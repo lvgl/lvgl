@@ -8,28 +8,6 @@
 
 #if 0 /*Remove this to enable the content*/
 
-/*=================
-   Basic setting
- *=================*/
-
-/* Horizontal and vertical resolution of the library.
- * Screen resolution multiplied by LV_DOWN_SCALE*/
-#define LV_HOR_RES          (320 * LV_DOWNSCALE)
-#define LV_VER_RES          (240 * LV_DOWNSCALE)
-
-/* Buffered rendering: >= LV_DOWNSCALE * LV_HOR_RES or 0 to disable buffering*/
-#define LV_VDB_SIZE         (LV_HOR_RES * LV_DOWNSCALE * 20)
-
-/* Anti-aliasing with downscaling everything
- * 1: disabled
- * 2: 2x anti-alias -> half size
- * 4: 4x anti-alias -> quarter size */
-#define LV_DOWNSCALE		1
-
-#define LV_UPSCALE_FONT	 0 /*Scale up fonts to compensate LV_DOWNSCALE*/
-#define LV_UPSCALE_MAP	 0 /*Scale up maps (e.g. images) elements to compensate LV_DOWNSCALE*/
-#define LV_UPSCALE_SYTLE 0 /*Scale up default styles to compensate LV_DOWNSCALE*/
-
 /*=====================
    Graphical settings
  *=====================*/
@@ -40,7 +18,7 @@
 #define LV_VER_RES          (320 * LV_DOWNSCALE)
 
 /* Buffered rendering: >= LV_DOWNSCALE * LV_HOR_RES or 0 to disable buffering*/
-#define LV_VDB_SIZE         (LV_HOR_RES * LV_DOWNSCALE * 20)
+#define LV_VDB_SIZE         (LV_HOR_RES * LV_VER_RES / 20)
 
 /* Anti-aliasing with downscaling everything
  * 1: disabled
