@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_conf.h"
 #if USE_LV_IMG != 0
 
 #include "lv_img.h"

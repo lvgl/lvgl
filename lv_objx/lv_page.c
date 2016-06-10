@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_conf.h"
 #if USE_LV_PAGE != 0
 
-#include "../../misc/math/math_base.h"
+#include "misc/math/math_base.h"
 #include "../lv_objx/lv_page.h"
 #include "../lv_objx/lv_rect.h"
 

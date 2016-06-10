@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include <lvgl/lv_misc/circ.h>
-#include "../../lv_conf.h"
+#include "lv_conf.h"
 
 #include <stdio.h>
 #include <stdbool.h>

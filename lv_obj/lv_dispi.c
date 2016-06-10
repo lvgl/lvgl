@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  ********************/
-#include "../../lv_conf.h"
+#include "lv_conf.h"
 
 #include "misc/os/ptask.h"
 #include "misc/math/math_base.h"
