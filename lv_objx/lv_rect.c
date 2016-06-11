@@ -67,14 +67,10 @@ lv_obj_t* lv_rect_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 
     lv_obj_set_design_f(new_obj_dp, lv_rect_design);
     lv_obj_set_signal_f(new_obj_dp, lv_rect_signal);
-    
+
     /*Init the new rectangle*/
     if(copy_dp == NULL) {
 		lv_obj_set_style(new_obj_dp, &lv_rects_def);
-    }
-    /*Copy 'copy_dp' if it is not NULL*/
-    else {
-		lv_obj_set_style(new_obj_dp, lv_obj_get_style(copy_dp));
     }
 
     return new_obj_dp;

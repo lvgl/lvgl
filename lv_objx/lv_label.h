@@ -27,7 +27,6 @@ typedef struct
 {
     font_types_t font;
     color_t color;
-    color_t bg_color;
     uint16_t letter_space;
     uint16_t line_space;
     uint8_t mid         :1;
