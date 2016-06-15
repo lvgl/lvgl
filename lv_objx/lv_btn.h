@@ -39,12 +39,6 @@ typedef struct
 	color_t mcolor[LV_BTN_STATE_NUM];
 	color_t gcolor[LV_BTN_STATE_NUM];
 	color_t bcolor[LV_BTN_STATE_NUM];
-	cord_t bwidth;
-	cord_t round;
-	opa_t bopa;
-	uint8_t empty;
-	cord_t hpad;
-	cord_t vpad;
 }lv_btns_t;
 
 typedef enum

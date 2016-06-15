@@ -32,7 +32,7 @@ typedef struct
 
 typedef struct
 {
-	color_t color;
+	lv_objs_t objs;
 	color_t bg_color;
 	uint16_t width;
 	opa_t bg_opa;

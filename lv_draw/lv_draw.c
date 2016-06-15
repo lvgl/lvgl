@@ -52,9 +52,9 @@ static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color
 
 
 static lv_rects_t lv_img_no_pic_rects = {
-  .mcolor = COLOR_BLACK, .gcolor = COLOR_BLACK,
+  .objs.color = COLOR_BLACK, .gcolor = COLOR_BLACK,
   .bcolor = COLOR_RED, .bwidth = 2 * LV_STYLE_MULT, .bopa = 100,
-  .round = 0, .empty = 0
+  .round = 0, .objs.empty = 0
 };
 
 static lv_labels_t lv_img_no_pic_labels = {
@@ -80,8 +80,7 @@ static lv_labels_t lv_img_no_pic_labels = {
 void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, 
                   const lv_rects_t * rects_p, opa_t opa)
 {
-    if(rects_p->empty == 0){
-
+    if(rects_p->objs.empty == 0){
         lv_draw_rect_main_mid(cords_p, mask_p, rects_p, opa);
 
         if(rects_p->round != 0) {
@@ -456,7 +455,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  draw_area.x2 = max(act_area.x1, act_area.x2);
 		  draw_area.y1 = min(act_area.y1, act_area.y2);
 		  draw_area.y2 = max(act_area.y1, act_area.y2);
-		  fill_fp(&draw_area, mask_p, lines_p->color, opa);
+		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	  }
 	  if (hor == false && last_x != act_point.x) {
 		  area_t act_area;
@@ -472,7 +471,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  draw_area.x2 = max(act_area.x1, act_area.x2);
 		  draw_area.y1 = min(act_area.y1, act_area.y2);
 		  draw_area.y2 = max(act_area.y1, act_area.y2);
-		  fill_fp(&draw_area, mask_p, lines_p->color, opa);
+		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	  }
 
 		/*Calc. the next point of the line*/
@@ -500,7 +499,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		draw_area.x2 = max(act_area.x1, act_area.x2);
 		draw_area.y1 = min(act_area.y1, act_area.y2);
 		draw_area.y2 = max(act_area.y1, act_area.y2);
-		fill_fp(&draw_area, mask_p, lines_p->color, opa);
+		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 	if (hor == false) {
 		area_t act_area;
@@ -514,7 +513,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		draw_area.x2 = max(act_area.x1, act_area.x2);
 		draw_area.y1 = min(act_area.y1, act_area.y2);
 		draw_area.y2 = max(act_area.y1, act_area.y2);
-		fill_fp(&draw_area, mask_p, lines_p->color, opa);
+		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 }
 
@@ -533,7 +532,7 @@ static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p,
 {
     uint16_t radius = rects_p->round;
 
-    color_t main_color = rects_p->mcolor;
+    color_t main_color = rects_p->objs.color;
     color_t grad_color = rects_p->gcolor;
     uint8_t mix;
     cord_t height = area_get_height(cords_p);
@@ -583,7 +582,7 @@ static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask
 {
     uint16_t radius = rects_p->round;
 
-    color_t main_color = rects_p->mcolor;
+    color_t main_color = rects_p->objs.color;
     color_t grad_color = rects_p->gcolor;
     color_t act_color;
     uint8_t mix;

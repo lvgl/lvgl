@@ -31,18 +31,18 @@ static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
  *  STATIC VARIABLES
  **********************/
 static lv_rects_t lv_rects_def =
-{ .mcolor = COLOR_MAKE(0x50, 0x70, 0x90), .gcolor = COLOR_MAKE(0x20, 0x40, 0x60),
+{ .objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .gcolor = COLOR_MAKE(0x20, 0x40, 0x60),
   .bcolor = COLOR_WHITE, .bwidth = 2 * LV_STYLE_MULT, .bopa = 50,
-  .round = 4 * LV_STYLE_MULT, .empty = 0,
+  .round = 4 * LV_STYLE_MULT, .objs.empty = 0,
   .hpad = 0, .vpad = 0 };
 
 static lv_rects_t lv_rects_transp =
-{ .bwidth = 0, .empty = 0,
+{ .bwidth = 0, .objs.empty = 0,
   .hpad = 0, .vpad = 0  };
 
 static lv_rects_t lv_rects_border =
 { .bcolor = COLOR_BLACK, .bwidth = 2 * LV_STYLE_MULT, .bopa = 100,
-  .round = 4 * LV_STYLE_MULT, .empty = 1,
+  .round = 4 * LV_STYLE_MULT, .objs.empty = 1,
   .hpad = 0, .vpad = 0};
 
 /**********************
@@ -265,7 +265,7 @@ static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
 {
     /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	if(LV_SA(obj_dp, lv_rects_t)->empty != 0) return false;
+    	if(LV_SA(obj_dp, lv_rects_t)->objs.empty != 0) return false;
 
     	uint16_t r = LV_SA(obj_dp, lv_rects_t)->round;
     	area_t area_tmp;
