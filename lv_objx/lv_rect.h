@@ -25,14 +25,13 @@
 
 typedef struct
 {
-    color_t mcolor;
+	lv_objs_t objs;
     color_t gcolor;
     color_t bcolor;
     uint16_t bwidth;
     cord_t hpad;
     cord_t vpad;
     uint8_t bopa;
-    uint8_t empty :1;
     uint16_t round;
 }lv_rects_t;
 

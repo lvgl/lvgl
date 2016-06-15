@@ -32,23 +32,23 @@ static void lv_page_sb_refresh(lv_obj_t* main_dp);
  **********************/
 static lv_pages_t lv_pages_def =
 {
-	.bg_rects.mcolor = COLOR_WHITE,
+	.bg_rects.objs.color = COLOR_WHITE,
 	.bg_rects.gcolor = COLOR_SILVER,
 	.bg_rects.bcolor = COLOR_GRAY,
 	.bg_rects.bopa = 50,
 	.bg_rects.bwidth = 0 * LV_STYLE_MULT,
 	.bg_rects.round = 2 * LV_STYLE_MULT,
-	.bg_rects.empty = 0,
+	.bg_rects.objs.empty = 0,
 	.bg_rects.hpad = 10,
 	.bg_rects.vpad = 10,
 
-	.sb_rects.mcolor = COLOR_BLACK,
+	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
 	.sb_rects.bcolor = COLOR_WHITE,
 	.sb_rects.bopa = 50,
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.empty = 0,
+	.sb_rects.objs.empty = 0,
 
 	.sb_width= 8 * LV_STYLE_MULT,
 	.sb_opa=50,
@@ -63,23 +63,23 @@ static lv_pages_t lv_pages_def =
 
 static lv_pages_t lv_pages_paper =
 {
-	.bg_rects.mcolor = COLOR_WHITE,
+	.bg_rects.objs.color = COLOR_WHITE,
 	.bg_rects.gcolor = COLOR_WHITE,
 	.bg_rects.bcolor = COLOR_GRAY,
 	.bg_rects.bopa = 100,
 	.bg_rects.bwidth = 2 * LV_STYLE_MULT,
 	.bg_rects.round = 0 * LV_STYLE_MULT,
-	.bg_rects.empty = 0,
+	.bg_rects.objs.empty = 0,
 	.bg_rects.hpad = 20 * LV_STYLE_MULT,
 	.bg_rects.vpad = 20 * LV_STYLE_MULT,
 
-	.sb_rects.mcolor = COLOR_BLACK,
+	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
 	.sb_rects.bcolor = COLOR_SILVER,
 	.sb_rects.bopa = 100,
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.empty = 0,
+	.sb_rects.objs.empty = 0,
 
 	.sb_width = 10 * LV_STYLE_MULT,
 	.sb_opa=50,
@@ -93,17 +93,17 @@ static lv_pages_t lv_pages_paper =
 
 static lv_pages_t lv_pages_transp =
 {
-	.bg_rects.empty = 1,
+	.bg_rects.objs.empty = 1,
 	.bg_rects.hpad = 1,
 	.bg_rects.vpad = 1,
 
-	.sb_rects.mcolor = COLOR_BLACK,
+	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
 	.sb_rects.bcolor = COLOR_WHITE,
 	.sb_rects.bopa = 0,
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.empty = 0,
+	.sb_rects.objs.empty = 0,
 
 	.sb_width = 8 * LV_STYLE_MULT,
 	.sb_opa = 50,

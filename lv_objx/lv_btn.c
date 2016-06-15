@@ -56,19 +56,19 @@ static lv_btns_t lv_btns_def =
 	.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
 	.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
 
-	.bwidth = 2 * LV_STYLE_MULT,
-	.bopa = 50,
-	.empty = 0,
-	.round = 4 * LV_STYLE_MULT,
-	.hpad = 10 * LV_STYLE_MULT,
-	.vpad = 15 * LV_STYLE_MULT,
+	.rects.bwidth = 2 * LV_STYLE_MULT,
+	.rects.bopa = 50,
+	.rects.objs.empty = 0,
+	.rects.round = 4 * LV_STYLE_MULT,
+	.rects.hpad = 10 * LV_STYLE_MULT,
+	.rects.vpad = 15 * LV_STYLE_MULT,
 };
 static lv_btns_t lv_btns_transp =
 {
-	.bwidth = 0,
-	.empty = 1,
-	.hpad = 10 * LV_STYLE_MULT,
-	.vpad = 15 * LV_STYLE_MULT,
+	.rects.bwidth = 0,
+	.rects.objs.empty = 1,
+	.rects.hpad = 10 * LV_STYLE_MULT,
+	.rects.vpad = 15 * LV_STYLE_MULT,
 };
 
 static lv_btns_t lv_btns_border =
@@ -78,12 +78,12 @@ static lv_btns_t lv_btns_border =
 	.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_BLACK,
 	.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_BLACK,
 	.bcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
-	.bwidth = 2 * LV_STYLE_MULT,
-	.empty = 1,
-	.bopa = 50,
-	.round = 4 * LV_STYLE_MULT,
-	.hpad = 10 * LV_STYLE_MULT,
-	.vpad = 15 * LV_STYLE_MULT,
+	.rects.bwidth = 2 * LV_STYLE_MULT,
+	.rects.objs.empty = 1,
+	.rects.bopa = 50,
+	.rects.round = 4 * LV_STYLE_MULT,
+	.rects.hpad = 10 * LV_STYLE_MULT,
+	.rects.vpad = 15 * LV_STYLE_MULT,
 };
 
 /**********************
@@ -417,17 +417,12 @@ static void lv_btn_style_load(lv_obj_t * obj_dp)
 {
     lv_btn_state_t state = lv_btn_get_state(obj_dp);
     lv_btns_t * btns_p = lv_obj_get_style(obj_dp);
+
     /*Init the style*/
     lv_rects_get(LV_RECTS_DEF, &btns_p->rects);
-    btns_p->rects.mcolor = btns_p->mcolor[state];
+    btns_p->rects.objs.color = btns_p->mcolor[state];
     btns_p->rects.gcolor = btns_p->gcolor[state];
     btns_p->rects.bcolor = btns_p->bcolor[state];
-    btns_p->rects.bwidth = btns_p->bwidth;
-    btns_p->rects.bopa = btns_p->bopa;
-    btns_p->rects.round = btns_p->round;
-    btns_p->rects.empty = btns_p->empty;
-    btns_p->rects.hpad= btns_p->hpad;
-    btns_p->rects.vpad= btns_p->vpad;
 }
 
 #endif

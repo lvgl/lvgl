@@ -38,13 +38,13 @@ static bool lv_line_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_lines_t lv_lines_def = { .width = 2 * LV_STYLE_MULT, .color = COLOR_RED, 
+static lv_lines_t lv_lines_def = { .width = 2 * LV_STYLE_MULT, .objs.color = COLOR_RED,
                                    .bg_color = COLOR_BLACK, .bg_opa = 0};
                                    
-static lv_lines_t lv_lines_decor = { .width = 1 * LV_STYLE_MULT, .color = COLOR_GRAY, 
+static lv_lines_t lv_lines_decor = { .width = 1 * LV_STYLE_MULT, .objs.color = COLOR_GRAY,
                                    .bg_color = COLOR_BLACK, .bg_opa = 0};
 
-static lv_lines_t lv_lines_chart = { .width = 3 * LV_STYLE_MULT, .color = COLOR_BLUE,
+static lv_lines_t lv_lines_chart = { .width = 3 * LV_STYLE_MULT, .objs.color = COLOR_BLUE,
                                      .bg_color = COLOR_BLACK, .bg_opa = 0};
 
 /**********************

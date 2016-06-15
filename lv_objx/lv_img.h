@@ -25,6 +25,7 @@
  **********************/
 typedef struct
 {
+	lv_objs_t objs;
     uint8_t transp_en :1;
 }lv_imgs_t;
 

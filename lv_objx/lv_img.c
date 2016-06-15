@@ -67,7 +67,6 @@ lv_obj_t* lv_img_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     lv_img_ext_t * img_ext_dp = lv_obj_get_ext(new_obj_dp);
 
     if(copy_dp == NULL) {
-
 		img_ext_dp->fn_dp = NULL;
 		img_ext_dp->w = lv_obj_get_width(new_obj_dp);
 		img_ext_dp->h = lv_obj_get_height(new_obj_dp);
