@@ -25,6 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_btn_style_load(lv_obj_t * obj_dp);
 
 /**********************
  *  STATIC VARIABLES
@@ -35,52 +36,54 @@ static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
  *-----------------*/
 static lv_btns_t lv_btns_def =
 {
-	.rel.mcolor = COLOR_MAKE(0x40, 0x60, 0x80), .rel.gcolor = COLOR_BLACK,
-	.rel.bcolor = COLOR_WHITE, .rel.bwidth = 2 * LV_STYLE_MULT, .rel.bopa = 50,
-	.rel.round = 4 * LV_STYLE_MULT, .rel.empty = 0,
+	.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80),
+	.gcolor[LV_BTN_STATE_REL] = COLOR_BLACK,
+	.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
 
-	.pr.mcolor = COLOR_MAKE(0x60, 0x80, 0xa0), .pr.gcolor = COLOR_MAKE(0x20, 0x30, 0x40),
-	.pr.bcolor = COLOR_WHITE, .pr.bwidth = 2 * LV_STYLE_MULT, .pr.bopa = 50,
-	.pr.round = 4 * LV_STYLE_MULT, .pr.empty = 0,
+	.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0),
+	.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40),
+	.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE,
 
-	.tgl_rel.mcolor = COLOR_MAKE(0x80,0x00,0x00), .tgl_rel.gcolor = COLOR_MAKE(0x20, 0x20, 0x20),
-	.tgl_rel.bcolor = COLOR_WHITE, .tgl_rel.bwidth = 2 * LV_STYLE_MULT, .tgl_rel.bopa = 50,
-	.tgl_rel.round = 4 * LV_STYLE_MULT, .tgl_rel.empty = 0,
+	.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x80,0x00,0x00),
+	.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x20, 0x20),
+	.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE,
 
-	.tgl_pr.mcolor = COLOR_MAKE(0xf0, 0x26, 0x26), .tgl_pr.gcolor = COLOR_MAKE(0x40, 0x40, 0x40),
-	.tgl_pr.bcolor = COLOR_WHITE, .tgl_pr.bwidth = 2 * LV_STYLE_MULT, .tgl_pr.bopa = 50,
-	.tgl_pr.round = 4 * LV_STYLE_MULT, .tgl_pr.empty = 0,
+	.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0xf0, 0x26, 0x26),
+	.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x40, 0x40),
+	.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE,
 
-	.ina.mcolor = COLOR_SILVER, .ina.gcolor = COLOR_GRAY,
-	.ina.bcolor = COLOR_WHITE, .ina.bwidth = 2 * LV_STYLE_MULT, .ina.bopa = 50,
-	.ina.round = 4 * LV_STYLE_MULT, .ina.empty = 0,
+	.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER,
+	.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
+	.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
+
+	.bwidth = 2 * LV_STYLE_MULT,
+	.bopa = 50,
+	.empty = 0,
+	.round = 4 * LV_STYLE_MULT,
+	.hpad = 10 * LV_STYLE_MULT,
+	.vpad = 15 * LV_STYLE_MULT,
 };
-
 static lv_btns_t lv_btns_transp =
 {
-	.rel.bwidth = 0, .rel.empty = 1, .rel.round = 0,
-	.pr.bwidth = 0, .pr.empty = 1, .rel.round = 0,
-	.tgl_rel.bwidth = 0, .tgl_rel.empty = 1, .rel.round = 0,
-	.tgl_pr.bwidth = 0, .tgl_pr.empty = 1, .rel.round = 0,
-	.ina.bwidth = 0, .ina.empty = 1, .rel.round = 0,
+	.bwidth = 0,
+	.empty = 1,
+	.hpad = 10 * LV_STYLE_MULT,
+	.vpad = 15 * LV_STYLE_MULT,
 };
 
 static lv_btns_t lv_btns_border =
 {
-	.rel.bcolor = COLOR_BLACK, .rel.bwidth = 2 * LV_STYLE_MULT, .rel.bopa = 100,
-	.rel.round = 4 * LV_STYLE_MULT, .rel.empty = 1,
-
-	.pr.bcolor = COLOR_GRAY, .pr.bwidth = 2 * LV_STYLE_MULT, .pr.bopa = 100,
-	.pr.round = 4 * LV_STYLE_MULT, .pr.empty = 1,
-
-	.tgl_rel.bcolor = COLOR_SILVER, .tgl_rel.bwidth = 2 * LV_STYLE_MULT, .tgl_rel.bopa = 100,
-	.tgl_rel.round = 4 * LV_STYLE_MULT, .tgl_rel.empty = 1,
-
-	.tgl_pr.bcolor = COLOR_GRAY, .tgl_pr.bwidth = 2 * LV_STYLE_MULT, .tgl_pr.bopa = 100,
-	.tgl_pr.round = 4 * LV_STYLE_MULT, .tgl_pr.empty = 1,
-
-	.ina.bcolor = COLOR_GRAY, .ina.bwidth = 2 * LV_STYLE_MULT, .ina.bopa = 100,
-	.ina.round = 4 * LV_STYLE_MULT, .ina.empty = 1,
+	.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK,
+	.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK,
+	.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_BLACK,
+	.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_BLACK,
+	.bcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
+	.bwidth = 2 * LV_STYLE_MULT,
+	.empty = 1,
+	.bopa = 50,
+	.round = 4 * LV_STYLE_MULT,
+	.hpad = 10 * LV_STYLE_MULT,
+	.vpad = 15 * LV_STYLE_MULT,
 };
 
 /**********************
@@ -101,7 +104,7 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 {
     lv_obj_t* new_obj;
     
-    new_obj = lv_obj_create(par_dp, copy_dp);
+    new_obj = lv_rect_create(par_dp, copy_dp);
     /*Allocate the extended data*/
     lv_obj_alloc_ext(new_obj, sizeof(lv_btn_ext_t));
     lv_obj_set_signal_f(new_obj, lv_btn_signal);
@@ -113,7 +116,7 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     /*If no copy do the basic initialization*/
     if(copy_dp == NULL)
     {
-		btn_ext_dp->state = LV_BTN_REL;
+		btn_ext_dp->state = LV_BTN_STATE_REL;
 		btn_ext_dp->pr_action = NULL;
 		btn_ext_dp->rel_action = NULL;
 		btn_ext_dp->lpr_action = NULL;
@@ -122,12 +125,12 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     }
     /*Copy 'copy_dp'*/
     else{
-    	lv_btn_ext_t * ori_btnd_dp = lv_obj_get_ext(copy_dp);
-    	btn_ext_dp->state = ori_btnd_dp->state;
-    	btn_ext_dp->pr_action = ori_btnd_dp->pr_action;
-    	btn_ext_dp->rel_action = ori_btnd_dp->rel_action;
-    	btn_ext_dp->lpr_action = ori_btnd_dp->lpr_action;
-    	btn_ext_dp->tgl = ori_btnd_dp->tgl;
+    	lv_btn_ext_t * ori_btn_ext = lv_obj_get_ext(copy_dp);
+    	btn_ext_dp->state = ori_btn_ext->state;
+    	btn_ext_dp->pr_action = ori_btn_ext->pr_action;
+    	btn_ext_dp->rel_action = ori_btn_ext->rel_action;
+    	btn_ext_dp->lpr_action = ori_btn_ext->lpr_action;
+    	btn_ext_dp->tgl = ori_btn_ext->tgl;
     }
     
     return new_obj;
@@ -143,8 +146,13 @@ bool lv_btn_signal(lv_obj_t * obj_dp, lv_signal_t sign, void* param)
 {   
     bool valid;
 
+    /*Be sure the  corresponding style is loaded*/
+    if(sign == LV_SIGNAL_STYLE_CHG) {
+    	lv_btn_style_load(obj_dp);
+    }
+
     /* Include the ancient signal function */
-    valid = lv_obj_signal(obj_dp, sign, param);
+    valid = lv_rect_signal(obj_dp, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -156,26 +164,26 @@ bool lv_btn_signal(lv_obj_t * obj_dp, lv_signal_t sign, void* param)
         switch (sign){
             case LV_SIGNAL_PRESSED:
                 /*Refresh the state*/
-                if(btn_ext_dp->state == LV_BTN_REL) {
-                    btn_ext_dp->state = LV_BTN_PR;
-                } else if(btn_ext_dp->state == LV_BTN_TGL_REL) {
-                    btn_ext_dp->state = LV_BTN_TGL_PR;
+                if(btn_ext_dp->state == LV_BTN_STATE_REL) {
+                	lv_btn_set_state(obj_dp, LV_BTN_STATE_PR);
+                } else if(btn_ext_dp->state == LV_BTN_STATE_TGL_REL) {
+                	lv_btn_set_state(obj_dp, LV_BTN_STATE_TGL_PR);
                 }
                 lv_obj_inv(obj_dp);
 
                 btn_ext_dp->lpr_exec = 0;
                 /*Call the press action, here 'param' is the caller dispi*/
-                if(btn_ext_dp->pr_action != NULL && state != LV_BTN_INA) {
+                if(btn_ext_dp->pr_action != NULL && state != LV_BTN_STATE_INA) {
                 	valid = btn_ext_dp->pr_action(obj_dp, param);
                 }
                 break;
 
             case LV_SIGNAL_PRESS_LOST:
                 /*Refresh the state*/
-                if(btn_ext_dp->state == LV_BTN_PR) {
-                    btn_ext_dp->state = LV_BTN_REL;
-                } else if(btn_ext_dp->state == LV_BTN_TGL_PR) {
-                    btn_ext_dp->state = LV_BTN_TGL_REL;
+                if(btn_ext_dp->state == LV_BTN_STATE_PR) {
+                	lv_btn_set_state(obj_dp, LV_BTN_STATE_REL);
+                } else if(btn_ext_dp->state == LV_BTN_STATE_TGL_PR) {
+                	lv_btn_set_state(obj_dp, LV_BTN_STATE_TGL_REL);
                 }
                 lv_obj_inv(obj_dp);
                 break;
@@ -184,25 +192,25 @@ bool lv_btn_signal(lv_obj_t * obj_dp, lv_signal_t sign, void* param)
                 /*If not dragged and it was not long press action then
                  *change state and run the action*/
                 if(lv_dispi_is_dragging(param) == false && btn_ext_dp->lpr_exec == 0) {
-                    if(btn_ext_dp->state == LV_BTN_PR && tgl == false) {
-                        btn_ext_dp->state = LV_BTN_REL;
-                    } else if(btn_ext_dp->state == LV_BTN_TGL_PR && tgl == false) {
-                        btn_ext_dp->state = LV_BTN_TGL_REL;
-                    } else if(btn_ext_dp->state == LV_BTN_PR && tgl == true) {
-                        btn_ext_dp->state = LV_BTN_TGL_REL;
-                    } else if(btn_ext_dp->state == LV_BTN_TGL_PR && tgl == true) {
-                        btn_ext_dp->state = LV_BTN_REL;
+                    if(btn_ext_dp->state == LV_BTN_STATE_PR && tgl == false) {
+                    	lv_btn_set_state(obj_dp, LV_BTN_STATE_REL);
+                    } else if(btn_ext_dp->state == LV_BTN_STATE_TGL_PR && tgl == false) {
+                    	lv_btn_set_state(obj_dp, LV_BTN_STATE_TGL_REL);
+                    } else if(btn_ext_dp->state == LV_BTN_STATE_PR && tgl == true) {
+                    	lv_btn_set_state(obj_dp, LV_BTN_STATE_TGL_REL);
+                    } else if(btn_ext_dp->state == LV_BTN_STATE_TGL_PR && tgl == true) {
+                    	lv_btn_set_state(obj_dp, LV_BTN_STATE_REL);
                     }
 
 
-                    if(btn_ext_dp->rel_action != NULL && state != LV_BTN_INA) {
+                    if(btn_ext_dp->rel_action != NULL && state != LV_BTN_STATE_INA) {
                     	valid = btn_ext_dp->rel_action(obj_dp, param);
                     }
                 } else { /*If dragged change back the state*/
-                    if(btn_ext_dp->state == LV_BTN_PR) {
-                        btn_ext_dp->state = LV_BTN_REL;
-                    } else if(btn_ext_dp->state == LV_BTN_TGL_PR) {
-                        btn_ext_dp->state = LV_BTN_TGL_REL;
+                    if(btn_ext_dp->state == LV_BTN_STATE_PR) {
+                        lv_btn_set_state(obj_dp, LV_BTN_STATE_REL);
+                    } else if(btn_ext_dp->state == LV_BTN_STATE_TGL_PR) {
+                    	lv_btn_set_state(obj_dp, LV_BTN_STATE_TGL_REL);
                     }
                 }
 
@@ -210,11 +218,15 @@ bool lv_btn_signal(lv_obj_t * obj_dp, lv_signal_t sign, void* param)
                 break;
             case LV_SIGNAL_LONG_PRESS:
                 /*Call the long press action, here 'param' is the caller dispi*/
-                if(btn_ext_dp->lpr_action != NULL && state != LV_BTN_INA) {
+                if(btn_ext_dp->lpr_action != NULL && state != LV_BTN_STATE_INA) {
                 	 btn_ext_dp->lpr_exec = 1;
                 	valid = btn_ext_dp->lpr_action(obj_dp, param);
                 }
                 break;
+            case LV_SIGNAL_STYLE_CHG:
+            	/*Load the currently active style*/
+            	lv_btn_style_load(obj_dp);
+            	break;
             default:
                 /*Do nothing*/
                 break;
@@ -250,6 +262,7 @@ void lv_btn_set_state(lv_obj_t* obj_dp, lv_btn_state_t state)
     lv_btn_ext_t * btn_p = lv_obj_get_ext(obj_dp);
     
     btn_p->state = state;
+	lv_btn_style_load(obj_dp);
     lv_obj_inv(obj_dp);
 }
 
@@ -364,38 +377,11 @@ lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy_p)
  */
 static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
 {
-
     lv_btns_t * btns_p = lv_obj_get_style(obj_dp);
-    lv_rects_t * rects_p;
-    switch(lv_btn_get_state(obj_dp)) {
-        case LV_BTN_REL:
-            rects_p = &btns_p->rel;
-            break;
-
-        case LV_BTN_PR:
-            rects_p = &btns_p->pr;
-            break;
-
-        case LV_BTN_TGL_PR:
-            rects_p = &btns_p->tgl_pr;
-            break;
-
-        case LV_BTN_TGL_REL:
-            rects_p = &btns_p->tgl_rel;
-            break;
-
-        case LV_BTN_INA:
-            rects_p = &btns_p->ina;
-            break;
-
-        default:
-            rects_p = &btns_p->rel;
-            break;
-    }
 
     /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	uint16_t r = rects_p->round;
+    	uint16_t r = btns_p->rects.round;
     	area_t area_tmp;
 
     	/*Check horizontally without radius*/
@@ -418,9 +404,30 @@ static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
     lv_obj_get_cords(obj_dp, &area);
 
     /*Draw the rectangle*/
-    lv_draw_rect(&area, mask_p, rects_p, opa);
+    lv_draw_rect(&area, mask_p, &btns_p->rects, opa);
     
     return true;
+}
+
+/**
+ * Load the corresponding style according to the state to 'rects' in 'lv_btns_t'
+ * @param obj_dp pointer to a button object
+ */
+static void lv_btn_style_load(lv_obj_t * obj_dp)
+{
+    lv_btn_state_t state = lv_btn_get_state(obj_dp);
+    lv_btns_t * btns_p = lv_obj_get_style(obj_dp);
+    /*Init the style*/
+    lv_rects_get(LV_RECTS_DEF, &btns_p->rects);
+    btns_p->rects.mcolor = btns_p->mcolor[state];
+    btns_p->rects.gcolor = btns_p->gcolor[state];
+    btns_p->rects.bcolor = btns_p->bcolor[state];
+    btns_p->rects.bwidth = btns_p->bwidth;
+    btns_p->rects.bopa = btns_p->bopa;
+    btns_p->rects.round = btns_p->round;
+    btns_p->rects.empty = btns_p->empty;
+    btns_p->rects.hpad= btns_p->hpad;
+    btns_p->rects.vpad= btns_p->vpad;
 }
 
 #endif

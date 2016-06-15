@@ -39,6 +39,8 @@ static lv_pages_t lv_pages_def =
 	.bg_rects.bwidth = 0 * LV_STYLE_MULT,
 	.bg_rects.round = 2 * LV_STYLE_MULT,
 	.bg_rects.empty = 0,
+	.bg_rects.hpad = 10,
+	.bg_rects.vpad = 10,
 
 	.sb_rects.mcolor = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -68,6 +70,8 @@ static lv_pages_t lv_pages_paper =
 	.bg_rects.bwidth = 2 * LV_STYLE_MULT,
 	.bg_rects.round = 0 * LV_STYLE_MULT,
 	.bg_rects.empty = 0,
+	.bg_rects.hpad = 20 * LV_STYLE_MULT,
+	.bg_rects.vpad = 20 * LV_STYLE_MULT,
 
 	.sb_rects.mcolor = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -85,12 +89,13 @@ static lv_pages_t lv_pages_paper =
 	.margin_ver = 15 * LV_STYLE_MULT,
 	.padding_hor = 10 * LV_STYLE_MULT,
 	.padding_ver = 10 * LV_STYLE_MULT,
-
 };
 
 static lv_pages_t lv_pages_transp =
 {
 	.bg_rects.empty = 1,
+	.bg_rects.hpad = 1,
+	.bg_rects.vpad = 1,
 
 	.sb_rects.mcolor = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -133,14 +138,14 @@ lv_obj_t* lv_page_create(lv_obj_t * par_dp, lv_obj_t * ori_dp)
     new_dp = lv_rect_create(par_dp, ori_dp);
     
     /*Init the new object*/
-    lv_page_t * page_p = lv_obj_alloc_ext(new_dp, sizeof(lv_page_t));
+    lv_page_ext_t * page_p = lv_obj_alloc_ext(new_dp, sizeof(lv_page_ext_t));
 
     /*Init the main rectangle if it is not copied*/
     if(ori_dp == NULL) {
-		lv_obj_set_size(new_dp, 100,200);
 		lv_obj_set_drag(new_dp, true);
 		lv_obj_set_drag_throw(new_dp, true);
 		lv_obj_set_style(new_dp, &lv_pages_def);
+		lv_rect_set_pad_en(new_dp, true, true);
     } else {
 		lv_obj_set_style(new_dp, lv_obj_get_style(ori_dp));
     }
@@ -198,10 +203,9 @@ bool lv_page_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param)
         bool refr_y = false;
         area_t page_cords;
         area_t par_cords;
-        lv_obj_t * i;
         
         lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
-        lv_page_t * page_ext_p = lv_obj_get_ext(obj_dp);
+        lv_page_ext_t * page_ext_p = lv_obj_get_ext(obj_dp);
         lv_pages_t * pages_p = lv_obj_get_style(obj_dp);
 
         switch(sign) {
@@ -268,36 +272,6 @@ bool lv_page_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param)
             	}
                 break;
                 
-            case LV_SIGNAL_CHILD_CHG:
-                page_cords.x1 = LV_CORD_MAX;
-                page_cords.y1 = LV_CORD_MAX;
-                page_cords.x2 = LV_CORD_MIN;
-                page_cords.y2 = LV_CORD_MIN;
-                
-                LL_READ(obj_dp->child_ll, i) {
-                    page_cords.x1 = min(page_cords.x1, i->cords.x1);
-                    page_cords.y1 = min(page_cords.y1, i->cords.y1);
-                    page_cords.x2 = max(page_cords.x2, i->cords.x2);
-                    page_cords.y2 = max(page_cords.y2, i->cords.y2);
-                }
-                
-                /*If the value is not the init value then the page has >=1 child.*/
-                if(page_cords.x1 != LV_CORD_MAX) {
-                	page_cords.x1 -= pages_p->padding_hor;
-                	page_cords.x2 += pages_p->padding_hor;
-                	page_cords.y1 -= pages_p->padding_ver;
-                	page_cords.y2 += pages_p->padding_ver;
-                    area_cpy(&obj_dp->cords, &page_cords);
-                    
-                    lv_obj_set_pos(obj_dp, lv_obj_get_x(obj_dp),
-                                           lv_obj_get_y(obj_dp));
-                } else {
-                    lv_obj_set_size(obj_dp, 10, 10);
-                }
-                
-                lv_obj_inv(par_dp);
-                
-                break;
             case LV_SIGNAL_STYLE_CHG:
 
             	/* Set the styles only if they are different else infinite loop
@@ -397,7 +371,7 @@ lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * to_copy)
  */
 static void lv_page_sb_refresh(lv_obj_t* page_dp)
 {
-    lv_page_t * page_p = lv_obj_get_ext(page_dp);
+    lv_page_ext_t * page_p = lv_obj_get_ext(page_dp);
     lv_pages_t * pages_p = lv_obj_get_style(page_dp);
     lv_obj_t* par_dp = lv_obj_get_parent(page_dp);
     cord_t size_tmp;

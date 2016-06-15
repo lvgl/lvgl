@@ -45,9 +45,10 @@ typedef struct
 
 typedef struct
 {
+	lv_rect_ext_t rect_exp;
     lv_obj_t* sbh_dp;  /*Horizontal scrollbar*/
     lv_obj_t* sbv_dp;  /*Vertical scrollbar*/
-}lv_page_t;
+}lv_page_ext_t;
 
 typedef enum
 {

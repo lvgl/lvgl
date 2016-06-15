@@ -15,8 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJ_DEF_LENGTH  80
-#define LV_OBJ_DEF_HEIGHT  60
 
 /**********************
  *      TYPEDEFS
@@ -111,6 +109,7 @@ void lv_obj_inv(lv_obj_t* obj_dp)
  */
 void lv_obj_refr_style(lv_obj_t* obj_dp)
 { 
+    lv_obj_inv(obj_dp);
     obj_dp->signal_f(obj_dp, LV_SIGNAL_STYLE_CHG, NULL);
     lv_obj_inv(obj_dp);
 
@@ -186,9 +185,9 @@ lv_obj_t* lv_obj_create(lv_obj_t* parent_dp, lv_obj_t * copy_dp)
         new_obj_dp->cords.x1 = parent_dp->cords.x1;
         new_obj_dp->cords.y1 = parent_dp->cords.y1;
         new_obj_dp->cords.x2 = parent_dp->cords.x1 +
-                                   LV_OBJ_DEF_LENGTH * LV_DOWNSCALE;
+                                   LV_OBJ_DEF_WIDTH;
         new_obj_dp->cords.y2 = parent_dp->cords.y1 +
-                                   LV_OBJ_DEF_HEIGHT * LV_DOWNSCALE;
+                                   LV_OBJ_DEF_HEIGHT;
 
         /*Set appearance*/
         new_obj_dp->style_p = lv_objs_get(LV_OBJS_DEF, NULL);
@@ -750,6 +749,7 @@ void lv_obj_set_style(lv_obj_t* obj_dp, void * style_p)
 
     obj_dp->style_p = style_p;
     obj_dp->signal_f(obj_dp, LV_SIGNAL_STYLE_CHG, NULL);
+    //obj_dp->signal_f(lv_obj_get_parent(obj_dp, )
     lv_obj_inv(obj_dp);
 }
 

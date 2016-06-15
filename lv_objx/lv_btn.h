@@ -25,20 +25,26 @@
 
 typedef enum
 {
-    LV_BTN_PR,
-    LV_BTN_REL,
-    LV_BTN_TGL_PR,
-    LV_BTN_TGL_REL,
-    LV_BTN_INA,
+    LV_BTN_STATE_PR,
+    LV_BTN_STATE_REL,
+    LV_BTN_STATE_TGL_PR,
+    LV_BTN_STATE_TGL_REL,
+    LV_BTN_STATE_INA,
+    LV_BTN_STATE_NUM,
 }lv_btn_state_t;
 
 typedef struct
 {
-    lv_rects_t rel;
-    lv_rects_t pr;
-    lv_rects_t tgl_rel;
-    lv_rects_t tgl_pr;
-    lv_rects_t ina;
+	lv_rects_t rects;	/*To be compatible with the ancestor*/
+	color_t mcolor[LV_BTN_STATE_NUM];
+	color_t gcolor[LV_BTN_STATE_NUM];
+	color_t bcolor[LV_BTN_STATE_NUM];
+	cord_t bwidth;
+	cord_t round;
+	opa_t bopa;
+	uint8_t empty;
+	cord_t hpad;
+	cord_t vpad;
 }lv_btns_t;
 
 typedef enum
@@ -50,6 +56,7 @@ typedef enum
 
 typedef struct
 {       
+	lv_rect_ext_t rect_ext;
     bool (*pr_action)(lv_obj_t*, lv_dispi_t *);
     bool  (*rel_action)(lv_obj_t*, lv_dispi_t *);
     bool (*lpr_action)(lv_obj_t*, lv_dispi_t *);

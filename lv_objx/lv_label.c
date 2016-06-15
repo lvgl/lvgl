@@ -207,6 +207,9 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
         lv_obj_set_width(obj_dp, longest_line);
     }
     
+    lv_obj_t * parent_dp = lv_obj_get_parent(obj_dp);
+    parent_dp->signal_f(parent_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
+
     lv_obj_inv(obj_dp);
 }
 

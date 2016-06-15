@@ -39,6 +39,9 @@
 #define LV_STYLE_MULT 1
 #endif
 
+#define LV_OBJ_DEF_WIDTH  (80 * LV_DOWNSCALE)
+#define LV_OBJ_DEF_HEIGHT  (60 * LV_DOWNSCALE)
+
 /**********************
  *      TYPEDEFS
  **********************/
