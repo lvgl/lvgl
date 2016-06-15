@@ -33,26 +33,26 @@ static bool lv_label_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_m
  **********************/
 static lv_labels_t lv_labels_def = {
   .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0x10, 0x18, 0x20),
-  .letter_space = 3 * LV_STYLE_MULT, .line_space =  3 * LV_STYLE_MULT,
-  .mid =  1, .auto_break = 0
+  .letter_space = 2 * LV_STYLE_MULT, .line_space =  2 * LV_STYLE_MULT,
+  .mid =  1
 };
 
 static lv_labels_t lv_labels_btn = {
   .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0xd0, 0xe0, 0xf0),
   .letter_space = 2 * LV_STYLE_MULT, .line_space =  2 * LV_STYLE_MULT,
-  .mid =  1, .auto_break = 0
+  .mid =  1,
 };
 
 static lv_labels_t lv_labels_title = {
   .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0x10, 0x20, 0x30),
   .letter_space = 4 * LV_STYLE_MULT, .line_space =  4 * LV_STYLE_MULT,
-  .mid =  0, .auto_break = 1
+  .mid =  0,
 };
 
 static lv_labels_t lv_labels_txt = {
   .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0x16, 0x23, 0x34),
   .letter_space = 1 * LV_STYLE_MULT, .line_space =  2 * LV_STYLE_MULT,
-  .mid =  0, .auto_break = 1
+  .mid =  0,
 };
 
 
@@ -81,7 +81,7 @@ lv_obj_t* lv_label_create(lv_obj_t* par_dp, lv_obj_t * ori_dp)
     lv_obj_alloc_ext(new_obj, sizeof(lv_label_ext_t));
     
     lv_label_ext_t * label_p = lv_obj_get_ext(new_obj);
-    label_p->txt = NULL;
+    label_p->txt_dp = NULL;
 
 	lv_obj_set_design_f(new_obj, lv_label_design);
 	lv_obj_set_signal_f(new_obj, lv_label_signal);
@@ -124,8 +124,8 @@ bool lv_label_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
         /*No signal handling*/
     	switch(sign) {
             case LV_SIGNAL_CLEANUP:
-                dm_free(label_p->txt);
-                label_p->txt = NULL;
+                dm_free(label_p->txt_dp);
+                label_p->txt_dp = NULL;
                 break;
             case LV_SIGNAL_STYLE_CHG:
             	lv_label_set_text(obj_dp, lv_label_get_text(obj_dp));
@@ -145,7 +145,7 @@ bool lv_label_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 /**
  * Set a new text for a label
  * @param obj_dp pointer to a label object
- * @param text '\0' terminated chacter string
+ * @param text '\0' terminated character string
  */
 void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
 {
@@ -153,15 +153,15 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
 
     lv_obj_inv(obj_dp);
     
-    lv_label_ext_t * label_p = lv_obj_get_ext(obj_dp);
+    lv_label_ext_t * ext_p = lv_obj_get_ext(obj_dp);
     uint32_t len = strlen(text) + 1;
 
-    if(label_p->txt != NULL && text != label_p->txt) {
-        dm_free(label_p->txt);
+    if(ext_p->txt_dp != NULL && text != ext_p->txt_dp) {
+        dm_free(ext_p->txt_dp);
     }
     
-    label_p->txt = dm_alloc(len);
-    strcpy(label_p->txt, text);
+    ext_p->txt_dp = dm_alloc(len);
+    strcpy(ext_p->txt_dp, text);
     
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
@@ -173,8 +173,8 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
     cord_t longest_line = 0;
     cord_t act_line_length;
     
-    /*If the auto-break is not enabled the set the max length to very big */
-    if(labels_p->auto_break == 0) {
+    /*If the fix width is not enabled the set the max length to very big */
+    if(ext_p->fixw == 0) {
         max_length = LV_CORD_MAX;
     }
     
@@ -185,8 +185,8 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
         new_height += letter_height;
         new_height += labels_p->line_space;
         
-        /*If no auto break then calc. the longest line */
-        if(labels_p->auto_break == false) {
+        /*If no fix width then calc. the longest line */
+        if(ext_p->fixw == false) {
           act_line_length = txt_get_length(&text[line_start], new_line_start - line_start,
                                            font_p, labels_p->letter_space);
           if(act_line_length > longest_line) {
@@ -202,8 +202,8 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
     
     lv_obj_set_height(obj_dp, new_height);
 
-    /*Refresh the length if no autobreak*/
-    if(labels_p->auto_break == 0) {
+    /*Refresh the length if no fix width*/
+    if(ext_p->fixw == 0) {
         lv_obj_set_width(obj_dp, longest_line);
     }
     
@@ -211,6 +211,17 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
     parent_dp->signal_f(parent_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
 
     lv_obj_inv(obj_dp);
+}
+
+/**
+ * Set the fix width attribute
+ * @param obj_dp pointer to a label object
+ * @param fixw true: enable fix width for the label
+ */
+void lv_label_set_fixw(lv_obj_t * obj_dp, bool fixw)
+{
+    lv_label_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+    ext_p->fixw = fixw == false ? 0 : 1;
 }
 
 /*=====================
@@ -226,7 +237,18 @@ const char * lv_label_get_text(lv_obj_t* obj_dp)
 {
     lv_label_ext_t * label_p = lv_obj_get_ext(obj_dp);
     
-    return label_p->txt;
+    return label_p->txt_dp;
+}
+
+/**
+ * Get the fix width attribute of a label
+ * @param obj_dp pointer to a label object
+ * @return true: fix width is enabled
+ */
+bool lv_label_get_fixw(lv_obj_t * obj_dp)
+{
+    lv_label_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+    return ext_p->fixw == 0 ? false: true;
 }
 
 /**

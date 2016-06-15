@@ -62,7 +62,7 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
             act_l += font_get_width(font_p, txt[i]);
             
             /*If the txt is too long then finish, this is the line end*/
-            if(act_l >= max_l) {
+            if(act_l > max_l) {
                 /*If already a break character is found, then break there*/
                 if(last_break != TXT_NO_BREAK_FOUND) {
                     i = last_break;
