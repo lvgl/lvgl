@@ -25,8 +25,8 @@
 
 typedef struct
 {
+	lv_objs_t objs;
     font_types_t font;
-    color_t color;
     uint16_t letter_space;
     uint16_t line_space;
     uint8_t mid         :1;

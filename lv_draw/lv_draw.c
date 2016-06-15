@@ -43,7 +43,7 @@ static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h);
 #if LV_VDB_SIZE != 0
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_vletter;
-static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp) = lv_vmap;
+static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, color_t recolor, opa_t recolor_opa) = lv_vmap;
 #else
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_rletter;
@@ -58,7 +58,7 @@ static lv_rects_t lv_img_no_pic_rects = {
 };
 
 static lv_labels_t lv_img_no_pic_labels = {
-  .font = LV_FONT_DEFAULT, .color = COLOR_WHITE,
+  .font = LV_FONT_DEFAULT, .objs.color = COLOR_WHITE,
   .letter_space = 1 * LV_STYLE_MULT, .line_space =  1 * LV_STYLE_MULT,
   .mid =  1,
 };
@@ -134,7 +134,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
     while(txt[line_start] != '\0') {
         /*Write all letter of a line*/
         for(i = line_start; i < line_end; i++) {
-        	letter_fp(&pos, mask_p, font_p, txt[i], labels_p->color, opa);
+        	letter_fp(&pos, mask_p, font_p, txt[i], labels_p->objs.color, opa);
             pos.x += font_get_width(font_p, txt[i]) + labels_p->letter_space;
         }
         /*Go to next line*/
@@ -163,78 +163,78 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
  * @param opa opacity of the image (0..255)
  */
 void lv_draw_img(const area_t * cords_p, const area_t * mask_p, 
-             const lv_imgs_t * imgs_p,  opa_t opa, const char * fn, const color_t * map_p)
+             const lv_imgs_t * imgs_p,  opa_t opa, const char * fn)
 {
-    
-    if(map_p != NULL) {
-        map_fp(cords_p, mask_p, map_p, opa, imgs_p->transp_en);
-    } else if(fn != NULL) {
-        fs_file_t file;
-        fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
-        if(res == FS_RES_OK) {
-            cord_t row;
-            color_t buf[LV_HOR_RES];
-            uint32_t br;
-            area_t act_area;
-            uint8_t ds_shift = 0;
-            uint8_t ds_num = 0;
-        #if LV_DOWNSCALE <= 1 || LV_UPSCALE_MAP == 0
-            ds_shift = 0;
-            ds_num = 1;
-        #elif LV_DOWNSCALE == 2
-            ds_shift = 1;
-            ds_num = 2;
-        #elif LV_DOWNSCALE == 4
-            ds_shift = 2;
-            ds_num = 4;
-        #else
-        #error "LV: not supported LV_DOWNSCALE value"
-        #endif
+	if(fn == NULL) {
+		lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
+		lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, "No data");
+	} else {
+		fs_file_t file;
+		fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
+		if(res == FS_RES_OK) {
+			cord_t row;
+			color_t buf[LV_HOR_RES];
+			uint32_t br;
+			area_t act_area;
+			uint8_t ds_shift = 0;
+			uint8_t ds_num = 0;
+		#if LV_DOWNSCALE <= 1 || LV_UPSCALE_MAP == 0
+			ds_shift = 0;
+			ds_num = 1;
+		#elif LV_DOWNSCALE == 2
+			ds_shift = 1;
+			ds_num = 2;
+		#elif LV_DOWNSCALE == 4
+			ds_shift = 2;
+			ds_num = 4;
+		#else
+		#error "LV: not supported LV_DOWNSCALE value"
+		#endif
 
 
-            area_t mask_sub;
-            bool union_ok;
-            union_ok = area_union(&mask_sub, mask_p, cords_p);
+			area_t mask_sub;
+			bool union_ok;
+			union_ok = area_union(&mask_sub, mask_p, cords_p);
 			if(union_ok == false) {
 				fs_close(&file);
 				return;
 			}
+			lv_img_raw_header_t header;
+			res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
 
-            uint32_t start_offset = sizeof(lv_img_raw_header_t);
+			uint32_t start_offset = 0;
 			start_offset += (area_get_width(cords_p) >> ds_shift) *
-					       ((mask_sub.y1 - cords_p->y1) >> ds_shift) * sizeof(color_t); /*First row*/
+						   ((mask_sub.y1 - cords_p->y1) >> ds_shift) * sizeof(color_t); /*First row*/
 			start_offset += ((mask_sub.x1 - cords_p->x1) >> ds_shift) * sizeof(color_t); /*First col*/
-            fs_seek(&file, start_offset);
+			fs_seek(&file, start_offset);
 
-            uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift)* sizeof(color_t);
+			uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift)* sizeof(color_t);
 			uint32_t next_row = (area_get_width(cords_p) >> ds_shift) * sizeof(color_t) - useful_data;
 
-            area_cpy(&act_area, &mask_sub);
-            act_area.y2 = act_area.y1 + ds_num - 1;
-            uint32_t act_pos;
+			area_cpy(&act_area, &mask_sub);
+			act_area.y2 = act_area.y1 + ds_num - 1;
+			uint32_t act_pos;
 
-            for(row = mask_sub.y1; row <= mask_sub.y2; row += ds_num) {
-            	res = fs_read(&file, buf, useful_data, &br);
-                map_fp(&act_area, &mask_sub, buf, opa, imgs_p->transp_en);
-                fs_tell(&file, &act_pos);
-                fs_seek(&file, act_pos + next_row);
-                act_area.y1 += ds_num;
-                act_area.y2 += ds_num;
-            }
+			for(row = mask_sub.y1; row <= mask_sub.y2; row += ds_num) {
+				res = fs_read(&file, buf, useful_data, &br);
+				map_fp(&act_area, &mask_sub, buf, opa, header.transp,
+								  imgs_p->objs.color, imgs_p->recolor_opa);
+				fs_tell(&file, &act_pos);
+				fs_seek(&file, act_pos + next_row);
+				act_area.y1 += ds_num;
+				act_area.y2 += ds_num;
+			}
 
-        }
-        fs_close(&file);
+		}
+		fs_close(&file);
 
-        if(res != FS_RES_OK) {
-            lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-            lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, fn);
-        }
-
-    } else {
-        lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-        lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, "No data");
-    }
+		if(res != FS_RES_OK) {
+			lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
+			lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, fn);
+		}
+	}
 }
+
 
 
 /**
@@ -248,158 +248,6 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p, 
                   const lv_lines_t * lines_p, opa_t opa)
 {
-
-	/*Draw circle*//*
-	point_t c1;
-	point_t c2;
-	cord_t ctmp1;
-	cord_t ctmp2;
-	area_t tmp_a;
-
-	circ_init(&c1, &ctmp1, lines_p->line_width);
-
-	cord_t dx = abs(p2->x - p1->x);
-	cord_t dy = abs(p2->y - p1->y);
-	uint16_t width;
-	uint16_t wcor;
-	opa = OPA_20;
-	static const uint8_t width_corr_array[] = {
-	            64, 64, 64, 64, 64, 64, 64, 64, 64, 65, 65, 65, 65, 65, 66, 66, 66, 66, 66,
-	            67, 67, 67, 68, 68, 68, 69, 69, 69, 70, 70, 71, 71, 72, 72, 72, 73, 73, 74,
-	            74, 75, 75, 76, 77, 77, 78, 78, 79, 79, 80, 81, 81, 82, 82, 83, 84, 84, 85,
-	            86, 86, 87, 88, 88, 89, 90, 91,
-	    };
-
-	wcor = (dy * LINE_WIDTH_CORR_BASE) / dx;
-	width = ((lines_p->line_width) *  LV_DOWNSCALE * width_corr_array[wcor]) >> LINE_WIDTH_CORR_SHIFT;
-
-	point_t e;
-	int32_t x_tmp = ((width*dy*dx)/(dx*dx+dy*dy));
-	e.x = p2->x + x_tmp;
-	e.y = p2->y - (x_tmp * dx)/dy;
-	area_t e_area;
-	e_area.x1 = e.x-3;
-	e_area.x2 = e.x+3;
-	e_area.y1 = e.y-3;
-	e_area.y2 = e.y+3;
-	lv_vfill(&e_area, mask_p, COLOR_GREEN, OPA_40);
-
-
-	color_t rnd_clr = {{130, 43, 99}};
-	uint16_t cnt = 0;
-	while(circ_cont(&c1)) {
-		area_set(&tmp_a, CIRC_OCT1_X(c1)+p2->x, CIRC_OCT1_Y(c1)+p2->y, CIRC_OCT1_X(c1)+p2->x, CIRC_OCT1_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, COLOR_BLUE, OPA_COVER);
-		area_set(&tmp_a, CIRC_OCT2_X(c1)+p2->x, CIRC_OCT2_Y(c1)+p2->y, CIRC_OCT2_X(c1)+p2->x, CIRC_OCT2_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, lines_p->color, opa);
-		area_set(&tmp_a, CIRC_OCT3_X(c1)+p2->x, CIRC_OCT3_Y(c1)+p2->y, CIRC_OCT3_X(c1)+p2->x, CIRC_OCT3_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, lines_p->color, opa);
-		area_set(&tmp_a, CIRC_OCT4_X(c1)+p2->x, CIRC_OCT4_Y(c1)+p2->y, CIRC_OCT4_X(c1)+p2->x, CIRC_OCT4_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, lines_p->color, opa);
-		area_set(&tmp_a, CIRC_OCT5_X(c1)+p2->x, CIRC_OCT5_Y(c1)+p2->y, CIRC_OCT5_X(c1)+p2->x, CIRC_OCT5_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, lines_p->color, opa);
-		area_set(&tmp_a, CIRC_OCT6_X(c1)+p2->x, CIRC_OCT6_Y(c1)+p2->y, CIRC_OCT6_X(c1)+p2->x, CIRC_OCT6_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, lines_p->color, opa);
-		area_set(&tmp_a, CIRC_OCT7_X(c1)+p2->x, CIRC_OCT7_Y(c1)+p2->y, CIRC_OCT7_X(c1)+p2->x, CIRC_OCT7_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, COLOR_PURPLE, OPA_COVER);
-		area_set(&tmp_a, CIRC_OCT8_X(c1)+p2->x, CIRC_OCT8_Y(c1)+p2->y, CIRC_OCT8_X(c1)+p2->x, CIRC_OCT8_Y(c1)+p2->y);
-		lv_vfill(&tmp_a, mask_p, lines_p->color, opa);
-
-
-		cord_t err = (dx > dy ? dx : -dy) / 2;
-		cord_t e2;
-		point_t act_point;
-		act_point.x = p1->x;
-		act_point.y = p1->y;
-
-		rnd_clr.full += 0x238993;
-
-		while(1){
-			//if(c1.y > 4) break;
-			area_t act_area;
-*/
-
-
-			/*if(act_point.x < p2->x + CIRC_OCT8_X(c1))
-			{
-				act_area.x1 = act_point.x;
-				act_area.x2 = act_point.x;
-				act_area.y1 = act_point.y - ((CIRC_OCT8_X(c1)*dy) - (CIRC_OCT8_Y(c1)*dx)) / (dx);
-				act_area.y2 = act_point.y - ((CIRC_OCT8_X(c1)*dy) - (CIRC_OCT8_Y(c1)*dx)) / (dx);// (dy * c1.x)/dx + CIRC_OCT8_Y(c1);
-				lv_vfill(&act_area, mask_p, COLOR_RED, OPA_50);
-			}*/
-/*
-			if(act_point.x < p2->x + CIRC_OCT1_X(c1)) {
-				act_area.x1 = act_point.x;
-				act_area.x2 = act_point.x;
-				act_area.y1 = act_point.y - (dy * c1.x)/dx + CIRC_OCT1_Y(c1);
-				act_area.y2 = act_point.y - (dy * c1.x)/dx + CIRC_OCT1_Y(c1);
-				lv_vfill(&act_area, mask_p, COLOR_RED, OPA_50);
-			}
-			if(act_point.x < p2->x + CIRC_OCT2_X(c1)) {
-				act_area.x1 = act_point.x;
-				act_area.x2 = act_point.x;
-				act_area.y1 = act_point.y - (dy * CIRC_OCT2_X(c1))/dx + CIRC_OCT2_Y(c1);
-				act_area.y2 = act_point.y - (dy * CIRC_OCT2_X(c1))/dx + CIRC_OCT2_Y(c1);
-				lv_vfill(&act_area, mask_p, COLOR_RED, OPA_50);
-			}
-
-			if(act_point.x < p2->x + CIRC_OCT3_X(c1)) {
-				act_area.x1 = act_point.x;
-				act_area.x2 = act_point.x;
-				act_area.y1 = act_point.y - (dy * CIRC_OCT3_X(c1))/dx + CIRC_OCT3_Y(c1);
-				act_area.y2 = act_point.y - (dy * CIRC_OCT3_X(c1))/dx + CIRC_OCT3_Y(c1);
-				lv_vfill(&act_area, mask_p, COLOR_RED, OPA_50);
-			}
-*//*
-			if(e.x > p2->x && e.x < p2->x + lines_p->line_width / 2 &&
-				act_point.x < p2->x + CIRC_OCT7_X(c1))
-			{
-				act_area.x1 = act_point.x;
-				act_area.x2 = act_point.x;
-				act_area.y1 = act_point.y - (dy * CIRC_OCT7_X(c1))/dx + CIRC_OCT7_Y(c1);
-				act_area.y2 = act_area.y1;
-				lv_vfill(&act_area, mask_p, COLOR_RED, OPA_50);
-
-			}*/
-/*
-			if(act_point.x < p2->x + CIRC_OCT7_X(c1)) {
-				act_area.x1 = act_point.x;
-				act_area.x2 = act_point.x;
-				act_area.y1 = act_point.y - (dy * CIRC_OCT7_X(c1))/dx + CIRC_OCT7_Y(c1);
-				act_area.y2 = act_point.y - (dy * CIRC_OCT7_X(c1))/dx + CIRC_OCT7_Y(c1);
-				lv_vfill(&act_area, mask_p, COLOR_RED, OPA_50);
-			}
-*/
-			//printf("hor x1:%d, y1:%d, x2:%d, y2:%d\n", act_area.x1, act_area.y1, act_area.x2, act_area.y2);
-			/*if (act_point.x == p2->x + c1.x)
-			{
-				printf("line end x%d, y%d\n", act_area.x1, act_area.y1);
-				cnt++;
-				if(cnt == 11) {
-					cnt++;
-					cnt--;
-				}
-				break;
-			}
-			e2 = err;
-			if (e2 >-dx) {
-				err -= dy;
-				act_point.x ++;
-			}
-			if (e2 < dy) {
-				err += dx;
-				act_point.y ++;
-			}
-		}
-
-
-		circ_next(&c1, &ctmp1);
-	}
-
-
-	  return;*/
-
 	if(lines_p->width == 0) return;
 
 	if(p1->x == p2->x && p1->y == p2->y) return;

@@ -156,6 +156,7 @@ lv_obj_t* lv_page_create(lv_obj_t * par_dp, lv_obj_t * ori_dp)
     page_p->sbh_dp = lv_rect_create(par_dp, NULL);
     lv_obj_set_height(page_p->sbh_dp, pages_p->sb_width);
     lv_obj_set_style(page_p->sbh_dp,  &pages_p->sb_rects);
+    lv_obj_set_click(page_p->sbh_dp, false);
     if(pages_p->sb_mode == LV_PAGE_SB_MODE_ON) {
     	lv_obj_set_opa(page_p->sbh_dp, (pages_p->sb_opa * OPA_COVER) / 100);
     } else {
@@ -166,6 +167,7 @@ lv_obj_t* lv_page_create(lv_obj_t * par_dp, lv_obj_t * ori_dp)
     page_p->sbv_dp =lv_rect_create(par_dp, NULL);
     lv_obj_set_width(page_p->sbv_dp, pages_p->sb_width);
     lv_obj_set_style(page_p->sbv_dp, &pages_p->sb_rects);
+    lv_obj_set_click(page_p->sbv_dp, false);
     if(lv_pages_def.sb_mode == LV_PAGE_SB_MODE_ON) {
     	lv_obj_set_opa(page_p->sbv_dp, (pages_p->sb_opa * OPA_COVER) / 100);
     } else {
@@ -299,7 +301,6 @@ bool lv_page_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param)
     }
     
     return obj_valid;
-    
 }
 
 /**
@@ -334,7 +335,7 @@ lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * to_copy)
 			style_p = &lv_pages_transp;
 			break;
 		default:
-			style_p = NULL;
+			style_p = &lv_pages_def;
 	}
 
 	if(to_copy != NULL) {

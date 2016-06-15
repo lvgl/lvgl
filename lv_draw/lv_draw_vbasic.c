@@ -146,7 +146,8 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
  * @param transp true: enable transparency of LV_IMG_COLOR_TRANSP color pixels
  */
 void lv_vmap(const area_t * cords_p, const area_t * mask_p, 
-             const color_t * map_p, opa_t opa, bool transp)
+             const color_t * map_p, opa_t opa, bool transp,
+			 color_t recolor, opa_t recolor_opa)
 {
     area_t masked_a;
     bool union_ok;
@@ -196,6 +197,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     cord_t row;
     cord_t col;
     color_t transp_color = LV_IMG_COLOR_TRANSP;
+    color_t color_tmp;
     cord_t map_i;
     map_p -= map_width; /*Compensate the first row % LV_DOWNSCALE*/
     for(row = masked_a.y1; row <= masked_a.y2; row++) {
@@ -203,9 +205,12 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
         map_i = masked_a.x1 >> ds_shift;
         map_i--; /*Compensate the first col % LV_DOWNSCALE*/
         for(col = masked_a.x1; col <= masked_a.x2; col++) {
-           if(col % LV_DOWNSCALE == 0) map_i++;
+           if(col % LV_DOWNSCALE == 0) {
+        	   map_i++;
+			   color_tmp = color_mix(recolor, map_p[map_i], recolor_opa);
+           }
            if(transp == false || map_p[map_i].full != transp_color.full) {
-               vdb_buf_tmp[col] = color_mix(map_p[map_i], vdb_buf_tmp[col], opa);
+               vdb_buf_tmp[col] = color_mix(color_tmp, vdb_buf_tmp[col], opa);
            }
         }
         vdb_buf_tmp += vdb_width;        /*Next row on the VDB*/
@@ -232,32 +237,70 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
                 vdb_buf_tmp += vdb_width;        /*Next row on the VDB*/
             }
         }
+
+        /*To recolor draw simply a rectangle above the image*/
+#if LV_VDB_SIZE != 0
+        lv_vfill(cords_p, mask_p, recolor, recolor_opa);
+#endif
+
     } else { /*transp == true: Check all pixels */
         cord_t row;
         cord_t col;
         color_t transp_color = LV_IMG_COLOR_TRANSP;
-        if(opa == OPA_COVER)  { /*no opa */
-            for(row = masked_a.y1; row <= masked_a.y2; row++) {
-               for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-                   if(map_p[col].full != transp_color.full) {
-                       vdb_buf_tmp[col] = map_p[col];
-                   }
-               }
 
-               map_p += map_width; /*Next row on the map*/
-               vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/   
-           }           
-        } else {
-            for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-                    if(map_p[col].full != transp_color.full) {
-                        vdb_buf_tmp[col] = color_mix( map_p[col], vdb_buf_tmp[col], opa);
-                    }
-                }
+        if(recolor_opa == OPA_TRANSP)/*No recolor*/
+        {
+			if(opa == OPA_COVER)  { /*no opa */
+				for(row = masked_a.y1; row <= masked_a.y2; row++) {
+				   for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+					   if(map_p[col].full != transp_color.full) {
+						   vdb_buf_tmp[col] = map_p[col];
+					   }
+				   }
 
-                map_p += map_width; /*Next row on the map*/
-                vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/   
-            }
+				   map_p += map_width; /*Next row on the map*/
+				   vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+			   }
+			} else {
+				for(row = masked_a.y1; row <= masked_a.y2; row++) {
+					for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+						if(map_p[col].full != transp_color.full) {
+							vdb_buf_tmp[col] = color_mix( map_p[col], vdb_buf_tmp[col], opa);
+						}
+					}
+
+					map_p += map_width; /*Next row on the map*/
+					vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+				}
+			}
+        } else { /*Recolor needed*/
+            color_t color_tmp;
+        	if(opa == OPA_COVER)  { /*no opa */
+				for(row = masked_a.y1; row <= masked_a.y2; row++) {
+				   for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+					   if(map_p[col].full != transp_color.full) {
+						   color_tmp = color_mix(recolor, map_p[col], recolor_opa);
+						   vdb_buf_tmp[col] = color_tmp;
+					   }
+				   }
+
+				   map_p += map_width; /*Next row on the map*/
+				   vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+			   }
+			} else {
+				for(row = masked_a.y1; row <= masked_a.y2; row++) {
+					for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+						if(map_p[col].full != transp_color.full) {
+						    color_tmp = color_mix(recolor, map_p[col], recolor_opa);
+							vdb_buf_tmp[col] = color_mix(color_tmp, vdb_buf_tmp[col], opa);
+						}
+					}
+
+					map_p += map_width; /*Next row on the map*/
+					vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+				}
+			}
+
         }
     }
 #endif /*No upscale and no downscale*/
@@ -347,4 +390,9 @@ static bool lv_vletter_get_px(const font_t * font_p, uint8_t letter, cord_t x, c
 	if((map_byte & (1 << col_sub)) == 0) return false;
 	else return true;
 }
+
 #endif
+
+
+
+

@@ -229,7 +229,7 @@ lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy_p)
 			style_p = &lv_rects_transp;
 			break;
 		default:
-			style_p = NULL;
+			style_p = &lv_rects_def;
 	}
 
 	if(copy_p != NULL) {

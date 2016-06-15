@@ -110,7 +110,8 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
  * @param transp true: enable transparency of LV_IMG_COLOR_TRANSP color pixels
  */
 void lv_rmap(const area_t * cords_p, const area_t * mask_p,
-             const color_t * map_p, opa_t opa, bool transp)
+             const color_t * map_p, opa_t opa, bool transp,
+			 color_t recolor, color_t recolor_opa)
 {
     area_t masked_a;
     bool union_ok;

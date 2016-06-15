@@ -351,7 +351,7 @@ lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy_p)
 			style_p = &lv_btns_border;
 			break;
 		default:
-			style_p = NULL;
+			style_p = &lv_btns_def;
 	}
 
 	if(copy_p != NULL) {

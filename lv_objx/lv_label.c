@@ -32,25 +32,25 @@ static bool lv_label_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_m
  *  STATIC VARIABLES
  **********************/
 static lv_labels_t lv_labels_def = {
-  .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0x10, 0x18, 0x20),
+  .font = LV_FONT_DEFAULT, .objs.color = COLOR_MAKE(0x10, 0x18, 0x20),
   .letter_space = 2 * LV_STYLE_MULT, .line_space =  2 * LV_STYLE_MULT,
   .mid =  1
 };
 
 static lv_labels_t lv_labels_btn = {
-  .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0xd0, 0xe0, 0xf0),
+  .font = LV_FONT_DEFAULT, .objs.color = COLOR_MAKE(0xd0, 0xe0, 0xf0),
   .letter_space = 2 * LV_STYLE_MULT, .line_space =  2 * LV_STYLE_MULT,
   .mid =  1,
 };
 
 static lv_labels_t lv_labels_title = {
-  .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0x10, 0x20, 0x30),
+  .font = LV_FONT_DEFAULT, .objs.color = COLOR_MAKE(0x10, 0x20, 0x30),
   .letter_space = 4 * LV_STYLE_MULT, .line_space =  4 * LV_STYLE_MULT,
   .mid =  0,
 };
 
 static lv_labels_t lv_labels_txt = {
-  .font = LV_FONT_DEFAULT, .color = COLOR_MAKE(0x16, 0x23, 0x34),
+  .font = LV_FONT_DEFAULT, .objs.color = COLOR_MAKE(0x16, 0x23, 0x34),
   .letter_space = 1 * LV_STYLE_MULT, .line_space =  2 * LV_STYLE_MULT,
   .mid =  0,
 };
@@ -274,7 +274,7 @@ lv_labels_t * lv_labels_get(lv_labels_builtin_t style, lv_labels_t * copy_p)
 			style_p = &lv_labels_title;
 			break;
 		default:
-			style_p = NULL;
+			style_p = &lv_labels_def;
 	}
 
 	if(copy_p != NULL) {
