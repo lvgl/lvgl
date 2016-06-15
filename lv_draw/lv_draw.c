@@ -60,8 +60,7 @@ static lv_rects_t lv_img_no_pic_rects = {
 static lv_labels_t lv_img_no_pic_labels = {
   .font = LV_FONT_DEFAULT, .color = COLOR_WHITE,
   .letter_space = 1 * LV_STYLE_MULT, .line_space =  1 * LV_STYLE_MULT,
-  .mid =  1, .auto_break = 1
-
+  .mid =  1,
 };
 
 /**********************
@@ -113,16 +112,11 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
     const font_t * font_p = font_get(labels_p->font);
 
     cord_t w = area_get_width(cords_p);
-    cord_t max_w = w;
-    /*If the auto-break is not enabled the set the max length to very big */
-    if(labels_p->auto_break == 0) {
-        max_w = LV_CORD_MAX;
-    }
 
     /*Init variables for the first line*/
     cord_t line_length = 0;
     uint32_t line_start = 0;
-    uint32_t line_end = txt_get_next_line(txt, font_p, labels_p->letter_space, max_w);
+    uint32_t line_end = txt_get_next_line(txt, font_p, labels_p->letter_space, w);
 
     point_t pos;
     pos.x = cords_p->x1;
@@ -146,7 +140,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
         }
         /*Go to next line*/
         line_start = line_end;
-        line_end += txt_get_next_line(&txt[line_start], font_p, labels_p->letter_space, max_w);
+        line_end += txt_get_next_line(&txt[line_start], font_p, labels_p->letter_space, w);
 
         pos.x = cords_p->x1;
         /*Align to middle*/
