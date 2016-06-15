@@ -30,7 +30,8 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
                      const font_t * font_p, uint8_t letter,
                      color_t color, opa_t opa);
 void lv_rmap(const area_t * cords_p, const area_t * mask_p,
-             const color_t * map_p, opa_t opa, bool transp);
+             const color_t * map_p, opa_t opa, bool transp,
+			 color_t recolor, color_t recolor_opa);
 /**********************
  *      MACROS
  **********************/

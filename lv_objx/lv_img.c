@@ -33,8 +33,9 @@ static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
 /*----------------- 
  * Style definition
  *-----------------*/
-static lv_imgs_t lv_imgs_def = {.transp_en = 0};
-static lv_imgs_t lv_imgs_transp = {.transp_en = 1};
+static lv_imgs_t lv_imgs_def = {.recolor_opa=OPA_TRANSP};
+static lv_imgs_t lv_imgs_light = {.objs.color = COLOR_WHITE, .recolor_opa=OPA_50};
+static lv_imgs_t lv_imgs_dark = {.objs.color = COLOR_BLACK, .recolor_opa=OPA_50};
 
 /**********************
  *      MACROS
@@ -129,11 +130,14 @@ lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy_p)
 		case LV_IMGS_DEF:
 			style_p = &lv_imgs_def;
 			break;
-		case LV_IMGS_TRANSP:
-			style_p = &lv_imgs_transp;
+		case LV_IMGS_LIGHT:
+			style_p = &lv_imgs_light;
+			break;
+		case LV_IMGS_DARK:
+			style_p = &lv_imgs_dark;
 			break;
 		default:
-			style_p = NULL;
+			style_p = &lv_imgs_def;
 	}
 
 	if(copy_p != NULL) {
@@ -252,9 +256,10 @@ bool lv_img_get_auto_size(lv_obj_t* obj_dp)
  */
 static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
 {
+    lv_imgs_t * imgs_p = lv_obj_get_style(obj_dp);
+
     if(mode == LV_DESIGN_COVER_CHK) {
-        lv_imgs_t * imgs_p = lv_obj_get_style(obj_dp);
-        if(imgs_p->transp_en == 0) {
+        if(imgs_p->objs.empty == 0) {
         	bool cover;
         	cover = area_is_in(mask_p, &obj_dp->cords);
         	return cover;
@@ -276,10 +281,9 @@ static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
 		cords_tmp.x1 = cords.x1;
 		cords_tmp.x2 = cords.x1 + img_ext_p->w - 1;
 		for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += img_ext_p->w, cords_tmp.x2 += img_ext_p->w) {
-			lv_draw_img(&cords_tmp, mask_p, lv_obj_get_style(obj_dp),opa, img_ext_p->fn_dp, NULL);
+			lv_draw_img(&cords_tmp, mask_p, lv_obj_get_style(obj_dp),opa, img_ext_p->fn_dp);
 		}
 	}
-    
     return true;
 }
 

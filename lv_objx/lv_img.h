@@ -26,7 +26,7 @@
 typedef struct
 {
 	lv_objs_t objs;
-    uint8_t transp_en :1;
+	opa_t recolor_opa;
 }lv_imgs_t;
 
 typedef struct
@@ -34,21 +34,22 @@ typedef struct
     char* fn_dp;
     cord_t w;
     cord_t h;
-    uint8_t auto_size 	  :1;
+    uint8_t auto_size 	:1;
 }lv_img_ext_t;
 
 typedef enum
 {
 	LV_IMGS_DEF,
-	LV_IMGS_TRANSP
+	LV_IMGS_LIGHT,
+	LV_IMGS_DARK,
 }lv_imgs_builtin_t;
 
 typedef struct
 {
 	uint16_t w;
 	uint16_t h;
-	uint16_t res1;
-	uint16_t res2;
+	uint16_t cd;		/*Color depth*/
+	uint16_t transp :1;	/*Do not draw LV_IMG_TRANSP_COLOR pixels*/
 }lv_img_raw_header_t;
 
 

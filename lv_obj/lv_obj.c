@@ -34,11 +34,10 @@ lv_obj_t* def_scr_dp = NULL;
 lv_obj_t* act_scr_dp = NULL;
 ll_dsc_t scr_ll;
 
-lv_objs_t lv_objs_def = {.color = COLOR_GRAY, .empty = 0, .auto_color = 1};
-lv_objs_t lv_objs_color = {.color = COLOR_RED, .empty = 0, .auto_color = 0};
-lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .empty = 0, .auto_color = 0};
-lv_objs_t lv_objs_empty = {.color = COLOR_GRAY, .empty = 1, .auto_color = 0};
-lv_objs_t lv_objs_autocolor = {.color = COLOR_GRAY, .empty = 0, .auto_color = 1};
+lv_objs_t lv_objs_def = {.color = COLOR_GRAY, .empty = 0};
+lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .empty = 0};
+lv_objs_t lv_objs_color = {.color = COLOR_RED, .empty = 0};
+lv_objs_t lv_objs_empty = {.color = COLOR_GRAY, .empty = 1};
 
 /**********************
  *      MACROS
@@ -335,9 +334,6 @@ lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
 			break;
 		case LV_OBJS_EMPTY:
 			style_p = &lv_objs_empty;
-			break;
-		case LV_OBJS_AUTOCOLOR:
-			style_p = &lv_objs_autocolor;
 			break;
 		default:
 			style_p = NULL;
@@ -1242,29 +1238,6 @@ static bool lv_obj_design(lv_obj_t* obj_dp, const  area_t * mask_p, lv_design_mo
     
     opa_t opa = lv_obj_get_opa(obj_dp);
     color_t color = objs_p->color;
-
-    /*Calculate the color*/
-    if(objs_p->auto_color != 0) {
-		lv_obj_t* par_dp = lv_obj_get_parent(obj_dp);
-
-		if(par_dp == NULL) {             /*If it is a screen use the default color*/
-			color = LV_OBJ_DEF_SCR_COLOR;
-		} else {                        /*Add a random color on every level*/
-			color = COLOR_WHITE;
-			while(par_dp != NULL) {
-#if COLOR_DEPTH == 1
-				color.full ++;
-#elif COLOR_DEPTH == 8
-				color.full += 0x52;
-#elif COLOR_DEPTH == 16
-				color.full += 0xA953;
-#elif COLOR_DEPTH == 24
-				color.full +=0x2963A9;
-#endif
-				par_dp = lv_obj_get_parent(par_dp);
-			}
-		}
-    }
 
     /*Simply draw a rectangle*/
 #if LV_VDB_SIZE == 0

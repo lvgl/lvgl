@@ -80,8 +80,8 @@ typedef struct __LV_OBJ_T
     area_t cords;
     
     /*Basic appearance*/
-    opa_t opa;       
-    
+    opa_t opa;
+
     /*Attributes and states*/
     uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
     uint8_t drag_en      :1;    /*1: enable the dragging*/
@@ -134,7 +134,6 @@ typedef struct
 {
 	color_t color;
 	uint8_t empty		:1;
-	uint8_t auto_color	:1;
 }lv_objs_t;
 
 typedef enum
@@ -143,7 +142,6 @@ typedef enum
 	LV_OBJS_COLOR,
 	LV_OBJS_SCR,
 	LV_OBJS_EMPTY,
-	LV_OBJS_AUTOCOLOR,
 }lv_objs_builtin_t;
 
 /**********************
