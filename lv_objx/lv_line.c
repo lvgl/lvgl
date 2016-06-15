@@ -67,16 +67,17 @@ lv_obj_t* lv_line_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     dm_assert(new_obj_dp);
 
     /*Extend the basic object to rectangle object*/
-    lv_line_t *line_ext_p = lv_obj_alloc_ext(new_obj_dp, sizeof(lv_line_t));
+    lv_line_ext_t *ext_p = lv_obj_alloc_ext(new_obj_dp, sizeof(lv_line_ext_t));
     lv_obj_set_design_f(new_obj_dp, lv_line_design);
     lv_obj_set_signal_f(new_obj_dp, lv_line_signal);
 
     /*Init the new rectangle*/
     if(copy_dp == NULL) {
-		line_ext_p->point_num = 0;
-		line_ext_p->point_p = NULL;
-		line_ext_p->auto_size = 1;
-		line_ext_p->y_inv = 0;
+		ext_p->point_num = 0;
+		ext_p->point_p = NULL;
+		ext_p->auto_size = 1;
+		ext_p->y_inv = 0;
+		ext_p->upscale = 1;
 	    lv_obj_set_style(new_obj_dp, &lv_lines_def);
     }
     /*Copy 'copy_p' is not NULL*/
@@ -84,8 +85,9 @@ lv_obj_t* lv_line_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     	lv_line_set_auto_size(new_obj_dp,lv_line_get_auto_size(copy_dp));
     	lv_line_set_y_inv(new_obj_dp,lv_line_get_y_inv(copy_dp));
     	lv_line_set_auto_size(new_obj_dp,lv_line_get_auto_size(copy_dp));
-    	lv_line_set_points(new_obj_dp, LV_EA(copy_dp, lv_line_t)->point_p,
-    								   LV_EA(copy_dp, lv_line_t)->point_num);
+    	lv_line_set_upscale(new_obj_dp,lv_line_get_upscale(copy_dp));
+    	lv_line_set_points(new_obj_dp, LV_EA(copy_dp, lv_line_ext_t)->point_p,
+    								   LV_EA(copy_dp, lv_line_ext_t)->point_num);
     }
 
 
@@ -130,17 +132,22 @@ bool lv_line_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
  */
 void lv_line_set_points(lv_obj_t* obj_dp, const point_t * point_a, uint16_t point_num)
 {
-	lv_line_t * line_p = lv_obj_get_ext(obj_dp);
-	line_p->point_p = point_a;
-	line_p->point_num = point_num;
+	lv_line_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+	ext_p->point_p = point_a;
+	ext_p->point_num = point_num;
 
-	if(point_num > 0 && line_p->auto_size != 0) {
+	uint8_t us = 1;
+	if(ext_p->upscale != 0) {
+		us = LV_DOWNSCALE;
+	}
+
+	if(point_num > 0 && ext_p->auto_size != 0) {
 		uint16_t i;
 		cord_t xmax = LV_CORD_MIN;
 		cord_t ymax = LV_CORD_MIN;
 		for(i = 0; i < point_num; i++) {
-			xmax = max(point_a[i].x, xmax);
-			ymax = max(point_a[i].y, ymax);
+			xmax = max(point_a[i].x * us, xmax);
+			ymax = max(point_a[i].y * us, ymax);
 		}
 
 		lv_lines_t * lines_p = lv_obj_get_style(obj_dp);
@@ -156,7 +163,7 @@ void lv_line_set_points(lv_obj_t* obj_dp, const point_t * point_a, uint16_t poin
  */
 void lv_line_set_auto_size(lv_obj_t * obj_dp, bool en)
 {
-	lv_line_t * line_p = lv_obj_get_ext(obj_dp);
+	lv_line_ext_t * line_p = lv_obj_get_ext(obj_dp);
 
 	line_p->auto_size = en == false ? 0 : 1;
 
@@ -175,11 +182,26 @@ void lv_line_set_auto_size(lv_obj_t * obj_dp, bool en)
  */
 void lv_line_set_y_inv(lv_obj_t * obj_dp, bool en)
 {
-	lv_line_t * line_p = lv_obj_get_ext(obj_dp);
+	lv_line_ext_t * line_p = lv_obj_get_ext(obj_dp);
 
 	line_p->y_inv = en == false ? 0 : 1;
 
 	lv_obj_inv(obj_dp);
+}
+
+/**
+ * Enable (or disable) the point coordinate upscaling (compensate LV_DOWNSCALE).
+ * @param obj_dp pointer to a line object
+ * @param en true: enable the point coordinate upscaling
+ */
+void lv_line_set_upscale(lv_obj_t * obj_dp, bool en)
+{
+	lv_line_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+
+	ext_p->upscale = en == false ? 0 : 1;
+
+	/*Refresh to point to handle auto size*/
+	lv_line_set_points(obj_dp, ext_p->point_p, ext_p->point_num);
 }
 
 /*=====================
@@ -193,7 +215,7 @@ void lv_line_set_y_inv(lv_obj_t * obj_dp, bool en)
  */
 bool lv_line_get_auto_size(lv_obj_t * obj_dp)
 {
-	lv_line_t * line_p = lv_obj_get_ext(obj_dp);
+	lv_line_ext_t * line_p = lv_obj_get_ext(obj_dp);
 
 	return line_p->auto_size == 0 ? false : true;
 }
@@ -205,9 +227,21 @@ bool lv_line_get_auto_size(lv_obj_t * obj_dp)
  */
 bool lv_line_get_y_inv(lv_obj_t * obj_dp)
 {
-	lv_line_t * line_p = lv_obj_get_ext(obj_dp);
+	lv_line_ext_t * line_p = lv_obj_get_ext(obj_dp);
 
 	return line_p->y_inv == 0 ? false : true;
+}
+
+/**
+ * Get the point upscale enable attribute
+ * @param obj_dp pointer to a line object
+ * @return true: point coordinate upscale is enabled, false: disabled
+ */
+bool lv_line_get_upscale(lv_obj_t * obj_dp)
+{
+	lv_line_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+
+	return ext_p->upscale == 0 ? false : true;
 }
 
 /**
@@ -259,9 +293,9 @@ static bool lv_line_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
     /*A line never covers an area*/
     if(mode == LV_DESIGN_COVER_CHK) return false;
     
-	lv_line_t * line_p = lv_obj_get_ext(obj_dp);
+	lv_line_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 
-	if(line_p->point_num == 0 || line_p->point_p == NULL) return false;
+	if(ext_p->point_num == 0 || ext_p->point_p == NULL) return false;
 
 	lv_lines_t * lines_p = lv_obj_get_style(obj_dp);
 	if(lines_p->bg_opa != 0) {
@@ -280,18 +314,23 @@ static bool lv_line_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
 	point_t p2;
 	cord_t h = lv_obj_get_height(obj_dp);
 	uint16_t i;
+	uint8_t us = 1;
+	if(ext_p->upscale != 0) {
+		us = LV_DOWNSCALE;
+	}
 
 	/*Read all pints and draw the lines*/
-	for (i = 0; i < line_p->point_num - 1; i++) {
-		p1.x = line_p->point_p[i].x + x_ofs;
-		p2.x = line_p->point_p[i + 1].x + x_ofs;
+	for (i = 0; i < ext_p->point_num - 1; i++) {
 
-		if(line_p->y_inv == 0) {
-			p1.y = line_p->point_p[i].y + y_ofs;
-			p2.y = line_p->point_p[i + 1].y + y_ofs;
+		p1.x = ext_p->point_p[i].x * us + x_ofs;
+		p2.x = ext_p->point_p[i + 1].x * us + x_ofs;
+
+		if(ext_p->y_inv == 0) {
+			p1.y = ext_p->point_p[i].y * us + y_ofs;
+			p2.y = ext_p->point_p[i + 1].y * us + y_ofs;
 		} else {
-			p1.y = h - line_p->point_p[i].y + y_ofs;
-			p2.y = h - line_p->point_p[i + 1].y + y_ofs;
+			p1.y = h - ext_p->point_p[i].y * us + y_ofs;
+			p2.y = h - ext_p->point_p[i + 1].y * us + y_ofs;
 		}
 		lv_draw_line(&p1, &p2, mask_p, lines_p, opa);
 	}

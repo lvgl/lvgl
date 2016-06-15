@@ -91,13 +91,12 @@ lv_obj_t* lv_label_create(lv_obj_t* par_dp, lv_obj_t * ori_dp)
 		lv_obj_set_opa(new_obj, OPA_COVER);
 		lv_obj_set_click(new_obj, false);
 		lv_obj_set_style(new_obj, &lv_labels_def);
+		lv_label_set_fixw(new_obj, false);
 		lv_label_set_text(new_obj, "Text");
     }
     /*Copy 'ori_dp' if not NULL*/
     else {
-		lv_obj_set_opa(new_obj, lv_obj_get_opa(ori_dp));
-		lv_obj_set_click(new_obj, lv_obj_get_click(ori_dp));
-		lv_obj_set_style(new_obj, lv_obj_get_style(ori_dp));
+		lv_label_set_fixw(new_obj, lv_label_get_fixw(ori_dp));
 		lv_label_set_text(new_obj, lv_label_get_text(ori_dp));
     }
     return new_obj;

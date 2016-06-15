@@ -26,8 +26,9 @@ typedef struct
 	const point_t * point_p;
 	uint16_t  point_num;
 	uint8_t  auto_size	:1;
-	uint8_t  y_inv	:1;
-}lv_line_t;
+	uint8_t  y_inv	    :1;
+	uint8_t  upscale    :1;
+}lv_line_ext_t;
 
 typedef struct
 {
@@ -53,8 +54,10 @@ lv_lines_t * lv_lines_get(lv_lines_builtin_t style, lv_lines_t * copy_p);
 void lv_line_set_points(lv_obj_t * obj_dp, const point_t * point_a, uint16_t point_num);
 void lv_line_set_auto_size(lv_obj_t * obj_dp, bool en);
 void lv_line_set_y_inv(lv_obj_t * obj_dp, bool en);
+void lv_line_set_upscale(lv_obj_t * obj_dp, bool en);
 bool lv_line_get_auto_size(lv_obj_t * obj_dp);
 bool lv_line_get_y_inv(lv_obj_t * obj_dp);
+bool lv_line_get_upscale(lv_obj_t * obj_dp);
 
 /**********************
  *      MACROS
