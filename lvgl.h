@@ -21,7 +21,7 @@
  *      DEFINES
  *********************/
 #define LV_GL_VERSION_MAJOR 1
-#define LV_GL_VERSION_MINOR 0
+#define LV_GL_VERSION_MINOR 1
 
 /**********************
  *      TYPEDEFS
