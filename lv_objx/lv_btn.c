@@ -58,7 +58,7 @@ static lv_btns_t lv_btns_def =
 
 	.rects.bwidth = 2 * LV_STYLE_MULT,
 	.rects.bopa = 50,
-	.rects.objs.empty = 0,
+	.rects.empty = 0,
 	.rects.round = 4 * LV_STYLE_MULT,
 	.rects.hpad = 10 * LV_STYLE_MULT,
 	.rects.vpad = 15 * LV_STYLE_MULT,
@@ -66,7 +66,7 @@ static lv_btns_t lv_btns_def =
 static lv_btns_t lv_btns_transp =
 {
 	.rects.bwidth = 0,
-	.rects.objs.empty = 1,
+	.rects.empty = 1,
 	.rects.hpad = 10 * LV_STYLE_MULT,
 	.rects.vpad = 15 * LV_STYLE_MULT,
 };
@@ -79,7 +79,7 @@ static lv_btns_t lv_btns_border =
 	.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_BLACK,
 	.bcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
 	.rects.bwidth = 2 * LV_STYLE_MULT,
-	.rects.objs.empty = 1,
+	.rects.empty = 1,
 	.rects.bopa = 50,
 	.rects.round = 4 * LV_STYLE_MULT,
 	.rects.hpad = 10 * LV_STYLE_MULT,

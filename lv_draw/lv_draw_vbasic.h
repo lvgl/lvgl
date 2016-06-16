@@ -37,7 +37,7 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
 
 void lv_vmap(const area_t * cords_p, const area_t * mask_p, 
              const color_t * map_p, opa_t opa, bool transp,
-			 color_t recolor, color_t recolor_opa);
+			 color_t recolor, opa_t recolor_opa);
 
 
 /**********************

@@ -71,7 +71,9 @@ lv_obj_t* lv_img_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		img_ext_dp->fn_dp = NULL;
 		img_ext_dp->w = lv_obj_get_width(new_obj_dp);
 		img_ext_dp->h = lv_obj_get_height(new_obj_dp);
+		img_ext_dp->transp = 0;
 
+		/*Enable auto size for non screens*/
 		if(par_dp != NULL) {
 			img_ext_dp->auto_size = 1;
 		} else {
@@ -190,12 +192,14 @@ void lv_img_set_file(lv_obj_t* obj_dp, const char * fn)
 		/*Create a dummy header*/
 		header.w = lv_obj_get_width(obj_dp);
 		header.h = lv_obj_get_height(obj_dp);
+		header.transp = 0;
 	}
 
 	fs_close(&file);
 
 	img_ext_p->w = header.w;
 	img_ext_p->h = header.h;
+	img_ext_p->transp = header.transp;
 #if LV_UPSCALE_MAP != 0
 	img_ext_p->w *= LV_DOWNSCALE;
 	img_ext_p->h *= LV_DOWNSCALE;
@@ -257,9 +261,10 @@ bool lv_img_get_auto_size(lv_obj_t* obj_dp)
 static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
 {
     lv_imgs_t * imgs_p = lv_obj_get_style(obj_dp);
+    lv_img_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 
     if(mode == LV_DESIGN_COVER_CHK) {
-        if(imgs_p->objs.empty == 0) {
+        if(ext_p->transp == 0) {
         	bool cover;
         	cover = area_is_in(mask_p, &obj_dp->cords);
         	return cover;
@@ -267,7 +272,6 @@ static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
         else return false;
     }
     
-    lv_img_ext_t * img_ext_p = lv_obj_get_ext(obj_dp);
     area_t cords;
 
     lv_obj_get_cords(obj_dp, &cords);
@@ -275,13 +279,13 @@ static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
 
 	area_t cords_tmp;
 	cords_tmp.y1 = cords.y1;
-	cords_tmp.y2 = cords.y1 + img_ext_p->h - 1;
+	cords_tmp.y2 = cords.y1 + ext_p->h - 1;
 
-	for(; cords_tmp.y1 < cords.y2; cords_tmp.y1 += img_ext_p->h, cords_tmp.y2 += img_ext_p->h) {
+	for(; cords_tmp.y1 < cords.y2; cords_tmp.y1 += ext_p->h, cords_tmp.y2 += ext_p->h) {
 		cords_tmp.x1 = cords.x1;
-		cords_tmp.x2 = cords.x1 + img_ext_p->w - 1;
-		for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += img_ext_p->w, cords_tmp.x2 += img_ext_p->w) {
-			lv_draw_img(&cords_tmp, mask_p, lv_obj_get_style(obj_dp),opa, img_ext_p->fn_dp);
+		cords_tmp.x2 = cords.x1 + ext_p->w - 1;
+		for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext_p->w, cords_tmp.x2 += ext_p->w) {
+			lv_draw_img(&cords_tmp, mask_p, imgs_p, opa, ext_p->fn_dp);
 		}
 	}
     return true;

@@ -133,15 +133,12 @@ typedef enum
 typedef struct
 {
 	color_t color;
-	uint8_t empty		:1;
 }lv_objs_t;
 
 typedef enum
 {
 	LV_OBJS_DEF,
-	LV_OBJS_COLOR,
 	LV_OBJS_SCR,
-	LV_OBJS_EMPTY,
 }lv_objs_builtin_t;
 
 /**********************
