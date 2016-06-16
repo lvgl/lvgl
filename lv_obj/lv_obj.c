@@ -34,10 +34,8 @@ lv_obj_t* def_scr_dp = NULL;
 lv_obj_t* act_scr_dp = NULL;
 ll_dsc_t scr_ll;
 
-lv_objs_t lv_objs_def = {.color = COLOR_GRAY, .empty = 0};
-lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .empty = 0};
-lv_objs_t lv_objs_color = {.color = COLOR_RED, .empty = 0};
-lv_objs_t lv_objs_empty = {.color = COLOR_GRAY, .empty = 1};
+lv_objs_t lv_objs_def = {.color = COLOR_RED};
+lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR};
 
 /**********************
  *      MACROS
@@ -326,14 +324,9 @@ lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
 		case LV_OBJS_DEF:
 			style_p = &lv_objs_def;
 			break;
-		case LV_OBJS_COLOR:
-			style_p = &lv_objs_color;
-			break;
 		case LV_OBJS_SCR:
 			style_p = &lv_objs_scr;
 			break;
-		case LV_OBJS_EMPTY:
-			style_p = &lv_objs_empty;
 			break;
 		default:
 			style_p = NULL;
@@ -1232,9 +1225,6 @@ static bool lv_obj_design(lv_obj_t* obj_dp, const  area_t * mask_p, lv_design_mo
     }
 
     lv_objs_t * objs_p = lv_obj_get_style(obj_dp);
-
-    /*Do not draw the empty objects*/
-    if(objs_p->empty != 0) return true;
     
     opa_t opa = lv_obj_get_opa(obj_dp);
     color_t color = objs_p->color;

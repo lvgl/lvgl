@@ -57,7 +57,6 @@ typedef enum
 	LV_PAGES_TRANSP,
 }lv_pages_builtin_t;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

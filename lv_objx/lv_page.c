@@ -38,7 +38,7 @@ static lv_pages_t lv_pages_def =
 	.bg_rects.bopa = 50,
 	.bg_rects.bwidth = 0 * LV_STYLE_MULT,
 	.bg_rects.round = 2 * LV_STYLE_MULT,
-	.bg_rects.objs.empty = 0,
+	.bg_rects.empty = 0,
 	.bg_rects.hpad = 10,
 	.bg_rects.vpad = 10,
 
@@ -48,7 +48,7 @@ static lv_pages_t lv_pages_def =
 	.sb_rects.bopa = 50,
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.objs.empty = 0,
+	.sb_rects.empty = 0,
 
 	.sb_width= 8 * LV_STYLE_MULT,
 	.sb_opa=50,
@@ -69,7 +69,7 @@ static lv_pages_t lv_pages_paper =
 	.bg_rects.bopa = 100,
 	.bg_rects.bwidth = 2 * LV_STYLE_MULT,
 	.bg_rects.round = 0 * LV_STYLE_MULT,
-	.bg_rects.objs.empty = 0,
+	.bg_rects.empty = 0,
 	.bg_rects.hpad = 20 * LV_STYLE_MULT,
 	.bg_rects.vpad = 20 * LV_STYLE_MULT,
 
@@ -79,7 +79,7 @@ static lv_pages_t lv_pages_paper =
 	.sb_rects.bopa = 100,
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.objs.empty = 0,
+	.sb_rects.empty = 0,
 
 	.sb_width = 10 * LV_STYLE_MULT,
 	.sb_opa=50,
@@ -93,7 +93,7 @@ static lv_pages_t lv_pages_paper =
 
 static lv_pages_t lv_pages_transp =
 {
-	.bg_rects.objs.empty = 1,
+	.bg_rects.empty = 1,
 	.bg_rects.hpad = 1,
 	.bg_rects.vpad = 1,
 
@@ -103,7 +103,7 @@ static lv_pages_t lv_pages_transp =
 	.sb_rects.bopa = 0,
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.objs.empty = 0,
+	.sb_rects.empty = 0,
 
 	.sb_width = 8 * LV_STYLE_MULT,
 	.sb_opa = 50,

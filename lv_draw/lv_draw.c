@@ -47,14 +47,14 @@ static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color
 #else
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_rletter;
-static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp) = lv_rmap;
+static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, color_t recolor, opa_t recolor_opa) = lv_rmap;
 #endif
 
 
 static lv_rects_t lv_img_no_pic_rects = {
   .objs.color = COLOR_BLACK, .gcolor = COLOR_BLACK,
   .bcolor = COLOR_RED, .bwidth = 2 * LV_STYLE_MULT, .bopa = 100,
-  .round = 0, .objs.empty = 0
+  .round = 0, .empty = 0
 };
 
 static lv_labels_t lv_img_no_pic_labels = {
@@ -80,7 +80,7 @@ static lv_labels_t lv_img_no_pic_labels = {
 void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, 
                   const lv_rects_t * rects_p, opa_t opa)
 {
-    if(rects_p->objs.empty == 0){
+    if(rects_p->empty == 0){
         lv_draw_rect_main_mid(cords_p, mask_p, rects_p, opa);
 
         if(rects_p->round != 0) {

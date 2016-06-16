@@ -35,6 +35,7 @@ typedef struct
     cord_t w;
     cord_t h;
     uint8_t auto_size 	:1;
+    uint8_t transp 	    :1; 	/*Transp. bit in the images header (library handles this)*/
 }lv_img_ext_t;
 
 typedef enum
