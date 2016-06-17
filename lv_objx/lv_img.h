@@ -63,7 +63,7 @@ lv_obj_t* lv_img_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
 bool lv_img_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
 void lv_img_set_file(lv_obj_t* obj_p, const char * fn);
 fs_res_t lv_img_create_file(const char * fn, const color_int_t * data_p);
-void lv_img_set_auto_size(lv_obj_t* obj_dp, bool mosaic_en);
+void lv_img_set_auto_size(lv_obj_t* obj_dp, bool en);
 
 bool lv_img_get_auto_size(lv_obj_t* obj_dp);
 

@@ -74,7 +74,7 @@ lv_obj_t* lv_line_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		ext_p->point_p = NULL;
 		ext_p->auto_size = 1;
 		ext_p->y_inv = 0;
-		ext_p->upscale = 1;
+		ext_p->upscale = 0;
 	    lv_obj_set_style(new_obj_dp, &lv_lines_def);
     }
     /*Copy 'copy_p' is not NULL*/

@@ -419,7 +419,6 @@ static void lv_btn_style_load(lv_obj_t * obj_dp)
     lv_btns_t * btns_p = lv_obj_get_style(obj_dp);
 
     /*Init the style*/
-    lv_rects_get(LV_RECTS_DEF, &btns_p->rects);
     btns_p->rects.objs.color = btns_p->mcolor[state];
     btns_p->rects.gcolor = btns_p->gcolor[state];
     btns_p->rects.bcolor = btns_p->bcolor[state];

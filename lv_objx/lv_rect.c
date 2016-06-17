@@ -31,19 +31,19 @@ static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
  *  STATIC VARIABLES
  **********************/
 static lv_rects_t lv_rects_def =
-{ .objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .gcolor = COLOR_MAKE(0x20, 0x40, 0x60),
+{ .objs.color = COLOR_MAKE(0x20, 0x30, 0x40), .gcolor = COLOR_MAKE(0x50, 0x70, 0x90),
   .bcolor = COLOR_WHITE, .bwidth = 2 * LV_STYLE_MULT, .bopa = 50,
   .round = 4 * LV_STYLE_MULT, .empty = 0,
-  .hpad = 0, .vpad = 0 };
+  .hpad = 0 * LV_STYLE_MULT, .vpad = 0 * LV_STYLE_MULT };
 
 static lv_rects_t lv_rects_transp =
 { .bwidth = 0, .empty = 1,
-  .hpad = 0, .vpad = 0  };
+  .hpad = 0, .vpad = 0};
 
 static lv_rects_t lv_rects_border =
 { .bcolor = COLOR_BLACK, .bwidth = 2 * LV_STYLE_MULT, .bopa = 100,
   .round = 4 * LV_STYLE_MULT, .empty = 1,
-  .hpad = 0, .vpad = 0};
+  .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT};
 
 /**********************
  *      MACROS
@@ -100,7 +100,7 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     valid = lv_obj_signal(obj_dp, sign, param);
     area_t rect_cords;
-    lv_rects_t * rests_p = lv_obj_get_style(obj_dp);
+    lv_rects_t * rects_p = lv_obj_get_style(obj_dp);
     lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
     lv_obj_t * i;
 
@@ -130,16 +130,16 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 
             /*If the value is not the init value then the page has >=1 child.*/
             if(rect_cords.x1 != LV_CORD_MAX) {
-            	if(rests_p->hpad != 0) {
-					rect_cords.x1 -= rests_p->hpad;
-					rect_cords.x2 += rests_p->hpad;
+            	if(ext_p->hpad_en != 0) {
+					rect_cords.x1 -= rects_p->hpad;
+					rect_cords.x2 += rects_p->hpad;
             	} else {
             		rect_cords.x1 = obj_dp->cords.x1;
             		rect_cords.x2 = obj_dp->cords.x2;
             	}
-            	if(rests_p->vpad != 0) {
-					rect_cords.y1 -= rests_p->vpad;
-					rect_cords.y2 += rests_p->vpad;
+            	if(ext_p->vpad_en != 0) {
+					rect_cords.y1 -= rects_p->vpad;
+					rect_cords.y2 += rects_p->vpad;
             	} else {
             		rect_cords.y1 = obj_dp->cords.y1;
             		rect_cords.y2 = obj_dp->cords.y2;
@@ -174,6 +174,7 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
  */
 void lv_rect_set_pad_en(lv_obj_t * obj_dp, bool hor_en, bool ver_en)
 {
+	lv_obj_inv(obj_dp);
 	lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 	ext_p->hpad_en = hor_en == false ? 0 : 1;
 	ext_p->vpad_en = ver_en == false ? 0 : 1;

@@ -202,7 +202,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 			lv_img_raw_header_t header;
 			res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
 
-			uint32_t start_offset = 0;
+			uint32_t start_offset = sizeof(lv_img_raw_header_t);
 			start_offset += (area_get_width(cords_p) >> ds_shift) *
 						   ((mask_sub.y1 - cords_p->y1) >> ds_shift) * sizeof(color_t); /*First row*/
 			start_offset += ((mask_sub.x1 - cords_p->x1) >> ds_shift) * sizeof(color_t); /*First col*/

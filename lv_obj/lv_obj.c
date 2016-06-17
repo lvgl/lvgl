@@ -34,7 +34,7 @@ lv_obj_t* def_scr_dp = NULL;
 lv_obj_t* act_scr_dp = NULL;
 ll_dsc_t scr_ll;
 
-lv_objs_t lv_objs_def = {.color = COLOR_RED};
+lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0x20, 0x30, 0x40)};
 lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR};
 
 /**********************
