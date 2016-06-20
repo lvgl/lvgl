@@ -130,6 +130,32 @@ typedef enum
 	LV_ALIGN_OUT_RIGHT_BOTTOM,
 }lv_align_t;
 
+
+/*Layout type. Use the OR connection of the bits*/
+typedef enum
+{
+	/*[0] bit*/
+	LV_LAYOUT_COL =  0 << 0,
+	LV_LAYOUT_ROW =  1 << 0,
+	/*[1..2] bit: horizontal alignment*/
+	LV_LAYOUT_H_LEFT =    0 << 1,
+	LV_LAYOUT_H_MID  =    1 << 1,
+	LV_LAYOUT_H_RIGHT =   2 << 1,
+	LV_LAYOUT_H_JUSTIFY = 3 << 1,
+	/*[3..4] bit: vertical alignment*/
+	LV_LAYOUT_V_TOP =     0 << 3,
+	LV_LAYOUT_V_MID =     1 << 3,
+	LV_LAYOUT_V_BOTTOM =  2 << 3,
+	LV_LAYOUT_V_JUSTIFY = 3 << 3,
+	/*[5] bit don't exceed the parent width (in ROW) or height (in COL)*/
+	LV_LAYOUT_KEEP_SIZE = 1 << 5,
+	/*[6] bit put more object in a row/col if possible*/
+	LV_LAYOUT_FILL = 1 << 6,
+	/*[7] bit: don't use layout*/
+	LV_LAYOUT_OFF = 1 << 7,
+}lv_layout_t;
+
+
 typedef struct
 {
 	color_t color;
