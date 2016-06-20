@@ -60,8 +60,8 @@ static lv_btns_t lv_btns_def =
 	.rects.bopa = 50,
 	.rects.empty = 0,
 	.rects.round = 4 * LV_STYLE_MULT,
-	.rects.hpad = 10 * LV_STYLE_MULT,
-	.rects.vpad = 15 * LV_STYLE_MULT,
+	.rects.hpad = 14 * LV_STYLE_MULT,
+	.rects.vpad = 10 * LV_STYLE_MULT,
 };
 static lv_btns_t lv_btns_transp =
 {
@@ -102,15 +102,15 @@ static lv_btns_t lv_btns_border =
  */
 lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 {
-    lv_obj_t* new_obj;
+    lv_obj_t* new_obj_dp;
     
-    new_obj = lv_rect_create(par_dp, copy_dp);
+    new_obj_dp = lv_rect_create(par_dp, copy_dp);
     /*Allocate the extended data*/
-    lv_obj_alloc_ext(new_obj, sizeof(lv_btn_ext_t));
-    lv_obj_set_signal_f(new_obj, lv_btn_signal);
-    lv_obj_set_design_f(new_obj, lv_btn_design);
+    lv_obj_alloc_ext(new_obj_dp, sizeof(lv_btn_ext_t));
+    lv_obj_set_signal_f(new_obj_dp, lv_btn_signal);
+    lv_obj_set_design_f(new_obj_dp, lv_btn_design);
     
-    lv_btn_ext_t * btn_ext_dp = lv_obj_get_ext(new_obj);
+    lv_btn_ext_t * btn_ext_dp = lv_obj_get_ext(new_obj_dp);
     btn_ext_dp->lpr_exec = 0;
 
     /*If no copy do the basic initialization*/
@@ -121,7 +121,9 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		btn_ext_dp->rel_action = NULL;
 		btn_ext_dp->lpr_action = NULL;
 		btn_ext_dp->tgl = 0;
-	    lv_obj_set_style(new_obj, &lv_btns_def);
+	    lv_obj_set_style(new_obj_dp, &lv_btns_def);
+	    lv_obj_set_layout(new_obj_dp, LV_LAYOUT_ROW_M);
+	    lv_obj_set_layout_space_us(new_obj_dp, 10); /*Justified align*/
     }
     /*Copy 'copy_dp'*/
     else{
@@ -133,7 +135,7 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     	btn_ext_dp->tgl = ori_btn_ext->tgl;
     }
     
-    return new_obj;
+    return new_obj_dp;
 }
 
 /**

@@ -199,11 +199,12 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
     /*Correction with the last line space*/
     new_height -= labels_p->line_space;
     
-    lv_obj_set_height(obj_dp, new_height);
-
-    /*Refresh the length if no fix width*/
     if(ext_p->fixw == 0) {
-        lv_obj_set_width(obj_dp, longest_line);
+    	/*Refresh the full size */
+    	lv_obj_set_size(obj_dp, longest_line, new_height);
+    } else {
+    	/*With fix width only the height can change*/
+        lv_obj_set_height(obj_dp, new_height);
     }
     
     lv_obj_t * parent_dp = lv_obj_get_parent(obj_dp);

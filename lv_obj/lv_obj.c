@@ -11,6 +11,7 @@
 #include "../lv_draw/lv_draw_vbasic.h"
 #include "lv_dispi.h"
 #include "lv_refr.h"
+#include "misc/math/math_base.h"
 
 /*********************
  *      DEFINES
@@ -26,6 +27,9 @@
 static void lv_obj_pos_child_refr(lv_obj_t* obj_dp, cord_t x_diff, cord_t y_diff);
 static void lv_style_refr_core(void * style_p, lv_obj_t* obj_dp);
 static bool lv_obj_design(lv_obj_t* obj_dp, const  area_t * mask_p, lv_design_mode_t mode);
+static void lv_obj_refr_layout(lv_obj_t * obj_dp);
+static void lv_layout_col(lv_obj_t * obj_dp);
+static void lv_layout_row(lv_obj_t * obj_dp);
 
 /**********************
  *  STATIC VARIABLES
@@ -303,6 +307,20 @@ bool lv_obj_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     bool valid = true;
 
     switch(sign) {
+    case LV_SIGNAL_CHILD_CHG:
+    	lv_obj_refr_layout(obj_dp);
+    	break;
+    case LV_SIGNAL_CORD_CHG:
+    	if(param == NULL)
+    	{
+    		break;
+    	}
+
+    	if(lv_obj_get_width(obj_dp) != area_get_width(param) ||
+		  lv_obj_get_height(obj_dp) != area_get_height(param)) {
+        	lv_obj_refr_layout(obj_dp);
+    	}
+    	break;
     	default:
     		break;
     }
@@ -417,6 +435,9 @@ void lv_obj_set_pos(lv_obj_t* obj_dp, cord_t x, cord_t y)
     point_t diff;
     diff.x =  x - obj_dp->cords.x1;
     diff.y =  y - obj_dp->cords.y1;
+
+    /*Do nothing if the position is not changed*/
+    if(diff.x == 0 && diff.y == 0) return;
         
     obj_dp->cords.x1 += diff.x;
     obj_dp->cords.y1 += diff.y;
@@ -570,6 +591,40 @@ void lv_obj_set_height_us(lv_obj_t* obj_dp, cord_t h)
     lv_obj_set_size(obj_dp, lv_obj_get_width(obj_dp), h * LV_DOWNSCALE);
 }
 
+
+/**
+ * Set a layout for an object.
+ * @param obj_dp pointer to an object
+ * @param layout type of the layout (an element from lv_layout_t)
+ */
+void lv_obj_set_layout(lv_obj_t* obj_dp, lv_layout_t layout)
+{
+	obj_dp->layout_type = layout;
+	obj_dp->signal_f(obj_dp, LV_SIGNAL_CHILD_CHG, NULL);
+}
+
+/**
+ * Set the layout spacing for an object.
+ * @param obj_dp pointer to an object
+ * @param space space between object on the layout (space / 2 on edges)
+ */
+void lv_obj_set_layout_space(lv_obj_t * obj_dp, cord_t space)
+{
+	obj_dp->layout_space = space;
+	obj_dp->signal_f(obj_dp, LV_SIGNAL_CHILD_CHG, NULL);
+}
+
+/**
+ * Set the layout spacing for an object.
+ * The space will be upscaled to compensate LV_DOWNSCALE
+ * @param obj_dp pointer to an object
+ * @param space space between object on the layout (space / 2 on edges)
+ */
+void lv_obj_set_layout_space_us(lv_obj_t * obj_dp, cord_t space)
+{
+	lv_obj_set_layout_space(obj_dp, space * LV_DOWNSCALE);
+}
+
 /**
  * Align an object to an other object. 
  * @param obj_dp pointer to an object to align
@@ -699,11 +754,16 @@ void lv_obj_align(lv_obj_t* obj_dp,lv_obj_t* base_dp, lv_align_t align, cord_t x
     cord_t base_abs_y = base_dp->cords.y1;
     cord_t par_abs_x = par_dp->cords.x1;
     cord_t par_abs_y = par_dp->cords.y1;
+    new_x += x_mod + base_abs_x;
+    new_y += y_mod + base_abs_y;
 
-    new_x -= par_abs_x - base_abs_x;
-    new_y -= par_abs_y - base_abs_y;
-    
-    lv_obj_set_pos(obj_dp, new_x + x_mod, new_y + y_mod);
+    if(new_x != obj_dp->cords.x1 || new_y != obj_dp->cords.y1) {
+
+		new_x -= par_abs_x;
+		new_y -= par_abs_y;
+
+		lv_obj_set_pos(obj_dp, new_x, new_y);
+    }
 }
 
 
@@ -1056,6 +1116,26 @@ cord_t lv_obj_get_height(lv_obj_t* obj_dp)
     return area_get_height(&obj_dp->cords);
 }
 
+/**
+ * Get the layout type of an object
+ * @param obj_dp pointer to an object
+ * @return type of the layout (from lv_layout_t)
+ */
+lv_layout_t lv_obj_get_layout(lv_obj_t * obj_dp)
+{
+	return obj_dp->layout_type;
+}
+
+/**
+ * Get the layout space of an object
+ * @param obj_dp pointer to an object
+ * @return the layout space
+ */
+cord_t lv_obj_get_layout_space(lv_obj_t * obj_dp)
+{
+	return obj_dp->layout_space;
+}
+
 /*-----------------
  * Appearance get
  *---------------*/
@@ -1275,3 +1355,134 @@ static void lv_style_refr_core(void * style_p, lv_obj_t* obj_dp)
         lv_style_refr_core(style_p, i);
     }
 }
+
+
+/**
+ * Refresh the layout of an object
+ * @param obj_dp pointer to an object which layout should be refreshed
+ */
+static void lv_obj_refr_layout(lv_obj_t * obj_dp)
+{
+	lv_layout_t type = obj_dp->layout_type;
+
+	if(type == LV_LAYOUT_OFF) return;
+
+	if(type == LV_LAYOUT_COL_L || type == LV_LAYOUT_COL_M || type == LV_LAYOUT_COL_R) {
+		lv_layout_col(obj_dp);
+	} else if(type == LV_LAYOUT_ROW_T || type == LV_LAYOUT_ROW_M || type == LV_LAYOUT_ROW_B) {
+		lv_layout_row(obj_dp);
+	}
+}
+
+
+/**
+ * Handle column type layouts
+ * @param obj_dp pointer to an object which layout should be handled
+ */
+static void lv_layout_col(lv_obj_t * obj_dp)
+{
+	lv_layout_t type = lv_obj_get_layout(obj_dp);
+	cord_t space = lv_obj_get_layout_space(obj_dp); /*Space between objects*/
+	cord_t margin = abs(space); 					   /*Margin by the parent*/
+
+	lv_obj_t * child;
+	/*Recalculate space in justified mode*/
+	if(space < 0) {
+		uint32_t h_tot = 0;
+		uint32_t obj_cnt = 0;
+		LL_READ(obj_dp->child_ll, child) {
+			h_tot += lv_obj_get_height(child);
+			obj_cnt ++;
+		}
+
+		if(obj_cnt == 0) return;
+		space = lv_obj_get_height(parent_dp) - h_tot;
+
+		if(obj_cnt == 5) {
+			obj_cnt = 5;
+		}
+
+		space = space / (cord_t)obj_cnt;
+	}
+
+	/*Adjust margin and get the alignment type*/
+	lv_align_t align;
+	switch(type) {
+		case LV_LAYOUT_COL_L:
+			align = LV_ALIGN_IN_TOP_LEFT;
+			margin = margin / 2;
+			break;
+		case LV_LAYOUT_COL_M:
+			align = LV_ALIGN_IN_TOP_MID;
+			margin = 0;
+			break;
+		case LV_LAYOUT_COL_R:
+			align = LV_ALIGN_IN_TOP_RIGHT;
+			margin = -(margin / 2);
+			break;
+		default:
+			align = LV_ALIGN_IN_TOP_LEFT;
+			margin = 0;
+			break;
+	}
+
+	cord_t last_cord = space / 2;
+	LL_READ_BACK(obj_dp->child_ll, child) {
+		lv_obj_align(child, parent_dp, align, margin , last_cord);
+		last_cord += lv_obj_get_height(child) + space;
+	}
+}
+
+/**
+ * Handle row type layouts
+ * @param obj_dp pointer to an object which layout should be handled
+ */
+static void lv_layout_row(lv_obj_t * obj_dp)
+{
+	lv_layout_t type = lv_obj_get_layout(obj_dp);
+	cord_t space = lv_obj_get_layout_space(obj_dp); /*Space between objects*/
+	cord_t margin = abs(space); 					   /*Margin by the parent*/
+
+	lv_obj_t * child;
+	/*Recalculate space in justified mode*/
+	if(space < 0) {
+		uint32_t w_tot = 0;
+		uint32_t obj_cnt = 0;
+		LL_READ(obj_dp->child_ll, child) {
+			w_tot += lv_obj_get_width(child);
+			obj_cnt ++;
+		}
+
+		if(obj_cnt == 0) return;
+		space = lv_obj_get_width(obj_dp) - w_tot;
+		space = space / (cord_t)obj_cnt;
+	}
+
+	/*Adjust margin and get the alignment type*/
+	lv_align_t align;
+	switch(type) {
+		case LV_LAYOUT_ROW_T:
+			align = LV_ALIGN_IN_TOP_LEFT;
+			margin = margin / 2;
+			break;
+		case LV_LAYOUT_ROW_M:
+			align = LV_ALIGN_IN_LEFT_MID;
+			margin = 0;
+			break;
+		case LV_LAYOUT_ROW_B:
+			align = LV_ALIGN_IN_BOTTOM_LEFT;
+			margin = -(margin / 2);
+			break;
+		default:
+			align = LV_ALIGN_IN_TOP_LEFT;
+			margin = 0;
+			break;
+	}
+
+	cord_t last_cord = space / 2;
+	LL_READ_BACK(obj_dp->child_ll, child) {
+		lv_obj_align(child, obj_dp, align, last_cord, margin);
+		last_cord += lv_obj_get_width(child) + space;
+	}
+}
+

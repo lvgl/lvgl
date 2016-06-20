@@ -8,6 +8,7 @@
  *********************/
 #include <stdint.h>
 #include <stddef.h>
+#include "lvgl/lvgl.h"
 
 /*********************
  *      DEFINES

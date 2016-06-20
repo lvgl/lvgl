@@ -103,6 +103,8 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     lv_rects_t * rects_p = lv_obj_get_style(obj_dp);
     lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
     lv_obj_t * i;
+    cord_t hpad = rects_p->hpad;
+    cord_t vpad = rects_p->vpad;
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -114,6 +116,39 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 			   ext_p->vpad_en == 0) {
         		break;
         	}
+
+        	/*Override the padding values according to the layout settings*/
+        	cord_t layout_space = lv_obj_get_layout_space(obj_dp);
+        	lv_layout_t layout_type = lv_obj_get_layout(obj_dp);
+
+        	if(lv_obj_get_layout(obj_dp) != LV_LAYOUT_OFF) {
+        		/* Non-justified case: use the half layout space because
+        		 * the layout use this as well on the edges.
+        		 * Else padding and layout makes an infinite loop */
+        		if(layout_space >= 0) {
+					hpad =  layout_space / 2;
+					vpad = hpad;
+        		} else { /*Justified cases*/
+        			/*The rectangle can increase infinitely with wrong settings*/
+        			/*COL layouts: set vpad to 0 */
+        			/*ROW layouts: set hpad to 0 */
+        			if(layout_type == LV_LAYOUT_COL_L ||
+					   layout_type == LV_LAYOUT_COL_M ||
+					   layout_type == LV_LAYOUT_COL_R) {
+        				vpad = 0;
+        				hpad =  (-layout_space) / 2;
+        			} else if(layout_type == LV_LAYOUT_ROW_T ||
+     					      layout_type == LV_LAYOUT_ROW_M ||
+     					      layout_type == LV_LAYOUT_ROW_B) {
+             				hpad = 0;
+             				vpad =  (-layout_space) / 2;
+					} else {
+						/*Never happens*/
+						break;
+					}
+        		}
+        	}
+
         	/*Search the side coordinates of the children*/
         	lv_obj_get_cords(obj_dp, &rect_cords);
         	rect_cords.x1 = LV_CORD_MAX;
@@ -131,15 +166,15 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
             /*If the value is not the init value then the page has >=1 child.*/
             if(rect_cords.x1 != LV_CORD_MAX) {
             	if(ext_p->hpad_en != 0) {
-					rect_cords.x1 -= rects_p->hpad;
-					rect_cords.x2 += rects_p->hpad;
+					rect_cords.x1 -= hpad;
+					rect_cords.x2 += hpad;
             	} else {
             		rect_cords.x1 = obj_dp->cords.x1;
             		rect_cords.x2 = obj_dp->cords.x2;
             	}
             	if(ext_p->vpad_en != 0) {
-					rect_cords.y1 -= rects_p->vpad;
-					rect_cords.y2 += rects_p->vpad;
+					rect_cords.y1 -= vpad;
+					rect_cords.y2 += vpad;
             	} else {
             		rect_cords.y1 = obj_dp->cords.y1;
             		rect_cords.y2 = obj_dp->cords.y2;
@@ -148,6 +183,9 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 
                 lv_obj_set_pos(obj_dp, lv_obj_get_x(obj_dp),
                                        lv_obj_get_y(obj_dp));
+
+            	lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
+            	par_dp->signal_f(par_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
             } else {
                 lv_obj_set_size(obj_dp, LV_OBJ_DEF_WIDTH, LV_OBJ_DEF_HEIGHT);
             }
@@ -180,6 +218,9 @@ void lv_rect_set_pad_en(lv_obj_t * obj_dp, bool hor_en, bool ver_en)
 	ext_p->vpad_en = ver_en == false ? 0 : 1;
 
 	obj_dp->signal_f(obj_dp, LV_SIGNAL_STYLE_CHG, obj_dp);
+
+	lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
+	par_dp->signal_f(par_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
 }
 
 /*=====================
@@ -240,14 +281,7 @@ lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy_p)
 
 	return style_p;
 }
-/*=====================
- * Setter functions 
- *====================*/
 
-
-/*=====================
- * Getter functions 
- *====================*/
 
 /**********************
  *   STATIC FUNCTIONS

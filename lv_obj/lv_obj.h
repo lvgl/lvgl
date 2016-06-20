@@ -70,6 +70,18 @@ typedef enum
     LV_SIGNAL_STYLE_CHG,
 }lv_signal_t;
 
+
+typedef enum
+{
+	LV_LAYOUT_OFF = 0,
+	LV_LAYOUT_COL_L,
+	LV_LAYOUT_COL_M,
+	LV_LAYOUT_COL_R,
+	LV_LAYOUT_ROW_T,
+	LV_LAYOUT_ROW_M,
+	LV_LAYOUT_ROW_B,
+}lv_layout_t;
+
 typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T* obj_dp, lv_signal_t sign, void * param);
 
 typedef struct __LV_OBJ_T
@@ -78,9 +90,20 @@ typedef struct __LV_OBJ_T
     ll_dsc_t child_ll;
     
     area_t cords;
+
+    lv_signal_f_t signal_f;
+    lv_design_f_t design_f;
     
-    /*Basic appearance*/
-    opa_t opa;
+    void * ext_dp;        /*The object attributes can be extended here*/
+    void * style_p;       /*Object specific style*/
+
+#if LV_OBJ_FREE_P != 0
+    void * free_p;        /*Application specific pointer (set it freely)*/
+#endif
+
+    /*Layout settings*/
+    cord_t layout_space;
+    uint8_t layout_type;
 
     /*Attributes and states*/
     uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
@@ -91,18 +114,11 @@ typedef struct __LV_OBJ_T
     uint8_t hidden       :1;    /*1: Object is hidden*/
     uint8_t top_en       :1;	/*1: If the object or its children  is clicked it goes to the foreground*/
     uint8_t res			 :1;
-    
+
+	opa_t opa;
+
     uint8_t free_num; 		/*Application specific identifier (set it freely)*/
     
-    lv_signal_f_t signal_f;
-    lv_design_f_t design_f;
-    
-    void * ext_dp;        /*The object attributes can be extended here*/
-    void * style_p;       /*Object specific style*/
-
-#if LV_OBJ_FREE_P != 0
-    void * free_p;        /*Application specific pointer (set it freely)*/
-#endif
 }lv_obj_t;
 
 typedef enum
@@ -129,31 +145,6 @@ typedef enum
 	LV_ALIGN_OUT_RIGHT_MID,
 	LV_ALIGN_OUT_RIGHT_BOTTOM,
 }lv_align_t;
-
-
-/*Layout type. Use the OR connection of the bits*/
-typedef enum
-{
-	/*[0] bit*/
-	LV_LAYOUT_COL =  0 << 0,
-	LV_LAYOUT_ROW =  1 << 0,
-	/*[1..2] bit: horizontal alignment*/
-	LV_LAYOUT_H_LEFT =    0 << 1,
-	LV_LAYOUT_H_MID  =    1 << 1,
-	LV_LAYOUT_H_RIGHT =   2 << 1,
-	LV_LAYOUT_H_JUSTIFY = 3 << 1,
-	/*[3..4] bit: vertical alignment*/
-	LV_LAYOUT_V_TOP =     0 << 3,
-	LV_LAYOUT_V_MID =     1 << 3,
-	LV_LAYOUT_V_BOTTOM =  2 << 3,
-	LV_LAYOUT_V_JUSTIFY = 3 << 3,
-	/*[5] bit don't exceed the parent width (in ROW) or height (in COL)*/
-	LV_LAYOUT_KEEP_SIZE = 1 << 5,
-	/*[6] bit put more object in a row/col if possible*/
-	LV_LAYOUT_FILL = 1 << 6,
-	/*[7] bit: don't use layout*/
-	LV_LAYOUT_OFF = 1 << 7,
-}lv_layout_t;
 
 
 typedef struct
@@ -198,6 +189,9 @@ void lv_obj_set_width(lv_obj_t* obj_dp, cord_t w);
 void lv_obj_set_width_us(lv_obj_t* obj_dp, cord_t w);
 void lv_obj_set_height(lv_obj_t* obj_dp, cord_t h);
 void lv_obj_set_height_us(lv_obj_t* obj_dp, cord_t h);
+void lv_obj_set_layout(lv_obj_t* obj_dp, lv_layout_t layout);
+void lv_obj_set_layout_space(lv_obj_t * obj_dp, cord_t space);
+void lv_obj_set_layout_space_us(lv_obj_t * obj_dp, cord_t space);
 void lv_obj_align(lv_obj_t* obj_dp,lv_obj_t* base_dp, lv_align_t align, cord_t x_mod, cord_t y_mod);
 void lv_obj_align_us(lv_obj_t* obj_dp,lv_obj_t* base_dp, lv_align_t align, cord_t x_mod, cord_t y_mod);
 /*Appearance set*/
@@ -234,6 +228,8 @@ cord_t lv_obj_get_x(lv_obj_t* obj_dp);
 cord_t lv_obj_get_y(lv_obj_t* obj_dp);
 cord_t lv_obj_get_width(lv_obj_t* obj_dp);
 cord_t lv_obj_get_height(lv_obj_t* obj_dp);
+lv_layout_t lv_obj_get_layout(lv_obj_t * obj_dp);
+cord_t lv_obj_get_layout_space(lv_obj_t * obj_dp);
 /*Appearance get*/
 bool lv_obj_get_hidden(lv_obj_t* obj_dp);
 opa_t lv_obj_get_opa(lv_obj_t* obj_dp);
