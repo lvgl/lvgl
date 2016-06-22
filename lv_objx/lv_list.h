@@ -49,6 +49,9 @@ typedef enum
 typedef struct
 {
 	lv_page_ext_t page_ext;
+	uint8_t fit_size :1;	/*Automatically set the size of list elements to the holder */
+	uint8_t sel_en   :1;	/*Enable selecting list elements by toggling them */
+	uint8_t sel_one  :1;	/*Enable to select only one list element*/
 }lv_list_ext_t;
 
 
@@ -57,7 +60,7 @@ typedef struct
  **********************/
 lv_obj_t* lv_list_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
 bool lv_list_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
-void lv_list_add(lv_obj_t * obj_dp);
+void lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt, void (*release) (lv_obj_t *));
 lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * copy_p);
 
 /**********************

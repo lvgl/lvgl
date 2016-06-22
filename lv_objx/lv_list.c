@@ -10,6 +10,8 @@
 #if USE_LV_LIST != 0
 
 #include "lv_list.h"
+#include "lv_rect.h"
+#include "lv_label.h"
 
 /*********************
  *      DEFINES
@@ -32,16 +34,20 @@ static lv_lists_t lv_lists_def =
 	/*Page style*/
 	.pages.bg_rects.objs.color = COLOR_WHITE, .pages.bg_rects.gcolor = COLOR_SILVER, .pages.bg_rects.bcolor = COLOR_GRAY,
 	.pages.bg_rects.bopa = 50, .pages.bg_rects.bwidth = 0 * LV_STYLE_MULT, .pages.bg_rects.round = 2 * LV_STYLE_MULT,
-	.pages.bg_rects.empty = 0, .pages.bg_rects.hpad = 0, .pages.bg_rects.vpad = 0,
+	.pages.bg_rects.empty = 0,
+	.pages.bg_rects.vpad = 40,
+	.pages.bg_rects.hpad = 20,
+	.pages.bg_rects.opad = 10,
 
 	.pages.sb_rects.objs.color = COLOR_BLACK, .pages.sb_rects.gcolor = COLOR_BLACK, .pages.sb_rects.bcolor = COLOR_WHITE,
 	.pages.sb_rects.bopa = 50, .pages.sb_rects.bwidth = 1 * LV_STYLE_MULT, .pages.sb_rects.round = 5 * LV_STYLE_MULT,
 	.pages.sb_rects.empty = 0, .pages.sb_width= 8 * LV_STYLE_MULT, .pages.sb_opa=50, .pages.sb_mode = LV_PAGE_SB_MODE_ON,
 
-	.pages.margin_hor = 0 * LV_STYLE_MULT, .pages.margin_ver = 0 * LV_STYLE_MULT,
+	.pages.margin_ver = 0 * LV_STYLE_MULT,
+	.pages.margin_ver = 0 * LV_STYLE_MULT,
 
 	/*List style*/
-	.list_layout = LV_LAYOUT_COL_M, .list_layout_space = 0 * LV_STYLE_MULT,
+	.list_layout = LV_LAYOUT_CENTER,
 
 	/*List element style*/
 	.liste_btns.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_REL] = COLOR_WHITE, .liste_btns.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
@@ -51,9 +57,11 @@ static lv_lists_t lv_lists_def =
 	.liste_btns.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER, .liste_btns.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY, .liste_btns.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
 	.liste_btns.rects.bwidth = 2 * LV_STYLE_MULT, .liste_btns.rects.bopa = 50,
 	.liste_btns.rects.empty = 0, .liste_btns.rects.round = 4 * LV_STYLE_MULT,
-	.liste_btns.rects.hpad = 10 * LV_STYLE_MULT, .liste_btns.rects.vpad = 15 * LV_STYLE_MULT,
+	.liste_btns.rects.hpad = 10 * LV_STYLE_MULT,
+	.liste_btns.rects.vpad = 20 * LV_STYLE_MULT,
+	.liste_btns.rects.opad = 5 * LV_STYLE_MULT,
 
-	.liste_layout = LV_LAYOUT_ROW_M, .liste_layout_space = 50 * LV_STYLE_MULT,
+	.liste_layout = LV_LAYOUT_ROW_M,
 };
 
 /**********************
@@ -82,8 +90,7 @@ lv_obj_t* lv_list_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     
     /*Init the new list object*/
     lv_obj_set_style(new_obj_dp, &lv_lists_def.pages);
-    lv_obj_set_layout(new_obj_dp, lv_lists_def.list_layout);
-    lv_obj_set_layout_space(new_obj_dp, lv_lists_def.list_layout_space);
+    lv_rect_set_layout(new_obj_dp, lv_lists_def.list_layout);
     
     return new_obj_dp;
 }
@@ -114,12 +121,23 @@ bool lv_list_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 }
 
 
-void lv_list_add(lv_obj_t * obj_dp)
+void lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt, void (*release) (lv_obj_t *))
 {
 	lv_obj_t * liste;
 	liste = lv_btn_create(obj_dp, NULL);
 	lv_obj_set_style(liste, &lv_lists_def.liste_btns);
+	//lv_btn_set_rel_action(liste, release);
 	lv_page_glue_obj(liste, true);
+	lv_rect_set_layout(liste, lv_lists_def.liste_layout);
+	lv_rect_set_fit(liste, true, true);
+
+
+	if(img_fn != NULL) {
+
+	}
+
+	lv_obj_t * label = lv_label_create(liste, NULL);
+	lv_label_set_text(label, txt);
 }
 
 /**

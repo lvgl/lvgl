@@ -70,18 +70,6 @@ typedef enum
     LV_SIGNAL_STYLE_CHG,
 }lv_signal_t;
 
-
-typedef enum
-{
-	LV_LAYOUT_OFF = 0,
-	LV_LAYOUT_COL_L,
-	LV_LAYOUT_COL_M,
-	LV_LAYOUT_COL_R,
-	LV_LAYOUT_ROW_T,
-	LV_LAYOUT_ROW_M,
-	LV_LAYOUT_ROW_B,
-}lv_layout_t;
-
 typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T* obj_dp, lv_signal_t sign, void * param);
 
 typedef struct __LV_OBJ_T
@@ -100,10 +88,6 @@ typedef struct __LV_OBJ_T
 #if LV_OBJ_FREE_P != 0
     void * free_p;        /*Application specific pointer (set it freely)*/
 #endif
-
-    /*Layout settings*/
-    cord_t layout_space;
-    uint8_t layout_type;
 
     /*Attributes and states*/
     uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
@@ -189,9 +173,6 @@ void lv_obj_set_width(lv_obj_t* obj_dp, cord_t w);
 void lv_obj_set_width_us(lv_obj_t* obj_dp, cord_t w);
 void lv_obj_set_height(lv_obj_t* obj_dp, cord_t h);
 void lv_obj_set_height_us(lv_obj_t* obj_dp, cord_t h);
-void lv_obj_set_layout(lv_obj_t* obj_dp, lv_layout_t layout);
-void lv_obj_set_layout_space(lv_obj_t * obj_dp, cord_t space);
-void lv_obj_set_layout_space_us(lv_obj_t * obj_dp, cord_t space);
 void lv_obj_align(lv_obj_t* obj_dp,lv_obj_t* base_dp, lv_align_t align, cord_t x_mod, cord_t y_mod);
 void lv_obj_align_us(lv_obj_t* obj_dp,lv_obj_t* base_dp, lv_align_t align, cord_t x_mod, cord_t y_mod);
 /*Appearance set*/
@@ -228,8 +209,6 @@ cord_t lv_obj_get_x(lv_obj_t* obj_dp);
 cord_t lv_obj_get_y(lv_obj_t* obj_dp);
 cord_t lv_obj_get_width(lv_obj_t* obj_dp);
 cord_t lv_obj_get_height(lv_obj_t* obj_dp);
-lv_layout_t lv_obj_get_layout(lv_obj_t * obj_dp);
-cord_t lv_obj_get_layout_space(lv_obj_t * obj_dp);
 /*Appearance get*/
 bool lv_obj_get_hidden(lv_obj_t* obj_dp);
 opa_t lv_obj_get_opa(lv_obj_t* obj_dp);

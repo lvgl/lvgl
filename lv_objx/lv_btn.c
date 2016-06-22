@@ -62,6 +62,7 @@ static lv_btns_t lv_btns_def =
 	.rects.round = 4 * LV_STYLE_MULT,
 	.rects.hpad = 10 * LV_STYLE_MULT,
 	.rects.vpad = 15 * LV_STYLE_MULT,
+	.rects.opad = 5 * LV_STYLE_MULT,
 };
 static lv_btns_t lv_btns_transp =
 {
@@ -69,6 +70,7 @@ static lv_btns_t lv_btns_transp =
 	.rects.empty = 1,
 	.rects.hpad = 10 * LV_STYLE_MULT,
 	.rects.vpad = 15 * LV_STYLE_MULT,
+	.rects.opad = 10 * LV_STYLE_MULT,
 };
 
 static lv_btns_t lv_btns_border =
@@ -84,6 +86,7 @@ static lv_btns_t lv_btns_border =
 	.rects.round = 4 * LV_STYLE_MULT,
 	.rects.hpad = 10 * LV_STYLE_MULT,
 	.rects.vpad = 15 * LV_STYLE_MULT,
+	.rects.vpad = 10 * LV_STYLE_MULT,
 };
 
 /**********************
@@ -122,8 +125,7 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		btn_ext_dp->lpr_action = NULL;
 		btn_ext_dp->tgl = 0;
 	    lv_obj_set_style(new_obj_dp, &lv_btns_def);
-	    lv_obj_set_layout(new_obj_dp, LV_LAYOUT_COL_M);
-	    lv_obj_set_layout_space_us(new_obj_dp, -40); /*Justified align*/
+	    lv_rect_set_layout(new_obj_dp, LV_LAYOUT_CENTER);
     }
     /*Copy 'copy_dp'*/
     else{

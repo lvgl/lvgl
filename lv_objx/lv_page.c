@@ -141,7 +141,7 @@ lv_obj_t* lv_page_create(lv_obj_t * par_dp, lv_obj_t * ori_dp)
 		lv_obj_set_drag(new_dp, true);
 		lv_obj_set_drag_throw(new_dp, true);
 		lv_obj_set_style(new_dp, &lv_pages_def);
-		lv_rect_set_pad_en(new_dp, true, true);
+		lv_rect_set_fit(new_dp, true, true);
     } else {
 		lv_obj_set_style(new_dp, lv_obj_get_style(ori_dp));
     }
