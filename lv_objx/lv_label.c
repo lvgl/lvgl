@@ -206,9 +206,6 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
     	/*With fix width only the height can change*/
         lv_obj_set_height(obj_dp, new_height);
     }
-    
-    lv_obj_t * parent_dp = lv_obj_get_parent(obj_dp);
-    parent_dp->signal_f(parent_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
 
     lv_obj_inv(obj_dp);
 }

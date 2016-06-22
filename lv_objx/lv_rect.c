@@ -100,6 +100,7 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     valid = lv_obj_signal(obj_dp, sign, param);
     area_t rect_cords;
+    area_t ori;
     lv_rects_t * rects_p = lv_obj_get_style(obj_dp);
     lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
     lv_obj_t * i;
@@ -150,7 +151,9 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
         	}
 
         	/*Search the side coordinates of the children*/
+        	lv_obj_get_cords(obj_dp, &ori);
         	lv_obj_get_cords(obj_dp, &rect_cords);
+
         	rect_cords.x1 = LV_CORD_MAX;
         	rect_cords.y1 = LV_CORD_MAX;
         	rect_cords.x2 = LV_CORD_MIN;
@@ -179,13 +182,16 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
             		rect_cords.y1 = obj_dp->cords.y1;
             		rect_cords.y2 = obj_dp->cords.y2;
             	}
+
                 area_cpy(&obj_dp->cords, &rect_cords);
 
-                lv_obj_set_pos(obj_dp, lv_obj_get_x(obj_dp),
-                                       lv_obj_get_y(obj_dp));
+                /*Notify the object about its new coordinates*/
+            	obj_dp->signal_f(obj_dp, LV_SIGNAL_CORD_CHG, &ori);
 
+                /*Inform the parent about the new coordinates*/
             	lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
             	par_dp->signal_f(par_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
+
             } else {
                 lv_obj_set_size(obj_dp, LV_OBJ_DEF_WIDTH, LV_OBJ_DEF_HEIGHT);
             }
@@ -217,8 +223,7 @@ void lv_rect_set_pad_en(lv_obj_t * obj_dp, bool hor_en, bool ver_en)
 	ext_p->hpad_en = hor_en == false ? 0 : 1;
 	ext_p->vpad_en = ver_en == false ? 0 : 1;
 
-	obj_dp->signal_f(obj_dp, LV_SIGNAL_STYLE_CHG, obj_dp);
-
+	/*Send a signal to run the paddig calculations*/
 	lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
 	par_dp->signal_f(par_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
 }

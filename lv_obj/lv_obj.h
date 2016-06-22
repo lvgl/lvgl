@@ -113,7 +113,7 @@ typedef struct __LV_OBJ_T
     uint8_t style_iso 	 :1;	/*1: The object has got an own style*/
     uint8_t hidden       :1;    /*1: Object is hidden*/
     uint8_t top_en       :1;	/*1: If the object or its children  is clicked it goes to the foreground*/
-    uint8_t res			 :1;
+    uint8_t child_chg_off:1;    /*1: Disable the child change signal. Useful when moving the children*/
 
 	opa_t opa;
 

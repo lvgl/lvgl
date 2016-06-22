@@ -60,8 +60,8 @@ static lv_btns_t lv_btns_def =
 	.rects.bopa = 50,
 	.rects.empty = 0,
 	.rects.round = 4 * LV_STYLE_MULT,
-	.rects.hpad = 14 * LV_STYLE_MULT,
-	.rects.vpad = 10 * LV_STYLE_MULT,
+	.rects.hpad = 10 * LV_STYLE_MULT,
+	.rects.vpad = 15 * LV_STYLE_MULT,
 };
 static lv_btns_t lv_btns_transp =
 {
@@ -122,8 +122,8 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		btn_ext_dp->lpr_action = NULL;
 		btn_ext_dp->tgl = 0;
 	    lv_obj_set_style(new_obj_dp, &lv_btns_def);
-	    lv_obj_set_layout(new_obj_dp, LV_LAYOUT_ROW_M);
-	    lv_obj_set_layout_space_us(new_obj_dp, 10); /*Justified align*/
+	    lv_obj_set_layout(new_obj_dp, LV_LAYOUT_COL_M);
+	    lv_obj_set_layout_space_us(new_obj_dp, -40); /*Justified align*/
     }
     /*Copy 'copy_dp'*/
     else{

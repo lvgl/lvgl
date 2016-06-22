@@ -306,9 +306,12 @@ bool lv_obj_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 {
     bool valid = true;
 
+
+
     switch(sign) {
     case LV_SIGNAL_CHILD_CHG:
-    	lv_obj_refr_layout(obj_dp);
+    	if(obj_dp->child_chg_off != 0) valid = false;
+    	else lv_obj_refr_layout(obj_dp);
     	break;
     case LV_SIGNAL_CORD_CHG:
     	if(param == NULL)
@@ -395,12 +398,14 @@ void lv_obj_set_parent(lv_obj_t* obj_dp, lv_obj_t* parent_dp)
     
     ll_chg_list(&obj_dp->par_dp->child_ll, &parent_dp->child_ll, obj_dp);
     
+    /*Notify the original parent because one of its children is lost*/
     obj_dp->par_dp->signal_f(obj_dp->par_dp, LV_SIGNAL_CHILD_CHG, NULL);
     
     obj_dp->par_dp = parent_dp;
     
     lv_obj_set_pos(obj_dp, old_pos.x, old_pos.y);
     
+    /*Notify the new parent about the child*/
     parent_dp->signal_f(parent_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
 
     
@@ -419,13 +424,6 @@ void lv_obj_set_parent(lv_obj_t* obj_dp, lv_obj_t* parent_dp)
  */
 void lv_obj_set_pos(lv_obj_t* obj_dp, cord_t x, cord_t y)
 {
-    /*Invalidate the original area*/
-    lv_obj_inv(obj_dp);
-    
-    /*Save the original coordinates*/
-    area_t ori;
-    lv_obj_get_cords(obj_dp, &ori);
-    
     /*Convert x and y to absolute coordinates*/
     lv_obj_t* par_dp = obj_dp->par_dp;
     x = x + par_dp->cords.x1;
@@ -436,9 +434,18 @@ void lv_obj_set_pos(lv_obj_t* obj_dp, cord_t x, cord_t y)
     diff.x =  x - obj_dp->cords.x1;
     diff.y =  y - obj_dp->cords.y1;
 
-    /*Do nothing if the position is not changed*/
+    /* Do nothing if the position is not changed */
+    /* It is very important else recursive positioning can
+     * occur without position change*/
     if(diff.x == 0 && diff.y == 0) return;
         
+    /*Invalidate the original area*/
+    lv_obj_inv(obj_dp);
+
+    /*Save the original coordinates*/
+    area_t ori;
+    lv_obj_get_cords(obj_dp, &ori);
+
     obj_dp->cords.x1 += diff.x;
     obj_dp->cords.y1 += diff.y;
     obj_dp->cords.x2 += diff.x;
@@ -446,7 +453,7 @@ void lv_obj_set_pos(lv_obj_t* obj_dp, cord_t x, cord_t y)
     
     lv_obj_pos_child_refr(obj_dp, diff.x, diff.y);
     
-    /*Send a signal*/
+    /*Inform the object about its new coordinates*/
     obj_dp->signal_f(obj_dp, LV_SIGNAL_CORD_CHG, &ori);
     
     /*Send a signal to the parent too*/
@@ -518,6 +525,14 @@ void lv_obj_set_y_us(lv_obj_t* obj_dp, cord_t y)
  */
 void lv_obj_set_size(lv_obj_t* obj_dp, cord_t w, cord_t h)
 {
+
+    /* Do nothing if the size is not changed */
+    /* It is very important else recursive resizing can
+     * occur without size change*/
+	if(lv_obj_get_width(obj_dp) == w && lv_obj_get_height(obj_dp) == h) {
+		return;
+	}
+
     /*Invalidate the original area*/
     lv_obj_inv(obj_dp);
     
@@ -528,8 +543,9 @@ void lv_obj_set_size(lv_obj_t* obj_dp, cord_t w, cord_t h)
     //Set the length and height
     obj_dp->cords.x2 = obj_dp->cords.x1 + w - 1;
     obj_dp->cords.y2 = obj_dp->cords.y1 + h - 1;
-    
-    /*Send a signal*/
+
+
+    /*Send a signal to the object with its new coordinates*/
     obj_dp->signal_f(obj_dp, LV_SIGNAL_CORD_CHG, &ori);
     
     /*Send a signal to the parent too*/
@@ -600,6 +616,8 @@ void lv_obj_set_height_us(lv_obj_t* obj_dp, cord_t h)
 void lv_obj_set_layout(lv_obj_t* obj_dp, lv_layout_t layout)
 {
 	obj_dp->layout_type = layout;
+
+	/*Send signal to refresh the layout*/
 	obj_dp->signal_f(obj_dp, LV_SIGNAL_CHILD_CHG, NULL);
 }
 
@@ -611,6 +629,8 @@ void lv_obj_set_layout(lv_obj_t* obj_dp, lv_layout_t layout)
 void lv_obj_set_layout_space(lv_obj_t * obj_dp, cord_t space)
 {
 	obj_dp->layout_space = space;
+
+	/*Send signal to refresh the layout*/
 	obj_dp->signal_f(obj_dp, LV_SIGNAL_CHILD_CHG, NULL);
 }
 
@@ -756,14 +776,10 @@ void lv_obj_align(lv_obj_t* obj_dp,lv_obj_t* base_dp, lv_align_t align, cord_t x
     cord_t par_abs_y = par_dp->cords.y1;
     new_x += x_mod + base_abs_x;
     new_y += y_mod + base_abs_y;
+	new_x -= par_abs_x;
+	new_y -= par_abs_y;
 
-    if(new_x != obj_dp->cords.x1 || new_y != obj_dp->cords.y1) {
-
-		new_x -= par_abs_x;
-		new_y -= par_abs_y;
-
-		lv_obj_set_pos(obj_dp, new_x, new_y);
-    }
+	lv_obj_set_pos(obj_dp, new_x, new_y);
 }
 
 
@@ -795,10 +811,10 @@ void lv_obj_set_style(lv_obj_t* obj_dp, void * style_p)
 	if(obj_dp->style_iso != 0) {
 		dm_free(obj_dp->style_p);
 	}
-
     obj_dp->style_p = style_p;
+
+    /*Send a style change signal to the object*/
     obj_dp->signal_f(obj_dp, LV_SIGNAL_STYLE_CHG, NULL);
-    //obj_dp->signal_f(lv_obj_get_parent(obj_dp, )
     lv_obj_inv(obj_dp);
 }
 
@@ -1396,7 +1412,7 @@ static void lv_layout_col(lv_obj_t * obj_dp)
 		}
 
 		if(obj_cnt == 0) return;
-		space = lv_obj_get_height(parent_dp) - h_tot;
+		space = lv_obj_get_height(obj_dp) - h_tot;
 
 		if(obj_cnt == 5) {
 			obj_cnt = 5;
@@ -1426,11 +1442,18 @@ static void lv_layout_col(lv_obj_t * obj_dp)
 			break;
 	}
 
+	/* Disable child change action because the children will be moved a lot
+	 * an unnecessary child change signals could be sent*/
+	obj_dp->child_chg_off = 1;
+
+	/* Align the children */
 	cord_t last_cord = space / 2;
 	LL_READ_BACK(obj_dp->child_ll, child) {
-		lv_obj_align(child, parent_dp, align, margin , last_cord);
+		lv_obj_align(child, obj_dp, align, margin , last_cord);
 		last_cord += lv_obj_get_height(child) + space;
 	}
+
+	obj_dp->child_chg_off = 0;
 }
 
 /**
@@ -1479,10 +1502,17 @@ static void lv_layout_row(lv_obj_t * obj_dp)
 			break;
 	}
 
+	/* Disable child change action because the children will be moved a lot
+	 * an unnecessary child change signals could be sent*/
+	obj_dp->child_chg_off = 1;
+
+	/* Align the children */
 	cord_t last_cord = space / 2;
 	LL_READ_BACK(obj_dp->child_ll, child) {
 		lv_obj_align(child, obj_dp, align, last_cord, margin);
 		last_cord += lv_obj_get_width(child) + space;
 	}
+
+	obj_dp->child_chg_off = 0;
 }
 
