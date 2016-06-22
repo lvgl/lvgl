@@ -25,7 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
-static void lv_btn_style_load(lv_obj_t * obj_dp);
+static void lv_btn_style_load(lv_obj_t * obj_dp, lv_rects_t * rects_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -148,11 +148,6 @@ bool lv_btn_signal(lv_obj_t * obj_dp, lv_signal_t sign, void* param)
 {   
     bool valid;
 
-    /*Be sure the  corresponding style is loaded*/
-    if(sign == LV_SIGNAL_STYLE_CHG) {
-    	lv_btn_style_load(obj_dp);
-    }
-
     /* Include the ancient signal function */
     valid = lv_rect_signal(obj_dp, sign, param);
 
@@ -224,10 +219,6 @@ bool lv_btn_signal(lv_obj_t * obj_dp, lv_signal_t sign, void* param)
                 	 btn_ext_dp->lpr_exec = 1;
                 	valid = btn_ext_dp->lpr_action(obj_dp, param);
                 }
-                break;
-            case LV_SIGNAL_STYLE_CHG:
-            	/*Load the currently active style*/
-            	lv_btn_style_load(obj_dp);
             	break;
             default:
                 /*Do nothing*/
@@ -264,7 +255,6 @@ void lv_btn_set_state(lv_obj_t* obj_dp, lv_btn_state_t state)
     lv_btn_ext_t * btn_p = lv_obj_get_ext(obj_dp);
     
     btn_p->state = state;
-	lv_btn_style_load(obj_dp);
     lv_obj_inv(obj_dp);
 }
 
@@ -405,8 +395,12 @@ static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
     area_t area;
     lv_obj_get_cords(obj_dp, &area);
 
+    lv_rects_t rects_tmp;
+
+    lv_btn_style_load(obj_dp, &rects_tmp);
+
     /*Draw the rectangle*/
-    lv_draw_rect(&area, mask_p, &btns_p->rects, opa);
+    lv_draw_rect(&area, mask_p, &rects_tmp, opa);
     
     return true;
 }
@@ -415,15 +409,16 @@ static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
  * Load the corresponding style according to the state to 'rects' in 'lv_btns_t'
  * @param obj_dp pointer to a button object
  */
-static void lv_btn_style_load(lv_obj_t * obj_dp)
+static void lv_btn_style_load(lv_obj_t * obj_dp, lv_rects_t * rects_p)
 {
     lv_btn_state_t state = lv_btn_get_state(obj_dp);
     lv_btns_t * btns_p = lv_obj_get_style(obj_dp);
 
-    /*Init the style*/
-    btns_p->rects.objs.color = btns_p->mcolor[state];
-    btns_p->rects.gcolor = btns_p->gcolor[state];
-    btns_p->rects.bcolor = btns_p->bcolor[state];
+    /*Load the style*/
+    memcpy(rects_p, &btns_p->rects, sizeof(lv_rects_t));
+    rects_p->objs.color = btns_p->mcolor[state];
+    rects_p->gcolor = btns_p->gcolor[state];
+    rects_p->bcolor = btns_p->bcolor[state];
 }
 
 #endif

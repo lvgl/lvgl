@@ -56,8 +56,6 @@ static lv_pages_t lv_pages_def =
 
 	.margin_hor = 10 * LV_STYLE_MULT,
 	.margin_ver = 10 * LV_STYLE_MULT,
-	.padding_hor = 10 * LV_STYLE_MULT,
-	.padding_ver = 10 * LV_STYLE_MULT,
 
 };
 
@@ -87,8 +85,6 @@ static lv_pages_t lv_pages_paper =
 
 	.margin_hor = 15 * LV_STYLE_MULT,
 	.margin_ver = 15 * LV_STYLE_MULT,
-	.padding_hor = 10 * LV_STYLE_MULT,
-	.padding_ver = 10 * LV_STYLE_MULT,
 };
 
 static lv_pages_t lv_pages_transp =
