@@ -303,11 +303,10 @@ bool lv_obj_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 {
     bool valid = true;
 
-
-
     switch(sign) {
     case LV_SIGNAL_CHILD_CHG:
-    	if(obj_dp->child_chg_off != 0) valid = false;
+    	/*Return 'invalid' if the child change  signal is not enabled*/
+  //  	if(obj_dp->child_chg_off != 0) valid = false;
     	break;
     	default:
     		break;

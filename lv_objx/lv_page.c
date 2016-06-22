@@ -39,8 +39,9 @@ static lv_pages_t lv_pages_def =
 	.bg_rects.bwidth = 0 * LV_STYLE_MULT,
 	.bg_rects.round = 2 * LV_STYLE_MULT,
 	.bg_rects.empty = 0,
-	.bg_rects.hpad = 10,
-	.bg_rects.vpad = 10,
+	.bg_rects.hpad = 10 * LV_STYLE_MULT,
+	.bg_rects.vpad = 10 * LV_STYLE_MULT,
+	.bg_rects.opad = 5 * LV_STYLE_MULT,
 
 	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -49,6 +50,9 @@ static lv_pages_t lv_pages_def =
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
 	.sb_rects.empty = 0,
+	.sb_rects.hpad = 0,
+	.sb_rects.vpad = 0,
+	.sb_rects.opad = 0,
 
 	.sb_width= 8 * LV_STYLE_MULT,
 	.sb_opa=50,
@@ -70,6 +74,7 @@ static lv_pages_t lv_pages_paper =
 	.bg_rects.empty = 0,
 	.bg_rects.hpad = 20 * LV_STYLE_MULT,
 	.bg_rects.vpad = 20 * LV_STYLE_MULT,
+	.bg_rects.opad = 10 * LV_STYLE_MULT,
 
 	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -78,6 +83,9 @@ static lv_pages_t lv_pages_paper =
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
 	.sb_rects.empty = 0,
+	.sb_rects.hpad = 0,
+	.sb_rects.vpad = 0,
+	.sb_rects.opad = 0,
 
 	.sb_width = 10 * LV_STYLE_MULT,
 	.sb_opa=50,
@@ -90,8 +98,9 @@ static lv_pages_t lv_pages_paper =
 static lv_pages_t lv_pages_transp =
 {
 	.bg_rects.empty = 1,
-	.bg_rects.hpad = 1,
-	.bg_rects.vpad = 1,
+	.bg_rects.hpad = 10 * LV_STYLE_MULT,
+	.bg_rects.vpad = 10 * LV_STYLE_MULT,
+	.bg_rects.vpad = 10 * LV_STYLE_MULT,
 
 	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -100,6 +109,9 @@ static lv_pages_t lv_pages_transp =
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
 	.sb_rects.empty = 0,
+	.sb_rects.hpad = 0,
+	.sb_rects.vpad = 0,
+	.sb_rects.opad = 0,
 
 	.sb_width = 8 * LV_STYLE_MULT,
 	.sb_opa = 50,
@@ -142,7 +154,7 @@ lv_obj_t* lv_page_create(lv_obj_t * par_dp, lv_obj_t * ori_dp)
 		lv_obj_set_drag_throw(new_dp, true);
 		lv_obj_set_style(new_dp, &lv_pages_def);
 		lv_rect_set_fit(new_dp, true, true);
-    } else {
+	} else {
 		lv_obj_set_style(new_dp, lv_obj_get_style(ori_dp));
     }
 

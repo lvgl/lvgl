@@ -6,7 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+
+#include <lvgl/lv_misc/2d.h>
+#include <misc/mem/dyn_mem.h>
+#include <misc/mem/linked_list.h>
+#include <misc/others/color.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
+
 #if USE_LV_RECT != 0
 
 #include "lv_rect.h"
@@ -27,9 +35,9 @@
  **********************/
 static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
 static void lv_rect_refr_layout(lv_obj_t * obj_dp);
-static void lv_layout_col(lv_obj_t * obj_dp);
-static void lv_layout_row(lv_obj_t * obj_dp);
-static void lv_layout_center(lv_obj_t * obj_dp);
+static void lv_rect_layout_col(lv_obj_t * obj_dp);
+static void lv_rect_layout_row(lv_obj_t * obj_dp);
+static void lv_rect_layout_center(lv_obj_t * obj_dp);
 static void lv_rect_refr_autofit(lv_obj_t * obj_dp);
 
 /**********************
@@ -39,11 +47,11 @@ static lv_rects_t lv_rects_def =
 { .objs.color = COLOR_MAKE(0x20, 0x30, 0x40), .gcolor = COLOR_MAKE(0x50, 0x70, 0x90),
   .bcolor = COLOR_WHITE, .bwidth = 2 * LV_STYLE_MULT, .bopa = 50,
   .round = 4 * LV_STYLE_MULT, .empty = 0,
-  .hpad = 0 * LV_STYLE_MULT, .vpad = 0 * LV_STYLE_MULT, .opad = 0 * LV_STYLE_MULT };
+  .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT };
 
 static lv_rects_t lv_rects_transp =
 { .bwidth = 0, .empty = 1,
-  .hpad = 0, .vpad = 0, .opad = 0};
+  .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT};
 
 static lv_rects_t lv_rects_border =
 { .bcolor = COLOR_BLACK, .bwidth = 2 * LV_STYLE_MULT, .bopa = 100,
@@ -91,7 +99,7 @@ lv_obj_t* lv_rect_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 
     return new_obj_dp;
 }
-
+uint32_t sign_cnt = 0;
 /**
  * Signal function of the rectangle
  * @param obj_dp pointer to a rectangle object
@@ -111,13 +119,16 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     	switch(sign) {
     	case LV_SIGNAL_STYLE_CHG: /*Recalculate the padding if the style changed*/
         case LV_SIGNAL_CHILD_CHG:
+        	sign_cnt++;
         	lv_rect_refr_layout(obj_dp);
         	lv_rect_refr_autofit(obj_dp);
         	break;
         case LV_SIGNAL_CORD_CHG:
+        	sign_cnt++;
         	if(lv_obj_get_width(obj_dp) != area_get_width(param) ||
     		  lv_obj_get_height(obj_dp) != area_get_height(param)) {
             	lv_rect_refr_layout(obj_dp);
+            	lv_rect_refr_autofit(obj_dp);
         	}
         	break;
 
@@ -136,7 +147,7 @@ bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
  * Setter functions
  *====================*/
 
-void lv_rect_set_layout(lv_obj_t * obj_dp, lv_layout_t layout)
+void lv_rect_set_layout(lv_obj_t * obj_dp, lv_rect_layout_t layout)
 {
 	lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 	ext_p->layout = layout;
@@ -168,7 +179,7 @@ void lv_rect_set_fit(lv_obj_t * obj_dp, bool hor_en, bool ver_en)
  * Getter functions
  *====================*/
 
-lv_layout_t lv_rect_get_layout(lv_obj_t * obj_dp)
+lv_rect_layout_t lv_rect_get_layout(lv_obj_t * obj_dp)
 {
 	lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 	return ext_p->layout;
@@ -179,7 +190,7 @@ lv_layout_t lv_rect_get_layout(lv_obj_t * obj_dp)
  * @param obj_dp pointer to a rectangle object
  * @return true: horizontal padding is enabled
  */
-bool lv_rect_get_hpad_en(lv_obj_t * obj_dp)
+bool lv_rect_get_hfit(lv_obj_t * obj_dp)
 {
 	lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 	return ext_p->hfit_en == 0 ? false : true;
@@ -190,7 +201,7 @@ bool lv_rect_get_hpad_en(lv_obj_t * obj_dp)
  * @param obj_dp pointer to a rectangle object
  * @return true: vertical padding is enabled
  */
-bool lv_rect_get_vpad_en(lv_obj_t * obj_dp)
+bool lv_rect_get_vfit(lv_obj_t * obj_dp)
 {
 	lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 	return ext_p->vfit_en == 0 ? false : true;
@@ -283,16 +294,16 @@ static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
  */
 static void lv_rect_refr_layout(lv_obj_t * obj_dp)
 {
-	lv_layout_t type = lv_rect_get_layout(obj_dp);
+	lv_rect_layout_t type = lv_rect_get_layout(obj_dp);
 
-	if(type == LV_LAYOUT_OFF) return;
+	if(type == LV_RECT_LAYOUT_OFF) return;
 
-	if(type == LV_LAYOUT_COL_L || type == LV_LAYOUT_COL_M || type == LV_LAYOUT_COL_R) {
-		lv_layout_col(obj_dp);
-	} else if(type == LV_LAYOUT_ROW_T || type == LV_LAYOUT_ROW_M || type == LV_LAYOUT_ROW_B) {
-		lv_layout_row(obj_dp);
-	} else if(type == LV_LAYOUT_CENTER) {
-		lv_layout_center(obj_dp);
+	if(type == LV_RECT_LAYOUT_COL_L || type == LV_RECT_LAYOUT_COL_M || type == LV_RECT_LAYOUT_COL_R) {
+		lv_rect_layout_col(obj_dp);
+	} else if(type == LV_RECT_LAYOUT_ROW_T || type == LV_RECT_LAYOUT_ROW_M || type == LV_RECT_LAYOUT_ROW_B) {
+		lv_rect_layout_row(obj_dp);
+	} else if(type == LV_RECT_LAYOUT_CENTER) {
+		lv_rect_layout_center(obj_dp);
 	}
 }
 
@@ -301,9 +312,9 @@ static void lv_rect_refr_layout(lv_obj_t * obj_dp)
  * Handle column type layouts
  * @param obj_dp pointer to an object which layout should be handled
  */
-static void lv_layout_col(lv_obj_t * obj_dp)
+static void lv_rect_layout_col(lv_obj_t * obj_dp)
 {
-	lv_layout_t type = lv_rect_get_layout(obj_dp);
+	lv_rect_layout_t type = lv_rect_get_layout(obj_dp);
 	lv_obj_t * child;
 
 	/*Adjust margin and get the alignment type*/
@@ -311,15 +322,15 @@ static void lv_layout_col(lv_obj_t * obj_dp)
 	lv_rects_t * rects_p = lv_obj_get_style(obj_dp);
 	cord_t hpad_corr;
 	switch(type) {
-		case LV_LAYOUT_COL_L:
+		case LV_RECT_LAYOUT_COL_L:
 			hpad_corr = rects_p->hpad;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
-		case LV_LAYOUT_COL_M:
+		case LV_RECT_LAYOUT_COL_M:
 			hpad_corr = 0;
 			align = LV_ALIGN_IN_TOP_MID;
 			break;
-		case LV_LAYOUT_COL_R:
+		case LV_RECT_LAYOUT_COL_R:
 			hpad_corr = -rects_p->hpad;
 			align = LV_ALIGN_IN_TOP_RIGHT;
 			break;
@@ -345,9 +356,9 @@ static void lv_layout_col(lv_obj_t * obj_dp)
  * Handle row type layouts
  * @param obj_dp pointer to an object which layout should be handled
  */
-static void lv_layout_row(lv_obj_t * obj_dp)
+static void lv_rect_layout_row(lv_obj_t * obj_dp)
 {
-	lv_layout_t type = lv_rect_get_layout(obj_dp);
+	lv_rect_layout_t type = lv_rect_get_layout(obj_dp);
 	lv_obj_t * child;
 
 	/*Adjust margin and get the alignment type*/
@@ -355,15 +366,15 @@ static void lv_layout_row(lv_obj_t * obj_dp)
 	lv_rects_t * rects_p = lv_obj_get_style(obj_dp);
 	cord_t vpad_corr = rects_p->vpad;
 	switch(type) {
-		case LV_LAYOUT_ROW_T:
+		case LV_RECT_LAYOUT_ROW_T:
 			vpad_corr = rects_p->vpad;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
-		case LV_LAYOUT_ROW_M:
+		case LV_RECT_LAYOUT_ROW_M:
 			vpad_corr = 0;
 			align = LV_ALIGN_IN_LEFT_MID;
 			break;
-		case LV_LAYOUT_ROW_B:
+		case LV_RECT_LAYOUT_ROW_B:
 			vpad_corr = -rects_p->vpad;
 			align = LV_ALIGN_IN_BOTTOM_LEFT;
 			break;
@@ -389,7 +400,7 @@ static void lv_layout_row(lv_obj_t * obj_dp)
 }
 
 
-static void lv_layout_center(lv_obj_t * obj_dp)
+static void lv_rect_layout_center(lv_obj_t * obj_dp)
 {
 	lv_obj_t * child;
 	lv_rects_t * rects_p = lv_obj_get_style(obj_dp);
@@ -408,7 +419,6 @@ static void lv_layout_center(lv_obj_t * obj_dp)
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
 	obj_dp->child_chg_off = 1;
-
 
 	/* Align the children */
 	cord_t last_cord = - (h_tot / 2);

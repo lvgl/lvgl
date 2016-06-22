@@ -27,15 +27,9 @@
 /*Style of LIST*/
 typedef struct
 {
-	/*Ancestor page style*/
-	lv_pages_t pages;
-	/*List style*/
-	lv_layout_t list_layout;
-	cord_t list_layout_space;
-	/*List element style*/
+	lv_pages_t pages; /*Ancestor page style*/
 	lv_btns_t liste_btns;
-	lv_layout_t liste_layout;
-	cord_t liste_layout_space;
+	lv_rect_layout_t liste_layout;
 }lv_lists_t;
 
 

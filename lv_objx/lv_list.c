@@ -16,6 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_LIST_LAYOUT_DEF	LV_RECT_LAYOUT_COL_M
 
 /**********************
  *      TYPEDEFS
@@ -34,20 +35,17 @@ static lv_lists_t lv_lists_def =
 	/*Page style*/
 	.pages.bg_rects.objs.color = COLOR_WHITE, .pages.bg_rects.gcolor = COLOR_SILVER, .pages.bg_rects.bcolor = COLOR_GRAY,
 	.pages.bg_rects.bopa = 50, .pages.bg_rects.bwidth = 0 * LV_STYLE_MULT, .pages.bg_rects.round = 2 * LV_STYLE_MULT,
-	.pages.bg_rects.empty = 0,
-	.pages.bg_rects.vpad = 40,
-	.pages.bg_rects.hpad = 20,
-	.pages.bg_rects.opad = 10,
+	.pages.bg_rects.empty = 1,
+	.pages.bg_rects.vpad = 0 * LV_STYLE_MULT,
+	.pages.bg_rects.hpad = 0 * LV_STYLE_MULT,
+	.pages.bg_rects.opad = 5 * LV_STYLE_MULT,
 
 	.pages.sb_rects.objs.color = COLOR_BLACK, .pages.sb_rects.gcolor = COLOR_BLACK, .pages.sb_rects.bcolor = COLOR_WHITE,
 	.pages.sb_rects.bopa = 50, .pages.sb_rects.bwidth = 1 * LV_STYLE_MULT, .pages.sb_rects.round = 5 * LV_STYLE_MULT,
-	.pages.sb_rects.empty = 0, .pages.sb_width= 8 * LV_STYLE_MULT, .pages.sb_opa=50, .pages.sb_mode = LV_PAGE_SB_MODE_ON,
+	.pages.sb_rects.empty = 0, .pages.sb_width= 8 * LV_STYLE_MULT, .pages.sb_opa=50, .pages.sb_mode = LV_PAGE_SB_MODE_AUTO,
 
 	.pages.margin_ver = 0 * LV_STYLE_MULT,
-	.pages.margin_ver = 0 * LV_STYLE_MULT,
-
-	/*List style*/
-	.list_layout = LV_LAYOUT_CENTER,
+	.pages.margin_hor = 0 * LV_STYLE_MULT,
 
 	/*List element style*/
 	.liste_btns.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_REL] = COLOR_WHITE, .liste_btns.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
@@ -58,10 +56,10 @@ static lv_lists_t lv_lists_def =
 	.liste_btns.rects.bwidth = 2 * LV_STYLE_MULT, .liste_btns.rects.bopa = 50,
 	.liste_btns.rects.empty = 0, .liste_btns.rects.round = 4 * LV_STYLE_MULT,
 	.liste_btns.rects.hpad = 10 * LV_STYLE_MULT,
-	.liste_btns.rects.vpad = 20 * LV_STYLE_MULT,
-	.liste_btns.rects.opad = 5 * LV_STYLE_MULT,
+	.liste_btns.rects.vpad = 10 * LV_STYLE_MULT,
+	.liste_btns.rects.opad = 3 * LV_STYLE_MULT,
 
-	.liste_layout = LV_LAYOUT_ROW_M,
+	.liste_layout = LV_RECT_LAYOUT_CENTER
 };
 
 /**********************
@@ -90,7 +88,7 @@ lv_obj_t* lv_list_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     
     /*Init the new list object*/
     lv_obj_set_style(new_obj_dp, &lv_lists_def.pages);
-    lv_rect_set_layout(new_obj_dp, lv_lists_def.list_layout);
+    lv_rect_set_layout(new_obj_dp, LV_LIST_LAYOUT_DEF);
     
     return new_obj_dp;
 }
@@ -129,7 +127,7 @@ void lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt, void 
 	//lv_btn_set_rel_action(liste, release);
 	lv_page_glue_obj(liste, true);
 	lv_rect_set_layout(liste, lv_lists_def.liste_layout);
-	lv_rect_set_fit(liste, true, true);
+	lv_rect_set_fit(liste, false, true);
 
 
 	if(img_fn != NULL) {
