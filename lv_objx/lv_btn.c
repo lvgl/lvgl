@@ -66,6 +66,7 @@ static lv_btns_t lv_btns_def =
 };
 static lv_btns_t lv_btns_transp =
 {
+	.rects.objs.transp = 1,
 	.rects.bwidth = 0,
 	.rects.empty = 1,
 	.rects.hpad = 10 * LV_STYLE_MULT,

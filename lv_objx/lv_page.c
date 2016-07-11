@@ -91,7 +91,9 @@ static lv_pages_t lv_pages_paper =
 
 static lv_pages_t lv_pages_transp =
 {
+	.bg_rects.objs.transp = 1,
 	.bg_rects.empty = 1,
+	.bg_rects.bwidth = 0,
 	.bg_rects.hpad = 10 * LV_STYLE_MULT,
 	.bg_rects.vpad = 10 * LV_STYLE_MULT,
 	.bg_rects.vpad = 10 * LV_STYLE_MULT,
@@ -274,14 +276,11 @@ bool lv_page_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param)
                 break;
                 
             case LV_SIGNAL_STYLE_CHG:
+				lv_obj_set_style(page_ext_p->sbh_dp, &pages_p->sb_rects);
+				lv_obj_set_style(page_ext_p->sbv_dp, &pages_p->sb_rects);
+				lv_obj_set_width(page_ext_p->sbv_dp, pages_p->sb_width);
+				lv_obj_set_height(page_ext_p->sbh_dp, pages_p->sb_width);
 
-            	/* Set the styles only if they are different else infinite loop
-            	 * will be created from lv_obj_set_style*/
-            	if(lv_obj_get_style(page_ext_p->sbh_dp) != &pages_p->sb_rects) {
-					lv_obj_set_style(page_ext_p->sbh_dp, &pages_p->sb_rects);
-					lv_obj_set_style(page_ext_p->sbv_dp, &pages_p->sb_rects);
-					lv_obj_set_style(obj_dp, &pages_p->bg_rects);
-            	}
             	if(pages_p->sb_mode == LV_PAGE_SB_MODE_ON) {
                 	lv_obj_set_opa(page_ext_p->sbv_dp, (pages_p->sb_opa * OPA_COVER) / 100);
                 	lv_obj_set_opa(page_ext_p->sbh_dp, (pages_p->sb_opa * OPA_COVER) / 100);

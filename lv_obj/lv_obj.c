@@ -35,8 +35,9 @@ lv_obj_t* def_scr_dp = NULL;
 lv_obj_t* act_scr_dp = NULL;
 ll_dsc_t scr_ll;
 
-lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0x20, 0x30, 0x40)};
-lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR};
+lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
+lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
+lv_objs_t lv_objs_transp = {.transp = 1};
 
 /**********************
  *      MACROS
@@ -306,7 +307,7 @@ bool lv_obj_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     switch(sign) {
     case LV_SIGNAL_CHILD_CHG:
     	/*Return 'invalid' if the child change  signal is not enabled*/
-  //  	if(obj_dp->child_chg_off != 0) valid = false;
+    	if(obj_dp->child_chg_off != 0) valid = false;
     	break;
     	default:
     		break;
@@ -332,6 +333,8 @@ lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
 		case LV_OBJS_SCR:
 			style_p = &lv_objs_scr;
 			break;
+		case LV_OBJS_TRANSP:
+			style_p = &lv_objs_transp;
 			break;
 		default:
 			style_p = NULL;
@@ -829,6 +832,9 @@ void lv_obj_set_hidden(lv_obj_t* obj_dp, bool hidden_en)
 {
     obj_dp->hidden = hidden_en == false ? 0 : 1;
     
+    lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
+    par_dp->signal_f(par_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
+
     lv_obj_inv(obj_dp);
 }
 

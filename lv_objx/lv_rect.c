@@ -50,7 +50,7 @@ static lv_rects_t lv_rects_def =
   .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT };
 
 static lv_rects_t lv_rects_transp =
-{ .bwidth = 0, .empty = 1,
+{ .objs.transp = 1, .bwidth = 0, .empty = 1,
   .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT};
 
 static lv_rects_t lv_rects_border =
@@ -345,6 +345,8 @@ static void lv_rect_layout_col(lv_obj_t * obj_dp)
 	/* Align the children */
 	cord_t last_cord = rects_p->vpad;
 	LL_READ_BACK(obj_dp->child_ll, child) {
+		if(lv_obj_get_hidden(child) != false) continue;
+
 		lv_obj_align(child, obj_dp, align, hpad_corr , last_cord);
 		last_cord += lv_obj_get_height(child) + rects_p->opad;
 	}
@@ -392,6 +394,8 @@ static void lv_rect_layout_row(lv_obj_t * obj_dp)
 	/* Align the children */
 	cord_t last_cord = rects_p->hpad;
 	LL_READ_BACK(obj_dp->child_ll, child) {
+		if(lv_obj_get_hidden(child) != false) continue;
+
 		lv_obj_align(child, obj_dp, align, last_cord, vpad_corr);
 		last_cord += lv_obj_get_width(child) + rects_p->opad;
 	}
@@ -423,6 +427,8 @@ static void lv_rect_layout_center(lv_obj_t * obj_dp)
 	/* Align the children */
 	cord_t last_cord = - (h_tot / 2);
 	LL_READ_BACK(obj_dp->child_ll, child) {
+		if(lv_obj_get_hidden(child) != false) continue;
+
 		lv_obj_align(child, obj_dp, LV_ALIGN_CENTER, 0, last_cord + lv_obj_get_height(child) / 2);
 		last_cord += lv_obj_get_height(child) + rects_p->opad;
 	}
@@ -457,6 +463,7 @@ void lv_rect_refr_autofit(lv_obj_t * obj_dp)
 	rect_cords.y2 = LV_CORD_MIN;
 
     LL_READ(obj_dp->child_ll, i) {
+		if(lv_obj_get_hidden(i) != false) continue;
     	rect_cords.x1 = min(rect_cords.x1, i->cords.x1);
     	rect_cords.y1 = min(rect_cords.y1, i->cords.y1);
         rect_cords.x2 = max(rect_cords.x2, i->cords.x2);
