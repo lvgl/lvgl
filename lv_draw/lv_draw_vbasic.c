@@ -191,26 +191,27 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     color_t * vdb_buf_tmp = vdb_p->buf; 
     vdb_buf_tmp += (uint32_t) vdb_width * masked_a.y1; /*Move to the first row*/
 
-    map_p -= masked_a.x1 >> ds_shift;
+    map_p -= (masked_a.x1 >> ds_shift);
 
 #if LV_DOWNSCALE > 1 && LV_UPSCALE_MAP != 0
     cord_t row;
     cord_t col;
+    cord_t row_cnt = 0;
     color_t transp_color = LV_IMG_COLOR_TRANSP;
     color_t color_tmp;
     cord_t map_i;
     map_p -= map_width; /*Compensate the first row % LV_DOWNSCALE*/
-    for(row = masked_a.y1; row <= masked_a.y2; row++) {
-        if(row % LV_DOWNSCALE == 0) map_p += map_width;              /*Next row on the map*/
+    for(row = masked_a.y1, row_cnt = 0; row <= masked_a.y2; row++, row_cnt ++) {
+        if(row_cnt % LV_DOWNSCALE == 0) map_p += map_width;              /*Next row on the map*/
         map_i = masked_a.x1 >> ds_shift;
         map_i--; /*Compensate the first col % LV_DOWNSCALE*/
         for(col = masked_a.x1; col <= masked_a.x2; col++) {
            if(col % LV_DOWNSCALE == 0) {
         	   map_i++;
-			   color_tmp = color_mix(recolor, map_p[map_i], recolor_opa);
+			   color_tmp = map_p[map_i];//color_mix(recolor, map_p[map_i], recolor_opa);
            }
            if(transp == false || map_p[map_i].full != transp_color.full) {
-               vdb_buf_tmp[col] = color_mix(color_tmp, vdb_buf_tmp[col], opa);
+               vdb_buf_tmp[col] = color_tmp;//color_mix(color_tmp, vdb_buf_tmp[col], opa);
            }
         }
         vdb_buf_tmp += vdb_width;        /*Next row on the VDB*/

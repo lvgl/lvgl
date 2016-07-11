@@ -489,10 +489,7 @@ void lv_rect_refr_autofit(lv_obj_t * obj_dp)
     	lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
     	par_dp->signal_f(par_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
 
-    } else {
-        lv_obj_set_size(obj_dp, LV_OBJ_DEF_WIDTH, LV_OBJ_DEF_HEIGHT);
     }
-
 }
 
 #endif

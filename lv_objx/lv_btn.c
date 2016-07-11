@@ -62,7 +62,7 @@ static lv_btns_t lv_btns_def =
 	.rects.round = 4 * LV_STYLE_MULT,
 	.rects.hpad = 10 * LV_STYLE_MULT,
 	.rects.vpad = 15 * LV_STYLE_MULT,
-	.rects.opad = 5 * LV_STYLE_MULT,
+	.rects.opad = 3 * LV_STYLE_MULT,
 };
 static lv_btns_t lv_btns_transp =
 {

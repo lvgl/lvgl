@@ -43,7 +43,7 @@ typedef enum
 typedef struct
 {
 	lv_page_ext_t page_ext;
-	uint8_t fit_size :1;	/*Automatically set the size of list elements to the holder */
+	uint8_t fit_size :1;	/*Automatically set the adjust size of list elements to longest element */
 	uint8_t sel_en   :1;	/*Enable selecting list elements by toggling them */
 	uint8_t sel_one  :1;	/*Enable to select only one list element*/
 }lv_list_ext_t;
