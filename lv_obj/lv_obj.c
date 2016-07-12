@@ -979,7 +979,7 @@ void lv_obj_anim(lv_obj_t * obj_dp, lv_anim_builtin_t type, uint16_t time, uint1
 	bool out = (type & ANIM_DIR_MASK) == ANIM_IN ? false : true;
 	type = type & (~ANIM_DIR_MASK);
 
-	if(type == ANIM_NONE) return;
+	if(type == LV_ANIM_NONE) return;
 
 	anim_t a;
 	a.p = obj_dp;
@@ -989,43 +989,43 @@ void lv_obj_anim(lv_obj_t * obj_dp, lv_anim_builtin_t type, uint16_t time, uint1
 
 	/*Init to ANIM_IN*/
 	switch(type) {
-		case ANIM_FLOAT_LEFT:
+		case LV_ANIM_FLOAT_LEFT:
 			a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
 			a.start = -lv_obj_get_width(obj_dp);
 			a.end = lv_obj_get_x(obj_dp);
 			a.path_p = anim_path_lin;
 			break;
-		case ANIM_FLOAT_RIGHT:
+		case LV_ANIM_FLOAT_RIGHT:
 			a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
 			a.start = lv_obj_get_width(par_dp);
 			a.end = lv_obj_get_x(obj_dp);
 			a.path_p = anim_path_lin;
 			break;
-		case ANIM_FLOAT_TOP:
+		case LV_ANIM_FLOAT_TOP:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_y;
 			a.start = -lv_obj_get_height(obj_dp);
 			a.end = lv_obj_get_y(obj_dp);
 			a.path_p = anim_path_lin;
 			break;
-		case ANIM_FLOAT_BOTTOM:
+		case LV_ANIM_FLOAT_BOTTOM:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_y;
 			a.start = lv_obj_get_height(par_dp);
 			a.end = lv_obj_get_y(obj_dp);
 			a.path_p = anim_path_lin;
 			break;
-		case ANIM_FADE:
+		case LV_ANIM_FADE:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_opar;
 			a.start = OPA_TRANSP;
 			a.end = OPA_COVER;
 			a.path_p = anim_path_lin;
 			break;
-		case ANIM_GROW_H:
+		case LV_ANIM_GROW_H:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_width;
 			a.start = 0;
 			a.end = lv_obj_get_width(obj_dp);
 			a.path_p = anim_path_lin;
 			break;
-		case ANIM_GROW_V:
+		case LV_ANIM_GROW_V:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_height;
 			a.start = 0;
 			a.end = lv_obj_get_height(obj_dp);
