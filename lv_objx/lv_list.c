@@ -25,7 +25,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if 0
 static bool lv_list_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -300,6 +302,7 @@ lv_list_fit_t lv_list_get_fit(lv_obj_t * obj_dp)
  *   STATIC FUNCTIONS
  **********************/
 
+#if 0 /*A new design function is not necessary*/
 /**
  * Handle the drawing related tasks of the lists
  * @param obj_dp pointer to an object
@@ -316,11 +319,11 @@ static bool lv_list_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
     	return false;
     }
 
-
     /*Draw the object*/
 
     return true;
 }
+#endif
 
 
 #endif

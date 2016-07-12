@@ -9,6 +9,7 @@
 #include "lv_obj.h"
 #include "../lv_draw/lv_draw_rbasic.h"
 #include "../lv_draw/lv_draw_vbasic.h"
+#include "../lv_misc/anim.h"
 #include "lv_dispi.h"
 #include "lv_refr.h"
 #include "misc/math/math_base.h"
@@ -39,6 +40,12 @@ lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
 lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
 lv_objs_t lv_objs_transp = {.transp = 1};
 
+static anim_path_t anim_path_lin[] =
+		{64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
+		 96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
+		 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+		 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192};
+
 /**********************
  *      MACROS
  **********************/
@@ -60,6 +67,9 @@ void lv_init(void)
     /*Init. the screen refresh system*/
     lv_refr_init();
     
+    /*Init. the animations*/
+    anim_init();
+
     /*Create the default screen*/
     ll_init(&scr_ll, sizeof(lv_obj_t));
     def_scr_dp = lv_obj_create(NULL, NULL);
@@ -952,6 +962,88 @@ void lv_obj_set_free_p(lv_obj_t* obj_dp, void * free_p)
     obj_dp->free_p = free_p;
 }
 #endif
+
+/**
+ * Animate an object
+ * @param obj_dp pointer to an object to animate
+ * @param type type of animation from 'lv_anim_builtin_t'. 'OR' it with ANIM_IN or ANIM_OUT
+ * @param time time of animation in milliseconds
+ * @param delay delay before the animation in milliseconds
+ * @param cb a function to call when the animation is ready
+ */
+void lv_obj_anim(lv_obj_t * obj_dp, lv_anim_builtin_t type, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *))
+{
+	lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
+
+	/*Get the direction*/
+	bool out = (type & ANIM_DIR_MASK) == ANIM_IN ? false : true;
+	type = type & (~ANIM_DIR_MASK);
+
+	if(type == ANIM_NONE) return;
+
+	anim_t a;
+	a.p = obj_dp;
+	a.time = time;
+	a.act_time = (int32_t)-delay;
+	a.end_cb = (void(*)(void*))cb;
+
+	/*Init to ANIM_IN*/
+	switch(type) {
+		case ANIM_FLOAT_LEFT:
+			a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
+			a.start = -lv_obj_get_width(obj_dp);
+			a.end = lv_obj_get_x(obj_dp);
+			a.path_p = anim_path_lin;
+			break;
+		case ANIM_FLOAT_RIGHT:
+			a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
+			a.start = lv_obj_get_width(par_dp);
+			a.end = lv_obj_get_x(obj_dp);
+			a.path_p = anim_path_lin;
+			break;
+		case ANIM_FLOAT_TOP:
+			a.fp = (void(*)(void * , int32_t))lv_obj_set_y;
+			a.start = -lv_obj_get_height(obj_dp);
+			a.end = lv_obj_get_y(obj_dp);
+			a.path_p = anim_path_lin;
+			break;
+		case ANIM_FLOAT_BOTTOM:
+			a.fp = (void(*)(void * , int32_t))lv_obj_set_y;
+			a.start = lv_obj_get_height(par_dp);
+			a.end = lv_obj_get_y(obj_dp);
+			a.path_p = anim_path_lin;
+			break;
+		case ANIM_FADE:
+			a.fp = (void(*)(void * , int32_t))lv_obj_set_opar;
+			a.start = OPA_TRANSP;
+			a.end = OPA_COVER;
+			a.path_p = anim_path_lin;
+			break;
+		case ANIM_GROW_H:
+			a.fp = (void(*)(void * , int32_t))lv_obj_set_width;
+			a.start = 0;
+			a.end = lv_obj_get_width(obj_dp);
+			a.path_p = anim_path_lin;
+			break;
+		case ANIM_GROW_V:
+			a.fp = (void(*)(void * , int32_t))lv_obj_set_height;
+			a.start = 0;
+			a.end = lv_obj_get_height(obj_dp);
+			a.path_p = anim_path_lin;
+			break;
+		default:
+			break;
+	}
+
+	/*Swap start and end in case of ANIM OUT*/
+	if(out != false) {
+		int32_t tmp = a.start;
+		a.start = a.end;
+		a.end = tmp;
+	}
+
+	anim_create(&a);
+}
 /*=======================
  * Getter functions
  *======================*/

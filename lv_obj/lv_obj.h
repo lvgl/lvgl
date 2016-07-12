@@ -42,6 +42,10 @@
 #define LV_OBJ_DEF_WIDTH  (80 * LV_DOWNSCALE)
 #define LV_OBJ_DEF_HEIGHT  (60 * LV_DOWNSCALE)
 
+#define ANIM_IN					0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
+#define ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
+#define ANIM_DIR_MASK			0x80	/*ANIM_IN/ANIM_OUT mask*/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -144,6 +148,18 @@ typedef enum
 	LV_OBJS_TRANSP,
 }lv_objs_builtin_t;
 
+typedef enum
+{
+	ANIM_NONE = 0,
+	ANIM_FADE,
+	ANIM_FLOAT_TOP,
+	ANIM_FLOAT_LEFT,
+	ANIM_FLOAT_BOTTOM,
+	ANIM_FLOAT_RIGHT,
+	ANIM_GROW_H,
+	ANIM_GROW_V,
+}lv_anim_builtin_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -195,7 +211,7 @@ void lv_obj_set_style(lv_obj_t* obj_dp, void * style_p);
 void * lv_obj_iso_style(lv_obj_t * obj_dp, uint32_t style_size);
 void lv_obj_set_free_num(lv_obj_t* obj_dp, uint8_t free_num);
 void lv_obj_set_free_p(lv_obj_t* obj_dp, void * free_p);
-void lv_obj_merge_style(lv_obj_t* obj_dp);
+void lv_obj_anim(lv_obj_t * obj_dp, lv_anim_builtin_t anim, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *));
 
 /*GETTER FUNCTIONS*/
 /*Screen get*/

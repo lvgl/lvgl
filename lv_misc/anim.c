@@ -6,50 +6,34 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include <stddef.h>
-#include "lvgl/lvgl.h"
+#include <string.h>
+#include "anim.h"
+#include "misc/os/ptask.h"
+#include "hal/systick/systick.h"
+
 
 /*********************
  *      DEFINES
  *********************/
+#define ANIM_PATH_LENGTH		129	/*Elements in a path array*/
+#define ANIM_PATH_START			64  /*In path array a value which corresponds to the start position*/
+#define ANIM_PATH_END			192 /* ... to the end position. Not required, just for clearance.*/
+#define ANIM_PATH_NORM_SHIFT	7 	/*ANIM_PATH_START - ANIM_PATH_END. Must be 2^N. The exponent goes here. */
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef uint8_t anim_path_t;
-
-typedef struct
-{
-
-}anim_t;
-
-typedef enum
-{
-	ANIM_NONE = 0,
-	ANIM_SHOW,
-	ANIM_FLOAT_TOP,
-	ANIM_FLOAT_LEFT,
-	ANIM_FLOAT_BOTTOM,
-	ANIM_FLOAT_RIGHT,
-	ANIM_SLIDE_TOP,
-	ANIM_SLIDE_LEFT,
-	ANIM_SLIDE_BOTTOM,
-	ANIM_SLIDE_RIGHT,
-	ANIM_FADE,
-	ANIM_FADER,
-	ANIM_SIZE,
-	ANIM_PINGPONG_H,
-	ANIM_PINGPONG_V,
-}anim_builtin_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void anim_task (void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static ll_dsc_t anim_ll;
+static uint32_t last_task_run;
 
 /**********************
  *      MACROS
@@ -59,34 +43,81 @@ typedef enum
  *   GLOBAL FUNCTIONS
  **********************/
 
-void anim_start(lv_obj_t * obj_dp, anim_builtin_t anim, uint32_t t, uint32_t delay)
+/**
+ * Init. the animation module
+ */
+void anim_init(void)
 {
-
+	ll_init(&anim_ll, sizeof(anim_t));
+	last_task_run = systick_get();
+	ptask_create(anim_task, LV_REFR_PERIOD, PTASK_PRIO_MID);
 }
 
-anim_t * anim_create(void * p, void * fp, int32_t v1, int32_t v2, anim_path_t * path_p)
+/**
+ * Create an animation
+ * @param anim_p an initialized 'anim_t' variable. Not required after call.
+ */
+void anim_create(anim_t * anim_p)
 {
-	return NULL;
+	anim_t * new_anim_dp = ll_ins_head(&anim_ll);
+	dm_assert(new_anim_dp);
+
+	memcpy(new_anim_dp, anim_p, sizeof(anim_t));
+
+	new_anim_dp->fp(new_anim_dp->p, new_anim_dp->start);
 }
-
-void ani_set_cb(anim_t * anim_dp, void (*cb)(void *, void *))
-{
-
-}
-
-void anim_start_t(anim_t anim_dp, uint32_t time, uint32_t delay)
-{
-
-}
-
-
-void anim_start_v(anim_t anim_dp, uint32_t v, uint32_t delay)
-{
-
-}
-
 
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * Periodically handle animations.
+ */
+static void anim_task (void)
+{
+	uint32_t elaps;
+	elaps = systick_elaps(last_task_run);
+
+	anim_t * a;
+	anim_t * a_next;
+	a = ll_get_head(&anim_ll);
+	while(a != NULL) {
+		/*'a' might be deleted, so get the next object while 'a' is valid*/
+		a_next = ll_get_next(&anim_ll, a);
+
+		a->act_time += elaps;
+		if(a->act_time >= 0) {
+			if(a->act_time > a->time) a->act_time = a->time;
+
+			/* Get the index of the path array based on the elapsed time*/
+			uint8_t path_i;
+			path_i = a->act_time * (ANIM_PATH_LENGTH - 1) / a->time;
+
+			/* Get the new value which will be proportional to the current element of 'path_p'
+			 * and the 'start' and 'end' values*/
+			int32_t new_val;
+			new_val =  (int32_t)(a->path_p[path_i] - ANIM_PATH_START) * (a->end - a->start);
+			new_val = new_val >> ANIM_PATH_NORM_SHIFT;
+			new_val += a->start;
+
+			a->fp(a->p, new_val);	/*Apply the calculated value*/
+
+			/*Delete the animation if it is ready*/
+			if(a->act_time >= a->time) {
+				void (*cb) (void *) = a->end_cb;
+				void * p = a->p;
+				ll_rem(&anim_ll, a);
+				dm_free(a);
+
+				/*Call the callback function at the end*/
+				if(cb != NULL) cb(p);
+			}
+		}
+
+		a = a_next;
+	}
+
+	last_task_run = systick_get();
+}
