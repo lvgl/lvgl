@@ -17,6 +17,7 @@
 #include "lv_objx/lv_page.h"
 #include "lv_objx/lv_rect.h"
 #include "lv_objx/lv_list.h"
+#include "lv_objx/lv_cb.h"
 
 /*********************
  *      DEFINES

@@ -22,25 +22,25 @@
  *      TYPEDEFS
  **********************/
 
-/*Style of TEMPL*/
+/*Style of template*/
 typedef struct
 {
-
+	/*Style of ancestor*/
+	/*New style element for this type */
 }lv_templs_t;
 
-
-/*Built-in styles of TEMPL*/
+/*Built-in styles of template*/
 typedef enum
 {
 	LV_TEMPLS_DEF,
 }lv_templs_builtin_t;
 
-/*Data of TEMPL*/
+/*Data of template*/
 typedef struct
 {
-
+	/*Ext. of ancestor*/
+	/*New data for this type */
 }lv_templ_ext_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES

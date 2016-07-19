@@ -1,11 +1,14 @@
+
+
 /**
  * @file lv_templ.c
  * 
  */
 
-/*Search an replace: templ -> object short name with lower case(e.g. btn, label etc)
+/*Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
+ * 					 templ -> object short name with lower case(e.g. btn, label etc)
  *                   TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
- *                   template -> object normal name with lower case (e.g. button, label etc.)
+ *
  */
 
 /*********************
@@ -53,13 +56,14 @@ static lv_templs_t lv_templs_def =
  * @param copy_dp pointer to a template object, if not NULL then the new object will be copied from it
  * @return pointer to the created template
  */
-lv_obj_t* lv_templ_create(lv_obj_t* par_dp, , lv_obj_t * copy_dp);
+lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 {
     /*Create the ancestor basic object*/
-    lv_obj_t* new_obj_dp = lv_obj_create(par_dp);
+    lv_obj_t* new_obj_dp = lv_obj_create(par_dp, copy_dp);
     dm_assert(new_obj_dp);
     
     /*Init the new template object*/
+    lv_obj_set_signal_f(new_obj_dp, lv_templ_signal);
     
     return new_obj_dp;
 }
@@ -90,6 +94,15 @@ bool lv_templ_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     return valid;
 }
 
+/*=====================
+ * Setter functions
+ *====================*/
+
+
+/*=====================
+ * Getter functions
+ *====================*/
+
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable
  * @param style a style name from lv_templs_builtin_t enum
@@ -115,14 +128,6 @@ lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy_p)
 
 	return style_p;
 }
-/*=====================
- * Setter functions 
- *====================*/
-
-
-/*=====================
- * Getter functions 
- *====================*/
 
 /**********************
  *   STATIC FUNCTIONS
