@@ -62,8 +62,16 @@ lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     lv_obj_t* new_obj_dp = lv_obj_create(par_dp, copy_dp);
     dm_assert(new_obj_dp);
     
+    /*Allocate the object type specific extended data*/
+    lv_templ_ext_t * ext_dp = lv_obj_alloc_ext(new_obj_dp, sizeof(lv_templ_ext_t));
+    dm_assert(ext_dp);
+
     /*Init the new template object*/
-    lv_obj_set_signal_f(new_obj_dp, lv_templ_signal);
+    if(copy_dp == NULL) {
+        lv_obj_set_signal_f(new_obj_dp, lv_templ_signal);
+    } else {
+
+    }
     
     return new_obj_dp;
 }

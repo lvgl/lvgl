@@ -22,7 +22,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if 0 /*The ancestor design function is used */
 static bool lv_cb_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -248,7 +250,7 @@ lv_cbs_t * lv_cbs_get(lv_cbs_builtin_t style, lv_cbs_t * copy_p)
  *   STATIC FUNCTIONS
  **********************/
 
-#if 0 /*THe ancestor design function is used */
+#if 0 /*The ancestor design function is used */
 /**
  * Handle the drawing related tasks of the check boxes
  * @param obj_dp pointer to an object

@@ -18,6 +18,7 @@
 #include "lv_objx/lv_rect.h"
 #include "lv_objx/lv_list.h"
 #include "lv_objx/lv_cb.h"
+#include "lv_objx/lv_pb.h"
 
 /*********************
  *      DEFINES
