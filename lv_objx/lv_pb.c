@@ -101,6 +101,12 @@ lv_obj_t* lv_pb_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 
     	lv_pb_set_value(new_obj_dp, ext_dp->act_value);
     } else {
+    	lv_pb_ext_t * ext_copy_dp = lv_obj_get_ext(copy_dp);
+    	ext_dp->format_dp = dm_alloc(strlen(ext_copy_dp->format_dp) + 1);
+		strcpy(ext_dp->format_dp, ext_copy_dp->format_dp);
+		ext_dp->min_value = ext_copy_dp->min_value;
+		ext_dp->max_value = ext_copy_dp->max_value;
+		ext_dp->act_value = ext_copy_dp->act_value;
 
     }
     return new_obj_dp;

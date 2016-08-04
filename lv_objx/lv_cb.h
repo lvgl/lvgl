@@ -42,7 +42,7 @@ typedef enum
 /*Data of check box*/
 typedef struct
 {
-	lv_btn_ext_t btn_ext_dp;
+	lv_btn_ext_t btn_ext;
 	lv_obj_t * bullet;
 	lv_obj_t * label;
 }lv_cb_ext_t;

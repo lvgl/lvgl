@@ -41,7 +41,7 @@ typedef enum
 /*Data of progress bar*/
 typedef struct
 {
-	lv_rect_ext_t rect;
+	lv_rect_ext_t rect_ext;
 	uint16_t act_value;
 	uint16_t min_value;
 	uint16_t max_value;

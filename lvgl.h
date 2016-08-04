@@ -19,6 +19,7 @@
 #include "lv_objx/lv_list.h"
 #include "lv_objx/lv_cb.h"
 #include "lv_objx/lv_pb.h"
+#include "lv_objx/lv_graphbg.h"
 
 /*********************
  *      DEFINES
