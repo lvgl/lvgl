@@ -1,5 +1,3 @@
-
-
 /**
  * @file lv_templ.c
  * 
@@ -94,6 +92,9 @@ bool lv_templ_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	switch(sign) {
+    		case LV_SIGNAL_CLEANUP:
+    			/*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    			break;
     		default:
     			break;
     	}

@@ -13,6 +13,7 @@
 
 #include "lv_pb.h"
 #include "../lv_draw/lv_draw.h"
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -133,6 +134,9 @@ bool lv_pb_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     	switch(sign) {
     	case LV_SIGNAL_CORD_CHG:
     		lv_pb_set_value(obj_dp, ext_dp->act_value);
+    		break;
+    	case LV_SIGNAL_CLEANUP:
+    		dm_free(ext_dp->format_dp);
     		break;
     		default:
     			break;

@@ -181,6 +181,9 @@ bool lv_cb_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     		lv_obj_set_style(ext_dp->bullet, &style_p->bullet);
     		lv_obj_set_style(ext_dp->label, &style_p->label);
     		break;
+    	case LV_SIGNAL_CLEANUP:
+    		/*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    		break;
     		default:
     			break;
     	}

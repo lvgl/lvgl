@@ -9,6 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <lvgl/lv_objx/lv_chart.h>
 #include "lv_obj/lv_obj.h"
 #include "lv_objx/lv_btn.h"
 #include "lv_objx/lv_img.h"
@@ -19,7 +20,6 @@
 #include "lv_objx/lv_list.h"
 #include "lv_objx/lv_cb.h"
 #include "lv_objx/lv_pb.h"
-#include "lv_objx/lv_graphbg.h"
 
 /*********************
  *      DEFINES
