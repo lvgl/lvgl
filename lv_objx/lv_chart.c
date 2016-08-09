@@ -61,8 +61,9 @@ static lv_charts_t lv_charts_def =
 	.div_line_opa = 100,
 
 	/*Data lines*/
-	.line_width = 1 * LV_STYLE_MULT, .col_space = 5 * LV_STYLE_MULT,
+	.width = 10 * LV_STYLE_MULT, .col_space = 5 * LV_STYLE_MULT,
 	.data_opa = 100,
+	.dark_eff = 150,
 	.color[0] = COLOR_RED,
 	.color[1] = COLOR_LIME,
 	.color[2] = COLOR_BLUE,
@@ -120,7 +121,7 @@ lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
         ext_dp->hdiv_num = LV_CHART_HDIV_DEF;
         ext_dp->vdiv_num = LV_CHART_VDIV_DEF;
         ext_dp->pnum = LV_CHART_PNUM_DEF;
-        ext_dp->type = LV_CHART_COL;
+        ext_dp->type = LV_CHART_POINT;
     } else {
     	lv_chart_ext_t * ext_copy_dp = lv_obj_get_ext(copy_dp);
     	ext_dp->xmin = ext_copy_dp->xmin;
@@ -363,7 +364,7 @@ static void lv_chart_draw_lines(lv_obj_t* obj_dp, const area_t * mask_p)
 	LL_READ_BACK(ext_dp->dl_ll, y_data) {
 
 		lines.objs.color = style_p->color[dl_cnt];
-		lines.width = style_p->line_width;
+		lines.width = style_p->width;
 
 		p1.x = 0 + x_ofs;
 		p2.x = 0 + x_ofs;
@@ -389,7 +390,46 @@ static void lv_chart_draw_lines(lv_obj_t* obj_dp, const area_t * mask_p)
 
 static void lv_chart_draw_points(lv_obj_t* obj_dp, const area_t * mask_p)
 {
+	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+	lv_charts_t * style_p = lv_obj_get_style(obj_dp);
 
+	uint8_t i;
+	area_t cir_a;
+	cord_t w = lv_obj_get_width(obj_dp);
+	cord_t h = lv_obj_get_height(obj_dp);
+	opa_t opa = (uint16_t)lv_obj_get_opa(obj_dp) * style_p->data_opa / 100;
+	cord_t x_ofs = lv_obj_get_x(obj_dp);
+	cord_t y_ofs = lv_obj_get_y(obj_dp);
+	int32_t y_tmp;
+	cord_t ** y_data;
+	uint8_t dl_cnt = 0;
+	lv_rects_t rects;
+	cord_t rad = style_p->width >> 1;
+
+	lv_rects_get(LV_RECTS_DEF, &rects);
+	rects.bwidth = 0;
+	rects.empty = 0;
+	rects.round = LV_RECT_CIRCLE;
+
+	LL_READ_BACK(ext_dp->dl_ll, y_data) {
+		rects.objs.color = style_p->color[dl_cnt];
+		rects.gcolor = color_mix(COLOR_BLACK, style_p->color[dl_cnt], style_p->dark_eff);
+
+		for(i = 0; i < ext_dp->pnum; i ++) {
+			cir_a.x1 = (w / ext_dp->pnum) * i + x_ofs;
+			cir_a.x2 = cir_a.x1 + rad;
+			cir_a.x1 -= rad;
+
+			y_tmp = (int32_t)((int32_t) (*y_data)[i] - ext_dp->ymin) * h;
+			y_tmp = y_tmp / (ext_dp->ymax - ext_dp->ymin);
+			cir_a.y1 = h - y_tmp + y_ofs;
+			cir_a.y2 = cir_a.y1 + rad;
+			cir_a.y1 -= rad;
+
+			lv_draw_rect(&cir_a, mask_p, &rects, opa);
+		}
+		dl_cnt++;
+	}
 }
 
 static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p)
@@ -417,7 +457,7 @@ static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p)
 	col_a.y2 = obj_dp->cords.y2;
 	LL_READ_BACK(ext_dp->dl_ll, y_data) {
 		rects.objs.color = style_p->color[dl_cnt];
-		rects.gcolor = style_p->color[dl_cnt];
+		rects.gcolor = color_mix(COLOR_BLACK, style_p->color[dl_cnt], style_p->dark_eff);
 
 		for(i = 0; i < ext_dp->pnum; i ++) {
 

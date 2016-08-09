@@ -41,9 +41,10 @@ typedef struct
 	lv_lines_t div_lines;
 	uint8_t div_line_opa;		/*Percentage of obj. opacity*/
 	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col color */
-	uint16_t line_width;			/*Line width or point diameter*/
+	uint16_t width;			/*Line width or point diameter*/
 	cord_t col_space;			/*Space between columns*/
 	opa_t data_opa;				/*Line/Point/Col opacity in the percentage of obj. opacity*/
+	uint8_t dark_eff;			/*Dark effect on the bottom of  points and columns*/
 }lv_charts_t;
 
 /*Built-in styles of chart background*/

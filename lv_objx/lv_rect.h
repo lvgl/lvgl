@@ -18,6 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_RECT_CIRCLE		0xFFFF	/*A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS
