@@ -61,7 +61,7 @@ static lv_charts_t lv_charts_def =
 	.div_line_opa = 100,
 
 	/*Data lines*/
-	.width = 10 * LV_STYLE_MULT, .col_space = 5 * LV_STYLE_MULT,
+	.width = 3 * LV_STYLE_MULT,
 	.data_opa = 100,
 	.dark_eff = 150,
 	.color[0] = COLOR_RED,
@@ -111,6 +111,7 @@ lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 
     /*Init the new chart background object*/
     if(copy_dp == NULL) {
+        ext_dp->type = LV_CHART_COL;
     	lv_obj_set_style(new_obj_dp, &lv_charts_def);
         lv_obj_set_signal_f(new_obj_dp, lv_chart_signal);
         lv_obj_set_design_f(new_obj_dp, lv_chart_design);
@@ -121,9 +122,9 @@ lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
         ext_dp->hdiv_num = LV_CHART_HDIV_DEF;
         ext_dp->vdiv_num = LV_CHART_VDIV_DEF;
         ext_dp->pnum = LV_CHART_PNUM_DEF;
-        ext_dp->type = LV_CHART_POINT;
     } else {
     	lv_chart_ext_t * ext_copy_dp = lv_obj_get_ext(copy_dp);
+        ext_dp->type = ext_copy_dp->type;
     	ext_dp->xmin = ext_copy_dp->xmin;
 		ext_dp->xmax = ext_copy_dp->xmax;
 		ext_dp->ymin = ext_copy_dp->ymin;
@@ -131,7 +132,6 @@ lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		ext_dp->hdiv_num = ext_copy_dp->hdiv_num;
 		ext_dp->vdiv_num = ext_copy_dp->vdiv_num;
         ext_dp->pnum = ext_copy_dp->pnum;
-        ext_dp->type = ext_copy_dp->type;
     }
 
     return new_obj_dp;
@@ -176,6 +176,7 @@ cord_t * lv_chart_add_dataline(lv_obj_t* obj_dp)
 {
 	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
 	cord_t ** dl_dp = ll_ins_head(&ext_dp->dl_ll);
+	cord_t def = (ext_dp->ymax - ext_dp->ymin) >> 2;	/*1/4 range as default value*/
 
 	if(dl_dp == NULL) return NULL;
 
@@ -184,7 +185,7 @@ cord_t * lv_chart_add_dataline(lv_obj_t* obj_dp)
 	uint16_t i;
 	cord_t * p_tmp = *dl_dp;
 	for(i = 0; i < ext_dp->pnum; i++) {
-		*p_tmp = 20;//ext_dp->ymin;
+		*p_tmp = def;
 		p_tmp++;
 	}
 
@@ -193,6 +194,14 @@ cord_t * lv_chart_add_dataline(lv_obj_t* obj_dp)
 	return *dl_dp;
 }
 
+/**
+ * Refresh a chart if its data line has changed
+ * @param obj_dp pionter to chart object
+ */
+void lv_chart_refr(lv_obj_t * obj_dp)
+{
+	lv_obj_inv(obj_dp);
+}
 /*=====================
  * Setter functions
  *====================*/
@@ -229,6 +238,61 @@ void lv_chart_set_range(lv_obj_t * obj_dp, int32_t xmin, int32_t xmax, int32_t y
 	ext_dp->xmax = xmax;
 	ext_dp->ymin = ymin;
 	ext_dp->ymax = ymax;
+
+	lv_chart_refr(obj_dp);
+}
+
+/**
+ * Set a new type for a chart
+ * @param obj_dp pointer to a chart object
+ * @param type ew type of the chart (from 'lv_chart_type_t' enum)
+ */
+void lv_chart_set_type(lv_obj_t * obj_dp, lv_chart_type_t type)
+{
+	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+	ext_dp->type = type;
+
+	lv_chart_refr(obj_dp);
+}
+
+/**
+ * Set the number of points on a data line on a chart
+ * @param obj_dp pointer r to chart object
+ * @param pnum new number of points on the data lines
+ */
+void lv_chart_set_pnum(lv_obj_t * obj_dp, uint16_t pnum)
+{
+	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+	cord_t ** y_data;
+
+	if(pnum < 1) pnum = 1;
+
+	LL_READ_BACK(ext_dp->dl_ll, y_data) {
+		*y_data = dm_realloc(*y_data, sizeof(cord_t) * pnum);
+	}
+
+	ext_dp->pnum = pnum;
+	lv_chart_refr(obj_dp);
+}
+
+/**
+ * Shift all data right and set the most right data on a data line
+ * @param obj_dp pointer to chart object
+ * @param dl_p pointer to a data line on 'obj_dp'
+ * @param y the new value of the most right data
+ */
+void lv_chart_set_next(lv_obj_t * obj_dp, cord_t * dl_p, cord_t y)
+{
+	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+
+	uint16_t i;
+	for(i = 0; i < ext_dp->pnum - 1; i++) {
+		dl_p[i] = dl_p[i + 1];
+	}
+
+	dl_p[ext_dp->pnum - 1] = y;
+	lv_chart_refr(obj_dp);
+
 }
 
 /*=====================
@@ -261,6 +325,29 @@ lv_charts_t * lv_charts_get(lv_charts_builtin_t style, lv_charts_t * copy_p)
 	return style_p;
 }
 
+/**
+ * Get the type of a chart
+ * @param obj_dp pointer to chart object
+ * @return type of the chart (from 'lv_chart_t' enum)
+ */
+lv_chart_type_t lv_chart_get_type(lv_obj_t * obj_dp)
+{
+	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+
+	return ext_dp->type;
+}
+
+/**
+ * Get the data point number per data line on chart
+ * @param obj_dp pointer to chart object
+ * @return point number on each data line
+ */
+uint16_t lv_chart_get_pnum(lv_obj_t * obj_dp)
+{
+	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+
+	return ext_dp->pnum;
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -309,7 +396,11 @@ static bool lv_chart_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_m
     return true;
 }
 
-
+/**
+ * Draw the division lines on chart background
+ * @param obj_dp pointer to chart object
+ * @param mask_p mask, inherited from the design function
+ */
 static void lv_chart_draw_div(lv_obj_t* obj_dp, const area_t * mask_p)
 {
 	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
@@ -342,6 +433,11 @@ static void lv_chart_draw_div(lv_obj_t* obj_dp, const area_t * mask_p)
 	}
 }
 
+/**
+ * Draw the data lines as lines on a chart
+ * @param obj_dp pointer to chart object
+ * @param mask_p mask, inherited from the design function
+ */
 static void lv_chart_draw_lines(lv_obj_t* obj_dp, const area_t * mask_p)
 {
 	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
@@ -361,6 +457,7 @@ static void lv_chart_draw_lines(lv_obj_t* obj_dp, const area_t * mask_p)
 	lv_lines_t lines;
 	lv_lines_get(LV_LINES_CHART, &lines);
 
+	/*Go through all data lines*/
 	LL_READ_BACK(ext_dp->dl_ll, y_data) {
 
 		lines.objs.color = style_p->color[dl_cnt];
@@ -376,7 +473,7 @@ static void lv_chart_draw_lines(lv_obj_t* obj_dp, const area_t * mask_p)
 			p1.x = p2.x;
 			p1.y = p2.y;
 
-			p2.x = (w / ext_dp->pnum) * i + x_ofs;
+			p2.x = (w / (ext_dp->pnum - 1)) * i + x_ofs;
 
 			y_tmp = (int32_t)((int32_t) (*y_data)[i] - ext_dp->ymin) * h;
 			y_tmp = y_tmp / (ext_dp->ymax - ext_dp->ymin);
@@ -388,6 +485,11 @@ static void lv_chart_draw_lines(lv_obj_t* obj_dp, const area_t * mask_p)
 	}
 }
 
+/**
+ * Draw the data lines as points on a chart
+ * @param obj_dp pointer to chart object
+ * @param mask_p mask, inherited from the design function
+ */
 static void lv_chart_draw_points(lv_obj_t* obj_dp, const area_t * mask_p)
 {
 	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
@@ -404,19 +506,20 @@ static void lv_chart_draw_points(lv_obj_t* obj_dp, const area_t * mask_p)
 	cord_t ** y_data;
 	uint8_t dl_cnt = 0;
 	lv_rects_t rects;
-	cord_t rad = style_p->width >> 1;
+	cord_t rad = style_p->width;
 
 	lv_rects_get(LV_RECTS_DEF, &rects);
 	rects.bwidth = 0;
 	rects.empty = 0;
 	rects.round = LV_RECT_CIRCLE;
 
+	/*Go through all data lines*/
 	LL_READ_BACK(ext_dp->dl_ll, y_data) {
 		rects.objs.color = style_p->color[dl_cnt];
 		rects.gcolor = color_mix(COLOR_BLACK, style_p->color[dl_cnt], style_p->dark_eff);
 
 		for(i = 0; i < ext_dp->pnum; i ++) {
-			cir_a.x1 = (w / ext_dp->pnum) * i + x_ofs;
+			cir_a.x1 = (w / (ext_dp->pnum - 1)) * i + x_ofs;
 			cir_a.x2 = cir_a.x1 + rad;
 			cir_a.x1 -= rad;
 
@@ -432,6 +535,11 @@ static void lv_chart_draw_points(lv_obj_t* obj_dp, const area_t * mask_p)
 	}
 }
 
+/**
+ * Draw the data lines as columns on a chart
+ * @param obj_dp pointer to chart object
+ * @param mask_p mask, inherited from the design function
+ */
 static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p)
 {
 	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
@@ -448,6 +556,7 @@ static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p)
 	cord_t ** y_data;
 	uint8_t dl_cnt = 0;
 	lv_rects_t rects;
+	cord_t x_ofs = w / ((ext_dp->dl_num + 1) * ext_dp->pnum) / 2; /*Shift with a half col.*/
 
 	lv_rects_get(LV_RECTS_DEF, &rects);
 	rects.bwidth = 0;
@@ -455,17 +564,22 @@ static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p)
 	rects.round = 0;
 
 	col_a.y2 = obj_dp->cords.y2;
+
+	/*Go through all data lines*/
 	LL_READ_BACK(ext_dp->dl_ll, y_data) {
 		rects.objs.color = style_p->color[dl_cnt];
 		rects.gcolor = color_mix(COLOR_BLACK, style_p->color[dl_cnt], style_p->dark_eff);
 
 		for(i = 0; i < ext_dp->pnum; i ++) {
+			/*Calculate the x coordinates. Suppose (dl_num + 1) * pnum columns */
+			col_a.x1 = (int32_t)((int32_t)w * (i * (ext_dp->dl_num + 1) + dl_cnt)) /
+					   (ext_dp->pnum * (ext_dp->dl_num + 1)) + obj_dp->cords.x1;
+			col_a.x2 = (int32_t)((int32_t)w * (i * (ext_dp->dl_num + 1) + dl_cnt + 1 )) /
+					   (ext_dp->pnum * (ext_dp->dl_num + 1)) + obj_dp->cords.x1 - 1;
 
-			/*Calculate the x coordinates. Suppose dl_num * pnum columns */
-			col_a.x1 = (int32_t)((int32_t)w * (i * ext_dp->dl_num + dl_cnt)) /
-					   (ext_dp->pnum * ext_dp->dl_num) + obj_dp->cords.x1;
-			col_a.x2 = (int32_t)((int32_t)w * (i * ext_dp->dl_num + dl_cnt + 1 )) /
-					   (ext_dp->pnum * ext_dp->dl_num) + obj_dp->cords.x1 - 1;
+			col_a.x1 += x_ofs;
+			col_a.x2 += x_ofs;
+
 
 			y_tmp = (int32_t)((int32_t) (*y_data)[i] - ext_dp->ymin) * h;
 			y_tmp = y_tmp / (ext_dp->ymax - ext_dp->ymin);

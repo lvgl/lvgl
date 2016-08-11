@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_CHART_DL_NUM		8
+#define LV_CHART_DL_NUM		8	/*Max data line number. Used in the style.*/
 
 /**********************
  *      TYPEDEFS
@@ -32,7 +32,7 @@ typedef enum
 	LV_CHART_POINT,
 }lv_chart_type_t;
 
-typedef int32_t lv_chart_range_t;
+typedef cord_t lv_chart_range_t;
 
 /*Style of chart background*/
 typedef struct
@@ -42,7 +42,6 @@ typedef struct
 	uint8_t div_line_opa;		/*Percentage of obj. opacity*/
 	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col color */
 	uint16_t width;			/*Line width or point diameter*/
-	cord_t col_space;			/*Space between columns*/
 	opa_t data_opa;				/*Line/Point/Col opacity in the percentage of obj. opacity*/
 	uint8_t dark_eff;			/*Dark effect on the bottom of  points and columns*/
 }lv_charts_t;
@@ -89,6 +88,7 @@ void lv_chart_set_next(lv_obj_t * obj_dp, cord_t * dl_p, cord_t y);
 
 lv_chart_type_t lv_chart_get_type(lv_obj_t * obj_dp);
 uint16_t lv_chart_get_pnum(lv_obj_t * obj_dp);
+
 /**********************
  *      MACROS
  **********************/
