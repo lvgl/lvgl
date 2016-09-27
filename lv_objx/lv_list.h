@@ -44,9 +44,8 @@ typedef enum
 
 typedef enum
 {
-	LV_LIST_FIT_OFF = 0,
-	LV_LIST_FIT_HOLDER,
 	LV_LIST_FIT_CONTENT,
+	LV_LIST_FIT_HOLDER,
 	LV_LIST_FIT_LONGEST,
 }lv_list_fit_t;
 

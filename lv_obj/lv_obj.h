@@ -151,13 +151,13 @@ typedef enum
 typedef enum
 {
 	LV_ANIM_NONE = 0,
-	LV_ANIM_FADE,
-	LV_ANIM_FLOAT_TOP,
-	LV_ANIM_FLOAT_LEFT,
-	LV_ANIM_FLOAT_BOTTOM,
-	LV_ANIM_FLOAT_RIGHT,
-	LV_ANIM_GROW_H,
-	LV_ANIM_GROW_V,
+	LV_ANIM_FADE,			/*Animate the opacity*/
+	LV_ANIM_FLOAT_TOP, 		/*Float from/to the top*/
+	LV_ANIM_FLOAT_LEFT,		/*Float from/to the left*/
+	LV_ANIM_FLOAT_BOTTOM,	/*Float from/to the bottom*/
+	LV_ANIM_FLOAT_RIGHT,	/*Float from/to the right*/
+	LV_ANIM_GROW_H,			/*Grow/shrink  horizontally*/
+	LV_ANIM_GROW_V,			/*Grow/shrink  vertically*/
 }lv_anim_builtin_t;
 
 /**********************

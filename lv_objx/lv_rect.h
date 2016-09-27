@@ -34,6 +34,7 @@ typedef enum
 	LV_RECT_LAYOUT_ROW_T,	/*Row row left align*/
 	LV_RECT_LAYOUT_ROW_M,	/*Row row middle align*/
 	LV_RECT_LAYOUT_ROW_B,	/*Row row right align*/
+	LV_RECT_LAYOUT_GRID,
 }lv_rect_layout_t;
 
 typedef struct

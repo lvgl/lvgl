@@ -125,6 +125,8 @@ lv_obj_t * lv_cb_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     lv_cb_ext_t * ext = lv_obj_alloc_ext(new_obj_dp, sizeof(lv_cb_ext_t));
     dm_assert(ext);
 
+    lv_obj_set_signal_f(new_obj_dp, lv_cb_signal);
+
     /*Init the new checkbox object*/
     if(copy_dp == NULL) {
         lv_rect_set_layout(new_obj_dp, LV_RECT_LAYOUT_ROW_M);
@@ -137,7 +139,6 @@ lv_obj_t * lv_cb_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
         ext->label = lv_label_create(new_obj_dp, NULL);
         lv_label_set_text(ext->label, "Check box");
 
-        lv_obj_set_signal_f(new_obj_dp, lv_cb_signal);
         lv_obj_set_style(new_obj_dp, &lv_cbs_def);
     } else {
     	lv_cb_ext_t * copy_ext = lv_obj_get_ext(copy_dp);
@@ -174,6 +175,7 @@ bool lv_cb_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
     	case LV_SIGNAL_PRESSED:
     	case LV_SIGNAL_RELEASED:
     	case LV_SIGNAL_LONG_PRESS:
+    	case LV_SIGNAL_PRESS_LOST:
     		lv_btn_set_state(ext_dp->bullet, lv_btn_get_state(obj_dp));
     		break;
     	case LV_SIGNAL_STYLE_CHG:

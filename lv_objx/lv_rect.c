@@ -38,13 +38,14 @@ static void lv_rect_refr_layout(lv_obj_t * obj_dp);
 static void lv_rect_layout_col(lv_obj_t * obj_dp);
 static void lv_rect_layout_row(lv_obj_t * obj_dp);
 static void lv_rect_layout_center(lv_obj_t * obj_dp);
+static void lv_rect_layout_grid(lv_obj_t * obj_dp);
 static void lv_rect_refr_autofit(lv_obj_t * obj_dp);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_rects_t lv_rects_def =
-{ .objs.color = COLOR_MAKE(0x20, 0x30, 0x40), .gcolor = COLOR_MAKE(0x50, 0x70, 0x90),
+{ .objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
   .bcolor = COLOR_WHITE, .bwidth = 2 * LV_STYLE_MULT, .bopa = 50,
   .round = 4 * LV_STYLE_MULT, .empty = 0,
   .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT };
@@ -298,12 +299,14 @@ static void lv_rect_refr_layout(lv_obj_t * obj_dp)
 
 	if(type == LV_RECT_LAYOUT_OFF) return;
 
-	if(type == LV_RECT_LAYOUT_COL_L || type == LV_RECT_LAYOUT_COL_M || type == LV_RECT_LAYOUT_COL_R) {
+	if(type == LV_RECT_LAYOUT_CENTER) {
+		lv_rect_layout_center(obj_dp);
+	} else if(type == LV_RECT_LAYOUT_COL_L || type == LV_RECT_LAYOUT_COL_M || type == LV_RECT_LAYOUT_COL_R) {
 		lv_rect_layout_col(obj_dp);
 	} else if(type == LV_RECT_LAYOUT_ROW_T || type == LV_RECT_LAYOUT_ROW_M || type == LV_RECT_LAYOUT_ROW_B) {
 		lv_rect_layout_row(obj_dp);
-	} else if(type == LV_RECT_LAYOUT_CENTER) {
-		lv_rect_layout_center(obj_dp);
+	} else if(type == LV_RECT_LAYOUT_GRID) {
+		lv_rect_layout_grid(obj_dp);
 	}
 }
 
@@ -403,7 +406,10 @@ static void lv_rect_layout_row(lv_obj_t * obj_dp)
 	obj_dp->child_chg_off = 0;
 }
 
-
+/**
+ * Handle the center layout
+ * @param obj_dp pointer to an object which layout should be handled
+ */
 static void lv_rect_layout_center(lv_obj_t * obj_dp)
 {
 	lv_obj_t * child;
@@ -437,6 +443,86 @@ static void lv_rect_layout_center(lv_obj_t * obj_dp)
 }
 
 
+/**
+ * Handle the grid layout. Put as many object as possible in row
+ * then begin a new row
+ * @param obj_dp pointer to an object which layout should be handled
+ */
+static void lv_rect_layout_grid(lv_obj_t * obj_dp)
+{
+	lv_obj_t * child_rs;    /* Row starter child */
+	lv_obj_t * child_rc;    /* Row closer child */
+	lv_obj_t * child_tmp;   /* Temporary child */
+	lv_rects_t * rects_p = lv_obj_get_style(obj_dp);
+	cord_t w_obj = lv_obj_get_width(obj_dp);
+	cord_t act_y = rects_p->vpad;
+	/* Disable child change action because the children will be moved a lot
+	 * an unnecessary child change signals could be sent*/
+
+	child_rs = ll_get_tail(&obj_dp->child_ll); /*Set the row starter child*/
+	if(child_rs == NULL) return;	/*Return if no child*/
+
+	obj_dp->child_chg_off = 1;
+
+	child_rc = child_rs; /*Initially the the row starter and closer is the same*/
+	while(child_rs != NULL) {
+		cord_t h_row = 0;
+		cord_t w_row = rects_p->hpad * 2; /*The width is minimum the left-right hpad*/
+		uint32_t obj_num = 0;
+
+		/*Find the row closer object and collect some data*/		do {
+			if(lv_obj_get_hidden(child_rc) == false) {
+				if(w_row + lv_obj_get_width(child_rc) > w_obj) break; /*If the next object is already not fit then break*/
+				w_row += lv_obj_get_width(child_rc) + rects_p->opad; /*Add the object width + opad*/
+				h_row = max(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
+				obj_num ++;
+			}
+			child_rc = ll_get_prev(&obj_dp->child_ll, child_rc); /*Load the next object*/
+			if(obj_num == 0) child_rs = child_rc; /*If the first object was hidden (or too long) then set the next as first */
+		}while(child_rc != NULL);
+
+		/*Step back one child because the last is already not fit*/
+		if(child_rc != NULL  && obj_num != 0) child_rc = ll_get_next(&obj_dp->child_ll, child_rc);
+
+		/*If the object is too long  then align it to the middle*/
+		if(obj_num == 0) {
+			if(child_rc != NULL) {
+				h_row = lv_obj_get_height(child_rc);
+				lv_obj_align(child_rc, obj_dp, LV_ALIGN_IN_TOP_MID, 0, act_y);
+			}
+		}
+		/*If here is only one object in the row then align it to the left*/
+		else if (obj_num == 1) {
+			lv_obj_align(child_rs, obj_dp, LV_ALIGN_IN_TOP_LEFT, rects_p->hpad, act_y);
+		}
+		/* Align the children (from child_rs to child_rc)*/
+		else {
+			w_row -= rects_p->opad * obj_num;
+			cord_t new_opad = (w_obj -  w_row) / (obj_num  - 1);
+			cord_t act_x = rects_p->hpad; /*x init*/
+			child_tmp = child_rs;
+			do{
+				if(lv_obj_get_hidden(child_tmp) == false) {
+					lv_obj_align(child_tmp, obj_dp, LV_ALIGN_IN_TOP_LEFT, act_x, act_y);
+					act_x += lv_obj_get_width(child_tmp) + new_opad;
+				}
+				child_tmp = ll_get_prev(&obj_dp->child_ll, child_tmp);
+			}while(child_tmp != child_rc);
+
+		}
+
+		if(child_rc == NULL) break;
+		act_y += rects_p->opad + h_row; /*y increment*/
+		child_rs = ll_get_prev(&obj_dp->child_ll, child_rc); /*Go to the next object*/
+		child_rc = child_rs;
+	}
+	obj_dp->child_chg_off = 0;
+}
+
+/**
+ * Handle auto fit. Set the size of the object to involve all children.
+ * @param obj_dp pointer to an object which size will be modified
+ */
 void lv_rect_refr_autofit(lv_obj_t * obj_dp)
 {
 	lv_rect_ext_t * ext_p = lv_obj_get_ext(obj_dp);

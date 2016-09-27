@@ -164,7 +164,7 @@ lv_obj_t * lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt,
 		lv_obj_set_click(label, false);
 	}
 
-	/*Make the adjustment*/
+	/*Make the size adjustment*/
 	if(ext_p->fit == LV_LIST_FIT_HOLDER) {
 		/*Now the width will be adjusted*/
 		lv_rect_set_fit(liste, false, true);
@@ -172,7 +172,7 @@ lv_obj_t * lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt,
 		w -= lists_p->pages.bg_rects.hpad * 2;
 		lv_obj_set_width(liste, w);
 	} else if(ext_p->fit == LV_LIST_FIT_LONGEST) {
-		/*Now the width will be adjusted*/
+		/*In this case the width will be adjusted*/
 		lv_rect_set_fit(liste, false, true);
 
 		lv_obj_t * e;
