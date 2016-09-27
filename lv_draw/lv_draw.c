@@ -208,10 +208,14 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 			start_offset += ((mask_sub.x1 - cords_p->x1) >> ds_shift) * sizeof(color_t); /*First col*/
 			fs_seek(&file, start_offset);
 
-			uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift)* sizeof(color_t);
+			uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift) * sizeof(color_t);
 			uint32_t next_row = (area_get_width(cords_p) >> ds_shift) * sizeof(color_t) - useful_data;
 
 			area_cpy(&act_area, &mask_sub);
+
+			/* Round down the start coordinate, because the upscaled images
+			 * can start only LV_DOWNSCALE 'y' coordinates */
+			act_area.y1 &= ~(cord_t)(ds_num - 1) ;
 			act_area.y2 = act_area.y1 + ds_num - 1;
 			uint32_t act_pos;
 

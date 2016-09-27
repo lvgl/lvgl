@@ -316,6 +316,7 @@ static lv_obj_t* lv_refr_get_top_obj(const area_t * area_p, lv_obj_t* obj_dp)
     /*If this object is fully cover the draw area check the children too */
     if(obj_dp->opa == OPA_COVER &&
        obj_dp->hidden == 0 &&
+	   LV_SA(obj_dp, lv_objs_t)->transp == 0 &&
        obj_dp->design_f(obj_dp, area_p, LV_DESIGN_COVER_CHK) != false)
     {
         LL_READ(obj_dp->child_ll, i)        {
@@ -397,7 +398,7 @@ static void lv_refr_obj(lv_obj_t* obj_dp, const area_t * mask_ori_p)
     if(union_ok != false) {
 
         /* Redraw the object */    
-        if(obj_dp->opa != OPA_TRANSP) {
+        if(obj_dp->opa != OPA_TRANSP && LV_SA(obj_dp, lv_objs_t)->transp == 0) {
             obj_dp->design_f(obj_dp, &mask_parent, LV_DESIGN_DRAW);
         }
 

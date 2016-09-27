@@ -39,8 +39,9 @@ static lv_pages_t lv_pages_def =
 	.bg_rects.bwidth = 0 * LV_STYLE_MULT,
 	.bg_rects.round = 2 * LV_STYLE_MULT,
 	.bg_rects.empty = 0,
-	.bg_rects.hpad = 10,
-	.bg_rects.vpad = 10,
+	.bg_rects.hpad = 10 * LV_STYLE_MULT,
+	.bg_rects.vpad = 10 * LV_STYLE_MULT,
+	.bg_rects.opad = 5 * LV_STYLE_MULT,
 
 	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -49,15 +50,13 @@ static lv_pages_t lv_pages_def =
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
 	.sb_rects.empty = 0,
+	.sb_rects.hpad = 0,
+	.sb_rects.vpad = 0,
+	.sb_rects.opad = 0,
 
 	.sb_width= 8 * LV_STYLE_MULT,
 	.sb_opa=50,
 	.sb_mode = LV_PAGE_SB_MODE_ON,
-
-	.margin_hor = 10 * LV_STYLE_MULT,
-	.margin_ver = 10 * LV_STYLE_MULT,
-	.padding_hor = 10 * LV_STYLE_MULT,
-	.padding_ver = 10 * LV_STYLE_MULT,
 
 };
 
@@ -72,6 +71,7 @@ static lv_pages_t lv_pages_paper =
 	.bg_rects.empty = 0,
 	.bg_rects.hpad = 20 * LV_STYLE_MULT,
 	.bg_rects.vpad = 20 * LV_STYLE_MULT,
+	.bg_rects.opad = 10 * LV_STYLE_MULT,
 
 	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -80,22 +80,23 @@ static lv_pages_t lv_pages_paper =
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
 	.sb_rects.empty = 0,
+	.sb_rects.hpad = 0,
+	.sb_rects.vpad = 0,
+	.sb_rects.opad = 0,
 
 	.sb_width = 10 * LV_STYLE_MULT,
 	.sb_opa=50,
 	.sb_mode = LV_PAGE_SB_MODE_ON,
-
-	.margin_hor = 15 * LV_STYLE_MULT,
-	.margin_ver = 15 * LV_STYLE_MULT,
-	.padding_hor = 10 * LV_STYLE_MULT,
-	.padding_ver = 10 * LV_STYLE_MULT,
 };
 
 static lv_pages_t lv_pages_transp =
 {
+	.bg_rects.objs.transp = 1,
 	.bg_rects.empty = 1,
-	.bg_rects.hpad = 1,
-	.bg_rects.vpad = 1,
+	.bg_rects.bwidth = 0,
+	.bg_rects.hpad = 10 * LV_STYLE_MULT,
+	.bg_rects.vpad = 10 * LV_STYLE_MULT,
+	.bg_rects.vpad = 10 * LV_STYLE_MULT,
 
 	.sb_rects.objs.color = COLOR_BLACK,
 	.sb_rects.gcolor = COLOR_BLACK,
@@ -104,13 +105,13 @@ static lv_pages_t lv_pages_transp =
 	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
 	.sb_rects.round = 5 * LV_STYLE_MULT,
 	.sb_rects.empty = 0,
+	.sb_rects.hpad = 0,
+	.sb_rects.vpad = 0,
+	.sb_rects.opad = 0,
 
 	.sb_width = 8 * LV_STYLE_MULT,
 	.sb_opa = 50,
 	.sb_mode = LV_PAGE_SB_MODE_AUTO,
-
-	.margin_hor = 0 * LV_STYLE_MULT,
-	.margin_ver = 0 * LV_STYLE_MULT,
 
 };
 /**********************
@@ -145,8 +146,8 @@ lv_obj_t* lv_page_create(lv_obj_t * par_dp, lv_obj_t * ori_dp)
 		lv_obj_set_drag(new_dp, true);
 		lv_obj_set_drag_throw(new_dp, true);
 		lv_obj_set_style(new_dp, &lv_pages_def);
-		lv_rect_set_pad_en(new_dp, true, true);
-    } else {
+		lv_rect_set_fit(new_dp, true, true);
+	} else {
 		lv_obj_set_style(new_dp, lv_obj_get_style(ori_dp));
     }
 
@@ -218,34 +219,34 @@ bool lv_page_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param)
                 lv_obj_get_cords(obj_dp, &page_cords);
 
                 /*page width smaller then parent width? -> align to left*/
-                if(area_get_width(&page_cords) <= area_get_width(&par_cords) - pages_p->margin_hor * 2) {
-                    if(page_cords.x1 - pages_p->margin_hor != par_cords.x1) {
-                        new_x = pages_p->margin_hor;
+                if(area_get_width(&page_cords) <= area_get_width(&par_cords)) {
+                    if(page_cords.x1 != par_cords.x1) {
+                        new_x = 0;
                         refr_x = true;
                     }
                 } else {
-                    if(page_cords.x2 + pages_p->margin_hor < par_cords.x2) {
-                       new_x =  area_get_width(&par_cords) - area_get_width(&page_cords) - pages_p->margin_hor;   /* Right align */
+                    if(page_cords.x2  < par_cords.x2) {
+                       new_x =  area_get_width(&par_cords) - area_get_width(&page_cords);   /* Right align */
                        refr_x = true;
                     } 
-                    if (page_cords.x1 - pages_p->margin_hor > par_cords.x1) {
-                        new_x = pages_p->margin_hor;  /*Left align*/
+                    if (page_cords.x1 > par_cords.x1) {
+                        new_x = 0;  /*Left align*/
                         refr_x = true;
                     }
                 }
                 /*Wrong in y?*/
-                if(area_get_height(&page_cords) <= area_get_height(&par_cords) - pages_p->margin_ver * 2) {
-                    if(page_cords.y1 - pages_p->margin_ver != par_cords.y1) {
-                        new_y = pages_p->margin_ver;
+                if(area_get_height(&page_cords) <= area_get_height(&par_cords)) {
+                    if(page_cords.y1 != par_cords.y1) {
+                        new_y = 0;
                         refr_y = true;
                     }
                 } else {
-                    if(page_cords.y2 + pages_p->margin_ver < par_cords.y2) {
-                       new_y =  area_get_height(&par_cords) - area_get_height(&page_cords) - pages_p->margin_ver;   /* Bottom align */
+                    if(page_cords.y2 < par_cords.y2) {
+                       new_y =  area_get_height(&par_cords) - area_get_height(&page_cords);   /* Bottom align */
                        refr_y = true;
                     } 
-                    if (page_cords.y1 - pages_p->margin_ver > par_cords.y1) {
-                        new_y = pages_p->margin_ver;  /*Top align*/
+                    if (page_cords.y1  > par_cords.y1) {
+                        new_y = 0;  /*Top align*/
                         refr_y = true;
                     }
                 }      
@@ -275,14 +276,11 @@ bool lv_page_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param)
                 break;
                 
             case LV_SIGNAL_STYLE_CHG:
+				lv_obj_set_style(page_ext_p->sbh_dp, &pages_p->sb_rects);
+				lv_obj_set_style(page_ext_p->sbv_dp, &pages_p->sb_rects);
+				lv_obj_set_width(page_ext_p->sbv_dp, pages_p->sb_width);
+				lv_obj_set_height(page_ext_p->sbh_dp, pages_p->sb_width);
 
-            	/* Set the styles only if they are different else infinite loop
-            	 * will be created from lv_obj_set_style*/
-            	if(lv_obj_get_style(page_ext_p->sbh_dp) != &pages_p->sb_rects) {
-					lv_obj_set_style(page_ext_p->sbh_dp, &pages_p->sb_rects);
-					lv_obj_set_style(page_ext_p->sbv_dp, &pages_p->sb_rects);
-					lv_obj_set_style(obj_dp, &pages_p->bg_rects);
-            	}
             	if(pages_p->sb_mode == LV_PAGE_SB_MODE_ON) {
                 	lv_obj_set_opa(page_ext_p->sbv_dp, (pages_p->sb_opa * OPA_COVER) / 100);
                 	lv_obj_set_opa(page_ext_p->sbh_dp, (pages_p->sb_opa * OPA_COVER) / 100);
@@ -376,8 +374,8 @@ static void lv_page_sb_refresh(lv_obj_t* page_dp)
     lv_pages_t * pages_p = lv_obj_get_style(page_dp);
     lv_obj_t* par_dp = lv_obj_get_parent(page_dp);
     cord_t size_tmp;
-    cord_t page_w = lv_obj_get_width(page_dp) + 2 * pages_p->margin_hor;
-    cord_t page_h =  lv_obj_get_height(page_dp) + 2 * pages_p->margin_ver;
+    cord_t page_w = lv_obj_get_width(page_dp);
+    cord_t page_h =  lv_obj_get_height(page_dp);
     cord_t par_w = lv_obj_get_width(par_dp);
     cord_t par_h = lv_obj_get_height(par_dp);
             
@@ -395,7 +393,7 @@ static void lv_page_sb_refresh(lv_obj_t* page_dp)
         lv_obj_set_width(page_p->sbh_dp,  size_tmp);
 
         lv_obj_set_pos(page_p->sbh_dp,
-                ( -(lv_obj_get_x(page_dp) - pages_p->margin_hor) * (par_w - size_tmp - pages_p->sb_width)) /
+                ( -(lv_obj_get_x(page_dp)) * (par_w - size_tmp - pages_p->sb_width)) /
                                       (page_w - par_w),
                                        par_h - pages_p->sb_width);
     }
@@ -414,7 +412,7 @@ static void lv_page_sb_refresh(lv_obj_t* page_dp)
 
         lv_obj_set_pos(page_p->sbv_dp, 
                        par_w - pages_p->sb_width,
-                   (-(lv_obj_get_y(page_dp) - pages_p->margin_ver) * (par_h - size_tmp - pages_p->sb_width)) /
+                   (-(lv_obj_get_y(page_dp)) * (par_h - size_tmp - pages_p->sb_width)) /
                                       (page_h - par_h));
     }
     

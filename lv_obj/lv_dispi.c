@@ -385,6 +385,8 @@ static void dispi_drag(lv_dispi_t * dispi_p)
  */
 static void dispi_drag_throw(lv_dispi_t * dispi_p)
 {
+	if(dispi_p->drag_in_prog == 0) return;
+
     /*Set new position if the vector is not zero*/
     lv_obj_t* par_dp = lv_obj_get_parent(dispi_p->last_obj_dp);
     lv_obj_t* drag_obj_dp = dispi_p->last_obj_dp;

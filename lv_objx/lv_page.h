@@ -34,10 +34,6 @@ typedef struct
     lv_rects_t bg_rects;
     lv_rects_t sb_rects;
     cord_t sb_width;
-    cord_t margin_hor;	/*Extra size between the parent and the page horizontally*/
-    cord_t margin_ver;  /*Extra size between the parent and the page vertically*/
-    cord_t padding_hor; /*Extra size on page horizontally*/
-    cord_t padding_ver; /*Extra size on page vertically*/
     lv_page_sb_mode_t sb_mode;
     uint8_t sb_opa;
 }lv_pages_t;
@@ -45,7 +41,7 @@ typedef struct
 
 typedef struct
 {
-	lv_rect_ext_t rect_exp;
+	lv_rect_ext_t rect_ext;
     lv_obj_t* sbh_dp;  /*Horizontal scrollbar*/
     lv_obj_t* sbv_dp;  /*Vertical scrollbar*/
 }lv_page_ext_t;

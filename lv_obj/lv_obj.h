@@ -42,6 +42,10 @@
 #define LV_OBJ_DEF_WIDTH  (80 * LV_DOWNSCALE)
 #define LV_OBJ_DEF_HEIGHT  (60 * LV_DOWNSCALE)
 
+#define ANIM_IN					0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
+#define ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
+#define ANIM_DIR_MASK			0x80	/*ANIM_IN/ANIM_OUT mask*/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -78,22 +82,7 @@ typedef struct __LV_OBJ_T
     ll_dsc_t child_ll;
     
     area_t cords;
-    
-    /*Basic appearance*/
-    opa_t opa;
 
-    /*Attributes and states*/
-    uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
-    uint8_t drag_en      :1;    /*1: enable the dragging*/
-    uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent  :1;    /*1. Parent will be dragged instead*/
-    uint8_t style_iso 	 :1;	/*1: The object has got an own style*/
-    uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top_en       :1;	/*1: If the object or its children  is clicked it goes to the foreground*/
-    uint8_t res			 :1;
-    
-    uint8_t free_num; 		/*Application specific identifier (set it freely)*/
-    
     lv_signal_f_t signal_f;
     lv_design_f_t design_f;
     
@@ -103,6 +92,21 @@ typedef struct __LV_OBJ_T
 #if LV_OBJ_FREE_P != 0
     void * free_p;        /*Application specific pointer (set it freely)*/
 #endif
+
+    /*Attributes and states*/
+    uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
+    uint8_t drag_en      :1;    /*1: enable the dragging*/
+    uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
+    uint8_t drag_parent  :1;    /*1. Parent will be dragged instead*/
+    uint8_t style_iso 	 :1;	/*1: The object has got an own style*/
+    uint8_t hidden       :1;    /*1: Object is hidden*/
+    uint8_t top_en       :1;	/*1: If the object or its children  is clicked it goes to the foreground*/
+    uint8_t child_chg_off:1;    /*1: Disable the child change signal. Useful when moving the children*/
+
+	opa_t opa;
+
+    uint8_t free_num; 		/*Application specific identifier (set it freely)*/
+    
 }lv_obj_t;
 
 typedef enum
@@ -130,16 +134,31 @@ typedef enum
 	LV_ALIGN_OUT_RIGHT_BOTTOM,
 }lv_align_t;
 
+
 typedef struct
 {
 	color_t color;
+	uint8_t transp :1;
 }lv_objs_t;
 
 typedef enum
 {
 	LV_OBJS_DEF,
 	LV_OBJS_SCR,
+	LV_OBJS_TRANSP,
 }lv_objs_builtin_t;
+
+typedef enum
+{
+	LV_ANIM_NONE = 0,
+	LV_ANIM_FADE,			/*Animate the opacity*/
+	LV_ANIM_FLOAT_TOP, 		/*Float from/to the top*/
+	LV_ANIM_FLOAT_LEFT,		/*Float from/to the left*/
+	LV_ANIM_FLOAT_BOTTOM,	/*Float from/to the bottom*/
+	LV_ANIM_FLOAT_RIGHT,	/*Float from/to the right*/
+	LV_ANIM_GROW_H,			/*Grow/shrink  horizontally*/
+	LV_ANIM_GROW_V,			/*Grow/shrink  vertically*/
+}lv_anim_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -192,7 +211,7 @@ void lv_obj_set_style(lv_obj_t* obj_dp, void * style_p);
 void * lv_obj_iso_style(lv_obj_t * obj_dp, uint32_t style_size);
 void lv_obj_set_free_num(lv_obj_t* obj_dp, uint8_t free_num);
 void lv_obj_set_free_p(lv_obj_t* obj_dp, void * free_p);
-void lv_obj_merge_style(lv_obj_t* obj_dp);
+void lv_obj_anim(lv_obj_t * obj_dp, lv_anim_builtin_t anim, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *));
 
 /*GETTER FUNCTIONS*/
 /*Screen get*/
