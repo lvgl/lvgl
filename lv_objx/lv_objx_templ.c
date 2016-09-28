@@ -56,7 +56,7 @@ static lv_templs_t lv_templs_def =
  */
 lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 {
-    /*Create the ancestor basic object*/
+    /*Create the ancestor object*/
     lv_obj_t* new_obj_dp = lv_obj_create(par_dp, copy_dp);
     dm_assert(new_obj_dp);
     
@@ -64,10 +64,15 @@ lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     lv_templ_ext_t * ext_dp = lv_obj_alloc_ext(new_obj_dp, sizeof(lv_templ_ext_t));
     dm_assert(ext_dp);
 
+    lv_obj_set_signal_f(new_obj_dp, lv_templ_signal);
+    lv_obj_set_design_f(new_obj_dp, lv_templ_design);
+
     /*Init the new template object*/
     if(copy_dp == NULL) {
-        lv_obj_set_signal_f(new_obj_dp, lv_templ_signal);
-    } else {
+
+    }
+    /*Copy an existing object*/
+    else {
 
     }
     
@@ -79,13 +84,14 @@ lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
  * @param obj_dp pointer to a template object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
  */
 bool lv_templ_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 {
     bool valid;
 
     /* Include the ancient signal function */
-    /* TODO update it to the ancient signal function*/
+    /* TODO update it to the ancestor's signal function*/
     valid = lv_obj_signal(obj_dp, sign, param);
 
     /* The object can be deleted so check its validity and then
