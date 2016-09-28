@@ -15,8 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_CHART_XMIN_DEF	0
-#define LV_CHART_XMAX_DEF	100
 #define LV_CHART_YMIN_DEF	0
 #define LV_CHART_YMAX_DEF	100
 #define LV_CHART_HDIV_DEF	3
@@ -109,14 +107,13 @@ lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     ll_init(&ext_dp->dl_ll, sizeof(cord_t *));
     ext_dp->dl_num = 0;
 
+    lv_obj_set_signal_f(new_obj_dp, lv_chart_signal);
+    lv_obj_set_design_f(new_obj_dp, lv_chart_design);
+
     /*Init the new chart background object*/
     if(copy_dp == NULL) {
-        ext_dp->type = LV_CHART_COL;
+        ext_dp->type = LV_CHART_LINE;
     	lv_obj_set_style(new_obj_dp, &lv_charts_def);
-        lv_obj_set_signal_f(new_obj_dp, lv_chart_signal);
-        lv_obj_set_design_f(new_obj_dp, lv_chart_design);
-        ext_dp->xmin = LV_CHART_XMIN_DEF;
-        ext_dp->xmax = LV_CHART_XMAX_DEF;
         ext_dp->ymin = LV_CHART_YMIN_DEF;
         ext_dp->ymax = LV_CHART_YMAX_DEF;
         ext_dp->hdiv_num = LV_CHART_HDIV_DEF;
@@ -125,8 +122,6 @@ lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     } else {
     	lv_chart_ext_t * ext_copy_dp = lv_obj_get_ext(copy_dp);
         ext_dp->type = ext_copy_dp->type;
-    	ext_dp->xmin = ext_copy_dp->xmin;
-		ext_dp->xmax = ext_copy_dp->xmax;
 		ext_dp->ymin = ext_copy_dp->ymin;
 		ext_dp->ymax = ext_copy_dp->ymax;
 		ext_dp->hdiv_num = ext_copy_dp->hdiv_num;
@@ -230,12 +225,10 @@ void lv_chart_set_hvdiv(lv_obj_t * obj_dp, uint8_t hdiv, uint8_t vdiv)
  * @param ymin y minimum value
  * @param ymax y maximum value
  */
-void lv_chart_set_range(lv_obj_t * obj_dp, int32_t xmin, int32_t xmax, int32_t ymin, int32_t ymax)
+void lv_chart_set_range(lv_obj_t * obj_dp, cord_t ymin, cord_t ymax)
 {
 	lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
 
-	ext_dp->xmin = xmin;
-	ext_dp->xmax = xmax;
 	ext_dp->ymin = ymin;
 	ext_dp->ymax = ymax;
 

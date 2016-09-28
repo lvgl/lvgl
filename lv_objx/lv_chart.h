@@ -32,8 +32,6 @@ typedef enum
 	LV_CHART_POINT,
 }lv_chart_type_t;
 
-typedef cord_t lv_chart_range_t;
-
 /*Style of chart background*/
 typedef struct
 {
@@ -41,9 +39,9 @@ typedef struct
 	lv_lines_t div_lines;
 	uint8_t div_line_opa;		/*Percentage of obj. opacity*/
 	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col color */
-	uint16_t width;			/*Line width or point diameter*/
+	uint16_t width;			/*Line width or point radius*/
 	opa_t data_opa;				/*Line/Point/Col opacity in the percentage of obj. opacity*/
-	uint8_t dark_eff;			/*Dark effect on the bottom of  points and columns*/
+	uint8_t dark_eff;			/*Dark effect on the bottom of ó points and columns*/
 }lv_charts_t;
 
 /*Built-in styles of chart background*/
@@ -56,10 +54,8 @@ typedef enum
 typedef struct
 {
 	lv_rect_ext_t rect_ext;
-	lv_chart_range_t xmin;
-	lv_chart_range_t xmax;
-	lv_chart_range_t ymin;
-	lv_chart_range_t ymax;
+	cord_t ymin;
+	cord_t ymax;
 	uint8_t hdiv_num;
 	uint8_t vdiv_num;
 
@@ -82,7 +78,7 @@ void lv_chart_refr(lv_obj_t * obj_dp);
 
 void lv_chart_set_type(lv_obj_t * obj_dp, lv_chart_type_t type);
 void lv_chart_set_hvdiv(lv_obj_t * obj_dp, uint8_t hdiv, uint8_t vdiv);
-void lv_chart_set_range(lv_obj_t * obj_dp, int32_t xmin, int32_t xmax, int32_t ymin, int32_t ymax);
+void lv_chart_set_range(lv_obj_t * obj_dp, cord_t ymin, cord_t ymax);
 void lv_chart_set_pnum(lv_obj_t * obj_dp, uint16_t pnum);
 void lv_chart_set_next(lv_obj_t * obj_dp, cord_t * dl_p, cord_t y);
 
