@@ -212,6 +212,7 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
 
 /**
  * Set the fix width attribute
+ * If enabled the text will be automatically broken to fit to the size
  * @param obj_dp pointer to a label object
  * @param fixw true: enable fix width for the label
  */
@@ -246,6 +247,55 @@ bool lv_label_get_fixw(lv_obj_t * obj_dp)
 {
     lv_label_ext_t * ext_p = lv_obj_get_ext(obj_dp);
     return ext_p->fixw == 0 ? false: true;
+}
+
+/**
+ * Get the relative x and y coordinates of a letter
+ * @param obj_dp pointer to a label object
+ * @param index index of the letter (0 ... text length)
+ * @param pos_p store the result here
+ */
+void lv_label_get_letter_pos(lv_obj_t * obj_dp, uint16_t index, point_t * pos_p)
+{
+	const char * text = lv_label_get_text(obj_dp);
+    lv_label_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+    uint32_t line_start = 0;
+    uint32_t new_line_start = 0;
+    cord_t max_length = lv_obj_get_width(obj_dp);
+    lv_labels_t * labels_p = lv_obj_get_style(obj_dp);
+    const font_t * font_p = font_get(labels_p->font);
+    uint8_t letter_height = font_get_height(font_p);
+    cord_t y = 0;
+
+    /*If the fix width is not enabled the set the max length to very big */
+    if(ext_p->fixw == 0) {
+        max_length = LV_CORD_MAX;
+    }
+
+    /*Search the line of the index letter */;
+    while (text[line_start] != '\0')
+    {
+        new_line_start += txt_get_next_line(&text[line_start], font_p, labels_p->letter_space, max_length);
+        if(index < new_line_start) break; /*Lines of index letter begins at 'line_start'*/
+
+        y += letter_height + labels_p->line_space;
+        line_start = new_line_start;
+    }
+
+    /*Calculate the x coordinate*/
+    cord_t x = 0;
+    /*TODO handle 'mid'*/
+    //if(labels_p->mid == 0)
+    {
+    	uint32_t i;
+    	for(i = line_start; i < index; i++) {
+    		x += font_get_width(font_p, text[i]) + labels_p->line_space;
+    	}
+    }
+
+    pos_p->x = x + obj_dp->cords.x1;
+    pos_p->y = y + obj_dp->cords.y1;
+
 }
 
 /**

@@ -95,6 +95,8 @@
 
 #define USE_LV_BTNM		1
 
+#define USE_LV_TA		1
+
 /*==================
  *  LV APP SETTINGS 
  * =================*/

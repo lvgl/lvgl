@@ -22,6 +22,7 @@
 #include "lv_objx/lv_pb.h"
 #include "lv_objx/lv_led.h"
 #include "lv_objx/lv_btnm.h"
+#include "lv_objx/lv_ta.h"
 
 /*********************
  *      DEFINES
