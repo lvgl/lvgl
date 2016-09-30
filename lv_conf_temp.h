@@ -83,6 +83,18 @@
 
 #define USE_LV_LIST     1
 
+#define USE_LV_CB 		1
+
+#define USE_LV_PB		1
+
+#define USE_LV_CHARTBG	1
+
+#define USE_LV_CHART	1
+
+#define USE_LV_LED 		1
+
+#define USE_LV_BTNM		1
+
 /*==================
  *  LV APP SETTINGS 
  * =================*/

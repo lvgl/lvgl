@@ -252,6 +252,6 @@ lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p);
  **********************/
 
 #define LV_SA(obj_dp, style_type) ((style_type *) obj_dp->style_p)
-#define LV_EA(obj_dp, obj_type) ((obj_type *) obj_dp->ext_dp)
+#define LV_EA(obj_dp, ext_type) ((ext_type *) obj_dp->ext_dp)
 
 #endif
