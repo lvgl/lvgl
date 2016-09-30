@@ -123,7 +123,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
 
     /*Align the line to middle if enabled*/
     if(labels_p->mid != 0) {
-        line_length = txt_get_length(&txt[line_start], line_end - line_start,
+        line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                     font_p, labels_p->letter_space);
         pos.x += (w - line_length) / 2;
     }
@@ -144,7 +144,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
         pos.x = cords_p->x1;
         /*Align to middle*/
         if(labels_p->mid != 0) {
-            line_length = txt_get_length(&txt[line_start], line_end - line_start,
+            line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                      font_p, labels_p->letter_space);
             pos.x += (w - line_length) / 2;
         }

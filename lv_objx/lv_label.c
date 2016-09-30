@@ -186,7 +186,7 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
         
         /*If no fix width then calc. the longest line */
         if(ext_p->fixw == false) {
-          act_line_length = txt_get_length(&text[line_start], new_line_start - line_start,
+          act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
                                            font_p, labels_p->letter_space);
           if(act_line_length > longest_line) {
               longest_line = act_line_length;
@@ -273,8 +273,7 @@ void lv_label_get_letter_pos(lv_obj_t * obj_dp, uint16_t index, point_t * pos_p)
     }
 
     /*Search the line of the index letter */;
-    while (text[line_start] != '\0')
-    {
+    while (text[line_start] != '\0') {
         new_line_start += txt_get_next_line(&text[line_start], font_p, labels_p->letter_space, max_length);
         if(index < new_line_start) break; /*Lines of index letter begins at 'line_start'*/
 
@@ -284,18 +283,66 @@ void lv_label_get_letter_pos(lv_obj_t * obj_dp, uint16_t index, point_t * pos_p)
 
     /*Calculate the x coordinate*/
     cord_t x = 0;
-    /*TODO handle 'mid'*/
-    //if(labels_p->mid == 0)
-    {
-    	uint32_t i;
-    	for(i = line_start; i < index; i++) {
-    		x += font_get_width(font_p, text[i]) + labels_p->line_space;
-    	}
+	uint32_t i;
+	for(i = line_start; i < index; i++) {
+		x += font_get_width(font_p, text[i]) + labels_p->letter_space;
+	}
+
+	if(labels_p->mid != 0) {
+		cord_t line_w;
+        line_w = txt_get_width(&text[line_start], new_line_start - line_start,
+                               font_p, labels_p->letter_space);
+		x += lv_obj_get_width(obj_dp) / 2 - line_w / 2;
     }
 
-    pos_p->x = x + obj_dp->cords.x1;
-    pos_p->y = y + obj_dp->cords.y1;
+    pos_p->x = x;
+    pos_p->y = y;
 
+}
+
+uint16_t lv_label_get_letter_on(lv_obj_t * obj_dp, point_t * pos_p)
+{
+	const char * text = lv_label_get_text(obj_dp);
+    lv_label_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+    uint32_t line_start = 0;
+    uint32_t new_line_start = 0;
+    cord_t max_length = lv_obj_get_width(obj_dp);
+    lv_labels_t * labels_p = lv_obj_get_style(obj_dp);
+    const font_t * font_p = font_get(labels_p->font);
+    uint8_t letter_height = font_get_height(font_p);
+    cord_t y = 0;
+
+    /*If the fix width is not enabled the set the max length to very big */
+    if(ext_p->fixw == 0) {
+        max_length = LV_CORD_MAX;
+    }
+
+    /*Search the line of the index letter */;
+    while (text[line_start] != '\0') {
+    	new_line_start += txt_get_next_line(&text[line_start], font_p, labels_p->letter_space, max_length);
+    	if(pos_p->y <= y + letter_height + labels_p->line_space) break; /*The line is found ('line_start')*/
+    	y += letter_height + labels_p->line_space;
+        line_start = new_line_start;
+    }
+
+    /*Calculate the x coordinate*/
+    cord_t x = 0;
+	if(labels_p->mid != 0) {
+		cord_t line_w;
+        line_w = txt_get_width(&text[line_start], new_line_start - line_start,
+                               font_p, labels_p->letter_space);
+		x += lv_obj_get_width(obj_dp) / 2 - line_w / 2;
+    }
+
+	uint32_t i;
+	for(i = line_start; i < new_line_start-1; i++) {
+		x += font_get_width(font_p, text[i]) + labels_p->letter_space;
+		if(pos_p->x <= x) break;
+
+	}
+
+
+	return i;
 }
 
 /**
@@ -353,7 +400,7 @@ static bool lv_label_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_m
     if(mode == LV_DESIGN_COVER_CHK) return false;
     
     /*TEST: draw a background for the label*/
-    /*lv_vfill(&obj_dp->cords, mask_p, COLOR_LIME, OPA_COVER);*/
+    /*lv_vfill(&obj_dp->cords, mask_p, COLOR_LIME, OPA_COVER); */
 
     area_t cords;
     lv_obj_get_cords(obj_dp, &cords);

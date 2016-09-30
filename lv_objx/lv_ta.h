@@ -56,7 +56,11 @@ bool lv_ta_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
 lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy_p);
 
 void lv_ta_add_char(lv_obj_t * obj_dp, char c);
+void lv_ta_add_text(lv_obj_t * obj_dp, const char * txt);
+void lv_ta_del(lv_obj_t * obj_dp);
 void lv_ta_set_cursor_pos(lv_obj_t * obj_dp, uint16_t pos);
+void lv_ta_cursor_down(lv_obj_t * obj_dp);
+void lv_ta_cursor_up(lv_obj_t * obj_dp);
 
 
 const char * lv_ta_get_txt(lv_obj_t obj_dp);

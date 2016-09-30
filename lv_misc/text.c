@@ -53,7 +53,9 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
         /*Check for new line chars*/
         if(txt[i] == '\n' || txt[i] == '\r') {
             /*Handle \n\r and \r\n as well*/
-            if(txt[i + 1] == '\n' || txt[i + 1] == '\r') {
+            if(txt[i] == '\n' && txt[i + 1] == '\r') {
+                i++;
+            } else if(txt[i] == '\r' && txt[i + 1] == '\n') {
                 i++;
             }
             return i+1;    /*Return with the first letter of the next line*/
@@ -95,7 +97,7 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
  * @param letter_space letter sapce
  * @return length of a char_num long text
  */
-cord_t txt_get_length(const char * txt, uint16_t char_num, 
+cord_t txt_get_width(const char * txt, uint16_t char_num, 
                       const font_t * font_p, uint16_t letter_space)
 {
     uint16_t i;

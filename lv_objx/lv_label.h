@@ -60,6 +60,7 @@ void lv_label_set_fixw(lv_obj_t * obj_dp, bool fixw);
 const char * lv_label_get_text(lv_obj_t* obj_dp);
 bool lv_label_get_fixw(lv_obj_t * obj_dp);
 void lv_label_get_letter_pos(lv_obj_t * obj_dp, uint16_t index, point_t * pos_p);
+uint16_t lv_label_get_letter_on(lv_obj_t * obj_dp, point_t * pos_p);
 
 lv_labels_t * lv_labels_get(lv_labels_builtin_t style, lv_labels_t * copy_p);
 

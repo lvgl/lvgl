@@ -96,6 +96,7 @@ lv_obj_t* lv_rect_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     	lv_rect_ext_t * ori_rect_ext = lv_obj_get_ext(copy_dp);
     	rect_ext_dp->hfit_en = ori_rect_ext->hfit_en;
     	rect_ext_dp->vfit_en = ori_rect_ext->vfit_en;
+    	rect_ext_dp->layout = ori_rect_ext->layout;
     }
 
     return new_obj_dp;
@@ -573,7 +574,9 @@ void lv_rect_refr_autofit(lv_obj_t * obj_dp)
     		rect_cords.y2 = obj_dp->cords.y2;
     	}
 
+    	lv_obj_inv(obj_dp);
         area_cpy(&obj_dp->cords, &rect_cords);
+    	lv_obj_inv(obj_dp);
 
         /*Notify the object about its new coordinates*/
     	obj_dp->signal_f(obj_dp, LV_SIGNAL_CORD_CHG, &ori);
