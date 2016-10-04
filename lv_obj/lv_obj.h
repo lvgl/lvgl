@@ -9,7 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/2d.h>
+#include <lvgl/lv_misc/area.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include "misc/mem/dyn_mem.h"
@@ -54,7 +54,8 @@ struct __LV_OBJ_T;
 
 typedef enum
 {
-    LV_DESIGN_DRAW,
+    LV_DESIGN_DRAW_MAIN,
+    LV_DESIGN_DRAW_POST,
     LV_DESIGN_COVER_CHK,
 }lv_design_mode_t;
 

@@ -399,7 +399,7 @@ static void lv_refr_obj(lv_obj_t* obj_dp, const area_t * mask_ori_p)
 
         /* Redraw the object */    
         if(obj_dp->opa != OPA_TRANSP && LV_SA(obj_dp, lv_objs_t)->transp == 0) {
-            obj_dp->design_f(obj_dp, &mask_parent, LV_DESIGN_DRAW);
+            obj_dp->design_f(obj_dp, &mask_parent, LV_DESIGN_DRAW_MAIN);
         }
 
         area_t mask_child; /*Mask from obj_dp and its child*/
@@ -416,5 +416,10 @@ static void lv_refr_obj(lv_obj_t* obj_dp, const area_t * mask_ori_p)
                 lv_refr_obj(child_p, &mask_child);
             }
         }
+
+        /* If all the children are redrawn call make 'post draw' design */
+		if(obj_dp->opa != OPA_TRANSP && LV_SA(obj_dp, lv_objs_t)->transp == 0) {
+		  obj_dp->design_f(obj_dp, &mask_parent, LV_DESIGN_DRAW_POST);
+		}
     }
 }

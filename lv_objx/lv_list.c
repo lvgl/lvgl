@@ -35,12 +35,71 @@ static bool lv_list_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
 static lv_lists_t lv_lists_def =
 {
 	/*Page style*/
-	.pages.bg_rects.objs.color = COLOR_MAKE(0x20, 0x50, 0x80), .pages.bg_rects.gcolor = COLOR_SILVER, .pages.bg_rects.bcolor = COLOR_GRAY,
-	.pages.bg_rects.bopa = 50, .pages.bg_rects.bwidth = 0 * LV_STYLE_MULT, .pages.bg_rects.round = 2 * LV_STYLE_MULT,
-	.pages.bg_rects.empty = 1,
+	.pages.bg_rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .pages.bg_rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
+	.pages.bg_rects.bcolor = COLOR_WHITE, .pages.bg_rects.bopa = 50, .pages.bg_rects.bwidth = 2 * LV_STYLE_MULT,
+	.pages.bg_rects.round = 4 * LV_STYLE_MULT,
+	.pages.bg_rects.empty = 0,
 	.pages.bg_rects.vpad = 10 * LV_STYLE_MULT,
 	.pages.bg_rects.hpad = 10 * LV_STYLE_MULT,
 	.pages.bg_rects.opad = 5 * LV_STYLE_MULT,
+
+	.pages.scrable_rects.objs.color = COLOR_WHITE,
+	.pages.scrable_rects.gcolor = COLOR_SILVER,
+	.pages.scrable_rects.bcolor = COLOR_GRAY,
+	.pages.scrable_rects.bopa = 100,
+	.pages.scrable_rects.bwidth = 2 * LV_STYLE_MULT,
+	.pages.scrable_rects.round = 4 * LV_STYLE_MULT,
+	.pages.scrable_rects.empty = 0,
+	.pages.scrable_rects.hpad = 10 * LV_STYLE_MULT,
+	.pages.scrable_rects.vpad = 10 * LV_STYLE_MULT,
+	.pages.scrable_rects.opad = 10 * LV_STYLE_MULT,
+
+	.pages.sb_rects.objs.color = COLOR_BLACK, .pages.sb_rects.gcolor = COLOR_BLACK, .pages.sb_rects.bcolor = COLOR_WHITE,
+	.pages.sb_rects.bopa = 50, .pages.sb_rects.bwidth = 1 * LV_STYLE_MULT, .pages.sb_rects.round = 5 * LV_STYLE_MULT,
+	.pages.sb_rects.empty = 0, .pages.sb_width= 8 * LV_STYLE_MULT, .pages.sb_opa=50, .pages.sb_mode = LV_PAGE_SB_MODE_AUTO,
+
+	/*List element style*/
+	.liste_btns.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_REL] = COLOR_WHITE, .liste_btns.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
+	.liste_btns.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa0, 0xc0, 0xe0), .liste_btns.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE,
+	.liste_btns.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x60,0x80,0xa0), .liste_btns.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0xc0, 0xd0, 0xf0), .liste_btns.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE,
+	.liste_btns.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x60, 0x80, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x80, 0xa0, 0xc0), .liste_btns.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE,
+	.liste_btns.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER, .liste_btns.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY, .liste_btns.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
+	.liste_btns.rects.bwidth = 2 * LV_STYLE_MULT, .liste_btns.rects.bopa = 50,
+	.liste_btns.rects.empty = 0, .liste_btns.rects.round = 4 * LV_STYLE_MULT,
+	.liste_btns.rects.hpad = 10 * LV_STYLE_MULT,
+	.liste_btns.rects.vpad = 10 * LV_STYLE_MULT,
+	.liste_btns.rects.opad = 20 * LV_STYLE_MULT,
+
+	.liste_labels.objs.color = COLOR_MAKE(0x20,0x20,0x20), .liste_labels.font = LV_FONT_DEFAULT,
+	.liste_labels.letter_space = 2 * LV_STYLE_MULT, .liste_labels.line_space = 2 * LV_STYLE_MULT,
+	.liste_labels.mid = 0,
+
+	.liste_imgs.recolor_opa = OPA_COVER,
+
+	.liste_layout = LV_RECT_LAYOUT_ROW_M
+};
+
+static lv_lists_t lv_lists_tight =
+{
+	/*Page style*/
+	.pages.bg_rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .pages.bg_rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
+	.pages.bg_rects.bcolor = COLOR_WHITE, .pages.bg_rects.bopa = 50, .pages.bg_rects.bwidth = 0 * LV_STYLE_MULT,
+	.pages.bg_rects.round = 4 * LV_STYLE_MULT,
+	.pages.bg_rects.empty = 1,
+	.pages.bg_rects.vpad = 0 * LV_STYLE_MULT,
+	.pages.bg_rects.hpad = 0 * LV_STYLE_MULT,
+	.pages.bg_rects.opad = 0 * LV_STYLE_MULT,
+
+	.pages.scrable_rects.objs.color = COLOR_WHITE,
+	.pages.scrable_rects.gcolor = COLOR_SILVER,
+	.pages.scrable_rects.bcolor = COLOR_GRAY,
+	.pages.scrable_rects.bopa = 100,
+	.pages.scrable_rects.bwidth = 0 * LV_STYLE_MULT,
+	.pages.scrable_rects.round = 0 * LV_STYLE_MULT,
+	.pages.scrable_rects.empty = 0,
+	.pages.scrable_rects.hpad = 0 * LV_STYLE_MULT,
+	.pages.scrable_rects.vpad = 0 * LV_STYLE_MULT,
+	.pages.scrable_rects.opad = 0 * LV_STYLE_MULT,
 
 	.pages.sb_rects.objs.color = COLOR_BLACK, .pages.sb_rects.gcolor = COLOR_BLACK, .pages.sb_rects.bcolor = COLOR_WHITE,
 	.pages.sb_rects.bopa = 50, .pages.sb_rects.bwidth = 1 * LV_STYLE_MULT, .pages.sb_rects.round = 5 * LV_STYLE_MULT,
@@ -91,13 +150,18 @@ lv_obj_t* lv_list_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     lv_obj_t * new_obj_dp = lv_page_create(par_dp, copy_dp);
     dm_assert(new_obj_dp);
     lv_list_ext_t * ext_p= lv_obj_alloc_ext(new_obj_dp, sizeof(lv_list_ext_t));
-    
+
+	lv_obj_set_signal_f(new_obj_dp, lv_list_signal);
+
     /*Init the new list object*/
     if(copy_dp == NULL) {
     	ext_p->fit = LV_LIST_FIT_LONGEST;
-    	lv_obj_set_signal_f(new_obj_dp, lv_list_signal);
+    	lv_obj_set_size_us(new_obj_dp, 100, 150);
 		lv_obj_set_style(new_obj_dp, &lv_lists_def);
-		lv_rect_set_layout(new_obj_dp, LV_LIST_LAYOUT_DEF);
+		lv_rect_set_layout(LV_EA(new_obj_dp, lv_list_ext_t)->page_ext.scrolling_dp, LV_LIST_LAYOUT_DEF);
+    } else {
+    	lv_list_ext_t * copy_ext_dp = lv_obj_get_ext(copy_dp);
+    	ext_p->fit = copy_ext_dp->fit;
     }
     
     return new_obj_dp;
@@ -147,7 +211,7 @@ lv_obj_t * lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt,
 	lv_obj_set_style(liste, &lists_p->liste_btns);
 	lv_btn_set_rel_action(liste, rel_action);
 	lv_page_glue_obj(liste, true);
-	lv_rect_set_layout(liste, lv_lists_def.liste_layout);
+	lv_rect_set_layout(liste, lists_p->liste_layout);
 	lv_rect_set_fit(liste, true, true);   /*hor. fit might be disabled later*/
 
 	if(img_fn != NULL) {
@@ -168,7 +232,7 @@ lv_obj_t * lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt,
 	if(ext_p->fit == LV_LIST_FIT_HOLDER) {
 		/*Now the width will be adjusted*/
 		lv_rect_set_fit(liste, false, true);
-		cord_t w = lv_obj_get_width(lv_obj_get_parent(obj_dp));
+		cord_t w = lv_obj_get_width(obj_dp);
 		w -= lists_p->pages.bg_rects.hpad * 2;
 		lv_obj_set_width(liste, w);
 	} else if(ext_p->fit == LV_LIST_FIT_LONGEST) {
@@ -178,49 +242,24 @@ lv_obj_t * lv_list_add(lv_obj_t * obj_dp, const char * img_fn, const char * txt,
 		lv_obj_t * e;
 		cord_t w = 0;
 		/*Get the longest list element*/
-		e = lv_obj_get_child(obj_dp, NULL);
+		lv_obj_t * e_par = lv_obj_get_parent(liste); /*The page changes the parent so get it*/
+		e = lv_obj_get_child(e_par, NULL);
 		while(e != NULL) {
 			w = max(w, lv_obj_get_width(e));
-			e = lv_obj_get_child(obj_dp, e);
+			e = lv_obj_get_child(e_par, e);
 		}
 
 		/*Set all list element to the longest width*/
-		e = lv_obj_get_child(obj_dp, NULL);
+		e = lv_obj_get_child(e_par, NULL);
 		while(e != NULL) {
 			if(lv_obj_get_width(e) != w) {
 				lv_obj_set_width(e, w);
 			}
-			e = lv_obj_get_child(obj_dp, e);
+			e = lv_obj_get_child(e_par, e);
 		}
 	}
 
 	return liste;
-}
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_lists_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_lists_t style
- */
-lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * copy_p)
-{
-	lv_lists_t  *style_p;
-
-	switch(style) {
-		case LV_LISTS_DEF:
-			style_p = &lv_lists_def;
-			break;
-		default:
-			style_p = &lv_lists_def;
-	}
-
-	if(copy_p != NULL) {
-		if(style_p != NULL) memcpy(copy_p, style_p, sizeof(lv_lists_t));
-		else memcpy(copy_p, &lv_lists_def, sizeof(lv_lists_t));
-	}
-
-	return style_p;
 }
 
 /**
@@ -298,6 +337,38 @@ lv_list_fit_t lv_list_get_fit(lv_obj_t * obj_dp)
 	return LV_EA(obj_dp, lv_list_ext_t)->fit;
 }
 
+
+/**
+ * Return with a pointer to a built-in style and/or copy it to a variable
+ * @param style a style name from lv_lists_builtin_t enum
+ * @param copy_p copy the style to this variable. (NULL if unused)
+ * @return pointer to an lv_lists_t style
+ */
+lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * copy_p)
+{
+	lv_lists_t  *style_p;
+
+	switch(style) {
+		case LV_LISTS_DEF:
+		case LV_LISTS_GAP:
+			style_p = &lv_lists_def;
+			break;
+		case LV_LISTS_TIGHT:
+			style_p = &lv_lists_tight;
+			break;
+		default:
+			style_p = &lv_lists_def;
+	}
+
+	if(copy_p != NULL) {
+		if(style_p != NULL) memcpy(copy_p, style_p, sizeof(lv_lists_t));
+		else memcpy(copy_p, &lv_lists_def, sizeof(lv_lists_t));
+	}
+
+	return style_p;
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -310,6 +381,7 @@ lv_list_fit_t lv_list_get_fit(lv_obj_t * obj_dp)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_list_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)

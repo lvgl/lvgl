@@ -72,6 +72,10 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
 
                 while(txt[i] == ' ') i++;
 
+                /* Do not let to return without doing nothing.
+                 * Find at least one character */
+                if(i == 0) i++;
+
                 return i;
             }
             /*If this char still can fit to this line then check if 

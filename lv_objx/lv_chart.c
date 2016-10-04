@@ -354,6 +354,7 @@ uint16_t lv_chart_get_pnum(lv_obj_t * obj_dp)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_chart_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
@@ -361,31 +362,30 @@ static bool lv_chart_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_m
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
     	return ancestor_design_fp(obj_dp, mask_p, mode);
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+		/*Draw the rectangle ancient*/
+		ancestor_design_fp(obj_dp, mask_p, mode);
+
+		/*Draw the object*/
+
+		lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+
+		lv_chart_draw_div(obj_dp, mask_p);
+
+		switch(ext_dp->type) {
+			case LV_CHART_LINE:
+				lv_chart_draw_lines(obj_dp, mask_p);
+				break;
+			case LV_CHART_COL:
+				lv_chart_draw_cols(obj_dp, mask_p);
+				break;
+			case LV_CHART_POINT:
+				lv_chart_draw_points(obj_dp, mask_p);
+				break;
+			default:
+				break;
+		}
     }
-
-    /*Draw the rectangle ancient*/
-    ancestor_design_fp(obj_dp, mask_p, mode);
-
-    /*Draw the object*/
-
-    lv_chart_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
-
-    lv_chart_draw_div(obj_dp, mask_p);
-
-    switch(ext_dp->type) {
-    	case LV_CHART_LINE:
-    		lv_chart_draw_lines(obj_dp, mask_p);
-    		break;
-    	case LV_CHART_COL:
-    		lv_chart_draw_cols(obj_dp, mask_p);
-    		break;
-    	case LV_CHART_POINT:
-    		lv_chart_draw_points(obj_dp, mask_p);
-    		break;
-    	default:
-    		break;
-    }
-
     return true;
 }
 

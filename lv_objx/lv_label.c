@@ -71,10 +71,10 @@ static lv_labels_t lv_labels_txt = {
  * @param copy_dp pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
  */
-lv_obj_t* lv_label_create(lv_obj_t* par_dp, lv_obj_t * ori_dp)
+lv_obj_t* lv_label_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 {
     /*Create a basic object*/
-    lv_obj_t* new_obj = lv_obj_create(par_dp, ori_dp);
+    lv_obj_t* new_obj = lv_obj_create(par_dp, copy_dp);
     dm_assert(new_obj);
     
     /*Extend the basic object to a label object*/
@@ -87,7 +87,7 @@ lv_obj_t* lv_label_create(lv_obj_t* par_dp, lv_obj_t * ori_dp)
 	lv_obj_set_signal_f(new_obj, lv_label_signal);
 
     /*Init the new label*/
-    if(ori_dp == NULL) {
+    if(copy_dp == NULL) {
 		lv_obj_set_opa(new_obj, OPA_COVER);
 		lv_obj_set_click(new_obj, false);
 		lv_obj_set_style(new_obj, &lv_labels_def);
@@ -96,8 +96,8 @@ lv_obj_t* lv_label_create(lv_obj_t* par_dp, lv_obj_t * ori_dp)
     }
     /*Copy 'ori_dp' if not NULL*/
     else {
-		lv_label_set_fixw(new_obj, lv_label_get_fixw(ori_dp));
-		lv_label_set_text(new_obj, lv_label_get_text(ori_dp));
+		lv_label_set_fixw(new_obj, lv_label_get_fixw(copy_dp));
+		lv_label_set_text(new_obj, lv_label_get_text(copy_dp));
     }
     return new_obj;
 }
@@ -127,8 +127,9 @@ bool lv_label_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
                 label_p->txt_dp = NULL;
                 break;
             case LV_SIGNAL_STYLE_CHG:
-            	lv_label_set_text(obj_dp, lv_label_get_text(obj_dp));
+            	lv_label_set_text(obj_dp, NULL);
             	break;
+
 			default:
 				break;
     	}
@@ -144,23 +145,30 @@ bool lv_label_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 /**
  * Set a new text for a label
  * @param obj_dp pointer to a label object
- * @param text '\0' terminated character string
+ * @param text '\0' terminated character string. If NULL then refresh with the current text.
  */
 void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
 {
-	if(text == NULL) return;
 
     lv_obj_inv(obj_dp);
     
-    lv_label_ext_t * ext_p = lv_obj_get_ext(obj_dp);
-    uint32_t len = strlen(text) + 1;
+    lv_label_ext_t * label_ext_dp = lv_obj_get_ext(obj_dp);
 
-    if(ext_p->txt_dp != NULL && text != ext_p->txt_dp) {
-        dm_free(ext_p->txt_dp);
+    if(text == label_ext_dp->txt_dp) text = NULL;
+
+    if(text != NULL) {
+    	uint32_t len = strlen(text) + 1;
+    	if(label_ext_dp->txt_dp != NULL) {
+			dm_free(label_ext_dp->txt_dp);
+    	}
+		label_ext_dp->txt_dp = dm_alloc(len);
+		strcpy(label_ext_dp->txt_dp, text);
+    } else {
+    	text = label_ext_dp->txt_dp;
     }
     
-    ext_p->txt_dp = dm_alloc(len);
-    strcpy(ext_p->txt_dp, text);
+    /*If 'text" still NULL then nothing to do: return*/
+    if(text == NULL) return;
     
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
@@ -173,7 +181,7 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
     cord_t act_line_length;
     
     /*If the fix width is not enabled the set the max length to very big */
-    if(ext_p->fixw == 0) {
+    if(label_ext_dp->fixw == 0) {
         max_length = LV_CORD_MAX;
     }
     
@@ -185,7 +193,7 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
         new_height += labels_p->line_space;
         
         /*If no fix width then calc. the longest line */
-        if(ext_p->fixw == false) {
+        if(label_ext_dp->fixw == false) {
           act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
                                            font_p, labels_p->letter_space);
           if(act_line_length > longest_line) {
@@ -199,7 +207,7 @@ void lv_label_set_text(lv_obj_t * obj_dp, const char * text)
     /*Correction with the last line space*/
     new_height -= labels_p->line_space;
     
-    if(ext_p->fixw == 0) {
+    if(label_ext_dp->fixw == 0) {
     	/*Refresh the full size */
     	lv_obj_set_size(obj_dp, longest_line, new_height);
     } else {
@@ -253,7 +261,7 @@ bool lv_label_get_fixw(lv_obj_t * obj_dp)
  * Get the relative x and y coordinates of a letter
  * @param obj_dp pointer to a label object
  * @param index index of the letter (0 ... text length)
- * @param pos_p store the result here
+ * @param pos_p store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
 void lv_label_get_letter_pos(lv_obj_t * obj_dp, uint16_t index, point_t * pos_p)
 {
@@ -273,9 +281,9 @@ void lv_label_get_letter_pos(lv_obj_t * obj_dp, uint16_t index, point_t * pos_p)
     }
 
     /*Search the line of the index letter */;
-    while (text[line_start] != '\0') {
+    while (text[new_line_start] != '\0') {
         new_line_start += txt_get_next_line(&text[line_start], font_p, labels_p->letter_space, max_length);
-        if(index < new_line_start) break; /*Lines of index letter begins at 'line_start'*/
+        if(index < new_line_start || text[new_line_start] == '\0') break; /*The line of 'index' letter begins at 'line_start'*/
 
         y += letter_height + labels_p->line_space;
         line_start = new_line_start;
@@ -300,6 +308,12 @@ void lv_label_get_letter_pos(lv_obj_t * obj_dp, uint16_t index, point_t * pos_p)
 
 }
 
+/**
+ * Get the index of letter on a relative point of a label
+ * @param obj_dp pointer to label object
+ * @param pos_p pointer to point with coordinates on a the label
+ * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
+ */
 uint16_t lv_label_get_letter_on(lv_obj_t * obj_dp, point_t * pos_p)
 {
 	const char * text = lv_label_get_text(obj_dp);
@@ -337,7 +351,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * obj_dp, point_t * pos_p)
 	uint32_t i;
 	for(i = line_start; i < new_line_start-1; i++) {
 		x += font_get_width(font_p, text[i]) + labels_p->letter_space;
-		if(pos_p->x <= x) break;
+		if(pos_p->x < x) break;
 
 	}
 
@@ -392,23 +406,23 @@ lv_labels_t * lv_labels_get(lv_labels_builtin_t style, lv_labels_t * copy_p)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_label_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
 {
     /* A label never covers an area */
     if(mode == LV_DESIGN_COVER_CHK) return false;
-    
-    /*TEST: draw a background for the label*/
-    /*lv_vfill(&obj_dp->cords, mask_p, COLOR_LIME, OPA_COVER); */
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
+		/*TEST: draw a background for the label*/
+		/*lv_vfill(&obj_dp->cords, mask_p, COLOR_LIME, OPA_COVER); */
 
-    area_t cords;
-    lv_obj_get_cords(obj_dp, &cords);
-    opa_t opa= lv_obj_get_opa(obj_dp);
-    const char * txt = lv_label_get_text(obj_dp);
-
-    lv_draw_label(&cords, mask_p, lv_obj_get_style(obj_dp), opa, txt);
-
+		area_t cords;
+		lv_obj_get_cords(obj_dp, &cords);
+		opa_t opa= lv_obj_get_opa(obj_dp);
+		const char * txt = lv_label_get_text(obj_dp);
+		lv_draw_label(&cords, mask_p, lv_obj_get_style(obj_dp), opa, txt);
+    }
     return true;
 }
 

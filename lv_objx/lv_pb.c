@@ -252,6 +252,7 @@ lv_pbs_t * lv_pbs_get(lv_pbs_builtin_t style, lv_pbs_t * copy_p)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_pb_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
@@ -261,23 +262,20 @@ static bool lv_pb_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
     	return  ancestor_design_fp(obj_dp, mask_p, mode);
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+		ancestor_design_fp(obj_dp, mask_p, mode);
+
+		lv_pb_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+		area_t bar_area;
+		uint32_t tmp;
+		area_cpy(&bar_area, &obj_dp->cords);
+		tmp = (uint32_t)ext_dp->act_value * lv_obj_get_width(obj_dp);
+		tmp = (uint32_t) tmp / (ext_dp->max_value - ext_dp->min_value);
+		bar_area.x2 = bar_area.x1 + (cord_t) tmp;
+
+		lv_pbs_t * style_p = lv_obj_get_style(obj_dp);
+		lv_draw_rect(&bar_area, mask_p, &style_p->bar, OPA_COVER);
     }
-
-
-    /*Draw the object*/
-    ancestor_design_fp(obj_dp, mask_p, mode);
-
-    lv_pb_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
-    area_t bar_area;
-    uint32_t tmp;
-    area_cpy(&bar_area, &obj_dp->cords);
-    tmp = (uint32_t)ext_dp->act_value * lv_obj_get_width(obj_dp);
-    tmp = (uint32_t) tmp / (ext_dp->max_value - ext_dp->min_value);
-    bar_area.x2 = bar_area.x1 + (cord_t) tmp;
-
-    lv_pbs_t * style_p = lv_obj_get_style(obj_dp);
-    lv_draw_rect(&bar_area, mask_p, &style_p->bar, OPA_COVER);
-
     return true;
 }
 

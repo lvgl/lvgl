@@ -31,7 +31,9 @@ typedef enum
 
 typedef struct
 {
-    lv_rects_t bg_rects;
+    lv_rects_t bg_rects;  /*Style of ancestor*/
+	/*New style element for this type */
+    lv_rects_t scrable_rects;
     lv_rects_t sb_rects;
     cord_t sb_width;
     lv_page_sb_mode_t sb_mode;
@@ -41,15 +43,18 @@ typedef struct
 
 typedef struct
 {
-	lv_rect_ext_t rect_ext;
-    lv_obj_t* sbh_dp;  /*Horizontal scrollbar*/
-    lv_obj_t* sbv_dp;  /*Vertical scrollbar*/
+	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+	/*New data for this type */
+	lv_obj_t * scrolling_dp;	/*The scrollable object on the background*/
+    area_t sbh;  				/*Horizontal scrollbar*/
+    area_t sbv;  				/*Vertical scrollbar*/
+    uint8_t sbh_draw :1; 		/*1: horizontal scrollbar is visible now*/
+    uint8_t sbv_draw :1; 		/*1: vertical scrollbar is visible now*/
 }lv_page_ext_t;
 
 typedef enum
 {
 	LV_PAGES_DEF,
-	LV_PAGES_PAPER,
 	LV_PAGES_TRANSP,
 }lv_pages_builtin_t;
 

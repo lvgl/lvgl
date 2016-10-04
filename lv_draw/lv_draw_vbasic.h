@@ -14,7 +14,7 @@
 #if LV_VDB_SIZE != 0
 
 #include "misc/others/color.h"
-#include "../lv_misc/2d.h"
+#include "../lv_misc/area.h"
 #include "../lv_misc/font.h"
 
 /*********************

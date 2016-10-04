@@ -256,6 +256,7 @@ bool lv_img_get_auto_size(lv_obj_t* obj_dp)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'        
  */
 static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
@@ -270,24 +271,25 @@ static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
         	return cover;
         }
         else return false;
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+		area_t cords;
+
+		lv_obj_get_cords(obj_dp, &cords);
+		opa_t opa = lv_obj_get_opa(obj_dp);
+
+		area_t cords_tmp;
+		cords_tmp.y1 = cords.y1;
+		cords_tmp.y2 = cords.y1 + ext_p->h - 1;
+
+		for(; cords_tmp.y1 < cords.y2; cords_tmp.y1 += ext_p->h, cords_tmp.y2 += ext_p->h) {
+			cords_tmp.x1 = cords.x1;
+			cords_tmp.x2 = cords.x1 + ext_p->w - 1;
+			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext_p->w, cords_tmp.x2 += ext_p->w) {
+				lv_draw_img(&cords_tmp, mask_p, imgs_p, opa, ext_p->fn_dp);
+			}
+		}
     }
     
-    area_t cords;
-
-    lv_obj_get_cords(obj_dp, &cords);
-    opa_t opa = lv_obj_get_opa(obj_dp);
-
-	area_t cords_tmp;
-	cords_tmp.y1 = cords.y1;
-	cords_tmp.y2 = cords.y1 + ext_p->h - 1;
-
-	for(; cords_tmp.y1 < cords.y2; cords_tmp.y1 += ext_p->h, cords_tmp.y2 += ext_p->h) {
-		cords_tmp.x1 = cords.x1;
-		cords_tmp.x2 = cords.x1 + ext_p->w - 1;
-		for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext_p->w, cords_tmp.x2 += ext_p->w) {
-			lv_draw_img(&cords_tmp, mask_p, imgs_p, opa, ext_p->fn_dp);
-		}
-	}
     return true;
 }
 

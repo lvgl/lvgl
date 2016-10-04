@@ -235,6 +235,7 @@ uint8_t lv_led_get_bright(lv_obj_t * obj_dp)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_led_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
@@ -242,26 +243,23 @@ static bool lv_led_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
     	return false;
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+		/*Make darker colors in a temporary style according to the brightness*/
+		lv_led_ext_t * led_ext_p = lv_obj_get_ext(obj_dp);
+		lv_leds_t * leds_p = lv_obj_get_style(obj_dp);
+		lv_leds_t leds_tmp;
+
+		memcpy(&leds_tmp, leds_p, sizeof(leds_tmp));
+
+		leds_tmp.rects.objs.color = color_mix(leds_tmp.rects.objs.color, COLOR_BLACK, led_ext_p->bright);
+		leds_tmp.rects.gcolor = color_mix(leds_tmp.rects.gcolor, COLOR_BLACK, led_ext_p->bright);
+
+		opa_t opa = lv_obj_get_opa(obj_dp);
+		area_t area;
+		lv_obj_get_cords(obj_dp, &area);
+
+		lv_draw_rect(&area, mask_p, &leds_tmp.rects, opa);
     }
-
-    /*Draw the object*/
-
-    /*Make darker colors in a temporary style according to the brightness*/
-    lv_led_ext_t * led_ext_p = lv_obj_get_ext(obj_dp);
-    lv_leds_t * leds_p = lv_obj_get_style(obj_dp);
-    lv_leds_t leds_tmp;
-
-    memcpy(&leds_tmp, leds_p, sizeof(leds_tmp));
-
-    leds_tmp.rects.objs.color = color_mix(leds_tmp.rects.objs.color, COLOR_BLACK, led_ext_p->bright);
-	leds_tmp.rects.gcolor = color_mix(leds_tmp.rects.gcolor, COLOR_BLACK, led_ext_p->bright);
-
-    opa_t opa = lv_obj_get_opa(obj_dp);
-    area_t area;
-    lv_obj_get_cords(obj_dp, &area);
-
-    lv_draw_rect(&area, mask_p, &leds_tmp.rects, opa);
-
     return true;
 }
 

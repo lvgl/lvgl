@@ -1,5 +1,5 @@
 /**
- * @file 2d.h
+ * @file area.h
  * 
  */
 
@@ -57,6 +57,9 @@ static inline cord_t area_get_height(const area_t * area_p)
 }
 
 void area_set(area_t * area_p, cord_t x1, cord_t y1, cord_t x2, cord_t y2);
+void area_set_width(area_t * area_p, cord_t w);
+void area_set_height(area_t * area_p, cord_t h);
+void area_set_pos(area_t * area_p, cord_t x, cord_t y);
 uint32_t area_get_size(const area_t * area_p);
 bool area_union(area_t * res_p, const area_t * a1_p, const area_t * a2_p);
 void area_join(area_t * a_res_p, const area_t * a1_p, const area_t * a2_p);

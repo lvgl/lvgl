@@ -368,6 +368,7 @@ lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy_p)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'        
  */
 static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
@@ -392,19 +393,18 @@ static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
     	if(area_is_in(mask_p, &area_tmp) == true) return true;
 
     	return false;
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+		opa_t opa = lv_obj_get_opa(obj_dp);
+		area_t area;
+		lv_obj_get_cords(obj_dp, &area);
+
+		lv_rects_t rects_tmp;
+
+		lv_btn_style_load(obj_dp, &rects_tmp);
+
+		/*Draw the rectangle*/
+		lv_draw_rect(&area, mask_p, &rects_tmp, opa);
     }
-
-    opa_t opa = lv_obj_get_opa(obj_dp);
-    area_t area;
-    lv_obj_get_cords(obj_dp, &area);
-
-    lv_rects_t rects_tmp;
-
-    lv_btn_style_load(obj_dp, &rects_tmp);
-
-    /*Draw the rectangle*/
-    lv_draw_rect(&area, mask_p, &rects_tmp, opa);
-    
     return true;
 }
 

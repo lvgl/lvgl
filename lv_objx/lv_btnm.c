@@ -319,6 +319,7 @@ lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * obj_dp)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_btnm_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)

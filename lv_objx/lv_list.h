@@ -40,6 +40,8 @@ typedef struct
 typedef enum
 {
 	LV_LISTS_DEF,
+	LV_LISTS_GAP,
+	LV_LISTS_TIGHT,
 }lv_lists_builtin_t;
 
 typedef enum

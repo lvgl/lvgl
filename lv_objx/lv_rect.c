@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include <lvgl/lv_misc/2d.h>
+#include <lvgl/lv_misc/area.h>
 #include <misc/mem/dyn_mem.h>
 #include <misc/mem/linked_list.h>
 #include <misc/others/color.h>
@@ -173,8 +173,7 @@ void lv_rect_set_fit(lv_obj_t * obj_dp, bool hor_en, bool ver_en)
 	ext_p->vfit_en = ver_en == false ? 0 : 1;
 
 	/*Send a signal to run the paddig calculations*/
-	lv_obj_t * par_dp = lv_obj_get_parent(obj_dp);
-	par_dp->signal_f(par_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
+	obj_dp->signal_f(obj_dp, LV_SIGNAL_CORD_CHG, obj_dp);
 }
 
 /*=====================
@@ -248,12 +247,13 @@ lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy_p)
  **********************/
 
 /**
- * Handle the drawing related tasks of the labels
+ * Handle the drawing related tasks of the rectangles
  * @param obj_dp pointer to an object
  * @param mask the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
@@ -278,15 +278,14 @@ static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
     	if(area_is_in(mask_p, &area_tmp) == true) return true;
 
     	return false;
-    }
-    
-    opa_t opa = lv_obj_get_opa(obj_dp);
-    area_t area;
-    lv_obj_get_cords(obj_dp, &area);
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+		opa_t opa = lv_obj_get_opa(obj_dp);
+		area_t area;
+		lv_obj_get_cords(obj_dp, &area);
 
-    /*Draw the rectangle*/
-    lv_draw_rect(&area, mask_p, lv_obj_get_style(obj_dp), opa);
-    
+		/*Draw the rectangle*/
+		lv_draw_rect(&area, mask_p, lv_obj_get_style(obj_dp), opa);
+    }
     return true;
 }
 

@@ -13,7 +13,7 @@
 #include "../lv_draw/lv_draw_vbasic.h"
 #include "../lv_draw/lv_draw_rbasic.h"
 #include "../lv_draw/lv_draw.h"
-#include <lvgl/lv_misc/2d.h>
+#include <lvgl/lv_misc/area.h>
 #include <misc/math/math_base.h>
 #include <misc/mem/dyn_mem.h>
 #include <misc/others/color.h>
@@ -283,49 +283,50 @@ lv_lines_t * lv_lines_get(lv_lines_builtin_t style, lv_lines_t * copy_p)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
 static bool lv_line_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
 {
     /*A line never covers an area*/
     if(mode == LV_DESIGN_COVER_CHK) return false;
-    
-	lv_line_ext_t * ext_p = lv_obj_get_ext(obj_dp);
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
+		lv_line_ext_t * ext_p = lv_obj_get_ext(obj_dp);
 
-	if(ext_p->point_num == 0 || ext_p->point_p == NULL) return false;
+		if(ext_p->point_num == 0 || ext_p->point_p == NULL) return false;
 
-	lv_lines_t * lines_p = lv_obj_get_style(obj_dp);
+		lv_lines_t * lines_p = lv_obj_get_style(obj_dp);
 
-	opa_t opa = lv_obj_get_opa(obj_dp);
-	area_t area;
-	lv_obj_get_cords(obj_dp, &area);
-	cord_t x_ofs = area.x1;
-	cord_t y_ofs = area.y1;
-	point_t p1;
-	point_t p2;
-	cord_t h = lv_obj_get_height(obj_dp);
-	uint16_t i;
-	uint8_t us = 1;
-	if(ext_p->upscale != 0) {
-		us = LV_DOWNSCALE;
-	}
-
-	/*Read all pints and draw the lines*/
-	for (i = 0; i < ext_p->point_num - 1; i++) {
-
-		p1.x = ext_p->point_p[i].x * us + x_ofs;
-		p2.x = ext_p->point_p[i + 1].x * us + x_ofs;
-
-		if(ext_p->y_inv == 0) {
-			p1.y = ext_p->point_p[i].y * us + y_ofs;
-			p2.y = ext_p->point_p[i + 1].y * us + y_ofs;
-		} else {
-			p1.y = h - ext_p->point_p[i].y * us + y_ofs;
-			p2.y = h - ext_p->point_p[i + 1].y * us + y_ofs;
+		opa_t opa = lv_obj_get_opa(obj_dp);
+		area_t area;
+		lv_obj_get_cords(obj_dp, &area);
+		cord_t x_ofs = area.x1;
+		cord_t y_ofs = area.y1;
+		point_t p1;
+		point_t p2;
+		cord_t h = lv_obj_get_height(obj_dp);
+		uint16_t i;
+		uint8_t us = 1;
+		if(ext_p->upscale != 0) {
+			us = LV_DOWNSCALE;
 		}
-		lv_draw_line(&p1, &p2, mask_p, lines_p, opa);
-	}
-    
+
+		/*Read all pints and draw the lines*/
+		for (i = 0; i < ext_p->point_num - 1; i++) {
+
+			p1.x = ext_p->point_p[i].x * us + x_ofs;
+			p2.x = ext_p->point_p[i + 1].x * us + x_ofs;
+
+			if(ext_p->y_inv == 0) {
+				p1.y = ext_p->point_p[i].y * us + y_ofs;
+				p2.y = ext_p->point_p[i + 1].y * us + y_ofs;
+			} else {
+				p1.y = h - ext_p->point_p[i].y * us + y_ofs;
+				p2.y = h - ext_p->point_p[i + 1].y * us + y_ofs;
+			}
+			lv_draw_line(&p1, &p2, mask_p, lines_p, opa);
+		}
+    }
     return true;
 }
 

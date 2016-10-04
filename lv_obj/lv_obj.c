@@ -394,18 +394,15 @@ void lv_obj_set_parent(lv_obj_t* obj_dp, lv_obj_t* parent_dp)
     old_pos.y = lv_obj_get_y(obj_dp);
     
     ll_chg_list(&obj_dp->par_dp->child_ll, &parent_dp->child_ll, obj_dp);
-    
+    obj_dp->par_dp = parent_dp;
+    lv_obj_set_pos(obj_dp, old_pos.x, old_pos.y);
+
     /*Notify the original parent because one of its children is lost*/
     obj_dp->par_dp->signal_f(obj_dp->par_dp, LV_SIGNAL_CHILD_CHG, NULL);
-    
-    obj_dp->par_dp = parent_dp;
-    
-    lv_obj_set_pos(obj_dp, old_pos.x, old_pos.y);
-    
+
     /*Notify the new parent about the child*/
     parent_dp->signal_f(parent_dp, LV_SIGNAL_CHILD_CHG, obj_dp);
 
-    
     lv_obj_inv(obj_dp);
 }
 
@@ -1342,20 +1339,19 @@ static bool lv_obj_design(lv_obj_t* obj_dp, const  area_t * mask_p, lv_design_mo
         bool cover;
     	cover = area_is_in(mask_p, &obj_dp->cords);
         return cover;
-    }
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+		lv_objs_t * objs_p = lv_obj_get_style(obj_dp);
 
-    lv_objs_t * objs_p = lv_obj_get_style(obj_dp);
-    
-    opa_t opa = lv_obj_get_opa(obj_dp);
-    color_t color = objs_p->color;
+		opa_t opa = lv_obj_get_opa(obj_dp);
+		color_t color = objs_p->color;
 
-    /*Simply draw a rectangle*/
+		/*Simply draw a rectangle*/
 #if LV_VDB_SIZE == 0
-    lv_rfill(&obj_dp->cords, mask_p, color, opa);
+		lv_rfill(&obj_dp->cords, mask_p, color, opa);
 #else
-    lv_vfill(&obj_dp->cords, mask_p, color, opa);
+		lv_vfill(&obj_dp->cords, mask_p, color, opa);
 #endif
-    
+    }
     return true;
 }
 

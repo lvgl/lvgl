@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/2d.h>
+#include <lvgl/lv_misc/area.h>
 #include "misc/math/math_base.h"
 
 /*********************
@@ -47,6 +47,26 @@ void area_set(area_t * area_p, cord_t x1, cord_t y1, cord_t x2, cord_t y2)
     area_p->y1 = y1;
     area_p->x2 = x2;
     area_p->y2 = y2;
+}
+
+void area_set_width(area_t * area_p, cord_t w)
+{
+	area_p->x2 = area_p->x1 + w - 1;
+}
+
+void area_set_height(area_t * area_p, cord_t h)
+{
+	area_p->y2 = area_p->y1 + h - 1;
+}
+
+void area_set_pos(area_t * area_p, cord_t x, cord_t y)
+{
+	cord_t w = area_get_width(area_p);
+	cord_t h = area_get_height(area_p);
+	area_p->x1 = x;
+	area_p->y1 = y;
+	area_set_width(area_p, w);
+	area_set_height(area_p, h);
 }
 
 /**

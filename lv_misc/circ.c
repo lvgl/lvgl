@@ -8,7 +8,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/2d.h>
+#include <lvgl/lv_misc/area.h>
 
 /*********************
  *      DEFINES

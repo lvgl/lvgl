@@ -30,6 +30,8 @@ typedef struct
 	lv_pages_t pages;	/*Style of ancestor*/
 	/*New style element for this type */
 	lv_labels_t labels;
+	color_t cursor_color;
+	cord_t cursor_width;
 	uint8_t cursor_show :1;
 }lv_tas_t;
 
@@ -45,6 +47,7 @@ typedef struct
 	lv_page_ext_t page; /*Ext. of ancestor*/
 	/*New data for this type */
 	lv_obj_t * label_dp;
+	cord_t cursor_valid_x;
 	uint16_t cursor_pos;
 }lv_ta_ext_t;
 
@@ -59,6 +62,8 @@ void lv_ta_add_char(lv_obj_t * obj_dp, char c);
 void lv_ta_add_text(lv_obj_t * obj_dp, const char * txt);
 void lv_ta_del(lv_obj_t * obj_dp);
 void lv_ta_set_cursor_pos(lv_obj_t * obj_dp, uint16_t pos);
+void lv_ta_cursor_right	(lv_obj_t * obj_dp);
+void lv_ta_cursor_left(lv_obj_t * obj_dp);
 void lv_ta_cursor_down(lv_obj_t * obj_dp);
 void lv_ta_cursor_up(lv_obj_t * obj_dp);
 
