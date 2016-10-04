@@ -34,10 +34,9 @@ static void lv_pages_init(void);;
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_design_f;
-
 static lv_pages_t lv_pages_def;
 static lv_pages_t lv_pages_transp;
+static lv_design_f_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -273,6 +272,10 @@ static bool lv_scrolling_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param)
     return obj_valid;
 }
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
  * @param obj_dp pointer to an object on a page
@@ -283,6 +286,11 @@ void lv_page_glue_obj(lv_obj_t* obj_dp, bool en)
     lv_obj_set_drag_parent(obj_dp, en);
     lv_obj_set_drag(obj_dp, en);
 }
+
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable
@@ -320,17 +328,6 @@ lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * to_copy)
 
 	return style_p;
 }
-
-
-
-
-/*=====================
- * Setter functions 
- *====================*/
-
-/*=====================
- * Getter functions 
- *====================*/
 
 /**********************
  *   STATIC FUNCTIONS

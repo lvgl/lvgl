@@ -9,8 +9,8 @@
 #include "lv_conf.h"
 #if USE_LV_CHART != 0
 
-#include <lvgl/lv_objx/lv_chart.h>
-#include "lvgl/lv_draw/lv_draw.h"
+#include "lv_chart.h"
+#include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -39,8 +39,8 @@ static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_design_fp;
 static lv_charts_t lv_charts_def;
+static lv_design_f_t ancestor_design_fp;
 
 /**********************
  *      MACROS

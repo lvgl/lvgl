@@ -34,7 +34,7 @@ static void lv_pbs_init(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool (*ancestor_design_fp)(lv_obj_t*, const area_t *, lv_design_mode_t);
+static lv_design_f_t ancestor_design_fp;
 static lv_pbs_t lv_pbs_def;
 
 /**********************

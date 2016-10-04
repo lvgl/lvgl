@@ -25,16 +25,12 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
-static void lv_btns_init(void);
 static void lv_btn_style_load(lv_obj_t * obj_dp, lv_rects_t * rects_p);
+static void lv_btns_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-/*----------------- 
- * Style definition
- *-----------------*/
 static lv_btns_t lv_btns_def;
 static lv_btns_t lv_btns_transp;
 static lv_btns_t lv_btns_border;
@@ -366,6 +362,22 @@ static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
 }
 
 /**
+ * Load the corresponding style according to the state to 'rects' in 'lv_btns_t'
+ * @param obj_dp pointer to a button object
+ */
+static void lv_btn_style_load(lv_obj_t * obj_dp, lv_rects_t * rects_p)
+{
+    lv_btn_state_t state = lv_btn_get_state(obj_dp);
+    lv_btns_t * btns_p = lv_obj_get_style(obj_dp);
+
+    /*Load the style*/
+    memcpy(rects_p, &btns_p->rects, sizeof(lv_rects_t));
+    rects_p->objs.color = btns_p->mcolor[state];
+    rects_p->gcolor = btns_p->gcolor[state];
+    rects_p->bcolor = btns_p->bcolor[state];
+}
+
+/**
  * Initialize the button styles
  */
 static void lv_btns_init(void)
@@ -420,22 +432,6 @@ static void lv_btns_init(void)
 	lv_btns_border.rects.hpad = 10 * LV_STYLE_MULT;
 	lv_btns_border.rects.vpad = 10 * LV_STYLE_MULT;
 	lv_btns_border.rects.vpad = 5 * LV_STYLE_MULT;
-}
-
-/**
- * Load the corresponding style according to the state to 'rects' in 'lv_btns_t'
- * @param obj_dp pointer to a button object
- */
-static void lv_btn_style_load(lv_obj_t * obj_dp, lv_rects_t * rects_p)
-{
-    lv_btn_state_t state = lv_btn_get_state(obj_dp);
-    lv_btns_t * btns_p = lv_obj_get_style(obj_dp);
-
-    /*Load the style*/
-    memcpy(rects_p, &btns_p->rects, sizeof(lv_rects_t));
-    rects_p->objs.color = btns_p->mcolor[state];
-    rects_p->gcolor = btns_p->gcolor[state];
-    rects_p->bcolor = btns_p->bcolor[state];
 }
 
 #endif

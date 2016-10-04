@@ -26,10 +26,10 @@
 #if 0 /*Not necessary*/
 static bool lv_btnm_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
 #endif
-static void lv_btnms_init(void);
 static uint8_t lv_btnm_get_width_unit(const char * btn_str);
 static void lv_btnm_create_btns(lv_obj_t * obj_dp, const char ** map_p);
 static bool lv_btnm_btn_release_action(lv_obj_t * obj_dp, lv_dispi_t * dispi_p);
+static void lv_btnms_init(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -223,6 +223,27 @@ void lv_btnm_set_cb(lv_obj_t * obj_dp, lv_btnm_callback_t cb)
  *====================*/
 
 /**
+ * Get the current map of a button matrix
+ * @param obj_dp pointer to a button matrix object
+ * @return the current map
+ */
+const char ** lv_btnm_get_map(lv_obj_t * obj_dp)
+{
+	return LV_EA(obj_dp, lv_btnm_ext_t)->map_p;
+}
+
+/**
+ * Get a the callback function of the buttons on a button matrix
+ * @param obj_dp: pointer to button matrix object
+ * @return pointer to the callback function
+ */
+lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * obj_dp)
+{
+	return LV_EA(obj_dp, lv_btnm_ext_t)->cb;
+}
+
+
+/**
  * Return with a pointer to a built-in style and/or copy it to a variable
  * @param style a style name from lv_btnms_builtin_t enum
  * @param copy_p copy the style to this variable. (NULL if unused)
@@ -254,26 +275,6 @@ lv_btnms_t * lv_btnms_get(lv_btnms_builtin_t style, lv_btnms_t * copy_p)
 	}
 
 	return style_p;
-}
-
-/**
- * Get the current map of a button matrix
- * @param obj_dp pointer to a button matrix object
- * @return the current map
- */
-const char ** lv_btnm_get_map(lv_obj_t * obj_dp)
-{
-	return LV_EA(obj_dp, lv_btnm_ext_t)->map_p;
-}
-
-/**
- * Get a the callback function of the buttons on a button matrix
- * @param obj_dp: pointer to button matrix object
- * @return pointer to the callback function
- */
-lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * obj_dp)
-{
-	return LV_EA(obj_dp, lv_btnm_ext_t)->cb;
 }
 
 /**********************

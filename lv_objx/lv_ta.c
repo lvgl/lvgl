@@ -438,7 +438,16 @@ static bool lv_ta_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode
     return true;
 }
 
-
+/**
+ * An extended label design. Calls the normal label design function and it draws a cursor.
+ * @param obj_dp pointer to a text area object
+ * @param mask_p  the object will be drawn only in this area
+ * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DESIGN_DRAW_MAIN: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
+ * @return return true/false, depends on 'mode'
+ */
 static bool lv_ta_label_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
 {
 	if(mode == LV_DESIGN_COVER_CHK) {

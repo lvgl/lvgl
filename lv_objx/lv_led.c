@@ -172,6 +172,17 @@ void lv_led_tgl(lv_obj_t * obj_dp)
  *====================*/
 
 /**
+ * Get the brightness of a LEd object
+ * @param obj_dp pointer to LED object
+ * @return bright 0 (max. dark) ... 255 (max. light)
+ */
+uint8_t lv_led_get_bright(lv_obj_t * obj_dp)
+{
+	lv_led_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
+	return ext_dp->bright;
+}
+
+/**
  * Return with a pointer to a built-in style and/or copy it to a variable
  * @param style a style name from lv_leds_builtin_t enum
  * @param copy_p copy the style to this variable. (NULL if unused)
@@ -209,21 +220,9 @@ lv_leds_t * lv_leds_get(lv_leds_builtin_t style, lv_leds_t * copy_p)
 	return style_p;
 }
 
-/**
- * Get the brightness of a LEd object
- * @param obj_dp pointer to LED object
- * @return bright 0 (max. dark) ... 255 (max. light)
- */
-uint8_t lv_led_get_bright(lv_obj_t * obj_dp)
-{
-	lv_led_ext_t * ext_dp = lv_obj_get_ext(obj_dp);
-	return ext_dp->bright;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 /**
  * Handle the drawing related tasks of the leds
