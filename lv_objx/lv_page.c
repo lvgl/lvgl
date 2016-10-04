@@ -462,7 +462,7 @@ static void lv_page_sb_refresh(lv_obj_t* page_dp)
     lv_inv_area(&page_ext_dp->sbv);
 
     /*Horizontal scrollbar*/
-    if(scrolling_w <= obj_w) {        /*Full sized scroll bar*/
+    if(scrolling_w <= obj_w - 2 * hpad) {        /*Full sized scroll bar*/
         area_set_width(&page_ext_dp->sbh, obj_w - pages_p->sb_width);
         area_set_pos(&page_ext_dp->sbh, page_x0, page_y0 + obj_h - pages_p->sb_width);
     } else {
@@ -479,7 +479,7 @@ static void lv_page_sb_refresh(lv_obj_t* page_dp)
     }
     
     /*Vertical scrollbar*/
-    if(scrolling_h <= obj_h) {        /*Full sized scroll bar*/
+    if(scrolling_h <= obj_h - 2 * vpad) {        /*Full sized scroll bar*/
         area_set_height(&page_ext_dp->sbv,  obj_h - pages_p->sb_width);
         area_set_pos(&page_ext_dp->sbv, page_x0 + obj_w - pages_p->sb_width, 0);
     } else {
