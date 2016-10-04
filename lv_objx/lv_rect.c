@@ -34,6 +34,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_rects_init(void);
 static void lv_rect_refr_layout(lv_obj_t * obj_dp);
 static void lv_rect_layout_col(lv_obj_t * obj_dp);
 static void lv_rect_layout_row(lv_obj_t * obj_dp);
@@ -44,20 +45,9 @@ static void lv_rect_refr_autofit(lv_obj_t * obj_dp);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_rects_t lv_rects_def =
-{ .objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
-  .bcolor = COLOR_WHITE, .bwidth = 2 * LV_STYLE_MULT, .bopa = 50,
-  .round = 4 * LV_STYLE_MULT, .empty = 0,
-  .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT };
-
-static lv_rects_t lv_rects_transp =
-{ .objs.transp = 1, .bwidth = 0, .empty = 1,
-  .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT};
-
-static lv_rects_t lv_rects_border =
-{ .bcolor = COLOR_BLACK, .bwidth = 2 * LV_STYLE_MULT, .bopa = 100,
-  .round = 4 * LV_STYLE_MULT, .empty = 1,
-  .hpad = 10 * LV_STYLE_MULT, .vpad = 10 * LV_STYLE_MULT, .opad = 10 * LV_STYLE_MULT};
+static lv_rects_t lv_rects_def;
+static lv_rects_t lv_rects_transp;
+static lv_rects_t lv_rects_border;
 
 /**********************
  *      MACROS
@@ -89,7 +79,7 @@ lv_obj_t* lv_rect_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 
     /*Init the new rectangle*/
     if(copy_dp == NULL) {
-		lv_obj_set_style(new_obj_dp, &lv_rects_def);
+		lv_obj_set_style(new_obj_dp, lv_rects_get(LV_RECTS_DEF, NULL));
 		rect_ext_dp->hfit_en = 0;
 		rect_ext_dp->vfit_en = 0;
     } else {
@@ -217,6 +207,14 @@ bool lv_rect_get_vfit(lv_obj_t * obj_dp)
  */
 lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_rects_init();
+		style_inited = true;
+	}
+
 	lv_rects_t * style_p;
 
 	switch(style) {
@@ -287,6 +285,38 @@ static bool lv_rect_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
 		lv_draw_rect(&area, mask_p, lv_obj_get_style(obj_dp), opa);
     }
     return true;
+}
+
+/**
+ * Initialize the rectangle styles
+ */
+static void lv_rects_init(void)
+{
+	/*Default style*/
+	lv_rects_def.objs.color = COLOR_MAKE(0x50, 0x70, 0x90);
+	lv_rects_def.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0);
+	lv_rects_def.bcolor = COLOR_WHITE;
+	lv_rects_def.bwidth = 2 * LV_STYLE_MULT;
+	lv_rects_def.bopa = 50;
+	lv_rects_def.round = 4 * LV_STYLE_MULT;
+	lv_rects_def.empty = 0;
+	lv_rects_def.hpad = 10 * LV_STYLE_MULT;
+	lv_rects_def.vpad = 10 * LV_STYLE_MULT;
+	lv_rects_def.opad = 10 * LV_STYLE_MULT;
+
+	/*Transparent style*/
+	memcpy(&lv_rects_transp, &lv_rects_def, sizeof(lv_rects_t));
+	lv_rects_transp.objs.transp = 1;
+	lv_rects_transp.bwidth = 0;
+	lv_rects_transp.empty = 1;
+
+	/*Border style*/
+	memcpy(&lv_rects_border, &lv_rects_def, sizeof(lv_rects_t));
+	lv_rects_border.bcolor = COLOR_BLACK;
+	lv_rects_border.bwidth = 2 * LV_STYLE_MULT;
+	lv_rects_border.bopa = 100;
+	lv_rects_border.round = 4 * LV_STYLE_MULT;
+	lv_rects_border.empty = 1;
 }
 
 /**

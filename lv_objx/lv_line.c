@@ -34,15 +34,14 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_line_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_lines_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_lines_t lv_lines_def = { .width = 2 * LV_STYLE_MULT, .objs.color = COLOR_RED};
-                                   
-static lv_lines_t lv_lines_decor = { .width = 1 * LV_STYLE_MULT, .objs.color = COLOR_GRAY};
-
-static lv_lines_t lv_lines_chart = { .width = 3 * LV_STYLE_MULT, .objs.color = COLOR_BLUE};
+static lv_lines_t lv_lines_def;
+static lv_lines_t lv_lines_decor;
+static lv_lines_t lv_lines_chart;
 
 /**********************
  *      MACROS
@@ -75,7 +74,7 @@ lv_obj_t* lv_line_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		ext_p->auto_size = 1;
 		ext_p->y_inv = 0;
 		ext_p->upscale = 0;
-	    lv_obj_set_style(new_obj_dp, &lv_lines_def);
+	    lv_obj_set_style(new_obj_dp, lv_lines_get(LV_LINES_DEF, NULL));
     }
     /*Copy 'copy_p' is not NULL*/
     else {
@@ -249,6 +248,14 @@ bool lv_line_get_upscale(lv_obj_t * obj_dp)
  */
 lv_lines_t * lv_lines_get(lv_lines_builtin_t style, lv_lines_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_lines_init();
+		style_inited = true;
+	}
+
 	lv_lines_t  *style_p;
 
 	switch(style) {
@@ -330,4 +337,24 @@ static bool lv_line_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
     return true;
 }
 
+/**
+ * Initialize the line styles
+ */
+static void lv_lines_init(void)
+{
+	/*Default style*/
+	lv_lines_def.width = 2 * LV_STYLE_MULT;
+	lv_lines_def.objs.color = COLOR_RED;
+	lv_lines_def.objs.transp = 0;
+
+	/*Decoration line style*/
+	memcpy(&lv_lines_decor, &lv_lines_def, sizeof(lv_lines_t));
+	lv_lines_decor.width = 1 * LV_STYLE_MULT;
+	lv_lines_decor.objs.color = COLOR_GRAY;
+
+	/*Chart line style*/
+	memcpy(&lv_lines_chart, &lv_lines_def, sizeof(lv_lines_t));
+	lv_lines_chart.width = 3 * LV_STYLE_MULT;
+	lv_lines_chart.objs.color = COLOR_RED;
+}
 #endif

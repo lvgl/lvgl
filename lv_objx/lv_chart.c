@@ -29,6 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_chart_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_charts_init(void);
 static void lv_chart_draw_div(lv_obj_t* obj_dp, const area_t * mask_p);
 static void lv_chart_draw_lines(lv_obj_t* obj_dp, const area_t * mask_p);
 static void lv_chart_draw_points(lv_obj_t* obj_dp, const area_t * mask_p);
@@ -38,39 +39,8 @@ static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool (*ancestor_design_fp)(lv_obj_t*, const area_t *, lv_design_mode_t);
-static lv_charts_t lv_charts_def =
-{
-	/* Background */
-	.bg_rects.objs.color = COLOR_MAKE(0x60, 0x80, 0xA0),
-	.bg_rects.gcolor = COLOR_WHITE,
-	.bg_rects.bcolor = COLOR_BLACK,
-	.bg_rects.bwidth = 2 * LV_STYLE_MULT,
-	.bg_rects.bopa = 50,
-	.bg_rects.empty = 0,
-	.bg_rects.round = 4 * LV_STYLE_MULT,
-	.bg_rects.hpad = 10 * LV_STYLE_MULT,
-	.bg_rects.vpad = 15 * LV_STYLE_MULT,
-	.bg_rects.opad = 3 * LV_STYLE_MULT,
-
-	/* Div. line */
-	.div_lines.width = 1 * LV_STYLE_MULT,
-	.div_lines.objs.color = COLOR_BLACK,
-	.div_line_opa = 100,
-
-	/*Data lines*/
-	.width = 3 * LV_STYLE_MULT,
-	.data_opa = 100,
-	.dark_eff = 150,
-	.color[0] = COLOR_RED,
-	.color[1] = COLOR_LIME,
-	.color[2] = COLOR_BLUE,
-	.color[3] = COLOR_MAGENTA,
-	.color[4] = COLOR_CYAN,
-	.color[5] = COLOR_YELLOW,
-	.color[6] = COLOR_WHITE,
-	.color[7] = COLOR_GRAY,
-};
+static lv_design_f_t ancestor_design_fp;
+static lv_charts_t lv_charts_def;
 
 /**********************
  *      MACROS
@@ -113,7 +83,7 @@ lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     /*Init the new chart background object*/
     if(copy_dp == NULL) {
         ext_dp->type = LV_CHART_LINE;
-    	lv_obj_set_style(new_obj_dp, &lv_charts_def);
+    	lv_obj_set_style(new_obj_dp, lv_charts_get(LV_CHARTS_DEF, NULL));
         ext_dp->ymin = LV_CHART_YMIN_DEF;
         ext_dp->ymax = LV_CHART_YMAX_DEF;
         ext_dp->hdiv_num = LV_CHART_HDIV_DEF;
@@ -300,6 +270,14 @@ void lv_chart_set_next(lv_obj_t * obj_dp, cord_t * dl_p, cord_t y)
  */
 lv_charts_t * lv_charts_get(lv_charts_builtin_t style, lv_charts_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_charts_init();
+		style_inited = true;
+	}
+
 	lv_charts_t * style_p;
 
 	switch(style) {
@@ -585,6 +563,38 @@ static void lv_chart_draw_cols(lv_obj_t* obj_dp, const area_t * mask_p)
 		}
 		dl_cnt++;
 	}
+}
+
+/**
+ * Initialize the chart styles
+ */
+static void lv_charts_init(void)
+{
+	/*Default style*/
+	/* Background */
+	lv_rects_get(LV_RECTS_DEF, &lv_charts_def.bg_rects);
+	lv_charts_def.bg_rects.objs.color = COLOR_MAKE(0x60, 0x80, 0xA0);
+	lv_charts_def.bg_rects.gcolor = COLOR_WHITE;
+	lv_charts_def.bg_rects.bcolor = COLOR_BLACK;
+
+	/* Div. line */
+	lv_lines_get(LV_LINES_DECOR, &lv_charts_def.div_lines);
+	lv_charts_def.div_lines.width = 1 * LV_STYLE_MULT;
+	lv_charts_def.div_lines.objs.color = COLOR_BLACK;
+	lv_charts_def.div_line_opa = OPA_COVER;
+
+	/*Data lines*/
+	lv_charts_def.width = 3 * LV_STYLE_MULT;
+	lv_charts_def.data_opa = 100;
+	lv_charts_def.dark_eff = 150;
+	lv_charts_def.color[0] = COLOR_RED;
+	lv_charts_def.color[1] = COLOR_LIME;
+	lv_charts_def.color[2] = COLOR_BLUE;
+	lv_charts_def.color[3] = COLOR_MAGENTA;
+	lv_charts_def.color[4] = COLOR_CYAN;
+	lv_charts_def.color[5] = COLOR_YELLOW;
+	lv_charts_def.color[6] = COLOR_WHITE;
+	lv_charts_def.color[7] = COLOR_GRAY;
 }
 
 #endif

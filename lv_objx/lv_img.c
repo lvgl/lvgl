@@ -26,16 +26,14 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_imgs_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-/*----------------- 
- * Style definition
- *-----------------*/
-static lv_imgs_t lv_imgs_def = {.recolor_opa=OPA_TRANSP};
-static lv_imgs_t lv_imgs_light = {.objs.color = COLOR_WHITE, .recolor_opa=OPA_50};
-static lv_imgs_t lv_imgs_dark = {.objs.color = COLOR_BLACK, .recolor_opa=OPA_50};
+static lv_imgs_t lv_imgs_def;
+static lv_imgs_t lv_imgs_light;
+static lv_imgs_t lv_imgs_dark;
 
 /**********************
  *      MACROS
@@ -79,7 +77,7 @@ lv_obj_t* lv_img_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		} else {
 			img_ext_dp->auto_size = 0;
 		}
-	    lv_obj_set_style(new_obj_dp, &lv_imgs_def);
+	    lv_obj_set_style(new_obj_dp, lv_imgs_get(LV_IMGS_DEF, NULL));
     } else {
     	img_ext_dp->auto_size = LV_EA(copy_dp, lv_img_ext_t)->auto_size;
     	lv_img_set_file(new_obj_dp, LV_EA(copy_dp, lv_img_ext_t)->fn_dp);
@@ -126,6 +124,14 @@ bool lv_img_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
  */
 lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_imgs_init();
+		style_inited = true;
+	}
+
 	lv_imgs_t * style_p;
 
 	switch(style) {
@@ -152,7 +158,7 @@ lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy_p)
 
 /**
  * Create a file to the RAMFS from a picture data
- * @param fn file name of the new file (e.g. "pic1", will be avaliable at "U:/pic1")
+ * @param fn file name of the new file (e.g. "pic1", will be available at "U:/pic1")
  * @param data_p pointer to a color map with lv_img_raw_header_t header
  * @return result of the file operation. FS_RES_OK or any error from fs_res_t
  */
@@ -292,6 +298,23 @@ static bool lv_img_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
     
     return true;
 }
+/**
+ * Initialize the image styles
+ */
+static void lv_imgs_init(void)
+{
+	/*Default style*/
+	lv_imgs_def.objs.color = COLOR_BLACK;
+	lv_imgs_def.recolor_opa = OPA_TRANSP;
 
+	/*Dark style*/
+	memcpy(&lv_imgs_dark, &lv_imgs_def, sizeof(lv_imgs_t));
+	lv_imgs_dark.objs.color = COLOR_WHITE; lv_imgs_dark.recolor_opa = OPA_50;
+
+	/*Light style*/
+	memcpy(&lv_imgs_light, &lv_imgs_dark, sizeof(lv_imgs_t));
+	lv_imgs_light.objs.color = COLOR_WHITE; lv_imgs_light.recolor_opa = OPA_50;
+
+}
 
 #endif

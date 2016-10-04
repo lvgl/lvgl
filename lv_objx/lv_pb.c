@@ -29,27 +29,13 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_pb_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_pbs_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static bool (*ancestor_design_fp)(lv_obj_t*, const area_t *, lv_design_mode_t);
-static lv_pbs_t lv_pbs_def =
-{
-	/*Background*/
-	.bg.objs.color = COLOR_WHITE, .bg.gcolor = COLOR_SILVER,
-	.bg.bcolor = COLOR_BLACK, .bg.bwidth = 2 * LV_STYLE_MULT, .bg.bopa = 50,
-	.bg.round = 4 * LV_STYLE_MULT, .bg.empty = 0,
-	.bg.hpad = 0, .bg.vpad = 0, .bg.opad = 0,
-
-	/*Bar*/
-	.bar.objs.color = COLOR_LIME, .bar.gcolor = COLOR_GREEN,
-	.bar.bcolor = COLOR_BLACK, .bar.bwidth = 2 * LV_STYLE_MULT, .bar.bopa = 50,
-	.bar.round = 4 * LV_STYLE_MULT, .bar.empty = 0,
-	.bar.hpad = 0, .bar.vpad = 0, .bar.opad = 0,
-
-
-};
+static lv_pbs_t lv_pbs_def;
 
 /**********************
  *      MACROS
@@ -97,7 +83,7 @@ lv_obj_t* lv_pb_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 
     	lv_rect_set_layout(new_obj_dp, LV_RECT_LAYOUT_CENTER);
     	lv_obj_set_signal_f(new_obj_dp, lv_pb_signal);
-    	lv_obj_set_style(new_obj_dp, &lv_pbs_def);
+    	lv_obj_set_style(new_obj_dp, lv_pbs_get(LV_PBS_DEF, NULL));
     	lv_obj_set_design_f(new_obj_dp, lv_pb_design);
 
     	lv_pb_set_value(new_obj_dp, ext_dp->act_value);
@@ -222,6 +208,14 @@ uint16_t lv_pb_get_value(lv_obj_t * obj_dp)
  */
 lv_pbs_t * lv_pbs_get(lv_pbs_builtin_t style, lv_pbs_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_pbs_init();
+		style_inited = true;
+	}
+
 	lv_pbs_t  *style_p;
 
 	switch(style) {
@@ -279,4 +273,24 @@ static bool lv_pb_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode
     return true;
 }
 
+/**
+ * Initialize the progess bar styles
+ */
+static void lv_pbs_init(void)
+{
+	/*Default style*/
+	lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bg);	/*Background*/
+	lv_pbs_def.bg.objs.color = COLOR_WHITE;
+	lv_pbs_def.bg.gcolor = COLOR_SILVER,
+	lv_pbs_def.bg.bcolor = COLOR_BLACK;
+
+	lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bar);	/*Bar*/
+	lv_pbs_def.bar.objs.color = COLOR_LIME;
+	lv_pbs_def.bar.gcolor = COLOR_GREEN;
+	lv_pbs_def.bar.bcolor = COLOR_BLACK;
+
+	lv_labels_get(LV_LABELS_DEF, &lv_pbs_def.label);
+	lv_pbs_def.label.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
+
+}
 #endif

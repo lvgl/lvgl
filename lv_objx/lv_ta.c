@@ -28,57 +28,12 @@
 static bool lv_ta_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
 static bool lv_ta_label_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
 static void lv_ta_save_valid_cursor_x(lv_obj_t * obj_dp);
+static void lv_tas_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_tas_t lv_tas_def =
-{   .pages.bg_rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90),
-	.pages.bg_rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
-	.pages.bg_rects.bcolor = COLOR_WHITE,
-	.pages.bg_rects.bopa = 50,
-	.pages.bg_rects.bwidth = 2 * LV_STYLE_MULT,
-	.pages.bg_rects.round = 4 * LV_STYLE_MULT,
-	.pages.bg_rects.empty = 0,
-	.pages.bg_rects.hpad = 10 * LV_STYLE_MULT,
-	.pages.bg_rects.vpad = 10 * LV_STYLE_MULT,
-	.pages.bg_rects.opad = 5 * LV_STYLE_MULT,
-
-	.pages.scrable_rects.objs.color = COLOR_WHITE,
-	.pages.scrable_rects.gcolor = COLOR_SILVER,
-	.pages.scrable_rects.bcolor = COLOR_GRAY,
-	.pages.scrable_rects.bopa = 50,
-	.pages.scrable_rects.bwidth = 0 * LV_STYLE_MULT,
-	.pages.scrable_rects.round = 2 * LV_STYLE_MULT,
-	.pages.scrable_rects.empty = 0,
-	.pages.scrable_rects.hpad = 10 * LV_STYLE_MULT,
-	.pages.scrable_rects.vpad = 10 * LV_STYLE_MULT,
-	.pages.scrable_rects.opad = 5 * LV_STYLE_MULT,
-
-	.pages.sb_rects.objs.color = COLOR_BLACK,
-	.pages.sb_rects.gcolor = COLOR_BLACK,
-	.pages.sb_rects.bcolor = COLOR_WHITE,
-	.pages.sb_rects.bopa = 50,
-	.pages.sb_rects.bwidth = 1 * LV_STYLE_MULT,
-	.pages.sb_rects.round = 5 * LV_STYLE_MULT,
-	.pages.sb_rects.empty = 0,
-	.pages.sb_rects.hpad = 0,
-	.pages.sb_rects.vpad = 0,
-	.pages.sb_rects.opad = 0,
-
-	.pages.sb_width= 8 * LV_STYLE_MULT,
-	.pages.sb_opa=50,
-	.pages.sb_mode = LV_PAGE_SB_MODE_AUTO,
-
-	.labels.font = LV_FONT_DEFAULT,
-	.labels.objs.color = COLOR_MAKE(0x10, 0x18, 0x20),
-	.labels.letter_space = 2 * LV_STYLE_MULT,
-    .labels.line_space =  2 * LV_STYLE_MULT,
-	.labels.mid =  0,
-
-	.cursor_color = COLOR_MAKE(0x20, 0x20, 0x20),
-	.cursor_width = 2 * LV_STYLE_MULT,	/*>1 px for visible cursor*/
-};
+static lv_tas_t lv_tas_def;
 
 lv_design_f_t ancestor_design_f;
 lv_design_f_t label_design_f;
@@ -132,7 +87,7 @@ lv_obj_t* lv_ta_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     	lv_label_set_text(ext_dp->label_dp, "abc aaaa bbbb ccc\n123\nABC\nxyz\nwww\n007\nalma\n:)\naaaaaa");
     	lv_page_glue_obj(ext_dp->label_dp, true);
     	lv_obj_set_click(ext_dp->label_dp, true);
-    	lv_obj_set_style(new_obj_dp, &lv_tas_def);
+    	lv_obj_set_style(new_obj_dp, lv_tas_get(LV_TAS_DEF, NULL));
 
     }
     /*Copy an existing object*/
@@ -428,6 +383,14 @@ uint16_t lv_ta_get_cursor_pos(lv_obj_t * obj_dp)
  */
 lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_tas_init();
+		style_inited = true;
+	}
+
 	lv_tas_t  *style_p;
 
 	switch(style) {
@@ -526,5 +489,18 @@ static void lv_ta_save_valid_cursor_x(lv_obj_t * obj_dp)
 	ta_ext_dp->cursor_valid_x = cur_pos.x;
 }
 
+/**
+ * Initialize the text area styles
+ */
+static void lv_tas_init(void)
+{
+	/*Default style*/
+	lv_pages_get(LV_PAGES_DEF, &lv_tas_def.pages);
 
+	lv_labels_get(LV_LABELS_TXT, &lv_tas_def.labels);
+	lv_tas_def.labels.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
+
+	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
+	lv_tas_def.cursor_width = 2 * LV_STYLE_MULT;	/*>1 px for visible cursor*/
+}
 #endif

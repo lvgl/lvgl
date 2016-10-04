@@ -26,6 +26,7 @@
 #if 0 /*Not necessary*/
 static bool lv_btnm_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
 #endif
+static void lv_btnms_init(void);
 static uint8_t lv_btnm_get_width_unit(const char * btn_str);
 static void lv_btnm_create_btns(lv_obj_t * obj_dp, const char ** map_p);
 static bool lv_btnm_btn_release_action(lv_obj_t * obj_dp, lv_dispi_t * dispi_p);
@@ -33,47 +34,7 @@ static bool lv_btnm_btn_release_action(lv_obj_t * obj_dp, lv_dispi_t * dispi_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_btnms_t lv_btnms_def =
-{
-  /*Background rectangle style*/
-  .rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
-  .rects.bcolor = COLOR_WHITE, .rects.bwidth = 2 * LV_STYLE_MULT, .rects.bopa = 50,
-  .rects.round = 4 * LV_STYLE_MULT, .rects.empty = 0,
-  .rects.hpad = 5 * LV_STYLE_MULT, .rects.vpad = 5 * LV_STYLE_MULT, .rects.opad = 5 * LV_STYLE_MULT,
-
-  /*Button style*/
-  .btns.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80),
-  .btns.gcolor[LV_BTN_STATE_REL] = COLOR_BLACK,
-  .btns.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
-
-  .btns.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0),
-  .btns.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40),
-  .btns.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE,
-
-  .btns.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x80,0x00,0x00),
-  .btns.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x20, 0x20),
-  .btns.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE,
-
-  .btns.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0xf0, 0x26, 0x26),
-  .btns.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x40, 0x40),
-  .btns.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE,
-
-  .btns.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER,
-  .btns.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
-  .btns.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
-
-  .btns.rects.bwidth = 2 * LV_STYLE_MULT, .btns.rects.bopa = 50,
-  .btns.rects.empty = 0, .btns.rects.round = 4 * LV_STYLE_MULT,
-  .btns.rects.hpad = 10 * LV_STYLE_MULT,
-  .btns.rects.vpad = 15 * LV_STYLE_MULT,
-  .btns.rects.opad = 3 * LV_STYLE_MULT,
-
-  /*Label style*/
-  .labels.font = LV_FONT_DEFAULT, .labels.objs.color = COLOR_MAKE(0xd0, 0xe0, 0xf0),
-  .labels.letter_space = 2 * LV_STYLE_MULT, .labels.line_space =  2 * LV_STYLE_MULT,
-  .labels.mid =  1,
-
-};
+static lv_btnms_t lv_btnms_def;
 
 static const char * lv_btnm_def_map[] = {"Btn1","Btn2", "Btn3","\n",
 										 "\002Btn4","Btn5", ""};
@@ -114,7 +75,7 @@ lv_obj_t* lv_btnm_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     /*Init the new button matrix object*/
     if(copy_dp == NULL) {
     	lv_obj_set_size(new_obj_dp, LV_HOR_RES / 2, LV_VER_RES / 2);
-    	lv_obj_set_style(new_obj_dp, &lv_btnms_def);
+    	lv_obj_set_style(new_obj_dp, lv_btnms_get(LV_BTNMS_DEF, NULL));
     	lv_btnm_set_map(new_obj_dp, lv_btnm_def_map);
     }
     /*Copy an existing object*/
@@ -269,6 +230,14 @@ void lv_btnm_set_cb(lv_obj_t * obj_dp, lv_btnm_callback_t cb)
  */
 lv_btnms_t * lv_btnms_get(lv_btnms_builtin_t style, lv_btnms_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_btnms_init();
+		style_inited = true;
+	}
+
 	lv_btnms_t  *style_p;
 
 	switch(style) {
@@ -335,6 +304,18 @@ static bool lv_btnm_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
     return true;
 }
 #endif
+
+
+/**
+ * Initialize the button matrix styles
+ */
+static void lv_btnms_init(void)
+{
+	/*Default style*/
+	lv_rects_get(LV_RECTS_DEF, &lv_btnms_def.rects);	 /*Background rectangle style*/
+	lv_btns_get(LV_BTNS_DEF, &lv_btnms_def.btns);	 	 /*Button style*/
+	lv_labels_get(LV_LABELS_BTN, &lv_btnms_def.labels);	 /*BUtton label style*/
+}
 
 /**
  * Create the required number of buttons according to a map

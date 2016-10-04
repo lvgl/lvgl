@@ -34,25 +34,14 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_led_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_leds_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-/* A RED style */
-static lv_leds_t lv_leds_def =
-{	.rects.objs.color = COLOR_RED, .rects.gcolor = COLOR_MARRON,
-	.rects.bcolor = COLOR_WHITE, .rects.bwidth = 4 * LV_STYLE_MULT, .rects.bopa = 50,
-	.rects.round = LV_RECT_CIRCLE, .rects.empty = 0,
-	.rects.hpad = 0, .rects.vpad = 0, .rects.opad = 0 /*Fit and layout is not used*/ };
-
-
-/* A GREEN style */
-static lv_leds_t lv_leds_green =
-{	.rects.objs.color = COLOR_LIME, .rects.gcolor = COLOR_GREEN,
-	.rects.bcolor = COLOR_WHITE, .rects.bwidth = 4 * LV_STYLE_MULT, .rects.bopa = 50,
-	.rects.round = LV_RECT_CIRCLE, .rects.empty = 0,
-	.rects.hpad = 0, .rects.vpad = 0, .rects.opad = 0 /*Fit and layout is not used*/ };
+static lv_leds_t lv_leds_def; /*Red*/
+static lv_leds_t lv_leds_green;
 
 /**********************
  *      MACROS
@@ -88,7 +77,7 @@ lv_obj_t* lv_led_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     /*Init the new led object*/
     if(copy_dp == NULL) {
     	ext_dp->bright = LV_LED_BRIGHTNESS_DEF;
-    	lv_obj_set_style(new_obj_dp, &lv_leds_def);
+    	lv_obj_set_style(new_obj_dp, lv_leds_get(LV_LEDS_DEF, NULL));
     	lv_obj_set_size_us(new_obj_dp, 40, 40);
     }
     /*Copy an existing object*/
@@ -190,6 +179,14 @@ void lv_led_tgl(lv_obj_t * obj_dp)
  */
 lv_leds_t * lv_leds_get(lv_leds_builtin_t style, lv_leds_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_leds_init();
+		style_inited = true;
+	}
+
 	lv_leds_t  *style_p;
 
 	switch(style) {
@@ -263,5 +260,28 @@ static bool lv_led_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
     return true;
 }
 
+/**
+ * Initialize the led styles
+ */
+static void lv_leds_init(void)
+{
+	/*Default style*/
+	lv_rects_get(LV_RECTS_DEF, &lv_leds_def.rects);
+	lv_leds_def.rects.objs.color = COLOR_RED;
+	lv_leds_def.rects.gcolor = COLOR_MARRON,
+	lv_leds_def.rects.bcolor = COLOR_WHITE;
+	lv_leds_def.rects.bwidth = 4 * LV_STYLE_MULT;
+	lv_leds_def.rects.bopa = 50;
+	lv_leds_def.rects.round = LV_RECT_CIRCLE;
+	lv_leds_def.rects.hpad = 0;
+	lv_leds_def.rects.vpad = 0;
+	lv_leds_def.rects.opad = 0;
+
+	/* Green style */
+	memcpy(&lv_leds_green, &lv_leds_def, sizeof(lv_leds_t));
+	lv_leds_green.rects.objs.color = COLOR_LIME;
+	lv_leds_green.rects.gcolor = COLOR_GREEN;
+	lv_leds_green.rects.bcolor = COLOR_WHITE;
+}
 
 #endif

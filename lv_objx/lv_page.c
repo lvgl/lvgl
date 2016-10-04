@@ -29,89 +29,16 @@
 static void lv_page_sb_refresh(lv_obj_t* main_dp);
 static bool lv_page_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
 static bool lv_scrolling_signal(lv_obj_t* obj_dp, lv_signal_t sign, void* param);
+static void lv_pages_init(void);;
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_design_f_t ancestor_design_f;
 
-static lv_pages_t lv_pages_def =
-{
-	.bg_rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90),
-	.bg_rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
-	.bg_rects.bcolor = COLOR_WHITE,
-	.bg_rects.bopa = 50,
-	.bg_rects.bwidth = 2 * LV_STYLE_MULT,
-	.bg_rects.round = 4 * LV_STYLE_MULT,
-	.bg_rects.empty = 0,
-	.bg_rects.hpad = 10 * LV_STYLE_MULT,
-	.bg_rects.vpad = 10 * LV_STYLE_MULT,
-	.bg_rects.opad = 5 * LV_STYLE_MULT,
+static lv_pages_t lv_pages_def;
+static lv_pages_t lv_pages_transp;
 
-	.scrable_rects.objs.color = COLOR_WHITE,
-	.scrable_rects.gcolor = COLOR_SILVER,
-	.scrable_rects.bcolor = COLOR_GRAY,
-	.scrable_rects.bopa = 50,
-	.scrable_rects.bwidth = 0 * LV_STYLE_MULT,
-	.scrable_rects.round = 2 * LV_STYLE_MULT,
-	.scrable_rects.empty = 0,
-	.scrable_rects.hpad = 10 * LV_STYLE_MULT,
-	.scrable_rects.vpad = 10 * LV_STYLE_MULT,
-	.scrable_rects.opad = 5 * LV_STYLE_MULT,
-
-	.sb_rects.objs.color = COLOR_BLACK,
-	.sb_rects.gcolor = COLOR_BLACK,
-	.sb_rects.bcolor = COLOR_WHITE,
-	.sb_rects.bopa = 50,
-	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
-	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.empty = 0,
-	.sb_rects.hpad = 0,
-	.sb_rects.vpad = 0,
-	.sb_rects.opad = 0,
-
-	.sb_width= 8 * LV_STYLE_MULT,
-	.sb_opa=50,
-	.sb_mode = LV_PAGE_SB_MODE_AUTO,
-
-};
-
-static lv_pages_t lv_pages_transp =
-{
-	.bg_rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90),
-	.bg_rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
-	.bg_rects.bcolor = COLOR_WHITE,
-	.bg_rects.bopa = 50,
-	.bg_rects.bwidth = 0 * LV_STYLE_MULT,
-	.bg_rects.round = 2 * LV_STYLE_MULT,
-	.bg_rects.empty = 0,
-	.bg_rects.hpad = 10 * LV_STYLE_MULT,
-	.bg_rects.vpad = 10 * LV_STYLE_MULT,
-	.bg_rects.opad = 5 * LV_STYLE_MULT,
-
-	.scrable_rects.objs.transp = 1,
-	.scrable_rects.empty = 1,
-	.scrable_rects.bwidth = 0,
-	.scrable_rects.hpad = 10 * LV_STYLE_MULT,
-	.scrable_rects.vpad = 10 * LV_STYLE_MULT,
-	.scrable_rects.vpad = 10 * LV_STYLE_MULT,
-
-	.sb_rects.objs.color = COLOR_BLACK,
-	.sb_rects.gcolor = COLOR_BLACK,
-	.sb_rects.bcolor = COLOR_WHITE,
-	.sb_rects.bopa = 0,
-	.sb_rects.bwidth = 1 * LV_STYLE_MULT,
-	.sb_rects.round = 5 * LV_STYLE_MULT,
-	.sb_rects.empty = 0,
-	.sb_rects.hpad = 0,
-	.sb_rects.vpad = 0,
-	.sb_rects.opad = 0,
-
-	.sb_width = 8 * LV_STYLE_MULT,
-	.sb_opa = 50,
-	.sb_mode = LV_PAGE_SB_MODE_AUTO,
-
-};
 /**********************
  *      MACROS
  **********************/
@@ -146,18 +73,19 @@ lv_obj_t* lv_page_create(lv_obj_t * par_dp, lv_obj_t * copy_dp)
 
     /*Init the new page object*/
     if(copy_dp == NULL) {
+    	lv_pages_t * style = lv_pages_get(LV_PAGES_DEF, NULL);
 	    ext_dp->scrolling_dp = lv_rect_create(new_obj_dp, NULL);
 	    lv_obj_set_signal_f(ext_dp->scrolling_dp, lv_scrolling_signal);
 		lv_obj_set_drag(ext_dp->scrolling_dp, true);
 		lv_obj_set_drag_throw(ext_dp->scrolling_dp, true);
 		lv_rect_set_fit(ext_dp->scrolling_dp, true, true);
-		lv_obj_set_style(ext_dp->scrolling_dp, &lv_pages_def.scrable_rects);
+		lv_obj_set_style(ext_dp->scrolling_dp, &style->scrable_rects);
 
 		/* Add the signal function only if 'scrolling_dp' is created
 		 * because everything has to be ready before any signal is received*/
 	    lv_obj_set_signal_f(new_obj_dp, lv_page_signal);
 	    lv_obj_set_design_f(new_obj_dp, lv_page_design);
-		lv_obj_set_style(new_obj_dp, &lv_pages_def);
+		lv_obj_set_style(new_obj_dp, style);
     } else {
     	lv_page_ext_t * copy_ext_dp = lv_obj_get_ext(copy_dp);
     	ext_dp->scrolling_dp = lv_rect_create(new_obj_dp, copy_ext_dp->scrolling_dp);
@@ -364,6 +292,14 @@ void lv_page_glue_obj(lv_obj_t* obj_dp, bool en)
  */
 lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * to_copy)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_pages_init();
+		style_inited = true;
+	}
+
 	lv_pages_t * style_p;
 
 	switch(style) {
@@ -497,7 +433,37 @@ static void lv_page_sb_refresh(lv_obj_t* page_dp)
     
     lv_inv_area(&page_ext_dp->sbh);
     lv_inv_area(&page_ext_dp->sbv);
+}
 
+/**
+ * Initialize the page styles
+ */
+static void lv_pages_init(void)
+{
+	/*Default style*/
+	lv_rects_get(LV_RECTS_DEF, &lv_pages_def.bg_rects);
+
+	lv_rects_get(LV_RECTS_DEF, &lv_pages_def.scrable_rects);
+	lv_pages_def.scrable_rects.objs.color = COLOR_WHITE;
+	lv_pages_def.scrable_rects.gcolor = COLOR_SILVER;
+	lv_pages_def.scrable_rects.bcolor = COLOR_GRAY;
+
+	lv_rects_get(LV_RECTS_DEF, &lv_pages_def.sb_rects);
+	lv_pages_def.sb_rects.objs.color = COLOR_BLACK;
+	lv_pages_def.sb_rects.gcolor = COLOR_BLACK;
+	lv_pages_def.sb_rects.bcolor = COLOR_WHITE;
+	lv_pages_def.sb_rects.bwidth = 1 * LV_STYLE_MULT;
+	lv_pages_def.sb_rects.round = 5 * LV_STYLE_MULT;
+
+	lv_pages_def.sb_width= 8 * LV_STYLE_MULT;
+	lv_pages_def.sb_opa=50;
+	lv_pages_def.sb_mode = LV_PAGE_SB_MODE_AUTO;
+
+	/*Transparent style*/
+	memcpy(&lv_pages_transp, &lv_pages_def, sizeof(lv_pages_t));
+	lv_pages_transp.scrable_rects.objs.transp = 1;
+	lv_pages_transp.scrable_rects.empty = 1;
+	lv_pages_transp.scrable_rects.bwidth = 0;
 
 }
 #endif

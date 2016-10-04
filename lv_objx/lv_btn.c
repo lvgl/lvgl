@@ -25,6 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static void lv_btns_init(void);
 static void lv_btn_style_load(lv_obj_t * obj_dp, lv_rects_t * rects_p);
 
 /**********************
@@ -34,61 +35,9 @@ static void lv_btn_style_load(lv_obj_t * obj_dp, lv_rects_t * rects_p);
 /*----------------- 
  * Style definition
  *-----------------*/
-static lv_btns_t lv_btns_def =
-{
-	.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80),
-	.gcolor[LV_BTN_STATE_REL] = COLOR_BLACK,
-	.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
-
-	.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0),
-	.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40),
-	.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE,
-
-	.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x80,0x00,0x00),
-	.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x20, 0x20),
-	.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE,
-
-	.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0xf0, 0x26, 0x26),
-	.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x40, 0x40),
-	.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE,
-
-	.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER,
-	.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
-	.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
-
-	.rects.bwidth = 2 * LV_STYLE_MULT,
-	.rects.bopa = 50,
-	.rects.empty = 0,
-	.rects.round = 4 * LV_STYLE_MULT,
-	.rects.hpad = 10 * LV_STYLE_MULT,
-	.rects.vpad = 15 * LV_STYLE_MULT,
-	.rects.opad = 3 * LV_STYLE_MULT,
-};
-static lv_btns_t lv_btns_transp =
-{
-	.rects.objs.transp = 1,
-	.rects.bwidth = 0,
-	.rects.empty = 1,
-	.rects.hpad = 10 * LV_STYLE_MULT,
-	.rects.vpad = 15 * LV_STYLE_MULT,
-	.rects.opad = 5 * LV_STYLE_MULT,
-};
-
-static lv_btns_t lv_btns_border =
-{
-	.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK,
-	.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK,
-	.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_BLACK,
-	.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_BLACK,
-	.bcolor[LV_BTN_STATE_INA] = COLOR_GRAY,
-	.rects.bwidth = 2 * LV_STYLE_MULT,
-	.rects.empty = 1,
-	.rects.bopa = 50,
-	.rects.round = 4 * LV_STYLE_MULT,
-	.rects.hpad = 10 * LV_STYLE_MULT,
-	.rects.vpad = 10 * LV_STYLE_MULT,
-	.rects.vpad = 5 * LV_STYLE_MULT,
-};
+static lv_btns_t lv_btns_def;
+static lv_btns_t lv_btns_transp;
+static lv_btns_t lv_btns_border;
 
 /**********************
  *      MACROS
@@ -125,7 +74,7 @@ lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 		btn_ext_dp->rel_action = NULL;
 		btn_ext_dp->lpr_action = NULL;
 		btn_ext_dp->tgl = 0;
-	    lv_obj_set_style(new_obj_dp, &lv_btns_def);
+	    lv_obj_set_style(new_obj_dp, lv_btns_get(LV_BTNS_DEF, NULL));
 	    lv_rect_set_layout(new_obj_dp, LV_RECT_LAYOUT_CENTER);
     }
     /*Copy 'copy_dp'*/
@@ -333,6 +282,14 @@ bool lv_btn_get_tgl(lv_obj_t* obj_dp)
  */
 lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_btns_init();
+		style_inited = true;
+	}
+
 	lv_btns_t  *style_p;
 
 	switch(style) {
@@ -406,6 +363,63 @@ static bool lv_btn_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mod
 		lv_draw_rect(&area, mask_p, &rects_tmp, opa);
     }
     return true;
+}
+
+/**
+ * Initialize the button styles
+ */
+static void lv_btns_init(void)
+{
+	/*Default style*/
+	lv_btns_def.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80);
+	lv_btns_def.gcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
+	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
+
+	lv_btns_def.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
+	lv_btns_def.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
+	lv_btns_def.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE;
+
+	lv_btns_def.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x80, 0x00, 0x00);
+	lv_btns_def.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x20, 0x20);
+	lv_btns_def.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE;
+
+	lv_btns_def.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0xf0, 0x26, 0x26);
+	lv_btns_def.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x40, 0x40);
+	lv_btns_def.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE;
+
+	lv_btns_def.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER;
+	lv_btns_def.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
+	lv_btns_def.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE;
+
+	lv_btns_def.rects.bwidth = 2 * LV_STYLE_MULT;
+	lv_btns_def.rects.bopa = 50;
+	lv_btns_def.rects.empty = 0;
+	lv_btns_def.rects.round = 4 * LV_STYLE_MULT;
+	lv_btns_def.rects.hpad = 10 * LV_STYLE_MULT;
+	lv_btns_def.rects.vpad = 15 * LV_STYLE_MULT;
+	lv_btns_def.rects.opad = 5 * LV_STYLE_MULT;
+
+	/*Transparent style*/
+	memcpy(&lv_btns_transp, &lv_btns_def, sizeof(lv_btns_t));
+	lv_btns_transp.rects.objs.transp = 1;
+	lv_btns_transp.rects.bwidth = 0;
+	lv_btns_transp.rects.empty = 1;
+
+
+	/*Border style*/
+	memcpy(&lv_btns_border, &lv_btns_def, sizeof(lv_btns_t));
+	lv_btns_border.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
+	lv_btns_border.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK;
+	lv_btns_border.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_BLACK;
+	lv_btns_border.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_BLACK;
+	lv_btns_border.bcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
+	lv_btns_border.rects.bwidth = 2 * LV_STYLE_MULT;
+	lv_btns_border.rects.empty = 1;
+	lv_btns_border.rects.bopa = 50;
+	lv_btns_border.rects.round = 4 * LV_STYLE_MULT;
+	lv_btns_border.rects.hpad = 10 * LV_STYLE_MULT;
+	lv_btns_border.rects.vpad = 10 * LV_STYLE_MULT;
+	lv_btns_border.rects.vpad = 5 * LV_STYLE_MULT;
 }
 
 /**

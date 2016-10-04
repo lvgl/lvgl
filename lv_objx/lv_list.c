@@ -28,103 +28,13 @@
 #if 0
 static bool lv_list_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
 #endif
+static void lv_lists_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_lists_t lv_lists_def =
-{
-	/*Page style*/
-	.pages.bg_rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .pages.bg_rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
-	.pages.bg_rects.bcolor = COLOR_WHITE, .pages.bg_rects.bopa = 50, .pages.bg_rects.bwidth = 2 * LV_STYLE_MULT,
-	.pages.bg_rects.round = 4 * LV_STYLE_MULT,
-	.pages.bg_rects.empty = 0,
-	.pages.bg_rects.vpad = 10 * LV_STYLE_MULT,
-	.pages.bg_rects.hpad = 10 * LV_STYLE_MULT,
-	.pages.bg_rects.opad = 5 * LV_STYLE_MULT,
-
-	.pages.scrable_rects.objs.color = COLOR_WHITE,
-	.pages.scrable_rects.gcolor = COLOR_SILVER,
-	.pages.scrable_rects.bcolor = COLOR_GRAY,
-	.pages.scrable_rects.bopa = 100,
-	.pages.scrable_rects.bwidth = 2 * LV_STYLE_MULT,
-	.pages.scrable_rects.round = 4 * LV_STYLE_MULT,
-	.pages.scrable_rects.empty = 0,
-	.pages.scrable_rects.hpad = 10 * LV_STYLE_MULT,
-	.pages.scrable_rects.vpad = 10 * LV_STYLE_MULT,
-	.pages.scrable_rects.opad = 10 * LV_STYLE_MULT,
-
-	.pages.sb_rects.objs.color = COLOR_BLACK, .pages.sb_rects.gcolor = COLOR_BLACK, .pages.sb_rects.bcolor = COLOR_WHITE,
-	.pages.sb_rects.bopa = 50, .pages.sb_rects.bwidth = 1 * LV_STYLE_MULT, .pages.sb_rects.round = 5 * LV_STYLE_MULT,
-	.pages.sb_rects.empty = 0, .pages.sb_width= 8 * LV_STYLE_MULT, .pages.sb_opa=50, .pages.sb_mode = LV_PAGE_SB_MODE_AUTO,
-
-	/*List element style*/
-	.liste_btns.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_REL] = COLOR_WHITE, .liste_btns.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa0, 0xc0, 0xe0), .liste_btns.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x60,0x80,0xa0), .liste_btns.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0xc0, 0xd0, 0xf0), .liste_btns.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x60, 0x80, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x80, 0xa0, 0xc0), .liste_btns.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER, .liste_btns.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY, .liste_btns.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
-	.liste_btns.rects.bwidth = 2 * LV_STYLE_MULT, .liste_btns.rects.bopa = 50,
-	.liste_btns.rects.empty = 0, .liste_btns.rects.round = 4 * LV_STYLE_MULT,
-	.liste_btns.rects.hpad = 10 * LV_STYLE_MULT,
-	.liste_btns.rects.vpad = 10 * LV_STYLE_MULT,
-	.liste_btns.rects.opad = 20 * LV_STYLE_MULT,
-
-	.liste_labels.objs.color = COLOR_MAKE(0x20,0x20,0x20), .liste_labels.font = LV_FONT_DEFAULT,
-	.liste_labels.letter_space = 2 * LV_STYLE_MULT, .liste_labels.line_space = 2 * LV_STYLE_MULT,
-	.liste_labels.mid = 0,
-
-	.liste_imgs.recolor_opa = OPA_COVER,
-
-	.liste_layout = LV_RECT_LAYOUT_ROW_M
-};
-
-static lv_lists_t lv_lists_tight =
-{
-	/*Page style*/
-	.pages.bg_rects.objs.color = COLOR_MAKE(0x50, 0x70, 0x90), .pages.bg_rects.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0),
-	.pages.bg_rects.bcolor = COLOR_WHITE, .pages.bg_rects.bopa = 50, .pages.bg_rects.bwidth = 0 * LV_STYLE_MULT,
-	.pages.bg_rects.round = 4 * LV_STYLE_MULT,
-	.pages.bg_rects.empty = 1,
-	.pages.bg_rects.vpad = 0 * LV_STYLE_MULT,
-	.pages.bg_rects.hpad = 0 * LV_STYLE_MULT,
-	.pages.bg_rects.opad = 0 * LV_STYLE_MULT,
-
-	.pages.scrable_rects.objs.color = COLOR_WHITE,
-	.pages.scrable_rects.gcolor = COLOR_SILVER,
-	.pages.scrable_rects.bcolor = COLOR_GRAY,
-	.pages.scrable_rects.bopa = 100,
-	.pages.scrable_rects.bwidth = 0 * LV_STYLE_MULT,
-	.pages.scrable_rects.round = 0 * LV_STYLE_MULT,
-	.pages.scrable_rects.empty = 0,
-	.pages.scrable_rects.hpad = 0 * LV_STYLE_MULT,
-	.pages.scrable_rects.vpad = 0 * LV_STYLE_MULT,
-	.pages.scrable_rects.opad = 0 * LV_STYLE_MULT,
-
-	.pages.sb_rects.objs.color = COLOR_BLACK, .pages.sb_rects.gcolor = COLOR_BLACK, .pages.sb_rects.bcolor = COLOR_WHITE,
-	.pages.sb_rects.bopa = 50, .pages.sb_rects.bwidth = 1 * LV_STYLE_MULT, .pages.sb_rects.round = 5 * LV_STYLE_MULT,
-	.pages.sb_rects.empty = 0, .pages.sb_width= 8 * LV_STYLE_MULT, .pages.sb_opa=50, .pages.sb_mode = LV_PAGE_SB_MODE_AUTO,
-
-	/*List element style*/
-	.liste_btns.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_REL] = COLOR_WHITE, .liste_btns.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa0, 0xa0, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa0, 0xc0, 0xe0), .liste_btns.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x60,0x80,0xa0), .liste_btns.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0xc0, 0xd0, 0xf0), .liste_btns.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x60, 0x80, 0xa0), .liste_btns.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x80, 0xa0, 0xc0), .liste_btns.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE,
-	.liste_btns.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER, .liste_btns.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY, .liste_btns.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE,
-	.liste_btns.rects.bwidth = 2 * LV_STYLE_MULT, .liste_btns.rects.bopa = 50,
-	.liste_btns.rects.empty = 0, .liste_btns.rects.round = 4 * LV_STYLE_MULT,
-	.liste_btns.rects.hpad = 10 * LV_STYLE_MULT,
-	.liste_btns.rects.vpad = 10 * LV_STYLE_MULT,
-	.liste_btns.rects.opad = 20 * LV_STYLE_MULT,
-
-	.liste_labels.objs.color = COLOR_MAKE(0x20,0x20,0x20), .liste_labels.font = LV_FONT_DEFAULT,
-	.liste_labels.letter_space = 2 * LV_STYLE_MULT, .liste_labels.line_space = 2 * LV_STYLE_MULT,
-	.liste_labels.mid = 0,
-
-	.liste_imgs.recolor_opa = OPA_COVER,
-
-	.liste_layout = LV_RECT_LAYOUT_ROW_M
-};
+static lv_lists_t lv_lists_def;
+static lv_lists_t lv_lists_tight;
 
 /**********************
  *      MACROS
@@ -157,7 +67,7 @@ lv_obj_t* lv_list_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     if(copy_dp == NULL) {
     	ext_p->fit = LV_LIST_FIT_LONGEST;
     	lv_obj_set_size_us(new_obj_dp, 100, 150);
-		lv_obj_set_style(new_obj_dp, &lv_lists_def);
+		lv_obj_set_style(new_obj_dp, lv_lists_get(LV_LISTS_DEF, NULL));
 		lv_rect_set_layout(LV_EA(new_obj_dp, lv_list_ext_t)->page_ext.scrolling_dp, LV_LIST_LAYOUT_DEF);
     } else {
     	lv_list_ext_t * copy_ext_dp = lv_obj_get_ext(copy_dp);
@@ -346,6 +256,14 @@ lv_list_fit_t lv_list_get_fit(lv_obj_t * obj_dp)
  */
 lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * copy_p)
 {
+	static bool style_inited = false;
+
+	/*Make the style initialization if it is not done yet*/
+	if(style_inited == false) {
+		lv_lists_init();
+		style_inited = true;
+	}
+
 	lv_lists_t  *style_p;
 
 	switch(style) {
@@ -397,5 +315,38 @@ static bool lv_list_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mo
 }
 #endif
 
+/**
+ * Initialize the list styles
+ */
+static void lv_lists_init(void)
+{
+	/*Default style*/
+	lv_pages_get(LV_PAGES_TRANSP, &lv_lists_def.pages);
+	lv_lists_def.pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
+	lv_lists_def.pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
+	lv_lists_def.pages.bg_rects.opad = 0 * LV_STYLE_MULT;
 
+	lv_lists_def.pages.scrable_rects.vpad = 10 * LV_STYLE_MULT;
+	lv_lists_def.pages.scrable_rects.hpad = 10 * LV_STYLE_MULT;
+	lv_lists_def.pages.scrable_rects.opad = 5 * LV_STYLE_MULT;
+
+	lv_btns_get(LV_BTNS_DEF, &lv_lists_def.liste_btns); /*List element button style*/
+
+	lv_labels_get(LV_LABELS_BTN, &lv_lists_def.liste_labels); /*List element label style*/
+	lv_lists_def.liste_labels.mid = 0;
+
+	lv_imgs_get(LV_IMGS_DEF, &lv_lists_def.liste_imgs); /*Lit element image style*/
+
+	lv_lists_def.liste_layout = LV_RECT_LAYOUT_ROW_M;
+
+	memcpy(&lv_lists_tight, &lv_lists_def, sizeof(lv_lists_t));
+	lv_lists_tight.pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.pages.bg_rects.opad = 0 * LV_STYLE_MULT;
+
+	lv_lists_tight.pages.scrable_rects.vpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.pages.scrable_rects.hpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.pages.scrable_rects.opad = 0 * LV_STYLE_MULT;
+
+}
 #endif

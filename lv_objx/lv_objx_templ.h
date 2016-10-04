@@ -52,7 +52,7 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
+lv_obj_t * lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
 bool lv_templ_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
 lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy_p);
 

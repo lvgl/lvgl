@@ -54,7 +54,7 @@ static lv_templs_t lv_templs_def =
  * @param copy_dp pointer to a template object, if not NULL then the new object will be copied from it
  * @return pointer to the created template
  */
-lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
+lv_obj_t * lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
 {
     /*Create the ancestor object*/
     lv_obj_t* new_obj_dp = lv_obj_create(par_dp, copy_dp);
@@ -64,6 +64,7 @@ lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     lv_templ_ext_t * ext_dp = lv_obj_alloc_ext(new_obj_dp, sizeof(lv_templ_ext_t));
     dm_assert(ext_dp);
 
+    /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_f(new_obj_dp, lv_templ_signal);
     lv_obj_set_design_f(new_obj_dp, lv_templ_design);
 
@@ -73,7 +74,7 @@ lv_obj_t* lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
     }
     /*Copy an existing object*/
     else {
-
+    	lv_templ_ext_t * copy_ext_dp = lv_obj_get_ext(copy_dp);
     }
     
     return new_obj_dp;
