@@ -35,10 +35,10 @@
 /*Style of button matrix*/
 typedef struct
 {
-	lv_rects_t rects;	/*Style of ancestor*/
+	lv_rects_t bg;	/*Style of ancestor*/
 	/*New style element for this type */
-	lv_btns_t btns;
-	lv_labels_t labels;
+	lv_btns_t btn;
+	lv_labels_t btn_label;
 }lv_btnms_t;
 
 /*Built-in styles of button matrix*/
@@ -54,7 +54,7 @@ typedef bool (*lv_btnm_callback_t) (lv_obj_t *, lv_obj_t *, uint16_t);
 /*Data of button matrix*/
 typedef struct
 {
-	lv_rect_ext_t rect;	/*Ext. of ancestor*/
+	lv_rect_ext_t bg;	/*Ext. of ancestor*/
 	/*New data for this type */
 	const char ** map_p;	/*Pointer to the current map*/
 	lv_btnm_callback_t cb;
@@ -63,15 +63,15 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t* lv_btnm_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
-bool lv_btnm_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
-lv_btnms_t * lv_btnms_get(lv_btnms_builtin_t style, lv_btnms_t * copy_p);
+lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy);
+bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
+lv_btnms_t * lv_btnms_get(lv_btnms_builtin_t style, lv_btnms_t * copy);
 
-void lv_btnm_set_map(lv_obj_t * obj_dp, const char ** map_p);
-void lv_btnm_set_cb(lv_obj_t * obj_dp, lv_btnm_callback_t cb);
+void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
+void lv_btnm_set_cb(lv_obj_t * btnm, lv_btnm_callback_t cb);
 
-const char ** lv_btnm_get_map(lv_obj_t * obj_dp);
-lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * obj_dp);
+const char ** lv_btnm_get_map(lv_obj_t * btnm);
+lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * btnm);
 /**********************
  *      MACROS
  **********************/

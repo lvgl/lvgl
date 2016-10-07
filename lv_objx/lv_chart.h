@@ -35,11 +35,12 @@ typedef enum
 /*Style of chart background*/
 typedef struct
 {
-	lv_rects_t bg_rects;
-	lv_lines_t div_lines;
+	lv_rects_t bg; /*Style of ancestor*/
+	/*New style element for this type */
+	lv_lines_t div_line;
 	uint8_t div_line_opa;		/*Percentage of obj. opacity*/
 	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col color */
-	uint16_t width;			/*Line width or point radius*/
+	uint16_t width;				/*Line width or point radius*/
 	opa_t data_opa;				/*Line/Point/Col opacity in the percentage of obj. opacity*/
 	uint8_t dark_eff;			/*Dark effect on the bottom of ó points and columns*/
 }lv_charts_t;
@@ -53,12 +54,12 @@ typedef enum
 /*Data of chart background*/
 typedef struct
 {
-	lv_rect_ext_t rect_ext;
+	lv_rect_ext_t bg;	/*Ext. of ancestor*/
+	/*New data for this type */
 	cord_t ymin;
 	cord_t ymax;
 	uint8_t hdiv_num;
 	uint8_t vdiv_num;
-
 	ll_dsc_t dl_ll;				/*Linked list for the data line pointers (stores cord_t * )*/
 	uint16_t pnum;				/*Point number in a data line*/
 	uint8_t type	:2;			/*Line, column or point chart*/
@@ -68,22 +69,22 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t* lv_chart_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
-bool lv_chart_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
-lv_charts_t * lv_charts_get(lv_charts_builtin_t style, lv_charts_t * copy_p);
+lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy);
+bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param);
+lv_charts_t * lv_charts_get(lv_charts_builtin_t style, lv_charts_t * copy);
 
-cord_t * lv_chart_add_dataline(lv_obj_t* obj_dp);
+cord_t * lv_chart_add_dataline(lv_obj_t * chart);
 
-void lv_chart_refr(lv_obj_t * obj_dp);
+void lv_chart_refr(lv_obj_t * chart);
 
-void lv_chart_set_type(lv_obj_t * obj_dp, lv_chart_type_t type);
-void lv_chart_set_hvdiv(lv_obj_t * obj_dp, uint8_t hdiv, uint8_t vdiv);
-void lv_chart_set_range(lv_obj_t * obj_dp, cord_t ymin, cord_t ymax);
-void lv_chart_set_pnum(lv_obj_t * obj_dp, uint16_t pnum);
-void lv_chart_set_next(lv_obj_t * obj_dp, cord_t * dl_p, cord_t y);
+void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type);
+void lv_chart_set_hvdiv(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv);
+void lv_chart_set_range(lv_obj_t * chart, cord_t ymin, cord_t ymax);
+void lv_chart_set_pnum(lv_obj_t * chart, uint16_t pnum);
+void lv_chart_set_next(lv_obj_t * chart, cord_t * dl, cord_t y);
 
-lv_chart_type_t lv_chart_get_type(lv_obj_t * obj_dp);
-uint16_t lv_chart_get_pnum(lv_obj_t * obj_dp);
+lv_chart_type_t lv_chart_get_type(lv_obj_t * chart);
+uint16_t lv_chart_get_pnum(lv_obj_t * chart);
 
 /**********************
  *      MACROS

@@ -59,12 +59,12 @@ void anim_init(void)
  */
 void anim_create(anim_t * anim_p)
 {
-	anim_t * new_anim_dp = ll_ins_head(&anim_ll);
-	dm_assert(new_anim_dp);
+	anim_t * new_anim = ll_ins_head(&anim_ll);
+	dm_assert(new_anim);
 
-	memcpy(new_anim_dp, anim_p, sizeof(anim_t));
+	memcpy(new_anim, anim_p, sizeof(anim_t));
 
-	new_anim_dp->fp(new_anim_dp->p, new_anim_dp->start);
+	new_anim->fp(new_anim->p, new_anim->start);
 }
 
 

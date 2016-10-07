@@ -33,14 +33,17 @@ typedef enum
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
 
+/*Style of button*/
 typedef struct
 {
-	lv_rects_t rects;	/*To be compatible with the ancestor*/
+	lv_rects_t rects;	/*Style of ancestor*/
+	/*New style element for this type */
 	color_t mcolor[LV_BTN_STATE_NUM];
 	color_t gcolor[LV_BTN_STATE_NUM];
 	color_t bcolor[LV_BTN_STATE_NUM];
 }lv_btns_t;
 
+/*Built-in styles of button*/
 typedef enum
 {
 	LV_BTNS_DEF,
@@ -48,12 +51,14 @@ typedef enum
 	LV_BTNS_BORDER,
 }lv_btns_builtin_t;
 
+/*Data of button*/
 typedef struct
 {       
-	lv_rect_ext_t rect_ext;
-    bool (*pr_action)(lv_obj_t*, lv_dispi_t *);
-    bool  (*rel_action)(lv_obj_t*, lv_dispi_t *);
-    bool (*lpr_action)(lv_obj_t*, lv_dispi_t *);
+	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+	/*New data for this type */
+    bool (*pr_action)(lv_obj_t *, lv_dispi_t *);
+    bool  (*rel_action)(lv_obj_t *, lv_dispi_t *);
+    bool (*lpr_action)(lv_obj_t *, lv_dispi_t *);
     
     lv_btn_state_t state;
     uint8_t tgl :1;      /*1: Toggle enabled*/
@@ -64,19 +69,19 @@ typedef struct
  * GLOBAL PROTOTYPES
  **********************/
 /*Create function*/
-lv_obj_t* lv_btn_create(lv_obj_t* par_dp, lv_obj_t * c_dp);
+lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy);
 
-bool lv_btn_signal(lv_obj_t * obj_dp, lv_signal_t sign, void * param);
-lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy_p);
+bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
+lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy);
 
-void lv_btn_set_tgl(lv_obj_t* obj_dp, bool tgl);
-void lv_btn_set_state(lv_obj_t* obj_dp, lv_btn_state_t state);
-void lv_btn_set_pr_action(lv_obj_t* obi_p, bool (*pr_action)(lv_obj_t*, lv_dispi_t *));
-void lv_btn_set_rel_action(lv_obj_t* obj_dp, bool (*rel_action)(lv_obj_t*, lv_dispi_t *));
-void lv_btn_set_lpr_action(lv_obj_t* obj_dp, bool (*lpr_action)(lv_obj_t*, lv_dispi_t *));
+void lv_btn_set_tgl(lv_obj_t * btn, bool tgl);
+void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
+void lv_btn_set_pr_action(lv_obj_t * btn, bool (*pr_action)(lv_obj_t *, lv_dispi_t *));
+void lv_btn_set_rel_action(lv_obj_t * btn, bool (*rel_action)(lv_obj_t *, lv_dispi_t *));
+void lv_btn_set_lpr_action(lv_obj_t * btn, bool (*lpr_action)(lv_obj_t *, lv_dispi_t *));
 
-bool lv_btn_get_tgl(lv_obj_t* obj_dp);
-lv_btn_state_t lv_btn_get_state(lv_obj_t* obj_dp);
+bool lv_btn_get_tgl(lv_obj_t * btn);
+lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);
 
 /**********************
  *      MACROS

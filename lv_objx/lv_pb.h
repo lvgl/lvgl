@@ -41,22 +41,23 @@ typedef enum
 /*Data of progress bar*/
 typedef struct
 {
-	lv_rect_ext_t rect_ext;
+	lv_rect_ext_t rect_ext;	/*Ext. of ancestor*/
+	/*New data for this type */
 	uint16_t act_value;
 	uint16_t min_value;
 	uint16_t max_value;
-	char * format_dp; /*Format string of the label*/
+	char * format; /*Format string of the label*/
 }lv_pb_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t* lv_pb_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
-bool lv_pb_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
-void lv_pb_set_value(lv_obj_t * obj_dp, uint16_t value);
-void lv_pb_set_min_max_value(lv_obj_t * obj_dp, uint16_t min, uint16_t max);
-void lv_pb_set_format(lv_obj_t * obj_dp, const char * format);
-uint16_t lv_pb_get_value(lv_obj_t * obj_dp);
+lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy);
+bool lv_pb_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+void lv_pb_set_value(lv_obj_t * obj, uint16_t value);
+void lv_pb_set_min_max_value(lv_obj_t * obj, uint16_t min, uint16_t max);
+void lv_pb_set_format(lv_obj_t * obj, const char * format);
+uint16_t lv_pb_get_value(lv_obj_t * obj);
 lv_pbs_t * lv_pbs_get(lv_pbs_builtin_t style, lv_pbs_t * copy_p);
 
 /**********************

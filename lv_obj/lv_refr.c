@@ -38,9 +38,9 @@ static void lv_refr_area_no_vdb(const area_t * area_p);
 static void lv_refr_area_with_vdb(const area_t * area_p);
 static void lv_refr_area_part_vdb(const area_t * area_p);
 #endif
-static lv_obj_t* lv_refr_get_top_obj(const area_t * area_p, lv_obj_t* obj_dp);
-static void lv_refr_make(lv_obj_t* top_p, const area_t * mask_p);
-static void lv_refr_obj(lv_obj_t* obj_dp, const area_t * mask_ori_p);
+static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj);
+static void lv_refr_make(lv_obj_t * top_p, const area_t * mask_p);
+static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -219,7 +219,7 @@ static void lv_refr_areas(lv_join_t * area_a, uint32_t area_num)
  */
 static void lv_refr_area_no_vdb(const area_t * area_p)
 {
-    lv_obj_t* top_p;
+    lv_obj_t * top_p;
     
     /*Get top object which is not covered by others*/    
     top_p = lv_refr_get_top_obj(area_p, lv_scr_act());
@@ -283,7 +283,7 @@ static void lv_refr_area_with_vdb(const area_t * area_p)
 static void lv_refr_area_part_vdb(const area_t * area_p)
 {
     lv_vdb_t * vdb_p = lv_vdb_get();
-    lv_obj_t* top_p;
+    lv_obj_t * top_p;
 
     /*Get the new mask from the original area and the act. VDB
      It will be a part of 'area_p'*/
@@ -305,21 +305,21 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
 /**
  * Search the most top object which fully covers an area
  * @param area_p pointer to an area
- * @param obj_dp the first object to start the searching (typically a screen)
+ * @param obj the first object to start the searching (typically a screen)
  * @return 
  */
-static lv_obj_t* lv_refr_get_top_obj(const area_t * area_p, lv_obj_t* obj_dp)
+static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
 {
-    lv_obj_t* i;
-    lv_obj_t* found_p = NULL;
+    lv_obj_t * i;
+    lv_obj_t * found_p = NULL;
     
     /*If this object is fully cover the draw area check the children too */
-    if(obj_dp->opa == OPA_COVER &&
-       obj_dp->hidden == 0 &&
-	   LV_SA(obj_dp, lv_objs_t)->transp == 0 &&
-       obj_dp->design_f(obj_dp, area_p, LV_DESIGN_COVER_CHK) != false)
+    if(obj->opa == OPA_COVER &&
+       obj->hidden == 0 &&
+	   LV_SA(obj, lv_objs_t)->transp == 0 &&
+       obj->design_f(obj, area_p, LV_DESIGN_COVER_CHK) != false)
     {
-        LL_READ(obj_dp->child_ll, i)        {
+        LL_READ(obj->child_ll, i)        {
             found_p = lv_refr_get_top_obj(area_p, i);
             
             /*If a children is ok then break*/
@@ -330,7 +330,7 @@ static lv_obj_t* lv_refr_get_top_obj(const area_t * area_p, lv_obj_t* obj_dp)
         
         /*If there is no better children use this object*/
         if(found_p == NULL) {
-            found_p = obj_dp;
+            found_p = obj;
         }
     }
     
@@ -342,7 +342,7 @@ static lv_obj_t* lv_refr_get_top_obj(const area_t * area_p, lv_obj_t* obj_dp)
  * @param top_p pointer to an objects. Start the drawing from it.
  * @param mask_p pointer to an area, the objects will be drawn only here
  */
-static void lv_refr_make(lv_obj_t* top_p, const area_t * mask_p)
+static void lv_refr_make(lv_obj_t * top_p, const area_t * mask_p)
 {
     /* Normally always will be a top_obj (at least the screen)
      * but in special cases (e.g. if the screen has alpha) it won't.
@@ -353,60 +353,60 @@ static void lv_refr_make(lv_obj_t* top_p, const area_t * mask_p)
     lv_refr_obj(top_p, mask_p);
     
     /*Draw the 'younger' objects because they can be on top_obj */
-    lv_obj_t* par_dp;
-    lv_obj_t* i;
-    lv_obj_t* border_p = top_p;
+    lv_obj_t * par;
+    lv_obj_t * i;
+    lv_obj_t * border_p = top_p;
 
-    par_dp = lv_obj_get_parent(top_p);
+    par = lv_obj_get_parent(top_p);
 
     /*Do until not reach the screen*/
-    while(par_dp != NULL) {
+    while(par != NULL) {
         /*object before border_p has to be redrawn*/
-        i = ll_get_prev(&(par_dp->child_ll), border_p);
+        i = ll_get_prev(&(par->child_ll), border_p);
 
         while(i != NULL) { 
             /*Refresh the objects*/
             lv_refr_obj(i, mask_p);
-            i = ll_get_prev(&(par_dp->child_ll), i);
+            i = ll_get_prev(&(par->child_ll), i);
         }  
         
         /*The new border will be there last parents,
          *so the 'younger' brothers of parent will be refreshed*/
-        border_p = par_dp;
+        border_p = par;
         /*Go a level deeper*/
-        par_dp = lv_obj_get_parent(par_dp);
+        par = lv_obj_get_parent(par);
     }
 }
 
 /**
  * Refresh an object an all of its children. (Called recursively)
- * @param obj_dp pointer to an object to refresh
+ * @param obj pointer to an object to refresh
  * @param mask_ori_p pointer to an area, the objects will be drawn only here
  */
-static void lv_refr_obj(lv_obj_t* obj_dp, const area_t * mask_ori_p)
+static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
 {
     /*Do not refresh hidden objects*/
-    if(obj_dp->hidden != 0) return;
+    if(obj->hidden != 0) return;
     
     bool union_ok;  /* Store the return value of area_union */
     /* Truncate the original mask to the coordinates of the parent
      * because the parent and its children are visible only here */
     area_t mask_parent;
-    union_ok = area_union(&mask_parent, mask_ori_p, &obj_dp->cords);
+    union_ok = area_union(&mask_parent, mask_ori_p, &obj->cords);
     
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
 
         /* Redraw the object */    
-        if(obj_dp->opa != OPA_TRANSP && LV_SA(obj_dp, lv_objs_t)->transp == 0) {
-            obj_dp->design_f(obj_dp, &mask_parent, LV_DESIGN_DRAW_MAIN);
+        if(obj->opa != OPA_TRANSP && LV_SA(obj, lv_objs_t)->transp == 0) {
+            obj->design_f(obj, &mask_parent, LV_DESIGN_DRAW_MAIN);
         }
 
-        area_t mask_child; /*Mask from obj_dp and its child*/
-        lv_obj_t* child_p;    
-        LL_READ_BACK(obj_dp->child_ll, child_p)
+        area_t mask_child; /*Mask from obj and its child*/
+        lv_obj_t * child_p;    
+        LL_READ_BACK(obj->child_ll, child_p)
         {   
-            /* Get the union (common parts) of original mask (from obj_dp)
+            /* Get the union (common parts) of original mask (from obj)
              * and its child */
             union_ok = area_union(&mask_child, &mask_parent, &child_p->cords);
 
@@ -418,8 +418,8 @@ static void lv_refr_obj(lv_obj_t* obj_dp, const area_t * mask_ori_p)
         }
 
         /* If all the children are redrawn call make 'post draw' design */
-		if(obj_dp->opa != OPA_TRANSP && LV_SA(obj_dp, lv_objs_t)->transp == 0) {
-		  obj_dp->design_f(obj_dp, &mask_parent, LV_DESIGN_DRAW_POST);
+		if(obj->opa != OPA_TRANSP && LV_SA(obj, lv_objs_t)->transp == 0) {
+		  obj->design_f(obj, &mask_parent, LV_DESIGN_DRAW_POST);
 		}
     }
 }

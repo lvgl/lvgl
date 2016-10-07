@@ -37,9 +37,11 @@ typedef enum
 	LV_RECT_LAYOUT_GRID,
 }lv_rect_layout_t;
 
+/*Style of template*/
 typedef struct
 {
-	lv_objs_t objs;
+	lv_objs_t objs;	/*Style of ancestor*/
+	/*New style element for this type */
     color_t gcolor;
     color_t bcolor;
     uint16_t bwidth;
@@ -51,14 +53,7 @@ typedef struct
     uint8_t empty :1;
 }lv_rects_t;
 
-
-typedef struct
-{
-    uint8_t layout  :5;
-	uint8_t hfit_en :1;
-	uint8_t vfit_en :1;
-}lv_rect_ext_t;
-
+/*Built-in styles of template*/
 typedef enum
 {
 	LV_RECTS_DEF,
@@ -66,21 +61,30 @@ typedef enum
 	LV_RECTS_BORDER,
 }lv_rects_builtin_t;
 
+
+typedef struct
+{
+	/*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
+	/*New data for this type */
+    uint8_t layout  :5;
+	uint8_t hfit_en :1;
+	uint8_t vfit_en :1;
+}lv_rect_ext_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 /*Create function*/
-lv_obj_t* lv_rect_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
-bool lv_rect_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
+lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy);
+bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param);
 
-void lv_rect_set_fit(lv_obj_t * obj_dp, bool hor_en, bool ver_en);
-void lv_rect_set_layout(lv_obj_t * obj_dp, lv_rect_layout_t layout);
+void lv_rect_set_fit(lv_obj_t * rect, bool hor_en, bool ver_en);
+void lv_rect_set_layout(lv_obj_t * rect, lv_rect_layout_t layout);
 
-lv_rect_layout_t lv_rect_get_layout(lv_obj_t * obj_dp);
-bool lv_rect_get_hfit(lv_obj_t * obj_dp);
-bool lv_rect_get_vfit(lv_obj_t * obj_dp);
-
-lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy_p);
+lv_rect_layout_t lv_rect_get_layout(lv_obj_t * rect);
+bool lv_rect_get_hfit(lv_obj_t * rect);
+bool lv_rect_get_vfit(lv_obj_t * rect);
+lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy);
 
 /**********************
  *      MACROS

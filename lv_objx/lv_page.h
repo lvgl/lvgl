@@ -29,6 +29,7 @@ typedef enum
 	LV_PAGE_SB_MODE_AUTO,
 }lv_page_sb_mode_t;
 
+/*Style of page*/
 typedef struct
 {
     lv_rects_t bg_rects;  /*Style of ancestor*/
@@ -40,32 +41,35 @@ typedef struct
     uint8_t sb_opa;
 }lv_pages_t;
 
-
-typedef struct
-{
-	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
-	/*New data for this type */
-	lv_obj_t * scrolling_dp;	/*The scrollable object on the background*/
-    area_t sbh;  				/*Horizontal scrollbar*/
-    area_t sbv;  				/*Vertical scrollbar*/
-    uint8_t sbh_draw :1; 		/*1: horizontal scrollbar is visible now*/
-    uint8_t sbv_draw :1; 		/*1: vertical scrollbar is visible now*/
-}lv_page_ext_t;
-
+/*Built-in styles of page*/
 typedef enum
 {
 	LV_PAGES_DEF,
 	LV_PAGES_TRANSP,
 }lv_pages_builtin_t;
 
+/*Data of page*/
+typedef struct
+{
+	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+	/*New data for this type */
+	lv_obj_t * scrolling;	/*The scrollable object on the background*/
+    area_t sbh;  				/*Horizontal scrollbar*/
+    area_t sbv;  				/*Vertical scrollbar*/
+    uint8_t sbh_draw :1; 		/*1: horizontal scrollbar is visible now*/
+    uint8_t sbv_draw :1; 		/*1: vertical scrollbar is visible now*/
+}lv_page_ext_t;
+
+
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 /*Create function*/
-lv_obj_t* lv_page_create(lv_obj_t* par_dp, lv_obj_t * ori_dp);
-void lv_page_glue_obj(lv_obj_t* page_p, bool en);
-lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * to_copy);
-bool lv_page_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
+lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
+void lv_page_glue_obj(lv_obj_t * page, bool glue);
+lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * copy);
+bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 
 /**********************
  *      MACROS

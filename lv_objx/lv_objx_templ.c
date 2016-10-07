@@ -28,14 +28,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_templ_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode);
+static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode);
 static void lv_temps_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_templs_t lv_templs_def =
-{ /*Create a default style*/ };
+static lv_templs_t lv_templs_def;	/*Default template style*/
 
 /**********************
  *      MACROS
@@ -51,50 +50,50 @@ static lv_templs_t lv_templs_def =
 
 /**
  * Create a template objects
- * @param par_dp pointer to an object, it will be the parent of the new template
- * @param copy_dp pointer to a template object, if not NULL then the new object will be copied from it
+ * @param par pointer to an object, it will be the parent of the new template
+ * @param copy pointer to a template object, if not NULL then the new object will be copied from it
  * @return pointer to the created template
  */
-lv_obj_t * lv_templ_create(lv_obj_t* par_dp, lv_obj_t * copy_dp)
+lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 {
-    /*Create the ancestor object*/
-    lv_obj_t* new_obj_dp = lv_obj_create(par_dp, copy_dp);
-    dm_assert(new_obj_dp);
+    /*Create the ancestor templect*/
+    lv_templ_t * new_templ = lv_templ_create(par, copy);
+    dm_assert(new_templ);
     
-    /*Allocate the object type specific extended data*/
-    lv_templ_ext_t * ext_dp = lv_obj_alloc_ext(new_obj_dp, sizeof(lv_templ_ext_t));
-    dm_assert(ext_dp);
+    /*Allocate the templect type specific extended data*/
+    lv_templ_ext_t * ext = lv_templ_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
+    dm_assert(ext);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_f(new_obj_dp, lv_templ_signal);
-    lv_obj_set_design_f(new_obj_dp, lv_templ_design);
+    lv_templ_set_signal_f(new_templ, lv_templ_signal);
+    lv_templ_set_design_f(new_templ, lv_templ_design);
 
-    /*Init the new template object*/
-    if(copy_dp == NULL) {
+    /*Init the new template templect*/
+    if(copy == NULL) {
 
     }
-    /*Copy an existing object*/
+    /*Copy an existing templect*/
     else {
-    	lv_templ_ext_t * copy_ext_dp = lv_obj_get_ext(copy_dp);
+    	lv_templ_ext_t * copy_ext = lv_templ_get_ext(copy);
     }
     
-    return new_obj_dp;
+    return new_templ;
 }
 
 /**
  * Signal function of the template
- * @param obj_dp pointer to a template object
+ * @param templ pointer to a template object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  * @return true: the object is still valid (not deleted), false: the object become invalid
  */
-bool lv_templ_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
+bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
 {
     bool valid;
 
     /* Include the ancient signal function */
     /* TODO update it to the ancestor's signal function*/
-    valid = lv_obj_signal(obj_dp, sign, param);
+    valid = lv_obj_signal(templ, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -123,10 +122,10 @@ bool lv_templ_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param)
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable
  * @param style a style name from lv_templs_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
+ * @param copy copy the style to this variable. (NULL if unused)
  * @return pointer to an lv_templs_t style
  */
-lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy_p)
+lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy)
 {
 	static bool style_inited = false;
 
@@ -146,9 +145,9 @@ lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy_p)
 			style_p = &lv_templs_def;
 	}
 
-	if(copy_p != NULL) {
-		if(style_p != NULL) memcpy(copy_p, style_p, sizeof(lv_templs_t));
-		else memcpy(copy_p, &lv_templs_def, sizeof(lv_templs_t));
+	if(copy != NULL) {
+		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_templs_t));
+		else memcpy(copy, &lv_templs_def, sizeof(lv_templs_t));
 	}
 
 	return style_p;
@@ -161,7 +160,7 @@ lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy_p)
 
 /**
  * Handle the drawing related tasks of the templates
- * @param obj_dp pointer to an object
+ * @param templ pointer to an object
  * @param mask the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
@@ -169,7 +168,7 @@ lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy_p)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_templ_design(lv_obj_t* obj_dp, const area_t * mask_p, lv_design_mode_t mode)
+static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/

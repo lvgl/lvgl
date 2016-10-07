@@ -29,7 +29,7 @@ typedef struct
 {
 	lv_pages_t pages;	/*Style of ancestor*/
 	/*New style element for this type */
-	lv_labels_t labels;
+	lv_labels_t label;
 	color_t cursor_color;
 	cord_t cursor_width;
 	uint8_t cursor_show :1;
@@ -46,7 +46,7 @@ typedef struct
 {
 	lv_page_ext_t page; /*Ext. of ancestor*/
 	/*New data for this type */
-	lv_obj_t * label_dp;
+	lv_obj_t * label;
 	cord_t cursor_valid_x;
 	uint16_t cursor_pos;
 }lv_ta_ext_t;
@@ -54,22 +54,21 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t* lv_ta_create(lv_obj_t* par_dp, lv_obj_t * copy_dp);
-bool lv_ta_signal(lv_obj_t* obj_dp, lv_signal_t sign, void * param);
-lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy_p);
+lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy);
+bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
+lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy);
 
-void lv_ta_add_char(lv_obj_t * obj_dp, char c);
-void lv_ta_add_text(lv_obj_t * obj_dp, const char * txt);
-void lv_ta_del(lv_obj_t * obj_dp);
-void lv_ta_set_cursor_pos(lv_obj_t * obj_dp, uint16_t pos);
-void lv_ta_cursor_right	(lv_obj_t * obj_dp);
-void lv_ta_cursor_left(lv_obj_t * obj_dp);
-void lv_ta_cursor_down(lv_obj_t * obj_dp);
-void lv_ta_cursor_up(lv_obj_t * obj_dp);
+void lv_ta_add_char(lv_obj_t * ta, char c);
+void lv_ta_add_text(lv_obj_t * ta, const char * txt);
+void lv_ta_del(lv_obj_t * ta);
+void lv_ta_set_cursor_pos(lv_obj_t * ta, uint16_t pos);
+void lv_ta_cursor_right	(lv_obj_t * ta);
+void lv_ta_cursor_left(lv_obj_t * taj);
+void lv_ta_cursor_down(lv_obj_t * ta);
+void lv_ta_cursor_up(lv_obj_t * ta);
 
-
-const char * lv_ta_get_txt(lv_obj_t obj_dp);
-uint16_t lv_ta_get_cursor_pos(lv_obj_t * obj_dp);
+const char * lv_ta_get_txt(lv_obj_t * ta);
+uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta);
 
 
 /**********************

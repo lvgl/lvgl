@@ -25,8 +25,8 @@ typedef struct
     point_t last_point;
     point_t vect;     
     point_t vect_sum;
-    lv_obj_t* act_obj_dp;
-    lv_obj_t* last_obj_dp;
+    lv_obj_t * act_obj;
+    lv_obj_t * last_obj;
     uint32_t press_time_stamp;
     
     /*Flags*/
