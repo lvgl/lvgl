@@ -26,7 +26,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_ta_design(lv_obj_t * ta, const area_t * mask, lv_design_mode_t mode);
-static bool lv_ta_label_design(lv_obj_t * label, const area_t * mask, lv_design_mode_t mode);
+static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_design_mode_t mode);
 static void lv_ta_save_valid_cursor_x(lv_obj_t * ta);
 static void lv_tas_init(void);
 
@@ -36,7 +36,7 @@ static void lv_tas_init(void);
 static lv_tas_t lv_tas_def;
 
 lv_design_f_t ancestor_design_f;
-lv_design_f_t label_design_f;
+lv_design_f_t scrling_design_f;
 
 /**********************
  *      MACROS
@@ -79,10 +79,10 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new text area object*/
     if(copy == NULL) {
     	ext->label = lv_label_create(new_ta, NULL);
-    	if(label_design_f == NULL) {
-    		label_design_f = lv_obj_get_design_f(ext->label);
+    	if(scrling_design_f == NULL) {
+    		scrling_design_f = lv_obj_get_design_f(ext->page.scrolling);
     	}
-    	lv_obj_set_design_f(ext->label, lv_ta_label_design);
+    	lv_obj_set_design_f(ext->page.scrolling, lv_ta_scrling_design);
     	lv_label_set_fixw(ext->label, true);
     	lv_label_set_text(ext->label, "abc aaaa bbbb ccc\n123\nABC\nxyz\nwww\n007\nalma\n:)\naaaaaa");
     	lv_page_glue_obj(ext->label, true);
@@ -91,9 +91,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
+    	lv_obj_set_design_f(ext->page.scrolling, lv_ta_scrling_design);
     	lv_ta_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->label = lv_label_create(new_ta, copy_ext->label);
-    	lv_obj_set_design_f(ext->label, lv_ta_label_design);
     	lv_page_glue_obj(ext->label, true);
 
     	/*Refresh the style when everything is ready*/
@@ -437,7 +437,7 @@ static bool lv_ta_design(lv_obj_t * ta, const area_t * masp, lv_design_mode_t mo
 }
 
 /**
- * An extended label design. Calls the normal label design function and it draws a cursor.
+ * An extended scrolling design of the page. Calls the normal design function and it draws a cursor.
  * @param label pointer to a text area object
  * @param mask  the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
@@ -446,33 +446,33 @@ static bool lv_ta_design(lv_obj_t * ta, const area_t * masp, lv_design_mode_t mo
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @return return true/false, depends on 'mode'
  */
-static bool lv_ta_label_design(lv_obj_t * label, const area_t * mask, lv_design_mode_t mode)
+static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_design_mode_t mode)
 {
 	if(mode == LV_DESIGN_COVER_CHK) {
 		/*Return false if the object is not covers the mask_p area*/
-		return label_design_f(label, mask, mode);
+		return scrling_design_f(scrling, mask, mode);
 	} else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*Draw the object*/
-		label_design_f(label, mask, mode);
+		scrling_design_f(scrling, mask, mode);
 	} else if(mode == LV_DESIGN_DRAW_POST) {
-		label_design_f(label, mask, mode);
+		scrling_design_f(scrling, mask, mode);
 
 		/*Draw the cursor too*/
-		lv_obj_t * ta = lv_obj_get_parent(lv_obj_get_parent(label));
+		lv_obj_t * ta = lv_obj_get_parent(scrling);
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
 		lv_tas_t * ta_style = lv_obj_get_style(ta);
 
 		if(ta_style->cursor_show != 0) {
 			uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
 			point_t letter_pos;
-			lv_label_get_letter_pos(label, cur_pos, &letter_pos);
+			lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
 
 			area_t cur_area;
 			lv_labels_t * labels_p = lv_obj_get_style(ta_ext->label);
-			cur_area.x1 = letter_pos.x + label->cords.x1 - (ta_style->cursor_width >> 1);
-			cur_area.y1 = letter_pos.y + label->cords.y1;
-			cur_area.x2 = letter_pos.x + label->cords.x1 + (ta_style->cursor_width >> 1);
-			cur_area.y2 = letter_pos.y + label->cords.y1 + font_get_height(font_get(labels_p->font));
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - (ta_style->cursor_width >> 1);
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + (ta_style->cursor_width >> 1);
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + font_get_height(font_get(labels_p->font));
 
 			lv_rects_t cur_rects;
 			lv_rects_get(LV_RECTS_DEF, &cur_rects);
@@ -512,5 +512,6 @@ static void lv_tas_init(void)
 
 	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
 	lv_tas_def.cursor_width = 2 * LV_STYLE_MULT;	/*>1 px for visible cursor*/
+	lv_tas_def.cursor_show = 1;
 }
 #endif

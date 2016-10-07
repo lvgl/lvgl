@@ -70,7 +70,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new rectangle*/
     if(copy == NULL) {
 		ext->point_num = 0;
-		ext->point_p = NULL;
+		ext->point_array = NULL;
 		ext->auto_size = 1;
 		ext->y_inv = 0;
 		ext->upscale = 0;
@@ -82,7 +82,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_line_set_y_inv(new_line,lv_line_get_y_inv(copy));
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
     	lv_line_set_upscale(new_line,lv_line_get_upscale(copy));
-    	lv_line_set_points(new_line, LV_EA(copy, lv_line_ext_t)->point_p,
+    	lv_line_set_points(new_line, LV_EA(copy, lv_line_ext_t)->point_array,
     								   LV_EA(copy, lv_line_ext_t)->point_num);
     }
 
@@ -129,7 +129,7 @@ bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
 void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num)
 {
 	lv_line_ext_t * ext = lv_obj_get_ext(line);
-	ext->point_p = point_a;
+	ext->point_array = point_a;
 	ext->point_num = point_num;
 
 	uint8_t us = 1;
@@ -165,7 +165,7 @@ void lv_line_set_auto_size(lv_obj_t * line, bool autosize)
 
 	/*Refresh the object*/
 	if(autosize != false) {
-		lv_line_set_points(line, ext->point_p, ext->point_num);
+		lv_line_set_points(line, ext->point_array, ext->point_num);
 	}
 }
 
@@ -197,7 +197,7 @@ void lv_line_set_upscale(lv_obj_t * line, bool unscale)
 	ext->upscale = unscale == false ? 0 : 1;
 
 	/*Refresh to point to handle auto size*/
-	lv_line_set_points(line, ext->point_p, ext->point_num);
+	lv_line_set_points(line, ext->point_array, ext->point_num);
 }
 
 /*=====================
@@ -300,7 +300,7 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
     else if(mode == LV_DESIGN_DRAW_MAIN) {
 		lv_line_ext_t * ext = lv_obj_get_ext(line);
 
-		if(ext->point_num == 0 || ext->point_p == NULL) return false;
+		if(ext->point_num == 0 || ext->point_array == NULL) return false;
 
 		lv_lines_t * lines = lv_obj_get_style(line);
 
@@ -321,15 +321,15 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 		/*Read all pints and draw the lines*/
 		for (i = 0; i < ext->point_num - 1; i++) {
 
-			p1.x = ext->point_p[i].x * us + x_ofs;
-			p2.x = ext->point_p[i + 1].x * us + x_ofs;
+			p1.x = ext->point_array[i].x * us + x_ofs;
+			p2.x = ext->point_array[i + 1].x * us + x_ofs;
 
 			if(ext->y_inv == 0) {
-				p1.y = ext->point_p[i].y * us + y_ofs;
-				p2.y = ext->point_p[i + 1].y * us + y_ofs;
+				p1.y = ext->point_array[i].y * us + y_ofs;
+				p2.y = ext->point_array[i + 1].y * us + y_ofs;
 			} else {
-				p1.y = h - ext->point_p[i].y * us + y_ofs;
-				p2.y = h - ext->point_p[i + 1].y * us + y_ofs;
+				p1.y = h - ext->point_array[i].y * us + y_ofs;
+				p2.y = h - ext->point_array[i + 1].y * us + y_ofs;
 			}
 			lv_draw_line(&p1, &p2, mask, lines, opa);
 		}

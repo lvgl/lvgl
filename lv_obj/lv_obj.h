@@ -59,7 +59,7 @@ typedef enum
     LV_DESIGN_COVER_CHK,
 }lv_design_mode_t;
 
-typedef bool (* lv_design_f_t) (struct __lv_obj_t * obj, const area_t * mask_p, lv_design_mode_t mode); 
+typedef bool (* lv_design_f_t) (struct __LV_OBJ_T * obj, const area_t * mask_p, lv_design_mode_t mode);
 
 typedef enum
 {
@@ -75,11 +75,11 @@ typedef enum
     LV_SIGNAL_STYLE_CHG,
 }lv_signal_t;
 
-typedef bool (* lv_signal_f_t) (struct __lv_obj_t * obj, lv_signal_t sign, void * param);
+typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
 
 typedef struct __LV_OBJ_T
 {
-    struct __lv_obj_t * par;
+    struct __LV_OBJ_T * par;
     ll_dsc_t child_ll;
     
     area_t cords;

@@ -54,7 +54,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_img = NULL;
     
     /*Create a basic object*/
-    new_img = lv_obj_create(par, NULL);
+    new_img = lv_obj_create(par, copy);
     
     /*Extend the basic object to image object*/
     lv_obj_alloc_ext(new_img, sizeof(lv_img_ext_t));

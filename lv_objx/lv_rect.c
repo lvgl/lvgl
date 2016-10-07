@@ -87,10 +87,10 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
-    	lv_rect_ext_t * ori_rect_ext = lv_obj_get_ext(copy);
-    	rect_ext->hfit_en = ori_rect_ext->hfit_en;
-    	rect_ext->vfit_en = ori_rect_ext->vfit_en;
-    	rect_ext->layout = ori_rect_ext->layout;
+    	lv_rect_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	rect_ext->hfit_en = copy_ext->hfit_en;
+    	rect_ext->vfit_en = copy_ext->vfit_en;
+    	rect_ext->layout = copy_ext->layout;
     }
 
     return new_rect;
