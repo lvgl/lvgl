@@ -65,8 +65,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new list object*/
     if(copy == NULL) {
-    	ext ->fit = LV_LIST_FIT_LONGEST;
-    	lv_obj_set_size_us(new_list, 100, 150);
+    	ext ->fit = LV_LIST_FIT_HOLDER;
+    	lv_obj_set_size_us(new_list, 120, 150);
 		lv_obj_set_style(new_list, lv_lists_get(LV_LISTS_DEF, NULL));
 		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page_ext.scrolling, LV_LIST_LAYOUT_DEF);
     } else {
@@ -144,6 +144,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, b
 		lv_rect_set_fit(liste, false, true);
 		cord_t w = lv_obj_get_width(list);
 		w -= lists->bg_page.bg_rects.hpad * 2;
+		w -= lists->bg_page.scrable_rects.hpad * 2;
 		lv_obj_set_width(liste, w);
 	} else if(ext->fit == LV_LIST_FIT_LONGEST) {
 		/*In this case the width will be adjusted*/
