@@ -10,6 +10,7 @@
 #if USE_LV_LABEL != 0
 
 #include "misc/others/color.h"
+#include "misc/math/math_base.h"
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
 #include "../lv_misc/text.h"
@@ -18,6 +19,10 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_LABEL_DOT_NUM	3
+#define LV_LABEL_DOT_END_INV 0xFFFF
+#define LV_LABEL_SCROLL_SPEED (50 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
+#define LV_LABEL_SCROLL_SPEED_VER  (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
 
 /**********************
  *      TYPEDEFS
@@ -60,23 +65,24 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     /*Extend the basic object to a label object*/
     lv_obj_alloc_ext(new_label, sizeof(lv_label_ext_t));
     
-    lv_label_ext_t * label_p = lv_obj_get_ext(new_label);
-    label_p->txt = NULL;
+    lv_label_ext_t * ext = lv_obj_get_ext(new_label);
+    ext->txt = NULL;
 
 	lv_obj_set_design_f(new_label, lv_label_design);
 	lv_obj_set_signal_f(new_label, lv_label_signal);
 
     /*Init the new label*/
     if(copy == NULL) {
+    	ext->dot_end = LV_LABEL_DOT_END_INV;
 		lv_obj_set_opa(new_label, OPA_COVER);
 		lv_obj_set_click(new_label, false);
 		lv_obj_set_style(new_label, lv_labels_get(LV_LABELS_DEF, NULL));
-		lv_label_set_fixw(new_label, false);
+		lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
 		lv_label_set_text(new_label, "Text");
     }
     /*Copy 'copy' if not NULL*/
     else {
-		lv_label_set_fixw(new_label, lv_label_get_fixw(copy));
+		lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
 		lv_label_set_text(new_label, lv_label_get_text(copy));
     }
     return new_label;
@@ -133,8 +139,11 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
+    /*If trying to set its own text then use NULL
+     * because NULL means text refresh*/
     if(text == ext->txt) text = NULL;
 
+    /*Allocate space for the new text*/
     if(text != NULL) {
     	uint32_t len = strlen(text) + 1;
     	if(ext->txt != NULL) {
@@ -142,7 +151,9 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     	}
 		ext->txt = dm_alloc(len);
 		strcpy(ext->txt, text);
-    } else {
+    }
+    /*Do not allocate just use the current text*/
+    else {
     	text = ext->txt;
     }
     
@@ -159,54 +170,92 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     cord_t longest_line = 0;
     cord_t act_line_length;
     
-    /*If the fix width is not enabled the set the max length to very big */
-    if(ext->fixw == 0) {
+    ext->dot_end = LV_LABEL_DOT_END_INV;	/*Initialize the dot end index*/
+
+    /*If the width will be expanded set the max length to very big */
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
         max_length = LV_CORD_MAX;
     }
     
-    /*Calc. the height and longest line*/;
+    /*Calc. the height and longest line*/
     while (text[line_start] != '\0')
     {
         new_line_start += txt_get_next_line(&text[line_start], font, labels->letter_space, max_length);
         new_height += letter_height;
         new_height += labels->line_space;
         
-        /*If no fix width then calc. the longest line */
-        if(ext->fixw == false) {
+        /*Calculate the the longest line if the width will be expanded*/
+        if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
           act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
                                            font, labels->letter_space);
-          if(act_line_length > longest_line) {
-              longest_line = act_line_length;
-          }
+              longest_line = max(act_line_length, longest_line);
         }
-        
+
         line_start = new_line_start;
     }
     
     /*Correction with the last line space*/
     new_height -= labels->line_space;
-    
-    if(ext->fixw == 0) {
-    	/*Refresh the full size */
+    /*Refresh the full size in expand mode*/
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
     	lv_obj_set_size(label, longest_line, new_height);
-    } else {
-    	/*With fix width only the height can change*/
+
+    	/*Start scrolling if the label is greater then its parent*/
+    	if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    		/*TODO create the animations*/
+    	}
+    }
+ 	/*In break mode only the height can change*/
+    else if (ext->long_mode == LV_LABEL_LONG_BREAK) {
         lv_obj_set_height(label, new_height);
+    }
+    /*Replace the last 'LV_LABEL_DOT_NUM' characters with dots
+     * and save these characters*/
+    else if(ext->long_mode == LV_LABEL_LONG_DOTS) {
+    	point_t point;
+    	point.x = lv_obj_get_width(label) - 1;
+    	point.y = lv_obj_get_height(label) - 1;
+    	uint16_t index = lv_label_get_letter_on(label, &point);
+    	printf("index: %d, letter: %c, %d\n", index, ext->txt[index], ext->txt[index]);
+
+    	if(index < strlen(text) - 1) {
+    		uint8_t i;
+    		for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
+        		ext->dot_tmp[i] = ext->txt[index - LV_LABEL_DOT_NUM + i];
+        		ext->txt[index - LV_LABEL_DOT_NUM + i] = '.';
+    		}
+    		/*The last character is '\0'*/
+    		ext->dot_tmp[i] = ext->txt[index];
+			ext->txt[index] = '\0';
+
+			/*Save the dot end index*/
+			ext->dot_end = index;
+    	}
     }
 
     lv_obj_inv(label);
 }
 
 /**
- * Set the fix width attribute
- * If enabled the text will be automatically broken to fit to the size
+ * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
- * @param fixw true: enable fix width for the label
+ * @param long_mode the new mode from 'lv_label_long_mode' enum.
  */
-void lv_label_set_fixw(lv_obj_t * label, bool fixw)
+void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
-    ext->fixw = fixw == false ? 0 : 1;
+
+    /*When changing from dot mode reload the characters replaced by dots*/
+    if(ext->long_mode == LV_LABEL_LONG_DOTS &&
+       ext->dot_end != LV_LABEL_DOT_END_INV) {
+    	uint8_t i;
+    	for(i = 0; i < LV_LABEL_DOT_NUM + 1; i++) {
+    		ext->txt[ext->dot_end - LV_LABEL_DOT_NUM + i] = ext->dot_tmp[i];
+    	}
+    }
+
+    ext->long_mode = long_mode;
+    lv_label_set_text(label, NULL);
 }
 
 /*=====================
@@ -230,10 +279,10 @@ const char * lv_label_get_text(lv_obj_t * label)
  * @param label pointer to a label object
  * @return true: fix width is enabled
  */
-bool lv_label_get_fixw(lv_obj_t * label)
+lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
-    return ext->fixw == 0 ? false: true;
+    return ext->long_mode;
 }
 
 /**
@@ -254,8 +303,8 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     uint8_t letter_height = font_get_height(font);
     cord_t y = 0;
 
-    /*If the fix width is not enabled the set the max length to very big */
-    if(ext->fixw == 0) {
+    /*If the width will be expanded  the set the max length to very big */
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
         max_length = LV_CORD_MAX;
     }
 
@@ -305,8 +354,8 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     uint8_t letter_height = font_get_height(font);
     cord_t y = 0;
 
-    /*If the fix width is not enabled the set the max length to very big */
-    if(ext->fixw == 0) {
+    /*If the width will be expanded set the max length to very big */
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
         max_length = LV_CORD_MAX;
     }
 
@@ -327,11 +376,10 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
 
-	uint32_t i;
+	uint16_t i;
 	for(i = line_start; i < new_line_start-1; i++) {
 		x += font_get_width(font, text[i]) + labels->letter_space;
 		if(pos->x < x) break;
-
 	}
 
 
@@ -402,13 +450,17 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
     if(mode == LV_DESIGN_COVER_CHK) return false;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*TEST: draw a background for the label*/
-		/*lv_vfill(&obj->cords, mask_p, COLOR_LIME, OPA_COVER); */
+		lv_vfill(&label->cords, mask, COLOR_LIME, OPA_COVER);
 
 		area_t cords;
 		lv_obj_get_cords(label, &cords);
-		opa_t opa= lv_obj_get_opa(label);
-		const char * txt = lv_label_get_text(label);
-		lv_draw_label(&cords, mask, lv_obj_get_style(label), opa, txt);
+		opa_t opa = lv_obj_get_opa(label);
+		lv_label_ext_t * ext = lv_obj_get_ext(label);
+
+
+		lv_draw_label(&cords, mask, lv_obj_get_style(label), opa, ext->txt);
+
+
     }
     return true;
 }

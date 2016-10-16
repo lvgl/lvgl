@@ -18,6 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_LABEL_DOT_NUM 3
 
 /**********************
  *      TYPEDEFS
@@ -43,13 +44,24 @@ typedef enum
 	LV_LABELS_TITLE,
 }lv_labels_builtin_t;
 
+
+typedef enum
+{
+	LV_LABEL_LONG_EXPAND,	/*Expand the object size to the text size*/
+	LV_LABEL_LONG_BREAK,    /*Keep the width and break the text and expand the object height*/
+	LV_LABEL_LONG_DOTS,     /*Keep the size, break the text and write dots in the last line*/
+	LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text (move the label object)*/
+}lv_label_long_mode_t;
+
 /*Data of label*/
 typedef struct
 {
 	/*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
 	/*New data for this type */
     char * txt;
-    uint8_t fixw  :1;
+    lv_label_long_mode_t long_mode;
+    char dot_tmp[LV_LABEL_DOT_NUM + 1];	/*Store character which are replaced with dots*/
+    uint16_t dot_end;			/*The text end in dot mode*/
 }lv_label_ext_t;
         
 /**********************
@@ -61,9 +73,9 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 lv_labels_t * lv_labels_get(lv_labels_builtin_t style, lv_labels_t * copy);
 
 void lv_label_set_text(lv_obj_t * label, const char * text);
-void lv_label_set_fixw(lv_obj_t * label, bool fixw);
+void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 const char * lv_label_get_text(lv_obj_t * label);
-bool lv_label_get_fixw(lv_obj_t * label);
+lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label);
 void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos);
 uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos);
 
