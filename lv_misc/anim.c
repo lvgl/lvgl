@@ -28,6 +28,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void anim_task (void);
+static void anim_ready_handler(anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -59,12 +60,16 @@ void anim_init(void)
  */
 void anim_create(anim_t * anim_p)
 {
+	/*Add the new animation to the animation linked list*/
 	anim_t * new_anim = ll_ins_head(&anim_ll);
 	dm_assert(new_anim);
 
+	/*Initialize the animation descriptor*/
+	anim_p->playback_now = 0;
 	memcpy(new_anim, anim_p, sizeof(anim_t));
 
-	new_anim->fp(new_anim->p, new_anim->start);
+	/*Set the start value*/
+	new_anim->fp(new_anim->var, new_anim->start);
 }
 
 
@@ -73,7 +78,7 @@ void anim_create(anim_t * anim_p)
  **********************/
 
 /**
- * Periodically handle animations.
+ * Periodically handle the animations.
  */
 static void anim_task (void)
 {
@@ -102,17 +107,11 @@ static void anim_task (void)
 			new_val = new_val >> ANIM_PATH_NORM_SHIFT;
 			new_val += a->start;
 
-			a->fp(a->p, new_val);	/*Apply the calculated value*/
+			a->fp(a->var, new_val);	/*Apply the calculated value*/
 
-			/*Delete the animation if it is ready*/
+			/*If the time is elapsed the animation is ready*/
 			if(a->act_time >= a->time) {
-				void (*cb) (void *) = a->end_cb;
-				void * p = a->p;
-				ll_rem(&anim_ll, a);
-				dm_free(a);
-
-				/*Call the callback function at the end*/
-				if(cb != NULL) cb(p);
+				anim_ready_handler(a);
 			}
 		}
 
@@ -120,4 +119,40 @@ static void anim_task (void)
 	}
 
 	last_task_run = systick_get();
+}
+
+/**
+ * Called when an animation is ready to do the necessary thinks
+ * e.g. repeat, play back, delete etc.
+ * @param a pointer to an animation descriptor
+ * */
+static void anim_ready_handler(anim_t * a)
+{
+	/*Delete the animation if
+	 * - no repeat and no play back (simple one shot animation)
+	 * - no repeat, play back is enabled and play back is ready */
+	if((a->repeat == 0 && a->playback == 0) ||
+	   (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
+		void (*cb) (void *) = a->end_cb;
+		void * p = a->var;
+		ll_rem(&anim_ll, a);
+		dm_free(a);
+
+		/*Call the callback function at the end*/
+		if(cb != NULL) cb(p);
+	}
+	/*If the animation is not deleted then restart it*/
+	else {
+		a->act_time = 0;	/*Restart the animation*/
+		/*Swap the start and end values in play back mode*/
+		if(a->playback != 0) {
+			/*Toggle the play back state*/
+			a->playback_now = a->playback_now == 0 ? 1: 0;
+			/*Swap the start and end values*/
+			int32_t tmp;
+			tmp = a->start;
+			a->start = a->end;
+			a->end = tmp;
+		}
+	}
 }
