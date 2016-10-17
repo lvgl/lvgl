@@ -36,13 +36,14 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_t mode);
-static void lv_rects_init(void);
+static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask);
 static void lv_rect_refr_layout(lv_obj_t * rect);
 static void lv_rect_layout_col(lv_obj_t * rect);
 static void lv_rect_layout_row(lv_obj_t * rect);
 static void lv_rect_layout_center(lv_obj_t * rect);
 static void lv_rect_layout_grid(lv_obj_t * rect);
 static void lv_rect_refr_autofit(lv_obj_t * rect);
+static void lv_rects_init(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -112,8 +113,15 @@ bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
+
+    	lv_rects_t * style = lv_obj_get_style(rect);
+
     	switch(sign) {
     	case LV_SIGNAL_STYLE_CHG: /*Recalculate the padding if the style changed*/
+        	lv_rect_refr_layout(rect);
+        	lv_rect_refr_autofit(rect);
+        	lv_obj_ext_size_refr(rect);
+        	break;
         case LV_SIGNAL_CHILD_CHG:
         	lv_rect_refr_layout(rect);
         	lv_rect_refr_autofit(rect);
@@ -125,10 +133,9 @@ bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param)
             	lv_rect_refr_autofit(rect);
         	}
         	break;
-
-
-            break;
-
+        case LV_SIGNAL_REFR_EXT_SIZE:
+        	if(style->light > rect->ext_size) rect->ext_size = style->light;
+        	break;
     		default:
     			break;
     	}
@@ -291,13 +298,62 @@ static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_
     	return false;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		opa_t opa = lv_obj_get_opa(rect);
+		lv_rects_t * style =  lv_obj_get_style(rect);
 		area_t area;
 		lv_obj_get_cords(rect, &area);
 
 		/*Draw the rectangle*/
-		lv_draw_rect(&area, mask, lv_obj_get_style(rect), opa);
+		lv_draw_rect(&area, mask, style, opa);
+		lv_rect_draw_light(rect, mask);
+
+    } else if(mode == LV_DESIGN_DRAW_POST) {
+
     }
     return true;
+}
+
+/**
+ * Draw a light around the object
+ * @param rect pointer to rectangle object
+ * @param mask pointer to a mask area (from the design functions)
+ */
+static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask)
+{
+	lv_rects_t * style =  lv_obj_get_style(rect);
+	cord_t light_size = style->light;
+	if(light_size == 0) return;
+	if(light_size < LV_DOWNSCALE) light_size = LV_DOWNSCALE;
+
+	area_t light_area;
+	lv_rects_t light_style;
+	lv_obj_get_cords(rect, &light_area);
+
+	memcpy(&light_style, style, sizeof(lv_rects_t));
+
+	light_style.empty = 1;
+	light_style.bwidth = light_size;
+	light_style.round =  style->round + light_size;
+	light_style.bcolor = style->lcolor;
+	light_style.bopa = 100;
+
+	light_area.x1 -= light_size;
+	light_area.y1 -= light_size;
+	light_area.x2 += light_size;
+	light_area.y2 += light_size;
+
+	cord_t i;
+	uint8_t res = LV_DOWNSCALE ;
+	opa_t opa_sub =  lv_obj_get_opa(rect) / (light_size / LV_DOWNSCALE);
+
+	for(i = 1; i < light_size; i += res) {
+		lv_draw_rect(&light_area, mask, &light_style, (uint16_t) opa_sub);
+		light_style.round -= res;
+		light_style.bwidth -= res;
+		light_area.x1 += res;
+		light_area.y1 += res;
+		light_area.x2 -= res;
+		light_area.y2 -= res;
+	}
 }
 
 /**
@@ -612,6 +668,8 @@ static void lv_rects_init(void)
 	lv_rects_def.hpad = 10 * LV_STYLE_MULT;
 	lv_rects_def.vpad = 10 * LV_STYLE_MULT;
 	lv_rects_def.opad = 10 * LV_STYLE_MULT;
+	lv_rects_def.light = 0;
+	lv_rects_def.lcolor = COLOR_MAKE(0x60, 0x60, 0x60);
 
 	/*Transparent style*/
 	memcpy(&lv_rects_transp, &lv_rects_def, sizeof(lv_rects_t));

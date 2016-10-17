@@ -41,6 +41,8 @@ typedef struct
 	color_t mcolor[LV_BTN_STATE_NUM];
 	color_t gcolor[LV_BTN_STATE_NUM];
 	color_t bcolor[LV_BTN_STATE_NUM];
+	color_t lcolor[LV_BTN_STATE_NUM];
+	uint8_t light_en[LV_BTN_STATE_NUM];
 }lv_btns_t;
 
 /*Built-in styles of button*/

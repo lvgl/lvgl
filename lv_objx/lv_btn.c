@@ -25,7 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t mode);
-static void lv_btn_style_load(lv_obj_t * btn, lv_rects_t * rects);
+static void lv_btn_style_load(lv_obj_t * btn, lv_rects_t * new_rects);
 static void lv_btns_init(void);
 
 /**********************
@@ -34,6 +34,8 @@ static void lv_btns_init(void);
 static lv_btns_t lv_btns_def;
 static lv_btns_t lv_btns_transp;
 static lv_btns_t lv_btns_border;
+
+static lv_design_f_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -56,11 +58,17 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     new_btn = lv_rect_create(par, copy);
     /*Allocate the extended data*/
     lv_obj_alloc_ext(new_btn, sizeof(lv_btn_ext_t));
+
+    if(ancestor_design_f  == NULL) {
+    	ancestor_design_f = lv_obj_get_design_f(new_btn);
+    }
+
     lv_obj_set_signal_f(new_btn, lv_btn_signal);
     lv_obj_set_design_f(new_btn, lv_btn_design);
     
     lv_btn_ext_t * ext = lv_obj_get_ext(new_btn);
     ext->lpr_exec = 0;
+
 
     /*If no copy do the basic initialization*/
     if(copy == NULL)
@@ -70,7 +78,6 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->rel_action = NULL;
 		ext->lpr_action = NULL;
 		ext->tgl = 0;
-	    lv_obj_set_style(new_btn, lv_btns_get(LV_BTNS_DEF, NULL));
 	    lv_rect_set_layout(new_btn, LV_RECT_LAYOUT_CENTER);
     }
     /*Copy 'copy'*/
@@ -83,6 +90,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->tgl = ori_btn_ext->tgl;
     }
     
+    lv_obj_set_style(new_btn, lv_btns_get(LV_BTNS_DEF, NULL));
+
     return new_btn;
 }
 
@@ -330,51 +339,44 @@ static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t 
 
     /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	uint16_t r = btns_p->rects.round;
-    	area_t area_tmp;
-
-    	/*Check horizontally without radius*/
-    	lv_obj_get_cords(btn, &area_tmp);
-    	area_tmp.x1 += r;
-    	area_tmp.x2 -= r;
-    	if(area_is_in(mask, &area_tmp) == true) return true;
-
-    	/*Check vertically without radius*/
-    	lv_obj_get_cords(btn, &area_tmp);
-    	area_tmp.y1 += r;
-    	area_tmp.y2 -= r;
-    	if(area_is_in(mask, &area_tmp) == true) return true;
-
-    	return false;
+    	return ancestor_design_f(btn, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		opa_t opa = lv_obj_get_opa(btn);
 		area_t area;
 		lv_obj_get_cords(btn, &area);
 
+		/*Temporally  set a rectangle style for the button to draw it as rectangle*/
 		lv_rects_t rects_tmp;
-
+		lv_btns_t * btns_tmp = lv_obj_get_style(btn);
 		lv_btn_style_load(btn, &rects_tmp);
-
-		/*Draw the rectangle*/
-		lv_draw_rect(&area, mask, &rects_tmp, opa);
+		btn->style_p = &rects_tmp;
+		ancestor_design_f(btn, mask, mode);	/*Draw the rectangle*/
+		btn->style_p = btns_tmp;			/*Reload the origial butto style*/
     }
     return true;
 }
 
 /**
- * Load the corresponding style according to the state to 'rects' in 'lv_btns_t'
- * @param obj pointer to a button object
+ * Crate a rectangle style according to the state of the button
+ * @param btn pointer to a button object
+ * @param new_rects load the style here (pointer to a rectangle style)
  */
-static void lv_btn_style_load(lv_obj_t * btn, lv_rects_t * rects)
+static void lv_btn_style_load(lv_obj_t * btn, lv_rects_t * new_rects)
 {
     lv_btn_state_t state = lv_btn_get_state(btn);
-    lv_btns_t * ext = lv_obj_get_style(btn);
+    lv_btns_t * style = lv_obj_get_style(btn);
 
     /*Load the style*/
-    memcpy(rects, &ext->rects, sizeof(lv_rects_t));
-    rects->objs.color = ext->mcolor[state];
-    rects->gcolor = ext->gcolor[state];
-    rects->bcolor = ext->bcolor[state];
+    memcpy(new_rects, &style->rects, sizeof(lv_rects_t));
+    new_rects->objs.color = style->mcolor[state];
+    new_rects->gcolor = style->gcolor[state];
+    new_rects->bcolor = style->bcolor[state];
+    new_rects->lcolor = style->lcolor[state];
+    if(style->light_en[state] != 0) {
+    	new_rects->light = style->rects.light;
+    } else {
+    	new_rects->light = 0;
+    }
 }
 
 /**
@@ -386,25 +388,36 @@ static void lv_btns_init(void)
 	lv_btns_def.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80);
 	lv_btns_def.gcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
 	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
+	lv_btns_def.lcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
+	lv_btns_def.light_en[LV_BTN_STATE_REL] = 0;
 
 	lv_btns_def.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
 	lv_btns_def.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
 	lv_btns_def.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE;
+	lv_btns_def.lcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
+	lv_btns_def.light_en[LV_BTN_STATE_PR] = 1;
 
 	lv_btns_def.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x80, 0x00, 0x00);
 	lv_btns_def.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x20, 0x20);
 	lv_btns_def.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE;
+	lv_btns_def.lcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
+	lv_btns_def.light_en[LV_BTN_STATE_TGL_REL] = 0;
 
 	lv_btns_def.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0xf0, 0x26, 0x26);
 	lv_btns_def.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x40, 0x40);
 	lv_btns_def.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE;
+	lv_btns_def.lcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
+	lv_btns_def.light_en[LV_BTN_STATE_TGL_PR] = 1;
 
 	lv_btns_def.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER;
 	lv_btns_def.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
 	lv_btns_def.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE;
+	lv_btns_def.lcolor[LV_BTN_STATE_INA] = COLOR_MAKE(0x30, 0x40, 0x50);
+	lv_btns_def.light_en[LV_BTN_STATE_INA] = 0;
 
 	lv_btns_def.rects.bwidth = 2 * LV_STYLE_MULT;
 	lv_btns_def.rects.bopa = 50;
+	lv_btns_def.rects.light = 8 * LV_STYLE_MULT;
 	lv_btns_def.rects.empty = 0;
 	lv_btns_def.rects.round = 4 * LV_STYLE_MULT;
 	lv_btns_def.rects.hpad = 10 * LV_STYLE_MULT;

@@ -42,13 +42,15 @@ typedef struct
 {
 	lv_objs_t objs;	/*Style of ancestor*/
 	/*New style element for this type */
-    color_t gcolor;
-    color_t bcolor;
+    color_t gcolor; /*Gradient color*/
+    color_t bcolor;	/*Border color*/
+    color_t lcolor;	/*Light color*/
     uint16_t bwidth;
     uint16_t round;
     cord_t hpad;
     cord_t vpad;
     cord_t opad;
+    cord_t light;	/*Light size*/
     uint8_t bopa;
     uint8_t empty :1;
 }lv_rects_t;

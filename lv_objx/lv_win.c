@@ -352,7 +352,7 @@ static void lv_wins_init(void)
 
 /**
  * Realign the building elements of a window
- * @param win pointer to window object
+ * @param win pointer to window objectker
  */
 static void lv_win_realign(lv_obj_t * win)
 {
