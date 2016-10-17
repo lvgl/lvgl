@@ -98,7 +98,12 @@ void lv_obj_inv(lv_obj_t * obj)
         lv_obj_t * par = lv_obj_get_parent(obj);
         bool union_ok = true;
         /*Start with the original coordinates*/
+        cord_t ext_size = obj->ext_size;
         area_cpy(&area_trunc, &obj->cords);
+        area_trunc.x1 -= ext_size;
+        area_trunc.y1 -= ext_size;
+        area_trunc.x2 += ext_size;
+        area_trunc.y2 += ext_size;
         
         /*Check through all parents*/
         while(par != NULL) {
@@ -163,6 +168,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->cords.y1 = 0;
 		new_obj->cords.x2 = LV_HOR_RES - 1;
 		new_obj->cords.y2 = LV_VER_RES - 1;
+		new_obj->ext_size = 0;
 
 		/*Set appearance*/
 		new_obj->style_p = lv_objs_get(LV_OBJS_SCR, NULL);
@@ -182,7 +188,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->top_en = 0;
 		new_obj->ext = NULL;
 	 }
-    /*parent != NULL create normal obj. on parent*/
+    /*parent != NULL create normal obj. on a parent*/
     else
     {   
         new_obj = ll_ins_head(&(parent)->child_ll);
@@ -197,6 +203,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
                                    LV_OBJ_DEF_WIDTH;
         new_obj->cords.y2 = parent->cords.y1 +
                                    LV_OBJ_DEF_HEIGHT;
+        new_obj->ext_size = 0;
 
         /*Set appearance*/
         new_obj->style_p = lv_objs_get(LV_OBJS_DEF, NULL);
@@ -221,7 +228,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
     if(copy != NULL) {
     	area_cpy(&new_obj->cords, &copy->cords);
-
+    	new_obj->ext_size = copy->ext_size;
         /*Set attributes*/
         new_obj->click_en = copy->click_en;
         new_obj->drag_en = copy->drag_en;
@@ -752,6 +759,18 @@ void lv_obj_align_us(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_
 	lv_obj_align(obj, base, align, x_mod * LV_DOWNSCALE, y_mod * LV_DOWNSCALE);
 }
 
+/**
+ * Set the extended size of an object
+ * @param obj pointer to an object
+ * @param ext_size the extended size
+ */
+void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
+{
+	obj->ext_size = ext_size;
+
+	lv_obj_inv(obj);
+}
+
 /*---------------------
  * Appearance set 
  *--------------------*/
@@ -934,6 +953,18 @@ void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size)
     obj->ext = dm_realloc(obj->ext, ext_size); 
     
    return (void*)obj->ext;
+}
+
+/**
+ * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object
+ * @param obj pointer to an object
+ */
+void lv_obj_ext_size_refr(lv_obj_t * obj)
+{
+	obj->ext_size = 0;
+	obj->signal_f(obj, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+
+	lv_obj_inv(obj);
 }
 
 /**
@@ -1171,6 +1202,16 @@ cord_t lv_obj_get_width(lv_obj_t * obj)
 cord_t lv_obj_get_height(lv_obj_t * obj)
 {
     return area_get_height(&obj->cords);
+}
+
+/**
+ * Get the extended size attribute of an object
+ * @param obj pointer to an object
+ * @return the extended size attribute
+ */
+cord_t lv_obj_getext_size(lv_obj_t * obj)
+{
+    return obj->ext_size;
 }
 
 /*-----------------

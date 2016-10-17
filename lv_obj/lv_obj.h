@@ -73,6 +73,7 @@ typedef enum
     LV_SIGNAL_CHILD_CHG,
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_STYLE_CHG,
+	LV_SIGNAL_REFR_EXT_SIZE,
 }lv_signal_t;
 
 typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
@@ -102,11 +103,13 @@ typedef struct __LV_OBJ_T
     uint8_t style_iso 	 :1;	/*1: The object has got an own style*/
     uint8_t hidden       :1;    /*1: Object is hidden*/
     uint8_t top_en       :1;	/*1: If the object or its children  is clicked it goes to the foreground*/
-    uint8_t child_chg_off:1;    /*1: Disable the child change signal. Useful when moving the children*/
+    uint8_t child_chg_off:1;    /*1: Disable the child change signal. Used by the library*/
 
-	opa_t opa;
+    cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
 
     uint8_t free_num; 		/*Application specific identifier (set it freely)*/
+	opa_t opa;
+
     
 }lv_obj_t;
 
@@ -194,6 +197,7 @@ void lv_obj_set_height(lv_obj_t * obj, cord_t h);
 void lv_obj_set_height_us(lv_obj_t * obj, cord_t h);
 void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
 void lv_obj_align_us(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
+void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size);;
 /*Appearance set*/
 void lv_obj_set_hidden(lv_obj_t * obj, bool hidden_en);
 void lv_obj_set_opa(lv_obj_t * obj, opa_t opa);
@@ -208,6 +212,7 @@ void lv_obj_set_signal_f(lv_obj_t * obj, lv_signal_f_t fp);
 void lv_obj_set_design_f(lv_obj_t * obj, lv_design_f_t fp);
 /*Other set*/
 void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size);
+void lv_obj_ext_size_refr(lv_obj_t * obj);
 void lv_obj_set_style(lv_obj_t * obj, void * style_p);
 void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size);
 void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
