@@ -83,7 +83,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     		scrling_design_f = lv_obj_get_design_f(ext->page.scrolling);
     	}
     	lv_obj_set_design_f(ext->page.scrolling, lv_ta_scrling_design);
-    	lv_label_set_fixw(ext->label, true);
+    	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
     	lv_label_set_text(ext->label, "abc aaaa bbbb ccc\n123\nABC\nxyz\nwww\n007\nalma\n:)\naaaaaa");
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, true);

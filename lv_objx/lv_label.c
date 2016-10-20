@@ -14,6 +14,7 @@
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
 #include "../lv_misc/text.h"
+#include "../lv_misc/anim.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************
@@ -23,6 +24,8 @@
 #define LV_LABEL_DOT_END_INV 0xFFFF
 #define LV_LABEL_SCROLL_SPEED (50 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
 #define LV_LABEL_SCROLL_SPEED_VER  (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
+#define LV_LABEL_SCROLL_PLAYBACK_PAUSE	300 /*Wait before the scroll turns back in ms*/
+#define LV_LABEL_SCROLL_REPEAT_PAUSE	600 /*Wait before the scroll begins again in ms*/
 
 /**********************
  *      TYPEDEFS
@@ -202,7 +205,45 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     	/*Start scrolling if the label is greater then its parent*/
     	if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
-    		/*TODO create the animations*/
+    		lv_obj_t * parent = lv_obj_get_parent(label);
+
+    		/*Delete the potential previous scroller animations*/
+        	anim_del(label, (anim_fp_t) lv_obj_set_x);
+        	anim_del(label, (anim_fp_t) lv_obj_set_y);
+
+    		anim_t anim;
+    		anim.var = label;
+    		anim.repeat = 1;
+    		anim.playback = 1;
+    		anim.start = font_get_width(font, ' ');
+    		anim.act_time = 0;
+    		anim.end_cb = NULL;
+    		anim.path = anim_get_path(ANIM_PATH_LIN);
+    		anim.time = 3000;
+    		anim.playback_pause = LV_LABEL_SCROLL_PLAYBACK_PAUSE;
+    		anim.repeat_pause = LV_LABEL_SCROLL_REPEAT_PAUSE;
+
+    		bool hor_anim = false;
+    		if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
+    			anim.end =  lv_obj_get_width(parent) - lv_obj_get_width(label) - font_get_width(font, ' ');
+    			anim.fp = (anim_fp_t) lv_obj_set_x;
+        		anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
+    			anim_create(&anim);
+    			hor_anim = true;
+    		}
+
+    		if(lv_obj_get_height(label) > lv_obj_get_height(parent)) {
+				anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) - font_get_height(font);
+				anim.fp = (anim_fp_t)lv_obj_set_y;
+
+				/*Different animation speed if horizontal animation is created too*/
+				if(hor_anim == false) {
+        			anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
+        		} else {
+        			anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED_VER, anim.start, anim.end);
+        		}
+				anim_create(&anim);
+			}
     	}
     }
  	/*In break mode only the height can change*/
@@ -216,18 +257,29 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     	point.x = lv_obj_get_width(label) - 1;
     	point.y = lv_obj_get_height(label) - 1;
     	uint16_t index = lv_label_get_letter_on(label, &point);
-    	printf("index: %d, letter: %c, %d\n", index, ext->txt[index], ext->txt[index]);
 
     	if(index < strlen(text) - 1) {
-    		uint8_t i;
-    		for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
-        		ext->dot_tmp[i] = ext->txt[index - LV_LABEL_DOT_NUM + i];
-        		ext->txt[index - LV_LABEL_DOT_NUM + i] = '.';
-    		}
-    		/*The last character is '\0'*/
-    		ext->dot_tmp[i] = ext->txt[index];
-			ext->txt[index] = '\0';
 
+    		/* Change the last 'LV_LABEL_DOT_NUM' to dots
+    		 * (if there are at least 'LV_LABEL_DOT_NUM' characters*/
+    		if(index > LV_LABEL_DOT_NUM) {
+				uint8_t i;
+				for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
+					ext->dot_tmp[i] = ext->txt[index - LV_LABEL_DOT_NUM + i];
+					ext->txt[index - LV_LABEL_DOT_NUM + i] = '.';
+				}
+				/*The last character is '\0'*/
+				ext->dot_tmp[i] = ext->txt[index];
+				ext->txt[index] = '\0';
+    		}
+    		/*Else with short text change all characters to dots*/
+    		else {
+				uint8_t i;
+				for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
+					ext->txt[i] = '.';
+				}
+				ext->txt[i] = '\0';
+    		}
 			/*Save the dot end index*/
 			ext->dot_end = index;
     	}
@@ -252,6 +304,12 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
     	for(i = 0; i < LV_LABEL_DOT_NUM + 1; i++) {
     		ext->txt[ext->dot_end - LV_LABEL_DOT_NUM + i] = ext->dot_tmp[i];
     	}
+    }
+
+    /*Delete the scroller animations*/
+    if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    	anim_del(label, (anim_fp_t) lv_obj_set_x);
+    	anim_del(label, (anim_fp_t) lv_obj_set_y);
     }
 
     ext->long_mode = long_mode;
@@ -450,7 +508,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
     if(mode == LV_DESIGN_COVER_CHK) return false;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*TEST: draw a background for the label*/
-		lv_vfill(&label->cords, mask, COLOR_LIME, OPA_COVER);
+		//lv_vfill(&label->cords, mask, COLOR_LIME, OPA_COVER);
 
 		area_t cords;
 		lv_obj_get_cords(label, &cords);

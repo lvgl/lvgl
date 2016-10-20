@@ -60,7 +60,7 @@ typedef struct
 	/*New data for this type */
     char * txt;
     lv_label_long_mode_t long_mode;
-    char dot_tmp[LV_LABEL_DOT_NUM + 1];	/*Store character which are replaced with dots*/
+    char dot_tmp[LV_LABEL_DOT_NUM + 10];	/*Store character which are replaced with dots*/
     uint16_t dot_end;			/*The text end in dot mode*/
 }lv_label_ext_t;
         

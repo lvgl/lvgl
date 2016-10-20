@@ -392,6 +392,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
     /* Truncate the original mask to the coordinates of the parent
      * because the parent and its children are visible only here */
     area_t obj_mask;
+    area_t obj_ext_mask;
     area_t obj_area;
     cord_t ext_size = obj->ext_size;
     lv_obj_get_cords(obj, &obj_area);
@@ -399,41 +400,46 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
     obj_area.y1 -= ext_size;
     obj_area.x2 += ext_size;
     obj_area.y2 += ext_size;
-    union_ok = area_union(&obj_mask, mask_ori_p, &obj_area);
+    union_ok = area_union(&obj_ext_mask, mask_ori_p, &obj_area);
     
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
 
         /* Redraw the object */    
         if(obj->opa != OPA_TRANSP && LV_SA(obj, lv_objs_t)->transp == 0) {
-            obj->design_f(obj, &obj_mask, LV_DESIGN_DRAW_MAIN);
+            obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
         }
 
-        area_t mask_child; /*Mask from obj and its child*/
-        lv_obj_t * child_p;    
-    	area_t child_area;
-        LL_READ_BACK(obj->child_ll, child_p)
-        {   
-			lv_obj_get_cords(child_p, &child_area);
-			ext_size = child_p->ext_size;
-			child_area.x1 -= ext_size;
-			child_area.y1 -= ext_size;
-			child_area.x2 += ext_size;
-			child_area.y2 += ext_size;
-            /* Get the union (common parts) of original mask (from obj)
-             * and its child */
-            union_ok = area_union(&mask_child, &obj_mask, &child_area);
+        /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
+        lv_obj_get_cords(obj, &obj_area);
+        union_ok = area_union(&obj_mask, mask_ori_p, &obj_area);
+        if(union_ok != false) {
+			area_t mask_child; /*Mask from obj and its child*/
+			lv_obj_t * child_p;
+			area_t child_area;
+			LL_READ_BACK(obj->child_ll, child_p)
+			{
+				lv_obj_get_cords(child_p, &child_area);
+				ext_size = child_p->ext_size;
+				child_area.x1 -= ext_size;
+				child_area.y1 -= ext_size;
+				child_area.x2 += ext_size;
+				child_area.y2 += ext_size;
+				/* Get the union (common parts) of original mask (from obj)
+				 * and its child */
+				union_ok = area_union(&mask_child, &obj_mask, &child_area);
 
-            /*If the parent and the child has common area then refresh the child */        
-            if(union_ok) {
-                /*Refresh the next children*/
-                lv_refr_obj(child_p, &mask_child);
-            }
+				/*If the parent and the child has common area then refresh the child */
+				if(union_ok) {
+					/*Refresh the next children*/
+					lv_refr_obj(child_p, &mask_child);
+				}
+			}
         }
 
-        /* If all the children are redrawn call make 'post draw' design */
+        /* If all the children are redrawn make 'post draw' design */
 		if(obj->opa != OPA_TRANSP && LV_SA(obj, lv_objs_t)->transp == 0) {
-		  obj->design_f(obj, &obj_mask, LV_DESIGN_DRAW_POST);
+		  obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
 		}
     }
 }

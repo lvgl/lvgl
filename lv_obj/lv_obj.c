@@ -40,12 +40,6 @@ lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
 lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
 lv_objs_t lv_objs_transp = {.transp = 1};
 
-anim_path_t anim_path_lin[] =
-		{64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
-		 96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
-		 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
-		 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192};
-
 /**********************
  *      MACROS
  **********************/
@@ -283,6 +277,9 @@ void lv_obj_del(lv_obj_t * obj)
         i = i_next;
     }
     
+    /*Remove the animations from this object*/
+    anim_del(obj, NULL);
+
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) { /*It is a screen*/
@@ -1014,6 +1011,11 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
 	a.time = time;
 	a.act_time = (int32_t)-delay;
 	a.end_cb = (void(*)(void*))cb;
+	a.path = anim_get_path(ANIM_PATH_LIN);
+	a.playback_pause = 0;
+	a.repeat_pause = 0;
+	a.playback = 0;
+	a.repeat = 0;
 
 	/*Init to ANIM_IN*/
 	switch(type) {
@@ -1021,43 +1023,36 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
 			a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
 			a.start = -lv_obj_get_width(obj);
 			a.end = lv_obj_get_x(obj);
-			a.path_p = anim_path_lin;
 			break;
 		case LV_ANIM_FLOAT_RIGHT:
 			a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
 			a.start = lv_obj_get_width(par);
 			a.end = lv_obj_get_x(obj);
-			a.path_p = anim_path_lin;
 			break;
 		case LV_ANIM_FLOAT_TOP:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_y;
 			a.start = -lv_obj_get_height(obj);
 			a.end = lv_obj_get_y(obj);
-			a.path_p = anim_path_lin;
 			break;
 		case LV_ANIM_FLOAT_BOTTOM:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_y;
 			a.start = lv_obj_get_height(par);
 			a.end = lv_obj_get_y(obj);
-			a.path_p = anim_path_lin;
 			break;
 		case LV_ANIM_FADE:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_opar;
 			a.start = OPA_TRANSP;
 			a.end = OPA_COVER;
-			a.path_p = anim_path_lin;
 			break;
 		case LV_ANIM_GROW_H:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_width;
 			a.start = 0;
 			a.end = lv_obj_get_width(obj);
-			a.path_p = anim_path_lin;
 			break;
 		case LV_ANIM_GROW_V:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_height;
 			a.start = 0;
 			a.end = lv_obj_get_height(obj);
-			a.path_p = anim_path_lin;
 			break;
 		default:
 			break;

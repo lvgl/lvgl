@@ -36,6 +36,12 @@ static void anim_ready_handler(anim_t * a);
 static ll_dsc_t anim_ll;
 static uint32_t last_task_run;
 
+static anim_path_t anim_path_lin[] =
+		{64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
+		 96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
+		 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+		 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192};
+
 /**********************
  *      MACROS
  **********************/
@@ -72,7 +78,70 @@ void anim_create(anim_t * anim_p)
 	new_anim->fp(new_anim->var, new_anim->start);
 }
 
+/**
+ * Delete an animation for a variable with a given animatior function
+ * @param var pointer to variable
+ * @param fp a function pointer which is animating 'var',
+ *           or NULL to ignore it and delete all animation with 'var
+ * @return true: at least 1 animation is deleted, false: no animation is deleted
+ */
+bool anim_del(void * var, anim_fp_t fp)
+{
+	bool del = false;
+	anim_t * a;
+	anim_t * a_next;
+	a = ll_get_head(&anim_ll);
+	while(a != NULL) {
+		/*'a' might be deleted, so get the next object while 'a' is valid*/
+		a_next = ll_get_next(&anim_ll, a);
 
+		if(a->var == var && (a->fp == fp || fp == NULL)) {
+			ll_rem(&anim_ll, a);
+			dm_free(a);
+			del = true;
+		}
+
+		a = a_next;
+	}
+
+	return del;
+}
+
+/**
+ * Calculate the time of an animation with a given speed and the start and end values
+ * @param speed speed of animation in unit/sec
+ * @param start start value of the animation
+ * @param end end value of the animation
+ * @return the required time [ms] for the animation with the given parameters
+ */
+uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
+{
+	int32_t d = abs((int32_t) start - end);
+	uint16_t time = (int32_t)((int32_t)(d * 1000) / speed);
+
+	if(time == 0) {
+		time++;
+	}
+
+	return time;
+}
+
+/**
+ * Get a predefine animation path
+ * @param name name of the path from 'anim_path_name_t'
+ * @return pointer to the path array
+ */
+anim_path_t * anim_get_path(anim_path_name_t name)
+{
+	switch (name) {
+		case ANIM_PATH_LIN:
+			return anim_path_lin;
+			break;
+		default:
+			return NULL;
+			break;
+	}
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -98,12 +167,15 @@ static void anim_task (void)
 
 			/* Get the index of the path array based on the elapsed time*/
 			uint8_t path_i;
-			path_i = a->act_time * (ANIM_PATH_LENGTH - 1) / a->time;
-
+			if(a->time != 0) {
+				path_i = a->act_time * (ANIM_PATH_LENGTH - 1) / a->time;
+			} else {
+				path_i = ANIM_PATH_LENGTH - 1;
+			}
 			/* Get the new value which will be proportional to the current element of 'path_p'
 			 * and the 'start' and 'end' values*/
 			int32_t new_val;
-			new_val =  (int32_t)(a->path_p[path_i] - ANIM_PATH_START) * (a->end - a->start);
+			new_val =  (int32_t)(a->path[path_i] - ANIM_PATH_START) * (a->end - a->start);
 			new_val = new_val >> ANIM_PATH_NORM_SHIFT;
 			new_val += a->start;
 
@@ -143,9 +215,12 @@ static void anim_ready_handler(anim_t * a)
 	}
 	/*If the animation is not deleted then restart it*/
 	else {
-		a->act_time = 0;	/*Restart the animation*/
+		a->act_time = - a->repeat_pause;	/*Restart the animation*/
 		/*Swap the start and end values in play back mode*/
 		if(a->playback != 0) {
+			/*If now turning back use the 'playback_pause*/
+			if(a->playback_now == 0) a->act_time = - a->playback_pause;
+
 			/*Toggle the play back state*/
 			a->playback_now = a->playback_now == 0 ? 1: 0;
 			/*Swap the start and end values*/
