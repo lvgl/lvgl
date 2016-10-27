@@ -120,7 +120,7 @@ bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param)
     	case LV_SIGNAL_STYLE_CHG: /*Recalculate the padding if the style changed*/
         	lv_rect_refr_layout(rect);
         	lv_rect_refr_autofit(rect);
-        	lv_obj_ext_size_refr(rect);
+        	lv_obj_refr_ext_size(rect);
         	break;
         case LV_SIGNAL_CHILD_CHG:
         	lv_rect_refr_layout(rect);

@@ -118,7 +118,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, b
 	/*Create a list element with the image an the text*/
 	lv_obj_t * liste;
 	liste = lv_btn_create(list, NULL);
-	lv_obj_set_style(liste, &lists->liste_btn);
+	lv_obj_set_style(liste, &lists->liste_btns);
 	lv_btn_set_rel_action(liste, rel_action);
 	lv_page_glue_obj(liste, true);
 	lv_rect_set_layout(liste, lists->liste_layout);
@@ -127,14 +127,14 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, b
 	if(img_fn != NULL) {
 		lv_obj_t * img = lv_img_create(liste, NULL);
 		lv_img_set_file(img, img_fn);
-		lv_obj_set_style(img, &lists->liste_img);
+		lv_obj_set_style(img, &lists->liste_imgs);
 		lv_obj_set_click(img, false);
 	}
 
 	if(txt != NULL) {
 		lv_obj_t * label = lv_label_create(liste, NULL);
 		lv_label_set_text(label, txt);
-		lv_obj_set_style(label,&lists->liste_label);
+		lv_obj_set_style(label,&lists->liste_labels);
 		lv_obj_set_click(label, false);
 	}
 
@@ -143,8 +143,8 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, b
 		/*Now the width will be adjusted*/
 		lv_rect_set_fit(liste, false, true);
 		cord_t w = lv_obj_get_width(list);
-		w -= lists->bg_page.bg_rects.hpad * 2;
-		w -= lists->bg_page.scrable_rects.hpad * 2;
+		w -= lists->bg_pages.bg_rects.hpad * 2;
+		w -= lists->bg_pages.scrable_rects.hpad * 2;
 		lv_obj_set_width(liste, w);
 	} else if(ext->fit == LV_LIST_FIT_LONGEST) {
 		/*In this case the width will be adjusted*/
@@ -322,32 +322,32 @@ static bool lv_list_design(lv_obj_t * list, const area_t * mask, lv_design_mode_
 static void lv_lists_init(void)
 {
 	/*Default style*/
-	lv_pages_get(LV_PAGES_TRANSP, &lv_lists_def.bg_page);
-	lv_lists_def.bg_page.bg_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_def.bg_page.bg_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_def.bg_page.bg_rects.opad = 0 * LV_STYLE_MULT;
+	lv_pages_get(LV_PAGES_TRANSP, &lv_lists_def.bg_pages);
+	lv_lists_def.bg_pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.bg_rects.opad = 0 * LV_STYLE_MULT;
 
-	lv_lists_def.bg_page.scrable_rects.vpad = 10 * LV_STYLE_MULT;
-	lv_lists_def.bg_page.scrable_rects.hpad = 10 * LV_STYLE_MULT;
-	lv_lists_def.bg_page.scrable_rects.opad = 5 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.scrable_rects.vpad = 10 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.scrable_rects.hpad = 10 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.scrable_rects.opad = 5 * LV_STYLE_MULT;
 
-	lv_btns_get(LV_BTNS_DEF, &lv_lists_def.liste_btn); /*List element button style*/
+	lv_btns_get(LV_BTNS_DEF, &lv_lists_def.liste_btns); /*List element button style*/
 
-	lv_labels_get(LV_LABELS_BTN, &lv_lists_def.liste_label); /*List element label style*/
-	lv_lists_def.liste_label.mid = 0;
+	lv_labels_get(LV_LABELS_BTN, &lv_lists_def.liste_labels); /*List element label style*/
+	lv_lists_def.liste_labels.mid = 0;
 
-	lv_imgs_get(LV_IMGS_DEF, &lv_lists_def.liste_img); /*Lit element image style*/
+	lv_imgs_get(LV_IMGS_DEF, &lv_lists_def.liste_imgs); /*Lit element image style*/
 
 	lv_lists_def.liste_layout = LV_RECT_LAYOUT_ROW_M;
 
 	memcpy(&lv_lists_tight, &lv_lists_def, sizeof(lv_lists_t));
-	lv_lists_tight.bg_page.bg_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_page.bg_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_page.bg_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.bg_rects.opad = 0 * LV_STYLE_MULT;
 
-	lv_lists_tight.bg_page.scrable_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_page.scrable_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_page.scrable_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.scrable_rects.vpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.scrable_rects.hpad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.scrable_rects.opad = 0 * LV_STYLE_MULT;
 
 }
 #endif

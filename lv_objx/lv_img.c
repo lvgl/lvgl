@@ -165,7 +165,7 @@ fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
 {
 	const lv_img_raw_header_t * raw_p = (lv_img_raw_header_t *) data;
 	fs_res_t res;
-	res = ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(color_t));
+	res = ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(color_t) + sizeof(lv_img_raw_header_t));
 
 	return res;
 }

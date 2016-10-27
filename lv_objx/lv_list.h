@@ -29,11 +29,11 @@
 /*Style of list*/
 typedef struct
 {
-	lv_pages_t bg_page; /*Style of ancestor*/
+	lv_pages_t bg_pages; /*Style of ancestor*/
 	/*New style element for this type */
-	lv_btns_t liste_btn;
-	lv_labels_t liste_label;
-	lv_imgs_t liste_img;
+	lv_btns_t liste_btns;
+	lv_labels_t liste_labels;
+	lv_imgs_t liste_imgs;
 	lv_rect_layout_t liste_layout;
 }lv_lists_t;
 

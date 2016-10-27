@@ -956,7 +956,7 @@ void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size)
  * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object
  * @param obj pointer to an object
  */
-void lv_obj_ext_size_refr(lv_obj_t * obj)
+void lv_obj_refr_ext_size(lv_obj_t * obj)
 {
 	obj->ext_size = 0;
 	obj->signal_f(obj, LV_SIGNAL_REFR_EXT_SIZE, NULL);
