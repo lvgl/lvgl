@@ -3,8 +3,8 @@
  * 
  */
 
-#ifndef _2D_H
-#define _2D_H
+#ifndef AREA_H
+#define AREA_H
 
 /*********************
  *      INCLUDES

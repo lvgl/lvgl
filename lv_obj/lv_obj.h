@@ -1,5 +1,5 @@
 /**
- * @file lv_base_obj.h
+ * @file lv_obj.h
  * 
  */
 
@@ -250,6 +250,7 @@ lv_signal_f_t  lv_obj_get_signal_f(lv_obj_t * obj);
 void * lv_obj_get_ext(lv_obj_t * obj);
 void * lv_obj_get_style(lv_obj_t * obj);
 uint8_t lv_obj_get_free_num(lv_obj_t * obj);
+void * lv_obj_get_free_p(lv_obj_t * obj);
 
 lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p);
 
