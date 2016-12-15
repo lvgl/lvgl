@@ -35,9 +35,9 @@ typedef enum
 /*Style of chart background*/
 typedef struct
 {
-	lv_rects_t bg; /*Style of ancestor*/
+	lv_rects_t bg_rects; /*Style of ancestor*/
 	/*New style element for this type */
-	lv_lines_t div_line;
+	lv_lines_t div_lines;
 	uint8_t div_line_opa;		/*Percentage of obj. opacity*/
 	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col color */
 	uint16_t width;				/*Line width or point radius*/
@@ -54,7 +54,7 @@ typedef enum
 /*Data of chart background*/
 typedef struct
 {
-	lv_rect_ext_t bg;	/*Ext. of ancestor*/
+	lv_rect_ext_t bg_rects;	/*Ext. of ancestor*/
 	/*New data for this type */
 	cord_t ymin;
 	cord_t ymax;

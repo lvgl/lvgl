@@ -396,7 +396,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 		p1.y = (int32_t)((int32_t)h * div_i) / (ext->hdiv_num + 1);
 		p1.y +=  y_ofs;
 		p2.y = p1.y;
-		lv_draw_line(&p1, &p2, mask, &style->div_line, div_opa);
+		lv_draw_line(&p1, &p2, mask, &style->div_lines, div_opa);
 	}
 
 	p1.y = 0 + y_ofs;
@@ -405,7 +405,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 		p1.x = (int32_t)((int32_t)w * div_i) / (ext->vdiv_num + 1);
 		p1.x +=  x_ofs;
 		p2.x = p1.x;
-		lv_draw_line(&p1, &p2, mask, &style->div_line, div_opa);
+		lv_draw_line(&p1, &p2, mask, &style->div_lines, div_opa);
 	}
 }
 
@@ -575,15 +575,15 @@ static void lv_charts_init(void)
 {
 	/*Default style*/
 	/* Background */
-	lv_rects_get(LV_RECTS_DEF, &lv_charts_def.bg);
-	lv_charts_def.bg.objs.color = COLOR_MAKE(0x60, 0x80, 0xA0);
-	lv_charts_def.bg.gcolor = COLOR_WHITE;
-	lv_charts_def.bg.bcolor = COLOR_BLACK;
+	lv_rects_get(LV_RECTS_DEF, &lv_charts_def.bg_rects);
+	lv_charts_def.bg_rects.objs.color = COLOR_MAKE(0x60, 0x80, 0xA0);
+	lv_charts_def.bg_rects.gcolor = COLOR_WHITE;
+	lv_charts_def.bg_rects.bcolor = COLOR_BLACK;
 
 	/* Div. line */
-	lv_lines_get(LV_LINES_DECOR, &lv_charts_def.div_line);
-	lv_charts_def.div_line.width = 1 * LV_STYLE_MULT;
-	lv_charts_def.div_line.objs.color = COLOR_BLACK;
+	lv_lines_get(LV_LINES_DECOR, &lv_charts_def.div_lines);
+	lv_charts_def.div_lines.width = 1 * LV_STYLE_MULT;
+	lv_charts_def.div_lines.objs.color = COLOR_BLACK;
 	lv_charts_def.div_line_opa = OPA_COVER;
 
 	/*Data lines*/

@@ -31,13 +31,13 @@ typedef enum
 	LV_RECT_LAYOUT_COL_L,	/*Column left align*/
 	LV_RECT_LAYOUT_COL_M,	/*Column middle align*/
 	LV_RECT_LAYOUT_COL_R,	/*Column right align*/
-	LV_RECT_LAYOUT_ROW_T,	/*Row row left align*/
-	LV_RECT_LAYOUT_ROW_M,	/*Row row middle align*/
-	LV_RECT_LAYOUT_ROW_B,	/*Row row right align*/
-	LV_RECT_LAYOUT_GRID,
+	LV_RECT_LAYOUT_ROW_T,	/*Row left align*/
+	LV_RECT_LAYOUT_ROW_M,	/*Row middle align*/
+	LV_RECT_LAYOUT_ROW_B,	/*Row right align*/
+	LV_RECT_LAYOUT_GRID,	/*Put as many object as possible in row and begin a new row*/
 }lv_rect_layout_t;
 
-/*Style of template*/
+/*Style of rectangle*/
 typedef struct
 {
 	lv_objs_t objs;	/*Style of ancestor*/
@@ -45,17 +45,17 @@ typedef struct
     color_t gcolor; /*Gradient color*/
     color_t bcolor;	/*Border color*/
     color_t lcolor;	/*Light color*/
-    uint16_t bwidth;
-    uint16_t round;
-    cord_t hpad;
-    cord_t vpad;
-    cord_t opad;
+    uint16_t bwidth;/*Border width*/
+    uint16_t round; /*Radius on the corners*/
+    cord_t hpad;	/*Horizontal padding when horizontal fit is enabled*/
+    cord_t vpad;	/*Vertical padding when vertical fit is enabled*/
+    cord_t opad;	/*Object padding with fit*/
     cord_t light;	/*Light size*/
-    uint8_t bopa;
-    uint8_t empty :1;
+    uint8_t bopa;	/*Border opacity*/
+    uint8_t empty :1; /*1: Do not draw the body of the rectangle*/
 }lv_rects_t;
 
-/*Built-in styles of template*/
+/*Built-in styles of rectangle*/
 typedef enum
 {
 	LV_RECTS_DEF,

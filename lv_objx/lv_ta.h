@@ -19,6 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_TA_CUR_LAST (0x7FFF) /*Put the cursor after the last character*/
 
 /**********************
  *      TYPEDEFS
@@ -29,7 +30,7 @@ typedef struct
 {
 	lv_pages_t pages;	/*Style of ancestor*/
 	/*New style element for this type */
-	lv_labels_t label;
+	lv_labels_t labels;
 	color_t cursor_color;
 	cord_t cursor_width;
 	uint8_t cursor_show :1;
@@ -49,6 +50,7 @@ typedef struct
 	lv_obj_t * label;
 	cord_t cursor_valid_x;
 	uint16_t cursor_pos;
+	uint8_t cur_hide :1;	/*Indicates that the cursor is visible now or not*/
 }lv_ta_ext_t;
 
 /**********************
@@ -60,8 +62,9 @@ lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy);
 
 void lv_ta_add_char(lv_obj_t * ta, char c);
 void lv_ta_add_text(lv_obj_t * ta, const char * txt);
+void lv_ta_set_text(lv_obj_t * ta, const char * txt);
 void lv_ta_del(lv_obj_t * ta);
-void lv_ta_set_cursor_pos(lv_obj_t * ta, uint16_t pos);
+void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos);
 void lv_ta_cursor_right	(lv_obj_t * ta);
 void lv_ta_cursor_left(lv_obj_t * taj);
 void lv_ta_cursor_down(lv_obj_t * ta);

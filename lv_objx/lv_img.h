@@ -44,20 +44,20 @@ typedef struct
 {
 	/*No ext. because inherited from the base object*/ /*Ext. of ancestor*/
 	/*New data for this type */
-    char* fn;
-    cord_t w;
-    cord_t h;
-    uint8_t auto_size 	:1;
+    char* fn;	/*Image file name. E.g. "U:/my_image"*/
+    cord_t w;	/*Width of the image (if LV_UPSCALE_MAP != 0 then multiplied by LV_DOWNSCALE)*/
+    cord_t h;	/*Height of the image (if LV_UPSCALE_MAP != 0 then multiplied by LV_DOWNSCALE)*/
+    uint8_t auto_size 	:1;		/*1: automatically set the object size to the image size*/
     uint8_t transp 	    :1; 	/*Transp. bit in the images header (library handles this)*/
 }lv_img_ext_t;
 
 /*Image header*/
 typedef struct
 {
-	uint16_t w;
-	uint16_t h;
-	uint16_t cd;		/*Color depth*/
-	uint16_t transp :1;	/*Do not draw LV_IMG_TRANSP_COLOR pixels*/
+	uint16_t w;			/*Width of the image map*/
+	uint16_t h;     	/*Height of the image map*/
+	uint16_t cd;		/*Color depth (8/16 or 24)*/
+	uint16_t transp :1;	/*1: Do not draw LV_IMG_TRANSP_COLOR pixels*/
 }lv_img_raw_header_t;
 
 

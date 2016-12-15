@@ -11,12 +11,16 @@
 #if USE_LV_TA != 0
 
 #include "lv_ta.h"
+#include "lvgl/lv_misc/anim.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_TA_MAX_LENGTH	512
+#define LV_TA_DEF_WIDTH		120
+#define LV_TA_DEF_HEIGHT	80
+#define LV_TA_CUR_BLINK_TIME 400	/*ms*/
 
 /**********************
  *      TYPEDEFS
@@ -27,6 +31,7 @@
  **********************/
 static bool lv_ta_design(lv_obj_t * ta, const area_t * mask, lv_design_mode_t mode);
 static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_design_mode_t mode);
+static void lv_ta_hide_cursor(lv_obj_t * ta, uint8_t hide);
 static void lv_ta_save_valid_cursor_x(lv_obj_t * ta);
 static void lv_tas_init(void);
 
@@ -75,6 +80,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
 
     ext->cursor_valid_x = 0;
     ext->cursor_pos = 0;
+    ext->cur_hide = 0;
 
     /*Init the new text area object*/
     if(copy == NULL) {
@@ -82,12 +88,14 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	if(scrling_design_f == NULL) {
     		scrling_design_f = lv_obj_get_design_f(ext->page.scrolling);
     	}
+
     	lv_obj_set_design_f(ext->page.scrolling, lv_ta_scrling_design);
     	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
-    	lv_label_set_text(ext->label, "abc aaaa bbbb ccc\n123\nABC\nxyz\nwww\n007\nalma\n:)\naaaaaa");
+    	lv_label_set_text(ext->label, "Text area");
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, true);
     	lv_obj_set_style(new_ta, lv_tas_get(LV_TAS_DEF, NULL));
+    	lv_obj_set_size_us(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
     }
     /*Copy an existing object*/
     else {
@@ -100,6 +108,20 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_obj_set_style(new_ta, lv_obj_get_style(copy));
     }
     
+    /*Create a cursor blinker animation*/
+    anim_t a;
+    a.var = new_ta;
+    a.fp = (anim_fp_t)lv_ta_hide_cursor;
+    a.time = LV_TA_CUR_BLINK_TIME;
+    a.act_time = 0;
+    a.end_cb = NULL;
+    a.repeat = 1;
+    a.repeat_pause = 0;
+    a.playback = 1;
+    a.playback_pause = 0;
+    a.path = anim_get_path(ANIM_PATH_STEP);
+    anim_create(&a);
+
     return new_ta;
 }
 
@@ -124,10 +146,11 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     	lv_tas_t * style = lv_obj_get_style(ta);
     	switch(sign) {
     		case LV_SIGNAL_CLEANUP:
-    			lv_obj_del(ext->label);
+    			/* Nothing to clean up.
+    			 * (The created label will be deleted automatically) */
     			break;
     		case LV_SIGNAL_STYLE_CHG:
-    			lv_obj_set_style(ext->label, &style->label);
+    			lv_obj_set_style(ext->label, &style->labels);
     	    	lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
     	    			(style->pages.bg_rects.hpad + style->pages.scrable_rects.hpad));
     	    	lv_label_set_text(ext->label, NULL);
@@ -207,6 +230,21 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 }
 
 /**
+ * Set the text os a text area
+ * @param ta pointer to a text area
+ * @param txt pointer to the text
+ */
+void lv_ta_set_text(lv_obj_t * ta, const char * txt)
+{
+	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+	lv_label_set_text(ext->label, txt);
+	lv_ta_set_cursor_pos(ta, LV_TA_CUR_LAST);
+
+	/*It is a valid x step so save it*/
+	lv_ta_save_valid_cursor_x(ta);
+}
+
+/**
  * Delete a the left character from the current cursor position
  * @param ta pointer to a text area object
  */
@@ -234,17 +272,22 @@ void lv_ta_del(lv_obj_t * ta)
 	lv_ta_save_valid_cursor_x(ta);
 }
 
+
 /**
  * Set the cursor position
  * @param obj pointer to a text area object
  * @param pos the new cursor position in character index
+ *             < 0 : index from the end of the text
+ *             LV_TA_CUR_LAST: go after the last character
  */
-void lv_ta_set_cursor_pos(lv_obj_t * ta, uint16_t pos)
+void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 	uint16_t txt_len = strlen(lv_label_get_text(ext->label));
 
-	if(pos > txt_len) pos = txt_len;
+	if(pos < 0) pos = txt_len + pos;
+
+	if(pos > txt_len || pos == LV_TA_CUR_LAST) pos = txt_len;
 
 	ext->cursor_pos = pos;
 
@@ -252,7 +295,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, uint16_t pos)
 	lv_obj_t * label_par = lv_obj_get_parent(ext->label);
 	point_t cur_pos;
 	lv_tas_t * style = lv_obj_get_style(ta);
-	const font_t * font_p = font_get(style->label.font);
+	const font_t * font_p = font_get(style->labels.font);
 	lv_label_get_letter_pos(ext->label, pos, &cur_pos);
 
 	/*Check the top*/
@@ -462,7 +505,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
 		lv_tas_t * ta_style = lv_obj_get_style(ta);
 
-		if(ta_style->cursor_show != 0) {
+		if(ta_style->cursor_show != 0 && ta_ext->cur_hide == 0) {
 			uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
 			point_t letter_pos;
 			lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
@@ -487,6 +530,21 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 	return true;
 }
 
+
+/**
+ * Set the cursor visibility to make a blinking cursor
+ * @param ta pointer to a text area
+ * @param hide 1: hide the cursor, 0: draw it
+ */
+static void lv_ta_hide_cursor(lv_obj_t * ta, uint8_t hide)
+{
+	lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
+	ta_ext->cur_hide = hide  == 0 ? 0 : 1;
+
+	lv_obj_inv(ta);
+
+}
+
 /**
  * Save the cursor x position as valid. It is important when jumping up/down to a shorter line
  * @param ta pointer to a text area object
@@ -507,11 +565,11 @@ static void lv_tas_init(void)
 	/*Default style*/
 	lv_pages_get(LV_PAGES_DEF, &lv_tas_def.pages);
 
-	lv_labels_get(LV_LABELS_TXT, &lv_tas_def.label);
-	lv_tas_def.label.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
+	lv_labels_get(LV_LABELS_TXT, &lv_tas_def.labels);
+	lv_tas_def.labels.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
 
 	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
-	lv_tas_def.cursor_width = 2 * LV_STYLE_MULT;	/*>1 px for visible cursor*/
+	lv_tas_def.cursor_width = 1 * LV_STYLE_MULT;	/*>=1 px for visible cursor*/
 	lv_tas_def.cursor_show = 1;
 }
 #endif

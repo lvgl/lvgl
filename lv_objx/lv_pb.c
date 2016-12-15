@@ -73,8 +73,8 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new progress bar object*/
     if(copy == NULL) {
-    	ext->format = dm_alloc(strlen(LV_PB_DEF_FORMAT) + 1);
-    	strcpy(ext->format, LV_PB_DEF_FORMAT);
+    	ext->format_str = dm_alloc(strlen(LV_PB_DEF_FORMAT) + 1);
+    	strcpy(ext->format_str, LV_PB_DEF_FORMAT);
     	ext->min_value = 0;
     	ext->max_value = 100;
     	ext->act_value = 0;
@@ -89,8 +89,8 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_pb_set_value(new_pb, ext->act_value);
     } else {
     	lv_pb_ext_t * ext_copy = lv_obj_get_ext(copy);
-    	ext->format = dm_alloc(strlen(ext_copy->format) + 1);
-		strcpy(ext->format, ext_copy->format);
+    	ext->format_str = dm_alloc(strlen(ext_copy->format_str) + 1);
+		strcpy(ext->format_str, ext_copy->format_str);
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
 		ext->act_value = ext_copy->act_value;
@@ -122,7 +122,7 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
     		lv_pb_set_value(pb, ext->act_value);
     		break;
     	case LV_SIGNAL_CLEANUP:
-    		dm_free(ext->format);
+    		dm_free(ext->format_str);
     		break;
     		default:
     			break;
@@ -147,7 +147,7 @@ void lv_pb_set_value(lv_obj_t * pb, uint16_t value)
 	ext->act_value = value > ext->max_value ? ext->max_value : value;
 
 	char buf[LV_PB_TXT_MAX_LENGTH];
-	sprintf(buf, ext->format, ext->act_value);
+	sprintf(buf, ext->format_str, ext->act_value);
 	lv_label_set_text(lv_obj_get_child(pb, NULL), buf);
 
 	lv_obj_inv(pb);
@@ -172,16 +172,16 @@ void lv_pb_set_min_max_value(lv_obj_t * pb, uint16_t min, uint16_t max)
 }
 
 /**
- * Set format string  for the label of the progress bar
+ * Set format string for the label of the progress bar
  * @param pb pointer to progress bar object
  * @param format a printf-like format string with one number (e.g. "Loading (%d)")
  */
-void lv_pb_set_format(lv_obj_t * pb, const char * format)
+void lv_pb_set_format_str(lv_obj_t * pb, const char * format)
 {
 	lv_pb_ext_t * ext = lv_obj_get_ext(pb);
-	dm_free(ext->format);
-	ext->format = dm_alloc(strlen(format) + 1);
-	strcpy(ext->format, format);
+	dm_free(ext->format_str);
+	ext->format_str = dm_alloc(strlen(format) + 1);
+	strcpy(ext->format_str, format);
 	lv_pb_set_value(pb, ext->act_value);
 }
 

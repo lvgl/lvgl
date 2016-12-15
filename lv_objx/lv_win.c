@@ -82,7 +82,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
     	/*Create a holder for the control buttons*/
     	ext->ctrl_holder = lv_rect_create(ext->header, NULL);
-    	lv_rect_set_fit(ext->ctrl_holder, true, true);
+    	lv_rect_set_fit(ext->ctrl_holder, true, false);
     	lv_rect_set_layout(ext->ctrl_holder, LV_RECT_LAYOUT_ROW_M);
 
     	/*Create a page for the content*/
@@ -229,6 +229,32 @@ void lv_win_set_title(lv_obj_t * win, const char * title)
 /*=====================
  * Getter functions
  *====================*/
+/**
+ * Get the title of a window
+ * @param win pointer to a window object
+ * @return title string of the window
+ */
+const char * lv_win_get_title(lv_obj_t * win)
+{
+	lv_win_ext_t * ext = lv_obj_get_ext(win);
+
+	return ext->title;
+}
+
+/**
+ * Get the pointer of a widow from one of  its control button.
+ * It is useful in the action of the control buttons where only button is known.
+ * @param ctrl_btn pointer to a control button of a window
+ * @return pointer to the window of 'ctrl_btn'
+ */
+lv_obj_t * lv_win_get_from_ctrl_btn(lv_obj_t * ctrl_btn)
+{
+	lv_obj_t * ctrl_holder = lv_obj_get_parent(ctrl_btn);
+	lv_obj_t * header = lv_obj_get_parent(ctrl_holder);
+	lv_obj_t * win = lv_obj_get_parent(header);
+
+	return win;
+}
 
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable
@@ -369,6 +395,7 @@ static void lv_win_realign(lv_obj_t * win)
 		cbtn = lv_obj_get_child(ext->ctrl_holder, cbtn);
 	}
 
+	lv_obj_set_height(ext->ctrl_holder, style->ctrl_btn_h + 2 * style->ctrl_holder.vpad * 2);
 	lv_obj_set_width(ext->header, lv_obj_get_width(win));
 	lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
 

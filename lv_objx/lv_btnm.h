@@ -4,12 +4,6 @@
  */
 
 
-/*Search an replace: button matrix -> object normal name with lower case (e.g. button, label etc.)
- * 					 btnm -> object short name with lower case(e.g. btn, label etc)
- *                   BTNM -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 #ifndef LV_BTNM_H
 #define LV_BTNM_H
 
@@ -35,10 +29,10 @@
 /*Style of button matrix*/
 typedef struct
 {
-	lv_rects_t bg;	/*Style of ancestor*/
+	lv_rects_t rects;	/*Style of ancestor*/
 	/*New style element for this type */
-	lv_btns_t btn;
-	lv_labels_t btn_label;
+	lv_btns_t btns;		/*Style of the buttons*/
+	lv_labels_t labels; /*Style of the labels on the buttons*/
 }lv_btnms_t;
 
 /*Built-in styles of button matrix*/
@@ -48,13 +42,14 @@ typedef enum
 }lv_btnms_builtin_t;
 
 /* Type of callback function which is called when a button is released
- * Parameters: button matrix, released object, button index in the map string*/
-typedef bool (*lv_btnm_callback_t) (lv_obj_t *, lv_obj_t *, uint16_t);
+ * Parameters: button matrix, released object, button index in the map string
+ * return false: the released button or the button matrix is deleted else true*/
+typedef bool (*lv_btnm_callback_t) (lv_obj_t *, lv_obj_t *, uint8_t);
 
 /*Data of button matrix*/
 typedef struct
 {
-	lv_rect_ext_t bg;	/*Ext. of ancestor*/
+	lv_rect_ext_t rect;	/*Ext. of ancestor*/
 	/*New data for this type */
 	const char ** map_p;	/*Pointer to the current map*/
 	lv_btnm_callback_t cb;

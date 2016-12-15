@@ -69,7 +69,7 @@ typedef struct
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
 void lv_page_glue_obj(lv_obj_t * page, bool glue);
 lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * copy);
-bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
+bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void  * param);
 
 /**********************
  *      MACROS

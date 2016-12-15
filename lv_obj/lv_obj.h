@@ -170,7 +170,7 @@ typedef enum
 void lv_init(void);
 void lv_obj_inv(lv_obj_t * obj);
 void lv_obj_refr_style(lv_obj_t * obj);
-void lv_style_refr_all(void * style_p);
+void lv_style_refr_all(void * style);
 
 /*Create and delete*/
 lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
@@ -199,21 +199,21 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
 void lv_obj_align_us(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
 void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size);
 /*Appearance set*/
-void lv_obj_set_hidden(lv_obj_t * obj, bool hidden_en);
+void lv_obj_set_hidden(lv_obj_t * obj, bool en);
 void lv_obj_set_opa(lv_obj_t * obj, opa_t opa);
 void lv_obj_set_opar(lv_obj_t * obj, opa_t opa);
 /*Attribute set*/
-void lv_obj_set_click(lv_obj_t * obj, bool click_en);
-void lv_obj_set_top(lv_obj_t * obj, bool click_en);
-void lv_obj_set_drag(lv_obj_t * obj, bool drag_en);
-void lv_obj_set_drag_throw(lv_obj_t * obj, bool dragthr_en);
-void lv_obj_set_drag_parent(lv_obj_t * obj, bool dragpar_en);
+void lv_obj_set_click(lv_obj_t * obj, bool en);
+void lv_obj_set_top(lv_obj_t * obj, bool en);
+void lv_obj_set_drag(lv_obj_t * obj, bool en);
+void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
+void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 void lv_obj_set_signal_f(lv_obj_t * obj, lv_signal_f_t fp);
 void lv_obj_set_design_f(lv_obj_t * obj, lv_design_f_t fp);
 /*Other set*/
 void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size);
 void lv_obj_refr_ext_size(lv_obj_t * obj);
-void lv_obj_set_style(lv_obj_t * obj, void * style_p);
+void lv_obj_set_style(lv_obj_t * obj, void * style);
 void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size);
 void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
 void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);

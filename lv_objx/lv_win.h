@@ -71,6 +71,8 @@ lv_wins_t * lv_wins_get(lv_wins_builtin_t style, lv_wins_t * copy);
 lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img, bool (*rel_action)(lv_obj_t *, lv_dispi_t *));
 void lv_win_set_title(lv_obj_t * win, const char * title);
 
+const char * lv_win_get_title(lv_obj_t * win);
+lv_obj_t * lv_win_get_from_ctrl_btn(lv_obj_t * ctrl_btn);
 /**********************
  *      MACROS
  **********************/

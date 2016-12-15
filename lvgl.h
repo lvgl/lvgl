@@ -29,8 +29,8 @@
  *      DEFINES
  *********************/
 #define LVGL_VERSION_MAJOR 1
-#define LVGL_VERSION_MINOR 2
-#define LVGL_VERSION_BUGFIX 4
+#define LVGL_VERSION_MINOR 3
+#define LVGL_VERSION_BUGFIX 1
 
 /**********************
  *      TYPEDEFS

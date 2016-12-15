@@ -80,6 +80,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_cb_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
     	ext->label = lv_label_create(new_cb, copy_ext->label);
+
+        lv_obj_set_style(new_cb, lv_obj_get_style(copy));
     }
 
     lv_obj_align_us(new_cb, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -241,22 +243,27 @@ static void lv_cbs_init(void)
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_REL] = COLOR_SILVER;
 	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
+	lv_cbs_def.bullet.light_en[LV_BTN_STATE_REL] = 0;
 
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_PR] = COLOR_SILVER;
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
 	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK;
+	lv_cbs_def.bullet.light_en[LV_BTN_STATE_PR] = 0;
 
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x10, 0x20, 0x30);
 	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE;
+	lv_cbs_def.bullet.light_en[LV_BTN_STATE_TGL_REL] = 0;
 
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x50, 0x70, 0x90);
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
 	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE;
+	lv_cbs_def.bullet.light_en[LV_BTN_STATE_TGL_PR] = 0;
 
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER;
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
 	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE;
+	lv_cbs_def.bullet.light_en[LV_BTN_STATE_INA] = 0;
 
 	lv_cbs_def.bullet.rects.bwidth = 2 * LV_STYLE_MULT;
 	lv_cbs_def.bullet.rects.bopa = 70;
