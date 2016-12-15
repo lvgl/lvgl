@@ -46,7 +46,7 @@ typedef struct
 	uint16_t act_value;
 	uint16_t min_value;
 	uint16_t max_value;
-	char * format; /*Format string of the label*/
+	char * format_str; /*Format string of the label*/
 }lv_pb_ext_t;
 
 /**********************
@@ -56,7 +56,7 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_pb_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 void lv_pb_set_value(lv_obj_t * obj, uint16_t value);
 void lv_pb_set_min_max_value(lv_obj_t * obj, uint16_t min, uint16_t max);
-void lv_pb_set_format(lv_obj_t * obj, const char * format);
+void lv_pb_set_format_str(lv_obj_t * obj, const char * format);
 uint16_t lv_pb_get_value(lv_obj_t * obj);
 lv_pbs_t * lv_pbs_get(lv_pbs_builtin_t style, lv_pbs_t * copy_p);
 

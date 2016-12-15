@@ -22,6 +22,7 @@
 typedef enum
 {
 	ANIM_PATH_LIN,
+	ANIM_PATH_STEP,
 }anim_path_name_t;
 
 typedef uint8_t anim_path_t;

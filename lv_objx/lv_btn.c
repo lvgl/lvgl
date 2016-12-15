@@ -6,7 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+
+#include <lvgl/lv_misc/area.h>
+#include <lvgl/lv_obj/lv_obj.h>
+#include <misc/others/color.h>
+#include <stdbool.h>
+
 #if USE_LV_BTN != 0
 
 #include <string.h>

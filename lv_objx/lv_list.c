@@ -140,7 +140,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, b
 
 	/*Make the size adjustment*/
 	if(ext->fit == LV_LIST_FIT_HOLDER) {
-		/*Now the width will be adjusted*/
+		/*Now the width will be adjusted (so disable hor. auto fit)*/
 		lv_rect_set_fit(liste, false, true);
 		cord_t w = lv_obj_get_width(list);
 		w -= lists->bg_pages.bg_rects.hpad * 2;

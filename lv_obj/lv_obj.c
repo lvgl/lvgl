@@ -79,7 +79,7 @@ void lv_init(void)
 }
 
 /**
- * Mark the object as invalid therefor it will be redrawn by 'lv_refr_task'
+ * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
  * @param obj pointer to an object
  */
 void lv_obj_inv(lv_obj_t * obj)
@@ -125,14 +125,14 @@ void lv_obj_refr_style(lv_obj_t * obj)
 
 /**
  * Notify all object if a style is modified
- * @param style_p pinter to a style. Only objects with this style will be notified
+ * @param style pinter to a style. Only objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_style_refr_all(void * style_p)
+void lv_style_refr_all(void * style)
 {
     lv_obj_t * i;
     LL_READ(scr_ll, i) {
-        lv_style_refr_core(style_p, i);
+        lv_style_refr_core(style, i);
     }
 }
 
@@ -777,13 +777,13 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
  * @param obj pointer to an object
  * @param style_p pointer to the new style
  */
-void lv_obj_set_style(lv_obj_t * obj, void * style_p)
+void lv_obj_set_style(lv_obj_t * obj, void * style)
 {
 
 	if(obj->style_iso != 0) {
 		dm_free(obj->style_p);
 	}
-    obj->style_p = style_p;
+    obj->style_p = style;
 
     /*Send a style change signal to the object*/
     obj->signal_f(obj, LV_SIGNAL_STYLE_CHG, NULL);
@@ -849,11 +849,11 @@ void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa)
 /**
  * Hide an object. It won't be visible and clickable.
  * @param obj pointer to an object
- * @param hidden_en true: hide the object
+ * @param en true: hide the object
  */
-void lv_obj_set_hidden(lv_obj_t * obj, bool hidden_en)
+void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 {
-    obj->hidden = hidden_en == false ? 0 : 1;
+    obj->hidden = en == false ? 0 : 1;
     
     lv_obj_t * par = lv_obj_get_parent(obj);
     par->signal_f(par, LV_SIGNAL_CHILD_CHG, obj);
@@ -864,11 +864,11 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool hidden_en)
 /**
  * Enable or disable the clicking of an object
  * @param obj pointer to an object
- * @param click_en true: make the object clickable
+ * @param en true: make the object clickable
  */
-void lv_obj_set_click(lv_obj_t * obj, bool click_en)
+void lv_obj_set_click(lv_obj_t * obj, bool en)
 {
-    obj->click_en = (click_en == true ? 1 : 0);
+    obj->click_en = (en == true ? 1 : 0);
     
 }
 
@@ -876,42 +876,42 @@ void lv_obj_set_click(lv_obj_t * obj, bool click_en)
  * Enable to bring this object to the foreground if it
  * or any of its children is clicked
  * @param obj pointer to an object
- * @param top_en true: enable the auto top feature
+ * @param en true: enable the auto top feature
  */
-void lv_obj_set_top(lv_obj_t * obj, bool top_en)
+void lv_obj_set_top(lv_obj_t * obj, bool en)
 {
-    obj->top_en= (top_en == true ? 1 : 0);
+    obj->top_en= (en == true ? 1 : 0);
 }
 
 /**
  * Enable the dragging of an object
  * @param obj pointer to an object
- * @param drag_en true: make the object dragable
+ * @param en true: make the object dragable
  */
-void lv_obj_set_drag(lv_obj_t * obj, bool drag_en)
+void lv_obj_set_drag(lv_obj_t * obj, bool en)
 {
-    obj->drag_en = (drag_en == true ? 1 : 0);
+    obj->drag_en = (en == true ? 1 : 0);
 }
 
 /**
  * Enable the throwing of an object after is is dragged
  * @param obj pointer to an object
- * @param dragthr_en true: enable the drag throw
+ * @param en true: enable the drag throw
  */
-void lv_obj_set_drag_throw(lv_obj_t * obj, bool dragthr_en)
+void lv_obj_set_drag_throw(lv_obj_t * obj, bool en)
 {
-    obj->drag_throw_en = (dragthr_en == true ? 1 : 0);
+    obj->drag_throw_en = (en == true ? 1 : 0);
 }
 
 /**
  * Enable to use parent for drag related operations. 
  * If trying to drag the object the parent will be moved instead 
  * @param obj pointer to an object
- * @param dragpar_en true: enable the 'drag parent' for the object
+ * @param en true: enable the 'drag parent' for the object
  */
-void lv_obj_set_drag_parent(lv_obj_t * obj, bool dragpar_en)
+void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
 {
-    obj->drag_parent = (dragpar_en == true ? 1 : 0);
+    obj->drag_parent = (en == true ? 1 : 0);
 }
 
 /**
