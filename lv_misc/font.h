@@ -22,6 +22,12 @@
 
 typedef enum
 {
+#if USE_FONT_DEJAVU_8
+    FONT_DEJAVU_8,
+#endif
+#if USE_FONT_DEJAVU_10
+    FONT_DEJAVU_10,
+#endif
 #if USE_FONT_DEJAVU_14
     FONT_DEJAVU_14,
 #endif
