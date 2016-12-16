@@ -8,6 +8,7 @@
  *********************/
 #include <stddef.h>
 #include "font.h"
+#include "fonts/dejavu_8.h"
 #include "fonts/dejavu_10.h"
 #include "fonts/dejavu_14.h"
 #include "fonts/dejavu_20.h"

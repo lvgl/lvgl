@@ -545,11 +545,10 @@ static void lv_labels_init(void)
 	lv_labels_title.line_space =  4 * LV_STYLE_MULT;
 	lv_labels_title.mid =  0;
 
-
 	memcpy(&lv_labels_txt, &lv_labels_def, sizeof(lv_labels_t));
 	lv_labels_txt.objs.color = COLOR_MAKE(0x16, 0x23, 0x34);
-	lv_labels_txt.letter_space = 1 * LV_STYLE_MULT;
-	lv_labels_txt.line_space =  2 * LV_STYLE_MULT;
+	lv_labels_txt.letter_space = 0 * LV_STYLE_MULT;
+	lv_labels_txt.line_space =  1 * LV_STYLE_MULT;
 	lv_labels_txt.mid =  0;
 
 }

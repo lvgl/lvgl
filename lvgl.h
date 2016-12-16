@@ -24,6 +24,7 @@
 #include "lv_objx/lv_btnm.h"
 #include "lv_objx/lv_ta.h"
 #include "lv_objx/lv_win.h"
+#include "lv_objx/lv_mbox.h"
 
 #include "lv_app/lv_app.h"
 

@@ -170,6 +170,7 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     			}
     			break;
     		case LV_SIGNAL_CORD_CHG:
+    			/*If the size is changed refresh the window*/
     			if(area_get_width(param) != lv_obj_get_width(win) ||
     			   area_get_height(param) != lv_obj_get_height(win)) {
     				lv_win_realign(win);
@@ -211,6 +212,21 @@ lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, bool (*rel
 	lv_win_realign(win);
 
 	return btn;
+}
+
+/**
+ * A release action which can be assigned to a window control button to close it
+ * @param btn pointer to the released button
+ * @param dispi pointer to the caller display input
+ * @return always false because the button is deleted with the window
+ */
+bool lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+	lv_obj_t * win = lv_win_get_from_ctrl_btn(btn);
+
+	lv_obj_del(win);
+
+	return false;
 }
 
 /**

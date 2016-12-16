@@ -340,13 +340,11 @@ lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy)
  */
 static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t mode)
 {
-    lv_btns_t * btns_p = lv_obj_get_style(btn);
 
     /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
     	return ancestor_design_f(btn, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		opa_t opa = lv_obj_get_opa(btn);
 		area_t area;
 		lv_obj_get_cords(btn, &area);
 
@@ -356,7 +354,7 @@ static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t 
 		lv_btn_style_load(btn, &rects_tmp);
 		btn->style_p = &rects_tmp;
 		ancestor_design_f(btn, mask, mode);	/*Draw the rectangle*/
-		btn->style_p = btns_tmp;			/*Reload the origial butto style*/
+		btn->style_p = btns_tmp;			/*Reload the original button style*/
     }
     return true;
 }

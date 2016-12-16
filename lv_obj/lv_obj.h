@@ -227,6 +227,8 @@ void lv_scr_load(lv_obj_t * scr);
 lv_obj_t * lv_obj_get_scr(lv_obj_t * obj);
 lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
 lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
+uint16_t lv_obj_get_child_num(lv_obj_t * obj);
+
 /*Coordinate get*/
 void lv_obj_get_cords(lv_obj_t * obj, area_t * cords_p);
 cord_t lv_obj_get_x(lv_obj_t * obj);

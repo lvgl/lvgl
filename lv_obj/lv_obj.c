@@ -87,7 +87,7 @@ void lv_obj_inv(lv_obj_t * obj)
     /*Invalidate the object only if it belongs to the 'act_scr'*/
     lv_obj_t * act_scr_p = lv_scr_act(); 
     if(lv_obj_get_scr(obj) == act_scr_p) {
-        /*Truncate the recursively on the parents*/
+        /*Truncate recursively to the parents*/
         area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
         bool union_ok = true;
@@ -1134,6 +1134,21 @@ lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child)
 	}
 
 	return NULL;
+}
+
+/**
+ * Count the children of an object (only children directly on 'obj')
+ * @param obj pointer to an object
+ * @return children number of 'obj'
+ */
+uint16_t lv_obj_get_child_num(lv_obj_t * obj)
+{
+	lv_obj_t * i;
+	uint16_t cnt = 0;
+
+	LL_READ(obj->child_ll, i) cnt++;
+
+	return cnt;
 }
 
 /*---------------------
