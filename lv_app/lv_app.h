@@ -23,7 +23,7 @@ typedef enum
 	LV_APP_MODE_NONE 	 = 0x0000,
 	LV_APP_MODE_RUN_ONCE = 0x0001,
 	LV_APP_MODE_NO_SC    = 0x0002,		/*No short cut*/
-	LV_APP_MODE_NO_WIN  = 0x0004,		/*No window mode*/
+	LV_APP_MODE_NO_WIN   = 0x0004,		/*No window mode*/
 	LV_APP_MODE_NO_CON   = 0x0008,		/*No connection to other apps*/
 	LV_APP_MODE_NO_CLOSE = 0x0010,		/*No close control button*/
 	LV_APP_MODE_NO_FIX   = 0x0020,		/*No fix control button*/
@@ -45,8 +45,9 @@ struct __LV_APP_DSC_T;
 typedef struct
 {
 	const struct __LV_APP_DSC_T * dsc;
-	const char * name_mod;
+	char * name;
 	lv_obj_t * sc;
+	lv_obj_t * sc_title;
 	lv_obj_t * win;
 	void * app_data;
 	void * sc_data;
@@ -88,8 +89,7 @@ typedef struct {
 	cord_t menu_h;
 	cord_t app_list_w;
 	cord_t app_list_h;
-	cord_t sc_w;
-	cord_t sc_h;
+	cord_t sc_title_margin;
 
 	font_types_t font_small;
 	font_types_t font_medium;
@@ -111,6 +111,7 @@ void lv_app_win_close(lv_app_inst_t * app);
 const lv_app_dsc_t * lv_app_get_dsc(const char * name);
 
 lv_app_style_t * lv_app_get_style(void);
+void lv_app_rename(lv_app_inst_t * app, const char * name);
 void lv_app_refr_style(void);
 
 const lv_app_dsc_t * lv_app_example_init(void);

@@ -65,10 +65,15 @@
 /*==================
  *  LV OBJ X USAGE 
  * ================*/
-
 #define USE_LV_RECT     1
 
 #define USE_LV_LABEL    1
+#if USE_LV_LABEL != 0
+#define LV_LABEL_SCROLL_SPEED 		(25 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
+#define LV_LABEL_SCROLL_SPEED_VER   (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
+#define LV_LABEL_SCROLL_PLAYBACK_PAUSE	500 /*Wait before the scroll turns back in ms*/
+#define LV_LABEL_SCROLL_REPEAT_PAUSE	500 /*Wait before the scroll begins again in ms*/
+#endif
 
 #define USE_LV_BTN      1
 
@@ -77,29 +82,48 @@
 #define USE_LV_IMG      1
 #if USE_LV_IMG != 0
 #define LV_IMG_COLOR_TRANSP     COLOR_LIME
+#define LV_IMG_DEF_WALLPAPER	img_bubbles_vflip
 #endif /*USE_LV_IMG*/
 
 #define USE_LV_PAGE     1
+#if USE_LV_PAGE != 0
+#define LV_PAGE_ANIM_FOCUS_TIME 300 /*List focus animation time [ms] (0: turn off the animation)*/
+#endif
 
-#define USE_LV_LIST     1
+#define USE_LV_LED     1
 
-#define USE_LV_CB 		1
+#define USE_LV_PB      1
 
-#define USE_LV_PB		1
+#define USE_LV_CB      1
 
-#define USE_LV_CHARTBG	1
+#define USE_LV_LIST    1
 
-#define USE_LV_CHART	1
+#define USE_LV_BTNM    1
 
-#define USE_LV_LED 		1
+#define USE_LV_WIN     1
 
-#define USE_LV_BTNM		1
+#define USE_LV_TA      1
 
-#define USE_LV_TA		1
+#define USE_LV_MBOX	1
 
 /*==================
- *  LV APP SETTINGS 
+ *  LV APP SETTINGS
  * =================*/
+#define LV_APP_SC_WIDTH		(LV_HOR_RES / 4)
+#define LV_APP_SC_HEIGHT	(LV_VER_RES / 3)
+
+#define LV_APP_USE_INTERNAL_ICONS 	1
+
+#define LV_APP_ANIM_WIN_OPEN 		300	/*Animation time in milliseconds (0: turn off animation)*/
+#define LV_APP_ANIM_WIN_OPEN_COMPLEX 1  /*1: Make more complex animation on window open*/
+#define LV_APP_ANIM_WIN_MINIM 		300 /*Animation time in milliseconds (0: turn off animation)*/
+#define LV_APP_ANIM_WIN_CLOSE 		300 /*Animation time in milliseconds (0: turn off animation)*/
+
+/* If the internal icons are not used
+ * set others */
+#if LV_APP_USE_INTERNAL_ICONS == 0
+
+#endif
 
 /*==================
  *  LV APP X USAGE 

@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_app_example.h"
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -96,6 +97,9 @@ static void my_app_run(lv_app_inst_t * app, const char * cstr)
 
 	/*Initialize the application*/
 	((app_data_t *)app->app_data)->txt = cstr;	/*Save the create string*/
+	char buf[256];
+	sprintf(buf,"%s - %s", my_app_dsc.name, cstr);
+	lv_app_rename(app, buf);
 }
 
 /**

@@ -852,7 +852,7 @@ void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa)
         lv_obj_set_opar(i, opa);
     }
     
-    obj->opa = opa;
+    if(obj->opa_protect == 0) obj->opa = opa;
     
     lv_obj_inv(obj);
 }
@@ -929,6 +929,15 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
     obj->drag_parent = (en == true ? 1 : 0);
 }
 
+/**
+ * Do not let 'lv_obj_set_opar' to set the opacity
+ * @param obj pointer to an object
+ * @param en true: enable the 'opa_protect' for the object
+ */
+void lv_obj_set_opa_protect(lv_obj_t * obj, bool en)
+{
+    obj->opa_protect = (en == true ? 1 : 0);
+}
 /**
  * Set the signal function of an object. 
  * Always call the previous signal function in the new.
@@ -1325,6 +1334,16 @@ bool lv_obj_get_drag_throw(lv_obj_t * obj)
 bool lv_obj_get_drag_parent(lv_obj_t * obj)
 {
     return obj->drag_parent == 0 ? false : true;
+}
+
+/**
+ * Get the opa_protect attribute of an object
+ * @param obj pointer to an object
+ * @return true: opa_protect is enabled
+ */
+bool lv_obj_get_opa_protect(lv_obj_t * obj)
+{
+    return obj->opa_protect == 0 ? false : true;
 }
 
 /**

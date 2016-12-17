@@ -97,15 +97,15 @@ typedef struct __LV_OBJ_T
 #endif
 
     /*Attributes and states*/
-    uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
-    uint8_t drag_en      :1;    /*1: enable the dragging*/
-    uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent  :1;    /*1. Parent will be dragged instead*/
-    uint8_t style_iso 	 :1;	/*1: The object has got an own style*/
-    uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top_en       :1;	/*1: If the object or its children  is clicked it goes to the foreground*/
-    uint8_t child_chg_off:1;    /*1: Disable the child change signal. Used by the library*/
-
+    uint16_t click_en     :1;    /*1: can be pressed by a display input device*/
+    uint16_t drag_en      :1;    /*1: enable the dragging*/
+    uint16_t drag_throw_en:1;    /*1: Enable throwing with drag*/
+    uint16_t drag_parent  :1;    /*1. Parent will be dragged instead*/
+    uint16_t style_iso 	  :1;	 /*1: The object has got an own style*/
+    uint16_t hidden       :1;    /*1: Object is hidden*/
+    uint16_t top_en       :1;	 /*1: If the object or its children  is clicked it goes to the foreground*/
+    uint16_t child_chg_off:1;    /*1: Disable the child change signal. Used by the library*/
+    uint16_t opa_protect  :1;    /*1: Do not let 'lv_obj_set_opar' to set the opacity*/
     cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
 
     uint8_t free_num; 		/*Application specific identifier (set it freely)*/
@@ -209,9 +209,10 @@ void lv_obj_set_top(lv_obj_t * obj, bool en);
 void lv_obj_set_drag(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
+void lv_obj_set_opa_protect(lv_obj_t * obj, bool en);
+/*Other set*/
 void lv_obj_set_signal_f(lv_obj_t * obj, lv_signal_f_t fp);
 void lv_obj_set_design_f(lv_obj_t * obj, lv_design_f_t fp);
-/*Other set*/
 void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size);
 void lv_obj_refr_ext_size(lv_obj_t * obj);
 void lv_obj_set_style(lv_obj_t * obj, void * style);
@@ -245,6 +246,7 @@ bool lv_obj_get_top(lv_obj_t * obj);
 bool lv_obj_get_drag(lv_obj_t * obj);
 bool lv_obj_get_drag_throw(lv_obj_t * obj);
 bool lv_obj_get_drag_parent(lv_obj_t * obj);
+bool lv_obj_get_opa_potect(lv_obj_t * obj);
 
 /*Virtual functions get*/
 lv_design_f_t lv_obj_get_design_f(lv_obj_t * obj);

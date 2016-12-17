@@ -603,7 +603,12 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
 	cord_t w_obj = lv_obj_get_width(lv_obj_get_child(rect, NULL));
 	cord_t h_obj = lv_obj_get_height(lv_obj_get_child(rect, NULL));
 	uint16_t obj_row = (w_tot - (2 * style->hpad)) / (w_obj + style->opad); /*Obj. num. in a row*/
-	cord_t x_ofs = w_obj + (w_tot - (2 * style->hpad) - (obj_row * w_obj)) / (obj_row - 1);
+	cord_t x_ofs;
+	if(obj_row > 1) {
+		x_ofs = w_obj + (w_tot - (2 * style->hpad) - (obj_row * w_obj)) / (obj_row - 1);
+	} else {
+		x_ofs = w_tot / 2 - w_obj / 2;
+	}
 	cord_t y_ofs = h_obj + style->opad;
 
 	/* Disable child change action because the children will be moved a lot
@@ -617,8 +622,12 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
 	LL_READ_BACK(rect->child_ll, child) {
 		if(lv_obj_get_hidden(child) != false) continue;
 
-		lv_obj_set_pos(child, act_x, act_y);
-		act_x += x_ofs;
+		if(obj_row > 1) {
+			lv_obj_set_pos(child, act_x, act_y);
+			act_x += x_ofs;
+		} else {
+			lv_obj_set_pos(child, x_ofs, act_y);
+		}
 		obj_cnt ++;
 
 		if(obj_cnt >= obj_row) {

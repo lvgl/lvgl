@@ -22,10 +22,6 @@
  *********************/
 #define LV_LABEL_DOT_NUM	3
 #define LV_LABEL_DOT_END_INV 0xFFFF
-#define LV_LABEL_SCROLL_SPEED (50 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
-#define LV_LABEL_SCROLL_SPEED_VER  (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
-#define LV_LABEL_SCROLL_PLAYBACK_PAUSE	300 /*Wait before the scroll turns back in ms*/
-#define LV_LABEL_SCROLL_REPEAT_PAUSE	600 /*Wait before the scroll begins again in ms*/
 
 /**********************
  *      TYPEDEFS

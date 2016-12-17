@@ -14,6 +14,7 @@
 #include "../lv_objx/lv_rect.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
+#include "../lv_misc/anim.h"
 
 /*********************
  *      DEFINES
@@ -287,6 +288,65 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
     lv_obj_set_drag(obj, glue);
 }
 
+/**
+ * Focus on an object. It ensures that the object will be visible on the page.
+ * @param page pointer to a page object
+ * @param obj pointer to an object to focus (must be on the page)
+ * @param anim_en true: scroll with animation
+ */
+void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
+{
+
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+	lv_pages_t * style = lv_obj_get_style(page);
+
+	cord_t obj_y = lv_obj_get_y(obj);
+	cord_t obj_h = lv_obj_get_height(obj);
+	cord_t scrlable_y = lv_obj_get_y(ext->scrolling);
+	cord_t page_h = lv_obj_get_height(page);
+
+	bool refr = false;
+
+	/*Out of the page on the top*/
+	if(scrlable_y + obj_y < 0) {
+		/*Calculate a new position try to align to the middle*/
+		scrlable_y = -(obj_y - style->scrable_rects.vpad - style->bg_rects.vpad);
+		scrlable_y += page_h / 2 - obj_h / 2;
+		refr = true;
+	}
+	/*Out of the page on the bottom*/
+	else if(scrlable_y + obj_y + obj_h > page_h) {
+		/*Calculate a new position try to align to the middle*/
+		scrlable_y = -obj_y;
+		scrlable_y += page_h - obj_h;
+		scrlable_y -= page_h / 2 - obj_h / 2;
+		refr = true;
+	}
+
+	if(refr != false) {
+#if LV_PAGE_ANIM_FOCUS_TIME == 0
+		lv_obj_set_y(ext->scrolling, scrlable_y);
+#else
+		if(anim_en == false) {
+			lv_obj_set_y(ext->scrolling, scrlable_y);
+		} else {
+			anim_t a;
+			a.act_time = 0;
+			a.start = lv_obj_get_y(ext->scrolling);
+			a.end = scrlable_y;
+			a.time = LV_PAGE_ANIM_FOCUS_TIME;//anim_speed_to_time(LV_PAGE_ANIM_SPEED, a.start, a.end);
+			a.end_cb = NULL;
+			a.playback = 0;
+			a.repeat = 0;
+			a.var = ext->scrolling;
+			a.path = anim_get_path(ANIM_PATH_LIN);
+
+			a.fp = (anim_fp_t) lv_obj_set_y;
+			anim_create(&a);
+		}
+	}
+#endif
+}
 
 /*=====================
  * Getter functions

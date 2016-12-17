@@ -217,6 +217,7 @@ void lv_list_down(lv_obj_t * list)
 	}
 }
 
+
 /*=====================
  * Setter functions 
  *====================*/

@@ -67,10 +67,11 @@ typedef struct
  **********************/
 /*Create function*/
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
-void lv_page_glue_obj(lv_obj_t * page, bool glue);
 lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * copy);
 bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void  * param);
 
+void lv_page_glue_obj(lv_obj_t * page, bool glue);
+void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en);
 lv_obj_t * lv_page_get_scrable(lv_obj_t * page);
 
 /**********************
