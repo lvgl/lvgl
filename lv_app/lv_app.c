@@ -40,7 +40,7 @@ static void lv_app_init_style(void);
 static ll_dsc_t app_dsc_ll; /*Store a pointer to the app descriptors*/
 static ll_dsc_t app_inst_ll; /*Store the running apps*/
 
-static lv_obj_t * menuh; 	/*Holder of the menu on the top*/
+static lv_obj_t * menuh; 	/*Holder of timg_bubbleshe menu on the top*/
 static lv_obj_t * app_btn;  /*The "Apps" button on the menu*/
 static lv_obj_t * sys_apph; /*Holder of the system app. buttons*/
 static lv_obj_t * app_list;
@@ -160,13 +160,22 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 {
 	app->sc = lv_btn_create(sc_area, NULL);
 	lv_obj_set_free_p(app->sc, app);
+	lv_obj_set_style(app->sc, &app_style.sc_style);
+	lv_obj_set_opa(app->sc, app_style.sc_opa);
 	lv_obj_set_size(app->sc, app_style.sc_w, app_style.sc_h);
+	lv_rect_set_layout(app->sc, LV_RECT_LAYOUT_OFF);
 	lv_btn_set_rel_action(app->sc, lv_app_sc_rel_action);
 	lv_btn_set_pr_action(app->sc, lv_app_sc_pr_action);
 	lv_page_glue_obj(app->sc, true);
 
 	app->sc_data = dm_alloc(app->dsc->sc_data_size);
 	app->dsc->sc_open(app, app->sc);
+
+	lv_obj_t * sc_title;
+	sc_title = lv_label_create(app->sc, NULL);
+	lv_obj_set_style(sc_title, &app_style.sc_title_style);
+	lv_label_set_text(sc_title, app->dsc->name);
+	lv_obj_align_us(sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, 3);
 
 	return app->sc;
 }
@@ -295,13 +304,6 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 			lv_obj_set_free_p(elem, *dsc);
 			lv_obj_set_opa(elem, app_style.menu_btn_opa);
 
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
 		}
 	}
 	return LV_ACTION_RES_OK;
@@ -460,8 +462,18 @@ static void lv_app_init_style(void)
 
 	/*Shortcut styles*/
 	lv_btns_get(LV_BTNS_DEF,&app_style.sc_style);
+	app_style.sc_style.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xC0, 0xC0, 0xC0);
+	app_style.sc_style.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
+	app_style.sc_style.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80);
+	app_style.sc_style.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
+	app_style.sc_style.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
+	app_style.sc_style.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xB0, 0xD0, 0xF0);
+	app_style.sc_style.rects.bopa = 70;
+	app_style.sc_style.rects.bwidth = 1 * LV_STYLE_MULT;
 
 	lv_labels_get(LV_LABELS_DEF,&app_style.sc_title_style);
+	app_style.sc_title_style.font = app_style.font_small;
+	app_style.sc_title_style.objs.color = COLOR_MAKE(0x30, 0x40, 0x50);
 
 	/*Window styles*/
 	lv_wins_get(LV_WINS_DEF,&app_style.win_style);

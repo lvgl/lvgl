@@ -182,6 +182,12 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
                 	valid = ext->lpr_action(btn, param);
                 }
             	break;
+            case LV_SIGNAL_LONG_PRESS_REP:
+                /*Call the release action, here 'param' is the caller dispi*/
+                if(ext->lpr_rep_action != NULL && state != LV_BTN_STATE_INA) {
+                	valid = ext->lpr_rep_action(btn, param);
+                }
+            	break;
             default:
                 /*Do nothing*/
                 break;
@@ -235,7 +241,7 @@ void lv_btn_set_pr_action(lv_obj_t * btn, lv_action_res_t (*pr_action)(lv_obj_t 
 /**
  * Set a function to call when the button is released
  * @param btn pointer to a button object
- * @param pr_action pointer to function
+ * @param rel_action pointer to functionREL
  */
 void lv_btn_set_rel_action(lv_obj_t * btn, lv_action_res_t (*rel_action)(lv_obj_t *, lv_dispi_t *))
 {
@@ -247,7 +253,7 @@ void lv_btn_set_rel_action(lv_obj_t * btn, lv_action_res_t (*rel_action)(lv_obj_
 /**
  * Set a function to call when the button is long pressed
  * @param btn pointer to a button object
- * @param pr_action pointer to function
+ * @param lpr_action pointer to function
  */
 void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_res_t (*lpr_action)(lv_obj_t *, lv_dispi_t *))
 {
@@ -256,6 +262,17 @@ void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_res_t (*lpr_action)(lv_obj_
     ext->lpr_action = lpr_action;
 }
 
+/**
+ * Set a function to called periodically after long press.
+ * @param btn pointer to a button object
+ * @param lpr_rep_action pointer to function
+ */
+void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_res_t (*lpr_rep_action)(lv_obj_t *, lv_dispi_t *))
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+
+    ext->lpr_rep_action = lpr_rep_action;
+}
 /*=====================
  * Getter functions 
  *====================*/

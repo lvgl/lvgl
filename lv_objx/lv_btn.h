@@ -76,6 +76,7 @@ typedef struct
 	lv_action_res_t (*pr_action)(lv_obj_t *, lv_dispi_t *);
 	lv_action_res_t  (*rel_action)(lv_obj_t *, lv_dispi_t *);
 	lv_action_res_t (*lpr_action)(lv_obj_t *, lv_dispi_t *);
+	lv_action_res_t (*lpr_rep_action)(lv_obj_t *, lv_dispi_t *);
     
     lv_btn_state_t state;
     uint8_t tgl :1;      /*1: Toggle enabled*/
@@ -96,6 +97,7 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
 void lv_btn_set_pr_action(lv_obj_t * btn, lv_action_res_t (*pr_action)(lv_obj_t *, lv_dispi_t *));
 void lv_btn_set_rel_action(lv_obj_t * btn, lv_action_res_t (*rel_action)(lv_obj_t *, lv_dispi_t *));
 void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_res_t (*lpr_action)(lv_obj_t *, lv_dispi_t *));
+void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_res_t (*lpr_rep_action)(lv_obj_t *, lv_dispi_t *));
 
 bool lv_btn_get_tgl(lv_obj_t * btn);
 lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);

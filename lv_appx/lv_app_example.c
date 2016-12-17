@@ -131,6 +131,7 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 	label = lv_label_create(sc, NULL);
 	lv_label_set_text(label, ((app_data_t *)app->app_data)->txt);
 	lv_obj_set_style(label, lv_labels_get(LV_LABELS_BTN, NULL));
+	lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
 }
 
 /**

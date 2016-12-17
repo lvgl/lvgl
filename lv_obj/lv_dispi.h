@@ -28,6 +28,7 @@ typedef struct
     lv_obj_t * act_obj;
     lv_obj_t * last_obj;
     uint32_t press_time_stamp;
+    uint32_t lpr_rep_time_stamp;
     
     /*Flags*/
     uint8_t drag_in_prog :1;

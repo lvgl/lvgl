@@ -14,6 +14,10 @@
 #include "lv_refr.h"
 #include "misc/math/math_base.h"
 
+#ifdef LV_IMG_DEF_WALLPAPER
+#include "../lv_objx/lv_img.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -32,13 +36,17 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_obj_t * def_scr = NULL;
-lv_obj_t * act_scr = NULL;
-ll_dsc_t scr_ll;
+static lv_obj_t * def_scr = NULL;
+static lv_obj_t * act_scr = NULL;
+static ll_dsc_t scr_ll;
 
-lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
-lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
-lv_objs_t lv_objs_transp = {.transp = 1};
+static lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
+static lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
+static lv_objs_t lv_objs_transp = {.transp = 1};
+
+#ifdef LV_IMG_DEF_WALLPAPER
+LV_IMG_DECLARE(LV_IMG_DEF_WALLPAPER);
+#endif
 
 /**********************
  *      MACROS
@@ -66,7 +74,14 @@ void lv_init(void)
 
     /*Create the default screen*/
     ll_init(&scr_ll, sizeof(lv_obj_t));
+#ifdef LV_IMG_DEF_WALLPAPER
+    lv_img_create_file("def_wp", LV_IMG_DEF_WALLPAPER);
+    def_scr = lv_img_create(NULL, NULL);
+    lv_img_set_auto_size(def_scr, false);
+    lv_img_set_file(def_scr, "U:/def_wp");
+#else
     def_scr = lv_obj_create(NULL, NULL);
+#endif
     act_scr = def_scr;
     
     /*Refresh the screen*/
