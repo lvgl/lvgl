@@ -68,7 +68,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 lv_mboxs_t * lv_mboxs_get(lv_mboxs_builtin_t style, lv_mboxs_t * copy);
 
-lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, bool (*rel_action)(lv_obj_t *, lv_dispi_t *));
+lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_btn_action_t rel_action);
 bool lv_mbox_close_action (lv_obj_t * mbox, lv_dispi_t *dispi);
 void lv_mbox_auto_close(lv_obj_t * mbox, uint16_t tout);
 void lv_mbox_set_title(lv_obj_t * mbox, const char * title);

@@ -342,12 +342,15 @@ static lv_obj_t * dispi_search_obj(const lv_dispi_t * dispi_p, lv_obj_t * obj)
  */
 static void dispi_drag(lv_dispi_t * dispi_p)
 {
-    lv_obj_t * par = lv_obj_get_parent(dispi_p->act_obj);
     lv_obj_t * drag_obj = dispi_p->act_obj;
     
-    if(lv_obj_get_drag_parent(dispi_p->act_obj) != false) {
-        drag_obj = par;
-    }
+    /*If drag parent is active check recursively the drag_parent attribute*/
+	while(lv_obj_get_drag_parent(drag_obj) != false &&
+		  drag_obj != NULL) {
+		drag_obj = lv_obj_get_parent(drag_obj);
+	}
+
+	if(drag_obj == NULL) return;
     
     if(lv_obj_get_drag(drag_obj) == false) return;
 
@@ -388,12 +391,16 @@ static void dispi_drag_throw(lv_dispi_t * dispi_p)
 	if(dispi_p->drag_in_prog == 0) return;
 
     /*Set new position if the vector is not zero*/
-    lv_obj_t * par = lv_obj_get_parent(dispi_p->last_obj);
     lv_obj_t * drag_obj = dispi_p->last_obj;
     
-    if(lv_obj_get_drag_parent(dispi_p->last_obj) != false) {
-        drag_obj = par;
-    }
+    /*If drag parent is active check recursively the drag_parent attribute*/
+
+	while(lv_obj_get_drag_parent(drag_obj) != false &&
+		  drag_obj != NULL) {
+		drag_obj = lv_obj_get_parent(drag_obj);
+	}
+
+	if(drag_obj == NULL) return;
     
     /*Return if the drag throw is not enabled*/
     if(lv_obj_get_drag_throw(drag_obj) == false ){

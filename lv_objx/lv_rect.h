@@ -34,7 +34,8 @@ typedef enum
 	LV_RECT_LAYOUT_ROW_T,	/*Row left align*/
 	LV_RECT_LAYOUT_ROW_M,	/*Row middle align*/
 	LV_RECT_LAYOUT_ROW_B,	/*Row right align*/
-	LV_RECT_LAYOUT_GRID,	/*Put as many object as possible in row and begin a new row*/
+	LV_RECT_LAYOUT_PRETTY,	/*Put as many object as possible in row and begin a new row*/
+	LV_RECT_LAYOUT_GRID,	/*Align same-sized object into a grid*/
 }lv_rect_layout_t;
 
 /*Style of rectangle*/

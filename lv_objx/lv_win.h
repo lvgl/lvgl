@@ -40,8 +40,11 @@ typedef struct
 	lv_imgs_t ctrl_img;
 	cord_t ctrl_btn_w;
 	cord_t ctrl_btn_h;
+	opa_t ctrl_btn_opa;
+	opa_t header_opa;
 	/*Content settings*/
 	lv_pages_t content;
+	uint8_t header_on_content:1;
 }lv_wins_t;
 
 /*Built-in styles of window*/
@@ -68,7 +71,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
 lv_wins_t * lv_wins_get(lv_wins_builtin_t style, lv_wins_t * copy);
 
-lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img, bool (*rel_action)(lv_obj_t *, lv_dispi_t *));
+lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img, lv_btn_action_t rel_action);
 bool lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
 void lv_win_set_title(lv_obj_t * win, const char * title);
 

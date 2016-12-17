@@ -72,6 +72,9 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new window object*/
     if(copy == NULL) {
+    	/*Create a page for the content*/
+		ext->content = lv_page_create(new_win, NULL);
+
     	/*Create a holder for the header*/
     	ext->header = lv_rect_create(new_win, NULL);
     	lv_rect_set_fit(ext->header, false, true);
@@ -85,8 +88,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_rect_set_fit(ext->ctrl_holder, true, false);
     	lv_rect_set_layout(ext->ctrl_holder, LV_RECT_LAYOUT_ROW_M);
 
-    	/*Create a page for the content*/
-    	ext->content = lv_page_create(new_win, NULL);
+
 
     	lv_obj_set_style(new_win, lv_wins_get(LV_WINS_DEF, NULL));
 
@@ -149,15 +151,20 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     			lv_obj_set_style(ext->ctrl_holder, &style->ctrl_holder);
     			lv_obj_set_style(ext->title, &style->title);
     			lv_obj_set_style(ext->header, &style->header);
+				lv_obj_set_opa(ext->header, style->header_opa);
 
     			/*Refresh the style of all control buttons*/
     			child = lv_obj_get_child(ext->ctrl_holder, NULL);
     			while(child != NULL) {
     				lv_obj_set_style(child, &style->ctrl_btn);
+    				lv_obj_set_opa(child, style->ctrl_btn_opa);
     				/*Refresh the image style too*/
     				lv_obj_set_style(lv_obj_get_child(child, NULL), &style->ctrl_img);
     				child = lv_obj_get_child(ext->ctrl_holder, child);
     			}
+
+    			lv_win_realign(win);
+
     			break;
     		case LV_SIGNAL_CHILD_CHG:
     			/*If a child added move it to the 'content' object*/
@@ -195,13 +202,14 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
  * @param rel_action a function pointer to call when the button is released
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, bool (*rel_action)(lv_obj_t *, lv_dispi_t *))
+lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_btn_action_t rel_action)
 {
 	lv_win_ext_t * ext = lv_obj_get_ext(win);
 	lv_wins_t * style = lv_obj_get_style(win);
 
 	lv_obj_t * btn = lv_btn_create(ext->ctrl_holder, NULL);
 	lv_obj_set_style(btn, &style->ctrl_btn);
+	lv_obj_set_opa(btn, style->ctrl_btn_opa);
 	lv_obj_set_size(btn, style->ctrl_btn_w, style->ctrl_btn_h);
 	lv_btn_set_rel_action(btn, rel_action);
 	lv_obj_t * img = lv_img_create(btn, NULL);
@@ -254,7 +262,7 @@ const char * lv_win_get_title(lv_obj_t * win)
 {
 	lv_win_ext_t * ext = lv_obj_get_ext(win);
 
-	return ext->title;
+	return lv_label_get_text(ext->title);
 }
 
 /**
@@ -348,6 +356,7 @@ static void lv_wins_init(void)
 	/*Transparent background. It will be always covered*/
 	lv_objs_get(LV_OBJS_TRANSP, &lv_wins_def.bg);
 
+	/*Style for the content*/
 	lv_pages_get(LV_PAGES_DEF, &lv_wins_def.content);
 	lv_wins_def.content.bg_rects.objs.color = COLOR_WHITE;
 	lv_wins_def.content.bg_rects.gcolor = COLOR_WHITE;
@@ -356,6 +365,7 @@ static void lv_wins_init(void)
 	lv_wins_def.content.bg_rects.round = 0;
 	lv_wins_def.content.bg_rects.hpad = 0;
 	lv_wins_def.content.bg_rects.vpad = 0;
+	lv_wins_def.header_on_content = 0;
 
 	/*Styles for the header*/
 	lv_rects_get(LV_RECTS_DEF, &lv_wins_def.header);
@@ -390,6 +400,9 @@ static void lv_wins_init(void)
 
 	lv_wins_def.ctrl_btn_w = LV_WIN_CTRL_BTN_DEF_W;
 	lv_wins_def.ctrl_btn_h = LV_WIN_CTRL_BTN_DEF_H;
+
+	lv_wins_def.header_opa = OPA_COVER;
+	lv_wins_def.ctrl_btn_opa = OPA_COVER;
 }
 
 /**
@@ -413,7 +426,13 @@ static void lv_win_realign(lv_obj_t * win)
 
 	lv_obj_set_height(ext->ctrl_holder, style->ctrl_btn_h + 2 * style->ctrl_holder.vpad * 2);
 	lv_obj_set_width(ext->header, lv_obj_get_width(win));
-	lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
+
+	if(style->header_on_content == 0) {
+		lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
+	}
+	else {
+		lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win));
+	}
 
 	/*Align the higher object first to make the correct header size first*/
 	if(lv_obj_get_height(ext->title) > lv_obj_get_height(ext->ctrl_holder)) {
@@ -425,7 +444,12 @@ static void lv_win_realign(lv_obj_t * win)
 	}
 
 	lv_obj_set_pos_us(ext->header, 0, 0);
-	lv_obj_align_us(ext->content, ext->header, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+	if(style->header_on_content == 0) {
+		lv_obj_align_us(ext->content, ext->header, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+	} else {
+		lv_obj_set_pos(ext->content, 0, 0);
+	}
 
 }
 #endif

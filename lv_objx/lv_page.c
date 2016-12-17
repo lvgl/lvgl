@@ -278,19 +278,31 @@ static bool lv_scrolling_signal(lv_obj_t * scrolling, lv_signal_t sign, void* pa
 
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
- * @param page pointer to an object on a page
+ * @param obj pointer to an object on a page
  * @param glue true: enable glue, false: disable glue
  */
-void lv_page_glue_obj(lv_obj_t * page, bool glue)
+void lv_page_glue_obj(lv_obj_t * obj, bool glue)
 {
-    lv_obj_set_drag_parent(page, glue);
-    lv_obj_set_drag(page, glue);
+    lv_obj_set_drag_parent(obj, glue);
+    lv_obj_set_drag(obj, glue);
 }
 
 
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the scrollable object of a page-
+ * @param page pointer to page object
+ * @return pointer to rectangle which is the scrollable part of the page
+ */
+lv_obj_t * lv_page_get_scrable(lv_obj_t * page)
+{
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+
+	return ext->scrolling;
+}
 
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable

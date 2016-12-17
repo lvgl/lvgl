@@ -82,7 +82,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
 
     	ext->btnh = lv_rect_create(new_mbox, NULL);
     	lv_rect_set_fit(ext->btnh, false, true);
-    	lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_GRID);
+    	lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
 
     	lv_obj_set_style(new_mbox, lv_mboxs_get(LV_MBOXS_DEF, NULL));
 
@@ -173,7 +173,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
  * @param rel_action a function which will be called when the button is relesed
  * @return pointer to the created button (lv_btn)
  */
-lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, bool (*rel_action)(lv_obj_t *, lv_dispi_t *))
+lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_btn_action_t rel_action)
 {
 	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
 	lv_mboxs_t * style = lv_obj_get_style(mbox);
@@ -194,7 +194,7 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, bool (*rel_act
 	if(child_num == 1) {
 		lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_CENTER);
 	} else if (child_num == 2) {
-		lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_GRID);
+		lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
 	}
 
 	return btn;
@@ -374,8 +374,8 @@ static void lv_temps_init(void)
 	lv_mboxs_def.bg.light = 10 * LV_STYLE_MULT;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_mboxs_def.btn);
-	lv_mboxs_def.btn.light_en[LV_BTN_STATE_PR] = 0;
-	lv_mboxs_def.btn.light_en[LV_BTN_STATE_REL] = 0;
+	lv_mboxs_def.btn.flags[LV_BTN_STATE_PR].light_en = 0;
+	lv_mboxs_def.btn.flags[LV_BTN_STATE_REL].light_en = 0;
 	lv_labels_get(LV_LABELS_TITLE, &lv_mboxs_def.title);
 	lv_labels_get(LV_LABELS_TXT, &lv_mboxs_def.txt);
 	lv_labels_get(LV_LABELS_BTN, &lv_mboxs_def.btn_label);
