@@ -92,7 +92,7 @@ static void my_app_run(lv_app_inst_t * app, const char * cstr)
 {
 	/*Check the create string*/
 	if(cstr == NULL || cstr[0] == '\0') {
-		cstr = "No create string";
+		cstr = "No create\nstring";
 	}
 
 	/*Initialize the application*/

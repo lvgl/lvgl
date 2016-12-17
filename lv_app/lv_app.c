@@ -258,47 +258,6 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
 	lv_win_add_ctrl_btn(app->win, "U:/icon_close", lv_app_win_close_action);
 
-	app->dsc->win_open(app, app->win);
-#if LV_APP_ANIM_WIN_OPEN != 0
-	anim_t a;
-	a.act_time = 0;
-	a.time = LV_APP_ANIM_WIN_OPEN;
-	a.end_cb = NULL;
-	a.playback = 0;
-	a.repeat = 0;
-	a.var = app->win;
-	a.path = anim_get_path(ANIM_PATH_LIN);
-#if LV_APP_ANIM_WIN_OPEN_COMPLEX != 0
-	area_t cords;
-	lv_obj_get_cords(app->sc, &cords);
-
-	a.start = lv_obj_get_width(app->sc);
-	a.end = LV_HOR_RES;
-	a.fp = (anim_fp_t) lv_obj_set_width;
-	anim_create(&a);
-
-	a.start = lv_obj_get_height(app->sc);
-	a.end = LV_VER_RES;
-	a.fp = (anim_fp_t) lv_obj_set_height;
-	anim_create(&a);
-
-	a.start = cords.x1;
-	a.end = 0;
-	a.fp = (anim_fp_t) lv_obj_set_x;
-	anim_create(&a);
-
-	a.start = cords.y1;
-	a.end = 0;
-	a.fp = (anim_fp_t) lv_obj_set_y;
-	anim_create(&a);
-#endif /*LV_APP_ANIM_WIN_OPEN_COMPLEX*/
-
-	a.start = OPA_TRANSP;
-	a.end = OPA_COVER;
-	a.fp = (anim_fp_t) lv_obj_set_opar;
-	anim_create(&a);
-#endif /*LV_APP_ANIM_WIN_OPEN*/
-
 	return app->win;
 }
 
@@ -459,6 +418,49 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
 	else {
 		lv_app_inst_t * app = lv_obj_get_free_p(sc);
 		lv_app_win_open(app);
+
+		app->dsc->win_open(app, app->win);
+
+		/*Make an animation on window open*/
+#if LV_APP_ANIM_WIN_OPEN != 0
+		anim_t a;
+		a.act_time = 0;
+		a.time = LV_APP_ANIM_WIN_OPEN;
+		a.end_cb = NULL;
+		a.playback = 0;
+		a.repeat = 0;
+		a.var = app->win;
+		a.path = anim_get_path(ANIM_PATH_LIN);
+#if LV_APP_ANIM_WIN_COMPLEX != 0
+		area_t cords;
+		lv_obj_get_cords(app->sc, &cords);
+
+		a.start = lv_obj_get_width(app->sc);
+		a.end = LV_HOR_RES;
+		a.fp = (anim_fp_t) lv_obj_set_width;
+		anim_create(&a);
+
+		a.start = lv_obj_get_height(app->sc);
+		a.end = LV_VER_RES;
+		a.fp = (anim_fp_t) lv_obj_set_height;
+		anim_create(&a);
+
+		a.start = cords.x1;
+		a.end = 0;
+		a.fp = (anim_fp_t) lv_obj_set_x;
+		anim_create(&a);
+
+		a.start = cords.y1;
+		a.end = 0;
+		a.fp = (anim_fp_t) lv_obj_set_y;
+		anim_create(&a);
+#endif /*LV_APP_ANIM_WIN_OPEN_COMPLEX*/
+
+		a.start = OPA_TRANSP;
+		a.end = OPA_COVER;
+		a.fp = (anim_fp_t) lv_obj_set_opar;
+		anim_create(&a);
+#endif /*LV_APP_ANIM_WIN_OPEN*/
 	}
 
 	return LV_ACTION_RES_OK;
@@ -496,9 +498,47 @@ static lv_action_res_t lv_app_win_minim_action(lv_obj_t * close_btn, lv_dispi_t 
 {
 	lv_obj_t * win = lv_win_get_from_ctrl_btn(close_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
+	/*Make an animation on window open*/
+	#if LV_APP_ANIM_WIN_OPEN != 0
+			anim_t a;
+			a.act_time = 0;
+			a.time = LV_APP_ANIM_WIN_OPEN;
+			a.end_cb = NULL;
+			a.playback = 0;
+			a.repeat = 0;
+			a.var = app->win;
+			a.path = anim_get_path(ANIM_PATH_LIN);
+	#if LV_APP_ANIM_WIN_COMPLEX != 0
+			area_t cords;
+			lv_obj_get_cords(app->sc, &cords);
 
-#if LV_APP_ANIM_WIN_CLOSE != 0
-	lv_obj_anim(app->win, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_ANIM_WIN_CLOSE, 0, lv_app_win_minim_anim_cb);
+			a.end = lv_obj_get_width(app->sc);
+			a.start = LV_HOR_RES;
+			a.fp = (anim_fp_t) lv_obj_set_width;
+			anim_create(&a);
+
+			a.end = lv_obj_get_height(app->sc);
+			a.start = LV_VER_RES;
+			a.fp = (anim_fp_t) lv_obj_set_height;
+			anim_create(&a);
+
+			a.end = cords.x1;
+			a.start = 0;
+			a.fp = (anim_fp_t) lv_obj_set_x;
+			anim_create(&a);
+
+			a.end = cords.y1;
+			a.start = 0;
+			a.fp = (anim_fp_t) lv_obj_set_y;
+			anim_create(&a);
+	#endif /*LV_APP_ANIM_WIN_COMPLEX*/
+
+			a.end = OPA_TRANSP;
+			a.start = OPA_COVER;
+			a.fp = (anim_fp_t) lv_obj_set_opar;
+			a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
+			//a.time = 500;
+			anim_create(&a);
 #else
 	lv_app_win_close(app);
 	return LV_ACTION_RES_INV;

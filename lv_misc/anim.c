@@ -29,13 +29,14 @@
  *  STATIC PROTOTYPES
  **********************/
 static void anim_task (void);
-static void anim_ready_handler(anim_t * a);
+static bool anim_ready_handler(anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static ll_dsc_t anim_ll;
 static uint32_t last_task_run;
+static bool anim_del_global_flag = false;
 
 static anim_path_t anim_path_lin[] =
 		{64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
@@ -106,6 +107,7 @@ bool anim_del(void * var, anim_fp_t fp)
 			ll_rem(&anim_ll, a);
 			dm_free(a);
 			del = true;
+			anim_del_global_flag = true;
 		}
 
 		a = a_next;
@@ -193,7 +195,11 @@ static void anim_task (void)
 
 			/*If the time is elapsed the animation is ready*/
 			if(a->act_time >= a->time) {
-				anim_ready_handler(a);
+				bool invalid;
+				invalid = anim_ready_handler(a);
+				if(invalid != false) {
+					a_next = ll_get_head(&anim_ll);	/*a_next might be invalid if animation delete occurred*/
+				}
 			}
 		}
 
@@ -207,9 +213,12 @@ static void anim_task (void)
  * Called when an animation is ready to do the necessary thinks
  * e.g. repeat, play back, delete etc.
  * @param a pointer to an animation descriptor
+ * @return true: animation delete occurred
  * */
-static void anim_ready_handler(anim_t * a)
+static bool anim_ready_handler(anim_t * a)
 {
+	bool invalid = false;
+
 	/*Delete the animation if
 	 * - no repeat and no play back (simple one shot animation)
 	 * - no repeat, play back is enabled and play back is ready */
@@ -221,7 +230,11 @@ static void anim_ready_handler(anim_t * a)
 		dm_free(a);
 
 		/*Call the callback function at the end*/
+		/* Check if an animation is deleted in the cb function
+		 * if yes then the caller function has to know this*/
+		anim_del_global_flag = false;
 		if(cb != NULL) cb(p);
+		invalid = anim_del_global_flag;
 	}
 	/*If the animation is not deleted then restart it*/
 	else {
@@ -240,4 +253,6 @@ static void anim_ready_handler(anim_t * a)
 			a->end = tmp;
 		}
 	}
+
+	return invalid;
 }
