@@ -231,7 +231,7 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
  * @param btn pointer to a button object
  * @param pr_action pointer to function
  */
-void lv_btn_set_pr_action(lv_obj_t * btn, lv_btn_action_t pr_action)
+void lv_btn_set_pr_action(lv_obj_t * btn, lv_action_t pr_action)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext(btn);
     
@@ -243,7 +243,7 @@ void lv_btn_set_pr_action(lv_obj_t * btn, lv_btn_action_t pr_action)
  * @param btn pointer to a button object
  * @param rel_action pointer to functionREL
  */
-void lv_btn_set_rel_action(lv_obj_t * btn, lv_btn_action_t rel_action)
+void lv_btn_set_rel_action(lv_obj_t * btn, lv_action_t rel_action)
 {
     lv_btn_ext_t * btn_p = lv_obj_get_ext(btn);
     
@@ -255,7 +255,7 @@ void lv_btn_set_rel_action(lv_obj_t * btn, lv_btn_action_t rel_action)
  * @param btn pointer to a button object
  * @param lpr_action pointer to function
  */
-void lv_btn_set_lpr_action(lv_obj_t * btn, lv_btn_action_t lpr_action)
+void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_t lpr_action)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext(btn);
     
@@ -267,7 +267,7 @@ void lv_btn_set_lpr_action(lv_obj_t * btn, lv_btn_action_t lpr_action)
  * @param btn pointer to a button object
  * @param lpr_rep_action pointer to function
  */
-void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_btn_action_t lpr_rep_action)
+void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext(btn);
 

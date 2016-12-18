@@ -212,7 +212,7 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
  * @param rel_action a function pointer to call when the button is released
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_btn_action_t rel_action)
+lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_t rel_action)
 {
 	lv_win_ext_t * ext = lv_obj_get_ext(win);
 	lv_wins_t * style = lv_obj_get_style(win);
@@ -280,6 +280,18 @@ const char * lv_win_get_title(lv_obj_t * win)
 	lv_win_ext_t * ext = lv_obj_get_ext(win);
 
 	return lv_label_get_text(ext->title);
+}
+
+/**
+ * Get the content object (lv_page type) of a window
+ * @param win pointer to a window object
+ * @return pointer to the content page object of a window
+ */
+lv_obj_t * lv_win_get_content(lv_obj_t * win)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext(win);
+
+    return ext->content;
 }
 
 /**

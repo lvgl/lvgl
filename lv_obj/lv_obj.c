@@ -6,13 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
-#include "../lv_draw/lv_draw_rbasic.h"
-#include "../lv_draw/lv_draw_vbasic.h"
-#include "../lv_misc/anim.h"
-#include "lv_dispi.h"
-#include "lv_refr.h"
-#include "misc/math/math_base.h"
+
+#include <lv_conf.h>
+#include <lvgl/lv_draw/lv_draw_rbasic.h>
+#include <lvgl/lv_draw/lv_draw_vbasic.h>
+#include <lvgl/lv_misc/anim.h>
+#include <lvgl/lv_obj/lv_dispi.h>
+#include <lvgl/lv_obj/lv_obj.h>
+#include <lvgl/lv_obj/lv_refr.h>
+#include <stdint.h>
+#include <string.h>
+#include <sys/types.h>
 
 #ifdef LV_IMG_DEF_WALLPAPER
 #include "../lv_objx/lv_img.h"

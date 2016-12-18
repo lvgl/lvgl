@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_app_example.h"
+#include "../lv_app/lv_app_spt.h"
 #include <stdio.h>
 
 /*********************
@@ -147,6 +148,7 @@ static void my_sc_close(lv_app_inst_t * app)
 
 }
 
+lv_action_res_t kb_open(lv_obj_t * ta, lv_dispi_t * dispi);
 /**
  * Open the application in a window
  * @param app pointer to an application
@@ -155,9 +157,25 @@ static void my_sc_close(lv_app_inst_t * app)
  */
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
+
+
 	lv_obj_t * label;
 	label = lv_label_create(win, NULL);
 	lv_label_set_text(label, ((app_data_t *)app->app_data)->txt);
+
+
+	lv_obj_t * ta;
+	ta = lv_ta_create(win, NULL);
+    lv_obj_set_size_us(ta, 200, 300);
+	lv_obj_set_pos_us(ta, 20, 270);
+	lv_rect_set_fit(ta, false, true);
+	lv_page_set_rel_action(ta, kb_open);
+}
+
+lv_action_res_t kb_open(lv_obj_t * ta, lv_dispi_t * dispi)
+{
+    lv_app_kb_open(ta);
+    return LV_ACTION_RES_OK;
 }
 
 /**

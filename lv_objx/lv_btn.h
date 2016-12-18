@@ -33,14 +33,6 @@ typedef enum
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
 
-typedef enum
-{
-	LV_ACTION_RES_OK = 0,
-	LV_ACTION_RES_INV = 0,
-}lv_action_res_t;
-
-typedef lv_action_res_t (*lv_btn_action_t) (lv_obj_t*, lv_dispi_t *);
-
 typedef struct
 {
 	uint8_t light_en :1;
@@ -73,10 +65,10 @@ typedef struct
 {       
 	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
 	/*New data for this type */
-	lv_btn_action_t pr_action;
-	lv_btn_action_t rel_action;
-	lv_btn_action_t lpr_action;
-	lv_btn_action_t lpr_rep_action;
+	lv_action_t pr_action;
+	lv_action_t rel_action;
+	lv_action_t lpr_action;
+	lv_action_t lpr_rep_action;
     
     lv_btn_state_t state;
     uint8_t tgl :1;      /*1: Toggle enabled*/
@@ -94,10 +86,10 @@ lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy);
 
 void lv_btn_set_tgl(lv_obj_t * btn, bool tgl);
 void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
-void lv_btn_set_pr_action(lv_obj_t * btn, lv_btn_action_t pr_action);
-void lv_btn_set_rel_action(lv_obj_t * btn, lv_btn_action_t rel_action);
-void lv_btn_set_lpr_action(lv_obj_t * btn, lv_btn_action_t lpr_action);
-void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_btn_action_t lpr_rep_action);
+void lv_btn_set_pr_action(lv_obj_t * btn, lv_action_t pr_action);
+void lv_btn_set_rel_action(lv_obj_t * btn, lv_action_t rel_action);
+void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_t lpr_action);
+void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action);
 
 bool lv_btn_get_tgl(lv_obj_t * btn);
 lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);

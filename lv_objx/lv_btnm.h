@@ -71,6 +71,6 @@ lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * btnm);
  *      MACROS
  **********************/
 
-#endif
+#endif /*USE_LV_BTNM*/
 
-#endif
+#endif /*LV_BTNM_H*/

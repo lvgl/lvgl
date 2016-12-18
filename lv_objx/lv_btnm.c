@@ -28,7 +28,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 #endif
 static uint8_t lv_btnm_get_width_unit(const char * btn_str);
 static void lv_btnm_create_btns(lv_obj_t * btnm, const char ** map);
-static bool lv_btnm_btn_release_action(lv_obj_t * btnm, lv_dispi_t * dispi);
+static lv_action_res_t lv_btnm_btn_release_action(lv_obj_t * btnm, lv_dispi_t * dispi);
 static void lv_btnms_init(void);
 
 /**********************
@@ -131,6 +131,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
  *            Use octal numbers (e.g. "\003") to set the relative
  *            width of a button. (max. 9 -> \011)
  *            (e.g. const char * str[] = {"a", "b", "\n", "\004c", "d", ""}).
+ *            The button do not copy the array so it can not be a local variable.
  */
 void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 {
@@ -379,12 +380,12 @@ static uint8_t lv_btnm_get_width_unit(const char * btn_str)
  * @param dispi pointer to the caller display input.
  * @return true: if the button remains valid (the button matrix or the button is not deleted)
  */
-static bool lv_btnm_btn_release_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t lv_btnm_btn_release_action(lv_obj_t * btn, lv_dispi_t * dispi)
 {
 	lv_obj_t * btnm = lv_obj_get_parent(btn);
 	lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
 	uint8_t id = lv_obj_get_free_num(btn);
-	bool ret;
+	lv_action_res_t ret;
 	if(ext->cb != NULL) {
 		ret = ext->cb(btnm, btn, id); /*Call the set callback function*/
 	}

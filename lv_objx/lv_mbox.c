@@ -91,6 +91,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy an existing message box*/
     else {
     	lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	/*TODO*/
     }
     
     return new_mbox;
@@ -173,7 +174,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
  * @param rel_action a function which will be called when the button is relesed
  * @return pointer to the created button (lv_btn)
  */
-lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_btn_action_t rel_action)
+lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t rel_action)
 {
 	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
 	lv_mboxs_t * style = lv_obj_get_style(mbox);

@@ -77,7 +77,6 @@ typedef struct {
 	lv_imgs_t  menu_btn_img_style;
 	lv_lists_t app_list_style;
 	lv_pages_t  sc_page_style;
-	lv_btns_t  sc_area_style;
 	lv_wins_t  win_style;
 	lv_btns_t  sc_style;
 	lv_labels_t sc_title_style;
@@ -108,6 +107,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app);
 void lv_app_sc_close(lv_app_inst_t * app);
 lv_obj_t * lv_app_win_open(lv_app_inst_t * app);
 void lv_app_win_close(lv_app_inst_t * app);
+lv_obj_t * lv_app_get_win_from_obj(lv_obj_t * obj);
 const lv_app_dsc_t * lv_app_get_dsc(const char * name);
 
 lv_app_style_t * lv_app_get_style(void);

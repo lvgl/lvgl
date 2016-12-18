@@ -48,7 +48,7 @@ static anim_path_t anim_path_step[] =
 		{64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
 		 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
          64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-         64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 192,};
+         64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 192,};
 
 /**********************
  *      MACROS
@@ -179,10 +179,10 @@ static void anim_task (void)
 
 			/* Get the index of the path array based on the elapsed time*/
 			uint8_t path_i;
-			if(a->time != 0) {
-				path_i = a->act_time * (ANIM_PATH_LENGTH - 1) / a->time;
+			if(a->time == a->act_time) {
+                path_i = ANIM_PATH_LENGTH - 1; /*Use the last value id the time fully elapsed*/
 			} else {
-				path_i = ANIM_PATH_LENGTH - 1;
+                path_i = a->act_time * (ANIM_PATH_LENGTH - 1) / a->time;
 			}
 			/* Get the new value which will be proportional to the current element of 'path_p'
 			 * and the 'start' and 'end' values*/

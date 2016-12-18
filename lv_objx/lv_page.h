@@ -54,6 +54,8 @@ typedef struct
 	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
 	/*New data for this type */
 	lv_obj_t * scrolling;	/*The scrollable object on the background*/
+	lv_action_t rel_action;
+	lv_action_t pr_action;
     area_t sbh;  				/*Horizontal scrollbar*/
     area_t sbv;  				/*Vertical scrollbar*/
     uint8_t sbh_draw :1; 		/*1: horizontal scrollbar is visible now*/
@@ -70,6 +72,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
 lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * copy);
 bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void  * param);
 
+void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
+void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
 void lv_page_glue_obj(lv_obj_t * page, bool glue);
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en);
 lv_obj_t * lv_page_get_scrable(lv_obj_t * page);

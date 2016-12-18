@@ -264,6 +264,18 @@ static bool lv_scrolling_signal(lv_obj_t * scrolling, lv_signal_t sign, void* pa
 					lv_inv_area(&page_ext->sbv);
             	}
                 break;
+            case LV_SIGNAL_PRESSED:
+            	if(page_ext->pr_action != NULL) {
+            		page_ext->pr_action(page, param);
+            	}
+            	break;
+            case LV_SIGNAL_RELEASED:
+            	if(lv_dispi_is_dragging(param) == false) {
+					if(page_ext->rel_action != NULL) {
+						page_ext->rel_action(page, param);
+					}
+            	}
+            	break;
             default:
                 break;
 
@@ -276,6 +288,29 @@ static bool lv_scrolling_signal(lv_obj_t * scrolling, lv_signal_t sign, void* pa
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set a release action for the page
+ * @param page pointer to a page object
+ * @param rel_action a function to call when the page is released
+ */
+void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action)
+{
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+	ext->rel_action = rel_action;
+}
+
+/**
+ * Set a press action for the page
+ * @param page pointer to a page object
+ * @param pr_action a function to call when the page is pressed
+ */
+void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action)
+{
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+	ext->pr_action = pr_action;
+}
+
 
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
@@ -309,17 +344,17 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 
 	/*Out of the page on the top*/
 	if(scrlable_y + obj_y < 0) {
-		/*Calculate a new position try to align to the middle*/
+		/*Calculate a new position and to let  scrable_rects.vpad space above*/
 		scrlable_y = -(obj_y - style->scrable_rects.vpad - style->bg_rects.vpad);
-		scrlable_y += page_h / 2 - obj_h / 2;
+		scrlable_y += style->scrable_rects.vpad;
 		refr = true;
 	}
 	/*Out of the page on the bottom*/
 	else if(scrlable_y + obj_y + obj_h > page_h) {
-		/*Calculate a new position try to align to the middle*/
+        /*Calculate a new position and to let  scrable_rects.vpad space below*/
 		scrlable_y = -obj_y;
 		scrlable_y += page_h - obj_h;
-		scrlable_y -= page_h / 2 - obj_h / 2;
+        scrlable_y -= style->scrable_rects.vpad;
 		refr = true;
 	}
 
