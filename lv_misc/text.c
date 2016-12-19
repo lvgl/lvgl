@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "text.h"
+#include "misc/math/math_base.h"
 
 /*********************
  *      DEFINES
@@ -33,6 +34,37 @@ static bool txt_is_break_char(char letter);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+void txt_get_size(point_t * size_res, const char * text, const font_t * font,
+		          uint16_t letter_space, uint16_t line_space, cord_t max_width)
+{
+    uint32_t line_start = 0;
+    uint32_t new_line_start = 0;
+    cord_t act_line_length;
+    uint8_t letter_height = font_get_height(font);
+    size_res->x = 0;
+    size_res->y = 0;
+
+    /*Calc. the height and longest line*/
+    while (text[line_start] != '\0')
+    {
+        new_line_start += txt_get_next_line(&text[line_start], font, letter_space, max_width);
+        size_res->y += letter_height;
+        size_res->y += line_space;
+
+		/*Calculate the the longest line*/
+		act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
+									   font, letter_space);
+
+		size_res->x = max(act_line_length, size_res->x);
+		line_start = new_line_start;
+    }
+
+    /*Correction with the last line space*/
+    if(size_res->y >= 0) {
+    	size_res->y -= line_space;
+    }
+}
 
 /**
  * Get the next line of text. Check line length and break chars too.

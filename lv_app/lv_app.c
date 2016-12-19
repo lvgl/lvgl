@@ -267,10 +267,14 @@ void lv_app_win_close(lv_app_inst_t * app)
 {
 	if(app->win == NULL) return;
 
+
+	lv_app_kb_close();
+
 	lv_obj_del(app->win);
 	app->win = NULL;
 	dm_free(app->win_data);
 	app->win_data = NULL;
+
 }
 
 
@@ -495,6 +499,8 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_obj_t * win = lv_win_get_from_ctrl_btn(close_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
 
+	lv_app_kb_close();
+
 #if LV_APP_ANIM_WIN_CLOSE != 0
 	lv_obj_anim(app->win, LV_ANIM_FADE | ANIM_OUT, LV_APP_ANIM_WIN_CLOSE, 0, lv_app_win_close_anim_cb);
 	lv_app_sc_close(app);
@@ -502,6 +508,7 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_app_close(app);
 	return LV_ACTION_RES_INV;
 #endif
+
 
 	return LV_ACTION_RES_OK;
 }
@@ -511,6 +518,9 @@ static lv_action_res_t lv_app_win_minim_action(lv_obj_t * close_btn, lv_dispi_t 
 {
 	lv_obj_t * win = lv_win_get_from_ctrl_btn(close_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
+
+	lv_app_kb_close();
+
 	/*Make an animation on window open*/
 	#if LV_APP_ANIM_WIN_OPEN != 0
 			anim_t a;
@@ -662,6 +672,7 @@ static void lv_app_init_style(void)
 	app_style.app_list_style.bg_pages.scrable_rects.opad = 0;
 	app_style.app_list_style.bg_pages.sb_rects.objs.color = COLOR_GRAY;
 	app_style.app_list_style.bg_pages.sb_rects.gcolor = COLOR_GRAY;
+	app_style.app_list_style.bg_pages.sb_width = 8 * LV_DOWNSCALE;
 
 	/*Shortcut page styles*/
 	lv_pages_get(LV_PAGES_DEF,&app_style.sc_page_style);
@@ -681,8 +692,8 @@ static void lv_app_init_style(void)
 	app_style.sc_style.mcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
 	app_style.sc_style.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
 	app_style.sc_style.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80);
-	app_style.sc_style.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xD0, 0xE0, 0xF0);
-	app_style.sc_style.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
+	app_style.sc_style.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xB0, 0xD0, 0xF0);
+	app_style.sc_style.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x00, 0x00, 0x00);
 	app_style.sc_style.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xB0, 0xD0, 0xF0);
 	app_style.sc_style.rects.bopa = 70;
 	app_style.sc_style.rects.bwidth = 1 * LV_STYLE_MULT;

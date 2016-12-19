@@ -29,6 +29,7 @@ typedef enum
 	LV_PAGE_SB_MODE_AUTO,
 }lv_page_sb_mode_t;
 
+
 /*Style of page*/
 typedef struct
 {
@@ -61,7 +62,6 @@ typedef struct
     uint8_t sbh_draw :1; 		/*1: horizontal scrollbar is visible now*/
     uint8_t sbv_draw :1; 		/*1: vertical scrollbar is visible now*/
 }lv_page_ext_t;
-
 
 
 /**********************

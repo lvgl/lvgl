@@ -159,45 +159,25 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     /*If 'text" still NULL then nothing to do: return*/
     if(text == NULL) return;
     
-    uint32_t line_start = 0;
-    uint32_t new_line_start = 0;
-    cord_t max_length = lv_obj_get_width(label);
-    lv_labels_t * labels = lv_obj_get_style(label);
-    const font_t * font = font_get(labels->font);
+    cord_t max_w = lv_obj_get_width(label);
+    lv_labels_t * style = lv_obj_get_style(label);
+    const font_t * font = font_get(style->font);
     uint8_t letter_height = font_get_height(font);
-    cord_t new_height = 0;
-    cord_t longest_line = 0;
-    cord_t act_line_length;
     
     ext->dot_end = LV_LABEL_DOT_END_INV;	/*Initialize the dot end index*/
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-        max_length = LV_CORD_MAX;
+        max_w = LV_CORD_MAX;
     }
     
     /*Calc. the height and longest line*/
-    while (text[line_start] != '\0')
-    {
-        new_line_start += txt_get_next_line(&text[line_start], font, labels->letter_space, max_length);
-        new_height += letter_height;
-        new_height += labels->line_space;
-        
-        /*Calculate the the longest line if the width will be expanded*/
-        if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-          act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
-                                           font, labels->letter_space);
-              longest_line = max(act_line_length, longest_line);
-        }
-
-        line_start = new_line_start;
-    }
+    point_t size;
+    txt_get_size(&size, ext->txt, font, style->letter_space, style->line_space, max_w);
     
-    /*Correction with the last line space*/
-    new_height -= labels->line_space;
     /*Refresh the full size in expand mode*/
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-    	lv_obj_set_size(label, longest_line, new_height);
+    	lv_obj_set_size(label, size.x, size.y);
 
     	/*Start scrolling if the label is greater then its parent*/
     	if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -244,7 +224,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     }
  	/*In break mode only the height can change*/
     else if (ext->long_mode == LV_LABEL_LONG_BREAK) {
-        lv_obj_set_height(label, new_height);
+        lv_obj_set_height(label, size.y);
     }
     /*Replace the last 'LV_LABEL_DOT_NUM' characters with dots
      * and save these characters*/

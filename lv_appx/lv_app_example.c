@@ -166,9 +166,9 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
 	lv_obj_t * ta;
 	ta = lv_ta_create(win, NULL);
-    lv_obj_set_size_us(ta, 200, 300);
+    lv_obj_set_size_us(ta, 200, 100);
 	lv_obj_set_pos_us(ta, 20, 270);
-	lv_rect_set_fit(ta, false, true);
+//	lv_rect_set_fit(ta, false, true);
 	lv_page_set_rel_action(ta, kb_open);
 }
 

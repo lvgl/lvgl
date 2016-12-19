@@ -448,9 +448,14 @@ static void lv_btns_init(void)
 	lv_btns_def.flags[LV_BTN_STATE_INA].transp= 0;
 	lv_btns_def.flags[LV_BTN_STATE_INA].empty = 0;
 
+	lv_btns_def.rects.objs.color = lv_btns_def.mcolor[LV_BTN_STATE_REL];
+	lv_btns_def.rects.gcolor = lv_btns_def.gcolor[LV_BTN_STATE_REL];
+	lv_btns_def.rects.bcolor = lv_btns_def.bcolor[LV_BTN_STATE_REL];
+	lv_btns_def.rects.objs.transp = 0;
+	lv_btns_def.rects.empty = 0;
+	lv_btns_def.rects.light = 0;
 	lv_btns_def.rects.bwidth = 2 * LV_STYLE_MULT;
 	lv_btns_def.rects.bopa = 50;
-	lv_btns_def.rects.light = 8 * LV_STYLE_MULT;
 	lv_btns_def.rects.empty = 0;
 	lv_btns_def.rects.round = 4 * LV_STYLE_MULT;
 	lv_btns_def.rects.hpad = 10 * LV_STYLE_MULT;

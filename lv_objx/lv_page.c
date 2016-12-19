@@ -342,15 +342,21 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 
 	bool refr = false;
 
+	cord_t top_err = -(scrlable_y + obj_y);
+	cord_t bot_err = scrlable_y + obj_y + obj_h - page_h;
+
+	/*If obj is higher then the page focus where the "error" is smaller*/
 	/*Out of the page on the top*/
-	if(scrlable_y + obj_y < 0) {
+	if((obj_h <= page_h && top_err > 0) ||
+	   (obj_h > page_h && top_err >= bot_err)) {
 		/*Calculate a new position and to let  scrable_rects.vpad space above*/
 		scrlable_y = -(obj_y - style->scrable_rects.vpad - style->bg_rects.vpad);
 		scrlable_y += style->scrable_rects.vpad;
 		refr = true;
 	}
 	/*Out of the page on the bottom*/
-	else if(scrlable_y + obj_y + obj_h > page_h) {
+	else if((obj_h <= page_h && bot_err > 0) ||
+			(obj_h > page_h && top_err < bot_err)) {
         /*Calculate a new position and to let  scrable_rects.vpad space below*/
 		scrlable_y = -obj_y;
 		scrlable_y += page_h - obj_h;
