@@ -454,13 +454,13 @@ static void lv_btns_init(void)
 	lv_btns_def.rects.objs.transp = 0;
 	lv_btns_def.rects.empty = 0;
 	lv_btns_def.rects.light = 0;
-	lv_btns_def.rects.bwidth = 2 * LV_STYLE_MULT;
+	lv_btns_def.rects.bwidth = 2 * LV_DOWNSCALE;
 	lv_btns_def.rects.bopa = 50;
 	lv_btns_def.rects.empty = 0;
-	lv_btns_def.rects.round = 4 * LV_STYLE_MULT;
-	lv_btns_def.rects.hpad = 10 * LV_STYLE_MULT;
-	lv_btns_def.rects.vpad = 15 * LV_STYLE_MULT;
-	lv_btns_def.rects.opad = 5 * LV_STYLE_MULT;
+	lv_btns_def.rects.round = 4 * LV_DOWNSCALE;
+	lv_btns_def.rects.hpad = 10 * LV_DOWNSCALE;
+	lv_btns_def.rects.vpad = 15 * LV_DOWNSCALE;
+	lv_btns_def.rects.opad = 5 * LV_DOWNSCALE;
 
 	/*Transparent style*/
 	memcpy(&lv_btns_transp, &lv_btns_def, sizeof(lv_btns_t));
@@ -489,12 +489,12 @@ static void lv_btns_init(void)
 	lv_btns_border.flags[LV_BTN_STATE_TGL_REL].empty = 1;
 	lv_btns_border.flags[LV_BTN_STATE_TGL_PR].empty = 1;
 	lv_btns_border.flags[LV_BTN_STATE_INA].empty = 1;
-	lv_btns_border.rects.bwidth = 2 * LV_STYLE_MULT;
+	lv_btns_border.rects.bwidth = 2 * LV_DOWNSCALE;
 	lv_btns_border.rects.bopa = 50;
-	lv_btns_border.rects.round = 4 * LV_STYLE_MULT;
-	lv_btns_border.rects.hpad = 10 * LV_STYLE_MULT;
-	lv_btns_border.rects.vpad = 10 * LV_STYLE_MULT;
-	lv_btns_border.rects.vpad = 5 * LV_STYLE_MULT;
+	lv_btns_border.rects.round = 4 * LV_DOWNSCALE;
+	lv_btns_border.rects.hpad = 10 * LV_DOWNSCALE;
+	lv_btns_border.rects.vpad = 10 * LV_DOWNSCALE;
+	lv_btns_border.rects.vpad = 5 * LV_DOWNSCALE;
 }
 
 #endif

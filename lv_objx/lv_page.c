@@ -562,10 +562,10 @@ static void lv_pages_init(void)
 	lv_pages_def.sb_rects.objs.color = COLOR_BLACK;
 	lv_pages_def.sb_rects.gcolor = COLOR_BLACK;
 	lv_pages_def.sb_rects.bcolor = COLOR_WHITE;
-	lv_pages_def.sb_rects.bwidth = 1 * LV_STYLE_MULT;
-	lv_pages_def.sb_rects.round = 5 * LV_STYLE_MULT;
+	lv_pages_def.sb_rects.bwidth = 1 * LV_DOWNSCALE;
+	lv_pages_def.sb_rects.round = 5 * LV_DOWNSCALE;
 
-	lv_pages_def.sb_width= 8 * LV_STYLE_MULT;
+	lv_pages_def.sb_width= 8 * LV_DOWNSCALE;
 	lv_pages_def.sb_opa=50;
 	lv_pages_def.sb_mode = LV_PAGE_SB_MODE_AUTO;
 

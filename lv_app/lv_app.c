@@ -720,9 +720,9 @@ static void lv_app_init_style(void)
 	app_style.sc_page_style.bg_rects.hpad = 0;
 	app_style.sc_page_style.bg_rects.opad = 0;
 	app_style.sc_page_style.scrable_rects.objs.transp = 1;
-	app_style.sc_page_style.scrable_rects.hpad = 20 * LV_STYLE_MULT;
-	app_style.sc_page_style.scrable_rects.vpad = 20 * LV_STYLE_MULT;
-	app_style.sc_page_style.scrable_rects.opad = 20 * LV_STYLE_MULT;
+	app_style.sc_page_style.scrable_rects.hpad = 20 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrable_rects.vpad = 20 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrable_rects.opad = 20 * LV_DOWNSCALE;
 
 	/*Shortcut styles*/
 	lv_btns_get(LV_BTNS_DEF,&app_style.sc_style);
@@ -733,7 +733,7 @@ static void lv_app_init_style(void)
 	app_style.sc_style.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x00, 0x00, 0x00);
 	app_style.sc_style.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xB0, 0xD0, 0xF0);
 	app_style.sc_style.rects.bopa = 70;
-	app_style.sc_style.rects.bwidth = 1 * LV_STYLE_MULT;
+	app_style.sc_style.rects.bwidth = 1 * LV_DOWNSCALE;
 
 	lv_labels_get(LV_LABELS_DEF,&app_style.sc_title_style);
 	app_style.sc_title_style.font = app_style.font_small;
@@ -749,11 +749,13 @@ static void lv_app_init_style(void)
 	app_style.win_style.header_on_content = 1;
 	app_style.win_style.header_opa = app_style.menu_opa;
 	app_style.win_style.ctrl_btn_opa = app_style.menu_btn_opa;
-	app_style.win_style.header.vpad = 5 * LV_STYLE_MULT;
-	app_style.win_style.header.hpad = 5 * LV_STYLE_MULT;
-	app_style.win_style.header.opad = 5 * LV_STYLE_MULT;
+	app_style.win_style.header.vpad = 5 * LV_DOWNSCALE;
+	app_style.win_style.header.hpad = 5 * LV_DOWNSCALE;
+	app_style.win_style.header.opad = 5 * LV_DOWNSCALE;
 	app_style.win_style.content.bg_rects.vpad = app_style.win_style.ctrl_btn_h +
 			                                    2 * app_style.win_style.header.vpad;
+	app_style.win_style.content.bg_rects.hpad = 5 * LV_DOWNSCALE;
+	app_style.win_style.content.scrable_rects.objs.transp = 1;
 }
 
 

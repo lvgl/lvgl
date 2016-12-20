@@ -717,13 +717,13 @@ static void lv_rects_init(void)
 	lv_rects_def.objs.color = COLOR_MAKE(0x50, 0x70, 0x90);
 	lv_rects_def.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0);
 	lv_rects_def.bcolor = COLOR_WHITE;
-	lv_rects_def.bwidth = 2 * LV_STYLE_MULT;
+	lv_rects_def.bwidth = 2 * LV_DOWNSCALE;
 	lv_rects_def.bopa = 50;
-	lv_rects_def.round = 4 * LV_STYLE_MULT;
+	lv_rects_def.round = 4 * LV_DOWNSCALE;
 	lv_rects_def.empty = 0;
-	lv_rects_def.hpad = 10 * LV_STYLE_MULT;
-	lv_rects_def.vpad = 10 * LV_STYLE_MULT;
-	lv_rects_def.opad = 10 * LV_STYLE_MULT;
+	lv_rects_def.hpad = 10 * LV_DOWNSCALE;
+	lv_rects_def.vpad = 10 * LV_DOWNSCALE;
+	lv_rects_def.opad = 10 * LV_DOWNSCALE;
 	lv_rects_def.light = 0;
 	lv_rects_def.lcolor = COLOR_MAKE(0x60, 0x60, 0x60);
 
@@ -736,9 +736,9 @@ static void lv_rects_init(void)
 	/*Border style*/
 	memcpy(&lv_rects_border, &lv_rects_def, sizeof(lv_rects_t));
 	lv_rects_border.bcolor = COLOR_BLACK;
-	lv_rects_border.bwidth = 2 * LV_STYLE_MULT;
+	lv_rects_border.bwidth = 2 * LV_DOWNSCALE;
 	lv_rects_border.bopa = 100;
-	lv_rects_border.round = 4 * LV_STYLE_MULT;
+	lv_rects_border.round = 4 * LV_DOWNSCALE;
 	lv_rects_border.empty = 1;
 }
 #endif

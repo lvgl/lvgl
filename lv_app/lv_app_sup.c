@@ -76,9 +76,9 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 {
 	if(kb_inited == false) {
 		lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
-		kb_btnms.rects.opad = 4 + LV_STYLE_MULT;
-		kb_btnms.rects.vpad = 3 + LV_STYLE_MULT;
-		kb_btnms.rects.hpad = 3 + LV_STYLE_MULT;
+		kb_btnms.rects.opad = 4 + LV_DOWNSCALE;
+		kb_btnms.rects.vpad = 3 + LV_DOWNSCALE;
+		kb_btnms.rects.hpad = 3 + LV_DOWNSCALE;
 		kb_inited = true;
 	}
 

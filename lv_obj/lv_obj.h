@@ -33,12 +33,6 @@
 #endif
 
 /*New defines*/
-#if LV_UPSCALE_SYTLE != 0
-#define LV_STYLE_MULT LV_DOWNSCALE
-#else
-#define LV_STYLE_MULT 1
-#endif
-
 #define LV_OBJ_DEF_WIDTH  (80 * LV_DOWNSCALE)
 #define LV_OBJ_DEF_HEIGHT  (60 * LV_DOWNSCALE)
 

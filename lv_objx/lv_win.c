@@ -389,7 +389,7 @@ static void lv_wins_init(void)
 	lv_pages_get(LV_PAGES_DEF, &lv_wins_def.content);
 	lv_wins_def.content.bg_rects.objs.color = COLOR_WHITE;
 	lv_wins_def.content.bg_rects.gcolor = COLOR_WHITE;
-	lv_wins_def.content.bg_rects.bwidth = 1 * LV_STYLE_MULT;
+	lv_wins_def.content.bg_rects.bwidth = 1 * LV_DOWNSCALE;
 	lv_wins_def.content.bg_rects.bcolor = COLOR_GRAY;
 	lv_wins_def.content.bg_rects.round = 0;
 	lv_wins_def.content.bg_rects.hpad = 0;
@@ -398,8 +398,8 @@ static void lv_wins_init(void)
 
 	/*Styles for the header*/
 	lv_rects_get(LV_RECTS_DEF, &lv_wins_def.header);
-	lv_wins_def.header.hpad = 5 * LV_STYLE_MULT;
-	lv_wins_def.header.vpad = 5 * LV_STYLE_MULT;
+	lv_wins_def.header.hpad = 5 * LV_DOWNSCALE;
+	lv_wins_def.header.vpad = 5 * LV_DOWNSCALE;
 	lv_wins_def.header.objs.color = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.header.gcolor = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.header.bwidth = 0;
@@ -408,14 +408,14 @@ static void lv_wins_init(void)
 	lv_rects_get(LV_RECTS_TRANSP, &lv_wins_def.ctrl_holder);
 	lv_wins_def.ctrl_holder.hpad = 0;
 	lv_wins_def.ctrl_holder.vpad = 0;
-	lv_wins_def.ctrl_holder.opad = 10 * LV_STYLE_MULT;
+	lv_wins_def.ctrl_holder.opad = 10 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_wins_def.ctrl_btn);
 	lv_wins_def.ctrl_btn.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xD0, 0xE0, 0xF0);
 	lv_wins_def.ctrl_btn.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.ctrl_btn.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.ctrl_btn.rects.bopa = 70;
-	lv_wins_def.ctrl_btn.rects.bwidth = 2 * LV_STYLE_MULT;
+	lv_wins_def.ctrl_btn.rects.bwidth = 2 * LV_DOWNSCALE;
 	lv_wins_def.ctrl_btn.rects.round = LV_RECT_CIRCLE;
 
 	lv_imgs_get(LV_IMGS_DEF, &lv_wins_def.ctrl_img);
@@ -424,11 +424,11 @@ static void lv_wins_init(void)
 
 	lv_labels_get(LV_LABELS_TITLE, &lv_wins_def.title);
 	lv_wins_def.title.objs.color = COLOR_MAKE(0xD0, 0xE0, 0xF0);
-	lv_wins_def.title.letter_space = 1 * LV_STYLE_MULT;
-	lv_wins_def.title.line_space = 1 * LV_STYLE_MULT;
+	lv_wins_def.title.letter_space = 1 * LV_DOWNSCALE;
+	lv_wins_def.title.line_space = 1 * LV_DOWNSCALE;
 
-	lv_wins_def.ctrl_btn_w = 30 * LV_STYLE_MULT;
-	lv_wins_def.ctrl_btn_h = 30 * LV_STYLE_MULT;
+	lv_wins_def.ctrl_btn_w = 30 * LV_DOWNSCALE;
+	lv_wins_def.ctrl_btn_h = 30 * LV_DOWNSCALE;
 
 	lv_wins_def.header_opa = OPA_COVER;
 	lv_wins_def.ctrl_btn_opa = OPA_COVER;

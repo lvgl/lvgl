@@ -511,8 +511,8 @@ static void lv_labels_init(void)
 	/*Default style*/
 	lv_labels_def.font = LV_FONT_DEFAULT;
 	lv_labels_def.objs.color = COLOR_MAKE(0x10, 0x18, 0x20);
-	lv_labels_def.letter_space = 2 * LV_STYLE_MULT;
-	lv_labels_def.line_space =  2 * LV_STYLE_MULT;
+	lv_labels_def.letter_space = 2 * LV_DOWNSCALE;
+	lv_labels_def.line_space =  2 * LV_DOWNSCALE;
 	lv_labels_def.mid =  0;
 
 	memcpy(&lv_labels_btn, &lv_labels_def, sizeof(lv_labels_t));
@@ -521,14 +521,14 @@ static void lv_labels_init(void)
 
 	memcpy(&lv_labels_title, &lv_labels_def, sizeof(lv_labels_t));
 	lv_labels_title.objs.color = COLOR_MAKE(0x10, 0x20, 0x30);
-	lv_labels_title.letter_space = 4 * LV_STYLE_MULT;
-	lv_labels_title.line_space =  4 * LV_STYLE_MULT;
+	lv_labels_title.letter_space = 4 * LV_DOWNSCALE;
+	lv_labels_title.line_space =  4 * LV_DOWNSCALE;
 	lv_labels_title.mid =  0;
 
 	memcpy(&lv_labels_txt, &lv_labels_def, sizeof(lv_labels_t));
 	lv_labels_txt.objs.color = COLOR_MAKE(0x16, 0x23, 0x34);
-	lv_labels_txt.letter_space = 0 * LV_STYLE_MULT;
-	lv_labels_txt.line_space =  1 * LV_STYLE_MULT;
+	lv_labels_txt.letter_space = 0 * LV_DOWNSCALE;
+	lv_labels_txt.line_space =  1 * LV_DOWNSCALE;
 	lv_labels_txt.mid =  0;
 
 }

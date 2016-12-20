@@ -567,7 +567,7 @@ static void lv_tas_init(void)
 	lv_tas_def.labels.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
 
 	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
-	lv_tas_def.cursor_width = 1 * LV_STYLE_MULT;	/*>=1 px for visible cursor*/
+	lv_tas_def.cursor_width = 1 * LV_DOWNSCALE;	/*>=1 px for visible cursor*/
 	lv_tas_def.cursor_show = 1;
 }
 #endif

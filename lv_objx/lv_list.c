@@ -324,13 +324,13 @@ static void lv_lists_init(void)
 {
 	/*Default style*/
 	lv_pages_get(LV_PAGES_TRANSP, &lv_lists_def.bg_pages);
-	lv_lists_def.bg_pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.bg_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
 
-	lv_lists_def.bg_pages.scrable_rects.vpad = 10 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.scrable_rects.hpad = 10 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.scrable_rects.opad = 5 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.scrable_rects.vpad = 10 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.scrable_rects.hpad = 10 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.scrable_rects.opad = 5 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_lists_def.liste_btns); /*List element button style*/
 
@@ -342,13 +342,13 @@ static void lv_lists_init(void)
 	lv_lists_def.liste_layout = LV_RECT_LAYOUT_ROW_M;
 
 	memcpy(&lv_lists_tight, &lv_lists_def, sizeof(lv_lists_t));
-	lv_lists_tight.bg_pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.bg_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
 
-	lv_lists_tight.bg_pages.scrable_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.scrable_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.scrable_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.scrable_rects.vpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.scrable_rects.hpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.scrable_rects.opad = 0 * LV_DOWNSCALE;
 
 }
 #endif

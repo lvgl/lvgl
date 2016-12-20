@@ -372,7 +372,7 @@ static void lv_temps_init(void)
 {
 	/*Default style*/
 	lv_rects_get(LV_RECTS_DEF, &lv_mboxs_def.bg);
-	lv_mboxs_def.bg.light = 10 * LV_STYLE_MULT;
+	lv_mboxs_def.bg.light = 10 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_mboxs_def.btn);
 	lv_mboxs_def.btn.flags[LV_BTN_STATE_PR].light_en = 0;

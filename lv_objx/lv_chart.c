@@ -582,12 +582,12 @@ static void lv_charts_init(void)
 
 	/* Div. line */
 	lv_lines_get(LV_LINES_DECOR, &lv_charts_def.div_lines);
-	lv_charts_def.div_lines.width = 1 * LV_STYLE_MULT;
+	lv_charts_def.div_lines.width = 1 * LV_DOWNSCALE;
 	lv_charts_def.div_lines.objs.color = COLOR_BLACK;
 	lv_charts_def.div_line_opa = OPA_COVER;
 
 	/*Data lines*/
-	lv_charts_def.width = 3 * LV_STYLE_MULT;
+	lv_charts_def.width = 3 * LV_DOWNSCALE;
 	lv_charts_def.data_opa = 100;
 	lv_charts_def.dark_eff = 150;
 	lv_charts_def.color[0] = COLOR_RED;

@@ -263,7 +263,7 @@ static void lv_leds_init(void)
 	lv_leds_def.bg_rect.objs.color = COLOR_RED;
 	lv_leds_def.bg_rect.gcolor = COLOR_MARRON,
 	lv_leds_def.bg_rect.bcolor = COLOR_WHITE;
-	lv_leds_def.bg_rect.bwidth = 4 * LV_STYLE_MULT;
+	lv_leds_def.bg_rect.bwidth = 4 * LV_DOWNSCALE;
 	lv_leds_def.bg_rect.bopa = 50;
 	lv_leds_def.bg_rect.round = LV_RECT_CIRCLE;
 	lv_leds_def.bg_rect.hpad = 0;
