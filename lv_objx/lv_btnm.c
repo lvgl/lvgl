@@ -225,20 +225,24 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 
 		/*Only deal with the non empty lines*/
 		if(btn_cnt != 0) {
-			/*Calculate the unit width*/
-			cord_t unit_w = max_w - ((btn_cnt-1) * btnms->rects.opad);
-			unit_w = unit_w / unit_cnt;
+			/*Calculate the width of all units*/
+			cord_t all_unit_w = max_w - ((btn_cnt-1) * btnms->rects.opad);
 
 			/*Set the button size and positions and set the texts*/
 			uint16_t i;
 			cord_t act_x = btnms->rects.hpad;
+			cord_t act_unit_w;
 			for(i = 0; i < btn_cnt; i++) {
+				/* one_unit_w = all_unit_w / unit_cnt
+				 * act_unit_w = one_unit_w * button_width
+				 * do this two operation but the multiplications first to divide a greater number */
+				act_unit_w = (all_unit_w * lv_btnm_get_width_unit(map_p_tmp[i])) / unit_cnt;
 				area_set(&ext->btn_areas[btn_i], act_x,
 						                         act_y,
-						                         act_x + unit_w * lv_btnm_get_width_unit(map_p_tmp[i]),
+						                         act_x + act_unit_w,
 				                                 act_y + btn_h);
 
-				act_x += unit_w * lv_btnm_get_width_unit(map_p_tmp[i]) + btnms->rects.opad;
+				act_x += act_unit_w + btnms->rects.opad;
 
 				i_tot ++;
 				btn_i ++;

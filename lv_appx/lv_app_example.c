@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <lvgl/lv_app/lv_app_sup.h>
 #include "lv_app_example.h"
-#include "../lv_app/lv_app_spt.h"
 #include <stdio.h>
 
 /*********************
@@ -167,14 +167,14 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 	lv_obj_t * ta;
 	ta = lv_ta_create(win, NULL);
     lv_obj_set_size_us(ta, 200, 100);
-	lv_obj_set_pos_us(ta, 20, 270);
+	lv_obj_set_pos_us(ta, 20, 200);
 //	lv_rect_set_fit(ta, false, true);
 	lv_page_set_rel_action(ta, kb_open);
 }
 
 lv_action_res_t kb_open(lv_obj_t * ta, lv_dispi_t * dispi)
 {
-    lv_app_kb_open(ta);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_NUM, NULL, NULL);
     return LV_ACTION_RES_OK;
 }
 

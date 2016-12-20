@@ -30,9 +30,10 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi);
 static lv_action_res_t lv_app_sc_pr_action(lv_obj_t * sc, lv_dispi_t * dispi);
 static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t * dispi);
 static lv_action_res_t lv_app_win_minim_action(lv_obj_t * close_btn, lv_dispi_t * dispi);
-
+#if LV_APP_ANIM_LEVEL == 2 && LV_APP_ANIM_WIN != 0
 static void lv_app_win_close_anim_cb(lv_obj_t * app_win);
 static void lv_app_win_minim_anim_cb(lv_obj_t * app_win);
+#endif
 
 static void lv_app_init_icons(void);
 static void lv_app_init_style(void);
@@ -216,7 +217,11 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 
 	/*Restore position of the scrollable part of the page*/
 	lv_obj_set_y(lv_page_get_scrable(sc_page), scrl_y);
+#if LV_APP_ANIM_LEVEL != 0
 	lv_page_focus(sc_page, app->sc, true);
+#else
+	lv_page_focus(sc_page, app->sc, false);
+#endif
 
 	return app->sc;
 }
@@ -252,6 +257,9 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	app->win = lv_win_create(lv_scr_act(), NULL);
 	lv_obj_set_free_p(app->win, app);
 	lv_obj_set_style(app->win, &app_style.win_style);
+	lv_obj_t * win_content = lv_page_get_scrable(lv_win_get_content(app->win));
+	lv_rect_set_fit(win_content, false, true);
+	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.content.bg_rects.hpad);
 
 	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
 	lv_win_add_ctrl_btn(app->win, "U:/icon_close", lv_app_win_close_action);
@@ -267,14 +275,12 @@ void lv_app_win_close(lv_app_inst_t * app)
 {
 	if(app->win == NULL) return;
 
-
-	lv_app_kb_close();
+	lv_app_kb_close(false);
 
 	lv_obj_del(app->win);
 	app->win = NULL;
 	dm_free(app->win_data);
 	app->win_data = NULL;
-
 }
 
 
@@ -310,8 +316,6 @@ lv_obj_t * lv_app_get_win_from_obj(lv_obj_t * obj)
     while(par != app_scr);
 
     return win;
-
-
 }
 
 const lv_app_dsc_t * lv_app_get_dsc(const char * name)
@@ -393,6 +397,10 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
 	lv_app_inst_t * app = lv_app_run(dsc, "");
 	lv_app_sc_open(app);
 
+#if LV_APP_ANIM_LEVEL == 2 && LV_APP_ANIM_SC != 0
+	lv_obj_anim(app->sc, LV_ANIM_FADE | ANIM_IN, LV_APP_ANIM_SC, 0, NULL);
+#endif
+
 	/*Close the app list*/
 	lv_obj_del(app_list);
 	app_list = NULL;
@@ -424,8 +432,11 @@ static lv_action_res_t lv_app_sc_page_pr_action(lv_obj_t * sc, lv_dispi_t * disp
 
 static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
 {
+#if LV_APP_ANIM_LEVEL != 0
 	lv_page_focus(sc_page, sc, true);
-
+#else
+	lv_page_focus(sc_page, sc, false);
+#endif
 	/*Close the list if opened*/
 	if(app_list != NULL) {
 		lv_obj_del(app_list);
@@ -438,19 +449,30 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
 
 		app->dsc->win_open(app, app->win);
 
-		/*Make an animation on window open*/
-#if LV_APP_ANIM_WIN_OPEN != 0
+/*Make an animation on window open*/
+#if LV_APP_ANIM_WIN != 0 && LV_APP_ANIM_LEVEL != 0
+
+#if LV_APP_ANIM_LEVEL == 1
+		lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_IN, LV_APP_ANIM_WIN, 0, NULL);
+#else /*LV_APP_ANIM_LEVEL == 2*/
+		area_t cords;
+		if(app->sc == NULL) {
+			cords.x1 = LV_HOR_RES / 2 - LV_APP_SC_WIDTH / 2;
+			cords.y1 = LV_VER_RES / 2 - LV_APP_SC_HEIGHT / 2;
+			cords.x2 = cords.x1 + LV_APP_SC_WIDTH;
+			cords.y2 = cords.y1 + LV_APP_SC_HEIGHT;
+		} else {
+			lv_obj_get_cords(app->sc, &cords);
+		}
+
 		anim_t a;
 		a.act_time = 0;
-		a.time = LV_APP_ANIM_WIN_OPEN;
+		a.time = LV_APP_ANIM_WIN;
 		a.end_cb = NULL;
 		a.playback = 0;
 		a.repeat = 0;
 		a.var = app->win;
 		a.path = anim_get_path(ANIM_PATH_LIN);
-#if LV_APP_ANIM_WIN_COMPLEX != 0
-		area_t cords;
-		lv_obj_get_cords(app->sc, &cords);
 
 		a.start = lv_obj_get_width(app->sc);
 		a.end = LV_HOR_RES;
@@ -471,13 +493,13 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
 		a.end = 0;
 		a.fp = (anim_fp_t) lv_obj_set_y;
 		anim_create(&a);
-#endif /*LV_APP_ANIM_WIN_OPEN_COMPLEX*/
 
 		a.start = OPA_TRANSP;
 		a.end = OPA_COVER;
 		a.fp = (anim_fp_t) lv_obj_set_opar;
 		anim_create(&a);
-#endif /*LV_APP_ANIM_WIN_OPEN*/
+#endif /*LV_APP_ANIM_LEVEL == 2*/
+#endif /*LLV_APP_ANIM_WIN != 0 && LV_APP_ANIM_LEVEL != 0*/
 	}
 
 	return LV_ACTION_RES_OK;
@@ -501,14 +523,18 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 
 	lv_app_kb_close();
 
-#if LV_APP_ANIM_WIN_CLOSE != 0
-	lv_obj_anim(app->win, LV_ANIM_FADE | ANIM_OUT, LV_APP_ANIM_WIN_CLOSE, 0, lv_app_win_close_anim_cb);
+#if LV_APP_ANIM_WIN != 0 && LV_APP_ANIM_LEVEL != 0
+  #if LV_APP_ANIM_LEVEL == 1
+	lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
 	lv_app_sc_close(app);
-#else
-	lv_app_close(app);
+  #else /*LV_APP_ANIM_LEVEL == 2*/
+	lv_obj_anim(app->win, LV_ANIM_FADE | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
+	lv_app_sc_close(app);
+  #endif /*LV_APP_ANIM_LEVEL*/
+#else /*LV_APP_ANIM_WIN == 0 && LV_APP_ANIM_LEVEL != 0*/
+ 	lv_app_close(app);
 	return LV_ACTION_RES_INV;
-#endif
-
+#endif /*LV_APP_ANIM_WIN*/
 
 	return LV_ACTION_RES_OK;
 }
@@ -522,47 +548,58 @@ static lv_action_res_t lv_app_win_minim_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_app_kb_close();
 
 	/*Make an animation on window open*/
-	#if LV_APP_ANIM_WIN_OPEN != 0
-			anim_t a;
-			a.act_time = 0;
-			a.time = LV_APP_ANIM_WIN_OPEN;
-			a.end_cb = NULL;
-			a.playback = 0;
-			a.repeat = 0;
-			a.var = app->win;
-			a.path = anim_get_path(ANIM_PATH_LIN);
-	#if LV_APP_ANIM_WIN_COMPLEX != 0
-			area_t cords;
-			lv_obj_get_cords(app->sc, &cords);
+#if LV_APP_ANIM_WIN != 0 && LV_APP_ANIM_LEVEL != 0
+  #if LV_APP_ANIM_LEVEL == 1
+	lv_obj_anim(app->win, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_minim_anim_cb);
+  #else /*LV_APP_ANIM_LEVEL == 2*/
+	area_t cords;
+	if(app->sc == NULL) {
+		cords.x1 = LV_HOR_RES / 2 - LV_APP_SC_WIDTH / 2;
+		cords.y1 = LV_VER_RES / 2 - LV_APP_SC_HEIGHT / 2;
+		cords.x2 = cords.x1 + LV_APP_SC_WIDTH;
+		cords.y2 = cords.y1 + LV_APP_SC_HEIGHT;
+	} else {
+		lv_obj_get_cords(app->sc, &cords);
+	}
 
-			a.end = lv_obj_get_width(app->sc);
-			a.start = LV_HOR_RES;
-			a.fp = (anim_fp_t) lv_obj_set_width;
-			anim_create(&a);
+	anim_t a;
+	a.act_time = 0;
+	a.time = LV_APP_ANIM_WIN;
+	a.end_cb = NULL;
+	a.playback = 0;
+	a.repeat = 0;
+	a.var = app->win;
+	a.path = anim_get_path(ANIM_PATH_LIN);
 
-			a.end = lv_obj_get_height(app->sc);
-			a.start = LV_VER_RES;
-			a.fp = (anim_fp_t) lv_obj_set_height;
-			anim_create(&a);
 
-			a.end = cords.x1;
-			a.start = 0;
-			a.fp = (anim_fp_t) lv_obj_set_x;
-			anim_create(&a);
+	a.end = lv_obj_get_width(app->sc);
+	a.start = LV_HOR_RES;
+	a.fp = (anim_fp_t) lv_obj_set_width;
+	anim_create(&a);
 
-			a.end = cords.y1;
-			a.start = 0;
-			a.fp = (anim_fp_t) lv_obj_set_y;
-			anim_create(&a);
-	#endif /*LV_APP_ANIM_WIN_COMPLEX*/
+	a.end = lv_obj_get_height(app->sc);
+	a.start = LV_VER_RES;
+	a.fp = (anim_fp_t) lv_obj_set_height;
+	anim_create(&a);
 
-			a.end = OPA_TRANSP;
-			a.start = OPA_COVER;
-			a.fp = (anim_fp_t) lv_obj_set_opar;
-			a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
-			//a.time = 500;
-			anim_create(&a);
-#else
+	a.end = cords.x1;
+	a.start = 0;
+	a.fp = (anim_fp_t) lv_obj_set_x;
+	anim_create(&a);
+
+	a.end = cords.y1;
+	a.start = 0;
+	a.fp = (anim_fp_t) lv_obj_set_y;
+	anim_create(&a);
+
+	a.end = OPA_TRANSP;
+	a.start = OPA_COVER;
+	a.fp = (anim_fp_t) lv_obj_set_opar;
+	a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
+	//a.time = 500;
+	anim_create(&a);
+  #endif /*LV_APP_ANIM_LEVEL*/
+#else /*LV_APP_ANIM_WIN == 0 || LV_APP_ANIM_LEVEL == 0*/
 	lv_app_win_close(app);
 	return LV_ACTION_RES_INV;
 #endif
@@ -715,8 +752,8 @@ static void lv_app_init_style(void)
 	app_style.win_style.header.vpad = 5 * LV_STYLE_MULT;
 	app_style.win_style.header.hpad = 5 * LV_STYLE_MULT;
 	app_style.win_style.header.opad = 5 * LV_STYLE_MULT;
-	//app_style.win_style.content.scrable_rects.vpad = app_style.win_style.ctrl_btn_h + 30;
-	app_style.win_style.content.bg_rects.vpad = app_style.win_style.ctrl_btn_h + 2 * app_style.win_style.header.vpad;
+	app_style.win_style.content.bg_rects.vpad = app_style.win_style.ctrl_btn_h +
+			                                    2 * app_style.win_style.header.vpad;
 }
 
 

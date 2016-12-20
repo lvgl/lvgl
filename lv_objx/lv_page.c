@@ -154,7 +154,10 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             	break;
 
             case LV_SIGNAL_CORD_CHG:
-            	lv_page_sb_refresh(page);
+            	if(ext->scrolling != NULL) {
+            		ext->scrolling->signal_f(ext->scrolling, LV_SIGNAL_CORD_CHG, &ext->scrolling->cords);
+            		lv_page_sb_refresh(page);
+            	}
             	break;
             default:
                 break;

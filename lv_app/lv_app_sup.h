@@ -1,10 +1,10 @@
 /**
- * @file lv_app_spt.h
+ * @file lv_app_sup.h
  *
  */
 
-#ifndef LV_APP_SPT_H
-#define LV_APP_SPT_H
+#ifndef LV_APP_SUP_H
+#define LV_APP_SUP_H
 
 /*********************
  *      INCLUDES
@@ -18,15 +18,20 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum
+{
+	LV_APP_KB_MODE_TXT = 0x01,
+	LV_APP_KB_MODE_NUM = 0x02,
+}lv_app_kb_mode_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_app_kb_open(lv_obj_t * ta);
-void lv_app_kb_close(void);
+void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *));
+void lv_app_kb_close(bool ok);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_APP_SPT*/
+#endif /*LV_APP_SUP_H*/

@@ -60,6 +60,10 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
 		line_start = new_line_start;
     }
 
+    if(line_start != 0 && (text[line_start - 1] == '\n' || text[line_start - 1] == '\r')) {
+    	size_res->y += letter_height + line_space;
+    }
+
     /*Correction with the last line space*/
     if(size_res->y >= 0) {
     	size_res->y -= line_space;
