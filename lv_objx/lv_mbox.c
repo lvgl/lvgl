@@ -90,7 +90,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing message box*/
     else {
-    	lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
+//    	lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
     	/*TODO*/
     }
     

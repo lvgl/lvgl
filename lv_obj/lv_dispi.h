@@ -38,8 +38,8 @@ typedef struct
 
 typedef enum
 {
-	LV_ACTION_RES_OK = 0,
-	LV_ACTION_RES_INV = 0,
+    LV_ACTION_RES_INV = 0,
+	LV_ACTION_RES_OK,
 }lv_action_res_t;
 
 typedef lv_action_res_t ( * lv_action_t) (struct __LV_OBJ_T * obj, lv_dispi_t * dispi);

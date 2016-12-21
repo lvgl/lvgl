@@ -344,9 +344,8 @@ lv_btnms_t * lv_btnms_get(lv_btnms_builtin_t style, lv_btnms_t * copy)
 static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-    	ancestor_design_f(btnm, mask, mode);
+        return ancestor_design_f(btnm, mask, mode);
     	/*Return false if the object is not covers the mask_p area*/
-    	return false;
     }
     /*Draw the object*/
     else if (mode == LV_DESIGN_DRAW_MAIN) {
@@ -405,7 +404,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			area_tmp.x2 = area_tmp.x1 + txt_size.x;
 			area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-			lv_draw_label(&area_tmp, mask, lv_labels_get(LV_LABELS_BTN, NULL), OPA_COVER, ext->map_p[txt_i]);
+			lv_draw_label(&area_tmp, mask, &style->labels, OPA_COVER, ext->map_p[txt_i]);
 			txt_i ++;
     	}
     }

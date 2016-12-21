@@ -10,6 +10,7 @@
  *      INCLUDES
  *********************/
 #include "lv_app.h"
+#if LV_APP_ENABLE != 0
 
 /*********************
  *      DEFINES
@@ -33,5 +34,6 @@ void lv_app_kb_close(bool ok);
 /**********************
  *      MACROS
  **********************/
+#endif /*LV_APP_ENABLE != 0*/
 
 #endif /*LV_APP_SUP_H*/

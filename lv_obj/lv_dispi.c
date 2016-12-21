@@ -259,7 +259,7 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
         /*If there is active object and it can be dragged run the drag*/
         if(dispi_p->act_obj != NULL) {
             dispi_p->act_obj->signal_f(dispi_p->act_obj, LV_SIGNAL_PRESSING, dispi_p);
-        
+
             dispi_drag(dispi_p);
         
             /*If there is no drag then check for long press time*/
