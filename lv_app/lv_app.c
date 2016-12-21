@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_app.h"
+
+#if LV_APP_ENABLE != 0
+
 #include "lvgl/lv_misc/anim.h"
 
 /*********************
@@ -47,6 +50,7 @@ static lv_obj_t * app_scr;
 static lv_obj_t * menuh; 	/*Holder of timg_bubbleshe menu on the top*/
 static lv_obj_t * app_btn;  /*The "Apps" button on the menu*/
 static lv_obj_t * sys_apph; /*Holder of the system app. buttons*/
+static lv_obj_t * clock; 	/*Clock on the menu bar (right top)*/
 static lv_obj_t * app_list;
 static lv_obj_t * sc_page;
 
@@ -125,9 +129,18 @@ void lv_app_init(void)
 	lv_btn_set_rel_action(app_btn, lv_app_menu_rel_action);
 	lv_obj_t * app_label = lv_label_create(app_btn, NULL);
 	lv_obj_set_style(app_label, &app_style.menu_btn_label_style);
-	lv_obj_set_pos(app_btn, 0, 0);
 	lv_label_set_text(app_label, "Apps");
+    lv_obj_set_pos(app_btn, 0, 0);
 
+	sys_apph = lv_rect_create(menuh, NULL);
+	lv_rect_set_layout(sys_apph, LV_RECT_LAYOUT_ROW_M);
+	lv_rect_set_fit(sys_apph, true, false);
+	lv_obj_set_height(sys_apph, app_style.menu_h);
+	lv_obj_set_style(sys_apph, lv_rects_get(LV_RECTS_TRANSP, NULL));
+	clock = lv_label_create(sys_apph, NULL);
+	lv_obj_set_style(clock, &app_style.menu_btn_label_style);
+	lv_label_set_text(clock, "20:17");
+	lv_obj_align(sys_apph, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
 	lv_app_refr_style();
 
 
@@ -177,13 +190,16 @@ void lv_app_close(lv_app_inst_t * app)
 }
 
 /**
- * Publish an event.
- * @param app pointer to an application which publishes the event
- * @param event an event from 'lv_app_event_t' enum
+ * Send data to other applications
+ * @param app_send pointer to the application which is sending the message
+ * @param type type of data from 'lv_app_com_type_t' enum
+ * @param data pointer to the sent data
+ * @param len length of 'data' in bytes
+ * @return number application which were received the message
  */
-void lv_app_event_send(lv_app_inst_t * app, lv_app_event_t event)
+uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , void * data, uint32_t len)
 {
-
+	return 0;
 }
 
 /**
@@ -211,7 +227,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 
 	app->sc_title = lv_label_create(app->sc, NULL);
 	lv_obj_set_style(app->sc_title, &app_style.sc_title_style);
-	lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
+	//lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
 	lv_label_set_text(app->sc_title, app->name);
 	lv_obj_align_us(app->sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, app_style.sc_title_margin);
 
@@ -263,6 +279,9 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 
 	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
 	lv_win_add_ctrl_btn(app->win, "U:/icon_close", lv_app_win_close_action);
+
+    app->win_data = dm_alloc(app->dsc->win_data_size);
+    app->dsc->win_open(app, app->win);
 
 	return app->win;
 }
@@ -330,6 +349,29 @@ const lv_app_dsc_t * lv_app_get_dsc(const char * name)
 	return NULL;
 }
 
+/**
+ * Read the list of the running applications. (Get he next element)
+ * @param prev the previous application (at the first call give NULL to get the first application)
+ * @param dsc pointer to an application descriptor to filer the applications (NULL to do not filter)
+ * @return pointer to the next running application or NULL if no more
+ */
+lv_app_inst_t * lv_app_get_next_app(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
+{
+    lv_app_inst_t * next;
+
+    while(1) {
+        if(prev == NULL) next = ll_get_head(&app_inst_ll);
+        else next = ll_get_next(&app_inst_ll, prev);
+        if(next == NULL) break;
+
+        if(next->dsc == dsc || dsc == NULL) return next;
+
+    };
+
+    return NULL;
+}
+
+
 lv_app_style_t * lv_app_get_style(void)
 {
 	return &app_style;
@@ -349,6 +391,7 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 	/*Create the app. list*/
 	else {
 		app_list = lv_list_create(lv_scr_act(), NULL);
+		lv_obj_set_hidden(app_list, true);
 		lv_obj_set_style(app_list, &app_style.app_list_style);
 		lv_obj_set_opa(app_list, app_style.menu_opa);
 		lv_obj_set_size(app_list, app_style.app_list_w, app_style.app_list_h);
@@ -386,6 +429,7 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 			lv_obj_set_opa(elem, app_style.menu_btn_opa);
 
 		}
+	    lv_obj_set_hidden(app_list, false);
 	}
 	return LV_ACTION_RES_OK;
 }
@@ -394,6 +438,10 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
 {
 	lv_app_dsc_t * dsc = lv_obj_get_free_p(app_elem_btn);
 
+    /*Close the app list*/
+    lv_obj_del(app_list);
+    app_list = NULL;
+
 	lv_app_inst_t * app = lv_app_run(dsc, "");
 	lv_app_sc_open(app);
 
@@ -401,9 +449,6 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
 	lv_obj_anim(app->sc, LV_ANIM_FADE | ANIM_IN, LV_APP_ANIM_SC, 0, NULL);
 #endif
 
-	/*Close the app list*/
-	lv_obj_del(app_list);
-	app_list = NULL;
 
 	return LV_ACTION_RES_INV;
 }
@@ -446,8 +491,6 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
 	else {
 		lv_app_inst_t * app = lv_obj_get_free_p(sc);
 		lv_app_win_open(app);
-
-		app->dsc->win_open(app, app->win);
 
 /*Make an animation on window open*/
 #if LV_APP_ANIM_WIN != 0 && LV_APP_ANIM_LEVEL != 0
@@ -656,11 +699,6 @@ static void lv_app_init_style(void)
 	app_style.app_list_h = (2 * LV_VER_RES) / 3;
 	app_style.sc_title_margin = 2 * LV_DOWNSCALE;
 
-	/*Fonts*/
-	app_style.font_small = FONT_DEJAVU_20;
-	app_style.font_medium = FONT_DEJAVU_30;
-	app_style.font_large = FONT_DEJAVU_40;
-
 	/*Opacity*/
 	app_style.menu_opa = OPA_80;
 	app_style.menu_btn_opa = OPA_50;
@@ -688,7 +726,7 @@ static void lv_app_init_style(void)
 	app_style.menu_btn_style.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
 
 	lv_labels_get(LV_LABELS_BTN,&app_style.menu_btn_label_style);
-	app_style.menu_btn_label_style.font = app_style.font_large;
+	app_style.menu_btn_label_style.font = LV_APP_FONT_LARGE;
 	app_style.menu_btn_label_style.objs.color = COLOR_MAKE(0xd0, 0xe0, 0xf0);
 
 	lv_imgs_get(LV_IMGS_DEF,&app_style.menu_btn_img_style);
@@ -736,7 +774,7 @@ static void lv_app_init_style(void)
 	app_style.sc_style.rects.bwidth = 1 * LV_DOWNSCALE;
 
 	lv_labels_get(LV_LABELS_DEF,&app_style.sc_title_style);
-	app_style.sc_title_style.font = app_style.font_small;
+	app_style.sc_title_style.font = LV_APP_FONT_SMALL;
 	app_style.sc_title_style.objs.color = COLOR_MAKE(0x20, 0x30, 0x40);
 	app_style.sc_title_style.mid = 1;
 
@@ -757,5 +795,7 @@ static void lv_app_init_style(void)
 	app_style.win_style.content.bg_rects.hpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.content.scrable_rects.objs.transp = 1;
 }
+
+#endif /*LV_APP_ENABLE != 0*/
 
 

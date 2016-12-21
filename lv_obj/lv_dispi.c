@@ -249,7 +249,6 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
     /* The reset can be set in the signal function.
      * In case of reset query ignore the remaining parts.*/
     if(lv_dispi_reset_qry == false) {
-        pr_obj->signal_f(pr_obj, LV_SIGNAL_PRESSING, dispi_p);
         dispi_p->act_obj = pr_obj;      /*Save the pressed object*/
         dispi_p->last_obj = dispi_p->act_obj; /*Refresh the last_obj*/
 
@@ -259,6 +258,8 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
 
         /*If there is active object and it can be dragged run the drag*/
         if(dispi_p->act_obj != NULL) {
+            dispi_p->act_obj->signal_f(dispi_p->act_obj, LV_SIGNAL_PRESSING, dispi_p);
+
             dispi_drag(dispi_p);
         
             /*If there is no drag then check for long press time*/

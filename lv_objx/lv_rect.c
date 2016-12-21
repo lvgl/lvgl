@@ -654,7 +654,7 @@ void lv_rect_refr_autofit(lv_obj_t * rect)
 		return;
 	}
 
-	area_t rect_cords;
+	area_t new_cords;
 	area_t ori;
 	lv_rects_t * style = lv_obj_get_style(rect);
 	lv_obj_t * i;
@@ -663,48 +663,55 @@ void lv_rect_refr_autofit(lv_obj_t * rect)
 
 	/*Search the side coordinates of the children*/
 	lv_obj_get_cords(rect, &ori);
-	lv_obj_get_cords(rect, &rect_cords);
+	lv_obj_get_cords(rect, &new_cords);
 
-	rect_cords.x1 = LV_CORD_MAX;
-	rect_cords.y1 = LV_CORD_MAX;
-	rect_cords.x2 = LV_CORD_MIN;
-	rect_cords.y2 = LV_CORD_MIN;
+	new_cords.x1 = LV_CORD_MAX;
+	new_cords.y1 = LV_CORD_MAX;
+	new_cords.x2 = LV_CORD_MIN;
+	new_cords.y2 = LV_CORD_MIN;
 
     LL_READ(rect->child_ll, i) {
 		if(lv_obj_get_hidden(i) != false) continue;
-    	rect_cords.x1 = min(rect_cords.x1, i->cords.x1);
-    	rect_cords.y1 = min(rect_cords.y1, i->cords.y1);
-        rect_cords.x2 = max(rect_cords.x2, i->cords.x2);
-        rect_cords.y2 = max(rect_cords.y2, i->cords.y2);
+    	new_cords.x1 = min(new_cords.x1, i->cords.x1);
+    	new_cords.y1 = min(new_cords.y1, i->cords.y1);
+        new_cords.x2 = max(new_cords.x2, i->cords.x2);
+        new_cords.y2 = max(new_cords.y2, i->cords.y2);
     }
 
     /*If the value is not the init value then the page has >=1 child.*/
-    if(rect_cords.x1 != LV_CORD_MAX) {
+    if(new_cords.x1 != LV_CORD_MAX) {
     	if(ext->hfit_en != 0) {
-			rect_cords.x1 -= hpad;
-			rect_cords.x2 += hpad;
+			new_cords.x1 -= hpad;
+			new_cords.x2 += hpad;
     	} else {
-    		rect_cords.x1 = rect->cords.x1;
-    		rect_cords.x2 = rect->cords.x2;
+    		new_cords.x1 = rect->cords.x1;
+    		new_cords.x2 = rect->cords.x2;
     	}
     	if(ext->vfit_en != 0) {
-			rect_cords.y1 -= vpad;
-			rect_cords.y2 += vpad;
+			new_cords.y1 -= vpad;
+			new_cords.y2 += vpad;
     	} else {
-    		rect_cords.y1 = rect->cords.y1;
-    		rect_cords.y2 = rect->cords.y2;
+    		new_cords.y1 = rect->cords.y1;
+    		new_cords.y2 = rect->cords.y2;
     	}
 
-    	lv_obj_inv(rect);
-        area_cpy(&rect->cords, &rect_cords);
-    	lv_obj_inv(rect);
+    	/*Do nothing if the coordinates are not changed*/
+    	if(rect->cords.x1 != new_cords.x1 ||
+    	   rect->cords.y1 != new_cords.y1 ||
+           rect->cords.x2 != new_cords.x2 ||
+           rect->cords.y2 != new_cords.y2) {
 
-        /*Notify the object about its new coordinates*/
-    	rect->signal_f(rect, LV_SIGNAL_CORD_CHG, &ori);
+            lv_obj_inv(rect);
+            area_cpy(&rect->cords, &new_cords);
+            lv_obj_inv(rect);
 
-        /*Inform the parent about the new coordinates*/
-    	lv_obj_t * par = lv_obj_get_parent(rect);
-    	par->signal_f(par, LV_SIGNAL_CHILD_CHG, rect);
+            /*Notify the object about its new coordinates*/
+            rect->signal_f(rect, LV_SIGNAL_CORD_CHG, &ori);
+
+            /*Inform the parent about the new coordinates*/
+            lv_obj_t * par = lv_obj_get_parent(rect);
+            par->signal_f(par, LV_SIGNAL_CHILD_CHG, rect);
+    	}
     }
 }
 

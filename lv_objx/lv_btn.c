@@ -128,7 +128,6 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
                 } else if(ext->state == LV_BTN_STATE_TGL_REL) {
                 	lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
                 }
-                lv_obj_inv(btn);
 
                 ext->lpr_exec = 0;
                 /*Call the press action, here 'param' is the caller dispi*/
@@ -143,8 +142,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
                 	lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 } else if(ext->state == LV_BTN_STATE_TGL_PR) {
                 	lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                }
-                lv_obj_inv(btn);
+                }lv_obj_inv(btn);
                 break;
 
             case LV_SIGNAL_RELEASED:
@@ -161,7 +159,6 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
                     	lv_btn_set_state(btn, LV_BTN_STATE_REL);
                     }
 
-
                     if(ext->rel_action != NULL && state != LV_BTN_STATE_INA) {
                     	valid = ext->rel_action(btn, param);
                     }
@@ -171,9 +168,9 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
                     } else if(ext->state == LV_BTN_STATE_TGL_PR) {
                     	lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
                     }
+                    lv_obj_inv(btn);
                 }
 
-                lv_obj_inv(btn);
                 break;
             case LV_SIGNAL_LONG_PRESS:
                 /*Call the long press action, here 'param' is the caller dispi*/

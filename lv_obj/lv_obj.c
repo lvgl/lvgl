@@ -35,6 +35,7 @@
  **********************/
 static void lv_obj_pos_child_refr(lv_obj_t * obj, cord_t x_diff, cord_t y_diff);
 static void lv_style_refr_core(void * style_p, lv_obj_t * obj);
+static void lv_obj_del_child(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
 
 /**********************
@@ -95,6 +96,12 @@ void lv_init(void)
     /*Init the display input handling*/
     lv_dispi_init();
 #endif
+
+    /*Initialize the application level*/
+#if LV_APP_ENABLE != 0
+    lv_app_init();
+#endif
+
 }
 
 /**
@@ -103,6 +110,10 @@ void lv_init(void)
  */
 void lv_obj_inv(lv_obj_t * obj)
 {
+
+    /*Do not invalidate hidden objects*/
+    if(obj->hidden != 0) return;
+
     /*Invalidate the object only if it belongs to the 'act_scr'*/
     lv_obj_t * act_scr_p = lv_scr_act(); 
     if(lv_obj_get_scr(obj) == act_scr_p) {
@@ -121,6 +132,10 @@ void lv_obj_inv(lv_obj_t * obj)
         /*Check through all parents*/
         while(par != NULL) {
             union_ok = area_union(&area_trunc, &area_trunc, &par->cords);
+
+            /*Do not invalidate hidden objects*/
+            if(par->hidden != 0) union_ok = false;
+
             if(union_ok == false) break; /*If no common parts with parent break;*/
             
             par = lv_obj_get_parent(par);
@@ -290,7 +305,7 @@ void lv_obj_del(lv_obj_t * obj)
         i_next = ll_get_next(&(obj->child_ll), i);
         
         /*Call the recursive del to the child too*/
-        lv_obj_del(i);
+        lv_obj_del_child(i);
         
         /*Set i to the next node*/
         i = i_next;
@@ -877,7 +892,9 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool en)
     lv_obj_t * par = lv_obj_get_parent(obj);
     par->signal_f(par, LV_SIGNAL_CHILD_CHG, obj);
 
-    lv_obj_inv(obj);
+    /*Invalidate the area because the hidden object are not invalidated*/
+    if(en = false) lv_obj_inv(obj);
+    else lv_inv_area(&obj->cords);
 }
 
 /**
@@ -1479,6 +1496,45 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
         
         lv_style_refr_core(style_p, i);
     }
+}
+
+/**
+ * Called by 'lv_obj_del' to delete the children objects
+ * @param obj pointer to an object (all of its children will be deleted)
+ */
+static void lv_obj_del_child(lv_obj_t * obj)
+{
+   lv_obj_t * i;
+   lv_obj_t * i_next;
+   i = ll_get_head(&(obj->child_ll));
+   while(i != NULL) {
+       /*Get the next object before delete this*/
+       i_next = ll_get_next(&(obj->child_ll), i);
+
+       /*Call the recursive del to the child too*/
+       lv_obj_del_child(i);
+
+       /*Set i to the next node*/
+       i = i_next;
+   }
+
+   /*Remove the animations from this object*/
+   anim_del(obj, NULL);
+
+   /*Remove the object from parent's children list*/
+   lv_obj_t * par = lv_obj_get_parent(obj);
+
+   ll_rem(&(par->child_ll), obj);
+
+   /* All children deleted.
+    * Now clean up the object specific data*/
+   obj->signal_f(obj, LV_SIGNAL_CLEANUP, NULL);
+
+   /*Delete the base objects*/
+   if(obj->ext != NULL)  dm_free(obj->ext);
+   if(obj->style_iso != 0) dm_free(obj->style_p);
+   dm_free(obj); /*Free the object itself*/
+
 }
 
 

@@ -11,6 +11,8 @@
  *********************/
 #include "lvgl/lvgl.h"
 
+#if LV_APP_ENABLE != 0
+
 /*********************
  *      DEFINES
  *********************/
@@ -32,13 +34,12 @@ typedef enum
 
 typedef enum
 {
-	LV_APP_EVENT_OPEN,
-	LV_APP_EVENT_CLOSE,
-	LV_APP_EVENT_SC_OPENED,
-	LV_APP_EVENT_SC_CLOSED,
-	LV_APP_EVENT_WIN_OPENED,
-	LV_APP_EVENT_WIN_CLOSED,
-}lv_app_event_t;
+	LV_APP_COM_TYPE_STR,    /*String data to process*/
+	LV_APP_COM_TYPE_BIN,    /*Binary data as 'int32_t' array*/
+	LV_APP_COM_TYPE_SYS,    /*System level event*/
+	LV_APP_COM_TYPE_LOG,    /*String about an event to log*/
+	LV_APP_COM_TYPE_NOTE,   /*String to display to the user as a notification*/
+}lv_app_com_type_t;
 
 struct __LV_APP_DSC_T;
 
@@ -60,7 +61,7 @@ typedef struct __LV_APP_DSC_T
 	lv_app_mode_t mode;
 	void (*app_run)(lv_app_inst_t *, const char *);
 	void (*app_close) (lv_app_inst_t *);
-	void (*event_read) (lv_app_inst_t *, lv_app_event_t);
+	void (*com_rec) (lv_app_inst_t *, lv_app_inst_t *, lv_app_com_type_t, void *, uint32_t);
 	void (*sc_open) (lv_app_inst_t *, lv_obj_t *);
 	void (*sc_close) (lv_app_inst_t *);
 	void (*win_open) (lv_app_inst_t *, lv_obj_t *);
@@ -89,10 +90,6 @@ typedef struct {
 	cord_t app_list_w;
 	cord_t app_list_h;
 	cord_t sc_title_margin;
-
-	font_types_t font_small;
-	font_types_t font_medium;
-	font_types_t font_large;
 }lv_app_style_t;
 
 
@@ -102,7 +99,7 @@ typedef struct {
 void lv_app_init(void);
 lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr);
 void lv_app_close(lv_app_inst_t * app);
-void lv_app_event_send(lv_app_inst_t * app, lv_app_event_t event);
+uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , void * data, uint32_t len);
 lv_obj_t * lv_app_sc_open(lv_app_inst_t * app);
 void lv_app_sc_close(lv_app_inst_t * app);
 lv_obj_t * lv_app_win_open(lv_app_inst_t * app);
@@ -114,10 +111,14 @@ lv_app_style_t * lv_app_get_style(void);
 void lv_app_rename(lv_app_inst_t * app, const char * name);
 void lv_app_refr_style(void);
 
+lv_app_inst_t * lv_app_get_next_app(lv_app_inst_t * prev, lv_app_dsc_t * dsc);
+
 const lv_app_dsc_t * lv_app_example_init(void);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif
+#endif /*LV_APP_ENABLE != 0*/
+
+#endif /*LV_APP_H*/
