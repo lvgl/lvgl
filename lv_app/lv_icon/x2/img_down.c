@@ -1,7 +1,7 @@
 #include "img_conf.h"
 #include "lv_conf.h"
 
-#if USE_IMG_DOWN != 0 || (LV_APP_USE_INTERNAL_ICONS != 0 && LV_DOWNSCALE == 2)
+#if USE_IMG_DOWN != 0 || LV_APP_USE_INTERNAL_ICONS == 2
 
 #include <stdint.h> 
 #include "misc/others/color.h"
