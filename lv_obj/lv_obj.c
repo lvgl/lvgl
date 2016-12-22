@@ -805,9 +805,11 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
  */
 void lv_obj_set_style(lv_obj_t * obj, void * style)
 {
+    lv_obj_inv(obj);
 
 	if(obj->style_iso != 0) {
 		dm_free(obj->style_p);
+		obj->style_iso = 0;
 	}
     obj->style_p = style;
 

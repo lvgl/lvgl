@@ -574,7 +574,19 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
 	lv_app_sc_open(app);
 
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_SC != 0
-	lv_obj_anim(app->sc, LV_ANIM_FADE | ANIM_IN, LV_APP_ANIM_SC, 0, NULL);
+    anim_t a;
+    a.act_time = 0;
+    a.time = LV_APP_ANIM_SC;
+    a.end_cb = NULL;
+    a.playback = 0;
+    a.repeat = 0;
+    a.var = app->sc;
+    a.path = anim_get_path(ANIM_PATH_LIN);
+    a.end = app_style.sc_opa;
+    a.start = OPA_TRANSP;
+    a.fp = (anim_fp_t) lv_obj_set_opa;
+    anim_create(&a);
+
 #endif
 
 	return LV_ACTION_RES_INV;
@@ -643,14 +655,16 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
     /*Connection mode: toggle the connection of 'con_sender' and this app */
     else {
         lv_app_inst_t * app = lv_obj_get_free_p(sc);
-        lv_btns_t * style = lv_obj_get_style(sc);
-        /*Add connection to this application*/
-        if(style == &app_style.sc_style) {
-            lv_obj_set_style(sc, &app_style.sc_rec_style);
-            lv_app_set_con(con_send, app);
-        } else { /*Remove the applications connection*/
-            lv_obj_set_style(sc, &app_style.sc_style);
-            lv_app_del_con(con_send, app);
+        if(app != con_send) { /*Do nothing with the sender*/
+            lv_btns_t * style = lv_obj_get_style(sc);
+            /*Add connection to this application*/
+            if(style == &app_style.sc_style) {
+                lv_obj_set_style(sc, &app_style.sc_rec_style);
+                lv_app_set_con(con_send, app);
+            } else { /*Remove the applications connection*/
+                lv_obj_set_style(sc, &app_style.sc_style);
+                lv_app_del_con(con_send, app);
+            }
         }
     }
 
@@ -861,7 +875,7 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     a.end = OPA_TRANSP;
     a.start = OPA_COVER;
     a.fp = (anim_fp_t) lv_obj_set_opar;
-    a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
+    a.end_cb = (void (*)(void *))lv_app_win_close_anim_cb;
     anim_create(&a);
 #endif
     return LV_ACTION_RES_OK;
@@ -902,7 +916,7 @@ static void lv_app_init_style(void)
 #else
     app_style.menu_opa = OPA_80;
     app_style.menu_btn_opa = OPA_50;
-    app_style.sc_opa = OPA_70;
+    app_style.sc_opa = OPA_80;
 #endif
 
 	/*Menu style*/
