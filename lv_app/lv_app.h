@@ -23,13 +23,8 @@
 typedef enum
 {
 	LV_APP_MODE_NONE 	 = 0x0000,
-	LV_APP_MODE_RUN_ONCE = 0x0001,
-	LV_APP_MODE_NO_SC    = 0x0002,		/*No short cut*/
-	LV_APP_MODE_NO_WIN   = 0x0004,		/*No window mode*/
-	LV_APP_MODE_NO_CON   = 0x0008,		/*No connection to other apps*/
-	LV_APP_MODE_NO_CLOSE = 0x0010,		/*No close control button*/
-	LV_APP_MODE_NO_FIX   = 0x0020,		/*No fix control button*/
-	LV_APP_MODE_NO_SC_TITLE = 0x0040,	/*No short cut*/
+	LV_APP_MODE_NOT_LIST = 0x0001,		/*Do not list the application*/
+	LV_APP_MODE_NO_SC_TITLE = 0x0002,	/*No short cut title*/
 }lv_app_mode_t;
 
 typedef enum
@@ -39,6 +34,7 @@ typedef enum
 	LV_APP_COM_TYPE_SYS,    /*System level event*/
 	LV_APP_COM_TYPE_LOG,    /*String about an event to log*/
 	LV_APP_COM_TYPE_NOTE,   /*String to display to the user as a notification*/
+    LV_APP_COM_TYPE_TRIG,   /*A trigger to do some specific action (data is ignored)*/
 }lv_app_com_type_t;
 
 struct __LV_APP_DSC_T;
@@ -106,15 +102,15 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app);
 void lv_app_sc_close(lv_app_inst_t * app);
 lv_obj_t * lv_app_win_open(lv_app_inst_t * app);
 void lv_app_win_close(lv_app_inst_t * app);
-lv_obj_t * lv_app_get_win_from_obj(lv_obj_t * obj);
-const lv_app_dsc_t * lv_app_get_dsc(const char * name);
+lv_obj_t * lv_app_win_get_from_obj(lv_obj_t * obj);
+const lv_app_dsc_t * lv_app_dsc_get(const char * name);
 
-void lv_app_set_con(lv_app_inst_t * sender, lv_app_inst_t * receiver);
+void lv_app_con_set(lv_app_inst_t * sender, lv_app_inst_t * receiver);
 lv_app_style_t * lv_app_get_style(void);
 void lv_app_rename(lv_app_inst_t * app, const char * name);
 void lv_app_refr_style(void);
 
-lv_app_inst_t * lv_app_get_next_app(lv_app_inst_t * prev, lv_app_dsc_t * dsc);
+lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc);
 
 const lv_app_dsc_t * lv_app_example_init(void);
 

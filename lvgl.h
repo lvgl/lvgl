@@ -31,8 +31,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define LVGL_VERSION_MAJOR 1
-#define LVGL_VERSION_MINOR 4
+#define LVGL_VERSION_MAJOR 2
+#define LVGL_VERSION_MINOR 0
 #define LVGL_VERSION_BUGFIX 0
 
 /**********************

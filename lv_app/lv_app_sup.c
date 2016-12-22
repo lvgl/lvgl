@@ -61,6 +61,7 @@ static const char * kb_map_num[] = {
 
 static cord_t kb_ta_ori_size;
 static uint8_t kb_mode;
+static bool kb_first;
 static void (*kb_close_action)(lv_obj_t *);
 static void (*kb_ok_action)(lv_obj_t *);
 static lv_btnms_t kb_btnms;
@@ -74,26 +75,39 @@ static bool kb_inited;
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Open a keyboard for a text area object
+ * @param ta pointer to a text area object
+ * @param mode 'OR'd values of 'lv_app_kb_mode_t' enum
+ * @param close a function to call when the keyboard is closed
+ * @param ok a function to called when the "Ok" button is pressed
+ */
 void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *))
 {
+    /*Init the style*/
 	if(kb_inited == false) {
 		lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
 		kb_btnms.rects.opad = 4 + LV_DOWNSCALE;
 		kb_btnms.rects.vpad = 3 + LV_DOWNSCALE;
 		kb_btnms.rects.hpad = 3 + LV_DOWNSCALE;
 		kb_btnms.rects.round = 0;
+
 		kb_inited = true;
 	}
 
+	/*Close the previous keyboard*/
     if(kb_btnm != NULL) {
         lv_app_kb_close(false);
     }
 
+    /*Save some parameters*/
     kb_ta = ta;
     kb_mode = mode;
     kb_close_action = close;
     kb_ok_action = ok;
+    kb_first = false;
 
+    /*Create a button matrix for the keyboard  */
     kb_btnm = lv_btnm_create(lv_scr_act(), NULL);
     lv_obj_set_size(kb_btnm, LV_HOR_RES, LV_VER_RES / 2);
     lv_obj_align(kb_btnm, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
@@ -108,10 +122,12 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     }
     lv_obj_set_style(kb_btnm, &kb_btnms);
 
-    kb_win = lv_app_get_win_from_obj(kb_ta);
+    /*Reduce teh size of the window and align it to the top*/
+    kb_win = lv_app_win_get_from_obj(kb_ta);
     lv_obj_set_height(kb_win, LV_VER_RES / 2);
     lv_obj_set_y(kb_win, 0);
 
+    /*If the text area is higher then the new size of the window redus its size too*/
 	lv_app_style_t * app_style = lv_app_get_style();
     cord_t win_cont_h = lv_obj_get_height(lv_win_get_content(kb_win)) -  2 * app_style->win_style.content.scrable_rects.vpad;
 	kb_ta_ori_size = lv_obj_get_height(kb_ta);
@@ -128,6 +144,10 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 #endif
 }
 
+/**
+ * Close the keyboard
+ * @param ok true: call the ok function, false: call the close function
+ */
 void lv_app_kb_close(bool ok)
 {
 	if(kb_btnm == NULL) return;
@@ -137,6 +157,8 @@ void lv_app_kb_close(bool ok)
 	} else {
 		if(kb_ok_action != NULL) kb_ok_action(kb_ta);
 	}
+
+	/*Reset the modified sizes*/
 
 	lv_obj_set_height(kb_ta, kb_ta_ori_size);
 
@@ -176,14 +198,34 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
     } else if(strcmp(txt, "1#") == 0) {
         lv_btnm_set_map(btnm, kb_map_spec);
     }  else if(strcmp(txt, "Enter") == 0) {
+        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
+            lv_ta_set_text(kb_ta, "");
+            kb_first = true;
+        }
         lv_ta_add_char(kb_ta, '\n');
     } else if(strcmp(txt, "Left") == 0) {
+        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
+            lv_ta_set_text(kb_ta, "");
+            kb_first = true;
+        }
         lv_ta_cursor_left(kb_ta);
     } else if(strcmp(txt, "Right") == 0) {
+        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
+            lv_ta_set_text(kb_ta, "");
+            kb_first = true;
+        }
         lv_ta_cursor_right(kb_ta);
     } else if(strcmp(txt, "Del") == 0) {
+        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
+            lv_ta_set_text(kb_ta, "");
+            kb_first = true;
+        }
         lv_ta_del(kb_ta);
     } else if(strcmp(txt, "+/-") == 0) {
+        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
+            lv_ta_set_text(kb_ta, "");
+            kb_first = true;
+        }
         uint16_t cur = lv_ta_get_cursor_pos(kb_ta);
         const char * ta_txt = lv_ta_get_txt(kb_ta);
         if(ta_txt[0] == '-') {
@@ -208,6 +250,10 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
         lv_app_kb_close(true);
         return LV_ACTION_RES_INV;
     } else {
+        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
+            lv_ta_set_text(kb_ta, "");
+            kb_first = true;
+        }
         lv_ta_add_text(kb_ta, txt);
     }
 

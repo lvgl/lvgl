@@ -24,7 +24,7 @@
 /*Application specific data for an instance of this application*/
 typedef struct
 {
-	const char * txt;
+
 }my_app_data_t;
 
 /*Application specific data a window of this application*/
@@ -50,7 +50,8 @@ static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
 
-static void task(void);
+static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi);
+static void kb_ok_action(lv_obj_t * ta);
 
 /**********************
  *  STATIC VARIABLES
@@ -81,8 +82,6 @@ static lv_app_dsc_t my_app_dsc =
 
 const lv_app_dsc_t * lv_app_example_init(void)
 {
-    ptask_create(task, 200, PTASK_PRIO_MID);
-
 	return &my_app_dsc;
 }
 
@@ -98,16 +97,12 @@ const lv_app_dsc_t * lv_app_example_init(void)
  */
 static void my_app_run(lv_app_inst_t * app, const char * cstr)
 {
-	/*Check the create string*/
-	if(cstr == NULL || cstr[0] == '\0') {
-		cstr = "No create\nstring";
+    /*Initialize the application*/
+	if(cstr != NULL && cstr[0] != '\0') {
+	    char buf[256];
+	    sprintf(buf,"%s - %s", my_app_dsc.name, cstr);
+	    lv_app_rename(app, buf);
 	}
-
-	/*Initialize the application*/
-	((my_app_data_t *)app->app_data)->txt = cstr;	/*Save the create string*/
-	char buf[256];
-	sprintf(buf,"%s - %s", my_app_dsc.name, cstr);
-	lv_app_rename(app, buf);
 }
 
 /**
@@ -118,7 +113,7 @@ static void my_app_run(lv_app_inst_t * app, const char * cstr)
  */
 static void my_app_close(lv_app_inst_t * app)
 {
-
+    /*No dynamically allocated data in 'my_app_data'*/
 }
 
 /**
@@ -137,12 +132,14 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 	    if (sc_data->label != NULL) {
 	        lv_label_set_text(sc_data->label, data);
 	        lv_obj_align(sc_data->label , NULL,LV_ALIGN_CENTER, 0, 0);
-
 	    }
 	}
 	else if(type == LV_APP_COM_TYPE_BIN) { /*data: array of 'int32_t' */
 
 	}
+    else if(type == LV_APP_COM_TYPE_TRIG) { /*data: ignored' */
+
+    }
 }
 
 /**
@@ -156,7 +153,7 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
     my_sc_data_t * sc_data = app->sc_data;
 
     sc_data->label = lv_label_create(sc, NULL);
-	lv_label_set_text(sc_data->label, ((my_app_data_t *)app->app_data)->txt);
+	lv_label_set_text(sc_data->label, "Empty");
 	lv_obj_set_style(sc_data->label, lv_labels_get(LV_LABELS_DEF, NULL));
 	lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
 }
@@ -167,10 +164,10 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
  */
 static void my_sc_close(lv_app_inst_t * app)
 {
-
+    /*No dynamically allocated data in 'my_sc_data'*/
 }
 
-lv_action_res_t kb_open(lv_obj_t * ta, lv_dispi_t * dispi);
+
 /**
  * Open the application in a window
  * @param app pointer to an application
@@ -179,31 +176,13 @@ lv_action_res_t kb_open(lv_obj_t * ta, lv_dispi_t * dispi);
  */
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
-    my_sc_data_t * win_data = app->win_data;
-
-
-    win_data->label = lv_label_create(win, NULL);
-	lv_label_set_text(win_data->label, ((my_app_data_t *)app->app_data)->txt);
-
-
 	lv_obj_t * ta;
 	ta = lv_ta_create(win, NULL);
     lv_obj_set_size_us(ta, 200, 100);
-	lv_obj_set_pos_us(ta, 20, 200);
-	lv_page_set_rel_action(ta, kb_open);
-	lv_obj_set_free_p(ta, app);
-}
-
-void kb_ok(lv_obj_t * ta) {
-    lv_app_inst_t * app = lv_obj_get_free_p(ta);
-    const char * txt = lv_ta_get_txt(ta);
-    lv_app_com_send(app, LV_APP_COM_TYPE_STR, txt, strlen(txt) + 1);
-}
-
-lv_action_res_t kb_open(lv_obj_t * ta, lv_dispi_t * dispi)
-{
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT, NULL, kb_ok);
-    return LV_ACTION_RES_OK;
+	lv_obj_set_pos_us(ta, 0, 0);
+    lv_obj_set_free_p(ta, app);
+	lv_page_set_rel_action(ta, ta_rel_action);
+	lv_ta_set_text(ta, "Write a text to send to the other applications");
 }
 
 /**
@@ -215,39 +194,31 @@ static void my_win_close(lv_app_inst_t * app)
 
 }
 
+/*--------------------
+ * OTHER FUNCTIONS
+ ---------------------*/
 
-static void task(void)
+/**
+ * Called when the text area on the window is released to open the app. keyboard
+ * @param ta pointer to the text area on the window
+ * @param dispi pointer to the caller display input
+ * @return LV_ACTION_RES_OK because the text area is not deleted
+ */
+static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
 {
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_CLR, NULL, kb_ok_action);
+    return LV_ACTION_RES_OK;
+}
 
-    return;
-    dm_defrag();
-
-    dm_mon_t mon;
-    dm_monitor(&mon);
-
-    lv_app_inst_t * app;
-    app = lv_app_get_next_app(NULL, &my_app_dsc);
-
-    while(app != NULL) {
-        char buf[256];
-        sprintf(buf, "Mem. total: %d\nMem. free: %d (%d)\nFrag: %d%%",
-                DM_MEM_SIZE, mon.size_free, mon.size_free * 100 / DM_MEM_SIZE, mon.pct_frag);
-
-        if(app->sc_data != NULL) {
-            my_sc_data_t * sc_data = app->sc_data;
-            lv_label_set_text(sc_data->label, buf);
-            lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
-        }
-
-        if(app->win_data != NULL) {
-            my_sc_data_t * win_data = app->win_data;
-            lv_label_set_text(win_data->label, buf);
-      //      lv_obj_align(win_data->label, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
-        }
-        app = lv_app_get_next_app(app, &my_app_dsc);
-    }
-
-
+/**
+ * Called when the "Ok" button is  pressed on the app. keyboard
+ * @param ta pointer to the text area assigned to the app. kexboard
+ */
+static void kb_ok_action(lv_obj_t * ta)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(ta);
+    const char * txt = lv_ta_get_txt(ta);
+    lv_app_com_send(app, LV_APP_COM_TYPE_STR, txt, strlen(txt) + 1);
 }
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/

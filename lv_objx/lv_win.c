@@ -456,13 +456,6 @@ static void lv_win_realign(lv_obj_t * win)
 	lv_obj_set_height(ext->ctrl_holder, style->ctrl_btn_h + 2 * style->ctrl_holder.vpad * 2);
 	lv_obj_set_width(ext->header, lv_obj_get_width(win));
 
-	if(style->header_on_content == 0) {
-		lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
-	}
-	else {
-		lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win));
-	}
-
 	/*Align the higher object first to make the correct header size first*/
 	if(lv_obj_get_height(ext->title) > lv_obj_get_height(ext->ctrl_holder)) {
 		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, style->header.hpad, 0);
@@ -475,8 +468,10 @@ static void lv_win_realign(lv_obj_t * win)
 	lv_obj_set_pos_us(ext->header, 0, 0);
 
 	if(style->header_on_content == 0) {
+        lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
 		lv_obj_align_us(ext->content, ext->header, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
 	} else {
+        lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win));
 		lv_obj_set_pos(ext->content, 0, 0);
 	}
 

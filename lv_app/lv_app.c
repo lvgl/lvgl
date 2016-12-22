@@ -183,19 +183,21 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 	lv_btn_set_rel_action(app->sc, lv_app_sc_rel_action);
     lv_btn_set_lpr_action(app->sc, lv_app_sc_lpr_action);
 	lv_page_glue_obj(app->sc, true);
-
-    /*Create a title on top of the shortcut*/
-    app->sc_title = lv_label_create(app->sc, NULL);
-    lv_obj_set_style(app->sc_title, &app_style.sc_title_style);
-#if LV_APP_EFFECT_ANIM != 0
-    lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
-#else
-    lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(font_get(app_style.sc_title_style.font)));
-    lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_DOTS);
-#endif
-    lv_label_set_text(app->sc_title, app->name);
-    lv_obj_align_us(app->sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, app_style.sc_title_margin);
-
+	if((app->dsc->mode & LV_APP_MODE_NO_SC_TITLE) == 0) {
+        /*Create a title on top of the shortcut*/
+        app->sc_title = lv_label_create(app->sc, NULL);
+        lv_obj_set_style(app->sc_title, &app_style.sc_title_style);
+    #if LV_APP_EFFECT_ANIM != 0
+        lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
+    #else
+        lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(font_get(app_style.sc_title_style.font)));
+        lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_DOTS);
+    #endif
+        lv_label_set_text(app->sc_title, app->name);
+        lv_obj_align_us(app->sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, app_style.sc_title_margin);
+	} else {
+	    app->sc_title = NULL;
+    }
 	/*Allocate data and call the app specific sc_open function*/
 	app->sc_data = dm_alloc(app->dsc->sc_data_size);
 	app->dsc->sc_open(app, app->sc);
@@ -301,7 +303,7 @@ uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , cons
  * @param receiver pointer to an application which receives data
  * @return false: no connection, true: there is connection
  */
-bool lv_app_check_con(lv_app_inst_t * sender, lv_app_inst_t * receiver)
+bool lv_app_con_check(lv_app_inst_t * sender, lv_app_inst_t * receiver)
 {
     lv_app_con_t * con;
 
@@ -319,9 +321,9 @@ bool lv_app_check_con(lv_app_inst_t * sender, lv_app_inst_t * receiver)
  * @param sender pointer to a data sender application
  * @param receiver pointer to a data receiver application
  */
-void lv_app_set_con(lv_app_inst_t * sender, lv_app_inst_t * receiver)
+void lv_app_con_set(lv_app_inst_t * sender, lv_app_inst_t * receiver)
 {
-    if(lv_app_check_con(sender, receiver) == false) {
+    if(lv_app_con_check(sender, receiver) == false) {
         lv_app_con_t * con;
         con = ll_ins_head(&app_con_ll);
         con->sender = sender;
@@ -334,7 +336,7 @@ void lv_app_set_con(lv_app_inst_t * sender, lv_app_inst_t * receiver)
  * @param sender pointer to a data sender application
  * @param receiver pointer to a data receiver application
  */
-void lv_app_del_con(lv_app_inst_t * sender, lv_app_inst_t * receiver)
+void lv_app_con_del(lv_app_inst_t * sender, lv_app_inst_t * receiver)
 {
     lv_app_con_t * con;
 
@@ -351,7 +353,7 @@ void lv_app_del_con(lv_app_inst_t * sender, lv_app_inst_t * receiver)
  * @param name name of the app. dsc.
  * @return pointer to the app. dsc.
  */
-const lv_app_dsc_t * lv_app_get_dsc(const char * name)
+const lv_app_dsc_t * lv_app_dsc_get(const char * name)
 {
     const lv_app_dsc_t ** dsc;
     LL_READ(app_dsc_ll, dsc) {
@@ -374,7 +376,7 @@ void lv_app_rename(lv_app_inst_t * app, const char * name)
 	app->name = dm_alloc(strlen(name) + 1);
 	strcpy(app->name, name);
 
-	if(app->sc != NULL) {
+	if(app->sc_title != NULL) {
 		lv_label_set_text(app->sc_title, app->name);
 	}
 }
@@ -384,7 +386,7 @@ void lv_app_rename(lv_app_inst_t * app, const char * name)
  * @param obj pointer to an object on the window
  * @return pointer to the window of 'obj'
  */
-lv_obj_t * lv_app_get_win_from_obj(lv_obj_t * obj)
+lv_obj_t * lv_app_win_get_from_obj(lv_obj_t * obj)
 {
     lv_obj_t * par = obj;
     lv_obj_t * win;
@@ -398,14 +400,13 @@ lv_obj_t * lv_app_get_win_from_obj(lv_obj_t * obj)
     return win;
 }
 
-
 /**
  * Read the list of the running applications. (Get he next element)
  * @param prev the previous application (at the first call give NULL to get the first application)
  * @param dsc pointer to an application descriptor to filer the applications (NULL to do not filter)
  * @return pointer to the next running application or NULL if no more
  */
-lv_app_inst_t * lv_app_get_next_app(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
+lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
 {
     lv_app_inst_t * next;
 
@@ -492,7 +493,6 @@ static void lv_app_init_desktop(void)
     lv_app_refr_style();
 }
 
-
 /*-----------------------
     APP. MENU ACTIONS
  ------------------------*/
@@ -513,7 +513,6 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 	/*Create the app. list*/
 	else {
 		app_list = lv_list_create(lv_scr_act(), NULL);
-		lv_obj_set_hidden(app_list, true);
 		lv_obj_set_style(app_list, &app_style.app_list_style);
 		lv_obj_set_opa(app_list, app_style.menu_opa);
 		lv_obj_set_size(app_list, app_style.app_list_w, app_style.app_list_h);
@@ -522,36 +521,12 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 		lv_app_dsc_t ** dsc;
 		lv_obj_t * elem;
 		LL_READ(app_dsc_ll, dsc) {
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-			elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-			lv_obj_set_free_p(elem, *dsc);
-			lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
+		    if(((*dsc)->mode & LV_APP_MODE_NOT_LIST) == 0) {
+                elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
+                lv_obj_set_free_p(elem, *dsc);
+                lv_obj_set_opa(elem, app_style.menu_btn_opa);
+		    }
 		}
-	    lv_obj_set_hidden(app_list, false);
 	}
 	return LV_ACTION_RES_OK;
 }
@@ -573,7 +548,7 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
 	lv_app_inst_t * app = lv_app_run(dsc, "");
 	lv_app_sc_open(app);
 
-#if LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_SC != 0
+#if LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA_ANIM != 0 && LV_APP_ANIM_SC != 0
     anim_t a;
     a.act_time = 0;
     a.time = LV_APP_ANIM_SC;
@@ -586,7 +561,6 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
     a.start = OPA_TRANSP;
     a.fp = (anim_fp_t) lv_obj_set_opa;
     anim_create(&a);
-
 #endif
 
 	return LV_ACTION_RES_INV;
@@ -660,10 +634,10 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
             /*Add connection to this application*/
             if(style == &app_style.sc_style) {
                 lv_obj_set_style(sc, &app_style.sc_rec_style);
-                lv_app_set_con(con_send, app);
+                lv_app_con_set(con_send, app);
             } else { /*Remove the applications connection*/
                 lv_obj_set_style(sc, &app_style.sc_style);
-                lv_app_del_con(con_send, app);
+                lv_app_con_del(con_send, app);
             }
         }
     }
@@ -699,7 +673,7 @@ static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_dispi_t * dispi)
         lv_obj_set_style(sc, &app_style.sc_send_style);
         lv_app_inst_t * i;
         LL_READ(app_inst_ll, i) {
-            if(i->sc != NULL && lv_app_check_con(con_send, i) != false) {
+            if(i->sc != NULL && lv_app_con_check(con_send, i) != false) {
                 lv_obj_set_style(i->sc, &app_style.sc_rec_style);
             }
         }
@@ -809,7 +783,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     a.fp = (anim_fp_t) lv_obj_set_y;
     anim_create(&a);
 
-#if LV_APP_EFFECT_OPA != 0
+#if LV_APP_EFFECT_OPA_ANIM != 0
     a.start = OPA_TRANSP;
     a.end = OPA_COVER;
     a.fp = (anim_fp_t) lv_obj_set_opar;
@@ -871,7 +845,7 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 #endif
     anim_create(&a);
 
-#if LV_APP_EFFECT_OPA != 0
+#if LV_APP_EFFECT_OPA_ANIM != 0
     a.end = OPA_TRANSP;
     a.start = OPA_COVER;
     a.fp = (anim_fp_t) lv_obj_set_opar;
