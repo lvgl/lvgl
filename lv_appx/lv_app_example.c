@@ -44,7 +44,7 @@ typedef struct
  **********************/
 static void my_app_run(lv_app_inst_t * app, const char * cstr);
 static void my_app_close(lv_app_inst_t * app);
-static void my_com_rec(lv_app_inst_t * app_rec, lv_app_inst_t * app_sender, lv_app_com_type_t type , void * data, uint32_t len);
+static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t len);
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
 static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
@@ -123,17 +123,22 @@ static void my_app_close(lv_app_inst_t * app)
 
 /**
  * Read the data have been sent to this application
- * @param app_rec pointer to an application which is receiving the message
  * @param app_send pointer to an application which sent the message
+ * @param app_rec pointer to an application which is receiving the message
  * @param type type of data from 'lv_app_com_type_t' enum
  * @param data pointer to the sent data
  * @param len length of 'data' in bytes
  */
-static void my_com_rec(lv_app_inst_t * app_rec, lv_app_inst_t * app_send,
-                       lv_app_com_type_t type , void * data, uint32_t len)
+static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
+                       lv_app_com_type_t type , const void * data, uint32_t len)
 {
 	if(type == LV_APP_COM_TYPE_STR) {      /*data: string*/
+	    my_sc_data_t * sc_data = app_rec->sc_data;
+	    if (sc_data->label != NULL) {
+	        lv_label_set_text(sc_data->label, data);
+	        lv_obj_align(sc_data->label , NULL,LV_ALIGN_CENTER, 0, 0);
 
+	    }
 	}
 	else if(type == LV_APP_COM_TYPE_BIN) { /*data: array of 'int32_t' */
 
@@ -186,11 +191,18 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_obj_set_size_us(ta, 200, 100);
 	lv_obj_set_pos_us(ta, 20, 200);
 	lv_page_set_rel_action(ta, kb_open);
+	lv_obj_set_free_p(ta, app);
+}
+
+void kb_ok(lv_obj_t * ta) {
+    lv_app_inst_t * app = lv_obj_get_free_p(ta);
+    const char * txt = lv_ta_get_txt(ta);
+    lv_app_com_send(app, LV_APP_COM_TYPE_STR, txt, strlen(txt) + 1);
 }
 
 lv_action_res_t kb_open(lv_obj_t * ta, lv_dispi_t * dispi)
 {
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT, NULL, NULL);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT, NULL, kb_ok);
     return LV_ACTION_RES_OK;
 }
 

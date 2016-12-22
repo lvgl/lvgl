@@ -28,8 +28,8 @@
 #error "LV: LV_DOWNSCALE can be only 1, 2 or 4"
 #endif
 
-#if LV_VDB_SIZE == 0 && (LV_DOWNSCALE != 1 || LV_UPSCALE_MAP != 0 || LV_UPSCALE_FONT != 0 || LV_UPSCALE_STYLE != 0)
-#error "LV: If LV_VDB_SIZE == 0 then LV_DOWNSCALE must be 1, LV_UPSCALE_MAP 0, LV_UPSCALE_FONT 0, LV_UPSCALE_STYLE 0"
+#if LV_VDB_SIZE == 0 && (LV_DOWNSCALE != 1 || LV_UPSCALE_MAP != 0  || LV_UPSCALE_STYLE != 0)
+#error "LV: If LV_VDB_SIZE == 0 then LV_DOWNSCALE must be 1, LV_UPSCALE_MAP 0, LV_UPSCALE_STYLE 0"
 #endif
 
 /*New defines*/

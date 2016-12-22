@@ -141,13 +141,7 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
-#if LV_UPSCALE_FONT == 0 ||  LV_DOWNSCALE == 1
     map_p += (row_start * font_p->width_byte) + (col_start>>3);
-#elif LV_DOWNSCALE == 2
-    map_p += ((row_start >> 1) * font_p->width_byte) + ((col_start >> 1)>>3);
-#elif LV_DOWNSCALE == 4
-    map_p += ((row_start >> 2) * font_p->width_byte) + ((col_start >> 2)>>3);
-#endif
 
     for(row = row_start; row < row_end; row ++) {
         col_byte_cnt = 0;
@@ -161,34 +155,16 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
             vdb_buf_tmp++;
 
             /*Use a col. more times depending on LV_UPSCALE_FONT*/
-#if LV_UPSCALE_FONT == 0 ||  LV_DOWNSCALE == 1
-            /*Use all cols.*/
-#elif LV_DOWNSCALE == 2
-            if((col & 0x01) == 0)
-#elif LV_DOWNSCALE == 4
-                if((col & 0x03) == 0)
-#endif
-            {
-               if(col_bit != 0) col_bit --;
-               else {
-                   col_bit = 7;
-                   col_byte_cnt ++;
-                   map_p ++;
-               }
+           if(col_bit != 0) col_bit --;
+           else {
+               col_bit = 7;
+               col_byte_cnt ++;
+               map_p ++;
+
             }
         }
 
-        /*Use a row more times depending on LV_UPSCALE_FONT*/
-#if LV_UPSCALE_FONT == 0 ||  LV_DOWNSCALE == 1
         map_p += font_p->width_byte - col_byte_cnt;
-#elif LV_DOWNSCALE == 2
-        if((row & 0x01) == 0) map_p += font_p->width_byte - col_byte_cnt;  /*Next row in the map*/
-        else map_p -= col_byte_cnt;   /*Reset the row*/
-#elif LV_DOWNSCALE == 4
-        if((row & 0x03) == 0) map_p += font_p->width_byte - col_byte_cnt;  /*Next row in the map*/
-        else map_p -= col_byte_cnt;   /*Reset the row*/
-#endif
-
         vdb_buf_tmp += vdb_width  - (col_end - col_start); /*Next row in VDB*/
     }
 }

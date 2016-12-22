@@ -140,6 +140,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     			}
     			break;
     		case LV_SIGNAL_RELEASED:
+            case LV_SIGNAL_LONG_PRESS_REP:
     			if(ext->cb != NULL &&
     			   ext->btn_pr != LV_BTNM_BTN_PR_INVALID) {
     				uint16_t txt_i = 0;
@@ -153,7 +154,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
     				ext->cb(btnm, txt_i);
     			}
-				ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
+    			if(sign == LV_SIGNAL_RELEASED) ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
 				lv_obj_inv(btnm);
 				break;
     		default:

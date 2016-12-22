@@ -61,7 +61,7 @@ typedef struct __LV_APP_DSC_T
 	lv_app_mode_t mode;
 	void (*app_run)(lv_app_inst_t *, const char *);
 	void (*app_close) (lv_app_inst_t *);
-	void (*com_rec) (lv_app_inst_t *, lv_app_inst_t *, lv_app_com_type_t, void *, uint32_t);
+	void (*com_rec) (lv_app_inst_t *, lv_app_inst_t *, lv_app_com_type_t, const void *, uint32_t);
 	void (*sc_open) (lv_app_inst_t *, lv_obj_t *);
 	void (*sc_close) (lv_app_inst_t *);
 	void (*win_open) (lv_app_inst_t *, lv_obj_t *);
@@ -80,6 +80,8 @@ typedef struct {
 	lv_pages_t  sc_page_style;
 	lv_wins_t  win_style;
 	lv_btns_t  sc_style;
+    lv_btns_t  sc_send_style;
+    lv_btns_t  sc_rec_style;
 	lv_labels_t sc_title_style;
 
 	opa_t menu_opa;
@@ -99,7 +101,7 @@ typedef struct {
 void lv_app_init(void);
 lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr);
 void lv_app_close(lv_app_inst_t * app);
-uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , void * data, uint32_t len);
+uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , const void * data, uint32_t len);
 lv_obj_t * lv_app_sc_open(lv_app_inst_t * app);
 void lv_app_sc_close(lv_app_inst_t * app);
 lv_obj_t * lv_app_win_open(lv_app_inst_t * app);
@@ -107,6 +109,7 @@ void lv_app_win_close(lv_app_inst_t * app);
 lv_obj_t * lv_app_get_win_from_obj(lv_obj_t * obj);
 const lv_app_dsc_t * lv_app_get_dsc(const char * name);
 
+void lv_app_set_con(lv_app_inst_t * sender, lv_app_inst_t * receiver);
 lv_app_style_t * lv_app_get_style(void);
 void lv_app_rename(lv_app_inst_t * app, const char * name);
 void lv_app_refr_style(void);

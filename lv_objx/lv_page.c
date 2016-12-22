@@ -159,6 +159,18 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             		lv_page_sb_refresh(page);
             	}
             	break;
+            case LV_SIGNAL_PRESSED:
+                if(ext->pr_action != NULL) {
+                    ext->pr_action(page, param);
+                }
+                break;
+            case LV_SIGNAL_RELEASED:
+                if(lv_dispi_is_dragging(param) == false) {
+                    if(ext->rel_action != NULL) {
+                        ext->rel_action(page, param);
+                    }
+                }
+                break;
             default:
                 break;
             
@@ -268,17 +280,17 @@ static bool lv_scrolling_signal(lv_obj_t * scrolling, lv_signal_t sign, void* pa
             	}
                 break;
             case LV_SIGNAL_PRESSED:
-            	if(page_ext->pr_action != NULL) {
-            		page_ext->pr_action(page, param);
-            	}
-            	break;
+                if(page_ext->pr_action != NULL) {
+                    page_ext->pr_action(page, param);
+                }
+                break;
             case LV_SIGNAL_RELEASED:
-            	if(lv_dispi_is_dragging(param) == false) {
-					if(page_ext->rel_action != NULL) {
-						page_ext->rel_action(page, param);
-					}
-            	}
-            	break;
+                if(lv_dispi_is_dragging(param) == false) {
+                    if(page_ext->rel_action != NULL) {
+                        page_ext->rel_action(page, param);
+                    }
+                }
+                break;
             default:
                 break;
 
@@ -491,8 +503,6 @@ static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_
  */
 static void lv_page_sb_refresh(lv_obj_t * page)
 {
-
-
     lv_page_ext_t * page_ext = lv_obj_get_ext(page);
     lv_pages_t * pages = lv_obj_get_style(page);
     lv_obj_t * scrolling = page_ext->scrolling;

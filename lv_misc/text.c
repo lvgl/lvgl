@@ -64,10 +64,10 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
     	size_res->y += letter_height + line_space;
     }
 
-    /*Correction with the last line space*/
-    if(size_res->y >= 0) {
-    	size_res->y -= line_space;
-    }
+    /*Correction with the last line space or set the height manually if the text is empty*/
+    if(size_res->y == 0) size_res->y = letter_height;
+    else size_res->y -= line_space;
+
 }
 
 /**

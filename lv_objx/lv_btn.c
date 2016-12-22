@@ -120,7 +120,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
     	lv_btn_ext_t * ext = lv_obj_get_ext(btn);
         bool tgl = lv_btn_get_tgl(btn);
 
-        switch (sign){
+        switch (sign) {
             case LV_SIGNAL_PRESSED:
                 /*Refresh the state*/
                 if(ext->state == LV_BTN_STATE_REL) {
@@ -357,7 +357,17 @@ static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t 
 
     /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	return ancestor_design_f(btn, mask, mode);
+        /*Temporally set a rectangle style for the button to look like as rectangle*/
+        lv_rects_t rects_tmp;
+        lv_btns_t * btns_tmp = lv_obj_get_style(btn);
+        bool ret = false;
+        lv_btn_style_load(btn, &rects_tmp);
+        if(rects_tmp.objs.transp == 0) {
+            btn->style_p = &rects_tmp;
+            ret = ancestor_design_f(btn, mask, mode); /*Draw the rectangle*/
+            btn->style_p = btns_tmp;            /*Reload the original button style*/
+        }
+    	return ret;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		area_t area;
 		lv_obj_get_cords(btn, &area);

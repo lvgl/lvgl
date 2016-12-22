@@ -88,11 +88,7 @@ static inline const uint8_t * font_get_bitmap(const font_t * font_p, uint8_t let
  */
 static inline uint8_t font_get_height(const font_t * font_p)
 {
-#if LV_DOWNSCALE > 1 && LV_UPSCALE_FONT != 0
-    return font_p->height_row * LV_DOWNSCALE;
-#else
     return font_p->height_row;
-#endif
 }
 
 /**
@@ -112,11 +108,7 @@ static inline uint8_t font_get_width(const font_t * font_p, uint8_t letter)
                                       font_p->width_bit_a[letter];
     }
 
-    #if LV_DOWNSCALE > 1 && LV_UPSCALE_FONT != 0
-    return w * LV_DOWNSCALE;
-    #else
     return w;
-#endif
 }
 
 #endif
