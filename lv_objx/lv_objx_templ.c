@@ -56,25 +56,26 @@ static lv_templs_t lv_templs_def;	/*Default template style*/
  */
 lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 {
-    /*Create the ancestor templect*/
-    lv_templ_t * new_templ = lv_templ_create(par, copy);
+    /*Create the ancestor template*/
+	/*TODO modify it to the ancestor create function */
+    lv_obj_t * new_templ = lv_obj_create(par, copy);
     dm_assert(new_templ);
     
-    /*Allocate the templect type specific extended data*/
-    lv_templ_ext_t * ext = lv_templ_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
+    /*Allocate the template type specific extended data*/
+    lv_templ_ext_t * ext = lv_obj_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
     dm_assert(ext);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_templ_set_signal_f(new_templ, lv_templ_signal);
-    lv_templ_set_design_f(new_templ, lv_templ_design);
+    lv_obj_set_signal_f(new_templ, lv_templ_signal);
+    lv_obj_set_design_f(new_templ, lv_templ_design);
 
-    /*Init the new template templect*/
+    /*Init the new template template*/
     if(copy == NULL) {
 
     }
-    /*Copy an existing templect*/
+    /*Copy an existing template*/
     else {
-    	lv_templ_ext_t * copy_ext = lv_templ_get_ext(copy);
+    	lv_templ_ext_t * copy_ext = lv_obj_get_ext(copy);
     }
     
     return new_templ;

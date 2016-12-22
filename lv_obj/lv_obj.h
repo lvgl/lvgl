@@ -1,5 +1,5 @@
 /**
- * @file lv_base_obj.h
+ * @file lv_obj.h
  * 
  */
 
@@ -28,17 +28,11 @@
 #error "LV: LV_DOWNSCALE can be only 1, 2 or 4"
 #endif
 
-#if LV_VDB_SIZE == 0 && (LV_DOWNSCALE != 1 || LV_UPSCALE_MAP != 0 || LV_UPSCALE_FONT != 0 || LV_UPSCALE_STYLE != 0)
-#error "LV: If LV_VDB_SIZE == 0 then LV_DOWNSCALE must be 1, LV_UPSCALE_MAP 0, LV_UPSCALE_FONT 0, LV_UPSCALE_STYLE 0"
+#if LV_VDB_SIZE == 0 && (LV_DOWNSCALE != 1 || LV_UPSCALE_MAP != 0  || LV_UPSCALE_STYLE != 0)
+#error "LV: If LV_VDB_SIZE == 0 then LV_DOWNSCALE must be 1, LV_UPSCALE_MAP 0, LV_UPSCALE_STYLE 0"
 #endif
 
 /*New defines*/
-#if LV_UPSCALE_SYTLE != 0
-#define LV_STYLE_MULT LV_DOWNSCALE
-#else
-#define LV_STYLE_MULT 1
-#endif
-
 #define LV_OBJ_DEF_WIDTH  (80 * LV_DOWNSCALE)
 #define LV_OBJ_DEF_HEIGHT  (60 * LV_DOWNSCALE)
 
@@ -65,9 +59,11 @@ typedef enum
 {
 	LV_SIGNAL_CLEANUP,
     LV_SIGNAL_PRESSED,
+	LV_SIGNAL_PRESSING,
     LV_SIGNAL_PRESS_LOST,
     LV_SIGNAL_RELEASED,
     LV_SIGNAL_LONG_PRESS,
+    LV_SIGNAL_LONG_PRESS_REP,
     LV_SIGNAL_DRAG_BEGIN,
     LV_SIGNAL_DRAG_END,        
     LV_SIGNAL_CHILD_CHG,
@@ -96,15 +92,15 @@ typedef struct __LV_OBJ_T
 #endif
 
     /*Attributes and states*/
-    uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
-    uint8_t drag_en      :1;    /*1: enable the dragging*/
-    uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent  :1;    /*1. Parent will be dragged instead*/
-    uint8_t style_iso 	 :1;	/*1: The object has got an own style*/
-    uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top_en       :1;	/*1: If the object or its children  is clicked it goes to the foreground*/
-    uint8_t child_chg_off:1;    /*1: Disable the child change signal. Used by the library*/
-
+    uint16_t click_en     :1;    /*1: can be pressed by a display input device*/
+    uint16_t drag_en      :1;    /*1: enable the dragging*/
+    uint16_t drag_throw_en:1;    /*1: Enable throwing with drag*/
+    uint16_t drag_parent  :1;    /*1. Parent will be dragged instead*/
+    uint16_t style_iso 	  :1;	 /*1: The object has got an own style*/
+    uint16_t hidden       :1;    /*1: Object is hidden*/
+    uint16_t top_en       :1;	 /*1: If the object or its children  is clicked it goes to the foreground*/
+    uint16_t child_chg_off:1;    /*1: Disable the child change signal. Used by the library*/
+    uint16_t opa_protect  :1;    /*1: Do not let 'lv_obj_set_opar' to set the opacity*/
     cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
 
     uint8_t free_num; 		/*Application specific identifier (set it freely)*/
@@ -208,9 +204,10 @@ void lv_obj_set_top(lv_obj_t * obj, bool en);
 void lv_obj_set_drag(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
+void lv_obj_set_opa_protect(lv_obj_t * obj, bool en);
+/*Other set*/
 void lv_obj_set_signal_f(lv_obj_t * obj, lv_signal_f_t fp);
 void lv_obj_set_design_f(lv_obj_t * obj, lv_design_f_t fp);
-/*Other set*/
 void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size);
 void lv_obj_refr_ext_size(lv_obj_t * obj);
 void lv_obj_set_style(lv_obj_t * obj, void * style);
@@ -227,6 +224,8 @@ void lv_scr_load(lv_obj_t * scr);
 lv_obj_t * lv_obj_get_scr(lv_obj_t * obj);
 lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
 lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
+uint16_t lv_obj_get_child_num(lv_obj_t * obj);
+
 /*Coordinate get*/
 void lv_obj_get_cords(lv_obj_t * obj, area_t * cords_p);
 cord_t lv_obj_get_x(lv_obj_t * obj);
@@ -242,6 +241,7 @@ bool lv_obj_get_top(lv_obj_t * obj);
 bool lv_obj_get_drag(lv_obj_t * obj);
 bool lv_obj_get_drag_throw(lv_obj_t * obj);
 bool lv_obj_get_drag_parent(lv_obj_t * obj);
+bool lv_obj_get_opa_potect(lv_obj_t * obj);
 
 /*Virtual functions get*/
 lv_design_f_t lv_obj_get_design_f(lv_obj_t * obj);
@@ -250,6 +250,7 @@ lv_signal_f_t  lv_obj_get_signal_f(lv_obj_t * obj);
 void * lv_obj_get_ext(lv_obj_t * obj);
 void * lv_obj_get_style(lv_obj_t * obj);
 uint8_t lv_obj_get_free_num(lv_obj_t * obj);
+void * lv_obj_get_free_p(lv_obj_t * obj);
 
 lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p);
 

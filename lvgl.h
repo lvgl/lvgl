@@ -24,13 +24,16 @@
 #include "lv_objx/lv_btnm.h"
 #include "lv_objx/lv_ta.h"
 #include "lv_objx/lv_win.h"
+#include "lv_objx/lv_mbox.h"
+
+#include "lv_app/lv_app.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LVGL_VERSION_MAJOR 1
-#define LVGL_VERSION_MINOR 3
-#define LVGL_VERSION_BUGFIX 1
+#define LVGL_VERSION_MAJOR 2
+#define LVGL_VERSION_MINOR 0
+#define LVGL_VERSION_BUGFIX 0
 
 /**********************
  *      TYPEDEFS

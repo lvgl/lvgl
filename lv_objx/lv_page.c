@@ -14,6 +14,7 @@
 #include "../lv_objx/lv_rect.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
+#include "../lv_misc/anim.h"
 
 /*********************
  *      DEFINES
@@ -153,8 +154,23 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             	break;
 
             case LV_SIGNAL_CORD_CHG:
-            	lv_page_sb_refresh(page);
+            	if(ext->scrolling != NULL) {
+            		ext->scrolling->signal_f(ext->scrolling, LV_SIGNAL_CORD_CHG, &ext->scrolling->cords);
+            		lv_page_sb_refresh(page);
+            	}
             	break;
+            case LV_SIGNAL_PRESSED:
+                if(ext->pr_action != NULL) {
+                    ext->pr_action(page, param);
+                }
+                break;
+            case LV_SIGNAL_RELEASED:
+                if(lv_dispi_is_dragging(param) == false) {
+                    if(ext->rel_action != NULL) {
+                        ext->rel_action(page, param);
+                    }
+                }
+                break;
             default:
                 break;
             
@@ -263,6 +279,18 @@ static bool lv_scrolling_signal(lv_obj_t * scrolling, lv_signal_t sign, void* pa
 					lv_inv_area(&page_ext->sbv);
             	}
                 break;
+            case LV_SIGNAL_PRESSED:
+                if(page_ext->pr_action != NULL) {
+                    page_ext->pr_action(page, param);
+                }
+                break;
+            case LV_SIGNAL_RELEASED:
+                if(lv_dispi_is_dragging(param) == false) {
+                    if(page_ext->rel_action != NULL) {
+                        page_ext->rel_action(page, param);
+                    }
+                }
+                break;
             default:
                 break;
 
@@ -277,20 +305,120 @@ static bool lv_scrolling_signal(lv_obj_t * scrolling, lv_signal_t sign, void* pa
  *====================*/
 
 /**
- * Glue the object to the page. After it the page can be moved (dragged) with this object too.
- * @param page pointer to an object on a page
- * @param glue true: enable glue, false: disable glue
+ * Set a release action for the page
+ * @param page pointer to a page object
+ * @param rel_action a function to call when the page is released
  */
-void lv_page_glue_obj(lv_obj_t * page, bool glue)
+void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action)
 {
-    lv_obj_set_drag_parent(page, glue);
-    lv_obj_set_drag(page, glue);
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+	ext->rel_action = rel_action;
 }
 
+/**
+ * Set a press action for the page
+ * @param page pointer to a page object
+ * @param pr_action a function to call when the page is pressed
+ */
+void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action)
+{
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+	ext->pr_action = pr_action;
+}
+
+
+/**
+ * Glue the object to the page. After it the page can be moved (dragged) with this object too.
+ * @param obj pointer to an object on a page
+ * @param glue true: enable glue, false: disable glue
+ */
+void lv_page_glue_obj(lv_obj_t * obj, bool glue)
+{
+    lv_obj_set_drag_parent(obj, glue);
+    lv_obj_set_drag(obj, glue);
+}
+
+/**
+ * Focus on an object. It ensures that the object will be visible on the page.
+ * @param page pointer to a page object
+ * @param obj pointer to an object to focus (must be on the page)
+ * @param anim_en true: scroll with animation
+ */
+void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
+{
+
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+	lv_pages_t * style = lv_obj_get_style(page);
+
+	cord_t obj_y = lv_obj_get_y(obj);
+	cord_t obj_h = lv_obj_get_height(obj);
+	cord_t scrlable_y = lv_obj_get_y(ext->scrolling);
+	cord_t page_h = lv_obj_get_height(page);
+
+	bool refr = false;
+
+	cord_t top_err = -(scrlable_y + obj_y);
+	cord_t bot_err = scrlable_y + obj_y + obj_h - page_h;
+
+	/*If obj is higher then the page focus where the "error" is smaller*/
+	/*Out of the page on the top*/
+	if((obj_h <= page_h && top_err > 0) ||
+	   (obj_h > page_h && top_err >= bot_err)) {
+		/*Calculate a new position and to let  scrable_rects.vpad space above*/
+		scrlable_y = -(obj_y - style->scrable_rects.vpad - style->bg_rects.vpad);
+		scrlable_y += style->scrable_rects.vpad;
+		refr = true;
+	}
+	/*Out of the page on the bottom*/
+	else if((obj_h <= page_h && bot_err > 0) ||
+			(obj_h > page_h && top_err < bot_err)) {
+        /*Calculate a new position and to let  scrable_rects.vpad space below*/
+		scrlable_y = -obj_y;
+		scrlable_y += page_h - obj_h;
+        scrlable_y -= style->scrable_rects.vpad;
+		refr = true;
+	}
+
+	if(refr != false) {
+#if LV_PAGE_ANIM_FOCUS_TIME == 0
+		lv_obj_set_y(ext->scrolling, scrlable_y);
+#else
+		if(anim_en == false) {
+			lv_obj_set_y(ext->scrolling, scrlable_y);
+		} else {
+			anim_t a;
+			a.act_time = 0;
+			a.start = lv_obj_get_y(ext->scrolling);
+			a.end = scrlable_y;
+			a.time = LV_PAGE_ANIM_FOCUS_TIME;//anim_speed_to_time(LV_PAGE_ANIM_SPEED, a.start, a.end);
+			a.end_cb = NULL;
+			a.playback = 0;
+			a.repeat = 0;
+			a.var = ext->scrolling;
+			a.path = anim_get_path(ANIM_PATH_LIN);
+
+			a.fp = (anim_fp_t) lv_obj_set_y;
+			anim_create(&a);
+		}
+	}
+#endif
+}
 
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the scrollable object of a page-
+ * @param page pointer to page object
+ * @return pointer to rectangle which is the scrollable part of the page
+ */
+lv_obj_t * lv_page_get_scrable(lv_obj_t * page)
+{
+	lv_page_ext_t * ext = lv_obj_get_ext(page);
+
+	return ext->scrolling;
+}
 
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable
@@ -388,8 +516,12 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     cord_t page_x0 = page->cords.x1;
     cord_t page_y0 = page->cords.y1;
 
-    lv_inv_area(&page_ext->sbh);
-    lv_inv_area(&page_ext->sbv);
+
+    if(pages->sb_mode == LV_PAGE_SB_MODE_OFF) return;
+
+    /*Invalidate the current (old) scrollbar areas*/
+    if(page_ext->sbh_draw != 0) lv_inv_area(&page_ext->sbh);
+    if(page_ext->sbv_draw != 0) lv_inv_area(&page_ext->sbv);
 
     /*Horizontal scrollbar*/
     if(scrolling_w <= obj_w - 2 * hpad) {        /*Full sized scroll bar*/
@@ -424,9 +556,10 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                    (-(lv_obj_get_y(scrolling) - vpad) * (obj_h - size_tmp - pages->sb_width)) /
                                       (scrolling_h - obj_h + 2 * vpad));
     }
-    
-    lv_inv_area(&page_ext->sbh);
-    lv_inv_area(&page_ext->sbv);
+
+    /*Invalidate the new scrollbar areas*/
+    if(page_ext->sbh_draw != 0) lv_inv_area(&page_ext->sbh);
+    if(page_ext->sbv_draw != 0) lv_inv_area(&page_ext->sbv);
 }
 
 /**
@@ -446,10 +579,10 @@ static void lv_pages_init(void)
 	lv_pages_def.sb_rects.objs.color = COLOR_BLACK;
 	lv_pages_def.sb_rects.gcolor = COLOR_BLACK;
 	lv_pages_def.sb_rects.bcolor = COLOR_WHITE;
-	lv_pages_def.sb_rects.bwidth = 1 * LV_STYLE_MULT;
-	lv_pages_def.sb_rects.round = 5 * LV_STYLE_MULT;
+	lv_pages_def.sb_rects.bwidth = 1 * LV_DOWNSCALE;
+	lv_pages_def.sb_rects.round = 5 * LV_DOWNSCALE;
 
-	lv_pages_def.sb_width= 8 * LV_STYLE_MULT;
+	lv_pages_def.sb_width= 8 * LV_DOWNSCALE;
 	lv_pages_def.sb_opa=50;
 	lv_pages_def.sb_mode = LV_PAGE_SB_MODE_AUTO;
 

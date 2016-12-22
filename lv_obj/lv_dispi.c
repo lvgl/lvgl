@@ -159,6 +159,7 @@ static void dispi_proc_point(lv_dispi_t * dispi_p, cord_t x, cord_t y)
         dispi_p->drag_in_prog = 0;
         dispi_p->long_press_sent = 0;
         dispi_p->press_time_stamp = 0;
+        dispi_p->lpr_rep_time_stamp = 0;
         dispi_p->vect_sum.x = 0;
         dispi_p->vect_sum.y = 0;
     }
@@ -245,7 +246,7 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
         }
     }
     
-    /*The reset can be set in the signal function. 
+    /* The reset can be set in the signal function.
      * In case of reset query ignore the remaining parts.*/
     if(lv_dispi_reset_qry == false) {
         dispi_p->act_obj = pr_obj;      /*Save the pressed object*/
@@ -257,6 +258,8 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
 
         /*If there is active object and it can be dragged run the drag*/
         if(dispi_p->act_obj != NULL) {
+            dispi_p->act_obj->signal_f(dispi_p->act_obj, LV_SIGNAL_PRESSING, dispi_p);
+
             dispi_drag(dispi_p);
         
             /*If there is no drag then check for long press time*/
@@ -266,8 +269,20 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
                     pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS, dispi_p);
 
                     /*Mark the signal sending to do not send it again*/
-                    dispi_p->long_press_sent = 1;    
+                    dispi_p->long_press_sent = 1;
+
+                    /*Save the long press time stamp for the long press repeat handler*/
+                    dispi_p->lpr_rep_time_stamp = systick_get();
                 }
+            }
+            /*Send long press repeated signal*/
+            if(dispi_p->drag_in_prog == 0 && dispi_p->long_press_sent == 1) {
+            	/*Send a signal about the long press repeate if enough time elapsed*/
+				if(systick_elaps(dispi_p->lpr_rep_time_stamp) > LV_DISPI_LONG_PRESS_REP_TIME) {
+					pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS_REP, dispi_p);
+                    dispi_p->lpr_rep_time_stamp = systick_get();
+
+				}
             }
         }
     }
@@ -286,6 +301,7 @@ static void disi_proc_release(lv_dispi_t * dispi_p)
 
         dispi_p->act_obj = NULL;   
         dispi_p->press_time_stamp = 0;
+        dispi_p->lpr_rep_time_stamp = 0;
     }
     
     /*The reset can be set in the signal function. 
@@ -342,12 +358,15 @@ static lv_obj_t * dispi_search_obj(const lv_dispi_t * dispi_p, lv_obj_t * obj)
  */
 static void dispi_drag(lv_dispi_t * dispi_p)
 {
-    lv_obj_t * par = lv_obj_get_parent(dispi_p->act_obj);
     lv_obj_t * drag_obj = dispi_p->act_obj;
     
-    if(lv_obj_get_drag_parent(dispi_p->act_obj) != false) {
-        drag_obj = par;
-    }
+    /*If drag parent is active check recursively the drag_parent attribute*/
+	while(lv_obj_get_drag_parent(drag_obj) != false &&
+		  drag_obj != NULL) {
+		drag_obj = lv_obj_get_parent(drag_obj);
+	}
+
+	if(drag_obj == NULL) return;
     
     if(lv_obj_get_drag(drag_obj) == false) return;
 
@@ -388,12 +407,16 @@ static void dispi_drag_throw(lv_dispi_t * dispi_p)
 	if(dispi_p->drag_in_prog == 0) return;
 
     /*Set new position if the vector is not zero*/
-    lv_obj_t * par = lv_obj_get_parent(dispi_p->last_obj);
     lv_obj_t * drag_obj = dispi_p->last_obj;
     
-    if(lv_obj_get_drag_parent(dispi_p->last_obj) != false) {
-        drag_obj = par;
-    }
+    /*If drag parent is active check recursively the drag_parent attribute*/
+
+	while(lv_obj_get_drag_parent(drag_obj) != false &&
+		  drag_obj != NULL) {
+		drag_obj = lv_obj_get_parent(drag_obj);
+	}
+
+	if(drag_obj == NULL) return;
     
     /*Return if the drag throw is not enabled*/
     if(lv_obj_get_drag_throw(drag_obj) == false ){

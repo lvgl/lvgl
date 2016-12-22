@@ -28,11 +28,21 @@ typedef struct
     lv_obj_t * act_obj;
     lv_obj_t * last_obj;
     uint32_t press_time_stamp;
+    uint32_t lpr_rep_time_stamp;
     
     /*Flags*/
     uint8_t drag_in_prog :1;
     uint8_t long_press_sent :1;
 }lv_dispi_t;
+
+
+typedef enum
+{
+    LV_ACTION_RES_INV = 0,
+	LV_ACTION_RES_OK,
+}lv_action_res_t;
+
+typedef lv_action_res_t ( * lv_action_t) (struct __LV_OBJ_T * obj, lv_dispi_t * dispi);
 
 /**********************
  * GLOBAL PROTOTYPES

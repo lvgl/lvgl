@@ -219,6 +219,8 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
     if(lv_img_get_auto_size(img) != false) {
     	lv_obj_set_size(img, ext->w, ext->h);
     }
+
+    lv_obj_inv(img);
 }
 
 /**
@@ -308,7 +310,7 @@ static void lv_imgs_init(void)
 
 	/*Dark style*/
 	memcpy(&lv_imgs_dark, &lv_imgs_def, sizeof(lv_imgs_t));
-	lv_imgs_dark.objs.color = COLOR_WHITE; lv_imgs_dark.recolor_opa = OPA_50;
+	lv_imgs_dark.objs.color = COLOR_BLACK; lv_imgs_dark.recolor_opa = OPA_50;
 
 	/*Light style*/
 	memcpy(&lv_imgs_light, &lv_imgs_dark, sizeof(lv_imgs_t));

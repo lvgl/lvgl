@@ -53,13 +53,13 @@ static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color
 
 static lv_rects_t lv_img_no_pic_rects = {
   .objs.color = COLOR_BLACK, .gcolor = COLOR_BLACK,
-  .bcolor = COLOR_RED, .bwidth = 2 * LV_STYLE_MULT, .bopa = 100,
+  .bcolor = COLOR_RED, .bwidth = 2 * LV_DOWNSCALE, .bopa = 100,
   .round = 0, .empty = 0
 };
 
 static lv_labels_t lv_img_no_pic_labels = {
   .font = LV_FONT_DEFAULT, .objs.color = COLOR_WHITE,
-  .letter_space = 1 * LV_STYLE_MULT, .line_space =  1 * LV_STYLE_MULT,
+  .letter_space = 1 * LV_DOWNSCALE, .line_space =  1 * LV_DOWNSCALE,
   .mid =  1,
 };
 

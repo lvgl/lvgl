@@ -65,7 +65,7 @@ typedef struct
  **********************/
 lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
-lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, bool (*rel_action)(lv_obj_t *, lv_dispi_t *));
+lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action);
 lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * copy);
 
 void lv_list_down(lv_obj_t * list);

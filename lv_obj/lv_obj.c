@@ -6,13 +6,21 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
-#include "../lv_draw/lv_draw_rbasic.h"
-#include "../lv_draw/lv_draw_vbasic.h"
-#include "../lv_misc/anim.h"
-#include "lv_dispi.h"
-#include "lv_refr.h"
-#include "misc/math/math_base.h"
+
+#include <lv_conf.h>
+#include <lvgl/lv_draw/lv_draw_rbasic.h>
+#include <lvgl/lv_draw/lv_draw_vbasic.h>
+#include <lvgl/lv_misc/anim.h>
+#include <lvgl/lv_obj/lv_dispi.h>
+#include <lvgl/lv_obj/lv_obj.h>
+#include <lvgl/lv_obj/lv_refr.h>
+#include <stdint.h>
+#include <string.h>
+#include <sys/types.h>
+
+#ifdef LV_IMG_DEF_WALLPAPER
+#include "../lv_objx/lv_img.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -27,18 +35,23 @@
  **********************/
 static void lv_obj_pos_child_refr(lv_obj_t * obj, cord_t x_diff, cord_t y_diff);
 static void lv_style_refr_core(void * style_p, lv_obj_t * obj);
+static void lv_obj_del_child(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_obj_t * def_scr = NULL;
-lv_obj_t * act_scr = NULL;
-ll_dsc_t scr_ll;
+static lv_obj_t * def_scr = NULL;
+static lv_obj_t * act_scr = NULL;
+static ll_dsc_t scr_ll;
 
-lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
-lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
-lv_objs_t lv_objs_transp = {.transp = 1};
+static lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
+static lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
+static lv_objs_t lv_objs_transp = {.transp = 1};
+
+#ifdef LV_IMG_DEF_WALLPAPER
+LV_IMG_DECLARE(LV_IMG_DEF_WALLPAPER);
+#endif
 
 /**********************
  *      MACROS
@@ -66,7 +79,14 @@ void lv_init(void)
 
     /*Create the default screen*/
     ll_init(&scr_ll, sizeof(lv_obj_t));
+#ifdef LV_IMG_DEF_WALLPAPER
+    lv_img_create_file("def_wp", LV_IMG_DEF_WALLPAPER);
+    def_scr = lv_img_create(NULL, NULL);
+    lv_img_set_auto_size(def_scr, false);
+    lv_img_set_file(def_scr, "U:/def_wp");
+#else
     def_scr = lv_obj_create(NULL, NULL);
+#endif
     act_scr = def_scr;
     
     /*Refresh the screen*/
@@ -76,6 +96,12 @@ void lv_init(void)
     /*Init the display input handling*/
     lv_dispi_init();
 #endif
+
+    /*Initialize the application level*/
+#if LV_APP_ENABLE != 0
+    lv_app_init();
+#endif
+
 }
 
 /**
@@ -87,7 +113,7 @@ void lv_obj_inv(lv_obj_t * obj)
     /*Invalidate the object only if it belongs to the 'act_scr'*/
     lv_obj_t * act_scr_p = lv_scr_act(); 
     if(lv_obj_get_scr(obj) == act_scr_p) {
-        /*Truncate the recursively on the parents*/
+        /*Truncate recursively to the parents*/
         area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
         bool union_ok = true;
@@ -271,7 +297,7 @@ void lv_obj_del(lv_obj_t * obj)
         i_next = ll_get_next(&(obj->child_ll), i);
         
         /*Call the recursive del to the child too*/
-        lv_obj_del(i);
+        lv_obj_del_child(i);
         
         /*Set i to the next node*/
         i = i_next;
@@ -779,9 +805,11 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
  */
 void lv_obj_set_style(lv_obj_t * obj, void * style)
 {
+    lv_obj_inv(obj);
 
 	if(obj->style_iso != 0) {
 		dm_free(obj->style_p);
+		obj->style_iso = 0;
 	}
     obj->style_p = style;
 
@@ -837,7 +865,7 @@ void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa)
         lv_obj_set_opar(i, opa);
     }
     
-    obj->opa = opa;
+    if(obj->opa_protect == 0) obj->opa = opa;
     
     lv_obj_inv(obj);
 }
@@ -914,6 +942,15 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
     obj->drag_parent = (en == true ? 1 : 0);
 }
 
+/**
+ * Do not let 'lv_obj_set_opar' to set the opacity
+ * @param obj pointer to an object
+ * @param en true: enable the 'opa_protect' for the object
+ */
+void lv_obj_set_opa_protect(lv_obj_t * obj, bool en)
+{
+    obj->opa_protect = (en == true ? 1 : 0);
+}
 /**
  * Set the signal function of an object. 
  * Always call the previous signal function in the new.
@@ -1136,6 +1173,21 @@ lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child)
 	return NULL;
 }
 
+/**
+ * Count the children of an object (only children directly on 'obj')
+ * @param obj pointer to an object
+ * @return children number of 'obj'
+ */
+uint16_t lv_obj_get_child_num(lv_obj_t * obj)
+{
+	lv_obj_t * i;
+	uint16_t cnt = 0;
+
+	LL_READ(obj->child_ll, i) cnt++;
+
+	return cnt;
+}
+
 /*---------------------
  * Coordinate get
  *--------------------*/
@@ -1298,6 +1350,16 @@ bool lv_obj_get_drag_parent(lv_obj_t * obj)
 }
 
 /**
+ * Get the opa_protect attribute of an object
+ * @param obj pointer to an object
+ * @return true: opa_protect is enabled
+ */
+bool lv_obj_get_opa_protect(lv_obj_t * obj)
+{
+    return obj->opa_protect == 0 ? false : true;
+}
+
+/**
  * Get the signal function of an object
  * @param obj pointer to an object
  * @return the signal function
@@ -1426,6 +1488,45 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
         
         lv_style_refr_core(style_p, i);
     }
+}
+
+/**
+ * Called by 'lv_obj_del' to delete the children objects
+ * @param obj pointer to an object (all of its children will be deleted)
+ */
+static void lv_obj_del_child(lv_obj_t * obj)
+{
+   lv_obj_t * i;
+   lv_obj_t * i_next;
+   i = ll_get_head(&(obj->child_ll));
+   while(i != NULL) {
+       /*Get the next object before delete this*/
+       i_next = ll_get_next(&(obj->child_ll), i);
+
+       /*Call the recursive del to the child too*/
+       lv_obj_del_child(i);
+
+       /*Set i to the next node*/
+       i = i_next;
+   }
+
+   /*Remove the animations from this object*/
+   anim_del(obj, NULL);
+
+   /*Remove the object from parent's children list*/
+   lv_obj_t * par = lv_obj_get_parent(obj);
+
+   ll_rem(&(par->child_ll), obj);
+
+   /* All children deleted.
+    * Now clean up the object specific data*/
+   obj->signal_f(obj, LV_SIGNAL_CLEANUP, NULL);
+
+   /*Delete the base objects*/
+   if(obj->ext != NULL)  dm_free(obj->ext);
+   if(obj->style_iso != 0) dm_free(obj->style_p);
+   dm_free(obj); /*Free the object itself*/
+
 }
 
 

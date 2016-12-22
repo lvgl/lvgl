@@ -30,8 +30,8 @@ typedef struct
  *  STATIC PROTOTYPES
  **********************/
 static void lv_refr_task(void);
-static void lv_refr_join_area(lv_join_t * area_a, uint32_t inv_num);
-static void lv_refr_areas(lv_join_t * area_a, uint32_t area_num);
+static void lv_refr_join_area(void);
+static void lv_refr_areas(void);
 #if LV_VDB_SIZE == 0
 static void lv_refr_area_no_vdb(const area_t * area_p);
 #else
@@ -45,8 +45,8 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-fifo_t fifo_inv;
-area_t fifo_inv_buf[LV_INV_FIFO_SIZE];
+lv_join_t inv_buf[LV_INV_FIFO_SIZE];
+uint16_t inv_buf_p;
 
 /**********************
  *      MACROS
@@ -61,8 +61,9 @@ area_t fifo_inv_buf[LV_INV_FIFO_SIZE];
  */
 void lv_refr_init(void)
 {    
-    fifo_init(&fifo_inv, fifo_inv_buf, sizeof(area_t), LV_INV_FIFO_SIZE);
-    
+    inv_buf_p = 0;
+    memset(inv_buf, 0, sizeof(inv_buf));
+
     ptask_t* task;
     task = ptask_create(lv_refr_task, LV_REFR_PERIOD, PTASK_PRIO_MID);
     dm_assert(task);
@@ -101,16 +102,22 @@ void lv_inv_area(const area_t * area_p)
     	com_area.x2 = com_area.x2 | 0x3;
     	com_area.y2 = com_area.y2 | 0x3;
 #endif
-        /*Save the area*/
-        suc = fifo_push(&fifo_inv, &com_area); 
 
-        /* There is no place for the new area 
-         * clear the fifo and add the whole screen*/
-        if(suc == false)
-        {
-            fifo_clear(&fifo_inv);
-            fifo_push(&fifo_inv, &scr_area);        
+    	/*Save only if this area is not in one of the saved areas*/
+    	uint16_t i;
+    	for(i = 0; i < inv_buf_p; i++) {
+    	    if(area_is_in(&com_area, &inv_buf[i].area) != false) return;
+    	}
+
+
+        /*Save the area*/
+    	if(inv_buf_p < LV_INV_FIFO_SIZE) {
+            area_cpy(&inv_buf[inv_buf_p].area,&com_area);
+    	} else {/*If no place for the area add the screen*/
+    	    inv_buf_p = 0;
+            area_cpy(&inv_buf[inv_buf_p].area,&scr_area);
         }
+    	inv_buf_p ++;
     }
 }
 
@@ -123,66 +130,50 @@ void lv_inv_area(const area_t * area_p)
  */
 static void lv_refr_task(void)
 {
-    lv_join_t area_tmp[LV_INV_FIFO_SIZE];
+    lv_refr_join_area();
     
-    memset(area_tmp, 0, sizeof(area_tmp));
-    
-    /*Read all data from the fifo_inv*/
-    uint32_t inv_num;
-    bool suc;
-    for(inv_num = 0; inv_num < LV_INV_FIFO_SIZE; inv_num++)
-    {
-         suc = fifo_pop(&fifo_inv, &area_tmp[inv_num].area); 
-         
-         if(suc == false) /*Break id the fifo is empty*/
-         {
-             break;
-         }
-    }
- 
-    lv_refr_join_area(area_tmp, inv_num);
-    
-    lv_refr_areas(area_tmp, inv_num);
+    lv_refr_areas();
+
+    memset(inv_buf, 0, sizeof(inv_buf));
+    inv_buf_p = 0;
 }
 
 
 /**
  * Join the areas which has got common parts
- * @param join_a an array of areas to join
- * @param inv_num item number of the array
  */
-static void lv_refr_join_area(lv_join_t * area_a, uint32_t area_num)
+static void lv_refr_join_area(void)
 {
     uint32_t join_from;
     uint32_t join_in;
     area_t joined_area;
-    for(join_in = 0; join_in < area_num; join_in++) {
-        if(area_a[join_in].joined != 0) continue;
+    for(join_in = 0; join_in < inv_buf_p; join_in++) {
+        if(inv_buf[join_in].joined != 0) continue;
         
         /*Check all areas to join them in 'join_in'*/
-        for(join_from = 0; join_from < area_num; join_from++) {
+        for(join_from = 0; join_from < inv_buf_p; join_from++) {
             /*Handle only unjoined areas and ignore itself*/
-            if(area_a[join_from].joined != 0 || join_in == join_from) {
+            if(inv_buf[join_from].joined != 0 || join_in == join_from) {
                 continue;
             }
 
             /*Check if the areas are on each other*/
-            if(area_is_on(&area_a[join_in].area, 
-                          &area_a[join_from].area) == false)
+            if(area_is_on(&inv_buf[join_in].area,
+                          &inv_buf[join_from].area) == false)
             {
                 continue;
             }
             
-            area_join(&joined_area, &area_a[join_in].area,
-                                    &area_a[join_from].area);
+            area_join(&joined_area, &inv_buf[join_in].area,
+                                    &inv_buf[join_from].area);
 
             /*Join two area only if the joined area size is smaller*/
             if(area_get_size(&joined_area) < 
-             (area_get_size(&area_a[join_in].area) + area_get_size(&area_a[join_from].area))) {
-                area_cpy(&area_a[join_in].area, &joined_area);
+             (area_get_size(&inv_buf[join_in].area) + area_get_size(&inv_buf[join_from].area))) {
+                area_cpy(&inv_buf[join_in].area, &joined_area);
 
                 /*Mark 'join_form' is joined into 'join_in'*/
-                area_a[join_from].joined = 1;     
+                inv_buf[join_from].joined = 1;
             }
         }   
     }
@@ -190,22 +181,20 @@ static void lv_refr_join_area(lv_join_t * area_a, uint32_t area_num)
 
 /**
  * Refresh the joined areas
- * @param area_a array of joined invalid areas
- * @param area_num item number of the array
  */
-static void lv_refr_areas(lv_join_t * area_a, uint32_t area_num)
+static void lv_refr_areas(void)
 {
     uint32_t i;
     
-    for(i = 0; i < area_num; i++) {
+    for(i = 0; i < inv_buf_p; i++) {
         /*Refresh the unjoined areas*/
-        if(area_a[i].joined == 0) {   
+        if(inv_buf[i].joined == 0) {
             /*If there is no VDB do simple drawing*/
 #if LV_VDB_SIZE == 0
-            lv_refr_area_no_vdb(&area_a[i].area);
+            lv_refr_area_no_vdb(&inv_buf[i].area);
 #else
             /*If VDB is used...*/
-            lv_refr_area_with_vdb(&area_a[i].area);
+            lv_refr_area_with_vdb(&inv_buf[i].area);
 #endif
             
         }
@@ -314,10 +303,7 @@ static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
     
     /*If this object is fully cover the draw area check the children too */
-    if(obj->opa == OPA_COVER &&
-       obj->hidden == 0 &&
-	   LV_SA(obj, lv_objs_t)->transp == 0 &&
-       obj->design_f(obj, area_p, LV_DESIGN_COVER_CHK) != false)
+    if(area_is_in(area_p, &obj->cords) && obj->hidden == 0)
     {
         LL_READ(obj->child_ll, i)        {
             found_p = lv_refr_get_top_obj(area_p, i);
@@ -328,9 +314,13 @@ static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
             }
         }
         
-        /*If there is no better children use this object*/
+        /*If no better children check this object*/
         if(found_p == NULL) {
-            found_p = obj;
+            if(obj->opa == OPA_COVER &&
+               LV_SA(obj, lv_objs_t)->transp == 0 &&
+               obj->design_f(obj, area_p, LV_DESIGN_COVER_CHK) != false) {
+                found_p = obj;
+            }
         }
     }
     
@@ -408,6 +398,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
         /* Redraw the object */    
         if(obj->opa != OPA_TRANSP && LV_SA(obj, lv_objs_t)->transp == 0) {
             obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
+           /* tick_wait_ms(100); */ /*DEBUG: Wait after every object draw to see the order of drawing*/
         }
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/

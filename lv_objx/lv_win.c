@@ -14,8 +14,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_WIN_CTRL_BTN_DEF_W 	(30 * LV_DOWNSCALE)
-#define LV_WIN_CTRL_BTN_DEF_H 	(30 * LV_DOWNSCALE)
 
 /**********************
  *      TYPEDEFS
@@ -50,7 +48,10 @@ static lv_wins_t lv_wins_def;
 /**
  * Create a window objects
  * @param par pointer to an object, it will be the parent of the new window
- * @param copy pointer to a window object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a window object, if not NULL then
+	lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
+	lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
+	lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);the new object will be copied from it
  * @return pointer to the created window
  */
 lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
@@ -72,6 +73,9 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new window object*/
     if(copy == NULL) {
+    	/*Create a page for the content*/
+		ext->content = lv_page_create(new_win, NULL);
+
     	/*Create a holder for the header*/
     	ext->header = lv_rect_create(new_win, NULL);
     	lv_rect_set_fit(ext->header, false, true);
@@ -84,9 +88,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->ctrl_holder = lv_rect_create(ext->header, NULL);
     	lv_rect_set_fit(ext->ctrl_holder, true, false);
     	lv_rect_set_layout(ext->ctrl_holder, LV_RECT_LAYOUT_ROW_M);
-
-    	/*Create a page for the content*/
-    	ext->content = lv_page_create(new_win, NULL);
 
     	lv_obj_set_style(new_win, lv_wins_get(LV_WINS_DEF, NULL));
 
@@ -149,15 +150,31 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     			lv_obj_set_style(ext->ctrl_holder, &style->ctrl_holder);
     			lv_obj_set_style(ext->title, &style->title);
     			lv_obj_set_style(ext->header, &style->header);
+				lv_obj_set_opa(ext->header, style->header_opa);
+
+				if(style->header_opa == OPA_COVER || style->header_opa == OPA_TRANSP) {
+					lv_obj_set_opa_protect(ext->header, false);
+				} else {
+					lv_obj_set_opa_protect(ext->header, true);
+				}
 
     			/*Refresh the style of all control buttons*/
     			child = lv_obj_get_child(ext->ctrl_holder, NULL);
     			while(child != NULL) {
     				lv_obj_set_style(child, &style->ctrl_btn);
+    				lv_obj_set_opa(child, style->ctrl_btn_opa);
+    				if(style->ctrl_btn_opa == OPA_COVER || style->ctrl_btn_opa == OPA_TRANSP) {
+    					lv_obj_set_opa_protect(child, false);
+    				} else {
+    					lv_obj_set_opa_protect(child, true);
+    				}
     				/*Refresh the image style too*/
     				lv_obj_set_style(lv_obj_get_child(child, NULL), &style->ctrl_img);
     				child = lv_obj_get_child(ext->ctrl_holder, child);
     			}
+
+    			lv_win_realign(win);
+
     			break;
     		case LV_SIGNAL_CHILD_CHG:
     			/*If a child added move it to the 'content' object*/
@@ -170,6 +187,7 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     			}
     			break;
     		case LV_SIGNAL_CORD_CHG:
+    			/*If the size is changed refresh the window*/
     			if(area_get_width(param) != lv_obj_get_width(win) ||
     			   area_get_height(param) != lv_obj_get_height(win)) {
     				lv_win_realign(win);
@@ -194,15 +212,23 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
  * @param rel_action a function pointer to call when the button is released
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, bool (*rel_action)(lv_obj_t *, lv_dispi_t *))
+lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_t rel_action)
 {
 	lv_win_ext_t * ext = lv_obj_get_ext(win);
 	lv_wins_t * style = lv_obj_get_style(win);
 
 	lv_obj_t * btn = lv_btn_create(ext->ctrl_holder, NULL);
 	lv_obj_set_style(btn, &style->ctrl_btn);
+	lv_obj_set_opa(btn, style->ctrl_btn_opa);
 	lv_obj_set_size(btn, style->ctrl_btn_w, style->ctrl_btn_h);
 	lv_btn_set_rel_action(btn, rel_action);
+
+	if(style->ctrl_btn_opa == OPA_COVER || style->ctrl_btn_opa == OPA_TRANSP) {
+		lv_obj_set_opa_protect(btn, false);
+	} else {
+		lv_obj_set_opa_protect(btn, true);
+	}
+
 	lv_obj_t * img = lv_img_create(btn, NULL);
 	lv_obj_set_click(img, false);
 	lv_obj_set_style(img, &style->ctrl_img);
@@ -211,6 +237,21 @@ lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, bool (*rel
 	lv_win_realign(win);
 
 	return btn;
+}
+
+/**
+ * A release action which can be assigned to a window control button to close it
+ * @param btn pointer to the released button
+ * @param dispi pointer to the caller display input
+ * @return always false because the button is deleted with the window
+ */
+bool lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+	lv_obj_t * win = lv_win_get_from_ctrl_btn(btn);
+
+	lv_obj_del(win);
+
+	return false;
 }
 
 /**
@@ -238,7 +279,19 @@ const char * lv_win_get_title(lv_obj_t * win)
 {
 	lv_win_ext_t * ext = lv_obj_get_ext(win);
 
-	return ext->title;
+	return lv_label_get_text(ext->title);
+}
+
+/**
+ * Get the content object (lv_page type) of a window
+ * @param win pointer to a window object
+ * @return pointer to the content page object of a window
+ */
+lv_obj_t * lv_win_get_content(lv_obj_t * win)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext(win);
+
+    return ext->content;
 }
 
 /**
@@ -332,19 +385,21 @@ static void lv_wins_init(void)
 	/*Transparent background. It will be always covered*/
 	lv_objs_get(LV_OBJS_TRANSP, &lv_wins_def.bg);
 
+	/*Style for the content*/
 	lv_pages_get(LV_PAGES_DEF, &lv_wins_def.content);
 	lv_wins_def.content.bg_rects.objs.color = COLOR_WHITE;
 	lv_wins_def.content.bg_rects.gcolor = COLOR_WHITE;
-	lv_wins_def.content.bg_rects.bwidth = 1 * LV_STYLE_MULT;
+	lv_wins_def.content.bg_rects.bwidth = 1 * LV_DOWNSCALE;
 	lv_wins_def.content.bg_rects.bcolor = COLOR_GRAY;
 	lv_wins_def.content.bg_rects.round = 0;
 	lv_wins_def.content.bg_rects.hpad = 0;
 	lv_wins_def.content.bg_rects.vpad = 0;
+	lv_wins_def.header_on_content = 0;
 
 	/*Styles for the header*/
 	lv_rects_get(LV_RECTS_DEF, &lv_wins_def.header);
-	lv_wins_def.header.hpad = 5 * LV_STYLE_MULT;
-	lv_wins_def.header.vpad = 5 * LV_STYLE_MULT;
+	lv_wins_def.header.hpad = 5 * LV_DOWNSCALE;
+	lv_wins_def.header.vpad = 5 * LV_DOWNSCALE;
 	lv_wins_def.header.objs.color = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.header.gcolor = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.header.bwidth = 0;
@@ -353,14 +408,14 @@ static void lv_wins_init(void)
 	lv_rects_get(LV_RECTS_TRANSP, &lv_wins_def.ctrl_holder);
 	lv_wins_def.ctrl_holder.hpad = 0;
 	lv_wins_def.ctrl_holder.vpad = 0;
-	lv_wins_def.ctrl_holder.opad = 10 * LV_STYLE_MULT;
+	lv_wins_def.ctrl_holder.opad = 10 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_wins_def.ctrl_btn);
 	lv_wins_def.ctrl_btn.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xD0, 0xE0, 0xF0);
 	lv_wins_def.ctrl_btn.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.ctrl_btn.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_wins_def.ctrl_btn.rects.bopa = 70;
-	lv_wins_def.ctrl_btn.rects.bwidth = 2 * LV_STYLE_MULT;
+	lv_wins_def.ctrl_btn.rects.bwidth = 2 * LV_DOWNSCALE;
 	lv_wins_def.ctrl_btn.rects.round = LV_RECT_CIRCLE;
 
 	lv_imgs_get(LV_IMGS_DEF, &lv_wins_def.ctrl_img);
@@ -369,11 +424,14 @@ static void lv_wins_init(void)
 
 	lv_labels_get(LV_LABELS_TITLE, &lv_wins_def.title);
 	lv_wins_def.title.objs.color = COLOR_MAKE(0xD0, 0xE0, 0xF0);
-	lv_wins_def.title.letter_space = 1 * LV_STYLE_MULT;
-	lv_wins_def.title.line_space = 1 * LV_STYLE_MULT;
+	lv_wins_def.title.letter_space = 1 * LV_DOWNSCALE;
+	lv_wins_def.title.line_space = 1 * LV_DOWNSCALE;
 
-	lv_wins_def.ctrl_btn_w = LV_WIN_CTRL_BTN_DEF_W;
-	lv_wins_def.ctrl_btn_h = LV_WIN_CTRL_BTN_DEF_H;
+	lv_wins_def.ctrl_btn_w = 30 * LV_DOWNSCALE;
+	lv_wins_def.ctrl_btn_h = 30 * LV_DOWNSCALE;
+
+	lv_wins_def.header_opa = OPA_COVER;
+	lv_wins_def.ctrl_btn_opa = OPA_COVER;
 }
 
 /**
@@ -397,7 +455,6 @@ static void lv_win_realign(lv_obj_t * win)
 
 	lv_obj_set_height(ext->ctrl_holder, style->ctrl_btn_h + 2 * style->ctrl_holder.vpad * 2);
 	lv_obj_set_width(ext->header, lv_obj_get_width(win));
-	lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
 
 	/*Align the higher object first to make the correct header size first*/
 	if(lv_obj_get_height(ext->title) > lv_obj_get_height(ext->ctrl_holder)) {
@@ -409,7 +466,14 @@ static void lv_win_realign(lv_obj_t * win)
 	}
 
 	lv_obj_set_pos_us(ext->header, 0, 0);
-	lv_obj_align_us(ext->content, ext->header, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+	if(style->header_on_content == 0) {
+        lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
+		lv_obj_align_us(ext->content, ext->header, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+	} else {
+        lv_obj_set_size(ext->content, lv_obj_get_width(win), lv_obj_get_height(win));
+		lv_obj_set_pos(ext->content, 0, 0);
+	}
 
 }
 #endif

@@ -41,6 +41,7 @@ static void lv_rect_refr_layout(lv_obj_t * rect);
 static void lv_rect_layout_col(lv_obj_t * rect);
 static void lv_rect_layout_row(lv_obj_t * rect);
 static void lv_rect_layout_center(lv_obj_t * rect);
+static void lv_rect_layout_pretty(lv_obj_t * rect);
 static void lv_rect_layout_grid(lv_obj_t * rect);
 static void lv_rect_refr_autofit(lv_obj_t * rect);
 static void lv_rects_init(void);
@@ -364,6 +365,9 @@ static void lv_rect_refr_layout(lv_obj_t * rect)
 {
 	lv_rect_layout_t type = lv_rect_get_layout(rect);
 
+	/*'rect' has to be at least 1 child*/
+	if(lv_obj_get_child(rect, NULL) == NULL) return;
+
 	if(type == LV_RECT_LAYOUT_OFF) return;
 
 	if(type == LV_RECT_LAYOUT_CENTER) {
@@ -372,7 +376,9 @@ static void lv_rect_refr_layout(lv_obj_t * rect)
 		lv_rect_layout_col(rect);
 	} else if(type == LV_RECT_LAYOUT_ROW_T || type == LV_RECT_LAYOUT_ROW_M || type == LV_RECT_LAYOUT_ROW_B) {
 		lv_rect_layout_row(rect);
-	} else if(type == LV_RECT_LAYOUT_GRID) {
+	} else if(type == LV_RECT_LAYOUT_PRETTY) {
+		lv_rect_layout_pretty(rect);
+	}  else if(type == LV_RECT_LAYOUT_GRID) {
 		lv_rect_layout_grid(rect);
 	}
 }
@@ -405,6 +411,7 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 			align = LV_ALIGN_IN_TOP_RIGHT;
 			break;
 		default:
+			hpad_corr = 0;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 	}
@@ -510,11 +517,11 @@ static void lv_rect_layout_center(lv_obj_t * rect)
 }
 
 /**
- * Handle the grid layout. Put as many object as possible in row
+ * Handle the pretty layout. Put as many object as possible in row
  * then begin a new row
  * @param rect pointer to an object which layout should be handled
  */
-static void lv_rect_layout_grid(lv_obj_t * rect)
+static void lv_rect_layout_pretty(lv_obj_t * rect)
 {
 	lv_obj_t * child_rs;    /* Row starter child */
 	lv_obj_t * child_rc;    /* Row closer child */
@@ -586,6 +593,56 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
 }
 
 /**
+ * Handle the grid layout. Align same-sized objects in a grid
+ * @param rect pointer to an object which layout should be handled
+ */
+static void lv_rect_layout_grid(lv_obj_t * rect)
+{
+	lv_obj_t * child;
+	lv_rects_t * style = lv_obj_get_style(rect);
+	cord_t w_tot = lv_obj_get_width(rect);
+	cord_t w_obj = lv_obj_get_width(lv_obj_get_child(rect, NULL));
+	cord_t h_obj = lv_obj_get_height(lv_obj_get_child(rect, NULL));
+	uint16_t obj_row = (w_tot - (2 * style->hpad)) / (w_obj + style->opad); /*Obj. num. in a row*/
+	cord_t x_ofs;
+	if(obj_row > 1) {
+		x_ofs = w_obj + (w_tot - (2 * style->hpad) - (obj_row * w_obj)) / (obj_row - 1);
+	} else {
+		x_ofs = w_tot / 2 - w_obj / 2;
+	}
+	cord_t y_ofs = h_obj + style->opad;
+
+	/* Disable child change action because the children will be moved a lot
+	 * an unnecessary child change signals could be sent*/
+	rect->child_chg_off = 1;
+
+	/* Align the children */
+	cord_t act_x = style->hpad;
+	cord_t act_y = style->vpad;
+	uint16_t obj_cnt = 0;
+	LL_READ_BACK(rect->child_ll, child) {
+		if(lv_obj_get_hidden(child) != false) continue;
+
+		if(obj_row > 1) {
+			lv_obj_set_pos(child, act_x, act_y);
+			act_x += x_ofs;
+		} else {
+			lv_obj_set_pos(child, x_ofs, act_y);
+		}
+		obj_cnt ++;
+
+		if(obj_cnt >= obj_row) {
+			obj_cnt = 0;
+			act_x = style->hpad;
+			act_y += y_ofs;
+		}
+	}
+
+	rect->child_chg_off = 0;
+
+}
+
+/**
  * Handle auto fit. Set the size of the object to involve all children.
  * @param rect pointer to an object which size will be modified
  */
@@ -598,7 +655,7 @@ void lv_rect_refr_autofit(lv_obj_t * rect)
 		return;
 	}
 
-	area_t rect_cords;
+	area_t new_cords;
 	area_t ori;
 	lv_rects_t * style = lv_obj_get_style(rect);
 	lv_obj_t * i;
@@ -607,48 +664,55 @@ void lv_rect_refr_autofit(lv_obj_t * rect)
 
 	/*Search the side coordinates of the children*/
 	lv_obj_get_cords(rect, &ori);
-	lv_obj_get_cords(rect, &rect_cords);
+	lv_obj_get_cords(rect, &new_cords);
 
-	rect_cords.x1 = LV_CORD_MAX;
-	rect_cords.y1 = LV_CORD_MAX;
-	rect_cords.x2 = LV_CORD_MIN;
-	rect_cords.y2 = LV_CORD_MIN;
+	new_cords.x1 = LV_CORD_MAX;
+	new_cords.y1 = LV_CORD_MAX;
+	new_cords.x2 = LV_CORD_MIN;
+	new_cords.y2 = LV_CORD_MIN;
 
     LL_READ(rect->child_ll, i) {
 		if(lv_obj_get_hidden(i) != false) continue;
-    	rect_cords.x1 = min(rect_cords.x1, i->cords.x1);
-    	rect_cords.y1 = min(rect_cords.y1, i->cords.y1);
-        rect_cords.x2 = max(rect_cords.x2, i->cords.x2);
-        rect_cords.y2 = max(rect_cords.y2, i->cords.y2);
+    	new_cords.x1 = min(new_cords.x1, i->cords.x1);
+    	new_cords.y1 = min(new_cords.y1, i->cords.y1);
+        new_cords.x2 = max(new_cords.x2, i->cords.x2);
+        new_cords.y2 = max(new_cords.y2, i->cords.y2);
     }
 
     /*If the value is not the init value then the page has >=1 child.*/
-    if(rect_cords.x1 != LV_CORD_MAX) {
+    if(new_cords.x1 != LV_CORD_MAX) {
     	if(ext->hfit_en != 0) {
-			rect_cords.x1 -= hpad;
-			rect_cords.x2 += hpad;
+			new_cords.x1 -= hpad;
+			new_cords.x2 += hpad;
     	} else {
-    		rect_cords.x1 = rect->cords.x1;
-    		rect_cords.x2 = rect->cords.x2;
+    		new_cords.x1 = rect->cords.x1;
+    		new_cords.x2 = rect->cords.x2;
     	}
     	if(ext->vfit_en != 0) {
-			rect_cords.y1 -= vpad;
-			rect_cords.y2 += vpad;
+			new_cords.y1 -= vpad;
+			new_cords.y2 += vpad;
     	} else {
-    		rect_cords.y1 = rect->cords.y1;
-    		rect_cords.y2 = rect->cords.y2;
+    		new_cords.y1 = rect->cords.y1;
+    		new_cords.y2 = rect->cords.y2;
     	}
 
-    	lv_obj_inv(rect);
-        area_cpy(&rect->cords, &rect_cords);
-    	lv_obj_inv(rect);
+    	/*Do nothing if the coordinates are not changed*/
+    	if(rect->cords.x1 != new_cords.x1 ||
+    	   rect->cords.y1 != new_cords.y1 ||
+           rect->cords.x2 != new_cords.x2 ||
+           rect->cords.y2 != new_cords.y2) {
 
-        /*Notify the object about its new coordinates*/
-    	rect->signal_f(rect, LV_SIGNAL_CORD_CHG, &ori);
+            lv_obj_inv(rect);
+            area_cpy(&rect->cords, &new_cords);
+            lv_obj_inv(rect);
 
-        /*Inform the parent about the new coordinates*/
-    	lv_obj_t * par = lv_obj_get_parent(rect);
-    	par->signal_f(par, LV_SIGNAL_CHILD_CHG, rect);
+            /*Notify the object about its new coordinates*/
+            rect->signal_f(rect, LV_SIGNAL_CORD_CHG, &ori);
+
+            /*Inform the parent about the new coordinates*/
+            lv_obj_t * par = lv_obj_get_parent(rect);
+            par->signal_f(par, LV_SIGNAL_CHILD_CHG, rect);
+    	}
     }
 }
 
@@ -661,13 +725,13 @@ static void lv_rects_init(void)
 	lv_rects_def.objs.color = COLOR_MAKE(0x50, 0x70, 0x90);
 	lv_rects_def.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0);
 	lv_rects_def.bcolor = COLOR_WHITE;
-	lv_rects_def.bwidth = 2 * LV_STYLE_MULT;
+	lv_rects_def.bwidth = 2 * LV_DOWNSCALE;
 	lv_rects_def.bopa = 50;
-	lv_rects_def.round = 4 * LV_STYLE_MULT;
+	lv_rects_def.round = 4 * LV_DOWNSCALE;
 	lv_rects_def.empty = 0;
-	lv_rects_def.hpad = 10 * LV_STYLE_MULT;
-	lv_rects_def.vpad = 10 * LV_STYLE_MULT;
-	lv_rects_def.opad = 10 * LV_STYLE_MULT;
+	lv_rects_def.hpad = 10 * LV_DOWNSCALE;
+	lv_rects_def.vpad = 10 * LV_DOWNSCALE;
+	lv_rects_def.opad = 10 * LV_DOWNSCALE;
 	lv_rects_def.light = 0;
 	lv_rects_def.lcolor = COLOR_MAKE(0x60, 0x60, 0x60);
 
@@ -680,9 +744,9 @@ static void lv_rects_init(void)
 	/*Border style*/
 	memcpy(&lv_rects_border, &lv_rects_def, sizeof(lv_rects_t));
 	lv_rects_border.bcolor = COLOR_BLACK;
-	lv_rects_border.bwidth = 2 * LV_STYLE_MULT;
+	lv_rects_border.bwidth = 2 * LV_DOWNSCALE;
 	lv_rects_border.bopa = 100;
-	lv_rects_border.round = 4 * LV_STYLE_MULT;
+	lv_rects_border.round = 4 * LV_DOWNSCALE;
 	lv_rects_border.empty = 1;
 }
 #endif

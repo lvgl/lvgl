@@ -42,9 +42,9 @@ typedef enum
 }lv_btnms_builtin_t;
 
 /* Type of callback function which is called when a button is released
- * Parameters: button matrix, released object, button index in the map string
+ * Parameters: button matrix,  released button index in the map string
  * return false: the released button or the button matrix is deleted else true*/
-typedef bool (*lv_btnm_callback_t) (lv_obj_t *, lv_obj_t *, uint8_t);
+typedef lv_action_res_t (*lv_btnm_callback_t) (lv_obj_t *, uint16_t);
 
 /*Data of button matrix*/
 typedef struct
@@ -52,6 +52,9 @@ typedef struct
 	lv_rect_ext_t rect;	/*Ext. of ancestor*/
 	/*New data for this type */
 	const char ** map_p;	/*Pointer to the current map*/
+	area_t * btn_areas;
+	uint16_t btn_cnt;
+	uint16_t btn_pr;
 	lv_btnm_callback_t cb;
 }lv_btnm_ext_t;
 
@@ -71,6 +74,6 @@ lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * btnm);
  *      MACROS
  **********************/
 
-#endif
+#endif /*USE_LV_BTNM*/
 
-#endif
+#endif /*LV_BTNM_H*/

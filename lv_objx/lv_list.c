@@ -110,7 +110,7 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
  * @param rel_action pointer to release action function (like with lv_btn)
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, bool (*rel_action)(lv_obj_t *, lv_dispi_t *))
+lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action)
 {
 	lv_lists_t * lists = lv_obj_get_style(list);
 	lv_list_ext_t  * ext = lv_obj_get_ext(list);
@@ -216,6 +216,7 @@ void lv_list_down(lv_obj_t * list)
 		e = lv_obj_get_child(list, e);
 	}
 }
+
 
 /*=====================
  * Setter functions 
@@ -323,13 +324,13 @@ static void lv_lists_init(void)
 {
 	/*Default style*/
 	lv_pages_get(LV_PAGES_TRANSP, &lv_lists_def.bg_pages);
-	lv_lists_def.bg_pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.bg_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
 
-	lv_lists_def.bg_pages.scrable_rects.vpad = 10 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.scrable_rects.hpad = 10 * LV_STYLE_MULT;
-	lv_lists_def.bg_pages.scrable_rects.opad = 5 * LV_STYLE_MULT;
+	lv_lists_def.bg_pages.scrable_rects.vpad = 10 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.scrable_rects.hpad = 10 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.scrable_rects.opad = 5 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_lists_def.liste_btns); /*List element button style*/
 
@@ -341,13 +342,13 @@ static void lv_lists_init(void)
 	lv_lists_def.liste_layout = LV_RECT_LAYOUT_ROW_M;
 
 	memcpy(&lv_lists_tight, &lv_lists_def, sizeof(lv_lists_t));
-	lv_lists_tight.bg_pages.bg_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.bg_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.bg_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
 
-	lv_lists_tight.bg_pages.scrable_rects.vpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.scrable_rects.hpad = 0 * LV_STYLE_MULT;
-	lv_lists_tight.bg_pages.scrable_rects.opad = 0 * LV_STYLE_MULT;
+	lv_lists_tight.bg_pages.scrable_rects.vpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.scrable_rects.hpad = 0 * LV_DOWNSCALE;
+	lv_lists_tight.bg_pages.scrable_rects.opad = 0 * LV_DOWNSCALE;
 
 }
 #endif

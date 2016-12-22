@@ -8,6 +8,8 @@
  *********************/
 #include <stddef.h>
 #include "font.h"
+#include "fonts/dejavu_8.h"
+#include "fonts/dejavu_10.h"
 #include "fonts/dejavu_14.h"
 #include "fonts/dejavu_20.h"
 #include "fonts/dejavu_30.h"
@@ -54,6 +56,16 @@ const font_t * font_get(font_types_t font_id)
     
     switch(font_id)
     {
+#if USE_FONT_DEJAVU_8 != 0
+        case FONT_DEJAVU_8:
+            font_p = dejavu_8_get_dsc();
+            break;
+#endif
+#if USE_FONT_DEJAVU_10 != 0
+        case FONT_DEJAVU_10:
+            font_p = dejavu_10_get_dsc();
+            break;
+#endif
 #if USE_FONT_DEJAVU_14 != 0
         case FONT_DEJAVU_14:
             font_p = dejavu_14_get_dsc();

@@ -23,10 +23,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_put_vpx(point_t * point_p, const area_t * mask_p,
-                       color_t color, opa_t opa);
-
-static bool lv_vletter_get_px(const font_t * font_p, uint8_t letter, cord_t x, cord_t y);
 
 /**********************
  *  STATIC VARIABLES
@@ -113,27 +109,63 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
                      color_t color, opa_t opa)
 {      
     if(font_p == NULL) return;
-    
-    uint8_t w = font_get_width(font_p, letter);
-    uint8_t h = font_get_height(font_p);
+
+    uint8_t letter_w = font_get_width(font_p, letter);
+    uint8_t letter_h = font_get_height(font_p);
+
+    const uint8_t * map_p = font_get_bitmap(font_p, letter);
+
+    if(map_p == NULL) return;
 
     /*If the letter is completely out of mask don't draw it */
-    if(pos_p->x + w < mask_p->x1 || pos_p->x > mask_p->x2 ||
-       pos_p->y + h < mask_p->y1 || pos_p->y > mask_p->y2) return;
+    if(pos_p->x + letter_w < mask_p->x1 || pos_p->x > mask_p->x2 ||
+       pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
 
+    lv_vdb_t * vdb_p = lv_vdb_get();
+    cord_t vdb_width = area_get_width(&vdb_p->vdb_area);
+    color_t * vdb_buf_tmp = vdb_p->buf;
     cord_t col, row;
-    point_t act_point;
+    uint8_t col_bit;
+    uint8_t col_byte_cnt;
 
-    for(row = 0; row < h; row ++) {
-        for(col = 0; col < w; col ++) {
-            act_point.x = pos_p->x + col;
-            act_point.y = pos_p->y + row;
+    cord_t col_start = pos_p->x >= mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
+    cord_t col_end  = pos_p->x + letter_w <= mask_p->x2 ? letter_w : mask_p->x2 - pos_p->x + 1;
+    cord_t row_start = pos_p->y >= mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
+    cord_t row_end  =  pos_p->y + letter_h <= mask_p->y2 ? letter_h : mask_p->y2 - pos_p->y + 1;
 
-            if(lv_vletter_get_px(font_p, letter, col, row)) {
-                lv_put_vpx(&act_point, mask_p, color,  opa);
+    /*Set a pointer on VDB to the first pixel of the letter*/
+    vdb_buf_tmp += ((pos_p->y - vdb_p->vdb_area.y1) * vdb_width)
+                    + pos_p->x - vdb_p->vdb_area.x1;
+
+    /*If the letter is partially out of mask the move there on VDB*/
+    vdb_buf_tmp += (row_start * vdb_width) + col_start;
+
+    /*Move on the map too*/
+    map_p += (row_start * font_p->width_byte) + (col_start>>3);
+
+    for(row = row_start; row < row_end; row ++) {
+        col_byte_cnt = 0;
+        col_bit = 7 - ((col_start / 2) % 8);
+        for(col = col_start; col < col_end; col ++) {
+
+            if((*map_p & (1 << col_bit)) != 0) {
+                if(opa == OPA_COVER) *vdb_buf_tmp = color;
+                else *vdb_buf_tmp = color_mix(color, *vdb_buf_tmp, opa);
             }
+            vdb_buf_tmp++;
 
+            /*Use a col. more times depending on LV_UPSCALE_FONT*/
+           if(col_bit != 0) col_bit --;
+           else {
+               col_bit = 7;
+               col_byte_cnt ++;
+               map_p ++;
+
+            }
         }
+
+        map_p += font_p->width_byte - col_byte_cnt;
+        vdb_buf_tmp += vdb_width  - (col_end - col_start); /*Next row in VDB*/
     }
 }
 
@@ -312,85 +344,6 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * Put a pixel into the Virtual Dispaly Buffer
- * @param x x coordinate of the pixel
- * @param y y coordinate of the pixel
- * @param mask_p the pixel will be drawn on this area
- * @param color color of the pixel
- * @param opa opacity of the pixel
- */
-static void lv_put_vpx(point_t * point_p, const area_t * mask_p,
-                            color_t color, opa_t opa)
-{    
-	if(opa == OPA_TRANSP) return;
-
-    bool point_ok;
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    
-    /*The point is on vdb?*/
-    point_ok = area_is_point_on(mask_p, point_p);
-    
-    /*If there are common part of the three area then draw to the vdb*/
-    if(point_ok == false) return;   
-    point_t vdb_rel_point;   /*Stores relative coordinates on vdb*/
-    vdb_rel_point.x = point_p->x - vdb_p->vdb_area.x1;
-    vdb_rel_point.y = point_p->y - vdb_p->vdb_area.y1;
-
-    color_t * vdb_buf_tmp = vdb_p->buf;
-    uint32_t vdb_width = vdb_p->vdb_area.x2 - vdb_p->vdb_area.x1 + 1;
-
-    /*Move the vdb_tmp to the point*/
-    vdb_buf_tmp += vdb_width * vdb_rel_point.y + vdb_rel_point.x;
-
-    if(opa == OPA_COVER) *vdb_buf_tmp = color;
-    else *vdb_buf_tmp = color_mix(color, *vdb_buf_tmp, opa); 
-}
-
-/**
- * Get a pixel from a letter
- * @param font_p pointer to a font
- * @param letter a letter 
- * @param x x coordinate of the pixel to get
- * @param y y coordinate of the pixel to get
- * @return true: pixel is set, false: pixel is clear
- */
-static bool lv_vletter_get_px(const font_t * font_p, uint8_t letter, cord_t x, cord_t y)
-{
-	uint8_t w = font_get_width(font_p, letter);
-	uint8_t h = font_get_height(font_p);
-	const uint8_t * map_p = font_get_bitmap(font_p, letter);
-
-	if(map_p == NULL) return NULL;
-
-	if(x < 0) x = 0;
-	if(y < 0) x = 0;
-	if(x >= w) x = w - 1;
-	if(y >= h) y = h - 1;
-
-#if LV_UPSCALE_FONT != 0
-#if LV_DOWNSCALE == 1
-/*Do nothing*/
-#elif LV_DOWNSCALE == 2
-	x = x >> 1;
-	y = y >> 1;
-#elif LV_DOWNSCALE == 4
-	x = x >> 2;
-	y = y >> 2;
-#else
-#error "LV: not supported LV_DOWNSCALE value"
-#endif
-#endif /*LV_UPSCALE_FONT == 0*/
-
-	map_p += (uint32_t)y * font_p->width_byte; /*Go to the corresponding row of the map*/
-	map_p += (x >> 3); /*Go to he corresponding col of the map*/ 
-
-	/*Get the corresponding col within a byte*/
-	uint8_t map_byte = *map_p;
-	uint8_t col_sub = 7 - (x % 8);
-	if((map_byte & (1 << col_sub)) == 0) return false;
-	else return true;
-}
 
 #endif
 

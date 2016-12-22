@@ -17,10 +17,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_TA_MAX_LENGTH	512
-#define LV_TA_DEF_WIDTH		120
-#define LV_TA_DEF_HEIGHT	80
-#define LV_TA_CUR_BLINK_TIME 400	/*ms*/
 
 /**********************
  *      TYPEDEFS
@@ -93,7 +89,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
     	lv_label_set_text(ext->label, "Text area");
     	lv_page_glue_obj(ext->label, true);
-    	lv_obj_set_click(ext->label, true);
+    	lv_obj_set_click(ext->label, false);
     	lv_obj_set_style(new_ta, lv_tas_get(LV_TAS_DEF, NULL));
     	lv_obj_set_size_us(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
     }
@@ -115,6 +111,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     a.time = LV_TA_CUR_BLINK_TIME;
     a.act_time = 0;
     a.end_cb = NULL;
+    a.start = 0;
+    a.end= 1;
     a.repeat = 1;
     a.repeat_pause = 0;
     a.playback = 1;
@@ -230,7 +228,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 }
 
 /**
- * Set the text os a text area
+ * Set the text of a text area
  * @param ta pointer to a text area
  * @param txt pointer to the text
  */
@@ -539,10 +537,10 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 static void lv_ta_hide_cursor(lv_obj_t * ta, uint8_t hide)
 {
 	lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
-	ta_ext->cur_hide = hide  == 0 ? 0 : 1;
-
-	lv_obj_inv(ta);
-
+	if(hide != ta_ext->cur_hide) {
+        ta_ext->cur_hide = hide  == 0 ? 0 : 1;
+        lv_obj_inv(ta);
+	}
 }
 
 /**
@@ -569,7 +567,7 @@ static void lv_tas_init(void)
 	lv_tas_def.labels.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
 
 	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
-	lv_tas_def.cursor_width = 1 * LV_STYLE_MULT;	/*>=1 px for visible cursor*/
+	lv_tas_def.cursor_width = 1 * LV_DOWNSCALE;	/*>=1 px for visible cursor*/
 	lv_tas_def.cursor_show = 1;
 }
 #endif

@@ -22,10 +22,6 @@
  *********************/
 #define LV_LABEL_DOT_NUM	3
 #define LV_LABEL_DOT_END_INV 0xFFFF
-#define LV_LABEL_SCROLL_SPEED (50 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
-#define LV_LABEL_SCROLL_SPEED_VER  (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
-#define LV_LABEL_SCROLL_PLAYBACK_PAUSE	300 /*Wait before the scroll turns back in ms*/
-#define LV_LABEL_SCROLL_REPEAT_PAUSE	600 /*Wait before the scroll begins again in ms*/
 
 /**********************
  *      TYPEDEFS
@@ -163,45 +159,24 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     /*If 'text" still NULL then nothing to do: return*/
     if(text == NULL) return;
     
-    uint32_t line_start = 0;
-    uint32_t new_line_start = 0;
-    cord_t max_length = lv_obj_get_width(label);
-    lv_labels_t * labels = lv_obj_get_style(label);
-    const font_t * font = font_get(labels->font);
-    uint8_t letter_height = font_get_height(font);
-    cord_t new_height = 0;
-    cord_t longest_line = 0;
-    cord_t act_line_length;
+    cord_t max_w = lv_obj_get_width(label);
+    lv_labels_t * style = lv_obj_get_style(label);
+    const font_t * font = font_get(style->font);
     
     ext->dot_end = LV_LABEL_DOT_END_INV;	/*Initialize the dot end index*/
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-        max_length = LV_CORD_MAX;
+        max_w = LV_CORD_MAX;
     }
     
     /*Calc. the height and longest line*/
-    while (text[line_start] != '\0')
-    {
-        new_line_start += txt_get_next_line(&text[line_start], font, labels->letter_space, max_length);
-        new_height += letter_height;
-        new_height += labels->line_space;
-        
-        /*Calculate the the longest line if the width will be expanded*/
-        if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-          act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
-                                           font, labels->letter_space);
-              longest_line = max(act_line_length, longest_line);
-        }
-
-        line_start = new_line_start;
-    }
+    point_t size;
+    txt_get_size(&size, ext->txt, font, style->letter_space, style->line_space, max_w);
     
-    /*Correction with the last line space*/
-    new_height -= labels->line_space;
     /*Refresh the full size in expand mode*/
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-    	lv_obj_set_size(label, longest_line, new_height);
+    	lv_obj_set_size(label, size.x, size.y);
 
     	/*Start scrolling if the label is greater then its parent*/
     	if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -248,7 +223,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     }
  	/*In break mode only the height can change*/
     else if (ext->long_mode == LV_LABEL_LONG_BREAK) {
-        lv_obj_set_height(label, new_height);
+        lv_obj_set_height(label, size.y);
     }
     /*Replace the last 'LV_LABEL_DOT_NUM' characters with dots
      * and save these characters*/
@@ -355,7 +330,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     lv_label_ext_t * ext = lv_obj_get_ext(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
-    cord_t max_length = lv_obj_get_width(label);
+    cord_t max_w = lv_obj_get_width(label);
     lv_labels_t * labels = lv_obj_get_style(label);
     const font_t * font = font_get(labels->font);
     uint8_t letter_height = font_get_height(font);
@@ -363,16 +338,21 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
     /*If the width will be expanded  the set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-        max_length = LV_CORD_MAX;
+        max_w = LV_CORD_MAX;
     }
 
     /*Search the line of the index letter */;
     while (text[new_line_start] != '\0') {
-        new_line_start += txt_get_next_line(&text[line_start], font, labels->letter_space, max_length);
+        new_line_start += txt_get_next_line(&text[line_start], font, labels->letter_space, max_w);
         if(index < new_line_start || text[new_line_start] == '\0') break; /*The line of 'index' letter begins at 'line_start'*/
 
         y += letter_height + labels->line_space;
         line_start = new_line_start;
+    }
+
+    if((text[index - 1] == '\n' || text[index - 1] == '\r') && text[index] == '\0') {
+        y += letter_height + labels->line_space;
+        line_start = index;
     }
 
     /*Calculate the x coordinate*/
@@ -406,37 +386,37 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     lv_label_ext_t * ext = lv_obj_get_ext(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
-    cord_t max_length = lv_obj_get_width(label);
-    lv_labels_t * labels = lv_obj_get_style(label);
-    const font_t * font = font_get(labels->font);
+    cord_t max_w = lv_obj_get_width(label);
+    lv_labels_t * style = lv_obj_get_style(label);
+    const font_t * font = font_get(style->font);
     uint8_t letter_height = font_get_height(font);
     cord_t y = 0;
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-        max_length = LV_CORD_MAX;
+        max_w = LV_CORD_MAX;
     }
 
     /*Search the line of the index letter */;
     while (text[line_start] != '\0') {
-    	new_line_start += txt_get_next_line(&text[line_start], font, labels->letter_space, max_length);
-    	if(pos->y <= y + letter_height + labels->line_space) break; /*The line is found ('line_start')*/
-    	y += letter_height + labels->line_space;
+    	new_line_start += txt_get_next_line(&text[line_start], font, style->letter_space, max_w);
+    	if(pos->y <= y + letter_height + style->line_space) break; /*The line is found ('line_start')*/
+    	y += letter_height + style->line_space;
         line_start = new_line_start;
     }
 
     /*Calculate the x coordinate*/
     cord_t x = 0;
-	if(labels->mid != 0) {
+	if(style->mid != 0) {
 		cord_t line_w;
         line_w = txt_get_width(&text[line_start], new_line_start - line_start,
-                               font, labels->letter_space);
+                               font, style->letter_space);
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
 
 	uint16_t i;
 	for(i = line_start; i < new_line_start-1; i++) {
-		x += font_get_width(font, text[i]) + labels->letter_space;
+		x += font_get_width(font, text[i]) + style->letter_space;
 		if(pos->x < x) break;
 	}
 
@@ -531,8 +511,8 @@ static void lv_labels_init(void)
 	/*Default style*/
 	lv_labels_def.font = LV_FONT_DEFAULT;
 	lv_labels_def.objs.color = COLOR_MAKE(0x10, 0x18, 0x20);
-	lv_labels_def.letter_space = 2 * LV_STYLE_MULT;
-	lv_labels_def.line_space =  2 * LV_STYLE_MULT;
+	lv_labels_def.letter_space = 2 * LV_DOWNSCALE;
+	lv_labels_def.line_space =  2 * LV_DOWNSCALE;
 	lv_labels_def.mid =  0;
 
 	memcpy(&lv_labels_btn, &lv_labels_def, sizeof(lv_labels_t));
@@ -541,15 +521,14 @@ static void lv_labels_init(void)
 
 	memcpy(&lv_labels_title, &lv_labels_def, sizeof(lv_labels_t));
 	lv_labels_title.objs.color = COLOR_MAKE(0x10, 0x20, 0x30);
-	lv_labels_title.letter_space = 4 * LV_STYLE_MULT;
-	lv_labels_title.line_space =  4 * LV_STYLE_MULT;
+	lv_labels_title.letter_space = 4 * LV_DOWNSCALE;
+	lv_labels_title.line_space =  4 * LV_DOWNSCALE;
 	lv_labels_title.mid =  0;
-
 
 	memcpy(&lv_labels_txt, &lv_labels_def, sizeof(lv_labels_t));
 	lv_labels_txt.objs.color = COLOR_MAKE(0x16, 0x23, 0x34);
-	lv_labels_txt.letter_space = 1 * LV_STYLE_MULT;
-	lv_labels_txt.line_space =  2 * LV_STYLE_MULT;
+	lv_labels_txt.letter_space = 0 * LV_DOWNSCALE;
+	lv_labels_txt.line_space =  1 * LV_DOWNSCALE;
 	lv_labels_txt.mid =  0;
 
 }

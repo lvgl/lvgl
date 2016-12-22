@@ -343,18 +343,18 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 static void lv_lines_init(void)
 {
 	/*Default style*/
-	lv_lines_def.width = 2 * LV_STYLE_MULT;
+	lv_lines_def.width = 2 * LV_DOWNSCALE;
 	lv_lines_def.objs.color = COLOR_RED;
 	lv_lines_def.objs.transp = 0;
 
 	/*Decoration line style*/
 	memcpy(&lv_lines_decor, &lv_lines_def, sizeof(lv_lines_t));
-	lv_lines_decor.width = 1 * LV_STYLE_MULT;
+	lv_lines_decor.width = 1 * LV_DOWNSCALE;
 	lv_lines_decor.objs.color = COLOR_GRAY;
 
 	/*Chart line style*/
 	memcpy(&lv_lines_chart, &lv_lines_def, sizeof(lv_lines_t));
-	lv_lines_chart.width = 3 * LV_STYLE_MULT;
+	lv_lines_chart.width = 3 * LV_DOWNSCALE;
 	lv_lines_chart.objs.color = COLOR_RED;
 }
 #endif

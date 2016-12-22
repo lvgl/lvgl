@@ -22,22 +22,28 @@
 
 typedef enum
 {
-#if USE_FONT_DEJAVU_14
+#if USE_FONT_DEJAVU_8 != 0
+    FONT_DEJAVU_8,
+#endif
+#if USE_FONT_DEJAVU_10 != 0
+    FONT_DEJAVU_10,
+#endif
+#if USE_FONT_DEJAVU_14 != 0
     FONT_DEJAVU_14,
 #endif
-#if USE_FONT_DEJAVU_20
+#if USE_FONT_DEJAVU_20 != 0
     FONT_DEJAVU_20,
 #endif
-#if USE_FONT_DEJAVU_30
+#if USE_FONT_DEJAVU_30 != 0
     FONT_DEJAVU_30,
 #endif
-#if USE_FONT_DEJAVU_40
+#if USE_FONT_DEJAVU_40 != 0
     FONT_DEJAVU_40,
 #endif
-#if USE_FONT_DEJAVU_60
+#if USE_FONT_DEJAVU_60 != 0
     FONT_DEJAVU_60,
 #endif
-#if USE_FONT_DEJAVU_80
+#if USE_FONT_DEJAVU_80 != 0
     FONT_DEJAVU_80,
 #endif
     FONT_TYPE_NUM,
@@ -82,11 +88,7 @@ static inline const uint8_t * font_get_bitmap(const font_t * font_p, uint8_t let
  */
 static inline uint8_t font_get_height(const font_t * font_p)
 {
-#if LV_DOWNSCALE > 1 && LV_UPSCALE_FONT != 0
-    return font_p->height_row * LV_DOWNSCALE;
-#else
     return font_p->height_row;
-#endif
 }
 
 /**
@@ -106,11 +108,7 @@ static inline uint8_t font_get_width(const font_t * font_p, uint8_t letter)
                                       font_p->width_bit_a[letter];
     }
 
-    #if LV_DOWNSCALE > 1 && LV_UPSCALE_FONT != 0
-    return w * LV_DOWNSCALE;
-    #else
     return w;
-#endif
 }
 
 #endif

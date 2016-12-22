@@ -64,6 +64,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c);
 void lv_ta_add_text(lv_obj_t * ta, const char * txt);
 void lv_ta_set_text(lv_obj_t * ta, const char * txt);
 void lv_ta_del(lv_obj_t * ta);
+
 void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos);
 void lv_ta_cursor_right	(lv_obj_t * ta);
 void lv_ta_cursor_left(lv_obj_t * taj);
