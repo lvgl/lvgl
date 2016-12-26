@@ -128,10 +128,10 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
     uint8_t col_bit;
     uint8_t col_byte_cnt;
 
-    cord_t col_start = pos_p->x >= mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
-    cord_t col_end  = pos_p->x + letter_w <= mask_p->x2 ? letter_w : mask_p->x2 - pos_p->x + 1;
-    cord_t row_start = pos_p->y >= mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
-    cord_t row_end  =  pos_p->y + letter_h <= mask_p->y2 ? letter_h : mask_p->y2 - pos_p->y + 1;
+    cord_t col_start = pos_p->x > mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
+    cord_t col_end  = pos_p->x + letter_w < mask_p->x2 ? letter_w : mask_p->x2 - pos_p->x + 1;
+    cord_t row_start = pos_p->y > mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
+    cord_t row_end  =  pos_p->y + letter_h < mask_p->y2 ? letter_h : mask_p->y2 - pos_p->y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
     vdb_buf_tmp += ((pos_p->y - vdb_p->vdb_area.y1) * vdb_width)
@@ -145,7 +145,7 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
 
     for(row = row_start; row < row_end; row ++) {
         col_byte_cnt = 0;
-        col_bit = 7 - ((col_start / 2) % 8);
+        col_bit = 7 - (col_start % 8);
         for(col = col_start; col < col_end; col ++) {
 
             if((*map_p & (1 << col_bit)) != 0) {

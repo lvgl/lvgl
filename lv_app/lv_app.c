@@ -840,7 +840,7 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     a.end = cords.y1;
     a.start = 0;
     a.fp = (anim_fp_t) lv_obj_set_y;
-#if LV_APP_EFFECT_OPA == 0
+#if LV_APP_EFFECT_OPA_ANIM == 0
     a.end_cb = (void (*)(void *))lv_app_win_close_anim_cb;
 #endif
     anim_create(&a);
