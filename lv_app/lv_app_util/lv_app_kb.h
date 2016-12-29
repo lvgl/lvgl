@@ -9,7 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_app.h"
+#include "../lv_app.h"
 #if LV_APP_ENABLE != 0
 
 /*********************
@@ -29,6 +29,7 @@ typedef enum
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_app_kb_init(void);
 void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *));
 void lv_app_kb_close(bool ok);
 

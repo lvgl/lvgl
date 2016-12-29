@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_app_sup.h"
+#include "lv_app_kb.h"
 #if LV_APP_ENABLE != 0
 
-#include "../lv_objx/lv_btnm.h"
-#include "../lv_objx/lv_ta.h"
+#include "lvgl/lv_objx/lv_btnm.h"
+#include "lvgl/lv_objx/lv_ta.h"
 
 /*********************
  *      DEFINES
@@ -65,7 +65,6 @@ static bool kb_first;
 static void (*kb_close_action)(lv_obj_t *);
 static void (*kb_ok_action)(lv_obj_t *);
 static lv_btnms_t kb_btnms;
-static bool kb_inited;
 
 /**********************
  *      MACROS
@@ -74,6 +73,15 @@ static bool kb_inited;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+void lv_app_kb_init(void)
+{
+    lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
+    kb_btnms.rects.opad = 4 + LV_DOWNSCALE;
+    kb_btnms.rects.vpad = 3 + LV_DOWNSCALE;
+    kb_btnms.rects.hpad = 3 + LV_DOWNSCALE;
+    kb_btnms.rects.round = 0;
+}
 
 /**
  * Open a keyboard for a text area object
@@ -84,17 +92,6 @@ static bool kb_inited;
  */
 void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *))
 {
-    /*Init the style*/
-	if(kb_inited == false) {
-		lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
-		kb_btnms.rects.opad = 4 + LV_DOWNSCALE;
-		kb_btnms.rects.vpad = 3 + LV_DOWNSCALE;
-		kb_btnms.rects.hpad = 3 + LV_DOWNSCALE;
-		kb_btnms.rects.round = 0;
-
-		kb_inited = true;
-	}
-
 	/*Close the previous keyboard*/
     if(kb_btnm != NULL) {
         lv_app_kb_close(false);

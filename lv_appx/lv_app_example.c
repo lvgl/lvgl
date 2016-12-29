@@ -9,7 +9,7 @@
 #include "lv_app_example.h"
 #if LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0
 
-#include "../lv_app/lv_app_sup.h"
+#include "../lv_app/lv_app_util/lv_app_kb.h"
 #include "misc/os/ptask.h"
 #include <stdio.h>
 
@@ -218,7 +218,7 @@ static void kb_ok_action(lv_obj_t * ta)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(ta);
     const char * txt = lv_ta_get_txt(ta);
-    lv_app_com_send(app, LV_APP_COM_TYPE_STR, txt, strlen(txt) + 1);
+    lv_app_com_send(app, LV_APP_COM_TYPE_NOTICE, txt, strlen(txt) + 1);
 }
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/

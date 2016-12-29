@@ -9,7 +9,8 @@
 #include "lv_app.h"
 
 #if LV_APP_ENABLE != 0
-#include "lv_app_sup.h"
+#include "lv_app_util/lv_app_kb.h"
+#include "lv_app_util/lv_app_notice.h"
 #include "lvgl/lv_misc/anim.h"
 
 /*********************
@@ -58,7 +59,6 @@ static lv_obj_t * app_scr;   /*Screen of the applications*/
 static lv_obj_t * menuh; 	 /*Holder of timg_bubbleshe menu on the top*/
 static lv_obj_t * app_btn;   /*The "Apps" button on the menu*/
 static lv_obj_t * sys_apph;  /*Holder of the system app. buttons*/
-static lv_obj_t * clock; 	 /*Clock on the menu bar (right top)*/
 static lv_obj_t * app_list;  /*A list which is opened on 'app_btn' release*/
 static lv_obj_t * sc_page;   /*A page for the shortcuts */
 static lv_app_inst_t * con_send; /*The sender application in connection mode. Not NLL means connection mode is active*/
@@ -116,6 +116,10 @@ void lv_app_init(void)
 
 	/*Create the desktop elements*/
 	lv_app_init_desktop();
+
+	/*Init. the utilities*/
+	lv_app_kb_init();
+	lv_app_notice_init();
 
 	/*Initialize all application descriptors*/
 	/*ADD NEW APPLICATION INITS HERE!!!*/
@@ -285,6 +289,11 @@ uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , cons
 {
     lv_app_con_t * con;
     uint16_t rec_cnt = 0;
+
+    /*Add the notifications to the notice utility*/
+    if(type == LV_APP_COM_TYPE_NOTICE) {
+        lv_app_notice_add(data);
+    }
 
     LL_READ(app_con_ll, con) {
         if(con->sender == app_send) {
@@ -485,9 +494,10 @@ static void lv_app_init_desktop(void)
     lv_rect_set_fit(sys_apph, true, false);
     lv_obj_set_height(sys_apph, app_style.menu_h);
     lv_obj_set_style(sys_apph, lv_rects_get(LV_RECTS_TRANSP, NULL));
-    clock = lv_label_create(sys_apph, NULL);
+   /* clock = lv_label_create(sys_apph, NULL);
     lv_obj_set_style(clock, &app_style.menu_btn_label_style);
     lv_label_set_text(clock, "20:17");
+*/
     lv_obj_align(sys_apph, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
 
     lv_app_refr_style();

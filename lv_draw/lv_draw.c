@@ -80,6 +80,8 @@ static lv_labels_t lv_img_no_pic_labels = {
 void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, 
                   const lv_rects_t * rects_p, opa_t opa)
 {
+    if(area_get_height(cords_p) < 1 || area_get_width(cords_p) < 1) return;
+
     if(rects_p->empty == 0){
         lv_draw_rect_main_mid(cords_p, mask_p, rects_p, opa);
 

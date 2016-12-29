@@ -33,7 +33,7 @@ typedef enum
 	LV_APP_COM_TYPE_BIN,    /*Binary data as 'int32_t' array*/
 	LV_APP_COM_TYPE_SYS,    /*System level event*/
 	LV_APP_COM_TYPE_LOG,    /*String about an event to log*/
-	LV_APP_COM_TYPE_NOTE,   /*String to display to the user as a notification*/
+	LV_APP_COM_TYPE_NOTICE,   /*String to display to the user as a notification*/
     LV_APP_COM_TYPE_TRIG,   /*A trigger to do some specific action (data is ignored)*/
 }lv_app_com_type_t;
 
