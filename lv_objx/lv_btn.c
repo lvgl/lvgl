@@ -138,11 +138,17 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
 
             case LV_SIGNAL_PRESS_LOST:
                 /*Refresh the state*/
-                if(ext->state == LV_BTN_STATE_PR) {
-                	lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                } else if(ext->state == LV_BTN_STATE_TGL_PR) {
-                	lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                }lv_obj_inv(btn);
+                if(ext->state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                else if(ext->state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+
+                lv_obj_inv(btn);
+                break;
+            case LV_SIGNAL_PRESSING:
+                if(lv_dispi_is_dragging(param) != false) {
+                    if(ext->state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                    else if(ext->state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                }
+                lv_obj_inv(btn);
                 break;
 
             case LV_SIGNAL_RELEASED:
@@ -218,9 +224,10 @@ void lv_btn_set_tgl(lv_obj_t * btn, bool tgl)
 void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext(btn);
-    
-    ext->state = state;
-    lv_obj_inv(btn);
+    if(ext->state != state) {
+        ext->state = state;
+        lv_obj_inv(btn);
+    }
 }
 
 /**
@@ -467,7 +474,7 @@ static void lv_btns_init(void)
 	lv_btns_def.rects.round = 4 * LV_DOWNSCALE;
 	lv_btns_def.rects.hpad = 10 * LV_DOWNSCALE;
 	lv_btns_def.rects.vpad = 15 * LV_DOWNSCALE;
-	lv_btns_def.rects.opad = 5 * LV_DOWNSCALE;
+	lv_btns_def.rects.opad = 10 * LV_DOWNSCALE;
 
 	/*Transparent style*/
 	memcpy(&lv_btns_transp, &lv_btns_def, sizeof(lv_btns_t));
@@ -501,7 +508,6 @@ static void lv_btns_init(void)
 	lv_btns_border.rects.round = 4 * LV_DOWNSCALE;
 	lv_btns_border.rects.hpad = 10 * LV_DOWNSCALE;
 	lv_btns_border.rects.vpad = 10 * LV_DOWNSCALE;
-	lv_btns_border.rects.vpad = 5 * LV_DOWNSCALE;
 }
 
 #endif

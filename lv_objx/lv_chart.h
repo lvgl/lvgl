@@ -10,7 +10,7 @@
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#if USE_LV_CHARTBG != 0
+#if USE_LV_CHART != 0
 
 #include "../lv_obj/lv_obj.h"
 #include "lv_rect.h"
@@ -49,6 +49,7 @@ typedef struct
 typedef enum
 {
 	LV_CHARTS_DEF,
+	LV_CHARTS_TRANSP,
 }lv_charts_builtin_t;
 
 /*Data of chart background*/

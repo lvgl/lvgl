@@ -1,17 +1,16 @@
 /**
- * @file lv_app_example.h
+ * @file lv_app_fsel.h
  *
  */
 
-#ifndef LV_APP_EXAMPLE_H
-#define LV_APP_EXAMPLE_H
+#ifndef LV_APP_FSEL_H
+#define LV_APP_FSEL_H
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lvgl/lv_app/lv_app.h"
-
-#if LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0
+#include "../lv_app.h"
+#if LV_APP_ENABLE != 0
 
 /*********************
  *      DEFINES
@@ -20,20 +19,18 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
-
-}lv_app_example_conf_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-const lv_app_dsc_t * lv_app_example_init(void);
+void lv_app_fsel_init(void);
+void lv_app_fsel_open(const char * path, const char * filter, void * param, void (*ok_action)(void *, const char *));
+void lv_app_fsel_close();
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/
+#endif /*LV_APP_ENABLE != 0*/
 
-#endif /* LV_APP_EXAMPLE */
+#endif /*LV_APP_FSEL_H*/

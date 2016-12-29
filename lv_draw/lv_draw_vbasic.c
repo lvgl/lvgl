@@ -160,7 +160,6 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
                col_bit = 7;
                col_byte_cnt ++;
                map_p ++;
-
             }
         }
 

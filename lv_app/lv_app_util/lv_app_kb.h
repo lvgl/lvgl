@@ -1,10 +1,10 @@
 /**
- * @file lv_app_sup.h
+ * @file lv_app_kb.h
  *
  */
 
-#ifndef LV_APP_SUP_H
-#define LV_APP_SUP_H
+#ifndef LV_APP_KB_H
+#define LV_APP_KB_H
 
 /*********************
  *      INCLUDES
@@ -38,4 +38,4 @@ void lv_app_kb_close(bool ok);
  **********************/
 #endif /*LV_APP_ENABLE != 0*/
 
-#endif /*LV_APP_SUP_H*/
+#endif /*LV_APP_KB_H*/

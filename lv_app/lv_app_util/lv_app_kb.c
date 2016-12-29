@@ -1,5 +1,5 @@
 /**
- * @file lv_app_sup.c
+ * @file lv_app_kb.c
  *
  */
 
@@ -125,7 +125,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     lv_obj_set_y(kb_win, 0);
 
     /*If the text area is higher then the new size of the window redus its size too*/
-	lv_app_style_t * app_style = lv_app_get_style();
+	lv_app_style_t * app_style = lv_app_style_get();
     cord_t win_cont_h = lv_obj_get_height(lv_win_get_content(kb_win)) -  2 * app_style->win_style.content.scrable_rects.vpad;
 	kb_ta_ori_size = lv_obj_get_height(kb_ta);
     if(lv_obj_get_height(kb_ta)  > win_cont_h) {

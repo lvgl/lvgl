@@ -249,6 +249,17 @@ lv_list_fit_t lv_list_get_fit(lv_obj_t * list)
 	return LV_EA(list, lv_list_ext_t)->fit;
 }
 
+/**
+ * Get the text of a list element
+ * @param liste pointer to list element
+ * @return pointer to the text
+ */
+const char * lv_list_element_get_txt(lv_obj_t * liste)
+{
+    /*The last child is the label*/
+    lv_obj_t * label = lv_obj_get_child(liste, NULL);
+    return lv_label_get_text(label);
+}
 
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable

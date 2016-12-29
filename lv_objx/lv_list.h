@@ -72,6 +72,7 @@ void lv_list_down(lv_obj_t * list);
 void lv_list_up(lv_obj_t * list);
 void lv_list_set_fit(lv_obj_t * list, lv_list_fit_t fit);
 lv_list_fit_t lv_list_get_fit(lv_obj_t * list);
+const char * lv_list_element_get_txt(lv_obj_t * liste);
 
 /**********************
  *      MACROS

@@ -1,0 +1,351 @@
+/**
+ * @file lv_app_sysmon.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+#include "lv_app_sysmon.h"
+#if LV_APP_ENABLE != 0 && USE_LV_APP_SYSMON != 0
+
+#include <stdio.h>
+#include "misc/os/ptask.h"
+#include "lvgl/lv_objx/lv_chart.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
+
+/*********************
+ *      DEFINES
+ *********************/
+#define LV_APP_SYSMON_REFR_TIME  500 /*[ms]*/
+#define LV_APP_SYSMON_PNUM       64
+#define LV_APP_SYS_MON_PADDING   (20 * LV_DOWNSCALE)
+#define LV_APP_SYS_MEM_WARN      (4 * 1024)
+#define LV_APP_SYS_FRAG_WARN     (70)           /*[%]*/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/*Application specific data for an instance of this application*/
+typedef struct
+{
+
+}my_app_data_t;
+
+/*Application specific data a window of this application*/
+typedef struct
+{
+    lv_obj_t * chart;
+    cord_t * cpu_dl;
+    cord_t * mem_dl;
+    lv_obj_t * label;
+}my_win_data_t;
+
+/*Application specific data for a shortcut of this application*/
+typedef struct
+{
+    lv_obj_t * pb_cpu;
+    lv_obj_t * pb_mem;
+}my_sc_data_t;
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf);
+static void my_app_close(lv_app_inst_t * app);
+static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t len);
+static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
+static void my_sc_close(lv_app_inst_t * app);
+static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
+static void my_win_close(lv_app_inst_t * app);
+
+static void sysmon_task(void);
+static void lv_app_sysmon_refr(void);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+static lv_app_dsc_t my_app_dsc =
+{
+	.name = "Sys. monitor",
+	.mode = LV_APP_MODE_NONE,
+	.app_run = my_app_run,
+	.app_close = my_app_close,
+	.com_rec = my_com_rec,
+	.win_open = my_win_open,
+	.win_close = my_win_close,
+	.sc_open = my_sc_open,
+	.sc_close = my_sc_close,
+	.app_data_size = sizeof(my_app_data_t),
+	.sc_data_size = sizeof(my_sc_data_t),
+	.win_data_size = sizeof(my_win_data_t),
+};
+
+static uint8_t mem_pct[LV_APP_SYSMON_PNUM];
+static uint8_t cpu_pct[LV_APP_SYSMON_PNUM];
+static lv_pbs_t cpu_pbs;
+static lv_pbs_t mem_pbs;
+static  dm_mon_t mem_mon;
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+const lv_app_dsc_t * lv_app_sysmon_init(void)
+{
+    ptask_create(sysmon_task, LV_APP_SYSMON_REFR_TIME, PTASK_PRIO_LOW);
+
+    memset(mem_pct, 0, sizeof(mem_pct));
+    memset(cpu_pct, 0, sizeof(cpu_pct));
+
+    lv_pbs_get(LV_PBS_DEF, &cpu_pbs);
+    cpu_pbs.bg.gcolor = COLOR_MAKE(0xFF, 0xE0, 0xE0);
+    cpu_pbs.bg.objs.color = COLOR_MAKE(0xFF, 0xD0, 0xD0);
+    cpu_pbs.bg.bcolor = COLOR_MAKE(0xFF, 0x20, 0x20);
+    cpu_pbs.bg.bwidth = 1 * LV_DOWNSCALE;
+
+    cpu_pbs.bar.gcolor = COLOR_MARRON;
+    cpu_pbs.bar.objs.color = COLOR_RED;
+    cpu_pbs.bar.bwidth = 0;
+
+    cpu_pbs.label.objs.color = COLOR_MAKE(0x40, 0x00, 0x00);
+    cpu_pbs.label.font = LV_APP_FONT_MEDIUM;
+    cpu_pbs.label.line_space = 0;
+    cpu_pbs.label.mid = 1;
+
+    memcpy(&mem_pbs, &cpu_pbs, sizeof(mem_pbs));
+    mem_pbs.bg.gcolor = COLOR_MAKE(0xD0, 0xFF, 0xD0);
+    mem_pbs.bg.objs.color = COLOR_MAKE(0xE0, 0xFF, 0xE0);
+    mem_pbs.bg.bcolor = COLOR_MAKE(0x20, 0xFF, 0x20);
+
+    mem_pbs.bar.gcolor = COLOR_GREEN;
+    mem_pbs.bar.objs.color = COLOR_LIME;
+
+    mem_pbs.label.objs.color = COLOR_MAKE(0x00, 0x40, 0x00);
+
+	return &my_app_dsc;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+/**
+ * Run an application according to 'app_dsc'
+ * @param app_dsc pointer to an application descriptor
+ * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
+ * @param conf pointer to a lv_app_sysmon_conf_t structure with configuration data or NULL if unused
+ * @return pointer to the opened application or NULL if any error occurred
+ */
+static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf)
+{
+
+}
+
+/**
+ * Close a running application.
+ * Close the Window and the Shortcut too if opened.
+ * Free all the allocated memory by this application.
+ * @param app pointer to an application
+ */
+static void my_app_close(lv_app_inst_t * app)
+{
+    /*No dynamically allocated data in 'my_app_data'*/
+}
+
+/**
+ * Read the data have been sent to this application
+ * @param app_send pointer to an application which sent the message
+ * @param app_rec pointer to an application which is receiving the message
+ * @param type type of data from 'lv_app_com_type_t' enum
+ * @param data pointer to the sent data
+ * @param len length of 'data' in bytes
+ */
+static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
+                       lv_app_com_type_t type , const void * data, uint32_t len)
+{
+	if(type == LV_APP_COM_TYPE_STR) {      /*data: string*/
+
+	}
+	else if(type == LV_APP_COM_TYPE_BIN) { /*data: array of 'int32_t' */
+
+	}
+    else if(type == LV_APP_COM_TYPE_TRIG) { /*data: ignored' */
+
+    }
+}
+
+/**
+ * Open a shortcut for an application
+ * @param app pointer to an application
+ * @param sc pointer to an object where the application
+ *           can create content of the shortcut
+ */
+static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
+{
+    my_sc_data_t * sc_data = app->sc_data;
+
+    cord_t w = lv_obj_get_width(sc) / 5;
+
+    sc_data->pb_cpu = lv_pb_create(sc, NULL);
+    lv_obj_set_size(sc_data->pb_cpu, w, 5 * lv_obj_get_height(sc) / 8);
+    lv_obj_align(sc_data->pb_cpu, NULL, LV_ALIGN_IN_BOTTOM_LEFT, w, - lv_obj_get_height(sc) / 8);
+    lv_obj_set_style(sc_data->pb_cpu, &cpu_pbs);
+    lv_obj_set_click(sc_data->pb_cpu, false);
+    lv_pb_set_min_max_value(sc_data->pb_cpu, 0, 100);
+    lv_pb_set_format_str(sc_data->pb_cpu, "C\nP\nU");
+
+    sc_data->pb_mem = lv_pb_create(sc, sc_data->pb_cpu);
+    lv_obj_align(sc_data->pb_mem, sc_data->pb_cpu, LV_ALIGN_OUT_RIGHT_MID, w, 0);
+    lv_obj_set_style(sc_data->pb_mem, &mem_pbs);
+    lv_pb_set_format_str(sc_data->pb_mem, "M\ne\nm");
+
+    lv_app_sysmon_refr();
+
+}
+
+/**
+ * Close the shortcut of an application
+ * @param app pointer to an application
+ */
+static void my_sc_close(lv_app_inst_t * app)
+{
+    /*No dynamically allocated data in 'my_sc_data'*/
+}
+
+
+/**
+ * Open the application in a window
+ * @param app pointer to an application
+ * @param win pointer to a window object where
+ *            the application can create content
+ */
+static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
+{
+    my_win_data_t * win_data = app->win_data;
+
+    win_data->chart = lv_chart_create(win, NULL);
+    lv_obj_set_size(win_data->chart, LV_HOR_RES / 2, LV_VER_RES / 2);
+    lv_chart_set_pnum(win_data->chart, LV_APP_SYSMON_PNUM);
+    lv_chart_set_range(win_data->chart, 0, 100);
+    lv_chart_set_type(win_data->chart, LV_CHART_LINE);
+
+    win_data->cpu_dl =  lv_chart_add_dataline(win_data->chart);
+    win_data->mem_dl =  lv_chart_add_dataline(win_data->chart);
+
+    uint16_t i;
+    for(i = 0; i < LV_APP_SYSMON_PNUM; i ++) {
+        win_data->cpu_dl[i] = cpu_pct[i];
+        win_data->mem_dl[i] = mem_pct[i];
+    }
+
+    lv_app_style_t * app_style = lv_app_style_get();
+    win_data->label = lv_label_create(win, NULL);
+    lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, LV_APP_SYS_MON_PADDING, 0);
+    lv_obj_set_style(win_data->label, &app_style->win_txt_style);
+
+    lv_app_sysmon_refr();
+}
+
+/**
+ * Close the window of an application
+ * @param app pointer to an application
+ */
+static void my_win_close(lv_app_inst_t * app)
+{
+
+}
+
+/*--------------------
+ * OTHER FUNCTIONS
+ ---------------------*/
+static void sysmon_task(void)
+{
+
+    /*Shift out the oldest data*/
+    uint16_t i;
+    for(i = 1; i < LV_APP_SYSMON_PNUM; i++) {
+        mem_pct[i - 1] = mem_pct[i];
+        cpu_pct[i - 1] = cpu_pct[i];
+    }
+
+    uint8_t cpu_busy = 0;
+#if USE_IDLE != 0
+    cpu_busy = 100 - idle_get();
+#endif
+
+    dm_monitor(&mem_mon);
+    uint8_t mem_free_pct = (uint32_t) ((DM_MEM_SIZE - mem_mon.size_free) * 100 ) / DM_MEM_SIZE;
+
+    cpu_pct[LV_APP_SYSMON_PNUM - 1] = cpu_busy;
+    mem_pct[LV_APP_SYSMON_PNUM - 1] = mem_free_pct;
+
+    lv_app_sysmon_refr();
+
+    static bool mem_warn_report = false;
+    if(mem_mon.size_free < LV_APP_SYS_MEM_WARN && mem_warn_report == false) {
+        mem_warn_report = true;
+        lv_app_notice_add("Critically low memory");
+    }
+
+    if(mem_mon.size_free > LV_APP_SYS_MEM_WARN) {
+        mem_warn_report = false;
+    }
+
+    static bool frag_warn_report = false;
+    if(mem_mon.pct_frag > LV_APP_SYS_FRAG_WARN && frag_warn_report == false) {
+        frag_warn_report = true;
+        lv_app_notice_add("Critically memory fragmentation");
+    }
+
+    if(mem_mon.pct_frag < LV_APP_SYS_FRAG_WARN) {
+        frag_warn_report = false;
+    }
+
+}
+
+
+static void lv_app_sysmon_refr(void)
+{
+    char buf_long[256];
+    sprintf(buf_long, "CPU: %d %%\n\nMEMORY: %d %%\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",
+                  cpu_pct[LV_APP_SYSMON_PNUM - 1],
+                  mem_pct[LV_APP_SYSMON_PNUM - 1],
+                  DM_MEM_SIZE,
+                  DM_MEM_SIZE - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
+
+    char buf_short[128];
+    sprintf(buf_short, "CPU: %d %%\nMem: %d %%\nFrag: %d %%",
+                  cpu_pct[LV_APP_SYSMON_PNUM - 1], mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
+
+    lv_app_inst_t * app;
+    app = lv_app_get_next(NULL, &my_app_dsc);
+    while(app != NULL) {
+        /*Refresh the windows*/
+        my_win_data_t * win_data = app->win_data;
+        if(win_data != NULL) {
+            lv_label_set_text(win_data->label, buf_long);
+            lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_TOP, LV_APP_SYS_MON_PADDING, 0);
+
+            lv_chart_set_next(win_data->chart, win_data->mem_dl, mem_pct[LV_APP_SYSMON_PNUM - 1]);
+            lv_chart_set_next(win_data->chart, win_data->cpu_dl, cpu_pct[LV_APP_SYSMON_PNUM - 1]);
+
+        }
+        /*Refresh the shortcut*/
+        my_sc_data_t * sc_data = app->sc_data;
+        if(sc_data != NULL) {
+            lv_pb_set_value(sc_data->pb_cpu, cpu_pct[LV_APP_SYSMON_PNUM - 1]);
+            lv_pb_set_value(sc_data->pb_mem, mem_pct[LV_APP_SYSMON_PNUM - 1]);
+        }
+
+        lv_app_com_send(app, LV_APP_COM_TYPE_STR, buf_short, strlen(buf_short));
+
+        app = lv_app_get_next(app, &my_app_dsc);
+    }
+}
+#endif /*LV_APP_ENABLE != 0 && USE_LV_APP_SYSMON != 0*/

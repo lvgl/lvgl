@@ -11,6 +11,7 @@
  *********************/
 #include "lv_conf.h"
 #include <stdint.h>
+#include <stddef.h>
 
 /*********************
  *      DEFINES
@@ -77,6 +78,8 @@ const font_t * font_get(font_types_t letter);
  */
 static inline const uint8_t * font_get_bitmap(const font_t * font_p, uint8_t letter)
 {
+    if(letter < font_p->start_ascii || letter >= font_p->start_ascii + font_p->letter_cnt) return NULL;
+
     uint32_t index = (letter - font_p->start_ascii) * font_p->height_row * font_p->width_byte;
     return &font_p->bitmaps_a[index];
 }

@@ -11,7 +11,12 @@
 #if LV_APP_ENABLE != 0
 #include "lv_app_util/lv_app_kb.h"
 #include "lv_app_util/lv_app_notice.h"
+#include "lv_app_util/lv_app_fsel.h"
+
 #include "lvgl/lv_misc/anim.h"
+
+#include "../lv_appx/lv_app_example.h"
+#include "../lv_appx/lv_app_sysmon.h"
 
 /*********************
  *      DEFINES
@@ -67,9 +72,6 @@ static lv_app_style_t app_style; /*Styles for application related things*/
 
 /*Declare icons*/
 LV_IMG_DECLARE(img_add);
-LV_IMG_DECLARE(img_battery_empty);
-LV_IMG_DECLARE(img_battery_full);
-LV_IMG_DECLARE(img_battery_half);
 LV_IMG_DECLARE(img_bubble);
 LV_IMG_DECLARE(img_calendar);
 LV_IMG_DECLARE(img_clock);
@@ -77,10 +79,9 @@ LV_IMG_DECLARE(img_close);
 LV_IMG_DECLARE(img_down);
 LV_IMG_DECLARE(img_driver);
 LV_IMG_DECLARE(img_eject);
+LV_IMG_DECLARE(img_file);
 LV_IMG_DECLARE(img_folder);
-LV_IMG_DECLARE(img_image);
 LV_IMG_DECLARE(img_left);
-LV_IMG_DECLARE(img_music);
 LV_IMG_DECLARE(img_ok);
 LV_IMG_DECLARE(img_play);
 LV_IMG_DECLARE(img_right);
@@ -89,7 +90,6 @@ LV_IMG_DECLARE(img_shut_down);
 LV_IMG_DECLARE(img_star);
 LV_IMG_DECLARE(img_up);
 LV_IMG_DECLARE(img_user);
-LV_IMG_DECLARE(img_video);
 LV_IMG_DECLARE(img_volume);
 
 /**********************
@@ -120,6 +120,7 @@ void lv_app_init(void)
 	/*Init. the utilities*/
 	lv_app_kb_init();
 	lv_app_notice_init();
+	lv_app_fsel_init();
 
 	/*Initialize all application descriptors*/
 	/*ADD NEW APPLICATION INITS HERE!!!*/
@@ -128,15 +129,21 @@ void lv_app_init(void)
 	dsc = ll_ins_head(&app_dsc_ll);
 	*dsc = lv_app_example_init();
 #endif
+
+#if USE_LV_APP_SYSMON != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_sysmon_init();
+#endif
 }
 
 /**
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
  * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
+ * @param conf pointer to an application specific configuration structure or NULL if unused
  * @return pointer to the opened application or NULL if any error occurred
  */
-lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr)
+lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr, void * conf)
 {
 	/*Add a new application and initialize it*/
 	lv_app_inst_t * app;
@@ -147,7 +154,7 @@ lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr)
 	lv_app_rename(app, app_dsc->name); /*Set a default name*/
 
 	/*Call the application specific run function*/
-	app_dsc->app_run(app, cstr);
+	app_dsc->app_run(app, cstr, conf);
 
 	return app;
 }
@@ -249,6 +256,7 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	app->win = lv_win_create(lv_scr_act(), NULL);
 	lv_obj_set_free_p(app->win, app);
 	lv_obj_set_style(app->win, &app_style.win_style);
+	lv_win_set_title(app->win, app->dsc->name);
 	lv_obj_t * win_content = lv_page_get_scrable(lv_win_get_content(app->win));
 	lv_rect_set_fit(win_content, false, true);
 	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.content.bg_rects.hpad);
@@ -426,6 +434,8 @@ lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
 
         if(next->dsc == dsc || dsc == NULL) return next;
 
+        prev = next;
+
     };
 
     return NULL;
@@ -450,7 +460,7 @@ void lv_app_refr_style(void)
  * Get a pointer to the application style structure. If modified then 'lv_app_refr_style' should be called
  * @return pointer to the application style structure
  */
-lv_app_style_t * lv_app_get_style(void)
+lv_app_style_t * lv_app_style_get(void)
 {
     return &app_style;
 }
@@ -555,7 +565,7 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
     lv_obj_del(app_list);
     app_list = NULL;
 
-	lv_app_inst_t * app = lv_app_run(dsc, "");
+	lv_app_inst_t * app = lv_app_run(dsc, "", NULL);
 	lv_app_sc_open(app);
 
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA_ANIM != 0 && LV_APP_ANIM_SC != 0
@@ -710,7 +720,7 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_app_kb_close(false);
 
 #if  LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_WIN != 0
-	lv_obj_anim(app->win, LV_ANIM_FADE | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
+	lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
 	lv_app_sc_close(app);
 	/*The animation will close the window*/
     return LV_ACTION_RES_OK;
@@ -793,12 +803,6 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     a.fp = (anim_fp_t) lv_obj_set_y;
     anim_create(&a);
 
-#if LV_APP_EFFECT_OPA_ANIM != 0
-    a.start = OPA_TRANSP;
-    a.end = OPA_COVER;
-    a.fp = (anim_fp_t) lv_obj_set_opar;
-    anim_create(&a);
-#endif /*LV_APP_EFFECT_OPA != 0*/
 #endif /*LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0*/
 
     return LV_ACTION_RES_OK;
@@ -850,18 +854,9 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     a.end = cords.y1;
     a.start = 0;
     a.fp = (anim_fp_t) lv_obj_set_y;
-#if LV_APP_EFFECT_OPA_ANIM == 0
     a.end_cb = (void (*)(void *))lv_app_win_close_anim_cb;
-#endif
     anim_create(&a);
 
-#if LV_APP_EFFECT_OPA_ANIM != 0
-    a.end = OPA_TRANSP;
-    a.start = OPA_COVER;
-    a.fp = (anim_fp_t) lv_obj_set_opar;
-    a.end_cb = (void (*)(void *))lv_app_win_close_anim_cb;
-    anim_create(&a);
-#endif
     return LV_ACTION_RES_OK;
 #else /*LV_APP_ANIM_WIN == 0 || LV_APP_ANIM_LEVEL == 0*/
     lv_app_win_close(app);
@@ -998,11 +993,15 @@ static void lv_app_init_style(void)
     app_style.sc_rec_style.rects.bopa = 30;
     app_style.sc_rec_style.rects.bwidth = 3 * LV_DOWNSCALE;
 
-
 	lv_labels_get(LV_LABELS_DEF,&app_style.sc_title_style);
 	app_style.sc_title_style.font = LV_APP_FONT_SMALL;
-	app_style.sc_title_style.objs.color = COLOR_MAKE(0x20, 0x30, 0x40);
+	app_style.sc_title_style.objs.color = COLOR_MAKE(0x10, 0x20, 0x30);
 	app_style.sc_title_style.mid = 1;
+
+	lv_labels_get(LV_LABELS_DEF,&app_style.sc_txt_style);
+    app_style.sc_txt_style.font = LV_APP_FONT_MEDIUM;
+    app_style.sc_txt_style.objs.color = COLOR_MAKE(0x20, 0x30, 0x40);
+    app_style.sc_txt_style.mid = 0;
 
 	/*Window styles*/
 	lv_wins_get(LV_WINS_DEF,&app_style.win_style);
@@ -1020,6 +1019,12 @@ static void lv_app_init_style(void)
 			                                    2 * app_style.win_style.header.vpad;
 	app_style.win_style.content.bg_rects.hpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.content.scrable_rects.objs.transp = 1;
+
+    lv_labels_get(LV_LABELS_DEF,&app_style.win_txt_style);
+    app_style.win_txt_style.font = LV_APP_FONT_MEDIUM;
+    app_style.win_txt_style.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    app_style.win_txt_style.mid = 0;
+    app_style.win_txt_style.letter_space = 1 * LV_DOWNSCALE;
 }
 
 /**
@@ -1028,9 +1033,6 @@ static void lv_app_init_style(void)
 static void lv_app_init_icons(void)
 {
     lv_img_create_file("icon_add", img_add);
-    lv_img_create_file("icon_battery_empty", img_battery_empty);
-    lv_img_create_file("icon_battery_full", img_battery_full);
-    lv_img_create_file("icon_battery_half", img_battery_half);
     lv_img_create_file("icon_bubble", img_bubble);
     lv_img_create_file("icon_calendar", img_calendar);
     lv_img_create_file("icon_clock", img_clock);
@@ -1038,10 +1040,9 @@ static void lv_app_init_icons(void)
     lv_img_create_file("icon_down", img_down);
     lv_img_create_file("icon_driver", img_driver);
     lv_img_create_file("icon_eject", img_eject);
+    lv_img_create_file("icon_file", img_file);
     lv_img_create_file("icon_folder", img_folder);
-    lv_img_create_file("icon_image", img_image);
     lv_img_create_file("icon_left", img_left);
-    lv_img_create_file("icon_music", img_music);
     lv_img_create_file("icon_ok", img_ok);
     lv_img_create_file("icon_play", img_play);
     lv_img_create_file("icon_right", img_right);
@@ -1050,7 +1051,6 @@ static void lv_app_init_icons(void)
     lv_img_create_file("icon_star", img_star);
     lv_img_create_file("icon_up", img_up);
     lv_img_create_file("icon_user", img_user);
-    lv_img_create_file("icon_video", img_video);
     lv_img_create_file("icon_volume", img_volume);
 }
 #endif /*LV_APP_ENABLE != 0*/

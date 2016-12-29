@@ -43,6 +43,7 @@ typedef struct
 {
 	lv_rect_ext_t rect_ext;	/*Ext. of ancestor*/
 	/*New data for this type */
+	lv_obj_t * label;
 	uint16_t act_value;
 	uint16_t min_value;
 	uint16_t max_value;

@@ -1041,8 +1041,6 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
 	bool out = (type & ANIM_DIR_MASK) == ANIM_IN ? false : true;
 	type = type & (~ANIM_DIR_MASK);
 
-	if(type == LV_ANIM_NONE) return;
-
 	anim_t a;
 	a.var = obj;
 	a.time = time;
@@ -1091,6 +1089,11 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
 			a.start = 0;
 			a.end = lv_obj_get_height(obj);
 			break;
+        case LV_ANIM_NONE:
+            a.fp = NULL;
+            a.start = 0;
+            a.end = 0;
+            break;
 		default:
 			break;
 	}

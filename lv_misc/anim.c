@@ -83,7 +83,7 @@ void anim_create(anim_t * anim_p)
 	memcpy(new_anim, anim_p, sizeof(anim_t));
 
 	/*Set the start value*/
-	new_anim->fp(new_anim->var, new_anim->start);
+	if(new_anim->fp != NULL) new_anim->fp(new_anim->var, new_anim->start);
 }
 
 /**
@@ -191,7 +191,7 @@ static void anim_task (void)
 			new_val = new_val >> ANIM_PATH_NORM_SHIFT;
 			new_val += a->start;
 
-			a->fp(a->var, new_val);	/*Apply the calculated value*/
+			if(a->fp != NULL) a->fp(a->var, new_val);	/*Apply the calculated value*/
 
 			/*If the time is elapsed the animation is ready*/
 			if(a->act_time >= a->time) {

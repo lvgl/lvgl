@@ -25,13 +25,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_action_res_t notice_rel_action(lv_obj_t * n, lv_dispi_t * dispi);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_obj_t * notice_h;
 
-static lv_rects_t notice_rects;
+static lv_btns_t notice_btns;
 static lv_labels_t notice_labels;
 
 /**********************
@@ -41,16 +42,24 @@ static lv_labels_t notice_labels;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+/**
+ * Initialize the Notifications
+ */
 void lv_app_notice_init(void)
 {
-    lv_app_style_t * app_style = lv_app_get_style();
+    lv_app_style_t * app_style = lv_app_style_get();
 
-    memcpy(&notice_rects, &app_style->menu_style, sizeof(lv_rects_t));
-    notice_rects.round = 5 * LV_DOWNSCALE;
-    notice_rects.bcolor = COLOR_WHITE;
-    notice_rects.bwidth = 1 * LV_DOWNSCALE;
-    notice_rects.bopa = 90;
-    notice_rects.light = 5 * LV_DOWNSCALE;
+    memcpy(&notice_btns, &app_style->menu_style, sizeof(lv_rects_t));
+    notice_btns.rects.round = 5 * LV_DOWNSCALE;
+    notice_btns.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
+    notice_btns.mcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
+    notice_btns.gcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
+    notice_btns.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE;
+    notice_btns.mcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
+    notice_btns.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
+    notice_btns.rects.bwidth = 1 * LV_DOWNSCALE;
+    notice_btns.rects.bopa = 90;
+    notice_btns.rects.light = 5 * LV_DOWNSCALE;
 
     memcpy(&notice_labels, &app_style->menu_btn_label_style, sizeof(lv_labels_t));
     notice_labels.mid = 0;
@@ -64,15 +73,20 @@ void lv_app_notice_init(void)
     lv_rect_set_layout(notice_h, LV_RECT_LAYOUT_COL_R);
 }
 
+/**
+ * Add a notification with a given text
+ * @param txt the text of the notification
+ */
 void lv_app_notice_add(const char * txt)
 {
-    lv_app_style_t * app_style = lv_app_get_style();
+    lv_app_style_t * app_style = lv_app_style_get();
 
     lv_obj_t * n;
-    n = lv_rect_create(notice_h, NULL);
+    n = lv_btn_create(notice_h, NULL);
     lv_rect_set_fit(n, true, true);
-    lv_obj_set_style(n, &notice_rects);
+    lv_obj_set_style(n, &notice_btns);
     lv_obj_set_opa(n, app_style->menu_opa);
+    lv_btn_set_rel_action(n, notice_rel_action);
 
     lv_obj_t * l;
     l = lv_label_create(n, NULL);
@@ -132,4 +146,12 @@ void lv_app_notice_add(const char * txt)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_action_res_t notice_rel_action(lv_obj_t * n, lv_dispi_t * dispi)
+{
+    lv_obj_del(n);
+
+    return LV_ACTION_RES_INV;
+}
+
 #endif

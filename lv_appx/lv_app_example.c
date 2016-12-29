@@ -10,7 +10,6 @@
 #if LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0
 
 #include "../lv_app/lv_app_util/lv_app_kb.h"
-#include "misc/os/ptask.h"
 #include <stdio.h>
 
 /*********************
@@ -42,7 +41,7 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void my_app_run(lv_app_inst_t * app, const char * cstr);
+static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf);
 static void my_app_close(lv_app_inst_t * app);
 static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t len);
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
@@ -93,9 +92,10 @@ const lv_app_dsc_t * lv_app_example_init(void)
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
  * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
+ * @param conf pointer to a lv_app_example_conf_t structure with configuration data or NULL if unused
  * @return pointer to the opened application or NULL if any error occurred
  */
-static void my_app_run(lv_app_inst_t * app, const char * cstr)
+static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf)
 {
     /*Initialize the application*/
 	if(cstr != NULL && cstr[0] != '\0') {
@@ -218,7 +218,7 @@ static void kb_ok_action(lv_obj_t * ta)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(ta);
     const char * txt = lv_ta_get_txt(ta);
-    lv_app_com_send(app, LV_APP_COM_TYPE_NOTICE, txt, strlen(txt) + 1);
+    lv_app_com_send(app, LV_APP_COM_TYPE_STR, txt, strlen(txt) + 1);
 }
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/
