@@ -294,7 +294,11 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	point_t cur_pos;
 	lv_tas_t * style = lv_obj_get_style(ta);
 	const font_t * font_p = font_get(style->labels.font);
+	area_t label_cords;
+    area_t ta_cords;
 	lv_label_get_letter_pos(ext->label, pos, &cur_pos);
+	lv_obj_get_cords(ta, &ta_cords);
+    lv_obj_get_cords(ext->label, &label_cords);
 
 	/*Check the top*/
 	if(lv_obj_get_y(label_par) + cur_pos.y < 0) {
@@ -302,9 +306,9 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	}
 
 	/*Check the bottom*/
-	if(lv_obj_get_y(label_par) + cur_pos.y + font_get_height(font_p) > lv_obj_get_height(ta)) {
+	if(label_cords.y1 + cur_pos.y + font_get_height(font_p) + style->pages.scrable_rects.vpad > ta_cords.y2) {
 		lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) +
-				                     font_get_height(font_p) + style->pages.scrable_rects.vpad * 2));
+				                     font_get_height(font_p) + 2 * style->pages.scrable_rects.vpad));
 	}
 
 	lv_obj_inv(ta);
