@@ -23,7 +23,6 @@ typedef enum
 {
 	LV_APP_KB_MODE_TXT = 0x01,
 	LV_APP_KB_MODE_NUM = 0x02,
-    LV_APP_KB_MODE_CLR = 0x04, /*Clear when the first character is pressed*/
 }lv_app_kb_mode_t;
 
 /**********************

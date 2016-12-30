@@ -61,7 +61,6 @@ static const char * kb_map_num[] = {
 
 static cord_t kb_ta_ori_size;
 static uint8_t kb_mode;
-static bool kb_first;
 static void (*kb_close_action)(lv_obj_t *);
 static void (*kb_ok_action)(lv_obj_t *);
 static lv_btnms_t kb_btnms;
@@ -102,7 +101,6 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     kb_mode = mode;
     kb_close_action = close;
     kb_ok_action = ok;
-    kb_first = false;
 
     /*Create a button matrix for the keyboard  */
     kb_btnm = lv_btnm_create(lv_scr_act(), NULL);
@@ -195,34 +193,14 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
     } else if(strcmp(txt, "1#") == 0) {
         lv_btnm_set_map(btnm, kb_map_spec);
     }  else if(strcmp(txt, "Enter") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_add_char(kb_ta, '\n');
     } else if(strcmp(txt, "Left") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_cursor_left(kb_ta);
     } else if(strcmp(txt, "Right") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_cursor_right(kb_ta);
     } else if(strcmp(txt, "Del") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_del(kb_ta);
     } else if(strcmp(txt, "+/-") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         uint16_t cur = lv_ta_get_cursor_pos(kb_ta);
         const char * ta_txt = lv_ta_get_txt(kb_ta);
         if(ta_txt[0] == '-') {
@@ -247,10 +225,6 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
         lv_app_kb_close(true);
         return LV_ACTION_RES_INV;
     } else {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_add_text(kb_ta, txt);
     }
 
