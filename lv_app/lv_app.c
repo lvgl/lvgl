@@ -17,6 +17,7 @@
 
 #include "../lv_appx/lv_app_example.h"
 #include "../lv_appx/lv_app_sysmon.h"
+#include "../lv_appx/lv_app_terminal.h"
 
 /*********************
  *      DEFINES
@@ -49,6 +50,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app);
 static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app);
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0
 static void lv_app_win_close_anim_cb(lv_obj_t * app_win);
+static void lv_app_win_minim_anim_cb(lv_obj_t * app_win);
 #endif
 
 static void lv_app_init_icons(void);
@@ -134,6 +136,11 @@ void lv_app_init(void)
     dsc = ll_ins_head(&app_dsc_ll);
     *dsc = lv_app_sysmon_init();
 #endif
+
+#if USE_LV_APP_TERMINAL != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_terminal_init();
+#endif
 }
 
 /**
@@ -168,10 +175,17 @@ void lv_app_close(lv_app_inst_t * app)
 	lv_app_win_close(app);
 	lv_app_sc_close(app);
 
+	/*Clear the connection list*/
+	lv_app_con_del(app, NULL);
+    lv_app_con_del(NULL, app);
+
 	app->dsc->app_close(app);
 
 	dm_free(app->app_data);
 	dm_free(app->name);
+
+	ll_rem(&app_inst_ll, app);
+	dm_free(app);
 }
 
 /**
@@ -246,7 +260,6 @@ void lv_app_sc_close(lv_app_inst_t * app)
  */
 lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 {
-
 	/*Close the app list if opened*/
 	if(app_list != NULL) {
 		lv_obj_del(app_list);
@@ -290,23 +303,20 @@ void lv_app_win_close(lv_app_inst_t * app)
  * @param app_send pointer to the application which is sending the message
  * @param type type of data from 'lv_app_com_type_t' enum
  * @param data pointer to the sent data
- * @param len length of 'data' in bytes
+ * @param size length of 'data' in bytes
  * @return number application which were received the message
  */
-uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , const void * data, uint32_t len)
+uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , const void * data, uint32_t size)
 {
+    if(type == LV_APP_COM_TYPE_INV) return 0;
+
     lv_app_con_t * con;
     uint16_t rec_cnt = 0;
-
-    /*Add the notifications to the notice utility*/
-    if(type == LV_APP_COM_TYPE_NOTICE) {
-        lv_app_notice_add(data);
-    }
 
     LL_READ(app_con_ll, con) {
         if(con->sender == app_send) {
             if(con->receiver->dsc->com_rec != NULL)
-            con->receiver->dsc->com_rec(app_send, con->receiver, type, data, len);
+            con->receiver->dsc->com_rec(app_send, con->receiver, type, data, size);
             rec_cnt ++;
         }
     }
@@ -350,15 +360,16 @@ void lv_app_con_set(lv_app_inst_t * sender, lv_app_inst_t * receiver)
 
 /**
  * Delete a communication connection
- * @param sender pointer to a data sender application
- * @param receiver pointer to a data receiver application
+ * @param sender pointer to a data sender application or NULL to be true for all sender
+ * @param receiver pointer to a data receiver application  or NULL to be true for all receiver
  */
 void lv_app_con_del(lv_app_inst_t * sender, lv_app_inst_t * receiver)
 {
     lv_app_con_t * con;
 
     LL_READ(app_con_ll, con) {
-        if(con->sender == sender && con->receiver == receiver) {
+        if((con->sender == sender || sender == NULL) &&
+           (con->receiver == receiver || receiver == NULL)) {
             ll_rem(&app_con_ll, con);
             dm_free(con);
         }
@@ -444,7 +455,7 @@ lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
 /**
  * Refresh the style of the applications
  * */
-void lv_app_refr_style(void)
+void lv_app_style_refr(void)
 {
     lv_style_refr_all(NULL);
 
@@ -510,7 +521,7 @@ static void lv_app_init_desktop(void)
 */
     lv_obj_align(sys_apph, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
 
-    lv_app_refr_style();
+    lv_app_style_refr();
 }
 
 /*-----------------------
@@ -720,6 +731,7 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_app_kb_close(false);
 
 #if  LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_WIN != 0
+    lv_obj_anim(app->win, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_ANIM_WIN, 0, NULL);
 	lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
 	lv_app_sc_close(app);
 	/*The animation will close the window*/
@@ -854,7 +866,7 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     a.end = cords.y1;
     a.start = 0;
     a.fp = (anim_fp_t) lv_obj_set_y;
-    a.end_cb = (void (*)(void *))lv_app_win_close_anim_cb;
+    a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
     anim_create(&a);
 
     return LV_ACTION_RES_OK;
@@ -866,10 +878,19 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 
 #if LV_APP_EFFECT_ANIM != 0
 /**
- * Called when the window close or minimization animation is ready to close the window
+ * Called when the window close animation is ready to close the application
  * @param app_win pointer to a window
  */
 static void lv_app_win_close_anim_cb(lv_obj_t * app_win)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(app_win);
+    lv_app_close(app);
+}
+/**
+ * Called when the window minimization animation is ready to close the window
+ * @param app_win pointer to a window
+ */
+static void lv_app_win_minim_anim_cb(lv_obj_t * app_win)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(app_win);
     lv_app_win_close(app);

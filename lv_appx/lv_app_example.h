@@ -36,4 +36,4 @@ const lv_app_dsc_t * lv_app_example_init(void);
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/
 
-#endif /* LV_APP_EXAMPLE */
+#endif /* LV_APP_EXAMPLE_H */

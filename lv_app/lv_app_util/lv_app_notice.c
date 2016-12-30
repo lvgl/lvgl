@@ -123,7 +123,7 @@ void lv_app_notice_add(const char * txt)
     a.fp = (anim_fp_t) lv_obj_set_height;
     a.start = lv_obj_get_height(n);
     a.end = 0;
-    a.end_cb = lv_obj_del;
+    a.end_cb = (anim_cb_t)lv_obj_del;
     anim_create(&a);
 #else
     anim_t a;

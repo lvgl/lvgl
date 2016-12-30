@@ -131,6 +131,7 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
     		break;
     	case LV_SIGNAL_CLEANUP:
     		dm_free(ext->format_str);
+    		ext->format_str = NULL;
     		break;
     	case LV_SIGNAL_STYLE_CHG:
     	    lv_obj_set_style(ext->label, &style->label);

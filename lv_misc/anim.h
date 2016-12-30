@@ -28,12 +28,13 @@ typedef enum
 typedef uint8_t anim_path_t;
 
 typedef void (*anim_fp_t)(void *, int32_t);
+typedef void (*anim_cb_t)(void *);
 
 typedef struct
 {
 	void * var;						/*Variable to animate*/
 	anim_fp_t fp;	/*Animator function*/
-	void (*end_cb) (void *);		/*Call it when the animation is ready*/
+	anim_cb_t end_cb;		/*Call it when the animation is ready*/
 	anim_path_t * path;			/*An array with the steps of animations*/
 	int32_t start;					/*Start value*/
 	int32_t end;					/*End value*/

@@ -43,7 +43,7 @@ typedef struct
  **********************/
 static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf);
 static void my_app_close(lv_app_inst_t * app);
-static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t len);
+static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t size);
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
 static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
@@ -79,6 +79,10 @@ static lv_app_dsc_t my_app_dsc =
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Initialize the application
+ * @return pointer to the application descriptor of this application
+ */
 const lv_app_dsc_t * lv_app_example_init(void)
 {
 	return &my_app_dsc;
@@ -122,24 +126,18 @@ static void my_app_close(lv_app_inst_t * app)
  * @param app_rec pointer to an application which is receiving the message
  * @param type type of data from 'lv_app_com_type_t' enum
  * @param data pointer to the sent data
- * @param len length of 'data' in bytes
+ * @param size length of 'data' in bytes
  */
 static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
-                       lv_app_com_type_t type , const void * data, uint32_t len)
+                       lv_app_com_type_t type , const void * data, uint32_t size)
 {
-	if(type == LV_APP_COM_TYPE_STR) {      /*data: string*/
+	if(type == LV_APP_COM_TYPE_CHAR) {      /*data: string*/
 	    my_sc_data_t * sc_data = app_rec->sc_data;
 	    if (sc_data->label != NULL) {
-	        lv_label_set_text(sc_data->label, data);
+	        lv_label_set_text_array(sc_data->label, data, size);
 	        lv_obj_align(sc_data->label , NULL,LV_ALIGN_CENTER, 0, 0);
 	    }
 	}
-	else if(type == LV_APP_COM_TYPE_BIN) { /*data: array of 'int32_t' */
-
-	}
-    else if(type == LV_APP_COM_TYPE_TRIG) { /*data: ignored' */
-
-    }
 }
 
 /**
@@ -151,10 +149,11 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 {
     my_sc_data_t * sc_data = app->sc_data;
+    lv_app_style_t * app_style = lv_app_style_get();
 
     sc_data->label = lv_label_create(sc, NULL);
 	lv_label_set_text(sc_data->label, "Empty");
-	lv_obj_set_style(sc_data->label, lv_labels_get(LV_LABELS_DEF, NULL));
+	lv_obj_set_style(sc_data->label, &app_style->sc_txt_style);
 	lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
 }
 
@@ -206,7 +205,8 @@ static void my_win_close(lv_app_inst_t * app)
  */
 static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
 {
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_CLR, NULL, kb_ok_action);
+    lv_ta_set_text(ta, ""); /*Clear the ta*/
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT, NULL, kb_ok_action);
     return LV_ACTION_RES_OK;
 }
 
@@ -218,7 +218,7 @@ static void kb_ok_action(lv_obj_t * ta)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(ta);
     const char * txt = lv_ta_get_txt(ta);
-    lv_app_com_send(app, LV_APP_COM_TYPE_STR, txt, strlen(txt) + 1);
+    lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, txt, strlen(txt));
 }
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/

@@ -11,17 +11,13 @@
 
 #include <stdio.h>
 #include "misc/os/ptask.h"
+#include "misc/os/idle.h"
 #include "lvgl/lv_objx/lv_chart.h"
 #include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_APP_SYSMON_REFR_TIME  500 /*[ms]*/
-#define LV_APP_SYSMON_PNUM       64
-#define LV_APP_SYS_MON_PADDING   (20 * LV_DOWNSCALE)
-#define LV_APP_SYS_MEM_WARN      (4 * 1024)
-#define LV_APP_SYS_FRAG_WARN     (70)           /*[%]*/
 
 /**********************
  *      TYPEDEFS
@@ -54,7 +50,7 @@ typedef struct
  **********************/
 static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf);
 static void my_app_close(lv_app_inst_t * app);
-static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t len);
+static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t size);
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
 static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
@@ -96,6 +92,10 @@ static  dm_mon_t mem_mon;
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Initialize the application
+ * @return pointer to the application descriptor of this application
+ */
 const lv_app_dsc_t * lv_app_sysmon_init(void)
 {
     ptask_create(sysmon_task, LV_APP_SYSMON_REFR_TIME, PTASK_PRIO_LOW);
@@ -103,6 +103,7 @@ const lv_app_dsc_t * lv_app_sysmon_init(void)
     memset(mem_pct, 0, sizeof(mem_pct));
     memset(cpu_pct, 0, sizeof(cpu_pct));
 
+    /*Create progress bar styles for the shortcut*/
     lv_pbs_get(LV_PBS_DEF, &cpu_pbs);
     cpu_pbs.bg.gcolor = COLOR_MAKE(0xFF, 0xE0, 0xE0);
     cpu_pbs.bg.objs.color = COLOR_MAKE(0xFF, 0xD0, 0xD0);
@@ -164,20 +165,12 @@ static void my_app_close(lv_app_inst_t * app)
  * @param app_rec pointer to an application which is receiving the message
  * @param type type of data from 'lv_app_com_type_t' enum
  * @param data pointer to the sent data
- * @param len length of 'data' in bytes
+ * @param size length of 'data' in bytes
  */
 static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
-                       lv_app_com_type_t type , const void * data, uint32_t len)
+                       lv_app_com_type_t type , const void * data, uint32_t size)
 {
-	if(type == LV_APP_COM_TYPE_STR) {      /*data: string*/
 
-	}
-	else if(type == LV_APP_COM_TYPE_BIN) { /*data: array of 'int32_t' */
-
-	}
-    else if(type == LV_APP_COM_TYPE_TRIG) { /*data: ignored' */
-
-    }
 }
 
 /**
@@ -192,6 +185,7 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 
     cord_t w = lv_obj_get_width(sc) / 5;
 
+    /*Create 2 progress bars fr the CPU and the Memory*/
     sc_data->pb_cpu = lv_pb_create(sc, NULL);
     lv_obj_set_size(sc_data->pb_cpu, w, 5 * lv_obj_get_height(sc) / 8);
     lv_obj_align(sc_data->pb_cpu, NULL, LV_ALIGN_IN_BOTTOM_LEFT, w, - lv_obj_get_height(sc) / 8);
@@ -206,7 +200,6 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
     lv_pb_set_format_str(sc_data->pb_mem, "M\ne\nm");
 
     lv_app_sysmon_refr();
-
 }
 
 /**
@@ -228,7 +221,9 @@ static void my_sc_close(lv_app_inst_t * app)
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
     my_win_data_t * win_data = app->win_data;
+    lv_app_style_t * app_style = lv_app_style_get();
 
+    /*Create a chart with two data lines*/
     win_data->chart = lv_chart_create(win, NULL);
     lv_obj_set_size(win_data->chart, LV_HOR_RES / 2, LV_VER_RES / 2);
     lv_chart_set_pnum(win_data->chart, LV_APP_SYSMON_PNUM);
@@ -244,9 +239,10 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
         win_data->mem_dl[i] = mem_pct[i];
     }
 
-    lv_app_style_t * app_style = lv_app_style_get();
+    /*Create a label for the details of Memory and CPU usage*/
+    cord_t opad = app_style->win_style.content.scrable_rects.opad;
     win_data->label = lv_label_create(win, NULL);
-    lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, LV_APP_SYS_MON_PADDING, 0);
+    lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, opad, 0);
     lv_obj_set_style(win_data->label, &app_style->win_txt_style);
 
     lv_app_sysmon_refr();
@@ -264,9 +260,13 @@ static void my_win_close(lv_app_inst_t * app)
 /*--------------------
  * OTHER FUNCTIONS
  ---------------------*/
+
+/**
+ * Called periodically to monitor the CPU and memory usage.
+ * It refreshes the shortcuts and windows and also add notifications if there is any problem.
+ */
 static void sysmon_task(void)
 {
-
     /*Shift out the oldest data*/
     uint16_t i;
     for(i = 1; i < LV_APP_SYSMON_PNUM; i++) {
@@ -274,6 +274,7 @@ static void sysmon_task(void)
         cpu_pct[i - 1] = cpu_pct[i];
     }
 
+    /*Get CPU and memory information */
     uint8_t cpu_busy = 0;
 #if USE_IDLE != 0
     cpu_busy = 100 - idle_get();
@@ -282,36 +283,40 @@ static void sysmon_task(void)
     dm_monitor(&mem_mon);
     uint8_t mem_free_pct = (uint32_t) ((DM_MEM_SIZE - mem_mon.size_free) * 100 ) / DM_MEM_SIZE;
 
+    /*Add the CPU and memory data*/
     cpu_pct[LV_APP_SYSMON_PNUM - 1] = cpu_busy;
     mem_pct[LV_APP_SYSMON_PNUM - 1] = mem_free_pct;
 
+    /*Refresh the shortcuts and windows*/
     lv_app_sysmon_refr();
 
+    /*Add notifications if something is critical*/
     static bool mem_warn_report = false;
-    if(mem_mon.size_free < LV_APP_SYS_MEM_WARN && mem_warn_report == false) {
+    if(mem_mon.size_free < LV_APP_SYSMON_MEM_WARN && mem_warn_report == false) {
         mem_warn_report = true;
         lv_app_notice_add("Critically low memory");
     }
 
-    if(mem_mon.size_free > LV_APP_SYS_MEM_WARN) {
-        mem_warn_report = false;
-    }
+    if(mem_mon.size_free > LV_APP_SYSMON_MEM_WARN)  mem_warn_report = false;
 
     static bool frag_warn_report = false;
-    if(mem_mon.pct_frag > LV_APP_SYS_FRAG_WARN && frag_warn_report == false) {
-        frag_warn_report = true;
-        lv_app_notice_add("Critically memory fragmentation");
+    if(mem_mon.pct_frag > LV_APP_SYSMON_FRAG_WARN) {
+        if(frag_warn_report == false) {
+            frag_warn_report = true;
+            lv_app_notice_add("Critically memory fragmentation");
+        }
+        dm_defrag(); /*Defrag. if the fragmentation is critical*/
     }
 
-    if(mem_mon.pct_frag < LV_APP_SYS_FRAG_WARN) {
-        frag_warn_report = false;
-    }
-
+    if(mem_mon.pct_frag < LV_APP_SYSMON_FRAG_WARN)  frag_warn_report = false;
 }
 
-
+/**
+ * Refresh the shortcuts and windows.
+ */
 static void lv_app_sysmon_refr(void)
 {
+    /*Create a long detailed string*/
     char buf_long[256];
     sprintf(buf_long, "CPU: %d %%\n\nMEMORY: %d %%\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",
                   cpu_pct[LV_APP_SYSMON_PNUM - 1],
@@ -319,10 +324,13 @@ static void lv_app_sysmon_refr(void)
                   DM_MEM_SIZE,
                   DM_MEM_SIZE - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
 
+    /*Create a short string*/
     char buf_short[128];
     sprintf(buf_short, "CPU: %d %%\nMem: %d %%\nFrag: %d %%",
                   cpu_pct[LV_APP_SYSMON_PNUM - 1], mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
 
+    lv_app_style_t * app_style = lv_app_style_get();
+    cord_t opad = app_style->win_style.content.scrable_rects.opad;
     lv_app_inst_t * app;
     app = lv_app_get_next(NULL, &my_app_dsc);
     while(app != NULL) {
@@ -330,7 +338,7 @@ static void lv_app_sysmon_refr(void)
         my_win_data_t * win_data = app->win_data;
         if(win_data != NULL) {
             lv_label_set_text(win_data->label, buf_long);
-            lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_TOP, LV_APP_SYS_MON_PADDING, 0);
+            lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
 
             lv_chart_set_next(win_data->chart, win_data->mem_dl, mem_pct[LV_APP_SYSMON_PNUM - 1]);
             lv_chart_set_next(win_data->chart, win_data->cpu_dl, cpu_pct[LV_APP_SYSMON_PNUM - 1]);
@@ -343,7 +351,7 @@ static void lv_app_sysmon_refr(void)
             lv_pb_set_value(sc_data->pb_mem, mem_pct[LV_APP_SYSMON_PNUM - 1]);
         }
 
-        lv_app_com_send(app, LV_APP_COM_TYPE_STR, buf_short, strlen(buf_short));
+        lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, buf_short, strlen(buf_short));
 
         app = lv_app_get_next(app, &my_app_dsc);
     }
