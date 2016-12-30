@@ -346,7 +346,6 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
  */
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 {
-
 	lv_page_ext_t * ext = lv_obj_get_ext(page);
 	lv_pages_t * style = lv_obj_get_style(page);
 
@@ -363,7 +362,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 	/*If obj is higher then the page focus where the "error" is smaller*/
 	/*Out of the page on the top*/
 	if((obj_h <= page_h && top_err > 0) ||
-	   (obj_h > page_h && top_err >= bot_err)) {
+	   (obj_h > page_h && top_err < bot_err)) {
 		/*Calculate a new position and to let  scrable_rects.vpad space above*/
 		scrlable_y = -(obj_y - style->scrable_rects.vpad - style->bg_rects.vpad);
 		scrlable_y += style->scrable_rects.vpad;
@@ -371,7 +370,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 	}
 	/*Out of the page on the bottom*/
 	else if((obj_h <= page_h && bot_err > 0) ||
-			(obj_h > page_h && top_err < bot_err)) {
+			(obj_h > page_h && top_err >= bot_err)) {
         /*Calculate a new position and to let  scrable_rects.vpad space below*/
 		scrlable_y = -obj_y;
 		scrlable_y += page_h - obj_h;
