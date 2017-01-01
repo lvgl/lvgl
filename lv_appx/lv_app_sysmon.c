@@ -14,6 +14,7 @@
 #include "misc/os/idle.h"
 #include "lvgl/lv_objx/lv_chart.h"
 #include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
+#include "hal/systick/systick.h"
 
 /*********************
  *      DEFINES
@@ -240,7 +241,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     }
 
     /*Create a label for the details of Memory and CPU usage*/
-    cord_t opad = app_style->win_style.content.scrable_rects.opad;
+    cord_t opad = app_style->win_style.content.scrl_rects.opad;
     win_data->label = lv_label_create(win, NULL);
     lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, opad, 0);
     lv_obj_set_style(win_data->label, &app_style->win_txt_style);
@@ -290,6 +291,16 @@ static void sysmon_task(void)
     /*Refresh the shortcuts and windows*/
     lv_app_sysmon_refr();
 
+    /*Handle periodic defrag. if enabled*/
+#if LV_APP_SYSMON_DEFRAG_PERIOD != 0
+    static uint32_t last_defrag = 0;
+
+    if(systick_elaps(last_defrag) > LV_APP_SYSMON_DEFRAG_PERIOD) {
+        dm_defrag();
+        last_defrag = systick_get();
+    }
+#endif
+
     /*Add notifications if something is critical*/
     static bool mem_warn_report = false;
     if(mem_mon.size_free < LV_APP_SYSMON_MEM_WARN && mem_warn_report == false) {
@@ -304,8 +315,8 @@ static void sysmon_task(void)
         if(frag_warn_report == false) {
             frag_warn_report = true;
             lv_app_notice_add("Critically memory fragmentation");
+            dm_defrag(); /*Defrag. if the fragmentation is critical*/
         }
-        dm_defrag(); /*Defrag. if the fragmentation is critical*/
     }
 
     if(mem_mon.pct_frag < LV_APP_SYSMON_FRAG_WARN)  frag_warn_report = false;
@@ -330,7 +341,7 @@ static void lv_app_sysmon_refr(void)
                   cpu_pct[LV_APP_SYSMON_PNUM - 1], mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
 
     lv_app_style_t * app_style = lv_app_style_get();
-    cord_t opad = app_style->win_style.content.scrable_rects.opad;
+    cord_t opad = app_style->win_style.content.scrl_rects.opad;
     lv_app_inst_t * app;
     app = lv_app_get_next(NULL, &my_app_dsc);
     while(app != NULL) {

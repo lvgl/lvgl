@@ -64,11 +64,9 @@ void lv_app_fsel_init(void)
 {
     lv_app_style_t * app_style = lv_app_style_get();
 
-    lv_lists_get(LV_LISTS_DEF, &fsel_lists);
+    lv_lists_get(LV_LISTS_TRANSP, &fsel_lists);
 
     memcpy(&fsel_lists.liste_labels, &app_style->menu_btn_label_style, sizeof(lv_labels_t));
-    fsel_lists.bg_pages.bg_rects.empty = 1;
-    fsel_lists.bg_pages.bg_rects.bwidth = 0;
 
     fsel_lists.liste_imgs.objs.color = COLOR_WHITE;
     fsel_lists.liste_imgs.recolor_opa = OPA_70;
@@ -141,10 +139,11 @@ static void fsel_refr(void)
     /*Create a new list*/
     lv_wins_t * wins = lv_obj_get_style(fsel_win);
     fsel_list = lv_list_create(fsel_win, NULL);
-    lv_obj_set_size(fsel_list, LV_HOR_RES -  2 * (wins->content.bg_rects.hpad + wins->content.scrable_rects.hpad), LV_VER_RES -
-                    wins->content.bg_rects.vpad - 2 * wins->content.scrable_rects.vpad);
+    lv_obj_set_size(fsel_list, LV_HOR_RES -  2 * (wins->content.bg_rects.hpad + wins->content.scrl_rects.hpad), LV_VER_RES -
+                    wins->content.bg_rects.vpad - 2 * wins->content.scrl_rects.vpad);
     lv_obj_align(fsel_list, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style(fsel_list, &fsel_lists);
+    lv_list_set_fit(fsel_list, LV_LIST_FIT_WIDTH_SB);
 
     fs_res_t res = FS_RES_OK;
 

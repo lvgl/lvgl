@@ -9,7 +9,7 @@
 #include "lv_app_terminal.h"
 #if LV_APP_ENABLE != 0 && USE_LV_APP_TERMINAL != 0
 
-#include "../lv_app/lv_app_util/lv_app_kb.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_kb.h"
 #include <stdio.h>
 
 /*********************
@@ -157,11 +157,11 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 
     /*Add the recevied data if the type is matches*/
 	if(type == app_data->com_type) {
+        if(app_data->txt[0] != '\0') add_data(app_rec, "\n", 1);
         add_data(app_rec, "@", 1);
         add_data(app_rec, app_send->name, strlen(app_send->name));
         add_data(app_rec, "\n", 1);
 	    add_data(app_rec, data, size);
-        add_data(app_rec, "\n", 1);
 	}
 }
 
@@ -213,14 +213,14 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     my_app_data_t * app_data = app->app_data;
     lv_app_style_t * app_style = lv_app_style_get();
 
-    cord_t opad = app_style->win_style.content.scrable_rects.opad;
+    cord_t opad = app_style->win_style.content.scrl_rects.opad;
 
     /*Create a label for the text of the terminal*/
     win_data->label = lv_label_create(win, NULL);
     lv_label_set_long_mode(win_data->label, LV_LABEL_LONG_BREAK);
     lv_obj_set_width(win_data->label, LV_HOR_RES -
                      2 * (app_style->win_style.content.bg_rects.hpad +
-                          app_style->win_style.content.scrable_rects.hpad));
+                          app_style->win_style.content.scrl_rects.hpad));
 
     lv_obj_set_style(win_data->label, &app_style->win_txt_style);
     lv_label_set_text_static(win_data->label, app_data->txt); /*Use the app. data text directly*/
@@ -228,10 +228,12 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     /*Create a text area. Text can be added to the terminal from here by app. keyboard.*/
     win_data->ta = lv_ta_create(win, NULL);
     lv_obj_set_size(win_data->ta, LV_HOR_RES / 2, LV_VER_RES / 4);
-    lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
     lv_obj_set_free_p(win_data->ta, app);
     lv_page_set_rel_action(win_data->ta, win_ta_rel_action);
     lv_ta_set_text(win_data->ta, "");
+    lv_obj_set_style(win_data->ta, lv_tas_get(LV_TAS_DEF, NULL));
+    lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
+
 
     /*Creat a button to set the communication type (char, integer etc.)*/
     win_data->com_type_btn = lv_btn_create(win, NULL);
@@ -244,8 +246,8 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_obj_align(win_data->com_type_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
 
     /*Align the window to see the text area on the bottom*/
-    lv_obj_align(lv_page_get_scrable(lv_win_get_content(app->win)), NULL, LV_ALIGN_IN_BOTTOM_LEFT,
-                             0, - app_style->win_style.content.scrable_rects.vpad);
+    lv_obj_align(lv_page_get_scrl(lv_win_get_content(app->win)), NULL, LV_ALIGN_IN_BOTTOM_LEFT,
+                             0, - app_style->win_style.content.scrl_rects.vpad);
 
 }
 
@@ -304,13 +306,13 @@ static lv_action_res_t win_comch_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
 static void win_ta_kb_ok_action(lv_obj_t * ta)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(ta);
+    my_app_data_t * app_data = app->app_data;
     const char * ta_txt = lv_ta_get_txt(ta);
     uint32_t ta_txt_len = strlen(ta_txt);
+    if(app_data->txt[0] != '\0') add_data(app, "\n", 1);
     add_data(app, ">", 1);
     add_data(app, ta_txt, ta_txt_len);
-    add_data(app, "\n", 1);
 
-    my_app_data_t * app_data = app->app_data;
     lv_app_com_send(app, app_data->com_type, ta_txt, ta_txt_len);
 
     lv_ta_set_text(ta, "");
@@ -357,11 +359,11 @@ static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len)
     lv_app_style_t * app_style = lv_app_style_get();
 
     if(win_data != NULL) {
-        cord_t opad = app_style->win_style.content.scrable_rects.opad;
+        cord_t opad = app_style->win_style.content.scrl_rects.opad;
         lv_label_set_text_static(win_data->label, app_data->txt);
         lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
         lv_obj_align(win_data->com_type_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
-        lv_obj_align(lv_page_get_scrable(lv_win_get_content(app->win)), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - app_style->win_style.content.scrable_rects.vpad);
+        lv_obj_align(lv_page_get_scrl(lv_win_get_content(app->win)), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - app_style->win_style.content.scrl_rects.vpad);
     }
 
     /*Set the last line on the shortcut*/
