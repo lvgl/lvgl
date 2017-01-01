@@ -41,14 +41,15 @@ typedef struct
 typedef enum
 {
 	LV_LISTS_DEF,
-	LV_LISTS_GAP,
-	LV_LISTS_TIGHT,
+    LV_LISTS_SCRL,
+	LV_LISTS_TRANSP,
 }lv_lists_builtin_t;
 
 typedef enum
 {
+    LV_LIST_FIT_WIDTH,
+    LV_LIST_FIT_WIDTH_SB,    /*Let space for the scrollbar*/
 	LV_LIST_FIT_CONTENT,
-	LV_LIST_FIT_HOLDER,
 	LV_LIST_FIT_LONGEST,
 }lv_list_fit_t;
 

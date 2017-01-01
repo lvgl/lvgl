@@ -35,7 +35,7 @@ typedef struct
 {
     lv_rects_t bg_rects;  /*Style of ancestor*/
 	/*New style element for this type */
-    lv_rects_t scrable_rects;
+    lv_rects_t scrl_rects;
     lv_rects_t sb_rects;
     cord_t sb_width;
     lv_page_sb_mode_t sb_mode;
@@ -46,6 +46,7 @@ typedef struct
 typedef enum
 {
 	LV_PAGES_DEF,
+    LV_PAGES_SIMPLE,
 	LV_PAGES_TRANSP,
 }lv_pages_builtin_t;
 
@@ -54,7 +55,7 @@ typedef struct
 {
 	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
 	/*New data for this type */
-	lv_obj_t * scrolling;	/*The scrollable object on the background*/
+	lv_obj_t * scrl;	        /*The scrollable object on the background*/
 	lv_action_t rel_action;
 	lv_action_t pr_action;
     area_t sbh;  				/*Horizontal scrollbar*/
@@ -76,7 +77,7 @@ void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
 void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
 void lv_page_glue_obj(lv_obj_t * page, bool glue);
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en);
-lv_obj_t * lv_page_get_scrable(lv_obj_t * page);
+lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
 
 /**********************
  *      MACROS

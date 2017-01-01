@@ -34,7 +34,8 @@ static void lv_lists_init(void);
  *  STATIC VARIABLES
  **********************/
 static lv_lists_t lv_lists_def;
-static lv_lists_t lv_lists_tight;
+static lv_lists_t lv_lists_scrl;
+static lv_lists_t lv_lists_transp;
 
 /**********************
  *      MACROS
@@ -65,10 +66,10 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new list object*/
     if(copy == NULL) {
-    	ext ->fit = LV_LIST_FIT_HOLDER;
+    	ext ->fit = LV_LIST_FIT_WIDTH;
     	lv_obj_set_size_us(new_list, 120, 150);
 		lv_obj_set_style(new_list, lv_lists_get(LV_LISTS_DEF, NULL));
-		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page_ext.scrolling, LV_LIST_LAYOUT_DEF);
+		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page_ext.scrl, LV_LIST_LAYOUT_DEF);
     } else {
     	lv_list_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext ->fit = copy_ext->fit;
@@ -139,12 +140,17 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	}
 
 	/*Make the size adjustment*/
-	if(ext->fit == LV_LIST_FIT_HOLDER) {
+	if(ext->fit == LV_LIST_FIT_WIDTH || ext->fit == LV_LIST_FIT_WIDTH_SB) {
 		/*Now the width will be adjusted (so disable hor. auto fit)*/
 		lv_rect_set_fit(liste, false, true);
 		cord_t w = lv_obj_get_width(list);
-		w -= lists->bg_pages.bg_rects.hpad * 2;
-		w -= lists->bg_pages.scrable_rects.hpad * 2;
+		cord_t hpad_tot = lists->bg_pages.bg_rects.hpad + lists->bg_pages.scrl_rects.hpad;
+		w -= hpad_tot * 2;
+
+		/*Make place for the scrollbar if hpad_tot is too small*/
+		if(ext->fit == LV_LIST_FIT_WIDTH_SB) {
+		    if(hpad_tot < lists->bg_pages.sb_width) w -= lists->bg_pages.sb_width - hpad_tot;
+		}
 		lv_obj_set_width(liste, w);
 	} else if(ext->fit == LV_LIST_FIT_LONGEST) {
 		/*In this case the width will be adjusted*/
@@ -281,11 +287,13 @@ lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * list)
 
 	switch(style) {
 		case LV_LISTS_DEF:
-		case LV_LISTS_GAP:
-			style_p = &lv_lists_def;
-			break;
-		case LV_LISTS_TIGHT:
-			style_p = &lv_lists_tight;
+            style_p = &lv_lists_def;
+            break;
+        case LV_LISTS_SCRL:
+            style_p = &lv_lists_scrl;
+            break;
+		case LV_LISTS_TRANSP:
+			style_p = &lv_lists_transp;
 			break;
 		default:
 			style_p = &lv_lists_def;
@@ -334,14 +342,14 @@ static bool lv_list_design(lv_obj_t * list, const area_t * mask, lv_design_mode_
 static void lv_lists_init(void)
 {
 	/*Default style*/
-	lv_pages_get(LV_PAGES_TRANSP, &lv_lists_def.bg_pages);
+	lv_pages_get(LV_PAGES_DEF, &lv_lists_def.bg_pages);
 	lv_lists_def.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
 	lv_lists_def.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
 	lv_lists_def.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
 
-	lv_lists_def.bg_pages.scrable_rects.vpad = 10 * LV_DOWNSCALE;
-	lv_lists_def.bg_pages.scrable_rects.hpad = 10 * LV_DOWNSCALE;
-	lv_lists_def.bg_pages.scrable_rects.opad = 5 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.scrl_rects.vpad = 0 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.scrl_rects.hpad = 0 * LV_DOWNSCALE;
+	lv_lists_def.bg_pages.scrl_rects.opad = 5 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_lists_def.liste_btns); /*List element button style*/
 
@@ -352,14 +360,30 @@ static void lv_lists_init(void)
 
 	lv_lists_def.liste_layout = LV_RECT_LAYOUT_ROW_M;
 
-	memcpy(&lv_lists_tight, &lv_lists_def, sizeof(lv_lists_t));
-	lv_lists_tight.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
-	lv_lists_tight.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
-	lv_lists_tight.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
+	/*Only the scrollable part is visible style*/
+    memcpy(&lv_lists_scrl, &lv_lists_def, sizeof(lv_lists_t));
+    lv_pages_get(LV_PAGES_TRANSP, &lv_lists_scrl.bg_pages);
+    lv_lists_scrl.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
+    lv_lists_scrl.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
+    lv_lists_scrl.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
 
-	lv_lists_tight.bg_pages.scrable_rects.vpad = 0 * LV_DOWNSCALE;
-	lv_lists_tight.bg_pages.scrable_rects.hpad = 0 * LV_DOWNSCALE;
-	lv_lists_tight.bg_pages.scrable_rects.opad = 0 * LV_DOWNSCALE;
+    lv_lists_scrl.bg_pages.scrl_rects.objs.transp = 0;
+    lv_lists_scrl.bg_pages.scrl_rects.empty = 0;
+    lv_lists_scrl.bg_pages.scrl_rects.bwidth = 1 * LV_DOWNSCALE;
+    lv_lists_scrl.bg_pages.scrl_rects.vpad = 0 * LV_DOWNSCALE;
+    lv_lists_scrl.bg_pages.scrl_rects.hpad = 0 * LV_DOWNSCALE;
+    lv_lists_scrl.bg_pages.scrl_rects.opad = 0 * LV_DOWNSCALE;
+
+	/*Transparent list background*/
+	memcpy(&lv_lists_transp, &lv_lists_def, sizeof(lv_lists_t));
+    lv_pages_get(LV_PAGES_TRANSP, &lv_lists_transp.bg_pages);
+    lv_lists_transp.bg_pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
+    lv_lists_transp.bg_pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
+    lv_lists_transp.bg_pages.bg_rects.opad = 0 * LV_DOWNSCALE;
+
+    lv_lists_transp.bg_pages.scrl_rects.vpad = 0 * LV_DOWNSCALE;
+    lv_lists_transp.bg_pages.scrl_rects.hpad = 0 * LV_DOWNSCALE;
+    lv_lists_transp.bg_pages.scrl_rects.opad = 5 * LV_DOWNSCALE;
 
 }
 #endif

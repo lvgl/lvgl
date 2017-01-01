@@ -40,6 +40,8 @@ typedef struct
 typedef enum
 {
 	LV_TAS_DEF,
+    LV_TAS_SIMPLE,
+    LV_TAS_TRANSP,
 }lv_tas_builtin_t;
 
 /*Data of text area*/
