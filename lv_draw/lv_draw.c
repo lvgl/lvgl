@@ -51,6 +51,7 @@ static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color
 #endif
 
 
+#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 static lv_rects_t lv_img_no_pic_rects = {
   .objs.color = COLOR_BLACK, .gcolor = COLOR_BLACK,
   .bcolor = COLOR_RED, .bwidth = 2 * LV_DOWNSCALE, .bopa = 100,
@@ -62,6 +63,7 @@ static lv_labels_t lv_img_no_pic_labels = {
   .letter_space = 1 * LV_DOWNSCALE, .line_space =  1 * LV_DOWNSCALE,
   .mid =  1,
 };
+#endif
 
 /**********************
  *      MACROS
@@ -157,6 +159,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
 }
 
 
+#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 /**
  * Draw an image
  * @param cords_p the coordinates of the image
@@ -241,7 +244,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 	}
 }
 
-
+#endif
 
 /**
  * Draw a line

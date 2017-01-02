@@ -12,6 +12,31 @@
 #include "lv_conf.h"
 #if USE_LV_WIN != 0
 
+/*Testing of dependencies*/
+#if USE_LV_RECT == 0
+#error "lv_win: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
+#endif
+
+#if USE_LV_BTN == 0
+#error "lv_win: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#endif
+
+#if USE_LV_LABEL == 0
+#error "lv_win: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#endif
+
+#if USE_LV_IMG == 0
+#error "lv_win: lv_img is required. Enable it in lv_conf.h (USE_LV_IMG  1) "
+#endif
+
+#if USE_LV_PAGE == 0
+#error "lv_win: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#endif
+
+#if USE_LV_PAGE == 0
+#error "lv_win: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#endif
+
 #include "../lv_obj/lv_obj.h"
 #include "lv_rect.h"
 #include "lv_btn.h"

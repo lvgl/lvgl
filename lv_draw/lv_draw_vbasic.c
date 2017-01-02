@@ -228,7 +228,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     cord_t row;
     cord_t col;
     cord_t row_cnt = 0;
-    color_t transp_color = LV_IMG_COLOR_TRANSP;
+    color_t transp_color = LV_COLOR_TRANSP;
     color_t color_tmp;
     cord_t map_i;
     map_p -= map_width; /*Compensate the first row % LV_DOWNSCALE*/
@@ -278,7 +278,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     } else { /*transp == true: Check all pixels */
         cord_t row;
         cord_t col;
-        color_t transp_color = LV_IMG_COLOR_TRANSP;
+        color_t transp_color = LV_COLOR_TRANSP;
 
         if(recolor_opa == OPA_TRANSP)/*No recolor*/
         {
