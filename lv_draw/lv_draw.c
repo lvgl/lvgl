@@ -31,11 +31,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if USE_LV_RECT != 0
 static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h);
+#endif /*USE_LV_RECT != 0*/
 
 /**********************
  *  STATIC VARIABLES
@@ -72,6 +74,8 @@ static lv_labels_t lv_img_no_pic_labels = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+#if USE_LV_RECT != 0
 /**
  * Draw a rectangle 
  * @param cords_p the coordinates of the rectangle
@@ -100,7 +104,9 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p,
         }
     }
 }
+#endif /*USE_LV_RECT != 0*/
 
+#if USE_LV_LABEL != 0
 /**
  * Write a text
  * @param cords_p coordinates of the label
@@ -158,6 +164,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
     }
 }
 
+#endif /* USE_LV_LABEL != 0*/
 
 #if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 /**
@@ -244,8 +251,9 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 	}
 }
 
-#endif
+#endif /*USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0*/
 
+#if USE_LV_LINE != 0
 /**
  * Draw a line
  * @param p1 first point of the line
@@ -373,11 +381,13 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 }
+#endif /*USE_LV_LINE != 0*/
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+#if USE_LV_RECT != 0
 /**
  * Draw the middle part (rectangular) of a rectangle
  * @param cords_p the coordinates of the original rectangle
@@ -865,3 +875,6 @@ static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h)
 
 	return r;
 }
+
+#endif /*USE_LV_RECT != 0*/
+

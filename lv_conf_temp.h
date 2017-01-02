@@ -70,8 +70,10 @@
  *  LV OBJ X USAGE 
  * ================*/
 
+/*Rectangle (dependencies: -*/
 #define USE_LV_RECT     1
 
+/*Label (dependencies: -*/
 #define USE_LV_LABEL    1
 #if USE_LV_LABEL != 0
 #define LV_LABEL_SCROLL_SPEED       (25 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
@@ -80,42 +82,53 @@
 #define LV_LABEL_SCROLL_REPEAT_PAUSE    500 /*Wait before the scroll begins again in ms*/
 #endif
 
+/*Button (dependencies: lv_rect*/
 #define USE_LV_BTN      1
 
+/*Line (dependencies: -*/
 #define USE_LV_LINE     1
 
-#define USE_LV_IMG      1       /*In misc_conf.h USE_FSINT 1 and USE_UFS 1 are required*/
+/*Image (dependencies: from misc: FSINT, UFS)*/
+#define USE_LV_IMG      1
 #if USE_LV_IMG != 0
 //#define LV_IMG_DEF_WALLPAPER    img_wallpaper_var /*Comment this line to NOT use wallpaper*/
 #endif /*USE_LV_IMG*/
 
+/*Page (dependencies: lv_rect)*/
 #define USE_LV_PAGE     1
 #if USE_LV_PAGE != 0
 #define LV_PAGE_ANIM_FOCUS_TIME 300 /*List focus animation time [ms] (0: turn off the animation)*/
 #endif
 
+/*List (dependencies: lv_btn, lv_label, lv_img)*/
 #define USE_LV_LIST     1
 
+/*Check box (dependencies: lv_btn, lv_label)*/
 #define USE_LV_CB       1
 
+/*Progress bar (dependencies: lv_rect, lv_label)*/
 #define USE_LV_PB       1
 
+/*LED (dependencies: lv_rect)*/
 #define USE_LV_LED      1
 
-#define USE_LV_CHARTBG  1
-
+/*Chart (dependencies: lv_rect, lv_line)*/
 #define USE_LV_CHART    1
 
+/*Text area (dependencies: lv_label, lv_page)*/
 #define USE_LV_TA       1
 #if USE_LV_TA != 0
 #define LV_TA_MAX_LENGTH    8
 #define LV_TA_CUR_BLINK_TIME 400    /*ms*/
 #endif
 
+/*Button matrix (dependencies: lv_rect, lv_label)*/
 #define USE_LV_BTNM     1
 
+/*Window (dependencies: lv_rect, lv_btn, lv_label, lv_img, lv_page)*/
 #define USE_LV_WIN      1
 
+/*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
 #define USE_LV_MBOX     1
 
 /*==================

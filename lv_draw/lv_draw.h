@@ -28,12 +28,20 @@
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+#if USE_LV_RECT != 0
 void lv_draw_rect(const area_t * cords_p, const area_t * mask_p,
                   const lv_rects_t * rects_p, opa_t opa);
+#endif
+
+#if USE_LV_LABEL != 0
 void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
                    const lv_labels_t * labels_p, opa_t opa, const char * txt);
+#endif
+
+#if USE_LV_LINE != 0
 void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p, 
                   const lv_lines_t * lines_p, opa_t opa);
+#endif
 
 #if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 void lv_draw_img(const area_t * cords_p, const area_t * mask_p, 
