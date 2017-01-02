@@ -17,6 +17,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_TA_DEF_WIDTH     (120 * LV_DOWNSCALE)
+#define LV_TA_DEF_HEIGHT    (80 * LV_DOWNSCALE)
 
 /**********************
  *      TYPEDEFS
@@ -89,7 +91,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, false);
     	lv_obj_set_style(new_ta, lv_tas_get(LV_TAS_DEF, NULL));
-    	lv_obj_set_size_us(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
+    	lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
     }
     /*Copy an existing object*/
     else {
@@ -183,10 +185,13 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 
-	/*Insert the character*/
-	char buf[LV_TA_MAX_LENGTH];
 	const char * label_txt = lv_label_get_text(ext->label);
 
+	/*Test the new length: txt length + 1 (closing'\0') + 1 (c character)*/
+    if((strlen(label_txt) + 2) > LV_TA_MAX_LENGTH) return;
+    char buf[LV_TA_MAX_LENGTH];
+
+    /*Insert the character*/
 	memcpy(buf, label_txt, ext->cursor_pos);
 	buf[ext->cursor_pos] = c;
 	memcpy(buf+ext->cursor_pos+1, label_txt+ext->cursor_pos, strlen(label_txt) - ext->cursor_pos + 1);
@@ -210,15 +215,19 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 
-	/*Insert the text*/
-	char buf[LV_TA_MAX_LENGTH];
 	const char * label_txt = lv_label_get_text(ext->label);
-	uint16_t label_len = strlen(label_txt);
-	uint16_t txt_len = strlen(txt);
+    uint16_t label_len = strlen(label_txt);
+    uint16_t txt_len = strlen(txt);
+
+    /*Test the new length (+ 1 for the closing '\0')*/
+    if((label_len + txt_len + 1) > LV_TA_MAX_LENGTH) return;
+
+    /*Insert the text*/
+    char buf[LV_TA_MAX_LENGTH];
 
 	memcpy(buf, label_txt, ext->cursor_pos);
-	memcpy(buf+ext->cursor_pos, txt, txt_len);
-	memcpy(buf+ext->cursor_pos + txt_len, label_txt+ext->cursor_pos, label_len - ext->cursor_pos + 1);
+	memcpy(buf + ext->cursor_pos, txt, txt_len);
+	memcpy(buf + ext->cursor_pos + txt_len, label_txt+ext->cursor_pos, label_len - ext->cursor_pos + 1);
 
 	/*Refresh the label*/
 	lv_label_set_text(ext->label, buf);

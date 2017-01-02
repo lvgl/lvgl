@@ -556,18 +556,6 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
                 elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
                 lv_obj_set_free_p(elem, *dsc);
                 lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-                elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-                lv_obj_set_free_p(elem, *dsc);
-                lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-                elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-                lv_obj_set_free_p(elem, *dsc);
-                lv_obj_set_opa(elem, app_style.menu_btn_opa);
-
-                elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
-                lv_obj_set_free_p(elem, *dsc);
-                lv_obj_set_opa(elem, app_style.menu_btn_opa);
 		    }
 		}
 	}
