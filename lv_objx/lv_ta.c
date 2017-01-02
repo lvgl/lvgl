@@ -68,24 +68,20 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_alloc_ext(new_ta, sizeof(lv_ta_ext_t));
     dm_assert(ext);
+    ext->cur_hide = 0;
+    ext->cursor_pos = 0;
+    ext->cursor_valid_x = 0;
+    ext->label = NULL;
 
-    if(ancestor_design_f == NULL) {
-    	ancestor_design_f = lv_obj_get_design_f(new_ta);
-    }
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_ta);
+    if(scrl_design_f == NULL) scrl_design_f = lv_obj_get_design_f(ext->page.scrl);
 
     lv_obj_set_signal_f(new_ta, lv_ta_signal);
     lv_obj_set_design_f(new_ta, lv_ta_design);
 
-    ext->cursor_valid_x = 0;
-    ext->cursor_pos = 0;
-    ext->cur_hide = 0;
-
     /*Init the new text area object*/
     if(copy == NULL) {
     	ext->label = lv_label_create(new_ta, NULL);
-    	if(scrl_design_f == NULL) {
-    		scrl_design_f = lv_obj_get_design_f(ext->page.scrl);
-    	}
 
     	lv_obj_set_design_f(ext->page.scrl, lv_ta_scrling_design);
     	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
@@ -102,8 +98,13 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->label = lv_label_create(new_ta, copy_ext->label);
     	lv_page_glue_obj(ext->label, true);
 
-    	/*Refresh the style when everything is ready*/
-    	lv_obj_set_style(new_ta, lv_obj_get_style(copy));
+        /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_ta) == false) {
+            lv_obj_set_style(new_ta, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_ta, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_ta, sizeof(lv_rects_t));
+        }
     }
     
     /*Create a cursor blinker animation*/

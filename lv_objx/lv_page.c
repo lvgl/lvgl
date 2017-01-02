@@ -67,10 +67,13 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_page_ext_t * ext = lv_obj_alloc_ext(new_page, sizeof(lv_page_ext_t));
     dm_assert(ext);
+    ext->scrl = NULL;
+    ext->pr_action = NULL;
+    ext->rel_action = NULL;
+    ext->sbh_draw = 0;
+    ext->sbv_draw = 0;
 
-    if(ancestor_design_f == NULL) {
-    	ancestor_design_f = lv_obj_get_design_f(new_page);
-    }
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_page);
 
     /*Init the new page object*/
     if(copy == NULL) {
@@ -96,7 +99,14 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 		 * because everything has to be ready before any signal is received*/
 	    lv_obj_set_signal_f(new_page, lv_page_signal);
 	    lv_obj_set_design_f(new_page, lv_page_design);
-		lv_obj_set_style(new_page, lv_obj_get_style(copy));
+
+	    /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_page) == false) {
+            lv_obj_set_style(new_page, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_page, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_page, sizeof(lv_pages_t));
+        }
     }
     
     lv_page_sb_refresh(new_page);

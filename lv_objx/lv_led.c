@@ -64,13 +64,13 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_alloc_ext(new_led, sizeof(lv_led_ext_t));
     dm_assert(ext);
+    ext->bright = LV_LED_BRIGHTNESS_DEF;
 
     lv_obj_set_signal_f(new_led, lv_led_signal);
     lv_obj_set_design_f(new_led, lv_led_design);
 
     /*Init the new led object*/
     if(copy == NULL) {
-    	ext->bright = LV_LED_BRIGHTNESS_DEF;
     	lv_obj_set_style(new_led, lv_leds_get(LV_LEDS_DEF, NULL));
     	lv_obj_set_size_us(new_led, 40, 40);
     }
@@ -78,6 +78,14 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
     else {
     	lv_led_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->bright = copy_ext->bright;
+
+    	/*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_led) == false) {
+            lv_obj_set_style(new_led, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_led, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_led, sizeof(lv_leds_t));
+        }
     }
     
     return new_led;

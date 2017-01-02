@@ -261,9 +261,9 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 
 	if(p1->x == p2->x && p1->y == p2->y) return;
 
-	cord_t dx = abs(p2->x - p1->x);
+	cord_t dx = MATH_ABS(p2->x - p1->x);
 	cord_t sx = p1->x < p2->x ? 1 : -1;
-	cord_t dy = abs(p2->y - p1->y);
+	cord_t dy = MATH_ABS(p2->y - p1->y);
 	cord_t sy = p1->y < p2->y ? 1 : -1;
 	cord_t err = (dx > dy ? dx : -dy) / 2;
 	cord_t e2;

@@ -62,12 +62,12 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the message box type specific extended data*/
     lv_mbox_ext_t * ext = lv_obj_alloc_ext(new_mbox, sizeof(lv_mbox_ext_t));
     dm_assert(ext);
+    ext->txt = NULL;
+    ext->title = NULL;
+    ext->btnh = NULL;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_f(new_mbox, lv_mbox_signal);
-
-    /* Let the design function of rect
-     lv_obj_set_design_f(new_mbox, lv_mbox_design); */
 
     /*Init the new message box message box*/
     if(copy == NULL) {
@@ -85,15 +85,25 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
 
     	lv_obj_set_style(new_mbox, lv_mboxs_get(LV_MBOXS_DEF, NULL));
-
-    	lv_mbox_realign(new_mbox);
     }
     /*Copy an existing message box*/
     else {
-//    	lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	/*TODO*/
+        lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
+        ext->title = lv_label_create(new_mbox, copy_ext->title);
+        ext->txt = lv_label_create(new_mbox, copy_ext->txt);
+        ext->btnh = lv_rect_create(new_mbox, copy_ext->btnh);
+
+        /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_mbox) == false) {
+            lv_obj_set_style(new_mbox, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_mbox, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_mbox, sizeof(lv_mboxs_t));
+        }
     }
     
+    lv_mbox_realign(new_mbox);
+
     return new_mbox;
 }
 

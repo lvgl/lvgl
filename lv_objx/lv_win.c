@@ -63,13 +63,13 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_win_ext_t * ext = lv_obj_alloc_ext(new_win, sizeof(lv_win_ext_t));
     dm_assert(ext);
+    ext->content = NULL;
+    ext->ctrl_holder = NULL;
+    ext->header = NULL;
+    ext->title = NULL;
 
-    /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_f(new_win, lv_win_signal);
-   /* The design function is not changed
-     lv_obj_set_design_f(new_obj, lv_win_design); */
 
-    lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
 
     /*Init the new window object*/
     if(copy == NULL) {
@@ -91,7 +91,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
     	lv_obj_set_style(new_win, lv_wins_get(LV_WINS_DEF, NULL));
 
-    	lv_win_realign(new_win);
+        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
     }
     /*Copy an existing object*/
     else {
@@ -112,11 +112,17 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     		child = lv_obj_get_child(copy_ext->ctrl_holder, child);
     	}
 
-    	lv_obj_set_style(new_win, lv_obj_get_style(copy));
-
-    	lv_win_realign(new_win);
+        /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_win) == false) {
+            lv_obj_set_style(new_win, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_win, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_win, sizeof(lv_wins_t));
+        }
     }
     
+    lv_win_realign(new_win);
+
     return new_win;
 }
 

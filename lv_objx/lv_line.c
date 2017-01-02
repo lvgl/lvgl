@@ -64,16 +64,18 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Extend the basic object to rectangle object*/
     lv_line_ext_t * ext = lv_obj_alloc_ext(new_line, sizeof(lv_line_ext_t));
+    dm_assert(ext);
+    ext->point_num = 0;
+    ext->point_array = NULL;
+    ext->auto_size = 1;
+    ext->y_inv = 0;
+    ext->upscale = 0;
+
     lv_obj_set_design_f(new_line, lv_line_design);
     lv_obj_set_signal_f(new_line, lv_line_signal);
 
     /*Init the new rectangle*/
     if(copy == NULL) {
-		ext->point_num = 0;
-		ext->point_array = NULL;
-		ext->auto_size = 1;
-		ext->y_inv = 0;
-		ext->upscale = 0;
 	    lv_obj_set_style(new_line, lv_lines_get(LV_LINES_DEF, NULL));
     }
     /*Copy an existing object*/
@@ -84,8 +86,8 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_line_set_upscale(new_line,lv_line_get_upscale(copy));
     	lv_line_set_points(new_line, LV_EA(copy, lv_line_ext_t)->point_array,
     								   LV_EA(copy, lv_line_ext_t)->point_num);
+        lv_obj_set_style(new_line, lv_obj_get_style(copy));
     }
-
 
     return new_line;
 }

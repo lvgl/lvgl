@@ -241,6 +241,7 @@ bool lv_obj_get_top(lv_obj_t * obj);
 bool lv_obj_get_drag(lv_obj_t * obj);
 bool lv_obj_get_drag_throw(lv_obj_t * obj);
 bool lv_obj_get_drag_parent(lv_obj_t * obj);
+bool lv_obj_get_style_iso(lv_obj_t * obj);
 bool lv_obj_get_opa_potect(lv_obj_t * obj);
 
 /*Virtual functions get*/

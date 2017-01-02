@@ -125,7 +125,7 @@ bool anim_del(void * var, anim_fp_t fp)
  */
 uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 {
-	int32_t d = abs((int32_t) start - end);
+	int32_t d = MATH_ABS((int32_t) start - end);
 	uint16_t time = (int32_t)((int32_t)(d * 1000) / speed);
 
 	if(time == 0) {

@@ -58,6 +58,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     
     lv_cb_ext_t * ext = lv_obj_alloc_ext(new_cb, sizeof(lv_cb_ext_t));
     dm_assert(ext);
+    ext->bullet = NULL;
+    ext->label = NULL;
 
     lv_obj_set_signal_f(new_cb, lv_cb_signal);
 
@@ -79,7 +81,13 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
     	ext->label = lv_label_create(new_cb, copy_ext->label);
 
-        lv_obj_set_style(new_cb, lv_obj_get_style(copy));
+    	/*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_cb) == false) {
+            lv_obj_set_style(new_cb, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_cb, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_cb, sizeof(lv_cbs_t));
+        }
     }
 
     lv_obj_align_us(new_cb, NULL, LV_ALIGN_CENTER, 0, 0);

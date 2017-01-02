@@ -61,42 +61,47 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_btn;
     
     new_btn = lv_rect_create(par, copy);
+    dm_assert(new_btn);
     /*Allocate the extended data*/
-    lv_obj_alloc_ext(new_btn, sizeof(lv_btn_ext_t));
+    lv_btn_ext_t * ext = lv_obj_alloc_ext(new_btn, sizeof(lv_btn_ext_t));
+    dm_assert(ext);
+    ext->state = LV_BTN_STATE_REL;
+    ext->pr_action = NULL;
+    ext->rel_action = NULL;
+    ext->lpr_action = NULL;
+    ext->lpr_rep_action = NULL;
+    ext->lpr_exec = 0;
+    ext->tgl = 0;
 
-    if(ancestor_design_f  == NULL) {
-    	ancestor_design_f = lv_obj_get_design_f(new_btn);
-    }
+    if(ancestor_design_f  == NULL) ancestor_design_f = lv_obj_get_design_f(new_btn);
 
     lv_obj_set_signal_f(new_btn, lv_btn_signal);
     lv_obj_set_design_f(new_btn, lv_btn_design);
     
-    lv_btn_ext_t * ext = lv_obj_get_ext(new_btn);
-    ext->lpr_exec = 0;
-
-
     /*If no copy do the basic initialization*/
-    if(copy == NULL)
-    {
-		ext->state = LV_BTN_STATE_REL;
-		ext->pr_action = NULL;
-		ext->rel_action = NULL;
-		ext->lpr_action = NULL;
-		ext->tgl = 0;
+    if(copy == NULL) {
 	    lv_rect_set_layout(new_btn, LV_RECT_LAYOUT_CENTER);
+	    lv_obj_set_style(new_btn, lv_btns_get(LV_BTNS_DEF, NULL));
     }
     /*Copy 'copy'*/
-    else{
-    	lv_btn_ext_t * ori_btn_ext = lv_obj_get_ext(copy);
-    	ext->state = ori_btn_ext->state;
-    	ext->pr_action = ori_btn_ext->pr_action;
-    	ext->rel_action = ori_btn_ext->rel_action;
-    	ext->lpr_action = ori_btn_ext->lpr_action;
-    	ext->tgl = ori_btn_ext->tgl;
+    else {
+    	lv_btn_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	ext->state = copy_ext->state;
+    	ext->pr_action = copy_ext->pr_action;
+    	ext->rel_action = copy_ext->rel_action;
+    	ext->lpr_action = copy_ext->lpr_action;
+        ext->lpr_rep_action = copy_ext->lpr_action;
+    	ext->tgl = copy_ext->tgl;
+
+    	/*Set the style of 'copy' and isolate it if it is necessary*/
+    	if(lv_obj_get_style_iso(new_btn) == false) {
+    	    lv_obj_set_style(new_btn, lv_obj_get_style(copy));
+    	} else {
+            lv_obj_set_style(new_btn, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_btn, sizeof(lv_btns_t));
+    	}
     }
     
-    lv_obj_set_style(new_btn, lv_btns_get(LV_BTNS_DEF, NULL));
-
     return new_btn;
 }
 
@@ -106,7 +111,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  */
-bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
+bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 {   
     bool valid;
 
@@ -144,6 +149,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void* param)
                 lv_obj_inv(btn);
                 break;
             case LV_SIGNAL_PRESSING:
+                /*When the button begins to drag revert pressed states to released*/
                 if(lv_dispi_is_dragging(param) != false) {
                     if(ext->state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
                     else if(ext->state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);

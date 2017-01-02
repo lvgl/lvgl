@@ -83,7 +83,9 @@ static uint8_t mem_pct[LV_APP_SYSMON_PNUM];
 static uint8_t cpu_pct[LV_APP_SYSMON_PNUM];
 static lv_pbs_t cpu_pbs;
 static lv_pbs_t mem_pbs;
+#if USE_DYN_MEM != 0
 static  dm_mon_t mem_mon;
+#endif
 
 /**********************
  *      MACROS
@@ -281,15 +283,20 @@ static void sysmon_task(void)
     cpu_busy = 100 - idle_get();
 #endif
 
+    uint8_t mem_used_pct = 0;
+#if  USE_DYN_MEM != 0
     dm_monitor(&mem_mon);
-    uint8_t mem_free_pct = (uint32_t) ((DM_MEM_SIZE - mem_mon.size_free) * 100 ) / DM_MEM_SIZE;
+    mem_used_pct = (uint32_t) ((DM_MEM_SIZE - mem_mon.size_free) * 100 ) / DM_MEM_SIZE;
+#endif
 
     /*Add the CPU and memory data*/
     cpu_pct[LV_APP_SYSMON_PNUM - 1] = cpu_busy;
-    mem_pct[LV_APP_SYSMON_PNUM - 1] = mem_free_pct;
+    mem_pct[LV_APP_SYSMON_PNUM - 1] = mem_used_pct;
 
     /*Refresh the shortcuts and windows*/
     lv_app_sysmon_refr();
+
+#if USE_DYN_MEM != 0
 
     /*Handle periodic defrag. if enabled*/
 #if LV_APP_SYSMON_DEFRAG_PERIOD != 0
@@ -320,6 +327,7 @@ static void sysmon_task(void)
     }
 
     if(mem_mon.pct_frag < LV_APP_SYSMON_FRAG_WARN)  frag_warn_report = false;
+#endif
 }
 
 /**
@@ -327,19 +335,30 @@ static void sysmon_task(void)
  */
 static void lv_app_sysmon_refr(void)
 {
-    /*Create a long detailed string*/
+
     char buf_long[256];
-    sprintf(buf_long, "CPU: %d %%\n\nMEMORY: %d %%\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",
-                  cpu_pct[LV_APP_SYSMON_PNUM - 1],
+    char buf_short[128];
+#if USE_IDLE != 0
+    sprintf(buf_long, "CPU: %d %%\n\n", cpu_pct[LV_APP_SYSMON_PNUM - 1]);
+    sprintf(buf_short, "CPU: %d %%\n", cpu_pct[LV_APP_SYSMON_PNUM - 1]);
+#else
+    strcpy(buf_long, "CPU: N/A\n\n");
+    strcpy(buf_short, "CPU: N/A\n");
+#endif
+
+#if USE_DYN_MEM != 0
+    sprintf(buf_long, "%sMEMORY: %d %%\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",
+                  buf_long,
                   mem_pct[LV_APP_SYSMON_PNUM - 1],
                   DM_MEM_SIZE,
                   DM_MEM_SIZE - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
 
-    /*Create a short string*/
-    char buf_short[128];
-    sprintf(buf_short, "CPU: %d %%\nMem: %d %%\nFrag: %d %%",
-                  cpu_pct[LV_APP_SYSMON_PNUM - 1], mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
-
+    sprintf(buf_short, "%sMem: %d %%\nFrag: %d %%",
+                  buf_short, mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
+#else
+    sprintf(buf_long, "%sMEMORY: N/A", buf_long);
+    sprintf(buf_short, "%sMem: N/A\nFrag: N/A", buf_short);
+#endif
     lv_app_style_t * app_style = lv_app_style_get();
     cord_t opad = app_style->win_style.content.scrl_rects.opad;
     lv_app_inst_t * app;

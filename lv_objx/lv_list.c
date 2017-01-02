@@ -61,18 +61,27 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_list = lv_page_create(par, copy);
     dm_assert(new_list);
     lv_list_ext_t * ext = lv_obj_alloc_ext(new_list, sizeof(lv_list_ext_t));
+    dm_assert(ext);
+    ext ->fit = LV_LIST_FIT_WIDTH;
 
 	lv_obj_set_signal_f(new_list, lv_list_signal);
 
     /*Init the new list object*/
     if(copy == NULL) {
-    	ext ->fit = LV_LIST_FIT_WIDTH;
     	lv_obj_set_size_us(new_list, 120, 150);
 		lv_obj_set_style(new_list, lv_lists_get(LV_LISTS_DEF, NULL));
 		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page_ext.scrl, LV_LIST_LAYOUT_DEF);
     } else {
     	lv_list_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext ->fit = copy_ext->fit;
+
+    	/*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_list) == false) {
+            lv_obj_set_style(new_list, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_list, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_list, sizeof(lv_lists_t));
+        }
     }
     
     return new_list;

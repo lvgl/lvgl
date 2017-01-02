@@ -66,14 +66,17 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_alloc_ext(new_label, sizeof(lv_label_ext_t));
     
     lv_label_ext_t * ext = lv_obj_get_ext(new_label);
+    dm_assert(ext);
     ext->txt = NULL;
+    ext->static_txt = 0;
+    ext->dot_end = LV_LABEL_DOT_END_INV;
+    ext->long_mode = LV_LABEL_LONG_EXPAND;
 
 	lv_obj_set_design_f(new_label, lv_label_design);
 	lv_obj_set_signal_f(new_label, lv_label_signal);
 
     /*Init the new label*/
     if(copy == NULL) {
-    	ext->dot_end = LV_LABEL_DOT_END_INV;
 		lv_obj_set_opa(new_label, OPA_COVER);
 		lv_obj_set_click(new_label, false);
 		lv_obj_set_style(new_label, lv_labels_get(LV_LABELS_DEF, NULL));
@@ -83,9 +86,17 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy 'copy' if not NULL*/
     else {
         lv_label_ext_t * copy_ext = lv_obj_get_ext(copy);
-		lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
-		if(copy_ext->static_txt == 0) lv_label_set_text(new_label, lv_label_get_text(copy));
-		else lv_label_set_text_static(new_label, lv_label_get_text(copy));
+        lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
+        if(copy_ext->static_txt == 0) lv_label_set_text(new_label, lv_label_get_text(copy));
+        else lv_label_set_text_static(new_label, lv_label_get_text(copy));
+
+        /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_label) == false) {
+            lv_obj_set_style(new_label, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_label, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_label, sizeof(lv_labels_t));
+        }
     }
     return new_label;
 }

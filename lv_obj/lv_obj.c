@@ -138,7 +138,7 @@ void lv_obj_inv(lv_obj_t * obj)
 }
 
 /**
- * Notify an object if its style is modified
+ * Notify an object about its style is modified
  * @param obj pointer to an object 
  */
 void lv_obj_refr_style(lv_obj_t * obj)
@@ -206,6 +206,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->style_iso = 0;
 		new_obj->hidden = 0;
 		new_obj->top_en = 0;
+        new_obj->child_chg_off = 0;
+		new_obj->opa_protect = 0;
+
 		new_obj->ext = NULL;
 	 }
     /*parent != NULL create normal obj. on a parent*/
@@ -241,6 +244,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->style_iso = 0;
         new_obj->hidden = 0;
         new_obj->top_en = 0;
+        new_obj->child_chg_off = 0;
+        new_obj->opa_protect = 0;
         
         new_obj->ext = NULL;
         
@@ -249,23 +254,27 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     if(copy != NULL) {
     	area_cpy(&new_obj->cords, &copy->cords);
     	new_obj->ext_size = copy->ext_size;
-        /*Set attributes*/
+
+        new_obj->opa = copy->opa;
+
+    	/*Set attributes*/
         new_obj->click_en = copy->click_en;
         new_obj->drag_en = copy->drag_en;
         new_obj->drag_throw_en = copy->drag_throw_en;
         new_obj->drag_parent = copy->drag_parent;
         new_obj->hidden = copy->hidden;
+        new_obj->style_iso = copy->style_iso;
         new_obj->top_en = copy->top_en;
+        new_obj->opa_protect = copy->opa_protect;
 
-    	new_obj->style_p = copy->style_p;
-
-        if(copy->style_iso != 0) {
-        	lv_obj_iso_style(new_obj, dm_get_size(copy->style_p));
+        if(copy->style_iso == 0) {
+            new_obj->style_p = copy->style_p;
+        } else {
+            new_obj->style_p = dm_alloc(sizeof(lv_objs_t));
+            memcpy(new_obj->style_p, copy->style_p, sizeof(lv_objs_t));
         }
 
     	lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
-
-        new_obj->opa = copy->opa;
     }
 
 
@@ -814,7 +823,8 @@ void lv_obj_set_style(lv_obj_t * obj, void * style)
     obj->style_p = style;
 
     /*Send a style change signal to the object*/
-    obj->signal_f(obj, LV_SIGNAL_STYLE_CHG, NULL);
+    lv_obj_refr_style(obj);
+
     lv_obj_inv(obj);
 }
 
@@ -1350,6 +1360,16 @@ bool lv_obj_get_drag_throw(lv_obj_t * obj)
 bool lv_obj_get_drag_parent(lv_obj_t * obj)
 {
     return obj->drag_parent == 0 ? false : true;
+}
+
+/**
+ * Get the style isolation attribute of an object
+ * @param obj pointer to an object
+ * @return pointer to a style
+ */
+bool lv_obj_get_style_iso(lv_obj_t * obj)
+{
+    return obj->style_iso == 0 ? false : true;
 }
 
 /**

@@ -129,6 +129,7 @@ static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf)
     /*Initialize the application*/
     my_app_data_t * app_data = app->app_data;
     app_data->com_type = LV_APP_COM_TYPE_CHAR;
+    memset(app_data->txt, 0, sizeof(app_data->txt));;
 }
 
 /**

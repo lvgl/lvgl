@@ -41,7 +41,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask);
  **********************/
 static lv_charts_t lv_charts_def;
 static lv_charts_t lv_charts_transp;
-static lv_design_f_t ancestor_design_fp;
+static lv_design_f_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -70,26 +70,23 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_alloc_ext(new_chart, sizeof(lv_chart_ext_t));
     dm_assert(ext);
-
-    if(ancestor_design_fp == NULL) {
-    	ancestor_design_fp = lv_obj_get_design_f(new_chart);
-    }
-
     ll_init(&ext->dl_ll, sizeof(cord_t *));
     ext->dl_num = 0;
+    ext->ymin = LV_CHART_YMIN_DEF;
+    ext->ymax = LV_CHART_YMAX_DEF;
+    ext->hdiv_num = LV_CHART_HDIV_DEF;
+    ext->vdiv_num = LV_CHART_VDIV_DEF;
+    ext->pnum = LV_CHART_PNUM_DEF;
+    ext->type = LV_CHART_LINE;
+
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_chart);
 
     lv_obj_set_signal_f(new_chart, lv_chart_signal);
     lv_obj_set_design_f(new_chart, lv_chart_design);
 
     /*Init the new chart background object*/
     if(copy == NULL) {
-        ext->type = LV_CHART_LINE;
     	lv_obj_set_style(new_chart, lv_charts_get(LV_CHARTS_DEF, NULL));
-        ext->ymin = LV_CHART_YMIN_DEF;
-        ext->ymax = LV_CHART_YMAX_DEF;
-        ext->hdiv_num = LV_CHART_HDIV_DEF;
-        ext->vdiv_num = LV_CHART_VDIV_DEF;
-        ext->pnum = LV_CHART_PNUM_DEF;
     } else {
     	lv_chart_ext_t * ext_copy = lv_obj_get_ext(copy);
         ext->type = ext_copy->type;
@@ -98,6 +95,14 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->hdiv_num = ext_copy->hdiv_num;
 		ext->vdiv_num = ext_copy->vdiv_num;
         ext->pnum = ext_copy->pnum;
+
+        /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_chart) == false) {
+            lv_obj_set_style(new_chart, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_chart, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_chart, sizeof(lv_charts_t));
+        }
     }
 
     return new_chart;
@@ -348,10 +353,10 @@ static bool lv_chart_design(lv_obj_t * chart, const area_t * mask, lv_design_mod
 {
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
-    	return ancestor_design_fp(chart, mask, mode);
+    	return ancestor_design_f(chart, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*Draw the rectangle ancient*/
-		ancestor_design_fp(chart, mask, mode);
+		ancestor_design_f(chart, mask, mode);
 
 		/*Draw the object*/
 

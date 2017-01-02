@@ -35,7 +35,7 @@ static void lv_pbs_init(void);
  *  STATIC VARIABLES
  **********************/
 static lv_pbs_t lv_pbs_def;
-static lv_design_f_t ancestor_design_fp;
+static lv_design_f_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -64,12 +64,15 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_pb_ext_t * ext = lv_obj_alloc_ext(new_pb, sizeof(lv_pb_ext_t));
     dm_assert(ext);
+    ext->min_value = 0;
+    ext->max_value = 100;
+    ext->act_value = 0;
+    ext->format_str = NULL;
+    ext->label = NULL;
 
     /* Save the rectangle design function.
      * It will be used in the progress bar design function*/
-    if(ancestor_design_fp == NULL) {
-    	ancestor_design_fp = lv_obj_get_design_f(new_pb);
-    }
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_pb);
 
     lv_obj_set_signal_f(new_pb, lv_pb_signal);
     lv_obj_set_design_f(new_pb, lv_pb_design);
@@ -78,9 +81,6 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
     	ext->format_str = dm_alloc(strlen(LV_PB_DEF_FORMAT) + 1);
     	strcpy(ext->format_str, LV_PB_DEF_FORMAT);
-    	ext->min_value = 0;
-    	ext->max_value = 100;
-    	ext->act_value = 0;
 
     	ext->label = lv_label_create(new_pb, NULL);
 
@@ -95,10 +95,15 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
 		ext->act_value = ext_copy->act_value;
-
         ext->label = lv_label_create(new_pb, ext_copy->label);
 
-        lv_obj_set_style(new_pb, lv_obj_get_style(copy));
+        /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_pb) == false) {
+            lv_obj_set_style(new_pb, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_pb, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_pb, sizeof(lv_pbs_t));
+        }
 
         lv_pb_set_value(new_pb, ext->act_value);
 
@@ -264,13 +269,13 @@ lv_pbs_t * lv_pbs_get(lv_pbs_builtin_t style, lv_pbs_t * copy)
  */
 static bool lv_pb_design(lv_obj_t * pb, const area_t * mask, lv_design_mode_t mode)
 {
-	if(ancestor_design_fp == NULL) return false;
+	if(ancestor_design_f == NULL) return false;
 
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
-    	return  ancestor_design_fp(pb, mask, mode);
+    	return  ancestor_design_f(pb, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		ancestor_design_fp(pb, mask, mode);
+		ancestor_design_f(pb, mask, mode);
 
 		lv_pb_ext_t * ext = lv_obj_get_ext(pb);
 		area_t bar_area;

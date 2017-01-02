@@ -77,22 +77,34 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_rect = lv_obj_create(par, copy);
     dm_assert(new_rect);
     lv_obj_alloc_ext(new_rect, sizeof(lv_rect_ext_t));
-    lv_rect_ext_t * rect_ext = lv_obj_get_ext(new_rect);
+    lv_rect_ext_t * ext = lv_obj_get_ext(new_rect);
+    dm_assert(ext);
+    ext->hfit_en = 0;
+    ext->vfit_en = 0;
+    ext->layout = LV_RECT_LAYOUT_OFF;
+
     lv_obj_set_design_f(new_rect, lv_rect_design);
     lv_obj_set_signal_f(new_rect, lv_rect_signal);
 
     /*Init the new rectangle*/
     if(copy == NULL) {
 		lv_obj_set_style(new_rect, lv_rects_get(LV_RECTS_DEF, NULL));
-		rect_ext->hfit_en = 0;
-		rect_ext->vfit_en = 0;
     }
     /*Copy an existing object*/
     else {
     	lv_rect_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	rect_ext->hfit_en = copy_ext->hfit_en;
-    	rect_ext->vfit_en = copy_ext->vfit_en;
-    	rect_ext->layout = copy_ext->layout;
+    	ext->hfit_en = copy_ext->hfit_en;
+    	ext->vfit_en = copy_ext->vfit_en;
+    	ext->layout = copy_ext->layout;
+
+    	/*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_rect) == false) {
+            lv_obj_set_style(new_rect, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_rect, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_rect, sizeof(lv_rects_t));
+        }
+
     }
 
     return new_rect;

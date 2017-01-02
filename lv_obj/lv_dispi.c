@@ -376,8 +376,8 @@ static void dispi_drag(lv_dispi_t * dispi_p)
         dispi_p->vect_sum.y += dispi_p->vect.y;
         
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if(abs(dispi_p->vect_sum.x) >= LV_DISPI_DRAG_LIMIT ||
-           abs(dispi_p->vect_sum.y) >= LV_DISPI_DRAG_LIMIT) 
+        if(MATH_ABS(dispi_p->vect_sum.x) >= LV_DISPI_DRAG_LIMIT ||
+           MATH_ABS(dispi_p->vect_sum.y) >= LV_DISPI_DRAG_LIMIT)
            {
                 dispi_p->drag_in_prog = 1;
                 drag_obj->signal_f(drag_obj,

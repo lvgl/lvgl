@@ -68,14 +68,17 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_btnm_ext_t * ext = lv_obj_alloc_ext(new_btnm, sizeof(lv_btnm_ext_t));
     dm_assert(ext);
+    ext->btn_cnt = 0;
+    ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
+    ext->btn_areas = NULL;
+    ext->cb = NULL;
+    ext->map_p = NULL;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_btnm);
 
     lv_obj_set_signal_f(new_btnm, lv_btnm_signal);
     lv_obj_set_design_f(new_btnm, lv_btnm_design);
 
-    ext->btn_cnt = 0;
-    ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
 
     /*Init the new button matrix object*/
     if(copy == NULL) {
@@ -85,7 +88,14 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
-
+        /*Set the style of 'copy' and isolate it if it is necessary*/
+        if(lv_obj_get_style_iso(new_btnm) == false) {
+            lv_obj_set_style(new_btnm, lv_obj_get_style(copy));
+        } else {
+            lv_obj_set_style(new_btnm, lv_obj_get_style(copy));
+            lv_obj_iso_style(new_btnm, sizeof(lv_btnms_t));
+        }
+        lv_btnm_set_map(new_btnm, lv_btnm_get_map(copy));
     }
     
     return new_btnm;
