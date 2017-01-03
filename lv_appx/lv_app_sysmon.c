@@ -243,7 +243,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     }
 
     /*Create a label for the details of Memory and CPU usage*/
-    cord_t opad = app_style->win_style.content.scrl_rects.opad;
+    cord_t opad = app_style->win_style.pages.scrl_rects.opad;
     win_data->label = lv_label_create(win, NULL);
     lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, opad, 0);
     lv_obj_set_style(win_data->label, &app_style->win_txt_style);
@@ -360,7 +360,7 @@ static void lv_app_sysmon_refr(void)
     sprintf(buf_short, "%sMem: N/A\nFrag: N/A", buf_short);
 #endif
     lv_app_style_t * app_style = lv_app_style_get();
-    cord_t opad = app_style->win_style.content.scrl_rects.opad;
+    cord_t opad = app_style->win_style.pages.scrl_rects.opad;
     lv_app_inst_t * app;
     app = lv_app_get_next(NULL, &my_app_dsc);
     while(app != NULL) {

@@ -124,10 +124,10 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 
     /*If the text area is higher then the new size of the window redus its size too*/
 	lv_app_style_t * app_style = lv_app_style_get();
-    cord_t win_cont_h = lv_obj_get_height(lv_win_get_content(kb_win)) -  2 * app_style->win_style.content.scrl_rects.vpad;
+    cord_t win_h = lv_obj_get_height(kb_win) -  2 * app_style->win_style.pages.scrl_rects.vpad;
 	kb_ta_ori_size = lv_obj_get_height(kb_ta);
-    if(lv_obj_get_height(kb_ta)  > win_cont_h) {
-    	lv_obj_set_height(kb_ta, win_cont_h);
+    if(lv_obj_get_height(kb_ta)  > win_h) {
+    	lv_obj_set_height(kb_ta, win_h);
     }
 
     lv_ta_set_cursor_pos(kb_ta, LV_TA_CUR_LAST);
@@ -135,7 +135,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 #if LV_APP_ANIM_LEVEL != 0
     lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-    lv_page_focus(lv_win_get_content(kb_win), kb_ta, false);
+    lv_page_focus(kb_win, kb_ta, false);
 #endif
 }
 
@@ -231,7 +231,7 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
 #if LV_APP_ANIM_LEVEL != 0
     lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-    lv_page_focus(lv_win_get_content(kb_win), kb_ta, false);
+    lv_page_focus(kb_win, kb_ta, false);
 #endif
     return LV_ACTION_RES_OK;
 }

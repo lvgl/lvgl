@@ -118,7 +118,7 @@
 /*Text area (dependencies: lv_label, lv_page)*/
 #define USE_LV_TA       1
 #if USE_LV_TA != 0
-#define LV_TA_MAX_LENGTH    8
+#define LV_TA_MAX_LENGTH    256
 #define LV_TA_CUR_BLINK_TIME 400    /*ms*/
 #endif
 

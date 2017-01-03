@@ -71,7 +71,6 @@ static lv_obj_t * sc_page;   /*A page for the shortcuts */
 static lv_app_inst_t * con_send; /*The sender application in connection mode. Not NLL means connection mode is active*/
 static lv_app_style_t app_style; /*Styles for application related things*/
 
-
 /*Declare icons*/
 LV_IMG_DECLARE(img_add);
 LV_IMG_DECLARE(img_bubble);
@@ -158,6 +157,11 @@ lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr, void
 	app->dsc = app_dsc;
 	app->app_data = dm_alloc(app_dsc->app_data_size);
 	app->name = NULL;
+	app->sc = NULL;
+	app->sc_data = NULL;
+	app->sc_title = NULL;
+	app->win = NULL;
+	app->win_data = NULL;
 	lv_app_rename(app, app_dsc->name); /*Set a default name*/
 
 	/*Call the application specific run function*/
@@ -270,9 +274,9 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	lv_obj_set_free_p(app->win, app);
 	lv_obj_set_style(app->win, &app_style.win_style);
 	lv_win_set_title(app->win, app->dsc->name);
-	lv_obj_t * win_content = lv_page_get_scrl(lv_win_get_content(app->win));
+	lv_obj_t * win_content = lv_page_get_scrl(app->win);
 	lv_rect_set_fit(win_content, false, true);
-	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.content.bg_rects.hpad);
+	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.pages.bg_rects.hpad);
 
 	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
 	lv_win_add_ctrl_btn(app->win, "U:/icon_close", lv_app_win_close_action);
@@ -848,23 +852,23 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     a.path = anim_get_path(ANIM_PATH_LIN);
 
 
-    a.end = lv_obj_get_width(app->sc);
     a.start = LV_HOR_RES;
+    a.end = lv_obj_get_width(app->sc);
     a.fp = (anim_fp_t) lv_obj_set_width;
     anim_create(&a);
 
-    a.end = lv_obj_get_height(app->sc);
     a.start = LV_VER_RES;
+    a.end = lv_obj_get_height(app->sc);
     a.fp = (anim_fp_t) lv_obj_set_height;
     anim_create(&a);
 
-    a.end = cords.x1;
     a.start = 0;
+    a.end = cords.x1;
     a.fp = (anim_fp_t) lv_obj_set_x;
     anim_create(&a);
 
-    a.end = cords.y1;
     a.start = 0;
+    a.end = cords.y1;
     a.fp = (anim_fp_t) lv_obj_set_y;
     a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
     anim_create(&a);
@@ -1026,16 +1030,15 @@ static void lv_app_init_style(void)
 	memcpy(&app_style.win_style.title, &app_style.menu_btn_label_style, sizeof(lv_labels_t));
 	memcpy(&app_style.win_style.ctrl_btn, &app_style.menu_btn_style, sizeof(lv_btns_t));
 	memcpy(&app_style.win_style.ctrl_img, &app_style.menu_btn_img_style, sizeof(lv_imgs_t));
-	app_style.win_style.header_on_content = 1;
 	app_style.win_style.header_opa = app_style.menu_opa;
 	app_style.win_style.ctrl_btn_opa = app_style.menu_btn_opa;
 	app_style.win_style.header.vpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.header.hpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.header.opad = 5 * LV_DOWNSCALE;
-	app_style.win_style.content.bg_rects.vpad = app_style.win_style.ctrl_btn_h +
+	app_style.win_style.pages.bg_rects.vpad = app_style.win_style.ctrl_btn_h +
 			                                    2 * app_style.win_style.header.vpad;
-	app_style.win_style.content.bg_rects.hpad = 5 * LV_DOWNSCALE;
-	app_style.win_style.content.scrl_rects.objs.transp = 1;
+	app_style.win_style.pages.bg_rects.hpad = 5 * LV_DOWNSCALE;
+	app_style.win_style.pages.scrl_rects.objs.transp = 1;
 
     lv_labels_get(LV_LABELS_DEF,&app_style.win_txt_style);
     app_style.win_txt_style.font = LV_APP_FONT_MEDIUM;

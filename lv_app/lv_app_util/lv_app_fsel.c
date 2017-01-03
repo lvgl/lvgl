@@ -146,8 +146,8 @@ static void fsel_refr(void)
     /*Create a new list*/
     lv_wins_t * wins = lv_obj_get_style(fsel_win);
     fsel_list = lv_list_create(fsel_win, NULL);
-    lv_obj_set_size(fsel_list, LV_HOR_RES -  2 * (wins->content.bg_rects.hpad + wins->content.scrl_rects.hpad), LV_VER_RES -
-                    wins->content.bg_rects.vpad - 2 * wins->content.scrl_rects.vpad);
+    lv_obj_set_size(fsel_list, LV_HOR_RES -  2 * (wins->pages.bg_rects.hpad + wins->pages.scrl_rects.hpad), LV_VER_RES -
+                    wins->pages.bg_rects.vpad - 2 * wins->pages.scrl_rects.vpad);
     lv_obj_align(fsel_list, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style(fsel_list, &fsel_lists);
     lv_list_set_fit(fsel_list, LV_LIST_FIT_WIDTH_SB);
