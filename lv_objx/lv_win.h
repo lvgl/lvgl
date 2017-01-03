@@ -55,7 +55,7 @@
 /*Style of window*/
 typedef struct
 {
-	lv_objs_t bg; /*Style of ancestor*/
+    lv_pages_t pages; /*Style of ancestor*/
 	/*New style element for this type */
 	/*Header settings*/
 	lv_rects_t header;
@@ -67,9 +67,6 @@ typedef struct
 	cord_t ctrl_btn_h;
 	opa_t ctrl_btn_opa;
 	opa_t header_opa;
-	/*Content settings*/
-	lv_pages_t content;
-	uint8_t header_on_content:1;
 }lv_wins_t;
 
 /*Built-in styles of window*/
@@ -81,12 +78,11 @@ typedef enum
 /*Data of window*/
 typedef struct
 {
-	/*Inherited from 'base_obj' so there is no ext. data*/ /*Ext. of ancestor*/
+    lv_page_ext_t page; /*Ext. of ancestor*/
 	/*New data for this type */
 	lv_obj_t * header;
 	lv_obj_t * title;
 	lv_obj_t * ctrl_holder;
-	lv_obj_t * content;
 }lv_win_ext_t;
 
 /**********************
@@ -101,7 +97,6 @@ bool lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
 void lv_win_set_title(lv_obj_t * win, const char * title);
 
 const char * lv_win_get_title(lv_obj_t * win);
-lv_obj_t * lv_win_get_content(lv_obj_t * win);
 lv_obj_t * lv_win_get_from_ctrl_btn(lv_obj_t * ctrl_btn);
 /**********************
  *      MACROS
