@@ -84,7 +84,7 @@ typedef struct __LV_OBJ_T
     lv_signal_f_t signal_f;
     lv_design_f_t design_f;
     
-    void * ext;        /*The object attributes can be extended here*/
+    void * ext;           /*The object attributes can be extended here*/
     void * style_p;       /*Object specific style*/
 
 #if LV_OBJ_FREE_P != 0
@@ -92,22 +92,32 @@ typedef struct __LV_OBJ_T
 #endif
 
     /*Attributes and states*/
-    uint16_t click_en     :1;    /*1: can be pressed by a display input device*/
-    uint16_t drag_en      :1;    /*1: enable the dragging*/
-    uint16_t drag_throw_en:1;    /*1: Enable throwing with drag*/
-    uint16_t drag_parent  :1;    /*1. Parent will be dragged instead*/
-    uint16_t style_iso 	  :1;	 /*1: The object has got an own style*/
-    uint16_t hidden       :1;    /*1: Object is hidden*/
-    uint16_t top_en       :1;	 /*1: If the object or its children  is clicked it goes to the foreground*/
-    uint16_t child_chg_off:1;    /*1: Disable the child change signal. Used by the library*/
-    uint16_t opa_protect  :1;    /*1: Do not let 'lv_obj_set_opar' to set the opacity*/
+    uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
+    uint8_t drag_en      :1;    /*1: enable the dragging*/
+    uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
+    uint8_t drag_parent  :1;    /*1. Parent will be dragged instead*/
+    uint8_t style_iso	 :1;	/*1: The object has got an own style*/
+    uint8_t hidden       :1;    /*1: Object is hidden*/
+    uint8_t top_en       :1;    /*1: If the object or its children  is clicked it goes to the foreground*/
+    uint8_t reserved     :1;
+
+    uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
+
     cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
 
-    uint8_t free_num; 		/*Application specific identifier (set it freely)*/
+    uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
 	opa_t opa;
 
     
 }lv_obj_t;
+
+typedef enum
+{
+    LV_OBJ_PROT_NONE      = 0x00,
+    LV_OBJ_PROT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
+    LV_OBJ_PROT_OPA       = 0x02, /*Prevent lv_obj_set_opar to modify the opacity*/
+    LV_OBJ_PROT_PARENT    = 0x04, /*Prevent automatic (hidden) parent change (e.g. in lv_page)*/
+}lv_obj_protect_t;
 
 typedef enum
 {
@@ -204,7 +214,8 @@ void lv_obj_set_top(lv_obj_t * obj, bool en);
 void lv_obj_set_drag(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
-void lv_obj_set_opa_protect(lv_obj_t * obj, bool en);
+void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
+void lv_obj_clr_protect(lv_obj_t * obj, uint8_t prot);
 /*Other set*/
 void lv_obj_set_signal_f(lv_obj_t * obj, lv_signal_f_t fp);
 void lv_obj_set_design_f(lv_obj_t * obj, lv_design_f_t fp);
@@ -242,7 +253,8 @@ bool lv_obj_get_drag(lv_obj_t * obj);
 bool lv_obj_get_drag_throw(lv_obj_t * obj);
 bool lv_obj_get_drag_parent(lv_obj_t * obj);
 bool lv_obj_get_style_iso(lv_obj_t * obj);
-bool lv_obj_get_opa_potect(lv_obj_t * obj);
+uint8_t lv_obj_get_protect(lv_obj_t * obj);
+bool lv_obj_is_protected(lv_obj_t * obj, uint8_t prot);
 
 /*Virtual functions get*/
 lv_design_f_t lv_obj_get_design_f(lv_obj_t * obj);

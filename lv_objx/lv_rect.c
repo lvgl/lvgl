@@ -411,7 +411,6 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 
 	switch(type) {
 		case LV_RECT_LAYOUT_COL_L:
-			hpad_corr = style->hpad;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 		case LV_RECT_LAYOUT_COL_M:
@@ -430,7 +429,7 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+	lv_obj_set_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 	/* Align the children */
 	cord_t last_cord = style->vpad;
 	LL_READ_BACK(rect->child_ll, child) {
@@ -440,7 +439,7 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 		last_cord += lv_obj_get_height(child) + style->opad;
 	}
 
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 }
 
 /**
@@ -478,7 +477,7 @@ static void lv_rect_layout_row(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 
 	/* Align the children */
 	cord_t last_cord = style->hpad;
@@ -489,7 +488,7 @@ static void lv_rect_layout_row(lv_obj_t * rect)
 		last_cord += lv_obj_get_width(child) + style->opad;
 	}
 
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 }
 
 /**
@@ -514,7 +513,7 @@ static void lv_rect_layout_center(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 
 	/* Align the children */
 	cord_t last_cord = - (h_tot / 2);
@@ -525,7 +524,7 @@ static void lv_rect_layout_center(lv_obj_t * rect)
 		last_cord += lv_obj_get_height(child) + style->opad;
 	}
 
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 }
 
 /**
@@ -547,7 +546,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 	child_rs = ll_get_tail(&rect->child_ll); /*Set the row starter child*/
 	if(child_rs == NULL) return;	/*Return if no child*/
 
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 
 	child_rc = child_rs; /*Initially the the row starter and closer is the same*/
 	while(child_rs != NULL) {
@@ -555,7 +554,8 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 		cord_t w_row = style->hpad * 2; /*The width is minimum the left-right hpad*/
 		uint32_t obj_num = 0;
 
-		/*Find the row closer object and collect some data*/		do {
+		/*Find the row closer object and collect some data*/
+		do {
 			if(lv_obj_get_hidden(child_rc) == false) {
 				if(w_row + lv_obj_get_width(child_rc) > w_obj) break; /*If the next object is already not fit then break*/
 				w_row += lv_obj_get_width(child_rc) + style->opad; /*Add the object width + opad*/
@@ -601,7 +601,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 		child_rs = ll_get_prev(&rect->child_ll, child_rc); /*Go to the next object*/
 		child_rc = child_rs;
 	}
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 }
 
 /**
@@ -626,7 +626,7 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 
 	/* Align the children */
 	cord_t act_x = style->hpad;
@@ -650,8 +650,7 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
 		}
 	}
 
-	rect->child_chg_off = 0;
-
+    lv_obj_clr_protect(rect, LV_OBJ_PROT_CHILD_CHG);
 }
 
 /**

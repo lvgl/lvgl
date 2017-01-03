@@ -82,6 +82,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
+		lv_obj_set_protect(ext->scrl, LV_OBJ_PROT_PARENT);
 		lv_rect_set_fit(ext->scrl, true, true);
 		lv_obj_set_style(ext->scrl, &pages->scrl_rects);
 
@@ -135,10 +136,10 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         lv_pages_t * pages = lv_obj_get_style(page);
         lv_obj_t * child;
         switch(sign) {
-        	case LV_SIGNAL_CHILD_CHG: /*Be sure, only scrollable object is on the page*/
+        	case LV_SIGNAL_CHILD_CHG: /*Move children to the scrollable object*/
         		child = lv_obj_get_child(page, NULL);
         		while(child != NULL) {
-        			if(child != ext->scrl) {
+        			if(lv_obj_is_protected(child, LV_OBJ_PROT_PARENT) == false) {
         				lv_obj_t * tmp = child;
             			child = lv_obj_get_child(page, child); /*Get the next child before move this*/
         				lv_obj_set_parent(tmp, ext->scrl);
@@ -410,8 +411,8 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 			a.fp = (anim_fp_t) lv_obj_set_y;
 			anim_create(&a);
 		}
-	}
 #endif
+	}
 }
 
 /*=====================
