@@ -400,8 +400,8 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 			a.fp = (anim_fp_t) lv_obj_set_y;
 			anim_create(&a);
 		}
-	}
 #endif
+	}
 }
 
 /*=====================
