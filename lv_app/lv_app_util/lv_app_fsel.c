@@ -67,9 +67,7 @@ void lv_app_fsel_init(void)
     lv_lists_get(LV_LISTS_TRANSP, &fsel_lists);
 
     memcpy(&fsel_lists.liste_labels, &app_style->menu_btn_label_style, sizeof(lv_labels_t));
-
-    fsel_lists.liste_imgs.objs.color = COLOR_WHITE;
-    fsel_lists.liste_imgs.recolor_opa = OPA_70;
+    memcpy(&fsel_lists.liste_imgs, &app_style->menu_btn_img_style, sizeof(lv_imgs_t));
 }
 
 /**
@@ -82,12 +80,21 @@ void lv_app_fsel_init(void)
  */
 void lv_app_fsel_open(const char * path, const char * filter, void * param, void (*ok_action)(void *, const char *))
 {
-    /*Save the paramteres*/
+    /*Save the parameters*/
     strcpy(fsel_path, path);
     fsel_filter = filter;
     fsel_file_cnt = 0;
     fsel_param = param;
     fsel_ok_action = ok_action;
+
+    /*Trim the extra '\' or '/' from the end of path*/
+    uint16_t i;
+    for(i = strlen(fsel_path) -1 ; fsel_path[i] == '/' || fsel_path[i] == '\\'; i--) {
+        fsel_path[i] = '\0';
+    }
+
+    /*Check filter: NULL and "" mean no filtering*/
+    if(fsel_filter == NULL) fsel_filter = "";
 
     /*Create a window for the File selector*/
     lv_app_style_t * app_style = lv_app_style_get();
@@ -161,10 +168,8 @@ static void fsel_refr(void)
             /*Add long press action to choose the driver as a folder*/
             if(fsel_filter[0] == '/') lv_btn_set_lpr_action(liste, fsel_drv_lpr_action);
         }
-        fsel_file_cnt = 0;
-
     }
-    /*List the files/folders with fs iterface*/
+    /*List the files/folders with fs interface*/
     else {
         lv_list_add(fsel_list, "U:/icon_up", "Up", fsel_up_action);
 
@@ -197,14 +202,17 @@ static void fsel_refr(void)
         while(res == FS_RES_OK && fn[0] != '\0') {
             if(fn[0] == '/') { /*Add a folder*/
                 lv_obj_t * liste;
-                liste = lv_list_add(fsel_list, "U:/icon_folder", fn, fsel_folder_action);
+                liste = lv_list_add(fsel_list, "U:/icon_folder", &fn[1], fsel_folder_action);
                 /*Add long press action to choose a folder*/
                 if(fsel_filter[0] == '/') lv_btn_set_lpr_action(liste, fsel_folder_lpr_action);
 
                 fsel_file_cnt ++;
                 file_cnt ++;
-            }else if(strcmp(fs_get_ext(fn), fsel_filter) == 0 &&
-                     fsel_filter[0] != '/') { /*Add a file if it is not filtered*/
+            }
+            /*Add a file if it is not filtered*/
+            else if(fsel_filter[0] == '\0' || /*No filtering or ...*/
+                    (strcmp(fs_get_ext(fn), fsel_filter) == 0 && /*.. the filter matches*/
+                     fsel_filter[0] != '/')) {
                 lv_list_add(fsel_list, "U:/icon_file", fn, fsel_file_action);
                 fsel_file_cnt ++;
                 file_cnt ++;
@@ -227,6 +235,9 @@ static void fsel_refr(void)
     if(res != FS_RES_OK) {
         lv_app_notice_add("Can not read the path\nin File selector");
     }
+
+    /*Focus to the top of the list*/
+    lv_obj_set_y(lv_page_get_scrl(fsel_list), 0);
     return;
 }
 
@@ -251,7 +262,7 @@ static lv_action_res_t fsel_close_action(lv_obj_t * close, lv_dispi_t * dispi)
 static lv_action_res_t fsel_up_action(lv_obj_t * up, lv_dispi_t * dispi)
 {
     fs_up(fsel_path);
-
+    fsel_file_cnt = 0;
     fsel_refr();
     return LV_ACTION_RES_INV;
 }
@@ -297,7 +308,7 @@ static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_dispi_t * dispi)
 static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
 {
     sprintf(fsel_path, "%s:", lv_list_element_get_txt(drv));
-
+    fsel_file_cnt = 0;
     fsel_refr();
     return LV_ACTION_RES_INV;
 }
@@ -330,7 +341,7 @@ static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_dispi_t * dispi)
 static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
 {
     sprintf(fsel_path, "%s/%s", fsel_path, lv_list_element_get_txt(folder));
-
+    fsel_file_cnt = 0;
     fsel_refr();
     return LV_ACTION_RES_INV;
 }
