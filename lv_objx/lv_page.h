@@ -31,7 +31,8 @@ typedef enum
 {
 	LV_PAGE_SB_MODE_OFF,
 	LV_PAGE_SB_MODE_ON,
-	LV_PAGE_SB_MODE_AUTO,
+	LV_PAGE_SB_MODE_DRAG,
+    LV_PAGE_SB_MODE_AUTO,
 }lv_page_sb_mode_t;
 
 
