@@ -166,9 +166,16 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             	break;
 
             case LV_SIGNAL_CORD_CHG:
-            	if(ext->scrl != NULL) {
+                /*Refresh the scrollbar and notify the scrl if the size is changed*/
+            	if(ext->scrl != NULL &&
+                   (lv_obj_get_width(page) != area_get_width(param) ||
+                    lv_obj_get_height(page) != area_get_height(param))) {
             		ext->scrl->signal_f(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->cords);
+
+            		/*The scrolbars are important olny if they are visible now*/
+            		if(ext->sbh_draw != 0 || ext->sbv_draw != 0)
             		lv_page_sb_refresh(page);
+
             	}
             	break;
             case LV_SIGNAL_PRESSED:
@@ -216,10 +223,10 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
         area_t page_cords;
         area_t obj_cords;
         lv_obj_t * page = lv_obj_get_parent(scrl);
-        lv_pages_t * pages = lv_obj_get_style(page);
+        lv_pages_t * style = lv_obj_get_style(page);
         lv_page_ext_t * page_ext = lv_obj_get_ext(page);
-        cord_t hpad = pages->bg_rects.hpad;
-        cord_t vpad = pages->bg_rects.vpad;
+        cord_t hpad = style->bg_rects.hpad;
+        cord_t vpad = style->bg_rects.vpad;
 
         switch(sign) {
             case LV_SIGNAL_CORD_CHG:
@@ -271,24 +278,40 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
                 break;
 
             case LV_SIGNAL_DRAG_BEGIN:
-            	if(pages->sb_mode == LV_PAGE_SB_MODE_AUTO ) {
-					if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - pages->sb_width) {
+            	if(style->sb_mode == LV_PAGE_SB_MODE_AUTO ) {
+            	    cord_t sbh_pad = max(style->sb_width, style->bg_rects.hpad);
+            	    cord_t sbv_pad = max(style->sb_width, style->bg_rects.vpad);
+            	    area_t sb_area_tmp;
+					if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - 2 * sbv_pad) {
 						page_ext->sbv_draw = 1;
-						lv_inv_area(&page_ext->sbv);
 					}
-					if(area_get_width(&page_ext->sbh) < lv_obj_get_width(scrl) - pages->sb_width) {
+					if(area_get_width(&page_ext->sbh) < lv_obj_get_width(scrl) - 2 * sbh_pad) {
 						page_ext->sbh_draw = 1;
-						lv_inv_area(&page_ext->sbh);
 					}
             	}
                 break;
 
             case LV_SIGNAL_DRAG_END:
-            	if(pages->sb_mode == LV_PAGE_SB_MODE_AUTO) {
+            	if(style->sb_mode == LV_PAGE_SB_MODE_AUTO) {
 					page_ext->sbh_draw = 0;
 					page_ext->sbv_draw = 0;
-					lv_inv_area(&page_ext->sbh);
-					lv_inv_area(&page_ext->sbv);
+				    area_t sb_area_tmp;
+				    if(page_ext->sbh_draw != 0) {
+				        area_cpy(&sb_area_tmp, &page_ext->sbh);
+				        sb_area_tmp.x1 += page->cords.x1;
+				        sb_area_tmp.y1 += page->cords.y1;
+				        sb_area_tmp.x2 += page->cords.x2;
+				        sb_area_tmp.y2 += page->cords.y2;
+				        lv_inv_area(&sb_area_tmp);
+				    }
+				    if(page_ext->sbv_draw != 0)  {
+				        area_cpy(&sb_area_tmp, &page_ext->sbv);
+				        sb_area_tmp.x1 += page->cords.x1;
+				        sb_area_tmp.y1 += page->cords.y1;
+				        sb_area_tmp.x2 += page->cords.x2;
+				        sb_area_tmp.y2 += page->cords.y2;
+				        lv_inv_area(&sb_area_tmp);
+				    }
             	}
                 break;
             case LV_SIGNAL_PRESSED:
@@ -499,12 +522,25 @@ static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_
 		opa_t sb_opa = lv_obj_get_opa(page) * style->sb_opa /100;
 
 		/*Draw the scrollbars*/
+		area_t sb_area;
 		if(ext->sbh_draw != 0) {
-			lv_draw_rect(&ext->sbh, mask, &style->sb_rects, sb_opa);
+		    /*Convert the relative coordinates to absolute*/
+            area_cpy(&sb_area, &ext->sbh);
+		    sb_area.x1 += page->cords.x1;
+            sb_area.y1 += page->cords.y1;
+            sb_area.x2 += page->cords.x1;
+            sb_area.y2 += page->cords.y1;
+			lv_draw_rect(&sb_area, mask, &style->sb_rects, sb_opa);
 		}
 
 		if(ext->sbv_draw != 0) {
-			lv_draw_rect(&ext->sbv, mask, &style->sb_rects, sb_opa);
+            /*Convert the relative coordinates to absolute*/
+            area_cpy(&sb_area, &ext->sbv);
+            sb_area.x1 += page->cords.x1;
+            sb_area.y1 += page->cords.y1;
+            sb_area.x2 += page->cords.x1;
+            sb_area.y2 += page->cords.y1;
+			lv_draw_rect(&sb_area, mask, &style->sb_rects, sb_opa);
 		}
 	}
 
@@ -532,54 +568,79 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     cord_t vpad = style->bg_rects.vpad;
     cord_t obj_w = lv_obj_get_width(page);
     cord_t obj_h = lv_obj_get_height(page);
-    cord_t page_x0 = page->cords.x1;
-    cord_t page_y0 = page->cords.y1;
+    cord_t sbh_pad = max(style->sb_width, style->bg_rects.hpad);
+    cord_t sbv_pad = max(style->sb_width, style->bg_rects.vpad);
 
     if(style->sb_mode == LV_PAGE_SB_MODE_OFF) return;
 
+    if(style->sb_mode == LV_PAGE_SB_MODE_ON) {
+        page_ext->sbh_draw = 1;
+        page_ext->sbv_draw = 1;
+    }
+
     /*Invalidate the current (old) scrollbar areas*/
-    if(page_ext->sbh_draw != 0) lv_inv_area(&page_ext->sbh);
-    if(page_ext->sbv_draw != 0) lv_inv_area(&page_ext->sbv);
+    area_t sb_area_tmp;
+    if(page_ext->sbh_draw != 0) {
+        area_cpy(&sb_area_tmp, &page_ext->sbh);
+        sb_area_tmp.x1 += page->cords.x1;
+        sb_area_tmp.y1 += page->cords.y1;
+        sb_area_tmp.x2 += page->cords.x2;
+        sb_area_tmp.y2 += page->cords.y2;
+        lv_inv_area(&sb_area_tmp);
+    }
+    if(page_ext->sbv_draw != 0)  {
+        area_cpy(&sb_area_tmp, &page_ext->sbv);
+        sb_area_tmp.x1 += page->cords.x1;
+        sb_area_tmp.y1 += page->cords.y1;
+        sb_area_tmp.x2 += page->cords.x2;
+        sb_area_tmp.y2 += page->cords.y2;
+        lv_inv_area(&sb_area_tmp);
+    }
 
     /*Horizontal scrollbar*/
     if(scrl_w <= obj_w - 2 * hpad) {        /*Full sized scroll bar*/
-        area_set_width(&page_ext->sbh, obj_w - style->sb_width);
-        area_set_pos(&page_ext->sbh, page_x0, page_y0 + obj_h - style->sb_width);
-        page_ext->sbh_draw = 0;
+        area_set_width(&page_ext->sbh, obj_w - 2 * sbh_pad);
+        area_set_pos(&page_ext->sbh, sbh_pad, obj_h - style->sb_width);
     } else {
-    	if(style->sb_mode == LV_PAGE_SB_MODE_ON) {
-    		page_ext->sbh_draw = 1;
-    	}
-        size_tmp = (obj_w * (obj_w - (2 * style->sb_width))) / (scrl_w + 2 * hpad);
+        size_tmp = (obj_w * (obj_w - (2 * sbh_pad))) / (scrl_w + 2 * hpad);
         area_set_width(&page_ext->sbh,  size_tmp);
 
-        area_set_pos(&page_ext->sbh, page_x0 + style->sb_width +
-                   (-(lv_obj_get_x(scrl) - hpad) * (obj_w - size_tmp -  2 * style->sb_width)) /
-                   (scrl_w + 2 * hpad - obj_w ),
-                   page_y0 + obj_h - style->sb_width);
+        area_set_pos(&page_ext->sbh, sbh_pad +
+                   (-(lv_obj_get_x(scrl) - hpad) * (obj_w - size_tmp -  2 * sbh_pad)) /
+                   (scrl_w + 2 * hpad - obj_w ), obj_h - style->sb_width);
     }
     
     /*Vertical scrollbar*/
     if(scrl_h <= obj_h - 2 * vpad) {        /*Full sized scroll bar*/
-        area_set_height(&page_ext->sbv,  obj_h - style->sb_width);
-        area_set_pos(&page_ext->sbv, page_x0 + obj_w - style->sb_width, 0);
-        page_ext->sbv_draw = 0;
+        area_set_height(&page_ext->sbv,  obj_h - 2 * sbv_pad);
+        area_set_pos(&page_ext->sbv, obj_w - style->sb_width, sbv_pad);
     } else {
-    	if(style->sb_mode == LV_PAGE_SB_MODE_ON) {
-    		page_ext->sbv_draw = 1;
-    	}
-        size_tmp = (obj_h * (obj_h - (2 * style->sb_width))) / (scrl_h + 2 * vpad);
+        size_tmp = (obj_h * (obj_h - (2 * sbv_pad))) / (scrl_h + 2 * vpad);
         area_set_height(&page_ext->sbv,  size_tmp);
 
-        area_set_pos(&page_ext->sbv, page_x0 + obj_w - style->sb_width,
-        		    page_y0 + style->sb_width +
-                   (-(lv_obj_get_y(scrl) - vpad) * (obj_h - size_tmp -  2 * style->sb_width)) /
+        area_set_pos(&page_ext->sbv,  obj_w - style->sb_width,
+        		    sbv_pad +
+                   (-(lv_obj_get_y(scrl) - vpad) * (obj_h - size_tmp -  2 * sbv_pad)) /
                                       (scrl_h + 2 * vpad - obj_h ));
     }
 
     /*Invalidate the new scrollbar areas*/
-    if(page_ext->sbh_draw != 0) lv_inv_area(&page_ext->sbh);
-    if(page_ext->sbv_draw != 0) lv_inv_area(&page_ext->sbv);
+    if(page_ext->sbh_draw != 0) {
+        area_cpy(&sb_area_tmp, &page_ext->sbh);
+        sb_area_tmp.x1 += page->cords.x1;
+        sb_area_tmp.y1 += page->cords.y1;
+        sb_area_tmp.x2 += page->cords.x2;
+        sb_area_tmp.y2 += page->cords.y2;
+        lv_inv_area(&sb_area_tmp);
+    }
+    if(page_ext->sbv_draw != 0)  {
+        area_cpy(&sb_area_tmp, &page_ext->sbv);
+        sb_area_tmp.x1 += page->cords.x1;
+        sb_area_tmp.y1 += page->cords.y1;
+        sb_area_tmp.x2 += page->cords.x2;
+        sb_area_tmp.y2 += page->cords.y2;
+        lv_inv_area(&sb_area_tmp);
+    }
 }
 
 /**
