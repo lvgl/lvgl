@@ -216,7 +216,8 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 
 	/* Count the units and the buttons in a line
 	 * (A button can be 1,2,3... unit wide)*/
-	uint16_t unit_cnt;
+	uint16_t unit_cnt;      /*Number of units in a row*/
+    uint16_t unit_act_cnt;  /*Number of units currently put in a row*/
 	uint16_t btn_cnt;		/*Number of buttons in a row*/
 	uint16_t i_tot = 0;		/*Act. index in the str map*/
 	uint16_t btn_i = 0;		/*Act. index of button areas*/
@@ -243,17 +244,22 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 			uint16_t i;
 			cord_t act_x = btnms->rects.hpad;
 			cord_t act_unit_w;
+			unit_act_cnt = 0;
 			for(i = 0; i < btn_cnt; i++) {
 				/* one_unit_w = all_unit_w / unit_cnt
 				 * act_unit_w = one_unit_w * button_width
-				 * do this two operation but the multiplications first to divide a greater number */
+				 * do this two operation but the multiply first to divide a greater number */
 				act_unit_w = (all_unit_w * lv_btnm_get_width_unit(map_p_tmp[i])) / unit_cnt;
+
+				/*Always recalculate act_x because of rounding errors */
+				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->rects.opad + btnms->rects.hpad;
+
 				area_set(&ext->btn_areas[btn_i], act_x,
 						                         act_y,
 						                         act_x + act_unit_w,
 				                                 act_y + btn_h);
 
-				act_x += act_unit_w + btnms->rects.opad;
+				unit_act_cnt += lv_btnm_get_width_unit(map_p_tmp[i]);
 
 				i_tot ++;
 				btn_i ++;
@@ -266,7 +272,6 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 	}
 
 	lv_obj_inv(btnm);
-
 }
 
 /**
@@ -388,7 +393,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			lv_rects_t new_rects;
 			lv_btn_state_t state;
 			state = ext->btn_pr == btn_i ? LV_BTN_STATE_PR : LV_BTN_STATE_REL;
-			memcpy(&new_rects, &style->rects, sizeof(lv_rects_t));
+			memcpy(&new_rects, &style->btns, sizeof(lv_rects_t));
 			new_rects.objs.color = style->btns.mcolor[state];
 			new_rects.gcolor = style->btns.gcolor[state];
 			new_rects.bcolor = style->btns.bcolor[state];
