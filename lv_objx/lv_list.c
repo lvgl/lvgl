@@ -62,7 +62,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_list);
     lv_list_ext_t * ext = lv_obj_alloc_ext(new_list, sizeof(lv_list_ext_t));
     dm_assert(ext);
-    ext ->fit = LV_LIST_FIT_WIDTH;
+    ext ->fit = LV_LIST_FIT_WIDTH_SB;
 
 	lv_obj_set_signal_f(new_list, lv_list_signal);
 
@@ -133,6 +133,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	lv_page_glue_obj(liste, true);
 	lv_rect_set_layout(liste, lists->liste_layout);
 	lv_rect_set_fit(liste, true, true);   /*hor. fit might be disabled later*/
+//	lv_btn_set_state(liste, LV_BTN_STATE_TGL_REL);
 
 	if(img_fn != NULL) {
 		lv_obj_t * img = lv_img_create(liste, NULL);
@@ -361,8 +362,58 @@ static void lv_lists_init(void)
 	lv_lists_def.bg_pages.scrl_rects.opad = 5 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_lists_def.liste_btns); /*List element button style*/
+	lv_lists_def.liste_btns.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x90, 0xa8, 0xc0);
+	lv_lists_def.liste_btns.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x90, 0xa8, 0xc0);
+	lv_lists_def.liste_btns.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
+	lv_lists_def.liste_btns.lcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
+	lv_lists_def.liste_btns.flags[LV_BTN_STATE_REL].light_en = 0;
+	lv_lists_def.liste_btns.flags[LV_BTN_STATE_REL].transp = 0;
+	lv_lists_def.liste_btns.flags[LV_BTN_STATE_REL].empty = 0;
 
-	lv_labels_get(LV_LABELS_BTN, &lv_lists_def.liste_labels); /*List element label style*/
+	lv_lists_def.liste_btns.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x40, 0x60, 0x80);// COLOR_MAKE(0x60, 0x80, 0xa0);
+    lv_lists_def.liste_btns.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x40, 0x60, 0x80);//COLOR_MAKE(0x20, 0x30, 0x40);
+    lv_lists_def.liste_btns.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
+    lv_lists_def.liste_btns.lcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_PR].light_en = 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_PR].transp = 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_PR].empty = 0;
+
+    lv_lists_def.liste_btns.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
+    lv_lists_def.liste_btns.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
+    lv_lists_def.liste_btns.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
+    lv_lists_def.liste_btns.lcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_TGL_REL].transp = 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_TGL_REL].empty = 0;
+
+    lv_lists_def.liste_btns.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x60, 0x80);
+    lv_lists_def.liste_btns.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x60, 0x80);
+    lv_lists_def.liste_btns.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
+    lv_lists_def.liste_btns.lcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_TGL_PR].transp = 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_TGL_PR].empty = 0;
+
+    lv_lists_def.liste_btns.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER;
+    lv_lists_def.liste_btns.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
+    lv_lists_def.liste_btns.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE;
+    lv_lists_def.liste_btns.lcolor[LV_BTN_STATE_INA] = COLOR_MAKE(0x30, 0x40, 0x50);
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_INA].light_en = 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_INA].transp= 0;
+    lv_lists_def.liste_btns.flags[LV_BTN_STATE_INA].empty = 0;
+
+    lv_lists_def.liste_btns.rects.objs.color = lv_lists_def.liste_btns.mcolor[LV_BTN_STATE_REL];
+    lv_lists_def.liste_btns.rects.gcolor = lv_lists_def.liste_btns.gcolor[LV_BTN_STATE_REL];
+    lv_lists_def.liste_btns.rects.bcolor = lv_lists_def.liste_btns.bcolor[LV_BTN_STATE_REL];
+    lv_lists_def.liste_btns.rects.objs.transp = 0;
+    lv_lists_def.liste_btns.rects.empty = 0;
+    lv_lists_def.liste_btns.rects.light = 6 * LV_DOWNSCALE;
+    lv_lists_def.liste_btns.rects.bwidth = 0 * LV_DOWNSCALE;
+    lv_lists_def.liste_btns.rects.bopa = 70;
+    lv_lists_def.liste_btns.rects.empty = 0;
+    lv_lists_def.liste_btns.rects.round = 0 * LV_DOWNSCALE;
+
+	lv_labels_get(LV_LABELS_DEF, &lv_lists_def.liste_labels); /*List element label style*/
 	lv_lists_def.liste_labels.mid = 0;
 
 	lv_imgs_get(LV_IMGS_DEF, &lv_lists_def.liste_imgs); /*Lit element image style*/

@@ -381,7 +381,7 @@ static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t 
             btn->style_p = btns_tmp;            /*Reload the original button style*/
         }
     	return ret;
-    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+    } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
 		area_t area;
 		lv_obj_get_cords(btn, &area);
 
@@ -428,33 +428,33 @@ static void lv_btn_style_load(lv_obj_t * btn, lv_rects_t * new_rects)
 static void lv_btns_init(void)
 {
 	/*Default style*/
-	lv_btns_def.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x40, 0x60, 0x80);
-	lv_btns_def.gcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
-	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
+    lv_btns_def.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x60, 0x88, 0xb0);
+    lv_btns_def.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
+	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x60, 0x70, 0x80);
 	lv_btns_def.lcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_btns_def.flags[LV_BTN_STATE_REL].light_en = 0;
 	lv_btns_def.flags[LV_BTN_STATE_REL].transp = 0;
 	lv_btns_def.flags[LV_BTN_STATE_REL].empty = 0;
 
-	lv_btns_def.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
-	lv_btns_def.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_btns_def.bcolor[LV_BTN_STATE_PR] = COLOR_WHITE;
+    lv_btns_def.mcolor[LV_BTN_STATE_PR] =COLOR_MAKE(0x50, 0x68, 0x80);
+    lv_btns_def.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x18, 0x20, 0x28);
+	lv_btns_def.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x40, 0x60, 0x80);
 	lv_btns_def.lcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_btns_def.flags[LV_BTN_STATE_PR].light_en = 1;
+	lv_btns_def.flags[LV_BTN_STATE_PR].light_en = 0;
 	lv_btns_def.flags[LV_BTN_STATE_PR].transp = 0;
 	lv_btns_def.flags[LV_BTN_STATE_PR].empty = 0;
 
-	lv_btns_def.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x80, 0x00, 0x00);
-	lv_btns_def.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x20, 0x20);
-	lv_btns_def.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE;
+	lv_btns_def.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x40, 0x60, 0x80);
+	lv_btns_def.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x10, 0x18, 0x20);
+	lv_btns_def.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
 	lv_btns_def.lcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_btns_def.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
+	lv_btns_def.flags[LV_BTN_STATE_TGL_REL].light_en = 1;
 	lv_btns_def.flags[LV_BTN_STATE_TGL_REL].transp = 0;
 	lv_btns_def.flags[LV_BTN_STATE_TGL_REL].empty = 0;
 
-	lv_btns_def.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0xf0, 0x26, 0x26);
-	lv_btns_def.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x40, 0x40, 0x40);
-	lv_btns_def.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE;
+	lv_btns_def.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
+	lv_btns_def.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
+	lv_btns_def.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
 	lv_btns_def.lcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_btns_def.flags[LV_BTN_STATE_TGL_PR].light_en = 1;
 	lv_btns_def.flags[LV_BTN_STATE_TGL_PR].transp = 0;
@@ -473,9 +473,9 @@ static void lv_btns_init(void)
 	lv_btns_def.rects.bcolor = lv_btns_def.bcolor[LV_BTN_STATE_REL];
 	lv_btns_def.rects.objs.transp = 0;
 	lv_btns_def.rects.empty = 0;
-	lv_btns_def.rects.light = 0;
+	lv_btns_def.rects.light = 6 * LV_DOWNSCALE;
 	lv_btns_def.rects.bwidth = 2 * LV_DOWNSCALE;
-	lv_btns_def.rects.bopa = 50;
+	lv_btns_def.rects.bopa = 70;
 	lv_btns_def.rects.empty = 0;
 	lv_btns_def.rects.round = 4 * LV_DOWNSCALE;
 	lv_btns_def.rects.hpad = 10 * LV_DOWNSCALE;
@@ -487,14 +487,20 @@ static void lv_btns_init(void)
 	lv_btns_transp.rects.bwidth = 0;
 	lv_btns_transp.flags[LV_BTN_STATE_REL].transp = 1;
 	lv_btns_transp.flags[LV_BTN_STATE_REL].empty = 1;
+    lv_btns_transp.flags[LV_BTN_STATE_REL].light_en = 0;
+
 	lv_btns_transp.flags[LV_BTN_STATE_PR].transp = 1;
 	lv_btns_transp.flags[LV_BTN_STATE_PR].empty = 1;
+    lv_btns_transp.flags[LV_BTN_STATE_PR].light_en = 0;
 	lv_btns_transp.flags[LV_BTN_STATE_TGL_REL].transp = 1;
 	lv_btns_transp.flags[LV_BTN_STATE_TGL_REL].empty = 1;
+    lv_btns_transp.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
 	lv_btns_transp.flags[LV_BTN_STATE_TGL_PR].transp = 1;
 	lv_btns_transp.flags[LV_BTN_STATE_TGL_PR].empty = 1;
+    lv_btns_transp.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
 	lv_btns_transp.flags[LV_BTN_STATE_INA].transp = 1;
 	lv_btns_transp.flags[LV_BTN_STATE_INA].empty = 1;
+    lv_btns_transp.flags[LV_BTN_STATE_INA].light_en = 0;
 
 
 	/*Border style*/
@@ -509,6 +515,11 @@ static void lv_btns_init(void)
 	lv_btns_border.flags[LV_BTN_STATE_TGL_REL].empty = 1;
 	lv_btns_border.flags[LV_BTN_STATE_TGL_PR].empty = 1;
 	lv_btns_border.flags[LV_BTN_STATE_INA].empty = 1;
+    lv_btns_border.flags[LV_BTN_STATE_REL].light_en = 0;
+    lv_btns_border.flags[LV_BTN_STATE_PR].light_en = 0;
+    lv_btns_border.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
+    lv_btns_border.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
+    lv_btns_border.flags[LV_BTN_STATE_INA].light_en = 0;
 	lv_btns_border.rects.bwidth = 2 * LV_DOWNSCALE;
 	lv_btns_border.rects.bopa = 50;
 	lv_btns_border.rects.round = 4 * LV_DOWNSCALE;
