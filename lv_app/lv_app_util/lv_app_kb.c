@@ -34,21 +34,21 @@ static lv_obj_t * kb_ta;
 static const char * kb_map_lc[] = {
 "\0051#", "\004q", "\004w", "\004e", "\004r", "\004t", "\004y", "\004u", "\004i", "\004o", "\004p", "\007Del", "\n",
 "\007ABC", "\004a", "\004s", "\004d", "\004f", "\004g", "\004h", "\004j", "\004k", "\004l", "\010Enter", "\n",
-"*", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ";", "\n",
+"_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
 "\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
 };
 
 static const char * kb_map_uc[] = {
 "\0051#", "\004Q", "\004W", "\004E", "\004R", "\004T", "\004Y", "\004U", "\004I", "\004O", "\004P", "\007Del", "\n",
 "\007abc", "\004A", "\004S", "\004D", "\004F", "\004G", "\004H", "\004J", "\004K", "\004L", "\010Enter", "\n",
-"*", "/", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ";", "\n",
+"_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
 "\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
 };
 
 static const char * kb_map_spec[] = {
-"0", "1", "2", "3", "4", "5", "6", "4", "8", "9", "\002Del", "\n",
-"\002abc", "+", "-", "=", "%", "!", "?", "#", "<", ">", "\002Enter", "\n",
-"\\", "@", "$", "_", "(", ")", "{", "}", "[", "]", ":", "\"", "'", "\n",
+"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\002Del", "\n",
+"\002abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+"\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
 "\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
 };
 
@@ -76,10 +76,16 @@ static lv_btnms_t kb_btnms;
 void lv_app_kb_init(void)
 {
     lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
+    kb_btnms.rects.gcolor = COLOR_WHITE;
+    kb_btnms.rects.objs.color = COLOR_WHITE;
     kb_btnms.rects.opad = 4 + LV_DOWNSCALE;
     kb_btnms.rects.vpad = 3 + LV_DOWNSCALE;
     kb_btnms.rects.hpad = 3 + LV_DOWNSCALE;
     kb_btnms.rects.round = 0;
+    kb_btnms.rects.bwidth = 0;
+
+    kb_btnms.btns.rects.bwidth = 0;
+    kb_btnms.btns.rects.round = 0;
 }
 
 /**
