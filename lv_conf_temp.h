@@ -21,11 +21,14 @@
 
 #define LV_VDB_SIZE         (LV_HOR_RES * (LV_VER_RES / 20))
 
-/* Anti-aliasing with downscaling everything
- * 1: disabled
- * 2: 2x anti-alias -> half size
- * 4: 4x anti-alias -> quarter size */
+/*Enable anti alaiassing */
+#define LV_ANTIALIAS        1
+/*Set the downscaling value*/
+#if LV_ANTIALIAS == 0
+#define LV_DOWNSCALE        1
+#else
 #define LV_DOWNSCALE        2
+#endif
 
 #define LV_UPSCALE_MAP   0 /*Scale up maps (e.g. images) elements to compensate LV_DOWNSCALE*/
 #define LV_REFR_PERIOD      40    /*Screen refresh period in milliseconds*/
@@ -142,15 +145,27 @@
 #define LV_APP_SC_WIDTH     (LV_HOR_RES / 4)    /*Shortcut width*/
 #define LV_APP_SC_HEIGHT    (LV_VER_RES / 3)    /*Shortcut height*/
 #define LV_APP_FONT_SMALL   FONT_DEJAVU_20
-#define LV_APP_FONT_MEDIUM  FONT_DEJAVU_30
+#define LV_APP_FONT_MEDIUM  LV_FONT_DEFAULT
 #define LV_APP_FONT_LARGE   FONT_DEJAVU_40
 
 /* Internal icons:
  * 0: Do not use internal icons (img_close, img_add etc. icons have to be provided)
- * 1: Reserved
- * 2: Use double sized icons
- * 4: Reserved */
+ * 1: Use simple sized icons
+ * 2: Use double sized icons*/
 #define LV_APP_USE_INTERNAL_ICONS   2
+
+/*Enable or disable the internal icons individually*/
+#if LV_APP_USE_INTERNAL_ICONS != 0
+#define USE_IMG_CLOSE       1
+#define USE_IMG_DOWN        1
+#define USE_IMG_DRIVER      1
+#define USE_IMG_FILE        1
+#define USE_IMG_FOLDER      1
+#define USE_IMG_LEFT        1
+#define USE_IMG_OK          1
+#define USE_IMG_RIGHT       1
+#define USE_IMG_UP          1
+#endif
 
 /*Animation settings*/
 #define LV_APP_EFFECT_OPA      1 /*Enable the opacity in the application style (can be modified)*/
