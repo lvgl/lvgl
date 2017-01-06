@@ -101,6 +101,10 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 	    lv_obj_set_signal_f(new_page, lv_page_signal);
 	    lv_obj_set_design_f(new_page, lv_page_design);
 
+
+	    lv_page_set_pr_action(new_page, copy_ext->pr_action);
+        lv_page_set_rel_action(new_page, copy_ext->rel_action);
+
 	    /*Set the style of 'copy' and isolate it if it is necessary*/
         if(lv_obj_get_style_iso(new_page) == false) {
             lv_obj_set_style(new_page, lv_obj_get_style(copy));
@@ -281,7 +285,6 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
             	if(style->sb_mode == LV_PAGE_SB_MODE_DRAG ) {
             	    cord_t sbh_pad = max(style->sb_width, style->bg_rects.hpad);
             	    cord_t sbv_pad = max(style->sb_width, style->bg_rects.vpad);
-            	    area_t sb_area_tmp;
 					if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - 2 * sbv_pad) {
 						page_ext->sbv_draw = 1;
 					}
@@ -384,7 +387,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 	lv_page_ext_t * ext = lv_obj_get_ext(page);
 	lv_pages_t * style = lv_obj_get_style(page);
 
-	cord_t obj_y = lv_obj_get_y(obj);
+	cord_t obj_y = obj->cords.y1 - ext->scrl->cords.y1;
 	cord_t obj_h = lv_obj_get_height(obj);
 	cord_t scrlable_y = lv_obj_get_y(ext->scrl);
 	cord_t page_h = lv_obj_get_height(page);
