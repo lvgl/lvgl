@@ -96,11 +96,6 @@ void lv_inv_area(const area_t * area_p)
     	com_area.y1 = com_area.y1 & (~0x1);
     	com_area.x2 = com_area.x2 | 0x1;
     	com_area.y2 = com_area.y2 | 0x1;
-#elif LV_DOWNSCALE == 4
-    	com_area.x1 = com_area.x1 & (~0x3);
-    	com_area.y1 = com_area.y1 & (~0x3);
-    	com_area.x2 = com_area.x2 | 0x3;
-    	com_area.y2 = com_area.y2 | 0x3;
 #endif
 
     	/*Save only if this area is not in one of the saved areas*/
@@ -240,8 +235,6 @@ static void lv_refr_area_with_vdb(const area_t * area_p)
     /*Round the row number with downscale*/
 #if LV_DOWNSCALE == 2
     max_row &= (~0x1);
-#elif LV_DOWNSCALE == 4
-    max_row &= (~0x3);
 #endif
 
     /*Refresh all rows*/

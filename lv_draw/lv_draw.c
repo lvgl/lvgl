@@ -188,21 +188,6 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 			color_t buf[LV_HOR_RES];
 			uint32_t br;
 			area_t act_area;
-			uint8_t ds_shift = 0;
-			uint8_t ds_num = 0;
-		#if LV_DOWNSCALE <= 1 || LV_UPSCALE_MAP == 0
-			ds_shift = 0;
-			ds_num = 1;
-		#elif LV_DOWNSCALE == 2
-			ds_shift = 1;
-			ds_num = 2;
-		#elif LV_DOWNSCALE == 4
-			ds_shift = 2;
-			ds_num = 4;
-		#else
-		#error "LV: not supported LV_DOWNSCALE value"
-		#endif
-
 
 			area_t mask_sub;
 			bool union_ok;
@@ -215,32 +200,28 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 			res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
 
 			uint32_t start_offset = sizeof(lv_img_raw_header_t);
-			start_offset += (area_get_width(cords_p) >> ds_shift) *
-						   ((mask_sub.y1 - cords_p->y1) >> ds_shift) * sizeof(color_t); /*First row*/
-			start_offset += ((mask_sub.x1 - cords_p->x1) >> ds_shift) * sizeof(color_t); /*First col*/
+			start_offset += area_get_width(cords_p) *
+						   (mask_sub.y1 - cords_p->y1) * sizeof(color_t); /*First row*/
+			start_offset += (mask_sub.x1 - cords_p->x1) * sizeof(color_t); /*First col*/
 			fs_seek(&file, start_offset);
 
-			uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift) * sizeof(color_t);
-			uint32_t next_row = (area_get_width(cords_p) >> ds_shift) * sizeof(color_t) - useful_data;
+			uint32_t useful_data = area_get_width(&mask_sub) * sizeof(color_t);
+			uint32_t next_row = area_get_width(cords_p) * sizeof(color_t) - useful_data;
 
 			area_cpy(&act_area, &mask_sub);
 
-			/* Round down the start coordinate, because the upscaled images
-			 * can start only LV_DOWNSCALE 'y' coordinates */
-			act_area.y1 &= ~(cord_t)(ds_num - 1) ;
-			act_area.y2 = act_area.y1 + ds_num - 1;
+			act_area.y2 = act_area.y1;
 			uint32_t act_pos;
 
-			for(row = mask_sub.y1; row <= mask_sub.y2; row += ds_num) {
+			for(row = mask_sub.y1; row <= mask_sub.y2; row ++) {
 				res = fs_read(&file, buf, useful_data, &br);
 				map_fp(&act_area, &mask_sub, buf, opa, header.transp,
 								  imgs_p->objs.color, imgs_p->recolor_opa);
 				fs_tell(&file, &act_pos);
 				fs_seek(&file, act_pos + next_row);
-				act_area.y1 += ds_num;
-				act_area.y2 += ds_num;
+				act_area.y1 ++;
+				act_area.y2 ++;
 			}
-
 		}
 		fs_close(&file);
 

@@ -155,7 +155,7 @@ static void dispi_task(void * param)
  */
 static void dispi_proc_point(lv_dispi_t * dispi_p, cord_t x, cord_t y)
 {
-#if LV_DOWNSCALE > 1 && LV_VDB_SIZE != 0
+#if LV_ANTIALIAS != 0 && LV_VDB_SIZE != 0
     dispi_p->act_point.x = x * LV_DOWNSCALE;
     dispi_p->act_point.y = y * LV_DOWNSCALE;
 #else

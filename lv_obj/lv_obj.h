@@ -24,11 +24,11 @@
 #error "LV: LV_HOR_RES and LV_VER_RES must be greater then 0"
 #endif
 
-#if LV_DOWNSCALE != 1 && LV_DOWNSCALE != 2 && LV_DOWNSCALE != 4
-#error "LV: LV_DOWNSCALE can be only 1, 2 or 4"
+#if LV_DOWNSCALE != 1 && LV_DOWNSCALE != 2
+#error "LV: LV_DOWNSCALE can be only 1 or 2"
 #endif
 
-#if LV_VDB_SIZE == 0 && (LV_DOWNSCALE != 1 || LV_UPSCALE_MAP != 0  || LV_UPSCALE_STYLE != 0)
+#if LV_VDB_SIZE == 0 && LV_DOWNSCALE != 1
 #error "LV: If LV_VDB_SIZE == 0 then LV_DOWNSCALE must be 1, LV_UPSCALE_MAP 0, LV_UPSCALE_STYLE 0"
 #endif
 

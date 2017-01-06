@@ -212,10 +212,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	ext->w = header.w;
 	ext->h = header.h;
 	ext->transp = header.transp;
-#if LV_UPSCALE_MAP != 0
-	ext->w *= LV_DOWNSCALE;
-	ext->h *= LV_DOWNSCALE;
-#endif
+
 	if(fn != NULL) {
 		ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
 		strcpy(ext->fn, fn);
