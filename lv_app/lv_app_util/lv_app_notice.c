@@ -13,6 +13,7 @@
 #include "lvgl/lv_objx/lv_label.h"
 
 #include "lvgl/lv_misc/anim.h"
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -75,10 +76,17 @@ void lv_app_notice_init(void)
 
 /**
  * Add a notification with a given text
- * @param txt the text of the notification
+ * @param format pritntf-like format string
  */
-void lv_app_notice_add(const char * txt)
+void lv_app_notice_add(const char * format, ...)
 {
+    char txt[LV_APP_NOTICE_MAX_LEN];
+
+    va_list va;
+    va_start(va, format);
+    vsprintf(txt,format, va);
+    va_end(va);
+
     lv_app_style_t * app_style = lv_app_style_get();
 
     lv_obj_t * n;

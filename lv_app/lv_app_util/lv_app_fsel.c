@@ -17,7 +17,7 @@
  *********************/
 #define LV_APP_FSEL_FN_MAX_LEN    128
 #define LV_APP_FSEL_PATH_MAX_LEN  256
-#define LV_APP_FSEL_MAX_FILE      8
+#define LV_APP_FSEL_PAGE_SIZE     8
 
 /**********************
  *      TYPEDEFS
@@ -62,12 +62,7 @@ static void (*fsel_ok_action)(void *, const char *);
  */
 void lv_app_fsel_init(void)
 {
-    lv_app_style_t * app_style = lv_app_style_get();
-
     lv_lists_get(LV_LISTS_TRANSP, &fsel_lists);
-
-    memcpy(&fsel_lists.liste_labels, &app_style->menu_btn_label_style, sizeof(lv_labels_t));
-    memcpy(&fsel_lists.liste_imgs, &app_style->menu_btn_img_style, sizeof(lv_imgs_t));
 }
 
 /**
@@ -144,13 +139,14 @@ static void fsel_refr(void)
     lv_win_set_title(fsel_win, fsel_path);
 
     /*Create a new list*/
-    lv_wins_t * wins = lv_obj_get_style(fsel_win);
+    lv_app_style_t * app_style = lv_app_style_get();
     fsel_list = lv_list_create(fsel_win, NULL);
-    lv_obj_set_size(fsel_list, LV_HOR_RES -  2 * (wins->pages.bg_rects.hpad + wins->pages.scrl_rects.hpad), LV_VER_RES -
-                    wins->pages.bg_rects.vpad - 2 * wins->pages.scrl_rects.vpad);
-    lv_obj_align(fsel_list, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style(fsel_list, &fsel_lists);
+    lv_obj_set_width(fsel_list, app_style->win_useful_w);
+    lv_obj_set_style(fsel_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
     lv_list_set_fit(fsel_list, LV_LIST_FIT_WIDTH_SB);
+    lv_obj_set_drag_parent(fsel_list, true);
+    lv_obj_set_drag_parent(lv_page_get_scrl(fsel_list), true);
+    lv_rect_set_fit(fsel_list, false, true);
 
     fs_res_t res = FS_RES_OK;
 
@@ -222,7 +218,7 @@ static void fsel_refr(void)
             res = fs_readdir(&rd, fn);
 
             /*Show only LV_APP_FSEL_MAX_FILE elements and add a Next page button*/
-            if(fsel_file_cnt != 0 && fsel_file_cnt % LV_APP_FSEL_MAX_FILE == 0) {
+            if(fsel_file_cnt != 0 && fsel_file_cnt % LV_APP_FSEL_PAGE_SIZE == 0) {
                 lv_list_add(fsel_list, "U:/icon_right", "Next page", fsel_next_action);
                 break;
             }
@@ -238,7 +234,6 @@ static void fsel_refr(void)
 
     /*Focus to the top of the list*/
     lv_obj_set_y(lv_page_get_scrl(fsel_list), 0);
-    return;
 }
 
 /**
@@ -287,11 +282,11 @@ static lv_action_res_t fsel_next_action(lv_obj_t * next, lv_dispi_t * dispi)
  */
 static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_dispi_t * dispi)
 {
-    if(fsel_file_cnt <= 2 * LV_APP_FSEL_MAX_FILE) fsel_file_cnt = 0;
-    else if(fsel_file_cnt % LV_APP_FSEL_MAX_FILE == 0) {
-        fsel_file_cnt -= 2 * LV_APP_FSEL_MAX_FILE;
+    if(fsel_file_cnt <= 2 * LV_APP_FSEL_PAGE_SIZE) fsel_file_cnt = 0;
+    else if(fsel_file_cnt % LV_APP_FSEL_PAGE_SIZE == 0) {
+        fsel_file_cnt -= 2 * LV_APP_FSEL_PAGE_SIZE;
     } else {
-        fsel_file_cnt = ((fsel_file_cnt / LV_APP_FSEL_MAX_FILE) - 1) * LV_APP_FSEL_MAX_FILE;
+        fsel_file_cnt = ((fsel_file_cnt / LV_APP_FSEL_PAGE_SIZE) - 1) * LV_APP_FSEL_PAGE_SIZE;
     }
 
     fsel_refr();
@@ -366,7 +361,7 @@ static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_dispi_t * di
 }
 
 /**
- * Called when a file list element is long pressed to choose it
+ * Called when a file list element is released to choose it
  * @param file pointer to a file button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function

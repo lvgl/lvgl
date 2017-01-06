@@ -18,6 +18,7 @@
 #include "../lv_appx/lv_app_example.h"
 #include "../lv_appx/lv_app_sysmon.h"
 #include "../lv_appx/lv_app_terminal.h"
+#include "../lv_appx/lv_app_files.h"
 
 /*********************
  *      DEFINES
@@ -140,16 +141,20 @@ void lv_app_init(void)
     dsc = ll_ins_head(&app_dsc_ll);
     *dsc = lv_app_terminal_init();
 #endif
+
+#if USE_LV_APP_FILES != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_files_init();
+#endif
 }
 
 /**
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
- * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
  * @param conf pointer to an application specific configuration structure or NULL if unused
  * @return pointer to the opened application or NULL if any error occurred
  */
-lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr, void * conf)
+lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, void * conf)
 {
 	/*Add a new application and initialize it*/
 	lv_app_inst_t * app;
@@ -165,7 +170,7 @@ lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr, void
 	lv_app_rename(app, app_dsc->name); /*Set a default name*/
 
 	/*Call the application specific run function*/
-	app_dsc->app_run(app, cstr, conf);
+	app_dsc->app_run(app, conf);
 
 	return app;
 }
@@ -185,6 +190,7 @@ void lv_app_close(lv_app_inst_t * app)
 
 	app->dsc->app_close(app);
 
+    memset(app->app_data, 0, app->dsc->app_data_size);
 	dm_free(app->app_data);
 	dm_free(app->name);
 
@@ -253,6 +259,7 @@ void lv_app_sc_close(lv_app_inst_t * app)
 	lv_obj_del(app->sc);
 	app->sc = NULL;
 	app->sc_title = NULL;
+    memset(app->sc_data, 0, app->dsc->sc_data_size);
 	dm_free(app->sc_data);
 	app->sc_data = NULL;
 }
@@ -299,6 +306,8 @@ void lv_app_win_close(lv_app_inst_t * app)
 
 	lv_obj_del(app->win);
 	app->win = NULL;
+
+	memset(app->win_data, 0, app->dsc->win_data_size);
 	dm_free(app->win_data);
 	app->win_data = NULL;
 }
@@ -455,6 +464,22 @@ lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
 
     return NULL;
 }
+/**
+ * Read the list of applications descriptors. (Get he next element)
+ * @param prev the previous application descriptors(at the first call give NULL to get the first)
+ * @return pointer to the next application descriptors or NULL if no more
+ */
+lv_app_dsc_t ** lv_app_dsc_get_next(lv_app_dsc_t ** prev)
+{
+    lv_app_dsc_t ** next;
+
+    if(prev == NULL) next = ll_get_head(&app_dsc_ll);
+    else next = ll_get_next(&app_dsc_ll, prev);
+
+    if(next == NULL) return NULL;
+
+    return next;
+}
 
 /**
  * Refresh the style of the applications
@@ -468,6 +493,12 @@ void lv_app_style_refr(void)
 
     lv_obj_set_width(lv_page_get_scrl(sc_page),
                 LV_HOR_RES - 2 * (app_style.sc_page_style.bg_rects.hpad));
+
+    app_style.win_useful_w =  LV_HOR_RES - 2 * (app_style.win_style.pages.bg_rects.hpad +
+                                                app_style.win_style.pages.scrl_rects.hpad);
+
+    app_style.win_useful_h = LV_VER_RES - 2 * (app_style.win_style.pages.bg_rects.vpad +
+                                                app_style.win_style.pages.scrl_rects.vpad);
 }
 
 
@@ -580,7 +611,7 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
     lv_obj_del(app_list);
     app_list = NULL;
 
-	lv_app_inst_t * app = lv_app_run(dsc, "", NULL);
+	lv_app_inst_t * app = lv_app_run(dsc, NULL);
 	lv_app_sc_open(app);
 
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA_ANIM != 0 && LV_APP_ANIM_SC != 0
@@ -1016,13 +1047,13 @@ static void lv_app_init_style(void)
 
 	lv_labels_get(LV_LABELS_DEF,&app_style.sc_title_style);
 	app_style.sc_title_style.font = LV_APP_FONT_SMALL;
-	app_style.sc_title_style.objs.color = COLOR_MAKE(0x10, 0x20, 0x30);
+	app_style.sc_title_style.objs.color = COLOR_MAKE(0x10, 0x18, 0x20);
 	app_style.sc_title_style.mid = 1;
 
 	lv_labels_get(LV_LABELS_DEF,&app_style.sc_txt_style);
     app_style.sc_txt_style.font = LV_APP_FONT_MEDIUM;
-    app_style.sc_txt_style.objs.color = COLOR_MAKE(0x20, 0x30, 0x40);
-    app_style.sc_txt_style.mid = 0;
+    app_style.sc_txt_style.objs.color = COLOR_MAKE(0x10, 0x18, 0x20);
+    app_style.sc_txt_style.mid = 1;
 
 	/*Window styles*/
 	lv_wins_get(LV_WINS_DEF,&app_style.win_style);
@@ -1039,6 +1070,7 @@ static void lv_app_init_style(void)
 			                                    2 * app_style.win_style.header.vpad;
 	app_style.win_style.pages.bg_rects.hpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.pages.scrl_rects.objs.transp = 1;
+	app_style.win_style.pages.sb_mode = LV_PAGE_SB_MODE_AUTO;
 
     lv_labels_get(LV_LABELS_DEF,&app_style.win_txt_style);
     app_style.win_txt_style.font = LV_APP_FONT_MEDIUM;

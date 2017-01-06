@@ -41,7 +41,7 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf);
+static void my_app_run(lv_app_inst_t * app, void * conf);
 static void my_app_close(lv_app_inst_t * app);
 static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t size);
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
@@ -95,18 +95,12 @@ const lv_app_dsc_t * lv_app_example_init(void)
 /**
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
- * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
  * @param conf pointer to a lv_app_example_conf_t structure with configuration data or NULL if unused
  * @return pointer to the opened application or NULL if any error occurred
  */
-static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf)
+static void my_app_run(lv_app_inst_t * app, void * conf)
 {
     /*Initialize the application*/
-	if(cstr != NULL && cstr[0] != '\0') {
-	    char buf[256];
-	    sprintf(buf,"%s - %s", my_app_dsc.name, cstr);
-	    lv_app_rename(app, buf);
-	}
 }
 
 /**

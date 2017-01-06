@@ -10,6 +10,7 @@
  *      INCLUDES
  *********************/
 #include "../lv_app.h"
+#include <stdarg.h>
 #if LV_APP_ENABLE != 0
 
 /*********************
@@ -24,7 +25,7 @@
  * GLOBAL PROTOTYPES
  **********************/
 void lv_app_notice_init(void);
-void lv_app_notice_add(const char * txt);
+void lv_app_notice_add(const char * format, ...);
 
 /**********************
  *      MACROS

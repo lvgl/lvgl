@@ -25,6 +25,7 @@ typedef struct
 {
     char txt[LV_APP_TERMINAL_LENGTH + 1];
     lv_app_com_type_t com_type;
+    lv_app_inst_t * last_sender;
 }my_app_data_t;
 
 /*Application specific data a window of this application*/
@@ -33,6 +34,7 @@ typedef struct
     lv_obj_t * label;
     lv_obj_t * ta;
     lv_obj_t * com_type_btn;
+    lv_obj_t * clear_btn;
 }my_win_data_t;
 
 /*Application specific data for a shortcut of this application*/
@@ -44,7 +46,7 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf);
+static void my_app_run(lv_app_inst_t * app, void * conf);
 static void my_app_close(lv_app_inst_t * app);
 static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t size);
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
@@ -55,6 +57,7 @@ static void my_win_close(lv_app_inst_t * app);
 static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len);
 static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi);
 static lv_action_res_t win_comch_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
 static void win_ta_kb_ok_action(lv_obj_t * ta);
 
 /**********************
@@ -94,16 +97,17 @@ lv_labels_t sc_txts;
  */
 const lv_app_dsc_t * lv_app_terminal_init(void)
 {
-    com_type_txt[LV_APP_COM_TYPE_INT] = "Comm. ch.\nnumbers";
-    com_type_txt[LV_APP_COM_TYPE_CHAR] = "Comm. ch.\nchars";
-    com_type_txt[LV_APP_COM_TYPE_LOG] = "Comm. ch.\nlog";
-    com_type_txt[LV_APP_COM_TYPE_INV] = "Comm. ch.\nnone";
+    com_type_txt[LV_APP_COM_TYPE_INT] = "Ch: Num";
+    com_type_txt[LV_APP_COM_TYPE_CHAR] = "Ch: Chars";
+    com_type_txt[LV_APP_COM_TYPE_LOG] = "Ch: Log";
+    com_type_txt[LV_APP_COM_TYPE_INV] = "Ch: None";
 
     lv_app_style_t * app_style = lv_app_style_get();
 
     memcpy(&sc_txts, &app_style->sc_txt_style, sizeof(lv_labels_t));
     sc_txts.line_space = 0;
     sc_txts.letter_space = 0;
+    sc_txts.mid = 0;
     sc_txts.objs.color = COLOR_WHITE;
 
     lv_objs_get(LV_OBJS_DEF, &sc_txt_bgs);
@@ -120,16 +124,16 @@ const lv_app_dsc_t * lv_app_terminal_init(void)
 /**
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
- * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
  * @param conf pointer to a lv_app_example_conf_t structure with configuration data or NULL if unused
  * @return pointer to the opened application or NULL if any error occurred
  */
-static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf)
+static void my_app_run(lv_app_inst_t * app, void * conf)
 {
     /*Initialize the application*/
     my_app_data_t * app_data = app->app_data;
     app_data->com_type = LV_APP_COM_TYPE_CHAR;
-    memset(app_data->txt, 0, sizeof(app_data->txt));;
+    app_data->last_sender = NULL;
+    memset(app_data->txt, 0, sizeof(app_data->txt));
 }
 
 /**
@@ -158,12 +162,18 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 
     /*Add the recevied data if the type is matches*/
 	if(type == app_data->com_type) {
-        if(app_data->txt[0] != '\0') add_data(app_rec, "\n", 1);
-        add_data(app_rec, "@", 1);
-        add_data(app_rec, app_send->name, strlen(app_send->name));
-        add_data(app_rec, "\n", 1);
-	    add_data(app_rec, data, size);
+
+        /*Insert the name of the sender application if it is not the last*/
+        if(app_data->last_sender != app_send) {
+            if(app_data->txt[0] != '\0') add_data(app_rec, "\n", 1);
+            add_data(app_rec, "@", 1);
+            add_data(app_rec, app_send->name, strlen(app_send->name));
+            add_data(app_rec, "\n", 1);
+        }
+        add_data(app_rec, data, size);
 	}
+
+	app_data->last_sender = app_send;
 }
 
 /**
@@ -236,7 +246,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
 
 
-    /*Creat a button to set the communication type (char, integer etc.)*/
+    /*Create a button to set the communication type (char, integer etc.)*/
     win_data->com_type_btn = lv_btn_create(win, NULL);
     lv_rect_set_fit(win_data->com_type_btn, true, true);
     lv_obj_set_free_p(win_data->com_type_btn, app);
@@ -245,6 +255,15 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_obj_set_style(btn_label, lv_labels_get(LV_LABELS_BTN, NULL));
     lv_label_set_text(btn_label, com_type_txt[app_data->com_type]);
     lv_obj_align(win_data->com_type_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
+
+
+    /*Create a clear button*/
+    win_data->clear_btn = lv_btn_create(win, win_data->com_type_btn);
+    lv_btn_set_rel_action(win_data->clear_btn, win_clear_rel_action);
+    btn_label = lv_label_create(win_data->clear_btn, NULL);
+    lv_obj_set_style(btn_label, lv_labels_get(LV_LABELS_BTN, NULL));
+    lv_label_set_text(btn_label, "Clear");
+    lv_obj_align(win_data->clear_btn, win_data->com_type_btn, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
 
     /*Align the window to see the text area on the bottom*/
     lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
@@ -300,6 +319,40 @@ static lv_action_res_t win_comch_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
 }
 
 /**
+ * Called when the Clear button is released to clear the ex od the terminal
+ * @param btn pointer to the clear button
+ * @param dispi pointer to the caller display input
+ * @return LV_ACTION_RES_OK because the button is not deleted
+ */
+static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    my_app_data_t * app_data = app->app_data;
+    my_win_data_t * win_data = app->win_data;
+    my_sc_data_t * sc_data = app->sc_data;
+
+    app_data->txt[0] = '\0';
+
+    if(sc_data != NULL) {
+        lv_label_set_text_static(sc_data->label, app_data->txt);
+        lv_obj_align(sc_data->label, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+    }
+
+    if(win_data != NULL) {
+        lv_app_style_t * app_style =lv_app_style_get();
+        cord_t opad = app_style->win_style.pages.scrl_rects.opad;
+        lv_label_set_text_static(win_data->label, app_data->txt);
+        lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
+        lv_obj_align(win_data->com_type_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
+        lv_obj_align(win_data->clear_btn, win_data->com_type_btn, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
+        lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
+                                      - app_style->win_style.pages.scrl_rects.vpad);
+    }
+
+    return LV_ACTION_RES_OK;
+}
+
+/**
  * Called when the 'Ok' button of the keyboard in the window
  * is pressed to write to the Terminal
  * @param ta pointer to the Text area in the window
@@ -331,25 +384,39 @@ static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len)
     uint16_t old_len = strlen(app_data->txt);
     const char * txt = data;
 
+    /*IF the data is longer then the terminal ax size show the last part of data*/
+    if(data_len > LV_APP_TERMINAL_LENGTH) {
+        txt += (data_len - LV_APP_TERMINAL_LENGTH);
+        data_len = LV_APP_TERMINAL_LENGTH;
+        old_len = 0;
+    }
     /*If the text become too long 'forget' the oldest lines*/
-    if(old_len + data_len > LV_APP_TERMINAL_LENGTH) {
-        uint16_t i;
-        for(i = 0; i < old_len; i++) {
-            if(app_data->txt[i] == '\n') {
+    else if(old_len + data_len > LV_APP_TERMINAL_LENGTH) {
+        uint16_t new_start;
+        for(new_start = 0; new_start < old_len; new_start++) {
+            if(app_data->txt[new_start] == '\n') {
                 /*If there is enough space break*/
-                if(i >= data_len) {
-                    /*Ignore line braks*/
-                    while(app_data->txt[i] == '\n' || app_data->txt[i] == '\r') i++;
+                if(new_start >= data_len) {
+                    /*Ignore line breaks*/
+                    while(app_data->txt[new_start] == '\n' || app_data->txt[new_start] == '\r') new_start++;
                     break;
                 }
             }
         }
-        uint16_t j;
-        for(j = i; j < old_len; j++) {
-            app_data->txt[j - i] = app_data->txt[j];
+
+        /* If it wasn't able to make enough space on line breaks
+         * simply forget the oldest characters*/
+        if(new_start == old_len) {
+            new_start = old_len - (LV_APP_TERMINAL_LENGTH - data_len);
         }
-        old_len = old_len - i;
+        /*Move the remaining text to the beginning*/
+        uint16_t j;
+        for(j = new_start; j < old_len; j++) {
+            app_data->txt[j - new_start] = app_data->txt[j];
+        }
+        old_len = old_len - new_start;
         app_data->txt[old_len] = '\0';
+
     }
 
     memcpy(&app_data->txt[old_len], txt, data_len);
@@ -364,6 +431,7 @@ static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len)
         lv_label_set_text_static(win_data->label, app_data->txt);
         lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
         lv_obj_align(win_data->com_type_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
+        lv_obj_align(win_data->clear_btn, win_data->com_type_btn, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
         lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
                                       - app_style->win_style.pages.scrl_rects.vpad);
     }

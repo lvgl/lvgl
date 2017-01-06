@@ -55,7 +55,7 @@ typedef struct __LV_APP_DSC_T
 {
 	const char * name;
 	lv_app_mode_t mode;
-	void (*app_run)(lv_app_inst_t *, const char *, void *);
+	void (*app_run)(lv_app_inst_t *, void *);
 	void (*app_close) (lv_app_inst_t *);
 	void (*com_rec) (lv_app_inst_t *, lv_app_inst_t *, lv_app_com_type_t, const void *, uint32_t);
 	void (*sc_open) (lv_app_inst_t *, lv_obj_t *);
@@ -91,6 +91,10 @@ typedef struct {
 	cord_t app_list_w;
 	cord_t app_list_h;
 	cord_t sc_title_margin;
+
+	/*Calculated values, do not set them!*/
+	cord_t win_useful_w;
+    cord_t win_useful_h;
 }lv_app_style_t;
 
 
@@ -98,7 +102,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 void lv_app_init(void);
-lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr, void * conf);
+lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, void * conf);
 void lv_app_close(lv_app_inst_t * app);
 uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , const void * data, uint32_t size);
 lv_obj_t * lv_app_sc_open(lv_app_inst_t * app);
@@ -116,6 +120,7 @@ void lv_app_rename(lv_app_inst_t * app, const char * name);
 void lv_app_style_refr(void);
 
 lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc);
+lv_app_dsc_t ** lv_app_dsc_get_next(lv_app_dsc_t ** prev);
 
 const lv_app_dsc_t * lv_app_example_init(void);
 

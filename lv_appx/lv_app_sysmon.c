@@ -49,7 +49,7 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf);
+static void my_app_run(lv_app_inst_t * app, void * conf);
 static void my_app_close(lv_app_inst_t * app);
 static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec, lv_app_com_type_t type , const void * data, uint32_t size);
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
@@ -57,7 +57,7 @@ static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
 
-static void sysmon_task(void);
+static void sysmon_task(void * param);
 static void lv_app_sysmon_refr(void);
 
 /**********************
@@ -101,7 +101,7 @@ static  dm_mon_t mem_mon;
  */
 const lv_app_dsc_t * lv_app_sysmon_init(void)
 {
-    ptask_create(sysmon_task, LV_APP_SYSMON_REFR_TIME, PTASK_PRIO_LOW);
+    ptask_create(sysmon_task, LV_APP_SYSMON_REFR_TIME, PTASK_PRIO_LOW, NULL);
 
     memset(mem_pct, 0, sizeof(mem_pct));
     memset(cpu_pct, 0, sizeof(cpu_pct));
@@ -142,11 +142,10 @@ const lv_app_dsc_t * lv_app_sysmon_init(void)
 /**
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
- * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
  * @param conf pointer to a lv_app_sysmon_conf_t structure with configuration data or NULL if unused
  * @return pointer to the opened application or NULL if any error occurred
  */
-static void my_app_run(lv_app_inst_t * app, const char * cstr, void * conf)
+static void my_app_run(lv_app_inst_t * app,  void * conf)
 {
 
 }
@@ -267,8 +266,9 @@ static void my_win_close(lv_app_inst_t * app)
 /**
  * Called periodically to monitor the CPU and memory usage.
  * It refreshes the shortcuts and windows and also add notifications if there is any problem.
+ * @param param unused
  */
-static void sysmon_task(void)
+static void sysmon_task(void * param)
 {
     /*Shift out the oldest data*/
     uint16_t i;
@@ -353,7 +353,7 @@ static void lv_app_sysmon_refr(void)
                   DM_MEM_SIZE,
                   DM_MEM_SIZE - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
 
-    sprintf(buf_short, "%sMem: %d %%\nFrag: %d %%",
+    sprintf(buf_short, "%sMem: %d %%\nFrag: %d %%\n",
                   buf_short, mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
 #else
     sprintf(buf_long, "%sMEMORY: N/A", buf_long);
