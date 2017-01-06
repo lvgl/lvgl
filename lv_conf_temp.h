@@ -183,6 +183,15 @@
 #define LV_APP_TERMINAL_LENGTH      512  /*Memory of the terminal*/
 #endif /*USE_LV_APP_TERMINAL != 0*/
 
+#define USE_LV_APP_FILES 1
+#if USE_LV_APP_FILES != 0
+#define LV_APP_FILES_PAGE_SIZE      8   /*Max. number of files/folder on a page*/
+#define LV_APP_FILES_FN_MAX_LEN     128
+#define LV_APP_FILES_PATH_MAX_LEN   256
+#define LV_APP_FILES_CHUNK_DEF_SIZE 256
+#define LV_APP_FILES_CHUNK_DEF_TIME 100
+#define LV_APP_FILES_CHUNK_MAX_SIZE 1024
+#endif /*USE_LV_APP_FILES != 0*/
 #endif /*LV_APP_ENABLE != 0*/
 
 #endif /*LV_CONF_H*/
