@@ -198,6 +198,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		lv_obj_set_signal_f(new_obj, lv_obj_signal);
 		lv_obj_set_design_f(new_obj, lv_obj_design);
 
+		/*Set free data*/
+		new_obj->free_num = 0;
+#if LV_OBJ_FREE_P != 0
+        new_obj->free_p = NULL;
+#endif
+
 		/*Set attributes*/
 		new_obj->click_en = 0;
 		new_obj->drag_en = 0;
@@ -234,6 +240,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         /*Set virtual functions*/
         lv_obj_set_signal_f(new_obj, lv_obj_signal);
         lv_obj_set_design_f(new_obj, lv_obj_design);
+
+        /*Set free data*/
+        new_obj->free_num = 0;
+#if LV_OBJ_FREE_P != 0
+        new_obj->free_p = NULL;
+#endif
         
         /*Set attributes*/
         new_obj->click_en = 1;
@@ -255,6 +267,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
         new_obj->opa = copy->opa;
 
+        /*Set free data*/
+        new_obj->free_num = copy->free_num;
+#if LV_OBJ_FREE_P != 0
+        new_obj->free_p = copy->free_p;
+#endif
     	/*Set attributes*/
         new_obj->click_en = copy->click_en;
         new_obj->drag_en = copy->drag_en;
