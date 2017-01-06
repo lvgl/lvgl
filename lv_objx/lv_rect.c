@@ -345,7 +345,7 @@ static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask)
 
 	light_style.empty = 1;
 	light_style.bwidth = light_size;
-	light_style.round =  style->round + light_size;
+	light_style.round =  style->round + light_size + 1;
 	light_style.bcolor = style->lcolor;
 	light_style.bopa = 100;
 
@@ -411,6 +411,7 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 
 	switch(type) {
 		case LV_RECT_LAYOUT_COL_L:
+            hpad_corr = style->hpad;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 		case LV_RECT_LAYOUT_COL_M:

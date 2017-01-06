@@ -27,7 +27,7 @@
 #if 0 /*Unused*/
 static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_t mode);
 #endif
-static void lv_temps_init(void);
+static void lv_mboxs_init(void);
 static void lv_mbox_realign(lv_obj_t * mbox);
 
 /**********************
@@ -318,7 +318,7 @@ lv_mboxs_t * lv_mboxs_get(lv_mboxs_builtin_t style, lv_mboxs_t * copy)
 
 	/*Make the style initialization if it is not done yet*/
 	if(style_inited == false) {
-		lv_temps_init();
+		lv_mboxs_init();
 		style_inited = true;
 	}
 
@@ -378,7 +378,7 @@ static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_
 /**
  * Initialize the message box styles
  */
-static void lv_temps_init(void)
+static void lv_mboxs_init(void)
 {
 	/*Default style*/
 	lv_rects_get(LV_RECTS_DEF, &lv_mboxs_def.bg);
@@ -417,6 +417,4 @@ static void lv_mbox_realign(lv_obj_t * mbox)
 
 	lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, 0);
 }
-
-
 #endif
