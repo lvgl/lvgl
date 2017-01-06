@@ -17,6 +17,9 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_APP_FILES_CHUNK_MIN_SIZE     32
+#define LV_APP_FILES_CHUNK_MIN_TIME     10
+#define LV_APP_FILES_CHUNK_MAX_TIME     10000
 
 /**********************
  *      TYPEDEFS
@@ -83,8 +86,8 @@ static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi);
 static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi);
 static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_dispi_t * dispi);
 static lv_action_res_t win_back_action(lv_obj_t * back, lv_dispi_t * dispi);
-static lv_action_res_t win_del_rel_action(lv_obj_t * send, lv_dispi_t * dispi);
-static lv_action_res_t win_del_lpr_action(lv_obj_t * send, lv_dispi_t * dispi);
+static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_dispi_t * dispi);
+static lv_action_res_t win_del_lpr_action(lv_obj_t * del, lv_dispi_t * dispi);
 static void send_settings_kb_close_action(lv_obj_t * ta);
 static void send_settings_kb_ok_action(lv_obj_t * ta);
 static void start_send(lv_app_inst_t * app, const char * path);
@@ -263,7 +266,35 @@ static void my_win_close(lv_app_inst_t * app)
 /*--------------------
  * OTHER FUNCTIONS
  ---------------------*/
+/**
+ * Create an mpty list on the window. 'win_load_file_list' will fill it.
+ * @param app pointer to a Files application
+ */
+static void win_create_list(lv_app_inst_t * app)
+{
+    lv_app_style_t * app_style = lv_app_style_get();
+    my_win_data_t * win_data = app->win_data;
 
+    /*Delete the previous list*/
+    if(win_data->file_list != NULL) {
+      lv_obj_del(win_data->file_list);
+    }
+
+    /*Create a new list*/
+    win_data->file_list = lv_list_create(app->win, NULL);
+    lv_obj_set_width(win_data->file_list, app_style->win_useful_w);
+    lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
+    lv_list_set_fit(win_data->file_list, LV_LIST_FIT_WIDTH_SB);
+    lv_obj_set_drag_parent(win_data->file_list, true);
+    lv_obj_set_drag_parent(lv_page_get_scrl(win_data->file_list), true);
+    lv_rect_set_fit(win_data->file_list, false, true);
+    lv_rect_set_layout(lv_page_get_scrl(win_data->file_list), LV_RECT_LAYOUT_COL_L);
+}
+
+/**
+ * Load the file list from the current path on the window
+ * @param app pointer to a Files application
+ */
 static void win_load_file_list(lv_app_inst_t * app)
 {
     my_app_data_t * app_data = app->app_data;
@@ -358,26 +389,6 @@ static void win_load_file_list(lv_app_inst_t * app)
     return;
 }
 
-static void win_create_list(lv_app_inst_t * app)
-{
-    lv_app_style_t * app_style = lv_app_style_get();
-    my_win_data_t * win_data = app->win_data;
-
-    /*Delete the previous list*/
-    if(win_data->file_list != NULL) {
-      lv_obj_del(win_data->file_list);
-    }
-
-    /*Create a new list*/
-    win_data->file_list = lv_list_create(app->win, NULL);
-    lv_obj_set_width(win_data->file_list, app_style->win_useful_w);
-    lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
-    lv_list_set_fit(win_data->file_list, LV_LIST_FIT_WIDTH_SB);
-    lv_obj_set_drag_parent(win_data->file_list, true);
-    lv_obj_set_drag_parent(lv_page_get_scrl(win_data->file_list), true);
-    lv_rect_set_fit(win_data->file_list, false, true);
-    lv_rect_set_layout(lv_page_get_scrl(win_data->file_list), LV_RECT_LAYOUT_COL_L);
-}
 
 /**
  * Called when the Up list element is released to step one level
@@ -489,7 +500,7 @@ static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
 
 
 /**
- * Called when a file list element is released to choose it
+ * Called when a file list element is released to show the list of operation on it
  * @param file pointer to a file button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
@@ -504,15 +515,18 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
 
     win_create_list(app);
 
+    /*Create the list of operations*/
     lv_obj_t * liste;
     liste = lv_list_add(win_data->file_list, "U:/icon_left", "Back", win_back_action);
     lv_obj_set_free_p(liste, app);
 
+    /*Send button*/
     liste = lv_list_add(win_data->file_list, NULL, "Send", win_send_rel_action);
     lv_obj_set_free_p(liste, app);
     lv_btn_set_lpr_action(liste, win_send_lpr_action);
     lv_obj_set_free_p(liste, app);
 
+    /*Delete button*/
     liste = lv_list_add(win_data->file_list, NULL, "Delete", win_del_rel_action);
     lv_btn_set_lpr_action(liste, win_del_lpr_action);
     lv_obj_set_free_p(liste, app);
@@ -520,6 +534,29 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
     return LV_ACTION_RES_INV;
 }
 
+/**
+ * Called when the Back list element is released to when a file chosen to
+ * go back to the file list from file operation
+ * @param back pointer to the back button
+ * @param dispi pointer to the caller display input
+ * @return LV_ACTION_RES_INV because the list is deleted in the function
+ */
+static lv_action_res_t win_back_action(lv_obj_t * up, lv_dispi_t * dispi)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(up);
+    my_app_data_t * app_data = app->app_data;
+
+    app_data->file_cnt = 0;
+    win_load_file_list(app);
+    return LV_ACTION_RES_INV;
+}
+
+/**
+ * Called when the Send list element is released to send the file
+ * @param sed pointer to the Up button
+ * @param dispi pointer to the caller display input
+ * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
+ */
 static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(send);
@@ -530,23 +567,26 @@ static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi)
         return LV_ACTION_RES_OK;
     }
 
-
     char path_fn[LV_APP_FILES_PATH_MAX_LEN + LV_APP_FILES_FN_MAX_LEN];
     sprintf(path_fn, "%s/%s", app_data->path, app_data->fn);
     start_send(app, path_fn);
 
-
-
     return LV_ACTION_RES_OK;
-
 }
 
+/**
+ * Called when the Send list element is long pressed to show/hide send settings
+ * @param send pointer to the Up button
+ * @param dispi pointer to the caller display input
+ * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
+ */
 static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(send);
     my_app_data_t * app_data = app->app_data;
     my_win_data_t * win_data = app->win_data;
 
+    /*Close the settings if it is opened*/
     if(win_data->send_set_h != NULL) {
         lv_obj_del(win_data->send_set_h);
         win_data->send_set_h = NULL;
@@ -555,17 +595,21 @@ static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
         return LV_ACTION_RES_OK;
     }
 
+    /*Create the settings*/
     lv_btn_set_state(send, LV_BTN_STATE_REL);
     lv_rect_set_layout(send, LV_RECT_LAYOUT_COL_L);
 
+    /*Create holder for the settings*/
     win_data->send_set_h = lv_rect_create(send, NULL);
     lv_obj_set_style(win_data->send_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
     lv_obj_set_click(win_data->send_set_h, false);
     lv_rect_set_fit(win_data->send_set_h, true, true);
     lv_rect_set_layout(win_data->send_set_h, LV_RECT_LAYOUT_COL_L);
 
+    /*Create check boxes*/
     lv_obj_t * cb;
 
+    /*Send file name check box*/
     cb = lv_cb_create(win_data->send_set_h, NULL);
     lv_cb_set_text(cb, "Send file name");
     lv_obj_set_free_num(cb, SEND_SETTINGS_FN);
@@ -574,20 +618,22 @@ static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
     if(app_data->send_fn != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
     else lv_btn_set_state(cb, LV_BTN_STATE_REL);
 
+    /*Send size check box*/
     cb = lv_cb_create(win_data->send_set_h, cb);
     lv_cb_set_text(cb, "Send size");
     lv_obj_set_free_num(cb, SEND_SETTINGS_SIZE);
     if(app_data->send_size != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
     else lv_btn_set_state(cb, LV_BTN_STATE_REL);
 
+    /*Send CRC check box*/
     cb = lv_cb_create(win_data->send_set_h, cb);
     lv_cb_set_text(cb, "Send CRC");
     lv_obj_set_free_num(cb, SEND_SETTINGS_CRC);
     if(app_data->send_crc != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
     else lv_btn_set_state(cb, LV_BTN_STATE_REL);
 
+    /*Create a text area the type chunk size*/
     lv_obj_t * val_set_h;
-
     val_set_h = lv_rect_create(win_data->send_set_h, NULL);
     lv_obj_set_style(val_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
     lv_obj_set_click(val_set_h, false);
@@ -609,6 +655,7 @@ static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
     sprintf(buf, "%d", app_data->chunk_size);
     lv_ta_set_text(ta, buf);
 
+    /*Create a text area to type the chunk delay*/
     val_set_h = lv_rect_create(win_data->send_set_h, val_set_h);
 
     label = lv_label_create(val_set_h, NULL);
@@ -619,9 +666,14 @@ static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
     sprintf(buf, "%d", app_data->chunk_delay);
     lv_ta_set_text(ta, buf);
 
-    return LV_ACTION_RES_INV;
+    return LV_ACTION_RES_OK;
 }
-
+/**
+ * Called when a send settings element is released
+ * @param element pointer to a chekbox or text area
+ * @param dispi pointer to the caller display input
+ * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
+ */
 static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_dispi_t * dispi)
 {
     send_settings_id_t id = lv_obj_get_free_num(element);
@@ -634,6 +686,11 @@ static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, 
         app_data->send_size = lv_btn_get_state(element) == LV_BTN_STATE_REL ? 0 : 1;
     } else if(id == SEND_SETTINGS_CRC) {
         app_data->send_crc = lv_btn_get_state(element) == LV_BTN_STATE_REL ? 0 : 1;
+
+        /*TODO CRC sending is not supported yet*/
+        if(app_data->send_crc != 0) {
+            lv_app_notice_add("CRC sending is\nnot supported yet");
+        }
     } else if(id == SEND_SETTINGS_CHUNK_SIZE) {
         lv_app_kb_open(element, LV_APP_KB_MODE_NUM, send_settings_kb_close_action, send_settings_kb_ok_action);
     } else if(id == SEND_SETTINGS_CHUNK_DELAY) {
@@ -642,34 +699,31 @@ static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, 
 
     return LV_ACTION_RES_OK;
 }
+
+
 /**
- * Called when the Back list element is released to when a file chosen to go back to the file list
- * @param back pointer to the back button
+ * Called when the Delete list element is released.
+ * It will show a notification to long press the Delete button to remove the file
+ * @param del pointer to the back button
  * @param dispi pointer to the caller display input
- * @return LV_ACTION_RES_INV because the list is deleted in the function
+ * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
  */
-static lv_action_res_t win_back_action(lv_obj_t * up, lv_dispi_t * dispi)
-{
-    lv_app_inst_t * app = lv_obj_get_free_p(up);
-    my_app_data_t * app_data = app->app_data;
-
-    app_data->file_cnt = 0;
-    win_load_file_list(app);
-    return LV_ACTION_RES_INV;
-}
-
-
-static lv_action_res_t win_del_rel_action(lv_obj_t * send, lv_dispi_t * dispi)
+static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_dispi_t * dispi)
 {
     lv_app_notice_add("Press long the Delete button\n"
                       "to remove the file");
 
     return LV_ACTION_RES_OK;
 }
-
-static lv_action_res_t win_del_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
+/**
+ * Called when the Delete list element is long pressed to remove a file
+ * @param del pointer to the Delete button
+ * @param dispi pointer to the caller display input
+ * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
+ */
+static lv_action_res_t win_del_lpr_action(lv_obj_t * del, lv_dispi_t * dispi)
 {
-    lv_app_inst_t * app = lv_obj_get_free_p(send);
+    lv_app_inst_t * app = lv_obj_get_free_p(del);
     my_app_data_t * app_data = app->app_data;
 
     char path_fn[LV_APP_FILES_PATH_MAX_LEN + LV_APP_FILES_FN_MAX_LEN];
@@ -681,6 +735,12 @@ static lv_action_res_t win_del_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
 
     return LV_ACTION_RES_OK;
 }
+
+/**
+ * Called when a send setting is typed and 'Close' pressed on the App. keyboard.
+ * The function reverts the original value in the text area.
+ * @param ta pointer to a text area
+ */
 static void send_settings_kb_close_action(lv_obj_t * ta)
 {
     send_settings_id_t id = lv_obj_get_free_num(ta);
@@ -698,6 +758,11 @@ static void send_settings_kb_close_action(lv_obj_t * ta)
     lv_ta_set_text(ta, buf);
 }
 
+/**
+ * Called when a send setting is typed and 'Ok' pressed on the App. keyboard.
+ * The function saves teh new value.
+ * @param ta pointer to a text area
+ */
 static void send_settings_kb_ok_action(lv_obj_t * ta)
 {
     send_settings_id_t id = lv_obj_get_free_num(ta);
@@ -708,39 +773,82 @@ static void send_settings_kb_ok_action(lv_obj_t * ta)
     sscanf(lv_ta_get_txt(ta), "%d", &num);
 
     if(id == SEND_SETTINGS_CHUNK_DELAY) {
+        if(num > LV_APP_FILES_CHUNK_MAX_TIME) num = LV_APP_FILES_CHUNK_MAX_TIME;
+        if(num < LV_APP_FILES_CHUNK_MIN_TIME) num = LV_APP_FILES_CHUNK_MIN_TIME;
         app_data->chunk_delay = (uint16_t) num;
     } else if(id == SEND_SETTINGS_CHUNK_SIZE) {
         if(num > LV_APP_FILES_CHUNK_MAX_SIZE) num = LV_APP_FILES_CHUNK_MAX_SIZE;
+        if(num < LV_APP_FILES_CHUNK_MIN_SIZE) num = LV_APP_FILES_CHUNK_MIN_SIZE;
         app_data->chunk_size= (uint16_t) num;
     }
 
 }
 
+/**
+ * Start the sending of a file
+ * @param app pointer to a Files application
+ * @param path path of the file to send
+ */
 static void start_send(lv_app_inst_t * app, const char * path)
 {
     my_app_data_t * app_data = app->app_data;
+
+    /*Open the file*/
     fs_res_t res = fs_open(&app_data->file, path, FS_MODE_RD);
     if(res == FS_RES_OK) {
         uint32_t rn;
         char rd_buf[LV_APP_FILES_CHUNK_MAX_SIZE];
+
+        /*Read the first chunk*/
         res = fs_read(&app_data->file, rd_buf, app_data->chunk_size, &rn);
         if(res == FS_RES_OK) {
             app_data->send_in_prog = 1;
-            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, rd_buf, rn);
 
-            ptask_set_period(app_data->send_task, app_data->chunk_delay);
-            ptask_reset(app_data->send_task);
-            ptask_set_prio(app_data->send_task, PTASK_PRIO_HIGH);
+            /*Send the header*/
+            if(app_data->send_fn != 0) {
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->path, strlen(app_data->path));
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "/", 1);
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->fn, strlen(app_data->fn));
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+            }
+
+            if(app_data->send_size != 0) {
+                char buf[64];
+                uint32_t size;
+                fs_size(&app_data->file, &size);
+                sprintf(buf,"%d", (int) size);
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, buf, strlen(buf));
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+            }
+            if(app_data->send_crc != 0) {
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "0x0000", 6);
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+            }
+
+            /*Add an extra \n to separate the header from the file data*/
+            if(app_data->send_fn != 0 || app_data->send_size != 0 || app_data->send_crc != 0) {
+                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+            }
+
         }
     }
 
-   if(res != FS_RES_OK) {
+    /*If an error occurred  close the file*/
+    if(res != FS_RES_OK) {
         fs_close(&app_data->file);
+        ptask_set_prio(app_data->send_task, PTASK_PRIO_OFF);
         app_data->send_in_prog = 0;
         lv_app_notice_add("Can not send\nthe file in Files");
-   } else {
+    }
+    /*If no error show notification, start the sender task and refresh the shortcut*/
+    else {
+       /*Start the sender task*/
+       ptask_set_period(app_data->send_task, app_data->chunk_delay);
+       ptask_reset(app_data->send_task);
+       ptask_set_prio(app_data->send_task, PTASK_PRIO_HIGH);
        lv_app_notice_add("Sending\n%s", fs_get_last(path));
 
+       /*Refresh the shortcut with the percentage of the sending*/
        if(app->sc_data != NULL) {
            my_sc_data_t * sc_data = app->sc_data;
 
@@ -757,9 +865,12 @@ static void start_send(lv_app_inst_t * app, const char * path)
            lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
        }
    }
-
 }
 
+/**
+ * Periodically send the next chunk of the file
+ * @param app pointer to a Files application
+ */
 static void send_task(void * param)
 {
     lv_app_inst_t * app = param;
@@ -767,6 +878,7 @@ static void send_task(void * param)
 
     if(app_data->send_in_prog == 0) return;
 
+    /*Read a chunk*/
     uint32_t rn;
     char rd_buf[LV_APP_FILES_CHUNK_MAX_SIZE];
     fs_res_t res = fs_read(&app_data->file, rd_buf, app_data->chunk_size, &rn);
@@ -775,23 +887,30 @@ static void send_task(void * param)
        lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, rd_buf, rn);
     }
 
+    /*If the read failed close the file and show an error*/
     if(res != FS_RES_OK) {
        fs_close(&app_data->file);
        app_data->send_in_prog = 0;
        lv_app_notice_add("Can not send\nthe file in Files");
-    } else {
+    }
+    /*If the read was successful*/
+    else {
         my_sc_data_t * sc_data = app->sc_data;
 
+        /*If the file is read close it a show a notification*/
         if(rn < app_data->chunk_size) {
             lv_app_notice_add("File sent");
             fs_close(&app_data->file);
             app_data->send_in_prog = 0;
 
+            /*Refresh the shortut*/
             if(sc_data != NULL) {
                 lv_label_set_text(sc_data->label, fs_get_last(app_data->path));
                 lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
             }
-        } else  {
+        }
+        /*If the file is not sent yet refresh the shortcut with percentage of sending*/
+        else {
             if(sc_data != NULL) {
                 uint32_t size;
                 fs_size(&app_data->file, &size);
@@ -809,4 +928,4 @@ static void send_task(void * param)
     }
 }
 
-#endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/
+#endif /*LV_APP_ENABLE != 0 && USE_LV_APP_FILES != 0*/
