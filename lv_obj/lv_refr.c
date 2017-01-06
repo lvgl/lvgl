@@ -29,7 +29,7 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_refr_task(void);
+static void lv_refr_task(void * param);
 static void lv_refr_join_area(void);
 static void lv_refr_areas(void);
 #if LV_VDB_SIZE == 0
@@ -65,7 +65,7 @@ void lv_refr_init(void)
     memset(inv_buf, 0, sizeof(inv_buf));
 
     ptask_t* task;
-    task = ptask_create(lv_refr_task, LV_REFR_PERIOD, PTASK_PRIO_MID);
+    task = ptask_create(lv_refr_task, LV_REFR_PERIOD, PTASK_PRIO_MID, NULL);
     dm_assert(task);
     
 }
@@ -127,8 +127,9 @@ void lv_inv_area(const area_t * area_p)
 
 /**
  * Called periodically to handle the refreshing
+ * @param param unused
  */
-static void lv_refr_task(void)
+static void lv_refr_task(void * param)
 {
     lv_refr_join_area();
     

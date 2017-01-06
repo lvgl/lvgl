@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_task (void);
+static void anim_task (void * param);
 static bool anim_ready_handler(anim_t * a);
 
 /**********************
@@ -65,7 +65,7 @@ void anim_init(void)
 {
 	ll_init(&anim_ll, sizeof(anim_t));
 	last_task_run = systick_get();
-	ptask_create(anim_task, LV_REFR_PERIOD, PTASK_PRIO_MID);
+	ptask_create(anim_task, LV_REFR_PERIOD, PTASK_PRIO_MID, NULL);
 }
 
 /**
@@ -160,8 +160,9 @@ anim_path_t * anim_get_path(anim_path_name_t name)
 
 /**
  * Periodically handle the animations.
+ * @param param unused
  */
-static void anim_task (void)
+static void anim_task (void * param)
 {
 	uint32_t elaps;
 	elaps = systick_elaps(last_task_run);

@@ -153,16 +153,20 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     			 * (The created label will be deleted automatically) */
     			break;
     		case LV_SIGNAL_STYLE_CHG:
-    			lv_obj_set_style(ext->label, &style->labels);
-    	    	lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-    	    			(style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
-    	    	lv_label_set_text(ext->label, NULL);
+    		    if(ext->label) {
+                    lv_obj_set_style(ext->label, &style->labels);
+                    lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
+                            (style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
+                    lv_label_set_text(ext->label, NULL);
+    		    }
     			break;
     		/*Set the label width according to the text area width*/
     		case LV_SIGNAL_CORD_CHG:
-    	    	lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-    	    			(style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
-    	    	lv_label_set_text(ext->label, NULL);
+    		    if(ext->label != NULL) {
+                    lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
+                            (style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
+                    lv_label_set_text(ext->label, NULL);
+    		    }
     			break;
     		default:
     			break;
@@ -584,7 +588,7 @@ static void lv_tas_init(void)
 {
 	/*Default style*/
 	lv_pages_get(LV_PAGES_DEF, &lv_tas_def.pages);
-	lv_tas_def.pages.sb_mode = LV_PAGE_SB_MODE_ON;
+	lv_tas_def.pages.sb_mode = LV_PAGE_SB_MODE_DRAG;
 
 	lv_labels_get(LV_LABELS_TXT, &lv_tas_def.labels);
 	lv_tas_def.labels.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
@@ -595,7 +599,7 @@ static void lv_tas_init(void)
 
 	memcpy(&lv_tas_simple, &lv_tas_def, sizeof(lv_tas_t));
     lv_pages_get(LV_PAGES_SIMPLE, &lv_tas_simple.pages);
-    lv_tas_simple.pages.sb_mode = LV_PAGE_SB_MODE_ON;
+    lv_tas_simple.pages.sb_mode = LV_PAGE_SB_MODE_DRAG;
     lv_tas_simple.pages.scrl_rects.objs.transp = 0; /*if transp == 1 the cursor will not be drawn*/
     lv_tas_simple.pages.bg_rects.objs.color = COLOR_WHITE;
     lv_tas_simple.pages.bg_rects.gcolor = COLOR_SILVER;
