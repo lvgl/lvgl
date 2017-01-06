@@ -73,26 +73,42 @@ static lv_app_inst_t * con_send; /*The sender application in connection mode. No
 static lv_app_style_t app_style; /*Styles for application related things*/
 
 /*Declare icons*/
-LV_IMG_DECLARE(img_add);
-LV_IMG_DECLARE(img_bubble);
-LV_IMG_DECLARE(img_calendar);
-LV_IMG_DECLARE(img_clock);
+#if USE_IMG_CLOSE != 0
 LV_IMG_DECLARE(img_close);
+#endif
+
+#if USE_IMG_DOWN != 0
 LV_IMG_DECLARE(img_down);
+#endif
+
+#if USE_IMG_DRIVER != 0
 LV_IMG_DECLARE(img_driver);
-LV_IMG_DECLARE(img_eject);
+#endif
+
+#if USE_IMG_FILE != 0
 LV_IMG_DECLARE(img_file);
+#endif
+
+#if USE_IMG_FOLDER != 0
 LV_IMG_DECLARE(img_folder);
+#endif
+
+#if USE_IMG_LEFT != 0
 LV_IMG_DECLARE(img_left);
+#endif
+
+#if USE_IMG_OK != 0
 LV_IMG_DECLARE(img_ok);
-LV_IMG_DECLARE(img_play);
+#endif
+
+#if USE_IMG_RIGHT != 0
 LV_IMG_DECLARE(img_right);
-LV_IMG_DECLARE(img_settings);
-LV_IMG_DECLARE(img_shut_down);
-LV_IMG_DECLARE(img_star);
+#endif
+
+#if USE_IMG_UP != 0
 LV_IMG_DECLARE(img_up);
-LV_IMG_DECLARE(img_user);
-LV_IMG_DECLARE(img_volume);
+#endif
+
 
 /**********************
  *      MACROS
@@ -285,8 +301,8 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	lv_rect_set_fit(win_content, false, true);
 	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.pages.bg_rects.hpad);
 
-	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
-	lv_win_add_ctrl_btn(app->win, "U:/icon_close", lv_app_win_close_action);
+	lv_win_add_ctrl_btn(app->win, "U:/icon_down" ,lv_app_win_minim_action);
+	lv_win_add_ctrl_btn(app->win, "U:/icon_close" ,lv_app_win_close_action);
 
     app->win_data = dm_alloc(app->dsc->win_data_size);
     app->dsc->win_open(app, app->win);
@@ -1084,26 +1100,41 @@ static void lv_app_init_style(void)
  */
 static void lv_app_init_icons(void)
 {
-    lv_img_create_file("icon_add", img_add);
-    lv_img_create_file("icon_bubble", img_bubble);
-    lv_img_create_file("icon_calendar", img_calendar);
-    lv_img_create_file("icon_clock", img_clock);
+#if USE_IMG_CLOSE != 0
     lv_img_create_file("icon_close", img_close);
+#endif
+
+#if USE_IMG_DOWN != 0
     lv_img_create_file("icon_down", img_down);
+#endif
+
+#if USE_IMG_DRIVER != 0
     lv_img_create_file("icon_driver", img_driver);
-    lv_img_create_file("icon_eject", img_eject);
+#endif
+
+#if USE_IMG_FILE != 0
     lv_img_create_file("icon_file", img_file);
+#endif
+
+#if USE_IMG_FOLDER != 0
     lv_img_create_file("icon_folder", img_folder);
+#endif
+
+#if USE_IMG_LEFT != 0
     lv_img_create_file("icon_left", img_left);
+#endif
+
+#if USE_IMG_OK != 0
     lv_img_create_file("icon_ok", img_ok);
-    lv_img_create_file("icon_play", img_play);
+#endif
+
+#if USE_IMG_RIGHT != 0
     lv_img_create_file("icon_right", img_right);
-    lv_img_create_file("icon_settings", img_settings);
-    lv_img_create_file("icon_shut_down", img_shut_down);
-    lv_img_create_file("icon_star", img_star);
+#endif
+
+#if USE_IMG_UP != 0
     lv_img_create_file("icon_up", img_up);
-    lv_img_create_file("icon_user", img_user);
-    lv_img_create_file("icon_volume", img_volume);
+#endif
 }
 #endif /*LV_APP_ENABLE != 0*/
 
