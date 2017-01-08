@@ -82,7 +82,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
-		lv_obj_set_protect(ext->scrl, LV_OBJ_PROT_PARENT);
+		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
 		lv_rect_set_fit(ext->scrl, true, true);
 		lv_obj_set_style(ext->scrl, &pages->scrl_rects);
 
@@ -96,22 +96,16 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->scrl = lv_rect_create(new_page, copy_ext->scrl);
 	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
 
+        lv_page_set_pr_action(new_page, copy_ext->pr_action);
+        lv_page_set_rel_action(new_page, copy_ext->rel_action);
+
 		/* Add the signal function only if 'scrolling' is created
 		 * because everything has to be ready before any signal is received*/
 	    lv_obj_set_signal_f(new_page, lv_page_signal);
 	    lv_obj_set_design_f(new_page, lv_page_design);
 
-
-	    lv_page_set_pr_action(new_page, copy_ext->pr_action);
-        lv_page_set_rel_action(new_page, copy_ext->rel_action);
-
-	    /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_page) == false) {
-            lv_obj_set_style(new_page, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_page, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_page, sizeof(lv_pages_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_page);
     }
     
     lv_page_sb_refresh(new_page);
@@ -143,7 +137,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         	case LV_SIGNAL_CHILD_CHG: /*Move children to the scrollable object*/
         		child = lv_obj_get_child(page, NULL);
         		while(child != NULL) {
-        			if(lv_obj_is_protected(child, LV_OBJ_PROT_PARENT) == false) {
+        			if(lv_obj_is_protected(child, LV_PROTECT_PARENT) == false) {
         				lv_obj_t * tmp = child;
             			child = lv_obj_get_child(page, child); /*Get the next child before move this*/
         				lv_obj_set_parent(tmp, ext->scrl);

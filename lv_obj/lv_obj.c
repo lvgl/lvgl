@@ -48,10 +48,11 @@ static ll_dsc_t scr_ll;
 static lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
 static lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
 static lv_objs_t lv_objs_transp = {.transp = 1};
-/*
+
+
 #ifdef LV_IMG_DEF_WALLPAPER
 LV_IMG_DECLARE(LV_IMG_DEF_WALLPAPER);
-#endif*/
+#endif
 
 /**********************
  *      MACROS
@@ -80,10 +81,10 @@ void lv_init(void)
     /*Create the default screen*/
     ll_init(&scr_ll, sizeof(lv_obj_t));
 #ifdef LV_IMG_DEF_WALLPAPER
-   // lv_img_create_file("def_wp", LV_IMG_DEF_WALLPAPER);
+    lv_img_create_file("def_wp", LV_IMG_DEF_WALLPAPER);
     def_scr = lv_img_create(NULL, NULL);
     lv_img_set_auto_size(def_scr, false);
-    lv_img_set_file(def_scr, LV_IMG_DEF_WALLPAPER);
+    lv_img_set_file(def_scr, "U:/def_wp");
 #else
     def_scr = lv_obj_create(NULL, NULL);
 #endif
@@ -212,7 +213,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->style_iso = 0;
 		new_obj->hidden = 0;
 		new_obj->top_en = 0;
-        new_obj->protect = LV_OBJ_PROT_NONE;
+        new_obj->protect = LV_PROTECT_NONE;
 
 		new_obj->ext = NULL;
 	 }
@@ -255,7 +256,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->style_iso = 0;
         new_obj->hidden = 0;
         new_obj->top_en = 0;
-        new_obj->protect = LV_OBJ_PROT_NONE;
+        new_obj->protect = LV_PROTECT_NONE;
         
         new_obj->ext = NULL;
         
@@ -278,15 +279,13 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->drag_throw_en = copy->drag_throw_en;
         new_obj->drag_parent = copy->drag_parent;
         new_obj->hidden = copy->hidden;
-        new_obj->style_iso = copy->style_iso;
         new_obj->top_en = copy->top_en;
         new_obj->protect = copy->protect;
 
-        if(copy->style_iso == 0) {
-            new_obj->style_p = copy->style_p;
-        } else {
-            new_obj->style_p = dm_alloc(sizeof(lv_objs_t));
-            memcpy(new_obj->style_p, copy->style_p, sizeof(lv_objs_t));
+        new_obj->style_p = copy->style_p;
+
+        if(copy->style_iso != 0) {
+            lv_obj_iso_style(new_obj, dm_get_size(copy->style_p));
         }
 
     	lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
@@ -371,7 +370,7 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     switch(sign) {
     case LV_SIGNAL_CHILD_CHG:
     	/*Return 'invalid' if the child change  signal is not enabled*/
-    	if(lv_obj_is_protected(obj, LV_OBJ_PROT_CHILD_CHG) != false) valid = false;
+    	if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) valid = false;
     	break;
     	default:
     		break;
@@ -891,7 +890,7 @@ void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa)
     }
     
     /*Set the opacity is the object is not protected*/
-    if(lv_obj_is_protected(obj, LV_OBJ_PROT_OPA) == false) obj->opa = opa;
+    if(lv_obj_is_protected(obj, LV_PROTECT_OPA) == false) obj->opa = opa;
     
     lv_obj_inv(obj);
 }

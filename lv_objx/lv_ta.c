@@ -100,13 +100,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->label = lv_label_create(new_ta, copy_ext->label);
     	lv_page_glue_obj(ext->label, true);
 
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_ta) == false) {
-            lv_obj_set_style(new_ta, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_ta, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_ta, sizeof(lv_rects_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_ta);
     }
     
     /*Create a cursor blinker animation*/

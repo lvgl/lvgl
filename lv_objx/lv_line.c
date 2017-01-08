@@ -86,7 +86,8 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_line_set_upscale(new_line,lv_line_get_upscale(copy));
     	lv_line_set_points(new_line, LV_EA(copy, lv_line_ext_t)->point_array,
     								   LV_EA(copy, lv_line_ext_t)->point_num);
-        lv_obj_set_style(new_line, lv_obj_get_style(copy));
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_line);
     }
 
     return new_line;

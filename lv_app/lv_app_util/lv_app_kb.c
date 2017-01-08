@@ -84,7 +84,7 @@ void lv_app_kb_init(void)
     kb_btnms.rects.round = 0;
     kb_btnms.rects.bwidth = 0;
 
-    kb_btnms.btns.rects.bwidth = 0;
+   // kb_btnms.btns.rects.bwidth = 0;
     kb_btnms.btns.rects.round = 0;
 }
 

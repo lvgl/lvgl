@@ -90,13 +90,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
         if(copy_ext->static_txt == 0) lv_label_set_text(new_label, lv_label_get_text(copy));
         else lv_label_set_text_static(new_label, lv_label_get_text(copy));
 
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_label) == false) {
-            lv_obj_set_style(new_label, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_label, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_label, sizeof(lv_labels_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_label);
     }
     return new_label;
 }

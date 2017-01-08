@@ -88,13 +88,6 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_btnm) == false) {
-            lv_obj_set_style(new_btnm, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_btnm, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_btnm, sizeof(lv_btnms_t));
-        }
         lv_btnm_set_map(new_btnm, lv_btnm_get_map(copy));
     }
     

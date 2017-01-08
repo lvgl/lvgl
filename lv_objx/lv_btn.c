@@ -93,13 +93,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
         ext->lpr_rep_action = copy_ext->lpr_action;
     	ext->tgl = copy_ext->tgl;
 
-    	/*Set the style of 'copy' and isolate it if it is necessary*/
-    	if(lv_obj_get_style_iso(new_btn) == false) {
-    	    lv_obj_set_style(new_btn, lv_obj_get_style(copy));
-    	} else {
-            lv_obj_set_style(new_btn, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_btn, sizeof(lv_btns_t));
-    	}
+    	/*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_btn);
     }
     
     return new_btn;
@@ -511,9 +506,9 @@ static void lv_btns_init(void)
 	lv_btns_border.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_BLACK;
 	lv_btns_border.bcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
 	lv_btns_border.flags[LV_BTN_STATE_REL].empty = 1;
-	lv_btns_border.flags[LV_BTN_STATE_PR].empty = 1;
-	lv_btns_border.flags[LV_BTN_STATE_TGL_REL].empty = 1;
-	lv_btns_border.flags[LV_BTN_STATE_TGL_PR].empty = 1;
+	lv_btns_border.flags[LV_BTN_STATE_PR].empty = 0;
+	lv_btns_border.flags[LV_BTN_STATE_TGL_REL].empty = 0;
+	lv_btns_border.flags[LV_BTN_STATE_TGL_PR].empty = 0;
 	lv_btns_border.flags[LV_BTN_STATE_INA].empty = 1;
     lv_btns_border.flags[LV_BTN_STATE_REL].light_en = 0;
     lv_btns_border.flags[LV_BTN_STATE_PR].light_en = 0;

@@ -93,13 +93,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
         ext->txt = lv_label_create(new_mbox, copy_ext->txt);
         ext->btnh = lv_rect_create(new_mbox, copy_ext->btnh);
 
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_mbox) == false) {
-            lv_obj_set_style(new_mbox, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_mbox, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_mbox, sizeof(lv_mboxs_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_mbox);
     }
     
     lv_mbox_realign(new_mbox);

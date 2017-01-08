@@ -79,7 +79,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->header = lv_rect_create(new_win, NULL);
     	lv_rect_set_fit(ext->header, false, true);
     	/*Move back the header because it is automatically moved to the scrollable */
-    	lv_obj_set_protect(ext->header, LV_OBJ_PROT_PARENT);
+    	lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
     	lv_obj_set_parent(ext->header, new_win);
 
     	/*Create a title on the header*/
@@ -101,7 +101,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	/*Create the objects*/
     	ext->header = lv_rect_create(new_win, copy_ext->header);
         /*Move back the header because it is automatically moved to the scrollable */
-        lv_obj_set_protect(ext->header, LV_OBJ_PROT_PARENT);
+        lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
         lv_obj_set_parent(ext->header, new_win);
 
     	ext->title = lv_label_create(ext->header, copy_ext->title);
@@ -117,13 +117,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     		child = lv_obj_get_child(copy_ext->ctrl_holder, child);
     	}
 
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_win) == false) {
-            lv_obj_set_style(new_win, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_win, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_win, sizeof(lv_wins_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_win);
     }
     
     lv_win_realign(new_win);

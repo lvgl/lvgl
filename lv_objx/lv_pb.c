@@ -97,13 +97,8 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->act_value = ext_copy->act_value;
         ext->label = lv_label_create(new_pb, ext_copy->label);
 
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_pb) == false) {
-            lv_obj_set_style(new_pb, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_pb, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_pb, sizeof(lv_pbs_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_pb);
 
         lv_pb_set_value(new_pb, ext->act_value);
 

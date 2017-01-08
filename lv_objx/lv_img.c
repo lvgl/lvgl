@@ -81,13 +81,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->auto_size = lv_img_get_auto_size(copy);
     	lv_img_set_file(new_img, LV_EA(copy, lv_img_ext_t)->fn);
 
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-         if(lv_obj_get_style_iso(new_img) == false) {
-             lv_obj_set_style(new_img, lv_obj_get_style(copy));
-         } else {
-             lv_obj_set_style(new_img, lv_obj_get_style(copy));
-             lv_obj_iso_style(new_img, sizeof(lv_imgs_t));
-         }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_img);
     }
 
     return new_img;

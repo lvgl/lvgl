@@ -111,12 +111,14 @@ typedef struct __LV_OBJ_T
     
 }lv_obj_t;
 
+/*Protect some attributes (max. 8 bit)*/
 typedef enum
 {
-    LV_OBJ_PROT_NONE      = 0x00,
-    LV_OBJ_PROT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
-    LV_OBJ_PROT_OPA       = 0x02, /*Prevent lv_obj_set_opar to modify the opacity*/
-    LV_OBJ_PROT_PARENT    = 0x04, /*Prevent automatic (hidden) parent change (e.g. in lv_page)*/
+    LV_PROTECT_NONE      = 0x00,
+    LV_PROTECT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
+    LV_PROTECT_OPA       = 0x02, /*Prevent lv_obj_set_opar to modify the opacity*/
+    LV_PROTECT_PARENT    = 0x04, /*Prevent automatic parent change (e.g. in lv_page)*/
+    LV_PROTECT_POS       = 0x08, /*Prevent automatic positioning (e.g. in lv_rect layout)*/
 }lv_obj_protect_t;
 
 typedef enum

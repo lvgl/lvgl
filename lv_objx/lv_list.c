@@ -75,13 +75,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_list_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext ->fit = copy_ext->fit;
 
-    	/*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_list) == false) {
-            lv_obj_set_style(new_list, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_list, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_list, sizeof(lv_lists_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_list);
     }
     
     return new_list;

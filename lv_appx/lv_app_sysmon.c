@@ -83,7 +83,7 @@ static uint8_t mem_pct[LV_APP_SYSMON_PNUM];
 static uint8_t cpu_pct[LV_APP_SYSMON_PNUM];
 static lv_pbs_t cpu_pbs;
 static lv_pbs_t mem_pbs;
-#if USE_DYN_MEM != 0
+#if USE_DYN_MEM != 0  && DM_CUSTOM == 0
 static  dm_mon_t mem_mon;
 #endif
 
@@ -284,9 +284,9 @@ static void sysmon_task(void * param)
 #endif
 
     uint8_t mem_used_pct = 0;
-#if  USE_DYN_MEM != 0
+#if  USE_DYN_MEM != 0  && DM_CUSTOM == 0
     dm_monitor(&mem_mon);
-    mem_used_pct = (uint32_t) ((DM_MEM_SIZE - mem_mon.size_free) * 100 ) / DM_MEM_SIZE;
+    mem_used_pct = mem_mon.pct_used;
 #endif
 
     /*Add the CPU and memory data*/
@@ -296,7 +296,7 @@ static void sysmon_task(void * param)
     /*Refresh the shortcuts and windows*/
     lv_app_sysmon_refr();
 
-#if USE_DYN_MEM != 0
+#if USE_DYN_MEM != 0 && DM_CUSTOM == 0
 
     /*Handle periodic defrag. if enabled*/
 #if LV_APP_SYSMON_DEFRAG_PERIOD != 0
@@ -307,7 +307,6 @@ static void sysmon_task(void * param)
         last_defrag = systick_get();
     }
 #endif
-
     /*Add notifications if something is critical*/
     static bool mem_warn_report = false;
     if(mem_mon.size_free < LV_APP_SYSMON_MEM_WARN && mem_warn_report == false) {
@@ -346,12 +345,12 @@ static void lv_app_sysmon_refr(void)
     strcpy(buf_short, "CPU: N/A\n");
 #endif
 
-#if USE_DYN_MEM != 0
+#if USE_DYN_MEM != 0  && DM_CUSTOM == 0
     sprintf(buf_long, "%sMEMORY: %d %%\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",
                   buf_long,
                   mem_pct[LV_APP_SYSMON_PNUM - 1],
-                  DM_MEM_SIZE,
-                  DM_MEM_SIZE - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
+                  mem_mon.size_total,
+                  mem_mon.size_total - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
 
     sprintf(buf_short, "%sMem: %d %%\nFrag: %d %%\n",
                   buf_short, mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);

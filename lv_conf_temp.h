@@ -21,7 +21,10 @@
 
 #define LV_VDB_SIZE         (LV_HOR_RES * (LV_VER_RES / 20))
 
-/*Enable anti alaiassing */
+/* Enable antialaiassing
+ * If enabled everything will half-sized
+ * Use LV_DOWNSCALE to compensate
+ * the down scaling effect of antialiassing*/
 #define LV_ANTIALIAS        1
 /*Set the downscaling value*/
 #if LV_ANTIALIAS == 0
@@ -30,7 +33,6 @@
 #define LV_DOWNSCALE        2
 #endif
 
-#define LV_UPSCALE_MAP   0 /*Scale up maps (e.g. images) elements to compensate LV_DOWNSCALE*/
 #define LV_REFR_PERIOD      40    /*Screen refresh period in milliseconds*/
 #define LV_INV_FIFO_SIZE    32    /*The average number of objects on a screen */
 
@@ -177,7 +179,7 @@
 
 /* App. utility settings */
 #define LV_APP_NOTICE_SHOW_TIME 4000 /*Notices will be shown for this time [ms]*/
-
+#define LV_APP_NOTICE_MAX_LEN   256  /*Max. number of characters on a notice*/
 /*==================
  *  LV APP X USAGE 
  * ================*/

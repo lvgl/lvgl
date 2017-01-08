@@ -80,13 +80,8 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     else {
     	lv_templ_ext_t * copy_ext = lv_obj_get_ext(copy);
 
-        /*Set the style of 'copy' and isolate it if it is necessary*/
-        if(lv_obj_get_style_iso(new_templ) == false) {
-            lv_obj_set_style(new_templ, lv_obj_get_style(copy));
-        } else {
-            lv_obj_set_style(new_templ, lv_obj_get_style(copy));
-            lv_obj_iso_style(new_templ, sizeof(lv_templs_t));
-        }
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_templ);
     }
     
     return new_templ;
