@@ -22,16 +22,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if 0 /*The ancestor design function is used */
 static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mode);
-#endif
 static void lv_cbs_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_cbs_t lv_cbs_def;
-
+static lv_design_f_t ancestor_design_f;
 /**********************
  *      MACROS
  **********************/
@@ -58,8 +56,13 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     
     lv_cb_ext_t * ext = lv_obj_alloc_ext(new_cb, sizeof(lv_cb_ext_t));
     dm_assert(ext);
+    ext->bullet = NULL;
+    ext->label = NULL;
+
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_cb);
 
     lv_obj_set_signal_f(new_cb, lv_cb_signal);
+    lv_obj_set_design_f(new_cb, lv_cb_design);
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
@@ -79,7 +82,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
     	ext->label = lv_label_create(new_cb, copy_ext->label);
 
-        lv_obj_set_style(new_cb, lv_obj_get_style(copy));
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_cb);
     }
 
     lv_obj_align_us(new_cb, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -199,7 +203,6 @@ lv_cbs_t * lv_cbs_get(lv_cbs_builtin_t style, lv_cbs_t * copy)
  *   STATIC FUNCTIONS
  **********************/
 
-#if 0 /*The ancestor design function is used */
 /**
  * Handle the drawing related tasks of the check boxes
  * @param cb pointer to an object
@@ -214,14 +217,23 @@ static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mo
 {
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
-    	return false;
+    	return ancestor_design_f(cb, mask, mode);
+    } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
+        lv_cb_ext_t * cb_ext = lv_obj_get_ext(cb);
+        lv_btn_ext_t * bullet_ext = lv_obj_get_ext(cb_ext->bullet);
+
+        /*Be sure he state of the bullet is the same as the parent button*/
+        bullet_ext->state = cb_ext->bg_btn.state;
+
+        return ancestor_design_f(cb, mask, mode);
+
     }
 
     /*Draw the object*/
 
     return true;
 }
-#endif
+
 /**
  * Initialize the rectangle styles
  */
@@ -231,8 +243,8 @@ static void lv_cbs_init(void)
 
 	/*Bg style*/
 	lv_btns_get(LV_RECTS_TRANSP, &lv_cbs_def.bg);
-	lv_cbs_def.bg.rects.hpad = 0 * LV_DOWNSCALE;
-	lv_cbs_def.bg.rects.vpad = 0 * LV_DOWNSCALE;
+	lv_cbs_def.bg.rects.hpad = 6 * LV_DOWNSCALE;
+	lv_cbs_def.bg.rects.vpad = 6 * LV_DOWNSCALE;
 	lv_cbs_def.bg.rects.opad = 5 * LV_DOWNSCALE;
 
 	/*Bullet style*/
@@ -251,12 +263,12 @@ static void lv_cbs_init(void)
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x10, 0x20, 0x30);
 	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE;
-	lv_cbs_def.bullet.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
+	lv_cbs_def.bullet.flags[LV_BTN_STATE_TGL_REL].light_en = 1;
 
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x50, 0x70, 0x90);
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
 	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE;
-	lv_cbs_def.bullet.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
+	lv_cbs_def.bullet.flags[LV_BTN_STATE_TGL_PR].light_en = 1;
 
 	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER;
 	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
@@ -265,6 +277,7 @@ static void lv_cbs_init(void)
 
 	lv_cbs_def.bullet.rects.bwidth = 2 * LV_DOWNSCALE;
 	lv_cbs_def.bullet.rects.bopa = 70;
+    lv_cbs_def.bullet.rects.light = 6 * LV_DOWNSCALE;
 	lv_cbs_def.bullet.rects.empty = 0;
 	lv_cbs_def.bullet.rects.round = LV_OBJ_DEF_WIDTH / 3 / 4;
 	lv_cbs_def.bullet.rects.hpad = 0 * LV_DOWNSCALE;

@@ -31,11 +31,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if USE_LV_RECT != 0
 static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
 static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h);
+#endif /*USE_LV_RECT != 0*/
 
 /**********************
  *  STATIC VARIABLES
@@ -51,6 +53,7 @@ static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color
 #endif
 
 
+#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 static lv_rects_t lv_img_no_pic_rects = {
   .objs.color = COLOR_BLACK, .gcolor = COLOR_BLACK,
   .bcolor = COLOR_RED, .bwidth = 2 * LV_DOWNSCALE, .bopa = 100,
@@ -62,6 +65,7 @@ static lv_labels_t lv_img_no_pic_labels = {
   .letter_space = 1 * LV_DOWNSCALE, .line_space =  1 * LV_DOWNSCALE,
   .mid =  1,
 };
+#endif
 
 /**********************
  *      MACROS
@@ -70,6 +74,8 @@ static lv_labels_t lv_img_no_pic_labels = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+#if USE_LV_RECT != 0
 /**
  * Draw a rectangle 
  * @param cords_p the coordinates of the rectangle
@@ -98,7 +104,9 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p,
         }
     }
 }
+#endif /*USE_LV_RECT != 0*/
 
+#if USE_LV_LABEL != 0
 /**
  * Write a text
  * @param cords_p coordinates of the label
@@ -156,7 +164,9 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
     }
 }
 
+#endif /* USE_LV_LABEL != 0*/
 
+#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 /**
  * Draw an image
  * @param cords_p the coordinates of the image
@@ -178,21 +188,6 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 			color_t buf[LV_HOR_RES];
 			uint32_t br;
 			area_t act_area;
-			uint8_t ds_shift = 0;
-			uint8_t ds_num = 0;
-		#if LV_DOWNSCALE <= 1 || LV_UPSCALE_MAP == 0
-			ds_shift = 0;
-			ds_num = 1;
-		#elif LV_DOWNSCALE == 2
-			ds_shift = 1;
-			ds_num = 2;
-		#elif LV_DOWNSCALE == 4
-			ds_shift = 2;
-			ds_num = 4;
-		#else
-		#error "LV: not supported LV_DOWNSCALE value"
-		#endif
-
 
 			area_t mask_sub;
 			bool union_ok;
@@ -205,32 +200,28 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 			res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
 
 			uint32_t start_offset = sizeof(lv_img_raw_header_t);
-			start_offset += (area_get_width(cords_p) >> ds_shift) *
-						   ((mask_sub.y1 - cords_p->y1) >> ds_shift) * sizeof(color_t); /*First row*/
-			start_offset += ((mask_sub.x1 - cords_p->x1) >> ds_shift) * sizeof(color_t); /*First col*/
+			start_offset += area_get_width(cords_p) *
+						   (mask_sub.y1 - cords_p->y1) * sizeof(color_t); /*First row*/
+			start_offset += (mask_sub.x1 - cords_p->x1) * sizeof(color_t); /*First col*/
 			fs_seek(&file, start_offset);
 
-			uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift) * sizeof(color_t);
-			uint32_t next_row = (area_get_width(cords_p) >> ds_shift) * sizeof(color_t) - useful_data;
+			uint32_t useful_data = area_get_width(&mask_sub) * sizeof(color_t);
+			uint32_t next_row = area_get_width(cords_p) * sizeof(color_t) - useful_data;
 
 			area_cpy(&act_area, &mask_sub);
 
-			/* Round down the start coordinate, because the upscaled images
-			 * can start only LV_DOWNSCALE 'y' coordinates */
-			act_area.y1 &= ~(cord_t)(ds_num - 1) ;
-			act_area.y2 = act_area.y1 + ds_num - 1;
+			act_area.y2 = act_area.y1;
 			uint32_t act_pos;
 
-			for(row = mask_sub.y1; row <= mask_sub.y2; row += ds_num) {
+			for(row = mask_sub.y1; row <= mask_sub.y2; row ++) {
 				res = fs_read(&file, buf, useful_data, &br);
 				map_fp(&act_area, &mask_sub, buf, opa, header.transp,
 								  imgs_p->objs.color, imgs_p->recolor_opa);
 				fs_tell(&file, &act_pos);
 				fs_seek(&file, act_pos + next_row);
-				act_area.y1 += ds_num;
-				act_area.y2 += ds_num;
+				act_area.y1 ++;
+				act_area.y2 ++;
 			}
-
 		}
 		fs_close(&file);
 
@@ -241,8 +232,9 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 	}
 }
 
+#endif /*USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0*/
 
-
+#if USE_LV_LINE != 0
 /**
  * Draw a line
  * @param p1 first point of the line
@@ -258,9 +250,9 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 
 	if(p1->x == p2->x && p1->y == p2->y) return;
 
-	cord_t dx = abs(p2->x - p1->x);
+	cord_t dx = MATH_ABS(p2->x - p1->x);
 	cord_t sx = p1->x < p2->x ? 1 : -1;
-	cord_t dy = abs(p2->y - p1->y);
+	cord_t dy = MATH_ABS(p2->y - p1->y);
 	cord_t sy = p1->y < p2->y ? 1 : -1;
 	cord_t err = (dx > dy ? dx : -dy) / 2;
 	cord_t e2;
@@ -370,11 +362,13 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 }
+#endif /*USE_LV_LINE != 0*/
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+#if USE_LV_RECT != 0
 /**
  * Draw the middle part (rectangular) of a rectangle
  * @param cords_p the coordinates of the original rectangle
@@ -862,3 +856,6 @@ static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h)
 
 	return r;
 }
+
+#endif /*USE_LV_RECT != 0*/
+

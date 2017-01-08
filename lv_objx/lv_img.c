@@ -7,7 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#if USE_LV_IMG != 0
+#include "misc_conf.h"
+#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 
 #include "lv_img.h"
 #include "../lv_draw/lv_draw.h"
@@ -55,32 +56,33 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     
     /*Create a basic object*/
     new_img = lv_obj_create(par, copy);
+    dm_assert(new_img);
     
     /*Extend the basic object to image object*/
-    lv_obj_alloc_ext(new_img, sizeof(lv_img_ext_t));
+    lv_img_ext_t * ext = lv_obj_alloc_ext(new_img, sizeof(lv_img_ext_t));
+    dm_assert(ext);
+    ext->fn = NULL;
+    ext->w = lv_obj_get_width(new_img);
+    ext->h = lv_obj_get_height(new_img);
+    ext->transp = 0;
 
     /*Init the new object*/    
     lv_obj_set_signal_f(new_img, lv_img_signal);
     lv_obj_set_design_f(new_img, lv_img_design);
     
-    lv_img_ext_t * img_ext = lv_obj_get_ext(new_img);
-
     if(copy == NULL) {
-		img_ext->fn = NULL;
-		img_ext->w = lv_obj_get_width(new_img);
-		img_ext->h = lv_obj_get_height(new_img);
-		img_ext->transp = 0;
-
-		/*Enable auto size for non screens*/
-		if(par != NULL) {
-			img_ext->auto_size = 1;
-		} else {
-			img_ext->auto_size = 0;
-		}
+		/* Enable auto size for non screens
+		 * because image screens are wallpapers
+		 * and must be screen sized*/
+		if(par != NULL) ext->auto_size = 1;
+		else ext->auto_size = 0;
 	    lv_obj_set_style(new_img, lv_imgs_get(LV_IMGS_DEF, NULL));
     } else {
-    	img_ext->auto_size = LV_EA(copy, lv_img_ext_t)->auto_size;
+    	ext->auto_size = lv_img_get_auto_size(copy);
     	lv_img_set_file(new_img, LV_EA(copy, lv_img_ext_t)->fn);
+
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_img);
     }
 
     return new_img;
@@ -205,10 +207,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	ext->w = header.w;
 	ext->h = header.h;
 	ext->transp = header.transp;
-#if LV_UPSCALE_MAP != 0
-	ext->w *= LV_DOWNSCALE;
-	ext->h *= LV_DOWNSCALE;
-#endif
+
 	if(fn != NULL) {
 		ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
 		strcpy(ext->fn, fn);

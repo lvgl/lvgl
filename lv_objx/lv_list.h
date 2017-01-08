@@ -12,6 +12,19 @@
 #include "lv_conf.h"
 #if USE_LV_LIST != 0
 
+/*Testing of dependencies*/
+#if USE_LV_BTN == 0
+#error "lv_list: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#endif
+
+#if USE_LV_LABEL == 0
+#error "lv_list: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#endif
+
+#if USE_LV_IMG == 0
+#error "lv_list: lv_img is required. Enable it in lv_conf.h (USE_LV_IMG  1) "
+#endif
+
 #include "../lv_obj/lv_obj.h"
 #include "lv_page.h"
 #include "lv_btn.h"
@@ -41,14 +54,15 @@ typedef struct
 typedef enum
 {
 	LV_LISTS_DEF,
-	LV_LISTS_GAP,
-	LV_LISTS_TIGHT,
+    LV_LISTS_SCRL,
+	LV_LISTS_TRANSP,
 }lv_lists_builtin_t;
 
 typedef enum
 {
+    LV_LIST_FIT_WIDTH,
+    LV_LIST_FIT_WIDTH_SB,    /*Let space for the scrollbar*/
 	LV_LIST_FIT_CONTENT,
-	LV_LIST_FIT_HOLDER,
 	LV_LIST_FIT_LONGEST,
 }lv_list_fit_t;
 
@@ -72,6 +86,7 @@ void lv_list_down(lv_obj_t * list);
 void lv_list_up(lv_obj_t * list);
 void lv_list_set_fit(lv_obj_t * list, lv_list_fit_t fit);
 lv_list_fit_t lv_list_get_fit(lv_obj_t * list);
+const char * lv_list_element_get_txt(lv_obj_t * liste);
 
 /**********************
  *      MACROS

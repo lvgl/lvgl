@@ -12,6 +12,11 @@
 #include "lv_conf.h"
 #if USE_LV_BTN != 0
 
+/*Testing of dependencies*/
+#if USE_LV_RECT == 0
+#error "lv_btn: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
+#endif
+
 #include "lv_rect.h"
 #include "../lv_obj/lv_dispi.h"
 

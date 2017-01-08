@@ -29,7 +29,7 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_refr_task(void);
+static void lv_refr_task(void * param);
 static void lv_refr_join_area(void);
 static void lv_refr_areas(void);
 #if LV_VDB_SIZE == 0
@@ -65,7 +65,7 @@ void lv_refr_init(void)
     memset(inv_buf, 0, sizeof(inv_buf));
 
     ptask_t* task;
-    task = ptask_create(lv_refr_task, LV_REFR_PERIOD, PTASK_PRIO_MID);
+    task = ptask_create(lv_refr_task, LV_REFR_PERIOD, PTASK_PRIO_MID, NULL);
     dm_assert(task);
     
 }
@@ -96,11 +96,6 @@ void lv_inv_area(const area_t * area_p)
     	com_area.y1 = com_area.y1 & (~0x1);
     	com_area.x2 = com_area.x2 | 0x1;
     	com_area.y2 = com_area.y2 | 0x1;
-#elif LV_DOWNSCALE == 4
-    	com_area.x1 = com_area.x1 & (~0x3);
-    	com_area.y1 = com_area.y1 & (~0x3);
-    	com_area.x2 = com_area.x2 | 0x3;
-    	com_area.y2 = com_area.y2 | 0x3;
 #endif
 
     	/*Save only if this area is not in one of the saved areas*/
@@ -127,8 +122,9 @@ void lv_inv_area(const area_t * area_p)
 
 /**
  * Called periodically to handle the refreshing
+ * @param param unused
  */
-static void lv_refr_task(void)
+static void lv_refr_task(void * param)
 {
     lv_refr_join_area();
     
@@ -239,8 +235,6 @@ static void lv_refr_area_with_vdb(const area_t * area_p)
     /*Round the row number with downscale*/
 #if LV_DOWNSCALE == 2
     max_row &= (~0x1);
-#elif LV_DOWNSCALE == 4
-    max_row &= (~0x3);
 #endif
 
     /*Refresh all rows*/
@@ -282,7 +276,7 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
     /*Get the most top object which is not covered by others*/
     top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
 
-    /*Do the refreshing*/
+    /*Do the refreshing from the top object*/
     lv_refr_make(top_p, &start_mask);
             
     /*Flush the content of the VDB*/ 
@@ -342,7 +336,7 @@ static void lv_refr_make(lv_obj_t * top_p, const area_t * mask_p)
     /*Refresh the top object and its children*/
     lv_refr_obj(top_p, mask_p);
     
-    /*Draw the 'younger' objects because they can be on top_obj */
+    /*Draw the 'younger' sibling objects because they can be on top_obj */
     lv_obj_t * par;
     lv_obj_t * i;
     lv_obj_t * border_p = top_p;
@@ -364,6 +358,13 @@ static void lv_refr_make(lv_obj_t * top_p, const area_t * mask_p)
          *so the 'younger' brothers of parent will be refreshed*/
         border_p = par;
         /*Go a level deeper*/
+        par = lv_obj_get_parent(par);
+    }
+
+    /*Call the post draw design function of the parents of the to object*/
+    par = lv_obj_get_parent(top_p);
+    while(par != NULL) {
+        par->design_f(par, mask_p, LV_DESIGN_DRAW_POST);
         par = lv_obj_get_parent(par);
     }
 }

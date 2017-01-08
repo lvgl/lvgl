@@ -17,6 +17,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_TA_DEF_WIDTH     (120 * LV_DOWNSCALE)
+#define LV_TA_DEF_HEIGHT    (80 * LV_DOWNSCALE)
 
 /**********************
  *      TYPEDEFS
@@ -35,9 +37,11 @@ static void lv_tas_init(void);
  *  STATIC VARIABLES
  **********************/
 static lv_tas_t lv_tas_def;
+static lv_tas_t lv_tas_simple;
+static lv_tas_t lv_tas_transp;
 
 lv_design_f_t ancestor_design_f;
-lv_design_f_t scrling_design_f;
+lv_design_f_t scrl_design_f;
 
 /**********************
  *      MACROS
@@ -66,42 +70,38 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_alloc_ext(new_ta, sizeof(lv_ta_ext_t));
     dm_assert(ext);
+    ext->cur_hide = 0;
+    ext->cursor_pos = 0;
+    ext->cursor_valid_x = 0;
+    ext->label = NULL;
 
-    if(ancestor_design_f == NULL) {
-    	ancestor_design_f = lv_obj_get_design_f(new_ta);
-    }
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_ta);
+    if(scrl_design_f == NULL) scrl_design_f = lv_obj_get_design_f(ext->page.scrl);
 
     lv_obj_set_signal_f(new_ta, lv_ta_signal);
     lv_obj_set_design_f(new_ta, lv_ta_design);
 
-    ext->cursor_valid_x = 0;
-    ext->cursor_pos = 0;
-    ext->cur_hide = 0;
-
     /*Init the new text area object*/
     if(copy == NULL) {
     	ext->label = lv_label_create(new_ta, NULL);
-    	if(scrling_design_f == NULL) {
-    		scrling_design_f = lv_obj_get_design_f(ext->page.scrolling);
-    	}
 
-    	lv_obj_set_design_f(ext->page.scrolling, lv_ta_scrling_design);
+    	lv_obj_set_design_f(ext->page.scrl, lv_ta_scrling_design);
     	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
     	lv_label_set_text(ext->label, "Text area");
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, false);
     	lv_obj_set_style(new_ta, lv_tas_get(LV_TAS_DEF, NULL));
-    	lv_obj_set_size_us(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
+    	lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
     }
     /*Copy an existing object*/
     else {
-    	lv_obj_set_design_f(ext->page.scrolling, lv_ta_scrling_design);
+    	lv_obj_set_design_f(ext->page.scrl, lv_ta_scrling_design);
     	lv_ta_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->label = lv_label_create(new_ta, copy_ext->label);
     	lv_page_glue_obj(ext->label, true);
 
-    	/*Refresh the style when everything is ready*/
-    	lv_obj_set_style(new_ta, lv_obj_get_style(copy));
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_ta);
     }
     
     /*Create a cursor blinker animation*/
@@ -148,16 +148,20 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     			 * (The created label will be deleted automatically) */
     			break;
     		case LV_SIGNAL_STYLE_CHG:
-    			lv_obj_set_style(ext->label, &style->labels);
-    	    	lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-    	    			(style->pages.bg_rects.hpad + style->pages.scrable_rects.hpad));
-    	    	lv_label_set_text(ext->label, NULL);
+    		    if(ext->label) {
+                    lv_obj_set_style(ext->label, &style->labels);
+                    lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
+                            (style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
+                    lv_label_set_text(ext->label, NULL);
+    		    }
     			break;
     		/*Set the label width according to the text area width*/
     		case LV_SIGNAL_CORD_CHG:
-    	    	lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-    	    			(style->pages.bg_rects.hpad + style->pages.scrable_rects.hpad));
-    	    	lv_label_set_text(ext->label, NULL);
+    		    if(ext->label != NULL) {
+                    lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
+                            (style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
+                    lv_label_set_text(ext->label, NULL);
+    		    }
     			break;
     		default:
     			break;
@@ -180,10 +184,13 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 
-	/*Insert the character*/
-	char buf[LV_TA_MAX_LENGTH];
 	const char * label_txt = lv_label_get_text(ext->label);
 
+	/*Test the new length: txt length + 1 (closing'\0') + 1 (c character)*/
+    if((strlen(label_txt) + 2) > LV_TA_MAX_LENGTH) return;
+    char buf[LV_TA_MAX_LENGTH];
+
+    /*Insert the character*/
 	memcpy(buf, label_txt, ext->cursor_pos);
 	buf[ext->cursor_pos] = c;
 	memcpy(buf+ext->cursor_pos+1, label_txt+ext->cursor_pos, strlen(label_txt) - ext->cursor_pos + 1);
@@ -207,15 +214,19 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 
-	/*Insert the text*/
-	char buf[LV_TA_MAX_LENGTH];
 	const char * label_txt = lv_label_get_text(ext->label);
-	uint16_t label_len = strlen(label_txt);
-	uint16_t txt_len = strlen(txt);
+    uint16_t label_len = strlen(label_txt);
+    uint16_t txt_len = strlen(txt);
+
+    /*Test the new length (+ 1 for the closing '\0')*/
+    if((label_len + txt_len + 1) > LV_TA_MAX_LENGTH) return;
+
+    /*Insert the text*/
+    char buf[LV_TA_MAX_LENGTH];
 
 	memcpy(buf, label_txt, ext->cursor_pos);
-	memcpy(buf+ext->cursor_pos, txt, txt_len);
-	memcpy(buf+ext->cursor_pos + txt_len, label_txt+ext->cursor_pos, label_len - ext->cursor_pos + 1);
+	memcpy(buf + ext->cursor_pos, txt, txt_len);
+	memcpy(buf + ext->cursor_pos + txt_len, label_txt+ext->cursor_pos, label_len - ext->cursor_pos + 1);
 
 	/*Refresh the label*/
 	lv_label_set_text(ext->label, buf);
@@ -294,7 +305,11 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	point_t cur_pos;
 	lv_tas_t * style = lv_obj_get_style(ta);
 	const font_t * font_p = font_get(style->labels.font);
+	area_t label_cords;
+    area_t ta_cords;
 	lv_label_get_letter_pos(ext->label, pos, &cur_pos);
+	lv_obj_get_cords(ta, &ta_cords);
+    lv_obj_get_cords(ext->label, &label_cords);
 
 	/*Check the top*/
 	if(lv_obj_get_y(label_par) + cur_pos.y < 0) {
@@ -302,9 +317,9 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	}
 
 	/*Check the bottom*/
-	if(lv_obj_get_y(label_par) + cur_pos.y + font_get_height(font_p) > lv_obj_get_height(ta)) {
+	if(label_cords.y1 + cur_pos.y + font_get_height(font_p) + style->pages.scrl_rects.vpad > ta_cords.y2) {
 		lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) +
-				                     font_get_height(font_p) + style->pages.scrable_rects.vpad * 2));
+				                     font_get_height(font_p) + 2 * style->pages.scrl_rects.vpad));
 	}
 
 	lv_obj_inv(ta);
@@ -437,6 +452,12 @@ lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy)
 		case LV_TAS_DEF:
 			style_p = &lv_tas_def;
 			break;
+        case LV_TAS_SIMPLE:
+            style_p = &lv_tas_simple;
+            break;
+        case LV_TAS_TRANSP:
+            style_p = &lv_tas_transp;
+            break;
 		default:
 			style_p = &lv_tas_def;
 	}
@@ -491,12 +512,12 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 {
 	if(mode == LV_DESIGN_COVER_CHK) {
 		/*Return false if the object is not covers the mask_p area*/
-		return scrling_design_f(scrling, mask, mode);
+		return scrl_design_f(scrling, mask, mode);
 	} else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*Draw the object*/
-		scrling_design_f(scrling, mask, mode);
+		scrl_design_f(scrling, mask, mode);
 	} else if(mode == LV_DESIGN_DRAW_POST) {
-		scrling_design_f(scrling, mask, mode);
+		scrl_design_f(scrling, mask, mode);
 
 		/*Draw the cursor too*/
 		lv_obj_t * ta = lv_obj_get_parent(scrling);
@@ -562,6 +583,7 @@ static void lv_tas_init(void)
 {
 	/*Default style*/
 	lv_pages_get(LV_PAGES_DEF, &lv_tas_def.pages);
+	lv_tas_def.pages.sb_mode = LV_PAGE_SB_MODE_DRAG;
 
 	lv_labels_get(LV_LABELS_TXT, &lv_tas_def.labels);
 	lv_tas_def.labels.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
@@ -569,5 +591,18 @@ static void lv_tas_init(void)
 	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
 	lv_tas_def.cursor_width = 1 * LV_DOWNSCALE;	/*>=1 px for visible cursor*/
 	lv_tas_def.cursor_show = 1;
+
+	memcpy(&lv_tas_simple, &lv_tas_def, sizeof(lv_tas_t));
+    lv_pages_get(LV_PAGES_SIMPLE, &lv_tas_simple.pages);
+    lv_tas_simple.pages.sb_mode = LV_PAGE_SB_MODE_DRAG;
+    lv_tas_simple.pages.scrl_rects.objs.transp = 0; /*if transp == 1 the cursor will not be drawn*/
+    lv_tas_simple.pages.bg_rects.objs.color = COLOR_WHITE;
+    lv_tas_simple.pages.bg_rects.gcolor = COLOR_SILVER;
+    lv_tas_simple.pages.bg_rects.bcolor = COLOR_GRAY;
+
+    memcpy(&lv_tas_transp, &lv_tas_def, sizeof(lv_tas_t));
+    lv_pages_get(LV_PAGES_TRANSP, &lv_tas_transp.pages);
+    lv_tas_transp.pages.scrl_rects.objs.transp = 0; /*if transp == 1 the cursor will not be drawn*/
+
 }
 #endif

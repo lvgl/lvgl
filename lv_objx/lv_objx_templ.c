@@ -58,12 +58,15 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor template*/
 	/*TODO modify it to the ancestor create function */
-    lv_obj_t * new_templ = lv_obj_create(par, copy);
+    lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
     dm_assert(new_templ);
     
     /*Allocate the template type specific extended data*/
     lv_templ_ext_t * ext = lv_obj_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
     dm_assert(ext);
+
+    /*Initialize the allocated 'ext' */
+
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_f(new_templ, lv_templ_signal);
@@ -71,11 +74,14 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new template template*/
     if(copy == NULL) {
-
+        lv_obj_set_style(new_templ, lv_templs_get(LV_TEMPLS_DEF, NULL));
     }
     /*Copy an existing template*/
     else {
     	lv_templ_ext_t * copy_ext = lv_obj_get_ext(copy);
+
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_templ);
     }
     
     return new_templ;
@@ -94,7 +100,7 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
 
     /* Include the ancient signal function */
     /* TODO update it to the ancestor's signal function*/
-    valid = lv_obj_signal(templ, sign, param);
+    valid = lv_ANCESTOR_signal(templ, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -171,20 +177,25 @@ lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy)
  */
 static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode)
 {
+    /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	/*Return false if the object is not covers the mask_p area*/
     	return false;
     }
-
-
     /*Draw the object*/
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
+
+    }
+    /*Post draw when the children are drawn*/
+    else if(mode == LV_DESIGN_DRAW_POST) {
+
+    }
 
     return true;
 }
 
 
 /**
- * Initialize the template styles
+ * Initialize the built-in template styles
  */
 static void lv_temps_init(void)
 {

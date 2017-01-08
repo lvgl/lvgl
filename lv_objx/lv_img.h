@@ -10,7 +10,8 @@
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#if USE_LV_IMG != 0
+#include "misc_conf.h"
+#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 
 #include "../lv_obj/lv_obj.h"
 #include "misc/fs/fsint.h"

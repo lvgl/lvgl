@@ -1,5 +1,5 @@
 /**
- * @file lv_app_sup.c
+ * @file lv_app_kb.c
  *
  */
 
@@ -34,21 +34,21 @@ static lv_obj_t * kb_ta;
 static const char * kb_map_lc[] = {
 "\0051#", "\004q", "\004w", "\004e", "\004r", "\004t", "\004y", "\004u", "\004i", "\004o", "\004p", "\007Del", "\n",
 "\007ABC", "\004a", "\004s", "\004d", "\004f", "\004g", "\004h", "\004j", "\004k", "\004l", "\010Enter", "\n",
-"*", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ";", "\n",
+"_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
 "\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
 };
 
 static const char * kb_map_uc[] = {
 "\0051#", "\004Q", "\004W", "\004E", "\004R", "\004T", "\004Y", "\004U", "\004I", "\004O", "\004P", "\007Del", "\n",
 "\007abc", "\004A", "\004S", "\004D", "\004F", "\004G", "\004H", "\004J", "\004K", "\004L", "\010Enter", "\n",
-"*", "/", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ";", "\n",
+"_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
 "\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
 };
 
 static const char * kb_map_spec[] = {
-"0", "1", "2", "3", "4", "5", "6", "4", "8", "9", "\002Del", "\n",
-"\002abc", "+", "-", "=", "%", "!", "?", "#", "<", ">", "\002Enter", "\n",
-"\\", "@", "$", "_", "(", ")", "{", "}", "[", "]", ":", "\"", "'", "\n",
+"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\002Del", "\n",
+"\002abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+"\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
 "\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
 };
 
@@ -61,7 +61,6 @@ static const char * kb_map_num[] = {
 
 static cord_t kb_ta_ori_size;
 static uint8_t kb_mode;
-static bool kb_first;
 static void (*kb_close_action)(lv_obj_t *);
 static void (*kb_ok_action)(lv_obj_t *);
 static lv_btnms_t kb_btnms;
@@ -77,10 +76,16 @@ static lv_btnms_t kb_btnms;
 void lv_app_kb_init(void)
 {
     lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
+    kb_btnms.rects.gcolor = COLOR_WHITE;
+    kb_btnms.rects.objs.color = COLOR_WHITE;
     kb_btnms.rects.opad = 4 + LV_DOWNSCALE;
     kb_btnms.rects.vpad = 3 + LV_DOWNSCALE;
     kb_btnms.rects.hpad = 3 + LV_DOWNSCALE;
     kb_btnms.rects.round = 0;
+    kb_btnms.rects.bwidth = 0;
+
+   // kb_btnms.btns.rects.bwidth = 0;
+    kb_btnms.btns.rects.round = 0;
 }
 
 /**
@@ -102,7 +107,6 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     kb_mode = mode;
     kb_close_action = close;
     kb_ok_action = ok;
-    kb_first = false;
 
     /*Create a button matrix for the keyboard  */
     kb_btnm = lv_btnm_create(lv_scr_act(), NULL);
@@ -125,11 +129,11 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     lv_obj_set_y(kb_win, 0);
 
     /*If the text area is higher then the new size of the window redus its size too*/
-	lv_app_style_t * app_style = lv_app_get_style();
-    cord_t win_cont_h = lv_obj_get_height(lv_win_get_content(kb_win)) -  2 * app_style->win_style.content.scrable_rects.vpad;
+	lv_app_style_t * app_style = lv_app_style_get();
+    cord_t win_h = lv_obj_get_height(kb_win) -  2 * app_style->win_style.pages.scrl_rects.vpad;
 	kb_ta_ori_size = lv_obj_get_height(kb_ta);
-    if(lv_obj_get_height(kb_ta)  > win_cont_h) {
-    	lv_obj_set_height(kb_ta, win_cont_h);
+    if(lv_obj_get_height(kb_ta)  > win_h) {
+    	lv_obj_set_height(kb_ta, win_h);
     }
 
     lv_ta_set_cursor_pos(kb_ta, LV_TA_CUR_LAST);
@@ -137,7 +141,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 #if LV_APP_ANIM_LEVEL != 0
     lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-    lv_page_focus(lv_win_get_content(kb_win), kb_ta, false);
+    lv_page_focus(kb_win, kb_ta, false);
 #endif
 }
 
@@ -195,34 +199,14 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
     } else if(strcmp(txt, "1#") == 0) {
         lv_btnm_set_map(btnm, kb_map_spec);
     }  else if(strcmp(txt, "Enter") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_add_char(kb_ta, '\n');
     } else if(strcmp(txt, "Left") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_cursor_left(kb_ta);
     } else if(strcmp(txt, "Right") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_cursor_right(kb_ta);
     } else if(strcmp(txt, "Del") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_del(kb_ta);
     } else if(strcmp(txt, "+/-") == 0) {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         uint16_t cur = lv_ta_get_cursor_pos(kb_ta);
         const char * ta_txt = lv_ta_get_txt(kb_ta);
         if(ta_txt[0] == '-') {
@@ -247,17 +231,13 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
         lv_app_kb_close(true);
         return LV_ACTION_RES_INV;
     } else {
-        if((kb_mode & LV_APP_KB_MODE_CLR) != 0 && kb_first == false) {
-            lv_ta_set_text(kb_ta, "");
-            kb_first = true;
-        }
         lv_ta_add_text(kb_ta, txt);
     }
 
 #if LV_APP_ANIM_LEVEL != 0
     lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-    lv_page_focus(lv_win_get_content(kb_win), kb_ta, false);
+    lv_page_focus(kb_win, kb_ta, false);
 #endif
     return LV_ACTION_RES_OK;
 }

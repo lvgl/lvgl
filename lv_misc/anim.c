@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_task (void);
+static void anim_task (void * param);
 static bool anim_ready_handler(anim_t * a);
 
 /**********************
@@ -65,7 +65,7 @@ void anim_init(void)
 {
 	ll_init(&anim_ll, sizeof(anim_t));
 	last_task_run = systick_get();
-	ptask_create(anim_task, LV_REFR_PERIOD, PTASK_PRIO_MID);
+	ptask_create(anim_task, LV_REFR_PERIOD, PTASK_PRIO_MID, NULL);
 }
 
 /**
@@ -83,7 +83,7 @@ void anim_create(anim_t * anim_p)
 	memcpy(new_anim, anim_p, sizeof(anim_t));
 
 	/*Set the start value*/
-	new_anim->fp(new_anim->var, new_anim->start);
+	if(new_anim->fp != NULL) new_anim->fp(new_anim->var, new_anim->start);
 }
 
 /**
@@ -125,7 +125,7 @@ bool anim_del(void * var, anim_fp_t fp)
  */
 uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 {
-	int32_t d = abs((int32_t) start - end);
+	int32_t d = MATH_ABS((int32_t) start - end);
 	uint16_t time = (int32_t)((int32_t)(d * 1000) / speed);
 
 	if(time == 0) {
@@ -160,8 +160,9 @@ anim_path_t * anim_get_path(anim_path_name_t name)
 
 /**
  * Periodically handle the animations.
+ * @param param unused
  */
-static void anim_task (void)
+static void anim_task (void * param)
 {
 	uint32_t elaps;
 	elaps = systick_elaps(last_task_run);
@@ -191,7 +192,7 @@ static void anim_task (void)
 			new_val = new_val >> ANIM_PATH_NORM_SHIFT;
 			new_val += a->start;
 
-			a->fp(a->var, new_val);	/*Apply the calculated value*/
+			if(a->fp != NULL) a->fp(a->var, new_val);	/*Apply the calculated value*/
 
 			/*If the time is elapsed the animation is ready*/
 			if(a->act_time >= a->time) {

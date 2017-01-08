@@ -11,7 +11,14 @@
 #if LV_APP_ENABLE != 0
 #include "lv_app_util/lv_app_kb.h"
 #include "lv_app_util/lv_app_notice.h"
+#include "lv_app_util/lv_app_fsel.h"
+
 #include "lvgl/lv_misc/anim.h"
+
+#include "../lv_appx/lv_app_example.h"
+#include "../lv_appx/lv_app_sysmon.h"
+#include "../lv_appx/lv_app_terminal.h"
+#include "../lv_appx/lv_app_files.h"
 
 /*********************
  *      DEFINES
@@ -44,6 +51,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app);
 static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app);
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0
 static void lv_app_win_close_anim_cb(lv_obj_t * app_win);
+static void lv_app_win_minim_anim_cb(lv_obj_t * app_win);
 #endif
 
 static void lv_app_init_icons(void);
@@ -64,33 +72,43 @@ static lv_obj_t * sc_page;   /*A page for the shortcuts */
 static lv_app_inst_t * con_send; /*The sender application in connection mode. Not NLL means connection mode is active*/
 static lv_app_style_t app_style; /*Styles for application related things*/
 
-
 /*Declare icons*/
-LV_IMG_DECLARE(img_add);
-LV_IMG_DECLARE(img_battery_empty);
-LV_IMG_DECLARE(img_battery_full);
-LV_IMG_DECLARE(img_battery_half);
-LV_IMG_DECLARE(img_bubble);
-LV_IMG_DECLARE(img_calendar);
-LV_IMG_DECLARE(img_clock);
+#if USE_IMG_CLOSE != 0
 LV_IMG_DECLARE(img_close);
+#endif
+
+#if USE_IMG_DOWN != 0
 LV_IMG_DECLARE(img_down);
+#endif
+
+#if USE_IMG_DRIVER != 0
 LV_IMG_DECLARE(img_driver);
-LV_IMG_DECLARE(img_eject);
+#endif
+
+#if USE_IMG_FILE != 0
+LV_IMG_DECLARE(img_file);
+#endif
+
+#if USE_IMG_FOLDER != 0
 LV_IMG_DECLARE(img_folder);
-LV_IMG_DECLARE(img_image);
+#endif
+
+#if USE_IMG_LEFT != 0
 LV_IMG_DECLARE(img_left);
-LV_IMG_DECLARE(img_music);
+#endif
+
+#if USE_IMG_OK != 0
 LV_IMG_DECLARE(img_ok);
-LV_IMG_DECLARE(img_play);
+#endif
+
+#if USE_IMG_RIGHT != 0
 LV_IMG_DECLARE(img_right);
-LV_IMG_DECLARE(img_settings);
-LV_IMG_DECLARE(img_shut_down);
-LV_IMG_DECLARE(img_star);
+#endif
+
+#if USE_IMG_UP != 0
 LV_IMG_DECLARE(img_up);
-LV_IMG_DECLARE(img_user);
-LV_IMG_DECLARE(img_video);
-LV_IMG_DECLARE(img_volume);
+#endif
+
 
 /**********************
  *      MACROS
@@ -120,6 +138,7 @@ void lv_app_init(void)
 	/*Init. the utilities*/
 	lv_app_kb_init();
 	lv_app_notice_init();
+	lv_app_fsel_init();
 
 	/*Initialize all application descriptors*/
 	/*ADD NEW APPLICATION INITS HERE!!!*/
@@ -128,15 +147,30 @@ void lv_app_init(void)
 	dsc = ll_ins_head(&app_dsc_ll);
 	*dsc = lv_app_example_init();
 #endif
+
+#if USE_LV_APP_SYSMON != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_sysmon_init();
+#endif
+
+#if USE_LV_APP_TERMINAL != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_terminal_init();
+#endif
+
+#if USE_LV_APP_FILES != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_files_init();
+#endif
 }
 
 /**
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
- * @param cstr a Create STRing which can give initial parameters to the application (NULL or "" if unused)
+ * @param conf pointer to an application specific configuration structure or NULL if unused
  * @return pointer to the opened application or NULL if any error occurred
  */
-lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr)
+lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, void * conf)
 {
 	/*Add a new application and initialize it*/
 	lv_app_inst_t * app;
@@ -144,10 +178,15 @@ lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, const char * cstr)
 	app->dsc = app_dsc;
 	app->app_data = dm_alloc(app_dsc->app_data_size);
 	app->name = NULL;
+	app->sc = NULL;
+	app->sc_data = NULL;
+	app->sc_title = NULL;
+	app->win = NULL;
+	app->win_data = NULL;
 	lv_app_rename(app, app_dsc->name); /*Set a default name*/
 
 	/*Call the application specific run function*/
-	app_dsc->app_run(app, cstr);
+	app_dsc->app_run(app, conf);
 
 	return app;
 }
@@ -161,10 +200,18 @@ void lv_app_close(lv_app_inst_t * app)
 	lv_app_win_close(app);
 	lv_app_sc_close(app);
 
+	/*Clear the connection list*/
+	lv_app_con_del(app, NULL);
+    lv_app_con_del(NULL, app);
+
 	app->dsc->app_close(app);
 
+    memset(app->app_data, 0, app->dsc->app_data_size);
 	dm_free(app->app_data);
 	dm_free(app->name);
+
+	ll_rem(&app_inst_ll, app);
+	dm_free(app);
 }
 
 /**
@@ -175,7 +222,7 @@ void lv_app_close(lv_app_inst_t * app)
 lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 {
 	/*Save the current position of the scrollable part of the page*/
-	cord_t scrl_y = lv_obj_get_y(lv_page_get_scrable(sc_page));
+	cord_t scrl_y = lv_obj_get_y(lv_page_get_scrl(sc_page));
 
 	/*Create a basic  shortcut*/
 	app->sc = lv_btn_create(sc_page, NULL);
@@ -208,7 +255,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 
 	/* Restore position of the scrollable part of the page because
 	 * it moved when the shortcut is created*/
-	lv_obj_set_y(lv_page_get_scrable(sc_page), scrl_y);
+	lv_obj_set_y(lv_page_get_scrl(sc_page), scrl_y);
 #if LV_APP_EFFECT_ANIM == 0
     lv_page_focus(sc_page, app->sc, false);
 #else
@@ -228,6 +275,7 @@ void lv_app_sc_close(lv_app_inst_t * app)
 	lv_obj_del(app->sc);
 	app->sc = NULL;
 	app->sc_title = NULL;
+    memset(app->sc_data, 0, app->dsc->sc_data_size);
 	dm_free(app->sc_data);
 	app->sc_data = NULL;
 }
@@ -239,7 +287,6 @@ void lv_app_sc_close(lv_app_inst_t * app)
  */
 lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 {
-
 	/*Close the app list if opened*/
 	if(app_list != NULL) {
 		lv_obj_del(app_list);
@@ -249,12 +296,13 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	app->win = lv_win_create(lv_scr_act(), NULL);
 	lv_obj_set_free_p(app->win, app);
 	lv_obj_set_style(app->win, &app_style.win_style);
-	lv_obj_t * win_content = lv_page_get_scrable(lv_win_get_content(app->win));
+	lv_win_set_title(app->win, app->dsc->name);
+	lv_obj_t * win_content = lv_page_get_scrl(app->win);
 	lv_rect_set_fit(win_content, false, true);
-	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.content.bg_rects.hpad);
+	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.pages.bg_rects.hpad);
 
-	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
-	lv_win_add_ctrl_btn(app->win, "U:/icon_close", lv_app_win_close_action);
+	lv_win_add_ctrl_btn(app->win, "U:/icon_down" ,lv_app_win_minim_action);
+	lv_win_add_ctrl_btn(app->win, "U:/icon_close" ,lv_app_win_close_action);
 
     app->win_data = dm_alloc(app->dsc->win_data_size);
     app->dsc->win_open(app, app->win);
@@ -274,6 +322,8 @@ void lv_app_win_close(lv_app_inst_t * app)
 
 	lv_obj_del(app->win);
 	app->win = NULL;
+
+	memset(app->win_data, 0, app->dsc->win_data_size);
 	dm_free(app->win_data);
 	app->win_data = NULL;
 }
@@ -282,23 +332,20 @@ void lv_app_win_close(lv_app_inst_t * app)
  * @param app_send pointer to the application which is sending the message
  * @param type type of data from 'lv_app_com_type_t' enum
  * @param data pointer to the sent data
- * @param len length of 'data' in bytes
+ * @param size length of 'data' in bytes
  * @return number application which were received the message
  */
-uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , const void * data, uint32_t len)
+uint16_t lv_app_com_send(lv_app_inst_t * app_send, lv_app_com_type_t type , const void * data, uint32_t size)
 {
+    if(type == LV_APP_COM_TYPE_INV) return 0;
+
     lv_app_con_t * con;
     uint16_t rec_cnt = 0;
-
-    /*Add the notifications to the notice utility*/
-    if(type == LV_APP_COM_TYPE_NOTICE) {
-        lv_app_notice_add(data);
-    }
 
     LL_READ(app_con_ll, con) {
         if(con->sender == app_send) {
             if(con->receiver->dsc->com_rec != NULL)
-            con->receiver->dsc->com_rec(app_send, con->receiver, type, data, len);
+            con->receiver->dsc->com_rec(app_send, con->receiver, type, data, size);
             rec_cnt ++;
         }
     }
@@ -342,15 +389,16 @@ void lv_app_con_set(lv_app_inst_t * sender, lv_app_inst_t * receiver)
 
 /**
  * Delete a communication connection
- * @param sender pointer to a data sender application
- * @param receiver pointer to a data receiver application
+ * @param sender pointer to a data sender application or NULL to be true for all sender
+ * @param receiver pointer to a data receiver application  or NULL to be true for all receiver
  */
 void lv_app_con_del(lv_app_inst_t * sender, lv_app_inst_t * receiver)
 {
     lv_app_con_t * con;
 
     LL_READ(app_con_ll, con) {
-        if(con->sender == sender && con->receiver == receiver) {
+        if((con->sender == sender || sender == NULL) &&
+           (con->receiver == receiver || receiver == NULL)) {
             ll_rem(&app_con_ll, con);
             dm_free(con);
         }
@@ -426,23 +474,47 @@ lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
 
         if(next->dsc == dsc || dsc == NULL) return next;
 
+        prev = next;
+
     };
 
     return NULL;
+}
+/**
+ * Read the list of applications descriptors. (Get he next element)
+ * @param prev the previous application descriptors(at the first call give NULL to get the first)
+ * @return pointer to the next application descriptors or NULL if no more
+ */
+lv_app_dsc_t ** lv_app_dsc_get_next(lv_app_dsc_t ** prev)
+{
+    lv_app_dsc_t ** next;
+
+    if(prev == NULL) next = ll_get_head(&app_dsc_ll);
+    else next = ll_get_next(&app_dsc_ll, prev);
+
+    if(next == NULL) return NULL;
+
+    return next;
 }
 
 /**
  * Refresh the style of the applications
  * */
-void lv_app_refr_style(void)
+void lv_app_style_refr(void)
 {
     lv_style_refr_all(NULL);
 
     lv_obj_set_opa(menuh, app_style.menu_opa);
     lv_obj_set_opa(app_btn, app_style.menu_btn_opa);
 
-    lv_obj_set_width(lv_page_get_scrable(sc_page),
+    lv_obj_set_width(lv_page_get_scrl(sc_page),
                 LV_HOR_RES - 2 * (app_style.sc_page_style.bg_rects.hpad));
+
+    app_style.win_useful_w =  LV_HOR_RES - 2 * (app_style.win_style.pages.bg_rects.hpad +
+                                                app_style.win_style.pages.scrl_rects.hpad);
+
+    app_style.win_useful_h = LV_VER_RES - 2 * (app_style.win_style.pages.bg_rects.vpad +
+                                                app_style.win_style.pages.scrl_rects.vpad);
 }
 
 
@@ -450,7 +522,7 @@ void lv_app_refr_style(void)
  * Get a pointer to the application style structure. If modified then 'lv_app_refr_style' should be called
  * @return pointer to the application style structure
  */
-lv_app_style_t * lv_app_get_style(void)
+lv_app_style_t * lv_app_style_get(void)
 {
     return &app_style;
 }
@@ -469,8 +541,8 @@ static void lv_app_init_desktop(void)
     lv_obj_set_style(sc_page, &app_style.sc_page_style);
     lv_obj_set_size(sc_page, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_pos(sc_page, 0, 0);
-    lv_rect_set_fit(lv_page_get_scrable(sc_page), false, true);
-    lv_rect_set_layout(lv_page_get_scrable(sc_page), LV_RECT_LAYOUT_GRID);
+    lv_rect_set_fit(lv_page_get_scrl(sc_page), false, true);
+    lv_rect_set_layout(lv_page_get_scrl(sc_page), LV_RECT_LAYOUT_GRID);
     lv_page_set_rel_action(sc_page, lv_app_sc_page_rel_action);
 
     /*Menu on the top*/
@@ -500,7 +572,7 @@ static void lv_app_init_desktop(void)
 */
     lv_obj_align(sys_apph, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
 
-    lv_app_refr_style();
+    lv_app_style_refr();
 }
 
 /*-----------------------
@@ -524,7 +596,7 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 	else {
 		app_list = lv_list_create(lv_scr_act(), NULL);
 		lv_obj_set_style(app_list, &app_style.app_list_style);
-		lv_obj_set_opa(app_list, app_style.menu_opa);
+		lv_obj_set_opar(app_list, app_style.menu_opa);
 		lv_obj_set_size(app_list, app_style.app_list_w, app_style.app_list_h);
 		lv_obj_set_y(app_list, app_style.menu_h);
 
@@ -555,7 +627,7 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
     lv_obj_del(app_list);
     app_list = NULL;
 
-	lv_app_inst_t * app = lv_app_run(dsc, "");
+	lv_app_inst_t * app = lv_app_run(dsc, NULL);
 	lv_app_sc_open(app);
 
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA_ANIM != 0 && LV_APP_ANIM_SC != 0
@@ -710,7 +782,8 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_app_kb_close(false);
 
 #if  LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_WIN != 0
-	lv_obj_anim(app->win, LV_ANIM_FADE | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
+    lv_obj_anim(app->win, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_ANIM_WIN, 0, NULL);
+	lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
 	lv_app_sc_close(app);
 	/*The animation will close the window*/
     return LV_ACTION_RES_OK;
@@ -793,12 +866,6 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     a.fp = (anim_fp_t) lv_obj_set_y;
     anim_create(&a);
 
-#if LV_APP_EFFECT_OPA_ANIM != 0
-    a.start = OPA_TRANSP;
-    a.end = OPA_COVER;
-    a.fp = (anim_fp_t) lv_obj_set_opar;
-    anim_create(&a);
-#endif /*LV_APP_EFFECT_OPA != 0*/
 #endif /*LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0*/
 
     return LV_ACTION_RES_OK;
@@ -832,36 +899,27 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     a.path = anim_get_path(ANIM_PATH_LIN);
 
 
-    a.end = lv_obj_get_width(app->sc);
     a.start = LV_HOR_RES;
+    a.end = lv_obj_get_width(app->sc);
     a.fp = (anim_fp_t) lv_obj_set_width;
     anim_create(&a);
 
-    a.end = lv_obj_get_height(app->sc);
     a.start = LV_VER_RES;
+    a.end = lv_obj_get_height(app->sc);
     a.fp = (anim_fp_t) lv_obj_set_height;
     anim_create(&a);
 
-    a.end = cords.x1;
     a.start = 0;
+    a.end = cords.x1;
     a.fp = (anim_fp_t) lv_obj_set_x;
     anim_create(&a);
 
-    a.end = cords.y1;
     a.start = 0;
+    a.end = cords.y1;
     a.fp = (anim_fp_t) lv_obj_set_y;
-#if LV_APP_EFFECT_OPA_ANIM == 0
-    a.end_cb = (void (*)(void *))lv_app_win_close_anim_cb;
-#endif
+    a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
     anim_create(&a);
 
-#if LV_APP_EFFECT_OPA_ANIM != 0
-    a.end = OPA_TRANSP;
-    a.start = OPA_COVER;
-    a.fp = (anim_fp_t) lv_obj_set_opar;
-    a.end_cb = (void (*)(void *))lv_app_win_close_anim_cb;
-    anim_create(&a);
-#endif
     return LV_ACTION_RES_OK;
 #else /*LV_APP_ANIM_WIN == 0 || LV_APP_ANIM_LEVEL == 0*/
     lv_app_win_close(app);
@@ -871,10 +929,19 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 
 #if LV_APP_EFFECT_ANIM != 0
 /**
- * Called when the window close or minimization animation is ready to close the window
+ * Called when the window close animation is ready to close the application
  * @param app_win pointer to a window
  */
 static void lv_app_win_close_anim_cb(lv_obj_t * app_win)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(app_win);
+    lv_app_close(app);
+}
+/**
+ * Called when the window minimization animation is ready to close the window
+ * @param app_win pointer to a window
+ */
+static void lv_app_win_minim_anim_cb(lv_obj_t * app_win)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(app_win);
     lv_app_win_close(app);
@@ -889,7 +956,7 @@ static void lv_app_init_style(void)
 	/*Coordinates*/
 	app_style.menu_h = 40 * LV_DOWNSCALE;
 	app_style.app_list_w = LV_HOR_RES / 3;
-	app_style.app_list_h = (2 * LV_VER_RES) / 3;
+	app_style.app_list_h = (3 * LV_VER_RES) / 4;
 	app_style.sc_title_margin = 2 * LV_DOWNSCALE;
 
 	/*Opacity*/
@@ -933,17 +1000,13 @@ static void lv_app_init_style(void)
 	app_style.menu_btn_img_style.recolor_opa = OPA_90;
 
 	/*App list styles*/
-	lv_lists_get(LV_LISTS_DEF,&app_style.app_list_style);
-	memcpy(&app_style.app_list_style.liste_btns, &app_style.menu_btn_style, sizeof(lv_btns_t));
-	memcpy(&app_style.app_list_style.bg_pages.bg_rects, &app_style.menu_style, sizeof(lv_rects_t));
+	lv_lists_get(LV_LISTS_SCRL,&app_style.app_list_style);
+	memcpy(&app_style.app_list_style.bg_pages.scrl_rects, &app_style.menu_style, sizeof(lv_rects_t));
+	app_style.app_list_style.bg_pages.scrl_rects.hpad = 0 * LV_DOWNSCALE;
+    app_style.app_list_style.bg_pages.scrl_rects.vpad = 0 * LV_DOWNSCALE;
+    app_style.app_list_style.bg_pages.scrl_rects.opad = 0 * LV_DOWNSCALE;
 	memcpy(&app_style.app_list_style.liste_labels, &app_style.menu_btn_label_style, sizeof(lv_labels_t));
-	app_style.app_list_style.bg_pages.bg_rects.vpad = 0;
-	app_style.app_list_style.bg_pages.bg_rects.hpad = 0;
-	app_style.app_list_style.bg_pages.bg_rects.opad = 0;
-	app_style.app_list_style.bg_pages.scrable_rects.objs.transp = 1;
-	app_style.app_list_style.bg_pages.scrable_rects.vpad = 0;
-	app_style.app_list_style.bg_pages.scrable_rects.hpad = 0;
-	app_style.app_list_style.bg_pages.scrable_rects.opad = 0;
+    memcpy(&app_style.app_list_style.liste_btns, &app_style.menu_btn_style, sizeof(lv_btns_t));
 	app_style.app_list_style.bg_pages.sb_rects.objs.color = COLOR_GRAY;
 	app_style.app_list_style.bg_pages.sb_rects.gcolor = COLOR_GRAY;
 	app_style.app_list_style.bg_pages.sb_width = 8 * LV_DOWNSCALE;
@@ -956,10 +1019,10 @@ static void lv_app_init_style(void)
 	app_style.sc_page_style.bg_rects.vpad = app_style.menu_h;
 	app_style.sc_page_style.bg_rects.hpad = 0;
 	app_style.sc_page_style.bg_rects.opad = 0;
-	app_style.sc_page_style.scrable_rects.objs.transp = 1;
-	app_style.sc_page_style.scrable_rects.hpad = 20 * LV_DOWNSCALE;
-	app_style.sc_page_style.scrable_rects.vpad = 20 * LV_DOWNSCALE;
-	app_style.sc_page_style.scrable_rects.opad = 20 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrl_rects.objs.transp = 1;
+	app_style.sc_page_style.scrl_rects.hpad = 20 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrl_rects.vpad = 20 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrl_rects.opad = 20 * LV_DOWNSCALE;
 
 	/*Shortcut styles*/
 	lv_btns_get(LV_BTNS_DEF,&app_style.sc_style);
@@ -998,11 +1061,15 @@ static void lv_app_init_style(void)
     app_style.sc_rec_style.rects.bopa = 30;
     app_style.sc_rec_style.rects.bwidth = 3 * LV_DOWNSCALE;
 
-
 	lv_labels_get(LV_LABELS_DEF,&app_style.sc_title_style);
 	app_style.sc_title_style.font = LV_APP_FONT_SMALL;
-	app_style.sc_title_style.objs.color = COLOR_MAKE(0x20, 0x30, 0x40);
+	app_style.sc_title_style.objs.color = COLOR_MAKE(0x10, 0x18, 0x20);
 	app_style.sc_title_style.mid = 1;
+
+	lv_labels_get(LV_LABELS_DEF,&app_style.sc_txt_style);
+    app_style.sc_txt_style.font = LV_APP_FONT_MEDIUM;
+    app_style.sc_txt_style.objs.color = COLOR_MAKE(0x10, 0x18, 0x20);
+    app_style.sc_txt_style.mid = 1;
 
 	/*Window styles*/
 	lv_wins_get(LV_WINS_DEF,&app_style.win_style);
@@ -1010,16 +1077,22 @@ static void lv_app_init_style(void)
 	memcpy(&app_style.win_style.title, &app_style.menu_btn_label_style, sizeof(lv_labels_t));
 	memcpy(&app_style.win_style.ctrl_btn, &app_style.menu_btn_style, sizeof(lv_btns_t));
 	memcpy(&app_style.win_style.ctrl_img, &app_style.menu_btn_img_style, sizeof(lv_imgs_t));
-	app_style.win_style.header_on_content = 1;
 	app_style.win_style.header_opa = app_style.menu_opa;
 	app_style.win_style.ctrl_btn_opa = app_style.menu_btn_opa;
 	app_style.win_style.header.vpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.header.hpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.header.opad = 5 * LV_DOWNSCALE;
-	app_style.win_style.content.bg_rects.vpad = app_style.win_style.ctrl_btn_h +
+	app_style.win_style.pages.bg_rects.vpad = app_style.win_style.ctrl_btn_h +
 			                                    2 * app_style.win_style.header.vpad;
-	app_style.win_style.content.bg_rects.hpad = 5 * LV_DOWNSCALE;
-	app_style.win_style.content.scrable_rects.objs.transp = 1;
+	app_style.win_style.pages.bg_rects.hpad = 5 * LV_DOWNSCALE;
+	app_style.win_style.pages.scrl_rects.objs.transp = 1;
+	app_style.win_style.pages.sb_mode = LV_PAGE_SB_MODE_AUTO;
+
+    lv_labels_get(LV_LABELS_DEF,&app_style.win_txt_style);
+    app_style.win_txt_style.font = LV_APP_FONT_MEDIUM;
+    app_style.win_txt_style.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    app_style.win_txt_style.mid = 0;
+    app_style.win_txt_style.letter_space = 1 * LV_DOWNSCALE;
 }
 
 /**
@@ -1027,31 +1100,41 @@ static void lv_app_init_style(void)
  */
 static void lv_app_init_icons(void)
 {
-    lv_img_create_file("icon_add", img_add);
-    lv_img_create_file("icon_battery_empty", img_battery_empty);
-    lv_img_create_file("icon_battery_full", img_battery_full);
-    lv_img_create_file("icon_battery_half", img_battery_half);
-    lv_img_create_file("icon_bubble", img_bubble);
-    lv_img_create_file("icon_calendar", img_calendar);
-    lv_img_create_file("icon_clock", img_clock);
+#if USE_IMG_CLOSE != 0
     lv_img_create_file("icon_close", img_close);
+#endif
+
+#if USE_IMG_DOWN != 0
     lv_img_create_file("icon_down", img_down);
+#endif
+
+#if USE_IMG_DRIVER != 0
     lv_img_create_file("icon_driver", img_driver);
-    lv_img_create_file("icon_eject", img_eject);
+#endif
+
+#if USE_IMG_FILE != 0
+    lv_img_create_file("icon_file", img_file);
+#endif
+
+#if USE_IMG_FOLDER != 0
     lv_img_create_file("icon_folder", img_folder);
-    lv_img_create_file("icon_image", img_image);
+#endif
+
+#if USE_IMG_LEFT != 0
     lv_img_create_file("icon_left", img_left);
-    lv_img_create_file("icon_music", img_music);
+#endif
+
+#if USE_IMG_OK != 0
     lv_img_create_file("icon_ok", img_ok);
-    lv_img_create_file("icon_play", img_play);
+#endif
+
+#if USE_IMG_RIGHT != 0
     lv_img_create_file("icon_right", img_right);
-    lv_img_create_file("icon_settings", img_settings);
-    lv_img_create_file("icon_shut_down", img_shut_down);
-    lv_img_create_file("icon_star", img_star);
+#endif
+
+#if USE_IMG_UP != 0
     lv_img_create_file("icon_up", img_up);
-    lv_img_create_file("icon_user", img_user);
-    lv_img_create_file("icon_video", img_video);
-    lv_img_create_file("icon_volume", img_volume);
+#endif
 }
 #endif /*LV_APP_ENABLE != 0*/
 

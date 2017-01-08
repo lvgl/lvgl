@@ -160,7 +160,6 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
                col_bit = 7;
                col_byte_cnt ++;
                map_p ++;
-
             }
         }
 
@@ -192,25 +191,14 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     
     /*If there are common part of the three area then draw to the vdb*/
     if(union_ok == false)  return; 
-    
-    uint8_t ds_shift = 0;
-#if LV_DOWNSCALE <= 1 || LV_UPSCALE_MAP == 0
-    ds_shift = 0;
-#elif LV_DOWNSCALE == 2
-    ds_shift = 1;
-#elif LV_DOWNSCALE == 4
-    ds_shift = 2;
-#else
-#error "LV: not supported LV_DOWNSCALE value"
-#endif
 
     /*If the map starts OUT of the masked area then calc. the first pixel*/
-    cord_t map_width = area_get_width(cords_p) >> ds_shift;
+    cord_t map_width = area_get_width(cords_p);
     if(cords_p->y1 < masked_a.y1) {
-        map_p += (uint32_t) map_width * ((masked_a.y1 - cords_p->y1) >> ds_shift);
+        map_p += (uint32_t) map_width * (masked_a.y1 - cords_p->y1);
     }
     if(cords_p->x1 < masked_a.x1) {
-        map_p += (masked_a.x1 - cords_p->x1) >> ds_shift;
+        map_p += (masked_a.x1 - cords_p->x1);
     }
 
     /*Stores coordinates relative to the act vdb*/
@@ -223,32 +211,9 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     color_t * vdb_buf_tmp = vdb_p->buf; 
     vdb_buf_tmp += (uint32_t) vdb_width * masked_a.y1; /*Move to the first row*/
 
-    map_p -= (masked_a.x1 >> ds_shift);
+    map_p -= masked_a.x1;
 
-#if LV_DOWNSCALE > 1 && LV_UPSCALE_MAP != 0
-    cord_t row;
-    cord_t col;
-    cord_t row_cnt = 0;
-    color_t transp_color = LV_IMG_COLOR_TRANSP;
-    color_t color_tmp;
-    cord_t map_i;
-    map_p -= map_width; /*Compensate the first row % LV_DOWNSCALE*/
-    for(row = masked_a.y1, row_cnt = 0; row <= masked_a.y2; row++, row_cnt ++) {
-        if(row_cnt % LV_DOWNSCALE == 0) map_p += map_width;              /*Next row on the map*/
-        map_i = masked_a.x1 >> ds_shift;
-        map_i--; /*Compensate the first col % LV_DOWNSCALE*/
-        for(col = masked_a.x1; col <= masked_a.x2; col++) {
-           if(col % LV_DOWNSCALE == 0) {
-        	   map_i++;
-			   color_tmp = map_p[map_i];//color_mix(recolor, map_p[map_i], recolor_opa);
-           }
-           if(transp == false || map_p[map_i].full != transp_color.full) {
-               vdb_buf_tmp[col] = color_tmp;//color_mix(color_tmp, vdb_buf_tmp[col], opa);
-           }
-        }
-        vdb_buf_tmp += vdb_width;        /*Next row on the VDB*/
-     }
-#else
+   /*No transparent pixels on the image*/
    if(transp == false) { /*Simply copy the pixels to the VDB*/
         cord_t row; 
 
@@ -279,7 +244,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     } else { /*transp == true: Check all pixels */
         cord_t row;
         cord_t col;
-        color_t transp_color = LV_IMG_COLOR_TRANSP;
+        color_t transp_color = LV_COLOR_TRANSP;
 
         if(recolor_opa == OPA_TRANSP)/*No recolor*/
         {
@@ -294,7 +259,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
 				   map_p += map_width; /*Next row on the map*/
 				   vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
 			   }
-			} else {
+			} else { /*Image opacity ut no recolor*/
 				for(row = masked_a.y1; row <= masked_a.y2; row++) {
 					for(col = masked_a.x1; col <= masked_a.x2; col ++) {
 						if(map_p[col].full != transp_color.full) {
@@ -320,7 +285,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
 				   map_p += map_width; /*Next row on the map*/
 				   vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
 			   }
-			} else {
+			} else { /*Image opacity with recolor*/
 				for(row = masked_a.y1; row <= masked_a.y2; row++) {
 					for(col = masked_a.x1; col <= masked_a.x2; col ++) {
 						if(map_p[col].full != transp_color.full) {
@@ -333,10 +298,8 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
 					vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
 				}
 			}
-
         }
     }
-#endif /*No upscale and no downscale*/
 }
 
 
@@ -344,9 +307,4 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
  *   STATIC FUNCTIONS
  **********************/
 
-
 #endif
-
-
-
-

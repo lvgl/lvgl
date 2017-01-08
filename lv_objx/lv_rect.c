@@ -77,22 +77,29 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_rect = lv_obj_create(par, copy);
     dm_assert(new_rect);
     lv_obj_alloc_ext(new_rect, sizeof(lv_rect_ext_t));
-    lv_rect_ext_t * rect_ext = lv_obj_get_ext(new_rect);
+    lv_rect_ext_t * ext = lv_obj_get_ext(new_rect);
+    dm_assert(ext);
+    ext->hfit_en = 0;
+    ext->vfit_en = 0;
+    ext->layout = LV_RECT_LAYOUT_OFF;
+
     lv_obj_set_design_f(new_rect, lv_rect_design);
     lv_obj_set_signal_f(new_rect, lv_rect_signal);
 
     /*Init the new rectangle*/
     if(copy == NULL) {
 		lv_obj_set_style(new_rect, lv_rects_get(LV_RECTS_DEF, NULL));
-		rect_ext->hfit_en = 0;
-		rect_ext->vfit_en = 0;
     }
     /*Copy an existing object*/
     else {
     	lv_rect_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	rect_ext->hfit_en = copy_ext->hfit_en;
-    	rect_ext->vfit_en = copy_ext->vfit_en;
-    	rect_ext->layout = copy_ext->layout;
+    	ext->hfit_en = copy_ext->hfit_en;
+    	ext->vfit_en = copy_ext->vfit_en;
+    	ext->layout = copy_ext->layout;
+
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_rect);
+
     }
 
     return new_rect;
@@ -333,7 +340,7 @@ static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask)
 
 	light_style.empty = 1;
 	light_style.bwidth = light_size;
-	light_style.round =  style->round + light_size;
+	light_style.round =  style->round + light_size + 1;
 	light_style.bcolor = style->lcolor;
 	light_style.bopa = 100;
 
@@ -399,7 +406,7 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 
 	switch(type) {
 		case LV_RECT_LAYOUT_COL_L:
-			hpad_corr = style->hpad;
+            hpad_corr = style->hpad;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 		case LV_RECT_LAYOUT_COL_M:
@@ -418,17 +425,18 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+	lv_obj_set_protect(rect, LV_PROTECT_CHILD_CHG);
 	/* Align the children */
 	cord_t last_cord = style->vpad;
 	LL_READ_BACK(rect->child_ll, child) {
-		if(lv_obj_get_hidden(child) != false) continue;
+        if(lv_obj_get_hidden(child) != false ||
+           lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
 		lv_obj_align(child, rect, align, hpad_corr , last_cord);
 		last_cord += lv_obj_get_height(child) + style->opad;
 	}
 
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -466,18 +474,19 @@ static void lv_rect_layout_row(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_PROTECT_CHILD_CHG);
 
 	/* Align the children */
 	cord_t last_cord = style->hpad;
 	LL_READ_BACK(rect->child_ll, child) {
-		if(lv_obj_get_hidden(child) != false) continue;
+		if(lv_obj_get_hidden(child) != false ||
+           lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
 		lv_obj_align(child, rect, align, last_cord, vpad_corr);
 		last_cord += lv_obj_get_width(child) + style->opad;
 	}
 
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -502,18 +511,19 @@ static void lv_rect_layout_center(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_PROTECT_CHILD_CHG);
 
 	/* Align the children */
 	cord_t last_cord = - (h_tot / 2);
 	LL_READ_BACK(rect->child_ll, child) {
-		if(lv_obj_get_hidden(child) != false) continue;
+        if(lv_obj_get_hidden(child) != false ||
+           lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
 		lv_obj_align(child, rect, LV_ALIGN_CENTER, 0, last_cord + lv_obj_get_height(child) / 2);
 		last_cord += lv_obj_get_height(child) + style->opad;
 	}
 
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -535,7 +545,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 	child_rs = ll_get_tail(&rect->child_ll); /*Set the row starter child*/
 	if(child_rs == NULL) return;	/*Return if no child*/
 
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_PROTECT_CHILD_CHG);
 
 	child_rc = child_rs; /*Initially the the row starter and closer is the same*/
 	while(child_rs != NULL) {
@@ -543,8 +553,10 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 		cord_t w_row = style->hpad * 2; /*The width is minimum the left-right hpad*/
 		uint32_t obj_num = 0;
 
-		/*Find the row closer object and collect some data*/		do {
-			if(lv_obj_get_hidden(child_rc) == false) {
+		/*Find the row closer object and collect some data*/
+		do {
+			if(lv_obj_get_hidden(child_rc) == false &&
+			   lv_obj_is_protected(child_rc, LV_PROTECT_POS) == false) {
 				if(w_row + lv_obj_get_width(child_rc) > w_obj) break; /*If the next object is already not fit then break*/
 				w_row += lv_obj_get_width(child_rc) + style->opad; /*Add the object width + opad*/
 				h_row = max(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
@@ -575,7 +587,8 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 			cord_t act_x = style->hpad; /*x init*/
 			child_tmp = child_rs;
 			do{
-				if(lv_obj_get_hidden(child_tmp) == false) {
+				if(lv_obj_get_hidden(child_tmp) == false &&
+				   lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
 					lv_obj_align(child_tmp, rect, LV_ALIGN_IN_TOP_LEFT, act_x, act_y);
 					act_x += lv_obj_get_width(child_tmp) + new_opad;
 				}
@@ -589,7 +602,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 		child_rs = ll_get_prev(&rect->child_ll, child_rc); /*Go to the next object*/
 		child_rc = child_rs;
 	}
-	rect->child_chg_off = 0;
+    lv_obj_clr_protect(rect, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -614,14 +627,15 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
-	rect->child_chg_off = 1;
+    lv_obj_set_protect(rect, LV_PROTECT_CHILD_CHG);
 
 	/* Align the children */
 	cord_t act_x = style->hpad;
 	cord_t act_y = style->vpad;
 	uint16_t obj_cnt = 0;
 	LL_READ_BACK(rect->child_ll, child) {
-		if(lv_obj_get_hidden(child) != false) continue;
+        if(lv_obj_get_hidden(child) != false ||
+           lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
 		if(obj_row > 1) {
 			lv_obj_set_pos(child, act_x, act_y);
@@ -638,8 +652,7 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
 		}
 	}
 
-	rect->child_chg_off = 0;
-
+    lv_obj_clr_protect(rect, LV_PROTECT_CHILD_CHG);
 }
 
 /**

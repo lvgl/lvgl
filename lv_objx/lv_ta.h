@@ -12,6 +12,15 @@
 #include "lv_conf.h"
 #if USE_LV_TA != 0
 
+/*Testing of dependencies*/
+#if USE_LV_PAGE == 0
+#error "lv_ta: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#endif
+
+#if USE_LV_LABEL == 0
+#error "lv_ta: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#endif
+
 #include "../lv_obj/lv_obj.h"
 #include "lv_page.h"
 #include "lv_label.h"
@@ -40,6 +49,8 @@ typedef struct
 typedef enum
 {
 	LV_TAS_DEF,
+    LV_TAS_SIMPLE,
+    LV_TAS_TRANSP,
 }lv_tas_builtin_t;
 
 /*Data of text area*/

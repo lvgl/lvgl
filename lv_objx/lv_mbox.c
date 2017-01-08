@@ -27,7 +27,7 @@
 #if 0 /*Unused*/
 static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_t mode);
 #endif
-static void lv_temps_init(void);
+static void lv_mboxs_init(void);
 static void lv_mbox_realign(lv_obj_t * mbox);
 
 /**********************
@@ -62,12 +62,12 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the message box type specific extended data*/
     lv_mbox_ext_t * ext = lv_obj_alloc_ext(new_mbox, sizeof(lv_mbox_ext_t));
     dm_assert(ext);
+    ext->txt = NULL;
+    ext->title = NULL;
+    ext->btnh = NULL;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_f(new_mbox, lv_mbox_signal);
-
-    /* Let the design function of rect
-     lv_obj_set_design_f(new_mbox, lv_mbox_design); */
 
     /*Init the new message box message box*/
     if(copy == NULL) {
@@ -85,15 +85,20 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
 
     	lv_obj_set_style(new_mbox, lv_mboxs_get(LV_MBOXS_DEF, NULL));
-
-    	lv_mbox_realign(new_mbox);
     }
     /*Copy an existing message box*/
     else {
-//    	lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	/*TODO*/
+        lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
+        ext->title = lv_label_create(new_mbox, copy_ext->title);
+        ext->txt = lv_label_create(new_mbox, copy_ext->txt);
+        ext->btnh = lv_rect_create(new_mbox, copy_ext->btnh);
+
+        /*Refresh the style with new signal function*/
+        lv_obj_refr_style(new_mbox);
     }
     
+    lv_mbox_realign(new_mbox);
+
     return new_mbox;
 }
 
@@ -308,7 +313,7 @@ lv_mboxs_t * lv_mboxs_get(lv_mboxs_builtin_t style, lv_mboxs_t * copy)
 
 	/*Make the style initialization if it is not done yet*/
 	if(style_inited == false) {
-		lv_temps_init();
+		lv_mboxs_init();
 		style_inited = true;
 	}
 
@@ -368,7 +373,7 @@ static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_
 /**
  * Initialize the message box styles
  */
-static void lv_temps_init(void)
+static void lv_mboxs_init(void)
 {
 	/*Default style*/
 	lv_rects_get(LV_RECTS_DEF, &lv_mboxs_def.bg);
@@ -407,6 +412,4 @@ static void lv_mbox_realign(lv_obj_t * mbox)
 
 	lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, 0);
 }
-
-
 #endif

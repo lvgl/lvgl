@@ -27,7 +27,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void dispi_task(void);
+static void dispi_task(void * param);
 static void dispi_proc_point(lv_dispi_t * dispi_p, cord_t x, cord_t y);
 static void dispi_proc_press(lv_dispi_t * dispi_p);
 static void disi_proc_release(lv_dispi_t * dispi_p);
@@ -59,7 +59,7 @@ void lv_dispi_init(void)
     lv_dispi_reset_now = false;
 
 #if LV_DISPI_READ_PERIOD != 0
-    dispi_task_p = ptask_create(dispi_task, LV_DISPI_READ_PERIOD, PTASK_PRIO_MID);
+    dispi_task_p = ptask_create(dispi_task, LV_DISPI_READ_PERIOD, PTASK_PRIO_MID, NULL);
 #else
     dispi_task_p = ptask_create(dispi_task, 1, PTASK_PRIO_OFF); /*Not use lv_dispi*/
 #endif
@@ -105,14 +105,24 @@ void lv_dispi_get_vect(lv_dispi_t * dispi_p, point_t * point_p)
     point_p->y = dispi_p->vect.y;
 }
 
+/**
+ * Do nothing until the next release
+ * @param dispi_p pointer to a display input
+ */
+void lv_dispi_wait_release(lv_dispi_t * dispi_p)
+{
+    dispi_p->wait_release = 1;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 /**
  * Called periodically to handle the display inputs
+ * @param param unused
  */
-static void dispi_task(void)
+static void dispi_task(void * param)
 {
 
 	static lv_dispi_t dispi[INDEV_NUM];
@@ -145,7 +155,7 @@ static void dispi_task(void)
  */
 static void dispi_proc_point(lv_dispi_t * dispi_p, cord_t x, cord_t y)
 {
-#if LV_DOWNSCALE > 1 && LV_VDB_SIZE != 0
+#if LV_ANTIALIAS != 0 && LV_VDB_SIZE != 0
     dispi_p->act_point.x = x * LV_DOWNSCALE;
     dispi_p->act_point.y = y * LV_DOWNSCALE;
 #else
@@ -191,6 +201,8 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
 {
     lv_obj_t * pr_obj = dispi_p->act_obj;
     
+    if(dispi_p->wait_release != 0) return;
+
     /*If there is no last object then search*/
     if(dispi_p->act_obj == NULL) {
         pr_obj = dispi_search_obj(dispi_p, lv_scr_act());
@@ -294,11 +306,18 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
  */
 static void disi_proc_release(lv_dispi_t * dispi_p)
 {
+    if(dispi_p->wait_release != 0) {
+        dispi_p->act_obj = NULL;
+        dispi_p->last_obj = NULL;
+        dispi_p->press_time_stamp = 0;
+        dispi_p->lpr_rep_time_stamp = 0;
+        dispi_p->wait_release = 0;
+    }
+
     /*Forgot the act obj and send a released signal */
     if(dispi_p->act_obj != NULL) {
-		dispi_p->act_obj->signal_f(dispi_p->act_obj,
-									  LV_SIGNAL_RELEASED, dispi_p);
-
+        dispi_p->act_obj->signal_f(dispi_p->act_obj,
+                                      LV_SIGNAL_RELEASED, dispi_p);
         dispi_p->act_obj = NULL;   
         dispi_p->press_time_stamp = 0;
         dispi_p->lpr_rep_time_stamp = 0;
@@ -309,6 +328,7 @@ static void disi_proc_release(lv_dispi_t * dispi_p)
     if(dispi_p->last_obj != NULL && lv_dispi_reset_qry == false) {
         dispi_drag_throw(dispi_p);
     }
+
 }
 
 /**
@@ -376,8 +396,8 @@ static void dispi_drag(lv_dispi_t * dispi_p)
         dispi_p->vect_sum.y += dispi_p->vect.y;
         
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if(abs(dispi_p->vect_sum.x) >= LV_DISPI_DRAG_LIMIT ||
-           abs(dispi_p->vect_sum.y) >= LV_DISPI_DRAG_LIMIT) 
+        if(MATH_ABS(dispi_p->vect_sum.x) >= LV_DISPI_DRAG_LIMIT ||
+           MATH_ABS(dispi_p->vect_sum.y) >= LV_DISPI_DRAG_LIMIT)
            {
                 dispi_p->drag_in_prog = 1;
                 drag_obj->signal_f(drag_obj,

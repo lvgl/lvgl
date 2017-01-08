@@ -12,6 +12,15 @@
 #include "lv_conf.h"
 #if USE_LV_PB != 0
 
+/*Testing of dependencies*/
+#if USE_LV_RECT == 0
+#error "lv_pb: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
+#endif
+
+#if USE_LV_LABEL == 0
+#error "lv_pb: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#endif
+
 #include "../lv_obj/lv_obj.h"
 #include "lv_rect.h"
 #include "lv_label.h"
@@ -43,6 +52,7 @@ typedef struct
 {
 	lv_rect_ext_t rect_ext;	/*Ext. of ancestor*/
 	/*New data for this type */
+	lv_obj_t * label;
 	uint16_t act_value;
 	uint16_t min_value;
 	uint16_t max_value;
