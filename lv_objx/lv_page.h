@@ -81,7 +81,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void  * param);
 
 void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
 void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
-void lv_page_glue_obj(lv_obj_t * page, bool glue);
+void lv_page_glue_obj(lv_obj_t * obj, bool glue);
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en);
 lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
 

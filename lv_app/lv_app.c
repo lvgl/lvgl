@@ -1001,6 +1001,7 @@ static void lv_app_init_style(void)
 
 	/*App list styles*/
 	lv_lists_get(LV_LISTS_SCRL,&app_style.app_list_style);
+    app_style.app_list_style.widthe_sb = 0;
 	memcpy(&app_style.app_list_style.bg_pages.scrl_rects, &app_style.menu_style, sizeof(lv_rects_t));
 	app_style.app_list_style.bg_pages.scrl_rects.hpad = 0 * LV_DOWNSCALE;
     app_style.app_list_style.bg_pages.scrl_rects.vpad = 0 * LV_DOWNSCALE;

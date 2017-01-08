@@ -425,7 +425,7 @@ static void lv_btns_init(void)
 	/*Default style*/
     lv_btns_def.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x60, 0x88, 0xb0);
     lv_btns_def.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x60, 0x70, 0x80);
+	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xa0, 0xc0, 0xe0);
 	lv_btns_def.lcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_btns_def.flags[LV_BTN_STATE_REL].light_en = 0;
 	lv_btns_def.flags[LV_BTN_STATE_REL].transp = 0;
@@ -433,7 +433,7 @@ static void lv_btns_init(void)
 
     lv_btns_def.mcolor[LV_BTN_STATE_PR] =COLOR_MAKE(0x50, 0x68, 0x80);
     lv_btns_def.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x18, 0x20, 0x28);
-	lv_btns_def.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x40, 0x60, 0x80);
+	lv_btns_def.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
 	lv_btns_def.lcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_btns_def.flags[LV_BTN_STATE_PR].light_en = 0;
 	lv_btns_def.flags[LV_BTN_STATE_PR].transp = 0;

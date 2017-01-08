@@ -143,7 +143,6 @@ static void fsel_refr(void)
     fsel_list = lv_list_create(fsel_win, NULL);
     lv_obj_set_width(fsel_list, app_style->win_useful_w);
     lv_obj_set_style(fsel_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
-    lv_list_set_fit(fsel_list, LV_LIST_FIT_WIDTH_SB);
     lv_obj_set_drag_parent(fsel_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(fsel_list), true);
     lv_rect_set_fit(fsel_list, false, true);

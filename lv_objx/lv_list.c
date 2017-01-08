@@ -62,7 +62,6 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_list);
     lv_list_ext_t * ext = lv_obj_alloc_ext(new_list, sizeof(lv_list_ext_t));
     dm_assert(ext);
-    ext ->fit = LV_LIST_FIT_WIDTH_SB;
 
 	lv_obj_set_signal_f(new_list, lv_list_signal);
 
@@ -72,9 +71,6 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 		lv_obj_set_style(new_list, lv_lists_get(LV_LISTS_DEF, NULL));
 		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page_ext.scrl, LV_LIST_LAYOUT_DEF);
     } else {
-    	lv_list_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	ext ->fit = copy_ext->fit;
-
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_list);
     }
@@ -127,8 +123,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	lv_btn_set_rel_action(liste, rel_action);
 	lv_page_glue_obj(liste, true);
 	lv_rect_set_layout(liste, lists->liste_layout);
-	lv_rect_set_fit(liste, true, true);   /*hor. fit might be disabled later*/
-//	lv_btn_set_state(liste, LV_BTN_STATE_TGL_REL);
+	lv_rect_set_fit(liste, false, true);
 
 	if(img_fn != NULL) {
 		lv_obj_t * img = lv_img_create(liste, NULL);
@@ -144,42 +139,19 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 		lv_obj_set_click(label, false);
 	}
 
+	lv_lists_t * style = lv_obj_get_style(list);
+
 	/*Make the size adjustment*/
-	if(ext->fit == LV_LIST_FIT_WIDTH || ext->fit == LV_LIST_FIT_WIDTH_SB) {
-		/*Now the width will be adjusted (so disable hor. auto fit)*/
-		lv_rect_set_fit(liste, false, true);
-		cord_t w = lv_obj_get_width(list);
-		cord_t hpad_tot = lists->bg_pages.bg_rects.hpad + lists->bg_pages.scrl_rects.hpad;
-		w -= hpad_tot * 2;
 
-		/*Make place for the scrollbar if hpad_tot is too small*/
-		if(ext->fit == LV_LIST_FIT_WIDTH_SB) {
-		    if(hpad_tot < lists->bg_pages.sb_width) w -= lists->bg_pages.sb_width - hpad_tot;
-		}
-		lv_obj_set_width(liste, w);
-	} else if(ext->fit == LV_LIST_FIT_LONGEST) {
-		/*In this case the width will be adjusted*/
-		lv_rect_set_fit(liste, false, true);
+    cord_t w = lv_obj_get_width(list);
+    cord_t hpad_tot = lists->bg_pages.bg_rects.hpad + lists->bg_pages.scrl_rects.hpad;
+    w -= hpad_tot * 2;
 
-		lv_obj_t * e;
-		cord_t w = 0;
-		/*Get the longest list element*/
-		lv_obj_t * e_par = lv_obj_get_parent(liste); /*The page changes the parent so get it*/
-		e = lv_obj_get_child(e_par, NULL);
-		while(e != NULL) {
-			w = max(w, lv_obj_get_width(e));
-			e = lv_obj_get_child(e_par, e);
-		}
-
-		/*Set all list element to the longest width*/
-		e = lv_obj_get_child(e_par, NULL);
-		while(e != NULL) {
-			if(lv_obj_get_width(e) != w) {
-				lv_obj_set_width(e, w);
-			}
-			e = lv_obj_get_child(e_par, e);
-		}
-	}
+    /*Make place for the scrollbar if hpad_tot is too small*/
+    if(style->widthe_sb != 0) {
+        if(hpad_tot < lists->bg_pages.sb_width) w -= lists->bg_pages.sb_width - hpad_tot;
+    }
+    lv_obj_set_width(liste, w);
 
 	return liste;
 }
@@ -233,32 +205,10 @@ void lv_list_down(lv_obj_t * list)
  * Setter functions 
  *====================*/
 
-/**
- * Set the list element fitting of a list
- * @param list pointer to a list object
- * @param fit type of fitting (from lv_list_fit_t)
- */
-void lv_list_set_fit(lv_obj_t * list, lv_list_fit_t fit)
-{
-	lv_list_ext_t * ext = lv_obj_get_ext(list);
-
-	ext->fit = fit;
-}
-
 
 /*=====================
  * Getter functions 
  *====================*/
-
-/**
- * Get the fit type of a list
- * @param list pointer to list object
- * @return the fit (from lv_list_fit_t)
- */
-lv_list_fit_t lv_list_get_fit(lv_obj_t * list)
-{
-	return LV_EA(list, lv_list_ext_t)->fit;
-}
 
 /**
  * Get the text of a list element
@@ -414,6 +364,7 @@ static void lv_lists_init(void)
 	lv_imgs_get(LV_IMGS_DEF, &lv_lists_def.liste_imgs); /*Lit element image style*/
 
 	lv_lists_def.liste_layout = LV_RECT_LAYOUT_ROW_M;
+    lv_lists_def.widthe_sb = 1;
 
 	/*Only the scrollable part is visible style*/
     memcpy(&lv_lists_scrl, &lv_lists_def, sizeof(lv_lists_t));

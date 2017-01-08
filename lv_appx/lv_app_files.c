@@ -284,7 +284,6 @@ static void win_create_list(lv_app_inst_t * app)
     win_data->file_list = lv_list_create(app->win, NULL);
     lv_obj_set_width(win_data->file_list, app_style->win_useful_w);
     lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
-    lv_list_set_fit(win_data->file_list, LV_LIST_FIT_WIDTH_SB);
     lv_obj_set_drag_parent(win_data->file_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(win_data->file_list), true);
     lv_rect_set_fit(win_data->file_list, false, true);

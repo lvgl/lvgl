@@ -119,7 +119,7 @@ typedef enum
     LV_PROTECT_OPA       = 0x02, /*Prevent lv_obj_set_opar to modify the opacity*/
     LV_PROTECT_PARENT    = 0x04, /*Prevent automatic parent change (e.g. in lv_page)*/
     LV_PROTECT_POS       = 0x08, /*Prevent automatic positioning (e.g. in lv_rect layout)*/
-}lv_obj_protect_t;
+}lv_protect_t;
 
 typedef enum
 {
