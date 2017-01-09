@@ -12,6 +12,7 @@
 #include "lv_btnm.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/text.h"
+#include "../lv_obj/lv_refr.h"
 
 /*********************
  *      DEFINES
@@ -28,6 +29,7 @@
 
 static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_t mode);
 static uint8_t lv_btnm_get_width_unit(const char * btn_str);
+static uint16_t lv_btnm_get_btn_from_point(lv_obj_t * btnm, point_t * p);
 static void lv_btnm_create_btns(lv_obj_t * btnm, const char ** map);
 static void lv_btnms_init(void);
 
@@ -112,10 +114,10 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
-    	uint16_t i;
+    	uint16_t new_btn;
+    	area_t btnm_area;
+        area_t btn_area;
     	point_t p;
-    	area_t btn_area;
-    	area_t btnm_cords;
     	switch(sign) {
     		case LV_SIGNAL_CLEANUP:
     			dm_free(ext->btn_areas);
@@ -126,21 +128,31 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     			break;
     		case LV_SIGNAL_PRESSING:
     			/*Search the pressed area*/
-    			ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
-    			lv_dispi_get_point(param, &p);
-    			lv_obj_get_cords(btnm, &btnm_cords);
-    			for(i = 0; i < ext->btn_cnt; i++) {
-    				area_cpy(&btn_area, &ext->btn_areas[i]);
-    				btn_area.x1 += btnm_cords.x1;
-    				btn_area.y1 += btnm_cords.y1;
-    				btn_area.x2 += btnm_cords.x1;
-    				btn_area.y2 += btnm_cords.y1;
-    				if(area_is_point_on(&btn_area, &p) != false) {
-    					ext->btn_pr = i;
-    					lv_obj_inv(btnm);
-    					break;
-    				}
+    		    lv_dispi_get_point(param, &p);
+    		    new_btn = lv_btnm_get_btn_from_point(btnm, &p);
+    			/*Invalidate to old and the new areas*/;
+                lv_obj_get_cords(btnm, &btnm_area);
+    		    if(new_btn != ext->btn_pr) {
+    		        lv_dispi_reset_lpr(param);
+    			    if(ext->btn_pr != LV_BTNM_BTN_PR_INVALID) {
+    			        area_cpy(&btn_area, &ext->btn_areas[ext->btn_pr]);
+    			        btn_area.x1 += btnm_area.x1;
+                        btn_area.y1 += btnm_area.y1;
+                        btn_area.x2 += btnm_area.x1;
+                        btn_area.y2 += btnm_area.y1;
+    			        lv_inv_area(&btn_area);
+    			    }
+                    if(new_btn != LV_BTNM_BTN_PR_INVALID) {
+                        area_cpy(&btn_area, &ext->btn_areas[new_btn]);
+                        btn_area.x1 += btnm_area.x1;
+                        btn_area.y1 += btnm_area.y1;
+                        btn_area.x2 += btnm_area.x1;
+                        btn_area.y2 += btnm_area.y1;
+                        lv_inv_area(&btn_area);
+                    }
     			}
+
+    		    ext->btn_pr = new_btn;
     			break;
     		case LV_SIGNAL_RELEASED:
             case LV_SIGNAL_LONG_PRESS_REP:
@@ -157,8 +169,18 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
     				ext->cb(btnm, txt_i);
     			}
-    			if(sign == LV_SIGNAL_RELEASED) ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
-				lv_obj_inv(btnm);
+    			if(sign == LV_SIGNAL_RELEASED && ext->btn_pr != LV_BTNM_BTN_PR_INVALID) {
+    			    /*Invalidate to old area*/;
+                    lv_obj_get_cords(btnm, &btnm_area);
+                    area_cpy(&btn_area, &ext->btn_areas[ext->btn_pr]);
+                    btn_area.x1 += btnm_area.x1;
+                    btn_area.y1 += btnm_area.y1;
+                    btn_area.x2 += btnm_area.x1;
+                    btn_area.y2 += btnm_area.y1;
+                    lv_inv_area(&btn_area);
+
+                    ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
+    			}
 				break;
     		default:
     			break;
@@ -472,6 +494,30 @@ static uint8_t lv_btnm_get_width_unit(const char * btn_str)
 
 	return 1;
 
+}
+
+static uint16_t lv_btnm_get_btn_from_point(lv_obj_t * btnm, point_t * p)
+{
+    area_t btnm_cords;
+    area_t btn_area;
+    lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
+    uint16_t i;
+    lv_obj_get_cords(btnm, &btnm_cords);
+
+    for(i = 0; i < ext->btn_cnt; i++) {
+        area_cpy(&btn_area, &ext->btn_areas[i]);
+        btn_area.x1 += btnm_cords.x1;
+        btn_area.y1 += btnm_cords.y1;
+        btn_area.x2 += btnm_cords.x1;
+        btn_area.y2 += btnm_cords.y1;
+        if(area_is_point_on(&btn_area, p) != false) {
+            break;
+        }
+    }
+
+    if(i == ext->btn_cnt) i = LV_BTNM_BTN_PR_INVALID;
+
+    return i;
 }
 
 
