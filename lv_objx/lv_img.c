@@ -252,6 +252,9 @@ void lv_img_set_upscale(lv_obj_t * img, bool en)
     lv_img_ext_t * ext = lv_obj_get_ext(img);
 
     ext->upscale = (en == false ? 0 : 1);
+
+    /*Refresh the image with the new size*/
+    lv_img_set_file(img, ext->fn);
 }
 
 /*=====================
