@@ -29,7 +29,7 @@
 #endif
 
 #if LV_VDB_SIZE == 0 && LV_ANTIALIAS != 0
-#error "LV: If LV_VDB_SIZE == 0 the antialaissing is not enabled"
+#error "LV: If LV_VDB_SIZE == 0 the antialaissing must be disabled"
 #endif
 
 /*New defines*/
