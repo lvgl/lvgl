@@ -50,6 +50,7 @@ typedef lv_action_res_t ( * lv_action_t) (struct __LV_OBJ_T * obj, lv_dispi_t * 
  **********************/
 void lv_dispi_init(void);
 void lv_dispi_reset(void);
+void lv_dispi_reset_lpr(lv_dispi_t * dispi);
 bool lv_dispi_is_dragging(lv_dispi_t * dispi_p);
 void lv_dispi_get_point(lv_dispi_t * dispi_p, point_t * point_p);
 void lv_dispi_get_vect(lv_dispi_t * dispi_p, point_t * point_p);
