@@ -65,6 +65,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
     ext->transp = 0;
+    ext->upscale = 0;
 
     /*Init the new object*/    
     lv_obj_set_signal_f(new_img, lv_img_signal);
@@ -195,8 +196,8 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 		res = fs_read(&file, &header, sizeof(header), &rn);
     }
 
+    /*Create a dummy header on fs error*/
     if(res != FS_RES_OK || rn != sizeof(header)) {
-		/*Create a dummy header*/
 		header.w = lv_obj_get_width(img);
 		header.h = lv_obj_get_height(img);
 		header.transp = 0;
@@ -207,6 +208,11 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	ext->w = header.w;
 	ext->h = header.h;
 	ext->transp = header.transp;
+
+    if(ext->upscale != 0) {
+        ext->w *=  2;
+        ext->h *=  2;
+    }
 
 	if(fn != NULL) {
 		ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
@@ -226,13 +232,26 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param autotosize true: auto size enable, false: auto size disable
+ * @param en true: auto size enable, false: auto size disable
  */
-void lv_img_set_auto_size(lv_obj_t * img, bool autotosize)
+void lv_img_set_auto_size(lv_obj_t * img, bool en)
 {
     lv_img_ext_t * ext = lv_obj_get_ext(img);
 
-    ext->auto_size = (autotosize == false ? 0 : 1);
+    ext->auto_size = (en == false ? 0 : 1);
+}
+
+/**
+ * Enable the upscaling with LV_DOWNSCALE.
+ * If enabled the object size will be same as the picture size.
+ * @param img pointer to an image
+ * @param en true: upscale enable, false: upscale disable
+ */
+void lv_img_set_upscale(lv_obj_t * img, bool en)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext(img);
+
+    ext->upscale = (en == false ? 0 : 1);
 }
 
 /*=====================
@@ -251,6 +270,17 @@ bool lv_img_get_auto_size(lv_obj_t * img)
     return ext->auto_size == 0 ? false : true;
 }
 
+/**
+ * Get the upscale enable attribute
+ * @param img pointer to an image
+ * @return true: upscale is enabled, false: upscale is disabled
+ */
+bool lv_img_get_upscale(lv_obj_t * img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext(img);
+
+    return ext->upscale == 0 ? false : true;
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -46,9 +46,10 @@ typedef struct
 	/*No ext. because inherited from the base object*/ /*Ext. of ancestor*/
 	/*New data for this type */
     char* fn;	/*Image file name. E.g. "U:/my_image"*/
-    cord_t w;	/*Width of the image (if LV_UPSCALE_MAP != 0 then multiplied by LV_DOWNSCALE)*/
-    cord_t h;	/*Height of the image (if LV_UPSCALE_MAP != 0 then multiplied by LV_DOWNSCALE)*/
+    cord_t w;	/*Width of the image (doubled when upscaled)*/
+    cord_t h;	/*Height of the image (doubled when upscaled)*/
     uint8_t auto_size 	:1;		/*1: automatically set the object size to the image size*/
+    uint8_t upscale     :1;     /*1: upscale to double size*/
     uint8_t transp 	    :1; 	/*Transp. bit in the images header (library handles this)*/
 }lv_img_ext_t;
 
@@ -71,10 +72,11 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
 void lv_img_set_file(lv_obj_t * img, const char * fn);
 fs_res_t lv_img_create_file(const char * fn, const color_int_t * data_p);
-void lv_img_set_auto_size(lv_obj_t * img, bool autotosize);
+void lv_img_set_auto_size(lv_obj_t * img, bool en);
+void lv_img_set_upscale(lv_obj_t * img, bool en);
 
 bool lv_img_get_auto_size(lv_obj_t * img);
-
+bool lv_img_get_upscale(lv_obj_t * img);
 lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy);
 
 /**********************
