@@ -284,11 +284,15 @@ lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy)
  */
 static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_t mode)
 {
-    /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
+        /* Because of the radius it is not sure the area is covered
+         * Check the areas where there is no radius*/
     	if(LV_SA(rect, lv_rects_t)->empty != 0) return false;
 
     	uint16_t r = LV_SA(rect, lv_rects_t)->round;
+
+    	if(r == LV_RECT_CIRCLE) return false;
+
     	area_t area_tmp;
 
     	/*Check horizontally without radius*/
