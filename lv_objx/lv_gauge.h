@@ -38,11 +38,11 @@ typedef struct
 {
 	lv_rects_t rects;   /*Style of ancestor*/
 	/*New style element for this type */
-	color_t mcolor_max;     /*Top color at max.*/
-    color_t gcolor_max;     /*Bootom color at max*/
+	color_t mcolor_critical;    /*Top color at critical.*/
+    color_t gcolor_critical;    /*Bottom color at critical*/
     /*Scale settings*/
     uint16_t scale_angle;       /*Angle of the scale in deg. (~220)*/
-	lv_labels_t scale_labels;   /*Style of the labels*/
+	lv_labels_t scale_labels;   /*Style of the scale labels*/
     cord_t scale_pad;           /*Padding of scale labels from the edge*/
     uint8_t scale_label_num;    /*Number of scale labels (~6)*/
     /*Needle settings*/
@@ -51,6 +51,9 @@ typedef struct
     color_t needle_mid_color;   /*Color of middle  where the needles start*/
     cord_t needle_mid_r;        /*Radius of the needle middle area*/
     opa_t needle_opa;           /*Opacity of the needles*/
+    /*Value text settings*/
+    lv_labels_t value_labels;   /*Style of the value label*/
+    uint8_t value_show  :1;     /*1: draw a label woth the most critical value*/
 }lv_gauges_t;
 
 /*Built-in styles of gauge*/
@@ -68,6 +71,7 @@ typedef struct
     int16_t max;
     int16_t * values;
     uint8_t needle_num;
+    uint8_t low_critical    :1; /*0: the higher value is more critical, 1: the lower value is more critical*/
 }lv_gauge_ext_t;
 
 /**********************
@@ -79,9 +83,12 @@ lv_gauges_t * lv_gauges_get(lv_gauges_builtin_t style, lv_gauges_t * copy);
 
 void lv_gauge_set_value(lv_obj_t * gauge, int16_t value, uint8_t needle);
 void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num);
+void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
+void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low);
 
 uint8_t lv_gauge_get_needle_num(lv_obj_t * gauge);
 int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
+bool lv_gauge_get_low_critical(lv_obj_t * gauge);
 
 /**********************
  *      MACROS

@@ -71,7 +71,8 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->min = 0;
     ext->max = 100;
-    ext->needle_num = 3;
+    ext->needle_num = 1;
+    ext->low_critical = 0;
     ext->values = NULL;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_gauge);
@@ -91,7 +92,9 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_gauge_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->min = copy_ext->min;
         ext->max = copy_ext->max;
-    	ext->needle_num = copy_ext->needle_num;
+        ext->low_critical = copy_ext->low_critical;
+        lv_gauge_set_needle_num(new_gauge, lv_gauge_get_needle_num(copy));
+
         uint8_t i;
         for(i = 0; i < ext->needle_num; i++) {
             ext->values[i] = copy_ext->values[i];
@@ -169,6 +172,7 @@ void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max)
     ext->min = MATH_MIN(min, max);
     ext->max = MATH_MAX(min, max);
 
+    lv_obj_inv(gauge);
 }
 
 /**
@@ -189,6 +193,21 @@ void lv_gauge_set_value(lv_obj_t * gauge, int16_t value, uint8_t needle)
     ext->values[needle] = value;
 
     lv_obj_inv(gauge);
+}
+
+/**
+ * Set which value is more critical (lower or higher)
+ * @param gauge pointer to a gauge object
+ * @param low false: higher / true: lower value is more critical
+ */
+void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low)
+{
+    lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
+
+    ext->low_critical = low == false ? 0 : 1;
+
+    lv_obj_inv(gauge);
+
 }
 
 /*=====================
@@ -220,6 +239,19 @@ int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle)
 
 
     return ext->values[needle];
+}
+
+/**
+ * Get which value is more critical (lower or higher)
+ * @param gauge pointer to a gauge object
+ * @param low false: higher / true: lower value is more critical
+ */
+bool lv_gauge_get_low_critical(lv_obj_t * gauge)
+{
+    lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
+
+    return ext->low_critical == 0 ? false : true;
+
 }
 
 /**
@@ -282,19 +314,23 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
         lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
 
         /* Draw the background
-         * Recolor the gauge according to the greatest value*/
+         * Re-color the gauge according to the greatest value*/
         color_t mcolor_min = style->rects.objs.color;
         color_t gcolor_min = style->rects.gcolor;
 
-        int16_t max_val = ext->min;
+        int16_t critical_val = ext->low_critical == 0 ? ext->min : ext->max;
         uint8_t i;
 
-        for(i = 0; i < ext->needle_num; i++) max_val = MATH_MAX(max_val, ext->values[i]);
+        for(i = 0; i < ext->needle_num; i++) {
+            critical_val = ext->low_critical == 0 ? MATH_MAX(critical_val, ext->values[i]) : MATH_MIN(critical_val, ext->values[i]);
+        }
 
-        opa_t ratio = ((max_val - ext->min) * OPA_COVER) / (ext->max - ext->min);
+        opa_t ratio = ((critical_val - ext->min) * OPA_COVER) / (ext->max - ext->min);
 
-        style->rects.objs.color= color_mix(style->mcolor_max, mcolor_min, ratio);
-        style->rects.gcolor = color_mix(style->gcolor_max, gcolor_min, ratio);
+        if(ext->low_critical != 0) ratio = OPA_COVER - ratio;
+
+        style->rects.objs.color= color_mix(style->mcolor_critical, mcolor_min, ratio);
+        style->rects.gcolor = color_mix(style->gcolor_critical, gcolor_min, ratio);
         ancestor_design_f(gauge, mask, mode);
         style->rects.objs.color= mcolor_min;
         style->rects.gcolor = gcolor_min;
@@ -312,7 +348,7 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
 }
 
 /**
- * Draw the scale of a gauge
+ * Draw the scale on a gauge
  * @param gauge pointer to gauge object
  * @param mask mask of drawing
  */
@@ -356,6 +392,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
 
         lv_draw_label(&label_cord, mask, &style->scale_labels, OPA_COVER, scale_txt);
     }
+
+
 }
 /**
  * Draw the needles of a gauge
@@ -371,6 +409,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
     cord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->cords.x1;
     cord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->cords.y1;
     int16_t angle_ofs = 90 + (360 - style->scale_angle) / 2;
+    int16_t critical_value = ext->low_critical == 0 ? ext->min : ext->max;
     point_t p_mid;
     point_t p_end;
     uint8_t i;
@@ -387,6 +426,10 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
         style->needle_lines.objs.color = style->needle_color[i];
 
         lv_draw_line(&p_mid, &p_end, mask, &style->needle_lines, style->needle_opa);
+
+        /*Calculate the critical value*/
+        critical_value = ext->low_critical == 0 ?
+                MATH_MAX(critical_value, ext->values[i]) : MATH_MIN(critical_value, ext->values[i]);
     }
 
     /*Draw the needle middle area*/
@@ -405,6 +448,24 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
 
     lv_draw_rect(&nm_cord, mask, &nm, OPA_100);
 
+    /*Write the critical value if enabled*/
+    if(style->value_show != 0) {
+        char value_txt[16];
+        sprintf(value_txt, "%d", critical_value);
+
+        area_t label_cord;
+        point_t label_size;
+        txt_get_size(&label_size, value_txt, font_get(style->value_labels.font),
+                style->value_labels.letter_space, style->value_labels.line_space, LV_CORD_MAX);
+
+        /*Draw the label*/
+        label_cord.x1 = gauge->cords.x1 + lv_obj_get_width(gauge) / 2 - label_size.x / 2;
+        label_cord.y1 = gauge->cords.y1 + 3 * lv_obj_get_height(gauge) / 4 - label_size.y / 2;
+        label_cord.x2 = label_cord.x1 + label_size.x;
+        label_cord.y2 = label_cord.y1 + label_size.y;
+
+        lv_draw_label(&label_cord, mask, &style->value_labels, OPA_COVER, value_txt);
+    }
 }
 
 /**
@@ -415,33 +476,38 @@ static void lv_gauges_init(void)
 	/*Default style*/
     lv_rects_get(LV_RECTS_DEF, &lv_gauges_def.rects);
     lv_gauges_def.rects.round = LV_RECT_CIRCLE;
-    lv_gauges_def.rects.bwidth = 6 * LV_DOWNSCALE;
-    lv_gauges_def.rects.objs.color = COLOR_SILVER;//MAKE(0x80, 0xFF, 0x80);//GREEN;
+    lv_gauges_def.rects.bwidth = 4 * LV_DOWNSCALE;
+    lv_gauges_def.rects.objs.color = COLOR_MAKE(0x00, 0xaa, 0x00);//GREEN;
     lv_gauges_def.rects.gcolor = COLOR_BLACK;
     lv_gauges_def.rects.bcolor = COLOR_BLACK;
 
-    lv_gauges_def.gcolor_max = COLOR_BLACK;
-    lv_gauges_def.mcolor_max = COLOR_MAKE(0xff, 0x50, 0x50);
+    lv_gauges_def.gcolor_critical = COLOR_BLACK;
+    lv_gauges_def.mcolor_critical = COLOR_MAKE(0xff, 0x50, 0x50);
 
-    lv_labels_get(LV_RECTS_DEF, &lv_gauges_def.scale_labels);
-    lv_gauges_def.scale_labels.objs.color = COLOR_WHITE;
+    lv_labels_get(LV_LABELS_DEF, &lv_gauges_def.scale_labels);
+    lv_gauges_def.scale_labels.objs.color = COLOR_MAKE(0xd0, 0xd0, 0xd0);
+
+    lv_labels_get(LV_LABELS_DEF, &lv_gauges_def.value_labels);
+    lv_gauges_def.value_labels.objs.color = COLOR_WHITE;
+    lv_gauges_def.value_labels.letter_space = 6 * LV_DOWNSCALE;
+    lv_gauges_def.value_labels.font = FONT_DEJAVU_60;
 
     lv_lines_get(LV_LINES_DEF, &lv_gauges_def.needle_lines);
     lv_gauges_def.needle_lines.objs.color = COLOR_WHITE;
     lv_gauges_def.needle_lines.width = 3 * LV_DOWNSCALE;
 
-
-    lv_gauges_def.needle_color[0] = COLOR_WHITE;
+    lv_gauges_def.needle_color[0] = COLOR_SILVER;
     lv_gauges_def.needle_color[1] = COLOR_MAKE(0x40, 0x90, 0xe0);
     lv_gauges_def.needle_color[2] = COLOR_MAKE(0x50, 0xe0, 0x50);
     lv_gauges_def.needle_color[3] = COLOR_MAKE(0xff, 0xff, 0x70);
 
     lv_gauges_def.needle_mid_r = 5 * LV_DOWNSCALE;
     lv_gauges_def.needle_mid_color = COLOR_GRAY;
+    lv_gauges_def.needle_opa = OPA_80;
     lv_gauges_def.scale_pad = 20 * LV_DOWNSCALE;
     lv_gauges_def.scale_label_num = 6;
-    lv_gauges_def.scale_angle = 240;
-    lv_gauges_def.needle_opa = OPA_70;
+    lv_gauges_def.scale_angle = 220;
+    lv_gauges_def.value_show = 1;
 }
 
 #endif
