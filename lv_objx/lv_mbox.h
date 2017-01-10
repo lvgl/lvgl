@@ -53,6 +53,7 @@ typedef struct
 	cord_t btn_h;
 	uint8_t hide_title	:1;
 	uint8_t hide_btns	:1;
+	uint8_t btn_fit     :1;
 }lv_mboxs_t;
 
 /*Built-in styles of message box*/
