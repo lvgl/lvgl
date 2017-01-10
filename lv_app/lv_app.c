@@ -1021,9 +1021,9 @@ static void lv_app_init_style(void)
 	app_style.sc_page_style.bg_rects.hpad = 0;
 	app_style.sc_page_style.bg_rects.opad = 0;
 	app_style.sc_page_style.scrl_rects.objs.transp = 1;
-	app_style.sc_page_style.scrl_rects.hpad = 20 * LV_DOWNSCALE;
-	app_style.sc_page_style.scrl_rects.vpad = 20 * LV_DOWNSCALE;
-	app_style.sc_page_style.scrl_rects.opad = 20 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrl_rects.hpad = 10 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrl_rects.vpad = 10 * LV_DOWNSCALE;
+	app_style.sc_page_style.scrl_rects.opad = 15 * LV_DOWNSCALE;
 
 	/*Shortcut styles*/
 	lv_btns_get(LV_BTNS_DEF,&app_style.sc_style);

@@ -25,7 +25,7 @@
  * GLOBAL PROTOTYPES
  **********************/
 void lv_app_notice_init(void);
-void lv_app_notice_add(const char * format, ...);
+lv_obj_t *  lv_app_notice_add(const char * format, ...);
 
 /**********************
  *      MACROS

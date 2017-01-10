@@ -136,6 +136,12 @@
 /*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
 #define USE_LV_MBOX     1
 
+/*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
+#define USE_LV_MBOX     1
+#if USE_LV_MBOX != 0
+#define LV_MBOX_ANIM_TIME   250 /*How fast animate out the message box in auto close. 0: no animation [ms]*/
+#endif
+
 /*==================
  *  LV APP SETTINGS
  * =================*/
@@ -175,7 +181,7 @@
 #define LV_APP_EFFECT_OPA_ANIM 1 /*Enable the using opacity in the application animations*/
 #define LV_APP_ANIM_WIN 200      /*Animation time in milliseconds (0: turn off animation)*/
 #define LV_APP_ANIM_SC  200      /*Animation time in milliseconds (0: turn off animation)*/
-#define LV_APP_ANIM_NOTICE 300   /*How fast animate out a notice [ms]*/
+#define LV_APP_ANIM_NOTICE 300   /*Obsolete, use LV_MBOX_ANIM. */
 
 /* App. utility settings */
 #define LV_APP_NOTICE_SHOW_TIME 4000 /*Notices will be shown for this time [ms]*/
