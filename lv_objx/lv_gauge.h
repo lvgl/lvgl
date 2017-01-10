@@ -53,7 +53,6 @@ typedef struct
     opa_t needle_opa;           /*Opacity of the needles*/
     /*Value text settings*/
     lv_labels_t value_labels;   /*Style of the value label*/
-    uint8_t value_show  :1;     /*1: draw a label woth the most critical value*/
 }lv_gauges_t;
 
 /*Built-in styles of gauge*/
@@ -70,6 +69,7 @@ typedef struct
     int16_t min;
     int16_t max;
     int16_t * values;
+    char * txt;
     uint8_t needle_num;
     uint8_t low_critical    :1; /*0: the higher value is more critical, 1: the lower value is more critical*/
 }lv_gauge_ext_t;
@@ -81,13 +81,15 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
 lv_gauges_t * lv_gauges_get(lv_gauges_builtin_t style, lv_gauges_t * copy);
 
-void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value)
+void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value);
 void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num);
 void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
+void lv_gauge_set_text(lv_obj_t * gauge, const char * txt);
 void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low);
 
 uint8_t lv_gauge_get_needle_num(lv_obj_t * gauge);
 int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
+const char * lv_gauge_get_text(lv_obj_t * gauge);
 bool lv_gauge_get_low_critical(lv_obj_t * gauge);
 
 /**********************

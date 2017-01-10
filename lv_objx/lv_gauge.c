@@ -12,6 +12,7 @@
 
 #include "lv_gauge.h"
 #include <stdio.h>
+#include <string.h>
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/text.h"
 #include "misc/math/trigo.h"
@@ -74,6 +75,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     ext->needle_num = 1;
     ext->low_critical = 0;
     ext->values = NULL;
+    ext->txt = NULL;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_gauge);
 
@@ -84,6 +86,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new gauge gauge*/
     if(copy == NULL) {
         lv_gauge_set_needle_num(new_gauge, 1);
+        lv_gauge_set_text(new_gauge, "%d");
         lv_obj_set_size(new_gauge, LV_GAUGE_DEF_WIDTH, LV_GAUGE_DEF_HEIGHT);
         lv_obj_set_style(new_gauge, lv_gauges_get(LV_GAUGES_DEF, NULL));
     }
@@ -94,6 +97,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
         ext->max = copy_ext->max;
         ext->low_critical = copy_ext->low_critical;
         lv_gauge_set_needle_num(new_gauge, lv_gauge_get_needle_num(copy));
+        lv_gauge_set_text(new_gauge, lv_gauge_get_text(copy));
 
         uint8_t i;
         for(i = 0; i < ext->needle_num; i++) {
@@ -196,6 +200,24 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value)
 }
 
 /**
+ * Set text on a gauge
+ * @param gauge pinter to a gauge object
+ * @param txt a printf like format string
+ *            with 1 place for a number (e.g. "Value: %d");
+ */
+void lv_gauge_set_text(lv_obj_t * gauge, const char * txt)
+{
+    lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
+
+    if(ext->txt != NULL) dm_free(ext->txt);
+
+    ext->txt = dm_alloc(strlen(txt) + 1);
+    strcpy(ext->txt, txt);
+
+    lv_obj_inv(gauge);
+}
+
+/**
  * Set which value is more critical (lower or higher)
  * @param gauge pointer to a gauge object
  * @param low false: higher / true: lower value is more critical
@@ -207,8 +229,8 @@ void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low)
     ext->low_critical = low == false ? 0 : 1;
 
     lv_obj_inv(gauge);
-
 }
+
 
 /*=====================
  * Getter functions
@@ -235,10 +257,21 @@ int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
 
-    if(needle >= ext->needle_num) return 0;
-
+    if(needle >= ext->needle_num) return ext->min;
 
     return ext->values[needle];
+}
+
+/**
+ * Get the text of a gauge
+ * @param gauge pointer to gauge
+ * @return the set text. (not with the current value)
+ */
+const char * lv_gauge_get_text(lv_obj_t * gauge)
+{
+    lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
+    return ext->txt;
+
 }
 
 /**
@@ -251,7 +284,6 @@ bool lv_gauge_get_low_critical(lv_obj_t * gauge)
     lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
 
     return ext->low_critical == 0 ? false : true;
-
 }
 
 /**
@@ -418,7 +450,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
     p_mid.y = y_ofs;
     for(i = 0; i < ext->needle_num; i++) {
         /*Calculate the end point of a needle*/
-        int16_t needle_angle = ext->values[i] * style->scale_angle / (ext->max - ext->min) + angle_ofs;
+        int16_t needle_angle = (ext->values[i] - ext->min) * style->scale_angle /
+                               (ext->max - ext->min) + angle_ofs;
         p_end.y = (trigo_sin(needle_angle) * r) / TRIGO_SIN_MAX + y_ofs;
         p_end.x = (trigo_sin(needle_angle + 90) * r) / TRIGO_SIN_MAX + x_ofs;
 
@@ -449,9 +482,9 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
     lv_draw_rect(&nm_cord, mask, &nm, OPA_100);
 
     /*Write the critical value if enabled*/
-    if(style->value_show != 0) {
+    if(ext->txt[0] != '\0') {
         char value_txt[16];
-        sprintf(value_txt, "%d", critical_value);
+        sprintf(value_txt, ext->txt, critical_value);
 
         area_t label_cord;
         point_t label_size;
@@ -489,8 +522,8 @@ static void lv_gauges_init(void)
 
     lv_labels_get(LV_LABELS_DEF, &lv_gauges_def.value_labels);
     lv_gauges_def.value_labels.objs.color = COLOR_WHITE;
-    lv_gauges_def.value_labels.letter_space = 6 * LV_DOWNSCALE;
-    lv_gauges_def.value_labels.font = FONT_DEJAVU_60;
+    lv_gauges_def.value_labels.letter_space = 3 * LV_DOWNSCALE;
+    lv_gauges_def.value_labels.mid = 1;
 
     lv_lines_get(LV_LINES_DEF, &lv_gauges_def.needle_lines);
     lv_gauges_def.needle_lines.objs.color = COLOR_WHITE;
@@ -507,7 +540,6 @@ static void lv_gauges_init(void)
     lv_gauges_def.scale_pad = 20 * LV_DOWNSCALE;
     lv_gauges_def.scale_label_num = 6;
     lv_gauges_def.scale_angle = 220;
-    lv_gauges_def.value_show = 1;
 }
 
 #endif
