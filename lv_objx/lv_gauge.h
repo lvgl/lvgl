@@ -81,7 +81,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
 lv_gauges_t * lv_gauges_get(lv_gauges_builtin_t style, lv_gauges_t * copy);
 
-void lv_gauge_set_value(lv_obj_t * gauge, int16_t value, uint8_t needle);
+void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value)
 void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num);
 void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
 void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low);

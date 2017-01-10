@@ -178,10 +178,10 @@ void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max)
 /**
  * Set the value of a needle
  * @param gauge pointer to gauge
- * @param value the new value
  * @param needle the id of the needle
+ * @param value the new value
  */
-void lv_gauge_set_value(lv_obj_t * gauge, int16_t value, uint8_t needle)
+void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
 
