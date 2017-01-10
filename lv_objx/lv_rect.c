@@ -563,7 +563,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 			   lv_obj_is_protected(child_rc, LV_PROTECT_POS) == false) {
 				if(w_row + lv_obj_get_width(child_rc) > w_obj) break; /*If the next object is already not fit then break*/
 				w_row += lv_obj_get_width(child_rc) + style->opad; /*Add the object width + opad*/
-				h_row = max(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
+				h_row = MATH_MAX(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
 				obj_num ++;
 			}
 			child_rc = ll_get_prev(&rect->child_ll, child_rc); /*Load the next object*/
@@ -690,10 +690,10 @@ void lv_rect_refr_autofit(lv_obj_t * rect)
 
     LL_READ(rect->child_ll, i) {
 		if(lv_obj_get_hidden(i) != false) continue;
-    	new_cords.x1 = min(new_cords.x1, i->cords.x1);
-    	new_cords.y1 = min(new_cords.y1, i->cords.y1);
-        new_cords.x2 = max(new_cords.x2, i->cords.x2);
-        new_cords.y2 = max(new_cords.y2, i->cords.y2);
+    	new_cords.x1 = MATH_MIN(new_cords.x1, i->cords.x1);
+    	new_cords.y1 = MATH_MIN(new_cords.y1, i->cords.y1);
+        new_cords.x2 = MATH_MAX(new_cords.x2, i->cords.x2);
+        new_cords.y2 = MATH_MAX(new_cords.y2, i->cords.y2);
     }
 
     /*If the value is not the init value then the page has >=1 child.*/

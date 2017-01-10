@@ -322,10 +322,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  last_y = act_point.y;
 		  last_x = act_point.x;
 
-		  draw_area.x1 = min(act_area.x1, act_area.x2);
-		  draw_area.x2 = max(act_area.x1, act_area.x2);
-		  draw_area.y1 = min(act_area.y1, act_area.y2);
-		  draw_area.y2 = max(act_area.y1, act_area.y2);
+		  draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	  }
 	  if (hor == false && last_x != act_point.x) {
@@ -338,10 +338,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  last_y = act_point.y;
 		  last_x = act_point.x;
 
-		  draw_area.x1 = min(act_area.x1, act_area.x2);
-		  draw_area.x2 = max(act_area.x1, act_area.x2);
-		  draw_area.y1 = min(act_area.y1, act_area.y2);
-		  draw_area.y2 = max(act_area.y1, act_area.y2);
+		  draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	  }
 
@@ -366,10 +366,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		act_area.y1 = last_y - width_half ;
 		act_area.y2 = act_point.y + width_half + width_1;
 
-		draw_area.x1 = min(act_area.x1, act_area.x2);
-		draw_area.x2 = max(act_area.x1, act_area.x2);
-		draw_area.y1 = min(act_area.y1, act_area.y2);
-		draw_area.y2 = max(act_area.y1, act_area.y2);
+		draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 	if (hor == false) {
@@ -380,10 +380,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		act_area.y1 = last_y;
 		act_area.y2 = act_point.y;
 
-		draw_area.x1 = min(act_area.x1, act_area.x2);
-		draw_area.x2 = max(act_area.x1, act_area.x2);
-		draw_area.y1 = min(act_area.y1, act_area.y2);
-		draw_area.y2 = max(act_area.y1, act_area.y2);
+		draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 }

@@ -56,7 +56,7 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
 		act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
 									   font, letter_space);
 
-		size_res->x = max(act_line_length, size_res->x);
+		size_res->x = MATH_MAX(act_line_length, size_res->x);
 		line_start = new_line_start;
     }
 

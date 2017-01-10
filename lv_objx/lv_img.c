@@ -311,6 +311,7 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
         }
         else return false;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
+        if(ext->h == 0 || ext->w == 0) return true;
 		area_t cords;
 
 		lv_obj_get_cords(img, &cords);
