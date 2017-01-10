@@ -554,7 +554,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 	child_rc = child_rs; /*Initially the the row starter and closer is the same*/
 	while(child_rs != NULL) {
 		cord_t h_row = 0;
-		cord_t w_row = style->hpad * 2; /*The width is minimum the left-right hpad*/
+		cord_t w_row = style->hpad * 2; /*The width is at least the left-right hpad*/
 		uint32_t obj_num = 0;
 
 		/*Find the row closer object and collect some data*/
@@ -582,7 +582,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 		}
 		/*If here is only one object in the row then align it to the left*/
 		else if (obj_num == 1) {
-			lv_obj_align(child_rs, rect, LV_ALIGN_IN_TOP_LEFT, style->hpad, act_y);
+			lv_obj_align(child_rs, rect, LV_ALIGN_IN_TOP_MID, 0, act_y);
 		}
 		/* Align the children (from child_rs to child_rc)*/
 		else {
