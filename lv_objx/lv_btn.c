@@ -515,7 +515,7 @@ static void lv_btns_init(void)
     lv_btns_border.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
     lv_btns_border.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
     lv_btns_border.flags[LV_BTN_STATE_INA].light_en = 0;
-	lv_btns_border.rects.bwidth = 2 * LV_DOWNSCALE;
+	lv_btns_border.rects.bwidth = 1 * LV_DOWNSCALE;
 	lv_btns_border.rects.bopa = 50;
 	lv_btns_border.rects.round = 4 * LV_DOWNSCALE;
 	lv_btns_border.rects.hpad = 10 * LV_DOWNSCALE;
