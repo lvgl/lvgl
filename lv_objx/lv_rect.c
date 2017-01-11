@@ -342,9 +342,16 @@ static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask)
 
 	memcpy(&light_style, style, sizeof(lv_rects_t));
 
+
+
+
 	light_style.empty = 1;
 	light_style.bwidth = light_size;
-	light_style.round =  style->round + light_size + 1;
+	light_style.round = style->round;
+	if(light_style.round == LV_RECT_CIRCLE) {
+	    light_style.round = MATH_MIN(lv_obj_get_width(rect), lv_obj_get_height(rect));
+	}
+	light_style.round += light_size + 1;
 	light_style.bcolor = style->lcolor;
 	light_style.bopa = 100;
 
