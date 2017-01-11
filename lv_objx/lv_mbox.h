@@ -49,21 +49,18 @@ typedef struct
 	lv_rects_t btnh;
 	lv_btns_t btn;
 	lv_labels_t btn_label;
-	cord_t btn_w;
-	cord_t btn_h;
 	uint8_t hide_title	:1;
 	uint8_t hide_btns	:1;
-	uint8_t btn_fit     :1;
 }lv_mboxs_t;
 
 /*Built-in styles of message box*/
 typedef enum
 {
 	LV_MBOXS_DEF,
+    LV_MBOXS_BUBBLE, /*Will be removed (use LV_MBOXS_INFO instead)*/
 	LV_MBOXS_INFO,
 	LV_MBOXS_WARN,
 	LV_MBOXS_ERR,
-	LV_MBOXS_BUBBLE,
 }lv_mboxs_builtin_t;
 
 /*Data of message box*/

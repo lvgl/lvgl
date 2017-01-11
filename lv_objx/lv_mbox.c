@@ -36,7 +36,6 @@ static void lv_mbox_disable_fit(lv_obj_t  * mbox);
  *  STATIC VARIABLES
  **********************/
 static lv_mboxs_t lv_mboxs_def;	/*Default message box style*/
-static lv_mboxs_t lv_mboxs_bubble;
 static lv_mboxs_t lv_mboxs_info;
 static lv_mboxs_t lv_mboxs_warn;
 static lv_mboxs_t lv_mboxs_err;
@@ -171,7 +170,6 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     			while(btn != NULL) {
     				/*Refresh the next button's style*/
     				lv_obj_set_style(btn, &style->btn);
-    				lv_obj_set_size(btn, style->btn_w, style->btn_h);
 
     				/*Refresh the button label too*/
     				lv_obj_set_style(lv_obj_get_child(btn, NULL), &style->btn_label);
@@ -220,9 +218,7 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 	btn = lv_btn_create(ext->btnh, NULL);
 	lv_btn_set_rel_action(btn, rel_action);
 	lv_obj_set_style(btn, &style->btn);
-	lv_obj_set_size(btn, style->btn_w, style->btn_h);
-
-	if(style->btn_fit != 0) lv_rect_set_fit(btn, true, true);
+	lv_rect_set_fit(btn, true, true);
 
 	lv_obj_t * label;
 	label = lv_label_create(btn, NULL);
@@ -376,9 +372,7 @@ lv_mboxs_t * lv_mboxs_get(lv_mboxs_builtin_t style, lv_mboxs_t * copy)
 		case LV_MBOXS_DEF:
 			style_p = &lv_mboxs_def;
 			break;
-        case LV_MBOXS_BUBBLE:
-            style_p = &lv_mboxs_bubble;
-            break;
+		case LV_MBOXS_BUBBLE:
         case LV_MBOXS_INFO:
             style_p = &lv_mboxs_info;
             break;
@@ -488,24 +482,17 @@ static void lv_mboxs_init(void)
 	lv_rects_get(LV_RECTS_TRANSP, &lv_mboxs_def.btnh);
 	lv_mboxs_def.btnh.hpad = 0;
 	lv_mboxs_def.btnh.vpad = 0;
-
-	lv_mboxs_def.btn_w = 80 * LV_DOWNSCALE;
-	lv_mboxs_def.btn_h = 50 * LV_DOWNSCALE;
-	lv_mboxs_def.btn_fit = 0;
 	lv_mboxs_def.hide_btns = 0;
 	lv_mboxs_def.hide_title = 0;
 
-	memcpy(&lv_mboxs_bubble, &lv_mboxs_def, sizeof(lv_mboxs_t));
-	lv_mboxs_bubble.bg.objs.color = COLOR_BLACK;
-    lv_mboxs_bubble.bg.gcolor = COLOR_BLACK;
-    lv_mboxs_bubble.bg.bcolor = COLOR_WHITE;
-    lv_mboxs_bubble.title.objs.color = COLOR_WHITE;
-    lv_mboxs_bubble.txt.objs.color = COLOR_WHITE;
-    lv_mboxs_bubble.txt.letter_space = 2 * LV_DOWNSCALE;
-    lv_mboxs_bubble.hide_btns = 1;
-    lv_mboxs_bubble.hide_title = 1;
+	memcpy(&lv_mboxs_info, &lv_mboxs_def, sizeof(lv_mboxs_t));
+	lv_mboxs_info.bg.objs.color = COLOR_BLACK;
+	lv_mboxs_info.bg.gcolor = COLOR_BLACK;
+	lv_mboxs_info.bg.bcolor = COLOR_WHITE;
+	lv_mboxs_info.title.objs.color = COLOR_WHITE;
+	lv_mboxs_info.txt.objs.color = COLOR_WHITE;
+	lv_mboxs_info.txt.letter_space = 2 * LV_DOWNSCALE;
 
-    memcpy(&lv_mboxs_info, &lv_mboxs_bubble, sizeof(lv_mboxs_t));
     lv_btns_get(LV_BTNS_BORDER, &lv_mboxs_info.btn);
     lv_mboxs_info.btn.bcolor[LV_BTN_STATE_PR] = COLOR_SILVER;
     lv_mboxs_info.btn.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
@@ -513,9 +500,8 @@ static void lv_mboxs_init(void)
     lv_mboxs_info.btn.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
     lv_mboxs_info.btn.rects.bopa = OPA_COVER;
     lv_mboxs_info.btn_label.objs.color = COLOR_WHITE;
-    lv_mboxs_info.hide_btns = 1;
+    lv_mboxs_info.hide_btns = 0;
     lv_mboxs_info.hide_title = 0;
-    lv_mboxs_info.btn_fit = 1;
 
     memcpy(&lv_mboxs_warn, &lv_mboxs_info, sizeof(lv_mboxs_t));
     lv_mboxs_warn.bg.objs.color = COLOR_MAKE(0xff, 0xb2, 0x66);
