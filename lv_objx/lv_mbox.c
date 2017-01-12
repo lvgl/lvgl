@@ -17,6 +17,10 @@
 /*********************
  *      DEFINES
  *********************/
+/*Test configurations*/
+#ifndef LV_MBOX_ANIM_TIME
+#define LV_MBOX_ANIM_TIME   250 /*How fast animate out the message box in auto close. 0: no animation [ms]*/
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -178,17 +182,12 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 
     			/*Hide the title and/or buttons*/
     			const char * title_txt = lv_label_get_text(ext->title);
-    		    if(style->hide_title != 0 || title_txt[0] == '\0') {
-                    lv_obj_set_hidden(ext->btnh, true);
-                } else {
-                    lv_obj_set_hidden(ext->btnh, false);
-                }
+    		    if(title_txt[0] == '\0') lv_obj_set_hidden(ext->btnh, true);
+                else  lv_obj_set_hidden(ext->btnh, false);
 
-    			if(style->hide_btns != 0 || lv_obj_get_child_num(ext->btnh) == 0) {
-    				lv_obj_set_hidden(ext->btnh, true);
-    			} else {
-    				lv_obj_set_hidden(ext->btnh, false);
-    			}
+    			if(lv_obj_get_child_num(ext->btnh) == 0) 	lv_obj_set_hidden(ext->btnh, true);
+    			else  lv_obj_set_hidden(ext->btnh, false);
+
     			break;
     		default:
     			break;
@@ -448,7 +447,6 @@ static void lv_mbox_realign(lv_obj_t * mbox)
             btn = lv_obj_get_child(ext->btnh, btn);
         }
 
-        if(style->hide_title != 0) title_w = 0;
         cord_t w = MATH_MAX(title_w, txt_w);
         w = MATH_MAX(w, btn_w);
         lv_obj_set_width(ext->btnh, w );
@@ -482,8 +480,6 @@ static void lv_mboxs_init(void)
 	lv_rects_get(LV_RECTS_TRANSP, &lv_mboxs_def.btnh);
 	lv_mboxs_def.btnh.hpad = 0;
 	lv_mboxs_def.btnh.vpad = 0;
-	lv_mboxs_def.hide_btns = 0;
-	lv_mboxs_def.hide_title = 0;
 
 	memcpy(&lv_mboxs_info, &lv_mboxs_def, sizeof(lv_mboxs_t));
 	lv_mboxs_info.bg.objs.color = COLOR_BLACK;
@@ -500,8 +496,6 @@ static void lv_mboxs_init(void)
     lv_mboxs_info.btn.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
     lv_mboxs_info.btn.rects.bopa = OPA_COVER;
     lv_mboxs_info.btn_label.objs.color = COLOR_WHITE;
-    lv_mboxs_info.hide_btns = 0;
-    lv_mboxs_info.hide_title = 0;
 
     memcpy(&lv_mboxs_warn, &lv_mboxs_info, sizeof(lv_mboxs_t));
     lv_mboxs_warn.bg.objs.color = COLOR_MAKE(0xff, 0xb2, 0x66);

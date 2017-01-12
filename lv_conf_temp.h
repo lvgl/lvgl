@@ -93,7 +93,7 @@
 /*Line (dependencies: -*/
 #define USE_LV_LINE     1
 
-/*Image (dependencies: from misc: FSINT, UFS)*/
+/*Image (dependencies: from misc: fsint, ufs)*/
 #define USE_LV_IMG      1
 #if USE_LV_IMG != 0
 //#define LV_IMG_DEF_WALLPAPER    img_wallpaper_var /*Comment this line to NOT use wallpaper*/
@@ -135,12 +135,12 @@
 
 /*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
 #define USE_LV_MBOX     1
-
-/*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
-#define USE_LV_MBOX     1
 #if USE_LV_MBOX != 0
 #define LV_MBOX_ANIM_TIME   250 /*How fast animate out the message box in auto close. 0: no animation [ms]*/
 #endif
+
+/*Gauge (dependencies: lv_rect, lv_label, lv_line, misc: trigo)*/
+#define USE_LV_GAUGE    1
 
 /*==================
  *  LV APP SETTINGS

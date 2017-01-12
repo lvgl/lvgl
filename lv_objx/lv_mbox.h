@@ -49,8 +49,6 @@ typedef struct
 	lv_rects_t btnh;
 	lv_btns_t btn;
 	lv_labels_t btn_label;
-	uint8_t hide_title	:1;
-	uint8_t hide_btns	:1;
 }lv_mboxs_t;
 
 /*Built-in styles of message box*/

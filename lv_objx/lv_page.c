@@ -19,6 +19,10 @@
 /*********************
  *      DEFINES
  *********************/
+/*Test configurations*/
+#ifndef LV_PAGE_ANIM_FOCUS_TIME
+#define LV_PAGE_ANIM_FOCUS_TIME     300 /*List focus animation time [ms] (0: turn off the animation)*/
+#endif
 
 /**********************
  *      TYPEDEFS
