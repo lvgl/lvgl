@@ -431,7 +431,6 @@ static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_
 static void lv_mbox_realign(lv_obj_t * mbox)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
-    lv_mboxs_t * style = lv_obj_get_style(mbox);
 
     if(ext->btnh == NULL || ext->title == NULL || ext->txt == NULL) return;
 
