@@ -1,10 +1,10 @@
 #include "lv_conf.h"
-#if  USE_FONT_ICONS != 0
+#if  USE_FONT_SYMBOL_30 != 0
 
 #include <stdint.h>
 #include "../font.h"
 
-static const uint8_t  icons_bitmaps[3120] =
+static const uint8_t  symbol_30_bitmaps[3120] =
 {
     // ASCII: 97, char width: 30
     0x00, 0x00, 0x00, 0x00,  // ------------------------------..
@@ -839,7 +839,7 @@ static const uint8_t  icons_bitmaps[3120] =
     0x00, 0x00, 0x00, 0x00,  // --------------------------------
 };
 
-static const uint8_t  icons_widths[26] =
+static const uint8_t  symbol_30_widths[26] =
 {
     30, 26, 32, 24, 26, 26, 30, 24, 
     30, 21, 21, 30, 17, 17, 24, 30, 
@@ -847,20 +847,20 @@ static const uint8_t  icons_widths[26] =
     26, 34, 
 };
 
-static const font_t icons_dsc =
+static const font_t symbol_30_dsc =
 {
     26, // Letter count
     97, // First ascii code
     4, // Letters width (bytes)
     30, // Letters height (row)
     0, // Fixed width or 0 if variable
-    icons_widths,
-    icons_bitmaps
+    symbol_30_widths,
+    symbol_30_bitmaps
 };
 
-const font_t * icons_get_dsc(void)
+const font_t * symbol_30_get_dsc(void)
 {
-    return &icons_dsc;
+    return &symbol_30_dsc;
 }
 
 

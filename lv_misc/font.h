@@ -47,8 +47,8 @@ typedef enum
 #if USE_FONT_DEJAVU_80 != 0
     FONT_DEJAVU_80,
 #endif
-#if USE_FONT_ICONS != 0
-    FONT_ICONS,
+#if USE_FONT_SYMBOL_30 != 0
+    FONT_SYMBOL_30,
 #endif
     FONT_TYPE_NUM,
 }font_types_t;
