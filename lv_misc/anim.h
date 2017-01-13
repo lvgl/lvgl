@@ -51,11 +51,42 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Init. the animation module
+ */
 void anim_init(void);
+
+/**
+ * Create an animation
+ * @param anim_p an initialized 'anim_t' variable. Not required after call.
+ */
 void anim_create(anim_t * anim_p);
-anim_path_t * anim_get_path(anim_path_name_t type);
+
+/**
+ * Delete an animation for a variable with a given animatior function
+ * @param var pointer to variable
+ * @param fp a function pointer which is animating 'var',
+ *           or NULL to ignore it and delete all animation with 'var
+ * @return true: at least 1 animation is deleted, false: no animation is deleted
+ */
 bool anim_del(void * var, anim_fp_t fp);
+
+/**
+ * Calculate the time of an animation with a given speed and the start and end values
+ * @param speed speed of animation in unit/sec
+ * @param start start value of the animation
+ * @param end end value of the animation
+ * @return the required time [ms] for the animation with the given parameters
+ */
 uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end);
+
+/**
+ * Get a predefine animation path
+ * @param name name of the path from 'anim_path_name_t'
+ * @return pointer to the path array
+ */
+anim_path_t * anim_get_path(anim_path_name_t name);
 
 /**********************
  *      MACROS

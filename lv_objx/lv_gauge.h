@@ -3,13 +3,6 @@
  * 
  */
 
-
-/*Search an replace: gauge -> object normal name with lower case (e.g. button, label etc.)
- * 					 gauge -> object short name with lower case(e.g. btn, label etc)
- *                   GAUGE -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 #ifndef LV_GAUGE_H
 #define LV_GAUGE_H
 
@@ -77,20 +70,99 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
-bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
-lv_gauges_t * lv_gauges_get(lv_gauges_builtin_t style, lv_gauges_t * copy);
 
-void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value);
+
+/**
+ * Create a gauge objects
+ * @param par pointer to an object, it will be the parent of the new gauge
+ * @param copy pointer to a gauge object, if not NULL then the new object will be copied from it
+ * @return pointer to the created gauge
+ */
+lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
+
+/**
+ * Signal function of the gauge
+ * @param gauge pointer to a gauge object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
+
+/**
+ * Set the number of needles (should be  <= LV_GAUGE_MAX_NEEDLE)
+ * @param gauge pointer to gauge object
+ * @param num number of needles
+ */
 void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num);
+
+/**
+ * Set the range of a gauge
+ * @param gauge pointer to gauge object
+ * @param min min value
+ * @param max max value
+ */
 void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
+
+/**
+ * Set the value of a needle
+ * @param gauge pointer to gauge
+ * @param needle the id of the needle
+ * @param value the new value
+ */
+void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value);
+
+/**
+ * Set text on a gauge
+ * @param gauge pinter to a gauge object
+ * @param txt a printf like format string
+ *            with 1 place for a number (e.g. "Value: %d");
+ */
 void lv_gauge_set_text(lv_obj_t * gauge, const char * txt);
+
+/**
+ * Set which value is more critical (lower or higher)
+ * @param gauge pointer to a gauge object
+ * @param low false: higher / true: lower value is more critical
+ */
 void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low);
 
+/**
+ * Get the number of needles on a gauge
+ * @param gauge pointer to gauge
+ * @return number of needles
+ */
 uint8_t lv_gauge_get_needle_num(lv_obj_t * gauge);
+
+/**
+ * Get the value of a needle
+ * @param gauge pointer to gauge object
+ * @param needle the id of the needle
+ * @return the value of the needle [min,max]
+ */
 int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
+
+/**
+ * Get the text of a gauge
+ * @param gauge pointer to gauge
+ * @return the set text. (not with the current value)
+ */
 const char * lv_gauge_get_text(lv_obj_t * gauge);
+
+/**
+ * Get which value is more critical (lower or higher)
+ * @param gauge pointer to a gauge object
+ * @param low false: higher / true: lower value is more critical
+ */
 bool lv_gauge_get_low_critical(lv_obj_t * gauge);
+
+/**
+ * Return with a pointer to a built-in style and/or copy it to a variable
+ * @param style a style name from lv_gauges_builtin_t enum
+ * @param copy copy the style to this variable. (NULL if unused)
+ * @return pointer to an lv_gauges_t style
+ */
+lv_gauges_t * lv_gauges_get(lv_gauges_builtin_t style, lv_gauges_t * copy);
 
 /**********************
  *      MACROS

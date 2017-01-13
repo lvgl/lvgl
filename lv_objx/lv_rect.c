@@ -66,10 +66,10 @@ static lv_rects_t lv_rects_border;
  *-----------------*/
 
 /**
- * Create a label objects
- * @param par pointer to an object, it will be the parent of the new label
+ * Create a rectangle objects
+ * @param par pointer to an object, it will be the parent of the new rectangle
  * @param copy pointer to a rectangle object, if not NULL then the new object will be copied from it
- * @return pointer to the created label
+ * @return pointer to the created rectangle
  */
 lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
 {
@@ -670,7 +670,7 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
  * Handle auto fit. Set the size of the object to involve all children.
  * @param rect pointer to an object which size will be modified
  */
-void lv_rect_refr_autofit(lv_obj_t * rect)
+static void lv_rect_refr_autofit(lv_obj_t * rect)
 {
 	lv_rect_ext_t * ext = lv_obj_get_ext(rect);
 

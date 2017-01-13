@@ -60,10 +60,43 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Create a check box objects
+ * @param par pointer to an object, it will be the parent of the new check box
+ * @param copy pointer to a check box object, if not NULL then the new object will be copied from it
+ * @return pointer to the created check box
+ */
 lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy);
+
+/**
+ * Signal function of the check box
+ * @param cb pointer to a check box object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ */
 bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
+
+/**
+ * Set the text of a check box
+ * @param cb pointer to a check box
+ * @param txt the text of the check box
+ */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt);
+
+/**
+ * Get the text of a check box
+ * @param cb pointer to check box object
+ * @return pointer to the text of the check box
+ */
 const char * lv_cb_get_text(lv_obj_t * cb);
+
+/**
+ * Return with a pointer to a built-in style and/or copy it to a variable
+ * @param style a style name from lv_cbs_builtin_t enum
+ * @param copy copy the style to this variable. (NULL if unused)
+ * @return pointer to an lv_cbs_t style
+ */
 lv_cbs_t * lv_cbs_get(lv_cbs_builtin_t style, lv_cbs_t * copy);
 
 /**********************

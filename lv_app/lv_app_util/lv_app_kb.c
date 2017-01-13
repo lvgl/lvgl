@@ -73,6 +73,9 @@ static lv_btnms_t kb_btnms;
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Initialize the application keyboard
+ */
 void lv_app_kb_init(void)
 {
     lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);

@@ -77,16 +77,66 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-/*Create function*/
+
+/**
+ * Create a rectangle objects
+ * @param par pointer to an object, it will be the parent of the new rectangle
+ * @param copy pointer to a rectangle object, if not NULL then the new object will be copied from it
+ * @return pointer to the created rectangle
+ */
 lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy);
+
+/**
+ * Signal function of the rectangle
+ * @param rect pointer to a rectangle object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ */
 bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param);
 
-void lv_rect_set_fit(lv_obj_t * rect, bool hor_en, bool ver_en);
+/**
+ * Set the layout on a rectangle
+ * @param rect pointer to a rectangle object
+ * @param layout a layout from 'lv_rect_layout_t'
+ */
 void lv_rect_set_layout(lv_obj_t * rect, lv_rect_layout_t layout);
 
+/**
+ * Enable the horizontal or vertical fit.
+ * The rectangle size will be set to involve the children horizontally or vertically.
+ * @param rect pointer to a rectangle object
+ * @param hor_en true: enable the horizontal padding
+ * @param ver_en true: enable the vertical padding
+ */
+void lv_rect_set_fit(lv_obj_t * rect, bool hor_en, bool ver_en);
+
+/**
+ * Get the layout of a rectangle
+ * @param rect pointer to rectangle object
+ * @return the layout from 'lv_rect_layout_t'
+ */
 lv_rect_layout_t lv_rect_get_layout(lv_obj_t * rect);
+
+/**
+ * Get horizontal fit enable attribute of a rectangle
+ * @param rect pointer to a rectangle object
+ * @return true: horizontal padding is enabled
+ */
 bool lv_rect_get_hfit(lv_obj_t * rect);
+
+/**
+ * Get vertical fit enable attribute of a rectangle
+ * @param obj pointer to a rectangle object
+ * @return true: vertical padding is enabled
+ */
 bool lv_rect_get_vfit(lv_obj_t * rect);
+
+/**
+ * Return with a pointer to a built-in style and/or copy it to a variable
+ * @param style a style name from lv_rects_builtin_t enum
+ * @param copy copy the style to this variable. (NULL if unused)
+ * @return pointer to an lv_rects_t style
+ */
 lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy);
 
 /**********************

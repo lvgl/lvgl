@@ -48,13 +48,49 @@ typedef lv_action_res_t ( * lv_action_t) (struct __LV_OBJ_T * obj, lv_dispi_t * 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the display input subsystem
+ */
 void lv_dispi_init(void);
+
+/**
+ * Reset all display inputs
+ */
 void lv_dispi_reset(void);
+
+/**
+ * Reset the long press state of a display input
+ * @param dispi pointer to a display input
+ */
 void lv_dispi_reset_lpr(lv_dispi_t * dispi);
-bool lv_dispi_is_dragging(lv_dispi_t * dispi_p);
-void lv_dispi_get_point(lv_dispi_t * dispi_p, point_t * point_p);
-void lv_dispi_get_vect(lv_dispi_t * dispi_p, point_t * point_p);
-void lv_dispi_wait_release(lv_dispi_t * dispi_p);
+
+/**
+ * Get the last point on display input
+ * @param dispi pointer to a display input
+ * @param point pointer to a point to store the result
+ */
+void lv_dispi_get_point(lv_dispi_t * dispi, point_t * point);
+
+/**
+ * Check if there is dragging on display input or not
+ * @param dispi pointer to a display input
+ * @return true: drag is in progress
+ */
+bool lv_dispi_is_dragging(lv_dispi_t * dispi);
+
+/**
+ * Get the vector of dragging on a display input
+ * @param dispi pointer to a display input
+ * @param point pointer to a point to store the vector
+ */
+void lv_dispi_get_vect(lv_dispi_t * dispi, point_t * point);
+
+/**
+ * Do nothing until the next release
+ * @param dispi pointer to a display input
+ */
+void lv_dispi_wait_release(lv_dispi_t * dispi);
 
 /**********************
  *      MACROS

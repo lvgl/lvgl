@@ -105,64 +105,6 @@ void lv_init(void)
 
 }
 
-/**
- * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
- * @param obj pointer to an object
- */
-void lv_obj_inv(lv_obj_t * obj)
-{
-    /*Invalidate the object only if it belongs to the 'act_scr'*/
-    lv_obj_t * act_scr_p = lv_scr_act(); 
-    if(lv_obj_get_scr(obj) == act_scr_p) {
-        /*Truncate recursively to the parents*/
-        area_t area_trunc;
-        lv_obj_t * par = lv_obj_get_parent(obj);
-        bool union_ok = true;
-        /*Start with the original coordinates*/
-        cord_t ext_size = obj->ext_size;
-        area_cpy(&area_trunc, &obj->cords);
-        area_trunc.x1 -= ext_size;
-        area_trunc.y1 -= ext_size;
-        area_trunc.x2 += ext_size;
-        area_trunc.y2 += ext_size;
-        
-        /*Check through all parents*/
-        while(par != NULL) {
-            union_ok = area_union(&area_trunc, &area_trunc, &par->cords);
-            if(union_ok == false) break; /*If no common parts with parent break;*/
-            
-            par = lv_obj_get_parent(par);
-        }
-        
-        if(union_ok != false)  lv_inv_area(&area_trunc);
-    }
-}
-
-/**
- * Notify an object about its style is modified
- * @param obj pointer to an object 
- */
-void lv_obj_refr_style(lv_obj_t * obj)
-{ 
-    lv_obj_inv(obj);
-    obj->signal_f(obj, LV_SIGNAL_STYLE_CHG, NULL);
-    lv_obj_inv(obj);
-
-}
-
-/**
- * Notify all object if a style is modified
- * @param style pinter to a style. Only objects with this style will be notified
- *               (NULL to notify all objects)
- */
-void lv_style_refr_all(void * style)
-{
-    lv_obj_t * i;
-    LL_READ(scr_ll, i) {
-        lv_style_refr_core(style, i);
-    }
-}
-
 /*--------------------
  * Create and delete
  *-------------------*/
@@ -410,6 +352,42 @@ lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
 
 	return style_p;
 }
+
+
+/**
+ * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
+ * @param obj pointer to an object
+ */
+void lv_obj_inv(lv_obj_t * obj)
+{
+    /*Invalidate the object only if it belongs to the 'act_scr'*/
+    lv_obj_t * act_scr_p = lv_scr_act();
+    if(lv_obj_get_scr(obj) == act_scr_p) {
+        /*Truncate recursively to the parents*/
+        area_t area_trunc;
+        lv_obj_t * par = lv_obj_get_parent(obj);
+        bool union_ok = true;
+        /*Start with the original coordinates*/
+        cord_t ext_size = obj->ext_size;
+        area_cpy(&area_trunc, &obj->cords);
+        area_trunc.x1 -= ext_size;
+        area_trunc.y1 -= ext_size;
+        area_trunc.x2 += ext_size;
+        area_trunc.y2 += ext_size;
+
+        /*Check through all parents*/
+        while(par != NULL) {
+            union_ok = area_union(&area_trunc, &area_trunc, &par->cords);
+            if(union_ok == false) break; /*If no common parts with parent break;*/
+
+            par = lv_obj_get_parent(par);
+        }
+
+        if(union_ok != false)  lv_inv_area(&area_trunc);
+    }
+}
+
+
 /*=====================
  * Setter functions 
  *====================*/
@@ -459,9 +437,9 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_inv(obj);
 }
 
-/*-------------------------------------------
- * Coordinate set (cord_chk_f will be called)
- * -----------------------------------------*/
+/*--------------------
+ * Coordinate set
+ * ------------------*/
 
 /**
  * Set relative the position of an object (relative to the parent)
@@ -894,6 +872,33 @@ void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa)
     
     lv_obj_inv(obj);
 }
+
+
+/**
+ * Notify an object about its style is modified
+ * @param obj pointer to an object
+ */
+void lv_obj_refr_style(lv_obj_t * obj)
+{
+    lv_obj_inv(obj);
+    obj->signal_f(obj, LV_SIGNAL_STYLE_CHG, NULL);
+    lv_obj_inv(obj);
+
+}
+
+/**
+ * Notify all object if a style is modified
+ * @param style pinter to a style. Only objects with this style will be notified
+ *               (NULL to notify all objects)
+ */
+void lv_style_refr_all(void * style)
+{
+    lv_obj_t * i;
+    LL_READ(scr_ll, i) {
+        lv_style_refr_core(style, i);
+    }
+}
+
 
 /*-----------------
  * Attribute set
@@ -1425,7 +1430,7 @@ bool lv_obj_is_protected(lv_obj_t * obj, uint8_t prot)
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_f_t  lv_obj_get_signal_f(lv_obj_t * obj)
+lv_signal_f_t   lv_obj_get_signal_f(lv_obj_t * obj)
 {
     return obj->signal_f;
 }

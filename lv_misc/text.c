@@ -35,6 +35,15 @@ static bool txt_is_break_char(char letter);
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Get size of a text
+ * @param size_res pointer to a 'point_t' variable to store the result
+ * @param text pointer to a text
+ * @param font pinter to font of the text
+ * @param letter_space letter space of the text
+ * @param line_space line space of the text
+ * @param max_width max with of the text (break the lines to fit this size) Set LV_CORD_MAX to avoid line breaks
+ */
 void txt_get_size(point_t * size_res, const char * text, const font_t * font,
 		          uint16_t letter_space, uint16_t line_space, cord_t max_width)
 {

@@ -28,8 +28,25 @@ typedef enum
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the application keyboard
+ */
 void lv_app_kb_init(void);
+
+/**
+ * Open a keyboard for a text area object
+ * @param ta pointer to a text area object
+ * @param mode 'OR'd values of 'lv_app_kb_mode_t' enum
+ * @param close a function to call when the keyboard is closed
+ * @param ok a function to called when the "Ok" button is pressed
+ */
 void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *));
+
+/**
+ * Close the keyboard
+ * @param ok true: call the ok function, false: call the close function
+ */
 void lv_app_kb_close(bool ok);
 
 /**********************

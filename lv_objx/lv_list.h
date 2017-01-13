@@ -70,14 +70,59 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy);
-bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
-lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action);
-lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * copy);
 
-void lv_list_down(lv_obj_t * list);
+/**
+ * Create a list objects
+ * @param par pointer to an object, it will be the parent of the new list
+ * @param copy pointer to a list object, if not NULL then the new object will be copied from it
+ * @return pointer to the created list
+ */
+lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy);
+
+/**
+ * Signal function of the list
+ * @param list pointer to a list object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ */
+bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
+
+/**
+ * Add a list element to the list
+ * @param list pointer to list object
+ * @param img_fn file name of an image before the text (NULL if unused)
+ * @param txt text of the list element (NULL if unused)
+ * @param rel_action pointer to release action function (like with lv_btn)
+ * @return pointer to the new list element which can be customized (a button)
+ */
+lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action);
+
+/**
+ * Move the list elements up by one
+ * @param list pointer a to list object
+ */
 void lv_list_up(lv_obj_t * list);
+
+/**
+ * Move the list elements down by one
+ * @param list pointer to a list object
+ */
+void lv_list_down(lv_obj_t * list);
+
+/**
+ * Get the text of a list element
+ * @param liste pointer to list element
+ * @return pointer to the text
+ */
 const char * lv_list_element_get_txt(lv_obj_t * liste);
+
+/**
+ * Return with a pointer to a built-in style and/or copy it to a variable
+ * @param style a style name from lv_lists_builtin_t enum
+ * @param copy_p copy the style to this variable. (NULL if unused)
+ * @return pointer to an lv_lists_t style
+ */
+lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * list);
 
 /**********************
  *      MACROS

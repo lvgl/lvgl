@@ -88,16 +88,74 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy);
-bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
-lv_wins_t * lv_wins_get(lv_wins_builtin_t style, lv_wins_t * copy);
 
-lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img, lv_action_t rel_action);
+/**
+ * Create a window objects
+ * @param par pointer to an object, it will be the parent of the new window
+ * @param copy pointer to a window object, if not NULL then
+lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
+lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
+lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);the new object will be copied from it
+ * @return pointer to the created window
+ */
+lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy);
+
+/**
+ * Signal function of the window
+ * @param win pointer to a window object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
+
+/**
+ * Add control button to the header of the window
+ * @param win pointer to a window object
+ * @param img_path path of an image on the control button
+ * @param rel_action a function pointer to call when the button is released
+ * @return pointer to the created button object
+ */
+lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_t rel_action);
+
+/**
+ * A release action which can be assigned to a window control button to close it
+ * @param btn pointer to the released button
+ * @param dispi pointer to the caller display input
+ * @return always false because the button is deleted with the window
+ */
 bool lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+
+/**
+ * Set the title of a window
+ * @param win pointer to a window object
+ * @param title string of the new title
+ */
 void lv_win_set_title(lv_obj_t * win, const char * title);
 
+/**
+ * Get the title of a window
+ * @param win pointer to a window object
+ * @return title string of the window
+ */
 const char * lv_win_get_title(lv_obj_t * win);
+
+/**
+ * Get the pointer of a widow from one of  its control button.
+ * It is useful in the action of the control buttons where only button is known.
+ * @param ctrl_btn pointer to a control button of a window
+ * @return pointer to the window of 'ctrl_btn'
+ */
 lv_obj_t * lv_win_get_from_ctrl_btn(lv_obj_t * ctrl_btn);
+
+/**
+ * Return with a pointer to a built-in style and/or copy it to a variable
+ * @param style a style name from lv_wins_builtin_t enum
+ * @param copy_p copy the style to this variable. (NULL if unused)
+ * @return pointer to an lv_wins_t style
+ */
+lv_wins_t * lv_wins_get(lv_wins_builtin_t style, lv_wins_t * copy);
+
 /**********************
  *      MACROS
  **********************/
