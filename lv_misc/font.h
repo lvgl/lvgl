@@ -50,6 +50,9 @@ typedef enum
 #if USE_FONT_SYMBOL_30 != 0
     FONT_SYMBOL_30,
 #endif
+#if USE_FONT_SYMBOL_60 != 0
+    FONT_SYMBOL_60,
+#endif
     FONT_TYPE_NUM,
 }font_types_t;
 

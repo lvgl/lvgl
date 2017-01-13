@@ -17,6 +17,7 @@
 #include "fonts/dejavu_60.h"
 #include "fonts/dejavu_80.h"
 #include "fonts/symbol_30.h"
+#include "fonts/symbol_60.h"
 
 /*********************
  *      DEFINES
@@ -105,6 +106,11 @@ const font_t * font_get(font_types_t font_id)
 #if USE_FONT_SYMBOL_30 != 0
         case FONT_SYMBOL_30:
             font_p = symbol_30_get_dsc();
+            break;
+#endif
+#if USE_FONT_SYMBOL_60 != 0
+        case FONT_SYMBOL_60:
+            font_p = symbol_60_get_dsc();
             break;
 #endif
         default:
