@@ -24,15 +24,36 @@
  *      TYPEDEFS
  **********************/
 
+/*Long mode behaviors. Used in 'lv_label_ext_t' */
+typedef enum
+{
+    LV_LABEL_LONG_EXPAND,   /*Expand the object size to the text size*/
+    LV_LABEL_LONG_BREAK,    /*Keep the width and break the text and expand the object height*/
+    LV_LABEL_LONG_DOTS,     /*Keep the size, break the text and write dots in the last line*/
+    LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
+}lv_label_long_mode_t;
+
+/*Data of label*/
+typedef struct
+{
+    /*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
+    /*New data for this type */
+    char * txt;                     /*Text of the label*/
+    lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
+    char dot_tmp[LV_LABEL_DOT_NUM]; /*Store character which are replaced with dots*/
+    uint16_t dot_end;               /* The text end position in dot mode*/
+    uint8_t static_txt  :1;         /* Flag to indicate the text is static*/
+}lv_label_ext_t;
+
 /*Style of label*/
 typedef struct
 {
 	lv_objs_t objs;		/*Style of ancestor*/
 	/*New style element for this type */
-    font_types_t font;
+    font_types_t font;      /*Name of the font. E.g: FONT_DEJAVU_20*/
     uint16_t letter_space;
     uint16_t line_space;
-    uint8_t mid         :1;
+    uint8_t mid         :1; /*1: Align the lines into the middle*/
 }lv_labels_t;
 
 /*Built-in styles of label*/
@@ -44,27 +65,6 @@ typedef enum
 	LV_LABELS_TITLE,
 }lv_labels_builtin_t;
 
-
-typedef enum
-{
-	LV_LABEL_LONG_EXPAND,	/*Expand the object size to the text size*/
-	LV_LABEL_LONG_BREAK,    /*Keep the width and break the text and expand the object height*/
-	LV_LABEL_LONG_DOTS,     /*Keep the size, break the text and write dots in the last line*/
-	LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text (move the label object)*/
-}lv_label_long_mode_t;
-
-/*Data of label*/
-typedef struct
-{
-	/*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
-	/*New data for this type */
-    char * txt;
-    lv_label_long_mode_t long_mode;
-    char dot_tmp[LV_LABEL_DOT_NUM];	/*Store character which are replaced with dots*/
-    uint16_t dot_end;			/* The text end in dot mode*/
-    uint8_t static_txt  :1;     /* Flag to indicate the text is static*/
-}lv_label_ext_t;
-        
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

@@ -21,6 +21,18 @@
 /**********************
  *      TYPEDEFS
  **********************/
+
+/*Data of line*/
+typedef struct
+{
+    /*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
+    const point_t * point_array;    /*Pointer to an array with the points of the line*/
+    uint16_t  point_num;            /*Number of points in 'point_array' */
+    uint8_t  auto_size  :1;         /*1: set obj. width to x max and obj. height to y max */
+    uint8_t  y_inv      :1;         /*1: y == 0 will be on the bottom*/
+    uint8_t  upscale    :1;         /*1: upscale coordinates with LV_DOWNSCALE*/
+}lv_line_ext_t;
+
 /*Style of line*/
 typedef struct
 {
@@ -36,17 +48,6 @@ typedef enum
 	LV_LINES_DECOR,
 	LV_LINES_CHART,
 }lv_lines_builtin_t;
-
-/*Data of line*/
-typedef struct
-{
-	/*Inherited from 'base_obj' so inherited ext.*/  /*Ext. of ancestor*/
-	const point_t * point_array;
-	uint16_t  point_num;
-	uint8_t  auto_size	:1;
-	uint8_t  y_inv	    :1;
-	uint8_t  upscale    :1;
-}lv_line_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -48,10 +48,7 @@ static lv_wins_t lv_wins_def;
 /**
  * Create a window objects
  * @param par pointer to an object, it will be the parent of the new window
- * @param copy pointer to a window object, if not NULL then
-	lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
-	lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
-	lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);the new object will be copied from it
+ * @param copy pointer to a window object, if not NULL then the new object will be copied from it
  * @return pointer to the created window
  */
 lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)

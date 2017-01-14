@@ -26,6 +26,19 @@
  *      TYPEDEFS
  **********************/
 
+/*Data of gauge*/
+typedef struct
+{
+    lv_rect_ext_t rect; /*Ext. of ancestor*/
+    /*New data for this type */
+    int16_t min;                /*Minimum value of the scale*/
+    int16_t max;                /*Maximum value of the scale*/
+    int16_t * values;           /*Array of the set values (for needles) */
+    char * txt;                 /*Printf-like text to display with the most critical value (e.g. "Value: %d")*/
+    uint8_t needle_num;         /*Number of needles*/
+    uint8_t low_critical    :1; /*0: the higher value is more critical, 1: the lower value is more critical*/
+}lv_gauge_ext_t;
+
 /*Style of gauge*/
 typedef struct
 {
@@ -46,6 +59,7 @@ typedef struct
     opa_t needle_opa;           /*Opacity of the needles*/
     /*Value text settings*/
     lv_labels_t value_labels;   /*Style of the value label*/
+    uint8_t value_pos;    /*Vertical position of the value label in percentage of object height (0..100 %)*/
 }lv_gauges_t;
 
 /*Built-in styles of gauge*/
@@ -53,19 +67,6 @@ typedef enum
 {
 	LV_GAUGES_DEF,
 }lv_gauges_builtin_t;
-
-/*Data of gauge*/
-typedef struct
-{
-	lv_rect_ext_t rect; /*Ext. of ancestor*/
-	/*New data for this type */
-    int16_t min;
-    int16_t max;
-    int16_t * values;
-    char * txt;
-    uint8_t needle_num;
-    uint8_t low_critical    :1; /*0: the higher value is more critical, 1: the lower value is more critical*/
-}lv_gauge_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

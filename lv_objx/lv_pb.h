@@ -33,12 +33,24 @@
  *      TYPEDEFS
  **********************/
 
+/*Data of progress bar*/
+typedef struct
+{
+    lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+    /*New data for this type */
+    lv_obj_t * label;       /*Pointer to the label on the progress bar*/
+    uint16_t act_value;     /*Current value of the progress bar*/
+    uint16_t min_value;     /*Minimum value of the progress bar*/
+    uint16_t max_value;     /*Maximum value of the progress bar*/
+    char * format_str;      /*Format string of the label. E.g. "Progress: %d"*/
+}lv_pb_ext_t;
+
 /*Style of progress bar*/
 typedef struct
 {
-	lv_rects_t bg;
-	lv_rects_t bar;
-	lv_labels_t label;
+	lv_rects_t bg;      /*Style of the background (inherited)*/
+	lv_rects_t bar;     /*Style of the bar*/
+	lv_labels_t label; /*Style of the label*/
 }lv_pbs_t;
 
 /*Built-in styles of progress bar*/
@@ -46,18 +58,6 @@ typedef enum
 {
 	LV_PBS_DEF,
 }lv_pbs_builtin_t;
-
-/*Data of progress bar*/
-typedef struct
-{
-	lv_rect_ext_t rect_ext;	/*Ext. of ancestor*/
-	/*New data for this type */
-	lv_obj_t * label;
-	uint16_t act_value;
-	uint16_t min_value;
-	uint16_t max_value;
-	char * format_str; /*Format string of the label*/
-}lv_pb_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

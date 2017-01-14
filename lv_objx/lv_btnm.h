@@ -35,6 +35,23 @@
  *      TYPEDEFS
  **********************/
 
+/* Type of callback function which is called when a button is released
+ * Parameters: button matrix, released button index in the map string
+ * return LV_ACTION_RES_INV:  the button matrix is deleted else LV_ACTION_RES_OK*/
+typedef lv_action_res_t (*lv_btnm_callback_t) (lv_obj_t *, uint16_t);
+
+/*Data of button matrix*/
+typedef struct
+{
+    lv_rect_ext_t rect; /*Ext. of ancestor*/
+    /*New data for this type */
+    const char ** map_p;    /*Pointer to the current map*/
+    area_t * btn_areas;
+    uint16_t btn_cnt;
+    uint16_t btn_pr;
+    lv_btnm_callback_t cb;
+}lv_btnm_ext_t;
+
 /*Style of button matrix*/
 typedef struct
 {
@@ -50,22 +67,6 @@ typedef enum
 	LV_BTNMS_DEF,
 }lv_btnms_builtin_t;
 
-/* Type of callback function which is called when a button is released
- * Parameters: button matrix,  released button index in the map string
- * return LV_ACTION_RES_INV:  the button matrix is deleted else LV_ACTION_RES_OK*/
-typedef lv_action_res_t (*lv_btnm_callback_t) (lv_obj_t *, uint16_t);
-
-/*Data of button matrix*/
-typedef struct
-{
-	lv_rect_ext_t rect;	/*Ext. of ancestor*/
-	/*New data for this type */
-	const char ** map_p;	/*Pointer to the current map*/
-	area_t * btn_areas;
-	uint16_t btn_cnt;
-	uint16_t btn_pr;
-	lv_btnm_callback_t cb;
-}lv_btnm_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -32,6 +32,15 @@
  *      TYPEDEFS
  **********************/
 
+/*Data of check box*/
+typedef struct
+{
+    lv_btn_ext_t bg_btn; /*Ext. of ancestor*/
+    /*New data for this type */
+    lv_obj_t * bullet;
+    lv_obj_t * label;
+}lv_cb_ext_t;
+
 /*Style of check box*/
 typedef struct
 {
@@ -47,15 +56,6 @@ typedef enum
 {
 	LV_CBS_DEF,
 }lv_cbs_builtin_t;
-
-/*Data of check box*/
-typedef struct
-{
-	lv_btn_ext_t bg_btn; /*Ext. of ancestor*/
-	/*New data for this type */
-	lv_obj_t * bullet;
-	lv_obj_t * label;
-}lv_cb_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

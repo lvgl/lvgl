@@ -38,47 +38,49 @@ typedef enum
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
 
-typedef struct
-{
-	uint8_t light_en :1;
-	uint8_t transp :1;
-	uint8_t empty :1;
-}lv_btns_bits_t;
-
-/*Style of button*/
-typedef struct
-{
-	lv_rects_t rects;	/*Style of ancestor*/
-	/*New style element for this type */
-	color_t mcolor[LV_BTN_STATE_NUM];
-	color_t gcolor[LV_BTN_STATE_NUM];
-	color_t bcolor[LV_BTN_STATE_NUM];
-	color_t lcolor[LV_BTN_STATE_NUM];
-	lv_btns_bits_t flags[LV_BTN_STATE_NUM];
-}lv_btns_t;
-
-/*Built-in styles of button*/
-typedef enum
-{
-	LV_BTNS_DEF,
-	LV_BTNS_TRANSP,
-	LV_BTNS_BORDER,
-}lv_btns_builtin_t;
-
 /*Data of button*/
 typedef struct
-{       
+{
 	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
 	/*New data for this type */
 	lv_action_t pr_action;
 	lv_action_t rel_action;
 	lv_action_t lpr_action;
 	lv_action_t lpr_rep_action;
-    
+
     lv_btn_state_t state;
     uint8_t tgl :1;      /*1: Toggle enabled*/
     uint8_t lpr_exec :1; /*1: long press action executed (Not for user)*/
 }lv_btn_ext_t;
+
+/*Bits of 'flag' in 'lv_btns_t'*/
+typedef struct
+{
+    uint8_t light_en :1;
+    uint8_t transp :1;
+    uint8_t empty :1;
+}lv_btns_bits_t;
+
+/*Style of button*/
+typedef struct
+{
+    lv_rects_t rects;   /*Style of ancestor*/
+    /*New style element for this type */
+    color_t mcolor[LV_BTN_STATE_NUM];
+    color_t gcolor[LV_BTN_STATE_NUM];
+    color_t bcolor[LV_BTN_STATE_NUM];
+    color_t lcolor[LV_BTN_STATE_NUM];
+    lv_btns_bits_t flags[LV_BTN_STATE_NUM];
+}lv_btns_t;
+
+/*Built-in styles of button*/
+typedef enum
+{
+    LV_BTNS_DEF,
+    LV_BTNS_TRANSP,
+    LV_BTNS_BORDER,
+}lv_btns_builtin_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES

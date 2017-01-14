@@ -210,8 +210,8 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	ext->transp = header.transp;
 
     if(ext->upscale != 0) {
-        ext->w *=  2;
-        ext->h *=  2;
+        ext->w *=  LV_DOWNSCALE;
+        ext->h *=  LV_DOWNSCALE;
     }
 
 	if(fn != NULL) {

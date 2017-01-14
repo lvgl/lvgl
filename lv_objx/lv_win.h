@@ -52,21 +52,31 @@
  *      TYPEDEFS
  **********************/
 
+/*Data of window*/
+typedef struct
+{
+    lv_page_ext_t page; /*Ext. of ancestor*/
+    /*New data for this type */
+    lv_obj_t * header;  /*Pointer to the header rectangle of the window*/
+    lv_obj_t * title;   /*Pointer to the title label of the window*/
+    lv_obj_t * ctrl_holder; /*Pointer to the control button holder rectangle of the window*/
+}lv_win_ext_t;
+
 /*Style of window*/
 typedef struct
 {
     lv_pages_t pages; /*Style of ancestor*/
 	/*New style element for this type */
 	/*Header settings*/
-	lv_rects_t header;
-	lv_labels_t title;
-	lv_rects_t ctrl_holder;
-	lv_btns_t ctrl_btn;
-	lv_imgs_t ctrl_img;
-	cord_t ctrl_btn_w;
-	cord_t ctrl_btn_h;
-	opa_t ctrl_btn_opa;
-	opa_t header_opa;
+	lv_rects_t header;      /*Style of the header rectangle*/
+	lv_labels_t title;      /*Style of the window title*/
+	lv_rects_t ctrl_holder; /*Style of holder of the control buttons*/
+	lv_btns_t ctrl_btn;     /*Style of the control buttons*/
+	lv_imgs_t ctrl_img;     /*Style of the image on the control buttons*/
+	cord_t ctrl_btn_w;      /*Width of the control buttons*/
+	cord_t ctrl_btn_h;      /*Height of the control buttons*/
+	opa_t ctrl_btn_opa;     /*Width of the control buttons in the percentage of object opacity (0..100)*/
+	opa_t header_opa;       /*Opacity of the header in the percentage of object opacity (0..100)*/
 }lv_wins_t;
 
 /*Built-in styles of window*/
@@ -75,16 +85,6 @@ typedef enum
 	LV_WINS_DEF,
 }lv_wins_builtin_t;
 
-/*Data of window*/
-typedef struct
-{
-    lv_page_ext_t page; /*Ext. of ancestor*/
-	/*New data for this type */
-	lv_obj_t * header;
-	lv_obj_t * title;
-	lv_obj_t * ctrl_holder;
-}lv_win_ext_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -92,10 +92,7 @@ typedef struct
 /**
  * Create a window objects
  * @param par pointer to an object, it will be the parent of the new window
- * @param copy pointer to a window object, if not NULL then
-lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
-lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);
-lv_win_add_ctrl_btn(app->win, "U:/close", lv_app_win_close_action);the new object will be copied from it
+ * @param copy pointer to a window object, if not NULL then the new object will be copied from it
  * @return pointer to the created window
  */
 lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy);

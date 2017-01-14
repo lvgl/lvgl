@@ -27,6 +27,14 @@
  *      TYPEDEFS
  **********************/
 
+/*Data of led*/
+typedef struct
+{
+    lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+    /*New data for this type */
+    uint8_t bright;         /*Current brightness of the LED*/
+}lv_led_ext_t;
+
 /*Style of led*/
 typedef struct
 {
@@ -41,14 +49,6 @@ typedef enum
 	LV_LEDS_RED,
 	LV_LEDS_GREEN,
 }lv_leds_builtin_t;
-
-/*Data of led*/
-typedef struct
-{
-	lv_rect_ext_t rect_ext;	/*Ext. of ancestor*/
-	/*New data for this type */
-	uint8_t bright;			/*Current brightness of the LED*/
-}lv_led_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

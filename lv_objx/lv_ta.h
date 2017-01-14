@@ -34,6 +34,17 @@
  *      TYPEDEFS
  **********************/
 
+/*Data of text area*/
+typedef struct
+{
+    lv_page_ext_t page; /*Ext. of ancestor*/
+    /*New data for this type */
+    lv_obj_t * label;       /*Label of the text area*/
+    cord_t cursor_valid_x;  /*Used when stepping up/down in text area. Handled by the library*/
+    uint16_t cursor_pos;    /*The current cursor position (0: before 1. letter, 1: before 2. letter etc.)*/
+    uint8_t cur_hide :1;    /*Indicates that the cursor is visible now or not*/
+}lv_ta_ext_t;
+
 /*Style of text area*/
 typedef struct
 {
@@ -52,17 +63,6 @@ typedef enum
     LV_TAS_SIMPLE,
     LV_TAS_TRANSP,
 }lv_tas_builtin_t;
-
-/*Data of text area*/
-typedef struct
-{
-	lv_page_ext_t page; /*Ext. of ancestor*/
-	/*New data for this type */
-	lv_obj_t * label;
-	cord_t cursor_valid_x;
-	uint16_t cursor_pos;
-	uint8_t cur_hide :1;	/*Indicates that the cursor is visible now or not*/
-}lv_ta_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -28,6 +28,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
+/*Data of template*/
+typedef struct
+{
+    /*Ext. of ancestor*/
+    /*New data for this type */
+}lv_templ_ext_t;
 
 /*Style of template*/
 typedef struct
@@ -41,13 +47,6 @@ typedef enum
 {
 	LV_TEMPLS_DEF,
 }lv_templs_builtin_t;
-
-/*Data of template*/
-typedef struct
-{
-	/*Ext. of ancestor*/
-	/*New data for this type */
-}lv_templ_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

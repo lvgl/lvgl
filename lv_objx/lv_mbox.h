@@ -39,37 +39,37 @@
  *      TYPEDEFS
  **********************/
 
+/*Data of message box*/
+typedef struct
+{
+    lv_rect_ext_t rect; /*Ext. of ancestor*/
+    /*New data for this type */
+    lv_obj_t * title;   /*Title of the message box*/
+    lv_obj_t * txt;     /*Text of the message box*/
+    lv_obj_t * btnh;    /*Holder of the buttons*/
+}lv_mbox_ext_t;
+
+
 /*Style of message box*/
 typedef struct
 {
 	lv_rects_t bg; /*Style of ancestor*/
 	/*New style element for this type */
-	lv_labels_t title;
-	lv_labels_t txt;
-	lv_rects_t btnh;
-	lv_btns_t btn;
-	lv_labels_t btn_label;
+	lv_labels_t title;      /*Style of the title*/
+	lv_labels_t txt;        /*Style of the text*/
+	lv_rects_t btnh;        /*Style of the button holder*/
+	lv_btns_t btn;          /*Style of the buttons*/
+	lv_labels_t btn_label;  /*Style of the label on the buttons*/
 }lv_mboxs_t;
 
 /*Built-in styles of message box*/
 typedef enum
 {
 	LV_MBOXS_DEF,
-    LV_MBOXS_BUBBLE, /*Will be removed (use LV_MBOXS_INFO instead)*/
 	LV_MBOXS_INFO,
 	LV_MBOXS_WARN,
 	LV_MBOXS_ERR,
 }lv_mboxs_builtin_t;
-
-/*Data of message box*/
-typedef struct
-{
-	lv_rect_ext_t rect; /*Ext. of ancestor*/
-	/*New data for this type */
-	lv_obj_t * title;
-	lv_obj_t * txt;
-	lv_obj_t * btnh;
-}lv_mbox_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

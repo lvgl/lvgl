@@ -38,17 +38,24 @@
 /**********************
  *      TYPEDEFS
  **********************/
+/*Data of list*/
+typedef struct
+{
+    lv_page_ext_t page_ext; /*Ext. of ancestor*/
+    /*New data for this type */
+    /*No new data*/
+}lv_list_ext_t;
 
 /*Style of list*/
 typedef struct
 {
 	lv_pages_t bg_pages; /*Style of ancestor*/
 	/*New style element for this type */
-	lv_btns_t liste_btns;
-	lv_labels_t liste_labels;
-	lv_imgs_t liste_imgs;
-	lv_rect_layout_t liste_layout;
-	uint8_t widthe_sb   :1;     /*Keep space for the scrollbar*/
+	lv_btns_t liste_btns;          /*List element button style*/
+	lv_labels_t liste_labels;      /*List element label style*/
+	lv_imgs_t liste_imgs;          /*List element image style*/
+	lv_rect_layout_t liste_layout; /*List element layout (will be removed)*/
+	uint8_t widthe_sb   :1;        /*1: Keep space for the scrollbar*/
 }lv_lists_t;
 
 /*Built-in styles of list*/
@@ -58,14 +65,6 @@ typedef enum
     LV_LISTS_SCRL,
 	LV_LISTS_TRANSP,
 }lv_lists_builtin_t;
-
-/*Data of list*/
-typedef struct
-{
-	lv_page_ext_t page_ext; /*Ext. of ancestor*/
-	/*New data for this type */
-	/*No new data*/
-}lv_list_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -24,6 +24,7 @@
  *      TYPEDEFS
  **********************/
 
+/*Layout options*/
 typedef enum
 {
 	LV_RECT_LAYOUT_OFF = 0,
@@ -38,6 +39,16 @@ typedef enum
 	LV_RECT_LAYOUT_GRID,	/*Align same-sized object into a grid*/
 }lv_rect_layout_t;
 
+typedef struct
+{
+    /*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
+    /*New data for this type */
+    uint8_t layout  :5;
+    uint8_t hfit_en :1;
+    uint8_t vfit_en :1;
+}lv_rect_ext_t;
+
+
 /*Style of rectangle*/
 typedef struct
 {
@@ -48,11 +59,11 @@ typedef struct
     color_t lcolor;	/*Light color*/
     uint16_t bwidth;/*Border width*/
     uint16_t round; /*Radius on the corners*/
-    cord_t hpad;	/*Horizontal padding when horizontal fit is enabled*/
-    cord_t vpad;	/*Vertical padding when vertical fit is enabled*/
-    cord_t opad;	/*Object padding with fit*/
+    cord_t hpad;	/*Horizontal padding. Used by fit and layout.*/
+    cord_t vpad;	/*Vertical padding. Used by fit and layout.*/
+    cord_t opad;	/*Object padding. Used by fit */
     cord_t light;	/*Light size*/
-    uint8_t bopa;	/*Border opacity*/
+    uint8_t bopa;	/*Border opacity in percentage of object opacity (0..100)*/
     uint8_t empty :1; /*1: Do not draw the body of the rectangle*/
 }lv_rects_t;
 
@@ -63,16 +74,6 @@ typedef enum
 	LV_RECTS_TRANSP,
 	LV_RECTS_BORDER,
 }lv_rects_builtin_t;
-
-
-typedef struct
-{
-	/*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
-	/*New data for this type */
-    uint8_t layout  :5;
-	uint8_t hfit_en :1;
-	uint8_t vfit_en :1;
-}lv_rect_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

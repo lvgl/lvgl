@@ -371,7 +371,6 @@ lv_mboxs_t * lv_mboxs_get(lv_mboxs_builtin_t style, lv_mboxs_t * copy)
 		case LV_MBOXS_DEF:
 			style_p = &lv_mboxs_def;
 			break;
-		case LV_MBOXS_BUBBLE:
         case LV_MBOXS_INFO:
             style_p = &lv_mboxs_info;
             break;

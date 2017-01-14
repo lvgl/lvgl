@@ -33,7 +33,22 @@
 /**********************
  *      TYPEDEFS
  **********************/
+/*Data of chart background*/
+typedef struct
+{
+    lv_rect_ext_t bg_rects; /*Ext. of ancestor*/
+    /*New data for this type */
+    cord_t ymin;
+    cord_t ymax;
+    uint8_t hdiv_num;     /*Number of horizontal division lines*/
+    uint8_t vdiv_num;     /*Number of vertical division lines*/
+    ll_dsc_t dl_ll;       /*Linked list for the data line pointers (stores cord_t * )*/
+    uint16_t pnum;        /*Point number in a data line*/
+    uint8_t type    :2;   /*Line, column or point chart (from 'lv_chart_type_t')*/
+    uint8_t dl_num;       /*Data line number in dl_ll*/
+}lv_chart_ext_t;
 
+/*Chart types*/
 typedef enum
 {
 	LV_CHART_LINE,
@@ -60,21 +75,6 @@ typedef enum
 	LV_CHARTS_DEF,
 	LV_CHARTS_TRANSP,
 }lv_charts_builtin_t;
-
-/*Data of chart background*/
-typedef struct
-{
-	lv_rect_ext_t bg_rects;	/*Ext. of ancestor*/
-	/*New data for this type */
-	cord_t ymin;
-	cord_t ymax;
-	uint8_t hdiv_num;
-	uint8_t vdiv_num;
-	ll_dsc_t dl_ll;				/*Linked list for the data line pointers (stores cord_t * )*/
-	uint16_t pnum;				/*Point number in a data line*/
-	uint8_t type	:2;			/*Line, column or point chart*/
-	uint8_t dl_num;				/*Data line number in dl_ll*/
-}lv_chart_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
