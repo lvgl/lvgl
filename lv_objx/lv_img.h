@@ -13,6 +13,14 @@
 #include "misc_conf.h"
 #if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 
+#if USE_FSINT == 0
+#error "lv_img: fsint is required. Enable it in misc_conf.h (USE_FSINT  1) "
+#endif
+
+#if USE_UFS == 0
+#error "lv_img: ufs is required. Enable it in misc_conf.h (USE_UFS  1) "
+#endif
+
 #include "../lv_obj/lv_obj.h"
 #include "misc/fs/fsint.h"
 
@@ -116,7 +124,6 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en);
 
 /**
  * Enable the upscaling with LV_DOWNSCALE.
- * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
  * @param en true: upscale enable, false: upscale disable
  */
