@@ -156,13 +156,13 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     			}
     			break;
     		case LV_SIGNAL_LONG_PRESS:
-            case LV_SIGNAL_RELEASED:
 #if LV_MBOX_ANIM_TIME != 0
-                lv_mbox_auto_close(mbox, 0);
+                lv_mbox_start_auto_close(mbox, 0);
 #else
                 lv_obj_del(mbox);
                 valid = false;
 #endif
+                lv_dispi_wait_release(param);
     		    break;
     		case LV_SIGNAL_STYLE_CHG:
     			lv_obj_set_style(ext->title, &style->title);
@@ -289,7 +289,7 @@ lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
  */
-void lv_mbox_auto_close(lv_obj_t * mbox, uint16_t tout)
+void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout)
 {
 #if LV_MBOX_ANIM_TIME != 0
     /*Add shrinking animations*/
@@ -302,6 +302,15 @@ void lv_mbox_auto_close(lv_obj_t * mbox, uint16_t tout)
 #else
     lv_obj_anim(mbox, LV_ANIM_NONE, LV_MBOX_ANIM_TIME, tout, lv_obj_del);
 #endif
+}
+
+/**
+ * Stop the auto. closing of message box
+ * @param mbox pointer to a message box object
+ */
+void lv_mbox_stop_auto_close(lv_obj_t * mbox)
+{
+    anim_del(mbox, NULL);
 }
 
 /*=====================

@@ -128,7 +128,13 @@ lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
  */
-void lv_mbox_auto_close(lv_obj_t * mbox, uint16_t tout);
+void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout);
+
+/**
+ * Stop the auto. closing of message box
+ * @param mbox pointer to a message box object
+ */
+void lv_mbox_stop_auto_close(lv_obj_t * mbox);
 
 /**
  * get the title of the message box

@@ -78,7 +78,7 @@ lv_obj_t *  lv_app_notice_add(const char * format, ...)
     lv_obj_set_opa(mbox, app_style->menu_opa);
 
 #if LV_APP_NOTICE_SHOW_TIME != 0
-    lv_mbox_auto_close(mbox, LV_APP_NOTICE_SHOW_TIME);
+    lv_mbox_start_auto_close(mbox, LV_APP_NOTICE_SHOW_TIME);
 #endif
 
     lv_obj_set_parent(notice_h, lv_scr_act());
