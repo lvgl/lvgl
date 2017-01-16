@@ -4,10 +4,8 @@
 /*Use ISO8859-1 encoding in the IDE*/
 
 #include "lv_conf.h"
-#if  USE_FONT_SYMBOL_30 != 0
+#if  USE_FONT_SYMBOL_30 != 0 || USE_FONT_SYMBOL_60 != 0
 
-#include <stdint.h>
-#include "../font.h"
 
 #define SYMBOL_DRIVE	"a"
 #define SYMBOL_FILE	    "b"
