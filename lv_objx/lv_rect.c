@@ -66,10 +66,10 @@ static lv_rects_t lv_rects_border;
  *-----------------*/
 
 /**
- * Create a label objects
- * @param par pointer to an object, it will be the parent of the new label
+ * Create a rectangle objects
+ * @param par pointer to an object, it will be the parent of the new rectangle
  * @param copy pointer to a rectangle object, if not NULL then the new object will be copied from it
- * @return pointer to the created label
+ * @return pointer to the created rectangle
  */
 lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
 {
@@ -284,11 +284,15 @@ lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy)
  */
 static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_t mode)
 {
-    /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
+        /* Because of the radius it is not sure the area is covered
+         * Check the areas where there is no radius*/
     	if(LV_SA(rect, lv_rects_t)->empty != 0) return false;
 
     	uint16_t r = LV_SA(rect, lv_rects_t)->round;
+
+    	if(r == LV_RECT_CIRCLE) return false;
+
     	area_t area_tmp;
 
     	/*Check horizontally without radius*/
@@ -338,9 +342,16 @@ static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask)
 
 	memcpy(&light_style, style, sizeof(lv_rects_t));
 
+
+
+
 	light_style.empty = 1;
 	light_style.bwidth = light_size;
-	light_style.round =  style->round + light_size + 1;
+	light_style.round = style->round;
+	if(light_style.round == LV_RECT_CIRCLE) {
+	    light_style.round = MATH_MIN(lv_obj_get_width(rect), lv_obj_get_height(rect));
+	}
+	light_style.round += light_size + 1;
 	light_style.bcolor = style->lcolor;
 	light_style.bopa = 100;
 
@@ -550,7 +561,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 	child_rc = child_rs; /*Initially the the row starter and closer is the same*/
 	while(child_rs != NULL) {
 		cord_t h_row = 0;
-		cord_t w_row = style->hpad * 2; /*The width is minimum the left-right hpad*/
+		cord_t w_row = style->hpad * 2; /*The width is at least the left-right hpad*/
 		uint32_t obj_num = 0;
 
 		/*Find the row closer object and collect some data*/
@@ -559,7 +570,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 			   lv_obj_is_protected(child_rc, LV_PROTECT_POS) == false) {
 				if(w_row + lv_obj_get_width(child_rc) > w_obj) break; /*If the next object is already not fit then break*/
 				w_row += lv_obj_get_width(child_rc) + style->opad; /*Add the object width + opad*/
-				h_row = max(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
+				h_row = MATH_MAX(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
 				obj_num ++;
 			}
 			child_rc = ll_get_prev(&rect->child_ll, child_rc); /*Load the next object*/
@@ -578,7 +589,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 		}
 		/*If here is only one object in the row then align it to the left*/
 		else if (obj_num == 1) {
-			lv_obj_align(child_rs, rect, LV_ALIGN_IN_TOP_LEFT, style->hpad, act_y);
+			lv_obj_align(child_rs, rect, LV_ALIGN_IN_TOP_MID, 0, act_y);
 		}
 		/* Align the children (from child_rs to child_rc)*/
 		else {
@@ -659,7 +670,7 @@ static void lv_rect_layout_grid(lv_obj_t * rect)
  * Handle auto fit. Set the size of the object to involve all children.
  * @param rect pointer to an object which size will be modified
  */
-void lv_rect_refr_autofit(lv_obj_t * rect)
+static void lv_rect_refr_autofit(lv_obj_t * rect)
 {
 	lv_rect_ext_t * ext = lv_obj_get_ext(rect);
 
@@ -686,10 +697,10 @@ void lv_rect_refr_autofit(lv_obj_t * rect)
 
     LL_READ(rect->child_ll, i) {
 		if(lv_obj_get_hidden(i) != false) continue;
-    	new_cords.x1 = min(new_cords.x1, i->cords.x1);
-    	new_cords.y1 = min(new_cords.y1, i->cords.y1);
-        new_cords.x2 = max(new_cords.x2, i->cords.x2);
-        new_cords.y2 = max(new_cords.y2, i->cords.y2);
+    	new_cords.x1 = MATH_MIN(new_cords.x1, i->cords.x1);
+    	new_cords.y1 = MATH_MIN(new_cords.y1, i->cords.y1);
+        new_cords.x2 = MATH_MAX(new_cords.x2, i->cords.x2);
+        new_cords.y2 = MATH_MAX(new_cords.y2, i->cords.y2);
     }
 
     /*If the value is not the init value then the page has >=1 child.*/

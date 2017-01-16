@@ -19,6 +19,10 @@
 /*********************
  *      DEFINES
  *********************/
+/*Test configurations*/
+#ifndef LV_PAGE_ANIM_FOCUS_TIME
+#define LV_PAGE_ANIM_FOCUS_TIME     300 /*List focus animation time [ms] (0: turn off the animation)*/
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -277,8 +281,8 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
 
             case LV_SIGNAL_DRAG_BEGIN:
             	if(style->sb_mode == LV_PAGE_SB_MODE_DRAG ) {
-            	    cord_t sbh_pad = max(style->sb_width, style->bg_rects.hpad);
-            	    cord_t sbv_pad = max(style->sb_width, style->bg_rects.vpad);
+            	    cord_t sbh_pad = MATH_MAX(style->sb_width, style->bg_rects.hpad);
+            	    cord_t sbv_pad = MATH_MAX(style->sb_width, style->bg_rects.vpad);
 					if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - 2 * sbv_pad) {
 						page_ext->sbv_draw = 1;
 					}
@@ -565,8 +569,8 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     cord_t vpad = style->bg_rects.vpad;
     cord_t obj_w = lv_obj_get_width(page);
     cord_t obj_h = lv_obj_get_height(page);
-    cord_t sbh_pad = max(style->sb_width, style->bg_rects.hpad);
-    cord_t sbv_pad = max(style->sb_width, style->bg_rects.vpad);
+    cord_t sbh_pad = MATH_MAX(style->sb_width, style->bg_rects.hpad);
+    cord_t sbv_pad = MATH_MAX(style->sb_width, style->bg_rects.vpad);
 
     if(style->sb_mode == LV_PAGE_SB_MODE_OFF) return;
 

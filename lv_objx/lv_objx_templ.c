@@ -29,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode);
-static void lv_temps_init(void);
+static void lv_templs_init(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -138,7 +138,7 @@ lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy)
 
 	/*Make the style initialization if it is not done yet*/
 	if(style_inited == false) {
-		lv_temps_init();
+		lv_templs_init();
 		style_inited = true;
 	}
 
@@ -197,7 +197,7 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
 /**
  * Initialize the built-in template styles
  */
-static void lv_temps_init(void)
+static void lv_templs_init(void)
 {
 	/*Default style*/
 }

@@ -175,30 +175,36 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
  * @param map_p pointer to a color_t array
  * @param opa opacity of the map (ignored, only for compatibility with lv_vmap)
  * @param transp true: enable transparency of LV_IMG_COLOR_TRANSP color pixels
+ * @param upscale true: upscale to double size
+ * @param recolor mix the pixels with this color
+ * @param recolor_opa the intense of recoloring
  */
 void lv_vmap(const area_t * cords_p, const area_t * mask_p, 
-             const color_t * map_p, opa_t opa, bool transp,
+             const color_t * map_p, opa_t opa, bool transp, bool upscale,
 			 color_t recolor, opa_t recolor_opa)
 {
     area_t masked_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
-    
+
     /*Get the union of map size and mask*/
     /* The mask is already truncated to the vdb size
-     * in 'lv_refr_area_with_vdb' function */
+    * in 'lv_refr_area_with_vdb' function */
     union_ok = area_union(&masked_a, cords_p, mask_p);
-    
+
     /*If there are common part of the three area then draw to the vdb*/
-    if(union_ok == false)  return; 
+    if(union_ok == false)  return;
+
+    uint8_t ds_shift = 0;
+    if(upscale != false) ds_shift = 1;
 
     /*If the map starts OUT of the masked area then calc. the first pixel*/
-    cord_t map_width = area_get_width(cords_p);
+    cord_t map_width = area_get_width(cords_p) >> ds_shift;
     if(cords_p->y1 < masked_a.y1) {
-        map_p += (uint32_t) map_width * (masked_a.y1 - cords_p->y1);
+        map_p += (uint32_t) map_width * ((masked_a.y1 - cords_p->y1) >> ds_shift);
     }
     if(cords_p->x1 < masked_a.x1) {
-        map_p += (masked_a.x1 - cords_p->x1);
+        map_p += (masked_a.x1 - cords_p->x1) >> ds_shift;
     }
 
     /*Stores coordinates relative to the act vdb*/
@@ -208,99 +214,124 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     masked_a.y2 = masked_a.y2 - vdb_p->vdb_area.y1;
 
     cord_t vdb_width = area_get_width(&vdb_p->vdb_area);
-    color_t * vdb_buf_tmp = vdb_p->buf; 
+    color_t * vdb_buf_tmp = vdb_p->buf;
     vdb_buf_tmp += (uint32_t) vdb_width * masked_a.y1; /*Move to the first row*/
 
-    map_p -= masked_a.x1;
+    map_p -= (masked_a.x1 >> ds_shift);
 
-   /*No transparent pixels on the image*/
-   if(transp == false) { /*Simply copy the pixels to the VDB*/
-        cord_t row; 
-
-        if(opa == OPA_COVER)  { /*no opa */
-            for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                memcpy(&vdb_buf_tmp[masked_a.x1], 
-                       &map_p[masked_a.x1], 
-                       area_get_width(&masked_a) * sizeof(color_t));
-                map_p += map_width;               /*Next row on the map*/
-                vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
-            }
-        } else {
-            cord_t col;
-            for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-                   vdb_buf_tmp[col] = color_mix( map_p[col], vdb_buf_tmp[col], opa);
-                }
-                map_p += map_width;              /*Next row on the map*/
-                vdb_buf_tmp += vdb_width;        /*Next row on the VDB*/
-            }
-        }
-
-        /*To recolor draw simply a rectangle above the image*/
-#if LV_VDB_SIZE != 0
-        lv_vfill(cords_p, mask_p, recolor, recolor_opa);
-#endif
-
-    } else { /*transp == true: Check all pixels */
+    if(upscale != false) {
         cord_t row;
         cord_t col;
         color_t transp_color = LV_COLOR_TRANSP;
+        color_t color_tmp;
+        color_t prev_color = COLOR_BLACK;
+        cord_t map_col;
 
-        if(recolor_opa == OPA_TRANSP)/*No recolor*/
-        {
-			if(opa == OPA_COVER)  { /*no opa */
-				for(row = masked_a.y1; row <= masked_a.y2; row++) {
-				   for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-					   if(map_p[col].full != transp_color.full) {
-						   vdb_buf_tmp[col] = map_p[col];
-					   }
-				   }
+        color_tmp = color_mix(recolor, prev_color, recolor_opa);
+        for(row = masked_a.y1; row <= masked_a.y2; row++) {
+            for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+                map_col = col >> 1;
 
-				   map_p += map_width; /*Next row on the map*/
-				   vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
-			   }
-			} else { /*Image opacity ut no recolor*/
-				for(row = masked_a.y1; row <= masked_a.y2; row++) {
-					for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-						if(map_p[col].full != transp_color.full) {
-							vdb_buf_tmp[col] = color_mix( map_p[col], vdb_buf_tmp[col], opa);
-						}
-					}
+                if(map_p[map_col].full != prev_color.full) {
+                    prev_color.full = map_p[map_col].full;
+                    color_tmp = color_mix(recolor, prev_color, recolor_opa);
+                }
+                if(transp == false || map_p[map_col].full != transp_color.full) {
+                    vdb_buf_tmp[col] = color_mix( color_tmp, vdb_buf_tmp[col], opa);
+                }
+            }
+            if((row & 0x1) != 0) map_p += map_width; /*Next row on the map*/
+            vdb_buf_tmp += vdb_width ;        /*Next row on the VDB*/
+        }
+    }
+    else {
+        if(transp == false) { /*Simply copy the pixels to the VDB*/
+            cord_t row;
 
-					map_p += map_width; /*Next row on the map*/
-					vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
-				}
-			}
-        } else { /*Recolor needed*/
-            color_t color_tmp;
-        	if(opa == OPA_COVER)  { /*no opa */
-				for(row = masked_a.y1; row <= masked_a.y2; row++) {
-				   for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-					   if(map_p[col].full != transp_color.full) {
-						   color_tmp = color_mix(recolor, map_p[col], recolor_opa);
-						   vdb_buf_tmp[col] = color_tmp;
-					   }
-				   }
+            if(opa == OPA_COVER)  { /*no opa */
+                for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                    memcpy(&vdb_buf_tmp[masked_a.x1],
+                           &map_p[masked_a.x1],
+                           area_get_width(&masked_a) * sizeof(color_t));
+                    map_p += map_width;               /*Next row on the map*/
+                    vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+                }
+            } else {
+                cord_t col;
+                for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                    for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+                        vdb_buf_tmp[col] = color_mix( map_p[col], vdb_buf_tmp[col], opa);
+                    }
+                    map_p += map_width;              /*Next row on the map*/
+                    vdb_buf_tmp += vdb_width;        /*Next row on the VDB*/
+                }
+            }
 
-				   map_p += map_width; /*Next row on the map*/
-				   vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
-			   }
-			} else { /*Image opacity with recolor*/
-				for(row = masked_a.y1; row <= masked_a.y2; row++) {
-					for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-						if(map_p[col].full != transp_color.full) {
-						    color_tmp = color_mix(recolor, map_p[col], recolor_opa);
-							vdb_buf_tmp[col] = color_mix(color_tmp, vdb_buf_tmp[col], opa);
-						}
-					}
+          /*To recolor draw simply a rectangle above the image*/
+#if LV_VDB_SIZE != 0
+          lv_vfill(cords_p, mask_p, recolor, recolor_opa);
+#endif
+        } else { /*transp == true: Check all pixels */
+            cord_t row;
+            cord_t col;
+            color_t transp_color = LV_COLOR_TRANSP;
 
-					map_p += map_width; /*Next row on the map*/
-					vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
-				}
-			}
+            if(recolor_opa == OPA_TRANSP) {/*No recolor*/
+                if(opa == OPA_COVER)  { /*no opa */
+                    for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                        for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+                            if(map_p[col].full != transp_color.full) {
+                                vdb_buf_tmp[col] = map_p[col];
+                            }
+                        }
+
+                        map_p += map_width; /*Next row on the map*/
+                        vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+                    }
+                } else {
+                    for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                        for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+                            if(map_p[col].full != transp_color.full) {
+                                vdb_buf_tmp[col] = color_mix( map_p[col], vdb_buf_tmp[col], opa);
+                            }
+                        }
+
+                        map_p += map_width; /*Next row on the map*/
+                        vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+                    }
+                }
+            } else { /*Recolor needed*/
+                color_t color_tmp;
+                if(opa == OPA_COVER)  { /*no opa */
+                    for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                        for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+                            if(map_p[col].full != transp_color.full) {
+                                color_tmp = color_mix(recolor, map_p[col], recolor_opa);
+                                vdb_buf_tmp[col] = color_tmp;
+                            }
+                        }
+
+                        map_p += map_width; /*Next row on the map*/
+                        vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+                    }
+                } else {
+                    for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                        for(col = masked_a.x1; col <= masked_a.x2; col ++) {
+                            if(map_p[col].full != transp_color.full) {
+                                color_tmp = color_mix(recolor, map_p[col], recolor_opa);
+                                vdb_buf_tmp[col] = color_mix(color_tmp, vdb_buf_tmp[col], opa);
+                            }
+                        }
+
+                        map_p += map_width; /*Next row on the map*/
+                        vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
+                    }
+                }
+            }
         }
     }
 }
+
 
 
 /**********************

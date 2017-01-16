@@ -12,10 +12,15 @@
 
 #include "lv_mbox.h"
 #include "../lv_misc/anim.h"
+#include "misc/math/math_base.h"
+
 /*********************
  *      DEFINES
  *********************/
-#define LV_MBOX_CLOSE_FADE_TIME	 750	/*ms*/
+/*Test configurations*/
+#ifndef LV_MBOX_ANIM_TIME
+#define LV_MBOX_ANIM_TIME   250 /*How fast animate out the message box in auto close. 0: no animation [ms]*/
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -29,11 +34,15 @@ static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_
 #endif
 static void lv_mboxs_init(void);
 static void lv_mbox_realign(lv_obj_t * mbox);
+static void lv_mbox_disable_fit(lv_obj_t  * mbox);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_mboxs_t lv_mboxs_def;	/*Default message box style*/
+static lv_mboxs_t lv_mboxs_info;
+static lv_mboxs_t lv_mboxs_warn;
+static lv_mboxs_t lv_mboxs_err;
 
 /**********************
  *      MACROS
@@ -83,6 +92,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->btnh = lv_rect_create(new_mbox, NULL);
     	lv_rect_set_fit(ext->btnh, false, true);
     	lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
+        lv_obj_set_hidden(ext->btnh, true); /*Initially hidden, the first button will unhide it */
 
     	lv_obj_set_style(new_mbox, lv_mboxs_get(LV_MBOXS_DEF, NULL));
     }
@@ -92,6 +102,17 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
         ext->title = lv_label_create(new_mbox, copy_ext->title);
         ext->txt = lv_label_create(new_mbox, copy_ext->txt);
         ext->btnh = lv_rect_create(new_mbox, copy_ext->btnh);
+
+        /*Copy the buttons and the label on them*/
+        lv_obj_t * btn;
+        lv_obj_t * new_btn;
+        btn = lv_obj_get_child(copy_ext->btnh, NULL);
+        while(btn != NULL) {
+            new_btn = lv_btnm_create(ext->btnh, btn);
+            lv_label_create(new_btn, lv_obj_get_child(btn, NULL));
+
+            btn = lv_obj_get_child(copy_ext->btnh, btn);
+        }
 
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_mbox);
@@ -134,6 +155,15 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     				lv_mbox_realign(mbox);
     			}
     			break;
+    		case LV_SIGNAL_LONG_PRESS:
+#if LV_MBOX_ANIM_TIME != 0
+                lv_mbox_start_auto_close(mbox, 0);
+#else
+                lv_obj_del(mbox);
+                valid = false;
+#endif
+                lv_dispi_wait_release(param);
+    		    break;
     		case LV_SIGNAL_STYLE_CHG:
     			lv_obj_set_style(ext->title, &style->title);
     			lv_obj_set_style(ext->txt, &style->txt);
@@ -144,7 +174,6 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     			while(btn != NULL) {
     				/*Refresh the next button's style*/
     				lv_obj_set_style(btn, &style->btn);
-    				lv_obj_set_size(btn, style->btn_w, style->btn_h);
 
     				/*Refresh the button label too*/
     				lv_obj_set_style(lv_obj_get_child(btn, NULL), &style->btn_label);
@@ -152,13 +181,13 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     			}
 
     			/*Hide the title and/or buttons*/
-    			lv_obj_set_hidden(ext->title, style->hide_title == 0 ? false : true);
+    			const char * title_txt = lv_label_get_text(ext->title);
+    		    if(title_txt[0] == '\0') lv_obj_set_hidden(ext->btnh, true);
+                else  lv_obj_set_hidden(ext->btnh, false);
 
-    			if(style->hide_btns != 0 || lv_obj_get_child_num(ext->btnh) != 0) {
-    				lv_obj_set_hidden(ext->btnh, true);
-    			} else {
-    				lv_obj_set_hidden(ext->btnh, false);
-    			}
+    			if(lv_obj_get_child_num(ext->btnh) == 0) 	lv_obj_set_hidden(ext->btnh, true);
+    			else  lv_obj_set_hidden(ext->btnh, false);
+
     			break;
     		default:
     			break;
@@ -171,6 +200,37 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set the title of the message box
+ * @param mbox pointer to a message box
+ * @param title a '\0' terminated character string which will be the message box title
+ */
+void lv_mbox_set_title(lv_obj_t * mbox, const char * title)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+
+    lv_label_set_text(ext->title, title);
+
+    /*Hide the title if it is an empty text*/
+    if(title[0] == '\0') lv_obj_set_hidden(ext->title, true);
+    else if (lv_obj_get_hidden(ext->title) != false) lv_obj_set_hidden(ext->title, false);
+
+    lv_mbox_realign(mbox);
+}
+
+/**
+ * Set the text of the message box
+ * @param mbox pointer to a message box
+ * @param txt a '\0' terminated character string which will be the message box text
+ */
+void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+
+    lv_label_set_text(ext->txt, txt);
+    lv_mbox_realign(mbox);
+}
 
 /**
  * Add a button to the message box
@@ -188,20 +248,23 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 	btn = lv_btn_create(ext->btnh, NULL);
 	lv_btn_set_rel_action(btn, rel_action);
 	lv_obj_set_style(btn, &style->btn);
-	lv_obj_set_size(btn, style->btn_w, style->btn_h);
+	lv_rect_set_fit(btn, true, true);
 
 	lv_obj_t * label;
 	label = lv_label_create(btn, NULL);
 	lv_obj_set_style(label, &style->btn_label);
 	lv_label_set_text(label, btn_txt);
 
-	/*With 1 button set center layout but from 3 set grid*/
+	/*With 1 button set center layout but from 2 set pretty*/
 	uint16_t child_num = lv_obj_get_child_num(ext->btnh);
 	if(child_num == 1) {
+	    lv_obj_set_hidden(ext->btnh, false);
 		lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_CENTER);
 	} else if (child_num == 2) {
 		lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
 	}
+
+    lv_mbox_realign(mbox);
 
 	return btn;
 }
@@ -210,15 +273,15 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
  * A release action which can be assigned to a message box button to close it
  * @param btn pointer to the released button
  * @param dispi pointer to the caller display input
- * @return always false because the button is deleted with the mesage box
+ * @return always lv_action_res_t because the button is deleted with the mesage box
  */
-bool lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
+lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
 {
 	lv_obj_t * mbox = lv_mbox_get_from_btn(btn);
 
 	lv_obj_del(mbox);
 
-	return false;
+	return LV_ACTION_RES_INV;
 }
 
 /**
@@ -226,37 +289,29 @@ bool lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
  */
-void lv_mbox_auto_close(lv_obj_t * mbox, uint16_t tout)
+void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout)
 {
+#if LV_MBOX_ANIM_TIME != 0
+    /*Add shrinking animations*/
+    lv_obj_anim(mbox, LV_ANIM_GROW_H| ANIM_OUT, LV_MBOX_ANIM_TIME, tout, NULL);
+	lv_obj_anim(mbox, LV_ANIM_GROW_V| ANIM_OUT, LV_MBOX_ANIM_TIME, tout, lv_obj_del);
 
-	lv_obj_anim(mbox, LV_ANIM_FADE | ANIM_OUT, LV_MBOX_CLOSE_FADE_TIME, tout, lv_obj_del);
-}
+    /*When the animations start disable fit to let shrinking work*/
+    lv_obj_anim(mbox, LV_ANIM_NONE, 1, tout, lv_mbox_disable_fit);
 
-
-/**
- * Set the title of the message box
- * @param mbox pointer to a message box
- * @param title a '\0' terminated character string which will be the message box title
- */
-void lv_mbox_set_title(lv_obj_t * mbox, const char * title)
-{
-	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
-
-	lv_label_set_text(ext->title, title);
+#else
+    lv_obj_anim(mbox, LV_ANIM_NONE, LV_MBOX_ANIM_TIME, tout, lv_obj_del);
+#endif
 }
 
 /**
- * Set the text of the message box
- * @param mbox pointer to a message box
- * @param txt a '\0' terminated character string which will be the message box text
+ * Stop the auto. closing of message box
+ * @param mbox pointer to a message box object
  */
-void lv_mbox_set_txt(lv_obj_t * mbox, const char * txt)
+void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
-	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
-
-	lv_label_set_text(ext->txt, txt);
+    anim_del(mbox, NULL);
 }
-
 
 /*=====================
  * Getter functions
@@ -321,12 +376,17 @@ lv_mboxs_t * lv_mboxs_get(lv_mboxs_builtin_t style, lv_mboxs_t * copy)
 
 	switch(style) {
 		case LV_MBOXS_DEF:
-		case LV_MBOXS_INFO:
-		case LV_MBOXS_WARN:
-		case LV_MBOXS_ERR:
-		case LV_MBOXS_BUBBLE:
 			style_p = &lv_mboxs_def;
 			break;
+        case LV_MBOXS_INFO:
+            style_p = &lv_mboxs_info;
+            break;
+        case LV_MBOXS_WARN:
+            style_p = &lv_mboxs_warn;
+            break;
+        case LV_MBOXS_ERR:
+            style_p = &lv_mboxs_err;
+            break;
 		default:
 			style_p = &lv_mboxs_def;
 	}
@@ -371,13 +431,50 @@ static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_
 #endif
 
 /**
+ * Realign the elements of the message box
+ * @param mbox pointer to message box object
+ */
+static void lv_mbox_realign(lv_obj_t * mbox)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+
+    if(ext->btnh == NULL || ext->title == NULL || ext->txt == NULL) return;
+
+    /*Set the button holder width to the width of the text and title*/
+    if(lv_obj_get_hidden(ext->btnh) == false) {
+        cord_t title_w = lv_obj_get_width(ext->title);
+        cord_t txt_w = lv_obj_get_width(ext->txt);
+        cord_t btn_w = 0;
+        lv_obj_t * btn;
+        btn = lv_obj_get_child(ext->btnh, NULL);
+        while(btn != NULL) {
+            btn_w = MATH_MAX(lv_obj_get_width(btn), btn_w);
+            btn = lv_obj_get_child(ext->btnh, btn);
+        }
+
+        cord_t w = MATH_MAX(title_w, txt_w);
+        w = MATH_MAX(w, btn_w);
+        lv_obj_set_width(ext->btnh, w );
+    }
+}
+
+/**
+ * CAlled when the close animations starts to disable the recargle's fit
+ * @param mbox ppointer to message box object
+ */
+static void lv_mbox_disable_fit(lv_obj_t  * mbox)
+{
+    lv_rect_set_fit(mbox, false, false);
+}
+
+/**
  * Initialize the message box styles
  */
 static void lv_mboxs_init(void)
 {
 	/*Default style*/
 	lv_rects_get(LV_RECTS_DEF, &lv_mboxs_def.bg);
-	lv_mboxs_def.bg.light = 10 * LV_DOWNSCALE;
+	lv_mboxs_def.bg.light = 8 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_mboxs_def.btn);
 	lv_mboxs_def.btn.flags[LV_BTN_STATE_PR].light_en = 0;
@@ -389,27 +486,43 @@ static void lv_mboxs_init(void)
 	lv_mboxs_def.btnh.hpad = 0;
 	lv_mboxs_def.btnh.vpad = 0;
 
-	lv_mboxs_def.btn_w = 80 * LV_DOWNSCALE;
-	lv_mboxs_def.btn_h = 50 * LV_DOWNSCALE;
-	lv_mboxs_def.hide_btns = 0;
-	lv_mboxs_def.hide_title = 0;
+	memcpy(&lv_mboxs_info, &lv_mboxs_def, sizeof(lv_mboxs_t));
+	lv_mboxs_info.bg.objs.color = COLOR_BLACK;
+	lv_mboxs_info.bg.gcolor = COLOR_BLACK;
+	lv_mboxs_info.bg.bcolor = COLOR_WHITE;
+	lv_mboxs_info.title.objs.color = COLOR_WHITE;
+	lv_mboxs_info.txt.objs.color = COLOR_WHITE;
+	lv_mboxs_info.txt.letter_space = 2 * LV_DOWNSCALE;
 
-	/*TODO add further styles*/
+    lv_btns_get(LV_BTNS_BORDER, &lv_mboxs_info.btn);
+    lv_mboxs_info.btn.bcolor[LV_BTN_STATE_PR] = COLOR_SILVER;
+    lv_mboxs_info.btn.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
+    lv_mboxs_info.btn.mcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
+    lv_mboxs_info.btn.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
+    lv_mboxs_info.btn.rects.bopa = OPA_COVER;
+    lv_mboxs_info.btn_label.objs.color = COLOR_WHITE;
+
+    memcpy(&lv_mboxs_warn, &lv_mboxs_info, sizeof(lv_mboxs_t));
+    lv_mboxs_warn.bg.objs.color = COLOR_MAKE(0xff, 0xb2, 0x66);
+    lv_mboxs_warn.bg.gcolor = COLOR_MAKE(0xff, 0xad, 0x29);
+    lv_mboxs_warn.btn.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x10, 0x10, 0x10);
+    lv_mboxs_warn.btn.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x10, 0x10, 0x10);
+    lv_mboxs_warn.btn.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa8, 0x6e, 0x33);
+    lv_mboxs_warn.btn.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa8, 0x6e, 0x33);
+    lv_mboxs_warn.title.objs.color = COLOR_MAKE(0x10, 0x10, 0x10);
+    lv_mboxs_warn.txt.objs.color = COLOR_MAKE(0x10, 0x10, 0x10);;
+    lv_mboxs_warn.btn_label.objs.color = COLOR_MAKE(0x10, 0x10, 0x10);
+
+    memcpy(&lv_mboxs_err, &lv_mboxs_warn, sizeof(lv_mboxs_t));
+    lv_mboxs_err.bg.objs.color = COLOR_MAKE(0xff, 0x66, 0x66);
+    lv_mboxs_err.bg.gcolor = COLOR_MAKE(0x99, 0x22, 0x22);
+    lv_mboxs_err.btn.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
+    lv_mboxs_err.btn.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK;
+    lv_mboxs_err.btn.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x70, 0x00, 0x00);
+    lv_mboxs_err.btn.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x70, 0x00, 0x00);
+    lv_mboxs_err.title.objs.color = COLOR_BLACK;
+    lv_mboxs_err.txt.objs.color = COLOR_BLACK;
+    lv_mboxs_err.btn_label.objs.color = COLOR_BLACK;
 }
 
-/**
- * Realign the elements of the message box
- * @param mbox pointer to message box object
- */
-static void lv_mbox_realign(lv_obj_t * mbox)
-{
-	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
-	lv_mboxs_t * style = lv_obj_get_style(mbox);
-
-	if(ext->btnh == NULL || ext->title == NULL || ext->txt == NULL) return;
-
-	lv_obj_set_width(ext->btnh, lv_obj_get_width(mbox) - 2 * style->bg.hpad);
-
-	lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, 0);
-}
 #endif

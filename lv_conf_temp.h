@@ -61,6 +61,8 @@
 #define USE_FONT_DEJAVU_40   1
 #define USE_FONT_DEJAVU_60   1
 #define USE_FONT_DEJAVU_80   1
+#define USE_FONT_SYMBOL_30   1
+#define USE_FONT_SYMBOL_60   1
 #define LV_FONT_DEFAULT      FONT_DEJAVU_30  /*Always set a default font*/
 #define LV_TXT_BREAK_CHARS  " ,.;-" /*Can break texts on these chars*/
 
@@ -93,10 +95,17 @@
 /*Line (dependencies: -*/
 #define USE_LV_LINE     1
 
-/*Image (dependencies: from misc: FSINT, UFS)*/
+/*Image (dependencies: lv_label (if symbols are enabled) from misc: FSINT, UFS)*/
 #define USE_LV_IMG      1
 #if USE_LV_IMG != 0
-//#define LV_IMG_DEF_WALLPAPER    img_wallpaper_var /*Comment this line to NOT use wallpaper*/
+#define LV_IMG_DEF_WALLPAPER    img_square_x2  /*Comment this line to NOT use wallpaper*/
+/* 1: enables to interpret the file names as symbol name
+ * from symbol_def.h if they begin with a lower case letter.
+ * (driver letters are always upper case)*/
+#define LV_IMG_ENABLE_SYMBOLS   1
+#if LV_IMG_ENABLE_SYMBOLS != 0
+#define LV_IMG_DEF_SYMBOL_FONT       FONT_SYMBOL_30
+#endif /*LV_IMG_ENABLE_SYMBOLS*/
 #endif /*USE_LV_IMG*/
 
 /*Page (dependencies: lv_rect)*/
@@ -135,6 +144,12 @@
 
 /*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
 #define USE_LV_MBOX     1
+#if USE_LV_MBOX != 0
+#define LV_MBOX_ANIM_TIME   250 /*How fast animate out the message box in auto close. 0: no animation [ms]*/
+#endif
+
+/*Gauge (dependencies: lv_rect, lv_label, lv_line, misc: trigo)*/
+#define USE_LV_GAUGE    1
 
 /*==================
  *  LV APP SETTINGS
@@ -175,7 +190,7 @@
 #define LV_APP_EFFECT_OPA_ANIM 1 /*Enable the using opacity in the application animations*/
 #define LV_APP_ANIM_WIN 200      /*Animation time in milliseconds (0: turn off animation)*/
 #define LV_APP_ANIM_SC  200      /*Animation time in milliseconds (0: turn off animation)*/
-#define LV_APP_ANIM_NOTICE 300   /*How fast animate out a notice [ms]*/
+#define LV_APP_ANIM_NOTICE 300   /*Obsolete, use LV_MBOX_ANIM. */
 
 /* App. utility settings */
 #define LV_APP_NOTICE_SHOW_TIME 4000 /*Notices will be shown for this time [ms]*/

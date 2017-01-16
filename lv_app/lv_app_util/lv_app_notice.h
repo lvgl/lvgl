@@ -24,8 +24,18 @@
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the Notifications
+ */
 void lv_app_notice_init(void);
-void lv_app_notice_add(const char * format, ...);
+
+/**
+ * Add a notification with a given text
+ * @param format pritntf-like format string
+ * @return pointer the notice which is a message box (lv_mbox) object
+ */
+lv_obj_t *  lv_app_notice_add(const char * format, ...);
 
 /**********************
  *      MACROS

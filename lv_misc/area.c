@@ -49,16 +49,32 @@ void area_set(area_t * area_p, cord_t x1, cord_t y1, cord_t x2, cord_t y2)
     area_p->y2 = y2;
 }
 
+/**
+ * Set the width of an area
+ * @param area_p pointer to an area
+ * @param w the new width of the area (w == 1 makes x1 == x2)
+ */
 void area_set_width(area_t * area_p, cord_t w)
 {
 	area_p->x2 = area_p->x1 + w - 1;
 }
 
+/**
+ * Set the height of an area
+ * @param area_p pointer to an area
+ * @param h the new height of the area (h == 1 makes y1 == y2)
+ */
 void area_set_height(area_t * area_p, cord_t h)
 {
 	area_p->y2 = area_p->y1 + h - 1;
 }
 
+/**
+ * Set the position of an area (width and height will be kept)
+ * @param area_p pointer to an area
+ * @param x the new x coordinate of the area
+ * @param y the new y coordinate of the area
+ */
 void area_set_pos(area_t * area_p, cord_t x, cord_t y)
 {
 	cord_t w = area_get_width(area_p);
@@ -94,10 +110,10 @@ uint32_t area_get_size(const area_t * area_p)
 bool area_union(area_t * res_p, const area_t * a1_p, const area_t * a2_p)
 {
     /* Get the smaller area from 'a1_p' and 'a2_p' */
-    res_p->x1 = max(a1_p->x1, a2_p->x1);
-    res_p->y1 = max(a1_p->y1, a2_p->y1);
-    res_p->x2 = min(a1_p->x2, a2_p->x2);
-    res_p->y2 = min(a1_p->y2, a2_p->y2);
+    res_p->x1 = MATH_MAX(a1_p->x1, a2_p->x1);
+    res_p->y1 = MATH_MAX(a1_p->y1, a2_p->y1);
+    res_p->x2 = MATH_MIN(a1_p->x2, a2_p->x2);
+    res_p->y2 = MATH_MIN(a1_p->y2, a2_p->y2);
     
     /*If x1 or y1 greater then x2 or y2 then the areas union is empty*/
     bool union_ok = true;
@@ -117,10 +133,10 @@ bool area_union(area_t * res_p, const area_t * a1_p, const area_t * a2_p)
  */
 void area_join(area_t * a_res_p, const area_t * a1_p, const area_t * a2_p)
 {
-    a_res_p->x1 = min(a1_p->x1, a2_p->x1);
-    a_res_p->y1 = min(a1_p->y1, a2_p->y1);
-    a_res_p->x2 = max(a1_p->x2, a2_p->x2);
-    a_res_p->y2 = max(a1_p->y2, a2_p->y2);
+    a_res_p->x1 = MATH_MIN(a1_p->x1, a2_p->x1);
+    a_res_p->y1 = MATH_MIN(a1_p->y1, a2_p->y1);
+    a_res_p->x2 = MATH_MAX(a1_p->x2, a2_p->x2);
+    a_res_p->y2 = MATH_MAX(a1_p->y2, a2_p->y2);
 }
 
 /**
@@ -146,7 +162,8 @@ bool area_is_point_on(const area_t * a_p, const point_t * p_p)
  * Check if two area has common parts
  * @param a1_p pointer to an area. 
  * @param a2_p pointer to an other area
- * @return false: a1_p and a2_p has no common parts */
+ * @return false: a1_p and a2_p has no common parts
+ */
 bool area_is_on(const area_t * a1_p, const area_t * a2_p)
 {
     /*Two area are on each other if... */

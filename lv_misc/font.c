@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <lvgl/lv_misc/fonts/symbol_30.h>
 #include <stddef.h>
 #include "font.h"
 #include "fonts/dejavu_8.h"
@@ -108,6 +109,7 @@ const font_t * font_get(font_types_t font_id)
             font_p = symbol_30_get_dsc();
             break;
 #endif
+
 #if USE_FONT_SYMBOL_60 != 0
         case FONT_SYMBOL_60:
             font_p = symbol_60_get_dsc();
@@ -118,6 +120,40 @@ const font_t * font_get(font_types_t font_id)
     }
     
     return font_p;
+}
+
+/**
+ * Return with the bitmap of a font.
+ * @param font_p pointer to a font
+ * @param letter a letter
+ * @return  pointer to the bitmap of the letter
+ */
+const uint8_t * font_get_bitmap(const font_t * font_p, uint8_t letter)
+{
+    if(letter < font_p->start_ascii || letter >= font_p->start_ascii + font_p->letter_cnt) return NULL;
+
+    uint32_t index = (letter - font_p->start_ascii) * font_p->height_row * font_p->width_byte;
+    return &font_p->bitmaps_a[index];
+}
+
+/**
+ * Get the width of a letter in a font
+ * @param font_p pointer to a font
+ * @param letter a letter
+ * @return the width of a letter
+ */
+uint8_t font_get_width(const font_t * font_p, uint8_t letter)
+{
+    if(letter < font_p->start_ascii) return 0;
+
+    letter -= font_p->start_ascii;
+    uint8_t w = 0;
+    if(letter < font_p->letter_cnt) {
+        w = font_p->fixed_width != 0 ? font_p->fixed_width :
+                                      font_p->width_bit_a[letter];
+    }
+
+    return w;
 }
 
 /**********************

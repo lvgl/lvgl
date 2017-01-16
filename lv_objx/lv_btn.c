@@ -425,7 +425,7 @@ static void lv_btns_init(void)
 	/*Default style*/
     lv_btns_def.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x60, 0x88, 0xb0);
     lv_btns_def.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xa0, 0xc0, 0xe0);
+	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xff, 0xff, 0xff);
 	lv_btns_def.lcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
 	lv_btns_def.flags[LV_BTN_STATE_REL].light_en = 0;
 	lv_btns_def.flags[LV_BTN_STATE_REL].transp = 0;
@@ -515,7 +515,7 @@ static void lv_btns_init(void)
     lv_btns_border.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
     lv_btns_border.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
     lv_btns_border.flags[LV_BTN_STATE_INA].light_en = 0;
-	lv_btns_border.rects.bwidth = 2 * LV_DOWNSCALE;
+	lv_btns_border.rects.bwidth = 1 * LV_DOWNSCALE;
 	lv_btns_border.rects.bopa = 50;
 	lv_btns_border.rects.round = 4 * LV_DOWNSCALE;
 	lv_btns_border.rects.hpad = 10 * LV_DOWNSCALE;

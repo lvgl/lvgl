@@ -114,7 +114,6 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action)
 {
 	lv_lists_t * lists = lv_obj_get_style(list);
-	lv_list_ext_t  * ext = lv_obj_get_ext(list);
 
 	/*Create a list element with the image an the text*/
 	lv_obj_t * liste;

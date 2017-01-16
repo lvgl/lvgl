@@ -20,6 +20,23 @@
 /*********************
  *      DEFINES
  *********************/
+/*Test configurations*/
+#ifndef LV_LABEL_SCROLL_SPEED
+#define LV_LABEL_SCROLL_SPEED       (25 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
+#endif
+
+#ifndef LV_LABEL_SCROLL_SPEED_VER
+#define LV_LABEL_SCROLL_SPEED_VER   (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
+#endif
+
+#ifndef LV_LABEL_SCROLL_PLAYBACK_PAUSE
+#define LV_LABEL_SCROLL_PLAYBACK_PAUSE  500 /*Wait before the scroll turns back in ms*/
+#endif
+
+#ifndef LV_LABEL_SCROLL_REPEAT_PAUSE
+#define LV_LABEL_SCROLL_REPEAT_PAUSE    500 /*Wait before the scroll begins again in ms*/
+#endif
+
 #define LV_LABEL_DOT_NUM	3
 #define LV_LABEL_DOT_END_INV 0xFFFF
 

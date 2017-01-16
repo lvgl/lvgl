@@ -37,8 +37,17 @@ typedef struct
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Get the vdb variable
+ * @return pointer to the vdb variable
+ */
 lv_vdb_t * lv_vdb_get(void);
+
+/**
+ * Flush the content of the vdb
+ */
 void lv_vdb_flush(void);
+
 /**********************
  *      MACROS
  **********************/

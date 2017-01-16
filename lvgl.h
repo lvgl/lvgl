@@ -9,6 +9,25 @@
 /*********************
  *      INCLUDES
  *********************/
+
+/*Test misc. module version*/
+#include "misc/misc.h"
+#define LV_MISC_REQ_MAJOR   3
+#define LV_MISC_REQ_MINOR   0
+#define LV_MISC_REQ_PATCH   0
+
+#if MISC_VERSION_MAJOR != LV_MISC_REQ_MAJOR /*The version major has to match*/
+#error "LV: incompatible misc. module version! See lvgl.h"
+#endif
+
+#if MISC_VERSION_MINOR < LV_MISC_REQ_MINOR /*The version minor has to be the same or greater*/
+#error "LV: incompatible misc. module version! See lvgl.h"
+#endif
+
+#if MISC_VERSION_PATCH < LV_MISC_REQ_PATCH /*The version patch has to be the same or greater*/
+#error "LV: incompatible misc. module version! See lvgl.h"
+#endif
+
 #include <lvgl/lv_objx/lv_chart.h>
 #include "lv_obj/lv_obj.h"
 #include "lv_objx/lv_btn.h"
@@ -25,6 +44,7 @@
 #include "lv_objx/lv_ta.h"
 #include "lv_objx/lv_win.h"
 #include "lv_objx/lv_mbox.h"
+#include "lv_objx/lv_gauge.h"
 
 #include "lv_app/lv_app.h"
 
@@ -32,8 +52,8 @@
  *      DEFINES
  *********************/
 #define LVGL_VERSION_MAJOR  2
-#define LVGL_VERSION_MINOR  1
-#define LVGL_VERSION_PATH   1
+#define LVGL_VERSION_MINOR  2
+#define LVGL_VERSION_PATH   0
 
 
 /**********************

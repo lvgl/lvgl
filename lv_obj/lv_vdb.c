@@ -56,37 +56,48 @@ void lv_vdb_flush(void)
 	disp_area(DISP_ID_ALL, vdb.vdb_area.x1 , vdb.vdb_area.y1, vdb.vdb_area.x2, vdb.vdb_area.y2);
 	disp_map(DISP_ID_ALL, vdb.buf);
 #else
-	color_t row_buf[LV_HOR_RES / LV_DOWNSCALE];
-	color_t * row_buf_p;
+	/* Get the average of 2x2 pixels and put the result back to the VDB
+	 * The reading goes much faster then the write back
+	 * so useful data won't be overwritten
+	 * Example:
+	 * -----------------------------
+	 * in1_buf  |2,2|6,8|      3,7
+	 * in2_buf  |4,4|7,7|      1,2
+	 *           ---------  ==>
+	 * in1_buf  |1,1|1,3|
+	 * in2_buf  |1,1|1,3|
+	 * */
 	cord_t x;
 	cord_t y;
 	cord_t w = area_get_width(&vdb.vdb_area);
-	cord_t i;
-	color_t * buf_p = vdb.buf;
-	for(y = vdb.vdb_area.y1 >> 1; y <= vdb.vdb_area.y2 >> 1; y ++) {
-		i = 0;
-		row_buf_p = row_buf;
-		for(x = vdb.vdb_area.x1; x < vdb.vdb_area.x2; x += 2, i += 2) {
-			row_buf_p->red = (buf_p[i].red +
-					          buf_p[i + 1].red +
-					          buf_p[i + w].red +
-							  buf_p[i + w + 1].red) >> 2;
-			row_buf_p->green = (buf_p[i].green +
-					            buf_p[i + 1].green +
-					            buf_p[i + w].green +
-								buf_p[i + w + 1].green) >> 2;
-			row_buf_p->blue = (buf_p[i].blue +
-					           buf_p[i + 1].blue +
-					           buf_p[i + w].blue +
-							   buf_p[i + w + 1].blue) >> 2;
+	color_t * in1_buf = vdb.buf;      /*Pointer to the first row*/
+    color_t * in2_buf = vdb.buf + w;  /*Pointer to the second row*/
+    color_t * out_buf = vdb.buf;      /*Store the result here*/
+	for(y = vdb.vdb_area.y1; y < vdb.vdb_area.y2; y += 2) {
+		for(x = vdb.vdb_area.x1; x < vdb.vdb_area.x2; x += 2) {
+		    /*Get the average of 2x2 red*/
+		    out_buf->red = (in1_buf->red + (in1_buf + 1)->red +
+					        in2_buf->red + (in2_buf+ 1)->red) >> 2;
+            /*Get the average of 2x2 green*/
+		    out_buf->green = (in1_buf->green + (in1_buf + 1)->green +
+                              in2_buf->green + (in2_buf + 1)->green) >> 2;
+            /*Get the average of 2x2 blue*/
+		    out_buf->blue = (in1_buf->blue + (in1_buf + 1)->blue +
+                             in2_buf->blue + (in2_buf + 1)->blue) >> 2;
 
-			row_buf_p++;
+			in1_buf+=2; /*Skip the next pixel because it is already used above*/
+            in2_buf+=2;
+			out_buf++;
 		}
-		buf_p += LV_DOWNSCALE * w;
-
-		disp_area(DISP_ID_ALL, vdb.vdb_area.x1 >> 1, y, vdb.vdb_area.x2 >> 1, y);
-		disp_map(DISP_ID_ALL, row_buf);
+		/*2 row is ready so go the next 2*/
+		in1_buf += w; /*Skip the next row because it is processed from in2_buf*/
+        in2_buf += w;
 	}
+
+	/* Now the full the VDB is filtered and the result is stored in the first quarter of it
+	 * Write out the filtered map to the display*/
+    disp_area(DISP_ID_ALL, vdb.vdb_area.x1 >> 1, vdb.vdb_area.y1 >> 1, vdb.vdb_area.x2 >> 1, vdb.vdb_area.y2 >> 1);
+    disp_map(DISP_ID_ALL, vdb.buf);
 #endif
 }
 

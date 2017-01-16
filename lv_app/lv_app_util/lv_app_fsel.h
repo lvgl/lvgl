@@ -23,9 +23,27 @@
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the File selector utility
+ */
 void lv_app_fsel_init(void);
-void lv_app_fsel_open(const char * path, const char * filter, void * param, void (*ok_action)(void *, const char *));
-void lv_app_fsel_close();
+
+/**
+ * Open the File selector
+ * @param path start path
+ * @param filter show only files with a specific extension, e.g. "wav".
+ *               "/" means filter to folders.
+ * @param param a free parameter which will be added to 'ok_action'
+ * @param ok_action an action to call when a file or folder is chosen
+ */
+void lv_app_fsel_open(const char * path, const char * filter, void * param,
+                       void (*ok_action)(void *, const char *));
+
+/**
+ * Close the File selector
+ */
+void lv_app_fsel_close(void);
 
 /**********************
  *      MACROS

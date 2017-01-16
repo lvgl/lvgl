@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "../font.h"
 
-static const uint8_t  symbol_60_bitmaps[12480] = 
+static const uint8_t  symbol_60_bitmaps[12480] =
 {
     // ASCII: 97, char width: 60
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // ------------------------------------------------------------....
@@ -1619,15 +1619,16 @@ static const uint8_t  symbol_60_bitmaps[12480] =
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // ----------------------------------------------------------------
 };
 
-static const uint8_t  symbol_60_widths[26] = 
+
+static const uint8_t  symbol_60_widths[26] =
 {
-    60, 51, 64, 47, 51, 51, 60, 47, 
-    60, 43, 43, 60, 34, 34, 47, 60, 
-    49, 59, 59, 59, 59, 59, 60, 51, 
-    51, 68, 
+    60, 51, 64, 47, 51, 51, 60, 47,
+    60, 43, 43, 60, 34, 34, 47, 60,
+    49, 59, 59, 59, 59, 59, 60, 51,
+    51, 68,
 };
 
-static const font_t symbol_60_dsc = 
+static const font_t symbol_60_dsc =
 {
     26, // Letter count
     97, // First ascii code

@@ -269,6 +269,30 @@ void lv_chart_set_next(lv_obj_t * chart, cord_t * dl, cord_t y)
  *====================*/
 
 /**
+ * Get the type of a chart
+ * @param chart pointer to chart object
+ * @return type of the chart (from 'lv_chart_t' enum)
+ */
+lv_chart_type_t lv_chart_get_type(lv_obj_t * chart)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+
+    return ext->type;
+}
+
+/**
+ * Get the data point number per data line on chart
+ * @param chart pointer to chart object
+ * @return point number on each data line
+ */
+uint16_t lv_chart_get_pnum(lv_obj_t * chart)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+
+    return ext->pnum;
+}
+
+/**
  * Return with a pointer to a built-in style and/or copy it to a variable
  * @param style a style name from lv_charts_builtin_t enum
  * @param copy copy the style to this variable. (NULL if unused)
@@ -303,30 +327,6 @@ lv_charts_t * lv_charts_get(lv_charts_builtin_t style, lv_charts_t * copy)
 	}
 
 	return style_p;
-}
-
-/**
- * Get the type of a chart
- * @param chart pointer to chart object
- * @return type of the chart (from 'lv_chart_t' enum)
- */
-lv_chart_type_t lv_chart_get_type(lv_obj_t * chart)
-{
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
-
-	return ext->type;
-}
-
-/**
- * Get the data point number per data line on chart
- * @param chart pointer to chart object
- * @return point number on each data line
- */
-uint16_t lv_chart_get_pnum(lv_obj_t * chart)
-{
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
-
-	return ext->pnum;
 }
 
 /**********************

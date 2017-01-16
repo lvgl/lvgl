@@ -74,44 +74,55 @@ void lv_dispi_reset(void)
 }
 
 /**
- * Get the last point on display input
- * @param dispi_p pointer to a display input
- * @param point_p pointer to a point to store the result 
+ * Reset the long press state of a display input
+ * @param dispi pointer to a display input
  */
-void lv_dispi_get_point(lv_dispi_t * dispi_p, point_t * point_p)
+void lv_dispi_reset_lpr(lv_dispi_t * dispi)
 {
-    point_p->x = dispi_p->act_point.x;
-    point_p->y = dispi_p->act_point.y;
+    dispi->long_press_sent = 0;
+    dispi->lpr_rep_time_stamp = systick_get();
+    dispi->press_time_stamp = systick_get();
+}
+
+/**
+ * Get the last point on display input
+ * @param dispi pointer to a display input
+ * @param point pointer to a point to store the result
+ */
+void lv_dispi_get_point(lv_dispi_t * dispi, point_t * point)
+{
+    point->x = dispi->act_point.x;
+    point->y = dispi->act_point.y;
 }
 
 /**
  * Check if there is dragging on display input or not 
- * @param dispi_p pointer to a display input
+ * @param dispi pointer to a display input
  * @return true: drag is in progress
  */
-bool lv_dispi_is_dragging(lv_dispi_t * dispi_p)
+bool lv_dispi_is_dragging(lv_dispi_t * dispi)
 {
-    return dispi_p->drag_in_prog == 0 ? false : true;
+    return dispi->drag_in_prog == 0 ? false : true;
 }
 
 /**
  * Get the vector of dragging on a display input
- * @param dispi_p pointer to a display input
- * @param point_p pointer to a point to store the vector 
+ * @param dispi pointer to a display input
+ * @param point pointer to a point to store the vector
  */
-void lv_dispi_get_vect(lv_dispi_t * dispi_p, point_t * point_p)
+void lv_dispi_get_vect(lv_dispi_t * dispi, point_t * point)
 {
-    point_p->x = dispi_p->vect.x;
-    point_p->y = dispi_p->vect.y;
+    point->x = dispi->vect.x;
+    point->y = dispi->vect.y;
 }
 
 /**
  * Do nothing until the next release
- * @param dispi_p pointer to a display input
+ * @param dispi pointer to a display input
  */
-void lv_dispi_wait_release(lv_dispi_t * dispi_p)
+void lv_dispi_wait_release(lv_dispi_t * dispi)
 {
-    dispi_p->wait_release = 1;
+    dispi->wait_release = 1;
 }
 
 /**********************

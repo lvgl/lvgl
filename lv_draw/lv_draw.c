@@ -45,11 +45,11 @@ static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h);
 #if LV_VDB_SIZE != 0
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_vletter;
-static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, color_t recolor, opa_t recolor_opa) = lv_vmap;
+static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_vmap;
 #else
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_rletter;
-static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, color_t recolor, opa_t recolor_opa) = lv_rmap;
+static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_rmap;
 #endif
 
 
@@ -177,60 +177,85 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
 void lv_draw_img(const area_t * cords_p, const area_t * mask_p, 
              const lv_imgs_t * imgs_p,  opa_t opa, const char * fn)
 {
-	if(fn == NULL) {
-		lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-		lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, "No data");
-	} else {
-		fs_file_t file;
-		fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
-		if(res == FS_RES_OK) {
-			cord_t row;
-			color_t buf[LV_HOR_RES];
-			uint32_t br;
-			area_t act_area;
+    if(fn == NULL) {
+        lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
+        lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, "No data");
+    } else {
+        fs_file_t file;
+        fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
+        if(res == FS_RES_OK) {
+            lv_img_raw_header_t header;
+            uint32_t br;
+            res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
 
-			area_t mask_sub;
-			bool union_ok;
-			union_ok = area_union(&mask_sub, mask_p, cords_p);
-			if(union_ok == false) {
-				fs_close(&file);
-				return;
-			}
-			lv_img_raw_header_t header;
-			res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
+            /*If the width is greater then map width then it is upscaled */
+            bool upscale = false;
+            if(area_get_width(cords_p) > header.w) upscale = true;
 
-			uint32_t start_offset = sizeof(lv_img_raw_header_t);
-			start_offset += area_get_width(cords_p) *
-						   (mask_sub.y1 - cords_p->y1) * sizeof(color_t); /*First row*/
-			start_offset += (mask_sub.x1 - cords_p->x1) * sizeof(color_t); /*First col*/
-			fs_seek(&file, start_offset);
+            cord_t row;
+            area_t act_area;
 
-			uint32_t useful_data = area_get_width(&mask_sub) * sizeof(color_t);
-			uint32_t next_row = area_get_width(cords_p) * sizeof(color_t) - useful_data;
 
-			area_cpy(&act_area, &mask_sub);
+            area_t mask_sub;
+            bool union_ok;
+            union_ok = area_union(&mask_sub, mask_p, cords_p);
+            if(union_ok == false) {
+                fs_close(&file);
+                return;
+            }
 
-			act_area.y2 = act_area.y1;
-			uint32_t act_pos;
+            uint8_t ds_shift = 0;
+            uint8_t ds_num = 1;
+            /*Set some values if upscale enabled*/
+            if(upscale != false) {
+                ds_shift = 1;
+                ds_num = 2;
+            }
 
-			for(row = mask_sub.y1; row <= mask_sub.y2; row ++) {
-				res = fs_read(&file, buf, useful_data, &br);
-				map_fp(&act_area, &mask_sub, buf, opa, header.transp,
-								  imgs_p->objs.color, imgs_p->recolor_opa);
-				fs_tell(&file, &act_pos);
-				fs_seek(&file, act_pos + next_row);
-				act_area.y1 ++;
-				act_area.y2 ++;
-			}
-		}
-		fs_close(&file);
+            uint32_t start_offset = sizeof(lv_img_raw_header_t);
+            start_offset += (area_get_width(cords_p) >> ds_shift) *
+                           ((mask_sub.y1 - cords_p->y1) >> ds_shift) * sizeof(color_t); /*First row*/
+            start_offset += ((mask_sub.x1 - cords_p->x1) >> ds_shift) * sizeof(color_t); /*First col*/
+            fs_seek(&file, start_offset);
 
-		if(res != FS_RES_OK) {
-			lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-			lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, fn);
-		}
-	}
+            uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift) * sizeof(color_t);
+            uint32_t next_row = (area_get_width(cords_p) >> ds_shift) * sizeof(color_t) - useful_data;
+
+
+            /*Round the coordinates with upscale*/
+            if(upscale != false) {
+                if((mask_sub.x1 & 0x1) != 0) mask_sub.x1 -= 1; /*Can be only even*/
+                if((mask_sub.x2 & 0x1) == 0) mask_sub.x2 -= 1; /*Can be only odd*/
+            }
+            area_cpy(&act_area, &mask_sub);
+
+            /* Round down the start coordinate, because the upscaled images
+             * can start only LV_DOWNSCALE 'y' coordinates */
+            act_area.y1 &= ~(cord_t)(ds_num - 1) ;
+            act_area.y2 = act_area.y1 + ds_num - 1;
+            uint32_t act_pos;
+
+            color_t buf[LV_HOR_RES];
+            for(row = mask_sub.y1; row <= mask_sub.y2; row += ds_num) {
+                res = fs_read(&file, buf, useful_data, &br);
+                map_fp(&act_area, &mask_sub, buf, opa, header.transp, upscale,
+                                  imgs_p->objs.color, imgs_p->recolor_opa);
+                fs_tell(&file, &act_pos);
+                fs_seek(&file, act_pos + next_row);
+                act_area.y1 += ds_num;
+                act_area.y2 += ds_num;
+            }
+
+        }
+        fs_close(&file);
+
+        if(res != FS_RES_OK) {
+            lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
+            lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, fn);
+        }
+    }
 }
+
 
 #endif /*USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0*/
 
@@ -297,10 +322,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  last_y = act_point.y;
 		  last_x = act_point.x;
 
-		  draw_area.x1 = min(act_area.x1, act_area.x2);
-		  draw_area.x2 = max(act_area.x1, act_area.x2);
-		  draw_area.y1 = min(act_area.y1, act_area.y2);
-		  draw_area.y2 = max(act_area.y1, act_area.y2);
+		  draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	  }
 	  if (hor == false && last_x != act_point.x) {
@@ -313,10 +338,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  last_y = act_point.y;
 		  last_x = act_point.x;
 
-		  draw_area.x1 = min(act_area.x1, act_area.x2);
-		  draw_area.x2 = max(act_area.x1, act_area.x2);
-		  draw_area.y1 = min(act_area.y1, act_area.y2);
-		  draw_area.y2 = max(act_area.y1, act_area.y2);
+		  draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	  }
 
@@ -341,10 +366,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		act_area.y1 = last_y - width_half ;
 		act_area.y2 = act_point.y + width_half + width_1;
 
-		draw_area.x1 = min(act_area.x1, act_area.x2);
-		draw_area.x2 = max(act_area.x1, act_area.x2);
-		draw_area.y1 = min(act_area.y1, act_area.y2);
-		draw_area.y2 = max(act_area.y1, act_area.y2);
+		draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 	if (hor == false) {
@@ -355,10 +380,10 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		act_area.y1 = last_y;
 		act_area.y2 = act_point.y;
 
-		draw_area.x1 = min(act_area.x1, act_area.x2);
-		draw_area.x2 = max(act_area.x1, act_area.x2);
-		draw_area.y1 = min(act_area.y1, act_area.y2);
-		draw_area.y2 = max(act_area.y1, act_area.y2);
+		draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
+		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
+		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
+		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
 		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
 	}
 }

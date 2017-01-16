@@ -311,7 +311,8 @@ static void sysmon_task(void * param)
     static bool mem_warn_report = false;
     if(mem_mon.size_free < LV_APP_SYSMON_MEM_WARN && mem_warn_report == false) {
         mem_warn_report = true;
-        lv_app_notice_add("Critically low memory");
+        lv_obj_t * not = lv_app_notice_add("Critically low memory");
+        lv_obj_set_style(not, lv_mboxs_get(LV_MBOXS_WARN, NULL));
     }
 
     if(mem_mon.size_free > LV_APP_SYSMON_MEM_WARN)  mem_warn_report = false;
@@ -320,7 +321,9 @@ static void sysmon_task(void * param)
     if(mem_mon.pct_frag > LV_APP_SYSMON_FRAG_WARN) {
         if(frag_warn_report == false) {
             frag_warn_report = true;
-            lv_app_notice_add("Critically memory fragmentation");
+            lv_obj_t * not =lv_app_notice_add("Critical memory\nfragmentation");
+            lv_obj_set_style(not, lv_mboxs_get(LV_MBOXS_WARN, NULL));
+
             dm_defrag(); /*Defrag. if the fragmentation is critical*/
         }
     }

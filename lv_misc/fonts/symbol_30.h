@@ -6,7 +6,6 @@
 #include "lv_conf.h"
 #if  USE_FONT_SYMBOL_30 != 0
 
-
 #include <stdint.h>
 #include "../font.h"
 
