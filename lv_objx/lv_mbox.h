@@ -93,6 +93,20 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 
 /**
+ * Set the title of the message box
+ * @param mbox pointer to a message box
+ * @param title a '\0' terminated character string which will be the message box title
+ */
+void lv_mbox_set_title(lv_obj_t * mbox, const char * title);
+
+/**
+ * Set the text of the message box
+ * @param mbox pointer to a message box
+ * @param txt a '\0' terminated character string which will be the message box text
+ */
+void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
+
+/**
  * Add a button to the message box
  * @param mbox pointer to message box object
  * @param btn_txt the text of the button
@@ -105,9 +119,9 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
  * A release action which can be assigned to a message box button to close it
  * @param btn pointer to the released button
  * @param dispi pointer to the caller display input
- * @return always false because the button is deleted with the mesage box
+ * @return always LV_ACTION_RES_INV because the button is deleted with the message box
  */
-bool lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
 
 /**
  * Automatically delete the message box after a given time
@@ -115,20 +129,6 @@ bool lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
  * @param tout a time (in milliseconds) to wait before delete the message box
  */
 void lv_mbox_auto_close(lv_obj_t * mbox, uint16_t tout);
-
-/**
- * Set the title of the message box
- * @param mbox pointer to a message box
- * @param title a '\0' terminated character string which will be the message box title
- */
-void lv_mbox_set_title(lv_obj_t * mbox, const char * title);
-
-/**
- * Set the text of the message box
- * @param mbox pointer to a message box
- * @param txt a '\0' terminated character string which will be the message box text
- */
-void lv_mbox_set_txt(lv_obj_t * mbox, const char * txt);
 
 /**
  * get the title of the message box

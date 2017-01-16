@@ -74,7 +74,7 @@ lv_obj_t *  lv_app_notice_add(const char * format, ...)
     mbox = lv_mbox_create(notice_h, NULL);
     lv_obj_set_style(mbox, lv_mboxs_get(LV_MBOXS_INFO, NULL));
     lv_mbox_set_title(mbox, "");
-    lv_mbox_set_txt(mbox, txt);
+    lv_mbox_set_text(mbox, txt);
     lv_obj_set_opa(mbox, app_style->menu_opa);
 
 #if LV_APP_NOTICE_SHOW_TIME != 0
