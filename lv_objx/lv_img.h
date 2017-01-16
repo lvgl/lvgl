@@ -24,6 +24,11 @@
 #include "../lv_obj/lv_obj.h"
 #include "misc/fs/fsint.h"
 
+#if LV_IMG_ENABLE_SYMBOLS
+#include "lv_label.h"
+#include "../lv_misc/fonts/symbol_def.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -49,7 +54,10 @@ typedef struct
 {
 	lv_objs_t objs;	/*Style of ancestor*/
 	/*New style element for this type */
-	opa_t recolor_opa;      /*Intensity of recoloring (OPA_TRANSP, OPA_10 ... OPA_COVER)*/
+	opa_t recolor_opa;                /*Intensity of recoloring (OPA_TRANSP, OPA_10 ... OPA_COVER)*/
+#if LV_IMG_ENABLE_SYMBOLS != 0
+    font_types_t sym_font;            /*Symbol font*/
+#endif
 }lv_imgs_t;
 
 /*Built-in styles of image*/
@@ -60,15 +68,17 @@ typedef enum
 	LV_IMGS_DARK,
 }lv_imgs_builtin_t;
 
+
 /* Image header it is compatible with
  * the result image converter utility*/
 typedef struct
 {
-	uint16_t w;			/*Width of the image map*/
-	uint16_t h;     	/*Height of the image map*/
-	uint16_t cd;		/*Color depth (8/16 or 24)*/
-	uint16_t transp :1;	/*1: Do not draw LV_IMG_TRANSP_COLOR pixels*/
+    uint16_t w;         /*Width of the image map*/
+    uint16_t h;         /*Height of the image map*/
+    uint16_t cd;        /*Color depth (8/16 or 24)*/
+    uint16_t transp :1; /*1: Do not draw LV_IMG_TRANSP_COLOR pixels*/
 }lv_img_raw_header_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -136,12 +146,17 @@ void lv_img_set_upscale(lv_obj_t * img, bool en);
  */
 bool lv_img_get_auto_size(lv_obj_t * img);
 
+
 /**
  * Get the upscale enable attribute
  * @param img pointer to an image
  * @return true: upscale is enabled, false: upscale is disabled
  */
 bool lv_img_get_upscale(lv_obj_t * img);
+
+
+lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy);
+
 
 /**********************
  *      MACROS

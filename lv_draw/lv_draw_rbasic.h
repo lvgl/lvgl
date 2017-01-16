@@ -59,9 +59,8 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
  * @param recolor_opa the intense of recoloring (not supported)
  */
 void lv_rmap(const area_t * cords_p, const area_t * mask_p,
-            const color_t * map_p, opa_t opa, bool transp, bool upscale,
-            color_t recolor, opa_t recolor_opa);
-
+             const color_t * map_p, opa_t opa, bool transp, bool upscale,
+			 color_t recolor, opa_t recolor_opa);
 /**********************
  *      MACROS
  **********************/

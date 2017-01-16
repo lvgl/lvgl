@@ -61,6 +61,8 @@
 #define USE_FONT_DEJAVU_40   1
 #define USE_FONT_DEJAVU_60   1
 #define USE_FONT_DEJAVU_80   1
+#define USE_FONT_SYMBOL_30   1
+#define USE_FONT_SYMBOL_60   1
 #define LV_FONT_DEFAULT      FONT_DEJAVU_30  /*Always set a default font*/
 #define LV_TXT_BREAK_CHARS  " ,.;-" /*Can break texts on these chars*/
 
@@ -93,10 +95,17 @@
 /*Line (dependencies: -*/
 #define USE_LV_LINE     1
 
-/*Image (dependencies: from misc: fsint, ufs)*/
+/*Image (dependencies: lv_label (if symbols are enabled) from misc: FSINT, UFS)*/
 #define USE_LV_IMG      1
 #if USE_LV_IMG != 0
-//#define LV_IMG_DEF_WALLPAPER    img_wallpaper_var /*Comment this line to NOT use wallpaper*/
+#define LV_IMG_DEF_WALLPAPER    img_square_x2  /*Comment this line to NOT use wallpaper*/
+/* 1: enables to interpret the file names as symbol name
+ * from symbol_def.h if they begin with a lower case letter.
+ * (driver letters are always upper case)*/
+#define LV_IMG_ENABLE_SYMBOLS   1
+#if LV_IMG_ENABLE_SYMBOLS != 0
+#define LV_IMG_DEF_SYMBOL_FONT       FONT_SYMBOL_30
+#endif /*LV_IMG_ENABLE_SYMBOLS*/
 #endif /*USE_LV_IMG*/
 
 /*Page (dependencies: lv_rect)*/

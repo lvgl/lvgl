@@ -47,12 +47,16 @@ static bool txt_is_break_char(char letter);
 void txt_get_size(point_t * size_res, const char * text, const font_t * font,
 		          uint16_t letter_space, uint16_t line_space, cord_t max_width)
 {
+    size_res->x = 0;
+    size_res->y = 0;
+
+    if(text == NULL) return;
+    if(font == NULL) return;
+
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     cord_t act_line_length;
     uint8_t letter_height = font_get_height(font);
-    size_res->x = 0;
-    size_res->y = 0;
 
     /*Calc. the height and longest line*/
     while (text[line_start] != '\0')
@@ -82,14 +86,17 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
 /**
  * Get the next line of text. Check line length and break chars too.
  * @param txt a '\0' terminated string
- * @param font_p pointer to a font
+ * @param font pointer to a font
  * @param letter_space letter space
  * @param max_l max line length
  * @return the index of the first char of the new line
  */
-uint16_t txt_get_next_line(const char * txt, const font_t * font_p, 
+uint16_t txt_get_next_line(const char * txt, const font_t * font,
                            uint16_t letter_space, cord_t max_l)
 {
+    if(txt == NULL) return 0;
+    if(font == NULL) return 0;
+
     uint32_t i = 0;
     cord_t act_l = 0;
     uint16_t last_break = TXT_NO_BREAK_FOUND;
@@ -106,7 +113,7 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
             return i+1;    /*Return with the first letter of the next line*/
 
         } else { /*Check the actual length*/
-            act_l += font_get_width(font_p, txt[i]);
+            act_l += font_get_width(font, txt[i]);
             
             /*If the txt is too long then finish, this is the line end*/
             if(act_l > max_l) {
@@ -142,26 +149,29 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
  * Give the length of a text with a given font
  * @param txt a '\0' terminate string
  * @param char_num number of characters in 'txt'
- * @param font_p pointer to a font
+ * @param font pointer to a font
  * @param letter_space letter sapce
  * @return length of a char_num long text
  */
 cord_t txt_get_width(const char * txt, uint16_t char_num, 
-                      const font_t * font_p, uint16_t letter_space)
+                      const font_t * font, uint16_t letter_space)
 {
+    if(txt == NULL) return 0;
+    if(font == NULL) return 0;
+
     uint16_t i;
     cord_t len = 0;
     
     if(char_num != 0) {
         for(i = 0; i < char_num; i++) {
-            len += font_get_width(font_p, txt[i]);
+            len += font_get_width(font, txt[i]);
             len += letter_space;
         }
         
         /*Trim closing spaces */
         for(i = char_num - 1; i > 0; i--) {
             if(txt[i] == ' ') {
-                len -= font_get_width(font_p, txt[i]);
+                len -= font_get_width(font, txt[i]);
                 len -= letter_space;
             } else {
                 break;

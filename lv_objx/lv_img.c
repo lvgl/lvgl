@@ -15,6 +15,10 @@
 #include "misc/fs/fsint.h"
 #include "misc/fs/ufs/ufs.h"
 
+#if LV_IMG_ENABLE_SYMBOLS != 0
+#include "../lv_misc/text.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -28,6 +32,8 @@
  **********************/
 static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode);
 static void lv_imgs_init(void);
+
+static bool lv_img_is_symbol(const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -186,28 +192,53 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 {
     lv_img_ext_t * ext = lv_obj_get_ext(img);
     
-    fs_file_t file;
-    fs_res_t res;
-	lv_img_raw_header_t header;
-	uint32_t rn;
-    
-    res = fs_open(&file, fn, FS_MODE_RD);
-    if(res == FS_RES_OK) {
-		res = fs_read(&file, &header, sizeof(header), &rn);
-    }
+    /*Handle normal images*/
+	if(lv_img_is_symbol(fn) == false) {
 
-    /*Create a dummy header on fs error*/
-    if(res != FS_RES_OK || rn != sizeof(header)) {
-		header.w = lv_obj_get_width(img);
-		header.h = lv_obj_get_height(img);
-		header.transp = 0;
+        fs_file_t file;
+        fs_res_t res;
+        lv_img_raw_header_t header;
+        uint32_t rn;
+        res = fs_open(&file, fn, FS_MODE_RD);
+        if(res == FS_RES_OK) {
+            res = fs_read(&file, &header, sizeof(header), &rn);
+        }
+
+        /*Create a dummy header on fs error*/
+        if(res != FS_RES_OK || rn != sizeof(header)) {
+            header.w = lv_obj_get_width(img);
+            header.h = lv_obj_get_height(img);
+            header.transp = 0;
+        }
+
+        fs_close(&file);
+
+        ext->w = header.w;
+        ext->h = header.h;
+        ext->transp = header.transp;
+
+        if(ext->upscale != 0) {
+            ext->w *=  2;
+            ext->h *=  2;
+        }
 	}
+	/*Handle symbol texts*/
+	else {
+#if LV_IMG_ENABLE_SYMBOLS
+        lv_imgs_t * imgs = lv_obj_get_style(img);
+        point_t size;
+        txt_get_size(&size, fn, font_get(imgs->sym_font), 0, 0, LV_CORD_MAX);
+        ext->w = size.x;
+        ext->h = size.y;
+        ext->transp = 0;
+#else
+        /*Never goes here, just to be sure handle this */
+        ext->w = lv_obj_get_width(img);
+        ext->h = lv_obj_get_height(img);
+        ext->transp = 0;
+#endif
 
-	fs_close(&file);
-
-	ext->w = header.w;
-	ext->h = header.h;
-	ext->transp = header.transp;
+	}
 
     if(ext->upscale != 0) {
         ext->w *=  LV_DOWNSCALE;
@@ -221,8 +252,9 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 		ext->fn = NULL;
 	}
 
+
     if(lv_img_get_auto_size(img) != false) {
-    	lv_obj_set_size(img, ext->w, ext->h);
+        lv_obj_set_size(img, ext->w, ext->h);
     }
 
     lv_obj_inv(img);
@@ -240,6 +272,7 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
 
     ext->auto_size = (en == false ? 0 : 1);
 }
+
 
 /**
  * Enable the upscaling with LV_DOWNSCALE.
@@ -313,6 +346,17 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
 		area_t cords;
+/*Create a default style for symbol texts*/
+#if LV_IMG_ENABLE_SYMBOLS != 0
+        bool sym = lv_img_is_symbol(ext->fn);
+		lv_labels_t sym_style;
+		lv_labels_get(LV_LABELS_DEF, &sym_style);
+		sym_style.font = imgs_p->sym_font;
+        sym_style.letter_space = 0;
+        sym_style.line_space = 0;
+        sym_style.mid = 0;
+        sym_style.objs.color = imgs_p->objs.color;
+#endif
 
 		lv_obj_get_cords(img, &cords);
 		opa_t opa = lv_obj_get_opa(img);
@@ -325,13 +369,42 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
 			cords_tmp.x1 = cords.x1;
 			cords_tmp.x2 = cords.x1 + ext->w - 1;
 			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-				lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
+
+#if LV_IMG_ENABLE_SYMBOLS == 0
+			    lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
+#else
+			    if(sym == false) lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
+			    else lv_draw_label(&cords_tmp, mask, &sym_style, opa, ext->fn);
+#endif
 			}
 		}
     }
     
     return true;
 }
+
+
+/**
+ * From the settings in lv_conf.h and the file name
+ * tells it a filename or a symbol text.
+ * @param txt a file name (e.g. "U:/file1") or a symbol (e.g. SYMBOL_OK)
+ * @return true: 'txt' is a symbol text, false: 'txt' is a file name
+ */
+static bool lv_img_is_symbol(const char * txt)
+{
+    /*If the symbols are not enabled always tell false*/
+#if LV_IMG_ENABLE_SYMBOLS == 0
+    return false;
+#endif
+
+    /* if txt begins with an upper case letter then it refers to a driver
+     * so it is a file name*/
+    if(txt[0] >= 'A' && txt[0] <= 'Z') return false;
+
+    /*If not returned during the above tests then it is symbol text*/
+    return true;
+}
+
 /**
  * Initialize the image styles
  */
@@ -340,7 +413,9 @@ static void lv_imgs_init(void)
 	/*Default style*/
 	lv_imgs_def.objs.color = COLOR_BLACK;
 	lv_imgs_def.recolor_opa = OPA_TRANSP;
-
+#if LV_IMG_ENABLE_SYMBOLS != 0
+	lv_imgs_def.sym_font = LV_IMG_DEF_SYMBOL_FONT;
+#endif
 	/*Dark style*/
 	memcpy(&lv_imgs_dark, &lv_imgs_def, sizeof(lv_imgs_t));
 	lv_imgs_dark.objs.color = COLOR_BLACK; lv_imgs_dark.recolor_opa = OPA_50;

@@ -68,6 +68,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
             color_t recolor, opa_t recolor_opa);
 
 
+
 /**********************
  *      MACROS
  **********************/
