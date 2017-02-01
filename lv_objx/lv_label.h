@@ -14,6 +14,7 @@
 
 #include "../lv_obj/lv_obj.h"
 #include "../lv_misc/font.h"
+#include "../lv_misc/text.h"
 
 /*********************
  *      DEFINES
@@ -43,6 +44,7 @@ typedef struct
     char dot_tmp[LV_LABEL_DOT_NUM]; /*Store character which are replaced with dots*/
     uint16_t dot_end;               /* The text end position in dot mode*/
     uint8_t static_txt  :1;         /* Flag to indicate the text is static*/
+    uint8_t recolor  :1;            /* Enable in-line letter recoloring*/
 }lv_label_ext_t;
 
 /*Style of label*/
@@ -117,6 +119,13 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text);
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 
 /**
+ * Enable the recoloring by in-line commands
+ * @param label pointer to a label object
+ * @param recolor true: enable recoloring, false: disable
+ */
+void lv_label_set_recolor(lv_obj_t * label, bool recolor);
+
+/**
  * Get the text of a label
  * @param label pointer to a label object
  * @return the text of the label
@@ -124,11 +133,19 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 const char * lv_label_get_text(lv_obj_t * label);
 
 /**
- * Get the fix width attribute of a label
+ * Get the long mode of a label
  * @param label pointer to a label object
- * @return true: fix width is enabled
+ * @return the long mode
  */
 lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label);
+
+
+/**
+ * Get the recoloring attribute
+ * @param label pointer to a label object
+ * @return true: recoloring is enabled, false: disable
+ */
+bool lv_label_get_recolor(lv_obj_t * label);
 
 /**
  * Get the relative x and y coordinates of a letter

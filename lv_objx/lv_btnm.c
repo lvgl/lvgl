@@ -428,14 +428,15 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			const font_t * font = font_get(style->labels.font);
 			point_t txt_size;
 			txt_get_size(&txt_size, ext->map_p[txt_i], font,
-					     style->labels.letter_space, style->labels.line_space, area_get_width(&area_btnm));
+					     style->labels.letter_space, style->labels.line_space,
+					     area_get_width(&area_btnm), TXT_FLAG_NONE);
 
 			area_tmp.x1 += (btn_w - txt_size.x) / 2;
 			area_tmp.y1 += (btn_h - txt_size.y) / 2;
 			area_tmp.x2 = area_tmp.x1 + txt_size.x;
 			area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-			lv_draw_label(&area_tmp, mask, &style->labels, OPA_COVER, ext->map_p[txt_i]);
+			lv_draw_label(&area_tmp, mask, &style->labels, OPA_COVER, ext->map_p[txt_i], TXT_FLAG_NONE);
 			txt_i ++;
     	}
     }

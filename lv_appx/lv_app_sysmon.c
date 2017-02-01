@@ -19,6 +19,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define CPU_LABEL_COLOR "FF0000"
+#define MEM_LABEL_COLOR "008000"
 
 /**********************
  *      TYPEDEFS
@@ -244,8 +246,10 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     /*Create a label for the details of Memory and CPU usage*/
     cord_t opad = app_style->win_style.pages.scrl_rects.opad;
     win_data->label = lv_label_create(win, NULL);
+    lv_label_set_recolor(win_data->label, true);
     lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, opad, 0);
     lv_obj_set_style(win_data->label, &app_style->win_txt_style);
+
 
     lv_app_sysmon_refr();
 }
@@ -341,24 +345,27 @@ static void lv_app_sysmon_refr(void)
     char buf_long[256];
     char buf_short[128];
 #if USE_IDLE != 0
-    sprintf(buf_long, "CPU: %d %%\n\n", cpu_pct[LV_APP_SYSMON_PNUM - 1]);
+    sprintf(buf_long, "%c%s CPU: %d %%%c\n\n",TXT_RECOLOR_CMD, CPU_LABEL_COLOR, cpu_pct[LV_APP_SYSMON_PNUM - 1], TXT_RECOLOR_CMD);
     sprintf(buf_short, "CPU: %d %%\n", cpu_pct[LV_APP_SYSMON_PNUM - 1]);
 #else
-    strcpy(buf_long, "CPU: N/A\n\n");
+    sprintf(buf_long, "%c%s CPU: N/A%c\n\n",TXT_RECOLOR_CMD, CPU_LABEL_COLOR, TXT_RECOLOR_CMD);
     strcpy(buf_short, "CPU: N/A\n");
 #endif
 
 #if USE_DYN_MEM != 0  && DM_CUSTOM == 0
-    sprintf(buf_long, "%sMEMORY: %d %%\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",
+    sprintf(buf_long, "%s%c%s MEMORY: %d %%%c\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",
                   buf_long,
+                  TXT_RECOLOR_CMD,
+                  MEM_LABEL_COLOR,
                   mem_pct[LV_APP_SYSMON_PNUM - 1],
+                  TXT_RECOLOR_CMD,
                   mem_mon.size_total,
                   mem_mon.size_total - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
 
     sprintf(buf_short, "%sMem: %d %%\nFrag: %d %%\n",
                   buf_short, mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
 #else
-    sprintf(buf_long, "%sMEMORY: N/A", buf_long);
+    sprintf(buf_long, "%s%c%s MEMORY: N/A%c", buf_long, TXT_RECOLOR_CMD, MEM_LABEL_COLOR, TXT_RECOLOR_CMD);
     sprintf(buf_short, "%sMem: N/A\nFrag: N/A", buf_short);
 #endif
     lv_app_style_t * app_style = lv_app_style_get();
