@@ -227,7 +227,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 #if LV_IMG_ENABLE_SYMBOLS
         lv_imgs_t * imgs = lv_obj_get_style(img);
         point_t size;
-        txt_get_size(&size, fn, font_get(imgs->sym_font), 0, 0, LV_CORD_MAX);
+        txt_get_size(&size, fn, font_get(imgs->sym_font), 0, 0, LV_CORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
         ext->transp = 0;
@@ -374,7 +374,7 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
 			    lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
 #else
 			    if(sym == false) lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
-			    else lv_draw_label(&cords_tmp, mask, &sym_style, opa, ext->fn);
+			    else lv_draw_label(&cords_tmp, mask, &sym_style, opa, ext->fn, TXT_FLAG_NONE);
 #endif
 			}
 		}

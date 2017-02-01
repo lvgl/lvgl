@@ -414,7 +414,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
         area_t label_cord;
         point_t label_size;
         txt_get_size(&label_size, scale_txt, font_get(style->scale_labels.font),
-                style->scale_labels.letter_space, style->scale_labels.line_space, LV_CORD_MAX);
+                style->scale_labels.letter_space, style->scale_labels.line_space,
+                LV_CORD_MAX, TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;
@@ -422,7 +423,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, &style->scale_labels, OPA_COVER, scale_txt);
+        lv_draw_label(&label_cord, mask, &style->scale_labels, OPA_COVER, scale_txt, TXT_FLAG_NONE);
     }
 
     /*Calculate the critical value*/
@@ -440,7 +441,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
         area_t label_cord;
         point_t label_size;
         txt_get_size(&label_size, value_txt, font_get(style->value_labels.font),
-                style->value_labels.letter_space, style->value_labels.line_space, LV_CORD_MAX);
+                style->value_labels.letter_space, style->value_labels.line_space,
+                LV_CORD_MAX, TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = gauge->cords.x1 + lv_obj_get_width(gauge) / 2 - label_size.x / 2;
@@ -450,7 +452,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, &style->value_labels, OPA_COVER, value_txt);
+        lv_draw_label(&label_cord, mask, &style->value_labels, OPA_COVER, value_txt, TXT_FLAG_NONE);
     }
 
 }

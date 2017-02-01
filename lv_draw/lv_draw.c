@@ -24,9 +24,18 @@
 #define LINE_WIDTH_CORR_BASE 64
 #define LINE_WIDTH_CORR_SHIFT 6
 
+#define LABEL_RECOLOR_PAR_LENGTH    6
+
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum
+{
+    CMD_STATE_WAIT,
+    CMD_STATE_PAR,
+    CMD_STATE_IN,
+}cmd_state_t;
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -114,53 +123,95 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p,
  * @param labels_p pointer to a label style
  * @param opa opacity of the text (0..255)
  * @param txt 0 terminated text to write
+ * @param flag settings for the text from 'txt_flag_t' enum
  */
 void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
-                   const lv_labels_t * labels_p, opa_t opa, const char * txt)
+                   const lv_labels_t * style, opa_t opa, const char * txt, txt_flag_t flag)
 {
-    const font_t * font_p = font_get(labels_p->font);
+    const font_t * font_p = font_get(style->font);
 
     cord_t w = area_get_width(cords_p);
 
     /*Init variables for the first line*/
     cord_t line_length = 0;
     uint32_t line_start = 0;
-    uint32_t line_end = txt_get_next_line(txt, font_p, labels_p->letter_space, w);
+    uint32_t line_end = txt_get_next_line(txt, font_p, style->letter_space, w, flag);
 
     point_t pos;
     pos.x = cords_p->x1;
     pos.y = cords_p->y1;
 
     /*Align the line to middle if enabled*/
-    if(labels_p->mid != 0) {
+    if(style->mid != 0) {
         line_length = txt_get_width(&txt[line_start], line_end - line_start,
-                                    font_p, labels_p->letter_space);
+                                    font_p, style->letter_space, flag);
         pos.x += (w - line_length) / 2;
     }
 
+    cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;
+    uint16_t par_start;
+    color_t recolor;
 
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
         /*Write all letter of a line*/
+        cmd_state = CMD_STATE_WAIT;
+
         for(i = line_start; i < line_end; i++) {
-        	letter_fp(&pos, mask_p, font_p, txt[i], labels_p->objs.color, opa);
-            pos.x += font_get_width(font_p, txt[i]) + labels_p->letter_space;
+            /*Handle the recolor command*/
+            if((flag & TXT_FLAG_RECOLOR) != 0) {
+                if(txt[i] == TXT_RECOLOR_CMD) {
+                    if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
+                        par_start = i + 1;
+                        cmd_state = CMD_STATE_PAR;
+                        continue;
+                    } else if(cmd_state == CMD_STATE_PAR) { /*Other start char in parameter escaped cmd. char */
+                        cmd_state = CMD_STATE_WAIT;
+                    }else if(cmd_state == CMD_STATE_IN) { /*Command end */
+                        cmd_state = CMD_STATE_WAIT;
+                        continue;
+                    }
+                }
+
+                /*Skip the color parameter and wait the space after it*/
+                if(cmd_state == CMD_STATE_PAR) {
+                    if(txt[i] == ' ') {
+                        /*Get the parameter*/
+                        if(i - par_start == LABEL_RECOLOR_PAR_LENGTH) {
+                            char buf[LABEL_RECOLOR_PAR_LENGTH];
+                            memcpy(buf, &txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
+                            buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
+                            int r,g,b;
+                            sscanf(buf, "%02x%02x%02x", &r, &g, &b);
+                            recolor = COLOR_MAKE(r, g, b);
+                        } else {
+                            recolor.full = style->objs.color.full;
+                        }
+                        cmd_state = CMD_STATE_IN; /*After the parameter the text is in the command*/
+                    }
+                    continue;
+                }
+            }
+
+            if(cmd_state == CMD_STATE_IN)  letter_fp(&pos, mask_p, font_p, txt[i], recolor, opa);
+            else letter_fp(&pos, mask_p, font_p, txt[i], style->objs.color, opa);
+            pos.x += font_get_width(font_p, txt[i]) + style->letter_space;
         }
         /*Go to next line*/
         line_start = line_end;
-        line_end += txt_get_next_line(&txt[line_start], font_p, labels_p->letter_space, w);
+        line_end += txt_get_next_line(&txt[line_start], font_p, style->letter_space, w, flag);
 
         pos.x = cords_p->x1;
         /*Align to middle*/
-        if(labels_p->mid != 0) {
+        if(style->mid != 0) {
             line_length = txt_get_width(&txt[line_start], line_end - line_start,
-                                     font_p, labels_p->letter_space);
+                                     font_p, style->letter_space, flag);
             pos.x += (w - line_length) / 2;
         }
         /*Go the next line position*/
         pos.y += font_get_height(font_p);
-        pos.y += labels_p->line_space;
+        pos.y += style->line_space;
     }
 }
 
@@ -179,7 +230,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 {
     if(fn == NULL) {
         lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-        lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, "No data");
+        lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, "No data", TXT_FLAG_NONE);
     } else {
         fs_file_t file;
         fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
@@ -251,7 +302,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 
         if(res != FS_RES_OK) {
             lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-            lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, fn);
+            lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, fn, TXT_FLAG_NONE);
         }
     }
 }

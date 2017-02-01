@@ -42,10 +42,11 @@ static bool txt_is_break_char(char letter);
  * @param font pinter to font of the text
  * @param letter_space letter space of the text
  * @param line_space line space of the text
+ * @param flags settings for the text from 'txt_flag_t' enum
  * @param max_width max with of the text (break the lines to fit this size) Set LV_CORD_MAX to avoid line breaks
  */
 void txt_get_size(point_t * size_res, const char * text, const font_t * font,
-		          uint16_t letter_space, uint16_t line_space, cord_t max_width)
+		          uint16_t letter_space, uint16_t line_space, cord_t max_width, txt_flag_t flag)
 {
     size_res->x = 0;
     size_res->y = 0;
@@ -61,13 +62,13 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
     /*Calc. the height and longest line*/
     while (text[line_start] != '\0')
     {
-        new_line_start += txt_get_next_line(&text[line_start], font, letter_space, max_width);
+        new_line_start += txt_get_next_line(&text[line_start], font, letter_space, max_width, flag);
         size_res->y += letter_height;
         size_res->y += line_space;
 
 		/*Calculate the the longest line*/
 		act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
-									   font, letter_space);
+									   font, letter_space, flag);
 
 		size_res->x = MATH_MAX(act_line_length, size_res->x);
 		line_start = new_line_start;
@@ -89,10 +90,11 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
  * @param font pointer to a font
  * @param letter_space letter space
  * @param max_l max line length
+ * @param flags settings for the text from 'txt_flag_type' enum
  * @return the index of the first char of the new line
  */
 uint16_t txt_get_next_line(const char * txt, const font_t * font,
-                           uint16_t letter_space, cord_t max_l)
+                           uint16_t letter_space, cord_t max_l, txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
@@ -100,8 +102,18 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font,
     uint32_t i = 0;
     cord_t act_l = 0;
     uint16_t last_break = TXT_NO_BREAK_FOUND;
+    txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
     
     while(txt[i] != '\0') {
+
+        /*Handle the recolor command*/
+        if((flag & TXT_FLAG_RECOLOR) != 0) {
+            if(txt_is_cmd(&cmd_state, txt[i]) != false) {
+                i++;    /*Skip the letter is it is part of a command*/
+                continue;
+            }
+        }
+
         /*Check for new line chars*/
         if(txt[i] == '\n' || txt[i] == '\r') {
             /*Handle \n\r and \r\n as well*/
@@ -150,20 +162,27 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font,
  * @param txt a '\0' terminate string
  * @param char_num number of characters in 'txt'
  * @param font pointer to a font
- * @param letter_space letter sapce
+ * @param letter_space letter space
+ * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
 cord_t txt_get_width(const char * txt, uint16_t char_num, 
-                      const font_t * font, uint16_t letter_space)
+                      const font_t * font, uint16_t letter_space, txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
     uint16_t i;
     cord_t len = 0;
+    txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
     
     if(char_num != 0) {
         for(i = 0; i < char_num; i++) {
+            if((flag & TXT_FLAG_RECOLOR) != 0) {
+                if(txt_is_cmd(&cmd_state, txt[i]) != false) {
+                    continue;
+                }
+            }
             len += font_get_width(font, txt[i]);
             len += letter_space;
         }
@@ -184,6 +203,40 @@ cord_t txt_get_width(const char * txt, uint16_t char_num,
     }
     
     return len;
+}
+
+/**
+ * Check next character in a string and decide if te character is part of the command or not
+ * @param state pointer to a txt_cmd_state_t variable which stores the current state of command processing
+ * @param c the current character
+ * @return true: the character is part of a command and should not be written,
+ *         false: the character should be written
+ */
+bool txt_is_cmd(txt_cmd_state_t * state, char c)
+{
+    bool ret = false;
+
+    if(c == TXT_RECOLOR_CMD) {
+       if(*state == TXT_CMD_STATE_WAIT) { /*Start char*/
+           *state = TXT_CMD_STATE_PAR;
+           ret = true;
+       } else if(*state == TXT_CMD_STATE_PAR) { /*Other start char in parameter is escaped cmd. char */
+           *state = TXT_CMD_STATE_WAIT;
+       }else if(*state == TXT_CMD_STATE_IN) { /*Command end */
+           *state = TXT_CMD_STATE_WAIT;
+           ret = true;
+       }
+   }
+
+   /*Skip the color parameter and wait the space after it*/
+   if(*state == TXT_CMD_STATE_PAR) {
+       if(c == ' ') {
+           *state = TXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
+       }
+       ret = true;
+   }
+
+   return ret;
 }
 
 /**********************

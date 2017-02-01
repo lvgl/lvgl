@@ -16,6 +16,7 @@
 #include "../lv_objx/lv_label.h"
 
 #include "misc_conf.h"
+#include "../lv_misc/text.h"
 
 /*********************
  *      DEFINES
@@ -48,10 +49,11 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p,
  * @param labels_p pointer to a label style
  * @param opa opacity of the text (0..255)
  * @param txt 0 terminated text to write
+ * @param flags settings for the text from 'txt_flag_t' enum
  */
 #if USE_LV_LABEL != 0
 void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
-                    const lv_labels_t * labels_p, opa_t opa, const char * txt);
+                    const lv_labels_t * labels_p, opa_t opa, const char * txt, txt_flag_t flag);
 #endif
 
 /**
