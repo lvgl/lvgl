@@ -90,6 +90,7 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->label = lv_label_create(new_pb, NULL);
 
     	lv_rect_set_layout(new_pb, LV_RECT_LAYOUT_CENTER);
+        lv_obj_set_click(new_pb, false);
     	lv_obj_set_size(new_pb, LV_PB_DEF_WIDTH, LV_PB_DEF_HEIGHT);
     	lv_obj_set_style(new_pb, lv_pbs_get(LV_PBS_DEF, NULL));
 
