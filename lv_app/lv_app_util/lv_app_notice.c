@@ -18,6 +18,18 @@
 /*********************
  *      DEFINES
  *********************/
+/*Add the required configurations*/
+#ifndef LV_APP_NOTICE_SHOW_TIME
+#define LV_APP_NOTICE_SHOW_TIME   4000
+#endif
+
+#ifndef LV_APP_NOTICE_MAX_NUM
+#define LV_APP_NOTICE_MAX_NUM   6
+#endif
+
+#ifndef LV_APP_NOTICE_MAX_LEN
+#define LV_APP_NOTICE_MAX_LEN   256
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -81,6 +93,14 @@ lv_obj_t *  lv_app_notice_add(const char * format, ...)
     lv_mbox_start_auto_close(mbox, LV_APP_NOTICE_SHOW_TIME);
 #endif
 
+    /*Delete the last children if there are too many*/
+    uint32_t child_num = lv_obj_get_child_num(notice_h);
+    if(child_num > LV_APP_NOTICE_MAX_NUM) {
+        lv_obj_t * last_child = ll_get_tail(&notice_h->child_ll);
+        lv_obj_del(last_child);
+    }
+
+    /*make sure the notices are on the top*/
     lv_obj_set_parent(notice_h, lv_scr_act());
 
     return mbox;

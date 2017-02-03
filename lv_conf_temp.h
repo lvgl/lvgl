@@ -194,6 +194,7 @@
 
 /* App. utility settings */
 #define LV_APP_NOTICE_SHOW_TIME 4000 /*Notices will be shown for this time [ms]*/
+#define LV_APP_NOTICE_MAX_NUM   6    /*Max. number of notices*/
 #define LV_APP_NOTICE_MAX_LEN   256  /*Max. number of characters on a notice*/
 /*==================
  *  LV APP X USAGE 
