@@ -31,6 +31,7 @@ typedef struct
     uint32_t lpr_rep_time_stamp;
     
     /*Flags*/
+    uint8_t drag_range_out :1;
     uint8_t drag_in_prog :1;
     uint8_t long_press_sent :1;
     uint8_t wait_release :1;

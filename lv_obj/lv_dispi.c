@@ -177,6 +177,7 @@ static void dispi_proc_point(lv_dispi_t * dispi_p, cord_t x, cord_t y)
     if(lv_dispi_reset_now != false) {
         dispi_p->act_obj = NULL;
         dispi_p->last_obj = NULL;
+        dispi_p->drag_range_out = 0;
         dispi_p->drag_in_prog = 0;
         dispi_p->long_press_sent = 0;
         dispi_p->press_time_stamp = 0;
@@ -219,7 +220,7 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
         pr_obj = dispi_search_obj(dispi_p, lv_scr_act());
     }
     /*If there is last object but it can not be dragged also search*/
-    else if(lv_obj_get_drag(dispi_p->act_obj) == false) {/*Now act_obj != NULL*/
+    else if(dispi_p->drag_in_prog == 0) {/*Now act_obj != NULL*/
         pr_obj = dispi_search_obj(dispi_p, lv_scr_act());
     }
     /*If a dragable object was the last then keep it*/
@@ -244,6 +245,7 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
              * It is necessary to count the long press time.*/
             dispi_p->press_time_stamp = systick_get();
             dispi_p->long_press_sent = 0;
+            dispi_p->drag_range_out = 0;
             dispi_p->drag_in_prog = 0;
             dispi_p->vect_sum.x = 0;
             dispi_p->vect_sum.y = 0;
@@ -402,7 +404,7 @@ static void dispi_drag(lv_dispi_t * dispi_p)
     if(lv_obj_get_drag(drag_obj) == false) return;
 
     /*If still there is no drag then count the movement*/
-    if(dispi_p->drag_in_prog == 0) {
+    if(dispi_p->drag_range_out == 0) {
         dispi_p->vect_sum.x += dispi_p->vect.x;
         dispi_p->vect_sum.y += dispi_p->vect.y;
         
@@ -410,21 +412,29 @@ static void dispi_drag(lv_dispi_t * dispi_p)
         if(MATH_ABS(dispi_p->vect_sum.x) >= LV_DISPI_DRAG_LIMIT ||
            MATH_ABS(dispi_p->vect_sum.y) >= LV_DISPI_DRAG_LIMIT)
            {
-                dispi_p->drag_in_prog = 1;
-                drag_obj->signal_f(drag_obj,
-                                        LV_SIGNAL_DRAG_BEGIN, dispi_p);
+                dispi_p->drag_range_out = 1;
            }
     }
     
     /*If the drag limit is stepped over then handle the dragging*/
-    if(dispi_p->drag_in_prog != 0) {
+    if(dispi_p->drag_range_out != 0) {
         /*Set new position if the vector is not zero*/
         if(dispi_p->vect.x != 0 ||
            dispi_p->vect.y != 0) {   
             /*Get the coordinates of the object end modify them*/
-            cord_t act_x = lv_obj_get_x(drag_obj) + dispi_p->vect.x;
-            cord_t act_y = lv_obj_get_y(drag_obj) + dispi_p->vect.y;
-            lv_obj_set_pos(drag_obj, act_x, act_y);
+            cord_t act_x = lv_obj_get_x(drag_obj);
+            cord_t act_y = lv_obj_get_y(drag_obj);
+
+            lv_obj_set_pos(drag_obj, act_x + dispi_p->vect.x, act_y + dispi_p->vect.y);
+
+            /*Set the drag in progress flag if the object is really moved*/
+            if(lv_obj_get_x(drag_obj) != act_x || lv_obj_get_y(drag_obj) != act_y) {
+                if(dispi_p->drag_range_out == 0) { /*Send the drag begin signal on first move*/
+                    drag_obj->signal_f(drag_obj,  LV_SIGNAL_DRAG_BEGIN, dispi_p);
+                }
+                dispi_p->drag_in_prog = 1;
+            }
+
         }
     }
 }
