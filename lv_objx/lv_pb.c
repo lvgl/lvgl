@@ -20,6 +20,8 @@
  *********************/
 #define LV_PB_TXT_MAX_LENGTH	64
 #define LV_PB_DEF_FORMAT	"%d %%"
+#define LV_PB_DEF_WIDTH     (120 * LV_DOWNSCALE)
+#define LV_PB_DEF_HEIGHT    (40 * LV_DOWNSCALE)
 
 /**********************
  *      TYPEDEFS
@@ -35,6 +37,7 @@ static void lv_pbs_init(void);
  *  STATIC VARIABLES
  **********************/
 static lv_pbs_t lv_pbs_def;
+static lv_pbs_t lv_pbs_slider;
 static lv_design_f_t ancestor_design_f;
 
 /**********************
@@ -67,6 +70,8 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->act_value = 0;
+    ext->tmp_value = 0;
+    ext->set_in_prog = 0;
     ext->format_str = NULL;
     ext->label = NULL;
 
@@ -85,6 +90,7 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->label = lv_label_create(new_pb, NULL);
 
     	lv_rect_set_layout(new_pb, LV_RECT_LAYOUT_CENTER);
+    	lv_obj_set_size(new_pb, LV_PB_DEF_WIDTH, LV_PB_DEF_HEIGHT);
     	lv_obj_set_style(new_pb, lv_pbs_get(LV_PBS_DEF, NULL));
 
     	lv_pb_set_value(new_pb, ext->act_value);
@@ -124,6 +130,8 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
     if(valid != false) {
     	lv_pb_ext_t * ext = lv_obj_get_ext(pb);
         lv_pbs_t * style = lv_obj_get_style(pb);
+        point_t p;
+        char buf[LV_PB_TXT_MAX_LENGTH];
 
     	switch(sign) {
     	case LV_SIGNAL_CORD_CHG:
@@ -136,6 +144,42 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
     	case LV_SIGNAL_STYLE_CHG:
     	    lv_obj_set_style(ext->label, &style->label);
     	    lv_pb_set_value(pb, lv_pb_get_value(pb));
+    	    break;
+    	case LV_SIGNAL_PRESSING:
+            ext->set_in_prog = 1;
+    	    lv_dispi_get_point(param, &p);
+    	    if(lv_obj_get_width(pb) > lv_obj_get_height(pb)) {
+    	        p.x -= pb->cords.x1 + style->btn_size / 2;
+    	        ext->tmp_value = (int32_t) ((int32_t) p.x * (ext->max_value - ext->min_value + 1)) /
+                        (lv_obj_get_width(pb) - style->btn_size);
+    	    } else {
+                p.y -= pb->cords.y1 + style->btn_size / 2;
+                ext->tmp_value = (int32_t) ((int32_t) p.y * (ext->max_value - ext->min_value + 1)) /
+                                  (lv_obj_get_height(pb) - style->btn_size);
+
+                /*Invert the value: greater y means smaller value
+                 * because it on a lower position on the screen*/
+                ext->tmp_value = ext->max_value - ext->tmp_value;
+            }
+
+    	    ext->tmp_value = ext->tmp_value > ext->max_value ? ext->max_value : ext->tmp_value;
+    	    ext->tmp_value = ext->tmp_value < ext->min_value ? ext->min_value : ext->tmp_value;
+
+    	    sprintf(buf, ext->format_str, ext->tmp_value);
+    	    lv_label_set_text(ext->label, buf);
+
+    	    lv_obj_inv(pb);
+    	    break;
+        case LV_SIGNAL_PRESS_LOST:
+            ext->set_in_prog = 0;
+            ext->tmp_value = ext->act_value;
+            sprintf(buf, ext->format_str, ext->act_value);
+            lv_label_set_text(ext->label, buf);
+            lv_obj_inv(pb);
+            break;
+    	case LV_SIGNAL_RELEASED:
+    	    lv_pb_set_value(pb, ext->tmp_value);
+    	    ext->set_in_prog = 0;
     	    break;
     		default:
     			break;
@@ -154,11 +198,13 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
  * @param pb pointer to a progress bar object
  * @param value new value
  */
-void lv_pb_set_value(lv_obj_t * pb, uint16_t value)
+void lv_pb_set_value(lv_obj_t * pb, int16_t value)
 {
 	lv_pb_ext_t * ext = lv_obj_get_ext(pb);
 	ext->act_value = value > ext->max_value ? ext->max_value : value;
+    ext->act_value = ext->act_value < ext->min_value ? ext->min_value : ext->act_value;
 
+    ext->tmp_value = ext->act_value;
 	char buf[LV_PB_TXT_MAX_LENGTH];
 	sprintf(buf, ext->format_str, ext->act_value);
 	lv_label_set_text(ext->label, buf);
@@ -172,7 +218,7 @@ void lv_pb_set_value(lv_obj_t * pb, uint16_t value)
  * @param min minimum value
  * @param max maximum value
  */
-void lv_pb_set_min_max_value(lv_obj_t * pb, uint16_t min, uint16_t max)
+void lv_pb_set_min_max_value(lv_obj_t * pb, int16_t min, int16_t max)
 {
 	lv_pb_ext_t * ext = lv_obj_get_ext(pb);
 	ext->max_value = max;
@@ -207,7 +253,7 @@ void lv_pb_set_format_str(lv_obj_t * pb, const char * format)
  * @param pb pointer to a progress bar object
  * @return the value of the progress bar
  */
-uint16_t lv_pb_get_value(lv_obj_t * pb)
+int16_t lv_pb_get_value(lv_obj_t * pb)
 {
 	lv_pb_ext_t * ext = lv_obj_get_ext(pb);
 	return ext->act_value;
@@ -235,6 +281,9 @@ lv_pbs_t * lv_pbs_get(lv_pbs_builtin_t style, lv_pbs_t * copy)
 		case LV_PBS_DEF:
 			style_p = &lv_pbs_def;
 			break;
+        case LV_PBS_SLIDER:
+            style_p = &lv_pbs_slider;
+            break;
 		default:
 			style_p = &lv_pbs_def;
 	}
@@ -273,47 +322,138 @@ static bool lv_pb_design(lv_obj_t * pb, const area_t * mask, lv_design_mode_t mo
 		ancestor_design_f(pb, mask, mode);
 
 		lv_pb_ext_t * ext = lv_obj_get_ext(pb);
+        lv_pbs_t * style = lv_obj_get_style(pb);
 		area_t bar_area;
+        area_t tmp_area;
 		uint32_t tmp;
 		area_cpy(&bar_area, &pb->cords);
+        area_cpy(&tmp_area, &pb->cords);
 
 		cord_t w = lv_obj_get_width(pb);
         cord_t h = lv_obj_get_height(pb);
 
 		if(w >= h) {
-            tmp = (uint32_t)ext->act_value * w;
-            tmp = (uint32_t) tmp / (ext->max_value - ext->min_value);
-            bar_area.x2 = bar_area.x1 + (cord_t) tmp;
+            tmp = (int32_t)ext->act_value * (w - style->btn_size);
+            tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
+            bar_area.x2 = bar_area.x1 + style->btn_size + (cord_t) tmp;
+
+            tmp = (int32_t)ext->tmp_value * (w - style->btn_size);
+            tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
+            tmp_area.x2 = tmp_area.x1 +  style->btn_size + (cord_t) tmp;
 		} else {
-            tmp = (uint32_t)ext->act_value * h;
-            tmp = (uint32_t) tmp / (ext->max_value - ext->min_value);
-            bar_area.y1 = bar_area.y2 - (cord_t) tmp;
+            tmp = (int32_t)ext->act_value * (h - style->btn_size);
+            tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
+            bar_area.y1 = bar_area.y2 - style->btn_size - (cord_t) tmp;
+
+            tmp = (int32_t)ext->tmp_value * (h - style->btn_size);
+            tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
+            tmp_area.y1 = tmp_area.y2 -  style->btn_size - (cord_t) tmp;
 		}
-		lv_pbs_t * style_p = lv_obj_get_style(pb);
-		lv_draw_rect(&bar_area, mask, &style_p->bar, OPA_COVER);
+
+		/*Draw the main bar*/
+		opa_t opa = lv_obj_get_opa(pb);
+        lv_draw_rect(&bar_area, mask, &style->bar, opa);
+
+        /*Draw a "phantom" bar when setting by a display input*/
+        if(ext->set_in_prog != 0) {
+            lv_rects_t tmp_rects;
+            memcpy(&tmp_rects, &style->bar, sizeof(lv_rects_t));
+            tmp_rects.objs.color = style->tmp_bar_mcolor;
+            tmp_rects.gcolor = style->tmp_bar_gcolor;
+            lv_draw_rect(&tmp_area, mask, &tmp_rects, (opa * style->tmp_bar_opa) / 100);
+		}
+
+        /*Draw a button if its size is not 0*/
+        if(style->btn_size != 0) {
+            lv_rects_t tmp_rects;
+            memcpy(&tmp_rects, &style->btn, sizeof(lv_rects_t));
+
+            if(w >= h) {
+                tmp_area.x1 = tmp_area.x2 - style->btn_size ;
+
+                if(tmp_area.x1 < pb->cords.x1) {
+                    tmp_area.x1 = pb->cords.x1;
+                    tmp_area.x2 = tmp_area.x1 + style->btn_size;
+                }
+
+                if(tmp_area.x2 > pb->cords.x2) {
+                    tmp_area.x2 = pb->cords.x2;
+                    tmp_area.x1 = tmp_area.x2 - style->btn_size;
+                }
+            } else {
+                tmp_area.y2 = tmp_area.y1 + style->btn_size ;
+
+                if(tmp_area.y1 < pb->cords.y1) {
+                    tmp_area.y1 = pb->cords.y1;
+                    tmp_area.y2 = tmp_area.y1 + style->btn_size;
+                }
+
+                if(tmp_area.y2 > pb->cords.y2) {
+                    tmp_area.y2 = pb->cords.y2;
+                    tmp_area.y1 = tmp_area.y2 - style->btn_size;
+                }
+
+            }
+            lv_draw_rect(&tmp_area, mask, &tmp_rects, opa );
+        }
     }
     return true;
 }
 
 /**
- * Initialize the progess bar styles
+ * Set a new temporal (ghost) value on the progress bar
+ * @param pb pointer to a progress bar object
+ * @param value new value
+ */
+void lv_pb_set_tmp_value(lv_obj_t * pb, int16_t value)
+{
+    lv_pb_ext_t * ext = lv_obj_get_ext(pb);
+    ext->act_value = value > ext->max_value ? ext->max_value : value;
+
+    char buf[LV_PB_TXT_MAX_LENGTH];
+    sprintf(buf, ext->format_str, ext->act_value);
+    lv_label_set_text(ext->label, buf);
+
+    lv_obj_inv(pb);
+}
+
+/**
+ * Initialize the progress bar styles
  */
 static void lv_pbs_init(void)
 {
 	/*Default style*/
-	lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bg);	/*Background*/
-	lv_pbs_def.bg.objs.color = COLOR_WHITE;
-	lv_pbs_def.bg.gcolor = COLOR_SILVER,
-	lv_pbs_def.bg.bcolor = COLOR_BLACK;
+    lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bg); /*Background*/
+    lv_pbs_def.bg.objs.color = COLOR_WHITE;
+    lv_pbs_def.bg.gcolor = COLOR_SILVER,
+    lv_pbs_def.bg.bcolor = COLOR_BLACK;
 
-	lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bar);	/*Bar*/
-	lv_pbs_def.bar.objs.color = COLOR_LIME;
-	lv_pbs_def.bar.gcolor = COLOR_GREEN;
-	lv_pbs_def.bar.bcolor = COLOR_BLACK;
+    lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bar);    /*Bar*/
+    lv_pbs_def.bar.objs.color = COLOR_LIME;
+    lv_pbs_def.bar.gcolor = COLOR_GREEN;
+    lv_pbs_def.bar.bcolor = COLOR_BLACK;
 
-	lv_labels_get(LV_LABELS_DEF, &lv_pbs_def.label);
-	lv_pbs_def.label.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
-	lv_pbs_def.label.line_space = 0;
+    lv_pbs_def.tmp_bar_mcolor = COLOR_YELLOW;
+    lv_pbs_def.tmp_bar_gcolor = COLOR_LIME;
+    lv_pbs_def.tmp_bar_opa = 80;
+
+    lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.btn);    /*Button*/
+    lv_pbs_def.btn.objs.color = COLOR_WHITE;
+    lv_pbs_def.btn.gcolor = COLOR_GRAY;
+    lv_pbs_def.btn.bcolor = COLOR_GRAY;
+    lv_pbs_def.btn_size = 0;
+
+    lv_labels_get(LV_LABELS_DEF, &lv_pbs_def.label);    /*Label*/
+    lv_pbs_def.label.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_pbs_def.label.line_space = 0;
+
+    /*Slider style*/
+    memcpy(&lv_pbs_slider, &lv_pbs_def, sizeof(lv_pbs_t));
+    lv_pbs_slider.bg.round = LV_RECT_CIRCLE;
+	lv_pbs_slider.bar.round = LV_RECT_CIRCLE;
+    lv_pbs_slider.btn.round = LV_RECT_CIRCLE;
+    lv_pbs_slider.btn_size = 40 * LV_DOWNSCALE;
+    lv_pbs_def.tmp_bar_opa = 80;
 
 }
 #endif
