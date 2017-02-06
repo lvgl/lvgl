@@ -45,7 +45,6 @@ typedef struct
 typedef struct
 {
     lv_obj_t * file_list;
-    lv_obj_t * send_set_h;
 }my_win_data_t;
 
 /*Application specific data for a shortcut of this application*/
@@ -73,6 +72,7 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
 static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
+static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win);
 
 static void win_load_file_list(lv_app_inst_t * app);
 static void win_create_list(lv_app_inst_t * app);
@@ -83,7 +83,6 @@ static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_dispi_t * dispi);
 static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi);
 static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi);
 static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi);
-static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi);
 static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_dispi_t * dispi);
 static lv_action_res_t win_back_action(lv_obj_t * back, lv_dispi_t * dispi);
 static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_dispi_t * dispi);
@@ -107,6 +106,7 @@ static lv_app_dsc_t my_app_dsc =
 	.win_close = my_win_close,
 	.sc_open = my_sc_open,
 	.sc_close = my_sc_close,
+    .conf_open = my_conf_open,
 	.app_data_size = sizeof(my_app_data_t),
 	.sc_data_size = sizeof(my_sc_data_t),
 	.win_data_size = sizeof(my_win_data_t),
@@ -247,7 +247,6 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
     app_data->file_cnt = 0;
     win_data->file_list = NULL;
-    win_data->send_set_h = NULL;
 
     lv_win_set_title(win, app_data->path);
 
@@ -261,6 +260,77 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 static void my_win_close(lv_app_inst_t * app)
 {
 
+}
+
+/**
+ * Create objects to configure the applications
+ * @param app pointer to an application which settings should be created
+ * @param conf_win pointer to a window where the objects can be created
+ *                (the window has the proper layout)
+ */
+static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
+{
+    my_app_data_t * app_data = app->app_data;
+
+    /*Create check boxes*/
+    lv_obj_t * cb;
+
+    /*Send file name check box*/
+    cb = lv_cb_create(conf_win, NULL);
+    lv_cb_set_text(cb, "Send file name");
+    lv_obj_set_free_num(cb, SEND_SETTINGS_FN);
+    lv_obj_set_free_p(cb, app);
+    lv_btn_set_rel_action(cb, win_send_settings_element_rel_action);
+    if(app_data->send_fn != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
+    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
+
+    /*Send size check box*/
+    cb = lv_cb_create(conf_win, cb);
+    lv_cb_set_text(cb, "Send size");
+    lv_obj_set_free_num(cb, SEND_SETTINGS_SIZE);
+    if(app_data->send_size != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
+    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
+
+    /*Send CRC check box*/
+    cb = lv_cb_create(conf_win, cb);
+    lv_cb_set_text(cb, "Send CRC");
+    lv_obj_set_free_num(cb, SEND_SETTINGS_CRC);
+    if(app_data->send_crc != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
+    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
+
+    /*Create a text area the type chunk size*/
+    lv_obj_t * val_set_h;
+    val_set_h = lv_rect_create(conf_win, NULL);
+    lv_obj_set_style(val_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
+    lv_obj_set_click(val_set_h, false);
+    lv_rect_set_fit(val_set_h, true, true);
+    lv_rect_set_layout(val_set_h, LV_RECT_LAYOUT_ROW_M);
+
+    lv_obj_t * label;
+    label = lv_label_create(val_set_h, NULL);
+    lv_label_set_text(label, "Chunk size");
+
+    lv_obj_t * ta;
+    char buf[32];
+    ta = lv_ta_create(val_set_h, NULL);
+    lv_obj_set_style(ta, lv_tas_get(LV_TAS_SIMPLE, NULL));
+    lv_rect_set_fit(ta, false, true);
+    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_SIZE);
+    lv_obj_set_free_p(ta, app);
+    lv_page_set_rel_action(ta, win_send_settings_element_rel_action);
+    sprintf(buf, "%d", app_data->chunk_size);
+    lv_ta_set_text(ta, buf);
+
+    /*Create a text area to type the chunk delay*/
+    val_set_h = lv_rect_create(conf_win, val_set_h);
+
+    label = lv_label_create(val_set_h, NULL);
+    lv_label_set_text(label, "Inter-chunk delay");
+
+    ta = lv_ta_create(val_set_h, ta);
+    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_DELAY);
+    sprintf(buf, "%d", app_data->chunk_delay);
+    lv_ta_set_text(ta, buf);
 }
 
 /*--------------------
@@ -522,8 +592,6 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
     /*Send button*/
     liste = lv_list_add(win_data->file_list, NULL, "Send", win_send_rel_action);
     lv_obj_set_free_p(liste, app);
-    lv_btn_set_lpr_action(liste, win_send_lpr_action);
-    lv_obj_set_free_p(liste, app);
 
     /*Delete button*/
     liste = lv_list_add(win_data->file_list, NULL, "Delete", win_del_rel_action);
@@ -573,100 +641,6 @@ static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 
-/**
- * Called when the Send list element is long pressed to show/hide send settings
- * @param send pointer to the Up button
- * @param dispi pointer to the caller display input
- * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
- */
-static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
-{
-    lv_app_inst_t * app = lv_obj_get_free_p(send);
-    my_app_data_t * app_data = app->app_data;
-    my_win_data_t * win_data = app->win_data;
-
-    /*Close the settings if it is opened*/
-    if(win_data->send_set_h != NULL) {
-        lv_obj_del(win_data->send_set_h);
-        win_data->send_set_h = NULL;
-        lv_dispi_wait_release(dispi);
-        lv_btn_set_state(send, LV_BTN_STATE_REL);
-        return LV_ACTION_RES_OK;
-    }
-
-    /*Create the settings*/
-    lv_btn_set_state(send, LV_BTN_STATE_REL);
-    lv_rect_set_layout(send, LV_RECT_LAYOUT_COL_L);
-
-    /*Create holder for the settings*/
-    win_data->send_set_h = lv_rect_create(send, NULL);
-    lv_obj_set_style(win_data->send_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
-    lv_obj_set_click(win_data->send_set_h, false);
-    lv_rect_set_fit(win_data->send_set_h, true, true);
-    lv_rect_set_layout(win_data->send_set_h, LV_RECT_LAYOUT_COL_L);
-
-    /*Create check boxes*/
-    lv_obj_t * cb;
-
-    /*Send file name check box*/
-    cb = lv_cb_create(win_data->send_set_h, NULL);
-    lv_cb_set_text(cb, "Send file name");
-    lv_obj_set_free_num(cb, SEND_SETTINGS_FN);
-    lv_obj_set_free_p(cb, app);
-    lv_btn_set_rel_action(cb, win_send_settings_element_rel_action);
-    if(app_data->send_fn != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
-    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
-
-    /*Send size check box*/
-    cb = lv_cb_create(win_data->send_set_h, cb);
-    lv_cb_set_text(cb, "Send size");
-    lv_obj_set_free_num(cb, SEND_SETTINGS_SIZE);
-    if(app_data->send_size != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
-    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
-
-    /*Send CRC check box*/
-    cb = lv_cb_create(win_data->send_set_h, cb);
-    lv_cb_set_text(cb, "Send CRC");
-    lv_obj_set_free_num(cb, SEND_SETTINGS_CRC);
-    if(app_data->send_crc != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
-    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
-
-    /*Create a text area the type chunk size*/
-    lv_obj_t * val_set_h;
-    val_set_h = lv_rect_create(win_data->send_set_h, NULL);
-    lv_obj_set_style(val_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
-    lv_obj_set_click(val_set_h, false);
-    lv_rect_set_fit(val_set_h, true, true);
-    lv_rect_set_layout(val_set_h, LV_RECT_LAYOUT_ROW_M);
-
-    lv_obj_t * label;
-    label = lv_label_create(val_set_h, NULL);
-    lv_label_set_text(label, "Chunk size");
-
-    lv_obj_t * ta;
-    char buf[32];
-    ta = lv_ta_create(val_set_h, NULL);
-    lv_obj_set_style(ta, lv_tas_get(LV_TAS_SIMPLE, NULL));
-    lv_rect_set_fit(ta, false, true);
-    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_SIZE);
-    lv_obj_set_free_p(ta, app);
-    lv_page_set_rel_action(ta, win_send_settings_element_rel_action);
-    sprintf(buf, "%d", app_data->chunk_size);
-    lv_ta_set_text(ta, buf);
-
-    /*Create a text area to type the chunk delay*/
-    val_set_h = lv_rect_create(win_data->send_set_h, val_set_h);
-
-    label = lv_label_create(val_set_h, NULL);
-    lv_label_set_text(label, "Inter-chunk delay");
-
-    ta = lv_ta_create(val_set_h, ta);
-    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_DELAY);
-    sprintf(buf, "%d", app_data->chunk_delay);
-    lv_ta_set_text(ta, buf);
-
-    return LV_ACTION_RES_OK;
-}
 /**
  * Called when a send settings element is released
  * @param element pointer to a chekbox or text area

@@ -9,6 +9,8 @@
 #include "lv_app.h"
 
 #if LV_APP_ENABLE != 0
+#include <stdio.h>
+
 #include "lv_app_util/lv_app_kb.h"
 #include "lv_app_util/lv_app_notice.h"
 #include "lv_app_util/lv_app_fsel.h"
@@ -19,6 +21,7 @@
 #include "../lv_appx/lv_app_sysmon.h"
 #include "../lv_appx/lv_app_terminal.h"
 #include "../lv_appx/lv_app_files.h"
+#include "../lv_appx/lv_app_visual.h"
 
 /*********************
  *      DEFINES
@@ -45,7 +48,8 @@ static lv_action_res_t lv_app_sc_page_rel_action(lv_obj_t * sc, lv_dispi_t * dis
 static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi);
 static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_dispi_t * dispi);
 static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t * dispi);
-static lv_action_res_t lv_app_win_minim_action(lv_obj_t * close_minim, lv_dispi_t * dispi);
+static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_dispi_t * dispi);
+static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * dispi);
 
 static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app);
 static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app);
@@ -105,6 +109,10 @@ LV_IMG_DECLARE(img_ok);
 LV_IMG_DECLARE(img_right);
 #endif
 
+#if USE_IMG_SETTINGS != 0
+LV_IMG_DECLARE(img_settings);
+#endif
+
 #if USE_IMG_UP != 0
 LV_IMG_DECLARE(img_up);
 #endif
@@ -161,6 +169,11 @@ void lv_app_init(void)
 #if USE_LV_APP_FILES != 0
     dsc = ll_ins_head(&app_dsc_ll);
     *dsc = lv_app_files_init();
+#endif
+
+#if USE_LV_APP_VISUAL != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_visual_init();
 #endif
 }
 
@@ -301,10 +314,14 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	lv_rect_set_fit(win_content, false, true);
 	lv_obj_set_width(win_content, LV_HOR_RES - 2 * app_style.win_style.pages.bg_rects.hpad);
 
-	lv_win_add_ctrl_btn(app->win, "U:/icon_down" ,lv_app_win_minim_action);
-	lv_win_add_ctrl_btn(app->win, "U:/icon_close" ,lv_app_win_close_action);
+	if(app->dsc->conf_open != NULL) {
+	    lv_win_add_ctrl_btn(app->win, "U:/icon_settings", lv_app_win_conf_action);
+	}
+	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
+	lv_win_add_ctrl_btn(app->win, "U:/icon_close",lv_app_win_close_action);
 
     app->win_data = dm_alloc(app->dsc->win_data_size);
+
     app->dsc->win_open(app, app->win);
 
 	return app->win;
@@ -327,6 +344,7 @@ void lv_app_win_close(lv_app_inst_t * app)
 	dm_free(app->win_data);
 	app->win_data = NULL;
 }
+
 /**
  * Send data to other applications
  * @param app_send pointer to the application which is sending the message
@@ -475,8 +493,7 @@ lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc)
         if(next->dsc == dsc || dsc == NULL) return next;
 
         prev = next;
-
-    };
+    }
 
     return NULL;
 }
@@ -795,13 +812,13 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 
 /**
  * Called when the minimization button of window is released
- * @param close_minimointer to the minim. button
+ * @param minim_btn pointer to the minim. button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK or LV_ACTION_RES_INC depending on LV_APP_EFFECT_... settings type
  */
-static lv_action_res_t lv_app_win_minim_action(lv_obj_t * close_minim, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_dispi_t * dispi)
 {
-	lv_obj_t * win = lv_win_get_from_ctrl_btn(close_minim);
+	lv_obj_t * win = lv_win_get_from_ctrl_btn(minim_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
 
 	lv_app_kb_close(false);
@@ -813,6 +830,40 @@ static lv_action_res_t lv_app_win_minim_action(lv_obj_t * close_minim, lv_dispi_
 	return res;
 }
 
+/**
+ * Open the settings of an application in a window (use the set_open function of the application)
+ * @param set_btn pointer to the settings button
+ * @param dispi pointer to the caller display input
+ * @return always LV_ACTION_RES_OK because the button is not deleted here
+ */
+static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * dispi)
+{
+    /*Close the app list if opened*/
+    if(app_list != NULL) {
+        lv_obj_del(app_list);
+        app_list = NULL;
+    }
+
+    lv_obj_t * win = lv_win_get_from_ctrl_btn(set_btn);
+    lv_app_inst_t * app = lv_obj_get_free_p(win);
+
+    app->conf_win = lv_win_create(lv_scr_act(), NULL);
+    lv_obj_set_free_p(app->conf_win, app);
+    lv_obj_set_style(app->conf_win, &app_style.win_style);
+    char buf[256];
+    sprintf(buf, "%s settings", app->dsc->name);
+    lv_win_set_title(app->conf_win, buf);
+    lv_obj_t * set_content = lv_page_get_scrl(app->conf_win);
+    lv_rect_set_fit(set_content, false, true);
+    lv_rect_set_layout(set_content, LV_RECT_LAYOUT_COL_L);
+    lv_obj_set_width(set_content, LV_HOR_RES - 2 * app_style.win_style.pages.bg_rects.hpad);
+
+    lv_win_add_ctrl_btn(app->conf_win, "U:/icon_close" ,lv_win_close_action);
+
+    app->dsc->conf_open(app, app->conf_win);
+
+    return LV_ACTION_RES_OK;
+}
 /*-----------------------
         ANIMATIONS
  ------------------------*/
@@ -1131,6 +1182,10 @@ static void lv_app_init_icons(void)
 
 #if USE_IMG_RIGHT != 0
     lv_img_create_file("icon_right", img_right);
+#endif
+
+#if USE_IMG_SETTINGS != 0
+    lv_img_create_file("icon_settings", img_settings);
 #endif
 
 #if USE_IMG_UP != 0

@@ -30,7 +30,7 @@ typedef enum
 
 typedef enum
 {
-	LV_APP_COM_TYPE_CHAR,   /*Stream of characters. Always '\0' terminated*/
+	LV_APP_COM_TYPE_CHAR,   /*Stream of characters. Not '\0' terminated*/
 	LV_APP_COM_TYPE_INT,    /*Stream of 'int32_t' numbers*/
 	LV_APP_COM_TYPE_LOG,    /*String about an event to log*/
     LV_APP_COM_TYPE_TRIG,   /*A trigger to do some specific action (data is ignored)*/
@@ -47,6 +47,7 @@ typedef struct
 	lv_obj_t * sc;
 	lv_obj_t * sc_title;
 	lv_obj_t * win;
+    lv_obj_t * conf_win;
 	void * app_data;
 	void * sc_data;
 	void * win_data;
@@ -63,6 +64,7 @@ typedef struct __LV_APP_DSC_T
 	void (*sc_close) (lv_app_inst_t *);
 	void (*win_open) (lv_app_inst_t *, lv_obj_t *);
 	void (*win_close) (lv_app_inst_t *);
+    void (*conf_open) (lv_app_inst_t *, lv_obj_t * );
 	uint16_t app_data_size;
 	uint16_t sc_data_size;
 	uint16_t win_data_size;

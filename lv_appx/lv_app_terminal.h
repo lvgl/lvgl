@@ -20,6 +20,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum
+{
+    LV_APP_TERMINAL_FORMAT_ASCII,
+    LV_APP_TERMINAL_FORMAT_HEX,
+}lv_app_terminal_format_t;
+
 typedef struct
 {
 
