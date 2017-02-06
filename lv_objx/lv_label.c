@@ -236,6 +236,32 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text)
 
     lv_label_refr_text(label);
 }
+
+/**
+ * Append a text to the label. The label current label text can not be static.
+ * @param label pointer to label object
+ * @param text pointe rto the new text
+ */
+void lv_label_append_text(lv_obj_t * label, const char * text)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext(label);
+
+    /*Can not append to static text*/
+    if(ext->static_txt != 0) return;
+
+    lv_obj_inv(label);
+
+    /*Allocate space for the new text*/
+    uint32_t old_len = strlen(ext->txt);
+    uint32_t app_len = strlen(text);
+    uint32_t new_len = app_len + old_len;
+    ext->txt = dm_realloc(ext->txt, new_len + 1);
+    memcpy(ext->txt + old_len, text, app_len);
+    ext->txt[new_len] = '\0';
+
+    lv_label_refr_text(label);
+}
+
 /**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object

@@ -112,6 +112,12 @@ void lv_label_set_text_array(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_text_static(lv_obj_t * label, const char * text);
 
 /**
+ * Append a text to the label. The label current label text can not be static.
+ * @param label pointer to label object
+ * @param text pointe rto the new text
+ */
+void lv_label_append_text(lv_obj_t * label, const char * text);
+/**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
