@@ -48,6 +48,21 @@ typedef struct
 	uint8_t playback_now :1;		/*Play back is in progress*/
 }anim_t;
 
+/*Example initialization
+anim_t a;
+a.var = obj;
+a.start = lv_obj_get_height(obj);
+a.end = new_height;
+a.fp = (anim_fp_t)lv_obj_set_height;
+a.path = anim_get_path(ANIM_PATH_LIN);
+a.end_cb = NULL;
+a.act_time = 0;
+a.time = 200;
+a.playback = 0;
+a.playback_pause = 0;
+a.repeat = 0;
+a.repeat_pause = 0;
+ */
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
