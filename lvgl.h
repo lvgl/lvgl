@@ -41,6 +41,7 @@
 #include "lv_objx/lv_pb.h"
 #include "lv_objx/lv_led.h"
 #include "lv_objx/lv_btnm.h"
+#include "lv_objx/lv_ddlist.h"
 #include "lv_objx/lv_ta.h"
 #include "lv_objx/lv_win.h"
 #include "lv_objx/lv_mbox.h"

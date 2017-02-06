@@ -121,10 +121,19 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
  * Setter functions
  *====================*/
 
+/*
+ * New object specific "set" function comes here
+ */
+
 
 /*=====================
  * Getter functions
  *====================*/
+
+/*
+ * New object specific "get" function comes here
+ */
+
 
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable

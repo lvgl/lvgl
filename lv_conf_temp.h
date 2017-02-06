@@ -139,6 +139,12 @@
 /*Button matrix (dependencies: lv_rect, lv_label)*/
 #define USE_LV_BTNM     1
 
+/*Drop down list (dependencies: lv_page, lv_btn_t, lv_label_t)*/
+#define USE_LV_DDLIST      1
+#if USE_LV_DDLIST != 0
+#define LV_DDLIST_ANIM_TIME    100 /*DDL open/close animation in milliseconds (0: disable animation)*/
+#endif
+
 /*Window (dependencies: lv_rect, lv_btn, lv_label, lv_img, lv_page)*/
 #define USE_LV_WIN      1
 
