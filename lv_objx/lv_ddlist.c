@@ -69,7 +69,8 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     ext->opt_label = NULL;
     ext->cb = NULL;
     ext->opened = 0;
-    ext->act_opt = 0;
+    ext->auto_size = 0;
+    ext->sel_opt = 0;
 
     /*The signal and design functions are not copied so set them here*/
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_ddlist);
@@ -79,6 +80,8 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
+        lv_obj_set_drag(lv_page_get_scrl(new_ddlist), false);
+
         ext->opt_label = lv_label_create(new_ddlist, NULL);
         lv_rect_set_fit(new_ddlist, true, false);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_rel_action);
@@ -90,6 +93,10 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_ddlist_ext_t * copy_ext = lv_obj_get_ext(copy);
         ext->opt_label = lv_label_create(new_ddlist, copy_ext->opt_label);
         lv_label_set_text(ext->opt_label, lv_label_get_text(copy_ext->opt_label));
+        ext->sel_opt = copy_ext->sel_opt;
+        ext->auto_size = copy_ext->auto_size;
+        ext->cb = copy_ext->cb;
+
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_ddlist);
     }
@@ -160,8 +167,25 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options)
 }
 
 /**
+ * Set the selected option
+ * @param ddlist pointer to drop down list object
+ * @param sel_opt id of the selected option (0 ... number of option - 1);
+ */
+void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+
+    ext->sel_opt = sel_opt;
+
+    /*Move the list to show the current option*/
+    if(ext->opened == 0) {
+        lv_ddlist_pos_act_option(ddlist);
+    }
+}
+
+/**
  * Set a function to call when a new option is chosen
- * @param ddlist pointer to drop down list
+ * @param ddlist pointer to a drop down list
  * @param cb pointer to a call back function. Its prototype is:
  *           parameter 1: pointer to the drop down list
  *           parameter 2: id of the chosen item (0 ... number of options - 1)
@@ -171,6 +195,18 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_res_t (*cb)(lv_obj_t *, u
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     ext->cb = cb;
+}
+
+/**
+ * Set the auto size attribute. If enabled the height will reduced to be visible on the parent.
+ * In this case the drop down list can be scrolled.
+ * @param ddlist pointer to a drop down list
+ * @param auto_size true: enable auto size, false: disable
+ */
+void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    ext->auto_size = auto_size == false ? 0 : 1;
 }
 
 /*=====================
@@ -186,6 +222,29 @@ const char * lv_ddlist_get_options(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     return lv_label_get_text(ext->opt_label);
+}
+
+/**
+ * Get the selected option
+ * @param ddlist pointer to drop down list object
+ * @return id of the selected option (0 ... number of option - 1);
+ */
+uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+
+    return ext->sel_opt;
+}
+
+/**
+ * Get the auto size attribute.
+ * @param ddlist pointer to a drop down list
+ * @return true: the auto_size is enabled, false: disabled
+ */
+bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    return ext->auto_size == 0 ? false : true;
 }
 
 /**
@@ -254,7 +313,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
             const font_t * font = font_get(style->list_labels.font);
             area_t rect_area;
             rect_area.y1 = ext->opt_label->cords.y1;
-            rect_area.y1 += ext->act_opt * (font_get_height(font) + style->list_labels.line_space);
+            rect_area.y1 += ext->sel_opt * (font_get_height(font) + style->list_labels.line_space);
             rect_area.y1 -= style->sel_rects.vpad;
 
             rect_area.y2 = rect_area.y1 + font_get_height(font) + 2 * style->sel_rects.vpad;
@@ -288,6 +347,8 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
         lv_obj_set_drag(lv_page_get_scrl(ddlist), true);
     } else {
         ext->opened = 0;
+        lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
+
         /*Search the clicked option*/
         point_t p;
         lv_dispi_get_point(dispi, &p);
@@ -303,10 +364,10 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
             if(txt[i] == '\n') new_opt ++;
         }
 
-        ext->act_opt = new_opt;
+        ext->sel_opt = new_opt;
 
         if(ext->cb != NULL) {
-            ext->cb(ddlist, ext->act_opt);
+            ext->cb(ddlist, ext->sel_opt);
         }
     }
 #if LV_DDLIST_ANIM_TIME == 0
@@ -332,8 +393,10 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     if(ext->opened != 0) { /*Open the list*/
         new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->pages.bg_rects.vpad;
         lv_obj_t * parent = lv_obj_get_parent(ddlist);
-        if(new_height + ddlist->cords.y1 > parent->cords.y2) {
+        /*Reduce the height is enabler and required*/
+        if(ext->auto_size != 0 && new_height + ddlist->cords.y1 > parent->cords.y2) {
             new_height = parent->cords.y2 - ddlist->cords.y1;
+
         }
     } else { /*Close the list*/
         const font_t * font = font_get(style->list_labels.font);
@@ -372,7 +435,7 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
     const font_t * font = font_get(style->list_labels.font);
 
     lv_obj_set_y(lv_page_get_scrl(ddlist),
-                       -(ext->act_opt * (font_get_height(font) + style->list_labels.line_space) +
+                       -(ext->sel_opt * (font_get_height(font) + style->list_labels.line_space) +
                        style->pages.scrl_rects.vpad) + style->sel_rects.vpad);
 
 }
@@ -393,7 +456,7 @@ static void lv_ddlists_init(void)
     lv_ddlists_def.pages.bg_rects.opad = 0;
 
     lv_ddlists_def.pages.scrl_rects.hpad = 5 * LV_DOWNSCALE;
-    lv_ddlists_def.pages.scrl_rects.vpad = 5 * LV_DOWNSCALE;
+    lv_ddlists_def.pages.scrl_rects.vpad = 10 * LV_DOWNSCALE;
     lv_ddlists_def.pages.scrl_rects.opad = 0 * LV_DOWNSCALE;
 
     lv_ddlists_def.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
@@ -404,7 +467,7 @@ static void lv_ddlists_init(void)
     lv_rects_get(LV_RECTS_DEF, &lv_ddlists_def.sel_rects);
     lv_ddlists_def.sel_rects.bwidth = 0;
     lv_ddlists_def.sel_rects.round = 0;
-    lv_ddlists_def.sel_rects.vpad = 5 * LV_DOWNSCALE;
+    lv_ddlists_def.sel_rects.vpad = 7 * LV_DOWNSCALE;
 }
 
 #endif

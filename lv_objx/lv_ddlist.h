@@ -30,8 +30,9 @@ typedef struct
     /*New data for this type */
     lv_obj_t * opt_label;   /*Label for the options*/
     lv_action_res_t (*cb)(lv_obj_t *, uint16_t);
-    uint16_t act_opt;
+    uint16_t sel_opt;
     uint8_t opened :1;
+    uint8_t auto_size :1;
 }lv_ddlist_ext_t;
 
 /*Style of drop down list*/
@@ -80,8 +81,15 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options);
 
 /**
+ * Set the selected option
+ * @param ddlist pointer to drop down list object
+ * @param sel_opt id of the selected option (0 ... number of option - 1);
+ */
+void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
+
+/**
  * Set a function to call when a new option is chosen
- * @param ddlist pointer to drop down list
+ * @param ddlist pointer to a drop down list
  * @param cb pointer to a call back function. Its prototype is:
  *           parameter 1: pointer to the drop down list
  *           parameter 2: id of the chosen item (0 ... number of options - 1)
@@ -89,12 +97,35 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options);
  */
 void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_res_t (*cb)(lv_obj_t *, uint16_t));
 
+
+/**
+ * Set the auto size attribute. If enabled the height will reduced to be visible on the parent.
+ * In this case the drop down list can be scrolled.
+ * @param ddlist pointer to a drop down list
+ * @param auto_size true: enable auto size, false: disable
+ */
+void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size);
+
 /**
  * Get the options of a drop down list
  * @param ddlist pointer to drop down list object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
 const char * lv_ddlist_get_options(lv_obj_t * ddlist);
+
+/**
+ * Get the selected option
+ * @param ddlist pointer to drop down list object
+ * @return id of the selected option (0 ... number of option - 1);
+ */
+uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
+
+/**
+ * Get the auto size attribute.
+ * @param ddlist pointer to a drop down list
+ * @return true: the auto_size is enabled, false: disabled
+ */
+bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size);
 
 /**
  * Return with a pointer to a built-in style and/or copy it to a variable
