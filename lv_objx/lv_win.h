@@ -121,7 +121,7 @@ lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_
  * @param dispi pointer to the caller display input
  * @return always false because the button is deleted with the window
  */
-bool lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+lv_action_res_t  lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
 
 /**
  * Set the title of a window

@@ -219,15 +219,15 @@ lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_
  * A release action which can be assigned to a window control button to close it
  * @param btn pointer to the released button
  * @param dispi pointer to the caller display input
- * @return always false because the button is deleted with the window
+ * @return always LV_ACTION_RES_INV because the button is deleted with the window
  */
-bool lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
+lv_action_res_t lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
 {
 	lv_obj_t * win = lv_win_get_from_ctrl_btn(btn);
 
 	lv_obj_del(win);
 
-	return false;
+	return LV_ACTION_RES_INV;
 }
 
 /**
@@ -368,7 +368,7 @@ static void lv_wins_init(void)
 	lv_rects_get(LV_RECTS_TRANSP, &lv_wins_def.ctrl_holder);
 	lv_wins_def.ctrl_holder.hpad = 0;
 	lv_wins_def.ctrl_holder.vpad = 0;
-	lv_wins_def.ctrl_holder.opad = 10 * LV_DOWNSCALE;
+	lv_wins_def.ctrl_holder.opad = 5 * LV_DOWNSCALE;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_wins_def.ctrl_btn);
 	lv_wins_def.ctrl_btn.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xD0, 0xE0, 0xF0);
