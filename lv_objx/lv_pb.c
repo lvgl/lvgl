@@ -71,7 +71,6 @@ lv_obj_t * lv_pb_create(lv_obj_t * par, lv_obj_t * copy)
     ext->max_value = 100;
     ext->act_value = 0;
     ext->tmp_value = 0;
-    ext->set_in_prog = 0;
     ext->format_str = NULL;
     ext->label = NULL;
 
@@ -147,7 +146,6 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
     	    lv_pb_set_value(pb, lv_pb_get_value(pb));
     	    break;
     	case LV_SIGNAL_PRESSING:
-            ext->set_in_prog = 1;
     	    lv_dispi_get_point(param, &p);
     	    if(lv_obj_get_width(pb) > lv_obj_get_height(pb)) {
     	        p.x -= pb->cords.x1 + style->btn_size / 2;
@@ -172,7 +170,6 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
     	    lv_obj_inv(pb);
     	    break;
         case LV_SIGNAL_PRESS_LOST:
-            ext->set_in_prog = 0;
             ext->tmp_value = ext->act_value;
             sprintf(buf, ext->format_str, ext->act_value);
             lv_label_set_text(ext->label, buf);
@@ -180,7 +177,6 @@ bool lv_pb_signal(lv_obj_t * pb, lv_signal_t sign, void * param)
             break;
     	case LV_SIGNAL_RELEASED:
     	    lv_pb_set_value(pb, ext->tmp_value);
-    	    ext->set_in_prog = 0;
     	    break;
     		default:
     			break;
@@ -325,44 +321,25 @@ static bool lv_pb_design(lv_obj_t * pb, const area_t * mask, lv_design_mode_t mo
 		lv_pb_ext_t * ext = lv_obj_get_ext(pb);
         lv_pbs_t * style = lv_obj_get_style(pb);
 		area_t bar_area;
-        area_t tmp_area;
 		uint32_t tmp;
 		area_cpy(&bar_area, &pb->cords);
-        area_cpy(&tmp_area, &pb->cords);
 
 		cord_t w = lv_obj_get_width(pb);
         cord_t h = lv_obj_get_height(pb);
 
 		if(w >= h) {
-            tmp = (int32_t)ext->act_value * (w - style->btn_size);
-            tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
-            bar_area.x2 = bar_area.x1 + style->btn_size + (cord_t) tmp;
-
             tmp = (int32_t)ext->tmp_value * (w - style->btn_size);
             tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
-            tmp_area.x2 = tmp_area.x1 +  style->btn_size + (cord_t) tmp;
+            bar_area.x2 = bar_area.x1 + style->btn_size + (cord_t) tmp;
 		} else {
-            tmp = (int32_t)ext->act_value * (h - style->btn_size);
-            tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
-            bar_area.y1 = bar_area.y2 - style->btn_size - (cord_t) tmp;
-
             tmp = (int32_t)ext->tmp_value * (h - style->btn_size);
             tmp = (int32_t) tmp / (ext->max_value - ext->min_value);
-            tmp_area.y1 = tmp_area.y2 -  style->btn_size - (cord_t) tmp;
+            bar_area.y1 = bar_area.y2 - style->btn_size - (cord_t) tmp;
 		}
 
 		/*Draw the main bar*/
 		opa_t opa = lv_obj_get_opa(pb);
         lv_draw_rect(&bar_area, mask, &style->bar, opa);
-
-        /*Draw a "phantom" bar when setting by a display input*/
-        if(ext->set_in_prog != 0) {
-            lv_rects_t tmp_rects;
-            memcpy(&tmp_rects, &style->bar, sizeof(lv_rects_t));
-            tmp_rects.objs.color = style->tmp_bar_mcolor;
-            tmp_rects.gcolor = style->tmp_bar_gcolor;
-            lv_draw_rect(&tmp_area, mask, &tmp_rects, (opa * style->tmp_bar_opa) / 100);
-		}
 
         /*Draw a button if its size is not 0*/
         if(style->btn_size != 0) {
@@ -370,32 +347,32 @@ static bool lv_pb_design(lv_obj_t * pb, const area_t * mask, lv_design_mode_t mo
             memcpy(&tmp_rects, &style->btn, sizeof(lv_rects_t));
 
             if(w >= h) {
-                tmp_area.x1 = tmp_area.x2 - style->btn_size ;
+                bar_area.x1 = bar_area.x2 - style->btn_size ;
 
-                if(tmp_area.x1 < pb->cords.x1) {
-                    tmp_area.x1 = pb->cords.x1;
-                    tmp_area.x2 = tmp_area.x1 + style->btn_size;
+                if(bar_area.x1 < pb->cords.x1) {
+                    bar_area.x1 = pb->cords.x1;
+                    bar_area.x2 = bar_area.x1 + style->btn_size;
                 }
 
-                if(tmp_area.x2 > pb->cords.x2) {
-                    tmp_area.x2 = pb->cords.x2;
-                    tmp_area.x1 = tmp_area.x2 - style->btn_size;
+                if(bar_area.x2 > pb->cords.x2) {
+                    bar_area.x2 = pb->cords.x2;
+                    bar_area.x1 = bar_area.x2 - style->btn_size;
                 }
             } else {
-                tmp_area.y2 = tmp_area.y1 + style->btn_size ;
+                bar_area.y2 = bar_area.y1 + style->btn_size ;
 
-                if(tmp_area.y1 < pb->cords.y1) {
-                    tmp_area.y1 = pb->cords.y1;
-                    tmp_area.y2 = tmp_area.y1 + style->btn_size;
+                if(bar_area.y1 < pb->cords.y1) {
+                    bar_area.y1 = pb->cords.y1;
+                    bar_area.y2 = bar_area.y1 + style->btn_size;
                 }
 
-                if(tmp_area.y2 > pb->cords.y2) {
-                    tmp_area.y2 = pb->cords.y2;
-                    tmp_area.y1 = tmp_area.y2 - style->btn_size;
+                if(bar_area.y2 > pb->cords.y2) {
+                    bar_area.y2 = pb->cords.y2;
+                    bar_area.y1 = bar_area.y2 - style->btn_size;
                 }
 
             }
-            lv_draw_rect(&tmp_area, mask, &tmp_rects, opa );
+            lv_draw_rect(&bar_area, mask, &tmp_rects, opa );
         }
     }
     return true;
@@ -434,14 +411,11 @@ static void lv_pbs_init(void)
     lv_pbs_def.bar.gcolor = COLOR_GREEN;
     lv_pbs_def.bar.bcolor = COLOR_BLACK;
 
-    lv_pbs_def.tmp_bar_mcolor = COLOR_YELLOW;
-    lv_pbs_def.tmp_bar_gcolor = COLOR_LIME;
-    lv_pbs_def.tmp_bar_opa = 80;
-
     lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.btn);    /*Button*/
     lv_pbs_def.btn.objs.color = COLOR_WHITE;
     lv_pbs_def.btn.gcolor = COLOR_GRAY;
     lv_pbs_def.btn.bcolor = COLOR_GRAY;
+    lv_pbs_def.btn.bopa = 100;
     lv_pbs_def.btn_size = 0;
 
     lv_labels_get(LV_LABELS_DEF, &lv_pbs_def.label);    /*Label*/
@@ -454,7 +428,6 @@ static void lv_pbs_init(void)
 	lv_pbs_slider.bar.round = LV_RECT_CIRCLE;
     lv_pbs_slider.btn.round = LV_RECT_CIRCLE;
     lv_pbs_slider.btn_size = 40 * LV_DOWNSCALE;
-    lv_pbs_def.tmp_bar_opa = 80;
 
 }
 #endif

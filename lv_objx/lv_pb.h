@@ -45,7 +45,6 @@ typedef struct
     int16_t min_value;     /*Minimum value of the progress bar*/
     int16_t max_value;     /*Maximum value of the progress bar*/
     char * format_str;     /*Format string of the label. E.g. "Progress: %d"*/
-    uint8_t set_in_prog :1;/*Indicates the setting by display input is in progress*/
 }lv_pb_ext_t;
 
 /*Style of progress bar*/
@@ -53,12 +52,10 @@ typedef struct
 {
 	lv_rects_t bg;      /*Style of the background (inherited)*/
 	lv_rects_t bar;     /*Style of the bar*/
-    lv_labels_t label; /*Style of the label*/
+    lv_labels_t label;  /*Style of the label*/
     lv_rects_t btn;     /*Style of the button (it is rectangle but acts as a button)*/
-    color_t tmp_bar_mcolor;     /*Main color of temporal bar when settings by hand*/
-    color_t tmp_bar_gcolor;     /*Gradient color of temporal bar when settings by hand*/
-    cord_t btn_size;            /*Width or height of the button (depending on the orientation of the pb)*/
-    uint8_t tmp_bar_opa;        /*Opacity of temporal bar in percentage of the object opacity [%]*/
+    cord_t btn_size;    /*Width or height of the button (depending on the orientation of the pb)*/
+
 }lv_pbs_t;
 
 /*Built-in styles of progress bar*/
