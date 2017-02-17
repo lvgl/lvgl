@@ -42,6 +42,19 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p,
                     const lv_rects_t * rects_p, opa_t opa);
 #endif
 
+
+/*Experimental use for 3D modeling*/
+#define USE_LV_TRIANGLE 0
+#if USE_LV_TRIANGLE != 0
+/**
+ *
+ * @param points pointer to an array with 3 points
+ * @param mask_p the triangle will be drawn only in this mask
+ * @param color color of the triangle
+ */
+void lv_draw_triangle(const point_t * points, const area_t * mask_p, color_t color);
+#endif
+
 /**
  * Write a text
  * @param cords_p coordinates of the label
