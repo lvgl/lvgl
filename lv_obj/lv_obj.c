@@ -16,7 +16,6 @@
 #include <lvgl/lv_obj/lv_refr.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/types.h>
 
 #ifdef LV_IMG_DEF_WALLPAPER
 #include "../lv_objx/lv_img.h"
