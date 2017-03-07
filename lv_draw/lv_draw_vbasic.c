@@ -74,11 +74,17 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
         
         /*Run simpler function without opacity*/
         if(opa == OPA_COVER) {
-            for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                for(col = vdb_rel_a.x1; col <= vdb_rel_a.x2; col++) {
-                    vdb_buf_tmp[col] = color;
-                }
-
+            /*Fill the first row with 'color'*/
+            for(col = vdb_rel_a.x1; col <= vdb_rel_a.x2; col++) {
+                 vdb_buf_tmp[col] = color;
+            }
+            /*Copy the first row to all other rows*/
+            color_t * vdb_buf_first = &vdb_buf_tmp[vdb_rel_a.x1];
+            cord_t copy_size =  (vdb_rel_a.x2 - vdb_rel_a.x1 + 1) * sizeof(color_t);
+            vdb_buf_tmp += vdb_width;
+            
+            for(row = vdb_rel_a.y1 + 1; row <= vdb_rel_a.y2; row++) {
+                memcpy(&vdb_buf_tmp[vdb_rel_a.x1], vdb_buf_first, copy_size);
                 vdb_buf_tmp += vdb_width;
             }            
         }
@@ -86,8 +92,7 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
         else {
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
                 for(col = vdb_rel_a.x1; col <= vdb_rel_a.x2; col++) {
-                    color_t c = color_mix(color, vdb_buf_tmp[col], opa);
-                    vdb_buf_tmp[col] = c;
+                    vdb_buf_tmp[col] = color_mix(color, vdb_buf_tmp[col], opa);
                 }
                 vdb_buf_tmp += vdb_width;
             }

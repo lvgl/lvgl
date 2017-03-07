@@ -17,6 +17,7 @@
 #include "misc/math/math_base.h"
 #include "lv_draw_rbasic.h"
 #include "lv_draw_vbasic.h"
+#include "misc/fs/ufs/ufs.h"
 
 /*********************
  *      DEFINES
@@ -399,12 +400,31 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
             act_area.y1 &= ~(cord_t)(ds_num - 1) ;
             act_area.y2 = act_area.y1 + ds_num - 1;
             uint32_t act_pos;
-
-            color_t buf[LV_HOR_RES];
+            bool const_data = false;
+            if(fn[0] == UFS_LETTER) {
+                if(((ufs_file_t*)file.file_d)->ent->const_data != 0) {
+                    const_data = true;
+                }
+            }
+            
             for(row = mask_sub.y1; row <= mask_sub.y2; row += ds_num) {
-                res = fs_read(&file, buf, useful_data, &br);
-                map_fp(&act_area, &mask_sub, buf, opa, header.transp, upscale,
-                                  imgs_p->objs.color, imgs_p->recolor_opa);
+                
+                /*Get and use the pointer of const data in program memory*/
+                if(const_data != false) {
+                    uint8_t * f_data = ((ufs_file_t*)file.file_d)->ent->data_d;
+                    f_data += ((ufs_file_t*)file.file_d)->rwp;
+                    ((ufs_file_t*)file.file_d)->rwp += useful_data;
+                    map_fp(&act_area, &mask_sub, (void*)f_data , opa, header.transp, upscale,
+                              imgs_p->objs.color, imgs_p->recolor_opa);
+                } 
+                /*Or read the NOT const files normally*/
+                else {
+                    color_t buf[LV_HOR_RES];
+                    res = fs_read(&file, buf, useful_data, &br);
+                    map_fp(&act_area, &mask_sub, buf, opa, header.transp, upscale,
+                              imgs_p->objs.color, imgs_p->recolor_opa);
+                }
+                
                 fs_tell(&file, &act_pos);
                 fs_seek(&file, act_pos + next_row);
                 act_area.y1 += ds_num;
