@@ -48,9 +48,6 @@ static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
 
-static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi);
-static void kb_ok_action(lv_obj_t * ta);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -183,28 +180,5 @@ static void my_win_close(lv_app_inst_t * app)
 /*--------------------
  * OTHER FUNCTIONS
  ---------------------*/
-
-/**
- * Called when the text area on the window is released to open the app. keyboard
- * @param ta pointer to the text area on the window
- * @param dispi pointer to the caller display input
- * @return LV_ACTION_RES_OK because the text area is not deleted
- */
-static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
-{
-
-    return LV_ACTION_RES_OK;
-}
-
-/**
- * Called when the "Ok" button is  pressed on the app. keyboard
- * @param ta pointer to the text area assigned to the app. kexboard
- */
-static void kb_ok_action(lv_obj_t * ta)
-{
-    lv_app_inst_t * app = lv_obj_get_free_p(ta);
-    const char * txt = lv_ta_get_txt(ta);
-    lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, txt, strlen(txt));
-}
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_VISUAL != 0*/

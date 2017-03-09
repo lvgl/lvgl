@@ -219,8 +219,8 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
     if(dispi_p->act_obj == NULL) {
         pr_obj = dispi_search_obj(dispi_p, lv_scr_act());
     }
-    /*If there is last object but it can not be dragged also search*/
-    else if(dispi_p->drag_range_out == 0) {/*Now act_obj != NULL*/
+    /*If there is last object but it is not dragged also search*/
+    else if(dispi_p->drag_in_prog == 0) {/*Now act_obj != NULL*/
         pr_obj = dispi_search_obj(dispi_p, lv_scr_act());
     }
     /*If a dragable object was the last then keep it*/

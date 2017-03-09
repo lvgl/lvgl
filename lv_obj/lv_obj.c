@@ -85,6 +85,7 @@ void lv_init(void)
     def_scr = lv_img_create(NULL, NULL);
     lv_img_set_auto_size(def_scr, false);
     lv_img_set_file(def_scr, "U:/def_wp");
+    lv_img_set_upscale(def_scr, true);
 #else
     def_scr = lv_obj_create(NULL, NULL);
 #endif

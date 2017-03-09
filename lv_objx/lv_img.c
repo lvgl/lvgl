@@ -217,10 +217,12 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
         ext->h = header.h;
         ext->transp = header.transp;
 
+#if LV_ANTIALIAS != 0
         if(ext->upscale != 0) {
             ext->w *=  2;
             ext->h *=  2;
         }
+#endif
 	}
 	/*Handle symbol texts*/
 	else {
@@ -239,11 +241,6 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 #endif
 
 	}
-
-    if(ext->upscale != 0) {
-        ext->w *=  LV_DOWNSCALE;
-        ext->h *=  LV_DOWNSCALE;
-    }
 
 	if(fn != NULL) {
 		ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
@@ -283,7 +280,11 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
 void lv_img_set_upscale(lv_obj_t * img, bool en)
 {
     lv_img_ext_t * ext = lv_obj_get_ext(img);
-
+    
+    /*Upscale works only if antialiassing is enabled*/
+#if LV_ANTIALIAS == 0
+    en = false;
+#endif
     ext->upscale = (en == false ? 0 : 1);
 
     /*Refresh the image with the new size*/

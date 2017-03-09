@@ -517,7 +517,6 @@ static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_
 		ancestor_design_f(page, mask, mode);
 	} else if(mode == LV_DESIGN_DRAW_POST) { /*Draw the scroll bars finally*/
 		ancestor_design_f(page, mask, mode);
-
 		lv_page_ext_t * ext = lv_obj_get_ext(page);
 		lv_pages_t * style = lv_obj_get_style(page);
 		opa_t sb_opa = lv_obj_get_opa(page) * style->sb_opa /100;
@@ -554,6 +553,7 @@ static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_
  */
 static void lv_page_sb_refresh(lv_obj_t * page)
 {
+//    return;
     /*Always let sb_width padding above,under, left and right to the scrollbars
      * else:
      * - horizontal and vertical scrollbars can overlap on the corners

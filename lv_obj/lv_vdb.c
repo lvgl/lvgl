@@ -74,20 +74,28 @@ void lv_vdb_flush(void)
     color_t * in2_buf = vdb.buf + w;  /*Pointer to the second row*/
     color_t * out_buf = vdb.buf;      /*Store the result here*/
 	for(y = vdb.vdb_area.y1; y < vdb.vdb_area.y2; y += 2) {
-		for(x = vdb.vdb_area.x1; x < vdb.vdb_area.x2; x += 2) {
-		    /*Get the average of 2x2 red*/
-		    out_buf->red = (in1_buf->red + (in1_buf + 1)->red +
-					        in2_buf->red + (in2_buf+ 1)->red) >> 2;
-            /*Get the average of 2x2 green*/
-		    out_buf->green = (in1_buf->green + (in1_buf + 1)->green +
-                              in2_buf->green + (in2_buf + 1)->green) >> 2;
-            /*Get the average of 2x2 blue*/
-		    out_buf->blue = (in1_buf->blue + (in1_buf + 1)->blue +
-                             in2_buf->blue + (in2_buf + 1)->blue) >> 2;
-
-			in1_buf+=2; /*Skip the next pixel because it is already used above*/
-            in2_buf+=2;
-			out_buf++;
+        for(x = vdb.vdb_area.x1; x < vdb.vdb_area.x2; x += 2) {
+        
+            /*If the pixels are the same do not calculate the average */
+            if(in1_buf->full == (in1_buf + 1)->full &&
+               in1_buf->full == in2_buf->full &&
+               in1_buf->full == (in2_buf + 1)->full) {
+                out_buf->full = in1_buf->full;
+            } else {
+                /*Get the average of 2x2 red*/
+                out_buf->red = (in1_buf->red + (in1_buf + 1)->red +
+                                in2_buf->red + (in2_buf+ 1)->red) >> 2;
+                /*Get the average of 2x2 green*/
+                out_buf->green = (in1_buf->green + (in1_buf + 1)->green +
+                                  in2_buf->green + (in2_buf + 1)->green) >> 2;
+                /*Get the average of 2x2 blue*/
+                out_buf->blue = (in1_buf->blue + (in1_buf + 1)->blue +
+                                 in2_buf->blue + (in2_buf + 1)->blue) >> 2;
+            }
+            
+			in1_buf += 2; /*Skip the next pixel because it is already used above*/
+            in2_buf += 2;
+			out_buf ++;
 		}
 		/*2 row is ready so go the next 2*/
 		in1_buf += w; /*Skip the next row because it is processed from in2_buf*/
@@ -104,7 +112,5 @@ void lv_vdb_flush(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-
 
 #endif

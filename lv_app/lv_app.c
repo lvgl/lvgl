@@ -54,6 +54,7 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
 static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app);
 static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app);
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0
+static void lv_app_win_open_anim_cb(lv_obj_t * app_win);
 static void lv_app_win_close_anim_cb(lv_obj_t * app_win);
 static void lv_app_win_minim_anim_cb(lv_obj_t * app_win);
 #endif
@@ -75,7 +76,7 @@ static lv_obj_t * app_list;  /*A list which is opened on 'app_btn' release*/
 static lv_obj_t * sc_page;   /*A page for the shortcuts */
 static lv_app_inst_t * con_send; /*The sender application in connection mode. Not NLL means connection mode is active*/
 static lv_app_style_t app_style; /*Styles for application related things*/
-
+static lv_wins_t wins_no_sb;    /*Used when the window is animated. (Do not use scrollbar during the anim.)*/
 /*Declare icons*/
 #if USE_IMG_CLOSE != 0
 LV_IMG_DECLARE(img_close);
@@ -799,8 +800,18 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_app_kb_close(false);
 
 #if  LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_WIN != 0
+    /*Temporally set no scrollbar style for the window*/
+    memcpy(&wins_no_sb, lv_obj_get_style(app->win), sizeof(lv_wins_t));
+    wins_no_sb.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
+    lv_obj_set_style(app->win, &wins_no_sb);
+    
+    /*Hide the control buttons and the title during the animation*/
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
+    
     lv_obj_anim(app->win, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_ANIM_WIN, 0, NULL);
 	lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
+    
 	lv_app_sc_close(app);
 	/*The animation will close the window*/
     return LV_ACTION_RES_OK;
@@ -878,7 +889,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     /*Make an animation on window open*/
 #if LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0
 
-    area_t cords; /*If no shortcut simulate one or load the its coordinates*/
+    area_t cords; /*If no shortcut simulate one and load the its coordinates*/
     if(app->sc == NULL) {
         cords.x1 = LV_HOR_RES / 2 - LV_APP_SC_WIDTH / 2;
         cords.y1 = LV_VER_RES / 2 - LV_APP_SC_HEIGHT / 2;
@@ -888,6 +899,15 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
         lv_obj_get_cords(app->sc, &cords);
     }
 
+    /*Temporally set no scrollbar style for the window*/
+    memcpy(&wins_no_sb, lv_obj_get_style(app->win), sizeof(lv_wins_t));
+    wins_no_sb.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
+    lv_obj_set_style(app->win, &wins_no_sb);
+    
+    /*Hide the control buttons and the title during the animation*/
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
+    
     anim_t a;
     a.act_time = 0;
     a.time = LV_APP_ANIM_WIN;
@@ -915,6 +935,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     a.start = cords.y1;
     a.end = 0;
     a.fp = (anim_fp_t) lv_obj_set_y;
+    a.end_cb = (anim_cb_t)lv_app_win_open_anim_cb;
     anim_create(&a);
 
 #endif /*LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0*/
@@ -939,7 +960,16 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     } else {
         lv_obj_get_cords(app->sc, &cords);
     }
+    
+    /*Temporally set no scrollbar style for the window*/
+    memcpy(&wins_no_sb, lv_obj_get_style(app->win), sizeof(lv_wins_t));
+    wins_no_sb.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
+    lv_obj_set_style(app->win, &wins_no_sb);
 
+    /*Hide the control buttons and the title during the animation*/
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
+    
     anim_t a;
     a.act_time = 0;
     a.time = LV_APP_ANIM_WIN;
@@ -979,6 +1009,22 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 }
 
 #if LV_APP_EFFECT_ANIM != 0
+
+
+/**
+ * Called when the window open animation is ready to close the application
+ * @param app_win pointer to a window
+ */
+static void lv_app_win_open_anim_cb(lv_obj_t * app_win)
+{
+    /*Unhide the title and the ctrl btn holder*/
+    lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->ctrl_holder, false);
+    lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->title, false);
+    
+    /*Restore the style*/
+    lv_obj_set_style(app_win, &app_style.win_style);
+}
+
 /**
  * Called when the window close animation is ready to close the application
  * @param app_win pointer to a window
@@ -988,6 +1034,8 @@ static void lv_app_win_close_anim_cb(lv_obj_t * app_win)
     lv_app_inst_t * app = lv_obj_get_free_p(app_win);
     lv_app_close(app);
 }
+
+
 /**
  * Called when the window minimization animation is ready to close the window
  * @param app_win pointer to a window
@@ -1129,7 +1177,7 @@ static void lv_app_init_style(void)
 	memcpy(&app_style.win_style.title, &app_style.menu_btn_label_style, sizeof(lv_labels_t));
 	memcpy(&app_style.win_style.ctrl_btn, &app_style.menu_btn_style, sizeof(lv_btns_t));
 	memcpy(&app_style.win_style.ctrl_img, &app_style.menu_btn_img_style, sizeof(lv_imgs_t));
-	app_style.win_style.header_opa = app_style.menu_opa;
+	app_style.win_style.header_opa = OPA_COVER; //app_style.menu_opa;
 	app_style.win_style.ctrl_btn_opa = app_style.menu_btn_opa;
 	app_style.win_style.header.vpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.header.hpad = 5 * LV_DOWNSCALE;
