@@ -769,41 +769,33 @@ static void start_send(lv_app_inst_t * app, const char * path)
     /*Open the file*/
     fs_res_t res = fs_open(&app_data->file, path, FS_MODE_RD);
     if(res == FS_RES_OK) {
-        uint32_t rn;
-        char rd_buf[LV_APP_FILES_CHUNK_MAX_SIZE];
+        app_data->send_in_prog = 1;
 
-        /*Read the first chunk*/
-        res = fs_read(&app_data->file, rd_buf, app_data->chunk_size, &rn);
-        if(res == FS_RES_OK) {
-            app_data->send_in_prog = 1;
-
-            /*Send the header*/
-            if(app_data->send_fn != 0) {
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->path, strlen(app_data->path));
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "/", 1);
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->fn, strlen(app_data->fn));
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-
-            if(app_data->send_size != 0) {
-                char buf[64];
-                uint32_t size;
-                fs_size(&app_data->file, &size);
-                sprintf(buf,"%d", (int) size);
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, buf, strlen(buf));
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-            if(app_data->send_crc != 0) {
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "0x0000", 6);
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-
-            /*Add an extra \n to separate the header from the file data*/
-            if(app_data->send_fn != 0 || app_data->send_size != 0 || app_data->send_crc != 0) {
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-
+        /*Send the header*/
+        if(app_data->send_fn != 0) {
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->path, strlen(app_data->path));
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "/", 1);
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->fn, strlen(app_data->fn));
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
         }
+
+        if(app_data->send_size != 0) {
+            char buf[64];
+            uint32_t size;
+            fs_size(&app_data->file, &size);
+            sprintf(buf,"%d", (int) size);
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, buf, strlen(buf));
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+        }
+        if(app_data->send_crc != 0) {
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "0x0000", 6);
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+        }
+
+        /*Add an extra \n to separate the header from the file data*/
+        if(app_data->send_fn != 0 || app_data->send_size != 0 || app_data->send_crc != 0) {
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+        } 
     }
 
     /*If an error occurred  close the file*/
