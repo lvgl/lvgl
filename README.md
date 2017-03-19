@@ -4,7 +4,7 @@ LittleV Graphical Library is C written software libraray which helps you to add 
 
 The library supports high level graphical effects, like anialaiasing, opacity, color fade etc.
 
-The GUI can be built from simle objects like screens, buttons labels, images etc.
+The GUI can be built from simple objects like screens, buttons labels, images etc.
 
 The "misc" modul is required to use use the library. (https://github.com/littlevgl/misc)
 
