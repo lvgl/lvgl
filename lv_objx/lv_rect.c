@@ -342,9 +342,6 @@ static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask)
 
 	memcpy(&light_style, style, sizeof(lv_rects_t));
 
-
-
-
 	light_style.empty = 1;
 	light_style.bwidth = light_size;
 	light_style.round = style->round;

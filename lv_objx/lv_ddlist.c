@@ -314,7 +314,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
             cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
             area_t rect_area;
             rect_area.y1 = ext->opt_label->cords.y1;
-            rect_area.y1 += ext->sel_opt * font_h + style->list_labels.line_space;
+            rect_area.y1 += ext->sel_opt * (font_h + style->list_labels.line_space);
             rect_area.y1 -= style->sel_rects.vpad;
 
             rect_area.y2 = rect_area.y1 + font_h + 2 * style->sel_rects.vpad;
@@ -434,9 +434,10 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     lv_ddlists_t * style = lv_obj_get_style(ddlist);
     const font_t * font = font_get(style->list_labels.font);
-
+    cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
+    
     lv_obj_set_y(lv_page_get_scrl(ddlist),
-                       -(ext->sel_opt * (font_get_height(font) + style->list_labels.line_space) +
+                       -(ext->sel_opt * (font_h + style->list_labels.line_space) +
                        style->pages.scrl_rects.vpad) + style->sel_rects.vpad);
 
 }
