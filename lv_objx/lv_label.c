@@ -358,7 +358,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     cord_t max_w = lv_obj_get_width(label);
     lv_labels_t * labels = lv_obj_get_style(label);
     const font_t * font = font_get(labels->font);
-    uint8_t letter_height = font_get_height(font);
+    uint8_t letter_height = font_get_height(font) >> LV_FONT_ANTIALIAS;
     cord_t y = 0;
     txt_flag_t flag = TXT_FLAG_NONE;
 
@@ -395,7 +395,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
             }
         }
 
-		x += font_get_width(font, text[i]) + labels->letter_space;
+		x += (font_get_width(font, text[i]) >> LV_FONT_ANTIALIAS) + labels->letter_space;
 	}
 
 	if(labels->mid != 0) {
@@ -425,7 +425,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     cord_t max_w = lv_obj_get_width(label);
     lv_labels_t * style = lv_obj_get_style(label);
     const font_t * font = font_get(style->font);
-    uint8_t letter_height = font_get_height(font);
+    uint8_t letter_height = font_get_height(font) >> LV_FONT_ANTIALIAS;
     cord_t y = 0;
     txt_flag_t flag = TXT_FLAG_NONE;
 
@@ -463,7 +463,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-		x += font_get_width(font, text[i]) + style->letter_space;
+		x += (font_get_width(font, text[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
 		if(pos->x < x) break;
 	}
 
@@ -595,7 +595,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.var = label;
             anim.repeat = 1;
             anim.playback = 1;
-            anim.start = font_get_width(font, ' ');
+            anim.start = font_get_width(font, ' ') >> LV_FONT_ANTIALIAS;
             anim.act_time = 0;
             anim.end_cb = NULL;
             anim.path = anim_get_path(ANIM_PATH_LIN);
@@ -605,7 +605,8 @@ static void lv_label_refr_text(lv_obj_t * label)
 
             bool hor_anim = false;
             if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
-                anim.end =  lv_obj_get_width(parent) - lv_obj_get_width(label) - font_get_width(font, ' ');
+                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label) -
+                           (font_get_width(font, ' ') >> LV_FONT_ANTIALIAS);
                 anim.fp = (anim_fp_t) lv_obj_set_x;
                 anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
                 anim_create(&anim);
@@ -613,7 +614,8 @@ static void lv_label_refr_text(lv_obj_t * label)
             }
 
             if(lv_obj_get_height(label) > lv_obj_get_height(parent)) {
-                anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) - font_get_height(font);
+                anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) -
+                                   (font_get_height(font) - LV_FONT_ANTIALIAS);
                 anim.fp = (anim_fp_t)lv_obj_set_y;
 
                 /*Different animation speed if horizontal animation is created too*/

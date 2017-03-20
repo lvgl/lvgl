@@ -326,9 +326,10 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	}
 
 	/*Check the bottom*/
-	if(label_cords.y1 + cur_pos.y + font_get_height(font_p) + style->pages.scrl_rects.vpad > ta_cords.y2) {
+	cord_t font_h = font_get_height(font_p) >> LV_FONT_ANTIALIAS;
+	if(label_cords.y1 + cur_pos.y + font_h + style->pages.scrl_rects.vpad > ta_cords.y2) {
 		lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) +
-				                     font_get_height(font_p) + 2 * style->pages.scrl_rects.vpad));
+				                     font_h + 2 * style->pages.scrl_rects.vpad));
 	}
 
 	lv_obj_inv(ta);
@@ -380,7 +381,8 @@ void lv_ta_cursor_down(lv_obj_t * ta)
 	/*Increment the y with one line and keep the valid x*/
 	lv_labels_t * label_style = lv_obj_get_style(ext->label);
 	const font_t * font_p = font_get(label_style->font);
-	pos.y += font_get_height(font_p) + label_style->line_space + 1;
+    cord_t font_h = font_get_height(font_p) >> LV_FONT_ANTIALIAS;
+	pos.y += font_h + label_style->line_space + 1;
 	pos.x = ext->cursor_valid_x;
 
 	/*Do not go below he last line*/
@@ -406,7 +408,8 @@ void lv_ta_cursor_up(lv_obj_t * ta)
 	/*Decrement the y with one line and keep the valid x*/
 	lv_labels_t * label_style = lv_obj_get_style(ext->label);
 	const font_t * font = font_get(label_style->font);
-	pos.y -= font_get_height(font) + label_style->line_space - 1;
+    cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
+	pos.y -= font_h + label_style->line_space - 1;
 	pos.x = ext->cursor_valid_x;
 
 	/*Get the letter index on the new cursor position and set it*/
@@ -543,7 +546,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - (ta_style->cursor_width >> 1);
 			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
 			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + (ta_style->cursor_width >> 1);
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + font_get_height(font_get(labels_p->font));
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + (font_get_height(font_get(labels_p->font)) >> LV_FONT_ANTIALIAS);
 
 			lv_rects_t cur_rects;
 			lv_rects_get(LV_RECTS_DEF, &cur_rects);

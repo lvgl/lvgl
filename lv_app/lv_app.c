@@ -21,7 +21,6 @@
 #include "../lv_appx/lv_app_sysmon.h"
 #include "../lv_appx/lv_app_terminal.h"
 #include "../lv_appx/lv_app_files.h"
-#include "../lv_appx/lv_app_visual.h"
 
 /*********************
  *      DEFINES

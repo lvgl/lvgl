@@ -311,12 +311,13 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         if(ext->opened != 0) {
             lv_ddlists_t * style = lv_obj_get_style(ddlist);
             const font_t * font = font_get(style->list_labels.font);
+            cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
             area_t rect_area;
             rect_area.y1 = ext->opt_label->cords.y1;
-            rect_area.y1 += ext->sel_opt * (font_get_height(font) + style->list_labels.line_space);
+            rect_area.y1 += ext->sel_opt * font_h + style->list_labels.line_space;
             rect_area.y1 -= style->sel_rects.vpad;
 
-            rect_area.y2 = rect_area.y1 + font_get_height(font) + 2 * style->sel_rects.vpad;
+            rect_area.y2 = rect_area.y1 + font_h + 2 * style->sel_rects.vpad;
             rect_area.x1 = ext->opt_label->cords.x1 - style->pages.scrl_rects.hpad;
             rect_area.x2 = rect_area.x1 + lv_obj_get_width(lv_page_get_scrl(ddlist));
 
@@ -393,14 +394,14 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     if(ext->opened != 0) { /*Open the list*/
         new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->pages.bg_rects.vpad;
         lv_obj_t * parent = lv_obj_get_parent(ddlist);
-        /*Reduce the height is enabler and required*/
+        /*Reduce the height if enabled and required*/
         if(ext->auto_size != 0 && new_height + ddlist->cords.y1 > parent->cords.y2) {
             new_height = parent->cords.y2 - ddlist->cords.y1;
-
         }
     } else { /*Close the list*/
         const font_t * font = font_get(style->list_labels.font);
-        new_height = font_get_height(font) +  2 * style->sel_rects.vpad;
+        cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
+        new_height = font_h +  2 * style->sel_rects.vpad;
     }
     if(anim_en == false) {
         lv_obj_set_height(ddlist, new_height);

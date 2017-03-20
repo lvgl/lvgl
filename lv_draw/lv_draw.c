@@ -311,7 +311,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
 
             if(cmd_state == CMD_STATE_IN)  letter_fp(&pos, mask_p, font_p, txt[i], recolor, opa);
             else letter_fp(&pos, mask_p, font_p, txt[i], style->objs.color, opa);
-            pos.x += font_get_width(font_p, txt[i]) + style->letter_space;
+            pos.x += (font_get_width(font_p, txt[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
         }
         /*Go to next line*/
         line_start = line_end;
@@ -325,7 +325,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
             pos.x += (w - line_length) / 2;
         }
         /*Go the next line position*/
-        pos.y += font_get_height(font_p);
+        pos.y += font_get_height(font_p) >> LV_FONT_ANTIALIAS;
         pos.y += style->line_space;
     }
 }

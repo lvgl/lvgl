@@ -57,13 +57,13 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     cord_t act_line_length;
-    uint8_t letter_height = font_get_height(font);
+    uint8_t letter_height = font_get_height(font) >> LV_FONT_ANTIALIAS;
 
     /*Calc. the height and longest line*/
     while (text[line_start] != '\0')
     {
         new_line_start += txt_get_next_line(&text[line_start], font, letter_space, max_width, flag);
-        size_res->y += letter_height;
+        size_res->y += letter_height ;
         size_res->y += line_space;
 
 		/*Calculate the the longest line*/
@@ -125,7 +125,7 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font,
             return i+1;    /*Return with the first letter of the next line*/
 
         } else { /*Check the actual length*/
-            act_l += font_get_width(font, txt[i]);
+            act_l += font_get_width(font, txt[i]) >> LV_FONT_ANTIALIAS;
             
             /*If the txt is too long then finish, this is the line end*/
             if(act_l > max_l) {
@@ -183,14 +183,14 @@ cord_t txt_get_width(const char * txt, uint16_t char_num,
                     continue;
                 }
             }
-            len += font_get_width(font, txt[i]);
+            len += font_get_width(font, txt[i]) >> LV_FONT_ANTIALIAS;
             len += letter_space;
         }
         
         /*Trim closing spaces */
         for(i = char_num - 1; i > 0; i--) {
             if(txt[i] == ' ') {
-                len -= font_get_width(font, txt[i]);
+                len -= font_get_width(font, txt[i]) >> LV_FONT_ANTIALIAS;
                 len -= letter_space;
             } else {
                 break;

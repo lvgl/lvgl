@@ -11,7 +11,6 @@
  *********************/
 #include "lv_conf.h"
 #if USE_LV_DDLIST != 0
-
 #include "../lv_obj/lv_obj.h"
 #include "../lv_objx/lv_page.h"
 #include "../lv_objx/lv_label.h"
