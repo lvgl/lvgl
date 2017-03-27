@@ -10,17 +10,19 @@
 
 #if LV_APP_ENABLE != 0
 #include <stdio.h>
+#include "lvgl/lv_misc/anim.h"
+#include "lvgl/lv_obj/lv_refr.h"
 
 #include "lv_app_util/lv_app_kb.h"
 #include "lv_app_util/lv_app_notice.h"
 #include "lv_app_util/lv_app_fsel.h"
 
-#include "lvgl/lv_misc/anim.h"
 
 #include "../lv_appx/lv_app_example.h"
 #include "../lv_appx/lv_app_sysmon.h"
 #include "../lv_appx/lv_app_terminal.h"
 #include "../lv_appx/lv_app_files.h"
+#include "../lv_appx/lv_app_visual.h"
 
 /*********************
  *      DEFINES
@@ -75,7 +77,7 @@ static lv_obj_t * app_list;  /*A list which is opened on 'app_btn' release*/
 static lv_obj_t * sc_page;   /*A page for the shortcuts */
 static lv_app_inst_t * con_send; /*The sender application in connection mode. Not NLL means connection mode is active*/
 static lv_app_style_t app_style; /*Styles for application related things*/
-static lv_wins_t wins_no_sb;    /*Used when the window is animated. (Do not use scrollbar during the anim.)*/
+static lv_wins_t wins_anim;    /*Used when the window is animated. (Do not use scrollbar during the anim.)*/
 /*Declare icons*/
 #if USE_IMG_CLOSE != 0
 LV_IMG_DECLARE(img_close);
@@ -254,7 +256,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
     #if LV_APP_EFFECT_ANIM != 0
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
     #else
-        lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(font_get(app_style.sc_title_style.font)));
+        lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(font_get(app_style.sc_title_style.font)) >> LV_FONT_ANTIALIAS);
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_DOTS);
     #endif
         lv_label_set_text(app->sc_title, app->name);
@@ -799,14 +801,24 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 	lv_app_kb_close(false);
 
 #if  LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_WIN != 0
-    /*Temporally set no scrollbar style for the window*/
-    memcpy(&wins_no_sb, lv_obj_get_style(app->win), sizeof(lv_wins_t));
-    wins_no_sb.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
-    lv_obj_set_style(app->win, &wins_no_sb);
+    /*Temporally set a simpler style for the window during the animation*/
+    memcpy(&wins_anim, lv_obj_get_style(app->win), sizeof(lv_wins_t));
+    wins_anim.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
+    /*Mix a new color for the header instead of using opacity */
+    wins_anim.header_opa = OPA_COVER;
+    wins_anim.header.gcolor = color_mix(wins_anim.header.gcolor,
+                                        app_style.win_style.pages.bg_rects.gcolor,
+                                        app_style.win_style.header_opa);
+
+    wins_anim.header.objs.color = color_mix(wins_anim.header.objs.color,
+                                        app_style.win_style.pages.bg_rects.objs.color,
+                                        app_style.win_style.header_opa);
+    lv_obj_set_style(app->win, &wins_anim);
     
-    /*Hide the control buttons and the title during the animation*/
+    /*Hide some elements to speed up the animation*/
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
     
     lv_obj_anim(app->win, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_ANIM_WIN, 0, NULL);
 	lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
@@ -898,14 +910,24 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
         lv_obj_get_cords(app->sc, &cords);
     }
 
-    /*Temporally set no scrollbar style for the window*/
-    memcpy(&wins_no_sb, lv_obj_get_style(app->win), sizeof(lv_wins_t));
-    wins_no_sb.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
-    lv_obj_set_style(app->win, &wins_no_sb);
+    /*Temporally set a simpler style for the window during the animation*/
+    memcpy(&wins_anim, lv_obj_get_style(app->win), sizeof(lv_wins_t));
+    wins_anim.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
+    /*Mix a new color for the header instead of using opacity */
+    wins_anim.header_opa = OPA_COVER;
+    wins_anim.header.gcolor = color_mix(wins_anim.header.gcolor,
+                                        app_style.win_style.pages.bg_rects.gcolor,
+                                        app_style.win_style.header_opa);
+
+    wins_anim.header.objs.color = color_mix(wins_anim.header.objs.color,
+                                        app_style.win_style.pages.bg_rects.objs.color,
+                                        app_style.win_style.header_opa);
+    lv_obj_set_style(app->win, &wins_anim);
     
-    /*Hide the control buttons and the title during the animation*/
+    /*Hide some elements to speed up the animation*/
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
     
     anim_t a;
     a.act_time = 0;
@@ -939,6 +961,14 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
 
 #endif /*LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0*/
 
+    /* Now a screen sized window is created but is is resized by the animations.
+     * Therefore the whole screen invalidated but only a small part is changed.
+     * So clear the invalidate buffer an refresh only the real area.
+     * Independently other parts on  the screen might be changed
+     * but they will be covered by the window after the animations*/
+    lv_inv_area(NULL);
+    lv_inv_area(&cords);
+    
     return LV_ACTION_RES_OK;
 }
 
@@ -959,15 +989,25 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     } else {
         lv_obj_get_cords(app->sc, &cords);
     }
-    
-    /*Temporally set no scrollbar style for the window*/
-    memcpy(&wins_no_sb, lv_obj_get_style(app->win), sizeof(lv_wins_t));
-    wins_no_sb.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
-    lv_obj_set_style(app->win, &wins_no_sb);
 
-    /*Hide the control buttons and the title during the animation*/
+    /*Temporally set a simpler style for the window during the animation*/
+    memcpy(&wins_anim, lv_obj_get_style(app->win), sizeof(lv_wins_t));
+    wins_anim.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
+    /*Mix a new color for the header instead of using opacity */
+    wins_anim.header_opa = OPA_COVER;
+    wins_anim.header.gcolor = color_mix(wins_anim.header.gcolor,
+                                        app_style.win_style.pages.bg_rects.gcolor,
+                                        app_style.win_style.header_opa);
+
+    wins_anim.header.objs.color = color_mix(wins_anim.header.objs.color,
+                                        app_style.win_style.pages.bg_rects.objs.color,
+                                        app_style.win_style.header_opa);
+    lv_obj_set_style(app->win, &wins_anim);
+
+    /*Hide some elements to speed up the animation*/
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
     
     anim_t a;
     a.act_time = 0;
@@ -1016,9 +1056,10 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
  */
 static void lv_app_win_open_anim_cb(lv_obj_t * app_win)
 {
-    /*Unhide the title and the ctrl btn holder*/
+    /*Unhide the the elements*/
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->ctrl_holder, false);
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->title, false);
+    lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->page.scrl, false);
     
     /*Restore the style*/
     lv_obj_set_style(app_win, &app_style.win_style);
@@ -1065,7 +1106,11 @@ static void lv_app_init_style(void)
 #else
     app_style.menu_opa = OPA_80;
     app_style.menu_btn_opa = OPA_50;
-    app_style.sc_opa = OPA_80;
+    app_style.sc_opa = OPA_70;
+    
+//    app_style.menu_opa = OPA_COVER;
+//    app_style.menu_btn_opa = OPA_COVER;
+//    app_style.sc_opa = OPA_COVER;
 #endif
 
 	/*Menu style*/
@@ -1176,7 +1221,7 @@ static void lv_app_init_style(void)
 	memcpy(&app_style.win_style.title, &app_style.menu_btn_label_style, sizeof(lv_labels_t));
 	memcpy(&app_style.win_style.ctrl_btn, &app_style.menu_btn_style, sizeof(lv_btns_t));
 	memcpy(&app_style.win_style.ctrl_img, &app_style.menu_btn_img_style, sizeof(lv_imgs_t));
-	app_style.win_style.header_opa = OPA_COVER; //app_style.menu_opa;
+	app_style.win_style.header_opa = app_style.menu_opa;
 	app_style.win_style.ctrl_btn_opa = app_style.menu_btn_opa;
 	app_style.win_style.header.vpad = 5 * LV_DOWNSCALE;
 	app_style.win_style.header.hpad = 5 * LV_DOWNSCALE;

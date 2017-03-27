@@ -385,12 +385,19 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
         color_t prev_color = COLOR_BLACK;
         cord_t map_col;
 
-        /*The most simple case (but upscale): o opacity, no recolor, no transp. pixels*/
-        if(transp == false && opa == OPA_COVER && recolor_opa == OPA_TRANSP) {
+        /*The most simple case (but upscale): 0 opacity, no recolor, no transp. pixels*/
+        if(transp == false && opa == OPA_COVER && recolor_opa == OPA_TRANSP) { 
+                cord_t map_col_start = masked_a.x1 >> 1;
+                cord_t map_col_end = masked_a.x2 >> 1;
+                cord_t map_col;
+                cord_t vdb_col = masked_a.x1;
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
-               for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-                   map_col = col >> 1;
-                   vdb_buf_tmp[col].full = map_p[map_col].full;
+                map_col_start = masked_a.x1 >> 1;
+                map_col_end = masked_a.x2 >> 1;
+                vdb_col = masked_a.x1;
+               for(map_col = map_col_start; map_col <= map_col_end; map_col ++, vdb_col += 2) {
+                   vdb_buf_tmp[vdb_col].full = map_p[map_col].full;
+                   vdb_buf_tmp[vdb_col + 1].full = map_p[map_col].full;
                }
                if((row & 0x1) != 0) map_p += map_width; /*Next row on the map*/
                vdb_buf_tmp += vdb_width ;        /*Next row on the VDB*/

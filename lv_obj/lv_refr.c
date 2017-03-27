@@ -45,8 +45,8 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_join_t inv_buf[LV_INV_FIFO_SIZE];
-uint16_t inv_buf_p;
+static lv_join_t inv_buf[LV_INV_FIFO_SIZE];
+static uint16_t inv_buf_p;
 
 /**********************
  *      MACROS
@@ -76,6 +76,12 @@ void lv_refr_init(void)
  */
 void lv_inv_area(const area_t * area_p)
 {
+    /*Clear the invalidate buffer if the parameter is NULL*/
+    if(area_p == NULL) {
+        inv_buf_p = 0;
+        return;
+    }
+    
     area_t scr_area;
     scr_area.x1 = 0;
     scr_area.y1 = 0;
