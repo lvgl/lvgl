@@ -50,21 +50,20 @@ typedef struct
 /*Style of label*/
 typedef struct
 {
-	lv_objs_t objs;		/*Style of ancestor*/
+	lv_objs_t base;		/*Style of ancestor*/
 	/*New style element for this type */
-    font_types_t font;      /*Name of the font. E.g: FONT_DEJAVU_20*/
-    uint16_t letter_space;
-    uint16_t line_space;
+    const font_t * font;      /*Pointer to a font*/
+    cord_t letter_space;
+    cord_t line_space;
     uint8_t mid         :1; /*1: Align the lines into the middle*/
 }lv_labels_t;
 
 /*Built-in styles of label*/
 typedef enum
 {
-	LV_LABELS_DEF,
-	LV_LABELS_BTN,
-	LV_LABELS_TXT,
 	LV_LABELS_TITLE,
+	LV_LABELS_TXT,
+	LV_LABELS_BTN,
 }lv_labels_builtin_t;
 
 /**********************

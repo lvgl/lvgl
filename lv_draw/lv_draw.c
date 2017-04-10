@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_img.c
+ * @file lv_draw.c
  * 
  */
 
@@ -42,10 +42,10 @@ typedef enum
  *  STATIC PROTOTYPES
  **********************/
 #if USE_LV_RECT != 0
-static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
-static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
-static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
-static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa);
+static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p);
+static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p);
+static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p);
+static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p);
 static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h);
 #endif /*USE_LV_RECT != 0*/
 
@@ -70,13 +70,13 @@ static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color
 
 #if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 static lv_rects_t lv_img_no_pic_rects = {
-  .objs.color = COLOR_BLACK, .gcolor = COLOR_BLACK,
+  .base.color = COLOR_BLACK, .gcolor = COLOR_BLACK,
   .bcolor = COLOR_RED, .bwidth = 2 * LV_DOWNSCALE, .bopa = 100,
-  .round = 0, .empty = 0
+  .radius = 0, .empty = 0
 };
 
 static lv_labels_t lv_img_no_pic_labels = {
-  .font = LV_FONT_DEFAULT, .objs.color = COLOR_WHITE,
+  .base.color = COLOR_WHITE,
   .letter_space = 1 * LV_DOWNSCALE, .line_space =  1 * LV_DOWNSCALE,
   .mid =  1,
 };
@@ -96,26 +96,24 @@ static lv_labels_t lv_img_no_pic_labels = {
  * @param cords_p the coordinates of the rectangle
  * @param mask_p the rectangle will be drawn only in this mask
  * @param rects_p pointer to a rectangle style
- * @param opa the opacity of the rectangle (0..255)
  */
-void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, 
-                  const lv_rects_t * rects_p, opa_t opa)
+void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p)
 {
     if(area_get_height(cords_p) < 1 || area_get_width(cords_p) < 1) return;
 
     if(rects_p->empty == 0){
-        lv_draw_rect_main_mid(cords_p, mask_p, rects_p, opa);
+        lv_draw_rect_main_mid(cords_p, mask_p, rects_p);
 
-        if(rects_p->round != 0) {
-            lv_draw_rect_main_corner(cords_p, mask_p, rects_p, opa);
+        if(rects_p->radius != 0) {
+            lv_draw_rect_main_corner(cords_p, mask_p, rects_p);
         }
     } 
     
     if(rects_p->bwidth != 0) {
-        lv_draw_rect_border_straight(cords_p, mask_p, rects_p, opa);
+        lv_draw_rect_border_straight(cords_p, mask_p, rects_p);
 
-        if(rects_p->round != 0) {
-            lv_draw_rect_border_corner(cords_p, mask_p, rects_p, opa);
+        if(rects_p->radius != 0) {
+            lv_draw_rect_border_corner(cords_p, mask_p, rects_p);
         }
     }
 }
@@ -236,21 +234,20 @@ void lv_draw_triangle(const point_t * points, const area_t * mask_p, color_t col
  * @param cords_p coordinates of the label
  * @param mask_p the label will be drawn only in this area
  * @param labels_p pointer to a label style
- * @param opa opacity of the text (0..255)
  * @param txt 0 terminated text to write
  * @param flag settings for the text from 'txt_flag_t' enum
  */
-void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
-                   const lv_labels_t * style, opa_t opa, const char * txt, txt_flag_t flag)
+void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_labels_t * style,
+                    const char * txt, txt_flag_t flag)
 {
-    const font_t * font_p = font_get(style->font);
+    const font_t * font = style->font;
 
     cord_t w = area_get_width(cords_p);
 
     /*Init variables for the first line*/
     cord_t line_length = 0;
     uint32_t line_start = 0;
-    uint32_t line_end = txt_get_next_line(txt, font_p, style->letter_space, w, flag);
+    uint32_t line_end = txt_get_next_line(txt, font, style->letter_space, w, flag);
 
     point_t pos;
     pos.x = cords_p->x1;
@@ -259,7 +256,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
     /*Align the line to middle if enabled*/
     if(style->mid != 0) {
         line_length = txt_get_width(&txt[line_start], line_end - line_start,
-                                    font_p, style->letter_space, flag);
+                                    font, style->letter_space, flag);
         pos.x += (w - line_length) / 2;
     }
 
@@ -301,7 +298,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
                             sscanf(buf, "%02x%02x%02x", &r, &g, &b);
                             recolor = COLOR_MAKE(r, g, b);
                         } else {
-                            recolor.full = style->objs.color.full;
+                            recolor.full = style->base.color.full;
                         }
                         cmd_state = CMD_STATE_IN; /*After the parameter the text is in the command*/
                     }
@@ -309,23 +306,23 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
                 }
             }
 
-            if(cmd_state == CMD_STATE_IN)  letter_fp(&pos, mask_p, font_p, txt[i], recolor, opa);
-            else letter_fp(&pos, mask_p, font_p, txt[i], style->objs.color, opa);
-            pos.x += (font_get_width(font_p, txt[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
+            if(cmd_state == CMD_STATE_IN)  letter_fp(&pos, mask_p, font, txt[i], recolor, style->base.opa);
+            else letter_fp(&pos, mask_p, font, txt[i], style->base.color, style->base.opa);
+            pos.x += (font_get_width(font, txt[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
         }
         /*Go to next line*/
         line_start = line_end;
-        line_end += txt_get_next_line(&txt[line_start], font_p, style->letter_space, w, flag);
+        line_end += txt_get_next_line(&txt[line_start], font, style->letter_space, w, flag);
 
         pos.x = cords_p->x1;
         /*Align to middle*/
         if(style->mid != 0) {
             line_length = txt_get_width(&txt[line_start], line_end - line_start,
-                                     font_p, style->letter_space, flag);
+                                     font, style->letter_space, flag);
             pos.x += (w - line_length) / 2;
         }
         /*Go the next line position*/
-        pos.y += font_get_height(font_p) >> LV_FONT_ANTIALIAS;
+        pos.y += font_get_height(font) >> LV_FONT_ANTIALIAS;
         pos.y += style->line_space;
     }
 }
@@ -341,11 +338,12 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p,
  * @param opa opacity of the image (0..255)
  */
 void lv_draw_img(const area_t * cords_p, const area_t * mask_p, 
-             const lv_imgs_t * imgs_p,  opa_t opa, const char * fn)
+             const lv_imgs_t * style, const char * fn)
 {
     if(fn == NULL) {
-        lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-        lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, "No data", TXT_FLAG_NONE);
+        lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects);
+        if(lv_img_no_pic_labels.font == NULL) lv_img_no_pic_labels.font = font_get(LV_FONT_DEFAULT);
+        lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, "No data", TXT_FLAG_NONE);
     } else {
         fs_file_t file;
         fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
@@ -414,15 +412,15 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
                     uint8_t * f_data = ((ufs_file_t*)file.file_d)->ent->data_d;
                     f_data += ((ufs_file_t*)file.file_d)->rwp;
                     ((ufs_file_t*)file.file_d)->rwp += useful_data;
-                    map_fp(&act_area, &mask_sub, (void*)f_data , opa, header.transp, upscale,
-                              imgs_p->objs.color, imgs_p->recolor_opa);
+                    map_fp(&act_area, &mask_sub, (void*)f_data , style->base.opa, header.transp, upscale,
+                              style->base.color, style->recolor_opa);
                 } 
                 /*Or read the NOT const files normally*/
                 else {
                     color_t buf[LV_HOR_RES];
                     res = fs_read(&file, buf, useful_data, &br);
-                    map_fp(&act_area, &mask_sub, buf, opa, header.transp, upscale,
-                              imgs_p->objs.color, imgs_p->recolor_opa);
+                    map_fp(&act_area, &mask_sub, buf, style->base.opa, header.transp, upscale,
+                              style->base.color, style->recolor_opa);
                 }
                 
                 fs_tell(&file, &act_pos);
@@ -435,8 +433,9 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
         fs_close(&file);
 
         if(res != FS_RES_OK) {
-            lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects, opa);
-            lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, opa, fn, TXT_FLAG_NONE);
+            lv_draw_rect(cords_p, mask_p, &lv_img_no_pic_rects);
+            if(lv_img_no_pic_labels.font == NULL) lv_img_no_pic_labels.font = font_get(LV_FONT_DEFAULT);
+            lv_draw_label(cords_p, mask_p,&lv_img_no_pic_labels, fn, TXT_FLAG_NONE);
         }
     }
 }
@@ -451,12 +450,11 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
  * @param p2 second point of the line
  * @param mask_pthe line will be drawn only on this area 
  * @param lines_p pointer to a line style
- * @param opa opacity of the line (0..255)
  */
 void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p, 
-                  const lv_lines_t * lines_p, opa_t opa)
+                  const lv_lines_t * style)
 {
-	if(lines_p->width == 0) return;
+	if(style->width == 0) return;
 
 	if(p1->x == p2->x && p1->y == p2->y) return;
 
@@ -492,7 +490,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 	}
 
     /*Make the correction on lie width*/
-	width = ((lines_p->width - 1) * width_corr_array[wcor]) >> LINE_WIDTH_CORR_SHIFT;
+	width = ((style->width - 1) * width_corr_array[wcor]) >> LINE_WIDTH_CORR_SHIFT;
 	width_half = width >> 1;
 	width_1 = width & 0x1 ? 1 : 0;
 
@@ -511,7 +509,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
+		  fill_fp(&draw_area, mask_p, style->base.color, style->base.opa);
 	  }
 	  if (hor == false && last_x != act_point.x) {
 		  area_t act_area;
@@ -527,7 +525,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		  fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
+		  fill_fp(&draw_area, mask_p, style->base.color, style->base.opa);
 	  }
 
 		/*Calc. the next point of the line*/
@@ -555,7 +553,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
+		fill_fp(&draw_area, mask_p, style->base.color, style->base.opa);
 	}
 	if (hor == false) {
 		area_t act_area;
@@ -569,7 +567,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		fill_fp(&draw_area, mask_p, lines_p->objs.color, opa);
+		fill_fp(&draw_area, mask_p, style->base.color, style->base.opa);
 	}
 }
 #endif /*USE_LV_LINE != 0*/
@@ -584,15 +582,15 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
  * @param cords_p the coordinates of the original rectangle
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
- * @param opa opacity of the rectangle (0..255)
  */
-static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa)
+static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p)
 {
-    uint16_t radius = rects_p->round;
+    uint16_t radius = rects_p->radius;
 
-    color_t main_color = rects_p->objs.color;
-    color_t grad_color = rects_p->gcolor;
+    color_t mcolor = rects_p->base.color;
+    color_t gcolor = rects_p->gcolor;
     uint8_t mix;
+    opa_t opa = rects_p->base.opa;
     cord_t height = area_get_height(cords_p);
     cord_t width = area_get_width(cords_p);
 
@@ -605,10 +603,10 @@ static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p,
 	work_area.x1 = cords_p->x1;
 	work_area.x2 = cords_p->x2;
 
-    if(main_color.full == grad_color.full) {
+    if(mcolor.full == gcolor.full) {
     	work_area.y1 = cords_p->y1 + radius;
     	work_area.y2 = cords_p->y2 - radius;
-		fill_fp(&work_area, mask_p, main_color, opa);
+		fill_fp(&work_area, mask_p, mcolor, opa);
     } else {
 
 		cord_t row;
@@ -623,7 +621,7 @@ static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p,
 			work_area.y1 = row;
 			work_area.y2 = row;
 			mix = (uint32_t)((uint32_t)(cords_p->y2 - work_area.y1) * 255) / height;
-			act_color = color_mix(main_color, grad_color, mix);
+			act_color = color_mix(mcolor, gcolor, mix);
 
 			fill_fp(&work_area, mask_p, act_color, opa);
 		}
@@ -634,15 +632,15 @@ static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p,
  * @param cords_p the coordinates of the original rectangle
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
- * @param opa opacity of the rectangle (0..255)
  */
-static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa)
+static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p)
 {
-    uint16_t radius = rects_p->round;
+    uint16_t radius = rects_p->radius;
 
-    color_t main_color = rects_p->objs.color;
-    color_t grad_color = rects_p->gcolor;
+    color_t mcolor = rects_p->base.color;
+    color_t gcolor = rects_p->gcolor;
     color_t act_color;
+    opa_t opa = rects_p->base.opa;
     uint8_t mix;
     cord_t height = area_get_height(cords_p);
     cord_t width = area_get_width(cords_p);
@@ -735,25 +733,25 @@ static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask
         /*Draw the areas which are not disabled*/
         if(edge_top_refr != 0){
             mix = (uint32_t)((uint32_t)(cords_p->y2 - edge_top_area.y1)  * 255) / height;
-            act_color = color_mix(main_color, grad_color, mix);
+            act_color = color_mix(mcolor, gcolor, mix);
             fill_fp(&edge_top_area, mask_p, act_color, opa);
         }
 
         if(mid_top_refr != 0) {
             mix = (uint32_t)((uint32_t)(cords_p->y2 - mid_top_area.y1) * 255) / height;
-            act_color = color_mix(main_color, grad_color, mix);
+            act_color = color_mix(mcolor, gcolor, mix);
             fill_fp(&mid_top_area, mask_p, act_color, opa);
         }
 
         if(mid_bot_refr != 0) {
             mix = (uint32_t)((uint32_t)(cords_p->y2 - mid_bot_area.y1) * 255) / height;
-            act_color = color_mix(main_color, grad_color, mix);
+            act_color = color_mix(mcolor, gcolor, mix);
             fill_fp(&mid_bot_area, mask_p, act_color, opa);
         }
 
         if(edge_bot_refr != 0) {
             mix = (uint32_t)((uint32_t)(cords_p->y2 - edge_bot_area.y1) * 255) / height;
-            act_color = color_mix(main_color, grad_color, mix);
+            act_color = color_mix(mcolor, gcolor, mix);
             fill_fp(&edge_bot_area, mask_p, act_color, opa);
         }
          /*Save the current coordinates*/
@@ -781,20 +779,20 @@ static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask
     }
 
 	mix = (uint32_t)((uint32_t)(cords_p->y2 - edge_top_area.y1)  * 255) / height;
-	act_color = color_mix(main_color, grad_color, mix);
+	act_color = color_mix(mcolor, gcolor, mix);
 	fill_fp(&edge_top_area, mask_p, act_color, opa);
 if(edge_top_area.y1 != mid_top_area.y1) {
 		mix = (uint32_t)((uint32_t)(cords_p->y2 - mid_top_area.y1) * 255) / height;
-		act_color = color_mix(main_color, grad_color, mix);
+		act_color = color_mix(mcolor, gcolor, mix);
 		fill_fp(&mid_top_area, mask_p, act_color, opa);
 	}
 	mix = (uint32_t)((uint32_t)(cords_p->y2 - mid_bot_area.y1) * 255) / height;
-	act_color = color_mix(main_color, grad_color, mix);
+	act_color = color_mix(mcolor, gcolor, mix);
 	fill_fp(&mid_bot_area, mask_p, act_color, opa);
 
 	if(edge_bot_area.y1 != mid_bot_area.y1) {
 		mix = (uint32_t)((uint32_t)(cords_p->y2 - edge_bot_area.y1) * 255) / height;
-		act_color = color_mix(main_color, grad_color, mix);
+		act_color = color_mix(mcolor, gcolor, mix);
 		fill_fp(&edge_bot_area, mask_p, act_color, opa);
 	}
 
@@ -805,28 +803,27 @@ if(edge_top_area.y1 != mid_top_area.y1) {
  * @param cords_p the coordinates of the original rectangle
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
- * @param opa opacity of the rectangle (0..255)
  */
-static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p, opa_t opa)
+static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_rects_t * rects_p)
 {
-    uint16_t radius = rects_p->round;
+    uint16_t radius = rects_p->radius;
 
     cord_t width = area_get_width(cords_p);
     cord_t height = area_get_height(cords_p);
-    uint16_t b_width = rects_p->bwidth;
-    opa_t b_opa = (uint16_t)((uint16_t) opa * rects_p->bopa) / 100;
+    uint16_t bwidth = rects_p->bwidth;
+    opa_t bopa = (uint16_t)((uint16_t) rects_p->base.opa * rects_p->bopa) >> 8;
     area_t work_area;
     cord_t length_corr = 0;
     cord_t corner_size = 0;
 
     /*the 0 px border width drawn as 1 px, so decrement the b_width*/
-    b_width--;
+    bwidth--;
 
     radius = lv_draw_rect_radius_corr(radius, width, height);
 
-    if(radius < b_width) {
-        length_corr = b_width - radius;
-        corner_size = b_width;
+    if(radius < bwidth) {
+        length_corr = bwidth - radius;
+        corner_size = bwidth;
     } else {
         corner_size = radius;
     }
@@ -838,53 +835,53 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
 
     /*Left border*/
     work_area.x1 = cords_p->x1;
-    work_area.x2 = work_area.x1 + b_width;
+    work_area.x2 = work_area.x1 + bwidth;
     work_area.y1 = cords_p->y1 + corner_size;
     work_area.y2 = cords_p->y2 - corner_size;
-    fill_fp(&work_area, mask_p, b_color, b_opa);
+    fill_fp(&work_area, mask_p, b_color, bopa);
 
     /*Right border*/
     work_area.x2 = cords_p->x2;
-    work_area.x1 = work_area.x2 - b_width;
-    fill_fp(&work_area, mask_p, b_color, b_opa);
+    work_area.x1 = work_area.x2 - bwidth;
+    fill_fp(&work_area, mask_p, b_color, bopa);
 
     /*Upper border*/
     work_area.x1 = cords_p->x1 + corner_size - length_corr;
     work_area.x2 = cords_p->x2 - corner_size + length_corr;
     work_area.y1 = cords_p->y1;
-    work_area.y2 = cords_p->y1 + b_width;
-    fill_fp(&work_area, mask_p, b_color, b_opa);
+    work_area.y2 = cords_p->y1 + bwidth;
+    fill_fp(&work_area, mask_p, b_color, bopa);
 
     /*Lower border*/
     work_area.y2 = cords_p->y2;
-    work_area.y1 = work_area.y2 - b_width;
-    fill_fp(&work_area, mask_p, b_color, b_opa);
+    work_area.y1 = work_area.y2 - bwidth;
+    fill_fp(&work_area, mask_p, b_color, bopa);
 
     /*Draw the a remaining rectangles if the radius is smaller then b_width */
     if(length_corr != 0) {
         work_area.x1 = cords_p->x1;
         work_area.x2 = cords_p->x1 + radius;
         work_area.y1 = cords_p->y1 + radius + 1;
-        work_area.y2 = cords_p->y1 + b_width;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        work_area.y2 = cords_p->y1 + bwidth;
+        fill_fp(&work_area, mask_p, b_color, bopa);
 
         work_area.x1 = cords_p->x2 - radius;
         work_area.x2 = cords_p->x2;
         work_area.y1 = cords_p->y1 + radius + 1;
-        work_area.y2 = cords_p->y1 + b_width;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        work_area.y2 = cords_p->y1 + bwidth;
+        fill_fp(&work_area, mask_p, b_color, bopa);
 
         work_area.x1 = cords_p->x1;
         work_area.x2 = cords_p->x1 + radius;
-        work_area.y1 = cords_p->y2 - b_width;
+        work_area.y1 = cords_p->y2 - bwidth;
         work_area.y2 = cords_p->y2 - radius - 1;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        fill_fp(&work_area, mask_p, b_color, bopa);
 
         work_area.x1 = cords_p->x2 - radius;
         work_area.x2 = cords_p->x2;
-        work_area.y1 = cords_p->y2 - b_width;
+        work_area.y1 = cords_p->y2 - bwidth;
         work_area.y2 = cords_p->y2 - radius - 1;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        fill_fp(&work_area, mask_p, b_color, bopa);
     }
 
     /*If radius == 0 one px on the corners are not drawn*/
@@ -893,25 +890,25 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
         work_area.x2 = cords_p->x1;
         work_area.y1 = cords_p->y1;
         work_area.y2 = cords_p->y1;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        fill_fp(&work_area, mask_p, b_color, bopa);
 
         work_area.x1 = cords_p->x2;
         work_area.x2 = cords_p->x2;
         work_area.y1 = cords_p->y1;
         work_area.y2 = cords_p->y1;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        fill_fp(&work_area, mask_p, b_color, bopa);
 
         work_area.x1 = cords_p->x1;
         work_area.x2 = cords_p->x1;
         work_area.y1 = cords_p->y2;
         work_area.y2 = cords_p->y2;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        fill_fp(&work_area, mask_p, b_color, bopa);
 
         work_area.x1 = cords_p->x2;
         work_area.x2 = cords_p->x2;
         work_area.y1 = cords_p->y2;
         work_area.y2 = cords_p->y2;
-        fill_fp(&work_area, mask_p, b_color, b_opa);
+        fill_fp(&work_area, mask_p, b_color, bopa);
     }
 }
 
@@ -923,15 +920,15 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
  * @param rects_p pointer to a rectangle style
  * @param opa opacity of the rectangle (0..255)
  */
-static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const  lv_rects_t * rects_p, opa_t opa)
+static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const  lv_rects_t * rects_p)
 {
-    uint16_t radius = rects_p->round;
-    uint16_t b_width = rects_p->bwidth;
-    color_t b_color = rects_p->bcolor;
-    opa_t b_opa = (uint16_t)((uint16_t) opa * rects_p->bopa ) / 100;
+    uint16_t radius = rects_p->radius;
+    uint16_t bwidth = rects_p->bwidth;
+    color_t bcolor = rects_p->bcolor;
+    opa_t bopa = (uint16_t)((uint16_t) rects_p->base.opa * rects_p->bopa ) >> 8;
 
-    /*0 px border width drawn as 1 px, so decrement the b_width*/
-    b_width--;
+    /*0 px border width drawn as 1 px, so decrement the bwidth*/
+    bwidth--;
 
     cord_t width = area_get_width(cords_p);
     cord_t height = area_get_height(cords_p);
@@ -961,7 +958,7 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
 
     point_t cir_in;
     cord_t tmp_in;
-    cord_t radius_in = radius - b_width;
+    cord_t radius_in = radius - bwidth;
 
     if(radius_in < 0){
         radius_in = 0;
@@ -989,26 +986,26 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
         circ_area.x2 = rb_origo.x + CIRC_OCT1_X(cir_out);
         circ_area.y1 = rb_origo.y + CIRC_OCT1_Y(cir_out);
         circ_area.y2 = rb_origo.y + CIRC_OCT1_Y(cir_out);
-        fill_fp(&circ_area, mask_p, b_color, b_opa);
+        fill_fp(&circ_area, mask_p, bcolor, bopa);
 
         circ_area.x1 = rb_origo.x + CIRC_OCT2_X(cir_out);
         circ_area.x2 = rb_origo.x + CIRC_OCT2_X(cir_out);
         circ_area.y1 = rb_origo.y + CIRC_OCT2_Y(cir_out)- act_w1;
         circ_area.y2 = rb_origo.y + CIRC_OCT2_Y(cir_out);
-        fill_fp(&circ_area, mask_p, b_color, b_opa);
+        fill_fp(&circ_area, mask_p, bcolor, bopa);
 
         /*Draw the octets to the left bottom corner*/
         circ_area.x1 = lb_origo.x + CIRC_OCT3_X(cir_out);
         circ_area.x2 = lb_origo.x + CIRC_OCT3_X(cir_out);
         circ_area.y1 = lb_origo.y + CIRC_OCT3_Y(cir_out) - act_w2;
         circ_area.y2 = lb_origo.y + CIRC_OCT3_Y(cir_out);
-        fill_fp(&circ_area, mask_p, b_color, b_opa);
+        fill_fp(&circ_area, mask_p, bcolor, bopa);
 
         circ_area.x1 = lb_origo.x + CIRC_OCT4_X(cir_out);
         circ_area.x2 = lb_origo.x + CIRC_OCT4_X(cir_out) + act_w1;
         circ_area.y1 = lb_origo.y + CIRC_OCT4_Y(cir_out);
         circ_area.y2 = lb_origo.y + CIRC_OCT4_Y(cir_out);
-        fill_fp(&circ_area, mask_p, b_color, b_opa);
+        fill_fp(&circ_area, mask_p, bcolor, bopa);
         
         /*Draw the octets to the left top corner*/
         /*Don't draw if the lines are common in the middle*/
@@ -1017,21 +1014,21 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
             circ_area.x2 = lt_origo.x + CIRC_OCT5_X(cir_out) + act_w2;
             circ_area.y1 = lt_origo.y + CIRC_OCT5_Y(cir_out);
             circ_area.y2 = lt_origo.y + CIRC_OCT5_Y(cir_out);
-            fill_fp(&circ_area, mask_p, b_color, b_opa);
+            fill_fp(&circ_area, mask_p, bcolor, bopa);
         }
 
         circ_area.x1 = lt_origo.x + CIRC_OCT6_X(cir_out);
         circ_area.x2 = lt_origo.x + CIRC_OCT6_X(cir_out);
         circ_area.y1 = lt_origo.y + CIRC_OCT6_Y(cir_out);
         circ_area.y2 = lt_origo.y + CIRC_OCT6_Y(cir_out) + act_w1;
-        fill_fp(&circ_area, mask_p, b_color, b_opa);
+        fill_fp(&circ_area, mask_p, bcolor, bopa);
         
         /*Draw the octets to the right top corner*/
         circ_area.x1 = rt_origo.x + CIRC_OCT7_X(cir_out);
         circ_area.x2 = rt_origo.x + CIRC_OCT7_X(cir_out);
         circ_area.y1 = rt_origo.y + CIRC_OCT7_Y(cir_out);
         circ_area.y2 = rt_origo.y + CIRC_OCT7_Y(cir_out) + act_w2;
-        fill_fp(&circ_area, mask_p, b_color, b_opa);
+        fill_fp(&circ_area, mask_p, bcolor, bopa);
 
         /*Don't draw if the lines are common in the middle*/
         if(rb_origo.y + CIRC_OCT1_Y(cir_out) > rt_origo.y + CIRC_OCT8_Y(cir_out)) {
@@ -1039,7 +1036,7 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
             circ_area.x2 = rt_origo.x + CIRC_OCT8_X(cir_out);
             circ_area.y1 = rt_origo.y + CIRC_OCT8_Y(cir_out);
             circ_area.y2 = rt_origo.y + CIRC_OCT8_Y(cir_out);
-            fill_fp(&circ_area, mask_p, b_color, b_opa);
+            fill_fp(&circ_area, mask_p, bcolor, bopa);
         }
 
         circ_next(&cir_out, &tmp_out);

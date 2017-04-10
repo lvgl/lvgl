@@ -48,9 +48,9 @@ typedef struct
 /*Style of text area*/
 typedef struct
 {
-	lv_pages_t pages;	/*Style of ancestor*/
+	lv_pages_t page;	/*Style of ancestor*/
 	/*New style element for this type */
-	lv_labels_t labels;
+	lv_labels_t label;
 	color_t cursor_color;
 	cord_t cursor_width;
 	uint8_t cursor_show :1;
@@ -60,8 +60,6 @@ typedef struct
 typedef enum
 {
 	LV_TAS_DEF,
-    LV_TAS_SIMPLE,
-    LV_TAS_TRANSP,
 }lv_tas_builtin_t;
 
 /**********************

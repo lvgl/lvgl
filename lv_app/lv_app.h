@@ -71,23 +71,19 @@ typedef struct __LV_APP_DSC_T
 }lv_app_dsc_t;
 
 typedef struct {
-	lv_rects_t  menu_style;
-	lv_btns_t  menu_btn_style;
-	lv_labels_t  menu_btn_label_style;
-	lv_imgs_t  menu_btn_img_style;
-	lv_lists_t app_list_style;
-	lv_pages_t  sc_page_style;
+	lv_rects_t  menu_bg;
+	lv_btns_t  menu_btn;
+	lv_labels_t  menu_btn_label;
+	lv_imgs_t  menu_btn_img;
+	lv_lists_t app_list;
+	lv_pages_t  sc_page;
     lv_labels_t win_txt_style;
-	lv_wins_t  win_style;
-	lv_btns_t  sc_style;
-    lv_btns_t  sc_send_style;
-    lv_btns_t  sc_rec_style;
+	lv_wins_t  win;
+	lv_btns_t  sc_bg;
+    lv_btns_t  sc_send_bg;
+    lv_btns_t  sc_rec_bg;
 	lv_labels_t sc_title_style;
     lv_labels_t sc_txt_style;
-
-	opa_t menu_opa;
-	opa_t menu_btn_opa;
-	opa_t sc_opa;
 
 	cord_t menu_h;
 	cord_t app_list_w;

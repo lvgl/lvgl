@@ -36,6 +36,7 @@
 static void lv_obj_pos_child_refr(lv_obj_t * obj, cord_t x_diff, cord_t y_diff);
 static void lv_style_refr_core(void * style_p, lv_obj_t * obj);
 static void lv_obj_del_child(lv_obj_t * obj);
+static void lv_objs_init(void);
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
 
 /**********************
@@ -45,9 +46,9 @@ static lv_obj_t * def_scr = NULL;
 static lv_obj_t * act_scr = NULL;
 static ll_dsc_t scr_ll;
 
-static lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
-static lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
-static lv_objs_t lv_objs_transp = {.transp = 1};
+static lv_objs_t lv_objs_scr;
+static lv_objs_t lv_objs_plain;
+static lv_objs_t lv_objs_transp;
 
 
 #ifdef LV_IMG_DEF_WALLPAPER
@@ -136,7 +137,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
 		/*Set appearance*/
 		new_obj->style_p = lv_objs_get(LV_OBJS_SCR, NULL);
-		new_obj->opa = OPA_COVER;
 
 		/*Set virtual functions*/
 		lv_obj_set_signal_f(new_obj, lv_obj_signal);
@@ -178,8 +178,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->ext_size = 0;
 
         /*Set appearance*/
-        new_obj->style_p = lv_objs_get(LV_OBJS_DEF, NULL);
-        new_obj->opa = OPA_COVER;
+        new_obj->style_p = lv_objs_get(LV_OBJS_PLAIN, NULL);
         
         /*Set virtual functions*/
         lv_obj_set_signal_f(new_obj, lv_obj_signal);
@@ -208,8 +207,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     if(copy != NULL) {
     	area_cpy(&new_obj->cords, &copy->cords);
     	new_obj->ext_size = copy->ext_size;
-
-        new_obj->opa = copy->opa;
 
         /*Set free data*/
         new_obj->free_num = copy->free_num;
@@ -330,15 +327,23 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
  */
 lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
 {
-	lv_objs_t  *style_p;
+    static bool style_inited = false;
+
+    /*Make the style initialization if it is not done yet*/
+    if(style_inited == false) {
+        lv_objs_init();
+        style_inited = true;
+    }
+
+	lv_objs_t * style_p;
 
 	switch(style) {
-		case LV_OBJS_DEF:
-			style_p = &lv_objs_def;
-			break;
 		case LV_OBJS_SCR:
 			style_p = &lv_objs_scr;
 			break;
+        case LV_OBJS_PLAIN:
+            style_p = &lv_objs_plain;
+            break;
 		case LV_OBJS_TRANSP:
 			style_p = &lv_objs_transp;
 			break;
@@ -346,10 +351,7 @@ lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
 			style_p = NULL;
 	}
 
-	if(copy_p != NULL) {
-		if(style_p != NULL) memcpy(copy_p, style_p, sizeof(lv_objs_t));
-		else memcpy(copy_p, &lv_objs_def, sizeof(lv_objs_t));
-	}
+	if(copy_p != NULL)  memcpy(copy_p, style_p, sizeof(lv_objs_t));
 
 	return style_p;
 }
@@ -844,38 +846,6 @@ void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size)
 }
 
 /**
- * Set the opacity of an object
- * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
- */
-void lv_obj_set_opa(lv_obj_t * obj, uint8_t opa)
-{
-    obj->opa = opa;
-    
-    lv_obj_inv(obj);
-}
-
-/**
- * Set the opacity of an object and all of its children
- * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
- */
-void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa)
-{
-    lv_obj_t * i;
-    
-    LL_READ(obj->child_ll, i) {
-        lv_obj_set_opar(i, opa);
-    }
-    
-    /*Set the opacity is the object is not protected*/
-    if(lv_obj_is_protected(obj, LV_PROTECT_OPA) == false) obj->opa = opa;
-    
-    lv_obj_inv(obj);
-}
-
-
-/**
  * Notify an object about its style is modified
  * @param obj pointer to an object
  */
@@ -889,7 +859,7 @@ void lv_obj_refr_style(lv_obj_t * obj)
 
 /**
  * Notify all object if a style is modified
- * @param style pinter to a style. Only objects with this style will be notified
+ * @param style pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
 void lv_style_refr_all(void * style)
@@ -1117,11 +1087,6 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
 			a.start = lv_obj_get_height(par);
 			a.end = lv_obj_get_y(obj);
 			break;
-		case LV_ANIM_FADE:
-			a.fp = (void(*)(void * , int32_t))lv_obj_set_opar;
-			a.start = OPA_TRANSP;
-			a.end = OPA_COVER;
-			break;
 		case LV_ANIM_GROW_H:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_width;
 			a.start = 0;
@@ -1321,16 +1286,6 @@ void * lv_obj_get_style(lv_obj_t * obj)
     return obj->style_p;
 }
 
-/**
- * Get the opacity of an object
- * @param obj pointer to an object
- * @return 0 (transparent) .. 255 (fully cover)
- */
-opa_t lv_obj_get_opa(lv_obj_t * obj)
-{
-    return obj->opa;
-}
-
 /*-----------------
  * Attribute get
  *----------------*/
@@ -1505,16 +1460,13 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
     	cover = area_is_in(mask_p, &obj->cords);
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		lv_objs_t * objs_p = lv_obj_get_style(obj);
-
-		opa_t opa = lv_obj_get_opa(obj);
-		color_t color = objs_p->color;
+		lv_objs_t * style = lv_obj_get_style(obj);
 
 		/*Simply draw a rectangle*/
 #if LV_VDB_SIZE == 0
-		lv_rfill(&obj->cords, mask_p, color, opa);
+		lv_rfill(&obj->cords, mask_p, style->color, style->opa);
 #else
-		lv_vfill(&obj->cords, mask_p, color, opa);
+		lv_vfill(&obj->cords, mask_p, style->color, style->opa);
 #endif
     }
     return true;
@@ -1596,4 +1548,14 @@ static void lv_obj_del_child(lv_obj_t * obj)
 
 }
 
+static void lv_objs_init(void)
+{
+    lv_objs_scr.color = LV_OBJ_DEF_SCR_COLOR;
+    lv_objs_scr.opa = OPA_COVER;
 
+    lv_objs_plain.color =COLOR_MAKE(0x88, 0xaf, 0xcb);
+    lv_objs_plain.opa = OPA_COVER;
+
+    lv_objs_transp.color = lv_objs_plain.color;
+    lv_objs_transp.opa = OPA_TRANSP;
+}

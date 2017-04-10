@@ -54,20 +54,20 @@ typedef enum
 /*Style of page*/
 typedef struct
 {
-    lv_rects_t bg_rects;  /*Style of ancestor*/
+    lv_rects_t bg;                  /*Style of ancestor*/
 	/*New style element for this type */
-    lv_rects_t scrl_rects;  /*Style of the scrollable rectangle*/
-    lv_rects_t sb_rects;    /*Style of scrollbars*/
-    cord_t sb_width;        /*Width of the scrollbars*/
-    lv_page_sb_mode_t sb_mode; /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
-    uint8_t sb_opa;         /*Opacity of scrollbars in percentage of object opacity (0..100)*/
+    lv_rects_t scrl;                /*Style of the scrollable rectangle*/
+    lv_rects_t sb;                  /*Style of scrollbars*/
+    cord_t sb_width;                /*Width of the scrollbars*/
+    lv_page_sb_mode_t sb_mode;      /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
 }lv_pages_t;
 
 /*Built-in styles of page*/
 typedef enum
 {
-	LV_PAGES_DEF,
-    LV_PAGES_SIMPLE,
+    LV_PAGES_DEF,
+    LV_PAGES_PAPER,                 /*White background, transparent scrollable*/
+    LV_PAGES_MENU,                  /*Transparent background, gray scrollable*/
 	LV_PAGES_TRANSP,
 }lv_pages_builtin_t;
 

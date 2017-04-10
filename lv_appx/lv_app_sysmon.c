@@ -111,28 +111,28 @@ const lv_app_dsc_t * lv_app_sysmon_init(void)
     /*Create progress bar styles for the shortcut*/
     lv_pbs_get(LV_PBS_DEF, &cpu_pbs);
     cpu_pbs.bg.gcolor = COLOR_MAKE(0xFF, 0xE0, 0xE0);
-    cpu_pbs.bg.objs.color = COLOR_MAKE(0xFF, 0xD0, 0xD0);
+    cpu_pbs.bg.base.color = COLOR_MAKE(0xFF, 0xD0, 0xD0);
     cpu_pbs.bg.bcolor = COLOR_MAKE(0xFF, 0x20, 0x20);
     cpu_pbs.bg.bwidth = 1 * LV_DOWNSCALE;
 
     cpu_pbs.bar.gcolor = COLOR_MARRON;
-    cpu_pbs.bar.objs.color = COLOR_RED;
+    cpu_pbs.bar.base.color = COLOR_RED;
     cpu_pbs.bar.bwidth = 0;
 
-    cpu_pbs.label.objs.color = COLOR_MAKE(0x40, 0x00, 0x00);
-    cpu_pbs.label.font = LV_APP_FONT_MEDIUM;
+    cpu_pbs.label.base.color = COLOR_MAKE(0x40, 0x00, 0x00);
+    cpu_pbs.label.font = font_get(LV_APP_FONT_MEDIUM);
     cpu_pbs.label.line_space = 0;
     cpu_pbs.label.mid = 1;
 
     memcpy(&mem_pbs, &cpu_pbs, sizeof(mem_pbs));
     mem_pbs.bg.gcolor = COLOR_MAKE(0xD0, 0xFF, 0xD0);
-    mem_pbs.bg.objs.color = COLOR_MAKE(0xE0, 0xFF, 0xE0);
+    mem_pbs.bg.base.color = COLOR_MAKE(0xE0, 0xFF, 0xE0);
     mem_pbs.bg.bcolor = COLOR_MAKE(0x20, 0xFF, 0x20);
 
     mem_pbs.bar.gcolor = COLOR_GREEN;
-    mem_pbs.bar.objs.color = COLOR_LIME;
+    mem_pbs.bar.base.color = COLOR_LIME;
 
-    mem_pbs.label.objs.color = COLOR_MAKE(0x00, 0x40, 0x00);
+    mem_pbs.label.base.color = COLOR_MAKE(0x00, 0x40, 0x00);
 
 	return &my_app_dsc;
 }
@@ -230,6 +230,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     /*Create a chart with two data lines*/
     win_data->chart = lv_chart_create(win, NULL);
     lv_obj_set_size(win_data->chart, LV_HOR_RES / 2, LV_VER_RES / 2);
+    lv_obj_set_pos(win_data->chart, LV_DPI / 10, LV_DPI / 10);
     lv_chart_set_pnum(win_data->chart, LV_APP_SYSMON_PNUM);
     lv_chart_set_range(win_data->chart, 0, 100);
     lv_chart_set_type(win_data->chart, LV_CHART_LINE);
@@ -244,7 +245,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     }
 
     /*Create a label for the details of Memory and CPU usage*/
-    cord_t opad = app_style->win_style.pages.scrl_rects.opad;
+    cord_t opad = app_style->win.page.scrl.opad;
     win_data->label = lv_label_create(win, NULL);
     lv_label_set_recolor(win_data->label, true);
     lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, opad, 0);
@@ -369,7 +370,7 @@ static void lv_app_sysmon_refr(void)
     sprintf(buf_short, "%sMem: N/A\nFrag: N/A", buf_short);
 #endif
     lv_app_style_t * app_style = lv_app_style_get();
-    cord_t opad = app_style->win_style.pages.scrl_rects.opad;
+    cord_t opad = app_style->win.page.scrl.opad;
     lv_app_inst_t * app;
     app = lv_app_get_next(NULL, &my_app_dsc);
     while(app != NULL) {

@@ -34,7 +34,7 @@ static void lv_ddlists_init(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_ddlists_t lv_ddlists_def;	/*Default drop down list style*/
+static lv_ddlists_t lv_ddlists_def;
 static lv_design_f_t  ancestor_design_f;
 static const char * def_options[] = {"Option 1", "Option 2", "Option 3", ""};
 /**********************
@@ -129,7 +129,7 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
     			/*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     			break;
     		case LV_SIGNAL_STYLE_CHG:
-    		    lv_obj_set_style(ext->opt_label, &style->list_labels);
+    		    lv_obj_set_style(ext->opt_label, &style->label);
     		    lv_ddlist_refr_size(ddlist, false);
     		    break;
     		default:
@@ -273,10 +273,7 @@ lv_ddlists_t * lv_ddlists_get(lv_ddlists_builtin_t style, lv_ddlists_t * copy)
 			style_p = &lv_ddlists_def;
 	}
 
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_ddlists_t));
-		else memcpy(copy, &lv_ddlists_def, sizeof(lv_ddlists_t));
-	}
+	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_ddlists_t));
 
 	return style_p;
 }
@@ -310,18 +307,18 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
         if(ext->opened != 0) {
             lv_ddlists_t * style = lv_obj_get_style(ddlist);
-            const font_t * font = font_get(style->list_labels.font);
+            const font_t * font = style->label.font;
             cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
             area_t rect_area;
             rect_area.y1 = ext->opt_label->cords.y1;
-            rect_area.y1 += ext->sel_opt * (font_h + style->list_labels.line_space);
-            rect_area.y1 -= style->sel_rects.vpad;
+            rect_area.y1 += ext->sel_opt * (font_h + style->label.line_space);
+            rect_area.y1 -= style->sel.vpad;
 
-            rect_area.y2 = rect_area.y1 + font_h + 2 * style->sel_rects.vpad;
-            rect_area.x1 = ext->opt_label->cords.x1 - style->pages.scrl_rects.hpad;
+            rect_area.y2 = rect_area.y1 + font_h + 2 * style->sel.vpad;
+            rect_area.x1 = ext->opt_label->cords.x1 - style->page.scrl.hpad;
             rect_area.x2 = rect_area.x1 + lv_obj_get_width(lv_page_get_scrl(ddlist));
 
-            lv_draw_rect(&rect_area, mask, &style->sel_rects, OPA_COVER);
+            lv_draw_rect(&rect_area, mask, &style->sel);
         }
     }
     /*Post draw when the children are drawn*/
@@ -392,16 +389,16 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     lv_ddlists_t * style = lv_obj_get_style(ddlist);
     cord_t new_height;
     if(ext->opened != 0) { /*Open the list*/
-        new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->pages.bg_rects.vpad;
+        new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->page.bg.vpad;
         lv_obj_t * parent = lv_obj_get_parent(ddlist);
         /*Reduce the height if enabled and required*/
         if(ext->auto_size != 0 && new_height + ddlist->cords.y1 > parent->cords.y2) {
             new_height = parent->cords.y2 - ddlist->cords.y1;
         }
     } else { /*Close the list*/
-        const font_t * font = font_get(style->list_labels.font);
+        const font_t * font = style->label.font;
         cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
-        new_height = font_h +  2 * style->sel_rects.vpad;
+        new_height = font_h +  2 * style->sel.vpad;
     }
     if(anim_en == false) {
         lv_obj_set_height(ddlist, new_height);
@@ -433,12 +430,12 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     lv_ddlists_t * style = lv_obj_get_style(ddlist);
-    const font_t * font = font_get(style->list_labels.font);
+    const font_t * font = style->label.font;
     cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
 
     lv_obj_set_y(lv_page_get_scrl(ddlist),
-                       -(ext->sel_opt * (font_h + style->list_labels.line_space) +
-                       style->pages.scrl_rects.vpad) + style->sel_rects.vpad);
+                       -(ext->sel_opt * (font_h + style->label.line_space) +
+                       style->page.scrl.vpad) + style->sel.vpad);
 
 }
 
@@ -447,29 +444,28 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
  */
 static void lv_ddlists_init(void)
 {
-	/*Default style*/
-    lv_pages_get(LV_PAGES_SIMPLE, &lv_ddlists_def.pages);
-    lv_ddlists_def.pages.bg_rects.objs.color = COLOR_WHITE;
-    lv_ddlists_def.pages.bg_rects.gcolor = COLOR_SILVER;
-    lv_ddlists_def.pages.bg_rects.bcolor = COLOR_GRAY;
+	/*Plain style*/
+    lv_pages_get(LV_PAGES_PAPER, &lv_ddlists_def.page);
+    lv_ddlists_def.page.bg.base.color = COLOR_WHITE;
+    lv_ddlists_def.page.bg.gcolor = COLOR_SILVER;
+    lv_ddlists_def.page.bg.bopa = OPA_50;
+    lv_ddlists_def.page.bg.swidth = LV_DPI / 8;
 
-    lv_ddlists_def.pages.bg_rects.hpad = 0 * LV_DOWNSCALE;
-    lv_ddlists_def.pages.bg_rects.vpad = 0 * LV_DOWNSCALE;
-    lv_ddlists_def.pages.bg_rects.opad = 0;
+    lv_ddlists_def.page.scrl.hpad = LV_DPI / 10;
+    lv_ddlists_def.page.scrl.vpad = LV_DPI / 4;
+    lv_ddlists_def.page.scrl.opad = 0;
 
-    lv_ddlists_def.pages.scrl_rects.hpad = 5 * LV_DOWNSCALE;
-    lv_ddlists_def.pages.scrl_rects.vpad = 10 * LV_DOWNSCALE;
-    lv_ddlists_def.pages.scrl_rects.opad = 0 * LV_DOWNSCALE;
+    lv_ddlists_def.page.sb_mode = LV_PAGE_SB_MODE_OFF;
 
-    lv_ddlists_def.pages.sb_mode = LV_PAGE_SB_MODE_OFF;
+    lv_labels_get(LV_LABELS_TXT, &lv_ddlists_def.label);
+    lv_ddlists_def.label.line_space = LV_DPI / 4;
 
-    lv_labels_get(LV_LABELS_DEF, &lv_ddlists_def.list_labels);
-    lv_ddlists_def.list_labels.line_space = 15 * LV_DOWNSCALE;
+    lv_rects_get(LV_RECTS_PLAIN, &lv_ddlists_def.sel);
+    lv_ddlists_def.sel.bwidth = 0;
+    lv_ddlists_def.sel.radius = 0;
+    lv_ddlists_def.sel.vpad = LV_DPI / 8;
 
-    lv_rects_get(LV_RECTS_DEF, &lv_ddlists_def.sel_rects);
-    lv_ddlists_def.sel_rects.bwidth = 0;
-    lv_ddlists_def.sel_rects.round = 0;
-    lv_ddlists_def.sel_rects.vpad = 7 * LV_DOWNSCALE;
+
 }
 
 #endif

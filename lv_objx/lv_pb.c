@@ -338,8 +338,7 @@ static bool lv_pb_design(lv_obj_t * pb, const area_t * mask, lv_design_mode_t mo
 		}
 
 		/*Draw the main bar*/
-		opa_t opa = lv_obj_get_opa(pb);
-        lv_draw_rect(&bar_area, mask, &style->bar, opa);
+        lv_draw_rect(&bar_area, mask, &style->bar);
 
         /*Draw a button if its size is not 0*/
         if(style->btn_size != 0) {
@@ -372,7 +371,7 @@ static bool lv_pb_design(lv_obj_t * pb, const area_t * mask, lv_design_mode_t mo
                 }
 
             }
-            lv_draw_rect(&bar_area, mask, &tmp_rects, opa );
+            lv_draw_rect(&bar_area, mask, &tmp_rects );
         }
     }
     return true;
@@ -401,32 +400,31 @@ void lv_pb_set_tmp_value(lv_obj_t * pb, int16_t value)
 static void lv_pbs_init(void)
 {
 	/*Default style*/
-    lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bg); /*Background*/
-    lv_pbs_def.bg.objs.color = COLOR_WHITE;
+    lv_rects_get(LV_RECTS_PLAIN, &lv_pbs_def.bg); /*Background*/
+    lv_pbs_def.bg.base.color = COLOR_WHITE;
     lv_pbs_def.bg.gcolor = COLOR_SILVER,
     lv_pbs_def.bg.bcolor = COLOR_BLACK;
 
-    lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.bar);    /*Bar*/
-    lv_pbs_def.bar.objs.color = COLOR_LIME;
+    lv_rects_get(LV_RECTS_PLAIN, &lv_pbs_def.bar);    /*Bar*/
+    lv_pbs_def.bar.base.color = COLOR_LIME;
     lv_pbs_def.bar.gcolor = COLOR_GREEN;
     lv_pbs_def.bar.bcolor = COLOR_BLACK;
 
-    lv_rects_get(LV_RECTS_DEF, &lv_pbs_def.btn);    /*Button*/
-    lv_pbs_def.btn.objs.color = COLOR_WHITE;
+    lv_rects_get(LV_RECTS_FANCY, &lv_pbs_def.btn);    /*Button*/
+    lv_pbs_def.btn.base.color = COLOR_WHITE;
     lv_pbs_def.btn.gcolor = COLOR_GRAY;
     lv_pbs_def.btn.bcolor = COLOR_GRAY;
     lv_pbs_def.btn.bopa = 100;
     lv_pbs_def.btn_size = 0;
 
-    lv_labels_get(LV_LABELS_DEF, &lv_pbs_def.label);    /*Label*/
-    lv_pbs_def.label.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_labels_get(LV_LABELS_TXT, &lv_pbs_def.label);    /*Label*/
     lv_pbs_def.label.line_space = 0;
 
     /*Slider style*/
     memcpy(&lv_pbs_slider, &lv_pbs_def, sizeof(lv_pbs_t));
-    lv_pbs_slider.bg.round = LV_RECT_CIRCLE;
-	lv_pbs_slider.bar.round = LV_RECT_CIRCLE;
-    lv_pbs_slider.btn.round = LV_RECT_CIRCLE;
+    lv_pbs_slider.bg.radius = LV_RECT_CIRCLE;
+	lv_pbs_slider.bar.radius = LV_RECT_CIRCLE;
+    lv_pbs_slider.btn.radius = LV_RECT_CIRCLE;
     lv_pbs_slider.btn_size = 40 * LV_DOWNSCALE;
 
 }

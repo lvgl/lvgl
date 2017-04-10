@@ -65,7 +65,7 @@ typedef struct
 /*Style of window*/
 typedef struct
 {
-    lv_pages_t pages; /*Style of ancestor*/
+    lv_pages_t page; /*Style of ancestor*/
 	/*New style element for this type */
 	/*Header settings*/
 	lv_rects_t header;      /*Style of the header rectangle*/
@@ -75,8 +75,6 @@ typedef struct
 	lv_imgs_t ctrl_img;     /*Style of the image on the control buttons*/
 	cord_t ctrl_btn_w;      /*Width of the control buttons*/
 	cord_t ctrl_btn_h;      /*Height of the control buttons*/
-	opa_t ctrl_btn_opa;     /*Width of the control buttons in the percentage of object opacity (0..100)*/
-	opa_t header_opa;       /*Opacity of the header in the percentage of object opacity (0..100)*/
 }lv_wins_t;
 
 /*Built-in styles of window*/

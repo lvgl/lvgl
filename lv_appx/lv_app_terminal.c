@@ -125,9 +125,9 @@ const lv_app_dsc_t * lv_app_terminal_init(void)
     sc_txts.line_space = 0;
     sc_txts.letter_space = 0;
     sc_txts.mid = 0;
-    sc_txts.objs.color = COLOR_WHITE;
+    sc_txts.base.color = COLOR_WHITE;
 
-    lv_objs_get(LV_OBJS_DEF, &sc_txt_bgs);
+    lv_objs_get(LV_OBJS_PLAIN, &sc_txt_bgs);
     sc_txt_bgs.color = COLOR_MAKE(0x20, 0x20, 0x20);
 
 
@@ -252,14 +252,14 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     my_app_data_t * app_data = app->app_data;
     lv_app_style_t * app_style = lv_app_style_get();
 
-    cord_t opad = app_style->win_style.pages.scrl_rects.opad;
+    cord_t opad = app_style->win.page.scrl.opad;
 
     /*Create a label for the text of the terminal*/
     win_data->label = lv_label_create(win, NULL);
     lv_label_set_long_mode(win_data->label, LV_LABEL_LONG_BREAK);
     lv_obj_set_width(win_data->label, LV_HOR_RES -
-                     2 * (app_style->win_style.pages.bg_rects.hpad +
-                          app_style->win_style.pages.scrl_rects.hpad));
+                     2 * (app_style->win.page.bg.hpad +
+                          app_style->win.page.scrl.hpad));
 
     lv_obj_set_style(win_data->label, &app_style->win_txt_style);
     lv_label_set_text_static(win_data->label, app_data->txt); /*Use the app. data text directly*/
@@ -271,7 +271,8 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_page_set_rel_action(win_data->ta, win_ta_rel_action);
     lv_ta_set_text(win_data->ta, "");
     lv_obj_set_style(win_data->ta, lv_tas_get(LV_TAS_DEF, NULL));
-    lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
+    if(app_data->txt[0] != '\0') lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, opad, opad);
+    else lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, opad, opad);
 
     /*Create a clear button*/
     win_data->clear_btn = lv_btn_create(win, NULL);
@@ -285,7 +286,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
     /*Align the window to see the text area on the bottom*/
     lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
-                                  - app_style->win_style.pages.scrl_rects.vpad);
+                                  - app_style->win.page.scrl.vpad);
 
 }
 
@@ -405,12 +406,12 @@ static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
 
     if(win_data != NULL) {
         lv_app_style_t * app_style =lv_app_style_get();
-        cord_t opad = app_style->win_style.pages.scrl_rects.opad;
+        cord_t opad = app_style->win.page.scrl.opad;
         lv_label_set_text_static(win_data->label, app_data->txt);
-        lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
+        lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, opad, opad);
         lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
         lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
-                                      - app_style->win_style.pages.scrl_rects.vpad);
+                                      - app_style->win.page.scrl.vpad);
     }
 
     return LV_ACTION_RES_OK;
@@ -491,12 +492,12 @@ static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len)
     lv_app_style_t * app_style = lv_app_style_get();
 
     if(win_data != NULL) {
-        cord_t opad = app_style->win_style.pages.scrl_rects.opad;
+        cord_t opad = app_style->win.page.scrl.opad;
         lv_label_set_text_static(win_data->label, app_data->txt);
-        lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, opad);
+        lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, opad, opad);
         lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
         lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
-                                      - app_style->win_style.pages.scrl_rects.vpad);
+                                      - app_style->win.page.scrl.vpad);
     }
 
     /*Set the last line on the shortcut*/

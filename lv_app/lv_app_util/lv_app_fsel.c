@@ -95,7 +95,7 @@ void lv_app_fsel_open(const char * path, const char * filter, void * param, void
     lv_app_style_t * app_style = lv_app_style_get();
     fsel_win = lv_win_create(lv_scr_act(), NULL);
     lv_obj_set_size(fsel_win, LV_HOR_RES, LV_VER_RES);
-    lv_obj_set_style(fsel_win, &app_style->win_style);
+    lv_obj_set_style(fsel_win, &app_style->win);
 
     lv_win_add_ctrl_btn(fsel_win, "U:/icon_close", fsel_close_action);
 

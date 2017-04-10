@@ -467,12 +467,9 @@ static void lv_mbox_disable_fit(lv_obj_t  * mbox)
 static void lv_mboxs_init(void)
 {
 	/*Default style*/
-	lv_rects_get(LV_RECTS_DEF, &lv_mboxs_def.bg);
-	lv_mboxs_def.bg.light = 8 * LV_DOWNSCALE;
+	lv_rects_get(LV_RECTS_FANCY, &lv_mboxs_def.bg);
 
 	lv_btns_get(LV_BTNS_DEF, &lv_mboxs_def.btn);
-	lv_mboxs_def.btn.flags[LV_BTN_STATE_PR].light_en = 0;
-	lv_mboxs_def.btn.flags[LV_BTN_STATE_REL].light_en = 0;
 	lv_labels_get(LV_LABELS_TITLE, &lv_mboxs_def.title);
 	lv_labels_get(LV_LABELS_TXT, &lv_mboxs_def.txt);
 	lv_labels_get(LV_LABELS_BTN, &lv_mboxs_def.btn_label);
@@ -481,42 +478,43 @@ static void lv_mboxs_init(void)
 	lv_mboxs_def.btnh.vpad = 0;
 
 	memcpy(&lv_mboxs_info, &lv_mboxs_def, sizeof(lv_mboxs_t));
-	lv_mboxs_info.bg.objs.color = COLOR_BLACK;
+	lv_mboxs_info.bg.base.color = COLOR_BLACK;
 	lv_mboxs_info.bg.gcolor = COLOR_BLACK;
 	lv_mboxs_info.bg.bcolor = COLOR_WHITE;
-	lv_mboxs_info.title.objs.color = COLOR_WHITE;
-	lv_mboxs_info.txt.objs.color = COLOR_WHITE;
+	lv_mboxs_info.title.base.color = COLOR_WHITE;
+	lv_mboxs_info.txt.base.color = COLOR_WHITE;
 	lv_mboxs_info.txt.letter_space = 2 * LV_DOWNSCALE;
 
     lv_btns_get(LV_BTNS_BORDER, &lv_mboxs_info.btn);
-    lv_mboxs_info.btn.bcolor[LV_BTN_STATE_PR] = COLOR_SILVER;
-    lv_mboxs_info.btn.bcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
-    lv_mboxs_info.btn.mcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
-    lv_mboxs_info.btn.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
-    lv_mboxs_info.btn.rects.bopa = OPA_COVER;
-    lv_mboxs_info.btn_label.objs.color = COLOR_WHITE;
+    lv_mboxs_info.btn.state_style[LV_BTN_STATE_PR].bcolor = COLOR_SILVER;
+    lv_mboxs_info.btn.state_style[LV_BTN_STATE_REL].bcolor = COLOR_WHITE;
+    lv_mboxs_info.btn.state_style[LV_BTN_STATE_PR].base.color = COLOR_GRAY;
+    lv_mboxs_info.btn.state_style[LV_BTN_STATE_PR].gcolor = COLOR_GRAY;
+    lv_mboxs_info.btn.state_style[LV_BTN_STATE_REL].bopa = OPA_COVER;
+    lv_mboxs_info.btn.state_style[LV_BTN_STATE_PR].bopa = OPA_COVER;
+    lv_mboxs_info.btn_label.base.color = COLOR_WHITE;
 
     memcpy(&lv_mboxs_warn, &lv_mboxs_info, sizeof(lv_mboxs_t));
-    lv_mboxs_warn.bg.objs.color = COLOR_MAKE(0xff, 0xb2, 0x66);
+    lv_mboxs_warn.bg.base.color = COLOR_MAKE(0xff, 0xb2, 0x66);
     lv_mboxs_warn.bg.gcolor = COLOR_MAKE(0xff, 0xad, 0x29);
-    lv_mboxs_warn.btn.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x10, 0x10, 0x10);
-    lv_mboxs_warn.btn.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x10, 0x10, 0x10);
-    lv_mboxs_warn.btn.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa8, 0x6e, 0x33);
-    lv_mboxs_warn.btn.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0xa8, 0x6e, 0x33);
-    lv_mboxs_warn.title.objs.color = COLOR_MAKE(0x10, 0x10, 0x10);
-    lv_mboxs_warn.txt.objs.color = COLOR_MAKE(0x10, 0x10, 0x10);;
-    lv_mboxs_warn.btn_label.objs.color = COLOR_MAKE(0x10, 0x10, 0x10);
+    lv_mboxs_warn.btn.state_style[LV_BTN_STATE_REL].bcolor = COLOR_MAKE(0x10, 0x10, 0x10);
+    lv_mboxs_warn.btn.state_style[LV_BTN_STATE_PR].bcolor = COLOR_MAKE(0x10, 0x10, 0x10);
+    lv_mboxs_warn.btn.state_style[LV_BTN_STATE_PR].base.color = COLOR_MAKE(0xa8, 0x6e, 0x33);
+    lv_mboxs_warn.btn.state_style[LV_BTN_STATE_PR].gcolor = COLOR_MAKE(0xa8, 0x6e, 0x33);
+    lv_mboxs_warn.title.base.color = COLOR_MAKE(0x10, 0x10, 0x10);
+    lv_mboxs_warn.txt.base.color = COLOR_MAKE(0x10, 0x10, 0x10);;
+    lv_mboxs_warn.btn_label.base.color = COLOR_MAKE(0x10, 0x10, 0x10);
 
     memcpy(&lv_mboxs_err, &lv_mboxs_warn, sizeof(lv_mboxs_t));
-    lv_mboxs_err.bg.objs.color = COLOR_MAKE(0xff, 0x66, 0x66);
+    lv_mboxs_err.bg.base.color = COLOR_MAKE(0xff, 0x66, 0x66);
     lv_mboxs_err.bg.gcolor = COLOR_MAKE(0x99, 0x22, 0x22);
-    lv_mboxs_err.btn.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
-    lv_mboxs_err.btn.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK;
-    lv_mboxs_err.btn.mcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x70, 0x00, 0x00);
-    lv_mboxs_err.btn.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x70, 0x00, 0x00);
-    lv_mboxs_err.title.objs.color = COLOR_BLACK;
-    lv_mboxs_err.txt.objs.color = COLOR_BLACK;
-    lv_mboxs_err.btn_label.objs.color = COLOR_BLACK;
+    lv_mboxs_err.btn.state_style[LV_BTN_STATE_REL].bcolor = COLOR_BLACK;
+    lv_mboxs_err.btn.state_style[LV_BTN_STATE_PR].bcolor = COLOR_BLACK;
+    lv_mboxs_err.btn.state_style[LV_BTN_STATE_PR].base.color = COLOR_MAKE(0x70, 0x00, 0x00);
+    lv_mboxs_err.btn.state_style[LV_BTN_STATE_PR].gcolor = COLOR_MAKE(0x70, 0x00, 0x00);
+    lv_mboxs_err.title.base.color = COLOR_BLACK;
+    lv_mboxs_err.txt.base.color = COLOR_BLACK;
+    lv_mboxs_err.btn_label.base.color = COLOR_BLACK;
 }
 
 #endif

@@ -52,11 +52,11 @@ typedef struct
 /*Style of image*/
 typedef struct
 {
-	lv_objs_t objs;	/*Style of ancestor*/
+	lv_objs_t base;	/*Style of ancestor*/
 	/*New style element for this type */
 	opa_t recolor_opa;                /*Intensity of recoloring (OPA_TRANSP, OPA_10 ... OPA_COVER)*/
 #if LV_IMG_ENABLE_SYMBOLS != 0
-    font_types_t sym_font;            /*Symbol font*/
+    const font_t * sym_font;            /*Symbol font*/
 #endif
 }lv_imgs_t;
 

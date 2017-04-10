@@ -26,6 +26,7 @@
  * Use LV_DOWNSCALE to compensate
  * the down scaling effect of antialiassing*/
 #define LV_ANTIALIAS        1
+#define LV_FONT_ANTIALIAS   0
 /*Set the downscaling value*/
 #if LV_ANTIALIAS == 0
 #define LV_DOWNSCALE        1

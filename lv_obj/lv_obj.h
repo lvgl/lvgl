@@ -106,9 +106,6 @@ typedef struct __LV_OBJ_T
     cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
 
     uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
-	opa_t opa;
-
-    
 }lv_obj_t;
 
 /*Protect some attributes (max. 8 bit)*/
@@ -150,20 +147,19 @@ typedef enum
 typedef struct
 {
 	color_t color;
-	uint8_t transp :1;
+    opa_t opa;
 }lv_objs_t;
 
 typedef enum
 {
-	LV_OBJS_DEF,
 	LV_OBJS_SCR,
+    LV_OBJS_PLAIN,
 	LV_OBJS_TRANSP,
 }lv_objs_builtin_t;
 
 typedef enum
 {
 	LV_ANIM_NONE = 0,
-	LV_ANIM_FADE,			/*Animate the opacity*/
 	LV_ANIM_FLOAT_TOP, 		/*Float from/to the top*/
 	LV_ANIM_FLOAT_LEFT,		/*Float from/to the left*/
 	LV_ANIM_FLOAT_BOTTOM,	/*Float from/to the bottom*/
@@ -378,20 +374,6 @@ void lv_obj_set_style(lv_obj_t * obj, void * style);
 void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size);
 
 /**
- * Set the opacity of an object
- * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
- */
-void lv_obj_set_opa(lv_obj_t * obj, uint8_t opa);
-
-/**
- * Set the opacity of an object and all of its children
- * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
- */
-void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa);
-
-/**
  * Hide an object. It won't be visible and clickable.
  * @param obj pointer to an object
  * @param en true: hide the object
@@ -588,13 +570,6 @@ cord_t lv_obj_getext_size(lv_obj_t * obj);
  * @return pointer to a style
  */
 void * lv_obj_get_style(lv_obj_t * obj);
-
-/**
- * Get the opacity of an object
- * @param obj pointer to an object
- * @return 0 (transparent) .. 255 (fully cover)
- */
-opa_t lv_obj_get_opa(lv_obj_t * obj);
 
 /**
  * Get the hidden attribute of an object

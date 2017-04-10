@@ -36,17 +36,15 @@ typedef struct
 /*Style of line*/
 typedef struct
 {
-	lv_objs_t objs;	/*Style of ancestor*/
+	lv_objs_t base;	/*Style of ancestor*/
 	/*New style element for this type */
-	uint16_t width;
+	cord_t width;   /*Line width*/
 }lv_lines_t;
 
 /*Built-in styles of line*/
 typedef enum
 {
 	LV_LINES_DEF,
-	LV_LINES_DECOR,
-	LV_LINES_CHART,
 }lv_lines_builtin_t;
 
 /**********************

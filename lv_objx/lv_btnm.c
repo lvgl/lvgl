@@ -215,9 +215,9 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 
 	/*Set size and positions of the buttons*/
 	lv_btnms_t * btnms = lv_obj_get_style(btnm);
-	cord_t max_w = lv_obj_get_width(btnm) - 2 * btnms->rects.hpad;
-	cord_t max_h = lv_obj_get_height(btnm) - 2 * btnms->rects.vpad;
-	cord_t act_y = btnms->rects.vpad;
+	cord_t max_w = lv_obj_get_width(btnm) - 2 * btnms->bg.hpad;
+	cord_t max_h = lv_obj_get_height(btnm) - 2 * btnms->bg.vpad;
+	cord_t act_y = btnms->bg.vpad;
 
 	/*Count the lines to calculate button height*/
 	uint8_t line_cnt = 1;
@@ -226,7 +226,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 			if(strcmp(map[li], "\n") == 0) line_cnt ++;
 	}
 
-	cord_t btn_h = max_h - ((line_cnt - 1) * btnms->rects.opad);
+	cord_t btn_h = max_h - ((line_cnt - 1) * btnms->bg.opad);
 	btn_h = btn_h / line_cnt;
 
 	/* Count the units and the buttons in a line
@@ -253,11 +253,11 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 		/*Only deal with the non empty lines*/
 		if(btn_cnt != 0) {
 			/*Calculate the width of all units*/
-			cord_t all_unit_w = max_w - ((btn_cnt-1) * btnms->rects.opad);
+			cord_t all_unit_w = max_w - ((btn_cnt-1) * btnms->bg.opad);
 
 			/*Set the button size and positions and set the texts*/
 			uint16_t i;
-			cord_t act_x = btnms->rects.hpad;
+			cord_t act_x = btnms->bg.hpad;
 			cord_t act_unit_w;
 			unit_act_cnt = 0;
 			for(i = 0; i < btn_cnt; i++) {
@@ -267,7 +267,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 				act_unit_w = (all_unit_w * lv_btnm_get_width_unit(map_p_tmp[i])) / unit_cnt;
 
 				/*Always recalculate act_x because of rounding errors */
-				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->rects.opad + btnms->rects.hpad;
+				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->bg.opad + btnms->bg.hpad;
 
 				area_set(&ext->btn_areas[btn_i], act_x,
 						                         act_y,
@@ -280,7 +280,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 				btn_i ++;
 			}
 		}
-		act_y += btn_h + btnms->rects.opad;
+		act_y += btn_h + btnms->bg.opad;
 		if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
 		map_p_tmp = &map_p_tmp[btn_cnt + 1]; /*Set the map to the next line*/
 		i_tot ++;	/*Skip the '\n'*/
@@ -350,10 +350,7 @@ lv_btnms_t * lv_btnms_get(lv_btnms_builtin_t style, lv_btnms_t * copy)
 			style_p = &lv_btnms_def;
 	}
 
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_btnms_t));
-		else memcpy(copy, &lv_btnms_def, sizeof(lv_btnms_t));
-	}
+	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_btnms_t));
 
 	return style_p;
 }
@@ -405,30 +402,19 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			btn_h = area_get_height(&area_tmp);
 
 			/*Load the style*/
-			lv_rects_t new_rects;
 			lv_btn_state_t state;
 			state = ext->btn_pr == btn_i ? LV_BTN_STATE_PR : LV_BTN_STATE_REL;
-			memcpy(&new_rects, &style->btns, sizeof(lv_rects_t));
-			new_rects.objs.color = style->btns.mcolor[state];
-			new_rects.gcolor = style->btns.gcolor[state];
-			new_rects.bcolor = style->btns.bcolor[state];
-			new_rects.lcolor = style->btns.lcolor[state];
-			new_rects.empty = style->btns.flags[state].empty;
-			new_rects.objs.transp = style->btns.flags[state].transp;
 
-			if(style->btns.flags[state].light_en != 0) new_rects.light = style->rects.light;
-			else new_rects.light = 0;
-
-			lv_draw_rect(&area_tmp, mask, &new_rects, OPA_COVER);
+			lv_draw_rect(&area_tmp, mask, &style->btn.state_style[state]);
 
 			/*Search the next valid text in the map*/
 			while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
 
 			/*Calculate the size of the text*/
-			const font_t * font = font_get(style->labels.font);
+			const font_t * font = style->label.font;
 			point_t txt_size;
 			txt_get_size(&txt_size, ext->map_p[txt_i], font,
-					     style->labels.letter_space, style->labels.line_space,
+					     style->label.letter_space, style->label.line_space,
 					     area_get_width(&area_btnm), TXT_FLAG_NONE);
 
 			area_tmp.x1 += (btn_w - txt_size.x) / 2;
@@ -436,7 +422,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			area_tmp.x2 = area_tmp.x1 + txt_size.x;
 			area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-			lv_draw_label(&area_tmp, mask, &style->labels, OPA_COVER, ext->map_p[txt_i], TXT_FLAG_NONE);
+			lv_draw_label(&area_tmp, mask, &style->label, ext->map_p[txt_i], TXT_FLAG_NONE);
 			txt_i ++;
     	}
     }
@@ -452,9 +438,16 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 static void lv_btnms_init(void)
 {
 	/*Default style*/
-	lv_rects_get(LV_RECTS_DEF, &lv_btnms_def.rects);	 /*Background rectangle style*/
-	lv_btns_get(LV_BTNS_DEF, &lv_btnms_def.btns);	 	 /*Button style*/
-	lv_labels_get(LV_LABELS_BTN, &lv_btnms_def.labels);	 /*BUtton label style*/
+	lv_rects_get(LV_RECTS_PLAIN, &lv_btnms_def.bg);	 /*Background rectangle style*/
+	lv_btnms_def.bg.vpad = LV_DPI / 30;
+    lv_btnms_def.bg.hpad = LV_DPI / 30;
+    lv_btnms_def.bg.opad = LV_DPI / 30;
+    lv_btnms_def.bg.radius = 0;
+    lv_btnms_def.bg.bwidth = 0;
+	lv_btns_get(LV_BTNS_DEF, &lv_btnms_def.btn);	 	 /*Button style*/
+    lv_btnms_def.btn.state_style[LV_BTN_STATE_REL].swidth = 0;
+    lv_btnms_def.btn.state_style[LV_BTN_STATE_PR].swidth = 0;
+	lv_labels_get(LV_LABELS_BTN, &lv_btnms_def.label);	 /*BUtton label style*/
 }
 
 /**

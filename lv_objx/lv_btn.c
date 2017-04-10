@@ -30,15 +30,15 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t mode);
-static void lv_btn_style_load(lv_obj_t * btn, lv_rects_t * new_rects);
+
 static void lv_btns_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_btns_t lv_btns_def;
-static lv_btns_t lv_btns_transp;
 static lv_btns_t lv_btns_border;
+static lv_btns_t lv_btns_transp;
 
 static lv_design_f_t ancestor_design_f;
 
@@ -110,6 +110,13 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 {   
     bool valid;
 
+    /*On style change preload the style for the rectangle signal*/
+    lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+    lv_btns_t * style = lv_obj_get_style(btn);
+    if(sign == LV_SIGNAL_STYLE_CHG) {
+        memcpy(&style->current, &style->state_style[ext->state], sizeof(lv_rects_t));
+    }
+
     /* Include the ancient signal function */
     valid = lv_rect_signal(btn, sign, param);
 
@@ -117,7 +124,6 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	lv_btn_state_t state = lv_btn_get_state(btn);
-    	lv_btn_ext_t * ext = lv_obj_get_ext(btn);
         bool tgl = lv_btn_get_tgl(btn);
 
         switch (sign) {
@@ -125,8 +131,8 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 /*Refresh the state*/
                 if(ext->state == LV_BTN_STATE_REL) {
                 	lv_btn_set_state(btn, LV_BTN_STATE_PR);
-                } else if(ext->state == LV_BTN_STATE_TGL_REL) {
-                	lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
+                } else if(ext->state == LV_BTN_STATE_TREL) {
+                	lv_btn_set_state(btn, LV_BTN_STATE_TPR);
                 }
 
                 ext->lpr_exec = 0;
@@ -139,17 +145,15 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             case LV_SIGNAL_PRESS_LOST:
                 /*Refresh the state*/
                 if(ext->state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                else if(ext->state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                else if(ext->state == LV_BTN_STATE_TPR) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
 
-                lv_obj_inv(btn);
                 break;
             case LV_SIGNAL_PRESSING:
                 /*When the button begins to drag revert pressed states to released*/
                 if(lv_dispi_is_dragging(param) != false) {
                     if(ext->state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                    else if(ext->state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                    else if(ext->state == LV_BTN_STATE_TPR) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
                 }
-                lv_obj_inv(btn);
                 break;
 
             case LV_SIGNAL_RELEASED:
@@ -158,11 +162,11 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 if(lv_dispi_is_dragging(param) == false && ext->lpr_exec == 0) {
                     if(ext->state == LV_BTN_STATE_PR && tgl == false) {
                     	lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                    } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == false) {
-                    	lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                    } else if(ext->state == LV_BTN_STATE_TPR && tgl == false) {
+                    	lv_btn_set_state(btn, LV_BTN_STATE_TREL);
                     } else if(ext->state == LV_BTN_STATE_PR && tgl == true) {
-                    	lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                    } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == true) {
+                    	lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+                    } else if(ext->state == LV_BTN_STATE_TPR && tgl == true) {
                     	lv_btn_set_state(btn, LV_BTN_STATE_REL);
                     }
 
@@ -172,10 +176,9 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 } else { /*If dragged change back the state*/
                     if(ext->state == LV_BTN_STATE_PR) {
                         lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                    } else if(ext->state == LV_BTN_STATE_TGL_PR) {
-                    	lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                    } else if(ext->state == LV_BTN_STATE_TPR) {
+                    	lv_btn_set_state(btn, LV_BTN_STATE_TREL);
                     }
-                    lv_obj_inv(btn);
                 }
 
                 break;
@@ -227,7 +230,9 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
     lv_btn_ext_t * ext = lv_obj_get_ext(btn);
     if(ext->state != state) {
         ext->state = state;
-        lv_obj_inv(btn);
+        lv_btns_t * style = lv_obj_get_style(btn);
+        memcpy(&style->current, &style->state_style[ext->state], sizeof(lv_rects_t));
+        lv_obj_refr_style(btn);
     }
 }
 
@@ -278,6 +283,7 @@ void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action)
 
     ext->lpr_rep_action = lpr_rep_action;
 }
+
 /*=====================
  * Getter functions 
  *====================*/
@@ -328,20 +334,17 @@ lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy)
 		case LV_BTNS_DEF:
 			style_p = &lv_btns_def;
 			break;
+        case LV_BTNS_BORDER:
+            style_p = &lv_btns_border;
+            break;
 		case LV_BTNS_TRANSP:
 			style_p = &lv_btns_transp;
-			break;
-		case LV_BTNS_BORDER:
-			style_p = &lv_btns_border;
 			break;
 		default:
 			style_p = &lv_btns_def;
 	}
 
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_btns_t));
-		else memcpy(copy, &lv_btns_def, sizeof(lv_btns_t));
-	}
+	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_btns_t));
 
 	return style_p;
 }
@@ -349,7 +352,6 @@ lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 /**
  * Handle the drawing related tasks of the buttons
  * @param btn pointer to a button object
@@ -368,13 +370,13 @@ static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t 
         /*Temporally set a rectangle style for the button to look like as rectangle*/
         lv_rects_t rects_tmp;
         lv_btns_t * btns_tmp = lv_obj_get_style(btn);
+        lv_btn_ext_t * ext = lv_obj_get_ext(btn);
         bool ret = false;
-        lv_btn_style_load(btn, &rects_tmp);
-        if(rects_tmp.objs.transp == 0) {
-            btn->style_p = &rects_tmp;
-            ret = ancestor_design_f(btn, mask, mode); /*Draw the rectangle*/
-            btn->style_p = btns_tmp;            /*Reload the original button style*/
-        }
+        memcpy(&rects_tmp, &btns_tmp->state_style[ext->state], sizeof(lv_rects_t));
+        btn->style_p = &rects_tmp;
+        ret = ancestor_design_f(btn, mask, mode); /*Draw the rectangle*/
+        btn->style_p = btns_tmp;            /*Reload the original button style*/
+
     	return ret;
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
 		area_t area;
@@ -383,143 +385,67 @@ static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t 
 		/*Temporally  set a rectangle style for the button to draw it as rectangle*/
 		lv_rects_t rects_tmp;
 		lv_btns_t * btns_tmp = lv_obj_get_style(btn);
-		lv_btn_style_load(btn, &rects_tmp);
-		if(rects_tmp.objs.transp == 0) {
-			btn->style_p = &rects_tmp;
-			ancestor_design_f(btn, mask, mode);	/*Draw the rectangle*/
-			btn->style_p = btns_tmp;			/*Reload the original button style*/
-		}
+		lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+        memcpy(&rects_tmp, &btns_tmp->state_style[ext->state], sizeof(lv_rects_t));
+        btn->style_p = &rects_tmp;
+        ancestor_design_f(btn, mask, mode);	/*Draw the rectangle*/
+        btn->style_p = btns_tmp;			/*Reload the original button style*/
+
     }
     return true;
 }
 
-/**
- * Crate a rectangle style according to the state of the button
- * @param btn pointer to a button object
- * @param new_rects load the style here (pointer to a rectangle style)
- */
-static void lv_btn_style_load(lv_obj_t * btn, lv_rects_t * new_rects)
-{
-    lv_btn_state_t state = lv_btn_get_state(btn);
-    lv_btns_t * style = lv_obj_get_style(btn);
 
-    /*Load the style*/
-    memcpy(new_rects, &style->rects, sizeof(lv_rects_t));
-    new_rects->objs.color = style->mcolor[state];
-    new_rects->gcolor = style->gcolor[state];
-    new_rects->bcolor = style->bcolor[state];
-    new_rects->lcolor = style->lcolor[state];
-    new_rects->empty = style->flags[state].empty;
-    new_rects->objs.transp = style->flags[state].transp;
-
-    if(style->flags[state].light_en != 0) new_rects->light = style->rects.light;
-    else new_rects->light = 0;
-
-}
 
 /**
  * Initialize the button styles
  */
 static void lv_btns_init(void)
 {
-	/*Default style*/
-    lv_btns_def.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x60, 0x88, 0xb0);
-    lv_btns_def.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_btns_def.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xff, 0xff, 0xff);
-	lv_btns_def.lcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_btns_def.flags[LV_BTN_STATE_REL].light_en = 0;
-	lv_btns_def.flags[LV_BTN_STATE_REL].transp = 0;
-	lv_btns_def.flags[LV_BTN_STATE_REL].empty = 0;
 
-    lv_btns_def.mcolor[LV_BTN_STATE_PR] =COLOR_MAKE(0x50, 0x68, 0x80);
-    lv_btns_def.gcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x18, 0x20, 0x28);
-	lv_btns_def.bcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
-	lv_btns_def.lcolor[LV_BTN_STATE_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_btns_def.flags[LV_BTN_STATE_PR].light_en = 0;
-	lv_btns_def.flags[LV_BTN_STATE_PR].transp = 0;
-	lv_btns_def.flags[LV_BTN_STATE_PR].empty = 0;
-
-	lv_btns_def.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x40, 0x60, 0x80);
-	lv_btns_def.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x10, 0x18, 0x20);
-	lv_btns_def.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_btns_def.lcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_btns_def.flags[LV_BTN_STATE_TGL_REL].light_en = 1;
-	lv_btns_def.flags[LV_BTN_STATE_TGL_REL].transp = 0;
-	lv_btns_def.flags[LV_BTN_STATE_TGL_REL].empty = 0;
-
-	lv_btns_def.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x60, 0x80, 0xa0);
-	lv_btns_def.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_btns_def.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_btns_def.lcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_btns_def.flags[LV_BTN_STATE_TGL_PR].light_en = 1;
-	lv_btns_def.flags[LV_BTN_STATE_TGL_PR].transp = 0;
-	lv_btns_def.flags[LV_BTN_STATE_TGL_PR].empty = 0;
-
-	lv_btns_def.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER;
-	lv_btns_def.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
-	lv_btns_def.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE;
-	lv_btns_def.lcolor[LV_BTN_STATE_INA] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_btns_def.flags[LV_BTN_STATE_INA].light_en = 0;
-	lv_btns_def.flags[LV_BTN_STATE_INA].transp= 0;
-	lv_btns_def.flags[LV_BTN_STATE_INA].empty = 0;
-
-	lv_btns_def.rects.objs.color = lv_btns_def.mcolor[LV_BTN_STATE_REL];
-	lv_btns_def.rects.gcolor = lv_btns_def.gcolor[LV_BTN_STATE_REL];
-	lv_btns_def.rects.bcolor = lv_btns_def.bcolor[LV_BTN_STATE_REL];
-	lv_btns_def.rects.objs.transp = 0;
-	lv_btns_def.rects.empty = 0;
-	lv_btns_def.rects.light = 6 * LV_DOWNSCALE;
-	lv_btns_def.rects.bwidth = 2 * LV_DOWNSCALE;
-	lv_btns_def.rects.bopa = 70;
-	lv_btns_def.rects.empty = 0;
-	lv_btns_def.rects.round = 4 * LV_DOWNSCALE;
-	lv_btns_def.rects.hpad = 10 * LV_DOWNSCALE;
-	lv_btns_def.rects.vpad = 15 * LV_DOWNSCALE;
-	lv_btns_def.rects.opad = 10 * LV_DOWNSCALE;
-
-	/*Transparent style*/
-	memcpy(&lv_btns_transp, &lv_btns_def, sizeof(lv_btns_t));
-	lv_btns_transp.rects.bwidth = 0;
-	lv_btns_transp.flags[LV_BTN_STATE_REL].transp = 1;
-	lv_btns_transp.flags[LV_BTN_STATE_REL].empty = 1;
-    lv_btns_transp.flags[LV_BTN_STATE_REL].light_en = 0;
-
-	lv_btns_transp.flags[LV_BTN_STATE_PR].transp = 1;
-	lv_btns_transp.flags[LV_BTN_STATE_PR].empty = 1;
-    lv_btns_transp.flags[LV_BTN_STATE_PR].light_en = 0;
-	lv_btns_transp.flags[LV_BTN_STATE_TGL_REL].transp = 1;
-	lv_btns_transp.flags[LV_BTN_STATE_TGL_REL].empty = 1;
-    lv_btns_transp.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
-	lv_btns_transp.flags[LV_BTN_STATE_TGL_PR].transp = 1;
-	lv_btns_transp.flags[LV_BTN_STATE_TGL_PR].empty = 1;
-    lv_btns_transp.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
-	lv_btns_transp.flags[LV_BTN_STATE_INA].transp = 1;
-	lv_btns_transp.flags[LV_BTN_STATE_INA].empty = 1;
-    lv_btns_transp.flags[LV_BTN_STATE_INA].light_en = 0;
+    /*Default style*/
+    lv_rects_get(LV_RECTS_FANCY, &lv_btns_def.state_style[LV_BTN_STATE_REL]);
+    lv_btns_def.state_style[LV_BTN_STATE_REL].base.color = COLOR_MAKE(0xcc, 0xe0, 0xf5);
+    lv_btns_def.state_style[LV_BTN_STATE_REL].gcolor = COLOR_MAKE(0xa6, 0xc9, 0xed);
+    lv_btns_def.state_style[LV_BTN_STATE_REL].bcolor = COLOR_MAKE(0x33, 0x99, 0xff);
+    lv_rects_get(LV_RECTS_FANCY, &lv_btns_def.state_style[LV_BTN_STATE_PR]);
+    lv_btns_def.state_style[LV_BTN_STATE_PR].base.color =  COLOR_MAKE(0xa6, 0xc9, 0xed);
+    lv_btns_def.state_style[LV_BTN_STATE_PR].gcolor = COLOR_MAKE(0x60, 0x88, 0xb0);
+    lv_btns_def.state_style[LV_BTN_STATE_PR].bcolor = COLOR_MAKE(0x33, 0x99, 0xff);
+    lv_btns_def.state_style[LV_BTN_STATE_PR].swidth = 3 * lv_btns_def.state_style[LV_BTN_STATE_REL].swidth / 4;
+    lv_rects_get(LV_RECTS_FANCY, &lv_btns_def.state_style[LV_BTN_STATE_TREL]);
+    lv_btns_def.state_style[LV_BTN_STATE_TREL].base.color = COLOR_MAKE(0xff, 0xed, 0xd3);
+    lv_btns_def.state_style[LV_BTN_STATE_TREL].gcolor = COLOR_MAKE(0xfc, 0xc7, 0x7a);
+    lv_btns_def.state_style[LV_BTN_STATE_TREL].bcolor = COLOR_MAKE(0xff, 0x90, 0x00);
+    lv_rects_get(LV_RECTS_FANCY, &lv_btns_def.state_style[LV_BTN_STATE_TPR]);
+    lv_btns_def.state_style[LV_BTN_STATE_TPR].base.color = COLOR_MAKE(0xfc, 0xc7, 0x7a);
+    lv_btns_def.state_style[LV_BTN_STATE_TPR].gcolor = COLOR_MAKE(0xdd, 0x8a, 0x4e);
+    lv_btns_def.state_style[LV_BTN_STATE_TPR].bcolor = COLOR_MAKE(0xff, 0x90, 0x00);
+    lv_btns_def.state_style[LV_BTN_STATE_TPR].swidth = 3 * lv_btns_def.state_style[LV_BTN_STATE_TREL].swidth / 4;
+    lv_rects_get(LV_RECTS_FANCY, &lv_btns_def.state_style[LV_BTN_STATE_INA]);
+    lv_btns_def.state_style[LV_BTN_STATE_INA].base.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
+    lv_btns_def.state_style[LV_BTN_STATE_INA].gcolor = lv_btns_def.state_style[LV_BTN_STATE_INA].base.color;
+    lv_btns_def.state_style[LV_BTN_STATE_INA].bcolor = COLOR_MAKE(0x80, 0x80, 0x80);
 
 
-	/*Border style*/
-	memcpy(&lv_btns_border, &lv_btns_def, sizeof(lv_btns_t));
-	lv_btns_border.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
-	lv_btns_border.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK;
-	lv_btns_border.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_BLACK;
-	lv_btns_border.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_BLACK;
-	lv_btns_border.bcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
-	lv_btns_border.flags[LV_BTN_STATE_REL].empty = 1;
-	lv_btns_border.flags[LV_BTN_STATE_PR].empty = 0;
-	lv_btns_border.flags[LV_BTN_STATE_TGL_REL].empty = 0;
-	lv_btns_border.flags[LV_BTN_STATE_TGL_PR].empty = 0;
-	lv_btns_border.flags[LV_BTN_STATE_INA].empty = 1;
-    lv_btns_border.flags[LV_BTN_STATE_REL].light_en = 0;
-    lv_btns_border.flags[LV_BTN_STATE_PR].light_en = 0;
-    lv_btns_border.flags[LV_BTN_STATE_TGL_REL].light_en = 0;
-    lv_btns_border.flags[LV_BTN_STATE_TGL_PR].light_en = 0;
-    lv_btns_border.flags[LV_BTN_STATE_INA].light_en = 0;
-	lv_btns_border.rects.bwidth = 1 * LV_DOWNSCALE;
-	lv_btns_border.rects.bopa = 50;
-	lv_btns_border.rects.round = 4 * LV_DOWNSCALE;
-	lv_btns_border.rects.hpad = 10 * LV_DOWNSCALE;
-	lv_btns_border.rects.vpad = 10 * LV_DOWNSCALE;
+    /*Border style*/
+    lv_rects_get(LV_RECTS_BORDER, &lv_btns_border.state_style[LV_BTN_STATE_REL]);
+    lv_btns_border.state_style[LV_BTN_STATE_REL].bcolor = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_rects_get(LV_RECTS_BORDER, &lv_btns_border.state_style[LV_BTN_STATE_PR]);
+    lv_btns_border.state_style[LV_BTN_STATE_PR].bcolor = COLOR_MAKE(0x60, 0x60, 0x60);
+    lv_rects_get(LV_RECTS_BORDER, &lv_btns_border.state_style[LV_BTN_STATE_TREL]);
+    lv_btns_border.state_style[LV_BTN_STATE_TREL].bcolor = COLOR_MAKE(0x00, 0x33, 0xff);
+    lv_rects_get(LV_RECTS_BORDER, &lv_btns_border.state_style[LV_BTN_STATE_TPR]);
+    lv_btns_border.state_style[LV_BTN_STATE_TPR].bcolor = COLOR_MAKE(0x00, 0x33, 0x99);
+    lv_rects_get(LV_RECTS_BORDER, &lv_btns_border.state_style[LV_BTN_STATE_INA]);
+    lv_btns_border.state_style[LV_BTN_STATE_INA].bcolor = COLOR_MAKE(0xa0, 0xa0, 0xa0);
+
+    /*Transparent style*/
+    lv_rects_get(LV_RECTS_TRANSP, &lv_btns_transp.state_style[LV_BTN_STATE_REL]);
+    lv_rects_get(LV_RECTS_TRANSP, &lv_btns_transp.state_style[LV_BTN_STATE_PR]);
+    lv_rects_get(LV_RECTS_TRANSP, &lv_btns_transp.state_style[LV_BTN_STATE_TREL]);
+    lv_rects_get(LV_RECTS_TRANSP, &lv_btns_transp.state_style[LV_BTN_STATE_TPR]);
+    lv_rects_get(LV_RECTS_TRANSP, &lv_btns_transp.state_style[LV_BTN_STATE_INA]);
 }
 
 #endif

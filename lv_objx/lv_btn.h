@@ -32,8 +32,8 @@ typedef enum
 {
     LV_BTN_STATE_PR,
     LV_BTN_STATE_REL,
-    LV_BTN_STATE_TGL_PR,
-    LV_BTN_STATE_TGL_REL,
+    LV_BTN_STATE_TPR,
+    LV_BTN_STATE_TREL,
     LV_BTN_STATE_INA,
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
@@ -53,32 +53,20 @@ typedef struct
     uint8_t lpr_exec :1; /*1: long press action executed (Not for user)*/
 }lv_btn_ext_t;
 
-/*Bits of 'flag' in 'lv_btns_t'*/
-typedef struct
-{
-    uint8_t light_en :1;
-    uint8_t transp :1;
-    uint8_t empty :1;
-}lv_btns_bits_t;
-
 /*Style of button*/
 typedef struct
 {
-    lv_rects_t rects;   /*Style of ancestor*/
+    lv_rects_t current;   /*Current style according to the state. Library use this. Style of ancestor*/
     /*New style element for this type */
-    color_t mcolor[LV_BTN_STATE_NUM];
-    color_t gcolor[LV_BTN_STATE_NUM];
-    color_t bcolor[LV_BTN_STATE_NUM];
-    color_t lcolor[LV_BTN_STATE_NUM];
-    lv_btns_bits_t flags[LV_BTN_STATE_NUM];
+    lv_rects_t state_style[LV_BTN_STATE_NUM];
 }lv_btns_t;
 
 /*Built-in styles of button*/
 typedef enum
 {
     LV_BTNS_DEF,
-    LV_BTNS_TRANSP,
     LV_BTNS_BORDER,
+    LV_BTNS_TRANSP,
 }lv_btns_builtin_t;
 
 

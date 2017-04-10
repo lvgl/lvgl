@@ -33,13 +33,13 @@
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of chart background*/
+/*Data of chart */
 typedef struct
 {
-    lv_rect_ext_t bg_rects; /*Ext. of ancestor*/
+    lv_rect_ext_t bg_rect; /*Ext. of ancestor*/
     /*New data for this type */
-    cord_t ymin;
-    cord_t ymax;
+    cord_t ymin;          /*y min value (used to scale the data)*/
+    cord_t ymax;          /*y max value (used to scale the data)*/
     uint8_t hdiv_num;     /*Number of horizontal division lines*/
     uint8_t vdiv_num;     /*Number of vertical division lines*/
     ll_dsc_t dl_ll;       /*Linked list for the data line pointers (stores cord_t * )*/
@@ -56,24 +56,22 @@ typedef enum
 	LV_CHART_POINT,
 }lv_chart_type_t;
 
-/*Style of chart background*/
+/*Style of chart*/
 typedef struct
 {
-	lv_rects_t bg_rects; /*Style of ancestor*/
+	lv_rects_t bg;              /*Style of the ancestor*/
 	/*New style element for this type */
-	lv_lines_t div_lines;
-	uint8_t div_line_opa;		/*Percentage of obj. opacity*/
-	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col color */
-	uint16_t width;				/*Line width or point radius*/
-	opa_t data_opa;				/*Line/Point/Col opacity in the percentage of obj. opacity*/
-	uint8_t dark_eff;			/*Dark effect on the bottom of ó points and columns*/
+	lv_lines_t div_line;
+	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col colors */
+	cord_t width;                   /*Data line width or point radius*/
+	opa_t data_opa;				    /*Line/Point/Col opacity*/
+	opa_t dark_eff;			        /*Dark effect on the bottom of points and columns*/
 }lv_charts_t;
 
-/*Built-in styles of chart background*/
+/*Built-in styles of chart*/
 typedef enum
 {
 	LV_CHARTS_DEF,
-	LV_CHARTS_TRANSP,
 }lv_charts_builtin_t;
 
 /**********************

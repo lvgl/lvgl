@@ -69,8 +69,10 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new window object*/
     if(copy == NULL) {
 
-        lv_obj_set_size(new_win, lv_obj_get_width(new_win), lv_obj_get_height(new_win));
+        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
         lv_obj_set_pos(new_win, 0, 0);
+        lv_obj_t * scrl = lv_page_get_scrl(new_win);
+        lv_rect_set_fit(scrl, false, true);
 
     	/*Create a holder for the header*/
     	ext->header = lv_rect_create(new_win, NULL);
@@ -151,14 +153,12 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     			lv_obj_set_style(ext->ctrl_holder, &style->ctrl_holder);
     			lv_obj_set_style(ext->title, &style->title);
     			lv_obj_set_style(ext->header, &style->header);
-				lv_obj_set_opa(ext->header, style->header_opa);
 
 
     			/*Refresh the style of all control buttons*/
     			child = lv_obj_get_child(ext->ctrl_holder, NULL);
     			while(child != NULL) {
     				lv_obj_set_style(child, &style->ctrl_btn);
-    				lv_obj_set_opa(child, style->ctrl_btn_opa);
 
     				/*Refresh the image style too*/
     				lv_obj_set_style(lv_obj_get_child(child, NULL), &style->ctrl_img);
@@ -201,7 +201,6 @@ lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_
 
 	lv_obj_t * btn = lv_btn_create(ext->ctrl_holder, NULL);
 	lv_obj_set_style(btn, &style->ctrl_btn);
-	lv_obj_set_opa(btn, style->ctrl_btn_opa);
 	lv_obj_set_size(btn, style->ctrl_btn_w, style->ctrl_btn_h);
 	lv_btn_set_rel_action(btn, rel_action);
 
@@ -299,10 +298,7 @@ lv_wins_t * lv_wins_get(lv_wins_builtin_t style, lv_wins_t * copy)
 			style_p = &lv_wins_def;
 	}
 
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_wins_t));
-		else memcpy(copy, &lv_wins_def, sizeof(lv_wins_t));
-	}
+	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_wins_t));
 
 	return style_p;
 }
@@ -347,51 +343,42 @@ static bool lv_win_design(lv_obj_t * win, const area_t * mask, lv_design_mode_t 
 static void lv_wins_init(void)
 {
 	/*Style for the content*/
-	lv_pages_get(LV_PAGES_DEF, &lv_wins_def.pages);
-	lv_wins_def.pages.bg_rects.objs.color = COLOR_WHITE;
-	lv_wins_def.pages.bg_rects.gcolor = COLOR_WHITE;
-	lv_wins_def.pages.bg_rects.bwidth = 1 * LV_DOWNSCALE;
-	lv_wins_def.pages.bg_rects.bcolor = COLOR_GRAY;
-	lv_wins_def.pages.bg_rects.round = 0;
-	lv_wins_def.pages.bg_rects.hpad = 0;
-	lv_wins_def.pages.bg_rects.vpad = 0;
+	lv_pages_get(LV_PAGES_PAPER, &lv_wins_def.page);    /*LV_PAGES_PAPER: White bg, transparent scrl*/
+	lv_wins_def.page.bg.base.color = COLOR_WHITE;
+	lv_wins_def.page.bg.gcolor = COLOR_WHITE;
+	lv_wins_def.page.bg.bwidth = 1 * LV_DOWNSCALE;
+	lv_wins_def.page.bg.bcolor = COLOR_GRAY;
+	lv_wins_def.page.bg.radius = 0;
+	lv_wins_def.page.bg.vpad = LV_DPI;  /*Great vpad on the background to move the content below the header*/
+    lv_wins_def.page.bg.hpad = LV_DPI / 4;
 
 	/*Styles for the header*/
-	lv_rects_get(LV_RECTS_DEF, &lv_wins_def.header);
-	lv_wins_def.header.hpad = 5 * LV_DOWNSCALE;
-	lv_wins_def.header.vpad = 5 * LV_DOWNSCALE;
-	lv_wins_def.header.objs.color = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_wins_def.header.gcolor = COLOR_MAKE(0x30, 0x40, 0x50);
+	lv_rects_get(LV_RECTS_PLAIN, &lv_wins_def.header);
+    lv_wins_def.header.bwidth = 0;
+    lv_wins_def.header.radius = 0;
+	lv_wins_def.header.hpad = LV_DPI / 10;
+	lv_wins_def.header.vpad = LV_DPI / 10;
 	lv_wins_def.header.bwidth = 0;
-	lv_wins_def.header.round = 0;
+	lv_wins_def.header.radius = 0;
 
 	lv_rects_get(LV_RECTS_TRANSP, &lv_wins_def.ctrl_holder);
 	lv_wins_def.ctrl_holder.hpad = 0;
 	lv_wins_def.ctrl_holder.vpad = 0;
-	lv_wins_def.ctrl_holder.opad = 5 * LV_DOWNSCALE;
+	lv_wins_def.ctrl_holder.opad = LV_DPI / 10;
 
 	lv_btns_get(LV_BTNS_DEF, &lv_wins_def.ctrl_btn);
-	lv_wins_def.ctrl_btn.bcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0xD0, 0xE0, 0xF0);
-	lv_wins_def.ctrl_btn.mcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_wins_def.ctrl_btn.gcolor[LV_BTN_STATE_REL] = COLOR_MAKE(0x30, 0x40, 0x50);
-	lv_wins_def.ctrl_btn.rects.bopa = 70;
-	lv_wins_def.ctrl_btn.rects.bwidth = 2 * LV_DOWNSCALE;
-	lv_wins_def.ctrl_btn.rects.round = LV_RECT_CIRCLE;
+	lv_wins_def.ctrl_btn.state_style[LV_BTN_STATE_REL].swidth = 0;
+    lv_wins_def.ctrl_btn.state_style[LV_BTN_STATE_PR].swidth = 0;
+    lv_wins_def.ctrl_btn.state_style[LV_BTN_STATE_TREL].swidth = 0;
+    lv_wins_def.ctrl_btn.state_style[LV_BTN_STATE_TPR].swidth = 0;
+    lv_wins_def.ctrl_btn.state_style[LV_BTN_STATE_INA].swidth = 0;
 
 	lv_imgs_get(LV_IMGS_DEF, &lv_wins_def.ctrl_img);
-	lv_wins_def.ctrl_img.recolor_opa = OPA_50;
-	lv_wins_def.ctrl_img.objs.color = COLOR_WHITE;
 
 	lv_labels_get(LV_LABELS_TITLE, &lv_wins_def.title);
-	lv_wins_def.title.objs.color = COLOR_MAKE(0xD0, 0xE0, 0xF0);
-	lv_wins_def.title.letter_space = 1 * LV_DOWNSCALE;
-	lv_wins_def.title.line_space = 1 * LV_DOWNSCALE;
 
-	lv_wins_def.ctrl_btn_w = 30 * LV_DOWNSCALE;
-	lv_wins_def.ctrl_btn_h = 30 * LV_DOWNSCALE;
-
-	lv_wins_def.header_opa = OPA_COVER;
-	lv_wins_def.ctrl_btn_opa = OPA_COVER;
+	lv_wins_def.ctrl_btn_w = 2 * LV_DPI / 3;
+	lv_wins_def.ctrl_btn_h = 2 * LV_DPI / 3;
 }
 
 /**
@@ -427,6 +414,8 @@ static void lv_win_realign(lv_obj_t * win)
 
 	lv_obj_set_pos_us(ext->header, 0, 0);
 
+    lv_obj_t * scrl = lv_page_get_scrl(win);
+    lv_obj_set_width(scrl, LV_HOR_RES - 2 * style->page.bg.hpad);
 
 }
 #endif

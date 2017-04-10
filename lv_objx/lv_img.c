@@ -229,7 +229,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 #if LV_IMG_ENABLE_SYMBOLS
         lv_imgs_t * imgs = lv_obj_get_style(img);
         point_t size;
-        txt_get_size(&size, fn, font_get(imgs->sym_font), 0, 0, LV_CORD_MAX, TXT_FLAG_NONE);
+        txt_get_size(&size, fn, imgs->sym_font, 0, 0, LV_CORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
         ext->transp = 0;
@@ -351,16 +351,15 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
 #if LV_IMG_ENABLE_SYMBOLS != 0
         bool sym = lv_img_is_symbol(ext->fn);
 		lv_labels_t sym_style;
-		lv_labels_get(LV_LABELS_DEF, &sym_style);
+		lv_labels_get(LV_LABELS_TXT, &sym_style);
 		sym_style.font = imgs_p->sym_font;
         sym_style.letter_space = 0;
         sym_style.line_space = 0;
         sym_style.mid = 0;
-        sym_style.objs.color = imgs_p->objs.color;
+        sym_style.base.color = imgs_p->base.color;
 #endif
 
 		lv_obj_get_cords(img, &cords);
-		opa_t opa = lv_obj_get_opa(img);
 
 		area_t cords_tmp;
 		cords_tmp.y1 = cords.y1;
@@ -374,8 +373,8 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
 #if LV_IMG_ENABLE_SYMBOLS == 0
 			    lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
 #else
-			    if(sym == false) lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
-			    else lv_draw_label(&cords_tmp, mask, &sym_style, opa, ext->fn, TXT_FLAG_NONE);
+			    if(sym == false) lv_draw_img(&cords_tmp, mask, imgs_p, ext->fn);
+			    else lv_draw_label(&cords_tmp, mask, &sym_style, ext->fn, TXT_FLAG_NONE);
 #endif
 			}
 		}
@@ -412,18 +411,19 @@ static bool lv_img_is_symbol(const char * txt)
 static void lv_imgs_init(void)
 {
 	/*Default style*/
-	lv_imgs_def.objs.color = COLOR_BLACK;
+	lv_imgs_def.base.color = COLOR_BLACK;
+    lv_imgs_def.base.opa = OPA_COVER;
 	lv_imgs_def.recolor_opa = OPA_TRANSP;
 #if LV_IMG_ENABLE_SYMBOLS != 0
-	lv_imgs_def.sym_font = LV_IMG_DEF_SYMBOL_FONT;
+	lv_imgs_def.sym_font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 #endif
 	/*Dark style*/
 	memcpy(&lv_imgs_dark, &lv_imgs_def, sizeof(lv_imgs_t));
-	lv_imgs_dark.objs.color = COLOR_BLACK; lv_imgs_dark.recolor_opa = OPA_50;
+	lv_imgs_dark.base.color = COLOR_BLACK; lv_imgs_dark.recolor_opa = OPA_50;
 
 	/*Light style*/
 	memcpy(&lv_imgs_light, &lv_imgs_dark, sizeof(lv_imgs_t));
-	lv_imgs_light.objs.color = COLOR_WHITE; lv_imgs_light.recolor_opa = OPA_50;
+	lv_imgs_light.base.color = COLOR_WHITE; lv_imgs_light.recolor_opa = OPA_50;
 
 }
 

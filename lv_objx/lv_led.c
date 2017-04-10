@@ -283,7 +283,7 @@ static void lv_leds_init(void)
 	lv_leds_def.bg_rect.bwidth = 4 * LV_DOWNSCALE;
 	lv_leds_def.bg_rect.bopa = 50;
 	lv_leds_def.bg_rect.light = 15 * LV_DOWNSCALE;
-	lv_leds_def.bg_rect.round = LV_RECT_CIRCLE;
+	lv_leds_def.bg_rect.radius = LV_RECT_CIRCLE;
 	lv_leds_def.bg_rect.hpad = 0;
 	lv_leds_def.bg_rect.vpad = 0;
 	lv_leds_def.bg_rect.opad = 0;

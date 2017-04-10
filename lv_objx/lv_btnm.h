@@ -43,7 +43,7 @@ typedef lv_action_res_t (*lv_btnm_callback_t) (lv_obj_t *, uint16_t);
 /*Data of button matrix*/
 typedef struct
 {
-    lv_rect_ext_t rect; /*Ext. of ancestor*/
+    lv_rect_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     const char ** map_p;    /*Pointer to the current map*/
     area_t * btn_areas;
@@ -55,10 +55,10 @@ typedef struct
 /*Style of button matrix*/
 typedef struct
 {
-	lv_rects_t rects;	/*Style of ancestor*/
+	lv_rects_t bg;	/*Style of ancestor*/
 	/*New style element for this type */
-	lv_btns_t btns;		/*Style of the buttons*/
-	lv_labels_t labels; /*Style of the labels on the buttons*/
+	lv_btns_t btn;		/*Style of the buttons*/
+	lv_labels_t label; /*Style of the labels on the buttons*/
 }lv_btnms_t;
 
 /*Built-in styles of button matrix*/

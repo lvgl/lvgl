@@ -42,7 +42,7 @@
 /*Data of message box*/
 typedef struct
 {
-    lv_rect_ext_t rect; /*Ext. of ancestor*/
+    lv_rect_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * title;   /*Title of the message box*/
     lv_obj_t * txt;     /*Text of the message box*/

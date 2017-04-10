@@ -40,8 +40,6 @@ static void lv_lines_init(void);
  *  STATIC VARIABLES
  **********************/
 static lv_lines_t lv_lines_def;
-static lv_lines_t lv_lines_decor;
-static lv_lines_t lv_lines_chart;
 
 /**********************
  *      MACROS
@@ -265,20 +263,11 @@ lv_lines_t * lv_lines_get(lv_lines_builtin_t style, lv_lines_t * copy)
 		case LV_LINES_DEF:
 			style_p = &lv_lines_def;
 			break;
-		case LV_LINES_DECOR:
-			style_p = &lv_lines_decor;
-			break;
-		case LV_LINES_CHART:
-			style_p = &lv_lines_chart;
-			break;
 		default:
 			style_p = &lv_lines_def;
 	}
 
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_lines_t));
-		else memcpy(copy, &lv_lines_def, sizeof(lv_lines_t));
-	}
+	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_lines_t));
 
 	return style_p;
 }
@@ -305,9 +294,7 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 
 		if(ext->point_num == 0 || ext->point_array == NULL) return false;
 
-		lv_lines_t * lines = lv_obj_get_style(line);
-
-		opa_t opa = lv_obj_get_opa(line);
+		lv_lines_t * style = lv_obj_get_style(line);
 		area_t area;
 		lv_obj_get_cords(line, &area);
 		cord_t x_ofs = area.x1;
@@ -334,7 +321,7 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 				p1.y = h - ext->point_array[i].y * us + y_ofs;
 				p2.y = h - ext->point_array[i + 1].y * us + y_ofs;
 			}
-			lv_draw_line(&p1, &p2, mask, lines, opa);
+			lv_draw_line(&p1, &p2, mask, style);
 		}
     }
     return true;
@@ -346,18 +333,8 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 static void lv_lines_init(void)
 {
 	/*Default style*/
-	lv_lines_def.width = 2 * LV_DOWNSCALE;
-	lv_lines_def.objs.color = COLOR_RED;
-	lv_lines_def.objs.transp = 0;
-
-	/*Decoration line style*/
-	memcpy(&lv_lines_decor, &lv_lines_def, sizeof(lv_lines_t));
-	lv_lines_decor.width = 1 * LV_DOWNSCALE;
-	lv_lines_decor.objs.color = COLOR_GRAY;
-
-	/*Chart line style*/
-	memcpy(&lv_lines_chart, &lv_lines_def, sizeof(lv_lines_t));
-	lv_lines_chart.width = 3 * LV_DOWNSCALE;
-	lv_lines_chart.objs.color = COLOR_RED;
+	lv_lines_def.width = LV_DPI / 25;
+	lv_lines_def.base.color = COLOR_RED;
+	lv_lines_def.base.opa = OPA_COVER;
 }
 #endif

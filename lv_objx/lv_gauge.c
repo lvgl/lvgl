@@ -495,7 +495,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
     area_t nm_cord;
     lv_rects_get(LV_RECTS_DEF, &nm);
     nm.bwidth = 0;
-    nm.round = LV_RECT_CIRCLE;
+    nm.radius = LV_RECT_CIRCLE;
     nm.objs.color = style->needle_mid_color;
     nm.gcolor = style->needle_mid_color;
 
@@ -515,7 +515,7 @@ static void lv_gauges_init(void)
 {
 	/*Default style*/
     lv_rects_get(LV_RECTS_DEF, &lv_gauges_def.rects);
-    lv_gauges_def.rects.round = LV_RECT_CIRCLE;
+    lv_gauges_def.rects.radius = LV_RECT_CIRCLE;
     lv_gauges_def.rects.bwidth = 4 * LV_DOWNSCALE;
     lv_gauges_def.rects.objs.color = COLOR_MAKE(0x00, 0xaa, 0x00);//GREEN;
     lv_gauges_def.rects.gcolor = COLOR_BLACK;

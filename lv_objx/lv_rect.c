@@ -36,7 +36,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_t mode);
-static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask);
+static void lv_rect_draw_shadow(lv_obj_t * rect, const area_t * mask);
 static void lv_rect_refr_layout(lv_obj_t * rect);
 static void lv_rect_layout_col(lv_obj_t * rect);
 static void lv_rect_layout_row(lv_obj_t * rect);
@@ -49,9 +49,10 @@ static void lv_rects_init(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_rects_t lv_rects_def;
-static lv_rects_t lv_rects_transp;
+static lv_rects_t lv_rects_plain;
+static lv_rects_t lv_rects_fancy;
 static lv_rects_t lv_rects_border;
+static lv_rects_t lv_rects_transp;
 
 /**********************
  *      MACROS
@@ -88,7 +89,7 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new rectangle*/
     if(copy == NULL) {
-		lv_obj_set_style(new_rect, lv_rects_get(LV_RECTS_DEF, NULL));
+		lv_obj_set_style(new_rect, lv_rects_get(LV_RECTS_PLAIN, NULL));
     }
     /*Copy an existing object*/
     else {
@@ -142,7 +143,7 @@ bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param)
         	}
         	break;
         case LV_SIGNAL_REFR_EXT_SIZE:
-        	if(style->light > rect->ext_size) rect->ext_size = style->light;
+        	if(style->swidth > rect->ext_size) rect->ext_size = style->swidth;
         	break;
     		default:
     			break;
@@ -246,9 +247,12 @@ lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy)
 	lv_rects_t * style_p;
 
 	switch(style) {
-		case LV_RECTS_DEF:
-			style_p = &lv_rects_def;
+		case LV_RECTS_PLAIN:
+			style_p = &lv_rects_plain;
 			break;
+        case LV_RECTS_FANCY:
+            style_p = &lv_rects_fancy;
+            break;
 		case LV_RECTS_BORDER:
 			style_p = &lv_rects_border;
 			break;
@@ -256,12 +260,11 @@ lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy)
 			style_p = &lv_rects_transp;
 			break;
 		default:
-			style_p = &lv_rects_def;
+			style_p = &lv_rects_plain;
 	}
 
 	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_rects_t));
-		else memcpy(copy, &lv_rects_def, sizeof(lv_rects_t));
+		memcpy(copy, style_p, sizeof(lv_rects_t));
 	}
 
 	return style_p;
@@ -289,7 +292,7 @@ static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_
          * Check the areas where there is no radius*/
     	if(LV_SA(rect, lv_rects_t)->empty != 0) return false;
 
-    	uint16_t r = LV_SA(rect, lv_rects_t)->round;
+    	uint16_t r = LV_SA(rect, lv_rects_t)->radius;
 
     	if(r == LV_RECT_CIRCLE) return false;
 
@@ -309,14 +312,13 @@ static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_
 
     	return false;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		opa_t opa = lv_obj_get_opa(rect);
 		lv_rects_t * style =  lv_obj_get_style(rect);
 		area_t area;
 		lv_obj_get_cords(rect, &area);
 
 		/*Draw the rectangle*/
-		lv_draw_rect(&area, mask, style, opa);
-		lv_rect_draw_light(rect, mask);
+		lv_draw_rect(&area, mask, style);
+		lv_rect_draw_shadow(rect, mask);
 
     } else if(mode == LV_DESIGN_DRAW_POST) {
 
@@ -325,50 +327,50 @@ static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_
 }
 
 /**
- * Draw a light around the object
+ * Draw a shadow around the object
  * @param rect pointer to rectangle object
  * @param mask pointer to a mask area (from the design functions)
  */
-static void lv_rect_draw_light(lv_obj_t * rect, const area_t * mask)
+static void lv_rect_draw_shadow(lv_obj_t * rect, const area_t * mask)
 {
 	lv_rects_t * style =  lv_obj_get_style(rect);
-	cord_t light_size = style->light;
-	if(light_size == 0) return;
-	if(light_size < LV_DOWNSCALE) light_size = LV_DOWNSCALE;
+	cord_t swidth = style->swidth;
+	if(swidth == 0) return;
+    uint8_t res = LV_DOWNSCALE * 2;
+	if(swidth < res) return;
 
-	area_t light_area;
-	lv_rects_t light_style;
-	lv_obj_get_cords(rect, &light_area);
+	area_t shadow_area;
+	lv_rects_t shadow_style;
+	lv_obj_get_cords(rect, &shadow_area);
 
-	memcpy(&light_style, style, sizeof(lv_rects_t));
+	memcpy(&shadow_style, style, sizeof(lv_rects_t));
 
-	light_style.empty = 1;
-	light_style.bwidth = light_size;
-	light_style.round = style->round;
-	if(light_style.round == LV_RECT_CIRCLE) {
-	    light_style.round = MATH_MIN(lv_obj_get_width(rect), lv_obj_get_height(rect));
+	shadow_style.empty = 1;
+	shadow_style.bwidth = swidth;
+	shadow_style.radius = style->radius;
+	if(shadow_style.radius == LV_RECT_CIRCLE) {
+	    shadow_style.radius = MATH_MIN(lv_obj_get_width(rect), lv_obj_get_height(rect));
 	}
-	light_style.round += light_size + 1;
-	light_style.bcolor = style->lcolor;
-	light_style.bopa = 100;
+	shadow_style.radius += swidth + 1;
+	shadow_style.bcolor = style->scolor;
+	shadow_style.bopa = 100;
 
-	light_area.x1 -= light_size;
-	light_area.y1 -= light_size;
-	light_area.x2 += light_size;
-	light_area.y2 += light_size;
+	shadow_area.x1 -= swidth;
+	shadow_area.y1 -= swidth;
+	shadow_area.x2 += swidth;
+	shadow_area.y2 += swidth;
 
 	cord_t i;
-	uint8_t res = LV_DOWNSCALE ;
-	opa_t opa_sub =  lv_obj_get_opa(rect) / (light_size / LV_DOWNSCALE);
+	shadow_style.base.opa =  style->base.opa / (swidth / res);
 
-	for(i = 1; i < light_size; i += res) {
-		lv_draw_rect(&light_area, mask, &light_style, (uint16_t) opa_sub);
-		light_style.round -= res;
-		light_style.bwidth -= res;
-		light_area.x1 += res;
-		light_area.y1 += res;
-		light_area.x2 -= res;
-		light_area.y2 -= res;
+	for(i = 1; i < swidth; i += res) {
+		lv_draw_rect(&shadow_area, mask, &shadow_style);
+		shadow_style.radius -= res;
+		shadow_style.bwidth -= res;
+		shadow_area.x1 += res;
+		shadow_area.y1 += res;
+		shadow_area.x2 -= res;
+		shadow_area.y2 -= res;
 	}
 }
 
@@ -742,32 +744,51 @@ static void lv_rect_refr_autofit(lv_obj_t * rect)
  */
 static void lv_rects_init(void)
 {
-	/*Default style*/
-	lv_rects_def.objs.color = COLOR_MAKE(0x50, 0x70, 0x90);
-	lv_rects_def.gcolor = COLOR_MAKE(0x70, 0xA0, 0xC0);
-	lv_rects_def.bcolor = COLOR_WHITE;
-	lv_rects_def.bwidth = 2 * LV_DOWNSCALE;
-	lv_rects_def.bopa = 50;
-	lv_rects_def.round = 4 * LV_DOWNSCALE;
-	lv_rects_def.empty = 0;
-	lv_rects_def.hpad = 10 * LV_DOWNSCALE;
-	lv_rects_def.vpad = 10 * LV_DOWNSCALE;
-	lv_rects_def.opad = 10 * LV_DOWNSCALE;
-	lv_rects_def.light = 0;
-	lv_rects_def.lcolor = COLOR_MAKE(0x60, 0x60, 0x60);
+	/*Plain style*/
+    lv_objs_get(LV_OBJS_PLAIN, &lv_rects_plain.base);
+    lv_rects_plain.base.color = COLOR_MAKE(0x80, 0xb3, 0xe6);  //6BA3BF
+    lv_rects_plain.gcolor = lv_rects_plain.base.color;
+    lv_rects_plain.bcolor = COLOR_WHITE;
+    lv_rects_plain.scolor = COLOR_GRAY;
+    lv_rects_plain.bwidth = (LV_DPI / 30) == 0 ? 1 * LV_DOWNSCALE : LV_DPI / 30;
+    lv_rects_plain.swidth = 0;
+    lv_rects_plain.bopa = OPA_COVER;
+    lv_rects_plain.radius = LV_DPI / 10;
+    lv_rects_plain.empty = 0;
+    lv_rects_plain.hpad = LV_DPI / 2;
+    lv_rects_plain.vpad = LV_DPI / 2;
+    lv_rects_plain.opad = LV_DPI / 4;
+
+    /*Fancy style*/
+    lv_objs_get(LV_OBJS_PLAIN, &lv_rects_fancy.base);
+    lv_rects_fancy.gcolor = COLOR_MAKE(0xd3, 0xe1, 0xea);
+    lv_rects_fancy.bcolor = COLOR_WHITE;
+    lv_rects_fancy.scolor = COLOR_GRAY;
+    lv_rects_fancy.bwidth = (LV_DPI / 30) == 0 ? 1 * LV_DOWNSCALE : LV_DPI / 30;
+    lv_rects_fancy.swidth = LV_DPI / 8;
+    lv_rects_fancy.bopa = OPA_50;
+    lv_rects_fancy.radius = LV_DPI / 10;
+    lv_rects_fancy.empty = 0;
+    lv_rects_fancy.hpad = LV_DPI / 4;
+    lv_rects_fancy.vpad = LV_DPI / 4;
+    lv_rects_fancy.opad = LV_DPI / 6;
+
 
 	/*Transparent style*/
-	memcpy(&lv_rects_transp, &lv_rects_def, sizeof(lv_rects_t));
-	lv_rects_transp.objs.transp = 1;
-	lv_rects_transp.bwidth = 0;
+	memcpy(&lv_rects_transp, &lv_rects_plain, sizeof(lv_rects_t));
+	 /* Do not use opa=OPA_TRANSP because design function will not be called
+	  * but it might draw something on transparent background*/
 	lv_rects_transp.empty = 1;
+	lv_rects_transp.bwidth = 0;
+	lv_rects_transp.swidth = 0;
+	lv_rects_transp.hpad = 0;
+    lv_rects_transp.vpad = 0;
 
 	/*Border style*/
-	memcpy(&lv_rects_border, &lv_rects_def, sizeof(lv_rects_t));
-	lv_rects_border.bcolor = COLOR_BLACK;
-	lv_rects_border.bwidth = 2 * LV_DOWNSCALE;
-	lv_rects_border.bopa = 100;
-	lv_rects_border.round = 4 * LV_DOWNSCALE;
+	memcpy(&lv_rects_border, &lv_rects_plain, sizeof(lv_rects_t));
+	lv_rects_border.bcolor = COLOR_MAKE(0x30, 0x30, 0x30);
+	lv_rects_border.bwidth = LV_DPI / 30;
+	lv_rects_border.swidth = 0;
 	lv_rects_border.empty = 1;
 }
 #endif

@@ -78,17 +78,18 @@ static lv_btnms_t kb_btnms;
  */
 void lv_app_kb_init(void)
 {
-    lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
-    kb_btnms.rects.gcolor = COLOR_WHITE;
-    kb_btnms.rects.objs.color = COLOR_WHITE;
-    kb_btnms.rects.opad = 4 + LV_DOWNSCALE;
-    kb_btnms.rects.vpad = 3 + LV_DOWNSCALE;
-    kb_btnms.rects.hpad = 3 + LV_DOWNSCALE;
-    kb_btnms.rects.round = 0;
-    kb_btnms.rects.bwidth = 0;
+    lv_app_style_t * app_style = lv_app_style_get();
 
-    kb_btnms.btns.rects.bwidth = 0;
-    kb_btnms.btns.rects.round = 0;
+    lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
+
+    memcpy(&kb_btnms.bg, &app_style->menu_bg, sizeof(lv_rects_t));
+    kb_btnms.bg.hpad = 0;
+    kb_btnms.bg.vpad = 0;
+    kb_btnms.bg.opad = 0;
+    memcpy(&kb_btnms.btn, &app_style->menu_btn, sizeof(lv_btns_t));
+    kb_btnms.btn.state_style[LV_BTN_STATE_REL].bwidth = 1 * LV_DOWNSCALE;
+    kb_btnms.btn.state_style[LV_BTN_STATE_REL].bcolor = COLOR_GRAY;
+    memcpy(&kb_btnms.label, &app_style->menu_btn_label, sizeof(lv_labels_t));
 }
 
 /**
@@ -117,23 +118,23 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     lv_obj_align(kb_btnm, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
     lv_btnm_set_cb(kb_btnm, lv_app_kb_action);
     if(mode & LV_APP_KB_MODE_TXT) {
-		kb_btnms.labels.font = LV_APP_FONT_MEDIUM;
+		kb_btnms.label.font = font_get(LV_APP_FONT_MEDIUM);
     	lv_btnm_set_map(kb_btnm, kb_map_lc);
     }
     else if(mode & LV_APP_KB_MODE_NUM) {
-		kb_btnms.labels.font = LV_APP_FONT_LARGE;
+		kb_btnms.label.font = font_get(LV_APP_FONT_LARGE);
     	lv_btnm_set_map(kb_btnm, kb_map_num);
     }
     lv_obj_set_style(kb_btnm, &kb_btnms);
 
-    /*Reduce teh size of the window and align it to the top*/
+    /*Reduce the size of the window and align it to the top*/
     kb_win = lv_app_win_get_from_obj(kb_ta);
     lv_obj_set_height(kb_win, LV_VER_RES / 2);
     lv_obj_set_y(kb_win, 0);
 
-    /*If the text area is higher then the new size of the window redus its size too*/
+    /*If the text area is higher then the new size of the window reduce its size too*/
 	lv_app_style_t * app_style = lv_app_style_get();
-    cord_t win_h = lv_obj_get_height(kb_win) -  2 * app_style->win_style.pages.scrl_rects.vpad;
+    cord_t win_h = lv_obj_get_height(kb_win) -  2 * app_style->win.page.bg.vpad;
 	kb_ta_ori_size = lv_obj_get_height(kb_ta);
     if(lv_obj_get_height(kb_ta)  > win_h) {
     	lv_obj_set_height(kb_ta, win_h);

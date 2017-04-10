@@ -37,10 +37,10 @@ typedef struct
 /*Style of drop down list*/
 typedef struct
 {
-	lv_pages_t pages;   /*Style of ancestor*/
+	lv_pages_t page;        /*Style of ancestor*/
 	/*New style element for this type */
-	lv_rects_t sel_rects;
-	lv_labels_t list_labels;
+	lv_rects_t sel;         /*Select rectangle*/
+	lv_labels_t label;      /*Style of labels*/
 }lv_ddlists_t;
 
 /*Built-in styles of drop down list*/
