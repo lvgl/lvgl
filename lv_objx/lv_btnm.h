@@ -35,7 +35,7 @@
  *      TYPEDEFS
  **********************/
 
-/* Type of callback function which is called when a button is released
+/* Type of callback function which is called when a button is released on the button matrix
  * Parameters: button matrix, released button index in the map string
  * return LV_ACTION_RES_INV:  the button matrix is deleted else LV_ACTION_RES_OK*/
 typedef lv_action_res_t (*lv_btnm_callback_t) (lv_obj_t *, uint16_t);
@@ -46,10 +46,10 @@ typedef struct
     lv_rect_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     const char ** map_p;    /*Pointer to the current map*/
-    area_t * btn_areas;
-    uint16_t btn_cnt;
-    uint16_t btn_pr;
-    lv_btnm_callback_t cb;
+    area_t * btn_areas;     /*Array of areas for the buttons (Handled by the library)*/
+    uint16_t btn_cnt;       /*Number of button in 'map_p'(Handled by the library)*/
+    uint16_t btn_pr;        /*Index of the currently pressed button or LV_BTNM_PR_NONE (Handled by the library)*/
+    lv_btnm_callback_t cb;  /*A function to call when a button is releases*/
 }lv_btnm_ext_t;
 
 /*Style of button matrix*/
@@ -106,7 +106,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
  * @param btnm: pointer to button matrix object
  * @param cb pointer to a callback function
  */
-void lv_btnm_set_cb(lv_obj_t * btnm, lv_btnm_callback_t cb);
+void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb);
 
 /**
  * Get the current map of a button matrix

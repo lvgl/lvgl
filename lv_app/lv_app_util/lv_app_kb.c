@@ -116,7 +116,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     kb_btnm = lv_btnm_create(lv_scr_act(), NULL);
     lv_obj_set_size(kb_btnm, LV_HOR_RES, LV_VER_RES / 2);
     lv_obj_align(kb_btnm, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
-    lv_btnm_set_cb(kb_btnm, lv_app_kb_action);
+    lv_btnm_set_action(kb_btnm, lv_app_kb_action);
     if(mode & LV_APP_KB_MODE_TXT) {
 		kb_btnms.label.font = font_get(LV_APP_FONT_MEDIUM);
     	lv_btnm_set_map(kb_btnm, kb_map_lc);

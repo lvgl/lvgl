@@ -427,7 +427,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 	lv_lines_t lines;
 	lv_lines_get(LV_LINES_DEF, &lines);
 	lines.width = style->width;
-	lines.base.opa = (uint16_t)((uint16_t)style->bg.base.opa * style->data_opa) >> 8;
+	lines.base.opa = (uint16_t)((uint16_t)style->bg_rect.base.opa * style->data_opa) >> 8;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, y_data) {
@@ -481,7 +481,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 	rects.bwidth = 0;
 	rects.empty = 0;
 	rects.radius = LV_RECT_CIRCLE;
-    rects.base.opa = (uint16_t)((uint16_t)style->bg.base.opa * style->data_opa) >> 8;
+    rects.base.opa = (uint16_t)((uint16_t)style->bg_rect.base.opa * style->data_opa) >> 8;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, y_data) {
@@ -531,7 +531,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 	rects.bwidth = 0;
 	rects.empty = 0;
 	rects.radius = 0;
-	rects.base.opa = (uint16_t)((uint16_t)style->bg.base.opa * style->data_opa) >> 8;
+	rects.base.opa = (uint16_t)((uint16_t)style->bg_rect.base.opa * style->data_opa) >> 8;
 
 	col_a.y2 = chart->cords.y2;
 
@@ -574,7 +574,7 @@ static void lv_charts_init(void)
 {
 	/*Default style*/
 	/* Background */
-	lv_rects_get(LV_RECTS_FANCY, &lv_charts_def.bg);
+	lv_rects_get(LV_RECTS_FANCY, &lv_charts_def.bg_rect);
 
 	/* Div. line */
 	lv_lines_get(LV_LINES_DEF, &lv_charts_def.div_line);

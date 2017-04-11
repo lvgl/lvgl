@@ -80,8 +80,8 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_alloc_ext(new_rect, sizeof(lv_rect_ext_t));
     lv_rect_ext_t * ext = lv_obj_get_ext(new_rect);
     dm_assert(ext);
-    ext->hfit_en = 0;
-    ext->vfit_en = 0;
+    ext->hpad_en = 0;
+    ext->vpad_en = 0;
     ext->layout = LV_RECT_LAYOUT_OFF;
 
     lv_obj_set_design_f(new_rect, lv_rect_design);
@@ -94,8 +94,8 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy an existing object*/
     else {
     	lv_rect_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	ext->hfit_en = copy_ext->hfit_en;
-    	ext->vfit_en = copy_ext->vfit_en;
+    	ext->hpad_en = copy_ext->hpad_en;
+    	ext->vpad_en = copy_ext->vpad_en;
     	ext->layout = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
@@ -183,8 +183,8 @@ void lv_rect_set_fit(lv_obj_t * rect, bool hor_en, bool ver_en)
 {
 	lv_obj_inv(rect);
 	lv_rect_ext_t * ext = lv_obj_get_ext(rect);
-	ext->hfit_en = hor_en == false ? 0 : 1;
-	ext->vfit_en = ver_en == false ? 0 : 1;
+	ext->hpad_en = hor_en == false ? 0 : 1;
+	ext->vpad_en = ver_en == false ? 0 : 1;
 
 	/*Send a signal to set a new size*/
 	rect->signal_f(rect, LV_SIGNAL_CORD_CHG, rect);
@@ -213,7 +213,7 @@ lv_rect_layout_t lv_rect_get_layout(lv_obj_t * rect)
 bool lv_rect_get_hfit(lv_obj_t * rect)
 {
 	lv_rect_ext_t * ext = lv_obj_get_ext(rect);
-	return ext->hfit_en == 0 ? false : true;
+	return ext->hpad_en == 0 ? false : true;
 }
 
 /**
@@ -224,7 +224,7 @@ bool lv_rect_get_hfit(lv_obj_t * rect)
 bool lv_rect_get_vfit(lv_obj_t * rect)
 {
 	lv_rect_ext_t * ext = lv_obj_get_ext(rect);
-	return ext->vfit_en == 0 ? false : true;
+	return ext->vpad_en == 0 ? false : true;
 }
 
 
@@ -673,8 +673,8 @@ static void lv_rect_refr_autofit(lv_obj_t * rect)
 {
 	lv_rect_ext_t * ext = lv_obj_get_ext(rect);
 
-	if(ext->hfit_en == 0 &&
-	   ext->vfit_en == 0) {
+	if(ext->hpad_en == 0 &&
+	   ext->vpad_en == 0) {
 		return;
 	}
 
@@ -704,14 +704,14 @@ static void lv_rect_refr_autofit(lv_obj_t * rect)
 
     /*If the value is not the init value then the page has >=1 child.*/
     if(new_cords.x1 != LV_CORD_MAX) {
-    	if(ext->hfit_en != 0) {
+    	if(ext->hpad_en != 0) {
 			new_cords.x1 -= hpad;
 			new_cords.x2 += hpad;
     	} else {
     		new_cords.x1 = rect->cords.x1;
     		new_cords.x2 = rect->cords.x2;
     	}
-    	if(ext->vfit_en != 0) {
+    	if(ext->vpad_en != 0) {
 			new_cords.y1 -= vpad;
 			new_cords.y2 += vpad;
     	} else {
@@ -763,16 +763,15 @@ static void lv_rects_init(void)
     lv_objs_get(LV_OBJS_PLAIN, &lv_rects_fancy.base);
     lv_rects_fancy.gcolor = COLOR_MAKE(0xd3, 0xe1, 0xea);
     lv_rects_fancy.bcolor = COLOR_WHITE;
-    lv_rects_fancy.scolor = COLOR_GRAY;
+    lv_rects_fancy.scolor = COLOR_BLACK;
     lv_rects_fancy.bwidth = (LV_DPI / 30) == 0 ? 1 * LV_DOWNSCALE : LV_DPI / 30;
-    lv_rects_fancy.swidth = LV_DPI / 8;
+    lv_rects_fancy.swidth = LV_DPI / 6;
     lv_rects_fancy.bopa = OPA_50;
     lv_rects_fancy.radius = LV_DPI / 10;
     lv_rects_fancy.empty = 0;
     lv_rects_fancy.hpad = LV_DPI / 4;
     lv_rects_fancy.vpad = LV_DPI / 4;
     lv_rects_fancy.opad = LV_DPI / 6;
-
 
 	/*Transparent style*/
 	memcpy(&lv_rects_transp, &lv_rects_plain, sizeof(lv_rects_t));

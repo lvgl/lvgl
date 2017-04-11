@@ -27,11 +27,11 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * opt_label;   /*Label for the options*/
-    lv_action_res_t (*cb)(lv_obj_t *, uint16_t);
-    uint16_t sel_opt;
-    uint8_t opened :1;
-    uint8_t auto_size :1;
+    lv_obj_t * opt_label;                           /*Label for the options*/
+    lv_action_res_t (*cb)(lv_obj_t *, uint16_t);    /*Pointer to function to call when an option is slected*/
+    uint16_t sel_opt;                               /*Index of the current option*/
+    uint8_t opened :1;                              /*1: The list is opened*/
+    uint8_t auto_size :1;                           /*1: Set height to show all options. 0: Set height maximum to the parent bottom*/
 }lv_ddlist_ext_t;
 
 /*Style of drop down list*/
@@ -39,14 +39,14 @@ typedef struct
 {
 	lv_pages_t page;        /*Style of ancestor*/
 	/*New style element for this type */
-	lv_rects_t sel;         /*Select rectangle*/
+	lv_rects_t sel;         /*Select the 'selected' rectangle*/
 	lv_labels_t label;      /*Style of labels*/
 }lv_ddlists_t;
 
 /*Built-in styles of drop down list*/
 typedef enum
 {
-	LV_DDLISTS_DEF,
+	LV_DDLISTS_DEF,     /*Default drop down list*/
 }lv_ddlists_builtin_t;
 
 /**********************

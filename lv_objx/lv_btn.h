@@ -28,6 +28,7 @@
  *      TYPEDEFS
  **********************/
 
+/*Button states*/
 typedef enum
 {
     LV_BTN_STATE_PR,
@@ -41,16 +42,16 @@ typedef enum
 /*Data of button*/
 typedef struct
 {
-	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+	lv_rect_ext_t rect; /*Ext. of ancestor*/
 	/*New data for this type */
-	lv_action_t pr_action;
-	lv_action_t rel_action;
-	lv_action_t lpr_action;
-	lv_action_t lpr_rep_action;
+	lv_action_t pr_action;      /*A function to call when the button is pressed (NULL if unused)*/
+	lv_action_t rel_action;     /*A function to call when the button is released (NULL if unused)*/
+	lv_action_t lpr_action;     /*A function to call when the button is long pressed (NULL if unused)*/
+	lv_action_t lpr_rep_action; /*A function to call periodically after long press (NULL if unused)*/
 
-    lv_btn_state_t state;
-    uint8_t tgl :1;      /*1: Toggle enabled*/
-    uint8_t lpr_exec :1; /*1: long press action executed (Not for user)*/
+    lv_btn_state_t state;       /*Current state of the button from 'lv_btn_state_t' enum*/
+    uint8_t tgl :1;             /*1: Toggle enabled*/
+    uint8_t lpr_exec :1;        /*1: Long press action executed (Handled by the library)*/
 }lv_btn_ext_t;
 
 /*Style of button*/
@@ -58,7 +59,7 @@ typedef struct
 {
     lv_rects_t current;   /*Current style according to the state. Library use this. Style of ancestor*/
     /*New style element for this type */
-    lv_rects_t state_style[LV_BTN_STATE_NUM];
+    lv_rects_t state_style[LV_BTN_STATE_NUM];   /*Rectangle styles for each state*/
 }lv_btns_t;
 
 /*Built-in styles of button*/

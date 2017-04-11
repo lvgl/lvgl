@@ -50,10 +50,8 @@ typedef struct
 {
 	lv_pages_t page;	/*Style of ancestor*/
 	/*New style element for this type */
-	lv_labels_t label;
-	color_t cursor_color;
-	cord_t cursor_width;
-	uint8_t cursor_show :1;
+	lv_labels_t label;      /*Style of the label*/
+	uint8_t cursor_show :1; /*Flag to indicate the cursor is now being shown or not (Handled by the library)*/
 }lv_tas_t;
 
 /*Built-in styles of text area*/

@@ -44,8 +44,8 @@ typedef struct
 /*Application specific data for a shortcut of this application*/
 typedef struct
 {
-    lv_obj_t * pb_cpu;
-    lv_obj_t * pb_mem;
+    lv_obj_t * bar_cpu;
+    lv_obj_t * bar_mem;
 }my_sc_data_t;
 
 /**********************
@@ -83,8 +83,8 @@ static lv_app_dsc_t my_app_dsc =
 
 static uint8_t mem_pct[LV_APP_SYSMON_PNUM];
 static uint8_t cpu_pct[LV_APP_SYSMON_PNUM];
-static lv_pbs_t cpu_pbs;
-static lv_pbs_t mem_pbs;
+static lv_bars_t cpu_bars;
+static lv_bars_t mem_bars;
 #if USE_DYN_MEM != 0  && DM_CUSTOM == 0
 static  dm_mon_t mem_mon;
 #endif
@@ -108,31 +108,31 @@ const lv_app_dsc_t * lv_app_sysmon_init(void)
     memset(mem_pct, 0, sizeof(mem_pct));
     memset(cpu_pct, 0, sizeof(cpu_pct));
 
-    /*Create progress bar styles for the shortcut*/
-    lv_pbs_get(LV_PBS_DEF, &cpu_pbs);
-    cpu_pbs.bg.gcolor = COLOR_MAKE(0xFF, 0xE0, 0xE0);
-    cpu_pbs.bg.base.color = COLOR_MAKE(0xFF, 0xD0, 0xD0);
-    cpu_pbs.bg.bcolor = COLOR_MAKE(0xFF, 0x20, 0x20);
-    cpu_pbs.bg.bwidth = 1 * LV_DOWNSCALE;
+    /*Create bar styles for the shortcut*/
+    lv_bars_get(LV_BARS_DEF, &cpu_bars);
+    cpu_bars.bg.gcolor = COLOR_MAKE(0xFF, 0xE0, 0xE0);
+    cpu_bars.bg.base.color = COLOR_MAKE(0xFF, 0xD0, 0xD0);
+    cpu_bars.bg.bcolor = COLOR_MAKE(0xFF, 0x20, 0x20);
+    cpu_bars.bg.bwidth = 1 * LV_DOWNSCALE;
 
-    cpu_pbs.bar.gcolor = COLOR_MARRON;
-    cpu_pbs.bar.base.color = COLOR_RED;
-    cpu_pbs.bar.bwidth = 0;
+    cpu_bars.indic.gcolor = COLOR_MARRON;
+    cpu_bars.indic.base.color = COLOR_RED;
+    cpu_bars.indic.bwidth = 0;
 
-    cpu_pbs.label.base.color = COLOR_MAKE(0x40, 0x00, 0x00);
-    cpu_pbs.label.font = font_get(LV_APP_FONT_MEDIUM);
-    cpu_pbs.label.line_space = 0;
-    cpu_pbs.label.mid = 1;
+    cpu_bars.label.base.color = COLOR_MAKE(0x40, 0x00, 0x00);
+    cpu_bars.label.font = font_get(LV_APP_FONT_MEDIUM);
+    cpu_bars.label.line_space = 0;
+    cpu_bars.label.mid = 1;
 
-    memcpy(&mem_pbs, &cpu_pbs, sizeof(mem_pbs));
-    mem_pbs.bg.gcolor = COLOR_MAKE(0xD0, 0xFF, 0xD0);
-    mem_pbs.bg.base.color = COLOR_MAKE(0xE0, 0xFF, 0xE0);
-    mem_pbs.bg.bcolor = COLOR_MAKE(0x20, 0xFF, 0x20);
+    memcpy(&mem_bars, &cpu_bars, sizeof(cpu_bars));
+    mem_bars.bg.gcolor = COLOR_MAKE(0xD0, 0xFF, 0xD0);
+    mem_bars.bg.base.color = COLOR_MAKE(0xE0, 0xFF, 0xE0);
+    mem_bars.bg.bcolor = COLOR_MAKE(0x20, 0xFF, 0x20);
 
-    mem_pbs.bar.gcolor = COLOR_GREEN;
-    mem_pbs.bar.base.color = COLOR_LIME;
+    mem_bars.indic.gcolor = COLOR_GREEN;
+    mem_bars.indic.base.color = COLOR_LIME;
 
-    mem_pbs.label.base.color = COLOR_MAKE(0x00, 0x40, 0x00);
+    mem_bars.label.base.color = COLOR_MAKE(0x00, 0x40, 0x00);
 
 	return &my_app_dsc;
 }
@@ -189,19 +189,19 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 
     cord_t w = lv_obj_get_width(sc) / 5;
 
-    /*Create 2 progress bars fr the CPU and the Memory*/
-    sc_data->pb_cpu = lv_pb_create(sc, NULL);
-    lv_obj_set_size(sc_data->pb_cpu, w, 5 * lv_obj_get_height(sc) / 8);
-    lv_obj_align(sc_data->pb_cpu, NULL, LV_ALIGN_IN_BOTTOM_LEFT, w, - lv_obj_get_height(sc) / 8);
-    lv_obj_set_style(sc_data->pb_cpu, &cpu_pbs);
-    lv_obj_set_click(sc_data->pb_cpu, false);
-    lv_pb_set_min_max_value(sc_data->pb_cpu, 0, 100);
-    lv_pb_set_format_str(sc_data->pb_cpu, "C\nP\nU");
+    /*Create 2 bars for the CPU and the Memory*/
+    sc_data->bar_cpu = lv_bar_create(sc, NULL);
+    lv_obj_set_size(sc_data->bar_cpu, w, 5 * lv_obj_get_height(sc) / 8);
+    lv_obj_align(sc_data->bar_cpu, NULL, LV_ALIGN_IN_BOTTOM_LEFT, w, - lv_obj_get_height(sc) / 8);
+    lv_obj_set_style(sc_data->bar_cpu, &cpu_bars);
+    lv_obj_set_click(sc_data->bar_cpu, false);
+    lv_bar_set_range(sc_data->bar_cpu, 0, 100);
+    lv_bar_set_format_str(sc_data->bar_cpu, "C\nP\nU");
 
-    sc_data->pb_mem = lv_pb_create(sc, sc_data->pb_cpu);
-    lv_obj_align(sc_data->pb_mem, sc_data->pb_cpu, LV_ALIGN_OUT_RIGHT_MID, w, 0);
-    lv_obj_set_style(sc_data->pb_mem, &mem_pbs);
-    lv_pb_set_format_str(sc_data->pb_mem, "M\ne\nm");
+    sc_data->bar_mem = lv_bar_create(sc, sc_data->bar_cpu);
+    lv_obj_align(sc_data->bar_mem, sc_data->bar_cpu, LV_ALIGN_OUT_RIGHT_MID, w, 0);
+    lv_obj_set_style(sc_data->bar_mem, &mem_bars);
+    lv_bar_set_format_str(sc_data->bar_mem, "M\ne\nm");
 
     lv_app_sysmon_refr();
 }
@@ -387,8 +387,8 @@ static void lv_app_sysmon_refr(void)
         /*Refresh the shortcut*/
         my_sc_data_t * sc_data = app->sc_data;
         if(sc_data != NULL) {
-            lv_pb_set_value(sc_data->pb_cpu, cpu_pct[LV_APP_SYSMON_PNUM - 1]);
-            lv_pb_set_value(sc_data->pb_mem, mem_pct[LV_APP_SYSMON_PNUM - 1]);
+            lv_bar_set_value(sc_data->bar_cpu, cpu_pct[LV_APP_SYSMON_PNUM - 1]);
+            lv_bar_set_value(sc_data->bar_mem, mem_pct[LV_APP_SYSMON_PNUM - 1]);
         }
 
         lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, buf_short, strlen(buf_short));

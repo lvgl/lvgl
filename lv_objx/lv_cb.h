@@ -37,24 +37,24 @@ typedef struct
 {
     lv_btn_ext_t bg_btn; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * bullet;
-    lv_obj_t * label;
+    lv_obj_t * bullet;  /*Pointer to button*/
+    lv_obj_t * label;   /*Pointer to label*/
 }lv_cb_ext_t;
 
 /*Style of check box*/
 typedef struct
 {
-	lv_btns_t bg; /*Style of ancestor*/
+	lv_btns_t bg; /*Style of the background button*/
 	/*New style element for this type */
-	lv_btns_t bullet;
-	lv_labels_t label;
-	cord_t bullet_size;
+	lv_btns_t bullet;   /*Style of the bullet*/
+	lv_labels_t label;  /*Style of the label*/
+	cord_t bullet_size; /*Size of bullet (square)*/
 }lv_cbs_t;
 
 /*Built-in styles of check box*/
 typedef enum
 {
-	LV_CBS_DEF,
+	LV_CBS_DEF,     /*Default style with transparent background*/
 }lv_cbs_builtin_t;
 
 /**********************

@@ -59,7 +59,7 @@ typedef enum
 /*Style of chart*/
 typedef struct
 {
-	lv_rects_t bg;              /*Style of the ancestor*/
+	lv_rects_t bg_rect;              /*Style of the ancestor*/
 	/*New style element for this type */
 	lv_lines_t div_line;
 	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col colors */

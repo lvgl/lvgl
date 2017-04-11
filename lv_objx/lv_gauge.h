@@ -48,37 +48,35 @@
 /*Data of gauge*/
 typedef struct
 {
-    lv_rect_ext_t rect; /*Ext. of ancestor*/
+    lv_rect_ext_t bg_rect; /*Ext. of ancestor*/
     /*New data for this type */
     int16_t min;                /*Minimum value of the scale*/
     int16_t max;                /*Maximum value of the scale*/
     int16_t * values;           /*Array of the set values (for needles) */
     char * txt;                 /*Printf-like text to display with the most critical value (e.g. "Value: %d")*/
     uint8_t needle_num;         /*Number of needles*/
-    uint8_t low_critical    :1; /*0: the higher value is more critical, 1: the lower value is more critical*/
+    uint8_t low_critical:1;     /*0: the higher value is more critical, 1: the lower value is more critical*/
 }lv_gauge_ext_t;
 
 /*Style of gauge*/
 typedef struct
 {
-	lv_rects_t rects;   /*Style of ancestor*/
+	lv_rects_t bg_rect;   /*Style of ancestor*/
 	/*New style element for this type */
-	color_t mcolor_critical;    /*Top color at critical.*/
-    color_t gcolor_critical;    /*Bottom color at critical*/
+	color_t critical_mcolor;    /*Top color at critical value*/
+    color_t critical_gcolor;    /*Bottom color at critical value*/
     /*Scale settings*/
-    uint16_t scale_angle;       /*Angle of the scale in deg. (~220)*/
+    uint16_t scale_angle;       /*Angle of the scale in deg. (e.g. 220)*/
 	lv_labels_t scale_labels;   /*Style of the scale labels*/
-    cord_t scale_pad;           /*Padding of scale labels from the edge*/
     uint8_t scale_label_num;    /*Number of scale labels (~6)*/
     /*Needle settings*/
     lv_lines_t needle_lines;    /*Style of neddles*/
     color_t needle_color[LV_GAUGE_MAX_NEEDLE];  /*Color of needles*/
-    color_t needle_mid_color;   /*Color of middle  where the needles start*/
-    cord_t needle_mid_r;        /*Radius of the needle middle area*/
-    opa_t needle_opa;           /*Opacity of the needles*/
+    color_t needle_mid_color;   /*Color of middle where the needles start*/
+    cord_t needle_mid_size;     /*Size of the needle middle area (circle diameter)*/
     /*Value text settings*/
     lv_labels_t value_labels;   /*Style of the value label*/
-    uint8_t value_pos;    /*Vertical position of the value label in percentage of object height (0..100 %)*/
+    uint8_t value_pos;          /*Vertical position of the value label in percentage of object height (0..100 %)*/
 }lv_gauges_t;
 
 /*Built-in styles of gauge*/

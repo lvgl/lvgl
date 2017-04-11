@@ -53,7 +53,7 @@ typedef struct
 /*Style of message box*/
 typedef struct
 {
-	lv_rects_t bg; /*Style of ancestor*/
+	lv_rects_t bg;          /*Style of ancestor*/
 	/*New style element for this type */
 	lv_labels_t title;      /*Style of the title*/
 	lv_labels_t txt;        /*Style of the text*/

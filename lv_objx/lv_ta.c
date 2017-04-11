@@ -532,17 +532,17 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 
 			area_t cur_area;
 			lv_labels_t * labels_p = lv_obj_get_style(ta_ext->label);
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - (ta_style->cursor_width >> 1);
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
 			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + (ta_style->cursor_width >> 1);
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + LV_DOWNSCALE ;
 			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + (font_get_height(labels_p->font) >> LV_FONT_ANTIALIAS);
 
 			lv_rects_t cur_rects;
 			lv_rects_get(LV_RECTS_PLAIN, &cur_rects);
 			cur_rects.radius = 0;
 			cur_rects.bwidth = 0;
-			cur_rects.base.color = ta_style->cursor_color;
-			cur_rects.gcolor = ta_style->cursor_color;
+			cur_rects.base.color = ta_style->label.base.color;
+			cur_rects.gcolor = ta_style->label.base.color;
 			lv_draw_rect(&cur_area, mask, &cur_rects);
 		}
 	}
@@ -588,8 +588,7 @@ static void lv_tas_init(void)
 
 	lv_labels_get(LV_LABELS_TXT, &lv_tas_def.label);
 
-	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
-	lv_tas_def.cursor_width = 1 * LV_DOWNSCALE;	/*>=1 px for visible cursor*/
+	lv_tas_def.label.base.color = COLOR_MAKE(0x10, 0x10, 0x10);
 	lv_tas_def.cursor_show = 1;
 
 }

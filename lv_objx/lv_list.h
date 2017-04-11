@@ -41,7 +41,7 @@
 /*Data of list*/
 typedef struct
 {
-    lv_page_ext_t page_ext; /*Ext. of ancestor*/
+    lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     /*No new data*/
 }lv_list_ext_t;
@@ -60,8 +60,8 @@ typedef struct
 /*Built-in styles of list*/
 typedef enum
 {
-	LV_LISTS_DEF,
-	LV_LISTS_TRANSP,
+	LV_LISTS_DEF,       /*Default list style. Transparent background, visible scrlollable object*/
+	LV_LISTS_TRANSP,    /*Transparent list style. Transparent background and scrollable object*/
 }lv_lists_builtin_t;
 
 /**********************

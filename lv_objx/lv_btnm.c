@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_BTNM_BTN_PR_INVALID 0xFFFF
+#define LV_BTNM_PR_NONE 0xFFFF
 
 /**********************
  *      TYPEDEFS
@@ -71,7 +71,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     lv_btnm_ext_t * ext = lv_obj_alloc_ext(new_btnm, sizeof(lv_btnm_ext_t));
     dm_assert(ext);
     ext->btn_cnt = 0;
-    ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
+    ext->btn_pr = LV_BTNM_PR_NONE;
     ext->btn_areas = NULL;
     ext->cb = NULL;
     ext->map_p = NULL;
@@ -134,7 +134,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 lv_obj_get_cords(btnm, &btnm_area);
     		    if(new_btn != ext->btn_pr) {
     		        lv_dispi_reset_lpr(param);
-    			    if(ext->btn_pr != LV_BTNM_BTN_PR_INVALID) {
+    			    if(ext->btn_pr != LV_BTNM_PR_NONE) {
     			        area_cpy(&btn_area, &ext->btn_areas[ext->btn_pr]);
     			        btn_area.x1 += btnm_area.x1;
                         btn_area.y1 += btnm_area.y1;
@@ -142,7 +142,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                         btn_area.y2 += btnm_area.y1;
     			        lv_inv_area(&btn_area);
     			    }
-                    if(new_btn != LV_BTNM_BTN_PR_INVALID) {
+                    if(new_btn != LV_BTNM_PR_NONE) {
                         area_cpy(&btn_area, &ext->btn_areas[new_btn]);
                         btn_area.x1 += btnm_area.x1;
                         btn_area.y1 += btnm_area.y1;
@@ -157,7 +157,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     		case LV_SIGNAL_RELEASED:
             case LV_SIGNAL_LONG_PRESS_REP:
     			if(ext->cb != NULL &&
-    			   ext->btn_pr != LV_BTNM_BTN_PR_INVALID) {
+    			   ext->btn_pr != LV_BTNM_PR_NONE) {
     				uint16_t txt_i = 0;
     				uint16_t btn_i = 0;
     				/*Search the next valid text in the map*/
@@ -169,7 +169,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
     				ext->cb(btnm, txt_i);
     			}
-    			if(sign == LV_SIGNAL_RELEASED && ext->btn_pr != LV_BTNM_BTN_PR_INVALID) {
+    			if(sign == LV_SIGNAL_RELEASED && ext->btn_pr != LV_BTNM_PR_NONE) {
     			    /*Invalidate to old area*/;
                     lv_obj_get_cords(btnm, &btnm_area);
                     area_cpy(&btn_area, &ext->btn_areas[ext->btn_pr]);
@@ -179,7 +179,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                     btn_area.y2 += btnm_area.y1;
                     lv_inv_area(&btn_area);
 
-                    ext->btn_pr = LV_BTNM_BTN_PR_INVALID;
+                    ext->btn_pr = LV_BTNM_PR_NONE;
     			}
 				break;
     		default:
@@ -294,7 +294,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
  * @param btnm: pointer to button matrix object
  * @param cb pointer to a callback function
  */
-void lv_btnm_set_cb(lv_obj_t * btnm, lv_btnm_callback_t cb)
+void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb)
 {
 	LV_EA(btnm, lv_btnm_ext_t)->cb = cb;
 }
@@ -509,7 +509,7 @@ static uint16_t lv_btnm_get_btn_from_point(lv_obj_t * btnm, point_t * p)
         }
     }
 
-    if(i == ext->btn_cnt) i = LV_BTNM_BTN_PR_INVALID;
+    if(i == ext->btn_cnt) i = LV_BTNM_PR_NONE;
 
     return i;
 }

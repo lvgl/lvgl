@@ -68,7 +68,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
     	lv_obj_set_size_us(new_list, 120, 150);
 		lv_obj_set_style(new_list, lv_lists_get(LV_LISTS_DEF, NULL));
-		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page_ext.scrl, LV_LIST_LAYOUT_DEF);
+		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page.scrl, LV_LIST_LAYOUT_DEF);
     } else {
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_list);

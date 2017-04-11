@@ -105,7 +105,9 @@ typedef struct __LV_OBJ_T
 
     cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
 
+#if LV_OBJ_FREE_NUM != 0
     uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
+#endif
 }lv_obj_t;
 
 /*Protect some attributes (max. 8 bit)*/
@@ -113,9 +115,8 @@ typedef enum
 {
     LV_PROTECT_NONE      = 0x00,
     LV_PROTECT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
-    LV_PROTECT_OPA       = 0x02, /*Prevent lv_obj_set_opar to modify the opacity*/
-    LV_PROTECT_PARENT    = 0x04, /*Prevent automatic parent change (e.g. in lv_page)*/
-    LV_PROTECT_POS       = 0x08, /*Prevent automatic positioning (e.g. in lv_rect layout)*/
+    LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
+    LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_rect layout)*/
 }lv_protect_t;
 
 typedef enum

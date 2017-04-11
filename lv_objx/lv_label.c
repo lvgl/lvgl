@@ -668,7 +668,7 @@ static void lv_labels_init(void)
 {
 	/*Text style*/
     lv_objs_get(LV_OBJS_PLAIN, &lv_labels_txt.base);
-    lv_labels_txt.base.color = COLOR_MAKE(0x10, 0x18, 0x20);
+    lv_labels_txt.base.color = COLOR_MAKE(0x20, 0x20, 0x20);
 	lv_labels_txt.font = font_get(LV_FONT_DEFAULT);
 	lv_labels_txt.letter_space = 1 * LV_DOWNSCALE;
 	lv_labels_txt.line_space =  2 * LV_DOWNSCALE;

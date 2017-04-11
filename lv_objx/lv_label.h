@@ -42,9 +42,9 @@ typedef struct
     char * txt;                     /*Text of the label*/
     lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
     char dot_tmp[LV_LABEL_DOT_NUM]; /*Store character which are replaced with dots*/
-    uint16_t dot_end;               /* The text end position in dot mode*/
-    uint8_t static_txt  :1;         /* Flag to indicate the text is static*/
-    uint8_t recolor  :1;            /* Enable in-line letter recoloring*/
+    uint16_t dot_end;               /*The text end position in dot mode*/
+    uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
+    uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/
 }lv_label_ext_t;
 
 /*Style of label*/
@@ -52,18 +52,18 @@ typedef struct
 {
 	lv_objs_t base;		/*Style of ancestor*/
 	/*New style element for this type */
-    const font_t * font;      /*Pointer to a font*/
-    cord_t letter_space;
-    cord_t line_space;
-    uint8_t mid         :1; /*1: Align the lines into the middle*/
+    const font_t * font;        /*Pointer to a font*/
+    cord_t letter_space;        /*Letter space in px*/
+    cord_t line_space;          /*Line space in px*/
+    uint8_t mid:1;              /*1: Align the lines into the middle*/
 }lv_labels_t;
 
 /*Built-in styles of label*/
 typedef enum
 {
-	LV_LABELS_TITLE,
-	LV_LABELS_TXT,
-	LV_LABELS_BTN,
+    LV_LABELS_TXT,          /*General text style*/
+	LV_LABELS_TITLE,        /*Like text style but greater spaces*/
+	LV_LABELS_BTN,          /*Mid. aligned style for buttons*/
 }lv_labels_builtin_t;
 
 /**********************

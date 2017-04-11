@@ -30,24 +30,23 @@
 /*Data of led*/
 typedef struct
 {
-    lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+    lv_rect_ext_t bg_rect;       /*Ext. of ancestor*/
     /*New data for this type */
-    uint8_t bright;         /*Current brightness of the LED*/
+    uint8_t bright;         /*Current brightness of the LED (0..255)*/
 }lv_led_ext_t;
 
 /*Style of led*/
 typedef struct
 {
-	lv_rects_t bg_rect;/*Style of ancestor*/
+	lv_rects_t bg_rect;  /*Style of ancestor*/
 	/*New style element for this type */
 }lv_leds_t;
 
 /*Built-in styles of led*/
 typedef enum
 {
-	LV_LEDS_DEF,
-	LV_LEDS_RED,
-	LV_LEDS_GREEN,
+	LV_LEDS_RED,        /*Red LED style*/
+	LV_LEDS_GREEN,      /*Green LED style*/
 }lv_leds_builtin_t;
 
 /**********************

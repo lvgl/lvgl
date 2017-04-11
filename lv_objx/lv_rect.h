@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_RECT_CIRCLE		0xFFFF	/*A very big radius to always draw as circle*/
+#define LV_RECT_CIRCLE		((cord_t)-1)	/*A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS
@@ -43,9 +43,9 @@ typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
     /*New data for this type */
-    uint8_t layout  :5;
-    uint8_t hfit_en :1;
-    uint8_t vfit_en :1;
+    uint8_t layout  :5;     /*Set a layout from 'lv_rect_layout_t' enum*/
+    uint8_t hpad_en :1;     /*Enable horizontal padding according to the children*/
+    uint8_t vpad_en :1;     /*Enable horizontal padding according to the children*/
 }lv_rect_ext_t;
 
 

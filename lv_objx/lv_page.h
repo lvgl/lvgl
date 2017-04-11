@@ -31,15 +31,15 @@
 /*Data of page*/
 typedef struct
 {
-    lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+    lv_rect_ext_t bg_rect; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * scrl;            /*The scrollable object on the background*/
-    lv_action_t rel_action;     /*Release action*/
-    lv_action_t pr_action;      /*Press action*/
-    area_t sbh;                 /*Horizontal scrollbar area (relative to the page) */
-    area_t sbv;                 /*Vertical scrollbar area (relative to the page)*/
-    uint8_t sbh_draw :1;        /*1: horizontal scrollbar is visible now*/
-    uint8_t sbv_draw :1;        /*1: vertical scrollbar is visible now*/
+    lv_action_t rel_action;     /*Function to call when the page is released*/
+    lv_action_t pr_action;      /*Function to call when the page is pressed*/
+    area_t sbh;                 /*Horizontal scrollbar area relative to the page. (Handled by the library) */
+    area_t sbv;                 /*Vertical scrollbar area relative to the page (Handled by the library)*/
+    uint8_t sbh_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
+    uint8_t sbv_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
 }lv_page_ext_t;
 
 /*Scrollbar modes: shows when should the scrollbars be visible*/
