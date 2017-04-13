@@ -28,26 +28,13 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * opt_label;                           /*Label for the options*/
+    lv_style_t * style_sel;                         /*Style of the selected option*/
     lv_action_res_t (*cb)(lv_obj_t *, uint16_t);    /*Pointer to function to call when an option is slected*/
     uint16_t sel_opt;                               /*Index of the current option*/
     uint8_t opened :1;                              /*1: The list is opened*/
     uint8_t auto_size :1;                           /*1: Set height to show all options. 0: Set height maximum to the parent bottom*/
 }lv_ddlist_ext_t;
 
-/*Style of drop down list*/
-typedef struct
-{
-	lv_pages_t page;        /*Style of ancestor*/
-	/*New style element for this type */
-	lv_rects_t sel;         /*Select the 'selected' rectangle*/
-	lv_labels_t label;      /*Style of labels*/
-}lv_ddlists_t;
-
-/*Built-in styles of drop down list*/
-typedef enum
-{
-	LV_DDLISTS_DEF,     /*Default drop down list*/
-}lv_ddlists_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -105,6 +92,8 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_res_t (*cb)(lv_obj_t *, u
  */
 void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size);
 
+void lv_dlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style);
+
 /**
  * Get the options of a drop down list
  * @param ddlist pointer to drop down list object
@@ -126,13 +115,7 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
  */
 bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_ddlists_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_ddlists_t style
- */
-lv_ddlists_t * lv_ddlists_get(lv_ddlists_builtin_t style, lv_ddlists_t * copy);
+lv_style_t * lv_dlist_get_style_select(lv_obj_t * ddlist);
 
 /**********************
  *      MACROS

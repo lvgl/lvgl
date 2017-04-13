@@ -48,34 +48,6 @@ typedef struct
     uint8_t vpad_en :1;     /*Enable horizontal padding according to the children*/
 }lv_rect_ext_t;
 
-
-/*Style of rectangle*/
-typedef struct
-{
-	lv_objs_t base;	/*Style of ancestor*/
-	/*New style element for this type */
-    color_t gcolor; /*Gradient color*/
-    color_t bcolor;	/*Border color*/
-    color_t scolor;	/*Shadow color*/
-    cord_t bwidth;  /*Border width*/
-    cord_t swidth;  /*Shadow width*/
-    cord_t radius;  /*Radius on the corners*/
-    cord_t hpad;	/*Horizontal padding. Used by fit and layout.*/
-    cord_t vpad;	/*Vertical padding. Used by fit and layout.*/
-    cord_t opad;	/*Object padding. Used by fit */
-    opa_t bopa;	    /*Border opacity relative to the object*/
-    uint8_t empty :1; /*1: Do not draw the body of the rectangle*/
-}lv_rects_t;
-
-/*Built-in styles of rectangle*/
-typedef enum
-{
-    LV_RECTS_PLAIN,
-    LV_RECTS_FANCY,
-	LV_RECTS_BORDER,
-    LV_RECTS_TRANSP,
-}lv_rects_builtin_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -133,13 +105,6 @@ bool lv_rect_get_hfit(lv_obj_t * rect);
  */
 bool lv_rect_get_vfit(lv_obj_t * rect);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_rects_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_rects_t style
- */
-lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy);
 
 /**********************
  *      MACROS

@@ -33,20 +33,6 @@ typedef struct
     uint8_t  upscale    :1;         /*1: upscale coordinates with LV_DOWNSCALE*/
 }lv_line_ext_t;
 
-/*Style of line*/
-typedef struct
-{
-	lv_objs_t base;	/*Style of ancestor*/
-	/*New style element for this type */
-	cord_t width;   /*Line width*/
-}lv_lines_t;
-
-/*Built-in styles of line*/
-typedef enum
-{
-	LV_LINES_DEF,
-}lv_lines_builtin_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -120,14 +106,6 @@ bool lv_line_get_y_inv(lv_obj_t * line);
  * @return true: point coordinate upscale is enabled, false: disabled
  */
 bool lv_line_get_upscale(lv_obj_t * line);
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_lines_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_lines_t style
- */
-lv_lines_t * lv_lines_get(lv_lines_builtin_t style, lv_lines_t * copy);
 
 /**********************
  *      MACROS

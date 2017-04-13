@@ -44,15 +44,10 @@ static void lv_rect_layout_center(lv_obj_t * rect);
 static void lv_rect_layout_pretty(lv_obj_t * rect);
 static void lv_rect_layout_grid(lv_obj_t * rect);
 static void lv_rect_refr_autofit(lv_obj_t * rect);
-static void lv_rects_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_rects_t lv_rects_plain;
-static lv_rects_t lv_rects_fancy;
-static lv_rects_t lv_rects_border;
-static lv_rects_t lv_rects_transp;
 
 /**********************
  *      MACROS
@@ -89,7 +84,7 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new rectangle*/
     if(copy == NULL) {
-		lv_obj_set_style(new_rect, lv_rects_get(LV_RECTS_PLAIN, NULL));
+		lv_obj_set_style(new_rect, lv_style_get(LV_STYLE_PLAIN, NULL));
     }
     /*Copy an existing object*/
     else {
@@ -123,7 +118,7 @@ bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
 
-    	lv_rects_t * style = lv_obj_get_style(rect);
+    	lv_style_t * style = lv_obj_get_style(rect);
 
     	switch(sign) {
     	case LV_SIGNAL_STYLE_CHG: /*Recalculate the padding if the style changed*/
@@ -228,47 +223,6 @@ bool lv_rect_get_vfit(lv_obj_t * rect)
 }
 
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_rects_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_rects_t style
- */
-lv_rects_t * lv_rects_get(lv_rects_builtin_t style, lv_rects_t * copy)
-{
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_rects_init();
-		style_inited = true;
-	}
-
-	lv_rects_t * style_p;
-
-	switch(style) {
-		case LV_RECTS_PLAIN:
-			style_p = &lv_rects_plain;
-			break;
-        case LV_RECTS_FANCY:
-            style_p = &lv_rects_fancy;
-            break;
-		case LV_RECTS_BORDER:
-			style_p = &lv_rects_border;
-			break;
-		case LV_RECTS_TRANSP:
-			style_p = &lv_rects_transp;
-			break;
-		default:
-			style_p = &lv_rects_plain;
-	}
-
-	if(copy != NULL) {
-		memcpy(copy, style_p, sizeof(lv_rects_t));
-	}
-
-	return style_p;
-}
 
 
 /**********************
@@ -290,9 +244,9 @@ static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_
     if(mode == LV_DESIGN_COVER_CHK) {
         /* Because of the radius it is not sure the area is covered
          * Check the areas where there is no radius*/
-    	if(LV_SA(rect, lv_rects_t)->empty != 0) return false;
+    	if(rect->style_p->empty != 0) return false;
 
-    	uint16_t r = LV_SA(rect, lv_rects_t)->radius;
+    	uint16_t r = rect->style_p->radius;
 
     	if(r == LV_RECT_CIRCLE) return false;
 
@@ -312,7 +266,7 @@ static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_
 
     	return false;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		lv_rects_t * style =  lv_obj_get_style(rect);
+		lv_style_t * style =  lv_obj_get_style(rect);
 		area_t area;
 		lv_obj_get_cords(rect, &area);
 
@@ -333,17 +287,17 @@ static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_
  */
 static void lv_rect_draw_shadow(lv_obj_t * rect, const area_t * mask)
 {
-	lv_rects_t * style =  lv_obj_get_style(rect);
+	lv_style_t * style =  lv_obj_get_style(rect);
 	cord_t swidth = style->swidth;
 	if(swidth == 0) return;
     uint8_t res = LV_DOWNSCALE * 2;
 	if(swidth < res) return;
 
 	area_t shadow_area;
-	lv_rects_t shadow_style;
+	lv_style_t shadow_style;
 	lv_obj_get_cords(rect, &shadow_area);
 
-	memcpy(&shadow_style, style, sizeof(lv_rects_t));
+	memcpy(&shadow_style, style, sizeof(lv_style_t));
 
 	shadow_style.empty = 1;
 	shadow_style.bwidth = swidth;
@@ -361,7 +315,7 @@ static void lv_rect_draw_shadow(lv_obj_t * rect, const area_t * mask)
 	shadow_area.y2 += swidth;
 
 	cord_t i;
-	shadow_style.base.opa =  style->base.opa / (swidth / res);
+	shadow_style.opa =  style->opa / (swidth / res);
 
 	for(i = 1; i < swidth; i += res) {
 		lv_draw_rect(&shadow_area, mask, &shadow_style);
@@ -411,7 +365,7 @@ static void lv_rect_layout_col(lv_obj_t * rect)
 
 	/*Adjust margin and get the alignment type*/
 	lv_align_t align;
-	lv_rects_t * style = lv_obj_get_style(rect);
+	lv_style_t * style = lv_obj_get_style(rect);
 	cord_t hpad_corr;
 
 	switch(type) {
@@ -460,7 +414,7 @@ static void lv_rect_layout_row(lv_obj_t * rect)
 
 	/*Adjust margin and get the alignment type*/
 	lv_align_t align;
-	lv_rects_t * style = lv_obj_get_style(rect);
+	lv_style_t * style = lv_obj_get_style(rect);
 	cord_t vpad_corr = style->vpad;
 
 	switch(type) {
@@ -506,7 +460,7 @@ static void lv_rect_layout_row(lv_obj_t * rect)
 static void lv_rect_layout_center(lv_obj_t * rect)
 {
 	lv_obj_t * child;
-	lv_rects_t * style = lv_obj_get_style(rect);
+	lv_style_t * style = lv_obj_get_style(rect);
 	uint32_t obj_num = 0;
 	cord_t h_tot = 0;
 
@@ -546,7 +500,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 	lv_obj_t * child_rs;    /* Row starter child */
 	lv_obj_t * child_rc;    /* Row closer child */
 	lv_obj_t * child_tmp;   /* Temporary child */
-	lv_rects_t * style = lv_obj_get_style(rect);
+	lv_style_t * style = lv_obj_get_style(rect);
 	cord_t w_obj = lv_obj_get_width(rect);
 	cord_t act_y = style->vpad;
 	/* Disable child change action because the children will be moved a lot
@@ -622,7 +576,7 @@ static void lv_rect_layout_pretty(lv_obj_t * rect)
 static void lv_rect_layout_grid(lv_obj_t * rect)
 {
 	lv_obj_t * child;
-	lv_rects_t * style = lv_obj_get_style(rect);
+	lv_style_t * style = lv_obj_get_style(rect);
 	cord_t w_tot = lv_obj_get_width(rect);
 	cord_t w_obj = lv_obj_get_width(lv_obj_get_child(rect, NULL));
 	cord_t h_obj = lv_obj_get_height(lv_obj_get_child(rect, NULL));
@@ -680,7 +634,7 @@ static void lv_rect_refr_autofit(lv_obj_t * rect)
 
 	area_t new_cords;
 	area_t ori;
-	lv_rects_t * style = lv_obj_get_style(rect);
+	lv_style_t * style = lv_obj_get_style(rect);
 	lv_obj_t * i;
 	cord_t hpad = style->hpad;
 	cord_t vpad = style->vpad;
@@ -739,55 +693,4 @@ static void lv_rect_refr_autofit(lv_obj_t * rect)
     }
 }
 
-/**
- * Initialize the rectangle styles
- */
-static void lv_rects_init(void)
-{
-	/*Plain style*/
-    lv_objs_get(LV_OBJS_PLAIN, &lv_rects_plain.base);
-    lv_rects_plain.base.color = COLOR_MAKE(0x80, 0xb3, 0xe6);  //6BA3BF
-    lv_rects_plain.gcolor = lv_rects_plain.base.color;
-    lv_rects_plain.bcolor = COLOR_WHITE;
-    lv_rects_plain.scolor = COLOR_GRAY;
-    lv_rects_plain.bwidth = (LV_DPI / 30) == 0 ? 1 * LV_DOWNSCALE : LV_DPI / 30;
-    lv_rects_plain.swidth = 0;
-    lv_rects_plain.bopa = OPA_COVER;
-    lv_rects_plain.radius = LV_DPI / 10;
-    lv_rects_plain.empty = 0;
-    lv_rects_plain.hpad = LV_DPI / 2;
-    lv_rects_plain.vpad = LV_DPI / 2;
-    lv_rects_plain.opad = LV_DPI / 4;
-
-    /*Fancy style*/
-    lv_objs_get(LV_OBJS_PLAIN, &lv_rects_fancy.base);
-    lv_rects_fancy.gcolor = COLOR_MAKE(0xd3, 0xe1, 0xea);
-    lv_rects_fancy.bcolor = COLOR_WHITE;
-    lv_rects_fancy.scolor = COLOR_BLACK;
-    lv_rects_fancy.bwidth = (LV_DPI / 30) == 0 ? 1 * LV_DOWNSCALE : LV_DPI / 30;
-    lv_rects_fancy.swidth = LV_DPI / 6;
-    lv_rects_fancy.bopa = OPA_50;
-    lv_rects_fancy.radius = LV_DPI / 10;
-    lv_rects_fancy.empty = 0;
-    lv_rects_fancy.hpad = LV_DPI / 4;
-    lv_rects_fancy.vpad = LV_DPI / 4;
-    lv_rects_fancy.opad = LV_DPI / 6;
-
-	/*Transparent style*/
-	memcpy(&lv_rects_transp, &lv_rects_plain, sizeof(lv_rects_t));
-	 /* Do not use opa=OPA_TRANSP because design function will not be called
-	  * but it might draw something on transparent background*/
-	lv_rects_transp.empty = 1;
-	lv_rects_transp.bwidth = 0;
-	lv_rects_transp.swidth = 0;
-	lv_rects_transp.hpad = 0;
-    lv_rects_transp.vpad = 0;
-
-	/*Border style*/
-	memcpy(&lv_rects_border, &lv_rects_plain, sizeof(lv_rects_t));
-	lv_rects_border.bcolor = COLOR_MAKE(0x30, 0x30, 0x30);
-	lv_rects_border.bwidth = LV_DPI / 30;
-	lv_rects_border.swidth = 0;
-	lv_rects_border.empty = 1;
-}
 #endif

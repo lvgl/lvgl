@@ -316,7 +316,8 @@ static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
         
         /*If no better children check this object*/
         if(found_p == NULL) {
-            if(((lv_objs_t *)obj->style_p)->opa == OPA_COVER &&
+            lv_style_t * style = lv_obj_get_style(obj);
+            if(style->opa == OPA_COVER &&
                obj->design_f(obj, area_p, LV_DESIGN_COVER_CHK) != false) {
                 found_p = obj;
             }
@@ -401,8 +402,9 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
 
-        /* Redraw the object */    
-        if(((lv_objs_t *)obj->style_p)->opa != OPA_TRANSP) {
+        /* Redraw the object */
+        lv_style_t * style = lv_obj_get_style(obj);
+        if(style->opa != OPA_TRANSP) {
             obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
            /* tick_wait_ms(100); */ /*DEBUG: Wait after every object draw to see the order of drawing*/
         }
@@ -435,7 +437,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
         }
 
         /* If all the children are redrawn make 'post draw' design */
-        if(((lv_objs_t *)obj->style_p)->opa != OPA_TRANSP) {
+        if(style->opa != OPA_TRANSP) {
 		  obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
 		}
     }

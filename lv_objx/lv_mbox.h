@@ -44,32 +44,10 @@ typedef struct
 {
     lv_rect_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * title;   /*Title of the message box*/
     lv_obj_t * txt;     /*Text of the message box*/
     lv_obj_t * btnh;    /*Holder of the buttons*/
+    lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Style of the buttons*/
 }lv_mbox_ext_t;
-
-
-/*Style of message box*/
-typedef struct
-{
-	lv_rects_t bg;          /*Style of ancestor*/
-	/*New style element for this type */
-	lv_labels_t title;      /*Style of the title*/
-	lv_labels_t txt;        /*Style of the text*/
-	lv_rects_t btnh;        /*Style of the button holder*/
-	lv_btns_t btn;          /*Style of the buttons*/
-	lv_labels_t btn_label;  /*Style of the label on the buttons*/
-}lv_mboxs_t;
-
-/*Built-in styles of message box*/
-typedef enum
-{
-	LV_MBOXS_DEF,
-	LV_MBOXS_INFO,
-	LV_MBOXS_WARN,
-	LV_MBOXS_ERR,
-}lv_mboxs_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -93,19 +71,12 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 
 /**
- * Set the title of the message box
- * @param mbox pointer to a message box
- * @param title a '\0' terminated character string which will be the message box title
- */
-void lv_mbox_set_title(lv_obj_t * mbox, const char * title);
-
-/**
  * Set the text of the message box
  * @param mbox pointer to a message box
  * @param txt a '\0' terminated character string which will be the message box text
  */
 void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
-
+void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
 /**
  * Add a button to the message box
  * @param mbox pointer to message box object
@@ -137,13 +108,6 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout);
 void lv_mbox_stop_auto_close(lv_obj_t * mbox);
 
 /**
- * get the title of the message box
- * @param mbox pointer to a message box object
- * @return pointer to the title of the message box
- */
-const char * lv_mbox_get_title(lv_obj_t * mbox);
-
-/**
  * Get the text of the message box
  * @param mbox pointer to a message box object
  * @return pointer to the text of the message box
@@ -157,14 +121,6 @@ const char * lv_mbox_get_txt(lv_obj_t * mbox);
  * @return pointer to the button's message box
  */
 lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn);
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_mboxs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_mboxs_t style
- */
-lv_mboxs_t * lv_mboxs_get(lv_mboxs_builtin_t style, lv_mboxs_t * copy);
 
 /**********************
  *      MACROS

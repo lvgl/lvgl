@@ -23,12 +23,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mode);
-static void lv_cbs_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_cbs_t lv_cbs_def;
 static lv_design_f_t ancestor_design_f;
 /**********************
  *      MACROS
@@ -66,17 +64,22 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
+        ext->bullet = lv_btn_create(new_cb, NULL);
+        lv_btn_set_styles(new_cb, lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
+                                  lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
+                                  lv_style_get(LV_STYLE_TRANSP, NULL));
         lv_rect_set_layout(new_cb, LV_RECT_LAYOUT_ROW_M);
         lv_rect_set_fit(new_cb, true, true);
         lv_btn_set_tgl(new_cb, true);
 
-        ext->bullet = lv_btn_create(new_cb, NULL);
         lv_obj_set_click(ext->bullet, false);
+        lv_btn_set_styles(ext->bullet, lv_style_get(LV_STYLE_BTN_REL, NULL), lv_style_get(LV_STYLE_BTN_PR, NULL),
+                                       lv_style_get(LV_STYLE_BTN_TREL, NULL), lv_style_get(LV_STYLE_BTN_TPR, NULL),
+                                       lv_style_get(LV_STYLE_BTN_INA, NULL));
 
         ext->label = lv_label_create(new_cb, NULL);
+        lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
         lv_label_set_text(ext->label, "Check box");
-
-        lv_obj_set_style(new_cb, lv_cbs_get(LV_CBS_DEF, NULL));
     } else {
     	lv_cb_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
@@ -106,29 +109,19 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     valid = lv_btn_signal(cb, sign, param);
 
     lv_cb_ext_t * ext = lv_obj_get_ext(cb);
-    lv_cbs_t * cbs = lv_obj_get_style(cb);
+    lv_style_t * style = lv_obj_get_style(cb);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	switch(sign) {
-    	case LV_SIGNAL_PRESSED:
-    	case LV_SIGNAL_RELEASED:
-    	case LV_SIGNAL_LONG_PRESS:
-    	case LV_SIGNAL_PRESS_LOST:
-    		lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-    		break;
-    	case LV_SIGNAL_STYLE_CHG:
-    		lv_obj_set_size(ext->bullet, cbs->bullet_size, cbs->bullet_size);
-    		lv_obj_set_style(ext->bullet, &cbs->bullet);
-    		lv_obj_set_style(ext->label, &cbs->label);
-    		break;
-    	case LV_SIGNAL_CLEANUP:
-    		/*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    		break;
-    		default:
-    			break;
+    	if(sign == LV_SIGNAL_STYLE_CHG) {
+    		lv_obj_set_size(ext->bullet, font_get_height(style->font), font_get_height(style->font));
     	}
+        if(sign == LV_SIGNAL_PRESSED ||
+            sign == LV_SIGNAL_RELEASED ||
+            sign == LV_SIGNAL_PRESS_LOST) {
+            lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
+        }
     }
     
     return valid;
@@ -167,35 +160,16 @@ const char * lv_cb_get_text(lv_obj_t * cb)
 }
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_cbs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_cbs_t style
+ * Get the bullet (lv_btn) of a check box
+ * @param cb pointer to check box object
+ * @return pointer to the bullet of the check box (lv_btn)
  */
-lv_cbs_t * lv_cbs_get(lv_cbs_builtin_t style, lv_cbs_t * copy)
+lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb)
 {
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_cbs_init();
-		style_inited = true;
-	}
-
-	lv_cbs_t  *style_p;
-
-	switch(style) {
-		case LV_CBS_DEF:
-			style_p = &lv_cbs_def;
-			break;
-		default:
-			style_p = &lv_cbs_def;
-	}
-
-	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_cbs_t));
-
-	return style_p;
+    lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+    return ext->bullet;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -231,33 +205,4 @@ static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mo
     return true;
 }
 
-/**
- * Initialize the rectangle styles
- */
-static void lv_cbs_init(void)
-{
-	/*Default style*/
-
-	/*Bg style*/
-	lv_btns_get(LV_BTNS_TRANSP, &lv_cbs_def.bg);
-	lv_cbs_def.bg.state_style[LV_BTN_STATE_REL].hpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_REL].vpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_PR].hpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_PR].vpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_TREL].hpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_TREL].vpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_TPR].hpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_TPR].vpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_INA].hpad = LV_DPI / 10;
-    lv_cbs_def.bg.state_style[LV_BTN_STATE_INA].vpad = LV_DPI / 10;
-
-	/*Bullet style*/
-	lv_btns_get(LV_BTNS_DEF, &lv_cbs_def.bullet);
-
-	/*Label*/
-	lv_labels_get(LV_LABELS_TXT, &lv_cbs_def.label);
-
-	/*Others*/
-	lv_cbs_def.bullet_size = LV_OBJ_DEF_WIDTH / 3;
-}
 #endif

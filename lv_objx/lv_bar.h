@@ -37,29 +37,15 @@
 /*Data of bar*/
 typedef struct
 {
-    lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+    lv_rect_ext_t rect_ext;     /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * label;      /*Pointer to the label on the bar*/
-    int16_t act_value;     /*Current value of the bar*/
-    int16_t min_value;     /*Minimum value of the bar*/
-    int16_t max_value;     /*Maximum value of the bar*/
-    char * format_str;     /*Format string of the label. E.g. "Progress: %d"*/
+    lv_obj_t * label;           /*Pointer to the label on the bar*/
+    int16_t act_value;          /*Current value of the bar*/
+    int16_t min_value;          /*Minimum value of the bar*/
+    int16_t max_value;          /*Maximum value of the bar*/
+    char * format_str;          /*Format string of the label. E.g. "Progress: %d"*/
+    lv_style_t * style_indic;   /*Style of the indicator*/
 }lv_bar_ext_t;
-
-/*Style of bar*/
-typedef struct
-{
-	lv_rects_t bg;      /*Style of the background (inherited)*/
-	lv_rects_t indic;   /*Style of the indicator*/
-    lv_labels_t label;  /*Style of the label*/
-
-}lv_bars_t;
-
-/*Built-in styles of bar*/
-typedef enum
-{
-	LV_BARS_DEF,
-}lv_bars_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -110,14 +96,8 @@ void lv_bar_set_format_str(lv_obj_t * bar, const char * format);
  */
 int16_t lv_bar_get_value(lv_obj_t * bar);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_bars_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_bars_t style
- */
-lv_bars_t * lv_bars_get(lv_bars_builtin_t style, lv_bars_t * copy);
-
+lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar);
+void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style);
 /**********************
  *      MACROS
  **********************/

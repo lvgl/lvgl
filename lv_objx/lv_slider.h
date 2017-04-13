@@ -29,15 +29,8 @@ typedef struct
     /*New data for this type */
     lv_action_t cb;     /*Function to call when a new value is set*/
     int16_t tmp_value;  /*Store temporal value during press until release (Handled by the library)*/
+    lv_style_t * style_knob;    /*Styée of the knob*/
 }lv_slider_ext_t;
-
-/*Style of slider*/
-typedef struct
-{
-	lv_bars_t  bar;     /*Style of ancestor*/
-	/*New style element for this type */
-	lv_rects_t knob;    /*Style of the knob*/
-}lv_sliders_t;
 
 /*Built-in styles of slider*/
 typedef enum
@@ -66,13 +59,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy);
  */
 bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_sliders_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_sliders_t style
- */
-lv_sliders_t * lv_sliders_get(lv_sliders_builtin_t style, lv_sliders_t * copy);
 
 /**********************
  *      MACROS

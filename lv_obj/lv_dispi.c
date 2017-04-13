@@ -429,7 +429,7 @@ static void dispi_drag(lv_dispi_t * dispi_p)
 
             /*Set the drag in progress flag if the object is really moved*/
             if(lv_obj_get_x(drag_obj) != act_x || lv_obj_get_y(drag_obj) != act_y) {
-                if(dispi_p->drag_range_out == 0) { /*Send the drag begin signal on first move*/
+                if(dispi_p->drag_range_out != 0) { /*Send the drag begin signal on first move*/
                     drag_obj->signal_f(drag_obj,  LV_SIGNAL_DRAG_BEGIN, dispi_p);
                 }
                 dispi_p->drag_in_prog = 1;

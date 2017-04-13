@@ -41,22 +41,6 @@ typedef struct
     lv_obj_t * label;   /*Pointer to label*/
 }lv_cb_ext_t;
 
-/*Style of check box*/
-typedef struct
-{
-	lv_btns_t bg; /*Style of the background button*/
-	/*New style element for this type */
-	lv_btns_t bullet;   /*Style of the bullet*/
-	lv_labels_t label;  /*Style of the label*/
-	cord_t bullet_size; /*Size of bullet (square)*/
-}lv_cbs_t;
-
-/*Built-in styles of check box*/
-typedef enum
-{
-	LV_CBS_DEF,     /*Default style with transparent background*/
-}lv_cbs_builtin_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -91,14 +75,7 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt);
  */
 const char * lv_cb_get_text(lv_obj_t * cb);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_cbs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_cbs_t style
- */
-lv_cbs_t * lv_cbs_get(lv_cbs_builtin_t style, lv_cbs_t * copy);
-
+lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb);
 /**********************
  *      MACROS
  **********************/

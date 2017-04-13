@@ -35,20 +35,6 @@ typedef struct
     uint8_t bright;         /*Current brightness of the LED (0..255)*/
 }lv_led_ext_t;
 
-/*Style of led*/
-typedef struct
-{
-	lv_rects_t bg_rect;  /*Style of ancestor*/
-	/*New style element for this type */
-}lv_leds_t;
-
-/*Built-in styles of led*/
-typedef enum
-{
-	LV_LEDS_RED,        /*Red LED style*/
-	LV_LEDS_GREEN,      /*Green LED style*/
-}lv_leds_builtin_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -101,15 +87,6 @@ void lv_led_tgl(lv_obj_t * led);
  * @return bright 0 (max. dark) ... 255 (max. light)
  */
 uint8_t lv_led_get_bright(lv_obj_t * led);
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_leds_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_leds_t style
- */
-lv_leds_t * lv_leds_get(lv_leds_builtin_t style, lv_leds_t * copy);
-
 
 /**********************
  *      MACROS

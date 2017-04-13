@@ -15,6 +15,7 @@
 #include "misc/mem/dyn_mem.h"
 #include "misc/mem/linked_list.h"
 #include "misc/others/color.h"
+#include "lv_style.h"
 
 /*********************
  *      DEFINES
@@ -85,7 +86,7 @@ typedef struct __LV_OBJ_T
     lv_design_f_t design_f;
     
     void * ext;           /*The object attributes can be extended here*/
-    void * style_p;       /*Object specific style*/
+    lv_style_t * style_p;       /*Object specific style*/
 
 #if LV_OBJ_FREE_P != 0
     void * free_p;        /*Application specific pointer (set it freely)*/
@@ -153,13 +154,6 @@ typedef struct
 
 typedef enum
 {
-	LV_OBJS_SCR,
-    LV_OBJS_PLAIN,
-	LV_OBJS_TRANSP,
-}lv_objs_builtin_t;
-
-typedef enum
-{
 	LV_ANIM_NONE = 0,
 	LV_ANIM_FLOAT_TOP, 		/*Float from/to the top*/
 	LV_ANIM_FLOAT_LEFT,		/*Float from/to the left*/
@@ -220,14 +214,6 @@ void lv_obj_del(lv_obj_t * obj);
  * @return false: the object become invalid (e.g. deleted)
  */
 bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
-
-/**
- * Return with a pointer to built-in style and/or copy it to a variable
- * @param style a style name from lv_objs_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_objs_t style
- */
-lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p);
 
 /**
  * Load a new screen
@@ -365,7 +351,7 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size);
  * @param obj pointer to an object
  * @param style_p pointer to the new style
  */
-void lv_obj_set_style(lv_obj_t * obj, void * style);
+void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style);
 
 /**
  * Isolate the style of an object. In other words a unique style will be created
@@ -570,7 +556,7 @@ cord_t lv_obj_getext_size(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to a style
  */
-void * lv_obj_get_style(lv_obj_t * obj);
+lv_style_t * lv_obj_get_style(lv_obj_t * obj);
 
 /**
  * Get the hidden attribute of an object
@@ -675,8 +661,5 @@ void * lv_obj_get_free_p(lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
-
-#define LV_SA(obj, style_type) ((style_type *) obj->style_p)
-#define LV_EA(obj, ext_type) ((ext_type *) obj->ext)
 
 #endif

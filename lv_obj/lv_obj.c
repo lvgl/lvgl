@@ -35,8 +35,8 @@
  **********************/
 static void lv_obj_pos_child_refr(lv_obj_t * obj, cord_t x_diff, cord_t y_diff);
 static void lv_style_refr_core(void * style_p, lv_obj_t * obj);
+static void lv_child_refr_style(lv_obj_t * obj);
 static void lv_obj_del_child(lv_obj_t * obj);
-static void lv_objs_init(void);
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
 
 /**********************
@@ -45,11 +45,6 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 static lv_obj_t * def_scr = NULL;
 static lv_obj_t * act_scr = NULL;
 static ll_dsc_t scr_ll;
-
-static lv_objs_t lv_objs_scr;
-static lv_objs_t lv_objs_plain;
-static lv_objs_t lv_objs_transp;
-
 
 #ifdef LV_IMG_DEF_WALLPAPER
 LV_IMG_DECLARE(LV_IMG_DEF_WALLPAPER);
@@ -72,6 +67,9 @@ void lv_init(void)
     area_t scr_area;
     area_set(&scr_area, 0, 0, LV_HOR_RES, LV_VER_RES);
     lv_rfill(&scr_area, NULL, COLOR_BLACK, OPA_COVER);
+
+    /*Init. the sstyles*/
+    lv_style_init();
     
     /*Init. the screen refresh system*/
     lv_refr_init();
@@ -136,7 +134,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->ext_size = 0;
 
 		/*Set appearance*/
-		new_obj->style_p = lv_objs_get(LV_OBJS_SCR, NULL);
+		new_obj->style_p = lv_style_get(LV_STYLE_PLAIN, NULL);
 
 		/*Set virtual functions*/
 		lv_obj_set_signal_f(new_obj, lv_obj_signal);
@@ -178,7 +176,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->ext_size = 0;
 
         /*Set appearance*/
-        new_obj->style_p = lv_objs_get(LV_OBJS_PLAIN, NULL);
+        new_obj->style_p = lv_style_get(LV_STYLE_PLAIN, NULL);
         
         /*Set virtual functions*/
         lv_obj_set_signal_f(new_obj, lv_obj_signal);
@@ -317,43 +315,6 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
 
     return valid;
-}
-
-/**
- * Return with a pointer to built-in style and/or copy it to a variable
- * @param style a style name from lv_objs_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_objs_t style
- */
-lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
-{
-    static bool style_inited = false;
-
-    /*Make the style initialization if it is not done yet*/
-    if(style_inited == false) {
-        lv_objs_init();
-        style_inited = true;
-    }
-
-	lv_objs_t * style_p;
-
-	switch(style) {
-		case LV_OBJS_SCR:
-			style_p = &lv_objs_scr;
-			break;
-        case LV_OBJS_PLAIN:
-            style_p = &lv_objs_plain;
-            break;
-		case LV_OBJS_TRANSP:
-			style_p = &lv_objs_transp;
-			break;
-		default:
-			style_p = NULL;
-	}
-
-	if(copy_p != NULL)  memcpy(copy_p, style_p, sizeof(lv_objs_t));
-
-	return style_p;
 }
 
 
@@ -807,20 +768,17 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
  * @param obj pointer to an object
  * @param style_p pointer to the new style
  */
-void lv_obj_set_style(lv_obj_t * obj, void * style)
+void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
 {
-    lv_obj_inv(obj);
-
 	if(obj->style_iso != 0) {
 		dm_free(obj->style_p);
 		obj->style_iso = 0;
 	}
     obj->style_p = style;
 
-    /*Send a style change signal to the object*/
-    lv_obj_refr_style(obj);
+    /*Send a signal about style change to every children with NULL style*/
+    lv_child_refr_style(obj);
 
-    lv_obj_inv(obj);
 }
 
 /**
@@ -1277,13 +1235,24 @@ cord_t lv_obj_getext_size(lv_obj_t * obj)
  *---------------*/
 
 /**
- * Get the style pointer of an object
+ * Get the style pointer of an object (if NULL get style of the parent)
  * @param obj pointer to an object
  * @return pointer to a style
  */
-void * lv_obj_get_style(lv_obj_t * obj)
+lv_style_t * lv_obj_get_style(lv_obj_t * obj)
 {
-    return obj->style_p;
+    if(obj->style_p != NULL) return obj->style_p;
+    else {
+        lv_obj_t * par = obj->par;
+
+        while(par != NULL) {
+            if(par->style_p != NULL) return par->style_p;
+            par = par->par;
+        }
+    }
+
+    /*Never reach this, at least the screen has to be a style*/
+    return NULL;
 }
 
 /*-----------------
@@ -1460,13 +1429,13 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
     	cover = area_is_in(mask_p, &obj->cords);
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		lv_objs_t * style = lv_obj_get_style(obj);
+		lv_style_t * style = lv_obj_get_style(obj);
 
 		/*Simply draw a rectangle*/
 #if LV_VDB_SIZE == 0
 		lv_rfill(&obj->cords, mask_p, style->color, style->opa);
 #else
-		lv_vfill(&obj->cords, mask_p, style->color, style->opa);
+		lv_vfill(&obj->cords, mask_p, style->mcolor, style->opa);
 #endif
     }
     return true;
@@ -1509,6 +1478,26 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
     }
 }
 
+
+/**
+ * Recursively refresh the style of the children. Go deeper until a not NULL style is found
+ * because the NULL styles are inherited from the parent
+ * @param obj pointer to an object
+ */
+static void lv_child_refr_style(lv_obj_t * obj)
+{
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    while(child != NULL) {
+        if(child->style_p == NULL) {
+            lv_child_refr_style(child);
+        }
+        child = lv_obj_get_child(obj, child);
+    }
+
+    /*Send a style change signal to the object*/
+    lv_obj_refr_style(obj);
+}
+
 /**
  * Called by 'lv_obj_del' to delete the children objects
  * @param obj pointer to an object (all of its children will be deleted)
@@ -1546,16 +1535,4 @@ static void lv_obj_del_child(lv_obj_t * obj)
    if(obj->style_iso != 0) dm_free(obj->style_p);
    dm_free(obj); /*Free the object itself*/
 
-}
-
-static void lv_objs_init(void)
-{
-    lv_objs_scr.color = LV_OBJ_DEF_SCR_COLOR;
-    lv_objs_scr.opa = OPA_COVER;
-
-    lv_objs_plain.color =COLOR_MAKE(0x88, 0xaf, 0xcb);
-    lv_objs_plain.opa = OPA_COVER;
-
-    lv_objs_transp.color = lv_objs_plain.color;
-    lv_objs_transp.opa = OPA_TRANSP;
 }

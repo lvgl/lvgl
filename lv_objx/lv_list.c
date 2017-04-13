@@ -28,13 +28,10 @@
 #if 0
 static bool lv_list_design(lv_obj_t * list, const area_t * mask, lv_design_mode_t mode);
 #endif
-static void lv_lists_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_lists_t lv_lists_def;
-static lv_lists_t lv_lists_transp;
 
 /**********************
  *      MACROS
@@ -62,13 +59,22 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     lv_list_ext_t * ext = lv_obj_alloc_ext(new_list, sizeof(lv_list_ext_t));
     dm_assert(ext);
 
+    ext->width_sb = 0;
+    ext->styles_liste[LV_BTN_STATE_REL] = lv_style_get(LV_STYLE_BTN_REL, NULL);
+    ext->styles_liste[LV_BTN_STATE_PR] = lv_style_get(LV_STYLE_BTN_PR, NULL);
+    ext->styles_liste[LV_BTN_STATE_TREL] = lv_style_get(LV_STYLE_BTN_TREL, NULL);
+    ext->styles_liste[LV_BTN_STATE_PR] = lv_style_get(LV_STYLE_BTN_TPR, NULL);
+    ext->styles_liste[LV_BTN_STATE_INA] = lv_style_get(LV_STYLE_BTN_INA, NULL);
+
 	lv_obj_set_signal_f(new_list, lv_list_signal);
 
     /*Init the new list object*/
     if(copy == NULL) {
-    	lv_obj_set_size_us(new_list, 120, 150);
-		lv_obj_set_style(new_list, lv_lists_get(LV_LISTS_DEF, NULL));
-		lv_rect_set_layout(LV_EA(new_list, lv_list_ext_t)->page.scrl, LV_LIST_LAYOUT_DEF);
+    	lv_obj_set_size_us(new_list, 2 * LV_DPI, 3 * LV_DPI);
+		lv_rect_set_layout(ext->page.scrl, LV_LIST_LAYOUT_DEF);
+		lv_obj_set_style(new_list, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+		lv_obj_set_style(lv_page_get_scrl(new_list), lv_style_get(LV_STYLE_PRETTY, NULL));
+		lv_page_set_sb_mode(new_list, LV_PAGE_SB_MODE_AUTO);
     } else {
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_list);
@@ -89,15 +95,6 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 
     /* Include the ancient signal function */
     valid = lv_page_signal(list, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	switch(sign) {
-    		default:
-    			break;
-    	}
-    }
     
     return valid;
 }
@@ -112,12 +109,16 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
  */
 lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action)
 {
-	lv_lists_t * lists = lv_obj_get_style(list);
+	lv_style_t * style = lv_obj_get_style(list);
+    lv_list_ext_t * ext = lv_obj_get_ext(list);
 
 	/*Create a list element with the image an the text*/
 	lv_obj_t * liste;
 	liste = lv_btn_create(list, NULL);
-	lv_obj_set_style(liste, &lists->liste_btn);
+	lv_btn_set_styles(liste, ext->styles_liste[LV_BTN_STATE_REL], ext->styles_liste[LV_BTN_STATE_PR],
+	                         ext->styles_liste[LV_BTN_STATE_TREL], ext->styles_liste[LV_BTN_STATE_TPR],
+	                         ext->styles_liste[LV_BTN_STATE_INA]);
+
 	lv_btn_set_rel_action(liste, rel_action);
 	lv_page_glue_obj(liste, true);
 	lv_rect_set_layout(liste, LV_RECT_LAYOUT_ROW_M);
@@ -126,28 +127,26 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	if(img_fn != NULL && img_fn[0] != '\0') {
 		lv_obj_t * img = lv_img_create(liste, NULL);
 		lv_img_set_file(img, img_fn);
-		lv_obj_set_style(img, &lists->liste_img);
+		lv_obj_set_style(img, ext->styles_liste[LV_BTN_STATE_REL]);
 		lv_obj_set_click(img, false);
 	}
 
 	if(txt != NULL) {
 		lv_obj_t * label = lv_label_create(liste, NULL);
 		lv_label_set_text(label, txt);
-		lv_obj_set_style(label,&lists->liste_label);
+		lv_obj_set_style(label, ext->styles_liste[LV_BTN_STATE_REL]);
 		lv_obj_set_click(label, false);
 	}
 
-	lv_lists_t * style = lv_obj_get_style(list);
-
 	/*Make the size adjustment*/
-
     cord_t w = lv_obj_get_width(list);
-    cord_t hpad_tot = lists->page.bg.hpad + lists->page.scrl.hpad;
+    lv_style_t *  style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
+    cord_t hpad_tot = style->hpad + style_scrl->hpad;
     w -= hpad_tot * 2;
 
     /*Make place for the scrollbar if hpad_tot is too small*/
-    if(style->width_sb != 0) {
-        if(hpad_tot < lists->page.sb_width) w -= lists->page.sb_width - hpad_tot;
+    if(ext->width_sb != 0) {
+        if(hpad_tot < ext->page.sb_width) w -= ext->page.sb_width - hpad_tot;
     }
     lv_obj_set_width(liste, w);
 
@@ -203,6 +202,33 @@ void lv_list_down(lv_obj_t * list)
  * Setter functions 
  *====================*/
 
+/**
+ * Set styles of the list elements of a list in each state
+ * @param list pointer to list object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
+ */
+void lv_list_set_styles_liste(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina)
+{
+    lv_list_ext_t * ext = lv_obj_get_ext(list);
+
+    ext->styles_liste[LV_BTN_STATE_REL] = rel;
+    ext->styles_liste[LV_BTN_STATE_PR] = pr;
+    ext->styles_liste[LV_BTN_STATE_TREL] = trel;
+    ext->styles_liste[LV_BTN_STATE_TPR] = tpr;
+    ext->styles_liste[LV_BTN_STATE_INA] = ina;
+
+    lv_obj_t * liste = lv_obj_get_child(list, NULL);
+
+    while(liste != NULL) {
+        lv_btn_set_styles(liste, rel, pr, trel, tpr, ina);
+        liste = lv_obj_get_child(list, liste);
+    }
+
+}
 
 /*=====================
  * Getter functions 
@@ -220,38 +246,20 @@ const char * lv_list_element_get_txt(lv_obj_t * liste)
     return lv_label_get_text(label);
 }
 
+
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_lists_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_lists_t style
+ * Get the style of the list elements in a given state
+ * @param list pointer to a button object
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
  */
-lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * list)
+lv_style_t * lv_list_get_style_liste(lv_obj_t * list, lv_btn_state_t state)
 {
-	static bool style_inited = false;
+    lv_list_ext_t * ext = lv_obj_get_ext(list);
 
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_lists_init();
-		style_inited = true;
-	}
+    if(ext->styles_liste[state] == NULL) return lv_obj_get_style(list);
 
-	lv_lists_t  *style_p;
-
-	switch(style) {
-        case LV_LISTS_DEF:
-            style_p = &lv_lists_def;
-            break;
-		case LV_LISTS_TRANSP:
-			style_p = &lv_lists_transp;
-			break;
-		default:
-			style_p = &lv_lists_def;
-	}
-
-	if(list != NULL) memcpy(list, style_p, sizeof(lv_lists_t));
-
-	return style_p;
+    return ext->styles_liste[state];
 }
 
 
@@ -283,41 +291,4 @@ static bool lv_list_design(lv_obj_t * list, const area_t * mask, lv_design_mode_
 }
 #endif
 
-/**
- * Initialize the list styles
- */
-static void lv_lists_init(void)
-{
-    /*Default style*/
-    lv_pages_get(LV_PAGES_MENU, &lv_lists_def.page);
-
-    lv_rects_get(LV_RECTS_TRANSP, &lv_lists_def.liste_btn.state_style[LV_BTN_STATE_REL]);
-    lv_rects_get(LV_RECTS_PLAIN, &lv_lists_def.liste_btn.state_style[LV_BTN_STATE_PR]);
-    lv_rects_get(LV_RECTS_TRANSP, &lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TREL]);
-    lv_rects_get(LV_RECTS_PLAIN, &lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TPR]);
-    lv_rects_get(LV_RECTS_PLAIN, &lv_lists_def.liste_btn.state_style[LV_BTN_STATE_INA]);
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_REL].hpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_REL].vpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_REL].opad = LV_DPI / 6;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_PR].hpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_PR].vpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_PR].opad = LV_DPI / 6;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_PR].radius = 0;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TREL].hpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TREL].vpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TREL].opad = LV_DPI / 6;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TPR].hpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TPR].vpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TPR].opad = LV_DPI / 6;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_TPR].radius = 0;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_INA].hpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_INA].vpad = LV_DPI / 4;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_INA].opad = LV_DPI / 6;
-    lv_lists_def.liste_btn.state_style[LV_BTN_STATE_INA].radius = 0;
-    lv_labels_get(LV_LABELS_BTN, &lv_lists_def.liste_label); /*List element label style*/
-    lv_imgs_get(LV_IMGS_DEF, &lv_lists_def.liste_img); /*List element image style*/
-
-    memcpy(&lv_lists_transp, &lv_lists_def, sizeof(lv_lists_t));
-    lv_pages_get(LV_PAGES_TRANSP, &lv_lists_transp.page);
-}
 #endif

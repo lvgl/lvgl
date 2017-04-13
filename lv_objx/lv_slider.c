@@ -25,13 +25,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_mode_t mode);
-static void lv_sliders_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_sliders_t lv_sliders_def;	/*Default slider style*/
-
 static lv_design_f_t ancestor_design_f;
 
 /**********************
@@ -66,6 +63,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->cb = NULL;
     ext->tmp_value = ext->bar.min_value;
+    ext->style_knob = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 
     /* Save the bar design function.
      * It will be used in the sllider design function*/
@@ -77,7 +75,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new slider slider*/
     if(copy == NULL) {
-        lv_obj_set_style(new_slider, lv_sliders_get(LV_SLIDERS_DEF, NULL));
         lv_obj_set_click(new_slider, true);
     }
     /*Copy an existing slider*/
@@ -165,45 +162,42 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t cb)
     ext->cb = cb;
 }
 
+/**
+ * Set the style of knob on a slider
+ * @param slider pointer to slider object
+ * @param style pointer the new knob style
+ */
+void lv_slider_set_sytle_knob(lv_obj_t * slider, lv_style_t * style)
+{
+    lv_slider_ext_t * ext = lv_obj_get_ext(slider);
+    ext->style_knob = style;
+    lv_obj_inv(slider);
+}
+
 
 /*=====================
  * Getter functions
  *====================*/
 
-/*
- * New object specific "get" function comes here
- */
-
-
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_sliders_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_sliders_t style
+ * Get the slider callback function
+ * @param slider pointer to slider object
+ * @return the callback function
  */
-lv_sliders_t * lv_sliders_get(lv_sliders_builtin_t style, lv_sliders_t * copy)
+lv_action_t lv_slider_get_action(lv_obj_t * slider)
 {
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_sliders_init();
-		style_inited = true;
-	}
-
-	lv_sliders_t  *style_p;
-
-	switch(style) {
-		case LV_SLIDERS_DEF:
-			style_p = &lv_sliders_def;
-			break;
-		default:
-			style_p = &lv_sliders_def;
-	}
-
-	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_sliders_t));
-
-	return style_p;
+    lv_slider_ext_t * ext = lv_obj_get_ext(slider);
+    return ext->cb;
+}
+/**
+ * Get the style of knob on a slider
+ * @param slider pointer to slider object
+ * @return pointer the new knob style
+ */
+lv_style_t *  lv_slider_get_sytle_knob(lv_obj_t * slider)
+{
+    lv_slider_ext_t * ext = lv_obj_get_ext(slider);
+    return ext->style_knob;
 }
 
 /**********************
@@ -252,7 +246,6 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
 
         ancestor_design_f(slider, mask, mode);
         ext->bar.act_value -=tmp;
-        lv_sliders_t * style = lv_obj_get_style(slider);
         area_t knob_area;
         area_cpy(&knob_area, &slider->cords);
 
@@ -269,7 +262,7 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
             knob_area.y2 = knob_area.y1 + w;
         }
 
-        lv_draw_rect(&knob_area, mask, &style->knob);
+        lv_draw_rect(&knob_area, mask, ext->style_knob);
 
     }
     /*Post draw when the children are drawn*/
@@ -278,24 +271,6 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
     }
 
     return true;
-}
-
-
-/**
- * Initialize the built-in slider styles
- */
-static void lv_sliders_init(void)
-{
-	/*Default style*/
-    lv_bars_get(LV_BARS_DEF, &lv_sliders_def.bar);
-    lv_sliders_def.bar.indic.radius = LV_RECT_CIRCLE;
-    lv_sliders_def.bar.bg.radius = LV_RECT_CIRCLE;
-    lv_rects_get(LV_RECTS_PLAIN, &lv_sliders_def.knob);
-    lv_sliders_def.knob.base.color = COLOR_SILVER;
-    lv_sliders_def.knob.gcolor = COLOR_GRAY;
-    lv_sliders_def.knob.base.opa = OPA_70;
-    lv_sliders_def.knob.radius = lv_sliders_def.bar.indic.radius;
-
 }
 
 #endif

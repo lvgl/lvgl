@@ -34,15 +34,10 @@
 static void lv_page_sb_refresh(lv_obj_t * main);
 static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_t mode);
 static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param);
-static void lv_pages_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_pages_t lv_pages_def;
-static lv_pages_t lv_pages_paper;
-static lv_pages_t lv_pages_menu;
-static lv_pages_t lv_pages_transp;
 static lv_design_f_t ancestor_design_f;
 
 /**********************
@@ -77,19 +72,22 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     ext->rel_action = NULL;
     ext->sbh_draw = 0;
     ext->sbv_draw = 0;
+    ext->style_sb = lv_style_get(LV_STYLE_PRETTY, NULL);
+    ext->sb_width = LV_DPI / 8;
+    ext->sb_mode = LV_PAGE_SB_MODE_ON;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_page);
 
     /*Init the new page object*/
     if(copy == NULL) {
-    	lv_pages_t * style = lv_pages_get(LV_PAGES_DEF, NULL);
+    	lv_style_t * style = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 	    ext->scrl = lv_rect_create(new_page, NULL);
 	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
 		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
 		lv_rect_set_fit(ext->scrl, true, true);
-		lv_obj_set_style(ext->scrl, &style->scrl);
+		lv_obj_set_style(ext->scrl, lv_style_get(LV_STYLE_PRETTY, NULL));
 
 		/* Add the signal function only if 'scrolling' is created
 		 * because everything has to be ready before any signal is received*/
@@ -136,7 +134,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(obj_valid != false) {
         lv_page_ext_t * ext = lv_obj_get_ext(page);
-        lv_pages_t * style = lv_obj_get_style(page);
+        lv_style_t * style = lv_obj_get_style(page);
         lv_obj_t * child;
         switch(sign) {
         	case LV_SIGNAL_CHILD_CHG: /*Move children to the scrollable object*/
@@ -153,11 +151,10 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         		break;
                 
             case LV_SIGNAL_STYLE_CHG:
-            	area_set_height(&ext->sbh, style->sb_width);
-            	area_set_width(&ext->sbv, style->sb_width);
-            	lv_obj_set_style(ext->scrl, &style->scrl);
+            	area_set_height(&ext->sbh, ext->sb_width);
+            	area_set_width(&ext->sbv, ext->sb_width);
 
-            	if(style->sb_mode == LV_PAGE_SB_MODE_ON) {
+            	if(ext->sb_mode == LV_PAGE_SB_MODE_ON) {
             		ext->sbh_draw = 1;
             		ext->sbv_draw = 1;
             	} else {
@@ -226,10 +223,10 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
         area_t page_cords;
         area_t obj_cords;
         lv_obj_t * page = lv_obj_get_parent(scrl);
-        lv_pages_t * style = lv_obj_get_style(page);
+        lv_style_t * page_style = lv_obj_get_style(page);
         lv_page_ext_t * page_ext = lv_obj_get_ext(page);
-        cord_t hpad = style->bg.hpad;
-        cord_t vpad = style->bg.vpad;
+        cord_t hpad = page_style->hpad;
+        cord_t vpad = page_style->vpad;
 
         switch(sign) {
             case LV_SIGNAL_CORD_CHG:
@@ -281,9 +278,9 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
                 break;
 
             case LV_SIGNAL_DRAG_BEGIN:
-            	if(style->sb_mode == LV_PAGE_SB_MODE_DRAG ) {
-            	    cord_t sbh_pad = MATH_MAX(style->sb_width, style->bg.hpad);
-            	    cord_t sbv_pad = MATH_MAX(style->sb_width, style->bg.vpad);
+            	if(page_ext->sb_mode == LV_PAGE_SB_MODE_DRAG ) {
+            	    cord_t sbh_pad = MATH_MAX(page_ext->sb_width, page_style->hpad);
+            	    cord_t sbv_pad = MATH_MAX(page_ext->sb_width, page_style->vpad);
 					if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - 2 * sbv_pad) {
 						page_ext->sbv_draw = 1;
 					}
@@ -294,7 +291,7 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
                 break;
 
             case LV_SIGNAL_DRAG_END:
-            	if(style->sb_mode == LV_PAGE_SB_MODE_DRAG) {
+            	if(page_ext->sb_mode == LV_PAGE_SB_MODE_DRAG) {
 				    area_t sb_area_tmp;
 				    if(page_ext->sbh_draw != 0) {
 				        area_cpy(&sb_area_tmp, &page_ext->sbh);
@@ -363,6 +360,41 @@ void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action)
 	ext->pr_action = pr_action;
 }
 
+/**
+ * Set the scroll bar width on a page
+ * @param page pointer to a page object
+ * @param sb_width the new scroll bar width in pixels
+ */
+void lv_page_set_sb_width(lv_obj_t * page, cord_t sb_width)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext(page);
+        ext->sb_width = sb_width;
+        lv_obj_inv(page);
+}
+
+/**
+ * Set the scroll bar mode on a page
+ * @param page pointer to a page object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext(page);
+        ext->sb_mode = sb_mode;
+        lv_obj_inv(page);
+}
+
+/**
+ * Set a new style for the scroll bars object on the page
+ * @param page pointer to a page object
+ * @param style pointer to a style for the scroll bars
+ */
+void lv_page_set_style_sb(lv_obj_t * page, lv_style_t * style)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext(page);
+        ext->style_sb = style;
+        lv_obj_inv(page);
+}
 
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
@@ -384,7 +416,9 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 {
 	lv_page_ext_t * ext = lv_obj_get_ext(page);
-	lv_pages_t * style = lv_obj_get_style(page);
+	lv_style_t * style = lv_obj_get_style(page);
+	lv_obj_t * scrl = lv_page_get_scrl(page);
+    lv_style_t * style_scrl = lv_obj_get_style(scrl);
 
 	cord_t obj_y = obj->cords.y1 - ext->scrl->cords.y1;
 	cord_t obj_h = lv_obj_get_height(obj);
@@ -401,8 +435,8 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 	if((obj_h <= page_h && top_err > 0) ||
 	   (obj_h > page_h && top_err < bot_err)) {
 		/*Calculate a new position and to let  scrable_rects.vpad space above*/
-		scrlable_y = -(obj_y - style->scrl.vpad - style->bg.vpad);
-		scrlable_y += style->scrl.vpad;
+		scrlable_y = -(obj_y - style_scrl->vpad - style->vpad);
+		scrlable_y += style_scrl->vpad;
 		refr = true;
 	}
 	/*Out of the page on the bottom*/
@@ -411,7 +445,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
         /*Calculate a new position and to let  scrable_rects.vpad space below*/
 		scrlable_y = -obj_y;
 		scrlable_y += page_h - obj_h;
-        scrlable_y -= style->scrl.vpad;
+        scrlable_y -= style_scrl->vpad;
 		refr = true;
 	}
 
@@ -455,45 +489,39 @@ lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
 
 	return ext->scrl;
 }
+/**
+ * Get the scroll bar width on a page
+ * @param page pointer to a page object
+ * @return the scroll bar width in pixels
+ */
+cord_t lv_page_get_sb_width(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext(page);
+    return ext->sb_width;
+}
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_pages_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_pages_t style
+ * Set the scroll bar mode on a page
+ * @param page pointer to a page object
+ * @return the mode from 'lv_page_sb_mode_t' enum
  */
-lv_pages_t * lv_pages_get(lv_pages_builtin_t style, lv_pages_t * copy)
+lv_page_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page)
 {
-	static bool style_inited = false;
+    lv_page_ext_t * ext = lv_obj_get_ext(page);
+    return ext->sb_mode;
+}
 
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_pages_init();
-		style_inited = true;
-	}
+/**
+ * Set a new style for the scroll bars object on the page
+ * @param page pointer to a page object
+ * @return pointer to a style for the scroll bars
+ */
+lv_style_t * lv_page_get_style_sb(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext(page);
+    if(ext->style_sb == NULL) return lv_obj_get_style(page);
 
-	lv_pages_t * style_p;
-
-	switch(style) {
-		case LV_PAGES_DEF:
-			style_p = &lv_pages_def;
-			break;
-        case LV_PAGES_PAPER:
-            style_p = &lv_pages_paper;
-            break;
-        case LV_PAGES_MENU:
-            style_p = &lv_pages_menu;
-            break;
-		case LV_PAGES_TRANSP:
-			style_p = &lv_pages_transp;
-			break;
-		default:
-			style_p = &lv_pages_def;
-	}
-
-	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_pages_t));
-
-	return style_p;
+    else return ext->style_sb;
 }
 
 /**********************
@@ -519,7 +547,6 @@ static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_
 	} else if(mode == LV_DESIGN_DRAW_POST) { /*Draw the scroll bars finally*/
 		ancestor_design_f(page, mask, mode);
 		lv_page_ext_t * ext = lv_obj_get_ext(page);
-		lv_pages_t * style = lv_obj_get_style(page);
 
 		/*Draw the scrollbars*/
 		area_t sb_area;
@@ -530,7 +557,7 @@ static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_
             sb_area.y1 += page->cords.y1;
             sb_area.x2 += page->cords.x1;
             sb_area.y2 += page->cords.y1;
-			lv_draw_rect(&sb_area, mask, &style->sb);
+			lv_draw_rect(&sb_area, mask, ext->style_sb);
 		}
 
 		if(ext->sbv_draw != 0) {
@@ -540,7 +567,7 @@ static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_
             sb_area.y1 += page->cords.y1;
             sb_area.x2 += page->cords.x1;
             sb_area.y2 += page->cords.y1;
-			lv_draw_rect(&sb_area, mask, &style->sb);
+			lv_draw_rect(&sb_area, mask, ext->style_sb);
 		}
 	}
 
@@ -559,38 +586,38 @@ static void lv_page_sb_refresh(lv_obj_t * page)
      * - horizontal and vertical scrollbars can overlap on the corners
      * - if the page has radius the scrollbar can be out of the radius  */
 
-    lv_page_ext_t * page_ext = lv_obj_get_ext(page);
-    lv_pages_t * style = lv_obj_get_style(page);
-    lv_obj_t * scrl = page_ext->scrl;
+    lv_page_ext_t * ext = lv_obj_get_ext(page);
+    lv_style_t * style = lv_obj_get_style(page);
+    lv_obj_t * scrl = ext->scrl;
     cord_t size_tmp;
     cord_t scrl_w = lv_obj_get_width(scrl);
     cord_t scrl_h =  lv_obj_get_height(scrl);
-    cord_t hpad = style->bg.hpad;
-    cord_t vpad = style->bg.vpad;
+    cord_t hpad = style->hpad;
+    cord_t vpad = style->vpad;
     cord_t obj_w = lv_obj_get_width(page);
     cord_t obj_h = lv_obj_get_height(page);
-    cord_t sbh_pad = MATH_MAX(style->sb_width, style->bg.hpad);
-    cord_t sbv_pad = MATH_MAX(style->sb_width, style->bg.vpad);
+    cord_t sbh_pad = MATH_MAX(ext->sb_width, style->hpad);
+    cord_t sbv_pad = MATH_MAX(ext->sb_width, style->vpad);
 
-    if(style->sb_mode == LV_PAGE_SB_MODE_OFF) return;
+    if(ext->sb_mode == LV_PAGE_SB_MODE_OFF) return;
 
-    if(style->sb_mode == LV_PAGE_SB_MODE_ON) {
-        page_ext->sbh_draw = 1;
-        page_ext->sbv_draw = 1;
+    if(ext->sb_mode == LV_PAGE_SB_MODE_ON) {
+        ext->sbh_draw = 1;
+        ext->sbv_draw = 1;
     }
 
     /*Invalidate the current (old) scrollbar areas*/
     area_t sb_area_tmp;
-    if(page_ext->sbh_draw != 0) {
-        area_cpy(&sb_area_tmp, &page_ext->sbh);
+    if(ext->sbh_draw != 0) {
+        area_cpy(&sb_area_tmp, &ext->sbh);
         sb_area_tmp.x1 += page->cords.x1;
         sb_area_tmp.y1 += page->cords.y1;
         sb_area_tmp.x2 += page->cords.x2;
         sb_area_tmp.y2 += page->cords.y2;
         lv_inv_area(&sb_area_tmp);
     }
-    if(page_ext->sbv_draw != 0)  {
-        area_cpy(&sb_area_tmp, &page_ext->sbv);
+    if(ext->sbv_draw != 0)  {
+        area_cpy(&sb_area_tmp, &ext->sbv);
         sb_area_tmp.x1 += page->cords.x1;
         sb_area_tmp.y1 += page->cords.y1;
         sb_area_tmp.x2 += page->cords.x2;
@@ -600,48 +627,48 @@ static void lv_page_sb_refresh(lv_obj_t * page)
 
     /*Horizontal scrollbar*/
     if(scrl_w <= obj_w - 2 * hpad) {        /*Full sized scroll bar*/
-        area_set_width(&page_ext->sbh, obj_w - 2 * sbh_pad);
-        area_set_pos(&page_ext->sbh, sbh_pad, obj_h - style->sb_width);
-        if(style->sb_mode == LV_PAGE_SB_MODE_AUTO)  page_ext->sbh_draw = 0;
+        area_set_width(&ext->sbh, obj_w - 2 * sbh_pad);
+        area_set_pos(&ext->sbh, sbh_pad, obj_h - ext->sb_width);
+        if(ext->sb_mode == LV_PAGE_SB_MODE_AUTO)  ext->sbh_draw = 0;
     } else {
         size_tmp = (obj_w * (obj_w - (2 * sbh_pad))) / (scrl_w + 2 * hpad);
-        area_set_width(&page_ext->sbh,  size_tmp);
+        area_set_width(&ext->sbh,  size_tmp);
 
-        area_set_pos(&page_ext->sbh, sbh_pad +
+        area_set_pos(&ext->sbh, sbh_pad +
                    (-(lv_obj_get_x(scrl) - hpad) * (obj_w - size_tmp -  2 * sbh_pad)) /
-                   (scrl_w + 2 * hpad - obj_w ), obj_h - style->sb_width);
+                   (scrl_w + 2 * hpad - obj_w ), obj_h - ext->sb_width);
 
-        if(style->sb_mode == LV_PAGE_SB_MODE_AUTO)  page_ext->sbh_draw = 1;
+        if(ext->sb_mode == LV_PAGE_SB_MODE_AUTO)  ext->sbh_draw = 1;
     }
     
     /*Vertical scrollbar*/
     if(scrl_h <= obj_h - 2 * vpad) {        /*Full sized scroll bar*/
-        area_set_height(&page_ext->sbv,  obj_h - 2 * sbv_pad);
-        area_set_pos(&page_ext->sbv, obj_w - style->sb_width, sbv_pad);
-        if(style->sb_mode == LV_PAGE_SB_MODE_AUTO)  page_ext->sbv_draw = 0;
+        area_set_height(&ext->sbv,  obj_h - 2 * sbv_pad);
+        area_set_pos(&ext->sbv, obj_w - ext->sb_width, sbv_pad);
+        if(ext->sb_mode == LV_PAGE_SB_MODE_AUTO)  ext->sbv_draw = 0;
     } else {
         size_tmp = (obj_h * (obj_h - (2 * sbv_pad))) / (scrl_h + 2 * vpad);
-        area_set_height(&page_ext->sbv,  size_tmp);
+        area_set_height(&ext->sbv,  size_tmp);
 
-        area_set_pos(&page_ext->sbv,  obj_w - style->sb_width,
+        area_set_pos(&ext->sbv,  obj_w - ext->sb_width,
         		    sbv_pad +
                    (-(lv_obj_get_y(scrl) - vpad) * (obj_h - size_tmp -  2 * sbv_pad)) /
                                       (scrl_h + 2 * vpad - obj_h ));
 
-        if(style->sb_mode == LV_PAGE_SB_MODE_AUTO)  page_ext->sbv_draw = 1;
+        if(ext->sb_mode == LV_PAGE_SB_MODE_AUTO)  ext->sbv_draw = 1;
     }
 
     /*Invalidate the new scrollbar areas*/
-    if(page_ext->sbh_draw != 0) {
-        area_cpy(&sb_area_tmp, &page_ext->sbh);
+    if(ext->sbh_draw != 0) {
+        area_cpy(&sb_area_tmp, &ext->sbh);
         sb_area_tmp.x1 += page->cords.x1;
         sb_area_tmp.y1 += page->cords.y1;
         sb_area_tmp.x2 += page->cords.x2;
         sb_area_tmp.y2 += page->cords.y2;
         lv_inv_area(&sb_area_tmp);
     }
-    if(page_ext->sbv_draw != 0)  {
-        area_cpy(&sb_area_tmp, &page_ext->sbv);
+    if(ext->sbv_draw != 0)  {
+        area_cpy(&sb_area_tmp, &ext->sbv);
         sb_area_tmp.x1 += page->cords.x1;
         sb_area_tmp.y1 += page->cords.y1;
         sb_area_tmp.x2 += page->cords.x2;
@@ -650,61 +677,4 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     }
 }
 
-/**
- * Initialize the page styles
- */
-static void lv_pages_init(void)
-{
-    /*Deafult style*/
-    lv_rects_get(LV_RECTS_FANCY, &lv_pages_def.bg);
-    lv_pages_def.bg.swidth = 0;
-    lv_rects_get(LV_RECTS_PLAIN, &lv_pages_def.scrl);
-    lv_rects_get(LV_RECTS_PLAIN, &lv_pages_def.sb);
-    lv_pages_def.sb.base.opa = OPA_70;
-    lv_pages_def.sb.base.color = COLOR_SILVER;
-    lv_pages_def.sb.gcolor = COLOR_GRAY;
-    lv_pages_def.sb.bcolor = COLOR_GRAY;
-    lv_pages_def.sb.bopa = OPA_COVER;
-    lv_pages_def.sb.bwidth = LV_DPI / 50 == 0 ? 1 * LV_DOWNSCALE : LV_DPI / 50;
-    lv_pages_def.sb.radius = LV_RECT_CIRCLE;
-    lv_pages_def.sb_width = LV_DPI / 6;
-    lv_pages_def.sb_mode = LV_PAGE_SB_MODE_ON;
-
-	/*Paper style*/
-	lv_rects_get(LV_RECTS_FANCY, &lv_pages_paper.bg);
-    lv_rects_get(LV_RECTS_TRANSP, &lv_pages_paper.scrl);
-    lv_pages_paper.scrl.hpad = LV_DPI / 4;
-    lv_pages_paper.scrl.vpad = LV_DPI / 4;
-    lv_pages_paper.scrl.opad = LV_DPI / 3;
-    lv_pages_paper.bg.hpad = 0;
-    lv_pages_paper.bg.vpad = 0;
-    lv_pages_paper.bg.opad = 0;
-    lv_pages_paper.bg.base.color = COLOR_WHITE;
-    lv_pages_paper.bg.gcolor = COLOR_SILVER;
-    memcpy(&lv_pages_paper.sb, &lv_pages_def.sb, sizeof(lv_rects_t));
-    lv_pages_paper.sb_width = LV_DPI / 6;
-    lv_pages_paper.sb_mode = LV_PAGE_SB_MODE_AUTO;
-
-    /*Menu style*/
-    lv_rects_get(LV_RECTS_TRANSP, &lv_pages_menu.bg);
-    lv_rects_get(LV_RECTS_PLAIN, &lv_pages_menu.scrl);
-    lv_pages_menu.scrl.hpad = 0;
-    lv_pages_menu.scrl.vpad = 0;
-    lv_pages_menu.scrl.opad = LV_DPI / 6;
-    lv_pages_menu.bg.hpad = 0;
-    lv_pages_menu.bg.vpad = 0;
-    lv_pages_menu.bg.opad = 0;
-    lv_pages_menu.scrl.base.color = COLOR_SILVER;
-    lv_pages_menu.scrl.gcolor = COLOR_SILVER;
-    memcpy(&lv_pages_menu.sb, &lv_pages_def.sb, sizeof(lv_rects_t));
-    lv_pages_menu.sb_width = LV_DPI / 6;
-    lv_pages_menu.sb_mode = LV_PAGE_SB_MODE_AUTO;
-
-    /*Transparent style*/
-    lv_rects_get(LV_RECTS_TRANSP, &lv_pages_transp.bg);
-    lv_rects_get(LV_RECTS_TRANSP, &lv_pages_transp.scrl);
-    memcpy(&lv_pages_transp.sb, &lv_pages_def.sb, sizeof(lv_rects_t));
-    lv_pages_transp.sb_width = LV_DPI / 6;
-    lv_pages_transp.sb_mode = LV_PAGE_SB_MODE_AUTO;
-}
 #endif

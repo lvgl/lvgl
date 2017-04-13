@@ -31,10 +31,10 @@
 /*Button states*/
 typedef enum
 {
-    LV_BTN_STATE_PR,
     LV_BTN_STATE_REL,
-    LV_BTN_STATE_TPR,
+    LV_BTN_STATE_PR,
     LV_BTN_STATE_TREL,
+    LV_BTN_STATE_TPR,
     LV_BTN_STATE_INA,
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
@@ -49,26 +49,12 @@ typedef struct
 	lv_action_t lpr_action;     /*A function to call when the button is long pressed (NULL if unused)*/
 	lv_action_t lpr_rep_action; /*A function to call periodically after long press (NULL if unused)*/
 
+	lv_style_t * styles[LV_BTN_STATE_NUM];    /*Styles in each state*/
+
     lv_btn_state_t state;       /*Current state of the button from 'lv_btn_state_t' enum*/
     uint8_t tgl :1;             /*1: Toggle enabled*/
     uint8_t lpr_exec :1;        /*1: Long press action executed (Handled by the library)*/
 }lv_btn_ext_t;
-
-/*Style of button*/
-typedef struct
-{
-    lv_rects_t current;   /*Current style according to the state. Library use this. Style of ancestor*/
-    /*New style element for this type */
-    lv_rects_t state_style[LV_BTN_STATE_NUM];   /*Rectangle styles for each state*/
-}lv_btns_t;
-
-/*Built-in styles of button*/
-typedef enum
-{
-    LV_BTNS_DEF,
-    LV_BTNS_BORDER,
-    LV_BTNS_TRANSP,
-}lv_btns_builtin_t;
 
 
 /**********************
@@ -133,6 +119,8 @@ void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_t lpr_action);
  */
 void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action);
 
+void lv_btn_set_styles(lv_obj_t * btn, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
+
 /**
  * Get the current state of the button
  * @param btn pointer to a button object
@@ -147,14 +135,7 @@ lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);
  */
 bool lv_btn_get_tgl(lv_obj_t * btn);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_btns_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_btns_t style
- */
-lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy);
-
+lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
 /**********************
  *      MACROS
  **********************/

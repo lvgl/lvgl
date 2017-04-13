@@ -49,15 +49,10 @@
  **********************/
 static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mode_t mode);
 static void lv_label_refr_text(lv_obj_t * label);
-static void lv_labels_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_labels_t lv_labels_title;
-static lv_labels_t lv_labels_txt;
-static lv_labels_t lv_labels_btn;
-
 /**********************
  *      MACROS
  **********************/
@@ -95,7 +90,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new label*/
     if(copy == NULL) {
 		lv_obj_set_click(new_label, false);
-		lv_obj_set_style(new_label, lv_labels_get(LV_LABELS_TXT, NULL));
+		lv_obj_set_style(new_label, NULL);
 		lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
 		lv_label_set_text(new_label, "Text");
     }
@@ -354,7 +349,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     cord_t max_w = lv_obj_get_width(label);
-    lv_labels_t * style = lv_obj_get_style(label);
+    lv_style_t * style = lv_obj_get_style(label);
     const font_t * font = style->font;
     uint8_t letter_height = font_get_height(font) >> LV_FONT_ANTIALIAS;
     cord_t y = 0;
@@ -396,7 +391,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 		x += (font_get_width(font, text[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
 	}
 
-	if(style->mid != 0) {
+	if(style->txt_align != 0) {
 		cord_t line_w;
         line_w = txt_get_width(&text[line_start], new_line_start - line_start,
                                font, style->letter_space, flag);
@@ -421,7 +416,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     cord_t max_w = lv_obj_get_width(label);
-    lv_labels_t * style = lv_obj_get_style(label);
+    lv_style_t * style = lv_obj_get_style(label);
     const font_t * font = style->font;
     uint8_t letter_height = font_get_height(font) >> LV_FONT_ANTIALIAS;
     cord_t y = 0;
@@ -444,7 +439,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
     /*Calculate the x coordinate*/
     cord_t x = 0;
-	if(style->mid != 0) {
+	if(style->txt_align != 0) {
 		cord_t line_w;
         line_w = txt_get_width(&text[line_start], new_line_start - line_start,
                                font, style->letter_space, flag);
@@ -467,43 +462,6 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
 
 	return i;
-}
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_labels_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_labels_t style
- */
-lv_labels_t * lv_labels_get(lv_labels_builtin_t style, lv_labels_t * copy)
-{
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_labels_init();
-		style_inited = true;
-	}
-
-	lv_labels_t * style_p;
-
-	switch(style) {
-		case LV_LABELS_TXT:
-			style_p = &lv_labels_txt;
-			break;
-		case LV_LABELS_TITLE:
-			style_p = &lv_labels_title;
-			break;
-        case LV_LABELS_BTN:
-            style_p = &lv_labels_btn;
-            break;
-		default:
-			style_p = &lv_labels_txt;
-	}
-
-	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_labels_t));
-
-	return style_p;
 }
 
 
@@ -554,7 +512,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     if(ext->txt == NULL) return;
 
     cord_t max_w = lv_obj_get_width(label);
-    lv_labels_t * style = lv_obj_get_style(label);
+    lv_style_t * style = lv_obj_get_style(label);
     const font_t * font = style->font;
 
     ext->dot_end = LV_LABEL_DOT_END_INV;    /*Initialize the dot end index*/
@@ -661,26 +619,4 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_obj_inv(label);
 }
 
-/**
- * Initialize the label styles
- */
-static void lv_labels_init(void)
-{
-	/*Text style*/
-    lv_objs_get(LV_OBJS_PLAIN, &lv_labels_txt.base);
-    lv_labels_txt.base.color = COLOR_MAKE(0x20, 0x20, 0x20);
-	lv_labels_txt.font = font_get(LV_FONT_DEFAULT);
-	lv_labels_txt.letter_space = 1 * LV_DOWNSCALE;
-	lv_labels_txt.line_space =  2 * LV_DOWNSCALE;
-	lv_labels_txt.mid =  0;
-
-	memcpy(&lv_labels_btn, &lv_labels_txt, sizeof(lv_labels_t));
-	lv_labels_btn.base.color = COLOR_MAKE(0x20, 0x20, 0x20);
-	lv_labels_btn.mid =  1;
-
-	memcpy(&lv_labels_title, &lv_labels_txt, sizeof(lv_labels_t));
-	lv_labels_title.letter_space = 4 * LV_DOWNSCALE;
-	lv_labels_title.line_space =  4 * LV_DOWNSCALE;
-	lv_labels_title.mid =  0;
-}
 #endif

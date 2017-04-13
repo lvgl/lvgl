@@ -811,7 +811,7 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
     lv_obj_set_style(app->win, &wins_anim);
     
     /*Hide some elements to speed up the animation*/
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
     
@@ -920,7 +920,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     lv_obj_set_style(app->win, &wins_anim);
     
     /*Hide some elements to speed up the animation*/
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
     
@@ -1000,7 +1000,7 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     lv_obj_set_style(app->win, &wins_anim);
 
     /*Hide some elements to speed up the animation*/
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->ctrl_holder, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
     
@@ -1052,7 +1052,7 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 static void lv_app_win_open_anim_cb(lv_obj_t * app_win)
 {
     /*Unhide the the elements*/
-    lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->ctrl_holder, false);
+    lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->btnh, false);
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->title, false);
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->page.scrl, false);
     

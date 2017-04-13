@@ -34,12 +34,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_t mode);
-static void lv_lines_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_lines_t lv_lines_def;
 
 /**********************
  *      MACROS
@@ -74,7 +72,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new rectangle*/
     if(copy == NULL) {
-	    lv_obj_set_style(new_line, lv_lines_get(LV_LINES_DEF, NULL));
+	    lv_obj_set_style(new_line, lv_style_get(LV_STYLE_PLAIN, NULL));
     }
     /*Copy an existing object*/
     else {
@@ -82,8 +80,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_line_set_y_inv(new_line,lv_line_get_y_inv(copy));
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
     	lv_line_set_upscale(new_line,lv_line_get_upscale(copy));
-    	lv_line_set_points(new_line, LV_EA(copy, lv_line_ext_t)->point_array,
-    								   LV_EA(copy, lv_line_ext_t)->point_num);
+    	lv_line_set_points(new_line, ext->point_array, ext->point_num);
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_line);
     }
@@ -147,8 +144,8 @@ void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point
 			ymax = MATH_MAX(point_a[i].y * us, ymax);
 		}
 
-		lv_lines_t * lines = lv_obj_get_style(line);
-		lv_obj_set_size(line, xmax + lines->width, ymax + lines->width);
+		lv_style_t * lines = lv_obj_get_style(line);
+		lv_obj_set_size(line, xmax + lines->line_width, ymax + lines->line_width);
 	}
 }
 
@@ -241,36 +238,6 @@ bool lv_line_get_upscale(lv_obj_t * line)
 	return ext->upscale == 0 ? false : true;
 }
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_lines_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_lines_t style
- */
-lv_lines_t * lv_lines_get(lv_lines_builtin_t style, lv_lines_t * copy)
-{
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_lines_init();
-		style_inited = true;
-	}
-
-	lv_lines_t  *style_p;
-
-	switch(style) {
-		case LV_LINES_DEF:
-			style_p = &lv_lines_def;
-			break;
-		default:
-			style_p = &lv_lines_def;
-	}
-
-	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_lines_t));
-
-	return style_p;
-}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -294,7 +261,7 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 
 		if(ext->point_num == 0 || ext->point_array == NULL) return false;
 
-		lv_lines_t * style = lv_obj_get_style(line);
+		lv_style_t * style = lv_obj_get_style(line);
 		area_t area;
 		lv_obj_get_cords(line, &area);
 		cord_t x_ofs = area.x1;
@@ -327,14 +294,4 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
     return true;
 }
 
-/**
- * Initialize the line styles
- */
-static void lv_lines_init(void)
-{
-	/*Default style*/
-	lv_lines_def.width = LV_DPI / 25;
-	lv_lines_def.base.color = COLOR_RED;
-	lv_lines_def.base.opa = OPA_COVER;
-}
 #endif

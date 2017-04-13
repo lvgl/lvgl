@@ -43,22 +43,8 @@ typedef struct
     cord_t cursor_valid_x;  /*Used when stepping up/down in text area. Handled by the library*/
     uint16_t cursor_pos;    /*The current cursor position (0: before 1. letter, 1: before 2. letter etc.)*/
     uint8_t cur_hide :1;    /*Indicates that the cursor is visible now or not*/
+    uint8_t cursor_show :1; /*Flag to indicate the cursor is now being shown or not (Handled by the library)*/
 }lv_ta_ext_t;
-
-/*Style of text area*/
-typedef struct
-{
-	lv_pages_t page;	/*Style of ancestor*/
-	/*New style element for this type */
-	lv_labels_t label;      /*Style of the label*/
-	uint8_t cursor_show :1; /*Flag to indicate the cursor is now being shown or not (Handled by the library)*/
-}lv_tas_t;
-
-/*Built-in styles of text area*/
-typedef enum
-{
-	LV_TAS_DEF,
-}lv_tas_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -155,13 +141,6 @@ const char * lv_ta_get_txt(lv_obj_t * ta);
  */
 uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_tas_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_tas_t style
- */
-lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy);
 
 /**********************
  *      MACROS

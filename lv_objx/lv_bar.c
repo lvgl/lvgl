@@ -31,12 +31,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t mode);
-static void lv_bars_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_bars_t lv_bars_def;
 static lv_design_f_t ancestor_design_f;
 
 /**********************
@@ -71,6 +69,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     ext->act_value = 0;
     ext->format_str = NULL;
     ext->label = NULL;
+    ext->style_indic = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 
     /* Save the rectangle design function.
      * It will be used in the bar design function*/
@@ -81,6 +80,8 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new  bar object*/
     if(copy == NULL) {
+
+
     	ext->format_str = dm_alloc(strlen(LV_BAR_DEF_FORMAT) + 1);
     	strcpy(ext->format_str, LV_BAR_DEF_FORMAT);
 
@@ -89,7 +90,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_rect_set_layout(new_bar, LV_RECT_LAYOUT_CENTER);
         lv_obj_set_click(new_bar, false);
     	lv_obj_set_size(new_bar, LV_BAR_DEF_WIDTH, LV_BAR_DEF_HEIGHT);
-    	lv_obj_set_style(new_bar, lv_bars_get(LV_BARS_DEF, NULL));
+        lv_obj_set_style(new_bar, lv_style_get(LV_STYLE_PRETTY, NULL));
 
     	lv_bar_set_value(new_bar, ext->act_value);
     } else {
@@ -99,13 +100,12 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
 		ext->act_value = ext_copy->act_value;
+        ext->style_indic = ext_copy->style_indic;
         ext->label = lv_label_create(new_bar, ext_copy->label);
-
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_bar);
 
         lv_bar_set_value(new_bar, ext->act_value);
-
     }
     return new_bar;
 }
@@ -127,7 +127,7 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
-        lv_bars_t * style = lv_obj_get_style(bar);
+        lv_style_t * style = lv_obj_get_style(bar);
         point_t p;
         char buf[LV_BAR_TXT_MAX_LENGTH];
 
@@ -137,8 +137,7 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
                 ext->format_str = NULL;
                 break;
             case LV_SIGNAL_STYLE_CHG:
-                lv_obj_set_style(ext->label, &style->label);
-                lv_bar_set_value(bar, lv_bar_get_value(bar));
+                lv_obj_set_style(ext->label, style);
                 break;
             default:
                 break;
@@ -202,6 +201,20 @@ void lv_bar_set_format_str(lv_obj_t * bar, const char * format)
 	lv_bar_set_value(bar, ext->act_value);
 }
 
+/**
+ * Set the style of bar indicator
+ * @param bar pointer to a bar obeject
+ * @param style pointer to a style
+ */
+void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style)
+{
+    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+
+    ext->style_indic = style;
+
+    lv_obj_inv(bar);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -218,34 +231,17 @@ int16_t lv_bar_get_value(lv_obj_t * bar)
 }
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_bars_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_bars_t style
+ * Get the style of bar indicator
+ * @param bar pointer to a bar object
+ * @return pointer to the bar indicator style
  */
-lv_bars_t * lv_bars_get(lv_bars_builtin_t style, lv_bars_t * copy)
+lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar)
 {
-	static bool style_inited = false;
+    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
 
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_bars_init();
-		style_inited = true;
-	}
+    if(ext->style_indic == NULL) return lv_obj_get_style(bar);
 
-	lv_bars_t  *style_p;
-
-	switch(style) {
-		case LV_BARS_DEF:
-			style_p = &lv_bars_def;
-			break;
-		default:
-			style_p = &lv_bars_def;
-	}
-
-	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_bars_t));
-
-	return style_p;
+    return ext->style_indic;
 }
 
 /**********************
@@ -274,9 +270,7 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
 		ancestor_design_f(bar, mask, mode);
 
 		lv_bar_ext_t * ext = lv_obj_get_ext(bar);
-        lv_bars_t * style = lv_obj_get_style(bar);
 		area_t bar_area;
-		uint32_t tmp;
 		area_cpy(&bar_area, &bar->cords);
 
 		cord_t w = lv_obj_get_width(bar);
@@ -291,30 +285,10 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
 		}
 
 		/*Draw the main bar*/
-        lv_draw_rect(&bar_area, mask, &style->indic);
+		lv_style_t * style_indic = lv_bar_get_style_indic(bar);
+        lv_draw_rect(&bar_area, mask, style_indic);
     }
     return true;
 }
 
-/**
- * Initialize the bar styles
- */
-static void lv_bars_init(void)
-{
-	/*Default style*/
-    lv_rects_get(LV_RECTS_FANCY, &lv_bars_def.bg); /*Background*/
-    lv_bars_def.bg.base.color = COLOR_WHITE;
-    lv_bars_def.bg.gcolor = COLOR_SILVER,
-    lv_bars_def.bg.bcolor = COLOR_BLACK;
-
-    lv_rects_get(LV_RECTS_FANCY, &lv_bars_def.indic);    /*Bar*/
-    lv_bars_def.indic.base.color = COLOR_LIME;
-    lv_bars_def.indic.gcolor = COLOR_GREEN;
-    lv_bars_def.indic.bcolor = COLOR_BLACK;
-    lv_bars_def.indic.swidth = 0;
-
-    lv_labels_get(LV_LABELS_TXT, &lv_bars_def.label);    /*Label*/
-    lv_bars_def.label.line_space = 0;
-
-}
 #endif

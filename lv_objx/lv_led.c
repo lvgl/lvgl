@@ -29,14 +29,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t mode);
-static void lv_leds_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_leds_t lv_leds_red;
-static lv_leds_t lv_leds_green;
-
 static lv_design_f_t ancestor_design_f;
 
 /**********************
@@ -75,7 +71,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new led object*/
     if(copy == NULL) {
-    	lv_obj_set_style(new_led, lv_leds_get(LV_LEDS_RED, NULL));
+    	lv_obj_set_style(new_led, lv_style_get(LV_STYLE_PRETTY_COLOR, NULL));
     	lv_obj_set_size(new_led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
     }
     /*Copy an existing object*/
@@ -183,40 +179,6 @@ uint8_t lv_led_get_bright(lv_obj_t * led)
 	return ext->bright;
 }
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_leds_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_leds_t style
- */
-lv_leds_t * lv_leds_get(lv_leds_builtin_t style, lv_leds_t * copy)
-{
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_leds_init();
-		style_inited = true;
-	}
-
-	lv_leds_t  *style_p;
-
-	switch(style) {
-        case LV_LEDS_RED:
-            style_p = &lv_leds_red;
-            break;
-		case LV_LEDS_GREEN:
-			style_p = &lv_leds_green;
-			break;
-		default:
-			style_p = &lv_leds_red;
-	}
-
-	if(copy != NULL) memcpy(copy, style_p, sizeof(lv_leds_t));
-
-	return style_p;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -239,49 +201,24 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*Make darker colors in a temporary style according to the brightness*/
 		lv_led_ext_t * ext = lv_obj_get_ext(led);
-		lv_leds_t * style = lv_obj_get_style(led);
+		lv_style_t * style = lv_obj_get_style(led);
 
 		/*Create a temporal style*/
-        lv_leds_t leds_tmp;
+        lv_style_t leds_tmp;
 		memcpy(&leds_tmp, style, sizeof(leds_tmp));
 
 		/*Mix. the color with black proportionally with brightness*/
-		leds_tmp.bg_rect.base.color = color_mix(leds_tmp.bg_rect.base.color, COLOR_BLACK, ext->bright);
-		leds_tmp.bg_rect.gcolor = color_mix(leds_tmp.bg_rect.gcolor, COLOR_BLACK, ext->bright);
+		leds_tmp.mcolor = color_mix(leds_tmp.mcolor, COLOR_BLACK, ext->bright);
+		leds_tmp.gcolor = color_mix(leds_tmp.gcolor, COLOR_BLACK, ext->bright);
 
 		/*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF and LV_LED_BRIGHT_ON*/
-		leds_tmp.bg_rect.swidth = (uint16_t)(uint16_t)(ext->bright * style->bg_rect.swidth) >> 8;
+		leds_tmp.swidth = (uint16_t)(uint16_t)(ext->bright * style->swidth) >> 8;
 
 		led->style_p = &leds_tmp;
 		ancestor_design_f(led, mask, mode);
         led->style_p = style;
     }
     return true;
-}
-
-/**
- * Initialize the led styles
- */
-static void lv_leds_init(void)
-{
-	/*Default style (red)*/
-	lv_rects_get(LV_RECTS_PLAIN, &lv_leds_red.bg_rect);
-	lv_leds_red.bg_rect.base.color = COLOR_RED;
-	lv_leds_red.bg_rect.gcolor = COLOR_MARRON,
-	lv_leds_red.bg_rect.bcolor = COLOR_MAKE(0x40, 0x00, 0x00);
-	lv_leds_red.bg_rect.scolor = COLOR_RED;
-	lv_leds_red.bg_rect.bwidth = 3 * LV_DOWNSCALE;
-	lv_leds_red.bg_rect.bopa = OPA_50;
-	lv_leds_red.bg_rect.swidth = LV_DPI / 4;
-	lv_leds_red.bg_rect.radius = LV_RECT_CIRCLE;
-
-
-	/* Green style */
-	memcpy(&lv_leds_green, &lv_leds_red, sizeof(lv_leds_t));
-	lv_leds_green.bg_rect.base.color = COLOR_LIME;
-	lv_leds_green.bg_rect.gcolor = COLOR_GREEN;
-	lv_leds_green.bg_rect.bcolor = COLOR_MAKE(0x00, 0x40, 0x00);
-	lv_leds_green.bg_rect.scolor = COLOR_LIME;
 }
 
 #endif

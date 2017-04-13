@@ -49,26 +49,6 @@ typedef struct
     uint8_t transp    :1;     /*Transp. bit in the image header (Handled by the library)*/
 }lv_img_ext_t;
 
-/*Style of image*/
-typedef struct
-{
-	lv_objs_t base;	/*Style of ancestor*/
-	/*New style element for this type */
-	opa_t recolor_opa;           /*Intensity of recoloring with base.color (OPA_TRANSP, OPA_10 ... OPA_COVER)*/
-#if LV_IMG_ENABLE_SYMBOLS != 0
-    const font_t * sym_font;     /*Symbol font is the image is used as icon*/
-#endif
-}lv_imgs_t;
-
-/*Built-in styles of image*/
-typedef enum
-{
-	LV_IMGS_DEF,
-	LV_IMGS_LIGHT,
-	LV_IMGS_DARK,
-}lv_imgs_builtin_t;
-
-
 /* Image header it is compatible with
  * the result image converter utility*/
 typedef struct
@@ -78,7 +58,6 @@ typedef struct
     uint16_t cd;        /*Color depth (8/16 or 24)*/
     uint16_t transp :1; /*1: Do not draw LV_IMG_TRANSP_COLOR pixels*/
 }lv_img_raw_header_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -100,14 +79,6 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
  * @param param pointer to a signal specific variable
  */
 bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
-
-/**
- * Return with a pointer to built-in style and/or copy it to a variable
- * @param style a style name from lv_imgs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_imgs_t style
- */
-lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy);
 
 /**
  * Create a file to the RAMFS from a picture data
@@ -153,10 +124,6 @@ bool lv_img_get_auto_size(lv_obj_t * img);
  * @return true: upscale is enabled, false: upscale is disabled
  */
 bool lv_img_get_upscale(lv_obj_t * img);
-
-
-lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy);
-
 
 /**********************
  *      MACROS

@@ -50,23 +50,9 @@ typedef struct
     uint16_t btn_cnt;       /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_pr;        /*Index of the currently pressed button or LV_BTNM_PR_NONE (Handled by the library)*/
     lv_btnm_callback_t cb;  /*A function to call when a button is releases*/
+    lv_style_t * style_btn_rel; /*Style of the released buttons*/
+    lv_style_t * style_btn_pr;  /*Style of the pressed buttons*/
 }lv_btnm_ext_t;
-
-/*Style of button matrix*/
-typedef struct
-{
-	lv_rects_t bg;	/*Style of ancestor*/
-	/*New style element for this type */
-	lv_btns_t btn;		/*Style of the buttons*/
-	lv_labels_t label; /*Style of the labels on the buttons*/
-}lv_btnms_t;
-
-/*Built-in styles of button matrix*/
-typedef enum
-{
-	LV_BTNMS_DEF,
-}lv_btnms_builtin_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -108,6 +94,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
  */
 void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb);
 
+void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_btn_state_t state, lv_style_t *  style);
 /**
  * Get the current map of a button matrix
  * @param btnm pointer to a button matrix object
@@ -120,16 +107,9 @@ const char ** lv_btnm_get_map(lv_obj_t * btnm);
  * @param btnm: pointer to button matrix object
  * @return pointer to the callback function
  */
-lv_btnm_callback_t lv_btnm_get_cb(lv_obj_t * btnm);
+lv_btnm_callback_t lv_btnm_get_action(lv_obj_t * btnm);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_btnms_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_btnms_t style
- */
-lv_btnms_t * lv_btnms_get(lv_btnms_builtin_t style, lv_btnms_t * copy);
-
+lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state);
 /**********************
  *      MACROS
  **********************/

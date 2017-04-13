@@ -43,26 +43,9 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    /*No new data*/
+    lv_style_t * styles_liste[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
+    uint8_t width_sb   :1;        /*1: Keep space for the scrollbar*/
 }lv_list_ext_t;
-
-/*Style of list*/
-typedef struct
-{
-	lv_pages_t page; /*Style of ancestor*/
-	/*New style element for this type */
-	lv_btns_t liste_btn;          /*List element button style*/
-	lv_labels_t liste_label;      /*List element label style*/
-	lv_imgs_t liste_img;          /*List element image style*/
-	uint8_t width_sb   :1;        /*1: Keep space for the scrollbar*/
-}lv_lists_t;
-
-/*Built-in styles of list*/
-typedef enum
-{
-	LV_LISTS_DEF,       /*Default list style. Transparent background, visible scrlollable object*/
-	LV_LISTS_TRANSP,    /*Transparent list style. Transparent background and scrollable object*/
-}lv_lists_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -106,6 +89,7 @@ void lv_list_up(lv_obj_t * list);
  */
 void lv_list_down(lv_obj_t * list);
 
+void lv_list_set_styles_liste(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
 /**
  * Get the text of a list element
  * @param liste pointer to list element
@@ -113,14 +97,7 @@ void lv_list_down(lv_obj_t * list);
  */
 const char * lv_list_element_get_txt(lv_obj_t * liste);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_lists_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_lists_t style
- */
-lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * list);
-
+lv_style_t * lv_list_get_style_liste(lv_obj_t * list, lv_btn_state_t state);
 /**********************
  *      MACROS
  **********************/

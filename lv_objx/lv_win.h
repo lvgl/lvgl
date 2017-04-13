@@ -55,33 +55,16 @@
 /*Data of window*/
 typedef struct
 {
-    lv_page_ext_t page; /*Ext. of ancestor*/
+    /*Ext. of ancestor*/
     /*New data for this type */
+    lv_obj_t * page;
     lv_obj_t * header;  /*Pointer to the header rectangle of the window*/
     lv_obj_t * title;   /*Pointer to the title label of the window*/
-    lv_obj_t * ctrl_holder; /*Pointer to the control button holder rectangle of the window*/
+    lv_obj_t * btnh; /*Pointer to the control button holder rectangle of the window*/
+    lv_style_t * style_header;      /*Style of the header rectangle*/
+    lv_style_t * styles_btn[LV_BTN_STATE_NUM];         /*Style of the control buttons*/
+    cord_t btn_size;                /*Size of the control buttons (square)*/
 }lv_win_ext_t;
-
-/*Style of window*/
-typedef struct
-{
-    lv_pages_t page; /*Style of ancestor*/
-	/*New style element for this type */
-	/*Header settings*/
-	lv_rects_t header;      /*Style of the header rectangle*/
-	lv_labels_t title;      /*Style of the window title*/
-	lv_rects_t ctrl_holder; /*Style of holder of the control buttons*/
-	lv_btns_t ctrl_btn;     /*Style of the control buttons*/
-	lv_imgs_t ctrl_img;     /*Style of the image on the control buttons*/
-	cord_t ctrl_btn_w;      /*Width of the control buttons*/
-	cord_t ctrl_btn_h;      /*Height of the control buttons*/
-}lv_wins_t;
-
-/*Built-in styles of window*/
-typedef enum
-{
-	LV_WINS_DEF,
-}lv_wins_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -135,6 +118,8 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
  */
 const char * lv_win_get_title(lv_obj_t * win);
 
+lv_obj_t * lv_win_get_page(lv_obj_t * win);
+
 /**
  * Get the pointer of a widow from one of  its control button.
  * It is useful in the action of the control buttons where only button is known.
@@ -142,14 +127,6 @@ const char * lv_win_get_title(lv_obj_t * win);
  * @return pointer to the window of 'ctrl_btn'
  */
 lv_obj_t * lv_win_get_from_ctrl_btn(lv_obj_t * ctrl_btn);
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_wins_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_wins_t style
- */
-lv_wins_t * lv_wins_get(lv_wins_builtin_t style, lv_wins_t * copy);
 
 /**********************
  *      MACROS
