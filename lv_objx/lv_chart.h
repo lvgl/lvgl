@@ -43,7 +43,7 @@ typedef struct
 /*Data of chart */
 typedef struct
 {
-    lv_rect_ext_t bg_rect; /*Ext. of ancestor*/
+    /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
     cord_t ymin;          /*y min value (used to scale the data)*/
     cord_t ymax;          /*y max value (used to scale the data)*/

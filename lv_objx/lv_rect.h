@@ -18,7 +18,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_RECT_CIRCLE		((cord_t)-1)	/*A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS

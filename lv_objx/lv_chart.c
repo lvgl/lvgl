@@ -61,13 +61,13 @@ static lv_design_f_t ancestor_design_f;
 lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor basic object*/
-    lv_obj_t * new_chart = lv_rect_create(par, copy);
+    lv_obj_t * new_chart = lv_obj_create(par, copy);
     dm_assert(new_chart);
 
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_alloc_ext(new_chart, sizeof(lv_chart_ext_t));
     dm_assert(ext);
-    ll_init(&ext->dl_ll, sizeof(cord_t *));
+    ll_init(&ext->dl_ll, sizeof(lv_chart_dl_t));
     ext->dl_num = 0;
     ext->ymin = LV_CHART_YMIN_DEF;
     ext->ymax = LV_CHART_YMAX_DEF;
@@ -114,7 +114,7 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_rect_signal(chart, sign, param);
+    valid = lv_obj_signal(chart, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -146,6 +146,9 @@ lv_chart_dl_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color, cord_t wi
 	cord_t def = (ext->ymax - ext->ymin) >> 2;	/*1/4 range as default value*/
 
 	if(dl == NULL) return NULL;
+
+	dl->width = width;
+    dl->color = color;
 
 	dl->points = dm_alloc(sizeof(cord_t) * ext->pnum);
 
@@ -352,10 +355,8 @@ static bool lv_chart_design(lv_obj_t * chart, const area_t * mask, lv_design_mod
     	/*Return false if the object is not covers the mask_p area*/
     	return ancestor_design_f(chart, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		/*Draw the rectangle ancient*/
-		ancestor_design_f(chart, mask, mode);
-
-		/*Draw the object*/
+		/*Draw the background*/
+        lv_draw_rect(&chart->cords, mask, lv_obj_get_style(chart));
 
 		lv_chart_ext_t * ext = lv_obj_get_ext(chart);
 

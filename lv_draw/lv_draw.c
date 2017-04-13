@@ -47,6 +47,7 @@ static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p,
 static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
 static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
 static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
+static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style);
 static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h);
 #endif /*USE_LV_RECT != 0*/
 
@@ -102,6 +103,10 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, const lv_style_
         if(style_p->radius != 0) {
             lv_draw_rect_border_corner(cords_p, mask_p, style_p);
         }
+    }
+
+    if(style_p->swidth != 0) {
+        lv_draw_rect_shadow(cords_p, mask_p, style_p);
     }
 }
 #endif /*USE_LV_RECT != 0*/
@@ -1031,6 +1036,55 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
         if(cir_in.y < cir_in.x) {
             circ_next(&cir_in, &tmp_in);
         }
+    }
+}
+
+
+/**
+ * Draw a shadow
+ * @param rect pointer to rectangle object
+ * @param mask pointer to a mask area (from the design functions)
+ */
+static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
+{
+    cord_t swidth = style->swidth;
+    if(swidth == 0) return;
+    uint8_t res = LV_DOWNSCALE * 2;
+    if(swidth < res) return;
+
+    area_t shadow_area;
+    lv_style_t shadow_style;
+    memcpy(&shadow_area, cords_p, sizeof(area_t));
+
+    memcpy(&shadow_style, style, sizeof(lv_style_t));
+
+    shadow_style.empty = 1;
+    shadow_style.bwidth = swidth;
+    shadow_style.radius = style->radius;
+    if(shadow_style.radius == LV_RECT_CIRCLE) {
+        shadow_style.radius = MATH_MIN(area_get_width(cords_p), area_get_height(cords_p));
+    }
+    shadow_style.radius += swidth + 1;
+    shadow_style.bcolor = style->scolor;
+    shadow_style.bopa = 100;
+
+    shadow_area.x1 -= swidth;
+    shadow_area.y1 -= swidth;
+    shadow_area.x2 += swidth;
+    shadow_area.y2 += swidth;
+
+    cord_t i;
+    shadow_style.opa =  style->opa / (swidth / res);
+
+    for(i = 1; i < swidth; i += res) {
+        lv_draw_rect_border_straight(&shadow_area, mask_p, &shadow_style);
+        lv_draw_rect_border_corner(&shadow_area, mask_p, &shadow_style);
+        shadow_style.radius -= res;
+        shadow_style.bwidth -= res;
+        shadow_area.x1 += res;
+        shadow_area.y1 += res;
+        shadow_area.x2 -= res;
+        shadow_area.y2 -= res;
     }
 }
 

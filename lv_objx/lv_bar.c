@@ -18,8 +18,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_BAR_TXT_MAX_LENGTH	64
-#define LV_BAR_DEF_FORMAT	"%d %%"
 #define LV_BAR_DEF_WIDTH     (LV_DPI * 2)
 #define LV_BAR_DEF_HEIGHT    (LV_DPI / 2)
 
@@ -58,7 +56,7 @@ static lv_design_f_t ancestor_design_f;
 lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor basic object*/
-    lv_obj_t * new_bar = lv_rect_create(par, copy);
+    lv_obj_t * new_bar = lv_obj_create(par, copy);
     dm_assert(new_bar);
 
     /*Allocate the object type specific extended data*/
@@ -67,8 +65,6 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->act_value = 0;
-    ext->format_str = NULL;
-    ext->label = NULL;
     ext->style_indic = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 
     /* Save the rectangle design function.
@@ -80,14 +76,6 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new  bar object*/
     if(copy == NULL) {
-
-
-    	ext->format_str = dm_alloc(strlen(LV_BAR_DEF_FORMAT) + 1);
-    	strcpy(ext->format_str, LV_BAR_DEF_FORMAT);
-
-    	ext->label = lv_label_create(new_bar, NULL);
-
-    	lv_rect_set_layout(new_bar, LV_RECT_LAYOUT_CENTER);
         lv_obj_set_click(new_bar, false);
     	lv_obj_set_size(new_bar, LV_BAR_DEF_WIDTH, LV_BAR_DEF_HEIGHT);
         lv_obj_set_style(new_bar, lv_style_get(LV_STYLE_PRETTY, NULL));
@@ -95,13 +83,10 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_bar_set_value(new_bar, ext->act_value);
     } else {
     	lv_bar_ext_t * ext_copy = lv_obj_get_ext(copy);
-    	ext->format_str = dm_alloc(strlen(ext_copy->format_str) + 1);
-		strcpy(ext->format_str, ext_copy->format_str);
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
 		ext->act_value = ext_copy->act_value;
         ext->style_indic = ext_copy->style_indic;
-        ext->label = lv_label_create(new_bar, ext_copy->label);
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_bar);
 
@@ -126,20 +111,7 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
-        lv_style_t * style = lv_obj_get_style(bar);
 
-    	switch(sign) {
-            case LV_SIGNAL_CLEANUP:
-                dm_free(ext->format_str);
-                ext->format_str = NULL;
-                break;
-            case LV_SIGNAL_STYLE_CHG:
-                lv_obj_set_style(ext->label, style);
-                break;
-            default:
-                break;
-    	    }
     }
 
     return valid;
@@ -160,10 +132,6 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 	ext->act_value = value > ext->max_value ? ext->max_value : value;
     ext->act_value = ext->act_value < ext->min_value ? ext->min_value : ext->act_value;
 
-	char buf[LV_BAR_TXT_MAX_LENGTH];
-	sprintf(buf, ext->format_str, ext->act_value);
-	lv_label_set_text(ext->label, buf);
-
 	lv_obj_inv(bar);
 }
 
@@ -183,20 +151,6 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 		lv_bar_set_value(bar, ext->act_value);
 	}
 	lv_obj_inv(bar);
-}
-
-/**
- * Set format string for the label of the bar
- * @param bar pointer to bar object
- * @param format a printf-like format string with one number (e.g. "Loading (%d)")
- */
-void lv_bar_set_format_str(lv_obj_t * bar, const char * format)
-{
-	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
-	dm_free(ext->format_str);
-	ext->format_str = dm_alloc(strlen(format) + 1);
-	strcpy(ext->format_str, format);
-	lv_bar_set_value(bar, ext->act_value);
 }
 
 /**
@@ -246,7 +200,6 @@ lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar)
  *   STATIC FUNCTIONS
  **********************/
 
-
 /**
  * Handle the drawing related tasks of the bars
  * @param bar pointer to an object
@@ -259,8 +212,6 @@ lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar)
  */
 static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t mode)
 {
-	if(ancestor_design_f == NULL) return false;
-
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
     	return  ancestor_design_f(bar, mask, mode);

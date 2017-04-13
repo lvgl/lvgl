@@ -35,8 +35,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if 0
 static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_t mode);
-static void lv_rect_draw_shadow(lv_obj_t * rect, const area_t * mask);
+#endif
+
 static void lv_rect_refr_layout(lv_obj_t * rect);
 static void lv_rect_layout_col(lv_obj_t * rect);
 static void lv_rect_layout_row(lv_obj_t * rect);
@@ -79,7 +81,6 @@ lv_obj_t * lv_rect_create(lv_obj_t * par, lv_obj_t * copy)
     ext->vpad_en = 0;
     ext->layout = LV_RECT_LAYOUT_OFF;
 
-    lv_obj_set_design_f(new_rect, lv_rect_design);
     lv_obj_set_signal_f(new_rect, lv_rect_signal);
 
     /*Init the new rectangle*/
@@ -124,7 +125,6 @@ bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param)
     	case LV_SIGNAL_STYLE_CHG: /*Recalculate the padding if the style changed*/
         	lv_rect_refr_layout(rect);
         	lv_rect_refr_autofit(rect);
-        	lv_obj_refr_ext_size(rect);
         	break;
         case LV_SIGNAL_CHILD_CHG:
         	lv_rect_refr_layout(rect);
@@ -136,9 +136,6 @@ bool lv_rect_signal(lv_obj_t * rect, lv_signal_t sign, void * param)
             	lv_rect_refr_layout(rect);
             	lv_rect_refr_autofit(rect);
         	}
-        	break;
-        case LV_SIGNAL_REFR_EXT_SIZE:
-        	if(style->swidth > rect->ext_size) rect->ext_size = style->swidth;
         	break;
     		default:
     			break;
@@ -228,7 +225,7 @@ bool lv_rect_get_vfit(lv_obj_t * rect)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+#if 0
 /**
  * Handle the drawing related tasks of the rectangles
  * @param rect pointer to an object
@@ -242,91 +239,18 @@ bool lv_rect_get_vfit(lv_obj_t * rect)
 static bool lv_rect_design(lv_obj_t * rect, const area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        /* Because of the radius it is not sure the area is covered
-         * Check the areas where there is no radius*/
-    	if(rect->style_p->empty != 0) return false;
-
-    	uint16_t r = rect->style_p->radius;
-
-    	if(r == LV_RECT_CIRCLE) return false;
-
-    	area_t area_tmp;
-
-    	/*Check horizontally without radius*/
-    	lv_obj_get_cords(rect, &area_tmp);
-    	area_tmp.x1 += r;
-    	area_tmp.x2 -= r;
-    	if(area_is_in(mask, &area_tmp) == true) return true;
-
-    	/*Check vertically without radius*/
-    	lv_obj_get_cords(rect, &area_tmp);
-    	area_tmp.y1 += r;
-    	area_tmp.y2 -= r;
-    	if(area_is_in(mask, &area_tmp) == true) return true;
 
     	return false;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		lv_style_t * style =  lv_obj_get_style(rect);
-		area_t area;
-		lv_obj_get_cords(rect, &area);
 
-		/*Draw the rectangle*/
-		lv_draw_rect(&area, mask, style);
-		lv_rect_draw_shadow(rect, mask);
 
     } else if(mode == LV_DESIGN_DRAW_POST) {
 
     }
     return true;
 }
+#endif
 
-/**
- * Draw a shadow around the object
- * @param rect pointer to rectangle object
- * @param mask pointer to a mask area (from the design functions)
- */
-static void lv_rect_draw_shadow(lv_obj_t * rect, const area_t * mask)
-{
-	lv_style_t * style =  lv_obj_get_style(rect);
-	cord_t swidth = style->swidth;
-	if(swidth == 0) return;
-    uint8_t res = LV_DOWNSCALE * 2;
-	if(swidth < res) return;
-
-	area_t shadow_area;
-	lv_style_t shadow_style;
-	lv_obj_get_cords(rect, &shadow_area);
-
-	memcpy(&shadow_style, style, sizeof(lv_style_t));
-
-	shadow_style.empty = 1;
-	shadow_style.bwidth = swidth;
-	shadow_style.radius = style->radius;
-	if(shadow_style.radius == LV_RECT_CIRCLE) {
-	    shadow_style.radius = MATH_MIN(lv_obj_get_width(rect), lv_obj_get_height(rect));
-	}
-	shadow_style.radius += swidth + 1;
-	shadow_style.bcolor = style->scolor;
-	shadow_style.bopa = 100;
-
-	shadow_area.x1 -= swidth;
-	shadow_area.y1 -= swidth;
-	shadow_area.x2 += swidth;
-	shadow_area.y2 += swidth;
-
-	cord_t i;
-	shadow_style.opa =  style->opa / (swidth / res);
-
-	for(i = 1; i < swidth; i += res) {
-		lv_draw_rect(&shadow_area, mask, &shadow_style);
-		shadow_style.radius -= res;
-		shadow_style.bwidth -= res;
-		shadow_area.x1 += res;
-		shadow_area.y1 += res;
-		shadow_area.x2 -= res;
-		shadow_area.y2 -= res;
-	}
-}
 
 /**
  * Refresh the layout of a rectangle

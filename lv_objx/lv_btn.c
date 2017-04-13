@@ -29,14 +29,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if 0
 static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t mode);
-
+#endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static lv_design_f_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -74,10 +73,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     ext->lpr_exec = 0;
     ext->tgl = 0;
 
-    if(ancestor_design_f  == NULL) ancestor_design_f = lv_obj_get_design_f(new_btn);
-
     lv_obj_set_signal_f(new_btn, lv_btn_signal);
-    lv_obj_set_design_f(new_btn, lv_btn_design);
     
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
@@ -351,6 +347,8 @@ lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#if 0
 /**
  * Handle the drawing related tasks of the buttons
  * @param btn pointer to a button object
@@ -366,12 +364,12 @@ static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t 
 
     /* Because of the radius it is not sure the area is covered*/
     if(mode == LV_DESIGN_COVER_CHK) {
-        return ancestor_design_f(btn, mask, mode); /*Draw the rectangle*/
+        return false;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
-        ancestor_design_f(btn, mask, mode);	/*Draw the rectangle*/
+
     }
     return true;
 }
-
+#endif
 #endif

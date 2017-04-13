@@ -61,13 +61,13 @@ void lv_style_init (void)
 
     lv_style_set_mcolor(&lv_style_scr, COLOR_WHITE);
     lv_style_set_gcolor(&lv_style_scr, COLOR_WHITE);
-    lv_style_set_bcolor(&lv_style_scr, COLOR_MAKE(0x20, 0x20 ,0x20));
+    lv_style_set_bcolor(&lv_style_scr, COLOR_WHITE);
     lv_style_set_scolor(&lv_style_scr, COLOR_GRAY);
     lv_style_set_radius(&lv_style_scr, 0);
     lv_style_set_bwidth(&lv_style_scr, 0);
     lv_style_set_swidth(&lv_style_scr, 0);
     lv_style_set_vpad(&lv_style_scr, LV_DPI / 6);
-    lv_style_set_hpad(&lv_style_scr, LV_DPI / 6);
+    lv_style_set_hpad(&lv_style_scr, LV_DPI / 4);
     lv_style_set_opad(&lv_style_scr, LV_DPI / 6);
     lv_style_set_bopa(&lv_style_scr, OPA_COVER);
     lv_style_set_empty(&lv_style_scr, false);
@@ -86,21 +86,27 @@ void lv_style_init (void)
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_set_ccolor(&lv_style_plain_color, COLOR_MAKE(0xf0, 0xf0, 0xf0));
+    lv_style_set_ccolor(&lv_style_plain_color, COLOR_RED);//MAKE(0xf0, 0xf0, 0xf0));
     lv_style_set_mcolor(&lv_style_plain_color, COLOR_MAKE(0x40, 0x60, 0x80));
     lv_style_set_gcolor(&lv_style_plain_color, COLOR_MAKE(0x40, 0x60, 0x80));
 
     /*Pretty style */
     memcpy(&lv_style_pretty, &lv_style_plain, sizeof(lv_style_t));
     lv_style_set_mcolor(&lv_style_pretty, COLOR_WHITE);
-    lv_style_set_mcolor(&lv_style_pretty, COLOR_SILVER);
+    lv_style_set_gcolor(&lv_style_pretty, COLOR_SILVER);
+    lv_style_set_bcolor(&lv_style_pretty, COLOR_GRAY);
     lv_style_set_radius(&lv_style_pretty, LV_DPI / 10);
     lv_style_set_bwidth(&lv_style_pretty, LV_DPI / 20 >= 1 ? LV_DPI / 30 >= 1 : 1);
+//    lv_style_set_swidth(&lv_style_pretty, LV_DPI / 6);
+//    lv_style_set_scolor(&lv_style_pretty, COLOR_BLACK);
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
+    lv_style_set_ccolor(&lv_style_pretty_color, COLOR_RED);//MAKE(0xf0, 0xf0, 0xf0));
     lv_style_set_mcolor(&lv_style_pretty_color, COLOR_WHITE);
-    lv_style_set_mcolor(&lv_style_pretty_color, COLOR_CYAN);
+    lv_style_set_gcolor(&lv_style_pretty_color, COLOR_CYAN);
+    lv_style_set_scolor(&lv_style_pretty_color, COLOR_BLACK);
+    lv_style_set_swidth(&lv_style_pretty_color, LV_DPI / 2);
 
     /*Transparent style*/
     memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));

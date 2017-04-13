@@ -187,12 +187,16 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
     lv_bar_set_style_indic(sc_data->bar_cpu, &cpu_bars);
     lv_obj_set_click(sc_data->bar_cpu, false);
     lv_bar_set_range(sc_data->bar_cpu, 0, 100);
-    lv_bar_set_format_str(sc_data->bar_cpu, "C\nP\nU");
+    lv_obj_t * label = lv_label_create(sc_data->bar_cpu, NULL);
+    lv_label_set_text(label, "C\nP\nU");
+    lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
 
     sc_data->bar_mem = lv_bar_create(sc, sc_data->bar_cpu);
     lv_obj_align(sc_data->bar_mem, sc_data->bar_cpu, LV_ALIGN_OUT_RIGHT_MID, w, 0);
     lv_bar_set_style_indic(sc_data->bar_mem, &mem_bars);
-    lv_bar_set_format_str(sc_data->bar_mem, "M\ne\nm");
+    label = lv_label_create(sc_data->bar_mem, NULL);
+    lv_label_set_text(label, "M\nE\nM");
+    lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
 
     lv_app_sysmon_refr();
 }
@@ -237,7 +241,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     /*Create a label for the details of Memory and CPU usage*/
     win_data->label = lv_label_create(win, NULL);
     lv_label_set_recolor(win_data->label, true);
-    lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, LV_DPI / 4, 0);
+    lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_TOP, LV_DPI / 4, 0);
 
 
     lv_app_sysmon_refr();

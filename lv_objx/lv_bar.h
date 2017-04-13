@@ -37,13 +37,11 @@
 /*Data of bar*/
 typedef struct
 {
-    lv_rect_ext_t rect_ext;     /*Ext. of ancestor*/
+    /*No inherited ext*/        /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * label;           /*Pointer to the label on the bar*/
     int16_t act_value;          /*Current value of the bar*/
     int16_t min_value;          /*Minimum value of the bar*/
     int16_t max_value;          /*Maximum value of the bar*/
-    char * format_str;          /*Format string of the label. E.g. "Progress: %d"*/
     lv_style_t * style_indic;   /*Style of the indicator*/
 }lv_bar_ext_t;
 

@@ -8,12 +8,12 @@
  *********************/
 
 #include <lv_conf.h>
-#include <lvgl/lv_draw/lv_draw_rbasic.h>
-#include <lvgl/lv_draw/lv_draw_vbasic.h>
+#include <lvgl/lv_draw/lv_draw.h>
 #include <lvgl/lv_misc/anim.h>
 #include <lvgl/lv_obj/lv_dispi.h>
 #include <lvgl/lv_obj/lv_obj.h>
 #include <lvgl/lv_obj/lv_refr.h>
+#include "lvgl/lv_draw/lv_draw_rbasic.h"
 #include <stdint.h>
 #include <string.h>
 #include <sys/types.h>
@@ -305,13 +305,20 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     bool valid = true;
 
+    lv_style_t * style = lv_obj_get_style(obj);
     switch(sign) {
-    case LV_SIGNAL_CHILD_CHG:
-    	/*Return 'invalid' if the child change  signal is not enabled*/
-    	if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) valid = false;
-    	break;
-    	default:
-    		break;
+        case LV_SIGNAL_CHILD_CHG:
+            /*Return 'invalid' if the child change  signal is not enabled*/
+            if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) valid = false;
+            break;
+        case LV_SIGNAL_REFR_EXT_SIZE:
+            if(style->swidth > obj->ext_size) obj->ext_size = style->swidth;
+            break;
+        case LV_SIGNAL_STYLE_CHG:
+            lv_obj_refr_ext_size(obj);
+            break;
+        default:
+            break;
     }
 
     return valid;
@@ -1425,18 +1432,33 @@ void * lv_obj_get_free_p(lv_obj_t * obj)
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        bool cover;
-    	cover = area_is_in(mask_p, &obj->cords);
-        return cover;
+
+        /* Because of the radius it is not sure the area is covered
+         * Check the areas where there is no radius*/
+        lv_style_t * style = lv_obj_get_style(obj);
+        if(style->empty != 0) return false;
+
+        uint16_t r = style->radius;
+
+        if(r == LV_RECT_CIRCLE) return false;
+
+        area_t area_tmp;
+
+        /*Check horizontally without radius*/
+        lv_obj_get_cords(obj, &area_tmp);
+        area_tmp.x1 += r;
+        area_tmp.x2 -= r;
+        if(area_is_in(mask_p, &area_tmp) != true) return false;
+
+        /*Check vertically without radius*/
+        lv_obj_get_cords(obj, &area_tmp);
+        area_tmp.y1 += r;
+        area_tmp.y2 -= r;
+        if(area_is_in(mask_p, &area_tmp) != true) return false;
+
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		lv_style_t * style = lv_obj_get_style(obj);
-
-		/*Simply draw a rectangle*/
-#if LV_VDB_SIZE == 0
-		lv_rfill(&obj->cords, mask_p, style->color, style->opa);
-#else
-		lv_vfill(&obj->cords, mask_p, style->mcolor, style->opa);
-#endif
+		lv_draw_rect(&obj->cords, mask_p, style);
     }
     return true;
 }
