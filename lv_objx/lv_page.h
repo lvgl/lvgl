@@ -18,7 +18,7 @@
 #endif
 
 #include "../lv_obj/lv_obj.h"
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 
 /*********************
  *      DEFINES
@@ -34,13 +34,13 @@ typedef enum
     LV_PAGE_SB_MODE_OFF,    /*Never show scrollbars*/
     LV_PAGE_SB_MODE_ON,     /*Always show scrollbars*/
     LV_PAGE_SB_MODE_DRAG,   /*Show scrollbars when page is being dragged*/
-    LV_PAGE_SB_MODE_AUTO,   /*Show scrollbars when the scrollable rect. is large enough to be scrolled*/
+    LV_PAGE_SB_MODE_AUTO,   /*Show scrollbars when the scrollable container is large enough to be scrolled*/
 }lv_page_sb_mode_t;
 
 /*Data of page*/
 typedef struct
 {
-    lv_rect_ext_t bg_rect; /*Ext. of ancestor*/
+    lv_cont_ext_t bg_rect; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * scrl;            /*The scrollable object on the background*/
     lv_action_t rel_action;     /*Function to call when the page is released*/
@@ -110,7 +110,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en);
 /**
  * Get the scrollable object of a page-
  * @param page pointer to page object
- * @return pointer to rectangle which is the scrollable part of the page
+ * @return pointer to container which is the scrollable part of the page
  */
 lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
 

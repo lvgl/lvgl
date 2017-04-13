@@ -23,7 +23,7 @@
 #endif
 
 #include "../lv_obj/lv_obj.h"
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "lv_label.h"
 #include "lv_btn.h"
 
@@ -43,7 +43,7 @@ typedef lv_action_res_t (*lv_btnm_callback_t) (lv_obj_t *, uint16_t);
 /*Data of button matrix*/
 typedef struct
 {
-    lv_rect_ext_t bg; /*Ext. of ancestor*/
+    lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     const char ** map_p;    /*Pointer to the current map*/
     area_t * btn_areas;     /*Array of areas for the buttons (Handled by the library)*/

@@ -299,11 +299,11 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
 
     /*Create a text area to type chunk size*/
     lv_obj_t * val_set_h;
-    val_set_h = lv_rect_create(conf_win, NULL);
+    val_set_h = lv_cont_create(conf_win, NULL);
     lv_obj_set_style(val_set_h, lv_style_get(LV_STYLE_PLAIN_COLOR, NULL));
     lv_obj_set_click(val_set_h, false);
-    lv_rect_set_fit(val_set_h, true, true);
-    lv_rect_set_layout(val_set_h, LV_RECT_LAYOUT_ROW_M);
+    lv_cont_set_fit(val_set_h, true, true);
+    lv_cont_set_layout(val_set_h, LV_CONT_LAYOUT_ROW_M);
 
     lv_obj_t * label;
     label = lv_label_create(val_set_h, NULL);
@@ -312,7 +312,7 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
     lv_obj_t * ta;
     char buf[32];
     ta = lv_ta_create(val_set_h, NULL);
-    lv_rect_set_fit(ta, false, true);
+    lv_cont_set_fit(ta, false, true);
     lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_SIZE);
     lv_obj_set_free_p(ta, app);
     lv_page_set_rel_action(ta, win_send_settings_element_rel_action);
@@ -320,7 +320,7 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
     lv_ta_set_text(ta, buf);
 
     /*Create a text area to type the chunk delay*/
-    val_set_h = lv_rect_create(conf_win, val_set_h);
+    val_set_h = lv_cont_create(conf_win, val_set_h);
 
     label = lv_label_create(val_set_h, NULL);
     lv_label_set_text(label, "Inter-chunk delay");
@@ -353,8 +353,8 @@ static void win_create_list(lv_app_inst_t * app)
    //TODO lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
     lv_obj_set_drag_parent(win_data->file_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(win_data->file_list), true);
-    lv_rect_set_fit(win_data->file_list, false, true);
-    lv_rect_set_layout(lv_page_get_scrl(win_data->file_list), LV_RECT_LAYOUT_COL_L);
+    lv_cont_set_fit(win_data->file_list, false, true);
+    lv_cont_set_layout(lv_page_get_scrl(win_data->file_list), LV_CONT_LAYOUT_COL_L);
 }
 
 /**

@@ -43,12 +43,12 @@ typedef enum
  *  STATIC PROTOTYPES
  **********************/
 #if USE_LV_RECT != 0
-static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
-static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
-static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
-static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
-static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style);
-static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h);
+static void lv_draw_cont_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
+static void lv_draw_cont_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
+static void lv_draw_cont_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
+static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
+static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style);
+static uint16_t lv_draw_cont_radius_corr(uint16_t r, cord_t w, cord_t h);
 #endif /*USE_LV_RECT != 0*/
 
 
@@ -90,23 +90,23 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, const lv_style_
     if(area_get_height(cords_p) < 1 || area_get_width(cords_p) < 1) return;
 
     if(style_p->empty == 0){
-        lv_draw_rect_main_mid(cords_p, mask_p, style_p);
+        lv_draw_cont_main_mid(cords_p, mask_p, style_p);
 
         if(style_p->radius != 0) {
-            lv_draw_rect_main_corner(cords_p, mask_p, style_p);
+            lv_draw_cont_main_corner(cords_p, mask_p, style_p);
         }
     } 
     
     if(style_p->bwidth != 0) {
-        lv_draw_rect_border_straight(cords_p, mask_p, style_p);
+        lv_draw_cont_border_straight(cords_p, mask_p, style_p);
 
         if(style_p->radius != 0) {
-            lv_draw_rect_border_corner(cords_p, mask_p, style_p);
+            lv_draw_cont_border_corner(cords_p, mask_p, style_p);
         }
     }
 
     if(style_p->swidth != 0) {
-        lv_draw_rect_shadow(cords_p, mask_p, style_p);
+        lv_draw_cont_shadow(cords_p, mask_p, style_p);
     }
 }
 #endif /*USE_LV_RECT != 0*/
@@ -573,7 +573,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
  */
-static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style)
+static void lv_draw_cont_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style)
 {
     uint16_t radius = style->radius;
 
@@ -584,7 +584,7 @@ static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p,
     cord_t height = area_get_height(cords_p);
     cord_t width = area_get_width(cords_p);
 
-    radius = lv_draw_rect_radius_corr(radius, width, height);
+    radius = lv_draw_cont_radius_corr(radius, width, height);
 
     /*If the radius is too big then there is no body*/
     if(radius > height / 2)  return;
@@ -623,7 +623,7 @@ static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p,
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
  */
-static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
+static void lv_draw_cont_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
 {
     uint16_t radius = style_p->radius;
 
@@ -635,7 +635,7 @@ static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask
     cord_t height = area_get_height(cords_p);
     cord_t width = area_get_width(cords_p);
 
-    radius = lv_draw_rect_radius_corr(radius, width, height);
+    radius = lv_draw_cont_radius_corr(radius, width, height);
 
     point_t lt_origo;   /*Left  Top    origo*/
     point_t lb_origo;   /*Left  Bottom origo*/
@@ -794,7 +794,7 @@ if(edge_top_area.y1 != mid_top_area.y1) {
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
  */
-static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
+static void lv_draw_cont_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
 {
     uint16_t radius = style_p->radius;
 
@@ -809,7 +809,7 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
     /*the 0 px border width drawn as 1 px, so decrement the b_width*/
     bwidth--;
 
-    radius = lv_draw_rect_radius_corr(radius, width, height);
+    radius = lv_draw_cont_radius_corr(radius, width, height);
 
     if(radius < bwidth) {
         length_corr = bwidth - radius;
@@ -910,7 +910,7 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
  * @param rects_p pointer to a rectangle style
  * @param opa opacity of the rectangle (0..255)
  */
-static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
+static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
 {
     uint16_t radius = style->radius;
     uint16_t bwidth = style->bwidth;
@@ -923,7 +923,7 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
     cord_t width = area_get_width(cords_p);
     cord_t height = area_get_height(cords_p);
 
-    radius = lv_draw_rect_radius_corr(radius, width, height);
+    radius = lv_draw_cont_radius_corr(radius, width, height);
 
     point_t lt_origo;   /*Left  Top    origo*/
     point_t lb_origo;   /*Left  Bottom origo*/
@@ -1045,7 +1045,7 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
  * @param rect pointer to rectangle object
  * @param mask pointer to a mask area (from the design functions)
  */
-static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
+static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
 {
     cord_t swidth = style->swidth;
     if(swidth == 0) return;
@@ -1061,7 +1061,7 @@ static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, c
     shadow_style.empty = 1;
     shadow_style.bwidth = swidth;
     shadow_style.radius = style->radius;
-    if(shadow_style.radius == LV_RECT_CIRCLE) {
+    if(shadow_style.radius == LV_CONT_CIRCLE) {
         shadow_style.radius = MATH_MIN(area_get_width(cords_p), area_get_height(cords_p));
     }
     shadow_style.radius += swidth + 1;
@@ -1077,8 +1077,8 @@ static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, c
     shadow_style.opa =  style->opa / (swidth / res);
 
     for(i = 1; i < swidth; i += res) {
-        lv_draw_rect_border_straight(&shadow_area, mask_p, &shadow_style);
-        lv_draw_rect_border_corner(&shadow_area, mask_p, &shadow_style);
+        lv_draw_cont_border_straight(&shadow_area, mask_p, &shadow_style);
+        lv_draw_cont_border_corner(&shadow_area, mask_p, &shadow_style);
         shadow_style.radius -= res;
         shadow_style.bwidth -= res;
         shadow_area.x1 += res;
@@ -1089,7 +1089,7 @@ static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, c
 }
 
 
-static uint16_t lv_draw_rect_radius_corr(uint16_t r, cord_t w, cord_t h)
+static uint16_t lv_draw_cont_radius_corr(uint16_t r, cord_t w, cord_t h)
 {
 	if(r >= (w >> 1)){
 		r = (w >> 1);

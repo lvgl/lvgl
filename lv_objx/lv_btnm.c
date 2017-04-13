@@ -61,7 +61,7 @@ static lv_design_f_t ancestor_design_f;
 lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor object*/
-    lv_obj_t * new_btnm = lv_rect_create(par, copy);
+    lv_obj_t * new_btnm = lv_cont_create(par, copy);
     dm_assert(new_btnm);
     
     /*Allocate the object type specific extended data*/
@@ -106,7 +106,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_rect_signal(btnm, sign, param);
+    valid = lv_cont_signal(btnm, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */

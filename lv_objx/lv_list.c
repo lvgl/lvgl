@@ -10,13 +10,13 @@
 #if USE_LV_LIST != 0
 
 #include "lv_list.h"
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "misc/math/math_base.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_LIST_LAYOUT_DEF	LV_RECT_LAYOUT_COL_M
+#define LV_LIST_LAYOUT_DEF	LV_CONT_LAYOUT_COL_M
 
 /**********************
  *      TYPEDEFS
@@ -71,7 +71,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new list object*/
     if(copy == NULL) {
     	lv_obj_set_size_us(new_list, 2 * LV_DPI, 3 * LV_DPI);
-		lv_rect_set_layout(ext->page.scrl, LV_LIST_LAYOUT_DEF);
+		lv_cont_set_layout(ext->page.scrl, LV_LIST_LAYOUT_DEF);
 		lv_obj_set_style(new_list, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
 		lv_obj_set_style(lv_page_get_scrl(new_list), lv_style_get(LV_STYLE_PRETTY, NULL));
 		lv_page_set_sb_mode(new_list, LV_PAGE_SB_MODE_AUTO);
@@ -121,8 +121,8 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 
 	lv_btn_set_rel_action(liste, rel_action);
 	lv_page_glue_obj(liste, true);
-	lv_rect_set_layout(liste, LV_RECT_LAYOUT_ROW_M);
-	lv_rect_set_fit(liste, false, true);
+	lv_cont_set_layout(liste, LV_CONT_LAYOUT_ROW_M);
+	lv_cont_set_fit(liste, false, true);
 
 	if(img_fn != NULL && img_fn[0] != '\0') {
 		lv_obj_t * img = lv_img_create(liste, NULL);

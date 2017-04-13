@@ -484,32 +484,32 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 	int32_t y_tmp;
     lv_chart_dl_t * dl;
     uint8_t dl_cnt = 0;
-    lv_style_t rects;
-    lv_style_get(LV_STYLE_PLAIN, &rects);
+    lv_style_t style_point;
+    lv_style_get(LV_STYLE_PLAIN, &style_point);
 
-	rects.bwidth = 0;
-	rects.empty = 0;
-	rects.radius = LV_RECT_CIRCLE;
-    rects.opa = (uint16_t)((uint16_t)style->opa * ext->data_opa) >> 8;
+	style_point.bwidth = 0;
+	style_point.empty = 0;
+	style_point.radius = LV_CONT_CIRCLE;
+    style_point.opa = (uint16_t)((uint16_t)style->opa * ext->data_opa) >> 8;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, dl) {
-	    rects.radius = dl->width;
-		rects.mcolor = dl->color;
-		rects.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dark_eff);
+	    style_point.radius = dl->width;
+		style_point.mcolor = dl->color;
+		style_point.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dark_eff);
 
 		for(i = 0; i < ext->pnum; i ++) {
 			cir_a.x1 = ((w * i) / (ext->pnum - 1)) + x_ofs;
-			cir_a.x2 = cir_a.x1 + rects.radius;
-			cir_a.x1 -= rects.radius;
+			cir_a.x2 = cir_a.x1 + style_point.radius;
+			cir_a.x1 -= style_point.radius;
 
 			y_tmp = (int32_t)((int32_t) dl->points[i] - ext->ymin) * h;
 			y_tmp = y_tmp / (ext->ymax - ext->ymin);
 			cir_a.y1 = h - y_tmp + y_ofs;
-			cir_a.y2 = cir_a.y1 + rects.radius;
-			cir_a.y1 -= rects.radius;
+			cir_a.y2 = cir_a.y1 + style_point.radius;
+			cir_a.y1 -= style_point.radius;
 
-			lv_draw_rect(&cir_a, mask, &rects);
+			lv_draw_rect(&cir_a, mask, &style_point);
 		}
 		dl_cnt++;
 	}

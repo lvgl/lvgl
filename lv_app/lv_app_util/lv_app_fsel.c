@@ -91,7 +91,6 @@ void lv_app_fsel_open(const char * path, const char * filter, void * param, void
     if(fsel_filter == NULL) fsel_filter = "";
 
     /*Create a window for the File selector*/
-    lv_app_style_t * app_style = lv_app_style_get();
     fsel_win = lv_win_create(lv_scr_act(), NULL);
     lv_obj_set_size(fsel_win, LV_HOR_RES, LV_VER_RES);
 
@@ -142,7 +141,7 @@ static void fsel_refr(void)
     //TODO lv_obj_set_style(fsel_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
     lv_obj_set_drag_parent(fsel_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(fsel_list), true);
-    lv_rect_set_fit(fsel_list, false, true);
+    lv_cont_set_fit(fsel_list, false, true);
 
     fs_res_t res = FS_RES_OK;
 

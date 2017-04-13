@@ -79,12 +79,12 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_sb_mode(ext->page, LV_PAGE_SB_MODE_AUTO);
 
         lv_obj_t * scrl = lv_page_get_scrl(ext->page);
-        lv_rect_set_fit(scrl, false, true);
+        lv_cont_set_fit(scrl, false, true);
         lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));
 
     	/*Create a holder for the header*/
-    	ext->header = lv_rect_create(new_win, NULL);
-    	lv_rect_set_fit(ext->header, false, true);
+    	ext->header = lv_cont_create(new_win, NULL);
+    	lv_cont_set_fit(ext->header, false, true);
     	/*Move back the header because it is automatically moved to the scrollable */
     	lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
     	lv_obj_set_parent(ext->header, new_win);
@@ -95,10 +95,10 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_label_set_text(ext->title,"My title");
 
     	/*Create a holder for the control buttons*/
-    	ext->btnh = lv_rect_create(ext->header, NULL);
-    	lv_rect_set_fit(ext->btnh, true, false);
+    	ext->btnh = lv_cont_create(ext->header, NULL);
+    	lv_cont_set_fit(ext->btnh, true, false);
         lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
-    	lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_ROW_M);
+    	lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_ROW_M);
 
         lv_obj_set_signal_f(new_win, lv_win_signal);
         lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
@@ -107,13 +107,13 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     else {
     	lv_win_ext_t * copy_ext = lv_obj_get_ext(copy);
     	/*Create the objects*/
-    	ext->header = lv_rect_create(new_win, copy_ext->header);
+    	ext->header = lv_cont_create(new_win, copy_ext->header);
         /*Move back the header because it is automatically moved to the scrollable */
         lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
         lv_obj_set_parent(ext->header, new_win);
 
     	ext->title = lv_label_create(ext->header, copy_ext->title);
-    	ext->btnh = lv_rect_create(ext->header, copy_ext->btnh);
+    	ext->btnh = lv_cont_create(ext->header, copy_ext->btnh);
 
     	/*Copy the control buttons*/
     	lv_obj_t * child;

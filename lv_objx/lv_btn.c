@@ -55,7 +55,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
 {
     lv_obj_t * new_btn;
     
-    new_btn = lv_rect_create(par, copy);
+    new_btn = lv_cont_create(par, copy);
     dm_assert(new_btn);
     /*Allocate the extended data*/
     lv_btn_ext_t * ext = lv_obj_alloc_ext(new_btn, sizeof(lv_btn_ext_t));
@@ -77,7 +77,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
-	    lv_rect_set_layout(new_btn, LV_RECT_LAYOUT_CENTER);
+	    lv_cont_set_layout(new_btn, LV_CONT_LAYOUT_CENTER);
 	    lv_obj_set_style(new_btn, ext->styles[LV_BTN_STATE_REL]);
     }
     /*Copy 'copy'*/
@@ -113,7 +113,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_rect_signal(btn, sign, param);
+    valid = lv_cont_signal(btn, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */

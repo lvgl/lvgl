@@ -17,7 +17,7 @@
 #error "lv_btn: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
 #endif
 
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "../lv_obj/lv_dispi.h"
 
 /*********************
@@ -42,7 +42,7 @@ typedef enum
 /*Data of button*/
 typedef struct
 {
-	lv_rect_ext_t rect; /*Ext. of ancestor*/
+	lv_cont_ext_t cont; /*Ext. of ancestor*/
 	/*New data for this type */
 	lv_action_t pr_action;      /*A function to call when the button is pressed (NULL if unused)*/
 	lv_action_t rel_action;     /*A function to call when the button is released (NULL if unused)*/

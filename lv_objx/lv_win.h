@@ -38,7 +38,7 @@
 #endif
 
 #include "../lv_obj/lv_obj.h"
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "lv_btn.h"
 #include "lv_label.h"
 #include "lv_img.h"
@@ -58,10 +58,10 @@ typedef struct
     /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * page;
-    lv_obj_t * header;  /*Pointer to the header rectangle of the window*/
+    lv_obj_t * header;  /*Pointer to the header container of the window*/
     lv_obj_t * title;   /*Pointer to the title label of the window*/
-    lv_obj_t * btnh; /*Pointer to the control button holder rectangle of the window*/
-    lv_style_t * style_header;      /*Style of the header rectangle*/
+    lv_obj_t * btnh; /*Pointer to the control button holder container of the window*/
+    lv_style_t * style_header;      /*Style of the header container*/
     lv_style_t * style_cbtn_rel;    /*Control button releases style*/
     lv_style_t * style_cbtn_pr;    /*Control button pressed style*/
     cord_t cbtn_size;                /*Size of the control buttons (square)*/

@@ -30,7 +30,7 @@
 /*Data of led*/
 typedef struct
 {
-    lv_rect_ext_t bg_rect;       /*Ext. of ancestor*/
+    lv_cont_ext_t bg_rect;       /*Ext. of ancestor*/
     /*New data for this type */
     uint8_t bright;         /*Current brightness of the LED (0..255)*/
 }lv_led_ext_t;

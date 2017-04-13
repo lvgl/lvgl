@@ -59,7 +59,7 @@ static void lv_mbox_disable_fit(lv_obj_t  * mbox);
 lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor message box*/
-	lv_obj_t * new_mbox = lv_rect_create(par, copy);
+	lv_obj_t * new_mbox = lv_cont_create(par, copy);
     dm_assert(new_mbox);
     
     /*Allocate the message box type specific extended data*/
@@ -78,8 +78,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new message box message box*/
     if(copy == NULL) {
-    	lv_rect_set_layout(new_mbox, LV_RECT_LAYOUT_COL_L);
-    	lv_rect_set_fit(new_mbox, true, true);
+    	lv_cont_set_layout(new_mbox, LV_CONT_LAYOUT_COL_L);
+    	lv_cont_set_fit(new_mbox, true, true);
 
     	ext->txt = lv_label_create(new_mbox, NULL);
     	lv_label_set_text(ext->txt, "Text of the message box");
@@ -126,7 +126,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_rect_signal(mbox, sign, param);
+    valid = lv_cont_signal(mbox, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -201,11 +201,11 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 
     /*Create a button if it is not existed yet*/
     if(ext->btnh == NULL) {
-        ext->btnh = lv_rect_create(mbox, NULL);
+        ext->btnh = lv_cont_create(mbox, NULL);
         lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSP, NULL));
         lv_obj_set_click(ext->btnh, false);
-        lv_rect_set_fit(ext->btnh, false, true);
-        lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
+        lv_cont_set_fit(ext->btnh, false, true);
+        lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_PRETTY);
     }
 
     lv_obj_t * btn;
@@ -214,7 +214,7 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
     lv_btn_set_styles(btn, ext->styles_btn[LV_BTN_STATE_REL], ext->styles_btn[LV_BTN_STATE_PR],
                              ext->styles_btn[LV_BTN_STATE_TREL], ext->styles_btn[LV_BTN_STATE_TPR],
                              ext->styles_btn[LV_BTN_STATE_INA]);
-    lv_rect_set_fit(btn, true, true);
+    lv_cont_set_fit(btn, true, true);
 
     lv_obj_t * label;
     label = lv_label_create(btn, NULL);
@@ -405,7 +405,7 @@ static void lv_mbox_realign(lv_obj_t * mbox)
  */
 static void lv_mbox_disable_fit(lv_obj_t  * mbox)
 {
-    lv_rect_set_fit(mbox, false, false);
+    lv_cont_set_fit(mbox, false, false);
 }
 
 #endif

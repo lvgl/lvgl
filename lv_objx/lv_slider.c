@@ -80,7 +80,8 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy an existing slider*/
     else {
     	lv_slider_ext_t * copy_ext = lv_obj_get_ext(copy);
-
+    	ext->style_knob = copy_ext->style_knob;
+        ext->cb = copy_ext->cb;
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_slider);
     }

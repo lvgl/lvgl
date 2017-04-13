@@ -27,7 +27,7 @@
 
 
 #include "../lv_obj/lv_obj.h"
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "lv_btn.h"
 #include "lv_label.h"
 
@@ -42,7 +42,7 @@
 /*Data of message box*/
 typedef struct
 {
-    lv_rect_ext_t bg; /*Ext. of ancestor*/
+    lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * txt;     /*Text of the message box*/
     lv_obj_t * btnh;    /*Holder of the buttons*/

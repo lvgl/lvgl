@@ -257,7 +257,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 	lv_obj_set_free_p(app->sc, app);
 	lv_btn_set_styles(app->sc, &app_style.sc_rel, &app_style.sc_pr, NULL, NULL, NULL);
 	lv_obj_set_size(app->sc, LV_APP_SC_WIDTH, LV_APP_SC_HEIGHT);
-	lv_rect_set_layout(app->sc, LV_RECT_LAYOUT_OFF);
+	lv_cont_set_layout(app->sc, LV_CONT_LAYOUT_OFF);
 	lv_btn_set_rel_action(app->sc, lv_app_sc_rel_action);
     lv_btn_set_lpr_action(app->sc, lv_app_sc_lpr_action);
 
@@ -545,23 +545,23 @@ lv_app_style_t * lv_app_style_get(void)
 static void lv_app_init_desktop(void)
 {
     /*Menu on the top*/
-    menuh = lv_rect_create(lv_scr_act(), NULL);
+    menuh = lv_cont_create(lv_scr_act(), NULL);
     lv_obj_set_width(menuh, LV_HOR_RES);
-    lv_rect_set_fit(menuh, false, true);
+    lv_cont_set_fit(menuh, false, true);
     lv_obj_set_style(menuh, &app_style.menu);
 
     app_btn = lv_btn_create(menuh, NULL);
     lv_btn_set_styles(app_btn, &app_style.menu_btn_rel, &app_style.menu_btn_pr, NULL, NULL, NULL);
-    lv_rect_set_fit(app_btn, true, true);
+    lv_cont_set_fit(app_btn, true, true);
     lv_btn_set_rel_action(app_btn, lv_app_menu_rel_action);
     lv_obj_t * app_label = lv_label_create(app_btn, NULL);
     lv_label_set_text(app_label, "Apps");
     lv_obj_set_pos(app_btn, 0, 0);
     lv_obj_set_pos(menuh, 0, 0);
 /*
-    sys_apph = lv_rect_create(menuh, NULL);
-    lv_rect_set_layout(sys_apph, LV_RECT_LAYOUT_ROW_M);
-    lv_rect_set_fit(sys_apph, true, false);
+    sys_apph = lv_cont_create(menuh, NULL);
+    lv_cont_set_layout(sys_apph, LV_CONT_LAYOUT_ROW_M);
+    lv_cont_set_fit(sys_apph, true, false);
     lv_obj_set_style(sys_apph, lv_rects_get(LV_RECTS_TRANSP, NULL));
     lv_obj_t * clock = lv_label_create(sys_apph, NULL);
     lv_obj_set_style(clock, &app_style.menu_btn_label);
@@ -576,8 +576,8 @@ static void lv_app_init_desktop(void)
      lv_obj_set_size(sc_page, LV_HOR_RES, LV_VER_RES - lv_obj_get_height(menuh));
      lv_obj_set_pos(sc_page, 0, lv_obj_get_height(menuh));
      lv_obj_set_width(lv_page_get_scrl(sc_page), LV_HOR_RES - 20);
-     lv_rect_set_fit(lv_page_get_scrl(sc_page), false, true);
-     lv_rect_set_layout(lv_page_get_scrl(sc_page), LV_RECT_LAYOUT_GRID);
+     lv_cont_set_fit(lv_page_get_scrl(sc_page), false, true);
+     lv_cont_set_layout(lv_page_get_scrl(sc_page), LV_CONT_LAYOUT_GRID);
      lv_page_set_rel_action(sc_page, lv_app_sc_page_rel_action);
      lv_page_set_sb_mode(sc_page, LV_PAGE_SB_MODE_AUTO);
 
@@ -849,7 +849,7 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
     sprintf(buf, "%s settings", app->dsc->name);
     lv_win_set_title(app->conf_win, buf);
     lv_obj_t * scrl = lv_page_get_scrl(app->conf_win);
-    lv_rect_set_layout(scrl, LV_RECT_LAYOUT_COL_L);
+    lv_cont_set_layout(scrl, LV_CONT_LAYOUT_COL_L);
 
     lv_win_add_ctrl_btn(app->conf_win, "U:/icon_close" ,lv_win_close_action);
 

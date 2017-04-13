@@ -86,7 +86,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
 
         ext->opt_label = lv_label_create(new_ddlist, NULL);
         lv_obj_set_style(ext->opt_label, NULL); /*Inherit the style*/
-        lv_rect_set_fit(new_ddlist, true, false);
+        lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_rel_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
         lv_obj_set_style(new_ddlist, lv_style_get(LV_STYLE_PRETTY, NULL));

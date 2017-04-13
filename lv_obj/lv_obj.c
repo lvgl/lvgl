@@ -1440,7 +1440,7 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 
         uint16_t r = style->radius;
 
-        if(r == LV_RECT_CIRCLE) return false;
+        if(r == LV_CONT_CIRCLE) return false;
 
         area_t area_tmp;
 

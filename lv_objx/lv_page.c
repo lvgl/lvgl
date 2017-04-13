@@ -11,7 +11,7 @@
 
 #include "misc/math/math_base.h"
 #include "../lv_objx/lv_page.h"
-#include "../lv_objx/lv_rect.h"
+#include "../lv_objx/lv_cont.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
 #include "../lv_misc/anim.h"
@@ -61,7 +61,7 @@ static lv_design_f_t ancestor_design_f;
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor object*/
-    lv_obj_t * new_page = lv_rect_create(par, copy);
+    lv_obj_t * new_page = lv_cont_create(par, copy);
     dm_assert(new_page);
 
     /*Allocate the object type specific extended data*/
@@ -81,12 +81,12 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new page object*/
     if(copy == NULL) {
     	lv_style_t * style = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
-	    ext->scrl = lv_rect_create(new_page, NULL);
+	    ext->scrl = lv_cont_create(new_page, NULL);
 	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
 		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
-		lv_rect_set_fit(ext->scrl, true, true);
+		lv_cont_set_fit(ext->scrl, true, true);
 		lv_obj_set_style(ext->scrl, lv_style_get(LV_STYLE_PRETTY, NULL));
 
 		/* Add the signal function only if 'scrolling' is created
@@ -96,7 +96,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 		lv_obj_set_style(new_page, style);
     } else {
     	lv_page_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	ext->scrl = lv_rect_create(new_page, copy_ext->scrl);
+    	ext->scrl = lv_cont_create(new_page, copy_ext->scrl);
 	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
 
         lv_page_set_pr_action(new_page, copy_ext->pr_action);
@@ -128,7 +128,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     bool obj_valid = true;
 
     /* Include the ancient signal function */
-    obj_valid = lv_rect_signal(page, sign, param);
+    obj_valid = lv_cont_signal(page, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -209,7 +209,7 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
     bool obj_valid = true;
 
     /* Include the ancient signal function */
-    obj_valid = lv_rect_signal(scrl, sign, param);
+    obj_valid = lv_cont_signal(scrl, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -480,7 +480,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 /**
  * Get the scrollable object of a page-
  * @param page pointer to page object
- * @return pointer to rectangle which is the scrollable part of the page
+ * @return pointer to a container which is the scrollable part of the page
  */
 lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
 {

@@ -67,7 +67,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     ext->act_value = 0;
     ext->style_indic = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 
-    /* Save the rectangle design function.
+    /* Save the ancient design function.
      * It will be used in the bar design function*/
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_bar);
 
@@ -106,7 +106,7 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_rect_signal(bar, sign, param);
+    valid = lv_cont_signal(bar, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */

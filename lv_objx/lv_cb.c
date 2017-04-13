@@ -68,8 +68,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         lv_btn_set_styles(new_cb, lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
                                   lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
                                   lv_style_get(LV_STYLE_TRANSP, NULL));
-        lv_rect_set_layout(new_cb, LV_RECT_LAYOUT_ROW_M);
-        lv_rect_set_fit(new_cb, true, true);
+        lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
+        lv_cont_set_fit(new_cb, true, true);
         lv_btn_set_tgl(new_cb, true);
 
         lv_obj_set_click(ext->bullet, false);

@@ -9,7 +9,7 @@
 #include "lv_app_notice.h"
 #if LV_APP_ENABLE != 0
 
-#include "lvgl/lv_objx/lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "lvgl/lv_objx/lv_label.h"
 
 #include "lvgl/lv_misc/anim.h"
@@ -56,12 +56,12 @@ static lv_obj_t * notice_h;
  */
 void lv_app_notice_init(void)
 {
-    notice_h = lv_rect_create(lv_scr_act(), NULL);
+    notice_h = lv_cont_create(lv_scr_act(), NULL);
     lv_obj_set_size(notice_h, LV_HOR_RES, LV_VER_RES - LV_DPI);
     lv_obj_set_y(notice_h, LV_DPI);
     lv_obj_set_click(notice_h, false);
     lv_obj_set_style(notice_h, lv_style_get(LV_STYLE_TRANSP, NULL));
-    lv_rect_set_layout(notice_h, LV_RECT_LAYOUT_COL_R);
+    lv_cont_set_layout(notice_h, LV_CONT_LAYOUT_COL_R);
 }
 
 /**

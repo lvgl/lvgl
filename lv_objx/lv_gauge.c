@@ -24,6 +24,7 @@
 #define LV_GAUGE_DEF_WIDTH          (3 * LV_DPI)
 #define LV_GAUGE_DEF_HEIGHT         (3 * LV_DPI)
 #define LV_GAUGE_DEF_NEEDLE_COLOR   COLOR_RED
+#define LV_GAUGE_DEF_ANGLE          220
 /**********************
  *      TYPEDEFS
  **********************/
@@ -61,7 +62,7 @@ static lv_design_f_t ancestor_design_f = NULL;
 lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor gauge*/
-    lv_obj_t * new_gauge = lv_rect_create(par, copy);
+    lv_obj_t * new_gauge = lv_cont_create(par, copy);
     dm_assert(new_gauge);
     
     /*Allocate the gauge type specific extended data*/
@@ -75,7 +76,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     ext->values = NULL;
     ext->needle_color = NULL;
     ext->low_critical = 0;
-    ext->scale_angle = 120;
+    ext->scale_angle = LV_GAUGE_DEF_ANGLE;
     ext->scale_label_num = 6;
     ext->style_critical = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 
@@ -123,7 +124,7 @@ bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_rect_signal(gauge, sign, param);
+    valid = lv_cont_signal(gauge, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -457,7 +458,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask, lv_style
     lv_style_get(LV_STYLE_PLAIN, &style_neddle_mid);
     style_neddle_mid.mcolor = style->bcolor;
     style_neddle_mid.gcolor = style->bcolor;
-    style_neddle_mid.radius = LV_RECT_CIRCLE;
+    style_neddle_mid.radius = LV_CONT_CIRCLE;
 
     area_t nm_cord;
     nm_cord.x1 = x_ofs - style->opad;

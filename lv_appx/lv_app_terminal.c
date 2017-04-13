@@ -12,10 +12,10 @@
 #include <lvgl/lv_obj/lv_dispi.h>
 #include <lvgl/lv_obj/lv_obj.h>
 #include <lvgl/lv_objx/lv_btn.h>
+#include <lvgl/lv_objx/lv_cont.h>
 #include <lvgl/lv_objx/lv_ddlist.h>
 #include <lvgl/lv_objx/lv_label.h>
 #include <lvgl/lv_objx/lv_page.h>
-#include <lvgl/lv_objx/lv_rect.h>
 #include <lvgl/lv_objx/lv_ta.h>
 #include <misc/others/color.h>
 #include <stdbool.h>
@@ -263,7 +263,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
     /*Create a clear button*/
     win_data->clear_btn = lv_btn_create(win, NULL);
-    lv_rect_set_fit(win_data->clear_btn, true, true);
+    lv_cont_set_fit(win_data->clear_btn, true, true);
     lv_obj_set_free_p(win_data->clear_btn, app);
     lv_btn_set_rel_action(win_data->clear_btn, win_clear_rel_action);
     lv_obj_t * btn_label = lv_label_create(win_data->clear_btn, NULL);

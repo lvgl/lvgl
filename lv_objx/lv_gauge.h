@@ -32,7 +32,7 @@
 
 
 #include "../lv_obj/lv_obj.h"
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "lv_label.h"
 #include "lv_line.h"
 
