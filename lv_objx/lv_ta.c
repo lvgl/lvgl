@@ -94,7 +94,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_label_set_text(ext->label, "Text area");
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, false);
-    	lv_obj_set_style(new_ta, lv_obj_get_style(ext->page.scrl));
+    	lv_obj_set_style(new_ta, lv_style_get(LV_STYLE_PRETTY, NULL));
+        lv_page_set_sb_mode(new_ta, LV_PAGE_SB_MODE_AUTO);
+        lv_obj_set_style(lv_page_get_scrl(new_ta), lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
     	lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
     }
     /*Copy an existing object*/

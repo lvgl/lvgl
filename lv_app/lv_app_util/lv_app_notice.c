@@ -56,13 +56,11 @@ static lv_obj_t * notice_h;
  */
 void lv_app_notice_init(void)
 {
-    lv_app_style_t * app_style = lv_app_style_get();
-
     notice_h = lv_rect_create(lv_scr_act(), NULL);
-    lv_obj_set_size(notice_h, LV_HOR_RES, LV_VER_RES - app_style->menu_h - LV_DPI / 8);
-    lv_obj_set_y(notice_h, app_style->menu_h + LV_DPI / 8);
+    lv_obj_set_size(notice_h, LV_HOR_RES, LV_VER_RES - LV_DPI);
+    lv_obj_set_y(notice_h, LV_DPI);
     lv_obj_set_click(notice_h, false);
-    lv_obj_set_style(notice_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
+    lv_obj_set_style(notice_h, lv_style_get(LV_STYLE_TRANSP, NULL));
     lv_rect_set_layout(notice_h, LV_RECT_LAYOUT_COL_R);
 }
 
@@ -82,8 +80,7 @@ lv_obj_t *  lv_app_notice_add(const char * format, ...)
 
     lv_obj_t * mbox;
     mbox = lv_mbox_create(notice_h, NULL);
-    lv_obj_set_style(mbox, lv_mboxs_get(LV_MBOXS_INFO, NULL));
-    lv_mbox_set_title(mbox, "");
+   // lv_obj_set_style(mbox, lv_mboxs_get(LV_MBOXS_INFO, NULL));
     lv_mbox_set_text(mbox, txt);
 
 #if LV_APP_NOTICE_SHOW_TIME != 0

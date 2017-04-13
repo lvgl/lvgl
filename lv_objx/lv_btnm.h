@@ -94,7 +94,8 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
  */
 void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb);
 
-void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_btn_state_t state, lv_style_t *  style);
+void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr);
+
 /**
  * Get the current map of a button matrix
  * @param btnm pointer to a button matrix object

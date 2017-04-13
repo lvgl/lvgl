@@ -112,7 +112,7 @@ static lv_app_dsc_t my_app_dsc =
 	.win_data_size = sizeof(my_win_data_t),
 };
 
-static lv_labels_t sc_labels;
+static lv_style_t style_sc_label;
 
 
 /**********************
@@ -130,9 +130,8 @@ static lv_labels_t sc_labels;
 const lv_app_dsc_t * lv_app_files_init(void)
 {
     lv_app_style_t * app_style = lv_app_style_get();
-    memcpy(&sc_labels, &app_style->sc_txt_style, sizeof(lv_labels_t));
-    sc_labels.font = font_get(LV_APP_FONT_LARGE);
-
+    memcpy(&style_sc_label, &app_style->sc_rec_rel, sizeof(lv_style_t));
+    style_sc_label.font = font_get(LV_APP_FONT_LARGE);
 
 	return &my_app_dsc;
 }
@@ -219,7 +218,7 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 
 
     sc_data->label = lv_label_create(sc, NULL);
-    lv_obj_set_style(sc_data->label, &sc_labels);
+    lv_obj_set_style(sc_data->label, &style_sc_label);
     lv_label_set_text(sc_data->label, fs_get_last(app_data->path));
     lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
 }
@@ -298,10 +297,10 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
     if(app_data->send_crc != 0) lv_btn_set_state(cb, LV_BTN_STATE_TREL);
     else lv_btn_set_state(cb, LV_BTN_STATE_REL);
 
-    /*Create a text area the type chunk size*/
+    /*Create a text area to type chunk size*/
     lv_obj_t * val_set_h;
     val_set_h = lv_rect_create(conf_win, NULL);
-    lv_obj_set_style(val_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
+    lv_obj_set_style(val_set_h, lv_style_get(LV_STYLE_PLAIN_COLOR, NULL));
     lv_obj_set_click(val_set_h, false);
     lv_rect_set_fit(val_set_h, true, true);
     lv_rect_set_layout(val_set_h, LV_RECT_LAYOUT_ROW_M);
@@ -313,7 +312,6 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
     lv_obj_t * ta;
     char buf[32];
     ta = lv_ta_create(val_set_h, NULL);
-    lv_obj_set_style(ta, lv_tas_get(LV_TAS_DEF, NULL));
     lv_rect_set_fit(ta, false, true);
     lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_SIZE);
     lv_obj_set_free_p(ta, app);
@@ -342,7 +340,6 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
  */
 static void win_create_list(lv_app_inst_t * app)
 {
-    lv_app_style_t * app_style = lv_app_style_get();
     my_win_data_t * win_data = app->win_data;
 
     /*Delete the previous list*/
@@ -352,8 +349,8 @@ static void win_create_list(lv_app_inst_t * app)
 
     /*Create a new list*/
     win_data->file_list = lv_list_create(app->win, NULL);
-    lv_obj_set_width(win_data->file_list, app_style->win_useful_w);
-    lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
+    lv_obj_set_width(win_data->file_list, lv_win_get_width(app->win));
+   //TODO lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
     lv_obj_set_drag_parent(win_data->file_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(win_data->file_list), true);
     lv_rect_set_fit(win_data->file_list, false, true);

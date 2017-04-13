@@ -63,8 +63,8 @@ static cord_t kb_ta_ori_size;
 static uint8_t kb_mode;
 static void (*kb_close_action)(lv_obj_t *);
 static void (*kb_ok_action)(lv_obj_t *);
-static lv_btnms_t kb_btnms;
-
+static lv_style_t style_btn_rel;
+static lv_style_t style_btn_pr;
 /**********************
  *      MACROS
  **********************/
@@ -78,18 +78,8 @@ static lv_btnms_t kb_btnms;
  */
 void lv_app_kb_init(void)
 {
-    lv_app_style_t * app_style = lv_app_style_get();
-
-    lv_btnms_get(LV_BTNMS_DEF, &kb_btnms);
-
-    memcpy(&kb_btnms.bg, &app_style->menu_bg, sizeof(lv_rects_t));
-    kb_btnms.bg.hpad = 0;
-    kb_btnms.bg.vpad = 0;
-    kb_btnms.bg.opad = 0;
-    memcpy(&kb_btnms.btn, &app_style->menu_btn, sizeof(lv_btns_t));
-    kb_btnms.btn.state_style[LV_BTN_STATE_REL].bwidth = 1 * LV_DOWNSCALE;
-    kb_btnms.btn.state_style[LV_BTN_STATE_REL].bcolor = COLOR_GRAY;
-    memcpy(&kb_btnms.label, &app_style->menu_btn_label, sizeof(lv_labels_t));
+    lv_style_get(LV_STYLE_BTN_REL, &style_btn_rel);
+    lv_style_get(LV_STYLE_BTN_PR, &style_btn_pr);
 }
 
 /**
@@ -118,14 +108,16 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     lv_obj_align(kb_btnm, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
     lv_btnm_set_action(kb_btnm, lv_app_kb_action);
     if(mode & LV_APP_KB_MODE_TXT) {
-		kb_btnms.label.font = font_get(LV_APP_FONT_MEDIUM);
+        style_btn_rel.font = font_get(LV_APP_FONT_MEDIUM);
+        style_btn_pr.font = font_get(LV_APP_FONT_MEDIUM);
     	lv_btnm_set_map(kb_btnm, kb_map_lc);
     }
     else if(mode & LV_APP_KB_MODE_NUM) {
-		kb_btnms.label.font = font_get(LV_APP_FONT_LARGE);
+        style_btn_rel.font = font_get(LV_APP_FONT_LARGE);
+        style_btn_pr.font = font_get(LV_APP_FONT_LARGE);
     	lv_btnm_set_map(kb_btnm, kb_map_num);
     }
-    lv_obj_set_style(kb_btnm, &kb_btnms);
+    lv_btnm_set_styles_btn(kb_btnm, &style_btn_rel, &style_btn_pr);
 
     /*Reduce the size of the window and align it to the top*/
     kb_win = lv_app_win_get_from_obj(kb_ta);
@@ -133,8 +125,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     lv_obj_set_y(kb_win, 0);
 
     /*If the text area is higher then the new size of the window reduce its size too*/
-	lv_app_style_t * app_style = lv_app_style_get();
-    cord_t win_h = lv_obj_get_height(kb_win) -  2 * app_style->win.page.bg.vpad;
+    cord_t win_h = lv_obj_get_height(kb_win);
 	kb_ta_ori_size = lv_obj_get_height(kb_ta);
     if(lv_obj_get_height(kb_ta)  > win_h) {
     	lv_obj_set_height(kb_ta, win_h);
@@ -145,7 +136,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 #if LV_APP_ANIM_LEVEL != 0
     lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-    lv_page_focus(kb_win, kb_ta, false);
+    lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
 #endif
 }
 
@@ -241,7 +232,7 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
 #if LV_APP_ANIM_LEVEL != 0
     lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-    lv_page_focus(kb_win, kb_ta, false);
+    lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
 #endif
     return LV_ACTION_RES_OK;
 }

@@ -31,6 +31,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define OBJ_PAD (LV_DPI / 4)
 
 /**********************
  *      TYPEDEFS
@@ -99,11 +100,10 @@ static lv_app_dsc_t my_app_dsc =
 	.win_data_size = sizeof(my_win_data_t),
 };
 
-const char * com_type_list_txt[] = {"Character", "Integer", "Log", "None", ""};
-lv_app_com_type_t com_type_list[] = {LV_APP_COM_TYPE_CHAR, LV_APP_COM_TYPE_INT, LV_APP_COM_TYPE_LOG, LV_APP_COM_TYPE_INV};
-const char * txt_format_list_txt[] = {"ASCII", "Hexadecimal", ""};
-lv_objs_t sc_txt_bgs;
-lv_labels_t sc_txts;
+static const char * com_type_list_txt[] = {"Character", "Integer", "Log", "None", ""};
+static lv_app_com_type_t com_type_list[] = {LV_APP_COM_TYPE_CHAR, LV_APP_COM_TYPE_INT, LV_APP_COM_TYPE_LOG, LV_APP_COM_TYPE_INV};
+static const char * txt_format_list_txt[] = {"ASCII", "Hexadecimal", ""};
+static lv_style_t style_sc_term;
 
 /**********************
  *      MACROS
@@ -119,17 +119,13 @@ lv_labels_t sc_txts;
  */
 const lv_app_dsc_t * lv_app_terminal_init(void)
 {
-    lv_app_style_t * app_style = lv_app_style_get();
-
-    memcpy(&sc_txts, &app_style->sc_txt_style, sizeof(lv_labels_t));
-    sc_txts.line_space = 0;
-    sc_txts.letter_space = 0;
-    sc_txts.mid = 0;
-    sc_txts.base.color = COLOR_WHITE;
-
-    lv_objs_get(LV_OBJS_PLAIN, &sc_txt_bgs);
-    sc_txt_bgs.color = COLOR_MAKE(0x20, 0x20, 0x20);
-
+    lv_style_get(LV_STYLE_PLAIN, &style_sc_term);
+    style_sc_term.line_space = 0;
+    style_sc_term.letter_space = 0;
+    style_sc_term.txt_align = 0;
+    style_sc_term.ccolor = COLOR_WHITE;
+    style_sc_term.mcolor = COLOR_MAKE(0x20, 0x20, 0x20);
+    style_sc_term.gcolor = COLOR_MAKE(0x20, 0x20, 0x20);
 
 	return &my_app_dsc;
 }
@@ -218,13 +214,12 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
     /*Create a dark background*/
     lv_obj_t * txt_bg = lv_obj_create(sc, NULL);
     lv_obj_set_size(txt_bg, 7 * LV_APP_SC_WIDTH / 8 , app->sc->cords.y2 - app->sc_title->cords.y2 - 10 * LV_DOWNSCALE);
-    lv_obj_set_style(txt_bg, &sc_txt_bgs);
+    lv_obj_set_style(txt_bg, &style_sc_term);
     lv_obj_align(txt_bg, app->sc_title, LV_ALIGN_OUT_BOTTOM_MID, 0, 3 * LV_DOWNSCALE);
     lv_obj_set_click(txt_bg, false);
 
     /*Add a text with the text of the terminal*/
     sc_data->label = lv_label_create(txt_bg, NULL);
-    lv_obj_set_style(sc_data->label, &sc_txts);
     lv_label_set_long_mode(sc_data->label, LV_LABEL_LONG_BREAK);
     lv_obj_set_width(sc_data->label, lv_obj_get_width(txt_bg) - LV_APP_SC_WIDTH / 8);
     lv_label_set_text_static(sc_data->label, app_data->txt);
@@ -250,18 +245,11 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
     my_win_data_t * win_data = app->win_data;
     my_app_data_t * app_data = app->app_data;
-    lv_app_style_t * app_style = lv_app_style_get();
-
-    cord_t opad = app_style->win.page.scrl.opad;
 
     /*Create a label for the text of the terminal*/
     win_data->label = lv_label_create(win, NULL);
     lv_label_set_long_mode(win_data->label, LV_LABEL_LONG_BREAK);
-    lv_obj_set_width(win_data->label, LV_HOR_RES -
-                     2 * (app_style->win.page.bg.hpad +
-                          app_style->win.page.scrl.hpad));
-
-    lv_obj_set_style(win_data->label, &app_style->win_txt_style);
+    lv_obj_set_width(win_data->label, lv_win_get_width(win));
     lv_label_set_text_static(win_data->label, app_data->txt); /*Use the app. data text directly*/
 
     /*Create a text area. Text can be added to the terminal from here by app. keyboard.*/
@@ -270,9 +258,8 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_obj_set_free_p(win_data->ta, app);
     lv_page_set_rel_action(win_data->ta, win_ta_rel_action);
     lv_ta_set_text(win_data->ta, "");
-    lv_obj_set_style(win_data->ta, lv_tas_get(LV_TAS_DEF, NULL));
-    if(app_data->txt[0] != '\0') lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, opad, opad);
-    else lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, opad, opad);
+    if(app_data->txt[0] != '\0') lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, OBJ_PAD, OBJ_PAD);
+    else lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, OBJ_PAD, OBJ_PAD);
 
     /*Create a clear button*/
     win_data->clear_btn = lv_btn_create(win, NULL);
@@ -280,13 +267,12 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_obj_set_free_p(win_data->clear_btn, app);
     lv_btn_set_rel_action(win_data->clear_btn, win_clear_rel_action);
     lv_obj_t * btn_label = lv_label_create(win_data->clear_btn, NULL);
-    lv_obj_set_style(btn_label, lv_labels_get(LV_LABELS_BTN, NULL));
     lv_label_set_text(btn_label, "Clear");
-    lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
+    lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, OBJ_PAD, 0);
 
     /*Align the window to see the text area on the bottom*/
-    lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
-                                  - app_style->win.page.scrl.vpad);
+    lv_obj_t * page = lv_win_get_page(app->win);
+    lv_obj_align(lv_page_get_scrl(page), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - LV_VER_RES);
 
 }
 
@@ -308,12 +294,10 @@ static void my_win_close(lv_app_inst_t * app)
 static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
 {
     my_app_data_t * app_data = app->app_data;
-    lv_app_style_t * app_style = lv_app_style_get();
 
     lv_obj_t * label;
     label = lv_label_create(conf_win, NULL);
     lv_label_set_text(label, "Communication type");
-    lv_obj_set_style(label, &app_style->win_txt_style);
 
     lv_obj_t * ddl;
     ddl = lv_ddlist_create(conf_win, NULL);
@@ -405,13 +389,11 @@ static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
     }
 
     if(win_data != NULL) {
-        lv_app_style_t * app_style =lv_app_style_get();
-        cord_t opad = app_style->win.page.scrl.opad;
         lv_label_set_text_static(win_data->label, app_data->txt);
-        lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, opad, opad);
-        lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
-        lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
-                                      - app_style->win.page.scrl.vpad);
+        lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, OBJ_PAD, OBJ_PAD);
+        lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, OBJ_PAD, 0);
+        lv_obj_t * page = lv_win_get_page(app->win);
+        lv_obj_align(lv_page_get_scrl(page), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - LV_VER_RES);
     }
 
     return LV_ACTION_RES_OK;
@@ -489,15 +471,13 @@ static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len)
 
     my_win_data_t * win_data = app->win_data;
     my_sc_data_t * sc_data = app->sc_data;
-    lv_app_style_t * app_style = lv_app_style_get();
 
     if(win_data != NULL) {
-        cord_t opad = app_style->win.page.scrl.opad;
         lv_label_set_text_static(win_data->label, app_data->txt);
-        lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, opad, opad);
-        lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
-        lv_obj_align(lv_page_get_scrl(app->win), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0,
-                                      - app_style->win.page.scrl.vpad);
+        lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, OBJ_PAD, OBJ_PAD);
+        lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, OBJ_PAD, 0);
+        lv_obj_t * page = lv_win_get_page(app->win);
+        lv_obj_align(lv_page_get_scrl(page), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - LV_VER_RES);
     }
 
     /*Set the last line on the shortcut*/

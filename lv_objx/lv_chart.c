@@ -137,9 +137,9 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param)
  * @param chart pointer to a chart object
  * @param color color of the data line
  * @param width line width/point radius/column width
- * @return pointer to the allocated data line (an array for the data points)
+ * @return pointer to the allocated data line (
  */
-cord_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color, cord_t width)
+lv_chart_dl_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color, cord_t width)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
 	lv_chart_dl_t * dl = ll_ins_head(&ext->dl_ll);
@@ -158,7 +158,7 @@ cord_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color, cord_t width)
 
 	ext->dl_num++;
 
-	return dl->points;
+	return dl;
 }
 
 /**
@@ -267,16 +267,16 @@ void lv_chart_set_drak_effect(lv_obj_t * chart, opa_t dark_eff)
  * @param dl pointer to a data line on 'chart'
  * @param y the new value of the most right data
  */
-void lv_chart_set_next(lv_obj_t * chart, cord_t * dl, cord_t y)
+void lv_chart_set_next(lv_obj_t * chart, lv_chart_dl_t * dl, cord_t y)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
 
 	uint16_t i;
 	for(i = 0; i < ext->pnum - 1; i++) {
-		dl[i] = dl[i + 1];
+		dl->points[i] = dl->points[i + 1];
 	}
 
-	dl[ext->pnum - 1] = y;
+	dl->points[ext->pnum - 1] = y;
 	lv_chart_refr(chart);
 
 }

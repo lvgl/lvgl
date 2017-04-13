@@ -128,8 +128,6 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(valid != false) {
     	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
         lv_style_t * style = lv_obj_get_style(bar);
-        point_t p;
-        char buf[LV_BAR_TXT_MAX_LENGTH];
 
     	switch(sign) {
             case LV_SIGNAL_CLEANUP:

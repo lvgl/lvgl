@@ -294,16 +294,18 @@ void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb)
 }
 
 /**
- * Set the style of the buttons in a given state
+ * Set the styles of the buttons of the button matrox
  * @param btnm pointer to a button matrix object
  * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
  * @param style pointer to style
  */
-void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_btn_state_t state, lv_style_t *  style)
+void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
-    if(state == LV_BTN_STATE_REL) ext->style_btn_rel = style;
-    if(state == LV_BTN_STATE_PR) ext->style_btn_pr = style;
+    ext->style_btn_rel = rel;
+    ext->style_btn_pr = pr;
+
+    lv_obj_inv(btnm);
 
 }
 

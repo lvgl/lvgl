@@ -123,7 +123,6 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
         lv_btn_ext_t * ext = lv_obj_get_ext(btn);
-        lv_style_t * style = lv_obj_get_style(btn);
     	lv_btn_state_t state = lv_btn_get_state(btn);
         bool tgl = lv_btn_get_tgl(btn);
 

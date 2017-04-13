@@ -78,14 +78,14 @@ static lv_obj_t * app_scr;   /*Screen of the applications*/
 #if LV_APP_DESKTOP != 0
 static lv_obj_t * menuh;     /*Holder of timg_bubbleshe menu on the top*/
 static lv_obj_t * app_btn;   /*The "Apps" button on the menu*/
-static lv_obj_t * sys_apph;  /*Holder of the system app. buttons*/
+//static lv_obj_t * sys_apph;  /*Holder of the system app. buttons*/
 static lv_obj_t * sc_page;   /*A page for the shortcuts */
 #endif
 
 static lv_obj_t * app_list;      /*A list which is opened on 'app_btn' release*/
 static lv_app_inst_t * con_send; /*The sender application in connection mode. Not NLL means connection mode is active*/
 static lv_app_style_t app_style; /*Styles for application related things*/
-static lv_wins_t wins_anim;      /*Used when the window is animated. (Do not use scrollbar during the anim.)*/
+
 /*Declare icons*/
 #if USE_IMG_CLOSE != 0
 LV_IMG_DECLARE(img_close);
@@ -255,7 +255,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
     app->sc = lv_btn_create(app_scr, NULL);
 #endif
 	lv_obj_set_free_p(app->sc, app);
-	lv_obj_set_style(app->sc, &app_style.sc_bg);
+	lv_btn_set_styles(app->sc, &app_style.sc_rel, &app_style.sc_pr, NULL, NULL, NULL);
 	lv_obj_set_size(app->sc, LV_APP_SC_WIDTH, LV_APP_SC_HEIGHT);
 	lv_rect_set_layout(app->sc, LV_RECT_LAYOUT_OFF);
 	lv_btn_set_rel_action(app->sc, lv_app_sc_rel_action);
@@ -264,7 +264,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 	if((app->dsc->mode & LV_APP_MODE_NO_SC_TITLE) == 0) {
         /*Create a title on top of the shortcut*/
         app->sc_title = lv_label_create(app->sc, NULL);
-        lv_obj_set_style(app->sc_title, &app_style.sc_title_style);
+        lv_obj_set_style(app->sc_title, &app_style.sc_title);
     #if LV_APP_EFFECT_ANIM != 0
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
     #else
@@ -272,7 +272,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_DOTS);
     #endif
         lv_label_set_text(app->sc_title, app->name);
-        lv_obj_align_us(app->sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, app_style.sc_title_margin);
+        lv_obj_align_us(app->sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, LV_DPI / 20);
 	} else {
 	    app->sc_title = NULL;
     }
@@ -321,7 +321,7 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 
 	app->win = lv_win_create(lv_scr_act(), NULL);
 	lv_obj_set_free_p(app->win, app);
-	lv_obj_set_style(app->win, &app_style.win);
+	lv_obj_set_style(lv_win_get_header(app->win), &app_style.win_header);
 	lv_win_set_title(app->win, app->dsc->name);
 
 	if(app->dsc->conf_open != NULL) {
@@ -524,22 +524,6 @@ lv_app_dsc_t ** lv_app_dsc_get_next(lv_app_dsc_t ** prev)
     return next;
 }
 
-/**
- * Refresh the style of the applications
- * */
-void lv_app_style_refr(void)
-{
-    lv_style_refr_all(NULL);
-
-#if LV_APP_DESKTOP != 0
-    lv_obj_set_width(lv_page_get_scrl(sc_page), LV_HOR_RES - 2 * (app_style.sc_page.bg.hpad));
-#endif
-
-    app_style.win_useful_w =  LV_HOR_RES - 2 * (app_style.win.page.bg.hpad + app_style.win.page.scrl.hpad);
-
-    app_style.win_useful_h = LV_VER_RES - 2 * (app_style.win.page.bg.vpad + app_style.win.page.scrl.vpad);
-}
-
 
 /**
  * Get a pointer to the application style structure. If modified then 'lv_app_refr_style' should be called
@@ -560,44 +544,46 @@ lv_app_style_t * lv_app_style_get(void)
  */
 static void lv_app_init_desktop(void)
 {
-    /*Shortcut area*/
-    sc_page = lv_page_create(lv_scr_act(), NULL);
-    lv_obj_set_style(sc_page, &app_style.sc_page);
-    lv_obj_set_size(sc_page, LV_HOR_RES, LV_VER_RES);
-    lv_obj_set_pos(sc_page, 0, 0);
-    lv_rect_set_fit(lv_page_get_scrl(sc_page), false, true);
-    lv_rect_set_layout(lv_page_get_scrl(sc_page), LV_RECT_LAYOUT_GRID);
-    lv_page_set_rel_action(sc_page, lv_app_sc_page_rel_action);
-
     /*Menu on the top*/
     menuh = lv_rect_create(lv_scr_act(), NULL);
-    lv_obj_set_size(menuh, LV_HOR_RES, app_style.menu_h);
-    lv_obj_set_pos(menuh, 0, 0);
-    lv_obj_set_style(menuh, &app_style.menu_bg);
+    lv_obj_set_width(menuh, LV_HOR_RES);
+    lv_rect_set_fit(menuh, false, true);
+    lv_obj_set_style(menuh, &app_style.menu);
 
     app_btn = lv_btn_create(menuh, NULL);
-    lv_obj_set_style(app_btn, &app_style.menu_btn);
-    lv_obj_set_height(app_btn, app_style.menu_h);
-    lv_rect_set_fit(app_btn, true, false);
+    lv_btn_set_styles(app_btn, &app_style.menu_btn_rel, &app_style.menu_btn_pr, NULL, NULL, NULL);
+    lv_rect_set_fit(app_btn, true, true);
     lv_btn_set_rel_action(app_btn, lv_app_menu_rel_action);
     lv_obj_t * app_label = lv_label_create(app_btn, NULL);
-    lv_obj_set_style(app_label, &app_style.menu_btn_label);
     lv_label_set_text(app_label, "Apps");
     lv_obj_set_pos(app_btn, 0, 0);
-
+    lv_obj_set_pos(menuh, 0, 0);
+/*
     sys_apph = lv_rect_create(menuh, NULL);
     lv_rect_set_layout(sys_apph, LV_RECT_LAYOUT_ROW_M);
     lv_rect_set_fit(sys_apph, true, false);
-    lv_obj_set_height(sys_apph, app_style.menu_h);
     lv_obj_set_style(sys_apph, lv_rects_get(LV_RECTS_TRANSP, NULL));
     lv_obj_t * clock = lv_label_create(sys_apph, NULL);
     lv_obj_set_style(clock, &app_style.menu_btn_label);
     lv_label_set_text(clock, "20:17");
 
-    lv_obj_align(sys_apph, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
+    lv_obj_align(sys_apph, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);*/
 
-    lv_app_style_refr();
+    /*Shortcut area*/
+     sc_page = lv_page_create(lv_scr_act(), NULL);
+     lv_obj_set_style(sc_page, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+     lv_obj_set_style(lv_page_get_scrl(sc_page), lv_style_get(LV_STYLE_TRANSP, NULL));
+     lv_obj_set_size(sc_page, LV_HOR_RES, LV_VER_RES - lv_obj_get_height(menuh));
+     lv_obj_set_pos(sc_page, 0, lv_obj_get_height(menuh));
+     lv_obj_set_width(lv_page_get_scrl(sc_page), LV_HOR_RES - 20);
+     lv_rect_set_fit(lv_page_get_scrl(sc_page), false, true);
+     lv_rect_set_layout(lv_page_get_scrl(sc_page), LV_RECT_LAYOUT_GRID);
+     lv_page_set_rel_action(sc_page, lv_app_sc_page_rel_action);
+     lv_page_set_sb_mode(sc_page, LV_PAGE_SB_MODE_AUTO);
+
+
 }
+
 #endif
 
 /*-----------------------
@@ -606,7 +592,7 @@ static void lv_app_init_desktop(void)
 
 #if LV_APP_DESKTOP != 0
 /**
- * CAlled when the "Apps" button is released to open or close the app. list
+ * Called when the "Apps" button is released to open or close the app. list
  * @param app_btn pointer to the "Apps" button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK because the "Apps" button is never deleted
@@ -621,9 +607,11 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 	/*Create the app. list*/
 	else {
 		app_list = lv_list_create(lv_scr_act(), NULL);
-		lv_obj_set_style(app_list, &app_style.app_list);
-		lv_obj_set_size(app_list, app_style.app_list_w, app_style.app_list_h);
-		lv_obj_set_y(app_list, app_style.menu_h);
+		lv_obj_t * scrl = lv_page_get_scrl(app_list);
+		lv_obj_set_style(scrl, &app_style.menu);
+		lv_obj_set_size(app_list, LV_HOR_RES / 3, (LV_VER_RES * 3) / 4);
+		lv_obj_align(app_list, menuh, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+		lv_list_set_styles_liste(app_list, &app_style.menu_btn_rel, &app_style.menu_btn_pr, NULL, NULL, NULL);
 
 		lv_app_dsc_t ** dsc;
 		lv_obj_t * elem;
@@ -681,7 +669,7 @@ static lv_action_res_t lv_app_sc_page_rel_action(lv_obj_t * page, lv_dispi_t * d
     if(con_send != NULL) {
         lv_app_inst_t * i;
         LL_READ(app_inst_ll, i) {
-            if(i->sc != NULL)  lv_obj_set_style(i->sc, &app_style.sc_bg);
+            if(i->sc != NULL)  lv_btn_set_styles(i->sc, &app_style.sc_rel, &app_style.sc_pr, NULL, NULL, NULL);
         }
         con_send = NULL;
     }
@@ -726,13 +714,13 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
     else {
         lv_app_inst_t * app = lv_obj_get_free_p(sc);
         if(app != con_send) { /*Do nothing with the sender*/
-            lv_btns_t * style = lv_obj_get_style(sc);
+            lv_style_t * style = lv_obj_get_style(sc);
             /*Add connection to this application*/
-            if(style == &app_style.sc_bg) {
-                lv_obj_set_style(sc, &app_style.sc_rec_bg);
+            if(style == &app_style.sc_rel) {
+                lv_btn_set_styles(sc, &app_style.sc_rec_rel, &app_style.sc_rec_pr, NULL, NULL, NULL);
                 lv_app_con_set(con_send, app);
             } else { /*Remove the applications connection*/
-                lv_obj_set_style(sc, &app_style.sc_bg);
+                lv_btn_set_styles(sc, &app_style.sc_rel, &app_style.sc_pr, NULL, NULL, NULL);
                 lv_app_con_del(con_send, app);
             }
         }
@@ -754,23 +742,23 @@ static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_dispi_t * dispi)
     if(con_send == app_send) {
         lv_app_inst_t * i;
         LL_READ(app_inst_ll, i) {
-            if(i->sc != NULL)  lv_obj_set_style(i->sc, &app_style.sc_bg);
+            if(i->sc != NULL)  lv_btn_set_styles(i->sc, &app_style.sc_rel, &app_style.sc_pr, NULL, NULL, NULL);
         }
         con_send = NULL;
     } else {
         if(con_send != NULL) {
             lv_app_inst_t * i;
             LL_READ(app_inst_ll, i) {
-                if(i->sc != NULL)  lv_obj_set_style(i->sc, &app_style.sc_bg);
+                if(i->sc != NULL)  lv_btn_set_styles(i->sc, &app_style.sc_rel, &app_style.sc_pr, NULL, NULL, NULL);
             }
         }
 
         con_send = app_send;
-        lv_obj_set_style(sc, &app_style.sc_send_bg);
+        lv_btn_set_styles(sc, &app_style.sc_send_rel, &app_style.sc_send_pr, NULL, NULL, NULL);
         lv_app_inst_t * i;
         LL_READ(app_inst_ll, i) {
             if(i->sc != NULL && lv_app_con_check(con_send, i) != false) {
-                lv_obj_set_style(i->sc, &app_style.sc_rec_bg);
+                lv_btn_set_styles(i->sc, &app_style.sc_rec_rel, &app_style.sc_rec_pr, NULL, NULL, NULL);
             }
         }
     }
@@ -797,23 +785,13 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 
 #if  LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_WIN != 0
     /*Temporally set a simpler style for the window during the animation*/
-    memcpy(&wins_anim, lv_obj_get_style(app->win), sizeof(lv_wins_t));
-    wins_anim.page.sb_mode = LV_PAGE_SB_MODE_OFF;
-    /*Mix a new color for the header instead of using opacity */
-    wins_anim.header.base.opa = OPA_COVER;
-    wins_anim.header.gcolor = color_mix(wins_anim.header.gcolor,
-                                        app_style.win.page.bg.gcolor,
-                                        app_style.win.header.base.opa);
+    lv_obj_t * win_page = lv_win_get_page(win);
+	lv_page_set_sb_mode(win_page, LV_PAGE_SB_MODE_OFF);
 
-    wins_anim.header.base.color = color_mix(wins_anim.header.base.color,
-                                        app_style.win.page.bg.base.color,
-                                        app_style.win.header.base.opa);
-    lv_obj_set_style(app->win, &wins_anim);
-    
     /*Hide some elements to speed up the animation*/
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
+    lv_obj_set_hidden(lv_page_get_scrl(win_page), true);
     
     lv_obj_anim(app->win, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_ANIM_WIN, 0, NULL);
 	lv_obj_anim(app->win, LV_ANIM_FLOAT_LEFT | ANIM_OUT, LV_APP_ANIM_WIN, 0, lv_app_win_close_anim_cb);
@@ -866,14 +844,12 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
 
     app->conf_win = lv_win_create(lv_scr_act(), NULL);
     lv_obj_set_free_p(app->conf_win, app);
-    lv_obj_set_style(app->conf_win, &app_style.win);
+
     char buf[256];
     sprintf(buf, "%s settings", app->dsc->name);
     lv_win_set_title(app->conf_win, buf);
     lv_obj_t * scrl = lv_page_get_scrl(app->conf_win);
-    lv_rect_set_fit(scrl, false, true);
     lv_rect_set_layout(scrl, LV_RECT_LAYOUT_COL_L);
-    lv_obj_set_width(scrl, LV_HOR_RES - 2 * app_style.win.page.bg.hpad);
 
     lv_win_add_ctrl_btn(app->conf_win, "U:/icon_close" ,lv_win_close_action);
 
@@ -905,24 +881,17 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
         lv_obj_get_cords(app->sc, &cords);
     }
 
-    /*Temporally set a simpler style for the window during the animation*/
-    memcpy(&wins_anim, lv_obj_get_style(app->win), sizeof(lv_wins_t));
-    wins_anim.page.sb_mode = LV_PAGE_SB_MODE_OFF;
-    /*Mix a new color for the header instead of using opacity */
-    wins_anim.header.base.opa = OPA_COVER;
-    wins_anim.header.gcolor = color_mix(wins_anim.header.gcolor,
-                                        app_style.win.page.bg.gcolor,
-                                        app_style.win.header.base.opa);
 
-    wins_anim.header.base.color = color_mix(wins_anim.header.base.color,
-                                        app_style.win.page.bg.base.color,
-                                        app_style.win.header.base.opa);
-    lv_obj_set_style(app->win, &wins_anim);
-    
+
+    /*Temporally set a simpler style for the window during the animation*/
+    lv_obj_t * win_page = lv_win_get_page(app->win);
+    lv_page_set_sb_mode(win_page, LV_PAGE_SB_MODE_OFF);
+
     /*Hide some elements to speed up the animation*/
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
+    lv_obj_set_hidden(lv_page_get_scrl(win_page), true);
+
     
     anim_t a;
     a.act_time = 0;
@@ -986,23 +955,19 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     }
 
     /*Temporally set a simpler style for the window during the animation*/
-    memcpy(&wins_anim, lv_obj_get_style(app->win), sizeof(lv_wins_t));
-    wins_anim.page.sb_mode = LV_PAGE_SB_MODE_OFF;
-    /*Mix a new color for the header instead of using opacity */
-    wins_anim.header.base.opa = OPA_COVER;
-    wins_anim.header.gcolor = color_mix(wins_anim.header.gcolor,
-                                        app_style.win.page.bg.gcolor,
-                                        app_style.win.header.base.opa);
-
-    wins_anim.header.base.color = color_mix(wins_anim.header.base.color,
-                                        app_style.win.page.bg.base.color,
-                                        app_style.win.header.base.opa);
-    lv_obj_set_style(app->win, &wins_anim);
+    lv_obj_t * win_page = lv_win_get_page(app->win);
+    lv_page_set_sb_mode(win_page, LV_PAGE_SB_MODE_OFF);
 
     /*Hide some elements to speed up the animation*/
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->page.scrl, true);
+    lv_obj_set_hidden(lv_page_get_scrl(win_page), true);
+
+
+    /*Hide some elements to speed up the animation*/
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
+    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
+    lv_obj_set_hidden(lv_page_get_scrl(win_page), true);
     
     anim_t a;
     a.act_time = 0;
@@ -1051,13 +1016,12 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
  */
 static void lv_app_win_open_anim_cb(lv_obj_t * app_win)
 {
+    lv_obj_t * win_page = lv_win_get_page(app_win);
+
     /*Unhide the the elements*/
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->btnh, false);
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->title, false);
-    lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->page.scrl, false);
-    
-    /*Restore the style*/
-    lv_obj_set_style(app_win, &app_style.win);
+    lv_obj_set_hidden(lv_page_get_scrl(win_page), false);
 }
 
 /**
@@ -1087,148 +1051,102 @@ static void lv_app_win_minim_anim_cb(lv_obj_t * app_win)
  */
 static void lv_app_init_style(void)
 {
-	/*Coordinates*/
-#if LV_APP_DESKTOP != 0
-	app_style.menu_h =  4 * LV_DPI / 5;
-	app_style.app_list_w = LV_HOR_RES / 3;
-	app_style.app_list_h = (3 * LV_VER_RES) / 4;
-#else
-    app_style.menu_h =  0;
-    app_style.app_list_w = 0;
-    app_style.app_list_h = 0;
-#endif
-
-	app_style.sc_title_margin = 2 * LV_DOWNSCALE;
-
 	/*Menu style*/
-	lv_rects_get(LV_RECTS_PLAIN,&app_style.menu_bg);
-	app_style.menu_bg.base.color = COLOR_BLACK;
-	app_style.menu_bg.gcolor = COLOR_BLACK;
-	app_style.menu_bg.base.opa = OPA_80;
-	app_style.menu_bg.radius = 0;
-	app_style.menu_bg.bwidth = 0;
-	app_style.menu_bg.swidth = 0;
-    app_style.menu_bg.vpad = LV_DPI / 10;
-    app_style.menu_bg.hpad = LV_DPI / 10;
-    app_style.menu_bg.opad = LV_DPI / 10;
+	lv_style_get(LV_STYLE_PLAIN,&app_style.menu);
+    app_style.menu.ccolor = COLOR_WHITE;
+	app_style.menu.mcolor = COLOR_BLACK;
+	app_style.menu.gcolor = COLOR_BLACK;
+	app_style.menu.opa = OPA_80;
+	app_style.menu.radius = 0;
+	app_style.menu.bwidth = 0;
+	app_style.menu.swidth = 0;
+    app_style.menu.vpad = LV_DPI / 10;
+    app_style.menu.hpad = LV_DPI / 10;
+    app_style.menu.opad = LV_DPI / 10;
 
-	lv_btns_get(LV_BTNS_DEF,&app_style.menu_btn);
-    app_style.menu_btn.state_style[LV_BTN_STATE_REL].base.color = COLOR_BLACK;
-    app_style.menu_btn.state_style[LV_BTN_STATE_REL].gcolor = COLOR_BLACK;
-    app_style.menu_btn.state_style[LV_BTN_STATE_REL].bwidth = 0;
-    app_style.menu_btn.state_style[LV_BTN_STATE_REL].radius = 0;
-	app_style.menu_btn.state_style[LV_BTN_STATE_REL].swidth = 0;
-    app_style.menu_btn.state_style[LV_BTN_STATE_REL].empty = 1;
+    lv_style_get(LV_STYLE_BTN_REL,&app_style.menu_btn_rel);
+    app_style.menu_btn_rel.ccolor = COLOR_MAKE(0xd0, 0xe0, 0xf0);
+    app_style.menu_btn_rel.mcolor = COLOR_BLACK;
+    app_style.menu_btn_rel.gcolor = COLOR_BLACK;
+    app_style.menu_btn_rel.bwidth = 0;
+    app_style.menu_btn_rel.radius = 0;
+	app_style.menu_btn_rel.swidth = 0;
+    app_style.menu_btn_rel.empty = 1;
+    app_style.menu_btn_rel.font = font_get(LV_APP_FONT_LARGE);
+    app_style.menu_btn_rel.img_recolor = OPA_90;
 
-	app_style.menu_btn.state_style[LV_BTN_STATE_PR].base.color = COLOR_GRAY;
-	app_style.menu_btn.state_style[LV_BTN_STATE_PR].gcolor = COLOR_GRAY;
-    app_style.menu_btn.state_style[LV_BTN_STATE_PR].bwidth = 0;
-    app_style.menu_btn.state_style[LV_BTN_STATE_PR].radius = 0;
-    app_style.menu_btn.state_style[LV_BTN_STATE_PR].empty = 0;
-    app_style.menu_btn.state_style[LV_BTN_STATE_PR].swidth = 0;
-
-	lv_labels_get(LV_LABELS_BTN,&app_style.menu_btn_label);
-	app_style.menu_btn_label.font = font_get(LV_APP_FONT_LARGE);
-	app_style.menu_btn_label.base.color = COLOR_MAKE(0xd0, 0xe0, 0xf0);
-
-	lv_imgs_get(LV_IMGS_DEF,&app_style.menu_btn_img);
-	app_style.menu_btn_img.base.color = COLOR_WHITE;
-	app_style.menu_btn_img.recolor_opa = OPA_90;
-
-	/*App list styles*/
-	lv_lists_get(LV_LISTS_DEF,&app_style.app_list);
-    app_style.app_list.width_sb = 0;    /*Do not keep place for the scrollbar*/
-	memcpy(&app_style.app_list.page.scrl, &app_style.menu_bg, sizeof(lv_rects_t));
-    app_style.app_list.page.bg.hpad = 0 * LV_DOWNSCALE;
-    app_style.app_list.page.bg.hpad = 0 * LV_DOWNSCALE;
-    app_style.app_list.page.bg.vpad = 0 * LV_DOWNSCALE;
-    app_style.app_list.page.bg.opad = 0 * LV_DOWNSCALE;
-	app_style.app_list.page.scrl.hpad = 0 * LV_DOWNSCALE;
-    app_style.app_list.page.scrl.vpad = 0 * LV_DOWNSCALE;
-    app_style.app_list.page.scrl.opad = 0 * LV_DOWNSCALE;
-	memcpy(&app_style.app_list.liste_label, &app_style.menu_btn_label, sizeof(lv_labels_t));
-    memcpy(&app_style.app_list.liste_btn, &app_style.menu_btn, sizeof(lv_btns_t));
-	app_style.app_list.page.sb.base.color = COLOR_GRAY;
-	app_style.app_list.page.sb.gcolor = COLOR_GRAY;
-	app_style.app_list.page.sb_width = 8 * LV_DOWNSCALE;
-
-	/*Shortcut page styles*/
-	lv_pages_get(LV_PAGES_TRANSP,&app_style.sc_page);
-	app_style.sc_page.bg.vpad = app_style.menu_h;
-	app_style.sc_page.bg.hpad = 0;
-	app_style.sc_page.bg.opad = 0;
-	app_style.sc_page.scrl.hpad = 10 * LV_DOWNSCALE;
-	app_style.sc_page.scrl.vpad = 10 * LV_DOWNSCALE;
-	app_style.sc_page.scrl.opad = 15 * LV_DOWNSCALE;
+    memcpy(&app_style.menu_btn_pr, &app_style.menu_btn_rel, sizeof(lv_style_t));
+	app_style.menu_btn_pr.mcolor = COLOR_GRAY;
+	app_style.menu_btn_pr.gcolor = COLOR_GRAY;
+    app_style.menu_btn_pr.bwidth = 0;
+    app_style.menu_btn_pr.radius = 0;
+    app_style.menu_btn_pr.empty = 0;
+    app_style.menu_btn_pr.swidth = 0;
 
 	/*Shortcut styles*/
-	lv_btns_get(LV_BTNS_DEF,&app_style.sc_bg);
-    app_style.sc_bg.state_style[LV_BTN_STATE_REL].base.opa = OPA_80;
-	app_style.sc_bg.state_style[LV_BTN_STATE_REL].base.color = COLOR_WHITE;
-	app_style.sc_bg.state_style[LV_BTN_STATE_REL].gcolor = COLOR_MAKE(0x20, 0x30, 0x40);
-	app_style.sc_bg.state_style[LV_BTN_STATE_REL].bcolor = COLOR_MAKE(0x40, 0x60, 0x80);
-    app_style.sc_bg.state_style[LV_BTN_STATE_REL].bopa = OPA_70;
-    app_style.sc_bg.state_style[LV_BTN_STATE_REL].bwidth = 1 * LV_DOWNSCALE;
-    app_style.sc_bg.state_style[LV_BTN_STATE_REL].swidth = 0 * LV_DOWNSCALE;
-    app_style.sc_bg.state_style[LV_BTN_STATE_PR].base.opa = OPA_80;
-	app_style.sc_bg.state_style[LV_BTN_STATE_PR].base.color = COLOR_MAKE(0xB0, 0xD0, 0xF0);
-	app_style.sc_bg.state_style[LV_BTN_STATE_PR].gcolor = COLOR_MAKE(0x00, 0x00, 0x00);
-	app_style.sc_bg.state_style[LV_BTN_STATE_PR].bcolor = COLOR_MAKE(0xB0, 0xD0, 0xF0);
-    app_style.sc_bg.state_style[LV_BTN_STATE_PR].bopa = OPA_70;
-    app_style.sc_bg.state_style[LV_BTN_STATE_PR].bwidth = 1 * LV_DOWNSCALE;
-    app_style.sc_bg.state_style[LV_BTN_STATE_PR].swidth = 0 * LV_DOWNSCALE;
+    lv_style_get(LV_STYLE_BTN_REL,&app_style.sc_rel);
+    app_style.sc_rel.ccolor = COLOR_MAKE(0x10, 0x18, 0x20);
+    app_style.sc_rel.opa = OPA_80;
+	app_style.sc_rel.mcolor = COLOR_WHITE;
+	app_style.sc_rel.gcolor = COLOR_MAKE(0x20, 0x30, 0x40);
+	app_style.sc_rel.bcolor = COLOR_MAKE(0x40, 0x60, 0x80);
+    app_style.sc_rel.bopa = OPA_70;
+    app_style.sc_rel.bwidth = 1 * LV_DOWNSCALE;
+    app_style.sc_rel.swidth = 0 * LV_DOWNSCALE;
+    app_style.sc_rel.font = font_get(LV_APP_FONT_MEDIUM);
+    app_style.sc_rel.txt_align = 1;
 
-	memcpy(&app_style.sc_send_bg, &app_style.sc_bg, sizeof(lv_btns_t));
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_REL].base.color = COLOR_MAKE(0xFF, 0xE0, 0xE0);
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_REL].gcolor = COLOR_MAKE(0x50, 0x20, 0x00);
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_REL].bcolor = COLOR_BLACK;
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_REL].bopa = OPA_30;
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_REL].bwidth = 3 * LV_DOWNSCALE;
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_PR].base.color = COLOR_MAKE(0xFF, 0xB0, 0xB0);
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_PR].gcolor = COLOR_MAKE(0x20, 0x10, 0x00);
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_PR].gcolor = COLOR_BLACK;
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_PR].bopa = OPA_30;
-    app_style.sc_send_bg.state_style[LV_BTN_STATE_PR].bwidth = 3 * LV_DOWNSCALE;
+    memcpy(&app_style.sc_pr, &app_style.sc_rel, sizeof(lv_style_t));
+    app_style.sc_pr.opa = OPA_80;
+	app_style.sc_pr.mcolor = COLOR_MAKE(0xB0, 0xD0, 0xF0);
+	app_style.sc_pr.gcolor = COLOR_MAKE(0x00, 0x00, 0x00);
+	app_style.sc_pr.bcolor = COLOR_MAKE(0xB0, 0xD0, 0xF0);
+    app_style.sc_pr.bopa = OPA_70;
+    app_style.sc_pr.bwidth = 1 * LV_DOWNSCALE;
+    app_style.sc_pr.swidth = 0 * LV_DOWNSCALE;
 
-    memcpy(&app_style.sc_rec_bg, &app_style.sc_bg, sizeof(lv_btns_t));
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_REL].base.color = COLOR_MAKE(0xE0, 0xFF, 0xE0);
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_REL].gcolor = COLOR_MAKE(0x20, 0x50, 0x20);
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_REL].bcolor = COLOR_BLACK;
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_REL].bopa = OPA_30;
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_REL].bwidth = 3 * LV_DOWNSCALE;
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_PR].base.color = COLOR_MAKE(0xB0, 0xFF, 0xB0);
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_PR].gcolor = COLOR_MAKE(0x20, 0x20, 0x10);
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_PR].bcolor = COLOR_BLACK;
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_PR].bopa = OPA_30;
-    app_style.sc_rec_bg.state_style[LV_BTN_STATE_PR].bwidth = 3 * LV_DOWNSCALE;
+	memcpy(&app_style.sc_send_rel, &app_style.sc_rel, sizeof(lv_style_t));
+    app_style.sc_send_rel.mcolor = COLOR_MAKE(0xFF, 0xE0, 0xE0);
+    app_style.sc_send_rel.gcolor = COLOR_MAKE(0x50, 0x20, 0x00);
+    app_style.sc_send_rel.bcolor = COLOR_BLACK;
+    app_style.sc_send_rel.bopa = OPA_30;
+    app_style.sc_send_rel.bwidth = 3 * LV_DOWNSCALE;
 
-	lv_labels_get(LV_LABELS_TITLE,&app_style.sc_title_style);
-	app_style.sc_title_style.font = font_get(LV_APP_FONT_SMALL);
-	app_style.sc_title_style.base.color = COLOR_MAKE(0x10, 0x18, 0x20);
-	app_style.sc_title_style.mid = 1;
+    memcpy(&app_style.sc_send_pr, &app_style.sc_pr, sizeof(lv_style_t));
+    app_style.sc_send_pr.mcolor = COLOR_MAKE(0xFF, 0xB0, 0xB0);
+    app_style.sc_send_pr.gcolor = COLOR_MAKE(0x20, 0x10, 0x00);
+    app_style.sc_send_pr.gcolor = COLOR_BLACK;
+    app_style.sc_send_pr.bopa = OPA_30;
+    app_style.sc_send_pr.bwidth = 3 * LV_DOWNSCALE;
 
-	lv_labels_get(LV_LABELS_TXT, &app_style.sc_txt_style);
-    app_style.sc_txt_style.font = font_get(LV_APP_FONT_MEDIUM);
-    app_style.sc_txt_style.base.color = COLOR_MAKE(0x10, 0x18, 0x20);
-    app_style.sc_txt_style.mid = 1;
+    memcpy(&app_style.sc_rec_rel, &app_style.sc_send_rel, sizeof(lv_style_t));
+    app_style.sc_rec_rel.mcolor = COLOR_MAKE(0xE0, 0xFF, 0xE0);
+    app_style.sc_rec_rel.gcolor = COLOR_MAKE(0x20, 0x50, 0x20);
+    app_style.sc_rec_rel.bcolor = COLOR_BLACK;
+    app_style.sc_rec_rel.bopa = OPA_30;
+    app_style.sc_rec_rel.bwidth = 3 * LV_DOWNSCALE;
 
-	/*Window styles*/
-	lv_wins_get(LV_WINS_DEF,&app_style.win);
-    app_style.win.page.bg.vpad = app_style.win.ctrl_btn_h + 2 * app_style.win.header.vpad;
-    app_style.win.page.sb_mode = LV_PAGE_SB_MODE_AUTO;
-	memcpy(&app_style.win.header, &app_style.menu_bg, sizeof(lv_rects_t));
-    app_style.win.header.base.opa = app_style.menu_bg.base.opa;
-	memcpy(&app_style.win.title, &app_style.menu_btn_label, sizeof(lv_labels_t));
-	memcpy(&app_style.win.ctrl_btn, &app_style.menu_btn, sizeof(lv_btns_t));
-    app_style.win.ctrl_btn.state_style[LV_BTN_STATE_REL].base.opa = app_style.menu_btn.state_style[LV_BTN_STATE_REL].base.opa;
-    app_style.win.ctrl_btn.state_style[LV_BTN_STATE_PR].base.opa = app_style.menu_btn.state_style[LV_BTN_STATE_REL].base.opa;
-	memcpy(&app_style.win.ctrl_img, &app_style.menu_btn_img, sizeof(lv_imgs_t));
+    memcpy(&app_style.sc_rec_pr, &app_style.sc_send_pr, sizeof(lv_style_t));
+    app_style.sc_rec_pr.mcolor = COLOR_MAKE(0xB0, 0xFF, 0xB0);
+    app_style.sc_rec_pr.gcolor = COLOR_MAKE(0x20, 0x20, 0x10);
+    app_style.sc_rec_pr.bcolor = COLOR_BLACK;
+    app_style.sc_rec_pr.bopa = OPA_30;
+    app_style.sc_rec_pr.bwidth = 3 * LV_DOWNSCALE;
 
-    lv_labels_get(LV_LABELS_TXT,&app_style.win_txt_style);
-    app_style.win_txt_style.font = font_get(LV_APP_FONT_MEDIUM);
-    app_style.win_txt_style.base.color = COLOR_MAKE(0x20, 0x20, 0x20);
-    app_style.win_txt_style.mid = 0;
-    app_style.win_txt_style.letter_space = 1 * LV_DOWNSCALE;
+    memcpy(&app_style.sc_title, &app_style.sc_rel, sizeof(lv_style_t));
+	app_style.sc_title.font = font_get(LV_APP_FONT_SMALL);
+
+	/*Window*/
+	lv_style_get(LV_STYLE_PLAIN_COLOR, &app_style.win_header);
+	app_style.win_header.font = font_get(LV_APP_FONT_LARGE);
+
+    lv_style_get(LV_STYLE_TRANSP, &app_style.win_scrl);
+
+
+    lv_style_get(LV_STYLE_BTN_REL, &app_style.win_cbtn_rel);
+    app_style.win_cbtn_rel.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
+
+    memcpy(&app_style.win_cbtn_pr, &app_style.win_cbtn_rel, sizeof(lv_style_t));
 }
 
 /**

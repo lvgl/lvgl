@@ -71,28 +71,20 @@ typedef struct __LV_APP_DSC_T
 }lv_app_dsc_t;
 
 typedef struct {
-	lv_rects_t  menu_bg;
-	lv_btns_t  menu_btn;
-	lv_labels_t  menu_btn_label;
-	lv_imgs_t  menu_btn_img;
-	lv_lists_t app_list;
-	lv_pages_t  sc_page;
-    lv_labels_t win_txt_style;
-	lv_wins_t  win;
-	lv_btns_t  sc_bg;
-    lv_btns_t  sc_send_bg;
-    lv_btns_t  sc_rec_bg;
-	lv_labels_t sc_title_style;
-    lv_labels_t sc_txt_style;
-
-	cord_t menu_h;
-	cord_t app_list_w;
-	cord_t app_list_h;
-	cord_t sc_title_margin;
-
-	/*Calculated values, do not set them!*/
-	cord_t win_useful_w;
-    cord_t win_useful_h;
+	lv_style_t menu;
+    lv_style_t menu_btn_rel;
+    lv_style_t menu_btn_pr;
+    lv_style_t sc_rel;
+    lv_style_t sc_pr;
+    lv_style_t sc_send_rel;
+    lv_style_t sc_send_pr;
+    lv_style_t sc_rec_rel;
+    lv_style_t sc_rec_pr;
+    lv_style_t sc_title;
+    lv_style_t win_header;
+    lv_style_t win_scrl;
+    lv_style_t win_cbtn_rel;
+    lv_style_t win_cbtn_pr;
 }lv_app_style_t;
 
 
@@ -213,10 +205,6 @@ lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc);
  */
 lv_app_dsc_t ** lv_app_dsc_get_next(lv_app_dsc_t ** prev);
 
-/**
- * Refresh the style of the applications
- * */
-void lv_app_style_refr(void);
 
 /**
  * Get a pointer to the application style structure. If modified then 'lv_app_refr_style' should be called

@@ -36,8 +36,8 @@ typedef struct
 typedef struct
 {
     lv_obj_t * chart;
-    cord_t * cpu_dl;
-    cord_t * mem_dl;
+    lv_chart_dl_t * cpu_dl;
+    lv_chart_dl_t * mem_dl;
     lv_obj_t * label;
 }my_win_data_t;
 
@@ -83,8 +83,8 @@ static lv_app_dsc_t my_app_dsc =
 
 static uint8_t mem_pct[LV_APP_SYSMON_PNUM];
 static uint8_t cpu_pct[LV_APP_SYSMON_PNUM];
-static lv_bars_t cpu_bars;
-static lv_bars_t mem_bars;
+static lv_style_t cpu_bars;
+static lv_style_t mem_bars;
 #if USE_DYN_MEM != 0  && DM_CUSTOM == 0
 static  dm_mon_t mem_mon;
 #endif
@@ -109,30 +109,21 @@ const lv_app_dsc_t * lv_app_sysmon_init(void)
     memset(cpu_pct, 0, sizeof(cpu_pct));
 
     /*Create bar styles for the shortcut*/
-    lv_bars_get(LV_BARS_DEF, &cpu_bars);
-    cpu_bars.bg.gcolor = COLOR_MAKE(0xFF, 0xE0, 0xE0);
-    cpu_bars.bg.base.color = COLOR_MAKE(0xFF, 0xD0, 0xD0);
-    cpu_bars.bg.bcolor = COLOR_MAKE(0xFF, 0x20, 0x20);
-    cpu_bars.bg.bwidth = 1 * LV_DOWNSCALE;
+    lv_style_get(LV_STYLE_PRETTY_COLOR, &cpu_bars);
 
-    cpu_bars.indic.gcolor = COLOR_MARRON;
-    cpu_bars.indic.base.color = COLOR_RED;
-    cpu_bars.indic.bwidth = 0;
+    cpu_bars.gcolor = COLOR_MARRON;
+    cpu_bars.mcolor = COLOR_RED;
+    cpu_bars.bwidth = 0;
 
-    cpu_bars.label.base.color = COLOR_MAKE(0x40, 0x00, 0x00);
-    cpu_bars.label.font = font_get(LV_APP_FONT_MEDIUM);
-    cpu_bars.label.line_space = 0;
-    cpu_bars.label.mid = 1;
+    cpu_bars.ccolor = COLOR_MAKE(0x40, 0x00, 0x00);
+    cpu_bars.font = font_get(LV_APP_FONT_MEDIUM);
+    cpu_bars.line_space = 0;
+    cpu_bars.txt_align = 1;
 
     memcpy(&mem_bars, &cpu_bars, sizeof(cpu_bars));
-    mem_bars.bg.gcolor = COLOR_MAKE(0xD0, 0xFF, 0xD0);
-    mem_bars.bg.base.color = COLOR_MAKE(0xE0, 0xFF, 0xE0);
-    mem_bars.bg.bcolor = COLOR_MAKE(0x20, 0xFF, 0x20);
-
-    mem_bars.indic.gcolor = COLOR_GREEN;
-    mem_bars.indic.base.color = COLOR_LIME;
-
-    mem_bars.label.base.color = COLOR_MAKE(0x00, 0x40, 0x00);
+    mem_bars.gcolor = COLOR_GREEN;
+    mem_bars.mcolor = COLOR_LIME;
+    mem_bars.ccolor = COLOR_MAKE(0x00, 0x40, 0x00);
 
 	return &my_app_dsc;
 }
@@ -193,14 +184,14 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
     sc_data->bar_cpu = lv_bar_create(sc, NULL);
     lv_obj_set_size(sc_data->bar_cpu, w, 5 * lv_obj_get_height(sc) / 8);
     lv_obj_align(sc_data->bar_cpu, NULL, LV_ALIGN_IN_BOTTOM_LEFT, w, - lv_obj_get_height(sc) / 8);
-    lv_obj_set_style(sc_data->bar_cpu, &cpu_bars);
+    lv_bar_set_style_indic(sc_data->bar_cpu, &cpu_bars);
     lv_obj_set_click(sc_data->bar_cpu, false);
     lv_bar_set_range(sc_data->bar_cpu, 0, 100);
     lv_bar_set_format_str(sc_data->bar_cpu, "C\nP\nU");
 
     sc_data->bar_mem = lv_bar_create(sc, sc_data->bar_cpu);
     lv_obj_align(sc_data->bar_mem, sc_data->bar_cpu, LV_ALIGN_OUT_RIGHT_MID, w, 0);
-    lv_obj_set_style(sc_data->bar_mem, &mem_bars);
+    lv_bar_set_style_indic(sc_data->bar_mem, &mem_bars);
     lv_bar_set_format_str(sc_data->bar_mem, "M\ne\nm");
 
     lv_app_sysmon_refr();
@@ -225,7 +216,6 @@ static void my_sc_close(lv_app_inst_t * app)
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
     my_win_data_t * win_data = app->win_data;
-    lv_app_style_t * app_style = lv_app_style_get();
 
     /*Create a chart with two data lines*/
     win_data->chart = lv_chart_create(win, NULL);
@@ -235,21 +225,19 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_chart_set_range(win_data->chart, 0, 100);
     lv_chart_set_type(win_data->chart, LV_CHART_LINE);
 
-    win_data->cpu_dl =  lv_chart_add_dataline(win_data->chart);
-    win_data->mem_dl =  lv_chart_add_dataline(win_data->chart);
+    win_data->cpu_dl =  lv_chart_add_dataline(win_data->chart, COLOR_RED, 2 * LV_DOWNSCALE);
+    win_data->mem_dl =  lv_chart_add_dataline(win_data->chart, COLOR_BLUE, 2 * LV_DOWNSCALE);
 
     uint16_t i;
     for(i = 0; i < LV_APP_SYSMON_PNUM; i ++) {
-        win_data->cpu_dl[i] = cpu_pct[i];
-        win_data->mem_dl[i] = mem_pct[i];
+        win_data->cpu_dl->points[i] = cpu_pct[i];
+        win_data->mem_dl->points[i] = mem_pct[i];
     }
 
     /*Create a label for the details of Memory and CPU usage*/
-    cord_t opad = app_style->win.page.scrl.opad;
     win_data->label = lv_label_create(win, NULL);
     lv_label_set_recolor(win_data->label, true);
-    lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, opad, 0);
-    lv_obj_set_style(win_data->label, &app_style->win_txt_style);
+    lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_MID, LV_DPI / 4, 0);
 
 
     lv_app_sysmon_refr();
@@ -317,7 +305,7 @@ static void sysmon_task(void * param)
     if(mem_mon.size_free < LV_APP_SYSMON_MEM_WARN && mem_warn_report == false) {
         mem_warn_report = true;
         lv_obj_t * not = lv_app_notice_add("Critically low memory");
-        lv_obj_set_style(not, lv_mboxs_get(LV_MBOXS_WARN, NULL));
+       //TODO lv_obj_set_style(not, lv_mboxs_get(LV_MBOXS_WARN, NULL));
     }
 
     if(mem_mon.size_free > LV_APP_SYSMON_MEM_WARN)  mem_warn_report = false;
@@ -327,7 +315,7 @@ static void sysmon_task(void * param)
         if(frag_warn_report == false) {
             frag_warn_report = true;
             lv_obj_t * not =lv_app_notice_add("Critical memory\nfragmentation");
-            lv_obj_set_style(not, lv_mboxs_get(LV_MBOXS_WARN, NULL));
+          //TODO  lv_obj_set_style(not, lv_mboxs_get(LV_MBOXS_WARN, NULL));
 
             dm_defrag(); /*Defrag. if the fragmentation is critical*/
         }
@@ -369,8 +357,6 @@ static void lv_app_sysmon_refr(void)
     sprintf(buf_long, "%s%c%s MEMORY: N/A%c", buf_long, TXT_RECOLOR_CMD, MEM_LABEL_COLOR, TXT_RECOLOR_CMD);
     sprintf(buf_short, "%sMem: N/A\nFrag: N/A", buf_short);
 #endif
-    lv_app_style_t * app_style = lv_app_style_get();
-    cord_t opad = app_style->win.page.scrl.opad;
     lv_app_inst_t * app;
     app = lv_app_get_next(NULL, &my_app_dsc);
     while(app != NULL) {
@@ -378,7 +364,7 @@ static void lv_app_sysmon_refr(void)
         my_win_data_t * win_data = app->win_data;
         if(win_data != NULL) {
             lv_label_set_text(win_data->label, buf_long);
-            lv_obj_align(win_data->label, win_data->chart, LV_ALIGN_OUT_RIGHT_TOP, opad, 0);
+
 
             lv_chart_set_next(win_data->chart, win_data->mem_dl, mem_pct[LV_APP_SYSMON_PNUM - 1]);
             lv_chart_set_next(win_data->chart, win_data->cpu_dl, cpu_pct[LV_APP_SYSMON_PNUM - 1]);

@@ -221,11 +221,12 @@ void lv_list_set_styles_liste(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr
     ext->styles_liste[LV_BTN_STATE_TPR] = tpr;
     ext->styles_liste[LV_BTN_STATE_INA] = ina;
 
-    lv_obj_t * liste = lv_obj_get_child(list, NULL);
-
-    while(liste != NULL) {
+    lv_obj_t * scrl = lv_page_get_scrl(list);
+    lv_obj_t * liste = lv_obj_get_child(scrl, NULL);
+    while(liste != NULL)
+    {
         lv_btn_set_styles(liste, rel, pr, trel, tpr, ina);
-        liste = lv_obj_get_child(list, liste);
+        liste = lv_obj_get_child(scrl, liste);
     }
 
 }

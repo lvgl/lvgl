@@ -90,9 +90,9 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param);
 /**
  * Allocate and add a data line to the chart
  * @param chart pointer to a chart object
- * @return pointer to the allocated data lie (an array for the data points)
+ * @return pointer to the allocated data line
  */
-cord_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color, cord_t width);
+lv_chart_dl_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color, cord_t width);
 
 /**
  * Refresh a chart if its data line has changed
@@ -142,7 +142,7 @@ void lv_chart_set_drak_effect(lv_obj_t * chart, opa_t dark_eff);
  * @param dl pointer to a data line on 'chart'
  * @param y the new value of the most right data
  */
-void lv_chart_set_next(lv_obj_t * chart, cord_t * dl, cord_t y);
+void lv_chart_set_next(lv_obj_t * chart, lv_chart_dl_t * dl, cord_t y);
 
 /**
  * Get the type of a chart

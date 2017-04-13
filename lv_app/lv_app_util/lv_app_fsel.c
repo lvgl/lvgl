@@ -45,7 +45,6 @@ static char fsel_path[LV_APP_FSEL_PATH_MAX_LEN];
 static uint16_t fsel_file_cnt;
 static lv_obj_t * fsel_win;
 static lv_obj_t * fsel_list;
-static lv_lists_t fsel_lists;
 static void *  fsel_param;
 static void (*fsel_ok_action)(void *, const char *);
 
@@ -62,7 +61,7 @@ static void (*fsel_ok_action)(void *, const char *);
  */
 void lv_app_fsel_init(void)
 {
-    lv_lists_get(LV_LISTS_TRANSP, &fsel_lists);
+   //TODO lv_lists_get(LV_LISTS_TRANSP, &fsel_lists);
 }
 
 /**
@@ -95,7 +94,6 @@ void lv_app_fsel_open(const char * path, const char * filter, void * param, void
     lv_app_style_t * app_style = lv_app_style_get();
     fsel_win = lv_win_create(lv_scr_act(), NULL);
     lv_obj_set_size(fsel_win, LV_HOR_RES, LV_VER_RES);
-    lv_obj_set_style(fsel_win, &app_style->win);
 
     lv_win_add_ctrl_btn(fsel_win, "U:/icon_close", fsel_close_action);
 
@@ -139,10 +137,9 @@ static void fsel_refr(void)
     lv_win_set_title(fsel_win, fsel_path);
 
     /*Create a new list*/
-    lv_app_style_t * app_style = lv_app_style_get();
     fsel_list = lv_list_create(fsel_win, NULL);
-    lv_obj_set_width(fsel_list, app_style->win_useful_w);
-    lv_obj_set_style(fsel_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
+    lv_obj_set_width(fsel_list, lv_win_get_width(fsel_win));
+    //TODO lv_obj_set_style(fsel_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
     lv_obj_set_drag_parent(fsel_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(fsel_list), true);
     lv_rect_set_fit(fsel_list, false, true);

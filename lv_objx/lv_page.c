@@ -134,7 +134,6 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(obj_valid != false) {
         lv_page_ext_t * ext = lv_obj_get_ext(page);
-        lv_style_t * style = lv_obj_get_style(page);
         lv_obj_t * child;
         switch(sign) {
         	case LV_SIGNAL_CHILD_CHG: /*Move children to the scrollable object*/

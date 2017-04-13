@@ -143,11 +143,9 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 {
     my_sc_data_t * sc_data = app->sc_data;
-    lv_app_style_t * app_style = lv_app_style_get();
 
     sc_data->label = lv_label_create(sc, NULL);
 	lv_label_set_text(sc_data->label, "Empty");
-	lv_obj_set_style(sc_data->label, &app_style->sc_txt_style);
 	lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
 }
 

@@ -62,8 +62,9 @@ typedef struct
     lv_obj_t * title;   /*Pointer to the title label of the window*/
     lv_obj_t * btnh; /*Pointer to the control button holder rectangle of the window*/
     lv_style_t * style_header;      /*Style of the header rectangle*/
-    lv_style_t * styles_btn[LV_BTN_STATE_NUM];         /*Style of the control buttons*/
-    cord_t btn_size;                /*Size of the control buttons (square)*/
+    lv_style_t * style_cbtn_rel;    /*Control button releases style*/
+    lv_style_t * style_cbtn_pr;    /*Control button pressed style*/
+    cord_t cbtn_size;                /*Size of the control buttons (square)*/
 }lv_win_ext_t;
 
 /**********************
@@ -119,6 +120,10 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 const char * lv_win_get_title(lv_obj_t * win);
 
 lv_obj_t * lv_win_get_page(lv_obj_t * win);
+
+lv_obj_t * lv_win_get_header(lv_obj_t * win);
+
+cord_t lv_win_get_width(lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.
