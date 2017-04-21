@@ -13,9 +13,8 @@
 
 #if LV_VDB_SIZE != 0
 
-#include "misc/others/color.h"
-#include <lvgl/lv_misc/area.h>
-#include "../lv_misc/font.h"
+#include "misc/gfx/color.h"
+#include "misc/gfx/area.h"
 
 /*********************
  *      DEFINES
@@ -27,7 +26,7 @@
 
 typedef struct
 {
-    area_t vdb_area;
+    area_t area;
     color_t buf[LV_VDB_SIZE];
 }lv_vdb_t;
 

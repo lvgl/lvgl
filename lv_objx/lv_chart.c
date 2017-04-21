@@ -75,8 +75,9 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
     ext->vdiv_num = LV_CHART_VDIV_DEF;
     ext->pnum = LV_CHART_PNUM_DEF;
     ext->type = LV_CHART_LINE;
-    ext->data_opa = OPA_COVER;
-    ext->dark_eff = OPA_50;
+    ext->dl_opa = OPA_COVER;
+    ext->dl_dark = OPA_50;
+    ext->dl_width = 2 * LV_DOWNSCALE;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_chart);
 
@@ -94,7 +95,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->hdiv_num = ext_copy->hdiv_num;
 		ext->vdiv_num = ext_copy->vdiv_num;
         ext->pnum = ext_copy->pnum;
-        ext->data_opa =  ext_copy->data_opa;
+        ext->dl_opa =  ext_copy->dl_opa;
 
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_chart);
@@ -136,18 +137,16 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param)
  * Allocate and add a data line to the chart
  * @param chart pointer to a chart object
  * @param color color of the data line
- * @param width line width/point radius/column width
  * @return pointer to the allocated data line (
  */
-lv_chart_dl_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color, cord_t width)
+lv_chart_dl_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
 	lv_chart_dl_t * dl = ll_ins_head(&ext->dl_ll);
-	cord_t def = (ext->ymax - ext->ymin) >> 2;	/*1/4 range as default value*/
+	cord_t def = (ext->ymin + ext->ymax) >> 1;	/*half range as default value*/
 
 	if(dl == NULL) return NULL;
 
-	dl->width = width;
     dl->color = color;
 
 	dl->points = dm_alloc(sizeof(cord_t) * ext->pnum);
@@ -248,21 +247,33 @@ void lv_chart_set_pnum(lv_obj_t * chart, uint16_t pnum)
  * @param chart pointer to chart object
  * @param opa opacity of the data lines
  */
-void lv_chart_set_data_opa(lv_obj_t * chart, opa_t opa)
+void lv_chart_set_dl_opa(lv_obj_t * chart, opa_t opa)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext(chart);
-    ext->data_opa = opa;
+    ext->dl_opa = opa;
+    lv_obj_inv(chart);
 }
 
+/**
+ * Set the line width or point radius of the data lines
+ * @param chart pointer to chart object
+ * @param width the new width
+ */
+void lv_chart_set_dl_width(lv_obj_t * chart, cord_t width)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    ext->dl_width = width;
+    lv_obj_inv(chart);
+}
 /**
  * Set the dark effect on the bottom of the points or columns
  * @param chart pointer to chart object
  * @param dark_eff dark effect level (OPA_TRANSP to turn off)
  */
-void lv_chart_set_drak_effect(lv_obj_t * chart, opa_t dark_eff)
+void lv_chart_set_dl_dark(lv_obj_t * chart, opa_t dark_eff)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext(chart);
-    ext->dark_eff = dark_eff;
+    ext->dl_dark = dark_eff;
 }
 /**
  * Shift all data right and set the most right data on a data line
@@ -318,10 +329,21 @@ uint16_t lv_chart_get_pnum(lv_obj_t * chart)
  * @param chart pointer to chart object
  * @return the opacity of the data lines
  */
-opa_t lv_chart_get_data_opa(lv_obj_t * chart)
+opa_t lv_chart_get_dl_opa(lv_obj_t * chart)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext(chart);
-    return ext->data_opa;
+    return ext->dl_opa;
+}
+
+/**
+ * Get the data line width
+ * @param chart pointer to chart object
+ * @return the width the data lines (lines or points)
+ */
+cord_t lv_chart_get_dl_width(lv_obj_t * chart)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    return ext->dl_width;
 }
 
 /**
@@ -329,10 +351,10 @@ opa_t lv_chart_get_data_opa(lv_obj_t * chart)
  * @param chart pointer to chart object
  * @return dark effect level (OPA_TRANSP to turn off)
  */
-opa_t lv_chart_get_dark_effect(lv_obj_t * chart, opa_t dark_eff)
+opa_t lv_chart_get_dl_dark(lv_obj_t * chart, opa_t dark_eff)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext(chart);
-    return ext->dark_eff;
+    return ext->dl_dark;
 }
 /**********************
  *   STATIC FUNCTIONS
@@ -362,19 +384,9 @@ static bool lv_chart_design(lv_obj_t * chart, const area_t * mask, lv_design_mod
 
 		lv_chart_draw_div(chart, mask);
 
-		switch(ext->type) {
-			case LV_CHART_LINE:
-				lv_chart_draw_lines(chart, mask);
-				break;
-			case LV_CHART_COL:
-				lv_chart_draw_cols(chart, mask);
-				break;
-			case LV_CHART_POINT:
-				lv_chart_draw_points(chart, mask);
-				break;
-			default:
-				break;
-		}
+		if(ext->type & LV_CHART_LINE) lv_chart_draw_lines(chart, mask);
+		if(ext->type & LV_CHART_COL) lv_chart_draw_cols(chart, mask);
+		if(ext->type & LV_CHART_POINT) lv_chart_draw_points(chart, mask);
     }
     return true;
 }
@@ -433,14 +445,13 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
     cord_t y_ofs = chart->cords.y1;
 	int32_t y_tmp;
 	lv_chart_dl_t * dl;
-	uint8_t dl_cnt = 0;
 	lv_style_t lines;
 	lv_style_get(LV_STYLE_PLAIN, &lines);
-	lines.opa = (uint16_t)((uint16_t)style->opa * ext->data_opa) >> 8;
+	lines.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
+    lines.line_width = ext->dl_width;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, dl) {
-	    lines.line_width = dl->width;
 		lines.ccolor = dl->color;
 
 		p1.x = 0 + x_ofs;
@@ -461,7 +472,6 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 
 			lv_draw_line(&p1, &p2, mask, &lines);
 		}
-		dl_cnt++;
 	}
 }
 
@@ -489,14 +499,14 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 
 	style_point.bwidth = 0;
 	style_point.empty = 0;
-	style_point.radius = LV_CONT_CIRCLE;
-    style_point.opa = (uint16_t)((uint16_t)style->opa * ext->data_opa) >> 8;
+	style_point.radius = LV_DRAW_CIRCLE;
+    style_point.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
+    style_point.radius = ext->dl_width;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, dl) {
-	    style_point.radius = dl->width;
 		style_point.mcolor = dl->color;
-		style_point.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dark_eff);
+		style_point.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
 
 		for(i = 0; i < ext->pnum; i ++) {
 			cir_a.x1 = ((w * i) / (ext->pnum - 1)) + x_ofs;
@@ -533,48 +543,42 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 	cord_t h = lv_obj_get_height(chart);
 	int32_t y_tmp;
     lv_chart_dl_t * dl;
-    uint8_t dl_cnt = 0;
     lv_style_t rects;
-	cord_t col_w = w / (2 * ext->dl_num * ext->pnum); /* Suppose (2 * dl_num) * pnum columns*/
+	cord_t col_w = w / ((ext->dl_num + 1) * ext->pnum); /* Suppose + 1 dl as separator*/
 	cord_t x_ofs = col_w / 2; /*Shift with a half col.*/
 
 	lv_style_get(LV_STYLE_PLAIN, &rects);
 	rects.bwidth = 0;
 	rects.empty = 0;
 	rects.radius = 0;
-	rects.opa = (uint16_t)((uint16_t)style->opa * ext->data_opa) >> 8;
+	rects.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
 
 	col_a.y2 = chart->cords.y2;
 
-	/*Go through all data lines*/
-	LL_READ_BACK(ext->dl_ll, dl) {
-		rects.mcolor = dl->color;
-		rects.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dark_eff);
+	cord_t x_act;
 
-		for(i = 0; i < ext->pnum; i ++) {
-			/* Calculate the x coordinates. Suppose (2 * dl_num) * pnum columns and draw to every second
-			 * the other columns will be spaces.
-			 * col_w =  w / (2 * ext->dl_num * ext->pnum)
-			 * act_col_x = col_w * i * ext->dl_num * 2 + 2 * dl_cnt
-			 * Reorder the operation to multiply first*/
+	/*Go through all points*/
+    for(i = 0; i < ext->pnum; i ++) {
+        x_act = (int32_t)((int32_t) w * i) / ext->pnum;
+        x_act += chart->cords.x1 + x_ofs;
 
-			col_a.x1 = (int32_t)((int32_t) w * ((i * ext->dl_num * 2) + (2 * dl_cnt))) /
-					   (ext->pnum * 2 * ext->dl_num);
-            col_a.x1 += chart->cords.x1;
-			col_a.x2 = col_a.x1 + col_w;
-			col_a.x1 += x_ofs;
-			col_a.x2 += x_ofs;
+        /*Draw the current point of all data line*/
+        LL_READ_BACK(ext->dl_ll, dl) {
+            rects.mcolor = dl->color;
+            rects.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
+            col_a.x1 = x_act;
+            col_a.x2 = col_a.x1 + col_w;
+            x_act += col_w;
 
-			y_tmp = (int32_t)((int32_t) dl->points[i] - ext->ymin) * h;
-			y_tmp = y_tmp / (ext->ymax - ext->ymin);
-			col_a.y1 = h - y_tmp + chart->cords.y1;
+            y_tmp = (int32_t)((int32_t) dl->points[i] - ext->ymin) * h;
+            y_tmp = y_tmp / (ext->ymax - ext->ymin);
+            col_a.y1 = h - y_tmp + chart->cords.y1;
 
-			mask_ret = area_union(&col_mask, mask, &col_a);
-			if(mask_ret != false) {
-				lv_draw_rect(&chart->cords, &col_mask, &rects);
-			}
-		}
-		dl_cnt++;
+            mask_ret = area_union(&col_mask, mask, &col_a);
+            if(mask_ret != false) {
+                lv_draw_rect(&chart->cords, &col_mask, &rects);
+            }
+        }
 	}
 }
 #endif

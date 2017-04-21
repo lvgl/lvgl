@@ -4,9 +4,9 @@
  */
 
 #include <lv_conf.h>
-#include <lvgl/lv_misc/area.h>
-#include <lvgl/lv_misc/font.h>
-#include <misc/others/color.h>
+#include <misc/gfx/area.h>
+#include <misc/gfx/font.h>
+#include <misc/gfx/color.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -66,13 +66,13 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
     /*If there are common part of the three area then draw to the vdb*/
     if(union_ok == true) {
         area_t vdb_rel_a;   /*Stores relative coordinates on vdb*/
-        vdb_rel_a.x1 = res_a.x1 - vdb_p->vdb_area.x1;
-        vdb_rel_a.y1 = res_a.y1 - vdb_p->vdb_area.y1;
-        vdb_rel_a.x2 = res_a.x2 - vdb_p->vdb_area.x1;
-        vdb_rel_a.y2 = res_a.y2 - vdb_p->vdb_area.y1;
+        vdb_rel_a.x1 = res_a.x1 - vdb_p->area.x1;
+        vdb_rel_a.y1 = res_a.y1 - vdb_p->area.y1;
+        vdb_rel_a.x2 = res_a.x2 - vdb_p->area.x1;
+        vdb_rel_a.y2 = res_a.y2 - vdb_p->area.y1;
         
         color_t * vdb_buf_tmp = vdb_p->buf;
-        uint32_t vdb_width = area_get_width(&vdb_p->vdb_area);
+        uint32_t vdb_width = area_get_width(&vdb_p->area);
         /*Move the vdb_tmp to the first row*/
         vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
         
@@ -142,7 +142,7 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
        pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
-    cord_t vdb_width = area_get_width(&vdb_p->vdb_area);
+    cord_t vdb_width = area_get_width(&vdb_p->area);
     color_t * vdb_buf_tmp = vdb_p->buf;
     cord_t col, row;
     uint8_t col_bit;
@@ -151,27 +151,29 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
     /* Calculate the col/row start/end on the map
      * If font anti alaiassing is enabled use the reduced letter sizes*/
     cord_t col_start = pos_p->x > mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
-    cord_t col_end = pos_p->x + (letter_w >> LV_FONT_ANTIALIAS) < mask_p->x2 ? (letter_w >> LV_FONT_ANTIALIAS) : mask_p->x2 - pos_p->x + 1;
+    cord_t col_end = pos_p->x + (letter_w >> FONT_ANTIALIAS) < mask_p->x2 ? (letter_w >> FONT_ANTIALIAS) : mask_p->x2 - pos_p->x + 1;
     cord_t row_start = pos_p->y > mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
-    cord_t row_end  = pos_p->y + (letter_h >> LV_FONT_ANTIALIAS) < mask_p->y2 ? (letter_h >> LV_FONT_ANTIALIAS) : mask_p->y2 - pos_p->y + 1;
+    cord_t row_end  = pos_p->y + (letter_h >> FONT_ANTIALIAS) < mask_p->y2 ? (letter_h >> FONT_ANTIALIAS) : mask_p->y2 - pos_p->y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
-    vdb_buf_tmp += ((pos_p->y - vdb_p->vdb_area.y1) * vdb_width)
-                    + pos_p->x - vdb_p->vdb_area.x1;
+    vdb_buf_tmp += ((pos_p->y - vdb_p->area.y1) * vdb_width)
+                    + pos_p->x - vdb_p->area.x1;
 
     /*If the letter is partially out of mask the move there on VDB*/
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
-    map_p += ((row_start << LV_FONT_ANTIALIAS) * font_p->width_byte) + ((col_start << LV_FONT_ANTIALIAS) >> 3);
+    map_p += ((row_start << FONT_ANTIALIAS) * font_p->width_byte) + ((col_start << FONT_ANTIALIAS) >> 3);
 
-#if LV_FONT_ANTIALIAS != 0
+#if FONT_ANTIALIAS != 0
+    opa_t opa_tmp = opa;
+    if(opa_tmp != OPA_COVER) opa_tmp = opa_tmp >> 2;   /*Opacity per pixel (used when sum the pixels)*/
     const uint8_t * map1_p = map_p;
     const uint8_t * map2_p = map_p + font_p->width_byte;
     uint8_t px_cnt;
     for(row = row_start; row < row_end; row ++) {
         col_byte_cnt = 0;
-        col_bit = 7 - ((col_start << LV_FONT_ANTIALIAS) % 8);
+        col_bit = 7 - ((col_start << FONT_ANTIALIAS) % 8);
         for(col = col_start; col < col_end; col ++) {
 
             px_cnt = 0;
@@ -197,7 +199,7 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
 
             if(px_cnt != 0) {
                 if(opa == OPA_COVER) *vdb_buf_tmp = color_mix(color, *vdb_buf_tmp, 63*px_cnt);
-                else *vdb_buf_tmp = color_mix(color, *vdb_buf_tmp, opa);
+                else *vdb_buf_tmp = color_mix(color, *vdb_buf_tmp, opa_tmp * px_cnt);
             }
 
            vdb_buf_tmp++;
@@ -276,12 +278,12 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     }
 
     /*Stores coordinates relative to the act vdb*/
-    masked_a.x1 = masked_a.x1 - vdb_p->vdb_area.x1;
-    masked_a.y1 = masked_a.y1 - vdb_p->vdb_area.y1;
-    masked_a.x2 = masked_a.x2 - vdb_p->vdb_area.x1;
-    masked_a.y2 = masked_a.y2 - vdb_p->vdb_area.y1;
+    masked_a.x1 = masked_a.x1 - vdb_p->area.x1;
+    masked_a.y1 = masked_a.y1 - vdb_p->area.y1;
+    masked_a.x2 = masked_a.x2 - vdb_p->area.x1;
+    masked_a.y2 = masked_a.y2 - vdb_p->area.y1;
 
-    cord_t vdb_width = area_get_width(&vdb_p->vdb_area);
+    cord_t vdb_width = area_get_width(&vdb_p->area);
     color_t * vdb_buf_tmp = vdb_p->buf;
     vdb_buf_tmp += (uint32_t) vdb_width * masked_a.y1; /*Move to the first row*/
 

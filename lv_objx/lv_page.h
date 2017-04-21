@@ -40,7 +40,7 @@ typedef enum
 /*Data of page*/
 typedef struct
 {
-    lv_cont_ext_t bg_rect; /*Ext. of ancestor*/
+    lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * scrl;            /*The scrollable object on the background*/
     lv_action_t rel_action;     /*Function to call when the page is released*/
@@ -90,15 +90,33 @@ void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
 void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
 
 /**
+ * Set the scroll bar width on a page
+ * @param page pointer to a page object
+ * @param sb_width the new scroll bar width in pixels
+ */
+void lv_page_set_sb_width(lv_obj_t * page, cord_t sb_width);
+
+/**
+ * Set the scroll bar mode on a page
+ * @param page pointer to a page object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode);
+
+/**
+ * Set a new style for the scroll bars object on the page
+ * @param page pointer to a page object
+ * @param style pointer to a style for the scroll bars
+ */
+void lv_page_set_style_sb(lv_obj_t * page, lv_style_t * style);
+
+/**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
  * @param obj pointer to an object on a page
  * @param glue true: enable glue, false: disable glue
  */
 void lv_page_glue_obj(lv_obj_t * obj, bool glue);
 
-void lv_page_set_sb_width(lv_obj_t * page, cord_t sb_width);
-void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode);
-void lv_page_set_style_sb(lv_obj_t * page, lv_style_t * style);
 /**
  * Focus on an object. It ensures that the object will be visible on the page.
  * @param page pointer to a page object
@@ -110,10 +128,15 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en);
 /**
  * Get the scrollable object of a page-
  * @param page pointer to page object
- * @return pointer to container which is the scrollable part of the page
+ * @return pointer to a container which is the scrollable part of the page
  */
 lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
 
+/**
+ * Get the scroll bar width on a page
+ * @param page pointer to a page object
+ * @return the scroll bar width in pixels
+ */
 cord_t lv_page_get_sb_width(lv_obj_t * page);
 
 /**
@@ -123,6 +146,11 @@ cord_t lv_page_get_sb_width(lv_obj_t * page);
  */
 lv_page_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
 
+/**
+ * Set a new style for the scroll bars object on the page
+ * @param page pointer to a page object
+ * @return pointer to a style for the scroll bars
+ */
 lv_style_t * lv_page_get_style_sb(lv_obj_t * page);
 
 /**********************

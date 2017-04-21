@@ -25,11 +25,11 @@
 /*Data of slider*/
 typedef struct
 {
-    lv_bar_ext_t bar; /*Ext. of ancestor*/
+    lv_bar_ext_t bar;       /*Ext. of ancestor*/
     /*New data for this type */
-    lv_action_t cb;     /*Function to call when a new value is set*/
-    int16_t tmp_value;  /*Store temporal value during press until release (Handled by the library)*/
-    lv_style_t * style_knob;    /*Styée of the knob*/
+    lv_action_t cb;             /*Function to call when a new value is set*/
+    lv_style_t * style_knob;    /*Style of the knob*/
+    int16_t tmp_value;          /*Store a temporal value during press until release (Handled by the library)*/
 }lv_slider_ext_t;
 
 /*Built-in styles of slider*/
@@ -59,6 +59,33 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy);
  */
 bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
 
+/**
+ * Set a function which will be called when a new value is set on the slider
+ * @param slider pointer to slider object
+ * @param cb a callback function
+ */
+void lv_slider_set_action(lv_obj_t * slider, lv_action_t cb);
+
+/**
+ * Set the style of knob on a slider
+ * @param slider pointer to slider object
+ * @param style pointer the new knob style
+ */
+void lv_slider_set_style_knob(lv_obj_t * slider, lv_style_t * style);
+
+/**
+ * Get the slider callback function
+ * @param slider pointer to slider object
+ * @return the callback function
+ */
+lv_action_t lv_slider_get_action(lv_obj_t * slider);
+
+/**
+ * Get the style of knob on a slider
+ * @param slider pointer to slider object
+ * @return pointer the new knob style
+ */
+lv_style_t *  lv_slider_get_style_knob(lv_obj_t * slider);
 
 /**********************
  *      MACROS

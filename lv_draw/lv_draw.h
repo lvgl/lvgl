@@ -10,13 +10,12 @@
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#include "../lv_misc/text.h"
+#include "misc/gfx/text.h"
 #include "../lv_obj/lv_style.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_CONT_CIRCLE      ((cord_t)-1)    /*A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS

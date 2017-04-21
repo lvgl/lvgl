@@ -13,8 +13,8 @@
 #if USE_LV_LABEL != 0
 
 #include "../lv_obj/lv_obj.h"
-#include "../lv_misc/font.h"
-#include "../lv_misc/text.h"
+#include "misc/gfx/font.h"
+#include "misc/gfx/text.h"
 
 /*********************
  *      DEFINES
@@ -41,8 +41,8 @@ typedef struct
     /*New data for this type */
     char * txt;                     /*Text of the label*/
     lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
-    char dot_tmp[LV_LABEL_DOT_NUM]; /*Store character which are replaced with dots*/
-    uint16_t dot_end;               /*The text end position in dot mode*/
+    char dot_tmp[LV_LABEL_DOT_NUM]; /*Store the character which are replaced by dots (Handled by the library)*/
+    uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
     uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/
 }lv_label_ext_t;
@@ -97,6 +97,7 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text);
  * @param text pointe rto the new text
  */
 void lv_label_append_text(lv_obj_t * label, const char * text);
+
 /**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
@@ -124,7 +125,6 @@ const char * lv_label_get_text(lv_obj_t * label);
  * @return the long mode
  */
 lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label);
-
 
 /**
  * Get the recoloring attribute

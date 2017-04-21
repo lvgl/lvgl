@@ -9,7 +9,7 @@
 
 #include <lv_conf.h>
 #include <lvgl/lv_draw/lv_draw.h>
-#include <lvgl/lv_misc/anim.h>
+#include <misc/gfx/anim.h>
 #include <lvgl/lv_obj/lv_dispi.h>
 #include <lvgl/lv_obj/lv_obj.h>
 #include <lvgl/lv_obj/lv_refr.h>
@@ -1440,7 +1440,7 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 
         uint16_t r = style->radius;
 
-        if(r == LV_CONT_CIRCLE) return false;
+        if(r == LV_DRAW_CIRCLE) return false;
 
         area_t area_tmp;
 

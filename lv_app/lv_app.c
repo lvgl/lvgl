@@ -10,7 +10,7 @@
 
 #if LV_APP_ENABLE != 0
 #include <stdio.h>
-#include "lvgl/lv_misc/anim.h"
+#include "misc/gfx/anim.h"
 #include "lvgl/lv_obj/lv_refr.h"
 
 #include "lv_app_util/lv_app_kb.h"
@@ -64,7 +64,6 @@ static void lv_app_win_close_anim_cb(lv_obj_t * app_win);
 static void lv_app_win_minim_anim_cb(lv_obj_t * app_win);
 #endif
 
-static void lv_app_init_icons(void);
 static void lv_app_init_style(void);
 
 /**********************
@@ -86,48 +85,6 @@ static lv_obj_t * app_list;      /*A list which is opened on 'app_btn' release*/
 static lv_app_inst_t * con_send; /*The sender application in connection mode. Not NLL means connection mode is active*/
 static lv_app_style_t app_style; /*Styles for application related things*/
 
-/*Declare icons*/
-#if USE_IMG_CLOSE != 0
-LV_IMG_DECLARE(img_close);
-#endif
-
-#if USE_IMG_DOWN != 0
-LV_IMG_DECLARE(img_down);
-#endif
-
-#if USE_IMG_DRIVER != 0
-LV_IMG_DECLARE(img_driver);
-#endif
-
-#if USE_IMG_FILE != 0
-LV_IMG_DECLARE(img_file);
-#endif
-
-#if USE_IMG_FOLDER != 0
-LV_IMG_DECLARE(img_folder);
-#endif
-
-#if USE_IMG_LEFT != 0
-LV_IMG_DECLARE(img_left);
-#endif
-
-#if USE_IMG_OK != 0
-LV_IMG_DECLARE(img_ok);
-#endif
-
-#if USE_IMG_RIGHT != 0
-LV_IMG_DECLARE(img_right);
-#endif
-
-#if USE_IMG_SETTINGS != 0
-LV_IMG_DECLARE(img_settings);
-#endif
-
-#if USE_IMG_UP != 0
-LV_IMG_DECLARE(img_up);
-#endif
-
-
 /**********************
  *      MACROS
  **********************/
@@ -147,7 +104,6 @@ void lv_app_init(void)
     ll_init(&app_con_ll, sizeof(lv_app_con_t));
 
 	app_scr = lv_scr_act();
-	lv_app_init_icons();
 	lv_app_init_style();
 
 #if LV_APP_DESKTOP != 0
@@ -268,7 +224,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
     #if LV_APP_EFFECT_ANIM != 0
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
     #else
-        lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(font_get(app_style.sc_title_style.font)) >> LV_FONT_ANTIALIAS);
+        lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(font_get(app_style.sc_title_style.font)) >> FONT_ANTIALIAS);
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_DOTS);
     #endif
         lv_label_set_text(app->sc_title, app->name);
@@ -324,11 +280,13 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	lv_obj_set_style(lv_win_get_header(app->win), &app_style.win_header);
 	lv_win_set_title(app->win, app->dsc->name);
 
+	lv_win_set_style_cbtn(app->win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
+
 	if(app->dsc->conf_open != NULL) {
-	    lv_win_add_ctrl_btn(app->win, "U:/icon_settings", lv_app_win_conf_action);
+	    lv_win_add_ctrl_btn(app->win, SYMBOL_SETUP, lv_app_win_conf_action);
 	}
-	lv_win_add_ctrl_btn(app->win, "U:/icon_down", lv_app_win_minim_action);
-	lv_win_add_ctrl_btn(app->win, "U:/icon_close",lv_app_win_close_action);
+	lv_win_add_ctrl_btn(app->win, SYMBOL_DOWN, lv_app_win_minim_action);
+	lv_win_add_ctrl_btn(app->win, SYMBOL_CLOSE,lv_app_win_close_action);
 
     app->win_data = dm_alloc(app->dsc->win_data_size);
 
@@ -611,7 +569,7 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 		lv_obj_set_style(scrl, &app_style.menu);
 		lv_obj_set_size(app_list, LV_HOR_RES / 3, (LV_VER_RES * 3) / 4);
 		lv_obj_align(app_list, menuh, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
-		lv_list_set_styles_liste(app_list, &app_style.menu_btn_rel, &app_style.menu_btn_pr, NULL, NULL, NULL);
+		lv_list_set_styles_btn(app_list, &app_style.menu_btn_rel, &app_style.menu_btn_pr, NULL, NULL, NULL);
 
 		lv_app_dsc_t ** dsc;
 		lv_obj_t * elem;
@@ -1142,58 +1100,13 @@ static void lv_app_init_style(void)
 
     lv_style_get(LV_STYLE_TRANSP, &app_style.win_scrl);
 
-
     lv_style_get(LV_STYLE_BTN_REL, &app_style.win_cbtn_rel);
     app_style.win_cbtn_rel.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 
-    memcpy(&app_style.win_cbtn_pr, &app_style.win_cbtn_rel, sizeof(lv_style_t));
+    lv_style_get(LV_STYLE_BTN_PR, &app_style.win_cbtn_pr);
+    app_style.win_cbtn_pr.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 }
 
-/**
- * Create files for the icons
- */
-static void lv_app_init_icons(void)
-{
-#if USE_IMG_CLOSE != 0
-    lv_img_create_file("icon_close", img_close);
-#endif
-
-#if USE_IMG_DOWN != 0
-    lv_img_create_file("icon_down", img_down);
-#endif
-
-#if USE_IMG_DRIVER != 0
-    lv_img_create_file("icon_driver", img_driver);
-#endif
-
-#if USE_IMG_FILE != 0
-    lv_img_create_file("icon_file", img_file);
-#endif
-
-#if USE_IMG_FOLDER != 0
-    lv_img_create_file("icon_folder", img_folder);
-#endif
-
-#if USE_IMG_LEFT != 0
-    lv_img_create_file("icon_left", img_left);
-#endif
-
-#if USE_IMG_OK != 0
-    lv_img_create_file("icon_ok", img_ok);
-#endif
-
-#if USE_IMG_RIGHT != 0
-    lv_img_create_file("icon_right", img_right);
-#endif
-
-#if USE_IMG_SETTINGS != 0
-    lv_img_create_file("icon_settings", img_settings);
-#endif
-
-#if USE_IMG_UP != 0
-    lv_img_create_file("icon_up", img_up);
-#endif
-}
 #endif /*LV_APP_ENABLE != 0*/
 
 

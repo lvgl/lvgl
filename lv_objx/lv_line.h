@@ -37,7 +37,6 @@ typedef struct
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Create a line objects
  * @param par pointer to an object, it will be the parent of the new line
@@ -57,7 +56,7 @@ bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
  * Set an array of points. The line object will connect these points.
  * @param line pointer to a line object
  * @param point_a an array of points. Only the address is saved,
- * so the array can be a local variable which will be destroyed
+ * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
 void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num);

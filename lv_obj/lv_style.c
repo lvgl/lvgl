@@ -33,8 +33,6 @@ static lv_style_t lv_style_plain;
 static lv_style_t lv_style_plain_color;
 static lv_style_t lv_style_pretty;
 static lv_style_t lv_style_pretty_color;
-//static lv_style_t lv_style_focus;
-//static lv_style_t lv_style_focus_color;
 static lv_style_t lv_style_btn_rel;
 static lv_style_t lv_style_btn_pr;
 static lv_style_t lv_style_btn_trel;
@@ -54,10 +52,13 @@ static lv_style_t lv_style_btn_ina;
  */
 void lv_style_init (void)
 {
+
+    /* Not White/Black/Gray colors are created by HSV model with
+     * HUE = 210*/
+
     /*Screen style*/
     lv_style_set_ccolor(&lv_style_scr, COLOR_MAKE(0x20, 0x20, 0x20));
     lv_style_set_opa(&lv_style_scr, OPA_COVER);
-    lv_style_set_opa_prop(&lv_style_scr, true);
 
     lv_style_set_mcolor(&lv_style_scr, COLOR_WHITE);
     lv_style_set_gcolor(&lv_style_scr, COLOR_WHITE);
@@ -66,15 +67,15 @@ void lv_style_init (void)
     lv_style_set_radius(&lv_style_scr, 0);
     lv_style_set_bwidth(&lv_style_scr, 0);
     lv_style_set_swidth(&lv_style_scr, 0);
-    lv_style_set_vpad(&lv_style_scr, LV_DPI / 6);
-    lv_style_set_hpad(&lv_style_scr, LV_DPI / 4);
-    lv_style_set_opad(&lv_style_scr, LV_DPI / 6);
+    lv_style_set_vpad(&lv_style_scr, LV_DPI / 8);
+    lv_style_set_hpad(&lv_style_scr, LV_DPI / 8);
+    lv_style_set_opad(&lv_style_scr, LV_DPI / 8);
     lv_style_set_bopa(&lv_style_scr, OPA_COVER);
     lv_style_set_empty(&lv_style_scr, false);
 
-    lv_style_set_font(&lv_style_scr, font_get(LV_FONT_DEFAULT));
+    lv_style_set_font(&lv_style_scr, font_get(FONT_DEFAULT));
     lv_style_set_letter_space(&lv_style_scr, 1 * LV_DOWNSCALE);
-    lv_style_set_line_space(&lv_style_scr, 5 * LV_DOWNSCALE);
+    lv_style_set_line_space(&lv_style_scr, 2 * LV_DOWNSCALE);
     lv_style_set_txt_align(&lv_style_scr, 0);
 
     lv_style_set_img_recolor(&lv_style_scr, OPA_TRANSP);
@@ -86,27 +87,28 @@ void lv_style_init (void)
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_set_ccolor(&lv_style_plain_color, COLOR_RED);//MAKE(0xf0, 0xf0, 0xf0));
-    lv_style_set_mcolor(&lv_style_plain_color, COLOR_MAKE(0x40, 0x60, 0x80));
-    lv_style_set_gcolor(&lv_style_plain_color, COLOR_MAKE(0x40, 0x60, 0x80));
+    lv_style_set_ccolor(&lv_style_plain_color, COLOR_MAKE(0xf0, 0xf0, 0xf0));
+    lv_style_set_mcolor(&lv_style_plain_color, COLOR_MAKE(0x55, 0x96, 0xd8));
+    lv_style_set_gcolor(&lv_style_plain_color, lv_style_plain_color.mcolor);
 
     /*Pretty style */
     memcpy(&lv_style_pretty, &lv_style_plain, sizeof(lv_style_t));
+    lv_style_set_ccolor(&lv_style_pretty, COLOR_MAKE(0x20, 0x20, 0x20));
     lv_style_set_mcolor(&lv_style_pretty, COLOR_WHITE);
     lv_style_set_gcolor(&lv_style_pretty, COLOR_SILVER);
-    lv_style_set_bcolor(&lv_style_pretty, COLOR_GRAY);
+    lv_style_set_bcolor(&lv_style_pretty, COLOR_MAKE(0x40, 0x40, 0x40));
     lv_style_set_radius(&lv_style_pretty, LV_DPI / 10);
-    lv_style_set_bwidth(&lv_style_pretty, LV_DPI / 20 >= 1 ? LV_DPI / 30 >= 1 : 1);
-//    lv_style_set_swidth(&lv_style_pretty, LV_DPI / 6);
-//    lv_style_set_scolor(&lv_style_pretty, COLOR_BLACK);
+    lv_style_set_bwidth(&lv_style_pretty, LV_DPI / 30 >= 1 ? LV_DPI / 30  : 1);
+    lv_style_set_bopa(&lv_style_pretty, OPA_50);
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
-    lv_style_set_ccolor(&lv_style_pretty_color, COLOR_RED);//MAKE(0xf0, 0xf0, 0xf0));
-    lv_style_set_mcolor(&lv_style_pretty_color, COLOR_WHITE);
-    lv_style_set_gcolor(&lv_style_pretty_color, COLOR_CYAN);
-    lv_style_set_scolor(&lv_style_pretty_color, COLOR_BLACK);
-    lv_style_set_swidth(&lv_style_pretty_color, LV_DPI / 2);
+    lv_style_set_ccolor(&lv_style_pretty_color, COLOR_MAKE(0xe0, 0xe0, 0xe0));
+    lv_style_set_gcolor(&lv_style_pretty_color, COLOR_MAKE(0x2b, 0x59, 0x8b));
+    lv_style_set_mcolor(&lv_style_pretty_color, COLOR_MAKE(0x90, 0xb3, 0xd5));
+    lv_style_set_bcolor(&lv_style_pretty_color, COLOR_MAKE(0x15, 0x2c, 0x42));
+    lv_style_set_scolor(&lv_style_pretty_color, COLOR_MAKE(0x6a, 0x8f, 0xb4));
+    lv_style_set_swidth(&lv_style_pretty_color, 0);
 
     /*Transparent style*/
     memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));
@@ -120,27 +122,44 @@ void lv_style_init (void)
 
     /*Button released style*/
     memcpy(&lv_style_btn_rel, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_set_mcolor(&lv_style_btn_rel, COLOR_WHITE);
-    lv_style_set_gcolor(&lv_style_btn_rel, COLOR_GRAY);
+    lv_style_set_mcolor(&lv_style_btn_rel, COLOR_MAKE(0x76, 0xa2, 0xd0));
+    lv_style_set_gcolor(&lv_style_btn_rel, COLOR_MAKE(0x19, 0x3a, 0x5d));
+    lv_style_set_bcolor(&lv_style_btn_rel, COLOR_MAKE(0x0b, 0x19, 0x28));
+    lv_style_set_ccolor(&lv_style_btn_rel, COLOR_MAKE(0xff, 0xff, 0xff));
+    lv_style_set_bwidth(&lv_style_btn_rel, LV_DPI / 30 >= 1 ? LV_DPI / 30  : 1);
+    lv_style_set_radius(&lv_style_btn_rel, LV_DPI / 10);
+    lv_style_set_bopa(&lv_style_btn_rel, OPA_70);
+    lv_style_set_scolor(&lv_style_btn_rel, COLOR_GRAY);
+    lv_style_set_swidth(&lv_style_btn_rel, 0);
+    lv_style_set_hpad(&lv_style_btn_rel, LV_DPI / 3);
+    lv_style_set_vpad(&lv_style_btn_rel, LV_DPI / 4);
+    lv_style_set_opad(&lv_style_btn_rel, LV_DPI / 6);
 
     /*Button pressed style*/
     memcpy(&lv_style_btn_pr, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_set_mcolor(&lv_style_btn_pr, COLOR_BLACK);
-    lv_style_set_ccolor(&lv_style_btn_pr, COLOR_SILVER);
-    lv_style_set_scolor(&lv_style_btn_pr, COLOR_GRAY);
-    lv_style_set_swidth(&lv_style_btn_pr, 10);
+    lv_style_set_mcolor(&lv_style_btn_pr, COLOR_MAKE(0x33, 0x62, 0x94));
+    lv_style_set_gcolor(&lv_style_btn_pr, COLOR_MAKE(0x10, 0x26, 0x3c));
+    lv_style_set_ccolor(&lv_style_btn_pr, COLOR_MAKE(0xa4, 0xb5, 0xc6));
 
     /*Button toggle released style*/
     memcpy(&lv_style_btn_trel, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_set_mcolor(&lv_style_btn_trel, COLOR_LIME);
+    lv_style_set_gcolor(&lv_style_btn_trel, COLOR_MAKE(0x37, 0x62, 0x90));
+    lv_style_set_mcolor(&lv_style_btn_trel, COLOR_MAKE(0x0a, 0x11, 0x22));
+    lv_style_set_bcolor(&lv_style_btn_trel, COLOR_MAKE(0x01, 0x07, 0x0d));
+    lv_style_set_ccolor(&lv_style_btn_trel, COLOR_MAKE(0xc8, 0xdd, 0xf4));
 
     /*Button toggle pressed style*/
     memcpy(&lv_style_btn_tpr, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_set_mcolor(&lv_style_btn_tpr, COLOR_GREEN);
+    lv_style_set_gcolor(&lv_style_btn_tpr, COLOR_MAKE(0x2b, 0x4c, 0x70));
+    lv_style_set_mcolor(&lv_style_btn_tpr, COLOR_MAKE(0x02, 0x14, 0x27));
+    lv_style_set_ccolor(&lv_style_btn_tpr, COLOR_MAKE(0xa4, 0xb5, 0xc6));
 
     /*Button inactive style*/
     memcpy(&lv_style_btn_ina, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_set_mcolor(&lv_style_btn_ina, COLOR_YELLOW);
+    lv_style_set_gcolor(&lv_style_btn_ina, COLOR_MAKE(0xd8, 0xd8, 0xd8));
+    lv_style_set_mcolor(&lv_style_btn_ina, COLOR_MAKE(0xd8, 0xd8, 0xd8));
+    lv_style_set_bcolor(&lv_style_btn_ina, COLOR_MAKE(0x90, 0x90, 0x90));
+    lv_style_set_ccolor(&lv_style_btn_ina, COLOR_MAKE(0x70, 0x70, 0x70));
 }
 
 
@@ -219,15 +238,6 @@ void lv_style_set_opa(lv_style_t * style, opa_t opa)
     style->opa = opa;
 }
 
-/**
- * Set the proportional opacity attribute of a style (make the opacity relative to the parent)
- * @param style pointer to style
- * @param opa_prop true: enabled, false: disabled
- */
-void lv_style_set_opa_prop(lv_style_t * style, bool opa_prop)
-{
-    style->opa_prop = opa_prop == false ? 0 : 1;
-}
 
 /**
  * Set the container main color of a style
@@ -391,9 +401,9 @@ void lv_style_set_line_space(lv_style_t * style, cord_t line_space)
 /**
  * Set the text align of a style
  * @param style pointer to style
- * @param align TODO
+ * @param align type of text alignment from 'lv_txt_align_t'
  */
-void lv_style_set_txt_align(lv_style_t * style, uint8_t align)
+void lv_style_set_txt_align(lv_style_t * style, lv_txt_align_t align)
 {
     style->txt_align = align;
 }
@@ -441,16 +451,6 @@ color_t lv_style_get_ccolor(lv_style_t * style)
 opa_t lv_style_get_opa(lv_style_t * style)
 {
     return style->opa;
-}
-
-/**
- * Get the proportional opacity attribute of a style (make the opacity relative to the parent)
- * @param style pointer to style
- * @return true: enabled, false: disabled
- */
-bool lv_style_get_opa_prop(lv_style_t * style)
-{
-    return style->opa_prop == 0 ? false : true;
 }
 
 /**
@@ -615,9 +615,9 @@ cord_t lv_style_get_line_space(lv_style_t * style)
 /**
  * Get the text align of a style
  * @param style pointer to style
- * @return TODO
+ * @return type of text alignment from 'lv_txt_align_t'
  */
-uint8_t lv_style_get_txt_align(lv_style_t * style)
+lv_txt_align_t lv_style_get_txt_align(lv_style_t * style)
 {
     return style->txt_align;
 }

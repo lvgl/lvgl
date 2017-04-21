@@ -43,8 +43,9 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t * styles_liste[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
-    uint8_t width_sb   :1;        /*1: Keep space for the scrollbar*/
+    lv_style_t * styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
+    lv_style_t * style_img;    /*Style of the list element images on buttons*/
+    uint8_t sb_out   :1;        /*1: Keep space for the scrollbar*/
 }lv_list_ext_t;
 
 /**********************
@@ -89,7 +90,34 @@ void lv_list_up(lv_obj_t * list);
  */
 void lv_list_down(lv_obj_t * list);
 
-void lv_list_set_styles_liste(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
+/**
+ * Enable/Disable to scrollbar outside attribute
+ * @param list pointer to list object
+ * @param out true: reduce the buttons width therefore scroll bar will be out of the buttons,
+ *            false: keep button size and place scroll bar on the buttons
+ */
+void lv_list_set_sb_out(lv_obj_t * list, bool out);
+
+/**
+ * Set styles of the list elements of a list in each state
+ * @param list pointer to list object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
+ */
+void lv_list_set_styles_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
+lv_style_t * trel, lv_style_t * tpr,
+lv_style_t * ina);
+
+/**
+ * Set the styles of the list element image (typically to set symbol font)
+ * @param list pointer to list object
+ * @param style pointer to the new style of the button images
+ */
+void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style);
+
 /**
  * Get the text of a list element
  * @param liste pointer to list element
@@ -97,7 +125,28 @@ void lv_list_set_styles_liste(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr
  */
 const char * lv_list_element_get_txt(lv_obj_t * liste);
 
+/**
+ * Get the scroll bar outside attribute
+ * @param list pointer to list object
+ * @param en true: scroll bar outside the buttons, false: scroll bar inside
+ */
+bool lv_list_get_sb_out(lv_obj_t * list, bool en);
+
+/**
+ * Get the style of the list elements in a given state
+ * @param list pointer to a list object
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
+ */
 lv_style_t * lv_list_get_style_liste(lv_obj_t * list, lv_btn_state_t state);
+
+/**
+ * Get the style of the list elements images
+ * @param list pointer to a list object
+ * @return pointer to the image style
+ */
+lv_style_t * lv_list_get_style_img(lv_obj_t * list, lv_btn_state_t state);
+
 /**********************
  *      MACROS
  **********************/

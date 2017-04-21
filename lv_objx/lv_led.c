@@ -9,7 +9,6 @@
 #include "lv_conf.h"
 #if USE_LV_LED != 0
 
-#include <lvgl/lv_objx/lv_cont.h>
 #include "lv_led.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -18,7 +17,7 @@
  *********************/
 #define LV_LED_WIDTH_DEF    (LV_DPI / 2)
 #define LV_LED_HEIGHT_DEF   (LV_DPI / 2)
-#define LV_LED_BRIGHT_OFF	40
+#define LV_LED_BRIGHT_OFF	128
 #define LV_LED_BRIGHT_ON	255
 
 /**********************
@@ -56,7 +55,7 @@ static lv_design_f_t ancestor_design_f;
 lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor basic object*/
-	lv_obj_t * new_led = lv_cont_create(par, copy);
+	lv_obj_t * new_led = lv_obj_create(par, copy);
     dm_assert(new_led);
     
     /*Allocate the object type specific extended data*/
@@ -98,18 +97,12 @@ bool lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_cont_signal(led, sign, param);
+    valid = lv_obj_signal(led, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	switch(sign) {
-    		case LV_SIGNAL_CLEANUP:
-    			/*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    			break;
-    		default:
-    			break;
-    	}
+
     }
     
     return valid;
@@ -210,9 +203,11 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 		/*Mix. the color with black proportionally with brightness*/
 		leds_tmp.mcolor = color_mix(leds_tmp.mcolor, COLOR_BLACK, ext->bright);
 		leds_tmp.gcolor = color_mix(leds_tmp.gcolor, COLOR_BLACK, ext->bright);
+        leds_tmp.bcolor = color_mix(leds_tmp.bcolor, COLOR_BLACK, ext->bright);
 
 		/*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF and LV_LED_BRIGHT_ON*/
-		leds_tmp.swidth = (uint16_t)(uint16_t)(ext->bright * style->swidth) >> 8;
+		uint16_t bright_tmp = ext->bright;
+        leds_tmp.swidth = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->swidth) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
 		led->style_p = &leds_tmp;
 		ancestor_design_f(led, mask, mode);

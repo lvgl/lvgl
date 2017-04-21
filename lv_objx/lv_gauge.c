@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../lv_draw/lv_draw.h"
-#include "../lv_misc/text.h"
+#include "misc/gfx/text.h"
 #include "misc/math/trigo.h"
 #include "misc/math/math_base.h"
 
@@ -25,6 +25,7 @@
 #define LV_GAUGE_DEF_HEIGHT         (3 * LV_DPI)
 #define LV_GAUGE_DEF_NEEDLE_COLOR   COLOR_RED
 #define LV_GAUGE_DEF_ANGLE          220
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -406,7 +407,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask, lv_style_
         point_t label_size;
         txt_get_size(&label_size, scale_txt, style->font,
                 style->letter_space, style->line_space,
-                LV_CORD_MAX, TXT_FLAG_NONE);
+                CORD_MAX, TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;
@@ -458,7 +459,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask, lv_style
     lv_style_get(LV_STYLE_PLAIN, &style_neddle_mid);
     style_neddle_mid.mcolor = style->bcolor;
     style_neddle_mid.gcolor = style->bcolor;
-    style_neddle_mid.radius = LV_CONT_CIRCLE;
+    style_neddle_mid.radius = LV_DRAW_CIRCLE;
 
     area_t nm_cord;
     nm_cord.x1 = x_ofs - style->opad;

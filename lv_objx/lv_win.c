@@ -75,7 +75,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
-        lv_obj_set_style(ext->page, lv_style_get(LV_STYLE_TRANSP, NULL));
+        lv_obj_set_style(ext->page, lv_style_get(LV_STYLE_PLAIN, NULL));
         lv_page_set_sb_mode(ext->page, LV_PAGE_SB_MODE_AUTO);
 
         lv_obj_t * scrl = lv_page_get_scrl(ext->page);
@@ -271,19 +271,18 @@ void lv_win_set_cbtn_size(lv_obj_t * win, cord_t size)
 /**
  * Set the style of the window  control buttons in a given state
  * @param win pointer to a window object
- * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
- * @param style pointer to style
+ * @param rel spointer to the style in released state
+ * @param pr pointer to the style in pressed state
  */
-void lv_win_set_style_cbtn(lv_obj_t * win, lv_btn_state_t state, lv_style_t *  style)
+void lv_win_set_style_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr)
 {
     lv_win_ext_t * ext = lv_obj_get_ext(win);
-    if(state == LV_BTN_STATE_REL) ext->style_cbtn_rel = style;
-    if(state == LV_BTN_STATE_PR) ext->style_cbtn_pr = style;
+    ext->style_cbtn_rel = rel;
+    ext->style_cbtn_pr = pr;
     lv_obj_t * cbtn;
     cbtn = lv_obj_get_child(ext->btnh, NULL);
     while(cbtn != NULL) {
         lv_btn_set_styles(cbtn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
-
         cbtn = lv_obj_get_child(ext->btnh, cbtn);
     }
 

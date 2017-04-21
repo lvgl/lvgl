@@ -26,7 +26,7 @@
 
 #if LV_IMG_ENABLE_SYMBOLS
 #include "lv_label.h"
-#include "../lv_misc/fonts/symbol_def.h"
+#include "misc/gfx/fonts/symbol_def.h"
 #endif
 
 /*********************

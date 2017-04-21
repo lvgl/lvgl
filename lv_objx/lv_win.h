@@ -13,10 +13,6 @@
 #if USE_LV_WIN != 0
 
 /*Testing of dependencies*/
-#if USE_LV_RECT == 0
-#error "lv_win: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
-#endif
-
 #if USE_LV_BTN == 0
 #error "lv_win: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
 #endif
@@ -29,9 +25,6 @@
 #error "lv_win: lv_img is required. Enable it in lv_conf.h (USE_LV_IMG  1) "
 #endif
 
-#if USE_LV_PAGE == 0
-#error "lv_win: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
-#endif
 
 #if USE_LV_PAGE == 0
 #error "lv_win: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
@@ -57,14 +50,14 @@ typedef struct
 {
     /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * page;
-    lv_obj_t * header;  /*Pointer to the header container of the window*/
-    lv_obj_t * title;   /*Pointer to the title label of the window*/
-    lv_obj_t * btnh; /*Pointer to the control button holder container of the window*/
+    lv_obj_t * page;                /*Pointer to a page which holds the content*/
+    lv_obj_t * header;              /*Pointer to the header container of the window*/
+    lv_obj_t * title;               /*Pointer to the title label of the window*/
+    lv_obj_t * btnh;                /*Pointer to the control button holder container of the window*/
     lv_style_t * style_header;      /*Style of the header container*/
     lv_style_t * style_cbtn_rel;    /*Control button releases style*/
-    lv_style_t * style_cbtn_pr;    /*Control button pressed style*/
-    cord_t cbtn_size;                /*Size of the control buttons (square)*/
+    lv_style_t * style_cbtn_pr;     /*Control button pressed style*/
+    cord_t cbtn_size;               /*Size of the control buttons (square)*/
 }lv_win_ext_t;
 
 /**********************
@@ -101,9 +94,9 @@ lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_
  * A release action which can be assigned to a window control button to close it
  * @param btn pointer to the released button
  * @param dispi pointer to the caller display input
- * @return always false because the button is deleted with the window
+ * @return always LV_ACTION_RES_INV because the button is deleted with the window
  */
-lv_action_res_t  lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+lv_action_res_t lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
 
 /**
  * Set the title of a window
@@ -113,16 +106,53 @@ lv_action_res_t  lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
 void lv_win_set_title(lv_obj_t * win, const char * title);
 
 /**
+ * Set the control button size of a window
+ * @param win pointer to a window object
+ * @return control button size
+ */
+void lv_win_set_cbtn_size(lv_obj_t * win, cord_t size);
+
+/**
+ * Set the style of the window  control buttons in a given state
+ * @param win pointer to a window object
+ * @param rel spointer to the style in released state
+ * @param pr pointer to the style in pressed state
+ */
+void lv_win_set_style_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr);
+
+/**
  * Get the title of a window
  * @param win pointer to a window object
  * @return title string of the window
  */
 const char * lv_win_get_title(lv_obj_t * win);
 
+/**
+ * Get the page of a window
+ * @param win pointer to a window object
+ * @return page pointer to the page object of the window
+ */
 lv_obj_t * lv_win_get_page(lv_obj_t * win);
 
+/**
+ * Get the s window header
+ * @param win pointer to a window object
+ * @return pointer to the window header object (lv_rect)
+ */
 lv_obj_t * lv_win_get_header(lv_obj_t * win);
 
+/**
+ * Get the control button size of a window
+ * @param win pointer to a window object
+ * @return control button size
+ */
+cord_t lv_win_get_cbtn_size(lv_obj_t * win);
+
+/**
+ * Get width of the content area (page scrollable) of the window
+ * @param win pointer to a window object
+ * @return the width of the contetn area
+ */
 cord_t lv_win_get_width(lv_obj_t * win);
 
 /**

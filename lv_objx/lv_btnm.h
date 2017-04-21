@@ -94,6 +94,12 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
  */
 void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb);
 
+/**
+ * Set the styles of the buttons of the button matrox
+ * @param btnm pointer to a button matrix object
+ * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
+ * @param style pointer to style
+ */
 void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr);
 
 /**
@@ -110,7 +116,14 @@ const char ** lv_btnm_get_map(lv_obj_t * btnm);
  */
 lv_btnm_callback_t lv_btnm_get_action(lv_obj_t * btnm);
 
+/**
+ * Get the style of buttons in button matrix
+ * @param btnm pointer to a button matrix object
+ * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
+ * @return pointer the button style in the given state
+ */
 lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state);
+
 /**********************
  *      MACROS
  **********************/

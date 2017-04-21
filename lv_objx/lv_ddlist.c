@@ -12,7 +12,7 @@
 
 #include "lv_ddlist.h"
 #include "../lv_draw/lv_draw.h"
-#include "../lv_misc/anim.h"
+#include "misc/gfx/anim.h"
 
 /*********************
  *      DEFINES
@@ -85,7 +85,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));
 
         ext->opt_label = lv_label_create(new_ddlist, NULL);
-        lv_obj_set_style(ext->opt_label, NULL); /*Inherit the style*/
+        lv_obj_set_style(ext->opt_label, lv_style_get(LV_STYLE_PRETTY, NULL));
         lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_rel_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
@@ -126,6 +126,8 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	if(sign == LV_SIGNAL_STYLE_CHG) {
+    	    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    	    lv_obj_set_style(ext->opt_label, lv_obj_get_style(ddlist));
             lv_ddlist_refr_size(ddlist, false);
     	}
     }
@@ -296,7 +298,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         if(ext->opened != 0) {
             lv_style_t * style = lv_obj_get_style(ddlist);
             const font_t * font = style->font;
-            cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
+            cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
             area_t rect_area;
             lv_style_t * style_page_scrl = lv_obj_get_style(lv_page_get_scrl(ddlist));
             rect_area.y1 = ext->opt_label->cords.y1;
@@ -386,7 +388,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     } else { /*Close the list*/
         const font_t * font = style->font;
         lv_style_t * label_style = lv_obj_get_style(ext->opt_label);
-        cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
+        cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
         new_height = font_h + 2 * label_style->line_space;
     }
     if(anim_en == false) {
@@ -420,7 +422,7 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
     const font_t * font = style->font;
-    cord_t font_h = font_get_height(font) >> LV_FONT_ANTIALIAS;
+    cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
     lv_style_t * label_style = lv_obj_get_style(ext->opt_label);
     lv_obj_t * scrl = lv_page_get_scrl(ddlist);
     lv_style_t * style_scrl = lv_obj_get_style(scrl);

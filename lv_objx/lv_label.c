@@ -9,12 +9,12 @@
 #include "lv_conf.h"
 #if USE_LV_LABEL != 0
 
-#include "misc/others/color.h"
+#include "misc/gfx/color.h"
 #include "misc/math/math_base.h"
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
-#include "../lv_misc/text.h"
-#include "../lv_misc/anim.h"
+#include "misc/gfx/text.h"
+#include "misc/gfx/anim.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************
@@ -351,7 +351,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     cord_t max_w = lv_obj_get_width(label);
     lv_style_t * style = lv_obj_get_style(label);
     const font_t * font = style->font;
-    uint8_t letter_height = font_get_height(font) >> LV_FONT_ANTIALIAS;
+    uint8_t letter_height = font_get_height(font) >> FONT_ANTIALIAS;
     cord_t y = 0;
     txt_flag_t flag = TXT_FLAG_NONE;
 
@@ -359,7 +359,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
     /*If the width will be expanded  the set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-        max_w = LV_CORD_MAX;
+        max_w = CORD_MAX;
     }
 
     /*Search the line of the index letter */;
@@ -388,10 +388,10 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
             }
         }
 
-		x += (font_get_width(font, text[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
+		x += (font_get_width(font, text[i]) >> FONT_ANTIALIAS) + style->letter_space;
 	}
 
-	if(style->txt_align != 0) {
+	if(style->txt_align == LV_TXT_ALIGN_MID) {
 		cord_t line_w;
         line_w = txt_get_width(&text[line_start], new_line_start - line_start,
                                font, style->letter_space, flag);
@@ -418,7 +418,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     cord_t max_w = lv_obj_get_width(label);
     lv_style_t * style = lv_obj_get_style(label);
     const font_t * font = style->font;
-    uint8_t letter_height = font_get_height(font) >> LV_FONT_ANTIALIAS;
+    uint8_t letter_height = font_get_height(font) >> FONT_ANTIALIAS;
     cord_t y = 0;
     txt_flag_t flag = TXT_FLAG_NONE;
 
@@ -426,7 +426,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-        max_w = LV_CORD_MAX;
+        max_w = CORD_MAX;
     }
 
     /*Search the line of the index letter */;
@@ -439,7 +439,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
     /*Calculate the x coordinate*/
     cord_t x = 0;
-	if(style->txt_align != 0) {
+	if(style->txt_align == LV_TXT_ALIGN_MID) {
 		cord_t line_w;
         line_w = txt_get_width(&text[line_start], new_line_start - line_start,
                                font, style->letter_space, flag);
@@ -456,7 +456,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-		x += (font_get_width(font, text[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
+		x += (font_get_width(font, text[i]) >> FONT_ANTIALIAS) + style->letter_space;
 		if(pos->x < x) break;
 	}
 
@@ -519,7 +519,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
-        max_w = LV_CORD_MAX;
+        max_w = CORD_MAX;
     }
 
     /*Calc. the height and longest line*/
@@ -544,7 +544,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.var = label;
             anim.repeat = 1;
             anim.playback = 1;
-            anim.start = font_get_width(font, ' ') >> LV_FONT_ANTIALIAS;
+            anim.start = font_get_width(font, ' ') >> FONT_ANTIALIAS;
             anim.act_time = 0;
             anim.end_cb = NULL;
             anim.path = anim_get_path(ANIM_PATH_LIN);
@@ -555,7 +555,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             bool hor_anim = false;
             if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
                 anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label) -
-                           (font_get_width(font, ' ') >> LV_FONT_ANTIALIAS);
+                           (font_get_width(font, ' ') >> FONT_ANTIALIAS);
                 anim.fp = (anim_fp_t) lv_obj_set_x;
                 anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
                 anim_create(&anim);
@@ -564,7 +564,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
             if(lv_obj_get_height(label) > lv_obj_get_height(parent)) {
                 anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) -
-                                   (font_get_height(font) - LV_FONT_ANTIALIAS);
+                                   (font_get_height(font) - FONT_ANTIALIAS);
                 anim.fp = (anim_fp_t)lv_obj_set_y;
 
                 /*Different animation speed if horizontal animation is created too*/

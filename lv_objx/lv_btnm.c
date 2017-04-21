@@ -11,7 +11,7 @@
 
 #include "lv_btnm.h"
 #include "../lv_draw/lv_draw.h"
-#include "../lv_misc/text.h"
+#include "misc/gfx/text.h"
 #include "../lv_obj/lv_refr.h"
 
 /*********************
@@ -88,7 +88,11 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
+        lv_btnm_ext_t * copy_ext = lv_obj_get_ext(copy);
+        ext->style_btn_rel = copy_ext->style_btn_rel;
+        ext->style_btn_pr = copy_ext->style_btn_pr;
         lv_btnm_set_map(new_btnm, lv_btnm_get_map(copy));
+        ext->cb = copy_ext->cb;
     }
     
     return new_btnm;
@@ -151,11 +155,12 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_pr = btn_pr;
     	}
     	else if(sign ==  LV_SIGNAL_RELEASED || sign == LV_SIGNAL_LONG_PRESS_REP) {
-            if(ext->cb != NULL &&
-               ext->btn_pr != LV_BTNM_PR_NONE) {
+            if(ext->cb != NULL && ext->btn_pr != LV_BTNM_PR_NONE) {
                 uint16_t txt_i = 0;
                 uint16_t btn_i = 0;
-                /*Search the next valid text in the map*/
+
+                /* Search the text of ext->btn_pr the buttons text in the map
+                 * Skip "\n"-s*/
                 while(btn_i != ext->btn_pr) {
                     btn_i ++;
                     txt_i ++;
@@ -164,6 +169,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
                 ext->cb(btnm, txt_i);
             }
+
             if(sign == LV_SIGNAL_RELEASED && ext->btn_pr != LV_BTNM_PR_NONE) {
                 /*Invalidate to old area*/;
                 lv_obj_get_cords(btnm, &btnm_area);
@@ -177,7 +183,11 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 ext->btn_pr = LV_BTNM_PR_NONE;
             }
     	}
+        else if(sign == LV_SIGNAL_PRESS_LOST) {
+            ext->btn_pr = LV_BTNM_PR_NONE;
+            lv_obj_inv(btnm);
 
+        }
     }
     
     return valid;
@@ -418,10 +428,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
 
 			/*Calculate the size of the text*/
-			const font_t * font = style->font;
+			const font_t * font = btn_style->font;
 			point_t txt_size;
 			txt_get_size(&txt_size, ext->map_p[txt_i], font,
-					     style->letter_space, style->line_space,
+			             btn_style->letter_space, btn_style->line_space,
 					     area_get_width(&area_btnm), TXT_FLAG_NONE);
 
 			area_tmp.x1 += (btn_w - txt_size.x) / 2;
@@ -429,7 +439,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			area_tmp.x2 = area_tmp.x1 + txt_size.x;
 			area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-			lv_draw_label(&area_tmp, mask, style, ext->map_p[txt_i], TXT_FLAG_NONE);
+			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], TXT_FLAG_NONE);
 			txt_i ++;
     	}
     }

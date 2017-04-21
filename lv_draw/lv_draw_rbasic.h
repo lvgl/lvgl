@@ -9,9 +9,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "misc/others/color.h"
-#include "../lv_misc/area.h"
-#include "../lv_misc/font.h"
+#include "misc/gfx/color.h"
+#include "misc/gfx/area.h"
+#include "misc/gfx/font.h"
 
 /*********************
  *      DEFINES

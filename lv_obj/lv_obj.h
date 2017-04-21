@@ -9,17 +9,19 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/area.h>
+#include "lv_conf.h"
+#include <misc/gfx/area.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include "misc/mem/dyn_mem.h"
 #include "misc/mem/linked_list.h"
-#include "misc/others/color.h"
+#include "misc/gfx/color.h"
 #include "lv_style.h"
 
 /*********************
  *      DEFINES
  *********************/
+
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES == 0 || LV_VER_RES == 0
 #error "LV: LV_HOR_RES and LV_VER_RES must be greater then 0"

@@ -44,9 +44,10 @@ typedef struct
 {
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * txt;     /*Text of the message box*/
-    lv_obj_t * btnh;    /*Holder of the buttons*/
-    lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Style of the buttons*/
+    lv_obj_t * txt;             /*Text of the message box*/
+    lv_obj_t * btnh;            /*Holder of the buttons*/
+    lv_style_t * style_btn_rel; /*Style of the released buttons*/
+    lv_style_t * style_btn_pr;  /*Style of the pressed buttons*/
 }lv_mbox_ext_t;
 
 /**********************
@@ -71,28 +72,39 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 
 /**
- * Set the text of the message box
- * @param mbox pointer to a message box
- * @param txt a '\0' terminated character string which will be the message box text
+ * A release action which can be assigned to a message box button to close it
+ * @param btn pointer to the released button
+ * @param dispi pointer to the caller display input
+ * @return always lv_action_res_t because the button is deleted with the mesage box
  */
-void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
-void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
+lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+
 /**
  * Add a button to the message box
  * @param mbox pointer to message box object
  * @param btn_txt the text of the button
- * @param rel_action a function which will be called when the button is relesed
+ * @param rel_action a function which will be called when the button is released
  * @return pointer to the created button (lv_btn)
  */
 lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t rel_action);
 
 /**
- * A release action which can be assigned to a message box button to close it
- * @param btn pointer to the released button
- * @param dispi pointer to the caller display input
- * @return always LV_ACTION_RES_INV because the button is deleted with the message box
+ * Set the text of the message box
+ * @param mbox pointer to a message box
+ * @param txt a '\0' terminated character string which will be the message box text
  */
-lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
+
+/**
+ * Set styles of the buttons of a message box in each state
+ * @param mbox pointer to a message box object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
+ */
+void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr);
 
 /**
  * Automatically delete the message box after a given time
@@ -121,6 +133,15 @@ const char * lv_mbox_get_txt(lv_obj_t * mbox);
  * @return pointer to the button's message box
  */
 lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn);
+
+/**
+ * Get the style of the buttons on a message box
+ * @param mbox pointer to a message box object
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
+ */
+lv_style_t * lv_mbox_get_style_btn(lv_obj_t * mbox, lv_btn_state_t state);
+
 
 /**********************
  *      MACROS

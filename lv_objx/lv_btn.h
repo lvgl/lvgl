@@ -119,6 +119,15 @@ void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_t lpr_action);
  */
 void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action);
 
+/**
+ * Set styles of a button is each state
+ * @param btn pointer to button object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
+ */
 void lv_btn_set_styles(lv_obj_t * btn, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
 
 /**
@@ -135,7 +144,14 @@ lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);
  */
 bool lv_btn_get_tgl(lv_obj_t * btn);
 
+/**
+ * Get the style of a button in a given state
+ * @param btn pointer to a button object
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
+ */
 lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
+
 /**********************
  *      MACROS
  **********************/

@@ -8,7 +8,7 @@
  *********************/
 
 #include <lv_conf.h>
-#include <lvgl/lv_misc/area.h>
+#include <misc/gfx/area.h>
 #include <lvgl/lv_obj/lv_dispi.h>
 #include <lvgl/lv_obj/lv_obj.h>
 #include <lvgl/lv_objx/lv_btn.h>
@@ -17,7 +17,7 @@
 #include <lvgl/lv_objx/lv_label.h>
 #include <lvgl/lv_objx/lv_page.h>
 #include <lvgl/lv_objx/lv_ta.h>
-#include <misc/others/color.h>
+#include <misc/gfx/color.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>

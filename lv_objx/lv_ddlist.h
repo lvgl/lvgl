@@ -83,7 +83,6 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
  */
 void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_res_t (*cb)(lv_obj_t *, uint16_t));
 
-
 /**
  * Set the auto size attribute. If enabled the height will reduced to be visible on the parent.
  * In this case the drop down list can be scrolled.
@@ -92,6 +91,11 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_res_t (*cb)(lv_obj_t *, u
  */
 void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size);
 
+/**
+ * Set the style of the rectangle on the selected option
+ * @param ddlist pointer to a drop down list object
+ * @param style pointer the new style of the select rectangle
+ */
 void lv_dlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style);
 
 /**
@@ -110,11 +114,16 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
 
 /**
  * Get the auto size attribute.
- * @param ddlist pointer to a drop down list
+ * @param ddlist pointer to a drop down list object
  * @return true: the auto_size is enabled, false: disabled
  */
 bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size);
 
+/**
+ * Get the style of the rectangle on the selected option
+ * @param ddlist pointer to a drop down list object
+ * @return pointer the style of the select rectangle
+ */
 lv_style_t * lv_dlist_get_style_select(lv_obj_t * ddlist);
 
 /**********************

@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/circ.h>
+#include <misc/gfx/circ.h>
 #include "lv_conf.h"
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "lvgl/lv_misc/text.h"
+#include "misc/gfx/text.h"
 #include "lv_draw.h"
 #include "misc/fs/fsint.h"
 #include "misc/math/math_base.h"
@@ -246,7 +246,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
     pos.y = cords_p->y1;
 
     /*Align the line to middle if enabled*/
-    if(style->txt_align != 0) {
+    if(style->txt_align  == LV_TXT_ALIGN_MID) {
         line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                     font, style->letter_space, flag);
         pos.x += (w - line_length) / 2;
@@ -263,7 +263,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
         cmd_state = CMD_STATE_WAIT;
 
         for(i = line_start; i < line_end; i++) {
-            /*Handle the recolor command*/
+            /*Handle the re-color command*/
             if((flag & TXT_FLAG_RECOLOR) != 0) {
                 if(txt[i] == TXT_RECOLOR_CMD) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
@@ -300,7 +300,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
 
             if(cmd_state == CMD_STATE_IN)  letter_fp(&pos, mask_p, font, txt[i], recolor, style->opa);
             else letter_fp(&pos, mask_p, font, txt[i], style->ccolor, style->opa);
-            pos.x += (font_get_width(font, txt[i]) >> LV_FONT_ANTIALIAS) + style->letter_space;
+            pos.x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
         }
         /*Go to next line*/
         line_start = line_end;
@@ -308,13 +308,13 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
 
         pos.x = cords_p->x1;
         /*Align to middle*/
-        if(style->txt_align != 0) {
+        if(style->txt_align == LV_TXT_ALIGN_MID) {
             line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                      font, style->letter_space, flag);
             pos.x += (w - line_length) / 2;
         }
         /*Go the next line position*/
-        pos.y += font_get_height(font) >> LV_FONT_ANTIALIAS;
+        pos.y += font_get_height(font) >> FONT_ANTIALIAS;
         pos.y += style->line_space;
     }
 }
@@ -1061,17 +1061,17 @@ static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, c
     shadow_style.empty = 1;
     shadow_style.bwidth = swidth;
     shadow_style.radius = style->radius;
-    if(shadow_style.radius == LV_CONT_CIRCLE) {
+    if(shadow_style.radius == LV_DRAW_CIRCLE) {
         shadow_style.radius = MATH_MIN(area_get_width(cords_p), area_get_height(cords_p));
     }
     shadow_style.radius += swidth + 1;
     shadow_style.bcolor = style->scolor;
-    shadow_style.bopa = 100;
+    shadow_style.bopa = style->opa;
 
-    shadow_area.x1 -= swidth;
-    shadow_area.y1 -= swidth;
-    shadow_area.x2 += swidth;
-    shadow_area.y2 += swidth;
+    shadow_area.x1 -= swidth - 1;
+    shadow_area.y1 -= swidth - 1;
+    shadow_area.x2 += swidth - 1;
+    shadow_area.y2 += swidth - 1;
 
     cord_t i;
     shadow_style.opa =  style->opa / (swidth / res);

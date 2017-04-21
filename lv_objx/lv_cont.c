@@ -14,14 +14,14 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <lvgl/lv_objx/lv_cont.h>
+#include "lv_cont.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_draw/lv_draw_vbasic.h"
-#include "../lv_misc/area.h"
+#include "misc/gfx/area.h"
 
 #include "misc/mem/dyn_mem.h"
 #include "misc/mem/linked_list.h"
-#include "misc/others/color.h"
+#include "misc/gfx/color.h"
 #include "misc/math/math_base.h"
 
 /*********************
@@ -77,8 +77,8 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_alloc_ext(new_rect, sizeof(lv_cont_ext_t));
     lv_cont_ext_t * ext = lv_obj_get_ext(new_rect);
     dm_assert(ext);
-    ext->hpad_en = 0;
-    ext->vpad_en = 0;
+    ext->hfit_en = 0;
+    ext->vfit_en = 0;
     ext->layout = LV_CONT_LAYOUT_OFF;
 
     lv_obj_set_signal_f(new_rect, lv_cont_signal);
@@ -90,8 +90,8 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy an existing object*/
     else {
     	lv_cont_ext_t * copy_ext = lv_obj_get_ext(copy);
-    	ext->hpad_en = copy_ext->hpad_en;
-    	ext->vpad_en = copy_ext->vpad_en;
+    	ext->hfit_en = copy_ext->hfit_en;
+    	ext->vfit_en = copy_ext->vfit_en;
     	ext->layout = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
@@ -118,9 +118,6 @@ bool lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-
-    	lv_style_t * style = lv_obj_get_style(cont);
-
     	switch(sign) {
     	case LV_SIGNAL_STYLE_CHG: /*Recalculate the padding if the style changed*/
         	lv_cont_refr_layout(cont);
@@ -175,8 +172,8 @@ void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
 {
 	lv_obj_inv(cont);
 	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
-	ext->hpad_en = hor_en == false ? 0 : 1;
-	ext->vpad_en = ver_en == false ? 0 : 1;
+	ext->hfit_en = hor_en == false ? 0 : 1;
+	ext->vfit_en = ver_en == false ? 0 : 1;
 
 	/*Send a signal to set a new size*/
 	cont->signal_f(cont, LV_SIGNAL_CORD_CHG, cont);
@@ -205,7 +202,7 @@ lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont)
 bool lv_cont_get_hfit(lv_obj_t * cont)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
-	return ext->hpad_en == 0 ? false : true;
+	return ext->hfit_en == 0 ? false : true;
 }
 
 /**
@@ -216,7 +213,7 @@ bool lv_cont_get_hfit(lv_obj_t * cont)
 bool lv_cont_get_vfit(lv_obj_t * cont)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
-	return ext->vpad_en == 0 ? false : true;
+	return ext->vfit_en == 0 ? false : true;
 }
 
 
@@ -549,8 +546,8 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
 
-	if(ext->hpad_en == 0 &&
-	   ext->vpad_en == 0) {
+	if(ext->hfit_en == 0 &&
+	   ext->vfit_en == 0) {
 		return;
 	}
 
@@ -565,10 +562,10 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 	lv_obj_get_cords(cont, &ori);
 	lv_obj_get_cords(cont, &new_cords);
 
-	new_cords.x1 = LV_CORD_MAX;
-	new_cords.y1 = LV_CORD_MAX;
-	new_cords.x2 = LV_CORD_MIN;
-	new_cords.y2 = LV_CORD_MIN;
+	new_cords.x1 = CORD_MAX;
+	new_cords.y1 = CORD_MAX;
+	new_cords.x2 = CORD_MIN;
+	new_cords.y2 = CORD_MIN;
 
     LL_READ(cont->child_ll, i) {
 		if(lv_obj_get_hidden(i) != false) continue;
@@ -579,15 +576,15 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
     }
 
     /*If the value is not the init value then the page has >=1 child.*/
-    if(new_cords.x1 != LV_CORD_MAX) {
-    	if(ext->hpad_en != 0) {
+    if(new_cords.x1 != CORD_MAX) {
+    	if(ext->hfit_en != 0) {
 			new_cords.x1 -= hpad;
 			new_cords.x2 += hpad;
     	} else {
     		new_cords.x1 = cont->cords.x1;
     		new_cords.x2 = cont->cords.x2;
     	}
-    	if(ext->vpad_en != 0) {
+    	if(ext->vfit_en != 0) {
 			new_cords.y1 -= vpad;
 			new_cords.y2 += vpad;
     	} else {

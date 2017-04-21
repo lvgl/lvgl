@@ -79,7 +79,6 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_click(new_bar, false);
     	lv_obj_set_size(new_bar, LV_BAR_DEF_WIDTH, LV_BAR_DEF_HEIGHT);
         lv_obj_set_style(new_bar, lv_style_get(LV_STYLE_PRETTY, NULL));
-
     	lv_bar_set_value(new_bar, ext->act_value);
     } else {
     	lv_bar_ext_t * ext_copy = lv_obj_get_ext(copy);
@@ -106,11 +105,15 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_cont_signal(bar, sign, param);
+    valid = lv_obj_signal(bar, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
+        if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+            lv_style_t * style_indic = lv_bar_get_style_indic(bar);
+            if(style_indic->swidth > bar->ext_size) bar->ext_size = style_indic->swidth;
+        }
 
     }
 
@@ -131,12 +134,11 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
 	ext->act_value = value > ext->max_value ? ext->max_value : value;
     ext->act_value = ext->act_value < ext->min_value ? ext->min_value : ext->act_value;
-
 	lv_obj_inv(bar);
 }
 
 /**
- * Set minimum and the maximum values of a  bar
+ * Set minimum and the maximum values of a bar
  * @param bar pointer to he bar object
  * @param min minimum value
  * @param max maximum value
@@ -155,7 +157,7 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 
 /**
  * Set the style of bar indicator
- * @param bar pointer to a bar obeject
+ * @param bar pointer to a bar object
  * @param style pointer to a style
  */
 void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style)
@@ -163,6 +165,8 @@ void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style)
     lv_bar_ext_t * ext = lv_obj_get_ext(bar);
 
     ext->style_indic = style;
+
+    bar->signal_f(bar, LV_SIGNAL_REFR_EXT_SIZE, NULL);
 
     lv_obj_inv(bar);
 }
@@ -180,6 +184,28 @@ int16_t lv_bar_get_value(lv_obj_t * bar)
 {
 	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
 	return ext->act_value;
+}
+
+/**
+ * Get the minimum value of a bar
+ * @param bar pointer to a bar object
+ * @return the minimum value of the bar
+ */
+int16_t lv_bar_get_min_value(lv_obj_t * bar)
+{
+    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    return ext->min_value;
+}
+
+/**
+ * Get the maximum value of a bar
+ * @param bar pointer to a bar object
+ * @return the maximum value of the bar
+ */
+int16_t lv_bar_get_max_value(lv_obj_t * bar)
+{
+    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    return ext->max_value;
 }
 
 /**
@@ -213,29 +239,33 @@ lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar)
 static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-    	/*Return false if the object is not covers the mask_p area*/
-    	return  ancestor_design_f(bar, mask, mode);
+    	/*Return false if the object is not covers the mask area*/
+    	return  ancestor_design_f(bar, mask, mode);;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		ancestor_design_f(bar, mask, mode);
+        ancestor_design_f(bar, mask, mode);
 
 		lv_bar_ext_t * ext = lv_obj_get_ext(bar);
-		area_t bar_area;
-		area_cpy(&bar_area, &bar->cords);
+        lv_style_t * style_indic = lv_bar_get_style_indic(bar);
+		area_t indic_area;
+		area_cpy(&indic_area, &bar->cords);
+		indic_area.x1 += style_indic->hpad;
+		indic_area.x2 -= style_indic->hpad;
+		indic_area.y1 += style_indic->vpad;
+		indic_area.y2 -= style_indic->vpad;
 
-		cord_t w = lv_obj_get_width(bar);
-        cord_t h = lv_obj_get_height(bar);
+		cord_t w = area_get_width(&indic_area);
+        cord_t h = area_get_height(&indic_area);
 
 		if(w >= h) {
-		    bar_area.x2 = (int32_t) ((int32_t)w * ext->act_value) / (ext->max_value - ext->min_value);
-            bar_area.x2 += bar_area.x1;
+		    indic_area.x2 = (int32_t) ((int32_t)w * ext->act_value) / (ext->max_value - ext->min_value);
+            indic_area.x2 += indic_area.x1;
 		} else {
-		    bar_area.y1 = (int32_t) ((int32_t)h * ext->act_value) / (ext->max_value - ext->min_value);
-            bar_area.y1 = bar_area.y2 - bar_area.y1;
+		    indic_area.y1 = (int32_t) ((int32_t)h * ext->act_value) / (ext->max_value - ext->min_value);
+            indic_area.y1 = indic_area.y2 - indic_area.y1;
 		}
 
-		/*Draw the main bar*/
-		lv_style_t * style_indic = lv_bar_get_style_indic(bar);
-        lv_draw_rect(&bar_area, mask, style_indic);
+		/*Draw the indicator*/
+        lv_draw_rect(&indic_area, mask, style_indic);
     }
     return true;
 }

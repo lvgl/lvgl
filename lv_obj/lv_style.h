@@ -10,23 +10,29 @@
  *      INCLUDES
  *********************/
 #include <stdbool.h>
-#include "misc/others/color.h"
-#include "../lv_misc/area.h"
-#include "../lv_misc/font.h"
+#include "misc/gfx/color.h"
+#include "misc/gfx/area.h"
+#include "misc/gfx/font.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_DRAW_CIRCLE      (CORD_MAX)    /*A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef enum {
+    LV_TXT_ALIGN_LEFT = 0,
+    LV_TXT_ALIGN_MID,
+}lv_txt_align_t;
+
 typedef struct
 {
     /*Object level styles*/
     color_t ccolor;     /*Content color (e.g. text or image re-color )*/
     opa_t opa;          /*Opacity of the object*/
-    uint8_t opa_prop:1;   /*Opacity is proportional to the parent*/
     uint8_t empty :1;   /*Transparent background (border drawn)*/
     color_t mcolor;     /*Main color of background*/
     color_t gcolor;     /*Gradient color of background*/
@@ -320,7 +326,7 @@ void lv_style_clear_line_space(lv_style_t * style);
  * @param style pointer to style
  * @param align TODO
  */
-void lv_style_set_txt_align(lv_style_t * style, uint8_t align);
+void lv_style_set_txt_align(lv_style_t * style, lv_txt_align_t align);
 
 /**
  * Clear the text align of a style (it will be inherited from the parent style)

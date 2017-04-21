@@ -13,10 +13,10 @@
 #include "../lv_draw/lv_draw_vbasic.h"
 #include "../lv_draw/lv_draw_rbasic.h"
 #include "../lv_draw/lv_draw.h"
-#include <lvgl/lv_misc/area.h>
+#include <misc/gfx/area.h>
 #include <misc/math/math_base.h>
 #include <misc/mem/dyn_mem.h>
-#include <misc/others/color.h>
+#include <misc/gfx/color.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -76,11 +76,12 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
+        lv_line_ext_t * copy_ext = lv_obj_get_ext(copy);
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
     	lv_line_set_y_inv(new_line,lv_line_get_y_inv(copy));
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
     	lv_line_set_upscale(new_line,lv_line_get_upscale(copy));
-    	lv_line_set_points(new_line, ext->point_array, ext->point_num);
+    	lv_line_set_points(new_line, copy_ext->point_array, copy_ext->point_num);
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_line);
     }
@@ -121,7 +122,7 @@ bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
  * Set an array of points. The line object will connect these points.
  * @param line pointer to a line object
  * @param point_a an array of points. Only the address is saved,
- * so the array can be a local variable which will be destroyed
+ * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
 void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num)
@@ -137,8 +138,8 @@ void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point
 
 	if(point_num > 0 && ext->auto_size != 0) {
 		uint16_t i;
-		cord_t xmax = LV_CORD_MIN;
-		cord_t ymax = LV_CORD_MIN;
+		cord_t xmax = CORD_MIN;
+		cord_t ymax = CORD_MIN;
 		for(i = 0; i < point_num; i++) {
 			xmax = MATH_MAX(point_a[i].x * us, xmax);
 			ymax = MATH_MAX(point_a[i].y * us, ymax);

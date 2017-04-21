@@ -39,11 +39,11 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * label;       /*Label of the text area*/
-    cord_t cursor_valid_x;  /*Used when stepping up/down in text area. Handled by the library*/
-    uint16_t cursor_pos;    /*The current cursor position (0: before 1. letter, 1: before 2. letter etc.)*/
-    uint8_t cur_hide :1;    /*Indicates that the cursor is visible now or not*/
-    uint8_t cursor_show :1; /*Flag to indicate the cursor is now being shown or not (Handled by the library)*/
+    lv_obj_t * label;           /*Label of the text area*/
+    cord_t cursor_valid_x;      /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
+    uint16_t cursor_pos;        /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
+    uint8_t cursor_show :1;     /*Show or hide cursor */
+    uint8_t cursor_state :1;    /*Indicates that the cursor is visible now or not (Handled by the library)*/
 }lv_ta_ext_t;
 
 /**********************
@@ -128,6 +128,13 @@ void lv_ta_cursor_down(lv_obj_t * ta);
 void lv_ta_cursor_up(lv_obj_t * ta);
 
 /**
+ * Get the current cursor visibility.
+ * @param ta pointer to a text area object
+ * @return show true: show the cursor and blink it, false: hide cursor
+ */
+void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
+
+/**
  * Get the text of the i the text area
  * @param ta obj pointer to a text area object
  * @return pointer to the text
@@ -140,6 +147,14 @@ const char * lv_ta_get_txt(lv_obj_t * ta);
  * @return the cursor position
  */
 uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta);
+
+/**
+ * Get the current cursor visibility.
+ * @param ta pointer to a text area object
+ * @return true: the cursor is drawn, false: the cursor is hidden
+ */
+bool lv_ta_get_cursor_show(lv_obj_t * ta);
+
 
 
 /**********************

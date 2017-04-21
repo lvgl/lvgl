@@ -12,7 +12,7 @@
 #include <lvgl/lv_objx/lv_cont.h>
 #include "lvgl/lv_objx/lv_label.h"
 
-#include "lvgl/lv_misc/anim.h"
+#include "misc/gfx/anim.h"
 #include <stdio.h>
 
 /*********************

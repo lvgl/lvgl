@@ -16,7 +16,7 @@
 #include "misc/fs/ufs/ufs.h"
 
 #if LV_IMG_ENABLE_SYMBOLS != 0
-#include "../lv_misc/text.h"
+#include "misc/gfx/text.h"
 #endif
 
 /*********************
@@ -79,10 +79,13 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
 		 * and must be screen sized*/
 		if(par != NULL) ext->auto_size = 1;
 		else ext->auto_size = 0;
-	    lv_obj_set_style(new_img, lv_style_get(LV_STYLE_PLAIN, NULL));
+		if(par != NULL) lv_obj_set_style(new_img, NULL);    /*Inherit the style  by default*/
+		else lv_obj_set_style(new_img, lv_style_get(LV_STYLE_PLAIN, NULL)); /*Set style for screens*/
     } else {
-    	ext->auto_size = lv_img_get_auto_size(copy);
-    	lv_img_set_file(new_img, ext->fn);
+        lv_img_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	ext->auto_size = copy_ext->auto_size;
+        ext->upscale = copy_ext->upscale;
+    	lv_img_set_file(new_img, copy_ext->fn);
 
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_img);
@@ -107,14 +110,15 @@ bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-        lv_img_ext_t * img_p = lv_obj_get_ext(img);
-        switch(sign) {
-            /*TODO set file again if style changed with symbols*/
-        	case LV_SIGNAL_CLEANUP:
-        		dm_free(img_p->fn);
-        		break;
-			default:
-				break;
+        lv_img_ext_t * ext = lv_obj_get_ext(img);
+        if(sign == LV_SIGNAL_CLEANUP) {
+            dm_free(ext->fn);
+        }
+        else if(sign == LV_SIGNAL_STYLE_CHG) {
+            /*Refresh the file name to refresh the symbol text size*/
+            if(lv_img_is_symbol(ext->fn) != false) {
+                lv_img_set_file(img, ext->fn);
+            }
         }
     }
     
@@ -186,7 +190,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 #if LV_IMG_ENABLE_SYMBOLS
         lv_style_t * style = lv_obj_get_style(img);
         point_t size;
-        txt_get_size(&size, fn, style->font, 0, 0, LV_CORD_MAX, TXT_FLAG_NONE);
+        txt_get_size(&size, fn, style->font, style->letter_space, style->line_space, CORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
         ext->transp = 0;
@@ -200,7 +204,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	}
 
 	if(fn != NULL) {
-		ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
+	    ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
 		strcpy(ext->fn, fn);
 	} else {
 		ext->fn = NULL;
@@ -346,6 +350,8 @@ static bool lv_img_is_symbol(const char * txt)
 #if LV_IMG_ENABLE_SYMBOLS == 0
     return false;
 #endif
+
+    if(txt == NULL) return false;
 
     /* if txt begins with an upper case letter then it refers to a driver
      * so it is a file name*/
