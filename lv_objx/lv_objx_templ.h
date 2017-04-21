@@ -35,19 +35,6 @@ typedef struct
     /*New data for this type */
 }lv_templ_ext_t;
 
-/*Style of template*/
-typedef struct
-{
-	/*Style of ancestor*/
-	/*New style element for this type */
-}lv_templs_t;
-
-/*Built-in styles of template*/
-typedef enum
-{
-	LV_TEMPLS_DEF,
-}lv_templs_builtin_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -69,13 +56,6 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy);
  */
 bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param);
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_templs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_templs_t style
- */
-lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy);
 
 /**********************
  *      MACROS

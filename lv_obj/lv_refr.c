@@ -406,7 +406,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
         lv_style_t * style = lv_obj_get_style(obj);
         if(style->opa != OPA_TRANSP) {
             obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
-           /* tick_wait_ms(100); */ /*DEBUG: Wait after every object draw to see the order of drawing*/
+            //tick_wait_ms(100);  /*DEBUG: Wait after every object draw to see the order of drawing*/
         }
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/

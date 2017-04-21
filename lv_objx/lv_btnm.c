@@ -469,6 +469,7 @@ static void lv_btnm_create_btns(lv_obj_t * btnm, const char ** map)
 
 	if(ext->btn_areas != NULL) {
 		dm_free(ext->btn_areas);
+		ext->btn_areas = NULL;
 	}
 
 	ext->btn_areas = dm_alloc(sizeof(area_t) * btn_cnt);

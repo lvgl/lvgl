@@ -170,6 +170,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
             header.w = lv_obj_get_width(img);
             header.h = lv_obj_get_height(img);
             header.transp = 0;
+            header.cd = 0;
         }
 
         fs_close(&file);
@@ -193,7 +194,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
         txt_get_size(&size, fn, style->font, style->letter_space, style->line_space, CORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
-        ext->transp = 0;
+        ext->transp = 1;    /*Symbols always have transparent parts*/
 #else
         /*Never goes here, just to be sure handle this */
         ext->w = lv_obj_get_width(img);
@@ -299,12 +300,10 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
     lv_img_ext_t * ext = lv_obj_get_ext(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {
-        if(ext->transp == 0) {
-        	bool cover;
-        	cover = area_is_in(mask, &img->cords);
-        	return cover;
-        }
-        else return false;
+        bool cover = false;
+        if(ext->transp == 0) cover = area_is_in(mask, &img->cords);
+        return cover;
+
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
 		area_t cords;

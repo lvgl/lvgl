@@ -67,15 +67,15 @@ void lv_style_init (void)
     lv_style_set_radius(&lv_style_scr, 0);
     lv_style_set_bwidth(&lv_style_scr, 0);
     lv_style_set_swidth(&lv_style_scr, 0);
-    lv_style_set_vpad(&lv_style_scr, LV_DPI / 8);
-    lv_style_set_hpad(&lv_style_scr, LV_DPI / 8);
-    lv_style_set_opad(&lv_style_scr, LV_DPI / 8);
+    lv_style_set_vpad(&lv_style_scr, LV_DPI / 12);
+    lv_style_set_hpad(&lv_style_scr, LV_DPI / 12);
+    lv_style_set_opad(&lv_style_scr, LV_DPI / 12);
     lv_style_set_bopa(&lv_style_scr, OPA_COVER);
     lv_style_set_empty(&lv_style_scr, false);
 
     lv_style_set_font(&lv_style_scr, font_get(FONT_DEFAULT));
     lv_style_set_letter_space(&lv_style_scr, 1 * LV_DOWNSCALE);
-    lv_style_set_line_space(&lv_style_scr, 2 * LV_DOWNSCALE);
+    lv_style_set_line_space(&lv_style_scr, 3 * LV_DOWNSCALE);
     lv_style_set_txt_align(&lv_style_scr, 0);
 
     lv_style_set_img_recolor(&lv_style_scr, OPA_TRANSP);
@@ -98,14 +98,14 @@ void lv_style_init (void)
     lv_style_set_gcolor(&lv_style_pretty, COLOR_SILVER);
     lv_style_set_bcolor(&lv_style_pretty, COLOR_MAKE(0x40, 0x40, 0x40));
     lv_style_set_radius(&lv_style_pretty, LV_DPI / 10);
-    lv_style_set_bwidth(&lv_style_pretty, LV_DPI / 30 >= 1 ? LV_DPI / 30  : 1);
+    lv_style_set_bwidth(&lv_style_pretty, LV_DPI / 40 >= 1 ? LV_DPI / 40  : 1);
     lv_style_set_bopa(&lv_style_pretty, OPA_50);
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
     lv_style_set_ccolor(&lv_style_pretty_color, COLOR_MAKE(0xe0, 0xe0, 0xe0));
+    lv_style_set_mcolor(&lv_style_pretty_color, COLOR_MAKE(0x6b, 0x9a, 0xc7));
     lv_style_set_gcolor(&lv_style_pretty_color, COLOR_MAKE(0x2b, 0x59, 0x8b));
-    lv_style_set_mcolor(&lv_style_pretty_color, COLOR_MAKE(0x90, 0xb3, 0xd5));
     lv_style_set_bcolor(&lv_style_pretty_color, COLOR_MAKE(0x15, 0x2c, 0x42));
     lv_style_set_scolor(&lv_style_pretty_color, COLOR_MAKE(0x6a, 0x8f, 0xb4));
     lv_style_set_swidth(&lv_style_pretty_color, 0);
@@ -126,14 +126,14 @@ void lv_style_init (void)
     lv_style_set_gcolor(&lv_style_btn_rel, COLOR_MAKE(0x19, 0x3a, 0x5d));
     lv_style_set_bcolor(&lv_style_btn_rel, COLOR_MAKE(0x0b, 0x19, 0x28));
     lv_style_set_ccolor(&lv_style_btn_rel, COLOR_MAKE(0xff, 0xff, 0xff));
-    lv_style_set_bwidth(&lv_style_btn_rel, LV_DPI / 30 >= 1 ? LV_DPI / 30  : 1);
+    lv_style_set_bwidth(&lv_style_btn_rel, LV_DPI / 40 >= 1 ? LV_DPI / 40  : 1);
     lv_style_set_radius(&lv_style_btn_rel, LV_DPI / 10);
     lv_style_set_bopa(&lv_style_btn_rel, OPA_70);
     lv_style_set_scolor(&lv_style_btn_rel, COLOR_GRAY);
     lv_style_set_swidth(&lv_style_btn_rel, 0);
-    lv_style_set_hpad(&lv_style_btn_rel, LV_DPI / 3);
-    lv_style_set_vpad(&lv_style_btn_rel, LV_DPI / 4);
-    lv_style_set_opad(&lv_style_btn_rel, LV_DPI / 6);
+    lv_style_set_hpad(&lv_style_btn_rel, LV_DPI / 4);
+    lv_style_set_vpad(&lv_style_btn_rel, LV_DPI / 6);
+    lv_style_set_opad(&lv_style_btn_rel, LV_DPI / 10);
 
     /*Button pressed style*/
     memcpy(&lv_style_btn_pr, &lv_style_btn_rel, sizeof(lv_style_t));
@@ -143,21 +143,21 @@ void lv_style_init (void)
 
     /*Button toggle released style*/
     memcpy(&lv_style_btn_trel, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_set_gcolor(&lv_style_btn_trel, COLOR_MAKE(0x37, 0x62, 0x90));
     lv_style_set_mcolor(&lv_style_btn_trel, COLOR_MAKE(0x0a, 0x11, 0x22));
+    lv_style_set_gcolor(&lv_style_btn_trel, COLOR_MAKE(0x37, 0x62, 0x90));
     lv_style_set_bcolor(&lv_style_btn_trel, COLOR_MAKE(0x01, 0x07, 0x0d));
     lv_style_set_ccolor(&lv_style_btn_trel, COLOR_MAKE(0xc8, 0xdd, 0xf4));
 
     /*Button toggle pressed style*/
     memcpy(&lv_style_btn_tpr, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_set_gcolor(&lv_style_btn_tpr, COLOR_MAKE(0x2b, 0x4c, 0x70));
     lv_style_set_mcolor(&lv_style_btn_tpr, COLOR_MAKE(0x02, 0x14, 0x27));
+    lv_style_set_gcolor(&lv_style_btn_tpr, COLOR_MAKE(0x2b, 0x4c, 0x70));
     lv_style_set_ccolor(&lv_style_btn_tpr, COLOR_MAKE(0xa4, 0xb5, 0xc6));
 
     /*Button inactive style*/
     memcpy(&lv_style_btn_ina, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_set_gcolor(&lv_style_btn_ina, COLOR_MAKE(0xd8, 0xd8, 0xd8));
     lv_style_set_mcolor(&lv_style_btn_ina, COLOR_MAKE(0xd8, 0xd8, 0xd8));
+    lv_style_set_gcolor(&lv_style_btn_ina, COLOR_MAKE(0xd8, 0xd8, 0xd8));
     lv_style_set_bcolor(&lv_style_btn_ina, COLOR_MAKE(0x90, 0x90, 0x90));
     lv_style_set_ccolor(&lv_style_btn_ina, COLOR_MAKE(0x70, 0x70, 0x70));
 }

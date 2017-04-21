@@ -32,7 +32,7 @@
 
 
 #include "../lv_obj/lv_obj.h"
-#include <lvgl/lv_objx/lv_cont.h>
+#include "lv_lmeter.h"
 #include "lv_label.h"
 #include "lv_line.h"
 
@@ -48,17 +48,13 @@
 /*Data of gauge*/
 typedef struct
 {
-    /*No inherited ext*/ /*Ext. of ancestor*/
+    lv_lmeter_ext_t lmeter;     /*Ext. of ancestor*/
     /*New data for this type */
-    int16_t min;                /*Minimum value of the scale*/
-    int16_t max;                /*Maximum value of the scale*/
-    int16_t * values;           /*Array of the set values (for needles) */
-    lv_style_t * style_critical;/*Fade to this style nearer to the critical value*/
-    color_t * needle_color;     /*A color of the needles (color_t my_colors[needle_num])*/
-    uint16_t scale_angle;       /*Angle of the scale in deg. (e.g. 220)*/
-    uint8_t scale_label_num;    /*Number of scale labels (~6)*/
-    uint8_t needle_num;         /*Number of needles*/
-    uint8_t low_critical:1;     /*0: the higher value is more critical, 1: the lower value is more critical*/
+    int16_t * values;               /*Array of the set values (for needles) */
+    lv_style_t * style_critical;    /*Fade to this style nearer to the critical value*/
+    color_t * needle_colors;        /*Color of the needles (color_t my_colors[needle_num])*/
+    uint8_t needle_num;             /*Number of needles*/
+    uint8_t low_critical:1;         /*0: the higher value is more critical, 1: the lower value is more critical*/
 }lv_gauge_ext_t;
 
 /**********************
@@ -83,19 +79,12 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
 
 /**
- * Set the number of needles (should be  <= LV_GAUGE_MAX_NEEDLE)
+ * Set the number of needles
  * @param gauge pointer to gauge object
  * @param num number of needles
+ * @param colors an array of colors for needles (with 'num' elements)
  */
 void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num, color_t * colors);
-
-/**
- * Set the range of a gauge
- * @param gauge pointer to gauge object
- * @param min min value
- * @param max max value
- */
-void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
 
 /**
  * Set the value of a needle
@@ -106,21 +95,19 @@ void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
 void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value);
 
 /**
- * Set text on a gauge
- * @param gauge pinter to a gauge object
- * @param txt a printf like format string
- *            with 1 place for a number (e.g. "Value: %d");
- */
-void lv_gauge_set_text(lv_obj_t * gauge, const char * txt);
-
-/**
  * Set which value is more critical (lower or higher)
  * @param gauge pointer to a gauge object
  * @param low false: higher / true: lower value is more critical
  */
 void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low);
 
-void lv_gauge_vet_style_critical(lv_obj_t * gauge, lv_style_t * style);
+/**
+ * Set the critical style of the gauge
+ * @param gauge pointer to a gauge object
+ * @param style pointer to the new critical style
+ */
+void lv_gauge_set_style_critical(lv_obj_t * gauge, lv_style_t * style);
+
 /**
  * Get the number of needles on a gauge
  * @param gauge pointer to gauge
@@ -137,20 +124,18 @@ uint8_t lv_gauge_get_needle_num(lv_obj_t * gauge);
 int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
 
 /**
- * Get the text of a gauge
- * @param gauge pointer to gauge
- * @return the set text. (not with the current value)
- */
-const char * lv_gauge_get_text(lv_obj_t * gauge);
-
-/**
  * Get which value is more critical (lower or higher)
  * @param gauge pointer to a gauge object
  * @param low false: higher / true: lower value is more critical
  */
 bool lv_gauge_get_low_critical(lv_obj_t * gauge);
 
-lv_style_t * lv_gauge_get_style_crit(lv_obj_t * gauge);
+/**
+ * Get the critical style of the gauge
+ * @param gauge pointer to a gauge object
+ * @return pointer to the critical style
+ */
+lv_style_t * lv_gauge_get_style_critical(lv_obj_t * gauge);
 
 /**********************
  *      MACROS

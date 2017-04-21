@@ -41,33 +41,33 @@ typedef struct
 {
     /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
     /*New data for this type */
-    char* fn;           /*Image file name. E.g. "U:/my_image"*/
-    cord_t w;           /*Width of the image (doubled when upscaled)*/
-    cord_t h;           /*Height of the image (doubled when upscaled)*/
-    uint8_t auto_size :1;     /*1: automatically set the object size to the image size*/
-    uint8_t upscale   :1;     /*1: upscale to double size with antialaissing*/
-    uint8_t transp    :1;     /*Transp. bit in the image header (Handled by the library)*/
+    char* fn;                   /*Image file name. E.g. "U:/my_image"*/
+    cord_t w;                   /*Width of the image (doubled when upscaled) (Handled by the library)*/
+    cord_t h;                   /*Height of the image (doubled when upscaled) (Handled by the library)*/
+    uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
+    uint8_t upscale   :1;       /*1: upscale to double size with antialaissing*/
+    uint8_t transp    :1;       /*Transp. bit in the image header (Handled by the library)*/
 }lv_img_ext_t;
 
 /* Image header it is compatible with
  * the result image converter utility*/
 typedef struct
 {
-    uint16_t w;         /*Width of the image map*/
-    uint16_t h;         /*Height of the image map*/
-    uint16_t cd;        /*Color depth (8/16 or 24)*/
-    uint16_t transp :1; /*1: Do not draw LV_IMG_TRANSP_COLOR pixels*/
+    uint32_t w:12;        /*Width of the image map*/
+    uint32_t h:12;        /*Height of the image map*/
+    uint32_t transp:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
+    uint32_t cd:3;        /*Color depth (0: reserved, 1: 8 bit, 2: 16 bit or 3: 24 bit, 4-7: reserved)*/
+    uint32_t res :4;      /*Reserved*/
 }lv_img_raw_header_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Create an image objects
  * @param par pointer to an object, it will be the parent of the new button
- * @param copy pointer to a rectangle object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a image object, if not NULL then the new object will be copied from it
  * @return pointer to the created image
  */
 lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
@@ -105,6 +105,7 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en);
 
 /**
  * Enable the upscaling with LV_DOWNSCALE.
+ * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
  * @param en true: upscale enable, false: upscale disable
  */
@@ -116,7 +117,6 @@ void lv_img_set_upscale(lv_obj_t * img, bool en);
  * @return true: auto size is enabled, false: auto size is disabled
  */
 bool lv_img_get_auto_size(lv_obj_t * img);
-
 
 /**
  * Get the upscale enable attribute

@@ -171,6 +171,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     uint32_t len = strlen(text) + 1;
     if(ext->txt != NULL && ext->static_txt == 0) {
         dm_free(ext->txt);
+        ext->txt = NULL;
     }
     ext->txt = dm_alloc(len);
     strcpy(ext->txt, text);
@@ -200,6 +201,7 @@ void lv_label_set_text_array(lv_obj_t * label, const char * array, uint16_t size
     /*Allocate space for the new text*/
     if(ext->txt != NULL && ext->static_txt == 0) {
         dm_free(ext->txt);
+        ext->txt = NULL;
     }
     ext->txt = dm_alloc(size + 1);
     memcpy(ext->txt, array, size);
@@ -220,6 +222,7 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text)
     lv_label_ext_t * ext = lv_obj_get_ext(label);
     if(ext->static_txt == 0 && ext->txt != NULL) {
         dm_free(ext->txt);
+        ext->txt = NULL;
     }
 
     if(text != NULL) {

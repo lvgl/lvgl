@@ -1049,7 +1049,7 @@ static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, c
 {
     cord_t swidth = style->swidth;
     if(swidth == 0) return;
-    uint8_t res = LV_DOWNSCALE * 2;
+    uint8_t res = LV_DOWNSCALE * 1;
     if(swidth < res) return;
 
     area_t shadow_area;

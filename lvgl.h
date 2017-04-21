@@ -47,6 +47,7 @@
 #include "lv_objx/lv_win.h"
 #include "lv_objx/lv_mbox.h"
 #include "lv_objx/lv_gauge.h"
+#include "lv_objx/lv_lmeter.h"
 
 #include "lv_app/lv_app.h"
 
