@@ -8,7 +8,7 @@
  *********************/
 #include "lv_conf.h"
 
-#if USE_LV_RECT != 0
+#if USE_LV_CONT != 0
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -19,8 +19,6 @@
 #include "../lv_draw/lv_draw_vbasic.h"
 #include "misc/gfx/area.h"
 
-#include "misc/mem/dyn_mem.h"
-#include "misc/mem/linked_list.h"
 #include "misc/gfx/color.h"
 #include "misc/math/math_base.h"
 

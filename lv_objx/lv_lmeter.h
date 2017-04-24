@@ -3,13 +3,6 @@
  * 
  */
 
-
-/*Search an replace: line meter -> object normal name with lower case (e.g. button, label etc.)
- * 					 lmeter -> object short name with lower case(e.g. btn, label etc)
- *                   LMETER -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 #ifndef LV_LMETER_H
 #define LV_LMETER_H
 
@@ -17,7 +10,18 @@
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
+#include "misc_conf.h"
 #if USE_LV_LMETER != 0
+
+/*Testing of dependencies*/
+#if USE_LV_BAR == 0
+#error "lv_lmeter: lv_bar is required. Enable it in lv_conf.h (USE_LV_BAR  1) "
+#endif
+
+#if USE_TRIGO == 0
+#error "lv_lmeter: trigo is required. Enable it in misc_conf.h (USE_TRIGO  1) "
+#endif
+
 
 #include "../lv_obj/lv_obj.h"
 #include "lv_bar.h"

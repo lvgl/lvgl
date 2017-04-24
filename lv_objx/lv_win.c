@@ -65,7 +65,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     ext->style_header = lv_style_get(LV_STYLE_PLAIN_COLOR, NULL);
     ext->style_cbtn_rel = lv_style_get(LV_STYLE_BTN_REL, NULL);
     ext->style_cbtn_pr = lv_style_get(LV_STYLE_BTN_PR, NULL);
-    ext->cbtn_size = (3 * LV_DPI) / 4;
+    ext->cbtn_size = ( LV_DPI) / 2;
 
     /*Init the new window object*/
     if(copy == NULL) {
@@ -410,7 +410,7 @@ static void lv_win_realign(lv_obj_t * win)
 	if(ext->page == NULL || ext->btnh == NULL || ext->header == NULL || ext->title == NULL) return;
 
     lv_obj_t * cbtn;
-	/*Refresh the style of all control buttons*/
+	/*Refresh the size of all control buttons*/
 	cbtn = lv_obj_get_child(ext->btnh, NULL);
 	while(cbtn != NULL) {
 		lv_obj_set_size(cbtn, ext->cbtn_size, ext->cbtn_size);

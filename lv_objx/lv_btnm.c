@@ -10,8 +10,8 @@
 #if USE_LV_BTNM != 0
 
 #include "lv_btnm.h"
-#include "../lv_draw/lv_draw.h"
 #include "misc/gfx/text.h"
+#include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
 
 /*********************
@@ -26,7 +26,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
 static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_t mode);
 static uint8_t lv_btnm_get_width_unit(const char * btn_str);
 static uint16_t lv_btnm_get_btn_from_point(lv_obj_t * btnm, point_t * p);

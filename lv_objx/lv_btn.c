@@ -7,16 +7,16 @@
  *      INCLUDES
  *********************/
 
-#include <misc/gfx/area.h>
-#include <lvgl/lv_obj/lv_obj.h>
-#include <misc/gfx/color.h>
-#include <stdbool.h>
-
+#include "lv_conf.h"
 #if USE_LV_BTN != 0
 
-#include <string.h>
-#include "lv_btn.h"
+#include "lvgl/lv_obj/lv_obj.h"
+#include "misc/gfx/area.h"
+#include "misc/gfx/color.h"
 #include "../lv_draw/lv_draw.h"
+#include "lv_btn.h"
+#include <stdbool.h>
+#include <string.h>
 
 /*********************
  *      DEFINES

@@ -119,6 +119,8 @@ const lv_app_dsc_t * lv_app_sysmon_init(void)
     cpu_bars.font = font_get(LV_APP_FONT_MEDIUM);
     cpu_bars.line_space = 0;
     cpu_bars.txt_align = 1;
+    cpu_bars.hpad = 0;
+    cpu_bars.vpad = 0;
 
     memcpy(&mem_bars, &cpu_bars, sizeof(cpu_bars));
     mem_bars.gcolor = COLOR_GREEN;
@@ -228,9 +230,9 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_chart_set_pnum(win_data->chart, LV_APP_SYSMON_PNUM);
     lv_chart_set_range(win_data->chart, 0, 100);
     lv_chart_set_type(win_data->chart, LV_CHART_LINE);
-
-    win_data->cpu_dl =  lv_chart_add_dataline(win_data->chart, COLOR_RED, 2 * LV_DOWNSCALE);
-    win_data->mem_dl =  lv_chart_add_dataline(win_data->chart, COLOR_BLUE, 2 * LV_DOWNSCALE);
+    lv_chart_set_dl_width(win_data->chart, 2 * LV_DOWNSCALE);
+    win_data->cpu_dl =  lv_chart_add_dataline(win_data->chart, COLOR_RED);
+    win_data->mem_dl =  lv_chart_add_dataline(win_data->chart, COLOR_BLUE);
 
     uint16_t i;
     for(i = 0; i < LV_APP_SYSMON_PNUM; i ++) {

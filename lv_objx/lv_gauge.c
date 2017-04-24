@@ -11,12 +11,12 @@
 #if USE_LV_GAUGE != 0
 
 #include "lv_gauge.h"
-#include <stdio.h>
-#include <string.h>
 #include "../lv_draw/lv_draw.h"
 #include "misc/gfx/text.h"
 #include "misc/math/trigo.h"
 #include "misc/math/math_base.h"
+#include <stdio.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
@@ -434,7 +434,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask, lv_style
     lv_style_get(LV_STYLE_PLAIN, &style_neddle_mid);
     style_neddle_mid.mcolor = style->bcolor;
     style_neddle_mid.gcolor = style->bcolor;
-    style_neddle_mid.radius = LV_DRAW_CIRCLE;
+    style_neddle_mid.radius = LV_RADIUS_CIRCLE;
 
     area_t nm_cord;
     nm_cord.x1 = x_ofs - style->opad;

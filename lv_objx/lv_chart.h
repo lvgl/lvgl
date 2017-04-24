@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_CHARTBG_H
-#define LV_CHARTBG_H
+#ifndef LV_CHART_H
+#define LV_CHART_H
 
 /*********************
  *      INCLUDES
@@ -12,17 +12,7 @@
 #include "lv_conf.h"
 #if USE_LV_CHART != 0
 
-/*Testing of dependencies*/
-#if USE_LV_RECT == 0
-#error "lv_chart: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
-#endif
-
-#if USE_LV_LINE == 0
-#error "lv_chart: lv_line is required. Enable it in lv_conf.h (USE_LV_LINE  1) "
-#endif
-
 #include "../lv_obj/lv_obj.h"
-#include <lvgl/lv_objx/lv_cont.h>
 #include "lv_line.h"
 
 /*********************

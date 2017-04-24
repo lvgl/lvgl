@@ -499,7 +499,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 
 	style_point.bwidth = 0;
 	style_point.empty = 0;
-	style_point.radius = LV_DRAW_CIRCLE;
+	style_point.radius = LV_RADIUS_CIRCLE;
     style_point.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
     style_point.radius = ext->dl_width;
 

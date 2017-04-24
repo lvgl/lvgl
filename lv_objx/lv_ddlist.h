@@ -11,6 +11,16 @@
  *********************/
 #include "lv_conf.h"
 #if USE_LV_DDLIST != 0
+
+/*Testing of dependencies*/
+#if USE_LV_PAGE == 0
+#error "lv_ddlist: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#endif
+
+#if USE_LV_LABEL == 0
+#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#endif
+
 #include "../lv_obj/lv_obj.h"
 #include "../lv_objx/lv_page.h"
 #include "../lv_objx/lv_label.h"

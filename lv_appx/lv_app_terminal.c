@@ -75,8 +75,8 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win);
 
 static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len);
 static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi);
-static lv_action_res_t win_comtype_action(lv_obj_t * btn, uint16_t opt);
-static lv_action_res_t win_format_action(lv_obj_t * btn, uint16_t opt);
+static lv_action_res_t win_comtype_action(lv_obj_t * ddlist, lv_dispi_t * dispi);
+static lv_action_res_t win_format_action(lv_obj_t * ddlist, lv_dispi_t * dispi);
 static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
 static void win_ta_kb_ok_action(lv_obj_t * ta);
 
@@ -334,15 +334,15 @@ static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
 /**
  * Called when an option is chosen in the communication type drop down list on the configuration window
  * @param ddl pointer to the drop down list
- * @param opt id of the chosen option
+ * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is not deleted
  */
-static lv_action_res_t win_comtype_action(lv_obj_t * btn, uint16_t opt)
+static lv_action_res_t win_comtype_action(lv_obj_t * ddlist, lv_dispi_t * dispi)
 {
-    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    lv_app_inst_t * app = lv_obj_get_free_p(ddlist);
     my_app_data_t * app_data = app->app_data;
 
-    app_data->com_type = com_type_list[opt];
+    app_data->com_type = com_type_list[lv_ddlist_get_selected(ddlist)];
 
     return LV_ACTION_RES_OK;
 }
@@ -350,14 +350,14 @@ static lv_action_res_t win_comtype_action(lv_obj_t * btn, uint16_t opt)
 /**
  * Called when an option is chosen in the format drop down list on the configuration window
  * @param ddl pointer to the drop down list
- * @param opt id of the chosen option
+ * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is not deleted
  */
-static lv_action_res_t win_format_action(lv_obj_t * btn, uint16_t opt)
+static lv_action_res_t win_format_action(lv_obj_t * ddlist, lv_dispi_t * dispi)
 {
-    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    lv_app_inst_t * app = lv_obj_get_free_p(ddlist);
     my_app_data_t * app_data = app->app_data;
-
+    uint16_t opt = lv_ddlist_get_selected(ddlist);
     if(strcmp(txt_format_list_txt[opt], "Hexadecimal") == 0) {
         app_data->format = LV_APP_TERMINAL_FORMAT_HEX;
     } else if (strcmp(txt_format_list_txt[opt], "ASCII") == 0) {

@@ -134,7 +134,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->ext_size = 0;
 
 		/*Set appearance*/
-		new_obj->style_p = lv_style_get(LV_STYLE_PLAIN, NULL);
+		new_obj->style_p = lv_style_get(LV_STYLE_SCR, NULL);
 
 		/*Set virtual functions*/
 		lv_obj_set_signal_f(new_obj, lv_obj_signal);
@@ -979,6 +979,7 @@ void lv_obj_refr_ext_size(lv_obj_t * obj)
 	lv_obj_inv(obj);
 }
 
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application. 
@@ -989,6 +990,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num)
 {
     obj->free_num = free_num;
 }
+#endif
 
 #if LV_OBJ_FREE_P != 0
 /**
@@ -1253,7 +1255,9 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
         lv_obj_t * par = obj->par;
 
         while(par != NULL) {
-            if(par->style_p != NULL) return par->style_p;
+            if(par->style_p != NULL) {
+                if(par->style_p->glass == 0) return par->style_p;
+            }
             par = par->par;
         }
     }
@@ -1393,7 +1397,7 @@ void * lv_obj_get_ext(lv_obj_t * obj)
    return obj->ext;
 }
 
-
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Get the free number
  * @param obj pointer to an object
@@ -1403,6 +1407,7 @@ uint8_t lv_obj_get_free_num(lv_obj_t * obj)
 {
     return obj->free_num;
 }
+#endif
 
 #if LV_OBJ_FREE_P != 0
 /**
@@ -1440,7 +1445,7 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 
         uint16_t r = style->radius;
 
-        if(r == LV_DRAW_CIRCLE) return false;
+        if(r == LV_RADIUS_CIRCLE) return false;
 
         area_t area_tmp;
 

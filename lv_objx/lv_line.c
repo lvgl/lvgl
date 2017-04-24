@@ -10,13 +10,8 @@
 
 #if USE_LV_LINE != 0
 #include "lv_line.h"
-#include "../lv_draw/lv_draw_vbasic.h"
-#include "../lv_draw/lv_draw_rbasic.h"
 #include "../lv_draw/lv_draw.h"
-#include <misc/gfx/area.h>
-#include <misc/math/math_base.h>
-#include <misc/mem/dyn_mem.h>
-#include <misc/gfx/color.h>
+#include "misc/math/math_base.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>

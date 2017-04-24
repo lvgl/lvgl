@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_DRAW_CIRCLE      (CORD_MAX)    /*A very big radius to always draw as circle*/
+#define LV_RADIUS_CIRCLE      (CORD_MAX)    /*A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS
@@ -41,6 +41,7 @@ typedef struct
     /*Object level styles*/
     color_t ccolor;     /*Content color (e.g. text or image re-color )*/
     opa_t opa;          /*Opacity of the object*/
+    uint8_t glass :1;   /*1: Do not inherit this style*/
     uint8_t empty :1;   /*Transparent background (border drawn)*/
     uint8_t stype :3;   /*Shadow type from 'lv_shadow_type_t'*/
     color_t mcolor;     /*Main color of background*/

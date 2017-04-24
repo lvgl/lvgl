@@ -11,9 +11,10 @@
  *********************/
 #include "lv_conf.h"
 #if USE_LV_CB != 0
+
 /*Testing of dependencies*/
 #if USE_LV_BTN == 0
-#error "lv_cb: lv_rect is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#error "lv_cb: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
 #endif
 
 #if USE_LV_LABEL == 0

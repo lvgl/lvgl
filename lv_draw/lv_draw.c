@@ -42,18 +42,16 @@ typedef enum
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if USE_LV_RECT != 0
-static void lv_draw_cont_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
-static void lv_draw_cont_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
-static void lv_draw_cont_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
-static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
-static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
+static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
+static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
+static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
+static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
+static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
 static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style);
 static void lv_draw_cont_shadow_bottom(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
 static void lv_draw_cont_shadow_full_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style, const opa_t * map);
 
 static uint16_t lv_draw_cont_radius_corr(uint16_t r, cord_t w, cord_t h);
-#endif /*USE_LV_RECT != 0*/
 
 
 #if USE_LV_TRIANGLE != 0
@@ -84,7 +82,6 @@ static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if USE_LV_RECT != 0
 /**
  * Draw a rectangle 
  * @param cords_p the coordinates of the rectangle
@@ -96,29 +93,27 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, const lv_style_
     if(area_get_height(cords_p) < 1 || area_get_width(cords_p) < 1) return;
 
     if(style_p->swidth != 0) {
-        lv_draw_cont_shadow(cords_p, mask_p, style_p);
+        lv_draw_rect_shadow(cords_p, mask_p, style_p);
     }
 
     if(style_p->empty == 0){
-        lv_draw_cont_main_mid(cords_p, mask_p, style_p);
+        lv_draw_rect_main_mid(cords_p, mask_p, style_p);
 
         if(style_p->radius != 0) {
-            lv_draw_cont_main_corner(cords_p, mask_p, style_p);
+            lv_draw_rect_main_corner(cords_p, mask_p, style_p);
         }
     } 
     
     if(style_p->bwidth != 0) {
-        lv_draw_cont_border_straight(cords_p, mask_p, style_p);
+        lv_draw_rect_border_straight(cords_p, mask_p, style_p);
 
         if(style_p->radius != 0) {
-            lv_draw_cont_border_corner(cords_p, mask_p, style_p);
+            lv_draw_rect_border_corner(cords_p, mask_p, style_p);
         }
     }
-
 }
-#endif /*USE_LV_RECT != 0*/
 
-#if USE_LV_TRIANGLE != 0
+#if USE_LV_TRIANGE != 0
 /**
  *
  * @param points pointer to an array with 3 points
@@ -224,10 +219,8 @@ void lv_draw_triangle(const point_t * points, const area_t * mask_p, color_t col
         } while(edge2.y == y2_tmp);
     }
 }
-
 #endif
 
-#if USE_LV_LABEL != 0
 /**
  * Write a text
  * @param cords_p coordinates of the label
@@ -326,9 +319,6 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
     }
 }
 
-#endif /* USE_LV_LABEL != 0*/
-
-#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 /**
  * Draw an image
  * @param cords_p the coordinates of the image
@@ -438,9 +428,6 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 }
 
 
-#endif /*USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0*/
-
-#if USE_LV_LINE != 0
 /**
  * Draw a line
  * @param p1 first point of the line
@@ -567,20 +554,19 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
 		fill_fp(&draw_area, mask_p, style->ccolor, style->opa);
 	}
 }
-#endif /*USE_LV_LINE != 0*/
+
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#if USE_LV_RECT != 0
 /**
  * Draw the middle part (rectangular) of a rectangle
  * @param cords_p the coordinates of the original rectangle
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
  */
-static void lv_draw_cont_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style)
+static void lv_draw_rect_main_mid(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style)
 {
     uint16_t radius = style->radius;
 
@@ -630,7 +616,7 @@ static void lv_draw_cont_main_mid(const area_t * cords_p, const area_t * mask_p,
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
  */
-static void lv_draw_cont_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
+static void lv_draw_rect_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
 {
     uint16_t radius = style_p->radius;
 
@@ -801,7 +787,7 @@ if(edge_top_area.y1 != mid_top_area.y1) {
  * @param mask_p the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
  */
-static void lv_draw_cont_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
+static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p)
 {
     uint16_t radius = style_p->radius;
 
@@ -917,7 +903,7 @@ static void lv_draw_cont_border_straight(const area_t * cords_p, const area_t * 
  * @param rects_p pointer to a rectangle style
  * @param opa opacity of the rectangle (0..255)
  */
-static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
+static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
 {
     uint16_t radius = style->radius;
     uint16_t bwidth = style->bwidth;
@@ -1051,7 +1037,7 @@ static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * ma
  * @param rect pointer to rectangle object
  * @param mask pointer to a mask area (from the design functions)
  */
-static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
+static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
 {
     /* If mask is in the middle of cords do not draw shadow*/
     cord_t radius = style->radius;
@@ -1346,8 +1332,6 @@ static uint16_t lv_draw_cont_radius_corr(uint16_t r, cord_t w, cord_t h)
 
 	return r;
 }
-
-#endif /*USE_LV_RECT != 0*/
 
 
 #if USE_LV_TRIANGLE != 0

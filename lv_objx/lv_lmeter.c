@@ -3,12 +3,6 @@
  * 
  */
 
-/*Search an replace: line meter -> object normal name with lower case (e.g. button, label etc.)
- * 					 lmeter -> object short name with lower case(e.g. btn, label etc)
- *                   LMETER -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 /*********************
  *      INCLUDES
  *********************/

@@ -805,11 +805,12 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
 
     char buf[256];
     sprintf(buf, "%s settings", app->dsc->name);
+    lv_win_add_ctrl_btn(app->conf_win, SYMBOL_CLOSE ,lv_win_close_action);
     lv_win_set_title(app->conf_win, buf);
-    lv_obj_t * scrl = lv_page_get_scrl(app->conf_win);
+    lv_win_set_style_cbtn(app->conf_win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
+    lv_obj_t * scrl = lv_page_get_scrl(lv_win_get_page(app->conf_win));
     lv_cont_set_layout(scrl, LV_CONT_LAYOUT_COL_L);
 
-    lv_win_add_ctrl_btn(app->conf_win, "U:/icon_close" ,lv_win_close_action);
 
     app->dsc->conf_open(app, app->conf_win);
 
@@ -1018,9 +1019,9 @@ static void lv_app_init_style(void)
 	app_style.menu.radius = 0;
 	app_style.menu.bwidth = 0;
 	app_style.menu.swidth = 0;
-    app_style.menu.vpad = LV_DPI / 10;
-    app_style.menu.hpad = LV_DPI / 10;
-    app_style.menu.opad = LV_DPI / 10;
+    app_style.menu.vpad = LV_DPI / 12;
+    app_style.menu.hpad = LV_DPI / 12;
+    app_style.menu.opad = LV_DPI / 12;
 
     lv_style_get(LV_STYLE_BTN_REL,&app_style.menu_btn_rel);
     app_style.menu_btn_rel.ccolor = COLOR_MAKE(0xd0, 0xe0, 0xf0);
@@ -1032,6 +1033,9 @@ static void lv_app_init_style(void)
     app_style.menu_btn_rel.empty = 1;
     app_style.menu_btn_rel.font = font_get(LV_APP_FONT_LARGE);
     app_style.menu_btn_rel.img_recolor = OPA_90;
+    app_style.menu_btn_rel.vpad = LV_DPI / 10;
+    app_style.menu_btn_rel.hpad = LV_DPI / 10;
+    app_style.menu_btn_rel.opad = LV_DPI / 10;
 
     memcpy(&app_style.menu_btn_pr, &app_style.menu_btn_rel, sizeof(lv_style_t));
 	app_style.menu_btn_pr.mcolor = COLOR_GRAY;
@@ -1075,21 +1079,21 @@ static void lv_app_init_style(void)
     app_style.sc_send_pr.gcolor = COLOR_MAKE(0x20, 0x10, 0x00);
     app_style.sc_send_pr.gcolor = COLOR_BLACK;
     app_style.sc_send_pr.bopa = OPA_30;
-    app_style.sc_send_pr.bwidth = 3 * LV_DOWNSCALE;
+    app_style.sc_send_pr.bwidth = 2 * LV_DOWNSCALE;
 
     memcpy(&app_style.sc_rec_rel, &app_style.sc_send_rel, sizeof(lv_style_t));
     app_style.sc_rec_rel.mcolor = COLOR_MAKE(0xE0, 0xFF, 0xE0);
     app_style.sc_rec_rel.gcolor = COLOR_MAKE(0x20, 0x50, 0x20);
     app_style.sc_rec_rel.bcolor = COLOR_BLACK;
     app_style.sc_rec_rel.bopa = OPA_30;
-    app_style.sc_rec_rel.bwidth = 3 * LV_DOWNSCALE;
+    app_style.sc_rec_rel.bwidth = 2 * LV_DOWNSCALE;
 
     memcpy(&app_style.sc_rec_pr, &app_style.sc_send_pr, sizeof(lv_style_t));
     app_style.sc_rec_pr.mcolor = COLOR_MAKE(0xB0, 0xFF, 0xB0);
     app_style.sc_rec_pr.gcolor = COLOR_MAKE(0x20, 0x20, 0x10);
     app_style.sc_rec_pr.bcolor = COLOR_BLACK;
     app_style.sc_rec_pr.bopa = OPA_30;
-    app_style.sc_rec_pr.bwidth = 3 * LV_DOWNSCALE;
+    app_style.sc_rec_pr.bwidth = 2 * LV_DOWNSCALE;
 
     memcpy(&app_style.sc_title, &app_style.sc_rel, sizeof(lv_style_t));
 	app_style.sc_title.font = font_get(LV_APP_FONT_SMALL);

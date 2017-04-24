@@ -24,7 +24,11 @@
 #include "../lv_obj/lv_obj.h"
 #include "misc/fs/fsint.h"
 
-#if LV_IMG_ENABLE_SYMBOLS
+#ifndef LV_IMG_ENABLE_SYMBOLS
+#define LV_IMG_ENABLE_SYMBOLS 0
+#endif
+
+#if LV_IMG_ENABLE_SYMBOLS != 0
 #include "lv_label.h"
 #include "misc/gfx/fonts/symbol_def.h"
 #endif

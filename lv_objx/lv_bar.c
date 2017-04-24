@@ -18,8 +18,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_BAR_DEF_WIDTH     (LV_DPI * 2)
-#define LV_BAR_DEF_HEIGHT    (LV_DPI / 2)
 
 /**********************
  *      TYPEDEFS
@@ -77,7 +75,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new  bar object*/
     if(copy == NULL) {
         lv_obj_set_click(new_bar, false);
-    	lv_obj_set_size(new_bar, LV_BAR_DEF_WIDTH, LV_BAR_DEF_HEIGHT);
+    	lv_obj_set_size(new_bar, LV_DPI * 2, LV_DPI / 3);
         lv_obj_set_style(new_bar, lv_style_get(LV_STYLE_PRETTY, NULL));
     	lv_bar_set_value(new_bar, ext->act_value);
     } else {
@@ -245,6 +243,9 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
         ancestor_design_f(bar, mask, mode);
 
 		lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+
+
+
         lv_style_t * style_indic = lv_bar_get_style_indic(bar);
 		area_t indic_area;
 		area_cpy(&indic_area, &bar->cords);

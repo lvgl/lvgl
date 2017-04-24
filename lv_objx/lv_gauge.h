@@ -14,16 +14,8 @@
 #if USE_LV_GAUGE != 0
 
 /*Testing of dependencies*/
-#if USE_LV_RECT == 0
-#error "lv_gauge: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
-#endif
-
-#if USE_LV_LABEL == 0
-#error "lv_gauge: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
-#endif
-
-#if USE_LV_RECT == 0
-#error "lv_gauge: lv_line is required. Enable it in lv_conf.h (USE_LV_LINE  1) "
+#if USE_LV_LMETER == 0
+#error "lv_gauge: lv_lmeter is required. Enable it in lv_conf.h (USE_LV_LMETER  1) "
 #endif
 
 #if USE_TRIGO == 0

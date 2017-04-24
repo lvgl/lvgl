@@ -9,7 +9,6 @@
 #include "lv_conf.h"
 #include "lv_style.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -60,9 +59,9 @@ void lv_style_init (void)
     lv_style_set_ccolor(&lv_style_scr, COLOR_MAKE(0x20, 0x20, 0x20));
     lv_style_set_opa(&lv_style_scr, OPA_COVER);
 
-    lv_style_set_mcolor(&lv_style_scr, COLOR_WHITE);
-    lv_style_set_gcolor(&lv_style_scr, COLOR_WHITE);
-    lv_style_set_bcolor(&lv_style_scr, COLOR_WHITE);
+    lv_style_set_mcolor(&lv_style_scr, COLOR_WHITE);//MAKE(0xc9, 0xdb, 0xee));
+    lv_style_set_gcolor(&lv_style_scr, COLOR_WHITE);//MAKE(0x4d, 0x91, 0xd5));
+    lv_style_set_bcolor(&lv_style_scr, COLOR_BLACK);
     lv_style_set_scolor(&lv_style_scr, COLOR_GRAY);
     lv_style_set_radius(&lv_style_scr, 0);
     lv_style_set_bwidth(&lv_style_scr, 0);
@@ -73,6 +72,7 @@ void lv_style_init (void)
     lv_style_set_bopa(&lv_style_scr, OPA_COVER);
     lv_style_set_empty(&lv_style_scr, false);
     lv_style_set_stype(&lv_style_scr, LV_STYPE_FULL);
+    lv_style_scr.glass = 0;
 
     lv_style_set_font(&lv_style_scr, font_get(FONT_DEFAULT));
     lv_style_set_letter_space(&lv_style_scr, 1 * LV_DOWNSCALE);
@@ -83,8 +83,11 @@ void lv_style_init (void)
 
     lv_style_set_line_width(&lv_style_scr, 1 * LV_DOWNSCALE);
 
-    /*Plain style (by default the same as the screen style)*/
+    /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
+    lv_style_set_mcolor(&lv_style_plain, COLOR_WHITE);
+    lv_style_set_gcolor(&lv_style_plain, COLOR_WHITE);
+    lv_style_set_bcolor(&lv_style_plain, COLOR_WHITE);
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
@@ -98,7 +101,7 @@ void lv_style_init (void)
     lv_style_set_mcolor(&lv_style_pretty, COLOR_WHITE);
     lv_style_set_gcolor(&lv_style_pretty, COLOR_SILVER);
     lv_style_set_bcolor(&lv_style_pretty, COLOR_MAKE(0x40, 0x40, 0x40));
-    lv_style_set_radius(&lv_style_pretty, LV_DPI / 10);
+    lv_style_set_radius(&lv_style_pretty, LV_DPI / 12);
     lv_style_set_bwidth(&lv_style_pretty, LV_DPI / 40 >= 1 ? LV_DPI / 40  : 1);
     lv_style_set_bopa(&lv_style_pretty, OPA_50);
 
@@ -115,6 +118,7 @@ void lv_style_init (void)
     memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));
     lv_style_set_empty(&lv_style_transp, true);
     lv_style_set_bwidth(&lv_style_transp, 0);
+    lv_style_transp.glass = 1;
 
     /*Transparent tight style*/
     memcpy(&lv_style_transp_tight, &lv_style_transp, sizeof(lv_style_t));
@@ -128,7 +132,7 @@ void lv_style_init (void)
     lv_style_set_bcolor(&lv_style_btn_rel, COLOR_MAKE(0x0b, 0x19, 0x28));
     lv_style_set_ccolor(&lv_style_btn_rel, COLOR_MAKE(0xff, 0xff, 0xff));
     lv_style_set_bwidth(&lv_style_btn_rel, LV_DPI / 40 >= 1 ? LV_DPI / 40  : 1);
-    lv_style_set_radius(&lv_style_btn_rel, LV_DPI / 10);
+    lv_style_set_radius(&lv_style_btn_rel, LV_DPI / 12);
     lv_style_set_bopa(&lv_style_btn_rel, OPA_70);
     lv_style_set_scolor(&lv_style_btn_rel, COLOR_GRAY);
     lv_style_set_swidth(&lv_style_btn_rel, 0);

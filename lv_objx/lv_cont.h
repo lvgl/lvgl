@@ -10,10 +10,9 @@
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#if USE_LV_RECT != 0
+#if USE_LV_CONT != 0
 
 #include "../lv_obj/lv_obj.h"
-#include "../lv_obj/lv_dispi.h"
 
 /*********************
  *      DEFINES

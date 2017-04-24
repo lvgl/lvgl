@@ -31,9 +31,7 @@
  * @param mask_p the rectangle will be drawn only in this mask
  * @param style_p pointer to a style
  */
-#if USE_LV_RECT != 0
 void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
-#endif
 
 
 /*Experimental use for 3D modeling*/
@@ -56,10 +54,8 @@ void lv_draw_triangle(const point_t * points, const area_t * mask_p, color_t col
  * @param txt 0 terminated text to write
  * @param flags settings for the text from 'txt_flag_t' enum
  */
-#if USE_LV_LABEL != 0
 void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_t * style_p,
                     const char * txt, txt_flag_t flag);
-#endif
 
 /**
  * Draw an image
@@ -67,10 +63,8 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
  * @param mask_p the image will be drawn only in this area
  * @param map_p pointer to a color_t array which contains the pixels of the image
  */
-#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
 void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
                  const lv_style_t * style_p, const char * fn);
-#endif
 
 /**
  * Draw a line
@@ -79,10 +73,8 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
  * @param mask_pthe line will be drawn only on this area
  * @param style_p pointer to a style
  */
-#if USE_LV_LINE != 0
 void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
                   const lv_style_t * style_p);
-#endif
 
 /**********************
  *      MACROS
