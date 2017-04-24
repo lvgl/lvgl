@@ -108,7 +108,7 @@ void lv_style_init (void)
     lv_style_set_mcolor(&lv_style_pretty_color, COLOR_MAKE(0x6b, 0x9a, 0xc7));
     lv_style_set_gcolor(&lv_style_pretty_color, COLOR_MAKE(0x2b, 0x59, 0x8b));
     lv_style_set_bcolor(&lv_style_pretty_color, COLOR_MAKE(0x15, 0x2c, 0x42));
-    lv_style_set_scolor(&lv_style_pretty_color, COLOR_MAKE(0x6a, 0x8f, 0xb4));
+    lv_style_set_scolor(&lv_style_pretty_color, COLOR_GRAY);
     lv_style_set_swidth(&lv_style_pretty_color, 0);
 
     /*Transparent style*/

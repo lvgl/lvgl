@@ -1046,8 +1046,6 @@ static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * ma
     }
 }
 
-#define S_OLD  0
-
 /**
  * Draw a shadow
  * @param rect pointer to rectangle object
@@ -1074,61 +1072,11 @@ static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, c
     area_tmp.y2 -= radius;
     if(area_is_in(mask_p, &area_tmp) != false) return;
 
-
-#if S_OLD == 0
     if(style->stype == LV_STYPE_FULL) {
         lv_draw_cont_shadow_full(cords_p, mask_p, style);
     } else if(style->stype == LV_STYPE_BOTTOM) {
         lv_draw_cont_shadow_bottom(cords_p, mask_p, style);
     }
-#else
-
-    cord_t swidth = style->swidth;
-    if(swidth == 0) return;
-    uint8_t res = LV_DOWNSCALE * 1;
-    if(swidth < res) return;
-
-    area_t shadow_area;
-    lv_style_t shadow_style;
-    memcpy(&shadow_area, cords_p, sizeof(area_t));
-
-    memcpy(&shadow_style, style, sizeof(lv_style_t));
-
-    shadow_style.empty = 1;
-    shadow_style.bwidth = swidth;
-    shadow_style.radius = style->radius;
-    if(shadow_style.radius == LV_DRAW_CIRCLE) {
-        shadow_style.radius = MATH_MIN(area_get_width(cords_p), area_get_height(cords_p));
-    }
-    shadow_style.radius += swidth + 1;
-    shadow_style.bcolor = style->scolor;
-    shadow_style.bopa = style->opa;
-
-    shadow_area.x1 -= swidth - 1;
-    shadow_area.y1 -= swidth - 1;
-    shadow_area.x2 += swidth - 1;
-    shadow_area.y2 += swidth - 1;
-
-    cord_t i;
-    shadow_style.bopa =  style->opa / (swidth / res);
-
-    static color_t x;
-    x.full = 0x1C224;
-
-    for(i = 1; i < swidth; i += res) {
-        x.full +=  0xFCA34;
-      //  shadow_style.bcolor.full = x.full;
-        lv_draw_cont_border_straight(&shadow_area, mask_p, &shadow_style);
-        lv_draw_cont_border_corner(&shadow_area, mask_p, &shadow_style);
-        shadow_style.radius -= res;
-        shadow_style.bwidth -= res;
-        shadow_area.x1 += res;
-        shadow_area.y1 += res;
-        shadow_area.x2 -= res;
-        shadow_area.y2 -= res;
-    }
-
-#endif
 }
 
 static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style)
@@ -1152,11 +1100,11 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
     }
     int16_t row;
 
-    opa_t opa_h_result[LV_HOR_RES];
+    uint16_t opa_h_result[LV_HOR_RES];
     int16_t filter_size = 2 * style->swidth + 1;
 
     for(row = 0; row < filter_size; row++) {
-        opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->opa) / (filter_size);
+        opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->opa * 2) / (filter_size);
     }
 
     uint16_t p;
@@ -1201,7 +1149,7 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
                {
                    int16_t p_tmp = p - (cruve_x[row_v] - cruve_x[row]);
                    if(p_tmp < -style->swidth) { /*Cols before the filtered shadow (still not blurred)*/
-                       opa_tmp += style->opa;
+                       opa_tmp += style->opa * 2;
                    }
                    /*Cols after the filtered shadow (already no effect) */
                    else if (p_tmp > style->swidth) {
@@ -1218,7 +1166,7 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
            }
            if(swidth_out == false) {
                opa_tmp = opa_tmp / (filter_size);
-               opa_v_result[p] = opa_tmp;
+               opa_v_result[p] = opa_tmp > OPA_COVER ? OPA_COVER : opa_tmp;
            }
            else {
                break;
@@ -1367,7 +1315,7 @@ static void lv_draw_cont_shadow_full_straight(const area_t * cords_p, const area
 
     int16_t d;
     for(d = 0; d < style->swidth; d++) {
-       fill_fp(&sider_area, mask_p, style->scolor, map[d]);
+        fill_fp(&sider_area, mask_p, style->scolor, map[d]);
         sider_area.x1++;
         sider_area.x2++;
 

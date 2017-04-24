@@ -15,8 +15,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_LED_WIDTH_DEF    (LV_DPI / 2)
-#define LV_LED_HEIGHT_DEF   (LV_DPI / 2)
+#define LV_LED_WIDTH_DEF    (LV_DPI / 3)
+#define LV_LED_HEIGHT_DEF   (LV_DPI / 3)
 #define LV_LED_BRIGHT_OFF	128
 #define LV_LED_BRIGHT_ON	255
 

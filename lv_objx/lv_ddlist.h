@@ -29,7 +29,7 @@ typedef struct
     /*New data for this type */
     lv_obj_t * opt_label;                           /*Label for the options*/
     lv_style_t * style_sel;                         /*Style of the selected option*/
-    lv_action_res_t (*cb)(lv_obj_t *, uint16_t);    /*Pointer to function to call when an option is slected*/
+    lv_action_t cb;                                 /*Pointer to function to call when an option is slected*/
     uint16_t sel_opt;                               /*Index of the current option*/
     uint8_t opened :1;                              /*1: The list is opened*/
     uint8_t auto_size :1;                           /*1: Set height to show all options. 0: Set height maximum to the parent bottom*/
@@ -73,15 +73,13 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options);
  */
 void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 
+
 /**
  * Set a function to call when a new option is chosen
  * @param ddlist pointer to a drop down list
- * @param cb pointer to a call back function. Its prototype is:
- *           parameter 1: pointer to the drop down list
- *           parameter 2: id of the chosen item (0 ... number of options - 1)
- *           return LV_ACTION_RES_INV if the drop down list is deleted in the function else LV_ACTION_RES_OK
+ * @param cb pointer to a call back function
  */
-void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_res_t (*cb)(lv_obj_t *, uint16_t));
+void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t cb);
 
 /**
  * Set the auto size attribute. If enabled the height will reduced to be visible on the parent.

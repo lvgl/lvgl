@@ -181,12 +181,9 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 /**
  * Set a function to call when a new option is chosen
  * @param ddlist pointer to a drop down list
- * @param cb pointer to a call back function. Its prototype is:
- *           parameter 1: pointer to the drop down list
- *           parameter 2: id of the chosen item (0 ... number of options - 1)
- *           return LV_ACTION_RES_INV if the drop down list is deleted in the function else LV_ACTION_RES_OK
+ * @param cb pointer to a call back function
  */
-void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_res_t (*cb)(lv_obj_t *, uint16_t))
+void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t cb)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     ext->cb = cb;
@@ -355,7 +352,7 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
         ext->sel_opt = new_opt;
 
         if(ext->cb != NULL) {
-            ext->cb(ddlist, ext->sel_opt);
+            ext->cb(ddlist, dispi);
         }
     }
 #if LV_DDLIST_ANIM_TIME == 0
