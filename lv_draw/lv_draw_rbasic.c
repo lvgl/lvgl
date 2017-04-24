@@ -22,7 +22,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_rpx(cord_t x, cord_t y, const area_t * mask_p, color_t color);
 
 /**********************
  *  STATIC VARIABLES
@@ -35,6 +34,25 @@ static void lv_rpx(cord_t x, cord_t y, const area_t * mask_p, color_t color);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+/**
+ * Put a pixel to the display
+ * @param x x coordinate of the pixel
+ * @param y y coordinate of the pixel
+ * @param mask_p the pixel will be drawn on this area
+ * @param color color of the pixel
+ * @param opa opacity (ignored, only for compatibility with lv_vpx)
+ */
+void lv_rpx(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa)
+{
+    area_t area;
+    area.x1 = x;
+    area.y1 = y;
+    area.x2 = x;
+    area.y2 = y;
+
+    lv_rfill(&area, mask_p, color, OPA_COVER);
+}
 
 /**
  * Fill an area on the display
@@ -84,7 +102,7 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
     for(row = 0; row < font_p->height_row; row ++) {
         for(col = 0, col_sub = 7; col < w; col ++, col_sub--) {
             if(*bitmap_p & (1 << col_sub)) {
-                lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, color);
+                lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, color, opa);
             }
 
             if(col_sub == 0) {
@@ -185,7 +203,7 @@ void lv_rmap(const area_t * cords_p, const area_t * mask_p,
             cord_t col;
             for(col = 0; col < area_get_width(&masked_a); col ++) {
                 if(map_p[col].full != transp_color.full) {
-                    lv_rpx(masked_a.x1 + col, masked_a.y1 + row, mask_p, map_p[col]);
+                    lv_rpx(masked_a.x1 + col, masked_a.y1 + row, mask_p, map_p[col], opa);
                 }
             }
             map_p += map_width;
@@ -196,21 +214,3 @@ void lv_rmap(const area_t * cords_p, const area_t * mask_p,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-/**
- * Put a pixel to the display
- * @param x x coordinate of the pixel
- * @param y y coordinate of the pixel
- * @param mask_p the pixel will be drawn on this area
- * @param color color of the pixel
- */
-static void lv_rpx(cord_t x, cord_t y, const area_t * mask_p, color_t color)
-{
-    area_t area;
-    area.x1 = x;
-    area.y1 = y;
-    area.x2 = x;
-    area.y2 = y;
-        
-    lv_rfill(&area, mask_p, color, OPA_COVER);
-}

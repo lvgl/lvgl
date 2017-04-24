@@ -28,12 +28,21 @@ typedef enum {
     LV_TXT_ALIGN_MID,
 }lv_txt_align_t;
 
+
+/*Shadow types*/
+typedef enum
+{
+    LV_STYPE_BOTTOM = 0,
+    LV_STYPE_FULL,
+}lv_stype_t;
+
 typedef struct
 {
     /*Object level styles*/
     color_t ccolor;     /*Content color (e.g. text or image re-color )*/
     opa_t opa;          /*Opacity of the object*/
     uint8_t empty :1;   /*Transparent background (border drawn)*/
+    uint8_t stype :3;   /*Shadow type from 'lv_shadow_type_t'*/
     color_t mcolor;     /*Main color of background*/
     color_t gcolor;     /*Gradient color of background*/
     color_t bcolor;     /*Border color of background*/
@@ -100,6 +109,7 @@ lv_style_t * lv_style_inherit(lv_style_t * result, const lv_style_t * child, con
  */
 void lv_style_set_ccolor(lv_style_t * style, color_t ccolor);
 
+void lv_style_set_stype(lv_style_t * style, lv_stype_t stype);
 /**
  * Clear the content color of a style (it will be inherited from the parent style)
  * @param style pointer to a style

@@ -72,6 +72,7 @@ void lv_style_init (void)
     lv_style_set_opad(&lv_style_scr, LV_DPI / 12);
     lv_style_set_bopa(&lv_style_scr, OPA_COVER);
     lv_style_set_empty(&lv_style_scr, false);
+    lv_style_set_stype(&lv_style_scr, LV_STYPE_FULL);
 
     lv_style_set_font(&lv_style_scr, font_get(FONT_DEFAULT));
     lv_style_set_letter_space(&lv_style_scr, 1 * LV_DOWNSCALE);
@@ -367,6 +368,16 @@ void lv_style_set_empty(lv_style_t * style, bool empty)
 }
 
 /**
+ * Set the shadow type (position) of a style
+ * @param style pointer to style
+ * @param stype shadow type from 'lv_shadow_type_t' enum
+ */
+void lv_style_set_stype(lv_style_t * style, lv_stype_t stype)
+{
+    style->stype = stype;
+}
+
+/**
  * Set the font of a style
  * @param style pointer to style
  * @param font pointer to a fint
@@ -578,6 +589,16 @@ opa_t lv_style_get_bopa(lv_style_t * style)
 bool lv_style_get_empty(lv_style_t * style, bool empty)
 {
     return style->empty == false ? 0 : 1;
+}
+
+/**
+ * Get the shadow type attribute
+ * @param style pointer to style
+ * @return shadow type from 'lv_stype_t' enum
+ */
+bool lv_style_get_stype(lv_style_t * style, bool empty)
+{
+    return style->stype;
 }
 
 /**

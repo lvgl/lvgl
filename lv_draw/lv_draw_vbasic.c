@@ -44,10 +44,45 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+
+/**
+ * Put a pixel in the Virtual Display Buffer
+ * @param x pixel x coordinate
+ * @param y pixel y coordinate
+ * @param mask_p fill only on this mask (truncated to VDB area)
+ * @param color pixel color
+ * @param opa opacity of the area (0..255)
+ */
+void lv_vpx(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa)
+{
+    lv_vdb_t * vdb_p = lv_vdb_get();
+
+    /*Pixel out of the mask*/
+    if(x < mask_p->x1 || x > mask_p->x2 ||
+       y < mask_p->y1 || y > mask_p->y2) {
+        return;
+    }
+
+    uint32_t vdb_width = area_get_width(&vdb_p->area);
+
+    /*Make the coordinates relative to VDB*/
+    x-=vdb_p->area.x1;
+    y-=vdb_p->area.y1;
+    color_t * vdb_px_p = vdb_p->buf + y * vdb_width + x;
+    if(opa == OPA_COVER) {
+        *vdb_px_p = color;
+    }
+    else {
+        *vdb_px_p = color_mix(color,*vdb_px_p, opa);
+    }
+
+}
+
+
 /**
  * Fill an area in the Virtual Display Buffer
  * @param cords_p coordinates of the area to fill
- * @param mask_p fill only o this mask
+ * @param mask_p fill only o this mask  (truncated to VDB area)
  * @param color fill color
  * @param opa opacity of the area (0..255)
  */
@@ -118,7 +153,7 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
 /**
  * Draw a letter in the Virtual Display Buffer
  * @param pos_p left-top coordinate of the latter
- * @param mask_p the letter will be drawn only on this area
+ * @param mask_p the letter will be drawn only on this area  (truncated to VDB area)
  * @param font_p pointer to font 
  * @param letter a letter to draw
  * @param color color of letter
@@ -241,7 +276,7 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
 /**
  * Draw a color map to the display
  * @param cords_p coordinates the color map
- * @param mask_p the map will drawn only on this area
+ * @param mask_p the map will drawn only on this area  (truncated to VDB area)
  * @param map_p pointer to a color_t array
  * @param opa opacity of the map (ignored, only for compatibility with lv_vmap)
  * @param transp true: enable transparency of LV_IMG_COLOR_TRANSP color pixels

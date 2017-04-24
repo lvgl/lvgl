@@ -1448,13 +1448,13 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
         lv_obj_get_cords(obj, &area_tmp);
         area_tmp.x1 += r;
         area_tmp.x2 -= r;
-        if(area_is_in(mask_p, &area_tmp) != true) return false;
+        if(area_is_in(mask_p, &area_tmp) == false) return false;
 
         /*Check vertically without radius*/
         lv_obj_get_cords(obj, &area_tmp);
         area_tmp.y1 += r;
         area_tmp.y2 -= r;
-        if(area_is_in(mask_p, &area_tmp) != true) return false;
+        if(area_is_in(mask_p, &area_tmp) == false) return false;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		lv_style_t * style = lv_obj_get_style(obj);

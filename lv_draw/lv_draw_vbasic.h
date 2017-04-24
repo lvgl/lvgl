@@ -29,6 +29,7 @@
  * GLOBAL PROTOTYPES
  **********************/
 
+void lv_vpx(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa);
 /**
  * Fill an area in the Virtual Display Buffer
  * @param cords_p coordinates of the area to fill

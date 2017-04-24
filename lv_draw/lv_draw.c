@@ -47,7 +47,9 @@ static void lv_draw_cont_main_mid(const area_t * cords_p, const area_t * mask_p,
 static void lv_draw_cont_main_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
 static void lv_draw_cont_border_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style_p);
 static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
-static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style);
+static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
+static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style);
+static void lv_draw_cont_shadow_bottom(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style);
 static void lv_draw_cont_shadow_full_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style, const opa_t * map);
 
 static uint16_t lv_draw_cont_radius_corr(uint16_t r, cord_t w, cord_t h);
@@ -62,10 +64,12 @@ static void point_swap(point_t * p1, point_t * p2);
  *  STATIC VARIABLES
  **********************/
 #if LV_VDB_SIZE != 0
+static void (*px_fp)(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa) = lv_vpx;
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_vletter;
 static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_vmap;
 #else
+static void (*px_fp)(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa) = lv_rpx;
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_rletter;
 static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_rmap;
@@ -1051,145 +1055,32 @@ static void lv_draw_cont_border_corner(const area_t * cords_p, const area_t * ma
  */
 static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
 {
-#if S_OLD == 0
+    /* If mask is in the middle of cords do not draw shadow*/
     cord_t radius = style->radius;
+    cord_t width = area_get_width(cords_p);
+    cord_t height = area_get_height(cords_p);
+    radius = lv_draw_cont_radius_corr(radius, width, height);
+    area_t area_tmp;
 
-  //  if(mask_p->y1 > cords_p->y1 + radius && mask_p->y2 < cords_p->y2 - radius) return;
-  //  if(mask_p->x1 > cords_p->x1 + radius && mask_p->x2 < cords_p->x2 - radius) return;
+    /*Check horizontally without radius*/
+    area_cpy(&area_tmp, cords_p);
+    area_tmp.x1 += radius;
+    area_tmp.x2 -= radius;
+    if(area_is_in(mask_p, &area_tmp) != false) return;
 
-    cord_t cruve_x[LV_VER_RES] = {CORD_MIN};
-    memset(cruve_x, 0, sizeof(cruve_x));
-    point_t circ;
-    cord_t circ_tmp;
-    circ_init(&circ, &circ_tmp, radius);
-    while(circ_cont(&circ)) {
-        cruve_x[CIRC_OCT1_Y(circ)] = CIRC_OCT1_X(circ);
-        cruve_x[CIRC_OCT2_Y(circ)] = CIRC_OCT2_X(circ);
-        circ_next(&circ, &circ_tmp);
+    /*Check vertically without radius*/
+    area_cpy(&area_tmp, cords_p);
+    area_tmp.y1 += radius;
+    area_tmp.y2 -= radius;
+    if(area_is_in(mask_p, &area_tmp) != false) return;
+
+
+#if S_OLD == 0
+    if(style->stype == LV_STYPE_FULL) {
+        lv_draw_cont_shadow_full(cords_p, mask_p, style);
+    } else if(style->stype == LV_STYPE_BOTTOM) {
+        lv_draw_cont_shadow_bottom(cords_p, mask_p, style);
     }
-    int16_t row;
-
-    opa_t opa_h_result[LV_HOR_RES];
-    int16_t filter_size = 2 * style->swidth + 1;
-
-    for(row = 0; row < filter_size; row++) {
-        opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * OPA_COVER) / (filter_size);
-    }
-
-    for(; row < LV_HOR_RES; row++) {
-            opa_h_result[row] = OPA_COVER;
-    }
-
-    uint16_t p;
-    area_t sarea_rt;
-    area_t sarea_rb;
-    area_t sarea_lt;
-    area_t sarea_lb;
-    point_t ofs_rb;
-    point_t ofs_rt;
-    point_t ofs_lb;
-    point_t ofs_lt;
-    opa_t opa_v_result[LV_VER_RES];
-
-    ofs_rb.x = cords_p->x2 - radius;
-    ofs_rb.y = cords_p->y2 - radius;
-
-    ofs_rt.x = cords_p->x2 - radius;
-    ofs_rt.y = cords_p->y1 + radius;
-
-    ofs_lb.x = cords_p->x1 + radius;
-    ofs_lb.y = cords_p->y2 - radius;
-
-    ofs_lt.x = cords_p->x1 + radius;
-    ofs_lt.y = cords_p->y1 + radius;
-    for(row = 0; row < radius + style->swidth; row++) {
-        for(p = 0; p < radius + style->swidth; p++) {
-           int16_t v;
-           uint32_t opa_tmp = 0;
-           int16_t row_v;
-           bool swidth_out = false;
-           for(v = -style->swidth; v < style->swidth; v++) {
-               row_v = row + v;
-               if(row_v < 0) row_v = 0; /*Rows above the corner*/
-
-               /*Rows below the bottom are empty so they won't modify the filter*/
-               if(row_v > radius) {
-                   break;
-               }
-               else
-               {
-                   int16_t p_tmp = p - (cruve_x[row_v] - cruve_x[row]);
-                   if(p_tmp < -style->swidth) { /*Cols before the filtered shadow (still not blurred)*/
-                       opa_tmp += OPA_COVER;
-                   }
-                   /*Cols after the filtered shadow (already no effect) */
-                   else if (p_tmp > style->swidth) {
-                       /* If on the current point the  filter top point is already out of swidth then
-                        * the remaining part will not do not anything on this point*/
-                       if(v == -style->swidth) { /*Is the first point?*/
-                           swidth_out = true;
-                       }
-                       break;
-                   } else {
-                       opa_tmp += opa_h_result[p_tmp + style->swidth];
-                   }
-               }
-           }
-           if(swidth_out == false) {
-               opa_tmp = opa_tmp / (filter_size);
-               opa_v_result[p] = opa_tmp;
-           }
-           else {
-               break;
-           }
-        }
-
-        sarea_rt.x1 = cruve_x[row] + ofs_rt.x;
-        sarea_rt.y1 = ofs_rt.y - row;
-        sarea_rt.x2 = sarea_rt.x1;
-        sarea_rt.y2 = sarea_rt.y1;
-
-        sarea_rb.x1 = cruve_x[row] + ofs_rb.x;
-        sarea_rb.y1 = ofs_rb.y + row;
-        sarea_rb.x2 = sarea_rt.x1;
-        sarea_rb.y2 = sarea_rb.y1;
-
-        sarea_lt.x1 = ofs_lt.x -  cruve_x[row];
-        sarea_lt.y1 = ofs_lt.y - row;
-        sarea_lt.x2 = sarea_lt.x1;
-        sarea_lt.y2 = sarea_lt.y1;
-
-        sarea_lb.x1 = ofs_lb.x - cruve_x[row];
-        sarea_lb.y1 = ofs_lb.y + row;
-        sarea_lb.x2 = sarea_lb.x1;
-        sarea_lb.y2 = sarea_lb.y1;
-
-        uint16_t d;
-        for(d= 0; d < p; d++) {
-            fill_fp(&sarea_rb, mask_p, style->scolor, opa_v_result[d]);
-            sarea_rb.x1++;
-            sarea_rb.x2++;
-
-            fill_fp(&sarea_rt, mask_p, style->scolor, opa_v_result[d]);
-            sarea_rt.x1++;
-            sarea_rt.x2++;
-
-            fill_fp(&sarea_lb, mask_p, style->scolor, opa_v_result[d]);
-            sarea_lb.x1--;
-            sarea_lb.x2--;
-
-            fill_fp(&sarea_lt, mask_p, style->scolor, opa_v_result[d]);
-            sarea_lt.x1--;
-            sarea_lt.x2--;
-        }
-
-        /*When the first row is known draw the straight pars with same opa. map*/
-        if(row == 0) {
-               lv_draw_cont_shadow_full_straight(cords_p, mask_p, style, opa_v_result);
-        }
-    }
-
-
 #else
 
     cord_t swidth = style->swidth;
@@ -1240,10 +1131,215 @@ static void lv_draw_cont_shadow(const area_t * cords_p, const area_t * mask_p, c
 #endif
 }
 
+static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style)
+{
+    cord_t radius = style->radius;
+
+    cord_t width = area_get_width(cords_p);
+    cord_t height = area_get_height(cords_p);
+
+    radius = lv_draw_cont_radius_corr(radius, width, height);
+
+    cord_t cruve_x[LV_VER_RES] = {CORD_MIN};
+    memset(cruve_x, 0, sizeof(cruve_x));
+    point_t circ;
+    cord_t circ_tmp;
+    circ_init(&circ, &circ_tmp, radius);
+    while(circ_cont(&circ)) {
+        cruve_x[CIRC_OCT1_Y(circ)] = CIRC_OCT1_X(circ);
+        cruve_x[CIRC_OCT2_Y(circ)] = CIRC_OCT2_X(circ);
+        circ_next(&circ, &circ_tmp);
+    }
+    int16_t row;
+
+    opa_t opa_h_result[LV_HOR_RES];
+    int16_t filter_size = 2 * style->swidth + 1;
+
+    for(row = 0; row < filter_size; row++) {
+        opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->opa) / (filter_size);
+    }
+
+    uint16_t p;
+    opa_t opa_v_result[LV_VER_RES];
+
+    point_t point_rt;
+    point_t point_rb;
+    point_t point_lt;
+    point_t point_lb;
+    point_t ofs_rb;
+    point_t ofs_rt;
+    point_t ofs_lb;
+    point_t ofs_lt;
+    ofs_rb.x = cords_p->x2 - radius;
+    ofs_rb.y = cords_p->y2 - radius;
+
+    ofs_rt.x = cords_p->x2 - radius;
+    ofs_rt.y = cords_p->y1 + radius;
+
+    ofs_lb.x = cords_p->x1 + radius;
+    ofs_lb.y = cords_p->y2 - radius;
+
+    ofs_lt.x = cords_p->x1 + radius;
+    ofs_lt.y = cords_p->y1 + radius;
+
+
+    for(row = 0; row < radius + style->swidth; row++) {
+        for(p = 0; p < radius + style->swidth; p++) {
+           int16_t v;
+           uint32_t opa_tmp = 0;
+           int16_t row_v;
+           bool swidth_out = false;
+           for(v = -style->swidth; v < style->swidth; v++) {
+               row_v = row + v;
+               if(row_v < 0) row_v = 0; /*Rows above the corner*/
+
+               /*Rows below the bottom are empty so they won't modify the filter*/
+               if(row_v > radius) {
+                   break;
+               }
+               else
+               {
+                   int16_t p_tmp = p - (cruve_x[row_v] - cruve_x[row]);
+                   if(p_tmp < -style->swidth) { /*Cols before the filtered shadow (still not blurred)*/
+                       opa_tmp += style->opa;
+                   }
+                   /*Cols after the filtered shadow (already no effect) */
+                   else if (p_tmp > style->swidth) {
+                       /* If on the current point the  filter top point is already out of swidth then
+                        * the remaining part will not do not anything on this point*/
+                       if(v == -style->swidth) { /*Is the first point?*/
+                           swidth_out = true;
+                       }
+                       break;
+                   } else {
+                       opa_tmp += opa_h_result[p_tmp + style->swidth];
+                   }
+               }
+           }
+           if(swidth_out == false) {
+               opa_tmp = opa_tmp / (filter_size);
+               opa_v_result[p] = opa_tmp;
+           }
+           else {
+               break;
+           }
+        }
+
+        point_rt.x = cruve_x[row] + ofs_rt.x;
+        point_rt.y = ofs_rt.y - row;
+
+        point_rb.x = cruve_x[row] + ofs_rb.x;
+        point_rb.y = ofs_rb.y + row;
+
+        point_lt.x = ofs_lt.x -  cruve_x[row];
+        point_lt.y = ofs_lt.y - row;
+
+        point_lb.x = ofs_lb.x - cruve_x[row];
+        point_lb.y = ofs_lb.y + row;
+
+        uint16_t d;
+        for(d= 0; d < p; d++) {
+            px_fp(point_rb.x,point_rb.y , mask_p, style->scolor, opa_v_result[d]);
+            point_rb.x++;
+
+            px_fp(point_rt.x,point_rt.y , mask_p, style->scolor, opa_v_result[d]);
+            point_rt.x++;
+
+            px_fp(point_lb.x,point_rb.y , mask_p, style->scolor, opa_v_result[d]);
+            point_lb.x--;
+
+            px_fp(point_lt.x,point_lt.y , mask_p, style->scolor, opa_v_result[d]);
+            point_lt.x--;
+        }
+
+        /*When the first row is known draw the straight pars with same opa. map*/
+        if(row == 0) {
+           lv_draw_cont_shadow_full_straight(cords_p, mask_p, style, opa_v_result);
+        }
+    }
+}
+
+
+static void lv_draw_cont_shadow_bottom(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style)
+{
+    cord_t radius = style->radius;
+
+    cord_t width = area_get_width(cords_p);
+    cord_t height = area_get_height(cords_p);
+
+    radius = lv_draw_cont_radius_corr(radius, width, height);
+
+    cord_t cruve_x[LV_VER_RES] = {CORD_MIN};
+    memset(cruve_x, 0, sizeof(cruve_x));
+    point_t circ;
+    cord_t circ_tmp;
+    circ_init(&circ, &circ_tmp, radius);
+    while(circ_cont(&circ)) {
+        cruve_x[CIRC_OCT1_Y(circ)] = CIRC_OCT1_X(circ);
+        cruve_x[CIRC_OCT2_Y(circ)] = CIRC_OCT2_X(circ);
+        circ_next(&circ, &circ_tmp);
+    }
+    int16_t row;
+
+    opa_t opa_h_result[LV_HOR_RES];
+    int16_t filter_size = 2 * style->swidth + 1;
+
+    for(row = 0; row < filter_size; row++) {
+        opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->opa) / (filter_size);
+    }
+
+    point_t point_l;
+    point_t point_r;
+    area_t area_mid;
+    point_t ofs1;
+    point_t ofs2;
+
+    ofs1.x = cords_p->x1 + radius;
+    ofs1.y = cords_p->y2 - radius;
+
+    ofs2.x = cords_p->x2 - radius;
+    ofs2.y = cords_p->y2 - radius;
+
+    for(row = 0; row < radius; row++) {
+        point_l.x = ofs1.x + radius - row - radius;
+        point_l.y = ofs1.y + cruve_x[row];
+
+        point_r.x = ofs2.x + row;
+        point_r.y = ofs2.y + cruve_x[row];
+
+        uint16_t d;
+        for(d= style->swidth; d < filter_size; d++) {
+            px_fp(point_l.x, point_l.y, mask_p, style->scolor, opa_h_result[d]);
+            point_l.y ++;
+
+            px_fp(point_r.x, point_r.y, mask_p, style->scolor, opa_h_result[d]);
+            point_r.y ++;
+        }
+
+    }
+
+    area_mid.x1 = ofs1.x + 1;
+    area_mid.y1 = ofs1.y + radius;
+    area_mid.x2 = ofs2.x - 1;
+    area_mid.y2 = area_mid.y1;
+
+    uint16_t d;
+    for(d= style->swidth; d < filter_size; d++) {
+        fill_fp(&area_mid, mask_p, style->scolor, opa_h_result[d]);
+        area_mid.y1 ++;
+        area_mid.y2 ++;
+    }
+}
+
 static void lv_draw_cont_shadow_full_straight(const area_t * cords_p, const area_t * mask_p, const lv_style_t * style, const opa_t * map)
 {
 
     cord_t radius = style->radius;
+
+    cord_t width = area_get_width(cords_p);
+    cord_t height = area_get_height(cords_p);
+
+    radius = lv_draw_cont_radius_corr(radius, width, height);
 
     area_t sider_area;
     sider_area.x1 = cords_p->x2;
