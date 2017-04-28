@@ -68,6 +68,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     ext->h = lv_obj_get_height(new_img);
     ext->transp = 0;
     ext->upscale = 0;
+    ext->auto_size = 1;
 
     /*Init the new object*/    
     lv_obj_set_signal_f(new_img, lv_img_signal);

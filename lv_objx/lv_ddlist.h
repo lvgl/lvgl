@@ -132,7 +132,7 @@ bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size);
  * @param ddlist pointer to a drop down list object
  * @return pointer the style of the select rectangle
  */
-lv_style_t * lv_dlist_get_style_select(lv_obj_t * ddlist);
+lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist);
 
 /**********************
  *      MACROS

@@ -113,6 +113,7 @@ static lv_app_dsc_t my_app_dsc =
 };
 
 static lv_style_t style_sc_label;
+static lv_style_t style_btn_symbol;
 
 
 /**********************
@@ -133,6 +134,8 @@ const lv_app_dsc_t * lv_app_files_init(void)
     memcpy(&style_sc_label, &app_style->sc_rec_rel, sizeof(lv_style_t));
     style_sc_label.font = font_get(LV_APP_FONT_LARGE);
 
+    lv_style_get(LV_STYLE_BTN_REL, &style_btn_symbol);
+    style_btn_symbol.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 	return &my_app_dsc;
 }
 
@@ -350,7 +353,8 @@ static void win_create_list(lv_app_inst_t * app)
     /*Create a new list*/
     win_data->file_list = lv_list_create(app->win, NULL);
     lv_obj_set_width(win_data->file_list, lv_win_get_width(app->win));
-   //TODO lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
+    lv_list_set_style_img(win_data->file_list, &style_btn_symbol);
+    lv_obj_set_style(lv_page_get_scrl(win_data->file_list), lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
     lv_obj_set_drag_parent(win_data->file_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(win_data->file_list), true);
     lv_cont_set_fit(win_data->file_list, false, true);
@@ -381,13 +385,13 @@ static void win_load_file_list(lv_app_inst_t * app)
         for(i = 0; drv[i] != '\0'; i++) {
             buf[0] = drv[i];
             buf[1] = '\0';
-            liste = lv_list_add(win_data->file_list, "U:/icon_driver", buf, win_drv_action);
+            liste = lv_list_add(win_data->file_list, SYMBOL_DRIVE, buf, win_drv_action);
             lv_obj_set_free_p(liste, app);
         }
     }
     /*List the files/folders with fs interface*/
     else {
-        liste = lv_list_add(win_data->file_list, "U:/icon_up", "Up", win_up_action);
+        liste = lv_list_add(win_data->file_list, SYMBOL_UP, "Up", win_up_action);
         lv_obj_set_free_p(liste, app);
 
         fs_readdir_t rd;
@@ -399,7 +403,7 @@ static void win_load_file_list(lv_app_inst_t * app)
 
         /*At not first page add prev. page button */
         if(app_data->file_cnt != 0) {
-            liste = lv_list_add(win_data->file_list, "U:/icon_left", "Previous page", win_prev_action);
+            liste = lv_list_add(win_data->file_list, SYMBOL_LEFT, "Previous page", win_prev_action);
             lv_obj_set_free_p(liste, app);
         }
 
@@ -409,7 +413,7 @@ static void win_load_file_list(lv_app_inst_t * app)
         uint16_t file_cnt = 0;
         while(file_cnt <= app_data->file_cnt) {
             res = fs_readdir(&rd, fn);
-            if(res != FS_RES_OK || fn[0] == '\0'){
+            if(res != FS_RES_OK ){
                 lv_app_notice_add("Can not read\nthe path in Files");
                 return;
             }
@@ -420,13 +424,13 @@ static void win_load_file_list(lv_app_inst_t * app)
         while(res == FS_RES_OK && fn[0] != '\0') {
             if(fn[0] == '/') { /*Add a folder*/
                 lv_obj_t * liste;
-                liste = lv_list_add(win_data->file_list, "U:/icon_folder", &fn[1], win_folder_action);
+                liste = lv_list_add(win_data->file_list, SYMBOL_FOLDER, &fn[1], win_folder_action);
                 lv_obj_set_free_p(liste, app);
                 app_data->file_cnt ++;
             }
             /*Add a file*/
             else {
-                liste = lv_list_add(win_data->file_list, "U:/icon_file", fn, win_file_action);
+                liste = lv_list_add(win_data->file_list, SYMBOL_FILE, fn, win_file_action);
                 lv_obj_set_free_p(liste, app);
                 app_data->file_cnt ++;
             }
@@ -436,7 +440,7 @@ static void win_load_file_list(lv_app_inst_t * app)
 
             /*Show only LV_APP_FSEL_MAX_FILE elements and add a Next page button*/
             if(app_data->file_cnt != 0 && app_data->file_cnt % LV_APP_FILES_PAGE_SIZE == 0) {
-                liste = lv_list_add(win_data->file_list, "U:/icon_right", "Next page", win_next_action);
+                liste = lv_list_add(win_data->file_list, SYMBOL_RIGHT, "Next page", win_next_action);
                 lv_obj_set_free_p(liste, app);
                 break;
             }
@@ -525,7 +529,7 @@ static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(drv);
     my_app_data_t * app_data = app->app_data;
-    sprintf(app_data->path, "%s:", lv_list_element_get_txt(drv));
+    sprintf(app_data->path, "%s:", lv_list_get_element_text(drv));
     app_data->file_cnt = 0;
     lv_win_set_title(app->win, app_data->path);
     my_sc_data_t * sc_data = app->sc_data;
@@ -549,7 +553,7 @@ static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(folder);
     my_app_data_t * app_data = app->app_data;
-    sprintf(app_data->path, "%s/%s", app_data->path, lv_list_element_get_txt(folder));
+    sprintf(app_data->path, "%s/%s", app_data->path, lv_list_get_element_text(folder));
     app_data->file_cnt = 0;
 
     lv_win_set_title(app->win, app_data->path);
@@ -577,7 +581,7 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
     my_app_data_t * app_data = app->app_data;
     my_win_data_t * win_data = app->win_data;
 
-    sprintf(app_data->fn, "%s", lv_list_element_get_txt(file));
+    sprintf(app_data->fn, "%s", lv_list_get_element_text(file));
 
     win_create_list(app);
 
@@ -662,9 +666,9 @@ static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, 
             lv_app_notice_add("CRC sending is\nnot supported yet");
         }
     } else if(id == SEND_SETTINGS_CHUNK_SIZE) {
-        lv_app_kb_open(element, LV_APP_KB_MODE_NUM, send_settings_kb_close_action, send_settings_kb_ok_action);
+        lv_app_kb_open(element, LV_APP_KB_MODE_NUM | LV_APP_KB_MODE_WIN_RESIZE, send_settings_kb_close_action, send_settings_kb_ok_action);
     } else if(id == SEND_SETTINGS_CHUNK_DELAY) {
-        lv_app_kb_open(element, LV_APP_KB_MODE_NUM, send_settings_kb_close_action, send_settings_kb_ok_action);
+        lv_app_kb_open(element, LV_APP_KB_MODE_NUM | LV_APP_KB_MODE_WIN_RESIZE, send_settings_kb_close_action, send_settings_kb_ok_action);
     }
 
     return LV_ACTION_RES_OK;

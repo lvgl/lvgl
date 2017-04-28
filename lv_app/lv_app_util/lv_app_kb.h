@@ -23,6 +23,7 @@ typedef enum
 {
 	LV_APP_KB_MODE_TXT = 0x01,
 	LV_APP_KB_MODE_NUM = 0x02,
+    LV_APP_KB_MODE_WIN_RESIZE = 0x04,
 }lv_app_kb_mode_t;
 
 /**********************

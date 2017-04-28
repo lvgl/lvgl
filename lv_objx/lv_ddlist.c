@@ -36,8 +36,7 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist);
  *  STATIC VARIABLES
  **********************/
 static lv_design_f_t  ancestor_design_f;
-static const char * def_options[] = {"Option 1", "Option 2", "Option 3","Option 4", "Option 5", "Option 6",
-                                     "Option 7", "Option 8", "Option 9","Option 10", "Option 11", "Option 12",""};
+static const char * def_options[] = {"Option 1", "Option 2", "Option 3", ""};
 /**********************
  *      MACROS
  **********************/
@@ -87,7 +86,6 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));
 
         ext->opt_label = lv_label_create(new_ddlist, NULL);
-        lv_obj_set_style(ext->opt_label, lv_style_get(LV_STYLE_PRETTY, NULL));
         lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_rel_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
@@ -258,7 +256,7 @@ bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size)
  * @param ddlist pointer to a drop down list object
  * @return pointer the style of the select rectangle
  */
-lv_style_t * lv_dlist_get_style_select(lv_obj_t * ddlist)
+lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     if(ext->style_sel == NULL) return lv_obj_get_style(ddlist);

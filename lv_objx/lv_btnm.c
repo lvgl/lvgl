@@ -396,7 +396,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
     	ancestor_design_f(btnm, mask, mode);
 
     	lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
-    	lv_style_t * style = lv_obj_get_style(btnm);
         lv_style_t * btn_style;
 
     	area_t area_btnm;

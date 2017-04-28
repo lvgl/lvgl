@@ -244,8 +244,6 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
 
 		lv_bar_ext_t * ext = lv_obj_get_ext(bar);
 
-
-
         lv_style_t * style_indic = lv_bar_get_style_indic(bar);
 		area_t indic_area;
 		area_cpy(&indic_area, &bar->cords);

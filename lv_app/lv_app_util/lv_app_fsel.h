@@ -35,7 +35,7 @@ void lv_app_fsel_init(void);
  * @param filter show only files with a specific extension, e.g. "wav".
  *               "/" means filter to folders.
  * @param param a free parameter which will be added to 'ok_action'
- * @param ok_action an action to call when a file or folder is chosen
+ * @param ok_action an action to call when a file or folder is chosen (give 'param' and the path as parameters)
  */
 void lv_app_fsel_open(const char * path, const char * filter, void * param,
                        void (*ok_action)(void *, const char *));

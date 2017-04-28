@@ -28,7 +28,8 @@ typedef enum
 
 typedef struct
 {
-
+    lv_app_terminal_format_t format;    /*Data display format*/
+    lv_app_com_type_t com_type;          /*The listened communication type (channel) */
 }lv_app_terminal_conf_t;
 
 /**********************

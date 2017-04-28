@@ -63,6 +63,7 @@ static cord_t kb_ta_ori_size;
 static uint8_t kb_mode;
 static void (*kb_close_action)(lv_obj_t *);
 static void (*kb_ok_action)(lv_obj_t *);
+static lv_style_t style_bg;
 static lv_style_t style_btn_rel;
 static lv_style_t style_btn_pr;
 /**********************
@@ -78,8 +79,16 @@ static lv_style_t style_btn_pr;
  */
 void lv_app_kb_init(void)
 {
+    lv_style_get(LV_STYLE_PLAIN, &style_bg);
+    style_bg.hpad = 0;
+    style_bg.vpad = 0;
+    style_bg.opad = 0;
     lv_style_get(LV_STYLE_BTN_REL, &style_btn_rel);
+    style_btn_rel.radius = 0;
+    style_btn_rel.bwidth = 1 * LV_DOWNSCALE;
     lv_style_get(LV_STYLE_BTN_PR, &style_btn_pr);
+    style_btn_pr.radius = 0;
+    style_btn_pr.bwidth = 1 * LV_DOWNSCALE;
 }
 
 /**
@@ -104,6 +113,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 
     /*Create a button matrix for the keyboard  */
     kb_btnm = lv_btnm_create(lv_scr_act(), NULL);
+    lv_obj_set_style(kb_btnm, &style_bg);
     lv_obj_set_size(kb_btnm, LV_HOR_RES, LV_VER_RES / 2);
     lv_obj_align(kb_btnm, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
     lv_btnm_set_action(kb_btnm, lv_app_kb_action);
@@ -119,25 +129,29 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     }
     lv_btnm_set_styles_btn(kb_btnm, &style_btn_rel, &style_btn_pr);
 
-    /*Reduce the size of the window and align it to the top*/
-    kb_win = lv_app_win_get_from_obj(kb_ta);
-    lv_obj_set_height(kb_win, LV_VER_RES / 2);
-    lv_obj_set_y(kb_win, 0);
+    kb_win = NULL;
+    kb_ta_ori_size = 0;
+    if(mode & LV_APP_KB_MODE_WIN_RESIZE) {
+        /*Reduce the size of the window and align it to the top*/
+        kb_win = lv_app_win_get_from_obj(kb_ta);
+        lv_obj_set_height(kb_win, LV_VER_RES / 2);
+        lv_obj_set_y(kb_win, 0);
 
-    /*If the text area is higher then the new size of the window reduce its size too*/
-    cord_t win_h = lv_obj_get_height(kb_win);
-	kb_ta_ori_size = lv_obj_get_height(kb_ta);
-    if(lv_obj_get_height(kb_ta)  > win_h) {
-    	lv_obj_set_height(kb_ta, win_h);
+        /*If the text area is higher then the new size of the window reduce its size too*/
+        cord_t cont_h = lv_obj_get_height(kb_win) - lv_obj_get_height(lv_win_get_header(kb_win));
+        kb_ta_ori_size = lv_obj_get_height(kb_ta);
+        if(lv_obj_get_height(kb_ta)  > cont_h - LV_DPI / 10) {
+            lv_obj_set_height(kb_ta, cont_h - LV_DPI / 10);
+        }
+#if LV_APP_ANIM_LEVEL != 0
+        lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
+#else
+        lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
+#endif
     }
 
     lv_ta_set_cursor_pos(kb_ta, LV_TA_CUR_LAST);
 
-#if LV_APP_ANIM_LEVEL != 0
-    lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
-#else
-    lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
-#endif
 }
 
 /**
@@ -155,11 +169,11 @@ void lv_app_kb_close(bool ok)
 	}
 
 	/*Reset the modified sizes*/
-
-	lv_obj_set_height(kb_ta, kb_ta_ori_size);
-
-	lv_obj_set_size(kb_win, LV_HOR_RES, LV_VER_RES);
-	kb_win = NULL;
+	if((kb_mode & LV_APP_KB_MODE_WIN_RESIZE) && kb_win != NULL) {
+        lv_obj_set_height(kb_ta, kb_ta_ori_size);
+        lv_obj_set_size(kb_win, LV_HOR_RES, LV_VER_RES);
+        kb_win = NULL;
+	}
 
     lv_obj_del(kb_btnm);
     kb_btnm = NULL;
@@ -229,11 +243,13 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
         lv_ta_add_text(kb_ta, txt);
     }
 
+    if(kb_mode & LV_APP_KB_MODE_WIN_RESIZE) {
 #if LV_APP_ANIM_LEVEL != 0
-    lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
+        lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-    lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
+        lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
 #endif
+    }
     return LV_ACTION_RES_OK;
 }
 

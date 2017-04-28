@@ -198,7 +198,7 @@ static void my_win_close(lv_app_inst_t * app)
 static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
 {
     lv_ta_set_text(ta, ""); /*Clear the ta*/
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT, NULL, kb_ok_action);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE, NULL, kb_ok_action);
     return LV_ACTION_RES_OK;
 }
 

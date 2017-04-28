@@ -291,7 +291,7 @@ void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style)
  * @param liste pointer to list element
  * @return pointer to the text
  */
-const char * lv_list_element_get_txt(lv_obj_t * liste)
+const char * lv_list_get_element_text(lv_obj_t * liste)
 {
     /*The last child is the label*/
     lv_obj_t * label = lv_obj_get_child(liste, NULL);

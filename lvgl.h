@@ -34,7 +34,7 @@
 #include "lv_objx/lv_label.h"
 #include "lv_objx/lv_line.h"
 #include "lv_objx/lv_page.h"
-#include <lvgl/lv_objx/lv_cont.h>
+#include "lv_objx/lv_cont.h"
 #include "lv_objx/lv_list.h"
 #include "lv_objx/lv_chart.h"
 #include "lv_objx/lv_cb.h"

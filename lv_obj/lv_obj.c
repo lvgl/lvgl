@@ -1234,7 +1234,7 @@ cord_t lv_obj_get_height(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-cord_t lv_obj_getext_size(lv_obj_t * obj)
+cord_t lv_obj_get_ext_size(lv_obj_t * obj)
 {
     return obj->ext_size;
 }

@@ -18,7 +18,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_CHART_DL_NUM		8	/*Max data line number. Used in the style.*/
 
 /**********************
  *      TYPEDEFS
@@ -83,7 +82,7 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param);
  * @param color color of the data line
  * @return pointer to the allocated data line (
  */
-lv_chart_dl_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color);
+lv_chart_dl_t * lv_chart_add_data_line(lv_obj_t * chart, color_t color);
 
 /**
  * Refresh a chart if its data line has changed

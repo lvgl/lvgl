@@ -47,6 +47,7 @@ static lv_obj_t * fsel_win;
 static lv_obj_t * fsel_list;
 static void *  fsel_param;
 static void (*fsel_ok_action)(void *, const char *);
+static lv_style_t style_btn_symbol;
 
 /**********************
  *      MACROS
@@ -61,7 +62,8 @@ static void (*fsel_ok_action)(void *, const char *);
  */
 void lv_app_fsel_init(void)
 {
-   //TODO lv_lists_get(LV_LISTS_TRANSP, &fsel_lists);
+    lv_style_get(LV_STYLE_BTN_REL, &style_btn_symbol);
+    style_btn_symbol.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 }
 
 /**
@@ -90,11 +92,14 @@ void lv_app_fsel_open(const char * path, const char * filter, void * param, void
     /*Check filter: NULL and "" mean no filtering*/
     if(fsel_filter == NULL) fsel_filter = "";
 
+    lv_app_style_t * app_style = lv_app_style_get();
+
     /*Create a window for the File selector*/
     fsel_win = lv_win_create(lv_scr_act(), NULL);
     lv_obj_set_size(fsel_win, LV_HOR_RES, LV_VER_RES);
+    lv_win_set_styles_cbtn(fsel_win, &app_style->win_cbtn_rel, &app_style->win_cbtn_pr);
 
-    lv_win_add_ctrl_btn(fsel_win, "U:/icon_close", fsel_close_action);
+    lv_win_add_cbtn(fsel_win, SYMBOL_CLOSE, fsel_close_action);
 
     fsel_refr(); /*Refresh the list*/
 
@@ -138,31 +143,32 @@ static void fsel_refr(void)
     /*Create a new list*/
     fsel_list = lv_list_create(fsel_win, NULL);
     lv_obj_set_width(fsel_list, lv_win_get_width(fsel_win));
-    //TODO lv_obj_set_style(fsel_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
+    lv_list_set_style_img(fsel_list, &style_btn_symbol);
+    lv_obj_set_style(lv_page_get_scrl(fsel_list), lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
     lv_obj_set_drag_parent(fsel_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(fsel_list), true);
     lv_cont_set_fit(fsel_list, false, true);
 
     fs_res_t res = FS_RES_OK;
+    lv_obj_t * liste;
 
     /*At empty path show the drivers */
     if(fsel_path[0] == '\0') {
         char drv[16];
         char buf[2];
-        lv_obj_t * liste;
         fs_get_letters(drv);
         uint8_t i;
         for(i = 0; drv[i] != '\0'; i++) {
             buf[0] = drv[i];
             buf[1] = '\0';
-            liste = lv_list_add(fsel_list, "U:/icon_driver", buf, fsel_drv_action);
+            liste = lv_list_add(fsel_list, SYMBOL_DRIVE, buf, fsel_drv_action);
             /*Add long press action to choose the driver as a folder*/
             if(fsel_filter[0] == '/') lv_btn_set_lpr_action(liste, fsel_drv_lpr_action);
         }
     }
     /*List the files/folders with fs interface*/
     else {
-        lv_list_add(fsel_list, "U:/icon_up", "Up", fsel_up_action);
+        liste = lv_list_add(fsel_list, SYMBOL_UP, "Up", fsel_up_action);
 
         fs_readdir_t rd;
         res = fs_readdir_init(&rd, fsel_path);
@@ -173,7 +179,7 @@ static void fsel_refr(void)
 
         /*At not first page add prev. page button */
         if(fsel_file_cnt != 0) {
-            lv_list_add(fsel_list, "U:/icon_left", "Previous page", fsel_prev_action);
+            liste = lv_list_add(fsel_list, SYMBOL_LEFT, "Previous page", fsel_prev_action);
         }
 
         char fn[LV_APP_FSEL_FN_MAX_LEN];
@@ -182,7 +188,7 @@ static void fsel_refr(void)
         uint16_t file_cnt = 0;
         while(file_cnt <= fsel_file_cnt) {
             res = fs_readdir(&rd, fn);
-            if(res != FS_RES_OK || fn[0] == '\0'){
+            if(res != FS_RES_OK){
                 lv_app_notice_add("Can not read the path\nin File selector");
                 return;
             }
@@ -193,7 +199,7 @@ static void fsel_refr(void)
         while(res == FS_RES_OK && fn[0] != '\0') {
             if(fn[0] == '/') { /*Add a folder*/
                 lv_obj_t * liste;
-                liste = lv_list_add(fsel_list, "U:/icon_folder", &fn[1], fsel_folder_action);
+                liste = lv_list_add(fsel_list, SYMBOL_FOLDER, &fn[1], fsel_folder_action);
                 /*Add long press action to choose a folder*/
                 if(fsel_filter[0] == '/') lv_btn_set_lpr_action(liste, fsel_folder_lpr_action);
 
@@ -204,7 +210,7 @@ static void fsel_refr(void)
             else if(fsel_filter[0] == '\0' || /*No filtering or ...*/
                     (strcmp(fs_get_ext(fn), fsel_filter) == 0 && /*.. the filter matches*/
                      fsel_filter[0] != '/')) {
-                lv_list_add(fsel_list, "U:/icon_file", fn, fsel_file_action);
+                liste = lv_list_add(fsel_list, SYMBOL_FILE, fn, fsel_file_action);
                 fsel_file_cnt ++;
                 file_cnt ++;
             }
@@ -214,7 +220,7 @@ static void fsel_refr(void)
 
             /*Show only LV_APP_FSEL_MAX_FILE elements and add a Next page button*/
             if(fsel_file_cnt != 0 && fsel_file_cnt % LV_APP_FSEL_PAGE_SIZE == 0) {
-                lv_list_add(fsel_list, "U:/icon_right", "Next page", fsel_next_action);
+                liste = lv_list_add(fsel_list, SYMBOL_RIGHT, "Next page", fsel_next_action);
                 break;
             }
         }
@@ -297,7 +303,7 @@ static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_dispi_t * dispi)
  */
 static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
 {
-    sprintf(fsel_path, "%s:", lv_list_element_get_txt(drv));
+    sprintf(fsel_path, "%s:", lv_list_get_element_text(drv));
     fsel_file_cnt = 0;
     fsel_refr();
     return LV_ACTION_RES_INV;
@@ -311,7 +317,7 @@ static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
  */
 static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_dispi_t * dispi)
 {
-    sprintf(fsel_path, "%s:", lv_list_element_get_txt(drv));
+    sprintf(fsel_path, "%s:", lv_list_get_element_text(drv));
 
     if(fsel_ok_action != NULL) {
         fsel_ok_action(fsel_param, fsel_path);
@@ -330,7 +336,7 @@ static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_dispi_t * dispi)
  */
 static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
 {
-    sprintf(fsel_path, "%s/%s", fsel_path, lv_list_element_get_txt(folder));
+    sprintf(fsel_path, "%s/%s", fsel_path, lv_list_get_element_text(folder));
     fsel_file_cnt = 0;
     fsel_refr();
     return LV_ACTION_RES_INV;
@@ -344,7 +350,7 @@ static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
  */
 static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_dispi_t * dispi)
 {
-    sprintf(fsel_path, "%s/%s", fsel_path, lv_list_element_get_txt(folder));
+    sprintf(fsel_path, "%s/%s", fsel_path, lv_list_get_element_text(folder));
 
     if(fsel_ok_action != NULL) {
         fsel_ok_action(fsel_param, fsel_path);
@@ -363,7 +369,7 @@ static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_dispi_t * di
  */
 static lv_action_res_t fsel_file_action(lv_obj_t * file, lv_dispi_t * dispi)
 {
-    sprintf(fsel_path, "%s/%s", fsel_path, lv_list_element_get_txt(file));
+    sprintf(fsel_path, "%s/%s", fsel_path, lv_list_get_element_text(file));
 
     if(fsel_ok_action != NULL) {
         fsel_ok_action(fsel_param, fsel_path);

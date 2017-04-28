@@ -347,7 +347,6 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
             cord_t row;
             area_t act_area;
 
-
             area_t mask_sub;
             bool union_ok;
             union_ok = area_union(&mask_sub, mask_p, cords_p);

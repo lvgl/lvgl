@@ -189,6 +189,9 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value)
 
     ext->values[needle] = value;
 
+    /*To be consistent with bar set the first needle's value for the bar*/
+    if(needle == 0) lv_bar_set_value(gauge, value);
+
     lv_obj_inv(gauge);
 }
 
@@ -309,6 +312,11 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
         int16_t min = lv_bar_get_min_value(gauge);
         int16_t max = lv_bar_get_max_value(gauge);
 
+        /*To be consistent with bar use the bar value as the first needle*/
+        if(ext->needle_num  != 0) {
+            ext->values[0] = lv_bar_get_value(gauge);
+        }
+
         int16_t critical_val = ext->low_critical == 0 ? min : max;
         uint8_t i;
 
@@ -327,7 +335,8 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
         style_bg.gcolor = color_mix(style_critical->gcolor, style_base->gcolor, ratio);
         style_bg.bcolor = color_mix(style_critical->bcolor, style_base->bcolor, ratio);
         style_bg.scolor = color_mix(style_critical->scolor, style_base->scolor, ratio);
-        style_bg.swidth = (cord_t)((cord_t)(style_critical->swidth + style_base->swidth) * ratio) >> 8;
+        style_bg.swidth = (cord_t)(((cord_t)style_critical->swidth * ratio) + ((cord_t)style_base->swidth * (OPA_COVER - ratio))) >> 8;
+        style_bg.opa = (cord_t)(((uint16_t)style_critical->opa * ratio) + ((uint16_t)style_base->opa * (OPA_COVER - ratio))) >> 8;
 
         lv_draw_rect(&gauge->cords, mask, &style_bg);
 

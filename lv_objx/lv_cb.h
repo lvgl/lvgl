@@ -76,7 +76,13 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt);
  */
 const char * lv_cb_get_text(lv_obj_t * cb);
 
+/**
+ * Get the bullet (lv_btn) of a check box
+ * @param cb pointer to check box object
+ * @return pointer to the bullet of the check box (lv_btn)
+ */
 lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb);
+
 /**********************
  *      MACROS
  **********************/

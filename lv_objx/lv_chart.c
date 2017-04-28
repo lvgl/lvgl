@@ -139,7 +139,7 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param)
  * @param color color of the data line
  * @return pointer to the allocated data line (
  */
-lv_chart_dl_t * lv_chart_add_dataline(lv_obj_t * chart, color_t color)
+lv_chart_dl_t * lv_chart_add_data_line(lv_obj_t * chart, color_t color)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
 	lv_chart_dl_t * dl = ll_ins_head(&ext->dl_ll);

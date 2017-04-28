@@ -88,7 +88,7 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
  * @param rel_action a function pointer to call when the button is released
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_t rel_action);
+lv_obj_t * lv_win_add_cbtn(lv_obj_t * win, const char * img_path, lv_action_t rel_action);
 
 /**
  * A release action which can be assigned to a window control button to close it
@@ -113,12 +113,12 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_cbtn_size(lv_obj_t * win, cord_t size);
 
 /**
- * Set the style of the window  control buttons in a given state
+ * Set the styles of the window control buttons in a given state
  * @param win pointer to a window object
  * @param rel spointer to the style in released state
  * @param pr pointer to the style in pressed state
  */
-void lv_win_set_style_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr);
+void lv_win_set_styles_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr);
 
 /**
  * Get the title of a window
@@ -158,10 +158,10 @@ cord_t lv_win_get_width(lv_obj_t * win);
 /**
  * Get the pointer of a widow from one of  its control button.
  * It is useful in the action of the control buttons where only button is known.
- * @param ctrl_btn pointer to a control button of a window
- * @return pointer to the window of 'ctrl_btn'
+ * @param cbtn pointer to a control button of a window
+ * @return pointer to the window of 'cbtn'
  */
-lv_obj_t * lv_win_get_from_ctrl_btn(lv_obj_t * ctrl_btn);
+lv_obj_t * lv_win_get_from_cbtn(lv_obj_t * cbtn);
 
 /**********************
  *      MACROS

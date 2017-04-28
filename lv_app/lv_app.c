@@ -19,6 +19,7 @@
 
 
 #include "../lv_appx/lv_app_example.h"
+#include "../lv_appx/lv_app_phantom.h"
 #include "../lv_appx/lv_app_sysmon.h"
 #include "../lv_appx/lv_app_terminal.h"
 #include "../lv_appx/lv_app_files.h"
@@ -77,7 +78,6 @@ static lv_obj_t * app_scr;   /*Screen of the applications*/
 #if LV_APP_DESKTOP != 0
 static lv_obj_t * menuh;     /*Holder of timg_bubbleshe menu on the top*/
 static lv_obj_t * app_btn;   /*The "Apps" button on the menu*/
-//static lv_obj_t * sys_apph;  /*Holder of the system app. buttons*/
 static lv_obj_t * sc_page;   /*A page for the shortcuts */
 #endif
 
@@ -123,6 +123,12 @@ void lv_app_init(void)
 	dsc = ll_ins_head(&app_dsc_ll);
 	*dsc = lv_app_example_init();
 #endif
+
+#if USE_LV_APP_PHANTOM != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_phantom_init();
+#endif
+
 
 #if USE_LV_APP_SYSMON != 0
     dsc = ll_ins_head(&app_dsc_ll);
@@ -185,7 +191,7 @@ void lv_app_close(lv_app_inst_t * app)
 	lv_app_con_del(app, NULL);
     lv_app_con_del(NULL, app);
 
-	app->dsc->app_close(app);
+    if(app->dsc->app_close != NULL) app->dsc->app_close(app);
 
     memset(app->app_data, 0, app->dsc->app_data_size);
 	dm_free(app->app_data);
@@ -202,6 +208,8 @@ void lv_app_close(lv_app_inst_t * app)
  */
 lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 {
+
+    if(app->dsc->sc_open == NULL) return NULL;
 
 	/*Create a basic  shortcut*/
 #if LV_APP_DESKTOP != 0
@@ -254,6 +262,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 void lv_app_sc_close(lv_app_inst_t * app)
 {
 	if(app->sc == NULL) return;
+    if(app->dsc->sc_close != NULL) app->dsc->sc_close(app);
 	lv_obj_del(app->sc);
 	app->sc = NULL;
 	app->sc_title = NULL;
@@ -275,22 +284,24 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 		app_list = NULL;
 	}
 
+	if(app->dsc->win_open == NULL) return NULL;
+
 	app->win = lv_win_create(lv_scr_act(), NULL);
 	lv_obj_set_free_p(app->win, app);
 	lv_obj_set_style(lv_win_get_header(app->win), &app_style.win_header);
 	lv_win_set_title(app->win, app->dsc->name);
-
-	lv_win_set_style_cbtn(app->win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
+	lv_page_set_sb_mode(lv_win_get_page(app->win), LV_PAGE_SB_MODE_ON);
+	lv_win_set_styles_cbtn(app->win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
 
 	if(app->dsc->conf_open != NULL) {
-	    lv_win_add_ctrl_btn(app->win, SYMBOL_SETUP, lv_app_win_conf_action);
+	    lv_win_add_cbtn(app->win, SYMBOL_SETUP, lv_app_win_conf_action);
 	}
-	lv_win_add_ctrl_btn(app->win, SYMBOL_DOWN, lv_app_win_minim_action);
-	lv_win_add_ctrl_btn(app->win, SYMBOL_CLOSE,lv_app_win_close_action);
+	lv_win_add_cbtn(app->win, SYMBOL_DOWN, lv_app_win_minim_action);
+	lv_win_add_cbtn(app->win, SYMBOL_CLOSE,lv_app_win_close_action);
 
     app->win_data = dm_alloc(app->dsc->win_data_size);
 
-    app->dsc->win_open(app, app->win);
+     app->dsc->win_open(app, app->win);
 
 	return app->win;
 }
@@ -303,7 +314,9 @@ void lv_app_win_close(lv_app_inst_t * app)
 {
 	if(app->win == NULL) return;
 
-	lv_app_kb_close(false);
+    lv_app_kb_close(false);
+
+    if(app->dsc->win_close != NULL) app->dsc->win_close(app);
 
 	lv_obj_del(app->win);
 	app->win = NULL;
@@ -516,16 +529,6 @@ static void lv_app_init_desktop(void)
     lv_label_set_text(app_label, "Apps");
     lv_obj_set_pos(app_btn, 0, 0);
     lv_obj_set_pos(menuh, 0, 0);
-/*
-    sys_apph = lv_cont_create(menuh, NULL);
-    lv_cont_set_layout(sys_apph, LV_CONT_LAYOUT_ROW_M);
-    lv_cont_set_fit(sys_apph, true, false);
-    lv_obj_set_style(sys_apph, lv_rects_get(LV_RECTS_TRANSP, NULL));
-    lv_obj_t * clock = lv_label_create(sys_apph, NULL);
-    lv_obj_set_style(clock, &app_style.menu_btn_label);
-    lv_label_set_text(clock, "20:17");
-
-    lv_obj_align(sys_apph, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);*/
 
     /*Shortcut area*/
      sc_page = lv_page_create(lv_scr_act(), NULL);
@@ -736,7 +739,7 @@ static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_dispi_t * dispi)
  */
 static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t * dispi)
 {
-	lv_obj_t * win = lv_win_get_from_ctrl_btn(close_btn);
+	lv_obj_t * win = lv_win_get_from_cbtn(close_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
 
 	lv_app_kb_close(false);
@@ -771,7 +774,7 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
  */
 static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_dispi_t * dispi)
 {
-	lv_obj_t * win = lv_win_get_from_ctrl_btn(minim_btn);
+	lv_obj_t * win = lv_win_get_from_cbtn(minim_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
 
 	lv_app_kb_close(false);
@@ -797,7 +800,7 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
         app_list = NULL;
     }
 
-    lv_obj_t * win = lv_win_get_from_ctrl_btn(set_btn);
+    lv_obj_t * win = lv_win_get_from_cbtn(set_btn);
     lv_app_inst_t * app = lv_obj_get_free_p(win);
 
     app->conf_win = lv_win_create(lv_scr_act(), NULL);
@@ -805,9 +808,9 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
 
     char buf[256];
     sprintf(buf, "%s settings", app->dsc->name);
-    lv_win_add_ctrl_btn(app->conf_win, SYMBOL_CLOSE ,lv_win_close_action);
+    lv_win_add_cbtn(app->conf_win, SYMBOL_CLOSE ,lv_win_close_action);
     lv_win_set_title(app->conf_win, buf);
-    lv_win_set_style_cbtn(app->conf_win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
+    lv_win_set_styles_cbtn(app->conf_win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
     lv_obj_t * scrl = lv_page_get_scrl(lv_win_get_page(app->conf_win));
     lv_cont_set_layout(scrl, LV_CONT_LAYOUT_COL_L);
 
@@ -839,8 +842,6 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     } else {
         lv_obj_get_cords(app->sc, &cords);
     }
-
-
 
     /*Temporally set a simpler style for the window during the animation*/
     lv_obj_t * win_page = lv_win_get_page(app->win);
@@ -921,12 +922,6 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
     lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
     lv_obj_set_hidden(lv_page_get_scrl(win_page), true);
-
-
-    /*Hide some elements to speed up the animation*/
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->btnh, true);
-    lv_obj_set_hidden(((lv_win_ext_t *)app->win->ext)->title, true);
-    lv_obj_set_hidden(lv_page_get_scrl(win_page), true);
     
     anim_t a;
     a.act_time = 0;
@@ -981,6 +976,8 @@ static void lv_app_win_open_anim_cb(lv_obj_t * app_win)
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->btnh, false);
     lv_obj_set_hidden(((lv_win_ext_t *)app_win->ext)->title, false);
     lv_obj_set_hidden(lv_page_get_scrl(win_page), false);
+
+    lv_page_set_sb_mode(win_page, LV_PAGE_SB_MODE_AUTO);
 }
 
 /**

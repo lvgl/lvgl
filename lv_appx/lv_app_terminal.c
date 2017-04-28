@@ -31,7 +31,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define OBJ_PAD (LV_DPI / 4)
+#define OBJ_PAD (LV_DPI / 12)
 
 /**********************
  *      TYPEDEFS
@@ -144,9 +144,17 @@ static void my_app_run(lv_app_inst_t * app, void * conf)
 {
     /*Initialize the application*/
     my_app_data_t * app_data = app->app_data;
-    app_data->com_type = LV_APP_COM_TYPE_CHAR;
-    app_data->format = LV_APP_TERMINAL_FORMAT_ASCII;
+
+    if(conf != NULL) {
+        app_data->com_type = ((lv_app_terminal_conf_t * ) conf)->com_type;
+        app_data->format = ((lv_app_terminal_conf_t * ) conf)->format;
+    } else {
+        app_data->com_type = LV_APP_COM_TYPE_CHAR;
+        app_data->format = LV_APP_TERMINAL_FORMAT_ASCII;
+    }
+
     app_data->last_sender = NULL;
+
     memset(app_data->txt, 0, sizeof(app_data->txt));
 }
 
@@ -326,7 +334,7 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
  */
 static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
 {
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT, NULL, win_ta_kb_ok_action);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE, NULL, win_ta_kb_ok_action);
 
     return LV_ACTION_RES_OK;
 }

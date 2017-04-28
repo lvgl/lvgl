@@ -108,8 +108,8 @@ void lv_list_set_sb_out(lv_obj_t * list, bool out);
  * @param ina pointer to a style for inactive state
  */
 void lv_list_set_styles_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
-lv_style_t * trel, lv_style_t * tpr,
-lv_style_t * ina);
+                            lv_style_t * trel, lv_style_t * tpr,
+                            lv_style_t * ina);
 
 /**
  * Set the styles of the list element image (typically to set symbol font)
@@ -123,7 +123,7 @@ void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style);
  * @param liste pointer to list element
  * @return pointer to the text
  */
-const char * lv_list_element_get_txt(lv_obj_t * liste);
+const char * lv_list_get_element_text(lv_obj_t * liste);
 
 /**
  * Get the scroll bar outside attribute

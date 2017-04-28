@@ -83,8 +83,10 @@ static lv_app_dsc_t my_app_dsc =
 
 static uint8_t mem_pct[LV_APP_SYSMON_PNUM];
 static uint8_t cpu_pct[LV_APP_SYSMON_PNUM];
-static lv_style_t cpu_bars;
-static lv_style_t mem_bars;
+static lv_style_t cpu_bar_bg;
+static lv_style_t mem_bar_bg;
+static lv_style_t cpu_bar_indic;
+static lv_style_t mem_bar_indic;
 #if USE_DYN_MEM != 0  && DM_CUSTOM == 0
 static  dm_mon_t mem_mon;
 #endif
@@ -109,23 +111,30 @@ const lv_app_dsc_t * lv_app_sysmon_init(void)
     memset(cpu_pct, 0, sizeof(cpu_pct));
 
     /*Create bar styles for the shortcut*/
-    lv_style_get(LV_STYLE_PRETTY_COLOR, &cpu_bars);
+    lv_style_get(LV_STYLE_PRETTY, &cpu_bar_bg);
+    cpu_bar_bg.ccolor = COLOR_MAKE(0x40, 0x00, 0x00);
+    cpu_bar_bg.font = font_get(LV_APP_FONT_MEDIUM);
+    cpu_bar_bg.line_space = 0;
+    cpu_bar_bg.txt_align = 1;
+    cpu_bar_bg.hpad = 0;
+    cpu_bar_bg.vpad = 0;
 
-    cpu_bars.gcolor = COLOR_MARRON;
-    cpu_bars.mcolor = COLOR_RED;
-    cpu_bars.bwidth = 0;
+    memcpy(&mem_bar_bg, &cpu_bar_bg, sizeof(lv_style_t));
+    mem_bar_bg.ccolor = COLOR_MAKE(0x00, 0x40, 0x00);
 
-    cpu_bars.ccolor = COLOR_MAKE(0x40, 0x00, 0x00);
-    cpu_bars.font = font_get(LV_APP_FONT_MEDIUM);
-    cpu_bars.line_space = 0;
-    cpu_bars.txt_align = 1;
-    cpu_bars.hpad = 0;
-    cpu_bars.vpad = 0;
+    lv_style_get(LV_STYLE_PRETTY_COLOR, &cpu_bar_indic);
+    cpu_bar_indic.gcolor = COLOR_MARRON;
+    cpu_bar_indic.mcolor = COLOR_RED;
+    cpu_bar_indic.bcolor = COLOR_BLACK;
+    //cpu_bar_indic.bwidth = 1 * LV_DOWNSCALE;
+    cpu_bar_indic.bopa = OPA_50;
+    cpu_bar_indic.hpad = 0 * LV_DOWNSCALE;
+    cpu_bar_indic.vpad = 0 * LV_DOWNSCALE;
 
-    memcpy(&mem_bars, &cpu_bars, sizeof(cpu_bars));
-    mem_bars.gcolor = COLOR_GREEN;
-    mem_bars.mcolor = COLOR_LIME;
-    mem_bars.ccolor = COLOR_MAKE(0x00, 0x40, 0x00);
+
+    memcpy(&mem_bar_indic, &cpu_bar_indic, sizeof(lv_style_t));
+    mem_bar_indic.gcolor = COLOR_GREEN;
+    mem_bar_indic.mcolor = COLOR_LIME;
 
 	return &my_app_dsc;
 }
@@ -186,7 +195,8 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
     sc_data->bar_cpu = lv_bar_create(sc, NULL);
     lv_obj_set_size(sc_data->bar_cpu, w, 5 * lv_obj_get_height(sc) / 8);
     lv_obj_align(sc_data->bar_cpu, NULL, LV_ALIGN_IN_BOTTOM_LEFT, w, - lv_obj_get_height(sc) / 8);
-    lv_bar_set_style_indic(sc_data->bar_cpu, &cpu_bars);
+    lv_obj_set_style(sc_data->bar_cpu, &cpu_bar_bg);
+    lv_bar_set_style_indic(sc_data->bar_cpu, &cpu_bar_indic);
     lv_obj_set_click(sc_data->bar_cpu, false);
     lv_bar_set_range(sc_data->bar_cpu, 0, 100);
     lv_obj_t * label = lv_label_create(sc_data->bar_cpu, NULL);
@@ -195,7 +205,8 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 
     sc_data->bar_mem = lv_bar_create(sc, sc_data->bar_cpu);
     lv_obj_align(sc_data->bar_mem, sc_data->bar_cpu, LV_ALIGN_OUT_RIGHT_MID, w, 0);
-    lv_bar_set_style_indic(sc_data->bar_mem, &mem_bars);
+    lv_obj_set_style(sc_data->bar_mem, &mem_bar_bg);
+    lv_bar_set_style_indic(sc_data->bar_mem, &mem_bar_indic);
     label = lv_label_create(sc_data->bar_mem, NULL);
     lv_label_set_text(label, "M\nE\nM");
     lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -223,6 +234,8 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
     my_win_data_t * win_data = app->win_data;
 
+    lv_cont_set_layout(lv_page_get_scrl(lv_win_get_page(win)), LV_CONT_LAYOUT_PRETTY);
+
     /*Create a chart with two data lines*/
     win_data->chart = lv_chart_create(win, NULL);
     lv_obj_set_size(win_data->chart, LV_HOR_RES / 2, LV_VER_RES / 2);
@@ -231,8 +244,8 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     lv_chart_set_range(win_data->chart, 0, 100);
     lv_chart_set_type(win_data->chart, LV_CHART_LINE);
     lv_chart_set_dl_width(win_data->chart, 2 * LV_DOWNSCALE);
-    win_data->cpu_dl =  lv_chart_add_dataline(win_data->chart, COLOR_RED);
-    win_data->mem_dl =  lv_chart_add_dataline(win_data->chart, COLOR_BLUE);
+    win_data->cpu_dl =  lv_chart_add_data_line(win_data->chart, COLOR_RED);
+    win_data->mem_dl =  lv_chart_add_data_line(win_data->chart, COLOR_BLUE);
 
     uint16_t i;
     for(i = 0; i < LV_APP_SYSMON_PNUM; i ++) {

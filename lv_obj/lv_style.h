@@ -43,7 +43,8 @@ typedef struct
     opa_t opa;          /*Opacity of the object*/
     uint8_t glass :1;   /*1: Do not inherit this style*/
     uint8_t empty :1;   /*Transparent background (border drawn)*/
-    uint8_t stype :3;   /*Shadow type from 'lv_shadow_type_t'*/
+    uint8_t stype :2;   /*Shadow type from 'lv_shadow_type_t'*/
+    uint8_t txt_align:2;
     color_t mcolor;     /*Main color of background*/
     color_t gcolor;     /*Gradient color of background*/
     color_t bcolor;     /*Border color of background*/
@@ -58,7 +59,6 @@ typedef struct
     const font_t * font;
     cord_t letter_space;
     cord_t line_space;
-    uint8_t txt_align;
     opa_t img_recolor;
     cord_t line_width;
 }lv_style_t;

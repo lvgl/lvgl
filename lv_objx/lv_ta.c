@@ -518,7 +518,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 		/*Draw the cursor too*/
 		lv_obj_t * ta = lv_obj_get_parent(scrling);
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
-        lv_style_t * ta_style = lv_obj_get_style(ta);
+        lv_style_t * scrl_style = lv_obj_get_style(lv_page_get_scrl(ta));
 
 		if(ta_ext->cursor_show != 0 && ta_ext->cursor_state == 0) {
 			uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
@@ -529,15 +529,15 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 			lv_style_t * labels_p = lv_obj_get_style(ta_ext->label);
 			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
 			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + LV_DOWNSCALE ;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + scrl_style->line_width ;
 			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + (font_get_height(labels_p->font) >> FONT_ANTIALIAS);
 
 			lv_style_t cur_rects;
 			lv_style_get(LV_STYLE_PLAIN, &cur_rects);
 			cur_rects.radius = 0;
 			cur_rects.bwidth = 0;
-            cur_rects.mcolor = ta_style->ccolor;
-            cur_rects.gcolor = ta_style->ccolor;
+            cur_rects.mcolor = scrl_style->ccolor;
+            cur_rects.gcolor = scrl_style->ccolor;
 			lv_draw_rect(&cur_area, mask, &cur_rects);
 		}
 	}

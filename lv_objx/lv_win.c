@@ -208,7 +208,7 @@ bool lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
  * @param rel_action a function pointer to call when the button is released
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_t rel_action)
+lv_obj_t * lv_win_add_cbtn(lv_obj_t * win, const char * img_path, lv_action_t rel_action)
 {
 	lv_win_ext_t * ext = lv_obj_get_ext(win);
 
@@ -235,7 +235,7 @@ lv_obj_t * lv_win_add_ctrl_btn(lv_obj_t * win, const char * img_path, lv_action_
  */
 lv_action_res_t lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
 {
-	lv_obj_t * win = lv_win_get_from_ctrl_btn(btn);
+	lv_obj_t * win = lv_win_get_from_cbtn(btn);
 
 	lv_obj_del(win);
 
@@ -269,12 +269,12 @@ void lv_win_set_cbtn_size(lv_obj_t * win, cord_t size)
 }
 
 /**
- * Set the style of the window  control buttons in a given state
+ * Set the styles of the window  control buttons in a given state
  * @param win pointer to a window object
  * @param rel spointer to the style in released state
  * @param pr pointer to the style in pressed state
  */
-void lv_win_set_style_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr)
+void lv_win_set_styles_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr)
 {
     lv_win_ext_t * ext = lv_obj_get_ext(win);
     ext->style_cbtn_rel = rel;
@@ -356,7 +356,7 @@ cord_t lv_win_get_width(lv_obj_t * win)
  * @param ctrl_btn pointer to a control button of a window
  * @return pointer to the window of 'ctrl_btn'
  */
-lv_obj_t * lv_win_get_from_ctrl_btn(lv_obj_t * ctrl_btn)
+lv_obj_t * lv_win_get_from_cbtn(lv_obj_t * ctrl_btn)
 {
 	lv_obj_t * ctrl_holder = lv_obj_get_parent(ctrl_btn);
 	lv_obj_t * header = lv_obj_get_parent(ctrl_holder);

@@ -29,8 +29,8 @@
 typedef enum
 {
     LV_LABEL_LONG_EXPAND,   /*Expand the object size to the text size*/
-    LV_LABEL_LONG_BREAK,    /*Keep the width and break the text and expand the object height*/
-    LV_LABEL_LONG_DOTS,     /*Keep the size, break the text and write dots in the last line*/
+    LV_LABEL_LONG_BREAK,    /*Keep the object width, break the too long lines and expand the object height*/
+    LV_LABEL_LONG_DOTS,     /*Keep the object size, break the text and write dots in the last line*/
     LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
 }lv_label_long_mode_t;
 
