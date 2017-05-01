@@ -17,9 +17,8 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_DDLIST_ANIM_TIME
-#define LV_DDLIST_ANIM_TIME 100 /*ms*/
-#endif
+#define LV_DDLIST_DEF_ANIM_TIME 200 /*ms*/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -29,7 +28,7 @@
  **********************/
 static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
 static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * dispi);
-static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en);
+static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time);
 static void lv_ddlist_pos_act_option(lv_obj_t * ddlist);
 
 /**********************
@@ -71,6 +70,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     ext->opened = 0;
     ext->auto_size = 0;
     ext->sel_opt = 0;
+    ext->anim_time = LV_DDLIST_DEF_ANIM_TIME;
     ext->style_sel = lv_style_get(LV_STYLE_PLAIN_COLOR, NULL);
 
     /*The signal and design functions are not copied so set them here*/
@@ -128,7 +128,7 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
     	if(sign == LV_SIGNAL_STYLE_CHG) {
     	    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     	    lv_obj_set_style(ext->opt_label, lv_obj_get_style(ddlist));
-            lv_ddlist_refr_size(ddlist, false);
+            lv_ddlist_refr_size(ddlist, 0);
     	}
     }
     
@@ -158,7 +158,7 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options)
         i++;
     }
 
-    lv_ddlist_refr_size(ddlist, false);
+    lv_ddlist_refr_size(ddlist, 0);
 }
 
 /**
@@ -201,6 +201,16 @@ void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size)
     ext->auto_size = auto_size == false ? 0 : 1;
 }
 
+/**
+ * Set the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @param anim_time: open/close animation time [ms]
+ */
+void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    ext->anim_time = anim_time;
+}
 
 /**
  * Set the style of the rectangle on the selected option
@@ -262,13 +272,21 @@ lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist)
     if(ext->style_sel == NULL) return lv_obj_get_style(ddlist);
 
     return ext->style_sel;
-
+}
+/**
+ * Get the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @return open/close animation time [ms]
+ */
+uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    return ext->anim_time;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 /**
  * Handle the drawing related tasks of the drop down lists
@@ -355,11 +373,7 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
             ext->cb(ddlist, dispi);
         }
     }
-#if LV_DDLIST_ANIM_TIME == 0
-    lv_ddlist_refr_size(ddlist, false);
-#else
-    lv_ddlist_refr_size(ddlist, true);
-#endif
+    lv_ddlist_refr_size(ddlist, ext->anim_time);
 
     return LV_ACTION_RES_OK;
 
@@ -367,10 +381,10 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
 
 /**
  * Refresh the size of drop down list according its start (open or closed)
- * @param ddlist poinr to a drop down list object
- * @param anim_en true: refresh the size with an animation, false: do not use animations
+ * @param ddlist pointer to a drop down list object
+ * @param anim_time animations time for open/close [ms]
  */
-static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
+static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
@@ -388,7 +402,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
         cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
         new_height = font_h + 2 * label_style->line_space;
     }
-    if(anim_en == false) {
+    if(anim_time == 0) {
         lv_obj_set_height(ddlist, new_height);
         lv_ddlist_pos_act_option(ddlist);
     } else {
@@ -400,7 +414,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
         a.path = anim_get_path(ANIM_PATH_LIN);
         a.end_cb = (anim_cb_t)lv_ddlist_pos_act_option;
         a.act_time = 0;
-        a.time = LV_DDLIST_ANIM_TIME;
+        a.time = ext->anim_time;
         a.playback = 0;
         a.playback_pause = 0;
         a.repeat = 0;

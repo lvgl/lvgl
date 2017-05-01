@@ -59,7 +59,7 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
 
 static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app);
 static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app);
-#if LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0
+#if  LV_APP_ANIM_WIN != 0
 static void lv_app_win_open_anim_cb(lv_obj_t * app_win);
 static void lv_app_win_close_anim_cb(lv_obj_t * app_win);
 static void lv_app_win_minim_anim_cb(lv_obj_t * app_win);
@@ -229,12 +229,8 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
         /*Create a title on top of the shortcut*/
         app->sc_title = lv_label_create(app->sc, NULL);
         lv_obj_set_style(app->sc_title, &app_style.sc_title);
-    #if LV_APP_EFFECT_ANIM != 0
-        lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_SCROLL);
-    #else
-        lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(font_get(app_style.sc_title_style.font)) >> FONT_ANTIALIAS);
+        lv_obj_set_size(app->sc_title, LV_APP_SC_WIDTH, font_get_height(app_style.sc_title.font) >> FONT_ANTIALIAS);
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_DOTS);
-    #endif
         lv_label_set_text(app->sc_title, app->name);
         lv_obj_align_us(app->sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, LV_DPI / 20);
 	} else {
@@ -245,11 +241,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
 	app->dsc->sc_open(app, app->sc);
 
 #if LV_APP_DESKTOP != 0
-#if LV_APP_EFFECT_ANIM == 0
-    lv_page_focus(sc_page, app->sc, false);
-#else
-    lv_page_focus(sc_page, app->sc, true);
-#endif
+    lv_page_focus(sc_page, app->sc, LV_APP_ANIM_DESKTOP);
 #endif
 
 	return app->sc;
@@ -652,7 +644,7 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
     if(con_send == NULL) {
 
 #if LV_APP_DESKTOP != 0
-#if LV_APP_EFFECT_ANIM == 0
+#if LV_APP_ANIM_DESKTOP == 0
         lv_page_focus(sc_page, sc, false);
 #else
         lv_page_focus(sc_page, sc, true);
@@ -744,7 +736,7 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 
 	lv_app_kb_close(false);
 
-#if  LV_APP_EFFECT_ANIM != 0 && LV_APP_EFFECT_OPA != 0 && LV_APP_ANIM_WIN != 0
+#if  LV_APP_ANIM_WIN != 0
     /*Temporally set a simpler style for the window during the animation*/
     lv_obj_t * win_page = lv_win_get_page(win);
 	lv_page_set_sb_mode(win_page, LV_PAGE_SB_MODE_OFF);
@@ -832,7 +824,7 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
 static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
 {
     /*Make an animation on window open*/
-#if LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0
+#if USE_ANIM != 0 && LV_APP_ANIM_WIN != 0
 
     area_t cords; /*If no shortcut simulate one and load the its coordinates*/
     if(app->sc == NULL) {
@@ -863,12 +855,12 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     a.var = app->win;
     a.path = anim_get_path(ANIM_PATH_LIN);
 
-    a.start = lv_obj_get_width(app->sc);
+    a.start = area_get_width(&cords);
     a.end = LV_HOR_RES;
     a.fp = (anim_fp_t) lv_obj_set_width;
     anim_create(&a);
 
-    a.start = lv_obj_get_height(app->sc);
+    a.start = area_get_height(&cords);
     a.end = LV_VER_RES;
     a.fp = (anim_fp_t) lv_obj_set_height;
     anim_create(&a);
@@ -884,16 +876,17 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     a.end_cb = (anim_cb_t)lv_app_win_open_anim_cb;
     anim_create(&a);
 
-#endif /*LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0*/
-
     /* Now a screen sized window is created but is is resized by the animations.
      * Therefore the whole screen invalidated but only a small part is changed.
      * So clear the invalidate buffer an refresh only the real area.
      * Independently other parts on  the screen might be changed
-     * but they will be covered by the window after the animations*/
+     * but they will be soon covered by the window after the animations*/
     lv_inv_area(NULL);
     lv_inv_area(&cords);
     
+#endif /* LV_APP_ANIM_WIN != 0*/
+
+
     return LV_ACTION_RES_OK;
 }
 
@@ -904,7 +897,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
  */
 static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 {
-#if LV_APP_EFFECT_ANIM != 0 && LV_APP_ANIM_WIN != 0
+#if  LV_APP_ANIM_WIN != 0
     area_t cords;
     if(app->sc == NULL) {
         cords.x1 = LV_HOR_RES / 2 - LV_APP_SC_WIDTH / 2;
@@ -935,12 +928,12 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 
 
     a.start = LV_HOR_RES;
-    a.end = lv_obj_get_width(&cords);
+    a.end = area_get_width(&cords);
     a.fp = (anim_fp_t) lv_obj_set_width;
     anim_create(&a);
 
     a.start = LV_VER_RES;
-    a.end = lv_obj_get_height(&cords);
+    a.end = area_get_height(&cords);
     a.fp = (anim_fp_t) lv_obj_set_height;
     anim_create(&a);
 
@@ -962,8 +955,7 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 #endif
 }
 
-#if LV_APP_EFFECT_ANIM != 0
-
+#if LV_APP_ANIM_WIN != 0
 
 /**
  * Called when the window open animation is ready to close the application
@@ -1049,7 +1041,7 @@ static void lv_app_init_style(void)
 	/*Shortcut styles*/
     lv_style_get(LV_STYLE_BTN_REL,&app_style.sc_rel);
     app_style.sc_rel.ccolor = COLOR_MAKE(0x10, 0x18, 0x20);
-    app_style.sc_rel.opa = OPA_80;
+    app_style.sc_rel.opa = OPA_COVER;
 	app_style.sc_rel.mcolor = COLOR_WHITE;
 	app_style.sc_rel.gcolor = COLOR_MAKE(0x20, 0x30, 0x40);
 	app_style.sc_rel.bcolor = COLOR_MAKE(0x40, 0x60, 0x80);
@@ -1060,7 +1052,7 @@ static void lv_app_init_style(void)
     app_style.sc_rel.txt_align = 1;
 
     memcpy(&app_style.sc_pr, &app_style.sc_rel, sizeof(lv_style_t));
-    app_style.sc_pr.opa = OPA_80;
+    app_style.sc_pr.opa = OPA_COVER;
 	app_style.sc_pr.mcolor = COLOR_MAKE(0xB0, 0xD0, 0xF0);
 	app_style.sc_pr.gcolor = COLOR_MAKE(0x00, 0x00, 0x00);
 	app_style.sc_pr.bcolor = COLOR_MAKE(0xB0, 0xD0, 0xF0);

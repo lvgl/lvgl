@@ -124,7 +124,7 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue);
  * @param obj pointer to an object to focus (must be on the page)
  * @param anim_en true: scroll with animation
  */
-void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en);
+void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time);
 
 /**
  * Get the scrollable object of a page-

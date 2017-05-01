@@ -151,7 +151,7 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
 #if LV_APP_ANIM_LEVEL != 0
         lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-        lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
+        lv_page_focus(lv_win_get_page(kb_win), kb_ta, 0);
 #endif
     }
 
@@ -252,7 +252,7 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * btnm, uint16_t i)
 #if LV_APP_ANIM_LEVEL != 0
         lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
 #else
-        lv_page_focus(lv_win_get_page(kb_win), kb_ta, false);
+        lv_page_focus(lv_win_get_page(kb_win), kb_ta, 0);
 #endif
     }
     return LV_ACTION_RES_OK;

@@ -64,6 +64,14 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 void lv_bar_set_value(lv_obj_t * bar, int16_t value);
 
 /**
+ * Set a new value with animation on the bar
+ * @param bar pointer to a bar object
+ * @param value new value
+ * @param anim_time animation time in milliseconds
+ */
+void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time);
+
+/**
  * Set minimum and the maximum values of a bar
  * @param bar pointer to he bar object
  * @param min minimum value

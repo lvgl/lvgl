@@ -17,10 +17,6 @@
 /*********************
  *      DEFINES
  *********************/
-/*Test configurations*/
-#ifndef LV_MBOX_ANIM_TIME
-#define LV_MBOX_ANIM_TIME   250 /*How fast animate out the message box in auto close. 0: no animation [ms]*/
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -256,20 +252,20 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
  * Automatically delete the message box after a given time
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
+ * @param anim_time time of close animation in milliseconds (0: no animation)
  */
-void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout)
+void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout, uint16_t anim_time)
 {
-#if LV_MBOX_ANIM_TIME != 0
-    /*Add shrinking animations*/
-    lv_obj_anim(mbox, LV_ANIM_GROW_H| ANIM_OUT, LV_MBOX_ANIM_TIME, tout, NULL);
-	lv_obj_anim(mbox, LV_ANIM_GROW_V| ANIM_OUT, LV_MBOX_ANIM_TIME, tout, lv_obj_del);
+    if(anim_time != 0) {
+        /*Add shrinking animations*/
+        lv_obj_anim(mbox, LV_ANIM_GROW_H| ANIM_OUT, anim_time, tout, NULL);
+        lv_obj_anim(mbox, LV_ANIM_GROW_V| ANIM_OUT, anim_time, tout, lv_obj_del);
 
-    /*When the animations start disable fit to let shrinking work*/
-    lv_obj_anim(mbox, LV_ANIM_NONE, 1, tout, lv_mbox_disable_fit);
-
-#else
-    lv_obj_anim(mbox, LV_ANIM_NONE, LV_MBOX_ANIM_TIME, tout, lv_obj_del);
-#endif
+        /*When the animations start disable fit to let shrinking work*/
+        lv_obj_anim(mbox, LV_ANIM_NONE, 1, tout, lv_mbox_disable_fit);
+    } else {
+        lv_obj_anim(mbox, LV_ANIM_NONE, anim_time, tout, lv_obj_del);
+    }
 }
 
 /**

@@ -111,7 +111,7 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr);
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
  */
-void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout);
+void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout, uint16_t anim_time);
 
 /**
  * Stop the auto. closing of message box

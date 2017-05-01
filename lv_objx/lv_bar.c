@@ -13,6 +13,7 @@
 
 #include <lvgl/lv_objx/lv_bar.h>
 #include "../lv_draw/lv_draw.h"
+#include "misc/gfx/anim.h"
 #include <stdio.h>
 
 /*********************
@@ -134,6 +135,39 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value)
     ext->act_value = ext->act_value < ext->min_value ? ext->min_value : ext->act_value;
 	lv_obj_inv(bar);
 }
+
+/**
+ * Set a new value with animation on the bar
+ * @param bar pointer to a bar object
+ * @param value new value
+ * @param anim_time animation time in milliseconds
+ */
+void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
+{
+
+    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    int16_t new_value;
+    new_value = value > ext->max_value ? ext->max_value : value;
+    new_value = new_value < ext->min_value ? ext->min_value : new_value;
+
+    anim_t a;
+    a.var = bar;
+    a.start = ext->act_value;
+    a.end = new_value;
+    a.fp = (anim_fp_t)lv_bar_set_value;
+    a.path = anim_get_path(ANIM_PATH_LIN);
+    a.end_cb = NULL;
+    a.act_time = 0;
+    a.time = anim_time;
+    a.playback = 0;
+    a.playback_pause = 0;
+    a.repeat = 0;
+    a.repeat_pause = 0;
+
+    anim_create(&a);
+
+}
+
 
 /**
  * Set minimum and the maximum values of a bar

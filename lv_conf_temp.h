@@ -97,9 +97,6 @@
 
 /*Page (dependencies: lv_rect)*/
 #define USE_LV_PAGE     1
-#if USE_LV_PAGE != 0
-#define LV_PAGE_ANIM_FOCUS_TIME 300 /*List focus animation time [ms] (0: turn off the animation)*/
-#endif
 
 /*Window (dependencies: lv_rect, lv_btn, lv_label, lv_img, lv_page)*/
 #define USE_LV_WIN      1
@@ -125,9 +122,6 @@
 
 /*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
 #define USE_LV_MBOX     1
-#if USE_LV_MBOX != 0
-#define LV_MBOX_ANIM_TIME   200 /*How fast animate out the message box in auto close. 0: no animation [ms]*/
-#endif
 
 /*Text area (dependencies: lv_label, lv_page)*/
 #define USE_LV_TA       1
@@ -154,9 +148,6 @@
 
 /*Drop down list (dependencies: lv_page, lv_label)*/
 #define USE_LV_DDLIST    1
-#if USE_LV_DDLIST != 0
-#define LV_DDLIST_ANIM_TIME    100 /*DDL open/close animation in milliseconds (0: disable animation)*/
-#endif
 
 /*Bar (dependencies: lv_bar)*/
 #define USE_LV_SLIDER    1
@@ -176,37 +167,15 @@
 #define LV_APP_FONT_MEDIUM  LV_FONT_DEFAULT
 #define LV_APP_FONT_LARGE   FONT_DEJAVU_40
 
-/* Internal icons:
- * 0: Do not use internal icons (img_close, img_add etc. icons have to be provided)
- * 1: Use simple sized icons
- * 2: Use double sized icons*/
-#define LV_APP_USE_INTERNAL_ICONS   2
-
-/*Enable or disable the internal icons individually*/
-#if LV_APP_USE_INTERNAL_ICONS != 0
-#define USE_IMG_CLOSE       1
-#define USE_IMG_DOWN        1
-#define USE_IMG_DRIVER      1
-#define USE_IMG_FILE        1
-#define USE_IMG_FOLDER      1
-#define USE_IMG_LEFT        1
-#define USE_IMG_OK          1
-#define USE_IMG_RIGHT       1
-#define USE_IMG_UP          1
-#endif
-
 /*Animation settings*/
-#define LV_APP_EFFECT_OPA      1 /*Enable the opacity in the application style (can be modified)*/
-#define LV_APP_EFFECT_ANIM     1 /*Enable the animation of the applications*/
-#define LV_APP_EFFECT_OPA_ANIM 1 /*Enable the using opacity in the application animations*/
-#define LV_APP_ANIM_WIN 200      /*Animation time in milliseconds (0: turn off animation)*/
-#define LV_APP_ANIM_SC  200      /*Animation time in milliseconds (0: turn off animation)*/
-#define LV_APP_ANIM_NOTICE 300   /*Obsolete, use LV_MBOX_ANIM. */
+#define LV_APP_ANIM_WIN      200      /*Animation time in milliseconds (0: turn off animation)*/
+#define LV_APP_ANIM_DESKTOP  200      /*Animation on the desktop (0: turn off animation)*/
 
 /* App. utility settings */
-#define LV_APP_NOTICE_SHOW_TIME 4000 /*Notices will be shown for this time [ms]*/
-#define LV_APP_NOTICE_MAX_NUM   6    /*Max. number of notices*/
-#define LV_APP_NOTICE_MAX_LEN   256  /*Max. number of characters on a notice*/
+#define LV_APP_NOTICE_SHOW_TIME 4000        /*Notices will be shown for this time [ms]*/
+#define LV_APP_NOTICE_CLOSE_ANIM_TIME   300 /*Notice close animation time. [ms] 0: no animation */
+#define LV_APP_NOTICE_MAX_NUM   6           /*Max. number of notices*/
+#define LV_APP_NOTICE_MAX_LEN   256         /*Max. number of characters on a notice*/
 /*==================
  *  LV APP X USAGE 
  * ================*/

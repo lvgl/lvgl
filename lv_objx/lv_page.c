@@ -19,10 +19,6 @@
 /*********************
  *      DEFINES
  *********************/
-/*Test configurations*/
-#ifndef LV_PAGE_ANIM_FOCUS_TIME
-#define LV_PAGE_ANIM_FOCUS_TIME     300 /*List focus animation time [ms] (0: turn off the animation)*/
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -418,9 +414,9 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
  * Focus on an object. It ensures that the object will be visible on the page.
  * @param page pointer to a page object
  * @param obj pointer to an object to focus (must be on the page)
- * @param anim_en true: scroll with animation
+ * @param anim_time true: scroll animation time in milliseconds (0: no animation)
  */
-void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
+void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 {
 	lv_page_ext_t * ext = lv_obj_get_ext(page);
 	lv_style_t * style = lv_obj_get_style(page);
@@ -456,29 +452,23 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, bool anim_en)
 		refr = true;
 	}
 
-	if(refr != false) {
-#if LV_PAGE_ANIM_FOCUS_TIME == 0
+    if(anim_time == 0) {
 		lv_obj_set_y(ext->scrl, scrlable_y);
-#else
-		if(anim_en == false) {
-			lv_obj_set_y(ext->scrl, scrlable_y);
-		} else {
-			anim_t a;
-			a.act_time = 0;
-			a.start = lv_obj_get_y(ext->scrl);
-			a.end = scrlable_y;
-			a.time = LV_PAGE_ANIM_FOCUS_TIME;//anim_speed_to_time(LV_PAGE_ANIM_SPEED, a.start, a.end);
-			a.end_cb = NULL;
-			a.playback = 0;
-			a.repeat = 0;
-			a.var = ext->scrl;
-			a.path = anim_get_path(ANIM_PATH_LIN);
-
-			a.fp = (anim_fp_t) lv_obj_set_y;
-			anim_create(&a);
-		}
-#endif
-	}
+    }
+    else {
+        anim_t a;
+        a.act_time = 0;
+        a.start = lv_obj_get_y(ext->scrl);
+        a.end = scrlable_y;
+        a.time = LV_PAGE_ANIM_FOCUS_TIME;//anim_speed_to_time(LV_PAGE_ANIM_SPEED, a.start, a.end);
+        a.end_cb = NULL;
+        a.playback = 0;
+        a.repeat = 0;
+        a.var = ext->scrl;
+        a.path = anim_get_path(ANIM_PATH_LIN);
+        a.fp = (anim_fp_t) lv_obj_set_y;
+        anim_create(&a);
+    }
 }
 
 /*=====================

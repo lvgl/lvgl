@@ -41,6 +41,7 @@ typedef struct
     lv_style_t * style_sel;                         /*Style of the selected option*/
     lv_action_t cb;                                 /*Pointer to function to call when an option is slected*/
     uint16_t sel_opt;                               /*Index of the current option*/
+    uint16_t anim_time;                             /*Open/Close animation time [ms]*/
     uint8_t opened :1;                              /*1: The list is opened*/
     uint8_t auto_size :1;                           /*1: Set height to show all options. 0: Set height maximum to the parent bottom*/
 }lv_ddlist_ext_t;

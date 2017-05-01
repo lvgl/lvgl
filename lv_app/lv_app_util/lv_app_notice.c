@@ -23,6 +23,11 @@
 #define LV_APP_NOTICE_SHOW_TIME   4000
 #endif
 
+#ifndef LV_APP_NOTICE_CLOSE_ANIM_TIME
+#define LV_APP_NOTICE_CLOSE_ANIM_TIME   300
+#endif
+
+
 #ifndef LV_APP_NOTICE_MAX_NUM
 #define LV_APP_NOTICE_MAX_NUM   6
 #endif
@@ -84,7 +89,7 @@ lv_obj_t *  lv_app_notice_add(const char * format, ...)
     lv_mbox_set_text(mbox, txt);
 
 #if LV_APP_NOTICE_SHOW_TIME != 0
-    lv_mbox_start_auto_close(mbox, LV_APP_NOTICE_SHOW_TIME);
+    lv_mbox_start_auto_close(mbox, LV_APP_NOTICE_SHOW_TIME, LV_APP_NOTICE_CLOSE_ANIM_TIME);
 #endif
 
     /*Delete the last children if there are too many*/
