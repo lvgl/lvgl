@@ -254,6 +254,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     my_win_data_t * win_data = app->win_data;
     my_app_data_t * app_data = app->app_data;
 
+    /*Make the window content responsive*/
     lv_cont_set_layout(lv_page_get_scrl(lv_win_get_page(win)), LV_CONT_LAYOUT_PRETTY);
 
     /*Create a label for the text of the terminal*/
@@ -264,7 +265,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
     /*Create a text area. Text can be added to the terminal from here by app. keyboard.*/
     win_data->ta = lv_ta_create(win, NULL);
-    lv_obj_set_size(win_data->ta, lv_win_get_width(win), LV_VER_RES / 4);
+    lv_obj_set_size(win_data->ta, 3 * LV_HOR_RES / 5, LV_VER_RES / 4);
     lv_obj_set_free_p(win_data->ta, app);
     lv_page_set_rel_action(win_data->ta, win_ta_rel_action);
     lv_page_glue_obj(win_data->ta, true);
@@ -282,7 +283,6 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     /*Align the window to see the text area on the bottom*/
     lv_obj_t * page = lv_win_get_page(app->win);
     lv_obj_align(lv_page_get_scrl(page), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - LV_VER_RES);
-
 }
 
 /**

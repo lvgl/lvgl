@@ -234,6 +234,7 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
     my_win_data_t * win_data = app->win_data;
 
+    /*Make the window content responsive*/
     lv_cont_set_layout(lv_page_get_scrl(lv_win_get_page(win)), LV_CONT_LAYOUT_PRETTY);
 
     /*Create a chart with two data lines*/

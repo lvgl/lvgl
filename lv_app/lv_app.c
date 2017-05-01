@@ -1011,9 +1011,10 @@ static void lv_app_init_style(void)
 	/*Menu style*/
 	lv_style_get(LV_STYLE_PLAIN,&app_style.menu);
     app_style.menu.ccolor = COLOR_WHITE;
-	app_style.menu.mcolor = COLOR_BLACK;
-	app_style.menu.gcolor = COLOR_BLACK;
-	app_style.menu.opa = OPA_80;
+	app_style.menu.mcolor = COLOR_MAKE(0x30, 0x30, 0x30);
+	app_style.menu.gcolor = COLOR_MAKE(0x30, 0x30, 0x30);
+    app_style.menu.bcolor = COLOR_MAKE(0x80, 0x80, 0x80);
+	app_style.menu.opa = OPA_COVER;
 	app_style.menu.radius = 0;
 	app_style.menu.bwidth = 0;
 	app_style.menu.swidth = 0;
@@ -1022,9 +1023,10 @@ static void lv_app_init_style(void)
     app_style.menu.opad = LV_DPI / 12;
 
     lv_style_get(LV_STYLE_BTN_REL,&app_style.menu_btn_rel);
-    app_style.menu_btn_rel.ccolor = COLOR_MAKE(0xd0, 0xe0, 0xf0);
-    app_style.menu_btn_rel.mcolor = COLOR_BLACK;
-    app_style.menu_btn_rel.gcolor = COLOR_BLACK;
+    app_style.menu_btn_rel.ccolor = COLOR_WHITE;
+    app_style.menu_btn_rel.mcolor = COLOR_MAKE(0x30, 0x30, 0x30);
+    app_style.menu_btn_rel.gcolor = COLOR_MAKE(0x30, 0x30, 0x30);
+    app_style.menu_btn_rel.bcolor = COLOR_MAKE(0x80, 0x80, 0x80);
     app_style.menu_btn_rel.bwidth = 0;
     app_style.menu_btn_rel.radius = 0;
 	app_style.menu_btn_rel.swidth = 0;
@@ -1038,6 +1040,7 @@ static void lv_app_init_style(void)
     memcpy(&app_style.menu_btn_pr, &app_style.menu_btn_rel, sizeof(lv_style_t));
 	app_style.menu_btn_pr.mcolor = COLOR_GRAY;
 	app_style.menu_btn_pr.gcolor = COLOR_GRAY;
+    app_style.menu_btn_pr.bcolor = COLOR_GRAY;
     app_style.menu_btn_pr.bwidth = 0;
     app_style.menu_btn_pr.radius = 0;
     app_style.menu_btn_pr.empty = 0;
