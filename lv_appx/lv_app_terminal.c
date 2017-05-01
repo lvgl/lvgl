@@ -254,6 +254,8 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
     my_win_data_t * win_data = app->win_data;
     my_app_data_t * app_data = app->app_data;
 
+    lv_cont_set_layout(lv_page_get_scrl(lv_win_get_page(win)), LV_CONT_LAYOUT_PRETTY);
+
     /*Create a label for the text of the terminal*/
     win_data->label = lv_label_create(win, NULL);
     lv_label_set_long_mode(win_data->label, LV_LABEL_LONG_BREAK);
@@ -262,21 +264,20 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
     /*Create a text area. Text can be added to the terminal from here by app. keyboard.*/
     win_data->ta = lv_ta_create(win, NULL);
-    lv_obj_set_size(win_data->ta, LV_HOR_RES / 2, LV_VER_RES / 4);
+    lv_obj_set_size(win_data->ta, lv_win_get_width(win), LV_VER_RES / 4);
     lv_obj_set_free_p(win_data->ta, app);
     lv_page_set_rel_action(win_data->ta, win_ta_rel_action);
+    lv_page_glue_obj(win_data->ta, true);
     lv_ta_set_text(win_data->ta, "");
-    if(app_data->txt[0] != '\0') lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, OBJ_PAD, OBJ_PAD);
-    else lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, OBJ_PAD, OBJ_PAD);
 
     /*Create a clear button*/
     win_data->clear_btn = lv_btn_create(win, NULL);
     lv_cont_set_fit(win_data->clear_btn, true, true);
     lv_obj_set_free_p(win_data->clear_btn, app);
+    lv_page_glue_obj(win_data->ta, true);
     lv_btn_set_rel_action(win_data->clear_btn, win_clear_rel_action);
     lv_obj_t * btn_label = lv_label_create(win_data->clear_btn, NULL);
     lv_label_set_text(btn_label, "Clear");
-    lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, OBJ_PAD, 0);
 
     /*Align the window to see the text area on the bottom*/
     lv_obj_t * page = lv_win_get_page(app->win);
@@ -398,8 +399,6 @@ static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
 
     if(win_data != NULL) {
         lv_label_set_text_static(win_data->label, app_data->txt);
-        lv_obj_align(win_data->ta, NULL, LV_ALIGN_IN_TOP_LEFT, OBJ_PAD, OBJ_PAD);
-        lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, OBJ_PAD, 0);
         lv_obj_t * page = lv_win_get_page(app->win);
         lv_obj_align(lv_page_get_scrl(page), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - LV_VER_RES);
     }
@@ -482,8 +481,6 @@ static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len)
 
     if(win_data != NULL) {
         lv_label_set_text_static(win_data->label, app_data->txt);
-        lv_obj_align(win_data->ta, win_data->label, LV_ALIGN_OUT_BOTTOM_LEFT, OBJ_PAD, OBJ_PAD);
-        lv_obj_align(win_data->clear_btn, win_data->ta, LV_ALIGN_OUT_RIGHT_TOP, OBJ_PAD, 0);
         lv_obj_t * page = lv_win_get_page(app->win);
         lv_obj_align(lv_page_get_scrl(page), NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, - LV_VER_RES);
     }

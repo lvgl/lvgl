@@ -285,7 +285,6 @@ void lv_win_set_styles_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr)
         lv_btn_set_styles(cbtn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
         cbtn = lv_obj_get_child(ext->btnh, cbtn);
     }
-
 }
 
 /*=====================

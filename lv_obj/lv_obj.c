@@ -73,9 +73,6 @@ void lv_init(void)
     
     /*Init. the screen refresh system*/
     lv_refr_init();
-    
-    /*Init. the animations*/
-    anim_init();
 
     /*Create the default screen*/
     ll_init(&scr_ll, sizeof(lv_obj_t));
@@ -151,7 +148,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->drag_en = 0;
 		new_obj->drag_throw_en = 0;
 		new_obj->drag_parent = 0;
-		new_obj->style_iso = 0;
 		new_obj->hidden = 0;
 		new_obj->top_en = 0;
         new_obj->protect = LV_PROTECT_NONE;
@@ -193,7 +189,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->drag_en = 0;
         new_obj->drag_throw_en = 0;
         new_obj->drag_parent = 0;
-        new_obj->style_iso = 0;
         new_obj->hidden = 0;
         new_obj->top_en = 0;
         new_obj->protect = LV_PROTECT_NONE;
@@ -222,10 +217,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
         new_obj->style_p = copy->style_p;
 
-        if(copy->style_iso != 0) {
-            lv_obj_iso_style(new_obj, dm_get_size(copy->style_p));
-        }
-
     	lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
     }
 
@@ -243,7 +234,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
 /**
  * Delete 'obj' and all of its children
- * @param obj
+ * @param obj pointer to an object to delete
  */
 void lv_obj_del(lv_obj_t * obj)
 {
@@ -281,7 +272,6 @@ void lv_obj_del(lv_obj_t * obj)
     
     /*Delete the base objects*/
     if(obj->ext != NULL)  dm_free(obj->ext);
-    if(obj->style_iso != 0) dm_free(obj->style_p);
     dm_free(obj); /*Free the object itself*/
     
     /* Reset all display input (dispi) because 
@@ -461,7 +451,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
 
 /**
  * Set relative the position of an object (relative to the parent).
- * The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinates will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side of the parent. (will be multiplied with LV_DOWNSCALE)
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
@@ -483,7 +473,7 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x)
 
 /**
  * Set the x coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -504,7 +494,7 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y)
 
 /**
  * Set the y coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -553,7 +543,7 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h)
 }
 
 /**
- * Set the size of an object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Set the size of an object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  * @param h new height (will be multiplied with LV_DOWNSCALE)
@@ -574,7 +564,7 @@ void lv_obj_set_width(lv_obj_t * obj, cord_t w)
 }
 
 /**
- * Set the width of an object.  The width will be upscaled to compensate LV_DOWNSCALE
+ * Set the width of an object.  The width will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  */
@@ -594,7 +584,7 @@ void lv_obj_set_height(lv_obj_t * obj, cord_t h)
 }
 
 /**
- * Set the height of an object.  The height will be upscaled to compensate LV_DOWNSCALE
+ * Set the height of an object.  The height will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param h new height (will be multiplied with LV_DOWNSCALE)
  */
@@ -742,7 +732,7 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
 
 
 /**
- * Align an object to an other object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Align an object to an other object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
@@ -777,37 +767,11 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
  */
 void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
 {
-	if(obj->style_iso != 0) {
-		dm_free(obj->style_p);
-		obj->style_iso = 0;
-	}
     obj->style_p = style;
 
     /*Send a signal about style change to every children with NULL style*/
     lv_child_refr_style(obj);
 
-}
-
-/**
- * Isolate the style of an object. In other words a unique style will be created
- * for this object which can be freely modified independently from the style of the
- * other objects.
- */
-void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size)
-{
-	if(obj->style_iso != 0) return obj->style_p;
-
-	void * ori_style_p = lv_obj_get_style(obj);
-	void * iso_style = dm_alloc(style_size);
-	dm_assert(iso_style);
-	memcpy(iso_style, ori_style_p, style_size);
-
-	obj->style_iso = 1;
-	obj->style_p = iso_style;
-
-	lv_obj_refr_style(obj);
-
-	return obj->style_p;
 }
 
 /**
@@ -827,7 +791,7 @@ void lv_obj_refr_style(lv_obj_t * obj)
  * @param style pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_style_refr_all(void * style)
+void lv_style_refr_objs(void * style)
 {
     lv_obj_t * i;
     LL_READ(scr_ll, i) {
@@ -1331,16 +1295,6 @@ bool lv_obj_get_drag_parent(lv_obj_t * obj)
 }
 
 /**
- * Get the style isolation attribute of an object
- * @param obj pointer to an object
- * @return pointer to a style
- */
-bool lv_obj_get_style_iso(lv_obj_t * obj)
-{
-    return obj->style_iso == 0 ? false : true;
-}
-
-/**
  * Get the protect field of an object
  * @param obj pointer to an object
  * @return protect field ('OR'ed values of lv_obj_prot_t)
@@ -1559,7 +1513,6 @@ static void lv_obj_del_child(lv_obj_t * obj)
 
    /*Delete the base objects*/
    if(obj->ext != NULL)  dm_free(obj->ext);
-   if(obj->style_iso != 0) dm_free(obj->style_p);
    dm_free(obj); /*Free the object itself*/
 
 }

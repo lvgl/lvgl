@@ -290,7 +290,7 @@ lv_obj_t * lv_app_win_open(lv_app_inst_t * app)
 	lv_obj_set_free_p(app->win, app);
 	lv_obj_set_style(lv_win_get_header(app->win), &app_style.win_header);
 	lv_win_set_title(app->win, app->dsc->name);
-	lv_page_set_sb_mode(lv_win_get_page(app->win), LV_PAGE_SB_MODE_ON);
+	lv_page_set_sb_mode(lv_win_get_page(app->win), LV_PAGE_SB_MODE_AUTO);
 	lv_win_set_styles_cbtn(app->win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
 
 	if(app->dsc->conf_open != NULL) {
@@ -809,6 +809,7 @@ static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * d
     char buf[256];
     sprintf(buf, "%s settings", app->dsc->name);
     lv_win_add_cbtn(app->conf_win, SYMBOL_CLOSE ,lv_win_close_action);
+    lv_obj_set_style(lv_win_get_header(app->conf_win), &app_style.win_header);
     lv_win_set_title(app->conf_win, buf);
     lv_win_set_styles_cbtn(app->conf_win, &app_style.win_cbtn_rel, &app_style.win_cbtn_pr);
     lv_obj_t * scrl = lv_page_get_scrl(lv_win_get_page(app->conf_win));
@@ -934,12 +935,12 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
 
 
     a.start = LV_HOR_RES;
-    a.end = lv_obj_get_width(app->sc);
+    a.end = lv_obj_get_width(&cords);
     a.fp = (anim_fp_t) lv_obj_set_width;
     anim_create(&a);
 
     a.start = LV_VER_RES;
-    a.end = lv_obj_get_height(app->sc);
+    a.end = lv_obj_get_height(&cords);
     a.fp = (anim_fp_t) lv_obj_set_height;
     anim_create(&a);
 
@@ -1097,14 +1098,17 @@ static void lv_app_init_style(void)
 
 	/*Window*/
 	lv_style_get(LV_STYLE_PLAIN_COLOR, &app_style.win_header);
-	app_style.win_header.font = font_get(LV_APP_FONT_LARGE);
+    memcpy(&app_style.win_header, &app_style.menu, sizeof(lv_style_t));
+    app_style.win_header.font = font_get(LV_APP_FONT_LARGE);
 
     lv_style_get(LV_STYLE_TRANSP, &app_style.win_scrl);
 
     lv_style_get(LV_STYLE_BTN_REL, &app_style.win_cbtn_rel);
+    memcpy(&app_style.win_cbtn_rel, &app_style.menu_btn_rel, sizeof(lv_style_t));
     app_style.win_cbtn_rel.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 
     lv_style_get(LV_STYLE_BTN_PR, &app_style.win_cbtn_pr);
+    memcpy(&app_style.win_cbtn_pr, &app_style.menu_btn_pr, sizeof(lv_style_t));
     app_style.win_cbtn_pr.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 }
 

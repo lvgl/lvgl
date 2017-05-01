@@ -20,7 +20,7 @@
  *      DEFINES
  *********************/
 #define CPU_LABEL_COLOR "FF0000"
-#define MEM_LABEL_COLOR "008000"
+#define MEM_LABEL_COLOR "0000FF"
 
 /**********************
  *      TYPEDEFS
@@ -291,8 +291,10 @@ static void sysmon_task(void * param)
 
     /*Get CPU and memory information */
     uint8_t cpu_busy = 0;
-#if USE_IDLE != 0
+#if USE_IDLE != 0   /*Use the more precise idle module if enabled*/
     cpu_busy = 100 - idle_get();
+#else
+    cpu_busy = 100 - ptask_get_idle();
 #endif
 
     uint8_t mem_used_pct = 0;
@@ -350,13 +352,8 @@ static void lv_app_sysmon_refr(void)
 
     char buf_long[256];
     char buf_short[128];
-#if USE_IDLE != 0
     sprintf(buf_long, "%c%s CPU: %d %%%c\n\n",TXT_RECOLOR_CMD, CPU_LABEL_COLOR, cpu_pct[LV_APP_SYSMON_PNUM - 1], TXT_RECOLOR_CMD);
     sprintf(buf_short, "CPU: %d %%\n", cpu_pct[LV_APP_SYSMON_PNUM - 1]);
-#else
-    sprintf(buf_long, "%c%s CPU: N/A%c\n\n",TXT_RECOLOR_CMD, CPU_LABEL_COLOR, TXT_RECOLOR_CMD);
-    strcpy(buf_short, "CPU: N/A\n");
-#endif
 
 #if USE_DYN_MEM != 0  && DM_CUSTOM == 0
     sprintf(buf_long, "%s%c%s MEMORY: %d %%%c\nTotal: %d bytes\nUsed: %d bytes\nFree: %d bytes\nFrag: %d %%",

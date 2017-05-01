@@ -431,7 +431,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 	child_rc = child_rs; /*Initially the the row starter and closer is the same*/
 	while(child_rs != NULL) {
 		cord_t h_row = 0;
-		cord_t w_row = style->hpad * 2; /*The width is at least the left-right hpad*/
+		cord_t w_row = style->hpad * 2; /*The width is at least the left+right hpad*/
 		uint32_t obj_num = 0;
 
 		/*Find the row closer object and collect some data*/
@@ -447,13 +447,12 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 			if(obj_num == 0) child_rs = child_rc; /*If the first object was hidden (or too long) then set the next as first */
 		}while(child_rc != NULL);
 
-		/*Step back one child because the last is already not fit*/
+		/*Step back one child because the last already not fit*/
 		if(child_rc != NULL  && obj_num != 0) child_rc = ll_get_next(&cont->child_ll, child_rc);
 
 		/*If the object is too long  then align it to the middle*/
 		if(obj_num == 0) {
 			if(child_rc != NULL) {
-				h_row = lv_obj_get_height(child_rc);
 				lv_obj_align(child_rc, cont, LV_ALIGN_IN_TOP_MID, 0, act_y);
 			}
 		}
@@ -467,14 +466,15 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 			cord_t new_opad = (w_obj -  w_row) / (obj_num  - 1);
 			cord_t act_x = style->hpad; /*x init*/
 			child_tmp = child_rs;
-			do{
+			while(child_tmp != NULL) {
 				if(lv_obj_get_hidden(child_tmp) == false &&
 				   lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
 					lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x, act_y);
 					act_x += lv_obj_get_width(child_tmp) + new_opad;
 				}
+				if(child_tmp == child_rc) break;
 				child_tmp = ll_get_prev(&cont->child_ll, child_tmp);
-			}while(child_tmp != child_rc);
+			}
 
 		}
 

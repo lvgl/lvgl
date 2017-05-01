@@ -79,14 +79,19 @@ static lv_style_t style_btn_pr;
  */
 void lv_app_kb_init(void)
 {
-    lv_style_get(LV_STYLE_PLAIN, &style_bg);
+    lv_app_style_t * app_style = lv_app_style_get();
+
+    memcpy(&style_bg, &app_style->menu, sizeof(lv_style_t));
+    style_bg.opa = OPA_COVER;
     style_bg.hpad = 0;
     style_bg.vpad = 0;
     style_bg.opad = 0;
-    lv_style_get(LV_STYLE_BTN_REL, &style_btn_rel);
+
+    memcpy(&style_btn_rel, &app_style->menu_btn_rel, sizeof(lv_style_t));
     style_btn_rel.radius = 0;
     style_btn_rel.bwidth = 1 * LV_DOWNSCALE;
-    lv_style_get(LV_STYLE_BTN_PR, &style_btn_pr);
+
+    memcpy(&style_btn_pr, &app_style->menu_btn_pr, sizeof(lv_style_t));
     style_btn_pr.radius = 0;
     style_btn_pr.bwidth = 1 * LV_DOWNSCALE;
 }

@@ -79,34 +79,33 @@ typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void 
 
 typedef struct __LV_OBJ_T
 {
-    struct __LV_OBJ_T * par;
-    ll_dsc_t child_ll;
+    struct __LV_OBJ_T * par;    /*Pointer to the parent object*/
+    ll_dsc_t child_ll;          /*Linked list to store the children objects*/
     
-    area_t cords;
+    area_t cords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 
-    lv_signal_f_t signal_f;
-    lv_design_f_t design_f;
+    lv_signal_f_t signal_f;     /*Object type specific signal function*/
+    lv_design_f_t design_f;     /*Object type specific design function*/
     
-    void * ext;           /*The object attributes can be extended here*/
-    lv_style_t * style_p;       /*Object specific style*/
+    void * ext;                 /*Object type specific extended data*/
+    lv_style_t * style_p;       /*Pointer to the object's style*/
 
 #if LV_OBJ_FREE_P != 0
-    void * free_p;        /*Application specific pointer (set it freely)*/
+    void * free_p;              /*Application specific pointer (set it freely)*/
 #endif
 
     /*Attributes and states*/
-    uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
-    uint8_t drag_en      :1;    /*1: enable the dragging*/
+    uint8_t click_en     :1;    /*1: Can be pressed by a display input device*/
+    uint8_t drag_en      :1;    /*1: Enable the dragging*/
     uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent  :1;    /*1. Parent will be dragged instead*/
-    uint8_t style_iso	 :1;	/*1: The object has got an own style*/
+    uint8_t drag_parent  :1;    /*1: Parent will be dragged instead*/
     uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top_en       :1;    /*1: If the object or its children  is clicked it goes to the foreground*/
+    uint8_t top_en       :1;    /*1: If the object or its children is clicked it goes to the foreground*/
     uint8_t reserved     :1;
 
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
 
-    cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
+    cord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
 #if LV_OBJ_FREE_NUM != 0
     uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
@@ -125,26 +124,26 @@ typedef enum
 typedef enum
 {
     LV_ALIGN_CENTER = 0,
-	LV_ALIGN_IN_TOP_LEFT,
-	LV_ALIGN_IN_TOP_MID,
-	LV_ALIGN_IN_TOP_RIGHT,
-	LV_ALIGN_IN_BOTTOM_LEFT,
-	LV_ALIGN_IN_BOTTOM_MID,
-	LV_ALIGN_IN_BOTTOM_RIGHT,
-	LV_ALIGN_IN_LEFT_MID,
-	LV_ALIGN_IN_RIGHT_MID,
-	LV_ALIGN_OUT_TOP_LEFT,
-	LV_ALIGN_OUT_TOP_MID,
-	LV_ALIGN_OUT_TOP_RIGHT,
-	LV_ALIGN_OUT_BOTTOM_LEFT,
-	LV_ALIGN_OUT_BOTTOM_MID,
-	LV_ALIGN_OUT_BOTTOM_RIGHT,
-	LV_ALIGN_OUT_LEFT_TOP,
-	LV_ALIGN_OUT_LEFT_MID,
-	LV_ALIGN_OUT_LEFT_BOTTOM,
-	LV_ALIGN_OUT_RIGHT_TOP,
-	LV_ALIGN_OUT_RIGHT_MID,
-	LV_ALIGN_OUT_RIGHT_BOTTOM,
+    LV_ALIGN_IN_TOP_LEFT,
+    LV_ALIGN_IN_TOP_MID,
+    LV_ALIGN_IN_TOP_RIGHT,
+    LV_ALIGN_IN_BOTTOM_LEFT,
+    LV_ALIGN_IN_BOTTOM_MID,
+    LV_ALIGN_IN_BOTTOM_RIGHT,
+    LV_ALIGN_IN_LEFT_MID,
+    LV_ALIGN_IN_RIGHT_MID,
+    LV_ALIGN_OUT_TOP_LEFT,
+    LV_ALIGN_OUT_TOP_MID,
+    LV_ALIGN_OUT_TOP_RIGHT,
+    LV_ALIGN_OUT_BOTTOM_LEFT,
+    LV_ALIGN_OUT_BOTTOM_MID,
+    LV_ALIGN_OUT_BOTTOM_RIGHT,
+    LV_ALIGN_OUT_LEFT_TOP,
+    LV_ALIGN_OUT_LEFT_MID,
+    LV_ALIGN_OUT_LEFT_BOTTOM,
+    LV_ALIGN_OUT_RIGHT_TOP,
+    LV_ALIGN_OUT_RIGHT_MID,
+    LV_ALIGN_OUT_RIGHT_BOTTOM,
 }lv_align_t;
 
 
@@ -191,7 +190,7 @@ void lv_obj_refr_style(lv_obj_t * obj);
  * @param style pinter to a style. Only objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_style_refr_all(void * style);
+void lv_style_refr_objs(void * style);
 
 /**
  * Create a basic object
@@ -204,7 +203,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children
- * @param obj
+ * @param obj pointer to an object to delete
  */
 void lv_obj_del(lv_obj_t * obj);
 
@@ -356,13 +355,6 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size);
 void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style);
 
 /**
- * Isolate the style of an object. In other words a unique style will be created
- * for this object which can be freely modified independently from the style of the
- * other objects.
- */
-void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size);
-
-/**
  * Hide an object. It won't be visible and clickable.
  * @param obj pointer to an object
  * @param en true: hide the object
@@ -449,6 +441,7 @@ void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size);
  */
 void lv_obj_refr_ext_size(lv_obj_t * obj);
 
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application.
@@ -456,7 +449,9 @@ void lv_obj_refr_ext_size(lv_obj_t * obj);
  * @param free_num the new free number
  */
 void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
+#endif
 
+#if LV_OBJ_FREE_P != 0
 /**
  * Set an application specific  pointer for an object.
  * It can help to identify objects in the application.
@@ -464,6 +459,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
  * @param free_p the new free pinter
  */
 void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);
+#endif
 
 /**
  * Animate an object
@@ -603,13 +599,6 @@ bool lv_obj_get_drag_throw(lv_obj_t * obj);
 bool lv_obj_get_drag_parent(lv_obj_t * obj);
 
 /**
- * Get the style isolation attribute of an object
- * @param obj pointer to an object
- * @return pointer to a style
- */
-bool lv_obj_get_style_iso(lv_obj_t * obj);
-
-/**
  * Get the protect field of an object
  * @param obj pointer to an object
  * @return protect field ('OR'ed values of lv_obj_prot_t)
@@ -646,19 +635,23 @@ lv_design_f_t lv_obj_get_design_f(lv_obj_t * obj);
  */
 void * lv_obj_get_ext(lv_obj_t * obj);
 
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Get the free number
  * @param obj pointer to an object
  * @return the free number
  */
 uint8_t lv_obj_get_free_num(lv_obj_t * obj);
+#endif
 
+#if LV_OBJ_FREE_P != 0
 /**
  * Get the free pointer
  * @param obj pointer to an object
  * @return the free pointer
  */
 void * lv_obj_get_free_p(lv_obj_t * obj);
+#endif
 
 /**********************
  *      MACROS
