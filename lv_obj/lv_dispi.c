@@ -189,10 +189,10 @@ static void dispi_proc_point(lv_dispi_t * dispi_p, cord_t x, cord_t y)
     if(dispi_p->pressed != false){
 #if LV_DISPI_TP_MARKER != 0
         area_t area;
-        area.x1 = x;
-        area.y1 = y;
-        area.x2 = x + 1;
-        area.y2 = y + 1;
+        area.x1 = x - (LV_DISPI_TP_MARKER >> 1);
+        area.y1 = y - (LV_DISPI_TP_MARKER >> 1);
+        area.x2 = x + ((LV_DISPI_TP_MARKER >> 1) | 0x1);
+        area.y2 = y + ((LV_DISPI_TP_MARKER >> 1) | 0x1);
         lv_rfill(&area, NULL, COLOR_MAKE(0xFF, 0, 0), OPA_COVER);
 #endif
         dispi_proc_press(dispi_p);
