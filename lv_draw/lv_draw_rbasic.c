@@ -148,7 +148,7 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
 
 
                if(px_cnt != 0) {
-                   lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, color_mix(color, COLOR_SILVER, 63 * px_cnt));
+                   lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, color_mix(color, COLOR_SILVER, 63 * px_cnt), OPA_COVER);
                }
            }
 

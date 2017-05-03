@@ -42,7 +42,7 @@
  *=================*/
 /*Display Input settings*/
 #define LV_DISPI_READ_PERIOD      50     /*Input device read period milliseconds*/
-#define LV_DISPI_TP_MARKER        0      /*Mark the pressed points*/
+#define LV_DISPI_TP_MARKER        0      /*Mark the pressed points (Value means marker point size)*/
 #define LV_DISPI_DRAG_LIMIT       10     /*Drag threshold in pixels */
 #define LV_DISPI_DRAG_THROW       20     /*Drag throw slow-down in [%]. Greater value means faster slow-down */
 #define LV_DISPI_LONG_PRESS_TIME  400    /*Long press time in milliseconds*/
@@ -161,6 +161,9 @@
 #define LV_APP_ENABLE       1
 
 #if LV_APP_ENABLE != 0
+
+#define LV_APP_DESKTOP 		1
+
 #define LV_APP_SC_WIDTH     (LV_HOR_RES / 4)    /*Shortcut width*/
 #define LV_APP_SC_HEIGHT    (LV_VER_RES / 3)    /*Shortcut height*/
 #define LV_APP_FONT_SMALL   FONT_DEJAVU_20

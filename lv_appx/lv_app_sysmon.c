@@ -363,8 +363,8 @@ static void lv_app_sysmon_refr(void)
                   MEM_LABEL_COLOR,
                   mem_pct[LV_APP_SYSMON_PNUM - 1],
                   TXT_RECOLOR_CMD,
-                  mem_mon.size_total,
-                  mem_mon.size_total - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
+                  (int)mem_mon.size_total,
+                  (int)mem_mon.size_total - mem_mon.size_free, mem_mon.size_free, mem_mon.pct_frag);
 
     sprintf(buf_short, "%sMem: %d %%\nFrag: %d %%\n",
                   buf_short, mem_pct[LV_APP_SYSMON_PNUM - 1], mem_mon.pct_frag);
@@ -379,7 +379,6 @@ static void lv_app_sysmon_refr(void)
         my_win_data_t * win_data = app->win_data;
         if(win_data != NULL) {
             lv_label_set_text(win_data->label, buf_long);
-
 
             lv_chart_set_next(win_data->chart, win_data->mem_dl, mem_pct[LV_APP_SYSMON_PNUM - 1]);
             lv_chart_set_next(win_data->chart, win_data->cpu_dl, cpu_pct[LV_APP_SYSMON_PNUM - 1]);

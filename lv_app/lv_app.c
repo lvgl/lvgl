@@ -533,8 +533,6 @@ static void lv_app_init_desktop(void)
      lv_cont_set_layout(lv_page_get_scrl(sc_page), LV_CONT_LAYOUT_GRID);
      lv_page_set_rel_action(sc_page, lv_app_sc_page_rel_action);
      lv_page_set_sb_mode(sc_page, LV_PAGE_SB_MODE_AUTO);
-
-
 }
 
 #endif
@@ -562,7 +560,7 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 		app_list = lv_list_create(lv_scr_act(), NULL);
 		lv_obj_t * scrl = lv_page_get_scrl(app_list);
 		lv_obj_set_style(scrl, &app_style.menu);
-		lv_obj_set_size(app_list, LV_HOR_RES / 3, (LV_VER_RES * 3) / 4);
+		lv_obj_set_size(app_list, LV_HOR_RES / 2, (LV_VER_RES * 3) / 4);
 		lv_obj_align(app_list, menuh, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 		lv_list_set_styles_btn(app_list, &app_style.menu_btn_rel, &app_style.menu_btn_pr, NULL, NULL, NULL);
 

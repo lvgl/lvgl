@@ -460,7 +460,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
         a.act_time = 0;
         a.start = lv_obj_get_y(ext->scrl);
         a.end = scrlable_y;
-        a.time = LV_PAGE_ANIM_FOCUS_TIME;//anim_speed_to_time(LV_PAGE_ANIM_SPEED, a.start, a.end);
+        a.time = anim_time;
         a.end_cb = NULL;
         a.playback = 0;
         a.repeat = 0;
