@@ -85,11 +85,11 @@ lv_obj_t *  lv_app_notice_add(const char * format, ...)
 
     lv_obj_t * mbox;
     mbox = lv_mbox_create(notice_h, NULL);
-   // lv_obj_set_style(mbox, lv_mboxs_get(LV_MBOXS_INFO, NULL));
     lv_mbox_set_text(mbox, txt);
+    lv_mbox_set_anim_close_time(mbox, LV_APP_NOTICE_CLOSE_ANIM_TIME);
 
 #if LV_APP_NOTICE_SHOW_TIME != 0
-    lv_mbox_start_auto_close(mbox, LV_APP_NOTICE_SHOW_TIME, LV_APP_NOTICE_CLOSE_ANIM_TIME);
+    lv_mbox_start_auto_close(mbox, LV_APP_NOTICE_SHOW_TIME);
 #endif
 
     /*Delete the last children if there are too many*/
