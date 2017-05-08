@@ -13,6 +13,10 @@
 #include "lvgl/lvgl.h"
 
 #if LV_APP_ENABLE != 0
+#include "lvgl/lv_app/lv_app_util/lv_app_kb.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_fsel.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
+
 
 /*********************
  *      DEFINES

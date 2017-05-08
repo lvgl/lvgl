@@ -13,11 +13,6 @@
 #include "misc/gfx/anim.h"
 #include "lvgl/lv_obj/lv_refr.h"
 
-#include "lv_app_util/lv_app_kb.h"
-#include "lv_app_util/lv_app_notice.h"
-#include "lv_app_util/lv_app_fsel.h"
-
-
 #include "../lv_appx/lv_app_example.h"
 #include "../lv_appx/lv_app_phantom.h"
 #include "../lv_appx/lv_app_sysmon.h"

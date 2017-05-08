@@ -35,21 +35,21 @@ static const char * kb_map_lc[] = {
 "\0051#", "\004q", "\004w", "\004e", "\004r", "\004t", "\004y", "\004u", "\004i", "\004o", "\004p", "\007Del", "\n",
 "\007ABC", "\004a", "\004s", "\004d", "\004f", "\004g", "\004h", "\004j", "\004k", "\004l", "\010Enter", "\n",
 "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
-"\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
+"\003Hide", "\003Left", "\006 ", "\003Right", "\003Ok", ""
 };
 
 static const char * kb_map_uc[] = {
 "\0051#", "\004Q", "\004W", "\004E", "\004R", "\004T", "\004Y", "\004U", "\004I", "\004O", "\004P", "\007Del", "\n",
 "\007abc", "\004A", "\004S", "\004D", "\004F", "\004G", "\004H", "\004J", "\004K", "\004L", "\010Enter", "\n",
 "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
-"\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
+"\003Hide", "\003Left", "\006 ", "\003Right", "\003Ok", ""
 };
 
 static const char * kb_map_spec[] = {
 "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\002Del", "\n",
 "\002abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
 "\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
-"\002Hide", "\002Left", "\006 ", "\002Right", "\002Ok", ""
+"\003Hide", "\003Left", "\006 ", "\003Right", "\003Ok", ""
 };
 
 static const char * kb_map_num[] = {
@@ -89,11 +89,11 @@ void lv_app_kb_init(void)
 
     memcpy(&style_btn_rel, &app_style->menu_btn_rel, sizeof(lv_style_t));
     style_btn_rel.radius = 0;
-    style_btn_rel.bwidth = 1 * LV_DOWNSCALE;
+    style_btn_rel.bwidth = 1;
 
     memcpy(&style_btn_pr, &app_style->menu_btn_pr, sizeof(lv_style_t));
     style_btn_pr.radius = 0;
-    style_btn_pr.bwidth = 1 * LV_DOWNSCALE;
+    style_btn_pr.bwidth = 1;
 }
 
 /**
@@ -102,8 +102,9 @@ void lv_app_kb_init(void)
  * @param mode 'OR'd values of 'lv_app_kb_mode_t' enum
  * @param close a function to call when the keyboard is closed
  * @param ok a function to called when the "Ok" button is pressed
+ * @return the created button matrix objects
  */
-void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *))
+lv_obj_t * lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *))
 {
 	/*Close the previous keyboard*/
     if(kb_btnm != NULL) {
@@ -156,6 +157,8 @@ void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t
     }
 
     lv_ta_set_cursor_pos(kb_ta, LV_TA_CUR_LAST);
+
+    return kb_btnm;
 
 }
 

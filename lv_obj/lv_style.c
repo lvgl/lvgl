@@ -218,6 +218,16 @@ lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy)
     return style;
 }
 
+/**
+ * Copy a style to an other
+ * @param dest pointer to the destination style
+ * @param src pointer to the source style
+ */
+void lv_style_cpy(lv_style_t * dest, const lv_style_t * src)
+{
+    memcpy(dest, src, sizeof(lv_style_t));
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

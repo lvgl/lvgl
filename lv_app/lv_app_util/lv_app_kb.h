@@ -41,8 +41,9 @@ void lv_app_kb_init(void);
  * @param mode 'OR'd values of 'lv_app_kb_mode_t' enum
  * @param close a function to call when the keyboard is closed
  * @param ok a function to called when the "Ok" button is pressed
+ * @return the created button matrix objects
  */
-void lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *));
+lv_obj_t * lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv_obj_t *), void (*ok)(lv_obj_t *));
 
 /**
  * Close the keyboard

@@ -17,6 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_MBOX_CLOSE_ANIM_TIME     300 /*ms*/
 
 /**********************
  *      TYPEDEFS
@@ -65,6 +66,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     ext->btnh = NULL;
     ext->style_btn_rel = lv_style_get(LV_STYLE_BTN_REL, NULL);
     ext->style_btn_pr = lv_style_get(LV_STYLE_BTN_PR, NULL);
+    ext->anim_close_time = LV_MBOX_CLOSE_ANIM_TIME;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_f(new_mbox, lv_mbox_signal);
@@ -249,22 +251,34 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
 }
 
 /**
+ * Set close animation duration
+ * @param mbox pointer to a message box object
+ * @param time animation length in  milliseconds (0: no animation)
+ */
+void lv_mbox_set_anim_close_time(lv_obj_t * mbox, uint16_t time)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    ext->anim_close_time = time;
+}
+
+/**
  * Automatically delete the message box after a given time
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
- * @param anim_time time of close animation in milliseconds (0: no animation)
  */
-void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout, uint16_t anim_time)
+void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout)
 {
-    if(anim_time != 0) {
+    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+
+    if(ext->anim_close_time != 0) {
         /*Add shrinking animations*/
-        lv_obj_anim(mbox, LV_ANIM_GROW_H| ANIM_OUT, anim_time, tout, NULL);
-        lv_obj_anim(mbox, LV_ANIM_GROW_V| ANIM_OUT, anim_time, tout, lv_obj_del);
+        lv_obj_anim(mbox, LV_ANIM_GROW_H| ANIM_OUT, ext->anim_close_time, tout, NULL);
+        lv_obj_anim(mbox, LV_ANIM_GROW_V| ANIM_OUT, ext->anim_close_time, tout, lv_obj_del);
 
         /*When the animations start disable fit to let shrinking work*/
         lv_obj_anim(mbox, LV_ANIM_NONE, 1, tout, lv_mbox_disable_fit);
     } else {
-        lv_obj_anim(mbox, LV_ANIM_NONE, anim_time, tout, lv_obj_del);
+        lv_obj_anim(mbox, LV_ANIM_NONE, ext->anim_close_time, tout, lv_obj_del);
     }
 }
 
@@ -307,6 +321,16 @@ lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn)
 	return mbox;
 }
 
+/**
+ * Get the close animation duration
+ * @param mbox pointer to a message box object
+ * @return animation length in  milliseconds (0: no animation)
+ */
+uint16_t lv_mbox_get_anim_close_time(lv_obj_t * mbox )
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    return ext->anim_close_time;
+}
 /**
  * Get the style of the buttons on a message box
  * @param mbox pointer to a message box object

@@ -48,6 +48,7 @@ typedef struct
     lv_obj_t * btnh;            /*Holder of the buttons*/
     lv_style_t * style_btn_rel; /*Style of the released buttons*/
     lv_style_t * style_btn_pr;  /*Style of the pressed buttons*/
+    uint16_t anim_close_time;   /*Duration of close animation [ms] (0: no animation)*/
 }lv_mbox_ext_t;
 
 /**********************
@@ -111,7 +112,7 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr);
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
  */
-void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout, uint16_t anim_time);
+void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout);
 
 /**
  * Stop the auto. closing of message box
