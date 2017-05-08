@@ -167,7 +167,7 @@
 #define LV_APP_SC_WIDTH     (LV_HOR_RES / 4)    /*Shortcut width*/
 #define LV_APP_SC_HEIGHT    (LV_VER_RES / 3)    /*Shortcut height*/
 #define LV_APP_FONT_SMALL   FONT_DEJAVU_20
-#define LV_APP_FONT_MEDIUM  LV_FONT_DEFAULT
+#define LV_APP_FONT_MEDIUM  FONT_DEFAULT
 #define LV_APP_FONT_LARGE   FONT_DEJAVU_40
 
 /*Animation settings*/
