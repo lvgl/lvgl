@@ -76,7 +76,7 @@ void lv_style_init (void)
     lv_style_scr.font = font_get(FONT_DEFAULT);
     lv_style_scr.letter_space = 1 * LV_DOWNSCALE;
     lv_style_scr.line_space = 3 * LV_DOWNSCALE;
-    lv_style_scr.txt_align = 0;
+    lv_style_scr.txt_align = LV_TXT_ALIGN_LEFT;
     lv_style_scr.img_recolor = OPA_TRANSP;
     lv_style_scr.line_width = 1 * LV_DOWNSCALE;
 

@@ -1011,8 +1011,10 @@ static void lv_app_init_style(void)
     app_style.menu_btn_rel.ccolor = COLOR_WHITE;
     app_style.menu_btn_rel.mcolor = COLOR_MAKE(0x30, 0x30, 0x30);
     app_style.menu_btn_rel.gcolor = COLOR_MAKE(0x30, 0x30, 0x30);
-    app_style.menu_btn_rel.bcolor = COLOR_MAKE(0x80, 0x80, 0x80);
+    app_style.menu_btn_rel.bcolor = COLOR_MAKE(0xa0, 0xa0, 0xa0);
+    app_style.menu_btn_rel.bopa = OPA_20;
     app_style.menu_btn_rel.bwidth = 0;
+
     app_style.menu_btn_rel.radius = 0;
 	app_style.menu_btn_rel.swidth = 0;
     app_style.menu_btn_rel.empty = 1;
