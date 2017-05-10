@@ -41,7 +41,7 @@ typedef struct
     /*New data for this type */
     char * txt;                     /*Text of the label*/
     lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
-    char dot_tmp[LV_LABEL_DOT_NUM]; /*Store the character which are replaced by dots (Handled by the library)*/
+    char dot_tmp[LV_LABEL_DOT_NUM + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
     uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/

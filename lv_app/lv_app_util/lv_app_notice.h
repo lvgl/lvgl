@@ -11,11 +11,28 @@
  *********************/
 #include "../lv_app.h"
 #include <stdarg.h>
-#if LV_APP_ENABLE != 0
+#if USE_LV_APP_NOTICE != 0
 
 /*********************
  *      DEFINES
  *********************/
+/*Add the required configurations*/
+#ifndef LV_APP_NOTICE_SHOW_TIME
+#define LV_APP_NOTICE_SHOW_TIME   4000
+#endif
+
+#ifndef LV_APP_NOTICE_CLOSE_ANIM_TIME
+#define LV_APP_NOTICE_CLOSE_ANIM_TIME   300
+#endif
+
+#ifndef LV_APP_NOTICE_MAX_NUM
+#define LV_APP_NOTICE_MAX_NUM   6
+#endif
+
+#ifndef LV_APP_NOTICE_MAX_LEN
+#define LV_APP_NOTICE_MAX_LEN   256
+#endif
+
 
 /**********************
  *      TYPEDEFS

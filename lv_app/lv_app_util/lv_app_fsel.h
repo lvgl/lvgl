@@ -10,11 +10,24 @@
  *      INCLUDES
  *********************/
 #include "../lv_app.h"
-#if LV_APP_ENABLE != 0
+#if USE_LV_APP_FSEL != 0
 
 /*********************
  *      DEFINES
  *********************/
+/*Add the required configurations*/
+#ifndef LV_APP_FSEL_FN_MAX_LEN
+#define LV_APP_FSEL_FN_MAX_LEN    128
+#endif
+
+#ifndef LV_APP_FSEL_PATH_MAX_LEN
+#define LV_APP_FSEL_PATH_MAX_LEN  256
+#endif
+
+#ifndef LV_APP_FSEL_PAGE_SIZE
+#define LV_APP_FSEL_PAGE_SIZE     8
+#endif
+
 
 /**********************
  *      TYPEDEFS

@@ -283,7 +283,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
                     if(txt[i] == ' ') {
                         /*Get the parameter*/
                         if(i - par_start == LABEL_RECOLOR_PAR_LENGTH) {
-                            char buf[LABEL_RECOLOR_PAR_LENGTH];
+                            char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
                             memcpy(buf, &txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r,g,b;

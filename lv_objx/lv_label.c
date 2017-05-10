@@ -602,7 +602,7 @@ static void lv_label_refr_text(lv_obj_t * label)
                     ext->dot_tmp[i] = ext->txt[index - LV_LABEL_DOT_NUM + i];
                     ext->txt[index - LV_LABEL_DOT_NUM + i] = '.';
                 }
-                /*The last character is '\0'*/
+                /*The last character is '\0'. Save this character from the text too.*/
                 ext->dot_tmp[i] = ext->txt[index];
                 ext->txt[index] = '\0';
             }

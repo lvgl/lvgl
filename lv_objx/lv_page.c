@@ -428,8 +428,6 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 	cord_t scrlable_y = lv_obj_get_y(ext->scrl);
 	cord_t page_h = lv_obj_get_height(page);
 
-	bool refr = false;
-
 	cord_t top_err = -(scrlable_y + obj_y);
 	cord_t bot_err = scrlable_y + obj_y + obj_h - page_h;
 
@@ -440,7 +438,6 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 		/*Calculate a new position and to let  scrable_rects.vpad space above*/
 		scrlable_y = -(obj_y - style_scrl->vpad - style->vpad);
 		scrlable_y += style_scrl->vpad;
-		refr = true;
 	}
 	/*Out of the page on the bottom*/
 	else if((obj_h <= page_h && bot_err > 0) ||
@@ -449,7 +446,9 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 		scrlable_y = -obj_y;
 		scrlable_y += page_h - obj_h;
         scrlable_y -= style_scrl->vpad;
-		refr = true;
+	} else {
+		/*Alraedy in focus*/
+		return;
 	}
 
     if(anim_time == 0) {

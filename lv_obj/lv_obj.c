@@ -7,13 +7,14 @@
  *      INCLUDES
  *********************/
 
-#include <lv_conf.h>
-#include <lvgl/lv_draw/lv_draw.h>
-#include <misc/gfx/anim.h>
-#include <lvgl/lv_obj/lv_dispi.h>
-#include <lvgl/lv_obj/lv_obj.h>
-#include <lvgl/lv_obj/lv_refr.h>
+#include "lv_conf.h"
+#include "lvgl/lv_draw/lv_draw.h"
+#include "lvgl/lv_obj/lv_dispi.h"
+#include "lvgl/lv_obj/lv_obj.h"
+#include "lvgl/lv_obj/lv_refr.h"
+#include "lvgl/lv_app/lv_app.h"
 #include "lvgl/lv_draw/lv_draw_rbasic.h"
+#include "misc/gfx/anim.h"
 #include <stdint.h>
 #include <string.h>
 #include <sys/types.h>
@@ -138,7 +139,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		lv_obj_set_design_f(new_obj, lv_obj_design);
 
 		/*Set free data*/
+#if LV_OBJ_FREE_NUM != 0
 		new_obj->free_num = 0;
+#endif
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
@@ -179,7 +182,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         lv_obj_set_design_f(new_obj, lv_obj_design);
 
         /*Set free data*/
+#if LV_OBJ_FREE_NUM != 0
         new_obj->free_num = 0;
+#endif
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
@@ -202,7 +207,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     	new_obj->ext_size = copy->ext_size;
 
         /*Set free data*/
+#if LV_OBJ_FREE_NUM != 0
         new_obj->free_num = copy->free_num;
+#endif
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = copy->free_p;
 #endif

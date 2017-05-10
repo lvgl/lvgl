@@ -21,6 +21,14 @@
 /*********************
  *      DEFINES
  *********************/
+/*Check dependencies*/
+#if LV_OBJ_FREE_P == 0
+#error "lv_app: Free pointer is required for application. Enable it lv_conf.h: LV_OBJ_FREE_P 1"
+#endif
+
+#if DM_CUSTOM == 0 && DM_MEM_SIZE < (2 * 1024)
+#error "lv_app: not enough dynamic memory. Increase it in misc_conf.h: DM_MEM_SIZE"
+#endif
 
 /**********************
  *      TYPEDEFS

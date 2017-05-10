@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_app_kb.h"
-#if LV_APP_ENABLE != 0
+#if USE_LV_APP_KB != 0
 
 #include "lvgl/lv_objx/lv_btnm.h"
 #include "lvgl/lv_objx/lv_ta.h"

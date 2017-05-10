@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_app_fsel.h"
-#if LV_APP_ENABLE != 0
+#if USE_LV_APP_FSEL != 0
 
 #include <stdio.h>
 #include "lv_app_notice.h"
@@ -15,9 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_APP_FSEL_FN_MAX_LEN    128
-#define LV_APP_FSEL_PATH_MAX_LEN  256
-#define LV_APP_FSEL_PAGE_SIZE     8
 
 /**********************
  *      TYPEDEFS

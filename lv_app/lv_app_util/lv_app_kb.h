@@ -10,7 +10,7 @@
  *      INCLUDES
  *********************/
 #include "../lv_app.h"
-#if LV_APP_ENABLE != 0
+#if USE_LV_APP_KB != 0
 
 /*********************
  *      DEFINES
