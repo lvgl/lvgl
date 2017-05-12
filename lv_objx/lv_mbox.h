@@ -108,6 +108,13 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
 void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr);
 
 /**
+ * Set close animation duration
+ * @param mbox pointer to a message box object
+ * @param time animation length in  milliseconds (0: no animation)
+ */
+void lv_mbox_set_anim_close_time(lv_obj_t * mbox, uint16_t time);
+
+/**
  * Automatically delete the message box after a given time
  * @param mbox pointer to a message box object
  * @param tout a time (in milliseconds) to wait before delete the message box
@@ -136,13 +143,19 @@ const char * lv_mbox_get_txt(lv_obj_t * mbox);
 lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn);
 
 /**
+ * Get the close animation duration
+ * @param mbox pointer to a message box object
+ * @return animation length in  milliseconds (0: no animation)
+ */
+uint16_t lv_mbox_get_anim_close_time(lv_obj_t * mbox );
+
+/**
  * Get the style of the buttons on a message box
  * @param mbox pointer to a message box object
  * @param state a state from 'lv_btn_state_t' in which style should be get
  * @return pointer to the style in the given state
  */
 lv_style_t * lv_mbox_get_style_btn(lv_obj_t * mbox, lv_btn_state_t state);
-
 
 /**********************
  *      MACROS

@@ -414,7 +414,7 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
  * Focus on an object. It ensures that the object will be visible on the page.
  * @param page pointer to a page object
  * @param obj pointer to an object to focus (must be on the page)
- * @param anim_time true: scroll animation time in milliseconds (0: no animation)
+ * @param anim_time scroll animation time in milliseconds (0: no animation)
  */
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 {

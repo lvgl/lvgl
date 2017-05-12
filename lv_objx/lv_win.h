@@ -113,9 +113,9 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_cbtn_size(lv_obj_t * win, cord_t size);
 
 /**
- * Set the styles of the window control buttons in a given state
+ * Set the styles of the window  control buttons in a given state
  * @param win pointer to a window object
- * @param rel spointer to the style in released state
+ * @param rel pointer to the style in released state
  * @param pr pointer to the style in pressed state
  */
 void lv_win_set_styles_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr);
@@ -151,17 +151,17 @@ cord_t lv_win_get_cbtn_size(lv_obj_t * win);
 /**
  * Get width of the content area (page scrollable) of the window
  * @param win pointer to a window object
- * @return the width of the contetn area
+ * @return the width of the content area
  */
 cord_t lv_win_get_width(lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.
  * It is useful in the action of the control buttons where only button is known.
- * @param cbtn pointer to a control button of a window
- * @return pointer to the window of 'cbtn'
+ * @param ctrl_btn pointer to a control button of a window
+ * @return pointer to the window of 'ctrl_btn'
  */
-lv_obj_t * lv_win_get_from_cbtn(lv_obj_t * cbtn);
+lv_obj_t * lv_win_get_from_cbtn(lv_obj_t * ctrl_btn);
 
 /**********************
  *      MACROS

@@ -174,25 +174,6 @@ typedef enum
 void lv_init(void);
 
 /**
- * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
- * @param obj pointer to an object
- */
-void lv_obj_inv(lv_obj_t * obj);
-
-/**
- * Notify an object about its style is modified
- * @param obj pointer to an object
- */
-void lv_obj_refr_style(lv_obj_t * obj);
-
-/**
- * Notify all object if a style is modified
- * @param style pinter to a style. Only objects with this style will be notified
- *               (NULL to notify all objects)
- */
-void lv_style_refr_objs(void * style);
-
-/**
  * Create a basic object
  * @param parent pointer to a parent object.
  *                  If NULL then a screen will be created
@@ -217,6 +198,12 @@ void lv_obj_del(lv_obj_t * obj);
 bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**
+ * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
+ * @param obj pointer to an object
+ */
+void lv_obj_inv(lv_obj_t * obj);
+
+/**
  * Load a new screen
  * @param scr pointer to a screen
  */
@@ -239,7 +226,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y);
 
 /**
  * Set relative the position of an object (relative to the parent).
- * The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinates will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side of the parent. (will be multiplied with LV_DOWNSCALE)
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
@@ -255,7 +242,7 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x);
 
 /**
  * Set the x coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -270,7 +257,7 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y);
 
 /**
  * Set the y coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -285,7 +272,7 @@ void lv_obj_set_y_us(lv_obj_t * obj, cord_t y);
 void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h);
 
 /**
- * Set the size of an object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Set the size of an object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  * @param h new height (will be multiplied with LV_DOWNSCALE)
@@ -300,7 +287,7 @@ void lv_obj_set_size_us(lv_obj_t * obj, cord_t w, cord_t h);
 void lv_obj_set_width(lv_obj_t * obj, cord_t w);
 
 /**
- * Set the width of an object.  The width will be upscaled to compensate LV_DOWNSCALE
+ * Set the width of an object.  The width will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  */
@@ -314,7 +301,7 @@ void lv_obj_set_width_us(lv_obj_t * obj, cord_t w);
 void lv_obj_set_height(lv_obj_t * obj, cord_t h);
 
 /**
- * Set the height of an object.  The height will be upscaled to compensate LV_DOWNSCALE
+ * Set the height of an object.  The height will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param h new height (will be multiplied with LV_DOWNSCALE)
  */
@@ -331,7 +318,7 @@ void lv_obj_set_height_us(lv_obj_t * obj, cord_t h);
 void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
 
 /**
- * Align an object to an other object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Align an object to an other object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
@@ -353,6 +340,19 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size);
  * @param style_p pointer to the new style
  */
 void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style);
+
+/**
+ * Notify an object about its style is modified
+ * @param obj pointer to an object
+ */
+void lv_obj_refr_style(lv_obj_t * obj);
+
+/**
+ * Notify all object if a style is modified
+ * @param style pointer to a style. Only the objects with this style will be notified
+ *               (NULL to notify all objects)
+ */
+void lv_style_refr_objs(void * style);
 
 /**
  * Hide an object. It won't be visible and clickable.
@@ -460,7 +460,6 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
  */
 void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);
 #endif
-
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -550,7 +549,7 @@ cord_t lv_obj_get_height(lv_obj_t * obj);
 cord_t lv_obj_get_ext_size(lv_obj_t * obj);
 
 /**
- * Get the style pointer of an object
+ * Get the style pointer of an object (if NULL get style of the parent)
  * @param obj pointer to an object
  * @return pointer to a style
  */
