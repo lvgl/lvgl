@@ -402,28 +402,58 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 	lv_style_t * style = lv_obj_get_style(chart);
 
 	uint8_t div_i;
+    uint8_t div_i_end;
+    uint8_t div_i_start;
 	point_t p1;
 	point_t p2;
 	cord_t w = lv_obj_get_width(chart);
 	cord_t h = lv_obj_get_height(chart);
 	cord_t x_ofs = chart->cords.x1;
 	cord_t y_ofs = chart->cords.y1;
-	p1.x = 0 + x_ofs;
-	p2.x = w + x_ofs;
-	for(div_i = 1; div_i <= ext->hdiv_num; div_i ++) {
-		p1.y = (int32_t)((int32_t)h * div_i) / (ext->hdiv_num + 1);
-		p1.y +=  y_ofs;
-		p2.y = p1.y;
-		lv_draw_line(&p1, &p2, mask, style);
+
+	if(ext->hdiv_num != 0) {
+        /*Draw slide lines if no border*/
+        if(style->bwidth != 0) {
+            div_i_start = 1;
+            div_i_end = ext->hdiv_num;
+        } else {
+            div_i_start = 0;
+            div_i_end = ext->hdiv_num + 1;
+        }
+
+        p1.x = 0 + x_ofs;
+        p2.x = w + x_ofs;
+        for(div_i = div_i_start; div_i <= div_i_end; div_i++) {
+            p1.y = (int32_t)((int32_t)h * div_i) / (ext->hdiv_num + 1);
+            p1.y +=  y_ofs;
+            if(div_i == div_i_start) p1.y += (style->line_width >> 1) + 1;  /*The first line might not be visible*/
+            if(div_i == div_i_end) p1.y -= (style->line_width >> 1) + 1;  /*The last line might not be visible*/
+
+            p2.y = p1.y;
+            lv_draw_line(&p1, &p2, mask, style);
+        }
 	}
 
-	p1.y = 0 + y_ofs;
-	p2.y = h + y_ofs;
-	for(div_i = 1; div_i <= ext->vdiv_num; div_i ++) {
-		p1.x = (int32_t)((int32_t)w * div_i) / (ext->vdiv_num + 1);
-		p1.x +=  x_ofs;
-		p2.x = p1.x;
-		lv_draw_line(&p1, &p2, mask, style);
+	if(ext->vdiv_num != 0) {
+        /*Draw slide lines if no border*/
+        if(style->bwidth != 0) {
+            div_i_start = 1;
+            div_i_end = ext->vdiv_num;
+        } else {
+            div_i_start = 0;
+            div_i_end = ext->vdiv_num + 1;
+        }
+
+        p1.y = 0 + y_ofs;
+        p2.y = h + y_ofs;
+        for(div_i = div_i_start; div_i <= div_i_end; div_i ++) {
+            p1.x = (int32_t)((int32_t)w * div_i) / (ext->vdiv_num + 1);
+            p1.x +=  x_ofs;
+            if(div_i == div_i_start) p1.x += (style->line_width >> 1) + 1;  /*The first line might not be visible*/
+            if(div_i == div_i_end) p1.x -= (style->line_width >> 1) + 1;  /*The last line might not be visible*/
+            p2.x = p1.x;
+            lv_draw_line(&p1, &p2, mask, style);
+        }
 	}
 }
 
