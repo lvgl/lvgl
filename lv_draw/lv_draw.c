@@ -1171,17 +1171,28 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
         point_lb.y = ofs_lb.y + row;
 
         uint16_t d;
-        for(d= 0; d < p; d++) {
-            px_fp(point_rb.x,point_rb.y , mask_p, style->scolor, opa_v_result[d]);
-            point_rb.x++;
+        for(d = 0; d < p; d++) {
+
+            if(point_rt.x != point_lt.x) {
+                px_fp(point_lt.x,point_lt.y , mask_p, style->scolor, opa_v_result[d]);
+            }
+
+            if(point_rb.x != point_lb.x && point_lt.y != point_lb.y) {
+                px_fp(point_lb.x,point_lb.y , mask_p, style->scolor, opa_v_result[d]);
+            }
+
+            if(point_lt.y != point_lb.y) {
+                px_fp(point_rb.x,point_rb.y , mask_p, style->scolor, opa_v_result[d]);
+            }
+
 
             px_fp(point_rt.x,point_rt.y , mask_p, style->scolor, opa_v_result[d]);
-            point_rt.x++;
 
-            px_fp(point_lb.x,point_rb.y , mask_p, style->scolor, opa_v_result[d]);
+
+            point_rb.x++;
             point_lb.x--;
 
-            px_fp(point_lt.x,point_lt.y , mask_p, style->scolor, opa_v_result[d]);
+            point_rt.x++;
             point_lt.x--;
         }
 
