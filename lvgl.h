@@ -12,7 +12,7 @@
 
 /*Test misc. module version*/
 #include "misc/misc.h"
-#define LV_MISC_REQ_MAJOR   3
+#define LV_MISC_REQ_MAJOR   4
 #define LV_MISC_REQ_MINOR   0
 #define LV_MISC_REQ_PATCH   0
 
@@ -54,8 +54,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define LVGL_VERSION_MAJOR  2
-#define LVGL_VERSION_MINOR  2
+#define LVGL_VERSION_MAJOR  4
+#define LVGL_VERSION_MINOR  0
 #define LVGL_VERSION_PATH   0
 
 
