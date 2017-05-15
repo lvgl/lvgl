@@ -69,7 +69,7 @@ See the [example HAL](https://github.com/littlevgl/hal) repository!
 12. Compile the code and load it to your embedded hardware
 
 ## PC Simulator
-If you don't hace got an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) to emulate a display on your monitor and a touch pad with your mouse.
+If you don't have got an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) to emulate a display on your monitor and a touch pad with your mouse.
 
 There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/proj_pc
 
@@ -80,7 +80,7 @@ There is a pre-configured PC project for **Eclipse CDT** in this repository: htt
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request!
 
-If you find issues please report them via GitHub!
+If you find an issue, please report it via GitHub!
 
 ## Donate
 If you are pleased with the graphics library and found it useful pleas support its further development:
