@@ -19,7 +19,7 @@
 #define LV_DPI              (80 * LV_DOWNSCALE)
 
 /* Buffered rendering: >= LV_DOWNSCALE * LV_HOR_RES or 0 to disable buffering*/
-#define LV_VDB_SIZE        (LV_HOR_RES * 20)
+#define LV_VDB_SIZE        (LV_HOR_RES * 30)
 
 /* Enable antialaiassing
  * If enabled everything will half-sized
@@ -28,11 +28,7 @@
 #define LV_ANTIALIAS        1
 
 /*Set the downscaling value*/
-#if LV_ANTIALIAS == 0
-#define LV_DOWNSCALE        1
-#else
-#define LV_DOWNSCALE        2
-#endif
+#define LV_DOWNSCALE        (1 << LV_ANTIALIAS)
 
 #define LV_REFR_PERIOD      40    /*Screen refresh period in milliseconds*/
 #define LV_INV_FIFO_SIZE    32    /*The average number of objects on a screen */
@@ -41,12 +37,12 @@
    Misc. setting
  *=================*/
 /*Display Input settings*/
-#define LV_DISPI_READ_PERIOD      50     /*Input device read period milliseconds*/
-#define LV_DISPI_TP_MARKER        0      /*Mark the pressed points (Value means marker point size)*/
-#define LV_DISPI_DRAG_LIMIT       10     /*Drag threshold in pixels */
-#define LV_DISPI_DRAG_THROW       20     /*Drag throw slow-down in [%]. Greater value means faster slow-down */
-#define LV_DISPI_LONG_PRESS_TIME  400    /*Long press time in milliseconds*/
-#define LV_DISPI_LONG_PRESS_REP_TIME 100 /*Repeated trigger period in long press [ms] */
+#define LV_DISPI_READ_PERIOD      50                    /*Input device read period milliseconds*/
+#define LV_DISPI_TP_MARKER        0                     /*Mark the pressed points (Value means marker point size)*/
+#define LV_DISPI_DRAG_LIMIT       (10 * LV_DOWNSCALE)   /*Drag threshold in pixels */
+#define LV_DISPI_DRAG_THROW       20                    /*Drag throw slow-down in [%]. Greater value means faster slow-down */
+#define LV_DISPI_LONG_PRESS_TIME        400             /*Long press time in milliseconds*/
+#define LV_DISPI_LONG_PRESS_REP_TIME    100             /*Repeated trigger period in long press [ms] */
 
 /*lv_obj (base object) settings*/
 #define LV_OBJ_FREE_NUM          1           /*Enable the free number attribute*/
@@ -95,10 +91,10 @@
 /*Container (dependencies: -*/
 #define USE_LV_CONT     1
 
-/*Page (dependencies: lv_rect)*/
+/*Page (dependencies: lv_cont)*/
 #define USE_LV_PAGE     1
 
-/*Window (dependencies: lv_rect, lv_btn, lv_label, lv_img, lv_page)*/
+/*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
 #define USE_LV_WIN      1
 
 /*************************
@@ -108,16 +104,16 @@
 /*Bar (dependencies: -)*/
 #define USE_LV_BAR       1
 
-/*Line meter (dependencies: bar, misc: trigo)*/
+/*Line meter (dependencies: bar; misc: trigo)*/
 #define USE_LV_LMETER   1
 
-/*Gauge (dependencies: misc: trigo)*/
+/*Gauge (dependencies:bar, lmeter; misc: trigo)*/
 #define USE_LV_GAUGE    1
 
 /*Chart (dependencies: -)*/
 #define USE_LV_CHART    1
 
-/*LED (dependencies: lv_rect)*/
+/*LED (dependencies: -)*/
 #define USE_LV_LED      1
 
 /*Message box (dependencies: lv_rect, lv_btn, lv_label)*/
@@ -143,13 +139,13 @@
 /*Check box (dependencies: lv_btn, lv_label)*/
 #define USE_LV_CB       1
 
-/*List (dependencies: lv_btn, lv_label, lv_img)*/
+/*List (dependencies: lv_page, lv_btn, lv_label, lv_img)*/
 #define USE_LV_LIST     1
 
 /*Drop down list (dependencies: lv_page, lv_label)*/
 #define USE_LV_DDLIST    1
 
-/*Bar (dependencies: lv_bar)*/
+/*Slider (dependencies: lv_bar)*/
 #define USE_LV_SLIDER    1
 
 
@@ -158,59 +154,91 @@
  * =================*/
 
 /*Enable the application system*/
-#define LV_APP_ENABLE       1
-
+#define LV_APP_ENABLE       0
 #if LV_APP_ENABLE != 0
 
-#define LV_APP_DESKTOP 		1
+/****************************
+ * Basic application settings
+ *****************************/
+#define LV_APP_DESKTOP      1                   /*Create a desktop-like environment*/
 
 #define LV_APP_SC_WIDTH     (LV_HOR_RES / 4)    /*Shortcut width*/
 #define LV_APP_SC_HEIGHT    (LV_VER_RES / 3)    /*Shortcut height*/
-#define LV_APP_FONT_SMALL   FONT_DEJAVU_20
-#define LV_APP_FONT_MEDIUM  FONT_DEFAULT
-#define LV_APP_FONT_LARGE   FONT_DEJAVU_40
+#define LV_APP_FONT_SMALL   FONT_DEJAVU_20      /*A small font*/
+#define LV_APP_FONT_MEDIUM  FONT_DEFAULT        /*A medium font*/
+#define LV_APP_FONT_LARGE   FONT_DEJAVU_40      /*A large font*/
 
-/*Animation settings*/
-#define LV_APP_ANIM_WIN      200      /*Animation time in milliseconds (0: turn off animation)*/
-#define LV_APP_ANIM_DESKTOP  200      /*Animation on the desktop (0: turn off animation)*/
+/***********************
+ * Animation settings
+ ***********************/
+#define LV_APP_ANIM_WIN      200      /*Animation time of windows [ms] (0: turn off animations)*/
+#define LV_APP_ANIM_DESKTOP  200      /*Animation time the desktop [ms] (0: turn off animations)*/
 
-/* App. utility settings */
-#define LV_APP_NOTICE_SHOW_TIME 4000        /*Notices will be shown for this time [ms]*/
-#define LV_APP_NOTICE_CLOSE_ANIM_TIME   300 /*Notice close animation time. [ms] 0: no animation */
-#define LV_APP_NOTICE_MAX_NUM   6           /*Max. number of notices*/
-#define LV_APP_NOTICE_MAX_LEN   256         /*Max. number of characters on a notice*/
+/************************
+ * App. utility settings
+ ************************/
+
+/*Notice*/
+#define USE_LV_APP_NOTICE           1
+#if USE_LV_APP_NOTICE != 0
+#define LV_APP_NOTICE_SHOW_TIME         4000    /*Notices will be shown for this time [ms]*/
+#define LV_APP_NOTICE_CLOSE_ANIM_TIME   300     /*Notice close animation time. [ms] 0: no animation */
+#define LV_APP_NOTICE_MAX_NUM   6               /*Max. number of notices*/
+#define LV_APP_NOTICE_MAX_LEN   256             /*Max. number of characters on a notice*/
+#endif
+
+/*File selector*/
+#define USE_LV_APP_FSEL         1
+#if USE_LV_APP_FSEL != 0
+#define LV_APP_FSEL_PAGE_SIZE     8         /*Max. number of files/folder on a page*/
+#define LV_APP_FSEL_FN_MAX_LEN    32        /*Max file name length*/
+#define LV_APP_FSEL_PATH_MAX_LEN  256       /*Max path length*/
+#endif
+
+/*Keyboard*/
+#define USE_LV_APP_KB           1
+#if USE_LV_APP_KB != 0
+/*No settings*/
+#endif
+
 /*==================
  *  LV APP X USAGE 
  * ================*/
 
+/*Example application*/
 #define USE_LV_APP_EXAMPLE  1
 
+/*System monitor*/
 #define USE_LV_APP_SYSMON   1
 #if USE_LV_APP_SYSMON != 0
-#define LV_APP_SYSMON_REFR_TIME     500     /*[ms]*/
-#define LV_APP_SYSMON_PNUM          64
-#define LV_APP_SYSMON_MEM_WARN      (4 * 1024)
-#define LV_APP_SYSMON_FRAG_WARN     (70)     /*[%]*/
-#define LV_APP_SYSMON_DEFRAG_PERIOD (5000)   /*[%]*/
+#define LV_APP_SYSMON_REFR_TIME     500         /*Mem. and CPU usage read period [ms]*/
+#define LV_APP_SYSMON_PNUM          64          /*Number of point on the window's chart*/
+#define LV_APP_SYSMON_MEM_WARN      (2 * 1024)  /*Make a notice less then this remaining memory [bytes]*/
+#define LV_APP_SYSMON_FRAG_WARN     (70)        /*Make a notice above this fragmentation level [%]*/
+#define LV_APP_SYSMON_DEFRAG_PERIOD (5000)      /*Auto-defrag period [ms]*/
 #endif /*USE_LV_APP_SYSMON != 0*/
 
+/*Terminal*/
 #define USE_LV_APP_TERMINAL 1
 #if USE_LV_APP_TERMINAL != 0
-#define LV_APP_TERMINAL_LENGTH      512  /*Memory of the terminal*/
+#define LV_APP_TERMINAL_LENGTH      512     /*Memory of the terminal [character number]*/
 #endif /*USE_LV_APP_TERMINAL != 0*/
 
-#define USE_LV_APP_FILES 1
+/*Files*/
+#define USE_LV_APP_FILES    1
 #if USE_LV_APP_FILES != 0
-#define LV_APP_FILES_PAGE_SIZE      8   /*Max. number of files/folder on a page*/
-#define LV_APP_FILES_FN_MAX_LEN     128
-#define LV_APP_FILES_PATH_MAX_LEN   256
-#define LV_APP_FILES_CHUNK_DEF_SIZE 256
-#define LV_APP_FILES_CHUNK_DEF_TIME 100
-#define LV_APP_FILES_CHUNK_MAX_SIZE 1024
+#define LV_APP_FILES_PAGE_SIZE      8       /*Max. number of files/folder on a page*/
+#define LV_APP_FILES_FN_MAX_LEN     32      /*Max file name length*/
+#define LV_APP_FILES_PATH_MAX_LEN   256     /*Max path length*/
+#define LV_APP_FILES_CHUNK_DEF_SIZE 256     /*Chunk size when sending a file*/
+#define LV_APP_FILES_CHUNK_DEF_TIME 100     /*Delay between sent chunks*/
+#define LV_APP_FILES_CHUNK_MAX_SIZE 1024    /*Max chunk size when the user sets it*/
 #endif /*USE_LV_APP_FILES != 0*/
+
 #endif /*LV_APP_ENABLE != 0*/
 
 #endif /*LV_CONF_H*/
+
 
 #endif /*Remove this to enable the content*/
 

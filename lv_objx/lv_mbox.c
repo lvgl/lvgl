@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_MBOX_CLOSE_ANIM_TIME     300 /*ms*/
+#define LV_MBOX_CLOSE_ANIM_TIME     200 /*Default close anim. time [ms]*/
 
 /**********************
  *      TYPEDEFS
@@ -134,13 +134,9 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
             }
         }
     	else if(sign == LV_SIGNAL_LONG_PRESS) {
-#if LV_MBOX_ANIM_TIME != 0
             lv_mbox_start_auto_close(mbox, 0);
-#else
-            lv_obj_del(mbox);
-            valid = false;
-#endif
             lv_dispi_wait_release(param);
+            valid = false;
         }
     	else if(sign == LV_SIGNAL_STYLE_CHG) {
             /*Refresh all the buttons*/
