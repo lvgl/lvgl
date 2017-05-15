@@ -55,15 +55,15 @@ See the [example HAL](https://github.com/littlevgl/hal) repository!
 5. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** and *misc/misc_conf_templ.h* as **misc_conf.h** to the projects root folder.
 6. In the *_conf.h files delete the first `#if 0` and its `#endif` at the end make the configurations
 7. In your *main.c* file include: 
-  * #include "misc/misc.h" 
-  * #include "misc/os/ptask.h"
-  * #include "lvgl/lvgl.h"   
+   * #include "misc/misc.h" 
+   * #include "misc/os/ptask.h"
+   * #include "lvgl/lvgl.h"   
 8. In your *main.c* intialize:
-  * **misc_init()**;
-  * your_systick_init();
-  * your_disp_init();
-  * your_indev_init();
-  * **lvgl_init()**;
+   * **misc_init()**;
+   * your_systick_init();
+   * your_disp_init();
+   * your_indev_init();
+   * **lvgl_init()**;
 10. Create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
 11. In the main *while(1)* call `ptask_handler();` and make a few milliseconds delay (e.g. `your_delay_ms(5);`) 
 
