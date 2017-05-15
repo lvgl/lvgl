@@ -83,37 +83,29 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_rect_set_layout(new_mbox, LV_RECT_LAYOUT_COL_L);
     	lv_rect_set_fit(new_mbox, true, true);
 
-    	ext->title = lv_label_create(new_mbox, NULL);
-    	lv_label_set_text(ext->title, "MESSAGE BOX");
-
     	ext->txt = lv_label_create(new_mbox, NULL);
     	lv_label_set_text(ext->txt, "Text of the message box");
-
-    	ext->btnh = lv_rect_create(new_mbox, NULL);
-    	lv_rect_set_fit(ext->btnh, false, true);
-    	lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
-        lv_obj_set_hidden(ext->btnh, true); /*Initially hidden, the first button will unhide it */
 
     	lv_obj_set_style(new_mbox, lv_mboxs_get(LV_MBOXS_DEF, NULL));
     }
     /*Copy an existing message box*/
     else {
         lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
-        ext->title = lv_label_create(new_mbox, copy_ext->title);
+
         ext->txt = lv_label_create(new_mbox, copy_ext->txt);
-        ext->btnh = lv_rect_create(new_mbox, copy_ext->btnh);
+        lv_mbox_set_title(new_mbox, lv_mbox_get_title(copy));
 
         /*Copy the buttons and the label on them*/
-        lv_obj_t * btn;
-        lv_obj_t * new_btn;
-        btn = lv_obj_get_child(copy_ext->btnh, NULL);
-        while(btn != NULL) {
-            new_btn = lv_btnm_create(ext->btnh, btn);
-            lv_label_create(new_btn, lv_obj_get_child(btn, NULL));
-
-            btn = lv_obj_get_child(copy_ext->btnh, btn);
+        if(copy_ext->btnh != NULL) {
+            lv_obj_t * btn;
+            const char * btn_txt;
+            btn = lv_obj_get_child(copy_ext->btnh, NULL);
+            while(btn != NULL) {
+                btn_txt = lv_label_get_text(lv_obj_get_child(btn, NULL));
+                lv_mbox_add_btn(new_mbox, btn_txt, LV_EA(btn, lv_btn_ext_t)->rel_action);
+                btn = lv_obj_get_child(copy_ext->btnh, btn);
+            }
         }
-
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_mbox);
     }
@@ -165,29 +157,22 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                 lv_dispi_wait_release(param);
     		    break;
     		case LV_SIGNAL_STYLE_CHG:
-    			lv_obj_set_style(ext->title, &style->title);
+    		    if(ext->title != NULL) lv_obj_set_style(ext->title, &style->title);
     			lv_obj_set_style(ext->txt, &style->txt);
-    			lv_obj_set_style(ext->btnh, &style->btnh);
+    			if(ext->btnh != NULL) lv_obj_set_style(ext->btnh, &style->btnh);
 
     			/*Refresh all the buttons*/
-    			btn = lv_obj_get_child(ext->btnh, NULL);
-    			while(btn != NULL) {
-    				/*Refresh the next button's style*/
-    				lv_obj_set_style(btn, &style->btn);
+    			if(ext->btnh != NULL) {
+                    btn = lv_obj_get_child(ext->btnh, NULL);
+                    while(btn != NULL) {
+                        /*Refresh the next button's style*/
+                        lv_obj_set_style(btn, &style->btn);
 
-    				/*Refresh the button label too*/
-    				lv_obj_set_style(lv_obj_get_child(btn, NULL), &style->btn_label);
-        			btn = lv_obj_get_child(ext->btnh, NULL);
+                        /*Refresh the button label too*/
+                        lv_obj_set_style(lv_obj_get_child(btn, NULL), &style->btn_label);
+                        btn = lv_obj_get_child(ext->btnh, btn);
+                    }
     			}
-
-    			/*Hide the title and/or buttons*/
-    			const char * title_txt = lv_label_get_text(ext->title);
-    		    if(title_txt[0] == '\0') lv_obj_set_hidden(ext->btnh, true);
-                else  lv_obj_set_hidden(ext->btnh, false);
-
-    			if(lv_obj_get_child_num(ext->btnh) == 0) 	lv_obj_set_hidden(ext->btnh, true);
-    			else  lv_obj_set_hidden(ext->btnh, false);
-
     			break;
     		default:
     			break;
@@ -209,12 +194,21 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 void lv_mbox_set_title(lv_obj_t * mbox, const char * title)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mboxs_t * style = lv_obj_get_style(mbox);
 
-    lv_label_set_text(ext->title, title);
-
-    /*Hide the title if it is an empty text*/
-    if(title[0] == '\0') lv_obj_set_hidden(ext->title, true);
-    else if (lv_obj_get_hidden(ext->title) != false) lv_obj_set_hidden(ext->title, false);
+    if(title[0] != '\0') {
+        if(ext->title == NULL) {
+            ext->title = lv_label_create(mbox, NULL);
+            lv_obj_set_style(ext->title, &style->title);
+            /*Set the other parents again. It will look like they were created later */
+            lv_obj_set_parent(ext->txt, mbox);
+            if(ext->btnh != NULL) lv_obj_set_parent(ext->btnh, mbox);
+        }
+        lv_label_set_text(ext->title, title);
+    } else if(ext->title != NULL) {
+        lv_obj_del(ext->title);
+        ext->title = NULL;
+    }
 
     lv_mbox_realign(mbox);
 }
@@ -244,6 +238,15 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
 	lv_mboxs_t * style = lv_obj_get_style(mbox);
 
+	/*Create a button if it is not existed yet*/
+	if(ext->btnh == NULL) {
+        ext->btnh = lv_rect_create(mbox, NULL);
+        lv_obj_set_style(ext->btnh, &style->btnh);
+        lv_obj_set_click(ext->btnh, false);
+        lv_rect_set_fit(ext->btnh, false, true);
+        lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
+	}
+
 	lv_obj_t * btn;
 	btn = lv_btn_create(ext->btnh, NULL);
 	lv_btn_set_rel_action(btn, rel_action);
@@ -254,15 +257,6 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 	label = lv_label_create(btn, NULL);
 	lv_obj_set_style(label, &style->btn_label);
 	lv_label_set_text(label, btn_txt);
-
-	/*With 1 button set center layout but from 2 set pretty*/
-	uint16_t child_num = lv_obj_get_child_num(ext->btnh);
-	if(child_num == 1) {
-	    lv_obj_set_hidden(ext->btnh, false);
-		lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_CENTER);
-	} else if (child_num == 2) {
-		lv_rect_set_layout(ext->btnh, LV_RECT_LAYOUT_PRETTY);
-	}
 
     lv_mbox_realign(mbox);
 
@@ -326,7 +320,7 @@ const char * lv_mbox_get_title(lv_obj_t * mbox)
 {
 	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
 
-	return lv_label_get_text(ext->title);
+	return ext->title == NULL ? "" : lv_label_get_text(ext->title);
 }
 
 /**
@@ -438,11 +432,11 @@ static void lv_mbox_realign(lv_obj_t * mbox)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
 
-    if(ext->btnh == NULL || ext->title == NULL || ext->txt == NULL) return;
+    if(ext->txt == NULL) return;
 
     /*Set the button holder width to the width of the text and title*/
-    if(lv_obj_get_hidden(ext->btnh) == false) {
-        cord_t title_w = lv_obj_get_width(ext->title);
+    if(ext->btnh != NULL) {
+        cord_t title_w = ext->title == NULL ? 0 :lv_obj_get_width(ext->title);
         cord_t txt_w = lv_obj_get_width(ext->txt);
         cord_t btn_w = 0;
         lv_obj_t * btn;
@@ -459,7 +453,7 @@ static void lv_mbox_realign(lv_obj_t * mbox)
 }
 
 /**
- * CAlled when the close animations starts to disable the recargle's fit
+ * Called when the close animations starts to disable the recargle's fit
  * @param mbox ppointer to message box object
  */
 static void lv_mbox_disable_fit(lv_obj_t  * mbox)
