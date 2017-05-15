@@ -23,12 +23,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mode);
-static void lv_cbs_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_cbs_t lv_cbs_def;
 static lv_design_f_t ancestor_design_f;
 /**********************
  *      MACROS
@@ -66,17 +64,22 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
-        lv_rect_set_layout(new_cb, LV_RECT_LAYOUT_ROW_M);
-        lv_rect_set_fit(new_cb, true, true);
+        ext->bullet = lv_btn_create(new_cb, NULL);
+        lv_btn_set_styles(new_cb, lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
+                                  lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
+                                  lv_style_get(LV_STYLE_TRANSP, NULL));
+        lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
+        lv_cont_set_fit(new_cb, true, true);
         lv_btn_set_tgl(new_cb, true);
 
-        ext->bullet = lv_btn_create(new_cb, NULL);
         lv_obj_set_click(ext->bullet, false);
+        lv_btn_set_styles(ext->bullet, lv_style_get(LV_STYLE_PRETTY, NULL), lv_style_get(LV_STYLE_PRETTY_COLOR, NULL),
+                                       lv_style_get(LV_STYLE_BTN_TREL, NULL), lv_style_get(LV_STYLE_BTN_TPR, NULL),
+                                       lv_style_get(LV_STYLE_BTN_INA, NULL));
 
         ext->label = lv_label_create(new_cb, NULL);
+        lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
         lv_label_set_text(ext->label, "Check box");
-
-        lv_obj_set_style(new_cb, lv_cbs_get(LV_CBS_DEF, NULL));
     } else {
     	lv_cb_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
@@ -85,8 +88,6 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_cb);
     }
-
-    lv_obj_align_us(new_cb, NULL, LV_ALIGN_CENTER, 0, 0);
     
     return new_cb;
 }
@@ -106,29 +107,19 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     valid = lv_btn_signal(cb, sign, param);
 
     lv_cb_ext_t * ext = lv_obj_get_ext(cb);
-    lv_cbs_t * cbs = lv_obj_get_style(cb);
+    lv_style_t * style = lv_obj_get_style(cb);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	switch(sign) {
-    	case LV_SIGNAL_PRESSED:
-    	case LV_SIGNAL_RELEASED:
-    	case LV_SIGNAL_LONG_PRESS:
-    	case LV_SIGNAL_PRESS_LOST:
-    		lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-    		break;
-    	case LV_SIGNAL_STYLE_CHG:
-    		lv_obj_set_size(ext->bullet, cbs->bullet_size, cbs->bullet_size);
-    		lv_obj_set_style(ext->bullet, &cbs->bullet);
-    		lv_obj_set_style(ext->label, &cbs->label);
-    		break;
-    	case LV_SIGNAL_CLEANUP:
-    		/*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    		break;
-    		default:
-    			break;
+    	if(sign == LV_SIGNAL_STYLE_CHG) {
+    		lv_obj_set_size(ext->bullet, font_get_height(style->font), font_get_height(style->font));
     	}
+        if(sign == LV_SIGNAL_PRESSED ||
+            sign == LV_SIGNAL_RELEASED ||
+            sign == LV_SIGNAL_PRESS_LOST) {
+            lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
+        }
     }
     
     return valid;
@@ -167,38 +158,16 @@ const char * lv_cb_get_text(lv_obj_t * cb)
 }
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_cbs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_cbs_t style
+ * Get the bullet (lv_btn) of a check box
+ * @param cb pointer to check box object
+ * @return pointer to the bullet of the check box (lv_btn)
  */
-lv_cbs_t * lv_cbs_get(lv_cbs_builtin_t style, lv_cbs_t * copy)
+lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb)
 {
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_cbs_init();
-		style_inited = true;
-	}
-
-	lv_cbs_t  *style_p;
-
-	switch(style) {
-		case LV_CBS_DEF:
-			style_p = &lv_cbs_def;
-			break;
-		default:
-			style_p = &lv_cbs_def;
-	}
-
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_cbs_t));
-		else memcpy(copy, &lv_cbs_def, sizeof(lv_cbs_t));
-	}
-
-	return style_p;
+    lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+    return ext->bullet;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -234,61 +203,4 @@ static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mo
     return true;
 }
 
-/**
- * Initialize the rectangle styles
- */
-static void lv_cbs_init(void)
-{
-	/*Default style*/
-
-	/*Bg style*/
-	lv_btns_get(LV_RECTS_TRANSP, &lv_cbs_def.bg);
-	lv_cbs_def.bg.rects.hpad = 6 * LV_DOWNSCALE;
-	lv_cbs_def.bg.rects.vpad = 6 * LV_DOWNSCALE;
-	lv_cbs_def.bg.rects.opad = 5 * LV_DOWNSCALE;
-
-	/*Bullet style*/
-	lv_btns_get(LV_BTNS_DEF, &lv_cbs_def.bullet);
-
-	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_REL] = COLOR_WHITE;
-	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_REL] = COLOR_SILVER;
-	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_REL] = COLOR_BLACK;
-	lv_cbs_def.bullet.flags[LV_BTN_STATE_REL].light_en = 0;
-
-	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_PR] = COLOR_SILVER;
-	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_PR] = COLOR_GRAY;
-	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_PR] = COLOR_BLACK;
-	lv_cbs_def.bullet.flags[LV_BTN_STATE_PR].light_en = 0;
-
-	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_TGL_REL] = COLOR_MAKE(0x10, 0x20, 0x30);
-	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_TGL_REL] = COLOR_WHITE;
-	lv_cbs_def.bullet.flags[LV_BTN_STATE_TGL_REL].light_en = 1;
-
-	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x50, 0x70, 0x90);
-	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_TGL_PR] = COLOR_MAKE(0x20, 0x30, 0x40);
-	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_TGL_PR] = COLOR_WHITE;
-	lv_cbs_def.bullet.flags[LV_BTN_STATE_TGL_PR].light_en = 1;
-
-	lv_cbs_def.bullet.mcolor[LV_BTN_STATE_INA] = COLOR_SILVER;
-	lv_cbs_def.bullet.gcolor[LV_BTN_STATE_INA] = COLOR_GRAY;
-	lv_cbs_def.bullet.bcolor[LV_BTN_STATE_INA] = COLOR_WHITE;
-	lv_cbs_def.bullet.flags[LV_BTN_STATE_INA].light_en = 0;
-
-	lv_cbs_def.bullet.rects.bwidth = 2 * LV_DOWNSCALE;
-	lv_cbs_def.bullet.rects.bopa = 70;
-    lv_cbs_def.bullet.rects.light = 6 * LV_DOWNSCALE;
-	lv_cbs_def.bullet.rects.empty = 0;
-	lv_cbs_def.bullet.rects.round = LV_OBJ_DEF_WIDTH / 3 / 4;
-	lv_cbs_def.bullet.rects.hpad = 0 * LV_DOWNSCALE;
-	lv_cbs_def.bullet.rects.vpad = 0 * LV_DOWNSCALE;
-	lv_cbs_def.bullet.rects.opad = 0 * LV_DOWNSCALE;
-
-	/*Label*/
-	lv_labels_get(LV_LABELS_TXT, &lv_cbs_def.label);
-	lv_cbs_def.label.objs.color = COLOR_MAKE(0x10, 0x18, 0x20);
-
-	/*Others*/
-	lv_cbs_def.bullet_size = LV_OBJ_DEF_WIDTH / 3;
-}
 #endif

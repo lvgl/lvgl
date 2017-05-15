@@ -13,6 +13,10 @@
 #if USE_LV_LIST != 0
 
 /*Testing of dependencies*/
+#if USE_LV_PAGE == 0
+#error "lv_list: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#endif
+
 #if USE_LV_BTN == 0
 #error "lv_list: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
 #endif
@@ -24,6 +28,7 @@
 #if USE_LV_IMG == 0
 #error "lv_list: lv_img is required. Enable it in lv_conf.h (USE_LV_IMG  1) "
 #endif
+
 
 #include "../lv_obj/lv_obj.h"
 #include "lv_page.h"
@@ -41,30 +46,12 @@
 /*Data of list*/
 typedef struct
 {
-    lv_page_ext_t page_ext; /*Ext. of ancestor*/
+    lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    /*No new data*/
+    lv_style_t * styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
+    lv_style_t * style_img;    /*Style of the list element images on buttons*/
+    uint8_t sb_out   :1;        /*1: Keep space for the scrollbar*/
 }lv_list_ext_t;
-
-/*Style of list*/
-typedef struct
-{
-	lv_pages_t bg_pages; /*Style of ancestor*/
-	/*New style element for this type */
-	lv_btns_t liste_btns;          /*List element button style*/
-	lv_labels_t liste_labels;      /*List element label style*/
-	lv_imgs_t liste_imgs;          /*List element image style*/
-	lv_rect_layout_t liste_layout; /*List element layout (will be removed)*/
-	uint8_t widthe_sb   :1;        /*1: Keep space for the scrollbar*/
-}lv_lists_t;
-
-/*Built-in styles of list*/
-typedef enum
-{
-	LV_LISTS_DEF,
-    LV_LISTS_SCRL,
-	LV_LISTS_TRANSP,
-}lv_lists_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -109,19 +96,61 @@ void lv_list_up(lv_obj_t * list);
 void lv_list_down(lv_obj_t * list);
 
 /**
+ * Enable/Disable to scrollbar outside attribute
+ * @param list pointer to list object
+ * @param out true: reduce the buttons width therefore scroll bar will be out of the buttons,
+ *            false: keep button size and place scroll bar on the buttons
+ */
+void lv_list_set_sb_out(lv_obj_t * list, bool out);
+
+/**
+ * Set styles of the list elements of a list in each state
+ * @param list pointer to list object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
+ */
+void lv_list_set_styles_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
+                            lv_style_t * trel, lv_style_t * tpr,
+                            lv_style_t * ina);
+
+/**
+ * Set the styles of the list element image (typically to set symbol font)
+ * @param list pointer to list object
+ * @param style pointer to the new style of the button images
+ */
+void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style);
+
+/**
  * Get the text of a list element
  * @param liste pointer to list element
  * @return pointer to the text
  */
-const char * lv_list_element_get_txt(lv_obj_t * liste);
+const char * lv_list_get_element_text(lv_obj_t * liste);
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_lists_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_lists_t style
+ * Get the scroll bar outside attribute
+ * @param list pointer to list object
+ * @param en true: scroll bar outside the buttons, false: scroll bar inside
  */
-lv_lists_t * lv_lists_get(lv_lists_builtin_t style, lv_lists_t * list);
+bool lv_list_get_sb_out(lv_obj_t * list, bool en);
+
+/**
+ * Get the style of the list elements in a given state
+ * @param list pointer to a list object
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
+ */
+lv_style_t * lv_list_get_style_liste(lv_obj_t * list, lv_btn_state_t state);
+
+/**
+ * Get the style of the list elements images
+ * @param list pointer to a list object
+ * @return pointer to the image style
+ */
+lv_style_t * lv_list_get_style_img(lv_obj_t * list, lv_btn_state_t state);
 
 /**********************
  *      MACROS

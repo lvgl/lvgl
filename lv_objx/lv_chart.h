@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_CHARTBG_H
-#define LV_CHARTBG_H
+#ifndef LV_CHART_H
+#define LV_CHART_H
 
 /*********************
  *      INCLUDES
@@ -12,69 +12,49 @@
 #include "lv_conf.h"
 #if USE_LV_CHART != 0
 
-/*Testing of dependencies*/
-#if USE_LV_RECT == 0
-#error "lv_chart: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
-#endif
-
-#if USE_LV_LINE == 0
-#error "lv_chart: lv_line is required. Enable it in lv_conf.h (USE_LV_LINE  1) "
-#endif
-
 #include "../lv_obj/lv_obj.h"
-#include "lv_rect.h"
 #include "lv_line.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_CHART_DL_NUM		8	/*Max data line number. Used in the style.*/
 
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of chart background*/
 typedef struct
 {
-    lv_rect_ext_t bg_rects; /*Ext. of ancestor*/
+    cord_t * points;
+    color_t color;
+}lv_chart_dl_t;
+
+/*Data of chart */
+typedef struct
+{
+    /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
-    cord_t ymin;
-    cord_t ymax;
+    ll_dsc_t dl_ll;       /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
+    cord_t ymin;          /*y min value (used to scale the data)*/
+    cord_t ymax;          /*y max value (used to scale the data)*/
     uint8_t hdiv_num;     /*Number of horizontal division lines*/
     uint8_t vdiv_num;     /*Number of vertical division lines*/
-    ll_dsc_t dl_ll;       /*Linked list for the data line pointers (stores cord_t * )*/
     uint16_t pnum;        /*Point number in a data line*/
-    uint8_t type    :2;   /*Line, column or point chart (from 'lv_chart_type_t')*/
-    uint8_t dl_num;       /*Data line number in dl_ll*/
+    cord_t dl_width;      /*Line width or point radius*/
+    uint8_t dl_num;       /*Number of data lines in dl_ll*/
+    opa_t dl_opa;       /*Opacity of data lines*/
+    opa_t dl_dark;       /*Dark level of the point/column bottoms*/
+    uint8_t type    :3;   /*Line, column or point chart (from 'lv_chart_type_t')*/
 }lv_chart_ext_t;
 
 /*Chart types*/
 typedef enum
 {
-	LV_CHART_LINE,
-	LV_CHART_COL,
-	LV_CHART_POINT,
+    LV_CHART_NONE = 0,
+	LV_CHART_LINE = 0x01,
+	LV_CHART_COL = 0x02,
+	LV_CHART_POINT = 0x04,
 }lv_chart_type_t;
 
-/*Style of chart background*/
-typedef struct
-{
-	lv_rects_t bg_rects; /*Style of ancestor*/
-	/*New style element for this type */
-	lv_lines_t div_lines;
-	uint8_t div_line_opa;		/*Percentage of obj. opacity*/
-	color_t color[LV_CHART_DL_NUM];	/*Line/Point/Col color */
-	uint16_t width;				/*Line width or point radius*/
-	opa_t data_opa;				/*Line/Point/Col opacity in the percentage of obj. opacity*/
-	uint8_t dark_eff;			/*Dark effect on the bottom of ó points and columns*/
-}lv_charts_t;
-
-/*Built-in styles of chart background*/
-typedef enum
-{
-	LV_CHARTS_DEF,
-	LV_CHARTS_TRANSP,
-}lv_charts_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -99,9 +79,10 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param);
 /**
  * Allocate and add a data line to the chart
  * @param chart pointer to a chart object
- * @return pointer to the allocated data lie (an array for the data points)
+ * @param color color of the data line
+ * @return pointer to the allocated data line (
  */
-cord_t * lv_chart_add_dataline(lv_obj_t * chart);
+lv_chart_dl_t * lv_chart_add_data_line(lv_obj_t * chart, color_t color);
 
 /**
  * Refresh a chart if its data line has changed
@@ -142,12 +123,33 @@ void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type);
 void lv_chart_set_pnum(lv_obj_t * chart, uint16_t pnum);
 
 /**
+ * Set the opacity of the data lines
+ * @param chart pointer to chart object
+ * @param opa opacity of the data lines
+ */
+void lv_chart_set_dl_opa(lv_obj_t * chart, opa_t opa);
+
+/**
+ * Set the line width or point radius of the data lines
+ * @param chart pointer to chart object
+ * @param width the new width
+ */
+void lv_chart_set_dl_width(lv_obj_t * chart, cord_t width);
+
+/**
+ * Set the dark effect on the bottom of the points or columns
+ * @param chart pointer to chart object
+ * @param dark_eff dark effect level (OPA_TRANSP to turn off)
+ */
+void lv_chart_set_dl_dark(lv_obj_t * chart, opa_t dark_eff);
+
+/**
  * Shift all data right and set the most right data on a data line
  * @param chart pointer to chart object
  * @param dl pointer to a data line on 'chart'
  * @param y the new value of the most right data
  */
-void lv_chart_set_next(lv_obj_t * chart, cord_t * dl, cord_t y);
+void lv_chart_set_next(lv_obj_t * chart, lv_chart_dl_t * dl, cord_t y);
 
 /**
  * Get the type of a chart
@@ -164,12 +166,25 @@ lv_chart_type_t lv_chart_get_type(lv_obj_t * chart);
 uint16_t lv_chart_get_pnum(lv_obj_t * chart);
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_charts_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_charts_t style
+ * Get the opacity of the data lines
+ * @param chart pointer to chart object
+ * @return the opacity of the data lines
  */
-lv_charts_t * lv_charts_get(lv_charts_builtin_t style, lv_charts_t * copy);
+opa_t lv_chart_get_dl_opa(lv_obj_t * chart);
+
+/**
+ * Get the data line width
+ * @param chart pointer to chart object
+ * @return the width the data lines (lines or points)
+ */
+cord_t lv_chart_get_dl_width(lv_obj_t * chart);
+
+/**
+ * Get the dark effect level on the bottom of the points or columns
+ * @param chart pointer to chart object
+ * @return dark effect level (OPA_TRANSP to turn off)
+ */
+opa_t lv_chart_get_dl_dark(lv_obj_t * chart, opa_t dark_eff);
 
 /**********************
  *      MACROS

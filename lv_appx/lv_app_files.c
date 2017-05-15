@@ -45,7 +45,6 @@ typedef struct
 typedef struct
 {
     lv_obj_t * file_list;
-    lv_obj_t * send_set_h;
 }my_win_data_t;
 
 /*Application specific data for a shortcut of this application*/
@@ -73,6 +72,7 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc);
 static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
+static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win);
 
 static void win_load_file_list(lv_app_inst_t * app);
 static void win_create_list(lv_app_inst_t * app);
@@ -83,7 +83,6 @@ static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_dispi_t * dispi);
 static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi);
 static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi);
 static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi);
-static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi);
 static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_dispi_t * dispi);
 static lv_action_res_t win_back_action(lv_obj_t * back, lv_dispi_t * dispi);
 static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_dispi_t * dispi);
@@ -107,12 +106,14 @@ static lv_app_dsc_t my_app_dsc =
 	.win_close = my_win_close,
 	.sc_open = my_sc_open,
 	.sc_close = my_sc_close,
+    .conf_open = my_conf_open,
 	.app_data_size = sizeof(my_app_data_t),
 	.sc_data_size = sizeof(my_sc_data_t),
 	.win_data_size = sizeof(my_win_data_t),
 };
 
-static lv_labels_t sc_labels;
+static lv_style_t style_sc_label;
+static lv_style_t style_btn_symbol;
 
 
 /**********************
@@ -130,10 +131,11 @@ static lv_labels_t sc_labels;
 const lv_app_dsc_t * lv_app_files_init(void)
 {
     lv_app_style_t * app_style = lv_app_style_get();
-    memcpy(&sc_labels, &app_style->sc_txt_style, sizeof(lv_labels_t));
-    sc_labels.font = LV_APP_FONT_LARGE;
+    memcpy(&style_sc_label, &app_style->sc_rec_rel, sizeof(lv_style_t));
+    style_sc_label.font = font_get(LV_APP_FONT_LARGE);
 
-
+    lv_style_get(LV_STYLE_BTN_REL, &style_btn_symbol);
+    style_btn_symbol.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 	return &my_app_dsc;
 }
 
@@ -219,7 +221,7 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 
 
     sc_data->label = lv_label_create(sc, NULL);
-    lv_obj_set_style(sc_data->label, &sc_labels);
+    lv_obj_set_style(sc_data->label, &style_sc_label);
     lv_label_set_text(sc_data->label, fs_get_last(app_data->path));
     lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
 }
@@ -247,7 +249,6 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
     app_data->file_cnt = 0;
     win_data->file_list = NULL;
-    win_data->send_set_h = NULL;
 
     lv_win_set_title(win, app_data->path);
 
@@ -263,6 +264,76 @@ static void my_win_close(lv_app_inst_t * app)
 
 }
 
+/**
+ * Create objects to configure the applications
+ * @param app pointer to an application which settings should be created
+ * @param conf_win pointer to a window where the objects can be created
+ *                (the window has the proper layout)
+ */
+static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
+{
+    my_app_data_t * app_data = app->app_data;
+
+    /*Create check boxes*/
+    lv_obj_t * cb;
+
+    /*Send file name check box*/
+    cb = lv_cb_create(conf_win, NULL);
+    lv_cb_set_text(cb, "Send file name");
+    lv_obj_set_free_num(cb, SEND_SETTINGS_FN);
+    lv_obj_set_free_p(cb, app);
+    lv_btn_set_rel_action(cb, win_send_settings_element_rel_action);
+    if(app_data->send_fn != 0) lv_btn_set_state(cb, LV_BTN_STATE_TREL);
+    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
+
+    /*Send size check box*/
+    cb = lv_cb_create(conf_win, cb);
+    lv_cb_set_text(cb, "Send size");
+    lv_obj_set_free_num(cb, SEND_SETTINGS_SIZE);
+    if(app_data->send_size != 0) lv_btn_set_state(cb, LV_BTN_STATE_TREL);
+    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
+
+    /*Send CRC check box*/
+    cb = lv_cb_create(conf_win, cb);
+    lv_cb_set_text(cb, "Send CRC");
+    lv_obj_set_free_num(cb, SEND_SETTINGS_CRC);
+    if(app_data->send_crc != 0) lv_btn_set_state(cb, LV_BTN_STATE_TREL);
+    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
+
+    /*Create a text area to type chunk size*/
+    lv_obj_t * val_set_h;
+    val_set_h = lv_cont_create(conf_win, NULL);
+    lv_obj_set_style(val_set_h, lv_style_get(LV_STYLE_PLAIN_COLOR, NULL));
+    lv_obj_set_click(val_set_h, false);
+    lv_cont_set_fit(val_set_h, true, true);
+    lv_cont_set_layout(val_set_h, LV_CONT_LAYOUT_ROW_M);
+
+    lv_obj_t * label;
+    label = lv_label_create(val_set_h, NULL);
+    lv_label_set_text(label, "Chunk size");
+
+    lv_obj_t * ta;
+    char buf[32];
+    ta = lv_ta_create(val_set_h, NULL);
+    lv_cont_set_fit(ta, false, true);
+    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_SIZE);
+    lv_obj_set_free_p(ta, app);
+    lv_page_set_rel_action(ta, win_send_settings_element_rel_action);
+    sprintf(buf, "%d", app_data->chunk_size);
+    lv_ta_set_text(ta, buf);
+
+    /*Create a text area to type the chunk delay*/
+    val_set_h = lv_cont_create(conf_win, val_set_h);
+
+    label = lv_label_create(val_set_h, NULL);
+    lv_label_set_text(label, "Inter-chunk delay");
+
+    ta = lv_ta_create(val_set_h, ta);
+    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_DELAY);
+    sprintf(buf, "%d", app_data->chunk_delay);
+    lv_ta_set_text(ta, buf);
+}
+
 /*--------------------
  * OTHER FUNCTIONS
  ---------------------*/
@@ -272,7 +343,6 @@ static void my_win_close(lv_app_inst_t * app)
  */
 static void win_create_list(lv_app_inst_t * app)
 {
-    lv_app_style_t * app_style = lv_app_style_get();
     my_win_data_t * win_data = app->win_data;
 
     /*Delete the previous list*/
@@ -282,12 +352,13 @@ static void win_create_list(lv_app_inst_t * app)
 
     /*Create a new list*/
     win_data->file_list = lv_list_create(app->win, NULL);
-    lv_obj_set_width(win_data->file_list, app_style->win_useful_w);
-    lv_obj_set_style(win_data->file_list, lv_lists_get(LV_LISTS_TRANSP, NULL));
+    lv_obj_set_width(win_data->file_list, lv_win_get_width(app->win));
+    lv_list_set_style_img(win_data->file_list, &style_btn_symbol);
+    lv_obj_set_style(lv_page_get_scrl(win_data->file_list), lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
     lv_obj_set_drag_parent(win_data->file_list, true);
     lv_obj_set_drag_parent(lv_page_get_scrl(win_data->file_list), true);
-    lv_rect_set_fit(win_data->file_list, false, true);
-    lv_rect_set_layout(lv_page_get_scrl(win_data->file_list), LV_RECT_LAYOUT_COL_L);
+    lv_cont_set_fit(win_data->file_list, false, true);
+    lv_cont_set_layout(lv_page_get_scrl(win_data->file_list), LV_CONT_LAYOUT_COL_L);
 }
 
 /**
@@ -314,13 +385,13 @@ static void win_load_file_list(lv_app_inst_t * app)
         for(i = 0; drv[i] != '\0'; i++) {
             buf[0] = drv[i];
             buf[1] = '\0';
-            liste = lv_list_add(win_data->file_list, "U:/icon_driver", buf, win_drv_action);
+            liste = lv_list_add(win_data->file_list, SYMBOL_DRIVE, buf, win_drv_action);
             lv_obj_set_free_p(liste, app);
         }
     }
     /*List the files/folders with fs interface*/
     else {
-        liste = lv_list_add(win_data->file_list, "U:/icon_up", "Up", win_up_action);
+        liste = lv_list_add(win_data->file_list, SYMBOL_UP, "Up", win_up_action);
         lv_obj_set_free_p(liste, app);
 
         fs_readdir_t rd;
@@ -332,7 +403,7 @@ static void win_load_file_list(lv_app_inst_t * app)
 
         /*At not first page add prev. page button */
         if(app_data->file_cnt != 0) {
-            liste = lv_list_add(win_data->file_list, "U:/icon_left", "Previous page", win_prev_action);
+            liste = lv_list_add(win_data->file_list, SYMBOL_LEFT, "Previous page", win_prev_action);
             lv_obj_set_free_p(liste, app);
         }
 
@@ -342,7 +413,7 @@ static void win_load_file_list(lv_app_inst_t * app)
         uint16_t file_cnt = 0;
         while(file_cnt <= app_data->file_cnt) {
             res = fs_readdir(&rd, fn);
-            if(res != FS_RES_OK || fn[0] == '\0'){
+            if(res != FS_RES_OK ){
                 lv_app_notice_add("Can not read\nthe path in Files");
                 return;
             }
@@ -353,13 +424,13 @@ static void win_load_file_list(lv_app_inst_t * app)
         while(res == FS_RES_OK && fn[0] != '\0') {
             if(fn[0] == '/') { /*Add a folder*/
                 lv_obj_t * liste;
-                liste = lv_list_add(win_data->file_list, "U:/icon_folder", &fn[1], win_folder_action);
+                liste = lv_list_add(win_data->file_list, SYMBOL_FOLDER, &fn[1], win_folder_action);
                 lv_obj_set_free_p(liste, app);
                 app_data->file_cnt ++;
             }
             /*Add a file*/
             else {
-                liste = lv_list_add(win_data->file_list, "U:/icon_file", fn, win_file_action);
+                liste = lv_list_add(win_data->file_list, SYMBOL_FILE, fn, win_file_action);
                 lv_obj_set_free_p(liste, app);
                 app_data->file_cnt ++;
             }
@@ -369,7 +440,7 @@ static void win_load_file_list(lv_app_inst_t * app)
 
             /*Show only LV_APP_FSEL_MAX_FILE elements and add a Next page button*/
             if(app_data->file_cnt != 0 && app_data->file_cnt % LV_APP_FILES_PAGE_SIZE == 0) {
-                liste = lv_list_add(win_data->file_list, "U:/icon_right", "Next page", win_next_action);
+                liste = lv_list_add(win_data->file_list, SYMBOL_RIGHT, "Next page", win_next_action);
                 lv_obj_set_free_p(liste, app);
                 break;
             }
@@ -458,7 +529,7 @@ static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(drv);
     my_app_data_t * app_data = app->app_data;
-    sprintf(app_data->path, "%s:", lv_list_element_get_txt(drv));
+    sprintf(app_data->path, "%s:", lv_list_get_element_text(drv));
     app_data->file_cnt = 0;
     lv_win_set_title(app->win, app_data->path);
     my_sc_data_t * sc_data = app->sc_data;
@@ -482,7 +553,7 @@ static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(folder);
     my_app_data_t * app_data = app->app_data;
-    sprintf(app_data->path, "%s/%s", app_data->path, lv_list_element_get_txt(folder));
+    sprintf(app_data->path, "%s/%s", app_data->path, lv_list_get_element_text(folder));
     app_data->file_cnt = 0;
 
     lv_win_set_title(app->win, app_data->path);
@@ -510,7 +581,7 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
     my_app_data_t * app_data = app->app_data;
     my_win_data_t * win_data = app->win_data;
 
-    sprintf(app_data->fn, "%s", lv_list_element_get_txt(file));
+    sprintf(app_data->fn, "%s", lv_list_get_element_text(file));
 
     win_create_list(app);
 
@@ -521,8 +592,6 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
 
     /*Send button*/
     liste = lv_list_add(win_data->file_list, NULL, "Send", win_send_rel_action);
-    lv_obj_set_free_p(liste, app);
-    lv_btn_set_lpr_action(liste, win_send_lpr_action);
     lv_obj_set_free_p(liste, app);
 
     /*Delete button*/
@@ -574,100 +643,6 @@ static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi)
 }
 
 /**
- * Called when the Send list element is long pressed to show/hide send settings
- * @param send pointer to the Up button
- * @param dispi pointer to the caller display input
- * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
- */
-static lv_action_res_t win_send_lpr_action(lv_obj_t * send, lv_dispi_t * dispi)
-{
-    lv_app_inst_t * app = lv_obj_get_free_p(send);
-    my_app_data_t * app_data = app->app_data;
-    my_win_data_t * win_data = app->win_data;
-
-    /*Close the settings if it is opened*/
-    if(win_data->send_set_h != NULL) {
-        lv_obj_del(win_data->send_set_h);
-        win_data->send_set_h = NULL;
-        lv_dispi_wait_release(dispi);
-        lv_btn_set_state(send, LV_BTN_STATE_REL);
-        return LV_ACTION_RES_OK;
-    }
-
-    /*Create the settings*/
-    lv_btn_set_state(send, LV_BTN_STATE_REL);
-    lv_rect_set_layout(send, LV_RECT_LAYOUT_COL_L);
-
-    /*Create holder for the settings*/
-    win_data->send_set_h = lv_rect_create(send, NULL);
-    lv_obj_set_style(win_data->send_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
-    lv_obj_set_click(win_data->send_set_h, false);
-    lv_rect_set_fit(win_data->send_set_h, true, true);
-    lv_rect_set_layout(win_data->send_set_h, LV_RECT_LAYOUT_COL_L);
-
-    /*Create check boxes*/
-    lv_obj_t * cb;
-
-    /*Send file name check box*/
-    cb = lv_cb_create(win_data->send_set_h, NULL);
-    lv_cb_set_text(cb, "Send file name");
-    lv_obj_set_free_num(cb, SEND_SETTINGS_FN);
-    lv_obj_set_free_p(cb, app);
-    lv_btn_set_rel_action(cb, win_send_settings_element_rel_action);
-    if(app_data->send_fn != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
-    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
-
-    /*Send size check box*/
-    cb = lv_cb_create(win_data->send_set_h, cb);
-    lv_cb_set_text(cb, "Send size");
-    lv_obj_set_free_num(cb, SEND_SETTINGS_SIZE);
-    if(app_data->send_size != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
-    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
-
-    /*Send CRC check box*/
-    cb = lv_cb_create(win_data->send_set_h, cb);
-    lv_cb_set_text(cb, "Send CRC");
-    lv_obj_set_free_num(cb, SEND_SETTINGS_CRC);
-    if(app_data->send_crc != 0) lv_btn_set_state(cb, LV_BTN_STATE_TGL_REL);
-    else lv_btn_set_state(cb, LV_BTN_STATE_REL);
-
-    /*Create a text area the type chunk size*/
-    lv_obj_t * val_set_h;
-    val_set_h = lv_rect_create(win_data->send_set_h, NULL);
-    lv_obj_set_style(val_set_h, lv_rects_get(LV_RECTS_TRANSP, NULL));
-    lv_obj_set_click(val_set_h, false);
-    lv_rect_set_fit(val_set_h, true, true);
-    lv_rect_set_layout(val_set_h, LV_RECT_LAYOUT_ROW_M);
-
-    lv_obj_t * label;
-    label = lv_label_create(val_set_h, NULL);
-    lv_label_set_text(label, "Chunk size");
-
-    lv_obj_t * ta;
-    char buf[32];
-    ta = lv_ta_create(val_set_h, NULL);
-    lv_obj_set_style(ta, lv_tas_get(LV_TAS_SIMPLE, NULL));
-    lv_rect_set_fit(ta, false, true);
-    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_SIZE);
-    lv_obj_set_free_p(ta, app);
-    lv_page_set_rel_action(ta, win_send_settings_element_rel_action);
-    sprintf(buf, "%d", app_data->chunk_size);
-    lv_ta_set_text(ta, buf);
-
-    /*Create a text area to type the chunk delay*/
-    val_set_h = lv_rect_create(win_data->send_set_h, val_set_h);
-
-    label = lv_label_create(val_set_h, NULL);
-    lv_label_set_text(label, "Inter-chunk delay");
-
-    ta = lv_ta_create(val_set_h, ta);
-    lv_obj_set_free_num(ta, SEND_SETTINGS_CHUNK_DELAY);
-    sprintf(buf, "%d", app_data->chunk_delay);
-    lv_ta_set_text(ta, buf);
-
-    return LV_ACTION_RES_OK;
-}
-/**
  * Called when a send settings element is released
  * @param element pointer to a chekbox or text area
  * @param dispi pointer to the caller display input
@@ -691,9 +666,9 @@ static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, 
             lv_app_notice_add("CRC sending is\nnot supported yet");
         }
     } else if(id == SEND_SETTINGS_CHUNK_SIZE) {
-        lv_app_kb_open(element, LV_APP_KB_MODE_NUM, send_settings_kb_close_action, send_settings_kb_ok_action);
+        lv_app_kb_open(element, LV_APP_KB_MODE_NUM | LV_APP_KB_MODE_WIN_RESIZE, send_settings_kb_close_action, send_settings_kb_ok_action);
     } else if(id == SEND_SETTINGS_CHUNK_DELAY) {
-        lv_app_kb_open(element, LV_APP_KB_MODE_NUM, send_settings_kb_close_action, send_settings_kb_ok_action);
+        lv_app_kb_open(element, LV_APP_KB_MODE_NUM | LV_APP_KB_MODE_WIN_RESIZE, send_settings_kb_close_action, send_settings_kb_ok_action);
     }
 
     return LV_ACTION_RES_OK;
@@ -795,41 +770,33 @@ static void start_send(lv_app_inst_t * app, const char * path)
     /*Open the file*/
     fs_res_t res = fs_open(&app_data->file, path, FS_MODE_RD);
     if(res == FS_RES_OK) {
-        uint32_t rn;
-        char rd_buf[LV_APP_FILES_CHUNK_MAX_SIZE];
+        app_data->send_in_prog = 1;
 
-        /*Read the first chunk*/
-        res = fs_read(&app_data->file, rd_buf, app_data->chunk_size, &rn);
-        if(res == FS_RES_OK) {
-            app_data->send_in_prog = 1;
-
-            /*Send the header*/
-            if(app_data->send_fn != 0) {
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->path, strlen(app_data->path));
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "/", 1);
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->fn, strlen(app_data->fn));
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-
-            if(app_data->send_size != 0) {
-                char buf[64];
-                uint32_t size;
-                fs_size(&app_data->file, &size);
-                sprintf(buf,"%d", (int) size);
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, buf, strlen(buf));
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-            if(app_data->send_crc != 0) {
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "0x0000", 6);
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-
-            /*Add an extra \n to separate the header from the file data*/
-            if(app_data->send_fn != 0 || app_data->send_size != 0 || app_data->send_crc != 0) {
-                lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
-            }
-
+        /*Send the header*/
+        if(app_data->send_fn != 0) {
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->path, strlen(app_data->path));
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "/", 1);
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, app_data->fn, strlen(app_data->fn));
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
         }
+
+        if(app_data->send_size != 0) {
+            char buf[64];
+            uint32_t size;
+            fs_size(&app_data->file, &size);
+            sprintf(buf,"%d", (int) size);
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, buf, strlen(buf));
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+        }
+        if(app_data->send_crc != 0) {
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "0x0000", 6);
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+        }
+
+        /*Add an extra \n to separate the header from the file data*/
+        if(app_data->send_fn != 0 || app_data->send_size != 0 || app_data->send_crc != 0) {
+            lv_app_com_send(app, LV_APP_COM_TYPE_CHAR, "\n", 1);
+        } 
     }
 
     /*If an error occurred  close the file*/

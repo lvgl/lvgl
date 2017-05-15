@@ -3,8 +3,8 @@
  * Include all LittleV GL related headers
  */
 
-#ifndef LV_GL_H
-#define LV_GL_H
+#ifndef LVGL_H
+#define LVGL_H
 
 /*********************
  *      INCLUDES
@@ -28,23 +28,26 @@
 #error "LV: incompatible misc. module version! See lvgl.h"
 #endif
 
-#include <lvgl/lv_objx/lv_chart.h>
 #include "lv_obj/lv_obj.h"
 #include "lv_objx/lv_btn.h"
 #include "lv_objx/lv_img.h"
 #include "lv_objx/lv_label.h"
 #include "lv_objx/lv_line.h"
 #include "lv_objx/lv_page.h"
-#include "lv_objx/lv_rect.h"
+#include "lv_objx/lv_cont.h"
 #include "lv_objx/lv_list.h"
+#include "lv_objx/lv_chart.h"
 #include "lv_objx/lv_cb.h"
-#include "lv_objx/lv_pb.h"
+#include "lv_objx/lv_bar.h"
+#include "lv_objx/lv_slider.h"
 #include "lv_objx/lv_led.h"
 #include "lv_objx/lv_btnm.h"
+#include "lv_objx/lv_ddlist.h"
 #include "lv_objx/lv_ta.h"
 #include "lv_objx/lv_win.h"
 #include "lv_objx/lv_mbox.h"
 #include "lv_objx/lv_gauge.h"
+#include "lv_objx/lv_lmeter.h"
 
 #include "lv_app/lv_app.h"
 

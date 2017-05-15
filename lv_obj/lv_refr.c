@@ -45,8 +45,8 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_join_t inv_buf[LV_INV_FIFO_SIZE];
-uint16_t inv_buf_p;
+static lv_join_t inv_buf[LV_INV_FIFO_SIZE];
+static uint16_t inv_buf_p;
 
 /**********************
  *      MACROS
@@ -76,6 +76,12 @@ void lv_refr_init(void)
  */
 void lv_inv_area(const area_t * area_p)
 {
+    /*Clear the invalidate buffer if the parameter is NULL*/
+    if(area_p == NULL) {
+        inv_buf_p = 0;
+        return;
+    }
+    
     area_t scr_area;
     scr_area.x1 = 0;
     scr_area.y1 = 0;
@@ -224,12 +230,12 @@ static void lv_refr_area_with_vdb(const area_t * area_p)
     lv_vdb_t * vdb_p = lv_vdb_get();
     
     /*Always use the full row*/
-    vdb_p->vdb_area.x1 = area_p->x1;
-    vdb_p->vdb_area.y1 = area_p->y1;
-    vdb_p->vdb_area.x2 = area_p->x2;
+    vdb_p->area.x1 = area_p->x1;
+    vdb_p->area.y1 = area_p->y1;
+    vdb_p->area.x2 = area_p->x2;
 
     /*Calculate the max row num*/
-    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (vdb_p->vdb_area.x2 - vdb_p->vdb_area.x1 + 1);
+    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (vdb_p->area.x2 - vdb_p->area.x1 + 1);
     if(max_row > area_get_height(area_p)) max_row = area_get_height(area_p);
     
     /*Round the row number with downscale*/
@@ -242,17 +248,17 @@ static void lv_refr_area_with_vdb(const area_t * area_p)
 
     for(row = area_p->y1; row  + max_row - 1 <= area_p->y2; row += max_row)  {
         /*Calc. the next y coordinates of VDB*/
-        vdb_p->vdb_area.y1 = row;
-        vdb_p->vdb_area.y2 = row + max_row - 1;
+        vdb_p->area.y1 = row;
+        vdb_p->area.y2 = row + max_row - 1;
 
         lv_refr_area_part_vdb(area_p);
     }
     
     /*If the last y coordinates are not handled yet ...*/
-    if(area_p->y2 != vdb_p->vdb_area.y2) {
+    if(area_p->y2 != vdb_p->area.y2) {
         /*Calc. the next y coordinates of VDB*/
-        vdb_p->vdb_area.y1 = row;
-        vdb_p->vdb_area.y2 = area_p->y2;
+        vdb_p->area.y1 = row;
+        vdb_p->area.y2 = area_p->y2;
 
         /*Refresh this part too*/
         lv_refr_area_part_vdb(area_p);
@@ -271,7 +277,7 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
     /*Get the new mask from the original area and the act. VDB
      It will be a part of 'area_p'*/
     area_t start_mask;
-    area_union(&start_mask, area_p, &vdb_p->vdb_area);
+    area_union(&start_mask, area_p, &vdb_p->area);
 
     /*Get the most top object which is not covered by others*/
     top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
@@ -310,8 +316,8 @@ static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
         
         /*If no better children check this object*/
         if(found_p == NULL) {
-            if(obj->opa == OPA_COVER &&
-               LV_SA(obj, lv_objs_t)->transp == 0 &&
+            lv_style_t * style = lv_obj_get_style(obj);
+            if(style->opa == OPA_COVER &&
                obj->design_f(obj, area_p, LV_DESIGN_COVER_CHK) != false) {
                 found_p = obj;
             }
@@ -396,10 +402,11 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
 
-        /* Redraw the object */    
-        if(obj->opa != OPA_TRANSP && LV_SA(obj, lv_objs_t)->transp == 0) {
+        /* Redraw the object */
+        lv_style_t * style = lv_obj_get_style(obj);
+        if(style->opa != OPA_TRANSP) {
             obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
-           /* tick_wait_ms(100); */ /*DEBUG: Wait after every object draw to see the order of drawing*/
+            //tick_wait_ms(100);  /*DEBUG: Wait after every object draw to see the order of drawing*/
         }
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
@@ -430,7 +437,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
         }
 
         /* If all the children are redrawn make 'post draw' design */
-		if(obj->opa != OPA_TRANSP && LV_SA(obj, lv_objs_t)->transp == 0) {
+        if(style->opa != OPA_TRANSP) {
 		  obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
 		}
     }

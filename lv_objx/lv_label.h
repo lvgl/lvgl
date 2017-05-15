@@ -13,8 +13,8 @@
 #if USE_LV_LABEL != 0
 
 #include "../lv_obj/lv_obj.h"
-#include "../lv_misc/font.h"
-#include "../lv_misc/text.h"
+#include "misc/gfx/font.h"
+#include "misc/gfx/text.h"
 
 /*********************
  *      DEFINES
@@ -29,8 +29,8 @@
 typedef enum
 {
     LV_LABEL_LONG_EXPAND,   /*Expand the object size to the text size*/
-    LV_LABEL_LONG_BREAK,    /*Keep the width and break the text and expand the object height*/
-    LV_LABEL_LONG_DOTS,     /*Keep the size, break the text and write dots in the last line*/
+    LV_LABEL_LONG_BREAK,    /*Keep the object width, break the too long lines and expand the object height*/
+    LV_LABEL_LONG_DOTS,     /*Keep the object size, break the text and write dots in the last line*/
     LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
 }lv_label_long_mode_t;
 
@@ -41,31 +41,11 @@ typedef struct
     /*New data for this type */
     char * txt;                     /*Text of the label*/
     lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
-    char dot_tmp[LV_LABEL_DOT_NUM]; /*Store character which are replaced with dots*/
-    uint16_t dot_end;               /* The text end position in dot mode*/
-    uint8_t static_txt  :1;         /* Flag to indicate the text is static*/
-    uint8_t recolor  :1;            /* Enable in-line letter recoloring*/
+    char dot_tmp[LV_LABEL_DOT_NUM + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
+    uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
+    uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
+    uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/
 }lv_label_ext_t;
-
-/*Style of label*/
-typedef struct
-{
-	lv_objs_t objs;		/*Style of ancestor*/
-	/*New style element for this type */
-    font_types_t font;      /*Name of the font. E.g: FONT_DEJAVU_20*/
-    uint16_t letter_space;
-    uint16_t line_space;
-    uint8_t mid         :1; /*1: Align the lines into the middle*/
-}lv_labels_t;
-
-/*Built-in styles of label*/
-typedef enum
-{
-	LV_LABELS_DEF,
-	LV_LABELS_BTN,
-	LV_LABELS_TXT,
-	LV_LABELS_TITLE,
-}lv_labels_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -112,6 +92,13 @@ void lv_label_set_text_array(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_text_static(lv_obj_t * label, const char * text);
 
 /**
+ * Append a text to the label. The label current label text can not be static.
+ * @param label pointer to label object
+ * @param text pointe rto the new text
+ */
+void lv_label_append_text(lv_obj_t * label, const char * text);
+
+/**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
@@ -139,7 +126,6 @@ const char * lv_label_get_text(lv_obj_t * label);
  */
 lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label);
 
-
 /**
  * Get the recoloring attribute
  * @param label pointer to a label object
@@ -162,14 +148,6 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos);
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  */
 uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos);
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_labels_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_labels_t style
- */
-lv_labels_t * lv_labels_get(lv_labels_builtin_t style, lv_labels_t * copy);
 
 /**********************
  *      MACROS

@@ -29,12 +29,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode);
-static void lv_templs_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_templs_t lv_templs_def;	/*Default template style*/
 
 /**********************
  *      MACROS
@@ -56,7 +54,7 @@ static lv_templs_t lv_templs_def;	/*Default template style*/
  */
 lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 {
-    /*Create the ancestor template*/
+    /*Create the ancestor of template*/
 	/*TODO modify it to the ancestor create function */
     lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
     dm_assert(new_templ);
@@ -66,7 +64,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
-
+    ext->xyz = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_f(new_templ, lv_templ_signal);
@@ -74,7 +72,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new template template*/
     if(copy == NULL) {
-        lv_obj_set_style(new_templ, lv_templs_get(LV_TEMPLS_DEF, NULL));
+        lv_obj_set_style(new_templ, lv_style_get(LV_STYLE_PRETTY, NULL));
     }
     /*Copy an existing template*/
     else {
@@ -105,12 +103,8 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	switch(sign) {
-    		case LV_SIGNAL_CLEANUP:
-    			/*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    			break;
-    		default:
-    			break;
+    	if(sign == LV_SIGNAL_CLEANUP) {
+            /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     	}
     }
     
@@ -121,44 +115,19 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
  * Setter functions
  *====================*/
 
+/*
+ * New object specific "set" function comes here
+ */
+
 
 /*=====================
  * Getter functions
  *====================*/
 
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_templs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_templs_t style
+/*
+ * New object specific "get" function comes here
  */
-lv_templs_t * lv_templs_get(lv_templs_builtin_t style, lv_templs_t * copy)
-{
-	static bool style_inited = false;
 
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_templs_init();
-		style_inited = true;
-	}
-
-	lv_templs_t  *style_p;
-
-	switch(style) {
-		case LV_TEMPLS_DEF:
-			style_p = &lv_templs_def;
-			break;
-		default:
-			style_p = &lv_templs_def;
-	}
-
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_templs_t));
-		else memcpy(copy, &lv_templs_def, sizeof(lv_templs_t));
-	}
-
-	return style_p;
-}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -193,13 +162,5 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
     return true;
 }
 
-
-/**
- * Initialize the built-in template styles
- */
-static void lv_templs_init(void)
-{
-	/*Default style*/
-}
 
 #endif

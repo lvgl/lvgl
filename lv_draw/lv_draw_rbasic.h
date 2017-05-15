@@ -9,9 +9,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "misc/others/color.h"
-#include "../lv_misc/area.h"
-#include "../lv_misc/font.h"
+#include "misc/gfx/color.h"
+#include "misc/gfx/area.h"
+#include "misc/gfx/font.h"
 
 /*********************
  *      DEFINES
@@ -24,6 +24,9 @@
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+void lv_rpx(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa);
+
 /**
  * Fill an area on the display
  * @param cords_p coordinates of the area to fill

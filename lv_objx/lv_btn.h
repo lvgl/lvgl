@@ -13,11 +13,11 @@
 #if USE_LV_BTN != 0
 
 /*Testing of dependencies*/
-#if USE_LV_RECT == 0
-#error "lv_btn: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
+#if USE_LV_CONT == 0
+#error "lv_btn: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
 #endif
 
-#include "lv_rect.h"
+#include <lvgl/lv_objx/lv_cont.h>
 #include "../lv_obj/lv_dispi.h"
 
 /*********************
@@ -28,12 +28,13 @@
  *      TYPEDEFS
  **********************/
 
+/*Button states*/
 typedef enum
 {
-    LV_BTN_STATE_PR,
     LV_BTN_STATE_REL,
-    LV_BTN_STATE_TGL_PR,
-    LV_BTN_STATE_TGL_REL,
+    LV_BTN_STATE_PR,
+    LV_BTN_STATE_TREL,
+    LV_BTN_STATE_TPR,
     LV_BTN_STATE_INA,
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
@@ -41,45 +42,19 @@ typedef enum
 /*Data of button*/
 typedef struct
 {
-	lv_rect_ext_t rect_ext; /*Ext. of ancestor*/
+	lv_cont_ext_t cont; /*Ext. of ancestor*/
 	/*New data for this type */
-	lv_action_t pr_action;
-	lv_action_t rel_action;
-	lv_action_t lpr_action;
-	lv_action_t lpr_rep_action;
+	lv_action_t pr_action;      /*A function to call when the button is pressed (NULL if unused)*/
+	lv_action_t rel_action;     /*A function to call when the button is released (NULL if unused)*/
+	lv_action_t lpr_action;     /*A function to call when the button is long pressed (NULL if unused)*/
+	lv_action_t lpr_rep_action; /*A function to call periodically after long press (NULL if unused)*/
 
-    lv_btn_state_t state;
-    uint8_t tgl :1;      /*1: Toggle enabled*/
-    uint8_t lpr_exec :1; /*1: long press action executed (Not for user)*/
+	lv_style_t * styles[LV_BTN_STATE_NUM];    /*Styles in each state*/
+
+    lv_btn_state_t state;       /*Current state of the button from 'lv_btn_state_t' enum*/
+    uint8_t tgl :1;             /*1: Toggle enabled*/
+    uint8_t lpr_exec :1;        /*1: Long press action executed (Handled by the library)*/
 }lv_btn_ext_t;
-
-/*Bits of 'flag' in 'lv_btns_t'*/
-typedef struct
-{
-    uint8_t light_en :1;
-    uint8_t transp :1;
-    uint8_t empty :1;
-}lv_btns_bits_t;
-
-/*Style of button*/
-typedef struct
-{
-    lv_rects_t rects;   /*Style of ancestor*/
-    /*New style element for this type */
-    color_t mcolor[LV_BTN_STATE_NUM];
-    color_t gcolor[LV_BTN_STATE_NUM];
-    color_t bcolor[LV_BTN_STATE_NUM];
-    color_t lcolor[LV_BTN_STATE_NUM];
-    lv_btns_bits_t flags[LV_BTN_STATE_NUM];
-}lv_btns_t;
-
-/*Built-in styles of button*/
-typedef enum
-{
-    LV_BTNS_DEF,
-    LV_BTNS_TRANSP,
-    LV_BTNS_BORDER,
-}lv_btns_builtin_t;
 
 
 /**********************
@@ -145,6 +120,17 @@ void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_t lpr_action);
 void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action);
 
 /**
+ * Set styles of a button is each state
+ * @param btn pointer to button object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
+ */
+void lv_btn_set_styles(lv_obj_t * btn, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
+
+/**
  * Get the current state of the button
  * @param btn pointer to a button object
  * @return the state of the button (from lv_btn_state_t enum)
@@ -159,12 +145,12 @@ lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);
 bool lv_btn_get_tgl(lv_obj_t * btn);
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_btns_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_btns_t style
+ * Get the style of a button in a given state
+ * @param btn pointer to a button object
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
  */
-lv_btns_t * lv_btns_get(lv_btns_builtin_t style, lv_btns_t * copy);
+lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
 
 /**********************
  *      MACROS

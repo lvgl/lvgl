@@ -16,7 +16,7 @@
 #include "misc/fs/ufs/ufs.h"
 
 #if LV_IMG_ENABLE_SYMBOLS != 0
-#include "../lv_misc/text.h"
+#include "misc/gfx/text.h"
 #endif
 
 /*********************
@@ -31,16 +31,12 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode);
-static void lv_imgs_init(void);
 
 static bool lv_img_is_symbol(const char * txt);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_imgs_t lv_imgs_def;
-static lv_imgs_t lv_imgs_light;
-static lv_imgs_t lv_imgs_dark;
 
 /**********************
  *      MACROS
@@ -53,7 +49,7 @@ static lv_imgs_t lv_imgs_dark;
 /**
  * Create an image objects
  * @param par pointer to an object, it will be the parent of the new button
- * @param copy pointer to a rectangle object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a image object, if not NULL then the new object will be copied from it
  * @return pointer to the created image
  */
 lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
@@ -72,6 +68,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     ext->h = lv_obj_get_height(new_img);
     ext->transp = 0;
     ext->upscale = 0;
+    ext->auto_size = 1;
 
     /*Init the new object*/    
     lv_obj_set_signal_f(new_img, lv_img_signal);
@@ -83,10 +80,13 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
 		 * and must be screen sized*/
 		if(par != NULL) ext->auto_size = 1;
 		else ext->auto_size = 0;
-	    lv_obj_set_style(new_img, lv_imgs_get(LV_IMGS_DEF, NULL));
+		if(par != NULL) lv_obj_set_style(new_img, NULL);    /*Inherit the style  by default*/
+		else lv_obj_set_style(new_img, lv_style_get(LV_STYLE_PLAIN, NULL)); /*Set style for screens*/
     } else {
-    	ext->auto_size = lv_img_get_auto_size(copy);
-    	lv_img_set_file(new_img, LV_EA(copy, lv_img_ext_t)->fn);
+        lv_img_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	ext->auto_size = copy_ext->auto_size;
+        ext->upscale = copy_ext->upscale;
+    	lv_img_set_file(new_img, copy_ext->fn);
 
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_img);
@@ -111,57 +111,19 @@ bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-        lv_img_ext_t * img_p = lv_obj_get_ext(img);
-        switch(sign) {
-        	case LV_SIGNAL_CLEANUP:
-        		dm_free(img_p->fn);
-        		break;
-			default:
-				break;
+        lv_img_ext_t * ext = lv_obj_get_ext(img);
+        if(sign == LV_SIGNAL_CLEANUP) {
+            dm_free(ext->fn);
+        }
+        else if(sign == LV_SIGNAL_STYLE_CHG) {
+            /*Refresh the file name to refresh the symbol text size*/
+            if(lv_img_is_symbol(ext->fn) != false) {
+                lv_img_set_file(img, ext->fn);
+            }
         }
     }
     
     return valid;
-}
-
-/**
- * Return with a pointer to built-in style and/or copy it to a variable
- * @param style a style name from lv_imgs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_imgs_t style
- */
-lv_imgs_t * lv_imgs_get(lv_imgs_builtin_t style, lv_imgs_t * copy)
-{
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_imgs_init();
-		style_inited = true;
-	}
-
-	lv_imgs_t * style_p;
-
-	switch(style) {
-		case LV_IMGS_DEF:
-			style_p = &lv_imgs_def;
-			break;
-		case LV_IMGS_LIGHT:
-			style_p = &lv_imgs_light;
-			break;
-		case LV_IMGS_DARK:
-			style_p = &lv_imgs_dark;
-			break;
-		default:
-			style_p = &lv_imgs_def;
-	}
-
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_imgs_t));
-		else memcpy(copy, &lv_imgs_def, sizeof(lv_imgs_t));
-	}
-
-	return style_p;
 }
 
 /**
@@ -209,6 +171,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
             header.w = lv_obj_get_width(img);
             header.h = lv_obj_get_height(img);
             header.transp = 0;
+            header.cd = 0;
         }
 
         fs_close(&file);
@@ -217,20 +180,22 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
         ext->h = header.h;
         ext->transp = header.transp;
 
+#if LV_ANTIALIAS != 0
         if(ext->upscale != 0) {
             ext->w *=  2;
             ext->h *=  2;
         }
+#endif
 	}
 	/*Handle symbol texts*/
 	else {
 #if LV_IMG_ENABLE_SYMBOLS
-        lv_imgs_t * imgs = lv_obj_get_style(img);
+        lv_style_t * style = lv_obj_get_style(img);
         point_t size;
-        txt_get_size(&size, fn, font_get(imgs->sym_font), 0, 0, LV_CORD_MAX, TXT_FLAG_NONE);
+        txt_get_size(&size, fn, style->font, style->letter_space, style->line_space, CORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
-        ext->transp = 0;
+        ext->transp = 1;    /*Symbols always have transparent parts*/
 #else
         /*Never goes here, just to be sure handle this */
         ext->w = lv_obj_get_width(img);
@@ -240,13 +205,8 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 
 	}
 
-    if(ext->upscale != 0) {
-        ext->w *=  LV_DOWNSCALE;
-        ext->h *=  LV_DOWNSCALE;
-    }
-
 	if(fn != NULL) {
-		ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
+	    ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
 		strcpy(ext->fn, fn);
 	} else {
 		ext->fn = NULL;
@@ -283,7 +243,11 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
 void lv_img_set_upscale(lv_obj_t * img, bool en)
 {
     lv_img_ext_t * ext = lv_obj_get_ext(img);
-
+    
+    /*Upscale works only if antialiassing is enabled*/
+#if LV_ANTIALIAS == 0
+    en = false;
+#endif
     ext->upscale = (en == false ? 0 : 1);
 
     /*Refresh the image with the new size*/
@@ -333,33 +297,23 @@ bool lv_img_get_upscale(lv_obj_t * img)
  */
 static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode)
 {
-    lv_imgs_t * imgs_p = lv_obj_get_style(img);
+    lv_style_t * style = lv_obj_get_style(img);
     lv_img_ext_t * ext = lv_obj_get_ext(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {
-        if(ext->transp == 0) {
-        	bool cover;
-        	cover = area_is_in(mask, &img->cords);
-        	return cover;
-        }
-        else return false;
+        bool cover = false;
+        if(ext->transp == 0) cover = area_is_in(mask, &img->cords);
+        return cover;
+
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
 		area_t cords;
 /*Create a default style for symbol texts*/
 #if LV_IMG_ENABLE_SYMBOLS != 0
         bool sym = lv_img_is_symbol(ext->fn);
-		lv_labels_t sym_style;
-		lv_labels_get(LV_LABELS_DEF, &sym_style);
-		sym_style.font = imgs_p->sym_font;
-        sym_style.letter_space = 0;
-        sym_style.line_space = 0;
-        sym_style.mid = 0;
-        sym_style.objs.color = imgs_p->objs.color;
 #endif
 
 		lv_obj_get_cords(img, &cords);
-		opa_t opa = lv_obj_get_opa(img);
 
 		area_t cords_tmp;
 		cords_tmp.y1 = cords.y1;
@@ -371,10 +325,10 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
 			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
 
 #if LV_IMG_ENABLE_SYMBOLS == 0
-			    lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
+			    lv_draw_img(&cords_tmp, mask, style, opa, ext->fn);
 #else
-			    if(sym == false) lv_draw_img(&cords_tmp, mask, imgs_p, opa, ext->fn);
-			    else lv_draw_label(&cords_tmp, mask, &sym_style, opa, ext->fn, TXT_FLAG_NONE);
+			    if(sym == false) lv_draw_img(&cords_tmp, mask, style, ext->fn);
+			    else lv_draw_label(&cords_tmp, mask, style, ext->fn, TXT_FLAG_NONE);
 #endif
 			}
 		}
@@ -397,6 +351,8 @@ static bool lv_img_is_symbol(const char * txt)
     return false;
 #endif
 
+    if(txt == NULL) return false;
+
     /* if txt begins with an upper case letter then it refers to a driver
      * so it is a file name*/
     if(txt[0] >= 'A' && txt[0] <= 'Z') return false;
@@ -405,25 +361,5 @@ static bool lv_img_is_symbol(const char * txt)
     return true;
 }
 
-/**
- * Initialize the image styles
- */
-static void lv_imgs_init(void)
-{
-	/*Default style*/
-	lv_imgs_def.objs.color = COLOR_BLACK;
-	lv_imgs_def.recolor_opa = OPA_TRANSP;
-#if LV_IMG_ENABLE_SYMBOLS != 0
-	lv_imgs_def.sym_font = LV_IMG_DEF_SYMBOL_FONT;
-#endif
-	/*Dark style*/
-	memcpy(&lv_imgs_dark, &lv_imgs_def, sizeof(lv_imgs_t));
-	lv_imgs_dark.objs.color = COLOR_BLACK; lv_imgs_dark.recolor_opa = OPA_50;
-
-	/*Light style*/
-	memcpy(&lv_imgs_light, &lv_imgs_dark, sizeof(lv_imgs_t));
-	lv_imgs_light.objs.color = COLOR_WHITE; lv_imgs_light.recolor_opa = OPA_50;
-
-}
 
 #endif

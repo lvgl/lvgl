@@ -53,8 +53,7 @@ lv_vdb_t * lv_vdb_get(void)
 void lv_vdb_flush(void)
 {
 #if LV_ANTIALIAS == 0
-	disp_area(DISP_ID_ALL, vdb.vdb_area.x1 , vdb.vdb_area.y1, vdb.vdb_area.x2, vdb.vdb_area.y2);
-	disp_map(DISP_ID_ALL, vdb.buf);
+	disp_map(vdb.area.x1, vdb.area.y1, vdb.area.x2, vdb.area.y2, vdb.buf);
 #else
 	/* Get the average of 2x2 pixels and put the result back to the VDB
 	 * The reading goes much faster then the write back
@@ -69,25 +68,33 @@ void lv_vdb_flush(void)
 	 * */
 	cord_t x;
 	cord_t y;
-	cord_t w = area_get_width(&vdb.vdb_area);
+	cord_t w = area_get_width(&vdb.area);
 	color_t * in1_buf = vdb.buf;      /*Pointer to the first row*/
     color_t * in2_buf = vdb.buf + w;  /*Pointer to the second row*/
     color_t * out_buf = vdb.buf;      /*Store the result here*/
-	for(y = vdb.vdb_area.y1; y < vdb.vdb_area.y2; y += 2) {
-		for(x = vdb.vdb_area.x1; x < vdb.vdb_area.x2; x += 2) {
-		    /*Get the average of 2x2 red*/
-		    out_buf->red = (in1_buf->red + (in1_buf + 1)->red +
-					        in2_buf->red + (in2_buf+ 1)->red) >> 2;
-            /*Get the average of 2x2 green*/
-		    out_buf->green = (in1_buf->green + (in1_buf + 1)->green +
-                              in2_buf->green + (in2_buf + 1)->green) >> 2;
-            /*Get the average of 2x2 blue*/
-		    out_buf->blue = (in1_buf->blue + (in1_buf + 1)->blue +
-                             in2_buf->blue + (in2_buf + 1)->blue) >> 2;
-
-			in1_buf+=2; /*Skip the next pixel because it is already used above*/
-            in2_buf+=2;
-			out_buf++;
+	for(y = vdb.area.y1; y < vdb.area.y2; y += 2) {
+        for(x = vdb.area.x1; x < vdb.area.x2; x += 2) {
+        
+            /*If the pixels are the same do not calculate the average */
+            if(in1_buf->full == (in1_buf + 1)->full &&
+               in1_buf->full == in2_buf->full &&
+               in1_buf->full == (in2_buf + 1)->full) {
+                out_buf->full = in1_buf->full;
+            } else {
+                /*Get the average of 2x2 red*/
+                out_buf->red = (in1_buf->red + (in1_buf + 1)->red +
+                                in2_buf->red + (in2_buf+ 1)->red) >> 2;
+                /*Get the average of 2x2 green*/
+                out_buf->green = (in1_buf->green + (in1_buf + 1)->green +
+                                  in2_buf->green + (in2_buf + 1)->green) >> 2;
+                /*Get the average of 2x2 blue*/
+                out_buf->blue = (in1_buf->blue + (in1_buf + 1)->blue +
+                                 in2_buf->blue + (in2_buf + 1)->blue) >> 2;
+            }
+            
+			in1_buf += 2; /*Skip the next pixel because it is already used above*/
+            in2_buf += 2;
+			out_buf ++;
 		}
 		/*2 row is ready so go the next 2*/
 		in1_buf += w; /*Skip the next row because it is processed from in2_buf*/
@@ -96,15 +103,12 @@ void lv_vdb_flush(void)
 
 	/* Now the full the VDB is filtered and the result is stored in the first quarter of it
 	 * Write out the filtered map to the display*/
-    disp_area(DISP_ID_ALL, vdb.vdb_area.x1 >> 1, vdb.vdb_area.y1 >> 1, vdb.vdb_area.x2 >> 1, vdb.vdb_area.y2 >> 1);
-    disp_map(DISP_ID_ALL, vdb.buf);
+    disp_map(vdb.area.x1 >> 1, vdb.area.y1 >> 1, vdb.area.x2 >> 1, vdb.area.y2 >> 1, vdb.buf);
 #endif
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-
 
 #endif

@@ -11,7 +11,7 @@
 #if USE_LV_TA != 0
 
 #include "lv_ta.h"
-#include "lvgl/lv_misc/anim.h"
+#include "misc/gfx/anim.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************
@@ -38,17 +38,12 @@
  **********************/
 static bool lv_ta_design(lv_obj_t * ta, const area_t * mask, lv_design_mode_t mode);
 static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_design_mode_t mode);
-static void lv_ta_hide_cursor(lv_obj_t * ta, uint8_t hide);
+static void lv_ta_hide_cursor_anim(lv_obj_t * ta, uint8_t hide);
 static void lv_ta_save_valid_cursor_x(lv_obj_t * ta);
-static void lv_tas_init(void);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_tas_t lv_tas_def;
-static lv_tas_t lv_tas_simple;
-static lv_tas_t lv_tas_transp;
-
 lv_design_f_t ancestor_design_f;
 lv_design_f_t scrl_design_f;
 
@@ -79,7 +74,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_alloc_ext(new_ta, sizeof(lv_ta_ext_t));
     dm_assert(ext);
-    ext->cur_hide = 0;
+    ext->cursor_show = 1;
+    ext->cursor_state = 0;
     ext->cursor_pos = 0;
     ext->cursor_valid_x = 0;
     ext->label = NULL;
@@ -99,7 +95,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_label_set_text(ext->label, "Text area");
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, false);
-    	lv_obj_set_style(new_ta, lv_tas_get(LV_TAS_DEF, NULL));
+    	lv_obj_set_style(new_ta, lv_style_get(LV_STYLE_PRETTY, NULL));
+        lv_page_set_sb_mode(new_ta, LV_PAGE_SB_MODE_AUTO);
+        lv_obj_set_style(lv_page_get_scrl(new_ta), lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
     	lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
     }
     /*Copy an existing object*/
@@ -116,7 +114,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create a cursor blinker animation*/
     anim_t a;
     a.var = new_ta;
-    a.fp = (anim_fp_t)lv_ta_hide_cursor;
+    a.fp = (anim_fp_t)lv_ta_hide_cursor_anim;
     a.time = LV_TA_CUR_BLINK_TIME;
     a.act_time = 0;
     a.end_cb = NULL;
@@ -150,7 +148,7 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
-    	lv_tas_t * style = lv_obj_get_style(ta);
+    	lv_style_t * style = lv_obj_get_style(ta);
     	switch(sign) {
     		case LV_SIGNAL_CLEANUP:
     			/* Nothing to clean up.
@@ -158,9 +156,9 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     			break;
     		case LV_SIGNAL_STYLE_CHG:
     		    if(ext->label) {
-                    lv_obj_set_style(ext->label, &style->labels);
+                    lv_obj_set_style(ext->label, lv_obj_get_style(ext->page.scrl));
                     lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-                            (style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
+                            (style->hpad + style->hpad));
                     lv_label_set_text(ext->label, NULL);
     		    }
     			break;
@@ -168,7 +166,7 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     		case LV_SIGNAL_CORD_CHG:
     		    if(ext->label != NULL) {
                     lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-                            (style->pages.bg_rects.hpad + style->pages.scrl_rects.hpad));
+                                    (style->hpad + style->hpad));
                     lv_label_set_text(ext->label, NULL);
     		    }
     			break;
@@ -301,6 +299,8 @@ void lv_ta_del(lv_obj_t * ta)
 void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    lv_obj_t * scrl = lv_page_get_scrl(ta);
+    lv_style_t * style_scrl = lv_obj_get_style(scrl);
 	uint16_t txt_len = strlen(lv_label_get_text(ext->label));
 
 	if(pos < 0) pos = txt_len + pos;
@@ -312,8 +312,8 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	/*Position the label to make the cursor visible*/
 	lv_obj_t * label_par = lv_obj_get_parent(ext->label);
 	point_t cur_pos;
-	lv_tas_t * style = lv_obj_get_style(ta);
-	const font_t * font_p = font_get(style->labels.font);
+	lv_style_t * style = lv_obj_get_style(ta);
+	const font_t * font_p = style->font;
 	area_t label_cords;
     area_t ta_cords;
 	lv_label_get_letter_pos(ext->label, pos, &cur_pos);
@@ -326,9 +326,10 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	}
 
 	/*Check the bottom*/
-	if(label_cords.y1 + cur_pos.y + font_get_height(font_p) + style->pages.scrl_rects.vpad > ta_cords.y2) {
+	cord_t font_h = font_get_height(font_p) >> FONT_ANTIALIAS;
+	if(label_cords.y1 + cur_pos.y + font_h + style_scrl->vpad > ta_cords.y2) {
 		lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) +
-				                     font_get_height(font_p) + 2 * style->pages.scrl_rects.vpad));
+				                     font_h + 2 * style_scrl->vpad));
 	}
 
 	lv_obj_inv(ta);
@@ -378,9 +379,10 @@ void lv_ta_cursor_down(lv_obj_t * ta)
 	lv_label_get_letter_pos(ext->label, lv_ta_get_cursor_pos(ta), &pos);
 
 	/*Increment the y with one line and keep the valid x*/
-	lv_labels_t * label_style = lv_obj_get_style(ext->label);
-	const font_t * font_p = font_get(label_style->font);
-	pos.y += font_get_height(font_p) + label_style->line_space + 1;
+	lv_style_t * label_style = lv_obj_get_style(ext->label);
+	const font_t * font_p = label_style->font;
+    cord_t font_h = font_get_height(font_p) >> FONT_ANTIALIAS;
+	pos.y += font_h + label_style->line_space + 1;
 	pos.x = ext->cursor_valid_x;
 
 	/*Do not go below he last line*/
@@ -404,15 +406,28 @@ void lv_ta_cursor_up(lv_obj_t * ta)
 	lv_label_get_letter_pos(ext->label, lv_ta_get_cursor_pos(ta), &pos);
 
 	/*Decrement the y with one line and keep the valid x*/
-	lv_labels_t * label_style = lv_obj_get_style(ext->label);
-	const font_t * font = font_get(label_style->font);
-	pos.y -= font_get_height(font) + label_style->line_space - 1;
+	lv_style_t * label_style = lv_obj_get_style(ext->label);
+	const font_t * font = label_style->font;
+    cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+	pos.y -= font_h + label_style->line_space - 1;
 	pos.x = ext->cursor_valid_x;
 
 	/*Get the letter index on the new cursor position and set it*/
 	uint16_t new_cur_pos = lv_label_get_letter_on(ext->label, &pos);
 	lv_ta_set_cursor_pos(ta, new_cur_pos);
 }
+
+/**
+ * Get the current cursor visibility.
+ * @param ta pointer to a text area object
+ * @return show true: show the cursor and blink it, false: hide cursor
+ */
+void lv_ta_set_cursor_show(lv_obj_t * ta, bool show)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    ext->cursor_show = show == false ? 0 : 1;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -440,44 +455,16 @@ uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta)
 }
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_tas_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_tas_t style
+ * Get the current cursor visibility.
+ * @param ta pointer to a text area object
+ * @return true: the cursor is drawn, false: the cursor is hidden
  */
-lv_tas_t * lv_tas_get(lv_tas_builtin_t style, lv_tas_t * copy)
+bool lv_ta_get_cursor_show(lv_obj_t * ta)
 {
-	static bool style_inited = false;
-
-	/*Make the style initialization if it is not done yet*/
-	if(style_inited == false) {
-		lv_tas_init();
-		style_inited = true;
-	}
-
-	lv_tas_t  *style_p;
-
-	switch(style) {
-		case LV_TAS_DEF:
-			style_p = &lv_tas_def;
-			break;
-        case LV_TAS_SIMPLE:
-            style_p = &lv_tas_simple;
-            break;
-        case LV_TAS_TRANSP:
-            style_p = &lv_tas_transp;
-            break;
-		default:
-			style_p = &lv_tas_def;
-	}
-
-	if(copy != NULL) {
-		if(style_p != NULL) memcpy(copy, style_p, sizeof(lv_tas_t));
-		else memcpy(copy, &lv_tas_def, sizeof(lv_tas_t));
-	}
-
-	return style_p;
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    return ext->cursor_show;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -531,27 +518,27 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 		/*Draw the cursor too*/
 		lv_obj_t * ta = lv_obj_get_parent(scrling);
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
-		lv_tas_t * ta_style = lv_obj_get_style(ta);
+        lv_style_t * scrl_style = lv_obj_get_style(lv_page_get_scrl(ta));
 
-		if(ta_style->cursor_show != 0 && ta_ext->cur_hide == 0) {
+		if(ta_ext->cursor_show != 0 && ta_ext->cursor_state == 0) {
 			uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
 			point_t letter_pos;
 			lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
 
 			area_t cur_area;
-			lv_labels_t * labels_p = lv_obj_get_style(ta_ext->label);
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - (ta_style->cursor_width >> 1);
+			lv_style_t * labels_p = lv_obj_get_style(ta_ext->label);
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
 			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + (ta_style->cursor_width >> 1);
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + font_get_height(font_get(labels_p->font));
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + scrl_style->line_width ;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + (font_get_height(labels_p->font) >> FONT_ANTIALIAS);
 
-			lv_rects_t cur_rects;
-			lv_rects_get(LV_RECTS_DEF, &cur_rects);
-			cur_rects.round = 0;
+			lv_style_t cur_rects;
+			lv_style_get(LV_STYLE_PLAIN, &cur_rects);
+			cur_rects.radius = 0;
 			cur_rects.bwidth = 0;
-			cur_rects.objs.color = ta_style->cursor_color;
-			cur_rects.gcolor = ta_style->cursor_color;
-			lv_draw_rect(&cur_area, mask, &cur_rects, OPA_COVER);
+            cur_rects.mcolor = scrl_style->ccolor;
+            cur_rects.gcolor = scrl_style->ccolor;
+			lv_draw_rect(&cur_area, mask, &cur_rects);
 		}
 	}
 
@@ -560,16 +547,16 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 
 
 /**
- * Set the cursor visibility to make a blinking cursor
+ * Called to blink the cursor
  * @param ta pointer to a text area
- * @param hide 1: hide the cursor, 0: draw it
+ * @param hide 1: hide the cursor, 0: show it
  */
-static void lv_ta_hide_cursor(lv_obj_t * ta, uint8_t hide)
+static void lv_ta_hide_cursor_anim(lv_obj_t * ta, uint8_t hide)
 {
 	lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
-	if(hide != ta_ext->cur_hide) {
-        ta_ext->cur_hide = hide  == 0 ? 0 : 1;
-        lv_obj_inv(ta);
+	if(hide != ta_ext->cursor_state) {
+        ta_ext->cursor_state = hide  == 0 ? 0 : 1;
+        if(ta_ext->cursor_show != 0) lv_obj_inv(ta);
 	}
 }
 
@@ -585,33 +572,4 @@ static void lv_ta_save_valid_cursor_x(lv_obj_t * ta)
 	ext->cursor_valid_x = cur_pos.x;
 }
 
-/**
- * Initialize the text area styles
- */
-static void lv_tas_init(void)
-{
-	/*Default style*/
-	lv_pages_get(LV_PAGES_DEF, &lv_tas_def.pages);
-	lv_tas_def.pages.sb_mode = LV_PAGE_SB_MODE_DRAG;
-
-	lv_labels_get(LV_LABELS_TXT, &lv_tas_def.labels);
-	lv_tas_def.labels.objs.color = COLOR_MAKE(0x20, 0x20, 0x20);
-
-	lv_tas_def.cursor_color = COLOR_MAKE(0x10, 0x10, 0x10);
-	lv_tas_def.cursor_width = 1 * LV_DOWNSCALE;	/*>=1 px for visible cursor*/
-	lv_tas_def.cursor_show = 1;
-
-	memcpy(&lv_tas_simple, &lv_tas_def, sizeof(lv_tas_t));
-    lv_pages_get(LV_PAGES_SIMPLE, &lv_tas_simple.pages);
-    lv_tas_simple.pages.sb_mode = LV_PAGE_SB_MODE_DRAG;
-    lv_tas_simple.pages.scrl_rects.objs.transp = 0; /*if transp == 1 the cursor will not be drawn*/
-    lv_tas_simple.pages.bg_rects.objs.color = COLOR_WHITE;
-    lv_tas_simple.pages.bg_rects.gcolor = COLOR_SILVER;
-    lv_tas_simple.pages.bg_rects.bcolor = COLOR_GRAY;
-
-    memcpy(&lv_tas_transp, &lv_tas_def, sizeof(lv_tas_t));
-    lv_pages_get(LV_PAGES_TRANSP, &lv_tas_transp.pages);
-    lv_tas_transp.pages.scrl_rects.objs.transp = 0; /*if transp == 1 the cursor will not be drawn*/
-
-}
 #endif

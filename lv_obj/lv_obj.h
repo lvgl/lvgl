@@ -9,16 +9,19 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/area.h>
+#include "lv_conf.h"
+#include <misc/gfx/area.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include "misc/mem/dyn_mem.h"
 #include "misc/mem/linked_list.h"
-#include "misc/others/color.h"
+#include "misc/gfx/color.h"
+#include "lv_style.h"
 
 /*********************
  *      DEFINES
  *********************/
+
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES == 0 || LV_VER_RES == 0
 #error "LV: LV_HOR_RES and LV_VER_RES must be greater then 0"
@@ -76,39 +79,37 @@ typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void 
 
 typedef struct __LV_OBJ_T
 {
-    struct __LV_OBJ_T * par;
-    ll_dsc_t child_ll;
+    struct __LV_OBJ_T * par;    /*Pointer to the parent object*/
+    ll_dsc_t child_ll;          /*Linked list to store the children objects*/
     
-    area_t cords;
+    area_t cords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 
-    lv_signal_f_t signal_f;
-    lv_design_f_t design_f;
+    lv_signal_f_t signal_f;     /*Object type specific signal function*/
+    lv_design_f_t design_f;     /*Object type specific design function*/
     
-    void * ext;           /*The object attributes can be extended here*/
-    void * style_p;       /*Object specific style*/
+    void * ext;                 /*Object type specific extended data*/
+    lv_style_t * style_p;       /*Pointer to the object's style*/
 
 #if LV_OBJ_FREE_P != 0
-    void * free_p;        /*Application specific pointer (set it freely)*/
+    void * free_p;              /*Application specific pointer (set it freely)*/
 #endif
 
     /*Attributes and states*/
-    uint8_t click_en     :1;    /*1: can be pressed by a display input device*/
-    uint8_t drag_en      :1;    /*1: enable the dragging*/
+    uint8_t click_en     :1;    /*1: Can be pressed by a display input device*/
+    uint8_t drag_en      :1;    /*1: Enable the dragging*/
     uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent  :1;    /*1. Parent will be dragged instead*/
-    uint8_t style_iso	 :1;	/*1: The object has got an own style*/
+    uint8_t drag_parent  :1;    /*1: Parent will be dragged instead*/
     uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top_en       :1;    /*1: If the object or its children  is clicked it goes to the foreground*/
+    uint8_t top_en       :1;    /*1: If the object or its children is clicked it goes to the foreground*/
     uint8_t reserved     :1;
 
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
 
-    cord_t ext_size;			/*EXTtend the size of the object in every direction. Used to draw shadow, shine etc.*/
+    cord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
+#if LV_OBJ_FREE_NUM != 0
     uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
-	opa_t opa;
-
-    
+#endif
 }lv_obj_t;
 
 /*Protect some attributes (max. 8 bit)*/
@@ -116,54 +117,45 @@ typedef enum
 {
     LV_PROTECT_NONE      = 0x00,
     LV_PROTECT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
-    LV_PROTECT_OPA       = 0x02, /*Prevent lv_obj_set_opar to modify the opacity*/
-    LV_PROTECT_PARENT    = 0x04, /*Prevent automatic parent change (e.g. in lv_page)*/
-    LV_PROTECT_POS       = 0x08, /*Prevent automatic positioning (e.g. in lv_rect layout)*/
+    LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
+    LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_rect layout)*/
 }lv_protect_t;
 
 typedef enum
 {
     LV_ALIGN_CENTER = 0,
-	LV_ALIGN_IN_TOP_LEFT,
-	LV_ALIGN_IN_TOP_MID,
-	LV_ALIGN_IN_TOP_RIGHT,
-	LV_ALIGN_IN_BOTTOM_LEFT,
-	LV_ALIGN_IN_BOTTOM_MID,
-	LV_ALIGN_IN_BOTTOM_RIGHT,
-	LV_ALIGN_IN_LEFT_MID,
-	LV_ALIGN_IN_RIGHT_MID,
-	LV_ALIGN_OUT_TOP_LEFT,
-	LV_ALIGN_OUT_TOP_MID,
-	LV_ALIGN_OUT_TOP_RIGHT,
-	LV_ALIGN_OUT_BOTTOM_LEFT,
-	LV_ALIGN_OUT_BOTTOM_MID,
-	LV_ALIGN_OUT_BOTTOM_RIGHT,
-	LV_ALIGN_OUT_LEFT_TOP,
-	LV_ALIGN_OUT_LEFT_MID,
-	LV_ALIGN_OUT_LEFT_BOTTOM,
-	LV_ALIGN_OUT_RIGHT_TOP,
-	LV_ALIGN_OUT_RIGHT_MID,
-	LV_ALIGN_OUT_RIGHT_BOTTOM,
+    LV_ALIGN_IN_TOP_LEFT,
+    LV_ALIGN_IN_TOP_MID,
+    LV_ALIGN_IN_TOP_RIGHT,
+    LV_ALIGN_IN_BOTTOM_LEFT,
+    LV_ALIGN_IN_BOTTOM_MID,
+    LV_ALIGN_IN_BOTTOM_RIGHT,
+    LV_ALIGN_IN_LEFT_MID,
+    LV_ALIGN_IN_RIGHT_MID,
+    LV_ALIGN_OUT_TOP_LEFT,
+    LV_ALIGN_OUT_TOP_MID,
+    LV_ALIGN_OUT_TOP_RIGHT,
+    LV_ALIGN_OUT_BOTTOM_LEFT,
+    LV_ALIGN_OUT_BOTTOM_MID,
+    LV_ALIGN_OUT_BOTTOM_RIGHT,
+    LV_ALIGN_OUT_LEFT_TOP,
+    LV_ALIGN_OUT_LEFT_MID,
+    LV_ALIGN_OUT_LEFT_BOTTOM,
+    LV_ALIGN_OUT_RIGHT_TOP,
+    LV_ALIGN_OUT_RIGHT_MID,
+    LV_ALIGN_OUT_RIGHT_BOTTOM,
 }lv_align_t;
 
 
 typedef struct
 {
 	color_t color;
-	uint8_t transp :1;
+    opa_t opa;
 }lv_objs_t;
 
 typedef enum
 {
-	LV_OBJS_DEF,
-	LV_OBJS_SCR,
-	LV_OBJS_TRANSP,
-}lv_objs_builtin_t;
-
-typedef enum
-{
 	LV_ANIM_NONE = 0,
-	LV_ANIM_FADE,			/*Animate the opacity*/
 	LV_ANIM_FLOAT_TOP, 		/*Float from/to the top*/
 	LV_ANIM_FLOAT_LEFT,		/*Float from/to the left*/
 	LV_ANIM_FLOAT_BOTTOM,	/*Float from/to the bottom*/
@@ -182,25 +174,6 @@ typedef enum
 void lv_init(void);
 
 /**
- * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
- * @param obj pointer to an object
- */
-void lv_obj_inv(lv_obj_t * obj);
-
-/**
- * Notify an object about its style is modified
- * @param obj pointer to an object
- */
-void lv_obj_refr_style(lv_obj_t * obj);
-
-/**
- * Notify all object if a style is modified
- * @param style pinter to a style. Only objects with this style will be notified
- *               (NULL to notify all objects)
- */
-void lv_style_refr_all(void * style);
-
-/**
  * Create a basic object
  * @param parent pointer to a parent object.
  *                  If NULL then a screen will be created
@@ -211,7 +184,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children
- * @param obj
+ * @param obj pointer to an object to delete
  */
 void lv_obj_del(lv_obj_t * obj);
 
@@ -225,12 +198,10 @@ void lv_obj_del(lv_obj_t * obj);
 bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**
- * Return with a pointer to built-in style and/or copy it to a variable
- * @param style a style name from lv_objs_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_objs_t style
+ * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
+ * @param obj pointer to an object
  */
-lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p);
+void lv_obj_inv(lv_obj_t * obj);
 
 /**
  * Load a new screen
@@ -255,7 +226,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y);
 
 /**
  * Set relative the position of an object (relative to the parent).
- * The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinates will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side of the parent. (will be multiplied with LV_DOWNSCALE)
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
@@ -271,7 +242,7 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x);
 
 /**
  * Set the x coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -286,7 +257,7 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y);
 
 /**
  * Set the y coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -301,7 +272,7 @@ void lv_obj_set_y_us(lv_obj_t * obj, cord_t y);
 void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h);
 
 /**
- * Set the size of an object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Set the size of an object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  * @param h new height (will be multiplied with LV_DOWNSCALE)
@@ -316,7 +287,7 @@ void lv_obj_set_size_us(lv_obj_t * obj, cord_t w, cord_t h);
 void lv_obj_set_width(lv_obj_t * obj, cord_t w);
 
 /**
- * Set the width of an object.  The width will be upscaled to compensate LV_DOWNSCALE
+ * Set the width of an object.  The width will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  */
@@ -330,7 +301,7 @@ void lv_obj_set_width_us(lv_obj_t * obj, cord_t w);
 void lv_obj_set_height(lv_obj_t * obj, cord_t h);
 
 /**
- * Set the height of an object.  The height will be upscaled to compensate LV_DOWNSCALE
+ * Set the height of an object.  The height will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param h new height (will be multiplied with LV_DOWNSCALE)
  */
@@ -347,7 +318,7 @@ void lv_obj_set_height_us(lv_obj_t * obj, cord_t h);
 void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
 
 /**
- * Align an object to an other object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Align an object to an other object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
@@ -368,28 +339,20 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size);
  * @param obj pointer to an object
  * @param style_p pointer to the new style
  */
-void lv_obj_set_style(lv_obj_t * obj, void * style);
+void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style);
 
 /**
- * Isolate the style of an object. In other words a unique style will be created
- * for this object which can be freely modified independently from the style of the
- * other objects.
- */
-void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size);
-
-/**
- * Set the opacity of an object
+ * Notify an object about its style is modified
  * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
  */
-void lv_obj_set_opa(lv_obj_t * obj, uint8_t opa);
+void lv_obj_refr_style(lv_obj_t * obj);
 
 /**
- * Set the opacity of an object and all of its children
- * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
+ * Notify all object if a style is modified
+ * @param style pointer to a style. Only the objects with this style will be notified
+ *               (NULL to notify all objects)
  */
-void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa);
+void lv_style_refr_objs(void * style);
 
 /**
  * Hide an object. It won't be visible and clickable.
@@ -478,6 +441,7 @@ void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size);
  */
 void lv_obj_refr_ext_size(lv_obj_t * obj);
 
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application.
@@ -485,7 +449,9 @@ void lv_obj_refr_ext_size(lv_obj_t * obj);
  * @param free_num the new free number
  */
 void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
+#endif
 
+#if LV_OBJ_FREE_P != 0
 /**
  * Set an application specific  pointer for an object.
  * It can help to identify objects in the application.
@@ -493,7 +459,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
  * @param free_p the new free pinter
  */
 void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);
-
+#endif
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -580,21 +546,14 @@ cord_t lv_obj_get_height(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-cord_t lv_obj_getext_size(lv_obj_t * obj);
+cord_t lv_obj_get_ext_size(lv_obj_t * obj);
 
 /**
- * Get the style pointer of an object
+ * Get the style pointer of an object (if NULL get style of the parent)
  * @param obj pointer to an object
  * @return pointer to a style
  */
-void * lv_obj_get_style(lv_obj_t * obj);
-
-/**
- * Get the opacity of an object
- * @param obj pointer to an object
- * @return 0 (transparent) .. 255 (fully cover)
- */
-opa_t lv_obj_get_opa(lv_obj_t * obj);
+lv_style_t * lv_obj_get_style(lv_obj_t * obj);
 
 /**
  * Get the hidden attribute of an object
@@ -639,13 +598,6 @@ bool lv_obj_get_drag_throw(lv_obj_t * obj);
 bool lv_obj_get_drag_parent(lv_obj_t * obj);
 
 /**
- * Get the style isolation attribute of an object
- * @param obj pointer to an object
- * @return pointer to a style
- */
-bool lv_obj_get_style_iso(lv_obj_t * obj);
-
-/**
  * Get the protect field of an object
  * @param obj pointer to an object
  * @return protect field ('OR'ed values of lv_obj_prot_t)
@@ -682,25 +634,26 @@ lv_design_f_t lv_obj_get_design_f(lv_obj_t * obj);
  */
 void * lv_obj_get_ext(lv_obj_t * obj);
 
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Get the free number
  * @param obj pointer to an object
  * @return the free number
  */
 uint8_t lv_obj_get_free_num(lv_obj_t * obj);
+#endif
 
+#if LV_OBJ_FREE_P != 0
 /**
  * Get the free pointer
  * @param obj pointer to an object
  * @return the free pointer
  */
 void * lv_obj_get_free_p(lv_obj_t * obj);
+#endif
 
 /**********************
  *      MACROS
  **********************/
-
-#define LV_SA(obj, style_type) ((style_type *) obj->style_p)
-#define LV_EA(obj, ext_type) ((ext_type *) obj->ext)
 
 #endif

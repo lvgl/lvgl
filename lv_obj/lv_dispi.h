@@ -31,6 +31,7 @@ typedef struct
     uint32_t lpr_rep_time_stamp;
     
     /*Flags*/
+    uint8_t drag_range_out :1;
     uint8_t drag_in_prog :1;
     uint8_t long_press_sent :1;
     uint8_t wait_release :1;
@@ -39,8 +40,8 @@ typedef struct
 
 typedef enum
 {
-    LV_ACTION_RES_INV = 0,
-	LV_ACTION_RES_OK,
+    LV_ACTION_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
+	LV_ACTION_RES_OK,           /*The object is valid (no deleted) after the action*/
 }lv_action_res_t;
 
 typedef lv_action_res_t ( * lv_action_t) (struct __LV_OBJ_T * obj, lv_dispi_t * dispi);

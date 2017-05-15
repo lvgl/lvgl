@@ -13,10 +13,26 @@
 #include "lvgl/lvgl.h"
 
 #if LV_APP_ENABLE != 0
+#include "lvgl/lv_app/lv_app_util/lv_app_kb.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_fsel.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
+
 
 /*********************
  *      DEFINES
  *********************/
+/*Check dependencies*/
+#if LV_OBJ_FREE_P == 0
+#error "lv_app: Free pointer is required for application. Enable it lv_conf.h: LV_OBJ_FREE_P 1"
+#endif
+
+#if LV_OBJ_FREE_NUM == 0
+#error "lv_app: Free number is required for application. Enable it lv_conf.h: LV_OBJ_FREE_NUM 1"
+#endif
+
+#if DM_CUSTOM == 0 && DM_MEM_SIZE < (2 * 1024)
+#error "lv_app: not enough dynamic memory. Increase it in misc_conf.h: DM_MEM_SIZE"
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -30,7 +46,7 @@ typedef enum
 
 typedef enum
 {
-	LV_APP_COM_TYPE_CHAR,   /*Stream of characters. Always '\0' terminated*/
+	LV_APP_COM_TYPE_CHAR,   /*Stream of characters. Not '\0' terminated*/
 	LV_APP_COM_TYPE_INT,    /*Stream of 'int32_t' numbers*/
 	LV_APP_COM_TYPE_LOG,    /*String about an event to log*/
     LV_APP_COM_TYPE_TRIG,   /*A trigger to do some specific action (data is ignored)*/
@@ -47,6 +63,7 @@ typedef struct
 	lv_obj_t * sc;
 	lv_obj_t * sc_title;
 	lv_obj_t * win;
+    lv_obj_t * conf_win;
 	void * app_data;
 	void * sc_data;
 	void * win_data;
@@ -63,38 +80,27 @@ typedef struct __LV_APP_DSC_T
 	void (*sc_close) (lv_app_inst_t *);
 	void (*win_open) (lv_app_inst_t *, lv_obj_t *);
 	void (*win_close) (lv_app_inst_t *);
+    void (*conf_open) (lv_app_inst_t *, lv_obj_t * );
 	uint16_t app_data_size;
 	uint16_t sc_data_size;
 	uint16_t win_data_size;
 }lv_app_dsc_t;
 
 typedef struct {
-	lv_rects_t  menu_style;
-	lv_btns_t  menu_btn_style;
-	lv_labels_t  menu_btn_label_style;
-	lv_imgs_t  menu_btn_img_style;
-	lv_lists_t app_list_style;
-	lv_pages_t  sc_page_style;
-    lv_labels_t win_txt_style;
-	lv_wins_t  win_style;
-	lv_btns_t  sc_style;
-    lv_btns_t  sc_send_style;
-    lv_btns_t  sc_rec_style;
-	lv_labels_t sc_title_style;
-    lv_labels_t sc_txt_style;
-
-	opa_t menu_opa;
-	opa_t menu_btn_opa;
-	opa_t sc_opa;
-
-	cord_t menu_h;
-	cord_t app_list_w;
-	cord_t app_list_h;
-	cord_t sc_title_margin;
-
-	/*Calculated values, do not set them!*/
-	cord_t win_useful_w;
-    cord_t win_useful_h;
+	lv_style_t menu;
+    lv_style_t menu_btn_rel;
+    lv_style_t menu_btn_pr;
+    lv_style_t sc_rel;
+    lv_style_t sc_pr;
+    lv_style_t sc_send_rel;
+    lv_style_t sc_send_pr;
+    lv_style_t sc_rec_rel;
+    lv_style_t sc_rec_pr;
+    lv_style_t sc_title;
+    lv_style_t win_header;
+    lv_style_t win_scrl;
+    lv_style_t win_cbtn_rel;
+    lv_style_t win_cbtn_pr;
 }lv_app_style_t;
 
 
@@ -215,10 +221,6 @@ lv_app_inst_t * lv_app_get_next(lv_app_inst_t * prev, lv_app_dsc_t * dsc);
  */
 lv_app_dsc_t ** lv_app_dsc_get_next(lv_app_dsc_t ** prev);
 
-/**
- * Refresh the style of the applications
- * */
-void lv_app_style_refr(void);
 
 /**
  * Get a pointer to the application style structure. If modified then 'lv_app_refr_style' should be called

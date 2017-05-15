@@ -14,16 +14,8 @@
 #if USE_LV_GAUGE != 0
 
 /*Testing of dependencies*/
-#if USE_LV_RECT == 0
-#error "lv_gauge: lv_rect is required. Enable it in lv_conf.h (USE_LV_RECT  1) "
-#endif
-
-#if USE_LV_LABEL == 0
-#error "lv_gauge: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
-#endif
-
-#if USE_LV_RECT == 0
-#error "lv_gauge: lv_line is required. Enable it in lv_conf.h (USE_LV_LINE  1) "
+#if USE_LV_LMETER == 0
+#error "lv_gauge: lv_lmeter is required. Enable it in lv_conf.h (USE_LV_LMETER  1) "
 #endif
 
 #if USE_TRIGO == 0
@@ -32,7 +24,7 @@
 
 
 #include "../lv_obj/lv_obj.h"
-#include "lv_rect.h"
+#include "lv_lmeter.h"
 #include "lv_label.h"
 #include "lv_line.h"
 
@@ -48,49 +40,18 @@
 /*Data of gauge*/
 typedef struct
 {
-    lv_rect_ext_t rect; /*Ext. of ancestor*/
+    lv_lmeter_ext_t lmeter;     /*Ext. of ancestor*/
     /*New data for this type */
-    int16_t min;                /*Minimum value of the scale*/
-    int16_t max;                /*Maximum value of the scale*/
-    int16_t * values;           /*Array of the set values (for needles) */
-    char * txt;                 /*Printf-like text to display with the most critical value (e.g. "Value: %d")*/
-    uint8_t needle_num;         /*Number of needles*/
-    uint8_t low_critical    :1; /*0: the higher value is more critical, 1: the lower value is more critical*/
+    int16_t * values;               /*Array of the set values (for needles) */
+    lv_style_t * style_critical;    /*Fade to this style nearer to the critical value*/
+    color_t * needle_colors;        /*Color of the needles (color_t my_colors[needle_num])*/
+    uint8_t needle_num;             /*Number of needles*/
+    uint8_t low_critical:1;         /*0: the higher value is more critical, 1: the lower value is more critical*/
 }lv_gauge_ext_t;
-
-/*Style of gauge*/
-typedef struct
-{
-	lv_rects_t rects;   /*Style of ancestor*/
-	/*New style element for this type */
-	color_t mcolor_critical;    /*Top color at critical.*/
-    color_t gcolor_critical;    /*Bottom color at critical*/
-    /*Scale settings*/
-    uint16_t scale_angle;       /*Angle of the scale in deg. (~220)*/
-	lv_labels_t scale_labels;   /*Style of the scale labels*/
-    cord_t scale_pad;           /*Padding of scale labels from the edge*/
-    uint8_t scale_label_num;    /*Number of scale labels (~6)*/
-    /*Needle settings*/
-    lv_lines_t needle_lines;    /*Style of neddles*/
-    color_t needle_color[LV_GAUGE_MAX_NEEDLE];  /*Color of needles*/
-    color_t needle_mid_color;   /*Color of middle  where the needles start*/
-    cord_t needle_mid_r;        /*Radius of the needle middle area*/
-    opa_t needle_opa;           /*Opacity of the needles*/
-    /*Value text settings*/
-    lv_labels_t value_labels;   /*Style of the value label*/
-    uint8_t value_pos;    /*Vertical position of the value label in percentage of object height (0..100 %)*/
-}lv_gauges_t;
-
-/*Built-in styles of gauge*/
-typedef enum
-{
-	LV_GAUGES_DEF,
-}lv_gauges_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 /**
  * Create a gauge objects
@@ -110,19 +71,12 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
 
 /**
- * Set the number of needles (should be  <= LV_GAUGE_MAX_NEEDLE)
+ * Set the number of needles
  * @param gauge pointer to gauge object
  * @param num number of needles
+ * @param colors an array of colors for needles (with 'num' elements)
  */
-void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num);
-
-/**
- * Set the range of a gauge
- * @param gauge pointer to gauge object
- * @param min min value
- * @param max max value
- */
-void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
+void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num, color_t * colors);
 
 /**
  * Set the value of a needle
@@ -133,19 +87,18 @@ void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max);
 void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value);
 
 /**
- * Set text on a gauge
- * @param gauge pinter to a gauge object
- * @param txt a printf like format string
- *            with 1 place for a number (e.g. "Value: %d");
- */
-void lv_gauge_set_text(lv_obj_t * gauge, const char * txt);
-
-/**
  * Set which value is more critical (lower or higher)
  * @param gauge pointer to a gauge object
  * @param low false: higher / true: lower value is more critical
  */
 void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low);
+
+/**
+ * Set the critical style of the gauge
+ * @param gauge pointer to a gauge object
+ * @param style pointer to the new critical style
+ */
+void lv_gauge_set_style_critical(lv_obj_t * gauge, lv_style_t * style);
 
 /**
  * Get the number of needles on a gauge
@@ -163,13 +116,6 @@ uint8_t lv_gauge_get_needle_num(lv_obj_t * gauge);
 int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
 
 /**
- * Get the text of a gauge
- * @param gauge pointer to gauge
- * @return the set text. (not with the current value)
- */
-const char * lv_gauge_get_text(lv_obj_t * gauge);
-
-/**
  * Get which value is more critical (lower or higher)
  * @param gauge pointer to a gauge object
  * @param low false: higher / true: lower value is more critical
@@ -177,12 +123,11 @@ const char * lv_gauge_get_text(lv_obj_t * gauge);
 bool lv_gauge_get_low_critical(lv_obj_t * gauge);
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_gauges_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_gauges_t style
+ * Get the critical style of the gauge
+ * @param gauge pointer to a gauge object
+ * @return pointer to the critical style
  */
-lv_gauges_t * lv_gauges_get(lv_gauges_builtin_t style, lv_gauges_t * copy);
+lv_style_t * lv_gauge_get_style_critical(lv_obj_t * gauge);
 
 /**********************
  *      MACROS

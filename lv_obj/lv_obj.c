@@ -7,13 +7,14 @@
  *      INCLUDES
  *********************/
 
-#include <lv_conf.h>
-#include <lvgl/lv_draw/lv_draw_rbasic.h>
-#include <lvgl/lv_draw/lv_draw_vbasic.h>
-#include <lvgl/lv_misc/anim.h>
-#include <lvgl/lv_obj/lv_dispi.h>
-#include <lvgl/lv_obj/lv_obj.h>
-#include <lvgl/lv_obj/lv_refr.h>
+#include "lv_conf.h"
+#include "lvgl/lv_draw/lv_draw.h"
+#include "lvgl/lv_obj/lv_dispi.h"
+#include "lvgl/lv_obj/lv_obj.h"
+#include "lvgl/lv_obj/lv_refr.h"
+#include "lvgl/lv_app/lv_app.h"
+#include "lvgl/lv_draw/lv_draw_rbasic.h"
+#include "misc/gfx/anim.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -34,6 +35,7 @@
  **********************/
 static void lv_obj_pos_child_refr(lv_obj_t * obj, cord_t x_diff, cord_t y_diff);
 static void lv_style_refr_core(void * style_p, lv_obj_t * obj);
+static void lv_child_refr_style(lv_obj_t * obj);
 static void lv_obj_del_child(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
 
@@ -43,11 +45,6 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 static lv_obj_t * def_scr = NULL;
 static lv_obj_t * act_scr = NULL;
 static ll_dsc_t scr_ll;
-
-static lv_objs_t lv_objs_def = {.color = COLOR_MAKE(0xa0, 0xc0, 0xe0), .transp = 0};
-static lv_objs_t lv_objs_scr = {.color = LV_OBJ_DEF_SCR_COLOR, .transp = 0};
-static lv_objs_t lv_objs_transp = {.transp = 1};
-
 
 #ifdef LV_IMG_DEF_WALLPAPER
 LV_IMG_DECLARE(LV_IMG_DEF_WALLPAPER);
@@ -70,12 +67,12 @@ void lv_init(void)
     area_t scr_area;
     area_set(&scr_area, 0, 0, LV_HOR_RES, LV_VER_RES);
     lv_rfill(&scr_area, NULL, COLOR_BLACK, OPA_COVER);
+
+    /*Init. the sstyles*/
+    lv_style_init();
     
     /*Init. the screen refresh system*/
     lv_refr_init();
-    
-    /*Init. the animations*/
-    anim_init();
 
     /*Create the default screen*/
     ll_init(&scr_ll, sizeof(lv_obj_t));
@@ -84,6 +81,7 @@ void lv_init(void)
     def_scr = lv_img_create(NULL, NULL);
     lv_img_set_auto_size(def_scr, false);
     lv_img_set_file(def_scr, "U:/def_wp");
+    lv_img_set_upscale(def_scr, true);
 #else
     def_scr = lv_obj_create(NULL, NULL);
 #endif
@@ -133,15 +131,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->ext_size = 0;
 
 		/*Set appearance*/
-		new_obj->style_p = lv_objs_get(LV_OBJS_SCR, NULL);
-		new_obj->opa = OPA_COVER;
+		new_obj->style_p = lv_style_get(LV_STYLE_SCR, NULL);
 
 		/*Set virtual functions*/
 		lv_obj_set_signal_f(new_obj, lv_obj_signal);
 		lv_obj_set_design_f(new_obj, lv_obj_design);
 
 		/*Set free data*/
+#if LV_OBJ_FREE_NUM != 0
 		new_obj->free_num = 0;
+#endif
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
@@ -151,7 +150,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->drag_en = 0;
 		new_obj->drag_throw_en = 0;
 		new_obj->drag_parent = 0;
-		new_obj->style_iso = 0;
 		new_obj->hidden = 0;
 		new_obj->top_en = 0;
         new_obj->protect = LV_PROTECT_NONE;
@@ -176,15 +174,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->ext_size = 0;
 
         /*Set appearance*/
-        new_obj->style_p = lv_objs_get(LV_OBJS_DEF, NULL);
-        new_obj->opa = OPA_COVER;
+        new_obj->style_p = lv_style_get(LV_STYLE_PLAIN, NULL);
         
         /*Set virtual functions*/
         lv_obj_set_signal_f(new_obj, lv_obj_signal);
         lv_obj_set_design_f(new_obj, lv_obj_design);
 
         /*Set free data*/
+#if LV_OBJ_FREE_NUM != 0
         new_obj->free_num = 0;
+#endif
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
@@ -194,7 +193,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->drag_en = 0;
         new_obj->drag_throw_en = 0;
         new_obj->drag_parent = 0;
-        new_obj->style_iso = 0;
         new_obj->hidden = 0;
         new_obj->top_en = 0;
         new_obj->protect = LV_PROTECT_NONE;
@@ -207,10 +205,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     	area_cpy(&new_obj->cords, &copy->cords);
     	new_obj->ext_size = copy->ext_size;
 
-        new_obj->opa = copy->opa;
-
         /*Set free data*/
+#if LV_OBJ_FREE_NUM != 0
         new_obj->free_num = copy->free_num;
+#endif
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = copy->free_p;
 #endif
@@ -224,10 +222,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->protect = copy->protect;
 
         new_obj->style_p = copy->style_p;
-
-        if(copy->style_iso != 0) {
-            lv_obj_iso_style(new_obj, dm_get_size(copy->style_p));
-        }
 
     	lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
     }
@@ -246,7 +240,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
 /**
  * Delete 'obj' and all of its children
- * @param obj
+ * @param obj pointer to an object to delete
  */
 void lv_obj_del(lv_obj_t * obj)
 {
@@ -284,7 +278,6 @@ void lv_obj_del(lv_obj_t * obj)
     
     /*Delete the base objects*/
     if(obj->ext != NULL)  dm_free(obj->ext);
-    if(obj->style_iso != 0) dm_free(obj->style_p);
     dm_free(obj); /*Free the object itself*/
     
     /* Reset all display input (dispi) because 
@@ -308,48 +301,23 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     bool valid = true;
 
+    lv_style_t * style = lv_obj_get_style(obj);
     switch(sign) {
-    case LV_SIGNAL_CHILD_CHG:
-    	/*Return 'invalid' if the child change  signal is not enabled*/
-    	if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) valid = false;
-    	break;
-    	default:
-    		break;
+        case LV_SIGNAL_CHILD_CHG:
+            /*Return 'invalid' if the child change  signal is not enabled*/
+            if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) valid = false;
+            break;
+        case LV_SIGNAL_REFR_EXT_SIZE:
+            if(style->swidth > obj->ext_size) obj->ext_size = style->swidth;
+            break;
+        case LV_SIGNAL_STYLE_CHG:
+            lv_obj_refr_ext_size(obj);
+            break;
+        default:
+            break;
     }
 
     return valid;
-}
-
-/**
- * Return with a pointer to built-in style and/or copy it to a variable
- * @param style a style name from lv_objs_builtin_t enum
- * @param copy_p copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_objs_t style
- */
-lv_objs_t * lv_objs_get(lv_objs_builtin_t style, lv_objs_t * copy_p)
-{
-	lv_objs_t  *style_p;
-
-	switch(style) {
-		case LV_OBJS_DEF:
-			style_p = &lv_objs_def;
-			break;
-		case LV_OBJS_SCR:
-			style_p = &lv_objs_scr;
-			break;
-		case LV_OBJS_TRANSP:
-			style_p = &lv_objs_transp;
-			break;
-		default:
-			style_p = NULL;
-	}
-
-	if(copy_p != NULL) {
-		if(style_p != NULL) memcpy(copy_p, style_p, sizeof(lv_objs_t));
-		else memcpy(copy_p, &lv_objs_def, sizeof(lv_objs_t));
-	}
-
-	return style_p;
 }
 
 
@@ -489,7 +457,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
 
 /**
  * Set relative the position of an object (relative to the parent).
- * The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinates will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side of the parent. (will be multiplied with LV_DOWNSCALE)
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
@@ -511,7 +479,7 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x)
 
 /**
  * Set the x coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -532,7 +500,7 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y)
 
 /**
  * Set the y coordinate of a object.
- * The coordinate will be upscaled to compensate LV_DOWNSCALE.
+ * The coordinate will be upscaled with LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
  */
@@ -581,7 +549,7 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h)
 }
 
 /**
- * Set the size of an object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Set the size of an object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  * @param h new height (will be multiplied with LV_DOWNSCALE)
@@ -602,7 +570,7 @@ void lv_obj_set_width(lv_obj_t * obj, cord_t w)
 }
 
 /**
- * Set the width of an object.  The width will be upscaled to compensate LV_DOWNSCALE
+ * Set the width of an object.  The width will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  */
@@ -622,7 +590,7 @@ void lv_obj_set_height(lv_obj_t * obj, cord_t h)
 }
 
 /**
- * Set the height of an object.  The height will be upscaled to compensate LV_DOWNSCALE
+ * Set the height of an object.  The height will be upscaled with  LV_DOWNSCALE
  * @param obj pointer to an object
  * @param h new height (will be multiplied with LV_DOWNSCALE)
  */
@@ -770,7 +738,7 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
 
 
 /**
- * Align an object to an other object. The coordinates will be upscaled to compensate LV_DOWNSCALE.
+ * Align an object to an other object. The coordinates will be upscaled with  LV_DOWNSCALE.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
@@ -803,75 +771,14 @@ void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
  * @param obj pointer to an object
  * @param style_p pointer to the new style
  */
-void lv_obj_set_style(lv_obj_t * obj, void * style)
+void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
 {
-    lv_obj_inv(obj);
-
-	if(obj->style_iso != 0) {
-		dm_free(obj->style_p);
-		obj->style_iso = 0;
-	}
     obj->style_p = style;
 
-    /*Send a style change signal to the object*/
-    lv_obj_refr_style(obj);
+    /*Send a signal about style change to every children with NULL style*/
+    lv_child_refr_style(obj);
 
-    lv_obj_inv(obj);
 }
-
-/**
- * Isolate the style of an object. In other words a unique style will be created
- * for this object which can be freely modified independently from the style of the
- * other objects.
- */
-void * lv_obj_iso_style(lv_obj_t * obj, uint32_t style_size)
-{
-	if(obj->style_iso != 0) return obj->style_p;
-
-	void * ori_style_p = lv_obj_get_style(obj);
-	void * iso_style = dm_alloc(style_size);
-	dm_assert(iso_style);
-	memcpy(iso_style, ori_style_p, style_size);
-
-	obj->style_iso = 1;
-	obj->style_p = iso_style;
-
-	lv_obj_refr_style(obj);
-
-	return obj->style_p;
-}
-
-/**
- * Set the opacity of an object
- * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
- */
-void lv_obj_set_opa(lv_obj_t * obj, uint8_t opa)
-{
-    obj->opa = opa;
-    
-    lv_obj_inv(obj);
-}
-
-/**
- * Set the opacity of an object and all of its children
- * @param obj pointer to an object
- * @param opa 0 (transparent) .. 255(fully cover)
- */
-void lv_obj_set_opar(lv_obj_t * obj, uint8_t opa)
-{
-    lv_obj_t * i;
-    
-    LL_READ(obj->child_ll, i) {
-        lv_obj_set_opar(i, opa);
-    }
-    
-    /*Set the opacity is the object is not protected*/
-    if(lv_obj_is_protected(obj, LV_PROTECT_OPA) == false) obj->opa = opa;
-    
-    lv_obj_inv(obj);
-}
-
 
 /**
  * Notify an object about its style is modified
@@ -887,10 +794,10 @@ void lv_obj_refr_style(lv_obj_t * obj)
 
 /**
  * Notify all object if a style is modified
- * @param style pinter to a style. Only objects with this style will be notified
+ * @param style pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_style_refr_all(void * style)
+void lv_style_refr_objs(void * style)
 {
     lv_obj_t * i;
     LL_READ(scr_ll, i) {
@@ -1042,6 +949,7 @@ void lv_obj_refr_ext_size(lv_obj_t * obj)
 	lv_obj_inv(obj);
 }
 
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application. 
@@ -1052,6 +960,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num)
 {
     obj->free_num = free_num;
 }
+#endif
 
 #if LV_OBJ_FREE_P != 0
 /**
@@ -1114,11 +1023,6 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_y;
 			a.start = lv_obj_get_height(par);
 			a.end = lv_obj_get_y(obj);
-			break;
-		case LV_ANIM_FADE:
-			a.fp = (void(*)(void * , int32_t))lv_obj_set_opar;
-			a.start = OPA_TRANSP;
-			a.end = OPA_COVER;
 			break;
 		case LV_ANIM_GROW_H:
 			a.fp = (void(*)(void * , int32_t))lv_obj_set_width;
@@ -1300,7 +1204,7 @@ cord_t lv_obj_get_height(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-cord_t lv_obj_getext_size(lv_obj_t * obj)
+cord_t lv_obj_get_ext_size(lv_obj_t * obj)
 {
     return obj->ext_size;
 }
@@ -1310,23 +1214,26 @@ cord_t lv_obj_getext_size(lv_obj_t * obj)
  *---------------*/
 
 /**
- * Get the style pointer of an object
+ * Get the style pointer of an object (if NULL get style of the parent)
  * @param obj pointer to an object
  * @return pointer to a style
  */
-void * lv_obj_get_style(lv_obj_t * obj)
+lv_style_t * lv_obj_get_style(lv_obj_t * obj)
 {
-    return obj->style_p;
-}
+    if(obj->style_p != NULL) return obj->style_p;
+    else {
+        lv_obj_t * par = obj->par;
 
-/**
- * Get the opacity of an object
- * @param obj pointer to an object
- * @return 0 (transparent) .. 255 (fully cover)
- */
-opa_t lv_obj_get_opa(lv_obj_t * obj)
-{
-    return obj->opa;
+        while(par != NULL) {
+            if(par->style_p != NULL) {
+                if(par->style_p->glass == 0) return par->style_p;
+            }
+            par = par->par;
+        }
+    }
+
+    /*Never reach this, at least the screen has to be a style*/
+    return NULL;
 }
 
 /*-----------------
@@ -1394,16 +1301,6 @@ bool lv_obj_get_drag_parent(lv_obj_t * obj)
 }
 
 /**
- * Get the style isolation attribute of an object
- * @param obj pointer to an object
- * @return pointer to a style
- */
-bool lv_obj_get_style_iso(lv_obj_t * obj)
-{
-    return obj->style_iso == 0 ? false : true;
-}
-
-/**
  * Get the protect field of an object
  * @param obj pointer to an object
  * @return protect field ('OR'ed values of lv_obj_prot_t)
@@ -1460,7 +1357,7 @@ void * lv_obj_get_ext(lv_obj_t * obj)
    return obj->ext;
 }
 
-
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Get the free number
  * @param obj pointer to an object
@@ -1470,6 +1367,7 @@ uint8_t lv_obj_get_free_num(lv_obj_t * obj)
 {
     return obj->free_num;
 }
+#endif
 
 #if LV_OBJ_FREE_P != 0
 /**
@@ -1499,21 +1397,33 @@ void * lv_obj_get_free_p(lv_obj_t * obj)
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        bool cover;
-    	cover = area_is_in(mask_p, &obj->cords);
-        return cover;
+
+        /* Because of the radius it is not sure the area is covered
+         * Check the areas where there is no radius*/
+        lv_style_t * style = lv_obj_get_style(obj);
+        if(style->empty != 0) return false;
+
+        uint16_t r = style->radius;
+
+        if(r == LV_RADIUS_CIRCLE) return false;
+
+        area_t area_tmp;
+
+        /*Check horizontally without radius*/
+        lv_obj_get_cords(obj, &area_tmp);
+        area_tmp.x1 += r;
+        area_tmp.x2 -= r;
+        if(area_is_in(mask_p, &area_tmp) == false) return false;
+
+        /*Check vertically without radius*/
+        lv_obj_get_cords(obj, &area_tmp);
+        area_tmp.y1 += r;
+        area_tmp.y2 -= r;
+        if(area_is_in(mask_p, &area_tmp) == false) return false;
+
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		lv_objs_t * objs_p = lv_obj_get_style(obj);
-
-		opa_t opa = lv_obj_get_opa(obj);
-		color_t color = objs_p->color;
-
-		/*Simply draw a rectangle*/
-#if LV_VDB_SIZE == 0
-		lv_rfill(&obj->cords, mask_p, color, opa);
-#else
-		lv_vfill(&obj->cords, mask_p, color, opa);
-#endif
+		lv_style_t * style = lv_obj_get_style(obj);
+		lv_draw_rect(&obj->cords, mask_p, style);
     }
     return true;
 }
@@ -1555,6 +1465,26 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
     }
 }
 
+
+/**
+ * Recursively refresh the style of the children. Go deeper until a not NULL style is found
+ * because the NULL styles are inherited from the parent
+ * @param obj pointer to an object
+ */
+static void lv_child_refr_style(lv_obj_t * obj)
+{
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    while(child != NULL) {
+        if(child->style_p == NULL) {
+            lv_child_refr_style(child);
+        }
+        child = lv_obj_get_child(obj, child);
+    }
+
+    /*Send a style change signal to the object*/
+    lv_obj_refr_style(obj);
+}
+
 /**
  * Called by 'lv_obj_del' to delete the children objects
  * @param obj pointer to an object (all of its children will be deleted)
@@ -1589,9 +1519,6 @@ static void lv_obj_del_child(lv_obj_t * obj)
 
    /*Delete the base objects*/
    if(obj->ext != NULL)  dm_free(obj->ext);
-   if(obj->style_iso != 0) dm_free(obj->style_p);
    dm_free(obj); /*Free the object itself*/
 
 }
-
-

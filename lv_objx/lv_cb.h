@@ -11,9 +11,10 @@
  *********************/
 #include "lv_conf.h"
 #if USE_LV_CB != 0
+
 /*Testing of dependencies*/
 #if USE_LV_BTN == 0
-#error "lv_cb: lv_rect is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#error "lv_cb: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
 #endif
 
 #if USE_LV_LABEL == 0
@@ -37,25 +38,9 @@ typedef struct
 {
     lv_btn_ext_t bg_btn; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * bullet;
-    lv_obj_t * label;
+    lv_obj_t * bullet;  /*Pointer to button*/
+    lv_obj_t * label;   /*Pointer to label*/
 }lv_cb_ext_t;
-
-/*Style of check box*/
-typedef struct
-{
-	lv_btns_t bg; /*Style of ancestor*/
-	/*New style element for this type */
-	lv_btns_t bullet;
-	lv_labels_t label;
-	cord_t bullet_size;
-}lv_cbs_t;
-
-/*Built-in styles of check box*/
-typedef enum
-{
-	LV_CBS_DEF,
-}lv_cbs_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -92,12 +77,11 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt);
 const char * lv_cb_get_text(lv_obj_t * cb);
 
 /**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_cbs_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_cbs_t style
+ * Get the bullet (lv_btn) of a check box
+ * @param cb pointer to check box object
+ * @return pointer to the bullet of the check box (lv_btn)
  */
-lv_cbs_t * lv_cbs_get(lv_cbs_builtin_t style, lv_cbs_t * copy);
+lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb);
 
 /**********************
  *      MACROS

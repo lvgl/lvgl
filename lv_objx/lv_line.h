@@ -33,26 +33,9 @@ typedef struct
     uint8_t  upscale    :1;         /*1: upscale coordinates with LV_DOWNSCALE*/
 }lv_line_ext_t;
 
-/*Style of line*/
-typedef struct
-{
-	lv_objs_t objs;	/*Style of ancestor*/
-	/*New style element for this type */
-	uint16_t width;
-}lv_lines_t;
-
-/*Built-in styles of line*/
-typedef enum
-{
-	LV_LINES_DEF,
-	LV_LINES_DECOR,
-	LV_LINES_CHART,
-}lv_lines_builtin_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 /**
  * Create a line objects
@@ -73,7 +56,7 @@ bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
  * Set an array of points. The line object will connect these points.
  * @param line pointer to a line object
  * @param point_a an array of points. Only the address is saved,
- * so the array can be a local variable which will be destroyed
+ * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
 void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num);
@@ -122,14 +105,6 @@ bool lv_line_get_y_inv(lv_obj_t * line);
  * @return true: point coordinate upscale is enabled, false: disabled
  */
 bool lv_line_get_upscale(lv_obj_t * line);
-
-/**
- * Return with a pointer to a built-in style and/or copy it to a variable
- * @param style a style name from lv_lines_builtin_t enum
- * @param copy copy the style to this variable. (NULL if unused)
- * @return pointer to an lv_lines_t style
- */
-lv_lines_t * lv_lines_get(lv_lines_builtin_t style, lv_lines_t * copy);
 
 /**********************
  *      MACROS
