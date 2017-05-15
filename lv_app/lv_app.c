@@ -13,12 +13,6 @@
 #include "misc/gfx/anim.h"
 #include "lvgl/lv_obj/lv_refr.h"
 
-#include "../lv_appx/lv_app_example.h"
-#include "../lv_appx/lv_app_phantom.h"
-#include "../lv_appx/lv_app_sysmon.h"
-#include "../lv_appx/lv_app_terminal.h"
-#include "../lv_appx/lv_app_files.h"
-#include "../lv_appx/lv_app_visual.h"
 
 /*********************
  *      DEFINES
@@ -138,11 +132,6 @@ void lv_app_init(void)
 #if USE_LV_APP_FILES != 0
     dsc = ll_ins_head(&app_dsc_ll);
     *dsc = lv_app_files_init();
-#endif
-
-#if USE_LV_APP_VISUAL != 0
-    dsc = ll_ins_head(&app_dsc_ll);
-    *dsc = lv_app_visual_init();
 #endif
 }
 

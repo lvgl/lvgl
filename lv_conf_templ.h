@@ -208,6 +208,12 @@
 /*Example application*/
 #define USE_LV_APP_EXAMPLE  1
 
+/*Phantom application*/
+#define USE_LV_APP_PHANTOM  1
+#if USE_LV_APP_PHANTOM != 0
+/*No settings*/
+#endif
+
 /*System monitor*/
 #define USE_LV_APP_SYSMON   1
 #if USE_LV_APP_SYSMON != 0

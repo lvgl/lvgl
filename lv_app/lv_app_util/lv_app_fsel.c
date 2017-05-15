@@ -95,6 +95,7 @@ void lv_app_fsel_open(const char * path, const char * filter, void * param, void
     fsel_win = lv_win_create(lv_scr_act(), NULL);
     lv_obj_set_size(fsel_win, LV_HOR_RES, LV_VER_RES);
     lv_win_set_styles_cbtn(fsel_win, &app_style->win_cbtn_rel, &app_style->win_cbtn_pr);
+    lv_obj_set_style(lv_win_get_header(fsel_win), &app_style->menu);
 
     lv_win_add_cbtn(fsel_win, SYMBOL_CLOSE, fsel_close_action);
 

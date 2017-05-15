@@ -13,10 +13,6 @@
 #include "lvgl/lvgl.h"
 
 #if LV_APP_ENABLE != 0
-#include "lvgl/lv_app/lv_app_util/lv_app_kb.h"
-#include "lvgl/lv_app/lv_app_util/lv_app_fsel.h"
-#include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
-
 
 /*********************
  *      DEFINES
@@ -231,6 +227,19 @@ lv_app_style_t * lv_app_style_get(void);
 /**********************
  *      MACROS
  **********************/
+
+/**********************
+ *   POST-INCLUDES
+ *********************/
+#include "lvgl/lv_app/lv_app_util/lv_app_kb.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_fsel.h"
+#include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
+
+#include "lvgl/lv_appx/lv_app_example.h"
+#include "lvgl/lv_appx/lv_app_phantom.h"
+#include "lvgl/lv_appx/lv_app_sysmon.h"
+#include "lvgl/lv_appx/lv_app_terminal.h"
+#include "lvgl/lv_appx/lv_app_files.h"
 
 #endif /*LV_APP_ENABLE != 0*/
 
