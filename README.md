@@ -52,8 +52,8 @@ See the [example HAL](https://github.com/littlevgl/hal) repository!
 2. Create project with your prefered IDE and add the **lvgl**, **misc** and **hal** folders 
 3. Add your projects **root directory as include path** 
 4. Write your display, touch pad and system tick **drivers in hal**
-5. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** and *misc/misc_conf_templ.h* as **misc_conf.h** to the projects root folder.
-6. In the *_conf.h files delete the first `#if 0` and its `#endif` at the end make the configurations
+5. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** and *misc/misc_conf_templ.h* as **misc_conf.h** to the projects root folder
+6. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
 7. In your *main.c* file include: 
    * #include "misc/misc.h" 
    * #include "misc/os/ptask.h"
@@ -64,10 +64,14 @@ See the [example HAL](https://github.com/littlevgl/hal) repository!
    * your_disp_init();
    * your_indev_init();
    * **lvgl_init()**;
-10. Create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
+10. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
 11. In the main *while(1)* call `ptask_handler();` and make a few milliseconds delay (e.g. `your_delay_ms(5);`) 
+12. Compile the code and load it to your embedded hardware
 
+## PC Simulator
+If you don't hace got an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) to emulate a display on your monitor and a touch pad with your mouse.
 
+There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/proj_pc
 
 ## Contributing
 1. Fork it!
