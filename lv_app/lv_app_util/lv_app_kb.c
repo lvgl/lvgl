@@ -149,14 +149,13 @@ lv_obj_t * lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv
         if(lv_obj_get_height(kb_ta)  > cont_h - LV_DPI / 10) {
             lv_obj_set_height(kb_ta, cont_h - LV_DPI / 10);
         }
-#if LV_APP_ANIM_LEVEL != 0
-        lv_page_focus(lv_win_get_content(kb_win), kb_ta, true);
-#else
         lv_page_focus(lv_win_get_page(kb_win), kb_ta, 0);
-#endif
     }
 
     lv_ta_set_cursor_pos(kb_ta, LV_TA_CUR_LAST);
+    if(kb_mode & LV_APP_KB_MODE_CURSOR_MANAGE) {
+        lv_ta_set_cursor_show(kb_ta, true);
+    }
 
     return kb_btnm;
 
@@ -182,7 +181,11 @@ void lv_app_kb_close(bool ok)
         lv_obj_set_size(kb_win, LV_HOR_RES, LV_VER_RES);
         kb_win = NULL;
 	}
-
+    
+    if(kb_mode & LV_APP_KB_MODE_CURSOR_MANAGE) {
+        lv_ta_set_cursor_show(kb_ta, false);
+    }
+    
     lv_obj_del(kb_btnm);
     kb_btnm = NULL;
 

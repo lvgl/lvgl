@@ -133,6 +133,11 @@ void lv_app_init(void)
     dsc = ll_ins_head(&app_dsc_ll);
     *dsc = lv_app_files_init();
 #endif
+    
+#if USE_LV_APP_WIFI != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_wifi_init();
+#endif
 }
 
 /**

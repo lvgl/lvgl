@@ -240,6 +240,7 @@ lv_app_style_t * lv_app_style_get(void);
 #include "lvgl/lv_appx/lv_app_sysmon.h"
 #include "lvgl/lv_appx/lv_app_terminal.h"
 #include "lvgl/lv_appx/lv_app_files.h"
+#include "lvgl/lv_appx/lv_app_wifi.h"
 
 #endif /*LV_APP_ENABLE != 0*/
 

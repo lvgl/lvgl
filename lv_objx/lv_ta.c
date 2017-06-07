@@ -105,6 +105,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_obj_set_design_f(ext->page.scrl, lv_ta_scrling_design);
     	lv_ta_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->label = lv_label_create(new_ta, copy_ext->label);
+        ext->cursor_show = copy_ext->cursor_show;
     	lv_page_glue_obj(ext->label, true);
 
         /*Refresh the style with new signal function*/

@@ -140,9 +140,9 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
  *====================*/
 
 /**
- * Set the options in a drop down list
+ * Set the options in a drop down list from an array
  * @param ddlist pointer to drop down list object
- * @param options an array of strings wit the text of the options.
+ * @param options an array of strings with the text of the options.
  *                The lest element has to be "" (empty string)
  *                E.g. const char * opts[] = {"apple", "banana", "orange", ""};
  */
@@ -158,6 +158,18 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options)
         i++;
     }
 
+    lv_ddlist_refr_size(ddlist, 0);
+}
+
+/**
+ * Set the options in a drop down list from a string
+ * @param ddlist pointer to drop down list object
+ * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ */
+void lv_ddlist_set_options_str(lv_obj_t * ddlist, const char * options)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    lv_label_set_text(ext->opt_label, options);
     lv_ddlist_refr_size(ddlist, 0);
 }
 
@@ -248,6 +260,31 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist)
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
 
     return ext->sel_opt;
+}
+
+/**
+ * Get the current selected option as a string
+ * @param ddlist pointer to ddlist object
+ * @param buf pointer to an array to store the string
+ */
+void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+
+    uint16_t i;
+    uint16_t line = 0;
+    const char * opt_txt = lv_label_get_text(ext->opt_label);
+    uint16_t txt_len = strlen(opt_txt);
+    
+    
+    for(i = 0; i < txt_len && line != ext->sel_opt; i++) {
+        if(opt_txt[i] == '\n') line ++;
+    }
+    
+    uint16_t c;
+    for(c = 0; opt_txt[i] != '\n' && i < txt_len; c++, i++) buf[c] = opt_txt[i];
+    
+    buf[c] = '\0';
 }
 
 /**

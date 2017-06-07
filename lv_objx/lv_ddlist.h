@@ -77,6 +77,7 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
  */
 void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options);
 
+void lv_ddlist_set_options_str(lv_obj_t * ddlist, const char * options);
 /**
  * Set the selected option
  * @param ddlist pointer to drop down list object
@@ -121,6 +122,7 @@ const char * lv_ddlist_get_options(lv_obj_t * ddlist);
  */
 uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
 
+void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
 /**
  * Get the auto size attribute.
  * @param ddlist pointer to a drop down list object
