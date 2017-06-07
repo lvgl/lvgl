@@ -32,6 +32,7 @@
  *      DEFINES
  *********************/
 #define OBJ_PAD (LV_DPI / 12)
+#define AUTO_CONNECT_TCP_DELAY  5000    /*Wait before TCS server connect when the WiFi connect is ready*/ 
 
 /**********************
  *      TYPEDEFS
@@ -187,7 +188,7 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 
         /*Insert the name of the sender application if it is not the last*/
         if(app_data->last_sender != app_send) {
-            add_data(app_rec, "@", 1);
+            add_data(app_rec, "\n@", 2);
             add_data(app_rec, app_send->name, strlen(app_send->name));
             add_data(app_rec, "\n", 1);
         }
@@ -424,6 +425,8 @@ static void win_ta_kb_ok_action(lv_obj_t * ta)
     lv_app_com_send(app, app_data->com_type, ta_txt, ta_txt_len);
 
     lv_ta_set_text(ta, "");
+    app_data->last_sender = NULL;   /*Now the least data in the terminal is from this app*/
+    
 }
 
 /**

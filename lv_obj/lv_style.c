@@ -134,6 +134,7 @@ void lv_style_init (void)
     lv_style_btn_rel.hpad = LV_DPI / 4;
     lv_style_btn_rel.vpad = LV_DPI / 6;
     lv_style_btn_rel.opad = LV_DPI / 10;
+    lv_style_btn_rel.txt_align = LV_TXT_ALIGN_MID;
 
     /*Button pressed style*/
     memcpy(&lv_style_btn_pr, &lv_style_btn_rel, sizeof(lv_style_t));
