@@ -298,9 +298,15 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
                 }
             }
 
-            if(cmd_state == CMD_STATE_IN)  letter_fp(&pos, mask_p, font, txt[i], recolor, style->opa);
-            else letter_fp(&pos, mask_p, font, txt[i], style->ccolor, style->opa);
-            pos.x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+            char letter = txt[i];
+            color_t color = style->ccolor;
+
+            if((flag & TXT_FLAG_PWD) != 0 && txt[i + 1] != '\0') letter = '*';
+            if(cmd_state == CMD_STATE_IN) color = recolor;
+            letter_fp(&pos, mask_p, font, letter, color, style->opa);
+
+            if((flag & TXT_FLAG_PWD) == 0 || txt[i + 1] == '\0')  pos.x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+            else pos.x += (font_get_width(font, '*') >> FONT_ANTIALIAS) + style->letter_space;
         }
         /*Go to next line*/
         line_start = line_end;

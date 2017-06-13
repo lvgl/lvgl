@@ -81,6 +81,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->txt = NULL;
     ext->static_txt = 0;
     ext->recolor = 0;
+    ext->pwd = 0;
     ext->dot_end = LV_LABEL_DOT_END_INV;
     ext->long_mode = LV_LABEL_LONG_EXPAND;
 
@@ -300,6 +301,20 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor)
     lv_label_refr_text(label);
 }
 
+/**
+ * Enable the password mode
+ * @param label pointer to a label object
+ * @param pwd true: enable password mode, false: disable
+ */
+void lv_label_set_pwd_mode(lv_obj_t * label, bool pwd)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext(label);
+
+    ext->pwd = pwd == false ? 0 : 1;
+
+    lv_label_refr_text(label);
+}
+
 /*=====================
  * Getter functions 
  *====================*/
@@ -336,7 +351,17 @@ bool lv_label_get_recolor(lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
     return ext->recolor == 0 ? false : true;
+}
 
+/**
+ * Get the password mode
+ * @param label pointer to a label object
+ * @return true: password mode is enabled, false: disable
+ */
+bool lv_label_get_pwd_mode(lv_obj_t * label)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    return ext->pwd == 0 ? false : true;
 }
 
 /**
@@ -347,7 +372,7 @@ bool lv_label_get_recolor(lv_obj_t * label)
  */
 void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 {
-	const char * text = lv_label_get_text(label);
+	const char * txt = lv_label_get_text(label);
     lv_label_ext_t * ext = lv_obj_get_ext(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
@@ -359,6 +384,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     txt_flag_t flag = TXT_FLAG_NONE;
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
+    if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
 
     /*If the width will be expanded  the set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -366,15 +392,15 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     }
 
     /*Search the line of the index letter */;
-    while (text[new_line_start] != '\0') {
-        new_line_start += txt_get_next_line(&text[line_start], font, style->letter_space, max_w, flag);
-        if(index < new_line_start || text[new_line_start] == '\0') break; /*The line of 'index' letter begins at 'line_start'*/
+    while (txt[new_line_start] != '\0') {
+        new_line_start += txt_get_next_line(&txt[line_start], font, style->letter_space, max_w, flag);
+        if(index < new_line_start || txt[new_line_start] == '\0') break; /*The line of 'index' letter begins at 'line_start'*/
 
         y += letter_height + style->line_space;
         line_start = new_line_start;
     }
 
-    if((text[index - 1] == '\n' || text[index - 1] == '\r') && text[index] == '\0') {
+    if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
         y += letter_height + style->line_space;
         line_start = index;
     }
@@ -386,17 +412,17 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 	for(i = line_start; i < index; i++) {
         /*Handle the recolor command*/
         if((flag & TXT_FLAG_RECOLOR) != 0) {
-            if(txt_is_cmd(&cmd_state, text[i]) != false) {
+            if(txt_is_cmd(&cmd_state, txt[i]) != false) {
                 continue; /*Skip the letter is it is part of a command*/
             }
         }
-
-		x += (font_get_width(font, text[i]) >> FONT_ANTIALIAS) + style->letter_space;
+        if((flag & TXT_FLAG_PWD) == 0  || txt[i + 1] == '\0') x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+        else x += (font_get_width(font, '*') >> FONT_ANTIALIAS) + style->letter_space;
 	}
 
 	if(style->txt_align == LV_TXT_ALIGN_MID) {
 		cord_t line_w;
-        line_w = txt_get_width(&text[line_start], new_line_start - line_start,
+        line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
                                font, style->letter_space, flag);
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
@@ -414,7 +440,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
  */
 uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 {
-	const char * text = lv_label_get_text(label);
+	const char * txt = lv_label_get_text(label);
     lv_label_ext_t * ext = lv_obj_get_ext(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
@@ -426,6 +452,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     txt_flag_t flag = TXT_FLAG_NONE;
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
+    if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -433,8 +460,8 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     }
 
     /*Search the line of the index letter */;
-    while (text[line_start] != '\0') {
-    	new_line_start += txt_get_next_line(&text[line_start], font, style->letter_space, max_w, flag);
+    while (txt[line_start] != '\0') {
+    	new_line_start += txt_get_next_line(&txt[line_start], font, style->letter_space, max_w, flag);
     	if(pos->y <= y + letter_height + style->line_space) break; /*The line is found ('line_start')*/
     	y += letter_height + style->line_space;
         line_start = new_line_start;
@@ -444,7 +471,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     cord_t x = 0;
 	if(style->txt_align == LV_TXT_ALIGN_MID) {
 		cord_t line_w;
-        line_w = txt_get_width(&text[line_start], new_line_start - line_start,
+        line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
                                font, style->letter_space, flag);
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
@@ -454,12 +481,14 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 	for(i = line_start; i < new_line_start - 1; i++) {
 	    /*Handle the recolor command*/
 	    if((flag & TXT_FLAG_RECOLOR) != 0) {
-            if(txt_is_cmd(&cmd_state, text[i]) != false) {
+            if(txt_is_cmd(&cmd_state, txt[i]) != false) {
                 continue; /*Skip the letter is it is part of a command*/
             }
 	    }
 
-		x += (font_get_width(font, text[i]) >> FONT_ANTIALIAS) + style->letter_space;
+	    if((flag & TXT_FLAG_PWD) == 0  || txt[i + 1] == '\0') x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+	    else x += (font_get_width(font, '*') >> FONT_ANTIALIAS) + style->letter_space;
+
 		if(pos->x < x) break;
 	}
 
@@ -495,6 +524,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
 		lv_label_ext_t * ext = lv_obj_get_ext(label);
 		txt_flag_t flag = TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
+        if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
 
 
 		lv_draw_label(&cords, mask, lv_obj_get_style(label), ext->txt, flag);
@@ -529,6 +559,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     point_t size;
     txt_flag_t flag = TXT_FLAG_NONE;
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
+    if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
     txt_get_size(&size, ext->txt, font, style->letter_space, style->line_space, max_w, flag);
 
     /*Refresh the full size in expand mode*/
