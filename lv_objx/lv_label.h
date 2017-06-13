@@ -45,6 +45,7 @@ typedef struct
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
     uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/
+    uint8_t pwd  :1;                /*Convert letters to '*' when draw*/
 }lv_label_ext_t;
 
 /**********************
@@ -113,6 +114,13 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 void lv_label_set_recolor(lv_obj_t * label, bool recolor);
 
 /**
+ * Enable the password mode
+ * @param label pointer to a label object
+ * @param pwd true: enable password mode, false: disable
+ */
+void lv_label_set_pwd_mode(lv_obj_t * label, bool pwd);
+
+/**
  * Get the text of a label
  * @param label pointer to a label object
  * @return the text of the label
@@ -132,6 +140,13 @@ lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label);
  * @return true: recoloring is enabled, false: disable
  */
 bool lv_label_get_recolor(lv_obj_t * label);
+
+/**
+ * Get the password mode
+ * @param label pointer to a label object
+ * @return true: password mode is enabled, false: disable
+ */
+bool lv_label_get_pwd_mode(lv_obj_t * label);
 
 /**
  * Get the relative x and y coordinates of a letter

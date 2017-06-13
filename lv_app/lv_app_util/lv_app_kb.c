@@ -199,8 +199,8 @@ void lv_app_kb_close(bool ok)
     } else {
         lv_obj_del(kb_btnm);
     }
-    kb_btnm = NULL;
 
+    kb_btnm = NULL;
     kb_ta = NULL;
 }
 
