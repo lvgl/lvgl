@@ -21,10 +21,11 @@
  **********************/
 typedef enum
 {
-	LV_APP_KB_MODE_TXT = 0x01,
-	LV_APP_KB_MODE_NUM = 0x02,
-    LV_APP_KB_MODE_WIN_RESIZE = 0x04,
-    LV_APP_KB_MODE_CURSOR_MANAGE = 0x08,
+	LV_APP_KB_MODE_TXT =            0x0001,
+	LV_APP_KB_MODE_NUM =            0x0002,
+    LV_APP_KB_MODE_WIN_RESIZE =     0x0004,
+    LV_APP_KB_MODE_CURSOR_MANAGE =  0x0008,
+    LV_APP_KB_MODE_ANIM =           0x0010,
 }lv_app_kb_mode_t;
 
 /**********************

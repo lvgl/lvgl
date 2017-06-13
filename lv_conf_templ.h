@@ -198,7 +198,7 @@
 /*Keyboard*/
 #define USE_LV_APP_KB           1
 #if USE_LV_APP_KB != 0
-/*No settings*/
+#define LV_APP_KB_ANIM_TIME     300         /*ms*/
 #endif
 
 /*==================
