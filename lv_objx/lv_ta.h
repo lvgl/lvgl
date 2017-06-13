@@ -142,6 +142,13 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
 const char * lv_ta_get_txt(lv_obj_t * ta);
 
 /**
+ * Get the label of a text area
+ * @param ta pointer to a text area object
+ * @return pointer to the label object
+ */
+lv_obj_t * lv_ta_get_label(lv_obj_t * ta);
+
+/**
  * Get the current cursor position in character index
  * @param ta pointer to a text area object
  * @return the cursor position
