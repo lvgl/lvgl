@@ -15,6 +15,9 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_APP_KB_ANIM_TIME
+#define LV_APP_KB_ANIM_TIME     300     /*ms*/
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -157,6 +160,11 @@ lv_obj_t * lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv
         lv_ta_set_cursor_show(kb_ta, true);
     }
 
+    if(kb_mode & LV_APP_KB_MODE_ANIM) {
+        lv_obj_anim(kb_btnm, LV_ANIM_FLOAT_BOTTOM | ANIM_IN, LV_APP_KB_ANIM_TIME, 0, NULL);
+    }
+
+
     return kb_btnm;
 
 }
@@ -185,8 +193,12 @@ void lv_app_kb_close(bool ok)
     if(kb_mode & LV_APP_KB_MODE_CURSOR_MANAGE) {
         lv_ta_set_cursor_show(kb_ta, false);
     }
-    
-    lv_obj_del(kb_btnm);
+
+    if(kb_mode & LV_APP_KB_MODE_ANIM) {
+        lv_obj_anim(kb_btnm, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_KB_ANIM_TIME, 0, lv_obj_del);
+    } else {
+        lv_obj_del(kb_btnm);
+    }
     kb_btnm = NULL;
 
     kb_ta = NULL;
