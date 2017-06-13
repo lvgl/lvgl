@@ -156,11 +156,11 @@ lv_obj_t * lv_app_kb_open(lv_obj_t * ta, lv_app_kb_mode_t mode, void (*close)(lv
     }
 
     lv_ta_set_cursor_pos(kb_ta, LV_TA_CUR_LAST);
-    if(kb_mode & LV_APP_KB_MODE_CURSOR_MANAGE) {
+    if(kb_mode & LV_APP_KB_MODE_CUR_MANAGE) {
         lv_ta_set_cursor_show(kb_ta, true);
     }
 
-    if(kb_mode & LV_APP_KB_MODE_ANIM) {
+    if(kb_mode & LV_APP_KB_MODE_ANIM_IN) {
         lv_obj_anim(kb_btnm, LV_ANIM_FLOAT_BOTTOM | ANIM_IN, LV_APP_KB_ANIM_TIME, 0, NULL);
     }
 
@@ -190,11 +190,11 @@ void lv_app_kb_close(bool ok)
         kb_win = NULL;
 	}
     
-    if(kb_mode & LV_APP_KB_MODE_CURSOR_MANAGE) {
+    if(kb_mode & LV_APP_KB_MODE_CUR_MANAGE) {
         lv_ta_set_cursor_show(kb_ta, false);
     }
 
-    if(kb_mode & LV_APP_KB_MODE_ANIM) {
+    if(kb_mode & LV_APP_KB_MODE_ANIM_OUT) {
         lv_obj_anim(kb_btnm, LV_ANIM_FLOAT_BOTTOM | ANIM_OUT, LV_APP_KB_ANIM_TIME, 0, lv_obj_del);
     } else {
         lv_obj_del(kb_btnm);
@@ -203,7 +203,6 @@ void lv_app_kb_close(bool ok)
     kb_btnm = NULL;
     kb_ta = NULL;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
