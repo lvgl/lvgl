@@ -346,83 +346,70 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
             uint32_t br;
             res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
 
-            /*If the width is greater then map width then it is upscaled */
+            /*If the width is greater then real img. width then it is upscaled */
             bool upscale = false;
             if(area_get_width(cords_p) > header.w) upscale = true;
 
-            cord_t row;
-            area_t act_area;
-
-            area_t mask_sub;
+            area_t mask_com;    /*Common area of mask and cords*/
             bool union_ok;
-            union_ok = area_union(&mask_sub, mask_p, cords_p);
+            union_ok = area_union(&mask_com, mask_p, cords_p);
             if(union_ok == false) {
                 fs_close(&file);
                 return;
             }
 
-            uint8_t ds_shift = 0;
-            uint8_t ds_num = 1;
-            /*Set some values if upscale enabled*/
-            if(upscale != false) {
-                ds_shift = 1;
-                ds_num = 2;
-            }
-
-            uint32_t start_offset = sizeof(lv_img_raw_header_t);
-            start_offset += (area_get_width(cords_p) >> ds_shift) *
-                           ((mask_sub.y1 - cords_p->y1) >> ds_shift) * sizeof(color_t); /*First row*/
-            start_offset += ((mask_sub.x1 - cords_p->x1) >> ds_shift) * sizeof(color_t); /*First col*/
-            fs_seek(&file, start_offset);
-
-            uint32_t useful_data = (area_get_width(&mask_sub) >> ds_shift) * sizeof(color_t);
-            uint32_t next_row = (area_get_width(cords_p) >> ds_shift) * sizeof(color_t) - useful_data;
-
-
             /*Round the coordinates with upscale*/
             if(upscale != false) {
-                if((mask_sub.x1 & 0x1) != 0) mask_sub.x1 -= 1; /*Can be only even*/
-                if((mask_sub.x2 & 0x1) == 0) mask_sub.x2 -= 1; /*Can be only odd*/
+                if((mask_com.x1 & 0x1) != 0) mask_com.x1 -= 1; /*Can be only even*/
+                if((mask_com.x2 & 0x1) == 0) mask_com.x2 -= 1; /*Can be only odd*/
             }
-            area_cpy(&act_area, &mask_sub);
 
-            /* Round down the start coordinate, because the upscaled images
-             * can start only LV_DOWNSCALE 'y' coordinates */
-            act_area.y1 &= ~(cord_t)(ds_num - 1) ;
-            act_area.y2 = act_area.y1 + ds_num - 1;
-            uint32_t act_pos;
-            bool const_data = false;
+            /*If the img. data is inside the MCU then do not use FS reading just a pointer*/
             if(fn[0] == UFS_LETTER) {
-                if(((ufs_file_t*)file.file_d)->ent->const_data != 0) {
-                    const_data = true;
-                }
+                uint8_t * f_data = ((ufs_file_t*)file.file_d)->ent->data_d;
+                f_data += sizeof(lv_img_raw_header_t);
+                map_fp(cords_p, &mask_com, (void*)f_data , style->opa, header.transp, upscale, style->ccolor, style->img_recolor);
             }
-            
-            for(row = mask_sub.y1; row <= mask_sub.y2; row += ds_num) {
-                
-                /*Get and use the pointer of const data in program memory*/
-                if(const_data != false) {
-                    uint8_t * f_data = ((ufs_file_t*)file.file_d)->ent->data_d;
-                    f_data += ((ufs_file_t*)file.file_d)->rwp;
-                    ((ufs_file_t*)file.file_d)->rwp += useful_data;
-                    map_fp(&act_area, &mask_sub, (void*)f_data , style->opa, header.transp, upscale,
-                              style->ccolor, style->img_recolor);
-                } 
-                /*Or read the NOT const files normally*/
-                else {
-                    color_t buf[LV_HOR_RES];
-                    res = fs_read(&file, buf, useful_data, &br);
-                    map_fp(&act_area, &mask_sub, buf, style->opa, header.transp, upscale,
-                              style->ccolor, style->img_recolor);
+            /*Read the img. with the FS interface*/
+            else {
+                uint8_t us_shift = 0;
+                uint8_t us_val = 1;
+                if(upscale != false) {
+                    us_shift = 1;
+                    us_val = 2;
                 }
-                
-                fs_tell(&file, &act_pos);
-                fs_seek(&file, act_pos + next_row);
-                act_area.y1 += ds_num;
-                act_area.y2 += ds_num;
-            }
 
+                /* Move the file pointer to the start address according to mask
+                 * But take care, the upscaled maps look greater*/
+                uint32_t start_offset = sizeof(lv_img_raw_header_t);
+                start_offset += (area_get_width(cords_p) >> us_shift) *
+                               ((mask_com.y1 - cords_p->y1) >> us_shift) * sizeof(color_t); /*First row*/
+                start_offset += ((mask_com.x1 - cords_p->x1) >> us_shift) * sizeof(color_t); /*First col*/
+                fs_seek(&file, start_offset);
+
+                uint32_t useful_data = (area_get_width(&mask_com) >> us_shift) * sizeof(color_t);
+                uint32_t next_row = (area_get_width(cords_p) >> us_shift) * sizeof(color_t) - useful_data;
+
+                area_t line;
+                area_cpy(&line, &mask_com);
+                area_set_height(&line, us_val); /*Create a line area. Hold 2 pixels if upscaled*/
+
+                cord_t row;
+                uint32_t act_pos;
+                color_t buf[LV_HOR_RES];
+                for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
+                    res = fs_read(&file, buf, useful_data, &br);
+                    map_fp(&line, &mask_com, buf, style->opa, header.transp, upscale,
+                                          style->ccolor, style->img_recolor);
+
+                    fs_tell(&file, &act_pos);
+                    fs_seek(&file, act_pos + next_row);
+                    line.y1 += us_val;    /*Go down a line*/
+                    line.y2 += us_val;
+                }
+            }
         }
+
         fs_close(&file);
 
         if(res != FS_RES_OK) {
