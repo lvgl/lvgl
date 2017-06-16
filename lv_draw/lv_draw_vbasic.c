@@ -31,6 +31,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void sw_render_fill(area_t * mem_area, color_t * mem, const area_t * fill_area, color_t color, opa_t opa);
+static inline void sw_render_map_line(color_t * mem, const color_t * map, cord_t map_len, opa_t opa);
 
 /**********************
  *  STATIC VARIABLES
@@ -99,55 +101,20 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
     union_ok = area_union(&res_a, cords_p, mask_p);
     
     /*If there are common part of the three area then draw to the vdb*/
-    if(union_ok == true) {
-        area_t vdb_rel_a;   /*Stores relative coordinates on vdb*/
-        vdb_rel_a.x1 = res_a.x1 - vdb_p->area.x1;
-        vdb_rel_a.y1 = res_a.y1 - vdb_p->area.y1;
-        vdb_rel_a.x2 = res_a.x2 - vdb_p->area.x1;
-        vdb_rel_a.y2 = res_a.y2 - vdb_p->area.y1;
-        
-        color_t * vdb_buf_tmp = vdb_p->buf;
-        uint32_t vdb_width = area_get_width(&vdb_p->area);
-        /*Move the vdb_tmp to the first row*/
-        vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
-        
-        /*Set all row in vdb to the given color*/
-        cord_t row;
-        uint32_t col;
-        
-        /*Run simpler function without opacity*/
-        if(opa == OPA_COVER) {
-            /*Fill the first row with 'color'*/
-            for(col = vdb_rel_a.x1; col <= vdb_rel_a.x2; col++) {
-                 vdb_buf_tmp[col] = color;
-            }
-            /*Copy the first row to all other rows*/
-            color_t * vdb_buf_first = &vdb_buf_tmp[vdb_rel_a.x1];
-            cord_t copy_size =  (vdb_rel_a.x2 - vdb_rel_a.x1 + 1) * sizeof(color_t);
-            vdb_buf_tmp += vdb_width;
-            
-            for(row = vdb_rel_a.y1 + 1; row <= vdb_rel_a.y2; row++) {
-                memcpy(&vdb_buf_tmp[vdb_rel_a.x1], vdb_buf_first, copy_size);
-                vdb_buf_tmp += vdb_width;
-            }            
-        }
-        /*Calculate with alpha too*/
-        else {
-            color_t bg_tmp = COLOR_BLACK;
-            color_t opa_tmp = color_mix(color, bg_tmp, opa);
-            for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                for(col = vdb_rel_a.x1; col <= vdb_rel_a.x2; col++) {
-                    /*If the bg color changed recalculate the result color*/
-                    if(vdb_buf_tmp[col].full != bg_tmp.full) {
-                        bg_tmp = vdb_buf_tmp[col];
-                        opa_tmp = color_mix(color, bg_tmp, opa);
-                    }
-                    vdb_buf_tmp[col] = opa_tmp;
-                }
-                vdb_buf_tmp += vdb_width;
-            }
-        }
-    }    
+    if(union_ok == false) return;
+
+    area_t vdb_rel_a;   /*Stores relative coordinates on vdb*/
+    vdb_rel_a.x1 = res_a.x1 - vdb_p->area.x1;
+    vdb_rel_a.y1 = res_a.y1 - vdb_p->area.y1;
+    vdb_rel_a.x2 = res_a.x2 - vdb_p->area.x1;
+    vdb_rel_a.y2 = res_a.y2 - vdb_p->area.y1;
+
+    color_t * vdb_buf_tmp = vdb_p->buf;
+    uint32_t vdb_width = area_get_width(&vdb_p->area);
+    /*Move the vdb_tmp to the first row*/
+    vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
+
+    sw_render_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
 }
 
 /**
@@ -322,38 +289,22 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     color_t * vdb_buf_tmp = vdb_p->buf;
     vdb_buf_tmp += (uint32_t) vdb_width * masked_a.y1; /*Move to the first row*/
 
-    map_p -= (masked_a.x1 >> ds_shift);
+    map_p -= (masked_a.x1 >> ds_shift); /*Move back. It will be easier to index 'map_p' later*/
 
     /*No upscalse*/
     if(upscale == false) {
         if(transp == false) { /*Simply copy the pixels to the VDB*/
             cord_t row;
 
-            if(opa == OPA_COVER)  { /*no opa */
-                for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                    memcpy(&vdb_buf_tmp[masked_a.x1],
-                           &map_p[masked_a.x1],
-                           area_get_width(&masked_a) * sizeof(color_t));
-                    map_p += map_width;               /*Next row on the map*/
-                    vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
-                }
-            } else {    /*with opacity*/
-                cord_t col;
-                for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                    for(col = masked_a.x1; col <= masked_a.x2; col ++) {
-                        vdb_buf_tmp[col] = color_mix( map_p[col], vdb_buf_tmp[col], opa);
-                    }
-                    map_p += map_width;              /*Next row on the map*/
-                    vdb_buf_tmp += vdb_width;        /*Next row on the VDB*/
-                }
+            for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                sw_render_map_line(&vdb_buf_tmp[masked_a.x1],  &map_p[masked_a.x1], map_width, opa);
+                map_p += map_width;               /*Next row on the map*/
+                vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
             }
-
-#if LV_VDB_SIZE != 0
             /*To recolor draw simply a rectangle above the image*/
             if(recolor_opa != OPA_TRANSP) {
                 lv_vfill(cords_p, mask_p, recolor, recolor_opa);
             }
-#endif
         } else { /*transp == true: Check all pixels */
             cord_t row;
             cord_t col;
@@ -473,10 +424,76 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     }
 }
 
-
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ *
+ * @param mem_area coordinates of 'mem' memory area
+ * @param mem a memory address. Considered to a rectangual window according to 'mem_area'
+ * @param fill_area coordinates of an area to fill. Relative to 'mem_area'.
+ * @param color fill color
+ * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
+ */
+static void sw_render_fill(area_t * mem_area, color_t * mem, const area_t * fill_area, color_t color, opa_t opa)
+{
+    /*Set all row in vdb to the given color*/
+    cord_t row;
+    uint32_t col;
+    cord_t mem_width = area_get_width(mem_area);
+
+    /*Run simpler function without opacity*/
+    if(opa == OPA_COVER) {
+        /*Fill the first row with 'color'*/
+        for(col = fill_area->x1; col <= fill_area->x2; col++) {
+            mem[col] = color;
+        }
+        /*Copy the first row to all other rows*/
+        color_t * mem_first = &mem[fill_area->x1];
+        cord_t copy_size =  (fill_area->x2 - fill_area->x1 + 1) * sizeof(color_t);
+        mem += mem_width;
+
+        for(row = fill_area->y1 + 1; row <= fill_area->y2; row++) {
+            memcpy(&mem[fill_area->x1], mem_first, copy_size);
+            mem += mem_width;
+        }
+    }
+    /*Calculate with alpha too*/
+    else {
+        color_t bg_tmp = COLOR_BLACK;
+        color_t opa_tmp = color_mix(color, bg_tmp, opa);
+        for(row = fill_area->y1; row <= fill_area->y2; row++) {
+            for(col = fill_area->x1; col <= fill_area->x2; col++) {
+                /*If the bg color changed recalculate the result color*/
+                if(mem[col].full != bg_tmp.full) {
+                    bg_tmp = mem[col];
+                    opa_tmp = color_mix(color, bg_tmp, opa);
+                }
+                mem[col] = opa_tmp;
+            }
+            mem += mem_width;
+        }
+    }
+}
+
+/**
+ * Copy one line of pixel map into a memory using opacity
+ * @param mem a memory address. Copy 'map' here.
+ * @param map pointer to pixel map. Copy it to 'mem'.
+ * @param map_len number of pixels in 'map'
+ * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
+ */
+static inline void sw_render_map_line(color_t * mem, const color_t * map, cord_t map_len, opa_t opa)
+{
+    if(opa == OPA_COVER)  { /*no opa */
+        memcpy(mem, map, map_len * sizeof(color_t));
+    } else {    /*with opacity*/
+        cord_t x;
+        for(x = 0; x <= map_len; x ++) {
+            mem[x] = color_mix(map[x], mem[x], opa);
+        }
+    }
+}
 
 #endif
