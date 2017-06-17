@@ -35,6 +35,14 @@
 #error "LV: If LV_VDB_SIZE == 0 the antialaissing must be disabled"
 #endif
 
+#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < LV_HOR_RES && LV_ANTIALIAS == 0
+#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
+#endif
+
+#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < 2 *LV_HOR_RES && LV_ANTIALIAS != 0
+#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= (2 * LV_HOR_RES))"
+#endif
+
 /*New defines*/
 #define LV_OBJ_DEF_WIDTH  (80 * LV_DOWNSCALE)
 #define LV_OBJ_DEF_HEIGHT  (60 * LV_DOWNSCALE)
