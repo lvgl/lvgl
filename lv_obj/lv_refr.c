@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MONITOR_EXEC_TIME   1
+#define MONITOR_EXEC_TIME   0
 #if MONITOR_EXEC_TIME != 0
 #include <time.h>
 #include <stdio.h>
