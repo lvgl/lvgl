@@ -238,11 +238,14 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
 
     ext->style_btn_rel = rel;
     ext->style_btn_pr = pr;
-    lv_obj_t * btn = lv_obj_get_child(ext->btnh, NULL);
 
-    while(btn != NULL) {
-        lv_btn_set_styles(btn, rel, pr, NULL, NULL, NULL);
-        btn = lv_obj_get_child(mbox, btn);
+    if(ext->btnh != NULL) {
+        lv_obj_t * btn = lv_obj_get_child(ext->btnh, NULL);
+
+        while(btn != NULL) {
+            lv_btn_set_styles(btn, rel, pr, NULL, NULL, NULL);
+            btn = lv_obj_get_child(mbox, btn);
+        }
     }
 }
 
