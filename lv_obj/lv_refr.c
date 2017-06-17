@@ -16,7 +16,11 @@
 /*********************
  *      DEFINES
  *********************/
-
+#define MONITOR_EXEC_TIME   1
+#if MONITOR_EXEC_TIME != 0
+#include <time.h>
+#include <stdio.h>
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -187,7 +191,11 @@ static void lv_refr_join_area(void)
 static void lv_refr_areas(void)
 {
     uint32_t i;
-    
+
+#if MONITOR_EXEC_TIME != 0
+    clock_t start = clock();
+#endif
+
     for(i = 0; i < inv_buf_p; i++) {
         /*Refresh the unjoined areas*/
         if(inv_buf[i].joined == 0) {
@@ -198,9 +206,16 @@ static void lv_refr_areas(void)
             /*If VDB is used...*/
             lv_refr_area_with_vdb(&inv_buf[i].area);
 #endif
-            
         }
     }
+
+#if MONITOR_EXEC_TIME != 0
+    if(inv_buf_p != 0) {
+        clock_t end = clock();
+        float time_spent = (float)(end - start) / CLOCKS_PER_SEC;
+        printf("Exec time: %08f ms\n", (float)time_spent * 1000);
+    }
+#endif
 }
 
 #if LV_VDB_SIZE == 0
