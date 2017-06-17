@@ -454,9 +454,10 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 		if(obj_num == 0) {
 			if(child_rc != NULL) {
 				lv_obj_align(child_rc, cont, LV_ALIGN_IN_TOP_MID, 0, act_y);
+				h_row = lv_obj_get_height(child_rc);    /*Not set previously because of the early break*/
 			}
 		}
-		/*If here is only one object in the row then align it to the left*/
+		/*If here is only one object in the row then align it to the middle*/
 		else if (obj_num == 1) {
 			lv_obj_align(child_rs, cont, LV_ALIGN_IN_TOP_MID, 0, act_y);
 		}
