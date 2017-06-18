@@ -397,7 +397,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask, lv_style_
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, scale_txt, TXT_FLAG_NONE);
+        lv_draw_label(&label_cord, mask, style, scale_txt, TXT_FLAG_NONE, NULL);
     }
 }
 /**

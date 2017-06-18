@@ -136,21 +136,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	lv_cont_set_layout(liste, LV_CONT_LAYOUT_ROW_M);
 	lv_cont_set_fit(liste, false, true);
 
-	if(img_fn != NULL && img_fn[0] != '\0') {
-		lv_obj_t * img = lv_img_create(liste, NULL);
-		lv_img_set_file(img, img_fn);
-		lv_obj_set_style(img, ext->style_img);
-		lv_obj_set_click(img, false);
-	}
-
-	if(txt != NULL) {
-		lv_obj_t * label = lv_label_create(liste, NULL);
-		lv_label_set_text(label, txt);
-		lv_obj_set_style(label, ext->styles_btn[LV_BTN_STATE_REL]);
-		lv_obj_set_click(label, false);
-	}
-
-	/*Make the size adjustment*/
+    /*Make the size adjustment*/
     cord_t w = lv_obj_get_width(list);
     lv_style_t *  style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
     cord_t hpad_tot = style->hpad + style_scrl->hpad;
@@ -161,6 +147,23 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
         if(hpad_tot < ext->page.sb_width) w -= ext->page.sb_width - hpad_tot;
     }
     lv_obj_set_width(liste, w);
+
+	if(img_fn != NULL && img_fn[0] != '\0') {
+		lv_obj_t * img = lv_img_create(liste, NULL);
+		lv_img_set_file(img, img_fn);
+		lv_obj_set_style(img, ext->style_img);
+		lv_obj_set_click(img, false);
+	}
+
+	if(txt != NULL) {
+		lv_obj_t * label = lv_label_create(liste, NULL);
+		lv_style_t * style_label = lv_obj_get_style(label);
+		lv_label_set_text(label, txt);
+		lv_obj_set_style(label, ext->styles_btn[LV_BTN_STATE_REL]);
+		lv_obj_set_click(label, false);
+		lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
+		lv_obj_set_size(label, liste->cords.x2 - label->cords.x1, font_get_height(style_label->font));
+	}
 
 	return liste;
 }

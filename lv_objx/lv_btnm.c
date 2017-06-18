@@ -437,7 +437,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			area_tmp.x2 = area_tmp.x1 + txt_size.x;
 			area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], TXT_FLAG_NONE);
+			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], TXT_FLAG_NONE, NULL);
 			txt_i ++;
     	}
     }
