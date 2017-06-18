@@ -295,9 +295,10 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
     if(upscale == false) {
         if(transp == false) { /*Simply copy the pixels to the VDB*/
             cord_t row;
+            cord_t map_useful_w = area_get_width(&masked_a);
 
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                sw_render_map_line(&vdb_buf_tmp[masked_a.x1],  &map_p[masked_a.x1], map_width, opa);
+                sw_render_map_line(&vdb_buf_tmp[masked_a.x1],  &map_p[masked_a.x1], map_useful_w, opa);
                 map_p += map_width;               /*Next row on the map*/
                 vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
             }
@@ -375,10 +376,10 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
 
         /*The most simple case (but upscale): 0 opacity, no recolor, no transp. pixels*/
         if(transp == false && opa == OPA_COVER && recolor_opa == OPA_TRANSP) { 
-                cord_t map_col_start = masked_a.x1 >> 1;
-                cord_t map_col_end = masked_a.x2 >> 1;
-                cord_t map_col;
-                cord_t vdb_col = masked_a.x1;
+            cord_t map_col_start = masked_a.x1 >> 1;
+            cord_t map_col_end = masked_a.x2 >> 1;
+            cord_t map_col;
+            cord_t vdb_col = masked_a.x1;
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
                 map_col_start = masked_a.x1 >> 1;
                 map_col_end = masked_a.x2 >> 1;
