@@ -228,14 +228,22 @@ void lv_draw_triangle(const point_t * points, const area_t * mask_p, color_t col
  * @param style pointer to a style
  * @param txt 0 terminated text to write
  * @param flag settings for the text from 'txt_flag_t' enum
+ * @param offset text offset in x and y direction (NULL if unused)
+ *
  */
 void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_t * style,
-                    const char * txt, txt_flag_t flag)
+                    const char * txt, txt_flag_t flag, point_t * offset)
 {
     const font_t * font = style->font;
+    cord_t w;
 
-    cord_t w = area_get_width(cords_p);
-
+    if((flag & TXT_FLAG_EXPAND) == 0) {
+        w = area_get_width(cords_p);
+    } else {
+        point_t p;
+        txt_get_size(&p, txt, style->font, style->letter_space, style->line_space, CORD_MAX, flag);
+        w = p.x;
+    }
     /*Init variables for the first line*/
     cord_t line_length = 0;
     uint32_t line_start = 0;
@@ -257,8 +265,15 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
     uint16_t par_start;
     color_t recolor;
 
+    if(offset != NULL) {
+        pos.y += offset->y;
+    }
+
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
+        if(offset != NULL) {
+            pos.x += offset->x;
+        }
         /*Write all letter of a line*/
         cmd_state = CMD_STATE_WAIT;
 
@@ -305,8 +320,11 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
             if(cmd_state == CMD_STATE_IN) color = recolor;
             letter_fp(&pos, mask_p, font, letter, color, style->opa);
 
-            if((flag & TXT_FLAG_PWD) == 0 || txt[i + 1] == '\0')  pos.x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
-            else pos.x += (font_get_width(font, '*') >> FONT_ANTIALIAS) + style->letter_space;
+            if((flag & TXT_FLAG_PWD) == 0 || txt[i + 1] == '\0') {
+                pos.x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+            } else {
+                pos.x += (font_get_width(font, '*') >> FONT_ANTIALIAS) + style->letter_space;
+            }
         }
         /*Go to next line*/
         line_start = line_end;
@@ -337,7 +355,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 {
     if(fn == NULL) {
         lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL));
-        lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL), "No data", TXT_FLAG_NONE);
+        lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL), "No data", TXT_FLAG_NONE, NULL);
     } else {
         fs_file_t file;
         fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
@@ -417,7 +435,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 
         if(res != FS_RES_OK) {
             lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL));
-            lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL), "No data", TXT_FLAG_NONE);
+            lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL), "No data", TXT_FLAG_NONE, NULL);
         }
     }
 }

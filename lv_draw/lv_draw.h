@@ -53,9 +53,10 @@ void lv_draw_triangle(const point_t * points, const area_t * mask_p, color_t col
  * @param style_p pointer to a style
  * @param txt 0 terminated text to write
  * @param flags settings for the text from 'txt_flag_t' enum
+ * @param offset text offset in x and y direction (NULL if unused)
  */
 void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_t * style_p,
-                    const char * txt, txt_flag_t flag);
+                    const char * txt, txt_flag_t flag, point_t * offset);
 
 /**
  * Draw an image

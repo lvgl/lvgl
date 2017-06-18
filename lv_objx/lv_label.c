@@ -49,6 +49,8 @@
  **********************/
 static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mode_t mode);
 static void lv_label_refr_text(lv_obj_t * label);
+static void lv_label_set_offset_x(lv_obj_t * label, cord_t x);
+static void lv_label_set_offset_y(lv_obj_t * label, cord_t y);
 
 /**********************
  *  STATIC VARIABLES
@@ -84,7 +86,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->pwd = 0;
     ext->dot_end = LV_LABEL_DOT_END_INV;
     ext->long_mode = LV_LABEL_LONG_EXPAND;
-
+    ext->offset.x = 0;
+    ext->offset.y = 0;
 	lv_obj_set_design_f(new_label, lv_label_design);
 	lv_obj_set_signal_f(new_label, lv_label_signal);
 
@@ -139,6 +142,12 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
             	lv_label_set_text(label, NULL);
             	break;
 
+            case LV_SIGNAL_CORD_CHG:
+                if(lv_obj_get_width(label) != area_get_width(param) ||
+                  lv_obj_get_height(label) != area_get_height(param)) {
+                    lv_label_refr_text(label);
+                }
+                break;
 			default:
 				break;
     	}
@@ -277,11 +286,16 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
     	}
     }
 
-    /*Delete the scroller animations*/
-    if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
-    	anim_del(label, (anim_fp_t) lv_obj_set_x);
-    	anim_del(label, (anim_fp_t) lv_obj_set_y);
-    }
+    /*Delete the old animation (if exists)*/
+    anim_del(label, (anim_fp_t) lv_obj_set_x);
+    anim_del(label, (anim_fp_t) lv_obj_set_y);
+    anim_del(label, (anim_fp_t) lv_label_set_offset_x);
+    anim_del(label, (anim_fp_t) lv_label_set_offset_y);
+    ext->offset.x = 0;
+    ext->offset.y = 0;
+
+    if(long_mode == LV_LABEL_LONG_ROLL) ext->expand = 1;
+    else ext->expand = 0;
 
     ext->long_mode = long_mode;
     lv_label_refr_text(label);
@@ -385,6 +399,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
     if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
+    if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
 
     /*If the width will be expanded  the set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -453,6 +468,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
     if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
+    if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -525,9 +541,15 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
 		txt_flag_t flag = TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
         if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
+        if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
 
+        if(strcmp("Folder1", ext->txt) == 0) {
+            uint8_t i;
+            i = 0;
+            i++;
+        }
 
-		lv_draw_label(&cords, mask, lv_obj_get_style(label), ext->txt, flag);
+		lv_draw_label(&cords, mask, lv_obj_get_style(label), ext->txt, flag, &ext->offset);
 
 
     }
@@ -551,7 +573,8 @@ static void lv_label_refr_text(lv_obj_t * label)
     ext->dot_end = LV_LABEL_DOT_END_INV;    /*Initialize the dot end index*/
 
     /*If the width will be expanded set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND ||
+       ext->long_mode == LV_LABEL_LONG_SCROLL) {
         max_w = CORD_MAX;
     }
 
@@ -560,6 +583,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     txt_flag_t flag = TXT_FLAG_NONE;
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
     if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
+    if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
     txt_get_size(&size, ext->txt, font, style->letter_space, style->line_space, max_w, flag);
 
     /*Refresh the full size in expand mode*/
@@ -611,6 +635,43 @@ static void lv_label_refr_text(lv_obj_t * label)
             }
         }
     }
+    /*In roll mode keep the size but start offset animations*/
+    else if(ext->long_mode == LV_LABEL_LONG_ROLL) {
+        anim_t anim;
+        anim.var = label;
+        anim.repeat = 1;
+        anim.playback = 1;
+        anim.start = font_get_width(font, ' ') >> FONT_ANTIALIAS;
+        anim.act_time = 0;
+        anim.end_cb = NULL;
+        anim.path = anim_get_path(ANIM_PATH_LIN);
+        anim.playback_pause = LV_LABEL_SCROLL_PLAYBACK_PAUSE;
+        anim.repeat_pause = LV_LABEL_SCROLL_REPEAT_PAUSE;
+
+        bool hor_anim = false;
+        if(size.x > lv_obj_get_width(label)) {
+            anim.end = lv_obj_get_width(label) - size.x -
+                       (font_get_width(font, ' ') >> FONT_ANTIALIAS);
+            anim.fp = (anim_fp_t) lv_label_set_offset_x;
+            anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
+            anim_create(&anim);
+            hor_anim = true;
+        }
+
+        if(size.y > lv_obj_get_height(label)) {
+            anim.end =  lv_obj_get_height(label) - size.y -
+                               (font_get_height(font) - FONT_ANTIALIAS);
+            anim.fp = (anim_fp_t)lv_label_set_offset_y;
+
+            /*Different animation speed if horizontal animation is created too*/
+            if(hor_anim == false) {
+                anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
+            } else {
+                anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED_VER, anim.start, anim.end);
+            }
+            anim_create(&anim);
+        }
+    }
     /*In break mode only the height can change*/
     else if (ext->long_mode == LV_LABEL_LONG_BREAK) {
         lv_obj_set_height(label, size.y);
@@ -653,4 +714,18 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_obj_inv(label);
 }
 
+
+static void lv_label_set_offset_x(lv_obj_t * label, cord_t x)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    ext->offset.x = x;
+    lv_obj_inv(label);
+}
+
+static void lv_label_set_offset_y(lv_obj_t * label, cord_t y)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    ext->offset.y = y;
+    lv_obj_inv(label);
+}
 #endif
