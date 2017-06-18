@@ -360,6 +360,8 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 
             /*Round the coordinates with upscale*/
             if(upscale != false) {
+                if((mask_com.y1 & 0x1) != 0) mask_com.y1 -= 1; /*Can be only even*/
+                if((mask_com.y2 & 0x1) == 0) mask_com.y2 -= 1; /*Can be only odd*/
                 if((mask_com.x1 & 0x1) != 0) mask_com.x1 -= 1; /*Can be only even*/
                 if((mask_com.x2 & 0x1) == 0) mask_com.x2 -= 1; /*Can be only odd*/
             }
@@ -399,6 +401,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
                 color_t buf[LV_HOR_RES];
                 for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
                     res = fs_read(&file, buf, useful_data, &br);
+
                     map_fp(&line, &mask_com, buf, style->opa, header.transp, upscale,
                                           style->ccolor, style->img_recolor);
 
