@@ -325,7 +325,7 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
 			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
 
 #if LV_IMG_ENABLE_SYMBOLS == 0
-			    lv_draw_img(&cords_tmp, mask, style, opa, ext->fn);
+			    lv_draw_img(&cords_tmp, mask, style, ext->fn);
 #else
 			    if(sym == false) lv_draw_img(&cords_tmp, mask, style, ext->fn);
 			    else lv_draw_label(&cords_tmp, mask, style, ext->fn, TXT_FLAG_NONE, NULL);
