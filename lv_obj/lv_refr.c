@@ -299,7 +299,7 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
 
     /*Do the refreshing from the top object*/
     lv_refr_make(top_p, &start_mask);
-            
+
     /*Flush the content of the VDB*/ 
     lv_vdb_flush();
 }
