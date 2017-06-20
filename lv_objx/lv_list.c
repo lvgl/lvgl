@@ -157,12 +157,11 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 
 	if(txt != NULL) {
 		lv_obj_t * label = lv_label_create(liste, NULL);
-		lv_style_t * style_label = lv_obj_get_style(label);
 		lv_label_set_text(label, txt);
 		lv_obj_set_style(label, ext->styles_btn[LV_BTN_STATE_REL]);
 		lv_obj_set_click(label, false);
 		lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
-		lv_obj_set_size(label, liste->cords.x2 - label->cords.x1, font_get_height(style_label->font));
+		lv_obj_set_width(label, liste->cords.x2 - label->cords.x1);
 	}
 
 	return liste;
