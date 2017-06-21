@@ -56,6 +56,12 @@ typedef lv_action_res_t ( * lv_action_t) (struct __LV_OBJ_T * obj, lv_dispi_t * 
 void lv_dispi_init(void);
 
 /**
+ * Get an array with all the display inputs. Contains (INDEV_NUM elements)
+ * @return pointer to a an lv_dispi_t array.
+ */
+lv_dispi_t * lv_dispi_get_array(void);
+
+/**
  * Reset all display inputs
  */
 void lv_dispi_reset(void);

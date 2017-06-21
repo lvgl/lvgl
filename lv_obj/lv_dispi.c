@@ -41,6 +41,7 @@ static void dispi_drag_throw(lv_dispi_t * dispi_p);
 static ptask_t* dispi_task_p;
 static bool lv_dispi_reset_qry;
 static bool lv_dispi_reset_now;
+static lv_dispi_t dispi_array[INDEV_NUM];
 
 /**********************
  *      MACROS
@@ -63,6 +64,15 @@ void lv_dispi_init(void)
 #else
     dispi_task_p = ptask_create(dispi_task, 1, PTASK_PRIO_OFF); /*Not use lv_dispi*/
 #endif
+}
+
+/**
+ * Get an array with all the display inputs. Contains (INDEV_NUM elements)
+ * @return pointer to a an lv_dispi_t array.
+ */
+lv_dispi_t * lv_dispi_get_array(void)
+{
+    return dispi_array;
 }
 
 /**
@@ -135,15 +145,13 @@ void lv_dispi_wait_release(lv_dispi_t * dispi)
  */
 static void dispi_task(void * param)
 {
-
-	static lv_dispi_t dispi[INDEV_NUM];
 	cord_t x;
 	cord_t y;
 	uint8_t i;
 
 	for (i = 0; i < INDEV_NUM; i++) {
-		dispi[i].pressed = indev_get(i, &x, &y);
-		dispi_proc_point(&dispi[i], x, y);
+		dispi_array[i].pressed = indev_get(i, &x, &y);
+		dispi_proc_point(&dispi_array[i], x, y);
 	}
 
     /*If reset query occurred in this round then set a flag to 
