@@ -324,25 +324,25 @@ static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_dispi_t* dispi)
 
 static lv_action_res_t netw_ssid_rel_action( lv_obj_t * ta, lv_dispi_t* dispi)
 {
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CURSOR_MANAGE, netw_ssid_kb_close ,netw_ssid_kb_ok);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CUR_MANAGE, netw_ssid_kb_close ,netw_ssid_kb_ok);
     return LV_ACTION_RES_OK;
 }
 
 static lv_action_res_t netw_pwd_rel_action( lv_obj_t * ta, lv_dispi_t* dispi)
 {
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CURSOR_MANAGE, netw_pwd_kb_close ,netw_pwd_kb_ok);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CUR_MANAGE, netw_pwd_kb_close ,netw_pwd_kb_ok);
     return LV_ACTION_RES_OK;
 }
 
 static lv_action_res_t tcp_ip_rel_action( lv_obj_t * ta, lv_dispi_t* dispi)
 {
-    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CURSOR_MANAGE, tcp_ip_kb_close ,tcp_ip_kb_ok);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CUR_MANAGE, tcp_ip_kb_close ,tcp_ip_kb_ok);
     return LV_ACTION_RES_OK;
 }
 
 static lv_action_res_t tcp_port_rel_action( lv_obj_t * ta, lv_dispi_t* dispi)
 {
-    lv_app_kb_open(ta, LV_APP_KB_MODE_NUM | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CURSOR_MANAGE, tcp_port_kb_close ,tcp_port_kb_ok);
+    lv_app_kb_open(ta, LV_APP_KB_MODE_NUM | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CUR_MANAGE, tcp_port_kb_close ,tcp_port_kb_ok);
     return LV_ACTION_RES_OK;
 }
 
