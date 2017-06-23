@@ -419,7 +419,7 @@ static void tcp_port_kb_close(lv_obj_t * ta)
 
 static void list_cb(wifi_state_t state, const char * txt)
 {
-    if(state == WIFI_STATE_READY) {
+    if(state == WIFI_STATE_OK) {
         if(txt[0] == '\0') {
         lv_app_notice_add("WiFi network list ready");
             return;
@@ -444,7 +444,7 @@ static void list_cb(wifi_state_t state, const char * txt)
 
 static void tcp_transf_cb(wifi_state_t state, const char * txt)
 {
-    if(state == WIFI_STATE_READY) {
+    if(state == WIFI_STATE_OK) {
         uint16_t size =  txt[0] + ((txt[1] << 8) & 0xFF00);
         char buf[256];
         memcpy(buf, &txt[2], size);
