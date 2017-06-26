@@ -138,6 +138,11 @@ void lv_app_init(void)
     dsc = ll_ins_head(&app_dsc_ll);
     *dsc = lv_app_wifi_init();
 #endif
+    
+#if USE_LV_APP_GSM != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_gsm_init();
+#endif
 }
 
 /**

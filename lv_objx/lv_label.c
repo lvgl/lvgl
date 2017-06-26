@@ -141,13 +141,6 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
             case LV_SIGNAL_STYLE_CHG:
             	lv_label_set_text(label, NULL);
             	break;
-
-            case LV_SIGNAL_CORD_CHG:
-                if(lv_obj_get_width(label) != area_get_width(param) ||
-                  lv_obj_get_height(label) != area_get_height(param)) {
-                    lv_label_refr_text(label);
-                }
-                break;
 			default:
 				break;
     	}
