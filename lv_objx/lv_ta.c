@@ -26,8 +26,8 @@
 #define LV_TA_CUR_BLINK_TIME 400    /*ms*/
 #endif
 
-#define LV_TA_DEF_WIDTH     (120 * LV_DOWNSCALE)
-#define LV_TA_DEF_HEIGHT    (80 * LV_DOWNSCALE)
+#define LV_TA_DEF_WIDTH     (2 * LV_DPI)
+#define LV_TA_DEF_HEIGHT    (1 * LV_DPI)
 
 /**********************
  *      TYPEDEFS
