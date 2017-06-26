@@ -2,14 +2,15 @@
  * @file lv_vdraw.c
  * 
  */
-
-#include <lv_conf.h>
-#include <misc/gfx/area.h>
-#include <misc/gfx/font.h>
-#include <misc/gfx/color.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+
+#include "lv_conf.h"
+#include "misc/gfx/area.h"
+#include "misc/gfx/font.h"
+#include "misc/gfx/color.h"
+#include "hal/disp/disp.h"
 
 #if LV_VDB_SIZE != 0
 
@@ -31,8 +32,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void sw_render_fill(area_t * mem_area, color_t * mem, const area_t * fill_area, color_t color, opa_t opa);
-static inline void sw_render_map_line(color_t * mem, const color_t * map, cord_t map_len, opa_t opa);
+static void sw_color_cpy(color_t * dest, const color_t * src, uint32_t length, opa_t opa);
+static void sw_color_fill(area_t * mem_area, color_t * mem, const area_t * fill_area, color_t color, opa_t opa);
 
 /**********************
  *  STATIC VARIABLES
@@ -114,7 +115,29 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
     /*Move the vdb_tmp to the first row*/
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
-    sw_render_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
+#if DISP_HW_ACC == 0
+    sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
+#else
+	static color_t color_map[LV_HOR_RES];
+	static cord_t last_width = 0;
+    cord_t map_width = area_get_width(&vdb_rel_a);
+	if(color_map[0].full != color.full || last_width != map_width) {
+		uint16_t i;
+
+		for(i =0; i < map_width; i++) {
+			color_map[i].full = color.full;
+		}
+
+		last_width = map_width;
+	}
+    cord_t row;
+    for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+    	disp_color_cpy(&vdb_buf_tmp[vdb_rel_a.x1], color_map, map_width, opa);
+
+    	vdb_buf_tmp += vdb_width;
+    }
+#endif
+
 }
 
 /**
@@ -298,7 +321,11 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
             cord_t map_useful_w = area_get_width(&masked_a);
 
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                sw_render_map_line(&vdb_buf_tmp[masked_a.x1],  &map_p[masked_a.x1], map_useful_w, opa);
+#if DISP_HW_ACC == 0
+            	sw_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+#else
+            	disp_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+#endif
                 map_p += map_width;               /*Next row on the map*/
                 vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
             }
@@ -429,6 +456,27 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
  *   STATIC FUNCTIONS
  **********************/
 
+#if DISP_HW_ACC == 0
+
+/**
+ * Copy pixels to destination memory using opacity
+ * @param dest a memory address. Copy 'src' here.
+ * @param src pointer to pixel map. Copy it to 'dest'.
+ * @param length number of pixels in 'src'
+ * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
+ */
+static void sw_color_cpy(color_t * dest, const color_t * src, uint32_t length, opa_t opa)
+{
+    if(opa == OPA_COVER) {
+        memcpy(dest, src, length * sizeof(color_t));
+    } else {
+        cord_t col;
+        for(col = 0; col < length; col++) {
+        	dest[col] = color_mix(src[col], dest[col], opa);
+		}
+    }
+}
+
 /**
  *
  * @param mem_area coordinates of 'mem' memory area
@@ -437,7 +485,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
  * @param color fill color
  * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
  */
-static void sw_render_fill(area_t * mem_area, color_t * mem, const area_t * fill_area, color_t color, opa_t opa)
+static void sw_color_fill(area_t * mem_area, color_t * mem, const area_t * fill_area, color_t color, opa_t opa)
 {
     /*Set all row in vdb to the given color*/
     cord_t row;
@@ -477,24 +525,6 @@ static void sw_render_fill(area_t * mem_area, color_t * mem, const area_t * fill
         }
     }
 }
-
-/**
- * Copy one line of pixel map into a memory using opacity
- * @param mem a memory address. Copy 'map' here.
- * @param map pointer to pixel map. Copy it to 'mem'.
- * @param map_len number of pixels in 'map'
- * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
- */
-static inline void sw_render_map_line(color_t * mem, const color_t * map, cord_t map_len, opa_t opa)
-{
-    if(opa == OPA_COVER)  { /*no opa */
-        memcpy(mem, map, map_len * sizeof(color_t));
-    } else {    /*with opacity*/
-        cord_t x;
-        for(x = 0; x <= map_len; x ++) {
-            mem[x] = color_mix(map[x], mem[x], opa);
-        }
-    }
-}
+#endif /*DISP_HW_ACC == 0*/
 
 #endif
