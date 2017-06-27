@@ -230,6 +230,25 @@ void lv_list_set_sb_out(lv_obj_t * list, bool out)
 }
 
 /**
+ * Enable or disable the text rolling on a list element
+ * @param liste pinter to list element
+ * @param en true: enable text scrolling, false: disable text scrolling
+ */
+void lv_list_set_element_text_roll(lv_obj_t * liste, bool en)
+{
+    /*The last child is the label*/
+    lv_obj_t * label = lv_obj_get_child(liste, NULL);
+    if(en == false) {
+        lv_label_set_long_mode(label, LV_LABEL_LONG_DOTS);
+    } else {
+        lv_obj_set_width(label, liste->cords.x2 - label->cords.x1);
+        lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
+    }
+
+}
+
+
+/**
  * Set styles of the list elements of a list in each state
  * @param list pointer to list object
  * @param rel pointer to a style for releases state
