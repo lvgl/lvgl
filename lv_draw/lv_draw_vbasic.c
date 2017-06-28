@@ -405,18 +405,23 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
         if(transp == false && opa == OPA_COVER && recolor_opa == OPA_TRANSP) { 
             cord_t map_col_start = masked_a.x1 >> 1;
             cord_t map_col_end = masked_a.x2 >> 1;
-            cord_t map_col;
-            cord_t vdb_col = masked_a.x1;
-            for(row = masked_a.y1; row <= masked_a.y2; row++) {
+            cord_t vdb_col;         /*Col. in this row*/
+            cord_t vdb_col2;        /*Col. in next row*/
+            for(row = masked_a.y1; row <= masked_a.y2; row += 2) {
                 map_col_start = masked_a.x1 >> 1;
                 map_col_end = masked_a.x2 >> 1;
                 vdb_col = masked_a.x1;
-               for(map_col = map_col_start; map_col <= map_col_end; map_col ++, vdb_col += 2) {
+                vdb_col2 = masked_a.x1 + vdb_width;
+               for(map_col = map_col_start; map_col <= map_col_end; map_col ++, vdb_col += 2, vdb_col2 += 2) {
                    vdb_buf_tmp[vdb_col].full = map_p[map_col].full;
                    vdb_buf_tmp[vdb_col + 1].full = map_p[map_col].full;
+                   vdb_buf_tmp[vdb_col2].full = map_p[map_col].full;
+                   vdb_buf_tmp[vdb_col2 + 1].full = map_p[map_col].full;
                }
-               if((row & 0x1) != 0) map_p += map_width; /*Next row on the map*/
-               vdb_buf_tmp += vdb_width ;        /*Next row on the VDB*/
+
+               map_p += map_width;
+               vdb_buf_tmp += 2 * vdb_width ; /*+ 2 row on the VDB (2 rows are filled because of the upscale)*/
+
             }
         }
         /*Handle other cases*/
