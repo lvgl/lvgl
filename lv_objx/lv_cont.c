@@ -438,7 +438,14 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 		do {
 			if(lv_obj_get_hidden(child_rc) == false &&
 			   lv_obj_is_protected(child_rc, LV_PROTECT_POS) == false) {
-				if(w_row + lv_obj_get_width(child_rc) > w_obj) break;       /*If this object is already not fit then break*/
+			    /*If this object is already not fit then break*/
+				if(w_row + lv_obj_get_width(child_rc) > w_obj) {
+			        /*Step back one child because the last already not fit, so the previous is the closer*/
+			        if(child_rc != NULL  && obj_num != 0 ) {
+			            child_rc = ll_get_next(&cont->child_ll, child_rc);
+			        }
+				    break;
+				}
 				w_row += lv_obj_get_width(child_rc) + style->opad; /*Add the object width + opad*/
 				h_row = MATH_MAX(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
 				obj_num ++;
@@ -448,11 +455,6 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 			child_rc = ll_get_prev(&cont->child_ll, child_rc); /*Load the next object*/
 			if(obj_num == 0) child_rs = child_rc; /*If the first object was hidden (or too long) then set the next as first */
 		}while(child_rc != NULL);
-
-		/*Step back one child because the last already not fit (except follow protected)*/
-		if(child_rc != NULL  && obj_num != 0 && !lv_obj_is_protected(child_rc, LV_PROTECT_FOLLOW)) {
-		    child_rc = ll_get_next(&cont->child_ll, child_rc);
-		}
 
 		/*If the object is too long  then align it to the middle*/
 		if(obj_num == 0) {

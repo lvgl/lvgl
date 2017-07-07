@@ -108,10 +108,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_win_ext_t * copy_ext = lv_obj_get_ext(copy);
     	/*Create the objects*/
     	ext->header = lv_cont_create(new_win, copy_ext->header);
-        /*Move back the header because it is automatically moved to the scrollable */
-        lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
-        lv_obj_set_parent(ext->header, new_win);
-
     	ext->title = lv_label_create(ext->header, copy_ext->title);
     	ext->btnh = lv_cont_create(ext->header, copy_ext->btnh);
 
