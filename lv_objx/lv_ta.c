@@ -26,6 +26,10 @@
 #define LV_TA_CUR_BLINK_TIME 400    /*ms*/
 #endif
 
+#ifndef LV_TA_PWD_SHOW_TIME
+#define LV_TA_PWD_SHOW_TIME 1500    /*ms*/
+#endif
+
 #define LV_TA_DEF_WIDTH     (2 * LV_DPI)
 #define LV_TA_DEF_HEIGHT    (1 * LV_DPI)
 
@@ -38,7 +42,9 @@
  **********************/
 static bool lv_ta_design(lv_obj_t * ta, const area_t * mask, lv_design_mode_t mode);
 static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_design_mode_t mode);
-static void lv_ta_hide_cursor_anim(lv_obj_t * ta, uint8_t hide);
+static void cursor_blink_anim(lv_obj_t * ta, uint8_t hide);
+static void pwd_char_hider_anim(lv_obj_t * ta, uint8_t x);
+static void pwd_char_hider(lv_obj_t * ta);
 static void lv_ta_save_valid_cursor_x(lv_obj_t * ta);
 
 /**********************
@@ -76,6 +82,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
     ext->cursor_show = 1;
     ext->cursor_state = 0;
+    ext->pwd_mode = 0;
+    ext->pwd_tmp = NULL;
     ext->cursor_pos = 0;
     ext->cursor_valid_x = 0;
     ext->label = NULL;
@@ -115,7 +123,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create a cursor blinker animation*/
     anim_t a;
     a.var = new_ta;
-    a.fp = (anim_fp_t)lv_ta_hide_cursor_anim;
+    a.fp = (anim_fp_t)cursor_blink_anim;
     a.time = LV_TA_CUR_BLINK_TIME;
     a.act_time = 0;
     a.end_cb = NULL;
@@ -196,6 +204,9 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 
 	/*Test the new length: txt length + 1 (closing'\0') + 1 (c character)*/
     if((strlen(label_txt) + 2) > LV_TA_MAX_LENGTH) return;
+
+    if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
+
     char buf[LV_TA_MAX_LENGTH];
 
     /*Insert the character*/
@@ -211,6 +222,24 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 
 	/*It is a valid x step so save it*/
 	lv_ta_save_valid_cursor_x(ta);
+
+	if(ext->pwd_mode != 0) {
+        anim_t a;
+        a.var = ta;
+        a.fp = (anim_fp_t)pwd_char_hider_anim;
+        a.time = LV_TA_PWD_SHOW_TIME;
+        a.act_time = 0;
+        a.end_cb = (anim_cb_t)pwd_char_hider;
+        a.start = 0;
+        a.end = 1;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.path = anim_get_path(ANIM_PATH_STEP);
+        anim_create(&a);
+    }
+
 }
 
 /**
@@ -229,6 +258,8 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     /*Test the new length (+ 1 for the closing '\0')*/
     if((label_len + txt_len + 1) > LV_TA_MAX_LENGTH) return;
 
+    if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
+
     /*Insert the text*/
     char buf[LV_TA_MAX_LENGTH];
 
@@ -244,6 +275,23 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
 	/*It is a valid x step so save it*/
 	lv_ta_save_valid_cursor_x(ta);
+
+    if(ext->pwd_mode != 0) {
+        anim_t a;
+        a.var = ta;
+        a.fp = (anim_fp_t)pwd_char_hider_anim;
+        a.time = LV_TA_PWD_SHOW_TIME;
+        a.act_time = 0;
+        a.end_cb = (anim_cb_t)pwd_char_hider;
+        a.start = 0;
+        a.end = 1;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.path = anim_get_path(ANIM_PATH_STEP);
+        anim_create(&a);
+    }
 }
 
 /**
@@ -259,6 +307,23 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 
 	/*It is a valid x step so save it*/
 	lv_ta_save_valid_cursor_x(ta);
+
+    if(ext->pwd_mode != 0) {
+        anim_t a;
+        a.var = ta;
+        a.fp = (anim_fp_t)pwd_char_hider_anim;
+        a.time = LV_TA_PWD_SHOW_TIME;
+        a.act_time = 0;
+        a.end_cb = (anim_cb_t)pwd_char_hider;
+        a.start = 0;
+        a.end = 1;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.path = anim_get_path(ANIM_PATH_STEP);
+        anim_create(&a);
+    }
 }
 
 /**
@@ -419,7 +484,7 @@ void lv_ta_cursor_up(lv_obj_t * ta)
 }
 
 /**
- * Get the current cursor visibility.
+ * Set the cursor visibility.
  * @param ta pointer to a text area object
  * @return show true: show the cursor and blink it, false: hide cursor
  */
@@ -429,6 +494,38 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show)
     ext->cursor_show = show == false ? 0 : 1;
 }
 
+/**
+ * Enable/Disable password mode
+ * @param ta ointer to a text area object
+ * @param en true: enable, false: disable
+ */
+void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+
+    /*Pwd mode is now enabled*/
+    if(ext->pwd_mode == 0 && en != false) {
+        char * txt = lv_label_get_text(ext->label);
+        uint16_t txt_len = strlen(txt);
+        ext->pwd_tmp = dm_alloc(txt_len + 1);
+        strcpy(ext->pwd_tmp, txt);
+
+        uint16_t i;
+        for(i = 0; i < txt_len; i++) {
+            txt[i] = '*';       /*All char to '*'*/
+        }
+
+        lv_label_set_text(ext->label, NULL);
+    }
+    /*Pwd mode is now disabled*/
+    else if(ext->pwd_mode == 1 && en == false) {
+        lv_label_set_text(ext->label, ext->pwd_tmp);
+        dm_free(ext->pwd_tmp);
+        ext->pwd_tmp = NULL;
+    }
+
+    ext->pwd_mode = en == false ? 0 : 1;
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -441,7 +538,15 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show)
 const char * lv_ta_get_txt(lv_obj_t * ta)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
-	return lv_label_get_text(ext->label);
+
+	const char * txt;
+	if(ext->pwd_mode == 0) {
+	    txt = lv_label_get_text(ext->label);
+	} else {
+	    txt = ext->pwd_tmp;
+	}
+
+	return txt;
 }
 
 
@@ -477,6 +582,17 @@ bool lv_ta_get_cursor_show(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext(ta);
     return ext->cursor_show;
+}
+
+/**
+ * Get the password mode
+ * @param ta pointer to a text area object
+ * @return true: password mode is enabled, false: disabled
+ */
+bool lv_ta_get_pwd_mode(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    return ext->pwd_mode;
 }
 
 /**********************
@@ -565,13 +681,49 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
  * @param ta pointer to a text area
  * @param hide 1: hide the cursor, 0: show it
  */
-static void lv_ta_hide_cursor_anim(lv_obj_t * ta, uint8_t hide)
+static void cursor_blink_anim(lv_obj_t * ta, uint8_t hide)
 {
-	lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
-	if(hide != ta_ext->cursor_state) {
-        ta_ext->cursor_state = hide  == 0 ? 0 : 1;
-        if(ta_ext->cursor_show != 0) lv_obj_inv(ta);
+	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+	if(hide != ext->cursor_state) {
+        ext->cursor_state = hide  == 0 ? 0 : 1;
+        if(ext->cursor_show != 0) lv_obj_inv(ta);
 	}
+}
+
+
+/**
+ * Dummy function to animate char hiding in pwd mode.
+ * Does nothing, nut a function is required in car hiding anim.
+ * (pwd_char_hider callback do the real job)
+ * @param ta unused
+ * @param x unused
+ */
+static void pwd_char_hider_anim(lv_obj_t * ta, uint8_t x)
+{
+
+}
+
+/**
+ * Hide all characters (convert them to '*')
+ * @param ta: pointer to text area object
+ */
+static void pwd_char_hider(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    if(ext->pwd_mode != 0) {
+        char * txt = lv_label_get_text(ext->label);
+        int16_t txt_len = strlen(txt);
+        bool refr = false;
+        uint16_t i;
+        for(i = 0; i < txt_len; i++) {
+            if(txt[i] != '*') {
+                txt[i] = '*';
+                refr = true;
+            }
+        }
+
+        if(refr != false) lv_label_set_text(ext->label, NULL);
+    }
 }
 
 /**

@@ -123,7 +123,8 @@
 #define USE_LV_TA       1
 #if USE_LV_TA != 0
 #define LV_TA_MAX_LENGTH    256
-#define LV_TA_CUR_BLINK_TIME 400    /*ms*/
+#define LV_TA_CUR_BLINK_TIME 400     /*ms*/
+#define LV_TA_PWD_SHOW_TIME  1500    /*ms*/
 #endif
 
 /*************************
