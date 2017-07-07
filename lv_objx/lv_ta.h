@@ -40,9 +40,11 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;           /*Label of the text area*/
+    char * pwd_tmp;             /*Used to store the original text in password mode*/
     cord_t cursor_valid_x;      /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
     uint16_t cursor_pos;        /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
     uint8_t cursor_show :1;     /*Show or hide cursor */
+    uint8_t pwd_mode :1;        /*Replace characters with '*' */
     uint8_t cursor_state :1;    /*Indicates that the cursor is visible now or not (Handled by the library)*/
 }lv_ta_ext_t;
 
@@ -135,6 +137,13 @@ void lv_ta_cursor_up(lv_obj_t * ta);
 void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
 
 /**
+ * Enable/Disable password mode
+ * @param ta ointer to a text area object
+ * @param en true: enable, false: disable
+ */
+void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en);
+
+/**
  * Get the text of the i the text area
  * @param ta obj pointer to a text area object
  * @return pointer to the text
@@ -162,7 +171,12 @@ uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta);
  */
 bool lv_ta_get_cursor_show(lv_obj_t * ta);
 
-
+/**
+ * Get the password mode
+ * @param ta pointer to a text area object
+ * @return true: password mode is enabled, false: disabled
+ */
+bool lv_ta_get_pwd_mode(lv_obj_t * ta);
 
 /**********************
  *      MACROS

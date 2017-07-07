@@ -47,7 +47,6 @@ typedef struct
     point_t offset;
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
     uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/
-    uint8_t pwd  :1;                /*Convert letters to '*' when draw*/
     uint8_t expand  :1;             /*Force expand size when solving line length (used by the library with LV_LABEL_LONG_ROLL)*/
 }lv_label_ext_t;
 
@@ -128,7 +127,7 @@ void lv_label_set_pwd_mode(lv_obj_t * label, bool pwd);
  * @param label pointer to a label object
  * @return the text of the label
  */
-const char * lv_label_get_text(lv_obj_t * label);
+char * lv_label_get_text(lv_obj_t * label);
 
 /**
  * Get the long mode of a label

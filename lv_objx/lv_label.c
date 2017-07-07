@@ -83,7 +83,6 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->txt = NULL;
     ext->static_txt = 0;
     ext->recolor = 0;
-    ext->pwd = 0;
     ext->dot_end = LV_LABEL_DOT_END_INV;
     ext->long_mode = LV_LABEL_LONG_EXPAND;
     ext->offset.x = 0;
@@ -308,20 +307,6 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor)
     lv_label_refr_text(label);
 }
 
-/**
- * Enable the password mode
- * @param label pointer to a label object
- * @param pwd true: enable password mode, false: disable
- */
-void lv_label_set_pwd_mode(lv_obj_t * label, bool pwd)
-{
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
-
-    ext->pwd = pwd == false ? 0 : 1;
-
-    lv_label_refr_text(label);
-}
-
 /*=====================
  * Getter functions 
  *====================*/
@@ -331,7 +316,7 @@ void lv_label_set_pwd_mode(lv_obj_t * label, bool pwd)
  * @param label pointer to a label object
  * @return the text of the label
  */
-const char * lv_label_get_text(lv_obj_t * label)
+char * lv_label_get_text(lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
     
@@ -361,17 +346,6 @@ bool lv_label_get_recolor(lv_obj_t * label)
 }
 
 /**
- * Get the password mode
- * @param label pointer to a label object
- * @return true: password mode is enabled, false: disable
- */
-bool lv_label_get_pwd_mode(lv_obj_t * label)
-{
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
-    return ext->pwd == 0 ? false : true;
-}
-
-/**
  * Get the relative x and y coordinates of a letter
  * @param label pointer to a label object
  * @param index index of the letter (0 ... text length)
@@ -391,7 +365,6 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     txt_flag_t flag = TXT_FLAG_NONE;
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-    if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
     if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
 
     /*If the width will be expanded  the set the max length to very big */
@@ -424,8 +397,8 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
                 continue; /*Skip the letter is it is part of a command*/
             }
         }
-        if((flag & TXT_FLAG_PWD) == 0  || txt[i + 1] == '\0') x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
-        else x += (font_get_width(font, '*') >> FONT_ANTIALIAS) + style->letter_space;
+        x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+
 	}
 
 	if(style->txt_align == LV_TXT_ALIGN_MID) {
@@ -460,7 +433,6 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     txt_flag_t flag = TXT_FLAG_NONE;
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-    if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
     if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
 
     /*If the width will be expanded set the max length to very big */
@@ -495,8 +467,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-	    if((flag & TXT_FLAG_PWD) == 0  || txt[i + 1] == '\0') x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
-	    else x += (font_get_width(font, '*') >> FONT_ANTIALIAS) + style->letter_space;
+	    x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
 
 		if(pos->x < x) break;
 	}
@@ -533,7 +504,6 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
 		lv_label_ext_t * ext = lv_obj_get_ext(label);
 		txt_flag_t flag = TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-        if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
         if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
 
         if(strcmp("Folder1", ext->txt) == 0) {
@@ -575,7 +545,6 @@ static void lv_label_refr_text(lv_obj_t * label)
     point_t size;
     txt_flag_t flag = TXT_FLAG_NONE;
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-    if(ext->pwd != 0) flag |= TXT_FLAG_PWD;
     if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
     txt_get_size(&size, ext->txt, font, style->letter_space, style->line_space, max_w, flag);
 
