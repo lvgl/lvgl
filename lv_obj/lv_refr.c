@@ -12,6 +12,7 @@
 #include "misc/mem/fifo.h"
 #include "lv_refr.h"
 #include "lv_vdb.h"
+#include "hal/systick/systick.h"
 
 /*********************
  *      DEFINES
