@@ -242,8 +242,8 @@
 #define LV_APP_FILES_CHUNK_MAX_SIZE 1024    /*Max chunk size when the user sets it*/
 #endif /*USE_LV_APP_FILES != 0*/
 
-/*WiFi*/
-#define USE_LV_APP_WIFI     1
+/*WiFi (requires hal/wifi)*/
+#define USE_LV_APP_WIFI     0
 #if USE_LV_APP_WIFI != 0
 #define LV_APP_WIFI_SSID_DEF        "my_ssid"
 #define LV_APP_WIFI_PWD_DEF         "my_pasword"
@@ -252,8 +252,8 @@
 #define LV_APP_WIFI_AUTO_CONNECT    1       /*Try to connect at start up to the deafult SSID and IP:PORT*/
 #endif /*USE_LV_APP_WIFI != 0*/
 
-/*GSM*/
-#define USE_LV_APP_GSM    1
+/*GSM (requires hal/gsm)*/
+#define USE_LV_APP_GSM    0
 #if USE_LV_APP_GSM != 0
 #define LV_APP_GSM_APN_DEF          "my_apn"
 #define LV_APP_GSM_IP_DEF           "10.11.12.13"
