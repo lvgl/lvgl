@@ -44,6 +44,11 @@ void lv_refr_init(void);
  */
 void lv_inv_area(const area_t * area_p);
 
+/**
+ * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels
+ * @param cb pointer to a callback function (void my_refr_cb(uint32_t time_ms, uint32_t px_num))
+ */
+void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t));
 /**********************
  *   STATIC FUNCTIONS
  **********************/

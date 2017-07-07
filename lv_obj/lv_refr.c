@@ -16,11 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MONITOR_EXEC_TIME   0
-#if MONITOR_EXEC_TIME != 0
-#include <time.h>
-#include <stdio.h>
-#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -51,6 +47,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p);
  **********************/
 static lv_join_t inv_buf[LV_INV_FIFO_SIZE];
 static uint16_t inv_buf_p;
+static void (*monitor_cb)(uint32_t, uint32_t);
 
 /**********************
  *      MACROS
@@ -126,6 +123,15 @@ void lv_inv_area(const area_t * area_p)
     }
 }
 
+/**
+ * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels
+ * @param cb pointer to a callback function (void my_refr_cb(uint32_t time_ms, uint32_t px_num))
+ */
+void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
+{
+    monitor_cb = cb;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -191,10 +197,8 @@ static void lv_refr_join_area(void)
 static void lv_refr_areas(void)
 {
     uint32_t i;
-
-#if MONITOR_EXEC_TIME != 0
-    clock_t start = clock();
-#endif
+    uint32_t start = systick_get();
+    uint32_t px_num = 0;
 
     for(i = 0; i < inv_buf_p; i++) {
         /*Refresh the unjoined areas*/
@@ -206,16 +210,16 @@ static void lv_refr_areas(void)
             /*If VDB is used...*/
             lv_refr_area_with_vdb(&inv_buf[i].area);
 #endif
+            if(monitor_cb != NULL) px_num += area_get_size(&inv_buf[i].area);
         }
     }
 
-#if MONITOR_EXEC_TIME != 0
     if(inv_buf_p != 0) {
-        clock_t end = clock();
-        float time_spent = (float)(end - start) / CLOCKS_PER_SEC;
-        printf("Exec time: %08f ms\n", (float)time_spent * 1000);
+        if(monitor_cb != NULL) {
+            monitor_cb(systick_elaps(start), px_num);
+        }
     }
-#endif
+
 }
 
 #if LV_VDB_SIZE == 0
@@ -343,7 +347,7 @@ static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
 }
 
 /**
- * Make the refreshing from an object. Draw all its children and the yungers too. 
+ * Make the refreshing from an object. Draw all its children and the youngers too.
  * @param top_p pointer to an objects. Start the drawing from it.
  * @param mask_p pointer to an area, the objects will be drawn only here
  */
