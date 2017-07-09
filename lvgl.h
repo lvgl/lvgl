@@ -17,7 +17,7 @@ extern "C" {
 /*Test misc. module version*/
 #include "misc/misc.h"
 #define LV_MISC_REQ_MAJOR   4
-#define LV_MISC_REQ_MINOR   0
+#define LV_MISC_REQ_MINOR   1
 #define LV_MISC_REQ_PATCH   0
 
 #if MISC_VERSION_MAJOR != LV_MISC_REQ_MAJOR /*The version major has to match*/
