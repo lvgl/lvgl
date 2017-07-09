@@ -6,6 +6,10 @@
 #ifndef LV_LED_H
 #define LV_LED_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -87,6 +91,10 @@ uint8_t lv_led_get_bright(lv_obj_t * led);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_LED*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_LED_H*/

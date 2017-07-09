@@ -3,11 +3,19 @@
  * 
  */
 
+#ifndef LV_REFR_H
+#define LV_REFR_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
 #include <stdbool.h>
+
 
 /*********************
  *      DEFINES
@@ -49,6 +57,14 @@ void lv_inv_area(const area_t * area_p);
  * @param cb pointer to a callback function (void my_refr_cb(uint32_t time_ms, uint32_t px_num))
  */
 void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t));
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif /*LV_REFR_H*/

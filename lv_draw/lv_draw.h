@@ -6,6 +6,10 @@
 #ifndef LV_DRAW_H
 #define LV_DRAW_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -81,4 +85,9 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask_p,
  *      MACROS
  **********************/
 
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
+
+#endif  /*LV_DRAW_H*/

@@ -382,6 +382,8 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 	cord_t h_tot = 0;
 
 	LL_READ(cont->child_ll, child) {
+        if(lv_obj_get_hidden(child) != false ||
+           lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 		h_tot += lv_obj_get_height(child) + style->opad;
 		obj_num ++;
 	}

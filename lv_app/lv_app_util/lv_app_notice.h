@@ -6,6 +6,10 @@
 #ifndef LV_APP_NOTICE_H
 #define LV_APP_NOTICE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -58,6 +62,11 @@ lv_obj_t *  lv_app_notice_add(const char * format, ...);
  *      MACROS
  **********************/
 
+#endif  /*LV_APP_ENABLE*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
 #endif /*LV_APP_NOTICE_H*/
 
-#endif

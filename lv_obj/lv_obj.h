@@ -6,6 +6,10 @@
 #ifndef LV_OBJ_H
 #define LV_OBJ_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -127,7 +131,7 @@ typedef enum
     LV_PROTECT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
     LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
     LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_cont layout)*/
-    LV_PROTECT_FOLLOW    = 0x08, /*Prevent an object follow in automatic ordering (e.g. in lv_cont PRETTY layout)*/
+    LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
 }lv_protect_t;
 
 typedef enum
@@ -665,4 +669,9 @@ void * lv_obj_get_free_p(lv_obj_t * obj);
  *      MACROS
  **********************/
 
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
+
+#endif /*LV_OBJ_H*/

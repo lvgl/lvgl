@@ -6,6 +6,10 @@
 #ifndef LV_APP_SYSMON_H
 #define LV_APP_SYSMON_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -35,5 +39,9 @@ const lv_app_dsc_t * lv_app_sysmon_init(void);
  **********************/
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_SYSMON != 0*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* LV_APP_SYSMON_H */

@@ -6,6 +6,10 @@
 #ifndef LV_DRAW_RBASIC_H
 #define LV_DRAW_RBASIC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -68,4 +72,9 @@ void lv_rmap(const area_t * cords_p, const area_t * mask_p,
  *      MACROS
  **********************/
 
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
+
+#endif  /*LV_DRAW_RBASIC_H*/

@@ -49,6 +49,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p);
 static lv_join_t inv_buf[LV_INV_FIFO_SIZE];
 static uint16_t inv_buf_p;
 static void (*monitor_cb)(uint32_t, uint32_t);
+static uint32_t px_num;
 
 /**********************
  *      MACROS
@@ -146,12 +147,25 @@ void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
  */
 static void lv_refr_task(void * param)
 {
+
+    uint32_t start = systick_get();
+
     lv_refr_join_area();
     
     lv_refr_areas();
 
+    bool refr_done = false;
+    if(inv_buf_p != 0) refr_done = true;
     memset(inv_buf, 0, sizeof(inv_buf));
     inv_buf_p = 0;
+
+    /* In the callback lv_obj_inv can occur
+     * therefore be sure the inv_buf is cleared prior to it*/
+    if(refr_done != false) {
+        if(monitor_cb != NULL) {
+            monitor_cb(systick_elaps(start), px_num);
+        }
+    }
 }
 
 
@@ -200,9 +214,8 @@ static void lv_refr_join_area(void)
  */
 static void lv_refr_areas(void)
 {
+    px_num = 0;
     uint32_t i;
-    uint32_t start = systick_get();
-    uint32_t px_num = 0;
 
     for(i = 0; i < inv_buf_p; i++) {
         /*Refresh the unjoined areas*/
@@ -215,12 +228,6 @@ static void lv_refr_areas(void)
             lv_refr_area_with_vdb(&inv_buf[i].area);
 #endif
             if(monitor_cb != NULL) px_num += area_get_size(&inv_buf[i].area);
-        }
-    }
-
-    if(inv_buf_p != 0) {
-        if(monitor_cb != NULL) {
-            monitor_cb(systick_elaps(start), px_num);
         }
     }
 

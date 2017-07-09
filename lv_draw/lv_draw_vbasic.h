@@ -6,6 +6,10 @@
 #ifndef LV_DRAW_VBASIC_H
 #define LV_DRAW_VBASIC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -74,6 +78,10 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
  *      MACROS
  **********************/
 
+#endif  /*LV_VDB_SIZE != 0*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_DRAW_RBASIC_H*/

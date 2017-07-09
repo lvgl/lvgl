@@ -6,6 +6,10 @@
 #ifndef LV_VDB_H
 #define LV_VDB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -51,6 +55,10 @@ void lv_vdb_flush(void);
  *      MACROS
  **********************/
 
+#endif /*LV_VDB_SIZE != 0*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif /*LV_VDB_H*/

@@ -6,6 +6,10 @@
 #ifndef LV_MBOX_H
 #define LV_MBOX_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -161,6 +165,10 @@ lv_style_t * lv_mbox_get_style_btn(lv_obj_t * mbox, lv_btn_state_t state);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_MBOX*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_MBOX_H*/

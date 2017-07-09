@@ -6,6 +6,10 @@
 #ifndef LV_APP_PHANTOM_H
 #define LV_APP_PHANTOM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -38,5 +42,9 @@ const lv_app_dsc_t * lv_app_phantom_init(void);
  **********************/
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_PHANTOM != 0*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* LV_APP_PHANTOM_H */

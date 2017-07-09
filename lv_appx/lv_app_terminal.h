@@ -6,6 +6,10 @@
 #ifndef LV_APP_TERMINAL_H
 #define LV_APP_TERMINAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -42,5 +46,9 @@ const lv_app_dsc_t * lv_app_terminal_init(void);
  **********************/
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_TERMINAL != 0*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* LV_APP_TERMINAL_H */

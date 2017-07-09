@@ -6,6 +6,10 @@
 #ifndef LV_CONT_H
 #define LV_CONT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -107,6 +111,10 @@ bool lv_cont_get_vfit(lv_obj_t * cont);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_CONT*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_CONT_H*/

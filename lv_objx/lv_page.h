@@ -6,6 +6,10 @@
 #ifndef LV_PAGE_H
 #define LV_PAGE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -158,6 +162,10 @@ lv_style_t * lv_page_get_style_sb(lv_obj_t * page);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_PAGE*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_PAGE_H*/

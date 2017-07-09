@@ -26,7 +26,6 @@
 /*********************
  *      DEFINES
  *********************/
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -1472,6 +1471,7 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
         if(i->style_p == style_p || style_p == NULL) {
+            lv_obj_inv(i);
             i->signal_f(i, LV_SIGNAL_STYLE_CHG, NULL);
             lv_obj_inv(i);
         }

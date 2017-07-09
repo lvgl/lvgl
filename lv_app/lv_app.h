@@ -6,6 +6,10 @@
 #ifndef LV_APP_H
 #define LV_APP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -244,6 +248,10 @@ lv_app_style_t * lv_app_style_get(void);
 #include "lvgl/lv_appx/lv_app_gsm.h"
 #include "lvgl/lv_appx/lv_app_benchmark.h"
 
-#endif /*LV_APP_ENABLE != 0*/
+#endif /*LV_APP_ENABLE*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /*LV_APP_H*/

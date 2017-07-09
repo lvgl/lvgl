@@ -6,6 +6,10 @@
 #ifndef LV_GAUGE_H
 #define LV_GAUGE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -31,7 +35,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_GAUGE_MAX_NEEDLE     4   /*Max number of needles. Used in the style.*/
 
 /**********************
  *      TYPEDEFS
@@ -133,6 +136,10 @@ lv_style_t * lv_gauge_get_style_critical(lv_obj_t * gauge);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_GAUGE*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_GAUGE_H*/

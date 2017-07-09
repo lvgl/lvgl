@@ -6,6 +6,10 @@
 #ifndef LV_APP_KB_H
 #define LV_APP_KB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -57,6 +61,11 @@ void lv_app_kb_close(bool ok);
 /**********************
  *      MACROS
  **********************/
-#endif /*LV_APP_ENABLE != 0*/
+
+#endif /*LV_APP_ENABLE*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /*LV_APP_KB_H*/

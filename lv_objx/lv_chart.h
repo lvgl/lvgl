@@ -6,6 +6,10 @@
 #ifndef LV_CHART_H
 #define LV_CHART_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -190,6 +194,10 @@ opa_t lv_chart_get_dl_dark(lv_obj_t * chart, opa_t dark_eff);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_CHART*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_CHART_H*/

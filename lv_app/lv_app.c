@@ -133,6 +133,11 @@ void lv_app_init(void)
     dsc = ll_ins_head(&app_dsc_ll);
     *dsc = lv_app_files_init();
 #endif
+
+#if USE_LV_APP_BENCHMARK != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_benchmark_init();
+#endif
     
 #if USE_LV_APP_WIFI != 0
     dsc = ll_ins_head(&app_dsc_ll);
@@ -144,10 +149,6 @@ void lv_app_init(void)
     *dsc = lv_app_gsm_init();
 #endif
 
-#if USE_LV_APP_BENCHMARK != 0
-    dsc = ll_ins_head(&app_dsc_ll);
-    *dsc = lv_app_benchmark_init();
-#endif
 }
 
 /**
@@ -232,6 +233,7 @@ lv_obj_t * lv_app_sc_open(lv_app_inst_t * app)
         lv_label_set_long_mode(app->sc_title, LV_LABEL_LONG_DOTS);
         lv_label_set_text(app->sc_title, app->name);
         lv_obj_align_us(app->sc_title, NULL, LV_ALIGN_IN_TOP_MID, 0, LV_DPI / 20);
+        lv_obj_set_protect(app->sc_title, LV_PROTECT_POS);
 	} else {
 	    app->sc_title = NULL;
     }
@@ -565,7 +567,7 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 
 		lv_app_dsc_t ** dsc;
 		lv_obj_t * elem;
-		LL_READ(app_dsc_ll, dsc) {
+		LL_READ_BACK(app_dsc_ll, dsc) {
 		    if(((*dsc)->mode & LV_APP_MODE_NOT_LIST) == 0) {
                 elem = lv_list_add(app_list, NULL, (*dsc)->name, lv_app_menu_elem_rel_action);
                 lv_obj_set_free_p(elem, *dsc);

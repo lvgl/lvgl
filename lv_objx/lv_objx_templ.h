@@ -13,6 +13,10 @@
 #ifndef LV_TEMPL_H
 #define LV_TEMPL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -61,6 +65,10 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_TEMPL*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_TEMPL_H*/

@@ -6,6 +6,10 @@
 #ifndef LV_SLIDER_H
 #define LV_SLIDER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -91,6 +95,10 @@ lv_style_t *  lv_slider_get_style_knob(lv_obj_t * slider);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_SLIDER*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_SLIDER_H*/
