@@ -6,6 +6,10 @@
 #ifndef LV_STYLE_H
 #define LV_STYLE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -102,4 +106,9 @@ void lv_style_cpy(lv_style_t * dest, const lv_style_t * src);
  *      MACROS
  **********************/
 
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
+
+#endif  /*LV_STYLE_H*/

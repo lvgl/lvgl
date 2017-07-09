@@ -6,6 +6,10 @@
 #ifndef LV_DISPI_H
 #define LV_DISPI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -103,4 +107,9 @@ void lv_dispi_wait_release(lv_dispi_t * dispi);
  *      MACROS
  **********************/
 
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
+
+#endif  /*LV_DISPI_H*/

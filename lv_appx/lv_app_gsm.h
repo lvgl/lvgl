@@ -6,6 +6,10 @@
 #ifndef LV_APP_GSM_H
 #define LV_APP_GSM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -35,5 +39,9 @@ const lv_app_dsc_t * lv_app_gsm_init(void);
  **********************/
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* LV_APP_EXAMPLE_H */

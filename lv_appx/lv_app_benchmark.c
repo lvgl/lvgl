@@ -3,16 +3,6 @@
  *
  */
 
-/*TODO
- * Win: - Complex GUI with: bg, buttons, text, lines, few recolored images
- *      - Buttons: Bg ON/OFF, Alpha: ON/OFF, Start (make a scr refr), Continuous (benchmark)
- *      - Text: last px num, last refr_time, last px/us, avg px/us
- * Shorcut: - Show last px/us
- *
- * Use: lv_refr_set_monitor_cb();
- * Ignore results if px_num == shortcut_label_size because not its test is the goal
- */
-
 /*********************
  *      INCLUDES
  *********************/
@@ -20,11 +10,16 @@
 #if LV_APP_ENABLE != 0 && USE_LV_APP_BENCHMARK != 0
 
 #include "../lv_app/lv_app_util/lv_app_kb.h"
+#include "lvgl/lv_obj/lv_refr.h"
 #include <stdio.h>
 
 /*********************
  *      DEFINES
  *********************/
+#define SHADOW_WIDTH    (LV_DPI / 4)
+#define IMG_RECOLOR     OPA_30
+#define OPACITY         OPA_60
+
 
 /**********************
  *      TYPEDEFS
@@ -33,14 +28,25 @@
 /*Application specific data for an instance of this application*/
 typedef struct
 {
-
+    uint8_t wp          :1;
+    uint8_t recolor     :1;
+    uint8_t upscalse    :1;
+    uint8_t shadow      :1;
+    uint8_t opa         :1;
 }my_app_data_t;
 
 /*Application specific data a window of this application*/
 typedef struct
 {
+    lv_obj_t * wp;
     lv_obj_t * value_l;
-
+    lv_style_t style_wp;
+    lv_style_t style_value_l;
+    lv_style_t style_btn_rel;
+    lv_style_t style_btn_pr;
+    lv_style_t style_btn_trel;
+    lv_style_t style_btn_tpr;
+    lv_style_t style_btn_ina;
 }my_win_data_t;
 
 /*Application specific data for a shortcut of this application*/
@@ -61,8 +67,12 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
 
 static void refr_monitor(uint32_t time_ms, uint32_t px_num);
-static lv_action_res_t run_once_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
-
+static lv_action_res_t run_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t wp_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t recolor_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t upscale_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t opa_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -82,10 +92,9 @@ static lv_app_dsc_t my_app_dsc =
 	.win_data_size = sizeof(my_win_data_t),
 };
 
-static lv_style_t style_scrl;
-static lv_style_t style_btn_rel;
-static lv_style_t style_btn_pr;
-static lv_style_t style_opa;
+static lv_style_t style_win_scrl;
+static lv_style_t style_sc_btn_rel;
+static lv_style_t style_sc_btn_pr;
 
 static bool caputre_next;
 
@@ -109,10 +118,17 @@ const lv_app_dsc_t * lv_app_benchmark_init(void)
 
     lv_img_create_file("app_bm_wp", img_bg);
 
-    lv_style_get(LV_STYLE_BTN_REL, &style_btn_rel);
-    lv_style_get(LV_STYLE_BTN_PR, &style_btn_pr);
-    lv_style_get(LV_STYLE_TRANSP, &style_scrl);
-    style_scrl.opad = LV_DPI / 6;
+    lv_style_get(LV_STYLE_TRANSP, &style_win_scrl);
+    style_win_scrl.opad = 2 * SHADOW_WIDTH + SHADOW_WIDTH / 8 ;
+    style_win_scrl.hpad = SHADOW_WIDTH;
+    style_win_scrl.vpad = SHADOW_WIDTH;
+
+    lv_style_get(LV_STYLE_BTN_REL, &style_sc_btn_rel);
+    style_sc_btn_rel.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
+
+
+    lv_style_get(LV_STYLE_BTN_PR, &style_sc_btn_pr);
+    style_sc_btn_pr.font = font_get(LV_IMG_DEF_SYMBOL_FONT);
 
 	return &my_app_dsc;
 }
@@ -130,7 +146,6 @@ const lv_app_dsc_t * lv_app_benchmark_init(void)
 static void my_app_run(lv_app_inst_t * app, void * conf)
 {
     /*Initialize the application*/
-
 }
 
 /**
@@ -174,9 +189,18 @@ static void my_sc_open(lv_app_inst_t * app, lv_obj_t * sc)
 {
     my_sc_data_t * sc_data = app->sc_data;
 
+    lv_cont_set_layout(sc, LV_CONT_LAYOUT_CENTER);
+
     sc_data->label = lv_label_create(sc, NULL);
-	lv_label_set_text(sc_data->label, "Empty");
-	lv_obj_align(sc_data->label, NULL, LV_ALIGN_CENTER, 0, 0);
+	lv_label_set_text(sc_data->label, "N/A ms");
+
+	lv_obj_t * btn = lv_btn_create(sc, NULL);
+	lv_btn_set_rel_action(btn, run_rel_action);
+	lv_cont_set_fit(btn, true, true);
+	lv_btn_set_styles(btn, &style_sc_btn_rel, &style_sc_btn_pr, NULL, NULL, NULL);
+
+	lv_obj_t * btn_l = lv_label_create(btn, NULL);
+	lv_label_set_text(btn_l, SYMBOL_PLAY);
 }
 
 /**
@@ -198,17 +222,63 @@ static void my_sc_close(lv_app_inst_t * app)
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 {
     my_win_data_t * wdata = app->win_data;
+    my_app_data_t * adata = app->app_data;
 
-    lv_obj_set_style(lv_page_get_scrl(lv_win_get_page(win)), &style_scrl);
+    lv_style_get(LV_STYLE_BTN_INA, &wdata->style_value_l);
+    wdata->style_value_l.ccolor = COLOR_BLACK;
+    lv_style_get(LV_STYLE_BTN_REL, &wdata->style_btn_rel);
+    lv_style_get(LV_STYLE_BTN_PR, &wdata->style_btn_pr);
+    lv_style_get(LV_STYLE_BTN_TREL, &wdata->style_btn_trel);
+    lv_style_get(LV_STYLE_BTN_TPR, &wdata->style_btn_tpr);
+    lv_style_get(LV_STYLE_BTN_INA, &wdata->style_btn_ina);
+    lv_style_get(LV_STYLE_PLAIN, &wdata->style_wp);
+    wdata->style_wp.ccolor = COLOR_RED;//MAKE(0x10, 0x20, 0x30);
 
+    if(adata->opa == 0) {
+        wdata->style_btn_rel.opa = OPA_COVER;
+        wdata->style_btn_pr.opa  = OPA_COVER;
+        wdata->style_btn_trel.opa =OPA_COVER;
+        wdata->style_btn_tpr.opa = OPA_COVER;
+        wdata->style_btn_ina.opa = OPA_COVER;
+    } else {
+        wdata->style_btn_rel.opa = OPACITY;
+        wdata->style_btn_pr.opa  = OPACITY;
+        wdata->style_btn_trel.opa =OPACITY;
+        wdata->style_btn_tpr.opa = OPACITY;
+        wdata->style_btn_ina.opa = OPACITY;
+    }
 
-	lv_obj_t * wp;
-	wp = lv_img_create(win, NULL);
-	lv_obj_set_protect(wp, LV_PROTECT_PARENT);
-	lv_obj_set_parent(wp, lv_win_get_page(win));
-	lv_img_set_file(wp, "U:/app_bm_wp");
-	lv_obj_set_size(wp, LV_HOR_RES, LV_VER_RES - lv_obj_get_height(lv_win_get_header(win)));
-	lv_obj_set_pos(wp, 0, 0);
+    if(adata->shadow == 0) {
+        wdata->style_btn_rel.swidth =  0;
+        wdata->style_btn_pr.swidth  =  0;
+        wdata->style_btn_trel.swidth = 0;
+        wdata->style_btn_tpr.swidth =  0;
+        wdata->style_btn_ina.swidth =  0;
+    } else {
+        wdata->style_btn_rel.swidth =  SHADOW_WIDTH;
+        wdata->style_btn_pr.swidth  =  SHADOW_WIDTH;
+        wdata->style_btn_trel.swidth = SHADOW_WIDTH;
+        wdata->style_btn_tpr.swidth =  SHADOW_WIDTH;
+        wdata->style_btn_ina.swidth =  SHADOW_WIDTH;
+    }
+
+    if(adata->recolor == 0) {
+        wdata->style_wp.img_recolor =  OPA_TRANSP;
+    } else {
+        wdata->style_wp.img_recolor =  IMG_RECOLOR;
+    }
+
+    lv_obj_set_style(lv_page_get_scrl(lv_win_get_page(win)), &style_win_scrl);
+
+	wdata->wp = lv_img_create(win, NULL);
+	lv_obj_set_protect(wdata->wp, LV_PROTECT_PARENT);
+	lv_obj_set_parent(wdata->wp, lv_win_get_page(win));
+	lv_img_set_file(wdata->wp, "U:/app_bm_wp");
+	lv_obj_set_size(wdata->wp, LV_HOR_RES, LV_VER_RES - lv_obj_get_height(lv_win_get_header(win)));
+	lv_obj_set_pos(wdata->wp, 0, 0);
+	lv_obj_set_style(wdata->wp, &wdata->style_wp);
+	if(adata->wp == 0) lv_obj_set_hidden(wdata->wp, true);
+    if(adata->upscalse != 0) lv_img_set_upscale(wdata->wp, true);
 
 	/* The order is changed because the wallpaper's parent change
 	 * Therefore add the scrollable again */
@@ -220,38 +290,64 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win)
 
 	holder = lv_cont_create(win, NULL);
 	lv_cont_set_fit(holder, true, true);
-	lv_obj_set_style(holder, &style_btn_rel);
+	lv_obj_set_style(holder, &wdata->style_btn_ina);
+	lv_page_glue_obj(holder, true);
 
     wdata->value_l = lv_label_create(holder, NULL);
-	lv_label_set_text(wdata->value_l, "2345654 px in 23 ms\n12313 px/ms");
+    lv_obj_set_style(wdata->value_l, &wdata->style_value_l);
+	lv_label_set_text(wdata->value_l, "Screen load: N/A ms\nN/A px/ms");
 
 	lv_obj_t * btn;
 	btn = lv_btn_create(win, NULL);
+	lv_obj_set_free_p(btn, app);
+    lv_page_glue_obj(btn, true);
 	lv_cont_set_fit(btn, true, true);
-	lv_btn_set_styles(btn, &style_btn_rel, &style_btn_pr, &style_btn_rel, &style_btn_pr, NULL);
-	lv_btn_set_rel_action(btn, run_once_rel_action);
+	lv_btn_set_styles(btn, &wdata->style_btn_rel, &wdata->style_btn_pr, &wdata->style_btn_trel, &wdata->style_btn_tpr, NULL);
+	lv_btn_set_rel_action(btn, run_rel_action);
 
 	lv_obj_t * btn_l;
 	btn_l = lv_label_create(btn, NULL);
 	lv_label_set_text(btn_l, "Run\ntest!");
-    lv_obj_set_protect(btn, LV_PROTECT_FOLLOW);
+	lv_obj_set_protect(btn, LV_PROTECT_FOLLOW);
 
-    lv_obj_t * cb;
-    cb = lv_cb_create(win, NULL);
-    lv_cb_set_text(cb, "Wallpaper");
-    lv_btn_set_styles(cb, &style_btn_rel, &style_btn_pr, &style_btn_rel, &style_btn_pr, NULL);
+    btn = lv_btn_create(win, btn);
+    lv_btn_set_tgl(btn, true);
+    lv_obj_clr_protect(btn, LV_PROTECT_FOLLOW);
+    if(adata->wp != 0) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+    else lv_btn_set_state(btn, LV_BTN_STATE_REL);
+    lv_btn_set_rel_action(btn, wp_rel_action);
+    btn_l = lv_label_create(btn, btn_l);
+    lv_label_set_text(btn_l, "Wallpaper");
 
-    cb = lv_cb_create(win, cb);
-    lv_cb_set_text(cb, "Img. recolor");
 
-    cb = lv_cb_create(win, cb);
-    lv_cb_set_text(cb, "Wp. upscale");
+    btn = lv_btn_create(win, btn);
+    if(adata->recolor != 0) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+    else lv_btn_set_state(btn, LV_BTN_STATE_REL);
+    lv_btn_set_rel_action(btn, recolor_rel_action);
+    btn_l = lv_label_create(btn, btn_l);
+    lv_label_set_text(btn_l, "Wp. recolor!");
 
-    cb = lv_cb_create(win, cb);
-    lv_cb_set_text(cb, "Shadow");
 
-    cb = lv_cb_create(win, cb);
-    lv_cb_set_text(cb, "Opacity");
+    btn = lv_btn_create(win, btn);
+    if(adata->upscalse != 0) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+    else lv_btn_set_state(btn, LV_BTN_STATE_REL);
+    lv_btn_set_rel_action(btn, upscale_rel_action);
+    btn_l = lv_label_create(btn, btn_l);
+    lv_label_set_text(btn_l, "Wp. upscalse!");
+
+
+    btn = lv_btn_create(win, btn);
+    if(adata->shadow != 0) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+    lv_btn_set_rel_action(btn, shadow_rel_action);
+    btn_l = lv_label_create(btn, btn_l);
+    lv_label_set_text(btn_l, "Shadow");
+
+    btn = lv_btn_create(win, btn);
+    if(adata->opa != 0) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+    else lv_btn_set_state(btn, LV_BTN_STATE_REL);
+    lv_btn_set_rel_action(btn, opa_rel_action);
+    btn_l = lv_label_create(btn, btn_l);
+    lv_label_set_text(btn_l, "Opacity");
 
 }
 
@@ -274,13 +370,22 @@ static void refr_monitor(uint32_t time_ms, uint32_t px_num)
         lv_app_inst_t * app = NULL;
         app = lv_app_get_next(app, &my_app_dsc);
 
-        char buf[256];
-        if(time_ms != 0) sprintf(buf, "%d px in %d ms\n%d px/ms", px_num, time_ms, px_num/time_ms);
-        else sprintf(buf, "%d px in %d ms\nN/A px/ms", px_num, time_ms);
+        char w_buf[256];
+        if(time_ms != 0) sprintf(w_buf, "Screen load: %d ms\n%d px/ms", time_ms, px_num/time_ms);
+        else sprintf(w_buf, "Screen load: %d ms\nN/A px/ms", time_ms);
+
+        char s_buf[16];
+        sprintf(s_buf, "%d ms", time_ms);
+
         while(app != NULL) {
             if(app->win_data != NULL) {
                my_win_data_t * wdata = app->win_data;
-               lv_label_set_text(wdata->value_l, buf);
+               lv_label_set_text(wdata->value_l, w_buf);
+            }
+
+            if(app->sc_data != NULL) {
+               my_sc_data_t * sdata = app->sc_data;
+               lv_label_set_text(sdata->label, s_buf);
             }
 
             app = lv_app_get_next(app, &my_app_dsc);
@@ -290,7 +395,8 @@ static void refr_monitor(uint32_t time_ms, uint32_t px_num)
         caputre_next = false;
     }
 }
-static lv_action_res_t run_once_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+
+static lv_action_res_t run_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
 {
     lv_obj_inv(lv_scr_act());
     caputre_next = true;
@@ -298,6 +404,123 @@ static lv_action_res_t run_once_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 
+static lv_action_res_t wp_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+
+    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    my_win_data_t * wdata = app->win_data;
+    my_app_data_t * adata = app->app_data;
+
+    if(lv_btn_get_state(btn) == LV_BTN_STATE_TREL) {
+        adata->wp = 1;
+        lv_obj_set_hidden(wdata->wp, false);
+    } else {
+        adata->wp = 0;
+        lv_obj_set_hidden(wdata->wp, true);
+    }
+
+    return LV_ACTION_RES_OK;
+}
+
+static lv_action_res_t recolor_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    my_win_data_t * wdata = app->win_data;
+    my_app_data_t * adata = app->app_data;
+
+    if(lv_btn_get_state(btn) == LV_BTN_STATE_TREL) {
+        adata->recolor = 1;
+        wdata->style_wp.img_recolor = IMG_RECOLOR;
+    } else {
+        adata->recolor = 0;
+        wdata->style_wp.img_recolor = OPA_TRANSP;
+    }
+
+    lv_obj_refr_style(wdata->wp);
+
+    return LV_ACTION_RES_OK;
+}
+
+static lv_action_res_t upscale_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    my_win_data_t * wdata = app->win_data;
+    my_app_data_t * adata = app->app_data;
+
+    if(lv_btn_get_state(btn) == LV_BTN_STATE_TREL) {
+        adata->upscalse = 1;
+        lv_img_set_upscale(wdata->wp, true);
+    } else {
+        adata->upscalse = 0;
+        lv_img_set_upscale(wdata->wp, false);
+    }
+
+    lv_obj_set_size(wdata->wp, LV_HOR_RES, LV_VER_RES - lv_obj_get_height(lv_win_get_header(app->win)));
+
+    return LV_ACTION_RES_OK;
+}
+
+static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    my_win_data_t * wdata = app->win_data;
+    my_app_data_t * adata = app->app_data;
+
+    if(lv_btn_get_state(btn) == LV_BTN_STATE_TREL) {
+        adata->shadow = 1;
+        wdata->style_btn_rel.swidth = SHADOW_WIDTH;
+        wdata->style_btn_pr.swidth  =  SHADOW_WIDTH;
+        wdata->style_btn_trel.swidth = SHADOW_WIDTH;
+        wdata->style_btn_tpr.swidth =  SHADOW_WIDTH;
+        wdata->style_btn_ina.swidth =  SHADOW_WIDTH;
+    } else {
+        adata->opa = 0;
+        wdata->style_btn_rel.swidth = 0;
+        wdata->style_btn_pr.swidth  = 0;
+        wdata->style_btn_trel.swidth =0;
+        wdata->style_btn_tpr.swidth = 0;
+        wdata->style_btn_ina.swidth = 0;
+    }
+
+    lv_style_refr_objs(&wdata->style_btn_rel);
+    lv_style_refr_objs(&wdata->style_btn_pr);
+    lv_style_refr_objs(&wdata->style_btn_trel);
+    lv_style_refr_objs(&wdata->style_btn_tpr);
+    lv_style_refr_objs(&wdata->style_btn_ina);
+
+    return LV_ACTION_RES_OK;
+}
+
+static lv_action_res_t opa_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+{
+    lv_app_inst_t * app = lv_obj_get_free_p(btn);
+    my_win_data_t * wdata = app->win_data;
+    my_app_data_t * adata = app->app_data;
+
+    if(lv_btn_get_state(btn) == LV_BTN_STATE_TREL) {
+        adata->opa = 1;
+        wdata->style_btn_rel.opa = OPACITY;
+        wdata->style_btn_pr.opa  = OPACITY;
+        wdata->style_btn_trel.opa =OPACITY;
+        wdata->style_btn_tpr.opa = OPACITY;
+        wdata->style_btn_ina.opa = OPACITY;
+    } else {
+        adata->opa = 0;
+        wdata->style_btn_rel.opa = OPA_COVER;
+        wdata->style_btn_pr.opa  = OPA_COVER;
+        wdata->style_btn_trel.opa =OPA_COVER;
+        wdata->style_btn_tpr.opa = OPA_COVER;
+        wdata->style_btn_ina.opa = OPA_COVER;
+    }
+
+    lv_style_refr_objs(&wdata->style_btn_rel);
+    lv_style_refr_objs(&wdata->style_btn_pr);
+    lv_style_refr_objs(&wdata->style_btn_trel);
+    lv_style_refr_objs(&wdata->style_btn_tpr);
+    lv_style_refr_objs(&wdata->style_btn_ina);
+
+    return LV_ACTION_RES_OK;
+}
 
 
 /*Exceptionally store the data because the big array would be bothering*/

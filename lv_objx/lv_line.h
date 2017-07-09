@@ -6,6 +6,10 @@
 #ifndef LV_LINE_H
 #define LV_LINE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -110,6 +114,10 @@ bool lv_line_get_upscale(lv_obj_t * line);
  *      MACROS
  **********************/
 
+#endif /*USE_LV_LINE*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_LINE_H*/

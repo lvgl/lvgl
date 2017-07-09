@@ -6,6 +6,10 @@
 #ifndef LV_TA_H
 #define LV_TA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -182,6 +186,10 @@ bool lv_ta_get_pwd_mode(lv_obj_t * ta);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_TA_H*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_TA_H*/

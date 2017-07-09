@@ -6,6 +6,10 @@
 #ifndef LV_BTN_H
 #define LV_BTN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -156,6 +160,10 @@ lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_BTN*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_BTN_H*/

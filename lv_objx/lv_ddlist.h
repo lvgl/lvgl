@@ -6,6 +6,10 @@
 #ifndef LV_DDLIST_H
 #define LV_DDLIST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -122,7 +126,13 @@ const char * lv_ddlist_get_options(lv_obj_t * ddlist);
  */
 uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
 
+/**
+ * Get the current selected option as a string
+ * @param ddlist pointer to ddlist object
+ * @param buf pointer to an array to store the string
+ */
 void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
+
 /**
  * Get the auto size attribute.
  * @param ddlist pointer to a drop down list object
@@ -141,6 +151,10 @@ lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_DDLIST*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_DDLIST_H*/

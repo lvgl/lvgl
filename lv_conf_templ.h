@@ -109,6 +109,9 @@
 
 /*Gauge (dependencies:bar, lmeter; misc: trigo)*/
 #define USE_LV_GAUGE    1
+#if USE_LV_GAUGE != 0
+#define LV_GAUGE_MAX_NEEDLE     4   /*Max number of needles. Used in the style.*/
+#endif
 
 /*Chart (dependencies: -)*/
 #define USE_LV_CHART    1
@@ -149,7 +152,6 @@
 /*Slider (dependencies: lv_bar)*/
 #define USE_LV_SLIDER    1
 
-
 /*==================
  *  LV APP SETTINGS
  * =================*/
@@ -163,8 +165,8 @@
  *****************************/
 #define LV_APP_DESKTOP      1                   /*Create a desktop-like environment*/
 
-#define LV_APP_SC_WIDTH     (LV_HOR_RES / 4)    /*Shortcut width*/
-#define LV_APP_SC_HEIGHT    (LV_VER_RES / 3)    /*Shortcut height*/
+#define LV_APP_SC_WIDTH     (LV_DPI * 2)        /*Shortcut width*/
+#define LV_APP_SC_HEIGHT    (3 * LV_DPI / 2)    /*Shortcut height*/
 #define LV_APP_FONT_SMALL   FONT_DEJAVU_20      /*A small font*/
 #define LV_APP_FONT_MEDIUM  FONT_DEFAULT        /*A medium font*/
 #define LV_APP_FONT_LARGE   FONT_DEJAVU_40      /*A large font*/
@@ -241,6 +243,12 @@
 #define LV_APP_FILES_CHUNK_DEF_TIME 100     /*Delay between sent chunks*/
 #define LV_APP_FILES_CHUNK_MAX_SIZE 1024    /*Max chunk size when the user sets it*/
 #endif /*USE_LV_APP_FILES != 0*/
+
+/*Benchmark*/
+#define USE_LV_APP_BENCHMARK     1
+#if USE_LV_APP_BENCHMARK != 0
+/*No settings*/
+#endif
 
 /*WiFi (requires hal/wifi)*/
 #define USE_LV_APP_WIFI     0

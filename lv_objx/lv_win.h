@@ -6,6 +6,10 @@
 #ifndef LV_WIN_H
 #define LV_WIN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -168,5 +172,9 @@ lv_obj_t * lv_win_get_from_cbtn(lv_obj_t * ctrl_btn);
  **********************/
 
 #endif /*USE_LV_WIN*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /*LV_WIN_H*/

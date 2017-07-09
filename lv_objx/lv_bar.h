@@ -6,6 +6,10 @@
 #ifndef LV_BAR_H
 #define LV_BAR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -118,6 +122,10 @@ lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_BAR*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif /*LV_BAR_H*/

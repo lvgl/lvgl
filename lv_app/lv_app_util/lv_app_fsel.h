@@ -6,6 +6,10 @@
 #ifndef LV_APP_FSEL_H
 #define LV_APP_FSEL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -62,6 +66,10 @@ void lv_app_fsel_close(void);
  *      MACROS
  **********************/
 
-#endif /*LV_APP_ENABLE != 0*/
+#endif /*LV_APP_ENABLE*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /*LV_APP_FSEL_H*/

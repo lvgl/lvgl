@@ -6,6 +6,10 @@
 #ifndef LV_LIST_H
 #define LV_LIST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -163,6 +167,10 @@ lv_style_t * lv_list_get_style_img(lv_obj_t * list, lv_btn_state_t state);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_LIST*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_LIST_H*/

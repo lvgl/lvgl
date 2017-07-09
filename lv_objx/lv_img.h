@@ -6,6 +6,10 @@
 #ifndef LV_IMG_H
 #define LV_IMG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -136,6 +140,10 @@ bool lv_img_get_upscale(lv_obj_t * img);
 /*Use this macro to declare an image in a c file*/
 #define LV_IMG_DECLARE(var_name) extern const color_int_t var_name[];
 
+#endif  /*USE_LV_IMG*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_IMG_H*/

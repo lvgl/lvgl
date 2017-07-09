@@ -6,6 +6,10 @@
 #ifndef LV_LMETER_H
 #define LV_LMETER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -88,6 +92,10 @@ uint16_t lv_lmeter_get_scale_angle(lv_obj_t * lmeter);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_LMETER*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_LMETER_H*/

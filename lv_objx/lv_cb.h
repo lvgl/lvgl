@@ -6,6 +6,10 @@
 #ifndef LV_CB_H
 #define LV_CB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -87,6 +91,10 @@ lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_CB*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_CB_H*/

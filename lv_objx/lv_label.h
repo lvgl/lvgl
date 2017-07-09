@@ -6,6 +6,10 @@
 #ifndef LV_LABEL_H
 #define LV_LABEL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -170,6 +174,10 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos);
  *      MACROS
  **********************/
 
+#endif  /*USE_LV_LABEL*/
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif
+#endif  /*LV_LABEL_H*/

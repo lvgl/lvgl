@@ -21,6 +21,10 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_GAUGE_MAX_NEEDLE
+#define LV_GAUGE_MAX_NEEDLE     4   /*Max number of needles. Used in the style.*/
+#endif
+
 #define LV_GAUGE_DEF_NEEDLE_COLOR   COLOR_RED
 
 /**********************

@@ -6,6 +6,10 @@
 #ifndef LVGL_H
 #define LVGL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -55,7 +59,7 @@
  *      DEFINES
  *********************/
 #define LVGL_VERSION_MAJOR  4
-#define LVGL_VERSION_MINOR  0
+#define LVGL_VERSION_MINOR  1
 #define LVGL_VERSION_PATH   0
 
 
