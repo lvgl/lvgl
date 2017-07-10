@@ -229,7 +229,7 @@ void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
  * @param ddlist pointer to a drop down list object
  * @param style pointer the new style of the select rectangle
  */
-void lv_dlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style)
+void lv_ddlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     ext->style_sel = style;

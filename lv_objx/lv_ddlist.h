@@ -110,7 +110,7 @@ void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size);
  * @param ddlist pointer to a drop down list object
  * @param style pointer the new style of the select rectangle
  */
-void lv_dlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style);
+void lv_ddlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style);
 
 /**
  * Get the options of a drop down list
