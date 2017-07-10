@@ -33,6 +33,8 @@ typedef struct
     char set_pwd[64];
     char set_ip[32];
     char set_port[16];
+    uint8_t * last_msg_dp;
+    uint16_t last_msg_size;
 }my_app_data_t;
 
 /*Application specific data a window of this application*/
@@ -151,6 +153,8 @@ static void my_app_run(lv_app_inst_t * app, void * conf)
     strcpy(adata->set_pwd, LV_APP_WIFI_PWD_DEF);
     strcpy(adata->set_ip, LV_APP_WIFI_IP_DEF);
     strcpy(adata->set_port, LV_APP_WIFI_PORT_DEF);
+    adata->last_msg_dp = NULL;
+    adata->last_msg_size = 0;
 }
 
 /**
@@ -177,6 +181,13 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 {
 	if(type == LV_APP_COM_TYPE_CHAR) {      /*data: string*/
         app_act_com = app_rec;
+        my_app_data_t * adata = app_act_com->app_data;
+        if(adata->last_msg_dp != NULL) dm_free(adata->last_msg_dp); 
+        
+        adata->last_msg_dp = dm_alloc(size);
+        memcpy(adata->last_msg_dp, data, size);
+        adata->last_msg_size = size;
+        
         wifi_tcp_transf(data, size, tcp_transf_cb);
 	}
 }
@@ -286,12 +297,23 @@ static void wifi_state_monitor_task(void * param)
     static wifimng_state_t state_prev = WIFIMNG_STATE_WAIT;
     wifimng_state_t state_act =  wifimng_get_state();
     
+    
     if(state_prev != state_act && state_act == WIFIMNG_STATE_READY) {
         lv_app_notice_add("WiFi connected to:\n%s\n%s:%s", 
                            wifimng_get_last_ssid(), wifimng_get_last_ip(), wifimng_get_last_port());
         win_title_refr();
     }
     
+    /* The wifi should be busy if there is sg. to send. 
+     * It means fail during last send. Try again*/
+    if(app_act_com != NULL) {
+        if(wifi_busy() ==  false && state_act == WIFIMNG_STATE_READY) {
+            /*Try to send the message again*/
+            lv_app_notice_add("Resend WiFi message");
+            my_app_data_t * adata = app_act_com->app_data;
+            wifi_tcp_transf(adata->last_msg_dp, adata->last_msg_size, tcp_transf_cb);
+        }
+    }
     
     state_prev = state_act;
 }
@@ -451,13 +473,17 @@ static void tcp_transf_cb(wifi_state_t state, const char * txt)
         memcpy(buf, &txt[2], size);
         buf[size] = '\0';
         lv_app_com_send(app_act_com, LV_APP_COM_TYPE_CHAR, &txt[2], size);
+        my_app_data_t * adata = app_act_com->app_data;
+        dm_free(adata->last_msg_dp);
+        adata->last_msg_dp = NULL;
+        adata->last_msg_size = 0;
+        app_act_com = NULL;
     }else if(state == WIFI_STATE_ERROR) {
         lv_app_notice_add("WiFi TCP transfer error\n%s", txt);
         lv_app_notice_add("Reconnecting to WiFi...");
         wifimng_reconnect();
     }
     
-    app_act_com = NULL;
 }
 
 
