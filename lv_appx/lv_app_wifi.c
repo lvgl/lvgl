@@ -299,7 +299,6 @@ static void wifi_state_monitor_task(void * param)
     static wifimng_state_t state_prev = WIFIMNG_STATE_WAIT;
     wifimng_state_t state_act =  wifimng_get_state();
     
-    
     if(state_prev != state_act && state_act == WIFIMNG_STATE_READY) {
         lv_app_notice_add("WiFi connected to:\n%s\n%s:%s", 
                            wifimng_get_last_ssid(), wifimng_get_last_ip(), wifimng_get_last_port());
@@ -316,7 +315,6 @@ static void wifi_state_monitor_task(void * param)
             wifi_tcp_transf(adata->last_msg_dp, adata->last_msg_size, tcp_transf_cb);
         }
     }
-    
     state_prev = state_act;
 }
 
@@ -485,7 +483,6 @@ static void tcp_transf_cb(wifi_state_t state, const char * txt)
         lv_app_notice_add("Reconnecting to WiFi...");
         wifimng_reconnect();
     }
-    
 }
 
 
@@ -501,6 +498,7 @@ static void win_title_refr(void)
                 lv_label_set_text(wdata->title, "Not connected");
             }
             else if(wifimng_get_state() == WIFIMNG_STATE_READY) {
+
                 char buf[256];
                 sprintf(buf, "%s - %s:%s", wifimng_get_last_ssid(), wifimng_get_last_ip(), wifimng_get_last_port());
                 lv_label_set_text(wdata->title, buf);
@@ -508,6 +506,7 @@ static void win_title_refr(void)
             else {
                 lv_label_set_text(wdata->title, "Connecting ...");
             }
+
             lv_obj_set_width(wdata->title, lv_win_get_width(app->win));
         }
         app = lv_app_get_next(app, &my_app_dsc);

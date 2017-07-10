@@ -54,7 +54,7 @@ See the [example HAL](https://github.com/littlevgl/hal) repository!
 4. Write your display, touch pad and system tick **drivers in hal**
 5. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** and *misc/misc_conf_templ.h* as **misc_conf.h** to the projects root folder
 6. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
-7. In your *main.c* file include: 
+7. In your *main.c* include: 
    * #include "misc/misc.h" 
    * #include "misc/os/ptask.h"
    * #include "lvgl/lvgl.h"   
@@ -85,5 +85,5 @@ If you find an issue, please report it via GitHub!
 ## Donate
 If you are pleased with the graphics library and found it useful pleas support its further development:
 
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LWHHAQYZMRQJS)
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GJV3SC5EHDANS)
 
