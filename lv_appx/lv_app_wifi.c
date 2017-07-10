@@ -127,8 +127,10 @@ const lv_app_dsc_t * lv_app_wifi_init(void)
 {
     strcpy(ssid_list, "");
     
+#if LV_APP_WIFI_AUTO_CONNECT != 0
     wifimng_set_last_netw(LV_APP_WIFI_SSID_DEF, LV_APP_WIFI_PWD_DEF);
     wifimng_set_last_tcp(LV_APP_WIFI_IP_DEF, LV_APP_WIFI_PORT_DEF);
+#endif
     
     ptask_create(wifi_state_monitor_task, WIFI_MONITOR_PERIOD, PTASK_PRIO_LOW, NULL);
     
@@ -495,11 +497,16 @@ static void win_title_refr(void)
         if(app->win != NULL) {
             my_win_data_t * wdata = app->win_data;
             
-            if(wifimng_get_state() != WIFIMNG_STATE_READY) lv_label_set_text(wdata->title, "Not connected");
-            else {
+            if(wifimng_get_state() == WIFIMNG_STATE_IDLE) {
+                lv_label_set_text(wdata->title, "Not connected");
+            }
+            else if(wifimng_get_state() == WIFIMNG_STATE_READY) {
                 char buf[256];
                 sprintf(buf, "%s - %s:%s", wifimng_get_last_ssid(), wifimng_get_last_ip(), wifimng_get_last_port());
                 lv_label_set_text(wdata->title, buf);
+            }
+            else {
+                lv_label_set_text(wdata->title, "Connecting ...");
             }
             lv_obj_set_width(wdata->title, lv_win_get_width(app->win));
         }

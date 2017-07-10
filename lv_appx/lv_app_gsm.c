@@ -31,6 +31,8 @@ typedef struct
     char set_apn[128];
     char set_ip[32];
     char set_port[16];
+    uint8_t * last_msg_dp;
+    uint16_t last_msg_size;
 }my_app_data_t;
 
 /*Application specific data a window of this application*/
@@ -165,6 +167,12 @@ static void my_com_rec(lv_app_inst_t * app_send, lv_app_inst_t * app_rec,
 	if(type == LV_APP_COM_TYPE_CHAR) {      /*data: string*/
         app_act_com = app_rec;
         gsm_tcp_transf(data, size, tcp_transf_cb);
+        my_app_data_t * adata = app_act_com->app_data;
+        if(adata->last_msg_dp != NULL) dm_free(adata->last_msg_dp); 
+        
+        adata->last_msg_dp = dm_alloc(size);
+        memcpy(adata->last_msg_dp, data, size);
+        adata->last_msg_size = size;
 	}
 }
 
@@ -262,6 +270,17 @@ static void gsm_state_monitor_task(void * param)
                            gsmmng_get_last_apn(), gsmmng_get_last_ip(), gsmmng_get_last_port());
         win_title_refr();
     }
+      
+    /* The GSM should be busy if there is sg. to send. 
+     * It means fail during last send. Try again*/
+    if(app_act_com != NULL) {
+        if(gsm_busy() ==  false && state_act == GSMMNG_STATE_READY) {
+            /*Try to send the message again*/
+            lv_app_notice_add("Resend GSM message");
+            my_app_data_t * adata = app_act_com->app_data;
+            gsm_tcp_transf(adata->last_msg_dp, adata->last_msg_size, tcp_transf_cb);
+        }
+    }
     
     state_prev = state_act;
 }
@@ -347,13 +366,16 @@ static void tcp_transf_cb(gsm_state_t state, const char * txt)
         memcpy(buf, &txt[2], size);
         buf[size] = '\0';
         lv_app_com_send(app_act_com, LV_APP_COM_TYPE_CHAR, &txt[2], size);
+        my_app_data_t * adata = app_act_com->app_data;
+        dm_free(adata->last_msg_dp);
+        adata->last_msg_dp = NULL;
+        adata->last_msg_size = 0;
+        app_act_com = NULL;
     }else if(state == GSM_STATE_ERROR) {
-        lv_app_notice_add("WiFi TCP transfer error\n%s", txt);
-        lv_app_notice_add("Reconnecting to WiFi...");
+        lv_app_notice_add("GSM TCP transfer error\n%s", txt);
+        lv_app_notice_add("Reconnecting to GSM...");
         gsmmng_reconnect();
     }
-    
-    app_act_com = NULL;
 }
 
 
@@ -365,8 +387,11 @@ static void win_title_refr(void)
         if(app->win != NULL) {
             my_win_data_t * wdata = app->win_data;
             
-            if(gsmmng_get_state() != GSMMNG_STATE_READY) lv_label_set_text(wdata->title, "Not connected");
-            else {
+            if(gsmmng_get_state() == GSMMNG_STATE_IDLE) {
+                lv_label_set_text(wdata->title, "Not connected");
+            } else if(gsmmng_get_state() == GSMMNG_STATE_READY) {
+                lv_label_set_text(wdata->title, "Connecting ...");
+            } else {
                 char buf[256];
                 sprintf(buf, "%s - %s:%s", gsmmng_get_last_apn(), gsmmng_get_last_ip(), gsmmng_get_last_port());
                 lv_label_set_text(wdata->title, buf);
