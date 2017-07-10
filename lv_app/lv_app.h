@@ -114,6 +114,18 @@ typedef struct {
 void lv_app_init(void);
 
 /**
+ * Get screen of the applications
+ */
+lv_obj_t * lv_scr_app(void);
+
+/**
+ * Allocate a new application descriptor
+ * @return pointer to an lv_app_dsc_t pointer. Save here a pointer to an app. dsc.
+ * E.g. *dsc = &my_app_dsc;
+ */
+lv_app_dsc_t ** lv_app_add_dsc(void);
+
+/**
  * Run an application according to 'app_dsc'
  * @param app_dsc pointer to an application descriptor
  * @param conf pointer to an application specific configuration structure or NULL if unused
@@ -246,6 +258,7 @@ lv_app_style_t * lv_app_style_get(void);
 #include "lvgl/lv_appx/lv_app_files.h"
 #include "lvgl/lv_appx/lv_app_wifi.h"
 #include "lvgl/lv_appx/lv_app_gsm.h"
+#include "lvgl/lv_appx/lv_app_ethernet.h"
 #include "lvgl/lv_appx/lv_app_benchmark.h"
 
 #endif /*LV_APP_ENABLE*/

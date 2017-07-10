@@ -149,7 +149,30 @@ void lv_app_init(void)
     *dsc = lv_app_gsm_init();
 #endif
 
+#if USE_LV_APP_ETHERNET != 0
+    dsc = ll_ins_head(&app_dsc_ll);
+    *dsc = lv_app_ethernet_init();
+#endif
 }
+
+/**
+ * Get screen of the applications
+ */
+lv_obj_t * lv_scr_app(void) 
+{
+    return app_scr;
+}
+
+/**
+ * Allocate a new application descriptor
+ * @return pointer to an lv_app_dsc_t pointer. Save here a pointer to an app. dsc.
+ * E.g. *dsc = &my_app_dsc;
+ */
+lv_app_dsc_t ** lv_app_add_dsc(void)
+{
+    return ll_ins_head(&app_dsc_ll);
+}
+
 
 /**
  * Run an application according to 'app_dsc'
@@ -173,7 +196,7 @@ lv_app_inst_t * lv_app_run(const lv_app_dsc_t * app_dsc, void * conf)
 	lv_app_rename(app, app_dsc->name); /*Set a default name*/
 
 	/*Call the application specific run function*/
-	app_dsc->app_run(app, conf);
+	if(app_dsc->app_run != NULL) app_dsc->app_run(app, conf);
 
 	return app;
 }
