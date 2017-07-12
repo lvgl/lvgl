@@ -587,7 +587,7 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
 
     /*Create the list of operations*/
     lv_obj_t * liste;
-    liste = lv_list_add(win_data->file_list, "U:/icon_left", "Back", win_back_action);
+    liste = lv_list_add(win_data->file_list, SYMBOL_LEFT, "Back", win_back_action);
     lv_obj_set_free_p(liste, app);
 
     /*Send button*/
