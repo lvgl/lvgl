@@ -850,7 +850,7 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
 
     area_t cords; /*If no shortcut simulate one and load the its coordinates*/
     if(app->sc == NULL) {
-        cords.x1 = LV_HOR_RES / 2 - LV_APP_SC_WIDTH / 2;
+        cords.x1 = (LV_HOR_RES / 2 - LV_APP_SC_WIDTH / 2);
         cords.y1 = LV_VER_RES / 2 - LV_APP_SC_HEIGHT / 2;
         cords.x2 = cords.x1 + LV_APP_SC_WIDTH;
         cords.y2 = cords.y1 + LV_APP_SC_HEIGHT;
@@ -877,24 +877,24 @@ static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app)
     a.var = app->win;
     a.path = anim_get_path(ANIM_PATH_LIN);
 
-    a.start = area_get_width(&cords);
-    a.end = LV_HOR_RES;
-    a.fp = (anim_fp_t) lv_obj_set_width;
+    a.start = area_get_width(&cords) >> LV_ANTIALIAS;
+    a.end = LV_HOR_RES >> LV_ANTIALIAS;
+    a.fp = (anim_fp_t) lv_obj_set_width_us;
     anim_create(&a);
 
-    a.start = area_get_height(&cords);
-    a.end = LV_VER_RES;
-    a.fp = (anim_fp_t) lv_obj_set_height;
+    a.start = area_get_height(&cords) >> LV_ANTIALIAS;
+    a.end = LV_VER_RES >> LV_ANTIALIAS;
+    a.fp = (anim_fp_t) lv_obj_set_height_us;
     anim_create(&a);
 
-    a.start = cords.x1;
+    a.start = cords.x1 >> LV_ANTIALIAS;
     a.end = 0;
-    a.fp = (anim_fp_t) lv_obj_set_x;
+    a.fp = (anim_fp_t) lv_obj_set_x_us;
     anim_create(&a);
 
-    a.start = cords.y1;
+    a.start = cords.y1 >> LV_ANTIALIAS;
     a.end = 0;
-    a.fp = (anim_fp_t) lv_obj_set_y;
+    a.fp = (anim_fp_t) lv_obj_set_y_us;
     a.end_cb = (anim_cb_t)lv_app_win_open_anim_cb;
     anim_create(&a);
 
@@ -949,24 +949,24 @@ static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app)
     a.path = anim_get_path(ANIM_PATH_LIN);
 
 
-    a.start = LV_HOR_RES;
-    a.end = area_get_width(&cords);
-    a.fp = (anim_fp_t) lv_obj_set_width;
+    a.start = LV_HOR_RES >> LV_ANTIALIAS;
+    a.end = area_get_width(&cords) >> LV_ANTIALIAS;
+    a.fp = (anim_fp_t) lv_obj_set_width_us;
     anim_create(&a);
 
-    a.start = LV_VER_RES;
-    a.end = area_get_height(&cords);
-    a.fp = (anim_fp_t) lv_obj_set_height;
-    anim_create(&a);
-
-    a.start = 0;
-    a.end = cords.x1;
-    a.fp = (anim_fp_t) lv_obj_set_x;
+    a.start = LV_VER_RES >> LV_ANTIALIAS;
+    a.end = area_get_height(&cords) >> LV_ANTIALIAS;
+    a.fp = (anim_fp_t) lv_obj_set_height_us;
     anim_create(&a);
 
     a.start = 0;
-    a.end = cords.y1;
-    a.fp = (anim_fp_t) lv_obj_set_y;
+    a.end = cords.x1 >> LV_ANTIALIAS;
+    a.fp = (anim_fp_t) lv_obj_set_x_us;
+    anim_create(&a);
+
+    a.start = 0;
+    a.end = cords.y1 >> LV_ANTIALIAS;
+    a.fp = (anim_fp_t) lv_obj_set_y_us;
     a.end_cb = (void (*)(void *))lv_app_win_minim_anim_cb;
     anim_create(&a);
 
