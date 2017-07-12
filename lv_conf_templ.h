@@ -244,7 +244,6 @@
 #define LV_APP_FILES_CHUNK_MAX_SIZE 1024    /*Max chunk size when the user sets it*/
 #endif /*USE_LV_APP_FILES != 0*/
 
-
 /*Benchmark*/
 #define USE_LV_APP_BENCHMARK     1
 #if USE_LV_APP_BENCHMARK != 0
@@ -252,7 +251,7 @@
 #endif
 
 /*WiFi*/
-#define USE_LV_APP_WIFI    1
+#define USE_LV_APP_WIFI    0
 #if USE_LV_APP_WIFI != 0
 #define LV_APP_WIFI_CONF_PATH       "S:/wifi_conf.txt"  /*Save config. here. Comment to use def. value*/
 #ifndef LV_APP_WIFI_CONF_PATH
@@ -265,7 +264,7 @@
 #endif /*USE_LV_APP_WIFI != 0*/
 
 /*GSM*/
-#define USE_LV_APP_GSM    1
+#define USE_LV_APP_GSM    0
 #if USE_LV_APP_GSM != 0
 #define LV_APP_GSM_CONF_PATH       "S:/gsm_conf.txt"    /*Save config. here. Comment to use def. value*/
 #ifndef LV_APP_GSM_CONF_PATH
@@ -277,7 +276,7 @@
 #endif /*USE_LV_APP_GSM != 0*/
 
 /*Ethernet*/
-#define USE_LV_APP_ETHERNET    1
+#define USE_LV_APP_ETHERNET    0
 #if USE_LV_APP_ETHERNET != 0
 /*No settings*/
 #endif /*USE_LV_APP_ETHERNET != 0*/
