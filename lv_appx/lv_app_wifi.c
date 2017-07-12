@@ -14,6 +14,7 @@
 #include "misc/os/ptask.h"
 #include "hal/systick/systick.h"
 #include "misc/comm/wifimng.h"
+#include "misc/fs/fat32/integer.h"
 #include <stdio.h>
 
 /*********************
@@ -89,6 +90,8 @@ static void tcp_transf_cb(wifi_state_t state, const char * txt);
 
 static void win_title_refr(void);
 
+static void save_conf(lv_app_inst_t * app);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -108,6 +111,11 @@ static lv_app_dsc_t my_app_dsc =
 	.win_data_size = sizeof(my_win_data_t),
 };
 
+static char def_ssid[64];
+static char def_pwd[64];
+static char def_ip[32];
+static char def_port[16];
+
 static char ssid_list[SSID_LIST_MAX_LENGTH];
 static lv_app_inst_t * app_act_com;
 
@@ -126,10 +134,61 @@ static lv_app_inst_t * app_act_com;
 const lv_app_dsc_t * lv_app_wifi_init(void)
 {
     strcpy(ssid_list, "");
+#ifdef LV_APP_WIFI_CONF_PATH
+    fs_file_t f;
+    fs_res_t res;
+    
+    res = fs_open(&f, LV_APP_WIFI_CONF_PATH, FS_MODE_RD);
+    if(res == FS_RES_NOT_EX) {
+        res = fs_open(&f, LV_APP_WIFI_CONF_PATH, FS_MODE_WR | FS_MODE_RD);
+        if(res == FS_RES_OK) {
+            const char * def_conf = "ssid\npwd\n100.101.102.103\n1234";
+            fs_write(&f, def_conf, strlen(def_conf) + 1, NULL);
+            fs_seek(&f, 0);
+        }
+    } 
+    
+    if(res == FS_RES_OK) {
+       volatile  char buf[256];
+       volatile  uint32_t rn;
+        fs_read(&f, (char *)buf, sizeof(buf) - 1, (uint32_t *)&rn);
+        
+        volatile  uint16_t i;
+        volatile uint16_t j = 0;
+        volatile uint8_t line_cnt = 0;
+        for(i = 0; i < rn; i++) {
+            if(buf[i] != '\n') {
+                if(line_cnt == 0) def_ssid[j] = buf[i];
+                if(line_cnt == 1) def_pwd[j] = buf[i];
+                if(line_cnt == 2) def_ip[j] = buf[i];
+                if(line_cnt == 3) def_port[j] = buf[i];
+                j++;
+            } else {
+                if(line_cnt == 0) def_ssid[j] = '\0';
+                if(line_cnt == 1) def_pwd[j] =  '\0';
+                if(line_cnt == 2) def_ip[j] = '\0';
+                if(line_cnt == 3) def_port[j] = '\0';
+                j = 0;
+                line_cnt ++;
+            }
+        }
+        
+        
+        fs_close(&f);        
+        
+    } else {
+        lv_app_notice_add("SD card error");
+    }
+#else
+    strcpy(def_ssid, LV_APP_WIFI_SSID_DEF);
+    strcpy(def_pwd, LV_APP_WIFI_PWD_DEF);
+    strcpy(def_ip, LV_APP_WIFI_IP_DEF);
+    strcpy(def_port, LV_APP_WIFI_PORT_DEF);
+#endif
     
 #if LV_APP_WIFI_AUTO_CONNECT != 0
-    wifimng_set_last_netw(LV_APP_WIFI_SSID_DEF, LV_APP_WIFI_PWD_DEF);
-    wifimng_set_last_tcp(LV_APP_WIFI_IP_DEF, LV_APP_WIFI_PORT_DEF);
+    wifimng_set_last_netw(def_ssid, def_pwd);
+    wifimng_set_last_tcp(def_ip, def_port);
 #endif
     
     ptask_create(wifi_state_monitor_task, WIFI_MONITOR_PERIOD, PTASK_PRIO_LOW, NULL);
@@ -151,10 +210,10 @@ static void my_app_run(lv_app_inst_t * app, void * conf)
 {
     /*Initialize the application*/
     my_app_data_t * adata = app->app_data;
-    strcpy(adata->set_ssid, LV_APP_WIFI_SSID_DEF);
-    strcpy(adata->set_pwd, LV_APP_WIFI_PWD_DEF);
-    strcpy(adata->set_ip, LV_APP_WIFI_IP_DEF);
-    strcpy(adata->set_port, LV_APP_WIFI_PORT_DEF);
+    strcpy(adata->set_ssid, def_ssid);
+    strcpy(adata->set_pwd, def_pwd);
+    strcpy(adata->set_ip, def_ip);
+    strcpy(adata->set_port, def_port);
     adata->last_msg_dp = NULL;
     adata->last_msg_size = 0;
 }
@@ -340,6 +399,7 @@ static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_dispi_t* dispi)
     wifimng_set_last_netw(adata->set_ssid, adata->set_pwd);
     wifimng_set_last_tcp(adata->set_ip, adata->set_port);
     wifimng_reconnect();
+    save_conf(app);
     lv_app_notice_add("Connecting to WiFi network\n%s, %s:%s", 
                       adata->set_ssid, adata->set_ip, adata->set_port);
     return LV_ACTION_RES_OK;
@@ -513,5 +573,21 @@ static void win_title_refr(void)
     }
 }
 
+static void save_conf(lv_app_inst_t * app)
+{
+#ifdef LV_APP_WIFI_CONF_PATH
+    my_app_data_t * adata = app->app_data;
+    
+    fs_file_t f;
+    fs_res_t res;
+    res = fs_open(&f, LV_APP_WIFI_CONF_PATH, FS_MODE_WR);
+    if(res == FS_RES_OK) {
+        char buf[256];
+        sprintf(buf,"%s\n%s\n%s\n%s", adata->set_ssid, adata->set_pwd, adata->set_ip, adata->set_port);
+        fs_write(&f, buf, strlen(buf) + 1, NULL);
+        fs_close(&f);
+    }
+#endif
+}
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/

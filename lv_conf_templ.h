@@ -244,30 +244,43 @@
 #define LV_APP_FILES_CHUNK_MAX_SIZE 1024    /*Max chunk size when the user sets it*/
 #endif /*USE_LV_APP_FILES != 0*/
 
+
 /*Benchmark*/
 #define USE_LV_APP_BENCHMARK     1
 #if USE_LV_APP_BENCHMARK != 0
 /*No settings*/
 #endif
 
-/*WiFi (requires hal/wifi)*/
-#define USE_LV_APP_WIFI     0
+/*WiFi*/
+#define USE_LV_APP_WIFI    1
 #if USE_LV_APP_WIFI != 0
-#define LV_APP_WIFI_SSID_DEF        "my_ssid"
-#define LV_APP_WIFI_PWD_DEF         "my_pasword"
-#define LV_APP_WIFI_IP_DEF          "10.11.12.13"
-#define LV_APP_WIFI_PORT_DEF        "5555" 
+#define LV_APP_WIFI_CONF_PATH       "S:/wifi_conf.txt"  /*Save config. here. Comment to use def. value*/
+#ifndef LV_APP_WIFI_CONF_PATH
+#define LV_APP_WIFI_SSID_DEF        "ssid"
+#define LV_APP_WIFI_PWD_DEF         "pwd"
+#define LV_APP_WIFI_IP_DEF          "100.101.102.103"
+#define LV_APP_WIFI_PORT_DEF        "1234" 
+#endif  /*LV_APP_WIFI_CONF_PATH*/
 #define LV_APP_WIFI_AUTO_CONNECT    1       /*Try to connect at start up to the deafult SSID and IP:PORT*/
 #endif /*USE_LV_APP_WIFI != 0*/
 
-/*GSM (requires hal/gsm)*/
-#define USE_LV_APP_GSM    0
+/*GSM*/
+#define USE_LV_APP_GSM    1
 #if USE_LV_APP_GSM != 0
-#define LV_APP_GSM_APN_DEF          "my_apn"
-#define LV_APP_GSM_IP_DEF           "10.11.12.13"
-#define LV_APP_GSM_PORT_DEF         "5555"
-#define LV_APP_GSM_AUTO_CONNECT     1       /*Try to connect at start up with the deafult APN and IP:PORT*/
+#define LV_APP_GSM_CONF_PATH       "S:/gsm_conf.txt"    /*Save config. here. Comment to use def. value*/
+#ifndef LV_APP_GSM_CONF_PATH
+#define LV_APP_GSM_APN_DEF        "apn"
+#define LV_APP_GSM_IP_DEF         "101.102.103.104"
+#define LV_APP_GSM_PORT_DEF       "1234"
+#endif  /*LV_APP_GSM_CONF_PATH*/
+#define LV_APP_GSM_AUTO_CONNECT   1       /*Try to connect at start up with the deafult APN and IP:PORT*/
 #endif /*USE_LV_APP_GSM != 0*/
+
+/*Ethernet*/
+#define USE_LV_APP_ETHERNET    1
+#if USE_LV_APP_ETHERNET != 0
+/*No settings*/
+#endif /*USE_LV_APP_ETHERNET != 0*/
 
 #endif /*LV_APP_ENABLE != 0*/
 

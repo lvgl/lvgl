@@ -79,6 +79,8 @@ static void tcp_transf_cb(gsm_state_t state, const char * txt);
 
 static void win_title_refr(void);
 
+static void save_conf(lv_app_inst_t * app);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -100,6 +102,10 @@ static lv_app_dsc_t my_app_dsc =
 
 static lv_app_inst_t * app_act_com;
 
+static char def_apn[128];
+static char def_ip[32];
+static char def_port[16];
+
 /**********************
  *      MACROS
  **********************/
@@ -114,10 +120,58 @@ static lv_app_inst_t * app_act_com;
  */
 const lv_app_dsc_t * lv_app_gsm_init(void)
 {
+    #ifdef LV_APP_GSM_CONF_PATH
+    fs_file_t f;
+    fs_res_t res;
     
-    gsmmng_set_last_apn(LV_APP_GSM_APN_DEF);
-    gsmmng_set_last_tcp(LV_APP_GSM_IP_DEF, LV_APP_GSM_PORT_DEF);
+    res = fs_open(&f, LV_APP_GSM_CONF_PATH, FS_MODE_RD);
+    if(res == FS_RES_NOT_EX) {
+        res = fs_open(&f, LV_APP_GSM_CONF_PATH, FS_MODE_WR | FS_MODE_RD);
+        if(res == FS_RES_OK) {
+            const char * def_conf = "apn\n100.101.102.103\n1234";
+            fs_write(&f, def_conf, strlen(def_conf) + 1, NULL);
+            fs_seek(&f, 0);
+        }
+    } 
     
+    if(res == FS_RES_OK) {
+       volatile  char buf[256];
+       volatile  uint32_t rn;
+        fs_read(&f, (char *)buf, sizeof(buf) - 1, (uint32_t *)&rn);
+        
+        volatile  uint16_t i;
+        volatile uint16_t j = 0;
+        volatile uint8_t line_cnt = 0;
+        for(i = 0; i < rn; i++) {
+            if(buf[i] != '\n') {
+                if(line_cnt == 0) def_apn[j] = buf[i];
+                if(line_cnt == 1) def_ip[j] = buf[i];
+                if(line_cnt == 2) def_port[j] = buf[i];
+                j++;
+            } else {
+                if(line_cnt == 0) def_apn[j] = '\0';
+                if(line_cnt == 1) def_ip[j] = '\0';
+                if(line_cnt == 2) def_port[j] = '\0';
+                j = 0;
+                line_cnt ++;
+            }
+        }
+        
+        fs_close(&f);        
+        
+    } else {
+        lv_app_notice_add("SD card error");
+    }
+#else
+    strcpy(def_apn, LV_APP_GSM_APN_DEF);
+    strcpy(def_ip, LV_APP_GSM_IP_DEF);
+    strcpy(def_port, LV_APP_GSM_PORT_DEF);
+#endif
+    
+#if LV_APP_GSM_AUTO_CONNECT != 0
+    gsmmng_set_last_apn(def_apn);
+    gsmmng_set_last_tcp(def_ip, def_port);
+#endif
     ptask_create(gsm_state_monitor_task, GSM_MONITOR_PERIOD, PTASK_PRIO_LOW, NULL);
     
     return &my_app_dsc;
@@ -137,9 +191,9 @@ static void my_app_run(lv_app_inst_t * app, void * conf)
 {
     /*Initialize the application*/
     my_app_data_t * adata = app->app_data;
-    strcpy(adata->set_apn, LV_APP_GSM_APN_DEF);
-    strcpy(adata->set_ip, LV_APP_GSM_IP_DEF);
-    strcpy(adata->set_port, LV_APP_GSM_PORT_DEF);
+    strcpy(adata->set_apn, def_apn);
+    strcpy(adata->set_ip, def_ip);
+    strcpy(adata->set_port, def_port);
 }
 
 /**
@@ -293,7 +347,8 @@ static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_dispi_t* dispi)
     gsmmng_set_last_apn(adata->set_apn);
     gsmmng_set_last_tcp(adata->set_ip, adata->set_port);
     gsmmng_reconnect();
-    lv_app_notice_add("Connecting to GSM network\n%s, %s:%s", 
+    save_conf(app);
+    lv_app_notice_add("Connecting to GSM network\n%s\n %s:%s", 
                       adata->set_apn, adata->set_ip, adata->set_port);
     return LV_ACTION_RES_OK;
 }
@@ -402,5 +457,21 @@ static void win_title_refr(void)
     }
 }
 
+static void save_conf(lv_app_inst_t * app)
+{
+#ifdef LV_APP_GSM_CONF_PATH
+    my_app_data_t * adata = app->app_data;
+    
+    fs_file_t f;
+    fs_res_t res;
+    res = fs_open(&f, LV_APP_GSM_CONF_PATH, FS_MODE_WR);
+    if(res == FS_RES_OK) {
+        char buf[256];
+        sprintf(buf,"%s\n%s\n%s", adata->set_apn, adata->set_ip, adata->set_port);
+        fs_write(&f, buf, strlen(buf) + 1, NULL);
+        fs_close(&f);
+    } 
+#endif
+}
 
 #endif /*LV_APP_ENABLE != 0 && USE_LV_APP_EXAMPLE != 0*/
