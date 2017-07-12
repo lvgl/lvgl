@@ -16,22 +16,6 @@ extern "C" {
 
 /*Test misc. module version*/
 #include "misc/misc.h"
-#define LV_MISC_REQ_MAJOR   4
-#define LV_MISC_REQ_MINOR   1
-#define LV_MISC_REQ_PATCH   1
-
-#if MISC_VERSION_MAJOR != LV_MISC_REQ_MAJOR /*The version major has to match*/
-#error "LV: incompatible misc. module version! See lvgl.h"
-#endif
-
-#if MISC_VERSION_MINOR < LV_MISC_REQ_MINOR /*The version minor has to be the same or greater*/
-#error "LV: incompatible misc. module version! See lvgl.h"
-#endif
-
-#if MISC_VERSION_PATCH < LV_MISC_REQ_PATCH /*The version patch has to be the same or greater*/
-#error "LV: incompatible misc. module version! See lvgl.h"
-#endif
-
 #include "lv_obj/lv_obj.h"
 #include "lv_objx/lv_btn.h"
 #include "lv_objx/lv_img.h"
@@ -58,10 +42,27 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+/*Current version of LittlevGL*/
 #define LVGL_VERSION_MAJOR  4
 #define LVGL_VERSION_MINOR  1
-#define LVGL_VERSION_PATH   0
+#define LVGL_VERSION_PATH   1
 
+/*Required misc. library version*/
+#define LV_MISC_REQ_MAJOR   4
+#define LV_MISC_REQ_MINOR   1
+#define LV_MISC_REQ_PATCH   0
+
+#if MISC_VERSION_MAJOR != LV_MISC_REQ_MAJOR /*The version major has to match*/
+#error "LV: incompatible misc. module version! See lvgl.h"
+#endif
+
+#if MISC_VERSION_MINOR < LV_MISC_REQ_MINOR /*The version minor has to be the same or greater*/
+#error "LV: incompatible misc. module version! See lvgl.h"
+#endif
+
+#if MISC_VERSION_PATCH < LV_MISC_REQ_PATCH /*The version patch has to be the same or greater*/
+#error "LV: incompatible misc. module version! See lvgl.h"
+#endif
 
 /**********************
  *      TYPEDEFS
