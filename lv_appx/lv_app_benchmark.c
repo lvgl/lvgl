@@ -98,7 +98,7 @@ static lv_style_t style_sc_btn_pr;
 
 static bool caputre_next;
 
-LV_IMG_DECLARE(img_bg);
+static const color_int_t img_benchmark_bg[];
 
 /**********************
  *      MACROS
@@ -116,7 +116,7 @@ const lv_app_dsc_t * lv_app_benchmark_init(void)
 {
     lv_refr_set_monitor_cb(refr_monitor);
 
-    lv_img_create_file("app_bm_wp", img_bg);
+    lv_img_create_file("app_bm_wp", img_benchmark_bg);
 
     lv_style_get(LV_STYLE_TRANSP, &style_win_scrl);
     style_win_scrl.opad = 2 * SHADOW_WIDTH + SHADOW_WIDTH / 8 ;
@@ -476,7 +476,7 @@ static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
         wdata->style_btn_tpr.swidth =  SHADOW_WIDTH;
         wdata->style_btn_ina.swidth =  SHADOW_WIDTH;
     } else {
-        adata->opa = 0;
+        adata->shdw = 0;
         wdata->style_btn_rel.swidth = 0;
         wdata->style_btn_pr.swidth  = 0;
         wdata->style_btn_trel.swidth =0;
@@ -528,7 +528,7 @@ static lv_action_res_t opa_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
 /*Exceptionally store the data because the big array would be bothering*/
 
 #if COLOR_DEPTH == 8
-const color_int_t img_bg[] = {
+static const color_int_t img_benchmark_bg[] = {
 /*HEADER
    Width = 40
    Height = 40
@@ -581,7 +581,7 @@ const color_int_t img_bg[] = {
 #endif /*COLOR_DEPTH*/
 
 #if COLOR_DEPTH == 16
-const color_int_t img_bg[] = {
+static const color_int_t img_benchmark_bg[] = {
 /*HEADER
    Width = 40
    Height = 40
@@ -634,8 +634,7 @@ const color_int_t img_bg[] = {
 #endif /*COLOR_DEPTH == 16*/
 
 #if COLOR_DEPTH == 24
->>>>>>> master
-const color_int_t img_bg[] = {
+static const color_int_t img_benchmark_bg[] = {
 /*HEADER
    Width = 40
    Height = 40
@@ -644,10 +643,7 @@ const color_int_t img_bg[] = {
 100827176,
 
 /*IMAGE DATA*/
-<<<<<<< HEAD
 
-=======
->>>>>>> master
 263172, 460551, 460551, 526344, 723723, 1447446, 1644825, 1447446, 1447446, 1052688, 1052688, 921102, 1052688, 723723, 263172, 197379, 131586, 65793, 65793, 0, 65793, 0, 65793, 65793, 65793, 65793, 65793, 328965, 789516, 855309, 1250067, 1052688, 1052688, 1184274, 1184274, 986895, 394758, 394758, 394758, 328965,
 131586, 460551, 526344, 394758, 1776411, 2631720, 2105376, 1447446, 1250067, 1052688, 855309, 1052688, 1579032, 1250067, 460551, 65793, 65793, 65793, 65793, 65793, 0, 65793, 65793, 0, 0, 0, 328965, 986895, 1184274, 789516, 921102, 1250067, 1052688, 1052688, 1842204, 1644825, 1052688, 328965, 263172, 328965,
 394758, 460551, 526344, 1052688, 2434341, 2434341, 2236962, 1907997, 1052688, 855309, 1052688, 1315860, 1381653, 1447446, 855309, 263172, 0, 0, 131586, 131586, 131586, 131586, 131586, 65793, 0, 263172, 855309, 1052688, 1052688, 1052688, 1118481, 921102, 986895, 1052688, 1579032, 1513239, 1513239, 1118481, 394758, 328965,
