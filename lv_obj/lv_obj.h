@@ -106,6 +106,8 @@ typedef struct __LV_OBJ_T
     void * free_p;              /*Application specific pointer (set it freely)*/
 #endif
 
+    void * group_p;             /*Pointer to the group of the object*/
+
     /*Attributes and states*/
     uint8_t click_en     :1;    /*1: Can be pressed by a display input device*/
     uint8_t drag_en      :1;    /*1: Enable the dragging*/
@@ -158,13 +160,6 @@ typedef enum
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
 }lv_align_t;
-
-
-typedef struct
-{
-	color_t color;
-    opa_t opa;
-}lv_objs_t;
 
 typedef enum
 {
@@ -473,6 +468,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
  */
 void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);
 #endif
+
 /**
  * Animate an object
  * @param obj pointer to an object to animate

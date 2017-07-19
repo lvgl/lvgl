@@ -12,6 +12,7 @@
 #include "lvgl/lv_obj/lv_dispi.h"
 #include "lvgl/lv_obj/lv_obj.h"
 #include "lvgl/lv_obj/lv_refr.h"
+#include "lvgl/lv_obj/lv_group.h"
 #include "lvgl/lv_app/lv_app.h"
 #include "lvgl/lv_draw/lv_draw_rbasic.h"
 #include "misc/gfx/anim.h"
@@ -1234,20 +1235,35 @@ cord_t lv_obj_get_ext_size(lv_obj_t * obj)
  */
 lv_style_t * lv_obj_get_style(lv_obj_t * obj)
 {
-    if(obj->style_p != NULL) return obj->style_p;
-    else {
+    lv_style_t * style_act = obj->style_p;
+    if(style_act == NULL) {
         lv_obj_t * par = obj->par;
 
         while(par != NULL) {
             if(par->style_p != NULL) {
-                if(par->style_p->glass == 0) return par->style_p;
+                if(par->style_p->glass == 0) {
+                    style_act = par->style_p;
+                    break;
+                }
             }
             par = par->par;
         }
     }
 
-    /*Never reach this, at least the screen has to be a style*/
-    return NULL;
+    if(obj->group_p != NULL) {
+        lv_obj_t * active_obj = NULL;
+        if(((lv_group_t *)obj->group_p)->actve_obj != NULL) {
+            active_obj = *((lv_group_t *)obj->group_p)->actve_obj;
+        }
+
+        if(active_obj == obj) {
+            lv_style_cpy(&((lv_group_t *)obj->group_p)->style_tmp, style_act);
+            ((lv_group_t *)obj->group_p)->style_activate(&((lv_group_t *)obj->group_p)->style_tmp);
+            style_act = &((lv_group_t *)obj->group_p)->style_tmp;
+        }
+    }
+
+    return style_act;
 }
 
 /*-----------------

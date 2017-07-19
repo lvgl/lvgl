@@ -17,6 +17,7 @@ extern "C" {
 /*Test misc. module version*/
 #include "misc/misc.h"
 #include "lv_obj/lv_obj.h"
+#include "lv_obj/lv_group.h"
 #include "lv_objx/lv_btn.h"
 #include "lv_objx/lv_img.h"
 #include "lv_objx/lv_label.h"
