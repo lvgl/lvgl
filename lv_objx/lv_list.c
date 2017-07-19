@@ -108,6 +108,11 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     valid = lv_page_signal(list, sign, param);
     
+    /* The object can be deleted so check its validity and then
+     * make the object specific signal handling */
+    if(valid != false) {
+
+    }
     return valid;
 }
 
@@ -210,7 +215,6 @@ void lv_list_down(lv_obj_t * list)
 		e = lv_obj_get_child(list, e);
 	}
 }
-
 
 /*=====================
  * Setter functions 

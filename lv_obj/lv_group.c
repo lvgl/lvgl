@@ -64,7 +64,10 @@ void lv_group_set_style_cb(lv_group_t * group, void (*style_cb)(lv_style_t * sty
 
 void lv_group_activate_next(lv_group_t * group)
 {
-    if(group->actve_obj != NULL) lv_obj_inv(*group->actve_obj);
+    if(group->actve_obj != NULL) {
+        (*group->actve_obj)->signal_f(*group->actve_obj, LV_SIGNAL_DEACTIVATE, NULL);
+        lv_obj_inv(*group->actve_obj);
+    }
 
     lv_obj_t ** obj_next;
     if(group->actve_obj == NULL) obj_next = ll_get_head(&group->obj_ll);
@@ -73,7 +76,10 @@ void lv_group_activate_next(lv_group_t * group)
     if(obj_next == NULL) obj_next = ll_get_head(&group->obj_ll);
     group->actve_obj = obj_next;
 
-    if(group->actve_obj != NULL) lv_obj_inv(*group->actve_obj);
+    if(group->actve_obj != NULL){
+        (*group->actve_obj)->signal_f(*group->actve_obj, LV_SIGNAL_ACTIVATE, NULL);
+        lv_obj_inv(*group->actve_obj);
+    }
 }
 
 void lv_group_activate_prev(lv_group_t * group)
@@ -89,6 +95,24 @@ void lv_group_activate_prev(lv_group_t * group)
 
     if(group->actve_obj != NULL) lv_obj_inv(*group->actve_obj);
 
+}
+
+lv_style_t * lv_group_activate_style(lv_group_t * group, lv_style_t * style)
+{
+    lv_style_cpy(&group->style_tmp, style);
+
+    if(group->style_activate != NULL) group->style_activate(&group->style_tmp);
+    else style_activate_def(&group->style_tmp);
+
+    return &group->style_tmp;
+}
+
+lv_obj_t * lv_group_get_active(lv_group_t * group)
+{
+    if(group == NULL) return NULL;
+    if(group->actve_obj == NULL) return NULL;
+
+    return *group->actve_obj;
 }
 
 /**********************

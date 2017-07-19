@@ -1249,20 +1249,13 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
             par = par->par;
         }
     }
-
+#if LV_OBJ_GROUP != 0
     if(obj->group_p != NULL) {
-        lv_obj_t * active_obj = NULL;
-        if(((lv_group_t *)obj->group_p)->actve_obj != NULL) {
-            active_obj = *((lv_group_t *)obj->group_p)->actve_obj;
-        }
-
-        if(active_obj == obj) {
-            lv_style_cpy(&((lv_group_t *)obj->group_p)->style_tmp, style_act);
-            ((lv_group_t *)obj->group_p)->style_activate(&((lv_group_t *)obj->group_p)->style_tmp);
-            style_act = &((lv_group_t *)obj->group_p)->style_tmp;
+        if(lv_group_get_active(obj->group_p) == obj) {
+            style_act = lv_group_activate_style(obj->group_p, style_act);
         }
     }
-
+#endif
     return style_act;
 }
 
@@ -1408,6 +1401,18 @@ uint8_t lv_obj_get_free_num(lv_obj_t * obj)
 void * lv_obj_get_free_p(lv_obj_t * obj)
 {
     return obj->free_p;
+}
+#endif
+
+#if LV_OBJ_GROUP != 0
+/**
+ * Get the group of the object
+ * @param obj pointer to an object
+ * @return the pointer to group of the object
+ */
+void * lv_obj_get_group(lv_obj_t * obj)
+{
+    return obj->group_p;
 }
 #endif
 

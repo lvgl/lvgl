@@ -130,6 +130,20 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
     	    lv_obj_set_style(ext->opt_label, lv_obj_get_style(ddlist));
             lv_ddlist_refr_size(ddlist, 0);
     	}
+    	else if(sign == LV_SIGNAL_ACTIVATE) {
+            lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    	    if(ext->opened == false) {
+    	        ext->opened = true;
+    	        lv_ddlist_refr_size(ddlist, true);
+    	    }
+    	}
+        else if(sign == LV_SIGNAL_DEACTIVATE) {
+            lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+            if(ext->opened != false) {
+                ext->opened = false;
+                lv_ddlist_refr_size(ddlist, true);
+            }
+        }
     }
     
     return valid;
@@ -417,7 +431,7 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
 }
 
 /**
- * Refresh the size of drop down list according its start (open or closed)
+ * Refresh the size of drop down list according its status (open or closed)
  * @param ddlist pointer to a drop down list object
  * @param anim_time animations time for open/close [ms]
  */

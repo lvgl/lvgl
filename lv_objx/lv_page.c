@@ -10,6 +10,7 @@
 #if USE_LV_PAGE != 0
 
 #include "misc/math/math_base.h"
+#include "../lv_obj/lv_group.h"
 #include "../lv_objx/lv_page.h"
 #include "../lv_objx/lv_cont.h"
 #include "../lv_draw/lv_draw.h"
@@ -28,13 +29,15 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_page_sb_refresh(lv_obj_t * main);
-static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_t mode);
+static bool lv_page_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_t mode);
+static bool lv_scrl_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_t mode);
 static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_design_f;
+static lv_design_f_t ancestor_page_design_f;
+static lv_design_f_t ancestor_scrl_design_f;
 
 /**********************
  *      MACROS
@@ -72,18 +75,20 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     ext->sb_width = LV_DPI / 8;     /*Will be modified later*/
     ext->sb_mode = LV_PAGE_SB_MODE_ON;
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_page);
+    if(ancestor_page_design_f == NULL) ancestor_page_design_f = lv_obj_get_design_f(new_page);
 
     /*Init the new page object*/
     if(copy == NULL) {
     	lv_style_t * style = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 	    ext->scrl = lv_cont_create(new_page, NULL);
+	    if(ancestor_scrl_design_f == NULL) ancestor_scrl_design_f = lv_obj_get_design_f(ext->scrl);
 	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
 		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
 		lv_cont_set_fit(ext->scrl, true, true);
 		lv_obj_set_style(ext->scrl, lv_style_get(LV_STYLE_PRETTY, NULL));
+        lv_obj_set_design_f(ext->scrl, lv_scrl_design);
 
 		lv_page_set_sb_width(new_page, style->hpad);
         lv_page_set_sb_mode(new_page, ext->sb_mode);
@@ -534,41 +539,85 @@ lv_style_t * lv_page_get_style_sb(lv_obj_t * page)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_page_design(lv_obj_t * page, const area_t * mask, lv_design_mode_t mode)
+static bool lv_page_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-    	return ancestor_design_f(page, mask, mode);
+    	return ancestor_page_design_f(scrl, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		ancestor_design_f(page, mask, mode);
+		ancestor_page_design_f(scrl, mask, mode);
 	} else if(mode == LV_DESIGN_DRAW_POST) { /*Draw the scroll bars finally*/
-		ancestor_design_f(page, mask, mode);
-		lv_page_ext_t * ext = lv_obj_get_ext(page);
+		ancestor_page_design_f(scrl, mask, mode);
+		lv_page_ext_t * ext = lv_obj_get_ext(scrl);
 
 		/*Draw the scrollbars*/
 		area_t sb_area;
 		if(ext->sbh_draw != 0) {
 		    /*Convert the relative coordinates to absolute*/
             area_cpy(&sb_area, &ext->sbh);
-		    sb_area.x1 += page->cords.x1;
-            sb_area.y1 += page->cords.y1;
-            sb_area.x2 += page->cords.x1;
-            sb_area.y2 += page->cords.y1;
+		    sb_area.x1 += scrl->cords.x1;
+            sb_area.y1 += scrl->cords.y1;
+            sb_area.x2 += scrl->cords.x1;
+            sb_area.y2 += scrl->cords.y1;
 			lv_draw_rect(&sb_area, mask, ext->style_sb);
 		}
 
 		if(ext->sbv_draw != 0) {
             /*Convert the relative coordinates to absolute*/
             area_cpy(&sb_area, &ext->sbv);
-            sb_area.x1 += page->cords.x1;
-            sb_area.y1 += page->cords.y1;
-            sb_area.x2 += page->cords.x1;
-            sb_area.y2 += page->cords.y1;
+            sb_area.x1 += scrl->cords.x1;
+            sb_area.y1 += scrl->cords.y1;
+            sb_area.x2 += scrl->cords.x1;
+            sb_area.y2 += scrl->cords.y1;
 			lv_draw_rect(&sb_area, mask, ext->style_sb);
 		}
 	}
 
 	return true;
 }
+/**
+ * Handle the drawing related tasks of the scrollable object
+ * @param scrl pointer to an object
+ * @param mask the object will be drawn only in this area
+ * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
+ * @param return true/false, depends on 'mode'
+ */
+static bool lv_scrl_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_t mode)
+{
+    if(mode == LV_DESIGN_COVER_CHK) {
+        return ancestor_page_design_f(scrl, mask, mode);
+    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+#if LV_OBJ_GROUP != 0
+        /* If the page is the active in a group and
+         * the background (page) is not visible (transparent or empty)
+         * then activate the style of the scrollable*/
+        lv_style_t * style_ori = lv_obj_get_style(scrl);
+        lv_obj_t * page = lv_obj_get_parent(scrl);
+        lv_style_t * style_page = lv_obj_get_style(page);
+        lv_group_t * g = lv_obj_get_group(page);
+        if(style_page->empty != 0 || style_page->opa == OPA_TRANSP) { /*Background is visible?*/
+            if(lv_group_get_active(g) == page) {
+                lv_style_t * style_mod;
+                style_mod = lv_group_activate_style(g, style_ori);
+                scrl->style_p = style_mod;  /*Temporally change the style to the activated */
+            }
+        }
+#endif
+        ancestor_page_design_f(scrl, mask, mode);
+
+#if LV_OBJ_GROUP != 0
+        scrl->style_p = style_ori;  /*Revert the style*/
+#endif
+    } else if(mode == LV_DESIGN_DRAW_POST) {
+        ancestor_page_design_f(scrl, mask, mode);
+    }
+
+    return true;
+}
+
+
 
 /**
  * Refresh the position and size of the scroll bars.

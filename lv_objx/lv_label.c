@@ -13,6 +13,7 @@
 #include "misc/math/math_base.h"
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
+#include "../lv_obj/lv_group.h"
 #include "misc/gfx/text.h"
 #include "misc/gfx/anim.h"
 #include "../lv_draw/lv_draw.h"
@@ -468,10 +469,8 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 	    }
 
 	    x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
-
 		if(pos->x < x) break;
 	}
-
 
 	return i;
 }
@@ -496,11 +495,20 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
     /* A label never covers an area */
     if(mode == LV_DESIGN_COVER_CHK) return false;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-		/*TEST: draw a background for the label*/
+        area_t cords;
+        lv_style_t * style = lv_obj_get_style(label);
+        lv_obj_get_cords(label, &cords);
+
+#if LV_OBJ_GROUP != 0
+        lv_group_t * g = lv_obj_get_group(label);
+        if(lv_group_get_active(g) == label) {
+            lv_draw_rect(&cords, mask, style);
+        }
+#endif
+
+        /*TEST: draw a background for the label*/
 		//lv_vfill(&label->cords, mask, COLOR_LIME, OPA_COVER);
 
-		area_t cords;
-		lv_obj_get_cords(label, &cords);
 		lv_label_ext_t * ext = lv_obj_get_ext(label);
 		txt_flag_t flag = TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
@@ -512,7 +520,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
             i++;
         }
 
-		lv_draw_label(&cords, mask, lv_obj_get_style(label), ext->txt, flag, &ext->offset);
+		lv_draw_label(&cords, mask, style, ext->txt, flag, &ext->offset);
 
 
     }
