@@ -185,6 +185,22 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             if(ext->lpr_rep_action != NULL && state != LV_BTN_STATE_INA) {
                 valid = ext->lpr_rep_action(btn, param);
             }
+        } else if(sign == LV_SIGNAL_INCREASE) {
+            if(lv_btn_get_tgl(btn) != false) {
+                lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+            }
+        } else if(sign == LV_SIGNAL_DECREASE) {
+            if(lv_btn_get_tgl(btn) != false) {
+                lv_btn_set_state(btn, LV_BTN_STATE_REL);
+            }
+        } else if(sign == LV_SIGNAL_SELECT) {
+            if(lv_btn_get_tgl(btn) != false) {
+                lv_btn_state_t state = lv_btn_get_state(btn);
+                if(state == LV_BTN_STATE_REL) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+                else if(state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TPR);
+                else if(state == LV_BTN_STATE_TREL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                else if(state == LV_BTN_STATE_TPR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+            }
         }
     }
     
@@ -319,6 +335,50 @@ bool lv_btn_get_tgl(lv_obj_t * btn)
     lv_btn_ext_t * ext = lv_obj_get_ext(btn);
     
     return ext->tgl != 0 ? true : false;
+}
+
+/**
+ * Get the release action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the release action function
+ */
+lv_action_t lv_btn_get_rel_action(lv_obj_t * btn)
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+    return ext->rel_action;
+}
+
+/**
+ * Get the press action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the press action function
+ */
+lv_action_t lv_btn_get_pr_action(lv_obj_t * btn)
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+    return ext->pr_action;
+}
+
+/**
+ * Get the long press action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the release action function
+ */
+lv_action_t lv_btn_get_lpr_action(lv_obj_t * btn)
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+    return ext->lpr_action;
+}
+
+/**
+ * Get the long press repeat action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the long press repeat action function
+ */
+lv_action_t lv_btn_get_lpr_rep_action(lv_obj_t * btn)
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+    return ext->lpr_rep_action;
 }
 
 /**

@@ -10,13 +10,17 @@
 #if USE_LV_LIST != 0
 
 #include "lv_list.h"
-#include <lvgl/lv_objx/lv_cont.h>
+#include "lvgl/lv_objx/lv_cont.h"
+#include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_LIST_LAYOUT_DEF	LV_CONT_LAYOUT_COL_M
+#ifndef LV_LIST_FOCUS_TIME
+#define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -111,7 +115,78 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
+        if(sign == LV_SIGNAL_ACTIVATE) {
+            /*Get the first button*/
+            lv_obj_t * btn = NULL;
+            lv_obj_t * btn_prev = NULL;
+            btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            while(btn != NULL) {
+                btn_prev = btn;
+                btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            }
+            if(btn_prev != NULL) {
+                lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+            }
+        } else if(sign == LV_SIGNAL_DEACTIVATE) {
+            /*Get the 'pressed' button*/
+            lv_obj_t * btn = NULL;
+            btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            while(btn != NULL) {
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            }
 
+            if(btn != NULL) {
+                lv_btn_set_state(btn, LV_BTN_STATE_REL);
+            }
+        } else if(sign == LV_SIGNAL_INCREASE) {
+            /*Get the last pressed button*/
+            lv_obj_t * btn = NULL;
+            lv_obj_t * btn_prev = NULL;
+            btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            while(btn != NULL) {
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                btn_prev = btn;
+                btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            }
+
+            if(btn_prev != NULL && btn != NULL) {
+                lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                lv_page_focus(list, btn_prev, LV_LIST_FOCUS_TIME);
+            }
+        } else if(sign == LV_SIGNAL_DECREASE) {
+            /*Get the last pressed button*/
+            lv_obj_t * btn = NULL;
+            btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            while(btn != NULL) {
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            }
+
+            if(btn != NULL) {
+                lv_obj_t * btn_prev = lv_obj_get_child(lv_page_get_scrl(list), btn);
+                if(btn_prev != NULL) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                    lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                    lv_page_focus(list, btn_prev, LV_LIST_FOCUS_TIME);
+                }
+            }
+        } else if(sign == LV_SIGNAL_SELECT) {
+            /*Get the 'pressed' button*/
+            lv_obj_t * btn = NULL;
+            btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            while(btn != NULL) {
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                btn = lv_obj_get_child(lv_page_get_scrl(list), btn);
+            }
+
+            if(btn != NULL) {
+                lv_action_t rel_action;
+                rel_action = lv_btn_get_rel_action(btn);
+                if(rel_action != NULL) rel_action(btn, NULL);
+            }
+        }
     }
     return valid;
 }
@@ -180,19 +255,37 @@ void lv_list_up(lv_obj_t * list)
 {
 	/*Search the first list element which 'y' coordinate is below the parent
 	 * and position the list to show this element on the bottom*/
-	lv_obj_t * h = lv_obj_get_parent(list);
+    lv_obj_t * scrl = lv_page_get_scrl(list);
 	lv_obj_t * e;
 	lv_obj_t * e_prev = NULL;
-	e = lv_obj_get_child(list, NULL);
+	e = lv_obj_get_child(scrl, NULL);
 	while(e != NULL) {
-		if(e->cords.y2 <= h->cords.y2) {
-			if(e_prev != NULL)
-			lv_obj_set_y(list, lv_obj_get_height(h) -
-					             (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev)));
+		if(e->cords.y2 <= list->cords.y2) {
+			if(e_prev != NULL) {
+			    cord_t new_y = lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
+#if LV_LIST_FOCUS_TIME == 0
+			    lv_obj_set_y(scrl, new_y);
+#else
+                anim_t a;
+                a.var = scrl;
+                a.start = lv_obj_get_y(scrl);
+                a.end = new_y;
+                a.fp = (anim_fp_t)lv_obj_set_y;
+                a.path = anim_get_path(ANIM_PATH_LIN);
+                a.end_cb = NULL;
+                a.act_time = 0;
+                a.time = LV_LIST_FOCUS_TIME;
+                a.playback = 0;
+                a.playback_pause = 0;
+                a.repeat = 0;
+                a.repeat_pause = 0;
+                anim_create(&a);
+#endif
+			}
 			break;
 		}
 		e_prev = e;
-		e = lv_obj_get_child(list, e);
+		e = lv_obj_get_child(scrl, e);
 	}
 }
 
@@ -204,15 +297,33 @@ void lv_list_down(lv_obj_t * list)
 {
 	/*Search the first list element which 'y' coordinate is above the parent
 	 * and position the list to show this element on the top*/
-	lv_obj_t * h = lv_obj_get_parent(list);
+	lv_obj_t * scrl = lv_page_get_scrl(list);
 	lv_obj_t * e;
-	e = lv_obj_get_child(list, NULL);
+	e = lv_obj_get_child(scrl, NULL);
 	while(e != NULL) {
-		if(e->cords.y1 < h->cords.y1) {
-			lv_obj_set_y(list, -lv_obj_get_y(e));
+		if(e->cords.y1 < list->cords.y1) {
+            cord_t new_y = -lv_obj_get_y(e);
+#if LV_LIST_FOCUS_TIME == 0
+			lv_obj_set_y(scrl, new_y);
+#else
+            anim_t a;
+            a.var = scrl;
+            a.start = lv_obj_get_y(scrl);
+            a.end = new_y;
+            a.fp = (anim_fp_t)lv_obj_set_y;
+            a.path = anim_get_path(ANIM_PATH_LIN);
+            a.end_cb = NULL;
+            a.act_time = 0;
+            a.time = LV_LIST_FOCUS_TIME;
+            a.playback = 0;
+            a.playback_pause = 0;
+            a.repeat = 0;
+            a.repeat_pause = 0;
+            anim_create(&a);
+#endif
 			break;
 		}
-		e = lv_obj_get_child(list, e);
+		e = lv_obj_get_child(scrl, e);
 	}
 }
 

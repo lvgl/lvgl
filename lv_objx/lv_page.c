@@ -86,7 +86,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
 		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
-		lv_cont_set_fit(ext->scrl, true, true);
+		lv_cont_set_fit(ext->scrl, false, true);
 		lv_obj_set_style(ext->scrl, lv_style_get(LV_STYLE_PRETTY, NULL));
         lv_obj_set_design_f(ext->scrl, lv_scrl_design);
 
@@ -143,60 +143,54 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     if(obj_valid != false) {
         lv_page_ext_t * ext = lv_obj_get_ext(page);
         lv_obj_t * child;
-        switch(sign) {
-        	case LV_SIGNAL_CHILD_CHG: /*Move children to the scrollable object*/
-        		child = lv_obj_get_child(page, NULL);
-        		while(child != NULL) {
-        			if(lv_obj_is_protected(child, LV_PROTECT_PARENT) == false) {
-        				lv_obj_t * tmp = child;
-            			child = lv_obj_get_child(page, child); /*Get the next child before move this*/
-        				lv_obj_set_parent(tmp, ext->scrl);
-        			} else {
-            			child = lv_obj_get_child(page, child);
-        			}
-        		}
-        		break;
-                
-            case LV_SIGNAL_STYLE_CHG:
-            	if(ext->sb_mode == LV_PAGE_SB_MODE_ON) {
-            		ext->sbh_draw = 1;
-            		ext->sbv_draw = 1;
-            	} else {
-            		ext->sbh_draw = 0;
-					ext->sbv_draw = 0;
-				}
-
-            	lv_page_sb_refresh(page);
-            	break;
-
-            case LV_SIGNAL_CORD_CHG:
-                /*Refresh the scrollbar and notify the scrl if the size is changed*/
-            	if(ext->scrl != NULL &&
-                   (lv_obj_get_width(page) != area_get_width(param) ||
-                    lv_obj_get_height(page) != area_get_height(param))) {
-            		ext->scrl->signal_f(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->cords);
-
-            		/*The scrolbars are important olny if they are visible now*/
-            		if(ext->sbh_draw != 0 || ext->sbv_draw != 0)
-            		lv_page_sb_refresh(page);
-
-            	}
-            	break;
-            case LV_SIGNAL_PRESSED:
-                if(ext->pr_action != NULL) {
-                    ext->pr_action(page, param);
+        if(sign == LV_SIGNAL_CHILD_CHG) { /*Move children to the scrollable object*/
+            child = lv_obj_get_child(page, NULL);
+            while(child != NULL) {
+                if(lv_obj_is_protected(child, LV_PROTECT_PARENT) == false) {
+                    lv_obj_t * tmp = child;
+                    child = lv_obj_get_child(page, child); /*Get the next child before move this*/
+                    lv_obj_set_parent(tmp, ext->scrl);
+                } else {
+                    child = lv_obj_get_child(page, child);
                 }
-                break;
-            case LV_SIGNAL_RELEASED:
-                if(lv_dispi_is_dragging(param) == false) {
-                    if(ext->rel_action != NULL) {
-                        ext->rel_action(page, param);
-                    }
+            }
+        } else if(sign == LV_SIGNAL_STYLE_CHG) {
+            lv_style_t * style = lv_obj_get_style(page);
+            if(lv_cont_get_hfit(ext->scrl) == false) {
+                lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->hpad);
+            }
+
+            if(ext->sb_mode == LV_PAGE_SB_MODE_ON) {
+                ext->sbh_draw = 1;
+                ext->sbv_draw = 1;
+            } else {
+                ext->sbh_draw = 0;
+                ext->sbv_draw = 0;
+            }
+
+            lv_page_sb_refresh(page);
+        } else if(sign == LV_SIGNAL_CORD_CHG) {
+            /*Refresh the scrollbar and notify the scrl if the size is changed*/
+            if(ext->scrl != NULL &&
+               (lv_obj_get_width(page) != area_get_width(param) ||
+                lv_obj_get_height(page) != area_get_height(param))) {
+                ext->scrl->signal_f(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->cords);
+
+                /*The scrollbars are important olny if they are visible now*/
+                if(ext->sbh_draw != 0 || ext->sbv_draw != 0)
+                lv_page_sb_refresh(page);
+
+            }
+        } else if(sign == LV_SIGNAL_PRESSED) {
+            if(ext->pr_action != NULL) {
+                ext->pr_action(page, param);
+            }
+        } else if(sign == LV_SIGNAL_RELEASED) {
+            if(lv_dispi_is_dragging(param) == false) {
+                if(ext->rel_action != NULL) {
+                    ext->rel_action(page, param);
                 }
-                break;
-            default:
-                break;
-            
+            }
         }
     }
     
@@ -220,118 +214,112 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
      * make the object specific signal handling */
     if(obj_valid != false) {
 
-        cord_t new_x;
-        cord_t new_y;
-        bool refr_x = false;
-        bool refr_y = false;
-        area_t page_cords;
-        area_t obj_cords;
         lv_obj_t * page = lv_obj_get_parent(scrl);
         lv_style_t * page_style = lv_obj_get_style(page);
         lv_page_ext_t * page_ext = lv_obj_get_ext(page);
-        cord_t hpad = page_style->hpad;
-        cord_t vpad = page_style->vpad;
 
-        switch(sign) {
-            case LV_SIGNAL_CORD_CHG:
-                new_x = lv_obj_get_x(scrl);
-                new_y = lv_obj_get_y(scrl);
-                lv_obj_get_cords(scrl, &obj_cords);
-                lv_obj_get_cords(page, &page_cords);
+        if(sign == LV_SIGNAL_CORD_CHG) {
+            cord_t new_x;
+            cord_t new_y;
+            bool refr_x = false;
+            bool refr_y = false;
+            area_t page_cords;
+            area_t scrl_cords;
+            cord_t hpad = page_style->hpad;
+            cord_t vpad = page_style->vpad;
 
-                /*scrollable width smaller then page width? -> align to left*/
-                if(area_get_width(&obj_cords) + 2 * hpad < area_get_width(&page_cords)) {
-                    if(obj_cords.x1 != page_cords.x1 + hpad) {
-                        new_x = hpad;
-                        refr_x = true;
-                    }
-                } else {
-                	/*The edges of the scrollable can not be in the page (minus hpad) */
-                    if(obj_cords.x2  < page_cords.x2 - hpad) {
-                       new_x =  area_get_width(&page_cords) - area_get_width(&obj_cords) - hpad;   /* Right align */
-                       refr_x = true;
-                    }
-                    if (obj_cords.x1 > page_cords.x1 + hpad) {
-                        new_x = hpad;  /*Left align*/
-                        refr_x = true;
-                    }
+            new_x = lv_obj_get_x(scrl);
+            new_y = lv_obj_get_y(scrl);
+            lv_obj_get_cords(scrl, &scrl_cords);
+            lv_obj_get_cords(page, &page_cords);
+
+            /*scrollable width smaller then page width? -> align to left*/
+            if(area_get_width(&scrl_cords) + 2 * hpad < area_get_width(&page_cords)) {
+                if(scrl_cords.x1 != page_cords.x1 + hpad) {
+                    new_x = hpad;
+                    refr_x = true;
                 }
-
-                /*scrollable height smaller then page height? -> align to left*/
-                if(area_get_height(&obj_cords) + 2 * vpad < area_get_height(&page_cords)) {
-                    if(obj_cords.y1 != page_cords.y1 + vpad) {
-                        new_y = vpad;
-                        refr_y = true;
-                    }
-                } else {
-                	/*The edges of the scrollable can not be in the page (minus vpad) */
-                    if(obj_cords.y2 < page_cords.y2 - vpad) {
-                       new_y =  area_get_height(&page_cords) - area_get_height(&obj_cords) - vpad;   /* Bottom align */
-                       refr_y = true;
-                    }
-                    if (obj_cords.y1  > page_cords.y1 + vpad) {
-                        new_y = vpad;  /*Top align*/
-                        refr_y = true;
-                    }
+            } else {
+                /*The edges of the scrollable can not be in the page (minus hpad) */
+                if(scrl_cords.x2  < page_cords.x2 - hpad) {
+                   new_x =  area_get_width(&page_cords) - area_get_width(&scrl_cords) - hpad;   /* Right align */
+                   refr_x = true;
                 }
-                if(refr_x != false || refr_y != false) {
-                    lv_obj_set_pos(scrl, new_x, new_y);
+                if (scrl_cords.x1 > page_cords.x1 + hpad) {
+                    new_x = hpad;  /*Left align*/
+                    refr_x = true;
                 }
+            }
 
-                lv_page_sb_refresh(page);
-                break;
+            /*scrollable height smaller then page height? -> align to left*/
+            if(area_get_height(&scrl_cords) + 2 * vpad < area_get_height(&page_cords)) {
+                if(scrl_cords.y1 != page_cords.y1 + vpad) {
+                    new_y = vpad;
+                    refr_y = true;
+                }
+            } else {
+                /*The edges of the scrollable can not be in the page (minus vpad) */
+                if(scrl_cords.y2 < page_cords.y2 - vpad) {
+                   new_y =  area_get_height(&page_cords) - area_get_height(&scrl_cords) - vpad;   /* Bottom align */
+                   refr_y = true;
+                }
+                if (scrl_cords.y1  > page_cords.y1 + vpad) {
+                    new_y = vpad;  /*Top align*/
+                    refr_y = true;
+                }
+            }
+            if(refr_x != false || refr_y != false) {
+                lv_obj_set_pos(scrl, new_x, new_y);
+            }
 
-            case LV_SIGNAL_DRAG_BEGIN:
-            	if(page_ext->sb_mode == LV_PAGE_SB_MODE_DRAG ) {
-            	    cord_t sbh_pad = MATH_MAX(page_ext->sb_width, page_style->hpad);
-            	    cord_t sbv_pad = MATH_MAX(page_ext->sb_width, page_style->vpad);
-					if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - 2 * sbv_pad) {
-						page_ext->sbv_draw = 1;
-					}
-					if(area_get_width(&page_ext->sbh) < lv_obj_get_width(scrl) - 2 * sbh_pad) {
-						page_ext->sbh_draw = 1;
-					}
-            	}
-                break;
-
-            case LV_SIGNAL_DRAG_END:
-            	if(page_ext->sb_mode == LV_PAGE_SB_MODE_DRAG) {
-				    area_t sb_area_tmp;
-				    if(page_ext->sbh_draw != 0) {
-				        area_cpy(&sb_area_tmp, &page_ext->sbh);
-				        sb_area_tmp.x1 += page->cords.x1;
-				        sb_area_tmp.y1 += page->cords.y1;
-				        sb_area_tmp.x2 += page->cords.x2;
-				        sb_area_tmp.y2 += page->cords.y2;
-				        lv_inv_area(&sb_area_tmp);
-	                    page_ext->sbh_draw = 0;
-				    }
-				    if(page_ext->sbv_draw != 0)  {
-				        area_cpy(&sb_area_tmp, &page_ext->sbv);
-				        sb_area_tmp.x1 += page->cords.x1;
-				        sb_area_tmp.y1 += page->cords.y1;
-				        sb_area_tmp.x2 += page->cords.x2;
-				        sb_area_tmp.y2 += page->cords.y2;
-				        lv_inv_area(&sb_area_tmp);
-	                    page_ext->sbv_draw = 0;
-				    }
-            	}
-                break;
-            case LV_SIGNAL_PRESSED:
+            lv_page_sb_refresh(page);
+        } else if(sign == LV_SIGNAL_CORD_CHG) {
+            if(lv_cont_get_hfit(scrl) == false) {
+                lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * page_style->hpad);
+            }
+        } else if(sign == LV_SIGNAL_DRAG_BEGIN) {
+            if(page_ext->sb_mode == LV_PAGE_SB_MODE_DRAG ) {
+                cord_t sbh_pad = MATH_MAX(page_ext->sb_width, page_style->hpad);
+                cord_t sbv_pad = MATH_MAX(page_ext->sb_width, page_style->vpad);
+                if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - 2 * sbv_pad) {
+                    page_ext->sbv_draw = 1;
+                }
+                if(area_get_width(&page_ext->sbh) < lv_obj_get_width(scrl) - 2 * sbh_pad) {
+                    page_ext->sbh_draw = 1;
+                }
+            }
+        } else if(sign == LV_SIGNAL_DRAG_END) {
+            if(page_ext->sb_mode == LV_PAGE_SB_MODE_DRAG) {
+                area_t sb_area_tmp;
+                if(page_ext->sbh_draw != 0) {
+                    area_cpy(&sb_area_tmp, &page_ext->sbh);
+                    sb_area_tmp.x1 += page->cords.x1;
+                    sb_area_tmp.y1 += page->cords.y1;
+                    sb_area_tmp.x2 += page->cords.x2;
+                    sb_area_tmp.y2 += page->cords.y2;
+                    lv_inv_area(&sb_area_tmp);
+                    page_ext->sbh_draw = 0;
+                }
+                if(page_ext->sbv_draw != 0)  {
+                    area_cpy(&sb_area_tmp, &page_ext->sbv);
+                    sb_area_tmp.x1 += page->cords.x1;
+                    sb_area_tmp.y1 += page->cords.y1;
+                    sb_area_tmp.x2 += page->cords.x2;
+                    sb_area_tmp.y2 += page->cords.y2;
+                    lv_inv_area(&sb_area_tmp);
+                    page_ext->sbv_draw = 0;
+                }
+            } else if(sign == LV_SIGNAL_PRESSED) {
                 if(page_ext->pr_action != NULL) {
                     page_ext->pr_action(page, param);
                 }
-                break;
-            case LV_SIGNAL_RELEASED:
+            } else if(sign == LV_SIGNAL_RELEASED) {
                 if(lv_dispi_is_dragging(param) == false) {
                     if(page_ext->rel_action != NULL) {
                         page_ext->rel_action(page, param);
                     }
                 }
-                break;
-            default:
-                break;
-
+            }
         }
     }
 

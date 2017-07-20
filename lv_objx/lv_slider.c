@@ -145,10 +145,15 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
               lv_obj_get_height(slider) != area_get_height(param)) {
                 slider->signal_f(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
             }
-        }
-        else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
             cord_t x = MATH_MIN(w, h);
             if(slider->ext_size < x) slider->ext_size = x;
+        } else if(sign == LV_SIGNAL_INCREASE) {
+            lv_bar_set_value(slider, lv_bar_get_value(slider) + 1);
+            if(ext->cb != NULL) ext->cb(slider, NULL);
+        } else if(sign == LV_SIGNAL_DECREASE) {
+            lv_bar_set_value(slider, lv_bar_get_value(slider) - 1);
+            if(ext->cb != NULL) ext->cb(slider, NULL);
         }
     }
 

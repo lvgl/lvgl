@@ -50,6 +50,12 @@ void lv_group_add(lv_group_t * group, lv_obj_t * obj)
     obj->group_p = group;
     lv_obj_t ** next = ll_ins_tail(&group->obj_ll);
     *next = obj;
+
+    /* If the head and the tail is equal then there is only one object in the linked list.
+     * In this case automatically activate it*/
+    if(ll_get_head(&group->obj_ll) == next) {
+        lv_group_activate_next(group);
+    }
 }
 
 void lv_group_activate_obj(lv_group_t * group, lv_obj_t * obj)
@@ -107,6 +113,31 @@ lv_style_t * lv_group_activate_style(lv_group_t * group, lv_style_t * style)
     return &group->style_tmp;
 }
 
+
+void lv_group_inc_active(lv_group_t * group)
+{
+    lv_obj_t * act = lv_group_get_active(group);
+    if(act == NULL) return;
+
+    act->signal_f(act, LV_SIGNAL_INCREASE, NULL);
+}
+
+void lv_group_dec_active(lv_group_t * group)
+{
+    lv_obj_t * act = lv_group_get_active(group);
+    if(act == NULL) return;
+
+    act->signal_f(act, LV_SIGNAL_DECREASE, NULL);
+}
+
+void lv_group_sel_active(lv_group_t * group)
+{
+    lv_obj_t * act = lv_group_get_active(group);
+    if(act == NULL) return;
+
+    act->signal_f(act, LV_SIGNAL_SELECT, NULL);
+}
+
 lv_obj_t * lv_group_get_active(lv_group_t * group)
 {
     if(group == NULL) return NULL;
@@ -123,7 +154,8 @@ static void style_activate_def(lv_style_t * style)
 {
     style->bcolor = COLOR_ORANGE;
     style->bopa = OPA_COVER;
-    style->bwidth = style->bwidth * 2;
+    if(style->bwidth == 0 && style->empty == 0) style->bwidth = 2 * LV_DOWNSCALE;   /*Add border to not transparent styles*/
+    else style->bwidth = style->bwidth * 2;                                         /*Make the border thicker*/
     style->mcolor = color_mix(style->mcolor, COLOR_ORANGE, OPA_80);
     style->gcolor = color_mix(style->gcolor, COLOR_ORANGE, OPA_80);
 }

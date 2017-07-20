@@ -70,6 +70,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     ext->opened = 0;
     ext->auto_size = 0;
     ext->sel_opt = 0;
+    ext->num_opt = 0;
     ext->anim_time = LV_DDLIST_DEF_ANIM_TIME;
     ext->style_sel = lv_style_get(LV_STYLE_PLAIN_COLOR, NULL);
 
@@ -83,7 +84,8 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));
+        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));;
+        lv_cont_set_fit(scrl, true, true);
 
         ext->opt_label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit(new_ddlist, true, false);
@@ -129,19 +131,35 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
     	    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     	    lv_obj_set_style(ext->opt_label, lv_obj_get_style(ddlist));
             lv_ddlist_refr_size(ddlist, 0);
-    	}
-    	else if(sign == LV_SIGNAL_ACTIVATE) {
+    	} else if(sign == LV_SIGNAL_ACTIVATE) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     	    if(ext->opened == false) {
     	        ext->opened = true;
     	        lv_ddlist_refr_size(ddlist, true);
     	    }
-    	}
-        else if(sign == LV_SIGNAL_DEACTIVATE) {
+    	} else if(sign == LV_SIGNAL_DEACTIVATE) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
             if(ext->opened != false) {
                 ext->opened = false;
                 lv_ddlist_refr_size(ddlist, true);
+            }
+        } else if(sign == LV_SIGNAL_INCREASE) {
+            lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+            if(ext->sel_opt < ext->num_opt - 1) {
+                ext->sel_opt ++;
+                lv_obj_inv(ddlist);
+                if(ext->cb != NULL) {
+                    ext->cb(ddlist, NULL);
+                }
+            }
+        } else if(sign == LV_SIGNAL_DECREASE) {
+            lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+            if(ext->sel_opt > 0) {
+                ext->sel_opt --;
+                lv_obj_inv(ddlist);
+                if(ext->cb != NULL) {
+                    ext->cb(ddlist, NULL);
+                }
             }
         }
     }
@@ -172,6 +190,8 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options)
         i++;
     }
 
+    ext->num_opt = i;
+
     lv_ddlist_refr_size(ddlist, 0);
 }
 
@@ -183,6 +203,15 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options)
 void lv_ddlist_set_options_str(lv_obj_t * ddlist, const char * options)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+
+    /*Count the '\n'-s to determine the number of options*/
+    ext->num_opt = 0;
+    uint16_t i;
+    for(i = 0; options[i] != '\0'; i++) {
+        if(options[i] == '\n') ext->num_opt++;
+    }
+    ext->num_opt++;     /*Last option in the at row*/
+
     lv_label_set_text(ext->opt_label, options);
     lv_ddlist_refr_size(ddlist, 0);
 }
@@ -372,7 +401,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
             rect_area.y1 -= style->line_space / 2;
 
             rect_area.y2 = rect_area.y1 + font_h + style->line_space;
-            rect_area.x1 = ext->opt_label->cords.x1 - style_page_scrl->hpad;
+            rect_area.x1 = ext->opt_label->cords.x1 - style->hpad;
             rect_area.x2 = rect_area.x1 + lv_obj_get_width(lv_page_get_scrl(ddlist));
 
             lv_draw_rect(&rect_area, mask, ext->style_sel);

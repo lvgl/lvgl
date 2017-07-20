@@ -72,21 +72,29 @@ typedef bool (* lv_design_f_t) (struct __LV_OBJ_T * obj, const area_t * mask_p, 
 
 typedef enum
 {
+    /*General signals*/
 	LV_SIGNAL_CLEANUP,
+    LV_SIGNAL_CHILD_CHG,
+    LV_SIGNAL_CORD_CHG,
+    LV_SIGNAL_STYLE_CHG,
+	LV_SIGNAL_REFR_EXT_SIZE,
+
+	/*Display input related*/
     LV_SIGNAL_PRESSED,
-	LV_SIGNAL_PRESSING,
+    LV_SIGNAL_PRESSING,
     LV_SIGNAL_PRESS_LOST,
     LV_SIGNAL_RELEASED,
     LV_SIGNAL_LONG_PRESS,
     LV_SIGNAL_LONG_PRESS_REP,
     LV_SIGNAL_DRAG_BEGIN,
-    LV_SIGNAL_DRAG_END,        
-    LV_SIGNAL_CHILD_CHG,
-    LV_SIGNAL_CORD_CHG,
-    LV_SIGNAL_STYLE_CHG,
-	LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_DRAG_END,
+
+	/*Group related*/
     LV_SIGNAL_ACTIVATE,
     LV_SIGNAL_DEACTIVATE,
+    LV_SIGNAL_INCREASE,
+    LV_SIGNAL_DECREASE,
+    LV_SIGNAL_SELECT,
 }lv_signal_t;
 
 typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
