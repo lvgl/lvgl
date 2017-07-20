@@ -40,6 +40,9 @@ void lv_group_activate_next(lv_group_t * group);
 void lv_group_activate_prev(lv_group_t * group);
 lv_style_t * lv_group_activate_style(lv_group_t * group, lv_style_t * style);
 lv_obj_t * lv_group_get_active(lv_group_t * group);
+void lv_group_inc_active(lv_group_t * group);
+void lv_group_dec_active(lv_group_t * group);
+void lv_group_sel_active(lv_group_t * group);
 
 /**********************
  *      MACROS

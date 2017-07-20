@@ -170,10 +170,16 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 
             lv_page_sb_refresh(page);
         } else if(sign == LV_SIGNAL_CORD_CHG) {
+            lv_style_t * style = lv_obj_get_style(page);
             /*Refresh the scrollbar and notify the scrl if the size is changed*/
             if(ext->scrl != NULL &&
                (lv_obj_get_width(page) != area_get_width(param) ||
                 lv_obj_get_height(page) != area_get_height(param))) {
+
+                if(lv_cont_get_hfit(ext->scrl) == false) {
+                    lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->hpad);
+                }
+
                 ext->scrl->signal_f(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->cords);
 
                 /*The scrollbars are important olny if they are visible now*/
@@ -309,15 +315,15 @@ static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
                     lv_inv_area(&sb_area_tmp);
                     page_ext->sbv_draw = 0;
                 }
-            } else if(sign == LV_SIGNAL_PRESSED) {
-                if(page_ext->pr_action != NULL) {
-                    page_ext->pr_action(page, param);
-                }
-            } else if(sign == LV_SIGNAL_RELEASED) {
-                if(lv_dispi_is_dragging(param) == false) {
-                    if(page_ext->rel_action != NULL) {
-                        page_ext->rel_action(page, param);
-                    }
+            }
+        }else if(sign == LV_SIGNAL_PRESSED) {
+            if(page_ext->pr_action != NULL) {
+                page_ext->pr_action(page, param);
+            }
+        } else if(sign == LV_SIGNAL_RELEASED) {
+            if(lv_dispi_is_dragging(param) == false) {
+                if(page_ext->rel_action != NULL) {
+                    page_ext->rel_action(page, param);
                 }
             }
         }

@@ -15,6 +15,7 @@
 #include "lvgl/lv_obj/lv_group.h"
 #include "lvgl/lv_app/lv_app.h"
 #include "lvgl/lv_draw/lv_draw_rbasic.h"
+#include "lv_group.h"
 #include "misc/gfx/anim.h"
 #include "hal/indev/indev.h"
 #include <stdint.h>
@@ -142,10 +143,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 #if LV_OBJ_FREE_NUM != 0
 		new_obj->free_num = 0;
 #endif
+
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
 
+#if LV_OBJ_GROUP != 0
+        new_obj->group_p = NULL;
+#endif
 		/*Set attributes*/
 		new_obj->click_en = 0;
 		new_obj->drag_en = 0;
@@ -188,6 +193,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
+#if LV_OBJ_GROUP != 0
+        new_obj->group_p = NULL;
+#endif
         
         /*Set attributes*/
         new_obj->click_en = 1;
@@ -199,7 +207,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->protect = LV_PROTECT_NONE;
         
         new_obj->ext = NULL;
-        
     }
 
     if(copy != NULL) {
@@ -223,6 +230,13 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->protect = copy->protect;
 
         new_obj->style_p = copy->style_p;
+
+#if LV_OBJ_GROUP != 0
+        /*Add to the same group*/
+        if(copy->group_p != NULL) {
+            lv_group_add(copy->group_p, new_obj);
+        }
+#endif
 
     	lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
     }
