@@ -11,6 +11,7 @@
 #if USE_LV_MBOX != 0
 
 #include "lv_mbox.h"
+#include "lvgl/lv_obj/lv_group.h"
 #include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 
@@ -148,7 +149,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     btn = lv_obj_get_child(ext->btnh, btn);
                 }
             }
-        } else if(sign == LV_SIGNAL_ACTIVATE) {
+        } else if(sign == LV_SIGNAL_FOCUS) {
             /*Get the first button*/
             if(ext->btnh != NULL) {
                 lv_obj_t * btn = NULL;
@@ -162,7 +163,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
                 }
             }
-        } else if(sign == LV_SIGNAL_DEACTIVATE) {
+        } else if(sign == LV_SIGNAL_DEFOCUS) {
             /*Get the 'pressed' button*/
             if(ext->btnh != NULL) {
                 lv_obj_t * btn = NULL;
@@ -176,56 +177,61 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 }
             }
-        } else if(sign == LV_SIGNAL_INCREASE) {
-            /*Get the last pressed button*/
-            if(ext->btnh != NULL) {
-                lv_obj_t * btn = NULL;
-                lv_obj_t * btn_prev = NULL;
-                btn = lv_obj_get_child(ext->btnh, btn);
-                while(btn != NULL) {
-                    if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
-                    btn_prev = btn;
+        } else if(sign == LV_SIGNAL_CONTROLL) {
+            lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+                /*Get the last pressed button*/
+                if(ext->btnh != NULL) {
+                    lv_obj_t * btn = NULL;
+                    lv_obj_t * btn_prev = NULL;
                     btn = lv_obj_get_child(ext->btnh, btn);
-                }
+                    while(btn != NULL) {
+                        if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                        btn_prev = btn;
+                        btn = lv_obj_get_child(ext->btnh, btn);
+                    }
 
-                if(btn_prev != NULL && btn != NULL) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                    lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
-                }
-            }
-        } else if(sign == LV_SIGNAL_DECREASE) {
-            /*Get the last pressed button*/
-            if(ext->btnh != NULL) {
-                lv_obj_t * btn = NULL;
-                btn = lv_obj_get_child(ext->btnh, btn);
-                while(btn != NULL) {
-                    if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
-                    btn = lv_obj_get_child(ext->btnh, btn);
-                }
-
-                if(btn != NULL) {
-                    lv_obj_t * btn_prev = lv_obj_get_child(ext->btnh, btn);
-                    if(btn_prev != NULL) {
+                    if(btn_prev != NULL && btn != NULL) {
                         lv_btn_set_state(btn, LV_BTN_STATE_REL);
                         lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
                     }
                 }
-            }
-        } else if(sign == LV_SIGNAL_SELECT) {
-            /*Get the 'pressed' button*/
-            if(ext->btnh != NULL) {
-                lv_obj_t * btn = NULL;
-                btn = lv_obj_get_child(ext->btnh, btn);
-                while(btn != NULL) {
-                    if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+                /*Get the last pressed button*/
+                if(ext->btnh != NULL) {
+                    lv_obj_t * btn = NULL;
                     btn = lv_obj_get_child(ext->btnh, btn);
-                }
+                    while(btn != NULL) {
+                        if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                        btn = lv_obj_get_child(ext->btnh, btn);
+                    }
 
-                if(btn != NULL) {
-                    lv_action_t rel_action;
-                    rel_action = lv_btn_get_rel_action(btn);
-                    if(rel_action != NULL) rel_action(btn, NULL);
+                    if(btn != NULL) {
+                        lv_obj_t * btn_prev = lv_obj_get_child(ext->btnh, btn);
+                        if(btn_prev != NULL) {
+                            lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                            lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                        }
+                    }
+
                 }
+            } else if(c == LV_GROUP_KEY_ENTER) {
+                /*Get the 'pressed' button*/
+               if(ext->btnh != NULL) {
+                   lv_obj_t * btn = NULL;
+                   btn = lv_obj_get_child(ext->btnh, btn);
+                   while(btn != NULL) {
+                       if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                       btn = lv_obj_get_child(ext->btnh, btn);
+                   }
+
+                   if(btn != NULL) {
+                       lv_action_t rel_action;
+                       rel_action = lv_btn_get_rel_action(btn);
+                       if(rel_action != NULL) rel_action(btn, NULL);
+                   }
+               }
             }
         }
     }

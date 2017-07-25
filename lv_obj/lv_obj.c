@@ -234,7 +234,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 #if LV_OBJ_GROUP != 0
         /*Add to the same group*/
         if(copy->group_p != NULL) {
-            lv_group_add(copy->group_p, new_obj);
+            lv_group_add_obj(copy->group_p, new_obj);
         }
 #endif
 
@@ -1265,8 +1265,8 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
     }
 #if LV_OBJ_GROUP != 0
     if(obj->group_p != NULL) {
-        if(lv_group_get_active(obj->group_p) == obj) {
-            style_act = lv_group_activate_style(obj->group_p, style_act);
+        if(lv_group_get_focused(obj->group_p) == obj) {
+            style_act = lv_group_mod_style(obj->group_p, style_act);
         }
     }
 #endif
@@ -1558,13 +1558,16 @@ static void lv_obj_del_child(lv_obj_t * obj)
    /*Remove the animations from this object*/
    anim_del(obj, NULL);
 
+   /*Delete from the group*/
+#if LV_OBJ_GROUP != 0
+   if(obj->group_p != NULL) lv_group_rem_obj(obj);
+#endif
+
    /*Remove the object from parent's children list*/
    lv_obj_t * par = lv_obj_get_parent(obj);
-
    ll_rem(&(par->child_ll), obj);
 
-   /* All children deleted.
-    * Now clean up the object specific data*/
+   /* Clean up the object specific data*/
    obj->signal_f(obj, LV_SIGNAL_CLEANUP, NULL);
 
    /*Delete the base objects*/

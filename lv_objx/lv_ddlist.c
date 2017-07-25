@@ -13,6 +13,7 @@
 #include "lv_ddlist.h"
 #include "../lv_draw/lv_draw.h"
 #include "misc/gfx/anim.h"
+#include "../lv_obj/lv_group.h"
 
 /*********************
  *      DEFINES
@@ -131,35 +132,42 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
     	    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     	    lv_obj_set_style(ext->opt_label, lv_obj_get_style(ddlist));
             lv_ddlist_refr_size(ddlist, 0);
-    	} else if(sign == LV_SIGNAL_ACTIVATE) {
+    	} else if(sign == LV_SIGNAL_FOCUS) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     	    if(ext->opened == false) {
     	        ext->opened = true;
     	        lv_ddlist_refr_size(ddlist, true);
     	    }
-    	} else if(sign == LV_SIGNAL_DEACTIVATE) {
+    	} else if(sign == LV_SIGNAL_DEFOCUS) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
             if(ext->opened != false) {
                 ext->opened = false;
                 lv_ddlist_refr_size(ddlist, true);
             }
-        } else if(sign == LV_SIGNAL_INCREASE) {
+        } else if(sign == LV_SIGNAL_CONTROLL) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
-            if(ext->sel_opt < ext->num_opt - 1) {
-                ext->sel_opt ++;
-                lv_obj_inv(ddlist);
-                if(ext->cb != NULL) {
-                    ext->cb(ddlist, NULL);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
+                if(ext->sel_opt < ext->num_opt - 1) {
+                    ext->sel_opt ++;
+                    lv_obj_inv(ddlist);
+                    if(ext->cb != NULL) {
+                        ext->cb(ddlist, NULL);
+                    }
                 }
-            }
-        } else if(sign == LV_SIGNAL_DECREASE) {
-            lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
-            if(ext->sel_opt > 0) {
-                ext->sel_opt --;
-                lv_obj_inv(ddlist);
-                if(ext->cb != NULL) {
-                    ext->cb(ddlist, NULL);
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
+                if(ext->sel_opt > 0) {
+                    ext->sel_opt --;
+                    lv_obj_inv(ddlist);
+                    if(ext->cb != NULL) {
+                        ext->cb(ddlist, NULL);
+                    }
                 }
+            } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ESC) {
+                if(ext->opened != false) ext->opened = false;
+                if(ext->opened == false) ext->opened = true;
+
+                lv_ddlist_refr_size(ddlist, true);
             }
         }
     }

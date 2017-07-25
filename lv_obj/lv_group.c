@@ -6,8 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
 #include "lv_group.h"
+#if LV_OBJ_GROUP != 0
+#include <stddef.h>
 
 /*********************
  *      DEFINES
@@ -20,7 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void style_activate_def(lv_style_t * style);
+static void style_mod_def(lv_style_t * style);
 
 /**********************
  *  STATIC VARIABLES
@@ -34,18 +35,27 @@ static void style_activate_def(lv_style_t * style);
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Create a new object group
+ * @return pointer to the new object group
+ */
 lv_group_t * lv_group_create(void)
 {
     lv_group_t * group = dm_alloc(sizeof(lv_group_t));
     ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
-    group->style_activate = style_activate_def;
-    group->actve_obj = NULL;
+    group->style_mod = style_mod_def;
+    group->obj_focus = NULL;
 
     return group;
 }
 
-void lv_group_add(lv_group_t * group, lv_obj_t * obj)
+/**
+ * Add an object to a group
+ * @param group pointer to a group
+ * @param obj pointer to an object to add
+ */
+void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     obj->group_p = group;
     lv_obj_t ** next = ll_ins_tail(&group->obj_ll);
@@ -54,104 +64,171 @@ void lv_group_add(lv_group_t * group, lv_obj_t * obj)
     /* If the head and the tail is equal then there is only one object in the linked list.
      * In this case automatically activate it*/
     if(ll_get_head(&group->obj_ll) == next) {
-        lv_group_activate_next(group);
+        lv_group_focus_next(group);
     }
 }
 
-void lv_group_activate_obj(lv_group_t * group, lv_obj_t * obj)
+/**
+ * Remove an object from its group
+ * @param obj pointer to an objectto remove
+ */
+void lv_group_rem_obj(lv_obj_t * obj)
 {
+    lv_group_t * g = obj->group_p;
+    if(g == NULL) return;
+    lv_obj_t ** i;
 
+    LL_READ(g->obj_ll, i) {
+        if(*i == obj) {
+            ll_rem(&g->obj_ll, i);
+            break;
+        }
+    }
 }
 
-void lv_group_set_style_cb(lv_group_t * group, void (*style_cb)(lv_style_t * style))
+
+/**
+ * Focus on an object (defocus the current)
+ * @param obj pointer to an object to focus on
+ */
+void lv_group_focus_obj(lv_obj_t * obj)
 {
-    group->style_activate = style_cb;
+    lv_group_t * g = obj->group_p;
+    if(g == NULL) return;
+    lv_obj_t ** i;
+
+    LL_READ(g->obj_ll, i) {
+        if(*i == obj) {
+            if(g->obj_focus != NULL) {
+                (*g->obj_focus)->signal_f(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+                lv_obj_inv(*g->obj_focus);
+            }
+
+            g->obj_focus = i;
+
+            if(g->obj_focus != NULL){
+                (*g->obj_focus)->signal_f(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
+                lv_obj_inv(*g->obj_focus);
+            }
+            break;
+        }
+    }
 }
 
-void lv_group_activate_next(lv_group_t * group)
+/**
+ * Focus the next object in a group (defocus the current)
+ * @param group pointer to a group
+ */
+void lv_group_focus_next(lv_group_t * group)
 {
-    if(group->actve_obj != NULL) {
-        (*group->actve_obj)->signal_f(*group->actve_obj, LV_SIGNAL_DEACTIVATE, NULL);
-        lv_obj_inv(*group->actve_obj);
+    if(group->obj_focus != NULL) {
+        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        lv_obj_inv(*group->obj_focus);
     }
 
     lv_obj_t ** obj_next;
-    if(group->actve_obj == NULL) obj_next = ll_get_head(&group->obj_ll);
-    else obj_next = ll_get_next(&group->obj_ll, group->actve_obj);
+    if(group->obj_focus == NULL) obj_next = ll_get_head(&group->obj_ll);
+    else obj_next = ll_get_next(&group->obj_ll, group->obj_focus);
 
     if(obj_next == NULL) obj_next = ll_get_head(&group->obj_ll);
-    group->actve_obj = obj_next;
+    group->obj_focus = obj_next;
 
-    if(group->actve_obj != NULL){
-        (*group->actve_obj)->signal_f(*group->actve_obj, LV_SIGNAL_ACTIVATE, NULL);
-        lv_obj_inv(*group->actve_obj);
+    if(group->obj_focus != NULL){
+        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+        lv_obj_inv(*group->obj_focus);
     }
 }
 
-void lv_group_activate_prev(lv_group_t * group)
+/**
+ * Focus the previous object in a group (defocus the current)
+ * @param group pointer to a group
+ */
+void lv_group_focus_prev(lv_group_t * group)
 {
-    if(group->actve_obj != NULL) lv_obj_inv(*group->actve_obj);
+    if(group->obj_focus != NULL) {
+        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        lv_obj_inv(*group->obj_focus);
+    }
 
     lv_obj_t ** obj_next;
-    if(group->actve_obj == NULL) obj_next = ll_get_tail(&group->obj_ll);
-    else obj_next = ll_get_prev(&group->obj_ll, group->actve_obj);
+    if(group->obj_focus == NULL) obj_next = ll_get_tail(&group->obj_ll);
+    else obj_next = ll_get_prev(&group->obj_ll, group->obj_focus);
 
     if(obj_next == NULL) obj_next = ll_get_tail(&group->obj_ll);
-    group->actve_obj = obj_next;
+    group->obj_focus = obj_next;
 
-    if(group->actve_obj != NULL) lv_obj_inv(*group->actve_obj);
+    if(group->obj_focus != NULL){
+        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+        lv_obj_inv(*group->obj_focus);
+    }
 
 }
 
-lv_style_t * lv_group_activate_style(lv_group_t * group, lv_style_t * style)
+/**
+ * Send a control character to the focuses object of a group
+ * @param group pointer to a group
+ * @param c a control character (use LV_GROUP_KEY_.. to navigate)
+ */
+void lv_group_send(lv_group_t * group, char c)
+{
+    lv_obj_t * act = lv_group_get_focused(group);
+    if(act == NULL) return;
+
+    act->signal_f(act, LV_SIGNAL_CONTROLL, &c);
+}
+
+
+/**
+ * Set a function for a group which will modify the object's style if it is in focus
+ * @param group pointer to a group
+ * @param style_cb the style modifier function pointer
+ */
+void lv_group_set_style_mod_cb(lv_group_t * group, void (*style_cb)(lv_style_t * style))
+{
+    group->style_mod = style_cb;
+    if(group->obj_focus != NULL) lv_obj_inv(*group->obj_focus);
+}
+
+/**
+ * Modify a style with the set 'style_mod' function. The input style remains unchanged.
+ * @param group pointer to group
+ * @param style pointer to a style to modify
+ * @return a copy of the input style but modified with the 'style_mod' function
+ */
+lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
 {
     lv_style_cpy(&group->style_tmp, style);
 
-    if(group->style_activate != NULL) group->style_activate(&group->style_tmp);
-    else style_activate_def(&group->style_tmp);
+    if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
+    else style_mod_def(&group->style_tmp);
 
     return &group->style_tmp;
 }
 
-
-void lv_group_inc_active(lv_group_t * group)
-{
-    lv_obj_t * act = lv_group_get_active(group);
-    if(act == NULL) return;
-
-    act->signal_f(act, LV_SIGNAL_INCREASE, NULL);
-}
-
-void lv_group_dec_active(lv_group_t * group)
-{
-    lv_obj_t * act = lv_group_get_active(group);
-    if(act == NULL) return;
-
-    act->signal_f(act, LV_SIGNAL_DECREASE, NULL);
-}
-
-void lv_group_sel_active(lv_group_t * group)
-{
-    lv_obj_t * act = lv_group_get_active(group);
-    if(act == NULL) return;
-
-    act->signal_f(act, LV_SIGNAL_SELECT, NULL);
-}
-
-lv_obj_t * lv_group_get_active(lv_group_t * group)
+/**
+ * Get the focused object or NULL if there isn't one
+ * @param group pointer to a group
+ * @return pointer to the focused object
+ */
+lv_obj_t * lv_group_get_focused(lv_group_t * group)
 {
     if(group == NULL) return NULL;
-    if(group->actve_obj == NULL) return NULL;
+    if(group->obj_focus == NULL) return NULL;
 
-    return *group->actve_obj;
+    return *group->obj_focus;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void style_activate_def(lv_style_t * style)
+/**
+ * Default style modifier function
+ * @param style pointer to a style to modify. (Typically &group->style_tmp) It will be OVERWRITTEN.
+ */
+static void style_mod_def(lv_style_t * style)
 {
+    /*Make the style a little bit orange*/
     style->bcolor = COLOR_ORANGE;
     style->bopa = OPA_COVER;
     if(style->bwidth == 0 && style->empty == 0) style->bwidth = 2 * LV_DOWNSCALE;   /*Add border to not transparent styles*/
@@ -159,3 +236,5 @@ static void style_activate_def(lv_style_t * style)
     style->mcolor = color_mix(style->mcolor, COLOR_ORANGE, OPA_80);
     style->gcolor = color_mix(style->gcolor, COLOR_ORANGE, OPA_80);
 }
+
+#endif /*LV_OBJ_GROUP != 0*/

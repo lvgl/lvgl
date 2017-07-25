@@ -10,9 +10,10 @@
 #if USE_LV_BTNM != 0
 
 #include "lv_btnm.h"
-#include "misc/gfx/text.h"
+#include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
+#include "misc/gfx/text.h"
 
 /*********************
  *      DEFINES
@@ -172,25 +173,29 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
                 ext->btn_pr = LV_BTNM_PR_NONE;
             }
-    	} else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEACTIVATE) {
+    	} else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
             ext->btn_pr = LV_BTNM_PR_NONE;
             lv_obj_inv(btnm);
-        } else if(sign == LV_SIGNAL_ACTIVATE) {
+        } else if(sign == LV_SIGNAL_FOCUS) {
             ext->btn_pr = 0;
             lv_obj_inv(btnm);
-    	} else if(sign == LV_SIGNAL_INCREASE) {
-            if(ext->btn_pr  == LV_BTNM_PR_NONE) ext->btn_pr = 0;
-            else ext->btn_pr++;
-            if(ext->btn_pr >= ext->btn_cnt - 1) ext->btn_pr = ext->btn_cnt - 1;
-            lv_obj_inv(btnm);
-        } else if(sign == LV_SIGNAL_DECREASE) {
-            if(ext->btn_pr  == LV_BTNM_PR_NONE) ext->btn_pr = 0;
-            if(ext->btn_pr > 0) ext->btn_pr--;
-            lv_obj_inv(btnm);
-        } else if(sign == LV_SIGNAL_SELECT) {
-            if(ext->cb != NULL) {
-                uint16_t txt_i = lv_btnm_get_btn_txt(btnm, ext->btn_pr);
-                if(txt_i != LV_BTNM_PR_NONE) ext->cb(btnm, txt_i);
+    	} else if(sign == LV_SIGNAL_CONTROLL) {
+            lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+                if(ext->btn_pr  == LV_BTNM_PR_NONE) ext->btn_pr = 0;
+                else ext->btn_pr++;
+                if(ext->btn_pr >= ext->btn_cnt - 1) ext->btn_pr = ext->btn_cnt - 1;
+                lv_obj_inv(btnm);
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+                if(ext->btn_pr  == LV_BTNM_PR_NONE) ext->btn_pr = 0;
+                if(ext->btn_pr > 0) ext->btn_pr--;
+                lv_obj_inv(btnm);
+            } else if(c == LV_GROUP_KEY_ENTER) {
+                if(ext->cb != NULL) {
+                    uint16_t txt_i = lv_btnm_get_btn_txt(btnm, ext->btn_pr);
+                    if(txt_i != LV_BTNM_PR_NONE) ext->cb(btnm, txt_i);
+                }
             }
         }
     }

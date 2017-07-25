@@ -122,11 +122,15 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     		lv_obj_set_size(ext->bullet, font_get_height(style->font), font_get_height(style->font));
     	} else if(sign == LV_SIGNAL_PRESSED ||
             sign == LV_SIGNAL_RELEASED ||
-            sign == LV_SIGNAL_PRESS_LOST ||
-            sign == LV_SIGNAL_INCREASE ||
-            sign == LV_SIGNAL_DECREASE ||
-            sign == LV_SIGNAL_SELECT) {
+            sign == LV_SIGNAL_PRESS_LOST) {
             lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
+        } else if(sign == LV_SIGNAL_CONTROLL) {
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
+               c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
+               c == LV_GROUP_KEY_ENTER) {
+                lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
+            }
         }
     }
     
@@ -235,9 +239,9 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
         if(style_page->empty != 0 || style_page->opa == OPA_TRANSP) { /*Background is visible?*/
-            if(lv_group_get_active(g) == bg) {
+            if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
-                style_mod = lv_group_activate_style(g, style_ori);
+                style_mod = lv_group_mod_style(g, style_ori);
                 bullet->style_p = style_mod;  /*Temporally change the style to the activated */
             }
         }

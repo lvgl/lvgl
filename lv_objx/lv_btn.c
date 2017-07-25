@@ -10,11 +10,11 @@
 #include "lv_conf.h"
 #if USE_LV_BTN != 0
 
-#include "lvgl/lv_obj/lv_obj.h"
+#include "lv_btn.h"
+#include "../lv_obj/lv_group.h"
+#include "../lv_draw/lv_draw.h"
 #include "misc/gfx/area.h"
 #include "misc/gfx/color.h"
-#include "../lv_draw/lv_draw.h"
-#include "lv_btn.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -185,24 +185,30 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             if(ext->lpr_rep_action != NULL && state != LV_BTN_STATE_INA) {
                 valid = ext->lpr_rep_action(btn, param);
             }
-        } else if(sign == LV_SIGNAL_INCREASE) {
-            if(lv_btn_get_tgl(btn) != false) {
-                lv_btn_set_state(btn, LV_BTN_STATE_TREL);
-                if(ext->rel_action != NULL) valid = ext->rel_action(btn, param);
-            }
-        } else if(sign == LV_SIGNAL_DECREASE) {
-            if(lv_btn_get_tgl(btn) != false) {
-                lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                if(ext->rel_action != NULL) valid = ext->rel_action(btn, param);
-            }
-        } else if(sign == LV_SIGNAL_SELECT) {
-            if(lv_btn_get_tgl(btn) != false) {
-                lv_btn_state_t state = lv_btn_get_state(btn);
-                if(state == LV_BTN_STATE_REL) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
-                else if(state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TPR);
-                else if(state == LV_BTN_STATE_TREL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                else if(state == LV_BTN_STATE_TPR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
-                if(ext->rel_action != NULL) valid = ext->rel_action(btn, param);
+        }  else if(sign == LV_SIGNAL_CONTROLL) {
+            lv_btn_ext_t * ext = lv_obj_get_ext(btn);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+                if(lv_btn_get_tgl(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+                if(ext->rel_action != NULL && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                    valid = ext->rel_action(btn, param);
+                }
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+                if(lv_btn_get_tgl(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                if(ext->rel_action != NULL && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                    valid = ext->rel_action(btn, param);
+                }
+            } else if(c == LV_GROUP_KEY_ENTER) {
+                if(lv_btn_get_tgl(btn) != false) {
+                    lv_btn_state_t state = lv_btn_get_state(btn);
+                    if(state == LV_BTN_STATE_REL) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
+                    else if(state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TPR);
+                    else if(state == LV_BTN_STATE_TREL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                    else if(state == LV_BTN_STATE_TPR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+                }
+                if(ext->rel_action != NULL && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                    valid = ext->rel_action(btn, param);
+                }
             }
         }
     }

@@ -11,6 +11,7 @@
 #if USE_LV_TA != 0
 
 #include "lv_ta.h"
+#include "lvgl/lv_obj/lv_group.h"
 #include "misc/gfx/anim.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -175,14 +176,21 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
                                 (style->hpad + style->hpad));
                 lv_label_set_text(ext->label, NULL);
             }
-    	} else if(sign == LV_SIGNAL_INCREASE) {
-    	    lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + 1);
-    	} else if(sign == LV_SIGNAL_DECREASE) {
-    	    uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
-    	    if(cur_pos > 0) lv_ta_set_cursor_pos(ta, cur_pos - 1);
+    	} else if (sign == LV_SIGNAL_CONTROLL) {
+            lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT) {
+                lv_ta_cursor_right(ta);
+            } else if(c == LV_GROUP_KEY_LEFT) {
+                lv_ta_cursor_left(ta);
+            } else if(c == LV_GROUP_KEY_UP) {
+                lv_ta_cursor_up(ta);
+            } else if(c == LV_GROUP_KEY_DOWN) {
+                lv_ta_cursor_down(ta);
+            }
         }
     }
-       return valid;
+    return valid;
 }
 
 /*=====================

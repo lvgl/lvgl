@@ -10,6 +10,7 @@
 #if USE_LV_SLIDER != 0
 
 #include "lv_slider.h"
+#include "lvgl/lv_obj/lv_group.h"
 #include "misc/math/math_base.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -52,7 +53,6 @@ static lv_design_f_t ancestor_design_f;
 lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor slider*/
-	/*TODO modify it to the ancestor create function */
     lv_obj_t * new_slider = lv_bar_create(par, copy);
     dm_assert(new_slider);
     
@@ -102,7 +102,6 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    /* TODO update it to the ancestor's signal function*/
     valid = lv_bar_signal(slider, sign, param);
 
     /* The object can be deleted so check its validity and then
@@ -148,12 +147,16 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
         } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
             cord_t x = MATH_MIN(w, h);
             if(slider->ext_size < x) slider->ext_size = x;
-        } else if(sign == LV_SIGNAL_INCREASE) {
-            lv_bar_set_value(slider, lv_bar_get_value(slider) + 1);
-            if(ext->cb != NULL) ext->cb(slider, NULL);
-        } else if(sign == LV_SIGNAL_DECREASE) {
-            lv_bar_set_value(slider, lv_bar_get_value(slider) - 1);
-            if(ext->cb != NULL) ext->cb(slider, NULL);
+        } else if(sign == LV_SIGNAL_CONTROLL) {
+            lv_slider_ext_t * ext = lv_obj_get_ext(slider);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+                lv_bar_set_value(slider, lv_bar_get_value(slider) + 1);
+                if(ext->cb != NULL) ext->cb(slider, NULL);
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+                lv_bar_set_value(slider, lv_bar_get_value(slider) - 1);
+                if(ext->cb != NULL) ext->cb(slider, NULL);
+            }
         }
     }
 

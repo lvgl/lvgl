@@ -90,11 +90,9 @@ typedef enum
     LV_SIGNAL_DRAG_END,
 
 	/*Group related*/
-    LV_SIGNAL_ACTIVATE,
-    LV_SIGNAL_DEACTIVATE,
-    LV_SIGNAL_INCREASE,
-    LV_SIGNAL_DECREASE,
-    LV_SIGNAL_SELECT,
+    LV_SIGNAL_FOCUS,
+    LV_SIGNAL_DEFOCUS,
+    LV_SIGNAL_CONTROLL,
 }lv_signal_t;
 
 typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);

@@ -501,7 +501,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
 
 #if LV_OBJ_GROUP != 0
         lv_group_t * g = lv_obj_get_group(label);
-        if(lv_group_get_active(g) == label) {
+        if(lv_group_get_focused(g) == label) {
             lv_draw_rect(&cords, mask, style);
         }
 #endif
