@@ -11,6 +11,7 @@
 #if USE_LV_TA != 0
 
 #include "lv_ta.h"
+#include "lvgl/lv_obj/lv_group.h"
 #include "misc/gfx/anim.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -158,32 +159,37 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     if(valid != false) {
     	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
     	lv_style_t * style = lv_obj_get_style(ta);
-    	switch(sign) {
-    		case LV_SIGNAL_CLEANUP:
-    			/* Nothing to clean up.
-    			 * (The created label will be deleted automatically) */
-    			break;
-    		case LV_SIGNAL_STYLE_CHG:
-    		    if(ext->label) {
-                    lv_obj_set_style(ext->label, lv_obj_get_style(ext->page.scrl));
-                    lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-                            (style->hpad + style->hpad));
-                    lv_label_set_text(ext->label, NULL);
-    		    }
-    			break;
+    	if(sign == LV_SIGNAL_CLEANUP) {
+            /* Nothing to clean up.
+             * (The created label will be deleted automatically) */
+    	} else if(sign == LV_SIGNAL_STYLE_CHG) {
+            if(ext->label) {
+                lv_obj_set_style(ext->label, lv_obj_get_style(ext->page.scrl));
+                lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
+                        (style->hpad + style->hpad));
+                lv_label_set_text(ext->label, NULL);
+            }
+    	} else if(sign == LV_SIGNAL_CORD_CHG) {
     		/*Set the label width according to the text area width*/
-    		case LV_SIGNAL_CORD_CHG:
-    		    if(ext->label != NULL) {
-                    lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-                                    (style->hpad + style->hpad));
-                    lv_label_set_text(ext->label, NULL);
-    		    }
-    			break;
-    		default:
-    			break;
-    	}
+            if(ext->label != NULL) {
+                lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
+                                (style->hpad + style->hpad));
+                lv_label_set_text(ext->label, NULL);
+            }
+    	} else if (sign == LV_SIGNAL_CONTROLL) {
+            lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT) {
+                lv_ta_cursor_right(ta);
+            } else if(c == LV_GROUP_KEY_LEFT) {
+                lv_ta_cursor_left(ta);
+            } else if(c == LV_GROUP_KEY_UP) {
+                lv_ta_cursor_up(ta);
+            } else if(c == LV_GROUP_KEY_DOWN) {
+                lv_ta_cursor_down(ta);
+            }
+        }
     }
-    
     return valid;
 }
 

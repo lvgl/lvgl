@@ -47,6 +47,7 @@
 /*lv_obj (base object) settings*/
 #define LV_OBJ_FREE_NUM          1           /*Enable the free number attribute*/
 #define LV_OBJ_FREE_P            1           /*Enable the free pointer attribute*/
+#define LV_OBJ_GROUP             1           /*Enable object groups*/
 
 /*Others*/
 #define LV_COLOR_TRANSP     COLOR_LIME
@@ -145,6 +146,9 @@
 
 /*List (dependencies: lv_page, lv_btn, lv_label, lv_img)*/
 #define USE_LV_LIST     1
+#if USE_LV_LIST != 0
+#define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#endif
 
 /*Drop down list (dependencies: lv_page, lv_label)*/
 #define USE_LV_DDLIST    1
@@ -244,7 +248,6 @@
 #define LV_APP_FILES_CHUNK_MAX_SIZE 1024    /*Max chunk size when the user sets it*/
 #endif /*USE_LV_APP_FILES != 0*/
 
-
 /*Benchmark*/
 #define USE_LV_APP_BENCHMARK     1
 #if USE_LV_APP_BENCHMARK != 0
@@ -252,7 +255,7 @@
 #endif
 
 /*WiFi*/
-#define USE_LV_APP_WIFI    1
+#define USE_LV_APP_WIFI    0
 #if USE_LV_APP_WIFI != 0
 #define LV_APP_WIFI_CONF_PATH       "S:/wifi_conf.txt"  /*Save config. here. Comment to use def. value*/
 #ifndef LV_APP_WIFI_CONF_PATH
@@ -265,7 +268,7 @@
 #endif /*USE_LV_APP_WIFI != 0*/
 
 /*GSM*/
-#define USE_LV_APP_GSM    1
+#define USE_LV_APP_GSM    0
 #if USE_LV_APP_GSM != 0
 #define LV_APP_GSM_CONF_PATH       "S:/gsm_conf.txt"    /*Save config. here. Comment to use def. value*/
 #ifndef LV_APP_GSM_CONF_PATH
@@ -277,7 +280,7 @@
 #endif /*USE_LV_APP_GSM != 0*/
 
 /*Ethernet*/
-#define USE_LV_APP_ETHERNET    1
+#define USE_LV_APP_ETHERNET    0
 #if USE_LV_APP_ETHERNET != 0
 /*No settings*/
 #endif /*USE_LV_APP_ETHERNET != 0*/

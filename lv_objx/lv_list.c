@@ -10,13 +10,18 @@
 #if USE_LV_LIST != 0
 
 #include "lv_list.h"
-#include <lvgl/lv_objx/lv_cont.h>
+#include "lvgl/lv_obj/lv_group.h"
+#include "lvgl/lv_objx/lv_cont.h"
+#include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_LIST_LAYOUT_DEF	LV_CONT_LAYOUT_COL_M
+#ifndef LV_LIST_FOCUS_TIME
+#define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -28,6 +33,8 @@
 #if 0
 static bool lv_list_design(lv_obj_t * list, const area_t * mask, lv_design_mode_t mode);
 #endif
+
+static lv_obj_t * lv_list_get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn);
 
 /**********************
  *  STATIC VARIABLES
@@ -108,6 +115,85 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     valid = lv_page_signal(list, sign, param);
     
+    /* The object can be deleted so check its validity and then
+     * make the object specific signal handling */
+    if(valid != false) {
+        if(sign == LV_SIGNAL_FOCUS) {
+            /*Get the first button*/
+            lv_obj_t * btn = NULL;
+            lv_obj_t * btn_prev = NULL;
+            btn = lv_list_get_next_btn(list, btn);
+            while(btn != NULL) {
+                btn_prev = btn;
+                btn = lv_list_get_next_btn(list, btn);
+            }
+            if(btn_prev != NULL) {
+                lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+            }
+        } else if(sign == LV_SIGNAL_DEFOCUS) {
+            /*Get the 'pressed' button*/
+            lv_obj_t * btn = NULL;
+            btn = lv_list_get_next_btn(list, btn);
+            while(btn != NULL) {
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                btn = lv_list_get_next_btn(list, btn);
+            }
+
+            if(btn != NULL) {
+                lv_btn_set_state(btn, LV_BTN_STATE_REL);
+            }
+        } else if(sign == LV_SIGNAL_CONTROLL) {
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
+                /*Get the last pressed button*/
+                lv_obj_t * btn = NULL;
+                lv_obj_t * btn_prev = NULL;
+                btn = lv_list_get_next_btn(list, btn);
+                while(btn != NULL) {
+                    if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                    btn_prev = btn;
+                    btn = lv_list_get_next_btn(list, btn);
+                }
+
+                if(btn_prev != NULL && btn != NULL) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                    lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                    lv_page_focus(list, btn_prev, LV_LIST_FOCUS_TIME);
+                }
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
+                /*Get the last pressed button*/
+                lv_obj_t * btn = NULL;
+                btn = lv_list_get_next_btn(list, btn);
+                while(btn != NULL) {
+                    if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                    btn = lv_list_get_next_btn(list, btn);
+                }
+
+                if(btn != NULL) {
+                    lv_obj_t * btn_prev = lv_list_get_next_btn(list, btn);
+                    if(btn_prev != NULL) {
+                        lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                        lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                        lv_page_focus(list, btn_prev, LV_LIST_FOCUS_TIME);
+                    }
+                }
+            } else if(c == LV_GROUP_KEY_ENTER) {
+                /*Get the 'pressed' button*/
+                lv_obj_t * btn = NULL;
+                btn = lv_list_get_next_btn(list, btn);
+                while(btn != NULL) {
+                    if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                    btn = lv_list_get_next_btn(list, btn);
+                }
+
+                if(btn != NULL) {
+                    lv_action_t rel_action;
+                    rel_action = lv_btn_get_rel_action(btn);
+                    if(rel_action != NULL) rel_action(btn, NULL);
+                }
+            }
+        }
+    }
     return valid;
 }
 
@@ -175,19 +261,37 @@ void lv_list_up(lv_obj_t * list)
 {
 	/*Search the first list element which 'y' coordinate is below the parent
 	 * and position the list to show this element on the bottom*/
-	lv_obj_t * h = lv_obj_get_parent(list);
+    lv_obj_t * scrl = lv_page_get_scrl(list);
 	lv_obj_t * e;
 	lv_obj_t * e_prev = NULL;
-	e = lv_obj_get_child(list, NULL);
+	e = lv_list_get_next_btn(list, NULL);
 	while(e != NULL) {
-		if(e->cords.y2 <= h->cords.y2) {
-			if(e_prev != NULL)
-			lv_obj_set_y(list, lv_obj_get_height(h) -
-					             (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev)));
+		if(e->cords.y2 <= list->cords.y2) {
+			if(e_prev != NULL) {
+			    cord_t new_y = lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
+#if LV_LIST_FOCUS_TIME == 0
+			    lv_obj_set_y(scrl, new_y);
+#else
+                anim_t a;
+                a.var = scrl;
+                a.start = lv_obj_get_y(scrl);
+                a.end = new_y;
+                a.fp = (anim_fp_t)lv_obj_set_y;
+                a.path = anim_get_path(ANIM_PATH_LIN);
+                a.end_cb = NULL;
+                a.act_time = 0;
+                a.time = LV_LIST_FOCUS_TIME;
+                a.playback = 0;
+                a.playback_pause = 0;
+                a.repeat = 0;
+                a.repeat_pause = 0;
+                anim_create(&a);
+#endif
+			}
 			break;
 		}
 		e_prev = e;
-		e = lv_obj_get_child(list, e);
+		e = lv_list_get_next_btn(list, e);
 	}
 }
 
@@ -199,18 +303,35 @@ void lv_list_down(lv_obj_t * list)
 {
 	/*Search the first list element which 'y' coordinate is above the parent
 	 * and position the list to show this element on the top*/
-	lv_obj_t * h = lv_obj_get_parent(list);
+	lv_obj_t * scrl = lv_page_get_scrl(list);
 	lv_obj_t * e;
-	e = lv_obj_get_child(list, NULL);
+	e = lv_list_get_next_btn(list, NULL);
 	while(e != NULL) {
-		if(e->cords.y1 < h->cords.y1) {
-			lv_obj_set_y(list, -lv_obj_get_y(e));
+		if(e->cords.y1 < list->cords.y1) {
+            cord_t new_y = -lv_obj_get_y(e);
+#if LV_LIST_FOCUS_TIME == 0
+			lv_obj_set_y(scrl, new_y);
+#else
+            anim_t a;
+            a.var = scrl;
+            a.start = lv_obj_get_y(scrl);
+            a.end = new_y;
+            a.fp = (anim_fp_t)lv_obj_set_y;
+            a.path = anim_get_path(ANIM_PATH_LIN);
+            a.end_cb = NULL;
+            a.act_time = 0;
+            a.time = LV_LIST_FOCUS_TIME;
+            a.playback = 0;
+            a.playback_pause = 0;
+            a.repeat = 0;
+            a.repeat_pause = 0;
+            anim_create(&a);
+#endif
 			break;
 		}
-		e = lv_obj_get_child(list, e);
+		e = lv_list_get_next_btn(list, e);
 	}
 }
-
 
 /*=====================
  * Setter functions 
@@ -236,8 +357,9 @@ void lv_list_set_sb_out(lv_obj_t * list, bool out)
  */
 void lv_list_set_element_text_roll(lv_obj_t * liste, bool en)
 {
-    /*The last child is the label*/
-    lv_obj_t * label = lv_obj_get_child(liste, NULL);
+    lv_obj_t * label = lv_list_get_element_label(liste);
+    if(label == NULL) return;
+
     if(en == false) {
         lv_label_set_long_mode(label, LV_LABEL_LONG_DOTS);
     } else {
@@ -269,12 +391,11 @@ void lv_list_set_styles_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
     ext->styles_btn[LV_BTN_STATE_TPR] = tpr;
     ext->styles_btn[LV_BTN_STATE_INA] = ina;
 
-    lv_obj_t * scrl = lv_page_get_scrl(list);
-    lv_obj_t * liste = lv_obj_get_child(scrl, NULL);
+    lv_obj_t * liste = lv_list_get_next_btn(list, NULL);
     while(liste != NULL)
     {
         lv_btn_set_styles(liste, rel, pr, trel, tpr, ina);
-        liste = lv_obj_get_child(scrl, liste);
+        liste = lv_list_get_next_btn(list, liste);
     }
 }
 
@@ -290,16 +411,14 @@ void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style)
 
     ext->style_img = style;
 
-    lv_obj_t * scrl = lv_page_get_scrl(list);
-    lv_obj_t * liste = lv_obj_get_child(scrl, NULL);
+    lv_obj_t * liste = lv_list_get_next_btn(list, NULL);
     lv_obj_t * img;
     while(liste != NULL)
     {
-        img = lv_obj_get_child(liste, NULL); /*Now img = the label*/
-        img = lv_obj_get_child(liste, img);  /*Now img = the image (if ULL then no image) */
+        img = lv_list_get_element_img(liste);
         if(img != NULL) lv_obj_set_style(img, style);
 
-        liste = lv_obj_get_child(scrl, liste);
+        liste = lv_list_get_next_btn(list, liste);
     }
 }
 
@@ -314,9 +433,45 @@ void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style)
  */
 const char * lv_list_get_element_text(lv_obj_t * liste)
 {
-    /*The last child is the label*/
-    lv_obj_t * label = lv_obj_get_child(liste, NULL);
+    lv_obj_t * label = lv_list_get_element_label(liste);
+    if(label == NULL) return "";
     return lv_label_get_text(label);
+}
+
+/**
+ * Get the label object from a list element
+ * @param liste pointer to a list element (button)
+ * @return pointer to the label from the list element or NULL if not found
+ */
+lv_obj_t * lv_list_get_element_label(lv_obj_t * liste)
+{
+    lv_obj_t * label = lv_obj_get_child(liste, NULL);
+    if(label == NULL) return NULL;
+
+    while(label->signal_f != lv_label_signal) {
+        label = lv_obj_get_child(liste, NULL);
+        if(label == NULL) break;
+    }
+
+    return label;
+}
+
+/**
+ * Get the image object from a list element
+ * @param liste pointer to a list element (button)
+ * @return pointer to the image from the list element or NULL if not found
+ */
+lv_obj_t * lv_list_get_element_img(lv_obj_t * liste)
+{
+    lv_obj_t * img = lv_obj_get_child(liste, NULL);
+    if(img == NULL) return NULL;
+
+    while(img->signal_f != lv_img_signal) {
+        img = lv_obj_get_child(liste, NULL);
+        if(img == NULL) break;
+    }
+
+    return img;
 }
 
 /**
@@ -387,5 +542,30 @@ static bool lv_list_design(lv_obj_t * list, const area_t * mask, lv_design_mode_
     return true;
 }
 #endif
+
+/**
+ * Get the next button from list
+ * @param list pointer to a list object
+ * @param prev_btn pointer to button. Search the next after it.
+ * @return pointer to the next button or NULL
+ */
+static lv_obj_t * lv_list_get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn)
+{
+    /* Not a good practice but user can add/create objects to the lists manually.
+     * When getting the next button try to be sure that it is at least a button */
+
+    lv_obj_t * btn ;
+    lv_obj_t * scrl = lv_page_get_scrl(list);
+
+    btn = lv_obj_get_child(scrl, prev_btn);
+    if(btn == NULL) return NULL;
+
+    while(btn->signal_f != lv_btn_signal) {
+        btn = lv_obj_get_child(scrl, prev_btn);
+        if(btn == NULL) break;
+    }
+
+    return btn;
+}
 
 #endif

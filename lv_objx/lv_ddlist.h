@@ -43,7 +43,8 @@ typedef struct
     /*New data for this type */
     lv_obj_t * opt_label;                           /*Label for the options*/
     lv_style_t * style_sel;                         /*Style of the selected option*/
-    lv_action_t cb;                                 /*Pointer to function to call when an option is slected*/
+    lv_action_t cb;                                 /*Pointer to function to call when an option is selected*/
+    uint16_t num_opt;                               /*Number of options*/
     uint16_t sel_opt;                               /*Index of the current option*/
     uint16_t anim_time;                             /*Open/Close animation time [ms]*/
     uint8_t opened :1;                              /*1: The list is opened*/

@@ -10,9 +10,10 @@
 #if USE_LV_BTNM != 0
 
 #include "lv_btnm.h"
-#include "misc/gfx/text.h"
+#include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
+#include "misc/gfx/text.h"
 
 /*********************
  *      DEFINES
@@ -29,6 +30,7 @@
 static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_t mode);
 static uint8_t lv_btnm_get_width_unit(const char * btn_str);
 static uint16_t lv_btnm_get_btn_from_point(lv_obj_t * btnm, point_t * p);
+static uint16_t lv_btnm_get_btn_txt(lv_obj_t * btnm, uint16_t btn_id);
 static void lv_btnm_create_btns(lv_obj_t * btnm, const char ** map);
 
 /**********************
@@ -155,18 +157,8 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     	}
     	else if(sign ==  LV_SIGNAL_RELEASED || sign == LV_SIGNAL_LONG_PRESS_REP) {
             if(ext->cb != NULL && ext->btn_pr != LV_BTNM_PR_NONE) {
-                uint16_t txt_i = 0;
-                uint16_t btn_i = 0;
-
-                /* Search the text of ext->btn_pr the buttons text in the map
-                 * Skip "\n"-s*/
-                while(btn_i != ext->btn_pr) {
-                    btn_i ++;
-                    txt_i ++;
-                    if(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
-                }
-
-                ext->cb(btnm, txt_i);
+                uint16_t txt_i = lv_btnm_get_btn_txt(btnm, ext->btn_pr);
+                if(txt_i != LV_BTNM_PR_NONE) ext->cb(btnm, txt_i);
             }
 
             if(sign == LV_SIGNAL_RELEASED && ext->btn_pr != LV_BTNM_PR_NONE) {
@@ -181,11 +173,30 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
                 ext->btn_pr = LV_BTNM_PR_NONE;
             }
-    	}
-        else if(sign == LV_SIGNAL_PRESS_LOST) {
+    	} else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
             ext->btn_pr = LV_BTNM_PR_NONE;
             lv_obj_inv(btnm);
-
+        } else if(sign == LV_SIGNAL_FOCUS) {
+            ext->btn_pr = 0;
+            lv_obj_inv(btnm);
+    	} else if(sign == LV_SIGNAL_CONTROLL) {
+            lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+                if(ext->btn_pr  == LV_BTNM_PR_NONE) ext->btn_pr = 0;
+                else ext->btn_pr++;
+                if(ext->btn_pr >= ext->btn_cnt - 1) ext->btn_pr = ext->btn_cnt - 1;
+                lv_obj_inv(btnm);
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+                if(ext->btn_pr  == LV_BTNM_PR_NONE) ext->btn_pr = 0;
+                if(ext->btn_pr > 0) ext->btn_pr--;
+                lv_obj_inv(btnm);
+            } else if(c == LV_GROUP_KEY_ENTER) {
+                if(ext->cb != NULL) {
+                    uint16_t txt_i = lv_btnm_get_btn_txt(btnm, ext->btn_pr);
+                    if(txt_i != LV_BTNM_PR_NONE) ext->cb(btnm, txt_i);
+                }
+            }
         }
     }
     
@@ -441,8 +452,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			txt_i ++;
     	}
     }
-
-
     return true;
 }
 
@@ -486,6 +495,12 @@ static uint8_t lv_btnm_get_width_unit(const char * btn_str)
 	return 1;
 }
 
+/**
+ * Gives the button id of a button under a given point
+ * @param btnm pointer to a button matrix object
+ * @param p a point with absolute coordinates
+ * @return the id of the button or LV_BTNM_PR_NONE.
+ */
 static uint16_t lv_btnm_get_btn_from_point(lv_obj_t * btnm, point_t * p)
 {
     area_t btnm_cords;
@@ -508,6 +523,34 @@ static uint16_t lv_btnm_get_btn_from_point(lv_obj_t * btnm, point_t * p)
     if(i == ext->btn_cnt) i = LV_BTNM_PR_NONE;
 
     return i;
+}
+
+/**
+ * Get the text of a button
+ * @param btnm pointer to a button matrix object
+ * @param btn_id button id
+ * @return text id in ext->map_p or LV_BTNM_PR_NONE if 'btn_id' was invalid
+ */
+static uint16_t lv_btnm_get_btn_txt(lv_obj_t * btnm, uint16_t btn_id)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
+    if(btn_id > ext->btn_cnt) return LV_BTNM_PR_NONE;
+
+    uint16_t txt_i = 0;
+    uint16_t btn_i = 0;
+
+    /* Search the text of ext->btn_pr the buttons text in the map
+     * Skip "\n"-s*/
+    while(btn_i != btn_id) {
+        btn_i ++;
+        txt_i ++;
+        if(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
+    }
+
+    if(btn_i == ext->btn_cnt) return  LV_BTNM_PR_NONE;
+
+    return txt_i;
+
 }
 
 

@@ -72,19 +72,27 @@ typedef bool (* lv_design_f_t) (struct __LV_OBJ_T * obj, const area_t * mask_p, 
 
 typedef enum
 {
+    /*General signals*/
 	LV_SIGNAL_CLEANUP,
+    LV_SIGNAL_CHILD_CHG,
+    LV_SIGNAL_CORD_CHG,
+    LV_SIGNAL_STYLE_CHG,
+	LV_SIGNAL_REFR_EXT_SIZE,
+
+	/*Display input related*/
     LV_SIGNAL_PRESSED,
-	LV_SIGNAL_PRESSING,
+    LV_SIGNAL_PRESSING,
     LV_SIGNAL_PRESS_LOST,
     LV_SIGNAL_RELEASED,
     LV_SIGNAL_LONG_PRESS,
     LV_SIGNAL_LONG_PRESS_REP,
     LV_SIGNAL_DRAG_BEGIN,
-    LV_SIGNAL_DRAG_END,        
-    LV_SIGNAL_CHILD_CHG,
-    LV_SIGNAL_CORD_CHG,
-    LV_SIGNAL_STYLE_CHG,
-	LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_DRAG_END,
+
+	/*Group related*/
+    LV_SIGNAL_FOCUS,
+    LV_SIGNAL_DEFOCUS,
+    LV_SIGNAL_CONTROLL,
 }lv_signal_t;
 
 typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
@@ -105,6 +113,8 @@ typedef struct __LV_OBJ_T
 #if LV_OBJ_FREE_P != 0
     void * free_p;              /*Application specific pointer (set it freely)*/
 #endif
+
+    void * group_p;             /*Pointer to the group of the object*/
 
     /*Attributes and states*/
     uint8_t click_en     :1;    /*1: Can be pressed by a display input device*/
@@ -158,13 +168,6 @@ typedef enum
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
 }lv_align_t;
-
-
-typedef struct
-{
-	color_t color;
-    opa_t opa;
-}lv_objs_t;
 
 typedef enum
 {
@@ -473,6 +476,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
  */
 void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);
 #endif
+
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -665,6 +669,14 @@ uint8_t lv_obj_get_free_num(lv_obj_t * obj);
 void * lv_obj_get_free_p(lv_obj_t * obj);
 #endif
 
+#if LV_OBJ_GROUP != 0
+/**
+ * Get the group of the object
+ * @param obj pointer to an object
+ * @return the pointer to group of the object
+ */
+void * lv_obj_get_group(lv_obj_t * obj);
+#endif
 /**********************
  *      MACROS
  **********************/
