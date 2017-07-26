@@ -50,7 +50,8 @@
 #define LV_OBJ_GROUP             1           /*Enable object groups*/
 
 /*Others*/
-#define LV_COLOR_TRANSP     COLOR_LIME
+#define LV_COLOR_TRANSP     COLOR_LIME      /*This could mean transparent pixel*/
+#define USE_LV_EXAMPLE      1               /*Enable examples (lvgl/lv_examples/). Disable to save memory*/
 
 /*==================
  *  LV OBJ X USAGE 
