@@ -77,7 +77,6 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         lv_cont_set_fit(new_cb, true, true);
         lv_btn_set_tgl(new_cb, true);
 
-        lv_obj_set_design_f(ext->bullet, lv_bullet_design);
         lv_obj_set_click(ext->bullet, false);
         lv_btn_set_styles(ext->bullet, lv_style_get(LV_STYLE_PRETTY, NULL), lv_style_get(LV_STYLE_PRETTY_COLOR, NULL),
                                        lv_style_get(LV_STYLE_BTN_TREL, NULL), lv_style_get(LV_STYLE_BTN_TPR, NULL),
@@ -94,6 +93,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_cb);
     }
+
+    lv_obj_set_design_f(ext->bullet, lv_bullet_design);
     
     return new_cb;
 }
