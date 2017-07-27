@@ -46,6 +46,7 @@ lv_group_t * lv_group_create(void)
 
     group->style_mod = style_mod_def;
     group->obj_focus = NULL;
+    group->frozen = 0;
 
     return group;
 }
@@ -84,6 +85,11 @@ void lv_group_rem_obj(lv_obj_t * obj)
             break;
         }
     }
+
+    if(*g->obj_focus == obj) {
+        g->obj_focus = NULL;
+        lv_group_focus_next(g);
+    }
 }
 
 
@@ -95,6 +101,9 @@ void lv_group_focus_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
+
+    if(g->frozen != 0) return;
+
     lv_obj_t ** i;
 
     LL_READ(g->obj_ll, i) {
@@ -121,6 +130,8 @@ void lv_group_focus_obj(lv_obj_t * obj)
  */
 void lv_group_focus_next(lv_group_t * group)
 {
+    if(group->frozen != 0) return;
+
     if(group->obj_focus != NULL) {
         (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_inv(*group->obj_focus);
@@ -145,6 +156,8 @@ void lv_group_focus_next(lv_group_t * group)
  */
 void lv_group_focus_prev(lv_group_t * group)
 {
+    if(group->frozen != 0) return;
+
     if(group->obj_focus != NULL) {
         (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_inv(*group->obj_focus);
@@ -162,6 +175,17 @@ void lv_group_focus_prev(lv_group_t * group)
         lv_obj_inv(*group->obj_focus);
     }
 
+}
+
+/**
+ * Do not let to change the focus from the current object
+ * @param group pointer to a group
+ * @param en true: freeze, false: release freezing (normal mode)
+ */
+void lv_group_focus_freeze(lv_group_t * group, bool en)
+{
+    if(en == false) group->frozen = 0;
+    else group->frozen = 1;
 }
 
 /**
