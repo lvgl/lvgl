@@ -68,22 +68,21 @@ void encoder_ctrl_init(void)
     style_mbox_bg.opa = OPA_50;
 
     lv_obj_t * title = lv_label_create(scr, NULL);
-    lv_label_set_text(title, "adasds");
+    lv_label_set_text(title, "Encoder control");
     lv_obj_set_protect(title, LV_PROTECT_FOLLOW);   /*Make a line break in the layout*/
 
 
     /*Create a holder, a subtitle and a drop down list*/
+    lv_obj_t * ddlist = lv_ddlist_create(scr, NULL);
+    lv_ddlist_set_options_str(ddlist, "Low\nMedium\nHigh");
+    lv_group_add_obj(g, ddlist);   /*Add the object to the first group*/
+
+    /*Copy the previous holder and subtitle and add check boxes*/
     lv_obj_t * holder = lv_cont_create(scr, NULL);     /*Create a transparent holder to group some objects*/
     lv_cont_set_fit(holder, true, true);
     lv_cont_set_layout(holder, LV_CONT_LAYOUT_COL_L);
     lv_obj_set_style(holder, lv_style_get(LV_STYLE_TRANSP, NULL));
 
-    lv_obj_t * ddlist = lv_ddlist_create(holder, NULL);
-    lv_ddlist_set_options_str(ddlist, "Low\nMedium\nHigh");
-    lv_group_add_obj(g, ddlist);   /*Add the object to the first group*/
-
-    /*Copy the previous holder and subtitle and add check boxes*/
-    holder = lv_cont_create(scr, holder);
     lv_obj_t * cb = lv_cb_create(holder, NULL);
     lv_cb_set_text(cb, "Red");
     lv_group_add_obj(g, cb);
@@ -95,8 +94,7 @@ void encoder_ctrl_init(void)
     lv_cb_set_text(cb, "Blue");
 
     /*Copy the previous holder and subtitle and add sliders*/
-    holder = lv_cont_create(scr, holder);
-    lv_obj_t * slider = lv_slider_create(holder, NULL);
+    lv_obj_t * slider = lv_slider_create(scr, NULL);
     lv_obj_set_size_us(slider, 180, 30);
     lv_group_add_obj(g, slider);
 
@@ -160,6 +158,7 @@ static lv_action_res_t enable_action(lv_obj_t * btn, lv_dispi_t * dispi)
         lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, - LV_DPI / 2);
 
         lv_group_focus_obj(mbox);
+        lv_group_focus_freeze(g, true);
     }
     return LV_ACTION_RES_OK;
 }
@@ -167,12 +166,14 @@ static lv_action_res_t enable_action(lv_obj_t * btn, lv_dispi_t * dispi)
 static lv_action_res_t mbox_yes_action(lv_obj_t * btn, lv_dispi_t * dispi)
 {
     lv_obj_t * mbox = lv_mbox_get_from_btn(btn);
+    lv_group_focus_freeze(g, false);
     lv_obj_del(lv_obj_get_parent(mbox));
 }
 
 static lv_action_res_t mbox_no_action(lv_obj_t * btn, lv_dispi_t * dispi)
 {
     lv_obj_t * mbox = lv_mbox_get_from_btn(btn);
+    lv_group_focus_freeze(g, false);
     lv_obj_del(lv_obj_get_parent(mbox));
 }
 
