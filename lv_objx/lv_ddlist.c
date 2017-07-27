@@ -103,6 +103,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         ext->sel_opt = copy_ext->sel_opt;
         ext->auto_size = copy_ext->auto_size;
         ext->cb = copy_ext->cb;
+        ext->num_opt = copy_ext->num_opt;
 
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_ddlist);
@@ -148,7 +149,7 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
             lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
             char c = *((char*)param);
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
-                if(ext->sel_opt < ext->num_opt - 1) {
+                if(ext->sel_opt +1 < ext->num_opt) {
                     ext->sel_opt ++;
                     lv_obj_inv(ddlist);
                     if(ext->cb != NULL) {
