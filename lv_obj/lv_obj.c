@@ -420,12 +420,14 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     old_pos.x = lv_obj_get_x(obj);
     old_pos.y = lv_obj_get_y(obj);
     
+    lv_obj_t * old_par = obj->par;
+
     ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
     obj->par = parent;
     lv_obj_set_pos(obj, old_pos.x, old_pos.y);
 
     /*Notify the original parent because one of its children is lost*/
-    obj->par->signal_f(obj->par, LV_SIGNAL_CHILD_CHG, NULL);
+    old_par->signal_f(old_par, LV_SIGNAL_CHILD_CHG, NULL);
 
     /*Notify the new parent about the child*/
     parent->signal_f(parent, LV_SIGNAL_CHILD_CHG, obj);
