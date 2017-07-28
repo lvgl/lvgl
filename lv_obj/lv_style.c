@@ -8,18 +8,31 @@
  *********************/
 #include "lv_conf.h"
 #include "lv_style.h"
+#include "lv_obj.h"
+#include "misc/mem/dyn_mem.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_STYLE_ANIM_RES       255    /*Animation max in 1024 steps*/
+#define LV_STYLE_ANIM_SHIFT     8      /*log2(LV_STYLE_ANIM_RES)*/
+
+#define VAL_PROP(v1, v2, r)   v1 + (((v2-v1) * r) >> LV_STYLE_ANIM_SHIFT)
+#define STYLE_ATTR_ANIM(attr, r)   if(start->attr != end->attr) act->attr = VAL_PROP(start->attr, end->attr, r)
 
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    const lv_style_t * style_start;
+    const lv_style_t * style_end;
+    lv_style_t * style_anim;
+}lv_style_anim_dsc_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val);
 
 /**********************
  *  STATIC VARIABLES
@@ -229,6 +242,84 @@ void lv_style_cpy(lv_style_t * dest, const lv_style_t * src)
     memcpy(dest, src, sizeof(lv_style_t));
 }
 
+/**
+ * Create an animation from a pre-configured 'lv_style_anim_t' variable
+ * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
+ */
+void lv_style_anim_create(lv_style_anim_t * anim)
+{
+    lv_style_anim_dsc_t * dsc;
+    dsc = dm_alloc(sizeof(lv_style_anim_dsc_t));
+    dsc->style_anim = anim->style_anim;
+    dsc->style_start = anim->style_start;
+    dsc->style_end = anim->style_end;
+
+    anim_t a;
+    a.var = (void*)dsc;
+    a.start = 0;
+    a.end = LV_STYLE_ANIM_RES;
+    a.fp = (anim_fp_t)lv_style_aimator;
+    a.path = anim_get_path(ANIM_PATH_LIN);
+    a.end_cb = anim->end_cb;
+    a.act_time = anim->act_time;
+    a.time = anim->time;
+    a.playback = anim->playback;
+    a.playback_pause = anim->playback_pause;
+    a.repeat = anim->repeat;
+    a.repeat_pause = anim->repeat_pause;
+
+    anim_create(&a);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * Used by the style animations to set the values of a style according to start and end style.
+ * @param dsc the 'animated variable' set by lv_style_anim_create()
+ * @param val the current state of the animation between 0 and LV_STYLE_ANIM_RES
+ */
+static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
+{
+    const lv_style_t * start = dsc->style_start;
+    const lv_style_t * end = dsc->style_end;
+    lv_style_t * act = dsc->style_anim;
+
+    STYLE_ATTR_ANIM(opa, val);
+    STYLE_ATTR_ANIM(radius, val);
+    STYLE_ATTR_ANIM(bwidth, val);
+    STYLE_ATTR_ANIM(swidth, val);
+    STYLE_ATTR_ANIM(hpad, val);
+    STYLE_ATTR_ANIM(vpad, val);
+    STYLE_ATTR_ANIM(opad, val);
+    STYLE_ATTR_ANIM(line_space, val);
+    STYLE_ATTR_ANIM(letter_space, val);
+    STYLE_ATTR_ANIM(line_width, val);
+    STYLE_ATTR_ANIM(img_recolor, val);
+
+    act->mcolor = color_mix(end->mcolor, start->mcolor, val);
+    act->gcolor = color_mix(end->gcolor, start->gcolor, val);
+    act->bcolor = color_mix(end->bcolor, start->bcolor, val);
+    act->scolor = color_mix(end->scolor, start->scolor, val);
+    act->ccolor = color_mix(end->ccolor, start->ccolor, val);
+
+
+    if(val == 0) {
+        act->empty = start->empty;
+        act->glass = start->glass;
+        act->font = start->font;
+        act->stype = start->stype;
+        act->txt_align = start->txt_align;
+    }
+
+    if(val == LV_STYLE_ANIM_RES) {
+        act->empty = end->empty;
+        act->glass = end->glass;
+        act->font = end->font;
+        act->stype = end->stype;
+        act->txt_align = end->txt_align;
+    }
+
+    lv_style_refr_objs(dsc->style_anim);
+}
