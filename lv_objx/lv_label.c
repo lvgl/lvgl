@@ -514,15 +514,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
 
-        if(strcmp("Folder1", ext->txt) == 0) {
-            uint8_t i;
-            i = 0;
-            i++;
-        }
-
 		lv_draw_label(&cords, mask, style, ext->txt, flag, &ext->offset);
-
-
     }
     return true;
 }
