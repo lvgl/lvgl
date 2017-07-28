@@ -38,6 +38,7 @@ typedef struct
     lv_obj_t ** obj_focus;
     void (*style_mod)(lv_style_t * style);
     lv_style_t style_tmp;
+    uint8_t frozen:1;
 }lv_group_t;
 
 /**********************
@@ -49,6 +50,7 @@ void lv_group_rem_obj(lv_obj_t * obj);
 void lv_group_focus_obj(lv_obj_t * obj);
 void lv_group_focus_next(lv_group_t * group);
 void lv_group_focus_prev(lv_group_t * group);
+void lv_group_focus_freeze(lv_group_t * group, bool en);
 void lv_group_send(lv_group_t * group, char c);
 lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
 lv_obj_t * lv_group_get_focused(lv_group_t * group);
