@@ -136,14 +136,12 @@ lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy);
  */
 void lv_style_cpy(lv_style_t * dest, const lv_style_t * src);
 
+/**
+ * Create an animation from a pre-configured 'lv_style_anim_t' variable
+ * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
+ */
 void lv_style_anim_create(lv_style_anim_t * anim);
 
-/**
- * Used by the style animations to set the values of a style according to start and end style.
- * @param dsc the 'animated variable' set by lv_style_anim_create()
- * @param val the current state of the animation between 0 and LV_STYLE_ANIM_RES
- */
-static void lv_style_aimator(void * dsc, int32_t val);
 
 /**********************
  *      MACROS
