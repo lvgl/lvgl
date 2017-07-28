@@ -7,6 +7,10 @@
  * Create a simple GUI to demonstrate how to control it with an encoder
  * using 'lv_group'.
  *
+ * Be sure in lv_conf.h:
+ * - LV_OBJ_GROUP   1   to enable groups
+ * - LV_APP_ENABLE  0   to disable applications because they might bother now
+ *
  * lv_group:
  * - you can create groups and add object to them
  * - it can be a focused object within a group
@@ -265,7 +269,7 @@ static lv_action_res_t mbox_no_action(lv_obj_t * btn, lv_dispi_t * dispi)
 }
 
 /**
- * Called when the Encoder emulator Next button is released
+ * Called when the Encoder emulator's Next button is released
  * @param btn pointer to the button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
@@ -279,7 +283,7 @@ static lv_action_res_t enc_next(lv_obj_t * btn, lv_dispi_t * dispi)
 }
 
 /**
- * Called when the Encoder emulator Increment button is released
+ * Called when the Encoder emulator's Increment button is released
  * @param btn pointer to the button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
@@ -293,7 +297,7 @@ static lv_action_res_t enc_inc(lv_obj_t * btn, lv_dispi_t * dispi)
 }
 
 /**
- * Called when the Encoder emulator Increment button is released
+ * Called when the Encoder emulator's Increment button is released
  * @param btn pointer to the button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
@@ -307,7 +311,7 @@ static lv_action_res_t enc_dec(lv_obj_t * btn, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 /**
- * Called when the Encoder emulator Send button is released
+ * Called when the Encoder emulator's Send button is released
  * @param btn pointer to the button
  * @param dispi pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
