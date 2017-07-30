@@ -74,13 +74,7 @@ If you don't have got an embedded hardware you can test the graphics library in 
 There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/proj_pc
 
 ## Contributing
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request!
-
-If you find an issue, please report it via GitHub!
+See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md)
 
 ## Donate
 If you are pleased with the graphics library and found it useful pleas support its further development:
