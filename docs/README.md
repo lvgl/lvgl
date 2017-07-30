@@ -2,11 +2,13 @@
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-The LittlevGL is a graphics library to create Graphical User Unterfaces (GUI) for TFT and LCD displays. You can use Buttons, Labels, Charts etc to build up your GUI.No double buffering is required to use transparency, scrolling or smooth animations.
+The LittlevGL is a free and open source graphics library to create Graphical User Interfaces (GUI) for TFT, LCD or monochrome displays using microcontroller based embedded systems.
+
+Transparency, anti-aliassing and smooth animations can be used with no double buffering so typically no external memories are required.
 
 The graphics library is written in C and it is completely hardware independent. You can even run it in a PC simulator without any embedded hardware.
 
-Visit the http://gl.littlev.hu
+Homepage: http://gl.littlev.hu
 
 ## Key features
 * Hardware independent, support any modern microcontroller
@@ -38,6 +40,7 @@ The following functions has to be provided
 * hal/systick `systick_elapse(prev_time)` get the elapsed milliseconds sience *prev_time*
 
 See the [example HAL](https://github.com/littlevgl/hal) repository!
+More info 
 
 ## Requirements
 * [Misc. library](https://github.com/littlevgl/misc) is used by the graphics library
