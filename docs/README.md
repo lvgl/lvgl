@@ -32,7 +32,7 @@ Visit the http://gl.littlev.hu
 The following functions has to be provided
 * hal/disp `disp_fill(x1, y1, x2, y2, color)` to fill area with a color
 * hal/disp `disp_map(x1, y1, x2, y2, &color_array)` copy a color map to an area
-* hal/disp `disp_color_cpy(color_t * dest, const color_t * src, uint32_t length, opa_t opa)` optional for GPU
+* hal/disp `disp_color_cpy(dest, src, length, opa)` copy pixel, optional for GPU
 * hal/indev `indev_get(id, &x, &y)` get the *x* and *y* coordinates from an input device (e.g. touch pad)
 * hal/systick `systick_get()` get a system tick with 1 ms resolution
 * hal/systick `systick_elapse(prev_time)` get the elapsed milliseconds sience *prev_time*
