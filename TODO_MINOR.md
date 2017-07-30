@@ -1,7 +1,11 @@
 # TODOs for minor versions
 Minor versions released when one or more new feature is addded without changing the API
 
+## Contributing
+Please create an issue to suggest a new feature instead of adding pull request to this file
+
 ## Ideas
+Here are ideas whish are not assigned to a minor version yet:
 - label: add a horzintal line (e.g. underline or line through). 
 - label long mode: dot begin
 - music player app
