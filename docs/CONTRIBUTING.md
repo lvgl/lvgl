@@ -12,7 +12,7 @@ In this guid you can read how can you help in developing the Littlev Graphic Lib
 * [Styling guide](#styling-guide)
   * [Git Commit Messages](#Git-mommit-messages)
   * [File format](#file-format)
-  * [Function](#functions)
+  * [Functions](#functions)
   * [Variables](#variables)
   * [Defines](#defines)
   * [Comments](#comments)
