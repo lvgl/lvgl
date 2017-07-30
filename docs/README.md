@@ -1,40 +1,38 @@
 # LittleV Graphics Libraray
 
-![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover.png)
+![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-The LittlevGL is a graphics library which allows you to create graphical user interfaces (GUI) from the most simple monochrome designs to amazing GUIs for high resolution TFTs. No double buffering is required to use transparency and smooth animations.
+The LittlevGL is a graphics library to create Graphical User Unterfaces (GUI) for TFT and LCD displays. You can use Buttons, Labels, Charts etc to build up your GUI.No double buffering is required to use transparency, scrolling or smooth animations.
 
 The graphics library is written in C and it is completely hardware independent. You can even run it in a PC simulator without any embedded hardware.
 
 Visit the http://gl.littlev.hu
 
 ## Key features
-* Hardware independent
-* Support any modern microcontroller
-* No external RAM, FPU or GPU required
-* High resolution TFTs and monochrome displays are also supported
-* Scalable and modular
-* Clear and well-structured source code
-* Color depth options: 24 bit, 16 bit, 8 bot or 1 bit
+* Hardware independent, support any modern microcontroller
+* High resolution TFTs, monochrome or any type of display supported (24/16/8/1 bit color depth)
+* No external RAM, FPU or GPU required just optional
 * Build GUI from simple graphical objects
   * Buttons, Labels, Images
   * Charts, Lists, Bars, Sliders, Text areas etc.
-* High level graphical features:
+* High level graphical features without double buffering
   * Antialiassing (font or full screen)
   * Animations
   * Transparency
   * Gradient colors
   * Smooth dragging and scrolling
-* Layers
+  * Layers
 * Customizable appearance with styles
 * Applications for complex tasks
 * Can run in a PC simulator
+* Modular and well-structured source code
 * Actively developed
 
 ## Porting
 The following functions has to be provided
 * hal/disp `disp_fill(x1, y1, x2, y2, color)` to fill area with a color
 * hal/disp `disp_map(x1, y1, x2, y2, &color_array)` copy a color map to an area
+* hal/disp `disp_color_cpy(color_t * dest, const color_t * src, uint32_t length, opa_t opa)` optional for GPU
 * hal/indev `indev_get(id, &x, &y)` get the *x* and *y* coordinates from an input device (e.g. touch pad)
 * hal/systick `systick_get()` get a system tick with 1 ms resolution
 * hal/systick `systick_elapse(prev_time)` get the elapsed milliseconds sience *prev_time*
@@ -77,7 +75,7 @@ There is a pre-configured PC project for **Eclipse CDT** in this repository: htt
 See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md)
 
 ## Donate
-If you are pleased with the graphics library and found it useful pleas support its further development:
+If you are pleased with the graphics library and found it useful please support its further development:
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GJV3SC5EHDANS)
 
