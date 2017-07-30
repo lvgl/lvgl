@@ -28,7 +28,7 @@ There are several ways to contribute in the graphics library like:
 * Fix an issue
 * Implement a feature
 
-Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/master/CODE_OF_CONDUCT.md)
+Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/master/docs/CODE_OF_CONDUCT.md)
 
 ## How to report an issue?
 
