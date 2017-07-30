@@ -14,7 +14,7 @@ In this guid you can read how can you help in developing the Littlev Graphic Lib
   * [File format](#file-format)
   * [Function](#functions)
   * [Variables](#variables)
-  * [Defines](#define)
+  * [Defines](#defines)
   * [Comments](#comments)
   * [Formatting](#formatting)
 
@@ -83,7 +83,7 @@ However if you would like to force it, take a look at this page: [Feature reques
 ### File format
 Use [misc/templ/templ.c](https://github.com/littlevgl/misc/blob/master/templ/templ.c) and [misc/templ/templ.h](https://github.com/littlevgl/misc/blob/master/templ/templ.h)
 
-### Function
+### Functions
 * try to write function shorter then is 40 lines 
 * always shorter then 100 lines (except very straightforwards) 
 * in function names: 
