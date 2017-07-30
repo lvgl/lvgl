@@ -11,7 +11,7 @@ Visit the http://gl.littlev.hu
 ## Key features
 * Hardware independent, support any modern microcontroller
 * High resolution TFTs, monochrome or any type of display supported (24/16/8/1 bit color depth)
-* No external RAM, FPU or GPU required just optional
+* External RAM, FPU or GPU not required just optional
 * Build GUI from simple graphical objects
   * Buttons, Labels, Images
   * Charts, Lists, Bars, Sliders, Text areas etc.
