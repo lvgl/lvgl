@@ -1,6 +1,24 @@
 # Contributing to Littlev Graphics Library
 First of all thank you for reading these guide before contributing!
 
+In this guid you can read how can you help in developing the Littlev Graphic Library. These are not strick rules reather just suggestions. If you have a constructive idea just create pull request on this document!
+
+### Table Of Content
+* [Who can contribute?](#who-can-contribute)
+* [How to report an issue?](#how-to-report-an-issue)
+  * [Simple issue](#simple-issue)
+  * [Complex issue](#complex-issue)
+* [How to suggest a feature?](#how-to-suggest-a-feature)
+* [Styling guide](#styling-guide)
+  * [Git Commit Messages](#Git-mommit-messages)
+  * [File format](#file-format)
+  * [Function](#functions)
+  * [Variables](#variables)
+  * [Defines](#define)
+  * [Comments](#comments)
+  * [Formatting](#formatting)
+
+
 ## Who can contribute?
 Basically everybody is welcome in contributing independently from skills, programming level or any personal attribute. 
 
@@ -13,6 +31,7 @@ There are several ways to contribute in the graphics library like:
 Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/master/CODE_OF_CONDUCT.md)
 
 ## How to report an issue?
+
 ### Simple issue
 If you find an issue which is very simple to fix, and you fixed it, please send a pull request. 
 A simple issue could be:
@@ -54,6 +73,7 @@ Keep in mind if you wouldn't like to do the implementation there is no guarantee
 However if you would like to force it, take a look at this page: [Feature request service](http://www.gl.littlev.hu/services#feature)
 
 ## Styling guide
+
 ### Git Commit Messages
 * Use the present tense ("Add feature" not "Added feature")
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
