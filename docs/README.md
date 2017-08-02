@@ -40,7 +40,6 @@ The following functions has to be provided
 * hal/systick `systick_elapse(prev_time)` get the elapsed milliseconds sience *prev_time*
 
 See the [example HAL](https://github.com/littlevgl/hal) repository!
-More info 
 
 ## Requirements
 * [Misc. library](https://github.com/littlevgl/misc) is used by the graphics library
