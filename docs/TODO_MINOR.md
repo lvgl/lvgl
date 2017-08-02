@@ -21,3 +21,4 @@ Here are ideas whish are not assigned to a minor version yet:
 - [x] style animations add
 - [ ] lv_btnm:  besides 0. byte (width dsc) 1. byte: hidden (\177, 0x7F, delete)
 - [ ] lv_label: font attribut to override style's font (no extra style needed to set only different font)
+- [ ] lv_label: padding enable/disable to increase size with hpad and vpad (useful with layouts)
