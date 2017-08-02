@@ -33,7 +33,7 @@ Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/
 ## How to report an issue?
 
 ### Simple issue
-If you find an issue which is very simple to fix, and you fixed it, please send a pull request. 
+If you find an issue which is very simple to fix, and you fixed it, please send a pull request against `beta` branch. 
 A simple issue could be:
 * Misspelled names
   * Comment: misspelling or grammatical error in comments
