@@ -14,7 +14,7 @@ Here are ideas whish are not assigned to a minor version yet:
 - automatically build GUI from file (e.g. XML, JSON or HTML)
 
 ## v4.2
-- [ ] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) 
+- [ ] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
 - [x] lv_group: to control without touch pad. Issue [#14](https://github.com/littlevgl/lvgl/issues/14)
 - [x] lv_page: scrl def fit modification: hor:false, ver:true, and always set width to parent width
 - [x] lv_btn: add lv_btn_get_..._action
