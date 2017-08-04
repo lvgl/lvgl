@@ -1,5 +1,5 @@
 # TODOs for patch versions
-Patch versions (x.y.1, x.y.2) contains bugfixes without changing the API but thay can apppear in minor (x.1.0, x.2.0) or major (1.0.0, 2.0.0) version too.
+Patch versions (x.y.1, x.y.2) contains bugfixes without changing the API but they can apppear in minor (x.1.0, x.2.0) or major (1.0.0, 2.0.0) version too.
 
 Bugfixes are done in `bugfix` branche.
 
