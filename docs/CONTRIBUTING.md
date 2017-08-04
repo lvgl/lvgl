@@ -1,7 +1,7 @@
 # Contributing to Littlev Graphics Library
 First of all thank you for reading these guide before contributing!
 
-In this guid you can read how can you help in developing the Littlev Graphic Library. These are not strick rules reather just suggestions. If you have a constructive idea just create pull request on this document!
+In this guide you can read how can you help in developing the Littlev Graphic Library. These are not strict rules rather just suggestions. If you have a constructive idea just create pull request on this document!
 
 ### Table Of Content
 * [Who can contribute?](#who-can-contribute)
@@ -10,7 +10,7 @@ In this guid you can read how can you help in developing the Littlev Graphic Lib
   * [Complex issue](#complex-issue)
 * [How to suggest a feature?](#how-to-suggest-a-feature)
 * [Styling guide](#styling-guide)
-  * [Git Commit Messages](#Git-mommit-messages)
+  * [Git Commit Messages](#Git-commit-messages)
   * [File format](#file-format)
   * [Functions](#functions)
   * [Variables](#variables)
@@ -38,7 +38,7 @@ A simple issue could be:
 * Misspelled names
   * Comment: misspelling or grammatical error in comments
   * Variable: misspelled variable name (e.g. ***ojb**_next* instead of ***obj**_next*)
-  * Define: only local defines in files becuse global defines affect API
+  * Define: only local defines in files because global defines affect API
   * Function: only static function name because global functions affect API
 * Not handled error case:
   * A parameter can be NULL (during normal usage)
@@ -87,7 +87,7 @@ Use [misc/templ/templ.c](https://github.com/littlevgl/misc/blob/master/templ/tem
 * try to write function shorter then is 40 lines 
 * always shorter then 100 lines (except very straightforwards) 
 * in function names: 
-  * words sperated by '_'
+  * words sparated by '_'
   * only lower case letters
   * only clear abbreviation (OK: *lv_xy_get_title_txt*, BAD: *lv_xy_get_ttxt*)
 
@@ -104,7 +104,7 @@ An example: *lv_btn_set_state()*
 Names can be used freely.
 
 ### Variables
-* words sperated by '_'
+* words sparated by '_'
 * always lower case
 * one line one declaration (BAD: char x, y;)
 * use `<stdint.h>` (*uint8_t*, *int32_t* etc)
@@ -138,7 +138,7 @@ Write readable code to avoid descriptive comments like:
 The code should show clearly what you are doing.
 
 You should write **why** have you done this: 
-`x++; /*Because of closeing '\0' of the string */`
+`x++; /*Because of closing '\0' of the string */`
 
 ### Formatting
 Here is example to show bracket placing and using of white spaces:
