@@ -1,5 +1,5 @@
 # TODOs for minor versions
-Minor versions released when one or more new feature is addded without changing the API
+Minor versions (x.1.0, x.2.0 ...) released when one or more new feature is addded without changing the API. New features can be added with major versions (1.0.0, 2.0.0 ...) too. 
 
 ## Contributing
 Please create an issue to suggest a new feature instead of adding pull request to this file.
