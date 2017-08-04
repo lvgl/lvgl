@@ -34,15 +34,13 @@ typedef struct
     color_t buf[LV_VDB_SIZE];
 }lv_vdb_t;
 
-
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
- * Get the vdb variable
- * @return pointer to the vdb variable
+ * Get the 'vdb' variable or allocate one in LV_VDB_DOUBLE mode
+ * @return pointer to the 'vdb' variable
  */
 lv_vdb_t * lv_vdb_get(void);
 
@@ -50,6 +48,13 @@ lv_vdb_t * lv_vdb_get(void);
  * Flush the content of the vdb
  */
 void lv_vdb_flush(void);
+
+
+/**
+ * In 'LV_VDB_DOUBLE' mode  has to be called when 'disp_map()'
+ * is ready with copying the map to a frame buffer.
+ */
+void lv_vdb_flush_ready(void);
 
 /**********************
  *      MACROS
