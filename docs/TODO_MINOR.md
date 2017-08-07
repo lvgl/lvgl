@@ -16,6 +16,7 @@ Here are ideas whish are not assigned to a minor version yet:
 - lv_valset: new object type, a label with "+" and "-" buttons
 - lv_tabview: new object type to organise content with tabs
 - lv_btngrp: new object type to display more buttons to choose an option from them
+- lv_switch: new object type, turn on/off by tap (a little slider)
 
 ## v4.2
 - [ ] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
