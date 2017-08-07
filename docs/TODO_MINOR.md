@@ -12,6 +12,10 @@ Here are ideas whish are not assigned to a minor version yet:
 - files app update: show content as text
 - GUI remote control
 - automatically build GUI from file (e.g. XML, JSON or HTML)
+- lv_split: new object type, a hor. or ver. line for decoration purpose
+- lv_valset: new object type, a label with "+" and "-" buttons
+- lv_tabview: new object type to organise content with tabs
+- lv_btngrp: new object type to display more buttons to choose an option from them
 
 ## v4.2
 - [ ] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
