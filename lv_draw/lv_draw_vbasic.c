@@ -123,8 +123,7 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
     cord_t map_width = area_get_width(&vdb_rel_a);
 	if(color_map[0].full != color.full || last_width != map_width) {
 		uint16_t i;
-
-		for(i =0; i < map_width; i++) {
+		for(i = 0; i < map_width; i++) {
 			color_map[i].full = color.full;
 		}
 
@@ -133,7 +132,6 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
     cord_t row;
     for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
     	disp_color_cpy(&vdb_buf_tmp[vdb_rel_a.x1], color_map, map_width, opa);
-
     	vdb_buf_tmp += vdb_width;
     }
 #endif
