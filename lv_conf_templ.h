@@ -28,7 +28,7 @@
 #if LV_VDB_SIZE
 /* Double virtual buffering
  * One for rendering another to transfer former rendered image to frame buffer in the background*/
-#define LV_VDB_DOUBLE       1
+#define LV_VDB_DOUBLE       0
 #endif
 
 #define LV_REFR_PERIOD      40    /*Screen refresh period in milliseconds*/
