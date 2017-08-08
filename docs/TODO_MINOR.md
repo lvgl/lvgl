@@ -19,7 +19,7 @@ Here are ideas whish are not assigned to a minor version yet:
 - lv_switch: new object type, turn on/off by tap (a little slider)
 
 ## v4.2
-- [ ] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
+- [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
 - [x] lv_group: to control without touch pad. Issue [#14](https://github.com/littlevgl/lvgl/issues/14)
 - [x] lv_page: scrl def fit modification: hor:false, ver:true, and always set width to parent width
 - [x] lv_btn: add lv_btn_get_..._action
