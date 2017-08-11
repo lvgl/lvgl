@@ -2,7 +2,7 @@
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-The LittlevGL is a free and open source graphics library to create Graphical User Interfaces (GUI) for TFT, LCD or monochrome displays using microcontroller based embedded systems.
+LittlevGL is a graphics library to create Graphical User Interfaces (GUI) on TFT, LCD or monochrome displays using microcontroller based embedded systems.
 
 Transparency, anti-aliassing and smooth animations can be used with no double buffering so typically no external memories are required.
 
