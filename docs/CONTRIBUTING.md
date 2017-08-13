@@ -31,6 +31,10 @@ There are several ways to contribute in the graphics library like:
 Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/master/docs/CODE_OF_CONDUCT.md)
 
 ## How to report an issue?
+There are 3 permanent branches:
+ * `master` for stable, released versions
+ * `beta` for developers, all feature branches merged here first
+ * `bugfix` for hotfixes, not new features
 
 ### Simple issue
 If you find an issue which is very simple to fix, and you fixed it, please send a pull request against `beta` branch. 
