@@ -20,7 +20,7 @@ In this guide you can read how can you help in developing the Littlev Graphic Li
 
 
 ## Who can contribute?
-Basically everybody is welcome in contributing independently from skills, programming level or any personal attribute. 
+Everybody is welcome in contributing independently from skills, programming level or any personal attribute. 
 
 There are several ways to contribute in the graphics library like:
 * Report an issue
@@ -75,6 +75,9 @@ The new feature should be in a new branch.
 
 Keep in mind if you wouldn't like to do the implementation there is no guarantee that it will be ready in the new future. 
 However if you would like to force it, take a look at this page: [Feature request service](http://www.gl.littlev.hu/services#feature)
+
+## How to implement a feature?
+In [docs/TODO_MINOR.md](https://github.com/littlevgl/lvgl/blob/master/docs/TODO_MINOR.md) and [docs/TODO_PATCH.md](https://github.com/littlevgl/lvgl/blob/master/docs/TODO_PATCH.md) you can see some ideas which are waiting for somebody to realize them! If want to deal with a feature from this files, please start an issue and discusse the details.
 
 ## Styling guide
 
