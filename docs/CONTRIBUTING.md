@@ -9,6 +9,7 @@ In this guide you can read how can you help in developing the Littlev Graphic Li
   * [Simple issue](#simple-issue)
   * [Complex issue](#complex-issue)
 * [How to suggest a feature?](#how-to-suggest-a-feature)
+* [How to implement a feature?](#how-to-implement-a-feature)
 * [Styling guide](#styling-guide)
   * [Git Commit Messages](#Git-commit-messages)
   * [File format](#file-format)
