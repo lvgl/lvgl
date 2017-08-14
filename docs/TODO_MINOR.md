@@ -26,7 +26,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] lv_btn: add lv_btn_get_..._action
 - [x] lv_list: add lv_list_get_element_label/img
 - [x] style animations add
-- [ ] lv_bind: 
+- [ ] lv_bind: bind a variable to an object or vice versa (update value periodically)
 - [ ] lv_btnm:  besides 0. byte (width dsc) 1. byte: hidden (\177, 0x7F, delete)
 - [ ] lv_label: font attribut to override style's font (no extra style needed to set only different font)
 - [ ] lv_label: padding enable/disable to increase size with hpad and vpad (useful with layouts)
