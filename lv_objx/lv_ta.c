@@ -161,8 +161,9 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
     	lv_style_t * style = lv_obj_get_style(ta);
     	if(sign == LV_SIGNAL_CLEANUP) {
-            /* Nothing to clean up.
-             * (The created label will be deleted automatically) */
+    	    if(ext->pwd_tmp != NULL) dm_free(ext->pwd_tmp);
+
+            /* (The created label will be deleted automatically) */
     	} else if(sign == LV_SIGNAL_STYLE_CHG) {
             if(ext->label) {
                 lv_obj_set_style(ext->label, lv_obj_get_style(ext->page.scrl));
