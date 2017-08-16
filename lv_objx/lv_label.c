@@ -84,6 +84,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->txt = NULL;
     ext->static_txt = 0;
     ext->recolor = 0;
+    ext->no_break = 0;
     ext->dot_end = LV_LABEL_DOT_END_INV;
     ext->long_mode = LV_LABEL_LONG_EXPAND;
     ext->offset.x = 0;
@@ -308,6 +309,19 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor)
     lv_label_refr_text(label);
 }
 
+/**
+ * Set the label the ignore (or accept) line breaks on '\n'
+ * @param label pointer to a label object
+ * @param en true: ignore line breaks, false: make line breaks on '\n'
+ */
+void lv_label_set_no_break(lv_obj_t * label, bool en)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    ext->no_break = en == false ? 0 : 1;
+
+    lv_label_refr_text(label);
+
+}
 /*=====================
  * Getter functions 
  *====================*/
@@ -367,6 +381,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
+    if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
 
     /*If the width will be expanded  the set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -402,6 +417,8 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
 	}
 
+	if(x > style->letter_space) x-= style->letter_space;
+
 	if(style->txt_align == LV_TXT_ALIGN_MID) {
 		cord_t line_w;
         line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
@@ -435,6 +452,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
+    if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -513,6 +531,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
 		txt_flag_t flag = TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
+        if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
 
 		lv_draw_label(&cords, mask, style, ext->txt, flag, &ext->offset);
     }
@@ -546,6 +565,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     txt_flag_t flag = TXT_FLAG_NONE;
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
+    if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
     txt_get_size(&size, ext->txt, font, style->letter_space, style->line_space, max_w, flag);
 
     /*Refresh the full size in expand mode*/

@@ -148,6 +148,13 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
 void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en);
 
 /**
+ * Configure the Text area to one line or back to normal
+ * @param ta pointer to a text area object
+ * @param en true: one line, false: normal
+ */
+void lv_ta_set_one_line(lv_obj_t * ta, bool en);
+
+/**
  * Get the text of the i the text area
  * @param ta obj pointer to a text area object
  * @return pointer to the text

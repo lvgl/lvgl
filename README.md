@@ -63,7 +63,7 @@ See the [example HAL](https://github.com/littlevgl/hal) repository!
    * your_systick_init();
    * your_disp_init();
    * your_indev_init();
-   * **lvgl_init()**;
+   * **lv_init()**;
 10. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
 11. In the main *while(1)* call `ptask_handler();` and make a few milliseconds delay (e.g. `your_delay_ms(5);`) 
 12. Compile the code and load it to your embedded hardware

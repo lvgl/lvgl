@@ -70,7 +70,6 @@ void lv_refr_init(void)
     ptask_t* task;
     task = ptask_create(lv_refr_task, LV_REFR_PERIOD, PTASK_PRIO_MID, NULL);
     dm_assert(task);
-    
 }
 
 /**
@@ -130,7 +129,7 @@ void lv_inv_area(const area_t * area_p)
  * @param cb pointer to a callback function (void my_refr_cb(uint32_t time_ms, uint32_t px_num))
  *           time_ms: refresh time in [ms]
  *           px_num: not the drawn pixels but the number of affected pixels of the screen
- *                   (more pixels are drawn with opacity areas)
+ *                   (more pixels are drawn because of overlapping objects)
  */
 void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
 {
@@ -257,15 +256,8 @@ static void lv_refr_area_no_vdb(const area_t * area_p)
  */
 static void lv_refr_area_with_vdb(const area_t * area_p)
 {
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    
-    /*Always use the full row*/
-    vdb_p->area.x1 = area_p->x1;
-    vdb_p->area.y1 = area_p->y1;
-    vdb_p->area.x2 = area_p->x2;
-
     /*Calculate the max row num*/
-    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (vdb_p->area.x2 - vdb_p->area.x1 + 1);
+    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (area_get_width(area_p));
     if(max_row > area_get_height(area_p)) max_row = area_get_height(area_p);
     
     /*Round the row number with downscale*/
@@ -273,20 +265,28 @@ static void lv_refr_area_with_vdb(const area_t * area_p)
     max_row &= (~0x1);
 #endif
 
-    /*Refresh all rows*/
-    cord_t row = area_p->y1;
-
+    /*Always use the full row*/
+    cord_t row;
+    cord_t row_last = 0;
     for(row = area_p->y1; row  + max_row - 1 <= area_p->y2; row += max_row)  {
+        lv_vdb_t * vdb_p = lv_vdb_get();
+
         /*Calc. the next y coordinates of VDB*/
+        vdb_p->area.x1 = area_p->x1;
+        vdb_p->area.x2 = area_p->x2;
         vdb_p->area.y1 = row;
         vdb_p->area.y2 = row + max_row - 1;
-
+        row_last = row + max_row - 1;
         lv_refr_area_part_vdb(area_p);
     }
     
     /*If the last y coordinates are not handled yet ...*/
-    if(area_p->y2 != vdb_p->area.y2) {
+    if(area_p->y2 != row_last) {
+        lv_vdb_t * vdb_p = lv_vdb_get();
+
         /*Calc. the next y coordinates of VDB*/
+        vdb_p->area.x1 = area_p->x1;
+        vdb_p->area.x2 = area_p->x2;
         vdb_p->area.y1 = row;
         vdb_p->area.y2 = area_p->y2;
 
