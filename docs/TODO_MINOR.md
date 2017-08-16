@@ -28,5 +28,4 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] lv_ta: lv_ta_set_one_line to configure the Text area to one lined input field
 - [x] style animations add
 - [ ] lv_bind: bind a variable to an object or vice versa (update value periodically)
-- [ ] lv_btnm:  besides 0. byte (width dsc) 1. byte: hidden (\177, 0x7F, delete)
-- [ ] lv_label: padding enable/disable to increase size with hpad and vpad (useful with layouts)
+- [x] lv_btnm:  besides 0. byte (width dsc) 1. byte: hidden (\177, 0x7F, delete)
