@@ -27,5 +27,4 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] lv_list: add lv_list_get_element_label/img
 - [x] lv_ta: lv_ta_set_one_line to configure the Text area to one lined input field
 - [x] style animations add
-- [ ] lv_bind: bind a variable to an object or vice versa (update value periodically)
 - [x] lv_btnm:  besides 0. byte (width dsc) 1. byte: hidden (\177, 0x7F, delete)
