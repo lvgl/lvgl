@@ -10,4 +10,4 @@ Please create an issue to introduce a bug instead of adding pull request to this
 
 ## Next release
 - [x] lv_slider: don't let indicator or bar to disappear because of hpad/vpad
-- [ ] lv_ta: memory leak if deleted in password mode
+- [x] lv_ta: memory leak if deleted in password mode
