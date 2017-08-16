@@ -416,7 +416,12 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 
     	uint16_t btn_i = 0;
     	uint16_t txt_i = 0;
-    	for(btn_i = 0; btn_i < ext->btn_cnt; btn_i ++) {
+    	for(btn_i = 0; btn_i < ext->btn_cnt; btn_i ++, txt_i ++) {
+            /*Search the next valid text in the map*/
+            while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
+
+            if(ext->map_p[txt_i][1] == '\177') continue;
+
 			lv_obj_get_cords(btnm, &area_btnm);
 
 			area_cpy(&area_tmp, &ext->btn_areas[btn_i]);
@@ -433,9 +438,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 
 			lv_draw_rect(&area_tmp, mask, btn_style);
 
-			/*Search the next valid text in the map*/
-			while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
-
 			/*Calculate the size of the text*/
 			const font_t * font = btn_style->font;
 			point_t txt_size;
@@ -449,7 +451,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
 			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], TXT_FLAG_NONE, NULL);
-			txt_i ++;
     	}
     }
     return true;
