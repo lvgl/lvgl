@@ -146,6 +146,14 @@ const lv_app_dsc_t * lv_app_benchmark_init(void)
 static void my_app_run(lv_app_inst_t * app, void * conf)
 {
     /*Initialize the application*/
+	my_app_data_t * ad = app->app_data;
+	ad->opa = 0;
+	ad->recolor = 0;
+	ad->shdw = 0;
+	ad->upscalse = 0;
+	ad->wp = 0;
+
+
 }
 
 /**

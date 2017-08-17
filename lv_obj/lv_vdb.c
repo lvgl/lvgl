@@ -20,7 +20,13 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
+#if LV_VDB_DOUBLE != 0
+typedef enum {
+    LV_VDB_STATE_FREE = 0,
+    LV_VDB_STATE_ACTIVE,
+    LV_VDB_STATE_FLUSH,
+} lv_vdb_state_t;
+#endif
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -28,7 +34,12 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_VDB_DOUBLE == 0
 static lv_vdb_t vdb;
+#else
+static lv_vdb_t vdb[2];
+static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
+#endif
 
 /**********************
  *      MACROS
@@ -39,21 +50,53 @@ static lv_vdb_t vdb;
  **********************/
 
 /**
- * Get the vdb variable
- * @return pointer to the vdb variable
+ * Get the 'vdb' variable or allocate one in LV_VDB_DOUBLE mode
+ * @return pointer to the 'vdb' variable
  */
 lv_vdb_t * lv_vdb_get(void)
 {
+#if LV_VDB_DOUBLE == 0
     return &vdb;
+#else
+    /*If already there is an active do nothing*/
+    if(vdb_state[0] == LV_VDB_STATE_ACTIVE) return &vdb[0];
+    if(vdb_state[1] == LV_VDB_STATE_ACTIVE) return &vdb[1];
+
+    /*Try to allocate a free VDB*/
+    if(vdb_state[0] == LV_VDB_STATE_FREE) {
+        vdb_state[0] = LV_VDB_STATE_ACTIVE;
+        return &vdb[0];
+    }
+
+    if(vdb_state[1] == LV_VDB_STATE_FREE) {
+        vdb_state[1] = LV_VDB_STATE_ACTIVE;
+        return &vdb[1];
+    }
+
+    return NULL;   /*There wasn't free VDB (never happen)*/
+#endif
 }
 
 /**
- * Flush the content of the vdb
+ * Flush the content of the VDB
  */
 void lv_vdb_flush(void)
 {
+    lv_vdb_t * vdb_act = lv_vdb_get();
+    if(vdb_act == NULL) return;
+
+#if LV_VDB_DOUBLE != 0
+    /* Wait the pending flush before starting this one
+     * (Don't forget: 'lv_vdb_flush_ready' has to be called when flushing is ready)*/
+    while(vdb_state[0] == LV_VDB_STATE_FLUSH || vdb_state[1] == LV_VDB_STATE_FLUSH);
+
+    /*Turn the active VDB to flushing*/
+    if(vdb_state[0] == LV_VDB_STATE_ACTIVE) vdb_state[0] = LV_VDB_STATE_FLUSH;
+    if(vdb_state[1] == LV_VDB_STATE_ACTIVE) vdb_state[1] = LV_VDB_STATE_FLUSH;
+#endif
+
 #if LV_ANTIALIAS == 0
-	disp_map(vdb.area.x1, vdb.area.y1, vdb.area.x2, vdb.area.y2, vdb.buf);
+	disp_map(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
 #else
 	/* Get the average of 2x2 pixels and put the result back to the VDB
 	 * The reading goes much faster then the write back
@@ -68,12 +111,12 @@ void lv_vdb_flush(void)
 	 * */
 	cord_t x;
 	cord_t y;
-	cord_t w = area_get_width(&vdb.area);
-	color_t * in1_buf = vdb.buf;      /*Pointer to the first row*/
-    color_t * in2_buf = vdb.buf + w;  /*Pointer to the second row*/
-    color_t * out_buf = vdb.buf;      /*Store the result here*/
-	for(y = vdb.area.y1; y < vdb.area.y2; y += 2) {
-        for(x = vdb.area.x1; x < vdb.area.x2; x += 2) {
+	cord_t w = area_get_width(&vdb_act->area);
+	color_t * in1_buf = vdb_act->buf;      /*Pointer to the first row*/
+    color_t * in2_buf = vdb_act->buf + w;  /*Pointer to the second row*/
+    color_t * out_buf = vdb_act->buf;      /*Store the result here*/
+	for(y = vdb_act->area.y1; y < vdb_act->area.y2; y += 2) {
+        for(x = vdb_act->area.x1; x < vdb_act->area.x2; x += 2) {
         
             /*If the pixels are the same do not calculate the average */
             if(in1_buf->full == (in1_buf + 1)->full &&
@@ -103,7 +146,19 @@ void lv_vdb_flush(void)
 
 	/* Now the full the VDB is filtered and the result is stored in the first quarter of it
 	 * Write out the filtered map to the display*/
-    disp_map(vdb.area.x1 >> 1, vdb.area.y1 >> 1, vdb.area.x2 >> 1, vdb.area.y2 >> 1, vdb.buf);
+    disp_map(vdb_act->area.x1 >> 1, vdb_act->area.y1 >> 1, vdb_act->area.x2 >> 1, vdb_act->area.y2 >> 1, vdb_act->buf);
+#endif
+}
+
+/**
+ * In 'LV_VDB_DOUBLE' mode  has to be called when the 'disp_map'
+ * is ready with copying the map to a frame buffer.
+ */
+void lv_vdb_flush_ready(void)
+{
+#if LV_VDB_DOUBLE != 0
+    if(vdb_state[0] == LV_VDB_STATE_FLUSH)  vdb_state[0] = LV_VDB_STATE_FREE;
+    if(vdb_state[1] == LV_VDB_STATE_FLUSH)  vdb_state[1] = LV_VDB_STATE_FREE;
 #endif
 }
 

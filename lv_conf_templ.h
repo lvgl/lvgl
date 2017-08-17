@@ -17,18 +17,19 @@
 #define LV_HOR_RES          (320 * LV_DOWNSCALE)
 #define LV_VER_RES          (240 * LV_DOWNSCALE)
 #define LV_DPI              (80 * LV_DOWNSCALE)
+/* Enable anti-aliasing
+ * If enabled everything will half-sized
+ * Use LV_DOWNSCALE to compensate he down scaling effect of anti-aliasing*/
+#define LV_ANTIALIAS        1
+#define LV_DOWNSCALE        (1 << LV_ANTIALIAS) /*Set the downscaling value*/
 
 /* Buffered rendering: >= LV_DOWNSCALE * LV_HOR_RES or 0 to disable buffering*/
-#define LV_VDB_SIZE        (LV_HOR_RES * 30)
-
-/* Enable antialaiassing
- * If enabled everything will half-sized
- * Use LV_DOWNSCALE to compensate
- * the down scaling effect of antialiassing*/
-#define LV_ANTIALIAS        1
-
-/*Set the downscaling value*/
-#define LV_DOWNSCALE        (1 << LV_ANTIALIAS)
+#define LV_VDB_SIZE         (LV_HOR_RES * LV_VER_RES / 20)
+#if LV_VDB_SIZE
+/* Double virtual buffering
+ * One for rendering another to transfer former rendered image to frame buffer in the background*/
+#define LV_VDB_DOUBLE       0
+#endif
 
 #define LV_REFR_PERIOD      40    /*Screen refresh period in milliseconds*/
 #define LV_INV_FIFO_SIZE    32    /*The average number of objects on a screen */
@@ -47,9 +48,11 @@
 /*lv_obj (base object) settings*/
 #define LV_OBJ_FREE_NUM          1           /*Enable the free number attribute*/
 #define LV_OBJ_FREE_P            1           /*Enable the free pointer attribute*/
+#define LV_OBJ_GROUP             1           /*Enable object groups*/
 
 /*Others*/
-#define LV_COLOR_TRANSP     COLOR_LIME
+#define LV_COLOR_TRANSP     COLOR_LIME      /*This could mean transparent pixel*/
+#define USE_LV_EXAMPLE      1               /*Enable examples (lvgl/lv_examples/). Disable to save memory*/
 
 /*==================
  *  LV OBJ X USAGE 
@@ -145,6 +148,9 @@
 
 /*List (dependencies: lv_page, lv_btn, lv_label, lv_img)*/
 #define USE_LV_LIST     1
+#if USE_LV_LIST != 0
+#define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#endif
 
 /*Drop down list (dependencies: lv_page, lv_label)*/
 #define USE_LV_DDLIST    1

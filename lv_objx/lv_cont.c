@@ -1,5 +1,5 @@
 /**
- * @file lv_rect.c
+ * @file lv_cont.c
  * 
  */
 
@@ -465,10 +465,19 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 				h_row = lv_obj_get_height(child_rc);    /*Not set previously because of the early break*/
 			}
 		}
-		/*If here is only one object in the row then align it to the middle*/
+		/*If there is only one object in the row then align it to the middle*/
 		else if (obj_num == 1) {
 			lv_obj_align(child_rs, cont, LV_ALIGN_IN_TOP_MID, 0, act_y);
 		}
+        /*If are two object in the row then align them proportionally*/
+        else if (obj_num == 2) {
+            lv_obj_t * obj1 = child_rs;
+            lv_obj_t * obj2 = ll_get_prev(&cont->child_ll, child_rs);
+            w_row = lv_obj_get_width(obj1) + lv_obj_get_width(obj2);
+            cord_t pad = (w_obj - w_row) / 3;
+            lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y);
+            lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y);
+        }
 		/* Align the children (from child_rs to child_rc)*/
 		else {
 			w_row -= style->opad * obj_num;

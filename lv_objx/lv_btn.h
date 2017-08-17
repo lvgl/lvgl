@@ -149,6 +149,32 @@ lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);
 bool lv_btn_get_tgl(lv_obj_t * btn);
 
 /**
+ * Get the release action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the release action function
+ */
+lv_action_t lv_btn_get_rel_action(lv_obj_t * btn);
+
+/**
+ * Get the press action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the press action function
+ */
+lv_action_t lv_btn_get_pr_action(lv_obj_t * btn);
+
+/**
+ * Get the long press action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the release action function
+ */
+lv_action_t lv_btn_get_lpr_action(lv_obj_t * btn);
+/**
+ * Get the long press repeat action of a button
+ * @param btn pointer to a button object
+ * @return pointer to the long press repeat action function
+ */
+lv_action_t lv_btn_get_lpr_rep_action(lv_obj_t * btn);
+/**
  * Get the style of a button in a given state
  * @param btn pointer to a button object
  * @param state a state from 'lv_btn_state_t' in which style should be get

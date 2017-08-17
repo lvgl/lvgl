@@ -48,10 +48,11 @@ typedef struct
     lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
     char dot_tmp[LV_LABEL_DOT_NUM + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
-    point_t offset;
+    point_t offset;                 /*Text draw position offset*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
     uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/
-    uint8_t expand  :1;             /*Force expand size when solving line length (used by the library with LV_LABEL_LONG_ROLL)*/
+    uint8_t expand  :1;             /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
+    uint8_t no_break  :1;           /*Ignore new line characters*/
 }lv_label_ext_t;
 
 /**********************
@@ -119,12 +120,13 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
  */
 void lv_label_set_recolor(lv_obj_t * label, bool recolor);
 
+
 /**
- * Enable the password mode
+ * Set the label the ignore (or accept) line breaks on '\n'
  * @param label pointer to a label object
- * @param pwd true: enable password mode, false: disable
+ * @param en true: ignore line breaks, false: make line breaks on '\n'
  */
-void lv_label_set_pwd_mode(lv_obj_t * label, bool pwd);
+void lv_label_set_no_break(lv_obj_t * label, bool en);
 
 /**
  * Get the text of a label

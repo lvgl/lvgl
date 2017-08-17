@@ -142,6 +142,20 @@ void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style);
 const char * lv_list_get_element_text(lv_obj_t * liste);
 
 /**
+ * Get the label object from a list element
+ * @param liste pointer to a list element (button)
+ * @return pointer to the label from the list element or NULL if not found
+ */
+lv_obj_t * lv_list_get_element_label(lv_obj_t * liste);
+
+/**
+ * Get the image object from a list element
+ * @param liste pointer to a list element (button)
+ * @return pointer to the image from the list element or NULL if not found
+ */
+lv_obj_t * lv_list_get_element_img(lv_obj_t * liste);
+
+/**
  * Get the scroll bar outside attribute
  * @param list pointer to list object
  * @param en true: scroll bar outside the buttons, false: scroll bar inside

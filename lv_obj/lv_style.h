@@ -17,6 +17,7 @@ extern "C" {
 #include "misc/gfx/color.h"
 #include "misc/gfx/area.h"
 #include "misc/gfx/font.h"
+#include "misc/gfx/anim.h"
 
 /*********************
  *      DEFINES
@@ -83,6 +84,34 @@ typedef enum {
 }lv_style_name_t;
 
 
+typedef struct {
+    const lv_style_t * style_start; /*Pointer to the starting style*/
+    const lv_style_t * style_end;   /*Pointer to the destination style*/
+    lv_style_t * style_anim;        /*Pointer to a style to animate*/
+    anim_cb_t end_cb;               /*Call it when the animation is ready*/
+    int16_t time;                   /*Animation time in ms*/
+    int16_t act_time;               /*Current time in animation. Set to negative to make delay.*/
+    uint16_t playback_pause;        /*Wait before play back*/
+    uint16_t repeat_pause;          /*Wait before repeat*/
+    uint8_t playback :1;            /*When the animation is ready play it back*/
+    uint8_t repeat :1;              /*Repeat the animation infinitely*/
+}lv_style_anim_t;
+
+/* Example initialization
+lv_style_anim_t a;
+a.style_anim = &style_to_anim;
+a.style_start = &style_1;
+a.style_end = &style_2;
+a.act_time = 0;
+a.time = 1000;
+a.playback = 0;
+a.playback_pause = 0;
+a.repeat = 0;
+a.repeat_pause = 0;
+a.end_cb = NULL;
+lv_style_anim_create(&a);
+ */
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -99,7 +128,19 @@ void lv_style_init (void);
  */
 lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy);
 
+
+/**
+ * Copy a style to an other
+ * @param dest pointer to the destination style
+ * @param src pointer to the source style
+ */
 void lv_style_cpy(lv_style_t * dest, const lv_style_t * src);
+
+/**
+ * Create an animation from a pre-configured 'lv_style_anim_t' variable
+ * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
+ */
+void lv_style_anim_create(lv_style_anim_t * anim);
 
 
 /**********************

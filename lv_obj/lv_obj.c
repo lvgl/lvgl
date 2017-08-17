@@ -12,8 +12,10 @@
 #include "lvgl/lv_obj/lv_dispi.h"
 #include "lvgl/lv_obj/lv_obj.h"
 #include "lvgl/lv_obj/lv_refr.h"
+#include "lvgl/lv_obj/lv_group.h"
 #include "lvgl/lv_app/lv_app.h"
 #include "lvgl/lv_draw/lv_draw_rbasic.h"
+#include "lv_group.h"
 #include "misc/gfx/anim.h"
 #include "hal/indev/indev.h"
 #include <stdint.h>
@@ -141,10 +143,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 #if LV_OBJ_FREE_NUM != 0
 		new_obj->free_num = 0;
 #endif
+
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
 
+#if LV_OBJ_GROUP != 0
+        new_obj->group_p = NULL;
+#endif
 		/*Set attributes*/
 		new_obj->click_en = 0;
 		new_obj->drag_en = 0;
@@ -187,6 +193,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 #if LV_OBJ_FREE_P != 0
         new_obj->free_p = NULL;
 #endif
+#if LV_OBJ_GROUP != 0
+        new_obj->group_p = NULL;
+#endif
         
         /*Set attributes*/
         new_obj->click_en = 1;
@@ -198,7 +207,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->protect = LV_PROTECT_NONE;
         
         new_obj->ext = NULL;
-        
     }
 
     if(copy != NULL) {
@@ -222,6 +230,13 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->protect = copy->protect;
 
         new_obj->style_p = copy->style_p;
+
+#if LV_OBJ_GROUP != 0
+        /*Add to the same group*/
+        if(copy->group_p != NULL) {
+            lv_group_add_obj(copy->group_p, new_obj);
+        }
+#endif
 
     	lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
     }
@@ -405,12 +420,14 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     old_pos.x = lv_obj_get_x(obj);
     old_pos.y = lv_obj_get_y(obj);
     
+    lv_obj_t * old_par = obj->par;
+
     ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
     obj->par = parent;
     lv_obj_set_pos(obj, old_pos.x, old_pos.y);
 
     /*Notify the original parent because one of its children is lost*/
-    obj->par->signal_f(obj->par, LV_SIGNAL_CHILD_CHG, NULL);
+    old_par->signal_f(old_par, LV_SIGNAL_CHILD_CHG, NULL);
 
     /*Notify the new parent about the child*/
     parent->signal_f(parent, LV_SIGNAL_CHILD_CHG, obj);
@@ -1234,20 +1251,28 @@ cord_t lv_obj_get_ext_size(lv_obj_t * obj)
  */
 lv_style_t * lv_obj_get_style(lv_obj_t * obj)
 {
-    if(obj->style_p != NULL) return obj->style_p;
-    else {
+    lv_style_t * style_act = obj->style_p;
+    if(style_act == NULL) {
         lv_obj_t * par = obj->par;
 
         while(par != NULL) {
             if(par->style_p != NULL) {
-                if(par->style_p->glass == 0) return par->style_p;
+                if(par->style_p->glass == 0) {
+                    style_act = par->style_p;
+                    break;
+                }
             }
             par = par->par;
         }
     }
-
-    /*Never reach this, at least the screen has to be a style*/
-    return NULL;
+#if LV_OBJ_GROUP != 0
+    if(obj->group_p != NULL) {
+        if(lv_group_get_focused(obj->group_p) == obj) {
+            style_act = lv_group_mod_style(obj->group_p, style_act);
+        }
+    }
+#endif
+    return style_act;
 }
 
 /*-----------------
@@ -1395,6 +1420,18 @@ void * lv_obj_get_free_p(lv_obj_t * obj)
 }
 #endif
 
+#if LV_OBJ_GROUP != 0
+/**
+ * Get the group of the object
+ * @param obj pointer to an object
+ * @return the pointer to group of the object
+ */
+void * lv_obj_get_group(lv_obj_t * obj)
+{
+    return obj->group_p;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -1471,9 +1508,7 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
         if(i->style_p == style_p || style_p == NULL) {
-            lv_obj_inv(i);
-            i->signal_f(i, LV_SIGNAL_STYLE_CHG, NULL);
-            lv_obj_inv(i);
+            lv_child_refr_style(i);
         }
         
         lv_style_refr_core(style_p, i);
@@ -1523,13 +1558,16 @@ static void lv_obj_del_child(lv_obj_t * obj)
    /*Remove the animations from this object*/
    anim_del(obj, NULL);
 
+   /*Delete from the group*/
+#if LV_OBJ_GROUP != 0
+   if(obj->group_p != NULL) lv_group_rem_obj(obj);
+#endif
+
    /*Remove the object from parent's children list*/
    lv_obj_t * par = lv_obj_get_parent(obj);
-
    ll_rem(&(par->child_ll), obj);
 
-   /* All children deleted.
-    * Now clean up the object specific data*/
+   /* Clean up the object specific data*/
    obj->signal_f(obj, LV_SIGNAL_CLEANUP, NULL);
 
    /*Delete the base objects*/
