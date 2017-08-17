@@ -8,6 +8,6 @@ The bugfixes of the still not released version are in `beta` branche.
 ## Contributing
 Please create an issue to introduce a bug instead of adding pull request to this file.
 
-## Next release
+## v.4.2  (released at: 17.08.2017)
 - [x] lv_slider: don't let indicator or bar to disappear because of hpad/vpad
 - [x] lv_ta: memory leak if deleted in password mode
