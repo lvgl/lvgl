@@ -12,14 +12,16 @@ Here are ideas which are not assigned to a minor version yet:
 - files app update: show content as text
 - GUI remote control
 - automatically build GUI from file (e.g. XML, JSON or HTML)
-- lv_split: new object type, a hor. or ver. line for decoration purpose
-- lv_valset: new object type, a label with "+" and "-" buttons
-- lv_tabview: new object type to organise content with tabs
-- lv_btngrp: new object type to display more buttons to choose an option from them
-- lv_switch: new object type, turn on/off by tap (a little slider)
-- lv_roller: new object type, a roller to select a value (like on smartphones) 
 
-## v4.2
+## v4.3 (In progress)
+- [ ] lv_split: new object type, a hor. or ver. line for decoration purpose
+- [ ] lv_valset: new object type, a label with "+" and "-" buttons
+- [ ] lv_tabview: new object type to organise content with tabs
+- [ ] lv_btngrp: new object type to display more buttons to choose an option from them
+- [ ] lv_switch: new object type, turn on/off by tap (a little slider)
+- [ ] lv_roller: new object type, a roller to select a value (like on smartphones) 
+
+## v4.2 (released at: 17.08.2017)
 - [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
 - [x] lv_group: to control without touch pad. Issue [#14](https://github.com/littlevgl/lvgl/issues/14)
 - [x] lv_page: scrl def fit modification: hor:false, ver:true, and always set width to parent width
