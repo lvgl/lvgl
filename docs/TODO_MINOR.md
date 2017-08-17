@@ -13,7 +13,7 @@ Here are ideas which are not assigned to a minor version yet:
 - GUI remote control
 - automatically build GUI from file (e.g. XML, JSON or HTML)
 
-## v4.3 (In progress)
+## v4.3 (in progress)
 - [ ] lv_split: new object type, a hor. or ver. line for decoration purpose
 - [ ] lv_valset: new object type, a label with "+" and "-" buttons
 - [ ] lv_tabview: new object type to organise content with tabs
