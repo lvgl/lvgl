@@ -1,10 +1,10 @@
 /**
- * @file encoder_ctrl.h
+ * @file lv_ex_encoder_ctrl.h
  *
  */
 
-#ifndef ENCODER_CTRL_H
-#define ENCODER_CTRL_H
+#ifndef LV_EX_ENCODER_CTRL_H
+#define LV_EX_ENCODER_CTRL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void encoder_ctrl_init(void);
+void lv_ex_encoder_ctrl(void);
 
 /**********************
  *      MACROS
