@@ -1,10 +1,10 @@
 /**
- * @file lv_hello_world.h
+ * @file lv_ex_objects.h
  *
  */
 
-#ifndef LV_OBJ_USAGE_H
-#define LV_OBJ_USAGE_H
+#ifndef LV_EX_OBJECTS_H
+#define LV_EX_OBJECTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_obj_usage_init(void);
+void lv_ex_objects(void);
 
 /**********************
  *      MACROS

@@ -1,5 +1,5 @@
 /**
- * @file lv_hello_world.c
+ * @file lv_ex_hello_world.c
  *
  */
 
@@ -14,7 +14,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_hello_world.h"
+#include "lv_ex_hello_world.h"
 #if USE_LV_EXAMPLE != 0
 
 #include "lvgl/lvgl.h"
@@ -46,7 +46,7 @@
 /**
  * Create a simple 'Hello world!' label
  */
-void lv_hello_world_init(void)
+void lv_ex_hello_world(void)
 {
     /*Create a Label on the current screen*/
     lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
