@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void style_usage_init(void);
+void lv_ex_styles(void);
 
 /**********************
  *      MACROS

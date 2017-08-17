@@ -57,7 +57,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "obj_usage.h"
+#include "lv_ex_objects.h"
 #if USE_LV_EXAMPLE != 0
 
 #include "lvgl/lvgl.h"
@@ -91,7 +91,7 @@ static  lv_action_res_t ddlist_action(lv_obj_t * ddlist, lv_dispi_t * dispi);
 /**
  * Initialize the Object usage example
  */
-void lv_obj_usage_init(void)
+void lv_ex_objects(void)
 {
 
     /********************

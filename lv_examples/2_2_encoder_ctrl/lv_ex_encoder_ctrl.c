@@ -1,5 +1,5 @@
 /**
- * @file encoder_ctrl.c
+ * @file lv_ex_encoder_ctrl.c
  *
  */
 
@@ -33,7 +33,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "encoder_ctrl.h"
+#include "lv_ex_encoder_ctrl.h"
 #if USE_LV_EXAMPLE != 0
 
 #include "lvgl/lvgl.h"
@@ -78,7 +78,7 @@ static lv_group_t * g;              /*An Object Group*/
 /**
  * Create a simple GUI to demonstrate encoder control capability
  */
-void encoder_ctrl_init(void)
+void lv_ex_encoder_ctrl(void)
 {
     /* Create a Page screen (to make it scrollable)
      * and use Pretty layout to make the content responsive.
