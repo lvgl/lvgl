@@ -404,7 +404,6 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
             const font_t * font = style->font;
             cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
             area_t rect_area;
-            lv_style_t * style_page_scrl = lv_obj_get_style(lv_page_get_scrl(ddlist));
             rect_area.y1 = ext->opt_label->cords.y1;
             rect_area.y1 += ext->sel_opt * (font_h + style->line_space);
             rect_area.y1 -= style->line_space / 2;
