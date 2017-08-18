@@ -3,13 +3,6 @@
  * 
  */
 
-
-/*Search an replace: switch -> object normal name with lower case (e.g. button, label etc.)
- * 					 sw -> object short name with lower case(e.g. btn, label etc)
- *                   SW -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 #ifndef LV_SW_H
 #define LV_SW_H
 
@@ -23,7 +16,13 @@ extern "C" {
 #include "lv_conf.h"
 #if USE_LV_SW != 0
 
+/*Testing of dependencies*/
+#if USE_LV_SW == 0
+#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (USE_LV_SLIDER  1)"
+#endif
+
 #include "../lv_obj/lv_obj.h"
+#include "lv_slider.h"
 
 /*********************
  *      DEFINES
@@ -35,8 +34,9 @@ extern "C" {
 /*Data of switch*/
 typedef struct
 {
-    /*Ext. of ancestor*/
+    lv_slider_ext_t slider;     /*Ext. of ancestor*/
     /*New data for this type */
+    uint8_t changed   :1;     /*Indicates the switch explicitly changed by drag*/
 }lv_sw_ext_t;
 
 /**********************

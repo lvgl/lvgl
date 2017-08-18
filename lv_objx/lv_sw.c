@@ -1,21 +1,15 @@
 /**
- * @file lv_templ.c
+ * @file lv_sw.c
  * 
- */
-
-/*Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
- * 					 templ -> object short name with lower case(e.g. btn, label etc)
- *                   TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
  */
 
 /*********************
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#if USE_LV_TEMPL != 0
+#if USE_LV_SW != 0
 
-#include "lv_templ.h"
+#include "lv_sw.h"
 
 /*********************
  *      DEFINES
@@ -28,8 +22,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode);
-
+#if 0 /*Slider design is used*/
+static bool lv_sw_design(lv_obj_t * sw, const area_t * mask, lv_design_mode_t mode);
+#endif
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -47,58 +42,63 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
  *-----------------*/
 
 /**
- * Create a template objects
- * @param par pointer to an object, it will be the parent of the new template
- * @param copy pointer to a template object, if not NULL then the new object will be copied from it
- * @return pointer to the created template
+ * Create a switch objects
+ * @param par pointer to an object, it will be the parent of the new switch
+ * @param copy pointer to a switch object, if not NULL then the new object will be copied from it
+ * @return pointer to the created switch
  */
-lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
 {
-    /*Create the ancestor of template*/
-	/*TODO modify it to the ancestor create function */
-    lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
-    dm_assert(new_templ);
+    /*Create the ancestor of switch*/
+    lv_obj_t * new_sw = lv_slider_create(par, copy);
+    dm_assert(new_sw);
     
-    /*Allocate the template type specific extended data*/
-    lv_templ_ext_t * ext = lv_obj_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
+    /*Allocate the switch type specific extended data*/
+    lv_sw_ext_t * ext = lv_obj_alloc_ext(new_sw, sizeof(lv_sw_ext_t));
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
-    ext->xyz = 0;
+    ext->changed = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_f(new_templ, lv_templ_signal);
-    lv_obj_set_design_f(new_templ, lv_templ_design);
+    lv_obj_set_signal_f(new_sw, lv_sw_signal);
 
-    /*Init the new template template*/
+    /*Init the new switch switch*/
     if(copy == NULL) {
-        lv_obj_set_style(new_templ, lv_style_get(LV_STYLE_PRETTY, NULL));
+        lv_bar_set_range(new_sw, 0, 1);
+        lv_obj_set_size(new_sw, LV_DPI, LV_DPI / 2);
+        lv_slider_set_knob_in(new_sw, true);
     }
-    /*Copy an existing template*/
+    /*Copy an existing switch*/
     else {
-    	lv_templ_ext_t * copy_ext = lv_obj_get_ext(copy);
+        /*Nothing to copy*/
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_templ);
+        lv_obj_refr_style(new_sw);
     }
     
-    return new_templ;
+    return new_sw;
 }
 
 /**
- * Signal function of the template
- * @param templ pointer to a template object
+ * Signal function of the switch
+ * @param sw pointer to a switch object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  * @return true: the object is still valid (not deleted), false: the object become invalid
  */
-bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
+bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 {
     bool valid;
 
+    lv_sw_ext_t * ext = lv_obj_get_ext(sw);
+    int16_t old_val = lv_bar_get_value(sw);
+
+    lv_action_t slider_cb = ext->slider.cb;
+    ext->slider.cb = NULL;  /*Do not let the slider to call the callback. The Switch will do it*/
+
     /* Include the ancient signal function */
-    /* TODO update it to the ancestor's signal function*/
-    valid = lv_ANCESTOR_signal(templ, sign, param);
+    valid = lv_slider_signal(sw, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -106,8 +106,28 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
     	if(sign == LV_SIGNAL_CLEANUP) {
             /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     	}
+        else if(sign == LV_SIGNAL_PRESSING) {
+            int16_t act_val = lv_bar_get_value(sw);
+            if(act_val != old_val) ext->changed = 1;
+        }
+        else if(sign == LV_SIGNAL_PRESS_LOST) {
+            ext->changed = 0;
+        }
+    	else if(sign == LV_SIGNAL_RELEASED) {
+    	    if(ext->changed == 0) {
+                int16_t v = lv_bar_get_value(sw);
+                if(v == 0) lv_bar_set_value(sw, 1);
+                else lv_bar_set_value(sw, 0);
+    	    }
+    	    if(slider_cb != NULL) slider_cb(sw, param);
+
+            ext->changed = 0;
+    	}
     }
     
+    /*Restore the callback*/
+    ext->slider.cb = slider_cb;
+
     return valid;
 }
 
@@ -133,10 +153,10 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
  *   STATIC FUNCTIONS
  **********************/
 
-
+#if 0 /*Slider design is used*/
 /**
- * Handle the drawing related tasks of the templates
- * @param templ pointer to an object
+ * Handle the drawing related tasks of the switchs
+ * @param sw pointer to an object
  * @param mask the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
@@ -144,7 +164,7 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode)
+static bool lv_sw_design(lv_obj_t * sw, const area_t * mask, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -161,6 +181,6 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
 
     return true;
 }
-
+#endif
 
 #endif

@@ -146,6 +146,9 @@
 /*Check box (dependencies: lv_btn, lv_label)*/
 #define USE_LV_CB       1
 
+/*Switch (dependencies: lv_slider)*/
+#define USE_LV_SW       1
+
 /*List (dependencies: lv_page, lv_btn, lv_label, lv_img)*/
 #define USE_LV_LIST     1
 #if USE_LV_LIST != 0
