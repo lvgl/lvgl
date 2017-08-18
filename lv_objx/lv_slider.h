@@ -34,6 +34,7 @@ typedef struct
     lv_action_t cb;             /*Function to call when a new value is set*/
     lv_style_t * style_knob;    /*Style of the knob*/
     int16_t tmp_value;          /*Store a temporal value during press until release (Handled by the library)*/
+    uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
 }lv_slider_ext_t;
 
 /*Built-in styles of slider*/
@@ -78,6 +79,14 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t cb);
 void lv_slider_set_style_knob(lv_obj_t * slider, lv_style_t * style);
 
 /**
+ * Set the 'knob in' attribute of a slider
+ * @param slider pointer to slider object
+ * @param in true: the knob is drawn always in the slider;
+ *           false: the knob can be out on the edges
+ */
+void lv_slider_set_knob_in(lv_obj_t * slider, bool in);
+
+/**
  * Get the slider callback function
  * @param slider pointer to slider object
  * @return the callback function
@@ -90,6 +99,14 @@ lv_action_t lv_slider_get_action(lv_obj_t * slider);
  * @return pointer the new knob style
  */
 lv_style_t *  lv_slider_get_style_knob(lv_obj_t * slider);
+
+/**
+ * Get the 'knob in' attribute of a slider
+ * @param slider pointer to slider object
+ * @return true: the knob is drawn always in the slider;
+ *         false: the knob can be out on the edges
+ */
+bool lv_slider_get_knob_in(lv_obj_t * slider);
 
 /**********************
  *      MACROS
