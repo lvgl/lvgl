@@ -45,12 +45,12 @@ extern "C" {
  *********************/
 /*Current version of LittlevGL*/
 #define LVGL_VERSION_MAJOR  4
-#define LVGL_VERSION_MINOR  1
-#define LVGL_VERSION_PATH   1
+#define LVGL_VERSION_MINOR  2
+#define LVGL_VERSION_PATH   0
 
 /*Required misc. library version*/
 #define LV_MISC_REQ_MAJOR   4
-#define LV_MISC_REQ_MINOR   1
+#define LV_MISC_REQ_MINOR   2
 #define LV_MISC_REQ_PATCH   0
 
 #if MISC_VERSION_MAJOR != LV_MISC_REQ_MAJOR /*The version major has to match*/
