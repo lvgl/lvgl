@@ -43,9 +43,13 @@ typedef struct
     area_t * btn_areas;     /*Array of areas for the buttons (Handled by the library)*/
     uint16_t btn_cnt;       /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_pr;        /*Index of the currently pressed button or LV_BTNM_PR_NONE (Handled by the library)*/
+    uint16_t btn_tgl;       /*Index of the currently toggled button or LV_BTNM_PR_NONE (Handled by the library)*/
     lv_btnm_callback_t cb;  /*A function to call when a button is releases*/
     lv_style_t * style_btn_rel; /*Style of the released buttons*/
     lv_style_t * style_btn_pr;  /*Style of the pressed buttons*/
+    lv_style_t * style_btn_trel; /*Style of the released buttons*/
+    lv_style_t * style_btn_tpr;  /*Style of the pressed buttons*/
+    uint8_t tgl     :1;         /*Enable toggling*/
 }lv_btnm_ext_t;
 
 /**********************
@@ -87,6 +91,14 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
  * @param cb pointer to a callback function
  */
 void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb);
+
+/**
+ * Enable or disable button toggling
+ * @param btnm pointer to button matrix object
+ * @param en true: enable toggling; false: disable toggling
+ * @param id index of the currently toggled button (ignored if 'en' == false)
+ */
+void lv_btnm_set_tgl(lv_obj_t * btnm, bool en, uint16_t id);
 
 /**
  * Set the styles of the buttons of the button matrox
