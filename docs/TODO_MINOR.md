@@ -17,9 +17,9 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] lv_split: new object type, a hor. or ver. line for decoration purpose
 - [ ] lv_valset: new object type, a label with "+" and "-" buttons
 - [ ] lv_tabview: new object type to organise content with tabs
-- [ ] lv_btngrp: new object type to display more buttons to choose an option from them
-- [ ] lv_switch: new object type, turn on/off by tap (a little slider)
+- [x] lv_sw: new object type, switch, turn on/off by tap (a little slider)
 - [ ] lv_roller: new object type, a roller to select a value (like on smartphones) 
+- [x] lv_btnm: toggle last buttonto create a button group
 
 ## v4.2 (released at: 17.08.2017)
 - [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
