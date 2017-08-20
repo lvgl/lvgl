@@ -9,8 +9,8 @@ The bugfixes of the still not released version are in `beta` branche.
 Please create an issue to introduce a bug instead of adding pull request to this file.
 
 
-## Nest release
-- [ ] lv_btnm: check hide code (\177) at 0. byte position too (if width is not specified)
+## Next release
+- [x] lv_btnm: check hide code (\177) at 0. byte position too (if width is not specified)
 
 ## v4.2  (released at: 17.08.2017)
 - [x] lv_slider: don't let indicator or bar to disappear because of hpad/vpad
