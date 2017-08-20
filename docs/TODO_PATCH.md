@@ -11,6 +11,8 @@ Please create an issue to introduce a bug instead of adding pull request to this
 
 ## Next release
 - [x] lv_btnm: check hide code (\177) at 0. byte position too (if width is not specified)
+- [ ] lv_img: define *lv_img_raw_header* in *lv_draw.h* because now lv_img van't be disabled
+- [ ] lv_list: ignore image related things when *lv_img* is not enebled
 
 ## v4.2  (released at: 17.08.2017)
 - [x] lv_slider: don't let indicator or bar to disappear because of hpad/vpad
