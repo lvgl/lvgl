@@ -116,7 +116,7 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
  *====================*/
 
 /*
- * New object specific "set" function comes here
+ * New object specific "set" functions come here
  */
 
 
@@ -125,9 +125,16 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
  *====================*/
 
 /*
- * New object specific "get" function comes here
+ * New object specific "get" functions come here
  */
 
+/*=====================
+ * Other functions
+ *====================*/
+
+/*
+ * New object specific "other" functions come here
+ */
 
 /**********************
  *   STATIC FUNCTIONS
