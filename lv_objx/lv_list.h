@@ -29,10 +29,6 @@ extern "C" {
 #error "lv_list: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
-#if USE_LV_IMG == 0
-#error "lv_list: lv_img is required. Enable it in lv_conf.h (USE_LV_IMG  1) "
-#endif
-
 
 #include "../lv_obj/lv_obj.h"
 #include "lv_page.h"

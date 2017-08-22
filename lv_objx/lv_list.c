@@ -233,18 +233,17 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
         if(hpad_tot < ext->page.sb_width) w -= ext->page.sb_width - hpad_tot;
     }
     lv_obj_set_width(liste, w);
-
+#if USE_LV_IMG != 0 && USE_FSINT != 0
 	if(img_fn != NULL && img_fn[0] != '\0') {
 		lv_obj_t * img = lv_img_create(liste, NULL);
 		lv_img_set_file(img, img_fn);
 		lv_obj_set_style(img, ext->style_img);
 		lv_obj_set_click(img, false);
 	}
-
+#endif
 	if(txt != NULL) {
 		lv_obj_t * label = lv_label_create(liste, NULL);
 		lv_label_set_text(label, txt);
-		lv_obj_set_style(label, ext->styles_btn[LV_BTN_STATE_REL]);
 		lv_obj_set_click(label, false);
 		lv_obj_set_width(label, liste->cords.x2 - label->cords.x1);
         lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
@@ -463,6 +462,7 @@ lv_obj_t * lv_list_get_element_label(lv_obj_t * liste)
  */
 lv_obj_t * lv_list_get_element_img(lv_obj_t * liste)
 {
+#if USE_LV_IMG != 0 && USE_FSINT != 0
     lv_obj_t * img = lv_obj_get_child(liste, NULL);
     if(img == NULL) return NULL;
 
@@ -472,6 +472,9 @@ lv_obj_t * lv_list_get_element_img(lv_obj_t * liste)
     }
 
     return img;
+#else
+    return NULL;
+#endif
 }
 
 /**
