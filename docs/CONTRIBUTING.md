@@ -1,7 +1,7 @@
 # Contributing to Littlev Graphics Library
 First of all thank you for reading these guide before contributing!
 
-In this guide you can read how can you help in developing the Littlev Graphic Library. These are not strict rules rather just suggestions. If you have a constructive idea just create pull request on this document!
+In this guide you can read how can you help in developing the Littlev Graphic Library. If you have a constructive idea just create pull request on this document!
 
 ### Table Of Content
 * [Who can contribute?](#who-can-contribute)
@@ -11,19 +11,17 @@ In this guide you can read how can you help in developing the Littlev Graphic Li
 * [How to suggest a feature?](#how-to-suggest-a-feature)
 * [How to implement a feature?](#how-to-implement-a-feature)
 * [Styling guide](#styling-guide)
-  * [Git Commit Messages](#Git-commit-messages)
   * [File format](#file-format)
   * [Functions](#functions)
   * [Variables](#variables)
   * [Defines](#defines)
+  * [Typedefs](#typedefs)
   * [Comments](#comments)
   * [Formatting](#formatting)
 
 
 ## Who can contribute?
-Everybody is welcome in contributing independently from skills, programming level or any personal attribute. 
-
-There are several ways to contribute in the graphics library like:
+As graphical interfaces for embedded systems has an increasing relevance today. You also might find important to work with a good graphics library. Now - independently from skills, programming level or any personal attributes - you can influence the development of the graphics library with:
 * Report an issue
 * Suggest feature
 * Fix an issue
@@ -31,11 +29,9 @@ There are several ways to contribute in the graphics library like:
 
 Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/master/docs/CODE_OF_CONDUCT.md)
 
+Continue reading to know how you can be part of the development! We are waiting for you!
+
 ## How to report an issue?
-There are 3 permanent branches:
- * `master` for stable, released versions
- * `beta` for developers, all feature branches merged here first
- * `bugfix` for hotfixes, not new features
 
 ### Simple issue
 If you find an issue which is very simple to fix, and you fixed it, please send a pull request against `beta` branch. 
@@ -72,21 +68,15 @@ If you have a good and useful idea you can use GitHub issues to suggest a new fe
 After a discussion we figure out the specification of the new feature and the technical details/implementation possibilities. 
 With the knowledge of how to do it somebody can implement the new feature.
 
-The new feature should be in a new branch.
-
 Keep in mind if you wouldn't like to do the implementation there is no guarantee that it will be ready in the new future. 
 However if you would like to force it, take a look at this page: [Feature request service](http://www.gl.littlev.hu/services#feature)
 
 ## How to implement a feature?
 In [docs/TODO_MINOR.md](https://github.com/littlevgl/lvgl/blob/master/docs/TODO_MINOR.md) and [docs/TODO_PATCH.md](https://github.com/littlevgl/lvgl/blob/master/docs/TODO_PATCH.md) you can see some ideas which are waiting for somebody to realize them! If want to deal with a feature from this files, please start an issue and discusse the details.
 
-## Styling guide
+The new feature should be in a new branch.
 
-### Git Commit Messages
-* Use the present tense ("Add feature" not "Added feature")
-* Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
-* Limit the first line to 72 characters or less
-* Reference issues and pull requests liberally after the first line
+## Styling guide
 
 ### File format
 Use [misc/templ/templ.c](https://github.com/littlevgl/misc/blob/master/templ/templ.c) and [misc/templ/templ.h](https://github.com/littlevgl/misc/blob/master/templ/templ.h)
@@ -114,18 +104,27 @@ Names can be used freely.
 ### Variables
 * words sparated by '_'
 * always lower case
-* one line one declaration (BAD: char x, y;)
+* one line, one declaration (BAD: char x, y;)
 * use `<stdint.h>` (*uint8_t*, *int32_t* etc)
 * declare variables when needed (not all at function start)
 * use the smallest required scope
 * variables in a file (outside functions) are always *static*
 * do not use global variables (use functions to set/get static variables)
 
-### Defines 
+### Defines
 * always upper case
 * starts with *LV_*
 * followed by the modul: *OBJ*, *BTN* etc.
 * closed by the subject: *ANIM_TIME*, *VALUE_MIN*, *WIDTH_DEF*
+
+### Typedefs
+- prefer `typedef struct` instead of  `struct name`
+- prefer `typedef enum` instead of  `enum name`
+- types always lowercase speperated by '_' 
+- first word for public typedefs is *lv_...*
+- next word identifies the modul: *lv_obj_...*, *lv_btn_...*
+- always add closing *..._t*
+- Examples: *lv_obj_t*, *lv_cont_layout_t*
 
 ### Comments
 Before every function have a comment like this:
