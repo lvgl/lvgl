@@ -33,8 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 /*Data of template*/
-typedef struct
-{
+typedef struct {
     lv_ANCESTOR_ext_t ANCESTOR; /*Ext. of ancestor*/
     /*New data for this type */
 }lv_templ_ext_t;
