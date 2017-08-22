@@ -233,7 +233,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
         if(hpad_tot < ext->page.sb_width) w -= ext->page.sb_width - hpad_tot;
     }
     lv_obj_set_width(liste, w);
-#if USE_LV_IMG != 0
+#if USE_LV_IMG != 0 && USE_FSINT != 0
 	if(img_fn != NULL && img_fn[0] != '\0') {
 		lv_obj_t * img = lv_img_create(liste, NULL);
 		lv_img_set_file(img, img_fn);
@@ -462,7 +462,7 @@ lv_obj_t * lv_list_get_element_label(lv_obj_t * liste)
  */
 lv_obj_t * lv_list_get_element_img(lv_obj_t * liste)
 {
-#if USE_LV_IMG != 0
+#if USE_LV_IMG != 0 && USE_FSINT != 0
     lv_obj_t * img = lv_obj_get_child(liste, NULL);
     if(img == NULL) return NULL;
 

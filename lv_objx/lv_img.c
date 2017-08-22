@@ -8,7 +8,7 @@
  *********************/
 #include "lv_conf.h"
 #include "misc_conf.h"
-#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
+#if USE_LV_IMG != 0 && USE_FSINT != 0
 
 #include "lv_img.h"
 #include "../lv_draw/lv_draw.h"
@@ -134,11 +134,15 @@ bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
  */
 fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
 {
+#if USE_UFS != 0
 	const lv_img_raw_header_t * raw_p = (lv_img_raw_header_t *) data;
 	fs_res_t res;
 	res = ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(color_t) + sizeof(lv_img_raw_header_t));
 
 	return res;
+#else
+	return FS_RES_NOT_EX;
+#endif
 }
 
 /*=====================
@@ -156,7 +160,6 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
     
     /*Handle normal images*/
 	if(lv_img_is_symbol(fn) == false) {
-
         fs_file_t file;
         fs_res_t res;
         lv_img_raw_header_t header;

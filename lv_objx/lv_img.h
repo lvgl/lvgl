@@ -15,15 +15,7 @@ extern "C" {
  *********************/
 #include "lv_conf.h"
 #include "misc_conf.h"
-#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
-
-#if USE_FSINT == 0
-#error "lv_img: fsint is required. Enable it in misc_conf.h (USE_FSINT  1) "
-#endif
-
-#if USE_UFS == 0
-#error "lv_img: ufs is required. Enable it in misc_conf.h (USE_UFS  1) "
-#endif
+#if USE_LV_IMG != 0 && USE_FSINT != 0
 
 #include "../lv_obj/lv_obj.h"
 #include "misc/fs/fsint.h"

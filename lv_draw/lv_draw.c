@@ -65,12 +65,16 @@ static void point_swap(point_t * p1, point_t * p2);
 static void (*px_fp)(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa) = lv_vpx;
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_vletter;
+#if USE_FSINT != 0
 static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_vmap;
+#endif
 #else
 static void (*px_fp)(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa) = lv_rpx;
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_rletter;
+#if USE_LV_IMG != 0 && USE_FSINT != 0
 static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_rmap;
+#endif
 #endif
 
 
@@ -338,6 +342,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
     }
 }
 
+#if USE_FSINT != 0
 /**
  * Draw an image
  * @param cords_p the coordinates of the image
@@ -379,14 +384,21 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
                 if((mask_com.x2 & 0x1) == 0) mask_com.x2 -= 1; /*Can be only odd*/
             }
 
+
+            bool const_data = false;
+
+#if USE_UFS != 0
             /*If the img. data is inside the MCU then do not use FS reading just a pointer*/
             if(fn[0] == UFS_LETTER) {
+                const_data = true;
                 uint8_t * f_data = ((ufs_file_t*)file.file_d)->ent->data_d;
                 f_data += sizeof(lv_img_raw_header_t);
                 map_fp(cords_p, &mask_com, (void*)f_data , style->opa, header.transp, upscale, style->ccolor, style->img_recolor);
             }
+#endif
+
             /*Read the img. with the FS interface*/
-            else {
+            if(const_data != false) {
                 uint8_t us_shift = 0;
                 uint8_t us_val = 1;
                 if(upscale != false) {
@@ -434,7 +446,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
         }
     }
 }
-
+#endif
 
 /**
  * Draw a line
