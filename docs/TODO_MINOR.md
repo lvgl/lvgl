@@ -19,6 +19,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] lv_tabview: new object type to organise content with tabs
 - [x] lv_sw: new object type, switch, turn on/off by tap (a little slider)
 - [ ] lv_roller: new object type, a roller to select a value (like on smartphones) 
+- [x] lv_kb: new object type, Keyboard
 - [x] lv_btnm: toggle last buttonto create a button group
 
 ## v4.2 (released at: 17.08.2017)
