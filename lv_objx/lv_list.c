@@ -10,8 +10,8 @@
 #if USE_LV_LIST != 0
 
 #include "lv_list.h"
-#include "lvgl/lv_obj/lv_group.h"
-#include "lvgl/lv_objx/lv_cont.h"
+#include "../lv_obj/lv_group.h"
+#include "lv_cont.h"
 #include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 

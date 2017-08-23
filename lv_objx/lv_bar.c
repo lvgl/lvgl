@@ -11,7 +11,7 @@
 #include "lv_conf.h"
 #if USE_LV_BAR != 0
 
-#include <lvgl/lv_objx/lv_bar.h>
+#include "lv_bar.h"
 #include "../lv_draw/lv_draw.h"
 #include "misc/gfx/anim.h"
 #include <stdio.h>

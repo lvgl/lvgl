@@ -16,7 +16,7 @@ extern "C" {
 #include "lv_conf.h"
 #if USE_LV_LINE != 0
 
-#include "lvgl/lv_obj/lv_obj.h"
+#include "../lv_obj/lv_obj.h"
 
 /*********************
  *      DEFINES

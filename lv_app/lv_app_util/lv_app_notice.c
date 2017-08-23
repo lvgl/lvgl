@@ -9,8 +9,8 @@
 #include "lv_app_notice.h"
 #if USE_LV_APP_NOTICE != 0
 
-#include <lvgl/lv_objx/lv_cont.h>
-#include "lvgl/lv_objx/lv_label.h"
+#include "../../lv_objx/lv_cont.h"
+#include "../../lv_objx/lv_label.h"
 
 #include "misc/gfx/anim.h"
 #include <stdio.h>

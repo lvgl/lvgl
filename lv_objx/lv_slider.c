@@ -10,9 +10,9 @@
 #if USE_LV_SLIDER != 0
 
 #include "lv_slider.h"
-#include "lvgl/lv_obj/lv_group.h"
-#include "misc/math/math_base.h"
+#include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
+#include "misc/math/math_base.h"
 
 /*********************
  *      DEFINES

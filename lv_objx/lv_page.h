@@ -21,8 +21,7 @@ extern "C" {
 #error "lv_page: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
 #endif
 
-#include "../lv_obj/lv_obj.h"
-#include "lvgl/lv_objx/lv_cont.h"
+#include "lv_cont.h"
 #include "../lv_obj/lv_dispi.h"
 
 /*********************
