@@ -47,7 +47,7 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
  *-----------------*/
 
 /**
- * Create a template objects
+ * Create a template object
  * @param par pointer to an object, it will be the parent of the new template
  * @param copy pointer to a template object, if not NULL then the new object will be copied from it
  * @return pointer to the created template
@@ -110,6 +110,15 @@ bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
     
     return valid;
 }
+
+/*======================
+ * Add/remove functions
+ *=====================*/
+
+/*
+ * New object specific "add" or "remove" functions come here
+ */
+
 
 /*=====================
  * Setter functions
