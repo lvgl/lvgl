@@ -175,7 +175,7 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
     lv_kb_ext_t * ext = lv_obj_get_ext(kb);
     ext->mode = mode;
     if(mode == LV_KB_MODE_TXT) lv_btnm_set_map(kb, kb_map_lc);
-    else if(mode == LV_KB_MODE_TXT) lv_btnm_set_map(kb, kb_map_num);
+    else if(mode == LV_KB_MODE_NUM) lv_btnm_set_map(kb, kb_map_num);
 }
 
 

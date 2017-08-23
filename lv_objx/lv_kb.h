@@ -65,6 +65,75 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy);
  */
 bool lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
 
+/**
+ * Assign a Text Area to the Keyboard. The pressed characters will be put there.
+ * @param kb pointer to a Keyboard object
+ * @param ta pointer to a Text Area object to write there
+ */
+void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta);
+
+/**
+ * Set a new a mode (text or number map)
+ * @param kb pointer to a Keyboard object
+ * @param mode the mode from 'lv_kb_mode_t'
+ */
+void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode);
+
+/**
+ * Automatically hide or show the cursor of Text Area
+ * @param kb pointer to a Keyboard object
+ * @param en true: show cursor on the current text area, false: hide cursor
+ */
+void lv_kb_set_cur_mng(lv_obj_t * kb, bool en);
+
+/**
+ * Set call back to call when the "Ok" button is pressed
+ * @param kb pointer to Keyboard object
+ * @param action a callback with 'lv_action_t' type
+ */
+void lv_kb_set_ok_action(lv_obj_t * kb, lv_action_t action);
+
+/**
+ * Set call back to call when the "Hide" button is pressed
+ * @param kb pointer to Keyboard object
+ * @param action a callback with 'lv_action_t' type
+ */
+void lv_kb_set_close_action(lv_obj_t * kb, lv_action_t action);
+
+/**
+ * Assign a Text Area to the Keyboard. The pressed characters will be put there.
+ * @param kb pointer to a Keyboard object
+ * @return pointer to the assigned Text Area object
+ */
+lv_obj_t * lv_kb_get_ta(lv_obj_t * kb);
+/**
+ * Set a new a mode (text or number map)
+ * @param kb pointer to a Keyboard object
+ * @return the current mode from 'lv_kb_mode_t'
+ */
+lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb);
+
+
+/**
+ * Get the current cursor manage mode.
+ * @param kb pointer to a Keyboard object
+ * @return true: show cursor on the current text area, false: hide cursor
+ */
+bool lv_kb_get_cur_mng(lv_obj_t * kb, bool en);
+
+/**
+ * Get the callback to call when the "Ok" button is pressed
+ * @param kb pointer to Keyboard object
+ * @return the ok callback
+ */
+lv_action_t lv_kb_get_ok_action(lv_obj_t * kb, lv_action_t action);
+
+/**
+ * Get the callback to call when the "Hide" button is pressed
+ * @param kb pointer to Keyboard object
+ * @return the close callback
+ */
+lv_action_t lv_kb_get_close_action(lv_obj_t * kb, lv_action_t action);
 
 /**********************
  *      MACROS
