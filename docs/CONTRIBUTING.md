@@ -129,7 +129,7 @@ Names can be used freely.
 ### Comments
 Before every function have a comment like this:
 
-```
+```c
 /**
  * Return with the screen of an object
  * @param obj pointer to an object
@@ -149,7 +149,7 @@ You should write **why** have you done this:
 
 ### Formatting
 Here is example to show bracket placing and using of white spaces:
-```
+```c
 /**
  * Set a new text for a label. Memory will be allocated to store the text by the label.
  * @param label pointer to a label object
