@@ -21,7 +21,7 @@ extern "C" {
 #error "lv_btn: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
 #endif
 
-#include <lvgl/lv_objx/lv_cont.h>
+#include "lv_cont.h"
 #include "../lv_obj/lv_dispi.h"
 
 /*********************
