@@ -100,6 +100,12 @@
 /*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
 #define USE_LV_WIN      1
 
+/*Tab (dependencies: lv_page, lv_btnm)*/
+#define USE_LV_TABVIEW      1
+#if USE_LV_TABVIEW != 0
+#define LV_TABVIEW_ANIM_TIME    300 /*Time of slide animation [ms] (0: no animation)*/
+#endif
+
 /*************************
  * Data visualizer object
  *************************/
@@ -143,8 +149,14 @@
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
 
+/*Keyboard (dependencies: lv_btnm)*/
+#define USE_LV_KB     1
+
 /*Check box (dependencies: lv_btn, lv_label)*/
 #define USE_LV_CB       1
+
+/*Switch (dependencies: lv_slider)*/
+#define USE_LV_SW       1
 
 /*List (dependencies: lv_page, lv_btn, lv_label, lv_img)*/
 #define USE_LV_LIST     1

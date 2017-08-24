@@ -8,14 +8,13 @@
  *********************/
 
 #include "lv_conf.h"
-#include "lvgl/lv_draw/lv_draw.h"
-#include "lvgl/lv_obj/lv_dispi.h"
-#include "lvgl/lv_obj/lv_obj.h"
-#include "lvgl/lv_obj/lv_refr.h"
-#include "lvgl/lv_obj/lv_group.h"
-#include "lvgl/lv_app/lv_app.h"
-#include "lvgl/lv_draw/lv_draw_rbasic.h"
+#include "../lv_draw/lv_draw.h"
+#include "../lv_draw/lv_draw_rbasic.h"
+#include "lv_dispi.h"
+#include "lv_obj.h"
+#include "lv_refr.h"
 #include "lv_group.h"
+#include "../lv_app/lv_app.h"
 #include "misc/gfx/anim.h"
 #include "hal/indev/indev.h"
 #include <stdint.h>

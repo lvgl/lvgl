@@ -11,7 +11,7 @@
 #if USE_LV_MBOX != 0
 
 #include "lv_mbox.h"
-#include "lvgl/lv_obj/lv_group.h"
+#include "../lv_obj/lv_group.h"
 #include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 

@@ -11,9 +11,9 @@
 #if USE_LV_TA != 0
 
 #include "lv_ta.h"
-#include "lvgl/lv_obj/lv_group.h"
-#include "misc/gfx/anim.h"
+#include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
+#include "misc/gfx/anim.h"
 
 /*********************
  *      DEFINES
@@ -522,6 +522,8 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext(ta);
     ext->cursor_show = show == false ? 0 : 1;
+    ext->cursor_state = 0;
+    lv_obj_inv(ta);
 }
 
 /**

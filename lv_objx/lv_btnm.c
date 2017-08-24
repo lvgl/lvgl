@@ -70,11 +70,15 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
     ext->btn_cnt = 0;
     ext->btn_pr = LV_BTNM_PR_NONE;
+    ext->btn_tgl = LV_BTNM_PR_NONE;
     ext->btn_areas = NULL;
     ext->cb = NULL;
     ext->map_p = NULL;
     ext->style_btn_rel = lv_style_get(LV_STYLE_BTN_REL, NULL);
     ext->style_btn_pr =  lv_style_get(LV_STYLE_BTN_PR, NULL);
+    ext->style_btn_trel = lv_style_get(LV_STYLE_BTN_TREL, NULL);
+    ext->style_btn_tpr =  lv_style_get(LV_STYLE_BTN_TPR, NULL);
+    ext->tgl = 0;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_btnm);
 
@@ -84,7 +88,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new button matrix object*/
     if(copy == NULL) {
     	lv_obj_set_size(new_btnm, LV_HOR_RES, LV_VER_RES / 2);
-    	lv_obj_set_style(new_btnm, lv_style_get(LV_STYLE_PLAIN, NULL));
+    	lv_obj_set_style(new_btnm, lv_style_get(LV_STYLE_PRETTY, NULL));
     	lv_btnm_set_map(new_btnm, lv_btnm_def_map);
     }
     /*Copy an existing object*/
@@ -162,7 +166,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             }
 
             if(sign == LV_SIGNAL_RELEASED && ext->btn_pr != LV_BTNM_PR_NONE) {
-                /*Invalidate to old area*/;
+                /*Invalidate to old pressed area*/;
                 lv_obj_get_cords(btnm, &btnm_area);
                 area_cpy(&btn_area, &ext->btn_areas[ext->btn_pr]);
                 btn_area.x1 += btnm_area.x1;
@@ -170,6 +174,18 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 btn_area.x2 += btnm_area.x1;
                 btn_area.y2 += btnm_area.y1;
                 lv_inv_area(&btn_area);
+
+                if(ext->tgl != 0) {
+                    /*Invalidate to old toggled area*/;
+                    area_cpy(&btn_area, &ext->btn_areas[ext->btn_tgl]);
+                    btn_area.x1 += btnm_area.x1;
+                    btn_area.y1 += btnm_area.y1;
+                    btn_area.x2 += btnm_area.x1;
+                    btn_area.y2 += btnm_area.y1;
+                    lv_inv_area(&btn_area);
+
+                    ext->btn_tgl = ext->btn_pr;
+                }
 
                 ext->btn_pr = LV_BTNM_PR_NONE;
             }
@@ -314,7 +330,28 @@ void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb)
 }
 
 /**
- * Set the styles of the buttons of the button matrox
+ * Enable or disable button toggling
+ * @param btnm pointer to button matrix object
+ * @param en true: enable toggling; false: disable toggling
+ * @param id index of the currently toggled button (ignored if 'en' == false)
+ */
+void lv_btnm_set_tgl(lv_obj_t * btnm, bool en, uint16_t id)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
+
+    ext->tgl = en == false ? 0 : 1;
+    if(ext->tgl != 0) {
+        if(id > ext->btn_cnt) id = LV_BTNM_PR_NONE;
+        ext->btn_tgl = id;
+    } else {
+        ext->btn_tgl = LV_BTNM_PR_NONE;
+    }
+
+    lv_obj_inv(btnm);
+}
+
+/**
+ * Set the styles of the buttons of the button matrix
  * @param btnm pointer to a button matrix object
  * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
  * @param style pointer to style
@@ -373,6 +410,12 @@ lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state)
         case LV_BTN_STATE_REL:
             style = ext->style_btn_rel;
             break;
+        case LV_BTN_STATE_TPR:
+            style = ext->style_btn_tpr;
+            break;
+        case LV_BTN_STATE_TREL:
+            style = ext->style_btn_trel;
+            break;
         default:
             style = NULL;
     }
@@ -420,7 +463,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
 
-            if(ext->map_p[txt_i][1] == '\177') continue;
+            if(ext->map_p[txt_i][1] == '\177' || ext->map_p[txt_i][0] == '\177') continue;
 
 			lv_obj_get_cords(btnm, &area_btnm);
 
@@ -434,7 +477,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			btn_h = area_get_height(&area_tmp);
 
 			/*Load the style*/
-			btn_style = lv_btnm_get_style_btn(btnm, ext->btn_pr == btn_i ? LV_BTN_STATE_PR : LV_BTN_STATE_REL);
+			if(btn_i != ext->btn_pr && btn_i != ext->btn_tgl) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_REL);
+			else if(btn_i == ext->btn_pr && btn_i != ext->btn_tgl) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_PR);
+            else if(btn_i != ext->btn_pr && btn_i == ext->btn_tgl) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_TREL);
+            else if(btn_i == ext->btn_pr && btn_i == ext->btn_tgl) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_TPR);
 
 			lv_draw_rect(&area_tmp, mask, btn_style);
 

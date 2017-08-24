@@ -31,12 +31,16 @@ extern "C" {
 #include "lv_objx/lv_slider.h"
 #include "lv_objx/lv_led.h"
 #include "lv_objx/lv_btnm.h"
+#include "lv_objx/lv_kb.h"
 #include "lv_objx/lv_ddlist.h"
 #include "lv_objx/lv_ta.h"
 #include "lv_objx/lv_win.h"
+#include "lv_objx/lv_tabview.h"
 #include "lv_objx/lv_mbox.h"
 #include "lv_objx/lv_gauge.h"
 #include "lv_objx/lv_lmeter.h"
+#include "lv_objx/lv_sw.h"
+#include "lv_objx/lv_kb.h"
 
 #include "lv_app/lv_app.h"
 

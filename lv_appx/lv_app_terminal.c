@@ -7,17 +7,15 @@
  *      INCLUDES
  *********************/
 
-#include <lv_conf.h>
-#include <misc/gfx/area.h>
-#include <lvgl/lv_obj/lv_dispi.h>
-#include <lvgl/lv_obj/lv_obj.h>
-#include <lvgl/lv_objx/lv_btn.h>
-#include <lvgl/lv_objx/lv_cont.h>
-#include <lvgl/lv_objx/lv_ddlist.h>
-#include <lvgl/lv_objx/lv_label.h>
-#include <lvgl/lv_objx/lv_page.h>
-#include <lvgl/lv_objx/lv_ta.h>
-#include <misc/gfx/color.h>
+#include "lv_conf.h"
+#include "../lv_obj/lv_dispi.h"
+#include "../lv_obj/lv_obj.h"
+#include "../lv_objx/lv_btn.h"
+#include "../lv_objx/lv_cont.h"
+#include "../lv_objx/lv_ddlist.h"
+#include "../lv_objx/lv_label.h"
+#include "../lv_objx/lv_page.h"
+#include "../lv_objx/lv_ta.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>

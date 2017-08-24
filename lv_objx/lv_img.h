@@ -15,15 +15,7 @@ extern "C" {
  *********************/
 #include "lv_conf.h"
 #include "misc_conf.h"
-#if USE_LV_IMG != 0 && USE_FSINT != 0 && USE_UFS != 0
-
-#if USE_FSINT == 0
-#error "lv_img: fsint is required. Enable it in misc_conf.h (USE_FSINT  1) "
-#endif
-
-#if USE_UFS == 0
-#error "lv_img: ufs is required. Enable it in misc_conf.h (USE_UFS  1) "
-#endif
+#if USE_LV_IMG != 0 && USE_FSINT != 0
 
 #include "../lv_obj/lv_obj.h"
 #include "misc/fs/fsint.h"
@@ -56,17 +48,6 @@ typedef struct
     uint8_t upscale   :1;       /*1: upscale to double size with antialaissing*/
     uint8_t transp    :1;       /*Transp. bit in the image header (Handled by the library)*/
 }lv_img_ext_t;
-
-/* Image header it is compatible with
- * the result image converter utility*/
-typedef struct
-{
-    uint32_t w:12;        /*Width of the image map*/
-    uint32_t h:12;        /*Height of the image map*/
-    uint32_t transp:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
-    uint32_t cd:3;        /*Color depth (0: reserved, 1: 8 bit, 2: 16 bit or 3: 24 bit, 4-7: reserved)*/
-    uint32_t res :4;      /*Reserved*/
-}lv_img_raw_header_t;
 
 /**********************
  * GLOBAL PROTOTYPES
