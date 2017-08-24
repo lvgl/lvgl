@@ -151,10 +151,11 @@ bool lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
+        lv_tabview_ext_t * ext = lv_obj_get_ext(tabview);
     	if(sign == LV_SIGNAL_CLEANUP) {
-            /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+            dm_free(ext->tab_name_ptr);
+            ext->tab_name_ptr = NULL;
     	} else if(sign == LV_SIGNAL_CORD_CHG) {
-    	    lv_tabview_ext_t * ext = lv_obj_get_ext(tabview);
     	    if(ext->content != NULL &&
     	      (lv_obj_get_width(tabview) != area_get_width(param) ||
     	       lv_obj_get_height(tabview) != area_get_height(param)))
