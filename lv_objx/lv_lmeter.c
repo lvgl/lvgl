@@ -10,7 +10,7 @@
 #if USE_LV_LMETER != 0
 
 #include "lv_lmeter.h"
-#include "misc/math/trigo.h"
+#include "../misc/math/trigo.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************

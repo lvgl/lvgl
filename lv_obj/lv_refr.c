@@ -8,11 +8,11 @@
  *********************/
 #include <stddef.h>
 #include "lv_conf.h"
-#include "misc/os/ptask.h"
-#include "misc/mem/fifo.h"
+#include "../misc/os/ptask.h"
+#include "../misc/mem/fifo.h"
 #include "lv_refr.h"
 #include "lv_vdb.h"
-#include "hal/systick/systick.h"
+#include "../hal/systick/systick.h"
 
 /*********************
  *      DEFINES

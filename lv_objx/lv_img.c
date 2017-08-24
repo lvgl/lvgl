@@ -12,11 +12,11 @@
 
 #include "lv_img.h"
 #include "../lv_draw/lv_draw.h"
-#include "misc/fs/fsint.h"
-#include "misc/fs/ufs/ufs.h"
+#include "../misc/fs/fsint.h"
+#include "../misc/fs/ufs/ufs.h"
 
 #if LV_IMG_ENABLE_SYMBOLS != 0
-#include "misc/gfx/text.h"
+#include "../misc/gfx/text.h"
 #endif
 
 /*********************

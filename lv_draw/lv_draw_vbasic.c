@@ -7,10 +7,10 @@
 #include <string.h>
 
 #include "lv_conf.h"
-#include "misc/gfx/area.h"
-#include "misc/gfx/font.h"
-#include "misc/gfx/color.h"
-#include "hal/disp/disp.h"
+#include "../misc/gfx/area.h"
+#include "../misc/gfx/font.h"
+#include "../misc/gfx/color.h"
+#include "../hal/disp/hal_disp.h"
 
 #if LV_VDB_SIZE != 0
 

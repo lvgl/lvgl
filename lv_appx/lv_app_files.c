@@ -10,7 +10,7 @@
 #if LV_APP_ENABLE != 0 && USE_LV_APP_FILES != 0
 
 #include <stdio.h>
-#include "misc/os/ptask.h"
+#include "../misc/os/ptask.h"
 #include "../lv_app/lv_app_util/lv_app_kb.h"
 #include "../lv_app/lv_app_util/lv_app_notice.h"
 

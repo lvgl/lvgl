@@ -13,8 +13,8 @@
 #include "lv_btn.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
-#include "misc/gfx/area.h"
-#include "misc/gfx/color.h"
+#include "../misc/gfx/area.h"
+#include "../misc/gfx/color.h"
 #include <stdbool.h>
 #include <string.h>
 

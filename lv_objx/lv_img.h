@@ -18,7 +18,7 @@ extern "C" {
 #if USE_LV_IMG != 0 && USE_FSINT != 0
 
 #include "../lv_obj/lv_obj.h"
-#include "misc/fs/fsint.h"
+#include "../misc/fs/fsint.h"
 
 #ifndef LV_IMG_ENABLE_SYMBOLS
 #define LV_IMG_ENABLE_SYMBOLS 0
@@ -26,7 +26,7 @@ extern "C" {
 
 #if LV_IMG_ENABLE_SYMBOLS != 0
 #include "lv_label.h"
-#include "misc/gfx/fonts/symbol_def.h"
+#include "../misc/gfx/fonts/symbol_def.h"
 #endif
 
 /*********************

@@ -11,10 +11,10 @@
 
 #include "../lv_app/lv_app_util/lv_app_kb.h"
 #include "hal/wifi/wifi.h"
-#include "misc/os/ptask.h"
+#include "../misc/os/ptask.h"
 #include "hal/systick/systick.h"
-#include "misc/comm/wifimng.h"
-#include "misc/fs/fat32/integer.h"
+#include "../misc/comm/wifimng.h"
+#include "../misc/fs/fat32/integer.h"
 #include <stdio.h>
 
 /*********************

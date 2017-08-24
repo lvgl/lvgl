@@ -10,11 +10,11 @@
 #if LV_APP_ENABLE != 0 && USE_LV_APP_SYSMON != 0
 
 #include <stdio.h>
-#include "misc/os/ptask.h"
-#include "misc/os/idle.h"
+#include "../misc/os/ptask.h"
+#include "../misc/os/idle.h"
 #include "lvgl/lv_objx/lv_chart.h"
 #include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
-#include "hal/systick/systick.h"
+#include "../hal/systick/systick.h"
 
 /*********************
  *      DEFINES

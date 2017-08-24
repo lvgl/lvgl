@@ -11,9 +11,9 @@
 
 #include "../lv_app/lv_app_util/lv_app_kb.h"
 #include "hal/gsm/gsm.h"
-#include "misc/os/ptask.h"
+#include "../misc/os/ptask.h"
 #include "hal/systick/systick.h"
-#include "misc/comm/gsmmng.h"
+#include "../misc/comm/gsmmng.h"
 #include <stdio.h>
 
 /*********************

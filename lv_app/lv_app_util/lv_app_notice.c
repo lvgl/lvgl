@@ -12,7 +12,7 @@
 #include "../../lv_objx/lv_cont.h"
 #include "../../lv_objx/lv_label.h"
 
-#include "misc/gfx/anim.h"
+#include "../misc/gfx/anim.h"
 #include <stdio.h>
 
 /*********************

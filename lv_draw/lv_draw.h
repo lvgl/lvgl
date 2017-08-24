@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#include "misc/gfx/text.h"
+#include "../misc/gfx/text.h"
 #include "../lv_obj/lv_style.h"
 
 /*********************

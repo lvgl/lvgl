@@ -12,8 +12,8 @@
 #include "lv_list.h"
 #include "../lv_obj/lv_group.h"
 #include "lv_cont.h"
-#include "misc/gfx/anim.h"
-#include "misc/math/math_base.h"
+#include "../misc/gfx/anim.h"
+#include "../misc/math/math_base.h"
 
 /*********************
  *      DEFINES

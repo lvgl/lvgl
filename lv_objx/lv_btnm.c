@@ -13,7 +13,7 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
-#include "misc/gfx/text.h"
+#include "../misc/gfx/text.h"
 
 /*********************
  *      DEFINES

@@ -12,9 +12,9 @@
 
 #include "lv_gauge.h"
 #include "../lv_draw/lv_draw.h"
-#include "misc/gfx/text.h"
-#include "misc/math/trigo.h"
-#include "misc/math/math_base.h"
+#include "../misc/gfx/text.h"
+#include "../misc/math/trigo.h"
+#include "../misc/math/math_base.h"
 #include <stdio.h>
 #include <string.h>
 

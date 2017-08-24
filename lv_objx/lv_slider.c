@@ -12,7 +12,7 @@
 #include "lv_slider.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
-#include "misc/math/math_base.h"
+#include "../misc/math/math_base.h"
 
 /*********************
  *      DEFINES

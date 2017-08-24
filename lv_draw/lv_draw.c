@@ -6,18 +6,18 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <misc/gfx/circ.h>
 #include "lv_conf.h"
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "misc/gfx/text.h"
 #include "lv_draw.h"
-#include "misc/fs/fsint.h"
-#include "misc/math/math_base.h"
 #include "lv_draw_rbasic.h"
 #include "lv_draw_vbasic.h"
-#include "misc/fs/ufs/ufs.h"
+#include "../misc/gfx/text.h"
+#include "../misc/gfx/circ.h"
+#include "../misc/fs/fsint.h"
+#include "../misc/math/math_base.h"
+#include "../misc/fs/ufs/ufs.h"
 #include "../lv_objx/lv_img.h"
 
 /*********************

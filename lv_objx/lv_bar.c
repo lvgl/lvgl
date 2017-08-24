@@ -13,7 +13,7 @@
 
 #include "lv_bar.h"
 #include "../lv_draw/lv_draw.h"
-#include "misc/gfx/anim.h"
+#include "../misc/gfx/anim.h"
 #include <stdio.h>
 
 /*********************

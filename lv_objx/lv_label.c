@@ -9,13 +9,13 @@
 #include "lv_conf.h"
 #if USE_LV_LABEL != 0
 
-#include "misc/gfx/color.h"
-#include "misc/math/math_base.h"
+#include "../misc/gfx/color.h"
+#include "../misc/math/math_base.h"
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
 #include "../lv_obj/lv_group.h"
-#include "misc/gfx/text.h"
-#include "misc/gfx/anim.h"
+#include "../misc/gfx/text.h"
+#include "../misc/gfx/anim.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************

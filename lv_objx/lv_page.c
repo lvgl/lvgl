@@ -9,13 +9,13 @@
 #include "lv_conf.h"
 #if USE_LV_PAGE != 0
 
-#include "misc/math/math_base.h"
+#include "../misc/math/math_base.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_objx/lv_page.h"
 #include "../lv_objx/lv_cont.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
-#include "misc/gfx/anim.h"
+#include "../misc/gfx/anim.h"
 
 /*********************
  *      DEFINES

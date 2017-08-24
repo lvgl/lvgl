@@ -11,7 +11,7 @@
 
 #include "../lv_app/lv_app_util/lv_app_kb.h"
 #include "hal/eth/eth.h"
-#include "misc/os/ptask.h"
+#include "../misc/os/ptask.h"
 #include "hal/systick/systick.h"
 #include <stdio.h>
 

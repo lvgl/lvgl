@@ -11,7 +11,7 @@
 
 #include <lvgl/lv_objx/lv_tabview.h>
 #include "lv_btnm.h"
-#include "misc/gfx/anim.h"
+#include "../misc/gfx/anim.h"
 
 /*********************
  *      DEFINES
