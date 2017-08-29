@@ -226,13 +226,14 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 	/*Refresh the label*/
 	lv_label_set_text(ext->label, buf);
 
-	/*Move the cursor after the new character*/
-	lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + 1);
-
-	/*It is a valid x step so save it*/
-	lv_ta_save_valid_cursor_x(ta);
-
 	if(ext->pwd_mode != 0) {
+	    ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
+	    dm_assert(ext->pwd_tmp);
+	    memcpy(buf, ext->pwd_tmp, ext->cursor_pos);
+	    buf[ext->cursor_pos] = c;
+	    memcpy(buf + ext->cursor_pos + 1, ext->pwd_tmp + ext->cursor_pos, strlen(ext->pwd_tmp) - ext->cursor_pos + 1);
+	    strcpy(ext->pwd_tmp, buf);
+
         anim_t a;
         a.var = ta;
         a.fp = (anim_fp_t)pwd_char_hider_anim;
@@ -248,6 +249,12 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         a.path = anim_get_path(ANIM_PATH_STEP);
         anim_create(&a);
     }
+
+    /*Move the cursor after the new character*/
+    lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + 1);
+
+    /*It is a valid x step so save it*/
+    lv_ta_save_valid_cursor_x(ta);
 
 }
 
@@ -279,13 +286,15 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 	/*Refresh the label*/
 	lv_label_set_text(ext->label, buf);
 
-	/*Move the cursor after the new text*/
-	lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + txt_len);
-
-	/*It is a valid x step so save it*/
-	lv_ta_save_valid_cursor_x(ta);
 
     if(ext->pwd_mode != 0) {
+        ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + txt_len + 1);
+        dm_assert(ext->pwd_tmp);
+        memcpy(buf, ext->pwd_tmp, ext->cursor_pos);
+        memcpy(buf + ext->cursor_pos, txt, txt_len);
+        memcpy(buf + ext->cursor_pos + txt_len, ext->pwd_tmp+ext->cursor_pos, label_len - ext->cursor_pos + 1);
+        strcpy(ext->pwd_tmp, buf);
+
         anim_t a;
         a.var = ta;
         a.fp = (anim_fp_t)pwd_char_hider_anim;
@@ -301,6 +310,12 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         a.path = anim_get_path(ANIM_PATH_STEP);
         anim_create(&a);
     }
+
+    /*Move the cursor after the new text*/
+    lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + txt_len);
+
+    /*It is a valid x step so save it*/
+    lv_ta_save_valid_cursor_x(ta);
 }
 
 /**
@@ -324,6 +339,9 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 	lv_ta_save_valid_cursor_x(ta);
 
     if(ext->pwd_mode != 0) {
+        ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(txt) + 1);
+        strcpy(ext->pwd_tmp, txt);
+
         anim_t a;
         a.var = ta;
         a.fp = (anim_fp_t)pwd_char_hider_anim;
