@@ -385,6 +385,12 @@ void lv_ta_del(lv_obj_t * ta)
         lv_obj_set_width(ext->label, style->line_width);
     }
 
+    if(ext->pwd_mode != 0) {
+        ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(buf));
+        dm_assert(ext->pwd_tmp);
+        strcpy(ext->pwd_tmp, buf);
+    }
+
 	/*Move the cursor to the place of the deleted character*/
 	lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) - 1);
 
