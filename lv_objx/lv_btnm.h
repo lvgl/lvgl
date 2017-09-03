@@ -112,7 +112,7 @@ void lv_btnm_set_tgl(lv_obj_t * btnm, bool en, uint16_t id);
  * @param ina pointer to a style for inactive state
  */
 void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr,
-                            lv_style_t *  trel, lv_style_t *  tpr, lv_style_t *  ina)
+                            lv_style_t *  trel, lv_style_t *  tpr, lv_style_t *  ina);
 
 /**
  * Get the current map of a button matrix
