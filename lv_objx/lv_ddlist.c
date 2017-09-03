@@ -194,8 +194,8 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options)
     lv_label_set_text(ext->opt_label, "");
     uint16_t i = 0;
     while(options[i][0] != '\0') {
-        lv_label_append_text(ext->opt_label, options[i]);
-        if(options[i + 1][0] != '\0') lv_label_append_text(ext->opt_label, "\n");
+        lv_label_ins_text(ext->opt_label, LV_LABEL_POS_LAST, options[i]);
+        if(options[i + 1][0] != '\0') lv_label_ins_text(ext->opt_label, LV_LABEL_POS_LAST, "\n");
         i++;
     }
 
@@ -239,6 +239,8 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
     /*Move the list to show the current option*/
     if(ext->opened == 0) {
         lv_ddlist_pos_act_option(ddlist);
+    } else {
+        lv_obj_inv(ddlist);
     }
 }
 
@@ -285,6 +287,20 @@ void lv_ddlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     ext->style_sel = style;
+
+}
+
+/**
+ * Open or Collapse the drop down list
+ * @param ddlist pointer to drop down list object
+ * @param state true: open; false: collapse
+ * @param anim true: use animations; false: not use animations
+ */
+void lv_ddlist_open(lv_obj_t * ddlist, bool state, bool anim)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
+    ext->opened = state ? 1 : 0;
+    lv_ddlist_refr_size(ddlist, anim ? ext->anim_time : 0);
 
 }
 /*=====================

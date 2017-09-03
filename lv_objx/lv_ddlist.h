@@ -114,6 +114,14 @@ void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size);
 void lv_ddlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style);
 
 /**
+ * Open or Collapse the drop down list
+ * @param ddlist pointer to drop down list object
+ * @param state true: open; false: collapse
+ * @param anim true: use animations; false: not use animations
+ */
+void lv_ddlist_open(lv_obj_t * ddlist, bool state, bool anim);
+
+/**
  * Get the options of a drop down list
  * @param ddlist pointer to drop down list object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
