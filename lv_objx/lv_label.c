@@ -524,6 +524,11 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
         }
 #endif
 
+        /*If the style is set explicitly draw background too*/
+        if(label->style_p != NULL) {
+            lv_draw_rect(&cords, mask, style);
+        }
+
         /*TEST: draw a background for the label*/
 		//lv_vfill(&label->cords, mask, COLOR_LIME, OPA_COVER);
 
