@@ -166,8 +166,7 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
             /* (The created label will be deleted automatically) */
     	} else if(sign == LV_SIGNAL_STYLE_CHG) {
             if(ext->label) {
-                lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 *
-                        (style->hpad + style->hpad));
+                lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 * style->hpad);
                 lv_label_set_text(ext->label, NULL);
             }
     	} else if(sign == LV_SIGNAL_CORD_CHG) {
@@ -176,7 +175,7 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
                 if(lv_obj_get_width(ta) != area_get_width(param) ||
                   lv_obj_get_height(ta) != area_get_height(param)) {
                     lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 * style->hpad);
-                    lv_label_set_text(ext->label, NULL);
+                    lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
                 }
             }
     	} else if (sign == LV_SIGNAL_CONTROLL) {
