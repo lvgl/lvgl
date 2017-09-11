@@ -180,8 +180,6 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-
-
         lv_style_t * style = lv_obj_get_style(roller);
         lv_draw_rect(&roller->cords, mask, style);
 
@@ -189,7 +187,7 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
         lv_roller_ext_t * ext = lv_obj_get_ext(roller);
         cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
         area_t rect_area;
-        rect_area.y1 = lv_obj_get_height(roller) / 2 - font_h / 2 - style->line_space - 2;
+        rect_area.y1 = roller->cords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->line_space - 2;
 
         rect_area.y2 = rect_area.y1 + font_h + style->line_space;
         rect_area.x1 = ext->ddlist.opt_label->cords.x1 - style->hpad;
@@ -221,7 +219,7 @@ bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param)
             lv_roller_ext_t * ext = lv_obj_get_ext(roller);
             lv_style_t * style_label = lv_obj_get_style(ext->ddlist.opt_label);
 
-            cord_t label_y1 = ext->ddlist.opt_label->cords.y1;
+            cord_t label_y1 = ext->ddlist.page.scrl->cords.y1 - roller->cords.y1;
             cord_t label_unit = (font_get_height(style_label->font) >> FONT_ANTIALIAS) + style_label->line_space / 2;
             cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
 

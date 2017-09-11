@@ -3,13 +3,6 @@
  * 
  */
 
-
-/*Search an replace: roller -> object normal name with lower case (e.g. button, label etc.)
- * 					 roller -> object short name with lower case(e.g. btn, label etc)
- *                   ROLLER -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 #ifndef LV_ROLLER_H
 #define LV_ROLLER_H
 
