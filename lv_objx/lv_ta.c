@@ -592,9 +592,10 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_ta_ext_t * ext = lv_obj_get_ext(ta);
         lv_style_t * style_ta = lv_obj_get_style(ta);
         lv_style_t * style_label = lv_obj_get_style(ext->label);
+        cord_t font_h =  font_get_height(style_label->font) >> FONT_ANTIALIAS;
 
         lv_cont_set_fit(lv_page_get_scrl(ta), true, true);
-        lv_obj_set_height(ta, font_get_height(style_label->font) + style_ta->vpad * 2);
+        lv_obj_set_height(ta, font_h + style_ta->vpad * 2);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
         lv_label_set_no_break(ext->label, true);
         lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->hpad, style_ta->vpad);
