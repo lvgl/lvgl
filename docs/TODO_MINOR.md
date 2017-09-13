@@ -20,7 +20,8 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] lv_sw: new object type, switch, turn on/off by tap (a little slider)
 - [ ] lv_roller: new object type, a roller to select a value (like on smartphones) 
 - [x] lv_kb: new object type, Keyboard
-- [x] lv_btnm: toggle last buttonto create a button group
+- [x] lv_btnm: lv_btnm_set_tgl() to toggle last button
+- [ ]lv_ta: cursor types
 
 ## v4.2 (released at: 17.08.2017)
 - [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
