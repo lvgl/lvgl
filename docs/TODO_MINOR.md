@@ -8,8 +8,6 @@ Please create an issue to suggest a new feature instead of adding pull request t
 Here are ideas which are not assigned to a minor version yet:
 - label: add a horzintal line (e.g. underline or line through). 
 - label long mode: dot begin
-- music player app
-- files app update: show content as text
 - GUI remote control
 - automatically build GUI from file (e.g. XML, JSON or HTML)
 
