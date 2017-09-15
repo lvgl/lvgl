@@ -414,10 +414,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
             }
         }
         x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
-
 	}
-
-	if(x > style->letter_space) x-= style->letter_space;
 
 	if(style->txt_align == LV_TXT_ALIGN_MID) {
 		cord_t line_w;

@@ -43,8 +43,8 @@
  **********************/
 static bool lv_ta_design(lv_obj_t * ta, const area_t * mask, lv_design_mode_t mode);
 static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_design_mode_t mode);
-static void cursor_blink_anim(lv_obj_t * ta, uint8_t hide);
-static void pwd_char_hider_anim(lv_obj_t * ta, uint8_t x);
+static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
+static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x);
 static void pwd_char_hider(lv_obj_t * ta);
 static void lv_ta_save_valid_cursor_x(lv_obj_t * ta);
 
@@ -85,7 +85,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     ext->cursor_state = 0;
     ext->pwd_mode = 0;
     ext->pwd_tmp = NULL;
+    ext->cursor_style = NULL;
     ext->cursor_pos = 0;
+    ext->cursor_type = LV_TA_CURSOR_LINE;
     ext->cursor_valid_x = 0;
     ext->label = NULL;
 
@@ -129,8 +131,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     a.time = LV_TA_CUR_BLINK_TIME;
     a.act_time = 0;
     a.end_cb = NULL;
-    a.start = 0;
-    a.end= 1;
+    a.start = 1;
+    a.end = 0;
     a.repeat = 1;
     a.repeat_pause = 0;
     a.playback = 1;
@@ -159,22 +161,27 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
-    	lv_style_t * style = lv_obj_get_style(ta);
     	if(sign == LV_SIGNAL_CLEANUP) {
     	    if(ext->pwd_tmp != NULL) dm_free(ext->pwd_tmp);
 
             /* (The created label will be deleted automatically) */
     	} else if(sign == LV_SIGNAL_STYLE_CHG) {
             if(ext->label) {
-                lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 * style->hpad);
+            	lv_obj_t * scrl = lv_page_get_scrl(ta);
+            	lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->hpad);
+                lv_obj_set_pos(ext->label, style_scrl->hpad, style_scrl->vpad);
                 lv_label_set_text(ext->label, NULL);
             }
     	} else if(sign == LV_SIGNAL_CORD_CHG) {
     		/*Set the label width according to the text area width*/
-            if(ext->label != NULL) {
+            if(ext->label) {
                 if(lv_obj_get_width(ta) != area_get_width(param) ||
                   lv_obj_get_height(ta) != area_get_height(param)) {
-                    lv_obj_set_width(ext->label, lv_obj_get_width(ta) - 2 * style->hpad);
+                	lv_obj_t * scrl = lv_page_get_scrl(ta);
+                	lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                    lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->hpad);
+                    lv_obj_set_pos(ext->label, style_scrl->hpad, style_scrl->vpad);
                     lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
                 }
             }
@@ -273,7 +280,6 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     if((label_len + txt_len + 1) > LV_TA_MAX_LENGTH) return;
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
-
     /*Insert the text*/
     char buf[LV_TA_MAX_LENGTH];
 
@@ -282,6 +288,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 	memcpy(buf + ext->cursor_pos + txt_len, label_txt+ext->cursor_pos, label_len - ext->cursor_pos + 1);
 
 	/*Refresh the label*/
+
 	lv_label_set_text(ext->label, buf);
 
 
@@ -330,7 +337,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 	/*Don't let 'width == 0' because cursor will not be visible*/
 	if(lv_obj_get_width(ext->label) == 0) {
 	    lv_style_t * style = lv_obj_get_style(ext->label);
-	    lv_obj_set_width(ext->label, style->line_width);
+	    lv_obj_set_width(ext->label, font_get_width(style->font, ' '));
 	}
 
 	/*It is a valid x step so save it*/
@@ -450,6 +457,21 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
                                      font_h + 2 * style_scrl->hpad));
     }
 
+    anim_t a;
+    a.var = ta;
+    a.fp = (anim_fp_t)cursor_blink_anim;
+    a.time = LV_TA_CUR_BLINK_TIME;
+    a.act_time = 0;
+    a.end_cb = NULL;
+    a.start = 1;
+    a.end= 0;
+    a.repeat = 1;
+    a.repeat_pause = 0;
+    a.playback = 1;
+    a.playback_pause = 0;
+    a.path = anim_get_path(ANIM_PATH_STEP);
+    anim_create(&a);
+
 	lv_obj_inv(ta);
 }
 
@@ -547,6 +569,31 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show)
     ext->cursor_state = 0;
     lv_obj_inv(ta);
 }
+
+/**
+ * Set the cursor type.
+ * @param ta pointer to a text area object
+ * @param cur_type: element of 'lv_ta_cursor_type_t'
+ */
+void lv_ta_set_cursor_type(lv_obj_t * ta, lv_ta_cursor_type_t cur_type)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    ext->cursor_type = cur_type;
+    lv_obj_inv(ta);
+}
+
+/**
+ * Set the style of the cursor (NULL to use label's style)
+ * @param ta pointer to a text area object
+ * @param style pointer to the new cursor style
+ */
+void lv_ta_set_cursor_style(lv_obj_t * ta, lv_style_t * style)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    ext->cursor_style = style;
+    lv_obj_inv(ta);
+}
+
 
 /**
  * Enable/Disable password mode
@@ -670,6 +717,28 @@ bool lv_ta_get_cursor_show(lv_obj_t * ta)
 }
 
 /**
+ * Get the current cursor type.
+ * @param ta pointer to a text area object
+ * @return element of 'lv_ta_cursor_type_t'
+ */
+lv_ta_cursor_type_t lv_ta_get_cursor_type(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    return ext->cursor_type;
+}
+
+/**
+ * Get the style of the cursor
+ * @param ta pointer to a text area object
+ * @return style pointer to the new cursor style
+ */
+lv_style_t *  lv_ta_get_cursor_style(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext(ta);
+    return ext->cursor_style;
+}
+
+/**
  * Get the password mode
  * @param ta pointer to a text area object
  * @return true: password mode is enabled, false: disabled
@@ -733,29 +802,73 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 		/*Draw the cursor too*/
 		lv_obj_t * ta = lv_obj_get_parent(scrling);
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext(ta);
-        lv_style_t * cur_style = lv_obj_get_style(lv_page_get_scrl(ta));
-        if(cur_style->glass) cur_style = lv_obj_get_style(ta);
+		if(ta_ext->cursor_show == 0 || ta_ext->cursor_state == 0) return true; 	/*The cursor is not visible now*/
 
-		if(ta_ext->cursor_show != 0 && ta_ext->cursor_state == 0) {
-			uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
-			point_t letter_pos;
-			lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
+        lv_style_t * label_style = lv_obj_get_style(ta_ext->label);
 
-			area_t cur_area;
-			lv_style_t * labels_p = lv_obj_get_style(ta_ext->label);
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - cur_style->line_width / 2 ;
+        lv_style_t cur_style;
+        if(ta_ext->cursor_style != NULL) {
+        	lv_style_cpy(&cur_style, ta_ext->cursor_style);
+        }
+        else {
+        	lv_style_cpy(&cur_style, label_style);		/*Use the label style is no better option and modify it */
+        	color_t ccolor_tmp = cur_style.ccolor;		/*Make letter color to cursor color*/
+        	cur_style.ccolor = cur_style.mcolor;		/*In block mode the letter color will be current background color*/
+        	cur_style.mcolor = ccolor_tmp;
+        	cur_style.gcolor = ccolor_tmp;
+        	cur_style.bcolor = ccolor_tmp;
+        	cur_style.bopa = OPA_COVER;
+        	cur_style.bwidth = 1 * LV_DOWNSCALE;
+        	cur_style.line_width = 1 * LV_DOWNSCALE;
+        	cur_style.swidth = 0;
+        	cur_style.radius = 0;
+        	cur_style.empty = 0;
+        	cur_style.opa = OPA_COVER;
+        }
+
+		uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
+		const char * txt = lv_label_get_text(ta_ext->label);
+		cord_t letter_w = font_get_width(label_style->font, txt[cur_pos] != '\0' ? txt[cur_pos] : ' ');
+		cord_t letter_h = font_get_height(label_style->font) >> FONT_ANTIALIAS;
+		point_t letter_pos;
+		lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
+
+		area_t cur_area;
+		if(ta_ext->cursor_type == LV_TA_CURSOR_LINE) {
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
 			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style->line_width / 2 + (cur_style->line_width & 0x1);
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + (font_get_height(labels_p->font) >> FONT_ANTIALIAS);
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.line_width;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			lv_draw_rect(&cur_area, mask, &cur_style);
+		} else if(ta_ext->cursor_type == LV_TA_CURSOR_BLOCK) {
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + letter_w;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			lv_draw_rect(&cur_area, mask, &cur_style);
 
-			lv_style_t cur_rects;
-			lv_style_get(LV_STYLE_PLAIN, &cur_rects);
-			cur_rects.radius = 0;
-			cur_rects.bwidth = 0;
-            cur_rects.mcolor = cur_style->ccolor;
-            cur_rects.gcolor = cur_style->ccolor;
-			lv_draw_rect(&cur_area, mask, &cur_rects);
+			char letter_buf[2];
+			letter_buf[0] = txt[cur_pos];
+			letter_buf[1] = '\0';
+			lv_draw_label(&cur_area, mask, &cur_style, letter_buf, TXT_FLAG_NONE, 0);
+
+		} else if(ta_ext->cursor_type == LV_TA_CURSOR_OUTLINE) {
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + letter_w;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			cur_style.empty = 1;
+			if(cur_style.bwidth == 0) cur_style.bwidth = 1 * LV_DOWNSCALE; /*Be sure the border will be drawn*/
+			lv_draw_rect(&cur_area, mask, &cur_style);
+		} else if(ta_ext->cursor_type == LV_TA_CURSOR_UNDERLINE) {
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 + letter_h - cur_style.line_width;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + letter_w;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			lv_draw_rect(&cur_area, mask, &cur_style);
 		}
+
+
 	}
 
 	return true;
@@ -767,11 +880,11 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
  * @param ta pointer to a text area
  * @param hide 1: hide the cursor, 0: show it
  */
-static void cursor_blink_anim(lv_obj_t * ta, uint8_t hide)
+static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
-	if(hide != ext->cursor_state) {
-        ext->cursor_state = hide  == 0 ? 0 : 1;
+	if(show != ext->cursor_state) {
+        ext->cursor_state = show == 0 ? 0 : 1;
         if(ext->cursor_show != 0) lv_obj_inv(ta);
 	}
 }
@@ -779,12 +892,12 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t hide)
 
 /**
  * Dummy function to animate char hiding in pwd mode.
- * Does nothing, nut a function is required in car hiding anim.
+ * Does nothing, but a function is required in car hiding anim.
  * (pwd_char_hider callback do the real job)
  * @param ta unused
  * @param x unused
  */
-static void pwd_char_hider_anim(lv_obj_t * ta, uint8_t x)
+static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x)
 {
 
 }

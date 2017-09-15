@@ -38,15 +38,24 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef enum {
+	LV_TA_CURSOR_LINE,
+	LV_TA_CURSOR_BLOCK,
+	LV_TA_CURSOR_OUTLINE,
+	LV_TA_CURSOR_UNDERLINE,
+}lv_ta_cursor_type_t;
+
 /*Data of text area*/
 typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;           /*Label of the text area*/
+    lv_style_t * cursor_style;	/*Style of the cursor (NULL to use label's style)*/
     char * pwd_tmp;             /*Used to store the original text in password mode*/
     cord_t cursor_valid_x;      /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
     uint16_t cursor_pos;        /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
+    lv_ta_cursor_type_t cursor_type;	/*Shape of the cursor*/
     uint8_t cursor_show :1;     /*Show or hide cursor */
     uint8_t pwd_mode :1;        /*Replace characters with '*' */
     uint8_t cursor_state :1;    /*Indicates that the cursor is visible now or not (Handled by the library)*/
@@ -141,6 +150,20 @@ void lv_ta_cursor_up(lv_obj_t * ta);
 void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
 
 /**
+ * Set the cursor type.
+ * @param ta pointer to a text area object
+ * @return cur_type: element of 'lv_ta_cursor_type_t'
+ */
+void lv_ta_set_cursor_type(lv_obj_t * ta, lv_ta_cursor_type_t cur_type);
+
+/**
+ * Set the style of the cursor (NULL to use label's style)
+ * @param ta pointer to a text area object
+ * @param style pointer to the new cursor style
+ */
+void lv_ta_set_cursor_style(lv_obj_t * ta, lv_style_t * style);
+
+/**
  * Enable/Disable password mode
  * @param ta ointer to a text area object
  * @param en true: enable, false: disable
@@ -181,6 +204,20 @@ uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta);
  * @return true: the cursor is drawn, false: the cursor is hidden
  */
 bool lv_ta_get_cursor_show(lv_obj_t * ta);
+
+/**
+ * Get the current cursor type.
+ * @param ta pointer to a text area object
+ * @return element of 'lv_ta_cursor_type_t'
+ */
+lv_ta_cursor_type_t lv_ta_get_cursor_type(lv_obj_t * ta);
+
+/**
+ * Get the style of the cursor
+ * @param ta pointer to a text area object
+ * @return style pointer to the new cursor style
+ */
+lv_style_t *  lv_ta_get_cursor_style(lv_obj_t * ta);
 
 /**
  * Get the password mode
