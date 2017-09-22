@@ -34,7 +34,6 @@ typedef enum
 {
     LV_LABEL_LONG_EXPAND,   /*Expand the object size to the text size*/
     LV_LABEL_LONG_BREAK,    /*Keep the object width, break the too long lines and expand the object height*/
-    LV_LABEL_LONG_DOTS,     /*Keep the object size, break the text and write dots in the last line*/
     LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
     LV_LABEL_LONG_ROLL,     /*Keep the size and roll the text infinitely*/
 }lv_label_long_mode_t;
@@ -46,7 +45,11 @@ typedef struct
     /*New data for this type */
     char * txt;                     /*Text of the label*/
     lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
+#if TXT_UTF8 == 0
     char dot_tmp[LV_LABEL_DOT_NUM + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
+#else
+    uint32_t dot_tmp[LV_LABEL_DOT_NUM + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
+#endif
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     point_t offset;                 /*Text draw position offset*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/

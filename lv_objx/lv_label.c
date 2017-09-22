@@ -271,15 +271,6 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
-    /*When changing from dot mode reload the characters replaced by dots*/
-    if(ext->long_mode == LV_LABEL_LONG_DOTS &&
-       ext->dot_end != LV_LABEL_DOT_END_INV) {
-    	uint8_t i;
-    	for(i = 0; i < LV_LABEL_DOT_NUM + 1; i++) {
-    		ext->txt[ext->dot_end - LV_LABEL_DOT_NUM + i] = ext->dot_tmp[i];
-    	}
-    }
-
     /*Delete the old animation (if exists)*/
     anim_del(label, (anim_fp_t) lv_obj_set_x);
     anim_del(label, (anim_fp_t) lv_obj_set_y);
@@ -397,6 +388,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
         line_start = new_line_start;
     }
 
+    /*If the last character is lie break then go to the next line*/
     if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
         y += letter_height + style->line_space;
         line_start = index;
@@ -404,16 +396,20 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
     /*Calculate the x coordinate*/
     cord_t x = 0;
-	uint32_t i;
+	uint32_t i = line_start;
+    uint32_t cnt = line_start;                      /*Count the letter (in UTF-8 1 letter not 1 byte)*/
 	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
-	for(i = line_start; i < index; i++) {
+	uint32_t letter;
+	while(cnt < index) {
+	    letter = txt_utf8_next(txt, &i);
+	    cnt++;
         /*Handle the recolor command*/
         if((flag & TXT_FLAG_RECOLOR) != 0) {
             if(txt_is_cmd(&cmd_state, txt[i]) != false) {
                 continue; /*Skip the letter is it is part of a command*/
             }
         }
-        x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+        x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->letter_space;
 	}
 
 	if(style->txt_align == LV_TXT_ALIGN_MID) {
@@ -474,8 +470,10 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     }
 
 	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
-	uint16_t i;
-	for(i = line_start; i < new_line_start - 1; i++) {
+	uint32_t i = line_start;
+	uint32_t letter;
+	while(i < new_line_start - 1) {
+	    letter = txt_utf8_next(txt, &i);
 	    /*Handle the recolor command*/
 	    if((flag & TXT_FLAG_RECOLOR) != 0) {
             if(txt_is_cmd(&cmd_state, txt[i]) != false) {
@@ -483,8 +481,8 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-	    x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
-		if(pos->x < x) break;
+	    x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->letter_space;
+		if(pos->x < x) break;   /*Get the position*/
 	}
 
 	return i;
@@ -660,40 +658,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     else if (ext->long_mode == LV_LABEL_LONG_BREAK) {
         lv_obj_set_height(label, size.y);
     }
-    /*Replace the last 'LV_LABEL_DOT_NUM' characters with dots
-     * and save these characters*/
-    else if(ext->long_mode == LV_LABEL_LONG_DOTS) {
-        point_t point;
-        point.x = lv_obj_get_width(label) - 1;
-        point.y = lv_obj_get_height(label) - 1;
-        uint16_t index = lv_label_get_letter_on(label, &point);
 
-        if(index < strlen(ext->txt) - 1) {
-
-            /* Change the last 'LV_LABEL_DOT_NUM' to dots
-             * (if there are at least 'LV_LABEL_DOT_NUM' characters*/
-            if(index > LV_LABEL_DOT_NUM) {
-                uint8_t i;
-                for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
-                    ext->dot_tmp[i] = ext->txt[index - LV_LABEL_DOT_NUM + i];
-                    ext->txt[index - LV_LABEL_DOT_NUM + i] = '.';
-                }
-                /*The last character is '\0'. Save this character from the text too.*/
-                ext->dot_tmp[i] = ext->txt[index];
-                ext->txt[index] = '\0';
-            }
-            /*Else with short text change all characters to dots*/
-            else {
-                uint8_t i;
-                for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
-                    ext->txt[i] = '.';
-                }
-                ext->txt[i] = '\0';
-            }
-            /*Save the dot end index*/
-            ext->dot_end = index;
-        }
-    }
 
     lv_obj_inv(label);
 }

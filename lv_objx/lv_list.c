@@ -349,25 +349,6 @@ void lv_list_set_sb_out(lv_obj_t * list, bool out)
     ext->sb_out = out == false ? 0 : 1;
 }
 
-/**
- * Enable or disable the text rolling on a list element
- * @param liste pinter to list element
- * @param en true: enable text scrolling, false: disable text scrolling
- */
-void lv_list_set_element_text_roll(lv_obj_t * liste, bool en)
-{
-    lv_obj_t * label = lv_list_get_element_label(liste);
-    if(label == NULL) return;
-
-    if(en == false) {
-        lv_label_set_long_mode(label, LV_LABEL_LONG_DOTS);
-    } else {
-        lv_obj_set_width(label, liste->cords.x2 - label->cords.x1);
-        lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
-    }
-
-}
-
 
 /**
  * Set styles of the list elements of a list in each state

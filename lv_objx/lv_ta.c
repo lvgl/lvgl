@@ -14,6 +14,7 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "misc/gfx/anim.h"
+#include "misc/gfx/text.h"
 
 /*********************
  *      DEFINES
@@ -103,7 +104,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
 
     	lv_obj_set_design_f(ext->page.scrl, lv_ta_scrling_design);
     	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
-    	lv_label_set_text(ext->label, "Text area");
+    	lv_label_set_text(ext->label, "Text.area");
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, false);
     	lv_obj_set_style(new_ta, lv_style_get(LV_STYLE_PRETTY, NULL));
@@ -221,22 +222,32 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
 
-    char buf[LV_TA_MAX_LENGTH];
 
+    uint32_t cur_pos;
+#if TXT_UTF8 == 0
+    cur_pos = ext->cursor_pos;
+#else
+    cur_pos = txt_utf8_get_id(label_txt, ext->cursor_pos);
+#endif
+
+    char buf[LV_TA_MAX_LENGTH];
     /*Insert the character*/
-	memcpy(buf, label_txt, ext->cursor_pos);
-	buf[ext->cursor_pos] = c;
-	memcpy(buf+ext->cursor_pos+1, label_txt+ext->cursor_pos, strlen(label_txt) - ext->cursor_pos + 1);
+	memcpy(buf, label_txt, cur_pos);
+	buf[cur_pos] = c;
+	memcpy(buf + cur_pos + 1, label_txt + cur_pos, strlen(label_txt) - cur_pos + 1);
 
 	/*Refresh the label*/
 	lv_label_set_text(ext->label, buf);
 
 	if(ext->pwd_mode != 0) {
+#if TXT_UTF8 != 0
+    cur_pos = txt_utf8_get_id(ext->pwd_tmp, ext->cursor_pos);   /*Noral text contains '*', pwd_tmp normal UTF-8 letter, so the cursor points to a different byte*/
+#endif
 	    ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
 	    dm_assert(ext->pwd_tmp);
-	    memcpy(buf, ext->pwd_tmp, ext->cursor_pos);
-	    buf[ext->cursor_pos] = c;
-	    memcpy(buf + ext->cursor_pos + 1, ext->pwd_tmp + ext->cursor_pos, strlen(ext->pwd_tmp) - ext->cursor_pos + 1);
+	    memcpy(buf, ext->pwd_tmp, cur_pos);
+	    buf[cur_pos] = c;
+	    memcpy(buf + cur_pos + 1, ext->pwd_tmp + cur_pos, strlen(ext->pwd_tmp) - cur_pos + 1);
 	    strcpy(ext->pwd_tmp, buf);
 
         anim_t a;
@@ -283,12 +294,18 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     /*Insert the text*/
     char buf[LV_TA_MAX_LENGTH];
 
-	memcpy(buf, label_txt, ext->cursor_pos);
-	memcpy(buf + ext->cursor_pos, txt, txt_len);
-	memcpy(buf + ext->cursor_pos + txt_len, label_txt+ext->cursor_pos, label_len - ext->cursor_pos + 1);
+    uint32_t cur_pos;
+#if TXT_UTF8 == 0
+    cur_pos = ext->cursor_pos;
+#else
+    cur_pos = txt_utf8_get_id(label_txt, ext->cursor_pos);
+#endif
+
+	memcpy(buf, label_txt, cur_pos);
+	memcpy(buf + cur_pos, txt, txt_len);
+	memcpy(buf + cur_pos + txt_len, label_txt+cur_pos, label_len - cur_pos + 1);
 
 	/*Refresh the label*/
-
 	lv_label_set_text(ext->label, buf);
 
 
@@ -296,8 +313,8 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + txt_len + 1);
         dm_assert(ext->pwd_tmp);
         memcpy(buf, ext->pwd_tmp, ext->cursor_pos);
-        memcpy(buf + ext->cursor_pos, txt, txt_len);
-        memcpy(buf + ext->cursor_pos + txt_len, ext->pwd_tmp+ext->cursor_pos, label_len - ext->cursor_pos + 1);
+        memcpy(buf + cur_pos, txt, txt_len);
+        memcpy(buf + cur_pos + txt_len, ext->pwd_tmp+ext->cursor_pos, label_len - ext->cursor_pos + 1);
         strcpy(ext->pwd_tmp, buf);
 
         anim_t a;
@@ -416,11 +433,11 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
     lv_obj_t * scrl = lv_page_get_scrl(ta);
     lv_style_t * style_scrl = lv_obj_get_style(scrl);
-	uint16_t txt_len = strlen(lv_label_get_text(ext->label));
+	uint16_t len = txt_len(lv_label_get_text(ext->label));
 
-	if(pos < 0) pos = txt_len + pos;
+	if(pos < 0) pos = len + pos;
 
-	if(pos > txt_len || pos == LV_TA_CUR_LAST) pos = txt_len;
+	if(pos > len || pos == LV_TA_CUR_LAST) pos = len;
 
 	ext->cursor_pos = pos;
 
@@ -457,6 +474,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
                                      font_h + 2 * style_scrl->hpad));
     }
 
+    /*Reset cursor blink animation*/
     anim_t a;
     a.var = ta;
     a.fp = (anim_fp_t)cursor_blink_anim;
@@ -607,14 +625,15 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
     /*Pwd mode is now enabled*/
     if(ext->pwd_mode == 0 && en != false) {
         char * txt = lv_label_get_text(ext->label);
-        uint16_t txt_len = strlen(txt);
-        ext->pwd_tmp = dm_alloc(txt_len + 1);
+        uint16_t len = strlen(txt);
+        ext->pwd_tmp = dm_alloc(len + 1);
         strcpy(ext->pwd_tmp, txt);
 
         uint16_t i;
-        for(i = 0; i < txt_len; i++) {
+        for(i = 0; i < len; i++) {
             txt[i] = '*';       /*All char to '*'*/
         }
+        txt[i] = '\0';
 
         lv_label_set_text(ext->label, NULL);
     }
@@ -828,7 +847,17 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 
 		uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
 		const char * txt = lv_label_get_text(ta_ext->label);
-		cord_t letter_w = font_get_width(label_style->font, txt[cur_pos] != '\0' ? txt[cur_pos] : ' ');
+
+        uint32_t byte_pos;
+#if TXT_UTF8 != 0
+        byte_pos = txt_utf8_get_id(txt, cur_pos);
+#else
+        byte_pos = cur_pos;
+#endif
+
+		uint32_t letter = txt_utf8_next(&txt[byte_pos], NULL);
+		printf("letter %d\n", letter);
+		cord_t letter_w = font_get_width(label_style->font, letter != '\0' ? letter : ' ');
 		cord_t letter_h = font_get_height(label_style->font) >> FONT_ANTIALIAS;
 		point_t letter_pos;
 		lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
@@ -847,9 +876,15 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
 			lv_draw_rect(&cur_area, mask, &cur_style);
 
+			/*Get the current letter*/
+#if TXT_UTF8 == 0
 			char letter_buf[2];
-			letter_buf[0] = txt[cur_pos];
-			letter_buf[1] = '\0';
+			letter_buf[0] = txt[byte_pos];
+            letter_buf[1] = '\0';
+#else
+            char letter_buf[8] = {0};
+            memcpy(letter_buf, &txt[byte_pos], txt_utf8_size(txt[byte_pos]));
+#endif
 			lv_draw_label(&cur_area, mask, &cur_style, letter_buf, TXT_FLAG_NONE, 0);
 
 		} else if(ta_ext->cursor_type == LV_TA_CURSOR_OUTLINE) {
@@ -911,10 +946,10 @@ static void pwd_char_hider(lv_obj_t * ta)
     lv_ta_ext_t * ext = lv_obj_get_ext(ta);
     if(ext->pwd_mode != 0) {
         char * txt = lv_label_get_text(ext->label);
-        int16_t txt_len = strlen(txt);
+        int16_t len = txt_len(txt);
         bool refr = false;
         uint16_t i;
-        for(i = 0; i < txt_len; i++) {
+        for(i = 0; i < len; i++) {
             if(txt[i] != '*') {
                 txt[i] = '*';
                 refr = true;
