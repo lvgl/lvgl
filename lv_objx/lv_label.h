@@ -113,7 +113,7 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text);
  *            -1: before the last char.
  * @param txt pointer to the text to insert
  */
-void lv_label_ins_text(lv_obj_t * label, int32_t pos,  const char * txt);
+void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt);
 
 /**
  * Set the behavior of the label with longer text then the object size

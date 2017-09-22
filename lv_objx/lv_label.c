@@ -10,6 +10,7 @@
 #if USE_LV_LABEL != 0
 
 #include "misc/gfx/color.h"
+#include "misc/gfx/text.h"
 #include "misc/math/math_base.h"
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
@@ -165,22 +166,28 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
-    /*If trying to set its own text or the text is NULL then refresh */
-    if(text == ext->txt || text == NULL) {
+    /*If text is NULL then refresh */
+    if(text == NULL) {
         lv_label_refr_text(label);
         return;
     }
 
-    /*Allocate space for the new text*/
-    uint32_t len = strlen(text) + 1;
-    if(ext->txt != NULL && ext->static_txt == 0) {
-        dm_free(ext->txt);
-        ext->txt = NULL;
+    if(ext->txt == text) {
+        /*If set its own text then reallocate it (maybe its size changed)*/
+        ext->txt = dm_realloc(ext->txt, strlen(ext->txt) + 1);
+    } else {
+        /*Allocate space for the new text*/
+        uint32_t len = strlen(text) + 1;
+        if(ext->txt != NULL && ext->static_txt == 0) {
+            dm_free(ext->txt);
+            ext->txt = NULL;
+        }
+
+        ext->txt = dm_alloc(len);
+        strcpy(ext->txt, text);
+        ext->static_txt = 0;    /*Now the text is dynamically allocated*/
     }
-    ext->txt = dm_alloc(len);
-    strcpy(ext->txt, text);
-    ext->static_txt = 0;    /*Now the text is dynamically allocated*/
-    
+
     lv_label_refr_text(label);
 }
 /**
@@ -243,11 +250,9 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text)
  * @param pos character index to insert
  *            0: before first char.
  *            LV_LABEL_POS_LAST: after last char.
- *            < 0: count from the end
- *            -1: before the last char.
  * @param txt pointer to the text to insert
  */
-void lv_label_ins_text(lv_obj_t * label, int32_t pos,  const char * txt)
+void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
@@ -262,17 +267,15 @@ void lv_label_ins_text(lv_obj_t * label, int32_t pos,  const char * txt)
     uint32_t new_len = ins_len + old_len;
     ext->txt = dm_realloc(ext->txt, new_len + 1);
 
-    if(pos == LV_LABEL_POS_LAST) pos = old_len;
-    else if(pos < 0) pos = old_len + pos;
-
-    /*Copy the second part into the end to make place to text to insert*/
-    int32_t i;
-    for(i = new_len; i >= pos + ins_len; i--){
-        ext->txt[i] = ext->txt[i - ins_len];
+    if(pos == LV_LABEL_POS_LAST) {
+#if TXT_UTF8 == 0
+        pos = old_len;
+#else
+        pos = txt_len(ext->txt);
+#endif
     }
 
-    /* Copy the text into the new space*/
-    memcpy(ext->txt + pos, txt, ins_len);
+    txt_ins(ext->txt, pos, txt);
 
     lv_label_refr_text(label);
 }

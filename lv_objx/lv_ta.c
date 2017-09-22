@@ -211,44 +211,37 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
  * @param ta pointer to a text area object
  * @param c a character
  */
-void lv_ta_add_char(lv_obj_t * ta, char c)
+void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 
-	const char * label_txt = lv_label_get_text(ext->label);
-
-	/*Test the new length: txt length + 1 (closing'\0') + 1 (c character)*/
-    if((strlen(label_txt) + 2) > LV_TA_MAX_LENGTH) return;
-
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
-
-
-    uint32_t cur_pos;
 #if TXT_UTF8 == 0
-    cur_pos = ext->cursor_pos;
+    char letter_buf[2];
+    letter_buf[0] = c;
+    letter_buf[1] = '\0';
 #else
-    cur_pos = txt_utf8_get_id(label_txt, ext->cursor_pos);
+    /*Swap because of UTF-8 is "big-endian-like" */
+    if(((c >> 8) & 0b11100000) == 0b11000000) {
+        c = (c & 0xFF) << 8 | ((c >> 8) & 0xFF);
+    }
+    if(((c >> 16) & 0b11110000) == 0b11100000) {
+        c = (c & 0xFF) << 16 | ((c >> 16) & 0xFF);
+    }
+    if(((c >> 24) & 0b11111000) == 0b11110000) {
+        c = ((c & 0xFF) << 24) | (((c >> 8) & 0xFF) >> 16) | (((c >> 16) & 0xFF) >> 8) | ((c >> 24) & 0xFF);
+    }
+
+    char letter_buf[8] = {0};
+    memcpy(letter_buf, &c, txt_utf8_size(c));
 #endif
+    lv_label_ins_text(ext->label, ext->cursor_pos, letter_buf);    /*Insert the character*/
 
-    char buf[LV_TA_MAX_LENGTH];
-    /*Insert the character*/
-	memcpy(buf, label_txt, cur_pos);
-	buf[cur_pos] = c;
-	memcpy(buf + cur_pos + 1, label_txt + cur_pos, strlen(label_txt) - cur_pos + 1);
+    if(ext->pwd_mode != 0) {
 
-	/*Refresh the label*/
-	lv_label_set_text(ext->label, buf);
-
-	if(ext->pwd_mode != 0) {
-#if TXT_UTF8 != 0
-    cur_pos = txt_utf8_get_id(ext->pwd_tmp, ext->cursor_pos);   /*Noral text contains '*', pwd_tmp normal UTF-8 letter, so the cursor points to a different byte*/
-#endif
-	    ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
-	    dm_assert(ext->pwd_tmp);
-	    memcpy(buf, ext->pwd_tmp, cur_pos);
-	    buf[cur_pos] = c;
-	    memcpy(buf + cur_pos + 1, ext->pwd_tmp + cur_pos, strlen(ext->pwd_tmp) - cur_pos + 1);
-	    strcpy(ext->pwd_tmp, buf);
+        ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
+        dm_assert(ext->pwd_tmp);
+        txt_ins(ext->pwd_tmp, ext->cursor_pos, letter_buf);
 
         anim_t a;
         a.var = ta;
@@ -284,38 +277,19 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 
 	const char * label_txt = lv_label_get_text(ext->label);
-    uint16_t label_len = strlen(label_txt);
     uint16_t txt_len = strlen(txt);
-
-    /*Test the new length (+ 1 for the closing '\0')*/
-    if((label_len + txt_len + 1) > LV_TA_MAX_LENGTH) return;
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     /*Insert the text*/
-    char buf[LV_TA_MAX_LENGTH];
 
-    uint32_t cur_pos;
-#if TXT_UTF8 == 0
-    cur_pos = ext->cursor_pos;
-#else
-    cur_pos = txt_utf8_get_id(label_txt, ext->cursor_pos);
-#endif
-
-	memcpy(buf, label_txt, cur_pos);
-	memcpy(buf + cur_pos, txt, txt_len);
-	memcpy(buf + cur_pos + txt_len, label_txt+cur_pos, label_len - cur_pos + 1);
-
-	/*Refresh the label*/
-	lv_label_set_text(ext->label, buf);
+    lv_label_ins_text(ext->label, ext->cursor_pos, txt);
 
 
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + txt_len + 1);
         dm_assert(ext->pwd_tmp);
-        memcpy(buf, ext->pwd_tmp, ext->cursor_pos);
-        memcpy(buf + cur_pos, txt, txt_len);
-        memcpy(buf + cur_pos + txt_len, ext->pwd_tmp+ext->cursor_pos, label_len - ext->cursor_pos + 1);
-        strcpy(ext->pwd_tmp, buf);
+
+        txt_ins(ext->pwd_tmp, ext->cursor_pos, txt);
 
         anim_t a;
         a.var = ta;
@@ -392,15 +366,17 @@ void lv_ta_del(lv_obj_t * ta)
 
 	if(cur_pos == 0) return;
 
+    char * label_txt = lv_label_get_text(ext->label);
 	/*Delete a character*/
-	char buf[LV_TA_MAX_LENGTH];
-	const char * label_txt = lv_label_get_text(ext->label);
-	uint16_t label_len = strlen(label_txt);
-	memcpy(buf, label_txt, cur_pos - 1);
-	memcpy(buf+cur_pos - 1, label_txt + cur_pos, label_len - cur_pos + 1);
-
+#if TXT_UTF8 == 0
+    txt_cut(label_txt, ext->cursor_pos - 1, 1);
+#else
+    uint32_t byte_pos = txt_utf8_get_id(label_txt, ext->cursor_pos - 1);
+    txt_cut(label_txt, ext->cursor_pos - 1, txt_utf8_size(label_txt[byte_pos]));
+#endif
 	/*Refresh the label*/
-	lv_label_set_text(ext->label, buf);
+	lv_label_set_text(ext->label, label_txt);
+
 	/*Don't let 'width == 0' because cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
         lv_style_t * style = lv_obj_get_style(ext->label);
@@ -408,13 +384,18 @@ void lv_ta_del(lv_obj_t * ta)
     }
 
     if(ext->pwd_mode != 0) {
-        ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(buf));
+#if TXT_UTF8 == 0
+        txt_cut(ext->pwd_tmp, ext->cursor_pos - 1, 1);
+#else
+        uint32_t byte_pos = txt_utf8_get_id(ext->pwd_tmp, ext->cursor_pos - 1);
+        txt_cut(ext->pwd_tmp, ext->cursor_pos - 1, txt_utf8_size(label_txt[byte_pos]));
+#endif
+        ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
         dm_assert(ext->pwd_tmp);
-        strcpy(ext->pwd_tmp, buf);
     }
 
 	/*Move the cursor to the place of the deleted character*/
-	lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) - 1);
+	lv_ta_set_cursor_pos(ta, ext->cursor_pos - 1);
 
 	/*It is a valid x step so save it*/
 	lv_ta_save_valid_cursor_x(ta);
@@ -949,14 +930,11 @@ static void pwd_char_hider(lv_obj_t * ta)
         int16_t len = txt_len(txt);
         bool refr = false;
         uint16_t i;
-        for(i = 0; i < len; i++) {
-            if(txt[i] != '*') {
-                txt[i] = '*';
-                refr = true;
-            }
-        }
+        for(i = 0; i < len; i++) txt[i] = '*';
 
-        if(refr != false) lv_label_set_text(ext->label, NULL);
+        txt[i] = '\0';
+
+        if(refr != false) lv_label_set_text(ext->label, txt);
     }
 }
 
