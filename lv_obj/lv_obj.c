@@ -1526,13 +1526,14 @@ static void lv_child_refr_style(lv_obj_t * obj)
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child != NULL) {
         if(child->style_p == NULL) {
+            lv_child_refr_style(child);     /*Check children too*/
+            lv_obj_refr_style(obj);         /*Send a style change signal to the object*/
+        } else if(child->style_p->glass) {
+            /*Children with 'glass' parent might be effected if their style == NULL*/
             lv_child_refr_style(child);
         }
-        child = lv_obj_get_child(obj, child);
+        child = lv_obj_get_child(child, NULL);
     }
-
-    /*Send a style change signal to the object*/
-    lv_obj_refr_style(obj);
 }
 
 /**
