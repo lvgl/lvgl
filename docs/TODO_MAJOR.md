@@ -20,3 +20,4 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [ ] lv_btnm_set_styles for *tpr*, t*rel* and *ina* too
 - [ ] LV_LABEL_LONG_DOTS removed, use LV_LABEL_LONG_ROLL instead
 - [ ] lv_list_set_element_text_roll removed.
+- [ ] lv_ddlist_set_fix_height instead of auto_size
