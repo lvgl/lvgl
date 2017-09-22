@@ -52,8 +52,7 @@ static lv_signal_f_t ancestor_scr_signal_f;
 lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor of roller*/
-	/*TODO modify it to the ancestor create function */
-    lv_obj_t * new_roller = lv_ddlist_create(par, copy);
+	lv_obj_t * new_roller = lv_ddlist_create(par, copy);
     dm_assert(new_roller);
     
     /*Allocate the roller type specific extended data*/
@@ -71,20 +70,16 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new roller roller*/
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
-        lv_obj_set_drag(scrl, true);
-        lv_page_set_rel_action(new_roller, NULL);
+        lv_obj_set_drag(scrl, true);                    /*In ddlist is might be disabled*/
+        lv_page_set_rel_action(new_roller, NULL);       /*Handle roller specific actions*/
+        lv_cont_set_fit(lv_page_get_scrl(new_roller), true, false); /*Height is specified directly*/
         lv_obj_set_signal_f(scrl, roller_scrl_signal);
-       // lv_ddlist_open(new_roller, true, false);
-        lv_obj_set_style(new_roller, lv_style_get(LV_STYLE_PRETTY, NULL));
-        lv_cont_set_fit(lv_page_get_scrl(new_roller), true, false);
-        lv_ddlist_set_options_str(new_roller, "alma\nkorte\ncitrom\nbanan\neper\ndinnye");
+        lv_ddlist_open(new_roller, true, 0);
 
         lv_style_t * style_label = lv_obj_get_style(ext->ddlist.opt_label);
-        lv_obj_set_height(new_roller, (font_get_height(style_label->font)  >> FONT_ANTIALIAS) * 3 + style_label->line_space * 4);
-
-        lv_obj_set_height(lv_page_get_scrl(new_roller), lv_obj_get_height(ext->ddlist.opt_label) + lv_obj_get_height(new_roller));
-        lv_obj_align(ext->ddlist.opt_label, NULL, LV_ALIGN_CENTER, 0, 0);
-
+        lv_ddlist_set_fix_height(new_roller, (font_get_height(style_label->font)  >> FONT_ANTIALIAS) * 3
+                                      + style_label->line_space * 4);
+        lv_obj_refr_style(new_roller);                /*To set scrollable size automatically*/
     }
     /*Copy an existing roller*/
     else {
@@ -109,15 +104,24 @@ bool lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    /* TODO update it to the ancestor's signal function*/
     valid = lv_ddlist_signal(roller, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	if(sign == LV_SIGNAL_CLEANUP) {
-            /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    	}
+        lv_roller_ext_t * ext = lv_obj_get_ext(roller);
+    	if(sign == LV_SIGNAL_STYLE_CHG) {
+            lv_obj_set_height(lv_page_get_scrl(roller),
+                                 lv_obj_get_height(ext->ddlist.opt_label) + lv_obj_get_height(roller));
+            lv_obj_align(ext->ddlist.opt_label, NULL, LV_ALIGN_CENTER, 0, 0);
+            lv_ddlist_set_selected(roller, ext->ddlist.sel_opt);
+    	} else if(sign == LV_SIGNAL_CORD_CHG) {
+    	    lv_ddlist_set_fix_height(roller, lv_obj_get_height(roller));
+            lv_obj_set_height(lv_page_get_scrl(roller),
+                                 lv_obj_get_height(ext->ddlist.opt_label) + lv_obj_get_height(roller));
+            lv_obj_align(ext->ddlist.opt_label, NULL, LV_ALIGN_CENTER, 0, 0);
+    	    lv_ddlist_set_selected(roller, ext->ddlist.sel_opt);
+        }
     }
     
     return valid;
@@ -188,7 +192,6 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
         cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
         area_t rect_area;
         rect_area.y1 = roller->cords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->line_space - 2;
-
         rect_area.y2 = rect_area.y1 + font_h + style->line_space;
         rect_area.x1 = ext->ddlist.opt_label->cords.x1 - style->hpad;
         rect_area.x2 = rect_area.x1 + lv_obj_get_width(lv_page_get_scrl(roller));
@@ -215,17 +218,56 @@ bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
         if(sign == LV_SIGNAL_RELEASED) {
+            int32_t id;
             lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
             lv_roller_ext_t * ext = lv_obj_get_ext(roller);
             lv_style_t * style_label = lv_obj_get_style(ext->ddlist.opt_label);
+            const font_t * font = style_label->font;
+            cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
 
-            cord_t label_y1 = ext->ddlist.page.scrl->cords.y1 - roller->cords.y1;
-            cord_t label_unit = (font_get_height(style_label->font) >> FONT_ANTIALIAS) + style_label->line_space / 2;
-            cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
+            if(lv_dispi_is_dragging(param)) {
 
-            int32_t id = (mid - label_y1) / label_unit;
+                cord_t label_y1 = ext->ddlist.opt_label->cords.y1 - roller->cords.y1;
+                cord_t label_unit = (font_get_height(style_label->font) >> FONT_ANTIALIAS) + style_label->line_space / 2;
+                cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
 
-            printf("roller diff: %d , unit: %d, id: %d\n", mid-label_y1, label_unit, id);
+                id = (mid - label_y1) / label_unit;
+
+                printf("roller diff: %d , unit: %d, id: %d\n", mid-label_y1, label_unit, id);
+            } else {
+                point_t p;
+                lv_dispi_get_point(param, &p);
+                p.y = p.y - ext->ddlist.opt_label->cords.y1;
+                printf("y: %d\n", p.y);
+                id = p.y / (font_h + style_label->line_space);
+            }
+            if(id < 0) id = 0;
+            if(id >= ext->ddlist.num_opt) id = ext->ddlist.num_opt - 1;
+            ext->ddlist.sel_opt = id;
+
+
+            cord_t h = lv_obj_get_height(roller);
+            cord_t line_y1 = id * (font_h + style_label->line_space) + ext->ddlist.opt_label->cords.y1 - roller_scrl->cords.y1;
+            cord_t new_y = - line_y1 + (h - font_h) / 2;
+
+            if(ext->ddlist.anim_time == 0) {
+                lv_obj_set_y(roller_scrl, new_y);
+            } else {
+                anim_t a;
+                a.var = roller_scrl;
+                a.start = lv_obj_get_y(roller_scrl);
+                a.end = new_y;
+                a.fp = (anim_fp_t)lv_obj_set_y;
+                a.path = anim_get_path(ANIM_PATH_LIN);
+                a.end_cb = NULL;
+                a.act_time = 0;
+                a.time = ext->ddlist.anim_time;
+                a.playback = 0;
+                a.playback_pause = 0;
+                a.repeat = 0;
+                a.repeat_pause = 0;
+                anim_create(&a);
+            }
         }
     }
 
