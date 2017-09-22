@@ -1,3 +1,4 @@
+
 /**
  * @file lv_kb.c
  * 
@@ -15,7 +16,6 @@
 /*********************
  *      DEFINES
  *********************/
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -80,7 +80,6 @@ static const char * kb_map_num[] = {
 lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor of keyboard*/
-	/*TODO modify it to the ancestor create function */
     lv_obj_t * new_kb = lv_btnm_create(par, copy);
     dm_assert(new_kb);
     
@@ -213,6 +212,7 @@ void lv_kb_set_close_action(lv_obj_t * kb, lv_action_t action)
     lv_kb_ext_t * ext = lv_obj_get_ext(kb);
     ext->close_action = action;
 }
+
 
 /*=====================
  * Getter functions
@@ -362,10 +362,10 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, uint16_t i)
             lv_ta_set_cursor_pos(ext->ta, cur + 1);
         }
     } else if(strcmp(txt, "Hide") == 0) {
-        //lv_app_kb_close(false);
+        if(ext->close_action) ext->close_action(kb, NULL);
         return LV_ACTION_RES_INV;
     } else if(strcmp(txt, "Ok") == 0) {
-        //lv_app_kb_close(true);
+        if(ext->ok_action) ext->ok_action(kb, NULL);
         return LV_ACTION_RES_INV;
     } else {
         lv_ta_add_text(ext->ta, txt);

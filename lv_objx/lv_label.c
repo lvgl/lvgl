@@ -238,11 +238,16 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text)
 }
 
 /**
- * Append a text to the label. The label current label text can not be static.
+ * Insert a text to the label. The label current label text can not be static.
  * @param label pointer to label object
- * @param text pointe rto the new text
+ * @param pos character index to insert
+ *            0: before first char.
+ *            LV_LABEL_POS_LAST: after last char.
+ *            < 0: count from the end
+ *            -1: before the last char.
+ * @param txt pointer to the text to insert
  */
-void lv_label_append_text(lv_obj_t * label, const char * text)
+void lv_label_ins_text(lv_obj_t * label, int32_t pos,  const char * txt)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
@@ -253,11 +258,21 @@ void lv_label_append_text(lv_obj_t * label, const char * text)
 
     /*Allocate space for the new text*/
     uint32_t old_len = strlen(ext->txt);
-    uint32_t app_len = strlen(text);
-    uint32_t new_len = app_len + old_len;
+    uint32_t ins_len = strlen(txt);
+    uint32_t new_len = ins_len + old_len;
     ext->txt = dm_realloc(ext->txt, new_len + 1);
-    memcpy(ext->txt + old_len, text, app_len);
-    ext->txt[new_len] = '\0';
+
+    if(pos == LV_LABEL_POS_LAST) pos = old_len;
+    else if(pos < 0) pos = old_len + pos;
+
+    /*Copy the second part into the end to make place to text to insert*/
+    int32_t i;
+    for(i = new_len; i >= pos + ins_len; i--){
+        ext->txt[i] = ext->txt[i - ins_len];
+    }
+
+    /* Copy the text into the new space*/
+    memcpy(ext->txt + pos, txt, ins_len);
 
     lv_label_refr_text(label);
 }

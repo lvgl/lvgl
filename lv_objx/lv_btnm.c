@@ -353,14 +353,21 @@ void lv_btnm_set_tgl(lv_obj_t * btnm, bool en, uint16_t id)
 /**
  * Set the styles of the buttons of the button matrix
  * @param btnm pointer to a button matrix object
- * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
- * @param style pointer to style
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
  */
-void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr)
+void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr,
+                            lv_style_t *  trel, lv_style_t *  tpr, lv_style_t *  ina)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
     ext->style_btn_rel = rel;
     ext->style_btn_pr = pr;
+    ext->style_btn_trel = trel;
+    ext->style_btn_tpr = tpr;
+    ext->style_btn_ina = ina;
 
     lv_obj_inv(btnm);
 

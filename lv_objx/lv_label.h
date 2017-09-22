@@ -19,12 +19,13 @@ extern "C" {
 #include "../lv_obj/lv_obj.h"
 #include "misc/gfx/font.h"
 #include "misc/gfx/text.h"
+#include "misc/gfx/fonts/symbol_def.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_LABEL_DOT_NUM 3
-
+#define LV_LABEL_POS_LAST   0xFFFF
 /**********************
  *      TYPEDEFS
  **********************/
@@ -103,11 +104,16 @@ void lv_label_set_text_array(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_text_static(lv_obj_t * label, const char * text);
 
 /**
- * Append a text to the label. The label current label text can not be static.
+ * Insert a text to the label. The label current label text can not be static.
  * @param label pointer to label object
- * @param text pointe rto the new text
+ * @param pos character index to insert
+ *            0: before first char.
+ *            LV_LABEL_POS_LAST: after last char.
+ *            < 0: count from the end
+ *            -1: before the last char.
+ * @param txt pointer to the text to insert
  */
-void lv_label_append_text(lv_obj_t * label, const char * text);
+void lv_label_ins_text(lv_obj_t * label, int32_t pos,  const char * txt);
 
 /**
  * Set the behavior of the label with longer text then the object size

@@ -47,8 +47,9 @@ typedef struct
     lv_btnm_callback_t cb;  /*A function to call when a button is releases*/
     lv_style_t * style_btn_rel; /*Style of the released buttons*/
     lv_style_t * style_btn_pr;  /*Style of the pressed buttons*/
-    lv_style_t * style_btn_trel; /*Style of the released buttons*/
-    lv_style_t * style_btn_tpr;  /*Style of the pressed buttons*/
+    lv_style_t * style_btn_trel; /*Style of the toggled released buttons*/
+    lv_style_t * style_btn_tpr;  /*Style of the toggled pressed buttons*/
+    lv_style_t * style_btn_ina;  /*Style of the inactive buttons*/
     uint8_t tgl     :1;         /*Enable toggling*/
 }lv_btnm_ext_t;
 
@@ -100,13 +101,18 @@ void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_callback_t cb);
  */
 void lv_btnm_set_tgl(lv_obj_t * btnm, bool en, uint16_t id);
 
+
 /**
- * Set the styles of the buttons of the button matrox
+ * Set the styles of the buttons of the button matrix
  * @param btnm pointer to a button matrix object
- * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
- * @param style pointer to style
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param trel pointer to a style for toggled releases state
+ * @param tpr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
  */
-void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr);
+void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr,
+                            lv_style_t *  trel, lv_style_t *  tpr, lv_style_t *  ina);
 
 /**
  * Get the current map of a button matrix
