@@ -206,8 +206,14 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
     return true;
 }
 
-
-bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param)
+/**
+ * Signal function of the scrollable part of the roller.
+ * @param roller_scrl ointer to the scrollable part of roller (page)
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param)
 {
     bool valid;
 
@@ -225,27 +231,25 @@ bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param)
             const font_t * font = style_label->font;
             cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
 
+            /*If dragged then align the list to there be an element in the middle*/
             if(lv_dispi_is_dragging(param)) {
-
                 cord_t label_y1 = ext->ddlist.opt_label->cords.y1 - roller->cords.y1;
                 cord_t label_unit = (font_get_height(style_label->font) >> FONT_ANTIALIAS) + style_label->line_space / 2;
                 cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
-
                 id = (mid - label_y1) / label_unit;
-
-                printf("roller diff: %d , unit: %d, id: %d\n", mid-label_y1, label_unit, id);
-            } else {
+            }
+            /*If pick an option by clicking then set it*/
+            else {
                 point_t p;
                 lv_dispi_get_point(param, &p);
                 p.y = p.y - ext->ddlist.opt_label->cords.y1;
-                printf("y: %d\n", p.y);
                 id = p.y / (font_h + style_label->line_space);
             }
             if(id < 0) id = 0;
             if(id >= ext->ddlist.num_opt) id = ext->ddlist.num_opt - 1;
             ext->ddlist.sel_opt = id;
 
-
+            /*Position the scrollable according to the new selected option*/
             cord_t h = lv_obj_get_height(roller);
             cord_t line_y1 = id * (font_h + style_label->line_space) + ext->ddlist.opt_label->cords.y1 - roller_scrl->cords.y1;
             cord_t new_y = - line_y1 + (h - font_h) / 2;
