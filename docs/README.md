@@ -17,6 +17,7 @@ Homepage: http://gl.littlev.hu
 * Build GUI from simple graphical objects
   * Buttons, Labels, Images
   * Charts, Lists, Bars, Sliders, Text areas etc.
+* Create or delete graphical object dynamically in run time   
 * High level graphical features without double buffering
   * Antialiassing (font or full screen)
   * Animations
