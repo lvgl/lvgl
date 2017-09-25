@@ -31,7 +31,6 @@
 static void lv_page_sb_refresh(lv_obj_t * main);
 static bool lv_page_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_t mode);
 static bool lv_scrl_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_t mode);
-static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param);
 
 /**********************
  *  STATIC VARIABLES
@@ -82,7 +81,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_style_t * style = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
 	    ext->scrl = lv_cont_create(new_page, NULL);
 	    if(ancestor_scrl_design_f == NULL) ancestor_scrl_design_f = lv_obj_get_design_f(ext->scrl);
-	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
+	    lv_obj_set_signal_f(ext->scrl, lv_page_scrl_signal);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
 		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
@@ -102,7 +101,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     } else {
     	lv_page_ext_t * copy_ext = lv_obj_get_ext(copy);
     	ext->scrl = lv_cont_create(new_page, copy_ext->scrl);
-	    lv_obj_set_signal_f(ext->scrl, lv_scrl_signal);
+	    lv_obj_set_signal_f(ext->scrl, lv_page_scrl_signal);
 
         lv_page_set_pr_action(new_page, copy_ext->pr_action);
         lv_page_set_rel_action(new_page, copy_ext->rel_action);
@@ -209,7 +208,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  */
-static bool lv_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void* param)
+bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
 {
     bool obj_valid = true;
 

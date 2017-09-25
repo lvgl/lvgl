@@ -83,6 +83,15 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
 
 /**
+ * Signal function of the scrollable part of the text area
+ * @param scrl pointer to scrollable part of a text area object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+bool lv_ta_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
+
+/**
  * Insert a character to the current cursor position
  * @param ta pointer to a text area object
  * @param c a character

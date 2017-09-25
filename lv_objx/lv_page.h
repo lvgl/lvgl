@@ -80,6 +80,14 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 
 /**
+ * Signal function of the scrollable part of a page
+ * @param scrl pointer to the scrollable object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ */
+bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
+
+/**
  * Set a release action for the page
  * @param page pointer to a page object
  * @param rel_action a function to call when the page is released
