@@ -209,7 +209,7 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
 /**
  * Insert a character to the current cursor position
  * @param ta pointer to a text area object
- * @param c a character
+ * @param c a character (could but UTF-8 code as well: 'Á' or txt_unicode_to_utf8(0x047C)
  */
 void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 {

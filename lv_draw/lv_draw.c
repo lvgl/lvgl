@@ -288,7 +288,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
             if((flag & TXT_FLAG_RECOLOR) != 0) {
                 if(letter == TXT_RECOLOR_CMD) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
-                        par_start = i + txt_utf8_size(&txt[i]);
+                        par_start = i + txt_utf8_size(txt[i]);
                         cmd_state = CMD_STATE_PAR;
                         continue;
                     } else if(cmd_state == CMD_STATE_PAR) { /*Other start char in parameter escaped cmd. char */
