@@ -12,8 +12,8 @@
 #include "misc/math/math_base.h"
 #include "lv_dispi.h"
 #include "../lv_draw/lv_draw_rbasic.h"
-#include "hal/indev/indev.h"
-#include "hal/systick/systick.h"
+#include "../hal/indev/hal_indev.h"
+#include "../hal/systick/systick.h"
 #include "lv_obj.h"
 
 /*********************
@@ -41,7 +41,7 @@ static void dispi_drag_throw(lv_dispi_t * dispi_p);
 static ptask_t* dispi_task_p;
 static bool lv_dispi_reset_qry;
 static bool lv_dispi_reset_now;
-static lv_dispi_t dispi_array[INDEV_NUM];
+static lv_dispi_t dispi_array[2];
 
 /**********************
  *      MACROS
@@ -145,12 +145,14 @@ void lv_dispi_wait_release(lv_dispi_t * dispi)
  */
 static void dispi_task(void * param)
 {
+
+    return; //TODO
 	cord_t x;
 	cord_t y;
 	uint8_t i;
 
-	for (i = 0; i < INDEV_NUM; i++) {
-		dispi_array[i].pressed = indev_get(i, &x, &y);
+	for (i = 0; i < 1; i++) {
+	    //TODO dispi_array[i].pressed = indev_get(i, &x, &y);
 		dispi_proc_point(&dispi_array[i], x, y);
 	}
 

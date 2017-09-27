@@ -16,7 +16,7 @@
 #include "lv_group.h"
 #include "../lv_app/lv_app.h"
 #include "misc/gfx/anim.h"
-#include "hal/indev/indev.h"
+#include "../hal/indev/hal_indev.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -293,24 +293,25 @@ void lv_obj_del(lv_obj_t * obj)
     /*Delete the base objects*/
     if(obj->ext != NULL)  dm_free(obj->ext);
     dm_free(obj); /*Free the object itself*/
-    
-    /* Reset all display input (dispi) if
-     * the currently pressed object is deleted too*/
-    lv_dispi_t * dispi_array = lv_dispi_get_array();
-    lv_obj_t * dpar;
-    uint8_t d;
-    for(d = 0; d < INDEV_NUM; d++) {
-        dpar = obj;
-        while(dpar != NULL) {
-            if(dispi_array[d].act_obj == dpar ||
-               dispi_array[d].last_obj == dpar) {
-                lv_dispi_reset();
-                break;
-            } else {
-                dpar = lv_obj_get_parent(dpar);
-            }
-        }
-    }
+
+//     TODO Update with the new HAL
+//    /* Reset all display input (dispi) if
+//     * the currently pressed object is deleted too*/
+//    lv_dispi_t * dispi_array = lv_dispi_get_array();
+//    lv_obj_t * dpar;
+//    uint8_t d;
+//    for(d = 0; d < INDEV_NUM; d++) {
+//        dpar = obj;
+//        while(dpar != NULL) {
+//            if(dispi_array[d].act_obj == dpar ||
+//               dispi_array[d].last_obj == dpar) {
+//                lv_dispi_reset();
+//                break;
+//            } else {
+//                dpar = lv_obj_get_parent(dpar);
+//            }
+//        }
+//    }
 
     /*Send a signal to the parent to notify it about the child delete*/
     if(par != NULL) {

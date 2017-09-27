@@ -14,11 +14,8 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "misc/gfx/anim.h"
-<<<<<<< ebfe8fbfd4d93bd0e09a8b16e96e623c5c6be0f2
 #include "misc/gfx/text.h"
-=======
 #include "misc/math/math_base.h"
->>>>>>> lv_ta: cursor style bugfix on '\n'
 
 /*********************
  *      DEFINES
@@ -874,8 +871,6 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 #endif
 
 		uint32_t letter = txt_utf8_next(&txt[byte_pos], NULL);
-		printf("letter %d\n", letter);
-		cord_t letter_w = font_get_width(label_style->font, letter != '\0' ? letter : ' ');
 		cord_t letter_h = font_get_height(label_style->font) >> FONT_ANTIALIAS;
 
         /*Set letter_w (set not 0 on non printable but valid chars)*/

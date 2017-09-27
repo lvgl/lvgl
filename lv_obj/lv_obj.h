@@ -14,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#include <misc/gfx/area.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "misc/gfx/area.h"
 #include "misc/mem/dyn_mem.h"
 #include "misc/mem/linked_list.h"
 #include "misc/gfx/color.h"

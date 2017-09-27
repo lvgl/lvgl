@@ -224,8 +224,6 @@ bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param)
             cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
 
             int32_t id = (mid - label_y1) / label_unit;
-
-            printf("roller diff: %d , unit: %d, id: %d\n", mid-label_y1, label_unit, id);
         }
     }
 
