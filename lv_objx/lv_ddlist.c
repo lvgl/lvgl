@@ -70,7 +70,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     ext->opt_label = NULL;
     ext->cb = NULL;
     ext->opened = 0;
-    ext->auto_size = 0;
+    ext->fix_height = 0;
     ext->sel_opt = 0;
     ext->num_opt = 0;
     ext->anim_time = LV_DDLIST_DEF_ANIM_TIME;
@@ -86,7 +86,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));;
+        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));
         lv_cont_set_fit(scrl, true, true);
 
         ext->opt_label = lv_label_create(new_ddlist, NULL);
@@ -102,7 +102,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         ext->opt_label = lv_label_create(new_ddlist, copy_ext->opt_label);
         lv_label_set_text(ext->opt_label, lv_label_get_text(copy_ext->opt_label));
         ext->sel_opt = copy_ext->sel_opt;
-        ext->auto_size = copy_ext->auto_size;
+        ext->fix_height = copy_ext->fix_height;
         ext->cb = copy_ext->cb;
         ext->num_opt = copy_ext->num_opt;
 
@@ -131,8 +131,6 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	if(sign == LV_SIGNAL_STYLE_CHG) {
-    	    lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
-    	    lv_obj_set_style(ext->opt_label, lv_obj_get_style(ddlist));
             lv_ddlist_refr_size(ddlist, 0);
     	} else if(sign == LV_SIGNAL_FOCUS) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
@@ -257,15 +255,16 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t cb)
 }
 
 /**
- * Set the auto size attribute. If enabled the height will reduced to be visible on the parent.
- * In this case the drop down list can be scrolled.
+ * Set the fix height value.
+ * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
  * @param ddlist pointer to a drop down list
- * @param auto_size true: enable auto size, false: disable
+ * @param h the height when the list is opened (0: auto size)
  */
-void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size)
+void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
-    ext->auto_size = auto_size == false ? 0 : 1;
+    ext->fix_height = h;
+    lv_ddlist_refr_size(ddlist, 0);
 }
 
 /**
@@ -357,14 +356,14 @@ void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf)
 }
 
 /**
- * Get the auto size attribute.
+ * Get the fix height value.
  * @param ddlist pointer to a drop down list object
- * @return true: the auto_size is enabled, false: disabled
+ * @return the height if the ddlist is opened (0: auto size)
  */
-bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size)
+cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
-    return ext->auto_size == 0 ? false : true;
+    return ext->fix_height;
 }
 
 /**
@@ -485,7 +484,7 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
 }
 
 /**
- * Refresh the size of drop down list according its status (open or closed)
+ * Refresh the size of drop down list according to its status (open or closed)
  * @param ddlist pointer to a drop down list object
  * @param anim_time animations time for open/close [ms]
  */
@@ -494,13 +493,9 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
     cord_t new_height;
-    if(ext->opened != 0) { /*Open the list*/
-        new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->vpad;
-        lv_obj_t * parent = lv_obj_get_parent(ddlist);
-        /*Reduce the height if enabled and required*/
-        if(ext->auto_size != 0 && new_height + ddlist->cords.y1 > parent->cords.y2) {
-            new_height = parent->cords.y2 - ddlist->cords.y1;
-        }
+    if(ext->opened) { /*Open the list*/
+        if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->vpad;
+        else new_height = ext->fix_height;
     } else { /*Close the list*/
         const font_t * font = style->font;
         lv_style_t * label_style = lv_obj_get_style(ext->opt_label);
