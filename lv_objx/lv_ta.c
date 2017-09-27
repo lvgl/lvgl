@@ -837,7 +837,6 @@ static bool lv_ta_scrling_design(lv_obj_t * scrling, const area_t * mask, lv_des
 #endif
 
 		uint32_t letter = txt_utf8_next(&txt[byte_pos], NULL);
-		printf("letter %d\n", letter);
 		cord_t letter_w = font_get_width(label_style->font, letter != '\0' ? letter : ' ');
 		cord_t letter_h = font_get_height(label_style->font) >> FONT_ANTIALIAS;
 		point_t letter_pos;
