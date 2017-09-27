@@ -8,7 +8,7 @@
  *********************/
 #include "lv_draw_rbasic.h"
 #include "lv_conf.h"
-#include "hal/disp/disp.h"
+#include "../hal/disp/hal_disp.h"
 #include "misc/gfx/font.h"
 
 /*********************
@@ -77,7 +77,7 @@ void lv_rfill(const area_t * cords_p, const area_t * mask_p,
         
     
     if(union_ok != false){
-    	disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
+    	//TODO disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
     }
 }
 
@@ -192,7 +192,7 @@ void lv_rmap(const area_t * cords_p, const area_t * mask_p,
         cord_t row;
         cord_t mask_w = area_get_width(&masked_a) - 1;
         for(row = 0; row < area_get_height(&masked_a); row++) {
-            disp_map(masked_a.x1, masked_a.y1 + row, masked_a.x1 + mask_w, masked_a.y1 + row, map_p);
+            //TODO disp_map(masked_a.x1, masked_a.y1 + row, masked_a.x1 + mask_w, masked_a.y1 + row, map_p);
 
             map_p += map_width;
         }

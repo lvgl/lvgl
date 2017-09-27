@@ -1,0 +1,3 @@
+[submodule "misc"]
+	path = misc
+	url = https://github.com/littlevgl/misc
