@@ -90,8 +90,8 @@ void lv_dispi_reset(void)
 void lv_dispi_reset_lpr(lv_dispi_t * dispi)
 {
     dispi->long_press_sent = 0;
-    dispi->lpr_rep_time_stamp = systick_get();
-    dispi->press_time_stamp = systick_get();
+    dispi->lpr_rep_time_stamp = lv_hal_tick_get();
+    dispi->press_time_stamp = lv_hal_tick_get();
 }
 
 /**
@@ -145,16 +145,16 @@ void lv_dispi_wait_release(lv_dispi_t * dispi)
  */
 static void dispi_task(void * param)
 {
+    lv_hal_indev_data_t data;
+    lv_indev_t * drv;
+    drv = lv_hal_indev_next(NULL);
 
-    return; //TODO
-	cord_t x;
-	cord_t y;
-	uint8_t i;
-
-	for (i = 0; i < 1; i++) {
-	    //TODO dispi_array[i].pressed = indev_get(i, &x, &y);
-		dispi_proc_point(&dispi_array[i], x, y);
-	}
+    while(drv) {
+        drv->drv.get_data(&data);
+        drv->dispi.pressed = data.state;
+        dispi_proc_point(&drv->dispi,data.point.x , data.point.y);
+        drv = lv_hal_indev_next(drv);
+    }
 
     /*If reset query occurred in this round then set a flag to 
      * ask the dispis to reset themself in the next round  */
@@ -253,7 +253,7 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
         if(pr_obj != NULL) {
             /* Save the time when the obj pressed. 
              * It is necessary to count the long press time.*/
-            dispi_p->press_time_stamp = systick_get();
+            dispi_p->press_time_stamp = lv_hal_tick_get();
             dispi_p->long_press_sent = 0;
             dispi_p->drag_range_out = 0;
             dispi_p->drag_in_prog = 0;
@@ -300,22 +300,22 @@ static void dispi_proc_press(lv_dispi_t * dispi_p)
             /*If there is no drag then check for long press time*/
             if(dispi_p->drag_in_prog == 0 && dispi_p->long_press_sent == 0) {
                 /*Send a signal about the long press if enough time elapsed*/
-                if(systick_elaps(dispi_p->press_time_stamp) > LV_DISPI_LONG_PRESS_TIME) {
+                if(lv_hal_tick_elaps(dispi_p->press_time_stamp) > LV_DISPI_LONG_PRESS_TIME) {
                     pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS, dispi_p);
 
                     /*Mark the signal sending to do not send it again*/
                     dispi_p->long_press_sent = 1;
 
                     /*Save the long press time stamp for the long press repeat handler*/
-                    dispi_p->lpr_rep_time_stamp = systick_get();
+                    dispi_p->lpr_rep_time_stamp = lv_hal_tick_get();
                 }
             }
             /*Send long press repeated signal*/
             if(dispi_p->drag_in_prog == 0 && dispi_p->long_press_sent == 1) {
             	/*Send a signal about the long press repeate if enough time elapsed*/
-				if(systick_elaps(dispi_p->lpr_rep_time_stamp) > LV_DISPI_LONG_PRESS_REP_TIME) {
+				if(lv_hal_tick_elaps(dispi_p->lpr_rep_time_stamp) > LV_DISPI_LONG_PRESS_REP_TIME) {
 					pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS_REP, dispi_p);
-                    dispi_p->lpr_rep_time_stamp = systick_get();
+                    dispi_p->lpr_rep_time_stamp = lv_hal_tick_get();
 
 				}
             }
