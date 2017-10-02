@@ -121,6 +121,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
         ext->cursor_show = copy_ext->cursor_show;
         ext->pwd_mode = copy_ext->pwd_mode;
     	lv_page_glue_obj(ext->label, true);
+    	if(copy_ext->one_line) lv_ta_set_one_line(new_ta, true);
 
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_ta);
@@ -674,6 +675,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_style_t * style_label = lv_obj_get_style(ext->label);
         cord_t font_h =  font_get_height(style_label->font) >> FONT_ANTIALIAS;
 
+        ext->one_line = 1;
         lv_cont_set_fit(lv_page_get_scrl(ta), true, true);
         lv_obj_set_height(ta, font_h + style_ta->vpad * 2);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
@@ -683,6 +685,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_ta_ext_t * ext = lv_obj_get_ext(ta);
         lv_style_t * style_ta = lv_obj_get_style(ta);
 
+        ext->one_line = 0;
         lv_cont_set_fit(lv_page_get_scrl(ta), false, true);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         lv_label_set_no_break(ext->label, false);
@@ -876,7 +879,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 		lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
 
 		/*If the cursor is out of the text (most right)  draw it to the next line*/
-		if(letter_pos.x + ta_ext->label->cords.x1 + letter_w> ta_ext->label->cords.x2) {
+		if(letter_pos.x + ta_ext->label->cords.x1 + letter_w> ta_ext->label->cords.x2 && ta_ext->one_line == 0) {
 		    letter_pos.x = 0;
 		    letter_pos.y += letter_h + label_style->line_space;
 

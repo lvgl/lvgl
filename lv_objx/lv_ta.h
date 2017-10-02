@@ -58,6 +58,7 @@ typedef struct
     lv_ta_cursor_type_t cursor_type;	/*Shape of the cursor*/
     uint8_t cursor_show :1;     /*Show or hide cursor */
     uint8_t pwd_mode :1;        /*Replace characters with '*' */
+    uint8_t one_line :1;        /*One line mode (ignore line breaks)*/
     uint8_t cursor_state :1;    /*Indicates that the cursor is visible now or not (Handled by the library)*/
 }lv_ta_ext_t;
 
