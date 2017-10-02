@@ -24,7 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_mode_t mode);
-bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
+static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
