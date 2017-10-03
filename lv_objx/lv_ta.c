@@ -875,8 +875,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 
 		uint32_t letter = txt_utf8_next(&txt[byte_pos], NULL);
 		cord_t letter_h = font_get_height(label_style->font) >> FONT_ANTIALIAS;
-		printf("letter1:%c, bp:%d\n", letter, byte_pos);
-        /*Set letter_w (set not 0 on non printable but valid chars)*/
+		/*Set letter_w (set not 0 on non printable but valid chars)*/
         cord_t letter_w;
 		if(letter == '\0' || letter == '\n' || letter == '\r') {
 		    letter_w = font_get_width(label_style->font, ' ');
@@ -897,7 +896,6 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 		        letter = txt_utf8_next(&txt[byte_pos], NULL);
 		    }
 
-	        printf("letter2:%c, bp:%d\n", letter, byte_pos);
 		    if(letter == '\0' || letter == '\n' || letter == '\r') {
                 letter_w = font_get_width(label_style->font, ' ');
             } else {
