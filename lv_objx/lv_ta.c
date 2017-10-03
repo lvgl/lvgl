@@ -895,9 +895,9 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 		/*Draw he cursor according to the type*/
 		area_t cur_area;
 		if(ta_ext->cursor_type == LV_TA_CURSOR_LINE) {
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - (cur_style.line_width >> 1) - (cur_style.line_width & 0x1);
 			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.line_width;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + (cur_style.line_width >> 1);
 			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
 			lv_draw_rect(&cur_area, mask, &cur_style);
 		} else if(ta_ext->cursor_type == LV_TA_CURSOR_BLOCK) {
@@ -924,9 +924,9 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 			lv_draw_rect(&cur_area, mask, &cur_style);
 		} else if(ta_ext->cursor_type == LV_TA_CURSOR_UNDERLINE) {
 			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
-			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 + letter_h - cur_style.line_width;
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 + letter_h - (cur_style.line_width >> 1);
 			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + letter_w;
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h + (cur_style.line_width >> 1) + (cur_style.line_width & 0x1);
 
 			lv_draw_rect(&cur_area, mask, &cur_style);
 		}
