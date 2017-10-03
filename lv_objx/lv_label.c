@@ -372,7 +372,7 @@ bool lv_label_get_recolor(lv_obj_t * label)
 /**
  * Get the relative x and y coordinates of a letter
  * @param label pointer to a label object
- * @param index index of the letter (0 ... text length)
+ * @param index index of the letter [0 ... text length]. Expressed in character index, not byte index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
 void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
@@ -397,6 +397,8 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
         max_w = CORD_MAX;
     }
 
+    index = txt_utf8_get_id(txt, index);
+
     /*Search the line of the index letter */;
     while (txt[new_line_start] != '\0') {
         new_line_start += txt_get_next_line(&txt[line_start], font, style->letter_space, max_w, flag);
@@ -406,7 +408,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
         line_start = new_line_start;
     }
 
-    /*If the last character is lie break then go to the next line*/
+    /*If the last character is line break then go to the next line*/
     if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
         y += letter_height + style->line_space;
         line_start = index;
@@ -419,8 +421,8 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
 	uint32_t letter;
 	while(cnt < index) {
+        cnt += txt_utf8_size(txt[i]);
 	    letter = txt_utf8_next(txt, &i);
-	    cnt++;
         /*Handle the recolor command*/
         if((flag & TXT_FLAG_RECOLOR) != 0) {
             if(txt_is_cmd(&cmd_state, txt[i]) != false) {

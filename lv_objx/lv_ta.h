@@ -58,6 +58,7 @@ typedef struct
     lv_ta_cursor_type_t cursor_type;	/*Shape of the cursor*/
     uint8_t cursor_show :1;     /*Show or hide cursor */
     uint8_t pwd_mode :1;        /*Replace characters with '*' */
+    uint8_t one_line :1;        /*One line mode (ignore line breaks)*/
     uint8_t cursor_state :1;    /*Indicates that the cursor is visible now or not (Handled by the library)*/
 }lv_ta_ext_t;
 
@@ -81,6 +82,15 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy);
  * @return true: the object is still valid (not deleted), false: the object become invalid
  */
 bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
+
+/**
+ * Signal function of the scrollable part of the text area
+ * @param scrl pointer to scrollable part of a text area object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+bool lv_ta_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 
 /**
  * Insert a character to the current cursor position
