@@ -6,17 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <misc/gfx/circ.h>
 #include "lv_conf.h"
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "misc/gfx/text.h"
 #include "lv_draw.h"
-#include "misc/fs/fsint.h"
-#include "misc/math/math_base.h"
 #include "lv_draw_rbasic.h"
 #include "lv_draw_vbasic.h"
+#include "misc/gfx/text.h"
+#include "misc/gfx/circ.h"
+#include "misc/fs/fsint.h"
+#include "misc/math/math_base.h"
 #include "misc/fs/ufs/ufs.h"
 #include "../lv_objx/lv_img.h"
 
@@ -64,14 +64,14 @@ static void point_swap(point_t * p1, point_t * p2);
 #if LV_VDB_SIZE != 0
 static void (*px_fp)(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa) = lv_vpx;
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_vfill;
-static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_vletter;
+static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint32_t letter, color_t color, opa_t opa) = lv_vletter;
 #if USE_FSINT != 0
 static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_vmap;
 #endif
 #else
 static void (*px_fp)(cord_t x, cord_t y, const area_t * mask_p, color_t color, opa_t opa) = lv_rpx;
 static void (*fill_fp)(const area_t * cords_p, const area_t * mask_p, color_t color, opa_t opa) =  lv_rfill;
-static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint8_t letter, color_t color, opa_t opa) = lv_rletter;
+static void (*letter_fp)(const point_t * pos_p, const area_t * mask_p, const font_t * font_p, uint32_t letter, color_t color, opa_t opa) = lv_rletter;
 #if USE_LV_IMG != 0 && USE_FSINT != 0
 static void (*map_fp)(const area_t * cords_p, const area_t * mask_p, const color_t * map_p, opa_t opa, bool transp, bool upscale, color_t recolor, opa_t recolor_opa) = lv_rmap;
 #endif
@@ -280,13 +280,15 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
         }
         /*Write all letter of a line*/
         cmd_state = CMD_STATE_WAIT;
-
-        for(i = line_start; i < line_end; i++) {
+        i = line_start;
+        uint32_t letter;
+        while(i < line_end) {
+            letter = txt_utf8_next(txt, &i);
             /*Handle the re-color command*/
             if((flag & TXT_FLAG_RECOLOR) != 0) {
-                if(txt[i] == TXT_RECOLOR_CMD) {
+                if(letter == TXT_RECOLOR_CMD) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
-                        par_start = i + 1;
+                        par_start = i + txt_utf8_size(txt[i]);
                         cmd_state = CMD_STATE_PAR;
                         continue;
                     } else if(cmd_state == CMD_STATE_PAR) { /*Other start char in parameter escaped cmd. char */
@@ -299,7 +301,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
 
                 /*Skip the color parameter and wait the space after it*/
                 if(cmd_state == CMD_STATE_PAR) {
-                    if(txt[i] == ' ') {
+                    if(letter == ' ') {
                         /*Get the parameter*/
                         if(i - par_start == LABEL_RECOLOR_PAR_LENGTH) {
                             char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
@@ -320,9 +322,9 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
             color_t color = style->ccolor;
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
-            letter_fp(&pos, mask_p, font, txt[i], color, style->opa);
+            letter_fp(&pos, mask_p, font, letter, color, style->opa);
 
-            pos.x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+            pos.x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->letter_space;
 
         }
         /*Go to next line*/

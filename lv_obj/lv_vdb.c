@@ -5,7 +5,7 @@
 #include "lv_conf.h"
 #if LV_VDB_SIZE != 0
 
-#include "hal/disp/disp.h"
+#include "../hal/disp/hal_disp.h"
 #include <stddef.h>
 #include "lv_vdb.h"
 
@@ -105,7 +105,7 @@ void lv_vdb_flush(void)
 	 * -----------------------------
 	 * in1_buf  |2,2|6,8|      3,7
 	 * in2_buf  |4,4|7,7|      1,2
-	 *           ---------  ==>
+	 *          ---------  ==>
 	 * in1_buf  |1,1|1,3|
 	 * in2_buf  |1,1|1,3|
 	 * */
@@ -146,7 +146,7 @@ void lv_vdb_flush(void)
 
 	/* Now the full the VDB is filtered and the result is stored in the first quarter of it
 	 * Write out the filtered map to the display*/
-    disp_map(vdb_act->area.x1 >> 1, vdb_act->area.y1 >> 1, vdb_act->area.x2 >> 1, vdb_act->area.y2 >> 1, vdb_act->buf);
+	hal_disp_map(vdb_act->area.x1 >> 1, vdb_act->area.y1 >> 1, vdb_act->area.x2 >> 1, vdb_act->area.y2 >> 1, vdb_act->buf);
 #endif
 }
 

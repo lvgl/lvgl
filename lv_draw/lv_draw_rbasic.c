@@ -8,7 +8,7 @@
  *********************/
 #include "lv_draw_rbasic.h"
 #include "lv_conf.h"
-#include "hal/disp/disp.h"
+#include "../hal/disp/hal_disp.h"
 #include "misc/gfx/font.h"
 
 /*********************
@@ -77,7 +77,7 @@ void lv_rfill(const area_t * cords_p, const area_t * mask_p,
         
     
     if(union_ok != false){
-    	disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
+    	//TODO disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
     }
 }
 
@@ -95,6 +95,7 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
                      color_t color, opa_t opa)
 {
     uint8_t w = font_get_width(font_p, letter);
+
     const uint8_t * bitmap_p = font_get_bitmap(font_p, letter);
 
     uint8_t col, col_sub, row;
@@ -110,15 +111,14 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
                 col_sub = 8;
             }
         }
-        
-        /*Correction if the letter is short*/
-        bitmap_p += font_p->width_byte - ((w >> 3) + 1);  
         /*Go to the next row*/
         bitmap_p ++;
     }
 #else
+       uint8_t width_byte = w >> 3;    /*Width in bytes (e.g. w = 11 -> 2 bytes wide)*/
+       if(w & 0x7) width_byte++;
        const uint8_t * map1_p = bitmap_p;
-       const uint8_t * map2_p = bitmap_p + font_p->width_byte;
+       const uint8_t * map2_p = bitmap_p + width_byte;
        uint8_t px_cnt;
        uint8_t col_byte_cnt;
        for(row = 0; row < (font_p->height_row >> 1); row ++) {
@@ -152,10 +152,10 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
                }
            }
 
-           map1_p += font_p->width_byte;
-           map2_p += font_p->width_byte;
-           map1_p += font_p->width_byte - col_byte_cnt;
-           map2_p += font_p->width_byte - col_byte_cnt;
+           map1_p += width_byte;
+           map2_p += width_byte;
+           map1_p += width_byte - col_byte_cnt;
+           map2_p += width_byte - col_byte_cnt;
        }
 #endif
 }
@@ -192,7 +192,7 @@ void lv_rmap(const area_t * cords_p, const area_t * mask_p,
         cord_t row;
         cord_t mask_w = area_get_width(&masked_a) - 1;
         for(row = 0; row < area_get_height(&masked_a); row++) {
-            disp_map(masked_a.x1, masked_a.y1 + row, masked_a.x1 + mask_w, masked_a.y1 + row, map_p);
+            //TODO disp_map(masked_a.x1, masked_a.y1 + row, masked_a.x1 + mask_w, masked_a.y1 + row, map_p);
 
             map_p += map_width;
         }

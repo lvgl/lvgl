@@ -14,6 +14,7 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "misc/gfx/anim.h"
+#include "misc/gfx/text.h"
 #include "misc/math/math_base.h"
 
 /*********************
@@ -244,7 +245,7 @@ bool lv_ta_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
  * @param ta pointer to a text area object
  * @param c a character
  */
-void lv_ta_add_char(lv_obj_t * ta, char c)
+void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
 
@@ -305,7 +306,6 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
-
 	const char * label_txt = lv_label_get_text(ext->label);
     uint16_t label_len = strlen(label_txt);
     uint16_t txt_len = strlen(txt);
@@ -324,7 +324,6 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 	/*Refresh the label*/
 
 	lv_label_set_text(ext->label, buf);
-
 
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + txt_len + 1);
@@ -816,7 +815,7 @@ static bool lv_ta_design(lv_obj_t * ta, const area_t * masp, lv_design_mode_t mo
 
 /**
  * An extended scrollable design of the page. Calls the normal design function and draws a cursor.
- * @param scrl pointer to the scrollabla part of the Text area
+ * @param scrl pointer to the scrollable part of the Text area
  * @param mask  the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
@@ -865,30 +864,40 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 
 		uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
 		const char * txt = lv_label_get_text(ta_ext->label);
-        cord_t letter_h = font_get_height(label_style->font) >> FONT_ANTIALIAS;
+        uint32_t byte_pos;
+#if TXT_UTF8 != 0
+        byte_pos = txt_utf8_get_id(txt, cur_pos);
+#else
+        byte_pos = cur_pos;
+#endif
 
-        /*Set letter_w (set not 0 on non printable but valid chars)*/
+		uint32_t letter = txt_utf8_next(&txt[byte_pos], NULL);
+		cord_t letter_h = font_get_height(label_style->font) >> FONT_ANTIALIAS;
+		/*Set letter_w (set not 0 on non printable but valid chars)*/
         cord_t letter_w;
-		if(txt[cur_pos] == '\0' || txt[cur_pos] == '\n' || txt[cur_pos] == '\r') {
+		if(letter == '\0' || letter == '\n' || letter == '\r') {
 		    letter_w = font_get_width(label_style->font, ' ');
 		} else {
-            letter_w = font_get_width(label_style->font, txt[cur_pos]);
+            letter_w = font_get_width(label_style->font, letter);
 		}
 
 		point_t letter_pos;
 		lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
 
-		/*If the cursor is out of the text (most right)  draw it to the next line*/
-		if(letter_pos.x + ta_ext->label->cords.x1 + letter_w> ta_ext->label->cords.x2 && ta_ext->one_line == 0) {
+		/*If the cursor is out of the text (most right) draw it to the next line*/
+		if(letter_pos.x + ta_ext->label->cords.x1 + letter_w > ta_ext->label->cords.x2 && ta_ext->one_line == 0) {
 		    letter_pos.x = 0;
 		    letter_pos.y += letter_h + label_style->line_space;
 
-		    if(txt[cur_pos] != '\0') cur_pos++;
+		    if(letter != '\0'){
+		        byte_pos += txt_utf8_size(txt[byte_pos]);
+		        letter = txt_utf8_next(&txt[byte_pos], NULL);
+		    }
 
-		    if(txt[cur_pos] == '\0' || txt[cur_pos] == '\n' || txt[cur_pos] == '\r') {
+		    if(letter == '\0' || letter == '\n' || letter == '\r') {
                 letter_w = font_get_width(label_style->font, ' ');
             } else {
-                letter_w = font_get_width(label_style->font, txt[cur_pos]);
+                letter_w = font_get_width(label_style->font, letter);
             }
 		}
 

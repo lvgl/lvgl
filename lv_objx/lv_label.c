@@ -10,6 +10,7 @@
 #if USE_LV_LABEL != 0
 
 #include "misc/gfx/color.h"
+#include "misc/gfx/text.h"
 #include "misc/math/math_base.h"
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
@@ -165,22 +166,28 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
-    /*If trying to set its own text or the text is NULL then refresh */
-    if(text == ext->txt || text == NULL) {
+    /*If text is NULL then refresh */
+    if(text == NULL) {
         lv_label_refr_text(label);
         return;
     }
 
-    /*Allocate space for the new text*/
-    uint32_t len = strlen(text) + 1;
-    if(ext->txt != NULL && ext->static_txt == 0) {
-        dm_free(ext->txt);
-        ext->txt = NULL;
+    if(ext->txt == text) {
+        /*If set its own text then reallocate it (maybe its size changed)*/
+        ext->txt = dm_realloc(ext->txt, strlen(ext->txt) + 1);
+    } else {
+        /*Allocate space for the new text*/
+        uint32_t len = strlen(text) + 1;
+        if(ext->txt != NULL && ext->static_txt == 0) {
+            dm_free(ext->txt);
+            ext->txt = NULL;
+        }
+
+        ext->txt = dm_alloc(len);
+        strcpy(ext->txt, text);
+        ext->static_txt = 0;    /*Now the text is dynamically allocated*/
     }
-    ext->txt = dm_alloc(len);
-    strcpy(ext->txt, text);
-    ext->static_txt = 0;    /*Now the text is dynamically allocated*/
-    
+
     lv_label_refr_text(label);
 }
 /**
@@ -238,11 +245,14 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text)
 }
 
 /**
- * Append a text to the label. The label current label text can not be static.
+ * Insert a text to the label. The label current label text can not be static.
  * @param label pointer to label object
- * @param text pointe rto the new text
+ * @param pos character index to insert
+ *            0: before first char.
+ *            LV_LABEL_POS_LAST: after last char.
+ * @param txt pointer to the text to insert
  */
-void lv_label_append_text(lv_obj_t * label, const char * text)
+void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
 
@@ -253,11 +263,19 @@ void lv_label_append_text(lv_obj_t * label, const char * text)
 
     /*Allocate space for the new text*/
     uint32_t old_len = strlen(ext->txt);
-    uint32_t app_len = strlen(text);
-    uint32_t new_len = app_len + old_len;
+    uint32_t ins_len = strlen(txt);
+    uint32_t new_len = ins_len + old_len;
     ext->txt = dm_realloc(ext->txt, new_len + 1);
-    memcpy(ext->txt + old_len, text, app_len);
-    ext->txt[new_len] = '\0';
+
+    if(pos == LV_LABEL_POS_LAST) {
+#if TXT_UTF8 == 0
+        pos = old_len;
+#else
+        pos = txt_len(ext->txt);
+#endif
+    }
+
+    txt_ins(ext->txt, pos, txt);
 
     lv_label_refr_text(label);
 }
@@ -270,15 +288,6 @@ void lv_label_append_text(lv_obj_t * label, const char * text)
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
     lv_label_ext_t * ext = lv_obj_get_ext(label);
-
-    /*When changing from dot mode reload the characters replaced by dots*/
-    if(ext->long_mode == LV_LABEL_LONG_DOTS &&
-       ext->dot_end != LV_LABEL_DOT_END_INV) {
-    	uint8_t i;
-    	for(i = 0; i < LV_LABEL_DOT_NUM + 1; i++) {
-    		ext->txt[ext->dot_end - LV_LABEL_DOT_NUM + i] = ext->dot_tmp[i];
-    	}
-    }
 
     /*Delete the old animation (if exists)*/
     anim_del(label, (anim_fp_t) lv_obj_set_x);
@@ -363,7 +372,7 @@ bool lv_label_get_recolor(lv_obj_t * label)
 /**
  * Get the relative x and y coordinates of a letter
  * @param label pointer to a label object
- * @param index index of the letter (0 ... text length)
+ * @param index index of the letter [0 ... text length]. Expressed in character index, not byte index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
 void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
@@ -388,6 +397,8 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
         max_w = CORD_MAX;
     }
 
+    index = txt_utf8_get_id(txt, index);
+
     /*Search the line of the index letter */;
     while (txt[new_line_start] != '\0') {
         new_line_start += txt_get_next_line(&txt[line_start], font, style->letter_space, max_w, flag);
@@ -397,6 +408,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
         line_start = new_line_start;
     }
 
+    /*If the last character is line break then go to the next line*/
     if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
         y += letter_height + style->line_space;
         line_start = index;
@@ -404,16 +416,20 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
     /*Calculate the x coordinate*/
     cord_t x = 0;
-	uint32_t i;
+	uint32_t i = line_start;
+    uint32_t cnt = line_start;                      /*Count the letter (in UTF-8 1 letter not 1 byte)*/
 	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
-	for(i = line_start; i < index; i++) {
+	uint32_t letter;
+	while(cnt < index) {
+        cnt += txt_utf8_size(txt[i]);
+	    letter = txt_utf8_next(txt, &i);
         /*Handle the recolor command*/
         if((flag & TXT_FLAG_RECOLOR) != 0) {
             if(txt_is_cmd(&cmd_state, txt[i]) != false) {
                 continue; /*Skip the letter is it is part of a command*/
             }
         }
-        x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
+        x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->letter_space;
 	}
 
 	if(style->txt_align == LV_TXT_ALIGN_MID) {
@@ -474,8 +490,10 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     }
 
 	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
-	uint16_t i;
-	for(i = line_start; i < new_line_start - 1; i++) {
+	uint32_t i = line_start;
+	uint32_t letter;
+	while(i < new_line_start - 1) {
+	    letter = txt_utf8_next(txt, &i);
 	    /*Handle the recolor command*/
 	    if((flag & TXT_FLAG_RECOLOR) != 0) {
             if(txt_is_cmd(&cmd_state, txt[i]) != false) {
@@ -483,8 +501,8 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-	    x += (font_get_width(font, txt[i]) >> FONT_ANTIALIAS) + style->letter_space;
-		if(pos->x < x) break;
+	    x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->letter_space;
+		if(pos->x < x) break;   /*Get the position*/
 	}
 
 	return i;
@@ -660,40 +678,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     else if (ext->long_mode == LV_LABEL_LONG_BREAK) {
         lv_obj_set_height(label, size.y);
     }
-    /*Replace the last 'LV_LABEL_DOT_NUM' characters with dots
-     * and save these characters*/
-    else if(ext->long_mode == LV_LABEL_LONG_DOTS) {
-        point_t point;
-        point.x = lv_obj_get_width(label) - 1;
-        point.y = lv_obj_get_height(label) - 1;
-        uint16_t index = lv_label_get_letter_on(label, &point);
 
-        if(index < strlen(ext->txt) - 1) {
-
-            /* Change the last 'LV_LABEL_DOT_NUM' to dots
-             * (if there are at least 'LV_LABEL_DOT_NUM' characters*/
-            if(index > LV_LABEL_DOT_NUM) {
-                uint8_t i;
-                for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
-                    ext->dot_tmp[i] = ext->txt[index - LV_LABEL_DOT_NUM + i];
-                    ext->txt[index - LV_LABEL_DOT_NUM + i] = '.';
-                }
-                /*The last character is '\0'. Save this character from the text too.*/
-                ext->dot_tmp[i] = ext->txt[index];
-                ext->txt[index] = '\0';
-            }
-            /*Else with short text change all characters to dots*/
-            else {
-                uint8_t i;
-                for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
-                    ext->txt[i] = '.';
-                }
-                ext->txt[i] = '\0';
-            }
-            /*Save the dot end index*/
-            ext->dot_end = index;
-        }
-    }
 
     lv_obj_inv(label);
 }

@@ -14,7 +14,7 @@
 #include "misc/os/idle.h"
 #include "lvgl/lv_objx/lv_chart.h"
 #include "lvgl/lv_app/lv_app_util/lv_app_notice.h"
-#include "hal/systick/systick.h"
+#include "../hal/systick/systick.h"
 
 /*********************
  *      DEFINES
