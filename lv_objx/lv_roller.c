@@ -223,56 +223,61 @@ static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-        if(sign == LV_SIGNAL_RELEASED) {
-            int32_t id;
-            lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
-            lv_roller_ext_t * ext = lv_obj_get_ext(roller);
-            lv_style_t * style_label = lv_obj_get_style(ext->ddlist.opt_label);
-            const font_t * font = style_label->font;
-            cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
-
+        int32_t id = -1;
+        lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
+        lv_roller_ext_t * ext = lv_obj_get_ext(roller);
+        lv_style_t * style_label = lv_obj_get_style(ext->ddlist.opt_label);
+        const font_t * font = style_label->font;
+        cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+        if(sign == LV_SIGNAL_DRAG_END) {
             /*If dragged then align the list to there be an element in the middle*/
-            if(lv_dispi_is_dragging(param)) {
-                cord_t label_y1 = ext->ddlist.opt_label->cords.y1 - roller->cords.y1;
-                cord_t label_unit = (font_get_height(style_label->font) >> FONT_ANTIALIAS) + style_label->line_space / 2;
-                cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
-                id = (mid - label_y1) / label_unit;
-            }
-            /*If pick an option by clicking then set it*/
-            else {
+            cord_t label_y1 = ext->ddlist.opt_label->cords.y1 - roller->cords.y1;
+            cord_t label_unit = (font_get_height(style_label->font) >> FONT_ANTIALIAS) + style_label->line_space / 2;
+            cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
+            id = (mid - label_y1) / label_unit;if(id < 0) id = 0;
+            if(id < 0) id = 0;
+            if(id >= ext->ddlist.num_opt) id = ext->ddlist.num_opt - 1;
+            ext->ddlist.sel_opt = id;
+        }
+        else if(sign == LV_SIGNAL_RELEASED) {
+            /*If picked an option by clicking then set it*/
+            if(!lv_dispi_is_dragging(param)) {
                 point_t p;
                 lv_dispi_get_point(param, &p);
                 p.y = p.y - ext->ddlist.opt_label->cords.y1;
                 id = p.y / (font_h + style_label->line_space);
-            }
-            if(id < 0) id = 0;
-            if(id >= ext->ddlist.num_opt) id = ext->ddlist.num_opt - 1;
-            ext->ddlist.sel_opt = id;
-
-            /*Position the scrollable according to the new selected option*/
-            cord_t h = lv_obj_get_height(roller);
-            cord_t line_y1 = id * (font_h + style_label->line_space) + ext->ddlist.opt_label->cords.y1 - roller_scrl->cords.y1;
-            cord_t new_y = - line_y1 + (h - font_h) / 2;
-
-            if(ext->ddlist.anim_time == 0) {
-                lv_obj_set_y(roller_scrl, new_y);
-            } else {
-                anim_t a;
-                a.var = roller_scrl;
-                a.start = lv_obj_get_y(roller_scrl);
-                a.end = new_y;
-                a.fp = (anim_fp_t)lv_obj_set_y;
-                a.path = anim_get_path(ANIM_PATH_LIN);
-                a.end_cb = NULL;
-                a.act_time = 0;
-                a.time = ext->ddlist.anim_time;
-                a.playback = 0;
-                a.playback_pause = 0;
-                a.repeat = 0;
-                a.repeat_pause = 0;
-                anim_create(&a);
+                if(id < 0) id = 0;
+                if(id >= ext->ddlist.num_opt) id = ext->ddlist.num_opt - 1;
+                ext->ddlist.sel_opt = id;
             }
         }
+
+        /*Position the scrollable according to the new selected option*/
+            if(id != -1) {
+                cord_t h = lv_obj_get_height(roller);
+              cord_t line_y1 = id * (font_h + style_label->line_space) + ext->ddlist.opt_label->cords.y1 - roller_scrl->cords.y1;
+              cord_t new_y = - line_y1 + (h - font_h) / 2;
+
+              if(ext->ddlist.anim_time == 0) {
+                  lv_obj_set_y(roller_scrl, new_y);
+              } else {
+                  anim_t a;
+                  a.var = roller_scrl;
+                  a.start = lv_obj_get_y(roller_scrl);
+                  a.end = new_y;
+                  a.fp = (anim_fp_t)lv_obj_set_y;
+                  a.path = anim_get_path(ANIM_PATH_LIN);
+                  a.end_cb = NULL;
+                  a.act_time = 0;
+                  a.time = ext->ddlist.anim_time;
+                  a.playback = 0;
+                  a.playback_pause = 0;
+                  a.repeat = 0;
+                  a.repeat_pause = 0;
+                  anim_create(&a);
+              }
+            }
+
     }
 
     return valid;
