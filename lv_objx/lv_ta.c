@@ -814,7 +814,11 @@ static bool lv_ta_design(lv_obj_t * ta, const area_t * masp, lv_design_mode_t mo
 
 /**
  * An extended scrollable design of the page. Calls the normal design function and draws a cursor.
+<<<<<<< HEAD
  * @param scrl pointer to the scrollable part of the Text area
+=======
+ * @param scrl pointer to the scrollabla part of the Text area
+>>>>>>> fc3b967f33a3af469bd1edbfdfa42d516dc58d20
  * @param mask  the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
@@ -881,7 +885,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 		}
 
 		point_t letter_pos;
-		lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
+		lv_label_get_letter_pos(ta_ext->label, byte_pos, &letter_pos);
 
 		/*If the cursor is out of the text (most right) draw it to the next line*/
 		if(letter_pos.x + ta_ext->label->cords.x1 + letter_w > ta_ext->label->cords.x2 && ta_ext->one_line == 0) {

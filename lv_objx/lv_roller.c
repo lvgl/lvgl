@@ -234,7 +234,7 @@ static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * 
             cord_t label_y1 = ext->ddlist.opt_label->cords.y1 - roller->cords.y1;
             cord_t label_unit = (font_get_height(style_label->font) >> FONT_ANTIALIAS) + style_label->line_space / 2;
             cord_t mid = (roller->cords.y2 - roller->cords.y1) / 2;
-            id = (mid - label_y1) / label_unit;if(id < 0) id = 0;
+            id = (mid - label_y1) / label_unit;
             if(id < 0) id = 0;
             if(id >= ext->ddlist.num_opt) id = ext->ddlist.num_opt - 1;
             ext->ddlist.sel_opt = id;
