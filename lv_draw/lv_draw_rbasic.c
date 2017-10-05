@@ -95,6 +95,7 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
                      color_t color, opa_t opa)
 {
     uint8_t w = font_get_width(font_p, letter);
+
     const uint8_t * bitmap_p = font_get_bitmap(font_p, letter);
 
     uint8_t col, col_sub, row;
@@ -110,15 +111,14 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
                 col_sub = 8;
             }
         }
-        
-        /*Correction if the letter is short*/
-        bitmap_p += font_p->width_byte - ((w >> 3) + 1);  
         /*Go to the next row*/
         bitmap_p ++;
     }
 #else
+       uint8_t width_byte = w >> 3;    /*Width in bytes (e.g. w = 11 -> 2 bytes wide)*/
+       if(w & 0x7) width_byte++;
        const uint8_t * map1_p = bitmap_p;
-       const uint8_t * map2_p = bitmap_p + font_p->width_byte;
+       const uint8_t * map2_p = bitmap_p + width_byte;
        uint8_t px_cnt;
        uint8_t col_byte_cnt;
        for(row = 0; row < (font_p->height_row >> 1); row ++) {
@@ -152,10 +152,10 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
                }
            }
 
-           map1_p += font_p->width_byte;
-           map2_p += font_p->width_byte;
-           map1_p += font_p->width_byte - col_byte_cnt;
-           map2_p += font_p->width_byte - col_byte_cnt;
+           map1_p += width_byte;
+           map2_p += width_byte;
+           map1_p += width_byte - col_byte_cnt;
+           map2_p += width_byte - col_byte_cnt;
        }
 #endif
 }

@@ -48,7 +48,7 @@ typedef struct
     uint16_t sel_opt;                               /*Index of the current option*/
     uint16_t anim_time;                             /*Open/Close animation time [ms]*/
     uint8_t opened :1;                              /*1: The list is opened*/
-    uint8_t auto_size :1;                           /*1: Set height to show all options. 0: Set height maximum to the parent bottom*/
+    cord_t fix_height;                              /*Height if the ddlist is opened. (0: auto-size)*/
 }lv_ddlist_ext_t;
 
 
@@ -99,12 +99,12 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t cb);
 
 /**
- * Set the auto size attribute. If enabled the height will reduced to be visible on the parent.
- * In this case the drop down list can be scrolled.
+ * Set the fix height value.
+ * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
  * @param ddlist pointer to a drop down list
- * @param auto_size true: enable auto size, false: disable
+ * @param h the height when the list is opened (0: auto size)
  */
-void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size);
+void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h);
 
 /**
  * Set the style of the rectangle on the selected option
@@ -112,6 +112,14 @@ void lv_ddlist_set_auto_size(lv_obj_t * ddlist, bool auto_size);
  * @param style pointer the new style of the select rectangle
  */
 void lv_ddlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style);
+
+/**
+ * Open or Collapse the drop down list
+ * @param ddlist pointer to drop down list object
+ * @param state true: open; false: collapse
+ * @param anim true: use animations; false: not use animations
+ */
+void lv_ddlist_open(lv_obj_t * ddlist, bool state, bool anim);
 
 /**
  * Get the options of a drop down list
@@ -134,12 +142,13 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
  */
 void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
 
+
 /**
- * Get the auto size attribute.
+ * Get the fix height value.
  * @param ddlist pointer to a drop down list object
- * @return true: the auto_size is enabled, false: disabled
+ * @return the height if the ddlist is opened (0: auto size)
  */
-bool lv_ddlist_get_auto_size(lv_obj_t * ddlist, bool auto_size);
+cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist);
 
 /**
  * Get the style of the rectangle on the selected option

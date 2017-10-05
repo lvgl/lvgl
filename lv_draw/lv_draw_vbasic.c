@@ -148,7 +148,7 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
  * @param opa opacity of letter (0..255)
  */
 void lv_vletter(const point_t * pos_p, const area_t * mask_p, 
-                     const font_t * font_p, uint8_t letter,
+                     const font_t * font_p, uint32_t letter,
                      color_t color, opa_t opa)
 {      
     if(font_p == NULL) return;
@@ -170,6 +170,8 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
     cord_t col, row;
     uint8_t col_bit;
     uint8_t col_byte_cnt;
+    uint8_t width_byte = letter_w >> 3;    /*Width in bytes (e.g. w = 11 -> 2 bytes wide)*/
+    if(letter_w & 0x7) width_byte++;
 
     /* Calculate the col/row start/end on the map
      * If font anti alaiassing is enabled use the reduced letter sizes*/
@@ -186,13 +188,13 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
-    map_p += ((row_start << FONT_ANTIALIAS) * font_p->width_byte) + ((col_start << FONT_ANTIALIAS) >> 3);
+    map_p += ((row_start << FONT_ANTIALIAS) * width_byte) + ((col_start << FONT_ANTIALIAS) >> 3);
 
 #if FONT_ANTIALIAS != 0
     opa_t opa_tmp = opa;
     if(opa_tmp != OPA_COVER) opa_tmp = opa_tmp >> 2;   /*Opacity per pixel (used when sum the pixels)*/
     const uint8_t * map1_p = map_p;
-    const uint8_t * map2_p = map_p + font_p->width_byte;
+    const uint8_t * map2_p = map_p + width_byte;
     uint8_t px_cnt;
     for(row = row_start; row < row_end; row ++) {
         col_byte_cnt = 0;
@@ -228,10 +230,10 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
            vdb_buf_tmp++;
         }
 
-        map1_p += font_p->width_byte;
-        map2_p += font_p->width_byte;
-        map1_p += font_p->width_byte - col_byte_cnt;
-        map2_p += font_p->width_byte - col_byte_cnt;
+        map1_p += width_byte;
+        map2_p += width_byte;
+        map1_p += width_byte - col_byte_cnt;
+        map2_p += width_byte - col_byte_cnt;
         vdb_buf_tmp += vdb_width  - ((col_end) - (col_start)); /*Next row in VDB*/
     }
 #else
@@ -255,7 +257,7 @@ void lv_vletter(const point_t * pos_p, const area_t * mask_p,
             }
         }
 
-        map_p += font_p->width_byte - col_byte_cnt;
+        map_p += width_byte - col_byte_cnt;
         vdb_buf_tmp += vdb_width  - (col_end - col_start); /*Next row in VDB*/
     }
 #endif

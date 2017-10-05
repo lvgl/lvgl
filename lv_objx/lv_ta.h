@@ -97,7 +97,7 @@ bool lv_ta_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
  * @param ta pointer to a text area object
  * @param c a character
  */
-void lv_ta_add_char(lv_obj_t * ta, char c);
+void lv_ta_add_char(lv_obj_t * ta, uint32_t c);
 
 /**
  * Insert a text to the current cursor position
