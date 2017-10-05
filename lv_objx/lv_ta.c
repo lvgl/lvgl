@@ -309,15 +309,12 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext(ta);
-
-	const char * label_txt = lv_label_get_text(ext->label);
     uint16_t txt_len = strlen(txt);
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     /*Insert the text*/
 
     lv_label_ins_text(ext->label, ext->cursor_pos, txt);
-
 
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = dm_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + txt_len + 1);
@@ -816,7 +813,7 @@ static bool lv_ta_design(lv_obj_t * ta, const area_t * masp, lv_design_mode_t mo
 
 /**
  * An extended scrollable design of the page. Calls the normal design function and draws a cursor.
- * @param scrl pointer to the scrollabla part of the Text area
+ * @param scrl pointer to the scrollable part of the Text area
  * @param mask  the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
