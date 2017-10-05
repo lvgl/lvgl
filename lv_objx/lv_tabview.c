@@ -205,6 +205,12 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_set_width(ext->indic, indic_width);
     lv_obj_set_x(ext->indic, indic_width * ext->tab_act + style_tabs->opad * ext->tab_act + style_tabs->hpad);
 
+    /*Set the first tab as active*/
+    if(ext->tab_cnt == 1) {
+        ext->tab_act = 0;
+        lv_tabview_set_act(tabview, 0, false);
+    }
+
     return h;
 }
 
