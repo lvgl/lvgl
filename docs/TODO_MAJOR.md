@@ -5,8 +5,20 @@ Major versions released typically when API changes are required
 Please create an issue to suggest a new feature instead of adding pull request to this file.
 
 ## v5 
+**Architectural changes**
 - [ ] rename repository from *lvgl* to *littlevgl*
+- [ ] rename repository from *proj_pc* to *pc_simulator*
+- [ ] integrate *hal* in LittlevGL as a normal folder
+- [ ] integrate *misc* in LittlevGl as submodule
+- [ ] create a new repository for examples
+- [ ] convert Applications into simple examples 
+
+**API changes**
 - [ ] define renames: e.g. *USE_LV_BTN* to *LV_BTN_USE*
 - [ ] Remove LV_DOWNSCALE (LV_ANTIALIAS will be used instead)
 - [ ] *lv_ta_get_txt* rename to *lv_ta_get_text* 
-- [ ] btnm_action pass text instead of text_id
+- [x] lv_btnm_set_styles for *tpr*, *trel* and *ina* too
+- [x] LV_LABEL_LONG_DOTS removed, use LV_LABEL_LONG_ROLL instead
+- [x] *lv_list_set_element_text_roll()* removed.
+- [x] *lv_ddlist_set_fix_height()* instead of *auto_size*
+- [x] rename *lv_dispi_...* to *lv_indev_proc_...* (except *lv_dispi_t* -> *lv_indev_t*)

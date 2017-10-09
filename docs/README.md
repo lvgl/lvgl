@@ -2,9 +2,9 @@
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-LittlevGL is a graphics library to create Graphical User Interfaces (GUI) on TFT, LCD or monochrome displays using microcontroller based embedded systems.
+LittlevGL is a graphics library to create Graphical User Interfaces (GUI) on TFT, LCD or monochrome displays for microcontroller based embedded systems.
 
-Transparency, anti-aliassing and smooth animations can be used with no double buffering so typically no external memories are required.
+Transparency, anti-aliassing and smooth animations can be used with no double buffering so typically no external memories are required. Layouts, scrolling, word-wrapping, layers and other features make your job easier. 
 
 The graphics library is written in C and it is completely hardware independent. You can even run it in a PC simulator without any embedded hardware.
 
@@ -17,12 +17,18 @@ Homepage: http://gl.littlev.hu
 * Build GUI from simple graphical objects
   * Buttons, Labels, Images
   * Charts, Lists, Bars, Sliders, Text areas etc.
+* Create or delete graphical object dynamically in run time   
 * High level graphical features without double buffering
   * Antialiassing (font or full screen)
   * Animations
   * Transparency
   * Gradient colors
   * Smooth dragging and scrolling
+* Built-in features
+  * Layouts (to auto-arrange items)
+  * Scrolling
+  * Auto-size (aligned to the content)
+  * Word wrapping
   * Layers
 * Customizable appearance with styles
 * Applications for complex tasks
