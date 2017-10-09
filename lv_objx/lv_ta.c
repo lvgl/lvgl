@@ -172,9 +172,16 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     	} else if(sign == LV_SIGNAL_STYLE_CHG) {
             if(ext->label) {
             	lv_obj_t * scrl = lv_page_get_scrl(ta);
+                lv_style_t * style_ta = lv_obj_get_style(ta);
             	lv_style_t * style_scrl = lv_obj_get_style(scrl);
-                lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->hpad);
-                lv_obj_set_pos(ext->label, style_scrl->hpad, style_scrl->vpad);
+            	if(ext->one_line) { /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
+                    lv_style_t * style_label = lv_obj_get_style(ext->label);
+                    cord_t font_h =  font_get_height(style_label->font) >> FONT_ANTIALIAS;
+                    lv_obj_set_height(ta, font_h + (style_ta->vpad + style_scrl->vpad) * 2);
+            	} else { /*In not one line mode refresh the Label width because 'hpad' can modify it*/
+            	    lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->hpad);
+                    lv_obj_set_pos(ext->label, style_scrl->hpad, style_scrl->vpad);         /*Be sure the Label is in the correct position*/
+            	}
                 lv_label_set_text(ext->label, NULL);
 
                 lv_obj_refr_ext_size(lv_page_get_scrl(ta));
@@ -669,12 +676,13 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
     if(en != false) {
         lv_ta_ext_t * ext = lv_obj_get_ext(ta);
         lv_style_t * style_ta = lv_obj_get_style(ta);
+        lv_style_t * style_scrl = lv_obj_get_style(lv_page_get_scrl(ta));
         lv_style_t * style_label = lv_obj_get_style(ext->label);
         cord_t font_h =  font_get_height(style_label->font) >> FONT_ANTIALIAS;
 
         ext->one_line = 1;
         lv_cont_set_fit(lv_page_get_scrl(ta), true, true);
-        lv_obj_set_height(ta, font_h + style_ta->vpad * 2);
+        lv_obj_set_height(ta, font_h + (style_ta->vpad + style_scrl->vpad) * 2);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
         lv_label_set_no_break(ext->label, true);
         lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->hpad, style_ta->vpad);
