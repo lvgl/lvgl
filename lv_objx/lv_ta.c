@@ -866,6 +866,8 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
         	cur_style.radius = 0;
         	cur_style.empty = 0;
         	cur_style.opa = OPA_COVER;
+        	cur_style.hpad = 0;
+            cur_style.vpad = 0;
         }
 
 		uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
@@ -911,16 +913,16 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 		/*Draw he cursor according to the type*/
 		area_t cur_area;
 		if(ta_ext->cursor_type == LV_TA_CURSOR_LINE) {
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - (cur_style.line_width >> 1) - (cur_style.line_width & 0x1);
-			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + (cur_style.line_width >> 1);
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.hpad - (cur_style.line_width >> 1) - (cur_style.line_width & 0x1);
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 + cur_style.vpad;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.hpad + (cur_style.line_width >> 1);
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + cur_style.vpad + letter_h;
 			lv_draw_rect(&cur_area, mask, &cur_style);
 		} else if(ta_ext->cursor_type == LV_TA_CURSOR_BLOCK) {
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
-			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + letter_w;
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - cur_style.hpad;
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 - cur_style.vpad;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.hpad + letter_w;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + cur_style.vpad + letter_h;
 
 			lv_draw_rect(&cur_area, mask, &cur_style);
 
@@ -933,22 +935,24 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
             char letter_buf[8] = {0};
             memcpy(letter_buf, &txt[byte_pos], txt_utf8_size(txt[byte_pos]));
 #endif
+            cur_area.x1 += cur_style.hpad;
+            cur_area.y1 += cur_style.vpad;
 			lv_draw_label(&cur_area, mask, &cur_style, letter_buf, TXT_FLAG_NONE, 0);
 
 		} else if(ta_ext->cursor_type == LV_TA_CURSOR_OUTLINE) {
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
-			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1;
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + letter_w;
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h;
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - cur_style.hpad;
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 - cur_style.vpad;
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.hpad + letter_w;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 - cur_style.vpad+ letter_h;
 
 			cur_style.empty = 1;
 			if(cur_style.bwidth == 0) cur_style.bwidth = 1 * LV_DOWNSCALE; /*Be sure the border will be drawn*/
 			lv_draw_rect(&cur_area, mask, &cur_style);
 		} else if(ta_ext->cursor_type == LV_TA_CURSOR_UNDERLINE) {
-			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1;
-			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 + letter_h - (cur_style.line_width >> 1);
-			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + letter_w;
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + letter_h + (cur_style.line_width >> 1) + (cur_style.line_width & 0x1);
+			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.hpad;
+			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 + cur_style.vpad + letter_h - (cur_style.line_width >> 1);
+			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.hpad + letter_w;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + cur_style.vpad + letter_h + (cur_style.line_width >> 1) + (cur_style.line_width & 0x1);
 
 			lv_draw_rect(&cur_area, mask, &cur_style);
 		}
