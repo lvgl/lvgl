@@ -119,7 +119,7 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
                 if(v == 0) lv_bar_set_value(sw, 1);
                 else lv_bar_set_value(sw, 0);
     	    }
-    	    if(slider_cb != NULL) slider_cb(sw, param);
+    	    if(slider_cb != NULL) slider_cb(sw);
 
             ext->changed = 0;
     	}

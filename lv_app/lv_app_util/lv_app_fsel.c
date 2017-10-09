@@ -24,15 +24,15 @@
  *  STATIC PROTOTYPES
  **********************/
 static void fsel_refr(void);
-static lv_action_res_t fsel_close_action(lv_obj_t * close, lv_dispi_t * dispi);
-static lv_action_res_t fsel_up_action(lv_obj_t * up, lv_dispi_t * dispi);
-static lv_action_res_t fsel_next_action(lv_obj_t * next, lv_dispi_t * dispi);
-static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_dispi_t * dispi);
-static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_dispi_t * dispi);
-static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_dispi_t * dispi);
-static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_dispi_t * dispi);
-static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_dispi_t * dispi);
-static lv_action_res_t fsel_file_action(lv_obj_t * file, lv_dispi_t * dispi);
+static lv_action_res_t fsel_close_action(lv_obj_t * close, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_up_action(lv_obj_t * up, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_next_action(lv_obj_t * next, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_indev_proc_t * indev_proc);
+static lv_action_res_t fsel_file_action(lv_obj_t * file, lv_indev_proc_t * indev_proc);
 
 /**********************
  *  STATIC VARIABLES
@@ -238,10 +238,10 @@ static void fsel_refr(void)
 /**
  * Called when the File selector window close button is released
  * @param close pointer to the close button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the window is deleted in the function
  */
-static lv_action_res_t fsel_close_action(lv_obj_t * close, lv_dispi_t * dispi)
+static lv_action_res_t fsel_close_action(lv_obj_t * close, lv_indev_proc_t * indev_proc)
 {
     lv_app_fsel_close();
     return LV_ACTION_RES_INV;
@@ -250,10 +250,10 @@ static lv_action_res_t fsel_close_action(lv_obj_t * close, lv_dispi_t * dispi)
 /**
  * Called when the Up list element is released to step one level
  * @param up pointer to the Up button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_up_action(lv_obj_t * up, lv_dispi_t * dispi)
+static lv_action_res_t fsel_up_action(lv_obj_t * up, lv_indev_proc_t * indev_proc)
 {
     fs_up(fsel_path);
     fsel_file_cnt = 0;
@@ -264,10 +264,10 @@ static lv_action_res_t fsel_up_action(lv_obj_t * up, lv_dispi_t * dispi)
 /**
  * Called when the Next list element is released to go to the next page
  * @param next pointer to the Next button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_next_action(lv_obj_t * next, lv_dispi_t * dispi)
+static lv_action_res_t fsel_next_action(lv_obj_t * next, lv_indev_proc_t * indev_proc)
 {
     fsel_refr();
     return LV_ACTION_RES_INV;
@@ -276,10 +276,10 @@ static lv_action_res_t fsel_next_action(lv_obj_t * next, lv_dispi_t * dispi)
 /**
  * Called when the Prev list element is released to previous page
  * @param prev pointer to the Prev button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_dispi_t * dispi)
+static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_indev_proc_t * indev_proc)
 {
     if(fsel_file_cnt <= 2 * LV_APP_FSEL_PAGE_SIZE) fsel_file_cnt = 0;
     else if(fsel_file_cnt % LV_APP_FSEL_PAGE_SIZE == 0) {
@@ -296,10 +296,10 @@ static lv_action_res_t fsel_prev_action(lv_obj_t * prev, lv_dispi_t * dispi)
 /**
  * Called when the Driver list element is released to step into a driver
  * @param drv pointer to the Driver button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
+static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_indev_proc_t * indev_proc)
 {
     sprintf(fsel_path, "%s:", lv_list_get_element_text(drv));
     fsel_file_cnt = 0;
@@ -310,10 +310,10 @@ static lv_action_res_t fsel_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
 /**
  * Called when the Driver list element is long pressed to choose it
  * @param drv pointer to the Driver button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_dispi_t * dispi)
+static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_indev_proc_t * indev_proc)
 {
     sprintf(fsel_path, "%s:", lv_list_get_element_text(drv));
 
@@ -329,10 +329,10 @@ static lv_action_res_t fsel_drv_lpr_action(lv_obj_t * drv, lv_dispi_t * dispi)
 /**
  * Called when a folder list element is released to enter into it
  * @param folder pointer to a folder button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
+static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_indev_proc_t * indev_proc)
 {
     sprintf(fsel_path, "%s/%s", fsel_path, lv_list_get_element_text(folder));
     fsel_file_cnt = 0;
@@ -343,10 +343,10 @@ static lv_action_res_t fsel_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
 /**
  * Called when a folder list element is long pressed to choose it
  * @param folder pointer to a folder button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_dispi_t * dispi)
+static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_indev_proc_t * indev_proc)
 {
     sprintf(fsel_path, "%s/%s", fsel_path, lv_list_get_element_text(folder));
 
@@ -362,10 +362,10 @@ static lv_action_res_t fsel_folder_lpr_action(lv_obj_t * folder, lv_dispi_t * di
 /**
  * Called when a file list element is released to choose it
  * @param file pointer to a file button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t fsel_file_action(lv_obj_t * file, lv_dispi_t * dispi)
+static lv_action_res_t fsel_file_action(lv_obj_t * file, lv_indev_proc_t * indev_proc)
 {
     sprintf(fsel_path, "%s/%s", fsel_path, lv_list_get_element_text(file));
 

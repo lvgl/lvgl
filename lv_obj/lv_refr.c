@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
+#include <lvgl/lv_hal/lv_hal_tick.h>
 #include "lv_conf.h"
-#include "misc/os/ptask.h"
-#include "misc/mem/fifo.h"
+#include <stddef.h>
 #include "lv_refr.h"
 #include "lv_vdb.h"
-#include "../hal/systick/systick.h"
+#include "misc/os/ptask.h"
+#include "misc/mem/fifo.h"
 
 /*********************
  *      DEFINES
@@ -147,7 +147,7 @@ void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
 static void lv_refr_task(void * param)
 {
 
-    uint32_t start = lv_hal_tick_get();
+    uint32_t start = lv_tick_get();
 
     lv_refr_join_area();
     
@@ -162,7 +162,7 @@ static void lv_refr_task(void * param)
      * therefore be sure the inv_buf is cleared prior to it*/
     if(refr_done != false) {
         if(monitor_cb != NULL) {
-            monitor_cb(lv_hal_tick_elaps(start), px_num);
+            monitor_cb(lv_tick_elaps(start), px_num);
         }
     }
 }

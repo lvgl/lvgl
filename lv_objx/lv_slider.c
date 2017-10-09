@@ -120,7 +120,7 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
             ext->tmp_value = lv_bar_get_value(slider);
         }
         else if(sign == LV_SIGNAL_PRESSING) {
-            lv_dispi_get_point(param, &p);
+            lv_indev_get_point(param, &p);
             if(w > h) {
                 cord_t knob_w = h;
                 p.x -= slider->cords.x1 + h / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
@@ -140,7 +140,7 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
         else if (sign == LV_SIGNAL_RELEASED) {
             ext->tmp_value = lv_bar_get_value(slider);
             lv_bar_set_value(slider, ext->tmp_value);
-            if(ext->cb != NULL) ext->cb(slider, param);
+            if(ext->cb != NULL) ext->cb(slider);
         }
         else if(sign == LV_SIGNAL_CORD_CHG) {
             /* The knob size depends on slider size.
@@ -167,10 +167,10 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
             char c = *((char*)param);
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
                 lv_bar_set_value(slider, lv_bar_get_value(slider) + 1);
-                if(ext->cb != NULL) ext->cb(slider, NULL);
+                if(ext->cb != NULL) ext->cb(slider);
             } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
                 lv_bar_set_value(slider, lv_bar_get_value(slider) - 1);
-                if(ext->cb != NULL) ext->cb(slider, NULL);
+                if(ext->cb != NULL) ext->cb(slider);
             }
         }
     }

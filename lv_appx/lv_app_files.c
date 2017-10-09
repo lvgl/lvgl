@@ -76,17 +76,17 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win);
 
 static void win_load_file_list(lv_app_inst_t * app);
 static void win_create_list(lv_app_inst_t * app);
-static lv_action_res_t win_up_action(lv_obj_t * up, lv_dispi_t * dispi);
-static lv_action_res_t win_next_action(lv_obj_t * next, lv_dispi_t * dispi);
-static lv_action_res_t win_prev_action(lv_obj_t * prev, lv_dispi_t * dispi);
-static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_dispi_t * dispi);
-static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi);
-static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi);
-static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi);
-static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_dispi_t * dispi);
-static lv_action_res_t win_back_action(lv_obj_t * back, lv_dispi_t * dispi);
-static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_dispi_t * dispi);
-static lv_action_res_t win_del_lpr_action(lv_obj_t * del, lv_dispi_t * dispi);
+static lv_action_res_t win_up_action(lv_obj_t * up, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_next_action(lv_obj_t * next, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_prev_action(lv_obj_t * prev, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_file_action(lv_obj_t * file, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_back_action(lv_obj_t * back, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_del_lpr_action(lv_obj_t * del, lv_indev_proc_t * indev_proc);
 static void send_settings_kb_close_action(lv_obj_t * ta);
 static void send_settings_kb_ok_action(lv_obj_t * ta);
 static void start_send(lv_app_inst_t * app, const char * path);
@@ -463,10 +463,10 @@ static void win_load_file_list(lv_app_inst_t * app)
 /**
  * Called when the Up list element is released to step one level
  * @param up pointer to the Up button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t win_up_action(lv_obj_t * up, lv_dispi_t * dispi)
+static lv_action_res_t win_up_action(lv_obj_t * up, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(up);
     my_app_data_t * app_data = app->app_data;
@@ -487,10 +487,10 @@ static lv_action_res_t win_up_action(lv_obj_t * up, lv_dispi_t * dispi)
 /**
  * Called when the Next list element is released to go to the next page
  * @param next pointer to the Next button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t win_next_action(lv_obj_t * next, lv_dispi_t * dispi)
+static lv_action_res_t win_next_action(lv_obj_t * next, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(next);
     win_load_file_list(app);
@@ -500,10 +500,10 @@ static lv_action_res_t win_next_action(lv_obj_t * next, lv_dispi_t * dispi)
 /**
  * Called when the Prev list element is released to previous page
  * @param prev pointer to the Prev button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t win_prev_action(lv_obj_t * prev, lv_dispi_t * dispi)
+static lv_action_res_t win_prev_action(lv_obj_t * prev, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(prev);
     my_app_data_t * app_data = app->app_data;
@@ -522,10 +522,10 @@ static lv_action_res_t win_prev_action(lv_obj_t * prev, lv_dispi_t * dispi)
 /**
  * Called when the Driver list element is released to step into a driver
  * @param drv pointer to the Driver button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
+static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(drv);
     my_app_data_t * app_data = app->app_data;
@@ -546,10 +546,10 @@ static lv_action_res_t win_drv_action(lv_obj_t * drv, lv_dispi_t * dispi)
 /**
  * Called when a folder list element is released to enter into it
  * @param folder pointer to a folder button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
+static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(folder);
     my_app_data_t * app_data = app->app_data;
@@ -572,10 +572,10 @@ static lv_action_res_t win_folder_action(lv_obj_t * folder, lv_dispi_t * dispi)
 /**
  * Called when a file list element is released to show the list of operation on it
  * @param file pointer to a file button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
+static lv_action_res_t win_file_action(lv_obj_t * file, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(file);
     my_app_data_t * app_data = app->app_data;
@@ -606,10 +606,10 @@ static lv_action_res_t win_file_action(lv_obj_t * file, lv_dispi_t * dispi)
  * Called when the Back list element is released to when a file chosen to
  * go back to the file list from file operation
  * @param back pointer to the back button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is deleted in the function
  */
-static lv_action_res_t win_back_action(lv_obj_t * up, lv_dispi_t * dispi)
+static lv_action_res_t win_back_action(lv_obj_t * up, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(up);
     my_app_data_t * app_data = app->app_data;
@@ -622,10 +622,10 @@ static lv_action_res_t win_back_action(lv_obj_t * up, lv_dispi_t * dispi)
 /**
  * Called when the Send list element is released to send the file
  * @param sed pointer to the Up button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
  */
-static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi)
+static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(send);
     my_app_data_t * app_data = app->app_data;
@@ -645,10 +645,10 @@ static lv_action_res_t win_send_rel_action(lv_obj_t * send, lv_dispi_t * dispi)
 /**
  * Called when a send settings element is released
  * @param element pointer to a chekbox or text area
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
  */
-static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_dispi_t * dispi)
+static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, lv_indev_proc_t * indev_proc)
 {
     send_settings_id_t id = lv_obj_get_free_num(element);
     lv_app_inst_t * app = lv_obj_get_free_p(element);
@@ -679,10 +679,10 @@ static lv_action_res_t win_send_settings_element_rel_action(lv_obj_t * element, 
  * Called when the Delete list element is released.
  * It will show a notification to long press the Delete button to remove the file
  * @param del pointer to the back button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
  */
-static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_dispi_t * dispi)
+static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_indev_proc_t * indev_proc)
 {
     lv_app_notice_add("Press long the Delete button\n"
                       "to remove the file");
@@ -692,10 +692,10 @@ static lv_action_res_t win_del_rel_action(lv_obj_t * del, lv_dispi_t * dispi)
 /**
  * Called when the Delete list element is long pressed to remove a file
  * @param del pointer to the Delete button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is NOT deleted in the function
  */
-static lv_action_res_t win_del_lpr_action(lv_obj_t * del, lv_dispi_t * dispi)
+static lv_action_res_t win_del_lpr_action(lv_obj_t * del, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(del);
     my_app_data_t * app_data = app->app_data;

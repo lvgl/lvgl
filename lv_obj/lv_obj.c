@@ -7,16 +7,15 @@
  *      INCLUDES
  *********************/
 
+#include <lvgl/lv_obj/lv_indev.h>
 #include "lv_conf.h"
+#include "lv_obj.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_draw/lv_draw_rbasic.h"
-#include "lv_dispi.h"
-#include "lv_obj.h"
 #include "lv_refr.h"
 #include "lv_group.h"
 #include "../lv_app/lv_app.h"
 #include "misc/gfx/anim.h"
-#include "../hal/indev/hal_indev.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -91,9 +90,9 @@ void lv_init(void)
     /*Refresh the screen*/
     lv_obj_inv(act_scr);
     
-#if LV_DISPI_READ_PERIOD != 0
-    /*Init the display input handling*/
-    lv_dispi_init();
+#if LV_indev_proc_READ_PERIOD != 0
+    /*Init the input device handling*/
+    lv_indev_proc_init();
 #endif
 
     /*Initialize the application level*/
@@ -294,24 +293,23 @@ void lv_obj_del(lv_obj_t * obj)
     if(obj->ext != NULL)  dm_free(obj->ext);
     dm_free(obj); /*Free the object itself*/
 
-//     TODO Update with the new HAL
-//    /* Reset all display input (dispi) if
-//     * the currently pressed object is deleted too*/
-//    lv_dispi_t * dispi_array = lv_dispi_get_array();
-//    lv_obj_t * dpar;
-//    uint8_t d;
-//    for(d = 0; d < INDEV_NUM; d++) {
-//        dpar = obj;
-//        while(dpar != NULL) {
-//            if(dispi_array[d].act_obj == dpar ||
-//               dispi_array[d].last_obj == dpar) {
-//                lv_dispi_reset();
-//                break;
-//            } else {
-//                dpar = lv_obj_get_parent(dpar);
-//            }
-//        }
-//    }
+    /* Reset all display input (indev_proc) if
+     * the currently pressed object is deleted*/
+    lv_indev_t * indev = lv_indev_next(NULL);
+    lv_obj_t * dpar;
+    while(indev) {
+        dpar = obj;
+        while(dpar != NULL) {
+            if(indev->state.act_obj == dpar ||
+               indev->state.last_obj == dpar) {
+                lv_indev_reset(indev);
+                break;
+            } else {
+                dpar = lv_obj_get_parent(dpar);
+            }
+        }
+        indev = lv_indev_next(NULL);
+    }
 
     /*Send a signal to the parent to notify it about the child delete*/
     if(par != NULL) {

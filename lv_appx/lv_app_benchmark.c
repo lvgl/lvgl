@@ -67,12 +67,12 @@ static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
 
 static void refr_monitor(uint32_t time_ms, uint32_t px_num);
-static lv_action_res_t run_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
-static lv_action_res_t wp_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
-static lv_action_res_t recolor_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
-static lv_action_res_t upscale_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
-static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
-static lv_action_res_t opa_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t run_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t wp_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t recolor_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t upscale_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t opa_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -406,7 +406,7 @@ static void refr_monitor(uint32_t time_ms, uint32_t px_num)
     }
 }
 
-static lv_action_res_t run_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t run_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
 {
     lv_obj_inv(lv_scr_act());
     caputre_next = true;
@@ -414,7 +414,7 @@ static lv_action_res_t run_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t wp_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t wp_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
 {
 
     lv_app_inst_t * app = lv_obj_get_free_p(btn);
@@ -432,7 +432,7 @@ static lv_action_res_t wp_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t recolor_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t recolor_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(btn);
     my_win_data_t * wdata = app->win_data;
@@ -451,7 +451,7 @@ static lv_action_res_t recolor_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t upscale_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t upscale_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(btn);
     my_win_data_t * wdata = app->win_data;
@@ -470,7 +470,7 @@ static lv_action_res_t upscale_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(btn);
     my_win_data_t * wdata = app->win_data;
@@ -501,7 +501,7 @@ static lv_action_res_t shadow_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t opa_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t opa_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(btn);
     my_win_data_t * wdata = app->win_data;

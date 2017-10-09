@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 
+#include <lvgl/lv_obj/lv_indev.h>
 #include "lv_conf.h"
-#include "../lv_obj/lv_dispi.h"
 #include "../lv_obj/lv_obj.h"
 #include "../lv_objx/lv_btn.h"
 #include "../lv_objx/lv_cont.h"
@@ -73,10 +73,10 @@ static void my_win_close(lv_app_inst_t * app);
 static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win);
 
 static void add_data(lv_app_inst_t * app, const void * data, uint16_t data_len);
-static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi);
-static lv_action_res_t win_comtype_action(lv_obj_t * ddlist, lv_dispi_t * dispi);
-static lv_action_res_t win_format_action(lv_obj_t * ddlist, lv_dispi_t * dispi);
-static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
+static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_comtype_action(lv_obj_t * ddlist, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_format_action(lv_obj_t * ddlist, lv_indev_proc_t * indev_proc);
+static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
 static void win_ta_kb_ok_action(lv_obj_t * ta);
 
 /**********************
@@ -329,10 +329,10 @@ static void my_conf_open(lv_app_inst_t * app, lv_obj_t * conf_win)
 /**
  * Called when the Text area is released to open the app. keybard
  * @param ta pointer to the text area
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the text area is not deleted
  */
-static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
+static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_indev_proc_t * indev_proc)
 {
     lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE, NULL, win_ta_kb_ok_action);
 
@@ -342,10 +342,10 @@ static lv_action_res_t win_ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
 /**
  * Called when an option is chosen in the communication type drop down list on the configuration window
  * @param ddl pointer to the drop down list
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is not deleted
  */
-static lv_action_res_t win_comtype_action(lv_obj_t * ddlist, lv_dispi_t * dispi)
+static lv_action_res_t win_comtype_action(lv_obj_t * ddlist, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(ddlist);
     my_app_data_t * app_data = app->app_data;
@@ -358,10 +358,10 @@ static lv_action_res_t win_comtype_action(lv_obj_t * ddlist, lv_dispi_t * dispi)
 /**
  * Called when an option is chosen in the format drop down list on the configuration window
  * @param ddl pointer to the drop down list
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the list is not deleted
  */
-static lv_action_res_t win_format_action(lv_obj_t * ddlist, lv_dispi_t * dispi)
+static lv_action_res_t win_format_action(lv_obj_t * ddlist, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(ddlist);
     my_app_data_t * app_data = app->app_data;
@@ -379,10 +379,10 @@ static lv_action_res_t win_format_action(lv_obj_t * ddlist, lv_dispi_t * dispi)
 /**
  * Called when the Clear button is released to clear the text of the terminal
  * @param btn pointer to the clear button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the button is not deleted
  */
-static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_dispi_t * dispi)
+static lv_action_res_t win_clear_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(btn);
     my_app_data_t * app_data = app->app_data;

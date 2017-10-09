@@ -49,7 +49,7 @@ static void my_sc_close(lv_app_inst_t * app);
 static void my_win_open(lv_app_inst_t * app, lv_obj_t * win);
 static void my_win_close(lv_app_inst_t * app);
 
-static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi);
+static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_indev_proc_t * indev_proc);
 static void kb_ok_action(lv_obj_t * ta);
 
 /**********************
@@ -192,10 +192,10 @@ static void my_win_close(lv_app_inst_t * app)
 /**
  * Called when the text area on the window is released to open the app. keyboard
  * @param ta pointer to the text area on the window
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the text area is not deleted
  */
-static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_dispi_t * dispi)
+static lv_action_res_t ta_rel_action(lv_obj_t * ta, lv_indev_proc_t * indev_proc)
 {
     lv_ta_set_text(ta, ""); /*Clear the ta*/
     lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE, NULL, kb_ok_action);

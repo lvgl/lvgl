@@ -13,7 +13,7 @@
 #include "lv_ddlist.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_group.h"
-#include "../lv_obj/lv_dispi.h"
+#include "../lv_obj/lv_indev.h"
 #include "misc/gfx/anim.h"
 
 /*********************
@@ -29,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
-static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * dispi);
+static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time);
 static void lv_ddlist_pos_act_option(lv_obj_t * ddlist);
 
@@ -152,7 +152,7 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
                     ext->sel_opt ++;
                     lv_obj_inv(ddlist);
                     if(ext->cb != NULL) {
-                        ext->cb(ddlist, NULL);
+                        ext->cb(ddlist);
                     }
                 }
             } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
@@ -160,7 +160,7 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
                     ext->sel_opt --;
                     lv_obj_inv(ddlist);
                     if(ext->cb != NULL) {
-                        ext->cb(ddlist, NULL);
+                        ext->cb(ddlist);
                     }
                 }
             } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ESC) {
@@ -442,10 +442,9 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
 /**
  * Called when a drop down list is released to open it or set new option
  * @param ddlist pointer to a drop down list object
- * @param dispi pointer to the called display input
  * @return LV_ACTION_RES_INV if the ddlist it deleted in the user callback else LV_ACTION_RES_OK
  */
-static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * dispi)
+static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
 
@@ -457,8 +456,9 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
         lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
 
         /*Search the clicked option*/
+        lv_indev_t *indev = lv_indev_get_act();
         point_t p;
-        lv_dispi_get_point(dispi, &p);
+        lv_indev_get_point(indev, &p);
         p.x -= ext->opt_label->cords.x1;
         p.y -= ext->opt_label->cords.y1;
         uint16_t letter_i;
@@ -474,7 +474,7 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist, lv_dispi_t * disp
         ext->sel_opt = new_opt;
 
         if(ext->cb != NULL) {
-            ext->cb(ddlist, dispi);
+            ext->cb(ddlist);
         }
     }
     lv_ddlist_refr_size(ddlist, ext->anim_time);

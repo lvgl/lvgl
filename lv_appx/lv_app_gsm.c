@@ -63,10 +63,10 @@ static void my_win_close(lv_app_inst_t * app);
 
 static void gsm_state_monitor_task(void * param);
 
-static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_dispi_t * dispi);
-static lv_action_res_t netw_apn_rel_action( lv_obj_t * ta, lv_dispi_t * dispi);
-static lv_action_res_t tcp_ip_rel_action( lv_obj_t * ta, lv_dispi_t * dispi);
-static lv_action_res_t tcp_port_rel_action( lv_obj_t * ta, lv_dispi_t * dispi);
+static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t netw_apn_rel_action( lv_obj_t * ta, lv_indev_proc_t * indev_proc);
+static lv_action_res_t tcp_ip_rel_action( lv_obj_t * ta, lv_indev_proc_t * indev_proc);
+static lv_action_res_t tcp_port_rel_action( lv_obj_t * ta, lv_indev_proc_t * indev_proc);
 
 static void netw_apn_kb_ok(lv_obj_t * ta);
 static void netw_apn_kb_close(lv_obj_t * ta);
@@ -339,7 +339,7 @@ static void gsm_state_monitor_task(void * param)
     state_prev = state_act;
 }
 
-static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_dispi_t* dispi)
+static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_indev_proc_t* indev_proc)
 {
     lv_app_inst_t * app = lv_obj_get_free_p(btn);
     my_app_data_t * adata = app->app_data;
@@ -353,19 +353,19 @@ static lv_action_res_t netw_con_rel_action(lv_obj_t * btn, lv_dispi_t* dispi)
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t netw_apn_rel_action( lv_obj_t * ta, lv_dispi_t* dispi)
+static lv_action_res_t netw_apn_rel_action( lv_obj_t * ta, lv_indev_proc_t* indev_proc)
 {
     lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CUR_MANAGE, netw_apn_kb_close ,netw_apn_kb_ok);
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t tcp_ip_rel_action( lv_obj_t * ta, lv_dispi_t* dispi)
+static lv_action_res_t tcp_ip_rel_action( lv_obj_t * ta, lv_indev_proc_t* indev_proc)
 {
     lv_app_kb_open(ta, LV_APP_KB_MODE_TXT | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CUR_MANAGE, tcp_ip_kb_close ,tcp_ip_kb_ok);
     return LV_ACTION_RES_OK;
 }
 
-static lv_action_res_t tcp_port_rel_action( lv_obj_t * ta, lv_dispi_t* dispi)
+static lv_action_res_t tcp_port_rel_action( lv_obj_t * ta, lv_indev_proc_t* indev_proc)
 {
     lv_app_kb_open(ta, LV_APP_KB_MODE_NUM | LV_APP_KB_MODE_WIN_RESIZE | LV_APP_KB_MODE_CUR_MANAGE, tcp_port_kb_close ,tcp_port_kb_ok);
     return LV_ACTION_RES_OK;

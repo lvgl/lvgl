@@ -362,10 +362,10 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, uint16_t i)
             lv_ta_set_cursor_pos(ext->ta, cur + 1);
         }
     } else if(strcmp(txt, "Hide") == 0) {
-        if(ext->close_action) ext->close_action(kb, NULL);
+        if(ext->close_action) ext->close_action(kb);
         return LV_ACTION_RES_INV;
     } else if(strcmp(txt, "Ok") == 0) {
-        if(ext->ok_action) ext->ok_action(kb, NULL);
+        if(ext->ok_action) ext->ok_action(kb);
         return LV_ACTION_RES_INV;
     } else {
         lv_ta_add_text(ext->ta, txt);

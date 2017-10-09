@@ -133,12 +133,12 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     	else if(sign == LV_SIGNAL_PRESSING) {
             uint16_t btn_pr;
             /*Search the pressed area*/
-            lv_dispi_get_point(param, &p);
+            lv_indev_get_point(param, &p);
             btn_pr = lv_btnm_get_btn_from_point(btnm, &p);
             /*Invalidate to old and the new areas*/;
             lv_obj_get_cords(btnm, &btnm_area);
             if(btn_pr != ext->btn_pr) {
-                lv_dispi_reset_lpr(param);
+                lv_indev_reset_lpr(param);
                 if(ext->btn_pr != LV_BTNM_PR_NONE) {
                     area_cpy(&btn_area, &ext->btn_areas[ext->btn_pr]);
                     btn_area.x1 += btnm_area.x1;

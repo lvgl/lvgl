@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_hal/lv_hal_disp.h"
 #include "lv_draw_rbasic.h"
 #include "lv_conf.h"
-#include "../hal/disp/hal_disp.h"
 #include "misc/gfx/font.h"
 
 /*********************
@@ -74,10 +74,9 @@ void lv_rfill(const area_t * cords_p, const area_t * mask_p,
         area_set(&scr_area, 0, 0, LV_HOR_RES - 1, LV_VER_RES - 1);
         union_ok = area_union(&masked_area, cords_p, &scr_area);
     }
-        
     
     if(union_ok != false){
-    	//TODO disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
+    	lv_disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
     }
 }
 
@@ -192,7 +191,7 @@ void lv_rmap(const area_t * cords_p, const area_t * mask_p,
         cord_t row;
         cord_t mask_w = area_get_width(&masked_a) - 1;
         for(row = 0; row < area_get_height(&masked_a); row++) {
-            //TODO disp_map(masked_a.x1, masked_a.y1 + row, masked_a.x1 + mask_w, masked_a.y1 + row, map_p);
+            lv_disp_map(masked_a.x1, masked_a.y1 + row, masked_a.x1 + mask_w, masked_a.y1 + row, map_p);
 
             map_p += map_width;
         }

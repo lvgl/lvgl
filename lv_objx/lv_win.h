@@ -97,10 +97,10 @@ lv_obj_t * lv_win_add_cbtn(lv_obj_t * win, const char * img_path, lv_action_t re
 /**
  * A release action which can be assigned to a window control button to close it
  * @param btn pointer to the released button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller input device
  * @return always LV_ACTION_RES_INV because the button is deleted with the window
  */
-lv_action_res_t lv_win_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+lv_action_res_t lv_win_close_action(lv_obj_t * btn);
 
 /**
  * Set the title of a window

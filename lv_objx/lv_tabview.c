@@ -31,9 +31,9 @@ static bool lv_tab_design(lv_obj_t * tab, const area_t * mask, lv_design_mode_t 
 static bool tabpage_signal(lv_obj_t * tab_page, lv_signal_t sign, void * param);
 static bool tabscrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void * param);
 
-static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv_dispi_t * dispi);
-static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv_dispi_t * dispi);
-static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv_dispi_t * dispi);
+static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage);
+static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage);
+static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage);
 static lv_action_res_t tab_btnm_action(lv_obj_t * tab_btnm, uint16_t id);
 
 /**********************
@@ -439,13 +439,13 @@ static bool tabpage_signal(lv_obj_t * tab_page, lv_signal_t sign, void * param)
         lv_obj_t * cont = lv_obj_get_parent(tab_page);
         lv_obj_t * tab = lv_obj_get_parent(cont);
         if(sign == LV_SIGNAL_PRESSED) {
-            tabpage_pressed_hadler(tab, tab_page, param);
+            tabpage_pressed_hadler(tab, tab_page);
         }
         else if(sign == LV_SIGNAL_PRESSING) {
-            tabpage_pressing_hadler(tab, tab_page, param);
+            tabpage_pressing_hadler(tab, tab_page);
         }
         else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-            tabpage_press_lost_hadler(tab, tab_page, param);
+            tabpage_press_lost_hadler(tab, tab_page);
         }
 
     }
@@ -473,13 +473,13 @@ static bool tabscrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void * param)
         lv_obj_t * cont = lv_obj_get_parent(tab_page);
         lv_obj_t * tab = lv_obj_get_parent(cont);
         if(sign == LV_SIGNAL_PRESSED) {
-            tabpage_pressed_hadler(tab, tab_page, param);
+            tabpage_pressed_hadler(tab, tab_page);
         }
         else if(sign == LV_SIGNAL_PRESSING) {
-            tabpage_pressing_hadler(tab, tab_page, param);
+            tabpage_pressing_hadler(tab, tab_page);
         }
         else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-            tabpage_press_lost_hadler(tab, tab_page, param);
+            tabpage_press_lost_hadler(tab, tab_page);
         }
 
     }
@@ -491,34 +491,34 @@ static bool tabscrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void * param)
  * Called when a tab's page or scrollable object is pressed
  * @param tabview pointer to the tab view object
  * @param tabpage pointer to the page of a tab
- * @param dispi pointer to the caller dispi
  */
-static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv_dispi_t * dispi)
+static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext(tabview);
-    lv_dispi_get_point(dispi, &ext->point_last);
+    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_get_point(indev, &ext->point_last);
 }
 
 /**
  * Called when a tab's page or scrollable object is being pressed
  * @param tabview pointer to the tab view object
  * @param tabpage pointer to the page of a tab
- * @param dispi pointer to the caller dispi
  */
-static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv_dispi_t * dispi)
+static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext(tabview);
+    lv_indev_t * indev = lv_indev_get_act();
     point_t point_act;
-    lv_dispi_get_point(dispi, &point_act);
+    lv_indev_get_point(indev, &point_act);
     cord_t x_diff = point_act.x - ext->point_last.x;
     cord_t y_diff = point_act.y - ext->point_last.y;
 
     if(ext->draging == 0) {
-        if(x_diff >= LV_DISPI_DRAG_LIMIT || x_diff<= -LV_DISPI_DRAG_LIMIT) {
+        if(x_diff >= LV_indev_proc_DRAG_LIMIT || x_diff<= -LV_indev_proc_DRAG_LIMIT) {
             ext->drag_h = 1;
             ext->draging = 1;
             lv_obj_set_drag(lv_page_get_scrl(tabpage), false);
-        } else if(y_diff >= LV_DISPI_DRAG_LIMIT || y_diff <= -LV_DISPI_DRAG_LIMIT) {
+        } else if(y_diff >= LV_indev_proc_DRAG_LIMIT || y_diff <= -LV_indev_proc_DRAG_LIMIT) {
             ext->drag_h = 0;
             ext->draging = 1;
         }
@@ -542,9 +542,8 @@ static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv_d
  * Called when a tab's page or scrollable object is released or the press id lost
  * @param tabview pointer to the tab view object
  * @param tabpage pointer to the page of a tab
- * @param dispi pointer to the caller dispi
  */
-static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv_dispi_t * dispi)
+static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext(tabview);
     ext->drag_h = 0;
@@ -552,14 +551,15 @@ static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage, lv
 
     lv_obj_set_drag(lv_page_get_scrl(tabpage), true);
 
+    lv_indev_t * indev = lv_indev_get_act();
     point_t point_act;
-    lv_dispi_get_point(dispi, &point_act);
+    lv_indev_get_point(indev, &point_act);
     cord_t x_diff = point_act.x - ext->point_last.x;
     cord_t x_predict = 0;
 
     while(x_diff != 0)   {
         x_predict += x_diff;
-        x_diff = x_diff * (100 - LV_DISPI_DRAG_THROW) / 100;
+        x_diff = x_diff * (100 - LV_indev_proc_DRAG_THROW) / 100;
     }
 
 

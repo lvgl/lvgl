@@ -24,7 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_mode_t mode);
-static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
+static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * indev);
 
 /**********************
  *  STATIC VARIABLES
@@ -223,6 +223,7 @@ static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
+        lv_indev_t * indev = lv_indev_get_act();
         int32_t id = -1;
         lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
         lv_roller_ext_t * ext = lv_obj_get_ext(roller);
@@ -241,9 +242,9 @@ static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * 
         }
         else if(sign == LV_SIGNAL_RELEASED) {
             /*If picked an option by clicking then set it*/
-            if(!lv_dispi_is_dragging(param)) {
+            if(!lv_indev_is_dragging(indev)) {
                 point_t p;
-                lv_dispi_get_point(param, &p);
+                lv_indev_get_point(indev, &p);
                 p.y = p.y - ext->ddlist.opt_label->cords.y1;
                 id = p.y / (font_h + style_label->line_space);
                 if(id < 0) id = 0;

@@ -2,15 +2,17 @@
  * @file lv_vdraw.c
  * 
  */
+
+#include "lv_conf.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
-#include "lv_conf.h"
+#include "../lv_hal/lv_hal_disp.h"
 #include "misc/gfx/area.h"
 #include "misc/gfx/font.h"
 #include "misc/gfx/color.h"
-#include "../hal/disp/hal_disp.h"
 
 #if LV_VDB_SIZE != 0
 
@@ -131,7 +133,7 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
 	}
     cord_t row;
     for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
-    	disp_color_cpy(&vdb_buf_tmp[vdb_rel_a.x1], color_map, map_width, opa);
+    	lv_disp_color_cpy(&vdb_buf_tmp[vdb_rel_a.x1], color_map, map_width, opa);
     	vdb_buf_tmp += vdb_width;
     }
 #endif
@@ -324,7 +326,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
 #if DISP_HW_ACC == 0
             	sw_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
 #else
-            	disp_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+            	lv_disp_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
 #endif
                 map_p += map_width;               /*Next row on the map*/
                 vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/

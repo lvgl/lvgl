@@ -135,7 +135,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
             }
         } else if(sign == LV_SIGNAL_LONG_PRESS) {
             lv_mbox_start_auto_close(mbox, 0);
-            lv_dispi_wait_release(param);
+            lv_indev_wait_release(param);
             valid = false;
         } else if(sign == LV_SIGNAL_STYLE_CHG) {
             /*Refresh all the buttons*/
@@ -229,7 +229,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                    if(btn != NULL) {
                        lv_action_t rel_action;
                        rel_action = lv_btn_get_rel_action(btn);
-                       if(rel_action != NULL) rel_action(btn, NULL);
+                       if(rel_action != NULL) rel_action(btn);
                    }
                }
             }
@@ -242,10 +242,9 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 /**
  * A release action which can be assigned to a message box button to close it
  * @param btn pointer to the released button
- * @param dispi pointer to the caller display input
  * @return always lv_action_res_t because the button is deleted with the mesage box
  */
-lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi)
+lv_action_res_t lv_mbox_close_action(lv_obj_t * btn)
 {
     lv_obj_t * mbox = lv_mbox_get_from_btn(btn);
 

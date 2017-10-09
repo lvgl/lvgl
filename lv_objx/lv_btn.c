@@ -131,9 +131,9 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             }
 
             ext->lpr_exec = 0;
-            /*Call the press action, 'param' is the caller dispi*/
+            /*Call the press action, 'param' is the caller indev_proc*/
             if(ext->pr_action != NULL && state != LV_BTN_STATE_INA) {
-                valid = ext->pr_action(btn, param);
+                valid = ext->pr_action(btn);
             }
         }
         else if(sign ==  LV_SIGNAL_PRESS_LOST) {
@@ -143,7 +143,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         }
         else if(sign == LV_SIGNAL_PRESSING) {
             /*When the button begins to drag revert pressed states to released*/
-            if(lv_dispi_is_dragging(param) != false) {
+            if(lv_indev_is_dragging(param) != false) {
                 if(ext->state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 else if(ext->state == LV_BTN_STATE_TPR) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
             }
@@ -151,7 +151,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         else if(sign == LV_SIGNAL_RELEASED) {
             /*If not dragged and it was not long press action then
              *change state and run the action*/
-            if(lv_dispi_is_dragging(param) == false && ext->lpr_exec == 0) {
+            if(lv_indev_is_dragging(param) == false && ext->lpr_exec == 0) {
                 if(ext->state == LV_BTN_STATE_PR && tgl == false) {
                     lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 } else if(ext->state == LV_BTN_STATE_TPR && tgl == false) {
@@ -163,7 +163,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 }
 
                 if(ext->rel_action != NULL && state != LV_BTN_STATE_INA) {
-                    valid = ext->rel_action(btn, param);
+                    valid = ext->rel_action(btn);
                 }
             } else { /*If dragged change back the state*/
                 if(ext->state == LV_BTN_STATE_PR) {
@@ -174,16 +174,14 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             }
         }
         else if(sign == LV_SIGNAL_LONG_PRESS) {
-                /*Call the long press action, 'param' is the caller dispi*/
                 if(ext->lpr_action != NULL && state != LV_BTN_STATE_INA) {
                 	ext->lpr_exec = 1;
-                	valid = ext->lpr_action(btn, param);
+                	valid = ext->lpr_action(btn);
                 }
         }
         else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-            /*Call the release action, 'param' is the caller dispi*/
             if(ext->lpr_rep_action != NULL && state != LV_BTN_STATE_INA) {
-                valid = ext->lpr_rep_action(btn, param);
+                valid = ext->lpr_rep_action(btn);
             }
         }  else if(sign == LV_SIGNAL_CONTROLL) {
             lv_btn_ext_t * ext = lv_obj_get_ext(btn);
@@ -191,12 +189,12 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
                 if(lv_btn_get_tgl(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_TREL);
                 if(ext->rel_action != NULL && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                    valid = ext->rel_action(btn, param);
+                    valid = ext->rel_action(btn);
                 }
             } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
                 if(lv_btn_get_tgl(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 if(ext->rel_action != NULL && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                    valid = ext->rel_action(btn, param);
+                    valid = ext->rel_action(btn);
                 }
             } else if(c == LV_GROUP_KEY_ENTER) {
                 if(lv_btn_get_tgl(btn) != false) {
@@ -207,7 +205,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                     else if(state == LV_BTN_STATE_TPR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
                 }
                 if(ext->rel_action != NULL && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                    valid = ext->rel_action(btn, param);
+                    valid = ext->rel_action(btn);
                 }
             }
         }

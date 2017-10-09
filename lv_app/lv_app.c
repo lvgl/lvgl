@@ -36,15 +36,15 @@ static void lv_app_init_desktop(void);
 
 /*Actions*/
 #if LV_APP_DESKTOP != 0
-static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * dispi);
-static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_dispi_t * dispi);
-static lv_action_res_t lv_app_sc_page_rel_action(lv_obj_t * sc, lv_dispi_t * dispi);
+static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t lv_app_sc_page_rel_action(lv_obj_t * sc, lv_indev_proc_t * indev_proc);
 #endif
-static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi);
-static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_dispi_t * dispi);
-static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t * dispi);
-static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_dispi_t * dispi);
-static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * dispi);
+static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_indev_proc_t * indev_proc);
+static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_indev_proc_t * indev_proc);
+static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_indev_proc_t * indev_proc);
 
 static lv_action_res_t lv_app_win_open_anim_create(lv_app_inst_t * app);
 static lv_action_res_t lv_app_win_minim_anim_create(lv_app_inst_t * app);
@@ -569,10 +569,10 @@ static void lv_app_init_desktop(void)
 /**
  * Called when the "Apps" button is released to open or close the app. list
  * @param app_btn pointer to the "Apps" button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the "Apps" button is never deleted
  */
-static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_indev_proc_t * indev_proc)
 {
 	/*Close the list if opened*/
 	if(app_list != NULL) {
@@ -603,10 +603,10 @@ static lv_action_res_t lv_app_menu_rel_action(lv_obj_t * app_btn, lv_dispi_t * d
 /**
  * Called when an element of the app list is released
  * @param app_elem_btn pointer to an element of app list
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_INV because the list is dleted on release
  */
-static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_indev_proc_t * indev_proc)
 {
 	lv_app_dsc_t * dsc = lv_obj_get_free_p(app_elem_btn);
 
@@ -630,10 +630,10 @@ static lv_action_res_t lv_app_menu_elem_rel_action(lv_obj_t * app_elem_btn, lv_d
  * Called when the shortcut page is released to hide the app list and/or
  * go back from connection mode
  * @param page pointer to the sc page
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the sc page is not deleted
  */
-static lv_action_res_t lv_app_sc_page_rel_action(lv_obj_t * page, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_sc_page_rel_action(lv_obj_t * page, lv_indev_proc_t * indev_proc)
 {
 	/*Close the list if opened*/
 	if(app_list != NULL) {
@@ -657,10 +657,10 @@ static lv_action_res_t lv_app_sc_page_rel_action(lv_obj_t * page, lv_dispi_t * d
  * Called when a shortcut is released to open its window (or close app list if opened) (in normal mode) or
  * add/remove it to/form a connection (in connection mode)
  * @param sc pointer to the releases shortcut object
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the sc page is not deleted
  */
-static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_indev_proc_t * indev_proc)
 {
     /*Normal mode*/
     if(con_send == NULL) {
@@ -707,10 +707,10 @@ static lv_action_res_t lv_app_sc_rel_action(lv_obj_t * sc, lv_dispi_t * dispi)
 /**
  * Called when a shortcut id long pressed to toggle normal and connection mode
  * @param sc pointer to the long presse shortcut
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK because the shortcut is not deleted
  */
-static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_indev_proc_t * indev_proc)
 {
     lv_app_inst_t * app_send = lv_obj_get_free_p(sc);
 
@@ -748,10 +748,10 @@ static lv_action_res_t lv_app_sc_lpr_action(lv_obj_t * sc, lv_dispi_t * dispi)
 /**
  * Called when the close button of window is released
  * @param close_btn pointer to the close button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK or LV_ACTION_RES_INC depending on LV_APP_EFFECT_... settings type
  */
-static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_indev_proc_t * indev_proc)
 {
 	lv_obj_t * win = lv_win_get_from_cbtn(close_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
@@ -783,10 +783,10 @@ static lv_action_res_t lv_app_win_close_action(lv_obj_t * close_btn, lv_dispi_t 
 /**
  * Called when the minimization button of window is released
  * @param minim_btn pointer to the minim. button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK or LV_ACTION_RES_INC depending on LV_APP_EFFECT_... settings type
  */
-static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_indev_proc_t * indev_proc)
 {
 	lv_obj_t * win = lv_win_get_from_cbtn(minim_btn);
 	lv_app_inst_t * app = lv_obj_get_free_p(win);
@@ -803,10 +803,10 @@ static lv_action_res_t lv_app_win_minim_action(lv_obj_t * minim_btn, lv_dispi_t 
 /**
  * Open the settings of an application in a window (use the set_open function of the application)
  * @param set_btn pointer to the settings button
- * @param dispi pointer to the caller display input
+ * @param indev_proc pointer to the caller display input
  * @return always LV_ACTION_RES_OK because the button is not deleted here
  */
-static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_dispi_t * dispi)
+static lv_action_res_t lv_app_win_conf_action(lv_obj_t * set_btn, lv_indev_proc_t * indev_proc)
 {
     /*Close the app list if opened*/
     if(app_list != NULL) {

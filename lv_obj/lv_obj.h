@@ -79,7 +79,7 @@ typedef enum
     LV_SIGNAL_STYLE_CHG,
 	LV_SIGNAL_REFR_EXT_SIZE,
 
-	/*Display input related*/
+	/*Input device related*/
     LV_SIGNAL_PRESSED,
     LV_SIGNAL_PRESSING,
     LV_SIGNAL_PRESS_LOST,
@@ -117,7 +117,7 @@ typedef struct __LV_OBJ_T
     void * group_p;             /*Pointer to the group of the object*/
 
     /*Attributes and states*/
-    uint8_t click_en     :1;    /*1: Can be pressed by a display input device*/
+    uint8_t click_en     :1;    /*1: Can be pressed by an input device*/
     uint8_t drag_en      :1;    /*1: Enable the dragging*/
     uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
     uint8_t drag_parent  :1;    /*1: Parent will be dragged instead*/

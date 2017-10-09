@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #include "lv_cont.h"
-#include "../lv_obj/lv_dispi.h"
+#include "../lv_obj/lv_indev.h"
 
 /*********************
  *      DEFINES

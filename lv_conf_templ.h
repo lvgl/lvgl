@@ -38,12 +38,12 @@
    Misc. setting
  *=================*/
 /*Display Input settings*/
-#define LV_DISPI_READ_PERIOD      50                    /*Input device read period milliseconds*/
-#define LV_DISPI_TP_MARKER        0                     /*Mark the pressed points (Value means marker point size)*/
-#define LV_DISPI_DRAG_LIMIT       (10 * LV_DOWNSCALE)   /*Drag threshold in pixels */
-#define LV_DISPI_DRAG_THROW       20                    /*Drag throw slow-down in [%]. Greater value means faster slow-down */
-#define LV_DISPI_LONG_PRESS_TIME        400             /*Long press time in milliseconds*/
-#define LV_DISPI_LONG_PRESS_REP_TIME    100             /*Repeated trigger period in long press [ms] */
+#define LV_indev_proc_READ_PERIOD      50                    /*Input device read period milliseconds*/
+#define LV_indev_proc_TP_MARKER        0                     /*Mark the pressed points (Value means marker point size)*/
+#define LV_indev_proc_DRAG_LIMIT       (10 * LV_DOWNSCALE)   /*Drag threshold in pixels */
+#define LV_indev_proc_DRAG_THROW       20                    /*Drag throw slow-down in [%]. Greater value means faster slow-down */
+#define LV_indev_proc_LONG_PRESS_TIME        400             /*Long press time in milliseconds*/
+#define LV_indev_proc_LONG_PRESS_REP_TIME    100             /*Repeated trigger period in long press [ms] */
 
 /*lv_obj (base object) settings*/
 #define LV_OBJ_FREE_NUM          1           /*Enable the free number attribute*/

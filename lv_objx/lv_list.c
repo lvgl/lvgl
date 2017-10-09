@@ -189,7 +189,7 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                 if(btn != NULL) {
                     lv_action_t rel_action;
                     rel_action = lv_btn_get_rel_action(btn);
-                    if(rel_action != NULL) rel_action(btn, NULL);
+                    if(rel_action != NULL) rel_action(btn);
                 }
             }
         }

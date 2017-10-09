@@ -79,10 +79,9 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 /**
  * A release action which can be assigned to a message box button to close it
  * @param btn pointer to the released button
- * @param dispi pointer to the caller display input
  * @return always lv_action_res_t because the button is deleted with the mesage box
  */
-lv_action_res_t lv_mbox_close_action(lv_obj_t * btn, lv_dispi_t * dispi);
+lv_action_res_t lv_mbox_close_action(lv_obj_t * btn);
 
 /**
  * Add a button to the message box
