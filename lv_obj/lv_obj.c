@@ -14,7 +14,6 @@
 #include "../lv_draw/lv_draw_rbasic.h"
 #include "lv_refr.h"
 #include "lv_group.h"
-#include "../lv_app/lv_app.h"
 #include "misc/gfx/anim.h"
 #include <stdint.h>
 #include <string.h>

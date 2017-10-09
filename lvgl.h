@@ -44,8 +44,6 @@ extern "C" {
 #include "lv_objx/lv_sw.h"
 #include "lv_objx/lv_kb.h"
 
-#include "lv_app/lv_app.h"
-
 /*********************
  *      DEFINES
  *********************/
