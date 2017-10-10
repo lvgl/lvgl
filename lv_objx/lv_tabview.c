@@ -514,11 +514,11 @@ static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
     cord_t y_diff = point_act.y - ext->point_last.y;
 
     if(ext->draging == 0) {
-        if(x_diff >= LV_indev_proc_DRAG_LIMIT || x_diff<= -LV_indev_proc_DRAG_LIMIT) {
+        if(x_diff >= LV_INDEV_DRAG_LIMIT || x_diff<= -LV_INDEV_DRAG_LIMIT) {
             ext->drag_h = 1;
             ext->draging = 1;
             lv_obj_set_drag(lv_page_get_scrl(tabpage), false);
-        } else if(y_diff >= LV_indev_proc_DRAG_LIMIT || y_diff <= -LV_indev_proc_DRAG_LIMIT) {
+        } else if(y_diff >= LV_INDEV_DRAG_LIMIT || y_diff <= -LV_INDEV_DRAG_LIMIT) {
             ext->drag_h = 0;
             ext->draging = 1;
         }
@@ -559,7 +559,7 @@ static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 
     while(x_diff != 0)   {
         x_predict += x_diff;
-        x_diff = x_diff * (100 - LV_indev_proc_DRAG_THROW) / 100;
+        x_diff = x_diff * (100 - LV_INDEV_DRAG_THROW) / 100;
     }
 
 

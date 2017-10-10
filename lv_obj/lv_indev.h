@@ -3,8 +3,8 @@
  * 
  */
 
-#ifndef LV_indev_proc_H
-#define LV_indev_proc_H
+#ifndef LV_INDEV_H
+#define LV_INDEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +39,7 @@ typedef lv_action_res_t ( * lv_action_t) (struct __LV_OBJ_T * obj);
 /**
  * Initialize the display input subsystem
  */
-void lv_indev_proc_init(void);
+void lv_indev_init(void);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -57,6 +57,13 @@ void lv_indev_reset(lv_indev_t * indev);
  * @param indev_proc pointer to a display input
  */
 void lv_indev_reset_lpr(lv_indev_t * indev_proc);
+
+/**
+ * Enable input devices device by type
+ * @param indev pointer to an input device
+ * @param cur_obj pointer to an object to be used as cursor
+ */
+void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj);
 
 /**
  * Get the last point on display input
@@ -94,4 +101,4 @@ void lv_indev_wait_release(lv_indev_t * indev_proc);
 } /* extern "C" */
 #endif
 
-#endif  /*LV_indev_proc_H*/
+#endif  /*LV_INDEV_H*/

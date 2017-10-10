@@ -25,6 +25,7 @@
 /*********************
  *      DEFINES
  *********************/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -43,6 +44,8 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
  **********************/
 static lv_obj_t * def_scr = NULL;
 static lv_obj_t * act_scr = NULL;
+static lv_obj_t * top_layer = NULL;
+static lv_obj_t * sys_layer = NULL;
 static ll_dsc_t scr_ll;
 
 #ifdef LV_IMG_DEF_WALLPAPER
@@ -86,12 +89,18 @@ void lv_init(void)
 #endif
     act_scr = def_scr;
     
+    top_layer = lv_obj_create(NULL, NULL);
+    lv_obj_set_style(top_layer, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+
+    sys_layer = lv_obj_create(NULL, NULL);
+    lv_obj_set_style(sys_layer, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+
     /*Refresh the screen*/
     lv_obj_inv(act_scr);
     
-#if LV_indev_proc_READ_PERIOD != 0
+#if LV_INDEV_READ_PERIOD != 0
     /*Init the input device handling*/
-    lv_indev_proc_init();
+    lv_indev_init();
 #endif
 
     /*Initialize the application level*/
@@ -354,8 +363,10 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 void lv_obj_inv(lv_obj_t * obj)
 {
     /*Invalidate the object only if it belongs to the 'act_scr'*/
-    lv_obj_t * act_scr_p = lv_scr_act();
-    if(lv_obj_get_scr(obj) == act_scr_p) {
+    lv_obj_t * obj_scr = lv_obj_get_scr(obj);
+    if(obj_scr == lv_scr_act() ||
+       obj_scr == lv_top_layer() ||
+       obj_scr == lv_sys_layer()) {
         /*Truncate recursively to the parents*/
         area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
@@ -376,7 +387,7 @@ void lv_obj_inv(lv_obj_t * obj)
             par = lv_obj_get_parent(par);
         }
 
-        if(union_ok != false)  lv_inv_area(&area_trunc);
+        if(union_ok != false) lv_inv_area(&area_trunc);
     }
 }
 
@@ -1090,11 +1101,30 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
 
 /**
  * Return with the actual screen
- * @return pointer to to the actual screen object
+ * @return pointer to the actual screen object
  */
 lv_obj_t * lv_scr_act(void)
 {
     return act_scr;
+}
+
+/**
+ * Return with the top layer. (Same on every screen and it is above the normal screen layer)
+ * @return pointer to the top layer object  (transparent screen sized lv_obj)
+ */
+lv_obj_t * lv_top_layer(void)
+{
+    return top_layer;
+}
+
+/**
+ * Return with the system layer. (Same on every screen and it is above the all other layers)
+ * It is used for example by the cursor
+ * @return pointer to the system layer object (transparent screen sized lv_obj)
+ */
+lv_obj_t * lv_sys_layer(void)
+{
+    return sys_layer;
 }
 
 /**
@@ -1269,6 +1299,9 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
         }
     }
 #endif
+
+    if(style_act == NULL) style_act = lv_style_get(LV_STYLE_PLAIN, NULL);
+
     return style_act;
 }
 

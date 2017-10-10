@@ -51,30 +51,15 @@ static lv_indev_t *indev_act;
 /**
  * Initialize the display input device subsystem
  */
-void lv_indev_proc_init(void)
+void lv_indev_init(void)
 {
-#if LV_indev_proc_READ_PERIOD != 0
-    indev_proc_task_p = ptask_create(indev_proc_task, LV_indev_proc_READ_PERIOD, PTASK_PRIO_MID, NULL);
+#if LV_INDEV_READ_PERIOD != 0
+    indev_proc_task_p = ptask_create(indev_proc_task, LV_INDEV_READ_PERIOD, PTASK_PRIO_MID, NULL);
 #else
     indev_proc_task_p = ptask_create(indev_proc_task, 1, PTASK_PRIO_OFF); /*Not use lv_indev_proc*/
 #endif
 
     lv_indev_reset(NULL);   /*Reset all input devices*/
-}
-
-/**
- * Enable input devices device by type
- * @param type Input device type
- * @param enable true: enable this type; false: disable this type
- */
-void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
-{
-    lv_indev_t *i = lv_indev_next(NULL);
-
-    while (i) {
-        if (i->drv.type == type) i->state.disable = enable == false ? 1 : 0;
-        i = lv_indev_next(i);
-    }
 }
 
 /**
@@ -112,6 +97,34 @@ void lv_indev_reset_lpr(lv_indev_t * indev_proc)
     indev_proc->state.lpr_rep_time_stamp = lv_tick_get();
     indev_proc->state.press_time_stamp = lv_tick_get();
 }
+
+/**
+ * Enable input devices device by type
+ * @param type Input device type
+ * @param enable true: enable this type; false: disable this type
+ */
+void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
+{
+    lv_indev_t *i = lv_indev_next(NULL);
+
+    while (i) {
+        if (i->drv.type == type) i->state.disable = enable == false ? 1 : 0;
+        i = lv_indev_next(i);
+    }
+}
+
+/**
+ * Enable input devices device by type
+ * @param indev pointer to an input device
+ * @param cur_obj pointer to an object to be used as cursor
+ */
+void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
+{
+    indev->cursor = cur_obj;
+    lv_obj_set_parent(indev->cursor, lv_sys_layer());
+    lv_obj_set_pos(indev->cursor, indev->state.act_point.x,  indev->state.act_point.y);
+}
+
 
 /**
  * Get the last point of an input device
@@ -186,9 +199,16 @@ static void indev_proc_task(void * param)
 
         lv_indev_get(i, &data);
         i->state.pressed = data.state;
+
+        if(i->cursor != NULL &&
+           (i->state.last_point.x != data.point.x ||
+            i->state.last_point.y != data.point.y))
+        {
+            lv_obj_set_pos_us(i->cursor, data.point.x, data.point.y);
+        }
+
+
         indev_proc_point(&i->state, data.point.x , data.point.y);
-
-
 
         i = lv_indev_next(i);
     }
@@ -213,19 +233,18 @@ static void indev_proc_point(lv_indev_state_t * indev, cord_t x, cord_t y)
 #endif
     
     if(indev->pressed != false){
-#if LV_indev_proc_TP_MARKER != 0
+#if LV_INDEV_TP_MARKER != 0
         area_t area;
-        area.x1 = x - (LV_indev_proc_TP_MARKER >> 1);
-        area.y1 = y - (LV_indev_proc_TP_MARKER >> 1);
-        area.x2 = x + ((LV_indev_proc_TP_MARKER >> 1) | 0x1);
-        area.y2 = y + ((LV_indev_proc_TP_MARKER >> 1) | 0x1);
+        area.x1 = x - (LV_INDEV_TP_MARKER >> 1);
+        area.y1 = y - (LV_INDEV_TP_MARKER >> 1);
+        area.x2 = x + ((LV_INDEV_TP_MARKER >> 1) | 0x1);
+        area.y2 = y + ((LV_INDEV_TP_MARKER >> 1) | 0x1);
         lv_rfill(&area, NULL, COLOR_MAKE(0xFF, 0, 0), OPA_COVER);
 #endif
         indev_proc_press(indev);
     } else {
         disi_proc_release(indev);
     }
-    
     
     indev->last_point.x = indev->act_point.x;
     indev->last_point.y = indev->act_point.y;
@@ -315,7 +334,7 @@ static void indev_proc_press(lv_indev_state_t * state)
             /*If there is no drag then check for long press time*/
             if(state->drag_in_prog == 0 && state->long_press_sent == 0) {
                 /*Send a signal about the long press if enough time elapsed*/
-                if(lv_tick_elaps(state->press_time_stamp) > LV_indev_proc_LONG_PRESS_TIME) {
+                if(lv_tick_elaps(state->press_time_stamp) > LV_INDEV_LONG_PRESS_TIME) {
                     pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
 
                     /*Mark the signal sending to do not send it again*/
@@ -328,7 +347,7 @@ static void indev_proc_press(lv_indev_state_t * state)
             /*Send long press repeated signal*/
             if(state->drag_in_prog == 0 && state->long_press_sent == 1) {
             	/*Send a signal about the long press repeate if enough time elapsed*/
-				if(lv_tick_elaps(state->lpr_rep_time_stamp) > LV_indev_proc_LONG_PRESS_REP_TIME) {
+				if(lv_tick_elaps(state->lpr_rep_time_stamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
 					pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
                     state->lpr_rep_time_stamp = lv_tick_get();
 
@@ -432,8 +451,8 @@ static void indev_drag(lv_indev_state_t * state)
         state->vect_sum.y += state->vect.y;
         
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if(MATH_ABS(state->vect_sum.x) >= LV_indev_proc_DRAG_LIMIT ||
-           MATH_ABS(state->vect_sum.y) >= LV_indev_proc_DRAG_LIMIT)
+        if(MATH_ABS(state->vect_sum.x) >= LV_INDEV_DRAG_LIMIT ||
+           MATH_ABS(state->vect_sum.y) >= LV_INDEV_DRAG_LIMIT)
            {
                 state->drag_range_out = 1;
            }
@@ -490,8 +509,8 @@ static void indev_drag_throw(lv_indev_state_t * state)
     }
     
     /*Reduce the vectors*/
-    state->vect.x = state->vect.x * (100 -LV_indev_proc_DRAG_THROW) / 100;
-    state->vect.y = state->vect.y * (100 -LV_indev_proc_DRAG_THROW) / 100;
+    state->vect.x = state->vect.x * (100 -LV_INDEV_DRAG_THROW) / 100;
+    state->vect.y = state->vect.y * (100 -LV_INDEV_DRAG_THROW) / 100;
     
     if(state->vect.x != 0 ||
        state->vect.y != 0)

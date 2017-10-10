@@ -315,6 +315,11 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
     /*Do the refreshing from the top object*/
     lv_refr_make(top_p, &start_mask);
 
+    /*Also refresh top and sys layer unconditionally*/
+    lv_refr_make(lv_top_layer(), &start_mask);
+    lv_refr_make(lv_sys_layer(), &start_mask);
+
+
     /*Flush the content of the VDB*/ 
     lv_vdb_flush();
 }

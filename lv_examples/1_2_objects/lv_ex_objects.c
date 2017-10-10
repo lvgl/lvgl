@@ -73,8 +73,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static  lv_action_res_t btn_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
-static  lv_action_res_t ddlist_action(lv_obj_t * ddlist, lv_indev_proc_t * indev_proc);
+static  lv_action_res_t btn_rel_action(lv_obj_t * btn, LV_INDEV_t * indev_proc);
+static  lv_action_res_t ddlist_action(lv_obj_t * ddlist, LV_INDEV_t * indev_proc);
 
 /**********************
  *  STATIC VARIABLES
@@ -190,7 +190,7 @@ void lv_ex_objects(void)
  * @param indev_proc pointer to caller display input (e.g. touchpad)
  * @return LV_ACTION_RES_OK because the object is not deleted in this function
  */
-static  lv_action_res_t btn_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static  lv_action_res_t btn_rel_action(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     /*Increase the button width*/
     cord_t width = lv_obj_get_width(btn);
@@ -205,7 +205,7 @@ static  lv_action_res_t btn_rel_action(lv_obj_t * btn, lv_indev_proc_t * indev_p
  * @param indev_proc pointer to caller display input (e.g. touchpad)
  * @return LV_ACTION_RES_OK because the object is not deleted in this function
  */
-static  lv_action_res_t ddlist_action(lv_obj_t * ddlist, lv_indev_proc_t * indev_proc)
+static  lv_action_res_t ddlist_action(lv_obj_t * ddlist, LV_INDEV_t * indev_proc)
 {
     uint16_t opt = lv_ddlist_get_selected(ddlist);      /*Get the id of selected option*/
 

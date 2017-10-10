@@ -51,13 +51,13 @@
  **********************/
 static void gui_create(void);
 static void enc_create(void);
-static lv_action_res_t mbox_yes_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
-static lv_action_res_t mbox_no_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
-static lv_action_res_t enable_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
-static lv_action_res_t enc_next(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
-static lv_action_res_t enc_inc(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
-static lv_action_res_t enc_dec(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
-static lv_action_res_t enc_sel(lv_obj_t * btn, lv_indev_proc_t * indev_proc);
+static lv_action_res_t mbox_yes_action(lv_obj_t * btn, LV_INDEV_t * indev_proc);
+static lv_action_res_t mbox_no_action(lv_obj_t * btn, LV_INDEV_t * indev_proc);
+static lv_action_res_t enable_action(lv_obj_t * btn, LV_INDEV_t * indev_proc);
+static lv_action_res_t enc_next(lv_obj_t * btn, LV_INDEV_t * indev_proc);
+static lv_action_res_t enc_inc(lv_obj_t * btn, LV_INDEV_t * indev_proc);
+static lv_action_res_t enc_dec(lv_obj_t * btn, LV_INDEV_t * indev_proc);
+static lv_action_res_t enc_sel(lv_obj_t * btn, LV_INDEV_t * indev_proc);
 
 /**********************
  *  STATIC VARIABLES
@@ -196,7 +196,7 @@ static void enc_create(void)
  * @param indev_proc pointer to the caller display input or NULL if the encoder used
  * @return LV_ACTION_RES_OK: because the button is not deleted
  */
-static lv_action_res_t enable_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static lv_action_res_t enable_action(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     /*If the butto nsi released the show message box to be sure about the Enable*/
     if(lv_btn_get_state(btn) == LV_BTN_STATE_REL) {
@@ -238,7 +238,7 @@ static lv_action_res_t enable_action(lv_obj_t * btn, lv_indev_proc_t * indev_pro
  * @param indev_proc pointer to the caller display input or NULL if the encoder used
  * @return LV_ACTION_RES_INV: because the button along with the message box will be deleted
  */
-static lv_action_res_t mbox_yes_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static lv_action_res_t mbox_yes_action(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     lv_group_focus_freeze(g, false);        /*Release the freeze*/
     lv_obj_t * mbox = lv_mbox_get_from_btn(btn);
@@ -259,7 +259,7 @@ static lv_action_res_t mbox_yes_action(lv_obj_t * btn, lv_indev_proc_t * indev_p
  * @param indev_proc pointer to the caller display input or NULL if the encoder used
  * @return LV_ACTION_RES_INV: because the button along with the message box will be deleted
  */
-static lv_action_res_t mbox_no_action(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static lv_action_res_t mbox_no_action(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     lv_group_focus_freeze(g, false);        /*Release the freeze*/
     lv_obj_t * mbox = lv_mbox_get_from_btn(btn);
@@ -274,7 +274,7 @@ static lv_action_res_t mbox_no_action(lv_obj_t * btn, lv_indev_proc_t * indev_pr
  * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
  */
-static lv_action_res_t enc_next(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static lv_action_res_t enc_next(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     /*Focus on the next object in the group*/
     lv_group_focus_next(g);
@@ -288,7 +288,7 @@ static lv_action_res_t enc_next(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
  * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
  */
-static lv_action_res_t enc_inc(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static lv_action_res_t enc_inc(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     /* Send RIGHT key when rotate to right.
      * It will trigger an increment like action in the object */
@@ -302,7 +302,7 @@ static lv_action_res_t enc_inc(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
  * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
  */
-static lv_action_res_t enc_dec(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static lv_action_res_t enc_dec(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     /* Send LEFT key when rotate to left.
      * It will trigger a decrement like action in the object */
@@ -316,7 +316,7 @@ static lv_action_res_t enc_dec(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
  * @param indev_proc pointer to the caller display input
  * @return LV_ACTION_RES_OK: because the button is not deleted
  */
-static lv_action_res_t enc_sel(lv_obj_t * btn, lv_indev_proc_t * indev_proc)
+static lv_action_res_t enc_sel(lv_obj_t * btn, LV_INDEV_t * indev_proc)
 {
     /* Send ENTER key.
      * It will trigger an 'OK' or 'Select' action in the object */
