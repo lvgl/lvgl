@@ -809,6 +809,9 @@ void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
     /*Send a signal about style change to every children with NULL style*/
     lv_child_refr_style(obj);
 
+    /*Notify the object about the style change too*/
+    lv_obj_refr_style(obj);
+
 }
 
 /**
@@ -1527,7 +1530,7 @@ static void lv_child_refr_style(lv_obj_t * obj)
     while(child != NULL) {
         if(child->style_p == NULL) {
             lv_child_refr_style(child);     /*Check children too*/
-            lv_obj_refr_style(obj);         /*Send a style change signal to the object*/
+            lv_obj_refr_style(child);       /*Notify the child about the style change*/
         } else if(child->style_p->glass) {
             /*Children with 'glass' parent might be effected if their style == NULL*/
             lv_child_refr_style(child);

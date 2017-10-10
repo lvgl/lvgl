@@ -295,7 +295,7 @@ void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action)
 }
 
 /**
- * Set styles of a button is each state
+ * Set styles of a button is each state. Use NULL for any style which are not be changed.
  * @param btn pointer to button object
  * @param rel pointer to a style for releases state
  * @param pr  pointer to a style for pressed state
@@ -308,14 +308,18 @@ void lv_btn_set_styles(lv_obj_t * btn, lv_style_t * rel, lv_style_t * pr,
                                        lv_style_t * ina)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext(btn);
-    ext->styles[LV_BTN_STATE_REL] = rel;
-    ext->styles[LV_BTN_STATE_PR] = pr;
-    ext->styles[LV_BTN_STATE_TREL] = trel;
-    ext->styles[LV_BTN_STATE_TPR] = tpr;
-    ext->styles[LV_BTN_STATE_INA] = ina;
+
+    if(rel != NULL)	ext->styles[LV_BTN_STATE_REL] = rel;
+
+    if(pr != NULL) ext->styles[LV_BTN_STATE_PR] = pr;
+
+    if(trel) ext->styles[LV_BTN_STATE_TREL] = trel;
+
+    if(tpr) ext->styles[LV_BTN_STATE_TPR] = tpr;
+
+    if(ina) ext->styles[LV_BTN_STATE_INA] = ina;
 
     lv_obj_set_style(btn, ext->styles[ext->state]);
-
 }
 
 /*=====================
