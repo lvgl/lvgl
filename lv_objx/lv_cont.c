@@ -116,24 +116,18 @@ bool lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	switch(sign) {
-    	case LV_SIGNAL_STYLE_CHG: /*Recalculate the padding if the style changed*/
+    	if(sign == LV_SIGNAL_STYLE_CHG) { /*Recalculate the padding if the style changed*/
         	lv_cont_refr_layout(cont);
         	lv_cont_refr_autofit(cont);
-        	break;
-        case LV_SIGNAL_CHILD_CHG:
+    	} else if(sign == LV_SIGNAL_CHILD_CHG) {
         	lv_cont_refr_layout(cont);
         	lv_cont_refr_autofit(cont);
-        	break;
-        case LV_SIGNAL_CORD_CHG:
-        	if(lv_obj_get_width(cont) != area_get_width(param) ||
-    		  lv_obj_get_height(cont) != area_get_height(param)) {
+    	} else if(sign == LV_SIGNAL_CORD_CHG) {
+    	    if(lv_obj_get_width(cont) != area_get_width(param) ||
+    		   lv_obj_get_height(cont) != area_get_height(param)) {
             	lv_cont_refr_layout(cont);
             	lv_cont_refr_autofit(cont);
         	}
-        	break;
-    		default:
-    			break;
     	}
     }
     
