@@ -21,4 +21,5 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [x] LV_LABEL_LONG_DOTS removed, use LV_LABEL_LONG_ROLL instead
 - [x] *lv_list_set_element_text_roll()* removed.
 - [x] *lv_ddlist_set_fix_height()* instead of *auto_size*
-- [x] rename *lv_dispi_...* to *lv_indev_proc_...* (except *lv_dispi_t* -> *lv_indev_t*)
+- [x] rename *lv_dispi_...* to *lv_indev_...*
+- [x] lv_dispi_t removed from lv_action_type_t. Use lv_indev_act() instead
