@@ -179,11 +179,15 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 {
 	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
 	ext->max_value = max;
-	ext->max_value = max;
+	ext->min_value = min;
 	if(ext->act_value > max) {
 		ext->act_value = max;
 		lv_bar_set_value(bar, ext->act_value);
 	}
+    if(ext->act_value < min) {
+        ext->act_value = min;
+        lv_bar_set_value(bar, ext->act_value);
+    }
 	lv_obj_inv(bar);
 }
 
@@ -290,10 +294,10 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
         cord_t h = area_get_height(&indic_area);
 
 		if(w >= h) {
-		    indic_area.x2 = (int32_t) ((int32_t)w * ext->act_value) / (ext->max_value - ext->min_value);
+		    indic_area.x2 = (int32_t) ((int32_t)w * (ext->act_value - ext->min_value)) / (ext->max_value - ext->min_value);
             indic_area.x2 += indic_area.x1;
 		} else {
-		    indic_area.y1 = (int32_t) ((int32_t)h * ext->act_value) / (ext->max_value - ext->min_value);
+		    indic_area.y1 = (int32_t) ((int32_t)h * (ext->act_value - ext->min_value)) / (ext->max_value - ext->min_value);
             indic_area.y1 = indic_area.y2 - indic_area.y1;
 		}
 
