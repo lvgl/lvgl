@@ -365,8 +365,8 @@ void lv_obj_inv(lv_obj_t * obj)
     /*Invalidate the object only if it belongs to the 'act_scr'*/
     lv_obj_t * obj_scr = lv_obj_get_scr(obj);
     if(obj_scr == lv_scr_act() ||
-       obj_scr == lv_top_layer() ||
-       obj_scr == lv_sys_layer()) {
+       obj_scr == lv_layer_top() ||
+       obj_scr == lv_layer_sys()) {
         /*Truncate recursively to the parents*/
         area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
@@ -1115,7 +1115,7 @@ lv_obj_t * lv_scr_act(void)
  * Return with the top layer. (Same on every screen and it is above the normal screen layer)
  * @return pointer to the top layer object  (transparent screen sized lv_obj)
  */
-lv_obj_t * lv_top_layer(void)
+lv_obj_t * lv_layer_top(void)
 {
     return top_layer;
 }
@@ -1125,7 +1125,7 @@ lv_obj_t * lv_top_layer(void)
  * It is used for example by the cursor
  * @return pointer to the system layer object (transparent screen sized lv_obj)
  */
-lv_obj_t * lv_sys_layer(void)
+lv_obj_t * lv_layer_sys(void)
 {
     return sys_layer;
 }

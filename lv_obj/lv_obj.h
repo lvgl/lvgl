@@ -491,14 +491,14 @@ void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t
  * Return with the actual screen
  * @return pointer to to the actual screen object
  */
-lv_obj_t * lv_scr_act(void);lv_obj_t * lv_top_layer(void);
+lv_obj_t * lv_scr_act(void);lv_obj_t * lv_layer_top(void);
 
 /**
  * Return with the system layer. (Same on every screen and it is above the all other layers)
  * It is used for example by the cursor
  * @return pointer to the system layer object (transparent screen sized lv_obj)
  */
-lv_obj_t * lv_sys_layer(void);
+lv_obj_t * lv_layer_sys(void);
 
 /**
  * Return with the screen of an object

@@ -316,8 +316,8 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
     lv_refr_make(top_p, &start_mask);
 
     /*Also refresh top and sys layer unconditionally*/
-    lv_refr_make(lv_top_layer(), &start_mask);
-    lv_refr_make(lv_sys_layer(), &start_mask);
+    lv_refr_make(lv_layer_top(), &start_mask);
+    lv_refr_make(lv_layer_sys(), &start_mask);
 
 
     /*Flush the content of the VDB*/ 

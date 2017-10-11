@@ -121,7 +121,7 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 {
     indev->cursor = cur_obj;
-    lv_obj_set_parent(indev->cursor, lv_sys_layer());
+    lv_obj_set_parent(indev->cursor, lv_layer_sys());
     lv_obj_set_pos(indev->cursor, indev->state.act_point.x,  indev->state.act_point.y);
 }
 
@@ -262,11 +262,13 @@ static void indev_proc_press(lv_indev_state_t * state)
 
     /*If there is no last object then search*/
     if(state->act_obj == NULL) {
-        pr_obj = indev_search_obj(state, lv_scr_act());
+        pr_obj = indev_search_obj(state, lv_layer_top());
+        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_scr_act());
     }
     /*If there is last object but it is not dragged also search*/
     else if(state->drag_in_prog == 0) {/*Now act_obj != NULL*/
-        pr_obj = indev_search_obj(state, lv_scr_act());
+        pr_obj = indev_search_obj(state, lv_layer_top());
+        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_scr_act());
     }
     /*If a dragable object was the last then keep it*/
     else {
