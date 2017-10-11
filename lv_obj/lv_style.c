@@ -71,8 +71,8 @@ void lv_style_init (void)
     lv_style_scr.ccolor = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.opa = OPA_COVER;
 
-    lv_style_scr.mcolor = COLOR_MAKE(0xc9, 0xdb, 0xee);
-    lv_style_scr.gcolor = COLOR_MAKE(0x4d, 0x91, 0xd5);
+    lv_style_scr.mcolor = COLOR_WHITE;
+    lv_style_scr.gcolor = COLOR_WHITE;
     lv_style_scr.bcolor = COLOR_BLACK;
     lv_style_scr.scolor = COLOR_GRAY;
     lv_style_scr.radius = 0;
