@@ -132,20 +132,23 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
         lv_label_ext_t * ext = lv_obj_get_ext(label);
-        /*No signal handling*/
-    	switch(sign) {
-            case LV_SIGNAL_CLEANUP:
-                if(ext->static_txt == 0) {
-                    dm_free(ext->txt);
-                    ext->txt = NULL;
-                }
-                break;
-            case LV_SIGNAL_STYLE_CHG:
-            	lv_label_set_text(label, NULL);
-            	break;
-			default:
-				break;
-    	}
+        if(sign ==  LV_SIGNAL_CLEANUP) {
+            if(ext->static_txt == 0) {
+                dm_free(ext->txt);
+                ext->txt = NULL;
+            }
+        }
+        else if(sign == LV_SIGNAL_STYLE_CHG) {
+            	lv_label_refr_text(label);
+        }
+        else if (sign == LV_SIGNAL_CORD_CHG) {
+            if(area_get_width(&label->cords) != area_get_width(param)
+               || area_get_height(&label->cords) != area_get_height(param))
+            {
+                lv_label_refr_text(label);
+            }
+        }
+
     }
     
     return valid;
@@ -624,7 +627,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
             if(lv_obj_get_height(label) > lv_obj_get_height(parent)) {
                 anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) -
-                                   (font_get_height(font) - FONT_ANTIALIAS);
+                                   (font_get_height(font) >> FONT_ANTIALIAS);
                 anim.fp = (anim_fp_t)lv_obj_set_y;
 
                 /*Different animation speed if horizontal animation is created too*/
@@ -662,7 +665,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         if(size.y > lv_obj_get_height(label)) {
             anim.end =  lv_obj_get_height(label) - size.y -
-                               (font_get_height(font) - FONT_ANTIALIAS);
+                               (font_get_height(font) >> FONT_ANTIALIAS);
             anim.fp = (anim_fp_t)lv_label_set_offset_y;
 
             /*Different animation speed if horizontal animation is created too*/
