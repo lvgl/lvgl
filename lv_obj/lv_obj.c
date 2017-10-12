@@ -316,7 +316,7 @@ void lv_obj_del(lv_obj_t * obj)
                 dpar = lv_obj_get_parent(dpar);
             }
         }
-        indev = lv_indev_next(NULL);
+        indev = lv_indev_next(indev);
     }
 
     /*Send a signal to the parent to notify it about the child delete*/
