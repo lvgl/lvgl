@@ -17,6 +17,7 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [ ] define renames: e.g. *USE_LV_BTN* to *LV_BTN_USE*
 - [ ] Remove LV_DOWNSCALE (LV_ANTIALIAS will be used instead)
 - [ ] *lv_ta_get_txt* rename to *lv_ta_get_text* 
+- [ ] lv_btnm: rework width control. Now a control byte is used for *width*, *hide* and *no long press* settings. 
 - [x] lv_btnm_set_styles for *tpr*, *trel* and *ina* too
 - [x] LV_LABEL_LONG_DOTS removed, use LV_LABEL_LONG_ROLL instead
 - [x] *lv_list_set_element_text_roll()* removed.
