@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_BTNM_PR_NONE 0xFFFF
+#define LV_BTNM_PR_NONE         0xFFFF
 
 /**********************
  *      TYPEDEFS
@@ -159,13 +159,28 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             ext->btn_pr = btn_pr;
     	}
-    	else if(sign ==  LV_SIGNAL_RELEASED || sign == LV_SIGNAL_LONG_PRESS_REP) {
+
+    	else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
             if(ext->cb != NULL && ext->btn_pr != LV_BTNM_PR_NONE) {
                 uint16_t txt_i = lv_btnm_get_btn_txt(btnm, ext->btn_pr);
-                if(txt_i != LV_BTNM_PR_NONE) ext->cb(btnm, txt_i);
-            }
+                if(txt_i != LV_BTNM_PR_NONE) {
+                    if((ext->map_p[txt_i][0] & LV_BTNM_CTRL_MASK) == LV_BTNM_CTRL_CODE) {   /*If there is control byte check for "no long press"*/
+                        if((ext->map_p[txt_i][0] & LV_BTNM_NO_LPR_MASK) == 0) ext->cb(btnm, txt_i);
+    	            } else {                                                                    /*If no control byte then call the action unconditionally*/
+    	                ext->cb(btnm, txt_i);
+    	            }
+    	        }
+    	    }
+    	}
+    	else if(sign == LV_SIGNAL_RELEASED) {
+            if(ext->btn_pr != LV_BTNM_PR_NONE) {
+                if(ext->cb) {
+                    uint16_t txt_i = lv_btnm_get_btn_txt(btnm, ext->btn_pr);
+                    if(txt_i != LV_BTNM_PR_NONE) {
+                        ext->cb(btnm, txt_i);
+                    }
+                }
 
-            if(sign == LV_SIGNAL_RELEASED && ext->btn_pr != LV_BTNM_PR_NONE) {
                 /*Invalidate to old pressed area*/;
                 lv_obj_get_cords(btnm, &btnm_area);
                 area_cpy(&btn_area, &ext->btn_areas[ext->btn_pr]);
@@ -228,10 +243,14 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
  * @param btnm pointer to a button matrix object
  * @param map pointer a string array. The last string has to be: "".
  *            Use "\n" to begin a new line.
- *            Use octal numbers (e.g. "\003") to set the relative
- *            width of a button. (max. 9 -> \011)
- *            (e.g. const char * str[] = {"a", "b", "\n", "\004c", "d", ""}).
- *            The button do not copy the array so it can not be a local variable.
+ *            The first byte can be a control data:
+ *             - bit 7: always 1
+ *             - bit 6: always 0
+ *             - bit 5: reserved
+ *             - bit 4: no long press
+ *             - bit 3: hidden
+ *             - bit 2..0: button relative width
+ *             Example (practically use octal numbers): "\224abc": "abc" text with 4 width and no long press
  */
 void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 {
@@ -353,24 +372,23 @@ void lv_btnm_set_tgl(lv_obj_t * btnm, bool en, uint16_t id)
 /**
  * Set the styles of the buttons of the button matrix
  * @param btnm pointer to a button matrix object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param trel pointer to a style for toggled releases state
- * @param tpr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
+ * @param rel pointer to a style for releases state (NULL to leave it unchanged)
+ * @param pr  pointer to a style for pressed state (NULL to leave it unchanged)
+ * @param trel pointer to a style for toggled releases state (NULL to leave it unchanged)
+ * @param tpr pointer to a style for toggled pressed state (NULL to leave it unchanged)
+ * @param ina pointer to a style for inactive state (NULL to leave it unchanged)
  */
-void lv_btnm_set_styles_btn(lv_obj_t * btnm, lv_style_t *  rel, lv_style_t *  pr,
-                            lv_style_t *  trel, lv_style_t *  tpr, lv_style_t *  ina)
+void lv_btnm_set_styles_btn(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
+                            lv_style_t *trel, lv_style_t *tpr, lv_style_t *ina)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext(btnm);
-    ext->style_btn_rel = rel;
-    ext->style_btn_pr = pr;
-    ext->style_btn_trel = trel;
-    ext->style_btn_tpr = tpr;
-    ext->style_btn_ina = ina;
+    if(rel != NULL) ext->style_btn_rel = rel;
+    if(pr != NULL) ext->style_btn_pr = pr;
+    if(trel != NULL) ext->style_btn_trel = trel;
+    if(tpr != NULL) ext->style_btn_tpr = tpr;
+    if(ina != NULL) ext->style_btn_ina = ina;
 
     lv_obj_inv(btnm);
-
 }
 
 /*=====================
@@ -470,7 +488,12 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
 
-            if(ext->map_p[txt_i][1] == '\177' || ext->map_p[txt_i][0] == '\177') continue;
+            /*Skip hidden buttons*/
+            if((ext->map_p[txt_i][0] & LV_BTNM_CTRL_MASK) == LV_BTNM_CTRL_CODE &&
+               (ext->map_p[txt_i][0] & LV_BTNM_HIDDEN_MASK))
+                {
+                    continue;
+                }
 
 			lv_obj_get_cords(btnm, &area_btnm);
 
@@ -544,9 +567,11 @@ static void lv_btnm_create_btns(lv_obj_t * btnm, const char ** map)
  */
 static uint8_t lv_btnm_get_width_unit(const char * btn_str)
 {
-	if(btn_str[0] <= '\011') return btn_str[0];
+	if((btn_str[0] & LV_BTNM_CTRL_MASK) == LV_BTNM_CTRL_CODE){
+	    return btn_str[0] & LV_BTNM_WIDTH_MASK;
+	}
 
-	return 1;
+	return 1;   /*Default width is 1*/
 }
 
 /**
@@ -604,7 +629,6 @@ static uint16_t lv_btnm_get_btn_txt(lv_obj_t * btnm, uint16_t btn_id)
     if(btn_i == ext->btn_cnt) return  LV_BTNM_PR_NONE;
 
     return txt_i;
-
 }
 
 

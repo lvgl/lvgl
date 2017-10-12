@@ -25,6 +25,14 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/*Control byte*/
+#define LV_BTNM_CTRL_CODE       0x80    /*The control byte has to begin (if present) with 0b10xxxxxx*/
+#define LV_BTNM_CTRL_MASK       0xC0
+#define LV_BTNM_WIDTH_MASK      0x07
+#define LV_BTNM_HIDDEN_MASK     0x08
+#define LV_BTNM_NO_LPR_MASK     0x10
+#define LV_BTNM_RESERVED_MASK   0x20
+
 /**********************
  *      TYPEDEFS
  **********************/
