@@ -81,6 +81,9 @@ The new feature should be in a new branch.
 ### File format
 Use [misc/templ/templ.c](https://github.com/littlevgl/misc/blob/master/templ/templ.c) and [misc/templ/templ.h](https://github.com/littlevgl/misc/blob/master/templ/templ.h)
 
+### Abbreviations
+Please read this document to see the list of accepted abbreviations: [abbreviations-in-code](https://github.com/kisvegabor/abbreviations-in-code)
+
 ### Functions
 * try to write function shorter then is 40 lines 
 * always shorter then 100 lines (except very straightforwards) 
@@ -146,6 +149,10 @@ The code should show clearly what you are doing.
 
 You should write **why** have you done this: 
 `x++; /*Because of closing '\0' of the string */`
+
+Short "code summaries" of a few lines are accepted. E.g. `/*Calculate the new coordinates*/`
+
+In comments use `' '` when refering to a variable. E.g. `/*Update the value of 'x_act'*/`
 
 ### Formatting
 Here is example to show bracket placing and using of white spaces:
