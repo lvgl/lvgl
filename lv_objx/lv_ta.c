@@ -943,7 +943,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 			cur_area.x1 = letter_pos.x + ta_ext->label->cords.x1 - cur_style.hpad;
 			cur_area.y1 = letter_pos.y + ta_ext->label->cords.y1 - cur_style.vpad;
 			cur_area.x2 = letter_pos.x + ta_ext->label->cords.x1 + cur_style.hpad + letter_w;
-			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 - cur_style.vpad+ letter_h;
+			cur_area.y2 = letter_pos.y + ta_ext->label->cords.y1 + cur_style.vpad + letter_h;
 
 			cur_style.empty = 1;
 			if(cur_style.bwidth == 0) cur_style.bwidth = 1 * LV_DOWNSCALE; /*Be sure the border will be drawn*/
