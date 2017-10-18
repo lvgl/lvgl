@@ -117,27 +117,26 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
     /*Move the vdb_tmp to the first row*/
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
-#if DISP_HW_ACC == 0
-    sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
-#else
-	static color_t color_map[LV_HOR_RES];
-	static cord_t last_width = 0;
-    cord_t map_width = area_get_width(&vdb_rel_a);
-	if(color_map[0].full != color.full || last_width != map_width) {
-		uint16_t i;
-		for(i = 0; i < map_width; i++) {
-			color_map[i].full = color.full;
-		}
+    if(lv_disp_is_accelerated() == false) {
+        sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
+    } else {
+        static color_t color_map[LV_HOR_RES];
+        static cord_t last_width = 0;
+        cord_t map_width = area_get_width(&vdb_rel_a);
+        if(color_map[0].full != color.full || last_width != map_width) {
+            uint16_t i;
+            for(i = 0; i < map_width; i++) {
+                color_map[i].full = color.full;
+            }
 
-		last_width = map_width;
-	}
-    cord_t row;
-    for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
-    	lv_disp_color_cpy(&vdb_buf_tmp[vdb_rel_a.x1], color_map, map_width, opa);
-    	vdb_buf_tmp += vdb_width;
+            last_width = map_width;
+        }
+        cord_t row;
+        for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+            lv_disp_copy(&vdb_buf_tmp[vdb_rel_a.x1], color_map, map_width, opa);
+            vdb_buf_tmp += vdb_width;
+        }
     }
-#endif
-
 }
 
 /**
@@ -323,11 +322,11 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
             cord_t map_useful_w = area_get_width(&masked_a);
 
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
-#if DISP_HW_ACC == 0
-            	sw_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
-#else
-            	lv_disp_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
-#endif
+                if(lv_disp_is_accelerated() == false) {
+                    sw_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+                } else {
+                    lv_disp_copy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+                }
                 map_p += map_width;               /*Next row on the map*/
                 vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
             }
@@ -463,8 +462,6 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
  *   STATIC FUNCTIONS
  **********************/
 
-#if DISP_HW_ACC == 0
-
 /**
  * Copy pixels to destination memory using opacity
  * @param dest a memory address. Copy 'src' here.
@@ -532,6 +529,5 @@ static void sw_color_fill(area_t * mem_area, color_t * mem, const area_t * fill_
         }
     }
 }
-#endif /*DISP_HW_ACC == 0*/
 
 #endif
