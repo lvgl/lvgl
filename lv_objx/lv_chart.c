@@ -413,7 +413,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 
 	if(ext->hdiv_num != 0) {
         /*Draw slide lines if no border*/
-        if(style->bwidth != 0) {
+        if(style->border.width != 0) {
             div_i_start = 1;
             div_i_end = ext->hdiv_num;
         } else {
@@ -426,8 +426,8 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
         for(div_i = div_i_start; div_i <= div_i_end; div_i++) {
             p1.y = (int32_t)((int32_t)h * div_i) / (ext->hdiv_num + 1);
             p1.y +=  y_ofs;
-            if(div_i == div_i_start) p1.y += (style->line_width >> 1) + 1;  /*The first line might not be visible*/
-            if(div_i == div_i_end) p1.y -= (style->line_width >> 1) + 1;  /*The last line might not be visible*/
+            if(div_i == div_i_start) p1.y += (style->line.width >> 1) + 1;  /*The first line might not be visible*/
+            if(div_i == div_i_end) p1.y -= (style->line.width >> 1) + 1;  /*The last line might not be visible*/
 
             p2.y = p1.y;
             lv_draw_line(&p1, &p2, mask, style);
@@ -436,7 +436,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 
 	if(ext->vdiv_num != 0) {
         /*Draw slide lines if no border*/
-        if(style->bwidth != 0) {
+        if(style->border.width != 0) {
             div_i_start = 1;
             div_i_end = ext->vdiv_num;
         } else {
@@ -449,8 +449,8 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
         for(div_i = div_i_start; div_i <= div_i_end; div_i ++) {
             p1.x = (int32_t)((int32_t)w * div_i) / (ext->vdiv_num + 1);
             p1.x +=  x_ofs;
-            if(div_i == div_i_start) p1.x += (style->line_width >> 1) + 1;  /*The first line might not be visible*/
-            if(div_i == div_i_end) p1.x -= (style->line_width >> 1) + 1;  /*The last line might not be visible*/
+            if(div_i == div_i_start) p1.x += (style->line.width >> 1) + 1;  /*The first line might not be visible*/
+            if(div_i == div_i_end) p1.x -= (style->line.width >> 1) + 1;  /*The last line might not be visible*/
             p2.x = p1.x;
             lv_draw_line(&p1, &p2, mask, style);
         }
@@ -477,12 +477,12 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 	lv_chart_dl_t * dl;
 	lv_style_t lines;
 	lv_style_get(LV_STYLE_PLAIN, &lines);
-	lines.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
-    lines.line_width = ext->dl_width;
+	lines.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
+    lines.line.width = ext->dl_width;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, dl) {
-		lines.ccolor = dl->color;
+		lines.line.color = dl->color;
 
 		p1.x = 0 + x_ofs;
 		p2.x = 0 + x_ofs;
@@ -527,27 +527,27 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
     lv_style_t style_point;
     lv_style_get(LV_STYLE_PLAIN, &style_point);
 
-	style_point.bwidth = 0;
-	style_point.empty = 0;
-	style_point.radius = LV_RADIUS_CIRCLE;
-    style_point.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
-    style_point.radius = ext->dl_width;
+	style_point.border.width = 0;
+	style_point.body.empty = 0;
+	style_point.body.radius = LV_RADIUS_CIRCLE;
+    style_point.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
+    style_point.body.radius = ext->dl_width;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, dl) {
-		style_point.mcolor = dl->color;
-		style_point.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
+		style_point.body.color_main = dl->color;
+		style_point.body.color_grad = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
 
 		for(i = 0; i < ext->pnum; i ++) {
 			cir_a.x1 = ((w * i) / (ext->pnum - 1)) + x_ofs;
-			cir_a.x2 = cir_a.x1 + style_point.radius;
-			cir_a.x1 -= style_point.radius;
+			cir_a.x2 = cir_a.x1 + style_point.body.radius;
+			cir_a.x1 -= style_point.body.radius;
 
 			y_tmp = (int32_t)((int32_t) dl->points[i] - ext->ymin) * h;
 			y_tmp = y_tmp / (ext->ymax - ext->ymin);
 			cir_a.y1 = h - y_tmp + y_ofs;
-			cir_a.y2 = cir_a.y1 + style_point.radius;
-			cir_a.y1 -= style_point.radius;
+			cir_a.y2 = cir_a.y1 + style_point.body.radius;
+			cir_a.y1 -= style_point.body.radius;
 
 			lv_draw_rect(&cir_a, mask, &style_point);
 		}
@@ -578,10 +578,10 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 	cord_t x_ofs = col_w / 2; /*Shift with a half col.*/
 
 	lv_style_get(LV_STYLE_PLAIN, &rects);
-	rects.bwidth = 0;
-	rects.empty = 0;
-	rects.radius = 0;
-	rects.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
+	rects.border.width = 0;
+	rects.body.empty = 0;
+	rects.body.radius = 0;
+	rects.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
 
 	col_a.y2 = chart->cords.y2;
 
@@ -594,8 +594,8 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 
         /*Draw the current point of all data line*/
         LL_READ_BACK(ext->dl_ll, dl) {
-            rects.mcolor = dl->color;
-            rects.gcolor = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
+            rects.body.color_main = dl->color;
+            rects.body.color_grad = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
             col_a.x1 = x_act;
             col_a.x2 = col_a.x1 + col_w;
             x_act += col_w;

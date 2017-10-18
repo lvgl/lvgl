@@ -68,112 +68,128 @@ void lv_style_init (void)
      * HUE = 210*/
 
     /*Screen style*/
-    lv_style_scr.ccolor = COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_scr.opa = OPA_COVER;
+    lv_style_scr.body.opa = OPA_COVER;
+    lv_style_scr.body.color_main = COLOR_WHITE;
+    lv_style_scr.body.color_grad = COLOR_WHITE;
+    lv_style_scr.body.radius = 0;
+    lv_style_scr.body.pad_ver = LV_DPI / 12;
+    lv_style_scr.body.pad_hor = LV_DPI / 12;
+    lv_style_scr.body.pad_obj = LV_DPI / 12;
+    lv_style_scr.body.empty = 0;
+    lv_style_scr.body.glass = 0;
 
-    lv_style_scr.mcolor = COLOR_WHITE;
-    lv_style_scr.gcolor = COLOR_WHITE;
-    lv_style_scr.bcolor = COLOR_BLACK;
-    lv_style_scr.scolor = COLOR_GRAY;
-    lv_style_scr.radius = 0;
-    lv_style_scr.bwidth = 0;
-    lv_style_scr.swidth = 0;
-    lv_style_scr.stype = LV_STYPE_FULL;
-    lv_style_scr.vpad = LV_DPI / 12;
-    lv_style_scr.hpad = LV_DPI / 12;
-    lv_style_scr.opad = LV_DPI / 12;
-    lv_style_scr.bopa = OPA_COVER;
-    lv_style_scr.empty = 0;
-    lv_style_scr.glass = 0;
+    lv_style_scr.border.color = COLOR_BLACK;
+    lv_style_scr.border.opa = OPA_COVER;
+    lv_style_scr.border.width = 0;
 
-    lv_style_scr.font = font_get(FONT_DEFAULT);
-    lv_style_scr.letter_space = 1 * LV_DOWNSCALE;
-    lv_style_scr.line_space = 2 * LV_DOWNSCALE;
-    lv_style_scr.txt_align = LV_TXT_ALIGN_LEFT;
-    lv_style_scr.img_recolor = OPA_TRANSP;
-    lv_style_scr.line_width = 1 * LV_DOWNSCALE;
+    lv_style_scr.shadow.color = COLOR_GRAY;
+    lv_style_scr.shadow.type = LV_STYPE_FULL;
+    lv_style_scr.shadow.width = 0;
+
+    lv_style_scr.txt.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_scr.txt.font = font_get(FONT_DEFAULT);
+    lv_style_scr.txt.space_letter = 1 * LV_DOWNSCALE;
+    lv_style_scr.txt.space_line = 2 * LV_DOWNSCALE;
+    lv_style_scr.txt.align = LV_TXT_ALIGN_LEFT;
+
+    lv_style_scr.img.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_scr.img.intense = OPA_TRANSP;
+
+    lv_style_scr.line.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_scr.line.width = 1 * LV_DOWNSCALE;
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
-    lv_style_plain.mcolor = COLOR_WHITE;
-    lv_style_plain.gcolor = COLOR_WHITE;
-    lv_style_plain.bcolor = COLOR_WHITE;
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_plain_color.ccolor = COLOR_MAKE(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.mcolor = COLOR_MAKE(0x55, 0x96, 0xd8);
-    lv_style_plain_color.gcolor = lv_style_plain_color.mcolor;
+    lv_style_plain_color.txt.color = COLOR_MAKE(0xf0, 0xf0, 0xf0);
+    lv_style_plain_color.img.color = COLOR_MAKE(0xf0, 0xf0, 0xf0);
+    lv_style_plain_color.line.color = COLOR_MAKE(0xf0, 0xf0, 0xf0);
+    lv_style_plain_color.body.color_main = COLOR_MAKE(0x55, 0x96, 0xd8);
+    lv_style_plain_color.body.color_grad = lv_style_plain_color.body.color_main;
 
     /*Pretty style */
     memcpy(&lv_style_pretty, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_pretty.ccolor = COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_pretty.mcolor = COLOR_WHITE;
-    lv_style_pretty.gcolor = COLOR_SILVER;
-    lv_style_pretty.bcolor = COLOR_MAKE(0x40, 0x40, 0x40);
-    lv_style_pretty.radius = LV_DPI / 15;
-    lv_style_pretty.bwidth = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
-    lv_style_pretty.bopa = OPA_50;
+    lv_style_pretty.txt.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_pretty.img.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_pretty.line.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_pretty.body.color_main = COLOR_WHITE;
+    lv_style_pretty.body.color_grad = COLOR_SILVER;
+    lv_style_pretty.body.radius = LV_DPI / 15;
+    lv_style_pretty.border.color = COLOR_MAKE(0x40, 0x40, 0x40);
+    lv_style_pretty.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
+    lv_style_pretty.border.opa = OPA_50;
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
-    lv_style_pretty_color.ccolor = COLOR_MAKE(0xe0, 0xe0, 0xe0);
-    lv_style_pretty_color.mcolor = COLOR_MAKE(0x6b, 0x9a, 0xc7);
-    lv_style_pretty_color.gcolor = COLOR_MAKE(0x2b, 0x59, 0x8b);
-    lv_style_pretty_color.bcolor = COLOR_MAKE(0x15, 0x2c, 0x42);
+    lv_style_pretty_color.txt.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
+    lv_style_pretty_color.img.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
+    lv_style_pretty_color.line.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
+    lv_style_pretty_color.body.color_main = COLOR_MAKE(0x6b, 0x9a, 0xc7);
+    lv_style_pretty_color.body.color_grad = COLOR_MAKE(0x2b, 0x59, 0x8b);
+    lv_style_pretty_color.border.color = COLOR_MAKE(0x15, 0x2c, 0x42);
 
     /*Transparent style*/
     memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_transp.empty = 1;
-    lv_style_transp.bwidth = 0;
-    lv_style_transp.glass = 1;
+    lv_style_transp.body.empty = 1;
+    lv_style_transp.body.glass = 1;
+    lv_style_transp.border.width = 0;
 
     /*Transparent tight style*/
     memcpy(&lv_style_transp_tight, &lv_style_transp, sizeof(lv_style_t));
-    lv_style_transp_tight.hpad = 0;
-    lv_style_transp_tight.vpad = 0;
+    lv_style_transp_tight.body.pad_hor = 0;
+    lv_style_transp_tight.body.pad_ver = 0;
 
     /*Button released style*/
     memcpy(&lv_style_btn_rel, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_btn_rel.mcolor = COLOR_MAKE(0x76, 0xa2, 0xd0);
-    lv_style_btn_rel.gcolor = COLOR_MAKE(0x19, 0x3a, 0x5d);
-    lv_style_btn_rel.bcolor = COLOR_MAKE(0x0b, 0x19, 0x28);
-    lv_style_btn_rel.ccolor = COLOR_MAKE(0xff, 0xff, 0xff);
-    lv_style_btn_rel.bwidth = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
-    lv_style_btn_rel.radius = LV_DPI / 15;
-    lv_style_btn_rel.bopa = OPA_70;
-    lv_style_btn_rel.scolor = COLOR_GRAY;
-    lv_style_btn_rel.swidth = 0;
-    lv_style_btn_rel.hpad = LV_DPI / 4;
-    lv_style_btn_rel.vpad = LV_DPI / 6;
-    lv_style_btn_rel.opad = LV_DPI / 10;
-    lv_style_btn_rel.txt_align = LV_TXT_ALIGN_MID;
+    lv_style_btn_rel.body.color_main = COLOR_MAKE(0x76, 0xa2, 0xd0);
+    lv_style_btn_rel.body.color_grad = COLOR_MAKE(0x19, 0x3a, 0x5d);
+    lv_style_btn_rel.body.radius = LV_DPI / 15;
+    lv_style_btn_rel.body.pad_hor = LV_DPI / 4;
+    lv_style_btn_rel.body.pad_ver = LV_DPI / 6;
+    lv_style_btn_rel.body.pad_obj = LV_DPI / 10;
+    lv_style_btn_rel.border.color = COLOR_MAKE(0x0b, 0x19, 0x28);
+    lv_style_btn_rel.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
+    lv_style_btn_rel.border.opa = OPA_70;
+    lv_style_btn_rel.txt.color = COLOR_MAKE(0xff, 0xff, 0xff);
+    lv_style_btn_rel.txt.align = LV_TXT_ALIGN_MID;
+    lv_style_btn_rel.shadow.color = COLOR_GRAY;
+    lv_style_btn_rel.shadow.width = 0;
 
     /*Button pressed style*/
     memcpy(&lv_style_btn_pr, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_btn_pr.mcolor = COLOR_MAKE(0x33, 0x62, 0x94);
-    lv_style_btn_pr.gcolor = COLOR_MAKE(0x10, 0x26, 0x3c);
-    lv_style_btn_pr.ccolor = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_pr.body.color_main = COLOR_MAKE(0x33, 0x62, 0x94);
+    lv_style_btn_pr.body.color_grad = COLOR_MAKE(0x10, 0x26, 0x3c);
+    lv_style_btn_pr.txt.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_pr.img.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_pr.line.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
 
     /*Button toggle released style*/
     memcpy(&lv_style_btn_trel, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_btn_trel.mcolor = COLOR_MAKE(0x0a, 0x11, 0x22);
-    lv_style_btn_trel.gcolor = COLOR_MAKE(0x37, 0x62, 0x90);
-    lv_style_btn_trel.bcolor = COLOR_MAKE(0x01, 0x07, 0x0d);
-    lv_style_btn_trel.ccolor = COLOR_MAKE(0xc8, 0xdd, 0xf4);
+    lv_style_btn_trel.body.color_main = COLOR_MAKE(0x0a, 0x11, 0x22);
+    lv_style_btn_trel.body.color_grad = COLOR_MAKE(0x37, 0x62, 0x90);
+    lv_style_btn_trel.border.color = COLOR_MAKE(0x01, 0x07, 0x0d);
+    lv_style_btn_trel.txt.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
+    lv_style_btn_trel.img.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
+    lv_style_btn_trel.line.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
 
     /*Button toggle pressed style*/
     memcpy(&lv_style_btn_tpr, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_btn_tpr.mcolor = COLOR_MAKE(0x02, 0x14, 0x27);
-    lv_style_btn_tpr.gcolor = COLOR_MAKE(0x2b, 0x4c, 0x70);
-    lv_style_btn_tpr.ccolor = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_tpr.body.color_main = COLOR_MAKE(0x02, 0x14, 0x27);
+    lv_style_btn_tpr.body.color_grad = COLOR_MAKE(0x2b, 0x4c, 0x70);
+    lv_style_btn_tpr.txt.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_tpr.img.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_tpr.line.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
 
     /*Button inactive style*/
     memcpy(&lv_style_btn_ina, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_btn_ina.mcolor = COLOR_MAKE(0xd8, 0xd8, 0xd8);
-    lv_style_btn_ina.gcolor = COLOR_MAKE(0xd8, 0xd8, 0xd8);
-    lv_style_btn_ina.bcolor = COLOR_MAKE(0x90, 0x90, 0x90);
-    lv_style_btn_ina.ccolor = COLOR_MAKE(0x70, 0x70, 0x70);
+    lv_style_btn_ina.body.color_main = COLOR_MAKE(0xd8, 0xd8, 0xd8);
+    lv_style_btn_ina.body.color_grad = COLOR_MAKE(0xd8, 0xd8, 0xd8);
+    lv_style_btn_ina.border.color = COLOR_MAKE(0x90, 0x90, 0x90);
+    lv_style_btn_ina.txt.color = COLOR_MAKE(0x70, 0x70, 0x70);
+    lv_style_btn_ina.img.color = COLOR_MAKE(0x70, 0x70, 0x70);
+    lv_style_btn_ina.line.color = COLOR_MAKE(0x70, 0x70, 0x70);
 }
 
 
@@ -286,39 +302,41 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
     const lv_style_t * end = dsc->style_end;
     lv_style_t * act = dsc->style_anim;
 
-    STYLE_ATTR_ANIM(opa, val);
-    STYLE_ATTR_ANIM(radius, val);
-    STYLE_ATTR_ANIM(bwidth, val);
-    STYLE_ATTR_ANIM(swidth, val);
-    STYLE_ATTR_ANIM(hpad, val);
-    STYLE_ATTR_ANIM(vpad, val);
-    STYLE_ATTR_ANIM(opad, val);
-    STYLE_ATTR_ANIM(line_space, val);
-    STYLE_ATTR_ANIM(letter_space, val);
-    STYLE_ATTR_ANIM(line_width, val);
-    STYLE_ATTR_ANIM(img_recolor, val);
+    STYLE_ATTR_ANIM(body.opa, val);
+    STYLE_ATTR_ANIM(body.radius, val);
+    STYLE_ATTR_ANIM(border.width, val);
+    STYLE_ATTR_ANIM(shadow.width, val);
+    STYLE_ATTR_ANIM(body.pad_hor, val);
+    STYLE_ATTR_ANIM(body.pad_ver, val);
+    STYLE_ATTR_ANIM(body.pad_obj, val);
+    STYLE_ATTR_ANIM(txt.space_line, val);
+    STYLE_ATTR_ANIM(txt.space_letter, val);
+    STYLE_ATTR_ANIM(line.width, val);
+    STYLE_ATTR_ANIM(img.intense, val);
 
-    act->mcolor = color_mix(end->mcolor, start->mcolor, val);
-    act->gcolor = color_mix(end->gcolor, start->gcolor, val);
-    act->bcolor = color_mix(end->bcolor, start->bcolor, val);
-    act->scolor = color_mix(end->scolor, start->scolor, val);
-    act->ccolor = color_mix(end->ccolor, start->ccolor, val);
+    act->body.color_main = color_mix(end->body.color_main, start->body.color_main, val);
+    act->body.color_grad = color_mix(end->body.color_grad, start->body.color_grad, val);
+    act->border.color = color_mix(end->border.color, start->border.color, val);
+    act->shadow.color = color_mix(end->shadow.color, start->shadow.color, val);
+    act->txt.color = color_mix(end->txt.color, start->txt.color, val);
+    act->img.color = color_mix(end->img.color, start->img.color, val);
+    act->line.color = color_mix(end->line.color, start->line.color, val);
 
 
     if(val == 0) {
-        act->empty = start->empty;
-        act->glass = start->glass;
-        act->font = start->font;
-        act->stype = start->stype;
-        act->txt_align = start->txt_align;
+        act->body.empty = start->body.empty;
+        act->body.glass = start->body.glass;
+        act->txt.font = start->txt.font;
+        act->shadow.type = start->shadow.type;
+        act->txt.align = start->txt.align;
     }
 
     if(val == LV_STYLE_ANIM_RES) {
-        act->empty = end->empty;
-        act->glass = end->glass;
-        act->font = end->font;
-        act->stype = end->stype;
-        act->txt_align = end->txt_align;
+        act->body.empty = end->body.empty;
+        act->body.glass = end->body.glass;
+        act->txt.font = end->txt.font;
+        act->shadow.type = end->shadow.type;
+        act->txt.align = end->txt.align;
     }
 
     lv_style_refr_objs(dsc->style_anim);

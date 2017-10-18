@@ -253,12 +253,12 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
 static void style_mod_def(lv_style_t * style)
 {
     /*Make the style a little bit orange*/
-    style->bcolor = COLOR_ORANGE;
-    style->bopa = OPA_COVER;
-    if(style->bwidth == 0 && style->empty == 0) style->bwidth = 2 * LV_DOWNSCALE;   /*Add border to not transparent styles*/
-    else style->bwidth = style->bwidth * 2;                                         /*Make the border thicker*/
-    style->mcolor = color_mix(style->mcolor, COLOR_ORANGE, OPA_80);
-    style->gcolor = color_mix(style->gcolor, COLOR_ORANGE, OPA_80);
+    style->border.color = COLOR_ORANGE;
+    style->border.opa = OPA_COVER;
+    if(style->border.width == 0 && style->body.empty == 0) style->border.width = 2 * LV_DOWNSCALE;   /*Add border to not transparent styles*/
+    else style->border.width = style->border.width * 2;                                         /*Make the border thicker*/
+    style->body.color_main = color_mix(style->body.color_main, COLOR_ORANGE, OPA_80);
+    style->body.color_grad = color_mix(style->body.color_grad, COLOR_ORANGE, OPA_80);
 }
 
 #endif /*LV_OBJ_GROUP != 0*/

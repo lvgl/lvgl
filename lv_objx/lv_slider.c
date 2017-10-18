@@ -155,7 +155,7 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
                 if(slider->ext_size < x) slider->ext_size = x;
             } else {
                 lv_style_t * style = lv_obj_get_style(slider);
-                cord_t pad = MATH_MIN(style->hpad, style->vpad);
+                cord_t pad = MATH_MIN(style->body.pad_hor, style->body.pad_ver);
                 if(pad < 0) {
                     pad = -pad;
                     if(slider->ext_size < pad) slider->ext_size = pad;
@@ -290,19 +290,19 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         area_t area_bar;
         area_cpy(&area_bar, &slider->cords);
         /*Be sure at least vpad/hpad width bar will remain*/
-       cord_t vpad_bar = style_slider->vpad;
-       cord_t hpad_bar = style_slider->hpad;
-       if(vpad_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
-           vpad_bar = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+       cord_t pad_ver_bar = style_slider->body.pad_ver;
+       cord_t pad_hor_bar = style_slider->body.pad_hor;
+       if(pad_ver_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
+           pad_ver_bar = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
        }
-       if(hpad_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_width(&area_bar)) {
-           hpad_bar = (area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+       if(pad_hor_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_width(&area_bar)) {
+           pad_hor_bar = (area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
        }
 
-        area_bar.x1 += hpad_bar;
-        area_bar.x2 -= hpad_bar;
-        area_bar.y1 += vpad_bar;
-        area_bar.y2 -= vpad_bar;
+        area_bar.x1 += pad_hor_bar;
+        area_bar.x2 -= pad_hor_bar;
+        area_bar.y1 += pad_ver_bar;
+        area_bar.y2 -= pad_ver_bar;
         lv_draw_rect(&area_bar, mask, style_slider);
 
         /*Draw the indicator*/
@@ -310,19 +310,19 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         area_cpy(&area_indic, &area_bar);
 
         /*Be sure at least vpad/hpad width indicator will remain*/
-        cord_t vpad_indic = style_indic->vpad;
-        cord_t hpad_indic = style_indic->hpad;
-        if(vpad_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
-            vpad_indic = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+        cord_t pad_ver_indic = style_indic->body.pad_ver;
+        cord_t pad_hor_indic = style_indic->body.pad_hor;
+        if(pad_ver_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
+            pad_ver_indic = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
         }
-        if(hpad_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_width(&area_bar)) {
-            hpad_indic = (area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+        if(pad_hor_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_width(&area_bar)) {
+            pad_hor_indic = (area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
         }
 
-        area_indic.x1 += hpad_indic;
-        area_indic.x2 -= hpad_indic;
-        area_indic.y1 += vpad_indic;
-        area_indic.y2 -= vpad_indic;
+        area_indic.x1 += pad_hor_indic;
+        area_indic.x2 -= pad_hor_indic;
+        area_indic.y1 += pad_ver_indic;
+        area_indic.y2 -= pad_ver_indic;
 
         cord_t slider_w = area_get_width(&slider->cords);
         cord_t slider_h = area_get_height(&slider->cords);

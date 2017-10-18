@@ -186,7 +186,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
         memcpy(&style_tmp, style, sizeof(lv_style_t));
 
          cord_t r_out = lv_obj_get_width(lmeter) / 2;
-         cord_t r_in =r_out - style->hpad;
+         cord_t r_in =r_out - style->body.pad_hor;
          cord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->cords.x1;
          cord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->cords.y1;
          int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;
@@ -195,7 +195,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
          int16_t level = (int32_t)((int32_t)(lv_bar_get_value(lmeter) - min) * ext->scale_num) / (max - min);
          uint8_t i;
 
-         style_tmp.ccolor = style->mcolor;
+         style_tmp.line.color = style->body.color_main;
 
          for(i = 0; i < ext->scale_num; i++) {
              /*Calculate the position a scale label*/
@@ -215,9 +215,9 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
              p1.x = x_out+ x_ofs;
              p1.y = y_out + y_ofs;
 
-             if(i > level) style_tmp.ccolor = style->ccolor;
+             if(i > level) style_tmp.line.color = style->line.color;
              else {
-                 style_tmp.ccolor=color_mix(style->gcolor, style->mcolor, (255 * i) /  ext->scale_num);
+                 style_tmp.line.color = color_mix(style->body.color_grad, style->body.color_main, (255 * i) /  ext->scale_num);
              }
 
              lv_draw_line(&p1, &p2, mask, &style_tmp);

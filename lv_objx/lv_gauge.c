@@ -134,7 +134,7 @@ bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param)
     	}
     	else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
     	    lv_style_t * style_crit = lv_gauge_get_style_critical(gauge);
-            if(style_crit->swidth > gauge->ext_size) gauge->ext_size = style_crit->swidth;
+            if(style_crit->shadow.width > gauge->ext_size) gauge->ext_size = style_crit->shadow.width;
     	}
     }
     
@@ -334,13 +334,13 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
 
         /*Mix the normal and the critical style*/
         memcpy(&style_bg, style_base, sizeof(lv_style_t));
-        style_bg.ccolor = color_mix(style_critical->ccolor, style_base->ccolor, ratio);
-        style_bg.mcolor= color_mix(style_critical->mcolor, style_base->mcolor, ratio);
-        style_bg.gcolor = color_mix(style_critical->gcolor, style_base->gcolor, ratio);
-        style_bg.bcolor = color_mix(style_critical->bcolor, style_base->bcolor, ratio);
-        style_bg.scolor = color_mix(style_critical->scolor, style_base->scolor, ratio);
-        style_bg.swidth = (cord_t)(((cord_t)style_critical->swidth * ratio) + ((cord_t)style_base->swidth * (OPA_COVER - ratio))) >> 8;
-        style_bg.opa = (cord_t)(((uint16_t)style_critical->opa * ratio) + ((uint16_t)style_base->opa * (OPA_COVER - ratio))) >> 8;
+        style_bg.txt.color = color_mix(style_critical->txt.color, style_base->txt.color, ratio);
+        style_bg.body.color_main= color_mix(style_critical->body.color_main, style_base->body.color_main, ratio);
+        style_bg.body.color_grad = color_mix(style_critical->body.color_grad, style_base->body.color_grad, ratio);
+        style_bg.border.color = color_mix(style_critical->border.color, style_base->border.color, ratio);
+        style_bg.shadow.color = color_mix(style_critical->shadow.color, style_base->shadow.color, ratio);
+        style_bg.shadow.width = (cord_t)(((cord_t)style_critical->shadow.width * ratio) + ((cord_t)style_base->shadow.width * (OPA_COVER - ratio))) >> 8;
+        style_bg.body.opa = (cord_t)(((uint16_t)style_critical->body.opa * ratio) + ((uint16_t)style_base->body.opa * (OPA_COVER - ratio))) >> 8;
 
         lv_draw_rect(&gauge->cords, mask, &style_bg);
 
@@ -365,7 +365,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask, lv_style_
 {
     char scale_txt[16];
 
-    cord_t r = lv_obj_get_width(gauge) / 2 - style->hpad;
+    cord_t r = lv_obj_get_width(gauge) / 2 - style->body.pad_hor;
     cord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->cords.x1;
     cord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->cords.y1;
     int16_t scale_angle = lv_lmeter_get_scale_angle(gauge);
@@ -391,8 +391,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask, lv_style_
 
         area_t label_cord;
         point_t label_size;
-        txt_get_size(&label_size, scale_txt, style->font,
-                style->letter_space, style->line_space,
+        txt_get_size(&label_size, scale_txt, style->txt.font,
+                style->txt.space_letter, style->txt.space_line,
                 CORD_MAX, TXT_FLAG_NONE);
 
         /*Draw the label*/
@@ -414,7 +414,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask, lv_style
     lv_style_t style_needle;
     lv_gauge_ext_t * ext = lv_obj_get_ext(gauge);
 
-    cord_t r = lv_obj_get_width(gauge) / 2 - style->opad;
+    cord_t r = lv_obj_get_width(gauge) / 2 - style->body.pad_obj;
     cord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->cords.x1;
     cord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->cords.y1;
     uint16_t angle = lv_lmeter_get_scale_angle(gauge);
@@ -436,8 +436,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask, lv_style
         p_end.x = (trigo_sin(needle_angle + 90) * r) / TRIGO_SIN_MAX + x_ofs;
 
         /*Draw the needle with the corresponding color*/
-        if(ext->needle_colors == NULL) style_needle.ccolor = LV_GAUGE_DEF_NEEDLE_COLOR;
-        else style_needle.ccolor = ext->needle_colors[i];
+        if(ext->needle_colors == NULL) style_needle.line.color = LV_GAUGE_DEF_NEEDLE_COLOR;
+        else style_needle.line.color = ext->needle_colors[i];
 
         lv_draw_line(&p_mid, &p_end, mask, &style_needle);
     }
@@ -445,15 +445,15 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask, lv_style
     /*Draw the needle middle area*/
     lv_style_t style_neddle_mid;
     lv_style_get(LV_STYLE_PLAIN, &style_neddle_mid);
-    style_neddle_mid.mcolor = style->bcolor;
-    style_neddle_mid.gcolor = style->bcolor;
-    style_neddle_mid.radius = LV_RADIUS_CIRCLE;
+    style_neddle_mid.body.color_main = style->border.color;
+    style_neddle_mid.body.color_grad = style->border.color;
+    style_neddle_mid.body.radius = LV_RADIUS_CIRCLE;
 
     area_t nm_cord;
-    nm_cord.x1 = x_ofs - style->opad;
-    nm_cord.y1 = y_ofs - style->opad;
-    nm_cord.x2 = x_ofs + style->opad;
-    nm_cord.y2 = y_ofs + style->opad;
+    nm_cord.x1 = x_ofs - style->body.pad_obj;
+    nm_cord.y1 = y_ofs - style->body.pad_obj;
+    nm_cord.x2 = x_ofs + style->body.pad_obj;
+    nm_cord.y2 = y_ofs + style->body.pad_obj;
 
     lv_draw_rect(&nm_cord, mask, &style_neddle_mid);
 }

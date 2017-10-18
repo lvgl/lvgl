@@ -120,7 +120,7 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	if(sign == LV_SIGNAL_STYLE_CHG) {
-    		lv_obj_set_size(ext->bullet, font_get_height(style->font), font_get_height(style->font));
+    		lv_obj_set_size(ext->bullet, font_get_height(style->txt.font), font_get_height(style->txt.font));
     	} else if(sign == LV_SIGNAL_PRESSED ||
             sign == LV_SIGNAL_RELEASED ||
             sign == LV_SIGNAL_PRESS_LOST) {
@@ -239,7 +239,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
         lv_obj_t * bg = lv_obj_get_parent(bullet);
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
-        if(style_page->empty != 0 || style_page->opa == OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.empty != 0 || style_page->body.opa == OPA_TRANSP) { /*Background is visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);

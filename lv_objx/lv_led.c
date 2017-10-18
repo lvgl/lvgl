@@ -201,13 +201,13 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 		memcpy(&leds_tmp, style, sizeof(leds_tmp));
 
 		/*Mix. the color with black proportionally with brightness*/
-		leds_tmp.mcolor = color_mix(leds_tmp.mcolor, COLOR_BLACK, ext->bright);
-		leds_tmp.gcolor = color_mix(leds_tmp.gcolor, COLOR_BLACK, ext->bright);
-        leds_tmp.bcolor = color_mix(leds_tmp.bcolor, COLOR_BLACK, ext->bright);
+		leds_tmp.body.color_main = color_mix(leds_tmp.body.color_main, COLOR_BLACK, ext->bright);
+		leds_tmp.body.color_grad = color_mix(leds_tmp.body.color_grad, COLOR_BLACK, ext->bright);
+        leds_tmp.border.color = color_mix(leds_tmp.border.color, COLOR_BLACK, ext->bright);
 
 		/*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF and LV_LED_BRIGHT_ON*/
 		uint16_t bright_tmp = ext->bright;
-        leds_tmp.swidth = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->swidth) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
+        leds_tmp.shadow.width = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->shadow.width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
 		led->style_p = &leds_tmp;
 		ancestor_design_f(led, mask, mode);

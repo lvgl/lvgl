@@ -225,12 +225,12 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     /*Make the size adjustment*/
     cord_t w = lv_obj_get_width(list);
     lv_style_t *  style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
-    cord_t hpad_tot = style->hpad + style_scrl->hpad;
-    w -= hpad_tot * 2;
+    cord_t pad_hor_tot = style->body.pad_hor + style_scrl->body.pad_hor;
+    w -= pad_hor_tot * 2;
 
-    /*Make place for the scrollbar if hpad_tot is too small*/
+    /*Make place for the scrollbar if pad_hor_tot is too small*/
     if(ext->sb_out != 0) {
-        if(hpad_tot < ext->page.sb_width) w -= ext->page.sb_width - hpad_tot;
+        if(pad_hor_tot < ext->page.sb_width) w -= ext->page.sb_width - pad_hor_tot;
     }
     lv_obj_set_width(liste, w);
 #if USE_LV_IMG != 0 && USE_FSINT != 0

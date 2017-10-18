@@ -343,7 +343,7 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) valid = false;
             break;
         case LV_SIGNAL_REFR_EXT_SIZE:
-            if(style->swidth > obj->ext_size) obj->ext_size = style->swidth;
+            if(style->shadow.width > obj->ext_size) obj->ext_size = style->shadow.width;
             break;
         case LV_SIGNAL_STYLE_CHG:
             lv_obj_refr_ext_size(obj);
@@ -1287,7 +1287,7 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
 
         while(par != NULL) {
             if(par->style_p != NULL) {
-                if(par->style_p->glass == 0) {
+                if(par->style_p->body.glass == 0) {
                     style_act = par->style_p;
                     break;
                 }
@@ -1485,9 +1485,9 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
         /* Because of the radius it is not sure the area is covered
          * Check the areas where there is no radius*/
         lv_style_t * style = lv_obj_get_style(obj);
-        if(style->empty != 0) return false;
+        if(style->body.empty != 0) return false;
 
-        uint16_t r = style->radius;
+        uint16_t r = style->body.radius;
 
         if(r == LV_RADIUS_CIRCLE) return false;
 
@@ -1561,7 +1561,7 @@ static void lv_child_refr_style(lv_obj_t * obj)
         if(child->style_p == NULL) {
             lv_child_refr_style(child);     /*Check children too*/
             lv_obj_refr_style(child);       /*Notify the child about the style change*/
-        } else if(child->style_p->glass) {
+        } else if(child->style_p->body.glass) {
             /*Children with 'glass' parent might be effected if their style == NULL*/
             lv_child_refr_style(child);
         }

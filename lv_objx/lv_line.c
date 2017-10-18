@@ -141,7 +141,7 @@ void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point
 		}
 
 		lv_style_t * lines = lv_obj_get_style(line);
-		lv_obj_set_size(line, xmax + lines->line_width, ymax + lines->line_width);
+		lv_obj_set_size(line, xmax + lines->line.width, ymax + lines->line.width);
 	}
 }
 

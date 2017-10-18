@@ -43,29 +43,49 @@ typedef enum
 
 typedef struct
 {
-    /*Object level styles*/
-    color_t ccolor;     /*Content color (e.g. text or image re-color )*/
-    opa_t opa;          /*Opacity of the object*/
-    uint8_t glass :1;   /*1: Do not inherit this style*/
-    uint8_t empty :1;   /*Transparent background (border drawn)*/
-    uint8_t stype :2;   /*Shadow type from 'lv_shadow_type_t'*/
-    uint8_t txt_align:2;
-    color_t mcolor;     /*Main color of background*/
-    color_t gcolor;     /*Gradient color of background*/
-    color_t bcolor;     /*Border color of background*/
-    color_t scolor;     /*Shadow color of background*/
-    cord_t radius;      /*Corner radius of background*/
-    cord_t bwidth;      /*Width of the background border*/
-    cord_t swidth;      /*Width of the background shadow effect*/
-    cord_t vpad;        /*Vertical padding*/
-    cord_t hpad;        /*Horizontal padding*/
-    cord_t opad;        /*Object padding on the background*/
-    opa_t bopa;         /*Opacity of background border*/
-    const font_t * font;
-    cord_t letter_space;
-    cord_t line_space;
-    opa_t img_recolor;
-    cord_t line_width;
+    struct {
+        color_t color_main;
+        color_t color_grad;
+        opa_t opa;
+        cord_t pad_ver;        /*Vertical padding*/
+        cord_t pad_hor;        /*Horizontal padding*/
+        cord_t pad_obj;        /*Object padding on the background*/
+        cord_t radius;      /*Corner radius of background*/
+        uint8_t glass :1;   /*1: Do not inherit this style*/
+        uint8_t empty :1;   /*Transparent background (border still drawn)*/
+    }body;
+
+    struct {
+        color_t color;
+        cord_t width;
+        opa_t opa;         /*Opacity of background border*/
+    }border;
+
+    struct {
+        color_t color;
+        cord_t width;
+        uint8_t type;
+    }shadow;
+
+
+    struct {
+        color_t color;
+        const font_t * font;
+        cord_t space_letter;
+        cord_t space_line;
+        uint8_t align:2;
+    }txt;
+
+    struct {
+        color_t color;
+        opa_t intense;
+    }img;
+
+    struct {
+        color_t color;
+        cord_t width;
+    }line;
+
 }lv_style_t;
 
 typedef enum {
