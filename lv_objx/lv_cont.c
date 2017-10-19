@@ -277,23 +277,23 @@ static void lv_cont_layout_col(lv_obj_t * cont)
 	/*Adjust margin and get the alignment type*/
 	lv_align_t align;
 	lv_style_t * style = lv_obj_get_style(cont);
-	cord_t pad_hor_corr;
+	cord_t hpad_corr;
 
 	switch(type) {
 		case LV_CONT_LAYOUT_COL_L:
-            pad_hor_corr = style->body.pad_hor;
+            hpad_corr = style->body.padding.horizontal;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 		case LV_CONT_LAYOUT_COL_M:
-			pad_hor_corr = 0;
+			hpad_corr = 0;
 			align = LV_ALIGN_IN_TOP_MID;
 			break;
 		case LV_CONT_LAYOUT_COL_R:
-			pad_hor_corr = -style->body.pad_hor;
+			hpad_corr = -style->body.padding.horizontal;
 			align = LV_ALIGN_IN_TOP_RIGHT;
 			break;
 		default:
-			pad_hor_corr = 0;
+			hpad_corr = 0;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 	}
@@ -302,13 +302,13 @@ static void lv_cont_layout_col(lv_obj_t * cont)
 	 * an unnecessary child change signals could be sent*/
 	lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
 	/* Align the children */
-	cord_t last_cord = style->body.pad_ver;
+	cord_t last_cord = style->body.padding.vertical;
 	LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
            lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
-		lv_obj_align(child, cont, align, pad_hor_corr , last_cord);
-		last_cord += lv_obj_get_height(child) + style->body.pad_obj;
+		lv_obj_align(child, cont, align, hpad_corr , last_cord);
+		last_cord += lv_obj_get_height(child) + style->body.padding.inner;
 	}
 
     lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
@@ -326,23 +326,23 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 	/*Adjust margin and get the alignment type*/
 	lv_align_t align;
 	lv_style_t * style = lv_obj_get_style(cont);
-	cord_t pad_ver_corr = style->body.pad_ver;
+	cord_t vpad_corr = style->body.padding.vertical;
 
 	switch(type) {
 		case LV_CONT_LAYOUT_ROW_T:
-			pad_ver_corr = style->body.pad_ver;
+			vpad_corr = style->body.padding.vertical;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 		case LV_CONT_LAYOUT_ROW_M:
-			pad_ver_corr = 0;
+			vpad_corr = 0;
 			align = LV_ALIGN_IN_LEFT_MID;
 			break;
 		case LV_CONT_LAYOUT_ROW_B:
-			pad_ver_corr = -style->body.pad_ver;
+			vpad_corr = -style->body.padding.vertical;
 			align = LV_ALIGN_IN_BOTTOM_LEFT;
 			break;
 		default:
-			pad_ver_corr = 0;
+			vpad_corr = 0;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
 	}
@@ -352,13 +352,13 @@ static void lv_cont_layout_row(lv_obj_t * cont)
     lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
 
 	/* Align the children */
-	cord_t last_cord = style->body.pad_hor;
+	cord_t last_cord = style->body.padding.horizontal;
 	LL_READ_BACK(cont->child_ll, child) {
 		if(lv_obj_get_hidden(child) != false ||
            lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
-		lv_obj_align(child, cont, align, last_cord, pad_ver_corr);
-		last_cord += lv_obj_get_width(child) + style->body.pad_obj;
+		lv_obj_align(child, cont, align, last_cord, vpad_corr);
+		last_cord += lv_obj_get_width(child) + style->body.padding.inner;
 	}
 
     lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
@@ -378,13 +378,13 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 	LL_READ(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
            lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
-		h_tot += lv_obj_get_height(child) + style->body.pad_obj;
+		h_tot += lv_obj_get_height(child) + style->body.padding.inner;
 		obj_num ++;
 	}
 
 	if(obj_num == 0) return;
 
-	h_tot -= style->body.pad_obj;
+	h_tot -= style->body.padding.inner;
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
@@ -397,7 +397,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
            lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
 		lv_obj_align(child, cont, LV_ALIGN_CENTER, 0, last_cord + lv_obj_get_height(child) / 2);
-		last_cord += lv_obj_get_height(child) + style->body.pad_obj;
+		last_cord += lv_obj_get_height(child) + style->body.padding.inner;
 	}
 
     lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
@@ -415,7 +415,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 	lv_obj_t * child_tmp;   /* Temporary child */
 	lv_style_t * style = lv_obj_get_style(cont);
 	cord_t w_obj = lv_obj_get_width(cont);
-	cord_t act_y = style->body.pad_ver;
+	cord_t act_y = style->body.padding.vertical;
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
 
@@ -427,7 +427,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 	child_rc = child_rs; /*Initially the the row starter and closer is the same*/
 	while(child_rs != NULL) {
 		cord_t h_row = 0;
-		cord_t w_row = style->body.pad_hor * 2; /*The width is at least the left+right hpad*/
+		cord_t w_row = style->body.padding.horizontal * 2; /*The width is at least the left+right hpad*/
 		uint32_t obj_num = 0;
 
 		/*Find the row closer object and collect some data*/
@@ -442,7 +442,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 			        }
 				    break;
 				}
-				w_row += lv_obj_get_width(child_rc) + style->body.pad_obj; /*Add the object width + opad*/
+				w_row += lv_obj_get_width(child_rc) + style->body.padding.inner; /*Add the object width + opad*/
 				h_row = MATH_MAX(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
 				obj_num ++;
 				if(lv_obj_is_protected(child_rc, LV_PROTECT_FOLLOW)) break; /*If can not be followed by an other object then break here*/
@@ -474,9 +474,9 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
         }
 		/* Align the children (from child_rs to child_rc)*/
 		else {
-			w_row -= style->body.pad_obj * obj_num;
+			w_row -= style->body.padding.inner * obj_num;
 			cord_t new_opad = (w_obj -  w_row) / (obj_num  - 1);
-			cord_t act_x = style->body.pad_hor; /*x init*/
+			cord_t act_x = style->body.padding.horizontal; /*x init*/
 			child_tmp = child_rs;
 			while(child_tmp != NULL) {
 				if(lv_obj_get_hidden(child_tmp) == false &&
@@ -491,7 +491,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 		}
 
 		if(child_rc == NULL) break;
-		act_y += style->body.pad_obj + h_row; /*y increment*/
+		act_y += style->body.padding.inner + h_row; /*y increment*/
 		child_rs = ll_get_prev(&cont->child_ll, child_rc); /*Go to the next object*/
 		child_rc = child_rs;
 	}
@@ -509,22 +509,22 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
 	cord_t w_tot = lv_obj_get_width(cont);
 	cord_t w_obj = lv_obj_get_width(lv_obj_get_child(cont, NULL));
 	cord_t h_obj = lv_obj_get_height(lv_obj_get_child(cont, NULL));
-	uint16_t obj_row = (w_tot - (2 * style->body.pad_hor)) / (w_obj + style->body.pad_obj); /*Obj. num. in a row*/
+	uint16_t obj_row = (w_tot - (2 * style->body.padding.horizontal)) / (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
 	cord_t x_ofs;
 	if(obj_row > 1) {
-		x_ofs = w_obj + (w_tot - (2 * style->body.pad_hor) - (obj_row * w_obj)) / (obj_row - 1);
+		x_ofs = w_obj + (w_tot - (2 * style->body.padding.horizontal) - (obj_row * w_obj)) / (obj_row - 1);
 	} else {
 		x_ofs = w_tot / 2 - w_obj / 2;
 	}
-	cord_t y_ofs = h_obj + style->body.pad_obj;
+	cord_t y_ofs = h_obj + style->body.padding.inner;
 
 	/* Disable child change action because the children will be moved a lot
 	 * an unnecessary child change signals could be sent*/
     lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
 
 	/* Align the children */
-	cord_t act_x = style->body.pad_hor;
-	cord_t act_y = style->body.pad_ver;
+	cord_t act_x = style->body.padding.horizontal;
+	cord_t act_y = style->body.padding.vertical;
 	uint16_t obj_cnt = 0;
 	LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
@@ -540,7 +540,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
 
 		if(obj_cnt >= obj_row) {
 			obj_cnt = 0;
-			act_x = style->body.pad_hor;
+			act_x = style->body.padding.horizontal;
 			act_y += y_ofs;
 		}
 	}
@@ -565,8 +565,8 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 	area_t ori;
 	lv_style_t * style = lv_obj_get_style(cont);
 	lv_obj_t * i;
-	cord_t hpad = style->body.pad_hor;
-	cord_t vpad = style->body.pad_ver;
+	cord_t hpad = style->body.padding.horizontal;
+	cord_t vpad = style->body.padding.vertical;
 
 	/*Search the side coordinates of the children*/
 	lv_obj_get_cords(cont, &ori);

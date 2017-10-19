@@ -86,7 +86,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));
+        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSPARENT, NULL));
         lv_cont_set_fit(scrl, true, true);
 
         ext->opt_label = lv_label_create(new_ddlist, NULL);
@@ -417,15 +417,15 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
         if(ext->opened != 0) {
             lv_style_t * style = lv_obj_get_style(ddlist);
-            const font_t * font = style->txt.font;
+            const font_t * font = style->text.font;
             cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
             area_t rect_area;
             rect_area.y1 = ext->opt_label->cords.y1;
-            rect_area.y1 += ext->sel_opt * (font_h + style->txt.space_line);
-            rect_area.y1 -= style->txt.space_line / 2;
+            rect_area.y1 += ext->sel_opt * (font_h + style->text.space_line);
+            rect_area.y1 -= style->text.space_line / 2;
 
-            rect_area.y2 = rect_area.y1 + font_h + style->txt.space_line;
-            rect_area.x1 = ext->opt_label->cords.x1 - style->body.pad_hor;
+            rect_area.y2 = rect_area.y1 + font_h + style->text.space_line;
+            rect_area.x1 = ext->opt_label->cords.x1 - style->body.padding.horizontal;
             rect_area.x2 = rect_area.x1 + lv_obj_get_width(lv_page_get_scrl(ddlist));
 
             lv_draw_rect(&rect_area, mask, ext->style_sel);
@@ -494,13 +494,13 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
     lv_style_t * style = lv_obj_get_style(ddlist);
     cord_t new_height;
     if(ext->opened) { /*Open the list*/
-        if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->body.pad_ver;
+        if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->body.padding.vertical;
         else new_height = ext->fix_height;
     } else { /*Close the list*/
-        const font_t * font = style->txt.font;
+        const font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->opt_label);
         cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
-        new_height = font_h + 2 * label_style->txt.space_line;
+        new_height = font_h + 2 * label_style->text.space_line;
     }
     if(anim_time == 0) {
         lv_obj_set_height(ddlist, new_height);
@@ -532,13 +532,13 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
-    const font_t * font = style->txt.font;
+    const font_t * font = style->text.font;
     cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
     lv_style_t * label_style = lv_obj_get_style(ext->opt_label);
     lv_obj_t * scrl = lv_page_get_scrl(ddlist);
 
     cord_t h = lv_obj_get_height(ddlist);
-    cord_t line_y1 = ext->sel_opt * (font_h + label_style->txt.space_line) + ext->opt_label->cords.y1 - scrl->cords.y1;
+    cord_t line_y1 = ext->sel_opt * (font_h + label_style->text.space_line) + ext->opt_label->cords.y1 - scrl->cords.y1;
 
     lv_obj_set_y(scrl, - line_y1 + (h - font_h) / 2);
 

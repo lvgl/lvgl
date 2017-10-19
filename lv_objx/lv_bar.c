@@ -285,10 +285,10 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
         lv_style_t * style_indic = lv_bar_get_style_indic(bar);
 		area_t indic_area;
 		area_cpy(&indic_area, &bar->cords);
-		indic_area.x1 += style_indic->body.pad_hor;
-		indic_area.x2 -= style_indic->body.pad_hor;
-		indic_area.y1 += style_indic->body.pad_ver;
-		indic_area.y2 -= style_indic->body.pad_ver;
+		indic_area.x1 += style_indic->body.padding.horizontal;
+		indic_area.x2 -= style_indic->body.padding.horizontal;
+		indic_area.y1 += style_indic->body.padding.vertical;
+		indic_area.y2 -= style_indic->body.padding.vertical;
 
 		cord_t w = area_get_width(&indic_area);
         cord_t h = area_get_height(&indic_area);

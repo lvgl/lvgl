@@ -63,8 +63,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     ext->header = NULL;
     ext->title = NULL;
     ext->style_header = lv_style_get(LV_STYLE_PLAIN_COLOR, NULL);
-    ext->style_cbtn_rel = lv_style_get(LV_STYLE_BTN_REL, NULL);
-    ext->style_cbtn_pr = lv_style_get(LV_STYLE_BTN_PR, NULL);
+    ext->style_cbtn_rel = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED, NULL);
+    ext->style_cbtn_pr = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED, NULL);
     ext->cbtn_size = ( LV_DPI) / 2;
 
     /*Init the new window object*/
@@ -80,7 +80,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
         lv_obj_t * scrl = lv_page_get_scrl(ext->page);
         lv_cont_set_fit(scrl, false, true);
-        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSP, NULL));
+        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSPARENT, NULL));
 
     	/*Create a holder for the header*/
     	ext->header = lv_cont_create(new_win, NULL);
@@ -97,7 +97,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	/*Create a holder for the control buttons*/
     	ext->btnh = lv_cont_create(ext->header, NULL);
     	lv_cont_set_fit(ext->btnh, true, false);
-        lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+        lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT, NULL));
     	lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_ROW_M);
 
         lv_obj_set_signal_f(new_win, lv_win_signal);
@@ -341,7 +341,7 @@ cord_t lv_win_get_width(lv_obj_t * win)
     lv_obj_t * scrl = lv_page_get_scrl(ext->page);
     lv_style_t * style_scrl = lv_obj_get_style(scrl);
 
-    return lv_obj_get_width(scrl) - 2 * style_scrl->body.pad_hor;
+    return lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.horizontal;
 }
 
 /**
@@ -412,16 +412,16 @@ static void lv_win_realign(lv_obj_t * win)
 	}
 
 	lv_style_t * btnh_style = lv_obj_get_style(ext->btnh);
-	lv_obj_set_height(ext->btnh, ext->cbtn_size + 2 * btnh_style->body.pad_ver * 2);
+	lv_obj_set_height(ext->btnh, ext->cbtn_size + 2 * btnh_style->body.padding.vertical * 2);
 	lv_obj_set_width(ext->header, lv_obj_get_width(win));
 
 	/*Align the higher object first to make the correct header size first*/
 	if(lv_obj_get_height(ext->title) > lv_obj_get_height(ext->btnh)) {
-		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.pad_hor, 0);
-		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.pad_hor, 0);
+		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.horizontal, 0);
+		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.padding.horizontal, 0);
 	} else {
-		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.pad_hor, 0);
-		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.pad_hor, 0);
+		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.padding.horizontal, 0);
+		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.horizontal, 0);
 	}
 
 	lv_obj_set_pos_us(ext->header, 0, 0);
@@ -433,7 +433,7 @@ static void lv_win_realign(lv_obj_t * win)
 	lv_style_t * style_page = lv_obj_get_style(page);
     lv_obj_t * scrl = lv_page_get_scrl(page);
 
-    lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * style_page->body.pad_hor);
+    lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * style_page->body.padding.horizontal);
 
 }
 #endif

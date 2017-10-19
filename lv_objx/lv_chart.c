@@ -477,7 +477,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 	lv_chart_dl_t * dl;
 	lv_style_t lines;
 	lv_style_get(LV_STYLE_PLAIN, &lines);
-	lines.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
+	lines.opacity = (uint16_t)((uint16_t)style->opacity * ext->dl_opa) >> 8;
     lines.line.width = ext->dl_width;
 
 	/*Go through all data lines*/
@@ -530,13 +530,13 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 	style_point.border.width = 0;
 	style_point.body.empty = 0;
 	style_point.body.radius = LV_RADIUS_CIRCLE;
-    style_point.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
+    style_point.opacity = (uint16_t)((uint16_t)style->opacity * ext->dl_opa) >> 8;
     style_point.body.radius = ext->dl_width;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->dl_ll, dl) {
 		style_point.body.color_main = dl->color;
-		style_point.body.color_grad = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
+		style_point.body.color_gradient = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
 
 		for(i = 0; i < ext->pnum; i ++) {
 			cir_a.x1 = ((w * i) / (ext->pnum - 1)) + x_ofs;
@@ -581,7 +581,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 	rects.border.width = 0;
 	rects.body.empty = 0;
 	rects.body.radius = 0;
-	rects.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
+	rects.opacity = (uint16_t)((uint16_t)style->opacity * ext->dl_opa) >> 8;
 
 	col_a.y2 = chart->cords.y2;
 
@@ -595,7 +595,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
         /*Draw the current point of all data line*/
         LL_READ_BACK(ext->dl_ll, dl) {
             rects.body.color_main = dl->color;
-            rects.body.color_grad = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
+            rects.body.color_gradient = color_mix(COLOR_BLACK, dl->color, ext->dl_dark);
             col_a.x1 = x_act;
             col_a.x2 = col_a.x1 + col_w;
             x_act += col_w;

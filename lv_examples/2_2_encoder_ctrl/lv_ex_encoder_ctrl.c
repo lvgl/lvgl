@@ -127,7 +127,7 @@ static void gui_create(void)
     lv_obj_t * holder = lv_cont_create(scr, NULL);   /*Create a transparent holder*/
     lv_cont_set_fit(holder, true, true);
     lv_cont_set_layout(holder, LV_CONT_LAYOUT_COL_L);
-    lv_obj_set_style(holder, lv_style_get(LV_STYLE_TRANSP, NULL));
+    lv_obj_set_style(holder, lv_style_get(LV_STYLE_TRANSPARENT, NULL));
 
     lv_obj_t * cb = lv_cb_create(holder, NULL);     /*First check box*/
     lv_cb_set_text(cb, "Red");

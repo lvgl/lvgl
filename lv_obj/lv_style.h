@@ -33,25 +33,28 @@ typedef enum {
     LV_TXT_ALIGN_MID,
 }lv_txt_align_t;
 
-
 /*Shadow types*/
 typedef enum
 {
-    LV_STYPE_BOTTOM = 0,
-    LV_STYPE_FULL,
-}lv_stype_t;
+    LV_SHADOW_BOTTOM = 0,
+    LV_SHADOW_FULL,
+}lv_shadow_type_t;
 
 typedef struct
 {
+    opa_t opacity;
+    uint8_t glass :1;   /*1: Do not inherit this style*/
+
     struct {
         color_t color_main;
-        color_t color_grad;
-        opa_t opa;
-        cord_t pad_ver;        /*Vertical padding*/
-        cord_t pad_hor;        /*Horizontal padding*/
-        cord_t pad_obj;        /*Object padding on the background*/
+        color_t color_gradient;
         cord_t radius;      /*Corner radius of background*/
-        uint8_t glass :1;   /*1: Do not inherit this style*/
+        struct {
+            cord_t vertical;
+            cord_t horizontal;
+            cord_t inner;
+        }padding;
+
         uint8_t empty :1;   /*Transparent background (border still drawn)*/
     }body;
 
@@ -67,40 +70,38 @@ typedef struct
         uint8_t type;
     }shadow;
 
-
     struct {
         color_t color;
         const font_t * font;
         cord_t space_letter;
         cord_t space_line;
         uint8_t align:2;
-    }txt;
+    }text;
 
     struct {
         color_t color;
         opa_t intense;
-    }img;
+    }image;
 
     struct {
         color_t color;
         cord_t width;
     }line;
-
 }lv_style_t;
 
 typedef enum {
-    LV_STYLE_SCR,
-    LV_STYLE_TRANSP,
-    LV_STYLE_TRANSP_TIGHT,
+    LV_STYLE_SCREEN,
+    LV_STYLE_TRANSPARENT,
+    LV_STYLE_TRANSPARENT_TIGHT,
     LV_STYLE_PLAIN,
     LV_STYLE_PLAIN_COLOR,
     LV_STYLE_PRETTY,
     LV_STYLE_PRETTY_COLOR,
-    LV_STYLE_BTN_REL,
-    LV_STYLE_BTN_PR,
-    LV_STYLE_BTN_TREL,
-    LV_STYLE_BTN_TPR,
-    LV_STYLE_BTN_INA,
+    LV_STYLE_BUTTON_OFF_RELEASED,
+    LV_STYLE_BUTTON_OFF_PRESSED,
+    LV_STYLE_BUTTON_ON_RELEASED,
+    LV_STYLE_BUTTON_ON_PRESSED,
+    LV_STYLE_BUTTON_INACTIVE,
 }lv_style_name_t;
 
 
@@ -161,7 +162,6 @@ void lv_style_cpy(lv_style_t * dest, const lv_style_t * src);
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
  */
 void lv_style_anim_create(lv_style_anim_t * anim);
-
 
 /**********************
  *      MACROS

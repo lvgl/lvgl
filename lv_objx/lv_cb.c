@@ -70,17 +70,17 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         ext->bullet = lv_btn_create(new_cb, NULL);
         if(ancestor_bullet_design_f == NULL) ancestor_bullet_design_f = lv_obj_get_design_f(ext->bullet);
-        lv_btn_set_styles(new_cb, lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
-                                  lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
-                                  lv_style_get(LV_STYLE_TRANSP, NULL));
+        lv_btn_set_styles(new_cb, lv_style_get(LV_STYLE_TRANSPARENT, NULL), lv_style_get(LV_STYLE_TRANSPARENT, NULL),
+                                  lv_style_get(LV_STYLE_TRANSPARENT, NULL), lv_style_get(LV_STYLE_TRANSPARENT, NULL),
+                                  lv_style_get(LV_STYLE_TRANSPARENT, NULL));
         lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
         lv_cont_set_fit(new_cb, true, true);
         lv_btn_set_tgl(new_cb, true);
 
         lv_obj_set_click(ext->bullet, false);
         lv_btn_set_styles(ext->bullet, lv_style_get(LV_STYLE_PRETTY, NULL), lv_style_get(LV_STYLE_PRETTY_COLOR, NULL),
-                                       lv_style_get(LV_STYLE_BTN_TREL, NULL), lv_style_get(LV_STYLE_BTN_TPR, NULL),
-                                       lv_style_get(LV_STYLE_BTN_INA, NULL));
+                                       lv_style_get(LV_STYLE_BUTTON_ON_RELEASED, NULL), lv_style_get(LV_STYLE_BUTTON_ON_PRESSED, NULL),
+                                       lv_style_get(LV_STYLE_BUTTON_INACTIVE, NULL));
 
         ext->label = lv_label_create(new_cb, NULL);
         lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
@@ -120,7 +120,7 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	if(sign == LV_SIGNAL_STYLE_CHG) {
-    		lv_obj_set_size(ext->bullet, font_get_height(style->txt.font), font_get_height(style->txt.font));
+    		lv_obj_set_size(ext->bullet, font_get_height(style->text.font), font_get_height(style->text.font));
     	} else if(sign == LV_SIGNAL_PRESSED ||
             sign == LV_SIGNAL_RELEASED ||
             sign == LV_SIGNAL_PRESS_LOST) {
@@ -239,7 +239,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
         lv_obj_t * bg = lv_obj_get_parent(bullet);
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
-        if(style_page->body.empty != 0 || style_page->body.opa == OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.empty != 0 || style_page->opacity == OPA_TRANSP) { /*Background is visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);

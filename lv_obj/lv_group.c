@@ -258,7 +258,7 @@ static void style_mod_def(lv_style_t * style)
     if(style->border.width == 0 && style->body.empty == 0) style->border.width = 2 * LV_DOWNSCALE;   /*Add border to not transparent styles*/
     else style->border.width = style->border.width * 2;                                         /*Make the border thicker*/
     style->body.color_main = color_mix(style->body.color_main, COLOR_ORANGE, OPA_80);
-    style->body.color_grad = color_mix(style->body.color_grad, COLOR_ORANGE, OPA_80);
+    style->body.color_gradient = color_mix(style->body.color_gradient, COLOR_ORANGE, OPA_80);
 }
 
 #endif /*LV_OBJ_GROUP != 0*/

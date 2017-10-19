@@ -90,10 +90,10 @@ void lv_init(void)
     act_scr = def_scr;
     
     top_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(top_layer, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+    lv_obj_set_style(top_layer, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT, NULL));
 
     sys_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(sys_layer, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+    lv_obj_set_style(sys_layer, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT, NULL));
 
     /*Refresh the screen*/
     lv_obj_inv(act_scr);
@@ -139,7 +139,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->ext_size = 0;
 
 		/*Set appearance*/
-		new_obj->style_p = lv_style_get(LV_STYLE_SCR, NULL);
+		new_obj->style_p = lv_style_get(LV_STYLE_SCREEN, NULL);
 
 		/*Set virtual functions*/
 		lv_obj_set_signal_f(new_obj, lv_obj_signal);
@@ -1287,7 +1287,7 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
 
         while(par != NULL) {
             if(par->style_p != NULL) {
-                if(par->style_p->body.glass == 0) {
+                if(par->style_p->glass == 0) {
                     style_act = par->style_p;
                     break;
                 }
@@ -1561,7 +1561,7 @@ static void lv_child_refr_style(lv_obj_t * obj)
         if(child->style_p == NULL) {
             lv_child_refr_style(child);     /*Check children too*/
             lv_obj_refr_style(child);       /*Notify the child about the style change*/
-        } else if(child->style_p->body.glass) {
+        } else if(child->style_p->glass) {
             /*Children with 'glass' parent might be effected if their style == NULL*/
             lv_child_refr_style(child);
         }

@@ -68,11 +68,11 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 
     ext->sb_out = 0;
     ext->style_img = NULL;
-    ext->styles_btn[LV_BTN_STATE_REL] = lv_style_get(LV_STYLE_BTN_REL, NULL);
-    ext->styles_btn[LV_BTN_STATE_PR] = lv_style_get(LV_STYLE_BTN_PR, NULL);
-    ext->styles_btn[LV_BTN_STATE_TREL] = lv_style_get(LV_STYLE_BTN_TREL, NULL);
-    ext->styles_btn[LV_BTN_STATE_PR] = lv_style_get(LV_STYLE_BTN_TPR, NULL);
-    ext->styles_btn[LV_BTN_STATE_INA] = lv_style_get(LV_STYLE_BTN_INA, NULL);
+    ext->styles_btn[LV_BTN_STATE_REL] = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED, NULL);
+    ext->styles_btn[LV_BTN_STATE_PR] = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED, NULL);
+    ext->styles_btn[LV_BTN_STATE_TREL] = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED, NULL);
+    ext->styles_btn[LV_BTN_STATE_PR] = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED, NULL);
+    ext->styles_btn[LV_BTN_STATE_INA] = lv_style_get(LV_STYLE_BUTTON_INACTIVE, NULL);
 
 	lv_obj_set_signal_f(new_list, lv_list_signal);
 
@@ -80,7 +80,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
     	lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
 		lv_cont_set_layout(ext->page.scrl, LV_LIST_LAYOUT_DEF);
-		lv_obj_set_style(new_list, lv_style_get(LV_STYLE_TRANSP_TIGHT, NULL));
+		lv_obj_set_style(new_list, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT, NULL));
 		lv_obj_set_style(lv_page_get_scrl(new_list), lv_style_get(LV_STYLE_PRETTY, NULL));
 		lv_page_set_sb_mode(new_list, LV_PAGE_SB_MODE_AUTO);
     } else {
@@ -225,7 +225,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     /*Make the size adjustment*/
     cord_t w = lv_obj_get_width(list);
     lv_style_t *  style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
-    cord_t pad_hor_tot = style->body.pad_hor + style_scrl->body.pad_hor;
+    cord_t pad_hor_tot = style->body.padding.horizontal + style_scrl->body.padding.horizontal;
     w -= pad_hor_tot * 2;
 
     /*Make place for the scrollbar if pad_hor_tot is too small*/
