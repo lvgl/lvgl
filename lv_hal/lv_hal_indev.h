@@ -93,21 +93,13 @@ typedef struct _lv_indev_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+
 /**
- * Register Input Device driver
- *
- * @param driver Input Device driver structure
- * @return 0 on success, -ve on error
+ * Register an initialized input device driver.
+ * @param driver pointer to an initialized 'lv_indev_drv_t' variable (can be local variable)
+ * @return pointer to the new input device or NULL on error
  */
 lv_indev_t * lv_indev_register(lv_indev_drv_t *driver);
-
-
-/**
- * Ask data from an input device.
- * @param data input device data
- * @return false: no more data; true: there more data to read (buffered)
- */
-bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data);
 
 /**
  * Get the next input device.
@@ -115,6 +107,14 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data);
  * @return the next input devise or NULL if no more. Give the first input device when the parameter is NULL
  */
 lv_indev_t * lv_indev_next(lv_indev_t * indev);
+
+/**
+ * Read data from an input device.
+ * @param indev pointer to an input device
+ * @param data input device will write its data here
+ * @return false: no more data; true: there more data to read (buffered)
+ */
+bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data);
 
 /**********************
  *      MACROS

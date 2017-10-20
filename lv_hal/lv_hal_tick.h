@@ -27,8 +27,10 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+
 /**
- * Call this function every milliseconds
+ * You have to call this function in every milliseconds in a timer interrupt
  */
 void lv_tick_handler(void);
 
@@ -40,7 +42,7 @@ uint32_t lv_tick_get(void);
 
 /**
  * Get the elapsed milliseconds science a previous time stamp
- * @param prev_tick a previous time stamp from 'systick_get'
+ * @param prev_tick a previous time stamp (return value of systick_get() )
  * @return the elapsed milliseconds since 'prev_tick'
  */
 uint32_t lv_tick_elaps(uint32_t prev_tick);

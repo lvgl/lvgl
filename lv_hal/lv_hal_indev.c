@@ -37,10 +37,9 @@ static lv_indev_t *indev_list = NULL;
  **********************/
 
 /**
- * Register Input Device driver
- *
- * @param driver Input Device driver structure
- * @return pointer to the new input device
+ * Register an initialized input device driver.
+ * @param driver pointer to an initialized 'lv_indev_drv_t' variable (can be local variable)
+ * @return pointer to the new input device or NULL on error
  */
 lv_indev_t * lv_indev_register(lv_indev_drv_t *driver)
 {

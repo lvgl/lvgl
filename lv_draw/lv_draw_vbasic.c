@@ -117,7 +117,7 @@ void lv_vfill(const area_t * cords_p, const area_t * mask_p,
     /*Move the vdb_tmp to the first row*/
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
-    if(lv_disp_is_accelerated() == false) {
+    if(lv_disp_is_copy_supported() == false) {
         sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
     } else {
         static color_t color_map[LV_HOR_RES];
@@ -322,7 +322,7 @@ void lv_vmap(const area_t * cords_p, const area_t * mask_p,
             cord_t map_useful_w = area_get_width(&masked_a);
 
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                if(lv_disp_is_accelerated() == false) {
+                if(lv_disp_is_copy_supported() == false) {
                     sw_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
                 } else {
                     lv_disp_copy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
