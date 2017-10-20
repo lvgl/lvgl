@@ -242,7 +242,7 @@ static void lv_refr_area_no_vdb(const area_t * area_p)
     lv_obj_t * top_p;
     
     /*Get top object which is not covered by others*/    
-    top_p = lv_refr_get_top_obj(area_p, lv_scr_act());
+    top_p = lv_refr_get_top_obj(area_p, lv_screen_act());
     
     /*Do the refreshing*/
     lv_refr_make(top_p, area_p);
@@ -310,7 +310,7 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
     area_union(&start_mask, area_p, &vdb_p->area);
 
     /*Get the most top object which is not covered by others*/
-    top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
+    top_p = lv_refr_get_top_obj(&start_mask, lv_screen_act());
 
     /*Do the refreshing from the top object*/
     lv_refr_make(top_p, &start_mask);
@@ -338,7 +338,7 @@ static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
     
     /*If this object is fully cover the draw area check the children too */
-    if(area_is_in(area_p, &obj->cords) && obj->hidden == 0)
+    if(area_is_in(area_p, &obj->coords) && obj->hidden == 0)
     {
         LL_READ(obj->child_ll, i)        {
             found_p = lv_refr_get_top_obj(area_p, i);
@@ -353,7 +353,7 @@ static lv_obj_t * lv_refr_get_top_obj(const area_t * area_p, lv_obj_t * obj)
         if(found_p == NULL) {
             lv_style_t * style = lv_obj_get_style(obj);
             if(style->opacity == OPA_COVER &&
-               obj->design_f(obj, area_p, LV_DESIGN_COVER_CHK) != false) {
+               obj->design_func(obj, area_p, LV_DESIGN_COVER_CHK) != false) {
                 found_p = obj;
             }
         }
@@ -372,7 +372,7 @@ static void lv_refr_make(lv_obj_t * top_p, const area_t * mask_p)
     /* Normally always will be a top_obj (at least the screen)
      * but in special cases (e.g. if the screen has alpha) it won't.
      * In this case use the screen directly */
-    if(top_p == NULL) top_p = lv_scr_act();
+    if(top_p == NULL) top_p = lv_screen_act();
     
     /*Refresh the top object and its children*/
     lv_refr_obj(top_p, mask_p);
@@ -405,7 +405,7 @@ static void lv_refr_make(lv_obj_t * top_p, const area_t * mask_p)
     /*Call the post draw design function of the parents of the to object*/
     par = lv_obj_get_parent(top_p);
     while(par != NULL) {
-        par->design_f(par, mask_p, LV_DESIGN_DRAW_POST);
+        par->design_func(par, mask_p, LV_DESIGN_DRAW_POST);
         par = lv_obj_get_parent(par);
     }
 }
@@ -427,7 +427,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
     area_t obj_ext_mask;
     area_t obj_area;
     cord_t ext_size = obj->ext_size;
-    lv_obj_get_cords(obj, &obj_area);
+    lv_obj_get_coords(obj, &obj_area);
     obj_area.x1 -= ext_size;
     obj_area.y1 -= ext_size;
     obj_area.x2 += ext_size;
@@ -440,12 +440,12 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
         /* Redraw the object */
         lv_style_t * style = lv_obj_get_style(obj);
         if(style->opacity != OPA_TRANSP) {
-            obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
+            obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
             //tick_wait_ms(100);  /*DEBUG: Wait after every object draw to see the order of drawing*/
         }
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
-        lv_obj_get_cords(obj, &obj_area);
+        lv_obj_get_coords(obj, &obj_area);
         union_ok = area_union(&obj_mask, mask_ori_p, &obj_area);
         if(union_ok != false) {
 			area_t mask_child; /*Mask from obj and its child*/
@@ -453,7 +453,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
 			area_t child_area;
 			LL_READ_BACK(obj->child_ll, child_p)
 			{
-				lv_obj_get_cords(child_p, &child_area);
+				lv_obj_get_coords(child_p, &child_area);
 				ext_size = child_p->ext_size;
 				child_area.x1 -= ext_size;
 				child_area.y1 -= ext_size;
@@ -473,7 +473,7 @@ static void lv_refr_obj(lv_obj_t * obj, const area_t * mask_ori_p)
 
         /* If all the children are redrawn make 'post draw' design */
         if(style->opacity != OPA_TRANSP) {
-		  obj->design_f(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
+		  obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
 		}
     }
 }

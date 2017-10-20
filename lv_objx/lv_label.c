@@ -24,11 +24,11 @@
  *********************/
 /*Test configurations*/
 #ifndef LV_LABEL_SCROLL_SPEED
-#define LV_LABEL_SCROLL_SPEED       (25 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
+#define LV_LABEL_SCROLL_SPEED       (25 << LV_ANTIALIAS) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
 #endif
 
 #ifndef LV_LABEL_SCROLL_SPEED_VER
-#define LV_LABEL_SCROLL_SPEED_VER   (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
+#define LV_LABEL_SCROLL_SPEED_VER   (10 << LV_ANTIALIAS) /*Ver. scroll speed if hor. scroll is applied too*/
 #endif
 
 #ifndef LV_LABEL_SCROLL_PLAYBACK_PAUSE
@@ -78,9 +78,9 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_label);
     
     /*Extend the basic object to a label object*/
-    lv_obj_alloc_ext(new_label, sizeof(lv_label_ext_t));
+    lv_obj_allocate_ext_attr(new_label, sizeof(lv_label_ext_t));
     
-    lv_label_ext_t * ext = lv_obj_get_ext(new_label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(new_label);
     dm_assert(ext);
     ext->txt = NULL;
     ext->static_txt = 0;
@@ -90,8 +90,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->long_mode = LV_LABEL_LONG_EXPAND;
     ext->offset.x = 0;
     ext->offset.y = 0;
-	lv_obj_set_design_f(new_label, lv_label_design);
-	lv_obj_set_signal_f(new_label, lv_label_signal);
+	lv_obj_set_design_func(new_label, lv_label_design);
+	lv_obj_set_signal_func(new_label, lv_label_signal);
 
     /*Init the new label*/
     if(copy == NULL) {
@@ -102,14 +102,14 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy 'copy' if not NULL*/
     else {
-        lv_label_ext_t * copy_ext = lv_obj_get_ext(copy);
+        lv_label_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
         lv_label_set_recolor(new_label, lv_label_get_recolor(copy));
         if(copy_ext->static_txt == 0) lv_label_set_text(new_label, lv_label_get_text(copy));
         else lv_label_set_text_static(new_label, lv_label_get_text(copy));
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_label);
+        lv_obj_refresh_style(new_label);
     }
     return new_label;
 }
@@ -131,7 +131,7 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-        lv_label_ext_t * ext = lv_obj_get_ext(label);
+        lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
         if(sign ==  LV_SIGNAL_CLEANUP) {
             if(ext->static_txt == 0) {
                 dm_free(ext->txt);
@@ -142,8 +142,8 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
             	lv_label_refr_text(label);
         }
         else if (sign == LV_SIGNAL_CORD_CHG) {
-            if(area_get_width(&label->cords) != area_get_width(param)
-               || area_get_height(&label->cords) != area_get_height(param))
+            if(area_get_width(&label->coords) != area_get_width(param)
+               || area_get_height(&label->coords) != area_get_height(param))
             {
                 lv_label_refr_text(label);
             }
@@ -165,9 +165,9 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
  */
 void lv_label_set_text(lv_obj_t * label, const char * text)
 {
-    lv_obj_inv(label);
+    lv_obj_invalidate(label);
     
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     /*If text is NULL then refresh */
     if(text == NULL) {
@@ -202,9 +202,9 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
  */
 void lv_label_set_text_array(lv_obj_t * label, const char * array, uint16_t size)
 {
-    lv_obj_inv(label);
+    lv_obj_invalidate(label);
 
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     /*If trying to set its own text or the array is NULL then refresh */
     if(array == ext->txt || array == NULL) {
@@ -233,7 +233,7 @@ void lv_label_set_text_array(lv_obj_t * label, const char * array, uint16_t size
  */
 void lv_label_set_text_static(lv_obj_t * label, const char * text)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->static_txt == 0 && ext->txt != NULL) {
         dm_free(ext->txt);
         ext->txt = NULL;
@@ -257,12 +257,12 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text)
  */
 void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     /*Can not append to static text*/
     if(ext->static_txt != 0) return;
 
-    lv_obj_inv(label);
+    lv_obj_invalidate(label);
 
     /*Allocate space for the new text*/
     uint32_t old_len = strlen(ext->txt);
@@ -290,7 +290,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
  */
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     /*Delete the old animation (if exists)*/
     anim_del(label, (anim_fp_t) lv_obj_set_x);
@@ -314,7 +314,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
  */
 void lv_label_set_recolor(lv_obj_t * label, bool recolor)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     ext->recolor = recolor == false ? 0 : 1;
 
@@ -328,7 +328,7 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor)
  */
 void lv_label_set_no_break(lv_obj_t * label, bool en)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->no_break = en == false ? 0 : 1;
 
     lv_label_refr_text(label);
@@ -345,7 +345,7 @@ void lv_label_set_no_break(lv_obj_t * label, bool en)
  */
 char * lv_label_get_text(lv_obj_t * label)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     
     return ext->txt;
 }
@@ -357,7 +357,7 @@ char * lv_label_get_text(lv_obj_t * label)
  */
 lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->long_mode;
 }
 
@@ -368,7 +368,7 @@ lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label)
  */
 bool lv_label_get_recolor(lv_obj_t * label)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->recolor == 0 ? false : true;
 }
 
@@ -381,7 +381,7 @@ bool lv_label_get_recolor(lv_obj_t * label)
 void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 {
 	const char * txt = lv_label_get_text(label);
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     cord_t max_w = lv_obj_get_width(label);
@@ -456,7 +456,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 {
 	const char * txt = lv_label_get_text(label);
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     cord_t max_w = lv_obj_get_width(label);
@@ -533,7 +533,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         area_t cords;
         lv_style_t * style = lv_obj_get_style(label);
-        lv_obj_get_cords(label, &cords);
+        lv_obj_get_coords(label, &cords);
 
 #if LV_OBJ_GROUP != 0
         lv_group_t * g = lv_obj_get_group(label);
@@ -550,7 +550,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
         /*TEST: draw a background for the label*/
 		//lv_vfill(&label->cords, mask, COLOR_LIME, OPA_COVER);
 
-		lv_label_ext_t * ext = lv_obj_get_ext(label);
+		lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 		txt_flag_t flag = TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
@@ -567,7 +567,7 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
  */
 static void lv_label_refr_text(lv_obj_t * label)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     if(ext->txt == NULL) return;
 
@@ -683,21 +683,21 @@ static void lv_label_refr_text(lv_obj_t * label)
     }
 
 
-    lv_obj_inv(label);
+    lv_obj_invalidate(label);
 }
 
 
 static void lv_label_set_offset_x(lv_obj_t * label, cord_t x)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->offset.x = x;
-    lv_obj_inv(label);
+    lv_obj_invalidate(label);
 }
 
 static void lv_label_set_offset_y(lv_obj_t * label, cord_t y)
 {
-    lv_label_ext_t * ext = lv_obj_get_ext(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->offset.y = y;
-    lv_obj_inv(label);
+    lv_obj_invalidate(label);
 }
 #endif

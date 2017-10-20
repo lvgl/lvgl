@@ -61,16 +61,16 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_mbox);
     
     /*Allocate the message box type specific extended data*/
-    lv_mbox_ext_t * ext = lv_obj_alloc_ext(new_mbox, sizeof(lv_mbox_ext_t));
+    lv_mbox_ext_t * ext = lv_obj_allocate_ext_attr(new_mbox, sizeof(lv_mbox_ext_t));
     dm_assert(ext);
     ext->txt = NULL;
     ext->btnh = NULL;
-    ext->style_btn_rel = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED, NULL);
-    ext->style_btn_pr = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED, NULL);
+    ext->style_btn_rel = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED);
+    ext->style_btn_pr = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED);
     ext->anim_close_time = LV_MBOX_CLOSE_ANIM_TIME;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_f(new_mbox, lv_mbox_signal);
+    lv_obj_set_signal_func(new_mbox, lv_mbox_signal);
 
     /*Init the new message box message box*/
     if(copy == NULL) {
@@ -80,11 +80,11 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->txt = lv_label_create(new_mbox, NULL);
     	lv_label_set_text(ext->txt, "Text of the message box");
 
-    	lv_obj_set_style(new_mbox, lv_style_get(LV_STYLE_PRETTY, NULL));
+    	lv_obj_set_style(new_mbox, lv_style_get(LV_STYLE_PRETTY));
     }
     /*Copy an existing message box*/
     else {
-        lv_mbox_ext_t * copy_ext = lv_obj_get_ext(copy);
+        lv_mbox_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
         ext->txt = lv_label_create(new_mbox, copy_ext->txt);
 
@@ -92,15 +92,13 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
         if(copy_ext->btnh != NULL) {
             lv_obj_t * btn_copy;
             const char * btn_txt_copy;
-            lv_btn_ext_t * btn_ext_copy;
             LL_READ_BACK(copy_ext->btnh->child_ll, btn_copy) {
                 btn_txt_copy = lv_label_get_text(lv_obj_get_child(btn_copy, NULL));
-                btn_ext_copy = lv_obj_get_ext(btn_copy);
-                lv_mbox_add_btn(new_mbox, btn_txt_copy, btn_ext_copy->rel_action);
+                lv_mbox_add_btn(new_mbox, btn_txt_copy, lv_btn_get_action(btn_copy, LV_BTN_ACTION_RELEASE));
             }
         }
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_mbox);
+        lv_obj_refresh_style(new_mbox);
     }
     
     lv_mbox_realign(new_mbox);
@@ -125,7 +123,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     	if(sign == LV_SIGNAL_CORD_CHG) {
             /*If the size is changed refresh the message box*/
@@ -144,8 +142,8 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                 btn = lv_obj_get_child(ext->btnh, NULL);
                 while(btn != NULL) {
                     /*Refresh the next button's style*/
-                    lv_btn_set_styles(btn, ext->style_btn_rel, ext->style_btn_pr, NULL, NULL, NULL);
-
+                    lv_btn_set_style(btn, LV_BTN_STATE_OFF_RELEASED, ext->style_btn_rel);
+                    lv_btn_set_style(btn, LV_BTN_STATE_OFF_PRESSED, ext->style_btn_pr);
                     btn = lv_obj_get_child(ext->btnh, btn);
                 }
             }
@@ -160,7 +158,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     btn = lv_obj_get_child(ext->btnh, btn);
                 }
                 if(btn_prev != NULL) {
-                    lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                    lv_btn_set_state(btn_prev, LV_BTN_STATE_OFF_PRESSED);
                 }
             }
         } else if(sign == LV_SIGNAL_DEFOCUS) {
@@ -169,16 +167,16 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                 lv_obj_t * btn = NULL;
                 btn = lv_obj_get_child(ext->btnh, btn);
                 while(btn != NULL) {
-                    if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                    if(lv_btn_get_state(btn) == LV_BTN_STATE_OFF_PRESSED) break;
                     btn = lv_obj_get_child(ext->btnh, btn);
                 }
 
                 if(btn != NULL) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                    lv_btn_set_state(btn, LV_BTN_STATE_OFF_RELEASED);
                 }
             }
         } else if(sign == LV_SIGNAL_CONTROLL) {
-            lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+            lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
             char c = *((char*)param);
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
                 /*Get the last pressed button*/
@@ -187,14 +185,14 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     lv_obj_t * btn_prev = NULL;
                     btn = lv_obj_get_child(ext->btnh, btn);
                     while(btn != NULL) {
-                        if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                        if(lv_btn_get_state(btn) == LV_BTN_STATE_OFF_PRESSED) break;
                         btn_prev = btn;
                         btn = lv_obj_get_child(ext->btnh, btn);
                     }
 
                     if(btn_prev != NULL && btn != NULL) {
-                        lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                        lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                        lv_btn_set_state(btn, LV_BTN_STATE_OFF_RELEASED);
+                        lv_btn_set_state(btn_prev, LV_BTN_STATE_OFF_PRESSED);
                     }
                 }
             } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
@@ -203,15 +201,15 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     lv_obj_t * btn = NULL;
                     btn = lv_obj_get_child(ext->btnh, btn);
                     while(btn != NULL) {
-                        if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                        if(lv_btn_get_state(btn) == LV_BTN_STATE_OFF_PRESSED) break;
                         btn = lv_obj_get_child(ext->btnh, btn);
                     }
 
                     if(btn != NULL) {
                         lv_obj_t * btn_prev = lv_obj_get_child(ext->btnh, btn);
                         if(btn_prev != NULL) {
-                            lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                            lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+                            lv_btn_set_state(btn, LV_BTN_STATE_OFF_RELEASED);
+                            lv_btn_set_state(btn_prev, LV_BTN_STATE_OFF_PRESSED);
                         }
                     }
 
@@ -222,13 +220,13 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                    lv_obj_t * btn = NULL;
                    btn = lv_obj_get_child(ext->btnh, btn);
                    while(btn != NULL) {
-                       if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                       if(lv_btn_get_state(btn) == LV_BTN_STATE_OFF_PRESSED) break;
                        btn = lv_obj_get_child(ext->btnh, btn);
                    }
 
                    if(btn != NULL) {
                        lv_action_t rel_action;
-                       rel_action = lv_btn_get_rel_action(btn);
+                       rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_RELEASE);
                        if(rel_action != NULL) rel_action(btn);
                    }
                }
@@ -262,12 +260,12 @@ lv_action_res_t lv_mbox_close_action(lv_obj_t * btn)
  */
 lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t rel_action)
 {
-    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     /*Create a button if it is not existed yet*/
     if(ext->btnh == NULL) {
         ext->btnh = lv_cont_create(mbox, NULL);
-        lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSPARENT, NULL));
+        lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSPARENT));
         lv_obj_set_click(ext->btnh, false);
         lv_cont_set_fit(ext->btnh, false, true);
         lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_PRETTY);
@@ -275,8 +273,9 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 
     lv_obj_t * btn;
     btn = lv_btn_create(ext->btnh, NULL);
-    lv_btn_set_rel_action(btn, rel_action);
-    lv_btn_set_styles(btn, ext->style_btn_rel, ext->style_btn_pr, NULL, NULL, NULL);
+    lv_btn_set_action(btn, LV_BTN_ACTION_RELEASE, rel_action);
+    lv_btn_set_style(btn, LV_BTN_STATE_OFF_RELEASED, ext->style_btn_rel);
+    lv_btn_set_style(btn, LV_BTN_STATE_OFF_PRESSED, ext->style_btn_pr);
     lv_cont_set_fit(btn, true, true);
 
     lv_obj_t * label;
@@ -299,7 +298,7 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
  */
 void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
 {
-    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     lv_label_set_text(ext->txt, txt);
     lv_mbox_realign(mbox);
@@ -316,7 +315,7 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
  */
 void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
 {
-    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     ext->style_btn_rel = rel;
     ext->style_btn_pr = pr;
@@ -325,7 +324,8 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
         lv_obj_t * btn = lv_obj_get_child(ext->btnh, NULL);
 
         while(btn != NULL) {
-            lv_btn_set_styles(btn, rel, pr, NULL, NULL, NULL);
+            lv_btn_set_style(btn, LV_BTN_STATE_OFF_RELEASED, rel);
+            lv_btn_set_style(btn, LV_BTN_STATE_OFF_PRESSED, pr);
             btn = lv_obj_get_child(mbox, btn);
         }
     }
@@ -338,7 +338,7 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
  */
 void lv_mbox_set_anim_close_time(lv_obj_t * mbox, uint16_t time)
 {
-    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     ext->anim_close_time = time;
 }
 
@@ -349,17 +349,17 @@ void lv_mbox_set_anim_close_time(lv_obj_t * mbox, uint16_t time)
  */
 void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t tout)
 {
-    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     if(ext->anim_close_time != 0) {
         /*Add shrinking animations*/
-        lv_obj_anim(mbox, LV_ANIM_GROW_H| ANIM_OUT, ext->anim_close_time, tout, NULL);
-        lv_obj_anim(mbox, LV_ANIM_GROW_V| ANIM_OUT, ext->anim_close_time, tout, lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_GROW_H| ANIM_OUT, ext->anim_close_time, tout, NULL);
+        lv_obj_animate(mbox, LV_ANIM_GROW_V| ANIM_OUT, ext->anim_close_time, tout, lv_obj_del);
 
         /*When the animations start disable fit to let shrinking work*/
-        lv_obj_anim(mbox, LV_ANIM_NONE, 1, tout, lv_mbox_disable_fit);
+        lv_obj_animate(mbox, LV_ANIM_NONE, 1, tout, lv_mbox_disable_fit);
     } else {
-        lv_obj_anim(mbox, LV_ANIM_NONE, ext->anim_close_time, tout, lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_close_time, tout, lv_obj_del);
     }
 }
 
@@ -383,7 +383,7 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox)
  */
 const char * lv_mbox_get_txt(lv_obj_t * mbox)
 {
-	lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
 	return lv_label_get_text(ext->txt);
 }
@@ -409,7 +409,7 @@ lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn)
  */
 uint16_t lv_mbox_get_anim_close_time(lv_obj_t * mbox )
 {
-    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return ext->anim_close_time;
 }
 /**
@@ -420,7 +420,7 @@ uint16_t lv_mbox_get_anim_close_time(lv_obj_t * mbox )
  */
 lv_style_t * lv_mbox_get_style_btn(lv_obj_t * mbox, lv_btn_state_t state)
 {
-    lv_btn_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_btn_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     if(ext->styles[state] == NULL) return lv_obj_get_style(mbox);
 
@@ -462,7 +462,7 @@ static bool lv_mbox_design(lv_obj_t * mbox, const area_t * mask, lv_design_mode_
  */
 static void lv_mbox_realign(lv_obj_t * mbox)
 {
-    lv_mbox_ext_t * ext = lv_obj_get_ext(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     if(ext->txt == NULL) return;
 

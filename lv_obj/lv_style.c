@@ -78,25 +78,25 @@ void lv_style_init (void)
     lv_style_scr.body.empty = 0;
     lv_style_scr.glass = 0;
 
-    lv_style_scr.border.color = COLOR_BLACK;
-    lv_style_scr.border.opa = OPA_COVER;
-    lv_style_scr.border.width = 0;
+    lv_style_scr.body.border.color = COLOR_BLACK;
+    lv_style_scr.body.border.opa = OPA_COVER;
+    lv_style_scr.body.border.width = 0;
 
-    lv_style_scr.shadow.color = COLOR_GRAY;
-    lv_style_scr.shadow.type = LV_SHADOW_FULL;
-    lv_style_scr.shadow.width = 0;
+    lv_style_scr.body.shadow.color = COLOR_GRAY;
+    lv_style_scr.body.shadow.type = LV_SHADOW_FULL;
+    lv_style_scr.body.shadow.width = 0;
 
     lv_style_scr.text.color = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.text.font = font_get(FONT_DEFAULT);
-    lv_style_scr.text.space_letter = 1 * LV_DOWNSCALE;
-    lv_style_scr.text.space_line = 2 * LV_DOWNSCALE;
+    lv_style_scr.text.space_letter = 1 << LV_ANTIALIAS;
+    lv_style_scr.text.space_line = 2 << LV_ANTIALIAS;
     lv_style_scr.text.align = LV_TXT_ALIGN_LEFT;
 
     lv_style_scr.image.color = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = OPA_TRANSP;
 
     lv_style_scr.line.color = COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_scr.line.width = 1 * LV_DOWNSCALE;
+    lv_style_scr.line.width = 1 << LV_ANTIALIAS;
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
@@ -117,9 +117,9 @@ void lv_style_init (void)
     lv_style_pretty.body.color_main = COLOR_WHITE;
     lv_style_pretty.body.color_gradient = COLOR_SILVER;
     lv_style_pretty.body.radius = LV_DPI / 15;
-    lv_style_pretty.border.color = COLOR_MAKE(0x40, 0x40, 0x40);
-    lv_style_pretty.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
-    lv_style_pretty.border.opa = OPA_50;
+    lv_style_pretty.body.border.color = COLOR_MAKE(0x40, 0x40, 0x40);
+    lv_style_pretty.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
+    lv_style_pretty.body.border.opa = OPA_50;
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
@@ -128,13 +128,13 @@ void lv_style_init (void)
     lv_style_pretty_color.line.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
     lv_style_pretty_color.body.color_main = COLOR_MAKE(0x6b, 0x9a, 0xc7);
     lv_style_pretty_color.body.color_gradient = COLOR_MAKE(0x2b, 0x59, 0x8b);
-    lv_style_pretty_color.border.color = COLOR_MAKE(0x15, 0x2c, 0x42);
+    lv_style_pretty_color.body.border.color = COLOR_MAKE(0x15, 0x2c, 0x42);
 
     /*Transparent style*/
     memcpy(&lv_style_transparent, &lv_style_plain, sizeof(lv_style_t));
     lv_style_transparent.body.empty = 1;
     lv_style_transparent.glass = 1;
-    lv_style_transparent.border.width = 0;
+    lv_style_transparent.body.border.width = 0;
 
     /*Transparent tight style*/
     memcpy(&lv_style_transparent_tight, &lv_style_transparent, sizeof(lv_style_t));
@@ -149,13 +149,13 @@ void lv_style_init (void)
     lv_style_button_off_released.body.padding.horizontal = LV_DPI / 4;
     lv_style_button_off_released.body.padding.vertical = LV_DPI / 6;
     lv_style_button_off_released.body.padding.inner = LV_DPI / 10;
-    lv_style_button_off_released.border.color = COLOR_MAKE(0x0b, 0x19, 0x28);
-    lv_style_button_off_released.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
-    lv_style_button_off_released.border.opa = OPA_70;
+    lv_style_button_off_released.body.border.color = COLOR_MAKE(0x0b, 0x19, 0x28);
+    lv_style_button_off_released.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
+    lv_style_button_off_released.body.border.opa = OPA_70;
     lv_style_button_off_released.text.color = COLOR_MAKE(0xff, 0xff, 0xff);
     lv_style_button_off_released.text.align = LV_TXT_ALIGN_MID;
-    lv_style_button_off_released.shadow.color = COLOR_GRAY;
-    lv_style_button_off_released.shadow.width = 0;
+    lv_style_button_off_released.body.shadow.color = COLOR_GRAY;
+    lv_style_button_off_released.body.shadow.width = 0;
 
     /*Button pressed style*/
     memcpy(&lv_style_button_off_pressed, &lv_style_button_off_released, sizeof(lv_style_t));
@@ -169,7 +169,7 @@ void lv_style_init (void)
     memcpy(&lv_style_button_on_released, &lv_style_button_off_released, sizeof(lv_style_t));
     lv_style_button_on_released.body.color_main = COLOR_MAKE(0x0a, 0x11, 0x22);
     lv_style_button_on_released.body.color_gradient = COLOR_MAKE(0x37, 0x62, 0x90);
-    lv_style_button_on_released.border.color = COLOR_MAKE(0x01, 0x07, 0x0d);
+    lv_style_button_on_released.body.border.color = COLOR_MAKE(0x01, 0x07, 0x0d);
     lv_style_button_on_released.text.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
     lv_style_button_on_released.image.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
     lv_style_button_on_released.line.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
@@ -186,7 +186,7 @@ void lv_style_init (void)
     memcpy(&lv_style_button_inactive, &lv_style_button_off_released, sizeof(lv_style_t));
     lv_style_button_inactive.body.color_main = COLOR_MAKE(0xd8, 0xd8, 0xd8);
     lv_style_button_inactive.body.color_gradient = COLOR_MAKE(0xd8, 0xd8, 0xd8);
-    lv_style_button_inactive.border.color = COLOR_MAKE(0x90, 0x90, 0x90);
+    lv_style_button_inactive.body.border.color = COLOR_MAKE(0x90, 0x90, 0x90);
     lv_style_button_inactive.text.color = COLOR_MAKE(0x70, 0x70, 0x70);
     lv_style_button_inactive.image.color = COLOR_MAKE(0x70, 0x70, 0x70);
     lv_style_button_inactive.line.color = COLOR_MAKE(0x70, 0x70, 0x70);
@@ -198,7 +198,7 @@ void lv_style_init (void)
  * @param style_name an element of the 'lv_style_name_t' enum
  * @return pointer to the requested style (lv_style_def by default)
  */
-lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy)
+lv_style_t * lv_style_get(lv_style_name_t style_name)
 {
     lv_style_t * style = &lv_style_plain;
 
@@ -243,8 +243,6 @@ lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy)
             style =  &lv_style_plain;
     }
 
-    if(copy != NULL) memcpy(copy, style, sizeof(lv_style_t));
-
     return style;
 }
 
@@ -253,7 +251,7 @@ lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy)
  * @param dest pointer to the destination style
  * @param src pointer to the source style
  */
-void lv_style_cpy(lv_style_t * dest, const lv_style_t * src)
+void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
 {
     memcpy(dest, src, sizeof(lv_style_t));
 }
@@ -304,8 +302,8 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
 
     STYLE_ATTR_ANIM(opacity, val);
     STYLE_ATTR_ANIM(body.radius, val);
-    STYLE_ATTR_ANIM(border.width, val);
-    STYLE_ATTR_ANIM(shadow.width, val);
+    STYLE_ATTR_ANIM(body.border.width, val);
+    STYLE_ATTR_ANIM(body.shadow.width, val);
     STYLE_ATTR_ANIM(body.padding.horizontal, val);
     STYLE_ATTR_ANIM(body.padding.vertical, val);
     STYLE_ATTR_ANIM(body.padding.inner, val);
@@ -316,8 +314,8 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
 
     act->body.color_main = color_mix(end->body.color_main, start->body.color_main, val);
     act->body.color_gradient = color_mix(end->body.color_gradient, start->body.color_gradient, val);
-    act->border.color = color_mix(end->border.color, start->border.color, val);
-    act->shadow.color = color_mix(end->shadow.color, start->shadow.color, val);
+    act->body.border.color = color_mix(end->body.border.color, start->body.border.color, val);
+    act->body.shadow.color = color_mix(end->body.shadow.color, start->body.shadow.color, val);
     act->text.color = color_mix(end->text.color, start->text.color, val);
     act->image.color = color_mix(end->image.color, start->image.color, val);
     act->line.color = color_mix(end->line.color, start->line.color, val);
@@ -327,7 +325,7 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
         act->body.empty = start->body.empty;
         act->glass = start->glass;
         act->text.font = start->text.font;
-        act->shadow.type = start->shadow.type;
+        act->body.shadow.type = start->body.shadow.type;
         act->text.align = start->text.align;
     }
 
@@ -335,7 +333,7 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
         act->body.empty = end->body.empty;
         act->glass = end->glass;
         act->text.font = end->text.font;
-        act->shadow.type = end->shadow.type;
+        act->body.shadow.type = end->body.shadow.type;
         act->text.align = end->text.align;
     }
 

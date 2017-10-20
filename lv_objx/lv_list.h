@@ -21,7 +21,7 @@ extern "C" {
 #error "lv_list: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
 #endif
 
-#if USE_LV_BTN == 0
+#if USE_LV_BUTTON == 0
 #error "lv_list: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
 #endif
 

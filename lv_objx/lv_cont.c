@@ -72,28 +72,28 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create a basic object*/
     lv_obj_t * new_rect = lv_obj_create(par, copy);
     dm_assert(new_rect);
-    lv_obj_alloc_ext(new_rect, sizeof(lv_cont_ext_t));
-    lv_cont_ext_t * ext = lv_obj_get_ext(new_rect);
+    lv_obj_allocate_ext_attr(new_rect, sizeof(lv_cont_ext_t));
+    lv_cont_ext_t * ext = lv_obj_get_ext_attr(new_rect);
     dm_assert(ext);
     ext->hfit_en = 0;
     ext->vfit_en = 0;
     ext->layout = LV_CONT_LAYOUT_OFF;
 
-    lv_obj_set_signal_f(new_rect, lv_cont_signal);
+    lv_obj_set_signal_func(new_rect, lv_cont_signal);
 
     /*Init the new container*/
     if(copy == NULL) {
-		lv_obj_set_style(new_rect, lv_style_get(LV_STYLE_PLAIN, NULL));
+		lv_obj_set_style(new_rect, lv_style_get(LV_STYLE_PLAIN));
     }
     /*Copy an existing object*/
     else {
-    	lv_cont_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	lv_cont_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->hfit_en = copy_ext->hfit_en;
     	ext->vfit_en = copy_ext->vfit_en;
     	ext->layout = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_rect);
+        lv_obj_refresh_style(new_rect);
 
     }
 
@@ -145,11 +145,11 @@ bool lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
  */
 void lv_cont_set_layout(lv_obj_t * cont, lv_cont_layout_t layout)
 {
-	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
+	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	ext->layout = layout;
 
 	/*Send a signal to refresh the layout*/
-	cont->signal_f(cont, LV_SIGNAL_CHILD_CHG, NULL);
+	cont->signal_func(cont, LV_SIGNAL_CHILD_CHG, NULL);
 }
 
 
@@ -162,13 +162,13 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_cont_layout_t layout)
  */
 void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
 {
-	lv_obj_inv(cont);
-	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
+	lv_obj_invalidate(cont);
+	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	ext->hfit_en = hor_en == false ? 0 : 1;
 	ext->vfit_en = ver_en == false ? 0 : 1;
 
 	/*Send a signal to set a new size*/
-	cont->signal_f(cont, LV_SIGNAL_CORD_CHG, cont);
+	cont->signal_func(cont, LV_SIGNAL_CORD_CHG, cont);
 }
 
 /*=====================
@@ -182,7 +182,7 @@ void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
  */
 lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont)
 {
-	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
+	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	return ext->layout;
 }
 
@@ -193,7 +193,7 @@ lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont)
  */
 bool lv_cont_get_hfit(lv_obj_t * cont)
 {
-	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
+	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	return ext->hfit_en == 0 ? false : true;
 }
 
@@ -204,7 +204,7 @@ bool lv_cont_get_hfit(lv_obj_t * cont)
  */
 bool lv_cont_get_vfit(lv_obj_t * cont)
 {
-	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
+	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	return ext->vfit_en == 0 ? false : true;
 }
 
@@ -311,7 +311,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
 		last_cord += lv_obj_get_height(child) + style->body.padding.inner;
 	}
 
-    lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -361,7 +361,7 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 		last_cord += lv_obj_get_width(child) + style->body.padding.inner;
 	}
 
-    lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -400,7 +400,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 		last_cord += lv_obj_get_height(child) + style->body.padding.inner;
 	}
 
-    lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -495,7 +495,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 		child_rs = ll_get_prev(&cont->child_ll, child_rc); /*Go to the next object*/
 		child_rc = child_rs;
 	}
-    lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -545,7 +545,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
 		}
 	}
 
-    lv_obj_clr_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
 }
 
 /**
@@ -554,7 +554,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
  */
 static void lv_cont_refr_autofit(lv_obj_t * cont)
 {
-	lv_cont_ext_t * ext = lv_obj_get_ext(cont);
+	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 
 	if(ext->hfit_en == 0 &&
 	   ext->vfit_en == 0) {
@@ -569,8 +569,8 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 	cord_t vpad = style->body.padding.vertical;
 
 	/*Search the side coordinates of the children*/
-	lv_obj_get_cords(cont, &ori);
-	lv_obj_get_cords(cont, &new_cords);
+	lv_obj_get_coords(cont, &ori);
+	lv_obj_get_coords(cont, &new_cords);
 
 	new_cords.x1 = CORD_MAX;
 	new_cords.y1 = CORD_MAX;
@@ -579,10 +579,10 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 
     LL_READ(cont->child_ll, i) {
 		if(lv_obj_get_hidden(i) != false) continue;
-    	new_cords.x1 = MATH_MIN(new_cords.x1, i->cords.x1);
-    	new_cords.y1 = MATH_MIN(new_cords.y1, i->cords.y1);
-        new_cords.x2 = MATH_MAX(new_cords.x2, i->cords.x2);
-        new_cords.y2 = MATH_MAX(new_cords.y2, i->cords.y2);
+    	new_cords.x1 = MATH_MIN(new_cords.x1, i->coords.x1);
+    	new_cords.y1 = MATH_MIN(new_cords.y1, i->coords.y1);
+        new_cords.x2 = MATH_MAX(new_cords.x2, i->coords.x2);
+        new_cords.y2 = MATH_MAX(new_cords.y2, i->coords.y2);
     }
 
     /*If the value is not the init value then the page has >=1 child.*/
@@ -591,33 +591,33 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 			new_cords.x1 -= hpad;
 			new_cords.x2 += hpad;
     	} else {
-    		new_cords.x1 = cont->cords.x1;
-    		new_cords.x2 = cont->cords.x2;
+    		new_cords.x1 = cont->coords.x1;
+    		new_cords.x2 = cont->coords.x2;
     	}
     	if(ext->vfit_en != 0) {
 			new_cords.y1 -= vpad;
 			new_cords.y2 += vpad;
     	} else {
-    		new_cords.y1 = cont->cords.y1;
-    		new_cords.y2 = cont->cords.y2;
+    		new_cords.y1 = cont->coords.y1;
+    		new_cords.y2 = cont->coords.y2;
     	}
 
     	/*Do nothing if the coordinates are not changed*/
-    	if(cont->cords.x1 != new_cords.x1 ||
-    	   cont->cords.y1 != new_cords.y1 ||
-           cont->cords.x2 != new_cords.x2 ||
-           cont->cords.y2 != new_cords.y2) {
+    	if(cont->coords.x1 != new_cords.x1 ||
+    	   cont->coords.y1 != new_cords.y1 ||
+           cont->coords.x2 != new_cords.x2 ||
+           cont->coords.y2 != new_cords.y2) {
 
-            lv_obj_inv(cont);
-            area_cpy(&cont->cords, &new_cords);
-            lv_obj_inv(cont);
+            lv_obj_invalidate(cont);
+            area_cpy(&cont->coords, &new_cords);
+            lv_obj_invalidate(cont);
 
             /*Notify the object about its new coordinates*/
-            cont->signal_f(cont, LV_SIGNAL_CORD_CHG, &ori);
+            cont->signal_func(cont, LV_SIGNAL_CORD_CHG, &ori);
 
             /*Inform the parent about the new coordinates*/
             lv_obj_t * par = lv_obj_get_parent(cont);
-            par->signal_f(par, LV_SIGNAL_CHILD_CHG, cont);
+            par->signal_func(par, LV_SIGNAL_CHILD_CHG, cont);
     	}
     }
 }

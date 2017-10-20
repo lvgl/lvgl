@@ -209,7 +209,7 @@ static void indev_proc_task(void * param)
                (i->state.last_point.x != data.point.x ||
                 i->state.last_point.y != data.point.y))
             {
-                lv_obj_set_pos_us(i->cursor, data.point.x, data.point.y);
+                lv_obj_set_pos_scale(i->cursor, data.point.x, data.point.y);
             }
 
             /*Process the current point*/
@@ -245,8 +245,8 @@ static void indev_proc_task(void * param)
 static void indev_proc_point(lv_indev_state_t * indev, cord_t x, cord_t y)
 {
 #if LV_ANTIALIAS != 0 && LV_VDB_SIZE != 0
-    indev->act_point.x = x * LV_DOWNSCALE;
-    indev->act_point.y = y * LV_DOWNSCALE;
+    indev->act_point.x = x << LV_ANTIALIAS;
+    indev->act_point.y = y << LV_ANTIALIAS;
 #else
     indev->act_point.x = x;
     indev->act_point.y = y;
@@ -283,12 +283,12 @@ static void indev_proc_press(lv_indev_state_t * state)
     /*If there is no last object then search*/
     if(state->act_obj == NULL) {
         pr_obj = indev_search_obj(state, lv_layer_top());
-        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_scr_act());
+        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_screen_act());
     }
     /*If there is last object but it is not dragged also search*/
     else if(state->drag_in_prog == 0) {/*Now act_obj != NULL*/
         pr_obj = indev_search_obj(state, lv_layer_top());
-        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_scr_act());
+        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_screen_act());
     }
     /*If a dragable object was the last then keep it*/
     else {
@@ -303,7 +303,7 @@ static void indev_proc_press(lv_indev_state_t * state)
         
         /*If a new object found the previous was lost, so send a signal*/
         if(state->act_obj != NULL) {
-            state->act_obj->signal_f(state->act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
+            state->act_obj->signal_func(state->act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
             if(state->reset_qry != 0) return;
         }
         
@@ -321,7 +321,7 @@ static void indev_proc_press(lv_indev_state_t * state)
             lv_obj_t * i = pr_obj;
             lv_obj_t * last_top = NULL;
             while(i != NULL){
-				if(i->top_en != 0) last_top = i;
+				if(i->top != 0) last_top = i;
 				i = lv_obj_get_parent(i);
             }
 
@@ -330,11 +330,11 @@ static void indev_proc_press(lv_indev_state_t * state)
             	lv_obj_t * par = lv_obj_get_parent(last_top);
             	/*After list change it will be the new head*/
                 ll_chg_list(&par->child_ll, &par->child_ll, last_top);
-                lv_obj_inv(last_top);
+                lv_obj_invalidate(last_top);
             }
 
             /*Send a signal about the press*/
-            pr_obj->signal_f(pr_obj, LV_SIGNAL_PRESSED, indev_act);
+            pr_obj->signal_func(pr_obj, LV_SIGNAL_PRESSED, indev_act);
             if(state->reset_qry != 0) return;
         }
     }
@@ -348,7 +348,7 @@ static void indev_proc_press(lv_indev_state_t * state)
 
     /*If there is active object and it can be dragged run the drag*/
     if(state->act_obj != NULL) {
-        state->act_obj->signal_f(state->act_obj, LV_SIGNAL_PRESSING, indev_act);
+        state->act_obj->signal_func(state->act_obj, LV_SIGNAL_PRESSING, indev_act);
         if(state->reset_qry != 0) return;
 
         indev_drag(state);
@@ -358,7 +358,7 @@ static void indev_proc_press(lv_indev_state_t * state)
         if(state->drag_in_prog == 0 && state->long_press_sent == 0) {
             /*Send a signal about the long press if enough time elapsed*/
             if(lv_tick_elaps(state->press_time_stamp) > LV_INDEV_LONG_PRESS_TIME) {
-                pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
+                pr_obj->signal_func(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
                 if(state->reset_qry != 0) return;
 
                 /*Mark the signal sending to do not send it again*/
@@ -372,7 +372,7 @@ static void indev_proc_press(lv_indev_state_t * state)
         if(state->drag_in_prog == 0 && state->long_press_sent == 1) {
             /*Send a signal about the long press repeate if enough time elapsed*/
             if(lv_tick_elaps(state->lpr_rep_time_stamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
-                pr_obj->signal_f(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
+                pr_obj->signal_func(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
                 if(state->reset_qry != 0) return;
                 state->lpr_rep_time_stamp = lv_tick_get();
 
@@ -397,7 +397,7 @@ static void disi_proc_release(lv_indev_state_t * state)
 
     /*Forgot the act obj and send a released signal */
     if(state->act_obj != NULL) {
-        state->act_obj->signal_f(state->act_obj, LV_SIGNAL_RELEASED, indev_act);
+        state->act_obj->signal_func(state->act_obj, LV_SIGNAL_RELEASED, indev_act);
         if(state->reset_qry != 0) return;
         state->act_obj = NULL;
         state->press_time_stamp = 0;
@@ -424,7 +424,7 @@ static lv_obj_t * indev_search_obj(const lv_indev_state_t * indev, lv_obj_t * ob
     
     /*If the point is on this object*/
     /*Check its children too*/
-    if(area_is_point_on(&obj->cords, &indev->act_point)) {
+    if(area_is_point_on(&obj->coords, &indev->act_point)) {
         lv_obj_t * i;
     
         LL_READ(obj->child_ll, i) {
@@ -498,7 +498,7 @@ static void indev_drag(lv_indev_state_t * state)
             /*Set the drag in progress flag if the object is really moved*/
             if(lv_obj_get_x(drag_obj) != act_x || lv_obj_get_y(drag_obj) != act_y) {
                 if(state->drag_range_out != 0) { /*Send the drag begin signal on first move*/
-                    drag_obj->signal_f(drag_obj,  LV_SIGNAL_DRAG_BEGIN, indev_act);
+                    drag_obj->signal_func(drag_obj,  LV_SIGNAL_DRAG_BEGIN, indev_act);
                     if(state->reset_qry != 0) return;
                 }
                 state->drag_in_prog = 1;
@@ -531,7 +531,7 @@ static void indev_drag_throw(lv_indev_state_t * state)
     /*Return if the drag throw is not enabled*/
     if(lv_obj_get_drag_throw(drag_obj) == false ){
     	state->drag_in_prog = 0;
-        drag_obj->signal_f(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
+        drag_obj->signal_func(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
         return;
     }
     
@@ -550,6 +550,6 @@ static void indev_drag_throw(lv_indev_state_t * state)
     /*If the vectors become 0 -> drag_in_prog = 0 and send a drag end signal*/
     else {
         state->drag_in_prog = 0;
-        drag_obj->signal_f(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
+        drag_obj->signal_func(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
     }
 }

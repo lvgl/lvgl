@@ -109,15 +109,15 @@ void lv_group_focus_obj(lv_obj_t * obj)
     LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             if(g->obj_focus != NULL) {
-                (*g->obj_focus)->signal_f(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-                lv_obj_inv(*g->obj_focus);
+                (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+                lv_obj_invalidate(*g->obj_focus);
             }
 
             g->obj_focus = i;
 
             if(g->obj_focus != NULL){
-                (*g->obj_focus)->signal_f(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
-                lv_obj_inv(*g->obj_focus);
+                (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
+                lv_obj_invalidate(*g->obj_focus);
             }
             break;
         }
@@ -133,8 +133,8 @@ void lv_group_focus_next(lv_group_t * group)
     if(group->frozen != 0) return;
 
     if(group->obj_focus != NULL) {
-        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-        lv_obj_inv(*group->obj_focus);
+        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        lv_obj_invalidate(*group->obj_focus);
     }
 
     lv_obj_t ** obj_next;
@@ -145,8 +145,8 @@ void lv_group_focus_next(lv_group_t * group)
     group->obj_focus = obj_next;
 
     if(group->obj_focus != NULL){
-        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
-        lv_obj_inv(*group->obj_focus);
+        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+        lv_obj_invalidate(*group->obj_focus);
     }
 }
 
@@ -159,8 +159,8 @@ void lv_group_focus_prev(lv_group_t * group)
     if(group->frozen != 0) return;
 
     if(group->obj_focus != NULL) {
-        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-        lv_obj_inv(*group->obj_focus);
+        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        lv_obj_invalidate(*group->obj_focus);
     }
 
     lv_obj_t ** obj_next;
@@ -171,8 +171,8 @@ void lv_group_focus_prev(lv_group_t * group)
     group->obj_focus = obj_next;
 
     if(group->obj_focus != NULL){
-        (*group->obj_focus)->signal_f(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
-        lv_obj_inv(*group->obj_focus);
+        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+        lv_obj_invalidate(*group->obj_focus);
     }
 
 }
@@ -198,7 +198,7 @@ void lv_group_send(lv_group_t * group, char c)
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return;
 
-    act->signal_f(act, LV_SIGNAL_CONTROLL, &c);
+    act->signal_func(act, LV_SIGNAL_CONTROLL, &c);
 }
 
 
@@ -210,7 +210,7 @@ void lv_group_send(lv_group_t * group, char c)
 void lv_group_set_style_mod_cb(lv_group_t * group, void (*style_cb)(lv_style_t * style))
 {
     group->style_mod = style_cb;
-    if(group->obj_focus != NULL) lv_obj_inv(*group->obj_focus);
+    if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
 }
 
 /**
@@ -221,7 +221,7 @@ void lv_group_set_style_mod_cb(lv_group_t * group, void (*style_cb)(lv_style_t *
  */
 lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
 {
-    lv_style_cpy(&group->style_tmp, style);
+    lv_style_copy(&group->style_tmp, style);
 
     if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
     else style_mod_def(&group->style_tmp);
@@ -253,10 +253,10 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
 static void style_mod_def(lv_style_t * style)
 {
     /*Make the style a little bit orange*/
-    style->border.color = COLOR_ORANGE;
-    style->border.opa = OPA_COVER;
-    if(style->border.width == 0 && style->body.empty == 0) style->border.width = 2 * LV_DOWNSCALE;   /*Add border to not transparent styles*/
-    else style->border.width = style->border.width * 2;                                         /*Make the border thicker*/
+    style->body.border.color = COLOR_ORANGE;
+    style->body.border.opa = OPA_COVER;
+    if(style->body.border.width == 0 && style->body.empty == 0) style->body.border.width = 2 << LV_ANTIALIAS;   /*Add border to not transparent styles*/
+    else style->body.border.width = style->body.border.width * 2;                                         /*Make the border thicker*/
     style->body.color_main = color_mix(style->body.color_main, COLOR_ORANGE, OPA_80);
     style->body.color_gradient = color_mix(style->body.color_gradient, COLOR_ORANGE, OPA_80);
 }

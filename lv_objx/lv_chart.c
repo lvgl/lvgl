@@ -38,7 +38,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_design_f;
+static lv_design_func_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -65,7 +65,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_chart);
 
     /*Allocate the object type specific extended data*/
-    lv_chart_ext_t * ext = lv_obj_alloc_ext(new_chart, sizeof(lv_chart_ext_t));
+    lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
     dm_assert(ext);
     ll_init(&ext->dl_ll, sizeof(lv_chart_dl_t));
     ext->dl_num = 0;
@@ -77,18 +77,18 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
     ext->type = LV_CHART_LINE;
     ext->dl_opa = OPA_COVER;
     ext->dl_dark = OPA_50;
-    ext->dl_width = 2 * LV_DOWNSCALE;
+    ext->dl_width = 2 << LV_ANTIALIAS;
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_chart);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_chart);
 
-    lv_obj_set_signal_f(new_chart, lv_chart_signal);
-    lv_obj_set_design_f(new_chart, lv_chart_design);
+    lv_obj_set_signal_func(new_chart, lv_chart_signal);
+    lv_obj_set_design_func(new_chart, lv_chart_design);
 
     /*Init the new chart background object*/
     if(copy == NULL) {
-    	lv_obj_set_style(new_chart, lv_style_get(LV_STYLE_PRETTY, NULL));
+    	lv_obj_set_style(new_chart, lv_style_get(LV_STYLE_PRETTY));
     } else {
-    	lv_chart_ext_t * ext_copy = lv_obj_get_ext(copy);
+    	lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
         ext->type = ext_copy->type;
 		ext->ymin = ext_copy->ymin;
 		ext->ymax = ext_copy->ymax;
@@ -98,7 +98,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
         ext->dl_opa =  ext_copy->dl_opa;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_chart);
+        lv_obj_refresh_style(new_chart);
     }
 
     return new_chart;
@@ -121,7 +121,7 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
     	cord_t ** datal;
-    	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     	if(sign == LV_SIGNAL_CLEANUP) {
             LL_READ(ext->dl_ll, datal) {
                 dm_free(*datal);
@@ -141,7 +141,7 @@ bool lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param)
  */
 lv_chart_dl_t * lv_chart_add_data_line(lv_obj_t * chart, color_t color)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	lv_chart_dl_t * dl = ll_ins_head(&ext->dl_ll);
 	cord_t def = (ext->ymin + ext->ymax) >> 1;	/*half range as default value*/
 
@@ -169,7 +169,7 @@ lv_chart_dl_t * lv_chart_add_data_line(lv_obj_t * chart, color_t color)
  */
 void lv_chart_refr(lv_obj_t * chart)
 {
-	lv_obj_inv(chart);
+	lv_obj_invalidate(chart);
 }
 /*=====================
  * Setter functions
@@ -183,12 +183,12 @@ void lv_chart_refr(lv_obj_t * chart)
  */
 void lv_chart_set_hvdiv(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
 	ext->hdiv_num = hdiv;
 	ext->vdiv_num = vdiv;
 
-	lv_obj_inv(chart);
+	lv_obj_invalidate(chart);
 }
 
 /**
@@ -201,7 +201,7 @@ void lv_chart_set_hvdiv(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv)
  */
 void lv_chart_set_range(lv_obj_t * chart, cord_t ymin, cord_t ymax)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
 	ext->ymin = ymin;
 	ext->ymax = ymax;
@@ -216,7 +216,7 @@ void lv_chart_set_range(lv_obj_t * chart, cord_t ymin, cord_t ymax)
  */
 void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	ext->type = type;
 
 	lv_chart_refr(chart);
@@ -229,7 +229,7 @@ void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type)
  */
 void lv_chart_set_pnum(lv_obj_t * chart, uint16_t pnum)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	lv_chart_dl_t * dl;
 
 	if(pnum < 1) pnum = 1;
@@ -249,9 +249,9 @@ void lv_chart_set_pnum(lv_obj_t * chart, uint16_t pnum)
  */
 void lv_chart_set_dl_opa(lv_obj_t * chart, opa_t opa)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     ext->dl_opa = opa;
-    lv_obj_inv(chart);
+    lv_obj_invalidate(chart);
 }
 
 /**
@@ -261,9 +261,9 @@ void lv_chart_set_dl_opa(lv_obj_t * chart, opa_t opa)
  */
 void lv_chart_set_dl_width(lv_obj_t * chart, cord_t width)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     ext->dl_width = width;
-    lv_obj_inv(chart);
+    lv_obj_invalidate(chart);
 }
 /**
  * Set the dark effect on the bottom of the points or columns
@@ -272,7 +272,7 @@ void lv_chart_set_dl_width(lv_obj_t * chart, cord_t width)
  */
 void lv_chart_set_dl_dark(lv_obj_t * chart, opa_t dark_eff)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     ext->dl_dark = dark_eff;
 }
 /**
@@ -283,7 +283,7 @@ void lv_chart_set_dl_dark(lv_obj_t * chart, opa_t dark_eff)
  */
 void lv_chart_set_next(lv_obj_t * chart, lv_chart_dl_t * dl, cord_t y)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
 	uint16_t i;
 	for(i = 0; i < ext->pnum - 1; i++) {
@@ -307,7 +307,7 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_dl_t * dl, cord_t y)
  */
 lv_chart_type_t lv_chart_get_type(lv_obj_t * chart)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     return ext->type;
 }
@@ -319,7 +319,7 @@ lv_chart_type_t lv_chart_get_type(lv_obj_t * chart)
  */
 uint16_t lv_chart_get_pnum(lv_obj_t * chart)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     return ext->pnum;
 }
@@ -331,7 +331,7 @@ uint16_t lv_chart_get_pnum(lv_obj_t * chart)
  */
 opa_t lv_chart_get_dl_opa(lv_obj_t * chart)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->dl_opa;
 }
 
@@ -342,7 +342,7 @@ opa_t lv_chart_get_dl_opa(lv_obj_t * chart)
  */
 cord_t lv_chart_get_dl_width(lv_obj_t * chart)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->dl_width;
 }
 
@@ -353,7 +353,7 @@ cord_t lv_chart_get_dl_width(lv_obj_t * chart)
  */
 opa_t lv_chart_get_dl_dark(lv_obj_t * chart, opa_t dark_eff)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->dl_dark;
 }
 /**********************
@@ -378,9 +378,9 @@ static bool lv_chart_design(lv_obj_t * chart, const area_t * mask, lv_design_mod
     	return ancestor_design_f(chart, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*Draw the background*/
-        lv_draw_rect(&chart->cords, mask, lv_obj_get_style(chart));
+        lv_draw_rect(&chart->coords, mask, lv_obj_get_style(chart));
 
-		lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+		lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
 		lv_chart_draw_div(chart, mask);
 
@@ -398,7 +398,7 @@ static bool lv_chart_design(lv_obj_t * chart, const area_t * mask, lv_design_mod
  */
 static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	lv_style_t * style = lv_obj_get_style(chart);
 
 	uint8_t div_i;
@@ -408,12 +408,12 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 	point_t p2;
 	cord_t w = lv_obj_get_width(chart);
 	cord_t h = lv_obj_get_height(chart);
-	cord_t x_ofs = chart->cords.x1;
-	cord_t y_ofs = chart->cords.y1;
+	cord_t x_ofs = chart->coords.x1;
+	cord_t y_ofs = chart->coords.y1;
 
 	if(ext->hdiv_num != 0) {
         /*Draw slide lines if no border*/
-        if(style->border.width != 0) {
+        if(style->body.border.width != 0) {
             div_i_start = 1;
             div_i_end = ext->hdiv_num;
         } else {
@@ -436,7 +436,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
 
 	if(ext->vdiv_num != 0) {
         /*Draw slide lines if no border*/
-        if(style->border.width != 0) {
+        if(style->body.border.width != 0) {
             div_i_start = 1;
             div_i_end = ext->vdiv_num;
         } else {
@@ -463,7 +463,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const area_t * mask)
  */
 static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	lv_style_t * style = lv_obj_get_style(chart);
 
 	uint8_t i;
@@ -471,12 +471,12 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 	point_t p2;
 	cord_t w = lv_obj_get_width(chart);
 	cord_t h = lv_obj_get_height(chart);
-    cord_t x_ofs = chart->cords.x1;
-    cord_t y_ofs = chart->cords.y1;
+    cord_t x_ofs = chart->coords.x1;
+    cord_t y_ofs = chart->coords.y1;
 	int32_t y_tmp;
 	lv_chart_dl_t * dl;
 	lv_style_t lines;
-	lv_style_get(LV_STYLE_PLAIN, &lines);
+	lv_style_copy(&lines, lv_style_get(LV_STYLE_PLAIN));
 	lines.opacity = (uint16_t)((uint16_t)style->opacity * ext->dl_opa) >> 8;
     lines.line.width = ext->dl_width;
 
@@ -512,22 +512,22 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
  */
 static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	lv_style_t * style = lv_obj_get_style(chart);
 
 	uint8_t i;
 	area_t cir_a;
 	cord_t w = lv_obj_get_width(chart);
 	cord_t h = lv_obj_get_height(chart);
-    cord_t x_ofs = chart->cords.x1;
-    cord_t y_ofs = chart->cords.y1;
+    cord_t x_ofs = chart->coords.x1;
+    cord_t y_ofs = chart->coords.y1;
 	int32_t y_tmp;
     lv_chart_dl_t * dl;
     uint8_t dl_cnt = 0;
     lv_style_t style_point;
-    lv_style_get(LV_STYLE_PLAIN, &style_point);
+    lv_style_copy(&style_point, lv_style_get(LV_STYLE_PLAIN));
 
-	style_point.border.width = 0;
+	style_point.body.border.width = 0;
 	style_point.body.empty = 0;
 	style_point.body.radius = LV_RADIUS_CIRCLE;
     style_point.opacity = (uint16_t)((uint16_t)style->opacity * ext->dl_opa) >> 8;
@@ -562,7 +562,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
  */
 static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext(chart);
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	lv_style_t * style = lv_obj_get_style(chart);
 
 	uint8_t i;
@@ -577,20 +577,20 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 	cord_t col_w = w / ((ext->dl_num + 1) * ext->pnum); /* Suppose + 1 dl as separator*/
 	cord_t x_ofs = col_w / 2; /*Shift with a half col.*/
 
-	lv_style_get(LV_STYLE_PLAIN, &rects);
-	rects.border.width = 0;
+	lv_style_copy(&rects, lv_style_get(LV_STYLE_PLAIN));
+	rects.body.border.width = 0;
 	rects.body.empty = 0;
 	rects.body.radius = 0;
 	rects.opacity = (uint16_t)((uint16_t)style->opacity * ext->dl_opa) >> 8;
 
-	col_a.y2 = chart->cords.y2;
+	col_a.y2 = chart->coords.y2;
 
 	cord_t x_act;
 
 	/*Go through all points*/
     for(i = 0; i < ext->pnum; i ++) {
         x_act = (int32_t)((int32_t) w * i) / ext->pnum;
-        x_act += chart->cords.x1 + x_ofs;
+        x_act += chart->coords.x1 + x_ofs;
 
         /*Draw the current point of all data line*/
         LL_READ_BACK(ext->dl_ll, dl) {
@@ -602,11 +602,11 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 
             y_tmp = (int32_t)((int32_t) dl->points[i] - ext->ymin) * h;
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
-            col_a.y1 = h - y_tmp + chart->cords.y1;
+            col_a.y1 = h - y_tmp + chart->coords.y1;
 
             mask_ret = area_union(&col_mask, mask, &col_a);
             if(mask_ret != false) {
-                lv_draw_rect(&chart->cords, &col_mask, &rects);
+                lv_draw_rect(&chart->coords, &col_mask, &rects);
             }
         }
 	}

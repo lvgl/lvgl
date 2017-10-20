@@ -17,7 +17,7 @@ extern "C" {
 #if USE_LV_WIN != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BTN == 0
+#if USE_LV_BUTTON == 0
 #error "lv_win: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
 #endif
 

@@ -32,7 +32,7 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_design_f;
+static lv_design_func_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -59,34 +59,34 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_bar);
 
     /*Allocate the object type specific extended data*/
-    lv_bar_ext_t * ext = lv_obj_alloc_ext(new_bar, sizeof(lv_bar_ext_t));
+    lv_bar_ext_t * ext = lv_obj_allocate_ext_attr(new_bar, sizeof(lv_bar_ext_t));
     dm_assert(ext);
     ext->min_value = 0;
     ext->max_value = 100;
     ext->act_value = 0;
-    ext->style_indic = lv_style_get(LV_STYLE_PRETTY_COLOR, NULL);
+    ext->style_indic = lv_style_get(LV_STYLE_PRETTY_COLOR);
 
     /* Save the ancient design function.
      * It will be used in the bar design function*/
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_bar);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_bar);
 
-    lv_obj_set_signal_f(new_bar, lv_bar_signal);
-    lv_obj_set_design_f(new_bar, lv_bar_design);
+    lv_obj_set_signal_func(new_bar, lv_bar_signal);
+    lv_obj_set_design_func(new_bar, lv_bar_design);
 
     /*Init the new  bar object*/
     if(copy == NULL) {
         lv_obj_set_click(new_bar, false);
     	lv_obj_set_size(new_bar, LV_DPI * 2, LV_DPI / 3);
-        lv_obj_set_style(new_bar, lv_style_get(LV_STYLE_PRETTY, NULL));
+        lv_obj_set_style(new_bar, lv_style_get(LV_STYLE_PRETTY));
     	lv_bar_set_value(new_bar, ext->act_value);
     } else {
-    	lv_bar_ext_t * ext_copy = lv_obj_get_ext(copy);
+    	lv_bar_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
 		ext->act_value = ext_copy->act_value;
         ext->style_indic = ext_copy->style_indic;
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_bar);
+        lv_obj_refresh_style(new_bar);
 
         lv_bar_set_value(new_bar, ext->act_value);
     }
@@ -111,7 +111,7 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(valid != false) {
         if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
             lv_style_t * style_indic = lv_bar_get_style_indic(bar);
-            if(style_indic->shadow.width > bar->ext_size) bar->ext_size = style_indic->shadow.width;
+            if(style_indic->body.shadow.width > bar->ext_size) bar->ext_size = style_indic->body.shadow.width;
         }
 
     }
@@ -130,10 +130,10 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
  */
 void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 {
-	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 	ext->act_value = value > ext->max_value ? ext->max_value : value;
     ext->act_value = ext->act_value < ext->min_value ? ext->min_value : ext->act_value;
-	lv_obj_inv(bar);
+	lv_obj_invalidate(bar);
 }
 
 /**
@@ -145,7 +145,7 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
 {
 
-    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     int16_t new_value;
     new_value = value > ext->max_value ? ext->max_value : value;
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
@@ -177,7 +177,7 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
  */
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 {
-	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 	ext->max_value = max;
 	ext->min_value = min;
 	if(ext->act_value > max) {
@@ -188,7 +188,7 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
         ext->act_value = min;
         lv_bar_set_value(bar, ext->act_value);
     }
-	lv_obj_inv(bar);
+	lv_obj_invalidate(bar);
 }
 
 /**
@@ -198,13 +198,13 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
  */
 void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style)
 {
-    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     ext->style_indic = style;
 
-    bar->signal_f(bar, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+    bar->signal_func(bar, LV_SIGNAL_REFR_EXT_SIZE, NULL);
 
-    lv_obj_inv(bar);
+    lv_obj_invalidate(bar);
 }
 
 /*=====================
@@ -218,7 +218,7 @@ void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style)
  */
 int16_t lv_bar_get_value(lv_obj_t * bar)
 {
-	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 	return ext->act_value;
 }
 
@@ -229,7 +229,7 @@ int16_t lv_bar_get_value(lv_obj_t * bar)
  */
 int16_t lv_bar_get_min_value(lv_obj_t * bar)
 {
-    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->min_value;
 }
 
@@ -240,7 +240,7 @@ int16_t lv_bar_get_min_value(lv_obj_t * bar)
  */
 int16_t lv_bar_get_max_value(lv_obj_t * bar)
 {
-    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->max_value;
 }
 
@@ -251,7 +251,7 @@ int16_t lv_bar_get_max_value(lv_obj_t * bar)
  */
 lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar)
 {
-    lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     if(ext->style_indic == NULL) return lv_obj_get_style(bar);
 
@@ -280,11 +280,11 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         ancestor_design_f(bar, mask, mode);
 
-		lv_bar_ext_t * ext = lv_obj_get_ext(bar);
+		lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
         lv_style_t * style_indic = lv_bar_get_style_indic(bar);
 		area_t indic_area;
-		area_cpy(&indic_area, &bar->cords);
+		area_cpy(&indic_area, &bar->coords);
 		indic_area.x1 += style_indic->body.padding.horizontal;
 		indic_area.x2 -= style_indic->body.padding.horizontal;
 		indic_area.y1 += style_indic->body.padding.vertical;

@@ -54,7 +54,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_line);
 
     /*Extend the basic object to line object*/
-    lv_line_ext_t * ext = lv_obj_alloc_ext(new_line, sizeof(lv_line_ext_t));
+    lv_line_ext_t * ext = lv_obj_allocate_ext_attr(new_line, sizeof(lv_line_ext_t));
     dm_assert(ext);
     ext->point_num = 0;
     ext->point_array = NULL;
@@ -62,23 +62,23 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     ext->y_inv = 0;
     ext->upscale = 0;
 
-    lv_obj_set_design_f(new_line, lv_line_design);
-    lv_obj_set_signal_f(new_line, lv_line_signal);
+    lv_obj_set_design_func(new_line, lv_line_design);
+    lv_obj_set_signal_func(new_line, lv_line_signal);
 
     /*Init the new line*/
     if(copy == NULL) {
-	    lv_obj_set_style(new_line, lv_style_get(LV_STYLE_PLAIN, NULL));
+	    lv_obj_set_style(new_line, lv_style_get(LV_STYLE_PLAIN));
     }
     /*Copy an existing object*/
     else {
-        lv_line_ext_t * copy_ext = lv_obj_get_ext(copy);
+        lv_line_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
     	lv_line_set_y_inv(new_line,lv_line_get_y_inv(copy));
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
     	lv_line_set_upscale(new_line,lv_line_get_upscale(copy));
     	lv_line_set_points(new_line, copy_ext->point_array, copy_ext->point_num);
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_line);
+        lv_obj_refresh_style(new_line);
     }
 
     return new_line;
@@ -122,13 +122,13 @@ bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
  */
 void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num)
 {
-	lv_line_ext_t * ext = lv_obj_get_ext(line);
+	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 	ext->point_array = point_a;
 	ext->point_num = point_num;
 
 	uint8_t us = 1;
 	if(ext->upscale != 0) {
-		us = LV_DOWNSCALE;
+		us = 1 << LV_ANTIALIAS;
 	}
 
 	if(point_num > 0 && ext->auto_size != 0) {
@@ -153,7 +153,7 @@ void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point
  */
 void lv_line_set_auto_size(lv_obj_t * line, bool autosize)
 {
-	lv_line_ext_t * ext = lv_obj_get_ext(line);
+	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
 	ext->auto_size = autosize == false ? 0 : 1;
 
@@ -172,11 +172,11 @@ void lv_line_set_auto_size(lv_obj_t * line, bool autosize)
  */
 void lv_line_set_y_inv(lv_obj_t * line, bool yinv)
 {
-	lv_line_ext_t * ext = lv_obj_get_ext(line);
+	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
 	ext->y_inv = yinv == false ? 0 : 1;
 
-	lv_obj_inv(line);
+	lv_obj_invalidate(line);
 }
 
 /**
@@ -186,7 +186,7 @@ void lv_line_set_y_inv(lv_obj_t * line, bool yinv)
  */
 void lv_line_set_upscale(lv_obj_t * line, bool unscale)
 {
-	lv_line_ext_t * ext = lv_obj_get_ext(line);
+	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
 	ext->upscale = unscale == false ? 0 : 1;
 
@@ -205,7 +205,7 @@ void lv_line_set_upscale(lv_obj_t * line, bool unscale)
  */
 bool lv_line_get_auto_size(lv_obj_t * line)
 {
-	lv_line_ext_t * ext = lv_obj_get_ext(line);
+	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
 	return ext->auto_size == 0 ? false : true;
 }
@@ -217,7 +217,7 @@ bool lv_line_get_auto_size(lv_obj_t * line)
  */
 bool lv_line_get_y_inv(lv_obj_t * line)
 {
-	lv_line_ext_t * ext = lv_obj_get_ext(line);
+	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
 	return ext->y_inv == 0 ? false : true;
 }
@@ -229,7 +229,7 @@ bool lv_line_get_y_inv(lv_obj_t * line)
  */
 bool lv_line_get_upscale(lv_obj_t * line)
 {
-	lv_line_ext_t * ext = lv_obj_get_ext(line);
+	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
 	return ext->upscale == 0 ? false : true;
 }
@@ -253,13 +253,13 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
     /*A line never covers an area*/
     if(mode == LV_DESIGN_COVER_CHK) return false;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-		lv_line_ext_t * ext = lv_obj_get_ext(line);
+		lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
 		if(ext->point_num == 0 || ext->point_array == NULL) return false;
 
 		lv_style_t * style = lv_obj_get_style(line);
 		area_t area;
-		lv_obj_get_cords(line, &area);
+		lv_obj_get_coords(line, &area);
 		cord_t x_ofs = area.x1;
 		cord_t y_ofs = area.y1;
 		point_t p1;
@@ -268,7 +268,7 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 		uint16_t i;
 		uint8_t us = 1;
 		if(ext->upscale != 0) {
-			us = LV_DOWNSCALE;
+			us = 1 << LV_ANTIALIAS;
 		}
 
 		/*Read all pints and draw the lines*/

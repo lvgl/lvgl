@@ -1,10 +1,10 @@
 /**
- * @file lv_btn.h
+ * @file lv_button.h
  * 
  */
 
-#ifndef LV_BTN_H
-#define LV_BTN_H
+#ifndef lv_btn_H
+#define lv_btn_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#if USE_LV_BTN != 0
+#if USE_LV_BUTTON != 0
 
 /*Testing of dependencies*/
 #if USE_LV_CONT == 0
@@ -35,29 +35,34 @@ extern "C" {
 /*Button states*/
 typedef enum
 {
-    LV_BTN_STATE_REL,
-    LV_BTN_STATE_PR,
-    LV_BTN_STATE_TREL,
-    LV_BTN_STATE_TPR,
-    LV_BTN_STATE_INA,
+    LV_BTN_STATE_OFF_RELEASED,
+    LV_BTN_STATE_OFF_PRESSED,
+    LV_BTN_STATE_ON_RELEASED,
+    LV_BTN_STATE_ON_PRESSED,
+    LV_BTN_STATE_INACTIVE,
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
+
+typedef enum
+{
+    LV_BTN_ACTION_RELEASE,
+    LV_BTN_ACTION_PRESS,
+    LV_BTN_ACTION_LONG_PRESS,
+    LV_BTN_ACTION_LONG_PRESS_REPEATE,
+    LV_BTN_ACTION_NUM,
+}lv_btn_action_t;
 
 /*Data of button*/
 typedef struct
 {
 	lv_cont_ext_t cont; /*Ext. of ancestor*/
 	/*New data for this type */
-	lv_action_t pr_action;      /*A function to call when the button is pressed (NULL if unused)*/
-	lv_action_t rel_action;     /*A function to call when the button is released (NULL if unused)*/
-	lv_action_t lpr_action;     /*A function to call when the button is long pressed (NULL if unused)*/
-	lv_action_t lpr_rep_action; /*A function to call periodically after long press (NULL if unused)*/
+	lv_action_t actions[LV_BTN_ACTION_NUM];
+	lv_style_t * styles[LV_BTN_STATE_NUM];        /*Styles in each state*/
 
-	lv_style_t * styles[LV_BTN_STATE_NUM];    /*Styles in each state*/
-
-    lv_btn_state_t state;       /*Current state of the button from 'lv_btn_state_t' enum*/
-    uint8_t tgl :1;             /*1: Toggle enabled*/
-    uint8_t lpr_exec :1;        /*1: Long press action executed (Handled by the library)*/
+    lv_btn_state_t state;                         /*Current state of the button from 'lv_btn_state_t' enum*/
+    uint8_t toggle :1;                            /*1: Toggle enabled*/
+    uint8_t long_press_action_executed :1;        /*1: Long press action executed (Handled by the library)*/
 }lv_btn_ext_t;
 
 
@@ -86,7 +91,7 @@ bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
  * @param btn pointer to a button object
  * @param tgl true: enable toggled states, false: disable
  */
-void lv_btn_set_tgl(lv_obj_t * btn, bool tgl);
+void lv_btn_set_toggle(lv_obj_t * btn, bool tgl);
 
 /**
  * Set the state of the button
@@ -100,28 +105,7 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
  * @param btn pointer to a button object
  * @param pr_action pointer to function
  */
-void lv_btn_set_pr_action(lv_obj_t * btn, lv_action_t pr_action);
-
-/**
- * Set a function to call when the button is released
- * @param btn pointer to a button object
- * @param rel_action pointer to functionREL
- */
-void lv_btn_set_rel_action(lv_obj_t * btn, lv_action_t rel_action);
-
-/**
- * Set a function to call when the button is long pressed
- * @param btn pointer to a button object
- * @param lpr_action pointer to function
- */
-void lv_btn_set_lpr_action(lv_obj_t * btn, lv_action_t lpr_action);
-
-/**
- * Set a function to called periodically after long press.
- * @param btn pointer to a button object
- * @param lpr_rep_action pointer to function
- */
-void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action);
+void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action);
 
 /**
  * Set styles of a button is each state
@@ -132,8 +116,9 @@ void lv_btn_set_lpr_rep_action(lv_obj_t * btn, lv_action_t lpr_rep_action);
  * @param tpr pointer to a style for toggled pressed state
  * @param ina pointer to a style for inactive state
  */
-void lv_btn_set_styles(lv_obj_t * btn, lv_style_t * rel, lv_style_t * pr, lv_style_t * trel, lv_style_t * tpr, lv_style_t * ina);
+void lv_btn_set_style(lv_obj_t * btn, lv_btn_state_t state, lv_style_t * style);
 
+void lv_btn_set_style_all(lv_obj_t * btn, lv_style_t ** style_array);
 /**
  * Get the current state of the button
  * @param btn pointer to a button object
@@ -146,14 +131,14 @@ lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);
  * @param btn pointer to a button object
  * @return ture: toggle enabled, false: disabled
  */
-bool lv_btn_get_tgl(lv_obj_t * btn);
+bool lv_btn_get_toggle(lv_obj_t * btn);
 
 /**
  * Get the release action of a button
  * @param btn pointer to a button object
  * @return pointer to the release action function
  */
-lv_action_t lv_btn_get_rel_action(lv_obj_t * btn);
+lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type);
 
 /**
  * Get the press action of a button
@@ -162,34 +147,16 @@ lv_action_t lv_btn_get_rel_action(lv_obj_t * btn);
  */
 lv_action_t lv_btn_get_pr_action(lv_obj_t * btn);
 
-/**
- * Get the long press action of a button
- * @param btn pointer to a button object
- * @return pointer to the release action function
- */
-lv_action_t lv_btn_get_lpr_action(lv_obj_t * btn);
-/**
- * Get the long press repeat action of a button
- * @param btn pointer to a button object
- * @return pointer to the long press repeat action function
- */
-lv_action_t lv_btn_get_lpr_rep_action(lv_obj_t * btn);
-/**
- * Get the style of a button in a given state
- * @param btn pointer to a button object
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
 lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_BTN*/
+#endif  /*USE_LV_BUTTON*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_BTN_H*/
+#endif  /*lv_btn_H*/

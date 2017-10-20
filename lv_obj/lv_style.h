@@ -49,6 +49,19 @@ typedef struct
         color_t color_main;
         color_t color_gradient;
         cord_t radius;      /*Corner radius of background*/
+
+        struct {
+            color_t color;
+            cord_t width;
+            opa_t opa;         /*Opacity of background border*/
+        }border;
+
+        struct {
+            color_t color;
+            cord_t width;
+            uint8_t type;
+        }shadow;
+
         struct {
             cord_t vertical;
             cord_t horizontal;
@@ -58,17 +71,6 @@ typedef struct
         uint8_t empty :1;   /*Transparent background (border still drawn)*/
     }body;
 
-    struct {
-        color_t color;
-        cord_t width;
-        opa_t opa;         /*Opacity of background border*/
-    }border;
-
-    struct {
-        color_t color;
-        cord_t width;
-        uint8_t type;
-    }shadow;
 
     struct {
         color_t color;
@@ -147,7 +149,7 @@ void lv_style_init (void);
  * @param style_name an element of the 'lv_style_name_t' enum
  * @return pointer to the requested style (lv_style_def by default)
  */
-lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy);
+lv_style_t * lv_style_get(lv_style_name_t style_name);
 
 
 /**
@@ -155,7 +157,7 @@ lv_style_t * lv_style_get(lv_style_name_t style_name, lv_style_t * copy);
  * @param dest pointer to the destination style
  * @param src pointer to the source style
  */
-void lv_style_cpy(lv_style_t * dest, const lv_style_t * src);
+void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable

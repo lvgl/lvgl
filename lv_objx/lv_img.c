@@ -61,7 +61,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_img);
     
     /*Extend the basic object to image object*/
-    lv_img_ext_t * ext = lv_obj_alloc_ext(new_img, sizeof(lv_img_ext_t));
+    lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
     dm_assert(ext);
     ext->fn = NULL;
     ext->w = lv_obj_get_width(new_img);
@@ -71,8 +71,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     ext->auto_size = 1;
 
     /*Init the new object*/    
-    lv_obj_set_signal_f(new_img, lv_img_signal);
-    lv_obj_set_design_f(new_img, lv_img_design);
+    lv_obj_set_signal_func(new_img, lv_img_signal);
+    lv_obj_set_design_func(new_img, lv_img_design);
     
     if(copy == NULL) {
 		/* Enable auto size for non screens
@@ -80,16 +80,16 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
 		 * and must be screen sized*/
 		if(par != NULL) ext->auto_size = 1;
 		else ext->auto_size = 0;
-		if(par != NULL) lv_obj_set_style(new_img, NULL);    /*Inherit the style  by default*/
-		else lv_obj_set_style(new_img, lv_style_get(LV_STYLE_PLAIN, NULL)); /*Set style for screens*/
+		if(par != NULL) lv_obj_set_style(new_img, NULL);                 /*Inherit the style  by default*/
+		else lv_obj_set_style(new_img, lv_style_get(LV_STYLE_PLAIN));    /*Set style for screens*/
     } else {
-        lv_img_ext_t * copy_ext = lv_obj_get_ext(copy);
+        lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->auto_size = copy_ext->auto_size;
         ext->upscale = copy_ext->upscale;
     	lv_img_set_file(new_img, copy_ext->fn);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_img);
+        lv_obj_refresh_style(new_img);
     }
 
     return new_img;
@@ -111,7 +111,7 @@ bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-        lv_img_ext_t * ext = lv_obj_get_ext(img);
+        lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
         if(sign == LV_SIGNAL_CLEANUP) {
             dm_free(ext->fn);
         }
@@ -156,7 +156,7 @@ fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
  */
 void lv_img_set_file(lv_obj_t * img, const char * fn)
 {
-    lv_img_ext_t * ext = lv_obj_get_ext(img);
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     
     /*Handle normal images*/
 	if(lv_img_is_symbol(fn) == false) {
@@ -220,7 +220,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
         lv_obj_set_size(img, ext->w, ext->h);
     }
 
-    lv_obj_inv(img);
+    lv_obj_invalidate(img);
 }
 
 /**
@@ -231,7 +231,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
  */
 void lv_img_set_auto_size(lv_obj_t * img, bool en)
 {
-    lv_img_ext_t * ext = lv_obj_get_ext(img);
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     ext->auto_size = (en == false ? 0 : 1);
 }
@@ -245,7 +245,7 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
  */
 void lv_img_set_upscale(lv_obj_t * img, bool en)
 {
-    lv_img_ext_t * ext = lv_obj_get_ext(img);
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     
     /*Upscale works only if antialiassing is enabled*/
 #if LV_ANTIALIAS == 0
@@ -268,7 +268,7 @@ void lv_img_set_upscale(lv_obj_t * img, bool en)
  */
 bool lv_img_get_auto_size(lv_obj_t * img)
 {
-    lv_img_ext_t * ext = lv_obj_get_ext(img);
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->auto_size == 0 ? false : true;
 }
@@ -280,7 +280,7 @@ bool lv_img_get_auto_size(lv_obj_t * img)
  */
 bool lv_img_get_upscale(lv_obj_t * img)
 {
-    lv_img_ext_t * ext = lv_obj_get_ext(img);
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->upscale == 0 ? false : true;
 }
@@ -301,11 +301,11 @@ bool lv_img_get_upscale(lv_obj_t * img)
 static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode)
 {
     lv_style_t * style = lv_obj_get_style(img);
-    lv_img_ext_t * ext = lv_obj_get_ext(img);
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {
         bool cover = false;
-        if(ext->transp == 0) cover = area_is_in(mask, &img->cords);
+        if(ext->transp == 0) cover = area_is_in(mask, &img->coords);
         return cover;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -316,7 +316,7 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
         bool sym = lv_img_is_symbol(ext->fn);
 #endif
 
-		lv_obj_get_cords(img, &cords);
+		lv_obj_get_coords(img, &cords);
 
 		area_t cords_tmp;
 		cords_tmp.y1 = cords.y1;

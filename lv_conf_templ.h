@@ -14,9 +14,9 @@
 
 /* Horizontal and vertical resolution of the library.
  * Screen resolution multiplied by LV_DOWN_SCALE*/
-#define LV_HOR_RES          (320 * LV_DOWNSCALE)
-#define LV_VER_RES          (240 * LV_DOWNSCALE)
-#define LV_DPI              (80 * LV_DOWNSCALE)
+#define LV_HOR_RES          (320 << LV_ANTIALIAS)
+#define LV_VER_RES          (240 << LV_ANTIALIAS)
+#define LV_DPI              (80 << LV_ANTIALIAS)
 /* Enable anti-aliasing
  * If enabled everything will half-sized
  * Use LV_DOWNSCALE to compensate he down scaling effect of anti-aliasing*/
@@ -40,7 +40,7 @@
 /*Display Input settings*/
 #define LV_INDEV_READ_PERIOD      50                    /*Input device read period milliseconds*/
 #define LV_INDEV_TP_MARKER        0                     /*Mark the pressed points (Value means marker point size)*/
-#define LV_INDEV_DRAG_LIMIT       (10 * LV_DOWNSCALE)   /*Drag threshold in pixels */
+#define LV_INDEV_DRAG_LIMIT       (10 << LV_ANTIALIAS)   /*Drag threshold in pixels */
 #define LV_INDEV_DRAG_THROW       20                    /*Drag throw slow-down in [%]. Greater value means faster slow-down */
 #define LV_INDEV_LONG_PRESS_TIME        400             /*Long press time in milliseconds*/
 #define LV_INDEV_LONG_PRESS_REP_TIME    100             /*Repeated trigger period in long press [ms] */
@@ -65,8 +65,8 @@
 /*Label (dependencies: -*/
 #define USE_LV_LABEL    1
 #if USE_LV_LABEL != 0
-#define LV_LABEL_SCROLL_SPEED       (25 * LV_DOWNSCALE) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
-#define LV_LABEL_SCROLL_SPEED_VER   (10 * LV_DOWNSCALE) /*Ver. scroll speed if hor. scroll is applied too*/
+#define LV_LABEL_SCROLL_SPEED       (25 << LV_ANTIALIAS) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
+#define LV_LABEL_SCROLL_SPEED_VER   (10 << LV_ANTIALIAS) /*Ver. scroll speed if hor. scroll is applied too*/
 #define LV_LABEL_SCROLL_PLAYBACK_PAUSE  500 /*Wait before the scroll turns back in ms*/
 #define LV_LABEL_SCROLL_REPEAT_PAUSE    500 /*Wait before the scroll begins again in ms*/
 #endif

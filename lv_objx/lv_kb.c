@@ -84,7 +84,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_kb);
     
     /*Allocate the keyboard type specific extended data*/
-    lv_kb_ext_t * ext = lv_obj_alloc_ext(new_kb, sizeof(lv_kb_ext_t));
+    lv_kb_ext_t * ext = lv_obj_allocate_ext_attr(new_kb, sizeof(lv_kb_ext_t));
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
@@ -96,7 +96,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     ext->ok_action = NULL;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_f(new_kb, lv_kb_signal);
+    lv_obj_set_signal_func(new_kb, lv_kb_signal);
 
     /*Init the new keyboard keyboard*/
     if(copy == NULL) {
@@ -107,7 +107,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing keyboard*/
     else {
-    	lv_kb_ext_t * copy_ext = lv_obj_get_ext(copy);ext->ta = NULL;
+    	lv_kb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);ext->ta = NULL;
         ext->ta = copy_ext->ta;
         ext->mode = copy_ext->mode;
         ext->cur_mng = copy_ext->cur_mng;
@@ -115,7 +115,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
         ext->ok_action = copy_ext->ok_action;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_kb);
+        lv_obj_refresh_style(new_kb);
     }
     
     return new_kb;
@@ -157,7 +157,7 @@ bool lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
  */
 void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
 
     if(ext->ta != NULL && ext->cur_mng != 0) lv_ta_set_cursor_show(ext->ta, false);
     ext->ta = ta;
@@ -171,7 +171,7 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
  */
 void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     ext->mode = mode;
     if(mode == LV_KB_MODE_TXT) lv_btnm_set_map(kb, kb_map_lc);
     else if(mode == LV_KB_MODE_NUM) lv_btnm_set_map(kb, kb_map_num);
@@ -185,7 +185,7 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
  */
 void lv_kb_set_cur_mng(lv_obj_t * kb, bool en)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     ext->cur_mng = en == false? 0 : 1;
 
     if(ext->ta != NULL) lv_ta_set_cursor_show(ext->ta, true);
@@ -198,7 +198,7 @@ void lv_kb_set_cur_mng(lv_obj_t * kb, bool en)
  */
 void lv_kb_set_ok_action(lv_obj_t * kb, lv_action_t action)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     ext->ok_action = action;
 }
 
@@ -209,7 +209,7 @@ void lv_kb_set_ok_action(lv_obj_t * kb, lv_action_t action)
  */
 void lv_kb_set_close_action(lv_obj_t * kb, lv_action_t action)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     ext->close_action = action;
 }
 
@@ -225,7 +225,7 @@ void lv_kb_set_close_action(lv_obj_t * kb, lv_action_t action)
  */
 lv_obj_t * lv_kb_get_ta(lv_obj_t * kb)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->ta;
 }
 
@@ -236,7 +236,7 @@ lv_obj_t * lv_kb_get_ta(lv_obj_t * kb)
  */
 lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->mode;
 }
 
@@ -248,7 +248,7 @@ lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb)
  */
 bool lv_kb_get_cur_mng(lv_obj_t * kb, bool en)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->cur_mng == 0 ? false : true;
 }
 
@@ -259,7 +259,7 @@ bool lv_kb_get_cur_mng(lv_obj_t * kb, bool en)
  */
 lv_action_t lv_kb_get_ok_action(lv_obj_t * kb, lv_action_t action)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->ok_action;
 }
 
@@ -270,7 +270,7 @@ lv_action_t lv_kb_get_ok_action(lv_obj_t * kb, lv_action_t action)
  */
 lv_action_t lv_kb_get_close_action(lv_obj_t * kb, lv_action_t action)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->close_action;
 }
 
@@ -317,7 +317,7 @@ static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mo
  */
 static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, uint16_t i)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext(kb);
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     if(ext->ta == NULL) return LV_ACTION_RES_OK;
 
     const char ** map = lv_btnm_get_map(kb);

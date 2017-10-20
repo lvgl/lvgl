@@ -55,7 +55,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_lmeter);
     
     /*Allocate the line meter type specific extended data*/
-    lv_lmeter_ext_t * ext = lv_obj_alloc_ext(new_lmeter, sizeof(lv_lmeter_ext_t));
+    lv_lmeter_ext_t * ext = lv_obj_allocate_ext_attr(new_lmeter, sizeof(lv_lmeter_ext_t));
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
@@ -63,23 +63,23 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
     ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_f(new_lmeter, lv_lmeter_signal);
-    lv_obj_set_design_f(new_lmeter, lv_lmeter_design);
+    lv_obj_set_signal_func(new_lmeter, lv_lmeter_signal);
+    lv_obj_set_design_func(new_lmeter, lv_lmeter_design);
 
     /*Init the new line meter line meter*/
     if(copy == NULL) {
         lv_obj_set_size(new_lmeter, 1 * LV_DPI, 1 * LV_DPI);
-        lv_obj_set_style(new_lmeter, lv_style_get(LV_STYLE_PRETTY_COLOR, NULL));
+        lv_obj_set_style(new_lmeter, lv_style_get(LV_STYLE_PRETTY_COLOR));
     }
     /*Copy an existing line meter*/
     else {
-    	lv_lmeter_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	lv_lmeter_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->scale_angle = copy_ext->scale_angle;
         ext->scale_num = copy_ext->scale_num;
 
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_lmeter);
+        lv_obj_refresh_style(new_lmeter);
     }
     
     return new_lmeter;
@@ -122,11 +122,11 @@ bool lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param)
  */
 void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t num)
 {
-    lv_lmeter_ext_t * ext = lv_obj_get_ext(lmeter);
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     ext->scale_angle = angle;
     ext->scale_num = num;
 
-    lv_obj_inv(lmeter);
+    lv_obj_invalidate(lmeter);
 }
 
 
@@ -141,7 +141,7 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t num)
  */
 uint8_t lv_lmeter_get_scale_num(lv_obj_t * lmeter)
 {
-    lv_lmeter_ext_t * ext = lv_obj_get_ext(lmeter);
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     return ext->scale_num ;
 }
 
@@ -152,7 +152,7 @@ uint8_t lv_lmeter_get_scale_num(lv_obj_t * lmeter)
  */
 uint16_t lv_lmeter_get_scale_angle(lv_obj_t * lmeter)
 {
-    lv_lmeter_ext_t * ext = lv_obj_get_ext(lmeter);
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     return ext->scale_angle;
 }
 
@@ -179,7 +179,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_lmeter_ext_t * ext = lv_obj_get_ext(lmeter);
+        lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
         lv_style_t * style = lv_obj_get_style(lmeter);
 
         lv_style_t style_tmp;
@@ -187,8 +187,8 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
 
          cord_t r_out = lv_obj_get_width(lmeter) / 2;
          cord_t r_in =r_out - style->body.padding.horizontal;
-         cord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->cords.x1;
-         cord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->cords.y1;
+         cord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
+         cord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
          int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;
          int16_t min = lv_bar_get_min_value(lmeter);
          int16_t max = lv_bar_get_max_value(lmeter);

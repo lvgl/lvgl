@@ -29,8 +29,8 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_bg_design_f;
-static lv_design_f_t ancestor_bullet_design_f;
+static lv_design_func_t ancestor_bg_design_f;
+static lv_design_func_t ancestor_bullet_design_f;
 
 /**********************
  *      MACROS
@@ -56,45 +56,49 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_cb = lv_btn_create(par, copy);
     dm_assert(new_cb);
     
-    lv_cb_ext_t * ext = lv_obj_alloc_ext(new_cb, sizeof(lv_cb_ext_t));
+    lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
     dm_assert(ext);
     ext->bullet = NULL;
     ext->label = NULL;
 
-    if(ancestor_bg_design_f == NULL) ancestor_bg_design_f = lv_obj_get_design_f(new_cb);
+    if(ancestor_bg_design_f == NULL) ancestor_bg_design_f = lv_obj_get_design_func(new_cb);
 
-    lv_obj_set_signal_f(new_cb, lv_cb_signal);
-    lv_obj_set_design_f(new_cb, lv_cb_design);
+    lv_obj_set_signal_func(new_cb, lv_cb_signal);
+    lv_obj_set_design_func(new_cb, lv_cb_design);
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
         ext->bullet = lv_btn_create(new_cb, NULL);
-        if(ancestor_bullet_design_f == NULL) ancestor_bullet_design_f = lv_obj_get_design_f(ext->bullet);
-        lv_btn_set_styles(new_cb, lv_style_get(LV_STYLE_TRANSPARENT, NULL), lv_style_get(LV_STYLE_TRANSPARENT, NULL),
-                                  lv_style_get(LV_STYLE_TRANSPARENT, NULL), lv_style_get(LV_STYLE_TRANSPARENT, NULL),
-                                  lv_style_get(LV_STYLE_TRANSPARENT, NULL));
+        if(ancestor_bullet_design_f == NULL) ancestor_bullet_design_f = lv_obj_get_design_func(ext->bullet);
+        lv_btn_set_style(new_cb, LV_BTN_STATE_OFF_RELEASED, lv_style_get(LV_STYLE_TRANSPARENT));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_OFF_PRESSED, lv_style_get(LV_STYLE_TRANSPARENT));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_ON_RELEASED, lv_style_get(LV_STYLE_TRANSPARENT));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_ON_PRESSED, lv_style_get(LV_STYLE_TRANSPARENT));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_INACTIVE, lv_style_get(LV_STYLE_TRANSPARENT));
+
         lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
         lv_cont_set_fit(new_cb, true, true);
-        lv_btn_set_tgl(new_cb, true);
+        lv_btn_set_toggle(new_cb, true);
 
         lv_obj_set_click(ext->bullet, false);
-        lv_btn_set_styles(ext->bullet, lv_style_get(LV_STYLE_PRETTY, NULL), lv_style_get(LV_STYLE_PRETTY_COLOR, NULL),
-                                       lv_style_get(LV_STYLE_BUTTON_ON_RELEASED, NULL), lv_style_get(LV_STYLE_BUTTON_ON_PRESSED, NULL),
-                                       lv_style_get(LV_STYLE_BUTTON_INACTIVE, NULL));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_OFF_RELEASED, lv_style_get(LV_STYLE_PRETTY));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_OFF_PRESSED, lv_style_get(LV_STYLE_PRETTY_COLOR));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_ON_RELEASED, lv_style_get(LV_STYLE_BUTTON_ON_RELEASED));
+        lv_btn_set_style(new_cb, LV_BTN_STATE_ON_PRESSED, lv_style_get(LV_STYLE_BUTTON_ON_PRESSED));
 
         ext->label = lv_label_create(new_cb, NULL);
         lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
         lv_label_set_text(ext->label, "Check box");
     } else {
-    	lv_cb_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
     	ext->label = lv_label_create(new_cb, copy_ext->label);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_cb);
+        lv_obj_refresh_style(new_cb);
     }
 
-    lv_obj_set_design_f(ext->bullet, lv_bullet_design);
+    lv_obj_set_design_func(ext->bullet, lv_bullet_design);
     
     return new_cb;
 }
@@ -113,7 +117,7 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     valid = lv_btn_signal(cb, sign, param);
 
-    lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_style_t * style = lv_obj_get_style(cb);
 
     /* The object can be deleted so check its validity and then
@@ -150,7 +154,7 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 {
-	lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 	lv_label_set_text(ext->label, txt);
 }
 
@@ -166,7 +170,7 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
  */
 const char * lv_cb_get_text(lv_obj_t * cb)
 {
-	lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 	return lv_label_get_text(ext->label);
 }
 
@@ -177,7 +181,7 @@ const char * lv_cb_get_text(lv_obj_t * cb)
  */
 lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb)
 {
-    lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     return ext->bullet;
 }
 
@@ -201,8 +205,8 @@ static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mo
     	/*Return false if the object is not covers the mask_p area*/
     	return ancestor_bg_design_f(cb, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
-        lv_cb_ext_t * cb_ext = lv_obj_get_ext(cb);
-        lv_btn_ext_t * bullet_ext = lv_obj_get_ext(cb_ext->bullet);
+        lv_cb_ext_t * cb_ext = lv_obj_get_ext_attr(cb);
+        lv_btn_ext_t * bullet_ext = lv_obj_get_ext_attr(cb_ext->bullet);
 
         /*Be sure the state of the bullet is the same as the parent button*/
         bullet_ext->state = cb_ext->bg_btn.state;

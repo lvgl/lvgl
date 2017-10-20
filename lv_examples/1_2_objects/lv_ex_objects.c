@@ -160,7 +160,7 @@ void lv_ex_objects(void)
     lv_obj_t * chart = lv_chart_create(lv_scr_act(), NULL);         /*Craete the chart*/
     lv_obj_set_size(chart, lv_obj_get_width(scr) / 2, lv_obj_get_width(scr) / 4);   /*Set the size*/
     lv_obj_align(chart, slider, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 20);   /*Align below the slider*/
-    lv_chart_set_dl_width(chart, 3 * LV_DOWNSCALE);                 /*Set the line width (LV_DOWNSCALE compensates anti-aliasing if enabled)*/
+    lv_chart_set_dl_width(chart, 3 << LV_ANTIALIAS);                 /*Set the line width (LV_DOWNSCALE compensates anti-aliasing if enabled)*/
 
     /*Add a RED data line and set some points*/
     lv_chart_dl_t * dl1 = lv_chart_add_data_line(chart, COLOR_RED);

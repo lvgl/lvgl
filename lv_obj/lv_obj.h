@@ -31,8 +31,8 @@ extern "C" {
 #error "LV: LV_HOR_RES and LV_VER_RES must be greater then 0"
 #endif
 
-#if LV_DOWNSCALE != 1 && LV_DOWNSCALE != 2
-#error "LV: LV_DOWNSCALE can be only 1 or 2"
+#if LV_ANTIALIAS != 0 && LV_ANTIALIAS != 1
+#error "LV: LV_ATIALIAS can be only 0 or 1"
 #endif
 
 #if LV_VDB_SIZE == 0 && LV_ANTIALIAS != 0
@@ -48,8 +48,8 @@ extern "C" {
 #endif
 
 /*New defines*/
-#define LV_OBJ_DEF_WIDTH  (80 * LV_DOWNSCALE)
-#define LV_OBJ_DEF_HEIGHT  (60 * LV_DOWNSCALE)
+#define LV_OBJ_DEF_WIDTH  (80 << LV_ANTIALIAS)
+#define LV_OBJ_DEF_HEIGHT  (60 << LV_ANTIALIAS)
 
 #define ANIM_IN					0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
 #define ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
@@ -68,7 +68,7 @@ typedef enum
     LV_DESIGN_COVER_CHK,
 }lv_design_mode_t;
 
-typedef bool (* lv_design_f_t) (struct __LV_OBJ_T * obj, const area_t * mask_p, lv_design_mode_t mode);
+typedef bool (* lv_design_func_t) (struct __LV_OBJ_T * obj, const area_t * mask_p, lv_design_mode_t mode);
 
 typedef enum
 {
@@ -95,41 +95,41 @@ typedef enum
     LV_SIGNAL_CONTROLL,
 }lv_signal_t;
 
-typedef bool (* lv_signal_f_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
+typedef bool (* lv_signal_func_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
 
 typedef struct __LV_OBJ_T
 {
     struct __LV_OBJ_T * par;    /*Pointer to the parent object*/
     ll_dsc_t child_ll;          /*Linked list to store the children objects*/
     
-    area_t cords;               /*Coordinates of the object (x1, y1, x2, y2)*/
+    area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 
-    lv_signal_f_t signal_f;     /*Object type specific signal function*/
-    lv_design_f_t design_f;     /*Object type specific design function*/
+    lv_signal_func_t signal_func;     /*Object type specific signal function*/
+    lv_design_func_t design_func;     /*Object type specific design function*/
     
-    void * ext;                 /*Object type specific extended data*/
+    void * ext_attr;                 /*Object type specific extended data*/
     lv_style_t * style_p;       /*Pointer to the object's style*/
 
-#if LV_OBJ_FREE_P != 0
-    void * free_p;              /*Application specific pointer (set it freely)*/
+#if LV_OBJ_FREE_POINTER != 0
+    void * free_ptr;              /*Application specific pointer (set it freely)*/
 #endif
 
     void * group_p;             /*Pointer to the group of the object*/
 
     /*Attributes and states*/
-    uint8_t click_en     :1;    /*1: Can be pressed by an input device*/
-    uint8_t drag_en      :1;    /*1: Enable the dragging*/
-    uint8_t drag_throw_en:1;    /*1: Enable throwing with drag*/
+    uint8_t click     :1;    /*1: Can be pressed by an input device*/
+    uint8_t drag      :1;    /*1: Enable the dragging*/
+    uint8_t drag_throw:1;    /*1: Enable throwing with drag*/
     uint8_t drag_parent  :1;    /*1: Parent will be dragged instead*/
     uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top_en       :1;    /*1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t top       :1;    /*1: If the object or its children is clicked it goes to the foreground*/
     uint8_t reserved     :1;
 
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
 
     cord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
-#if LV_OBJ_FREE_NUM != 0
+#if LV_OBJ_FREE_NUMBER != 0
     uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
 #endif
 }lv_obj_t;
@@ -217,13 +217,13 @@ bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
  * @param obj pointer to an object
  */
-void lv_obj_inv(lv_obj_t * obj);
+void lv_obj_invalidate(lv_obj_t * obj);
 
 /**
  * Load a new screen
  * @param scr pointer to a screen
  */
-void lv_scr_load(lv_obj_t * scr);
+void lv_screen_load(lv_obj_t * scr);
 
 /**
  * Set a new parent for an object. Its relative position will be the same.
@@ -247,7 +247,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y);
  * @param x new distance from the left side of the parent. (will be multiplied with LV_DOWNSCALE)
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
  */
-void lv_obj_set_pos_us(lv_obj_t * obj, cord_t x, cord_t y);
+void lv_obj_set_pos_scale(lv_obj_t * obj, cord_t x, cord_t y);
 
 /**
  * Set the x coordinate of a object
@@ -262,7 +262,7 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x);
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent. (will be multiplied with LV_DOWNSCALE)
  */
-void lv_obj_set_x_us(lv_obj_t * obj, cord_t x);
+void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x);
 
 /**
  * Set the y coordinate of a object
@@ -277,7 +277,7 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y);
  * @param obj pointer to an object
  * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
  */
-void lv_obj_set_y_us(lv_obj_t * obj, cord_t y);
+void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y);
 
 /**
  * Set the size of an object
@@ -293,7 +293,7 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h);
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  * @param h new height (will be multiplied with LV_DOWNSCALE)
  */
-void lv_obj_set_size_us(lv_obj_t * obj, cord_t w, cord_t h);
+void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h);
 
 /**
  * Set the width of an object
@@ -307,7 +307,7 @@ void lv_obj_set_width(lv_obj_t * obj, cord_t w);
  * @param obj pointer to an object
  * @param w new width (will be multiplied with LV_DOWNSCALE)
  */
-void lv_obj_set_width_us(lv_obj_t * obj, cord_t w);
+void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w);
 
 /**
  * Set the height of an object
@@ -321,7 +321,7 @@ void lv_obj_set_height(lv_obj_t * obj, cord_t h);
  * @param obj pointer to an object
  * @param h new height (will be multiplied with LV_DOWNSCALE)
  */
-void lv_obj_set_height_us(lv_obj_t * obj, cord_t h);
+void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h);
 
 /**
  * Align an object to an other object.
@@ -341,7 +341,7 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
  * @param x_mod x coordinate shift after alignment (will be multiplied with LV_DOWNSCALE)
  * @param y_mod y coordinate shift after alignment (will be multiplied with LV_DOWNSCALE)
  */
-void lv_obj_align_us(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
+void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
 
 /**
  * Set the extended size of an object
@@ -361,7 +361,7 @@ void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style);
  * Notify an object about its style is modified
  * @param obj pointer to an object
  */
-void lv_obj_refr_style(lv_obj_t * obj);
+void lv_obj_refresh_style(lv_obj_t * obj);
 
 /**
  * Notify all object if a style is modified
@@ -426,7 +426,7 @@ void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
  * @param obj pointer to an object
  * @param prot 'OR'-ed values from lv_obj_prot_t
  */
-void lv_obj_clr_protect(lv_obj_t * obj, uint8_t prot);
+void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
 
 /**
  * Set the signal function of an object.
@@ -434,14 +434,14 @@ void lv_obj_clr_protect(lv_obj_t * obj, uint8_t prot);
  * @param obj pointer to an object
  * @param fp the new signal function
  */
-void lv_obj_set_signal_f(lv_obj_t * obj, lv_signal_f_t fp);
+void lv_obj_set_signal_func(lv_obj_t * obj, lv_signal_func_t fp);
 
 /**
  * Set a new design function for an object
  * @param obj pointer to an object
  * @param fp the new design function
  */
-void lv_obj_set_design_f(lv_obj_t * obj, lv_design_f_t fp);
+void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp);
 
 /**
  * Allocate a new ext. data for an object
@@ -449,32 +449,32 @@ void lv_obj_set_design_f(lv_obj_t * obj, lv_design_f_t fp);
  * @param ext_size the size of the new ext. data
  * @return Normal pointer to the allocated ext
  */
-void * lv_obj_alloc_ext(lv_obj_t * obj, uint16_t ext_size);
+void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 
 /**
  * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object
  * @param obj pointer to an object
  */
-void lv_obj_refr_ext_size(lv_obj_t * obj);
+void lv_obj_refresh_ext_size(lv_obj_t * obj);
 
-#if LV_OBJ_FREE_NUM != 0
+#if LV_OBJ_FREE_NUMBER != 0
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application.
  * @param obj pointer to an object
  * @param free_num the new free number
  */
-void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num);
+void lv_obj_set_free_number(lv_obj_t * obj, uint8_t free_number);
 #endif
 
-#if LV_OBJ_FREE_P != 0
+#if LV_OBJ_FREE_POINTER != 0
 /**
  * Set an application specific  pointer for an object.
  * It can help to identify objects in the application.
  * @param obj pointer to an object
  * @param free_p the new free pinter
  */
-void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);
+void lv_obj_set_free_pointer(lv_obj_t * obj, void * free_pointer);
 #endif
 
 /**
@@ -485,13 +485,13 @@ void lv_obj_set_free_p(lv_obj_t * obj, void * free_p);
  * @param delay delay before the animation in milliseconds
  * @param cb a function to call when the animation is ready
  */
-void lv_obj_anim(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *));
+void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *));
 
 /**
  * Return with the actual screen
  * @return pointer to to the actual screen object
  */
-lv_obj_t * lv_scr_act(void);lv_obj_t * lv_layer_top(void);
+lv_obj_t * lv_screen_act(void);lv_obj_t * lv_layer_top(void);
 
 /**
  * Return with the system layer. (Same on every screen and it is above the all other layers)
@@ -505,7 +505,7 @@ lv_obj_t * lv_layer_sys(void);
  * @param obj pointer to an object
  * @return pointer to a screen
  */
-lv_obj_t * lv_obj_get_scr(lv_obj_t * obj);
+lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
 
 /**
  * Returns with the parent of an object
@@ -528,14 +528,14 @@ lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
  * @param obj pointer to an object
  * @return children number of 'obj'
  */
-uint16_t lv_obj_get_child_num(lv_obj_t * obj);
+uint16_t lv_obj_count_children(lv_obj_t * obj);
 
 /**
  * Copy the coordinates of an object to an area
  * @param obj pointer to an object
  * @param cords_p pointer to an area to store the coordinates
  */
-void lv_obj_get_cords(lv_obj_t * obj, area_t * cords_p);
+void lv_obj_get_coords(lv_obj_t * obj, area_t * cords_p);
 
 /**
  * Get the x coordinate of object
@@ -641,22 +641,22 @@ bool lv_obj_is_protected(lv_obj_t * obj, uint8_t prot);
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_f_t   lv_obj_get_signal_f(lv_obj_t * obj);
+lv_signal_func_t   lv_obj_get_signal_func(lv_obj_t * obj);
 
 /**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
  */
-lv_design_f_t lv_obj_get_design_f(lv_obj_t * obj);
+lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
 
 /**
  * Get the ext pointer
  * @param obj pointer to an object
  * @return the ext pointer but not the dynamic version
- *         Use it as ext->data1, and NOT da(ext)->data1
+ *         Use it as ext->data1, and NOT da(ext_attr)->data1
  */
-void * lv_obj_get_ext(lv_obj_t * obj);
+void * lv_obj_get_ext_attr(lv_obj_t * obj);
 
 #if LV_OBJ_FREE_NUM != 0
 /**

@@ -96,7 +96,7 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, const lv_style_
 {
     if(area_get_height(cords_p) < 1 || area_get_width(cords_p) < 1) return;
 
-    if(style_p->shadow.width != 0) {
+    if(style_p->body.shadow.width != 0) {
         lv_draw_rect_shadow(cords_p, mask_p, style_p);
     }
 
@@ -108,7 +108,7 @@ void lv_draw_rect(const area_t * cords_p, const area_t * mask_p, const lv_style_
         }
     } 
     
-    if(style_p->border.width != 0) {
+    if(style_p->body.border.width != 0) {
         lv_draw_rect_border_straight(cords_p, mask_p, style_p);
 
         if(style_p->body.radius != 0) {
@@ -356,8 +356,8 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
              const lv_style_t * style, const char * fn)
 {
     if(fn == NULL) {
-        lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL));
-        lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL), "No data", TXT_FLAG_NONE, NULL);
+        lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN));
+        lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN), "No data", TXT_FLAG_NONE, NULL);
     } else {
         fs_file_t file;
         fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
@@ -443,8 +443,8 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
         fs_close(&file);
 
         if(res != FS_RES_OK) {
-            lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL));
-            lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN, NULL), "No data", TXT_FLAG_NONE, NULL);
+            lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN));
+            lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN), "No data", TXT_FLAG_NONE, NULL);
         }
     }
 }
@@ -815,8 +815,8 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
 
     cord_t width = area_get_width(cords_p);
     cord_t height = area_get_height(cords_p);
-    uint16_t bwidth = style_p->border.width;
-    opa_t bopa = (uint16_t)((uint16_t) style_p->opacity * style_p->border.opa) >> 8;
+    uint16_t bwidth = style_p->body.border.width;
+    opa_t bopa = (uint16_t)((uint16_t) style_p->opacity * style_p->body.border.opa) >> 8;
     area_t work_area;
     cord_t length_corr = 0;
     cord_t corner_size = 0;
@@ -836,7 +836,7 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
     /* Modify the corner_size if corner is drawn */
     corner_size ++;
 
-    color_t b_color = style_p->border.color;
+    color_t b_color = style_p->body.border.color;
 
     /*Left border*/
     work_area.x1 = cords_p->x1;
@@ -928,9 +928,9 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
 static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * mask_p, const  lv_style_t * style)
 {
     uint16_t radius = style->body.radius;
-    uint16_t bwidth = style->border.width;
-    color_t bcolor = style->border.color;
-    opa_t bopa = (uint16_t)((uint16_t) style->opacity * style->border.opa ) >> 8;
+    uint16_t bwidth = style->body.border.width;
+    color_t bcolor = style->body.border.color;
+    opa_t bopa = (uint16_t)((uint16_t) style->opacity * style->body.border.opa ) >> 8;
 
     /*0 px border width drawn as 1 px, so decrement the bwidth*/
     bwidth--;
@@ -1080,9 +1080,9 @@ static void lv_draw_rect_shadow(const area_t * cords_p, const area_t * mask_p, c
     area_tmp.y2 -= radius;
     if(area_is_in(mask_p, &area_tmp) != false) return;
 
-    if(style->shadow.type == LV_SHADOW_FULL) {
+    if(style->body.shadow.type == LV_SHADOW_FULL) {
         lv_draw_cont_shadow_full(cords_p, mask_p, style);
-    } else if(style->shadow.type == LV_SHADOW_BOTTOM) {
+    } else if(style->body.shadow.type == LV_SHADOW_BOTTOM) {
         lv_draw_cont_shadow_bottom(cords_p, mask_p, style);
     }
 }
@@ -1109,7 +1109,7 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
     int16_t row;
 
     uint16_t opa_h_result[LV_HOR_RES];
-    int16_t filter_size = 2 * style->shadow.width + 1;
+    int16_t filter_size = 2 * style->body.shadow.width + 1;
 
     for(row = 0; row < filter_size; row++) {
         opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->opacity * 2) / (filter_size);
@@ -1139,13 +1139,13 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
     ofs_lt.y = cords_p->y1 + radius;
 
 
-    for(row = 0; row < radius + style->shadow.width; row++) {
-        for(p = 0; p < radius + style->shadow.width; p++) {
+    for(row = 0; row < radius + style->body.shadow.width; row++) {
+        for(p = 0; p < radius + style->body.shadow.width; p++) {
            int16_t v;
            uint32_t opa_tmp = 0;
            int16_t row_v;
            bool swidth_out = false;
-           for(v = -style->shadow.width; v < style->shadow.width; v++) {
+           for(v = -style->body.shadow.width; v < style->body.shadow.width; v++) {
                row_v = row + v;
                if(row_v < 0) row_v = 0; /*Rows above the corner*/
 
@@ -1156,19 +1156,19 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
                else
                {
                    int16_t p_tmp = p - (cruve_x[row_v] - cruve_x[row]);
-                   if(p_tmp < -style->shadow.width) { /*Cols before the filtered shadow (still not blurred)*/
+                   if(p_tmp < -style->body.shadow.width) { /*Cols before the filtered shadow (still not blurred)*/
                        opa_tmp += style->opacity * 2;
                    }
                    /*Cols after the filtered shadow (already no effect) */
-                   else if (p_tmp > style->shadow.width) {
+                   else if (p_tmp > style->body.shadow.width) {
                        /* If on the current point the  filter top point is already out of swidth then
                         * the remaining part will not do not anything on this point*/
-                       if(v == -style->shadow.width) { /*Is the first point?*/
+                       if(v == -style->body.shadow.width) { /*Is the first point?*/
                            swidth_out = true;
                        }
                        break;
                    } else {
-                       opa_tmp += opa_h_result[p_tmp + style->shadow.width];
+                       opa_tmp += opa_h_result[p_tmp + style->body.shadow.width];
                    }
                }
            }
@@ -1197,19 +1197,19 @@ static void lv_draw_cont_shadow_full(const area_t * cords_p, const area_t * mask
         for(d = 0; d < p; d++) {
 
             if(point_rt.x != point_lt.x) {
-                px_fp(point_lt.x,point_lt.y , mask_p, style->shadow.color, opa_v_result[d]);
+                px_fp(point_lt.x,point_lt.y , mask_p, style->body.shadow.color, opa_v_result[d]);
             }
 
             if(point_rb.x != point_lb.x && point_lt.y != point_lb.y) {
-                px_fp(point_lb.x,point_lb.y , mask_p, style->shadow.color, opa_v_result[d]);
+                px_fp(point_lb.x,point_lb.y , mask_p, style->body.shadow.color, opa_v_result[d]);
             }
 
             if(point_lt.y != point_lb.y) {
-                px_fp(point_rb.x,point_rb.y , mask_p, style->shadow.color, opa_v_result[d]);
+                px_fp(point_rb.x,point_rb.y , mask_p, style->body.shadow.color, opa_v_result[d]);
             }
 
 
-            px_fp(point_rt.x,point_rt.y , mask_p, style->shadow.color, opa_v_result[d]);
+            px_fp(point_rt.x,point_rt.y , mask_p, style->body.shadow.color, opa_v_result[d]);
 
 
             point_rb.x++;
@@ -1249,7 +1249,7 @@ static void lv_draw_cont_shadow_bottom(const area_t * cords_p, const area_t * ma
     int16_t row;
 
     opa_t opa_h_result[LV_HOR_RES];
-    int16_t filter_size = 2 * style->shadow.width + 1;
+    int16_t filter_size = 2 * style->body.shadow.width + 1;
 
     for(row = 0; row < filter_size; row++) {
         opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->opacity) / (filter_size);
@@ -1275,11 +1275,11 @@ static void lv_draw_cont_shadow_bottom(const area_t * cords_p, const area_t * ma
         point_r.y = ofs2.y + cruve_x[row];
 
         uint16_t d;
-        for(d= style->shadow.width; d < filter_size; d++) {
-            px_fp(point_l.x, point_l.y, mask_p, style->shadow.color, opa_h_result[d]);
+        for(d= style->body.shadow.width; d < filter_size; d++) {
+            px_fp(point_l.x, point_l.y, mask_p, style->body.shadow.color, opa_h_result[d]);
             point_l.y ++;
 
-            px_fp(point_r.x, point_r.y, mask_p, style->shadow.color, opa_h_result[d]);
+            px_fp(point_r.x, point_r.y, mask_p, style->body.shadow.color, opa_h_result[d]);
             point_r.y ++;
         }
 
@@ -1291,8 +1291,8 @@ static void lv_draw_cont_shadow_bottom(const area_t * cords_p, const area_t * ma
     area_mid.y2 = area_mid.y1;
 
     uint16_t d;
-    for(d= style->shadow.width; d < filter_size; d++) {
-        fill_fp(&area_mid, mask_p, style->shadow.color, opa_h_result[d]);
+    for(d= style->body.shadow.width; d < filter_size; d++) {
+        fill_fp(&area_mid, mask_p, style->body.shadow.color, opa_h_result[d]);
         area_mid.y1 ++;
         area_mid.y2 ++;
     }
@@ -1333,20 +1333,20 @@ static void lv_draw_cont_shadow_full_straight(const area_t * cords_p, const area
     sideb_area.y2 = sideb_area.y1;
 
     int16_t d;
-    for(d = 0; d < style->shadow.width; d++) {
-        fill_fp(&sider_area, mask_p, style->shadow.color, map[d]);
+    for(d = 0; d < style->body.shadow.width; d++) {
+        fill_fp(&sider_area, mask_p, style->body.shadow.color, map[d]);
         sider_area.x1++;
         sider_area.x2++;
 
-        fill_fp(&sidel_area, mask_p, style->shadow.color, map[d]);
+        fill_fp(&sidel_area, mask_p, style->body.shadow.color, map[d]);
         sidel_area.x1--;
         sidel_area.x2--;
 
-        fill_fp(&sidet_area, mask_p, style->shadow.color, map[d]);
+        fill_fp(&sidet_area, mask_p, style->body.shadow.color, map[d]);
         sidet_area.y1--;
         sidet_area.y2--;
 
-        fill_fp(&sideb_area, mask_p, style->shadow.color, map[d]);
+        fill_fp(&sideb_area, mask_p, style->body.shadow.color, map[d]);
         sideb_area.y1++;
         sideb_area.y2++;
     }

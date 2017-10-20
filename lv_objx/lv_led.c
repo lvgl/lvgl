@@ -32,7 +32,7 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_design_f;
+static lv_design_func_t ancestor_design_f;
 
 /**********************
  *      MACROS
@@ -59,27 +59,27 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_led);
     
     /*Allocate the object type specific extended data*/
-    lv_led_ext_t * ext = lv_obj_alloc_ext(new_led, sizeof(lv_led_ext_t));
+    lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
     dm_assert(ext);
     ext->bright = LV_LED_BRIGHT_ON;
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_f(new_led);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_led);
 
-    lv_obj_set_signal_f(new_led, lv_led_signal);
-    lv_obj_set_design_f(new_led, lv_led_design);
+    lv_obj_set_signal_func(new_led, lv_led_signal);
+    lv_obj_set_design_func(new_led, lv_led_design);
 
     /*Init the new led object*/
     if(copy == NULL) {
-    	lv_obj_set_style(new_led, lv_style_get(LV_STYLE_PRETTY_COLOR, NULL));
+    	lv_obj_set_style(new_led, lv_style_get(LV_STYLE_PRETTY_COLOR));
     	lv_obj_set_size(new_led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
     }
     /*Copy an existing object*/
     else {
-    	lv_led_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	lv_led_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->bright = copy_ext->bright;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_led);
+        lv_obj_refresh_style(new_led);
     }
     
     return new_led;
@@ -120,11 +120,11 @@ bool lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param)
 void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
 {
 	/*Set the brightness*/
-	lv_led_ext_t * ext = lv_obj_get_ext(led);
+	lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
 	ext->bright = bright;
 
 	/*Invalidate the object there fore it will be redrawn*/
-	lv_obj_inv(led);
+	lv_obj_invalidate(led);
 }
 
 /**
@@ -168,7 +168,7 @@ void lv_led_tgl(lv_obj_t * led)
  */
 uint8_t lv_led_get_bright(lv_obj_t * led)
 {
-	lv_led_ext_t * ext = lv_obj_get_ext(led);
+	lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
 	return ext->bright;
 }
 
@@ -193,7 +193,7 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
     	return ancestor_design_f(led, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*Make darker colors in a temporary style according to the brightness*/
-		lv_led_ext_t * ext = lv_obj_get_ext(led);
+		lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
 		lv_style_t * style = lv_obj_get_style(led);
 
 		/*Create a temporal style*/
@@ -203,11 +203,11 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 		/*Mix. the color with black proportionally with brightness*/
 		leds_tmp.body.color_main = color_mix(leds_tmp.body.color_main, COLOR_BLACK, ext->bright);
 		leds_tmp.body.color_gradient = color_mix(leds_tmp.body.color_gradient, COLOR_BLACK, ext->bright);
-        leds_tmp.border.color = color_mix(leds_tmp.border.color, COLOR_BLACK, ext->bright);
+        leds_tmp.body.border.color = color_mix(leds_tmp.body.border.color, COLOR_BLACK, ext->bright);
 
 		/*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF and LV_LED_BRIGHT_ON*/
 		uint16_t bright_tmp = ext->bright;
-        leds_tmp.shadow.width = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->shadow.width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
+        leds_tmp.body.shadow.width = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->body.shadow.width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
 		led->style_p = &leds_tmp;
 		ancestor_design_f(led, mask, mode);

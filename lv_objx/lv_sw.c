@@ -54,14 +54,14 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(new_sw);
     
     /*Allocate the switch type specific extended data*/
-    lv_sw_ext_t * ext = lv_obj_alloc_ext(new_sw, sizeof(lv_sw_ext_t));
+    lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
     ext->changed = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_f(new_sw, lv_sw_signal);
+    lv_obj_set_signal_func(new_sw, lv_sw_signal);
 
     /*Init the new switch switch*/
     if(copy == NULL) {
@@ -74,7 +74,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
         /*Nothing to copy*/
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_sw);
+        lv_obj_refresh_style(new_sw);
     }
     
     return new_sw;
@@ -91,7 +91,7 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 {
     bool valid;
 
-    lv_sw_ext_t * ext = lv_obj_get_ext(sw);
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     int16_t old_val = lv_bar_get_value(sw);
 
     lv_action_t slider_cb = ext->slider.cb;
