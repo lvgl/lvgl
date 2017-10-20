@@ -6,8 +6,7 @@ Please create an issue to suggest a new feature instead of adding pull request t
 
 ## Ideas
 Here are ideas which are not assigned to a minor version yet:
-- label: add a horzintal line (e.g. underline or line through). 
-- label long mode: dot begin
+- label: add a horzintal line (e.g. underline or line through).
 - GUI remote control
 - automatically build GUI from file (e.g. XML, JSON or HTML)
 
