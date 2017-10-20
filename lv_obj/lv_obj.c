@@ -196,7 +196,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 #if LV_OBJ_FREE_NUM != 0
         new_obj->free_num = 0;
 #endif
-#if LV_OBJ_FREE_P != 0
+#if LV_OBJ_FREE_PTR != 0
         new_obj->free_ptr = NULL;
 #endif
 #if LV_OBJ_GROUP != 0

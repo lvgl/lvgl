@@ -32,17 +32,16 @@ extern "C" {
  * Display Driver structure to be registered by HAL
  */
 typedef struct _disp_drv_t {
-    const char *name;
-    int32_t h_res;
-    int32_t v_res;
+    int32_t hor_res;
+    int32_t ver_res;
     void (*fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color);
     void (*map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t * color_p);
     void (*copy)(color_t * dest, const color_t * src, uint32_t length, opa_t opa);
-} lv_hal_disp_drv_t;
+} lv_disp_drv_t;
 
-typedef struct _disp_drv_node_t {
-    lv_hal_disp_drv_t drv;
-    struct _disp_drv_node_t *next;
+typedef struct _disp_t {
+    lv_disp_drv_t driver;
+    struct _disp_t *next;
 } lv_disp_t;
 
 /**********************
@@ -55,7 +54,7 @@ typedef struct _disp_drv_node_t {
  * @param driver Display driver structure
  * @return 0 on success, -ve on error
  */
-lv_disp_t * lv_disp_drv_register(lv_hal_disp_drv_t *driver);
+lv_disp_t * lv_disp_register(lv_disp_drv_t *driver);
 
 /**
  * Set Active Display by ID

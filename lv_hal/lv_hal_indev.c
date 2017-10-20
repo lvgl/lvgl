@@ -42,14 +42,14 @@ static lv_indev_t *indev_list = NULL;
  * @param driver Input Device driver structure
  * @return pointer to the new input device
  */
-lv_indev_t * lv_indev_register(lv_hal_indev_drv_t *driver)
+lv_indev_t * lv_indev_register(lv_indev_drv_t *driver)
 {
     lv_indev_t *node;
 
     node = dm_alloc(sizeof(lv_indev_t));
     if (!node) return NULL;
 
-    memcpy(&node->drv, driver, sizeof(lv_hal_indev_drv_t));
+    memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
 
     node->next = NULL;
 
@@ -88,14 +88,14 @@ lv_indev_t * lv_indev_next(lv_indev_t * indev)
  * @param data input device will write its data here
  * @return false: no more data; true: there more data to read (buffered)
  */
-bool lv_indev_read(lv_indev_t * indev, lv_hal_indev_data_t *data)
+bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data)
 {
     bool cont = false;
 
-    if(indev->drv.get_data) {
-        cont = indev->drv.get_data(data);
+    if(indev->driver.get_data) {
+        cont = indev->driver.get_data(data);
     } else {
-        memset(data, 0, sizeof(lv_hal_indev_data_t));
+        memset(data, 0, sizeof(lv_indev_data_t));
     }
 
     return cont;

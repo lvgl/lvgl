@@ -27,7 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void indev_proc_task(void * param);
-static void indev_proc_point(lv_indev_state_t * indev, cord_t x, cord_t y);
+static void indev_proc_point(lv_indev_state_t * indev);
 static void indev_proc_press(lv_indev_state_t * state);
 static void disi_proc_release(lv_indev_state_t * state);
 static lv_obj_t * indev_search_obj(const lv_indev_state_t * indev, lv_obj_t * obj);
@@ -77,11 +77,11 @@ lv_indev_t * lv_indev_get_act(void)
  */
 void lv_indev_reset(lv_indev_t * indev)
 {
-    if(indev) indev->state.reset_qry = 1;
+    if(indev) indev->state.reset_query = 1;
     else {
         lv_indev_t * i = lv_indev_next(NULL);
         while(i) {
-            i->state.reset_qry = 1;
+            i->state.reset_query = 1;
             i = lv_indev_next(i);
         }
     }
@@ -94,8 +94,8 @@ void lv_indev_reset(lv_indev_t * indev)
 void lv_indev_reset_lpr(lv_indev_t * indev_proc)
 {
     indev_proc->state.long_press_sent = 0;
-    indev_proc->state.lpr_rep_time_stamp = lv_tick_get();
-    indev_proc->state.press_time_stamp = lv_tick_get();
+    indev_proc->state.longpress_repeat_timestamp = lv_tick_get();
+    indev_proc->state.press_timestamp = lv_tick_get();
 }
 
 /**
@@ -108,7 +108,7 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
     lv_indev_t *i = lv_indev_next(NULL);
 
     while (i) {
-        if (i->drv.type == type) i->state.disable = enable == false ? 1 : 0;
+        if (i->driver.type == type) i->state.disabled = enable == false ? 1 : 0;
         i = lv_indev_next(i);
     }
 }
@@ -164,7 +164,7 @@ void lv_indev_get_vect(lv_indev_t * indev, point_t * point)
  */
 void lv_indev_wait_release(lv_indev_t * indev)
 {
-    indev->state.wait_release = 1;
+    indev->state.wait_unil_release = 1;
 }
 
 /**********************
@@ -177,7 +177,7 @@ void lv_indev_wait_release(lv_indev_t * indev)
  */
 static void indev_proc_task(void * param)
 {
-    lv_hal_indev_data_t data;
+    lv_indev_data_t data;
     lv_indev_t * i;
     i = lv_indev_next(NULL);
 
@@ -186,23 +186,23 @@ static void indev_proc_task(void * param)
         indev_act = i;
 
         /*Handle reset query before processing the point*/
-        if(i->state.reset_qry) {
+        if(i->state.reset_query) {
             i->state.act_obj = NULL;
             i->state.last_obj = NULL;
             i->state.drag_range_out = 0;
             i->state.drag_in_prog = 0;
             i->state.long_press_sent = 0;
-            i->state.press_time_stamp = 0;
-            i->state.lpr_rep_time_stamp = 0;
+            i->state.press_timestamp = 0;
+            i->state.longpress_repeat_timestamp = 0;
             i->state.vect_sum.x = 0;
             i->state.vect_sum.y = 0;
-            i->state.reset_qry = 0;
+            i->state.reset_query = 0;
         }
 
-        if(i->state.disable == 0) {
+        if(i->state.disabled == 0) {
             /*Read the data*/
             lv_indev_read(i, &data);
-            i->state.pressed = data.state;
+            i->state.event = data.state;
 
             /*Move the cursor if set and moved*/
             if(i->cursor != NULL &&
@@ -212,22 +212,25 @@ static void indev_proc_task(void * param)
                 lv_obj_set_pos_scale(i->cursor, data.point.x, data.point.y);
             }
 
+            i->state.act_point.x = data.point.x << LV_ANTIALIAS;
+            i->state.act_point.y = data.point.y << LV_ANTIALIAS;
+
             /*Process the current point*/
-            indev_proc_point(&i->state, data.point.x , data.point.y);
+            indev_proc_point(&i->state);
         }
 
         /*Handle reset query if it happened in during processing*/
-        if(i->state.reset_qry) {
+        if(i->state.reset_query) {
             i->state.act_obj = NULL;
             i->state.last_obj = NULL;
             i->state.drag_range_out = 0;
             i->state.drag_in_prog = 0;
             i->state.long_press_sent = 0;
-            i->state.press_time_stamp = 0;
-            i->state.lpr_rep_time_stamp = 0;
+            i->state.press_timestamp = 0;
+            i->state.longpress_repeat_timestamp = 0;
             i->state.vect_sum.x = 0;
             i->state.vect_sum.y = 0;
-            i->state.reset_qry = 0;
+            i->state.reset_query = 0;
         }
 
         i = lv_indev_next(i);    /*Go to the next indev*/
@@ -242,17 +245,9 @@ static void indev_proc_task(void * param)
  * @param x x coordinate of the next point
  * @param y y coordinate of the next point
  */
-static void indev_proc_point(lv_indev_state_t * indev, cord_t x, cord_t y)
+static void indev_proc_point(lv_indev_state_t * indev)
 {
-#if LV_ANTIALIAS != 0 && LV_VDB_SIZE != 0
-    indev->act_point.x = x << LV_ANTIALIAS;
-    indev->act_point.y = y << LV_ANTIALIAS;
-#else
-    indev->act_point.x = x;
-    indev->act_point.y = y;
-#endif
-    
-    if(indev->pressed != false){
+    if(indev->event == LV_INDEV_EVENT_PRESSED){
 #if LV_INDEV_TP_MARKER != 0
         area_t area;
         area.x1 = x - (LV_INDEV_TP_MARKER >> 1);
@@ -278,7 +273,7 @@ static void indev_proc_press(lv_indev_state_t * state)
 {
     lv_obj_t * pr_obj = state->act_obj;
     
-    if(state->wait_release != 0) return;
+    if(state->wait_unil_release != 0) return;
 
     /*If there is no last object then search*/
     if(state->act_obj == NULL) {
@@ -304,13 +299,13 @@ static void indev_proc_press(lv_indev_state_t * state)
         /*If a new object found the previous was lost, so send a signal*/
         if(state->act_obj != NULL) {
             state->act_obj->signal_func(state->act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
-            if(state->reset_qry != 0) return;
+            if(state->reset_query != 0) return;
         }
         
         if(pr_obj != NULL) {
             /* Save the time when the obj pressed. 
              * It is necessary to count the long press time.*/
-            state->press_time_stamp = lv_tick_get();
+            state->press_timestamp = lv_tick_get();
             state->long_press_sent = 0;
             state->drag_range_out = 0;
             state->drag_in_prog = 0;
@@ -335,7 +330,7 @@ static void indev_proc_press(lv_indev_state_t * state)
 
             /*Send a signal about the press*/
             pr_obj->signal_func(pr_obj, LV_SIGNAL_PRESSED, indev_act);
-            if(state->reset_qry != 0) return;
+            if(state->reset_query != 0) return;
         }
     }
     
@@ -349,32 +344,32 @@ static void indev_proc_press(lv_indev_state_t * state)
     /*If there is active object and it can be dragged run the drag*/
     if(state->act_obj != NULL) {
         state->act_obj->signal_func(state->act_obj, LV_SIGNAL_PRESSING, indev_act);
-        if(state->reset_qry != 0) return;
+        if(state->reset_query != 0) return;
 
         indev_drag(state);
-        if(state->reset_qry != 0) return;
+        if(state->reset_query != 0) return;
 
         /*If there is no drag then check for long press time*/
         if(state->drag_in_prog == 0 && state->long_press_sent == 0) {
             /*Send a signal about the long press if enough time elapsed*/
-            if(lv_tick_elaps(state->press_time_stamp) > LV_INDEV_LONG_PRESS_TIME) {
+            if(lv_tick_elaps(state->press_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
                 pr_obj->signal_func(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
-                if(state->reset_qry != 0) return;
+                if(state->reset_query != 0) return;
 
                 /*Mark the signal sending to do not send it again*/
                 state->long_press_sent = 1;
 
                 /*Save the long press time stamp for the long press repeat handler*/
-                state->lpr_rep_time_stamp = lv_tick_get();
+                state->longpress_repeat_timestamp = lv_tick_get();
             }
         }
         /*Send long press repeated signal*/
         if(state->drag_in_prog == 0 && state->long_press_sent == 1) {
             /*Send a signal about the long press repeate if enough time elapsed*/
-            if(lv_tick_elaps(state->lpr_rep_time_stamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
+            if(lv_tick_elaps(state->longpress_repeat_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
                 pr_obj->signal_func(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
-                if(state->reset_qry != 0) return;
-                state->lpr_rep_time_stamp = lv_tick_get();
+                if(state->reset_query != 0) return;
+                state->longpress_repeat_timestamp = lv_tick_get();
 
             }
         }
@@ -387,28 +382,28 @@ static void indev_proc_press(lv_indev_state_t * state)
  */
 static void disi_proc_release(lv_indev_state_t * state)
 {
-    if(state->wait_release != 0) {
+    if(state->wait_unil_release != 0) {
         state->act_obj = NULL;
         state->last_obj = NULL;
-        state->press_time_stamp = 0;
-        state->lpr_rep_time_stamp = 0;
-        state->wait_release = 0;
+        state->press_timestamp = 0;
+        state->longpress_repeat_timestamp = 0;
+        state->wait_unil_release = 0;
     }
 
     /*Forgot the act obj and send a released signal */
     if(state->act_obj != NULL) {
         state->act_obj->signal_func(state->act_obj, LV_SIGNAL_RELEASED, indev_act);
-        if(state->reset_qry != 0) return;
+        if(state->reset_query != 0) return;
         state->act_obj = NULL;
-        state->press_time_stamp = 0;
-        state->lpr_rep_time_stamp = 0;
+        state->press_timestamp = 0;
+        state->longpress_repeat_timestamp = 0;
     }
     
     /*The reset can be set in the signal function. 
      * In case of reset query ignore the remaining parts.*/
-    if(state->last_obj != NULL && state->reset_qry == 0) {
+    if(state->last_obj != NULL && state->reset_query == 0) {
         indev_drag_throw(state);
-        if(state->reset_qry != 0) return;
+        if(state->reset_query != 0) return;
     }
 }
 
@@ -499,7 +494,7 @@ static void indev_drag(lv_indev_state_t * state)
             if(lv_obj_get_x(drag_obj) != act_x || lv_obj_get_y(drag_obj) != act_y) {
                 if(state->drag_range_out != 0) { /*Send the drag begin signal on first move*/
                     drag_obj->signal_func(drag_obj,  LV_SIGNAL_DRAG_BEGIN, indev_act);
-                    if(state->reset_qry != 0) return;
+                    if(state->reset_query != 0) return;
                 }
                 state->drag_in_prog = 1;
             }

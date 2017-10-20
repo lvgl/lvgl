@@ -110,7 +110,7 @@ typedef struct __LV_OBJ_T
     void * ext_attr;                 /*Object type specific extended data*/
     lv_style_t * style_p;       /*Pointer to the object's style*/
 
-#if LV_OBJ_FREE_POINTER != 0
+#if LV_OBJ_FREE_PTR != 0
     void * free_ptr;              /*Application specific pointer (set it freely)*/
 #endif
 
@@ -129,7 +129,7 @@ typedef struct __LV_OBJ_T
 
     cord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
-#if LV_OBJ_FREE_NUMBER != 0
+#if LV_OBJ_FREE_NUM != 0
     uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
 #endif
 }lv_obj_t;

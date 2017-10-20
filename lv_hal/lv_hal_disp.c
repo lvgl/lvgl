@@ -45,14 +45,14 @@ static lv_disp_t *active;
  * @param driver Display driver structure
  * @return pointer to the new display or NULL on error
  */
-lv_disp_t * lv_disp_drv_register(lv_hal_disp_drv_t *driver)
+lv_disp_t * lv_disp_register(lv_disp_drv_t *driver)
 {
     lv_disp_t *node;
 
     node = dm_alloc(sizeof(lv_disp_t));
     if (!node) return NULL;
 
-    memcpy(&node->drv,driver, sizeof(lv_hal_disp_drv_t));
+    memcpy(&node->driver,driver, sizeof(lv_disp_drv_t));
     node->next = NULL;
 
     /* Set first display as active by default */
@@ -65,6 +65,7 @@ lv_disp_t * lv_disp_drv_register(lv_hal_disp_drv_t *driver)
 
     return node;
 }
+
 
 /**
  * Set Active Display by ID
@@ -111,7 +112,7 @@ lv_disp_t * lv_disp_next(lv_disp_t * disp)
 void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color)
 {
     if(active == NULL) return;
-    if(active->drv.fill != NULL) active->drv.fill(x1, y1, x2, y2, color);
+    if(active->driver.fill != NULL) active->driver.fill(x1, y1, x2, y2, color);
 }
 
 /**
@@ -125,7 +126,7 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color)
 void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t * color_map)
 {
     if(active == NULL) return;
-    if(active->drv.map != NULL)  active->drv.map(x1, y1, x2, y2, color_map);
+    if(active->driver.map != NULL)  active->driver.map(x1, y1, x2, y2, color_map);
 }
 
 
@@ -139,12 +140,12 @@ void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t *
 void lv_disp_copy(color_t * dest, const color_t * src, uint32_t length, opa_t opa)
 {
     if(active == NULL) return;
-    if(active->drv.copy != NULL) active->drv.copy(dest, src, length, opa);
+    if(active->driver.copy != NULL) active->driver.copy(dest, src, length, opa);
 }
 
 bool lv_disp_is_accelerated(void)
 {
-    if(active->drv.copy) return true;
+    if(active->driver.copy) return true;
     else return false;
 }
 
