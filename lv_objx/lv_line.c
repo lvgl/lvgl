@@ -180,7 +180,7 @@ void lv_line_set_y_inv(lv_obj_t * line, bool yinv)
 }
 
 /**
- * Enable (or disable) the point coordinate upscaling (compensate LV_DOWNSCALE).
+ * Enable (or disable) the points' coordinate upscaling (if LV_ANTIALIAS is enabled).
  * @param line pointer to a line object
  * @param unscale true: enable the point coordinate upscaling
  */

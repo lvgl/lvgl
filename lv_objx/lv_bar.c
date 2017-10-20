@@ -64,7 +64,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->act_value = 0;
-    ext->style_indic = lv_style_get(LV_STYLE_PRETTY_COLOR);
+    ext->indicator_style = lv_style_get(LV_STYLE_PRETTY_COLOR);
 
     /* Save the ancient design function.
      * It will be used in the bar design function*/
@@ -84,7 +84,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
 		ext->act_value = ext_copy->act_value;
-        ext->style_indic = ext_copy->style_indic;
+        ext->indicator_style = ext_copy->indicator_style;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_bar);
 
@@ -110,7 +110,7 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(valid != false) {
         if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-            lv_style_t * style_indic = lv_bar_get_style_indic(bar);
+            lv_style_t * style_indic = lv_bar_get_indicator_style(bar);
             if(style_indic->body.shadow.width > bar->ext_size) bar->ext_size = style_indic->body.shadow.width;
         }
 
@@ -196,11 +196,11 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
  * @param bar pointer to a bar object
  * @param style pointer to a style
  */
-void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style)
+void lv_bar_set_indicator_style(lv_obj_t * bar, lv_style_t * style)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-    ext->style_indic = style;
+    ext->indicator_style = style;
 
     bar->signal_func(bar, LV_SIGNAL_REFR_EXT_SIZE, NULL);
 
@@ -249,13 +249,13 @@ int16_t lv_bar_get_max_value(lv_obj_t * bar)
  * @param bar pointer to a bar object
  * @return pointer to the bar indicator style
  */
-lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar)
+lv_style_t * lv_bar_get_indicator_style(lv_obj_t * bar)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-    if(ext->style_indic == NULL) return lv_obj_get_style(bar);
+    if(ext->indicator_style == NULL) return lv_obj_get_style(bar);
 
-    return ext->style_indic;
+    return ext->indicator_style;
 }
 
 /**********************
@@ -282,7 +282,7 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
 
 		lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-        lv_style_t * style_indic = lv_bar_get_style_indic(bar);
+        lv_style_t * style_indic = lv_bar_get_indicator_style(bar);
 		area_t indic_area;
 		area_cpy(&indic_area, &bar->coords);
 		indic_area.x1 += style_indic->body.padding.horizontal;

@@ -93,7 +93,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
         lv_btnm_set_map(ext->tabs, tab_def);
         lv_obj_set_height(ext->tabs, 3 * LV_DPI / 4);
         lv_btnm_set_action(ext->tabs, tab_btnm_action);
-        lv_btnm_set_tgl(ext->tabs, true, 0);
+        lv_btnm_set_toggle(ext->tabs, true, 0);
 
         ext->indic = lv_obj_create(ext->tabs, NULL);
         lv_style_t * style_indic = lv_obj_get_style(ext->indic);
@@ -279,7 +279,7 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
         anim_create(&a);
     }
 
-    lv_btnm_set_tgl(ext->tabs, true, ext->tab_act);
+    lv_btnm_set_toggle(ext->tabs, true, ext->tab_act);
 }
 
 /*=====================

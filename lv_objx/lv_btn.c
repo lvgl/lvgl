@@ -8,15 +8,14 @@
  *********************/
 
 #include "lv_conf.h"
-#if USE_LV_BUTTON != 0
+#if USE_LV_BTN != 0
 
+#include <string.h>
 #include "lv_btn.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "misc/gfx/area.h"
 #include "misc/gfx/color.h"
-#include <stdbool.h>
-#include <string.h>
 
 /*********************
  *      DEFINES
@@ -237,6 +236,22 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
     if(ext->state != state) {
         ext->state = state;
         lv_obj_set_style(btn, ext->styles[state]);
+    }
+}
+
+/**
+ * Toggle the state of the button (ON->OFF, OFF->ON)
+ * @param btn pointer to a button object
+ */
+void lv_btn_toggle(lv_obj_t * btn)
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+    switch(ext->state) {
+        case LV_BTN_STATE_OFF_RELEASED: lv_btn_set_state(btn, LV_BTN_STATE_ON_RELEASED); break;
+        case LV_BTN_STATE_OFF_PRESSED: lv_btn_set_state(btn, LV_BTN_STATE_ON_PRESSED); break;
+        case LV_BTN_STATE_ON_RELEASED: lv_btn_set_state(btn, LV_BTN_STATE_OFF_RELEASED); break;
+        case LV_BTN_STATE_ON_PRESSED: lv_btn_set_state(btn, LV_BTN_STATE_OFF_PRESSED); break;
+        default: break;
     }
 }
 

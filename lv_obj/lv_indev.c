@@ -201,7 +201,7 @@ static void indev_proc_task(void * param)
 
         if(i->state.disable == 0) {
             /*Read the data*/
-            lv_indev_get(i, &data);
+            lv_indev_read(i, &data);
             i->state.pressed = data.state;
 
             /*Move the cursor if set and moved*/
@@ -283,12 +283,12 @@ static void indev_proc_press(lv_indev_state_t * state)
     /*If there is no last object then search*/
     if(state->act_obj == NULL) {
         pr_obj = indev_search_obj(state, lv_layer_top());
-        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_screen_act());
+        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_scr_act());
     }
     /*If there is last object but it is not dragged also search*/
     else if(state->drag_in_prog == 0) {/*Now act_obj != NULL*/
         pr_obj = indev_search_obj(state, lv_layer_top());
-        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_screen_act());
+        if(pr_obj == NULL) pr_obj = indev_search_obj(state, lv_scr_act());
     }
     /*If a dragable object was the last then keep it*/
     else {
@@ -520,7 +520,6 @@ static void indev_drag_throw(lv_indev_state_t * state)
     lv_obj_t * drag_obj = state->last_obj;
     
     /*If drag parent is active check recursively the drag_parent attribute*/
-
 	while(lv_obj_get_drag_parent(drag_obj) != false &&
 		  drag_obj != NULL) {
 		drag_obj = lv_obj_get_parent(drag_obj);

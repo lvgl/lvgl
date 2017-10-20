@@ -364,7 +364,7 @@ void lv_obj_invalidate(lv_obj_t * obj)
 {
     /*Invalidate the object only if it belongs to the 'act_scr'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    if(obj_scr == lv_screen_act() ||
+    if(obj_scr == lv_scr_act() ||
        obj_scr == lv_layer_top() ||
        obj_scr == lv_layer_sys()) {
         /*Truncate recursively to the parents*/
@@ -404,7 +404,7 @@ void lv_obj_invalidate(lv_obj_t * obj)
  * Load a new screen
  * @param scr pointer to a screen
  */
-void lv_screen_load(lv_obj_t * scr)
+void lv_scr_load(lv_obj_t * scr)
 {
     act_scr = scr;
     
@@ -496,10 +496,10 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
 
 /**
  * Set relative the position of an object (relative to the parent).
- * The coordinates will be upscaled with LV_DOWNSCALE.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param x new distance from the left side of the parent. (will be multiplied with LV_DOWNSCALE)
- * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
+ * @param x new distance from the left side of the parent.
+ * @param y new distance from the top of the parent.
  */
 void lv_obj_set_pos_scale(lv_obj_t * obj, cord_t x, cord_t y)
 {
@@ -518,9 +518,9 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x)
 
 /**
  * Set the x coordinate of a object.
- * The coordinate will be upscaled with  LV_DOWNSCALE.
+ * The coordinate will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param x new distance from the left side from the parent. (will be multiplied with LV_DOWNSCALE)
+ * @param x new distance from the left side from the parent.
  */
 void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x)
 {
@@ -539,9 +539,9 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y)
 
 /**
  * Set the y coordinate of a object.
- * The coordinate will be upscaled with LV_DOWNSCALE.
+ * The coordinate will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
+ * @param y new distance from the top of the parent.
  */
 void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y)
 {
@@ -588,10 +588,11 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h)
 }
 
 /**
- * Set the size of an object. The coordinates will be upscaled with  LV_DOWNSCALE.
+ * Set the size of an object.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param w new width (will be multiplied with LV_DOWNSCALE)
- * @param h new height (will be multiplied with LV_DOWNSCALE)
+ * @param w new width
+ * @param h new height
  */
 void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h)
 {
@@ -609,9 +610,10 @@ void lv_obj_set_width(lv_obj_t * obj, cord_t w)
 }
 
 /**
- * Set the width of an object.  The width will be upscaled with  LV_DOWNSCALE
+ * Set the width of an object.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param w new width (will be multiplied with LV_DOWNSCALE)
+ * @param w new width
  */
 void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w)
 {
@@ -629,9 +631,10 @@ void lv_obj_set_height(lv_obj_t * obj, cord_t h)
 }
 
 /**
- * Set the height of an object.  The height will be upscaled with  LV_DOWNSCALE
+ * Set the height of an object.
+ * The coordinate will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param h new height (will be multiplied with LV_DOWNSCALE)
+ * @param h new height
  */
 void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h)
 {
@@ -777,28 +780,17 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
 
 
 /**
- * Align an object to an other object. The coordinates will be upscaled with  LV_DOWNSCALE.
+ * Align an object to an other object.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment (will be multiplied with LV_DOWNSCALE)
- * @param y_mod y coordinate shift after alignment (will be multiplied with LV_DOWNSCALE)
+ * @param x_mod x coordinate shift after alignment
+ * @param y_mod y coordinate shift after alignment
  */
 void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod)
 {
 	lv_obj_align(obj, base, align, x_mod << LV_ANTIALIAS, y_mod << LV_ANTIALIAS);
-}
-
-/**
- * Set the extended size of an object
- * @param obj pointer to an object
- * @param ext_size the extended size
- */
-void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size)
-{
-	obj->ext_size = ext_size;
-
-	lv_obj_invalidate(obj);
 }
 
 /*---------------------
@@ -1108,7 +1100,7 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Return with the actual screen
  * @return pointer to the actual screen object
  */
-lv_obj_t * lv_screen_act(void)
+lv_obj_t * lv_scr_act(void)
 {
     return act_scr;
 }

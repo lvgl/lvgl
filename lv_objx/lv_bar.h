@@ -32,12 +32,12 @@ extern "C" {
 /*Data of bar*/
 typedef struct
 {
-    /*No inherited ext*/        /*Ext. of ancestor*/
+    /*No inherited ext*/            /*Ext. of ancestor*/
     /*New data for this type */
-    int16_t act_value;          /*Current value of the bar*/
-    int16_t min_value;          /*Minimum value of the bar*/
-    int16_t max_value;          /*Maximum value of the bar*/
-    lv_style_t * style_indic;   /*Style of the indicator*/
+    int16_t act_value;              /*Current value of the bar*/
+    int16_t min_value;              /*Minimum value of the bar*/
+    int16_t max_value;              /*Maximum value of the bar*/
+    lv_style_t *indicator_style;    /*Style of the indicator*/
 }lv_bar_ext_t;
 
 /**********************
@@ -88,7 +88,7 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
  * @param bar pointer to a bar object
  * @param style pointer to a style
  */
-void lv_bar_set_style_indic(lv_obj_t * bar, lv_style_t * style);
+void lv_bar_set_indicator_style(lv_obj_t * bar, lv_style_t * style);
 
 /**
  * Get the value of a bar
@@ -116,7 +116,7 @@ int16_t lv_bar_get_max_value(lv_obj_t * bar);
  * @param bar pointer to a bar object
  * @return pointer to the bar indicator style
  */
-lv_style_t * lv_bar_get_style_indic(lv_obj_t * bar);
+lv_style_t * lv_bar_get_indicator_style(lv_obj_t * bar);
 
 /**********************
  *      MACROS

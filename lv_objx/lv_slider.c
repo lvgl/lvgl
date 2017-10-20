@@ -284,7 +284,7 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
 
         lv_style_t * style_slider = lv_obj_get_style(slider);
         lv_style_t * style_knob = lv_slider_get_style_knob(slider);
-        lv_style_t * style_indic = lv_bar_get_style_indic(slider);
+        lv_style_t * style_indic = lv_bar_get_indicator_style(slider);
 
         /*Draw the bar*/
         area_t area_bar;

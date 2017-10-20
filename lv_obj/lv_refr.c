@@ -98,7 +98,7 @@ void lv_inv_area(const area_t * area_p)
     /*The area is truncated to the screen*/
     if(suc != false)
     {
-#if LV_DOWNSCALE == 2
+#if LV_ANTIALIAS == 1
     	/*Rounding*/
     	com_area.x1 = com_area.x1 & (~0x1);
     	com_area.y1 = com_area.y1 & (~0x1);
@@ -242,7 +242,7 @@ static void lv_refr_area_no_vdb(const area_t * area_p)
     lv_obj_t * top_p;
     
     /*Get top object which is not covered by others*/    
-    top_p = lv_refr_get_top_obj(area_p, lv_screen_act());
+    top_p = lv_refr_get_top_obj(area_p, lv_scr_act());
     
     /*Do the refreshing*/
     lv_refr_make(top_p, area_p);
@@ -261,7 +261,7 @@ static void lv_refr_area_with_vdb(const area_t * area_p)
     if(max_row > area_get_height(area_p)) max_row = area_get_height(area_p);
     
     /*Round the row number with downscale*/
-#if LV_DOWNSCALE == 2
+#if LV_ANTIALIAS == 1
     max_row &= (~0x1);
 #endif
 
@@ -310,7 +310,7 @@ static void lv_refr_area_part_vdb(const area_t * area_p)
     area_union(&start_mask, area_p, &vdb_p->area);
 
     /*Get the most top object which is not covered by others*/
-    top_p = lv_refr_get_top_obj(&start_mask, lv_screen_act());
+    top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
 
     /*Do the refreshing from the top object*/
     lv_refr_make(top_p, &start_mask);
@@ -372,7 +372,7 @@ static void lv_refr_make(lv_obj_t * top_p, const area_t * mask_p)
     /* Normally always will be a top_obj (at least the screen)
      * but in special cases (e.g. if the screen has alpha) it won't.
      * In this case use the screen directly */
-    if(top_p == NULL) top_p = lv_screen_act();
+    if(top_p == NULL) top_p = lv_scr_act();
     
     /*Refresh the top object and its children*/
     lv_refr_obj(top_p, mask_p);

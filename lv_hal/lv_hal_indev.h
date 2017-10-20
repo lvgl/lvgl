@@ -17,8 +17,8 @@ extern "C" {
  *********************/
 #include <stdbool.h>
 #include <stdint.h>
+#include "lv_hal.h"
 #include "misc/gfx/area.h"
-#include <lvgl/lv_hal/lv_hal.h>
 
 /*********************
  *      DEFINES
@@ -99,15 +99,15 @@ typedef struct _lv_indev_t {
  * @param driver Input Device driver structure
  * @return 0 on success, -ve on error
  */
-lv_indev_t * lv_indev_drv_register(lv_hal_indev_drv_t *driver);
+lv_indev_t * lv_indev_register(lv_hal_indev_drv_t *driver);
 
 
 /**
- * Ask data fro man input device.
+ * Ask data from an input device.
  * @param data input device data
  * @return false: no more data; true: there more data to read (buffered)
  */
-bool lv_indev_get(lv_indev_t * indev, lv_hal_indev_data_t *data);
+bool lv_indev_read(lv_indev_t * indev, lv_hal_indev_data_t *data);
 
 /**
  * Get the next input device.

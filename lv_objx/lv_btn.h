@@ -1,10 +1,10 @@
 /**
- * @file lv_button.h
+ * @file lv_btn.h
  * 
  */
 
-#ifndef lv_btn_H
-#define lv_btn_H
+#ifndef LV_BTN_H
+#define LV_BTN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#if USE_LV_BUTTON != 0
+#if USE_LV_BTN != 0
 
 /*Testing of dependencies*/
 #if USE_LV_CONT == 0
@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #include "lv_cont.h"
-#include <lvgl/lv_obj/lv_indev.h>
+#include "../lv_obj/lv_indev.h"
 
 /*********************
  *      DEFINES
@@ -101,6 +101,12 @@ void lv_btn_set_toggle(lv_obj_t * btn, bool tgl);
 void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
 
 /**
+ * Toggle the state of the button (ON->OFF, OFF->ON)
+ * @param btn pointer to a button object
+ */
+void lv_btn_toggle(lv_obj_t * btn);
+
+/**
  * Set a function to call when the button is pressed
  * @param btn pointer to a button object
  * @param pr_action pointer to function
@@ -108,7 +114,7 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
 void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action);
 
 /**
- * Set styles of a button is each state
+ * Set styles of a button is each state. Use NULL for any style which are not be changed.
  * @param btn pointer to button object
  * @param rel pointer to a style for releases state
  * @param pr  pointer to a style for pressed state
@@ -118,7 +124,6 @@ void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action)
  */
 void lv_btn_set_style(lv_obj_t * btn, lv_btn_state_t state, lv_style_t * style);
 
-void lv_btn_set_style_all(lv_obj_t * btn, lv_style_t ** style_array);
 /**
  * Get the current state of the button
  * @param btn pointer to a button object
@@ -141,12 +146,11 @@ bool lv_btn_get_toggle(lv_obj_t * btn);
 lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type);
 
 /**
- * Get the press action of a button
+ * Get the style of a button in a given state
  * @param btn pointer to a button object
- * @return pointer to the press action function
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
  */
-lv_action_t lv_btn_get_pr_action(lv_obj_t * btn);
-
 lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
 
 /**********************

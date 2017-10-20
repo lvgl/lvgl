@@ -223,7 +223,7 @@ void lv_obj_invalidate(lv_obj_t * obj);
  * Load a new screen
  * @param scr pointer to a screen
  */
-void lv_screen_load(lv_obj_t * scr);
+void lv_scr_load(lv_obj_t * scr);
 
 /**
  * Set a new parent for an object. Its relative position will be the same.
@@ -457,7 +457,7 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
  */
 void lv_obj_refresh_ext_size(lv_obj_t * obj);
 
-#if LV_OBJ_FREE_NUMBER != 0
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application.
@@ -467,7 +467,7 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj);
 void lv_obj_set_free_number(lv_obj_t * obj, uint8_t free_number);
 #endif
 
-#if LV_OBJ_FREE_POINTER != 0
+#if LV_OBJ_FREE_PTR != 0
 /**
  * Set an application specific  pointer for an object.
  * It can help to identify objects in the application.
@@ -491,7 +491,7 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Return with the actual screen
  * @return pointer to to the actual screen object
  */
-lv_obj_t * lv_screen_act(void);lv_obj_t * lv_layer_top(void);
+lv_obj_t * lv_scr_act(void);lv_obj_t * lv_layer_top(void);
 
 /**
  * Return with the system layer. (Same on every screen and it is above the all other layers)
@@ -667,7 +667,7 @@ void * lv_obj_get_ext_attr(lv_obj_t * obj);
 uint8_t lv_obj_get_free_num(lv_obj_t * obj);
 #endif
 
-#if LV_OBJ_FREE_P != 0
+#if LV_OBJ_FREE_PTR != 0
 /**
  * Get the free pointer
  * @param obj pointer to an object
@@ -684,9 +684,11 @@ void * lv_obj_get_free_p(lv_obj_t * obj);
  */
 void * lv_obj_get_group(lv_obj_t * obj);
 #endif
+
 /**********************
  *      MACROS
  **********************/
+#define LV_SCALE(x) (x << LV_ANTIALIAS)
 
 
 #ifdef __cplusplus

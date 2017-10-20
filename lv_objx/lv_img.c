@@ -238,7 +238,7 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
 
 
 /**
- * Enable the upscaling with LV_DOWNSCALE.
+ * Enable the upscaling if LV_ANTIALIAS is enabled.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
  * @param en true: upscale enable, false: upscale disable
@@ -250,9 +250,9 @@ void lv_img_set_upscale(lv_obj_t * img, bool en)
     /*Upscale works only if antialiassing is enabled*/
 #if LV_ANTIALIAS == 0
     en = false;
-#endif
+#else
     ext->upscale = (en == false ? 0 : 1);
-
+#endif
     /*Refresh the image with the new size*/
     lv_img_set_file(img, ext->fn);
 }

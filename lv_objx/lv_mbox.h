@@ -21,7 +21,7 @@ extern "C" {
 #error "lv_mbox: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
 #endif
 
-#if USE_LV_BUTTON == 0
+#if USE_LV_BTN == 0
 #error "lv_mbox: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
 #endif
 

@@ -42,7 +42,7 @@ static lv_indev_t *indev_list = NULL;
  * @param driver Input Device driver structure
  * @return pointer to the new input device
  */
-lv_indev_t * lv_indev_drv_register(lv_hal_indev_drv_t *driver)
+lv_indev_t * lv_indev_register(lv_hal_indev_drv_t *driver)
 {
     lv_indev_t *node;
 
@@ -88,7 +88,7 @@ lv_indev_t * lv_indev_next(lv_indev_t * indev)
  * @param data input device will write its data here
  * @return false: no more data; true: there more data to read (buffered)
  */
-bool lv_indev_get(lv_indev_t * indev, lv_hal_indev_data_t *data)
+bool lv_indev_read(lv_indev_t * indev, lv_hal_indev_data_t *data)
 {
     bool cont = false;
 
