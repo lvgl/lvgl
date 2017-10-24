@@ -14,6 +14,7 @@ Please create an issue to introduce a bug instead of adding pull request to this
 - [ ] lv_img: define *lv_img_raw_header* in *lv_draw.h* because now lv_img can't be disabled
 - [ ] lv_list: ignore image related things when *lv_img* is not enebled
 - [ ] lv_ta: fix hegiht if *one_line* and *FONT_ANTIALIAS*
+- [ ] lv_obj_set_style: fix to update self style too (not only children)
 
 ## v4.2  (released at: 17.08.2017)
 - [x] lv_slider: don't let indicator or bar to disappear because of hpad/vpad
