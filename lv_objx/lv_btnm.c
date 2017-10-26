@@ -267,9 +267,9 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 
 	/*Set size and positions of the buttons*/
 	lv_style_t * btnms = lv_obj_get_style(btnm);
-	cord_t max_w = lv_obj_get_width(btnm) - 2 * btnms->body.padding.horizontal;
-	cord_t max_h = lv_obj_get_height(btnm) - 2 * btnms->body.padding.vertical;
-	cord_t act_y = btnms->body.padding.vertical;
+	cord_t max_w = lv_obj_get_width(btnm) - 2 * btnms->body.padding.hor;
+	cord_t max_h = lv_obj_get_height(btnm) - 2 * btnms->body.padding.ver;
+	cord_t act_y = btnms->body.padding.ver;
 
 	/*Count the lines to calculate button height*/
 	uint8_t line_cnt = 1;
@@ -308,7 +308,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 
 			/*Set the button size and positions and set the texts*/
 			uint16_t i;
-			cord_t act_x = btnms->body.padding.horizontal;
+			cord_t act_x = btnms->body.padding.hor;
 			cord_t act_unit_w;
 			unit_act_cnt = 0;
 			for(i = 0; i < btn_cnt; i++) {
@@ -318,7 +318,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 				act_unit_w = (all_unit_w * get_button_width(map_p_tmp[i])) / unit_cnt;
 
 				/*Always recalculate act_x because of rounding errors */
-				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->body.padding.inner + btnms->body.padding.horizontal;
+				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->body.padding.inner + btnms->body.padding.hor;
 
 				area_set(&ext->button_areas[btn_i], act_x,
 						                         act_y,

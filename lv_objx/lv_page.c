@@ -89,7 +89,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 		lv_obj_set_style(ext->scrl, lv_style_get(LV_STYLE_PRETTY));
         lv_obj_set_design_func(ext->scrl, lv_scrl_design);
 
-		lv_page_set_sb_width(new_page, style->body.padding.horizontal);
+		lv_page_set_sb_width(new_page, style->body.padding.hor);
         lv_page_set_sb_mode(new_page, ext->sb_mode);
         lv_page_set_style_sb(new_page, ext->style_sb);
 
@@ -155,8 +155,8 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             }
         } else if(sign == LV_SIGNAL_STYLE_CHG) {
             lv_style_t * style = lv_obj_get_style(page);
-            if(lv_cont_get_hfit(ext->scrl) == false) {
-                lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.horizontal);
+            if(lv_cont_get_hor_fit(ext->scrl) == false) {
+                lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.hor);
             } else {
                 ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
             }
@@ -177,8 +177,8 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 (lv_obj_get_width(page) != area_get_width(param) ||
                  lv_obj_get_height(page) != area_get_height(param))) {
 
-                if(lv_cont_get_hfit(ext->scrl) == false) {
-                    lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.horizontal);
+                if(lv_cont_get_hor_fit(ext->scrl) == false) {
+                    lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.hor);
                 }
 
                 ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
@@ -228,8 +228,8 @@ bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
         if(sign == LV_SIGNAL_CORD_CHG) {
 
             /*Be sure the width of the scrollable is correct*/
-            if(lv_cont_get_hfit(scrl) == false) {
-                lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * page_style->body.padding.horizontal);
+            if(lv_cont_get_hor_fit(scrl) == false) {
+                lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * page_style->body.padding.hor);
             }
 
             cord_t new_x;
@@ -238,8 +238,8 @@ bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
             bool refr_y = false;
             area_t page_cords;
             area_t scrl_cords;
-            cord_t hpad = page_style->body.padding.horizontal;
-            cord_t vpad = page_style->body.padding.vertical;
+            cord_t hpad = page_style->body.padding.hor;
+            cord_t vpad = page_style->body.padding.ver;
 
             new_x = lv_obj_get_x(scrl);
             new_y = lv_obj_get_y(scrl);
@@ -288,8 +288,8 @@ bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
             lv_page_sb_refresh(page);
         } else if(sign == LV_SIGNAL_DRAG_BEGIN) {
             if(page_ext->sb_mode == LV_PAGE_SB_MODE_DRAG ) {
-                cord_t sbh_pad = MATH_MAX(page_ext->sb_width, page_style->body.padding.horizontal);
-                cord_t sbv_pad = MATH_MAX(page_ext->sb_width, page_style->body.padding.vertical);
+                cord_t sbh_pad = MATH_MAX(page_ext->sb_width, page_style->body.padding.hor);
+                cord_t sbv_pad = MATH_MAX(page_ext->sb_width, page_style->body.padding.ver);
                 if(area_get_height(&page_ext->sbv) < lv_obj_get_height(scrl) - 2 * sbv_pad) {
                     page_ext->sbv_draw = 1;
                 }
@@ -438,8 +438,8 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 	if((obj_h <= page_h && top_err > 0) ||
 	   (obj_h > page_h && top_err < bot_err)) {
 		/*Calculate a new position and to let  scrable_rects.vpad space above*/
-		scrlable_y = -(obj_y - style_scrl->body.padding.vertical - style->body.padding.vertical);
-		scrlable_y += style_scrl->body.padding.vertical;
+		scrlable_y = -(obj_y - style_scrl->body.padding.ver - style->body.padding.ver);
+		scrlable_y += style_scrl->body.padding.ver;
 	}
 	/*Out of the page on the bottom*/
 	else if((obj_h <= page_h && bot_err > 0) ||
@@ -447,7 +447,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
         /*Calculate a new position and to let  scrable_rects.vpad space below*/
 		scrlable_y = -obj_y;
 		scrlable_y += page_h - obj_h;
-        scrlable_y -= style_scrl->body.padding.vertical;
+        scrlable_y -= style_scrl->body.padding.ver;
 	} else {
 		/*Alraedy in focus*/
 		return;
@@ -594,7 +594,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_
         lv_obj_t * page = lv_obj_get_parent(scrl);
         lv_style_t * style_page = lv_obj_get_style(page);
         lv_group_t * g = lv_obj_get_group(page);
-        if(style_page->body.empty != 0 || style_page->opacity == OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.empty != 0 || style_page->opa == OPA_TRANSP) { /*Background is visible?*/
             if(lv_group_get_focused(g) == page) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);
@@ -633,12 +633,12 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     cord_t size_tmp;
     cord_t scrl_w = lv_obj_get_width(scrl);
     cord_t scrl_h =  lv_obj_get_height(scrl);
-    cord_t hpad = style->body.padding.horizontal;
-    cord_t vpad = style->body.padding.vertical;
+    cord_t hpad = style->body.padding.hor;
+    cord_t vpad = style->body.padding.ver;
     cord_t obj_w = lv_obj_get_width(page);
     cord_t obj_h = lv_obj_get_height(page);
-    cord_t sbh_pad = MATH_MAX(ext->sb_width, style->body.padding.horizontal);
-    cord_t sbv_pad = MATH_MAX(ext->sb_width, style->body.padding.vertical);
+    cord_t sbh_pad = MATH_MAX(ext->sb_width, style->body.padding.hor);
+    cord_t sbv_pad = MATH_MAX(ext->sb_width, style->body.padding.ver);
 
     if(ext->sb_mode == LV_PAGE_SB_MODE_OFF) return;
 

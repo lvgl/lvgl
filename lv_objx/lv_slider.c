@@ -155,7 +155,7 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
                 if(slider->ext_size < x) slider->ext_size = x;
             } else {
                 lv_style_t * style = lv_obj_get_style(slider);
-                cord_t pad = MATH_MIN(style->body.padding.horizontal, style->body.padding.vertical);
+                cord_t pad = MATH_MIN(style->body.padding.hor, style->body.padding.ver);
                 if(pad < 0) {
                     pad = -pad;
                     if(slider->ext_size < pad) slider->ext_size = pad;
@@ -290,8 +290,8 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         area_t area_bar;
         area_cpy(&area_bar, &slider->coords);
         /*Be sure at least vpad/hpad width bar will remain*/
-       cord_t pad_ver_bar = style_slider->body.padding.vertical;
-       cord_t pad_hor_bar = style_slider->body.padding.horizontal;
+       cord_t pad_ver_bar = style_slider->body.padding.ver;
+       cord_t pad_hor_bar = style_slider->body.padding.hor;
        if(pad_ver_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
            pad_ver_bar = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
        }
@@ -310,8 +310,8 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         area_cpy(&area_indic, &area_bar);
 
         /*Be sure at least vpad/hpad width indicator will remain*/
-        cord_t pad_ver_indic = style_indic->body.padding.vertical;
-        cord_t pad_hor_indic = style_indic->body.padding.horizontal;
+        cord_t pad_ver_indic = style_indic->body.padding.ver;
+        cord_t pad_hor_indic = style_indic->body.padding.hor;
         if(pad_ver_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
             pad_ver_indic = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
         }

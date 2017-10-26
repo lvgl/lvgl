@@ -223,7 +223,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     /*Make the size adjustment*/
     cord_t w = lv_obj_get_width(list);
     lv_style_t *  style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
-    cord_t pad_hor_tot = style->body.padding.horizontal + style_scrl->body.padding.horizontal;
+    cord_t pad_hor_tot = style->body.padding.hor + style_scrl->body.padding.hor;
     w -= pad_hor_tot * 2;
 
     /*Make place for the scrollbar if pad_hor_tot is too small*/

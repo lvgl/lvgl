@@ -68,12 +68,12 @@ void lv_style_init (void)
      * HUE = 210*/
 
     /*Screen style*/
-    lv_style_scr.opacity = OPA_COVER;
+    lv_style_scr.opa = OPA_COVER;
     lv_style_scr.body.color_main = COLOR_WHITE;
     lv_style_scr.body.color_gradient = COLOR_WHITE;
     lv_style_scr.body.radius = 0;
-    lv_style_scr.body.padding.vertical = LV_DPI / 12;
-    lv_style_scr.body.padding.horizontal = LV_DPI / 12;
+    lv_style_scr.body.padding.ver = LV_DPI / 12;
+    lv_style_scr.body.padding.hor = LV_DPI / 12;
     lv_style_scr.body.padding.inner = LV_DPI / 12;
     lv_style_scr.body.empty = 0;
     lv_style_scr.glass = 0;
@@ -138,16 +138,16 @@ void lv_style_init (void)
 
     /*Transparent tight style*/
     memcpy(&lv_style_transparent_tight, &lv_style_transparent, sizeof(lv_style_t));
-    lv_style_transparent_tight.body.padding.horizontal = 0;
-    lv_style_transparent_tight.body.padding.vertical = 0;
+    lv_style_transparent_tight.body.padding.hor = 0;
+    lv_style_transparent_tight.body.padding.ver = 0;
 
     /*Button released style*/
     memcpy(&lv_style_button_off_released, &lv_style_plain, sizeof(lv_style_t));
     lv_style_button_off_released.body.color_main = COLOR_MAKE(0x76, 0xa2, 0xd0);
     lv_style_button_off_released.body.color_gradient = COLOR_MAKE(0x19, 0x3a, 0x5d);
     lv_style_button_off_released.body.radius = LV_DPI / 15;
-    lv_style_button_off_released.body.padding.horizontal = LV_DPI / 4;
-    lv_style_button_off_released.body.padding.vertical = LV_DPI / 6;
+    lv_style_button_off_released.body.padding.hor = LV_DPI / 4;
+    lv_style_button_off_released.body.padding.ver = LV_DPI / 6;
     lv_style_button_off_released.body.padding.inner = LV_DPI / 10;
     lv_style_button_off_released.body.border.color = COLOR_MAKE(0x0b, 0x19, 0x28);
     lv_style_button_off_released.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
@@ -300,12 +300,12 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
     const lv_style_t * end = dsc->style_end;
     lv_style_t * act = dsc->style_anim;
 
-    STYLE_ATTR_ANIM(opacity, val);
+    STYLE_ATTR_ANIM(opa, val);
     STYLE_ATTR_ANIM(body.radius, val);
     STYLE_ATTR_ANIM(body.border.width, val);
     STYLE_ATTR_ANIM(body.shadow.width, val);
-    STYLE_ATTR_ANIM(body.padding.horizontal, val);
-    STYLE_ATTR_ANIM(body.padding.vertical, val);
+    STYLE_ATTR_ANIM(body.padding.hor, val);
+    STYLE_ATTR_ANIM(body.padding.ver, val);
     STYLE_ATTR_ANIM(body.padding.inner, val);
     STYLE_ATTR_ANIM(text.space_line, val);
     STYLE_ATTR_ANIM(text.space_letter, val);

@@ -46,10 +46,9 @@ typedef struct
     lv_lmeter_ext_t lmeter;     /*Ext. of ancestor*/
     /*New data for this type */
     int16_t * values;               /*Array of the set values (for needles) */
-    lv_style_t * style_critical;    /*Fade to this style nearer to the critical value*/
     color_t * needle_colors;        /*Color of the needles (color_t my_colors[needle_num])*/
-    uint8_t needle_num;             /*Number of needles*/
-    uint8_t low_critical:1;         /*0: the higher value is more critical, 1: the lower value is more critical*/
+    uint8_t needle_count;             /*Number of needles*/
+    uint8_t label_count;              /*Number of labels on the scale*/
 }lv_gauge_ext_t;
 
 /**********************
@@ -108,8 +107,9 @@ void lv_gauge_set_style_critical(lv_obj_t * gauge, lv_style_t * style);
  * @param gauge pointer to gauge
  * @return number of needles
  */
-uint8_t lv_gauge_get_needle_num(lv_obj_t * gauge);
+uint8_t lv_gauge_get_needle_count(lv_obj_t * gauge);
 
+uint8_t lv_gauge_get_label_count(lv_obj_t * gauge);
 /**
  * Get the value of a needle
  * @param gauge pointer to gauge object

@@ -186,7 +186,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
         memcpy(&style_tmp, style, sizeof(lv_style_t));
 
          cord_t r_out = lv_obj_get_width(lmeter) / 2;
-         cord_t r_in =r_out - style->body.padding.horizontal;
+         cord_t r_in = r_out - style->body.padding.hor;
          cord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
          cord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
          int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;

@@ -201,9 +201,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
 
     /*Modify the indicator size*/
     lv_style_t * style_tabs = lv_obj_get_style(ext->tabs);
-    cord_t indic_width = (lv_obj_get_width(tabview) - style_tabs->body.padding.inner * (ext->tab_cnt - 1) - 2 * style_tabs->body.padding.horizontal) / ext->tab_cnt;
+    cord_t indic_width = (lv_obj_get_width(tabview) - style_tabs->body.padding.inner * (ext->tab_cnt - 1) - 2 * style_tabs->body.padding.hor) / ext->tab_cnt;
     lv_obj_set_width(ext->indic, indic_width);
-    lv_obj_set_x(ext->indic, indic_width * ext->tab_act + style_tabs->body.padding.inner * ext->tab_act + style_tabs->body.padding.horizontal);
+    lv_obj_set_x(ext->indic, indic_width * ext->tab_act + style_tabs->body.padding.inner * ext->tab_act + style_tabs->body.padding.hor);
 
     /*Set the first tab as active*/
     if(ext->tab_cnt == 1) {
@@ -235,7 +235,7 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     anim_en = false;
 #endif
 
-    cord_t cont_x = -(lv_obj_get_width(tabview) * id + style->body.padding.inner * id + style->body.padding.horizontal);
+    cord_t cont_x = -(lv_obj_get_width(tabview) * id + style->body.padding.inner * id + style->body.padding.hor);
     if(anim_en == false) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
@@ -258,7 +258,7 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     /*Move the indicator*/
     cord_t indic_width = lv_obj_get_width(ext->indic);
     lv_style_t * tabs_style = lv_obj_get_style(ext->tabs);
-    cord_t indic_x = indic_width * id + tabs_style->body.padding.inner * id + tabs_style->body.padding.horizontal;
+    cord_t indic_x = indic_width * id + tabs_style->body.padding.inner * id + tabs_style->body.padding.hor;
 
     if(anim_en == false) {
         lv_obj_set_x(ext->indic, indic_x);
@@ -376,7 +376,7 @@ void lv_tabview_realign(lv_obj_t * tabview)
     if(ext->tab_cnt != 0) {
         lv_style_t * style_tabs = lv_obj_get_style(ext->tabs);
         cord_t indic_width = (lv_obj_get_width(tabview) - style_tabs->body.padding.inner * (ext->tab_cnt - 1) -
-                2 * style_tabs->body.padding.horizontal) / ext->tab_cnt;
+                2 * style_tabs->body.padding.hor) / ext->tab_cnt;
         lv_obj_set_width(ext->indic, indic_width);
     }
 
@@ -534,7 +534,7 @@ static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
         lv_style_t * indic_style = lv_obj_get_style(ext->indic);
         cord_t p = ((tabpage->coords.x1 - tabview->coords.x1) * (indic_width + tabs_style->body.padding.inner)) / lv_obj_get_width(tabview);
 
-        lv_obj_set_x(ext->indic, indic_width * ext->tab_act + tabs_style->body.padding.inner * ext->tab_act + indic_style->body.padding.horizontal - p);
+        lv_obj_set_x(ext->indic, indic_width * ext->tab_act + tabs_style->body.padding.inner * ext->tab_act + indic_style->body.padding.hor - p);
     }
 }
 

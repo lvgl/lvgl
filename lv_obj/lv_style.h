@@ -42,18 +42,18 @@ typedef enum
 
 typedef struct
 {
-    opa_t opacity;
+    opa_t opa;
     uint8_t glass :1;   /*1: Do not inherit this style*/
 
     struct {
         color_t color_main;
         color_t color_gradient;
-        cord_t radius;      /*Corner radius of background*/
+        cord_t radius;
 
         struct {
             color_t color;
             cord_t width;
-            opa_t opa;         /*Opacity of background border*/
+            opa_t opa;
         }border;
 
         struct {
@@ -63,8 +63,8 @@ typedef struct
         }shadow;
 
         struct {
-            cord_t vertical;
-            cord_t horizontal;
+            cord_t ver;
+            cord_t hor;
             cord_t inner;
         }padding;
 

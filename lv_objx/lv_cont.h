@@ -45,14 +45,15 @@ typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
     /*New data for this type */
-    uint8_t layout  :5;     /*A layout from 'lv_cont_layout_t' enum*/
-    uint8_t hfit_en :1;     /*Enable horizontal padding to involve all children*/
-    uint8_t vfit_en :1;     /*Enable horizontal padding to involve all children*/
+    uint8_t layout  :4;     /*A layout from 'lv_cont_layout_t' enum*/
+    uint8_t hor_fit :1;     /*1: Enable horizontal fit to involve all children*/
+    uint8_t ver_fit :1;     /*1: Enable horizontal fir to involve all children*/
 }lv_cont_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
 
 /**
  * Create a container objects
@@ -98,14 +99,14 @@ lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont);
  * @param cont pointer to a container object
  * @return true: horizontal padding is enabled
  */
-bool lv_cont_get_hfit(lv_obj_t * cont);
+bool lv_cont_get_hor_fit(lv_obj_t * cont);
 
 /**
  * Get vertical fit enable attribute of a container
  * @param cont pointer to a container object
  * @return true: vertical padding is enabled
  */
-bool lv_cont_get_vfit(lv_obj_t * cont);
+bool lv_cont_get_ver_fit(lv_obj_t * cont);
 
 /**********************
  *      MACROS

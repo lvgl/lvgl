@@ -41,11 +41,11 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * opt_label;                           /*Label for the options*/
-    lv_style_t * style_sel;                         /*Style of the selected option*/
-    lv_action_t cb;                                 /*Pointer to function to call when an option is selected*/
-    uint16_t num_opt;                               /*Number of options*/
-    uint16_t sel_opt;                               /*Index of the current option*/
+    lv_obj_t * options_label;                           /*Label for the options*/
+    lv_style_t * selected_style;                         /*Style of the selected option*/
+    lv_action_t callback;                                 /*Pointer to function to call when an option is selected*/
+    uint16_t option_cnt;                               /*Number of options*/
+    uint16_t selected_option_id;                               /*Index of the current option*/
     uint16_t anim_time;                             /*Open/Close animation time [ms]*/
     uint8_t opened :1;                              /*1: The list is opened*/
     cord_t fix_height;                              /*Height if the ddlist is opened. (0: auto-size)*/
@@ -74,22 +74,27 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 
 /**
- * Set the options in a drop down list
+ * Set the options in a drop down list from an array
  * @param ddlist pointer to drop down list object
- * @param options an array of strings wit the text of the options.
+ * @param options an array of strings with the text of the options.
  *                The lest element has to be "" (empty string)
  *                E.g. const char * opts[] = {"apple", "banana", "orange", ""};
  */
 void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options);
 
+/**
+ * Set the options in a drop down list from a string
+ * @param ddlist pointer to drop down list object
+ * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ */
 void lv_ddlist_set_options_str(lv_obj_t * ddlist, const char * options);
+
 /**
  * Set the selected option
  * @param ddlist pointer to drop down list object
  * @param sel_opt id of the selected option (0 ... number of option - 1);
  */
 void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
-
 
 /**
  * Set a function to call when a new option is chosen
@@ -107,19 +112,32 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t cb);
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h);
 
 /**
+ * Set the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @param anim_time: open/close animation time [ms]
+ */
+void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
+
+/**
  * Set the style of the rectangle on the selected option
  * @param ddlist pointer to a drop down list object
  * @param style pointer the new style of the select rectangle
  */
-void lv_ddlist_set_style_select(lv_obj_t * ddlist, lv_style_t * style);
+void lv_ddlist_set_selected_style(lv_obj_t * ddlist, lv_style_t * style);
 
 /**
- * Open or Collapse the drop down list
+ * Open the drop down list with or without animation
  * @param ddlist pointer to drop down list object
- * @param state true: open; false: collapse
- * @param anim true: use animations; false: not use animations
+ * @param anim true: use animation; false: not use animations
  */
-void lv_ddlist_open(lv_obj_t * ddlist, bool state, bool anim);
+void lv_ddlist_open(lv_obj_t * ddlist, bool anim);
+
+/**
+ * Close (Collapse) the drop down list
+ * @param ddlist pointer to drop down list object
+ * @param anim true: use animation; false: not use animations
+ */
+void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
 
 /**
  * Get the options of a drop down list
@@ -142,7 +160,6 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
  */
 void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
 
-
 /**
  * Get the fix height value.
  * @param ddlist pointer to a drop down list object
@@ -156,6 +173,13 @@ cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist);
  * @return pointer the style of the select rectangle
  */
 lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist);
+
+/**
+ * Get the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @return open/close animation time [ms]
+ */
+uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
 
 /**********************
  *      MACROS

@@ -40,8 +40,8 @@ typedef struct
     ll_dsc_t dl_ll;       /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
     cord_t ymin;          /*y min value (used to scale the data)*/
     cord_t ymax;          /*y max value (used to scale the data)*/
-    uint8_t hdiv_num;     /*Number of horizontal division lines*/
-    uint8_t vdiv_num;     /*Number of vertical division lines*/
+    uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
+    uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint16_t pnum;        /*Point number in a data line*/
     cord_t dl_width;      /*Line width or point radius*/
     uint8_t dl_num;       /*Number of data lines in dl_ll*/
@@ -53,10 +53,9 @@ typedef struct
 /*Chart types*/
 typedef enum
 {
-    LV_CHART_NONE = 0,
-	LV_CHART_LINE = 0x01,
-	LV_CHART_COL = 0x02,
-	LV_CHART_POINT = 0x04,
+	LV_CHART_TYPE_LINE = 0x01,
+	LV_CHART_TYPE_COLUMN = 0x02,
+	LV_CHART_TYPE_POINT = 0x04,
 }lv_chart_type_t;
 
 
@@ -92,7 +91,7 @@ lv_chart_dl_t * lv_chart_add_data_line(lv_obj_t * chart, color_t color);
  * Refresh a chart if its data line has changed
  * @param chart pointer to chart object
  */
-void lv_chart_refr(lv_obj_t * chart);
+void lv_chart_refresh(lv_obj_t * chart);
 
 /**
  * Set the number of horizontal and vertical division lines
@@ -100,7 +99,7 @@ void lv_chart_refr(lv_obj_t * chart);
  * @param hdiv number of horizontal division lines
  * @param vdiv number of vertical division lines
  */
-void lv_chart_set_hvdiv(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv);
+void lv_chart_set_div_line_count(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv);
 
 /**
  * Set the minimal and maximal x and y values

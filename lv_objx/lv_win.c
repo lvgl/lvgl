@@ -343,7 +343,7 @@ cord_t lv_win_get_width(lv_obj_t * win)
     lv_obj_t * scrl = lv_page_get_scrl(ext->page);
     lv_style_t * style_scrl = lv_obj_get_style(scrl);
 
-    return lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.horizontal;
+    return lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor;
 }
 
 /**
@@ -414,16 +414,16 @@ static void lv_win_realign(lv_obj_t * win)
 	}
 
 	lv_style_t * btnh_style = lv_obj_get_style(ext->btnh);
-	lv_obj_set_height(ext->btnh, ext->cbtn_size + 2 * btnh_style->body.padding.vertical * 2);
+	lv_obj_set_height(ext->btnh, ext->cbtn_size + 2 * btnh_style->body.padding.ver * 2);
 	lv_obj_set_width(ext->header, lv_obj_get_width(win));
 
 	/*Align the higher object first to make the correct header size first*/
 	if(lv_obj_get_height(ext->title) > lv_obj_get_height(ext->btnh)) {
-		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.horizontal, 0);
-		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.padding.horizontal, 0);
+		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.hor, 0);
+		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.padding.hor, 0);
 	} else {
-		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.padding.horizontal, 0);
-		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.horizontal, 0);
+		lv_obj_align(ext->btnh, NULL, LV_ALIGN_IN_RIGHT_MID, - ext->style_header->body.padding.hor, 0);
+		lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.hor, 0);
 	}
 
 	lv_obj_set_pos_scale(ext->header, 0, 0);
@@ -435,7 +435,7 @@ static void lv_win_realign(lv_obj_t * win)
 	lv_style_t * style_page = lv_obj_get_style(page);
     lv_obj_t * scrl = lv_page_get_scrl(page);
 
-    lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * style_page->body.padding.horizontal);
+    lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * style_page->body.padding.hor);
 
 }
 #endif
