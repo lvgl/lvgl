@@ -64,7 +64,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->act_value = 0;
-    ext->indicator_style = lv_style_get(LV_STYLE_PRETTY_COLOR);
+    ext->indicator_style = &lv_style_pretty_color;
 
     /* Save the ancient design function.
      * It will be used in the bar design function*/
@@ -77,7 +77,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_click(new_bar, false);
     	lv_obj_set_size(new_bar, LV_DPI * 2, LV_DPI / 3);
-        lv_obj_set_style(new_bar, lv_style_get(LV_STYLE_PRETTY));
+        lv_obj_set_style(new_bar, &lv_style_pretty);
     	lv_bar_set_value(new_bar, ext->act_value);
     } else {
     	lv_bar_ext_t * ext_copy = lv_obj_get_ext_attr(copy);

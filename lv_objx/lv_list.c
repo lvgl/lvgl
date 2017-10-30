@@ -68,11 +68,11 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 
     ext->sb_out = 0;
     ext->style_img = NULL;
-    ext->styles_btn[LV_BTN_STATE_OFF_RELEASED] = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED);
-    ext->styles_btn[LV_BTN_STATE_OFF_PRESSED] = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED);
-    ext->styles_btn[LV_BTN_STATE_ON_RELEASED] = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED);
-    ext->styles_btn[LV_BTN_STATE_OFF_PRESSED] = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED);
-    ext->styles_btn[LV_BTN_STATE_INACTIVE] = lv_style_get(LV_STYLE_BUTTON_INACTIVE);
+    ext->styles_btn[LV_BTN_STATE_OFF_RELEASED] = &lv_style_btn_off_released;
+    ext->styles_btn[LV_BTN_STATE_OFF_PRESSED] = &lv_style_btn_off_pressed;
+    ext->styles_btn[LV_BTN_STATE_ON_RELEASED] = &lv_style_btn_on_released;
+    ext->styles_btn[LV_BTN_STATE_OFF_PRESSED] = &lv_style_btn_on_pressed;
+    ext->styles_btn[LV_BTN_STATE_INACTIVE] = &lv_style_btn_inactive;
 
 	lv_obj_set_signal_func(new_list, lv_list_signal);
 
@@ -80,8 +80,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
     	lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
 		lv_cont_set_layout(ext->page.scrl, LV_LIST_LAYOUT_DEF);
-		lv_obj_set_style(new_list, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT));
-		lv_obj_set_style(lv_page_get_scrl(new_list), lv_style_get(LV_STYLE_PRETTY));
+		lv_obj_set_style(new_list, &lv_style_transp_tight);
+		lv_obj_set_style(lv_page_get_scrl(new_list), &lv_style_pretty);
 		lv_page_set_sb_mode(new_list, LV_PAGE_SB_MODE_AUTO);
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);

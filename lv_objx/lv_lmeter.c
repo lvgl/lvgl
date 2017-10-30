@@ -69,7 +69,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new line meter line meter*/
     if(copy == NULL) {
         lv_obj_set_size(new_lmeter, 1 * LV_DPI, 1 * LV_DPI);
-        lv_obj_set_style(new_lmeter, lv_style_get(LV_STYLE_PRETTY_COLOR));
+        lv_obj_set_style(new_lmeter, &lv_style_pretty_color);
     }
     /*Copy an existing line meter*/
     else {

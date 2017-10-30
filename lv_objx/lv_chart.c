@@ -86,7 +86,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new chart background object*/
     if(copy == NULL) {
-    	lv_obj_set_style(new_chart, lv_style_get(LV_STYLE_PRETTY));
+    	lv_obj_set_style(new_chart, &lv_style_pretty);
     	lv_obj_set_size(new_chart, LV_HOR_RES / 2, LV_VER_RES / 2);
     } else {
     	lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
@@ -487,7 +487,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 	int32_t y_tmp;
 	lv_chart_dl_t * dl;
 	lv_style_t lines;
-	lv_style_copy(&lines, lv_style_get(LV_STYLE_PLAIN));
+	lv_style_copy(&lines, &lv_style_plain);
 	lines.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
     lines.line.width = ext->dl_width;
 
@@ -536,7 +536,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
     lv_chart_dl_t * dl;
     uint8_t dl_cnt = 0;
     lv_style_t style_point;
-    lv_style_copy(&style_point, lv_style_get(LV_STYLE_PLAIN));
+    lv_style_copy(&style_point, &lv_style_plain);
 
 	style_point.body.border.width = 0;
 	style_point.body.empty = 0;
@@ -588,7 +588,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 	cord_t col_w = w / ((ext->dl_num + 1) * ext->pnum); /* Suppose + 1 dl as separator*/
 	cord_t x_ofs = col_w / 2; /*Shift with a half col.*/
 
-	lv_style_copy(&rects, lv_style_get(LV_STYLE_PLAIN));
+	lv_style_copy(&rects, &lv_style_plain);
 	rects.body.border.width = 0;
 	rects.body.empty = 0;
 	rects.body.radius = 0;

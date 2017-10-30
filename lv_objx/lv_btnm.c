@@ -78,11 +78,11 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     ext->action = NULL;
     ext->map_p = NULL;
     ext->toggle = 0;
-    ext->button_styles[LV_BTN_STATE_OFF_RELEASED] = lv_style_get(LV_STYLE_BUTTON_OFF_RELEASED);
-    ext->button_styles[LV_BTN_STATE_OFF_PRESSED] = lv_style_get(LV_STYLE_BUTTON_OFF_PRESSED);
-    ext->button_styles[LV_BTN_STATE_ON_RELEASED] = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED);
-    ext->button_styles[LV_BTN_STATE_ON_PRESSED] = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED);
-    ext->button_styles[LV_BTN_STATE_INACTIVE] = lv_style_get(LV_STYLE_BUTTON_INACTIVE);
+    ext->button_styles[LV_BTN_STATE_OFF_RELEASED] = &lv_style_btn_off_released;
+    ext->button_styles[LV_BTN_STATE_OFF_PRESSED] = &lv_style_btn_off_pressed;
+    ext->button_styles[LV_BTN_STATE_ON_RELEASED] = &lv_style_btn_on_released;
+    ext->button_styles[LV_BTN_STATE_ON_PRESSED] = &lv_style_btn_on_pressed;
+    ext->button_styles[LV_BTN_STATE_INACTIVE] = &lv_style_btn_inactive;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_btnm);
 
@@ -92,7 +92,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new button matrix object*/
     if(copy == NULL) {
     	lv_obj_set_size(new_btnm, LV_HOR_RES, LV_VER_RES / 2);
-    	lv_obj_set_style(new_btnm, lv_style_get(LV_STYLE_PRETTY));
+    	lv_obj_set_style(new_btnm, &lv_style_pretty);
     	lv_btnm_set_map(new_btnm, lv_btnm_def_map);
     }
     /*Copy an existing object*/

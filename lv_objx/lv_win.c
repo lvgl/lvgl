@@ -62,25 +62,25 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     ext->btnh = NULL;
     ext->header = NULL;
     ext->title = NULL;
-    ext->style_header = lv_style_get(LV_STYLE_PLAIN_COLOR);
-    ext->style_cbtn_rel = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED);
-    ext->style_cbtn_pr = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED);
+    ext->style_header = &lv_style_plain_color;
+    ext->style_cbtn_rel = &lv_style_btn_on_released;
+    ext->style_cbtn_pr = &lv_style_btn_on_pressed;
     ext->cbtn_size = ( LV_DPI) / 2;
 
     /*Init the new window object*/
     if(copy == NULL) {
         lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
         lv_obj_set_pos(new_win, 0, 0);
-        lv_obj_set_style(new_win, lv_style_get(LV_STYLE_PLAIN));
+        lv_obj_set_style(new_win, &lv_style_plain);
 
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
-        lv_obj_set_style(ext->page, lv_style_get(LV_STYLE_PLAIN));
+        lv_obj_set_style(ext->page, &lv_style_plain);
         lv_page_set_sb_mode(ext->page, LV_PAGE_SB_MODE_AUTO);
 
         lv_obj_t * scrl = lv_page_get_scrl(ext->page);
         lv_cont_set_fit(scrl, false, true);
-        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSPARENT));
+        lv_obj_set_style(scrl, &lv_style_transp);
 
     	/*Create a holder for the header*/
     	ext->header = lv_cont_create(new_win, NULL);
@@ -88,7 +88,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	/*Move back the header because it is automatically moved to the scrollable */
     	lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
     	lv_obj_set_parent(ext->header, new_win);
-    	lv_obj_set_style(ext->header, lv_style_get(LV_STYLE_PLAIN_COLOR));
+    	lv_obj_set_style(ext->header, &lv_style_plain_color);
 
     	/*Create a title on the header*/
     	ext->title = lv_label_create(ext->header, NULL);
@@ -97,7 +97,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	/*Create a holder for the control buttons*/
     	ext->btnh = lv_cont_create(ext->header, NULL);
     	lv_cont_set_fit(ext->btnh, true, false);
-        lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT));
+        lv_obj_set_style(ext->btnh, &lv_style_transp_tight);
     	lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_ROW_M);
 
         lv_obj_set_signal_func(new_win, lv_win_signal);

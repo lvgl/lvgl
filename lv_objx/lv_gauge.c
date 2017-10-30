@@ -91,7 +91,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
         lv_lmeter_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_SCALE_LINE_COUNT);
         lv_gauge_set_needle_num(new_gauge, 1, NULL);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
-        lv_obj_set_style(new_gauge, lv_style_get(LV_STYLE_PRETTY));
+        lv_obj_set_style(new_gauge, &lv_style_pretty);
     }
     /*Copy an existing gauge*/
     else {
@@ -405,7 +405,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
 
     /*Draw the needle middle area*/
     lv_style_t style_neddle_mid;
-    lv_style_copy(&style_neddle_mid, lv_style_get(LV_STYLE_PLAIN));
+    lv_style_copy(&style_neddle_mid, &lv_style_plain);
     style_neddle_mid.body.color_main = style->body.border.color;
     style_neddle_mid.body.color_gradient = style->body.border.color;
     style_neddle_mid.body.radius = LV_RADIUS_CIRCLE;

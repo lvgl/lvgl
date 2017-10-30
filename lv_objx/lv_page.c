@@ -70,7 +70,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     ext->rel_action = NULL;
     ext->sbh_draw = 0;
     ext->sbv_draw = 0;
-    ext->style_sb = lv_style_get(LV_STYLE_PRETTY);
+    ext->style_sb = &lv_style_pretty;
     ext->sb_width = LV_DPI / 8;     /*Will be modified later*/
     ext->sb_mode = LV_PAGE_SB_MODE_ON;
 
@@ -78,7 +78,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new page object*/
     if(copy == NULL) {
-    	lv_style_t * style = lv_style_get(LV_STYLE_PRETTY_COLOR);
+    	lv_style_t * style = &lv_style_pretty_color;
 	    ext->scrl = lv_cont_create(new_page, NULL);
 	    if(ancestor_scrl_design_f == NULL) ancestor_scrl_design_f = lv_obj_get_design_func(ext->scrl);
 	    lv_obj_set_signal_func(ext->scrl, lv_page_scrl_signal);
@@ -86,7 +86,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 		lv_obj_set_drag_throw(ext->scrl, true);
 		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
 		lv_cont_set_fit(ext->scrl, false, true);
-		lv_obj_set_style(ext->scrl, lv_style_get(LV_STYLE_PRETTY));
+		lv_obj_set_style(ext->scrl, &lv_style_pretty);
         lv_obj_set_design_func(ext->scrl, lv_scrl_design);
 
 		lv_page_set_sb_width(new_page, style->body.padding.hor);

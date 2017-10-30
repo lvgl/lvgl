@@ -91,22 +91,6 @@ typedef struct
     }line;
 }lv_style_t;
 
-typedef enum {
-    LV_STYLE_SCREEN,
-    LV_STYLE_TRANSPARENT,
-    LV_STYLE_TRANSPARENT_TIGHT,
-    LV_STYLE_PLAIN,
-    LV_STYLE_PLAIN_COLOR,
-    LV_STYLE_PRETTY,
-    LV_STYLE_PRETTY_COLOR,
-    LV_STYLE_BUTTON_OFF_RELEASED,
-    LV_STYLE_BUTTON_OFF_PRESSED,
-    LV_STYLE_BUTTON_ON_RELEASED,
-    LV_STYLE_BUTTON_ON_PRESSED,
-    LV_STYLE_BUTTON_INACTIVE,
-}lv_style_name_t;
-
-
 typedef struct {
     const lv_style_t * style_start; /*Pointer to the starting style*/
     const lv_style_t * style_end;   /*Pointer to the destination style*/
@@ -145,14 +129,6 @@ lv_style_anim_create(&a);
 void lv_style_init (void);
 
 /**
- * Get style from its name
- * @param style_name an element of the 'lv_style_name_t' enum
- * @return pointer to the requested style (lv_style_def by default)
- */
-lv_style_t * lv_style_get(lv_style_name_t style_name);
-
-
-/**
  * Copy a style to an other
  * @param dest pointer to the destination style
  * @param src pointer to the source style
@@ -164,6 +140,22 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
  */
 void lv_style_anim_create(lv_style_anim_t * anim);
+
+/*************************
+ *    GLOBAL VARIABLES
+ *************************/
+extern lv_style_t lv_style_scr;
+extern lv_style_t lv_style_transp;
+extern lv_style_t lv_style_transp_tight;
+extern lv_style_t lv_style_plain;
+extern lv_style_t lv_style_plain_color;
+extern lv_style_t lv_style_pretty;
+extern lv_style_t lv_style_pretty_color;
+extern lv_style_t lv_style_btn_off_released;
+extern lv_style_t lv_style_btn_off_pressed;
+extern lv_style_t lv_style_btn_on_released;
+extern lv_style_t lv_style_btn_on_pressed;;
+extern lv_style_t lv_style_btn_inactive;
 
 /**********************
  *      MACROS

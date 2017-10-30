@@ -83,7 +83,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new container*/
     if(copy == NULL) {
-		lv_obj_set_style(new_rect, lv_style_get(LV_STYLE_PLAIN));
+		lv_obj_set_style(new_rect, &lv_style_plain);
     }
     /*Copy an existing object*/
     else {

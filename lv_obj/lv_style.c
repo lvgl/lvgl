@@ -37,19 +37,18 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val);
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static lv_style_t lv_style_scr;
-static lv_style_t lv_style_transparent;
-static lv_style_t lv_style_transparent_tight;
-static lv_style_t lv_style_plain;
-static lv_style_t lv_style_plain_color;
-static lv_style_t lv_style_pretty;
-static lv_style_t lv_style_pretty_color;
-static lv_style_t lv_style_button_off_released;
-static lv_style_t lv_style_button_off_pressed;
-static lv_style_t lv_style_button_on_released;
-static lv_style_t lv_style_button_on_pressed;;
-static lv_style_t lv_style_button_inactive;
+lv_style_t lv_style_scr;
+lv_style_t lv_style_transp;
+lv_style_t lv_style_transp_tight;
+lv_style_t lv_style_plain;
+lv_style_t lv_style_plain_color;
+lv_style_t lv_style_pretty;
+lv_style_t lv_style_pretty_color;
+lv_style_t lv_style_btn_off_released;
+lv_style_t lv_style_btn_off_pressed;
+lv_style_t lv_style_btn_on_released;
+lv_style_t lv_style_btn_on_pressed;;
+lv_style_t lv_style_btn_inactive;
 
 /**********************
  *      MACROS
@@ -131,120 +130,67 @@ void lv_style_init (void)
     lv_style_pretty_color.body.border.color = COLOR_MAKE(0x15, 0x2c, 0x42);
 
     /*Transparent style*/
-    memcpy(&lv_style_transparent, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_transparent.body.empty = 1;
-    lv_style_transparent.glass = 1;
-    lv_style_transparent.body.border.width = 0;
+    memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));
+    lv_style_transp.body.empty = 1;
+    lv_style_transp.glass = 1;
+    lv_style_transp.body.border.width = 0;
 
     /*Transparent tight style*/
-    memcpy(&lv_style_transparent_tight, &lv_style_transparent, sizeof(lv_style_t));
-    lv_style_transparent_tight.body.padding.hor = 0;
-    lv_style_transparent_tight.body.padding.ver = 0;
+    memcpy(&lv_style_transp_tight, &lv_style_transp, sizeof(lv_style_t));
+    lv_style_transp_tight.body.padding.hor = 0;
+    lv_style_transp_tight.body.padding.ver = 0;
 
     /*Button released style*/
-    memcpy(&lv_style_button_off_released, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_button_off_released.body.color_main = COLOR_MAKE(0x76, 0xa2, 0xd0);
-    lv_style_button_off_released.body.color_gradient = COLOR_MAKE(0x19, 0x3a, 0x5d);
-    lv_style_button_off_released.body.radius = LV_DPI / 15;
-    lv_style_button_off_released.body.padding.hor = LV_DPI / 4;
-    lv_style_button_off_released.body.padding.ver = LV_DPI / 6;
-    lv_style_button_off_released.body.padding.inner = LV_DPI / 10;
-    lv_style_button_off_released.body.border.color = COLOR_MAKE(0x0b, 0x19, 0x28);
-    lv_style_button_off_released.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
-    lv_style_button_off_released.body.border.opa = OPA_70;
-    lv_style_button_off_released.text.color = COLOR_MAKE(0xff, 0xff, 0xff);
-    lv_style_button_off_released.text.align = LV_TEXT_ALIGN_MID;
-    lv_style_button_off_released.body.shadow.color = COLOR_GRAY;
-    lv_style_button_off_released.body.shadow.width = 0;
+    memcpy(&lv_style_btn_off_released, &lv_style_plain, sizeof(lv_style_t));
+    lv_style_btn_off_released.body.color_main = COLOR_MAKE(0x76, 0xa2, 0xd0);
+    lv_style_btn_off_released.body.color_gradient = COLOR_MAKE(0x19, 0x3a, 0x5d);
+    lv_style_btn_off_released.body.radius = LV_DPI / 15;
+    lv_style_btn_off_released.body.padding.hor = LV_DPI / 4;
+    lv_style_btn_off_released.body.padding.ver = LV_DPI / 6;
+    lv_style_btn_off_released.body.padding.inner = LV_DPI / 10;
+    lv_style_btn_off_released.body.border.color = COLOR_MAKE(0x0b, 0x19, 0x28);
+    lv_style_btn_off_released.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
+    lv_style_btn_off_released.body.border.opa = OPA_70;
+    lv_style_btn_off_released.text.color = COLOR_MAKE(0xff, 0xff, 0xff);
+    lv_style_btn_off_released.text.align = LV_TEXT_ALIGN_MID;
+    lv_style_btn_off_released.body.shadow.color = COLOR_GRAY;
+    lv_style_btn_off_released.body.shadow.width = 0;
 
     /*Button pressed style*/
-    memcpy(&lv_style_button_off_pressed, &lv_style_button_off_released, sizeof(lv_style_t));
-    lv_style_button_off_pressed.body.color_main = COLOR_MAKE(0x33, 0x62, 0x94);
-    lv_style_button_off_pressed.body.color_gradient = COLOR_MAKE(0x10, 0x26, 0x3c);
-    lv_style_button_off_pressed.text.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_button_off_pressed.image.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_button_off_pressed.line.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    memcpy(&lv_style_btn_off_pressed, &lv_style_btn_off_released, sizeof(lv_style_t));
+    lv_style_btn_off_pressed.body.color_main = COLOR_MAKE(0x33, 0x62, 0x94);
+    lv_style_btn_off_pressed.body.color_gradient = COLOR_MAKE(0x10, 0x26, 0x3c);
+    lv_style_btn_off_pressed.text.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_off_pressed.image.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_off_pressed.line.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
 
     /*Button toggle released style*/
-    memcpy(&lv_style_button_on_released, &lv_style_button_off_released, sizeof(lv_style_t));
-    lv_style_button_on_released.body.color_main = COLOR_MAKE(0x0a, 0x11, 0x22);
-    lv_style_button_on_released.body.color_gradient = COLOR_MAKE(0x37, 0x62, 0x90);
-    lv_style_button_on_released.body.border.color = COLOR_MAKE(0x01, 0x07, 0x0d);
-    lv_style_button_on_released.text.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
-    lv_style_button_on_released.image.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
-    lv_style_button_on_released.line.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
+    memcpy(&lv_style_btn_on_released, &lv_style_btn_off_released, sizeof(lv_style_t));
+    lv_style_btn_on_released.body.color_main = COLOR_MAKE(0x0a, 0x11, 0x22);
+    lv_style_btn_on_released.body.color_gradient = COLOR_MAKE(0x37, 0x62, 0x90);
+    lv_style_btn_on_released.body.border.color = COLOR_MAKE(0x01, 0x07, 0x0d);
+    lv_style_btn_on_released.text.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
+    lv_style_btn_on_released.image.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
+    lv_style_btn_on_released.line.color = COLOR_MAKE(0xc8, 0xdd, 0xf4);
 
     /*Button toggle pressed style*/
-    memcpy(&lv_style_button_on_pressed, &lv_style_button_on_released, sizeof(lv_style_t));
-    lv_style_button_on_pressed.body.color_main = COLOR_MAKE(0x02, 0x14, 0x27);
-    lv_style_button_on_pressed.body.color_gradient = COLOR_MAKE(0x2b, 0x4c, 0x70);
-    lv_style_button_on_pressed.text.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_button_on_pressed.image.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_button_on_pressed.line.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    memcpy(&lv_style_btn_on_pressed, &lv_style_btn_on_released, sizeof(lv_style_t));
+    lv_style_btn_on_pressed.body.color_main = COLOR_MAKE(0x02, 0x14, 0x27);
+    lv_style_btn_on_pressed.body.color_gradient = COLOR_MAKE(0x2b, 0x4c, 0x70);
+    lv_style_btn_on_pressed.text.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_on_pressed.image.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_on_pressed.line.color = COLOR_MAKE(0xa4, 0xb5, 0xc6);
 
     /*Button inactive style*/
-    memcpy(&lv_style_button_inactive, &lv_style_button_off_released, sizeof(lv_style_t));
-    lv_style_button_inactive.body.color_main = COLOR_MAKE(0xd8, 0xd8, 0xd8);
-    lv_style_button_inactive.body.color_gradient = COLOR_MAKE(0xd8, 0xd8, 0xd8);
-    lv_style_button_inactive.body.border.color = COLOR_MAKE(0x90, 0x90, 0x90);
-    lv_style_button_inactive.text.color = COLOR_MAKE(0x70, 0x70, 0x70);
-    lv_style_button_inactive.image.color = COLOR_MAKE(0x70, 0x70, 0x70);
-    lv_style_button_inactive.line.color = COLOR_MAKE(0x70, 0x70, 0x70);
+    memcpy(&lv_style_btn_inactive, &lv_style_btn_off_released, sizeof(lv_style_t));
+    lv_style_btn_inactive.body.color_main = COLOR_MAKE(0xd8, 0xd8, 0xd8);
+    lv_style_btn_inactive.body.color_gradient = COLOR_MAKE(0xd8, 0xd8, 0xd8);
+    lv_style_btn_inactive.body.border.color = COLOR_MAKE(0x90, 0x90, 0x90);
+    lv_style_btn_inactive.text.color = COLOR_MAKE(0x70, 0x70, 0x70);
+    lv_style_btn_inactive.image.color = COLOR_MAKE(0x70, 0x70, 0x70);
+    lv_style_btn_inactive.line.color = COLOR_MAKE(0x70, 0x70, 0x70);
 }
 
-
-/**
- * Get style from its name
- * @param style_name an element of the 'lv_style_name_t' enum
- * @return pointer to the requested style (lv_style_def by default)
- */
-lv_style_t * lv_style_get(lv_style_name_t style_name)
-{
-    lv_style_t * style = &lv_style_plain;
-
-    switch(style_name) {
-        case LV_STYLE_SCREEN:
-            style = &lv_style_scr;
-            break;
-        case LV_STYLE_PLAIN:
-            style = &lv_style_plain;
-            break;
-        case LV_STYLE_PLAIN_COLOR:
-            style = &lv_style_plain_color;
-            break;
-        case LV_STYLE_PRETTY:
-            style = &lv_style_pretty;
-            break;
-        case LV_STYLE_PRETTY_COLOR:
-            style = &lv_style_pretty_color;
-            break;
-        case LV_STYLE_TRANSPARENT:
-            style = &lv_style_transparent;
-            break;
-        case LV_STYLE_TRANSPARENT_TIGHT:
-            style = &lv_style_transparent_tight;
-            break;
-        case LV_STYLE_BUTTON_OFF_RELEASED:
-            style = &lv_style_button_off_released;
-            break;
-        case LV_STYLE_BUTTON_OFF_PRESSED:
-            style = &lv_style_button_off_pressed;
-            break;
-        case LV_STYLE_BUTTON_ON_RELEASED:
-            style = &lv_style_button_on_released;
-            break;
-        case LV_STYLE_BUTTON_ON_PRESSED:
-            style = &lv_style_button_on_pressed;
-            break;
-        case LV_STYLE_BUTTON_INACTIVE:
-            style = &lv_style_button_inactive;
-            break;
-        default:
-            style =  &lv_style_plain;
-    }
-
-    return style;
-}
 
 /**
  * Copy a style to an other

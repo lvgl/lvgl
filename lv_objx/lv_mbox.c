@@ -65,8 +65,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
     ext->txt = NULL;
     ext->btnh = NULL;
-    ext->style_btn_rel = lv_style_get(LV_STYLE_BUTTON_ON_RELEASED);
-    ext->style_btn_pr = lv_style_get(LV_STYLE_BUTTON_ON_PRESSED);
+    ext->style_btn_rel = &lv_style_btn_on_released;
+    ext->style_btn_pr = &lv_style_btn_on_pressed;
     ext->anim_close_time = LV_MBOX_CLOSE_ANIM_TIME;
 
     /*The signal and design functions are not copied so set them here*/
@@ -80,7 +80,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->txt = lv_label_create(new_mbox, NULL);
     	lv_label_set_text(ext->txt, "Text of the message box");
 
-    	lv_obj_set_style(new_mbox, lv_style_get(LV_STYLE_PRETTY));
+    	lv_obj_set_style(new_mbox, &lv_style_pretty);
     }
     /*Copy an existing message box*/
     else {
@@ -265,7 +265,7 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
     /*Create a button if it is not existed yet*/
     if(ext->btnh == NULL) {
         ext->btnh = lv_cont_create(mbox, NULL);
-        lv_obj_set_style(ext->btnh, lv_style_get(LV_STYLE_TRANSPARENT));
+        lv_obj_set_style(ext->btnh, &lv_style_transp);
         lv_obj_set_click(ext->btnh, false);
         lv_cont_set_fit(ext->btnh, false, true);
         lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_PRETTY);

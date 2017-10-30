@@ -64,7 +64,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->cb = NULL;
     ext->tmp_value = ext->bar.min_value;
-    ext->style_knob = lv_style_get(LV_STYLE_PRETTY);
+    ext->style_knob = &lv_style_pretty;
     ext->knob_in = 0;
 
     /* Save the bar design function.

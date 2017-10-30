@@ -90,10 +90,10 @@ void lv_init(void)
     act_scr = def_scr;
     
     top_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(top_layer, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT));
+    lv_obj_set_style(top_layer, &lv_style_transp_tight);
 
     sys_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(sys_layer, lv_style_get(LV_STYLE_TRANSPARENT_TIGHT));
+    lv_obj_set_style(sys_layer, &lv_style_transp_tight);
 
     /*Refresh the screen*/
     lv_obj_invalidate(act_scr);
@@ -139,7 +139,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->ext_size = 0;
 
 		/*Set appearance*/
-		new_obj->style_p = lv_style_get(LV_STYLE_SCREEN);
+		new_obj->style_p = &lv_style_scr;
 
 		/*Set virtual functions*/
 		lv_obj_set_signal_func(new_obj, lv_obj_signal);
@@ -186,7 +186,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->ext_size = 0;
 
         /*Set appearance*/
-        new_obj->style_p = lv_style_get(LV_STYLE_PLAIN);
+        new_obj->style_p = &lv_style_plain;
         
         /*Set virtual functions*/
         lv_obj_set_signal_func(new_obj, lv_obj_signal);
@@ -1297,7 +1297,7 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
     }
 #endif
 
-    if(style_act == NULL) style_act = lv_style_get(LV_STYLE_PLAIN);
+    if(style_act == NULL) style_act = &lv_style_plain;
 
     return style_act;
 }

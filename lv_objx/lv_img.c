@@ -81,7 +81,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
 		if(par != NULL) ext->auto_size = 1;
 		else ext->auto_size = 0;
 		if(par != NULL) lv_obj_set_style(new_img, NULL);                 /*Inherit the style  by default*/
-		else lv_obj_set_style(new_img, lv_style_get(LV_STYLE_PLAIN));    /*Set style for screens*/
+		else lv_obj_set_style(new_img, &lv_style_plain);    /*Set style for screens*/
     } else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->auto_size = copy_ext->auto_size;

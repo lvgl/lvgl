@@ -359,8 +359,8 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
              const lv_style_t * style, const char * fn)
 {
     if(fn == NULL) {
-        lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN));
-        lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN), "No data", TXT_FLAG_NONE, NULL);
+        lv_draw_rect(cords_p, mask_p, &lv_style_plain);
+        lv_draw_label(cords_p, mask_p, &lv_style_plain, "No data", TXT_FLAG_NONE, NULL);
     } else {
         fs_file_t file;
         fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
@@ -446,8 +446,8 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
         fs_close(&file);
 
         if(res != FS_RES_OK) {
-            lv_draw_rect(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN));
-            lv_draw_label(cords_p, mask_p, lv_style_get(LV_STYLE_PLAIN), "No data", TXT_FLAG_NONE, NULL);
+            lv_draw_rect(cords_p, mask_p, &lv_style_plain);
+            lv_draw_label(cords_p, mask_p, &lv_style_plain, "No data", TXT_FLAG_NONE, NULL);
         }
     }
 }

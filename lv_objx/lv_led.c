@@ -70,7 +70,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new led object*/
     if(copy == NULL) {
-    	lv_obj_set_style(new_led, lv_style_get(LV_STYLE_PRETTY_COLOR));
+    	lv_obj_set_style(new_led, &lv_style_pretty_color);
     	lv_obj_set_size(new_led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
     }
     /*Copy an existing object*/

@@ -74,7 +74,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     ext->selected_option_id = 0;
     ext->option_cnt = 0;
     ext->anim_time = LV_DDLIST_DEF_ANIM_TIME;
-    ext->selected_style = lv_style_get(LV_STYLE_PLAIN_COLOR);
+    ext->selected_style = &lv_style_plain_color;
 
     /*The signal and design functions are not copied so set them here*/
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_ddlist);
@@ -86,14 +86,14 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_obj_set_style(scrl, lv_style_get(LV_STYLE_TRANSPARENT));
+        lv_obj_set_style(scrl, &lv_style_transp);
         lv_cont_set_fit(scrl, true, true);
 
         ext->options_label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_rel_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
-        lv_obj_set_style(new_ddlist, lv_style_get(LV_STYLE_PRETTY));
+        lv_obj_set_style(new_ddlist, &lv_style_pretty);
         lv_ddlist_set_options(new_ddlist, def_options);
     }
     /*Copy an existing drop down list*/
