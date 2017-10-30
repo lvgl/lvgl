@@ -1535,8 +1535,9 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
 {
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
-        if(i->style_p == style_p || style_p == NULL) {
+        if(i->style_p == style_p) {
             refresh_childen_style(i);
+            lv_obj_refresh_style(i);
         }
         
         lv_style_refr_core(style_p, i);

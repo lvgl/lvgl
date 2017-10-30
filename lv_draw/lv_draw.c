@@ -258,7 +258,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
     pos.y = cords_p->y1;
 
     /*Align the line to middle if enabled*/
-    if(style->text.align  == LV_TXT_ALIGN_MID) {
+    if(style->text.align  == LV_TEXT_ALIGN_MID) {
         line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                     font, style->text.space_letter, flag);
         pos.x += (w - line_length) / 2;
@@ -284,6 +284,9 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
         uint32_t letter;
         while(i < line_end) {
             letter = txt_utf8_next(txt, &i);
+            if(letter == ':') {
+                letter = ':';
+            }
             /*Handle the re-color command*/
             if((flag & TXT_FLAG_RECOLOR) != 0) {
                 if(letter == TXT_RECOLOR_CMD) {
@@ -333,7 +336,7 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
 
         pos.x = cords_p->x1;
         /*Align to middle*/
-        if(style->text.align == LV_TXT_ALIGN_MID) {
+        if(style->text.align == LV_TEXT_ALIGN_MID) {
             line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                      font, style->text.space_letter, flag);
             pos.x += (w - line_length) / 2;
@@ -400,7 +403,7 @@ void lv_draw_img(const area_t * cords_p, const area_t * mask_p,
 #endif
 
             /*Read the img. with the FS interface*/
-            if(const_data != false) {
+            if(const_data == false) {
                 uint8_t us_shift = 0;
                 uint8_t us_val = 1;
                 if(upscale != false) {
@@ -816,7 +819,7 @@ static void lv_draw_rect_border_straight(const area_t * cords_p, const area_t * 
     cord_t width = area_get_width(cords_p);
     cord_t height = area_get_height(cords_p);
     uint16_t bwidth = style_p->body.border.width;
-    opa_t bopa = (uint16_t)((uint16_t) style_p->opa * style_p->body.border.opa) >> 8;
+    opa_t bopa = (uint32_t)((uint32_t) style_p->opa * style_p->body.border.opa) >> 8;
     area_t work_area;
     cord_t length_corr = 0;
     cord_t corner_size = 0;

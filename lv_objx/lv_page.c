@@ -193,7 +193,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 ext->pr_action(page);
             }
         } else if(sign == LV_SIGNAL_RELEASED) {
-            if(lv_indev_is_dragging(param) == false) {
+            if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
                 if(ext->rel_action != NULL) {
                     ext->rel_action(page);
                 }
@@ -324,7 +324,7 @@ bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
                 page_ext->pr_action(page);
             }
         } else if(sign == LV_SIGNAL_RELEASED) {
-            if(lv_indev_is_dragging(param) == false) {
+            if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
                 if(page_ext->rel_action != NULL) {
                     page_ext->rel_action(page);
                 }

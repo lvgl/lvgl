@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_STYLE_ANIM_RES       255    /*Animation max in 1024 steps*/
+#define LV_STYLE_ANIM_RES       256    /*Animation max in 1024 steps*/
 #define LV_STYLE_ANIM_SHIFT     8      /*log2(LV_STYLE_ANIM_RES)*/
 
 #define VAL_PROP(v1, v2, r)   v1 + (((v2-v1) * r) >> LV_STYLE_ANIM_SHIFT)
@@ -24,8 +24,8 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-    const lv_style_t * style_start;
-    const lv_style_t * style_end;
+    const lv_style_t style_start;   /*Save not only pointers because if same as 'style_anim' then it will be modified too*/
+    const lv_style_t style_end;
     lv_style_t * style_anim;
 }lv_style_anim_dsc_t;
 
@@ -90,7 +90,7 @@ void lv_style_init (void)
     lv_style_scr.text.font = font_get(FONT_DEFAULT);
     lv_style_scr.text.space_letter = 1 << LV_ANTIALIAS;
     lv_style_scr.text.space_line = 2 << LV_ANTIALIAS;
-    lv_style_scr.text.align = LV_TXT_ALIGN_LEFT;
+    lv_style_scr.text.align = LV_TEXT_ALIGN_LEFT;
 
     lv_style_scr.image.color = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = OPA_TRANSP;
@@ -153,7 +153,7 @@ void lv_style_init (void)
     lv_style_button_off_released.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
     lv_style_button_off_released.body.border.opa = OPA_70;
     lv_style_button_off_released.text.color = COLOR_MAKE(0xff, 0xff, 0xff);
-    lv_style_button_off_released.text.align = LV_TXT_ALIGN_MID;
+    lv_style_button_off_released.text.align = LV_TEXT_ALIGN_MID;
     lv_style_button_off_released.body.shadow.color = COLOR_GRAY;
     lv_style_button_off_released.body.shadow.width = 0;
 
@@ -265,8 +265,8 @@ void lv_style_anim_create(lv_style_anim_t * anim)
     lv_style_anim_dsc_t * dsc;
     dsc = dm_alloc(sizeof(lv_style_anim_dsc_t));
     dsc->style_anim = anim->style_anim;
-    dsc->style_start = anim->style_start;
-    dsc->style_end = anim->style_end;
+    memcpy(&dsc->style_start, anim->style_start, sizeof(lv_style_t));
+    memcpy(&dsc->style_end, anim->style_end, sizeof(lv_style_t));
 
     anim_t a;
     a.var = (void*)dsc;
@@ -296,8 +296,8 @@ void lv_style_anim_create(lv_style_anim_t * anim)
  */
 static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
 {
-    const lv_style_t * start = dsc->style_start;
-    const lv_style_t * end = dsc->style_end;
+    const lv_style_t * start = &dsc->style_start;
+    const lv_style_t * end = &dsc->style_end;
     lv_style_t * act = dsc->style_anim;
 
     STYLE_ATTR_ANIM(opa, val);
@@ -338,4 +338,9 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
     }
 
     lv_style_refr_objs(dsc->style_anim);
+
+
+    if(val == LV_STYLE_ANIM_RES) {
+        dm_free(dsc);
+    }
 }

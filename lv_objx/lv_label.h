@@ -54,9 +54,10 @@ typedef struct
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     point_t offset;                 /*Text draw position offset*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
-    uint8_t recolor  :1;            /*Enable in-line letter re-coloring*/
-    uint8_t expand  :1;             /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
-    uint8_t no_break  :1;           /*Ignore new line characters*/
+    uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
+    uint8_t expand      :1;         /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
+    uint8_t no_break    :1;         /*Ignore new line characters*/
+    uint8_t body_draw   :1;         /*Draw background body*/
 }lv_label_ext_t;
 
 /**********************
@@ -137,6 +138,8 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor);
  */
 void lv_label_set_no_break(lv_obj_t * label, bool en);
 
+
+void lv_label_set_body_draw(lv_obj_t *label, bool body_enable);
 /**
  * Get the text of a label
  * @param label pointer to a label object
@@ -157,6 +160,21 @@ lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label);
  * @return true: recoloring is enabled, false: disable
  */
 bool lv_label_get_recolor(lv_obj_t * label);
+
+
+/**
+ * Get the no break attribute
+ * @param label pointer to a label object
+ * @return true: no_break_enabled (ignore '\n' line breaks); false: make line breaks on '\n'
+ */
+bool lv_label_get_no_break(lv_obj_t * label);
+
+/**
+ * Get the body draw attribute
+ * @param label pointer to a label object
+ * @return true: draw body; false: don't draw body
+ */
+bool lv_label_get_body_draw(lv_obj_t *label);
 
 /**
  * Get the password mode

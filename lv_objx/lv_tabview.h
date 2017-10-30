@@ -49,6 +49,7 @@ typedef struct
     point_t point_last;
     uint16_t tab_act;
     uint16_t tab_cnt;
+    uint16_t anim_time;
     uint8_t draging :1;
     uint8_t drag_h :1;
 

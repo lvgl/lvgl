@@ -29,9 +29,9 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_TXT_ALIGN_LEFT = 0,
-    LV_TXT_ALIGN_MID,
-}lv_txt_align_t;
+    LV_TEXT_ALIGN_LEFT = 0,
+    LV_TEXT_ALIGN_MID,
+}lv_text_align_t;
 
 /*Shadow types*/
 typedef enum

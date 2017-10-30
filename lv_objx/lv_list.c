@@ -243,8 +243,8 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 		lv_obj_t * label = lv_label_create(liste, NULL);
 		lv_label_set_text(label, txt);
 		lv_obj_set_click(label, false);
-		lv_obj_set_width(label, liste->coords.x2 - label->coords.x1);
         lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
+		lv_obj_set_width(label, liste->coords.x2 - label->coords.x1);
 	}
 
 	return liste;

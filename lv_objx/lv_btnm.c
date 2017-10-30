@@ -460,6 +460,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
     	ancestor_design_f(btnm, mask, mode);
 
     	lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+        lv_style_t * bg_style = lv_obj_get_style(btnm);
         lv_style_t * btn_style;
 
     	area_t area_btnm;
@@ -507,6 +508,8 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			area_tmp.x2 = area_tmp.x1 + txt_size.x;
 			area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
+
+			if(btn_style->glass) btn_style = bg_style;
 			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], TXT_FLAG_NONE, NULL);
     	}
     }

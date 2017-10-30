@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_KB_MODE_TXT,
+    LV_KB_MODE_TEXT,
     LV_KB_MODE_NUM,
 }lv_kb_mode_t;
 

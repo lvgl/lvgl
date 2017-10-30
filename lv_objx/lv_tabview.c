@@ -34,7 +34,7 @@ static bool tabscrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void * param);
 static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage);
 static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage);
 static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage);
-static lv_action_res_t tab_btnm_action(lv_obj_t * tab_btnm, uint16_t id);
+static lv_action_res_t tab_btnm_action(lv_obj_t * tab_btnm, const char * tab_name);
 
 /**********************
  *  STATIC VARIABLES
@@ -78,6 +78,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
     ext->content = NULL;
     ext->indic = NULL;
     ext->tabs = NULL;
+    ext->anim_time = LV_TABVIEW_ANIM_TIME;
     ext->tab_name_ptr = dm_alloc(sizeof(char*));
     ext->tab_name_ptr[0] = "";
 
@@ -87,7 +88,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new tab tab*/
     if(copy == NULL) {
         lv_obj_set_size(new_tabview, LV_HOR_RES, LV_VER_RES);
-        lv_obj_set_style(new_tabview, lv_style_get(LV_STYLE_PRETTY));
+        lv_obj_set_style(new_tabview, lv_style_get(LV_STYLE_PLAIN));
 
         ext->tabs = lv_btnm_create(new_tabview, NULL);
         lv_btnm_set_map(ext->tabs, tab_def);
@@ -116,6 +117,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
         ext->tabs = lv_btnm_create(new_tabview, copy_ext->tabs);
         ext->indic = lv_obj_create(ext->tabs, copy_ext->indic);
         ext->content = lv_cont_create(new_tabview, copy_ext->content);
+        ext->anim_time = copy_ext->anim_time;
 
         ext->tab_name_ptr = dm_alloc(sizeof(char*));
         ext->tab_name_ptr[0] = "";
@@ -184,8 +186,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
 
     /*Create the container page*/
     lv_obj_t * h = lv_page_create(ext->content, NULL);
-    lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(tabview));
-    lv_obj_set_style(h, lv_style_get(LV_STYLE_PRETTY_COLOR));
+    lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(tabview) - lv_obj_get_height(ext->tabs));
+    lv_obj_set_style(h, lv_style_get(LV_STYLE_PLAIN));
+    lv_obj_set_style(lv_page_get_scrl(h), lv_style_get(LV_STYLE_TRANSPARENT_TIGHT));
     lv_obj_set_signal_func(h, tabpage_signal);
     lv_page_set_sb_mode(h, LV_PAGE_SB_MODE_AUTO);
     if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(h));
@@ -231,12 +234,8 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 
     ext->tab_act = id >= ext->tab_cnt  ? ext->tab_cnt - 1 : id;
 
-#if LV_TABVIEW_ANIM_TIME == 0
-    anim_en = false;
-#endif
-
     cord_t cont_x = -(lv_obj_get_width(tabview) * id + style->body.padding.inner * id + style->body.padding.hor);
-    if(anim_en == false) {
+    if(ext->anim_time == 0 || anim_en == false) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
         anim_t a;
@@ -247,7 +246,7 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
         a.path = anim_get_path(ANIM_PATH_LIN);
         a.end_cb = NULL;
         a.act_time = 0;
-        a.time = LV_TABVIEW_ANIM_TIME;
+        a.time = ext->anim_time;
         a.playback = 0;
         a.playback_pause = 0;
         a.repeat = 0;
@@ -260,7 +259,7 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     lv_style_t * tabs_style = lv_obj_get_style(ext->tabs);
     cord_t indic_x = indic_width * id + tabs_style->body.padding.inner * id + tabs_style->body.padding.hor;
 
-    if(anim_en == false) {
+    if(ext->anim_time == 0 || anim_en == false ) {
         lv_obj_set_x(ext->indic, indic_x);
     } else {
         anim_t a;
@@ -271,7 +270,7 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
         a.path = anim_get_path(ANIM_PATH_LIN);
         a.end_cb = NULL;
         a.act_time = 0;
-        a.time = LV_TABVIEW_ANIM_TIME;
+        a.time = ext->anim_time;
         a.playback = 0;
         a.playback_pause = 0;
         a.repeat = 0;
@@ -281,6 +280,18 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 
     lv_btnm_set_toggle(ext->tabs, true, ext->tab_act);
 }
+
+/**
+ * Set the animation time of tab view when a new tab is loaded
+ * @param tabview pointer to Tab view object
+ * @param anim_time_ms time of animation in milliseconds
+ */
+void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms)
+{
+    lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
+    ext->anim_time = anim_time_ms;
+}
+
 
 /*=====================
  * Getter functions
@@ -352,6 +363,17 @@ lv_obj_t * lv_tabview_get_indic(lv_obj_t * tabview)
     return ext->indic;
 }
 
+/**
+ * Get the animation time of tab view when a new tab is loaded
+ * @param tabview pointer to Tab view object
+ * @return time of animation in milliseconds
+ */
+uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms)
+{
+    lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
+    return ext->anim_time;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -369,7 +391,7 @@ void lv_tabview_realign(lv_obj_t * tabview)
     lv_obj_align(ext->content, ext->tabs, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
     lv_obj_t * pages = lv_obj_get_child(ext->content, NULL);
     while(pages != NULL) {
-        lv_obj_set_size(pages, lv_obj_get_width(tabview), lv_obj_get_height(tabview) - lv_obj_get_height(ext->tabs));
+        lv_obj_set_size(pages, lv_obj_get_width(tabview), 200);//lv_obj_get_height(tabview) - lv_obj_get_height(ext->tabs));
         pages = lv_obj_get_child(ext->content, pages);
     }
 
@@ -581,12 +603,21 @@ static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
  * @param id the id of the tab (>= 0)
  * @return LV_ACTION_RES_OK because the button matrix in not deleted in the function
  */
-static lv_action_res_t tab_btnm_action(lv_obj_t * tab_btnm, uint16_t id)
+static lv_action_res_t tab_btnm_action(lv_obj_t * tab_btnm, const char * tab_name)
 {
     lv_obj_t * tab = lv_obj_get_parent(tab_btnm);
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tab);
-    ext->tab_act = id;
-    lv_tabview_set_act(tab, id, true);
+    const char ** tabs_map = lv_btnm_get_map(tab_btnm);
+
+    uint8_t i = 0;
+
+    while(tabs_map[i][0] != '\0') {
+        if(strcmp(tabs_map[i], tab_name) == 0) break;
+        i++;
+    }
+
+    ext->tab_act = i;
+    lv_tabview_set_act(tab, i, true);
 
     return LV_ACTION_RES_OK;
 }

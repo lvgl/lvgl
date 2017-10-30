@@ -86,6 +86,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->static_txt = 0;
     ext->recolor = 0;
     ext->no_break = 0;
+    ext->body_draw = 0;
     ext->dot_end = LV_LABEL_DOT_END_INV;
     ext->long_mode = LV_LABEL_LONG_EXPAND;
     ext->offset.x = 0;
@@ -105,6 +106,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
         lv_label_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
         lv_label_set_recolor(new_label, lv_label_get_recolor(copy));
+        lv_label_set_body_draw(new_label, lv_label_get_body_draw(copy));
         if(copy_ext->static_txt == 0) lv_label_set_text(new_label, lv_label_get_text(copy));
         else lv_label_set_text_static(new_label, lv_label_get_text(copy));
 
@@ -310,30 +312,43 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 /**
  * Enable the recoloring by in-line commands
  * @param label pointer to a label object
- * @param recolor true: enable recoloring, false: disable
+ * @param recolor_enable true: enable recoloring, false: disable
  */
-void lv_label_set_recolor(lv_obj_t * label, bool recolor)
+void lv_label_set_recolor(lv_obj_t * label, bool recolor_enable)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
-    ext->recolor = recolor == false ? 0 : 1;
+    ext->recolor = recolor_enable == false ? 0 : 1;
 
     lv_label_refr_text(label);
 }
 
 /**
- * Set the label the ignore (or accept) line breaks on '\n'
+ * Set the label to ignore (or accept) line breaks on '\n'
  * @param label pointer to a label object
- * @param en true: ignore line breaks, false: make line breaks on '\n'
+ * @param no_break_enable true: ignore line breaks, false: make line breaks on '\n'
  */
-void lv_label_set_no_break(lv_obj_t * label, bool en)
+void lv_label_set_no_break(lv_obj_t * label, bool no_break_enable)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    ext->no_break = en == false ? 0 : 1;
+    ext->no_break = no_break_enable == false ? 0 : 1;
 
     lv_label_refr_text(label);
-
 }
+
+/**
+ * Set the label to draw (or not draw) background specified in its style's body
+ * @param label pointer to a label object
+ * @param body_enable true: draw body; false: don't draw body
+ */
+void lv_label_set_body_draw(lv_obj_t *label, bool body_enable)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    ext->body_draw = body_enable == false ? 0 : 1;
+
+    lv_obj_invalidate(label);
+}
+
 /*=====================
  * Getter functions 
  *====================*/
@@ -371,6 +386,29 @@ bool lv_label_get_recolor(lv_obj_t * label)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->recolor == 0 ? false : true;
 }
+
+/**
+ * Get the no break attribute
+ * @param label pointer to a label object
+ * @return true: no_break_enabled (ignore '\n' line breaks); false: make line breaks on '\n'
+ */
+bool lv_label_get_no_break(lv_obj_t * label)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    return ext->no_break == 0 ? false : true;
+}
+
+/**
+ * Get the body draw attribute
+ * @param label pointer to a label object
+ * @return true: draw body; false: don't draw body
+ */
+bool lv_label_get_body_draw(lv_obj_t *label)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    return ext->body_draw == 0 ? false : true;
+}
+
 
 /**
  * Get the relative x and y coordinates of a letter
@@ -435,7 +473,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
         x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.space_letter;
 	}
 
-	if(style->text.align == LV_TXT_ALIGN_MID) {
+	if(style->text.align == LV_TEXT_ALIGN_MID) {
 		cord_t line_w;
         line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
                                font, style->text.space_letter, flag);
@@ -485,7 +523,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
     /*Calculate the x coordinate*/
     cord_t x = 0;
-	if(style->text.align == LV_TXT_ALIGN_MID) {
+	if(style->text.align == LV_TEXT_ALIGN_MID) {
 		cord_t line_w;
         line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
                                font, style->text.space_letter, flag);
@@ -542,15 +580,13 @@ static bool lv_label_design(lv_obj_t * label, const area_t * mask, lv_design_mod
         }
 #endif
 
-        /*If the style is set explicitly draw background too*/
-        if(label->style_p != NULL) {
-            lv_draw_rect(&cords, mask, style);
-        }
+        lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+
+        if(ext->body_draw) lv_draw_rect(&cords, mask, style);
 
         /*TEST: draw a background for the label*/
-		//lv_vfill(&label->cords, mask, COLOR_LIME, OPA_COVER);
+		//lv_vfill(&label->coords, mask, COLOR_LIME, OPA_COVER);
 
-		lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 		txt_flag_t flag = TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;

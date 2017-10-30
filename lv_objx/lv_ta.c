@@ -106,7 +106,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
 
     	lv_obj_set_design_func(ext->page.scrl, lv_ta_scrling_design);
     	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
-    	lv_label_set_text(ext->label, "Text.area");
+    	lv_label_set_text(ext->label, "Text area");
     	lv_page_glue_obj(ext->label, true);
     	lv_obj_set_click(ext->label, false);
     	lv_obj_set_style(new_ta, lv_style_get(LV_STYLE_PRETTY));
@@ -847,9 +847,9 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 		/*Draw the cursor too*/
 		lv_obj_t * ta = lv_obj_get_parent(scrl);
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext_attr(ta);
-		if(ta_ext->cursor_show == 0 || ta_ext->cursor_state == 0) return true; 	/*The cursor is not visible now*/
-
         lv_style_t * label_style = lv_obj_get_style(ta_ext->label);
+		if(ta_ext->cursor_show == 0 || ta_ext->cursor_state == 0 || label_style->opa == OPA_TRANSP) return true; 	/*The cursor is not visible now*/
+
 
         lv_style_t cur_style;
         if(ta_ext->cursor_style != NULL) {
@@ -932,7 +932,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 			/*Get the current letter*/
 #if TXT_UTF8 == 0
 			char letter_buf[2];
-			letter_buf[0] = text[byte_pos];
+			letter_buf[0] = txt[byte_pos];
             letter_buf[1] = '\0';
 #else
             char letter_buf[8] = {0};

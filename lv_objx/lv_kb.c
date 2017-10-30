@@ -27,36 +27,36 @@
 static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mode);
 #endif
 
-static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, uint16_t i);
+static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static const char * kb_map_lc[] = {
-"\0051#", "\004q", "\004w", "\004e", "\004r", "\004t", "\004y", "\004u", "\004i", "\004o", "\004p", "\007Del", "\n",
-"\006ABC", "\003a", "\003s", "\003d", "\003f", "\003g", "\003h", "\003j", "\003k", "\003l", "\010Enter", "\n",
+"\2051#", "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207Del", "\n",
+"\206ABC", "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207Enter", "\n",
 "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
-"\003Hide", "\003Left", "\006 ", "\003Right", "\003Ok", ""
+"\203Hide", "\203Left", "\206 ", "\203Right", "\203Ok", ""
 };
 
 static const char * kb_map_uc[] = {
-"\0051#", "\004Q", "\004W", "\004E", "\004R", "\004T", "\004Y", "\004U", "\004I", "\004O", "\004P", "\007Del", "\n",
-"\006abc", "\003A", "\003S", "\003D", "\003F", "\003G", "\003H", "\003J", "\003K", "\003L", "\010Enter", "\n",
+"\2051#", "\204Q", "\204W", "\204E", "\204R", "\204T", "\204Y", "\204U", "\204I", "\204O", "\204P", "\207Del", "\n",
+"\206abc", "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\2070Enter", "\n",
 "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
-"\003Hide", "\003Left", "\006 ", "\003Right", "\003Ok", ""
+"\203Hide", "\203Left", "\206 ", "\203Right", "\203Ok", ""
 };
 
 static const char * kb_map_spec[] = {
-"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\002Del", "\n",
-"\002abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\202Del", "\n",
+"\202abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
 "\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
-"\003Hide", "\003Left", "\006 ", "\003Right", "\003Ok", ""
+"\203Hide", "\203Left", "\206 ", "\203Right", "\203Ok", ""
 };
 
 static const char * kb_map_num[] = {
-"1", "2", "3", "\002Hide","\n",
-"4", "5", "6", "\002Ok", "\n",
-"7", "8", "9", "\002Del", "\n",
+"1", "2", "3", "\202Hide","\n",
+"4", "5", "6", "\202Ok", "\n",
+"7", "8", "9", "\202Del", "\n",
 "+/-", "0", ".", "Left", "Right", ""
 };
 /**********************
@@ -90,7 +90,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
 
     ext->ta = NULL;
-    ext->mode = LV_KB_MODE_TXT;
+    ext->mode = LV_KB_MODE_TEXT;
     ext->cur_mng = 0;
     ext->close_action = NULL;
     ext->ok_action = NULL;
@@ -173,7 +173,7 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     ext->mode = mode;
-    if(mode == LV_KB_MODE_TXT) lv_btnm_set_map(kb, kb_map_lc);
+    if(mode == LV_KB_MODE_TEXT) lv_btnm_set_map(kb, kb_map_lc);
     else if(mode == LV_KB_MODE_NUM) lv_btnm_set_map(kb, kb_map_num);
 }
 
@@ -315,18 +315,10 @@ static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mo
  * @param i the index of the released button from the current btnm map
  * @return LV_ACTION_RES_INV if the btnm is deleted else LV_ACTION_RES_OK
  */
-static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, uint16_t i)
+static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     if(ext->ta == NULL) return LV_ACTION_RES_OK;
-
-    const char ** map = lv_btnm_get_map(kb);
-    const char * txt = map[i];
-
-    /*Ignore the unit size number of the text*/
-    if(txt[0] <= '\011') txt++;     /*Ignore length specifier*/
-
-    if(txt[0] == '\177') return LV_ACTION_RES_OK;    /*Don't care hidden buttons*/
 
     /*Do the corresponding action according to the text of the button*/
     if(strcmp(txt, "abc") == 0) {
