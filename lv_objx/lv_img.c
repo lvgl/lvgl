@@ -14,10 +14,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "misc/fs/fsint.h"
 #include "misc/fs/ufs/ufs.h"
-
-#if LV_IMG_ENABLE_SYMBOLS != 0
 #include "misc/gfx/text.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -31,7 +28,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode);
-
 static bool lv_img_is_symbol(const char * txt);
 
 /**********************
@@ -192,20 +188,12 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	}
 	/*Handle symbol texts*/
 	else {
-#if LV_IMG_ENABLE_SYMBOLS
         lv_style_t * style = lv_obj_get_style(img);
         point_t size;
         txt_get_size(&size, fn, style->text.font, style->text.space_letter, style->text.space_line, CORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
         ext->transp = 1;    /*Symbols always have transparent parts*/
-#else
-        /*Never goes here, just to be sure handle this */
-        ext->w = lv_obj_get_width(img);
-        ext->h = lv_obj_get_height(img);
-        ext->transp = 0;
-#endif
-
 	}
 
 	if(fn != NULL) {
@@ -236,7 +224,6 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
     ext->auto_size = (en == false ? 0 : 1);
 }
 
-
 /**
  * Enable the upscaling if LV_ANTIALIAS is enabled.
  * If enabled the object size will be same as the picture size.
@@ -260,6 +247,20 @@ void lv_img_set_upscale(lv_obj_t * img, bool en)
 /*=====================
  * Getter functions 
  *====================*/
+
+
+/**
+ * Get the name of the file set for an image
+ * @param img pointer to an image
+ * @return file name
+ */
+const char * lv_img_get_file_name(lv_obj_t * img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->fn;
+}
+
 
 /**
  * Get the auto size enable attribute
@@ -312,9 +313,7 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
         if(ext->h == 0 || ext->w == 0) return true;
 		area_t cords;
 /*Create a default style for symbol texts*/
-#if LV_IMG_ENABLE_SYMBOLS != 0
         bool sym = lv_img_is_symbol(ext->fn);
-#endif
 
 		lv_obj_get_coords(img, &cords);
 
@@ -326,13 +325,9 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
 			cords_tmp.x1 = cords.x1;
 			cords_tmp.x2 = cords.x1 + ext->w - 1;
 			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-
-#if LV_IMG_ENABLE_SYMBOLS == 0
-			    lv_draw_img(&cords_tmp, mask, style, ext->fn);
-#else
 			    if(sym == false) lv_draw_img(&cords_tmp, mask, style, ext->fn);
 			    else lv_draw_label(&cords_tmp, mask, style, ext->fn, TXT_FLAG_NONE, NULL);
-#endif
+
 			}
 		}
     }
@@ -349,18 +344,13 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
  */
 static bool lv_img_is_symbol(const char * txt)
 {
-    /*If the symbols are not enabled always tell false*/
-#if LV_IMG_ENABLE_SYMBOLS == 0
-    return false;
-#endif
-
     if(txt == NULL) return false;
 
     /* if txt begins with an upper case letter then it refers to a driver
      * so it is a file name*/
     if(txt[0] >= 'A' && txt[0] <= 'Z') return false;
 
-    /*If not returned during the above tests then it is symbol text*/
+    /*If not returned during the above tests then consider as text*/
     return true;
 }
 

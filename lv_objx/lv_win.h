@@ -100,7 +100,7 @@ lv_obj_t * lv_win_add_cbtn(lv_obj_t * win, const char * img_path, lv_action_t re
  * @param indev_proc pointer to the caller input device
  * @return always LV_ACTION_RES_INV because the button is deleted with the window
  */
-lv_action_res_t lv_win_close_action(lv_obj_t * btn);
+lv_res_t lv_win_close_action(lv_obj_t * btn);
 
 /**
  * Set the title of a window

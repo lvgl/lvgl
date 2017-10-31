@@ -284,9 +284,6 @@ void lv_draw_label(const area_t * cords_p,const area_t * mask_p, const lv_style_
         uint32_t letter;
         while(i < line_end) {
             letter = txt_utf8_next(txt, &i);
-            if(letter == ':') {
-                letter = ':';
-            }
             /*Handle the re-color command*/
             if((flag & TXT_FLAG_RECOLOR) != 0) {
                 if(letter == TXT_RECOLOR_CMD) {
@@ -933,7 +930,7 @@ static void lv_draw_rect_border_corner(const area_t * cords_p, const area_t * ma
     uint16_t radius = style->body.radius;
     uint16_t bwidth = style->body.border.width;
     color_t bcolor = style->body.border.color;
-    opa_t bopa = (uint16_t)((uint16_t) style->opa * style->body.border.opa ) >> 8;
+    opa_t bopa = (uint32_t)((uint32_t) style->opa * style->body.border.opa ) >> 8;
 
     /*0 px border width drawn as 1 px, so decrement the bwidth*/
     bwidth--;

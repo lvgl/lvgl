@@ -146,6 +146,7 @@ void lv_style_anim_create(lv_style_anim_t * anim);
  *************************/
 extern lv_style_t lv_style_scr;
 extern lv_style_t lv_style_transp;
+extern lv_style_t lv_style_transp_fit;
 extern lv_style_t lv_style_transp_tight;
 extern lv_style_t lv_style_plain;
 extern lv_style_t lv_style_plain_color;

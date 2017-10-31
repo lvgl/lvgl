@@ -205,6 +205,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
 void lv_obj_del(lv_obj_t * obj);
 
 /**
+ * Delete all children of an object
+ * @param obj pointer to an object
+ */
+void lv_obj_clear(lv_obj_t *obj);
+
+/**
  * Signal function of the basic object
  * @param obj pointer to an object
  * @param sign signal type
@@ -522,6 +528,15 @@ lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
  * @return the child after 'act_child' or NULL if no more child
  */
 lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
+
+/**
+ * Iterate through the children of an object (start from the "oldest")
+ * @param obj pointer to an object
+ * @param child NULL at first call to get the next children
+ *                  and the previous return value later
+ * @return the child after 'act_child' or NULL if no more child
+ */
+lv_obj_t * lv_obj_get_child_back(lv_obj_t * obj, lv_obj_t * child);
 
 /**
  * Count the children of an object (only children directly on 'obj')

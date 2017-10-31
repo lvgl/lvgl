@@ -69,11 +69,9 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new checkbox object*/
     if(copy == NULL) {
         ext->bullet = lv_btn_create(new_cb, NULL);
-        lv_btn_set_style(new_cb, LV_BTN_STATE_OFF_RELEASED, &lv_style_transp);
-        lv_btn_set_style(new_cb, LV_BTN_STATE_OFF_PRESSED, &lv_style_transp);
-        lv_btn_set_style(new_cb, LV_BTN_STATE_ON_RELEASED, &lv_style_transp);
-        lv_btn_set_style(new_cb, LV_BTN_STATE_ON_PRESSED, &lv_style_transp);
-        lv_btn_set_style(new_cb, LV_BTN_STATE_INACTIVE, &lv_style_transp);
+        lv_btn_set_styles(new_cb, &lv_style_transp, &lv_style_transp,
+                        &lv_style_transp, &lv_style_transp,
+                        &lv_style_transp);
 
         lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
         lv_cont_set_fit(new_cb, true, true);
@@ -81,10 +79,9 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
 
         if(ancestor_bullet_design_f == NULL) ancestor_bullet_design_f = lv_obj_get_design_func(ext->bullet);
         lv_obj_set_click(ext->bullet, false);
-        lv_btn_set_style(ext->bullet, LV_BTN_STATE_OFF_RELEASED, &lv_style_pretty);
-        lv_btn_set_style(ext->bullet, LV_BTN_STATE_OFF_PRESSED, &lv_style_pretty_color);
-        lv_btn_set_style(ext->bullet, LV_BTN_STATE_ON_RELEASED, &lv_style_btn_on_released);
-        lv_btn_set_style(ext->bullet, LV_BTN_STATE_ON_PRESSED, &lv_style_btn_on_pressed);
+        lv_btn_set_styles(ext->bullet, &lv_style_pretty, &lv_style_pretty_color,
+                                       &lv_style_btn_on_released, &lv_style_btn_on_pressed,
+                                       NULL);
 
         ext->label = lv_label_create(new_cb, NULL);
         lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/

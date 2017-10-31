@@ -101,6 +101,13 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en);
 void lv_img_set_upscale(lv_obj_t * img, bool en);
 
 /**
+ * Get the name of the file set for an image
+ * @param img pointer to an image
+ * @return file name
+ */
+const char * lv_img_get_file_name(lv_obj_t * img);
+
+/**
  * Get the auto size enable attribute
  * @param img pointer to an image
  * @return true: auto size is enabled, false: auto size is disabled

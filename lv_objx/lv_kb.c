@@ -27,7 +27,7 @@
 static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mode);
 #endif
 
-static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt);
+static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -315,10 +315,10 @@ static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mo
  * @param i the index of the released button from the current btnm map
  * @return LV_ACTION_RES_INV if the btnm is deleted else LV_ACTION_RES_OK
  */
-static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
+static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    if(ext->ta == NULL) return LV_ACTION_RES_OK;
+    if(ext->ta == NULL) return LV_RES_OK;
 
     /*Do the corresponding action according to the text of the button*/
     if(strcmp(txt, "abc") == 0) {
@@ -355,14 +355,14 @@ static lv_action_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
         }
     } else if(strcmp(txt, "Hide") == 0) {
         if(ext->close_action) ext->close_action(kb);
-        return LV_ACTION_RES_INV;
+        return LV_RES_INV;
     } else if(strcmp(txt, "Ok") == 0) {
         if(ext->ok_action) ext->ok_action(kb);
-        return LV_ACTION_RES_INV;
+        return LV_RES_INV;
     } else {
         lv_ta_add_text(ext->ta, txt);
     }
-    return LV_ACTION_RES_OK;
+    return LV_RES_OK;
 }
 
 #endif

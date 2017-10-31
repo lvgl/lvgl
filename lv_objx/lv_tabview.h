@@ -37,6 +37,10 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+/* parametes: pointer to a tabview object, tab_id*/
+typedef void (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
+
 /*Data of tab*/
 typedef struct
 {
@@ -47,12 +51,12 @@ typedef struct
     lv_obj_t * content;   /*A rectangle to show the current tab*/
     const char ** tab_name_ptr;
     point_t point_last;
-    uint16_t tab_act;
+    uint16_t tab_cur;
     uint16_t tab_cnt;
     uint16_t anim_time;
     uint8_t draging :1;
     uint8_t drag_h :1;
-
+    lv_tabview_action_t tab_load_action;
 }lv_tabview_ext_t;
 
 /**********************
@@ -90,11 +94,27 @@ void lv_tabview_realign(lv_obj_t * tabview);
 void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en);
 
 /**
+ * Set an action to call when a tab is loaded (Good to create content only if required)
+ * lv_tabview_get_act() still gives the current (old) tab (to remove content from here)
+ * @param tabview pointer to a tabview object
+ * @param action pointer to a function to call when a tab is loaded
+ */
+void lv_tabview_set_tab_load_action(lv_obj_t *tabview,lv_tabview_action_t action);
+
+/**
+ * Set the animation time of tab view when a new tab is loaded
+ * @param tabview pointer to Tab view object
+ * @param anim_time_ms time of animation in milliseconds
+ */
+void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
+
+/**
  * Get the index of the currently active tab
  * @param tabview pointer to Tab view object
  * @return the active tab index
  */
 uint16_t lv_tabview_get_tab_act(lv_obj_t * tabview);
+
 /**
  * Get the number of tabs
  * @param tabview pointer to Tab view object
@@ -131,6 +151,18 @@ lv_obj_t * lv_tabview_get_indic(lv_obj_t * tabview);
  */
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
 
+/**
+ * Get the tab load action
+ * @param tabview pointer to a tabview object
+ * @param return the current tab load action
+ */
+lv_tabview_action_t lv_tabview_get_tab_load_action(lv_obj_t *tabview);
+/**
+ * Get the animation time of tab view when a new tab is loaded
+ * @param tabview pointer to Tab view object
+ * @return time of animation in milliseconds
+ */
+uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
 
 /**********************
  *      MACROS

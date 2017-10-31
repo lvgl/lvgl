@@ -78,10 +78,10 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     ext->action = NULL;
     ext->map_p = NULL;
     ext->toggle = 0;
-    ext->button_styles[LV_BTN_STATE_OFF_RELEASED] = &lv_style_btn_off_released;
-    ext->button_styles[LV_BTN_STATE_OFF_PRESSED] = &lv_style_btn_off_pressed;
-    ext->button_styles[LV_BTN_STATE_ON_RELEASED] = &lv_style_btn_on_released;
-    ext->button_styles[LV_BTN_STATE_ON_PRESSED] = &lv_style_btn_on_pressed;
+    ext->button_styles[LV_BTN_STATE_RELEASED] = &lv_style_btn_off_released;
+    ext->button_styles[LV_BTN_STATE_PRESSED] = &lv_style_btn_off_pressed;
+    ext->button_styles[LV_BTN_STATE_TGL_RELEASED] = &lv_style_btn_on_released;
+    ext->button_styles[LV_BTN_STATE_TGL_PRESSED] = &lv_style_btn_on_pressed;
     ext->button_styles[LV_BTN_STATE_INACTIVE] = &lv_style_btn_inactive;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_btnm);
@@ -373,20 +373,26 @@ void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id)
 }
 
 /**
- * Set the styles of the buttons of the button matrix
- * @param btnm pointer to a button matrix object
- * @param rel pointer to a style for releases state (NULL to leave it unchanged)
- * @param pr  pointer to a style for pressed state (NULL to leave it unchanged)
- * @param trel pointer to a style for toggled releases state (NULL to leave it unchanged)
- * @param tpr pointer to a style for toggled pressed state (NULL to leave it unchanged)
- * @param ina pointer to a style for inactive state (NULL to leave it unchanged)
+ * Set styles of the button is each state. Use NULL for any style to leave it unchanged.
+ * @param btnm pointer to button matrix object
+ * @param rel_style pointer to a style for releases state
+ * @param pr_style  pointer to a style for pressed state
+ * @param tgl_rel_style pointer to a style for toggled releases state
+ * @param tgl_pr_style pointer to a style for toggled pressed state
+ * @param inactive_style pointer to a style for inactive state
  */
-void lv_btnm_set_button_style(lv_obj_t *btnm, lv_btn_state_t state, lv_style_t *style)
-{
-    if(state >= LV_BTN_STATE_NUM) return;
+void lv_btnm_set_button_style(lv_obj_t *btnm, lv_style_t *rel_style, lv_style_t *pr_style,
+                             lv_style_t *tgl_rel_style, lv_style_t *tgl_pr_style,
+                             lv_style_t *inactive_style)
 
+{
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    ext->button_styles[state] = style;
+
+    if(rel_style != NULL) ext->button_styles[LV_BTN_STATE_RELEASED] = rel_style;
+    if(pr_style != NULL) ext->button_styles[LV_BTN_STATE_PRESSED] = pr_style;
+    if(tgl_rel_style != NULL) ext->button_styles[LV_BTN_STATE_TGL_RELEASED] = tgl_rel_style;
+    if(tgl_pr_style != NULL) ext->button_styles[LV_BTN_STATE_TGL_PRESSED] = tgl_pr_style;
+    if(inactive_style != NULL) ext->button_styles[LV_BTN_STATE_INACTIVE] = inactive_style;
 
     lv_obj_invalidate(btnm);
 }
@@ -489,10 +495,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			btn_h = area_get_height(&area_tmp);
 
 			/*Load the style*/
-			if(btn_i != ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_OFF_RELEASED);
-			else if(btn_i == ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_OFF_PRESSED);
-            else if(btn_i != ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_ON_RELEASED);
-            else if(btn_i == ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_ON_PRESSED);
+			if(btn_i != ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_RELEASED);
+			else if(btn_i == ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_PRESSED);
+            else if(btn_i != ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_TGL_RELEASED);
+            else if(btn_i == ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_TGL_PRESSED);
 
 			lv_draw_rect(&area_tmp, mask, btn_style);
 

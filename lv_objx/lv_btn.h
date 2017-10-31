@@ -35,10 +35,10 @@ extern "C" {
 /*Button states*/
 typedef enum
 {
-    LV_BTN_STATE_OFF_RELEASED,
-    LV_BTN_STATE_OFF_PRESSED,
-    LV_BTN_STATE_ON_RELEASED,
-    LV_BTN_STATE_ON_PRESSED,
+    LV_BTN_STATE_RELEASED,
+    LV_BTN_STATE_PRESSED,
+    LV_BTN_STATE_TGL_RELEASED,
+    LV_BTN_STATE_TGL_PRESSED,
     LV_BTN_STATE_INACTIVE,
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
@@ -114,15 +114,17 @@ void lv_btn_toggle(lv_obj_t * btn);
 void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action);
 
 /**
- * Set styles of a button is each state. Use NULL for any style which are not be changed.
+ * Set styles of a button is each state. Use NULL for any style to leave it unchanged
  * @param btn pointer to button object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param trel pointer to a style for toggled releases state
- * @param tpr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
+ * @param rel_style pointer to a style for releases state
+ * @param pr_style  pointer to a style for pressed state
+ * @param tgl_rel_style pointer to a style for toggled releases state
+ * @param tgl_pr_style pointer to a style for toggled pressed state
+ * @param inactive_style pointer to a style for inactive state
  */
-void lv_btn_set_style(lv_obj_t * btn, lv_btn_state_t state, lv_style_t * style);
+void lv_btn_set_styles(lv_obj_t * btn, lv_style_t *rel_style, lv_style_t *pr_style,
+                                       lv_style_t *tgl_rel_style, lv_style_t *tgl_pr_style,
+                                       lv_style_t *inactive_style);
 
 /**
  * Get the current state of the button

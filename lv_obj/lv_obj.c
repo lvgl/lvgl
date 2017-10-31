@@ -90,10 +90,10 @@ void lv_init(void)
     act_scr = def_scr;
     
     top_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(top_layer, &lv_style_transp_tight);
+    lv_obj_set_style(top_layer, &lv_style_transp_fit);
 
     sys_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(sys_layer, &lv_style_transp_tight);
+    lv_obj_set_style(sys_layer, &lv_style_transp_fit);
 
     /*Refresh the screen*/
     lv_obj_invalidate(act_scr);
@@ -323,6 +323,21 @@ void lv_obj_del(lv_obj_t * obj)
     if(par != NULL) {
     	par->signal_func(par, LV_SIGNAL_CHILD_CHG, NULL);
     }
+}
+
+/**
+ * Delete all children of an object
+ * @param obj pointer to an object
+ */
+void lv_obj_clear(lv_obj_t *obj)
+{
+    lv_obj_t *child = lv_obj_get_child(obj, NULL);
+
+    while(child) {
+        lv_obj_del(child);
+        child = lv_obj_get_child(obj, child);
+    }
+
 }
 
 /**
@@ -869,7 +884,6 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 void lv_obj_set_click(lv_obj_t * obj, bool en)
 {
     obj->click = (en == true ? 1 : 0);
-    
 }
 
 /**
@@ -985,7 +999,7 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj)
 	lv_obj_invalidate(obj);
 }
 
-#if LV_OBJ_FREE_NUMBER != 0
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application. 
@@ -998,7 +1012,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num)
 }
 #endif
 
-#if LV_OBJ_FREE_POINTER != 0
+#if LV_OBJ_FREE_PTR != 0
 /**
  * Set an application specific  pointer for an object.
  * It can help to identify objects in the application.
@@ -1159,7 +1173,7 @@ lv_obj_t * lv_obj_get_parent(lv_obj_t * obj)
 }
 
 /**
- * Iterate through the children of an object
+ * Iterate through the children of an object (start from the "youngest")
  * @param obj pointer to an object
  * @param child NULL at first call to get the next children
  *                  and the previous return value later
@@ -1174,6 +1188,24 @@ lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child)
 	}
 
 	return NULL;
+}
+
+/**
+ * Iterate through the children of an object (start from the "oldest")
+ * @param obj pointer to an object
+ * @param child NULL at first call to get the next children
+ *                  and the previous return value later
+ * @return the child after 'act_child' or NULL if no more child
+ */
+lv_obj_t * lv_obj_get_child_back(lv_obj_t * obj, lv_obj_t * child)
+{
+    if(child == NULL) {
+        return ll_get_tail(&obj->child_ll);
+    } else {
+        return ll_get_prev(&obj->child_ll, child);
+    }
+
+    return NULL;
 }
 
 /**

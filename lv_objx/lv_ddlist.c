@@ -29,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
-static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist);
+static lv_res_t lv_ddlist_rel_action(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time);
 static void lv_ddlist_pos_act_option(lv_obj_t * ddlist);
 
@@ -457,7 +457,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
  * @param ddlist pointer to a drop down list object
  * @return LV_ACTION_RES_INV if the ddlist it deleted in the user callback else LV_ACTION_RES_OK
  */
-static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist)
+static lv_res_t lv_ddlist_rel_action(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -492,7 +492,7 @@ static lv_action_res_t lv_ddlist_rel_action(lv_obj_t * ddlist)
     }
     lv_ddlist_refr_size(ddlist, ext->anim_time);
 
-    return LV_ACTION_RES_OK;
+    return LV_RES_OK;
 
 }
 

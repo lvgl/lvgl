@@ -40,7 +40,7 @@ extern "C" {
 /* Type of callback function which is called when a button is released or long pressed on the button matrix
  * Parameters: button matrix, text of the released button
  * return LV_ACTION_RES_INV if  the button matrix is deleted else LV_ACTION_RES_OK*/
-typedef lv_action_res_t (*lv_btnm_action_t) (lv_obj_t *, const char *txt);
+typedef lv_res_t (*lv_btnm_action_t) (lv_obj_t *, const char *txt);
 
 /*Data of button matrix*/
 typedef struct
@@ -110,17 +110,19 @@ void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t cb);
  */
 void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
 
-/**
- * Set the styles of the buttons of the button matrix
- * @param btnm pointer to a button matrix object
- * @param rel pointer to a style for releases state (NULL to leave it unchanged)
- * @param pr  pointer to a style for pressed state (NULL to leave it unchanged)
- * @param trel pointer to a style for toggled releases state (NULL to leave it unchanged)
- * @param tpr pointer to a style for toggled pressed state (NULL to leave it unchanged)
- * @param ina pointer to a style for inactive state (NULL to leave it unchanged)
- */
-void lv_btnm_set_button_style(lv_obj_t *btnm, lv_btn_state_t state, lv_style_t *style);
 
+/**
+ * Set styles of the button is each state. Use NULL for any style to leave it unchanged.
+ * @param btnm pointer to button matrix object
+ * @param rel_style pointer to a style for releases state
+ * @param pr_style  pointer to a style for pressed state
+ * @param tgl_rel_style pointer to a style for toggled releases state
+ * @param tgl_pr_style pointer to a style for toggled pressed state
+ * @param inactive_style pointer to a style for inactive state
+ */
+void lv_btnm_set_button_style(lv_obj_t *btnm, lv_style_t *rel_style, lv_style_t *pr_style,
+                             lv_style_t *tgl_rel_style, lv_style_t *tgl_pr_style,
+                             lv_style_t *inactive_style);
 /**
  * Get the current map of a button matrix
  * @param btnm pointer to a button matrix object

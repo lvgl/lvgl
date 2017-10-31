@@ -97,7 +97,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	/*Create a holder for the control buttons*/
     	ext->btnh = lv_cont_create(ext->header, NULL);
     	lv_cont_set_fit(ext->btnh, true, false);
-        lv_obj_set_style(ext->btnh, &lv_style_transp_tight);
+        lv_obj_set_style(ext->btnh, &lv_style_transp_fit);
     	lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_ROW_M);
 
         lv_obj_set_signal_func(new_win, lv_win_signal);
@@ -209,8 +209,7 @@ lv_obj_t * lv_win_add_cbtn(lv_obj_t * win, const char * img_path, lv_action_t re
 	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
 	lv_obj_t * btn = lv_btn_create(ext->btnh, NULL);
-    lv_btn_set_style(btn, LV_BTN_STATE_OFF_RELEASED, ext->style_cbtn_rel);
-    lv_btn_set_style(btn, LV_BTN_STATE_OFF_PRESSED, ext->style_cbtn_pr);
+    lv_btn_set_styles(btn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
 	lv_obj_set_size(btn, ext->cbtn_size, ext->cbtn_size);
 	lv_btn_set_action(btn, LV_BTN_ACTION_RELEASE, rel_action);
 
@@ -228,13 +227,13 @@ lv_obj_t * lv_win_add_cbtn(lv_obj_t * win, const char * img_path, lv_action_t re
  * @param btn pointer to the released button
  * @return always LV_ACTION_RES_INV because the button is deleted with the window
  */
-lv_action_res_t lv_win_close_action(lv_obj_t * btn)
+lv_res_t lv_win_close_action(lv_obj_t * btn)
 {
 	lv_obj_t * win = lv_win_get_from_cbtn(btn);
 
 	lv_obj_del(win);
 
-	return LV_ACTION_RES_INV;
+	return LV_RES_INV;
 }
 
 /**
@@ -277,8 +276,7 @@ void lv_win_set_styles_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr)
     lv_obj_t * cbtn;
     cbtn = lv_obj_get_child(ext->btnh, NULL);
     while(cbtn != NULL) {
-        lv_btn_set_style(cbtn, LV_BTN_STATE_OFF_RELEASED, ext->style_cbtn_rel);
-        lv_btn_set_style(cbtn, LV_BTN_STATE_OFF_PRESSED, ext->style_cbtn_pr);
+        lv_btn_set_styles(cbtn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
 
         cbtn = lv_obj_get_child(ext->btnh, cbtn);
     }

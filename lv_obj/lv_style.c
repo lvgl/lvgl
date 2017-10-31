@@ -39,6 +39,7 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val);
  **********************/
 lv_style_t lv_style_scr;
 lv_style_t lv_style_transp;
+lv_style_t lv_style_transp_fit;
 lv_style_t lv_style_transp_tight;
 lv_style_t lv_style_plain;
 lv_style_t lv_style_plain_color;
@@ -47,7 +48,7 @@ lv_style_t lv_style_pretty_color;
 lv_style_t lv_style_btn_off_released;
 lv_style_t lv_style_btn_off_pressed;
 lv_style_t lv_style_btn_on_released;
-lv_style_t lv_style_btn_on_pressed;;
+lv_style_t lv_style_btn_on_pressed;
 lv_style_t lv_style_btn_inactive;
 
 /**********************
@@ -136,9 +137,13 @@ void lv_style_init (void)
     lv_style_transp.body.border.width = 0;
 
     /*Transparent tight style*/
-    memcpy(&lv_style_transp_tight, &lv_style_transp, sizeof(lv_style_t));
-    lv_style_transp_tight.body.padding.hor = 0;
-    lv_style_transp_tight.body.padding.ver = 0;
+    memcpy(&lv_style_transp_fit, &lv_style_transp, sizeof(lv_style_t));
+    lv_style_transp_fit.body.padding.hor = 0;
+    lv_style_transp_fit.body.padding.ver = 0;
+
+    /*Transparent fitting size*/
+    memcpy(&lv_style_transp_tight, &lv_style_transp_fit, sizeof(lv_style_t));
+    lv_style_transp_tight.body.padding.inner = 0;
 
     /*Button released style*/
     memcpy(&lv_style_btn_off_released, &lv_style_plain, sizeof(lv_style_t));
