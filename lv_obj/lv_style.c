@@ -24,8 +24,8 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-    const lv_style_t style_start;   /*Save not only pointers because if same as 'style_anim' then it will be modified too*/
-    const lv_style_t style_end;
+    lv_style_t style_start;   /*Save not only pointers because if same as 'style_anim' then it will be modified too*/
+    lv_style_t style_end;
     lv_style_t * style_anim;
 }lv_style_anim_dsc_t;
 
