@@ -23,3 +23,6 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [x] *lv_gauge* rework to make it more like line meter (remove background but add scale lines)
 - [x] rename *lv_dispi_...* to *lv_indev_...*
 - [x] *lv_dispi_t* removed from *lv_action_type_t*. Use lv_indev_act() instead
+- [x] make styles to global variable to ensure less typing
+- [x] make fonts to global variables to ensure less typing and easy user-font adding
+- [x] join symbol fonts into normal built-in fonts
