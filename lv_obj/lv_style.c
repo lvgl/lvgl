@@ -87,7 +87,7 @@ void lv_style_init (void)
     lv_style_scr.body.shadow.width = 0;
 
     lv_style_scr.text.color = COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_scr.text.font = font_get(FONT_DEFAULT);
+    lv_style_scr.text.font = FONT_DEFAULT;
     lv_style_scr.text.space_letter = 1 << LV_ANTIALIAS;
     lv_style_scr.text.space_line = 2 << LV_ANTIALIAS;
     lv_style_scr.text.align = LV_TEXT_ALIGN_LEFT;
