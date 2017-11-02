@@ -87,6 +87,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->recolor = 0;
     ext->no_break = 0;
     ext->body_draw = 0;
+    ext->align = LV_LABEL_ALIGN_LEFT;
     ext->dot_end = LV_LABEL_DOT_END_INV;
     ext->long_mode = LV_LABEL_LONG_EXPAND;
     ext->offset.x = 0;

@@ -78,7 +78,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new slider slider*/
     if(copy == NULL) {
         lv_obj_set_click(new_slider, true);
-        lv_slider_set_style_knob(new_slider, ext->style_knob);
+        lv_slider_set_knob_style(new_slider, ext->style_knob);
     }
     /*Copy an existing slider*/
     else {
@@ -198,7 +198,7 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t cb)
  * @param slider pointer to slider object
  * @param style pointer the new knob style
  */
-void lv_slider_set_style_knob(lv_obj_t * slider, lv_style_t * style)
+void lv_slider_set_knob_style(lv_obj_t * slider, lv_style_t * style)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     ext->style_knob = style;

@@ -76,7 +76,7 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t cb);
  * @param slider pointer to slider object
  * @param style pointer the new knob style
  */
-void lv_slider_set_style_knob(lv_obj_t * slider, lv_style_t * style);
+void lv_slider_set_knob_style(lv_obj_t * slider, lv_style_t * style);
 
 /**
  * Set the 'knob in' attribute of a slider

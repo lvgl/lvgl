@@ -86,7 +86,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
-        lv_list_set_styles_btn(new_list, copy_ext->styles_btn[LV_BTN_STATE_RELEASED],
+        lv_list_set_btn_styles(new_list, copy_ext->styles_btn[LV_BTN_STATE_RELEASED],
                                          copy_ext->styles_btn[LV_BTN_STATE_PRESSED],
                                          copy_ext->styles_btn[LV_BTN_STATE_TGL_RELEASED],
                                          copy_ext->styles_btn[LV_BTN_STATE_TGL_PRESSED],
@@ -357,7 +357,7 @@ void lv_list_set_sb_out(lv_obj_t * list, bool out)
  * @param tpr pointer to a style for toggled pressed state
  * @param ina pointer to a style for inactive state
  */
-void lv_list_set_styles_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
+void lv_list_set_btn_styles(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
                                                lv_style_t * trel, lv_style_t * tpr,
                                                lv_style_t * ina)
 {

@@ -158,7 +158,6 @@ void lv_label_set_body_draw(lv_obj_t *label, bool body_enable);
  */
 char * lv_label_get_text(lv_obj_t * label);
 
-
 /**
  * Get the align attribute
  * @param label pointer to a label object

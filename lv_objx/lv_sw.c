@@ -66,7 +66,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new switch switch*/
     if(copy == NULL) {
         lv_bar_set_range(new_sw, 0, 1);
-        lv_obj_set_size(new_sw, LV_DPI, LV_DPI / 2);
+        lv_obj_set_size(new_sw, 2 * LV_DPI / 3, LV_DPI / 3);
         lv_slider_set_knob_in(new_sw, true);
     }
     /*Copy an existing switch*/

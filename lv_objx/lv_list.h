@@ -112,7 +112,7 @@ void lv_list_set_sb_out(lv_obj_t * list, bool out);
  * @param tpr pointer to a style for toggled pressed state
  * @param ina pointer to a style for inactive state
  */
-void lv_list_set_styles_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
+void lv_list_set_btn_styles(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
                             lv_style_t * trel, lv_style_t * tpr,
                             lv_style_t * ina);
 

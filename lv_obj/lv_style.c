@@ -74,7 +74,7 @@ void lv_style_init (void)
     lv_style_scr.body.radius = 0;
     lv_style_scr.body.padding.ver = LV_DPI / 12;
     lv_style_scr.body.padding.hor = LV_DPI / 12;
-    lv_style_scr.body.padding.inner = LV_DPI / 12;
+    lv_style_scr.body.padding.inner = LV_DPI / 10;
     lv_style_scr.body.empty = 0;
     lv_style_scr.glass = 0;
 

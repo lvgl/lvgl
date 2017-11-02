@@ -100,7 +100,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
 
         ext->indic = lv_obj_create(ext->tabs, NULL);
         lv_style_t * style_indic = lv_obj_get_style(ext->indic);
-        lv_obj_set_size(ext->indic, LV_DPI, style_indic->line.width);
+        lv_obj_set_size(ext->indic, LV_DPI, LV_DPI / 10);
         lv_obj_align(ext->indic, ext->tabs, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
         lv_obj_set_click(ext->indic, false);
 

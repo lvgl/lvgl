@@ -78,6 +78,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         lv_btn_set_toggle(new_cb, true);
 
         if(ancestor_bullet_design_f == NULL) ancestor_bullet_design_f = lv_obj_get_design_func(ext->bullet);
+
         lv_obj_set_click(ext->bullet, false);
         lv_btn_set_styles(ext->bullet, &lv_style_pretty, &lv_style_pretty_color,
                                        &lv_style_btn_on_released, &lv_style_btn_on_pressed,
@@ -86,6 +87,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         ext->label = lv_label_create(new_cb, NULL);
         lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
         lv_label_set_text(ext->label, "Check box");
+
+        lv_obj_refresh_style(new_cb);
     } else {
     	lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
