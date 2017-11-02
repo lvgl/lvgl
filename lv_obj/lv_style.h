@@ -42,13 +42,13 @@ typedef enum
 
 typedef struct
 {
-    opa_t opa;
     uint8_t glass :1;   /*1: Do not inherit this style*/
 
     struct {
         color_t color_main;
         color_t color_gradient;
         cord_t radius;
+        opa_t opa;
 
         struct {
             color_t color;

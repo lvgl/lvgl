@@ -241,7 +241,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
         lv_obj_t * bg = lv_obj_get_parent(bullet);
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
-        if(style_page->body.empty != 0 || style_page->opa == OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.empty != 0 || style_page->body.opa == OPA_TRANSP) { /*Background is visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);

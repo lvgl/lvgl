@@ -848,7 +848,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
 		lv_obj_t * ta = lv_obj_get_parent(scrl);
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext_attr(ta);
         lv_style_t * label_style = lv_obj_get_style(ta_ext->label);
-		if(ta_ext->cursor_show == 0 || ta_ext->cursor_state == 0 || label_style->opa == OPA_TRANSP) return true; 	/*The cursor is not visible now*/
+		if(ta_ext->cursor_show == 0 || ta_ext->cursor_state == 0 || label_style->body.opa == OPA_TRANSP) return true; 	/*The cursor is not visible now*/
 
 
         lv_style_t cur_style;
@@ -871,7 +871,7 @@ static bool lv_ta_scrling_design(lv_obj_t * scrl, const area_t * mask, lv_design
         	cur_style.body.padding.hor = 0;
             cur_style.body.padding.ver = 0;
             cur_style.line.width = 1 << LV_ANTIALIAS;
-            cur_style.opa = OPA_COVER;
+            cur_style.body.opa = OPA_COVER;
         }
 
 		uint16_t cur_pos = lv_ta_get_cursor_pos(ta);

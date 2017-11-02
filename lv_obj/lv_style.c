@@ -68,7 +68,7 @@ void lv_style_init (void)
      * HUE = 210*/
 
     /*Screen style*/
-    lv_style_scr.opa = OPA_COVER;
+    lv_style_scr.body.opa = OPA_COVER;
     lv_style_scr.body.color_main = COLOR_WHITE;
     lv_style_scr.body.color_gradient = COLOR_WHITE;
     lv_style_scr.body.radius = 0;
@@ -251,7 +251,7 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
     const lv_style_t * end = &dsc->style_end;
     lv_style_t * act = dsc->style_anim;
 
-    STYLE_ATTR_ANIM(opa, val);
+    STYLE_ATTR_ANIM(body.opa, val);
     STYLE_ATTR_ANIM(body.radius, val);
     STYLE_ATTR_ANIM(body.border.width, val);
     STYLE_ATTR_ANIM(body.shadow.width, val);

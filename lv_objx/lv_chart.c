@@ -488,7 +488,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const area_t * mask)
 	lv_chart_dl_t * dl;
 	lv_style_t lines;
 	lv_style_copy(&lines, &lv_style_plain);
-	lines.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
+	lines.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
     lines.line.width = ext->dl_width;
 
 	/*Go through all data lines*/
@@ -541,7 +541,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 	style_point.body.border.width = 0;
 	style_point.body.empty = 0;
 	style_point.body.radius = LV_RADIUS_CIRCLE;
-    style_point.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
+    style_point.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
     style_point.body.radius = ext->dl_width;
 
 	/*Go through all data lines*/
@@ -592,7 +592,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 	rects.body.border.width = 0;
 	rects.body.empty = 0;
 	rects.body.radius = 0;
-	rects.opa = (uint16_t)((uint16_t)style->opa * ext->dl_opa) >> 8;
+	rects.body.opa = (uint16_t)((uint16_t)style->body.opa * ext->dl_opa) >> 8;
 
 	col_a.y2 = chart->coords.y2;
 
