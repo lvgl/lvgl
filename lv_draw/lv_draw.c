@@ -258,7 +258,7 @@ void lv_draw_label(const area_t * coords,const area_t * mask, const lv_style_t *
     pos.y = coords->y1;
 
     /*Align the line to middle if enabled*/
-    if(style->text.align  == LV_TEXT_ALIGN_MID) {
+    if(flag & TXT_FLAG_CENTER) {
         line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                     font, style->text.space_letter, flag);
         pos.x += (w - line_length) / 2;
@@ -333,7 +333,7 @@ void lv_draw_label(const area_t * coords,const area_t * mask, const lv_style_t *
 
         pos.x = coords->x1;
         /*Align to middle*/
-        if(style->text.align == LV_TEXT_ALIGN_MID) {
+        if(flag & TXT_FLAG_CENTER) {
             line_length = txt_get_width(&txt[line_start], line_end - line_start,
                                      font, style->text.space_letter, flag);
             pos.x += (w - line_length) / 2;

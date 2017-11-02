@@ -39,6 +39,12 @@ typedef enum
     LV_LABEL_LONG_ROLL,     /*Keep the size and roll the text infinitely*/
 }lv_label_long_mode_t;
 
+/*Label align policy*/
+typedef enum {
+    LV_LABEL_ALIGN_LEFT,
+    LV_LABEL_ALIGN_CENTER,
+}lv_label_align_t;
+
 /*Data of label*/
 typedef struct
 {
@@ -54,6 +60,7 @@ typedef struct
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     point_t offset;                 /*Text draw position offset*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
+    uint8_t align       :2;         /*Align type from 'lv_label_align_t'*/
     uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
     uint8_t expand      :1;         /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
     uint8_t no_break    :1;         /*Ignore new line characters*/
@@ -123,6 +130,9 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt);
  */
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 
+
+void lv_label_set_align(lv_obj_t *label, lv_label_align_t align);
+
 /**
  * Enable the recoloring by in-line commands
  * @param label pointer to a label object
@@ -140,12 +150,21 @@ void lv_label_set_no_break(lv_obj_t * label, bool en);
 
 
 void lv_label_set_body_draw(lv_obj_t *label, bool body_enable);
+
 /**
  * Get the text of a label
  * @param label pointer to a label object
  * @return the text of the label
  */
 char * lv_label_get_text(lv_obj_t * label);
+
+
+/**
+ * Get the align attribute
+ * @param label pointer to a label object
+ * @return LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER
+ */
+lv_label_align_t lv_label_get_align(lv_obj_t * label);
 
 /**
  * Get the long mode of a label

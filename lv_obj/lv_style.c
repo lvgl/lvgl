@@ -90,7 +90,6 @@ void lv_style_init (void)
     lv_style_scr.text.font = FONT_DEFAULT;
     lv_style_scr.text.space_letter = 1 << LV_ANTIALIAS;
     lv_style_scr.text.space_line = 2 << LV_ANTIALIAS;
-    lv_style_scr.text.align = LV_TEXT_ALIGN_LEFT;
 
     lv_style_scr.image.color = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = OPA_TRANSP;
@@ -157,7 +156,6 @@ void lv_style_init (void)
     lv_style_btn_off_released.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
     lv_style_btn_off_released.body.border.opa = OPA_70;
     lv_style_btn_off_released.text.color = COLOR_MAKE(0xff, 0xff, 0xff);
-    lv_style_btn_off_released.text.align = LV_TEXT_ALIGN_MID;
     lv_style_btn_off_released.body.shadow.color = COLOR_GRAY;
     lv_style_btn_off_released.body.shadow.width = 0;
 
@@ -277,7 +275,6 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
         act->glass = start->glass;
         act->text.font = start->text.font;
         act->body.shadow.type = start->body.shadow.type;
-        act->text.align = start->text.align;
     }
 
     if(val == LV_STYLE_ANIM_RES) {
@@ -285,7 +282,6 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
         act->glass = end->glass;
         act->text.font = end->text.font;
         act->body.shadow.type = end->body.shadow.type;
-        act->text.align = end->text.align;
     }
 
     lv_style_refr_objs(dsc->style_anim);

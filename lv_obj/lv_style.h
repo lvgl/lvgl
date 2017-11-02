@@ -28,11 +28,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
-    LV_TEXT_ALIGN_LEFT = 0,
-    LV_TEXT_ALIGN_MID,
-}lv_text_align_t;
-
 /*Shadow types*/
 typedef enum
 {
@@ -77,7 +72,6 @@ typedef struct
         const font_t * font;
         cord_t space_letter;
         cord_t space_line;
-        uint8_t align:2;
     }text;
 
     struct {
