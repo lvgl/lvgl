@@ -178,7 +178,7 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 {
 	lv_bar_ext_t * ext = lv_obj_get_ext(bar);
-	ext->max_value = max;
+	ext->min_value = min;
 	ext->max_value = max;
 	if(ext->act_value > max) {
 		ext->act_value = max;
