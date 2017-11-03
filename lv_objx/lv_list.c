@@ -213,7 +213,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	/*Create a list element with the image an the text*/
 	lv_obj_t * liste;
 	liste = lv_btn_create(list, NULL);
-	lv_btn_set_style_all(liste, ext->styles_btn);
+	lv_btn_set_style(liste, ext->styles_btn[LV_BTN_STATE_RELEASED], ext->styles_btn[LV_BTN_STATE_PRESSED],
+                            ext->styles_btn[LV_BTN_STATE_TGL_PRESSED], ext->styles_btn[LV_BTN_STATE_TGL_PRESSED],
+                            ext->styles_btn[LV_BTN_STATE_INACTIVE]);
 
 	lv_btn_set_action(liste, LV_BTN_ACTION_RELEASE, rel_action);
 	lv_page_glue_obj(liste, true);
@@ -372,7 +374,7 @@ void lv_list_set_btn_styles(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
     lv_obj_t * liste = lv_list_get_next_btn(list, NULL);
     while(liste != NULL)
     {
-        lv_btn_set_styles(liste, rel, pr, trel, tpr, ina);
+        lv_btn_set_style(liste, rel, pr, trel, tpr, ina);
         liste = lv_list_get_next_btn(list, liste);
     }
 }

@@ -94,8 +94,8 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     int16_t old_val = lv_bar_get_value(sw);
 
-    lv_action_t slider_cb = ext->slider.cb;
-    ext->slider.cb = NULL;  /*Do not let the slider to call the callback. The Switch will do it*/
+    lv_action_t slider_cb = ext->slider.action;
+    ext->slider.action = NULL;  /*Do not let the slider to call the callback. The Switch will do it*/
 
     /* Include the ancient signal function */
     valid = lv_slider_signal(sw, sign, param);
@@ -126,7 +126,7 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     }
     
     /*Restore the callback*/
-    ext->slider.cb = slider_cb;
+    ext->slider.action = slider_cb;
 
     return valid;
 }

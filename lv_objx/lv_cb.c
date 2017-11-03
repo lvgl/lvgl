@@ -69,7 +69,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new checkbox object*/
     if(copy == NULL) {
         ext->bullet = lv_btn_create(new_cb, NULL);
-        lv_btn_set_styles(new_cb, &lv_style_transp, &lv_style_transp,
+        lv_btn_set_style(new_cb, &lv_style_transp, &lv_style_transp,
                         &lv_style_transp, &lv_style_transp,
                         &lv_style_transp);
 
@@ -80,7 +80,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         if(ancestor_bullet_design_f == NULL) ancestor_bullet_design_f = lv_obj_get_design_func(ext->bullet);
 
         lv_obj_set_click(ext->bullet, false);
-        lv_btn_set_styles(ext->bullet, &lv_style_pretty, &lv_style_pretty_color,
+        lv_btn_set_style(ext->bullet, &lv_style_pretty, &lv_style_pretty_color,
                                        &lv_style_btn_on_released, &lv_style_btn_on_pressed,
                                        NULL);
 
@@ -125,17 +125,17 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     if(valid != false) {
     	if(sign == LV_SIGNAL_STYLE_CHG) {
     		lv_obj_set_size(ext->bullet, font_get_height(style->text.font), font_get_height(style->text.font));
-            lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
+            lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     	} else if(sign == LV_SIGNAL_PRESSED ||
             sign == LV_SIGNAL_RELEASED ||
             sign == LV_SIGNAL_PRESS_LOST) {
-            lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
+            lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
         } else if(sign == LV_SIGNAL_CONTROLL) {
             char c = *((char*)param);
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
                c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
                c == LV_GROUP_KEY_ENTER) {
-                lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
+                lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
             }
         }
     }
@@ -159,6 +159,23 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 	lv_label_set_text(ext->label, txt);
 }
 
+/**
+ * Set styles of a checkbox's bullet is each state. Use NULL for any style to leave it unchanged
+ * @param cb pointer to check box object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param tgl_rel pointer to a style for toggled releases state
+ * @param tgl_pr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
+ */
+void lv_cb_set_style_bullet(lv_obj_t *cb, lv_style_t *rel, lv_style_t *pr,
+                                          lv_style_t *tgl_rel, lv_style_t *tgl_pr,
+                                          lv_style_t *ina)
+{
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_btn_set_style(ext->bullet, rel, pr, tgl_rel, tgl_pr, ina);
+}
+
 
 /*=====================
  * Getter functions
@@ -173,17 +190,6 @@ const char * lv_cb_get_text(lv_obj_t * cb)
 {
 	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 	return lv_label_get_text(ext->label);
-}
-
-/**
- * Get the bullet (lv_btn) of a check box
- * @param cb pointer to check box object
- * @return pointer to the bullet of the check box (lv_btn)
- */
-lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb)
-{
-    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
-    return ext->bullet;
 }
 
 /**********************

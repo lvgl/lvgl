@@ -142,7 +142,7 @@ bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                 btn = lv_obj_get_child(ext->btnh, NULL);
                 while(btn != NULL) {
                     /*Refresh the next button's style*/
-                    lv_btn_set_styles(btn, ext->style_btn_rel, ext->style_btn_pr, NULL, NULL, NULL);
+                    lv_btn_set_style(btn, ext->style_btn_rel, ext->style_btn_pr, NULL, NULL, NULL);
                     btn = lv_obj_get_child(ext->btnh, btn);
                 }
             }
@@ -273,7 +273,7 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
     lv_obj_t * btn;
     btn = lv_btn_create(ext->btnh, NULL);
     lv_btn_set_action(btn, LV_BTN_ACTION_RELEASE, rel_action);
-    lv_btn_set_styles(btn, ext->style_btn_rel, ext->style_btn_pr, NULL, NULL, NULL);
+    lv_btn_set_style(btn, ext->style_btn_rel, ext->style_btn_pr, NULL, NULL, NULL);
     lv_cont_set_fit(btn, true, true);
 
     lv_obj_t * label;
@@ -322,7 +322,7 @@ void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
         lv_obj_t * btn = lv_obj_get_child(ext->btnh, NULL);
 
         while(btn != NULL) {
-            lv_btn_set_styles(btn, rel, pr, NULL, NULL, NULL);
+            lv_btn_set_style(btn, rel, pr, NULL, NULL, NULL);
             btn = lv_obj_get_child(mbox, btn);
         }
     }

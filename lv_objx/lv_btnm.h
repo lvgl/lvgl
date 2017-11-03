@@ -29,9 +29,9 @@ extern "C" {
 #define LV_BTNM_CTRL_CODE       0x80    /*The control byte has to begin (if present) with 0b10xxxxxx*/
 #define LV_BTNM_CTRL_MASK       0xC0
 #define LV_BTNM_WIDTH_MASK      0x07
-#define LV_BTNM_HIDE_MASK     0x08
+#define LV_BTNM_HIDE_MASK       0x08
 #define LV_BTNM_REPEAT_DISABLE_MASK     0x10
-#define LV_BTNM_RESERVED_MASK   0x20
+#define LV_BTNM_INACTIVE_MASK   0x20
 
 /**********************
  *      TYPEDEFS
@@ -45,12 +45,12 @@ typedef lv_res_t (*lv_btnm_action_t) (lv_obj_t *, const char *txt);
 /*Data of button matrix*/
 typedef struct
 {
-    lv_cont_ext_t bg; /*Ext. of ancestor*/
+    /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     const char ** map_p;                            /*Pointer to the current map*/
-    area_t * button_areas;                          /*Array of areas of buttons*/
+    area_t *button_areas;                          /*Array of areas of buttons*/
     lv_btnm_action_t action;                        /*A function to call when a button is releases*/
-    lv_style_t * button_styles[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
+    lv_style_t *styles_btn[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
     uint16_t button_cnt;                            /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t button_id_pressed;                     /*Index of the currently pressed button or LV_BTNM_PR_NONE*/
     uint16_t button_id_toggled;                     /*Index of the currently toggled button or LV_BTNM_PR_NONE */
@@ -87,7 +87,7 @@ bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
  *            The first byte can be a control data:
  *             - bit 7: always 1
  *             - bit 6: always 0
- *             - bit 5: reserved
+ *             - bit 5: inactive (disabled)
  *             - bit 4: no repeat (on long press)
  *             - bit 3: hidden
  *             - bit 2..0: button relative width
@@ -120,9 +120,9 @@ void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
  * @param tgl_pr_style pointer to a style for toggled pressed state
  * @param inactive_style pointer to a style for inactive state
  */
-void lv_btnm_set_button_style(lv_obj_t *btnm, lv_style_t *rel_style, lv_style_t *pr_style,
-                             lv_style_t *tgl_rel_style, lv_style_t *tgl_pr_style,
-                             lv_style_t *inactive_style);
+void lv_btnm_set_style(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
+                                       lv_style_t *tgl_rel, lv_style_t *tgl_pr,
+                                       lv_style_t *ina);
 /**
  * Get the current map of a button matrix
  * @param btnm pointer to a button matrix object

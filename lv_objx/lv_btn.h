@@ -107,24 +107,24 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
 void lv_btn_toggle(lv_obj_t * btn);
 
 /**
- * Set a function to call when the button is pressed
+ * Set a function to call when the button event happens
  * @param btn pointer to a button object
- * @param pr_action pointer to function
+ * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
  */
 void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action);
 
 /**
  * Set styles of a button is each state. Use NULL for any style to leave it unchanged
  * @param btn pointer to button object
- * @param rel_style pointer to a style for releases state
- * @param pr_style  pointer to a style for pressed state
- * @param tgl_rel_style pointer to a style for toggled releases state
- * @param tgl_pr_style pointer to a style for toggled pressed state
- * @param inactive_style pointer to a style for inactive state
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param tgl_rel pointer to a style for toggled releases state
+ * @param tgl_pr pointer to a style for toggled pressed state
+ * @param inactive pointer to a style for inactive state
  */
-void lv_btn_set_styles(lv_obj_t * btn, lv_style_t *rel_style, lv_style_t *pr_style,
-                                       lv_style_t *tgl_rel_style, lv_style_t *tgl_pr_style,
-                                       lv_style_t *inactive_style);
+void lv_btn_set_style(lv_obj_t * btn, lv_style_t *rel, lv_style_t *pr,
+                                       lv_style_t *tgl_rel, lv_style_t *tgl_pr,
+                                       lv_style_t *ina);
 
 /**
  * Get the current state of the button
@@ -154,6 +154,63 @@ lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type);
  * @return pointer to the style in the given state
  */
 lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
+
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+ * Set the layout on a button
+ * @param btn pointer to a button object
+ * @param layout a layout from 'lv_cont_layout_t'
+ */
+static inline void lv_btn_set_layout(lv_obj_t * btn, lv_cont_layout_t layout)
+{
+    lv_cont_set_layout(btn, layout);
+}
+
+/**
+ * Enable the horizontal or vertical fit.
+ * The button size will be set to involve the children horizontally or vertically.
+ * @param btn pointer to a button object
+ * @param hor_en true: enable the horizontal fit
+ * @param ver_en true: enable the vertical fit
+ */
+static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
+{
+    lv_cont_set_fit(btn, hor_en, ver_en);
+}
+
+/**
+ * Get the layout of a button
+ * @param btn pointer to button object
+ * @return the layout from 'lv_cont_layout_t'
+ */
+static inline lv_cont_layout_t lv_btn_get_layout(lv_obj_t * btn)
+{
+    return lv_cont_get_layout(btn);
+}
+
+/**
+ * Get horizontal fit enable attribute of a button
+ * @param btn pointer to a button object
+ * @return true: horizontal fit is enabled; false: disabled
+ */
+static inline bool lv_btn_get_hor_fit(lv_obj_t * btn)
+{
+    return lv_cont_get_fit_hor(btn);
+}
+
+/**
+ * Get vertical fit enable attribute of a container
+ * @param btn pointer to a button object
+ * @return true: vertical fit is enabled; false: disabled
+ */
+static inline bool lv_btn_get_ver_fit(lv_obj_t * btn)
+{
+    return lv_cont_get_fit_ver(btn);
+}
 
 /**********************
  *      MACROS

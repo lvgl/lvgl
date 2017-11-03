@@ -97,16 +97,16 @@ lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont);
 /**
  * Get horizontal fit enable attribute of a container
  * @param cont pointer to a container object
- * @return true: horizontal padding is enabled
+ * @return true: horizontal fit is enabled; false: disabled
  */
-bool lv_cont_get_hor_fit(lv_obj_t * cont);
+bool lv_cont_get_fit_hor(lv_obj_t * cont);
 
 /**
- * Get vertical fit enable attribute of a container
- * @param cont pointer to a container object
- * @return true: vertical padding is enabled
+ * Get vertical fit enable attribute of a button
+ * @param btn pointer to a button object
+ * @return true: vertical padding is enabled; false: disabled
  */
-bool lv_cont_get_ver_fit(lv_obj_t * cont);
+bool lv_cont_get_fit_ver(lv_obj_t * cont);
 
 /**********************
  *      MACROS

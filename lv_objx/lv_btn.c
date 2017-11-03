@@ -256,9 +256,9 @@ void lv_btn_toggle(lv_obj_t * btn)
 }
 
 /**
- * Set a function to call when the button is pressed
+ * Set a function to call when the button event happens
  * @param btn pointer to a button object
- * @param pr_action pointer to function
+ * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
  */
 void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action)
 {
@@ -271,36 +271,28 @@ void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action)
 /**
  * Set styles of a button is each state. Use NULL for any style to leave it unchanged
  * @param btn pointer to button object
- * @param rel_style pointer to a style for releases state
- * @param pr_style  pointer to a style for pressed state
- * @param tgl_rel_style pointer to a style for toggled releases state
- * @param tgl_pr_style pointer to a style for toggled pressed state
- * @param inactive_style pointer to a style for inactive state
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param tgl_rel pointer to a style for toggled releases state
+ * @param tgl_pr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
  */
-void lv_btn_set_styles(lv_obj_t * btn, lv_style_t *rel_style, lv_style_t *pr_style,
-                                       lv_style_t *tgl_rel_style, lv_style_t *tgl_pr_style,
-                                       lv_style_t *inactive_style)
+void lv_btn_set_style(lv_obj_t * btn, lv_style_t *rel, lv_style_t *pr,
+                                       lv_style_t *tgl_rel, lv_style_t *tgl_pr,
+                                       lv_style_t *ina)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
-    if(rel_style != NULL) ext->styles[LV_BTN_STATE_RELEASED] = rel_style;
-    if(pr_style != NULL) ext->styles[LV_BTN_STATE_PRESSED] = pr_style;
-    if(tgl_rel_style != NULL) ext->styles[LV_BTN_STATE_TGL_RELEASED] = tgl_rel_style;
-    if(tgl_pr_style != NULL) ext->styles[LV_BTN_STATE_TGL_PRESSED] = tgl_pr_style;
-    if(inactive_style != NULL) ext->styles[LV_BTN_STATE_INACTIVE] = inactive_style;
+    if(rel != NULL) ext->styles[LV_BTN_STATE_RELEASED] = rel;
+    if(pr != NULL) ext->styles[LV_BTN_STATE_PRESSED] = pr;
+    if(tgl_rel != NULL) ext->styles[LV_BTN_STATE_TGL_RELEASED] = tgl_rel;
+    if(tgl_pr != NULL) ext->styles[LV_BTN_STATE_TGL_PRESSED] = tgl_pr;
+    if(ina != NULL) ext->styles[LV_BTN_STATE_INACTIVE] = ina;
 
     /*Refresh the object with the new style*/
     lv_obj_set_style(btn, ext->styles[ext->state]);
 }
 
-
-void lv_btn_set_style_all(lv_obj_t * btn, lv_style_t ** style_array)
-{
-    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    memcpy(ext->styles, style_array, sizeof(ext->styles));
-
-    lv_obj_set_style(btn, ext->styles[ext->state]);
-}
 
 /*=====================
  * Getter functions 

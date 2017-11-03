@@ -37,7 +37,7 @@ typedef struct
     int16_t act_value;              /*Current value of the bar*/
     int16_t min_value;              /*Minimum value of the bar*/
     int16_t max_value;              /*Maximum value of the bar*/
-    lv_style_t *indicator_style;    /*Style of the indicator*/
+    lv_style_t *style_inicator;    /*Style of the indicator*/
 }lv_bar_ext_t;
 
 /**********************
@@ -83,12 +83,14 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time);
  */
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
 
+
 /**
- * Set the style of bar indicator
+ * Set the styles of a bar
  * @param bar pointer to a bar object
- * @param style pointer to a style
+ * @param bg pointer to the background's style
+ * @param indic pointer to the indicator's style
  */
-void lv_bar_set_indicator_style(lv_obj_t * bar, lv_style_t * style);
+void lv_bar_set_styles(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic);
 
 /**
  * Get the value of a bar
@@ -116,7 +118,21 @@ int16_t lv_bar_get_max_value(lv_obj_t * bar);
  * @param bar pointer to a bar object
  * @return pointer to the bar indicator style
  */
-lv_style_t * lv_bar_get_indicator_style(lv_obj_t * bar);
+lv_style_t * lv_bar_get_style_indicator(lv_obj_t * bar);
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+ * Get the style of bar background
+ * @param bar pointer to a bar object
+ * @return pointer to the bar's background style
+ */
+static inline lv_style_t * lv_bar_get_style_bg(lv_obj_t *bar)
+{
+    return lv_obj_get_style(bar);
+}
 
 /**********************
  *      MACROS

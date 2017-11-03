@@ -157,8 +157,8 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_cont_layout_t layout)
  * Enable the horizontal or vertical fit.
  * The container size will be set to involve the children horizontally or vertically.
  * @param cont pointer to a container object
- * @param hor_en true: enable the horizontal padding
- * @param ver_en true: enable the vertical padding
+ * @param hor_en true: enable the horizontal fit
+ * @param ver_en true: enable the vertical fit
  */
 void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
 {
@@ -189,9 +189,9 @@ lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont)
 /**
  * Get horizontal fit enable attribute of a container
  * @param cont pointer to a container object
- * @return true: horizontal padding is enabled
+ * @return true: horizontal fit is enabled; false: disabled
  */
-bool lv_cont_get_hor_fit(lv_obj_t * cont)
+bool lv_cont_get_fit_hor(lv_obj_t * cont)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	return ext->hor_fit == 0 ? false : true;
@@ -200,9 +200,9 @@ bool lv_cont_get_hor_fit(lv_obj_t * cont)
 /**
  * Get vertical fit enable attribute of a container
  * @param cont pointer to a container object
- * @return true: vertical padding is enabled
+ * @return true: vertical fit is enabled; false: disabled
  */
-bool lv_cont_get_ver_fit(lv_obj_t * cont)
+bool lv_cont_get_fit_ver(lv_obj_t * cont)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	return ext->ver_fit == 0 ? false : true;

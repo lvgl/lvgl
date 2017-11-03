@@ -48,8 +48,8 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t * styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
-    lv_style_t * style_img;    /*Style of the list element images on buttons*/
+    lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
+    lv_style_t *style_img;    /*Style of the list element images on buttons*/
     uint8_t sb_out   :1;        /*1: Keep space for the scrollbar*/
 }lv_list_ext_t;
 

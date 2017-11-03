@@ -155,7 +155,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             }
         } else if(sign == LV_SIGNAL_STYLE_CHG) {
             lv_style_t * style = lv_obj_get_style(page);
-            if(lv_cont_get_hor_fit(ext->scrl) == false) {
+            if(lv_cont_get_fit_hor(ext->scrl) == false) {
                 lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.hor);
             } else {
                 ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
@@ -177,7 +177,7 @@ bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 (lv_obj_get_width(page) != area_get_width(param) ||
                  lv_obj_get_height(page) != area_get_height(param))) {
 
-                if(lv_cont_get_hor_fit(ext->scrl) == false) {
+                if(lv_cont_get_fit_hor(ext->scrl) == false) {
                     lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.hor);
                 }
 
@@ -228,7 +228,7 @@ bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
         if(sign == LV_SIGNAL_CORD_CHG) {
 
             /*Be sure the width of the scrollable is correct*/
-            if(lv_cont_get_hor_fit(scrl) == false) {
+            if(lv_cont_get_fit_hor(scrl) == false) {
                 lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * page_style->body.padding.hor);
             }
 

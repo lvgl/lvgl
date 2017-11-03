@@ -209,7 +209,7 @@ lv_obj_t * lv_win_add_cbtn(lv_obj_t * win, const char * img_path, lv_action_t re
 	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
 	lv_obj_t * btn = lv_btn_create(ext->btnh, NULL);
-    lv_btn_set_styles(btn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
+    lv_btn_set_style(btn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
 	lv_obj_set_size(btn, ext->cbtn_size, ext->cbtn_size);
 	lv_btn_set_action(btn, LV_BTN_ACTION_RELEASE, rel_action);
 
@@ -276,7 +276,7 @@ void lv_win_set_styles_cbtn(lv_obj_t * win, lv_style_t *  rel, lv_style_t *  pr)
     lv_obj_t * cbtn;
     cbtn = lv_obj_get_child(ext->btnh, NULL);
     while(cbtn != NULL) {
-        lv_btn_set_styles(cbtn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
+        lv_btn_set_style(cbtn, ext->style_cbtn_rel, ext->style_cbtn_pr, NULL, NULL, NULL);
 
         cbtn = lv_obj_get_child(ext->btnh, cbtn);
     }

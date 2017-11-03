@@ -62,7 +62,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
-    ext->cb = NULL;
+    ext->action = NULL;
     ext->tmp_value = ext->bar.min_value;
     ext->style_knob = &lv_style_pretty;
     ext->knob_in = 0;
@@ -78,13 +78,13 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new slider slider*/
     if(copy == NULL) {
         lv_obj_set_click(new_slider, true);
-        lv_slider_set_knob_style(new_slider, ext->style_knob);
+        lv_slider_set_style(new_slider, NULL, NULL, ext->style_knob);
     }
     /*Copy an existing slider*/
     else {
     	lv_slider_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->style_knob = copy_ext->style_knob;
-        ext->cb = copy_ext->cb;
+        ext->action = copy_ext->action;
         ext->knob_in = copy_ext->knob_in;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_slider);
@@ -140,7 +140,7 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
         else if (sign == LV_SIGNAL_RELEASED) {
             ext->tmp_value = lv_bar_get_value(slider);
             lv_bar_set_value(slider, ext->tmp_value);
-            if(ext->cb != NULL) ext->cb(slider);
+            if(ext->action != NULL) ext->action(slider);
         }
         else if(sign == LV_SIGNAL_CORD_CHG) {
             /* The knob size depends on slider size.
@@ -167,10 +167,10 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
             char c = *((char*)param);
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
                 lv_bar_set_value(slider, lv_bar_get_value(slider) + 1);
-                if(ext->cb != NULL) ext->cb(slider);
+                if(ext->action != NULL) ext->action(slider);
             } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
                 lv_bar_set_value(slider, lv_bar_get_value(slider) - 1);
-                if(ext->cb != NULL) ext->cb(slider);
+                if(ext->action != NULL) ext->action(slider);
             }
         }
     }
@@ -185,27 +185,32 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
 /**
  * Set a function which will be called when a new value is set on the slider
  * @param slider pointer to slider object
- * @param cb a callback function
+ * @param action a callback function
  */
-void lv_slider_set_action(lv_obj_t * slider, lv_action_t cb)
+void lv_slider_set_action(lv_obj_t * slider, lv_action_t action)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    ext->cb = cb;
+    ext->action = action;
 }
 
+
 /**
- * Set the style of knob on a slider
- * @param slider pointer to slider object
- * @param style pointer the new knob style
+ * Set the styles of a slider
+ * @param bar pointer to a bar object
+ * @param bg pointer to the background's style (NULL to leave unchanged)
+ * @param indic pointer to the indicator's style (NULL to leave unchanged)
+ * @param knob pointer to the knob's style (NULL to leave unchanged)
  */
-void lv_slider_set_knob_style(lv_obj_t * slider, lv_style_t * style)
+void lv_slider_set_style(lv_obj_t * slider, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob)
 {
-    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    ext->style_knob = style;
+    if(knob != NULL) {
+        lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+        ext->style_knob = knob;
+        slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+        lv_obj_invalidate(slider);
+    }
 
-    slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
-
-    lv_obj_invalidate(slider);
+    lv_bar_set_styles(slider, bg, indic);
 }
 
 /**
@@ -225,24 +230,26 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
  *====================*/
 
 /**
- * Get the slider callback function
+ * Get the slider action function
  * @param slider pointer to slider object
  * @return the callback function
  */
 lv_action_t lv_slider_get_action(lv_obj_t * slider)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    return ext->cb;
+    return ext->action;
 }
+
 /**
- * Get the style of knob on a slider
- * @param slider pointer to slider object
- * @return pointer the new knob style
+ * Set the styles of a slider
+ * @param slider pointer to a bar object
+ * @return pointer to the knob's style
  */
-lv_style_t *  lv_slider_get_style_knob(lv_obj_t * slider)
+lv_style_t * lv_slider_get_style_knob(lv_obj_t * slider)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->style_knob;
+
 }
 
 /**
@@ -282,9 +289,9 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
-        lv_style_t * style_slider = lv_obj_get_style(slider);
+        lv_style_t * style_slider = lv_slider_get_style_bg(slider);
         lv_style_t * style_knob = lv_slider_get_style_knob(slider);
-        lv_style_t * style_indic = lv_bar_get_indicator_style(slider);
+        lv_style_t * style_indic = lv_slider_get_style_indicator(slider);
 
         /*Draw the bar*/
         area_t area_bar;
