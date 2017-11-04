@@ -75,41 +75,28 @@ bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
 /**
  * Set the number of needles
  * @param gauge pointer to gauge object
- * @param num number of needles
+ * @param needle_cnt new count of needles
  * @param colors an array of colors for needles (with 'num' elements)
  */
-void lv_gauge_set_needle_num(lv_obj_t * gauge, uint8_t num, color_t * colors);
+void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, color_t * colors);
 
 /**
  * Set the value of a needle
- * @param gauge pointer to gauge
- * @param needle the id of the needle
+ * @param gauge pointer to a gauge
+ * @param needle_id the id of the needle
  * @param value the new value
  */
-void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle, int16_t value);
+void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value);
 
 /**
- * Set which value is more critical (lower or higher)
+ * Set the scale settings of a gauge
  * @param gauge pointer to a gauge object
- * @param low false: higher / true: lower value is more critical
+ * @param angle angle of the scale (0..360)
+ * @param line_cnt count of scale lines
+ * @param label_cnt count of scale labels
  */
-void lv_gauge_set_low_critical(lv_obj_t * gauge, bool low);
+void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt);
 
-/**
- * Set the critical style of the gauge
- * @param gauge pointer to a gauge object
- * @param style pointer to the new critical style
- */
-void lv_gauge_set_style_critical(lv_obj_t * gauge, lv_style_t * style);
-
-/**
- * Get the number of needles on a gauge
- * @param gauge pointer to gauge
- * @return number of needles
- */
-uint8_t lv_gauge_get_needle_count(lv_obj_t * gauge);
-
-uint8_t lv_gauge_get_label_count(lv_obj_t * gauge);
 /**
  * Get the value of a needle
  * @param gauge pointer to gauge object
@@ -119,18 +106,74 @@ uint8_t lv_gauge_get_label_count(lv_obj_t * gauge);
 int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
 
 /**
- * Get which value is more critical (lower or higher)
- * @param gauge pointer to a gauge object
- * @param low false: higher / true: lower value is more critical
+ * Get the count of needles on a gauge
+ * @param gauge pointer to gauge
+ * @return count of needles
  */
-bool lv_gauge_get_low_critical(lv_obj_t * gauge);
+uint8_t lv_gauge_get_needle_count(lv_obj_t * gauge);
 
 /**
- * Get the critical style of the gauge
+ * Set the number of labels (and the thicker lines too)
  * @param gauge pointer to a gauge object
- * @return pointer to the critical style
+ * @return count of labels
  */
-lv_style_t * lv_gauge_get_style_critical(lv_obj_t * gauge);
+uint8_t lv_gauge_get_label_count(lv_obj_t * gauge);
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+ * Set minimum and the maximum values of a gauge
+ * @param gauge pointer to he gauge object
+ * @param min minimum value
+ * @param max maximum value
+ */
+static inline void lv_gauge_set_range(lv_obj_t *gauge, int16_t min, int16_t max)
+{
+    lv_lmeter_set_range(gauge, min, max);
+}
+
+/**
+ * Get the minimum value of a gauge
+ * @param gauge pointer to a gauge object
+ * @return the minimum value of the gauge
+ */
+static inline int16_t lv_gauge_get_min_value(lv_obj_t * lmeter)
+{
+    return lv_lmeter_get_min_value(lmeter);
+}
+
+/**
+ * Get the maximum value of a gauge
+ * @param gauge pointer to a gauge object
+ * @return the maximum value of the gauge
+ */
+static inline int16_t lv_gauge_get_max_value(lv_obj_t * lmeter)
+{
+    return lv_lmeter_get_max_value(lmeter);
+}
+
+
+/**
+ * Get the scale number of a gauge
+ * @param gauge pointer to a gauge object
+ * @return number of the scale units
+ */
+static inline uint8_t lv_gauge_get_line_count(lv_obj_t * gauge)
+{
+    return lv_lmeter_get_line_count(gauge);
+}
+
+/**
+ * Get the scale angle of a gauge
+ * @param gauge pointer to a gauge object
+ * @return angle of the scale
+ */
+static inline uint16_t lv_gauge_get_scale_angle(lv_obj_t * gauge)
+{
+    return lv_lmeter_get_scale_angle(gauge);
+}
 
 /**********************
  *      MACROS

@@ -134,6 +134,14 @@ typedef struct __LV_OBJ_T
 #endif
 }lv_obj_t;
 
+typedef enum
+{
+    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
+    LV_RES_OK,           /*The object is valid (no deleted) after the action*/
+}lv_res_t;
+
+typedef lv_res_t (*lv_action_t) (struct __LV_OBJ_T * obj);
+
 /*Protect some attributes (max. 8 bit)*/
 typedef enum
 {

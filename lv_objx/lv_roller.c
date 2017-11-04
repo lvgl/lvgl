@@ -71,14 +71,14 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_obj_set_drag(scrl, true);                    /*In ddlist is might be disabled*/
-        lv_page_set_rel_action(new_roller, NULL);       /*Handle roller specific actions*/
+        lv_page_set_release_action(new_roller, NULL);       /*Handle roller specific actions*/
         lv_cont_set_fit(lv_page_get_scrl(new_roller), true, false); /*Height is specified directly*/
         lv_obj_set_signal_func(scrl, roller_scrl_signal);
         lv_ddlist_open(new_roller, false);
 
         lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
         lv_ddlist_set_fix_height(new_roller, (font_get_height(style_label->text.font)  >> FONT_ANTIALIAS) * 3
-                                      + style_label->text.space_line * 4);
+                                      + style_label->text.line_space * 4);
         lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/
     }
     /*Copy an existing roller*/
@@ -191,8 +191,8 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
         cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
         area_t rect_area;
-        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.space_line - 2;
-        rect_area.y2 = rect_area.y1 + font_h + style->text.space_line;
+        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space - 2;
+        rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
         rect_area.x1 = ext->ddlist.options_label->coords.x1 - style->body.padding.hor;
         rect_area.x2 = rect_area.x1 + lv_obj_get_width(lv_page_get_scrl(roller));
 
@@ -233,7 +233,7 @@ static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * 
         if(sign == LV_SIGNAL_DRAG_END) {
             /*If dragged then align the list to there be an element in the middle*/
             cord_t label_y1 = ext->ddlist.options_label->coords.y1 - roller->coords.y1;
-            cord_t label_unit = (font_get_height(style_label->text.font) >> FONT_ANTIALIAS) + style_label->text.space_line / 2;
+            cord_t label_unit = (font_get_height(style_label->text.font) >> FONT_ANTIALIAS) + style_label->text.line_space / 2;
             cord_t mid = (roller->coords.y2 - roller->coords.y1) / 2;
             id = (mid - label_y1) / label_unit;
             if(id < 0) id = 0;
@@ -246,7 +246,7 @@ static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * 
                 point_t p;
                 lv_indev_get_point(indev, &p);
                 p.y = p.y - ext->ddlist.options_label->coords.y1;
-                id = p.y / (font_h + style_label->text.space_line);
+                id = p.y / (font_h + style_label->text.line_space);
                 if(id < 0) id = 0;
                 if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
                 ext->ddlist.selected_option_id = id;
@@ -256,7 +256,7 @@ static bool roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * 
         /*Position the scrollable according to the new selected option*/
         if(id != -1) {
             cord_t h = lv_obj_get_height(roller);
-            cord_t line_y1 = id * (font_h + style_label->text.space_line) + ext->ddlist.options_label->coords.y1 - roller_scrl->coords.y1;
+            cord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.options_label->coords.y1 - roller_scrl->coords.y1;
             cord_t new_y = - line_y1 + (h - font_h) / 2;
 
             if(ext->ddlist.anim_time == 0) {

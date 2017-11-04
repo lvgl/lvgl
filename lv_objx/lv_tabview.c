@@ -24,10 +24,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if 0 /*Unused*/
-static bool lv_tab_design(lv_obj_t * tab, const area_t * mask, lv_design_mode_t mode);
-#endif
-
 static bool tabpage_signal(lv_obj_t * tab_page, lv_signal_t sign, void * param);
 static bool tabscrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void * param);
 
@@ -39,6 +35,8 @@ static lv_res_t tab_btnm_action(lv_obj_t * tab_btnm, const char * tab_name);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t ancestor_signal;
+static lv_signal_func_t page_signal;
 static lv_signal_func_t page_scrl_signal;
 static const char * tab_def[] = {""};
 /**********************
@@ -64,6 +62,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor of tab*/
     lv_obj_t * new_tabview = lv_obj_create(par, copy);
     dm_assert(new_tabview);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_tabview);
     
     /*Allocate the tab type specific extended data*/
     lv_tabview_ext_t * ext = lv_obj_allocate_ext_attr(new_tabview, sizeof(lv_tabview_ext_t));
@@ -99,7 +98,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
         lv_btnm_set_toggle(ext->tabs, true, 0);
 
         ext->indic = lv_obj_create(ext->tabs, NULL);
-        lv_style_t * style_indic = lv_obj_get_style(ext->indic);
         lv_obj_set_size(ext->indic, LV_DPI, LV_DPI / 10);
         lv_obj_align(ext->indic, ext->tabs, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
         lv_obj_set_click(ext->indic, false);
@@ -151,7 +149,7 @@ bool lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_obj_signal(tabview, sign, param);
+    valid = ancestor_signal(tabview, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -192,9 +190,11 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(tabview) - lv_obj_get_height(ext->tabs));
     lv_obj_set_style(h, &lv_style_transp_fit);
     lv_obj_set_style(lv_page_get_scrl(h), &lv_style_transp_fit);
-    lv_obj_set_signal_func(h, tabpage_signal);
     lv_page_set_sb_mode(h, LV_PAGE_SB_MODE_AUTO);
+
+    if(page_signal == NULL) page_signal = lv_obj_get_signal_func(h);
     if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(h));
+    lv_obj_set_signal_func(h, tabpage_signal);
     lv_obj_set_signal_func(lv_page_get_scrl(h), tabscrl_signal);
 
     /*Extend the button matrix map with the new name*/
@@ -483,7 +483,7 @@ static bool tabpage_signal(lv_obj_t * tab_page, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_page_signal(tab_page, sign, param);
+    valid = page_signal(tab_page, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */

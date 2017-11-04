@@ -117,7 +117,7 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
         int16_t tmp;
 
         if(sign == LV_SIGNAL_PRESSED) {
-            ext->tmp_value = lv_bar_get_value(slider);
+            ext->tmp_value = lv_slider_get_value(slider);
         }
         else if(sign == LV_SIGNAL_PRESSING) {
             lv_indev_get_point(param, &p);
@@ -132,14 +132,14 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
                 tmp = ext->bar.max_value - tmp;     /*Invert he value: small value means higher y*/
             }
 
-            lv_bar_set_value(slider, tmp);
+            lv_slider_set_value(slider, tmp);
         }
         else if (sign == LV_SIGNAL_PRESS_LOST) {
-            lv_bar_set_value(slider, ext->tmp_value);
+            lv_slider_set_value(slider, ext->tmp_value);
         }
         else if (sign == LV_SIGNAL_RELEASED) {
-            ext->tmp_value = lv_bar_get_value(slider);
-            lv_bar_set_value(slider, ext->tmp_value);
+            ext->tmp_value = lv_slider_get_value(slider);
+            lv_slider_set_value(slider, ext->tmp_value);
             if(ext->action != NULL) ext->action(slider);
         }
         else if(sign == LV_SIGNAL_CORD_CHG) {
@@ -166,10 +166,10 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
             lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
             char c = *((char*)param);
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
-                lv_bar_set_value(slider, lv_bar_get_value(slider) + 1);
+                lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
                 if(ext->action != NULL) ext->action(slider);
             } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
-                lv_bar_set_value(slider, lv_bar_get_value(slider) - 1);
+                lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
                 if(ext->action != NULL) ext->action(slider);
             }
         }
@@ -196,7 +196,7 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t action)
 
 /**
  * Set the styles of a slider
- * @param bar pointer to a bar object
+ * @param slider pointer to a slider object
  * @param bg pointer to the background's style (NULL to leave unchanged)
  * @param indic pointer to the indicator's style (NULL to leave unchanged)
  * @param knob pointer to the knob's style (NULL to leave unchanged)
@@ -210,7 +210,7 @@ void lv_slider_set_style(lv_obj_t * slider, lv_style_t *bg, lv_style_t *indic, l
         lv_obj_invalidate(slider);
     }
 
-    lv_bar_set_styles(slider, bg, indic);
+    lv_bar_set_style(slider, bg, indic);
 }
 
 /**
@@ -242,7 +242,7 @@ lv_action_t lv_slider_get_action(lv_obj_t * slider)
 
 /**
  * Set the styles of a slider
- * @param slider pointer to a bar object
+ * @param slider pointer to a slider object
  * @return pointer to the knob's style
  */
 lv_style_t * lv_slider_get_style_knob(lv_obj_t * slider)
@@ -334,9 +334,9 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         cord_t slider_w = area_get_width(&slider->coords);
         cord_t slider_h = area_get_height(&slider->coords);
 
-        cord_t act_value = lv_bar_get_value(slider);
-        cord_t min_value = lv_bar_get_min_value(slider);
-        cord_t max_value = lv_bar_get_max_value(slider);
+        cord_t act_value = lv_slider_get_value(slider);
+        cord_t min_value = lv_slider_get_min_value(slider);
+        cord_t max_value = lv_slider_get_max_value(slider);
 
         if(slider_w >= slider_h) {
             area_indic.x2 = (int32_t) ((int32_t)area_get_width(&area_indic) * act_value) / (max_value - min_value);

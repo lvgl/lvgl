@@ -11,7 +11,6 @@
 
 #include "lv_list.h"
 #include "../lv_obj/lv_group.h"
-#include "lv_cont.h"
 #include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 
@@ -39,6 +38,10 @@ static lv_obj_t * lv_list_get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t btn_signal;
+static lv_signal_func_t img_signal;
+static lv_signal_func_t label_signal;
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -63,10 +66,11 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor basic object*/
     lv_obj_t * new_list = lv_page_create(par, copy);
     dm_assert(new_list);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_list);
+
     lv_list_ext_t * ext = lv_obj_allocate_ext_attr(new_list, sizeof(lv_list_ext_t));
     dm_assert(ext);
 
-    ext->sb_out = 0;
     ext->style_img = NULL;
     ext->styles_btn[LV_BTN_STATE_RELEASED] = &lv_style_btn_off_released;
     ext->styles_btn[LV_BTN_STATE_PRESSED] = &lv_style_btn_off_pressed;
@@ -79,21 +83,17 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new list object*/
     if(copy == NULL) {
     	lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
-		lv_cont_set_layout(ext->page.scrl, LV_LIST_LAYOUT_DEF);
-		lv_obj_set_style(new_list, &lv_style_transp_fit);
-		lv_obj_set_style(lv_page_get_scrl(new_list), &lv_style_pretty);
-		lv_page_set_sb_mode(new_list, LV_PAGE_SB_MODE_AUTO);
+		lv_page_set_scrl_layout(new_list, LV_LIST_LAYOUT_DEF);
+		lv_list_set_style_bg(new_list, &lv_style_transp_fit, &lv_style_pretty, NULL);
+		lv_page_set_sb_mode(new_list, LV_PAGE_SB_MODE_DRAG);
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
-        lv_list_set_btn_styles(new_list, copy_ext->styles_btn[LV_BTN_STATE_RELEASED],
+        lv_list_set_style_btn(new_list, copy_ext->styles_btn[LV_BTN_STATE_RELEASED],
                                          copy_ext->styles_btn[LV_BTN_STATE_PRESSED],
                                          copy_ext->styles_btn[LV_BTN_STATE_TGL_RELEASED],
                                          copy_ext->styles_btn[LV_BTN_STATE_TGL_PRESSED],
                                          copy_ext->styles_btn[LV_BTN_STATE_INACTIVE]);
-        lv_list_set_style_img(new_list, copy_ext->style_img);
-
-        lv_list_set_sb_out(new_list, copy_ext->sb_out);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_list);
@@ -113,7 +113,7 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_page_signal(list, sign, param);
+    valid = ancestor_signal(list, sign, param);
     
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -219,8 +219,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 
 	lv_btn_set_action(liste, LV_BTN_ACTION_RELEASE, rel_action);
 	lv_page_glue_obj(liste, true);
-	lv_cont_set_layout(liste, LV_CONT_LAYOUT_ROW_M);
-	lv_cont_set_fit(liste, false, true);
+	lv_btn_set_layout(liste, LV_CONT_LAYOUT_ROW_M);
+	lv_btn_set_fit(liste, false, true);
+    if(btn_signal == NULL) btn_signal = lv_obj_get_signal_func(liste);
 
     /*Make the size adjustment*/
     cord_t w = lv_obj_get_width(list);
@@ -228,10 +229,6 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     cord_t pad_hor_tot = style->body.padding.hor + style_scrl->body.padding.hor;
     w -= pad_hor_tot * 2;
 
-    /*Make place for the scrollbar if pad_hor_tot is too small*/
-    if(ext->sb_out != 0) {
-        if(pad_hor_tot < ext->page.sb_width) w -= ext->page.sb_width - pad_hor_tot;
-    }
     lv_obj_set_width(liste, w);
 #if USE_LV_IMG != 0 && USE_FSINT != 0
 	if(img_fn != NULL && img_fn[0] != '\0') {
@@ -239,6 +236,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 		lv_img_set_file(img, img_fn);
 		lv_obj_set_style(img, ext->style_img);
 		lv_obj_set_click(img, false);
+		if(img_signal == NULL) img_signal = lv_obj_get_signal_func(img);
 	}
 #endif
 	if(txt != NULL) {
@@ -247,7 +245,10 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 		lv_obj_set_click(label, false);
         lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
 		lv_obj_set_width(label, liste->coords.x2 - label->coords.x1);
+        if(label_signal == NULL) label_signal = lv_obj_get_signal_func(label);
 	}
+
+
 
 	return liste;
 }
@@ -337,67 +338,31 @@ void lv_list_down(lv_obj_t * list)
  *====================*/
 
 /**
- * Enable/Disable to scrollbar outside attribute
- * @param list pointer to list object
- * @param out true: reduce the buttons width therefore scroll bar will be out of the buttons,
- *            false: keep button size and place scroll bar on the buttons
- */
-void lv_list_set_sb_out(lv_obj_t * list, bool out)
-{
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-
-    ext->sb_out = out == false ? 0 : 1;
-}
-
-
-/**
  * Set styles of the list elements of a list in each state
  * @param list pointer to list object
  * @param rel pointer to a style for releases state
  * @param pr  pointer to a style for pressed state
- * @param trel pointer to a style for toggled releases state
- * @param tpr pointer to a style for toggled pressed state
+ * @param tgl_rel pointer to a style for toggled releases state
+ * @param tgl_pr pointer to a style for toggled pressed state
  * @param ina pointer to a style for inactive state
  */
-void lv_list_set_btn_styles(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
-                                               lv_style_t * trel, lv_style_t * tpr,
+void lv_list_set_style_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
+                                               lv_style_t * tgl_rel, lv_style_t * tgl_pr,
                                                lv_style_t * ina)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
-    ext->styles_btn[LV_BTN_STATE_RELEASED] = rel;
-    ext->styles_btn[LV_BTN_STATE_PRESSED] = pr;
-    ext->styles_btn[LV_BTN_STATE_TGL_RELEASED] = trel;
-    ext->styles_btn[LV_BTN_STATE_TGL_PRESSED] = tpr;
-    ext->styles_btn[LV_BTN_STATE_INACTIVE] = ina;
+    if(rel != NULL) ext->styles_btn[LV_BTN_STATE_RELEASED] = rel;
+    if(pr != NULL) ext->styles_btn[LV_BTN_STATE_PRESSED] = pr;
+    if(tgl_rel != NULL) ext->styles_btn[LV_BTN_STATE_TGL_RELEASED] = tgl_rel;
+    if(tgl_pr != NULL) ext->styles_btn[LV_BTN_STATE_TGL_PRESSED] = tgl_pr;
+    if(ina != NULL) ext->styles_btn[LV_BTN_STATE_INACTIVE] = ina;
 
+    /*Refresh all existing buttons*/
     lv_obj_t * liste = lv_list_get_next_btn(list, NULL);
     while(liste != NULL)
     {
-        lv_btn_set_style(liste, rel, pr, trel, tpr, ina);
-        liste = lv_list_get_next_btn(list, liste);
-    }
-}
-
-
-/**
- * Set the styles of the list element image (typically to set symbol font)
- * @param list pointer to list object
- * @param style pointer to the new style of the button images
- */
-void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style)
-{
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-
-    ext->style_img = style;
-
-    lv_obj_t * liste = lv_list_get_next_btn(list, NULL);
-    lv_obj_t * img;
-    while(liste != NULL)
-    {
-        img = lv_list_get_element_img(liste);
-        if(img != NULL) lv_obj_set_style(img, style);
-
+        lv_btn_set_style(liste, rel, pr, tgl_rel, tgl_pr, ina);
         liste = lv_list_get_next_btn(list, liste);
     }
 }
@@ -411,9 +376,9 @@ void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style)
  * @param liste pointer to list element
  * @return pointer to the text
  */
-const char * lv_list_get_element_text(lv_obj_t * liste)
+const char * lv_list_get_btn_text(lv_obj_t * liste)
 {
-    lv_obj_t * label = lv_list_get_element_label(liste);
+    lv_obj_t * label = lv_list_get_btn_label(liste);
     if(label == NULL) return "";
     return lv_label_get_text(label);
 }
@@ -423,12 +388,12 @@ const char * lv_list_get_element_text(lv_obj_t * liste)
  * @param liste pointer to a list element (button)
  * @return pointer to the label from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_element_label(lv_obj_t * liste)
+lv_obj_t * lv_list_get_btn_label(lv_obj_t * liste)
 {
     lv_obj_t * label = lv_obj_get_child(liste, NULL);
     if(label == NULL) return NULL;
 
-    while(label->signal_func != lv_label_signal) {
+    while(label->signal_func != label_signal) {
         label = lv_obj_get_child(liste, label);
         if(label == NULL) break;
     }
@@ -441,13 +406,13 @@ lv_obj_t * lv_list_get_element_label(lv_obj_t * liste)
  * @param liste pointer to a list element (button)
  * @return pointer to the image from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_element_img(lv_obj_t * liste)
+lv_obj_t * lv_list_get_btn_img(lv_obj_t * liste)
 {
 #if USE_LV_IMG != 0 && USE_FSINT != 0
     lv_obj_t * img = lv_obj_get_child(liste, NULL);
     if(img == NULL) return NULL;
 
-    while(img->signal_func != lv_img_signal) {
+    while(img->signal_func != img_signal) {
         img = lv_obj_get_child(liste, img);
         if(img == NULL) break;
     }
@@ -459,23 +424,12 @@ lv_obj_t * lv_list_get_element_img(lv_obj_t * liste)
 }
 
 /**
- * Get the scroll bar outside attribute
- * @param list pointer to list object
- * @param en true: scroll bar outside the buttons, false: scroll bar inside
- */
-bool lv_list_get_sb_out(lv_obj_t * list, bool en)
-{
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-    return ext->sb_out == 0 ? false : true;
-}
-
-/**
  * Get the style of the list elements in a given state
  * @param list pointer to a list object
  * @param state a state from 'lv_btn_state_t' in which style should be get
  * @return pointer to the style in the given state
  */
-lv_style_t * lv_list_get_style_liste(lv_obj_t * list, lv_btn_state_t state)
+lv_style_t * lv_list_get_style_btn(lv_obj_t * list, lv_btn_state_t state)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
@@ -484,48 +438,9 @@ lv_style_t * lv_list_get_style_liste(lv_obj_t * list, lv_btn_state_t state)
     return ext->styles_btn[state];
 }
 
-
-/**
- * Get the style of the list elements images
- * @param list pointer to a list object
- * @return pointer to the image style
- */
-lv_style_t * lv_list_get_style_img(lv_obj_t * list, lv_btn_state_t state)
-{
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-
-    if(ext->style_img == NULL) return lv_list_get_style_liste(list, LV_BTN_STATE_RELEASED);
-
-    return ext->style_img;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-#if 0 /*A new design function is not necessary*/
-/**
- * Handle the drawing related tasks of the lists
- * @param list pointer to an object
- * @param mask the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
- */
-static bool lv_list_design(lv_obj_t * list, const area_t * mask, lv_design_mode_t mode)
-{
-    if(mode == LV_DESIGN_COVER_CHK) {
-    	/*Return false if the object is not covers the mask_p area*/
-    	return false;
-    }
-
-    /*Draw the object*/
-
-    return true;
-}
-#endif
 
 /**
  * Get the next button from list
@@ -544,7 +459,7 @@ static lv_obj_t * lv_list_get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn)
     btn = lv_obj_get_child(scrl, prev_btn);
     if(btn == NULL) return NULL;
 
-    while(btn->signal_func != lv_btn_signal) {
+    while(btn->signal_func != btn_signal) {
         btn = lv_obj_get_child(scrl, prev_btn);
         if(btn == NULL) break;
     }

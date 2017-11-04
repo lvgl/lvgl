@@ -120,7 +120,7 @@ void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
  * @param tgl_pr_style pointer to a style for toggled pressed state
  * @param inactive_style pointer to a style for inactive state
  */
-void lv_btnm_set_style(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
+void lv_btnm_set_style_btn(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
                                        lv_style_t *tgl_rel, lv_style_t *tgl_pr,
                                        lv_style_t *ina);
 /**
@@ -143,7 +143,32 @@ lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm);
  * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
  * @return pointer the button style in the given state
  */
-lv_style_t * lv_btnm_get_button_style(lv_obj_t * btnm, lv_btn_state_t state);
+lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state);
+
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+ * Set the style of a button matrix's background
+ * @param btnm pointer to a button matrix object
+ * @param bg pointer to the background style
+ */
+static inline void lv_btnm_set_style_bg(lv_obj_t *btnm, lv_style_t * bg)
+{
+    lv_obj_set_style(btnm, bg);
+}
+
+/**
+ * Get the style of a button matrix
+ * @param btnm pointer to a button matrix object
+ * @return pointer to the backgrond style
+ */
+static inline lv_style_t * lv_btnm_get_style_bg(lv_obj_t *btnm)
+{
+    return lv_obj_get_style(btnm);
+}
 
 /**********************
  *      MACROS

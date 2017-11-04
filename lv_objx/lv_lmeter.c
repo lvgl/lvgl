@@ -51,7 +51,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
 lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor of line meter*/
-    lv_obj_t * new_lmeter = lv_bar_create(par, copy);
+    lv_obj_t * new_lmeter = lv_obj_create(par, copy);
     dm_assert(new_lmeter);
     
     /*Allocate the line meter type specific extended data*/
@@ -59,7 +59,10 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
-    ext->scale_num = 31;    /*Odd scale number looks better*/
+    ext->min_value = 0;
+    ext->max_value = 100;
+    ext->cur_value = 0;
+    ext->line_cnt = 31;    /*Odd scale number looks better*/
     ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
 
     /*The signal and design functions are not copied so set them here*/
@@ -75,8 +78,10 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
     else {
     	lv_lmeter_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->scale_angle = copy_ext->scale_angle;
-        ext->scale_num = copy_ext->scale_num;
-
+        ext->line_cnt = copy_ext->line_cnt;
+        ext->min_value = copy_ext->min_value;
+        ext->max_value = copy_ext->max_value;
+        ext->cur_value = copy_ext->cur_value;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_lmeter);
@@ -97,7 +102,7 @@ bool lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_bar_signal(lmeter, sign, param);
+    valid = lv_obj_signal(lmeter, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
@@ -115,16 +120,51 @@ bool lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param)
  *====================*/
 
 /**
+ * Set a new value on the line meter
+ * @param lmeter pointer to a line meter object
+ * @param value new value
+ */
+void lv_lmeter_set_value(lv_obj_t *lmeter, int16_t value)
+{
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    ext->cur_value = value > ext->max_value ? ext->max_value : value;
+    ext->cur_value = ext->cur_value < ext->min_value ? ext->min_value : ext->cur_value;
+    lv_obj_invalidate(lmeter);
+}
+
+/**
+ * Set minimum and the maximum values of a line meter
+ * @param lmeter pointer to he line meter object
+ * @param min minimum value
+ * @param max maximum value
+ */
+void lv_lmeter_set_range(lv_obj_t *lmeter, int16_t min, int16_t max)
+{
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    ext->max_value = max;
+    ext->min_value = min;
+    if(ext->cur_value > max) {
+        ext->cur_value = max;
+        lv_lmeter_set_value(lmeter, ext->cur_value);
+    }
+    if(ext->cur_value < min) {
+        ext->cur_value = min;
+        lv_lmeter_set_value(lmeter, ext->cur_value);
+    }
+    lv_obj_invalidate(lmeter);
+}
+
+/**
  * Set the scale settings of a line meter
  * @param lmeter pointer to a line meter object
  * @param angle angle of the scale (0..360)
- * @param num number of scale units
+ * @param line_cnt number of lines
  */
-void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t num)
+void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     ext->scale_angle = angle;
-    ext->scale_num = num;
+    ext->line_cnt = line_cnt;
 
     lv_obj_invalidate(lmeter);
 }
@@ -135,14 +175,47 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t num)
  *====================*/
 
 /**
+ * Get the value of a line meter
+ * @param lmeter pointer to a line meter object
+ * @return the value of the line meter
+ */
+int16_t lv_lmeter_get_value(lv_obj_t *lmeter)
+{
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    return ext->cur_value;
+}
+
+/**
+ * Get the minimum value of a line meter
+ * @param lmeter pointer to a line meter object
+ * @return the minimum value of the line meter
+ */
+int16_t lv_lmeter_get_min_value(lv_obj_t * lmeter)
+{
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    return ext->min_value;
+}
+
+/**
+ * Get the maximum value of a line meter
+ * @param lmeter pointer to a line meter object
+ * @return the maximum value of the line meter
+ */
+int16_t lv_lmeter_get_max_value(lv_obj_t * lmeter)
+{
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    return ext->max_value;
+}
+
+/**
  * Get the scale number of a line meter
  * @param lmeter pointer to a line meter object
  * @return number of the scale units
  */
-uint8_t lv_lmeter_get_scale_num(lv_obj_t * lmeter)
+uint8_t lv_lmeter_get_line_count(lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    return ext->scale_num ;
+    return ext->line_cnt ;
 }
 
 /**
@@ -190,16 +263,14 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
          cord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
          cord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
          int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;
-         int16_t min = lv_bar_get_min_value(lmeter);
-         int16_t max = lv_bar_get_max_value(lmeter);
-         int16_t level = (int32_t)((int32_t)(lv_bar_get_value(lmeter) - min) * ext->scale_num) / (max - min);
+         int16_t level = (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
          uint8_t i;
 
          style_tmp.line.color = style->body.color_main;
 
-         for(i = 0; i < ext->scale_num; i++) {
+         for(i = 0; i < ext->line_cnt; i++) {
              /*Calculate the position a scale label*/
-             int16_t angle = (i * ext->scale_angle) / (ext->scale_num - 1) + angle_ofs;
+             int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
 
              cord_t y_out = (int32_t)((int32_t)trigo_sin(angle) * r_out) / TRIGO_SIN_MAX;
              cord_t x_out = (int32_t)((int32_t)trigo_sin(angle + 90) * r_out) / TRIGO_SIN_MAX;
@@ -217,7 +288,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
 
              if(i > level) style_tmp.line.color = style->line.color;
              else {
-                 style_tmp.line.color = color_mix(style->body.color_gradient, style->body.color_main, (255 * i) /  ext->scale_num);
+                 style_tmp.line.color = color_mix(style->body.color_gradient, style->body.color_main, (255 * i) /  ext->line_cnt);
              }
 
              lv_draw_line(&p1, &p2, mask, &style_tmp);

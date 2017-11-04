@@ -63,7 +63,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
     ext->min_value = 0;
     ext->max_value = 100;
-    ext->act_value = 0;
+    ext->cur_value = 0;
     ext->style_inicator = &lv_style_pretty_color;
 
     /* Save the ancient design function.
@@ -78,17 +78,17 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_click(new_bar, false);
     	lv_obj_set_size(new_bar, LV_DPI * 2, LV_DPI / 3);
         lv_obj_set_style(new_bar, &lv_style_pretty);
-    	lv_bar_set_value(new_bar, ext->act_value);
+    	lv_bar_set_value(new_bar, ext->cur_value);
     } else {
     	lv_bar_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
-		ext->act_value = ext_copy->act_value;
+		ext->cur_value = ext_copy->cur_value;
         ext->style_inicator = ext_copy->style_inicator;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_bar);
 
-        lv_bar_set_value(new_bar, ext->act_value);
+        lv_bar_set_value(new_bar, ext->cur_value);
     }
     return new_bar;
 }
@@ -131,8 +131,8 @@ bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
 void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 {
 	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-	ext->act_value = value > ext->max_value ? ext->max_value : value;
-    ext->act_value = ext->act_value < ext->min_value ? ext->min_value : ext->act_value;
+	ext->cur_value = value > ext->max_value ? ext->max_value : value;
+    ext->cur_value = ext->cur_value < ext->min_value ? ext->min_value : ext->cur_value;
 	lv_obj_invalidate(bar);
 }
 
@@ -152,7 +152,7 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
 
     anim_t a;
     a.var = bar;
-    a.start = ext->act_value;
+    a.start = ext->cur_value;
     a.end = new_value;
     a.fp = (anim_fp_t)lv_bar_set_value;
     a.path = anim_get_path(ANIM_PATH_LIN);
@@ -180,13 +180,13 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 	ext->max_value = max;
 	ext->min_value = min;
-	if(ext->act_value > max) {
-		ext->act_value = max;
-		lv_bar_set_value(bar, ext->act_value);
+	if(ext->cur_value > max) {
+		ext->cur_value = max;
+		lv_bar_set_value(bar, ext->cur_value);
 	}
-    if(ext->act_value < min) {
-        ext->act_value = min;
-        lv_bar_set_value(bar, ext->act_value);
+    if(ext->cur_value < min) {
+        ext->cur_value = min;
+        lv_bar_set_value(bar, ext->cur_value);
     }
 	lv_obj_invalidate(bar);
 }
@@ -197,7 +197,7 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
  * @param bg pointer to the background's style (NULL to leave unchanged)
  * @param indic pointer to the indicator's style (NULL to leave unchanged)
  */
-void lv_bar_set_styles(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic)
+void lv_bar_set_style(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
@@ -223,7 +223,7 @@ void lv_bar_set_styles(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic)
 int16_t lv_bar_get_value(lv_obj_t * bar)
 {
 	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-	return ext->act_value;
+	return ext->cur_value;
 }
 
 /**
@@ -298,10 +298,10 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
         cord_t h = area_get_height(&indic_area);
 
 		if(w >= h) {
-		    indic_area.x2 = (int32_t) ((int32_t)w * (ext->act_value - ext->min_value)) / (ext->max_value - ext->min_value);
+		    indic_area.x2 = (int32_t) ((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
             indic_area.x2 += indic_area.x1;
 		} else {
-		    indic_area.y1 = (int32_t) ((int32_t)h * (ext->act_value - ext->min_value)) / (ext->max_value - ext->min_value);
+		    indic_area.y1 = (int32_t) ((int32_t)h * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
             indic_area.y1 = indic_area.y2 - indic_area.y1;
 		}
 

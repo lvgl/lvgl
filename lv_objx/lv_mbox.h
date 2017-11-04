@@ -68,15 +68,6 @@ typedef struct
 lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the message box
- * @param mbox pointer to a message box object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
-
-/**
  * A release action which can be assigned to a message box button to close it
  * @param btn pointer to the released button
  * @return always lv_action_res_t because the button is deleted with the mesage box

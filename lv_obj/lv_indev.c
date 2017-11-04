@@ -144,6 +144,7 @@ void lv_indev_get_point(lv_indev_t * indev, point_t * point)
  */
 bool lv_indev_is_dragging(lv_indev_t * indev)
 {
+    if(indev == NULL) return false;
     return indev->state.drag_in_prog == 0 ? false : true;
 }
 

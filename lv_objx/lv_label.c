@@ -466,16 +466,16 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
 
     /*Search the line of the index letter */;
     while (txt[new_line_start] != '\0') {
-        new_line_start += txt_get_next_line(&txt[line_start], font, style->text.space_letter, max_w, flag);
+        new_line_start += txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
         if(index < new_line_start || txt[new_line_start] == '\0') break; /*The line of 'index' letter begins at 'line_start'*/
 
-        y += letter_height + style->text.space_line;
+        y += letter_height + style->text.line_space;
         line_start = new_line_start;
     }
 
     /*If the last character is line break then go to the next line*/
     if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
-        y += letter_height + style->text.space_line;
+        y += letter_height + style->text.line_space;
         line_start = index;
     }
 
@@ -494,13 +494,13 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
                 continue; /*Skip the letter is it is part of a command*/
             }
         }
-        x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.space_letter;
+        x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.letter_space;
 	}
 
 	if(ext->align == LV_LABEL_ALIGN_CENTER) {
 		cord_t line_w;
         line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
-                               font, style->text.space_letter, flag);
+                               font, style->text.letter_space, flag);
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
 
@@ -540,9 +540,9 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
     /*Search the line of the index letter */;
     while (txt[line_start] != '\0') {
-    	new_line_start += txt_get_next_line(&txt[line_start], font, style->text.space_letter, max_w, flag);
-    	if(pos->y <= y + letter_height + style->text.space_line) break; /*The line is found ('line_start')*/
-    	y += letter_height + style->text.space_line;
+    	new_line_start += txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
+    	if(pos->y <= y + letter_height + style->text.line_space) break; /*The line is found ('line_start')*/
+    	y += letter_height + style->text.line_space;
         line_start = new_line_start;
     }
 
@@ -551,7 +551,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 	if(ext->align == LV_LABEL_ALIGN_CENTER) {
 		cord_t line_w;
         line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
-                               font, style->text.space_letter, flag);
+                               font, style->text.letter_space, flag);
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
 
@@ -567,7 +567,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-	    x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.space_letter;
+	    x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.letter_space;
 		if(pos->x < x) break;   /*Get the position*/
 	}
 
@@ -651,7 +651,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
     if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
-    txt_get_size(&size, ext->txt, font, style->text.space_letter, style->text.space_line, max_w, flag);
+    txt_get_size(&size, ext->txt, font, style->text.letter_space, style->text.line_space, max_w, flag);
 
     /*Refresh the full size in expand mode*/
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {

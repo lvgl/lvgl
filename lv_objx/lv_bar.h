@@ -34,7 +34,7 @@ typedef struct
 {
     /*No inherited ext*/            /*Ext. of ancestor*/
     /*New data for this type */
-    int16_t act_value;              /*Current value of the bar*/
+    int16_t cur_value;              /*Current value of the bar*/
     int16_t min_value;              /*Minimum value of the bar*/
     int16_t max_value;              /*Maximum value of the bar*/
     lv_style_t *style_inicator;    /*Style of the indicator*/
@@ -90,7 +90,7 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
  * @param bg pointer to the background's style
  * @param indic pointer to the indicator's style
  */
-void lv_bar_set_styles(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic);
+void lv_bar_set_style(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic);
 
 /**
  * Get the value of a bar

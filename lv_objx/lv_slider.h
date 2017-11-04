@@ -155,7 +155,7 @@ static inline void lv_slider_set_range(lv_obj_t *slider, int16_t min, int16_t ma
  */
 static inline int16_t lv_slider_get_value(lv_obj_t * slider)
 {
-    return lv_slider_get_value(slider);
+    return lv_bar_get_value(slider);
 }
 
 /**
@@ -163,7 +163,7 @@ static inline int16_t lv_slider_get_value(lv_obj_t * slider)
  * @param slider pointer to a slider object
  * @return the minimum value of the slider
  */
-static inline int16_t lv_slider_slider_min_value(lv_obj_t * slider)
+static inline int16_t lv_slider_get_min_value(lv_obj_t * slider)
 {
     return lv_bar_get_min_value(slider);
 }

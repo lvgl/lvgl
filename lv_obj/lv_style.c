@@ -86,14 +86,17 @@ void lv_style_init (void)
     lv_style_scr.body.shadow.type = LV_SHADOW_FULL;
     lv_style_scr.body.shadow.width = 0;
 
+    lv_style_scr.text.opa = OPA_COVER;
     lv_style_scr.text.color = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.text.font = FONT_DEFAULT;
-    lv_style_scr.text.space_letter = 1 << LV_ANTIALIAS;
-    lv_style_scr.text.space_line = 2 << LV_ANTIALIAS;
+    lv_style_scr.text.letter_space = 1 << LV_ANTIALIAS;
+    lv_style_scr.text.line_space = 2 << LV_ANTIALIAS;
 
+    lv_style_scr.image.opa = OPA_COVER;
     lv_style_scr.image.color = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = OPA_TRANSP;
 
+    lv_style_scr.line.opa = OPA_COVER;
     lv_style_scr.line.color = COLOR_MAKE(0x20, 0x20, 0x20);
     lv_style_scr.line.width = 1 << LV_ANTIALIAS;
 
@@ -256,8 +259,8 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
     STYLE_ATTR_ANIM(body.padding.hor, val);
     STYLE_ATTR_ANIM(body.padding.ver, val);
     STYLE_ATTR_ANIM(body.padding.inner, val);
-    STYLE_ATTR_ANIM(text.space_line, val);
-    STYLE_ATTR_ANIM(text.space_letter, val);
+    STYLE_ATTR_ANIM(text.line_space, val);
+    STYLE_ATTR_ANIM(text.letter_space, val);
     STYLE_ATTR_ANIM(line.width, val);
     STYLE_ATTR_ANIM(image.intense, val);
 

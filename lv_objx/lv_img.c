@@ -190,7 +190,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	else {
         lv_style_t * style = lv_obj_get_style(img);
         point_t size;
-        txt_get_size(&size, fn, style->text.font, style->text.space_letter, style->text.space_line, CORD_MAX, TXT_FLAG_NONE);
+        txt_get_size(&size, fn, style->text.font, style->text.letter_space, style->text.line_space, CORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
         ext->transp = 1;    /*Symbols always have transparent parts*/

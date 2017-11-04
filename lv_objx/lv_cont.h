@@ -54,7 +54,6 @@ typedef struct
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Create a container objects
  * @param par pointer to an object, it will be the parent of the new container
@@ -62,14 +61,6 @@ typedef struct
  * @return pointer to the created container
  */
 lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy);
-
-/**
- * Signal function of the container
- * @param cont pointer to a container object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param);
 
 /**
  * Set the layout on a container
@@ -99,14 +90,38 @@ lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont);
  * @param cont pointer to a container object
  * @return true: horizontal fit is enabled; false: disabled
  */
-bool lv_cont_get_fit_hor(lv_obj_t * cont);
+bool lv_cont_get_hor_fit(lv_obj_t * cont);
 
 /**
  * Get vertical fit enable attribute of a button
  * @param btn pointer to a button object
  * @return true: vertical padding is enabled; false: disabled
  */
-bool lv_cont_get_fit_ver(lv_obj_t * cont);
+bool lv_cont_get_ver_fit(lv_obj_t * cont);
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+ * Set the style of a container
+ * @param cont pointer to a container object
+ * @param style pointer to the new style
+ */
+static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
+{
+    lv_obj_set_style(cont, style);
+}
+
+/**
+ * Get the style of a container
+ * @param cont pointer to a container object
+ * @return pointer to the container's style
+ */
+static inline void lv_cont_get_style(lv_obj_t *cont, lv_style_t * style)
+{
+    lv_obj_set_style(cont, style);
+}
 
 /**********************
  *      MACROS

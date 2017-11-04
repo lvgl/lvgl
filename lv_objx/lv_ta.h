@@ -90,7 +90,7 @@ bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
  * @param param pointer to a signal specific variable
  * @return true: the object is still valid (not deleted), false: the object become invalid
  */
-bool lv_ta_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
+bool lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 
 /**
  * Insert a character to the current cursor position
@@ -192,7 +192,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en);
  * @param ta obj pointer to a text area object
  * @return pointer to the text
  */
-const char * lv_ta_get_txt(lv_obj_t * ta);
+const char * lv_ta_get_text(lv_obj_t * ta);
 
 /**
  * Get the label of a text area
@@ -227,7 +227,7 @@ lv_ta_cursor_type_t lv_ta_get_cursor_type(lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return style pointer to the new cursor style
  */
-lv_style_t *  lv_ta_get_cursor_style(lv_obj_t * ta);
+lv_style_t *  lv_ta_get_style_cursor(lv_obj_t * ta);
 
 /**
  * Get the password mode
@@ -235,6 +235,30 @@ lv_style_t *  lv_ta_get_cursor_style(lv_obj_t * ta);
  * @return true: password mode is enabled, false: disabled
  */
 bool lv_ta_get_pwd_mode(lv_obj_t * ta);
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+* Get the style of the text area background
+* @param ta pointer to a text area object
+* @return pointer to the style of the background
+*/
+static inline lv_style_t * lv_ta_get_style_bg(lv_obj_t * ta)
+{
+    return lv_page_get_style_bg(ta);
+}
+
+/**
+* Get the style of the scrollbars of a text area
+* @param ta pointer to a text area object
+* @return pointer to the style of the scrollbars
+*/
+static inline lv_style_t * lv_ta_get_style_scrollbar(lv_obj_t * ta)
+{
+    return lv_page_get_style_sb(ta);
+}
 
 /**********************
  *      MACROS

@@ -49,13 +49,14 @@ typedef struct
     lv_obj_t * scrl;            /*The scrollable object on the background*/
     lv_action_t rel_action;     /*Function to call when the page is released*/
     lv_action_t pr_action;      /*Function to call when the page is pressed*/
-    lv_style_t * style_sb;      /*Style of scrollbars*/
-    cord_t sb_width;            /*Width of the scrollbars*/
-    lv_page_sb_mode_t sb_mode;  /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
-    area_t sbh;                 /*Horizontal scrollbar area relative to the page. (Handled by the library) */
-    area_t sbv;                 /*Vertical scrollbar area relative to the page (Handled by the library)*/
-    uint8_t sbh_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
-    uint8_t sbv_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
+    struct {
+        lv_style_t *style;          /*Style of scrollbars*/
+        area_t hor_area;            /*Horizontal scrollbar area relative to the page. (Handled by the library) */
+        area_t ver_area;            /*Vertical scrollbar area relative to the page (Handled by the library)*/
+        uint8_t hor_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
+        uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
+        uint8_t mode     :3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
+    }sb;
 }lv_page_ext_t;
 
 
@@ -72,41 +73,18 @@ typedef struct
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the page
- * @param page pointer to a page object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
-
-/**
- * Signal function of the scrollable part of a page
- * @param scrl pointer to the scrollable object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
-
-/**
  * Set a release action for the page
  * @param page pointer to a page object
  * @param rel_action a function to call when the page is released
  */
-void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
+void lv_page_set_release_action(lv_obj_t * page, lv_action_t rel_action);
 
 /**
  * Set a press action for the page
  * @param page pointer to a page object
  * @param pr_action a function to call when the page is pressed
  */
-void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
-
-/**
- * Set the scroll bar width on a page
- * @param page pointer to a page object
- * @param sb_width the new scroll bar width in pixels
- */
-void lv_page_set_sb_width(lv_obj_t * page, cord_t sb_width);
+void lv_page_set_press_action(lv_obj_t * page, lv_action_t pr_action);
 
 /**
  * Set the scroll bar mode on a page
@@ -116,12 +94,13 @@ void lv_page_set_sb_width(lv_obj_t * page, cord_t sb_width);
 void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode);
 
 /**
- * Set a new style for the scroll bars object on the page
+ * Set a new styles for the page
  * @param page pointer to a page object
- * @param style pointer to a style for the scroll bars
+ * @param bg pointer to a style for the background
+ * @param scrl pointer to a style for the scrollable area
+ * @param sb pointer to a style for the scroll bars
  */
-void lv_page_set_style_sb(lv_obj_t * page, lv_style_t * style);
-
+void lv_page_set_style(lv_obj_t *page, lv_style_t *bg, lv_style_t *scrl, lv_style_t *sb);
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
  * @param obj pointer to an object on a page
@@ -145,13 +124,6 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time);
 lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
 
 /**
- * Get the scroll bar width on a page
- * @param page pointer to a page object
- * @return the scroll bar width in pixels
- */
-cord_t lv_page_get_sb_width(lv_obj_t * page);
-
-/**
  * Set the scroll bar mode on a page
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb_mode_t' enum
@@ -159,11 +131,127 @@ cord_t lv_page_get_sb_width(lv_obj_t * page);
 lv_page_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
 
 /**
- * Set a new style for the scroll bars object on the page
- * @param page pointer to a page object
- * @return pointer to a style for the scroll bars
- */
+* Get the style of the scrollable part of a page
+* @param page pointer to a page object
+* @return pointer to the style of the scrollale part
+*/
+lv_style_t * lv_page_get_style_scrl(lv_obj_t * page);
+
+/**
+* Get the style of the scrolbars of a page
+* @param page pointer to a page object
+* @return pointer to the style of the scrollbars
+*/
 lv_style_t * lv_page_get_style_sb(lv_obj_t * page);
+
+/******************************
+ *  TRANSPARENT API FUNCTIONS
+ ******************************/
+
+/**
+ * Set the fit attribute of the scrollable part of a page.
+ * It means it can set its size automatically to involve all children.
+ * (Can be set separately horizontally and vertically)
+ * @param page pointer to a page object
+ * @param hor_en true: enable horizontal fit
+ * @param ver_en true: enable vertical fit
+ */
+static inline void lv_page_set_scrl_fit(lv_obj_t *page, bool hor_en, bool ver_en)
+{
+    lv_cont_set_fit(lv_page_get_scrl(page), hor_en, ver_en);
+}
+
+/**
+ * Set width of the scrollable part of a page
+ * @param page pointer to a page object
+ * @param w the new width of the scrollable (it ha no effect is horizontal fit is enabled)
+ */
+static inline void lv_page_set_scrl_width(lv_obj_t *page, cord_t w)
+{
+    lv_obj_set_width(lv_page_get_scrl(page), w);
+}
+
+/**
+ * Set height of the scrollable part of a page
+ * @param page pointer to a page object
+ * @param h the new height of the scrollable (it ha no effect is vertical fit is enabled)
+ */
+static inline void lv_page_set_scrl_height(lv_obj_t *page, cord_t h)
+{
+    lv_obj_set_height(lv_page_get_scrl(page), h);
+
+}
+
+/**
+* Set the layout of the scrollable part of the page
+* @param page pointer to a page object
+* @param layout a layout from 'lv_cont_layout_t'
+*/
+static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_cont_layout_t layout)
+{
+    lv_cont_set_layout(lv_page_get_scrl(page), layout);
+}
+
+/**
+ * Get width of the scrollable part of a page
+ * @param page pointer to a page object
+ * @return the width of the scrollable
+ */
+static inline cord_t lv_page_get_scrl_width(lv_obj_t *page)
+{
+    return lv_obj_get_width(lv_page_get_scrl(page));
+}
+
+/**
+* Get the style of page's background
+* @param page pointer to a page object
+* @return pointer to the style of background
+*/
+static inline lv_style_t * lv_page_get_style_bg(lv_obj_t * page)
+{
+    return lv_obj_get_style(page);
+}
+
+
+/**
+ * Get height of the scrollable part of a page
+ * @param page pointer to a page object
+ * @return the height of the scrollable
+ */
+static inline cord_t lv_page_get_scrl_height(lv_obj_t *page)
+{
+    return lv_obj_get_height(lv_page_get_scrl(page));
+}
+
+/**
+* Get the layout of the scrollable part of a page
+* @param page pointer to page object
+* @return the layout from 'lv_cont_layout_t'
+*/
+static inline lv_cont_layout_t lv_page_get_scrl_layout(lv_obj_t * page)
+{
+    return lv_cont_get_layout(lv_page_get_scrl(page));
+}
+
+/**
+* Get horizontal fit attribute of the scrollable part of a page
+* @param page pointer to a page object
+* @return true: horizontal fit is enabled; false: disabled
+*/
+static inline bool lv_page_get_scrl_hor_fit(lv_obj_t * page)
+{
+    return lv_cont_get_hor_fit(lv_page_get_scrl(page));
+}
+
+/**
+* Get vertical fit attribute of the scrollable part of a page
+* @param page pointer to a page object
+* @return true: vertical fit is enabled; false: disabled
+*/
+static inline bool lv_page_get_scrl_fit_ver(lv_obj_t * page)
+{
+    return lv_cont_get_ver_fit(lv_page_get_scrl(page));
+}
 
 /**********************
  *      MACROS

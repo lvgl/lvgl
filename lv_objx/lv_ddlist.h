@@ -99,9 +99,9 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 /**
  * Set a function to call when a new option is chosen
  * @param ddlist pointer to a drop down list
- * @param cb pointer to a call back function
+ * @param action pointer to a call back function
  */
-void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t cb);
+void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action);
 
 /**
  * Set the fix height value.
@@ -119,13 +119,6 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h);
 void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
 
 /**
- * Set the style of the rectangle on the selected option
- * @param ddlist pointer to a drop down list object
- * @param style pointer the new style of the select rectangle
- */
-void lv_ddlist_set_selected_style(lv_obj_t * ddlist, lv_style_t * style);
-
-/**
  * Open the drop down list with or without animation
  * @param ddlist pointer to drop down list object
  * @param anim true: use animation; false: not use animations
@@ -138,6 +131,15 @@ void lv_ddlist_open(lv_obj_t * ddlist, bool anim);
  * @param anim true: use animation; false: not use animations
  */
 void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
+
+/**
+ * Set the style of a drop down list
+ * @param ddlist pointer to a drop down list object
+ * @param bg pointer to the new style of the background
+ * @param sb pointer to the new style of the scrollbars (only visible with fix height)
+ * @param sel pointer to the new style of the select rectangle
+ */
+void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t * bg, lv_style_t * sb, lv_style_t * sel);
 
 /**
  * Get the options of a drop down list
@@ -180,6 +182,32 @@ lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist);
  * @return open/close animation time [ms]
  */
 uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
+
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+* Get the style of the drop down list background
+* @param ddlist pointer to a text area object
+* @return pointer to the style of the background
+*/
+static inline lv_style_t * lv_ddlist_get_style_bg(lv_obj_t * ddlist)
+{
+    return lv_page_get_style_bg(ddlist);
+}
+
+/**
+* Get the style of the scrollbars of a drop down list
+* @param ddlist pointer to a text area object
+* @return pointer to the style of the scrollbars
+*/
+static inline lv_style_t * lv_ddlist_get_style_scrollbar(lv_obj_t * ddlist)
+{
+    return lv_page_get_style_sb(ddlist);
+}
+
 
 /**********************
  *      MACROS

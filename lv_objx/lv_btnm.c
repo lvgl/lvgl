@@ -383,7 +383,7 @@ void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id)
  * @param tgl_pr pointer to a style for toggled pressed state
  * @param ina pointer to a style for inactive state
  */
-void lv_btnm_set_style(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
+void lv_btnm_set_style_btn(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
                                        lv_style_t *tgl_rel, lv_style_t *tgl_pr,
                                        lv_style_t *ina)
 
@@ -431,7 +431,7 @@ lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm)
  * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
  * @return pointer the button style in the given state
  */
-lv_style_t * lv_btnm_get_button_style(lv_obj_t * btnm, lv_btn_state_t state)
+lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state)
 {
     if(state >= LV_BTN_STATE_NUM) return lv_obj_get_style(btnm);
 
@@ -497,18 +497,18 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			btn_h = area_get_height(&area_tmp);
 
 			/*Load the style*/
-			if(button_is_inactive(ext->map_p[txt_i])) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_INACTIVE);
-			else if(btn_i != ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_RELEASED);
-			else if(btn_i == ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_PRESSED);
-            else if(btn_i != ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_TGL_RELEASED);
-            else if(btn_i == ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_button_style(btnm, LV_BTN_STATE_TGL_PRESSED);
+			if(button_is_inactive(ext->map_p[txt_i])) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_INACTIVE);
+			else if(btn_i != ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_RELEASED);
+			else if(btn_i == ext->button_id_pressed && btn_i != ext->button_id_toggled) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_PRESSED);
+            else if(btn_i != ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_TGL_RELEASED);
+            else if(btn_i == ext->button_id_pressed && btn_i == ext->button_id_toggled) btn_style = lv_btnm_get_style_btn(btnm, LV_BTN_STATE_TGL_PRESSED);
             lv_draw_rect(&area_tmp, mask, btn_style);
 
 			/*Calculate the size of the text*/
 			const font_t * font = btn_style->text.font;
 			point_t txt_size;
 			txt_get_size(&txt_size, ext->map_p[txt_i], font,
-			             btn_style->text.space_letter, btn_style->text.space_line,
+			             btn_style->text.letter_space, btn_style->text.line_space,
 					     area_get_width(&area_btnm), TXT_FLAG_NONE);
 
 			area_tmp.x1 += (btn_w - txt_size.x) / 2;

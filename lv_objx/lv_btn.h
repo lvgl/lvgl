@@ -79,14 +79,6 @@ typedef struct
 lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the button
- * @param btn pointer to a button object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
-
-/**
  * Enable the toggled states
  * @param btn pointer to a button object
  * @param tgl true: enable toggled states, false: disable
@@ -155,7 +147,6 @@ lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type);
  */
 lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
 
-
 /****************************
  * TRANSPARENT API FUNCTIONS
  ***************************/
@@ -199,7 +190,7 @@ static inline lv_cont_layout_t lv_btn_get_layout(lv_obj_t * btn)
  */
 static inline bool lv_btn_get_hor_fit(lv_obj_t * btn)
 {
-    return lv_cont_get_fit_hor(btn);
+    return lv_cont_get_hor_fit(btn);
 }
 
 /**
@@ -209,7 +200,7 @@ static inline bool lv_btn_get_hor_fit(lv_obj_t * btn)
  */
 static inline bool lv_btn_get_ver_fit(lv_obj_t * btn)
 {
-    return lv_cont_get_fit_ver(btn);
+    return lv_cont_get_ver_fit(btn);
 }
 
 /**********************

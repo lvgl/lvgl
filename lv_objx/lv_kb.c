@@ -16,6 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -183,7 +184,7 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
  * @param kb pointer to a Keyboard object
  * @param en true: show cursor on the current text area, false: hide cursor
  */
-void lv_kb_set_cur_mng(lv_obj_t * kb, bool en)
+void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     ext->cur_mng = en == false? 0 : 1;
@@ -246,7 +247,7 @@ lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb)
  * @param kb pointer to a Keyboard object
  * @return true: show cursor on the current text area, false: hide cursor
  */
-bool lv_kb_get_cur_mng(lv_obj_t * kb, bool en)
+bool lv_kb_get_cursor_manage(lv_obj_t * kb, bool en)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->cur_mng == 0 ? false : true;
@@ -337,7 +338,7 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
         lv_ta_del(ext->ta);
     } else if(strcmp(txt, "+/-") == 0) {
         uint16_t cur = lv_ta_get_cursor_pos(ext->ta);
-        const char * ta_txt = lv_ta_get_txt(ext->ta);
+        const char * ta_txt = lv_ta_get_text(ext->ta);
         if(ta_txt[0] == '-') {
             lv_ta_set_cursor_pos(ext->ta, 1);
             lv_ta_del(ext->ta);

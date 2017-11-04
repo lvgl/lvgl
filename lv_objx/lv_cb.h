@@ -59,20 +59,11 @@ typedef struct
 lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the check box
- * @param cb pointer to a check box object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
-
-/**
  * Set the text of a check box
  * @param cb pointer to a check box
  * @param txt the text of the check box
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt);
-
 
 /**
  * Set styles of a checkbox's bullet is each state. Use NULL for any style to leave it unchanged
@@ -140,14 +131,12 @@ static inline void lv_cb_set_style_bg(lv_obj_t *cb, lv_style_t *bg)
     lv_btn_set_style(cb, bg, bg, bg, bg, bg);
 }
 
-
-
 /**
  * Get the current state of the check box
  * @param cb pointer to a check box object
  * @return true: checked; false: not checked
  */
-static inline bool lv_cb_is_checked(lv_obj_t * cb)
+static inline bool lv_cb_get_checked(lv_obj_t * cb)
 {
     return lv_btn_get_state(cb) == LV_BTN_STATE_RELEASED ? true : false;
 }

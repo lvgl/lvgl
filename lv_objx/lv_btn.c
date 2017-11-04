@@ -28,13 +28,12 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if 0
-static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t mode);
-#endif
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
 
 /**********************
  *      MACROS
@@ -56,6 +55,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     
     new_btn = lv_cont_create(par, copy);
     dm_assert(new_btn);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_btn);
+
     /*Allocate the extended data*/
     lv_btn_ext_t * ext = lv_obj_allocate_ext_attr(new_btn, sizeof(lv_btn_ext_t));
     dm_assert(ext);
@@ -79,7 +80,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
-	    lv_cont_set_layout(new_btn, LV_CONT_LAYOUT_CENTER);
+	    lv_btn_set_layout(new_btn, LV_CONT_LAYOUT_CENTER);
 	    lv_obj_set_style(new_btn, ext->styles[LV_BTN_STATE_RELEASED]);
     }
     /*Copy 'copy'*/
@@ -95,118 +96,6 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     }
     
     return new_btn;
-}
-
-/**
- * Signal function of the button
- * @param btn pointer to a button object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
-{   
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_cont_signal(btn, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-        lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    	lv_btn_state_t state = lv_btn_get_state(btn);
-        bool tgl = lv_btn_get_toggle(btn);
-
-        if(sign == LV_SIGNAL_PRESSED) {
-            /*Refresh the state*/
-            if(ext->state == LV_BTN_STATE_RELEASED) {
-                lv_btn_set_state(btn, LV_BTN_STATE_PRESSED);
-            } else if(ext->state == LV_BTN_STATE_TGL_RELEASED) {
-                lv_btn_set_state(btn, LV_BTN_STATE_TGL_PRESSED);
-            }
-
-            ext->long_press_action_executed = 0;
-            /*Call the press action, 'param' is the caller indev_proc*/
-            if(ext->actions[LV_BTN_ACTION_PRESS] && state != LV_BTN_STATE_INACTIVE) {
-                valid = ext->actions[LV_BTN_ACTION_PRESS](btn);
-            }
-        }
-        else if(sign ==  LV_SIGNAL_PRESS_LOST) {
-            /*Refresh the state*/
-            if(ext->state == LV_BTN_STATE_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
-            else if(ext->state == LV_BTN_STATE_TGL_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
-        }
-        else if(sign == LV_SIGNAL_PRESSING) {
-            /*When the button begins to drag revert pressed states to released*/
-            if(lv_indev_is_dragging(param) != false) {
-                if(ext->state == LV_BTN_STATE_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
-                else if(ext->state == LV_BTN_STATE_TGL_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
-            }
-        }
-        else if(sign == LV_SIGNAL_RELEASED) {
-            /*If not dragged and it was not long press action then
-             *change state and run the action*/
-            if(lv_indev_is_dragging(param) == false && ext->long_press_action_executed == 0) {
-                if(ext->state == LV_BTN_STATE_PRESSED && tgl == false) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
-                } else if(ext->state == LV_BTN_STATE_TGL_PRESSED && tgl == false) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
-                } else if(ext->state == LV_BTN_STATE_PRESSED && tgl == true) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
-                } else if(ext->state == LV_BTN_STATE_TGL_PRESSED && tgl == true) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
-                }
-
-                if(ext->actions[LV_BTN_ACTION_RELEASE] && state != LV_BTN_STATE_INACTIVE) {
-                    valid = ext->actions[LV_BTN_ACTION_RELEASE](btn);
-                }
-            } else { /*If dragged change back the state*/
-                if(ext->state == LV_BTN_STATE_PRESSED) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
-                } else if(ext->state == LV_BTN_STATE_TGL_PRESSED) {
-                    lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
-                }
-            }
-        }
-        else if(sign == LV_SIGNAL_LONG_PRESS) {
-                if(ext->actions[LV_BTN_ACTION_LONG_PRESS] && state != LV_BTN_STATE_INACTIVE) {
-                	ext->long_press_action_executed = 1;
-                	valid = ext->actions[LV_BTN_ACTION_LONG_PRESS](btn);
-                }
-        }
-        else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-            if(ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE] && state != LV_BTN_STATE_INACTIVE) {
-                valid = ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE](btn);
-            }
-        }
-        else if(sign == LV_SIGNAL_CONTROLL) {
-            char c = *((char*)param);
-            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
-                if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
-                if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INACTIVE) {
-                    valid = ext->actions[LV_BTN_ACTION_RELEASE];
-                }
-            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
-                if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
-                if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INACTIVE) {
-                    valid = ext->actions[LV_BTN_ACTION_RELEASE](btn);
-                }
-            } else if(c == LV_GROUP_KEY_ENTER) {
-                if(lv_btn_get_toggle(btn) != false) {
-                    lv_btn_state_t state = lv_btn_get_state(btn);
-                    if(state == LV_BTN_STATE_RELEASED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
-                    else if(state == LV_BTN_STATE_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_PRESSED);
-                    else if(state == LV_BTN_STATE_TGL_RELEASED) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
-                    else if(state == LV_BTN_STATE_TGL_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_PRESSED);
-                }
-                if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INACTIVE) {
-                    valid = ext->actions[LV_BTN_ACTION_RELEASE](btn);
-                }
-            }
-        }
-    }
-    
-    return valid;
 }
 
 /*=====================
@@ -354,28 +243,118 @@ lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state)
  *   STATIC FUNCTIONS
  **********************/
 
-#if 0
 /**
- * Handle the drawing related tasks of the buttons
+ * Signal function of the button
  * @param btn pointer to a button object
- * @param mask the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'        
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static bool lv_btn_design(lv_obj_t * btn, const area_t * mask, lv_design_mode_t mode)
+static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 {
+    lv_res_t res;
 
-    /* Because of the radius it is not sure the area is covered*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return false;
+    /* Include the ancient signal function */
+    res = ancestor_signal(btn, sign, param);
 
-    } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
+    /* The object can be deleted so check its validity and then
+     * make the object specific signal handling */
+    if(res == LV_RES_OK) {
+        lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+        lv_btn_state_t state = lv_btn_get_state(btn);
+        bool tgl = lv_btn_get_toggle(btn);
 
+        if(sign == LV_SIGNAL_PRESSED) {
+            /*Refresh the state*/
+            if(ext->state == LV_BTN_STATE_RELEASED) {
+                lv_btn_set_state(btn, LV_BTN_STATE_PRESSED);
+            } else if(ext->state == LV_BTN_STATE_TGL_RELEASED) {
+                lv_btn_set_state(btn, LV_BTN_STATE_TGL_PRESSED);
+            }
+
+            ext->long_press_action_executed = 0;
+            /*Call the press action, 'param' is the caller indev_proc*/
+            if(ext->actions[LV_BTN_ACTION_PRESS] && state != LV_BTN_STATE_INACTIVE) {
+                res = ext->actions[LV_BTN_ACTION_PRESS](btn);
+            }
+        }
+        else if(sign ==  LV_SIGNAL_PRESS_LOST) {
+            /*Refresh the state*/
+            if(ext->state == LV_BTN_STATE_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
+            else if(ext->state == LV_BTN_STATE_TGL_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
+        }
+        else if(sign == LV_SIGNAL_PRESSING) {
+            /*When the button begins to drag revert pressed states to released*/
+            if(lv_indev_is_dragging(param) != false) {
+                if(ext->state == LV_BTN_STATE_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
+                else if(ext->state == LV_BTN_STATE_TGL_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
+            }
+        }
+        else if(sign == LV_SIGNAL_RELEASED) {
+            /*If not dragged and it was not long press action then
+             *change state and run the action*/
+            if(lv_indev_is_dragging(param) == false && ext->long_press_action_executed == 0) {
+                if(ext->state == LV_BTN_STATE_PRESSED && tgl == false) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
+                } else if(ext->state == LV_BTN_STATE_TGL_PRESSED && tgl == false) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
+                } else if(ext->state == LV_BTN_STATE_PRESSED && tgl == true) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
+                } else if(ext->state == LV_BTN_STATE_TGL_PRESSED && tgl == true) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
+                }
+
+                if(ext->actions[LV_BTN_ACTION_RELEASE] && state != LV_BTN_STATE_INACTIVE) {
+                    res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+                }
+            } else { /*If dragged change back the state*/
+                if(ext->state == LV_BTN_STATE_PRESSED) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
+                } else if(ext->state == LV_BTN_STATE_TGL_PRESSED) {
+                    lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
+                }
+            }
+        }
+        else if(sign == LV_SIGNAL_LONG_PRESS) {
+                if(ext->actions[LV_BTN_ACTION_LONG_PRESS] && state != LV_BTN_STATE_INACTIVE) {
+                    ext->long_press_action_executed = 1;
+                    res = ext->actions[LV_BTN_ACTION_LONG_PRESS](btn);
+                }
+        }
+        else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
+            if(ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE] && state != LV_BTN_STATE_INACTIVE) {
+                res = ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE](btn);
+            }
+        }
+        else if(sign == LV_SIGNAL_CONTROLL) {
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+                if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
+                if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INACTIVE) {
+                    res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+                }
+            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+                if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
+                if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INACTIVE) {
+                    res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+                }
+            } else if(c == LV_GROUP_KEY_ENTER) {
+                if(lv_btn_get_toggle(btn) != false) {
+                    lv_btn_state_t state = lv_btn_get_state(btn);
+                    if(state == LV_BTN_STATE_RELEASED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_RELEASED);
+                    else if(state == LV_BTN_STATE_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_TGL_PRESSED);
+                    else if(state == LV_BTN_STATE_TGL_RELEASED) lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
+                    else if(state == LV_BTN_STATE_TGL_PRESSED) lv_btn_set_state(btn, LV_BTN_STATE_PRESSED);
+                }
+                if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INACTIVE) {
+                    res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+                }
+            }
+        }
     }
-    return true;
+
+    return res;
 }
-#endif
+
+
 #endif

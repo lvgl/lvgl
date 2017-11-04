@@ -65,7 +65,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new switch switch*/
     if(copy == NULL) {
-        lv_bar_set_range(new_sw, 0, 1);
+        lv_slider_set_range(new_sw, 0, 1);
         lv_obj_set_size(new_sw, 2 * LV_DPI / 3, LV_DPI / 3);
         lv_slider_set_knob_in(new_sw, true);
     }
@@ -92,7 +92,7 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     bool valid;
 
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-    int16_t old_val = lv_bar_get_value(sw);
+    int16_t old_val = lv_slider_get_value(sw);
 
     lv_action_t slider_cb = ext->slider.action;
     ext->slider.action = NULL;  /*Do not let the slider to call the callback. The Switch will do it*/
@@ -107,7 +107,7 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     	}
         else if(sign == LV_SIGNAL_PRESSING) {
-            int16_t act_val = lv_bar_get_value(sw);
+            int16_t act_val = lv_slider_get_value(sw);
             if(act_val != old_val) ext->changed = 1;
         }
         else if(sign == LV_SIGNAL_PRESS_LOST) {
@@ -115,9 +115,9 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         }
     	else if(sign == LV_SIGNAL_RELEASED) {
     	    if(ext->changed == 0) {
-                int16_t v = lv_bar_get_value(sw);
-                if(v == 0) lv_bar_set_value(sw, 1);
-                else lv_bar_set_value(sw, 0);
+                int16_t v = lv_slider_get_value(sw);
+                if(v == 0) lv_slider_set_value(sw, 1);
+                else lv_slider_set_value(sw, 0);
     	    }
     	    if(slider_cb != NULL) slider_cb(sw);
 

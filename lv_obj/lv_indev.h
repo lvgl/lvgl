@@ -24,14 +24,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum
-{
-    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
-	LV_RES_OK,           /*The object is valid (no deleted) after the action*/
-}lv_res_t;
-
-typedef lv_res_t (*lv_action_t) (struct __LV_OBJ_T * obj);
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

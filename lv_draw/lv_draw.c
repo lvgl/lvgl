@@ -245,13 +245,13 @@ void lv_draw_label(const area_t * coords,const area_t * mask, const lv_style_t *
         w = area_get_width(coords);
     } else {
         point_t p;
-        txt_get_size(&p, txt, style->text.font, style->text.space_letter, style->text.space_line, CORD_MAX, flag);
+        txt_get_size(&p, txt, style->text.font, style->text.letter_space, style->text.line_space, CORD_MAX, flag);
         w = p.x;
     }
     /*Init variables for the first line*/
     cord_t line_length = 0;
     uint32_t line_start = 0;
-    uint32_t line_end = txt_get_next_line(txt, font, style->text.space_letter, w, flag);
+    uint32_t line_end = txt_get_next_line(txt, font, style->text.letter_space, w, flag);
 
     point_t pos;
     pos.x = coords->x1;
@@ -260,7 +260,7 @@ void lv_draw_label(const area_t * coords,const area_t * mask, const lv_style_t *
     /*Align the line to middle if enabled*/
     if(flag & TXT_FLAG_CENTER) {
         line_length = txt_get_width(&txt[line_start], line_end - line_start,
-                                    font, style->text.space_letter, flag);
+                                    font, style->text.letter_space, flag);
         pos.x += (w - line_length) / 2;
     }
 
@@ -322,25 +322,25 @@ void lv_draw_label(const area_t * coords,const area_t * mask, const lv_style_t *
             color_t color = style->text.color;
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
-            letter_fp(&pos, mask, font, letter, color, style->body.opa);
+            letter_fp(&pos, mask, font, letter, color, style->text.opa);
 
-            pos.x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.space_letter;
+            pos.x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.letter_space;
 
         }
         /*Go to next line*/
         line_start = line_end;
-        line_end += txt_get_next_line(&txt[line_start], font, style->text.space_letter, w, flag);
+        line_end += txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
 
         pos.x = coords->x1;
         /*Align to middle*/
         if(flag & TXT_FLAG_CENTER) {
             line_length = txt_get_width(&txt[line_start], line_end - line_start,
-                                     font, style->text.space_letter, flag);
+                                     font, style->text.letter_space, flag);
             pos.x += (w - line_length) / 2;
         }
         /*Go the next line position*/
         pos.y += font_get_height(font) >> FONT_ANTIALIAS;
-        pos.y += style->text.space_line;
+        pos.y += style->text.line_space;
     }
 }
 
@@ -395,7 +395,7 @@ void lv_draw_img(const area_t * coords, const area_t * mask,
                 const_data = true;
                 uint8_t * f_data = ((ufs_file_t*)file.file_d)->ent->data_d;
                 f_data += sizeof(lv_img_raw_header_t);
-                map_fp(coords, &mask_com, (void*)f_data , style->body.opa, header.transp, upscale, style->image.color, style->image.intense);
+                map_fp(coords, &mask_com, (void*)f_data , style->image.opa, header.transp, upscale, style->image.color, style->image.intense);
             }
 #endif
 
@@ -429,7 +429,7 @@ void lv_draw_img(const area_t * coords, const area_t * mask,
                 for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
                     res = fs_read(&file, buf, useful_data, &br);
 
-                    map_fp(&line, &mask_com, buf, style->body.opa, header.transp, upscale,
+                    map_fp(&line, &mask_com, buf, style->image.opa, header.transp, upscale,
                                           style->image.color, style->image.intense);
 
                     fs_tell(&file, &act_pos);
@@ -515,7 +515,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask,
 		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		  fill_fp(&draw_area, mask, style->line.color, style->body.opa);
+		  fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	  }
 	  if (hor == false && last_x != act_point.x) {
 		  area_t act_area;
@@ -531,7 +531,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask,
 		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		  fill_fp(&draw_area, mask, style->line.color, style->body.opa);
+		  fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	  }
 
 		/*Calc. the next point of the line*/
@@ -559,7 +559,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask,
 		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		fill_fp(&draw_area, mask, style->line.color, style->body.opa);
+		fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	}
 	if (hor == false) {
 		area_t act_area;
@@ -573,7 +573,7 @@ void lv_draw_line(const point_t * p1, const point_t * p2, const area_t * mask,
 		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
 		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
 		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
-		fill_fp(&draw_area, mask, style->line.color, style->body.opa);
+		fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	}
 }
 

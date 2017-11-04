@@ -70,18 +70,21 @@ typedef struct
     struct {
         color_t color;
         const font_t * font;
-        cord_t space_letter;
-        cord_t space_line;
+        cord_t letter_space;
+        cord_t line_space;
+        opa_t opa;
     }text;
 
     struct {
         color_t color;
         opa_t intense;
+        opa_t opa;
     }image;
 
     struct {
         color_t color;
         cord_t width;
+        opa_t opa;
     }line;
 }lv_style_t;
 

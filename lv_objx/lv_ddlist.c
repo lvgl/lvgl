@@ -29,14 +29,17 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
+static bool lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_rel_action(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time);
-static void lv_ddlist_pos_act_option(lv_obj_t * ddlist);
+static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t  ancestor_design_f;
+static lv_signal_func_t  ancestor_signal;
+static lv_signal_func_t  ancestor_scrl_signal;
+static lv_design_func_t  ancestor_design;
 static const char * def_options[] = {"Option 1", "Option 2", "Option 3", ""};
 /**********************
  *      MACROS
@@ -61,6 +64,9 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor drop down list*/
     lv_obj_t * new_ddlist = lv_page_create(par, copy);
     dm_assert(new_ddlist);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_ddlist);
+    if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(new_ddlist));
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_ddlist);
     
     /*Allocate the drop down list type specific extended data*/
     lv_ddlist_ext_t * ext = lv_obj_allocate_ext_attr(new_ddlist, sizeof(lv_ddlist_ext_t));
@@ -77,23 +83,21 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     ext->selected_style = &lv_style_plain_color;
 
     /*The signal and design functions are not copied so set them here*/
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_ddlist);
-
     lv_obj_set_signal_func(new_ddlist, lv_ddlist_signal);
+    lv_obj_set_signal_func(lv_page_get_scrl(new_ddlist), lv_ddlist_scrl_signal);
     lv_obj_set_design_func(new_ddlist, lv_ddlist_design);
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_obj_set_style(scrl, &lv_style_transp);
-        lv_cont_set_fit(scrl, true, true);
+        lv_page_set_scrl_fit(new_ddlist, true, true);
 
         ext->options_label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit(new_ddlist, true, false);
-        lv_page_set_rel_action(new_ddlist, lv_ddlist_rel_action);
+        lv_page_set_release_action(new_ddlist, lv_ddlist_rel_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
-        lv_obj_set_style(new_ddlist, &lv_style_pretty);
+        lv_ddlist_set_style(new_ddlist, &lv_style_pretty, NULL, &lv_style_plain_color);
         lv_ddlist_set_options(new_ddlist, def_options);
     }
     /*Copy an existing drop down list*/
@@ -127,20 +131,22 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_page_signal(ddlist, sign, param);
+    valid = ancestor_signal(ddlist, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
     if(valid != false) {
-    	if(sign == LV_SIGNAL_STYLE_CHG) {
+        if(sign == LV_SIGNAL_STYLE_CHG) {
             lv_ddlist_refr_size(ddlist, 0);
-    	} else if(sign == LV_SIGNAL_FOCUS) {
+            lv_obj_t *scrl = lv_page_get_scrl(ddlist);
+            lv_obj_refresh_ext_size(scrl);  /*Because of the wider selected rectangle*/
+        } else if(sign == LV_SIGNAL_FOCUS) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    	    if(ext->opened == false) {
-    	        ext->opened = true;
-    	        lv_ddlist_refr_size(ddlist, true);
-    	    }
-    	} else if(sign == LV_SIGNAL_DEFOCUS) {
+            if(ext->opened == false) {
+                ext->opened = true;
+                lv_ddlist_refr_size(ddlist, true);
+            }
+        } else if(sign == LV_SIGNAL_DEFOCUS) {
             lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
             if(ext->opened != false) {
                 ext->opened = false;
@@ -173,7 +179,7 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
             }
         }
     }
-    
+
     return valid;
 }
 
@@ -239,7 +245,7 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 
     /*Move the list to show the current option*/
     if(ext->opened == 0) {
-        lv_ddlist_pos_act_option(ddlist);
+        lv_ddlist_pos_current_option(ddlist);
     } else {
         lv_obj_invalidate(ddlist);
     }
@@ -250,10 +256,10 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
  * @param ddlist pointer to a drop down list
  * @param cb pointer to a call back function
  */
-void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t cb)
+void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    ext->callback = cb;
+    ext->callback = action;
 }
 
 /**
@@ -281,18 +287,6 @@ void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
 }
 
 /**
- * Set the style of the rectangle on the selected option
- * @param ddlist pointer to a drop down list object
- * @param style pointer the new style of the select rectangle
- */
-void lv_ddlist_set_selected_style(lv_obj_t * ddlist, lv_style_t * style)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    ext->selected_style = style;
-
-}
-
-/**
  * Open the drop down list with or without animation
  * @param ddlist pointer to drop down list object
  * @param anim true: use animation; false: not use animations
@@ -301,6 +295,7 @@ void lv_ddlist_open(lv_obj_t * ddlist, bool anim)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->opened = 1;
+    lv_obj_set_drag(lv_page_get_scrl(ddlist), true);
     lv_ddlist_refr_size(ddlist, anim ? ext->anim_time : 0);
 }
 
@@ -313,7 +308,25 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->opened = 0;
+    lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
     lv_ddlist_refr_size(ddlist, anim ? ext->anim_time : 0);
+}
+
+/**
+ * Set the style of a drop down list
+ * @param ddlist pointer to a drop down list object
+ * @param bg pointer to the new style of the background
+ * @param sb pointer to the new style of the scrollbars (only visible with fix height)
+ * @param sel pointer to the new style of the select rectangle
+ */
+void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t *bg, lv_style_t *sb, lv_style_t *sel)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    ext->selected_style = sel;
+    lv_obj_set_style(ext->options_label, bg);
+
+    lv_page_set_style(ddlist, bg, &lv_style_transp_tight, sb);
+
 }
 
 /*=====================
@@ -420,36 +433,66 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	return ancestor_design_f(ddlist, mask, mode);
+    	return ancestor_design(ddlist, mask, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        ancestor_design_f(ddlist, mask, mode);
+        ancestor_design(ddlist, mask, mode);
 
-        /*If the list is opened draw a rectangle below the selected item*/
+        /*If the list is opened draw a rectangle under the selected item*/
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         if(ext->opened != 0) {
-            lv_style_t * style = lv_obj_get_style(ddlist);
+            lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
+            lv_obj_t *scrl = lv_page_get_scrl(ddlist);
             const font_t * font = style->text.font;
             cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
             area_t rect_area;
             rect_area.y1 = ext->options_label->coords.y1;
-            rect_area.y1 += ext->selected_option_id * (font_h + style->text.space_line);
-            rect_area.y1 -= style->text.space_line / 2;
+            rect_area.y1 += ext->selected_option_id * (font_h + style->text.line_space);
+            rect_area.y1 -= style->text.line_space / 2;
 
-            rect_area.y2 = rect_area.y1 + font_h + style->text.space_line;
-            rect_area.x1 = ext->options_label->coords.x1 - style->body.padding.hor;
-            rect_area.x2 = rect_area.x1 + lv_obj_get_width(lv_page_get_scrl(ddlist));
+            rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
+            rect_area.x1 = scrl->coords.x1 - (style->body.padding.hor >> 1);    /*Draw a littlebit wider rectangle then the text*/
+            rect_area.x2 = scrl->coords.x2 + (style->body.padding.hor >> 1);
 
             lv_draw_rect(&rect_area, mask, ext->selected_style);
         }
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_design_f(ddlist, mask, mode);
+        ancestor_design(ddlist, mask, mode);
     }
 
     return true;
+}
+
+/**
+ * Signal function of the drop down list's scrollable part
+ * @param scrl pointer to a drop down list's scrollable part
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+static bool lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
+{
+    bool valid;
+
+    /* Include the ancient signal function */
+    valid = ancestor_scrl_signal(scrl, sign, param);
+
+    /* The object can be deleted so check its validity and then
+     * make the object specific signal handling */
+    if(valid != false) {
+        if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+            /* Because of the wider selected rectangle ext. size
+             * In this way by dragging the scrollable part the wider rectangle area will be redrawn too*/
+            lv_obj_t *ddlist = lv_obj_get_parent(scrl);
+            lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
+            if(scrl->ext_size < (style->body.padding.hor >> 1)) scrl->ext_size = style->body.padding.hor >> 1;
+        }
+    }
+
+    return valid;
 }
 
 /**
@@ -513,11 +556,11 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
         const font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->options_label);
         cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
-        new_height = font_h + 2 * label_style->text.space_line;
+        new_height = font_h + 2 * label_style->text.line_space;
     }
     if(anim_time == 0) {
         lv_obj_set_height(ddlist, new_height);
-        lv_ddlist_pos_act_option(ddlist);
+        lv_ddlist_pos_current_option(ddlist);
     } else {
         anim_t a;
         a.var = ddlist;
@@ -525,7 +568,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
         a.end = new_height;
         a.fp = (anim_fp_t)lv_obj_set_height;
         a.path = anim_get_path(ANIM_PATH_LIN);
-        a.end_cb = (anim_cb_t)lv_ddlist_pos_act_option;
+        a.end_cb = (anim_cb_t)lv_ddlist_pos_current_option;
         a.act_time = 0;
         a.time = ext->anim_time;
         a.playback = 0;
@@ -541,7 +584,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
  * Set the position of list when it is closed to show the selected item
  * @param ddlist pointer to a drop down list
  */
-static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
+static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
@@ -551,7 +594,7 @@ static void lv_ddlist_pos_act_option(lv_obj_t * ddlist)
     lv_obj_t * scrl = lv_page_get_scrl(ddlist);
 
     cord_t h = lv_obj_get_height(ddlist);
-    cord_t line_y1 = ext->selected_option_id * (font_h + label_style->text.space_line) + ext->options_label->coords.y1 - scrl->coords.y1;
+    cord_t line_y1 = ext->selected_option_id * (font_h + label_style->text.line_space) + ext->options_label->coords.y1 - scrl->coords.y1;
 
     lv_obj_set_y(scrl, - line_y1 + (h - font_h) / 2);
 
