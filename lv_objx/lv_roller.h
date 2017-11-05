@@ -44,15 +44,120 @@ typedef struct {
  */
 lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the roller
- * @param roller pointer to a roller object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
 
+/**
+ * Set the options on a roller
+ * @param roller pointer to roller object
+ * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ */
+static inline void lv_roller_set_options(lv_obj_t * roller, const char * options)
+{
+    lv_ddlist_set_options(roller, options);
+}
+/**
+ * Set the selected option
+ * @param roller pointer to a roller object
+ * @param sel_opt id of the selected option (0 ... number of option - 1);
+ */
+static inline void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt)
+{
+    lv_ddlist_set_selected(roller, sel_opt);
+}
+
+/**
+ * Set the open/close animation time.
+ * @param roller pointer to a roller object
+ * @param anim_time: open/close animation time [ms]
+ */
+static inline void lv_roller_set_anim_time(lv_obj_t *roller, uint16_t anim_time)
+{
+    lv_ddlist_set_anim_time(roller, anim_time);
+}
+
+/**
+ * Set the style of a roller
+ * @param roller pointer to a roller object
+ * @param bg pointer to the new style of the background
+ * @param sel pointer to the new style of the select rectangle
+ */
+static inline void lv_roller_set_style(lv_obj_t *roller, lv_style_t *bg, lv_style_t *sel)
+{
+    lv_ddlist_set_style(roller, bg, NULL, sel);
+}
+
+/**
+ * Get the options of a roller
+ * @param roller pointer to roller object
+ * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
+ */
+static inline const char * lv_roller_get_options(lv_obj_t *roller)
+{
+    return lv_ddlist_get_options(roller);
+}
+
+
+/**
+ * Get the id of the selected option
+ * @param roller pointer to a roller object
+ * @return id of the selected option (0 ... number of option - 1);
+ */
+static inline uint16_t lv_roller_get_selected(lv_obj_t *roller)
+{
+    return lv_ddlist_get_selected(roller);
+}
+
+/**
+ * Get the current selected option as a string
+ * @param roller pointer to roller object
+ * @param buf pointer to an array to store the string
+ */
+static inline void lv_roller_get_selected_str(lv_obj_t * roller, char * buf)
+{
+    lv_roller_get_selected_str(roller, buf);
+}
+
+/**
+ * Get the "option selected" callback function
+ * @param roller pointer to a roller
+ * @return  pointer to the call back function
+ */
+static inline lv_action_t lv_roller_get_action(lv_obj_t * roller)
+{
+    return lv_ddlist_get_action(roller);
+}
+
+/**
+ * Get the open/close animation time.
+ * @param roller pointer to a roller
+ * @return open/close animation time [ms]
+ */
+static inline uint16_t lv_roller_get_anim_time(lv_obj_t * roller)
+{
+    return lv_ddlist_get_anim_time(roller);
+}
+
+/**
+* Get the style of the roller's background
+* @param roller pointer to a roller object
+* @return pointer to the background's style
+*/
+static inline lv_style_t * lv_roller_get_style_bg(lv_obj_t *roller)
+{
+    return lv_ddlist_get_style_bg(roller);
+}
+
+/**
+* Get the style of the roller's selected rectangle
+* @param roller pointer to a roller object
+* @return pointer to the selected rectangle's style
+*/
+static inline lv_style_t * lv_roller_get_style_selected(lv_obj_t *roller)
+{
+    return lv_ddlist_get_style_select(roller);
+}
 
 /**********************
  *      MACROS

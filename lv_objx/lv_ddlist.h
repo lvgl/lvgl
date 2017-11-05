@@ -74,20 +74,11 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy);
 bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 
 /**
- * Set the options in a drop down list from an array
- * @param ddlist pointer to drop down list object
- * @param options an array of strings with the text of the options.
- *                The lest element has to be "" (empty string)
- *                E.g. const char * opts[] = {"apple", "banana", "orange", ""};
- */
-void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options);
-
-/**
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
-void lv_ddlist_set_options_str(lv_obj_t * ddlist, const char * options);
+void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options);
 
 /**
  * Set the selected option
@@ -163,6 +154,13 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
 void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
 
 /**
+ * Get the "option selected" callback function
+ * @param ddlist pointer to a drop down list
+ * @return  pointer to the call back function
+ */
+lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist);
+
+/**
  * Get the fix height value.
  * @param ddlist pointer to a drop down list object
  * @return the height if the ddlist is opened (0: auto size)
@@ -210,7 +208,7 @@ static inline lv_page_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ta)
 
 /**
 * Get the style of the drop down list background
-* @param ddlist pointer to a text area object
+* @param ddlist pointer to a drop down list object
 * @return pointer to the style of the background
 */
 static inline lv_style_t * lv_ddlist_get_style_bg(lv_obj_t * ddlist)

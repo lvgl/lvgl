@@ -40,7 +40,6 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
 static lv_signal_func_t  ancestor_signal;
 static lv_signal_func_t  ancestor_scrl_signal;
 static lv_design_func_t  ancestor_design;
-static const char * def_options[] = {"Option 1", "Option 2", "Option 3", ""};
 /**********************
  *      MACROS
  **********************/
@@ -98,7 +97,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_release_action(new_ddlist, lv_ddlist_rel_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
         lv_ddlist_set_style(new_ddlist, &lv_style_pretty, NULL, &lv_style_plain_color);
-        lv_ddlist_set_options(new_ddlist, def_options);
+        lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
     }
     /*Copy an existing drop down list*/
     else {
@@ -188,35 +187,11 @@ bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
  *====================*/
 
 /**
- * Set the options in a drop down list from an array
- * @param ddlist pointer to drop down list object
- * @param options an array of strings with the text of the options.
- *                The lest element has to be "" (empty string)
- *                E.g. const char * opts[] = {"apple", "banana", "orange", ""};
- */
-void lv_ddlist_set_options(lv_obj_t * ddlist, const char ** options)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-
-    lv_label_set_text(ext->options_label, "");
-    uint16_t i = 0;
-    while(options[i][0] != '\0') {
-        lv_label_ins_text(ext->options_label, LV_LABEL_POS_LAST, options[i]);
-        if(options[i + 1][0] != '\0') lv_label_ins_text(ext->options_label, LV_LABEL_POS_LAST, "\n");
-        i++;
-    }
-
-    ext->option_cnt = i;
-
-    lv_ddlist_refr_size(ddlist, 0);
-}
-
-/**
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
-void lv_ddlist_set_options_str(lv_obj_t * ddlist, const char * options)
+void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -254,7 +229,7 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 /**
  * Set a function to call when a new option is chosen
  * @param ddlist pointer to a drop down list
- * @param cb pointer to a call back function
+ * @param action pointer to a call back function
  */
 void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action)
 {
@@ -326,7 +301,6 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t *bg, lv_style_t *sb, lv_s
     lv_obj_set_style(ext->options_label, bg);
 
     lv_page_set_style(ddlist, bg, &lv_style_transp_tight, sb);
-
 }
 
 /*=====================
@@ -382,6 +356,17 @@ void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf)
 }
 
 /**
+ * Get the "option selected" callback function
+ * @param ddlist pointer to a drop down list
+ * @return  pointer to the call back function
+ */
+lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    return ext->callback;
+}
+
+/**
  * Get the fix height value.
  * @param ddlist pointer to a drop down list object
  * @return the height if the ddlist is opened (0: auto size)
@@ -404,6 +389,7 @@ lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist)
 
     return ext->selected_style;
 }
+
 /**
  * Get the open/close animation time.
  * @param ddlist pointer to a drop down list
@@ -443,7 +429,6 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         if(ext->opened != 0) {
             lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
-            lv_obj_t *scrl = lv_page_get_scrl(ddlist);
             const font_t * font = style->text.font;
             cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
             area_t rect_area;
@@ -452,8 +437,8 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
             rect_area.y1 -= style->text.line_space / 2;
 
             rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
-            rect_area.x1 = scrl->coords.x1 - (style->body.padding.hor >> 1);    /*Draw a littlebit wider rectangle then the text*/
-            rect_area.x2 = scrl->coords.x2 + (style->body.padding.hor >> 1);
+            rect_area.x1 = ddlist->coords.x1;
+            rect_area.x2 = ddlist->coords.x2;
 
             lv_draw_rect(&rect_area, mask, ext->selected_style);
         }
@@ -485,10 +470,10 @@ static bool lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * para
     if(valid != false) {
         if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
             /* Because of the wider selected rectangle ext. size
-             * In this way by dragging the scrollable part the wider rectangle area will be redrawn too*/
+             * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
             lv_obj_t *ddlist = lv_obj_get_parent(scrl);
             lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
-            if(scrl->ext_size < (style->body.padding.hor >> 1)) scrl->ext_size = style->body.padding.hor >> 1;
+            if(scrl->ext_size < style->body.padding.hor) scrl->ext_size = style->body.padding.hor;
         }
     }
 

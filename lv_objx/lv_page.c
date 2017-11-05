@@ -435,6 +435,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             /*The scrollbars are important only if they are visible now*/
             if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
 
+            /*Refresh the ext. size because the scrollbars might be positioned out of the page*/
+            lv_obj_refresh_ext_size(page);
         }
         else if(sign == LV_SIGNAL_CORD_CHG) {
             /*Refresh the scrollbar and notify the scrl if the size is changed*/
@@ -463,6 +465,11 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                     ext->rel_action(page);
                 }
             }
+        }
+        else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+            /*Ensure ext. size for the scrollbars if they are out of the page*/
+            if(page->ext_size < (-ext->sb.style->body.padding.hor)) page->ext_size = -ext->sb.style->body.padding.hor;
+            if(page->ext_size < (-ext->sb.style->body.padding.ver)) page->ext_size = -ext->sb.style->body.padding.ver;
         }
     }
 
