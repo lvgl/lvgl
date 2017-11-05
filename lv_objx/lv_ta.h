@@ -32,7 +32,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_TA_CUR_LAST (0x7FFF) /*Put the cursor after the last character*/
+#define LV_TA_CURSOR_LAST (0x7FFF) /*Put the cursor after the last character*/
 
 /**********************
  *      TYPEDEFS
@@ -97,7 +97,7 @@ bool lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
  * @param ta pointer to a text area object
  * @param c a character
  */
-void lv_ta_add_char(lv_obj_t * ta, uint32_t c);
+void lv_ta_add_char(lv_obj_t * ta, char c);
 
 /**
  * Insert a text to the current cursor position
@@ -167,11 +167,13 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
 void lv_ta_set_cursor_type(lv_obj_t * ta, lv_ta_cursor_type_t cur_type);
 
 /**
- * Set the style of the cursor (NULL to use label's style)
+ * Set the style of the text area
  * @param ta pointer to a text area object
- * @param style pointer to the new cursor style
+ * @param bg pointer to the new background style (NULL to leave unchanged)
+ * @param sb pointer to the new scrollbar style (NULL to leave unchanged)
+ * @param cur pointer to the new cursor style (NULL to use the label's style)
  */
-void lv_ta_set_cursor_style(lv_obj_t * ta, lv_style_t * style);
+void lv_ta_set_style(lv_obj_t * ta, lv_style_t *bg, lv_style_t *sb, lv_style_t *cur);
 
 /**
  * Enable/Disable password mode
@@ -236,9 +238,36 @@ lv_style_t *  lv_ta_get_style_cursor(lv_obj_t * ta);
  */
 bool lv_ta_get_pwd_mode(lv_obj_t * ta);
 
+/**
+ * Get the one line configuration attribute
+ * @param ta pointer to a text area object
+ * @return true: one line configuration is enabled, false: disabled
+ */
+bool lv_ta_get_one_line(lv_obj_t * ta);
+
 /****************************
  * TRANSPARENT API FUNCTIONS
  ***************************/
+
+/**
+ * Set the scroll bar mode of a text area
+ * @param ta pointer to a text area object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_page_sb_mode_t mode)
+{
+    lv_page_set_sb_mode(ta, mode);
+}
+
+/**
+ * Get the scroll bar mode of a text area
+ * @param ta pointer to a text area object
+ * @return scrollbar mode from 'lv_page_sb_mode_t' enum
+ */
+static inline lv_page_sb_mode_t lv_ta_get_sb_mode(lv_obj_t * ta)
+{
+    return lv_page_get_sb_mode(ta);
+}
 
 /**
 * Get the style of the text area background
@@ -255,10 +284,11 @@ static inline lv_style_t * lv_ta_get_style_bg(lv_obj_t * ta)
 * @param ta pointer to a text area object
 * @return pointer to the style of the scrollbars
 */
-static inline lv_style_t * lv_ta_get_style_scrollbar(lv_obj_t * ta)
+static inline lv_style_t * lv_ta_get_style_sb(lv_obj_t * ta)
 {
     return lv_page_get_style_sb(ta);
 }
+
 
 /**********************
  *      MACROS

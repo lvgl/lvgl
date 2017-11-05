@@ -478,7 +478,7 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj);
  * @param obj pointer to an object
  * @param free_num the new free number
  */
-void lv_obj_set_free_number(lv_obj_t * obj, uint8_t free_number);
+void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_number);
 #endif
 
 #if LV_OBJ_FREE_PTR != 0
@@ -488,7 +488,7 @@ void lv_obj_set_free_number(lv_obj_t * obj, uint8_t free_number);
  * @param obj pointer to an object
  * @param free_p the new free pinter
  */
-void lv_obj_set_free_pointer(lv_obj_t * obj, void * free_pointer);
+void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_pointer);
 #endif
 
 /**

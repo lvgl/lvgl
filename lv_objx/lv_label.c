@@ -253,7 +253,7 @@ void lv_label_set_text_static(lv_obj_t * label, const char * text)
 /**
  * Insert a text to the label. The label current label text can not be static.
  * @param label pointer to label object
- * @param pos character index to insert
+ * @param pos character index to insert Expressed in character index and not byte index (Different in UTF-8)
  *            0: before first char.
  *            LV_LABEL_POS_LAST: after last char.
  * @param txt pointer to the text to insert
@@ -462,7 +462,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
         max_w = CORD_MAX;
     }
 
-    index = txt_utf8_get_id(txt, index);
+    index = txt_utf8_get_byte_id(txt, index);
 
     /*Search the line of the index letter */;
     while (txt[new_line_start] != '\0') {
@@ -514,6 +514,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
  * @param label pointer to label object
  * @param pos pointer to point with coordinates on a the label
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
+ * Expressed in character index and not byte index (different in UTF-8)
  */
 uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 {
@@ -541,7 +542,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     /*Search the line of the index letter */;
     while (txt[line_start] != '\0') {
     	new_line_start += txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
-    	if(pos->y <= y + letter_height + style->text.line_space) break; /*The line is found ('line_start')*/
+    	if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
     	y += letter_height + style->text.line_space;
         line_start = new_line_start;
     }
@@ -557,9 +558,10 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
 
 	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
 	uint32_t i = line_start;
+    uint32_t i_current = i;
 	uint32_t letter;
 	while(i < new_line_start - 1) {
-	    letter = txt_utf8_next(txt, &i);
+	    letter = txt_utf8_next(txt, &i);    /*Be careful 'i' already points to the next character*/
 	    /*Handle the recolor command*/
 	    if((flag & TXT_FLAG_RECOLOR) != 0) {
             if(txt_is_cmd(&cmd_state, txt[i]) != false) {
@@ -567,11 +569,16 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-	    x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.letter_space;
-		if(pos->x < x) break;   /*Get the position*/
+	    x += (font_get_width(font, letter) >> FONT_ANTIALIAS);
+		if(pos->x < x) {
+		    i = i_current;
+		    break;
+		}
+		x += style->text.letter_space;
+		i_current = i;
 	}
 
-	return i;
+	return txt_utf8_get_char_id(txt, i);
 }
 
 

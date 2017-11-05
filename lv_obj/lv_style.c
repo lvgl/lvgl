@@ -121,7 +121,7 @@ void lv_style_init (void)
     lv_style_pretty.body.radius = LV_DPI / 15;
     lv_style_pretty.body.border.color = COLOR_MAKE(0x40, 0x40, 0x40);
     lv_style_pretty.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
-    lv_style_pretty.body.border.opa = OPA_50;
+    lv_style_pretty.body.border.opa = OPA_30;
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));

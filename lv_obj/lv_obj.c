@@ -1440,7 +1440,7 @@ void * lv_obj_get_ext_attr(lv_obj_t * obj)
    return obj->ext_attr;
 }
 
-#if LV_OBJ_FREE_NUMBER != 0
+#if LV_OBJ_FREE_NUM != 0
 /**
  * Get the free number
  * @param obj pointer to an object
@@ -1452,7 +1452,7 @@ uint8_t lv_obj_get_free_num(lv_obj_t * obj)
 }
 #endif
 
-#if LV_OBJ_FREE_POINTER != 0
+#if LV_OBJ_FREE_PTR != 0
 /**
  * Get the free pointer
  * @param obj pointer to an object
