@@ -42,6 +42,8 @@
  **********************/
 static bool lv_ta_design(lv_obj_t * ta, const area_t * mask, lv_design_mode_t mode);
 static bool lv_ta_scrollable_design(lv_obj_t * scrl, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
+static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
 static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x);
 static void pwd_char_hider(lv_obj_t * ta);
@@ -109,9 +111,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_label_set_text(ext->label, "Text area");
     	lv_obj_set_click(ext->label, false);
     	lv_obj_set_style(new_ta, &lv_style_pretty);
-        lv_page_set_sb_mode(new_ta, LV_PAGE_SB_MODE_DRAG);
         lv_obj_set_style(lv_page_get_scrl(new_ta), &lv_style_transp_fit);
     	lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
+        lv_ta_set_sb_mode(new_ta, LV_PAGE_SB_MODE_DRAG);
     }
     /*Copy an existing object*/
     else {
@@ -148,102 +150,6 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     return new_ta;
 }
 
-/**
- * Signal function of the text area
- * @param ta pointer to a text area object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = ancestor_signal(ta, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    	if(sign == LV_SIGNAL_CLEANUP) {
-    	    if(ext->pwd_tmp != NULL) dm_free(ext->pwd_tmp);
-
-            /* (The created label will be deleted automatically) */
-    	} else if(sign == LV_SIGNAL_STYLE_CHG) {
-            if(ext->label) {
-            	lv_obj_t * scrl = lv_page_get_scrl(ta);
-                lv_style_t * style_ta = lv_obj_get_style(ta);
-            	lv_style_t * style_scrl = lv_obj_get_style(scrl);
-            	if(ext->one_line) { /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
-                    lv_style_t * style_label = lv_obj_get_style(ext->label);
-                    cord_t font_h =  font_get_height(style_label->text.font) >> FONT_ANTIALIAS;
-                    lv_obj_set_height(ta, font_h + (style_ta->body.padding.ver + style_scrl->body.padding.ver) * 2);
-            	} else { /*In not one line mode refresh the Label width because 'hpad' can modify it*/
-            	    lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
-                    lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);         /*Be sure the Label is in the correct position*/
-            	}
-                lv_label_set_text(ext->label, NULL);
-
-                lv_obj_refresh_ext_size(lv_page_get_scrl(ta));
-            }
-    	} else if(sign == LV_SIGNAL_CORD_CHG) {
-    		/*Set the label width according to the text area width*/
-            if(ext->label) {
-                if(lv_obj_get_width(ta) != area_get_width(param) ||
-                  lv_obj_get_height(ta) != area_get_height(param)) {
-                	lv_obj_t * scrl = lv_page_get_scrl(ta);
-                	lv_style_t * style_scrl = lv_obj_get_style(scrl);
-                    lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
-                    lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);
-                    lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
-                }
-            }
-    	}
-        else if (sign == LV_SIGNAL_CONTROLL) {
-            char c = *((char*)param);
-            if(c == LV_GROUP_KEY_RIGHT) {
-                lv_ta_cursor_right(ta);
-            } else if(c == LV_GROUP_KEY_LEFT) {
-                lv_ta_cursor_left(ta);
-            } else if(c == LV_GROUP_KEY_UP) {
-                lv_ta_cursor_up(ta);
-            } else if(c == LV_GROUP_KEY_DOWN) {
-                lv_ta_cursor_down(ta);
-            }
-        }
-    }
-    return valid;
-}
-
-/**
- * Signal function of the scrollable part of the text area
- * @param scrl pointer to scrollable part of a text area object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = scrl_signal(scrl, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-        if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-            /*Set ext. size because the cursor might be out of this object*/
-            lv_obj_t * ta = lv_obj_get_parent(scrl);
-            lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-            lv_style_t * style_label = lv_obj_get_style(ext->label);
-
-            scrl->ext_size = MATH_MAX(scrl->ext_size, style_label->text.line_space + font_get_height(style_label->text.font));
-        }
-    }
-    return valid;
-}
 /*=====================
  * Setter functions
  *====================*/
@@ -417,8 +323,7 @@ void lv_ta_del(lv_obj_t * ta)
 void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    lv_obj_t * scrl = lv_page_get_scrl(ta);
-	uint16_t len = txt_len(lv_label_get_text(ext->label));
+    uint16_t len = txt_len(lv_label_get_text(ext->label));
 
 	if(pos < 0) pos = len + pos;
 
@@ -598,6 +503,7 @@ void lv_ta_set_style(lv_obj_t * ta, lv_style_t *bg, lv_style_t *sb, lv_style_t *
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     ext->cursor_style = cur;
+
     lv_page_set_style(ta, bg, &lv_style_transp_tight, sb);
 }
 
@@ -651,7 +557,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         cord_t font_h =  font_get_height(style_label->text.font) >> FONT_ANTIALIAS;
 
         ext->one_line = 1;
-        lv_cont_set_fit(lv_page_get_scrl(ta), true, true);
+        lv_page_set_scrl_fit(ta, true, true);
         lv_obj_set_height(ta, font_h + (style_ta->body.padding.ver + style_scrl->body.padding.ver) * 2);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
         lv_label_set_no_break(ext->label, true);
@@ -661,7 +567,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_style_t * style_ta = lv_obj_get_style(ta);
 
         ext->one_line = 0;
-        lv_cont_set_fit(lv_page_get_scrl(ta), false, true);
+        lv_page_set_scrl_fit(ta, false, true);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         lv_label_set_no_break(ext->label, false);
         lv_obj_set_height(ta, LV_TA_DEF_HEIGHT);
@@ -942,6 +848,104 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const area_t * mask, lv_des
 	return true;
 }
 
+/**
+ * Signal function of the text area
+ * @param ta pointer to a text area object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(ta, sign, param);
+
+    /* The object can be deleted so check its validity and then
+     * make the object specific signal handling */
+    if(res == LV_RES_OK) {
+        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+        if(sign == LV_SIGNAL_CLEANUP) {
+            if(ext->pwd_tmp != NULL) dm_free(ext->pwd_tmp);
+
+            /* (The created label will be deleted automatically) */
+        } else if(sign == LV_SIGNAL_STYLE_CHG) {
+            if(ext->label) {
+                lv_obj_t * scrl = lv_page_get_scrl(ta);
+                lv_style_t * style_ta = lv_obj_get_style(ta);
+                lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                if(ext->one_line) {
+                    /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
+                    lv_style_t * style_label = lv_obj_get_style(ext->label);
+                    cord_t font_h =  font_get_height(style_label->text.font) >> FONT_ANTIALIAS;
+                    lv_obj_set_height(ta, font_h + (style_ta->body.padding.ver + style_scrl->body.padding.ver) * 2);
+                } else {
+                    /*In not one line mode refresh the Label width because 'hpad' can modify it*/
+                    lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
+                    lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);         /*Be sure the Label is in the correct position*/
+                }
+                lv_label_set_text(ext->label, NULL);
+
+                lv_obj_refresh_ext_size(scrl); /*Refresh ext. size because of cursor drawing*/
+            }
+        } else if(sign == LV_SIGNAL_CORD_CHG) {
+            /*Set the label width according to the text area width*/
+            if(ext->label) {
+                if(lv_obj_get_width(ta) != area_get_width(param) ||
+                  lv_obj_get_height(ta) != area_get_height(param)) {
+                    lv_obj_t * scrl = lv_page_get_scrl(ta);
+                    lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                    lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
+                    lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);
+                    lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
+                }
+            }
+        }
+        else if (sign == LV_SIGNAL_CONTROLL) {
+            char c = *((char*)param);
+            if(c == LV_GROUP_KEY_RIGHT) {
+                lv_ta_cursor_right(ta);
+            } else if(c == LV_GROUP_KEY_LEFT) {
+                lv_ta_cursor_left(ta);
+            } else if(c == LV_GROUP_KEY_UP) {
+                lv_ta_cursor_up(ta);
+            } else if(c == LV_GROUP_KEY_DOWN) {
+                lv_ta_cursor_down(ta);
+            }
+        }
+    }
+    return res;
+}
+
+/**
+ * Signal function of the scrollable part of the text area
+ * @param scrl pointer to scrollable part of a text area object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return true: the object is still valid (not deleted), false: the object become invalid
+ */
+static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = scrl_signal(scrl, sign, param);
+
+    /* The object can be deleted so check its validity and then
+     * make the object specific signal handling */
+    if(res == LV_RES_OK) {
+        if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+            /*Set ext. size because the cursor might be out of this object*/
+            lv_obj_t * ta = lv_obj_get_parent(scrl);
+            lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+            lv_style_t * style_label = lv_obj_get_style(ext->label);
+            cord_t font_h = font_get_height(style_label->text.font) >> FONT_ANTIALIAS;
+            scrl->ext_size = MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
+        }
+    }
+    return res;
+}
 
 /**
  * Called to blink the cursor
