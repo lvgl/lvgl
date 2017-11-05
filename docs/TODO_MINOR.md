@@ -7,11 +7,11 @@ Please create an issue to suggest a new feature instead of adding pull request t
 ## Ideas
 Here are ideas which are not assigned to a minor version yet:
 - label: add a horzintal line (e.g. underline or line through).
+- lv_split: new object type, a hor. or ver. line for decoration purpose
+- lv_valset: new object type, a label with "+" and "-" buttons
 
 ## v4.3 (in progress)
 - [x] UTF-8 support
-- [ ] lv_split: new object type, a hor. or ver. line for decoration purpose
-- [ ] lv_valset: new object type, a label with "+" and "-" buttons
 - [ ] lv_tabview: new object type to organise content with tabs
 - [x] lv_sw: new object type, switch, turn on/off by tap (a little slider)
 - [ ] lv_roller: new object type, a roller to select a value (like on smartphones) 
