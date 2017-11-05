@@ -26,3 +26,4 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [x] make styles to global variable to ensure less typing
 - [x] make fonts to global variables to ensure less typing and easy user-font adding
 - [x] join symbol fonts into normal built-in fonts
+- [ ] add inline functions to avoide direct use of anchestor functions (e.g. for buttons: lv_cont_set_fit -> lv_btn_set_fit)
