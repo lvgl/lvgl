@@ -44,6 +44,28 @@ typedef struct {
  */
 lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy);
 
+/**
+ * Set the selected option
+ * @param roller pointer to a roller object
+ * @param sel_opt id of the selected option (0 ... number of option - 1);
+ * @param anim_en true: set with animation; false set immediately
+ */
+void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
+
+/**
+ * Enable/disable to set the width of the roller manually (by lv_obj_Set_width())
+ * @param roller pointer to a roller object
+ * @param fit_en: true: enable auto size; false: use manual width settings
+ */
+void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en);
+
+/**
+ * Get the auto width set attribute
+ * @param roller pointer to a roller object
+ * @return true: auto size enabled; false: manual width settings enabled
+ */
+bool lv_roller_get_hor_fit(lv_obj_t *roller);
+
 /****************************
  * TRANSPARENT API FUNCTIONS
  ***************************/
@@ -56,15 +78,6 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy);
 static inline void lv_roller_set_options(lv_obj_t * roller, const char * options)
 {
     lv_ddlist_set_options(roller, options);
-}
-/**
- * Set the selected option
- * @param roller pointer to a roller object
- * @param sel_opt id of the selected option (0 ... number of option - 1);
- */
-static inline void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt)
-{
-    lv_ddlist_set_selected(roller, sel_opt);
 }
 
 /**

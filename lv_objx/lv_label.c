@@ -108,6 +108,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
         lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
         lv_label_set_recolor(new_label, lv_label_get_recolor(copy));
         lv_label_set_body_draw(new_label, lv_label_get_body_draw(copy));
+        lv_label_set_align(new_label, lv_label_get_align(copy));
         if(copy_ext->static_txt == 0) lv_label_set_text(new_label, lv_label_get_text(copy));
         else lv_label_set_text_static(new_label, lv_label_get_text(copy));
 

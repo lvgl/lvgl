@@ -29,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
-static bool lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
+static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_rel_action(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time);
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
@@ -297,7 +297,7 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim)
 void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t *bg, lv_style_t *sb, lv_style_t *sel)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    ext->selected_style = sel;
+    if(sel != NULL) ext->selected_style = sel;
     lv_obj_set_style(ext->options_label, bg);
 
     lv_page_set_style(ddlist, bg, &lv_style_transp_tight, sb);
@@ -456,18 +456,18 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
  * @param scrl pointer to a drop down list's scrollable part
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static bool lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
+static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
 {
-    bool valid;
+    lv_res_t res;
 
     /* Include the ancient signal function */
-    valid = ancestor_scrl_signal(scrl, sign, param);
+    res = ancestor_scrl_signal(scrl, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */
-    if(valid != false) {
+    if(res != false) {
         if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
             /* Because of the wider selected rectangle ext. size
              * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
@@ -477,7 +477,7 @@ static bool lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * para
         }
     }
 
-    return valid;
+    return res;
 }
 
 /**

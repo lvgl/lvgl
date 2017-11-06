@@ -65,35 +65,33 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));
     dm_assert(ext);
 
-    /*Initialize the allocated 'ext' */
-
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_roller, lv_roller_signal);
     lv_obj_set_design_func(new_roller, lv_roller_design);
 
-
     /*Init the new roller roller*/
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
-        lv_obj_set_drag(scrl, true);                    /*In ddlist is might be disabled*/
-        lv_page_set_release_action(new_roller, NULL);       /*Handle roller specific actions*/
-        lv_cont_set_fit(lv_page_get_scrl(new_roller), true, false); /*Height is specified directly*/
-        lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
+        lv_obj_set_drag(scrl, true);                        /*In ddlist is might be disabled*/
+        lv_page_set_release_action(new_roller, NULL);       /*Roller don't uses it (like ddlist)*/
+        lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
+        lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
+        lv_ddlist_set_fix_height(new_roller, (font_get_height(style_label->text.font) >> FONT_ANTIALIAS) * 3
+                                                                   + style_label->text.line_space * 4);
 
         lv_label_set_align(ext->ddlist.options_label, LV_LABEL_ALIGN_CENTER);
 
-        lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
-        lv_ddlist_set_fix_height(new_roller, (font_get_height(style_label->text.font)  >> FONT_ANTIALIAS) * 3
-                                      + style_label->text.line_space * 4);
+        lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
         lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/
     }
     /*Copy an existing roller*/
     else {
-    	lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        lv_obj_t * scrl = lv_page_get_scrl(new_roller);
+        lv_ddlist_open(new_roller, false);
+        lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
 
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_roller);
+        lv_obj_refresh_style(new_roller);        /*Refresh the style with new signal function*/
     }
     
     return new_roller;
@@ -112,18 +110,43 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
  * Setter functions
  *====================*/
 
-/*
- * New object specific "set" functions come here
+/**
+ * Set the selected option
+ * @param roller pointer to a roller object
+ * @param sel_opt id of the selected option (0 ... number of option - 1);
+ * @param anim_en true: set with animation; false set immediately
  */
+void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en)
+{
+    lv_ddlist_set_selected(roller, sel_opt);
+    refr_position(roller, anim_en);
+}
+
+/**
+ * Enable/disable to set the width of the roller manually (by lv_obj_Set_width())
+ * @param roller pointer to a roller object
+ * @param fit_en: true: enable auto size; false: use manual width settings
+ */
+void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en)
+{
+    lv_page_set_scrl_fit(roller, fit_en ,false);
+    lv_cont_set_fit(roller, fit_en ,false);
+}
 
 
 /*=====================
  * Getter functions
  *====================*/
 
-/*
- * New object specific "get" functions come here
+/**
+ * Get the auto width set attribute
+ * @param roller pointer to a roller object
+ * @return true: auto size enabled; false: manual width settings enabled
  */
+bool lv_roller_get_hor_fit(lv_obj_t *roller)
+{
+    return lv_page_get_scrl_hor_fit(roller);
+}
 
 /*=====================
  * Other functions
@@ -204,12 +227,18 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             lv_ddlist_set_selected(roller, ext->ddlist.selected_option_id);
             refr_position(roller, false);
         } else if(sign == LV_SIGNAL_CORD_CHG) {
-            lv_ddlist_set_fix_height(roller, lv_obj_get_height(roller));
-            lv_obj_set_height(lv_page_get_scrl(roller),
-                                 lv_obj_get_height(ext->ddlist.options_label) + lv_obj_get_height(roller));
-            lv_obj_align(ext->ddlist.options_label, NULL, LV_ALIGN_CENTER, 0, 0);
-            lv_ddlist_set_selected(roller, ext->ddlist.selected_option_id);
-            refr_position(roller, false);
+
+            if(lv_obj_get_width(roller) != area_get_width(param) ||
+               lv_obj_get_height(roller) != area_get_height(param)) {
+
+                lv_ddlist_set_fix_height(roller, lv_obj_get_height(roller));
+                lv_obj_set_height(lv_page_get_scrl(roller),
+                                     lv_obj_get_height(ext->ddlist.options_label) + lv_obj_get_height(roller));
+
+                lv_obj_align(ext->ddlist.options_label, NULL, LV_ALIGN_CENTER, 0, 0);
+                lv_ddlist_set_selected(roller, ext->ddlist.selected_option_id);
+                refr_position(roller, false);
+            }
         }
     }
 
