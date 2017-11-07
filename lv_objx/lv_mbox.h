@@ -95,9 +95,6 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
  * @param mbox pointer to a message box object
  * @param rel pointer to a style for releases state
  * @param pr  pointer to a style for pressed state
- * @param trel pointer to a style for toggled releases state
- * @param tpr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
  */
 void lv_mbox_set_style_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr);
 
@@ -151,10 +148,6 @@ uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox );
  */
 lv_style_t * lv_mbox_get_style_btn(lv_obj_t * mbox, lv_btn_state_t state);
 
-/**********************
- *      MACROS
- **********************/
-
 /****************************
  * TRANSPARENT API FUNCTIONS
  ***************************/
@@ -174,10 +167,15 @@ static inline void lv_mbox_set_style(lv_obj_t *mbox, lv_style_t * style)
  * @param mbox pointer to a message box object
  * @return pointer to the message box's style
  */
-static inline void lv_mbox_get_style(lv_obj_t *mbox, lv_style_t * style)
+static inline lv_style_t * lv_mbox_get_style(lv_obj_t *mbox)
 {
-    lv_obj_set_style(mbox, style);
+    return lv_obj_get_style(mbox);
 }
+
+/**********************
+ *      MACROS
+ **********************/
+
 
 #endif  /*USE_LV_MBOX*/
 

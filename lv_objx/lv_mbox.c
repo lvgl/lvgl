@@ -28,7 +28,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
-static void lv_mbox_disable_fit(lv_obj_t  * mbox);
+static void btnh_resize(lv_obj_t *mbox);
 
 /**********************
  *  STATIC VARIABLES
@@ -133,10 +133,10 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
     /*Create a button holder if it is not existed yet*/
     if(ext->btnh == NULL) {
         ext->btnh = lv_cont_create(mbox, NULL);
-        lv_obj_set_style(ext->btnh, &lv_style_transp);
+        lv_obj_set_style(ext->btnh, &lv_style_plain_color);
         lv_obj_set_click(ext->btnh, false);
-        lv_cont_set_fit(ext->btnh, true, true);
-        lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_ROW_M);
+        lv_cont_set_fit(ext->btnh, false, true);
+        lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_PRETTY);
     }
 
     lv_obj_t *btn = lv_btn_create(ext->btnh, NULL);
@@ -146,6 +146,8 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 
     lv_obj_t *label = lv_label_create(btn, NULL);
     lv_label_set_text(label, btn_txt);
+
+    btnh_resize(mbox);
 
     return btn;
 }
@@ -162,8 +164,9 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-
     lv_label_set_text(ext->txt, txt);
+
+    btnh_resize(mbox);
 }
 
 /**
@@ -171,9 +174,6 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
  * @param mbox pointer to a message box object
  * @param rel pointer to a style for releases state
  * @param pr  pointer to a style for pressed state
- * @param trel pointer to a style for toggled releases state
- * @param tpr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
  */
 void lv_mbox_set_style_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
 {
@@ -190,6 +190,8 @@ void lv_mbox_set_style_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
             btn = lv_obj_get_child(mbox, btn);
         }
     }
+
+    btnh_resize(mbox);
 }
 
 /**
@@ -311,12 +313,17 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
      * make the object specific signal handling */
     if(res == LV_RES_OK) {
         lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-
+        if(sign == LV_SIGNAL_CORD_CHG) {
+            if(lv_obj_get_width(mbox) != area_get_width(param)) {
+                btnh_resize(mbox);
+            }
+        }
         if(sign == LV_SIGNAL_LONG_PRESS) {
             lv_mbox_start_auto_close(mbox, 0);
             lv_indev_wait_release(param);
             res = LV_RES_INV;
-        } else if(sign == LV_SIGNAL_STYLE_CHG) {
+        }
+        else if(sign == LV_SIGNAL_STYLE_CHG) {
             /*Refresh all the buttons*/
             if(ext->btnh != NULL) {
                 lv_obj_t * btn;
@@ -327,7 +334,8 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     btn = lv_obj_get_child(ext->btnh, btn);
                 }
             }
-        } else if(sign == LV_SIGNAL_FOCUS) {
+        }
+        else if(sign == LV_SIGNAL_FOCUS) {
             /*Get the first button*/
             if(ext->btnh != NULL) {
                 lv_obj_t * btn = NULL;
@@ -341,7 +349,8 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     lv_btn_set_state(btn_prev, LV_BTN_STATE_PRESSED);
                 }
             }
-        } else if(sign == LV_SIGNAL_DEFOCUS) {
+        }
+        else if(sign == LV_SIGNAL_DEFOCUS) {
             /*Get the 'pressed' button*/
             if(ext->btnh != NULL) {
                 lv_obj_t * btn = NULL;
@@ -355,7 +364,8 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
                 }
             }
-        } else if(sign == LV_SIGNAL_CONTROLL) {
+        }
+        else if(sign == LV_SIGNAL_CONTROLL) {
             lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
             char c = *((char*)param);
             if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
@@ -375,7 +385,8 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                         lv_btn_set_state(btn_prev, LV_BTN_STATE_PRESSED);
                     }
                 }
-            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+            }
+            else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
                 /*Get the last pressed button*/
                 if(ext->btnh != NULL) {
                     lv_obj_t * btn = NULL;
@@ -394,7 +405,8 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
                     }
 
                 }
-            } else if(c == LV_GROUP_KEY_ENTER) {
+            }
+            else if(c == LV_GROUP_KEY_ENTER) {
                 /*Get the 'pressed' button*/
                if(ext->btnh != NULL) {
                    lv_obj_t * btn = NULL;
@@ -418,12 +430,29 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 }
 
 /**
- * Called when the close animations starts to disable the recargle's fit
+ * Resize the button holder to fit
  * @param mbox pointer to message box object
  */
-static void lv_mbox_disable_fit(lv_obj_t  * mbox)
+static void btnh_resize(lv_obj_t *mbox)
 {
-    lv_cont_set_fit(mbox, false, false);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    if(ext->btnh == NULL) return;
+
+    lv_style_t *bg_style = lv_mbox_get_style(mbox);
+    lv_style_t *btnh_style = lv_mbox_get_style(ext->btnh);
+    cord_t btnh_req_w = 2 * btnh_style->body.padding.hor;
+
+    lv_obj_t *btn = lv_obj_get_child(ext->btnh, NULL);
+    while(btn != NULL) {
+        btnh_req_w += lv_obj_get_width(btn) + btnh_style->body.padding.inner;
+        btn = lv_obj_get_child(ext->btnh, btn);
+    }
+
+    btnh_req_w -= btnh_style->body.padding.inner;                                   /*Trim the last inner padding*/
+
+    cord_t txt_w = lv_obj_get_width(ext->txt);
+
+    lv_obj_set_width(ext->btnh, btnh_req_w > txt_w ? btnh_req_w : txt_w);
 }
 
 #endif

@@ -118,9 +118,9 @@ static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
  * @param cont pointer to a container object
  * @return pointer to the container's style
  */
-static inline void lv_cont_get_style(lv_obj_t *cont, lv_style_t * style)
+static inline lv_style_t * lv_cont_get_style(lv_obj_t *cont)
 {
-    lv_obj_set_style(cont, style);
+    return lv_obj_get_style(cont);
 }
 
 /**********************
