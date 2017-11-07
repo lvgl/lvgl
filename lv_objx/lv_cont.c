@@ -191,26 +191,23 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
 
     /* Include the ancient signal function */
     res = ancestor_signal(cont, sign, param);
+    if(res != LV_RES_OK) return res;
 
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(res == LV_RES_OK) {
-        if(sign == LV_SIGNAL_STYLE_CHG) { /*Recalculate the padding if the style changed*/
+    if(sign == LV_SIGNAL_STYLE_CHG) { /*Recalculate the padding if the style changed*/
+        lv_cont_refr_layout(cont);
+        lv_cont_refr_autofit(cont);
+    } else if(sign == LV_SIGNAL_CHILD_CHG) {
+        lv_cont_refr_layout(cont);
+        lv_cont_refr_autofit(cont);
+    } else if(sign == LV_SIGNAL_CORD_CHG) {
+        if(lv_obj_get_width(cont) != area_get_width(param) ||
+           lv_obj_get_height(cont) != area_get_height(param)) {
             lv_cont_refr_layout(cont);
             lv_cont_refr_autofit(cont);
-        } else if(sign == LV_SIGNAL_CHILD_CHG) {
-            lv_cont_refr_layout(cont);
-            lv_cont_refr_autofit(cont);
-        } else if(sign == LV_SIGNAL_CORD_CHG) {
-            if(lv_obj_get_width(cont) != area_get_width(param) ||
-               lv_obj_get_height(cont) != area_get_height(param)) {
-                lv_cont_refr_layout(cont);
-                lv_cont_refr_autofit(cont);
-            }
         }
     }
 
-    return res;
+    return LV_RES_OK;
 }
 
 

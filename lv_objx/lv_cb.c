@@ -241,31 +241,28 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
 
     /* Include the ancient signal function */
     res = ancestor_signal(cb, sign, param);
+    if(res != LV_RES_OK) return res;
 
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_style_t * style = lv_obj_get_style(cb);
 
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(res == LV_RES_OK) {
-        if(sign == LV_SIGNAL_STYLE_CHG) {
-            lv_obj_set_size(ext->bullet, font_get_height(style->text.font), font_get_height(style->text.font));
+    if(sign == LV_SIGNAL_STYLE_CHG) {
+        lv_obj_set_size(ext->bullet, font_get_height(style->text.font), font_get_height(style->text.font));
+        lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
+    } else if(sign == LV_SIGNAL_PRESSED ||
+        sign == LV_SIGNAL_RELEASED ||
+        sign == LV_SIGNAL_PRESS_LOST) {
+        lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
+    } else if(sign == LV_SIGNAL_CONTROLL) {
+        char c = *((char*)param);
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
+           c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
+           c == LV_GROUP_KEY_ENTER) {
             lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-        } else if(sign == LV_SIGNAL_PRESSED ||
-            sign == LV_SIGNAL_RELEASED ||
-            sign == LV_SIGNAL_PRESS_LOST) {
-            lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-        } else if(sign == LV_SIGNAL_CONTROLL) {
-            char c = *((char*)param);
-            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
-               c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
-               c == LV_GROUP_KEY_ENTER) {
-                lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-            }
         }
     }
 
-    return res;
+    return LV_RES_OK;
 }
 
 #endif

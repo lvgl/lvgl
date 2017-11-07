@@ -65,15 +65,6 @@ typedef struct
 lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the drop down list
- * @param ddlist pointer to a drop down list object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
-
-/**
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"

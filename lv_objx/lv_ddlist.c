@@ -29,6 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
+lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_rel_action(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time);
@@ -116,70 +117,6 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     }
     
     return new_ddlist;
-}
-
-/**
- * Signal function of the drop down list
- * @param ddlist pointer to a drop down list object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = ancestor_signal(ddlist, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-        if(sign == LV_SIGNAL_STYLE_CHG) {
-            lv_ddlist_refr_size(ddlist, 0);
-            lv_obj_t *scrl = lv_page_get_scrl(ddlist);
-            lv_obj_refresh_ext_size(scrl);  /*Because of the wider selected rectangle*/
-        } else if(sign == LV_SIGNAL_FOCUS) {
-            lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-            if(ext->opened == false) {
-                ext->opened = true;
-                lv_ddlist_refr_size(ddlist, true);
-            }
-        } else if(sign == LV_SIGNAL_DEFOCUS) {
-            lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-            if(ext->opened != false) {
-                ext->opened = false;
-                lv_ddlist_refr_size(ddlist, true);
-            }
-        } else if(sign == LV_SIGNAL_CONTROLL) {
-            lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-            char c = *((char*)param);
-            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
-                if(ext->selected_option_id +1 < ext->option_cnt) {
-                    ext->selected_option_id ++;
-                    lv_obj_invalidate(ddlist);
-                    if(ext->callback != NULL) {
-                        ext->callback(ddlist);
-                    }
-                }
-            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
-                if(ext->selected_option_id > 0) {
-                    ext->selected_option_id --;
-                    lv_obj_invalidate(ddlist);
-                    if(ext->callback != NULL) {
-                        ext->callback(ddlist);
-                    }
-                }
-            } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ESC) {
-                if(ext->opened != false) ext->opened = false;
-                if(ext->opened == false) ext->opened = true;
-
-                lv_ddlist_refr_size(ddlist, true);
-            }
-        }
-    }
-
-    return valid;
 }
 
 /*=====================
@@ -452,6 +389,69 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
 }
 
 /**
+ * Signal function of the drop down list
+ * @param ddlist pointer to a drop down list object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+    /* Include the ancient signal function */
+    res = ancestor_signal(ddlist, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    if(sign == LV_SIGNAL_STYLE_CHG) {
+        lv_ddlist_refr_size(ddlist, 0);
+        lv_obj_t *scrl = lv_page_get_scrl(ddlist);
+        lv_obj_refresh_ext_size(scrl);  /*Because of the wider selected rectangle*/
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+        lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        if(ext->opened == false) {
+            ext->opened = true;
+            lv_ddlist_refr_size(ddlist, true);
+        }
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS) {
+        lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        if(ext->opened != false) {
+            ext->opened = false;
+            lv_ddlist_refr_size(ddlist, true);
+        }
+    }
+    else if(sign == LV_SIGNAL_CONTROLL) {
+        lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        char c = *((char*)param);
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
+            if(ext->selected_option_id +1 < ext->option_cnt) {
+                ext->selected_option_id ++;
+                lv_obj_invalidate(ddlist);
+                if(ext->callback != NULL) {
+                    ext->callback(ddlist);
+                }
+            }
+        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
+            if(ext->selected_option_id > 0) {
+                ext->selected_option_id --;
+                lv_obj_invalidate(ddlist);
+                if(ext->callback != NULL) {
+                    ext->callback(ddlist);
+                }
+            }
+        } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ESC) {
+            if(ext->opened != false) ext->opened = false;
+            if(ext->opened == false) ext->opened = true;
+
+            lv_ddlist_refr_size(ddlist, true);
+        }
+    }
+
+    return res;
+}
+
+/**
  * Signal function of the drop down list's scrollable part
  * @param scrl pointer to a drop down list's scrollable part
  * @param sign a signal type from lv_signal_t enum
@@ -464,17 +464,14 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
 
     /* Include the ancient signal function */
     res = ancestor_scrl_signal(scrl, sign, param);
+    if(res != LV_RES_OK) return res;
 
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(res != false) {
-        if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-            /* Because of the wider selected rectangle ext. size
-             * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
-            lv_obj_t *ddlist = lv_obj_get_parent(scrl);
-            lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
-            if(scrl->ext_size < style->body.padding.hor) scrl->ext_size = style->body.padding.hor;
-        }
+    if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        /* Because of the wider selected rectangle ext. size
+         * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
+        lv_obj_t *ddlist = lv_obj_get_parent(scrl);
+        lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
+        if(scrl->ext_size < style->body.padding.hor) scrl->ext_size = style->body.padding.hor;
     }
 
     return res;
