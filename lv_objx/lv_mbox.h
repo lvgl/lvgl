@@ -52,7 +52,7 @@ typedef struct
     lv_obj_t * btnh;            /*Holder of the buttons*/
     lv_style_t * style_btn_rel; /*Style of the released buttons*/
     lv_style_t * style_btn_pr;  /*Style of the pressed buttons*/
-    uint16_t anim_close_time;   /*Duration of close animation [ms] (0: no animation)*/
+    uint16_t anim_time;   /*Duration of close animation [ms] (0: no animation)*/
 }lv_mbox_ext_t;
 
 /**********************
@@ -99,14 +99,14 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
  * @param tpr pointer to a style for toggled pressed state
  * @param ina pointer to a style for inactive state
  */
-void lv_mbox_set_styles_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr);
+void lv_mbox_set_style_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr);
 
 /**
  * Set close animation duration
  * @param mbox pointer to a message box object
  * @param time animation length in  milliseconds (0: no animation)
  */
-void lv_mbox_set_anim_close_time(lv_obj_t * mbox, uint16_t time);
+void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t time);
 
 /**
  * Automatically delete the message box after a given time
@@ -126,7 +126,7 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox);
  * @param mbox pointer to a message box object
  * @return pointer to the text of the message box
  */
-const char * lv_mbox_get_txt(lv_obj_t * mbox);
+const char * lv_mbox_get_text(lv_obj_t * mbox);
 
 /**
  * Get the message box object from one of its button.
@@ -141,7 +141,7 @@ lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn);
  * @param mbox pointer to a message box object
  * @return animation length in  milliseconds (0: no animation)
  */
-uint16_t lv_mbox_get_anim_close_time(lv_obj_t * mbox );
+uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox );
 
 /**
  * Get the style of the buttons on a message box
@@ -154,6 +154,30 @@ lv_style_t * lv_mbox_get_style_btn(lv_obj_t * mbox, lv_btn_state_t state);
 /**********************
  *      MACROS
  **********************/
+
+/****************************
+ * TRANSPARENT API FUNCTIONS
+ ***************************/
+
+/**
+ * Set the style of a message box
+ * @param mbox pointer to a message box object
+ * @param style pointer to the new style
+ */
+static inline void lv_mbox_set_style(lv_obj_t *mbox, lv_style_t * style)
+{
+    lv_obj_set_style(mbox, style);
+}
+
+/**
+ * Get the style of a message box
+ * @param mbox pointer to a message box object
+ * @return pointer to the message box's style
+ */
+static inline void lv_mbox_get_style(lv_obj_t *mbox, lv_style_t * style)
+{
+    lv_obj_set_style(mbox, style);
+}
 
 #endif  /*USE_LV_MBOX*/
 

@@ -223,7 +223,6 @@ static inline lv_style_t * lv_list_get_style_sb(lv_obj_t *list)
     return lv_page_get_style_sb(list);
 }
 
-
 /**********************
  *      MACROS
  **********************/
