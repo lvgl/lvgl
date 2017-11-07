@@ -542,10 +542,6 @@ static void indev_drag_throw(lv_indev_state_t * state)
         cord_t act_y = lv_obj_get_y(drag_obj) + state->vect.y;
         lv_obj_set_pos(drag_obj, act_x, act_y);
 
-        printf("req_x:%d, real_x:%d, state_x:%d\n", act_x, lv_obj_get_x(drag_obj), state->vect.x);
-        printf("req_y:%d, real_y:%d, state_y:%d\n\n", act_y, lv_obj_get_y(drag_obj), state->vect.y);
-
-
         /*If non of the coordinates are changed then do not continue throwing*/
         if((lv_obj_get_x(drag_obj) != act_x || state->vect.x == 0) &&
            (lv_obj_get_y(drag_obj) != act_y || state->vect.y == 0)) {
