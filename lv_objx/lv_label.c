@@ -146,8 +146,8 @@ bool lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
             	lv_label_refr_text(label);
         }
         else if (sign == LV_SIGNAL_CORD_CHG) {
-            if(area_get_width(&label->coords) != area_get_width(param)
-               || area_get_height(&label->coords) != area_get_height(param))
+            if(area_get_width(&label->coords) != area_get_width(param) ||
+               area_get_height(&label->coords) != area_get_height(param))
             {
                 lv_label_refr_text(label);
             }
@@ -731,6 +731,10 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
             anim_create(&anim);
             hor_anim = true;
+        } else {
+            /*Delete the offset animation if not required*/
+            anim_del(label, (anim_fp_t) lv_label_set_offset_x);
+            ext->offset.x = 0;
         }
 
         if(size.y > lv_obj_get_height(label)) {
@@ -745,6 +749,11 @@ static void lv_label_refr_text(lv_obj_t * label)
                 anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED_VER, anim.start, anim.end);
             }
             anim_create(&anim);
+        } else {
+            /*Delete the offset animation if not required*/
+            anim_del(label, (anim_fp_t) lv_label_set_offset_y);
+            ext->offset.y = 0;
+
         }
     }
     /*In break mode only the height can change*/
