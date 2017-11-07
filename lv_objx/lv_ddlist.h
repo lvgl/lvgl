@@ -188,12 +188,12 @@ uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
 
 /**
  * Set the scroll bar mode of a drop down list
- * @param ta pointer to a drop down list object
+ * @param ddlist pointer to a drop down list object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
  */
-static inline void lv_ddlist_set_sb_mode(lv_obj_t * ta, lv_page_sb_mode_t mode)
+static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_page_sb_mode_t mode)
 {
-    lv_page_set_sb_mode(ta, mode);
+    lv_page_set_sb_mode(ddlist, mode);
 }
 
 /**
@@ -201,9 +201,9 @@ static inline void lv_ddlist_set_sb_mode(lv_obj_t * ta, lv_page_sb_mode_t mode)
  * @param ddlist pointer to a  drop down list object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
  */
-static inline lv_page_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ta)
+static inline lv_page_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
 {
-    return lv_page_get_sb_mode(ta);
+    return lv_page_get_sb_mode(ddlist);
 }
 
 /**
@@ -218,7 +218,7 @@ static inline lv_style_t * lv_ddlist_get_style_bg(lv_obj_t * ddlist)
 
 /**
 * Get the style of the scrollbars of a drop down list
-* @param ddlist pointer to a text area object
+* @param ddlist pointer to a drop down list object
 * @return pointer to the style of the scrollbars
 */
 static inline lv_style_t * lv_ddlist_get_style_sb(lv_obj_t * ddlist)

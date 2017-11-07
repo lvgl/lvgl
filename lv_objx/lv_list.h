@@ -48,8 +48,9 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
+    uint16_t anim_time;                          /*Scroll animation time*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
-    lv_style_t *style_img;    /*Style of the list element images on buttons*/
+    lv_style_t *style_img;                       /*Style of the list element images on buttons*/
 }lv_list_ext_t;
 
 /**********************
@@ -62,15 +63,7 @@ typedef struct
  * @param copy pointer to a list object, if not NULL then the new object will be copied from it
  * @return pointer to the created list
  */
-lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy);
-
-/**
- * Signal function of the list
- * @param list pointer to a list object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
+lv_obj_t * lv_list_create(lv_obj_t *par, lv_obj_t * copy);
 
 /**
  * Add a list element to the list
@@ -80,27 +73,26 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
  * @param rel_action pointer to release action function (like with lv_btn)
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action);
+lv_obj_t * lv_list_add(lv_obj_t *list, const char * img_fn, const char * txt, lv_action_t rel_action);
 
 /**
  * Move the list elements up by one
  * @param list pointer a to list object
  */
-void lv_list_up(lv_obj_t * list);
+void lv_list_up(lv_obj_t *list);
 
 /**
  * Move the list elements down by one
  * @param list pointer to a list object
  */
-void lv_list_down(lv_obj_t * list);
+void lv_list_down(lv_obj_t *list);
 
 /**
- * Enable/Disable to scrollbar outside attribute
- * @param list pointer to list object
- * @param out true: reduce the buttons width therefore scroll bar will be out of the buttons,
- *            false: keep button size and place scroll bar on the buttons
+ * Focus on a list button. It ensures that the button will be visible on the list.
+ * @param btn pointer to a list button to focus
+ * @param anim_en true: scroll with animation, false: without animation
  */
-void lv_list_set_sscrollbar_out(lv_obj_t * list, bool out);
+void lv_list_focus(lv_obj_t *btn, bool anim_en);
 
 /**
  * Set styles of the list elements of a list in each state
@@ -114,6 +106,13 @@ void lv_list_set_sscrollbar_out(lv_obj_t * list, bool out);
 void lv_list_set_style_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
                             lv_style_t * trel, lv_style_t * tpr,
                             lv_style_t * ina);
+
+/**
+ * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
+ * @param list pointer to a list object
+ * @param anim_time duration of animation [ms]
+ */
+void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time);
 
 /**
  * Get the text of a list element
@@ -149,7 +148,14 @@ bool lv_list_get_sb_out(lv_obj_t * list, bool en);
  * @param state a state from 'lv_btn_state_t' in which style should be get
  * @return pointer to the style in the given state
  */
-lv_style_t * lv_list_get_style_btne(lv_obj_t * list, lv_btn_state_t state);
+lv_style_t * lv_list_get_style_btn(lv_obj_t * list, lv_btn_state_t state);
+
+/**
+ * Get scroll animation duration
+ * @param list pointer to a list object
+ * @return duration of animation [ms]
+ */
+uint16_t lv_list_get_anim_time(lv_obj_t *list);
 
 /****************************
  * TRANSPARENT API FUNCTIONS
@@ -162,10 +168,61 @@ lv_style_t * lv_list_get_style_btne(lv_obj_t * list, lv_btn_state_t state);
  * @param scrl pointer to a style for the scrollable area
  * @param sb pointer to a style for the scroll bars
  */
-static inline void lv_list_set_style_bg(lv_obj_t *list, lv_style_t *bg, lv_style_t *scrl, lv_style_t *sb)
+static inline void lv_list_set_style(lv_obj_t *list, lv_style_t *bg, lv_style_t *scrl, lv_style_t *sb)
 {
     lv_page_set_style(list, bg, scrl, sb);
 }
+
+/**
+ * Set the scroll bar mode of a list
+ * @param list pointer to a list object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_page_sb_mode_t mode)
+{
+    lv_page_set_sb_mode(list, mode);
+}
+
+/**
+ * Get the scroll bar mode of a list
+ * @param list pointer to a list object
+ * @return scrollbar mode from 'lv_page_sb_mode_t' enum
+ */
+static inline lv_page_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
+{
+    return lv_page_get_sb_mode(list);
+}
+
+/**
+ * Get a style of a list's background
+ * @param list pointer to a list object
+ * @return pointer to the background's style
+ */
+static inline lv_style_t * lv_list_get_style_bg(lv_obj_t *list)
+{
+    return lv_page_get_style_bg(list);
+}
+
+/**
+ * Get a style of a list's scrollable part
+ * @param list pointer to a list object
+ * @return pointer to the scrollable"s style
+ */
+static inline lv_style_t * lv_list_get_style_scrl(lv_obj_t *list)
+{
+    return lv_page_get_style_scrl(list);
+}
+
+/**
+* Get the style of the scrollbars of a list
+* @param list pointer to a list object
+* @return pointer to the style of the scrollbars
+*/
+static inline lv_style_t * lv_list_get_style_sb(lv_obj_t *list)
+{
+    return lv_page_get_style_sb(list);
+}
+
 
 /**********************
  *      MACROS

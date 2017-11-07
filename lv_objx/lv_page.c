@@ -173,6 +173,11 @@ void lv_page_set_style(lv_obj_t *page, lv_style_t *bg, lv_style_t *scrl, lv_styl
         area_set_height(&ext->sb.hor_area, ext->sb.style->body.padding.inner);
         area_set_width(&ext->sb.ver_area, ext->sb.style->body.padding.inner);
         lv_page_sb_refresh(page);
+        if(bg == NULL) {
+            /*If scrollbars are positioned out of page then ext. size is needed to draw it*/
+            /*Page's style change signal will handle it but if no bg. style specified do it manually*/
+            lv_obj_refresh_ext_size(page);
+        }
         lv_obj_invalidate(page);
     }
     if(scrl != NULL) lv_obj_set_style(ext->scrl, scrl);
