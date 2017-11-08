@@ -28,11 +28,13 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_design_func_t ancestor_design_f;
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -58,6 +60,9 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_bar = lv_obj_create(par, copy);
     dm_assert(new_bar);
 
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_bar);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_bar);
+
     /*Allocate the object type specific extended data*/
     lv_bar_ext_t * ext = lv_obj_allocate_ext_attr(new_bar, sizeof(lv_bar_ext_t));
     dm_assert(ext);
@@ -65,10 +70,6 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     ext->max_value = 100;
     ext->cur_value = 0;
     ext->style_inicator = &lv_style_pretty_color;
-
-    /* Save the ancient design function.
-     * It will be used in the bar design function*/
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_bar);
 
     lv_obj_set_signal_func(new_bar, lv_bar_signal);
     lv_obj_set_design_func(new_bar, lv_bar_design);
@@ -91,32 +92,6 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
         lv_bar_set_value(new_bar, ext->cur_value);
     }
     return new_bar;
-}
-
-/**
- * Signal function of the bar
- * @param bar pointer to a bar object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_obj_signal(bar, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-        if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-            lv_style_t * style_indic = lv_bar_get_style_indicator(bar);
-            if(style_indic->body.shadow.width > bar->ext_size) bar->ext_size = style_indic->body.shadow.width;
-        }
-
-    }
-
-    return valid;
 }
 
 /*=====================
@@ -310,5 +285,29 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
     }
     return true;
 }
+
+/**
+ * Signal function of the bar
+ * @param bar pointer to a bar object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(bar, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        lv_style_t * style_indic = lv_bar_get_style_indicator(bar);
+        if(style_indic->body.shadow.width > bar->ext_size) bar->ext_size = style_indic->body.shadow.width;
+    }
+
+    return LV_RES_OK;
+}
+
 
 #endif

@@ -53,14 +53,6 @@ typedef struct
 lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the bar
- * @param bar pointer to a bar object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
-
-/**
  * Set a new value on the bar
  * @param bar pointer to a bar object
  * @param value new value

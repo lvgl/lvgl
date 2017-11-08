@@ -52,7 +52,8 @@ typedef struct
     lv_obj_t * btnh;            /*Holder of the buttons*/
     lv_style_t * style_btn_rel; /*Style of the released buttons*/
     lv_style_t * style_btn_pr;  /*Style of the pressed buttons*/
-    uint16_t anim_time;   /*Duration of close animation [ms] (0: no animation)*/
+    uint16_t anim_time;         /*Duration of close animation [ms] (0: no animation)*/
+    cord_t btn_width;           /*Button width (0: to auto fit)*/
 }lv_mbox_ext_t;
 
 /**********************
@@ -91,6 +92,21 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
 void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
 
 /**
+ * Set the width of the buttons
+ * @param mbox pointer to message box object
+ * @param w width of the buttons or 0 to use auto fit
+ */
+void lv_mbox_set_btn_width(lv_obj_t *mbox, cord_t w);
+
+/**
+ * Set the styles of a message box
+ * @param mbox pointer to a message box object
+ * @param bg pointer to the new background style
+ * @param btnh pointer to the new button holder style
+ */
+void lv_mbox_set_style(lv_obj_t *mbox, lv_style_t *bg, lv_style_t *btnh);
+
+/**
  * Set styles of the buttons of a message box in each state
  * @param mbox pointer to a message box object
  * @param rel pointer to a style for releases state
@@ -126,6 +142,13 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox);
 const char * lv_mbox_get_text(lv_obj_t * mbox);
 
 /**
+ * Get width of the buttons
+ * @param mbox pointer to a message box object
+ * @return width of the buttons (0: auto fit enabled)
+ */
+cord_t lv_mbox_get_text(lv_obj_t * mbox);
+
+/**
  * Get the message box object from one of its button.
  * It is useful in the button release actions where only the button is known
  * @param btn pointer to a button of a message box
@@ -148,29 +171,27 @@ uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox );
  */
 lv_style_t * lv_mbox_get_style_btn(lv_obj_t * mbox, lv_btn_state_t state);
 
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
+/**
+ * Get the style of a message box's button holder
+ * @param mbox pointer to a message box object
+ * @return pointer to the message box's background style
+ */
+lv_style_t * lv_mbox_get_style_btnh(lv_obj_t *mbox);
+
+/******************************
+ *  TRANSPARENT API FUNCTIONS
+ ******************************/
 
 /**
- * Set the style of a message box
+ * Get the style of a message box's background
  * @param mbox pointer to a message box object
- * @param style pointer to the new style
+ * @return pointer to the message box's background style
  */
-static inline void lv_mbox_set_style(lv_obj_t *mbox, lv_style_t * style)
-{
-    lv_obj_set_style(mbox, style);
-}
-
-/**
- * Get the style of a message box
- * @param mbox pointer to a message box object
- * @return pointer to the message box's style
- */
-static inline lv_style_t * lv_mbox_get_style(lv_obj_t *mbox)
+static inline lv_style_t * lv_mbox_get_style_bg(lv_obj_t *mbox)
 {
     return lv_obj_get_style(mbox);
 }
+
 
 /**********************
  *      MACROS

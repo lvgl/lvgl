@@ -111,7 +111,6 @@ lv_style_t * lv_slider_get_style_knob(lv_obj_t * slider);
  */
 bool lv_slider_get_knob_in(lv_obj_t * slider);
 
-
 /******************************
  *  TRANSPARENT API FUNCTIONS
  ******************************/

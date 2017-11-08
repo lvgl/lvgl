@@ -25,6 +25,7 @@
 #if 0 /*Slider design is used*/
 static bool lv_sw_design(lv_obj_t * sw, const area_t * mask, lv_design_mode_t mode);
 #endif
+static lv_signal_func_t ancestor_signal;
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -52,6 +53,8 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor of switch*/
     lv_obj_t * new_sw = lv_slider_create(par, copy);
     dm_assert(new_sw);
+
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_sw);
     
     /*Allocate the switch type specific extended data*/
     lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
@@ -98,7 +101,7 @@ bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     ext->slider.action = NULL;  /*Do not let the slider to call the callback. The Switch will do it*/
 
     /* Include the ancient signal function */
-    valid = lv_slider_signal(sw, sign, param);
+    valid = ancestor_signal(sw, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */

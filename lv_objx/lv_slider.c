@@ -32,6 +32,7 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
  *  STATIC VARIABLES
  **********************/
 static lv_design_func_t ancestor_design_f;
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -57,6 +58,9 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_slider = lv_bar_create(par, copy);
     dm_assert(new_slider);
     
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_slider);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_slider);
+
     /*Allocate the slider type specific extended data*/
     lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(new_slider, sizeof(lv_slider_ext_t));
     dm_assert(ext);
@@ -66,10 +70,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     ext->tmp_value = ext->bar.min_value;
     ext->style_knob = &lv_style_pretty;
     ext->knob_in = 0;
-
-    /* Save the bar design function.
-     * It will be used in the sllider design function*/
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_slider);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_slider, lv_slider_signal);
@@ -105,7 +105,7 @@ bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
     bool valid;
 
     /* Include the ancient signal function */
-    valid = lv_bar_signal(slider, sign, param);
+    valid = ancestor_signal(slider, sign, param);
 
     /* The object can be deleted so check its validity and then
      * make the object specific signal handling */

@@ -68,6 +68,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     ext->style_btn_rel = &lv_style_btn_off_released;
     ext->style_btn_pr = &lv_style_btn_off_pressed;
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;
+    ext->btn_width = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_mbox, lv_mbox_signal);
@@ -78,6 +79,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_cont_set_fit(new_mbox, true, true);
 
     	ext->txt = lv_label_create(new_mbox, NULL);
+    	lv_label_set_align(ext->txt, LV_LABEL_ALIGN_CENTER);
     	lv_label_set_text(ext->txt, "Message");
 
     	lv_obj_set_style(new_mbox, &lv_style_pretty);
@@ -87,6 +89,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
         lv_mbox_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
         ext->txt = lv_label_create(new_mbox, copy_ext->txt);
+        ext->btn_width = copy_ext->btn_width;
 
         /*Copy the buttons and the label on them*/
         if(copy_ext->btnh != NULL) {
@@ -97,6 +100,10 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
                 lv_mbox_add_btn(new_mbox, btn_txt_copy, lv_btn_get_action(btn_copy, LV_BTN_ACTION_RELEASE));
             }
         }
+
+        lv_mbox_set_style(new_mbox, lv_mbox_get_style_bg(copy), lv_mbox_get_style_btnh(copy));
+        lv_mbox_set_style_btn(new_mbox, copy_ext->style_btn_rel, copy_ext->style_btn_pr);
+
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_mbox);
     }
@@ -133,7 +140,7 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
     /*Create a button holder if it is not existed yet*/
     if(ext->btnh == NULL) {
         ext->btnh = lv_cont_create(mbox, NULL);
-        lv_obj_set_style(ext->btnh, &lv_style_plain_color);
+        lv_obj_set_style(ext->btnh, &lv_style_transp_fit);
         lv_obj_set_click(ext->btnh, false);
         lv_cont_set_fit(ext->btnh, false, true);
         lv_cont_set_layout(ext->btnh, LV_CONT_LAYOUT_PRETTY);
@@ -142,7 +149,13 @@ lv_obj_t * lv_mbox_add_btn(lv_obj_t * mbox, const char * btn_txt, lv_action_t re
     lv_obj_t *btn = lv_btn_create(ext->btnh, NULL);
     lv_btn_set_action(btn, LV_BTN_ACTION_RELEASE, rel_action);
     lv_btn_set_style(btn, ext->style_btn_rel, ext->style_btn_pr, NULL, NULL, NULL);
-    lv_cont_set_fit(btn, true, true);
+
+    if(ext->btn_width) {
+        lv_btn_set_fit(btn, false, true);
+        lv_obj_set_width(btn, ext->btn_width);
+    } else {
+        lv_btn_set_fit(btn, true, true);
+    }
 
     lv_obj_t *label = lv_label_create(btn, NULL);
     lv_label_set_text(label, btn_txt);
@@ -167,6 +180,44 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
     lv_label_set_text(ext->txt, txt);
 
     btnh_resize(mbox);
+}
+
+/**
+ * Set the width of the buttons
+ * @param mbox pointer to message box object
+ * @param w width of the buttons or 0 to use auto fit
+ */
+void lv_mbox_set_btn_width(lv_obj_t *mbox, cord_t w)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    ext->btn_width = w;
+    if(ext->btnh == NULL) return;
+
+    lv_obj_t *btn = lv_obj_get_child(ext->btnh, NULL);
+    while(btn != NULL) {
+        if(w) {
+            lv_btn_set_fit(btn, false, true);
+            lv_obj_set_width(btn, w);
+        } else {
+            lv_btn_set_fit(btn, true, true);
+        }
+        btn = lv_obj_get_child(ext->btnh, btn);
+    }
+
+    btnh_resize(mbox);
+}
+
+/**
+ * Set the styles of a message box
+ * @param mbox pointer to a message box object
+ * @param bg pointer to the new background style
+ * @param btnh pointer to the new button holder style
+ */
+void lv_mbox_set_style(lv_obj_t *mbox, lv_style_t *bg, lv_style_t *btnh)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    lv_obj_set_style(ext->btnh, btnh);
+    lv_obj_set_style(mbox, bg);
 }
 
 /**
@@ -252,6 +303,17 @@ const char * lv_mbox_get_text(lv_obj_t * mbox)
 }
 
 /**
+ * Get width of the buttons
+ * @param mbox pointer to a message box object
+ * @return width of the buttons (0: auto fit enabled)
+ */
+cord_t lv_mbox_get_text(lv_obj_t * mbox)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    return ext->btn_width;
+}
+
+/**
  * Get the message box object from one of its button.
  * It is useful in the button release actions where only the button is known
  * @param btn pointer to a button of a message box
@@ -275,6 +337,18 @@ uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox )
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return ext->anim_time;
 }
+
+/**
+ * Get the style of a message box's button holder
+ * @param mbox pointer to a message box object
+ * @return pointer to the message box's background style
+ */
+lv_style_t * lv_mbox_get_style_btnh(lv_obj_t *mbox)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    return lv_obj_get_style(ext->btnh);
+}
+
 
 /**
  * Get the style of the buttons on a message box
@@ -435,8 +509,7 @@ static void btnh_resize(lv_obj_t *mbox)
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     if(ext->btnh == NULL) return;
 
-    lv_style_t *bg_style = lv_mbox_get_style(mbox);
-    lv_style_t *btnh_style = lv_mbox_get_style(ext->btnh);
+    lv_style_t *btnh_style = lv_mbox_get_style_bg(ext->btnh);
     cord_t btnh_req_w = 2 * btnh_style->body.padding.hor;
 
     lv_obj_t *btn = lv_obj_get_child(ext->btnh, NULL);
