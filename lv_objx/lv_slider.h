@@ -56,15 +56,6 @@ typedef enum
 lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the slider
- * @param slider pointer to a slider object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
-
-/**
  * Set a function which will be called when a new value is set on the slider
  * @param slider pointer to slider object
  * @param cb a callback function

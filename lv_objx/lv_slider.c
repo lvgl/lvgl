@@ -18,7 +18,7 @@
  *      DEFINES
  *********************/
 #define LV_SLIDER_SIZE_MIN (2 << LV_ANTIALIAS)      /*hpad and vpad cannot make the bar or indicator smaller then this [px]*/
-
+#define LV_SLIDER_NOT_PRESSED   INT16_MIN
 /**********************
  *      TYPEDEFS
  **********************/
@@ -27,6 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
@@ -91,91 +92,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     }
     
     return new_slider;
-}
-
-/**
- * Signal function of the slider
- * @param slider pointer to a slider object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = ancestor_signal(slider, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-        lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-        point_t p;
-        cord_t w = lv_obj_get_width(slider);
-        cord_t h = lv_obj_get_height(slider);
-        int16_t tmp;
-
-        if(sign == LV_SIGNAL_PRESSED) {
-            ext->tmp_value = lv_slider_get_value(slider);
-        }
-        else if(sign == LV_SIGNAL_PRESSING) {
-            lv_indev_get_point(param, &p);
-            if(w > h) {
-                cord_t knob_w = h;
-                p.x -= slider->coords.x1 + h / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
-                tmp = (int32_t) ((int32_t) p.x * (ext->bar.max_value - ext->bar.min_value + 1)) / (w - knob_w);
-            } else {
-                cord_t knob_h = w;
-                p.y -= slider->coords.y1 + w / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
-                tmp = (int32_t) ((int32_t) p.y * (ext->bar.max_value - ext->bar.min_value + 1)) / (h - knob_h);
-                tmp = ext->bar.max_value - tmp;     /*Invert he value: small value means higher y*/
-            }
-
-            lv_slider_set_value(slider, tmp);
-        }
-        else if (sign == LV_SIGNAL_PRESS_LOST) {
-            lv_slider_set_value(slider, ext->tmp_value);
-        }
-        else if (sign == LV_SIGNAL_RELEASED) {
-            ext->tmp_value = lv_slider_get_value(slider);
-            lv_slider_set_value(slider, ext->tmp_value);
-            if(ext->action != NULL) ext->action(slider);
-        }
-        else if(sign == LV_SIGNAL_CORD_CHG) {
-            /* The knob size depends on slider size.
-             * During the drawing method the ext. size is used by the knob so refresh the ext. size.*/
-            if(lv_obj_get_width(slider) != area_get_width(param) ||
-              lv_obj_get_height(slider) != area_get_height(param)) {
-                slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
-            }
-        } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-            if(ext->knob_in == 0) {
-                cord_t x = MATH_MIN(w, h);      /*The smaller size is the knob diameter*/
-                if(slider->ext_size < x) slider->ext_size = x;
-            } else {
-                lv_style_t * style = lv_obj_get_style(slider);
-                cord_t pad = MATH_MIN(style->body.padding.hor, style->body.padding.ver);
-                if(pad < 0) {
-                    pad = -pad;
-                    if(slider->ext_size < pad) slider->ext_size = pad;
-                }
-
-            }
-        } else if(sign == LV_SIGNAL_CONTROLL) {
-            lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-            char c = *((char*)param);
-            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
-                lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
-                if(ext->action != NULL) ext->action(slider);
-            } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
-                lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
-                if(ext->action != NULL) ext->action(slider);
-            }
-        }
-    }
-
-    return valid;
 }
 
 /*=====================
@@ -287,6 +203,8 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
+        lv_vfill(&slider->coords, mask, COLOR_LIME, OPA_COVER);
+
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
         lv_style_t * style_slider = lv_slider_get_style_bg(slider);
@@ -334,22 +252,24 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         cord_t slider_w = area_get_width(&slider->coords);
         cord_t slider_h = area_get_height(&slider->coords);
 
-        cord_t act_value = lv_slider_get_value(slider);
+        cord_t cur_value = lv_slider_get_value(slider);
         cord_t min_value = lv_slider_get_min_value(slider);
         cord_t max_value = lv_slider_get_max_value(slider);
 
+        if(ext->tmp_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->tmp_value;
+
         if(slider_w >= slider_h) {
-            area_indic.x2 = (int32_t) ((int32_t)area_get_width(&area_indic) * act_value) / (max_value - min_value);
+            area_indic.x2 = (int32_t) ((int32_t)area_get_width(&area_indic) * cur_value) / (max_value - min_value);
             area_indic.x2 += area_indic.x1;
 
         } else {
-            area_indic.y1 = (int32_t) ((int32_t)area_get_height(&area_indic) * act_value) / (max_value - min_value);
+            area_indic.y1 = (int32_t) ((int32_t)area_get_height(&area_indic) * cur_value) / (max_value - min_value);
             area_indic.y1 = area_indic.y2 - area_indic.y1;
         }
 
-        /*Draw the indicator*/
-        if(act_value != min_value) lv_draw_rect(&area_indic, mask, style_indic);
+        if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic);
 
+        /*Draw the knob*/
         area_t knob_area;
         area_cpy(&knob_area, &slider->coords);
 
@@ -358,7 +278,7 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
                 knob_area.x1 = area_indic.x2 - slider_h / 2;
                 knob_area.x2 = knob_area.x1 + slider_h;
             } else {
-                knob_area.x1 = (int32_t) ((int32_t)(slider_w - slider_h) * act_value) / (max_value - min_value);
+                knob_area.x1 = (int32_t) ((int32_t)(slider_w - slider_h) * cur_value) / (max_value - min_value);
                 knob_area.x1 += slider->coords.x1;
                 knob_area.x2 = knob_area.x1 + slider_h;
             }
@@ -370,7 +290,7 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
                 knob_area.y1 = area_indic.y1 - slider_w / 2;
                 knob_area.y2 = knob_area.y1 + slider_w;
             } else {
-                knob_area.y2 = (int32_t) ((int32_t)(slider_h - slider_w) * act_value) / (max_value - min_value);
+                knob_area.y2 = (int32_t) ((int32_t)(slider_h - slider_w) * cur_value) / (max_value - min_value);
                 knob_area.y2 = slider->coords.y2 - knob_area.y2;
                 knob_area.y1 = knob_area.y2 - slider_w;
             }
@@ -390,4 +310,84 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
     return true;
 }
 
+/**
+ * Signal function of the slider
+ * @param slider pointer to a slider object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(slider, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+    point_t p;
+    cord_t w = lv_obj_get_width(slider);
+    cord_t h = lv_obj_get_height(slider);
+
+    if(sign == LV_SIGNAL_PRESSED) {
+        ext->tmp_value = lv_slider_get_value(slider);
+    }
+    else if(sign == LV_SIGNAL_PRESSING) {
+        lv_indev_get_point(param, &p);
+        if(w > h) {
+            cord_t knob_w = h;
+            p.x -= slider->coords.x1 + h / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
+            ext->tmp_value = (int32_t) ((int32_t) p.x * (ext->bar.max_value - ext->bar.min_value + 1)) / (w - knob_w);
+        } else {
+            cord_t knob_h = w;
+            p.y -= slider->coords.y1 + w / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
+            ext->tmp_value = (int32_t) ((int32_t) p.y * (ext->bar.max_value - ext->bar.min_value + 1)) / (h - knob_h);
+            ext->tmp_value = ext->bar.max_value - ext->tmp_value;     /*Invert the value: smaller value means higher y*/
+        }
+        lv_obj_invalidate(slider);
+    }
+    else if (sign == LV_SIGNAL_PRESS_LOST) {
+        ext->tmp_value = LV_SLIDER_NOT_PRESSED;
+
+    }
+    else if (sign == LV_SIGNAL_RELEASED) {
+        lv_slider_set_value(slider, ext->tmp_value);
+        ext->tmp_value = LV_SLIDER_NOT_PRESSED;
+        if(ext->action != NULL) ext->action(slider);
+    }
+    else if(sign == LV_SIGNAL_CORD_CHG) {
+        /* The knob size depends on slider size.
+         * During the drawing method the ext. size is used by the knob so refresh the ext. size.*/
+        if(lv_obj_get_width(slider) != area_get_width(param) ||
+          lv_obj_get_height(slider) != area_get_height(param)) {
+            slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+        }
+    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        if(ext->knob_in == 0) {
+            cord_t x = MATH_MIN(w, h);      /*The smaller size is the knob diameter*/
+            if(slider->ext_size < x) slider->ext_size = x;
+        } else {
+            lv_style_t * style = lv_obj_get_style(slider);
+            cord_t pad = MATH_MIN(style->body.padding.hor, style->body.padding.ver);
+            if(pad < 0) {
+                pad = -pad;
+                if(slider->ext_size < pad) slider->ext_size = pad;
+            }
+
+        }
+    } else if(sign == LV_SIGNAL_CONTROLL) {
+        lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+        char c = *((char*)param);
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+            lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
+            if(ext->action != NULL) ext->action(slider);
+        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+            lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
+            if(ext->action != NULL) ext->action(slider);
+        }
+    }
+
+    return LV_RES_OK;
+}
 #endif
