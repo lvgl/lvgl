@@ -307,7 +307,7 @@ const char * lv_mbox_get_text(lv_obj_t * mbox)
  * @param mbox pointer to a message box object
  * @return width of the buttons (0: auto fit enabled)
  */
-cord_t lv_mbox_get_text(lv_obj_t * mbox)
+cord_t lv_mbox_get_btn_width(lv_obj_t * mbox)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return ext->btn_width;
@@ -518,7 +518,7 @@ static void btnh_resize(lv_obj_t *mbox)
         btn = lv_obj_get_child(ext->btnh, btn);
     }
 
-    btnh_req_w -= btnh_style->body.padding.inner;                                   /*Trim the last inner padding*/
+    btnh_req_w -= btnh_style->body.padding.inner;       /*Trim the last inner padding*/
 
     cord_t txt_w = lv_obj_get_width(ext->txt);
 

@@ -146,7 +146,7 @@ const char * lv_mbox_get_text(lv_obj_t * mbox);
  * @param mbox pointer to a message box object
  * @return width of the buttons (0: auto fit enabled)
  */
-cord_t lv_mbox_get_text(lv_obj_t * mbox);
+cord_t lv_mbox_get_btn_width(lv_obj_t * mbox);
 
 /**
  * Get the message box object from one of its button.
