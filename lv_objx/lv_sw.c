@@ -22,13 +22,12 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if 0 /*Slider design is used*/
-static bool lv_sw_design(lv_obj_t * sw, const area_t * mask, lv_design_mode_t mode);
-#endif
-static lv_signal_func_t ancestor_signal;
+static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -74,8 +73,12 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing switch*/
     else {
-        /*Nothing to copy*/
+        lv_sw_ext_t *copy_ext = lv_obj_get_ext_attr(copy);
+        ext->knob_off_style = copy_ext->knob_off_style;
+        ext->knob_on_style = copy_ext->knob_on_style;
 
+        if(lv_sw_get_state(new_sw)) lv_slider_set_style(new_sw, NULL, NULL, ext->knob_on_style);
+        else lv_slider_set_style(new_sw, NULL, NULL, ext->knob_off_style);
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_sw);
     }
@@ -83,107 +86,138 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     return new_sw;
 }
 
-/**
- * Signal function of the switch
- * @param sw pointer to a switch object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-    int16_t old_val = lv_slider_get_value(sw);
-
-    lv_action_t slider_cb = ext->slider.action;
-    ext->slider.action = NULL;  /*Do not let the slider to call the callback. The Switch will do it*/
-
-    /* Include the ancient signal function */
-    valid = ancestor_signal(sw, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	if(sign == LV_SIGNAL_CLEANUP) {
-            /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    	}
-        else if(sign == LV_SIGNAL_PRESSING) {
-            int16_t act_val = lv_slider_get_value(sw);
-            if(act_val != old_val) ext->changed = 1;
-        }
-        else if(sign == LV_SIGNAL_PRESS_LOST) {
-            ext->changed = 0;
-        }
-    	else if(sign == LV_SIGNAL_RELEASED) {
-    	    if(ext->changed == 0) {
-                int16_t v = lv_slider_get_value(sw);
-                if(v == 0) lv_slider_set_value(sw, 1);
-                else lv_slider_set_value(sw, 0);
-    	    }
-    	    if(slider_cb != NULL) slider_cb(sw);
-
-            ext->changed = 0;
-    	}
-    }
-    
-    /*Restore the callback*/
-    ext->slider.action = slider_cb;
-
-    return valid;
-}
-
 /*=====================
  * Setter functions
  *====================*/
 
-/*
- * New object specific "set" function comes here
+/**
+ * Turn ON the switch
+ * @param sw pointer to a switch object
  */
+void lv_sw_set_on(lv_obj_t *sw)
+{
+    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    lv_slider_set_value(sw, 1);
+    lv_slider_set_style(sw, NULL, NULL,ext->knob_on_style);
+}
 
+/**
+ * Turn OFF the switch
+ * @param sw pointer to a switch object
+ */
+void lv_sw_set_off(lv_obj_t *sw)
+{
+    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    lv_slider_set_value(sw, 0);
+    lv_slider_set_style(sw, NULL, NULL,ext->knob_off_style);
+}
+
+/**
+ * Set the styles of a switch
+ * @param sw pointer to a switch object
+ * @param bg pointer to the background's style
+ * @param indic pointer to the indicator's style
+ * @param knob_off pointer to the knob's style when the switch is OFF
+ * @param knob_on pointer to the knob's style when the switch is ON
+ */
+void lv_sw_set_style(lv_obj_t * sw, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob_off, lv_style_t *knob_on)
+{
+    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+
+    ext->knob_on_style = knob_on;
+    ext->knob_off_style = knob_off;
+
+    if(lv_sw_get_state(sw)) lv_slider_set_style(sw, bg, indic, knob_on);
+    else lv_slider_set_style(sw, bg, indic, knob_off);
+}
 
 /*=====================
  * Getter functions
  *====================*/
 
-/*
- * New object specific "get" function comes here
+/**
+ * Get the style of the switch's knob when the switch is OFF
+ * @param sw pointer to a switch object
+ * @return pointer to the switch's knob OFF style
  */
+lv_style_t * lv_sw_get_style_knob_off(lv_obj_t *sw)
+{
+    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    return ext->knob_off_style;
+}
 
+
+/**
+ * Get the style of the switch's knob when the switch is ON
+ * @param sw pointer to a switch object
+ * @return pointer to the switch's knob ON style
+ */
+lv_style_t * lv_sw_get_style_knob_on(lv_obj_t *sw)
+{
+    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    return ext->knob_on_style;
+}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#if 0 /*Slider design is used*/
 /**
- * Handle the drawing related tasks of the switchs
- * @param sw pointer to an object
- * @param mask the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * Signal function of the switch
+ * @param sw pointer to a switch object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static bool lv_sw_design(lv_obj_t * sw, const area_t * mask, lv_design_mode_t mode)
+static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 {
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-    	return false;
-    }
-    /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
+    /*Save the current (old) value before slider signal modifies it*/
+    int16_t old_val;
+    if(sign == LV_SIGNAL_PRESSING) old_val = ext->slider.drag_value;
+    else old_val = lv_slider_get_value(sw);
 
+    /*Do not let the slider to call the callback. The Switch will do it if required*/
+    lv_action_t slider_cb = ext->slider.action;
+    ext->slider.action = NULL;
+
+    lv_res_t res;
+    /* Include the ancient signal function */
+    res = ancestor_signal(sw, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    if(sign == LV_SIGNAL_CLEANUP) {
+        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    }
+    else if(sign == LV_SIGNAL_PRESSING) {
+        int16_t act_val = ext->slider.drag_value;
+        if(act_val != old_val) ext->changed = 1;
+    }
+    else if(sign == LV_SIGNAL_PRESS_LOST) {
+        ext->changed = 0;
+        if(lv_sw_get_state(sw)) lv_slider_set_style(sw, NULL, NULL, ext->knob_on_style);
+        else lv_slider_set_style(sw, NULL, NULL, ext->knob_off_style);
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
+        if(ext->changed == 0) {
+            int16_t v = lv_slider_get_value(sw);
+            if(v == 0) lv_slider_set_value(sw, 1);
+            else lv_slider_set_value(sw, 0);
+        }
+
+        if(lv_sw_get_state(sw)) lv_slider_set_style(sw, NULL, NULL, ext->knob_on_style);
+        else lv_slider_set_style(sw, NULL, NULL, ext->knob_off_style);
+
+        if(slider_cb != NULL) slider_cb(sw);
+
+        ext->changed = 0;
     }
 
-    return true;
+    /*Restore the callback*/
+    ext->slider.action = slider_cb;
+
+    return res;
 }
-#endif
 
 #endif
