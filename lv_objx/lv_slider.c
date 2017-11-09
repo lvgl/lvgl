@@ -68,7 +68,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->action = NULL;
-    ext->tmp_value = ext->bar.min_value;
+    ext->drag_value = LV_SLIDER_NOT_PRESSED;
     ext->style_knob = &lv_style_pretty;
     ext->knob_in = 0;
 
@@ -203,8 +203,6 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_vfill(&slider->coords, mask, COLOR_LIME, OPA_COVER);
-
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
         lv_style_t * style_slider = lv_slider_get_style_bg(slider);
@@ -256,7 +254,8 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         cord_t min_value = lv_slider_get_min_value(slider);
         cord_t max_value = lv_slider_get_max_value(slider);
 
-        if(ext->tmp_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->tmp_value;
+        /*If dragged draw to the drag position*/
+        if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
 
         if(slider_w >= slider_h) {
             area_indic.x2 = (int32_t) ((int32_t)area_get_width(&area_indic) * cur_value) / (max_value - min_value);
@@ -331,29 +330,33 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     cord_t h = lv_obj_get_height(slider);
 
     if(sign == LV_SIGNAL_PRESSED) {
-        ext->tmp_value = lv_slider_get_value(slider);
+        ext->drag_value = lv_slider_get_value(slider);
     }
     else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_get_point(param, &p);
         if(w > h) {
             cord_t knob_w = h;
             p.x -= slider->coords.x1 + h / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
-            ext->tmp_value = (int32_t) ((int32_t) p.x * (ext->bar.max_value - ext->bar.min_value + 1)) / (w - knob_w);
+            ext->drag_value = (int32_t) ((int32_t) p.x * (ext->bar.max_value - ext->bar.min_value + 1)) / (w - knob_w);
         } else {
             cord_t knob_h = w;
             p.y -= slider->coords.y1 + w / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
-            ext->tmp_value = (int32_t) ((int32_t) p.y * (ext->bar.max_value - ext->bar.min_value + 1)) / (h - knob_h);
-            ext->tmp_value = ext->bar.max_value - ext->tmp_value;     /*Invert the value: smaller value means higher y*/
+            ext->drag_value = (int32_t) ((int32_t) p.y * (ext->bar.max_value - ext->bar.min_value + 1)) / (h - knob_h);
+            ext->drag_value = ext->bar.max_value - ext->drag_value;     /*Invert the value: smaller value means higher y*/
         }
+
+        if(ext->drag_value < ext->bar.min_value) ext->drag_value = ext->bar.min_value;
+        else if(ext->drag_value > ext->bar.max_value) ext->drag_value = ext->bar.max_value;
+
         lv_obj_invalidate(slider);
     }
     else if (sign == LV_SIGNAL_PRESS_LOST) {
-        ext->tmp_value = LV_SLIDER_NOT_PRESSED;
+        ext->drag_value = LV_SLIDER_NOT_PRESSED;
 
     }
     else if (sign == LV_SIGNAL_RELEASED) {
-        lv_slider_set_value(slider, ext->tmp_value);
-        ext->tmp_value = LV_SLIDER_NOT_PRESSED;
+        lv_slider_set_value(slider, ext->drag_value);
+        ext->drag_value = LV_SLIDER_NOT_PRESSED;
         if(ext->action != NULL) ext->action(slider);
     }
     else if(sign == LV_SIGNAL_CORD_CHG) {
@@ -374,7 +377,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
                 pad = -pad;
                 if(slider->ext_size < pad) slider->ext_size = pad;
             }
-
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);

@@ -33,7 +33,7 @@ typedef struct
     /*New data for this type */
     lv_action_t action;             /*Function to call when a new value is set*/
     lv_style_t *style_knob;    /*Style of the knob*/
-    int16_t tmp_value;          /*Store a temporal value during press until release (Handled by the library)*/
+    int16_t drag_value;          /*Store a temporal value during press until release (Handled by the library)*/
     uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
 }lv_slider_ext_t;
 
