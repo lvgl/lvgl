@@ -67,10 +67,10 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     ext->actions[LV_BTN_ACTION_LONG_PRESS] = NULL;
     ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE] = NULL;
 
-    ext->styles[LV_BTN_STATE_RELEASED] = &lv_style_btn_off_released;
-    ext->styles[LV_BTN_STATE_PRESSED] = &lv_style_btn_off_pressed;
-    ext->styles[LV_BTN_STATE_TGL_RELEASED] = &lv_style_btn_on_released;
-    ext->styles[LV_BTN_STATE_TGL_PRESSED] = &lv_style_btn_on_pressed;
+    ext->styles[LV_BTN_STATE_RELEASED] = &lv_style_btn_released;
+    ext->styles[LV_BTN_STATE_PRESSED] = &lv_style_btn_pressed;
+    ext->styles[LV_BTN_STATE_TGL_RELEASED] = &lv_style_btn_tgl_released;
+    ext->styles[LV_BTN_STATE_TGL_PRESSED] = &lv_style_btn_tgl_pressed;
     ext->styles[LV_BTN_STATE_INACTIVE] = &lv_style_btn_inactive;
 
     ext->long_press_action_executed = 0;

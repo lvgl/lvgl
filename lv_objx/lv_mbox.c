@@ -61,8 +61,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
     ext->txt = NULL;
     ext->btnh = NULL;
-    ext->style_btn_rel = &lv_style_btn_off_released;
-    ext->style_btn_pr = &lv_style_btn_off_pressed;
+    ext->style_btn_rel = &lv_style_btn_released;
+    ext->style_btn_pr = &lv_style_btn_pressed;
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;
     ext->btn_width = 0;
 

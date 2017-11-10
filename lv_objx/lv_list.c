@@ -66,10 +66,10 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
 
     ext->style_img = NULL;
-    ext->styles_btn[LV_BTN_STATE_RELEASED] = &lv_style_btn_off_released;
-    ext->styles_btn[LV_BTN_STATE_PRESSED] = &lv_style_btn_off_pressed;
-    ext->styles_btn[LV_BTN_STATE_TGL_RELEASED] = &lv_style_btn_on_released;
-    ext->styles_btn[LV_BTN_STATE_PRESSED] = &lv_style_btn_on_pressed;
+    ext->styles_btn[LV_BTN_STATE_RELEASED] = &lv_style_btn_released;
+    ext->styles_btn[LV_BTN_STATE_PRESSED] = &lv_style_btn_pressed;
+    ext->styles_btn[LV_BTN_STATE_TGL_RELEASED] = &lv_style_btn_tgl_released;
+    ext->styles_btn[LV_BTN_STATE_PRESSED] = &lv_style_btn_tgl_pressed;
     ext->styles_btn[LV_BTN_STATE_INACTIVE] = &lv_style_btn_inactive;
     ext->anim_time = LV_LIST_FOCUS_TIME;
 

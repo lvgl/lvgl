@@ -70,7 +70,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         if(ancestor_bullet_design == NULL) ancestor_bullet_design = lv_obj_get_design_func(ext->bullet);
         lv_obj_set_click(ext->bullet, false);
         lv_btn_set_style(ext->bullet, &lv_style_pretty, &lv_style_pretty_color,
-                                       &lv_style_btn_on_released, &lv_style_btn_on_pressed,
+                                       &lv_style_btn_tgl_released, &lv_style_btn_tgl_pressed,
                                        NULL);
 
         ext->label = lv_label_create(new_cb, NULL);

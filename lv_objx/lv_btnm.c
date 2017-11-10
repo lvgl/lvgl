@@ -78,10 +78,10 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     ext->action = NULL;
     ext->map_p = NULL;
     ext->toggle = 0;
-    ext->styles_btn[LV_BTN_STATE_RELEASED] = &lv_style_btn_off_released;
-    ext->styles_btn[LV_BTN_STATE_PRESSED] = &lv_style_btn_off_pressed;
-    ext->styles_btn[LV_BTN_STATE_TGL_RELEASED] = &lv_style_btn_on_released;
-    ext->styles_btn[LV_BTN_STATE_TGL_PRESSED] = &lv_style_btn_on_pressed;
+    ext->styles_btn[LV_BTN_STATE_RELEASED] = &lv_style_btn_released;
+    ext->styles_btn[LV_BTN_STATE_PRESSED] = &lv_style_btn_pressed;
+    ext->styles_btn[LV_BTN_STATE_TGL_RELEASED] = &lv_style_btn_tgl_released;
+    ext->styles_btn[LV_BTN_STATE_TGL_PRESSED] = &lv_style_btn_tgl_pressed;
     ext->styles_btn[LV_BTN_STATE_INACTIVE] = &lv_style_btn_inactive;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_btnm);

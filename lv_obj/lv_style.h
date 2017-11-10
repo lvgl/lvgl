@@ -149,10 +149,10 @@ extern lv_style_t lv_style_plain;
 extern lv_style_t lv_style_plain_color;
 extern lv_style_t lv_style_pretty;
 extern lv_style_t lv_style_pretty_color;
-extern lv_style_t lv_style_btn_off_released;
-extern lv_style_t lv_style_btn_off_pressed;
-extern lv_style_t lv_style_btn_on_released;
-extern lv_style_t lv_style_btn_on_pressed;;
+extern lv_style_t lv_style_btn_released;
+extern lv_style_t lv_style_btn_pressed;
+extern lv_style_t lv_style_btn_tgl_released;
+extern lv_style_t lv_style_btn_tgl_pressed;;
 extern lv_style_t lv_style_btn_inactive;
 
 /**********************

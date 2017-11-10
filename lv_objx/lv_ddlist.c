@@ -31,7 +31,7 @@
 static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
 lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
-static lv_res_t lv_ddlist_rel_action(lv_obj_t * ddlist);
+static lv_res_t lv_ddlist_release_action(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time);
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
 
@@ -91,7 +91,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
 
         ext->options_label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit(new_ddlist, true, false);
-        lv_page_set_release_action(new_ddlist, lv_ddlist_rel_action);
+        lv_page_set_release_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
         lv_ddlist_set_style(new_ddlist, &lv_style_pretty, NULL, &lv_style_plain_color);
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
@@ -482,7 +482,7 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
  * @param ddlist pointer to a drop down list object
  * @return LV_ACTION_RES_INV if the ddlist it deleted in the user callback else LV_ACTION_RES_OK
  */
-static lv_res_t lv_ddlist_rel_action(lv_obj_t * ddlist)
+static lv_res_t lv_ddlist_release_action(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 

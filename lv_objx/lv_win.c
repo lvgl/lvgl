@@ -63,8 +63,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     ext->header = NULL;
     ext->title = NULL;
     ext->style_header = &lv_style_plain_color;
-    ext->style_cbtn_rel = &lv_style_btn_on_released;
-    ext->style_cbtn_pr = &lv_style_btn_on_pressed;
+    ext->style_cbtn_rel = &lv_style_btn_tgl_released;
+    ext->style_cbtn_pr = &lv_style_btn_tgl_pressed;
     ext->cbtn_size = ( LV_DPI) / 2;
 
     /*Init the new window object*/
