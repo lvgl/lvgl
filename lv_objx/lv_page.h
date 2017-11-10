@@ -72,6 +72,17 @@ typedef struct
  */
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
+ * Get the scrollable object of a page
+ * @param page pointer to a page object
+ * @return pointer to a container which is the scrollable part of the page
+ */
+lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
+
 /**
  * Set a release action for the page
  * @param page pointer to a page object
@@ -89,7 +100,7 @@ void lv_page_set_press_action(lv_obj_t * page, lv_action_t pr_action);
 /**
  * Set the scroll bar mode on a page
  * @param page pointer to a page object
- * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ * @param sb.mode the new mode from 'lv_page_sb.mode_t' enum
  */
 void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode);
 
@@ -101,6 +112,7 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode);
  * @param sb pointer to a style for the scroll bars
  */
 void lv_page_set_style(lv_obj_t *page, lv_style_t *bg, lv_style_t *scrl, lv_style_t *sb);
+
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
  * @param obj pointer to an object on a page
@@ -115,38 +127,6 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue);
  * @param anim_time scroll animation time in milliseconds (0: no animation)
  */
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time);
-
-/**
- * Get the scrollable object of a page-
- * @param page pointer to page object
- * @return pointer to a container which is the scrollable part of the page
- */
-lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
-
-/**
- * Set the scroll bar mode on a page
- * @param page pointer to a page object
- * @return the mode from 'lv_page_sb_mode_t' enum
- */
-lv_page_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
-
-/**
-* Get the style of the scrollable part of a page
-* @param page pointer to a page object
-* @return pointer to the style of the scrollale part
-*/
-lv_style_t * lv_page_get_style_scrl(lv_obj_t * page);
-
-/**
-* Get the style of the scrolbars of a page
-* @param page pointer to a page object
-* @return pointer to the style of the scrollbars
-*/
-lv_style_t * lv_page_get_style_sb(lv_obj_t * page);
-
-/******************************
- *  TRANSPARENT API FUNCTIONS
- ******************************/
 
 /**
  * Set the fit attribute of the scrollable part of a page.
@@ -192,6 +172,17 @@ static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_cont_layout_t lay
     lv_cont_set_layout(lv_page_get_scrl(page), layout);
 }
 
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Set the scroll bar mode on a page
+ * @param page pointer to a page object
+ * @return the mode from 'lv_page_sb.mode_t' enum
+ */
+lv_page_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
+
 /**
  * Get width of the scrollable part of a page
  * @param page pointer to a page object
@@ -201,17 +192,6 @@ static inline cord_t lv_page_get_scrl_width(lv_obj_t *page)
 {
     return lv_obj_get_width(lv_page_get_scrl(page));
 }
-
-/**
-* Get the style of page's background
-* @param page pointer to a page object
-* @return pointer to the style of background
-*/
-static inline lv_style_t * lv_page_get_style_bg(lv_obj_t * page)
-{
-    return lv_obj_get_style(page);
-}
-
 
 /**
  * Get height of the scrollable part of a page
@@ -252,6 +232,30 @@ static inline bool lv_page_get_scrl_fit_ver(lv_obj_t * page)
 {
     return lv_cont_get_ver_fit(lv_page_get_scrl(page));
 }
+
+/**
+* Get the style of page's background
+* @param page pointer to a page object
+* @return pointer to the style of background
+*/
+static inline lv_style_t * lv_page_get_style_bg(lv_obj_t * page)
+{
+    return lv_obj_get_style(page);
+}
+
+/**
+* Get the style of the scrollable part of a page
+* @param page pointer to a page object
+* @return pointer to the style of the scrollale part
+*/
+lv_style_t * lv_page_get_style_scrl(lv_obj_t * page);
+
+/**
+* Get the style of the scrolbars of a page
+* @param page pointer to a page object
+* @return pointer to the style of the scrollbars
+*/
+lv_style_t * lv_page_get_style_sb(lv_obj_t * page);
 
 /**********************
  *      MACROS

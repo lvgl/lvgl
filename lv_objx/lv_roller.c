@@ -43,10 +43,6 @@ static lv_signal_func_t ancestor_scrl_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a roller object
  * @param par pointer to an object, it will be the parent of the new roller
@@ -97,15 +93,6 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
     return new_roller;
 }
 
-/*======================
- * Add/remove functions
- *=====================*/
-
-/*
- * New object specific "add" or "remove" functions come here
- */
-
-
 /*=====================
  * Setter functions
  *====================*/
@@ -133,7 +120,6 @@ void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en)
     lv_cont_set_fit(roller, fit_en ,false);
 }
 
-
 /*=====================
  * Getter functions
  *====================*/
@@ -147,14 +133,6 @@ bool lv_roller_get_hor_fit(lv_obj_t *roller)
 {
     return lv_page_get_scrl_hor_fit(roller);
 }
-
-/*=====================
- * Other functions
- *====================*/
-
-/*
- * New object specific "other" functions come here
- */
 
 /**********************
  *   STATIC FUNCTIONS

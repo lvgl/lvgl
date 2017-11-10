@@ -43,10 +43,6 @@ static lv_signal_func_t ancestor_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a message box objects
  * @param par pointer to an object, it will be the parent of the new message box
@@ -208,44 +204,6 @@ void lv_mbox_set_btn_width(lv_obj_t *mbox, cord_t w)
 }
 
 /**
- * Set the styles of a message box
- * @param mbox pointer to a message box object
- * @param bg pointer to the new background style
- * @param btnh pointer to the new button holder style
- */
-void lv_mbox_set_style(lv_obj_t *mbox, lv_style_t *bg, lv_style_t *btnh)
-{
-    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    lv_obj_set_style(ext->btnh, btnh);
-    lv_obj_set_style(mbox, bg);
-}
-
-/**
- * Set styles of the buttons of a message box in each state
- * @param mbox pointer to a message box object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- */
-void lv_mbox_set_style_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
-{
-    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-
-    ext->style_btn_rel = rel;
-    ext->style_btn_pr = pr;
-
-    if(ext->btnh != NULL) {
-        lv_obj_t * btn = lv_obj_get_child(ext->btnh, NULL);
-
-        while(btn != NULL) {
-            lv_btn_set_style(btn, rel, pr, NULL, NULL, NULL);
-            btn = lv_obj_get_child(mbox, btn);
-        }
-    }
-
-    btnh_resize(mbox);
-}
-
-/**
  * Set animation duration
  * @param mbox pointer to a message box object
  * @param time animation length in  milliseconds (0: no animation)
@@ -284,6 +242,44 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
     anim_del(mbox, NULL);
+}
+
+/**
+ * Set the styles of a message box
+ * @param mbox pointer to a message box object
+ * @param bg pointer to the new background style
+ * @param btnh pointer to the new button holder style
+ */
+void lv_mbox_set_style(lv_obj_t *mbox, lv_style_t *bg, lv_style_t *btnh)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    lv_obj_set_style(ext->btnh, btnh);
+    lv_obj_set_style(mbox, bg);
+}
+
+/**
+ * Set styles of the buttons of a message box in each state
+ * @param mbox pointer to a message box object
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ */
+void lv_mbox_set_style_btn(lv_obj_t * mbox, lv_style_t * rel, lv_style_t * pr)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+
+    ext->style_btn_rel = rel;
+    ext->style_btn_pr = pr;
+
+    if(ext->btnh != NULL) {
+        lv_obj_t * btn = lv_obj_get_child(ext->btnh, NULL);
+
+        while(btn != NULL) {
+            lv_btn_set_style(btn, rel, pr, NULL, NULL, NULL);
+            btn = lv_obj_get_child(mbox, btn);
+        }
+    }
+
+    btnh_resize(mbox);
 }
 
 /*=====================
@@ -348,7 +344,6 @@ lv_style_t * lv_mbox_get_style_btnh(lv_obj_t *mbox)
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return lv_obj_get_style(ext->btnh);
 }
-
 
 /**
  * Get the style of the buttons on a message box

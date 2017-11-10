@@ -55,56 +55,9 @@ typedef enum
  */
 lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Set a function which will be called when a new value is set on the slider
- * @param slider pointer to slider object
- * @param cb a callback function
- */
-void lv_slider_set_action(lv_obj_t * slider, lv_action_t cb);
-
-/**
- * Set the styles of a slider
- * @param bar pointer to a bar object
- * @param bg pointer to the background's style
- * @param indic pointer to the indicator's style
- * @param knob pointer to the knob's style
- */
-void lv_slider_set_style(lv_obj_t * slider, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob);
-
-/**
- * Set the 'knob in' attribute of a slider
- * @param slider pointer to slider object
- * @param in true: the knob is drawn always in the slider;
- *           false: the knob can be out on the edges
- */
-void lv_slider_set_knob_in(lv_obj_t * slider, bool in);
-
-/**
- * Get the slider callback function
- * @param slider pointer to slider object
- * @return the callback function
- */
-lv_action_t lv_slider_get_action(lv_obj_t * slider);
-
-
-/**
- * Set the styles of a slider
- * @param slider pointer to a bar object
- * @return pointer to the knob's style
- */
-lv_style_t * lv_slider_get_style_knob(lv_obj_t * slider);
-
-/**
- * Get the 'knob in' attribute of a slider
- * @param slider pointer to slider object
- * @return true: the knob is drawn always in the slider;
- *         false: the knob can be out on the edges
- */
-bool lv_slider_get_knob_in(lv_obj_t * slider);
-
-/******************************
- *  TRANSPARENT API FUNCTIONS
- ******************************/
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set a new value on the slider
@@ -139,6 +92,34 @@ static inline void lv_slider_set_range(lv_obj_t *slider, int16_t min, int16_t ma
 }
 
 /**
+ * Set a function which will be called when a new value is set on the slider
+ * @param slider pointer to slider object
+ * @param action a callback function
+ */
+void lv_slider_set_action(lv_obj_t * slider, lv_action_t action);
+
+/**
+ * Set the 'knob in' attribute of a slider
+ * @param slider pointer to slider object
+ * @param in true: the knob is drawn always in the slider;
+ *           false: the knob can be out on the edges
+ */
+void lv_slider_set_knob_in(lv_obj_t * slider, bool in);
+
+/**
+ * Set the styles of a slider
+ * @param slider pointer to a slider object
+ * @param bg pointer to the background's style (NULL to leave unchanged)
+ * @param indic pointer to the indicator's style (NULL to leave unchanged)
+ * @param knob pointer to the knob's style (NULL to leave unchanged)
+ */
+void lv_slider_set_style(lv_obj_t * slider, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
  * Get the value of a slider
  * @param slider pointer to a slider object
  * @return the value of the slider
@@ -168,6 +149,27 @@ static inline int16_t lv_slider_get_max_value(lv_obj_t * slider)
     return lv_bar_get_max_value(slider);
 }
 
+/**
+ * Get the slider action function
+ * @param slider pointer to slider object
+ * @return the callback function
+ */
+lv_action_t lv_slider_get_action(lv_obj_t * slider);
+
+/**
+ * Set the styles of a slider
+ * @param slider pointer to a slider object
+ * @return pointer to the knob's style
+ */
+lv_style_t * lv_slider_get_style_knob(lv_obj_t * slider);
+
+/**
+ * Get the 'knob in' attribute of a slider
+ * @param slider pointer to slider object
+ * @return true: the knob is drawn always in the slider;
+ *         false: the knob can be out on the edges
+ */
+bool lv_slider_get_knob_in(lv_obj_t * slider);
 
 /**
  * Get the style of the slider's background

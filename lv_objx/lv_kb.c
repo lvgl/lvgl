@@ -24,41 +24,40 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if 0 /*Use Button matrix design*/
-static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mode);
-#endif
-
+static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
 static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t ancestor_signal;
+
 static const char * kb_map_lc[] = {
 "\2051#", "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207Del", "\n",
 "\206ABC", "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207Enter", "\n",
 "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
-"\203Hide", "\203Left", "\206 ", "\203Right", "\203Ok", ""
+"\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_uc[] = {
 "\2051#", "\204Q", "\204W", "\204E", "\204R", "\204T", "\204Y", "\204U", "\204I", "\204O", "\204P", "\207Del", "\n",
 "\206abc", "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\207Enter", "\n",
 "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
-"\203Hide", "\203Left", "\206 ", "\203Right", "\203Ok", ""
+"\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_spec[] = {
 "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\202Del", "\n",
 "\202abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
 "\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
-"\203Hide", "\203Left", "\206 ", "\203Right", "\203Ok", ""
+"\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_num[] = {
-"1", "2", "3", "\202Hide","\n",
-"4", "5", "6", "\202Ok", "\n",
+"1", "2", "3", "\202"SYMBOL_CLOSE,"\n",
+"4", "5", "6", "\202"SYMBOL_OK, "\n",
 "7", "8", "9", "\202Del", "\n",
-"+/-", "0", ".", "Left", "Right", ""
+"+/-", "0", ".", SYMBOL_LEFT, SYMBOL_RIGHT, ""
 };
 /**********************
  *      MACROS
@@ -67,10 +66,6 @@ static const char * kb_map_num[] = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-/*----------------- 
- * Create function
- *-----------------*/
 
 /**
  * Create a keyboard objects
@@ -83,6 +78,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor of keyboard*/
     lv_obj_t * new_kb = lv_btnm_create(par, copy);
     dm_assert(new_kb);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_kb);
     
     /*Allocate the keyboard type specific extended data*/
     lv_kb_ext_t * ext = lv_obj_allocate_ext_attr(new_kb, sizeof(lv_kb_ext_t));
@@ -120,31 +116,6 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     }
     
     return new_kb;
-}
-
-/**
- * Signal function of the keyboard
- * @param kb pointer to a keyboard object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_btnm_signal(kb, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	if(sign == LV_SIGNAL_CLEANUP) {
-            /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    	}
-    }
-    
-    return valid;
 }
 
 /*=====================
@@ -280,35 +251,27 @@ lv_action_t lv_kb_get_close_action(lv_obj_t * kb, lv_action_t action)
  *   STATIC FUNCTIONS
  **********************/
 
-#if 0 /*Use Button matrix design*/
 /**
- * Handle the drawing related tasks of the keyboards
- * @param kb pointer to an object
- * @param mask the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * Signal function of the keyboard
+ * @param kb pointer to a keyboard object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mode)
+static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
 {
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-    	return false;
-    }
-    /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
+    lv_res_t res;
 
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
+    /* Include the ancient signal function */
+    res = ancestor_signal(kb, sign, param);
+    if(res != LV_RES_OK) return res;
 
+    if(sign == LV_SIGNAL_CLEANUP) {
+        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
 
-    return true;
+    return res;
 }
-#endif
 
 /**
  * Called when a button of 'kb_btnm' is released
@@ -319,24 +282,28 @@ static bool lv_kb_design(lv_obj_t * kb, const area_t * mask, lv_design_mode_t mo
 static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    if(ext->ta == NULL) return LV_RES_OK;
 
     /*Do the corresponding action according to the text of the button*/
-    if(strcmp(txt, "abc") == 0) {
-        lv_btnm_set_map(kb, kb_map_lc);
-    } else if(strcmp(txt, "ABC") == 0) {
-        lv_btnm_set_map(kb, kb_map_uc);
-    } else if(strcmp(txt, "1#") == 0) {
-        lv_btnm_set_map(kb, kb_map_spec);
-    }  else if(strcmp(txt, "Enter") == 0) {
-        lv_ta_add_char(ext->ta, '\n');
-    } else if(strcmp(txt, "Left") == 0) {
-        lv_ta_cursor_left(ext->ta);
-    } else if(strcmp(txt, "Right") == 0) {
-        lv_ta_cursor_right(ext->ta);
-    } else if(strcmp(txt, "Del") == 0) {
-        lv_ta_del(ext->ta);
-    } else if(strcmp(txt, "+/-") == 0) {
+    if(strcmp(txt, "abc") == 0) lv_btnm_set_map(kb, kb_map_lc);
+    else if(strcmp(txt, "ABC") == 0) lv_btnm_set_map(kb, kb_map_uc);
+    else if(strcmp(txt, "1#") == 0) lv_btnm_set_map(kb, kb_map_spec);
+    else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
+        if(ext->close_action) ext->close_action(kb);
+        else lv_obj_del(kb);
+        return LV_RES_INV;
+    } else if(strcmp(txt, SYMBOL_OK) == 0) {
+        if(ext->ok_action) ext->ok_action(kb);
+        else lv_obj_del(kb);
+        return LV_RES_INV;
+    }
+
+    if(ext->ta == NULL) return LV_RES_OK;
+
+    if(strcmp(txt, "Enter") == 0)lv_ta_add_char(ext->ta, '\n');
+    else if(strcmp(txt, SYMBOL_LEFT) == 0) lv_ta_cursor_left(ext->ta);
+    else if(strcmp(txt, SYMBOL_RIGHT) == 0) lv_ta_cursor_right(ext->ta);
+    else if(strcmp(txt, "Del") == 0)  lv_ta_del(ext->ta);
+    else if(strcmp(txt, "+/-") == 0) {
         uint16_t cur = lv_ta_get_cursor_pos(ext->ta);
         const char * ta_txt = lv_ta_get_text(ext->ta);
         if(ta_txt[0] == '-') {
@@ -354,12 +321,6 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
             lv_ta_add_char(ext->ta, '-');
             lv_ta_set_cursor_pos(ext->ta, cur + 1);
         }
-    } else if(strcmp(txt, "Hide") == 0) {
-        if(ext->close_action) ext->close_action(kb);
-        return LV_RES_INV;
-    } else if(strcmp(txt, "Ok") == 0) {
-        if(ext->ok_action) ext->ok_action(kb);
-        return LV_RES_INV;
     } else {
         lv_ta_add_text(ext->ta, txt);
     }

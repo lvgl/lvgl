@@ -53,6 +53,10 @@ typedef struct
  */
 lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
  * Turn ON the switch
  * @param sw pointer to a switch object
@@ -64,33 +68,6 @@ void lv_sw_set_on(lv_obj_t *sw);
  * @param sw pointer to a switch object
  */
 void lv_sw_set_off(lv_obj_t *sw);
-/**
- * Set the styles of a switch
- * @param sw pointer to a switch object
- * @param bg pointer to the background's style
- * @param indic pointer to the indicator's style
- * @param knob_off pointer to the knob's style when the switch is OFF
- * @param knob_on pointer to the knob's style when the switch is ON
- */
-void lv_sw_set_style(lv_obj_t * sw, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob_off, lv_style_t *knob_on);
-
-/**
- * Get the style of the switch's knob when the switch is OFF
- * @param sw pointer to a switch object
- * @return pointer to the switch's knob OFF style
- */
-lv_style_t * lv_sw_get_style_knob_off(lv_obj_t *sw);
-
-/**
- * Get the style of the switch's knob when the switch is ON
- * @param sw pointer to a switch object
- * @return pointer to the switch's knob ON style
- */
-lv_style_t * lv_sw_get_style_knob_on(lv_obj_t *sw);
-
-/******************************
- *  TRANSPARENT API FUNCTIONS
- ******************************/
 
 /**
  * Set a function which will be called when the switch is toggled by the user
@@ -101,6 +78,20 @@ static inline void lv_sw_set_action(lv_obj_t * sw, lv_action_t action)
 {
     lv_slider_set_action(sw, action);
 }
+
+/**
+ * Set the styles of a switch
+ * @param sw pointer to a switch object
+ * @param bg pointer to the background's style
+ * @param indic pointer to the indicator's style
+ * @param knob_off pointer to the knob's style when the switch is OFF
+ * @param knob_on pointer to the knob's style when the switch is ON
+ */
+void lv_sw_set_style(lv_obj_t * sw, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob_off, lv_style_t *knob_on);
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the state of a switch
@@ -141,6 +132,21 @@ static inline lv_style_t * lv_sw_get_style_indicator(lv_obj_t *sw)
 {
     return lv_slider_get_style_indicator(sw);
 }
+
+/**
+ * Get the style of the switch's knob when the switch is OFF
+ * @param sw pointer to a switch object
+ * @return pointer to the switch's knob OFF style
+ */
+lv_style_t * lv_sw_get_style_knob_off(lv_obj_t *sw);
+
+/**
+ * Get the style of the switch's knob when the switch is ON
+ * @param sw pointer to a switch object
+ * @return pointer to the switch's knob ON style
+ */
+lv_style_t * lv_sw_get_style_knob_on(lv_obj_t *sw);
+
 
 /**********************
  *      MACROS

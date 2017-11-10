@@ -42,10 +42,6 @@ static lv_signal_func_t ancestor_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a check box objects
  * @param par pointer to an object, it will be the parent of the new check box
@@ -80,7 +76,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         ext->label = lv_label_create(new_cb, NULL);
         lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
 
-        lv_cb_set_style_bg(new_cb, &lv_style_transp);
+        lv_cb_set_style(new_cb, &lv_style_transp);
         lv_cb_set_text(new_cb, "Check box");
         lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
         lv_cont_set_fit(new_cb, true, true);
@@ -117,7 +113,7 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 }
 
 /**
- * Set styles of a checkbox's bullet is each state. Use NULL for any style to leave it unchanged
+ * Set styles of a checkbox's bullet in each state. Use NULL for any style to leave it unchanged
  * @param cb pointer to check box object
  * @param rel pointer to a style for releases state
  * @param pr  pointer to a style for pressed state
@@ -147,6 +143,17 @@ const char * lv_cb_get_text(lv_obj_t * cb)
 {
 	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 	return lv_label_get_text(ext->label);
+}
+
+/**
+ * Get styles of a checkbox's bullet in a  state.
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
+ */
+lv_style_t * lv_cb_get_style_bullet(lv_obj_t *cb, lv_btn_state_t state)
+{
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    return lv_btn_get_style(ext->bullet, state);
 }
 
 /**********************

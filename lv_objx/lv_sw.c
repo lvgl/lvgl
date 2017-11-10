@@ -37,10 +37,6 @@ static lv_signal_func_t ancestor_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a switch objects
  * @param par pointer to an object, it will be the parent of the new switch

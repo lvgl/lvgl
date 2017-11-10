@@ -52,6 +52,10 @@ typedef struct
  */
 lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
  * Set a new value on the bar
  * @param bar pointer to a bar object
@@ -67,22 +71,26 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value);
  */
 void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time);
 
+
 /**
  * Set minimum and the maximum values of a bar
- * @param bar pointer to he bar object
+ * @param bar pointer to the bar object
  * @param min minimum value
  * @param max maximum value
  */
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
 
-
 /**
  * Set the styles of a bar
  * @param bar pointer to a bar object
- * @param bg pointer to the background's style
- * @param indic pointer to the indicator's style
+ * @param bg pointer to the background's style (NULL to leave unchanged)
+ * @param indic pointer to the indicator's style (NULL to leave unchanged)
  */
 void lv_bar_set_style(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic);
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the value of a bar
@@ -106,17 +114,6 @@ int16_t lv_bar_get_min_value(lv_obj_t * bar);
 int16_t lv_bar_get_max_value(lv_obj_t * bar);
 
 /**
- * Get the style of bar indicator
- * @param bar pointer to a bar object
- * @return pointer to the bar indicator style
- */
-lv_style_t * lv_bar_get_style_indicator(lv_obj_t * bar);
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-
-/**
  * Get the style of bar background
  * @param bar pointer to a bar object
  * @return pointer to the bar's background style
@@ -125,6 +122,14 @@ static inline lv_style_t * lv_bar_get_style_bg(lv_obj_t *bar)
 {
     return lv_obj_get_style(bar);
 }
+
+/**
+ * Get the style of bar indicator
+ * @param bar pointer to a bar object
+ * @return pointer to the bar indicator style
+ */
+lv_style_t * lv_bar_get_style_indicator(lv_obj_t * bar);
+
 
 /**********************
  *      MACROS

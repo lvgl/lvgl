@@ -37,38 +37,16 @@ typedef struct {
  **********************/
 
 /**
- * Create a roller objects
+ * Create a roller object
  * @param par pointer to an object, it will be the parent of the new roller
  * @param copy pointer to a roller object, if not NULL then the new object will be copied from it
  * @return pointer to the created roller
  */
 lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Set the selected option
- * @param roller pointer to a roller object
- * @param sel_opt id of the selected option (0 ... number of option - 1);
- * @param anim_en true: set with animation; false set immediately
- */
-void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
-
-/**
- * Enable/disable to set the width of the roller manually (by lv_obj_Set_width())
- * @param roller pointer to a roller object
- * @param fit_en: true: enable auto size; false: use manual width settings
- */
-void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en);
-
-/**
- * Get the auto width set attribute
- * @param roller pointer to a roller object
- * @return true: auto size enabled; false: manual width settings enabled
- */
-bool lv_roller_get_hor_fit(lv_obj_t *roller);
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set the options on a roller
@@ -79,6 +57,14 @@ static inline void lv_roller_set_options(lv_obj_t * roller, const char * options
 {
     lv_ddlist_set_options(roller, options);
 }
+
+/**
+ * Set the selected option
+ * @param roller pointer to a roller object
+ * @param sel_opt id of the selected option (0 ... number of option - 1);
+ * @param anim_en true: set with animation; false set immediately
+ */
+void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
 
 /**
  * Set the open/close animation time.
@@ -100,6 +86,16 @@ static inline void lv_roller_set_style(lv_obj_t *roller, lv_style_t *bg, lv_styl
 {
     lv_ddlist_set_style(roller, bg, NULL, sel);
 }
+/**
+ * Enable/disable to set the width of the roller manually (by lv_obj_Set_width())
+ * @param roller pointer to a roller object
+ * @param fit_en: true: enable auto size; false: use manual width settings
+ */
+void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en);
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the options of a roller
@@ -110,7 +106,6 @@ static inline const char * lv_roller_get_options(lv_obj_t *roller)
 {
     return lv_ddlist_get_options(roller);
 }
-
 
 /**
  * Get the id of the selected option
@@ -151,6 +146,13 @@ static inline uint16_t lv_roller_get_anim_time(lv_obj_t * roller)
 {
     return lv_ddlist_get_anim_time(roller);
 }
+
+/**
+ * Get the auto width set attribute
+ * @param roller pointer to a roller object
+ * @return true: auto size enabled; false: manual width settings enabled
+ */
+bool lv_roller_get_hor_fit(lv_obj_t *roller);
 
 /**
 * Get the style of the roller's background

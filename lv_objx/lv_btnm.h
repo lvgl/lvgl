@@ -51,16 +51,15 @@ typedef struct
     area_t *button_areas;                          /*Array of areas of buttons*/
     lv_btnm_action_t action;                        /*A function to call when a button is releases*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
-    uint16_t button_cnt;                            /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t button_id_pressed;                     /*Index of the currently pressed button or LV_BTNM_PR_NONE*/
-    uint16_t button_id_toggled;                     /*Index of the currently toggled button or LV_BTNM_PR_NONE */
+    uint16_t btn_cnt;                            /*Number of button in 'map_p'(Handled by the library)*/
+    uint16_t btn_id_pressed;                     /*Index of the currently pressed button or LV_BTNM_PR_NONE*/
+    uint16_t btn_id_toggled;                     /*Index of the currently toggled button or LV_BTNM_PR_NONE */
     uint8_t toggle     :1;                          /*Enable toggling*/
 }lv_btnm_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 /**
  * Create a button matrix objects
@@ -70,14 +69,9 @@ typedef struct
  */
 lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the button matrix
- * @param btnm pointer to a button matrix object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set a new map. Buttons will be created/deleted according to the map.
@@ -98,9 +92,9 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
 /**
  * Set a new callback function for the buttons (It will be called when a button is released)
  * @param btnm: pointer to button matrix object
- * @param cb pointer to a callback function
+ * @param action pointer to a callback function
  */
-void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t cb);
+void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t action);
 
 /**
  * Enable or disable button toggling
@@ -110,19 +104,33 @@ void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t cb);
  */
 void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
 
+/**
+ * Set the style of a button matrix's background
+ * @param btnm pointer to a button matrix object
+ * @param bg pointer to the background style
+ */
+static inline void lv_btnm_set_style(lv_obj_t *btnm, lv_style_t * bg)
+{
+    lv_obj_set_style(btnm, bg);
+}
 
 /**
  * Set styles of the button is each state. Use NULL for any style to leave it unchanged.
  * @param btnm pointer to button matrix object
- * @param rel_style pointer to a style for releases state
- * @param pr_style  pointer to a style for pressed state
- * @param tgl_rel_style pointer to a style for toggled releases state
- * @param tgl_pr_style pointer to a style for toggled pressed state
- * @param inactive_style pointer to a style for inactive state
+ * @param rel pointer to a style for releases state
+ * @param pr  pointer to a style for pressed state
+ * @param tgl_rel pointer to a style for toggled releases state
+ * @param tgl_pr pointer to a style for toggled pressed state
+ * @param ina pointer to a style for inactive state
  */
 void lv_btnm_set_style_btn(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
                                        lv_style_t *tgl_rel, lv_style_t *tgl_pr,
                                        lv_style_t *ina);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
 /**
  * Get the current map of a button matrix
  * @param btnm pointer to a button matrix object
@@ -138,29 +146,6 @@ const char ** lv_btnm_get_map(lv_obj_t * btnm);
 lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm);
 
 /**
- * Get the style of buttons in button matrix
- * @param btnm pointer to a button matrix object
- * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
- * @return pointer the button style in the given state
- */
-lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state);
-
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-
-/**
- * Set the style of a button matrix's background
- * @param btnm pointer to a button matrix object
- * @param bg pointer to the background style
- */
-static inline void lv_btnm_set_style_bg(lv_obj_t *btnm, lv_style_t * bg)
-{
-    lv_obj_set_style(btnm, bg);
-}
-
-/**
  * Get the style of a button matrix
  * @param btnm pointer to a button matrix object
  * @return pointer to the backgrond style
@@ -169,6 +154,14 @@ static inline lv_style_t * lv_btnm_get_style_bg(lv_obj_t *btnm)
 {
     return lv_obj_get_style(btnm);
 }
+
+/**
+ * Get the style of buttons in button matrix
+ * @param btnm pointer to a button matrix object
+ * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
+ * @return pointer the button style in the given state
+ */
+lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state);
 
 /**********************
  *      MACROS

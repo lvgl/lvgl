@@ -74,6 +74,10 @@ typedef struct
  */
 lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
  * Insert a character to the current cursor position
  * @param ta pointer to a text area object
@@ -121,7 +125,6 @@ void lv_ta_cursor_right(lv_obj_t * ta);
  * @param ta pointer to a text area object
  */
 void lv_ta_cursor_left(lv_obj_t * ta);
-
 /**
  * Move the cursor one line down
  * @param ta pointer to a text area object
@@ -135,7 +138,7 @@ void lv_ta_cursor_down(lv_obj_t * ta);
 void lv_ta_cursor_up(lv_obj_t * ta);
 
 /**
- * Get the current cursor visibility.
+ * Set the cursor visibility.
  * @param ta pointer to a text area object
  * @return show true: show the cursor and blink it, false: hide cursor
  */
@@ -144,9 +147,33 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
 /**
  * Set the cursor type.
  * @param ta pointer to a text area object
- * @return cur_type: element of 'lv_ta_cursor_type_t'
+ * @param cur_type: element of 'lv_ta_cursor_type_t'
  */
 void lv_ta_set_cursor_type(lv_obj_t * ta, lv_ta_cursor_type_t cur_type);
+
+/**
+ * Enable/Disable password mode
+ * @param ta pointer to a text area object
+ * @param pwd_en true: enable, false: disable
+ */
+void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en);
+
+/**
+ * Configure the text area to one line or back to normal
+ * @param ta pointer to a Text area object
+ * @param en true: one line, false: normal
+ */
+void lv_ta_set_one_line(lv_obj_t * ta, bool en);
+
+/**
+ * Set the scroll bar mode of a text area
+ * @param ta pointer to a text area object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_page_sb_mode_t mode)
+{
+    lv_page_set_sb_mode(ta, mode);
+}
 
 /**
  * Set the style of the text area
@@ -157,23 +184,13 @@ void lv_ta_set_cursor_type(lv_obj_t * ta, lv_ta_cursor_type_t cur_type);
  */
 void lv_ta_set_style(lv_obj_t * ta, lv_style_t *bg, lv_style_t *sb, lv_style_t *cur);
 
-/**
- * Enable/Disable password mode
- * @param ta ointer to a text area object
- * @param en true: enable, false: disable
- */
-void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en);
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
- * Configure the Text area to one line or back to normal
+ * Get the text of a text area
  * @param ta pointer to a text area object
- * @param en true: one line, false: normal
- */
-void lv_ta_set_one_line(lv_obj_t * ta, bool en);
-
-/**
- * Get the text of the i the text area
- * @param ta obj pointer to a text area object
  * @return pointer to the text
  */
 const char * lv_ta_get_text(lv_obj_t * ta);
@@ -184,6 +201,7 @@ const char * lv_ta_get_text(lv_obj_t * ta);
  * @return pointer to the label object
  */
 lv_obj_t * lv_ta_get_label(lv_obj_t * ta);
+
 
 /**
  * Get the current cursor position in character index
@@ -207,14 +225,7 @@ bool lv_ta_get_cursor_show(lv_obj_t * ta);
 lv_ta_cursor_type_t lv_ta_get_cursor_type(lv_obj_t * ta);
 
 /**
- * Get the style of the cursor
- * @param ta pointer to a text area object
- * @return style pointer to the new cursor style
- */
-lv_style_t *  lv_ta_get_style_cursor(lv_obj_t * ta);
-
-/**
- * Get the password mode
+ * Get the password mode attribute
  * @param ta pointer to a text area object
  * @return true: password mode is enabled, false: disabled
  */
@@ -226,20 +237,6 @@ bool lv_ta_get_pwd_mode(lv_obj_t * ta);
  * @return true: one line configuration is enabled, false: disabled
  */
 bool lv_ta_get_one_line(lv_obj_t * ta);
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-
-/**
- * Set the scroll bar mode of a text area
- * @param ta pointer to a text area object
- * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
- */
-static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_page_sb_mode_t mode)
-{
-    lv_page_set_sb_mode(ta, mode);
-}
 
 /**
  * Get the scroll bar mode of a text area
@@ -271,6 +268,12 @@ static inline lv_style_t * lv_ta_get_style_sb(lv_obj_t * ta)
     return lv_page_get_style_sb(ta);
 }
 
+/**
+ * Get the style of the cursor
+ * @param ta pointer to a text area object
+ * @return style pointer to the new cursor style
+ */
+lv_style_t *  lv_ta_get_style_cursor(lv_obj_t * ta);
 
 /**********************
  *      MACROS

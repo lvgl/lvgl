@@ -64,10 +64,6 @@ static lv_signal_func_t scrl_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a text area objects
  * @param par pointer to an object, it will be the parent of the new text area
@@ -493,22 +489,6 @@ void lv_ta_set_cursor_type(lv_obj_t * ta, lv_ta_cursor_type_t cur_type)
 }
 
 /**
- * Set the style of the text area
- * @param ta pointer to a text area object
- * @param bg pointer to the new background style (NULL to leave unchanged)
- * @param sb pointer to the new scrollbar style (NULL to leave unchanged)
- * @param cur pointer to the new cursor style (NULL to use the label's style)
- */
-void lv_ta_set_style(lv_obj_t * ta, lv_style_t *bg, lv_style_t *sb, lv_style_t *cur)
-{
-    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    ext->cursor_style = cur;
-
-    lv_page_set_style(ta, bg, &lv_style_transp_tight, sb);
-}
-
-
-/**
  * Enable/Disable password mode
  * @param ta pointer to a text area object
  * @param pwd_en true: enable, false: disable
@@ -573,6 +553,21 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_obj_set_height(ta, LV_TA_DEF_HEIGHT);
         lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.hor, style_ta->body.padding.ver);
     }
+}
+
+/**
+ * Set the style of the text area
+ * @param ta pointer to a text area object
+ * @param bg pointer to the new background style (NULL to leave unchanged)
+ * @param sb pointer to the new scrollbar style (NULL to leave unchanged)
+ * @param cur pointer to the new cursor style (NULL to use the label's style)
+ */
+void lv_ta_set_style(lv_obj_t * ta, lv_style_t *bg, lv_style_t *sb, lv_style_t *cur)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    ext->cursor_style = cur;
+
+    lv_page_set_style(ta, bg, &lv_style_transp_tight, sb);
 }
 
 /*=====================

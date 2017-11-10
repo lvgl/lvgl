@@ -238,7 +238,6 @@ lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state)
     return ext->styles[state];
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -55,10 +55,6 @@ static lv_signal_func_t ancestor_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a container objects
  * @param par pointer to an object, it will be the parent of the new container
@@ -172,7 +168,6 @@ bool lv_cont_get_ver_fit(lv_obj_t * cont)
 	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	return ext->ver_fit == 0 ? false : true;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS

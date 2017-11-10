@@ -43,10 +43,6 @@ static lv_signal_func_t ancestor_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a slider objects
  * @param par pointer to an object, it will be the parent of the new slider
@@ -109,6 +105,17 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t action)
     ext->action = action;
 }
 
+/**
+ * Set the 'knob in' attribute of a slider
+ * @param slider pointer to slider object
+ * @param in true: the knob is drawn always in the slider;
+ *           false: the knob can be out on the edges
+ */
+void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
+{
+    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+    ext->knob_in = in == false ? 0 : 1;
+}
 
 /**
  * Set the styles of a slider
@@ -127,18 +134,6 @@ void lv_slider_set_style(lv_obj_t * slider, lv_style_t *bg, lv_style_t *indic, l
     }
 
     lv_bar_set_style(slider, bg, indic);
-}
-
-/**
- * Set the 'knob in' attribute of a slider
- * @param slider pointer to slider object
- * @param in true: the knob is drawn always in the slider;
- *           false: the knob can be out on the edges
- */
-void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
-{
-    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    ext->knob_in = in == false ? 0 : 1;
 }
 
 /*=====================

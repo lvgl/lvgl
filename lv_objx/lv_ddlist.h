@@ -55,7 +55,6 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 /**
  * Create a drop down list objects
  * @param par pointer to an object, it will be the parent of the new drop down list
@@ -63,6 +62,10 @@ typedef struct
  * @return pointer to the created drop down list
  */
 lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy);
+
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set the options in a drop down list from a string
@@ -94,25 +97,21 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action);
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h);
 
 /**
+ * Set the scroll bar mode of a drop down list
+ * @param ddlist pointer to a drop down list object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_page_sb_mode_t mode)
+{
+    lv_page_set_sb_mode(ddlist, mode);
+}
+
+/**
  * Set the open/close animation time.
  * @param ddlist pointer to a drop down list
  * @param anim_time: open/close animation time [ms]
  */
 void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
-
-/**
- * Open the drop down list with or without animation
- * @param ddlist pointer to drop down list object
- * @param anim true: use animation; false: not use animations
- */
-void lv_ddlist_open(lv_obj_t * ddlist, bool anim);
-
-/**
- * Close (Collapse) the drop down list
- * @param ddlist pointer to drop down list object
- * @param anim true: use animation; false: not use animations
- */
-void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
 
 /**
  * Set the style of a drop down list
@@ -121,7 +120,11 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
  * @param sb pointer to the new style of the scrollbars (only visible with fix height)
  * @param sel pointer to the new style of the select rectangle
  */
-void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t * bg, lv_style_t * sb, lv_style_t * sel);
+void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t *bg, lv_style_t *sb, lv_style_t *sel);
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the options of a drop down list
@@ -129,7 +132,6 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t * bg, lv_style_t * sb, lv
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
 const char * lv_ddlist_get_options(lv_obj_t * ddlist);
-
 /**
  * Get the selected option
  * @param ddlist pointer to drop down list object
@@ -143,7 +145,6 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
  * @param buf pointer to an array to store the string
  */
 void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
-
 /**
  * Get the "option selected" callback function
  * @param ddlist pointer to a drop down list
@@ -159,35 +160,6 @@ lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist);
 cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist);
 
 /**
- * Get the style of the rectangle on the selected option
- * @param ddlist pointer to a drop down list object
- * @return pointer the style of the select rectangle
- */
-lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist);
-
-/**
- * Get the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @return open/close animation time [ms]
- */
-uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
-
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-
-/**
- * Set the scroll bar mode of a drop down list
- * @param ddlist pointer to a drop down list object
- * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
- */
-static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_page_sb_mode_t mode)
-{
-    lv_page_set_sb_mode(ddlist, mode);
-}
-
-/**
  * Get the scroll bar mode of a drop down list
  * @param ddlist pointer to a  drop down list object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
@@ -196,6 +168,13 @@ static inline lv_page_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
 {
     return lv_page_get_sb_mode(ddlist);
 }
+
+/**
+ * Get the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @return open/close animation time [ms]
+ */
+uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
 
 /**
 * Get the style of the drop down list background
@@ -217,6 +196,29 @@ static inline lv_style_t * lv_ddlist_get_style_sb(lv_obj_t * ddlist)
     return lv_page_get_style_sb(ddlist);
 }
 
+/**
+ * Get the style of the rectangle on the selected option
+ * @param ddlist pointer to a drop down list object
+ * @return pointer the style of the select rectangle
+ */
+lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist);
+
+/*=====================
+ * Other functions
+ *====================*/
+
+/**
+ * Open the drop down list with or without animation
+ * @param ddlist pointer to drop down list object
+ * @param anim true: use animation; false: not use animations
+ */
+void lv_ddlist_open(lv_obj_t * ddlist, bool anim);
+/**
+ * Close (Collapse) the drop down list
+ * @param ddlist pointer to drop down list object
+ * @param anim true: use animation; false: not use animations
+ */
+void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
 
 /**********************
  *      MACROS

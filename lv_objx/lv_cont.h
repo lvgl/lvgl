@@ -62,21 +62,40 @@ typedef struct
  */
 lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
- * Set the layout on a container
+ * Set a layout on a container
  * @param cont pointer to a container object
  * @param layout a layout from 'lv_cont_layout_t'
  */
 void lv_cont_set_layout(lv_obj_t * cont, lv_cont_layout_t layout);
 
+
 /**
  * Enable the horizontal or vertical fit.
  * The container size will be set to involve the children horizontally or vertically.
  * @param cont pointer to a container object
- * @param hor_en true: enable the horizontal padding
- * @param ver_en true: enable the vertical padding
+ * @param hor_en true: enable the horizontal fit
+ * @param ver_en true: enable the vertical fit
  */
 void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en);
+
+/**
+ * Set the style of a container
+ * @param cont pointer to a container object
+ * @param style pointer to the new style
+ */
+static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
+{
+    lv_obj_set_style(cont, style);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the layout of a container
@@ -93,25 +112,11 @@ lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont);
 bool lv_cont_get_hor_fit(lv_obj_t * cont);
 
 /**
- * Get vertical fit enable attribute of a button
- * @param btn pointer to a button object
- * @return true: vertical padding is enabled; false: disabled
+ * Get vertical fit enable attribute of a container
+ * @param cont pointer to a container object
+ * @return true: vertical fit is enabled; false: disabled
  */
 bool lv_cont_get_ver_fit(lv_obj_t * cont);
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-
-/**
- * Set the style of a container
- * @param cont pointer to a container object
- * @param style pointer to the new style
- */
-static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
-{
-    lv_obj_set_style(cont, style);
-}
 
 /**
  * Get the style of a container

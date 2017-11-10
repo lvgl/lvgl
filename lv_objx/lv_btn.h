@@ -70,6 +70,7 @@ typedef struct
  * GLOBAL PROTOTYPES
  **********************/
 
+
 /**
  * Create a button objects
  * @param par pointer to an object, it will be the parent of the new button
@@ -78,8 +79,12 @@ typedef struct
  */
 lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
- * Enable the toggled states
+ * Enable the toggled states. On release the button will change from/to toggled state.
  * @param btn pointer to a button object
  * @param tgl true: enable toggled states, false: disable
  */
@@ -106,17 +111,43 @@ void lv_btn_toggle(lv_obj_t * btn);
 void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action);
 
 /**
+ * Set the layout on a button
+ * @param btn pointer to a button object
+ * @param layout a layout from 'lv_cont_layout_t'
+ */
+static inline void lv_btn_set_layout(lv_obj_t * btn, lv_cont_layout_t layout)
+{
+    lv_cont_set_layout(btn, layout);
+}
+
+/**
+ * Enable the horizontal or vertical fit.
+ * The button size will be set to involve the children horizontally or vertically.
+ * @param btn pointer to a button object
+ * @param hor_en true: enable the horizontal fit
+ * @param ver_en true: enable the vertical fit
+ */
+static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
+{
+    lv_cont_set_fit(btn, hor_en, ver_en);
+}
+
+/**
  * Set styles of a button is each state. Use NULL for any style to leave it unchanged
  * @param btn pointer to button object
  * @param rel pointer to a style for releases state
  * @param pr  pointer to a style for pressed state
  * @param tgl_rel pointer to a style for toggled releases state
  * @param tgl_pr pointer to a style for toggled pressed state
- * @param inactive pointer to a style for inactive state
+ * @param ina pointer to a style for inactive state
  */
 void lv_btn_set_style(lv_obj_t * btn, lv_style_t *rel, lv_style_t *pr,
-                                       lv_style_t *tgl_rel, lv_style_t *tgl_pr,
-                                       lv_style_t *ina);
+                                      lv_style_t *tgl_rel, lv_style_t *tgl_pr,
+                                      lv_style_t *ina);
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the current state of the button
@@ -138,40 +169,6 @@ bool lv_btn_get_toggle(lv_obj_t * btn);
  * @return pointer to the release action function
  */
 lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type);
-
-/**
- * Get the style of a button in a given state
- * @param btn pointer to a button object
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
-lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-
-/**
- * Set the layout on a button
- * @param btn pointer to a button object
- * @param layout a layout from 'lv_cont_layout_t'
- */
-static inline void lv_btn_set_layout(lv_obj_t * btn, lv_cont_layout_t layout)
-{
-    lv_cont_set_layout(btn, layout);
-}
-
-/**
- * Enable the horizontal or vertical fit.
- * The button size will be set to involve the children horizontally or vertically.
- * @param btn pointer to a button object
- * @param hor_en true: enable the horizontal fit
- * @param ver_en true: enable the vertical fit
- */
-static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
-{
-    lv_cont_set_fit(btn, hor_en, ver_en);
-}
 
 /**
  * Get the layout of a button
@@ -202,6 +199,14 @@ static inline bool lv_btn_get_ver_fit(lv_obj_t * btn)
 {
     return lv_cont_get_ver_fit(btn);
 }
+
+/**
+ * Get the style of a button in a given state
+ * @param btn pointer to a button object
+ * @param state a state from 'lv_btn_state_t' in which style should be get
+ * @return pointer to the style in the given state
+ */
+lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
 
 /**********************
  *      MACROS

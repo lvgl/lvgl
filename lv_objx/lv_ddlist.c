@@ -49,10 +49,6 @@ static lv_design_func_t  ancestor_design;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a drop down list objects
  * @param par pointer to an object, it will be the parent of the new drop down list
@@ -199,32 +195,6 @@ void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
 }
 
 /**
- * Open the drop down list with or without animation
- * @param ddlist pointer to drop down list object
- * @param anim true: use animation; false: not use animations
- */
-void lv_ddlist_open(lv_obj_t * ddlist, bool anim)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    ext->opened = 1;
-    lv_obj_set_drag(lv_page_get_scrl(ddlist), true);
-    lv_ddlist_refr_size(ddlist, anim ? ext->anim_time : 0);
-}
-
-/**
- * Close (Collapse) the drop down list
- * @param ddlist pointer to drop down list object
- * @param anim true: use animation; false: not use animations
- */
-void lv_ddlist_close(lv_obj_t * ddlist, bool anim)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    ext->opened = 0;
-    lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
-    lv_ddlist_refr_size(ddlist, anim ? ext->anim_time : 0);
-}
-
-/**
  * Set the style of a drop down list
  * @param ddlist pointer to a drop down list object
  * @param bg pointer to the new style of the background
@@ -315,6 +285,17 @@ cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist)
 }
 
 /**
+ * Get the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @return open/close animation time [ms]
+ */
+uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    return ext->anim_time;
+}
+
+/**
  * Get the style of the rectangle on the selected option
  * @param ddlist pointer to a drop down list object
  * @return pointer the style of the select rectangle
@@ -327,15 +308,34 @@ lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist)
     return ext->selected_style;
 }
 
+/*=====================
+ * Other functions
+ *====================*/
+
 /**
- * Get the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @return open/close animation time [ms]
+ * Open the drop down list with or without animation
+ * @param ddlist pointer to drop down list object
+ * @param anim true: use animation; false: not use animations
  */
-uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist)
+void lv_ddlist_open(lv_obj_t * ddlist, bool anim)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    return ext->anim_time;
+    ext->opened = 1;
+    lv_obj_set_drag(lv_page_get_scrl(ddlist), true);
+    lv_ddlist_refr_size(ddlist, anim ? ext->anim_time : 0);
+}
+
+/**
+ * Close (Collapse) the drop down list
+ * @param ddlist pointer to drop down list object
+ * @param anim true: use animation; false: not use animations
+ */
+void lv_ddlist_close(lv_obj_t * ddlist, bool anim)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    ext->opened = 0;
+    lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
+    lv_ddlist_refr_size(ddlist, anim ? ext->anim_time : 0);
 }
 
 /**********************

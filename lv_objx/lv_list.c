@@ -49,10 +49,6 @@ static lv_signal_func_t ancestor_signal;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a list objects
  * @param par pointer to an object, it will be the parent of the new list
@@ -111,6 +107,10 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     return new_list;
 }
 
+/*======================
+ * Add/remove functions
+ *=====================*/
+
 /**
  * Add a list element to the list
  * @param list pointer to list object
@@ -167,103 +167,20 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	return liste;
 }
 
-/**
- * Move the list elements up by one
- * @param list pointer a to list object
- */
-void lv_list_up(lv_obj_t * list)
-{
-	/*Search the first list element which 'y' coordinate is below the parent
-	 * and position the list to show this element on the bottom*/
-    lv_obj_t * scrl = lv_page_get_scrl(list);
-	lv_obj_t * e;
-	lv_obj_t * e_prev = NULL;
-	e = get_next_btn(list, NULL);
-	while(e != NULL) {
-		if(e->coords.y2 <= list->coords.y2) {
-			if(e_prev != NULL) {
-			    cord_t new_y = lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
-	            lv_list_ext_t *ext = lv_obj_get_ext_attr(list);
-	            if(ext->anim_time == 0) {
-	                lv_obj_set_y(scrl, new_y);
-	            } else {
-                    anim_t a;
-                    a.var = scrl;
-                    a.start = lv_obj_get_y(scrl);
-                    a.end = new_y;
-                    a.fp = (anim_fp_t)lv_obj_set_y;
-                    a.path = anim_get_path(ANIM_PATH_LIN);
-                    a.end_cb = NULL;
-                    a.act_time = 0;
-                    a.time = LV_LIST_FOCUS_TIME;
-                    a.playback = 0;
-                    a.playback_pause = 0;
-                    a.repeat = 0;
-                    a.repeat_pause = 0;
-                    anim_create(&a);
-                }
-			}
-			break;
-		}
-		e_prev = e;
-		e = get_next_btn(list, e);
-	}
-}
-
-/**
- * Move the list elements down by one
- * @param list pointer to a list object
- */
-void lv_list_down(lv_obj_t * list)
-{
-	/*Search the first list element which 'y' coordinate is above the parent
-	 * and position the list to show this element on the top*/
-	lv_obj_t * scrl = lv_page_get_scrl(list);
-	lv_obj_t * e;
-	e = get_next_btn(list, NULL);
-	while(e != NULL) {
-		if(e->coords.y1 < list->coords.y1) {
-            cord_t new_y = -lv_obj_get_y(e);
-            lv_list_ext_t *ext = lv_obj_get_ext_attr(list);
-            if(ext->anim_time == 0) {
-                lv_obj_set_y(scrl, new_y);
-            } else {
-                anim_t a;
-                a.var = scrl;
-                a.start = lv_obj_get_y(scrl);
-                a.end = new_y;
-                a.fp = (anim_fp_t)lv_obj_set_y;
-                a.path = anim_get_path(ANIM_PATH_LIN);
-                a.end_cb = NULL;
-                a.act_time = 0;
-                a.time = LV_LIST_FOCUS_TIME;
-                a.playback = 0;
-                a.playback_pause = 0;
-                a.repeat = 0;
-                a.repeat_pause = 0;
-                anim_create(&a);
-            }
-			break;
-		}
-		e = get_next_btn(list, e);
-	}
-}
-
-/**
- * Focus on a list button. It ensures that the button will be visible on the list.
- * @param btn pointer to a list button to focus
- * @param anim_en true: scroll with animation, false: without animation
- */
-void lv_list_focus(lv_obj_t *btn, bool anim_en)
-{
-    lv_obj_t *list = lv_obj_get_parent(lv_obj_get_parent(btn));
-
-    lv_page_focus(list, btn, anim_en == false ? 0 :lv_list_get_anim_time(list));
-}
-
 /*=====================
  * Setter functions 
  *====================*/
+
+/**
+ * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
+ * @param list pointer to a list object
+ * @param anim_time duration of animation [ms]
+ */
+void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time)
+{
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+    ext->anim_time = anim_time;
+}
 
 /**
  * Set styles of the list elements of a list in each state
@@ -295,45 +212,34 @@ void lv_list_set_style_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
     }
 }
 
-/**
- * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
- * @param list pointer to a list object
- * @param anim_time duration of animation [ms]
- */
-void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time)
-{
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-    ext->anim_time = anim_time;
-}
-
 /*=====================
  * Getter functions 
  *====================*/
 
 /**
  * Get the text of a list element
- * @param liste pointer to list element
+ * @param btn pointer to list element
  * @return pointer to the text
  */
-const char * lv_list_get_btn_text(lv_obj_t * liste)
+const char * lv_list_get_btn_text(lv_obj_t * btn)
 {
-    lv_obj_t * label = lv_list_get_btn_label(liste);
+    lv_obj_t * label = lv_list_get_btn_label(btn);
     if(label == NULL) return "";
     return lv_label_get_text(label);
 }
 
 /**
  * Get the label object from a list element
- * @param liste pointer to a list element (button)
+ * @param btn pointer to a list element (button)
  * @return pointer to the label from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_btn_label(lv_obj_t * liste)
+lv_obj_t * lv_list_get_btn_label(lv_obj_t * btn)
 {
-    lv_obj_t * label = lv_obj_get_child(liste, NULL);
+    lv_obj_t * label = lv_obj_get_child(btn, NULL);
     if(label == NULL) return NULL;
 
     while(label->signal_func != label_signal) {
-        label = lv_obj_get_child(liste, label);
+        label = lv_obj_get_child(btn, label);
         if(label == NULL) break;
     }
 
@@ -342,17 +248,17 @@ lv_obj_t * lv_list_get_btn_label(lv_obj_t * liste)
 
 /**
  * Get the image object from a list element
- * @param liste pointer to a list element (button)
+ * @param btn pointer to a list element (button)
  * @return pointer to the image from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_btn_img(lv_obj_t * liste)
+lv_obj_t * lv_list_get_btn_img(lv_obj_t * btn)
 {
 #if USE_LV_IMG != 0 && USE_FSINT != 0
-    lv_obj_t * img = lv_obj_get_child(liste, NULL);
+    lv_obj_t * img = lv_obj_get_child(btn, NULL);
     if(img == NULL) return NULL;
 
     while(img->signal_func != img_signal) {
-        img = lv_obj_get_child(liste, img);
+        img = lv_obj_get_child(btn, img);
         if(img == NULL) break;
     }
 
@@ -360,6 +266,17 @@ lv_obj_t * lv_list_get_btn_img(lv_obj_t * liste)
 #else
     return NULL;
 #endif
+}
+
+/**
+ * Get scroll animation duration
+ * @param list pointer to a list object
+ * @return duration of animation [ms]
+ */
+uint16_t lv_list_get_anim_time(lv_obj_t *list)
+{
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+    return ext->anim_time;
 }
 
 /**
@@ -377,21 +294,107 @@ lv_style_t * lv_list_get_style_btn(lv_obj_t * list, lv_btn_state_t state)
     return ext->styles_btn[state];
 }
 
+/*=====================
+ * Other functions
+ *====================*/
+
 /**
- * Get scroll animation duration
- * @param list pointer to a list object
- * @return duration of animation [ms]
+ * Move the list elements up by one
+ * @param list pointer a to list object
  */
-uint16_t lv_list_get_anim_time(lv_obj_t *list)
+void lv_list_up(lv_obj_t * list)
 {
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-    return ext->anim_time;
+    /*Search the first list element which 'y' coordinate is below the parent
+     * and position the list to show this element on the bottom*/
+    lv_obj_t * scrl = lv_page_get_scrl(list);
+    lv_obj_t * e;
+    lv_obj_t * e_prev = NULL;
+    e = get_next_btn(list, NULL);
+    while(e != NULL) {
+        if(e->coords.y2 <= list->coords.y2) {
+            if(e_prev != NULL) {
+                cord_t new_y = lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
+                lv_list_ext_t *ext = lv_obj_get_ext_attr(list);
+                if(ext->anim_time == 0) {
+                    lv_obj_set_y(scrl, new_y);
+                } else {
+                    anim_t a;
+                    a.var = scrl;
+                    a.start = lv_obj_get_y(scrl);
+                    a.end = new_y;
+                    a.fp = (anim_fp_t)lv_obj_set_y;
+                    a.path = anim_get_path(ANIM_PATH_LIN);
+                    a.end_cb = NULL;
+                    a.act_time = 0;
+                    a.time = LV_LIST_FOCUS_TIME;
+                    a.playback = 0;
+                    a.playback_pause = 0;
+                    a.repeat = 0;
+                    a.repeat_pause = 0;
+                    anim_create(&a);
+                }
+            }
+            break;
+        }
+        e_prev = e;
+        e = get_next_btn(list, e);
+    }
+}
+
+/**
+ * Move the list elements down by one
+ * @param list pointer to a list object
+ */
+void lv_list_down(lv_obj_t * list)
+{
+    /*Search the first list element which 'y' coordinate is above the parent
+     * and position the list to show this element on the top*/
+    lv_obj_t * scrl = lv_page_get_scrl(list);
+    lv_obj_t * e;
+    e = get_next_btn(list, NULL);
+    while(e != NULL) {
+        if(e->coords.y1 < list->coords.y1) {
+            cord_t new_y = -lv_obj_get_y(e);
+            lv_list_ext_t *ext = lv_obj_get_ext_attr(list);
+            if(ext->anim_time == 0) {
+                lv_obj_set_y(scrl, new_y);
+            } else {
+                anim_t a;
+                a.var = scrl;
+                a.start = lv_obj_get_y(scrl);
+                a.end = new_y;
+                a.fp = (anim_fp_t)lv_obj_set_y;
+                a.path = anim_get_path(ANIM_PATH_LIN);
+                a.end_cb = NULL;
+                a.act_time = 0;
+                a.time = LV_LIST_FOCUS_TIME;
+                a.playback = 0;
+                a.playback_pause = 0;
+                a.repeat = 0;
+                a.repeat_pause = 0;
+                anim_create(&a);
+            }
+            break;
+        }
+        e = get_next_btn(list, e);
+    }
+}
+
+/**
+ * Focus on a list button. It ensures that the button will be visible on the list.
+ * @param btn pointer to a list button to focus
+ * @param anim_en true: scroll with animation, false: without animation
+ */
+void lv_list_focus(lv_obj_t *btn, bool anim_en)
+{
+    lv_obj_t *list = lv_obj_get_parent(lv_obj_get_parent(btn));
+
+    lv_page_focus(list, btn, anim_en == false ? 0 :lv_list_get_anim_time(list));
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 /**
  * Signal function of the list
