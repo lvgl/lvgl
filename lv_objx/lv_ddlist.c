@@ -367,7 +367,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         if(ext->opened != 0) {
             lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
             const font_t * font = style->text.font;
-            cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+            cord_t font_h = font_get_height_scale(font);
             area_t rect_area;
             rect_area.y1 = ext->options_label->coords.y1;
             rect_area.y1 += ext->selected_option_id * (font_h + style->text.line_space);
@@ -537,7 +537,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
     } else { /*Close the list*/
         const font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->options_label);
-        cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+        cord_t font_h = font_get_height_scale(font);
         new_height = font_h + 2 * label_style->text.line_space;
     }
     if(anim_time == 0) {
@@ -571,7 +571,7 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
     const font_t * font = style->text.font;
-    cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+    cord_t font_h = font_get_height_scale(font);
     lv_style_t * label_style = lv_obj_get_style(ext->options_label);
     lv_obj_t * scrl = lv_page_get_scrl(ddlist);
 

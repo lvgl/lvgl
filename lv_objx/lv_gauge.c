@@ -39,13 +39,15 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
 static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask);
 static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design_f = NULL;
+static lv_design_func_t ancestor_design;
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -54,10 +56,6 @@ static lv_design_func_t ancestor_design_f = NULL;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-/*----------------- 
- * Create function
- *-----------------*/
 
 /**
  * Create a gauge objects
@@ -80,7 +78,8 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     ext->values = NULL;
     ext->needle_colors = NULL;
     ext->label_count = LV_GAUGE_DEF_LABEL_COUNT;
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_gauge);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_gauge);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_gauge);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_gauge, lv_gauge_signal);
@@ -108,33 +107,6 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     }
     
     return new_gauge;
-}
-
-/**
- * Signal function of the gauge
- * @param gauge pointer to a gauge object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_lmeter_signal(gauge, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-        lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    	if(sign == LV_SIGNAL_CLEANUP) {
-            dm_free(ext->values);
-            ext->values = NULL;
-    	}
-    }
-    
-    return valid;
 }
 
 /*=====================
@@ -282,7 +254,7 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
         int16_t value_tmp = ext->lmeter.cur_value;
         ext->lmeter.cur_value = ext->lmeter.max_value;
-        ancestor_design_f(gauge, mask, mode);           /*To draw lines*/
+        ancestor_design(gauge, mask, mode);           /*To draw lines*/
 
         /*Temporally modify the line meter to draw thicker and longer lines where labels are*/
         lv_style_t style_tmp;
@@ -292,7 +264,7 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
         style_tmp.body.padding.hor = style_tmp.body.padding.hor * 2;    /*Longer lines*/
         gauge->style_p = &style_tmp;
 
-        ancestor_design_f(gauge, mask, mode);           /*To draw lines*/
+        ancestor_design(gauge, mask, mode);           /*To draw lines*/
 
         ext->lmeter.line_cnt = line_cnt_tmp;          /*Restore the parameters*/
         ext->lmeter.cur_value = value_tmp;
@@ -304,10 +276,34 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_design_f(gauge, mask, mode);
+        ancestor_design(gauge, mask, mode);
     }
 
     return true;
+}
+
+/**
+ * Signal function of the gauge
+ * @param gauge pointer to a gauge object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(gauge, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
+    if(sign == LV_SIGNAL_CLEANUP) {
+        dm_free(ext->values);
+        ext->values = NULL;
+    }
+
+    return res;
 }
 
 /**

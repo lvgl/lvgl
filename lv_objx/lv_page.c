@@ -37,8 +37,8 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
 static lv_design_func_t ancestor_design;
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS

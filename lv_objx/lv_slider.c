@@ -251,10 +251,6 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
 
         /*If dragged draw to the drag position*/
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
-        else {
-            char x = 'a';
-            x++;
-        }
 
         if(slider_w >= slider_h) {
             area_indic.x2 = (int32_t) ((int32_t)area_get_width(&area_indic) * (cur_value - min_value)) / (max_value - min_value);

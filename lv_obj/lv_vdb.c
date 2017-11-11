@@ -96,7 +96,7 @@ void lv_vdb_flush(void)
 #endif
 
 #if LV_ANTIALIAS == 0
-	disp_map(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
+	lv_disp_map(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
 #else
 	/* Get the average of 2x2 pixels and put the result back to the VDB
 	 * The reading goes much faster then the write back

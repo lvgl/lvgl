@@ -25,10 +25,12 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -37,10 +39,6 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-/*----------------- 
- * Create function
- *-----------------*/
 
 /**
  * Create a line meter objects
@@ -53,6 +51,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor of line meter*/
     lv_obj_t * new_lmeter = lv_obj_create(par, copy);
     dm_assert(new_lmeter);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_lmeter);
     
     /*Allocate the line meter type specific extended data*/
     lv_lmeter_ext_t * ext = lv_obj_allocate_ext_attr(new_lmeter, sizeof(lv_lmeter_ext_t));
@@ -88,31 +87,6 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
     }
     
     return new_lmeter;
-}
-
-/**
- * Signal function of the line meter
- * @param lmeter pointer to a line meter object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_obj_signal(lmeter, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	if(sign == LV_SIGNAL_CLEANUP) {
-            /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    	}
-    }
-    
-    return valid;
 }
 
 /*=====================
@@ -301,6 +275,28 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
     }
 
     return true;
+}
+
+/**
+ * Signal function of the line meter
+ * @param lmeter pointer to a line meter object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(lmeter, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    if(sign == LV_SIGNAL_CLEANUP) {
+        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    }
+
+    return LV_RES_OK;
 }
 
 

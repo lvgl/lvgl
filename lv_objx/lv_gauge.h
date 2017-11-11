@@ -63,14 +63,9 @@ typedef struct
  */
 lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the gauge
- * @param gauge pointer to a gauge object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set the number of needles
@@ -89,6 +84,17 @@ void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, color_t * c
 void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value);
 
 /**
+ * Set minimum and the maximum values of a gauge
+ * @param gauge pointer to he gauge object
+ * @param min minimum value
+ * @param max maximum value
+ */
+static inline void lv_gauge_set_range(lv_obj_t *gauge, int16_t min, int16_t max)
+{
+    lv_lmeter_set_range(gauge, min, max);
+}
+
+/**
  * Set the scale settings of a gauge
  * @param gauge pointer to a gauge object
  * @param angle angle of the scale (0..360)
@@ -96,6 +102,20 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value);
  * @param label_cnt count of scale labels
  */
 void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt);
+
+/**
+ * Set the styles of a gauge
+ * @param gauge pointer to a gauge object
+ * @param bg set the style of the gauge
+ *  */
+static inline void lv_gauge_set_style(lv_obj_t *gauge, lv_style_t *bg)
+{
+    lv_obj_set_style(gauge, bg);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the value of a needle
@@ -111,28 +131,6 @@ int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
  * @return count of needles
  */
 uint8_t lv_gauge_get_needle_count(lv_obj_t * gauge);
-
-/**
- * Set the number of labels (and the thicker lines too)
- * @param gauge pointer to a gauge object
- * @return count of labels
- */
-uint8_t lv_gauge_get_label_count(lv_obj_t * gauge);
-
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-
-/**
- * Set minimum and the maximum values of a gauge
- * @param gauge pointer to he gauge object
- * @param min minimum value
- * @param max maximum value
- */
-static inline void lv_gauge_set_range(lv_obj_t *gauge, int16_t min, int16_t max)
-{
-    lv_lmeter_set_range(gauge, min, max);
-}
 
 /**
  * Get the minimum value of a gauge
@@ -154,6 +152,12 @@ static inline int16_t lv_gauge_get_max_value(lv_obj_t * lmeter)
     return lv_lmeter_get_max_value(lmeter);
 }
 
+/**
+ * Set the number of labels (and the thicker lines too)
+ * @param gauge pointer to a gauge object
+ * @return count of labels
+ */
+uint8_t lv_gauge_get_label_count(lv_obj_t * gauge);
 
 /**
  * Get the scale number of a gauge
@@ -175,6 +179,15 @@ static inline uint16_t lv_gauge_get_scale_angle(lv_obj_t * gauge)
     return lv_lmeter_get_scale_angle(gauge);
 }
 
+/**
+ * Get the style of a gauge
+ * @param gauge pointer to a gauge object
+ * @return pointer to the gauge's style
+ */
+static inline lv_style_t * lv_gauge_get_style_bg(lv_obj_t *gauge)
+{
+    return lv_obj_get_style(gauge);
+}
 /**********************
  *      MACROS
  **********************/

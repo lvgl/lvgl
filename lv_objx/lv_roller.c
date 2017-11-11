@@ -73,8 +73,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
-        lv_ddlist_set_fix_height(new_roller, (font_get_height(style_label->text.font) >> FONT_ANTIALIAS) * 3
-                                                                   + style_label->text.line_space * 4);
+        lv_ddlist_set_fix_height(new_roller, font_get_height_scale(style_label->text.font) * 3 + style_label->text.line_space * 4);
 
         lv_label_set_align(ext->ddlist.options_label, LV_LABEL_ALIGN_CENTER);
 
@@ -163,7 +162,7 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
         lv_style_t *style = lv_ddlist_get_style_bg(roller);
         const font_t * font = style->text.font;
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-        cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+        cord_t font_h = font_get_height_scale(font);
         area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
@@ -242,7 +241,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
     const font_t * font = style_label->text.font;
-    cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+    cord_t font_h = font_get_height_scale(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
         /*If dragged then align the list to there be an element in the middle*/
@@ -342,7 +341,7 @@ static void refr_position(lv_obj_t *roller, bool anim_en)
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
     const font_t * font = style_label->text.font;
-    cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+    cord_t font_h = font_get_height_scale(font);
     cord_t h = lv_obj_get_height(roller);
     int32_t id = ext->ddlist.selected_option_id;
     cord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.options_label->coords.y1 - roller_scrl->coords.y1;

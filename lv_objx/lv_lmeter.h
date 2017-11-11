@@ -56,14 +56,9 @@ typedef struct
  */
 lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the line meter
- * @param lmeter pointer to a line meter object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set a new value on the line meter
@@ -84,9 +79,23 @@ void lv_lmeter_set_range(lv_obj_t *lmeter, int16_t min, int16_t max);
  * Set the scale settings of a line meter
  * @param lmeter pointer to a line meter object
  * @param angle angle of the scale (0..360)
- * @param num number of scale units
+ * @param line_cnt number of lines
  */
-void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t num);
+void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt);
+
+/**
+ * Set the styles of a line meter
+ * @param lmeter pointer to a line meter object
+ * @param bg set the style of the line meter
+ *  */
+static inline void lv_lmeter_set_style(lv_obj_t *lmeter, lv_style_t *bg)
+{
+    lv_obj_set_style(lmeter, bg);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the value of a line meter
@@ -123,30 +132,15 @@ uint8_t lv_lmeter_get_line_count(lv_obj_t * lmeter);
  */
 uint16_t lv_lmeter_get_scale_angle(lv_obj_t * lmeter);
 
-/****************************
- * TRANSPARENT API FUNCTIONS
- ***************************/
-/**
- * Set the styles of a line meter
- * @param lmeter pointer to a line meter object
- * @param style set the style of the line meter
- *  */
-static inline void lv_lmeter_set_style(lv_obj_t *lmeter, lv_style_t *style)
-{
-    lv_obj_set_style(lmeter, style);
-}
-
-
 /**
  * Get the style of a line meter
  * @param lmeter pointer to a line meter object
  * @return pointer to the line meter's style
  */
-static inline lv_style_t * lv_lmeter_get_style(lv_obj_t * lmeter)
+static inline lv_style_t * lv_lmeter_get_style_bg(lv_obj_t * lmeter)
 {
     return lv_obj_get_style(lmeter);
 }
-
 
 /**********************
  *      MACROS

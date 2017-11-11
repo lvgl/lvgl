@@ -339,7 +339,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     lv_obj_get_coords(ext->label, &label_cords);
 
 	/*Check the top*/
-    cord_t font_h = font_get_height(font_p) >> FONT_ANTIALIAS;
+    cord_t font_h = font_get_height_scale(font_p);
 	if(lv_obj_get_y(label_par) + cur_pos.y < 0) {
 		lv_obj_set_y(label_par, - cur_pos.y + style->body.padding.ver);
 	}
@@ -421,7 +421,7 @@ void lv_ta_cursor_down(lv_obj_t * ta)
 	/*Increment the y with one line and keep the valid x*/
 	lv_style_t * label_style = lv_obj_get_style(ext->label);
 	const font_t * font_p = label_style->text.font;
-    cord_t font_h = font_get_height(font_p) >> FONT_ANTIALIAS;
+    cord_t font_h = font_get_height_scale(font_p);
 	pos.y += font_h + label_style->text.line_space + 1;
 	pos.x = ext->cursor_valid_x;
 
@@ -451,7 +451,7 @@ void lv_ta_cursor_up(lv_obj_t * ta)
 	/*Decrement the y with one line and keep the valid x*/
 	lv_style_t * label_style = lv_obj_get_style(ext->label);
 	const font_t * font = label_style->text.font;
-    cord_t font_h = font_get_height(font) >> FONT_ANTIALIAS;
+    cord_t font_h = font_get_height_scale(font);
 	pos.y -= font_h + label_style->text.line_space - 1;
 	pos.x = ext->cursor_valid_x;
 
@@ -534,7 +534,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_style_t * style_ta = lv_obj_get_style(ta);
         lv_style_t * style_scrl = lv_obj_get_style(lv_page_get_scrl(ta));
         lv_style_t * style_label = lv_obj_get_style(ext->label);
-        cord_t font_h =  font_get_height(style_label->text.font) >> FONT_ANTIALIAS;
+        cord_t font_h =  font_get_height_scale(style_label->text.font);
 
         ext->one_line = 1;
         lv_page_set_scrl_fit(ta, true, true);
@@ -762,7 +762,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const area_t * mask, lv_des
 #endif
 
 		uint32_t letter = txt_utf8_next(&txt[byte_pos], NULL);
-		cord_t letter_h = font_get_height(label_style->text.font) >> FONT_ANTIALIAS;
+		cord_t letter_h = font_get_height_scale(label_style->text.font);
 		/*Set letter_w (set not 0 on non printable but valid chars)*/
         cord_t letter_w;
 		if(letter == '\0' || letter == '\n' || letter == '\r') {
@@ -848,7 +848,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const area_t * mask, lv_des
  * @param ta pointer to a text area object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
 static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
 {
@@ -871,7 +871,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
             if(ext->one_line) {
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
                 lv_style_t * style_label = lv_obj_get_style(ext->label);
-                cord_t font_h =  font_get_height(style_label->text.font) >> FONT_ANTIALIAS;
+                cord_t font_h =  font_get_height_scale(style_label->text.font);
                 lv_obj_set_height(ta, font_h + (style_ta->body.padding.ver + style_scrl->body.padding.ver) * 2);
             } else {
                 /*In not one line mode refresh the Label width because 'hpad' can modify it*/
@@ -916,7 +916,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
  * @param scrl pointer to scrollable part of a text area object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
 static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
 {
@@ -931,7 +931,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
         lv_obj_t * ta = lv_obj_get_parent(scrl);
         lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
         lv_style_t * style_label = lv_obj_get_style(ext->label);
-        cord_t font_h = font_get_height(style_label->text.font) >> FONT_ANTIALIAS;
+        cord_t font_h = font_get_height_scale(style_label->text.font);
         scrl->ext_size = MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
     }
 

@@ -254,7 +254,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     lv_style_t * style = lv_obj_get_style(cb);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_set_size(ext->bullet, font_get_height(style->text.font), font_get_height(style->text.font));
+        lv_obj_set_size(ext->bullet, font_get_height_scale(style->text.font), font_get_height_scale(style->text.font));
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_PRESSED ||
         sign == LV_SIGNAL_RELEASED ||

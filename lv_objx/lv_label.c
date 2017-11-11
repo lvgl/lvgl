@@ -449,7 +449,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
     cord_t max_w = lv_obj_get_width(label);
     lv_style_t * style = lv_obj_get_style(label);
     const font_t * font = style->text.font;
-    uint8_t letter_height = font_get_height(font) >> FONT_ANTIALIAS;
+    uint8_t letter_height = font_get_height_scale(font);
     cord_t y = 0;
     txt_flag_t flag = TXT_FLAG_NONE;
 
@@ -526,7 +526,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
     cord_t max_w = lv_obj_get_width(label);
     lv_style_t * style = lv_obj_get_style(label);
     const font_t * font = style->text.font;
-    uint8_t letter_height = font_get_height(font) >> FONT_ANTIALIAS;
+    uint8_t letter_height = font_get_height_scale(font);
     cord_t y = 0;
     txt_flag_t flag = TXT_FLAG_NONE;
 
@@ -696,8 +696,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             }
 
             if(lv_obj_get_height(label) > lv_obj_get_height(parent)) {
-                anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) -
-                                   (font_get_height(font) >> FONT_ANTIALIAS);
+                anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) - font_get_height_scale(font);
                 anim.fp = (anim_fp_t)lv_obj_set_y;
 
                 /*Different animation speed if horizontal animation is created too*/
@@ -738,8 +737,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         }
 
         if(size.y > lv_obj_get_height(label)) {
-            anim.end =  lv_obj_get_height(label) - size.y -
-                               (font_get_height(font) >> FONT_ANTIALIAS);
+            anim.end =  lv_obj_get_height(label) - size.y - (font_get_height_scale(font));
             anim.fp = (anim_fp_t)lv_label_set_offset_y;
 
             /*Different animation speed if horizontal animation is created too*/

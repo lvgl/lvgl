@@ -339,7 +339,7 @@ void lv_draw_label(const area_t * coords,const area_t * mask, const lv_style_t *
             pos.x += (w - line_length) / 2;
         }
         /*Go the next line position*/
-        pos.y += font_get_height(font) >> FONT_ANTIALIAS;
+        pos.y += font_get_height_scale(font);
         pos.y += style->text.line_space;
     }
 }
