@@ -9,6 +9,7 @@ Here are ideas which are not assigned to a minor version yet:
 - label: add a horzintal line (e.g. underline or line through).
 - lv_split: new object type, a hor. or ver. line for decoration purpose
 - lv_valset: new object type, a label with "+" and "-" buttons
+- lv_form: new object type, form field with place holder text 
 
 ## v4.3 (in progress)
 - [x] UTF-8 support
