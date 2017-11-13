@@ -62,20 +62,16 @@ typedef struct
 lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the image
- * @param img pointer to animage object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
-
-/**
  * Create a file to the RAMFS from a picture data
  * @param fn file name of the new file (e.g. "pic1", will be available at "U:/pic1")
  * @param data pointer to a color map with lv_img_raw_header_t header
  * @return result of the file operation. FS_RES_OK or any error from fs_res_t
  */
 fs_res_t lv_img_create_file(const char * fn, const color_int_t * data);
+
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set a file to the image
@@ -88,12 +84,12 @@ void lv_img_set_file(lv_obj_t * img, const char * fn);
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param en true: auto size enable, false: auto size disable
+ * @param autosize_en true: auto size enable, false: auto size disable
  */
-void lv_img_set_auto_size(lv_obj_t * img, bool en);
+void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
 
 /**
- * Enable the upscaling with LV_DOWNSCALE.
+ * Enable the upscaling if LV_ANTIALIAS is enabled.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
  * @param en true: upscale enable, false: upscale disable
@@ -101,11 +97,26 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en);
 void lv_img_set_upscale(lv_obj_t * img, bool en);
 
 /**
+ * Set the style of an image
+ * @param img pointer to an image object
+ * @param style pointer to a style
+ */
+static inline void lv_img_set_style(lv_obj_t *img, lv_style_t *style)
+{
+    lv_obj_set_style(img, style);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
  * Get the name of the file set for an image
  * @param img pointer to an image
  * @return file name
  */
 const char * lv_img_get_file_name(lv_obj_t * img);
+
 
 /**
  * Get the auto size enable attribute
@@ -120,6 +131,16 @@ bool lv_img_get_auto_size(lv_obj_t * img);
  * @return true: upscale is enabled, false: upscale is disabled
  */
 bool lv_img_get_upscale(lv_obj_t * img);
+
+/**
+ * Get the style of an image object
+ * @param img pointer to an image object
+ * @return the style an image
+ */
+static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
+{
+    return lv_obj_get_style(img);
+}
 
 /**********************
  *      MACROS

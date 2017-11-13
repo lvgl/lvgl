@@ -28,11 +28,13 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
 static bool lv_img_is_symbol(const char * txt);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -55,6 +57,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create a basic object*/
     new_img = lv_obj_create(par, copy);
     dm_assert(new_img);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_img);
     
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
@@ -89,37 +92,6 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     }
 
     return new_img;
-}
-
-/**
- * Signal function of the image
- * @param img pointer to animage object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
-{
-    bool valid = true;
-
-    /* Include the ancient signal function */
-    valid = lv_obj_signal(img, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-        lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-        if(sign == LV_SIGNAL_CLEANUP) {
-            dm_free(ext->fn);
-        }
-        else if(sign == LV_SIGNAL_STYLE_CHG) {
-            /*Refresh the file name to refresh the symbol text size*/
-            if(lv_img_is_symbol(ext->fn) != false) {
-                lv_img_set_file(img, ext->fn);
-            }
-        }
-    }
-    
-    return valid;
 }
 
 /**
@@ -215,30 +187,30 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param en true: auto size enable, false: auto size disable
+ * @param autosize_en true: auto size enable, false: auto size disable
  */
-void lv_img_set_auto_size(lv_obj_t * img, bool en)
+void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    ext->auto_size = (en == false ? 0 : 1);
+    ext->auto_size = (autosize_en == false ? 0 : 1);
 }
 
 /**
  * Enable the upscaling if LV_ANTIALIAS is enabled.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param en true: upscale enable, false: upscale disable
+ * @param upscale_en true: upscale enable, false: upscale disable
  */
-void lv_img_set_upscale(lv_obj_t * img, bool en)
+void lv_img_set_upscale(lv_obj_t * img, bool upscale_en)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     
     /*Upscale works only if antialiassing is enabled*/
 #if LV_ANTIALIAS == 0
-    en = false;
+    upscale_en = false;
 #else
-    ext->upscale = (en == false ? 0 : 1);
+    ext->upscale = (upscale_en == false ? 0 : 1);
 #endif
     /*Refresh the image with the new size*/
     lv_img_set_file(img, ext->fn);
@@ -285,6 +257,7 @@ bool lv_img_get_upscale(lv_obj_t * img)
 
     return ext->upscale == 0 ? false : true;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -333,6 +306,36 @@ static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t 
     }
     
     return true;
+}
+
+
+/**
+ * Signal function of the image
+ * @param img pointer to animage object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(img, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    if(sign == LV_SIGNAL_CLEANUP) {
+        dm_free(ext->fn);
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
+        /*Refresh the file name to refresh the symbol text size*/
+        if(lv_img_is_symbol(ext->fn) != false) {
+            lv_img_set_file(img, ext->fn);
+        }
+    }
+
+    return LV_RES_OK;
 }
 
 

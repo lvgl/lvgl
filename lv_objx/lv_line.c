@@ -29,10 +29,12 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -52,6 +54,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create a basic object*/
     lv_obj_t * new_line = lv_obj_create(par, copy);
     dm_assert(new_line);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_line);
 
     /*Extend the basic object to line object*/
     lv_line_ext_t * ext = lv_obj_allocate_ext_attr(new_line, sizeof(lv_line_ext_t));
@@ -67,13 +70,14 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new line*/
     if(copy == NULL) {
+        lv_obj_set_size(new_line, LV_DPI, LV_DPI);
 	    lv_obj_set_style(new_line, &lv_style_plain);
     }
     /*Copy an existing object*/
     else {
         lv_line_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
-    	lv_line_set_y_inv(new_line,lv_line_get_y_inv(copy));
+    	lv_line_set_y_invert(new_line,lv_line_get_y_inv(copy));
     	lv_line_set_auto_size(new_line,lv_line_get_auto_size(copy));
     	lv_line_set_upscale(new_line,lv_line_get_upscale(copy));
     	lv_line_set_points(new_line, copy_ext->point_array, copy_ext->point_num);
@@ -82,31 +86,6 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     }
 
     return new_line;
-}
-
-/**
- * Signal function of the line
- * @param line pointer to a line object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_obj_signal(line, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	switch(sign) {
-    		default:
-    			break;
-    	}
-    }
-
-    return valid;
 }
 
 /*=====================
@@ -149,18 +128,16 @@ void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point
  * Enable (or disable) the auto-size option. The size of the object will fit to its points.
  * (set width to x max and height to y max)
  * @param line pointer to a line object
- * @param autosize true: auto size is enabled, false: auto size is disabled
+ * @param autosize_en true: auto size is enabled, false: auto size is disabled
  */
-void lv_line_set_auto_size(lv_obj_t * line, bool autosize)
+void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en)
 {
 	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
-	ext->auto_size = autosize == false ? 0 : 1;
+	ext->auto_size = autosize_en == false ? 0 : 1;
 
 	/*Refresh the object*/
-	if(autosize != false) {
-		lv_line_set_points(line, ext->point_array, ext->point_num);
-	}
+	if(autosize_en) lv_line_set_points(line, ext->point_array, ext->point_num);
 }
 
 /**
@@ -168,13 +145,13 @@ void lv_line_set_auto_size(lv_obj_t * line, bool autosize)
  * If enabled then y will be subtracted from the height of the object,
  * therefore the y=0 coordinate will be on the bottom.
  * @param line pointer to a line object
- * @param yinv true: enable the y inversion, false:disable the y inversion
+ * @param yinv_en true: enable the y inversion, false:disable the y inversion
  */
-void lv_line_set_y_inv(lv_obj_t * line, bool yinv)
+void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en)
 {
 	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
-	ext->y_inv = yinv == false ? 0 : 1;
+	ext->y_inv = yinv_en == false ? 0 : 1;
 
 	lv_obj_invalidate(line);
 }
@@ -184,13 +161,13 @@ void lv_line_set_y_inv(lv_obj_t * line, bool yinv)
  * @param line pointer to a line object
  * @param unscale true: enable the point coordinate upscaling
  */
-void lv_line_set_upscale(lv_obj_t * line, bool unscale)
+void lv_line_set_upscale(lv_obj_t * line, bool unscale_en)
 {
 	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
-	ext->upscale = unscale == false ? 0 : 1;
+	ext->upscale = unscale_en == false ? 0 : 1;
 
-	/*Refresh to point to handle auto size*/
+	/*Refresh to point to handle upscale*/
 	lv_line_set_points(line, ext->point_array, ext->point_num);
 }
 
@@ -290,4 +267,20 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
     return true;
 }
 
+/**
+ * Signal function of the line
+ * @param line pointer to a line object
+ * @param sign a signal type from lv_signal_t enum
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = lv_obj_signal(line, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    return LV_RES_OK;
+}
 #endif

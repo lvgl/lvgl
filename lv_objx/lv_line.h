@@ -41,6 +41,7 @@ typedef struct
  * GLOBAL PROTOTYPES
  **********************/
 
+
 /**
  * Create a line objects
  * @param par pointer to an object, it will be the parent of the new line
@@ -48,13 +49,9 @@ typedef struct
  */
 lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the line
- * @param line pointer to a line object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set an array of points. The line object will connect these points.
@@ -69,25 +66,39 @@ void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point
  * Enable (or disable) the auto-size option. The size of the object will fit to its points.
  * (set width to x max and height to y max)
  * @param line pointer to a line object
- * @param autosize true: auto size is enabled, false: auto size is disabled
+ * @param autosize_en true: auto size is enabled, false: auto size is disabled
  */
-void lv_line_set_auto_size(lv_obj_t * line, bool autosize);
+void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en);
 
 /**
  * Enable (or disable) the y coordinate inversion.
  * If enabled then y will be subtracted from the height of the object,
  * therefore the y=0 coordinate will be on the bottom.
  * @param line pointer to a line object
- * @param yinv true: enable the y inversion, false:disable the y inversion
+ * @param yinv_en true: enable the y inversion, false:disable the y inversion
  */
-void lv_line_set_y_inv(lv_obj_t * line, bool yinv);
+void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en);
 
 /**
- * Enable (or disable) the point coordinate upscaling (compensate LV_DOWNSCALE).
+ * Enable (or disable) the points' coordinate upscaling (if LV_ANTIALIAS is enabled).
  * @param line pointer to a line object
- * @param unscale true: enable the point coordinate upscaling
+ * @param unscale_en true: enable the point coordinate upscaling
  */
-void lv_line_set_upscale(lv_obj_t * line, bool unscale);
+void lv_line_set_upscale(lv_obj_t * line, bool unscale_en);
+
+/**
+ * Set the style of a line
+ * @param line pointer to a line object
+ * @param style pointer to a style
+ */
+static inline void lv_line_set_style(lv_obj_t *line, lv_style_t *style)
+{
+    lv_obj_set_style(line, style);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the auto size attribute
@@ -109,6 +120,16 @@ bool lv_line_get_y_inv(lv_obj_t * line);
  * @return true: point coordinate upscale is enabled, false: disabled
  */
 bool lv_line_get_upscale(lv_obj_t * line);
+
+/**
+ * Get the style of an image object
+ * @param line pointer to an line object
+ * @return the style an image
+ */
+static inline lv_style_t* lv_line_get_style(lv_obj_t *img)
+{
+    return lv_obj_get_style(img);
+}
 
 /**********************
  *      MACROS

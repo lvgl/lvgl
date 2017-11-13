@@ -46,10 +46,6 @@ static lv_design_func_t ancestor_design;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
  * Create a template object
  * @param par pointer to an object, it will be the parent of the new template
