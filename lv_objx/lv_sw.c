@@ -57,6 +57,8 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->changed = 0;
+    ext->style_knob_off = ext->slider.style_knob;
+    ext->style_knob_on = ext->slider.style_knob;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_sw, lv_sw_signal);
@@ -70,11 +72,11 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy an existing switch*/
     else {
         lv_sw_ext_t *copy_ext = lv_obj_get_ext_attr(copy);
-        ext->knob_off_style = copy_ext->knob_off_style;
-        ext->knob_on_style = copy_ext->knob_on_style;
+        ext->style_knob_off = copy_ext->style_knob_off;
+        ext->style_knob_on = copy_ext->style_knob_on;
 
-        if(lv_sw_get_state(new_sw)) lv_slider_set_style(new_sw, NULL, NULL, ext->knob_on_style);
-        else lv_slider_set_style(new_sw, NULL, NULL, ext->knob_off_style);
+        if(lv_sw_get_state(new_sw)) lv_slider_set_style(new_sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
+        else lv_slider_set_style(new_sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_sw);
     }
@@ -94,7 +96,7 @@ void lv_sw_set_on(lv_obj_t *sw)
 {
     lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 1);
-    lv_slider_set_style(sw, NULL, NULL,ext->knob_on_style);
+    lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB,ext->style_knob_on);
 }
 
 /**
@@ -105,26 +107,35 @@ void lv_sw_set_off(lv_obj_t *sw)
 {
     lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 0);
-    lv_slider_set_style(sw, NULL, NULL,ext->knob_off_style);
+    lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB,ext->style_knob_off);
 }
 
 /**
- * Set the styles of a switch
+ * Set a style of a switch
  * @param sw pointer to a switch object
- * @param bg pointer to the background's style
- * @param indic pointer to the indicator's style
- * @param knob_off pointer to the knob's style when the switch is OFF
- * @param knob_on pointer to the knob's style when the switch is ON
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_sw_set_style(lv_obj_t * sw, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob_off, lv_style_t *knob_on)
+void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style)
 {
-    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
-    ext->knob_on_style = knob_on;
-    ext->knob_off_style = knob_off;
-
-    if(lv_sw_get_state(sw)) lv_slider_set_style(sw, bg, indic, knob_on);
-    else lv_slider_set_style(sw, bg, indic, knob_off);
+    switch (type) {
+        case LV_SLIDER_STYLE_BG:
+            lv_slider_set_style(sw, LV_SLIDER_STYLE_BG, style);
+            break;
+        case LV_SLIDER_STYLE_INDIC:
+            lv_bar_set_style(sw, LV_SLIDER_STYLE_INDIC, style);
+            break;
+        case LV_SW_STYLE_KNOB_OFF:
+            ext->style_knob_off = style;
+            if(lv_sw_get_state(sw) == 0) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, style);
+            break;
+        case LV_SW_STYLE_KNOB_ON:
+            ext->style_knob_on = style;
+            if(lv_sw_get_state(sw) != 0) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, style);
+            break;
+    }
 }
 
 /*=====================
@@ -132,28 +143,26 @@ void lv_sw_set_style(lv_obj_t * sw, lv_style_t *bg, lv_style_t *indic, lv_style_
  *====================*/
 
 /**
- * Get the style of the switch's knob when the switch is OFF
- * @param sw pointer to a switch object
- * @return pointer to the switch's knob OFF style
+ * Get a style of a switch
+ * @param sw pointer to a  switch object
+ * @param type which style should be get
+ * @return style pointer to a style
  */
-lv_style_t * lv_sw_get_style_knob_off(lv_obj_t *sw)
+lv_style_t * lv_sw_get_style(lv_obj_t *sw, lv_bar_style_t type)
 {
     lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
-    return ext->knob_off_style;
+
+    switch (type) {
+        case LV_SW_STYLE_BG:    return lv_slider_get_style(sw, LV_SLIDER_STYLE_BG);
+        case LV_SW_STYLE_INDIC: return lv_slider_get_style(sw, LV_SLIDER_STYLE_INDIC);
+        case LV_SW_STYLE_KNOB_OFF:  return ext->style_knob_off;
+        case LV_SW_STYLE_KNOB_ON:  return ext->style_knob_on;
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
 }
-
-
-/**
- * Get the style of the switch's knob when the switch is ON
- * @param sw pointer to a switch object
- * @return pointer to the switch's knob ON style
- */
-lv_style_t * lv_sw_get_style_knob_on(lv_obj_t *sw)
-{
-    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
-    return ext->knob_on_style;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -192,8 +201,8 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_PRESS_LOST) {
         ext->changed = 0;
-        if(lv_sw_get_state(sw)) lv_slider_set_style(sw, NULL, NULL, ext->knob_on_style);
-        else lv_slider_set_style(sw, NULL, NULL, ext->knob_off_style);
+        if(lv_sw_get_state(sw)) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
+        else lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->changed == 0) {
@@ -202,8 +211,8 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             else lv_slider_set_value(sw, 0);
         }
 
-        if(lv_sw_get_state(sw)) lv_slider_set_style(sw, NULL, NULL, ext->knob_on_style);
-        else lv_slider_set_style(sw, NULL, NULL, ext->knob_off_style);
+        if(lv_sw_get_state(sw)) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
+        else lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
 
         if(slider_cb != NULL) slider_cb(sw);
 

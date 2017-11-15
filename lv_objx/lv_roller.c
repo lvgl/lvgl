@@ -119,6 +119,24 @@ void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en)
     lv_cont_set_fit(roller, fit_en ,false);
 }
 
+/**
+ * Set a style of a roller
+ * @param roller pointer to a roller object
+ * @param type which style should be set
+ * @param style pointer to a style
+ */
+void lv_roller_set_style(lv_obj_t *roller, lv_roller_style_t type, lv_style_t *style)
+{
+    switch (type) {
+        case LV_ROLLER_STYLE_BG:
+            lv_obj_set_style(roller, style);
+            break;
+        case LV_ROLLER_STYLE_SELECTED:
+            lv_ddlist_set_style(roller, LV_DDLIST_STYLE_SELECTED, style);
+            break;
+    }
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -131,6 +149,24 @@ void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en)
 bool lv_roller_get_hor_fit(lv_obj_t *roller)
 {
     return lv_page_get_scrl_hor_fit(roller);
+}
+
+/**
+ * Get a style of a roller
+ * @param roller pointer to a roller object
+ * @param type which style should be get
+ * @return style pointer to a style
+ *  */
+lv_style_t * lv_roller_get_style(lv_obj_t *roller, lv_roller_style_t type)
+{
+    switch (type) {
+        case LV_ROLLER_STYLE_BG:        return lv_obj_get_style(roller);
+        case LV_ROLLER_STYLE_SELECTED:  return lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SELECTED);
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
 }
 
 /**********************
@@ -159,7 +195,7 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
 
         draw_bg(roller, mask);
 
-        lv_style_t *style = lv_ddlist_get_style_bg(roller);
+        lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
         const font_t * font = style->text.font;
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
         cord_t font_h = font_get_height_scale(font);
@@ -281,7 +317,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
  */
 static void draw_bg(lv_obj_t *roller, const area_t *mask)
 {
-    lv_style_t *style = lv_ddlist_get_style_bg(roller);
+    lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
     area_t half_mask;
     area_t half_roller;
     cord_t h = lv_obj_get_height(roller);

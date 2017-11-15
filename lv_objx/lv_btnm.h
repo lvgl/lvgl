@@ -57,6 +57,15 @@ typedef struct
     uint8_t toggle     :1;                          /*Enable toggling*/
 }lv_btnm_ext_t;
 
+typedef enum {
+    LV_BTNM_STYLE_BG,
+    LV_BTNM_STYLE_BTN_REL,
+    LV_BTNM_STYLE_BTN_PR,
+    LV_BTNM_STYLE_BTN_TGL_REL,
+    LV_BTNM_STYLE_BTN_TGL_PR,
+    LV_BTNM_STYLE_BTN_INA,
+}lv_btnm_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -105,27 +114,12 @@ void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t action);
 void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
 
 /**
- * Set the style of a button matrix's background
+ * Set a style of a button matrix
  * @param btnm pointer to a button matrix object
- * @param bg pointer to the background style
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-static inline void lv_btnm_set_style(lv_obj_t *btnm, lv_style_t * bg)
-{
-    lv_obj_set_style(btnm, bg);
-}
-
-/**
- * Set styles of the button is each state. Use NULL for any style to leave it unchanged.
- * @param btnm pointer to button matrix object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param tgl_rel pointer to a style for toggled releases state
- * @param tgl_pr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
- */
-void lv_btnm_set_style_btn(lv_obj_t *btnm, lv_style_t *rel, lv_style_t *pr,
-                                       lv_style_t *tgl_rel, lv_style_t *tgl_pr,
-                                       lv_style_t *ina);
+void lv_btnm_set_style(lv_obj_t *btnm, lv_btnm_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -145,23 +139,21 @@ const char ** lv_btnm_get_map(lv_obj_t * btnm);
  */
 lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm);
 
-/**
- * Get the style of a button matrix
- * @param btnm pointer to a button matrix object
- * @return pointer to the backgrond style
- */
-static inline lv_style_t * lv_btnm_get_style_bg(lv_obj_t *btnm)
-{
-    return lv_obj_get_style(btnm);
-}
 
 /**
- * Get the style of buttons in button matrix
- * @param btnm pointer to a button matrix object
- * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
- * @return pointer the button style in the given state
+ * Get the toggled button
+ * @param btnm pointer to button matrix object
+ * @return  index of the currently toggled button (0: if unset)
  */
-lv_style_t * lv_btnm_get_style_btn(lv_obj_t * btnm, lv_btn_state_t state);
+uint16_t lv_btnm_get_toggled(lv_obj_t * btnm);
+
+/**
+ * Get a style of a button matrix
+ * @param btnm pointer to a button matrix object
+ * @param type which style should be get
+ * @return style pointer to a style
+ */
+lv_style_t * lv_btnm_get_style(lv_obj_t *btnm, lv_btnm_style_t type);
 
 /**********************
  *      MACROS

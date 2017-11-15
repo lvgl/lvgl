@@ -46,6 +46,15 @@ typedef struct
     lv_obj_t * label;   /*Pointer to label*/
 }lv_cb_ext_t;
 
+typedef enum {
+    LV_CB_STYLE_BG,
+    LV_CB_STYLE_RELEASED,
+    LV_CB_STYLE_PRESSED,
+    LV_CB_STYLE_TGL_RELEASED,
+    LV_CB_STYLE_TGL_PRESSED,
+    LV_CB_STYLE_INACTIVE,
+}lv_cb_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -76,7 +85,7 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt);
  */
 static inline void lv_cb_set_checked(lv_obj_t * cb, bool checked)
 {
-    lv_btn_set_state(cb, checked ? LV_BTN_STATE_TGL_RELEASED : LV_BTN_STATE_RELEASED);
+    lv_btn_set_state(cb, checked ? LV_BTN_STATE_TGL_REL : LV_BTN_STATE_REL);
 }
 
 /**
@@ -85,7 +94,7 @@ static inline void lv_cb_set_checked(lv_obj_t * cb, bool checked)
  */
 static inline void lv_cb_set_inactive(lv_obj_t * cb)
 {
-    lv_btn_set_state(cb, LV_BTN_STATE_INACTIVE);
+    lv_btn_set_state(cb, LV_BTN_STATE_INA);
 }
 
 /**
@@ -97,32 +106,14 @@ static inline void lv_cb_set_action(lv_obj_t * cb, lv_action_t action)
     lv_btn_set_action(cb, LV_BTN_ACTION_RELEASE, action);
 }
 
-/**
- * Set styles of a checkbox's background is each state. Use NULL for any style to leave it unchanged
- * @param cb pointer to check box object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param tgl_rel pointer to a style for toggled releases state
- * @param tgl_pr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
- */
-static inline void lv_cb_set_style(lv_obj_t *cb, lv_style_t *bg)
-{
-    lv_btn_set_style(cb, bg, bg, bg, bg, bg);
-}
 
 /**
- * Set styles of a checkbox's bullet in each state. Use NULL for any style to leave it unchanged
+ * Set a style of a check box
  * @param cb pointer to check box object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param tgl_rel pointer to a style for toggled releases state
- * @param tgl_pr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
- */
-void lv_cb_set_style_bullet(lv_obj_t *cb, lv_style_t *rel, lv_style_t *pr,
-                                          lv_style_t *tgl_rel, lv_style_t *tgl_pr,
-                                          lv_style_t *ina);
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -142,7 +133,7 @@ const char * lv_cb_get_text(lv_obj_t * cb);
  */
 static inline bool lv_cb_get_checked(lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_RELEASED ? true : false;
+    return lv_btn_get_state(cb) == LV_BTN_STATE_REL ? true : false;
 }
 
 /**
@@ -155,23 +146,14 @@ static inline lv_action_t lv_cb_get_action(lv_obj_t * cb)
     return lv_btn_get_action(cb, LV_BTN_ACTION_RELEASE);
 }
 
-/**
- * Get the style of a check box's background in a given state
- * @param cb pointer to a check box object
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
-static inline lv_style_t * lv_cb_get_style_bg(lv_obj_t * cb)
-{
-    return lv_btn_get_style(cb, lv_btn_get_state(cb));
-}
 
 /**
- * Get styles of a checkbox's bullet in a  state.
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
-lv_style_t * lv_cb_get_style_bullet(lv_obj_t *cb, lv_btn_state_t state);
+ * Get a style of a button
+ * @param cb pointer to check box object
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type);
 
 /**********************
  *      MACROS

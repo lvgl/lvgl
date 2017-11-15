@@ -335,7 +335,7 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         }
     }
 
-    return LV_RES_OK;
+    return res;
 }
 
 

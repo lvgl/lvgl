@@ -202,7 +202,7 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
         }
     }
 
-    return LV_RES_OK;
+    return res;
 }
 
 

@@ -44,13 +44,18 @@ typedef struct {
     lv_action_t  close_action;  /*Called when the "Hide" button is clicked*/
 }lv_kb_ext_t;
 
+typedef enum {
+    LV_KB_STYLE_BG,
+    LV_KB_STYLE_BTN_REL,
+    LV_KB_STYLE_BTN_PR,
+    LV_KB_STYLE_BTN_TGL_REL,
+    LV_KB_STYLE_BTN_TGL_PR,
+    LV_KB_STYLE_BTN_INA,
+}lv_kb_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/*-----------------
- * Create function
- *-----------------*/
 
 /**
  * Create a keyboard objects
@@ -100,30 +105,12 @@ void lv_kb_set_ok_action(lv_obj_t * kb, lv_action_t action);
 void lv_kb_set_close_action(lv_obj_t * kb, lv_action_t action);
 
 /**
- * Set the style of a keyboards's background
+ * Set a style of a keyboard
  * @param kb pointer to a keyboard object
- * @param bg pointer to the background style
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-static inline void lv_kb_set_style(lv_obj_t *kb, lv_style_t * bg)
-{
-    lv_btnm_set_style(kb, bg);
-}
-
-/**
- * Set styles of the buttons is each state. Use NULL for any style to leave it unchanged.
- * @param kb pointer to keyboard object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param tgl_rel pointer to a style for toggled releases state
- * @param tgl_pr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
- */
-static inline void lv_kb_set_style_btn(lv_obj_t *kb, lv_style_t *rel, lv_style_t *pr,
-                                                     lv_style_t *tgl_rel, lv_style_t *tgl_pr,
-                                                     lv_style_t *ina)
-{
-    lv_btnm_set_style_btn(kb, rel, pr, tgl_rel, tgl_pr, ina);
-}
+void lv_kb_set_style(lv_obj_t *kb, lv_kb_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -165,25 +152,12 @@ lv_action_t lv_kb_get_ok_action(lv_obj_t * kb, lv_action_t action);
 lv_action_t lv_kb_get_close_action(lv_obj_t * kb, lv_action_t action);
 
 /**
- * Get the style of a keyboard
+ * Get a style of a keyboard
  * @param kb pointer to a keyboard object
- * @return pointer to the background style
+ * @param type which style should be get
+ * @return style pointer to a style
  */
-static inline lv_style_t * lv_kb_get_style_bg(lv_obj_t *kb)
-{
-    return lv_btnm_get_style_bg(kb);
-}
-
-/**
- * Get the style of the buttons of keyboard
- * @param kb pointer to a keyboard object
- * @param state style in this state (LV_BTN_STATE_PR or LV_BTN_STATE_REL)
- * @return pointer the button style in the given state
- */
-static inline lv_style_t * lv_kb_kb_style_btn(lv_obj_t *kb, lv_btn_state_t state)
-{
-    return lv_btnm_get_style_btn(kb, state);
-}
+lv_style_t * lv_kb_get_style(lv_obj_t *kb, lv_kb_style_t type);
 
 /**********************
  *      MACROS

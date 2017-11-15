@@ -62,9 +62,16 @@ typedef struct
     uint8_t cursor_state :1;    /*Indicates that the cursor is visible now or not (Handled by the library)*/
 }lv_ta_ext_t;
 
+typedef enum {
+    LV_TA_STYLE_BG,
+    LV_TA_STYLE_SB,
+    LV_TA_STYLE_CURSOR,
+}lv_ta_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
 
 /**
  * Create a text area objects
@@ -74,9 +81,10 @@ typedef struct
  */
 lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy);
 
-/*=====================
- * Setter functions
- *====================*/
+
+/*======================
+ * Add/remove functions
+ *=====================*/
 
 /**
  * Insert a character to the current cursor position
@@ -93,6 +101,16 @@ void lv_ta_add_char(lv_obj_t * ta, char c);
 void lv_ta_add_text(lv_obj_t * ta, const char * txt);
 
 /**
+ * Delete a the left character from the current cursor position
+ * @param ta pointer to a text area object
+ */
+void lv_ta_del_char(lv_obj_t * ta);
+
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
  * Set the text of a text area
  * @param ta pointer to a text area
  * @param txt pointer to the text
@@ -100,42 +118,13 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt);
 void lv_ta_set_text(lv_obj_t * ta, const char * txt);
 
 /**
- * Delete a the left character from the current cursor position
- * @param ta pointer to a text area object
- */
-void lv_ta_del(lv_obj_t * ta);
-
-/**
  * Set the cursor position
  * @param obj pointer to a text area object
  * @param pos the new cursor position in character index
  *             < 0 : index from the end of the text
- *             LV_TA_CUR_LAST: go after the last character
+ *             LV_TA_CURSOR_LAST: go after the last character
  */
 void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos);
-
-/**
- * Move the cursor one character right
- * @param ta pointer to a text area object
- */
-void lv_ta_cursor_right(lv_obj_t * ta);
-
-/**
- * Move the cursor one character left
- * @param ta pointer to a text area object
- */
-void lv_ta_cursor_left(lv_obj_t * ta);
-/**
- * Move the cursor one line down
- * @param ta pointer to a text area object
- */
-void lv_ta_cursor_down(lv_obj_t * ta);
-
-/**
- * Move the cursor one line up
- * @param ta pointer to a text area object
- */
-void lv_ta_cursor_up(lv_obj_t * ta);
 
 /**
  * Set the cursor visibility.
@@ -150,7 +139,6 @@ void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
  * @param cur_type: element of 'lv_ta_cursor_type_t'
  */
 void lv_ta_set_cursor_type(lv_obj_t * ta, lv_ta_cursor_type_t cur_type);
-
 /**
  * Enable/Disable password mode
  * @param ta pointer to a text area object
@@ -176,13 +164,12 @@ static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_page_sb_mode_t mode)
 }
 
 /**
- * Set the style of the text area
+ * Set a style of a text area
  * @param ta pointer to a text area object
- * @param bg pointer to the new background style (NULL to leave unchanged)
- * @param sb pointer to the new scrollbar style (NULL to leave unchanged)
- * @param cur pointer to the new cursor style (NULL to use the label's style)
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_ta_set_style(lv_obj_t * ta, lv_style_t *bg, lv_style_t *sb, lv_style_t *cur);
+void lv_ta_set_style(lv_obj_t *ta, lv_ta_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -201,7 +188,6 @@ const char * lv_ta_get_text(lv_obj_t * ta);
  * @return pointer to the label object
  */
 lv_obj_t * lv_ta_get_label(lv_obj_t * ta);
-
 
 /**
  * Get the current cursor position in character index
@@ -249,31 +235,40 @@ static inline lv_page_sb_mode_t lv_ta_get_sb_mode(lv_obj_t * ta)
 }
 
 /**
-* Get the style of the text area background
-* @param ta pointer to a text area object
-* @return pointer to the style of the background
-*/
-static inline lv_style_t * lv_ta_get_style_bg(lv_obj_t * ta)
-{
-    return lv_page_get_style_bg(ta);
-}
-
-/**
-* Get the style of the scrollbars of a text area
-* @param ta pointer to a text area object
-* @return pointer to the style of the scrollbars
-*/
-static inline lv_style_t * lv_ta_get_style_sb(lv_obj_t * ta)
-{
-    return lv_page_get_style_sb(ta);
-}
-
-/**
- * Get the style of the cursor
+ * Get a style of a text area
  * @param ta pointer to a text area object
- * @return style pointer to the new cursor style
+ * @param type which style should be get
+ * @return style pointer to a style
  */
-lv_style_t *  lv_ta_get_style_cursor(lv_obj_t * ta);
+lv_style_t * lv_ta_get_style(lv_obj_t *ta, lv_ta_style_t type);
+
+/*=====================
+ * Other functions
+ *====================*/
+
+/**
+ * Move the cursor one character right
+ * @param ta pointer to a text area object
+ */
+void lv_ta_cursor_right(lv_obj_t * ta);
+
+/**
+ * Move the cursor one character left
+ * @param ta pointer to a text area object
+ */
+void lv_ta_cursor_left(lv_obj_t * ta);
+
+/**
+ * Move the cursor one line down
+ * @param ta pointer to a text area object
+ */
+void lv_ta_cursor_down(lv_obj_t * ta);
+
+/**
+ * Move the cursor one line up
+ * @param ta pointer to a text area object
+ */
+void lv_ta_cursor_up(lv_obj_t * ta);
 
 /**********************
  *      MACROS

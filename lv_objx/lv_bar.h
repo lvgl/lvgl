@@ -40,6 +40,11 @@ typedef struct
     lv_style_t *style_inicator;    /*Style of the indicator*/
 }lv_bar_ext_t;
 
+typedef enum {
+    LV_BAR_STYLE_BG,
+    LV_BAR_STYLE_INDIC,
+}lv_bar_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -81,12 +86,12 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time);
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
 
 /**
- * Set the styles of a bar
+ * Set a style of a bar
  * @param bar pointer to a bar object
- * @param bg pointer to the background's style (NULL to leave unchanged)
- * @param indic pointer to the indicator's style (NULL to leave unchanged)
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_bar_set_style(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic);
+void lv_bar_set_style(lv_obj_t *bar, lv_bar_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -113,23 +118,14 @@ int16_t lv_bar_get_min_value(lv_obj_t * bar);
  */
 int16_t lv_bar_get_max_value(lv_obj_t * bar);
 
-/**
- * Get the style of bar background
- * @param bar pointer to a bar object
- * @return pointer to the bar's background style
- */
-static inline lv_style_t * lv_bar_get_style_bg(lv_obj_t *bar)
-{
-    return lv_obj_get_style(bar);
-}
 
 /**
- * Get the style of bar indicator
+ * Get a style of a bar
  * @param bar pointer to a bar object
- * @return pointer to the bar indicator style
+ * @param type which style should be get
+ * @return style pointer to a style
  */
-lv_style_t * lv_bar_get_style_indicator(lv_obj_t * bar);
-
+lv_style_t * lv_bar_get_style(lv_obj_t *bar, lv_bar_style_t type);
 
 /**********************
  *      MACROS

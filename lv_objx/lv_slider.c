@@ -75,7 +75,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new slider slider*/
     if(copy == NULL) {
         lv_obj_set_click(new_slider, true);
-        lv_slider_set_style(new_slider, NULL, NULL, ext->style_knob);
+        lv_slider_set_style(new_slider, LV_SLIDER_STYLE_KNOB, ext->style_knob);
     }
     /*Copy an existing slider*/
     else {
@@ -118,22 +118,27 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
 }
 
 /**
- * Set the styles of a slider
+ * Set a style of a slider
  * @param slider pointer to a slider object
- * @param bg pointer to the background's style (NULL to leave unchanged)
- * @param indic pointer to the indicator's style (NULL to leave unchanged)
- * @param knob pointer to the knob's style (NULL to leave unchanged)
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_slider_set_style(lv_obj_t * slider, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob)
+void lv_slider_set_style(lv_obj_t *slider, lv_slider_style_t type, lv_style_t *style)
 {
-    if(knob != NULL) {
-        lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-        ext->style_knob = knob;
-        slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
-        lv_obj_invalidate(slider);
-    }
+    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
-    lv_bar_set_style(slider, bg, indic);
+    switch (type) {
+        case LV_SLIDER_STYLE_BG:
+            lv_bar_set_style(slider, LV_BAR_STYLE_BG, style);
+            break;
+        case LV_SLIDER_STYLE_INDIC:
+            lv_bar_set_style(slider, LV_BAR_STYLE_INDIC, style);
+            break;
+        case LV_SLIDER_STYLE_KNOB:
+            ext->style_knob = style;
+            lv_obj_refresh_ext_size(slider);
+            break;
+    }
 }
 
 /*=====================
@@ -175,6 +180,27 @@ bool lv_slider_get_knob_in(lv_obj_t * slider)
     return ext->knob_in == 0 ? false : true;
 }
 
+/**
+ * Get a style of a slider
+ * @param slider pointer to a slider object
+ * @param type which style should be get
+ * @return style pointer to a style
+ */
+lv_style_t * lv_slider_get_style(lv_obj_t *slider, lv_bar_style_t type)
+{
+    lv_slider_ext_t *ext = lv_obj_get_ext_attr(slider);
+
+    switch (type) {
+        case LV_SLIDER_STYLE_BG:    return lv_bar_get_style(slider, LV_BAR_STYLE_BG);
+        case LV_SLIDER_STYLE_INDIC: return lv_bar_get_style(slider, LV_BAR_STYLE_INDIC);
+        case LV_SLIDER_STYLE_KNOB:  return ext->style_knob;
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -200,9 +226,9 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
-        lv_style_t * style_slider = lv_slider_get_style_bg(slider);
-        lv_style_t * style_knob = lv_slider_get_style_knob(slider);
-        lv_style_t * style_indic = lv_slider_get_style_indicator(slider);
+        lv_style_t * style_slider = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
+        lv_style_t * style_knob = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
+        lv_style_t * style_indic = lv_slider_get_style(slider, LV_SLIDER_STYLE_INDIC);
 
         /*Draw the bar*/
         area_t area_bar;
@@ -386,6 +412,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
     }
 
-    return LV_RES_OK;
+    return res;
 }
 #endif

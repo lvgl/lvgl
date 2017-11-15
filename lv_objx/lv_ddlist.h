@@ -51,6 +51,11 @@ typedef struct
     cord_t fix_height;                              /*Height if the ddlist is opened. (0: auto-size)*/
 }lv_ddlist_ext_t;
 
+typedef enum {
+    LV_DDLIST_STYLE_BG,
+    LV_DDLIST_STYLE_SELECTED,
+    LV_DDLIST_STYLE_SB,
+}lv_ddlist_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -113,14 +118,14 @@ static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_page_sb_mode_t mo
  */
 void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
 
+
 /**
- * Set the style of a drop down list
+ * Set a style of a drop down list
  * @param ddlist pointer to a drop down list object
- * @param bg pointer to the new style of the background
- * @param sb pointer to the new style of the scrollbars (only visible with fix height)
- * @param sel pointer to the new style of the select rectangle
- */
-void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t *bg, lv_style_t *sb, lv_style_t *sel);
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_ddlist_set_style(lv_obj_t *ddlist, lv_ddlist_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -132,6 +137,7 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t *bg, lv_style_t *sb, lv_s
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
 const char * lv_ddlist_get_options(lv_obj_t * ddlist);
+
 /**
  * Get the selected option
  * @param ddlist pointer to drop down list object
@@ -145,6 +151,7 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
  * @param buf pointer to an array to store the string
  */
 void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
+
 /**
  * Get the "option selected" callback function
  * @param ddlist pointer to a drop down list
@@ -176,32 +183,14 @@ static inline lv_page_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
  */
 uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
 
-/**
-* Get the style of the drop down list background
-* @param ddlist pointer to a drop down list object
-* @return pointer to the style of the background
-*/
-static inline lv_style_t * lv_ddlist_get_style_bg(lv_obj_t * ddlist)
-{
-    return lv_page_get_style_bg(ddlist);
-}
 
 /**
-* Get the style of the scrollbars of a drop down list
-* @param ddlist pointer to a drop down list object
-* @return pointer to the style of the scrollbars
-*/
-static inline lv_style_t * lv_ddlist_get_style_sb(lv_obj_t * ddlist)
-{
-    return lv_page_get_style_sb(ddlist);
-}
-
-/**
- * Get the style of the rectangle on the selected option
+ * Get a style of a drop down list
  * @param ddlist pointer to a drop down list object
- * @return pointer the style of the select rectangle
+ * @param type which style should be get
+ * @return style pointer to a style
  */
-lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist);
+lv_style_t * lv_ddlist_get_style(lv_obj_t *ddlist, lv_ddlist_style_t type);
 
 /*=====================
  * Other functions

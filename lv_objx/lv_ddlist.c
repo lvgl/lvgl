@@ -93,7 +93,9 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_release_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
-        lv_ddlist_set_style(new_ddlist, &lv_style_pretty, NULL, &lv_style_plain_color);
+        lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
+        lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, &lv_style_pretty);
+        lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SELECTED, &lv_style_plain_color);
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
     }
     /*Copy an existing drop down list*/
@@ -195,19 +197,28 @@ void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
 }
 
 /**
- * Set the style of a drop down list
+ * Set a style of a drop down list
  * @param ddlist pointer to a drop down list object
- * @param bg pointer to the new style of the background
- * @param sb pointer to the new style of the scrollbars (only visible with fix height)
- * @param sel pointer to the new style of the select rectangle
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_ddlist_set_style(lv_obj_t * ddlist, lv_style_t *bg, lv_style_t *sb, lv_style_t *sel)
+void lv_ddlist_set_style(lv_obj_t *ddlist, lv_ddlist_style_t type, lv_style_t *style)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    if(sel != NULL) ext->selected_style = sel;
-    lv_obj_set_style(ext->options_label, bg);
 
-    lv_page_set_style(ddlist, bg, &lv_style_transp_tight, sb);
+    switch (type) {
+        case LV_DDLIST_STYLE_BG:
+            lv_page_set_style(ddlist, LV_PAGE_STYLE_BG, style);
+            break;
+        case LV_DDLIST_STYLE_SB:
+            lv_page_set_style(ddlist, LV_PAGE_STYLE_SB, style);
+            break;
+        case LV_DDLIST_STYLE_SELECTED:
+            ext->selected_style = style;
+            lv_obj_t *scrl = lv_page_get_scrl(ddlist);
+            lv_obj_refresh_ext_size(scrl);  /*Because of the wider selected rectangle*/
+            break;
+    }
 }
 
 /*=====================
@@ -295,19 +306,27 @@ uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist)
     return ext->anim_time;
 }
 
+
 /**
- * Get the style of the rectangle on the selected option
+ * Get a style of a drop down list
  * @param ddlist pointer to a drop down list object
- * @return pointer the style of the select rectangle
+ * @param type which style should be get
+ * @return style pointer to a style
  */
-lv_style_t * lv_ddlist_get_style_select(lv_obj_t * ddlist)
+lv_style_t * lv_ddlist_get_style(lv_obj_t *ddlist, lv_ddlist_style_t type)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    if(ext->selected_style == NULL) return lv_obj_get_style(ddlist);
 
-    return ext->selected_style;
+    switch (type) {
+        case LV_DDLIST_STYLE_BG:        return lv_page_get_style(ddlist, LV_PAGE_STYLE_BG);
+        case LV_DDLIST_STYLE_SB:        return lv_page_get_style(ddlist, LV_PAGE_STYLE_SB);
+        case LV_DDLIST_STYLE_SELECTED:  return ext->selected_style;
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
 }
-
 /*=====================
  * Other functions
  *====================*/
@@ -365,7 +384,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         /*If the list is opened draw a rectangle under the selected item*/
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         if(ext->opened != 0) {
-            lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
+            lv_style_t *style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
             const font_t * font = style->text.font;
             cord_t font_h = font_get_height_scale(font);
             area_t rect_area;
@@ -404,8 +423,6 @@ lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_ddlist_refr_size(ddlist, 0);
-        lv_obj_t *scrl = lv_page_get_scrl(ddlist);
-        lv_obj_refresh_ext_size(scrl);  /*Because of the wider selected rectangle*/
     }
     else if(sign == LV_SIGNAL_FOCUS) {
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
@@ -470,7 +487,7 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
         /* Because of the wider selected rectangle ext. size
          * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
         lv_obj_t *ddlist = lv_obj_get_parent(scrl);
-        lv_style_t *style = lv_ddlist_get_style_bg(ddlist);
+        lv_style_t *style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
         if(scrl->ext_size < style->body.padding.hor) scrl->ext_size = style->body.padding.hor;
     }
 

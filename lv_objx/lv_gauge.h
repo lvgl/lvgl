@@ -184,10 +184,11 @@ static inline uint16_t lv_gauge_get_scale_angle(lv_obj_t * gauge)
  * @param gauge pointer to a gauge object
  * @return pointer to the gauge's style
  */
-static inline lv_style_t * lv_gauge_get_style_bg(lv_obj_t *gauge)
+static inline lv_style_t * lv_gauge_get_style(lv_obj_t *gauge)
 {
     return lv_obj_get_style(gauge);
 }
+
 /**********************
  *      MACROS
  **********************/

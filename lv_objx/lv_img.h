@@ -135,7 +135,7 @@ bool lv_img_get_upscale(lv_obj_t * img);
 /**
  * Get the style of an image object
  * @param img pointer to an image object
- * @return the style an image
+ * @return pointer to the image's style
  */
 static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
 {

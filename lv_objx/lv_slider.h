@@ -40,8 +40,10 @@ typedef struct
 /*Built-in styles of slider*/
 typedef enum
 {
-	LV_SLIDERS_DEF,
-}lv_sliders_builtin_t;
+	LV_SLIDER_STYLE_BG,
+    LV_SLIDER_STYLE_INDIC,
+    LV_SLIDER_STYLE_KNOB,
+}lv_slider_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -107,13 +109,12 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t action);
 void lv_slider_set_knob_in(lv_obj_t * slider, bool in);
 
 /**
- * Set the styles of a slider
+ * Set a style of a slider
  * @param slider pointer to a slider object
- * @param bg pointer to the background's style (NULL to leave unchanged)
- * @param indic pointer to the indicator's style (NULL to leave unchanged)
- * @param knob pointer to the knob's style (NULL to leave unchanged)
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_slider_set_style(lv_obj_t * slider, lv_style_t *bg, lv_style_t *indic, lv_style_t *knob);
+void lv_slider_set_style(lv_obj_t *slider, lv_slider_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -171,25 +172,14 @@ lv_style_t * lv_slider_get_style_knob(lv_obj_t * slider);
  */
 bool lv_slider_get_knob_in(lv_obj_t * slider);
 
-/**
- * Get the style of the slider's background
- * @param slider pointer to a slider object
- * @return pointer to the slider's background style
- */
-static inline lv_style_t * lv_slider_get_style_bg(lv_obj_t * slider)
-{
-    return lv_bar_get_style_bg(slider);
-}
 
 /**
- * Get the style of slider indicator
- * @param bar pointer to a slider object
- * @return pointer to the slider indicator style
+ * Get a style of a slider
+ * @param slider pointer to a slider object
+ * @param type which style should be get
+ * @return style pointer to a style
  */
-static inline lv_style_t * lv_slider_get_style_indicator(lv_obj_t * slider)
-{
-    return lv_bar_get_style_indicator(slider);
-}
+lv_style_t * lv_slider_get_style(lv_obj_t *slider, lv_bar_style_t type);
 
 /**********************
  *      MACROS

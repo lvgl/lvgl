@@ -234,7 +234,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos);
 /**
  * Get the style of an label object
  * @param label pointer to an label object
- * @return the style an label
+ * @return pointer to the label's style
  */
 static inline lv_style_t* lv_label_get_style(lv_obj_t *label)
 {

@@ -28,11 +28,13 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_design_func_t ancestor_design_f;
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -41,10 +43,6 @@ static lv_design_func_t ancestor_design_f;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-/*----------------- 
- * Create function
- *-----------------*/
 
 /**
  * Create a led objects
@@ -57,13 +55,13 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor basic object*/
 	lv_obj_t * new_led = lv_obj_create(par, copy);
     dm_assert(new_led);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_led);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_led);
     
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
     dm_assert(ext);
     ext->bright = LV_LED_BRIGHT_ON;
-
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_led);
 
     lv_obj_set_signal_func(new_led, lv_led_signal);
     lv_obj_set_design_func(new_led, lv_led_design);
@@ -83,29 +81,6 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
     }
     
     return new_led;
-}
-
-/**
- * Signal function of the led
- * @param led pointer to a led object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_obj_signal(led, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-
-    }
-    
-    return valid;
 }
 
 /*=====================
@@ -216,4 +191,21 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
     return true;
 }
 
+/**
+ * Signal function of the led
+ * @param led pointer to a led object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(led, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    return res;
+}
 #endif

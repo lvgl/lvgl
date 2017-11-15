@@ -68,6 +68,7 @@ void lv_style_init (void)
      * HUE = 210*/
 
     /*Screen style*/
+    lv_style_scr.glass = 0;
     lv_style_scr.body.opa = OPA_COVER;
     lv_style_scr.body.color_main = COLOR_WHITE;
     lv_style_scr.body.color_gradient = COLOR_WHITE;
@@ -76,7 +77,6 @@ void lv_style_init (void)
     lv_style_scr.body.padding.hor = LV_DPI / 10;
     lv_style_scr.body.padding.inner = LV_DPI / 10;
     lv_style_scr.body.empty = 0;
-    lv_style_scr.glass = 0;
 
     lv_style_scr.body.border.color = COLOR_BLACK;
     lv_style_scr.body.border.opa = OPA_COVER;

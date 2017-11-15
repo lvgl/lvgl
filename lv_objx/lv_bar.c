@@ -162,23 +162,25 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 	lv_obj_invalidate(bar);
 }
 
+
 /**
- * Set the styles of a bar
+ * Set a style of a bar
  * @param bar pointer to a bar object
- * @param bg pointer to the background's style (NULL to leave unchanged)
- * @param indic pointer to the indicator's style (NULL to leave unchanged)
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_bar_set_style(lv_obj_t * bar, lv_style_t * bg, lv_style_t * indic)
+void lv_bar_set_style(lv_obj_t *bar, lv_bar_style_t type, lv_style_t *style)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-    if(indic != NULL) {
-        ext->style_inicator = indic;
-        bar->signal_func(bar, LV_SIGNAL_REFR_EXT_SIZE, NULL);
-    }
-
-    if(bg != NULL) {
-        lv_obj_set_style(bar, bg);
+    switch (type) {
+        case LV_BAR_STYLE_BG:
+            lv_obj_set_style(bar, style);
+            break;
+        case LV_BAR_STYLE_INDIC:
+            ext->style_inicator = style;
+            lv_obj_refresh_ext_size(bar);
+            break;
     }
 }
 
@@ -231,6 +233,26 @@ lv_style_t * lv_bar_get_style_indicator(lv_obj_t * bar)
     if(ext->style_inicator == NULL) return lv_obj_get_style(bar);
 
     return ext->style_inicator;
+}
+
+/**
+ * Get a style of a bar
+ * @param bar pointer to a bar object
+ * @param type which style should be get
+ * @return style pointer to a style
+ */
+lv_style_t * lv_bar_get_style(lv_obj_t *bar, lv_bar_style_t type)
+{
+    lv_bar_ext_t *ext = lv_obj_get_ext_attr(bar);
+
+    switch (type) {
+        case LV_BAR_STYLE_BG:    return lv_obj_get_style(bar);
+        case LV_BAR_STYLE_INDIC: return ext->style_inicator;
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
 }
 
 /**********************
@@ -302,7 +324,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
         if(style_indic->body.shadow.width > bar->ext_size) bar->ext_size = style_indic->body.shadow.width;
     }
 
-    return LV_RES_OK;
+    return res;
 }
 
 

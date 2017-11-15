@@ -53,6 +53,17 @@ typedef struct
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
 }lv_list_ext_t;
 
+typedef enum {
+    LV_LIST_STYLE_BG,
+    LV_LIST_STYLE_SCRL,
+    LV_LIST_STYLE_SB,
+    LV_LIST_STYLE_BTN_REL,
+    LV_LIST_STYLE_BTN_PR,
+    LV_LIST_STYLE_BTN_TGL_REL,
+    LV_LIST_STYLE_BTN_TGL_PR,
+    LV_LIST_STYLE_BTN_INA,
+}lv_list_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -100,30 +111,14 @@ static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_page_sb_mode_t mode)
     lv_page_set_sb_mode(list, mode);
 }
 
-/**
- * Set a new styles for the list
- * @param list pointer to a list object
- * @param bg pointer to a style for the background (typically transparent)
- * @param scrl pointer to a style for the scrollable area
- * @param sb pointer to a style for the scroll bars
- */
-static inline void lv_list_set_style(lv_obj_t *list, lv_style_t *bg, lv_style_t *scrl, lv_style_t *sb)
-{
-    lv_page_set_style(list, bg, scrl, sb);
-}
 
 /**
- * Set styles of the list elements of a list in each state
- * @param list pointer to list object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param tgl_rel pointer to a style for toggled releases state
- * @param tgl_pr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
+ * Set a style of a list
+ * @param list pointer to a list object
+ * @param type which style should be set
+ * @param style pointer to a style
  */
-void lv_list_set_style_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
-                                               lv_style_t * tgl_rel, lv_style_t * tgl_pr,
-                                               lv_style_t * ina);
+void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -167,42 +162,12 @@ static inline lv_page_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
 }
 
 /**
- * Get a style of a list's background
+ * Get a style of a list
  * @param list pointer to a list object
- * @return pointer to the background's style
- */
-static inline lv_style_t * lv_list_get_style_bg(lv_obj_t *list)
-{
-    return lv_page_get_style_bg(list);
-}
-
-/**
- * Get a style of a list's scrollable part
- * @param list pointer to a list object
- * @return pointer to the scrollable"s style
- */
-static inline lv_style_t * lv_list_get_style_scrl(lv_obj_t *list)
-{
-    return lv_page_get_style_scrl(list);
-}
-
-/**
-* Get the style of the scrollbars of a list
-* @param list pointer to a list object
-* @return pointer to the style of the scrollbars
-*/
-static inline lv_style_t * lv_list_get_style_sb(lv_obj_t *list)
-{
-    return lv_page_get_style_sb(list);
-}
-
-/**
- * Get the style of the list elements in a given state
- * @param list pointer to a list object
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
-lv_style_t * lv_list_get_style_btn(lv_obj_t * list, lv_btn_state_t state);
+ * @param type which style should be get
+ * @return style pointer to a style
+ *  */
+lv_style_t * lv_list_get_style(lv_obj_t *list, lv_btn_style_t type);
 
 /*=====================
  * Other functions

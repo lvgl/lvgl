@@ -122,13 +122,13 @@ bool lv_line_get_y_inv(lv_obj_t * line);
 bool lv_line_get_upscale(lv_obj_t * line);
 
 /**
- * Get the style of an image object
+ * Get the style of an line object
  * @param line pointer to an line object
- * @return the style an image
+ * @return pointer to the line's style
  */
-static inline lv_style_t* lv_line_get_style(lv_obj_t *img)
+static inline lv_style_t* lv_line_get_style(lv_obj_t *line)
 {
-    return lv_obj_get_style(img);
+    return lv_obj_get_style(line);
 }
 
 /**********************

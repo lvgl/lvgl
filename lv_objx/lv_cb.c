@@ -69,14 +69,11 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         ext->bullet = lv_btn_create(new_cb, NULL);
         if(ancestor_bullet_design == NULL) ancestor_bullet_design = lv_obj_get_design_func(ext->bullet);
         lv_obj_set_click(ext->bullet, false);
-        lv_btn_set_style(ext->bullet, &lv_style_pretty, &lv_style_pretty_color,
-                                       &lv_style_btn_tgl_released, &lv_style_btn_tgl_pressed,
-                                       NULL);
 
         ext->label = lv_label_create(new_cb, NULL);
         lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
 
-        lv_cb_set_style(new_cb, &lv_style_transp);
+        lv_cb_set_style(new_cb,LV_CB_STYLE_BG, &lv_style_transp);
         lv_cb_set_text(new_cb, "Check box");
         lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
         lv_cont_set_fit(new_cb, true, true);
@@ -113,21 +110,41 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 }
 
 /**
- * Set styles of a checkbox's bullet in each state. Use NULL for any style to leave it unchanged
+ * Set a style of a check box
  * @param cb pointer to check box object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param tgl_rel pointer to a style for toggled releases state
- * @param tgl_pr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
- */
-void lv_cb_set_style_bullet(lv_obj_t *cb, lv_style_t *rel, lv_style_t *pr,
-                                          lv_style_t *tgl_rel, lv_style_t *tgl_pr,
-                                          lv_style_t *ina)
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
-    lv_btn_set_style(ext->bullet, rel, pr, tgl_rel, tgl_pr, ina);
+
+    switch (type) {
+        case LV_CB_STYLE_BG:
+            lv_btn_set_style(cb, LV_BTN_STYLE_REL, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_PR, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_TGL_REL, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_TGL_PR, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_INA, style);
+            break;
+        case LV_CB_STYLE_RELEASED:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_REL, style);
+            break;
+        case LV_CB_STYLE_PRESSED:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_PR, style);
+            break;
+        case LV_CB_STYLE_TGL_RELEASED:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_REL, style);
+            break;
+        case LV_CB_STYLE_TGL_PRESSED:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_PR, style);
+            break;
+        case LV_CB_STYLE_INACTIVE:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_INA, style);
+            break;
+    }
 }
+
 
 
 /*=====================
@@ -145,15 +162,28 @@ const char * lv_cb_get_text(lv_obj_t * cb)
 	return lv_label_get_text(ext->label);
 }
 
+
 /**
- * Get styles of a checkbox's bullet in a  state.
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
-lv_style_t * lv_cb_get_style_bullet(lv_obj_t *cb, lv_btn_state_t state)
+ * Get a style of a button
+ * @param cb pointer to check box object
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
-    return lv_btn_get_style(ext->bullet, state);
+
+    switch (type) {
+        case LV_CB_STYLE_RELEASED:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
+        case LV_CB_STYLE_PRESSED:      return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
+        case LV_CB_STYLE_TGL_RELEASED: return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
+        case LV_CB_STYLE_TGL_PRESSED:  return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
+        case LV_CB_STYLE_INACTIVE:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
+        default: return NULL;
+    }
+
+    /*To avoid awrning*/
+    return NULL;
 }
 
 /**********************
@@ -269,7 +299,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
         }
     }
 
-    return LV_RES_OK;
+    return res;
 }
 
 #endif

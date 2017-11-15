@@ -185,6 +185,35 @@ void lv_kb_set_close_action(lv_obj_t * kb, lv_action_t action)
     ext->close_action = action;
 }
 
+/**
+ * Set a style of a keyboard
+ * @param kb pointer to a keyboard object
+ * @param type which style should be set
+ * @param style pointer to a style
+ */
+void lv_kb_set_style(lv_obj_t *kb, lv_kb_style_t type, lv_style_t *style)
+{
+    switch (type) {
+        case LV_KB_STYLE_BG:
+            lv_btnm_set_style(kb, LV_BTNM_STYLE_BG, style);
+            break;
+        case LV_KB_STYLE_BTN_REL:
+            lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_REL, style);
+            break;
+        case LV_KB_STYLE_BTN_PR:
+            lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_PR, style);
+            break;
+        case LV_KB_STYLE_BTN_TGL_REL:
+            lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_TGL_REL, style);
+            break;
+        case LV_KB_STYLE_BTN_TGL_PR:
+            lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_TGL_PR, style);
+            break;
+        case LV_KB_STYLE_BTN_INA:
+            lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_INA, style);
+            break;
+    }
+}
 
 /*=====================
  * Getter functions
@@ -246,6 +275,27 @@ lv_action_t lv_kb_get_close_action(lv_obj_t * kb, lv_action_t action)
     return ext->close_action;
 }
 
+/**
+ * Get a style of a keyboard
+ * @param kb pointer to a keyboard object
+ * @param type which style should be get
+ * @return style pointer to a style
+ */
+lv_style_t * lv_kb_get_style(lv_obj_t *kb, lv_kb_style_t type)
+{
+    switch (type) {
+        case LV_KB_STYLE_BG:          return lv_btnm_get_style(kb, LV_BTNM_STYLE_BG);
+        case LV_KB_STYLE_BTN_REL:     return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_REL);
+        case LV_KB_STYLE_BTN_PR:      return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_PR);
+        case LV_KB_STYLE_BTN_TGL_REL: return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL);
+        case LV_KB_STYLE_BTN_TGL_PR:  return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_PR);
+        case LV_KB_STYLE_BTN_INA:     return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_INA);
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -302,18 +352,18 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
     if(strcmp(txt, "Enter") == 0)lv_ta_add_char(ext->ta, '\n');
     else if(strcmp(txt, SYMBOL_LEFT) == 0) lv_ta_cursor_left(ext->ta);
     else if(strcmp(txt, SYMBOL_RIGHT) == 0) lv_ta_cursor_right(ext->ta);
-    else if(strcmp(txt, "Del") == 0)  lv_ta_del(ext->ta);
+    else if(strcmp(txt, "Del") == 0)  lv_ta_del_char(ext->ta);
     else if(strcmp(txt, "+/-") == 0) {
         uint16_t cur = lv_ta_get_cursor_pos(ext->ta);
         const char * ta_txt = lv_ta_get_text(ext->ta);
         if(ta_txt[0] == '-') {
             lv_ta_set_cursor_pos(ext->ta, 1);
-            lv_ta_del(ext->ta);
+            lv_ta_del_char(ext->ta);
             lv_ta_add_char(ext->ta, '+');
             lv_ta_set_cursor_pos(ext->ta, cur);
         } else if(ta_txt[0] == '+') {
             lv_ta_set_cursor_pos(ext->ta, 1);
-            lv_ta_del(ext->ta);
+            lv_ta_del_char(ext->ta);
             lv_ta_add_char(ext->ta, '-');
             lv_ta_set_cursor_pos(ext->ta, cur);
         } else {

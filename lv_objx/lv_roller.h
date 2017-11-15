@@ -32,6 +32,11 @@ typedef struct {
     /*New data for this type */
 }lv_roller_ext_t;
 
+typedef enum {
+    LV_ROLLER_STYLE_BG,
+    LV_ROLLER_STYLE_SELECTED,
+}lv_roller_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -77,21 +82,19 @@ static inline void lv_roller_set_anim_time(lv_obj_t *roller, uint16_t anim_time)
 }
 
 /**
- * Set the style of a roller
- * @param roller pointer to a roller object
- * @param bg pointer to the new style of the background
- * @param sel pointer to the new style of the select rectangle
- */
-static inline void lv_roller_set_style(lv_obj_t *roller, lv_style_t *bg, lv_style_t *sel)
-{
-    lv_ddlist_set_style(roller, bg, NULL, sel);
-}
-/**
  * Enable/disable to set the width of the roller manually (by lv_obj_Set_width())
  * @param roller pointer to a roller object
  * @param fit_en: true: enable auto size; false: use manual width settings
  */
 void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en);
+
+/**
+ * Set a style of a roller
+ * @param roller pointer to a roller object
+ * @param type which style should be set
+ * @param style pointer to a style
+ */
+void lv_roller_set_style(lv_obj_t *roller, lv_roller_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -155,24 +158,12 @@ static inline uint16_t lv_roller_get_anim_time(lv_obj_t * roller)
 bool lv_roller_get_hor_fit(lv_obj_t *roller);
 
 /**
-* Get the style of the roller's background
-* @param roller pointer to a roller object
-* @return pointer to the background's style
-*/
-static inline lv_style_t * lv_roller_get_style_bg(lv_obj_t *roller)
-{
-    return lv_ddlist_get_style_bg(roller);
-}
-
-/**
-* Get the style of the roller's selected rectangle
-* @param roller pointer to a roller object
-* @return pointer to the selected rectangle's style
-*/
-static inline lv_style_t * lv_roller_get_style_selected(lv_obj_t *roller)
-{
-    return lv_ddlist_get_style_select(roller);
-}
+ * Get a style of a roller
+ * @param roller pointer to a roller object
+ * @param type which style should be get
+ * @return style pointer to a style
+ *  */
+lv_style_t * lv_roller_get_style(lv_obj_t *roller, lv_roller_style_t type);
 
 /**********************
  *      MACROS

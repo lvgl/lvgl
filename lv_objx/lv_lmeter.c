@@ -296,7 +296,7 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
 
-    return LV_RES_OK;
+    return res;
 }
 
 

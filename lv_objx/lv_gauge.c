@@ -90,7 +90,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
         lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
         lv_gauge_set_needle_count(new_gauge, 1, NULL);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
-        lv_obj_set_style(new_gauge, &lv_style_pretty);
+        lv_obj_set_style(new_gauge, &lv_style_pretty_color);
     }
     /*Copy an existing gauge*/
     else {
@@ -259,9 +259,9 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
         /*Temporally modify the line meter to draw thicker and longer lines where labels are*/
         lv_style_t style_tmp;
         lv_style_copy(&style_tmp, style);
-        ext->lmeter.line_cnt = ext->label_count;                         /*Only to labels*/
+        ext->lmeter.line_cnt = ext->label_count;                        /*Only to labels*/
         style_tmp.line.width = style_tmp.line.width * 2;                /*Ticker lines*/
-        style_tmp.body.padding.hor = style_tmp.body.padding.hor * 2;    /*Longer lines*/
+        style_tmp.body.padding.hor = style_tmp.body.padding.hor * 2;                            /*Longer lines*/
         gauge->style_p = &style_tmp;
 
         ancestor_design(gauge, mask, mode);           /*To draw lines*/

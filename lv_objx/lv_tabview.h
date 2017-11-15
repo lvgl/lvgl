@@ -46,7 +46,7 @@ typedef struct
 {
    /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * tabs;
+    lv_obj_t * btns;
     lv_obj_t * indic;
     lv_obj_t * content;   /*A rectangle to show the current tab*/
     const char ** tab_name_ptr;
@@ -59,39 +59,53 @@ typedef struct
     lv_tabview_action_t tab_load_action;
 }lv_tabview_ext_t;
 
+typedef enum {
+    LV_TABVIEW_STYLE_BG,
+    LV_TABVIEW_STYLE_BTN_BG,
+    LV_TABVIEW_STYLE_BTN_REL,
+    LV_TABVIEW_STYLE_BTN_PR,
+    LV_TABVIEW_STYLE_BTN_TGL_REL,
+    LV_TABVIEW_STYLE_BTN_TGL_PR,
+    LV_TABVIEW_STYLE_BTN_INA,
+    LV_TABVIEW_STYLE_INDIC,
+}lv_tabview_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+
 /**
- * Create a Tab view objects
+ * Create a Tab view object
  * @param par pointer to an object, it will be the parent of the new tab
  * @param copy pointer to a tab object, if not NULL then the new object will be copied from it
  * @return pointer to the created tab
  */
 lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the Tab view
- * @param tab pointer to a tab object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_tabview_signal(lv_obj_t * tab, lv_signal_t sign, void * param);
+/*======================
+ * Add/remove functions
+ *=====================*/
 
 /**
- * Realign and resize the elements of Tab view
- * @param tabview pointer to a Tab view object
+ * Add a new tab with the given name
+ * @param tabview pointer to Tab view object where to ass the new tab
+ * @param name the text on the tab button
+ * @return pointer to the created page object (lv_page). You can create your content here
  */
-void lv_tabview_realign(lv_obj_t * tabview);
+lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
+
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
  * Set a new tab
  * @param tabview pointer to Tab view object
  * @param id index of a tab to load
  * @param anim_en true: set with sliding animation; false: set immediately
  */
-void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en);
+void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en);
 
 /**
  * Set an action to call when a tab is loaded (Good to create content only if required)
@@ -99,7 +113,7 @@ void lv_tabview_set_act(lv_obj_t * tabview, uint16_t id, bool anim_en);
  * @param tabview pointer to a tabview object
  * @param action pointer to a function to call when a tab is loaded
  */
-void lv_tabview_set_tab_load_action(lv_obj_t *tabview,lv_tabview_action_t action);
+void lv_tabview_set_tab_load_action(lv_obj_t *tabview, lv_tabview_action_t action);
 
 /**
  * Set the animation time of tab view when a new tab is loaded
@@ -109,47 +123,39 @@ void lv_tabview_set_tab_load_action(lv_obj_t *tabview,lv_tabview_action_t action
 void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
 
 /**
+ * Set the height of the tab buttons
+ * @param tabview pointer to a tabview object
+ * @param h the new height
+ */
+void lv_tabview_set_btn_height(lv_obj_t *tabview, cord_t h);
+
+
+void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t *style);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
  * Get the index of the currently active tab
  * @param tabview pointer to Tab view object
  * @return the active tab index
  */
-uint16_t lv_tabview_get_tab_act(lv_obj_t * tabview);
+uint16_t lv_tabview_get_current_tab(lv_obj_t * tabview);
 
 /**
  * Get the number of tabs
  * @param tabview pointer to Tab view object
  * @return tab count
  */
-uint16_t lv_tabview_get_tab_cnt(lv_obj_t * tabview);
-
+uint16_t lv_tabview_get_tab_count(lv_obj_t * tabview);
 /**
  * Get the page (content area) of a tab
  * @param tabview pointer to Tab view object
  * @param id index of the tab (>= 0)
  * @return pointer to page (lv_page) object
  */
-lv_obj_t * lv_tabview_get_tab_page(lv_obj_t * tabview, uint16_t id);
-
-/**
- * Get the tab button matrix (lv_btnm) of a Tab view
- * @param tabview pointer to Tab view object
- * @return pointer to button matrix (lv_btnm) object which is the tab buttons
- */
-lv_obj_t * lv_tabview_get_tabs(lv_obj_t * tabview);
-/**
- * Get the indicator rectangle (lv_obj) of a Tab view
- * @param tabview pointer to Tab view object
- * @return pointer to Base object (lv_obj) which is the indicator rectangle on the tab buttons
- */
-lv_obj_t * lv_tabview_get_indic(lv_obj_t * tabview);
-
-/**
- * Add a new tab with the given name
- * @param tabview pointer to Tab view object where to ass the new tab
- * @param name the text on the tab button
- * @return pointer to page object (lv_page) which is the containter of the contet
- */
-lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
+lv_obj_t * lv_tabview_get_tab(lv_obj_t * tabview, uint16_t id);
 
 /**
  * Get the tab load action
@@ -157,12 +163,22 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
  * @param return the current tab load action
  */
 lv_tabview_action_t lv_tabview_get_tab_load_action(lv_obj_t *tabview);
+
 /**
  * Get the animation time of tab view when a new tab is loaded
  * @param tabview pointer to Tab view object
  * @return time of animation in milliseconds
  */
 uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
+
+/**
+ * Get a style of a tab view
+ * @param tabview pointer to a ab view object
+ * @param type which style should be get
+ * @return style pointer to a style
+ */
+lv_style_t * lv_tabview_get_style(lv_obj_t *tabview, lv_tabview_style_t type);
+
 
 /**********************
  *      MACROS

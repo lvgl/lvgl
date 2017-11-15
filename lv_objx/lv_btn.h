@@ -35,11 +35,11 @@ extern "C" {
 /*Button states*/
 typedef enum
 {
-    LV_BTN_STATE_RELEASED,
-    LV_BTN_STATE_PRESSED,
-    LV_BTN_STATE_TGL_RELEASED,
-    LV_BTN_STATE_TGL_PRESSED,
-    LV_BTN_STATE_INACTIVE,
+    LV_BTN_STATE_REL,
+    LV_BTN_STATE_PR,
+    LV_BTN_STATE_TGL_REL,
+    LV_BTN_STATE_TGL_PR,
+    LV_BTN_STATE_INA,
     LV_BTN_STATE_NUM,
 }lv_btn_state_t;
 
@@ -65,11 +65,17 @@ typedef struct
     uint8_t long_press_action_executed :1;        /*1: Long press action executed (Handled by the library)*/
 }lv_btn_ext_t;
 
+typedef enum {
+    LV_BTN_STYLE_REL,
+    LV_BTN_STYLE_PR,
+    LV_BTN_STYLE_TGL_REL,
+    LV_BTN_STYLE_TGL_PR,
+    LV_BTN_STYLE_INA,
+}lv_btn_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 /**
  * Create a button objects
@@ -132,18 +138,14 @@ static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
     lv_cont_set_fit(btn, hor_en, ver_en);
 }
 
+
 /**
- * Set styles of a button is each state. Use NULL for any style to leave it unchanged
+ * Set a style of a button.
  * @param btn pointer to button object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param tgl_rel pointer to a style for toggled releases state
- * @param tgl_pr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
- */
-void lv_btn_set_style(lv_obj_t * btn, lv_style_t *rel, lv_style_t *pr,
-                                      lv_style_t *tgl_rel, lv_style_t *tgl_pr,
-                                      lv_style_t *ina);
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -201,12 +203,12 @@ static inline bool lv_btn_get_ver_fit(lv_obj_t * btn)
 }
 
 /**
- * Get the style of a button in a given state
- * @param btn pointer to a button object
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
-lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_state_t state);
+ * Get style of a button.
+ * @param btn pointer to button object
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_style_t type);
 
 /**********************
  *      MACROS

@@ -59,10 +59,17 @@ typedef struct
     }sb;
 }lv_page_ext_t;
 
+typedef enum {
+    LV_PAGE_STYLE_BG,
+    LV_PAGE_STYLE_SCRL,
+    LV_PAGE_STYLE_SB,
+}lv_page_style_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
 
 /**
  * Create a page objects
@@ -72,16 +79,16 @@ typedef struct
  */
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
 
-/*=====================
- * Setter functions
- *====================*/
-
 /**
  * Get the scrollable object of a page
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
  */
 lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
+
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set a release action for the page
@@ -103,30 +110,6 @@ void lv_page_set_press_action(lv_obj_t * page, lv_action_t pr_action);
  * @param sb.mode the new mode from 'lv_page_sb.mode_t' enum
  */
 void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode);
-
-/**
- * Set a new styles for the page
- * @param page pointer to a page object
- * @param bg pointer to a style for the background
- * @param scrl pointer to a style for the scrollable area
- * @param sb pointer to a style for the scroll bars
- */
-void lv_page_set_style(lv_obj_t *page, lv_style_t *bg, lv_style_t *scrl, lv_style_t *sb);
-
-/**
- * Glue the object to the page. After it the page can be moved (dragged) with this object too.
- * @param obj pointer to an object on a page
- * @param glue true: enable glue, false: disable glue
- */
-void lv_page_glue_obj(lv_obj_t * obj, bool glue);
-
-/**
- * Focus on an object. It ensures that the object will be visible on the page.
- * @param page pointer to a page object
- * @param obj pointer to an object to focus (must be on the page)
- * @param anim_time scroll animation time in milliseconds (0: no animation)
- */
-void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time);
 
 /**
  * Set the fit attribute of the scrollable part of a page.
@@ -171,6 +154,14 @@ static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_cont_layout_t lay
 {
     lv_cont_set_layout(lv_page_get_scrl(page), layout);
 }
+
+/**
+ * Set a style of a page
+ * @param page pointer to a page object
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_page_set_style(lv_obj_t *page, lv_page_style_t type, lv_style_t *style);
 
 /*=====================
  * Getter functions
@@ -234,28 +225,31 @@ static inline bool lv_page_get_scrl_fit_ver(lv_obj_t * page)
 }
 
 /**
-* Get the style of page's background
-* @param page pointer to a page object
-* @return pointer to the style of background
-*/
-static inline lv_style_t * lv_page_get_style_bg(lv_obj_t * page)
-{
-    return lv_obj_get_style(page);
-}
+ * Get a style of a page
+ * @param page pointer to page object
+ * @param type which style should be get
+ * @return style pointer to a style
+ *  */
+lv_style_t * lv_page_get_style(lv_obj_t *page, lv_page_style_t type);
+
+/*=====================
+ * Other functions
+ *====================*/
 
 /**
-* Get the style of the scrollable part of a page
-* @param page pointer to a page object
-* @return pointer to the style of the scrollale part
-*/
-lv_style_t * lv_page_get_style_scrl(lv_obj_t * page);
+ * Glue the object to the page. After it the page can be moved (dragged) with this object too.
+ * @param obj pointer to an object on a page
+ * @param glue true: enable glue, false: disable glue
+ */
+void lv_page_glue_obj(lv_obj_t * obj, bool glue);
 
 /**
-* Get the style of the scrolbars of a page
-* @param page pointer to a page object
-* @return pointer to the style of the scrollbars
-*/
-lv_style_t * lv_page_get_style_sb(lv_obj_t * page);
+ * Focus on an object. It ensures that the object will be visible on the page.
+ * @param page pointer to a page object
+ * @param obj pointer to an object to focus (must be on the page)
+ * @param anim_time scroll animation time in milliseconds (0: no animation)
+ */
+void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time);
 
 /**********************
  *      MACROS

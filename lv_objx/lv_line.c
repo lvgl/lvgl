@@ -281,6 +281,6 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
     res = lv_obj_signal(line, sign, param);
     if(res != LV_RES_OK) return res;
 
-    return LV_RES_OK;
+    return res;
 }
 #endif
