@@ -192,7 +192,6 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-
         draw_bg(roller, mask);
 
         lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
@@ -209,7 +208,26 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-
+        lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
+        lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+        const font_t * font = style->text.font;
+        cord_t font_h = font_get_height_scale(font);
+        /*Redraw the text on the selected area with a different color*/
+        area_t rect_area;
+        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
+        rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
+        rect_area.x1 = roller->coords.x1;
+        rect_area.x2 = roller->coords.x2;
+        area_t mask_sel;
+        bool area_ok;
+        area_ok = area_union(&mask_sel, mask, &rect_area);
+        if(area_ok) {
+            lv_style_t *sel_style = lv_roller_get_style(roller, LV_ROLLER_STYLE_SELECTED);
+            lv_style_t new_style;
+            lv_style_copy(&new_style, style);
+            new_style.text.color = sel_style->text.color;
+            lv_draw_label(&ext->ddlist.options_label->coords, &mask_sel, &new_style, lv_label_get_text(ext->ddlist.options_label), TXT_FLAG_CENTER, NULL);
+        }
     }
 
     return true;
