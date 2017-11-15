@@ -186,7 +186,7 @@ bool lv_slider_get_knob_in(lv_obj_t * slider)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_slider_get_style(lv_obj_t *slider, lv_bar_style_t type)
+lv_style_t * lv_slider_get_style(lv_obj_t *slider, lv_slider_style_t type)
 {
     lv_slider_ext_t *ext = lv_obj_get_ext_attr(slider);
 

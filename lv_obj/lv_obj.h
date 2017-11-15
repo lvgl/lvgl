@@ -72,6 +72,12 @@ typedef bool (* lv_design_func_t) (struct __LV_OBJ_T * obj, const area_t * mask_
 
 typedef enum
 {
+    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
+    LV_RES_OK,           /*The object is valid (no deleted) after the action*/
+}lv_res_t;
+
+typedef enum
+{
     /*General signals*/
 	LV_SIGNAL_CLEANUP,
     LV_SIGNAL_CHILD_CHG,
@@ -95,7 +101,7 @@ typedef enum
     LV_SIGNAL_CONTROLL,
 }lv_signal_t;
 
-typedef bool (* lv_signal_func_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
+typedef lv_res_t (* lv_signal_func_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
 
 typedef struct __LV_OBJ_T
 {
@@ -133,12 +139,6 @@ typedef struct __LV_OBJ_T
     uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
 #endif
 }lv_obj_t;
-
-typedef enum
-{
-    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
-    LV_RES_OK,           /*The object is valid (no deleted) after the action*/
-}lv_res_t;
 
 typedef lv_res_t (*lv_action_t) (struct __LV_OBJ_T * obj);
 
@@ -210,7 +210,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete
  */
-void lv_obj_del(lv_obj_t * obj);
+lv_res_t lv_obj_del(lv_obj_t * obj);
 
 /**
  * Delete all children of an object
@@ -218,14 +218,6 @@ void lv_obj_del(lv_obj_t * obj);
  */
 void lv_obj_clear(lv_obj_t *obj);
 
-/**
- * Signal function of the basic object
- * @param obj pointer to an object
- * @param sign signal type
- * @param param parameter for the signal (depends on signal type)
- * @return false: the object become invalid (e.g. deleted)
- */
-bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'

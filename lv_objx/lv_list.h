@@ -167,7 +167,7 @@ static inline lv_page_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_list_get_style(lv_obj_t *list, lv_btn_style_t type);
+lv_style_t * lv_list_get_style(lv_obj_t *list, lv_list_style_t type);
 
 /*=====================
  * Other functions

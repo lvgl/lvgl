@@ -136,6 +136,19 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
     mbox_realign(mbox);
 }
 
+
+/**
+ * Stop the action to call when button is released
+ * @param mbox pointer to a message box object
+ * @param pointer to an 'lv_btnm_action_t' action
+ */
+void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action)
+{
+    lv_mbox_ext_t *ext = lv_obj_get_ext_attr(mbox);
+    lv_btnm_set_action(ext->btnm, action);
+}
+
+
 /**
  * Set animation duration
  * @param mbox pointer to a message box object
@@ -159,12 +172,12 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
     if(ext->anim_time != 0) {
         /*Add shrinking animations*/
         lv_obj_animate(mbox, LV_ANIM_GROW_H| ANIM_OUT, ext->anim_time, delay, NULL);
-        lv_obj_animate(mbox, LV_ANIM_GROW_V| ANIM_OUT, ext->anim_time, delay, lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_GROW_V| ANIM_OUT, ext->anim_time, delay, (anim_cb_t)lv_obj_del);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, false, false);
     } else {
-        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, (anim_cb_t)lv_obj_del);
     }
 }
 
@@ -238,8 +251,7 @@ const char * lv_mbox_get_text(lv_obj_t * mbox)
  */
 lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn)
 {
-	lv_obj_t * btnh = lv_obj_get_parent(btn);
-	lv_obj_t * mbox = lv_obj_get_parent(btnh);
+	lv_obj_t * mbox = lv_obj_get_parent(btn);
 
 	return mbox;
 }

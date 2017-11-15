@@ -103,6 +103,13 @@ void lv_mbox_set_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t ac
 void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
 
 /**
+ * Stop the action to call when button is released
+ * @param mbox pointer to a message box object
+ * @param pointer to an 'lv_btnm_action_t' action
+ */
+void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action);
+
+/**
  * Set animation duration
  * @param mbox pointer to a message box object
  * @param time animation length in  milliseconds (0: no animation)

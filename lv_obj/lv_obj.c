@@ -34,6 +34,7 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj);
 static void refresh_childen_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
+static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
@@ -247,8 +248,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 /**
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete
+ * @preturn LV_RES_INV beacuse the object is deleted
  */
-void lv_obj_del(lv_obj_t * obj)
+lv_res_t lv_obj_del(lv_obj_t * obj)
 {
     lv_obj_invalidate(obj);
     
@@ -308,6 +310,8 @@ void lv_obj_del(lv_obj_t * obj)
     if(par != NULL) {
     	par->signal_func(par, LV_SIGNAL_CHILD_CHG, NULL);
     }
+
+    return LV_RES_INV;
 }
 
 /**
@@ -322,39 +326,7 @@ void lv_obj_clear(lv_obj_t *obj)
         lv_obj_del(child);
         child = lv_obj_get_child(obj, child);
     }
-
 }
-
-/**
- * Signal function of the basic object
- * @param obj pointer to an object
- * @param sign signal type
- * @param param parameter for the signal (depends on signal type)
- * @return false: the object become invalid (e.g. deleted) 
- */
-bool lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
-{
-    bool valid = true;
-
-    lv_style_t * style = lv_obj_get_style(obj);
-    switch(sign) {
-        case LV_SIGNAL_CHILD_CHG:
-            /*Return 'invalid' if the child change  signal is not enabled*/
-            if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) valid = false;
-            break;
-        case LV_SIGNAL_REFR_EXT_SIZE:
-            if(style->body.shadow.width > obj->ext_size) obj->ext_size = style->body.shadow.width;
-            break;
-        case LV_SIGNAL_STYLE_CHG:
-            lv_obj_refresh_ext_size(obj);
-            break;
-        default:
-            break;
-    }
-
-    return valid;
-}
-
 
 /**
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
@@ -1521,6 +1493,36 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 		lv_draw_rect(&obj->coords, mask_p, style);
     }
     return true;
+}
+
+/**
+ * Signal function of the basic object
+ * @param obj pointer to an object
+ * @param sign signal type
+ * @param param parameter for the signal (depends on signal type)
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
+{
+    lv_res_t res = LV_RES_OK;
+
+    lv_style_t * style = lv_obj_get_style(obj);
+    switch(sign) {
+        case LV_SIGNAL_CHILD_CHG:
+            /*Return 'invalid' if the child change  signal is not enabled*/
+            if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
+            break;
+        case LV_SIGNAL_REFR_EXT_SIZE:
+            if(style->body.shadow.width > obj->ext_size) obj->ext_size = style->body.shadow.width;
+            break;
+        case LV_SIGNAL_STYLE_CHG:
+            lv_obj_refresh_ext_size(obj);
+            break;
+        default:
+            break;
+    }
+
+    return res;
 }
 
 /**

@@ -124,7 +124,7 @@ static inline lv_action_t lv_sw_get_action(lv_obj_t * slider)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_sw_get_style(lv_obj_t *sw, lv_bar_style_t type);
+lv_style_t * lv_sw_get_style(lv_obj_t *sw, lv_sw_style_t type);
 
 /**********************
  *      MACROS
