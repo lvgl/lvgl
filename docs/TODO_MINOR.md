@@ -10,6 +10,8 @@ Here are ideas which are not assigned to a minor version yet:
 - lv_split: new object type, a hor. or ver. line for decoration purpose
 - lv_valset: new object type, a label with "+" and "-" buttons
 - lv_form: new object type, form field with place holder text 
+- anim paths: monentum (tnh(x)), curve (exp), shake
+- auto shadow size according to z
 
 ## v4.3 (in progress)
 - [x] UTF-8 support
