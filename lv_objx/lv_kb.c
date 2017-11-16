@@ -12,6 +12,7 @@
 
 #include "lv_kb.h"
 #include "lv_ta.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -34,21 +35,21 @@ static lv_signal_func_t ancestor_signal;
 
 static const char * kb_map_lc[] = {
 "\2051#", "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207Del", "\n",
-"\206ABC", "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207Enter", "\n",
+"\226ABC", "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207Enter", "\n",
 "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
 "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_uc[] = {
 "\2051#", "\204Q", "\204W", "\204E", "\204R", "\204T", "\204Y", "\204U", "\204I", "\204O", "\204P", "\207Del", "\n",
-"\206abc", "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\207Enter", "\n",
+"\226abc", "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\207Enter", "\n",
 "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
 "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_spec[] = {
 "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\202Del", "\n",
-"\202abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+"\222abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
 "\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
 "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
@@ -101,6 +102,19 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_btnm_set_action(new_kb, lv_app_kb_action);
         lv_btnm_set_map(new_kb, kb_map_lc);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BG, th->kb.bg);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_REL, th->kb.btn.rel);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_PR, th->kb.btn.pr);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_REL, th->kb.btn.tgl_rel);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_PR, th->kb.btn.tgl_pr);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_INA, th->kb.btn.ina);
+        } else {
+            /*Let the button matrix's styles*/
+        }
     }
     /*Copy an existing keyboard*/
     else {
@@ -334,9 +348,18 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
 
     /*Do the corresponding action according to the text of the button*/
-    if(strcmp(txt, "abc") == 0) lv_btnm_set_map(kb, kb_map_lc);
-    else if(strcmp(txt, "ABC") == 0) lv_btnm_set_map(kb, kb_map_uc);
-    else if(strcmp(txt, "1#") == 0) lv_btnm_set_map(kb, kb_map_spec);
+    if(strcmp(txt, "abc") == 0) {
+        lv_btnm_set_map(kb, kb_map_lc);
+        return LV_RES_OK;
+    }
+    else if(strcmp(txt, "ABC") == 0) {
+        lv_btnm_set_map(kb, kb_map_uc);
+        return LV_RES_OK;
+    }
+    else if(strcmp(txt, "1#") == 0) {
+        lv_btnm_set_map(kb, kb_map_spec);
+        return LV_RES_OK;
+    }
     else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
         if(ext->close_action) ext->close_action(kb);
         else lv_obj_del(kb);

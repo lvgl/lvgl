@@ -9,15 +9,15 @@
 #include "lv_conf.h"
 #if USE_LV_LABEL != 0
 
-#include "misc/gfx/color.h"
-#include "misc/gfx/text.h"
-#include "misc/math/math_base.h"
 #include "lv_label.h"
 #include "../lv_obj/lv_obj.h"
 #include "../lv_obj/lv_group.h"
+#include "../lv_draw/lv_draw.h"
+#include "misc/gfx/color.h"
+#include "misc/gfx/text.h"
+#include "misc/math/math_base.h"
 #include "misc/gfx/text.h"
 #include "misc/gfx/anim.h"
-#include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -93,9 +93,9 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new label*/
     if(copy == NULL) {
 		lv_obj_set_click(new_label, false);
-		lv_obj_set_style(new_label, NULL);
 		lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
 		lv_label_set_text(new_label, "Text");
+        lv_label_set_style(new_label, NULL);        /*Inherit parent's style*/
     }
     /*Copy 'copy' if not NULL*/
     else {

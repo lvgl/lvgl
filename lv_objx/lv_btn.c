@@ -14,6 +14,7 @@
 #include "lv_btn.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/area.h"
 #include "misc/gfx/color.h"
 
@@ -81,7 +82,18 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
 	    lv_btn_set_layout(new_btn, LV_CONT_LAYOUT_CENTER);
-	    lv_obj_set_style(new_btn, ext->styles[LV_BTN_STATE_REL]);
+
+	    /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_REL, th->btn.md.rel);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_PR, th->btn.md.pr);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_REL, th->btn.md.tgl_rel);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->btn.md.tgl_pr);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->btn.md.ina);
+        } else {
+            lv_obj_set_style(new_btn, ext->styles[LV_BTN_STATE_REL]);
+        }
     }
     /*Copy 'copy'*/
     else {

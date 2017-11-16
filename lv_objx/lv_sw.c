@@ -10,6 +10,7 @@
 #if USE_LV_SW != 0
 
 #include "lv_sw.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -68,6 +69,18 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
         lv_slider_set_range(new_sw, 0, 1);
         lv_obj_set_size(new_sw, 2 * LV_DPI / 3, LV_DPI / 3);
         lv_slider_set_knob_in(new_sw, true);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_slider_set_style(new_sw, LV_SW_STYLE_BG, th->sw.bg);
+            lv_slider_set_style(new_sw, LV_SW_STYLE_INDIC, th->sw.indic);
+            lv_slider_set_style(new_sw, LV_SW_STYLE_KNOB_OFF, th->sw.knob_off);
+            lv_slider_set_style(new_sw, LV_SW_STYLE_KNOB_ON, th->sw.knob_on);
+        } else {
+            /*Let the slider' style*/
+        }
+
     }
     /*Copy an existing switch*/
     else {

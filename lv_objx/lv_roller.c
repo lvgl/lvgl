@@ -11,6 +11,7 @@
 
 #include "lv_roller.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -78,7 +79,16 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 
         lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
-        lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_BG, th->roller.bg);
+            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_SEL, th->roller.sel);
+        } else {
+            /*Let the ddlist's style*/
+            lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/
+        }
     }
     /*Copy an existing roller*/
     else {

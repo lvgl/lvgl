@@ -17,6 +17,7 @@
 #include "lv_cont.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_draw/lv_draw_vbasic.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/area.h"
 
 #include "misc/gfx/color.h"
@@ -79,7 +80,13 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new container*/
     if(copy == NULL) {
-		lv_cont_set_style(new_cont, &lv_style_plain);
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_cont_set_style(new_cont, th->cont.filled);
+        } else {
+            lv_cont_set_style(new_cont, &lv_style_pretty);
+        }
     }
     /*Copy an existing object*/
     else {

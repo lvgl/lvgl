@@ -13,6 +13,7 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/text.h"
 
 /*********************
@@ -92,8 +93,20 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new button matrix object*/
     if(copy == NULL) {
     	lv_obj_set_size(new_btnm, LV_HOR_RES, LV_VER_RES / 2);
-    	lv_obj_set_style(new_btnm, &lv_style_pretty);
     	lv_btnm_set_map(new_btnm, lv_btnm_def_map);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BG, th->btnm.bg);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_REL, th->btnm.btn.rel);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_PR, th->btnm.btn.pr);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_REL, th->btnm.btn.tgl_rel);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_PR, th->btnm.btn.tgl_pr);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_INA, th->btnm.btn.ina);
+        } else {
+            lv_obj_set_style(new_btnm, &lv_style_pretty);
+        }
     }
     /*Copy an existing object*/
     else {
@@ -120,9 +133,9 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
  *            The first byte can be a control data:
  *             - bit 7: always 1
  *             - bit 6: always 0
- *             - bit 5: inactive (disabled)
- *             - bit 4: no repeat (on long press)
- *             - bit 3: hidden
+ *             - bit 5: inactive (disabled) (\24x)
+ *             - bit 4: no repeat (on long press) (\22x)
+ *             - bit 3: hidden (\21x)
  *             - bit 2..0: button relative width
  *             Example (practically use octal numbers): "\224abc": "abc" text with 4 width and no long press
  */

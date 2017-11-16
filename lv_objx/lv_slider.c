@@ -12,6 +12,7 @@
 #include "lv_slider.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/math/math_base.h"
 
 /*********************
@@ -75,7 +76,16 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new slider slider*/
     if(copy == NULL) {
         lv_obj_set_click(new_slider, true);
-        lv_slider_set_style(new_slider, LV_SLIDER_STYLE_KNOB, ext->style_knob);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_BG, th->slider.bg);
+            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_INDIC, th->slider.indic);
+            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_KNOB, th->slider.knob);
+        } else {
+            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_KNOB, ext->style_knob);
+        }
     }
     /*Copy an existing slider*/
     else {

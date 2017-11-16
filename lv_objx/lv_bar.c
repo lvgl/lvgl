@@ -13,6 +13,7 @@
 
 #include "lv_bar.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/anim.h"
 #include <stdio.h>
 
@@ -74,8 +75,15 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_click(new_bar, false);
     	lv_obj_set_size(new_bar, LV_DPI * 2, LV_DPI / 3);
-        lv_obj_set_style(new_bar, &lv_style_pretty);
     	lv_bar_set_value(new_bar, ext->cur_value);
+
+    	lv_theme_t *th = lv_theme_get_current();
+    	if(th) {
+    	    lv_bar_set_style(new_bar, LV_BAR_STYLE_BG, th->bar.bg);
+            lv_bar_set_style(new_bar, LV_BAR_STYLE_INDIC, th->bar.indic);
+    	} else {
+            lv_obj_set_style(new_bar, &lv_style_pretty);
+    	}
     } else {
     	lv_bar_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
 		ext->min_value = ext_copy->min_value;
@@ -222,20 +230,6 @@ int16_t lv_bar_get_max_value(lv_obj_t * bar)
 }
 
 /**
- * Get the style of bar indicator
- * @param bar pointer to a bar object
- * @return pointer to the bar indicator style
- */
-lv_style_t * lv_bar_get_style_indicator(lv_obj_t * bar)
-{
-    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-
-    if(ext->style_indic == NULL) return lv_obj_get_style(bar);
-
-    return ext->style_indic;
-}
-
-/**
  * Get a style of a bar
  * @param bar pointer to a bar object
  * @param type which style should be get
@@ -279,7 +273,7 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
 
 		lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-        lv_style_t * style_indic = lv_bar_get_style_indicator(bar);
+        lv_style_t *style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
 		area_t indic_area;
 		area_cpy(&indic_area, &bar->coords);
 		indic_area.x1 += style_indic->body.padding.hor;
@@ -320,7 +314,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-        lv_style_t * style_indic = lv_bar_get_style_indicator(bar);
+        lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
         if(style_indic->body.shadow.width > bar->ext_size) bar->ext_size = style_indic->body.shadow.width;
     }
 

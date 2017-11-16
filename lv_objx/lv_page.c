@@ -13,6 +13,7 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_objx/lv_page.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 #include "../lv_obj/lv_refr.h"
 #include "misc/gfx/anim.h"
 
@@ -88,10 +89,20 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 	    lv_obj_set_signal_func(new_page, lv_page_signal);
 	    lv_obj_set_design_func(new_page, lv_page_design);
 
-	    lv_page_set_style(new_page, LV_PAGE_STYLE_BG, &lv_style_pretty_color);
-        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, &lv_style_pretty);
-        lv_page_set_style(new_page, LV_PAGE_STYLE_SB, &lv_style_pretty_color);
         lv_page_set_sb_mode(new_page, ext->sb.mode);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_page_set_style(new_page, LV_PAGE_STYLE_BG, th->page.bg);
+            lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, th->page.scrl);
+            lv_page_set_style(new_page, LV_PAGE_STYLE_SB, th->page.sb);
+        } else {
+            lv_page_set_style(new_page, LV_PAGE_STYLE_BG, &lv_style_pretty_color);
+            lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, &lv_style_pretty);
+            lv_page_set_style(new_page, LV_PAGE_STYLE_SB, &lv_style_pretty_color);
+        }
+
     } else {
     	lv_page_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->scrl = lv_cont_create(new_page, copy_ext->scrl);

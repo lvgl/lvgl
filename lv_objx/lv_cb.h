@@ -48,11 +48,11 @@ typedef struct
 
 typedef enum {
     LV_CB_STYLE_BG,
-    LV_CB_STYLE_REL,
-    LV_CB_STYLE_PR,
-    LV_CB_STYLE_TGL_REL,
-    LV_CB_STYLE_TGL_PR,
-    LV_CB_STYLE_INA,
+    LV_CB_STYLE_BOX_REL,
+    LV_CB_STYLE_BOX_PR,
+    LV_CB_STYLE_BOX_TGL_REL,
+    LV_CB_STYLE_BOX_TGL_PR,
+    LV_CB_STYLE_BOX_INA,
 }lv_cb_style_t;
 
 /**********************

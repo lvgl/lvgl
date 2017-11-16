@@ -11,6 +11,7 @@
 
 #include "lv_list.h"
 #include "../lv_obj/lv_group.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 
@@ -79,9 +80,23 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
     	lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
 		lv_page_set_scrl_layout(new_list, LV_LIST_LAYOUT_DEF);
-		lv_page_set_sb_mode(new_list, LV_PAGE_SB_MODE_DRAG);
-        lv_list_set_style(new_list, LV_LIST_STYLE_BG, &lv_style_transp_fit);
-        lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, &lv_style_pretty);
+		lv_list_set_sb_mode(new_list, LV_PAGE_SB_MODE_DRAG);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_list_set_style(new_list, LV_LIST_STYLE_BG, th->list.bg);
+            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, th->list.scrl);
+            lv_list_set_style(new_list, LV_LIST_STYLE_SB, th->list.sb);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, th->list.btn.rel);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, th->list.btn.pr);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, th->list.btn.tgl_rel);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, th->list.btn.tgl_pr);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, th->list.btn.ina);
+        } else {
+            lv_list_set_style(new_list, LV_LIST_STYLE_BG, &lv_style_transp_fit);
+            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, &lv_style_pretty);
+        }
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 

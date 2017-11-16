@@ -13,6 +13,7 @@
 #include "lv_ta.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/anim.h"
 #include "misc/gfx/text.h"
 #include "misc/math/math_base.h"
@@ -103,13 +104,22 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->label = lv_label_create(new_ta, NULL);
 
     	lv_obj_set_design_func(ext->page.scrl, lv_ta_scrollable_design);
+
     	lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
     	lv_label_set_text(ext->label, "Text area");
     	lv_obj_set_click(ext->label, false);
-    	lv_obj_set_style(new_ta, &lv_style_pretty);
-        lv_obj_set_style(lv_page_get_scrl(new_ta), &lv_style_transp_fit);
     	lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
         lv_ta_set_sb_mode(new_ta, LV_PAGE_SB_MODE_DRAG);
+        lv_page_set_style(new_ta, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_ta_set_style(new_ta, LV_TA_STYLE_BG, th->ta.area);
+            lv_ta_set_style(new_ta, LV_TA_STYLE_SB, th->ta.sb);
+        } else {
+            lv_ta_set_style(new_ta, LV_TA_STYLE_BG, &lv_style_pretty);
+        }
     }
     /*Copy an existing object*/
     else {

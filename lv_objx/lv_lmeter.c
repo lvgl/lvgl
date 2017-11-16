@@ -10,8 +10,9 @@
 #if USE_LV_LMETER != 0
 
 #include "lv_lmeter.h"
-#include "misc/math/trigo.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
+#include "misc/math/trigo.h"
 
 /*********************
  *      DEFINES
@@ -70,8 +71,15 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new line meter line meter*/
     if(copy == NULL) {
-        lv_obj_set_size(new_lmeter, 1 * LV_DPI, 1 * LV_DPI);
-        lv_obj_set_style(new_lmeter, &lv_style_pretty_color);
+        lv_obj_set_size(new_lmeter, LV_DPI, LV_DPI);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_lmeter_set_style(new_lmeter, th->lmeter);
+        } else {
+            lv_lmeter_set_style(new_lmeter, &lv_style_pretty_color);
+        }
     }
     /*Copy an existing line meter*/
     else {

@@ -10,6 +10,7 @@
 #if USE_LV_WIN != 0
 
 #include "lv_win.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -71,7 +72,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
         lv_page_set_sb_mode(ext->page, LV_PAGE_SB_MODE_AUTO);
-        lv_page_set_style(ext->page, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
+        lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
     	/*Create a holder for the header*/
     	ext->header = lv_obj_create(new_win, NULL);
@@ -83,9 +84,24 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->title = lv_label_create(ext->header, NULL);
     	lv_label_set_text(ext->title,"My title");
 
-        lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_pretty);
-        lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, &lv_style_transp);
-        lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
+
+    	/*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->win.bg);
+            lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->win.sb);
+            lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, th->win.header);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, th->win.content);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->win.btn.rel);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->win.btn.pr);
+
+        } else {
+            lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_pretty);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, &lv_style_transp);
+            lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
+
+        }
+
 
         lv_obj_set_signal_func(new_win, lv_win_signal);
         lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
@@ -212,7 +228,7 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style)
             lv_win_realign(win);
             break;
         case LV_WIN_STYLE_CONTENT:
-            lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, style);
+            lv_page_set_style(ext->page, LV_PAGE_STYLE_BG, style);
             break;
         case LV_WIN_STYLE_SB:
             lv_page_set_style(ext->page, LV_PAGE_STYLE_SB, style);
@@ -292,8 +308,7 @@ cord_t lv_win_get_width(lv_obj_t * win)
  */
 lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn)
 {
-	lv_obj_t * ctrl_holder = lv_obj_get_parent(ctrl_btn);
-	lv_obj_t * header = lv_obj_get_parent(ctrl_holder);
+	lv_obj_t * header = lv_obj_get_parent(ctrl_btn);
 	lv_obj_t * win = lv_obj_get_parent(header);
 
 	return win;
@@ -312,7 +327,7 @@ lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type)
     switch (type) {
         case LV_WIN_STYLE_BG:      return lv_obj_get_style(win);
         case LV_WIN_STYLE_SB:      return lv_page_get_style(ext->page, LV_PAGE_STYLE_SB);
-        case LV_WIN_STYLE_CONTENT: return lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL);
+        case LV_WIN_STYLE_CONTENT: return lv_page_get_style(ext->page, LV_PAGE_STYLE_BG);
         case LV_WIN_STYLE_HEADER:  return lv_obj_get_style(ext->header);
         case LV_WIN_STYLE_BTN_REL: return ext->style_btn_rel;
         case LV_WIN_STYLE_BTN_PR:  return ext->style_btn_pr;

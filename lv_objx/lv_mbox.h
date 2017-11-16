@@ -76,13 +76,6 @@ typedef enum {
 lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * A release action which can be assigned to a message box button to close it
- * @param btn pointer to the released button
- * @return always lv_action_res_t because the button is deleted with the mesage box
- */
-lv_res_t lv_mbox_close_action(lv_obj_t * btn);
-
-/**
  * Set  button to the message box
  * @param mbox pointer to message box object
  * @param btn_map button descriptor (button matrix map).

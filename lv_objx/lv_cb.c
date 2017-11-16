@@ -11,6 +11,7 @@
 
 #include "lv_cb.h"
 #include "../lv_obj/lv_group.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -71,15 +72,24 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_click(ext->bullet, false);
 
         ext->label = lv_label_create(new_cb, NULL);
-        lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
 
-        lv_cb_set_style(new_cb,LV_CB_STYLE_BG, &lv_style_transp);
         lv_cb_set_text(new_cb, "Check box");
-        lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
-        lv_cont_set_fit(new_cb, true, true);
+        lv_btn_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
+        lv_btn_set_fit(new_cb, true, true);
         lv_btn_set_toggle(new_cb, true);
 
-        lv_obj_refresh_style(new_cb);
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BG, th->cb.bg);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, th->cb.box.rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_PR, th->cb.box.pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_REL, th->cb.box.tgl_rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_PR, th->cb.box.tgl_pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->cb.box.ina);
+        } else {
+            lv_cb_set_style(new_cb,LV_CB_STYLE_BG, &lv_style_transp);
+        }
     } else {
     	lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
@@ -127,19 +137,19 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style)
             lv_btn_set_style(cb, LV_BTN_STYLE_TGL_PR, style);
             lv_btn_set_style(cb, LV_BTN_STYLE_INA, style);
             break;
-        case LV_CB_STYLE_REL:
+        case LV_CB_STYLE_BOX_REL:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_REL, style);
             break;
-        case LV_CB_STYLE_PR:
+        case LV_CB_STYLE_BOX_PR:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_PR, style);
             break;
-        case LV_CB_STYLE_TGL_REL:
+        case LV_CB_STYLE_BOX_TGL_REL:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_REL, style);
             break;
-        case LV_CB_STYLE_TGL_PR:
+        case LV_CB_STYLE_BOX_TGL_PR:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_PR, style);
             break;
-        case LV_CB_STYLE_INA:
+        case LV_CB_STYLE_BOX_INA:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_INA, style);
             break;
     }
@@ -174,11 +184,11 @@ lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     switch (type) {
-        case LV_CB_STYLE_REL:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
-        case LV_CB_STYLE_PR:      return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
-        case LV_CB_STYLE_TGL_REL: return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
-        case LV_CB_STYLE_TGL_PR:  return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
-        case LV_CB_STYLE_INA:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
+        case LV_CB_STYLE_BOX_REL:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
+        case LV_CB_STYLE_BOX_PR:      return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
+        case LV_CB_STYLE_BOX_TGL_REL: return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
+        case LV_CB_STYLE_BOX_TGL_PR:  return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
+        case LV_CB_STYLE_BOX_INA:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
         default: return NULL;
     }
 

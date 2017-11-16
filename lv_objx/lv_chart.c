@@ -11,6 +11,7 @@
 
 #include "lv_chart.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -84,8 +85,16 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new chart background object*/
     if(copy == NULL) {
-    	lv_obj_set_style(new_chart, &lv_style_pretty);
-    	lv_obj_set_size(new_chart, LV_HOR_RES / 2, LV_VER_RES / 2);
+    	lv_obj_set_size(new_chart, LV_HOR_RES / 3, LV_VER_RES / 3);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_chart_set_style(new_chart, th->chart);
+        } else {
+            lv_chart_set_style(new_chart, &lv_style_pretty);
+        }
+
     } else {
     	lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
         ext->type = ext_copy->type;

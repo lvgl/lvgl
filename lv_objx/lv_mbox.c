@@ -12,6 +12,7 @@
 
 #include "lv_mbox.h"
 #include "../lv_obj/lv_group.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/anim.h"
 #include "misc/math/math_base.h"
 
@@ -29,6 +30,7 @@
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t *mbox);
+static lv_res_t lv_mbox_close_action(lv_obj_t *btn, const char *txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -76,8 +78,16 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
         lv_cont_set_layout(new_mbox, LV_CONT_LAYOUT_COL_M);
         lv_cont_set_fit(new_mbox, false, true);
         lv_obj_set_width(new_mbox, LV_HOR_RES / 3);
+        lv_obj_align(new_mbox, NULL, LV_ALIGN_CENTER, 0, 0);
 
-    	lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, &lv_style_pretty);
+        /*Set the default styles*/
+         lv_theme_t *th = lv_theme_get_current();
+         if(th) {
+             lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->mbox.bg);
+         } else {
+             lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, &lv_style_pretty);
+         }
+
     }
     /*Copy an existing message box*/
     else {
@@ -110,11 +120,21 @@ void lv_mbox_set_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t ac
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnm_create(mbox, NULL);
         lv_obj_set_height(ext->btnm, LV_DPI / 2);
-        lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, &lv_style_transp_fit);
+
+        /*Set the default styles*/
+         lv_theme_t *th = lv_theme_get_current();
+         if(th) {
+             lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->mbox.btn.bg);
+             lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->mbox.btn.rel);
+             lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->mbox.btn.pr);
+         } else {
+             lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, &lv_style_transp_fit);
+         }
     }
 
     lv_btnm_set_map(ext->btnm, btn_map);
-    lv_btnm_set_action(ext->btnm, action);
+    if(action == NULL) lv_btnm_set_action(ext->btnm, lv_mbox_close_action); /*Set a default action anyway*/
+    else  lv_btnm_set_action(ext->btnm, action);
 
     mbox_realign(mbox);
 }
@@ -344,6 +364,18 @@ static void mbox_realign(lv_obj_t *mbox)
     cord_t w = lv_obj_get_width(mbox) - 2 * style->body.padding.hor;
     if(ext->btnm) lv_obj_set_width(ext->btnm, w);
     if(ext->text) lv_obj_set_width(ext->text, w);
+}
+
+static lv_res_t lv_mbox_close_action(lv_obj_t *btn, const char *txt)
+{
+    lv_obj_t *mbox = lv_mbox_get_from_btn(btn);
+
+    if(txt[0] != '\0') {
+        lv_mbox_start_auto_close(mbox, 0);
+        return LV_RES_INV;
+    }
+
+    return LV_RES_OK;
 }
 
 #endif

@@ -9,8 +9,9 @@
 #include "lv_conf.h"
 #if USE_LV_TABVIEW != 0
 
-#include <lvgl/lv_objx/lv_tabview.h>
+#include "lv_tabview.h"
 #include "lv_btnm.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/anim.h"
 
 /*********************
@@ -107,12 +108,23 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_height(ext->content, LV_VER_RES - lv_obj_get_height(ext->btns));
         lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 
-        lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_transp);
-        lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, &lv_style_plain_color);
 
-
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BG, th->tabview.bg);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, th->tabview.indic);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, th->tabview.btn.bg);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_REL, th->tabview.btn.rel);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_PR, th->tabview.btn.pr);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_REL, th->tabview.btn.tgl_rel);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_PR, th->tabview.btn.tgl_pr);
+        } else {
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_transp);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, &lv_style_plain_color);
+        }
     }
-    /*Copy an existing tab*/
+    /*Copy an existing tab view*/
     else {
     	lv_tabview_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->point_last.x = 0;
@@ -194,7 +206,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_set_width(ext->indic, indic_width);
     lv_obj_set_x(ext->indic, indic_width * ext->tab_cur + style_tabs->body.padding.inner * ext->tab_cur + style_tabs->body.padding.hor);
 
-    /*Set the first tab as active*/
+    /*Set the first btn as active*/
     if(ext->tab_cnt == 1) {
         ext->tab_cur = 0;
         lv_tabview_set_current_tab(tabview, 0, false);
@@ -274,7 +286,7 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
  * Set an action to call when a tab is loaded (Good to create content only if required)
  * lv_tabview_get_act() still gives the current (old) tab (to remove content from here)
  * @param tabview pointer to a tabview object
- * @param action pointer to a function to call when a tab is loaded
+ * @param action pointer to a function to call when a btn is loaded
  */
 void lv_tabview_set_tab_load_action(lv_obj_t *tabview, lv_tabview_action_t action)
 {
@@ -346,9 +358,9 @@ void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t
  *====================*/
 
 /**
- * Get the index of the currently active tab
+ * Get the index of the currently active btn
  * @param tabview pointer to Tab view object
- * @return the active tab index
+ * @return the active btn index
  */
 uint16_t lv_tabview_get_current_tab(lv_obj_t * tabview)
 {
@@ -359,7 +371,7 @@ uint16_t lv_tabview_get_current_tab(lv_obj_t * tabview)
 /**
  * Get the number of tabs
  * @param tabview pointer to Tab view object
- * @return tab count
+ * @return btn count
  */
 uint16_t lv_tabview_get_tab_count(lv_obj_t * tabview)
 {
@@ -370,7 +382,7 @@ uint16_t lv_tabview_get_tab_count(lv_obj_t * tabview)
 /**
  * Get the page (content area) of a tab
  * @param tabview pointer to Tab view object
- * @param id index of the tab (>= 0)
+ * @param id index of the btn (>= 0)
  * @return pointer to page (lv_page) object
  */
 lv_obj_t * lv_tabview_get_tab(lv_obj_t * tabview, uint16_t id)
@@ -392,7 +404,7 @@ lv_obj_t * lv_tabview_get_tab(lv_obj_t * tabview, uint16_t id)
 /**
  * Get the tab load action
  * @param tabview pointer to a tabview object
- * @param return the current tab load action
+ * @param return the current btn load action
  */
 lv_tabview_action_t lv_tabview_get_tab_load_action(lv_obj_t *tabview)
 {
@@ -537,8 +549,8 @@ static lv_res_t tabpage_scrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void 
 
 /**
  * Called when a tab's page or scrollable object is pressed
- * @param tabview pointer to the tab view object
- * @param tabpage pointer to the page of a tab
+ * @param tabview pointer to the btn view object
+ * @param tabpage pointer to the page of a btn
  */
 static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
@@ -549,8 +561,8 @@ static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 
 /**
  * Called when a tab's page or scrollable object is being pressed
- * @param tabview pointer to the tab view object
- * @param tabpage pointer to the page of a tab
+ * @param tabview pointer to the btn view object
+ * @param tabpage pointer to the page of a btn
  */
 static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
@@ -588,8 +600,8 @@ static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 
 /**
  * Called when a tab's page or scrollable object is released or the press id lost
- * @param tabview pointer to the tab view object
- * @param tabpage pointer to the page of a tab
+ * @param tabview pointer to the btn view object
+ * @param tabpage pointer to the page of a btn
  */
 static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {

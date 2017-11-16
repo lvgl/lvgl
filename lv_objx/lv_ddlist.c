@@ -14,6 +14,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_obj/lv_indev.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/anim.h"
 
 /*********************
@@ -94,9 +95,20 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_release_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
         lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
-        lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, &lv_style_pretty);
-        lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, &lv_style_plain_color);
+
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, th->ddlist.bg);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL,th->ddlist.sel);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, th->ddlist.sb);
+        } else {
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, &lv_style_pretty);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, &lv_style_plain_color);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, &lv_style_pretty_color);
+        }
     }
     /*Copy an existing drop down list*/
     else {

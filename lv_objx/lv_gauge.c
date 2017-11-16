@@ -12,6 +12,7 @@
 
 #include "lv_gauge.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 #include "misc/gfx/text.h"
 #include "misc/math/trigo.h"
 #include "misc/math/math_base.h"
@@ -90,7 +91,14 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
         lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
         lv_gauge_set_needle_count(new_gauge, 1, NULL);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
-        lv_obj_set_style(new_gauge, &lv_style_pretty_color);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_gauge_set_style(new_gauge, th->gauge);
+        } else {
+            lv_gauge_set_style(new_gauge, &lv_style_pretty_color);
+        }
     }
     /*Copy an existing gauge*/
     else {

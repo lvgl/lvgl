@@ -10,6 +10,7 @@
 #if USE_LV_LED != 0
 
 #include "lv_led.h"
+#include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************
@@ -68,8 +69,15 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new led object*/
     if(copy == NULL) {
-    	lv_obj_set_style(new_led, &lv_style_pretty_color);
     	lv_obj_set_size(new_led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_led_set_style(new_led, th->led);
+        } else {
+            lv_led_set_style(new_led, &lv_style_pretty_color);
+        }
     }
     /*Copy an existing object*/
     else {
