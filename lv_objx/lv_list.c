@@ -66,11 +66,11 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
 
     ext->style_img = NULL;
-    ext->styles_btn[LV_BTN_STATE_REL] = &lv_style_btn_rel;
-    ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_pr;
-    ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
-    ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_tgl_pr;
-    ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
+    ext->styles_btn[LV_BTN_STATE_REL] = &lv_style_btn_released;
+    ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_pressed;
+    ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_released;
+    ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_tgl_pressed;
+    ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_inactive;
     ext->anim_time = LV_LIST_FOCUS_TIME;
 
 	lv_obj_set_signal_func(new_list, lv_list_signal);
@@ -134,7 +134,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STATE_TGL_PR]);
     lv_btn_set_style(liste, LV_BTN_STYLE_INA, ext->styles_btn[LV_BTN_STATE_INA]);
 
-	lv_btn_set_action(liste, LV_BTN_ACTION_RELEASE, rel_action);
+	lv_btn_set_action(liste, LV_BTN_ACTION_REL, rel_action);
 	lv_page_glue_obj(liste, true);
 	lv_btn_set_layout(liste, LV_CONT_LAYOUT_ROW_M);
 	lv_btn_set_fit(liste, false, true);
@@ -192,6 +192,8 @@ void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time)
 void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style)
 {
     lv_list_ext_t *ext = lv_obj_get_ext_attr(list);
+    lv_btn_style_t btn_style_refr = LV_BTN_STYLE_REL;
+    lv_obj_t *btn;
 
     switch (type) {
         case LV_LIST_STYLE_BG:
@@ -205,35 +207,36 @@ void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style)
             break;
         case LV_LIST_STYLE_BTN_REL:
             ext->styles_btn[LV_BTN_STATE_REL] = style;
+            btn_style_refr = LV_BTN_STYLE_REL;
             break;
         case LV_LIST_STYLE_BTN_PR:
             ext->styles_btn[LV_BTN_STATE_PR] = style;
+            btn_style_refr = LV_BTN_STYLE_PR;
             break;
         case LV_LIST_STYLE_BTN_TGL_REL:
             ext->styles_btn[LV_BTN_STATE_TGL_REL] = style;
+            btn_style_refr = LV_BTN_STYLE_TGL_REL;
             break;
         case LV_LIST_STYLE_BTN_TGL_PR:
             ext->styles_btn[LV_BTN_STATE_TGL_PR] = style;
+            btn_style_refr = LV_BTN_STYLE_TGL_PR;
             break;
         case LV_LIST_STYLE_BTN_INA:
             ext->styles_btn[LV_BTN_STATE_INA] = style;
+            btn_style_refr = LV_BTN_STYLE_INA;
             break;
     }
 
 
     /*Refresh existing buttons' style*/
     if(type == LV_LIST_STYLE_BTN_PR || type == LV_LIST_STYLE_BTN_REL ||
-      type == LV_LIST_STYLE_BTN_TGL_REL || type == LV_LIST_STYLE_BTN_TGL_PR ||
-      type == LV_LIST_STYLE_BTN_INA)
+       type == LV_LIST_STYLE_BTN_TGL_REL || type == LV_LIST_STYLE_BTN_TGL_PR ||
+       type == LV_LIST_STYLE_BTN_INA)
     {
-        lv_obj_t * liste = get_next_btn(list, NULL);
-        while(liste != NULL) {
-            lv_btn_set_style(liste, LV_BTN_STYLE_REL, ext->styles_btn[LV_BTN_STYLE_REL]);
-            lv_btn_set_style(liste, LV_BTN_STYLE_PR, ext->styles_btn[LV_BTN_STYLE_PR]);
-            lv_btn_set_style(liste, LV_BTN_STYLE_TGL_REL, ext->styles_btn[LV_BTN_STYLE_TGL_REL]);
-            lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STYLE_TGL_PR]);
-            lv_btn_set_style(liste, LV_BTN_STYLE_INA, ext->styles_btn[LV_BTN_STYLE_INA]);
-            liste = get_next_btn(list, liste);
+        btn= get_next_btn(list, NULL);
+        while(btn != NULL) {
+            lv_btn_set_style(btn, btn_style_refr, ext->styles_btn[btn_style_refr]);
+            btn = get_next_btn(list, btn);
         }
     }
 }
@@ -533,7 +536,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 
             if(btn != NULL) {
                 lv_action_t rel_action;
-                rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_RELEASE);
+                rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_REL);
                 if(rel_action != NULL) rel_action(btn);
             }
         }

@@ -65,7 +65,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->cur_value = 0;
-    ext->style_inicator = &lv_style_pretty_color;
+    ext->style_indic = &lv_style_pretty_color;
 
     lv_obj_set_signal_func(new_bar, lv_bar_signal);
     lv_obj_set_design_func(new_bar, lv_bar_design);
@@ -81,7 +81,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 		ext->min_value = ext_copy->min_value;
 		ext->max_value = ext_copy->max_value;
 		ext->cur_value = ext_copy->cur_value;
-        ext->style_inicator = ext_copy->style_inicator;
+        ext->style_indic = ext_copy->style_indic;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_bar);
 
@@ -178,7 +178,7 @@ void lv_bar_set_style(lv_obj_t *bar, lv_bar_style_t type, lv_style_t *style)
             lv_obj_set_style(bar, style);
             break;
         case LV_BAR_STYLE_INDIC:
-            ext->style_inicator = style;
+            ext->style_indic = style;
             lv_obj_refresh_ext_size(bar);
             break;
     }
@@ -230,9 +230,9 @@ lv_style_t * lv_bar_get_style_indicator(lv_obj_t * bar)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-    if(ext->style_inicator == NULL) return lv_obj_get_style(bar);
+    if(ext->style_indic == NULL) return lv_obj_get_style(bar);
 
-    return ext->style_inicator;
+    return ext->style_indic;
 }
 
 /**
@@ -247,7 +247,7 @@ lv_style_t * lv_bar_get_style(lv_obj_t *bar, lv_bar_style_t type)
 
     switch (type) {
         case LV_BAR_STYLE_BG:    return lv_obj_get_style(bar);
-        case LV_BAR_STYLE_INDIC: return ext->style_inicator;
+        case LV_BAR_STYLE_INDIC: return ext->style_indic;
         default: return NULL;
     }
 

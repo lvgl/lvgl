@@ -34,7 +34,7 @@ typedef struct {
 
 typedef enum {
     LV_ROLLER_STYLE_BG,
-    LV_ROLLER_STYLE_SELECTED,
+    LV_ROLLER_STYLE_SEL,
 }lv_roller_style_t;
 
 /**********************

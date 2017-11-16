@@ -93,9 +93,9 @@ void lv_indev_reset(lv_indev_t * indev)
  */
 void lv_indev_reset_lpr(lv_indev_t * indev_proc)
 {
-    indev_proc->state.long_press_sent = 0;
-    indev_proc->state.longpress_repeat_timestamp = lv_tick_get();
-    indev_proc->state.press_timestamp = lv_tick_get();
+    indev_proc->state.long_pr_sent = 0;
+    indev_proc->state.longpr_rep_timestamp = lv_tick_get();
+    indev_proc->state.pr_timestamp = lv_tick_get();
 }
 
 /**
@@ -192,9 +192,9 @@ static void indev_proc_task(void * param)
             i->state.last_obj = NULL;
             i->state.drag_range_out = 0;
             i->state.drag_in_prog = 0;
-            i->state.long_press_sent = 0;
-            i->state.press_timestamp = 0;
-            i->state.longpress_repeat_timestamp = 0;
+            i->state.long_pr_sent = 0;
+            i->state.pr_timestamp = 0;
+            i->state.longpr_rep_timestamp = 0;
             i->state.vect_sum.x = 0;
             i->state.vect_sum.y = 0;
             i->state.reset_query = 0;
@@ -226,9 +226,9 @@ static void indev_proc_task(void * param)
             i->state.last_obj = NULL;
             i->state.drag_range_out = 0;
             i->state.drag_in_prog = 0;
-            i->state.long_press_sent = 0;
-            i->state.press_timestamp = 0;
-            i->state.longpress_repeat_timestamp = 0;
+            i->state.long_pr_sent = 0;
+            i->state.pr_timestamp = 0;
+            i->state.longpr_rep_timestamp = 0;
             i->state.vect_sum.x = 0;
             i->state.vect_sum.y = 0;
             i->state.reset_query = 0;
@@ -248,7 +248,7 @@ static void indev_proc_task(void * param)
  */
 static void indev_proc_point(lv_indev_state_t * indev)
 {
-    if(indev->event == LV_INDEV_EVENT_PRESSED){
+    if(indev->event == LV_INDEV_EVENT_PR){
 #if LV_INDEV_TP_MARKER != 0
         area_t area;
         area.x1 = x - (LV_INDEV_TP_MARKER >> 1);
@@ -306,8 +306,8 @@ static void indev_proc_press(lv_indev_state_t * state)
         if(pr_obj != NULL) {
             /* Save the time when the obj pressed. 
              * It is necessary to count the long press time.*/
-            state->press_timestamp = lv_tick_get();
-            state->long_press_sent = 0;
+            state->pr_timestamp = lv_tick_get();
+            state->long_pr_sent = 0;
             state->drag_range_out = 0;
             state->drag_in_prog = 0;
             state->vect_sum.x = 0;
@@ -351,26 +351,26 @@ static void indev_proc_press(lv_indev_state_t * state)
         if(state->reset_query != 0) return;
 
         /*If there is no drag then check for long press time*/
-        if(state->drag_in_prog == 0 && state->long_press_sent == 0) {
+        if(state->drag_in_prog == 0 && state->long_pr_sent == 0) {
             /*Send a signal about the long press if enough time elapsed*/
-            if(lv_tick_elaps(state->press_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
+            if(lv_tick_elaps(state->pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
                 pr_obj->signal_func(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
                 if(state->reset_query != 0) return;
 
                 /*Mark the signal sending to do not send it again*/
-                state->long_press_sent = 1;
+                state->long_pr_sent = 1;
 
                 /*Save the long press time stamp for the long press repeat handler*/
-                state->longpress_repeat_timestamp = lv_tick_get();
+                state->longpr_rep_timestamp = lv_tick_get();
             }
         }
         /*Send long press repeated signal*/
-        if(state->drag_in_prog == 0 && state->long_press_sent == 1) {
+        if(state->drag_in_prog == 0 && state->long_pr_sent == 1) {
             /*Send a signal about the long press repeate if enough time elapsed*/
-            if(lv_tick_elaps(state->longpress_repeat_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
+            if(lv_tick_elaps(state->longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
                 pr_obj->signal_func(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
                 if(state->reset_query != 0) return;
-                state->longpress_repeat_timestamp = lv_tick_get();
+                state->longpr_rep_timestamp = lv_tick_get();
 
             }
         }
@@ -386,8 +386,8 @@ static void disi_proc_release(lv_indev_state_t * state)
     if(state->wait_unil_release != 0) {
         state->act_obj = NULL;
         state->last_obj = NULL;
-        state->press_timestamp = 0;
-        state->longpress_repeat_timestamp = 0;
+        state->pr_timestamp = 0;
+        state->longpr_rep_timestamp = 0;
         state->wait_unil_release = 0;
     }
 
@@ -396,8 +396,8 @@ static void disi_proc_release(lv_indev_state_t * state)
         state->act_obj->signal_func(state->act_obj, LV_SIGNAL_RELEASED, indev_act);
         if(state->reset_query != 0) return;
         state->act_obj = NULL;
-        state->press_timestamp = 0;
-        state->longpress_repeat_timestamp = 0;
+        state->pr_timestamp = 0;
+        state->longpr_rep_timestamp = 0;
     }
     
     /*The reset can be set in the signal function. 

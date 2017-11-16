@@ -48,11 +48,11 @@ typedef struct
 
 typedef enum {
     LV_CB_STYLE_BG,
-    LV_CB_STYLE_RELEASED,
-    LV_CB_STYLE_PRESSED,
-    LV_CB_STYLE_TGL_RELEASED,
-    LV_CB_STYLE_TGL_PRESSED,
-    LV_CB_STYLE_INACTIVE,
+    LV_CB_STYLE_REL,
+    LV_CB_STYLE_PR,
+    LV_CB_STYLE_TGL_REL,
+    LV_CB_STYLE_TGL_PR,
+    LV_CB_STYLE_INA,
 }lv_cb_style_t;
 
 /**********************
@@ -98,12 +98,12 @@ static inline void lv_cb_set_inactive(lv_obj_t * cb)
 }
 
 /**
- * Set a function to call when the button is pressed
+ * Set a function to call when the check box is clicked
  * @param cb pointer to a check box object
  */
 static inline void lv_cb_set_action(lv_obj_t * cb, lv_action_t action)
 {
-    lv_btn_set_action(cb, LV_BTN_ACTION_RELEASE, action);
+    lv_btn_set_action(cb, LV_BTN_ACTION_REL, action);
 }
 
 
@@ -143,7 +143,7 @@ static inline bool lv_cb_get_checked(lv_obj_t * cb)
  */
 static inline lv_action_t lv_cb_get_action(lv_obj_t * cb)
 {
-    return lv_btn_get_action(cb, LV_BTN_ACTION_RELEASE);
+    return lv_btn_get_action(cb, LV_BTN_ACTION_REL);
 }
 
 

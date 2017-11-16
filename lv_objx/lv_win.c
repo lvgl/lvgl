@@ -58,8 +58,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     ext->header = NULL;
     ext->title = NULL;
     ext->style_header = &lv_style_plain_color;
-    ext->style_btn_rel = &lv_style_btn_rel;
-    ext->style_btn_pr = &lv_style_btn_pr;
+    ext->style_btn_rel = &lv_style_btn_released;
+    ext->style_btn_pr = &lv_style_btn_pressed;
     ext->btn_size = ( LV_DPI) / 2;
 
     /*Init the new window object*/
@@ -141,7 +141,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const char * img_path, lv_action_t rel
     lv_btn_set_style(btn, LV_BTN_STYLE_REL, ext->style_btn_rel);
     lv_btn_set_style(btn, LV_BTN_STYLE_PR, ext->style_btn_pr);
     lv_obj_set_size(btn, ext->btn_size, ext->btn_size);
-    lv_btn_set_action(btn, LV_BTN_ACTION_RELEASE, rel_action);
+    lv_btn_set_action(btn, LV_BTN_ACTION_REL, rel_action);
 
     lv_obj_t * img = lv_img_create(btn, NULL);
     lv_obj_set_click(img, false);

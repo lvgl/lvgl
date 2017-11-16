@@ -38,8 +38,8 @@ typedef enum {
 
 /*State for input devices*/
 typedef enum {
-    LV_INDEV_EVENT_RELEASED,
-    LV_INDEV_EVENT_PRESSED
+    LV_INDEV_EVENT_REL,
+    LV_INDEV_EVENT_PR
 }lv_indev_event_t;
 
 /*Data read from an input device.  */
@@ -69,13 +69,13 @@ typedef struct _lv_indev_state_t
     point_t vect_sum;
     struct __LV_OBJ_T * act_obj;
     struct __LV_OBJ_T * last_obj;
-    uint32_t press_timestamp;
-    uint32_t longpress_repeat_timestamp;
+    uint32_t pr_timestamp;          /*Pressed time stamp*/
+    uint32_t longpr_rep_timestamp;  /*Long press repeat time stamp*/
 
     /*Flags*/
     uint8_t drag_range_out      :1;
     uint8_t drag_in_prog        :1;
-    uint8_t long_press_sent     :1;
+    uint8_t long_pr_sent        :1;
     uint8_t wait_unil_release   :1;
     uint8_t reset_query         :1;
     uint8_t disabled            :1;

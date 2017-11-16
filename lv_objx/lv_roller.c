@@ -72,10 +72,10 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_release_action(new_roller, NULL);       /*Roller don't uses it (like ddlist)*/
         lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
-        lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
+        lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
         lv_ddlist_set_fix_height(new_roller, font_get_height_scale(style_label->text.font) * 3 + style_label->text.line_space * 4);
 
-        lv_label_set_align(ext->ddlist.options_label, LV_LABEL_ALIGN_CENTER);
+        lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 
         lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
         lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/
@@ -131,8 +131,8 @@ void lv_roller_set_style(lv_obj_t *roller, lv_roller_style_t type, lv_style_t *s
         case LV_ROLLER_STYLE_BG:
             lv_obj_set_style(roller, style);
             break;
-        case LV_ROLLER_STYLE_SELECTED:
-            lv_ddlist_set_style(roller, LV_DDLIST_STYLE_SELECTED, style);
+        case LV_ROLLER_STYLE_SEL:
+            lv_ddlist_set_style(roller, LV_DDLIST_STYLE_SEL, style);
             break;
     }
 }
@@ -161,7 +161,7 @@ lv_style_t * lv_roller_get_style(lv_obj_t *roller, lv_roller_style_t type)
 {
     switch (type) {
         case LV_ROLLER_STYLE_BG:        return lv_obj_get_style(roller);
-        case LV_ROLLER_STYLE_SELECTED:  return lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SELECTED);
+        case LV_ROLLER_STYLE_SEL:  return lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
         default: return NULL;
     }
 
@@ -204,7 +204,7 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
 
-        lv_draw_rect(&rect_area, mask, ext->ddlist.selected_style);
+        lv_draw_rect(&rect_area, mask, ext->ddlist.sel_style);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -222,11 +222,11 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
         bool area_ok;
         area_ok = area_union(&mask_sel, mask, &rect_area);
         if(area_ok) {
-            lv_style_t *sel_style = lv_roller_get_style(roller, LV_ROLLER_STYLE_SELECTED);
+            lv_style_t *sel_style = lv_roller_get_style(roller, LV_ROLLER_STYLE_SEL);
             lv_style_t new_style;
             lv_style_copy(&new_style, style);
             new_style.text.color = sel_style->text.color;
-            lv_draw_label(&ext->ddlist.options_label->coords, &mask_sel, &new_style, lv_label_get_text(ext->ddlist.options_label), TXT_FLAG_CENTER, NULL);
+            lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style, lv_label_get_text(ext->ddlist.label), TXT_FLAG_CENTER, NULL);
         }
     }
 
@@ -252,9 +252,9 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_set_height(lv_page_get_scrl(roller),
-                             lv_obj_get_height(ext->ddlist.options_label) + lv_obj_get_height(roller));
-        lv_obj_align(ext->ddlist.options_label, NULL, LV_ALIGN_CENTER, 0, 0);
-        lv_ddlist_set_selected(roller, ext->ddlist.selected_option_id);
+                             lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
+        lv_obj_align(ext->ddlist.label, NULL, LV_ALIGN_CENTER, 0, 0);
+        lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
         refr_position(roller, false);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
 
@@ -263,10 +263,10 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 
             lv_ddlist_set_fix_height(roller, lv_obj_get_height(roller));
             lv_obj_set_height(lv_page_get_scrl(roller),
-                                 lv_obj_get_height(ext->ddlist.options_label) + lv_obj_get_height(roller));
+                                 lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
 
-            lv_obj_align(ext->ddlist.options_label, NULL, LV_ALIGN_CENTER, 0, 0);
-            lv_ddlist_set_selected(roller, ext->ddlist.selected_option_id);
+            lv_obj_align(ext->ddlist.label, NULL, LV_ALIGN_CENTER, 0, 0);
+            lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
         }
     }
@@ -293,30 +293,30 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     int32_t id = -1;
     lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
+    lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const font_t * font = style_label->text.font;
     cord_t font_h = font_get_height_scale(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
         /*If dragged then align the list to there be an element in the middle*/
-        cord_t label_y1 = ext->ddlist.options_label->coords.y1 - roller->coords.y1;
+        cord_t label_y1 = ext->ddlist.label->coords.y1 - roller->coords.y1;
         cord_t label_unit = font_h + style_label->text.line_space;
         cord_t mid = (roller->coords.y2 - roller->coords.y1) / 2;
         id = (mid - label_y1 + style_label->text.line_space / 2) / label_unit;
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
-        ext->ddlist.selected_option_id = id;
+        ext->ddlist.sel_opt_id = id;
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         /*If picked an option by clicking then set it*/
         if(!lv_indev_is_dragging(indev)) {
             point_t p;
             lv_indev_get_point(indev, &p);
-            p.y = p.y - ext->ddlist.options_label->coords.y1;
+            p.y = p.y - ext->ddlist.label->coords.y1;
             id = p.y / (font_h + style_label->text.line_space);
             if(id < 0) id = 0;
             if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
-            ext->ddlist.selected_option_id = id;
+            ext->ddlist.sel_opt_id = id;
         }
     }
 
@@ -393,12 +393,12 @@ static void refr_position(lv_obj_t *roller, bool anim_en)
 {
     lv_obj_t *roller_scrl = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_style_t * style_label = lv_obj_get_style(ext->ddlist.options_label);
+    lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const font_t * font = style_label->text.font;
     cord_t font_h = font_get_height_scale(font);
     cord_t h = lv_obj_get_height(roller);
-    int32_t id = ext->ddlist.selected_option_id;
-    cord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.options_label->coords.y1 - roller_scrl->coords.y1;
+    int32_t id = ext->ddlist.sel_opt_id;
+    cord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
     cord_t new_y = - line_y1 + (h - font_h) / 2;
 
     if(ext->ddlist.anim_time == 0 || anim_en == false) {

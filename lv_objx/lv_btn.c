@@ -62,18 +62,18 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
     ext->state = LV_BTN_STATE_REL;
 
-    ext->actions[LV_BTN_ACTION_PRESS] = NULL;
-    ext->actions[LV_BTN_ACTION_RELEASE] = NULL;
-    ext->actions[LV_BTN_ACTION_LONG_PRESS] = NULL;
-    ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE] = NULL;
+    ext->actions[LV_BTN_ACTION_PR] = NULL;
+    ext->actions[LV_BTN_ACTION_REL] = NULL;
+    ext->actions[LV_BTN_ACTION_LONG_PR] = NULL;
+    ext->actions[LV_BTN_ACTION_LONG_PR_REPEAT] = NULL;
 
-    ext->styles[LV_BTN_STATE_REL] = &lv_style_btn_rel;
-    ext->styles[LV_BTN_STATE_PR] = &lv_style_btn_pr;
-    ext->styles[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
-    ext->styles[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pr;
-    ext->styles[LV_BTN_STATE_INA] = &lv_style_btn_ina;
+    ext->styles[LV_BTN_STATE_REL] = &lv_style_btn_released;
+    ext->styles[LV_BTN_STATE_PR] = &lv_style_btn_pressed;
+    ext->styles[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_released;
+    ext->styles[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pressed;
+    ext->styles[LV_BTN_STATE_INA] = &lv_style_btn_inactive;
 
-    ext->long_press_action_executed = 0;
+    ext->long_pr_action_executed = 0;
     ext->toggle = 0;
 
     lv_obj_set_signal_func(new_btn, lv_btn_signal);
@@ -284,10 +284,10 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
         }
 
-        ext->long_press_action_executed = 0;
+        ext->long_pr_action_executed = 0;
         /*Call the press action, 'param' is the caller indev_proc*/
-        if(ext->actions[LV_BTN_ACTION_PRESS] && state != LV_BTN_STATE_INA) {
-            res = ext->actions[LV_BTN_ACTION_PRESS](btn);
+        if(ext->actions[LV_BTN_ACTION_PR] && state != LV_BTN_STATE_INA) {
+            res = ext->actions[LV_BTN_ACTION_PR](btn);
         }
     }
     else if(sign ==  LV_SIGNAL_PRESS_LOST) {
@@ -305,7 +305,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_RELEASED) {
         /*If not dragged and it was not long press action then
          *change state and run the action*/
-        if(lv_indev_is_dragging(param) == false && ext->long_press_action_executed == 0) {
+        if(lv_indev_is_dragging(param) == false && ext->long_pr_action_executed == 0) {
             if(ext->state == LV_BTN_STATE_PR && tgl == false) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
             } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == false) {
@@ -316,8 +316,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
             }
 
-            if(ext->actions[LV_BTN_ACTION_RELEASE] && state != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+            if(ext->actions[LV_BTN_ACTION_REL] && state != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_REL](btn);
             }
         } else { /*If dragged change back the state*/
             if(ext->state == LV_BTN_STATE_PR) {
@@ -328,27 +328,27 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_LONG_PRESS) {
-            if(ext->actions[LV_BTN_ACTION_LONG_PRESS] && state != LV_BTN_STATE_INA) {
-                ext->long_press_action_executed = 1;
-                res = ext->actions[LV_BTN_ACTION_LONG_PRESS](btn);
+            if(ext->actions[LV_BTN_ACTION_LONG_PR] && state != LV_BTN_STATE_INA) {
+                ext->long_pr_action_executed = 1;
+                res = ext->actions[LV_BTN_ACTION_LONG_PR](btn);
             }
     }
     else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-        if(ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE] && state != LV_BTN_STATE_INA) {
-            res = ext->actions[LV_BTN_ACTION_LONG_PRESS_REPEATE](btn);
+        if(ext->actions[LV_BTN_ACTION_LONG_PR_REPEAT] && state != LV_BTN_STATE_INA) {
+            res = ext->actions[LV_BTN_ACTION_LONG_PR_REPEAT](btn);
         }
     }
     else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-            if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+            if(ext->actions[LV_BTN_ACTION_REL] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_REL](btn);
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-            if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+            if(ext->actions[LV_BTN_ACTION_REL] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_REL](btn);
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             if(lv_btn_get_toggle(btn) != false) {
@@ -358,8 +358,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 else if(state == LV_BTN_STATE_TGL_REL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 else if(state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
             }
-            if(ext->actions[LV_BTN_ACTION_RELEASE] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_RELEASE](btn);
+            if(ext->actions[LV_BTN_ACTION_REL] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_REL](btn);
             }
         }
     }

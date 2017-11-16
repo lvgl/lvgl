@@ -127,19 +127,19 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style)
             lv_btn_set_style(cb, LV_BTN_STYLE_TGL_PR, style);
             lv_btn_set_style(cb, LV_BTN_STYLE_INA, style);
             break;
-        case LV_CB_STYLE_RELEASED:
+        case LV_CB_STYLE_REL:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_REL, style);
             break;
-        case LV_CB_STYLE_PRESSED:
+        case LV_CB_STYLE_PR:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_PR, style);
             break;
-        case LV_CB_STYLE_TGL_RELEASED:
+        case LV_CB_STYLE_TGL_REL:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_REL, style);
             break;
-        case LV_CB_STYLE_TGL_PRESSED:
+        case LV_CB_STYLE_TGL_PR:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_PR, style);
             break;
-        case LV_CB_STYLE_INACTIVE:
+        case LV_CB_STYLE_INA:
             lv_btn_set_style(ext->bullet, LV_BTN_STYLE_INA, style);
             break;
     }
@@ -174,11 +174,11 @@ lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     switch (type) {
-        case LV_CB_STYLE_RELEASED:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
-        case LV_CB_STYLE_PRESSED:      return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
-        case LV_CB_STYLE_TGL_RELEASED: return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
-        case LV_CB_STYLE_TGL_PRESSED:  return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
-        case LV_CB_STYLE_INACTIVE:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
+        case LV_CB_STYLE_REL:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
+        case LV_CB_STYLE_PR:      return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
+        case LV_CB_STYLE_TGL_REL: return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
+        case LV_CB_STYLE_TGL_PR:  return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
+        case LV_CB_STYLE_INA:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
         default: return NULL;
     }
 

@@ -41,19 +41,19 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * options_label;                           /*Label for the options*/
-    lv_style_t * selected_style;                         /*Style of the selected option*/
-    lv_action_t callback;                                 /*Pointer to function to call when an option is selected*/
-    uint16_t option_cnt;                               /*Number of options*/
-    uint16_t selected_option_id;                               /*Index of the current option*/
-    uint16_t anim_time;                             /*Open/Close animation time [ms]*/
-    uint8_t opened :1;                              /*1: The list is opened*/
-    cord_t fix_height;                              /*Height if the ddlist is opened. (0: auto-size)*/
+    lv_obj_t *label;                     /*Label for the options*/
+    lv_style_t * sel_style;              /*Style of the selected option*/
+    lv_action_t action;                  /*Pointer to function to call when an option is selected*/
+    uint16_t option_cnt;                 /*Number of options*/
+    uint16_t sel_opt_id;                 /*Index of the current option*/
+    uint16_t anim_time;                  /*Open/Close animation time [ms]*/
+    uint8_t opened :1;                   /*1: The list is opened*/
+    cord_t fix_height;                   /*Height if the ddlist is opened. (0: auto-size)*/
 }lv_ddlist_ext_t;
 
 typedef enum {
     LV_DDLIST_STYLE_BG,
-    LV_DDLIST_STYLE_SELECTED,
+    LV_DDLIST_STYLE_SEL,
     LV_DDLIST_STYLE_SB,
 }lv_ddlist_style_t;
 

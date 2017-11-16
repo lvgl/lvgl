@@ -45,10 +45,10 @@ typedef enum
 
 typedef enum
 {
-    LV_BTN_ACTION_RELEASE,
-    LV_BTN_ACTION_PRESS,
-    LV_BTN_ACTION_LONG_PRESS,
-    LV_BTN_ACTION_LONG_PRESS_REPEATE,
+    LV_BTN_ACTION_REL,
+    LV_BTN_ACTION_PR,
+    LV_BTN_ACTION_LONG_PR,
+    LV_BTN_ACTION_LONG_PR_REPEAT,
     LV_BTN_ACTION_NUM,
 }lv_btn_action_t;
 
@@ -62,7 +62,7 @@ typedef struct
 
     lv_btn_state_t state;                         /*Current state of the button from 'lv_btn_state_t' enum*/
     uint8_t toggle :1;                            /*1: Toggle enabled*/
-    uint8_t long_press_action_executed :1;        /*1: Long press action executed (Handled by the library)*/
+    uint8_t long_pr_action_executed :1;           /*1: Long press action executed (Handled by the library)*/
 }lv_btn_ext_t;
 
 typedef enum {

@@ -52,8 +52,8 @@ typedef struct
     lv_btnm_action_t action;                        /*A function to call when a button is releases*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
     uint16_t btn_cnt;                            /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_pressed;                     /*Index of the currently pressed button or LV_BTNM_PR_NONE*/
-    uint16_t btn_id_toggled;                     /*Index of the currently toggled button or LV_BTNM_PR_NONE */
+    uint16_t btn_id_pr;                     /*Index of the currently pressed button or LV_BTNM_PR_NONE*/
+    uint16_t btn_id_tgl;                     /*Index of the currently toggled button or LV_BTNM_PR_NONE */
     uint8_t toggle     :1;                          /*Enable toggling*/
 }lv_btnm_ext_t;
 
