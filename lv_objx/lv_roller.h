@@ -72,6 +72,17 @@ static inline void lv_roller_set_options(lv_obj_t * roller, const char * options
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
 
 /**
+ * Set the fix width for the roller
+ * If 0 then the roller will be auto. sized else the set width will be applied.
+ * @param roller pointer to a drop down list
+ * @param w the new width (0: auto size)
+ */
+static inline void lv_roller_set_fix_width(lv_obj_t * roller, cord_t w)
+{
+    lv_ddlist_set_fix_width(roller, w);
+}
+
+/**
  * Set the open/close animation time.
  * @param roller pointer to a roller object
  * @param anim_time: open/close animation time [ms]
@@ -81,12 +92,6 @@ static inline void lv_roller_set_anim_time(lv_obj_t *roller, uint16_t anim_time)
     lv_ddlist_set_anim_time(roller, anim_time);
 }
 
-/**
- * Enable/disable to set the width of the roller manually (by lv_obj_Set_width())
- * @param roller pointer to a roller object
- * @param fit_en: true: enable auto size; false: use manual width settings
- */
-void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en);
 
 /**
  * Set a style of a roller

@@ -121,7 +121,7 @@ void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action)
  * @param btn pointer to a button object
  * @param layout a layout from 'lv_cont_layout_t'
  */
-static inline void lv_btn_set_layout(lv_obj_t * btn, lv_cont_layout_t layout)
+static inline void lv_btn_set_layout(lv_obj_t * btn, lv_layout_t layout)
 {
     lv_cont_set_layout(btn, layout);
 }
@@ -177,7 +177,7 @@ lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type);
  * @param btn pointer to button object
  * @return the layout from 'lv_cont_layout_t'
  */
-static inline lv_cont_layout_t lv_btn_get_layout(lv_obj_t * btn)
+static inline lv_layout_t lv_btn_get_layout(lv_obj_t * btn)
 {
     return lv_cont_get_layout(btn);
 }

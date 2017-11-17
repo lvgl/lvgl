@@ -185,7 +185,7 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action)
 }
 
 /**
- * Set the fix height value.
+ * Set the fix height for the drop down list
  * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
  * @param ddlist pointer to a drop down list
  * @param h the height when the list is opened (0: auto size)
@@ -194,8 +194,31 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->fix_height = h;
+
     lv_ddlist_refr_size(ddlist, 0);
 }
+
+/**
+ * Set the fix width for the drop down list
+ * If 0 then the ddlist will be auto. sized else the set width will be applied.
+ * @param ddlist pointer to a drop down list
+ * @param w the new width (0: auto size)
+ */
+void lv_ddlist_set_fix_width(lv_obj_t * ddlist, cord_t w)
+{
+    if(w) {
+        lv_cont_set_fit(ddlist, false, lv_cont_get_ver_fit(ddlist));
+        lv_page_set_scrl_fit(ddlist, false, lv_page_get_scrl_fit_ver(ddlist));
+        lv_obj_set_width(ddlist, w);
+
+    } else {
+        lv_cont_set_fit(ddlist, true, lv_cont_get_ver_fit(ddlist));
+        lv_page_set_scrl_fit(ddlist, true, lv_page_get_scrl_fit_ver(ddlist));
+    }
+
+    lv_ddlist_refr_size(ddlist, 0);
+}
+
 
 /**
  * Set the open/close animation time.

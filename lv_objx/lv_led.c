@@ -184,8 +184,8 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 		memcpy(&leds_tmp, style, sizeof(leds_tmp));
 
 		/*Mix. the color with black proportionally with brightness*/
-		leds_tmp.body.color_main = color_mix(leds_tmp.body.color_main, COLOR_BLACK, ext->bright);
-		leds_tmp.body.color_gradient = color_mix(leds_tmp.body.color_gradient, COLOR_BLACK, ext->bright);
+		leds_tmp.body.main_color = color_mix(leds_tmp.body.main_color, COLOR_BLACK, ext->bright);
+		leds_tmp.body.gradient_color = color_mix(leds_tmp.body.gradient_color, COLOR_BLACK, ext->bright);
         leds_tmp.body.border.color = color_mix(leds_tmp.body.border.color, COLOR_BLACK, ext->bright);
 
 		/*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF and LV_LED_BRIGHT_ON*/

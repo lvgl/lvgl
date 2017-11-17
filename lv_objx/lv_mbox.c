@@ -75,7 +75,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_label_set_long_mode(ext->text, LV_LABEL_LONG_BREAK);
     	lv_label_set_text(ext->text, "Message");
 
-        lv_cont_set_layout(new_mbox, LV_CONT_LAYOUT_COL_M);
+        lv_cont_set_layout(new_mbox, LV_LAYOUT_COL_M);
         lv_cont_set_fit(new_mbox, false, true);
         lv_obj_set_width(new_mbox, LV_HOR_RES / 3);
         lv_obj_align(new_mbox, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -105,21 +105,24 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     return new_mbox;
 }
 
+/*======================
+ * Add/remove functions
+ *=====================*/
+
 /**
- * Set  button to the message box
+ * Add button to the message box
  * @param mbox pointer to message box object
  * @param btn_map button descriptor (button matrix map).
  *                E.g.  a const char *txt[] = {"ok", "close", ""} (Can not be local variable)
  * @param action a function which will be called when a button is released
  */
-void lv_mbox_set_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t action)
+void lv_mbox_add_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t action)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     /*Create a button matrix if not exists yet*/
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnm_create(mbox, NULL);
-        lv_obj_set_height(ext->btnm, LV_DPI / 2);
 
         /*Set the default styles*/
          lv_theme_t *th = lv_theme_get_current();
@@ -362,8 +365,17 @@ static void mbox_realign(lv_obj_t *mbox)
 
     lv_style_t *style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BG);
     cord_t w = lv_obj_get_width(mbox) - 2 * style->body.padding.hor;
-    if(ext->btnm) lv_obj_set_width(ext->btnm, w);
-    if(ext->text) lv_obj_set_width(ext->text, w);
+
+    if(ext->text) {
+        lv_obj_set_width(ext->text, w);
+    }
+
+    if(ext->btnm) {
+        lv_style_t *btn_bg_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
+        lv_style_t *btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
+        cord_t font_h = font_get_height_scale(btn_rel_style->text.font);
+        lv_obj_set_size(ext->btnm, w, font_h + 2 * btn_rel_style->body.padding.ver + 2 * btn_bg_style->body.padding.ver);
+    }
 }
 
 static lv_res_t lv_mbox_close_action(lv_obj_t *btn, const char *txt)

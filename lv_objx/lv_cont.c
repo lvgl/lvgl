@@ -74,7 +74,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
     ext->hor_fit = 0;
     ext->ver_fit = 0;
-    ext->layout = LV_CONT_LAYOUT_OFF;
+    ext->layout = LV_LAYOUT_OFF;
 
     lv_obj_set_signal_func(new_cont, lv_cont_signal);
 
@@ -111,7 +111,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
  * @param cont pointer to a container object
  * @param layout a layout from 'lv_cont_layout_t'
  */
-void lv_cont_set_layout(lv_obj_t * cont, lv_cont_layout_t layout)
+void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	ext->layout = layout;
@@ -148,7 +148,7 @@ void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
  * @param cont pointer to container object
  * @return the layout from 'lv_cont_layout_t'
  */
-lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont)
+lv_layout_t lv_cont_get_layout(lv_obj_t * cont)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 	return ext->layout;
@@ -219,22 +219,22 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
  */
 static void lv_cont_refr_layout(lv_obj_t * cont)
 {
-	lv_cont_layout_t type = lv_cont_get_layout(cont);
+	lv_layout_t type = lv_cont_get_layout(cont);
 
 	/*'cont' has to be at least 1 child*/
 	if(lv_obj_get_child(cont, NULL) == NULL) return;
 
-	if(type == LV_CONT_LAYOUT_OFF) return;
+	if(type == LV_LAYOUT_OFF) return;
 
-	if(type == LV_CONT_LAYOUT_CENTER) {
+	if(type == LV_LAYOUT_CENTER) {
 		lv_cont_layout_center(cont);
-	} else if(type == LV_CONT_LAYOUT_COL_L || type == LV_CONT_LAYOUT_COL_M || type == LV_CONT_LAYOUT_COL_R) {
+	} else if(type == LV_LAYOUT_COL_L || type == LV_LAYOUT_COL_M || type == LV_LAYOUT_COL_R) {
 		lv_cont_layout_col(cont);
-	} else if(type == LV_CONT_LAYOUT_ROW_T || type == LV_CONT_LAYOUT_ROW_M || type == LV_CONT_LAYOUT_ROW_B) {
+	} else if(type == LV_LAYOUT_ROW_T || type == LV_LAYOUT_ROW_M || type == LV_LAYOUT_ROW_B) {
 		lv_cont_layout_row(cont);
-	} else if(type == LV_CONT_LAYOUT_PRETTY) {
+	} else if(type == LV_LAYOUT_PRETTY) {
 		lv_cont_layout_pretty(cont);
-	}  else if(type == LV_CONT_LAYOUT_GRID) {
+	}  else if(type == LV_LAYOUT_GRID) {
 		lv_cont_layout_grid(cont);
 	}
 }
@@ -245,7 +245,7 @@ static void lv_cont_refr_layout(lv_obj_t * cont)
  */
 static void lv_cont_layout_col(lv_obj_t * cont)
 {
-	lv_cont_layout_t type = lv_cont_get_layout(cont);
+	lv_layout_t type = lv_cont_get_layout(cont);
 	lv_obj_t * child;
 
 	/*Adjust margin and get the alignment type*/
@@ -254,15 +254,15 @@ static void lv_cont_layout_col(lv_obj_t * cont)
 	cord_t hpad_corr;
 
 	switch(type) {
-		case LV_CONT_LAYOUT_COL_L:
+		case LV_LAYOUT_COL_L:
             hpad_corr = style->body.padding.hor;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
-		case LV_CONT_LAYOUT_COL_M:
+		case LV_LAYOUT_COL_M:
 			hpad_corr = 0;
 			align = LV_ALIGN_IN_TOP_MID;
 			break;
-		case LV_CONT_LAYOUT_COL_R:
+		case LV_LAYOUT_COL_R:
 			hpad_corr = -style->body.padding.hor;
 			align = LV_ALIGN_IN_TOP_RIGHT;
 			break;
@@ -294,7 +294,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
  */
 static void lv_cont_layout_row(lv_obj_t * cont)
 {
-	lv_cont_layout_t type = lv_cont_get_layout(cont);
+	lv_layout_t type = lv_cont_get_layout(cont);
 	lv_obj_t * child;
 
 	/*Adjust margin and get the alignment type*/
@@ -303,15 +303,15 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 	cord_t vpad_corr = style->body.padding.ver;
 
 	switch(type) {
-		case LV_CONT_LAYOUT_ROW_T:
+		case LV_LAYOUT_ROW_T:
 			vpad_corr = style->body.padding.ver;
 			align = LV_ALIGN_IN_TOP_LEFT;
 			break;
-		case LV_CONT_LAYOUT_ROW_M:
+		case LV_LAYOUT_ROW_M:
 			vpad_corr = 0;
 			align = LV_ALIGN_IN_LEFT_MID;
 			break;
-		case LV_CONT_LAYOUT_ROW_B:
+		case LV_LAYOUT_ROW_B:
 			vpad_corr = -style->body.padding.ver;
 			align = LV_ALIGN_IN_BOTTOM_LEFT;
 			break;

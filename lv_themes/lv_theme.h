@@ -36,37 +36,19 @@ typedef struct {
 #endif
 #if USE_LV_BTN != 0
     struct {
-        struct {
-            lv_style_t *rel;
-            lv_style_t *pr;
-            lv_style_t *tgl_rel;
-            lv_style_t *tgl_pr;
-            lv_style_t *ina;
-        }sm;
-
-        struct {
-            lv_style_t *rel;
-            lv_style_t *pr;
-            lv_style_t *tgl_rel;
-            lv_style_t *tgl_pr;
-            lv_style_t *ina;
-        }md;
-
-        struct {
-            lv_style_t *rel;
-            lv_style_t *pr;
-            lv_style_t *tgl_rel;
-            lv_style_t *tgl_pr;
-            lv_style_t *ina;
-        }lg;
+        lv_style_t *rel;
+        lv_style_t *pr;
+        lv_style_t *tgl_rel;
+        lv_style_t *tgl_pr;
+        lv_style_t *ina;
     }btn;
 #endif
 
 #if USE_LV_LABEL != 0
     struct {
-        lv_style_t *sm;
-        lv_style_t *md;
-        lv_style_t *lg;
+        lv_style_t *prim;
+        lv_style_t *sec;
+        lv_style_t *hint;
     }label;
 #endif
 
@@ -265,12 +247,6 @@ void lv_theme_set_current(lv_theme_t *th);
  */
 lv_theme_t * lv_theme_get_current(void);
 
-/**
- * Create a test screen with a lot objects and apply the given theme on them
- * @param th pointer to a theme
- */
-void lv_theme_create_test_screen(lv_theme_t *th);
-
 /**********************
  *    MACROS
  **********************/
@@ -278,6 +254,7 @@ void lv_theme_create_test_screen(lv_theme_t *th);
 /**********************
  *     POST INCLUDE
  *********************/
+#include "lv_theme_templ.h"
 #include "lv_theme_alien.h"
 
 #ifdef __cplusplus

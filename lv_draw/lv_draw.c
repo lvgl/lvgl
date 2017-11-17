@@ -108,7 +108,7 @@ void lv_draw_rect(const area_t * coords, const area_t * mask, const lv_style_t *
         }
     } 
     
-    if(style->body.border.width != 0) {
+    if(style->body.border.width != 0 && style->body.border.part != LV_BORDER_NONE) {
         lv_draw_rect_border_straight(coords, mask, style);
 
         if(style->body.radius != 0) {
@@ -324,7 +324,7 @@ void lv_draw_label(const area_t * coords,const area_t * mask, const lv_style_t *
             if(cmd_state == CMD_STATE_IN) color = recolor;
             letter_fp(&pos, mask, font, letter, color, style->text.opa);
 
-            pos.x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.letter_space;
+            pos.x += font_get_width_scale(font, letter) + style->text.letter_space;
 
         }
         /*Go to next line*/
@@ -592,8 +592,8 @@ static void lv_draw_rect_main_mid(const area_t * coords, const area_t * mask, co
 {
     uint16_t radius = style->body.radius;
 
-    color_t mcolor = style->body.color_main;
-    color_t gcolor = style->body.color_gradient;
+    color_t mcolor = style->body.main_color;
+    color_t gcolor = style->body.gradient_color;
     uint8_t mix;
     opa_t opa = style->body.opa;
     cord_t height = area_get_height(coords);
@@ -642,8 +642,8 @@ static void lv_draw_rect_main_corner(const area_t * coords, const area_t * mask,
 {
     uint16_t radius = style->body.radius;
 
-    color_t mcolor = style->body.color_main;
-    color_t gcolor = style->body.color_gradient;
+    color_t mcolor = style->body.main_color;
+    color_t gcolor = style->body.gradient_color;
     color_t act_color;
     opa_t opa = style->body.opa;
     uint8_t mix;
@@ -816,7 +816,9 @@ static void lv_draw_rect_border_straight(const area_t * coords, const area_t * m
     cord_t width = area_get_width(coords);
     cord_t height = area_get_height(coords);
     uint16_t bwidth = style->body.border.width;
-    opa_t bopa = style->body.border.opa;//(uint32_t)((uint32_t) style->opa * style->body.border.opa) >> 8;
+    opa_t opa = style->body.border.opa;
+    lv_border_part_t part = style->body.border.part;
+    color_t color = style->body.border.color;
     area_t work_area;
     cord_t length_corr = 0;
     cord_t corner_size = 0;
@@ -836,84 +838,122 @@ static void lv_draw_rect_border_straight(const area_t * coords, const area_t * m
     /* Modify the corner_size if corner is drawn */
     corner_size ++;
 
-    color_t b_color = style->body.border.color;
+
+    /*Depending one which part's are drawn modify the area lengths */
+    if(part & LV_BORDER_TOP) work_area.y1 = coords->y1 + corner_size;
+    else  work_area.y1 = coords->y1 + radius;
+
+    if(part & LV_BORDER_BOTTOM) work_area.y2 = coords->y2 - corner_size;
+    else work_area.y2 = coords->y2 - radius;
 
     /*Left border*/
-    work_area.x1 = coords->x1;
-    work_area.x2 = work_area.x1 + bwidth;
-    work_area.y1 = coords->y1 + corner_size;
-    work_area.y2 = coords->y2 - corner_size;
-    fill_fp(&work_area, mask, b_color, bopa);
+    if(part & LV_BORDER_LEFT) {
+        work_area.x1 = coords->x1;
+        work_area.x2 = work_area.x1 + bwidth;
+        fill_fp(&work_area, mask, color, opa);
+    }
 
     /*Right border*/
-    work_area.x2 = coords->x2;
-    work_area.x1 = work_area.x2 - bwidth;
-    fill_fp(&work_area, mask, b_color, bopa);
+    if(part & LV_BORDER_RIGHT) {
+        work_area.x2 = coords->x2;
+        work_area.x1 = work_area.x2 - bwidth;
+        fill_fp(&work_area, mask, color, opa);
+    }
 
-    /*Upper border*/
     work_area.x1 = coords->x1 + corner_size - length_corr;
     work_area.x2 = coords->x2 - corner_size + length_corr;
-    work_area.y1 = coords->y1;
-    work_area.y2 = coords->y1 + bwidth;
-    fill_fp(&work_area, mask, b_color, bopa);
+
+    /*Upper border*/
+    if(part & LV_BORDER_TOP) {
+        work_area.y1 = coords->y1;
+        work_area.y2 = coords->y1 + bwidth;
+        fill_fp(&work_area, mask, color, opa);
+    }
 
     /*Lower border*/
-    work_area.y2 = coords->y2;
-    work_area.y1 = work_area.y2 - bwidth;
-    fill_fp(&work_area, mask, b_color, bopa);
+    if(part & LV_BORDER_BOTTOM) {
+        work_area.y2 = coords->y2;
+        work_area.y1 = work_area.y2 - bwidth;
+        fill_fp(&work_area, mask, color, opa);
+    }
 
     /*Draw the a remaining rectangles if the radius is smaller then b_width */
     if(length_corr != 0) {
-        work_area.x1 = coords->x1;
-        work_area.x2 = coords->x1 + radius;
-        work_area.y1 = coords->y1 + radius + 1;
-        work_area.y2 = coords->y1 + bwidth;
-        fill_fp(&work_area, mask, b_color, bopa);
+        /*Left top correction*/
+        if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
+            work_area.x1 = coords->x1;
+            work_area.x2 = coords->x1 + radius;
+            work_area.y1 = coords->y1 + radius + 1;
+            work_area.y2 = coords->y1 + bwidth;
+            fill_fp(&work_area, mask, color, opa);
+        }
 
-        work_area.x1 = coords->x2 - radius;
-        work_area.x2 = coords->x2;
-        work_area.y1 = coords->y1 + radius + 1;
-        work_area.y2 = coords->y1 + bwidth;
-        fill_fp(&work_area, mask, b_color, bopa);
+        /*Right top correction*/
+        if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
+            work_area.x1 = coords->x2 - radius;
+            work_area.x2 = coords->x2;
+            work_area.y1 = coords->y1 + radius + 1;
+            work_area.y2 = coords->y1 + bwidth;
+            fill_fp(&work_area, mask, color, opa);
+        }
 
-        work_area.x1 = coords->x1;
-        work_area.x2 = coords->x1 + radius;
-        work_area.y1 = coords->y2 - bwidth;
-        work_area.y2 = coords->y2 - radius - 1;
-        fill_fp(&work_area, mask, b_color, bopa);
+        /*Left bottom correction*/
+        if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
+            work_area.x1 = coords->x1;
+            work_area.x2 = coords->x1 + radius;
+            work_area.y1 = coords->y2 - bwidth;
+            work_area.y2 = coords->y2 - radius - 1;
+            fill_fp(&work_area, mask, color, opa);
+        }
 
-        work_area.x1 = coords->x2 - radius;
-        work_area.x2 = coords->x2;
-        work_area.y1 = coords->y2 - bwidth;
-        work_area.y2 = coords->y2 - radius - 1;
-        fill_fp(&work_area, mask, b_color, bopa);
+        /*Right bottom correction*/
+        if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
+            work_area.x1 = coords->x2 - radius;
+            work_area.x2 = coords->x2;
+            work_area.y1 = coords->y2 - bwidth;
+            work_area.y2 = coords->y2 - radius - 1;
+            fill_fp(&work_area, mask, color, opa);
+        }
     }
 
     /*If radius == 0 one px on the corners are not drawn*/
     if(radius == 0) {
-        work_area.x1 = coords->x1;
-        work_area.x2 = coords->x1;
-        work_area.y1 = coords->y1;
-        work_area.y2 = coords->y1;
-        fill_fp(&work_area, mask, b_color, bopa);
 
-        work_area.x1 = coords->x2;
-        work_area.x2 = coords->x2;
-        work_area.y1 = coords->y1;
-        work_area.y2 = coords->y1;
-        fill_fp(&work_area, mask, b_color, bopa);
+        /*Left top corner*/
+        if(part & (LV_BORDER_TOP | LV_BORDER_LEFT)) {
+            work_area.x1 = coords->x1;
+            work_area.x2 = coords->x1;
+            work_area.y1 = coords->y1;
+            work_area.y2 = coords->y1;
+            fill_fp(&work_area, mask, color, opa);
+        }
 
-        work_area.x1 = coords->x1;
-        work_area.x2 = coords->x1;
-        work_area.y1 = coords->y2;
-        work_area.y2 = coords->y2;
-        fill_fp(&work_area, mask, b_color, bopa);
+        /*Right top corner*/
+        if(part & (LV_BORDER_TOP | LV_BORDER_RIGHT)) {
+            work_area.x1 = coords->x2;
+            work_area.x2 = coords->x2;
+            work_area.y1 = coords->y1;
+            work_area.y2 = coords->y1;
+            fill_fp(&work_area, mask, color, opa);
+        }
 
-        work_area.x1 = coords->x2;
-        work_area.x2 = coords->x2;
-        work_area.y1 = coords->y2;
-        work_area.y2 = coords->y2;
-        fill_fp(&work_area, mask, b_color, bopa);
+        /*Left bottom corner*/
+        if(part & (LV_BORDER_BOTTOM | LV_BORDER_LEFT)) {
+            work_area.x1 = coords->x1;
+            work_area.x2 = coords->x1;
+            work_area.y1 = coords->y2;
+            work_area.y2 = coords->y2;
+            fill_fp(&work_area, mask, color, opa);
+        }
+
+        /*Right bottom corner*/
+        if(part & (LV_BORDER_BOTTOM | LV_BORDER_RIGHT)) {
+            work_area.x1 = coords->x2;
+            work_area.x2 = coords->x2;
+            work_area.y1 = coords->y2;
+            work_area.y2 = coords->y2;
+            fill_fp(&work_area, mask, color, opa);
+        }
     }
 }
 
@@ -929,8 +969,9 @@ static void lv_draw_rect_border_corner(const area_t * coords, const area_t * mas
 {
     uint16_t radius = style->body.radius;
     uint16_t bwidth = style->body.border.width;
-    color_t bcolor = style->body.border.color;
-    opa_t bopa = style->body.border.opa;//(uint32_t)((uint32_t) style->opa * style->body.border.opa ) >> 8;
+    color_t color = style->body.border.color;
+    opa_t opa = style->body.border.opa;
+    lv_border_part_t part = style->body.border.part;
 
     /*0 px border width drawn as 1 px, so decrement the bwidth*/
     bwidth--;
@@ -987,63 +1028,70 @@ static void lv_draw_rect_border_corner(const area_t * coords, const area_t * mas
         }
 
         /*Draw the octets to the right bottom corner*/
-        circ_area.x1 = rb_origo.x + CIRC_OCT1_X(cir_out) - act_w2;
-        circ_area.x2 = rb_origo.x + CIRC_OCT1_X(cir_out);
-        circ_area.y1 = rb_origo.y + CIRC_OCT1_Y(cir_out);
-        circ_area.y2 = rb_origo.y + CIRC_OCT1_Y(cir_out);
-        fill_fp(&circ_area, mask, bcolor, bopa);
+        if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
+            circ_area.x1 = rb_origo.x + CIRC_OCT1_X(cir_out) - act_w2;
+            circ_area.x2 = rb_origo.x + CIRC_OCT1_X(cir_out);
+            circ_area.y1 = rb_origo.y + CIRC_OCT1_Y(cir_out);
+            circ_area.y2 = rb_origo.y + CIRC_OCT1_Y(cir_out);
+            fill_fp(&circ_area, mask, color, opa);
 
-        circ_area.x1 = rb_origo.x + CIRC_OCT2_X(cir_out);
-        circ_area.x2 = rb_origo.x + CIRC_OCT2_X(cir_out);
-        circ_area.y1 = rb_origo.y + CIRC_OCT2_Y(cir_out)- act_w1;
-        circ_area.y2 = rb_origo.y + CIRC_OCT2_Y(cir_out);
-        fill_fp(&circ_area, mask, bcolor, bopa);
+            circ_area.x1 = rb_origo.x + CIRC_OCT2_X(cir_out);
+            circ_area.x2 = rb_origo.x + CIRC_OCT2_X(cir_out);
+            circ_area.y1 = rb_origo.y + CIRC_OCT2_Y(cir_out)- act_w1;
+            circ_area.y2 = rb_origo.y + CIRC_OCT2_Y(cir_out);
+            fill_fp(&circ_area, mask, color, opa);
+        }
 
         /*Draw the octets to the left bottom corner*/
-        circ_area.x1 = lb_origo.x + CIRC_OCT3_X(cir_out);
-        circ_area.x2 = lb_origo.x + CIRC_OCT3_X(cir_out);
-        circ_area.y1 = lb_origo.y + CIRC_OCT3_Y(cir_out) - act_w2;
-        circ_area.y2 = lb_origo.y + CIRC_OCT3_Y(cir_out);
-        fill_fp(&circ_area, mask, bcolor, bopa);
+        if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
+            circ_area.x1 = lb_origo.x + CIRC_OCT3_X(cir_out);
+            circ_area.x2 = lb_origo.x + CIRC_OCT3_X(cir_out);
+            circ_area.y1 = lb_origo.y + CIRC_OCT3_Y(cir_out) - act_w2;
+            circ_area.y2 = lb_origo.y + CIRC_OCT3_Y(cir_out);
+            fill_fp(&circ_area, mask, color, opa);
 
-        circ_area.x1 = lb_origo.x + CIRC_OCT4_X(cir_out);
-        circ_area.x2 = lb_origo.x + CIRC_OCT4_X(cir_out) + act_w1;
-        circ_area.y1 = lb_origo.y + CIRC_OCT4_Y(cir_out);
-        circ_area.y2 = lb_origo.y + CIRC_OCT4_Y(cir_out);
-        fill_fp(&circ_area, mask, bcolor, bopa);
+            circ_area.x1 = lb_origo.x + CIRC_OCT4_X(cir_out);
+            circ_area.x2 = lb_origo.x + CIRC_OCT4_X(cir_out) + act_w1;
+            circ_area.y1 = lb_origo.y + CIRC_OCT4_Y(cir_out);
+            circ_area.y2 = lb_origo.y + CIRC_OCT4_Y(cir_out);
+            fill_fp(&circ_area, mask, color, opa);
+        }
         
         /*Draw the octets to the left top corner*/
-        /*Don't draw if the lines are common in the middle*/
-        if(lb_origo.y + CIRC_OCT4_Y(cir_out) > lt_origo.y + CIRC_OCT5_Y(cir_out)) {
-            circ_area.x1 = lt_origo.x + CIRC_OCT5_X(cir_out);
-            circ_area.x2 = lt_origo.x + CIRC_OCT5_X(cir_out) + act_w2;
-            circ_area.y1 = lt_origo.y + CIRC_OCT5_Y(cir_out);
-            circ_area.y2 = lt_origo.y + CIRC_OCT5_Y(cir_out);
-            fill_fp(&circ_area, mask, bcolor, bopa);
-        }
+        if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
+            if(lb_origo.y + CIRC_OCT4_Y(cir_out) > lt_origo.y + CIRC_OCT5_Y(cir_out)) {
+                /*Don't draw if the lines are common in the middle*/
+                circ_area.x1 = lt_origo.x + CIRC_OCT5_X(cir_out);
+                circ_area.x2 = lt_origo.x + CIRC_OCT5_X(cir_out) + act_w2;
+                circ_area.y1 = lt_origo.y + CIRC_OCT5_Y(cir_out);
+                circ_area.y2 = lt_origo.y + CIRC_OCT5_Y(cir_out);
+                fill_fp(&circ_area, mask, color, opa);
+            }
 
-        circ_area.x1 = lt_origo.x + CIRC_OCT6_X(cir_out);
-        circ_area.x2 = lt_origo.x + CIRC_OCT6_X(cir_out);
-        circ_area.y1 = lt_origo.y + CIRC_OCT6_Y(cir_out);
-        circ_area.y2 = lt_origo.y + CIRC_OCT6_Y(cir_out) + act_w1;
-        fill_fp(&circ_area, mask, bcolor, bopa);
+            circ_area.x1 = lt_origo.x + CIRC_OCT6_X(cir_out);
+            circ_area.x2 = lt_origo.x + CIRC_OCT6_X(cir_out);
+            circ_area.y1 = lt_origo.y + CIRC_OCT6_Y(cir_out);
+            circ_area.y2 = lt_origo.y + CIRC_OCT6_Y(cir_out) + act_w1;
+            fill_fp(&circ_area, mask, color, opa);
+        }
         
         /*Draw the octets to the right top corner*/
-        circ_area.x1 = rt_origo.x + CIRC_OCT7_X(cir_out);
-        circ_area.x2 = rt_origo.x + CIRC_OCT7_X(cir_out);
-        circ_area.y1 = rt_origo.y + CIRC_OCT7_Y(cir_out);
-        circ_area.y2 = rt_origo.y + CIRC_OCT7_Y(cir_out) + act_w2;
-        fill_fp(&circ_area, mask, bcolor, bopa);
+        if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
+            circ_area.x1 = rt_origo.x + CIRC_OCT7_X(cir_out);
+            circ_area.x2 = rt_origo.x + CIRC_OCT7_X(cir_out);
+            circ_area.y1 = rt_origo.y + CIRC_OCT7_Y(cir_out);
+            circ_area.y2 = rt_origo.y + CIRC_OCT7_Y(cir_out) + act_w2;
+            fill_fp(&circ_area, mask, color, opa);
 
-        /*Don't draw if the lines are common in the middle*/
-        if(rb_origo.y + CIRC_OCT1_Y(cir_out) > rt_origo.y + CIRC_OCT8_Y(cir_out)) {
-            circ_area.x1 = rt_origo.x + CIRC_OCT8_X(cir_out) - act_w1;
-            circ_area.x2 = rt_origo.x + CIRC_OCT8_X(cir_out);
-            circ_area.y1 = rt_origo.y + CIRC_OCT8_Y(cir_out);
-            circ_area.y2 = rt_origo.y + CIRC_OCT8_Y(cir_out);
-            fill_fp(&circ_area, mask, bcolor, bopa);
+            /*Don't draw if the lines are common in the middle*/
+            if(rb_origo.y + CIRC_OCT1_Y(cir_out) > rt_origo.y + CIRC_OCT8_Y(cir_out)) {
+                circ_area.x1 = rt_origo.x + CIRC_OCT8_X(cir_out) - act_w1;
+                circ_area.x2 = rt_origo.x + CIRC_OCT8_X(cir_out);
+                circ_area.y1 = rt_origo.y + CIRC_OCT8_Y(cir_out);
+                circ_area.y2 = rt_origo.y + CIRC_OCT8_Y(cir_out);
+                fill_fp(&circ_area, mask, color, opa);
+            }
         }
-
         circ_next(&cir_out, &tmp_out);
 
         /*The internal circle will be ready faster
@@ -1111,6 +1159,7 @@ static void lv_draw_cont_shadow_full(const area_t * coords, const area_t * mask,
     uint16_t opa_h_result[LV_HOR_RES];
     int16_t filter_size = 2 * style->body.shadow.width + 1;
 
+    /*TODO recalculate only values are changed*/
     for(row = 0; row < filter_size; row++) {
         opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->body.opa * 2) / (filter_size);
     }

@@ -94,12 +94,20 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action);
 
 /**
- * Set the fix height value.
+ * Set the fix height for the drop down list
  * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
  * @param ddlist pointer to a drop down list
  * @param h the height when the list is opened (0: auto size)
  */
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h);
+
+/**
+ * Set the fix width for the drop down list
+ * If 0 then the ddlist will be auto. sized else the set width will be applied.
+ * @param ddlist pointer to a drop down list
+ * @param w the new width (0: auto size)
+ */
+void lv_ddlist_set_fix_width(lv_obj_t * ddlist, cord_t w);
 
 /**
  * Set the scroll bar mode of a drop down list

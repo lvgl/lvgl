@@ -74,7 +74,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         ext->label = lv_label_create(new_cb, NULL);
 
         lv_cb_set_text(new_cb, "Check box");
-        lv_btn_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
+        lv_btn_set_layout(new_cb, LV_LAYOUT_ROW_M);
         lv_btn_set_fit(new_cb, true, true);
         lv_btn_set_toggle(new_cb, true);
 

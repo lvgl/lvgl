@@ -28,6 +28,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+
+/*Border types (Use 'OR'ed values)*/
+typedef enum
+{
+    LV_BORDER_NONE =   0x00,
+    LV_BORDER_BOTTOM = 0x01,
+    LV_BORDER_TOP =    0x02,
+    LV_BORDER_LEFT =   0x04,
+    LV_BORDER_RIGHT =  0x08,
+    LV_BORDER_FULL =   0x0F,
+}lv_border_part_t;
+
 /*Shadow types*/
 typedef enum
 {
@@ -40,14 +52,15 @@ typedef struct
     uint8_t glass :1;   /*1: Do not inherit this style*/
 
     struct {
-        color_t color_main;
-        color_t color_gradient;
+        color_t main_color;
+        color_t gradient_color;
         cord_t radius;
         opa_t opa;
 
         struct {
             color_t color;
             cord_t width;
+            lv_border_part_t part;
             opa_t opa;
         }border;
 

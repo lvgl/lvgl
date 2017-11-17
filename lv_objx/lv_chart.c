@@ -553,8 +553,8 @@ static void lv_chart_draw_points(lv_obj_t * chart, const area_t * mask)
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->series_ll, ser) {
-		style_point.body.color_main = ser->color;
-		style_point.body.color_gradient = color_mix(COLOR_BLACK, ser->color, ext->series.dark);
+		style_point.body.main_color = ser->color;
+		style_point.body.gradient_color = color_mix(COLOR_BLACK, ser->color, ext->series.dark);
 
 		for(i = 0; i < ext->point_cnt; i ++) {
 			cir_a.x1 = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
@@ -611,8 +611,8 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const area_t * mask)
 
         /*Draw the current point of all data line*/
         LL_READ_BACK(ext->series_ll, ser) {
-            rects.body.color_main = ser->color;
-            rects.body.color_gradient = color_mix(COLOR_BLACK, ser->color, ext->series.dark);
+            rects.body.main_color = ser->color;
+            rects.body.gradient_color = color_mix(COLOR_BLACK, ser->color, ext->series.dark);
             col_a.x1 = x_act;
             col_a.x2 = col_a.x1 + col_w;
             x_act += col_w;

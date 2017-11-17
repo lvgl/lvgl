@@ -150,7 +150,7 @@ static inline void lv_page_set_scrl_height(lv_obj_t *page, cord_t h)
 * @param page pointer to a page object
 * @param layout a layout from 'lv_cont_layout_t'
 */
-static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_cont_layout_t layout)
+static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
 {
     lv_cont_set_layout(lv_page_get_scrl(page), layout);
 }
@@ -199,7 +199,7 @@ static inline cord_t lv_page_get_scrl_height(lv_obj_t *page)
 * @param page pointer to page object
 * @return the layout from 'lv_cont_layout_t'
 */
-static inline lv_cont_layout_t lv_page_get_scrl_layout(lv_obj_t * page)
+static inline lv_layout_t lv_page_get_scrl_layout(lv_obj_t * page)
 {
     return lv_cont_get_layout(lv_page_get_scrl(page));
 }

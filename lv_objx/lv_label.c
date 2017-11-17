@@ -453,7 +453,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos)
                 continue; /*Skip the letter is it is part of a command*/
             }
         }
-        x += (font_get_width(font, letter) >> FONT_ANTIALIAS) + style->text.letter_space;
+        x += font_get_width_scale(font, letter) + style->text.letter_space;
 	}
 
 	if(ext->align == LV_LABEL_ALIGN_CENTER) {
@@ -528,7 +528,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos)
             }
 	    }
 
-	    x += (font_get_width(font, letter) >> FONT_ANTIALIAS);
+	    x += font_get_width_scale(font, letter);
 		if(pos->x < x) {
 		    i = i_current;
 		    break;
@@ -739,17 +739,17 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.var = label;
             anim.repeat = 1;
             anim.playback = 1;
-            anim.start = font_get_width(font, ' ') >> FONT_ANTIALIAS;
+            anim.start = font_get_width_scale(font, ' ');
             anim.act_time = 0;
             anim.end_cb = NULL;
             anim.path = anim_get_path(ANIM_PATH_LIN);
             anim.time = 3000;
-            anim.playback_pause = (((font_get_width(style->text.font, ' ') + style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;
+            anim.playback_pause = (((font_get_width_scale(style->text.font, ' ') + style->text.letter_space) * 1000) /ext->anim_speed)
+                                     * ANIM_WAIT_CHAR_COUNT;
             anim.repeat_pause = anim.playback_pause;
 
             if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
-                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label) -
-                           (font_get_width(font, ' ') >> FONT_ANTIALIAS);
+                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label) - font_get_width_scale(font, ' ');
                 anim.fp = (anim_fp_t) lv_obj_set_x;
                 anim.time = anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
                 anim_create(&anim);
@@ -767,17 +767,16 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.var = label;
         anim.repeat = 1;
         anim.playback = 1;
-        anim.start = font_get_width(font, ' ') >> FONT_ANTIALIAS;
+        anim.start = font_get_width_scale(font, ' ');
         anim.act_time = 0;
         anim.end_cb = NULL;
         anim.path = anim_get_path(ANIM_PATH_LIN);
-        anim.playback_pause =  (((font_get_width(style->text.font, ' ') + style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;;
+        anim.playback_pause =  (((font_get_width_scale(style->text.font, ' ') + style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;;
         anim.repeat_pause =  anim.playback_pause;
 
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
-            anim.end = lv_obj_get_width(label) - size.x -
-                       (font_get_width(font, ' ') >> FONT_ANTIALIAS);
+            anim.end = lv_obj_get_width(label) - size.x - font_get_width_scale(font, ' ');
             anim.fp = (anim_fp_t) lv_label_set_offset_x;
             anim.time = anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
             anim_create(&anim);

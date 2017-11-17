@@ -29,17 +29,17 @@ extern "C" {
 /*Layout options*/
 typedef enum
 {
-	LV_CONT_LAYOUT_OFF = 0,
-	LV_CONT_LAYOUT_CENTER,
-	LV_CONT_LAYOUT_COL_L,	/*Column left align*/
-	LV_CONT_LAYOUT_COL_M,	/*Column middle align*/
-	LV_CONT_LAYOUT_COL_R,	/*Column right align*/
-	LV_CONT_LAYOUT_ROW_T,	/*Row top align*/
-	LV_CONT_LAYOUT_ROW_M,	/*Row middle align*/
-	LV_CONT_LAYOUT_ROW_B,	/*Row bottom align*/
-	LV_CONT_LAYOUT_PRETTY,	/*Put as many object as possible in row and begin a new row*/
-	LV_CONT_LAYOUT_GRID,	/*Align same-sized object into a grid*/
-}lv_cont_layout_t;
+	LV_LAYOUT_OFF = 0,
+	LV_LAYOUT_CENTER,
+	LV_LAYOUT_COL_L,	/*Column left align*/
+	LV_LAYOUT_COL_M,	/*Column middle align*/
+	LV_LAYOUT_COL_R,	/*Column right align*/
+	LV_LAYOUT_ROW_T,	/*Row top align*/
+	LV_LAYOUT_ROW_M,	/*Row middle align*/
+	LV_LAYOUT_ROW_B,	/*Row bottom align*/
+	LV_LAYOUT_PRETTY,	/*Put as many object as possible in row and begin a new row*/
+	LV_LAYOUT_GRID,	    /*Align same-sized object into a grid*/
+}lv_layout_t;
 
 typedef struct
 {
@@ -71,7 +71,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy);
  * @param cont pointer to a container object
  * @param layout a layout from 'lv_cont_layout_t'
  */
-void lv_cont_set_layout(lv_obj_t * cont, lv_cont_layout_t layout);
+void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout);
 
 
 /**
@@ -102,7 +102,7 @@ static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
  * @param cont pointer to container object
  * @return the layout from 'lv_cont_layout_t'
  */
-lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont);
+lv_layout_t lv_cont_get_layout(lv_obj_t * cont);
 
 /**
  * Get horizontal fit enable attribute of a container

@@ -119,17 +119,6 @@ void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en)
 }
 
 /**
- * Enable/disable to set the width of the roller manually (by lv_obj_Set_width())
- * @param roller pointer to a roller object
- * @param fit_en: true: enable auto size; false: use manual width settings
- */
-void lv_roller_set_hor_fit(lv_obj_t *roller, bool fit_en)
-{
-    lv_page_set_scrl_fit(roller, fit_en ,false);
-    lv_cont_set_fit(roller, fit_en ,false);
-}
-
-/**
  * Set a style of a roller
  * @param roller pointer to a roller object
  * @param type which style should be set
@@ -382,14 +371,14 @@ static void draw_bg(lv_obj_t *roller, const area_t *mask)
     half_roller.y1 -= style->body.radius;
 
     if(union_ok){
-        color_t main_tmp = style->body.color_main;
-        color_t grad_tmp = style->body.color_gradient;
+        color_t main_tmp = style->body.main_color;
+        color_t grad_tmp = style->body.gradient_color;
 
-        style->body.color_main = grad_tmp;
-        style->body.color_gradient = main_tmp;
+        style->body.main_color = grad_tmp;
+        style->body.gradient_color = main_tmp;
         lv_draw_rect(&half_roller, &half_mask, style);
-        style->body.color_main = main_tmp;
-        style->body.color_gradient = grad_tmp;
+        style->body.main_color = main_tmp;
+        style->body.gradient_color = grad_tmp;
     }
 
 }

@@ -248,7 +248,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
          int16_t level = (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
          uint8_t i;
 
-         style_tmp.line.color = style->body.color_main;
+         style_tmp.line.color = style->body.main_color;
 
          for(i = 0; i < ext->line_cnt; i++) {
              /*Calculate the position a scale label*/
@@ -270,7 +270,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
 
              if(i > level) style_tmp.line.color = style->line.color;
              else {
-                 style_tmp.line.color = color_mix(style->body.color_gradient, style->body.color_main, (255 * i) /  ext->line_cnt);
+                 style_tmp.line.color = color_mix(style->body.gradient_color, style->body.main_color, (255 * i) /  ext->line_cnt);
              }
 
              lv_draw_line(&p1, &p2, mask, &style_tmp);

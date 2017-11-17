@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_THEME_ALIEN_H
-#define LV_THEME_ALIEN_H
+#ifndef LV_THEME_TEMPL_H
+#define LV_THEME_TEMPL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_conf.h"
 
-#if USE_LV_THEME_ALIEN
+#if USE_LV_THEME_TEMPL
 
 /*********************
  *      DEFINES
@@ -35,12 +35,13 @@ extern "C" {
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_alien_init(uint16_t hue, font_t *font);
+lv_theme_t * lv_theme_templ_init(uint16_t hue, font_t *font);
+
 /**
  * Get a pointer to the theme
  * @return pointer to the theme
  */
-lv_theme_t * lv_theme_get_alien(void);
+lv_theme_t * lv_theme_get_templ(void);
 
 /**********************
  *      MACROS
@@ -52,4 +53,4 @@ lv_theme_t * lv_theme_get_alien(void);
 } /* extern "C" */
 #endif
 
-#endif /*LV_THEME_ALIEN_H*/
+#endif /*LV_THEME_TEMPL_H*/

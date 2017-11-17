@@ -257,8 +257,8 @@ static void style_mod_def(lv_style_t * style)
     style->body.border.opa = OPA_COVER;
     if(style->body.border.width == 0 && style->body.empty == 0) style->body.border.width = 2 << LV_ANTIALIAS;   /*Add border to not transparent styles*/
     else style->body.border.width = style->body.border.width * 2;                                         /*Make the border thicker*/
-    style->body.color_main = color_mix(style->body.color_main, COLOR_ORANGE, OPA_80);
-    style->body.color_gradient = color_mix(style->body.color_gradient, COLOR_ORANGE, OPA_80);
+    style->body.main_color = color_mix(style->body.main_color, COLOR_ORANGE, OPA_80);
+    style->body.gradient_color = color_mix(style->body.gradient_color, COLOR_ORANGE, OPA_80);
 }
 
 #endif /*LV_OBJ_GROUP != 0*/

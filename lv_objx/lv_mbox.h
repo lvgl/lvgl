@@ -75,14 +75,18 @@ typedef enum {
  */
 lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*======================
+ * Add/remove functions
+ *=====================*/
+
 /**
- * Set  button to the message box
+ * Add button to the message box
  * @param mbox pointer to message box object
  * @param btn_map button descriptor (button matrix map).
  *                E.g.  a const char *txt[] = {"ok", "close", ""} (Can not be local variable)
  * @param action a function which will be called when a button is released
  */
-void lv_mbox_set_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t action);
+void lv_mbox_add_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t action);
 
 /*=====================
  * Setter functions

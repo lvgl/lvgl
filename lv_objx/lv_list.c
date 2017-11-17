@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_LIST_LAYOUT_DEF	LV_CONT_LAYOUT_COL_M
+#define LV_LIST_LAYOUT_DEF	LV_LAYOUT_COL_M
 #ifndef LV_LIST_FOCUS_TIME
 #define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #endif
@@ -151,7 +151,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 
 	lv_btn_set_action(liste, LV_BTN_ACTION_REL, rel_action);
 	lv_page_glue_obj(liste, true);
-	lv_btn_set_layout(liste, LV_CONT_LAYOUT_ROW_M);
+	lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
 	lv_btn_set_fit(liste, false, true);
     if(btn_signal == NULL) btn_signal = lv_obj_get_signal_func(liste);
 
