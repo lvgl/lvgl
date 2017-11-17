@@ -1,5 +1,5 @@
 /**
- * @file lv_theme_alien.c
+ * @file lv_theme_templ.c
  *
  */
 
@@ -11,7 +11,7 @@
 
 #include "lv_conf.h"
 
-#if USE_LV_THEME_ALIEN
+#if USE_LV_THEME_TEMPL
 
 /*********************
  *      DEFINES
@@ -78,17 +78,6 @@ static void label_init(void)
 #endif
 }
 
-
-static void bar_init(void)
-{
-#if USE_LV_BAR
-
-
-    theme.bar.bg = &def;
-    theme.bar.indic = &def;
-#endif
-}
-
 static void img_init(void)
 {
 #if USE_LV_IMG != 0
@@ -114,6 +103,16 @@ static void led_init(void)
 
 
     theme.led = &def;
+#endif
+}
+
+static void bar_init(void)
+{
+#if USE_LV_BAR
+
+
+    theme.bar.bg = &def;
+    theme.bar.indic = &def;
 #endif
 }
 
@@ -289,6 +288,7 @@ static void tabview_init(void)
 
 
     theme.tabview.bg = &def;
+    theme.tabview.sb = &def;
     theme.tabview.indic = &def;
     theme.tabview.btn.bg = &def;
     theme.tabview.btn.rel = &def;
@@ -307,7 +307,8 @@ static void win_init(void)
     theme.win.bg = &def;
     theme.win.sb = &def;
     theme.win.header = &def;
-    theme.win.content = &def;
+    theme.win.content.bg = &def;
+    theme.win.content.scrl = &def;
     theme.win.btn.rel = &def;
     theme.win.btn.pr = &def;
 #endif
@@ -320,7 +321,7 @@ static void win_init(void)
 
 
 /**
- * Initialize the alien theme
+ * Initialize the templ theme
  * @param hue [0..360] hue value from HSV color space to define the theme's base color
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
@@ -343,10 +344,10 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, font_t *font)
     basic_init();
     btn_init();
     label_init();
-    bar_init();
     img_init();
     line_init();
     led_init();
+    bar_init();
     slider_init();
     sw_init();
     lmeter_init();
@@ -371,7 +372,7 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, font_t *font)
  * Get a pointer to the theme
  * @return pointer to the theme
  */
-lv_theme_t * lv_theme_get_templ(void)
+lv_theme_t * lv_theme_get_deafult(void)
 {
     return &theme;
 }

@@ -221,7 +221,10 @@ typedef struct {
         lv_style_t *bg;
         lv_style_t *sb;
         lv_style_t *header;
-        lv_style_t *content;
+        struct {
+            lv_style_t *bg;
+            lv_style_t *scrl;
+        }content;
         struct {
             lv_style_t *rel;
             lv_style_t *pr;
@@ -255,6 +258,7 @@ lv_theme_t * lv_theme_get_current(void);
  *     POST INCLUDE
  *********************/
 #include "lv_theme_templ.h"
+#include "lv_theme_default.h"
 #include "lv_theme_alien.h"
 
 #ifdef __cplusplus
