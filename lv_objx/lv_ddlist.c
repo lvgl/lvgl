@@ -93,7 +93,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         ext->label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_release_action(new_ddlist, lv_ddlist_release_action);
-        lv_page_set_sb_mode(new_ddlist, LV_PAGE_SB_MODE_DRAG);
+        lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_DRAG);
         lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
@@ -199,26 +199,18 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h)
 }
 
 /**
- * Set the fix width for the drop down list
- * If 0 then the ddlist will be auto. sized else the set width will be applied.
+ * Enable or disable the horizontal fit to the content
  * @param ddlist pointer to a drop down list
- * @param w the new width (0: auto size)
+ * @param fit en true: enable auto fit; false: disable auto fit
  */
-void lv_ddlist_set_fix_width(lv_obj_t * ddlist, cord_t w)
+void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, bool fit_en)
 {
-    if(w) {
-        lv_cont_set_fit(ddlist, false, lv_cont_get_ver_fit(ddlist));
-        lv_page_set_scrl_fit(ddlist, false, lv_page_get_scrl_fit_ver(ddlist));
-        lv_obj_set_width(ddlist, w);
+    lv_cont_set_fit(ddlist, fit_en, lv_cont_get_ver_fit(ddlist));
+    lv_page_set_scrl_fit(ddlist, fit_en, lv_page_get_scrl_fit_ver(ddlist));
 
-    } else {
-        lv_cont_set_fit(ddlist, true, lv_cont_get_ver_fit(ddlist));
-        lv_page_set_scrl_fit(ddlist, true, lv_page_get_scrl_fit_ver(ddlist));
-    }
 
     lv_ddlist_refr_size(ddlist, 0);
 }
-
 
 /**
  * Set the open/close animation time.
@@ -477,7 +469,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
-            if(ext->sel_opt_id +1 < ext->option_cnt) {
+            if(ext->sel_opt_id + 1 < ext->option_cnt) {
                 ext->sel_opt_id ++;
                 lv_obj_invalidate(ddlist);
                 if(ext->action != NULL) {
@@ -494,7 +486,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
             }
         } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ESC) {
             if(ext->opened != false) ext->opened = false;
-            if(ext->opened == false) ext->opened = true;
+            else ext->opened = true;
 
             lv_ddlist_refr_size(ddlist, true);
         }

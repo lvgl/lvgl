@@ -176,7 +176,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
     lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_transp);
     lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
-    lv_page_set_sb_mode(h, LV_PAGE_SB_MODE_AUTO);
+    lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
 
     if(page_signal == NULL) page_signal = lv_obj_get_signal_func(h);
     if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(h));
@@ -474,12 +474,18 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 
         dm_free(ext->tab_name_ptr);
         ext->tab_name_ptr = NULL;
-    } else if(sign == LV_SIGNAL_CORD_CHG) {
+    }
+    else if(sign == LV_SIGNAL_CORD_CHG) {
         if(ext->content != NULL &&
           (lv_obj_get_width(tabview) != area_get_width(param) ||
            lv_obj_get_height(tabview) != area_get_height(param)))
         {
             tabview_realign(tabview);
+        }
+    }
+    else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROLL) {
+        if(ext->btns) {
+            ext->btns->signal_func(ext->btns, sign, param);
         }
     }
 

@@ -47,10 +47,6 @@ extern "C" {
 #error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= (2 * LV_HOR_RES))"
 #endif
 
-/*New defines*/
-#define LV_OBJ_DEF_WIDTH  (80 << LV_ANTIALIAS)
-#define LV_OBJ_DEF_HEIGHT  (60 << LV_ANTIALIAS)
-
 #define ANIM_IN					0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
 #define ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
 #define ANIM_DIR_MASK			0x80	/*ANIM_IN/ANIM_OUT mask*/

@@ -253,8 +253,12 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
 
-        lv_style_t * style = lv_obj_get_style(gauge);
-        lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
+        /* Store the real pointer because of 'lv_group'
+         * If the object is in focus 'lv_obj_get_style()' will give a pointer to tmp style
+         * and to the real object style. It is important because of style change tricks below*/
+        lv_style_t *style_ori_p = gauge->style_p;
+        lv_style_t *style = lv_obj_get_style(gauge);
+        lv_gauge_ext_t *ext = lv_obj_get_ext_attr(gauge);
 
         lv_gauge_draw_scale(gauge, mask);
 
@@ -276,8 +280,7 @@ static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mod
 
         ext->lmeter.line_cnt = line_cnt_tmp;          /*Restore the parameters*/
         ext->lmeter.cur_value = value_tmp;
-        gauge->style_p = style;
-
+        gauge->style_p = style_ori_p;                 /*Restore the ORIGINAL style pointer*/
 
         lv_gauge_draw_needle(gauge, mask);
 

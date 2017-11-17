@@ -71,15 +71,15 @@ static inline void lv_roller_set_options(lv_obj_t * roller, const char * options
  */
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
 
+
 /**
- * Set the fix width for the roller
- * If 0 then the roller will be auto. sized else the set width will be applied.
- * @param roller pointer to a drop down list
- * @param w the new width (0: auto size)
+ * Enable or disable the horizontal fit to the content
+ * @param roller pointer to a roller
+ * @param fit en true: enable auto fit; false: disable auto fit
  */
-static inline void lv_roller_set_fix_width(lv_obj_t * roller, cord_t w)
+static inline void lv_roller_set_hor_fit(lv_obj_t * roller, bool fit_en)
 {
-    lv_ddlist_set_fix_width(roller, w);
+    lv_ddlist_set_hor_fit(roller, fit_en);
 }
 
 /**

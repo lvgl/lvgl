@@ -89,7 +89,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
 
     ext->ta = NULL;
     ext->mode = LV_KB_MODE_TEXT;
-    ext->cur_mng = 0;
+    ext->cursor_mng = 0;
     ext->close_action = NULL;
     ext->ok_action = NULL;
 
@@ -121,7 +121,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_kb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);ext->ta = NULL;
         ext->ta = copy_ext->ta;
         ext->mode = copy_ext->mode;
-        ext->cur_mng = copy_ext->cur_mng;
+        ext->cursor_mng = copy_ext->cursor_mng;
         ext->close_action = copy_ext->close_action;
         ext->ok_action = copy_ext->ok_action;
 
@@ -144,10 +144,19 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
 void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+    lv_cursor_type_t cur_type;
 
-    if(ext->ta != NULL && ext->cur_mng != 0) lv_ta_set_cursor_show(ext->ta, false);
+    if(ext->ta && ext->cursor_mng) {
+        cur_type = lv_ta_get_cursor_type(ext->ta);
+        lv_ta_set_cursor_type(ext->ta,  cur_type | LV_CURSOR_HIDDEN);
+    }
+
     ext->ta = ta;
-    if(ext->cur_mng != 0) lv_ta_set_cursor_show(ext->ta, true);
+
+    if(ext->cursor_mng) {
+        cur_type = lv_ta_get_cursor_type(ext->ta);
+        lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
+    }
 }
 
 /**
@@ -172,9 +181,13 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    ext->cur_mng = en == false? 0 : 1;
+    ext->cursor_mng = en == false? 0 : 1;
 
-    if(ext->ta != NULL) lv_ta_set_cursor_show(ext->ta, true);
+    if(ext->ta) {
+        lv_cursor_type_t cur_type;
+        cur_type = lv_ta_get_cursor_type(ext->ta);
+        lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
+    }
 }
 
 /**
@@ -264,7 +277,7 @@ lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb)
 bool lv_kb_get_cursor_manage(lv_obj_t * kb, bool en)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    return ext->cur_mng == 0 ? false : true;
+    return ext->cursor_mng == 0 ? false : true;
 }
 
 /**

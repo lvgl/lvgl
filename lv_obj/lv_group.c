@@ -130,9 +130,9 @@ void lv_group_focus_obj(lv_obj_t * obj)
  */
 void lv_group_focus_next(lv_group_t * group)
 {
-    if(group->frozen != 0) return;
+    if(group->frozen) return;
 
-    if(group->obj_focus != NULL) {
+    if(group->obj_focus) {
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
     }
@@ -144,7 +144,7 @@ void lv_group_focus_next(lv_group_t * group)
     if(obj_next == NULL) obj_next = ll_get_head(&group->obj_ll);
     group->obj_focus = obj_next;
 
-    if(group->obj_focus != NULL){
+    if(group->obj_focus){
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
     }
@@ -156,9 +156,9 @@ void lv_group_focus_next(lv_group_t * group)
  */
 void lv_group_focus_prev(lv_group_t * group)
 {
-    if(group->frozen != 0) return;
+    if(group->frozen) return;
 
-    if(group->obj_focus != NULL) {
+    if(group->obj_focus) {
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
     }
@@ -248,17 +248,22 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
 
 /**
  * Default style modifier function
- * @param style pointer to a style to modify. (Typically &group->style_tmp) It will be OVERWRITTEN.
+ * @param style pointer to a style to modify. (Typically group.style_tmp) It will be OVERWRITTEN.
  */
 static void style_mod_def(lv_style_t * style)
 {
-    /*Make the style a little bit orange*/
-    style->body.border.color = COLOR_ORANGE;
+    /*Make the style to be a little bit orange*/
     style->body.border.opa = OPA_COVER;
-    if(style->body.border.width == 0 && style->body.empty == 0) style->body.border.width = 2 << LV_ANTIALIAS;   /*Add border to not transparent styles*/
-    else style->body.border.width = style->body.border.width * 2;                                         /*Make the border thicker*/
+    style->body.border.color = COLOR_ORANGE;
+
+    /*If not empty or has border then emphasis the border*/
+    if(style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+
     style->body.main_color = color_mix(style->body.main_color, COLOR_ORANGE, OPA_80);
     style->body.gradient_color = color_mix(style->body.gradient_color, COLOR_ORANGE, OPA_80);
+
+    style->body.shadow.color = color_mix(style->body.shadow.color, COLOR_ORANGE, OPA_60);
+
 }
 
 #endif /*LV_OBJ_GROUP != 0*/

@@ -72,7 +72,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     ext->sb.hor_draw = 0;
     ext->sb.ver_draw = 0;
     ext->sb.style = &lv_style_pretty;
-    ext->sb.mode = LV_PAGE_SB_MODE_AUTO;
+    ext->sb.mode = LV_SB_MODE_AUTO;
 
     /*Init the new page object*/
     if(copy == NULL) {
@@ -161,7 +161,7 @@ void lv_page_set_press_action(lv_obj_t * page, lv_action_t pr_action)
  * @param page pointer to a page object
  * @param sb.mode the new mode from 'lv_page_sb.mode_t' enum
  */
-void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode)
+void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     ext->sb.mode = sb_mode;
@@ -220,7 +220,7 @@ lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
-lv_page_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page)
+lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->sb.mode;
@@ -580,7 +580,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
     }
     else if(sign == LV_SIGNAL_DRAG_END) {
         /*Hide scrollbars if required*/
-        if(page_ext->sb.mode == LV_PAGE_SB_MODE_DRAG) {
+        if(page_ext->sb.mode == LV_SB_MODE_DRAG) {
             area_t sb_area_tmp;
             if(page_ext->sb.hor_draw) {
                 area_cpy(&sb_area_tmp, &page_ext->sb.hor_area);
@@ -644,9 +644,9 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     cord_t sb_hor_pad = MATH_MAX(ext->sb.style->body.padding.inner, style->body.padding.hor);
     cord_t sb_ver_pad = MATH_MAX(ext->sb.style->body.padding.inner, style->body.padding.ver);
 
-    if(ext->sb.mode == LV_PAGE_SB_MODE_OFF) return;
+    if(ext->sb.mode == LV_SB_MODE_OFF) return;
 
-    if(ext->sb.mode == LV_PAGE_SB_MODE_ON) {
+    if(ext->sb.mode == LV_SB_MODE_ON) {
         ext->sb.hor_draw = 1;
         ext->sb.ver_draw = 1;
     }
@@ -671,7 +671,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     }
 
 
-    if(ext->sb.mode == LV_PAGE_SB_MODE_DRAG && lv_indev_is_dragging(lv_indev_get_act()) == false) {
+    if(ext->sb.mode == LV_SB_MODE_DRAG && lv_indev_is_dragging(lv_indev_get_act()) == false) {
         ext->sb.hor_draw = 0;
         ext->sb.ver_draw = 0;
         return;
@@ -682,7 +682,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     if(scrl_w <= obj_w - 2 * hpad) {        /*Full sized scroll bar*/
         area_set_width(&ext->sb.hor_area, obj_w - 2 * sb_hor_pad);
         area_set_pos(&ext->sb.hor_area, sb_hor_pad, obj_h - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.ver);
-        if(ext->sb.mode == LV_PAGE_SB_MODE_AUTO || ext->sb.mode == LV_PAGE_SB_MODE_DRAG)  ext->sb.hor_draw = 0;
+        if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG)  ext->sb.hor_draw = 0;
     } else {
         size_tmp = (obj_w * (obj_w - (2 * sb_hor_pad))) / (scrl_w + 2 * hpad);
         if(size_tmp < LV_PAGE_SB_MIN_SIZE) size_tmp = LV_PAGE_SB_MIN_SIZE;
@@ -693,14 +693,14 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                    (scrl_w + 2 * hpad - obj_w ),
                    obj_h - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.ver);
 
-        if(ext->sb.mode == LV_PAGE_SB_MODE_AUTO || ext->sb.mode == LV_PAGE_SB_MODE_DRAG)  ext->sb.hor_draw = 1;
+        if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG)  ext->sb.hor_draw = 1;
     }
     
     /*Vertical scrollbar*/
     if(scrl_h <= obj_h - 2 * vpad) {        /*Full sized scroll bar*/
         area_set_height(&ext->sb.ver_area,  obj_h - 2 * sb_ver_pad);
         area_set_pos(&ext->sb.ver_area, obj_w - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.hor, sb_ver_pad);
-        if(ext->sb.mode == LV_PAGE_SB_MODE_AUTO || ext->sb.mode == LV_PAGE_SB_MODE_DRAG)  ext->sb.ver_draw = 0;
+        if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG)  ext->sb.ver_draw = 0;
     } else {
         size_tmp = (obj_h * (obj_h - (2 * sb_ver_pad))) / (scrl_h + 2 * vpad);
         if(size_tmp < LV_PAGE_SB_MIN_SIZE) size_tmp = LV_PAGE_SB_MIN_SIZE;
@@ -711,7 +711,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                    (-(lv_obj_get_y(scrl) - vpad) * (obj_h - size_tmp -  2 * sb_ver_pad)) /
                                       (scrl_h + 2 * vpad - obj_h ));
 
-        if(ext->sb.mode == LV_PAGE_SB_MODE_AUTO || ext->sb.mode == LV_PAGE_SB_MODE_DRAG)  ext->sb.ver_draw = 1;
+        if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG)  ext->sb.ver_draw = 1;
     }
 
     /*Invalidate the new scrollbar areas*/

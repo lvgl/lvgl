@@ -21,6 +21,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJ_DEF_WIDTH  (LV_DPI)
+#define LV_OBJ_DEF_HEIGHT  (2 * LV_DPI / 3)
 
 /**********************
  *      TYPEDEFS
@@ -1268,8 +1270,8 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
     if(style_act == NULL) {
         lv_obj_t * par = obj->par;
 
-        while(par != NULL) {
-            if(par->style_p != NULL) {
+        while(par) {
+            if(par->style_p) {
                 if(par->style_p->glass == 0) {
                     style_act = par->style_p;
                     break;
@@ -1279,7 +1281,7 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
         }
     }
 #if LV_OBJ_GROUP != 0
-    if(obj->group_p != NULL) {
+    if(obj->group_p) {
         if(lv_group_get_focused(obj->group_p) == obj) {
             style_act = lv_group_mod_style(obj->group_p, style_act);
         }

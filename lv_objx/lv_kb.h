@@ -39,7 +39,7 @@ typedef struct {
     /*New data for this type */
     lv_obj_t *ta;               /*Pointer to the assigned text area*/
     lv_kb_mode_t mode;          /*Key map type*/
-    uint8_t cur_mng    :1;      /*1: automatically show/hide cursor when a text area is assigned or left*/
+    uint8_t cursor_mng      :1; /*1: automatically show/hide cursor when a text area is assigned or left*/
     lv_action_t  ok_action;     /*Called when the "Ok" button is clicked*/
     lv_action_t  close_action;  /*Called when the "Hide" button is clicked*/
 }lv_kb_ext_t;

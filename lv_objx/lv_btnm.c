@@ -92,7 +92,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new button matrix object*/
     if(copy == NULL) {
-    	lv_obj_set_size(new_btnm, LV_HOR_RES, LV_VER_RES / 2);
+    	lv_obj_set_size(new_btnm, LV_HOR_RES / 2, LV_VER_RES / 4);
     	lv_btnm_set_map(new_btnm, lv_btnm_def_map);
 
         /*Set the default styles*/

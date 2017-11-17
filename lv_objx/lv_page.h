@@ -35,11 +35,11 @@ extern "C" {
 /*Scrollbar modes: shows when should the scrollbars be visible*/
 typedef enum
 {
-    LV_PAGE_SB_MODE_OFF,    /*Never show scrollbars*/
-    LV_PAGE_SB_MODE_ON,     /*Always show scrollbars*/
-    LV_PAGE_SB_MODE_DRAG,   /*Show scrollbars when page is being dragged*/
-    LV_PAGE_SB_MODE_AUTO,   /*Show scrollbars when the scrollable container is large enough to be scrolled*/
-}lv_page_sb_mode_t;
+    LV_SB_MODE_OFF,    /*Never show scrollbars*/
+    LV_SB_MODE_ON,     /*Always show scrollbars*/
+    LV_SB_MODE_DRAG,   /*Show scrollbars when page is being dragged*/
+    LV_SB_MODE_AUTO,   /*Show scrollbars when the scrollable container is large enough to be scrolled*/
+}lv_sb_mode_t;
 
 /*Data of page*/
 typedef struct
@@ -109,7 +109,7 @@ void lv_page_set_press_action(lv_obj_t * page, lv_action_t pr_action);
  * @param page pointer to a page object
  * @param sb.mode the new mode from 'lv_page_sb.mode_t' enum
  */
-void lv_page_set_sb_mode(lv_obj_t * page, lv_page_sb_mode_t sb_mode);
+void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
 
 /**
  * Set the fit attribute of the scrollable part of a page.
@@ -172,7 +172,7 @@ void lv_page_set_style(lv_obj_t *page, lv_page_style_t type, lv_style_t *style);
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
-lv_page_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
+lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
 
 /**
  * Get width of the scrollable part of a page

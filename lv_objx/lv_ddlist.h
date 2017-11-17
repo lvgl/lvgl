@@ -102,19 +102,18 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action);
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h);
 
 /**
- * Set the fix width for the drop down list
- * If 0 then the ddlist will be auto. sized else the set width will be applied.
+ * Enable or disable the horizontal fit to the content
  * @param ddlist pointer to a drop down list
- * @param w the new width (0: auto size)
+ * @param fit en true: enable auto fit; false: disable auto fit
  */
-void lv_ddlist_set_fix_width(lv_obj_t * ddlist, cord_t w);
+void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, bool fit_en);
 
 /**
  * Set the scroll bar mode of a drop down list
  * @param ddlist pointer to a drop down list object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
  */
-static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_page_sb_mode_t mode)
+static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_sb_mode_t mode)
 {
     lv_page_set_sb_mode(ddlist, mode);
 }
@@ -179,7 +178,7 @@ cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist);
  * @param ddlist pointer to a  drop down list object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
  */
-static inline lv_page_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
+static inline lv_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
 {
     return lv_page_get_sb_mode(ddlist);
 }

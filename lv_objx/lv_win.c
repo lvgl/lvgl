@@ -71,8 +71,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
-        lv_page_set_sb_mode(ext->page, LV_PAGE_SB_MODE_AUTO);
-        lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
+        lv_page_set_sb_mode(ext->page, LV_SB_MODE_AUTO);
 
     	/*Create a holder for the header*/
     	ext->header = lv_obj_create(new_win, NULL);
@@ -91,13 +90,15 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->win.bg);
             lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->win.sb);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, th->win.header);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, th->win.content);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, th->win.content.bg);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->win.content.scrl);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->win.btn.rel);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->win.btn.pr);
 
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_pretty);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, &lv_style_transp);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_transp);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
 
         }
@@ -202,7 +203,7 @@ void lv_win_set_title(lv_obj_t * win, const char * title)
 /**
  * Set the control button size of a window
  * @param win pointer to a window object
- * @return control button size
+ * @param size control button size
  */
 void lv_win_set_btn_size(lv_obj_t * win, cord_t size)
 {
@@ -210,6 +211,28 @@ void lv_win_set_btn_size(lv_obj_t * win, cord_t size)
     ext->btn_size = size;
 
     lv_win_realign(win);
+}
+
+/**
+ * Set the layout of the window
+ * @param win pointer to a window object
+ * @param layout the layout from 'lv_layout_t'
+ */
+void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    lv_page_set_scrl_layout(ext->page, layout);
+}
+
+/**
+ * Set the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
+ */
+void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    lv_page_set_sb_mode(ext->page, sb_mode);
 }
 
 /**
@@ -227,8 +250,11 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style)
             lv_obj_set_style(win, style);
             lv_win_realign(win);
             break;
-        case LV_WIN_STYLE_CONTENT:
+        case LV_WIN_STYLE_CONTENT_BG:
             lv_page_set_style(ext->page, LV_PAGE_STYLE_BG, style);
+            break;
+        case LV_WIN_STYLE_CONTENT_SCRL:
+            lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, style);
             break;
         case LV_WIN_STYLE_SB:
             lv_page_set_style(ext->page, LV_PAGE_STYLE_SB, style);
@@ -287,9 +313,31 @@ cord_t lv_win_get_btn_size(lv_obj_t * win)
 }
 
 /**
+ * Get the layout of a window
+ * @param win pointer to a window object
+ * @return the layout of the window (from 'lv_layout_t')
+ */
+lv_layout_t lv_win_get_layout(lv_obj_t *win)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    return lv_page_get_scrl_layout(ext->page);
+}
+
+/**
+ * Get the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
+ */
+lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    return lv_page_get_sb_mode(ext->page);
+}
+
+/**
  * Get width of the content area (page scrollable) of the window
  * @param win pointer to a window object
- * @return the width of the content area
+ * @return the width of the content_bg area
  */
 cord_t lv_win_get_width(lv_obj_t * win)
 {
@@ -325,17 +373,34 @@ lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type)
     lv_win_ext_t *ext = lv_obj_get_ext_attr(win);
 
     switch (type) {
-        case LV_WIN_STYLE_BG:      return lv_obj_get_style(win);
-        case LV_WIN_STYLE_SB:      return lv_page_get_style(ext->page, LV_PAGE_STYLE_SB);
-        case LV_WIN_STYLE_CONTENT: return lv_page_get_style(ext->page, LV_PAGE_STYLE_BG);
-        case LV_WIN_STYLE_HEADER:  return lv_obj_get_style(ext->header);
-        case LV_WIN_STYLE_BTN_REL: return ext->style_btn_rel;
-        case LV_WIN_STYLE_BTN_PR:  return ext->style_btn_pr;
+        case LV_WIN_STYLE_BG:           return lv_obj_get_style(win);
+        case LV_WIN_STYLE_CONTENT_BG:   return lv_page_get_style(ext->page, LV_PAGE_STYLE_BG);
+        case LV_WIN_STYLE_CONTENT_SCRL: return lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL);
+        case LV_WIN_STYLE_SB:           return lv_page_get_style(ext->page, LV_PAGE_STYLE_SB);
+        case LV_WIN_STYLE_HEADER:       return lv_obj_get_style(ext->header);
+        case LV_WIN_STYLE_BTN_REL:      return ext->style_btn_rel;
+        case LV_WIN_STYLE_BTN_PR:       return ext->style_btn_pr;
         default: return NULL;
     }
 
     /*To avoid warning*/
     return NULL;
+}
+
+/*=====================
+ * Other functions
+ *====================*/
+
+/**
+ * Focus on an object. It ensures that the object will be visible in the window.
+ * @param win pointer to a window object
+ * @param obj pointer to an object to focus (must be in the window)
+ * @param anim_time scroll animation time in milliseconds (0: no animation)
+ */
+void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time)
+{
+    lv_win_ext_t *ext = lv_obj_get_ext_attr(win);
+    lv_page_focus(ext->page, obj, anim_time);
 }
 
 /**********************

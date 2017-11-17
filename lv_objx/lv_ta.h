@@ -44,6 +44,7 @@ typedef enum {
 	LV_CURSOR_BLOCK,
 	LV_CURSOR_OUTLINE,
 	LV_CURSOR_UNDERLINE,
+    LV_CURSOR_HIDDEN = 0x10,    /*Or it to any value to hide the cursor temporally*/
 }lv_cursor_type_t;
 
 /*Data of text area*/
@@ -153,7 +154,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en);
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
  */
-static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_page_sb_mode_t mode)
+static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_sb_mode_t mode)
 {
     lv_page_set_sb_mode(ta, mode);
 }
@@ -224,7 +225,7 @@ bool lv_ta_get_one_line(lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
  */
-static inline lv_page_sb_mode_t lv_ta_get_sb_mode(lv_obj_t * ta)
+static inline lv_sb_mode_t lv_ta_get_sb_mode(lv_obj_t * ta)
 {
     return lv_page_get_sb_mode(ta);
 }

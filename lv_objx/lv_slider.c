@@ -18,8 +18,9 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_SLIDER_SIZE_MIN      (2 << LV_ANTIALIAS)      /*hpad and vpad cannot make the bar or indicator smaller then this [px]*/
+#define LV_SLIDER_SIZE_MIN      (4 << LV_ANTIALIAS)      /*hpad and vpad cannot make the bar or indicator smaller then this [px]*/
 #define LV_SLIDER_NOT_PRESSED   INT16_MIN
+
 /**********************
  *      TYPEDEFS
  **********************/

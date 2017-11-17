@@ -179,6 +179,11 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 		lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
 		lv_style_t * style = lv_obj_get_style(led);
 
+        /* Store the real pointer because of 'lv_group'
+         * If the object is in focus 'lv_obj_get_style()' will give a pointer to tmp style
+         * and to the real object style. It is important because of style change tricks below*/
+        lv_style_t *style_ori_p = led->style_p;
+
 		/*Create a temporal style*/
         lv_style_t leds_tmp;
 		memcpy(&leds_tmp, style, sizeof(leds_tmp));
@@ -194,7 +199,7 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 
 		led->style_p = &leds_tmp;
 		ancestor_design_f(led, mask, mode);
-        led->style_p = style;
+        led->style_p = style_ori_p;                 /*Restore the ORIGINAL style pointer*/
     }
     return true;
 }

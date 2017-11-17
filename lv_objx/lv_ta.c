@@ -108,7 +108,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     	lv_label_set_text(ext->label, "Text area");
     	lv_obj_set_click(ext->label, false);
     	lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
-        lv_ta_set_sb_mode(new_ta, LV_PAGE_SB_MODE_DRAG);
+        lv_ta_set_sb_mode(new_ta, LV_SB_MODE_DRAG);
         lv_page_set_style(new_ta, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
         /*Set the default styles*/
@@ -739,6 +739,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const area_t * mask, lv_des
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext_attr(ta);
         lv_style_t * label_style = lv_obj_get_style(ta_ext->label);
 		if(ta_ext->cursor.type == LV_CURSOR_NONE ||
+           (ta_ext->cursor.type & LV_CURSOR_HIDDEN) ||
 		   ta_ext->cursor.state == 0 ||
 		   label_style->body.opa == OPA_TRANSP)
 		{
@@ -913,15 +914,11 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     }
     else if (sign == LV_SIGNAL_CONTROLL) {
         char c = *((char*)param);
-        if(c == LV_GROUP_KEY_RIGHT) {
-            lv_ta_cursor_right(ta);
-        } else if(c == LV_GROUP_KEY_LEFT) {
-            lv_ta_cursor_left(ta);
-        } else if(c == LV_GROUP_KEY_UP) {
-            lv_ta_cursor_up(ta);
-        } else if(c == LV_GROUP_KEY_DOWN) {
-            lv_ta_cursor_down(ta);
-        }
+        if(c == LV_GROUP_KEY_RIGHT)  lv_ta_cursor_right(ta);
+        else if(c == LV_GROUP_KEY_LEFT)  lv_ta_cursor_left(ta);
+        else if(c == LV_GROUP_KEY_UP)  lv_ta_cursor_up(ta);
+        else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
+        else lv_ta_add_char(ta, c);
     }
 
     return res;
@@ -964,7 +961,10 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
 	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 	if(show != ext->cursor.state) {
         ext->cursor.state = show == 0 ? 0 : 1;
-        if(ext->cursor.show != 0) lv_obj_invalidate(ta);
+        if(ext->cursor.type != LV_CURSOR_NONE &&
+           (ext->cursor.type & LV_CURSOR_HIDDEN) == 0) {
+            lv_obj_invalidate(ta);
+        }
 	}
 }
 

@@ -11,6 +11,7 @@
 
 #include "lv_roller.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_obj/lv_group.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
@@ -243,10 +244,12 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 {
     lv_res_t res;
 
-    /* Include the ancient signal function */
-    res = ancestor_signal(roller, sign, param);
-    if(res != LV_RES_OK) return res;
-
+    /*Don't let the drop down list to handle the control signals. It works differently*/
+    if(sign != LV_SIGNAL_CONTROLL && sign != LV_SIGNAL_FOCUS && sign != LV_SIGNAL_DEFOCUS) {
+         /* Include the ancient signal function */
+        res = ancestor_signal(roller, sign, param);
+        if(res != LV_RES_OK) return res;
+    }
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     if(sign == LV_SIGNAL_STYLE_CHG) {
@@ -267,6 +270,25 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             lv_obj_align(ext->ddlist.label, NULL, LV_ALIGN_CENTER, 0, 0);
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
+        }
+    } else if(sign == LV_SIGNAL_CONTROLL) {
+        lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+        char c = *((char*)param);
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
+            if(ext->ddlist.sel_opt_id +1 < ext->ddlist.option_cnt) {
+
+                lv_roller_set_selected(roller, ext->ddlist.sel_opt_id + 1, true);
+                if(ext->ddlist.action != NULL) {
+                    ext->ddlist.action(roller);
+                }
+            }
+        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
+            if(ext->ddlist.sel_opt_id > 0) {
+                lv_roller_set_selected(roller, ext->ddlist.sel_opt_id - 1, true);
+                if(ext->ddlist.action != NULL) {
+                    ext->ddlist.action(roller);
+                }
+            }
         }
     }
 

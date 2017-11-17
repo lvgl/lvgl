@@ -65,7 +65,8 @@ typedef struct
 
 typedef enum {
     LV_WIN_STYLE_BG,
-    LV_WIN_STYLE_CONTENT,
+    LV_WIN_STYLE_CONTENT_BG,
+    LV_WIN_STYLE_CONTENT_SCRL,
     LV_WIN_STYLE_SB,
     LV_WIN_STYLE_HEADER,
     LV_WIN_STYLE_BTN_REL,
@@ -124,6 +125,27 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_btn_size(lv_obj_t * win, cord_t size);
 
 /**
+ * Set the control button size of a window
+ * @param win pointer to a window object
+ * @param size control button size
+ */
+void lv_win_set_btn_size(lv_obj_t * win, cord_t size);
+
+/**
+ * Set the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
+ */
+void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
+
+/**
+ * Set the layout of the window
+ * @param win pointer to a window object
+ * @param layout the layout from 'lv_layout_t'
+ */
+void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
+
+/**
  * Set a style of a window
  * @param win pointer to a window object
  * @param type which style should be set
@@ -150,6 +172,20 @@ const char * lv_win_get_title(lv_obj_t * win);
 cord_t lv_win_get_btn_size(lv_obj_t * win);
 
 /**
+ * Get the layout of a window
+ * @param win pointer to a window object
+ * @return the layout of the window (from 'lv_layout_t')
+ */
+lv_layout_t lv_win_get_layout(lv_obj_t *win);
+
+/**
+ * Get the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
+ */
+lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win);
+
+/**
  * Get width of the content area (page scrollable) of the window
  * @param win pointer to a window object
  * @return the width of the content area
@@ -171,6 +207,18 @@ lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn);
  * @return style pointer to a style
  */
 lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type);
+
+/*=====================
+ * Other functions
+ *====================*/
+
+/**
+ * Focus on an object. It ensures that the object will be visible in the window.
+ * @param win pointer to a window object
+ * @param obj pointer to an object to focus (must be in the window)
+ * @param anim_time scroll animation time in milliseconds (0: no animation)
+ */
+void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time);
 
 /**********************
  *      MACROS

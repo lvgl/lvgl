@@ -87,7 +87,7 @@ void lv_style_init (void)
     lv_style_scr.body.shadow.width = 0;
 
     lv_style_scr.text.opa = OPA_COVER;
-    lv_style_scr.text.color = COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_scr.text.color = COLOR_MAKE(0x30, 0x30, 0x30);
     lv_style_scr.text.font = FONT_DEFAULT;
     lv_style_scr.text.letter_space = 1 << LV_ANTIALIAS;
     lv_style_scr.text.line_space = 2 << LV_ANTIALIAS;
@@ -125,9 +125,9 @@ void lv_style_init (void)
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
-    lv_style_pretty_color.text.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
+    lv_style_pretty_color.text.color = COLOR_MAKE(0xc0, 0xc0, 0xc0);
     lv_style_pretty_color.image.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
-    lv_style_pretty_color.line.color = COLOR_MAKE(0xe0, 0xe0, 0xe0);
+    lv_style_pretty_color.line.color = COLOR_MAKE(0xc0, 0xc0, 0xc0);
     lv_style_pretty_color.body.main_color = COLOR_MAKE(0x6b, 0x9a, 0xc7);
     lv_style_pretty_color.body.gradient_color = COLOR_MAKE(0x2b, 0x59, 0x8b);
     lv_style_pretty_color.body.border.color = COLOR_MAKE(0x15, 0x2c, 0x42);

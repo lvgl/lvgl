@@ -80,7 +80,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
     	lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
 		lv_page_set_scrl_layout(new_list, LV_LIST_LAYOUT_DEF);
-		lv_list_set_sb_mode(new_list, LV_PAGE_SB_MODE_DRAG);
+		lv_list_set_sb_mode(new_list, LV_SB_MODE_DRAG);
 
         /*Set the default styles*/
         lv_theme_t *th = lv_theme_get_current();

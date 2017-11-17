@@ -106,7 +106,7 @@ void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time);
  * @param list pointer to a list object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
  */
-static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_page_sb_mode_t mode)
+static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
 {
     lv_page_set_sb_mode(list, mode);
 }
@@ -156,7 +156,7 @@ uint16_t lv_list_get_anim_time(lv_obj_t *list);
  * @param list pointer to a list object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
  */
-static inline lv_page_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
+static inline lv_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
 {
     return lv_page_get_sb_mode(list);
 }
