@@ -10,18 +10,18 @@ Here are ideas which are not assigned to a minor version yet:
 - lv_split: new object type, a hor. or ver. line for decoration purpose
 - lv_valset: new object type, a label with "+" and "-" buttons
 - lv_form: new object type, form field with place holder text 
-- anim paths: monentum (tnh(x)), curve (exp), shake
-- auto shadow size according to z
+- lv_listctrl: new object type, a list various controls on th right (sw, cb erc.)
+- anim. paths: monentum (tnh(x)), curve (exp), shake
 
-## v4.3 (in progress)
+## v5.0 (in progress)
 - [x] UTF-8 support
-- [ ] lv_tabview: new object type to organise content with tabs
+- [x] lv_tabview: new object type to organise content with tabs
 - [x] lv_sw: new object type, switch, turn on/off by tap (a little slider)
-- [ ] lv_roller: new object type, a roller to select a value (like on smartphones) 
+- [x] lv_roller: new object type, a roller to select a value (like on smartphones) 
 - [x] lv_kb: new object type, Keyboard
 - [x] lv_btnm: lv_btnm_set_tgl() to toggle last button
 - [x] lv_ta: cursor types
-- [ ] add themes with predefined styles
+- [x] add themes with predefined styles
 
 ## v4.2 (released at: 17.08.2017)
 - [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
