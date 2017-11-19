@@ -51,7 +51,7 @@ void lv_rfill(const area_t * cords_p, const area_t * mask_p,
  * @param opa opacity of letter (ignored, only for compatibility with lv_vletter)
  */
 void lv_rletter(const point_t * pos_p, const area_t * mask_p,
-                const font_t * font_p, uint8_t letter,
+                const font_t * font_p, uint32_t letter,
                 color_t color, opa_t opa);
 
 /**

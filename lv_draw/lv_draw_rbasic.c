@@ -90,10 +90,14 @@ void lv_rfill(const area_t * cords_p, const area_t * mask_p,
  * @param opa opacity of letter (ignored, only for compatibility with lv_vletter)
  */
 void lv_rletter(const point_t * pos_p, const area_t * mask_p,
-                     const font_t * font_p, uint8_t letter,
+                     const font_t * font_p, uint32_t letter,
                      color_t color, opa_t opa)
 {
     uint8_t w = font_get_width(font_p, letter);
+
+    if(letter == 'C') {
+        letter = 'C';
+    }
 
     const uint8_t * bitmap_p = font_get_bitmap(font_p, letter);
 
@@ -111,7 +115,7 @@ void lv_rletter(const point_t * pos_p, const area_t * mask_p,
             }
         }
         /*Go to the next row*/
-        bitmap_p ++;
+        if(col_sub != 7) bitmap_p ++;   /*Go to the next byte if it not done in the last step*/
     }
 #else
        uint8_t width_byte = w >> 3;    /*Width in bytes (e.g. w = 11 -> 2 bytes wide)*/
