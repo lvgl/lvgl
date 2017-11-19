@@ -32,7 +32,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void refresh_childen_position(lv_obj_t * obj, cord_t x_diff, cord_t y_diff);
-static void lv_style_refr_core(void * style_p, lv_obj_t * obj);
+static void lv_obj_report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_childen_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
@@ -468,17 +468,6 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set relative the position of an object (relative to the parent).
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param x new distance from the left side of the parent.
- * @param y new distance from the top of the parent.
- */
-void lv_obj_set_pos_scale(lv_obj_t * obj, cord_t x, cord_t y)
-{
-	lv_obj_set_pos(obj, x << LV_ANTIALIAS, y << LV_ANTIALIAS);
-}
 
 /**
  * Set the x coordinate of a object
@@ -490,16 +479,6 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x)
     lv_obj_set_pos(obj, x, lv_obj_get_y(obj));
 }
 
-/**
- * Set the x coordinate of a object.
- * The coordinate will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param x new distance from the left side from the parent.
- */
-void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x)
-{
-    lv_obj_set_pos(obj, x << LV_ANTIALIAS, lv_obj_get_y(obj));
-}
 
 /**
  * Set the y coordinate of a object
@@ -509,17 +488,6 @@ void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x)
 void lv_obj_set_y(lv_obj_t * obj, cord_t y)
 {
     lv_obj_set_pos(obj, lv_obj_get_x(obj), y);
-}
-
-/**
- * Set the y coordinate of a object.
- * The coordinate will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param y new distance from the top of the parent.
- */
-void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y)
-{
-    lv_obj_set_pos(obj, lv_obj_get_x(obj), y << LV_ANTIALIAS);
 }
 
 /**
@@ -562,18 +530,6 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h)
 }
 
 /**
- * Set the size of an object.
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param w new width
- * @param h new height
- */
-void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h)
-{
-	lv_obj_set_size(obj, w << LV_ANTIALIAS, h << LV_ANTIALIAS);
-}
-
-/**
  * Set the width of an object
  * @param obj pointer to an object
  * @param w new width
@@ -584,17 +540,6 @@ void lv_obj_set_width(lv_obj_t * obj, cord_t w)
 }
 
 /**
- * Set the width of an object.
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param w new width
- */
-void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w)
-{
-    lv_obj_set_size(obj, w << LV_ANTIALIAS, lv_obj_get_height(obj));
-}
-
-/**
  * Set the height of an object
  * @param obj pointer to an object
  * @param h new height
@@ -602,17 +547,6 @@ void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w)
 void lv_obj_set_height(lv_obj_t * obj, cord_t h)
 {
     lv_obj_set_size(obj, lv_obj_get_width(obj), h);
-}
-
-/**
- * Set the height of an object.
- * The coordinate will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param h new height
- */
-void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h)
-{
-    lv_obj_set_size(obj, lv_obj_get_width(obj), h << LV_ANTIALIAS);
 }
 
 /**
@@ -752,21 +686,6 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
 	lv_obj_set_pos(obj, new_x, new_y);
 }
 
-
-/**
- * Align an object to an other object.
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
- */
-void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod)
-{
-	lv_obj_align(obj, base, align, x_mod << LV_ANTIALIAS, y_mod << LV_ANTIALIAS);
-}
-
 /*---------------------
  * Appearance set 
  *--------------------*/
@@ -800,21 +719,18 @@ void lv_obj_refresh_style(lv_obj_t * obj)
 
 }
 
-
-/*TODO move this function out of here*/
 /**
  * Notify all object if a style is modified
  * @param style pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_style_refr_objs(void * style)
+void lv_obj_report_style_mod(void * style)
 {
     lv_obj_t * i;
     LL_READ(scr_ll, i) {
-        lv_style_refr_core(style, i);
+        lv_obj_report_style_mod_core(style, i);
     }
 }
-
 
 /*-----------------
  * Attribute set
@@ -1116,7 +1032,6 @@ lv_obj_t * lv_obj_get_screen(lv_obj_t * obj)
     return act_p;
 }
 
-
 /*---------------------
  * Parent/children get
  *--------------------*/
@@ -1398,7 +1313,6 @@ lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj)
     return obj->design_func;
 }
 
-
 /*------------------
  * Other get
  *-----------------*/
@@ -1546,13 +1460,12 @@ static void refresh_childen_position(lv_obj_t * obj, cord_t x_diff, cord_t y_dif
     }
 }
 
-/*TODO move this function out of here*/
 /**
  * Refresh the style of all children of an object. (Called recursively)
  * @param style_p refresh objects only with this style. (ignore is if NULL)
  * @param obj pointer to an object
  */
-static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
+static void lv_obj_report_style_mod_core(void * style_p, lv_obj_t * obj)
 {
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
@@ -1561,7 +1474,7 @@ static void lv_style_refr_core(void * style_p, lv_obj_t * obj)
             lv_obj_refresh_style(i);
         }
         
-        lv_style_refr_core(style_p, i);
+        lv_obj_report_style_mod_core(style_p, i);
     }
 }
 
@@ -1611,7 +1524,7 @@ static void delete_children(lv_obj_t * obj)
 
    /*Delete from the group*/
 #if LV_OBJ_GROUP != 0
-   if(obj->group_p != NULL) lv_group_rem_obj(obj);
+   if(obj->group_p != NULL) lv_group_remove_obj(obj);
 #endif
 
    /*Remove the object from parent's children list*/

@@ -245,7 +245,7 @@ static void indev_proc_task(void * param)
                         lv_group_focus_prev(i->group);
                     }
                     else {
-                        lv_group_send(i->group, data.key);
+                        lv_group_send_data(i->group, data.key);
                     }
                 }
             }

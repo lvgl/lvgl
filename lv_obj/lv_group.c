@@ -71,9 +71,9 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
 /**
  * Remove an object from its group
- * @param obj pointer to an objectto remove
+ * @param obj pointer to an object to remove
  */
-void lv_group_rem_obj(lv_obj_t * obj)
+void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
@@ -91,7 +91,6 @@ void lv_group_rem_obj(lv_obj_t * obj)
         lv_group_focus_next(g);
     }
 }
-
 
 /**
  * Focus on an object (defocus the current)
@@ -193,7 +192,7 @@ void lv_group_focus_freeze(lv_group_t * group, bool en)
  * @param group pointer to a group
  * @param c a character (use LV_GROUP_KEY_.. to navigate)
  */
-void lv_group_send(lv_group_t * group, uint32_t c)
+void lv_group_send_data(lv_group_t * group, uint32_t c)
 {
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return;
@@ -259,11 +258,11 @@ static void style_mod_def(lv_style_t * style)
     /*If not empty or has border then emphasis the border*/
     if(style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 
-    style->body.main_color = color_mix(style->body.main_color, COLOR_ORANGE, OPA_80);
-    style->body.gradient_color = color_mix(style->body.gradient_color, COLOR_ORANGE, OPA_80);
-
+    style->body.main_color = color_mix(style->body.main_color, COLOR_ORANGE, OPA_70);
+    style->body.gradient_color = color_mix(style->body.gradient_color, COLOR_ORANGE, OPA_70);
     style->body.shadow.color = color_mix(style->body.shadow.color, COLOR_ORANGE, OPA_60);
 
+    style->text.color = color_mix(style->text.color, COLOR_ORANGE, OPA_70);
 }
 
 #endif /*LV_OBJ_GROUP != 0*/

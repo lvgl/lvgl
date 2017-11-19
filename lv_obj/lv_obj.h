@@ -193,6 +193,10 @@ typedef enum
  */
 void lv_init(void);
 
+/*--------------------
+ * Create and delete
+ *-------------------*/
+
 /**
  * Create a basic object
  * @param parent pointer to a parent object.
@@ -205,6 +209,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
 /**
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete
+ * @preturn LV_RES_INV beacuse the object is deleted
  */
 lv_res_t lv_obj_del(lv_obj_t * obj);
 
@@ -214,12 +219,20 @@ lv_res_t lv_obj_del(lv_obj_t * obj);
  */
 void lv_obj_clear(lv_obj_t *obj);
 
-
 /**
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
  * @param obj pointer to an object
  */
 void lv_obj_invalidate(lv_obj_t * obj);
+
+
+/*=====================
+ * Setter functions
+ *====================*/
+
+/*--------------
+ * Screen set
+ *--------------*/
 
 /**
  * Load a new screen
@@ -227,12 +240,20 @@ void lv_obj_invalidate(lv_obj_t * obj);
  */
 void lv_scr_load(lv_obj_t * scr);
 
+/*--------------------
+ * Parent/children set
+ *--------------------*/
+
 /**
  * Set a new parent for an object. Its relative position will be the same.
  * @param obj pointer to an object
  * @param parent pointer to the new parent object
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent);
+
+/*--------------------
+ * Coordinate set
+ * ------------------*/
 
 /**
  * Set relative the position of an object (relative to the parent)
@@ -244,12 +265,15 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y);
 
 /**
  * Set relative the position of an object (relative to the parent).
- * The coordinates will be upscaled with LV_DOWNSCALE.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param x new distance from the left side of the parent. (will be multiplied with LV_DOWNSCALE)
- * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
+ * @param x new distance from the left side of the parent.
+ * @param y new distance from the top of the parent.
  */
-void lv_obj_set_pos_scale(lv_obj_t * obj, cord_t x, cord_t y);
+static inline void lv_obj_set_pos_scale(lv_obj_t * obj, cord_t x, cord_t y)
+{
+    lv_obj_set_pos(obj, x << LV_ANTIALIAS, y << LV_ANTIALIAS);
+}
 
 /**
  * Set the x coordinate of a object
@@ -260,11 +284,14 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x);
 
 /**
  * Set the x coordinate of a object.
- * The coordinate will be upscaled with  LV_DOWNSCALE.
+ * The coordinate will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param x new distance from the left side from the parent. (will be multiplied with LV_DOWNSCALE)
+ * @param x new distance from the left side from the parent.
  */
-void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x);
+static inline void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x)
+{
+    lv_obj_set_x(obj, x << LV_ANTIALIAS);
+}
 
 /**
  * Set the y coordinate of a object
@@ -275,11 +302,14 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y);
 
 /**
  * Set the y coordinate of a object.
- * The coordinate will be upscaled with LV_DOWNSCALE.
+ * The coordinate will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param y new distance from the top of the parent. (will be multiplied with LV_DOWNSCALE)
+ * @param y new distance from the top of the parent.
  */
-void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y);
+static inline void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y)
+{
+    lv_obj_set_y(obj, y << LV_ANTIALIAS);
+}
 
 /**
  * Set the size of an object
@@ -290,12 +320,16 @@ void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y);
 void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h);
 
 /**
- * Set the size of an object. The coordinates will be upscaled with  LV_DOWNSCALE.
+ * Set the size of an object.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param w new width (will be multiplied with LV_DOWNSCALE)
- * @param h new height (will be multiplied with LV_DOWNSCALE)
+ * @param w new width
+ * @param h new height
  */
-void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h);
+static inline void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h)
+{
+    lv_obj_set_size(obj, w << LV_ANTIALIAS, h << LV_ANTIALIAS);
+}
 
 /**
  * Set the width of an object
@@ -305,11 +339,15 @@ void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h);
 void lv_obj_set_width(lv_obj_t * obj, cord_t w);
 
 /**
- * Set the width of an object.  The width will be upscaled with  LV_DOWNSCALE
+ * Set the width of an object.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param w new width (will be multiplied with LV_DOWNSCALE)
+ * @param w new width
  */
-void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w);
+static inline void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w)
+{
+    lv_obj_set_width(obj, w << LV_ANTIALIAS);
+}
 
 /**
  * Set the height of an object
@@ -319,11 +357,15 @@ void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w);
 void lv_obj_set_height(lv_obj_t * obj, cord_t h);
 
 /**
- * Set the height of an object.  The height will be upscaled with  LV_DOWNSCALE
+ * Set the height of an object.
+ * The coordinate will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object
- * @param h new height (will be multiplied with LV_DOWNSCALE)
+ * @param h new height
  */
-void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h);
+static inline void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h)
+{
+    lv_obj_set_height(obj, h << LV_ANTIALIAS);
+}
 
 /**
  * Align an object to an other object.
@@ -336,21 +378,22 @@ void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h);
 void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
 
 /**
- * Align an object to an other object. The coordinates will be upscaled with  LV_DOWNSCALE.
+ * Align an object to an other object.
+ * The coordinates will be up scaled LV_ANTIALIAS is enabled.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment (will be multiplied with LV_DOWNSCALE)
- * @param y_mod y coordinate shift after alignment (will be multiplied with LV_DOWNSCALE)
+ * @param x_mod x coordinate shift after alignment
+ * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
+static inline void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod)
+{
+    lv_obj_align(obj, base, align, x_mod << LV_ANTIALIAS, y_mod << LV_ANTIALIAS);
+}
 
-/**
- * Set the extended size of an object
- * @param obj pointer to an object
- * @param ext_size the extended size
- */
-void lv_obj_set_ext_size(lv_obj_t * obj, cord_t ext_size);
+/*---------------------
+ * Appearance set
+ *--------------------*/
 
 /**
  * Set a new style for an object
@@ -370,7 +413,11 @@ void lv_obj_refresh_style(lv_obj_t * obj);
  * @param style pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_style_refr_objs(void * style);
+void lv_obj_report_style_mod(void * style);
+
+/*-----------------
+ * Attribute set
+ *----------------*/
 
 /**
  * Hide an object. It won't be visible and clickable.
@@ -445,6 +492,10 @@ void lv_obj_set_signal_func(lv_obj_t * obj, lv_signal_func_t fp);
  */
 void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp);
 
+/*----------------
+ * Other set
+ *--------------*/
+
 /**
  * Allocate a new ext. data for an object
  * @param obj pointer to an object
@@ -466,7 +517,7 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj);
  * @param obj pointer to an object
  * @param free_num the new free number
  */
-void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_number);
+void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_num);
 #endif
 
 #if LV_OBJ_FREE_PTR != 0
@@ -476,7 +527,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_number);
  * @param obj pointer to an object
  * @param free_p the new free pinter
  */
-void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_pointer);
+void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p);
 #endif
 
 /**
@@ -489,11 +540,25 @@ void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_pointer);
  */
 void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *));
 
+/*=======================
+ * Getter functions
+ *======================*/
+
+/*------------------
+ * Screen get
+ *-----------------*/
+
 /**
- * Return with the actual screen
- * @return pointer to to the actual screen object
+ * Return with a pointer to the active screen
+ * @return pointer to the active screen object (loaded by 'lv_scr_load()')
  */
-lv_obj_t * lv_scr_act(void);lv_obj_t * lv_layer_top(void);
+lv_obj_t * lv_scr_act(void);
+
+/**
+ * Return with the top layer. (Same on every screen and it is above the normal screen layer)
+ * @return pointer to the top layer object  (transparent screen sized lv_obj)
+ */
+lv_obj_t * lv_layer_top(void);
 
 /**
  * Return with the system layer. (Same on every screen and it is above the all other layers)
@@ -509,6 +574,10 @@ lv_obj_t * lv_layer_sys(void);
  */
 lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
 
+/*---------------------
+ * Parent/children get
+ *--------------------*/
+
 /**
  * Returns with the parent of an object
  * @param obj pointer to an object
@@ -517,7 +586,7 @@ lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
 lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
 
 /**
- * Iterate through the children of an object
+ * Iterate through the children of an object (start from the "youngest, lastly created")
  * @param obj pointer to an object
  * @param child NULL at first call to get the next children
  *                  and the previous return value later
@@ -526,7 +595,7 @@ lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
 lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
 
 /**
- * Iterate through the children of an object (start from the "oldest")
+ * Iterate through the children of an object (start from the "oldest", firstly created)
  * @param obj pointer to an object
  * @param child NULL at first call to get the next children
  *                  and the previous return value later
@@ -540,6 +609,10 @@ lv_obj_t * lv_obj_get_child_back(lv_obj_t * obj, lv_obj_t * child);
  * @return children number of 'obj'
  */
 uint16_t lv_obj_count_children(lv_obj_t * obj);
+
+/*---------------------
+ * Coordinate get
+ *--------------------*/
 
 /**
  * Copy the coordinates of an object to an area
@@ -583,12 +656,20 @@ cord_t lv_obj_get_height(lv_obj_t * obj);
  */
 cord_t lv_obj_get_ext_size(lv_obj_t * obj);
 
+/*-----------------
+ * Appearance get
+ *---------------*/
+
 /**
  * Get the style pointer of an object (if NULL get style of the parent)
  * @param obj pointer to an object
  * @return pointer to a style
  */
 lv_style_t * lv_obj_get_style(lv_obj_t * obj);
+
+/*-----------------
+ * Attribute get
+ *----------------*/
 
 /**
  * Get the hidden attribute of an object
@@ -661,11 +742,15 @@ lv_signal_func_t   lv_obj_get_signal_func(lv_obj_t * obj);
  */
 lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
 
+/*------------------
+ * Other get
+ *-----------------*/
+
 /**
  * Get the ext pointer
  * @param obj pointer to an object
  * @return the ext pointer but not the dynamic version
- *         Use it as ext->data1, and NOT da(ext_attr)->data1
+ *         Use it as ext->data1, and NOT da(ext)->data1
  */
 void * lv_obj_get_ext_attr(lv_obj_t * obj);
 
@@ -684,7 +769,7 @@ LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the free pointer
  */
-void * lv_obj_get_free_p(lv_obj_t * obj);
+void * lv_obj_get_free_ptr(lv_obj_t * obj);
 #endif
 
 #if LV_OBJ_GROUP != 0
@@ -695,6 +780,7 @@ void * lv_obj_get_free_p(lv_obj_t * obj);
  */
 void * lv_obj_get_group(lv_obj_t * obj);
 #endif
+
 
 /**********************
  *      MACROS

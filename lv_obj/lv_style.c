@@ -208,6 +208,8 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
     memcpy(dest, src, sizeof(lv_style_t));
 }
 
+
+
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
@@ -287,8 +289,7 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
         act->body.shadow.type = end->body.shadow.type;
     }
 
-    lv_style_refr_objs(dsc->style_anim);
-
+    lv_obj_report_style_mod(dsc->style_anim);
 
     if(val == LV_STYLE_ANIM_RES) {
         dm_free(dsc);

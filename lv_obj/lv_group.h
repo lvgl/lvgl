@@ -46,15 +46,79 @@ typedef struct _lv_group_t
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Create a new object group
+ * @return pointer to the new object group
+ */
 lv_group_t * lv_group_create(void);
+
+/**
+ * Add an object to a group
+ * @param group pointer to a group
+ * @param obj pointer to an object to add
+ */
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj);
-void lv_group_rem_obj(lv_obj_t * obj);
+
+/**
+ * Remove an object from its group
+ * @param obj pointer to an object to remove
+ */
+void lv_group_remove_obj(lv_obj_t * obj);
+
+/**
+ * Focus on an object (defocus the current)
+ * @param obj pointer to an object to focus on
+ */
 void lv_group_focus_obj(lv_obj_t * obj);
+
+/**
+ * Focus the next object in a group (defocus the current)
+ * @param group pointer to a group
+ */
 void lv_group_focus_next(lv_group_t * group);
+
+/**
+ * Focus the previous object in a group (defocus the current)
+ * @param group pointer to a group
+ */
 void lv_group_focus_prev(lv_group_t * group);
+
+/**
+ * Do not let to change the focus from the current object
+ * @param group pointer to a group
+ * @param en true: freeze, false: release freezing (normal mode)
+ */
 void lv_group_focus_freeze(lv_group_t * group, bool en);
-void lv_group_send(lv_group_t * group, uint32_t c);
+
+/**
+ * Send a control character to the focuses object of a group
+ * @param group pointer to a group
+ * @param c a character (use LV_GROUP_KEY_.. to navigate)
+ */
+void lv_group_send_data(lv_group_t * group, uint32_t c);
+
+
+/**
+ * Set a function for a group which will modify the object's style if it is in focus
+ * @param group pointer to a group
+ * @param style_cb the style modifier function pointer
+ */
+void lv_group_set_style_mod_cb(lv_group_t * group, void (*style_cb)(lv_style_t * style));
+
+/**
+ * Modify a style with the set 'style_mod' function. The input style remains unchanged.
+ * @param group pointer to group
+ * @param style pointer to a style to modify
+ * @return a copy of the input style but modified with the 'style_mod' function
+ */
 lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
+
+/**
+ * Get the focused object or NULL if there isn't one
+ * @param group pointer to a group
+ * @return pointer to the focused object
+ */
 lv_obj_t * lv_group_get_focused(lv_group_t * group);
 
 /**********************

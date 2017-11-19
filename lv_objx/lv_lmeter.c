@@ -12,6 +12,7 @@
 #include "lv_lmeter.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
+#include "../lv_obj/lv_group.h"
 #include "misc/math/trigo.h"
 
 /*********************
@@ -239,6 +240,14 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
 
         lv_style_t style_tmp;
         memcpy(&style_tmp, style, sizeof(lv_style_t));
+
+
+#if LV_OBJ_GROUP
+        lv_group_t *g = lv_obj_get_group(lmeter);
+        if(lv_group_get_focused(g) == lmeter) {
+            style_tmp.line.width += 1 << LV_ANTIALIAS;
+        }
+#endif
 
          cord_t r_out = lv_obj_get_width(lmeter) / 2;
          cord_t r_in = r_out - style->body.padding.hor;

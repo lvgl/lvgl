@@ -83,7 +83,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->title = lv_label_create(ext->header, NULL);
     	lv_label_set_text(ext->title,"My title");
 
-
     	/*Set the default styles*/
         lv_theme_t *th = lv_theme_get_current();
         if(th) {

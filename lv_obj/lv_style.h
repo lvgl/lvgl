@@ -22,12 +22,12 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_RADIUS_CIRCLE      (CORD_MAX)    /*A very big radius to always draw as circle*/
+#define LV_RADIUS_CIRCLE  (CORD_MAX)    /*A very big radius to always draw as circle*/
+#define LV_AA             LV_ANTIALIAS  /*Just a shorter form of LV_ANTIALIAS*/
 
 /**********************
  *      TYPEDEFS
  **********************/
-
 
 /*Border types (Use 'OR'ed values)*/
 typedef enum

@@ -15,6 +15,7 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_obj/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
+#include "misc/gfx/fonts/symbol_def.h"
 #include "misc/gfx/anim.h"
 
 /*********************
@@ -408,12 +409,15 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         ancestor_design(ddlist, mask, mode);
 
-        /*If the list is opened draw a rectangle under the selected item*/
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+        /*If the list is opened draw a rectangle under the selected item*/
         if(ext->opened != 0) {
             lv_style_t *style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
             const font_t * font = style->text.font;
             cord_t font_h = font_get_height_scale(font);
+
+            /*Draw the selected*/
             area_t rect_area;
             rect_area.y1 = ext->label->coords.y1;
             rect_area.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
