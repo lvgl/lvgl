@@ -11,6 +11,7 @@ Here are ideas which are not assigned to a minor version yet:
 - lv_valset: new object type, a label with "+" and "-" buttons
 - lv_form: new object type, form field with place holder text 
 - lv_listctrl: new object type, a list various controls on th right (sw, cb erc.)
+- lv_inlist: new ibject type, inline drop down list (different open/closed style)
 - anim. paths: monentum (tnh(x)), curve (exp), shake
 - hover, hover_lost signals
 
@@ -23,6 +24,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] lv_btnm: lv_btnm_set_tgl() to toggle last button
 - [x] lv_ta: cursor types
 - [x] add themes with predefined styles
+- [ ] ddlist: draw down/up arrow on the right
 
 ## v4.2 (released at: 17.08.2017)
 - [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
