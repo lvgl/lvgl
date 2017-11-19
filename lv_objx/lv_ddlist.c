@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_DDLIST_DEF_ANIM_TIME 200 /*ms*/
+#define LV_DDLIST_DEF_ANIM_TIME     200     /*ms*/
 
 /**********************
  *      TYPEDEFS

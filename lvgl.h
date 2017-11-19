@@ -86,4 +86,8 @@ extern "C" {
  *      MACROS
  **********************/
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /*LVGL_H*/
