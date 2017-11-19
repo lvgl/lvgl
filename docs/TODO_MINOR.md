@@ -12,6 +12,7 @@ Here are ideas which are not assigned to a minor version yet:
 - lv_form: new object type, form field with place holder text 
 - lv_listctrl: new object type, a list various controls on th right (sw, cb erc.)
 - anim. paths: monentum (tnh(x)), curve (exp), shake
+- hover, hover_lost signals
 
 ## v5.0 (in progress)
 - [x] UTF-8 support
