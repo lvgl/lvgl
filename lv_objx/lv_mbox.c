@@ -195,12 +195,12 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
     if(ext->anim_time != 0) {
         /*Add shrinking animations*/
         lv_obj_animate(mbox, LV_ANIM_GROW_H| ANIM_OUT, ext->anim_time, delay, NULL);
-        lv_obj_animate(mbox, LV_ANIM_GROW_V| ANIM_OUT, ext->anim_time, delay, (anim_cb_t)lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_GROW_V| ANIM_OUT, ext->anim_time, delay, (void (*)(lv_obj_t*))lv_obj_del);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, false, false);
     } else {
-        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, (anim_cb_t)lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, (void (*)(lv_obj_t*))lv_obj_del);
     }
 }
 

@@ -15,8 +15,7 @@ extern "C" {
  *********************/
 #include "lv_hal_disp.h"
 #include "lv_hal_indev.h"
-#include <lvgl/lv_hal/lv_hal_tick.h>
-#include "lv_hal_indev_keycode.h"
+#include "lv_hal_tick.h"
 
 /*********************
  *      DEFINES
