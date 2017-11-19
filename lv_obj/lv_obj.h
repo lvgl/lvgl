@@ -55,7 +55,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct __LV_OBJ_T;
+struct _lv_obj_t;
 
 typedef enum
 {
@@ -64,7 +64,7 @@ typedef enum
     LV_DESIGN_COVER_CHK,
 }lv_design_mode_t;
 
-typedef bool (* lv_design_func_t) (struct __LV_OBJ_T * obj, const area_t * mask_p, lv_design_mode_t mode);
+typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const area_t * mask_p, lv_design_mode_t mode);
 
 typedef enum
 {
@@ -97,11 +97,11 @@ typedef enum
     LV_SIGNAL_CONTROLL,
 }lv_signal_t;
 
-typedef lv_res_t (* lv_signal_func_t) (struct __LV_OBJ_T * obj, lv_signal_t sign, void * param);
+typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
-typedef struct __LV_OBJ_T
+typedef struct _lv_obj_t
 {
-    struct __LV_OBJ_T * par;    /*Pointer to the parent object*/
+    struct _lv_obj_t * par;    /*Pointer to the parent object*/
     ll_dsc_t child_ll;          /*Linked list to store the children objects*/
     
     area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
@@ -131,12 +131,12 @@ typedef struct __LV_OBJ_T
 
     cord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
-#if LV_OBJ_FREE_NUM != 0
-    uint8_t free_num; 		    /*Application specific identifier (set it freely)*/
+#ifdef LV_OBJ_FREE_NUM_TYPE
+    LV_OBJ_FREE_NUM_TYPE free_num; 		    /*Application specific identifier (set it freely)*/
 #endif
 }lv_obj_t;
 
-typedef lv_res_t (*lv_action_t) (struct __LV_OBJ_T * obj);
+typedef lv_res_t (*lv_action_t) (struct _lv_obj_t * obj);
 
 /*Protect some attributes (max. 8 bit)*/
 typedef enum
@@ -459,14 +459,14 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
  */
 void lv_obj_refresh_ext_size(lv_obj_t * obj);
 
-#if LV_OBJ_FREE_NUM != 0
+#ifdef LV_OBJ_FREE_NUM_TYPE
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application.
  * @param obj pointer to an object
  * @param free_num the new free number
  */
-void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_number);
+void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_number);
 #endif
 
 #if LV_OBJ_FREE_PTR != 0
@@ -669,13 +669,13 @@ lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
  */
 void * lv_obj_get_ext_attr(lv_obj_t * obj);
 
-#if LV_OBJ_FREE_NUM != 0
+#ifdef LV_OBJ_FREE_NUM_TYPE
 /**
  * Get the free number
  * @param obj pointer to an object
  * @return the free number
  */
-uint8_t lv_obj_get_free_num(lv_obj_t * obj);
+LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
 #endif
 
 #if LV_OBJ_FREE_PTR != 0

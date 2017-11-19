@@ -34,7 +34,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
+typedef struct _lv_group_t
 {
     ll_dsc_t obj_ll;
     lv_obj_t ** obj_focus;
@@ -53,7 +53,7 @@ void lv_group_focus_obj(lv_obj_t * obj);
 void lv_group_focus_next(lv_group_t * group);
 void lv_group_focus_prev(lv_group_t * group);
 void lv_group_focus_freeze(lv_group_t * group, bool en);
-void lv_group_send(lv_group_t * group, char c);
+void lv_group_send(lv_group_t * group, uint32_t c);
 lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
 lv_obj_t * lv_group_get_focused(lv_group_t * group);
 

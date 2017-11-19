@@ -913,12 +913,34 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         }
     }
     else if (sign == LV_SIGNAL_CONTROLL) {
-        char c = *((char*)param);
+        uint32_t c = *((uint32_t*)param);       /*uint32_t because can be UTF-8*/
         if(c == LV_GROUP_KEY_RIGHT)  lv_ta_cursor_right(ta);
         else if(c == LV_GROUP_KEY_LEFT)  lv_ta_cursor_left(ta);
         else if(c == LV_GROUP_KEY_UP)  lv_ta_cursor_up(ta);
         else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
-        else lv_ta_add_char(ta, c);
+        else {
+#if TXT_UTF8 != 0
+            /*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
+            if((c & 0x80) == 0) {   /*ASCII*/
+                lv_ta_add_char(ta, (char)c);
+            }
+            else {
+                uint32_t swapped[2] = {0, 0};   /*the 2. element is the closing '\0'*/
+                uint8_t c8[4];
+                memcpy(c8, &c, 4);
+                swapped[0] = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
+                char *p = (char*)swapped;
+                uint8_t i;
+                for(i = 0; i < 4; i++) {
+                    if(p[0] == 0) p++; /*Ignore leading zeros (they were in the end originally)*/
+                }
+                lv_ta_add_text(ta, p);
+            }
+#else
+            lv_ta_add_char(ta, (char)c);
+
+#endif
+        }
     }
 
     return res;

@@ -702,7 +702,7 @@ static void win_init(void)
  */
 lv_theme_t * lv_theme_alien_init(uint16_t hue, font_t *font)
 {
-    if(font == NULL) font = FONT_DEFAULT;
+    if(font == NULL) font = LV_FONT_DEFAULT;
 
     _hue = hue;
     _font = font;

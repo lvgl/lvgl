@@ -10,6 +10,7 @@
 #include "lv_conf.h"
 
 #include "../lv_hal/lv_hal_tick.h"
+#include "../lv_obj/lv_group.h"
 #include "misc/os/ptask.h"
 #include "misc/math/math_base.h"
 #include "../lv_draw/lv_draw_rbasic.h"
@@ -114,15 +115,27 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
 }
 
 /**
- * Enable input devices device by type
- * @param indev pointer to an input device
+ * Set a cursor for a mouse input device
+ * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_MOUSE')
  * @param cur_obj pointer to an object to be used as cursor
  */
-void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
+void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj)
 {
+    if(indev->driver.type != LV_INDEV_TYPE_MOUSE) return;
+
     indev->cursor = cur_obj;
     lv_obj_set_parent(indev->cursor, lv_layer_sys());
     lv_obj_set_pos(indev->cursor, indev->state.act_point.x,  indev->state.act_point.y);
+}
+
+/**
+ * Set a destination group for a keypad input device
+ * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_KEYPAD')
+ * @param group point to a group
+ */
+void lv_indev_set_group(lv_indev_t *indev, lv_group_t *group)
+{
+    indev->group = group;
 }
 
 
@@ -206,18 +219,36 @@ static void indev_proc_task(void * param)
             i->state.event = data.state;
 
             /*Move the cursor if set and moved*/
-            if(i->cursor != NULL &&
+            if(i->driver.type == LV_INDEV_TYPE_MOUSE &&
+               i->cursor != NULL &&
                (i->state.last_point.x != data.point.x ||
                 i->state.last_point.y != data.point.y))
             {
                 lv_obj_set_pos_scale(i->cursor, data.point.x, data.point.y);
             }
 
-            i->state.act_point.x = data.point.x << LV_ANTIALIAS;
-            i->state.act_point.y = data.point.y << LV_ANTIALIAS;
+            if(i->driver.type == LV_INDEV_TYPE_MOUSE ||
+               i->driver.type == LV_INDEV_TYPE_TOUCHPAD ||
+               i->driver.type == LV_INDEV_TYPE_BUTTON)
+            {
+                i->state.act_point.x = data.point.x << LV_ANTIALIAS;
+                i->state.act_point.y = data.point.y << LV_ANTIALIAS;
 
-            /*Process the current point*/
-            indev_proc_point(&i->state);
+                /*Process the current point*/
+                indev_proc_point(&i->state);
+            }
+            else if (i->driver.type == LV_INDEV_TYPE_KEYPAD) {
+                if(i->group != NULL && data.state == LV_INDEV_EVENT_PR) {
+                    if(data.key == LV_GROUP_KEY_NEXT) { lv_group_focus_next(i->group);
+                    }
+                    else if(data.key == LV_GROUP_KEY_PREV) {
+                        lv_group_focus_prev(i->group);
+                    }
+                    else {
+                        lv_group_send(i->group, data.key);
+                    }
+                }
+            }
         }
 
         /*Handle reset query if it happened in during processing*/
@@ -251,10 +282,10 @@ static void indev_proc_point(lv_indev_state_t * indev)
     if(indev->event == LV_INDEV_EVENT_PR){
 #if LV_INDEV_TP_MARKER != 0
         area_t area;
-        area.x1 = x - (LV_INDEV_TP_MARKER >> 1);
-        area.y1 = y - (LV_INDEV_TP_MARKER >> 1);
-        area.x2 = x + ((LV_INDEV_TP_MARKER >> 1) | 0x1);
-        area.y2 = y + ((LV_INDEV_TP_MARKER >> 1) | 0x1);
+        area.x1 = x - (LV_INDEV_POINT_MARKER >> 1);
+        area.y1 = y - (LV_INDEV_POINT_MARKER >> 1);
+        area.x2 = x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
+        area.y2 = y + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
         lv_rfill(&area, NULL, COLOR_MAKE(0xFF, 0, 0), OPA_COVER);
 #endif
         indev_proc_press(indev);

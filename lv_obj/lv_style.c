@@ -88,7 +88,7 @@ void lv_style_init (void)
 
     lv_style_scr.text.opa = OPA_COVER;
     lv_style_scr.text.color = COLOR_MAKE(0x30, 0x30, 0x30);
-    lv_style_scr.text.font = FONT_DEFAULT;
+    lv_style_scr.text.font = LV_FONT_DEFAULT;
     lv_style_scr.text.letter_space = 1 << LV_ANTIALIAS;
     lv_style_scr.text.line_space = 2 << LV_ANTIALIAS;
 

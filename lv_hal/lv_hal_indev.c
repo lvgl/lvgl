@@ -41,7 +41,7 @@ static lv_indev_t *indev_list = NULL;
  * @param driver pointer to an initialized 'lv_indev_drv_t' variable (can be local variable)
  * @return pointer to the new input device or NULL on error
  */
-lv_indev_t * lv_indev_register(lv_indev_drv_t *driver)
+lv_indev_t * lv_indev_add(lv_indev_drv_t *driver)
 {
     lv_indev_t *node;
 
@@ -76,8 +76,8 @@ lv_indev_t * lv_indev_next(lv_indev_t * indev)
     if(indev == NULL) {
         return indev_list;
     } else {
-        if(indev_list->next == NULL) return NULL;
-        else return indev_list->next;
+        if(indev->next == NULL) return NULL;
+        else return indev->next;
     }
 }
 

@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "../lv_hal/lv_hal_indev.h"
+#include "../lv_obj/lv_group.h"
 
 /*********************
  *      DEFINES
@@ -29,7 +30,7 @@ extern "C" {
  **********************/
 
 /**
- * Initialize the display input subsystem
+ * Initialize the display input device subsystem
  */
 void lv_indev_init(void);
 
@@ -40,49 +41,63 @@ void lv_indev_init(void);
 lv_indev_t * lv_indev_get_act(void);
 
 /**
- * Reset all display inputs
+ * Reset one or all input devices
+ * @param indev
  */
 void lv_indev_reset(lv_indev_t * indev);
 
 /**
- * Reset the long press state of a display input
- * @param indev_proc pointer to a display input
+ * Reset the long press state of an input device
+ * @param indev_proc pointer to an input device
  */
 void lv_indev_reset_lpr(lv_indev_t * indev_proc);
 
 /**
  * Enable input devices device by type
- * @param indev pointer to an input device
+ * @param type Input device type
+ * @param enable true: enable this type; false: disable this type
+ */
+void lv_indev_enable(lv_hal_indev_type_t type, bool enable);
+
+/**
+ * Set a cursor for a mouse input device
+ * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_MOUSE')
  * @param cur_obj pointer to an object to be used as cursor
  */
-void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj);
+void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj);
 
 /**
- * Get the last point on display input
- * @param indev_proc pointer to a display input
+ * Set a destination group for a keypad input device
+ * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_KEYPAD')
+ * @param group point to a group
+ */
+void lv_indev_set_group(lv_indev_t *indev, lv_group_t *group);
+
+/**
+ * Get the last point of an input device
+ * @param indev pointer to an input device
  * @param point pointer to a point to store the result
  */
-void lv_indev_get_point(lv_indev_t * indev_proc, point_t * point);
-
+void lv_indev_get_point(lv_indev_t * indev, point_t * point);
 /**
- * Check if there is dragging on display input or not
- * @param indev_proc pointer to a display input
+ * Check if there is dragging with an input device or not
+ * @param indev pointer to an input device
  * @return true: drag is in progress
  */
-bool lv_indev_is_dragging(lv_indev_t * indev_proc);
+bool lv_indev_is_dragging(lv_indev_t * indev);
 
 /**
- * Get the vector of dragging on a display input
- * @param indev_proc pointer to a display input
+ * Get the vector of dragging of an input device
+ * @param indev pointer to an input device
  * @param point pointer to a point to store the vector
  */
-void lv_indev_get_vect(lv_indev_t * indev_proc, point_t * point);
+void lv_indev_get_vect(lv_indev_t * indev, point_t * point);
 
 /**
  * Do nothing until the next release
- * @param indev_proc pointer to a display input
+ * @param indev pointer to an input device
  */
-void lv_indev_wait_release(lv_indev_t * indev_proc);
+void lv_indev_wait_release(lv_indev_t * indev);
 
 /**********************
  *      MACROS

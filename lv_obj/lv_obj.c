@@ -958,14 +958,14 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj)
 	lv_obj_invalidate(obj);
 }
 
-#if LV_OBJ_FREE_NUM != 0
+#ifdef LV_OBJ_FREE_NUM_TYPE
 /**
  * Set an application specific number for an object.
  * It can help to identify objects in the application. 
  * @param obj pointer to an object
  * @param free_num the new free number
  */
-void lv_obj_set_free_num(lv_obj_t * obj, uint8_t free_num)
+void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_num)
 {
     obj->free_num = free_num;
 }
@@ -1070,8 +1070,8 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  *-----------------*/
 
 /**
- * Return with the actual screen
- * @return pointer to the actual screen object
+ * Return with a pointer to the active screen
+ * @return pointer to the active screen object (loaded by 'lv_scr_load()')
  */
 lv_obj_t * lv_scr_act(void)
 {
@@ -1414,13 +1414,13 @@ void * lv_obj_get_ext_attr(lv_obj_t * obj)
    return obj->ext_attr;
 }
 
-#if LV_OBJ_FREE_NUM != 0
+#ifdef LV_OBJ_FREE_NUM_TYPE
 /**
  * Get the free number
  * @param obj pointer to an object
  * @return the free number
  */
-uint8_t lv_obj_get_free_num(lv_obj_t * obj)
+LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj)
 {
     return obj->free_num;
 }

@@ -88,7 +88,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new tab tab*/
     if(copy == NULL) {
         lv_obj_set_size(new_tabview, LV_HOR_RES, LV_VER_RES);
-        lv_obj_set_style(new_tabview, &lv_style_pretty);
 
         ext->btns = lv_btnm_create(new_tabview, NULL);
         lv_obj_set_height(ext->btns, 3 * LV_DPI / 4);
@@ -108,7 +107,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_height(ext->content, LV_VER_RES - lv_obj_get_height(ext->btns));
         lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 
-
         /*Set the default styles*/
         lv_theme_t *th = lv_theme_get_current();
         if(th) {
@@ -120,6 +118,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_REL, th->tabview.btn.tgl_rel);
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_PR, th->tabview.btn.tgl_pr);
         } else {
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BG, &lv_style_plain);
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_transp);
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, &lv_style_plain_color);
         }
@@ -174,9 +173,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     /*Create the container page*/
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
+    lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
     lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_transp);
     lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
-    lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
 
     if(page_signal == NULL) page_signal = lv_obj_get_signal_func(h);
     if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(h));

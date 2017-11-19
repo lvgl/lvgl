@@ -191,9 +191,9 @@ void lv_group_focus_freeze(lv_group_t * group, bool en)
 /**
  * Send a control character to the focuses object of a group
  * @param group pointer to a group
- * @param c a control character (use LV_GROUP_KEY_.. to navigate)
+ * @param c a character (use LV_GROUP_KEY_.. to navigate)
  */
-void lv_group_send(lv_group_t * group, char c)
+void lv_group_send(lv_group_t * group, uint32_t c)
 {
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return;
