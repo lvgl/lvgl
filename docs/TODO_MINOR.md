@@ -24,7 +24,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] lv_btnm: lv_btnm_set_tgl() to toggle last button
 - [x] lv_ta: cursor types
 - [x] add themes with predefined styles
-- [ ] ddlist: draw down/up arrow on the right
+- [x] partial border draw in styles
 
 ## v4.2 (released at: 17.08.2017)
 - [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
