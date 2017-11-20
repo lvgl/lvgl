@@ -32,8 +32,6 @@ extern "C" {
  * Display Driver structure to be registered by HAL
  */
 typedef struct _disp_drv_t {
-    int32_t hor_res;
-    int32_t ver_res;
     void (*fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color);
     void (*map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t * color_p);
     void (*copy)(color_t * dest, const color_t * src, uint32_t length, opa_t opa);
