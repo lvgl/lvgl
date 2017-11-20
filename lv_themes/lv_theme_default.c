@@ -58,7 +58,7 @@ static void basic_init(void)
     lv_style_copy(&def, &lv_style_pretty);  /*Initialize the default style*/
 
     lv_style_copy(&sb, &lv_style_pretty_color);
-    sb.body.gradient_color = sb.body.main_color;
+    sb.body.grad_color = sb.body.main_color;
     sb.body.padding.hor = sb.body.padding.hor / 2;      /*Make closer to the edges*/
     sb.body.padding.ver = sb.body.padding.ver / 2;
 
@@ -76,7 +76,7 @@ static void btn_init(void)
 #if USE_LV_BTN != 0
     theme.btn.rel = &lv_style_btn_released;
     theme.btn.pr = &lv_style_btn_pressed;
-    theme.btn.tgl_rel = &lv_style_btn_tgl_released;
+    theme.btn.tgl_rel = &lv_style_btn_tgl_rel;
     theme.btn.tgl_pr =  &lv_style_btn_tgl_pressed;
     theme.btn.ina =  &lv_style_btn_inactive;
 #endif
@@ -182,7 +182,7 @@ static void lmeter_init(void)
     lmeter.line.color = COLOR_HEX3(0xddd);
     lmeter.line.width = 2 << LV_ANTIALIAS;
     lmeter.body.main_color = color_mix(lmeter.body.main_color , COLOR_WHITE, OPA_50);
-    lmeter.body.gradient_color = color_mix(lmeter.body.gradient_color , COLOR_BLACK, OPA_50);
+    lmeter.body.grad_color = color_mix(lmeter.body.grad_color , COLOR_BLACK, OPA_50);
 
     theme.lmeter = &lmeter;
 #endif
@@ -214,7 +214,7 @@ static void cb_init(void)
     theme.cb.bg = &lv_style_transp;
     theme.cb.box.rel = &lv_style_pretty;
     theme.cb.box.pr = &lv_style_btn_pressed;
-    theme.cb.box.tgl_rel = &lv_style_btn_tgl_released;
+    theme.cb.box.tgl_rel = &lv_style_btn_tgl_rel;
     theme.cb.box.tgl_pr = &lv_style_btn_tgl_pressed;
     theme.cb.box.ina = &lv_style_btn_inactive;
 #endif
@@ -229,7 +229,7 @@ static void btnm_init(void)
     theme.btnm.bg = &lv_style_pretty;
     theme.btnm.btn.rel = &lv_style_btn_released;
     theme.btnm.btn.pr = &lv_style_btn_pressed;
-    theme.btnm.btn.tgl_rel = &lv_style_btn_tgl_released;
+    theme.btnm.btn.tgl_rel = &lv_style_btn_tgl_rel;
     theme.btnm.btn.tgl_pr = &lv_style_btn_tgl_pressed;
     theme.btnm.btn.ina = &lv_style_btn_inactive;
 #endif
@@ -243,7 +243,7 @@ static void kb_init(void)
     theme.kb.bg = &lv_style_pretty;
     theme.kb.btn.rel = &lv_style_btn_released;
     theme.kb.btn.pr = &lv_style_btn_pressed;
-    theme.kb.btn.tgl_rel = &lv_style_btn_tgl_released;
+    theme.kb.btn.tgl_rel = &lv_style_btn_tgl_rel;
     theme.kb.btn.tgl_pr = &lv_style_btn_tgl_pressed;
     theme.kb.btn.ina = &lv_style_btn_inactive;
 #endif
@@ -294,7 +294,7 @@ static void list_init(void)
     theme.list.sb = &sb;
     theme.list.btn.rel = &lv_style_btn_released;
     theme.list.btn.pr = &lv_style_btn_pressed;
-    theme.list.btn.tgl_rel = &lv_style_btn_tgl_released;
+    theme.list.btn.tgl_rel = &lv_style_btn_tgl_rel;
     theme.list.btn.tgl_pr = &lv_style_btn_tgl_pressed;
     theme.list.btn.ina = &lv_style_btn_inactive;
 #endif
@@ -332,7 +332,7 @@ static void tabview_init(void)
     theme.tabview.btn.bg = &lv_style_transp;
     theme.tabview.btn.rel = &lv_style_btn_released;
     theme.tabview.btn.pr = &lv_style_btn_pressed;
-    theme.tabview.btn.tgl_rel = &lv_style_btn_tgl_released;
+    theme.tabview.btn.tgl_rel = &lv_style_btn_tgl_rel;
     theme.tabview.btn.tgl_pr = &lv_style_btn_tgl_pressed;
 #endif
 }

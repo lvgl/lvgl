@@ -259,7 +259,7 @@ static void style_mod_def(lv_style_t * style)
     if(style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 
     style->body.main_color = color_mix(style->body.main_color, COLOR_ORANGE, OPA_70);
-    style->body.gradient_color = color_mix(style->body.gradient_color, COLOR_ORANGE, OPA_70);
+    style->body.grad_color = color_mix(style->body.grad_color, COLOR_ORANGE, OPA_70);
     style->body.shadow.color = color_mix(style->body.shadow.color, COLOR_ORANGE, OPA_60);
 
     style->text.color = color_mix(style->text.color, COLOR_ORANGE, OPA_70);

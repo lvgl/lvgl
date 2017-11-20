@@ -593,7 +593,7 @@ static void lv_draw_rect_main_mid(const area_t * coords, const area_t * mask, co
     uint16_t radius = style->body.radius;
 
     color_t mcolor = style->body.main_color;
-    color_t gcolor = style->body.gradient_color;
+    color_t gcolor = style->body.grad_color;
     uint8_t mix;
     opa_t opa = style->body.opa;
     cord_t height = area_get_height(coords);
@@ -643,7 +643,7 @@ static void lv_draw_rect_main_corner(const area_t * coords, const area_t * mask,
     uint16_t radius = style->body.radius;
 
     color_t mcolor = style->body.main_color;
-    color_t gcolor = style->body.gradient_color;
+    color_t gcolor = style->body.grad_color;
     color_t act_color;
     opa_t opa = style->body.opa;
     uint8_t mix;

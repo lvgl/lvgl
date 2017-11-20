@@ -406,7 +406,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
     lv_style_t style_neddle_mid;
     lv_style_copy(&style_neddle_mid, &lv_style_plain);
     style_neddle_mid.body.main_color = style->body.border.color;
-    style_neddle_mid.body.gradient_color = style->body.border.color;
+    style_neddle_mid.body.grad_color = style->body.border.color;
     style_neddle_mid.body.radius = LV_RADIUS_CIRCLE;
 
     area_t nm_cord;

@@ -394,13 +394,13 @@ static void draw_bg(lv_obj_t *roller, const area_t *mask)
 
     if(union_ok){
         color_t main_tmp = style->body.main_color;
-        color_t grad_tmp = style->body.gradient_color;
+        color_t grad_tmp = style->body.grad_color;
 
         style->body.main_color = grad_tmp;
-        style->body.gradient_color = main_tmp;
+        style->body.grad_color = main_tmp;
         lv_draw_rect(&half_roller, &half_mask, style);
         style->body.main_color = main_tmp;
-        style->body.gradient_color = grad_tmp;
+        style->body.grad_color = grad_tmp;
     }
 
 }

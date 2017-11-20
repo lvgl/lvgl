@@ -757,7 +757,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const area_t * mask, lv_des
         	color_t ccolor_tmp = cur_style.text.color;		/*Make letter color to cursor color*/
         	cur_style.text.color = cur_style.body.main_color;		/*In block mode the letter color will be current background color*/
         	cur_style.body.main_color = ccolor_tmp;
-        	cur_style.body.gradient_color = ccolor_tmp;
+        	cur_style.body.grad_color = ccolor_tmp;
         	cur_style.body.border.color = ccolor_tmp;
         	cur_style.body.border.opa = OPA_COVER;
         	cur_style.body.border.width = 1 << LV_ANTIALIAS;

@@ -53,7 +53,7 @@ typedef struct
 
     struct {
         color_t main_color;
-        color_t gradient_color;
+        color_t grad_color;
         cord_t radius;
         opa_t opa;
 
@@ -162,11 +162,11 @@ extern lv_style_t lv_style_plain;
 extern lv_style_t lv_style_plain_color;
 extern lv_style_t lv_style_pretty;
 extern lv_style_t lv_style_pretty_color;
-extern lv_style_t lv_style_btn_released;
-extern lv_style_t lv_style_btn_pressed;
-extern lv_style_t lv_style_btn_tgl_released;
-extern lv_style_t lv_style_btn_tgl_pressed;;
-extern lv_style_t lv_style_btn_inactive;
+extern lv_style_t lv_style_btn_rel;
+extern lv_style_t lv_style_btn_pr;
+extern lv_style_t lv_style_btn_tgl_rel;
+extern lv_style_t lv_style_btn_tgl_pr;;
+extern lv_style_t lv_style_btn_ina;
 
 /**********************
  *      MACROS
