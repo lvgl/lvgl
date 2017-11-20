@@ -89,6 +89,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
             lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->cb.box.ina);
         } else {
             lv_cb_set_style(new_cb,LV_CB_STYLE_BG, &lv_style_transp);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL,&lv_style_pretty);
         }
     } else {
     	lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
