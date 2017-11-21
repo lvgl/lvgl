@@ -14,7 +14,7 @@
 #include "lv_bar.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include "lvgl/misc/gfx/anim.h"
+#include "misc/gfx/anim.h"
 #include <stdio.h>
 
 /*********************

@@ -17,9 +17,9 @@ extern "C" {
 #if USE_LV_LABEL != 0
 
 #include "../lv_obj/lv_obj.h"
-#include "lvgl/misc/gfx/font.h"
-#include "lvgl/misc/gfx/text.h"
-#include "lvgl/misc/gfx/fonts/symbol_def.h"
+#include "misc/gfx/font.h"
+#include "misc/gfx/text.h"
+#include "misc/gfx/fonts/symbol_def.h"
 
 /*********************
  *      DEFINES

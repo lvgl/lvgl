@@ -12,7 +12,7 @@
 #include "lv_tabview.h"
 #include "lv_btnm.h"
 #include "../lv_themes/lv_theme.h"
-#include "lvgl/misc/gfx/anim.h"
+#include "misc/gfx/anim.h"
 
 /*********************
  *      DEFINES

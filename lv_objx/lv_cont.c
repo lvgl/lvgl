@@ -18,10 +18,10 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_draw/lv_draw_vbasic.h"
 #include "../lv_themes/lv_theme.h"
-#include "lvgl/misc/gfx/area.h"
+#include "misc/gfx/area.h"
 
-#include "lvgl/misc/gfx/color.h"
-#include "lvgl/misc/math/math_base.h"
+#include "misc/gfx/color.h"
+#include "misc/math/math_base.h"
 
 /*********************
  *      DEFINES

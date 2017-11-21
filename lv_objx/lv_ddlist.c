@@ -15,8 +15,8 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_obj/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
-#include "lvgl/misc/gfx/fonts/symbol_def.h"
-#include "lvgl/misc/gfx/anim.h"
+#include "misc/gfx/fonts/symbol_def.h"
+#include "misc/gfx/anim.h"
 
 /*********************
  *      DEFINES

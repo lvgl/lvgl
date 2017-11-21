@@ -18,7 +18,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include "lv_hal.h"
-#include "lvgl/misc/gfx/area.h"
+#include "misc/gfx/area.h"
 
 /*********************
  *      DEFINES
