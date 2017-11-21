@@ -686,7 +686,9 @@ static void tabview_realign(lv_obj_t * tabview)
 
     lv_obj_t * pages = lv_obj_get_child(ext->content, NULL);
     while(pages != NULL) {
-        lv_obj_set_size(pages, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
+        if(lv_obj_get_signal_func(pages) == tabpage_signal) {  /*Be sure adjust only the pages (user can other things)*/
+            lv_obj_set_size(pages, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
+        }
         pages = lv_obj_get_child(ext->content, pages);
     }
 
