@@ -7,14 +7,7 @@
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
-/**
- * @file lv_conf.h
- *
- */
 
-
-#ifndef LV_CONF_H
-#define LV_CONF_H
 
 /*===================
    Graphical settings
