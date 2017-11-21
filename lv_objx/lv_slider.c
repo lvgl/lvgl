@@ -400,16 +400,19 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        lv_style_t *style = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
+        lv_style_t *knob_style = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
+        cord_t shadow_w = knob_style->body.shadow.width;
         if(ext->knob_in == 0) {
-            cord_t x = MATH_MIN(w / 2, h / 2);      /*The smaller size is the knob diameter*/
+            cord_t x = MATH_MIN(w / 2 + shadow_w, h / 2 + shadow_w);      /*The smaller size is the knob diameter*/
             if(slider->ext_size < x) slider->ext_size = x;
         } else {
-            lv_style_t * style = lv_obj_get_style(slider);
             cord_t pad = MATH_MIN(style->body.padding.hor, style->body.padding.ver);
             if(pad < 0) {
                 pad = -pad;
                 if(slider->ext_size < pad) slider->ext_size = pad;
             }
+            if(slider->ext_size < shadow_w) slider->ext_size = shadow_w;
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
