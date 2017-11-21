@@ -9,7 +9,7 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "lv_draw_rbasic.h"
 #include "lv_conf.h"
-#include "misc/gfx/font.h"
+#include "lvgl/misc/gfx/font.h"
 
 /*********************
  *      DEFINES

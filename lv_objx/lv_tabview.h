@@ -122,13 +122,6 @@ void lv_tabview_set_tab_load_action(lv_obj_t *tabview, lv_tabview_action_t actio
  */
 void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
 
-/**
- * Set the height of the tab buttons
- * @param tabview pointer to a tabview object
- * @param h the new height
- */
-void lv_tabview_set_btn_height(lv_obj_t *tabview, cord_t h);
-
 
 void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t *style);
 

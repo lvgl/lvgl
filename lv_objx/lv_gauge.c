@@ -13,9 +13,9 @@
 #include "lv_gauge.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/gfx/text.h"
-#include "misc/math/trigo.h"
-#include "misc/math/math_base.h"
+#include "lvgl/misc/gfx/text.h"
+#include "lvgl/misc/math/trigo.h"
+#include "lvgl/misc/math/math_base.h"
 #include <stdio.h>
 #include <string.h>
 

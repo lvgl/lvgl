@@ -14,10 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stdbool.h>
-#include "misc/gfx/color.h"
-#include "misc/gfx/area.h"
-#include "misc/gfx/font.h"
-#include "misc/gfx/anim.h"
+#include "lvgl/misc/gfx/color.h"
+#include "lvgl/misc/gfx/area.h"
+#include "lvgl/misc/gfx/font.h"
+#include "lvgl/misc/gfx/anim.h"
 
 /*********************
  *      DEFINES

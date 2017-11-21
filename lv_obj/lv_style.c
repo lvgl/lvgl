@@ -9,7 +9,7 @@
 #include "lv_conf.h"
 #include "lv_style.h"
 #include "lv_obj.h"
-#include "misc/mem/dyn_mem.h"
+#include "lvgl/misc/mem/dyn_mem.h"
 
 /*********************
  *      DEFINES

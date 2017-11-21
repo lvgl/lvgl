@@ -12,7 +12,7 @@
 #include "lv_tabview.h"
 #include "lv_btnm.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/gfx/anim.h"
+#include "lvgl/misc/gfx/anim.h"
 
 /*********************
  *      DEFINES
@@ -209,6 +209,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     if(ext->tab_cnt == 1) {
         ext->tab_cur = 0;
         lv_tabview_set_current_tab(tabview, 0, false);
+        tabview_realign(tabview);       /*To set the proper btns height*/
     }
 
     return h;
@@ -305,19 +306,6 @@ void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms)
     ext->anim_time = anim_time_ms;
 }
 
-/**
- * Set the height of the tab buttons
- * @param tabview pointer to a tabview object
- * @param h the new height
- */
-void lv_tabview_set_btn_height(lv_obj_t *tabview, cord_t h)
-{
-    lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
-    lv_obj_set_height(ext->btns, h);
-    tabview_realign(tabview);
-}
-
-
 void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t *style)
 {
     lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
@@ -328,9 +316,11 @@ void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t
             break;
         case LV_TABVIEW_STYLE_BTN_BG:
             lv_btnm_set_style(ext->btns, LV_BTNM_STYLE_BG, style);
+            tabview_realign(tabview);
             break;
         case LV_TABVIEW_STYLE_BTN_REL:
             lv_btnm_set_style(ext->btns, LV_BTNM_STYLE_BTN_REL, style);
+            tabview_realign(tabview);
             break;
         case LV_TABVIEW_STYLE_BTN_PR:
             lv_btnm_set_style(ext->btns, LV_BTNM_STYLE_BTN_PR, style);
@@ -673,20 +663,33 @@ static void tabview_realign(lv_obj_t * tabview)
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
     lv_obj_set_width(ext->btns, lv_obj_get_width(tabview));
+
+    if(ext->tab_cnt != 0) {
+        lv_style_t * style_btn_bg = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_BTN_BG);
+        lv_style_t * style_btn_rel = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_BTN_REL);
+
+        /*Set the indicator widths*/
+        cord_t indic_width = (lv_obj_get_width(tabview) - style_btn_bg->body.padding.inner * (ext->tab_cnt - 1) -
+                2 * style_btn_bg->body.padding.hor) / ext->tab_cnt;
+        lv_obj_set_width(ext->indic, indic_width);
+
+        /*Set the tabs height*/
+        cord_t btns_height = font_get_height_scale(style_btn_rel->text.font) +
+                              2 * style_btn_rel->body.padding.ver +
+                              2 * style_btn_bg->body.padding.ver;
+        lv_obj_set_height(ext->btns, btns_height);
+
+    }
+
     lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));
     lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
     lv_obj_t * pages = lv_obj_get_child(ext->content, NULL);
     while(pages != NULL) {
         lv_obj_set_size(pages, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
         pages = lv_obj_get_child(ext->content, pages);
     }
 
-    if(ext->tab_cnt != 0) {
-        lv_style_t * style_tabs = lv_obj_get_style(ext->btns);
-        cord_t indic_width = (lv_obj_get_width(tabview) - style_tabs->body.padding.inner * (ext->tab_cnt - 1) -
-                2 * style_tabs->body.padding.hor) / ext->tab_cnt;
-        lv_obj_set_width(ext->indic, indic_width);
-    }
 
     lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
 

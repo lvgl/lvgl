@@ -11,8 +11,8 @@
 #include <stddef.h>
 #include "lv_refr.h"
 #include "lv_vdb.h"
-#include "misc/os/ptask.h"
-#include "misc/mem/fifo.h"
+#include "lvgl/misc/os/ptask.h"
+#include "lvgl/misc/mem/fifo.h"
 
 /*********************
  *      DEFINES

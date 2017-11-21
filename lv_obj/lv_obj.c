@@ -14,7 +14,7 @@
 #include "../lv_draw/lv_draw_rbasic.h"
 #include "lv_refr.h"
 #include "lv_group.h"
-#include "misc/gfx/anim.h"
+#include "lvgl/misc/gfx/anim.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -60,6 +60,9 @@ static ll_dsc_t scr_ll;                 /*Linked list of screens*/
  */
 void lv_init(void)
 {
+    /*Initialize misc. library. (Protected against re-initialization)*/
+    misc_init();
+
     /*Clear the screen*/
     area_t scr_area;
     area_set(&scr_area, 0, 0, LV_HOR_RES, LV_VER_RES);

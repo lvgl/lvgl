@@ -14,7 +14,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/gfx/text.h"
+#include "lvgl/misc/gfx/text.h"
 
 /*********************
  *      DEFINES
@@ -384,9 +384,12 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
         lv_style_t * btn_style;
 
     	area_t area_btnm;
+        lv_obj_get_coords(btnm, &area_btnm);
+
     	area_t area_tmp;
     	cord_t btn_w;
     	cord_t btn_h;
+    	bool border_mod = false;
 
     	uint16_t btn_i = 0;
     	uint16_t txt_i = 0;
@@ -396,8 +399,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 
             /*Skip hidden buttons*/
             if(button_is_hidden(ext->map_p[txt_i])) continue;
-
-			lv_obj_get_coords(btnm, &area_btnm);
 
 			area_cpy(&area_tmp, &ext->button_areas[btn_i]);
 			area_tmp.x1 += area_btnm.x1;
@@ -414,7 +415,22 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 			else if(btn_i == ext->btn_id_pr && btn_i != ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_PR);
             else if(btn_i != ext->btn_id_pr && btn_i == ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_REL);
             else if(btn_i == ext->btn_id_pr && btn_i == ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_PR);
-            lv_draw_rect(&area_tmp, mask, btn_style);
+
+			/*On the right buttons clear the border if only right borders are drawn*/
+			if(ext->map_p[txt_i + 1][0] == '\0' || ext->map_p[txt_i + 1][0] == '\n') {
+			    if(btn_style->body.border.part == LV_BORDER_RIGHT) {
+			        btn_style->body.border.part  = LV_BORDER_NONE;
+			        border_mod = true;
+			    }
+			}
+
+			lv_draw_rect(&area_tmp, mask, btn_style);
+
+			if(border_mod) {
+			    border_mod = false;
+                btn_style->body.border.part = LV_BORDER_RIGHT;
+			}
+
 
 			/*Calculate the size of the text*/
 			const font_t * font = btn_style->text.font;

@@ -11,8 +11,8 @@
 
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_obj/lv_group.h"
-#include "misc/os/ptask.h"
-#include "misc/math/math_base.h"
+#include "lvgl/misc/os/ptask.h"
+#include "lvgl/misc/math/math_base.h"
 #include "../lv_draw/lv_draw_rbasic.h"
 #include "lv_obj.h"
 
