@@ -8,15 +8,16 @@ Please create an issue to suggest a new feature instead of adding pull request t
 **Architectural changes**
 - [ ] Rename repository from *lvgl* to *littlevgl*
 - [ ] Rename repository from *proj_pc* to *pc_simulator*
-- [ ] Integrate *hal* in LittlevGL as a normal folder
-- [ ] Create a new repository for examples
+- [x] Integrate *hal* in LittlevGL as a normal folder
+- [x] Create a new repository for examples
 - [ ] Convert Applications into simple examples 
-- [ ] Add tests for all object types
+- [x] Add tests for all object types
 
 **API changes**
-- [ ] Remove LV_DOWNSCALE (LV_ANTIALIAS will be used instead)
-- [ ] Rename (and slightl rework) some function, defines and enums to be more descriptive
-- [ ] lv_btnm: rework width control. Now a control byte is used for *width*, *hide* and *no long press* settings. 
+- [x] Rework lv_style_t structure
+- [x] Remove LV_DOWNSCALE (LV_ANTIALIAS will be used instead)
+- [x] Rename (and slightly rework) some function, defines and enums to be more descriptive
+- [x] lv_btnm: rework width control. Now a control byte is used for *width*, *hide* and *no long press* settings. 
 - [x] LV_LABEL_LONG_DOTS removed, use LV_LABEL_LONG_ROLL instead
 - [x] *lv_list_set_element_text_roll()* removed.
 - [x] *lv_ddlist_set_fix_height()* instead of *auto_size*
@@ -27,4 +28,4 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [x] make styles to global variable to ensure less typing
 - [x] make fonts to global variables to ensure less typing and easy user-font adding
 - [x] join symbol fonts into normal built-in fonts
-- [ ] add inline functions to avoide direct use of anchestor functions (e.g. for buttons: lv_cont_set_fit -> lv_btn_set_fit)
+- [x] add inline functions to avoide direct use of anchestor functions (e.g. for buttons: lv_cont_set_fit -> lv_btn_set_fit)
