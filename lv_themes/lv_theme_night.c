@@ -74,7 +74,7 @@ static void btn_init(void)
     btn_rel.body.grad_color = color_hsv_to_rgb(_hue, 10, 20);
     btn_rel.body.border.color = COLOR_HEX3(0x111);
     btn_rel.body.border.width = 1 << LV_AA;
-    btn_rel.body.border.opa = OPA_80;
+    btn_rel.body.border.opa = OPA_70;
     btn_rel.body.padding.hor = LV_DPI / 4;
     btn_rel.body.padding.ver = LV_DPI / 8;
     btn_rel.body.shadow.type = LV_SHADOW_BOTTOM;
