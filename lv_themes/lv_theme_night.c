@@ -38,6 +38,7 @@ static lv_style_t btn_rel, btn_pr, btn_tgl_rel, btn_tgl_pr, btn_ina;
 static lv_style_t bar_bg, bar_indic;
 static lv_style_t slider_knob;
 static lv_style_t ddlist_bg, ddlist_sel;
+static lv_style_t lmeter_bg;
 
 /*Saved input parameters*/
 static uint16_t _hue;
@@ -78,7 +79,7 @@ static void btn_init(void)
     btn_rel.body.padding.ver = LV_DPI / 8;
     btn_rel.body.shadow.type = LV_SHADOW_BOTTOM;
     btn_rel.body.shadow.color = COLOR_HEX3(0x111);
-    btn_rel.body.shadow.width = LV_DPI / 20;
+    btn_rel.body.shadow.width = LV_DPI / 30;
     btn_rel.text.color = COLOR_HEX3(0xeee);
 
     lv_style_copy(&btn_pr, &btn_rel);
@@ -88,7 +89,7 @@ static void btn_init(void)
     lv_style_copy(&btn_tgl_rel, &btn_rel);
     btn_tgl_rel.body.main_color = color_hsv_to_rgb(_hue, 10, 20);
     btn_tgl_rel.body.grad_color = color_hsv_to_rgb(_hue, 10, 40);
-    btn_tgl_rel.body.shadow.width = LV_DPI / 30;
+    btn_tgl_rel.body.shadow.width = LV_DPI / 40;
     btn_tgl_rel.text.color = COLOR_HEX3(0xddd);
 
     lv_style_copy(&btn_tgl_pr, &btn_rel);
@@ -214,9 +215,17 @@ static void sw_init(void)
 static void lmeter_init(void)
 {
 #if USE_LV_LMETER != 0
+    lv_style_copy(&lmeter_bg, &def);
+    lmeter_bg.body.main_color = color_hsv_to_rgb(_hue, 10, 70);
+    lmeter_bg.body.grad_color = color_hsv_to_rgb(_hue, 80, 80);
+    lmeter_bg.body.padding.hor = LV_DPI / 10;           /*Scale line length*/
+    lmeter_bg.body.padding.inner = LV_DPI / 10;         /*Text padding*/
+    lmeter_bg.body.border.color = COLOR_HEX3(0x333);
+    lmeter_bg.line.color = COLOR_HEX3(0x555);
+    lmeter_bg.line.width = 2 << LV_ANTIALIAS;
+    lmeter_bg.text.color = COLOR_HEX3(0xddd);
 
-
-    theme.lmeter = &def;
+    theme.lmeter = &lmeter_bg;
 #endif
 }
 
@@ -225,14 +234,13 @@ static void gauge_init(void)
 #if USE_LV_GAUGE != 0
 
 
-    theme.gauge = &def;
+    theme.gauge = &lmeter_bg;
 #endif
 }
 
 static void chart_init(void)
 {
 #if USE_LV_CHART
-
 
     theme.chart = &def;
 #endif
@@ -315,12 +323,19 @@ static void kb_init(void)
 static void mbox_init(void)
 {
 #if USE_LV_MBOX
-
-
-    theme.mbox.bg = &def;
-    theme.mbox.btn.bg = &def;
-    theme.mbox.btn.rel = &def;
-    theme.mbox.btn.pr = &def;
+    static lv_style_t mbox_bg;
+    lv_style_copy(&mbox_bg, &bg);
+    mbox_bg.body.main_color =  color_hsv_to_rgb(_hue, 30, 30);
+    mbox_bg.body.grad_color =  color_hsv_to_rgb(_hue, 30, 30);
+    mbox_bg.body.border.color =  color_hsv_to_rgb(_hue, 11, 20);
+    mbox_bg.body.border.width = 1 << LV_AA;
+    mbox_bg.body.shadow.width = LV_DPI / 10;
+    mbox_bg.body.shadow.color = COLOR_HEX3(0x222);
+    mbox_bg.body.radius = LV_DPI / 20;
+    theme.mbox.bg = &mbox_bg;
+    theme.mbox.btn.bg = &lv_style_transp;
+    theme.mbox.btn.rel = &btn_rel;
+    theme.mbox.btn.pr = &btn_pr;
 #endif
 }
 
@@ -339,9 +354,21 @@ static void ta_init(void)
 {
 #if USE_LV_TA
 
+    static lv_style_t list_ta;
 
-    theme.ta.area = &def;
-    theme.ta.oneline = &def;
+    lv_style_copy(&list_ta, &bg);
+    list_ta.body.main_color = color_hsv_to_rgb(_hue, 11, 18);
+    list_ta.body.grad_color = color_hsv_to_rgb(_hue, 11, 18);
+    list_ta.body.radius = LV_DPI / 30;
+    list_ta.body.border.color = color_hsv_to_rgb(_hue, 10, 10);
+    list_ta.body.border.width = 1 << LV_AA;
+    list_ta.body.border.opa = OPA_COVER;
+    list_ta.body.padding.ver = LV_DPI / 10;
+    list_ta.body.padding.hor = LV_DPI / 10;
+
+    theme.ta.area = &list_ta;
+    theme.ta.oneline = &list_ta;
+    theme.ta.cursor = NULL;
     theme.ta.sb = &def;
 #endif
 }
@@ -412,8 +439,8 @@ static void ddlist_init(void)
     ddlist_bg.body.radius = LV_DPI / 30;
 
     lv_style_copy(&ddlist_sel, &btn_rel);
-    ddlist_sel.body.main_color = color_hsv_to_rgb(_hue, 10, 50);
-    ddlist_sel.body.grad_color = color_hsv_to_rgb(_hue, 10, 50);
+    ddlist_sel.body.main_color = color_hsv_to_rgb(_hue, 20, 50);
+    ddlist_sel.body.grad_color = color_hsv_to_rgb(_hue, 20, 50);
     ddlist_sel.body.radius = 0;
 
     theme.ddlist.bg = &ddlist_bg;
@@ -458,15 +485,36 @@ static void tabview_init(void)
 static void win_init(void)
 {
 #if USE_LV_WIN != 0
+    static lv_style_t win_bg;
+    lv_style_copy(&win_bg, &bg);
+    win_bg.body.main_color = color_hsv_to_rgb(_hue, 10, 60);
+    win_bg.body.grad_color = color_hsv_to_rgb(_hue, 10, 60);
+    win_bg.body.radius = LV_DPI / 20;
+    win_bg.body.border.color = COLOR_HEX3(0x333);
+    win_bg.body.border.width = 1 << LV_AA;
+    win_bg.body.border.width = 1 << LV_AA;
 
+    static lv_style_t win_header;
+    lv_style_copy(&win_header, &win_bg);
+    win_header.body.main_color = color_hsv_to_rgb(_hue, 10, 20);
+    win_header.body.grad_color = color_hsv_to_rgb(_hue, 10, 20);
+    win_header.body.radius = 0;
+    win_header.body.padding.hor = 0;
+    win_header.body.padding.ver = 0;
+    win_header.body.padding.ver = 0;
 
-    theme.win.bg = &def;
+    static lv_style_t win_btn_pr;
+    lv_style_copy(&win_btn_pr, &lv_style_plain);
+    win_btn_pr.body.main_color = color_hsv_to_rgb(_hue, 10, 10);
+    win_btn_pr.body.grad_color = color_hsv_to_rgb(_hue, 10, 10);
+
+    theme.win.bg = &win_bg;
     theme.win.sb = &def;
-    theme.win.header = &def;
-    theme.win.content.bg = &def;
-    theme.win.content.scrl = &def;
-    theme.win.btn.rel = &def;
-    theme.win.btn.pr = &def;
+    theme.win.header = &win_header;
+    theme.win.content.bg = &lv_style_transp;
+    theme.win.content.scrl = &lv_style_transp;
+    theme.win.btn.rel = &lv_style_transp;
+    theme.win.btn.pr = &win_btn_pr;
 #endif
 }
 

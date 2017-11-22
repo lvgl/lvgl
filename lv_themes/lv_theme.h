@@ -167,6 +167,7 @@ typedef struct {
     struct {
         lv_style_t *area;
         lv_style_t *oneline;
+        lv_style_t *cursor;
         lv_style_t *sb;
     }ta;
 #endif

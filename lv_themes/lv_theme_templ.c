@@ -241,6 +241,7 @@ static void ta_init(void)
 
     theme.ta.area = &def;
     theme.ta.oneline = &def;
+    theme.ta.cursor = NULL;     /*Let library to calculate the cursor's style*/
     theme.ta.sb = &def;
 #endif
 }

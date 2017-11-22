@@ -353,7 +353,7 @@ static void lmeter_init(void)
     lmeter_bg.body.main_color = color_hsv_to_rgb(_hue, 10, 70);
     lmeter_bg.body.grad_color = color_hsv_to_rgb(_hue, 80, 80);
     lmeter_bg.body.padding.hor = LV_DPI / 8;         /*Scale line length*/
-    lmeter_bg.line.color = COLOR_HEX3(0x555);
+    lmeter_bg.line.color = COLOR_HEX3(0x222);
     lmeter_bg.line.width = 2 << LV_ANTIALIAS;
 
     theme.lmeter = &lmeter_bg;
@@ -519,6 +519,7 @@ static void ta_init(void)
 #if USE_LV_TA
     theme.ta.area = &panel;
     theme.ta.oneline = &panel;
+    theme.ta.cursor = NULL;
     theme.ta.sb = &sb;
 #endif
 }

@@ -280,6 +280,7 @@ static void ta_init(void)
 
     theme.ta.area = &lv_style_pretty;
     theme.ta.oneline = &lv_style_pretty;
+    theme.ta.cursor = NULL;
     theme.ta.sb = &sb;
 #endif
 }
