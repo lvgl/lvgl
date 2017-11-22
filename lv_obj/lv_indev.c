@@ -128,6 +128,7 @@ void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj)
     lv_obj_set_pos(indev->cursor, indev->state.act_point.x,  indev->state.act_point.y);
 }
 
+#if LV_OBJ_GROUP
 /**
  * Set a destination group for a keypad input device
  * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_KEYPAD')
@@ -137,7 +138,7 @@ void lv_indev_set_group(lv_indev_t *indev, lv_group_t *group)
 {
     indev->group = group;
 }
-
+#endif
 
 /**
  * Get the last point of an input device
@@ -281,12 +282,12 @@ static void indev_proc_task(void * param)
 static void indev_proc_point(lv_indev_state_t * indev)
 {
     if(indev->event == LV_INDEV_EVENT_PR){
-#if LV_INDEV_TP_MARKER != 0
+#if LV_INDEV_POINT_MARKER != 0
         area_t area;
-        area.x1 = x - (LV_INDEV_POINT_MARKER >> 1);
-        area.y1 = y - (LV_INDEV_POINT_MARKER >> 1);
-        area.x2 = x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        area.y2 = y + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
+        area.x1 = (indev->act_point.x >> LV_ANTIALIAS) - (LV_INDEV_POINT_MARKER >> 1);
+        area.y1 = (indev->act_point.y >> LV_ANTIALIAS) - (LV_INDEV_POINT_MARKER >> 1);
+        area.x2 = (indev->act_point.x >> LV_ANTIALIAS) + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
+        area.y2 = (indev->act_point.y >> LV_ANTIALIAS) + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
         lv_rfill(&area, NULL, COLOR_MAKE(0xFF, 0, 0), OPA_COVER);
 #endif
         indev_proc_press(indev);

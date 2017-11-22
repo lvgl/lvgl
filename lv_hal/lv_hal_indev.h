@@ -53,7 +53,6 @@ typedef struct {
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct {
-    const char * name;                              /*Input device name*/
     lv_hal_indev_type_t type;                       /*Input device type*/
     bool (*get_data)(lv_indev_data_t *data);        /*Function pointer to read data. Return 'true' if there is still data to be read (buffered)*/
 }lv_indev_drv_t;
