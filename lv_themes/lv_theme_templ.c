@@ -53,6 +53,15 @@ static void basic_init(void)
 
 }
 
+static void cont_init(void)
+{
+#if USE_LV_CONT != 0
+
+
+    theme.cont = &def;
+#endif
+}
+
 static void btn_init(void)
 {
 #if USE_LV_BTN != 0
@@ -289,7 +298,6 @@ static void tabview_init(void)
 
 
     theme.tabview.bg = &def;
-    theme.tabview.sb = &def;
     theme.tabview.indic = &def;
     theme.tabview.btn.bg = &def;
     theme.tabview.btn.rel = &def;
@@ -343,6 +351,7 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, font_t *font)
     }
 
     basic_init();
+    cont_init();
     btn_init();
     label_init();
     img_init();
@@ -373,7 +382,7 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, font_t *font)
  * Get a pointer to the theme
  * @return pointer to the theme
  */
-lv_theme_t * lv_theme_get_deafult(void)
+lv_theme_t * lv_theme_get_templ(void)
 {
     return &theme;
 }

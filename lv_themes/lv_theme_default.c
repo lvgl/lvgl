@@ -74,11 +74,11 @@ static void basic_init(void)
 static void btn_init(void)
 {
 #if USE_LV_BTN != 0
-    theme.btn.rel = &lv_style_btn_released;
-    theme.btn.pr = &lv_style_btn_pressed;
+    theme.btn.rel = &lv_style_btn_rel;
+    theme.btn.pr = &lv_style_btn_pr;
     theme.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.btn.tgl_pr =  &lv_style_btn_tgl_pressed;
-    theme.btn.ina =  &lv_style_btn_inactive;
+    theme.btn.tgl_pr =  &lv_style_btn_tgl_pr;
+    theme.btn.ina =  &lv_style_btn_ina;
 #endif
 }
 
@@ -213,10 +213,10 @@ static void cb_init(void)
 
     theme.cb.bg = &lv_style_transp;
     theme.cb.box.rel = &lv_style_pretty;
-    theme.cb.box.pr = &lv_style_btn_pressed;
+    theme.cb.box.pr = &lv_style_btn_pr;
     theme.cb.box.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.cb.box.tgl_pr = &lv_style_btn_tgl_pressed;
-    theme.cb.box.ina = &lv_style_btn_inactive;
+    theme.cb.box.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.cb.box.ina = &lv_style_btn_ina;
 #endif
 }
 
@@ -227,11 +227,11 @@ static void btnm_init(void)
 
 
     theme.btnm.bg = &lv_style_pretty;
-    theme.btnm.btn.rel = &lv_style_btn_released;
-    theme.btnm.btn.pr = &lv_style_btn_pressed;
+    theme.btnm.btn.rel = &lv_style_btn_rel;
+    theme.btnm.btn.pr = &lv_style_btn_pr;
     theme.btnm.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.btnm.btn.tgl_pr = &lv_style_btn_tgl_pressed;
-    theme.btnm.btn.ina = &lv_style_btn_inactive;
+    theme.btnm.btn.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.btnm.btn.ina = &lv_style_btn_ina;
 #endif
 }
 
@@ -241,11 +241,11 @@ static void kb_init(void)
 
 
     theme.kb.bg = &lv_style_pretty;
-    theme.kb.btn.rel = &lv_style_btn_released;
-    theme.kb.btn.pr = &lv_style_btn_pressed;
+    theme.kb.btn.rel = &lv_style_btn_rel;
+    theme.kb.btn.pr = &lv_style_btn_pr;
     theme.kb.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.kb.btn.tgl_pr = &lv_style_btn_tgl_pressed;
-    theme.kb.btn.ina = &lv_style_btn_inactive;
+    theme.kb.btn.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.kb.btn.ina = &lv_style_btn_ina;
 #endif
 
 }
@@ -257,8 +257,8 @@ static void mbox_init(void)
 
     theme.mbox.bg = &lv_style_pretty;
     theme.mbox.btn.bg = &lv_style_transp;
-    theme.mbox.btn.rel = &lv_style_btn_released;
-    theme.mbox.btn.pr = &lv_style_btn_tgl_pressed;
+    theme.mbox.btn.rel = &lv_style_btn_rel;
+    theme.mbox.btn.pr = &lv_style_btn_tgl_pr;
 #endif
 }
 
@@ -293,11 +293,11 @@ static void list_init(void)
     theme.list.bg = &lv_style_pretty;
     theme.list.scrl = &lv_style_transp;
     theme.list.sb = &sb;
-    theme.list.btn.rel = &lv_style_btn_released;
-    theme.list.btn.pr = &lv_style_btn_pressed;
+    theme.list.btn.rel = &lv_style_btn_rel;
+    theme.list.btn.pr = &lv_style_btn_pr;
     theme.list.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.list.btn.tgl_pr = &lv_style_btn_tgl_pressed;
-    theme.list.btn.ina = &lv_style_btn_inactive;
+    theme.list.btn.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.list.btn.ina = &lv_style_btn_ina;
 #endif
 }
 
@@ -328,13 +328,12 @@ static void tabview_init(void)
 
 
     theme.tabview.bg = &plain_bordered;
-    theme.tabview.sb = &sb;
     theme.tabview.indic = &lv_style_plain_color;
     theme.tabview.btn.bg = &lv_style_transp;
-    theme.tabview.btn.rel = &lv_style_btn_released;
-    theme.tabview.btn.pr = &lv_style_btn_pressed;
+    theme.tabview.btn.rel = &lv_style_btn_rel;
+    theme.tabview.btn.pr = &lv_style_btn_pr;
     theme.tabview.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.tabview.btn.tgl_pr = &lv_style_btn_tgl_pressed;
+    theme.tabview.btn.tgl_pr = &lv_style_btn_tgl_pr;
 #endif
 }
 
@@ -349,8 +348,8 @@ static void win_init(void)
     theme.win.header = &lv_style_plain_color;
     theme.win.content.bg = &lv_style_transp;
     theme.win.content.scrl = &lv_style_transp;
-    theme.win.btn.rel = &lv_style_btn_released;
-    theme.win.btn.pr = &lv_style_btn_pressed;
+    theme.win.btn.rel = &lv_style_btn_rel;
+    theme.win.btn.pr = &lv_style_btn_pr;
 #endif
 }
 
@@ -412,7 +411,7 @@ lv_theme_t * lv_theme_default_init(uint16_t hue, font_t *font)
  * Get a pointer to the theme
  * @return pointer to the theme
  */
-lv_theme_t * lv_theme_get_templ(void)
+lv_theme_t * lv_theme_get_default(void)
 {
     return &theme;
 }

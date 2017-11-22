@@ -587,17 +587,17 @@ static void roller_init(void)
     lv_style_copy(&roller_bg, &ddlist_bg);
     roller_bg.text.line_space = LV_DPI / 6;
     roller_bg.body.radius = LV_DPI / 20;
-    roller_bg.body.main_color = COLOR_HEX3(0x333);
-    roller_bg.body.grad_color = COLOR_HEX3(0x999);
+    roller_bg.body.main_color = COLOR_HEX3(0x222);
+    roller_bg.body.grad_color = COLOR_HEX3(0x666);
     roller_bg.body.border.opa = OPA_30;
     roller_bg.text.opa = OPA_70;
     roller_bg.text.color = color_hsv_to_rgb(_hue, 20, 70);
-    roller_bg.body.shadow.width = LV_DPI / 20;
-    roller_bg.body.shadow.color = COLOR_HEX3(0x444);
+    roller_bg.body.shadow.width = 0;
 
     lv_style_copy(&roller_sel, &panel);
     roller_sel.body.empty = 1;
     roller_sel.body.radius = 0;
+    roller_sel.text.opa = OPA_COVER;
     roller_sel.text.color = color_hsv_to_rgb(_hue, 70, 95);
 
     theme.roller.bg = &roller_bg;
@@ -613,7 +613,7 @@ static void tabview_init(void)
     tab_rel.body.main_color = COLOR_HEX3(0x666);
     tab_rel.body.grad_color = COLOR_HEX3(0x666);
     tab_rel.body.padding.hor = 0;
-    tab_rel.body.padding.ver = 0;
+    tab_rel.body.padding.ver = LV_DPI / 6;
     tab_rel.body.padding.inner = 0;
     tab_rel.body.border.width = 1 << LV_ANTIALIAS;
     tab_rel.body.border.color = COLOR_SILVER;
@@ -628,7 +628,7 @@ static void tabview_init(void)
     lv_style_copy(&tab_trel, &def);
     tab_trel.body.empty = 1;
     tab_trel.body.padding.hor = 0;
-    tab_trel.body.padding.ver = 0;
+    tab_trel.body.padding.ver = LV_DPI / 6;
     tab_trel.body.padding.inner = 0;
     tab_trel.body.border.width = 1 << LV_ANTIALIAS;
     tab_trel.body.border.color = COLOR_SILVER;
@@ -640,7 +640,7 @@ static void tabview_init(void)
     tab_tpr.body.main_color = COLOR_GRAY;
     tab_tpr.body.grad_color = COLOR_GRAY;
     tab_tpr.body.padding.hor = 0;
-    tab_tpr.body.padding.ver = 0;
+    tab_tpr.body.padding.ver = LV_DPI / 6;
     tab_tpr.body.padding.inner = 0;
     tab_tpr.body.border.width = 1 << LV_ANTIALIAS;
     tab_tpr.body.border.color = COLOR_SILVER;

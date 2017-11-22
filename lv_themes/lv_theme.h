@@ -29,10 +29,7 @@ typedef struct {
     lv_style_t *panel;
 
 #if USE_LV_CONT != 0
-    struct {
-        lv_style_t *filled;
-        lv_style_t *frame;
-    }cont;
+    lv_style_t *cont;
 #endif
 #if USE_LV_BTN != 0
     struct {
@@ -205,7 +202,6 @@ typedef struct {
 #if USE_LV_TABVIEW != 0
     struct {
         lv_style_t *bg;
-        lv_style_t *sb;
         lv_style_t *indic;
         struct {
             lv_style_t *bg;

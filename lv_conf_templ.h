@@ -64,9 +64,9 @@
 #define USE_LV_THEME_TEMPL      0       /*Just for test*/
 #define USE_LV_THEME_DEFAULT    0       /*Built manly from the built-in styles. Consumes very few RAM*/
 #define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
+#define USE_LV_THEME_NIGHT      0       /*Dark elegant theme*/
 #define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows (Planned)*/
 #define USE_LV_THEME_ZEN        0       /*Peaceful, mainly black and white theme (Planned)*/
-#define USE_LV_THEME_NIGHT      0       /*Dark elegant theme (Planned)*/
 
 /*==================
  *  LV OBJ X USAGE 
