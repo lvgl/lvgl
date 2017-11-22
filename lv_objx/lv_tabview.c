@@ -69,7 +69,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
     dm_assert(ext);
 
     /*Initialize the allocated 'ext' */
-    ext->drag_h = 0;
+    ext->drag_hor = 0;
     ext->draging = 0;
     ext->tab_cur = 0;
     ext->point_last.x = 0;
@@ -570,15 +570,15 @@ static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 
     if(ext->draging == 0) {
         if(x_diff >= LV_INDEV_DRAG_LIMIT || x_diff<= -LV_INDEV_DRAG_LIMIT) {
-            ext->drag_h = 1;
+            ext->drag_hor = 1;
             ext->draging = 1;
             lv_obj_set_drag(lv_page_get_scrl(tabpage), false);
         } else if(y_diff >= LV_INDEV_DRAG_LIMIT || y_diff <= -LV_INDEV_DRAG_LIMIT) {
-            ext->drag_h = 0;
+            ext->drag_hor = 0;
             ext->draging = 1;
         }
     }
-    if(ext->drag_h != 0) {
+    if(ext->drag_hor) {
         lv_obj_set_x(ext->content, lv_obj_get_x(ext->content) + point_act.x - ext->point_last.x);
         ext->point_last.x = point_act.x;
         ext->point_last.y = point_act.y;
@@ -601,7 +601,7 @@ static void tabpage_pressing_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    ext->drag_h = 0;
+    ext->drag_hor = 0;
     ext->draging = 0;
 
     lv_obj_set_drag(lv_page_get_scrl(tabpage), true);
@@ -609,12 +609,13 @@ static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
     lv_indev_t * indev = lv_indev_get_act();
     point_t point_act;
     lv_indev_get_point(indev, &point_act);
-    cord_t x_diff = point_act.x - ext->point_last.x;
+    point_t vect;
+    lv_indev_get_vect(indev, &vect);
     cord_t x_predict = 0;
 
-    while(x_diff != 0)   {
-        x_predict += x_diff;
-        x_diff = x_diff * (100 - LV_INDEV_DRAG_THROW) / 100;
+    while(vect.x != 0)   {
+        x_predict += vect.x;
+        vect.x = vect.x * (100 - LV_INDEV_DRAG_THROW) / 100;
     }
 
     cord_t page_x1 = tabpage->coords.x1 - tabview->coords.x1 + x_predict;
@@ -678,7 +679,6 @@ static void tabview_realign(lv_obj_t * tabview)
                               2 * style_btn_rel->body.padding.ver +
                               2 * style_btn_bg->body.padding.ver;
         lv_obj_set_height(ext->btns, btns_height);
-
     }
 
     lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));

@@ -55,7 +55,7 @@ typedef struct
     uint16_t tab_cnt;
     uint16_t anim_time;
     uint8_t draging :1;
-    uint8_t drag_h :1;
+    uint8_t drag_hor :1;
     lv_tabview_action_t tab_load_action;
 }lv_tabview_ext_t;
 
