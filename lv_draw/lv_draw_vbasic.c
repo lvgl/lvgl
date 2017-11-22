@@ -484,7 +484,7 @@ static void sw_color_cpy(color_t * dest, const color_t * src, uint32_t length, o
 /**
  *
  * @param mem_area coordinates of 'mem' memory area
- * @param mem a memory address. Considered to a rectangual window according to 'mem_area'
+ * @param mem a memory address. Considered to a rectangular window according to 'mem_area'
  * @param fill_area coordinates of an area to fill. Relative to 'mem_area'.
  * @param color fill color
  * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
