@@ -208,8 +208,8 @@ static void indev_proc_task(void * param)
             i->state.long_pr_sent = 0;
             i->state.pr_timestamp = 0;
             i->state.longpr_rep_timestamp = 0;
-            i->state.vect_sum.x = 0;
-            i->state.vect_sum.y = 0;
+            i->state.drag_sum.x = 0;
+            i->state.drag_sum.y = 0;
             i->state.reset_query = 0;
         }
 
@@ -261,8 +261,8 @@ static void indev_proc_task(void * param)
             i->state.long_pr_sent = 0;
             i->state.pr_timestamp = 0;
             i->state.longpr_rep_timestamp = 0;
-            i->state.vect_sum.x = 0;
-            i->state.vect_sum.y = 0;
+            i->state.drag_sum.x = 0;
+            i->state.drag_sum.y = 0;
             i->state.reset_query = 0;
         }
 
@@ -342,8 +342,8 @@ static void indev_proc_press(lv_indev_state_t * state)
             state->long_pr_sent = 0;
             state->drag_range_out = 0;
             state->drag_in_prog = 0;
-            state->vect_sum.x = 0;
-            state->vect_sum.y = 0;
+            state->drag_sum.x = 0;
+            state->drag_sum.y = 0;
 
             /*Search for 'top' attribute*/
             lv_obj_t * i = pr_obj;
@@ -501,12 +501,12 @@ static void indev_drag(lv_indev_state_t * state)
 
     /*If still there is no drag then count the movement*/
     if(state->drag_range_out == 0) {
-        state->vect_sum.x += state->vect.x;
-        state->vect_sum.y += state->vect.y;
+        state->drag_sum.x += state->vect.x;
+        state->drag_sum.y += state->vect.y;
         
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if(MATH_ABS(state->vect_sum.x) >= LV_INDEV_DRAG_LIMIT ||
-           MATH_ABS(state->vect_sum.y) >= LV_INDEV_DRAG_LIMIT)
+        if(MATH_ABS(state->drag_sum.x) >= LV_INDEV_DRAG_LIMIT ||
+           MATH_ABS(state->drag_sum.y) >= LV_INDEV_DRAG_LIMIT)
            {
                 state->drag_range_out = 1;
            }

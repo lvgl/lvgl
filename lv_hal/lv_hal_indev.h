@@ -67,7 +67,7 @@ typedef struct _lv_indev_state_t {
             point_t act_point;
             point_t last_point;
             point_t vect;
-            point_t vect_sum;
+            point_t drag_sum;				/*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
             struct _lv_obj_t * act_obj;
             struct _lv_obj_t * last_obj;
 
