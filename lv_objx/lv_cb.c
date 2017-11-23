@@ -24,8 +24,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mode);
-static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_mode_t mode);
+static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode);
+static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
 
 /**********************
@@ -211,7 +211,7 @@ lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mode)
+static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
@@ -242,7 +242,7 @@ static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mo
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_mode_t mode)
+static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_bullet_design(bullet, mask, mode);
@@ -255,7 +255,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
         lv_obj_t * bg = lv_obj_get_parent(bullet);
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
-        if(style_page->body.empty != 0 || style_page->body.opa == OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.empty != 0 || style_page->body.opa == LV_OPA_TRANSP) { /*Background is visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);
@@ -295,7 +295,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     lv_style_t * style = lv_obj_get_style(cb);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_set_size(ext->bullet, font_get_height_scale(style->text.font), font_get_height_scale(style->text.font));
+        lv_obj_set_size(ext->bullet, lv_font_get_height_scale(style->text.font), lv_font_get_height_scale(style->text.font));
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_PRESSED ||
         sign == LV_SIGNAL_RELEASED ||

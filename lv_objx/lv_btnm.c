@@ -29,13 +29,13 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
-static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_t mode);
+static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mode_t mode);
 static uint8_t get_button_width(const char * btn_str);
 static bool button_is_hidden(const char * btn_str);
 static bool button_is_repeat_disabled(const char * btn_str);
 static bool button_is_inactive(const char * btn_str);
 const char * cut_ctrl_byte(const char * btn_str);
-static uint16_t get_button_from_point(lv_obj_t * btnm, point_t * p);
+static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p);
 static uint16_t get_button_text(lv_obj_t * btnm, uint16_t btn_id);
 static void create_buttons(lv_obj_t * btnm, const char ** map);
 
@@ -151,9 +151,9 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 
 	/*Set size and positions of the buttons*/
 	lv_style_t * btnms = lv_obj_get_style(btnm);
-	cord_t max_w = lv_obj_get_width(btnm) - 2 * btnms->body.padding.hor;
-	cord_t max_h = lv_obj_get_height(btnm) - 2 * btnms->body.padding.ver;
-	cord_t act_y = btnms->body.padding.ver;
+	lv_coord_t max_w = lv_obj_get_width(btnm) - 2 * btnms->body.padding.hor;
+	lv_coord_t max_h = lv_obj_get_height(btnm) - 2 * btnms->body.padding.ver;
+	lv_coord_t act_y = btnms->body.padding.ver;
 
 	/*Count the lines to calculate button height*/
 	uint8_t line_cnt = 1;
@@ -162,7 +162,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 			if(strcmp(map[li], "\n") == 0) line_cnt ++;
 	}
 
-	cord_t btn_h = max_h - ((line_cnt - 1) * btnms->body.padding.inner);
+	lv_coord_t btn_h = max_h - ((line_cnt - 1) * btnms->body.padding.inner);
 	btn_h = btn_h / line_cnt;
 
 	/* Count the units and the buttons in a line
@@ -188,12 +188,12 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 		/*Only deal with the non empty lines*/
 		if(btn_cnt != 0) {
 			/*Calculate the width of all units*/
-			cord_t all_unit_w = max_w - ((btn_cnt-1) * btnms->body.padding.inner);
+			lv_coord_t all_unit_w = max_w - ((btn_cnt-1) * btnms->body.padding.inner);
 
 			/*Set the button size and positions and set the texts*/
 			uint16_t i;
-			cord_t act_x = btnms->body.padding.hor;
-			cord_t act_unit_w;
+			lv_coord_t act_x = btnms->body.padding.hor;
+			lv_coord_t act_unit_w;
 			unit_act_cnt = 0;
 			for(i = 0; i < btn_cnt; i++) {
 				/* one_unit_w = all_unit_w / unit_cnt
@@ -204,7 +204,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 				/*Always recalculate act_x because of rounding errors */
 				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->body.padding.inner + btnms->body.padding.hor;
 
-				area_set(&ext->button_areas[btn_i], act_x,
+				lv_area_set(&ext->button_areas[btn_i], act_x,
 						                         act_y,
 						                         act_x + act_unit_w,
 				                                 act_y + btn_h);
@@ -369,7 +369,7 @@ lv_style_t * lv_btnm_get_style(lv_obj_t *btnm, lv_btnm_style_t type)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_t mode)
+static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design_f(btnm, mask, mode);
@@ -383,12 +383,12 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
         lv_style_t * bg_style = lv_obj_get_style(btnm);
         lv_style_t * btn_style;
 
-    	area_t area_btnm;
+    	lv_area_t area_btnm;
         lv_obj_get_coords(btnm, &area_btnm);
 
-    	area_t area_tmp;
-    	cord_t btn_w;
-    	cord_t btn_h;
+    	lv_area_t area_tmp;
+    	lv_coord_t btn_w;
+    	lv_coord_t btn_h;
     	bool border_mod = false;
 
     	uint16_t btn_i = 0;
@@ -433,8 +433,8 @@ static bool lv_btnm_design(lv_obj_t * btnm, const area_t * mask, lv_design_mode_
 
 
 			/*Calculate the size of the text*/
-			const font_t * font = btn_style->text.font;
-			point_t txt_size;
+			const lv_font_t * font = btn_style->text.font;
+			lv_point_t txt_size;
 			txt_get_size(&txt_size, ext->map_p[txt_i], font,
 			             btn_style->text.letter_space, btn_style->text.line_space,
 					     area_get_width(&area_btnm), TXT_FLAG_NONE);
@@ -468,11 +468,11 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    area_t btnm_area;
-    area_t btn_area;
-    point_t p;
+    lv_area_t btnm_area;
+    lv_area_t btn_area;
+    lv_point_t p;
     if(sign == LV_SIGNAL_CLEANUP) {
-        dm_free(ext->button_areas);
+        lv_mem_free(ext->button_areas);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_CORD_CHG) {
         lv_btnm_set_map(btnm, ext->map_p);
@@ -604,11 +604,11 @@ static void create_buttons(lv_obj_t * btnm, const char ** map)
 	lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
 	if(ext->button_areas != NULL) {
-		dm_free(ext->button_areas);
+		lv_mem_free(ext->button_areas);
 		ext->button_areas = NULL;
 	}
 
-	ext->button_areas = dm_alloc(sizeof(area_t) * btn_cnt);
+	ext->button_areas = lv_mem_alloc(sizeof(lv_area_t) * btn_cnt);
 	ext->btn_cnt = btn_cnt;
 }
 
@@ -673,10 +673,10 @@ const char * cut_ctrl_byte(const char * btn_str)
  * @param p a point with absolute coordinates
  * @return the id of the button or LV_BTNM_PR_NONE.
  */
-static uint16_t get_button_from_point(lv_obj_t * btnm, point_t * p)
+static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
 {
-    area_t btnm_cords;
-    area_t btn_area;
+    lv_area_t btnm_cords;
+    lv_area_t btn_area;
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     uint16_t i;
     lv_obj_get_coords(btnm, &btnm_cords);
@@ -687,7 +687,7 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, point_t * p)
         btn_area.y1 += btnm_cords.y1;
         btn_area.x2 += btnm_cords.x1;
         btn_area.y2 += btnm_cords.y1;
-        if(area_is_point_on(&btn_area, p) != false) {
+        if(lv_area_is_point_on(&btn_area, p) != false) {
             break;
         }
     }

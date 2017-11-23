@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_SYMBOL_10_BASIC != 0
+#if  USE_LV_FONT_SYMBOL_10_BASIC != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -189,7 +189,7 @@ static const uint8_t symbol_10_basic_width[] =
      7,  8,  8, 10, 10, 11, 
 };
 
-font_t font_symbol_10_basic = 
+lv_font_t lv_font_symbol_10_basic = 
 {
 #if TXT_UTF8 == 0
     192,        /*First letter's unicode */

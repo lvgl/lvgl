@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t mode);
+static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 
 /**********************
@@ -129,12 +129,12 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
     new_value = value > ext->max_value ? ext->max_value : value;
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
 
-    anim_t a;
+    lv_anim_t a;
     a.var = bar;
     a.start = ext->cur_value;
     a.end = new_value;
-    a.fp = (anim_fp_t)lv_bar_set_value;
-    a.path = anim_get_path(ANIM_PATH_LIN);
+    a.fp = (lv_anim_fp_t)lv_bar_set_value;
+    a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
     a.end_cb = NULL;
     a.act_time = 0;
     a.time = anim_time;
@@ -143,7 +143,7 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
     a.repeat = 0;
     a.repeat_pause = 0;
 
-    anim_create(&a);
+    lv_anim_create(&a);
 
 }
 
@@ -263,7 +263,7 @@ lv_style_t * lv_bar_get_style(lv_obj_t *bar, lv_bar_style_t type)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t mode)
+static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask area*/
@@ -274,15 +274,15 @@ static bool lv_bar_design(lv_obj_t * bar, const area_t * mask, lv_design_mode_t 
 		lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
         lv_style_t *style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
-		area_t indic_area;
+		lv_area_t indic_area;
 		area_cpy(&indic_area, &bar->coords);
 		indic_area.x1 += style_indic->body.padding.hor;
 		indic_area.x2 -= style_indic->body.padding.hor;
 		indic_area.y1 += style_indic->body.padding.ver;
 		indic_area.y2 -= style_indic->body.padding.ver;
 
-		cord_t w = area_get_width(&indic_area);
-        cord_t h = area_get_height(&indic_area);
+		lv_coord_t w = area_get_width(&indic_area);
+        lv_coord_t h = area_get_height(&indic_area);
 
 		if(w >= h) {
 		    indic_area.x2 = (int32_t) ((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);

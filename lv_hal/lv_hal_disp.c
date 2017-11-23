@@ -50,7 +50,7 @@ lv_disp_t * lv_disp_register(lv_disp_drv_t *driver)
 {
     lv_disp_t *node;
 
-    node = dm_alloc(sizeof(lv_disp_t));
+    node = lv_mem_alloc(sizeof(lv_disp_t));
     if (!node) return NULL;
 
     memcpy(&node->driver,driver, sizeof(lv_disp_drv_t));
@@ -109,7 +109,7 @@ lv_disp_t * lv_disp_next(lv_disp_t * disp)
  * @param y2 bottom coordinate of the rectangle
  * @param color fill color
  */
-void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color)
+void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color)
 {
     if(active == NULL) return;
     if(active->driver.fill != NULL) active->driver.fill(x1, y1, x2, y2, color);
@@ -123,7 +123,7 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color)
  * @param y2 bottom coordinate of the rectangle
  * @param color_map pointer to an array of colors
  */
-void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t * color_map)
+void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_map)
 {
     if(active == NULL) return;
     if(active->driver.map != NULL)  active->driver.map(x1, y1, x2, y2, color_map);
@@ -136,9 +136,9 @@ void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t *
  * @param dest a memory address. Copy 'src' here.
  * @param src pointer to pixel map. Copy it to 'dest'.
  * @param length number of pixels in 'src'
- * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
+ * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
  */
-void lv_disp_copy(color_t * dest, const color_t * src, uint32_t length, opa_t opa)
+void lv_disp_copy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
 {
     if(active == NULL) return;
     if(active->driver.copy != NULL) active->driver.copy(dest, src, length, opa);

@@ -204,14 +204,14 @@ fs_res_t ufs_remove(const char * fn)
     if(ent->oc != 0) return FS_RES_DENIED;
     
     ll_rem(&file_ll, ent);
-    dm_free(ent->fn_d);
+    lv_mem_free(ent->fn_d);
     ent->fn_d = NULL;
     if(ent->const_data == 0){
-        dm_free(ent->data_d);
+        lv_mem_free(ent->data_d);
         ent->data_d = NULL;
     }
     
-    dm_free(ent);
+    lv_mem_free(ent);
     
     return FS_RES_OK;
 }
@@ -282,7 +282,7 @@ fs_res_t ufs_write (void * file_p, const void * buf, uint32_t btw, uint32_t * bw
     /*Reallocate data array if it necessary*/
     uint32_t new_size = fp->rwp + btw;
     if(new_size > ent->size) {
-        uint8_t* new_data = dm_realloc(ent->data_d, new_size);
+        uint8_t* new_data = lv_mem_realloc(ent->data_d, new_size);
         if(new_data == NULL) return FS_RES_FULL; /*Cannot allocate the new memory*/
             
         ent->data_d = new_data;
@@ -317,7 +317,7 @@ fs_res_t ufs_seek (void * file_p, uint32_t pos)
     } else { /*Expand the file size*/
         if(fp->aw == 0) return FS_RES_DENIED;       /*Not opened for write*/
         
-        uint8_t* new_data = dm_realloc(ent->data_d, pos);
+        uint8_t* new_data = lv_mem_realloc(ent->data_d, pos);
         if(new_data == NULL) return FS_RES_FULL; /*Out of memory*/
             
         ent->data_d = new_data;
@@ -357,7 +357,7 @@ fs_res_t ufs_trunc (void * file_p)
     
     if(fp->aw == 0) return FS_RES_DENIED; /*Not opened for write*/
     
-    void * new_data = dm_realloc(ent->data_d, fp->rwp);
+    void * new_data = lv_mem_realloc(ent->data_d, fp->rwp);
     if(new_data == NULL) return FS_RES_FULL; /*Out of memory*/
     
     ent->data_d = new_data;
@@ -444,7 +444,7 @@ fs_res_t ufs_free (uint32_t * total_p, uint32_t * free_p)
 {
     dm_mon_t mon;
 
-    dm_monitor(&mon);
+    lv_mem_monitor(&mon);
     *total_p = DM_MEM_SIZE >> 10;    /*Convert bytes to kB*/
     *free_p = mon.size_free >> 10;
 
@@ -488,7 +488,7 @@ static ufs_ent_t* ufs_ent_new(const char * fn)
         return NULL;
     }
     
-    new_ent->fn_d = dm_alloc(strlen(fn)  + 1); /*Save the name*/
+    new_ent->fn_d = lv_mem_alloc(strlen(fn)  + 1); /*Save the name*/
     strcpy(new_ent->fn_d, fn);
     new_ent->data_d = NULL;
     new_ent->size = 0;

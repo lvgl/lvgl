@@ -25,11 +25,11 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_mode_t mode);
+static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t *roller, bool anim_en);
-static void draw_bg(lv_obj_t *roller, const area_t *mask);
+static void draw_bg(lv_obj_t *roller, const lv_area_t *mask);
 
 /**********************
  *  STATIC VARIABLES
@@ -75,7 +75,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
-        lv_ddlist_set_fix_height(new_roller, font_get_height_scale(style_label->text.font) * 3 + style_label->text.line_space * 4);
+        lv_ddlist_set_fix_height(new_roller, lv_font_get_height_scale(style_label->text.font) * 3 + style_label->text.line_space * 4);
 
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 
@@ -184,7 +184,7 @@ lv_style_t * lv_roller_get_style(lv_obj_t *roller, lv_roller_style_t type)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_mode_t mode)
+static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -195,10 +195,10 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
         draw_bg(roller, mask);
 
         lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
-        const font_t * font = style->text.font;
+        const lv_font_t * font = style->text.font;
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-        cord_t font_h = font_get_height_scale(font);
-        area_t rect_area;
+        lv_coord_t font_h = lv_font_get_height_scale(font);
+        lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
         rect_area.x1 = roller->coords.x1;
@@ -210,17 +210,17 @@ static bool lv_roller_design(lv_obj_t * roller, const area_t * mask, lv_design_m
     else if(mode == LV_DESIGN_DRAW_POST) {
         lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-        const font_t * font = style->text.font;
-        cord_t font_h = font_get_height_scale(font);
+        const lv_font_t * font = style->text.font;
+        lv_coord_t font_h = lv_font_get_height_scale(font);
         /*Redraw the text on the selected area with a different color*/
-        area_t rect_area;
+        lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
-        area_t mask_sel;
+        lv_area_t mask_sel;
         bool area_ok;
-        area_ok = area_union(&mask_sel, mask, &rect_area);
+        area_ok = lv_area_union(&mask_sel, mask, &rect_area);
         if(area_ok) {
             lv_style_t *sel_style = lv_roller_get_style(roller, LV_ROLLER_STYLE_SEL);
             lv_style_t new_style;
@@ -316,14 +316,14 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
-    const font_t * font = style_label->text.font;
-    cord_t font_h = font_get_height_scale(font);
+    const lv_font_t * font = style_label->text.font;
+    lv_coord_t font_h = lv_font_get_height_scale(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
         /*If dragged then align the list to there be an element in the middle*/
-        cord_t label_y1 = ext->ddlist.label->coords.y1 - roller->coords.y1;
-        cord_t label_unit = font_h + style_label->text.line_space;
-        cord_t mid = (roller->coords.y2 - roller->coords.y1) / 2;
+        lv_coord_t label_y1 = ext->ddlist.label->coords.y1 - roller->coords.y1;
+        lv_coord_t label_unit = font_h + style_label->text.line_space;
+        lv_coord_t mid = (roller->coords.y2 - roller->coords.y1) / 2;
         id = (mid - label_y1 + style_label->text.line_space / 2) / label_unit;
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
@@ -332,7 +332,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     else if(sign == LV_SIGNAL_RELEASED) {
         /*If picked an option by clicking then set it*/
         if(!lv_indev_is_dragging(indev)) {
-            point_t p;
+            lv_point_t p;
             lv_indev_get_point(indev, &p);
             p.y = p.y - ext->ddlist.label->coords.y1;
             id = p.y / (font_h + style_label->text.line_space);
@@ -355,12 +355,12 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
  * @param roller pointer to a roller object
  * @param mask pointer to the current mask (from the design function)
  */
-static void draw_bg(lv_obj_t *roller, const area_t *mask)
+static void draw_bg(lv_obj_t *roller, const lv_area_t *mask)
 {
     lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
-    area_t half_mask;
-    area_t half_roller;
-    cord_t h = lv_obj_get_height(roller);
+    lv_area_t half_mask;
+    lv_area_t half_roller;
+    lv_coord_t h = lv_obj_get_height(roller);
     bool union_ok;
     area_cpy(&half_roller, &roller->coords);
 
@@ -369,7 +369,7 @@ static void draw_bg(lv_obj_t *roller, const area_t *mask)
     half_roller.y1 -= roller->ext_size;
     half_roller.y2 = roller->coords.y1 + h / 2;
 
-    union_ok = area_union(&half_mask, &half_roller, mask);
+    union_ok = lv_area_union(&half_mask, &half_roller, mask);
 
     half_roller.x1 += roller->ext_size; /*Revert ext. size adding*/
     half_roller.x2 -= roller->ext_size;
@@ -386,7 +386,7 @@ static void draw_bg(lv_obj_t *roller, const area_t *mask)
     half_roller.y1 = roller->coords.y1 + h / 2;
     if((h & 0x1) == 0) half_roller.y1++;    /*With even height the pixels in the middle would be drawn twice*/
 
-    union_ok = area_union(&half_mask, &half_roller, mask);
+    union_ok = lv_area_union(&half_mask, &half_roller, mask);
 
     half_roller.x1 += roller->ext_size; /*Revert ext. size adding*/
     half_roller.x2 -= roller->ext_size;
@@ -394,8 +394,8 @@ static void draw_bg(lv_obj_t *roller, const area_t *mask)
     half_roller.y1 -= style->body.radius;
 
     if(union_ok){
-        color_t main_tmp = style->body.main_color;
-        color_t grad_tmp = style->body.grad_color;
+        lv_color_t main_tmp = style->body.main_color;
+        lv_color_t grad_tmp = style->body.grad_color;
 
         style->body.main_color = grad_tmp;
         style->body.grad_color = main_tmp;
@@ -416,22 +416,22 @@ static void refr_position(lv_obj_t *roller, bool anim_en)
     lv_obj_t *roller_scrl = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
-    const font_t * font = style_label->text.font;
-    cord_t font_h = font_get_height_scale(font);
-    cord_t h = lv_obj_get_height(roller);
+    const lv_font_t * font = style_label->text.font;
+    lv_coord_t font_h = lv_font_get_height_scale(font);
+    lv_coord_t h = lv_obj_get_height(roller);
     int32_t id = ext->ddlist.sel_opt_id;
-    cord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
-    cord_t new_y = - line_y1 + (h - font_h) / 2;
+    lv_coord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
+    lv_coord_t new_y = - line_y1 + (h - font_h) / 2;
 
     if(ext->ddlist.anim_time == 0 || anim_en == false) {
         lv_obj_set_y(roller_scrl, new_y);
     } else {
-        anim_t a;
+        lv_anim_t a;
         a.var = roller_scrl;
         a.start = lv_obj_get_y(roller_scrl);
         a.end = new_y;
-        a.fp = (anim_fp_t)lv_obj_set_y;
-        a.path = anim_get_path(ANIM_PATH_LIN);
+        a.fp = (lv_anim_fp_t)lv_obj_set_y;
+        a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
         a.end_cb = NULL;
         a.act_time = 0;
         a.time = ext->ddlist.anim_time;
@@ -439,7 +439,7 @@ static void refr_position(lv_obj_t *roller, bool anim_en)
         a.playback_pause = 0;
         a.repeat = 0;
         a.repeat_pause = 0;
-        anim_create(&a);
+        lv_anim_create(&a);
     }
 }
 

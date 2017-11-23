@@ -41,7 +41,7 @@ static void style_mod_def(lv_style_t * style);
  */
 lv_group_t * lv_group_create(void)
 {
-    lv_group_t * group = dm_alloc(sizeof(lv_group_t));
+    lv_group_t * group = lv_mem_alloc(sizeof(lv_group_t));
     ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
     group->style_mod = style_mod_def;
@@ -252,17 +252,17 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
 static void style_mod_def(lv_style_t * style)
 {
     /*Make the style to be a little bit orange*/
-    style->body.border.opa = OPA_COVER;
-    style->body.border.color = COLOR_ORANGE;
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_ORANGE;
 
     /*If not empty or has border then emphasis the border*/
     if(style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 
-    style->body.main_color = color_mix(style->body.main_color, COLOR_ORANGE, OPA_70);
-    style->body.grad_color = color_mix(style->body.grad_color, COLOR_ORANGE, OPA_70);
-    style->body.shadow.color = color_mix(style->body.shadow.color, COLOR_ORANGE, OPA_60);
+    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
+    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
+    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
 
-    style->text.color = color_mix(style->text.color, COLOR_ORANGE, OPA_70);
+    style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
 }
 
 #endif /*LV_OBJ_GROUP != 0*/

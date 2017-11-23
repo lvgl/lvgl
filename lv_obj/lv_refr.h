@@ -50,7 +50,7 @@ void lv_refr_init(void);
  * Invalidate an area
  * @param area_p pointer to area which should be invalidated
  */
-void lv_inv_area(const area_t * area_p);
+void lv_inv_area(const lv_area_t * area_p);
 
 /**
  * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels

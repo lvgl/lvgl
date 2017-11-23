@@ -156,9 +156,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     if(btn_signal == NULL) btn_signal = lv_obj_get_signal_func(liste);
 
     /*Make the size adjustment*/
-    cord_t w = lv_obj_get_width(list);
+    lv_coord_t w = lv_obj_get_width(list);
     lv_style_t *  style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
-    cord_t pad_hor_tot = style->body.padding.hor + style_scrl->body.padding.hor;
+    lv_coord_t pad_hor_tot = style->body.padding.hor + style_scrl->body.padding.hor;
     w -= pad_hor_tot * 2;
 
     lv_obj_set_width(liste, w);
@@ -367,17 +367,17 @@ void lv_list_up(lv_obj_t * list)
     while(e != NULL) {
         if(e->coords.y2 <= list->coords.y2) {
             if(e_prev != NULL) {
-                cord_t new_y = lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
+                lv_coord_t new_y = lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
                 lv_list_ext_t *ext = lv_obj_get_ext_attr(list);
                 if(ext->anim_time == 0) {
                     lv_obj_set_y(scrl, new_y);
                 } else {
-                    anim_t a;
+                    lv_anim_t a;
                     a.var = scrl;
                     a.start = lv_obj_get_y(scrl);
                     a.end = new_y;
-                    a.fp = (anim_fp_t)lv_obj_set_y;
-                    a.path = anim_get_path(ANIM_PATH_LIN);
+                    a.fp = (lv_anim_fp_t)lv_obj_set_y;
+                    a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
                     a.end_cb = NULL;
                     a.act_time = 0;
                     a.time = LV_LIST_FOCUS_TIME;
@@ -385,7 +385,7 @@ void lv_list_up(lv_obj_t * list)
                     a.playback_pause = 0;
                     a.repeat = 0;
                     a.repeat_pause = 0;
-                    anim_create(&a);
+                    lv_anim_create(&a);
                 }
             }
             break;
@@ -408,17 +408,17 @@ void lv_list_down(lv_obj_t * list)
     e = get_next_btn(list, NULL);
     while(e != NULL) {
         if(e->coords.y1 < list->coords.y1) {
-            cord_t new_y = -lv_obj_get_y(e);
+            lv_coord_t new_y = -lv_obj_get_y(e);
             lv_list_ext_t *ext = lv_obj_get_ext_attr(list);
             if(ext->anim_time == 0) {
                 lv_obj_set_y(scrl, new_y);
             } else {
-                anim_t a;
+                lv_anim_t a;
                 a.var = scrl;
                 a.start = lv_obj_get_y(scrl);
                 a.end = new_y;
-                a.fp = (anim_fp_t)lv_obj_set_y;
-                a.path = anim_get_path(ANIM_PATH_LIN);
+                a.fp = (lv_anim_fp_t)lv_obj_set_y;
+                a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
                 a.end_cb = NULL;
                 a.act_time = 0;
                 a.time = LV_LIST_FOCUS_TIME;
@@ -426,7 +426,7 @@ void lv_list_down(lv_obj_t * list)
                 a.playback_pause = 0;
                 a.repeat = 0;
                 a.repeat_pause = 0;
-                anim_create(&a);
+                lv_anim_create(&a);
             }
             break;
         }
@@ -467,7 +467,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_CORD_CHG) {
         /*Be sure the width of the buttons are correct*/
-        cord_t w = lv_obj_get_width(list);
+        lv_coord_t w = lv_obj_get_width(list);
         if(w != area_get_width(param)) {   /*Width changed*/
            refr_btn_width(list);
         }
@@ -588,8 +588,8 @@ static void refr_btn_width(lv_obj_t *list)
 {
    lv_style_t *style = lv_list_get_style(list, LV_LIST_STYLE_BG);
    lv_style_t *style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
-   cord_t w = lv_obj_get_width(list);
-   cord_t btn_w = w - (style->body.padding.hor + style_scrl->body.padding.hor) * 2;
+   lv_coord_t w = lv_obj_get_width(list);
+   lv_coord_t btn_w = w - (style->body.padding.hor + style_scrl->body.padding.hor) * 2;
 
    lv_obj_t *btn = get_next_btn(list, NULL);
    while(btn) {

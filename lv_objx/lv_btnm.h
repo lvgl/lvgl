@@ -48,7 +48,7 @@ typedef struct
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     const char ** map_p;                            /*Pointer to the current map*/
-    area_t *button_areas;                          /*Array of areas of buttons*/
+    lv_area_t *button_areas;                          /*Array of areas of buttons*/
     lv_btnm_action_t action;                        /*A function to call when a button is releases*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
     uint16_t btn_cnt;                            /*Number of button in 'map_p'(Handled by the library)*/

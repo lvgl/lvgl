@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_mode_t mode);
+static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
 
 /**********************
@@ -227,7 +227,7 @@ lv_style_t * lv_slider_get_style(lv_obj_t *slider, lv_slider_style_t type)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_mode_t mode)
+static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -242,11 +242,11 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         lv_style_t * style_indic = lv_slider_get_style(slider, LV_SLIDER_STYLE_INDIC);
 
         /*Draw the bar*/
-        area_t area_bar;
+        lv_area_t area_bar;
         area_cpy(&area_bar, &slider->coords);
         /*Be sure at least vpad/hpad width bar will remain*/
-       cord_t pad_ver_bar = style_slider->body.padding.ver;
-       cord_t pad_hor_bar = style_slider->body.padding.hor;
+       lv_coord_t pad_ver_bar = style_slider->body.padding.ver;
+       lv_coord_t pad_hor_bar = style_slider->body.padding.hor;
        if(pad_ver_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
            pad_ver_bar = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
        }
@@ -261,12 +261,12 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         lv_draw_rect(&area_bar, mask, style_slider);
 
         /*Draw the indicator*/
-        area_t area_indic;
+        lv_area_t area_indic;
         area_cpy(&area_indic, &area_bar);
 
         /*Be sure at least vpad/hpad width indicator will remain*/
-        cord_t pad_ver_indic = style_indic->body.padding.ver;
-        cord_t pad_hor_indic = style_indic->body.padding.hor;
+        lv_coord_t pad_ver_indic = style_indic->body.padding.ver;
+        lv_coord_t pad_hor_indic = style_indic->body.padding.hor;
         if(pad_ver_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
             pad_ver_indic = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
         }
@@ -279,12 +279,12 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         area_indic.y1 += pad_ver_indic;
         area_indic.y2 -= pad_ver_indic;
 
-        cord_t slider_w = area_get_width(&slider->coords);
-        cord_t slider_h = area_get_height(&slider->coords);
+        lv_coord_t slider_w = area_get_width(&slider->coords);
+        lv_coord_t slider_h = area_get_height(&slider->coords);
 
-        cord_t cur_value = lv_slider_get_value(slider);
-        cord_t min_value = lv_slider_get_min_value(slider);
-        cord_t max_value = lv_slider_get_max_value(slider);
+        lv_coord_t cur_value = lv_slider_get_value(slider);
+        lv_coord_t min_value = lv_slider_get_min_value(slider);
+        lv_coord_t max_value = lv_slider_get_max_value(slider);
 
         /*If dragged draw to the drag position*/
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
@@ -301,7 +301,7 @@ static bool lv_slider_design(lv_obj_t * slider, const area_t * mask, lv_design_m
         if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic);
 
         /*Draw the knob*/
-        area_t knob_area;
+        lv_area_t knob_area;
         area_cpy(&knob_area, &slider->coords);
 
         if(slider_w >= slider_h) {
@@ -357,9 +357,9 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     if(res != LV_RES_OK) return res;
 
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    point_t p;
-    cord_t w = lv_obj_get_width(slider);
-    cord_t h = lv_obj_get_height(slider);
+    lv_point_t p;
+    lv_coord_t w = lv_obj_get_width(slider);
+    lv_coord_t h = lv_obj_get_height(slider);
 
     if(sign == LV_SIGNAL_PRESSED) {
         ext->drag_value = lv_slider_get_value(slider);
@@ -367,12 +367,12 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_get_point(param, &p);
         if(w > h) {
-            cord_t knob_w = h;
+            lv_coord_t knob_w = h;
             p.x -= slider->coords.x1 + h / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
             ext->drag_value = (int32_t) ((int32_t) p.x * (ext->bar.max_value - ext->bar.min_value + 1)) / (w - knob_w);
             ext->drag_value += ext->bar.min_value;
         } else {
-            cord_t knob_h = w;
+            lv_coord_t knob_h = w;
             p.y -= slider->coords.y1 + w / 2;    /*Modify the point to shift with half knob (important on the start and end)*/
             ext->drag_value = (int32_t) ((int32_t) p.y * (ext->bar.max_value - ext->bar.min_value + 1)) / (h - knob_h);
             ext->drag_value = ext->bar.max_value - ext->drag_value;     /*Invert the value: smaller value means higher y*/
@@ -402,12 +402,12 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         lv_style_t *style = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
         lv_style_t *knob_style = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
-        cord_t shadow_w = knob_style->body.shadow.width;
+        lv_coord_t shadow_w = knob_style->body.shadow.width;
         if(ext->knob_in == 0) {
-            cord_t x = MATH_MIN(w / 2 + shadow_w, h / 2 + shadow_w);      /*The smaller size is the knob diameter*/
+            lv_coord_t x = MATH_MIN(w / 2 + shadow_w, h / 2 + shadow_w);      /*The smaller size is the knob diameter*/
             if(slider->ext_size < x) slider->ext_size = x;
         } else {
-            cord_t pad = MATH_MIN(style->body.padding.hor, style->body.padding.ver);
+            lv_coord_t pad = MATH_MIN(style->body.padding.hor, style->body.padding.ver);
             if(pad < 0) {
                 pad = -pad;
                 if(slider->ext_size < pad) slider->ext_size = pad;

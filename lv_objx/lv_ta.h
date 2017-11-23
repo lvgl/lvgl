@@ -58,7 +58,7 @@ typedef struct
     uint8_t one_line :1;        /*One line mode (ignore line breaks)*/
     struct {
         lv_style_t *style;      /*Style of the cursor (NULL to use label's style)*/
-        cord_t valid_x;         /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
+        lv_coord_t valid_x;         /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
         uint16_t pos;           /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
         lv_cursor_type_t type;  /*Shape of the cursor*/
         uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/

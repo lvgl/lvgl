@@ -45,7 +45,7 @@ lv_indev_t * lv_indev_register(lv_indev_drv_t *driver)
 {
     lv_indev_t *node;
 
-    node = dm_alloc(sizeof(lv_indev_t));
+    node = lv_mem_alloc(sizeof(lv_indev_t));
     if (!node) return NULL;
 
     memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));

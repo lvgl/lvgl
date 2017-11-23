@@ -48,7 +48,7 @@ typedef struct
     uint16_t sel_opt_id;                 /*Index of the current option*/
     uint16_t anim_time;                  /*Open/Close animation time [ms]*/
     uint8_t opened :1;                   /*1: The list is opened*/
-    cord_t fix_height;                   /*Height if the ddlist is opened. (0: auto-size)*/
+    lv_coord_t fix_height;                   /*Height if the ddlist is opened. (0: auto-size)*/
 }lv_ddlist_ext_t;
 
 typedef enum {
@@ -99,7 +99,7 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action);
  * @param ddlist pointer to a drop down list
  * @param h the height when the list is opened (0: auto size)
  */
-void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h);
+void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h);
 
 /**
  * Enable or disable the horizontal fit to the content
@@ -171,7 +171,7 @@ lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist);
  * @param ddlist pointer to a drop down list object
  * @return the height if the ddlist is opened (0: auto size)
  */
-cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist);
+lv_coord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist);
 
 /**
  * Get the scroll bar mode of a drop down list

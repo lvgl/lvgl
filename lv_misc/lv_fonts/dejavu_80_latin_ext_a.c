@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_DEJAVU_80_LATIN_EXT_A != 0
+#if  USE_LV_FONT_DEJAVU_80_LATIN_EXT_A != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -10545,7 +10545,7 @@ static const uint8_t dejavu_80_latin_ext_a_width[] =
     42, 47, 36, 47, 36, 47, 36, 24, 
 };
 
-font_t font_dejavu_80_latin_ext_a = 
+lv_font_t lv_font_dejavu_80_latin_ext_a = 
 {
     256,        /*First letter's unicode */
     383,        /*Last letter's unicode */

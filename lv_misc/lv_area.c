@@ -1,5 +1,5 @@
 /**
- * @file 2d.c
+ * @file lv_area.c
  * 
  */
 
@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_AREA != 0
 
 #include "lv_area.h"
 #include "lv_math.h"
@@ -44,7 +43,7 @@
  * @param x2 right coordinate of the area
  * @param y2 bottom coordinate of the area
  */
-void area_set(area_t * area_p, cord_t x1, cord_t y1, cord_t x2, cord_t y2)
+void lv_area_set(lv_area_t * area_p, lv_coord_t x1, lv_coord_t y1, lv_coord_t x2, lv_coord_t y2)
 {
     area_p->x1 = x1;
     area_p->y1 = y1;
@@ -57,7 +56,7 @@ void area_set(area_t * area_p, cord_t x1, cord_t y1, cord_t x2, cord_t y2)
  * @param area_p pointer to an area
  * @param w the new width of the area (w == 1 makes x1 == x2)
  */
-void area_set_width(area_t * area_p, cord_t w)
+void lv_area_set_width(lv_area_t * area_p, lv_coord_t w)
 {
 	area_p->x2 = area_p->x1 + w - 1;
 }
@@ -67,7 +66,7 @@ void area_set_width(area_t * area_p, cord_t w)
  * @param area_p pointer to an area
  * @param h the new height of the area (h == 1 makes y1 == y2)
  */
-void area_set_height(area_t * area_p, cord_t h)
+void lv_area_set_height(lv_area_t * area_p, lv_coord_t h)
 {
 	area_p->y2 = area_p->y1 + h - 1;
 }
@@ -78,14 +77,14 @@ void area_set_height(area_t * area_p, cord_t h)
  * @param x the new x coordinate of the area
  * @param y the new y coordinate of the area
  */
-void area_set_pos(area_t * area_p, cord_t x, cord_t y)
+void lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y)
 {
-	cord_t w = area_get_width(area_p);
-	cord_t h = area_get_height(area_p);
+	lv_coord_t w = area_get_width(area_p);
+	lv_coord_t h = area_get_height(area_p);
 	area_p->x1 = x;
 	area_p->y1 = y;
-	area_set_width(area_p, w);
-	area_set_height(area_p, h);
+	lv_area_set_width(area_p, w);
+	lv_area_set_height(area_p, h);
 }
 
 /**
@@ -93,7 +92,7 @@ void area_set_pos(area_t * area_p, cord_t x, cord_t y)
  * @param area_p pointer to an area
  * @return size of area
  */
-uint32_t area_get_size(const area_t * area_p)
+uint32_t lv_area_get_size(const lv_area_t * area_p)
 {
     uint32_t size;
     
@@ -110,7 +109,7 @@ uint32_t area_get_size(const area_t * area_p)
  * @param a2_p pointer to the second area
  * @return false: the two area has NO common parts, res_p is invalid
  */
-bool area_union(area_t * res_p, const area_t * a1_p, const area_t * a2_p)
+bool lv_area_union(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /* Get the smaller area from 'a1_p' and 'a2_p' */
     res_p->x1 = MATH_MAX(a1_p->x1, a2_p->x1);
@@ -134,7 +133,7 @@ bool area_union(area_t * res_p, const area_t * a1_p, const area_t * a2_p)
  * @param a1_p pointer to the first area
  * @param a2_p pointer to the second area
  */
-void area_join(area_t * a_res_p, const area_t * a1_p, const area_t * a2_p)
+void lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     a_res_p->x1 = MATH_MIN(a1_p->x1, a2_p->x1);
     a_res_p->y1 = MATH_MIN(a1_p->y1, a2_p->y1);
@@ -148,7 +147,7 @@ void area_join(area_t * a_res_p, const area_t * a1_p, const area_t * a2_p)
  * @param p_p pointer to a point
  * @return false:the point is out of the area
  */
-bool area_is_point_on(const area_t * a_p, const point_t * p_p)
+bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p)
 {
     bool is_on = false;
     
@@ -167,30 +166,30 @@ bool area_is_point_on(const area_t * a_p, const point_t * p_p)
  * @param a2_p pointer to an other area
  * @return false: a1_p and a2_p has no common parts
  */
-bool area_is_on(const area_t * a1_p, const area_t * a2_p)
+bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /*Two area are on each other if... */
     
-    point_t p;
+    lv_point_t p;
     /*a2 left-top corner is on a1*/
     p.x = a2_p->x1;
     p.y = a2_p->y1;
-    if(area_is_point_on(a1_p, &p)) return true;
+    if(lv_area_is_point_on(a1_p, &p)) return true;
     
     /*a2 right-top corner is on a1*/
     p.x = a2_p->x1;
     p.y = a2_p->y1;
-    if(area_is_point_on(a1_p, &p)) return true;
+    if(lv_area_is_point_on(a1_p, &p)) return true;
     
     /*a2 left-bottom corner is on a1*/
     p.x = a2_p->x1;
     p.y = a2_p->y2;
-    if(area_is_point_on(a1_p, &p)) return true;
+    if(lv_area_is_point_on(a1_p, &p)) return true;
     
     /*a2 right-bottom corner is on a1*/
     p.x = a2_p->x2;
     p.y = a2_p->y2;
-    if(area_is_point_on(a1_p, &p)) return true;
+    if(lv_area_is_point_on(a1_p, &p)) return true;
     
     /*a2 is horizontally bigger then a1 and covers it*/
     if((a2_p->x1 <= a1_p->x1 && a2_p->x2 >= a1_p->x2) &&  /*a2 hor. cover a1?*/
@@ -212,11 +211,11 @@ bool area_is_on(const area_t * a1_p, const area_t * a2_p)
 
 /**
  * Check if an area is fully on an other
- * @param ain_p pointer to an area which could be on aholder_p
- * @param aholder pointer to an area which could involve ain_p
+ * @param ain_p pointer to an area which could be in 'aholder_p'
+ * @param aholder pointer to an area which could involve 'ain_p'
  * @return 
  */
-bool area_is_in(const area_t * ain_p, const area_t * aholder_p)
+bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p)
 {
     bool is_in = false;
     
@@ -234,5 +233,3 @@ bool area_is_in(const area_t * ain_p, const area_t * aholder_p)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-#endif /*USE_AREA*/

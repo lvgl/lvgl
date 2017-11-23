@@ -30,7 +30,7 @@ extern "C" {
 typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
-    const point_t * point_array;    /*Pointer to an array with the points of the line*/
+    const lv_point_t * point_array;    /*Pointer to an array with the points of the line*/
     uint16_t  point_num;            /*Number of points in 'point_array' */
     uint8_t  auto_size  :1;         /*1: set obj. width to x max and obj. height to y max */
     uint8_t  y_inv      :1;         /*1: y == 0 will be on the bottom*/
@@ -60,7 +60,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy);
  * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
-void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num);
+void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t point_num);
 
 /**
  * Enable (or disable) the auto-size option. The size of the object will fit to its points.

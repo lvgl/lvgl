@@ -32,9 +32,9 @@ extern "C" {
  * Display Driver structure to be registered by HAL
  */
 typedef struct _disp_drv_t {
-    void (*fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color);
-    void (*map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t * color_p);
-    void (*copy)(color_t * dest, const color_t * src, uint32_t length, opa_t opa);
+    void (*fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color);
+    void (*map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
+    void (*copy)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 } lv_disp_drv_t;
 
 typedef struct _disp_t {
@@ -82,7 +82,7 @@ lv_disp_t * lv_disp_next(lv_disp_t * disp);
  * @param y2 bottom coordinate of the rectangle
  * @param color fill color
  */
-void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color);
+void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color);
 
 /**
  * Put a color map to a rectangular area on the active display
@@ -92,7 +92,7 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_t color)
  * @param y2 bottom coordinate of the rectangle
  * @param color_map pointer to an array of colors
  */
-void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t * color_map);
+void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_map);
 
 /**
  * Copy pixels to a destination memory applying opacity
@@ -100,9 +100,9 @@ void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const color_t *
  * @param dest a memory address. Copy 'src' here.
  * @param src pointer to pixel map. Copy it to 'dest'.
  * @param length number of pixels in 'src'
- * @param opa opacity (0, OPA_TRANSP: transparent ... 255, OPA_COVER, fully cover)
+ * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
  */
-void lv_disp_copy(color_t * dest, const color_t * src, uint32_t length, opa_t opa);
+void lv_disp_copy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 
 /**
  * Shows if 'copy' is supported or not

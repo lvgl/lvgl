@@ -1,5 +1,5 @@
 /**
- * @file circ.c
+ * @file lv_circ.c
  * Circle drawing algorithm (with Bresenham)
  * Only a 1/8 circle is calculated. Use CIRC_OCT1_X, CIRC_OCT1_Y macros to get
  * the other octets.
@@ -9,7 +9,6 @@
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_CIRC != 0
 
 #include "lv_area.h"
 
@@ -43,7 +42,7 @@
  * @param tmp point to a variable. It will store temporary data
  * @param radius radius of the circle
  */
-void circ_init(point_t * c, cord_t * tmp, cord_t radius)
+void lv_circ_init(lv_point_t * c, lv_coord_t * tmp, lv_coord_t radius)
 {
     c->x = radius;
     c->y = 0;
@@ -55,7 +54,7 @@ void circ_init(point_t * c, cord_t * tmp, cord_t radius)
  * @param c same as in circ_init
  * @return true if the circle is not ready yet
  */
-bool circ_cont(point_t * c)
+bool lv_circ_cont(lv_point_t * c)
 {
     return c->y <= c->x ? true : false;
 }
@@ -65,7 +64,7 @@ bool circ_cont(point_t * c)
  * @param c same as in circ_init. The next point stored here.
  * @param tmp same as in circ_init.
  */
-void circ_next(point_t * c, cord_t * tmp)
+void lv_circ_next(lv_point_t * c, lv_coord_t * tmp)
 {
     c->y++;
     
@@ -80,5 +79,3 @@ void circ_next(point_t * c, cord_t * tmp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#endif /*USE_CIRC*/
-

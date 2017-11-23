@@ -7,10 +7,12 @@
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#include "../lv_misc/lv_task.h"
-#include "lv_anim.h"
+
 #include <stddef.h>
 #include <string.h>
+
+#include "lv_task.h"
+#include "lv_anim.h"
 
 #if USE_ANIM != 0
 #include "lv_math.h"
@@ -32,7 +34,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void anim_task (void * param);
-static bool anim_ready_handler(anim_t * a);
+static bool anim_ready_handler(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -41,13 +43,13 @@ static ll_dsc_t anim_ll;
 static uint32_t last_task_run;
 static bool anim_del_global_flag = false;
 
-static anim_path_t anim_path_lin[] =
+static lv_anim_path_t anim_path_lin[] =
 		{64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
 		 96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
 		 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
 		 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192};
 
-static anim_path_t anim_path_step[] =
+static lv_anim_path_t anim_path_step[] =
 		{64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
 		 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
          64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
@@ -64,9 +66,9 @@ static anim_path_t anim_path_step[] =
 /**
  * Init. the animation module
  */
-void anim_init(void)
+void lv_anim_init(void)
 {
-	ll_init(&anim_ll, sizeof(anim_t));
+	ll_init(&anim_ll, sizeof(lv_anim_t));
 	last_task_run = MISC_SYSTICK_GET();
 	ptask_create(anim_task, ANIM_REFR_PERIOD, PTASK_PRIO_MID, NULL);
 }
@@ -75,18 +77,18 @@ void anim_init(void)
  * Create an animation
  * @param anim_p an initialized 'anim_t' variable. Not required after call.
  */
-void anim_create(anim_t * anim_p)
+void lv_anim_create(lv_anim_t * anim_p)
 {
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
-    if(anim_p->fp != NULL) anim_del(anim_p->var, anim_p->fp);       /*fp == NULL would delete all animations of var*/
+    if(anim_p->fp != NULL) lv_anim_del(anim_p->var, anim_p->fp);       /*fp == NULL would delete all animations of var*/
 
 	/*Add the new animation to the animation linked list*/
-	anim_t * new_anim = ll_ins_head(&anim_ll);
+	lv_anim_t * new_anim = ll_ins_head(&anim_ll);
 	dm_assert(new_anim);
 
 	/*Initialize the animation descriptor*/
 	anim_p->playback_now = 0;
-	memcpy(new_anim, anim_p, sizeof(anim_t));
+	memcpy(new_anim, anim_p, sizeof(lv_anim_t));
 
 	/*Set the start value*/
 	if(new_anim->fp != NULL) new_anim->fp(new_anim->var, new_anim->start);
@@ -99,11 +101,11 @@ void anim_create(anim_t * anim_p)
  *           or NULL to delete all animations of 'var'
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool anim_del(void * var, anim_fp_t fp)
+bool lv_anim_del(void * var, lv_anim_fp_t fp)
 {
 	bool del = false;
-	anim_t * a;
-	anim_t * a_next;
+	lv_anim_t * a;
+	lv_anim_t * a_next;
 	a = ll_get_head(&anim_ll);
 	while(a != NULL) {
 		/*'a' might be deleted, so get the next object while 'a' is valid*/
@@ -111,7 +113,7 @@ bool anim_del(void * var, anim_fp_t fp)
 
 		if(a->var == var && (a->fp == fp || fp == NULL)) {
 			ll_rem(&anim_ll, a);
-			dm_free(a);
+			lv_mem_free(a);
 			del = true;
 			anim_del_global_flag = true;
 		}
@@ -129,7 +131,7 @@ bool anim_del(void * var, anim_fp_t fp)
  * @param end end value of the animation
  * @return the required time [ms] for the animation with the given parameters
  */
-uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
+uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 {
 	int32_t d = MATH_ABS((int32_t) start - end);
 	uint16_t time = (int32_t)((int32_t)(d * 1000) / speed);
@@ -146,13 +148,13 @@ uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
  * @param name name of the path from 'anim_path_name_t'
  * @return pointer to the path array
  */
-anim_path_t * anim_get_path(anim_path_name_t name)
+lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name)
 {
 	switch (name) {
-		case ANIM_PATH_LIN:
+		case LV_ANIM_PATH_LIN:
 			return anim_path_lin;
 			break;
-		case ANIM_PATH_STEP:
+		case LV_ANIM_PATH_STEP:
 			return anim_path_step;
 			break;
 		default:
@@ -173,8 +175,8 @@ static void anim_task (void * param)
 	volatile uint32_t elaps;
 	elaps = MISC_SYSTICK_ELAPS(last_task_run);
 
-	anim_t * a;
-	anim_t * a_next;
+	lv_anim_t * a;
+	lv_anim_t * a_next;
 	a = ll_get_head(&anim_ll);
 	while(a != NULL) {
 		/*'a' might be deleted, so get the next object while 'a' is valid*/
@@ -222,7 +224,7 @@ static void anim_task (void * param)
  * @param a pointer to an animation descriptor
  * @return true: animation delete occurred
  * */
-static bool anim_ready_handler(anim_t * a)
+static bool anim_ready_handler(lv_anim_t * a)
 {
 	bool invalid = false;
 
@@ -234,7 +236,7 @@ static bool anim_ready_handler(anim_t * a)
 		void (*cb) (void *) = a->end_cb;
 		void * p = a->var;
 		ll_rem(&anim_ll, a);
-		dm_free(a);
+		lv_mem_free(a);
 
 		/*Call the callback function at the end*/
 		/* Check if an animation is deleted in the cb function
@@ -275,7 +277,7 @@ static void anim_dummy_handler(void * anim_dm);
  * Create an animation. Immediately set to end value
  * @param anim_p an initialized 'anim_t' variable. Not required after call.
  */
-void anim_create(anim_t * anim_p)
+void lv_anim_create(lv_anim_t * anim_p)
 {
 
     /*If no delay simply set the end value end call the callback */
@@ -287,8 +289,8 @@ void anim_create(anim_t * anim_p)
     else {
 #if USE_DYN_MEM != 0 && USE_PTASK != 0
         if(anim_p->fp != NULL) anim_p->fp(anim_p->var, anim_p->start);
-        void * anim_dm = dm_alloc(sizeof(anim_t));
-        memcpy(anim_dm, anim_p, sizeof(anim_t));
+        void * anim_dm = dm_alloc(sizeof(lv_anim_t));
+        memcpy(anim_dm, anim_p, sizeof(lv_anim_t));
         ptask_t * ptask = ptask_create(anim_dummy_handler, -anim_p->act_time, PTASK_PRIO_LOW, anim_dm);
         ptask_once(ptask);
 #else
@@ -305,7 +307,7 @@ void anim_create(anim_t * anim_p)
  *           or NULL to ignore it and delete all animation with 'var
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool anim_del(void * var, anim_fp_t fp)
+bool lv_anim_del(void * var, lv_anim_fp_t fp)
 {
     return false;
 }
@@ -317,7 +319,7 @@ bool anim_del(void * var, anim_fp_t fp)
  * @param end end value of the animation
  * @return the required time [ms] for the animation with the given parameters
  */
-uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
+uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 {
     return 1;
 }
@@ -327,7 +329,7 @@ uint16_t anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
  * @param name name of the path from 'anim_path_name_t'
  * @return pointer to the path array
  */
-anim_path_t * anim_get_path(anim_path_name_t name)
+lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name)
 {
     return NULL;
 }
@@ -340,12 +342,12 @@ anim_path_t * anim_get_path(anim_path_name_t name)
  */
 static void anim_dummy_handler(void * anim_dm)
 {
-    anim_t * anim = anim_dm;
+    lv_anim_t * anim = anim_dm;
 
     if(anim->fp != NULL) anim->fp(anim->var, anim->end);
     if(anim->end_cb != NULL) anim->end_cb(anim->var);
 
-    dm_free(anim_dm);
+    lv_mem_free(anim_dm);
 }
 #endif
 

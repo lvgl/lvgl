@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_SYMBOL_30_FILE != 0
+#if  USE_LV_FONT_SYMBOL_30_FILE != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -695,7 +695,7 @@ static const uint8_t symbol_30_file_width[] =
     28, 30, 30, 26, 26, 
 };
 
-font_t font_symbol_30_file = 
+lv_font_t lv_font_symbol_30_file = 
 {
 #if TXT_UTF8 == 0
     224,        /*First letter's unicode */

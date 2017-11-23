@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_SYMBOL_40_FEEDBACK != 0
+#if  USE_LV_FONT_SYMBOL_40_FEEDBACK != 0
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -651,7 +651,7 @@ static const uint8_t symbol_40_feedback_width[] =
     46, 51, 51, 51, 51, 51, 34, 
 };
 
-font_t font_symbol_40_feedback = 
+lv_font_t lv_font_symbol_40_feedback = 
 {
 #if TXT_UTF8 == 0
     208,        /*First letter's unicode */

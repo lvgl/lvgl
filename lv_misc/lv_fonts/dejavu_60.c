@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_DEJAVU_60 != 0
+#if  USE_LV_FONT_DEJAVU_60 != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -5931,7 +5931,7 @@ static const uint8_t dejavu_60_width[] =
     31, 31, 27, 33, 18, 33, 44, 
 };
 
-font_t font_dejavu_60 = 
+lv_font_t lv_font_dejavu_60 = 
 {
     32,        /*First letter's unicode */
     126,        /*Last letter's unicode */

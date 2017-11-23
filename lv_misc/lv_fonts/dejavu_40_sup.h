@@ -5,13 +5,13 @@
 
 #include "misc_conf.h"
 
-#if  USE_FONT_DEJAVU_40_SUP != 0
+#if  USE_LV_FONT_DEJAVU_40_SUP != 0
 
 #include <stdint.h>
 #include "../lv_font.h"
 
-extern font_t font_dejavu_40_sup;
+extern lv_font_t lv_font_dejavu_40_sup;
 
-#endif   /*USE_FONT_DEJAVU_40_SUP != 0*/
+#endif   /*USE_LV_FONT_DEJAVU_40_SUP != 0*/
 
 #endif   /*DEJAVU_40_SUP_H*/

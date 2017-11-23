@@ -204,7 +204,7 @@ void lv_win_set_title(lv_obj_t * win, const char * title)
  * @param win pointer to a window object
  * @param size control button size
  */
-void lv_win_set_btn_size(lv_obj_t * win, cord_t size)
+void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     ext->btn_size = size;
@@ -305,7 +305,7 @@ const char * lv_win_get_title(lv_obj_t * win)
  * @param win pointer to a window object
  * @return control button size
  */
-cord_t lv_win_get_btn_size(lv_obj_t * win)
+lv_coord_t lv_win_get_btn_size(lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return ext->btn_size;
@@ -338,7 +338,7 @@ lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win)
  * @param win pointer to a window object
  * @return the width of the content_bg area
  */
-cord_t lv_win_get_width(lv_obj_t * win)
+lv_coord_t lv_win_get_width(lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_obj_t * scrl = lv_page_get_scrl(ext->page);

@@ -43,7 +43,7 @@ static lv_style_t lmeter;
 
 /*Saved input parameters*/
 static uint16_t _hue;
-static font_t * _font;
+static lv_font_t * _font;
 
 /**********************
  *      MACROS
@@ -64,7 +64,7 @@ static void basic_init(void)
 
     lv_style_copy(&plain_bordered, &lv_style_plain);
     plain_bordered.body.border.width = 2 << LV_ANTIALIAS;
-    plain_bordered.body.border.color= COLOR_HEX3(0xbbb);
+    plain_bordered.body.border.color= LV_COLOR_HEX3(0xbbb);
 
     theme.bg = &lv_style_plain;
     theme.panel = &lv_style_pretty;
@@ -90,9 +90,9 @@ static void label_init(void)
     lv_style_copy(&label_sec, &lv_style_plain);
     lv_style_copy(&label_hint, &lv_style_plain);
 
-    label_prim.text.color = COLOR_HEX3(0x111);
-    label_sec.text.color = COLOR_HEX3(0x888);
-    label_hint.text.color = COLOR_HEX3(0xaaa);
+    label_prim.text.color = LV_COLOR_HEX3(0x111);
+    label_sec.text.color = LV_COLOR_HEX3(0x888);
+    label_hint.text.color = LV_COLOR_HEX3(0xaaa);
 
 
     theme.label.prim = &label_prim;
@@ -129,7 +129,7 @@ static void led_init(void)
     led.body.shadow.width = LV_DPI / 10;
     led.body.radius = LV_RADIUS_CIRCLE;
     led.body.border.width= LV_DPI / 30;
-    led.body.border.opa = OPA_30;
+    led.body.border.opa = LV_OPA_30;
     led.body.shadow.color = led.body.main_color;
 
 
@@ -179,10 +179,10 @@ static void lmeter_init(void)
 #if USE_LV_LMETER != 0
 
     lv_style_copy(&lmeter, &lv_style_pretty_color);
-    lmeter.line.color = COLOR_HEX3(0xddd);
+    lmeter.line.color = LV_COLOR_HEX3(0xddd);
     lmeter.line.width = 2 << LV_ANTIALIAS;
-    lmeter.body.main_color = color_mix(lmeter.body.main_color , COLOR_WHITE, OPA_50);
-    lmeter.body.grad_color = color_mix(lmeter.body.grad_color , COLOR_BLACK, OPA_50);
+    lmeter.body.main_color = color_mix(lmeter.body.main_color , LV_COLOR_WHITE, LV_OPA_50);
+    lmeter.body.grad_color = color_mix(lmeter.body.grad_color , LV_COLOR_BLACK, LV_OPA_50);
 
     theme.lmeter = &lmeter;
 #endif
@@ -365,7 +365,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_default_init(uint16_t hue, font_t *font)
+lv_theme_t * lv_theme_default_init(uint16_t hue, lv_font_t *font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 

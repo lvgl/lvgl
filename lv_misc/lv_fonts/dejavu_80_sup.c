@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_DEJAVU_80_SUP != 0
+#if  USE_LV_FONT_DEJAVU_80_SUP != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -7913,7 +7913,7 @@ static const uint8_t dejavu_80_sup_width[] =
     42, 44, 44, 44, 44, 41, 44, 41, 
 };
 
-font_t font_dejavu_80_sup = 
+lv_font_t lv_font_dejavu_80_sup = 
 {
     160,        /*First letter's unicode */
     255,        /*Last letter's unicode */

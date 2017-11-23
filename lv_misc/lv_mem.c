@@ -8,7 +8,6 @@
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_DYN_MEM != 0
 
 #include "lv_mem.h"
 #include "lv_math.h"
@@ -35,21 +34,21 @@ typedef union
 		uint32_t d_size:31;     //Size off the data (1 means 4 bytes)
 	};
 	uint32_t header;            //The header (used + d_size)
-}dm_header_t;
+}lv_mem_header_t;
 
 typedef struct
 {
-    dm_header_t header;
+    lv_mem_header_t header;
     uint8_t first_data;        //First data in entry data
-}dm_ent_t;
+}lv_mem_ent_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 #if DM_CUSTOM == 0
-static dm_ent_t  * ent_get_next(dm_ent_t * act_e);
-static void * ent_alloc(dm_ent_t * e, uint32_t size);
-static dm_ent_t * ent_trunc(dm_ent_t * e, uint32_t size);
+static lv_mem_ent_t  * ent_get_next(lv_mem_ent_t * act_e);
+static void * ent_alloc(lv_mem_ent_t * e, uint32_t size);
+static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size);
 #endif
 
 /**********************
@@ -70,15 +69,15 @@ static uint32_t zero_mem;       /*Give the address of this variable if 0 byte sh
  **********************/
 
 /**
- * Initiaize the dyn_mem module (work memory and other variables)
+ * Initiaiize the dyn_mem module (work memory and other variables)
  */
-void dm_init(void)
+void lv_mem_init(void)
 {
 #if DM_CUSTOM == 0
-    dm_ent_t * full = (dm_ent_t *)&work_mem;
+    lv_mem_ent_t * full = (lv_mem_ent_t *)&work_mem;
     full->header.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */
-    full->header.d_size = DM_MEM_SIZE - sizeof(dm_header_t);
+    full->header.d_size = DM_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 }
 
@@ -87,7 +86,7 @@ void dm_init(void)
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory 
  */
-void * dm_alloc(uint32_t size)
+void * lv_mem_alloc(uint32_t size)
 {
     if(size == 0) {
         return &zero_mem;
@@ -102,7 +101,7 @@ void * dm_alloc(uint32_t size)
     void * alloc = NULL;
 
 #if DM_CUSTOM == 0 /*Use the allocation from dyn_mem*/
-    dm_ent_t * e = NULL;
+    lv_mem_ent_t * e = NULL;
     
     //Search for a appropriate entry
     do {
@@ -117,11 +116,11 @@ void * dm_alloc(uint32_t size)
     }while(e != NULL && alloc == NULL); 
 #else  /*Use custom, user defined malloc function*/
     /*Allocate a header too to store the size*/
-    alloc = DM_CUST_ALLOC(size + sizeof(dm_header_t));
+    alloc = DM_CUST_ALLOC(size + sizeof(lv_mem_header_t));
     if(alloc != NULL) {
-        ((dm_ent_t*) alloc)->header.d_size = size;
-        ((dm_ent_t*) alloc)->header.used = 1;
-        alloc = &((dm_ent_t*) alloc)->first_data;
+        ((lv_mem_ent_t*) alloc)->header.d_size = size;
+        ((lv_mem_ent_t*) alloc)->header.used = 1;
+        alloc = &((lv_mem_ent_t*) alloc)->first_data;
     }
 #endif
 
@@ -136,19 +135,19 @@ void * dm_alloc(uint32_t size)
  * Free an allocated data
  * @param data pointer to an allocated memory 
  */
-void dm_free(const void * data)
+void lv_mem_free(const void * data)
 {    
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
     /*e points to the header*/
-    dm_ent_t * e = (dm_ent_t *)((uint8_t *) data - sizeof(dm_header_t));
+    lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data - sizeof(lv_mem_header_t));
     e->header.used = 0;
 
 #if DM_CUSTOM == 0 /*Use the free from dyn_mem*/
     /* Make a simple defrag.
      * Join the following free entries after this*/
-    dm_ent_t * e_next;
+    lv_mem_ent_t * e_next;
     e_next = ent_get_next(e);
     while(e_next != NULL) {
         if(e_next->header.used == 0) {
@@ -170,11 +169,11 @@ void dm_free(const void * data)
  * @param new_size the desired new size in byte
  * @return pointer to the new memory
  */
-void * dm_realloc(void * data_p, uint32_t new_size)
+void * lv_mem_realloc(void * data_p, uint32_t new_size)
 {
     /*data_p could be previously freed pointer (in this case it is invalid)*/
     if(data_p != NULL) {
-        dm_ent_t * e = (dm_ent_t *)((uint8_t *) data_p - sizeof(dm_header_t));
+        lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data_p - sizeof(lv_mem_header_t));
         if(e->header.used == 0) data_p = NULL;
     }
 
@@ -182,13 +181,13 @@ void * dm_realloc(void * data_p, uint32_t new_size)
     if(old_size == new_size) return data_p;
 
     void * new_p;
-    new_p = dm_alloc(new_size);
+    new_p = lv_mem_alloc(new_size);
     
     if(new_p != NULL && data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
         if(old_size != 0) {
             memcpy(new_p, data_p, MATH_MIN(new_size, old_size));
-            dm_free(data_p);
+            lv_mem_free(data_p);
         }
     }
     
@@ -198,11 +197,11 @@ void * dm_realloc(void * data_p, uint32_t new_size)
 /**
  * Join the adjacent free memory blocks
  */
-void dm_defrag(void)
+void lv_mem_defrag(void)
 {
 #if DM_CUSTOM == 0
-    dm_ent_t * e_free;
-    dm_ent_t * e_next;
+    lv_mem_ent_t * e_free;
+    lv_mem_ent_t * e_next;
     e_free = ent_get_next(NULL);
 
     while(1) {
@@ -242,12 +241,12 @@ void dm_defrag(void)
  * @param mon_p pointer to a dm_mon_p variable, 
  *              the result of the analysis will be stored here
  */
-void dm_monitor(dm_mon_t * mon_p)
+void lv_mem_monitor(dm_mon_t * mon_p)
 {
     /*Init the data*/
     memset(mon_p, 0, sizeof(dm_mon_t));
 #if DM_CUSTOM == 0
-    dm_ent_t * e;
+    lv_mem_ent_t * e;
     e = NULL;
     
     e = ent_get_next(e);
@@ -282,7 +281,7 @@ uint32_t dm_get_size(void * data)
     if(data == NULL) return 0;
     if(data == &zero_mem) return 0;
     
-    dm_ent_t * e = (dm_ent_t *)((uint8_t *) data - sizeof(dm_header_t));
+    lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data - sizeof(lv_mem_header_t));
 
     return e->header.d_size;
 }
@@ -296,17 +295,17 @@ uint32_t dm_get_size(void * data)
  * @param act_e pointer to an entry
  * @return pointer to an entry after 'act_e'
  */
-static dm_ent_t * ent_get_next(dm_ent_t * act_e)
+static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
 {
-    dm_ent_t * next_e = NULL;
+    lv_mem_ent_t * next_e = NULL;
 
     if(act_e == NULL) { /*NULL means: get the first entry*/ 
-        next_e = (dm_ent_t * ) work_mem;
+        next_e = (lv_mem_ent_t * ) work_mem;
     }
     else /*Get the next entry */
     {
         uint8_t * data = &act_e->first_data;
-        next_e = (dm_ent_t * )&data[act_e->header.d_size];
+        next_e = (lv_mem_ent_t * )&data[act_e->header.d_size];
         
         if(&next_e->first_data >= &work_mem[DM_MEM_SIZE]) next_e = NULL;
     }
@@ -321,7 +320,7 @@ static dm_ent_t * ent_get_next(dm_ent_t * act_e)
  * @param size size of the new memory in bytes
  * @return pointer to the allocated memory or NULL if not enough memory in the entry
  */
-static void * ent_alloc(dm_ent_t * e, uint32_t size)
+static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
 {
     void * alloc = NULL;
     
@@ -345,21 +344,21 @@ static void * ent_alloc(dm_ent_t * e, uint32_t size)
  * @param size new size in bytes
  * @return the new entry created from the remaining memory
  */
-static dm_ent_t * ent_trunc(dm_ent_t * e, uint32_t size)
+static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size)
 {
-    dm_ent_t * new_e;
+    lv_mem_ent_t * new_e;
     
     /*Do let empty space  only for a header withot data*/
-    if(e->header.d_size == size + sizeof(dm_header_t)) {
-        size += sizeof(dm_header_t);
+    if(e->header.d_size == size + sizeof(lv_mem_header_t)) {
+        size += sizeof(lv_mem_header_t);
     }
 
     /* Create the new entry after the current if there is space for it */
     if(e->header.d_size != size) {
         uint8_t * e_data = &e->first_data;
-        dm_ent_t * new_e = (dm_ent_t *)&e_data[size];
+        lv_mem_ent_t * new_e = (lv_mem_ent_t *)&e_data[size];
         new_e->header.used = 0;
-        new_e->header.d_size = e->header.d_size - size - sizeof(dm_header_t);
+        new_e->header.d_size = e->header.d_size - size - sizeof(lv_mem_header_t);
     }
     
     /* Set the new size for the original entry */
@@ -368,7 +367,5 @@ static dm_ent_t * ent_trunc(dm_ent_t * e, uint32_t size)
     
     return new_e;
 }
-
-#endif /*DM_CUSTOM == 0*/
 
 #endif

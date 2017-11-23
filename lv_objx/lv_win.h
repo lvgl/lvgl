@@ -60,7 +60,7 @@ typedef struct
     lv_style_t * style_header;      /*Style of the header container*/
     lv_style_t * style_btn_rel;    /*Control button releases style*/
     lv_style_t * style_btn_pr;     /*Control button pressed style*/
-    cord_t btn_size;               /*Size of the control buttons (square)*/
+    lv_coord_t btn_size;               /*Size of the control buttons (square)*/
 }lv_win_ext_t;
 
 typedef enum {
@@ -122,14 +122,14 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
  * @param win pointer to a window object
  * @return control button size
  */
-void lv_win_set_btn_size(lv_obj_t * win, cord_t size);
+void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
 
 /**
  * Set the control button size of a window
  * @param win pointer to a window object
  * @param size control button size
  */
-void lv_win_set_btn_size(lv_obj_t * win, cord_t size);
+void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
 
 /**
  * Set the scroll bar mode of a window
@@ -169,7 +169,7 @@ const char * lv_win_get_title(lv_obj_t * win);
  * @param win pointer to a window object
  * @return control button size
  */
-cord_t lv_win_get_btn_size(lv_obj_t * win);
+lv_coord_t lv_win_get_btn_size(lv_obj_t * win);
 
 /**
  * Get the layout of a window
@@ -190,7 +190,7 @@ lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win);
  * @param win pointer to a window object
  * @return the width of the content area
  */
-cord_t lv_win_get_width(lv_obj_t * win);
+lv_coord_t lv_win_get_width(lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.

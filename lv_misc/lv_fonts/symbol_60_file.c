@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_SYMBOL_60_FILE != 0
+#if  USE_LV_FONT_SYMBOL_60_FILE != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -1325,7 +1325,7 @@ static const uint8_t symbol_60_file_width[] =
     56, 60, 60, 51, 51, 
 };
 
-font_t font_symbol_60_file = 
+lv_font_t lv_font_symbol_60_file = 
 {
 #if TXT_UTF8 == 0
     224,        /*First letter's unicode */

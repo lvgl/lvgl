@@ -42,8 +42,8 @@ typedef struct
     /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
     /*New data for this type */
     char* fn;                   /*Image file name. E.g. "U:/my_image"*/
-    cord_t w;                   /*Width of the image (doubled when upscaled) (Handled by the library)*/
-    cord_t h;                   /*Height of the image (doubled when upscaled) (Handled by the library)*/
+    lv_coord_t w;                   /*Width of the image (doubled when upscaled) (Handled by the library)*/
+    lv_coord_t h;                   /*Height of the image (doubled when upscaled) (Handled by the library)*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
     uint8_t upscale   :1;       /*1: upscale to double size with antialaissing*/
     uint8_t transp    :1;       /*Transp. bit in the image header (Handled by the library)*/

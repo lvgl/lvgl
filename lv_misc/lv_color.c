@@ -1,5 +1,5 @@
 /**
- * @file color.c
+ * @file lv_color.c
  *
  */
 
@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_color.h"
-#if USE_COLOR != 0
 
 /*********************
  *      DEFINES
@@ -42,9 +41,9 @@
  * @param h hue [0..359]
  * @param s saturation [0..100]
  * @param v value [0..100]
- * @return the given RGB color in RGB (with COLOR_DEPTH depth)
+ * @return the given RGB color in RGB (with LV_COLOR_DEPTH depth)
  */
-color_t color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
+lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
 {
     h = (uint32_t)((uint32_t)h * 255) / 360;
     s = (uint16_t)((uint16_t)s * 255) / 100;
@@ -59,7 +58,7 @@ color_t color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
         r = v;
         g = v;
         b = v;
-        return COLOR_MAKE(v, v, v);
+        return LV_COLOR_MAKE(v, v, v);
     }
 
     region = h / 43;
@@ -91,7 +90,7 @@ color_t color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
             break;
     }
 
-    color_t result = COLOR_MAKE(r, g, b);
+    lv_color_t result = LV_COLOR_MAKE(r, g, b);
     return result;
 }
 
@@ -102,9 +101,9 @@ color_t color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
  * @param b blue
  * @return the given RGB color n HSV
  */
-color_hsv_t color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b)
+lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b)
 {
-    color_hsv_t hsv;
+    lv_color_hsv_t hsv;
     uint8_t rgbMin, rgbMax;
 
     rgbMin = r < g ? (r < b ? r : b) : (g < b ? g : b);
@@ -134,5 +133,3 @@ color_hsv_t color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b)
 
     return hsv;
 }
-
-#endif /*USE_COLOR*/

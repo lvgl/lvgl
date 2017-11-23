@@ -46,7 +46,7 @@ typedef struct
     lv_lmeter_ext_t lmeter;     /*Ext. of ancestor*/
     /*New data for this type */
     int16_t * values;               /*Array of the set values (for needles) */
-    color_t * needle_colors;        /*Color of the needles (color_t my_colors[needle_num])*/
+    lv_color_t * needle_colors;        /*Color of the needles (lv_color_t my_colors[needle_num])*/
     uint8_t needle_count;             /*Number of needles*/
     uint8_t label_count;              /*Number of labels on the scale*/
 }lv_gauge_ext_t;
@@ -73,7 +73,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
  * @param needle_cnt new count of needles
  * @param colors an array of colors for needles (with 'num' elements)
  */
-void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, color_t * colors);
+void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, lv_color_t * colors);
 
 /**
  * Set the value of a needle

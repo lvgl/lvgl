@@ -61,7 +61,7 @@ typedef struct
 #endif
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;            /*Speed of scroll and roll animation in px/sec unit*/
-    point_t offset;                 /*Text draw position offset*/
+    lv_point_t offset;                 /*Text draw position offset*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
     uint8_t align       :2;         /*Align type from 'lv_label_align_t'*/
     uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
@@ -220,7 +220,7 @@ uint16_t lv_label_get_anim_speed(lv_obj_t *label);
  * @param index index of the letter [0 ... text length]. Expressed in character index, not byte index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
-void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos);
+void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos);
 
 /**
  * Get the index of letter on a relative point of a label
@@ -229,7 +229,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, point_t * pos);
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  * Expressed in character index and not byte index (different in UTF-8)
  */
-uint16_t lv_label_get_letter_on(lv_obj_t * label, point_t * pos);
+uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos);
 
 /**
  * Get the style of an label object

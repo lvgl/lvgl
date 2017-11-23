@@ -83,7 +83,7 @@ fs_res_t fs_open (fs_file_t * file_p, const char * path, fs_mode_t mode)
         }
     }
     
-    file_p->file_d = dm_alloc(file_p->drv->file_size);
+    file_p->file_d = lv_mem_alloc(file_p->drv->file_size);
     if(file_p->file_d == NULL) {   
         file_p->drv = NULL;
         return FS_RES_OUT_OF_MEM;  /* Out of memory */
@@ -116,7 +116,7 @@ fs_res_t fs_close (fs_file_t * file_p)
     
     fs_res_t res = file_p->drv->close(file_p->file_d);
     
-    dm_free(file_p->file_d);   /*Clean up*/
+    lv_mem_free(file_p->file_d);   /*Clean up*/
     file_p->file_d = NULL;
     file_p->drv = NULL;
     file_p->file_d = NULL;
@@ -283,7 +283,7 @@ fs_res_t fs_readdir_init(fs_readdir_t * rddir_p, const char * path)
         return FS_RES_NOT_EX;
     }
     
-    rddir_p->rddir_d = dm_alloc(rddir_p->drv->file_size);
+    rddir_p->rddir_d = lv_mem_alloc(rddir_p->drv->file_size);
     if(rddir_p->rddir_d == NULL) {   
         rddir_p->rddir_d = NULL;
         return FS_RES_OUT_OF_MEM;  /* Out of memory */
@@ -340,7 +340,7 @@ fs_res_t fs_readdir_close (fs_readdir_t * rddir_p)
         res = rddir_p->drv->rddir_close(rddir_p->rddir_d);
     }
     
-    dm_free(rddir_p->rddir_d);   /*Clean up*/
+    lv_mem_free(rddir_p->rddir_d);   /*Clean up*/
     rddir_p->rddir_d = NULL;
     rddir_p->drv = NULL;
     rddir_p->rddir_d = NULL;

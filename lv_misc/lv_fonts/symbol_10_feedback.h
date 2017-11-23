@@ -5,13 +5,13 @@
 
 #include "misc_conf.h"
 
-#if  USE_FONT_SYMBOL_10_FEEDBACK != 0
+#if  USE_LV_FONT_SYMBOL_10_FEEDBACK != 0
 
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
-extern font_t font_symbol_10_feedback;
+extern lv_font_t lv_font_symbol_10_feedback;
 
-#endif   /*USE_FONT_SYMBOL_10_FEEDBACK != 0*/
+#endif   /*USE_LV_FONT_SYMBOL_10_FEEDBACK != 0*/
 
 #endif   /*SYMBOL_10_FEEDBACK_H*/

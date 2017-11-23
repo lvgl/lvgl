@@ -50,7 +50,7 @@ typedef struct
     lv_obj_t * indic;
     lv_obj_t * content;   /*A rectangle to show the current tab*/
     const char ** tab_name_ptr;
-    point_t point_last;
+    lv_point_t point_last;
     uint16_t tab_cur;
     uint16_t tab_cnt;
     uint16_t anim_time;

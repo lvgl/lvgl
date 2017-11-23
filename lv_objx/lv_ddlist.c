@@ -30,7 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode);
+static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_release_action(lv_obj_t * ddlist);
@@ -191,7 +191,7 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action)
  * @param ddlist pointer to a drop down list
  * @param h the height when the list is opened (0: auto size)
  */
-void lv_ddlist_set_fix_height(lv_obj_t * ddlist, cord_t h)
+void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->fix_height = h;
@@ -317,7 +317,7 @@ lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist)
  * @param ddlist pointer to a drop down list object
  * @return the height if the ddlist is opened (0: auto size)
  */
-cord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist)
+lv_coord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return ext->fix_height;
@@ -399,7 +399,7 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_mode_t mode)
+static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -414,11 +414,11 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const area_t * mask, lv_design_m
         /*If the list is opened draw a rectangle under the selected item*/
         if(ext->opened != 0) {
             lv_style_t *style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-            const font_t * font = style->text.font;
-            cord_t font_h = font_get_height_scale(font);
+            const lv_font_t * font = style->text.font;
+            lv_coord_t font_h = lv_font_get_height_scale(font);
 
             /*Draw the selected*/
-            area_t rect_area;
+            lv_area_t rect_area;
             rect_area.y1 = ext->label->coords.y1;
             rect_area.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
             rect_area.y1 -= style->text.line_space / 2;
@@ -543,7 +543,7 @@ static lv_res_t lv_ddlist_release_action(lv_obj_t * ddlist)
 
         /*Search the clicked option*/
         lv_indev_t *indev = lv_indev_get_act();
-        point_t p;
+        lv_point_t p;
         lv_indev_get_point(indev, &p);
         p.x -= ext->label->coords.x1;
         p.y -= ext->label->coords.y1;
@@ -578,27 +578,27 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
-    cord_t new_height;
+    lv_coord_t new_height;
     if(ext->opened) { /*Open the list*/
         if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->body.padding.ver;
         else new_height = ext->fix_height;
     } else { /*Close the list*/
-        const font_t * font = style->text.font;
+        const lv_font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->label);
-        cord_t font_h = font_get_height_scale(font);
+        lv_coord_t font_h = lv_font_get_height_scale(font);
         new_height = font_h + 2 * label_style->text.line_space;
     }
     if(anim_time == 0) {
         lv_obj_set_height(ddlist, new_height);
         lv_ddlist_pos_current_option(ddlist);
     } else {
-        anim_t a;
+        lv_anim_t a;
         a.var = ddlist;
         a.start = lv_obj_get_height(ddlist);
         a.end = new_height;
-        a.fp = (anim_fp_t)lv_obj_set_height;
-        a.path = anim_get_path(ANIM_PATH_LIN);
-        a.end_cb = (anim_cb_t)lv_ddlist_pos_current_option;
+        a.fp = (lv_anim_fp_t)lv_obj_set_height;
+        a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+        a.end_cb = (lv_anim_cb_t)lv_ddlist_pos_current_option;
         a.act_time = 0;
         a.time = ext->anim_time;
         a.playback = 0;
@@ -606,7 +606,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
         a.repeat = 0;
         a.repeat_pause = 0;
 
-        anim_create(&a);
+        lv_anim_create(&a);
     }
 }
 
@@ -618,13 +618,13 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
-    const font_t * font = style->text.font;
-    cord_t font_h = font_get_height_scale(font);
+    const lv_font_t * font = style->text.font;
+    lv_coord_t font_h = lv_font_get_height_scale(font);
     lv_style_t * label_style = lv_obj_get_style(ext->label);
     lv_obj_t * scrl = lv_page_get_scrl(ddlist);
 
-    cord_t h = lv_obj_get_height(ddlist);
-    cord_t line_y1 = ext->sel_opt_id * (font_h + label_style->text.line_space) + ext->label->coords.y1 - scrl->coords.y1;
+    lv_coord_t h = lv_obj_get_height(ddlist);
+    lv_coord_t line_y1 = ext->sel_opt_id * (font_h + label_style->text.line_space) + ext->label->coords.y1 - scrl->coords.y1;
 
     lv_obj_set_y(scrl, - line_y1 + (h - font_h) / 2);
 

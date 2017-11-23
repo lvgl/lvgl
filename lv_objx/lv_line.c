@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_t mode);
+static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
 
 /**********************
@@ -99,7 +99,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
  * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
-void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num)
+void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t point_num)
 {
 	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 	ext->point_array = point_a;
@@ -112,8 +112,8 @@ void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point
 
 	if(point_num > 0 && ext->auto_size != 0) {
 		uint16_t i;
-		cord_t xmax = CORD_MIN;
-		cord_t ymax = CORD_MIN;
+		lv_coord_t xmax = LV_COORD_MIN;
+		lv_coord_t ymax = LV_COORD_MIN;
 		for(i = 0; i < point_num; i++) {
 			xmax = MATH_MAX(point_a[i].x * us, xmax);
 			ymax = MATH_MAX(point_a[i].y * us, ymax);
@@ -225,7 +225,7 @@ bool lv_line_get_upscale(lv_obj_t * line)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_t mode)
+static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mode_t mode)
 {
     /*A line never covers an area*/
     if(mode == LV_DESIGN_COVER_CHK) return false;
@@ -235,13 +235,13 @@ static bool lv_line_design(lv_obj_t * line, const area_t * mask, lv_design_mode_
 		if(ext->point_num == 0 || ext->point_array == NULL) return false;
 
 		lv_style_t * style = lv_obj_get_style(line);
-		area_t area;
+		lv_area_t area;
 		lv_obj_get_coords(line, &area);
-		cord_t x_ofs = area.x1;
-		cord_t y_ofs = area.y1;
-		point_t p1;
-		point_t p2;
-		cord_t h = lv_obj_get_height(line);
+		lv_coord_t x_ofs = area.x1;
+		lv_coord_t y_ofs = area.y1;
+		lv_point_t p1;
+		lv_point_t p2;
+		lv_coord_t h = lv_obj_get_height(line);
 		uint16_t i;
 		uint8_t us = 1;
 		if(ext->upscale != 0) {

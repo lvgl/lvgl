@@ -34,7 +34,7 @@ static lv_style_t def;
 
 /*Saved input parameters*/
 static uint16_t _hue;
-static font_t * _font;
+static lv_font_t * _font;
 
 /**********************
  *      MACROS
@@ -335,7 +335,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_templ_init(uint16_t hue, font_t *font)
+lv_theme_t * lv_theme_templ_init(uint16_t hue, lv_font_t *font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 

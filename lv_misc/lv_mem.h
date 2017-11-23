@@ -1,10 +1,10 @@
 /**
- * @file dyn_mem.h
+ * @file lv_mem.h
  *
  */
 
-#ifndef DYN_MEM_H
-#define DYN_MEM_H
+#ifndef LV_MEM_H
+#define LV_MEM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_DYN_MEM != 0
 
 #include <stdint.h>
 #include <stddef.h>
@@ -49,20 +48,20 @@ typedef struct
 /**
  * Initiaize the dyn_mem module (work memory and other variables)
  */
-void dm_init(void);
+void lv_mem_init(void);
 
 /**
  * Allocate a memory dynamically
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
  */
-void * dm_alloc(uint32_t size);
+void * lv_mem_alloc(uint32_t size);
 
 /**
  * Free an allocated data
  * @param data pointer to an allocated memory
  */
-void dm_free(const void * data);
+void lv_mem_free(const void * data);
 
 /**
  * Reallocate a memory with a new size. The old content will be kept.
@@ -71,19 +70,19 @@ void dm_free(const void * data);
  * @param new_size the desired new size in byte
  * @return pointer to the new memory
  */
-void * dm_realloc(void * data_p, uint32_t new_size);
+void * lv_mem_realloc(void * data_p, uint32_t new_size);
 
 /**
  * Join the adjacent free memory blocks
  */
-void dm_defrag(void);
+void lv_mem_defrag(void);
 
 /**
  * Give information about the work memory of dynamic allocation
  * @param mon_p pointer to a dm_mon_p variable,
  *              the result of the analysis will be stored here
  */
-void dm_monitor(dm_mon_t * mon_p);
+void lv_mem_monitor(dm_mon_t * mon_p);
 
 /**
  * Give the size of an allocated memory
@@ -98,11 +97,9 @@ uint32_t dm_get_size(void * data);
 
 #define dm_assert(p) {if(p == NULL) {while(1);}}
 
-#endif /*USE_DYN_MEM*/
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /*DYN_MEM_H*/
+#endif /*LV_MEM_H*/
 

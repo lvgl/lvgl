@@ -49,8 +49,8 @@
 #define LV_OBJ_GROUP            1           /*Enable object groups*/
 
 /*Others*/
-#define LV_COLOR_TRANSP     COLOR_LIME          /*Images pixels with this color will not be drawn*/
-#define LV_FONT_DEFAULT      &font_dejavu_40    /*Always set a default font from the built-in fonts*/
+#define LV_LV_COLOR_TRANSP     LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
+#define LV_FONT_DEFAULT      &lv_font_dejavu_40    /*Always set a default font from the built-in fonts*/
 
 /*==================
  *  IMAGE USAGE

@@ -210,7 +210,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
  */
 void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
-    anim_del(mbox, NULL);
+    lv_anim_del(mbox, NULL);
 }
 
 /**
@@ -364,7 +364,7 @@ static void mbox_realign(lv_obj_t *mbox)
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     lv_style_t *style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BG);
-    cord_t w = lv_obj_get_width(mbox) - 2 * style->body.padding.hor;
+    lv_coord_t w = lv_obj_get_width(mbox) - 2 * style->body.padding.hor;
 
     if(ext->text) {
         lv_obj_set_width(ext->text, w);
@@ -373,7 +373,7 @@ static void mbox_realign(lv_obj_t *mbox)
     if(ext->btnm) {
         lv_style_t *btn_bg_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
         lv_style_t *btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
-        cord_t font_h = font_get_height_scale(btn_rel_style->text.font);
+        lv_coord_t font_h = lv_font_get_height_scale(btn_rel_style->text.font);
         lv_obj_set_size(ext->btnm, w, font_h + 2 * btn_rel_style->body.padding.ver + 2 * btn_bg_style->body.padding.ver);
     }
 }

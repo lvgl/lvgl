@@ -51,8 +51,8 @@ typedef struct
     lv_action_t pr_action;      /*Function to call when the page is pressed*/
     struct {
         lv_style_t *style;          /*Style of scrollbars*/
-        area_t hor_area;            /*Horizontal scrollbar area relative to the page. (Handled by the library) */
-        area_t ver_area;            /*Vertical scrollbar area relative to the page (Handled by the library)*/
+        lv_area_t hor_area;            /*Horizontal scrollbar area relative to the page. (Handled by the library) */
+        lv_area_t ver_area;            /*Vertical scrollbar area relative to the page (Handled by the library)*/
         uint8_t hor_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
         uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
         uint8_t mode     :3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
@@ -129,7 +129,7 @@ static inline void lv_page_set_scrl_fit(lv_obj_t *page, bool hor_en, bool ver_en
  * @param page pointer to a page object
  * @param w the new width of the scrollable (it ha no effect is horizontal fit is enabled)
  */
-static inline void lv_page_set_scrl_width(lv_obj_t *page, cord_t w)
+static inline void lv_page_set_scrl_width(lv_obj_t *page, lv_coord_t w)
 {
     lv_obj_set_width(lv_page_get_scrl(page), w);
 }
@@ -139,7 +139,7 @@ static inline void lv_page_set_scrl_width(lv_obj_t *page, cord_t w)
  * @param page pointer to a page object
  * @param h the new height of the scrollable (it ha no effect is vertical fit is enabled)
  */
-static inline void lv_page_set_scrl_height(lv_obj_t *page, cord_t h)
+static inline void lv_page_set_scrl_height(lv_obj_t *page, lv_coord_t h)
 {
     lv_obj_set_height(lv_page_get_scrl(page), h);
 
@@ -179,7 +179,7 @@ lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
  * @param page pointer to a page object
  * @return the width of the scrollable
  */
-static inline cord_t lv_page_get_scrl_width(lv_obj_t *page)
+static inline lv_coord_t lv_page_get_scrl_width(lv_obj_t *page)
 {
     return lv_obj_get_width(lv_page_get_scrl(page));
 }
@@ -189,7 +189,7 @@ static inline cord_t lv_page_get_scrl_width(lv_obj_t *page)
  * @param page pointer to a page object
  * @return the height of the scrollable
  */
-static inline cord_t lv_page_get_scrl_height(lv_obj_t *page)
+static inline lv_coord_t lv_page_get_scrl_height(lv_obj_t *page)
 {
     return lv_obj_get_height(lv_page_get_scrl(page));
 }

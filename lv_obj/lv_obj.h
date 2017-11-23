@@ -64,7 +64,7 @@ typedef enum
     LV_DESIGN_COVER_CHK,
 }lv_design_mode_t;
 
-typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const area_t * mask_p, lv_design_mode_t mode);
+typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 
 typedef enum
 {
@@ -104,7 +104,7 @@ typedef struct _lv_obj_t
     struct _lv_obj_t * par;    /*Pointer to the parent object*/
     ll_dsc_t child_ll;          /*Linked list to store the children objects*/
     
-    area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
+    lv_area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 
     lv_signal_func_t signal_func;     /*Object type specific signal function*/
     lv_design_func_t design_func;     /*Object type specific design function*/
@@ -129,7 +129,7 @@ typedef struct _lv_obj_t
 
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
 
-    cord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+    lv_coord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
     LV_OBJ_FREE_NUM_TYPE free_num; 		    /*Application specific identifier (set it freely)*/
@@ -261,7 +261,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent);
  * @param x new distance from the left side of the parent
  * @param y new distance from the top of the parent
  */
-void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y);
+void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set relative the position of an object (relative to the parent).
@@ -270,7 +270,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y);
  * @param x new distance from the left side of the parent.
  * @param y new distance from the top of the parent.
  */
-static inline void lv_obj_set_pos_scale(lv_obj_t * obj, cord_t x, cord_t y)
+static inline void lv_obj_set_pos_scale(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     lv_obj_set_pos(obj, x << LV_ANTIALIAS, y << LV_ANTIALIAS);
 }
@@ -280,7 +280,7 @@ static inline void lv_obj_set_pos_scale(lv_obj_t * obj, cord_t x, cord_t y)
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent
  */
-void lv_obj_set_x(lv_obj_t * obj, cord_t x);
+void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x);
 
 /**
  * Set the x coordinate of a object.
@@ -288,7 +288,7 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x);
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent.
  */
-static inline void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x)
+static inline void lv_obj_set_x_scale(lv_obj_t * obj, lv_coord_t x)
 {
     lv_obj_set_x(obj, x << LV_ANTIALIAS);
 }
@@ -298,7 +298,7 @@ static inline void lv_obj_set_x_scale(lv_obj_t * obj, cord_t x)
  * @param obj pointer to an object
  * @param y new distance from the top of the parent
  */
-void lv_obj_set_y(lv_obj_t * obj, cord_t y);
+void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
 
 /**
  * Set the y coordinate of a object.
@@ -306,7 +306,7 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y);
  * @param obj pointer to an object
  * @param y new distance from the top of the parent.
  */
-static inline void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y)
+static inline void lv_obj_set_y_scale(lv_obj_t * obj, lv_coord_t y)
 {
     lv_obj_set_y(obj, y << LV_ANTIALIAS);
 }
@@ -317,7 +317,7 @@ static inline void lv_obj_set_y_scale(lv_obj_t * obj, cord_t y)
  * @param w new width
  * @param h new height
  */
-void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h);
+void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
 /**
  * Set the size of an object.
@@ -326,7 +326,7 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h);
  * @param w new width
  * @param h new height
  */
-static inline void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h)
+static inline void lv_obj_set_size_scale(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
     lv_obj_set_size(obj, w << LV_ANTIALIAS, h << LV_ANTIALIAS);
 }
@@ -336,7 +336,7 @@ static inline void lv_obj_set_size_scale(lv_obj_t * obj, cord_t w, cord_t h)
  * @param obj pointer to an object
  * @param w new width
  */
-void lv_obj_set_width(lv_obj_t * obj, cord_t w);
+void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w);
 
 /**
  * Set the width of an object.
@@ -344,7 +344,7 @@ void lv_obj_set_width(lv_obj_t * obj, cord_t w);
  * @param obj pointer to an object
  * @param w new width
  */
-static inline void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w)
+static inline void lv_obj_set_width_scale(lv_obj_t * obj, lv_coord_t w)
 {
     lv_obj_set_width(obj, w << LV_ANTIALIAS);
 }
@@ -354,7 +354,7 @@ static inline void lv_obj_set_width_scale(lv_obj_t * obj, cord_t w)
  * @param obj pointer to an object
  * @param h new height
  */
-void lv_obj_set_height(lv_obj_t * obj, cord_t h);
+void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
 
 /**
  * Set the height of an object.
@@ -362,7 +362,7 @@ void lv_obj_set_height(lv_obj_t * obj, cord_t h);
  * @param obj pointer to an object
  * @param h new height
  */
-static inline void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h)
+static inline void lv_obj_set_height_scale(lv_obj_t * obj, lv_coord_t h)
 {
     lv_obj_set_height(obj, h << LV_ANTIALIAS);
 }
@@ -375,7 +375,7 @@ static inline void lv_obj_set_height_scale(lv_obj_t * obj, cord_t h)
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod);
+void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
 
 /**
  * Align an object to an other object.
@@ -386,7 +386,7 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-static inline void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod)
+static inline void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
 {
     lv_obj_align(obj, base, align, x_mod << LV_ANTIALIAS, y_mod << LV_ANTIALIAS);
 }
@@ -619,42 +619,42 @@ uint16_t lv_obj_count_children(lv_obj_t * obj);
  * @param obj pointer to an object
  * @param cords_p pointer to an area to store the coordinates
  */
-void lv_obj_get_coords(lv_obj_t * obj, area_t * cords_p);
+void lv_obj_get_coords(lv_obj_t * obj, lv_area_t * cords_p);
 
 /**
  * Get the x coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent
  */
-cord_t lv_obj_get_x(lv_obj_t * obj);
+lv_coord_t lv_obj_get_x(lv_obj_t * obj);
 
 /**
  * Get the y coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the top of its parent
  */
-cord_t lv_obj_get_y(lv_obj_t * obj);
+lv_coord_t lv_obj_get_y(lv_obj_t * obj);
 
 /**
  * Get the width of an object
  * @param obj pointer to an object
  * @return the width
  */
-cord_t lv_obj_get_width(lv_obj_t * obj);
+lv_coord_t lv_obj_get_width(lv_obj_t * obj);
 
 /**
  * Get the height of an object
  * @param obj pointer to an object
  * @return the height
  */
-cord_t lv_obj_get_height(lv_obj_t * obj);
+lv_coord_t lv_obj_get_height(lv_obj_t * obj);
 
 /**
  * Get the extended size attribute of an object
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-cord_t lv_obj_get_ext_size(lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_size(lv_obj_t * obj);
 
 /*-----------------
  * Appearance get

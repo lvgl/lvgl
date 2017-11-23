@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_SYMBOL_80_FEEDBACK != 0
+#if  USE_LV_FONT_SYMBOL_80_FEEDBACK != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -1251,7 +1251,7 @@ static const uint8_t symbol_80_feedback_width[] =
     91, 103, 103, 103, 103, 103, 69, 
 };
 
-font_t font_symbol_80_feedback = 
+lv_font_t lv_font_symbol_80_feedback = 
 {
 #if TXT_UTF8 == 0
     208,        /*First letter's unicode */

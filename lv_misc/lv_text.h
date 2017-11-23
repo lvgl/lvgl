@@ -24,7 +24,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define TXT_RECOLOR_CMD  '#'
+#define TXT_RELV_COLOR_CMD  '#'
 
 /**********************
  *      TYPEDEFS
@@ -59,8 +59,8 @@ typedef enum
  * @param flags settings for the text from 'txt_flag_t' enum
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
  */
-void txt_get_size(point_t * size_res, const char * text, const font_t * font,
-                    cord_t letter_space, cord_t line_space, cord_t max_width, txt_flag_t flag);
+void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, txt_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -71,8 +71,8 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return the index of the first char of the new line
  */
-uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
-                            cord_t letter_space, cord_t max_l, txt_flag_t flag);
+uint16_t txt_get_next_line(const char * txt, const lv_font_t * font_p,
+                            lv_coord_t letter_space, lv_coord_t max_l, txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -83,8 +83,8 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font_p,
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-cord_t txt_get_width(const char * txt, uint16_t char_num,
-                    const font_t * font_p, cord_t letter_space, txt_flag_t flag);
+lv_coord_t txt_get_width(const char * txt, uint16_t char_num,
+                    const lv_font_t * font_p, lv_coord_t letter_space, txt_flag_t flag);
 
 /**
  * Check next character in a string and decide if te character is part of the command or not

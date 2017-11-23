@@ -109,12 +109,12 @@ void lv_vdb_flush(void)
 	 * in1_buf  |1,1|1,3|
 	 * in2_buf  |1,1|1,3|
 	 * */
-	cord_t x;
-	cord_t y;
-	cord_t w = area_get_width(&vdb_act->area);
-	color_t * in1_buf = vdb_act->buf;      /*Pointer to the first row*/
-    color_t * in2_buf = vdb_act->buf + w;  /*Pointer to the second row*/
-    color_t * out_buf = vdb_act->buf;      /*Store the result here*/
+	lv_coord_t x;
+	lv_coord_t y;
+	lv_coord_t w = area_get_width(&vdb_act->area);
+	lv_color_t * in1_buf = vdb_act->buf;      /*Pointer to the first row*/
+    lv_color_t * in2_buf = vdb_act->buf + w;  /*Pointer to the second row*/
+    lv_color_t * out_buf = vdb_act->buf;      /*Store the result here*/
 	for(y = vdb_act->area.y1; y < vdb_act->area.y2; y += 2) {
         for(x = vdb_act->area.x1; x < vdb_act->area.x2; x += 2) {
         

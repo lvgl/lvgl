@@ -79,7 +79,7 @@ void lv_indev_set_group(lv_indev_t *indev, lv_group_t *group);
  * @param indev pointer to an input device
  * @param point pointer to a point to store the result
  */
-void lv_indev_get_point(lv_indev_t * indev, point_t * point);
+void lv_indev_get_point(lv_indev_t * indev, lv_point_t * point);
 /**
  * Check if there is dragging with an input device or not
  * @param indev pointer to an input device
@@ -92,7 +92,7 @@ bool lv_indev_is_dragging(lv_indev_t * indev);
  * @param indev pointer to an input device
  * @param point pointer to a point to store the vector
  */
-void lv_indev_get_vect(lv_indev_t * indev, point_t * point);
+void lv_indev_get_vect(lv_indev_t * indev, lv_point_t * point);
 
 /**
  * Do nothing until the next release

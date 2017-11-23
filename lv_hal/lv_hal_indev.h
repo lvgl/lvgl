@@ -45,7 +45,7 @@ typedef enum {
 /*Data type when an input device is read */
 typedef struct {
     union {
-        point_t point;      /*For INDEV_TYPE_TOUCHPAD, INDEV_TYPE_POINTER, LV_INDEV_TYPE_BUTTON*/
+        lv_point_t point;      /*For INDEV_TYPE_TOUCHPAD, INDEV_TYPE_POINTER, LV_INDEV_TYPE_BUTTON*/
         uint32_t key;       /*For INDEV_TYPE_KEYPAD*/
     };
     lv_indev_event_t state; /*LV_INDEV_EVENT_REL or LV_INDEV_EVENT_PR*/
@@ -63,10 +63,10 @@ typedef struct _lv_indev_state_t {
     lv_indev_event_t event;
     union {
         struct {
-            point_t act_point;
-            point_t last_point;
-            point_t vect;
-            point_t drag_sum;				/*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
+            lv_point_t act_point;
+            lv_point_t last_point;
+            lv_point_t vect;
+            lv_point_t drag_sum;				/*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
             struct _lv_obj_t * act_obj;
             struct _lv_obj_t * last_obj;
 

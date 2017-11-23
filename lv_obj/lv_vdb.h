@@ -30,8 +30,8 @@ extern "C" {
 
 typedef struct
 {
-    area_t area;
-    color_t buf[LV_VDB_SIZE];
+    lv_area_t area;
+    lv_color_t buf[LV_VDB_SIZE];
 }lv_vdb_t;
 
 /**********************

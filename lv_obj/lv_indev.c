@@ -145,7 +145,7 @@ void lv_indev_set_group(lv_indev_t *indev, lv_group_t *group)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the result
  */
-void lv_indev_get_point(lv_indev_t * indev, point_t * point)
+void lv_indev_get_point(lv_indev_t * indev, lv_point_t * point)
 {
     point->x = indev->state.act_point.x;
     point->y = indev->state.act_point.y;
@@ -167,7 +167,7 @@ bool lv_indev_is_dragging(lv_indev_t * indev)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the vector
  */
-void lv_indev_get_vect(lv_indev_t * indev, point_t * point)
+void lv_indev_get_vect(lv_indev_t * indev, lv_point_t * point)
 {
     point->x = indev->state.vect.x;
     point->y = indev->state.vect.y;
@@ -288,7 +288,7 @@ static void indev_proc_point(lv_indev_state_t * indev)
         area.y1 = (indev->act_point.y >> LV_ANTIALIAS) - (LV_INDEV_POINT_MARKER >> 1);
         area.x2 = (indev->act_point.x >> LV_ANTIALIAS) + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
         area.y2 = (indev->act_point.y >> LV_ANTIALIAS) + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        lv_rfill(&area, NULL, COLOR_MAKE(0xFF, 0, 0), OPA_COVER);
+        lv_rfill(&area, NULL, LV_COLOR_MAKE(0xFF, 0, 0), LV_OPA_COVER);
 #endif
         indev_proc_press(indev);
     } else {
@@ -453,7 +453,7 @@ static lv_obj_t * indev_search_obj(const lv_indev_state_t * indev, lv_obj_t * ob
     
     /*If the point is on this object*/
     /*Check its children too*/
-    if(area_is_point_on(&obj->coords, &indev->act_point)) {
+    if(lv_area_is_point_on(&obj->coords, &indev->act_point)) {
         lv_obj_t * i;
     
         LL_READ(obj->child_ll, i) {
@@ -519,8 +519,8 @@ static void indev_drag(lv_indev_state_t * state)
         if(state->vect.x != 0 ||
            state->vect.y != 0) {
             /*Get the coordinates of the object end modify them*/
-            cord_t act_x = lv_obj_get_x(drag_obj);
-            cord_t act_y = lv_obj_get_y(drag_obj);
+            lv_coord_t act_x = lv_obj_get_x(drag_obj);
+            lv_coord_t act_y = lv_obj_get_y(drag_obj);
 
             lv_obj_set_pos(drag_obj, act_x + state->vect.x, act_y + state->vect.y);
 
@@ -571,8 +571,8 @@ static void indev_drag_throw(lv_indev_state_t * state)
        state->vect.y != 0)
     {
         /*Get the coordinates  and modify them*/
-        cord_t act_x = lv_obj_get_x(drag_obj) + state->vect.x;
-        cord_t act_y = lv_obj_get_y(drag_obj) + state->vect.y;
+        lv_coord_t act_x = lv_obj_get_x(drag_obj) + state->vect.x;
+        lv_coord_t act_y = lv_obj_get_y(drag_obj) + state->vect.y;
         lv_obj_set_pos(drag_obj, act_x, act_y);
 
         /*If non of the coordinates are changed then do not continue throwing*/

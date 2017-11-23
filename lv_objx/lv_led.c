@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t mode);
+static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param);
 
 /**********************
@@ -169,7 +169,7 @@ uint8_t lv_led_get_bright(lv_obj_t * led)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t mode)
+static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask area*/
@@ -189,9 +189,9 @@ static bool lv_led_design(lv_obj_t * led, const area_t * mask, lv_design_mode_t 
 		memcpy(&leds_tmp, style, sizeof(leds_tmp));
 
 		/*Mix. the color with black proportionally with brightness*/
-		leds_tmp.body.main_color = color_mix(leds_tmp.body.main_color, COLOR_BLACK, ext->bright);
-		leds_tmp.body.grad_color = color_mix(leds_tmp.body.grad_color, COLOR_BLACK, ext->bright);
-        leds_tmp.body.border.color = color_mix(leds_tmp.body.border.color, COLOR_BLACK, ext->bright);
+		leds_tmp.body.main_color = lv_color_mix(leds_tmp.body.main_color, LV_COLOR_BLACK, ext->bright);
+		leds_tmp.body.grad_color = lv_color_mix(leds_tmp.body.grad_color, LV_COLOR_BLACK, ext->bright);
+        leds_tmp.body.border.color = lv_color_mix(leds_tmp.body.border.color, LV_COLOR_BLACK, ext->bright);
 
 		/*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF and LV_LED_BRIGHT_ON*/
 		uint16_t bright_tmp = ext->bright;

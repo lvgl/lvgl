@@ -48,8 +48,8 @@ static bool txt_is_break_char(uint32_t letter);
  * @param flags settings for the text from 'txt_flag_t' enum
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
  */
-void txt_get_size(point_t * size_res, const char * text, const font_t * font,
-                    cord_t letter_space, cord_t line_space, cord_t max_width, txt_flag_t flag)
+void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, txt_flag_t flag)
 {
     size_res->x = 0;
     size_res->y = 0;
@@ -57,12 +57,12 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
     if(text == NULL) return;
     if(font == NULL) return;
 
-    if(flag & TXT_FLAG_EXPAND) max_width = CORD_MAX;
+    if(flag & TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
-    cord_t act_line_length;
-    uint8_t letter_height = font_get_height_scale(font);
+    lv_coord_t act_line_length;
+    uint8_t letter_height = lv_font_get_height_scale(font);
 
     /*Calc. the height and longest line*/
     while (text[line_start] != '\0') {
@@ -97,16 +97,16 @@ void txt_get_size(point_t * size_res, const char * text, const font_t * font,
  * @param flags settings for the text from 'txt_flag_type' enum
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
-uint16_t txt_get_next_line(const char * txt, const font_t * font,
-                           cord_t letter_space, cord_t max_width, txt_flag_t flag)
+uint16_t txt_get_next_line(const char * txt, const lv_font_t * font,
+                           lv_coord_t letter_space, lv_coord_t max_width, txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
-    if(flag & TXT_FLAG_EXPAND) max_width = CORD_MAX;
+    if(flag & TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t i = 0;
-    cord_t act_l = 0;
+    lv_coord_t act_l = 0;
     uint32_t last_break = TXT_NO_BREAK_FOUND;
     txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
     uint32_t letter = 0;
@@ -130,7 +130,7 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font,
             return i;    /*Return with the first letter of the next line*/
 
         } else { /*Check the actual length*/
-            act_l += font_get_width_scale(font, letter);
+            act_l += lv_font_get_width_scale(font, letter);
 
             /*If the txt is too long then finish, this is the line end*/
             if(act_l > max_width) {
@@ -177,14 +177,14 @@ uint16_t txt_get_next_line(const char * txt, const font_t * font,
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-cord_t txt_get_width(const char * txt, uint16_t length, 
-                      const font_t * font, cord_t letter_space, txt_flag_t flag)
+lv_coord_t txt_get_width(const char * txt, uint16_t length, 
+                      const lv_font_t * font, lv_coord_t letter_space, txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
     uint32_t i = 0;
-    cord_t width = 0;
+    lv_coord_t width = 0;
     txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
     uint32_t letter;
     
@@ -196,14 +196,14 @@ cord_t txt_get_width(const char * txt, uint16_t length,
                     continue;
                 }
             }
-            width += font_get_width_scale(font, letter);
+            width += lv_font_get_width_scale(font, letter);
             width += letter_space;
         }
         
         /*Trim closing spaces. Important when the text is aligned to the middle */
         for(i = length - 1; i > 0; i--) {
             if(txt[i] == ' ') {
-                width -= font_get_width_scale(font, txt[i]);
+                width -= lv_font_get_width_scale(font, txt[i]);
                 width -= letter_space;
             } else {
                 break;
@@ -226,7 +226,7 @@ bool txt_is_cmd(txt_cmd_state_t * state, uint32_t c)
 {
     bool ret = false;
 
-    if(c == TXT_RECOLOR_CMD) {
+    if(c == TXT_RELV_COLOR_CMD) {
        if(*state == TXT_CMD_STATE_WAIT) { /*Start char*/
            *state = TXT_CMD_STATE_PAR;
            ret = true;

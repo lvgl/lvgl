@@ -1,5 +1,5 @@
 #include "misc_conf.h"
-#if  USE_FONT_DEJAVU_80_CYRILLIC != 0
+#if  USE_LV_FONT_DEJAVU_80_CYRILLIC != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
@@ -21073,7 +21073,7 @@ static const uint8_t dejavu_80_cyrillic_width[] =
     61, 54, 47, 40, 47, 41, 47, 41, 
 };
 
-font_t font_dejavu_80_cyrillic = 
+lv_font_t lv_font_dejavu_80_cyrillic = 
 {
     1024,        /*First letter's unicode */
     1279,        /*Last letter's unicode */

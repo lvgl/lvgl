@@ -153,7 +153,7 @@ void ptask_del(ptask_t* ptask_p)
 {
     ll_rem(&ptask_ll, ptask_p);
     
-    dm_free(ptask_p);
+    lv_mem_free(ptask_p);
 }
 
 /**

@@ -5,13 +5,13 @@
 
 #include "misc_conf.h"
 
-#if  USE_FONT_SYMBOL_10_BASIC != 0
+#if  USE_LV_FONT_SYMBOL_10_BASIC != 0
 
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
-extern font_t font_symbol_10_basic;
+extern lv_font_t lv_font_symbol_10_basic;
 
-#endif   /*USE_FONT_SYMBOL_10_BASIC != 0*/
+#endif   /*USE_LV_FONT_SYMBOL_10_BASIC != 0*/
 
 #endif   /*SYMBOL_10_BASIC_H*/

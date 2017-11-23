@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_GAUGE_DEF_NEEDLE_COLOR       COLOR_RED
+#define LV_GAUGE_DEF_NEEDLE_COLOR       LV_COLOR_RED
 #define LV_GAUGE_DEF_LABEL_COUNT        6
 #define LV_GAUGE_DEF_LINE_COUNT   21      /*Should be: ((label_cnt - 1) * internal_lines) + 1*/
 #define LV_GAUGE_DEF_ANGLE              220
@@ -35,10 +35,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mode_t mode);
+static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
-static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask);
-static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask);
+static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask);
+static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask);
 
 /**********************
  *  STATIC VARIABLES
@@ -123,15 +123,15 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
  * @param needle_cnt new count of needles
  * @param colors an array of colors for needles (with 'num' elements)
  */
-void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, color_t * colors)
+void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, lv_color_t * colors)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     if(ext->values != NULL) {
-        dm_free(ext->values);
+        lv_mem_free(ext->values);
         ext->values = NULL;
     }
 
-    ext->values = dm_realloc(ext->values, needle_cnt * sizeof(int16_t));
+    ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(int16_t));
 
     int16_t min = lv_gauge_get_min_value(gauge);
     uint8_t n;
@@ -239,7 +239,7 @@ uint8_t lv_gauge_get_label_count(lv_obj_t * gauge)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_gauge_design(lv_obj_t * gauge, const area_t * mask, lv_design_mode_t mode)
+static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_mode_t mode)
 {
 
     /*Return false if the object is not covers the mask_p area*/
@@ -306,7 +306,7 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     if(sign == LV_SIGNAL_CLEANUP) {
-        dm_free(ext->values);
+        lv_mem_free(ext->values);
         ext->values = NULL;
     }
 
@@ -318,15 +318,15 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
  * @param gauge pointer to gauge object
  * @param mask mask of drawing
  */
-static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
+static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 {
     char scale_txt[16];
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     lv_style_t * style = lv_obj_get_style(gauge);
-    cord_t r = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.hor) - style->body.padding.inner;
-    cord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
-    cord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
+    lv_coord_t r = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.hor) - style->body.padding.inner;
+    lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
+    lv_coord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
     int16_t scale_angle = lv_lmeter_get_scale_angle(gauge);
     uint16_t label_num = ext->label_count;
     int16_t angle_ofs = 90 + (360 - scale_angle) / 2;
@@ -338,21 +338,21 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
         /*Calculate the position a scale label*/
         int16_t angle = (i * scale_angle) / (label_num - 1) + angle_ofs;
 
-        cord_t y = (int32_t)((int32_t)trigo_sin(angle) * r) / TRIGO_SIN_MAX;
+        lv_coord_t y = (int32_t)((int32_t)trigo_sin(angle) * r) / TRIGO_SIN_MAX;
         y += y_ofs;
 
-        cord_t x = (int32_t)((int32_t)trigo_sin(angle + 90) * r) / TRIGO_SIN_MAX;
+        lv_coord_t x = (int32_t)((int32_t)trigo_sin(angle + 90) * r) / TRIGO_SIN_MAX;
         x += x_ofs;
 
         int16_t scale_act = (int32_t)((int32_t)(max - min) * i) /  (label_num - 1);
         scale_act += min;
         sprintf(scale_txt, "%d", scale_act);
 
-        area_t label_cord;
-        point_t label_size;
+        lv_area_t label_cord;
+        lv_point_t label_size;
         txt_get_size(&label_size, scale_txt, style->text.font,
                 style->text.letter_space, style->text.line_space,
-                CORD_MAX, TXT_FLAG_NONE);
+                LV_COORD_MAX, TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;
@@ -368,21 +368,21 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const area_t * mask)
  * @param gauge pointer to gauge object
  * @param mask mask of drawing
  */
-static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
+static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
 {
     lv_style_t style_needle;
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     lv_style_t * style = lv_obj_get_style(gauge);
 
-    cord_t r = lv_obj_get_width(gauge) / 2 - style->body.padding.hor;
-    cord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
-    cord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
+    lv_coord_t r = lv_obj_get_width(gauge) / 2 - style->body.padding.hor;
+    lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
+    lv_coord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
     uint16_t angle = lv_lmeter_get_scale_angle(gauge);
     int16_t angle_ofs = 90 + (360 - angle) / 2;
     int16_t min = lv_gauge_get_min_value(gauge);
     int16_t max = lv_gauge_get_max_value(gauge);
-    point_t p_mid;
-    point_t p_end;
+    lv_point_t p_mid;
+    lv_point_t p_end;
     uint8_t i;
 
     memcpy(&style_needle, style, sizeof(lv_style_t));
@@ -409,7 +409,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const area_t * mask)
     style_neddle_mid.body.grad_color = style->body.border.color;
     style_neddle_mid.body.radius = LV_RADIUS_CIRCLE;
 
-    area_t nm_cord;
+    lv_area_t nm_cord;
     nm_cord.x1 = x_ofs - style->body.padding.ver;
     nm_cord.y1 = y_ofs - style->body.padding.ver;
     nm_cord.x2 = x_ofs + style->body.padding.ver;

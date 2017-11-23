@@ -1,10 +1,10 @@
 /**
- * @file font.h
+ * @file lv_font.h
  * 
  */
 
-#ifndef FONT_H
-#define FONT_H
+#ifndef LV_FONT_H
+#define LV_FONT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_FONT != 0
 
 #include <stdint.h>
 #include <stddef.h>
@@ -30,9 +29,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _font_struct;
-
-typedef struct _font_struct
+typedef struct _lv_font_struct
 {
     uint32_t first_ascii;
     uint32_t last_ascii;
@@ -40,8 +37,8 @@ typedef struct _font_struct
     const uint8_t * bitmap;
     const uint32_t * map;
     const uint8_t * width;
-    struct _font_struct * next_page;    /*Pointer to a font extension*/
-}font_t;
+    struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
+}lv_font_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -50,14 +47,14 @@ typedef struct _font_struct
 /**
  * Initialize the built-in fonts
  */
-void font_init(void);
+void lv_font_init(void);
 
 /**
  * Create a pair from font name and font dsc. get function. After it 'font_get' can be used for this font
  * @param child pointer to a font to join to the 'parent'
  * @param parent pointer to a font. 'child' will be joined here
  */
-void font_add(font_t *child, font_t *parent);
+void lv_font_add(lv_font_t *child, lv_font_t *parent);
 
 /**
  * Return with the bitmap of a font.
@@ -65,14 +62,14 @@ void font_add(font_t *child, font_t *parent);
  * @param letter a letter
  * @return  pointer to the bitmap of the letter
  */
-const uint8_t * font_get_bitmap(const font_t * font_p, uint32_t letter);
+const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the height of a font
  * @param font_p pointer to a font
  * @return the height of a font
  */
-static inline uint8_t font_get_height(const font_t * font_p)
+static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
 {
     return font_p->height_row;
 }
@@ -82,7 +79,7 @@ static inline uint8_t font_get_height(const font_t * font_p)
  * @param font_p pointer to a font
  * @return the height of a font
  */
-static inline uint8_t font_get_height_scale(const font_t * font_p)
+static inline uint8_t lv_font_get_height_scale(const lv_font_t * font_p)
 {
     return font_p->height_row >> FONT_ANTIALIAS;
 }
@@ -94,7 +91,7 @@ static inline uint8_t font_get_height_scale(const font_t * font_p)
  * @param letter a letter
  * @return the width of a letter
  */
-uint8_t font_get_width(const font_t * font_p, uint32_t letter);
+uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the width of a letter in a font )Give the real size on the screen (half size if FONT_ANTIALIAS is enabled)
@@ -102,7 +99,10 @@ uint8_t font_get_width(const font_t * font_p, uint32_t letter);
  * @param letter a letter
  * @return the width of a letter
  */
-uint8_t font_get_width_scale(const font_t * font_p, uint32_t letter);
+static inline uint8_t lv_font_get_width_scale(const lv_font_t * font_p, uint32_t letter)
+{
+    return lv_font_get_width(font_p, letter) >> FONT_ANTIALIAS;
+}
 
 /**********************
  *      MACROS
@@ -173,5 +173,3 @@ uint8_t font_get_width_scale(const font_t * font_p, uint32_t letter);
 } /* extern "C" */
 #endif
 
-
-#endif

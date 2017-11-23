@@ -5,13 +5,13 @@
 
 #include "misc_conf.h"
 
-#if  USE_FONT_DEJAVU_30 != 0
+#if  USE_LV_FONT_DEJAVU_30 != 0
 
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
 
-extern font_t font_dejavu_30;
+extern lv_font_t lv_font_dejavu_30;
 
-#endif   /*USE_FONT_DEJAVU_30 != 0*/
+#endif   /*USE_LV_FONT_DEJAVU_30 != 0*/
 
 #endif   /*DEJAVU_30_H*/

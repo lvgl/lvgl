@@ -71,7 +71,7 @@ void * ll_ins_head(ll_dsc_t * ll_p)
 {
     ll_node_t* n_new;
     
-    n_new = dm_alloc(ll_p->n_size + LL_NODE_META_SIZE);
+    n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
     
     if(n_new != NULL) { 
         node_set_prev(ll_p, n_new, NULL);           /*No prev. before the new head*/
@@ -99,7 +99,7 @@ void * ll_ins_tail(ll_dsc_t * ll_p)
 {   
     ll_node_t* n_new;
     
-    n_new = dm_alloc(ll_p->n_size + LL_NODE_META_SIZE);
+    n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
     
     if(n_new != NULL) {
         node_set_next(ll_p, n_new, NULL); /*No next after the new tail*/
@@ -172,7 +172,7 @@ void ll_clear(ll_dsc_t * ll_p)
 		i_next = ll_get_next(ll_p, i);
 
 		ll_rem(ll_p, i);
-		dm_free(i);
+		lv_mem_free(i);
 
 		i = i_next;
 	}

@@ -32,11 +32,11 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void refresh_childen_position(lv_obj_t * obj, cord_t x_diff, cord_t y_diff);
+static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 static void lv_obj_report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_childen_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
-static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode);
+static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
@@ -65,7 +65,7 @@ void lv_init(void)
     misc_init();
 
 #if USE_DYN_MEM != 0
-    dm_init();
+    lv_mem_init();
 #endif
 
 #if USE_PTASK != 0
@@ -81,17 +81,17 @@ void lv_init(void)
 #endif
 
 #if USE_FONT != 0
-    font_init();
+    lv_font_init();
 #endif
 
 #if USE_ANIM != 0
-    anim_init();
+    lv_anim_init();
 #endif
 
     /*Clear the screen*/
-    area_t scr_area;
-    area_set(&scr_area, 0, 0, LV_HOR_RES, LV_VER_RES);
-    lv_rfill(&scr_area, NULL, COLOR_BLACK, OPA_COVER);
+    lv_area_t scr_area;
+    lv_area_set(&scr_area, 0, 0, LV_HOR_RES, LV_VER_RES);
+    lv_rfill(&scr_area, NULL, LV_COLOR_BLACK, LV_OPA_COVER);
 
     /*Init. the sstyles*/
     lv_style_init();
@@ -300,7 +300,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     }
     
     /*Remove the animations from this object*/
-    anim_del(obj, NULL);
+    lv_anim_del(obj, NULL);
 
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
@@ -315,8 +315,8 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
     
     /*Delete the base objects*/
-    if(obj->ext_attr != NULL)  dm_free(obj->ext_attr);
-    dm_free(obj); /*Free the object itself*/
+    if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
+    lv_mem_free(obj); /*Free the object itself*/
 
     /* Reset all display input (indev_proc) if
      * the currently pressed object is deleted*/
@@ -370,11 +370,11 @@ void lv_obj_invalidate(lv_obj_t * obj)
        obj_scr == lv_layer_top() ||
        obj_scr == lv_layer_sys()) {
         /*Truncate recursively to the parents*/
-        area_t area_trunc;
+        lv_area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
         bool union_ok = true;
         /*Start with the original coordinates*/
-        cord_t ext_size = obj->ext_size;
+        lv_coord_t ext_size = obj->ext_size;
         area_cpy(&area_trunc, &obj->coords);
         area_trunc.x1 -= ext_size;
         area_trunc.y1 -= ext_size;
@@ -383,7 +383,7 @@ void lv_obj_invalidate(lv_obj_t * obj)
 
         /*Check through all parents*/
         while(par != NULL) {
-            union_ok = area_union(&area_trunc, &area_trunc, &par->coords);
+            union_ok = lv_area_union(&area_trunc, &area_trunc, &par->coords);
             if(union_ok == false) break; /*If no common parts with parent break;*/
 
             par = lv_obj_get_parent(par);
@@ -426,7 +426,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 {
     lv_obj_invalidate(obj);
     
-    point_t old_pos;
+    lv_point_t old_pos;
     old_pos.x = lv_obj_get_x(obj);
     old_pos.y = lv_obj_get_y(obj);
     
@@ -455,7 +455,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
  * @param x new distance from the left side of the parent
  * @param y new distance from the top of the parent
  */
-void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
+void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * par = obj->par;
@@ -463,7 +463,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
     y = y + par->coords.y1;
     
     /*Calculate and set the movement*/
-    point_t diff;
+    lv_point_t diff;
     diff.x =  x - obj->coords.x1;
     diff.y =  y - obj->coords.y1;
 
@@ -476,7 +476,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
     lv_obj_invalidate(obj);
 
     /*Save the original coordinates*/
-    area_t ori;
+    lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
 
     obj->coords.x1 += diff.x;
@@ -502,7 +502,7 @@ void lv_obj_set_pos(lv_obj_t * obj, cord_t x, cord_t y)
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent
  */
-void lv_obj_set_x(lv_obj_t * obj, cord_t x)
+void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 {
     lv_obj_set_pos(obj, x, lv_obj_get_y(obj));
 }
@@ -513,7 +513,7 @@ void lv_obj_set_x(lv_obj_t * obj, cord_t x)
  * @param obj pointer to an object
  * @param y new distance from the top of the parent
  */
-void lv_obj_set_y(lv_obj_t * obj, cord_t y)
+void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 {
     lv_obj_set_pos(obj, lv_obj_get_x(obj), y);
 }
@@ -524,7 +524,7 @@ void lv_obj_set_y(lv_obj_t * obj, cord_t y)
  * @param w new width 
  * @param h new height
  */
-void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h)
+void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
 
     /* Do nothing if the size is not changed */
@@ -538,7 +538,7 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h)
     lv_obj_invalidate(obj);
     
     /*Save the original coordinates*/
-    area_t ori;
+    lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
     
     //Set the length and height
@@ -562,7 +562,7 @@ void lv_obj_set_size(lv_obj_t * obj, cord_t w, cord_t h)
  * @param obj pointer to an object
  * @param w new width
  */
-void lv_obj_set_width(lv_obj_t * obj, cord_t w)
+void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
 {
     lv_obj_set_size(obj, w, lv_obj_get_height(obj));
 }
@@ -572,7 +572,7 @@ void lv_obj_set_width(lv_obj_t * obj, cord_t w)
  * @param obj pointer to an object
  * @param h new height
  */
-void lv_obj_set_height(lv_obj_t * obj, cord_t h)
+void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 {
     lv_obj_set_size(obj, lv_obj_get_width(obj), h);
 }
@@ -585,10 +585,10 @@ void lv_obj_set_height(lv_obj_t * obj, cord_t h)
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod, cord_t y_mod)
+void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
 {
-    cord_t new_x = lv_obj_get_x(obj);
-    cord_t new_y = lv_obj_get_y(obj);
+    lv_coord_t new_x = lv_obj_get_x(obj);
+    lv_coord_t new_y = lv_obj_get_y(obj);
 
     if(base == NULL) {
         base = lv_obj_get_parent(obj);
@@ -702,10 +702,10 @@ void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, cord_t x_mod
 
     /*Bring together the coordination system of base and obj*/
     lv_obj_t * par = lv_obj_get_parent(obj);
-    cord_t base_abs_x = base->coords.x1;
-    cord_t base_abs_y = base->coords.y1;
-    cord_t par_abs_x = par->coords.x1;
-    cord_t par_abs_y = par->coords.y1;
+    lv_coord_t base_abs_x = base->coords.x1;
+    lv_coord_t base_abs_y = base->coords.y1;
+    lv_coord_t par_abs_x = par->coords.x1;
+    lv_coord_t par_abs_y = par->coords.y1;
     new_x += x_mod + base_abs_x;
     new_y += y_mod + base_abs_y;
 	new_x -= par_abs_x;
@@ -885,7 +885,7 @@ void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp)
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
 {
-    obj->ext_attr = dm_realloc(obj->ext_attr, ext_size); 
+    obj->ext_attr = lv_mem_realloc(obj->ext_attr, ext_size); 
     
    return (void*)obj->ext_attr;
 }
@@ -944,12 +944,12 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
 	bool out = (type & ANIM_DIR_MASK) == ANIM_IN ? false : true;
 	type = type & (~ANIM_DIR_MASK);
 
-	anim_t a;
+	lv_anim_t a;
 	a.var = obj;
 	a.time = time;
 	a.act_time = (int32_t)-delay;
 	a.end_cb = (void(*)(void*))cb;
-	a.path = anim_get_path(ANIM_PATH_LIN);
+	a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
 	a.playback_pause = 0;
 	a.repeat_pause = 0;
 	a.playback = 0;
@@ -1003,7 +1003,7 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
 		a.end = tmp;
 	}
 
-	anim_create(&a);
+	lv_anim_create(&a);
 }
 /*=======================
  * Getter functions
@@ -1134,7 +1134,7 @@ uint16_t lv_obj_count_children(lv_obj_t * obj)
  * @param obj pointer to an object
  * @param cords_p pointer to an area to store the coordinates 
  */
-void lv_obj_get_coords(lv_obj_t * obj, area_t * cords_p)
+void lv_obj_get_coords(lv_obj_t * obj, lv_area_t * cords_p)
 {
     area_cpy(cords_p, &obj->coords);
 }
@@ -1145,9 +1145,9 @@ void lv_obj_get_coords(lv_obj_t * obj, area_t * cords_p)
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent 
  */
-cord_t lv_obj_get_x(lv_obj_t * obj)
+lv_coord_t lv_obj_get_x(lv_obj_t * obj)
 {
-    cord_t rel_x;
+    lv_coord_t rel_x;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     rel_x = obj->coords.x1 - parent->coords.x1;
     
@@ -1159,9 +1159,9 @@ cord_t lv_obj_get_x(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return distance of 'obj' from the top of its parent 
  */
-cord_t lv_obj_get_y(lv_obj_t * obj)
+lv_coord_t lv_obj_get_y(lv_obj_t * obj)
 {
-    cord_t rel_y;
+    lv_coord_t rel_y;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     rel_y = obj->coords.y1 - parent->coords.y1;
     
@@ -1173,7 +1173,7 @@ cord_t lv_obj_get_y(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the width
  */
-cord_t lv_obj_get_width(lv_obj_t * obj)
+lv_coord_t lv_obj_get_width(lv_obj_t * obj)
 {
     return area_get_width(&obj->coords);
 }
@@ -1183,7 +1183,7 @@ cord_t lv_obj_get_width(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the height
  */
-cord_t lv_obj_get_height(lv_obj_t * obj)
+lv_coord_t lv_obj_get_height(lv_obj_t * obj)
 {
     return area_get_height(&obj->coords);
 }
@@ -1193,7 +1193,7 @@ cord_t lv_obj_get_height(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-cord_t lv_obj_get_ext_size(lv_obj_t * obj)
+lv_coord_t lv_obj_get_ext_size(lv_obj_t * obj)
 {
     return obj->ext_size;
 }
@@ -1405,7 +1405,7 @@ void * lv_obj_get_group(lv_obj_t * obj)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  * @param return true/false, depends on 'mode'        
  */
-static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode_t mode)
+static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
 
@@ -1418,19 +1418,19 @@ static bool lv_obj_design(lv_obj_t * obj, const  area_t * mask_p, lv_design_mode
 
         if(r == LV_RADIUS_CIRCLE) return false;
 
-        area_t area_tmp;
+        lv_area_t area_tmp;
 
         /*Check horizontally without radius*/
         lv_obj_get_coords(obj, &area_tmp);
         area_tmp.x1 += r;
         area_tmp.x2 -= r;
-        if(area_is_in(mask_p, &area_tmp) == false) return false;
+        if(lv_area_is_in(mask_p, &area_tmp) == false) return false;
 
         /*Check vertically without radius*/
         lv_obj_get_coords(obj, &area_tmp);
         area_tmp.y1 += r;
         area_tmp.y2 -= r;
-        if(area_is_in(mask_p, &area_tmp) == false) return false;
+        if(lv_area_is_in(mask_p, &area_tmp) == false) return false;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		lv_style_t * style = lv_obj_get_style(obj);
@@ -1475,7 +1475,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
  * @param x_diff x coordinate shift
  * @param y_diff y coordinate shift
  */
-static void refresh_childen_position(lv_obj_t * obj, cord_t x_diff, cord_t y_diff)
+static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
 {
     lv_obj_t * i;   
     LL_READ(obj->child_ll, i) {
@@ -1548,7 +1548,7 @@ static void delete_children(lv_obj_t * obj)
    }
 
    /*Remove the animations from this object*/
-   anim_del(obj, NULL);
+   lv_anim_del(obj, NULL);
 
    /*Delete from the group*/
 #if LV_OBJ_GROUP != 0
@@ -1563,7 +1563,7 @@ static void delete_children(lv_obj_t * obj)
    obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
 
    /*Delete the base objects*/
-   if(obj->ext_attr != NULL)  dm_free(obj->ext_attr);
-   dm_free(obj); /*Free the object itself*/
+   if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
+   lv_mem_free(obj); /*Free the object itself*/
 
 }

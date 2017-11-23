@@ -26,7 +26,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_mode_t mode);
+static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
 
 /**********************
@@ -227,7 +227,7 @@ uint16_t lv_lmeter_get_scale_angle(lv_obj_t * lmeter)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_mode_t mode)
+static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -249,10 +249,10 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
         }
 #endif
 
-         cord_t r_out = lv_obj_get_width(lmeter) / 2;
-         cord_t r_in = r_out - style->body.padding.hor;
-         cord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
-         cord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
+         lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
+         lv_coord_t r_in = r_out - style->body.padding.hor;
+         lv_coord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
+         lv_coord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
          int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;
          int16_t level = (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
          uint8_t i;
@@ -263,13 +263,13 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
              /*Calculate the position a scale label*/
              int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
 
-             cord_t y_out = (int32_t)((int32_t)trigo_sin(angle) * r_out) / TRIGO_SIN_MAX;
-             cord_t x_out = (int32_t)((int32_t)trigo_sin(angle + 90) * r_out) / TRIGO_SIN_MAX;
-             cord_t y_in = (int32_t)((int32_t)trigo_sin(angle) * r_in) / TRIGO_SIN_MAX;
-             cord_t x_in = (int32_t)((int32_t)trigo_sin(angle + 90) * r_in) / TRIGO_SIN_MAX;
+             lv_coord_t y_out = (int32_t)((int32_t)trigo_sin(angle) * r_out) / TRIGO_SIN_MAX;
+             lv_coord_t x_out = (int32_t)((int32_t)trigo_sin(angle + 90) * r_out) / TRIGO_SIN_MAX;
+             lv_coord_t y_in = (int32_t)((int32_t)trigo_sin(angle) * r_in) / TRIGO_SIN_MAX;
+             lv_coord_t x_in = (int32_t)((int32_t)trigo_sin(angle + 90) * r_in) / TRIGO_SIN_MAX;
 
-             point_t p1;
-             point_t p2;
+             lv_point_t p1;
+             lv_point_t p2;
 
              p2.x = x_in + x_ofs;
              p2.y = y_in +  y_ofs;
@@ -279,7 +279,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const area_t * mask, lv_design_m
 
              if(i > level) style_tmp.line.color = style->line.color;
              else {
-                 style_tmp.line.color = color_mix(style->body.grad_color, style->body.main_color, (255 * i) /  ext->line_cnt);
+                 style_tmp.line.color = lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) /  ext->line_cnt);
              }
 
              lv_draw_line(&p1, &p2, mask, &style_tmp);

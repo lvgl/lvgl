@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode);
+static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
 static bool lv_img_is_symbol(const char * txt);
 
@@ -106,7 +106,7 @@ fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
 #if USE_UFS != 0
 	const lv_img_raw_header_t * raw_p = (lv_img_raw_header_t *) data;
 	fs_res_t res;
-	res = ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(color_t) + sizeof(lv_img_raw_header_t));
+	res = ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(lv_color_t) + sizeof(lv_img_raw_header_t));
 
 	return res;
 #else
@@ -162,15 +162,15 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	/*Handle symbol texts*/
 	else {
         lv_style_t * style = lv_obj_get_style(img);
-        point_t size;
-        txt_get_size(&size, fn, style->text.font, style->text.letter_space, style->text.line_space, CORD_MAX, TXT_FLAG_NONE);
+        lv_point_t size;
+        txt_get_size(&size, fn, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
         ext->transp = 1;    /*Symbols always have transparent parts*/
 	}
 
 	if(fn != NULL) {
-	    ext->fn = dm_realloc(ext->fn, strlen(fn) + 1);
+	    ext->fn = lv_mem_realloc(ext->fn, strlen(fn) + 1);
 		strcpy(ext->fn, fn);
 	} else {
 		ext->fn = NULL;
@@ -273,25 +273,25 @@ bool lv_img_get_upscale(lv_obj_t * img)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'        
  */
-static bool lv_img_design(lv_obj_t * img, const area_t * mask, lv_design_mode_t mode)
+static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode_t mode)
 {
     lv_style_t * style = lv_obj_get_style(img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {
         bool cover = false;
-        if(ext->transp == 0) cover = area_is_in(mask, &img->coords);
+        if(ext->transp == 0) cover = lv_area_is_in(mask, &img->coords);
         return cover;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
-		area_t cords;
+		lv_area_t cords;
 /*Create a default style for symbol texts*/
         bool sym = lv_img_is_symbol(ext->fn);
 
 		lv_obj_get_coords(img, &cords);
 
-		area_t cords_tmp;
+		lv_area_t cords_tmp;
 		cords_tmp.y1 = cords.y1;
 		cords_tmp.y2 = cords.y1 + ext->h - 1;
 
@@ -327,7 +327,7 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(sign == LV_SIGNAL_CLEANUP) {
-        dm_free(ext->fn);
+        lv_mem_free(ext->fn);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         /*Refresh the file name to refresh the symbol text size*/
