@@ -18,7 +18,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_hal.h"
-#include "misc/gfx/color.h"
+#include "../lv_misc/lv_color.h"
 
 /*********************
  *      DEFINES

@@ -15,8 +15,8 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/gfx/area.h"
-#include "misc/gfx/color.h"
+#include "../lv_misc/lv_area.h"
+#include "../lv_misc/lv_color.h"
 
 /*********************
  *      DEFINES

@@ -13,11 +13,11 @@
 #include "../lv_obj/lv_obj.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
-#include "misc/gfx/color.h"
-#include "misc/gfx/text.h"
-#include "misc/math/math_base.h"
-#include "misc/gfx/text.h"
-#include "misc/gfx/anim.h"
+#include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_text.h"
+#include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_text.h"
+#include "../lv_misc/lv_anim.h"
 
 /*********************
  *      DEFINES

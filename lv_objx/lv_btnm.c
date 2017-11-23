@@ -14,7 +14,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/gfx/text.h"
+#include "../lv_misc/lv_text.h"
 
 /*********************
  *      DEFINES

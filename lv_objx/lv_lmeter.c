@@ -13,7 +13,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_obj/lv_group.h"
-#include "misc/math/trigo.h"
+#include "../lv_misc/lv_trigo.h"
 
 /*********************
  *      DEFINES

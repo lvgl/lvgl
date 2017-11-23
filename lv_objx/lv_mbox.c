@@ -13,8 +13,8 @@
 #include "lv_mbox.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/gfx/anim.h"
-#include "misc/math/math_base.h"
+#include "../lv_misc/lv_anim.h"
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES

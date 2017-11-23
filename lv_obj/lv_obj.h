@@ -16,10 +16,10 @@ extern "C" {
 #include "lv_conf.h"
 #include <stddef.h>
 #include <stdbool.h>
-#include "misc/gfx/area.h"
-#include "misc/mem/dyn_mem.h"
-#include "misc/mem/linked_list.h"
-#include "misc/gfx/color.h"
+#include "../lv_misc/lv_area.h"
+#include "../lv_misc/lv_mem.h"
+#include "../lv_misc/lv_ll.h"
+#include "../lv_misc/lv_color.h"
 #include "lv_style.h"
 
 /*********************

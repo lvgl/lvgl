@@ -15,7 +15,7 @@
 #include "lv_refr.h"
 #include "lv_group.h"
 #include "misc/misc.h"
-#include "misc/gfx/anim.h"
+#include "../lv_misc/lv_anim.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -63,6 +63,30 @@ void lv_init(void)
 {
     /*Initialize misc. library. (Protected against re-initialization)*/
     misc_init();
+
+#if USE_DYN_MEM != 0
+    dm_init();
+#endif
+
+#if USE_PTASK != 0
+    ptask_init();
+#endif
+
+#if USE_FSINT != 0  /*Init is befor other FS inits*/
+    fs_init();
+#endif
+
+#if USE_UFS != 0
+    ufs_init();
+#endif
+
+#if USE_FONT != 0
+    font_init();
+#endif
+
+#if USE_ANIM != 0
+    anim_init();
+#endif
 
     /*Clear the screen*/
     area_t scr_area;

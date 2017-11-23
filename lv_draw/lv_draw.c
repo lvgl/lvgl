@@ -13,11 +13,11 @@
 #include "lv_draw.h"
 #include "lv_draw_rbasic.h"
 #include "lv_draw_vbasic.h"
-#include "misc/gfx/text.h"
-#include "misc/gfx/circ.h"
-#include "misc/fs/fsint.h"
-#include "misc/math/math_base.h"
-#include "misc/fs/ufs/ufs.h"
+#include "../lv_misc/lv_text.h"
+#include "../lv_misc/lv_circ.h"
+#include "../lv_misc/lv_fs.h"
+#include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_ufs.h"
 #include "../lv_objx/lv_img.h"
 
 /*********************

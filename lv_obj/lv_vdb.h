@@ -17,8 +17,8 @@ extern "C" {
 
 #if LV_VDB_SIZE != 0
 
-#include "misc/gfx/color.h"
-#include "misc/gfx/area.h"
+#include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_area.h"
 
 /*********************
  *      DEFINES

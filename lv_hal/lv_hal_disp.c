@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "../lv_hal/lv_hal_disp.h"
-#include "misc/mem/dyn_mem.h"
+#include "../lv_misc/lv_mem.h"
 
 /*********************
  *      DEFINES

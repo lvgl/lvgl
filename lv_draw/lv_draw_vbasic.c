@@ -10,9 +10,9 @@
 #include <string.h>
 
 #include "../lv_hal/lv_hal_disp.h"
-#include "misc/gfx/area.h"
-#include "misc/gfx/font.h"
-#include "misc/gfx/color.h"
+#include "../lv_misc/lv_area.h"
+#include "../lv_misc/lv_font.h"
+#include "../lv_misc/lv_color.h"
 
 #if LV_VDB_SIZE != 0
 

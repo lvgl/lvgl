@@ -16,7 +16,7 @@ extern "C" {
 
 /*Test misc. module version*/
 #include "misc/misc.h"
-#include "misc/os/ptask.h"
+#include "lv_misc/lv_task.h"
 
 #include "lv_hal/lv_hal.h"
 

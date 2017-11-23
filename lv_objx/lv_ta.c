@@ -14,9 +14,9 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/gfx/anim.h"
-#include "misc/gfx/text.h"
-#include "misc/math/math_base.h"
+#include "../lv_misc/lv_anim.h"
+#include "../lv_misc/lv_text.h"
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES

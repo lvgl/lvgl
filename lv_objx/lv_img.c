@@ -13,9 +13,9 @@
 #include "lv_img.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include "misc/fs/fsint.h"
-#include "misc/fs/ufs/ufs.h"
-#include "misc/gfx/text.h"
+#include "../lv_misc/lv_fs.h"
+#include "../lv_misc/lv_ufs.h"
+#include "../lv_misc/lv_text.h"
 
 /*********************
  *      DEFINES
