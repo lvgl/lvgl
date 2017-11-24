@@ -1,5 +1,5 @@
 /**
- * @file dyn_mem.c
+ * @file lv_mem.c
  * General and portable implementation of malloc and free.
  * The dynamic memory monitoring is also supported.
  */
@@ -177,7 +177,7 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
         if(e->header.used == 0) data_p = NULL;
     }
 
-    uint32_t old_size = dm_get_size(data_p);
+    uint32_t old_size = lv_mem_get_size(data_p);
     if(old_size == new_size) return data_p;
 
     void * new_p;
@@ -186,7 +186,7 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
     if(new_p != NULL && data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
         if(old_size != 0) {
-            memcpy(new_p, data_p, MATH_MIN(new_size, old_size));
+            memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
             lv_mem_free(data_p);
         }
     }
@@ -276,7 +276,7 @@ void lv_mem_monitor(dm_mon_t * mon_p)
  * @param data pointer to an allocated memory
  * @return the size of data memory in bytes 
  */
-uint32_t dm_get_size(void * data)
+uint32_t lv_mem_get_size(void * data)
 {
     if(data == NULL) return 0;
     if(data == &zero_mem) return 0;
@@ -285,6 +285,7 @@ uint32_t dm_get_size(void * data)
 
     return e->header.d_size;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

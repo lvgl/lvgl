@@ -36,7 +36,7 @@ extern "C" {
  **********************/
 typedef struct _lv_group_t
 {
-    ll_dsc_t obj_ll;
+    lv_ll_t obj_ll;
     lv_obj_t ** obj_focus;
     void (*style_mod)(lv_style_t * style);
     lv_style_t style_tmp;

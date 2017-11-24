@@ -102,7 +102,7 @@ typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign,
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par;    /*Pointer to the parent object*/
-    ll_dsc_t child_ll;          /*Linked list to store the children objects*/
+    lv_ll_t child_ll;          /*Linked list to store the children objects*/
     
     lv_area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#include "../lv_misc/lv_text.h"
+#include <lvgl/lv_misc/lv_txt.h>
 #include "../lv_obj/lv_style.h"
 
 /*********************
@@ -71,7 +71,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask_p, lv_co
  * @param offset text offset in x and y direction (NULL if unused)
  */
 void lv_draw_label(const lv_area_t * cords_p,const lv_area_t * mask_p, const lv_style_t * style_p,
-                    const char * txt, txt_flag_t flag, lv_point_t * offset);
+                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset);
 
 /**
  * Draw an image

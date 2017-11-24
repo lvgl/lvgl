@@ -641,8 +641,8 @@ static void lv_page_sb_refresh(lv_obj_t * page)
      * else:
      * - horizontal and vertical scrollbars can overlap on the corners
      * - if the page has radius the scrollbar can be out of the radius  */
-    lv_coord_t sb_hor_pad = MATH_MAX(ext->sb.style->body.padding.inner, style->body.padding.hor);
-    lv_coord_t sb_ver_pad = MATH_MAX(ext->sb.style->body.padding.inner, style->body.padding.ver);
+    lv_coord_t sb_hor_pad = LV_MATH_MAX(ext->sb.style->body.padding.inner, style->body.padding.hor);
+    lv_coord_t sb_ver_pad = LV_MATH_MAX(ext->sb.style->body.padding.inner, style->body.padding.ver);
 
     if(ext->sb.mode == LV_SB_MODE_OFF) return;
 

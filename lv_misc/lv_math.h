@@ -3,8 +3,8 @@
  * 
  */
 
-#ifndef MATH_BASE_H
-#define MATH_BASE_H
+#ifndef LV_MATH_H
+#define LV_MATH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,15 +15,14 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_MATH_BASE != 0
 
 /*********************
  *      DEFINES
  *********************/
 
-#define MATH_MIN(a,b) (a<b?a:b)
-#define MATH_MAX(a,b) (a>b?a:b)
-#define MATH_ABS(x) ((x)>0?(x):(-(x)))
+#define LV_MATH_MIN(a,b) (a<b?a:b)
+#define LV_MATH_MAX(a,b) (a>b?a:b)
+#define LV_MATH_ABS(x) ((x)>0?(x):(-(x)))
 
 /**********************
  *      TYPEDEFS
@@ -36,8 +35,6 @@ extern "C" {
 /**********************
  *      MACROS
  **********************/
-
-#endif /*USE_MATH_BASE*/
 
 #ifdef __cplusplus
 } /* extern "C" */

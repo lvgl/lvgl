@@ -1,21 +1,20 @@
 /**
- * @file font.c
+ * @file lv_text.c
  * 
  */
 
 /*********************
  *      INCLUDES
  *********************/
+#include <lvgl/lv_misc/lv_txt.h>
 #include "misc_conf.h"
-#if USE_TEXT != 0
 
-#include "lv_text.h"
 #include "lv_math.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define TXT_NO_BREAK_FOUND  UINT32_MAX
+#define NO_BREAK_FOUND  UINT32_MAX
 
 /**********************
  *      TYPEDEFS
@@ -24,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool txt_is_break_char(uint32_t letter);
+static bool is_break_char(uint32_t letter);
 
 /**********************
  *  STATIC VARIABLES
@@ -48,8 +47,8 @@ static bool txt_is_break_char(uint32_t letter);
  * @param flags settings for the text from 'txt_flag_t' enum
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
  */
-void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
-                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, txt_flag_t flag)
+void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag)
 {
     size_res->x = 0;
     size_res->y = 0;
@@ -57,7 +56,7 @@ void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * fo
     if(text == NULL) return;
     if(font == NULL) return;
 
-    if(flag & TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
@@ -66,15 +65,15 @@ void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * fo
 
     /*Calc. the height and longest line*/
     while (text[line_start] != '\0') {
-        new_line_start += txt_get_next_line(&text[line_start], font, letter_space, max_width, flag);
+        new_line_start += lv_txt_get_next_line(&text[line_start], font, letter_space, max_width, flag);
         size_res->y += letter_height ;
         size_res->y += line_space;
 
         /*Calculate the the longest line*/
-        act_line_length = txt_get_width(&text[line_start], new_line_start - line_start,
+        act_line_length = lv_txt_get_width(&text[line_start], new_line_start - line_start,
                                        font, letter_space, flag);
 
-        size_res->x = MATH_MAX(act_line_length, size_res->x);
+        size_res->x = LV_MATH_MAX(act_line_length, size_res->x);
         line_start = new_line_start;
     }
 
@@ -97,34 +96,34 @@ void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * fo
  * @param flags settings for the text from 'txt_flag_type' enum
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
-uint16_t txt_get_next_line(const char * txt, const lv_font_t * font,
-                           lv_coord_t letter_space, lv_coord_t max_width, txt_flag_t flag)
+uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
+                           lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
-    if(flag & TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t i = 0;
     lv_coord_t act_l = 0;
-    uint32_t last_break = TXT_NO_BREAK_FOUND;
-    txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
+    uint32_t last_break = NO_BREAK_FOUND;
+    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter = 0;
     
     while(txt[i] != '\0') {
-        letter = txt_utf8_next(txt, &i);
+        letter = lv_txt_utf8_next(txt, &i);
 
         /*Handle the recolor command*/
-        if((flag & TXT_FLAG_RECOLOR) != 0) {
-            if(txt_is_cmd(&cmd_state, letter) != false) {
+        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if(lv_txt_is_cmd(&cmd_state, letter) != false) {
                 continue;   /*Skip the letter is it is part of a command*/
             }
         }
         /*Check for new line chars*/
-        if((flag & TXT_FLAG_NO_BREAK) == 0 && (letter == '\n' || letter == '\r')) {
+        if((flag & LV_TXT_FLAG_NO_BREAK) == 0 && (letter == '\n' || letter == '\r')) {
             /*Handle \r\n as well*/
             uint32_t i_tmp = i;
-            uint32_t letter_next = txt_utf8_next(txt, &i_tmp);
+            uint32_t letter_next = lv_txt_utf8_next(txt, &i_tmp);
             if(letter == '\r' &&  letter_next == '\n') i = i_tmp;
 
             return i;    /*Return with the first letter of the next line*/
@@ -135,29 +134,29 @@ uint16_t txt_get_next_line(const char * txt, const lv_font_t * font,
             /*If the txt is too long then finish, this is the line end*/
             if(act_l > max_width) {
                 /*If this a break char then break here.*/
-                if(txt_is_break_char(letter)) {
+                if(is_break_char(letter)) {
                     /* Now 'i' points to the next char because of txt_utf8_next()
                      * But we need the first char of the next line so keep it.
                      * Hence do nothing here*/
                 }
                 /*If already a break character is found, then break there*/
-                else if(last_break != TXT_NO_BREAK_FOUND ) {
+                else if(last_break != NO_BREAK_FOUND ) {
                     i = last_break;
                 } else {
                     /* Now this character is out of the area but 'i' points to the next char because of txt_utf8_next()
                      * So step back one char*/
-                    txt_utf8_prev(txt, &i);
+                    lv_txt_utf8_prev(txt, &i);
                 }
 
                 /* Do not let to return without doing nothing.
                  * Find at least one character (Avoid infinite loop )*/
-                if(i == 0) txt_utf8_next(txt, &i);
+                if(i == 0) lv_txt_utf8_next(txt, &i);
 
                 return i;
             }
             /*If this char still can fit to this line then check if 
              * txt can be broken here later */
-            else if(txt_is_break_char(letter)) {
+            else if(is_break_char(letter)) {
                 last_break = i; /*Save the first char index  after break*/
             }
         }
@@ -177,22 +176,22 @@ uint16_t txt_get_next_line(const char * txt, const lv_font_t * font,
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t txt_get_width(const char * txt, uint16_t length, 
-                      const lv_font_t * font, lv_coord_t letter_space, txt_flag_t flag)
+lv_coord_t lv_txt_get_width(const char * txt, uint16_t length, 
+                            const lv_font_t * font, lv_coord_t letter_space, lv_txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
     uint32_t i = 0;
     lv_coord_t width = 0;
-    txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
+    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter;
     
     if(length != 0) {
         while(i < length) {
-            letter = txt_utf8_next(txt, &i);
-            if((flag & TXT_FLAG_RECOLOR) != 0) {
-                if(txt_is_cmd(&cmd_state, letter) != false) {
+            letter = lv_txt_utf8_next(txt, &i);
+            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+                if(lv_txt_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
             }
@@ -222,26 +221,26 @@ lv_coord_t txt_get_width(const char * txt, uint16_t length,
  * @return true: the character is part of a command and should not be written,
  *         false: the character should be written
  */
-bool txt_is_cmd(txt_cmd_state_t * state, uint32_t c)
+bool lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c)
 {
     bool ret = false;
 
-    if(c == TXT_RELV_COLOR_CMD) {
-       if(*state == TXT_CMD_STATE_WAIT) { /*Start char*/
-           *state = TXT_CMD_STATE_PAR;
+    if(c == LV_TXT_COLOR_CMD[0]) {
+       if(*state == LV_TXT_CMD_STATE_WAIT) { /*Start char*/
+           *state = LV_TXT_CMD_STATE_PAR;
            ret = true;
-       } else if(*state == TXT_CMD_STATE_PAR) { /*Other start char in parameter is escaped cmd. char */
-           *state = TXT_CMD_STATE_WAIT;
-       }else if(*state == TXT_CMD_STATE_IN) { /*Command end */
-           *state = TXT_CMD_STATE_WAIT;
+       } else if(*state == LV_TXT_CMD_STATE_PAR) { /*Other start char in parameter is escaped cmd. char */
+           *state = LV_TXT_CMD_STATE_WAIT;
+       }else if(*state == LV_TXT_CMD_STATE_IN) { /*Command end */
+           *state = LV_TXT_CMD_STATE_WAIT;
            ret = true;
        }
    }
 
    /*Skip the color parameter and wait the space after it*/
-   if(*state == TXT_CMD_STATE_PAR) {
+   if(*state == LV_TXT_CMD_STATE_PAR) {
        if(c == ' ') {
-           *state = TXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
+           *state = LV_TXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
        }
        ret = true;
    }
@@ -256,7 +255,7 @@ bool txt_is_cmd(txt_cmd_state_t * state, uint32_t c)
  *            0: before the original text, 1: after the first char etc.
  * @param ins_txt text to insert
  */
-void txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
+void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 {
     uint32_t old_len = strlen(txt_buf);
     uint32_t ins_len = strlen(ins_txt);
@@ -280,7 +279,7 @@ void txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
  * @param pos position where to start the deleting (0: before the first char, 1: after the first char etc.)
  * @param len number of characters to delete
  */
-void txt_cut(char * txt, uint32_t pos, uint32_t len)
+void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 {
 
     uint32_t old_len = strlen(txt);
@@ -301,7 +300,7 @@ void txt_cut(char * txt, uint32_t pos, uint32_t len)
  * @param c A character where the UTF-8 character starts
  * @return length of the UTF-8 character (1,2,3 or 4). O on invalid code
  */
-uint8_t txt_utf8_size(uint8_t c)
+uint8_t lv_txt_utf8_size(uint8_t c)
 {
     if((c & 0b10000000) == 0) return 1;
     else if((c & 0b11100000) == 0b11000000) return 2;
@@ -346,12 +345,12 @@ uint32_t txt_unicode_to_utf8(uint32_t letter_uni)
 /**
  * Decode an UTF-8 character from a string.
  * @param txt pointer to '\0' terminated string
- * @param i start index in 'txt' where to start.
- *                After the call it will point to the next UTF-8 char in 'txt'.
- *                NULL to use txt[0] as index
+ * @param i start byte index in 'txt' where to start.
+ *          After call it will point to the next UTF-8 char in 'txt'.
+ *          NULL to use txt[0] as index
  * @return the decoded Unicode character or 0 on invalid UTF-8 code
  */
-uint32_t txt_utf8_next(const char * txt, uint32_t * i)
+uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
 {
 #if TXT_UTF8 == 0
     if(i == NULL) return txt[1];    /*Get the next char */
@@ -428,38 +427,47 @@ uint32_t txt_utf8_next(const char * txt, uint32_t * i)
 /**
  * Get previous UTF-8 character form a string.
  * @param txt pointer to '\0' terminated string
- * @param i_start index in 'txt' where to start. After the call it will point to the next UTF-8 char in 'txt'.
+ * @param i start byte index in 'txt' where to start. After the call it will point to the previous UTF-8 char in 'txt'.
  * @return the decoded Unicode character or 0 on invalid UTF-8 code
  */
-uint32_t txt_utf8_prev(const char * txt, uint32_t * i_start)
+uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
 {
+#if TXT_UTF8 == 0
+    if(i == NULL) return *(txt- 1);    /*Get the prev. char */
+
+    (*i)--;
+    uint8_t letter = txt[*i)] ;
+
+    return letter;
+#else
     uint8_t c_size;
     uint8_t cnt = 0;
 
     /*Try to find a !0 long UTF-8 char by stepping one character back*/
-    (*i_start)--;
+    (*i)--;
     do {
         if(cnt >= 4) return 0;      /*No UTF-8 char found before the initial*/
 
-        c_size = txt_utf8_size(txt[*i_start]);
+        c_size = lv_txt_utf8_size(txt[*i]);
         if(c_size == 0) {
-            if(*i_start != 0) (*i_start)--;
+            if(*i != 0) (*i)--;
             else return 0;
         }
         cnt++;
     } while(c_size == 0);
 
-    uint32_t i_tmp = *i_start;
-    uint32_t letter = txt_utf8_next(txt, &i_tmp);   /*Character found, get it*/
+    uint32_t i_tmp = *i;
+    uint32_t letter = lv_txt_utf8_next(txt, &i_tmp);   /*Character found, get it*/
 
     return letter;
+#endif
 }
 
 /**
  * Convert a character index (in an UTF-8 text) to byte index.
- * E.g. in "AÁRT" index of 'R' is 2 but start at byte 3 because 'Á' is 2 bytes long
+ * E.g. in "AÁRT" index of 'R' is 2th char but start at byte 3 because 'Á' is 2 bytes long
  * @param txt a '\0' terminated UTF-8 string
- * @param utf8_id letter index
+ * @param utf8_id character index
  * @return byte index of the 'utf8_id'th letter
  */
 uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
@@ -470,7 +478,7 @@ uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
     uint32_t i;
     uint32_t byte_cnt = 0;
     for(i = 0; i < utf8_id; i++) {
-        byte_cnt += txt_utf8_size(txt[byte_cnt]);
+        byte_cnt += lv_txt_utf8_size(txt[byte_cnt]);
     }
 
     return byte_cnt;
@@ -480,12 +488,12 @@ uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
 
 /**
  * Convert a byte index (in an UTF-8 text) to character index.
- * E.g. in "AÁRT" index of 'R' is 2 but start at byte 3 because 'Á' is 2 bytes long
+ * E.g. in "AÁRT" index of 'R' is 2th char but start at byte 3 because 'Á' is 2 bytes long
  * @param txt a '\0' terminated UTF-8 string
  * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
  */
-uint32_t txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
+uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
 {
 #if TXT_UTF8 == 0
     return byte_id;     /*In Non UTF-8 no difference*/
@@ -494,7 +502,7 @@ uint32_t txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
     uint32_t char_cnt = 0;
 
     while(i < byte_id) {
-        txt_utf8_next(txt, &i); /*'i' points to the next letter so use the prev. value*/
+        lv_txt_utf8_next(txt, &i); /*'i' points to the next letter so use the prev. value*/
         char_cnt++;
     }
 
@@ -509,7 +517,7 @@ uint32_t txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
  * @param txt a '\0' terminated char string
  * @return number of characters
  */
-uint32_t txt_len(const char * txt)
+uint32_t lv_txt_get_length(const char * txt)
 {
 #if TXT_UTF8 == 0
     return strlen(txt);
@@ -518,7 +526,7 @@ uint32_t txt_len(const char * txt)
     uint32_t i = 0;
 
     while(txt[i] != '\0') {
-        txt_utf8_next(txt, &i);
+        lv_txt_utf8_next(txt, &i);
         len++;
     }
 
@@ -535,7 +543,7 @@ uint32_t txt_len(const char * txt)
  * @param letter a letter
  * @return false: 'letter' is not break char
  */
-static bool txt_is_break_char(uint32_t letter)
+static bool is_break_char(uint32_t letter)
 {
     uint8_t i;
     bool ret = false;
@@ -551,4 +559,3 @@ static bool txt_is_break_char(uint32_t letter)
     return ret;
 }
 
-#endif /*USE_TEXT*/

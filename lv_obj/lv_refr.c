@@ -67,8 +67,8 @@ void lv_refr_init(void)
     inv_buf_p = 0;
     memset(inv_buf, 0, sizeof(inv_buf));
 
-    ptask_t* task;
-    task = ptask_create(lv_refr_task, LV_REFR_PERIOD, PTASK_PRIO_MID, NULL);
+    lv_task_t* task;
+    task = lv_task_create(lv_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
     dm_assert(task);
 }
 
@@ -387,12 +387,12 @@ static void lv_refr_make(lv_obj_t * top_p, const lv_area_t * mask_p)
     /*Do until not reach the screen*/
     while(par != NULL) {
         /*object before border_p has to be redrawn*/
-        i = ll_get_prev(&(par->child_ll), border_p);
+        i = lv_ll_get_prev(&(par->child_ll), border_p);
 
         while(i != NULL) { 
             /*Refresh the objects*/
             lv_refr_obj(i, mask_p);
-            i = ll_get_prev(&(par->child_ll), i);
+            i = lv_ll_get_prev(&(par->child_ll), i);
         }  
         
         /*The new border will be there last parents,

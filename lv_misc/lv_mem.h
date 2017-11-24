@@ -89,7 +89,7 @@ void lv_mem_monitor(dm_mon_t * mon_p);
  * @param data pointer to an allocated memory
  * @return the size of data memory in bytes
  */
-uint32_t dm_get_size(void * data);
+uint32_t lv_mem_get_size(void * data);
 
 /**********************
  *      MACROS

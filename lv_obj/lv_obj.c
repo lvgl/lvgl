@@ -46,7 +46,7 @@ static lv_obj_t * def_scr = NULL;
 static lv_obj_t * act_scr = NULL;
 static lv_obj_t * top_layer = NULL;
 static lv_obj_t * sys_layer = NULL;
-static ll_dsc_t scr_ll;                 /*Linked list of screens*/
+static lv_ll_t scr_ll;                 /*Linked list of screens*/
 
 /**********************
  *      MACROS
@@ -68,16 +68,16 @@ void lv_init(void)
     lv_mem_init();
 #endif
 
-#if USE_PTASK != 0
-    ptask_init();
+#if USE_LV_TASK != 0
+    lv_task_init();
 #endif
 
 #if USE_FSINT != 0  /*Init is befor other FS inits*/
-    fs_init();
+    lv_fs_init();
 #endif
 
 #if USE_UFS != 0
-    ufs_init();
+    lv_ufs_init();
 #endif
 
 #if USE_FONT != 0
@@ -100,7 +100,7 @@ void lv_init(void)
     lv_refr_init();
 
     /*Create the default screen*/
-    ll_init(&scr_ll, sizeof(lv_obj_t));
+    lv_ll_init(&scr_ll, sizeof(lv_obj_t));
     def_scr = lv_obj_create(NULL, NULL);
 
     act_scr = def_scr;
@@ -142,10 +142,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     lv_obj_t * new_obj = NULL;
     /*Create a screen if the parent is NULL*/
     if(parent == NULL) {
-        new_obj = ll_ins_head(&scr_ll);
+        new_obj = lv_ll_ins_head(&scr_ll);
         
         new_obj->par = NULL; /*Screens has no a parent*/
-        ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
+        lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
         
 		/*Set coordinates to full screen size*/
 		new_obj->coords.x1 = 0;
@@ -187,10 +187,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     /*parent != NULL create normal obj. on a parent*/
     else
     {   
-        new_obj = ll_ins_head(&(parent)->child_ll);
+        new_obj = lv_ll_ins_head(&(parent)->child_ll);
 
         new_obj->par = parent; /*Set the parent*/
-        ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
+        lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
         
         /*Set coordinates left top corner of parent*/
         new_obj->coords.x1 = parent->coords.x1;
@@ -287,10 +287,10 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Recursively delete the children*/
     lv_obj_t * i;
     lv_obj_t * i_next;
-    i = ll_get_head(&(obj->child_ll));
+    i = lv_ll_get_head(&(obj->child_ll));
     while(i != NULL) {
         /*Get the next object before delete this*/
-        i_next = ll_get_next(&(obj->child_ll), i);
+        i_next = lv_ll_get_next(&(obj->child_ll), i);
         
         /*Call the recursive del to the child too*/
         delete_children(i);
@@ -305,9 +305,9 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) { /*It is a screen*/
-    	ll_rem(&scr_ll, obj);
+    	lv_ll_rem(&scr_ll, obj);
     } else {
-    	ll_rem(&(par->child_ll), obj);
+    	lv_ll_rem(&(par->child_ll), obj);
     }
 
     /* All children deleted.
@@ -432,7 +432,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     
     lv_obj_t * old_par = obj->par;
 
-    ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
+    lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
     obj->par = parent;
     lv_obj_set_pos(obj, old_pos.x, old_pos.y);
 
@@ -1084,9 +1084,9 @@ lv_obj_t * lv_obj_get_parent(lv_obj_t * obj)
 lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child)
 {
 	if(child == NULL) {
-		return ll_get_head(&obj->child_ll);
+		return lv_ll_get_head(&obj->child_ll);
 	} else {
-		return ll_get_next(&obj->child_ll, child);
+		return lv_ll_get_next(&obj->child_ll, child);
 	}
 
 	return NULL;
@@ -1102,9 +1102,9 @@ lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child)
 lv_obj_t * lv_obj_get_child_back(lv_obj_t * obj, lv_obj_t * child)
 {
     if(child == NULL) {
-        return ll_get_tail(&obj->child_ll);
+        return lv_ll_get_tail(&obj->child_ll);
     } else {
-        return ll_get_prev(&obj->child_ll, child);
+        return lv_ll_get_prev(&obj->child_ll, child);
     }
 
     return NULL;
@@ -1535,10 +1535,10 @@ static void delete_children(lv_obj_t * obj)
 {
    lv_obj_t * i;
    lv_obj_t * i_next;
-   i = ll_get_head(&(obj->child_ll));
+   i = lv_ll_get_head(&(obj->child_ll));
    while(i != NULL) {
        /*Get the next object before delete this*/
-       i_next = ll_get_next(&(obj->child_ll), i);
+       i_next = lv_ll_get_next(&(obj->child_ll), i);
 
        /*Call the recursive del to the child too*/
        delete_children(i);
@@ -1557,7 +1557,7 @@ static void delete_children(lv_obj_t * obj)
 
    /*Remove the object from parent's children list*/
    lv_obj_t * par = lv_obj_get_parent(obj);
-   ll_rem(&(par->child_ll), obj);
+   lv_ll_rem(&(par->child_ll), obj);
 
    /* Clean up the object specific data*/
    obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);

@@ -42,7 +42,7 @@ static void style_mod_def(lv_style_t * style);
 lv_group_t * lv_group_create(void)
 {
     lv_group_t * group = lv_mem_alloc(sizeof(lv_group_t));
-    ll_init(&group->obj_ll, sizeof(lv_obj_t *));
+    lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
     group->style_mod = style_mod_def;
     group->obj_focus = NULL;
@@ -59,12 +59,12 @@ lv_group_t * lv_group_create(void)
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     obj->group_p = group;
-    lv_obj_t ** next = ll_ins_tail(&group->obj_ll);
+    lv_obj_t ** next = lv_ll_ins_tail(&group->obj_ll);
     *next = obj;
 
     /* If the head and the tail is equal then there is only one object in the linked list.
      * In this case automatically activate it*/
-    if(ll_get_head(&group->obj_ll) == next) {
+    if(lv_ll_get_head(&group->obj_ll) == next) {
         lv_group_focus_next(group);
     }
 }
@@ -81,7 +81,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
 
     LL_READ(g->obj_ll, i) {
         if(*i == obj) {
-            ll_rem(&g->obj_ll, i);
+            lv_ll_rem(&g->obj_ll, i);
             break;
         }
     }
@@ -137,10 +137,10 @@ void lv_group_focus_next(lv_group_t * group)
     }
 
     lv_obj_t ** obj_next;
-    if(group->obj_focus == NULL) obj_next = ll_get_head(&group->obj_ll);
-    else obj_next = ll_get_next(&group->obj_ll, group->obj_focus);
+    if(group->obj_focus == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
+    else obj_next = lv_ll_get_next(&group->obj_ll, group->obj_focus);
 
-    if(obj_next == NULL) obj_next = ll_get_head(&group->obj_ll);
+    if(obj_next == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
     group->obj_focus = obj_next;
 
     if(group->obj_focus){
@@ -163,10 +163,10 @@ void lv_group_focus_prev(lv_group_t * group)
     }
 
     lv_obj_t ** obj_next;
-    if(group->obj_focus == NULL) obj_next = ll_get_tail(&group->obj_ll);
-    else obj_next = ll_get_prev(&group->obj_ll, group->obj_focus);
+    if(group->obj_focus == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
+    else obj_next = lv_ll_get_prev(&group->obj_ll, group->obj_focus);
 
-    if(obj_next == NULL) obj_next = ll_get_tail(&group->obj_ll);
+    if(obj_next == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
     group->obj_focus = obj_next;
 
     if(group->obj_focus != NULL){

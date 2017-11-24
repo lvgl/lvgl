@@ -15,7 +15,7 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"
-#include "../lv_misc/lv_text.h"
+#include <lvgl/lv_misc/lv_txt.h>
 
 /*********************
  *      DEFINES
@@ -99,14 +99,14 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
  * Create a file to the RAMFS from a picture data
  * @param fn file name of the new file (e.g. "pic1", will be available at "U:/pic1")
  * @param data pointer to a color map with lv_img_raw_header_t header
- * @return result of the file operation. FS_RES_OK or any error from fs_res_t
+ * @return result of the file operation. FS_RES_OK or any error from lv_fs_res_t
  */
-fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
+lv_fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
 {
 #if USE_UFS != 0
 	const lv_img_raw_header_t * raw_p = (lv_img_raw_header_t *) data;
-	fs_res_t res;
-	res = ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(lv_color_t) + sizeof(lv_img_raw_header_t));
+	lv_fs_res_t res;
+	res = lv_ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(lv_color_t) + sizeof(lv_img_raw_header_t));
 
 	return res;
 #else
@@ -129,13 +129,13 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
     
     /*Handle normal images*/
 	if(lv_img_is_symbol(fn) == false) {
-        fs_file_t file;
-        fs_res_t res;
+        lv_fs_file_t file;
+        lv_fs_res_t res;
         lv_img_raw_header_t header;
         uint32_t rn;
-        res = fs_open(&file, fn, FS_MODE_RD);
+        res = lv_fs_open(&file, fn, FS_MODE_RD);
         if(res == FS_RES_OK) {
-            res = fs_read(&file, &header, sizeof(header), &rn);
+            res = lv_fs_read(&file, &header, sizeof(header), &rn);
         }
 
         /*Create a dummy header on fs error*/
@@ -146,7 +146,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
             header.cd = 0;
         }
 
-        fs_close(&file);
+        lv_fs_close(&file);
 
         ext->w = header.w;
         ext->h = header.h;
@@ -163,7 +163,7 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	else {
         lv_style_t * style = lv_obj_get_style(img);
         lv_point_t size;
-        txt_get_size(&size, fn, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, TXT_FLAG_NONE);
+        lv_txt_get_size(&size, fn, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
         ext->w = size.x;
         ext->h = size.y;
         ext->transp = 1;    /*Symbols always have transparent parts*/
@@ -300,7 +300,7 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
 			cords_tmp.x2 = cords.x1 + ext->w - 1;
 			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
 			    if(sym == false) lv_draw_img(&cords_tmp, mask, style, ext->fn);
-			    else lv_draw_label(&cords_tmp, mask, style, ext->fn, TXT_FLAG_NONE, NULL);
+			    else lv_draw_label(&cords_tmp, mask, style, ext->fn, LV_TXT_FLAG_NONE, NULL);
 
 			}
 		}

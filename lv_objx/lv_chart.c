@@ -65,7 +65,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
     dm_assert(ext);
-    ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
+    lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
     ext->series.num = 0;
     ext->ymin = LV_CHART_YMIN_DEF;
     ext->ymax = LV_CHART_YMAX_DEF;
@@ -125,7 +125,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-	lv_chart_series_t *ser = ll_ins_head(&ext->series_ll);
+	lv_chart_series_t *ser = lv_ll_ins_head(&ext->series_ll);
 	lv_coord_t def = (ext->ymin + ext->ymax) >> 1;	/*half range as default value*/
 
 	if(ser == NULL) return NULL;
@@ -405,7 +405,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
         LL_READ(ext->series_ll, datal) {
             lv_mem_free(*datal);
         }
-        ll_clear(&ext->series_ll);
+        lv_ll_clear(&ext->series_ll);
     }
 
     return res;

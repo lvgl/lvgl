@@ -39,7 +39,7 @@ static bool anim_ready_handler(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static ll_dsc_t anim_ll;
+static lv_ll_t anim_ll;
 static uint32_t last_task_run;
 static bool anim_del_global_flag = false;
 
@@ -68,9 +68,9 @@ static lv_anim_path_t anim_path_step[] =
  */
 void lv_anim_init(void)
 {
-	ll_init(&anim_ll, sizeof(lv_anim_t));
+	lv_ll_init(&anim_ll, sizeof(lv_anim_t));
 	last_task_run = MISC_SYSTICK_GET();
-	ptask_create(anim_task, ANIM_REFR_PERIOD, PTASK_PRIO_MID, NULL);
+	lv_task_create(anim_task, ANIM_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
 }
 
 /**
@@ -83,7 +83,7 @@ void lv_anim_create(lv_anim_t * anim_p)
     if(anim_p->fp != NULL) lv_anim_del(anim_p->var, anim_p->fp);       /*fp == NULL would delete all animations of var*/
 
 	/*Add the new animation to the animation linked list*/
-	lv_anim_t * new_anim = ll_ins_head(&anim_ll);
+	lv_anim_t * new_anim = lv_ll_ins_head(&anim_ll);
 	dm_assert(new_anim);
 
 	/*Initialize the animation descriptor*/
@@ -106,13 +106,13 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
 	bool del = false;
 	lv_anim_t * a;
 	lv_anim_t * a_next;
-	a = ll_get_head(&anim_ll);
+	a = lv_ll_get_head(&anim_ll);
 	while(a != NULL) {
 		/*'a' might be deleted, so get the next object while 'a' is valid*/
-		a_next = ll_get_next(&anim_ll, a);
+		a_next = lv_ll_get_next(&anim_ll, a);
 
 		if(a->var == var && (a->fp == fp || fp == NULL)) {
-			ll_rem(&anim_ll, a);
+			lv_ll_rem(&anim_ll, a);
 			lv_mem_free(a);
 			del = true;
 			anim_del_global_flag = true;
@@ -133,7 +133,7 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
  */
 uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 {
-	int32_t d = MATH_ABS((int32_t) start - end);
+	int32_t d = LV_MATH_ABS((int32_t) start - end);
 	uint16_t time = (int32_t)((int32_t)(d * 1000) / speed);
 
 	if(time == 0) {
@@ -177,10 +177,10 @@ static void anim_task (void * param)
 
 	lv_anim_t * a;
 	lv_anim_t * a_next;
-	a = ll_get_head(&anim_ll);
+	a = lv_ll_get_head(&anim_ll);
 	while(a != NULL) {
 		/*'a' might be deleted, so get the next object while 'a' is valid*/
-		a_next = ll_get_next(&anim_ll, a);
+		a_next = lv_ll_get_next(&anim_ll, a);
 
 		a->act_time += elaps;
 		if(a->act_time >= 0) {
@@ -207,7 +207,7 @@ static void anim_task (void * param)
 				bool invalid;
 				invalid = anim_ready_handler(a);
 				if(invalid != false) {
-					a_next = ll_get_head(&anim_ll);	/*a_next might be invalid if animation delete occurred*/
+					a_next = lv_ll_get_head(&anim_ll);	/*a_next might be invalid if animation delete occurred*/
 				}
 			}
 		}
@@ -235,7 +235,7 @@ static bool anim_ready_handler(lv_anim_t * a)
 	   (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
 		void (*cb) (void *) = a->end_cb;
 		void * p = a->var;
-		ll_rem(&anim_ll, a);
+		lv_ll_rem(&anim_ll, a);
 		lv_mem_free(a);
 
 		/*Call the callback function at the end*/
@@ -269,7 +269,7 @@ static bool anim_ready_handler(lv_anim_t * a)
 /*For compatibility add dummy functions*/
 #else
 
-#if USE_PTASK != 0
+#if USE_LV_TASK != 0
 static void anim_dummy_handler(void * anim_dm);
 #endif
 
@@ -285,14 +285,14 @@ void lv_anim_create(lv_anim_t * anim_p)
         if(anim_p->fp != NULL) anim_p->fp(anim_p->var, anim_p->end);
         if(anim_p->end_cb != NULL) anim_p->end_cb(anim_p->var);
     }
-    /*With delay set the start value and set a one shot ptask to set end value and call the callback*/
+    /*With delay set the start value and set a one shot lv_task to set end value and call the callback*/
     else {
-#if USE_DYN_MEM != 0 && USE_PTASK != 0
+#if USE_DYN_MEM != 0 && USE_LV_TASK != 0
         if(anim_p->fp != NULL) anim_p->fp(anim_p->var, anim_p->start);
         void * anim_dm = dm_alloc(sizeof(lv_anim_t));
         memcpy(anim_dm, anim_p, sizeof(lv_anim_t));
-        ptask_t * ptask = ptask_create(anim_dummy_handler, -anim_p->act_time, PTASK_PRIO_LOW, anim_dm);
-        ptask_once(ptask);
+        lv_task_t * lv_task = lv_task_create(anim_dummy_handler, -anim_p->act_time, LV_TASK_PRIO_LOW, anim_dm);
+        lv_task_once(lv_task);
 #else
         if(anim_p->fp != NULL) anim_p->fp(anim_p->var, anim_p->end);
         if(anim_p->end_cb != NULL) anim_p->end_cb(anim_p->var);
@@ -334,10 +334,10 @@ lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name)
     return NULL;
 }
 
-#if USE_PTASK != 0
+#if USE_LV_TASK != 0
 
 /**
- * A One Shot ptask to handle end callbacks with delay
+ * A One Shot lv_task to handle end callbacks with delay
  * @param anim_dm pointer to temporal dynamically allocated animation
  */
 static void anim_dummy_handler(void * anim_dm)

@@ -1,10 +1,10 @@
 /**
- * @file text.h
+ * @file lv_text.h
  * 
  */
 
-#ifndef TEXT_H
-#define TEXT_H
+#ifndef LV_TEXT_H
+#define LV_TEXT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_FONT != 0
 
 #include <stdbool.h>
 #include "lv_area.h"
@@ -24,26 +23,26 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define TXT_RELV_COLOR_CMD  '#'
+#define LV_TXT_COLOR_CMD  "#"
 
 /**********************
  *      TYPEDEFS
  **********************/
 typedef enum
 {
-    TXT_FLAG_NONE =     0x00,
-    TXT_FLAG_RECOLOR =  0x01,   /*Enable parsing of recolor command*/
-    TXT_FLAG_EXPAND =   0x02,   /*Ignore width (Used by the library)*/
-    TXT_FLAG_NO_BREAK = 0x04,   /*Ignore line breaks (Used by the library)*/
-    TXT_FLAG_CENTER =   0x08,   /*Align the text to the middle*/
-}txt_flag_t;
+    LV_TXT_FLAG_NONE =     0x00,
+    LV_TXT_FLAG_RECOLOR =  0x01,   /*Enable parsing of recolor command*/
+    LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width (Used by the library)*/
+    LV_TXT_FLAG_NO_BREAK = 0x04,   /*Ignore line breaks (Used by the library)*/
+    LV_TXT_FLAG_CENTER =   0x08,   /*Align the text to the middle*/
+}lv_txt_flag_t;
 
 typedef enum
 {
-    TXT_CMD_STATE_WAIT,
-    TXT_CMD_STATE_PAR,
-    TXT_CMD_STATE_IN,
-}txt_cmd_state_t;
+    LV_TXT_CMD_STATE_WAIT,      /*Waiting for command*/
+    LV_TXT_CMD_STATE_PAR,       /*Processing the parameter*/
+    LV_TXT_CMD_STATE_IN,        /*Processing the command*/
+}lv_txt_cmd_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -59,8 +58,8 @@ typedef enum
  * @param flags settings for the text from 'txt_flag_t' enum
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
  */
-void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
-                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, txt_flag_t flag);
+void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -71,8 +70,8 @@ void txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * fo
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return the index of the first char of the new line
  */
-uint16_t txt_get_next_line(const char * txt, const lv_font_t * font_p,
-                            lv_coord_t letter_space, lv_coord_t max_l, txt_flag_t flag);
+uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font_p,
+                            lv_coord_t letter_space, lv_coord_t max_l, lv_txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -83,8 +82,8 @@ uint16_t txt_get_next_line(const char * txt, const lv_font_t * font_p,
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t txt_get_width(const char * txt, uint16_t char_num,
-                    const lv_font_t * font_p, lv_coord_t letter_space, txt_flag_t flag);
+lv_coord_t lv_txt_get_width(const char * txt, uint16_t char_num,
+                    const lv_font_t * font_p, lv_coord_t letter_space, lv_txt_flag_t flag);
 
 /**
  * Check next character in a string and decide if te character is part of the command or not
@@ -93,7 +92,7 @@ lv_coord_t txt_get_width(const char * txt, uint16_t char_num,
  * @return true: the character is part of a command and should not be written,
  *         false: the character should be written
  */
-bool txt_is_cmd(txt_cmd_state_t * state, uint32_t c);
+bool lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c);
 
 /**
  * Insert a string into an other
@@ -101,7 +100,7 @@ bool txt_is_cmd(txt_cmd_state_t * state, uint32_t c);
  * @param pos position to insert (0: before the original text, 1: after the first char etc.)
  * @param ins_txt text to insert
  */
-void txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
+void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
 
 /**
  * Delete a part of a string
@@ -109,14 +108,14 @@ void txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
  * @param pos position where to start the deleting (0: before the first char, 1: after the first char etc.)
  * @param len number of characters to delete
  */
-void txt_cut(char * txt, uint32_t pos, uint32_t len);
+void lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
 
 /**
  * Give the size of an UTF-8 coded character
  * @param c A character where the UTF-8 character starts
  * @return length of the UTF-8 character (1,2,3 or 4). O on invalid code
  */
-uint8_t txt_utf8_size(uint8_t c);
+uint8_t lv_txt_utf8_size(uint8_t c);
 
 
 /**
@@ -134,7 +133,7 @@ uint32_t txt_unicode_to_utf8(uint32_t letter_uni);
  *                NULL to use txt[0] as index
  * @return the decoded Unicode character or 0 on invalid UTF-8 code
  */
-uint32_t txt_utf8_next(const char * txt, uint32_t * i);
+uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i);
 
 /**
  * Get previous UTF-8 character form a string.
@@ -142,7 +141,7 @@ uint32_t txt_utf8_next(const char * txt, uint32_t * i);
  * @param i_start index in 'txt' where to start. After the call it will point to the next UTF-8 char in 'txt'.
  * @return the decoded Unicode character or 0 on invalid UTF-8 code
  */
-uint32_t txt_utf8_prev(const char * txt, uint32_t * i_start);
+uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i_start);
 
 /**
  * Convert a letter index (in an UTF-8 text) to byte index.
@@ -160,7 +159,7 @@ uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id);
  * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
  */
-uint32_t txt_utf8_get_char_id(const char * txt, uint32_t byte_id);
+uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id);
 
 /**
  * Get the number of characters (and NOT bytes) in a string. Decode it with UTF-8 if enabled.
@@ -168,7 +167,7 @@ uint32_t txt_utf8_get_char_id(const char * txt, uint32_t byte_id);
  * @param txt a '\0' terminated char string
  * @return number of characters
  */
-uint32_t txt_len(const char * txt);
+uint32_t lv_txt_get_length(const char * txt);
 
 /**********************
  *      MACROS
@@ -178,7 +177,4 @@ uint32_t txt_len(const char * txt);
 
 #ifdef __cplusplus
 } /* extern "C" */
-#endif
-
-
 #endif

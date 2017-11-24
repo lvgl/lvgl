@@ -1,15 +1,13 @@
 /**
- * @file ptask.c
- * A Periodic Tasks is a void (*fp) (void) type function which will be called periodically.
- * A priority (5 levels + disable) can be assigned to ptasks. 
+ * @file lv_task.c
+ * An 'lv_task'  is a void (*fp) (void* param) type function which will be called periodically.
+ * A priority (5 levels + disable) can be assigned to lv_tasks. 
  */
 
 /*********************
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_PTASK != 0
-
 
 #include "lv_task.h"
 #include "../lv_hal/lv_hal_tick.h"
@@ -26,13 +24,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool ptask_exec(ptask_t* ptask_p, ptask_prio_t prio_act);
+static bool lv_task_exec(lv_task_t* lv_task_p, lv_task_prio_t prio_act);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static ll_dsc_t ptask_ll;  /*Linked list to store the ptasks*/
-static bool ptask_run = false;
+static lv_ll_t lv_task_ll;  /*Linked list to store the lv_tasks*/
+static bool lv_task_run = false;
 static uint8_t idle_last = 0;
 
 /**********************
@@ -44,180 +42,166 @@ static uint8_t idle_last = 0;
  **********************/
 
 /**
- * Init the ptask module
+ * Init the lv_task module
  */
-void ptask_init(void)
+void lv_task_init(void)
 {
-    ll_init(&ptask_ll, sizeof(ptask_t));
+    lv_ll_init(&lv_task_ll, sizeof(lv_task_t));
     
-    /*Initially enable the ptask handling*/
-    ptask_en(true);
+    /*Initially enable the lv_task handling*/
+    lv_task_enable(true);
 }
 
 /**
- * Call it  periodically to handle ptasks.
+ * Call it  periodically to handle lv_tasks.
  */
-void ptask_handler(void)
+void lv_task_handler(void)
 {
-	if(ptask_run == false) return;
+	if(lv_task_run == false) return;
 
-	static uint32_t idle_tick = 0;
-    static uint32_t used_tick = 0;
-    uint32_t start_tick = MISC_SYSTICK_GET();
-
-	if(idle_tick == 0) idle_tick = MISC_SYSTICK_GET();
-
-    ptask_t* ptask_prio_a[PTASK_PRIO_NUM]; /*Lists for all prio.*/
-    ptask_prio_t prio_act;
+    lv_task_t* lv_task_prio_a[LV_TASK_PRIO_NUM]; /*Lists for all prio.*/
+    lv_task_prio_t prio_act;
     bool prio_reset = false;  /*Used to go back to the highest priority*/
-    ptask_t* ptask_next;
+    lv_task_t* lv_task_next;
 
     /*Init. the lists*/
-    for(prio_act = PTASK_PRIO_LOWEST; prio_act <= PTASK_PRIO_HIGHEST; prio_act++) {
-        ptask_prio_a[prio_act] = ll_get_head(&ptask_ll);
+    for(prio_act = LV_TASK_PRIO_LOWEST; prio_act <= LV_TASK_PRIO_HIGHEST; prio_act++) {
+        lv_task_prio_a[prio_act] = lv_ll_get_head(&lv_task_ll);
     }
 
-    /*Handle the ptasks on all priority*/
-    for(prio_act = PTASK_PRIO_HIGHEST; prio_act > PTASK_PRIO_OFF; prio_act --) {
+    /*Handle the lv_tasks on all priority*/
+    for(prio_act = LV_TASK_PRIO_HIGHEST; prio_act > LV_TASK_PRIO_OFF; prio_act --) {
         /*Reset the prio. if necessary*/
         if(prio_reset != false) {
             prio_reset = false;
-            prio_act = PTASK_PRIO_HIGHEST; /*Go again with highest prio */
+            prio_act = LV_TASK_PRIO_HIGHEST; /*Go again with highest prio */
         }
 
-        /* Read all ptask on 'prio_act' but stop on 'prio_reset' */
-        while(ptask_prio_a[prio_act] != NULL && prio_reset == false)  {
-            /* Get the next task. (Invalid pointer if a ptask deletes itself)*/
-            ptask_next = ll_get_next(&ptask_ll, ptask_prio_a[prio_act]);
+        /* Read all lv_task on 'prio_act' but stop on 'prio_reset' */
+        while(lv_task_prio_a[prio_act] != NULL && prio_reset == false)  {
+            /* Get the next task. (Invalid pointer if a lv_task deletes itself)*/
+            lv_task_next = lv_ll_get_next(&lv_task_ll, lv_task_prio_a[prio_act]);
 
-            /*Execute the current ptask*/
-            bool executed = ptask_exec(ptask_prio_a[prio_act], prio_act);
+            /*Execute the current lv_task*/
+            bool executed = lv_task_exec(lv_task_prio_a[prio_act], prio_act);
             if(executed != false) {     /*If the task is executed*/
-                /* During the execution higher priority ptasks
+                /* During the execution higher priority lv_tasks
                  * can be ready, so reset the priority if it is not highest*/
-                if(prio_act != PTASK_PRIO_HIGHEST) {
+                if(prio_act != LV_TASK_PRIO_HIGHEST) {
                     prio_reset = true;
                 }
             }
 
-            ptask_prio_a[prio_act] = ptask_next; /*Load the next task*/
+            lv_task_prio_a[prio_act] = lv_task_next; /*Load the next task*/
         }
 
         /*Reset higher priority lists on 'prio_reset' query*/
         if(prio_reset != false) {
-            for(prio_act = prio_act + 1; prio_act <= PTASK_PRIO_HIGHEST; prio_act++) {
-                ptask_prio_a[prio_act] = ll_get_head(&ptask_ll);
+            for(prio_act = prio_act + 1; prio_act <= LV_TASK_PRIO_HIGHEST; prio_act++) {
+                lv_task_prio_a[prio_act] = lv_ll_get_head(&lv_task_ll);
             }
         }
     }
-
-    used_tick += MISC_SYSTICK_ELAPS(start_tick);
-    if(MISC_SYSTICK_ELAPS(idle_tick) > PTASK_IDLE_PERIOD) {
-        idle_last = (uint32_t)((uint32_t) used_tick * 100) / MISC_SYSTICK_ELAPS(idle_tick);  /*Calculate the busy time*/
-        idle_last = idle_last > 100 ? 0 : 100 - idle_last;  /*Convert he busy time to idle time*/
-        idle_tick = 0;
-        used_tick = 0;
-    }
 }
 
 /**
- * Create a new ptask
+ * Create a new lv_task
  * @param task a function which is the task itself
  * @param period call period in ms unit
- * @param prio priority of the task (PTASK_PRIO_OFF means the task is stopped)
+ * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
  * @param param free parameter
  * @return pointer to the new task
  */
-ptask_t* ptask_create(void (*task) (void *), uint32_t period, ptask_prio_t prio, void * param)
+lv_task_t* lv_task_create(void (*task) (void *), uint32_t period, lv_task_prio_t prio, void * param)
 {
-    ptask_t* new_ptask;
+    lv_task_t* new_lv_task;
     
-    new_ptask = ll_ins_head(&ptask_ll);
-    dm_assert(new_ptask);
+    new_lv_task = lv_ll_ins_head(&lv_task_ll);
+    dm_assert(new_lv_task);
     
-    new_ptask->period = period;
-    new_ptask->task = task;
-    new_ptask->prio = prio;
-    new_ptask->param = param;
-    new_ptask->once = 0;
-    new_ptask->last_run = MISC_SYSTICK_GET();
+    new_lv_task->period = period;
+    new_lv_task->task = task;
+    new_lv_task->prio = prio;
+    new_lv_task->param = param;
+    new_lv_task->once = 0;
+    new_lv_task->last_run = MISC_SYSTICK_GET();
 
-    return new_ptask;
+    return new_lv_task;
 }
 
 /**
- * Delete a ptask
- * @param ptask_p pointer to task created by ptask_p
+ * Delete a lv_task
+ * @param lv_task_p pointer to task created by lv_task_p
  */
-void ptask_del(ptask_t* ptask_p) 
+void lv_task_del(lv_task_t* lv_task_p) 
 {
-    ll_rem(&ptask_ll, ptask_p);
+    lv_ll_rem(&lv_task_ll, lv_task_p);
     
-    lv_mem_free(ptask_p);
+    lv_mem_free(lv_task_p);
 }
 
 /**
- * Set new priority for a ptask
- * @param ptask_p pointer to a ptask
+ * Set new priority for a lv_task
+ * @param lv_task_p pointer to a lv_task
  * @param prio the new priority
  */
-void ptask_set_prio(ptask_t* ptask_p, ptask_prio_t prio)
+void lv_task_set_prio(lv_task_t* lv_task_p, lv_task_prio_t prio)
 {
-    ptask_p->prio = prio;
+    lv_task_p->prio = prio;
 }
 
 /**
- * Set new period for a ptask
- * @param ptask_p pointer to a ptask
+ * Set new period for a lv_task
+ * @param lv_task_p pointer to a lv_task
  * @param period the new period
  */
-void ptask_set_period(ptask_t* ptask_p, uint32_t period)
+void lv_task_set_period(lv_task_t* lv_task_p, uint32_t period)
 {
-    ptask_p->period = period;
+    lv_task_p->period = period;
 }
 
 /**
- * Make a ptask ready. It will not wait its period.
- * @param ptask_p pointer to a ptask.
+ * Make a lv_task ready. It will not wait its period.
+ * @param lv_task_p pointer to a lv_task.
  */
-void ptask_ready(ptask_t* ptask_p)
+void lv_task_ready(lv_task_t* lv_task_p)
 {
-    ptask_p->last_run = MISC_SYSTICK_GET() - ptask_p->period - 1;
+    lv_task_p->last_run = MISC_SYSTICK_GET() - lv_task_p->period - 1;
 }
 
 /**
- * Delete the ptask after one call
- * @param ptask_p pointer to a ptask.
+ * Delete the lv_task after one call
+ * @param lv_task_p pointer to a lv_task.
  */
-void ptask_once(ptask_t * ptask_p)
+void lv_task_once(lv_task_t * lv_task_p)
 {
-    ptask_p->once = 1;
+    lv_task_p->once = 1;
 }
 
 /**
- * Reset a ptask. 
+ * Reset a lv_task. 
  * It will be called the previously set period milliseconds later.
- * @param ptask_p pointer to a ptask.
+ * @param lv_task_p pointer to a lv_task.
  */
-void ptask_reset(ptask_t* ptask_p)
+void lv_task_reset(lv_task_t* lv_task_p)
 {
-    ptask_p->last_run = MISC_SYSTICK_GET();
+    lv_task_p->last_run = MISC_SYSTICK_GET();
 }
 
 /**
- * Enable or disable ptask handling
- * @param en: true: ptask handling is running, false: ptask handling is suspended
+ * Enable or disable the whole lv_task handling
+ * @param en: true: lv_task handling is running, false: lv_task handling is suspended
  */
-void ptask_en(bool en)
+void lv_task_enable(bool en)
 {
-	ptask_run = en;
+	lv_task_run = en;
 }
 
 /**
  * Get idle percentage
- * @return the ptask idle in percentage
+ * @return the lv_task idle in percentage
  */
-uint8_t ptask_get_idle(void)
+uint8_t lv_task_get_idle(void)
 {
     return idle_last;
 }
@@ -229,24 +213,24 @@ uint8_t ptask_get_idle(void)
 
 /**
  * Execute task if its the priority is appropriate 
- * @param ptask_p pointer to ptask
+ * @param lv_task_p pointer to lv_task
  * @param prio_act the current priority
  * @return true: execute, false: not executed
  */
-static bool ptask_exec (ptask_t* ptask_p, ptask_prio_t prio_act)
+static bool lv_task_exec (lv_task_t* lv_task_p, lv_task_prio_t prio_act)
 {
     bool exec = false;
     
-    /*Execute ptask if its prio is 'prio_act'*/
-    if(ptask_p->prio == prio_act) {
+    /*Execute lv_task if its prio is 'prio_act'*/
+    if(lv_task_p->prio == prio_act) {
         /*Execute if at least 'period' time elapsed*/
-        uint32_t elp = MISC_SYSTICK_ELAPS(ptask_p->last_run);
-        if(elp >= ptask_p->period) {
-            ptask_p->last_run = MISC_SYSTICK_GET();
-            ptask_p->task(ptask_p->param);
+        uint32_t elp = MISC_SYSTICK_ELAPS(lv_task_p->last_run);
+        if(elp >= lv_task_p->period) {
+            lv_task_p->last_run = MISC_SYSTICK_GET();
+            lv_task_p->task(lv_task_p->param);
 
-            /*Delete if it was a one shot ptask*/
-            if(ptask_p->once != 0) ptask_del(ptask_p);
+            /*Delete if it was a one shot lv_task*/
+            if(lv_task_p->once != 0) lv_task_del(lv_task_p);
 
             exec = true;
         }
@@ -255,5 +239,3 @@ static bool ptask_exec (ptask_t* ptask_p, ptask_prio_t prio_act)
     return exec;
 }
 
-
-#endif

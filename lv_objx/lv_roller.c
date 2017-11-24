@@ -227,7 +227,8 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
             lv_style_copy(&new_style, style);
             new_style.text.color = sel_style->text.color;
             new_style.text.opa = sel_style->text.opa;
-            lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style, lv_label_get_text(ext->ddlist.label), TXT_FLAG_CENTER, NULL);
+            lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style,
+                          lv_label_get_text(ext->ddlist.label), LV_TXT_FLAG_CENTER, NULL);
         }
     }
 

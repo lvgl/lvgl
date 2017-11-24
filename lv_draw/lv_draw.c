@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <lvgl/lv_misc/lv_txt.h>
 #include "lv_conf.h"
 
 #include <stdio.h>
@@ -13,7 +14,6 @@
 #include "lv_draw.h"
 #include "lv_draw_rbasic.h"
 #include "lv_draw_vbasic.h"
-#include "../lv_misc/lv_text.h"
 #include "../lv_misc/lv_circ.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_math.h"
@@ -145,17 +145,17 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
 
     /*Draw the triangle*/
     lv_point_t edge1;
-    lv_coord_t dx1 = MATH_ABS(tri[0].x - tri[1].x);
+    lv_coord_t dx1 = LV_MATH_ABS(tri[0].x - tri[1].x);
     lv_coord_t sx1 = tri[0].x < tri[1].x ? 1 : -1;
-    lv_coord_t dy1 = MATH_ABS(tri[0].y - tri[1].y);
+    lv_coord_t dy1 = LV_MATH_ABS(tri[0].y - tri[1].y);
     lv_coord_t sy1 = tri[0].y < tri[1].y ? 1 : -1;
     lv_coord_t err1 = (dx1 > dy1 ? dx1 : -dy1) / 2;
     lv_coord_t err_tmp1;
 
     lv_point_t edge2;
-    lv_coord_t dx2 = MATH_ABS(tri[0].x - tri[2].x);
+    lv_coord_t dx2 = LV_MATH_ABS(tri[0].x - tri[2].x);
     lv_coord_t sx2 = tri[0].x < tri[2].x ? 1 : -1;
-    lv_coord_t dy2 = MATH_ABS(tri[0].y - tri[2].y);
+    lv_coord_t dy2 = LV_MATH_ABS(tri[0].y - tri[2].y);
     lv_coord_t sy2 = tri[0].y < tri[2].y ? 1 : -1;
     lv_coord_t err2 = (dx1 > dy2 ? dx2 : -dy2) / 2;
     lv_coord_t err_tmp2;
@@ -177,10 +177,10 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
         act_area.y2 = edge2.y ;
 
 
-        draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
-        draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
-        draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
-        draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
+        draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
+        draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
+        draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
+        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
         draw_area.x2--; /*Do not draw most right pixel because it will be drawn by the adjacent triangle*/
         fill_fp(&draw_area, mask, color, LV_OPA_50);
 
@@ -189,9 +189,9 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
         do {
             if (edge1.x == tri[1].x && edge1.y == tri[1].y) {
 
-                dx1 = MATH_ABS(tri[1].x - tri[2].x);
+                dx1 = LV_MATH_ABS(tri[1].x - tri[2].x);
                 sx1 = tri[1].x < tri[2].x ? 1 : -1;
-                dy1 = MATH_ABS(tri[1].y - tri[2].y);
+                dy1 = LV_MATH_ABS(tri[1].y - tri[2].y);
                 sy1 = tri[1].y < tri[2].y ? 1 : -1;
                 err1 = (dx1 > dy1 ? dx1 : -dy1) / 2;
             }
@@ -236,30 +236,30 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
  *
  */
 void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_style_t * style,
-                    const char * txt, txt_flag_t flag, lv_point_t * offset)
+                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset)
 {
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
 
-    if((flag & TXT_FLAG_EXPAND) == 0) {
+    if((flag & LV_TXT_FLAG_EXPAND) == 0) {
         w = area_get_width(coords);
     } else {
         lv_point_t p;
-        txt_get_size(&p, txt, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, flag);
+        lv_txt_get_size(&p, txt, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, flag);
         w = p.x;
     }
     /*Init variables for the first line*/
     lv_coord_t line_length = 0;
     uint32_t line_start = 0;
-    uint32_t line_end = txt_get_next_line(txt, font, style->text.letter_space, w, flag);
+    uint32_t line_end = lv_txt_get_next_line(txt, font, style->text.letter_space, w, flag);
 
     lv_point_t pos;
     pos.x = coords->x1;
     pos.y = coords->y1;
 
     /*Align the line to middle if enabled*/
-    if(flag & TXT_FLAG_CENTER) {
-        line_length = txt_get_width(&txt[line_start], line_end - line_start,
+    if(flag & LV_TXT_FLAG_CENTER) {
+        line_length = lv_txt_get_width(&txt[line_start], line_end - line_start,
                                     font, style->text.letter_space, flag);
         pos.x += (w - line_length) / 2;
     }
@@ -283,12 +283,12 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
         i = line_start;
         uint32_t letter;
         while(i < line_end) {
-            letter = txt_utf8_next(txt, &i);
+            letter = lv_txt_utf8_next(txt, &i);
             /*Handle the re-color command*/
-            if((flag & TXT_FLAG_RECOLOR) != 0) {
-                if(letter == TXT_RELV_COLOR_CMD) {
+            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+                if(letter == LV_TXT_COLOR_CMD[0]) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
-                        par_start = i + txt_utf8_size(txt[i]);
+                        par_start = i + lv_txt_utf8_size(txt[i]);
                         cmd_state = CMD_STATE_PAR;
                         continue;
                     } else if(cmd_state == CMD_STATE_PAR) { /*Other start char in parameter escaped cmd. char */
@@ -329,12 +329,12 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
         }
         /*Go to next line*/
         line_start = line_end;
-        line_end += txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
+        line_end += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
 
         pos.x = coords->x1;
         /*Align to middle*/
-        if(flag & TXT_FLAG_CENTER) {
-            line_length = txt_get_width(&txt[line_start], line_end - line_start,
+        if(flag & LV_TXT_FLAG_CENTER) {
+            line_length = lv_txt_get_width(&txt[line_start], line_end - line_start,
                                      font, style->text.letter_space, flag);
             pos.x += (w - line_length) / 2;
         }
@@ -357,14 +357,14 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 {
     if(fn == NULL) {
         lv_draw_rect(coords, mask, &lv_style_plain);
-        lv_draw_label(coords, mask, &lv_style_plain, "No data", TXT_FLAG_NONE, NULL);
+        lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
     } else {
-        fs_file_t file;
-        fs_res_t res = fs_open(&file, fn, FS_MODE_RD);
+        lv_fs_file_t file;
+        lv_fs_res_t res = lv_fs_open(&file, fn, FS_MODE_RD);
         if(res == FS_RES_OK) {
             lv_img_raw_header_t header;
             uint32_t br;
-            res = fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
+            res = lv_fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
 
             /*If the width is greater then real img. width then it is upscaled */
             bool upscale = false;
@@ -374,7 +374,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             bool union_ok;
             union_ok = lv_area_union(&mask_com, mask, coords);
             if(union_ok == false) {
-                fs_close(&file);
+                lv_fs_close(&file);
                 return;
             }
 
@@ -393,7 +393,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             /*If the img. data is inside the MCU then do not use FS reading just a pointer*/
             if(fn[0] == UFS_LETTER) {
                 const_data = true;
-                uint8_t * f_data = ((ufs_file_t*)file.file_d)->ent->data_d;
+                uint8_t * f_data = ((lv_ufs_file_t*)file.file_d)->ent->data_d;
                 f_data += sizeof(lv_img_raw_header_t);
                 map_fp(coords, &mask_com, (void*)f_data , style->image.opa, header.transp, upscale, style->image.color, style->image.intense);
             }
@@ -414,7 +414,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                 start_offset += (area_get_width(coords) >> us_shift) *
                                ((mask_com.y1 - coords->y1) >> us_shift) * sizeof(lv_color_t); /*First row*/
                 start_offset += ((mask_com.x1 - coords->x1) >> us_shift) * sizeof(lv_color_t); /*First col*/
-                fs_seek(&file, start_offset);
+                lv_fs_seek(&file, start_offset);
 
                 uint32_t useful_data = (area_get_width(&mask_com) >> us_shift) * sizeof(lv_color_t);
                 uint32_t next_row = (area_get_width(coords) >> us_shift) * sizeof(lv_color_t) - useful_data;
@@ -427,24 +427,24 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                 uint32_t act_pos;
                 lv_color_t buf[LV_HOR_RES];
                 for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
-                    res = fs_read(&file, buf, useful_data, &br);
+                    res = lv_fs_read(&file, buf, useful_data, &br);
 
                     map_fp(&line, &mask_com, buf, style->image.opa, header.transp, upscale,
                                           style->image.color, style->image.intense);
 
-                    fs_tell(&file, &act_pos);
-                    fs_seek(&file, act_pos + next_row);
+                    lv_fs_tell(&file, &act_pos);
+                    lv_fs_seek(&file, act_pos + next_row);
                     line.y1 += us_val;    /*Go down a line*/
                     line.y2 += us_val;
                 }
             }
         }
 
-        fs_close(&file);
+        lv_fs_close(&file);
 
         if(res != FS_RES_OK) {
             lv_draw_rect(coords, mask, &lv_style_plain);
-            lv_draw_label(coords, mask, &lv_style_plain, "No data", TXT_FLAG_NONE, NULL);
+            lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
         }
     }
 }
@@ -464,9 +464,9 @@ void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t 
 
 	if(p1->x == p2->x && p1->y == p2->y) return;
 
-	lv_coord_t dx = MATH_ABS(p2->x - p1->x);
+	lv_coord_t dx = LV_MATH_ABS(p2->x - p1->x);
 	lv_coord_t sx = p1->x < p2->x ? 1 : -1;
-	lv_coord_t dy = MATH_ABS(p2->y - p1->y);
+	lv_coord_t dy = LV_MATH_ABS(p2->y - p1->y);
 	lv_coord_t sy = p1->y < p2->y ? 1 : -1;
 	lv_coord_t err = (dx > dy ? dx : -dy) / 2;
 	lv_coord_t e2;
@@ -511,10 +511,10 @@ void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t 
 		  last_y = act_point.y;
 		  last_x = act_point.x;
 
-		  draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
-		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
-		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
-		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
+		  draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
+		  draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
+		  draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
+		  draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
 		  fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	  }
 	  if (hor == false && last_x != act_point.x) {
@@ -527,10 +527,10 @@ void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t 
 		  last_y = act_point.y;
 		  last_x = act_point.x;
 
-		  draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
-		  draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
-		  draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
-		  draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
+		  draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
+		  draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
+		  draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
+		  draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
 		  fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	  }
 
@@ -555,10 +555,10 @@ void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t 
 		act_area.y1 = last_y - width_half ;
 		act_area.y2 = act_point.y + width_half + width_1;
 
-		draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
-		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
-		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
-		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
+		draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
+		draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
+		draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
+		draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
 		fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	}
 	if (hor == false) {
@@ -569,10 +569,10 @@ void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t 
 		act_area.y1 = last_y;
 		act_area.y2 = act_point.y;
 
-		draw_area.x1 = MATH_MIN(act_area.x1, act_area.x2);
-		draw_area.x2 = MATH_MAX(act_area.x1, act_area.x2);
-		draw_area.y1 = MATH_MIN(act_area.y1, act_area.y2);
-		draw_area.y2 = MATH_MAX(act_area.y1, act_area.y2);
+		draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
+		draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
+		draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
+		draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
 		fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 	}
 }

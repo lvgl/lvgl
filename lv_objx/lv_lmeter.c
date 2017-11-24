@@ -263,10 +263,10 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
              /*Calculate the position a scale label*/
              int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
 
-             lv_coord_t y_out = (int32_t)((int32_t)trigo_sin(angle) * r_out) / TRIGO_SIN_MAX;
-             lv_coord_t x_out = (int32_t)((int32_t)trigo_sin(angle + 90) * r_out) / TRIGO_SIN_MAX;
-             lv_coord_t y_in = (int32_t)((int32_t)trigo_sin(angle) * r_in) / TRIGO_SIN_MAX;
-             lv_coord_t x_in = (int32_t)((int32_t)trigo_sin(angle + 90) * r_in) / TRIGO_SIN_MAX;
+             lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) / TRIGO_SIN_MAX;
+             lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) / TRIGO_SIN_MAX;
+             lv_coord_t y_in = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) / TRIGO_SIN_MAX;
+             lv_coord_t x_in = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) / TRIGO_SIN_MAX;
 
              lv_point_t p1;
              lv_point_t p2;

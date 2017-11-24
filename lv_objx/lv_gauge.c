@@ -13,7 +13,7 @@
 #include "lv_gauge.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include "../lv_misc/lv_text.h"
+#include <lvgl/lv_misc/lv_txt.h>
 #include "../lv_misc/lv_trigo.h"
 #include "../lv_misc/lv_math.h"
 #include <stdio.h>
@@ -338,10 +338,10 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         /*Calculate the position a scale label*/
         int16_t angle = (i * scale_angle) / (label_num - 1) + angle_ofs;
 
-        lv_coord_t y = (int32_t)((int32_t)trigo_sin(angle) * r) / TRIGO_SIN_MAX;
+        lv_coord_t y = (int32_t)((int32_t)lv_trigo_sin(angle) * r) / TRIGO_SIN_MAX;
         y += y_ofs;
 
-        lv_coord_t x = (int32_t)((int32_t)trigo_sin(angle + 90) * r) / TRIGO_SIN_MAX;
+        lv_coord_t x = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r) / TRIGO_SIN_MAX;
         x += x_ofs;
 
         int16_t scale_act = (int32_t)((int32_t)(max - min) * i) /  (label_num - 1);
@@ -350,9 +350,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 
         lv_area_t label_cord;
         lv_point_t label_size;
-        txt_get_size(&label_size, scale_txt, style->text.font,
-                style->text.letter_space, style->text.line_space,
-                LV_COORD_MAX, TXT_FLAG_NONE);
+        lv_txt_get_size(&label_size, scale_txt, style->text.font,
+                style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;
@@ -360,7 +359,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, scale_txt, TXT_FLAG_NONE, NULL);
+        lv_draw_label(&label_cord, mask, style, scale_txt, LV_TXT_FLAG_NONE, NULL);
     }
 }
 /**
@@ -392,8 +391,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     for(i = 0; i < ext->needle_count; i++) {
         /*Calculate the end point of a needle*/
         int16_t needle_angle = (ext->values[i] - min) * angle / (max - min) + angle_ofs;
-        p_end.y = (trigo_sin(needle_angle) * r) / TRIGO_SIN_MAX + y_ofs;
-        p_end.x = (trigo_sin(needle_angle + 90) * r) / TRIGO_SIN_MAX + x_ofs;
+        p_end.y = (lv_trigo_sin(needle_angle) * r) / TRIGO_SIN_MAX + y_ofs;
+        p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / TRIGO_SIN_MAX + x_ofs;
 
         /*Draw the needle with the corresponding color*/
         if(ext->needle_colors == NULL) style_needle.line.color = LV_GAUGE_DEF_NEEDLE_COLOR;

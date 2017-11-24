@@ -12,7 +12,7 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_obj/lv_group.h"
 #include "../lv_misc/lv_task.h"
-#include "../misc/math/math_base.h"
+#include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rbasic.h"
 #include "lv_obj.h"
 
@@ -38,7 +38,7 @@ static void indev_drag_throw(lv_indev_state_t * state);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static ptask_t *indev_proc_task_p;
+static lv_task_t *indev_proc_task_p;
 static lv_indev_t *indev_act;
 
 /**********************
@@ -55,9 +55,9 @@ static lv_indev_t *indev_act;
 void lv_indev_init(void)
 {
 #if LV_INDEV_READ_PERIOD != 0
-    indev_proc_task_p = ptask_create(indev_proc_task, LV_INDEV_READ_PERIOD, PTASK_PRIO_MID, NULL);
+    indev_proc_task_p = lv_task_create(indev_proc_task, LV_INDEV_READ_PERIOD, LV_TASK_PRIO_MID, NULL);
 #else
-    indev_proc_task_p = ptask_create(indev_proc_task, 1, PTASK_PRIO_OFF); /*Not use lv_indev_proc*/
+    indev_proc_task_p = lv_task_create(indev_proc_task, 1, LV_TASK_PRIO_OFF); /*Not use lv_indev_proc*/
 #endif
 
     lv_indev_reset(NULL);   /*Reset all input devices*/
@@ -358,7 +358,7 @@ static void indev_proc_press(lv_indev_state_t * state)
             	/*Move the last_top object to the foreground*/
             	lv_obj_t * par = lv_obj_get_parent(last_top);
             	/*After list change it will be the new head*/
-                ll_chg_list(&par->child_ll, &par->child_ll, last_top);
+                lv_ll_chg_list(&par->child_ll, &par->child_ll, last_top);
                 lv_obj_invalidate(last_top);
             }
 
@@ -506,8 +506,8 @@ static void indev_drag(lv_indev_state_t * state)
         state->drag_sum.y += state->vect.y;
         
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if(MATH_ABS(state->drag_sum.x) >= LV_INDEV_DRAG_LIMIT ||
-           MATH_ABS(state->drag_sum.y) >= LV_INDEV_DRAG_LIMIT)
+        if(LV_MATH_ABS(state->drag_sum.x) >= LV_INDEV_DRAG_LIMIT ||
+           LV_MATH_ABS(state->drag_sum.y) >= LV_INDEV_DRAG_LIMIT)
            {
                 state->drag_range_out = 1;
            }

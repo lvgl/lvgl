@@ -1,14 +1,13 @@
 
 /**
- * @file trigo.c
- * Basic trigonometrical integer functions
+ * @file lv_trigo.c
+ * Basic trigonometric integer functions
  */
 
 /*********************
  *      INCLUDES
  *********************/
 #include "misc_conf.h"
-#if USE_TRIGO != 0
 
 #include "lv_trigo.h"
 
@@ -54,7 +53,7 @@ static int16_t sin0_90_table[] =
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-int16_t trigo_sin(int16_t angle)
+int16_t lv_trigo_sin(int16_t angle)
 {
     int16_t ret = 0;
     angle = angle % 360;
@@ -83,5 +82,3 @@ int16_t trigo_sin(int16_t angle)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-#endif

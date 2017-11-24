@@ -112,10 +112,10 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
 bool lv_area_union(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /* Get the smaller area from 'a1_p' and 'a2_p' */
-    res_p->x1 = MATH_MAX(a1_p->x1, a2_p->x1);
-    res_p->y1 = MATH_MAX(a1_p->y1, a2_p->y1);
-    res_p->x2 = MATH_MIN(a1_p->x2, a2_p->x2);
-    res_p->y2 = MATH_MIN(a1_p->y2, a2_p->y2);
+    res_p->x1 = LV_MATH_MAX(a1_p->x1, a2_p->x1);
+    res_p->y1 = LV_MATH_MAX(a1_p->y1, a2_p->y1);
+    res_p->x2 = LV_MATH_MIN(a1_p->x2, a2_p->x2);
+    res_p->y2 = LV_MATH_MIN(a1_p->y2, a2_p->y2);
     
     /*If x1 or y1 greater then x2 or y2 then the areas union is empty*/
     bool union_ok = true;
@@ -135,10 +135,10 @@ bool lv_area_union(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * 
  */
 void lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
-    a_res_p->x1 = MATH_MIN(a1_p->x1, a2_p->x1);
-    a_res_p->y1 = MATH_MIN(a1_p->y1, a2_p->y1);
-    a_res_p->x2 = MATH_MAX(a1_p->x2, a2_p->x2);
-    a_res_p->y2 = MATH_MAX(a1_p->y2, a2_p->y2);
+    a_res_p->x1 = LV_MATH_MIN(a1_p->x1, a2_p->x1);
+    a_res_p->y1 = LV_MATH_MIN(a1_p->y1, a2_p->y1);
+    a_res_p->x2 = LV_MATH_MAX(a1_p->x2, a2_p->x2);
+    a_res_p->y2 = LV_MATH_MAX(a1_p->y2, a2_p->y2);
 }
 
 /**

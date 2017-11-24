@@ -1,10 +1,10 @@
 /**
- * @file trig.h
+ * @file lv_trig.h
  * Basic trigonometric integer functions
  */
 
-#ifndef TRIGO_H
-#define TRIGO_H
+#ifndef LV_TRIGO_H
+#define LV_TRIGO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +37,7 @@ extern "C" {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-int16_t trigo_sin(int16_t angle);
+int16_t lv_trigo_sin(int16_t angle);
 
 /**********************
  *      MACROS

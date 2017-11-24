@@ -14,9 +14,9 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_color.h"
-#include "../lv_misc/lv_text.h"
+#include <lvgl/lv_misc/lv_txt.h>
 #include "../lv_misc/lv_math.h"
-#include "../lv_misc/lv_text.h"
+#include <lvgl/lv_misc/lv_txt.h>
 #include "../lv_misc/lv_anim.h"
 
 /*********************
@@ -109,8 +109,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
 
         /*In DOT mode save the text byte-to-byte because a '\0' can be in the middle*/
         if(copy_ext->long_mode == LV_LABEL_LONG_DOT) {
-            ext->text = lv_mem_realloc(ext->text, dm_get_size(copy_ext->text));
-            memcpy(ext->text, copy_ext->text, dm_get_size(copy_ext->text));
+            ext->text = lv_mem_realloc(ext->text, lv_mem_get_size(copy_ext->text));
+            memcpy(ext->text, copy_ext->text, lv_mem_get_size(copy_ext->text));
         }
 
         memcpy(ext->dot_tmp, copy_ext->dot_tmp, sizeof(ext->dot_tmp));
@@ -409,12 +409,12 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
     const lv_font_t * font = style->text.font;
     uint8_t letter_height = lv_font_get_height_scale(font);
     lv_coord_t y = 0;
-    txt_flag_t flag = TXT_FLAG_NONE;
+    lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
 
-    if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-    if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
-    if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= TXT_FLAG_CENTER;
+    if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
+    if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
+    if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded  the set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -425,7 +425,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
 
     /*Search the line of the index letter */;
     while (txt[new_line_start] != '\0') {
-        new_line_start += txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
+        new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
         if(index < new_line_start || txt[new_line_start] == '\0') break; /*The line of 'index' letter begins at 'line_start'*/
 
         y += letter_height + style->text.line_space;
@@ -442,14 +442,14 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
     lv_coord_t x = 0;
 	uint32_t i = line_start;
     uint32_t cnt = line_start;                      /*Count the letter (in UTF-8 1 letter not 1 byte)*/
-	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
+	lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
 	uint32_t letter;
 	while(cnt < index) {
-        cnt += txt_utf8_size(txt[i]);
-	    letter = txt_utf8_next(txt, &i);
+        cnt += lv_txt_utf8_size(txt[i]);
+	    letter = lv_txt_utf8_next(txt, &i);
         /*Handle the recolor command*/
-        if((flag & TXT_FLAG_RECOLOR) != 0) {
-            if(txt_is_cmd(&cmd_state, txt[i]) != false) {
+        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
                 continue; /*Skip the letter is it is part of a command*/
             }
         }
@@ -458,7 +458,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
 
 	if(ext->align == LV_LABEL_ALIGN_CENTER) {
 		lv_coord_t line_w;
-        line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
+        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
                                font, style->text.letter_space, flag);
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
@@ -486,12 +486,12 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
     const lv_font_t * font = style->text.font;
     uint8_t letter_height = lv_font_get_height_scale(font);
     lv_coord_t y = 0;
-    txt_flag_t flag = TXT_FLAG_NONE;
+    lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
 
-    if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-    if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
-    if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= TXT_FLAG_CENTER;
+    if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
+    if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
+    if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -500,7 +500,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
 
     /*Search the line of the index letter */;
     while (txt[line_start] != '\0') {
-    	new_line_start += txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
+    	new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
     	if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
     	y += letter_height + style->text.line_space;
         line_start = new_line_start;
@@ -510,20 +510,20 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
     lv_coord_t x = 0;
 	if(ext->align == LV_LABEL_ALIGN_CENTER) {
 		lv_coord_t line_w;
-        line_w = txt_get_width(&txt[line_start], new_line_start - line_start,
+        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
                                font, style->text.letter_space, flag);
 		x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
 
-	txt_cmd_state_t cmd_state = TXT_CMD_STATE_WAIT;
+	lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
 	uint32_t i = line_start;
     uint32_t i_current = i;
 	uint32_t letter;
 	while(i < new_line_start - 1) {
-	    letter = txt_utf8_next(txt, &i);    /*Be careful 'i' already points to the next character*/
+	    letter = lv_txt_utf8_next(txt, &i);    /*Be careful 'i' already points to the next character*/
 	    /*Handle the recolor command*/
-	    if((flag & TXT_FLAG_RECOLOR) != 0) {
-            if(txt_is_cmd(&cmd_state, txt[i]) != false) {
+	    if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
                 continue; /*Skip the letter is it is part of a command*/
             }
 	    }
@@ -537,7 +537,7 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
 		i_current = i;
 	}
 
-	return txt_utf8_get_char_id(txt, i);
+	return lv_txt_utf8_get_char_id(txt, i);
 }
 
 
@@ -572,11 +572,11 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
 #if TXT_UTF8 == 0
         pos = old_len;
 #else
-        pos = txt_len(ext->text);
+        pos = lv_txt_get_length(ext->text);
 #endif
     }
 
-    txt_ins(ext->text, pos, txt);
+    lv_txt_ins(ext->text, pos, txt);
 
     lv_label_refr_text(label);
 }
@@ -599,7 +599,7 @@ void lv_label_cut_text(lv_obj_t * label, uint32_t pos,  uint32_t cnt)
 
     char * label_txt = lv_label_get_text(label);
     /*Delete the characters*/
-    txt_cut(label_txt, pos, cnt);
+    lv_txt_cut(label_txt, pos, cnt);
 
     /*Refresh the label*/
     lv_label_refr_text(label);
@@ -642,11 +642,11 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         /*TEST: draw a background for the label*/
 //		lv_vfill(&label->coords, mask, LV_COLOR_LIME, LV_OPA_COVER);
 
-		txt_flag_t flag = TXT_FLAG_NONE;
-		if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-        if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
-        if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
-        if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= TXT_FLAG_CENTER;
+		lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
+		if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
+        if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+        if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
+        if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
 		lv_draw_label(&cords, mask, style, ext->text, flag, &ext->offset);
     }
@@ -717,11 +717,11 @@ static void lv_label_refr_text(lv_obj_t * label)
 
     /*Calc. the height and longest line*/
     lv_point_t size;
-    txt_flag_t flag = TXT_FLAG_NONE;
-    if(ext->recolor != 0) flag |= TXT_FLAG_RECOLOR;
-    if(ext->expand != 0) flag |= TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= TXT_FLAG_NO_BREAK;
-    txt_get_size(&size, ext->text, font, style->text.letter_space, style->text.line_space, max_w, flag);
+    lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
+    if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
+    if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
+    lv_txt_get_size(&size, ext->text, font, style->text.letter_space, style->text.line_space, max_w, flag);
 
     /*Set the full size in expand mode*/
     if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
@@ -801,7 +801,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     else if(ext->long_mode == LV_LABEL_LONG_DOT) {
        if(size.y <= lv_obj_get_height(label)) {                /*No dots are required, the text is short enough*/
            ext->dot_end = LV_LABEL_DOT_END_INV;
-       } else if(txt_len(ext->text) <= LV_LABEL_DOT_NUM) {     /*Don't turn to dots all the characters*/
+       } else if(lv_txt_get_length(ext->text) <= LV_LABEL_DOT_NUM) {     /*Don't turn to dots all the characters*/
            ext->dot_end = LV_LABEL_DOT_END_INV;
        } else {
            lv_point_t p;
@@ -831,8 +831,8 @@ static void lv_label_refr_text(lv_obj_t * label)
            uint32_t byte_id_ori = byte_id;
            uint8_t len = 0;
            for(i = 0; i <= LV_LABEL_DOT_NUM; i++)  {
-               len += txt_utf8_size(ext->text[byte_id]);
-               txt_utf8_next(ext->text, &byte_id);
+               len += lv_txt_utf8_size(ext->text[byte_id]);
+               lv_txt_utf8_next(ext->text, &byte_id);
            }
 
            memcpy(ext->dot_tmp, &ext->text[byte_id_ori], len);

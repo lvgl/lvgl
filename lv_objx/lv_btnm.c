@@ -14,7 +14,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_obj/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
-#include "../lv_misc/lv_text.h"
+#include <lvgl/lv_misc/lv_txt.h>
 
 /*********************
  *      DEFINES
@@ -435,9 +435,9 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 			/*Calculate the size of the text*/
 			const lv_font_t * font = btn_style->text.font;
 			lv_point_t txt_size;
-			txt_get_size(&txt_size, ext->map_p[txt_i], font,
+			lv_txt_get_size(&txt_size, ext->map_p[txt_i], font,
 			             btn_style->text.letter_space, btn_style->text.line_space,
-					     area_get_width(&area_btnm), TXT_FLAG_NONE);
+					     area_get_width(&area_btnm), LV_TXT_FLAG_NONE);
 
 			area_tmp.x1 += (btn_w - txt_size.x) / 2;
 			area_tmp.y1 += (btn_h - txt_size.y) / 2;
@@ -446,7 +446,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
 
 			if(btn_style->glass) btn_style = bg_style;
-			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], TXT_FLAG_NONE, NULL);
+			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], LV_TXT_FLAG_NONE, NULL);
     	}
     }
     return true;

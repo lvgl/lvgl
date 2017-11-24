@@ -115,8 +115,8 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t po
 		lv_coord_t xmax = LV_COORD_MIN;
 		lv_coord_t ymax = LV_COORD_MIN;
 		for(i = 0; i < point_num; i++) {
-			xmax = MATH_MAX(point_a[i].x * us, xmax);
-			ymax = MATH_MAX(point_a[i].y * us, ymax);
+			xmax = LV_MATH_MAX(point_a[i].x * us, xmax);
+			ymax = LV_MATH_MAX(point_a[i].y * us, ymax);
 		}
 
 		lv_style_t * lines = lv_obj_get_style(line);
