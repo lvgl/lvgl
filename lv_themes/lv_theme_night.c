@@ -443,6 +443,7 @@ static void list_init(void)
     lv_style_copy(&list_bg, &panel);
     list_bg.body.padding.ver = 0;
     list_bg.body.padding.hor = 0;
+    list_bg.body.padding.inner = 0;
 
     lv_style_copy(&list_btn_rel, &bg);
     list_btn_rel.body.empty = 1;
