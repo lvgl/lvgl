@@ -7,14 +7,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
+#include "lv_conf.h"
 #include "lv_mem.h"
 #include "lv_math.h"
 #include <string.h>
 
-#if DM_CUSTOM != 0
-#include DM_CUST_INCLUDE
+#if LV_MEM_CUSTOM != 0
+#include LV_MEM_CUSTOM_INCLUDE
 #endif
 
 /*********************
@@ -39,13 +38,13 @@ typedef union
 typedef struct
 {
     lv_mem_header_t header;
-    uint8_t first_data;        //First data in entry data
+    uint8_t first_data;        /*First data byte in the allocated data (Just for easily create a pointer)*/
 }lv_mem_ent_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if DM_CUSTOM == 0
+#if LV_MEM_CUSTOM == 0
 static lv_mem_ent_t  * ent_get_next(lv_mem_ent_t * act_e);
 static void * ent_alloc(lv_mem_ent_t * e, uint32_t size);
 static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size);
@@ -54,8 +53,8 @@ static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if DM_CUSTOM == 0
-static DM_MEM_ATTR uint8_t work_mem[DM_MEM_SIZE] ;    //Work memory for allocation
+#if LV_MEM_CUSTOM == 0
+static LV_MEM_ATTR uint8_t work_mem[LV_MEM_SIZE];    /*Work memory for allocations*/
 #endif
 
 static uint32_t zero_mem;       /*Give the address of this variable if 0 byte should be allocated*/ 
@@ -73,11 +72,11 @@ static uint32_t zero_mem;       /*Give the address of this variable if 0 byte sh
  */
 void lv_mem_init(void)
 {
-#if DM_CUSTOM == 0
+#if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * full = (lv_mem_ent_t *)&work_mem;
     full->header.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */
-    full->header.d_size = DM_MEM_SIZE - sizeof(lv_mem_header_t);
+    full->header.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 }
 
@@ -100,7 +99,7 @@ void * lv_mem_alloc(uint32_t size)
     
     void * alloc = NULL;
 
-#if DM_CUSTOM == 0 /*Use the allocation from dyn_mem*/
+#if LV_MEM_CUSTOM == 0 /*Use the allocation from dyn_mem*/
     lv_mem_ent_t * e = NULL;
     
     //Search for a appropriate entry
@@ -116,16 +115,12 @@ void * lv_mem_alloc(uint32_t size)
     }while(e != NULL && alloc == NULL); 
 #else  /*Use custom, user defined malloc function*/
     /*Allocate a header too to store the size*/
-    alloc = DM_CUST_ALLOC(size + sizeof(lv_mem_header_t));
+    alloc = LV_MEM_CUSTOM_ALLOC(size + sizeof(lv_mem_header_t));
     if(alloc != NULL) {
         ((lv_mem_ent_t*) alloc)->header.d_size = size;
         ((lv_mem_ent_t*) alloc)->header.used = 1;
         alloc = &((lv_mem_ent_t*) alloc)->first_data;
     }
-#endif
-
-#if DM_AUTO_ZERO != 0
-    if(alloc != NULL) memset(alloc, 0, size);
 #endif
 
     return alloc;
@@ -144,7 +139,7 @@ void lv_mem_free(const void * data)
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data - sizeof(lv_mem_header_t));
     e->header.used = 0;
 
-#if DM_CUSTOM == 0 /*Use the free from dyn_mem*/
+#if LV_MEM_CUSTOM == 0 /*Use the free from dyn_mem*/
     /* Make a simple defrag.
      * Join the following free entries after this*/
     lv_mem_ent_t * e_next;
@@ -158,7 +153,7 @@ void lv_mem_free(const void * data)
         e_next = ent_get_next(e_next);
     }
 #else /*Use custom, user defined free function*/
-    DM_CUST_FREE(e);
+    LV_MEM_CUSTOM_FREE(e);
 #endif
 }
 
@@ -199,7 +194,7 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
  */
 void lv_mem_defrag(void)
 {
-#if DM_CUSTOM == 0
+#if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e_free;
     lv_mem_ent_t * e_next;
     e_free = ent_get_next(NULL);
@@ -241,11 +236,11 @@ void lv_mem_defrag(void)
  * @param mon_p pointer to a dm_mon_p variable, 
  *              the result of the analysis will be stored here
  */
-void lv_mem_monitor(dm_mon_t * mon_p)
+void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 {
     /*Init the data*/
-    memset(mon_p, 0, sizeof(dm_mon_t));
-#if DM_CUSTOM == 0
+    memset(mon_p, 0, sizeof(lv_mem_monitor_t));
+#if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e;
     e = NULL;
     
@@ -253,21 +248,21 @@ void lv_mem_monitor(dm_mon_t * mon_p)
     
     while(e != NULL)  {
         if(e->header.used == 0) {
-            mon_p->cnt_free++;
-            mon_p->size_free += e->header.d_size;
-            if(e->header.d_size > mon_p->size_free_big) {
-                mon_p->size_free_big = e->header.d_size;
+            mon_p->free_cnt++;
+            mon_p->free_size += e->header.d_size;
+            if(e->header.d_size > mon_p->free_biggest_size) {
+                mon_p->free_biggest_size = e->header.d_size;
             }
         } else {
-            mon_p->cnt_used++;
+            mon_p->used_cnt++;
         }
         
         e = ent_get_next(e);
     }
-    mon_p->size_total = DM_MEM_SIZE;
-    mon_p->pct_used = 100 - (100U * mon_p->size_free) / mon_p->size_total;
-    mon_p->pct_frag = (uint32_t)mon_p->size_free_big * 100U / mon_p->size_free;
-    mon_p->pct_frag = 100 - mon_p->pct_frag;
+    mon_p->total_size = LV_MEM_SIZE;
+    mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
+    mon_p->frag_pct = (uint32_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
+    mon_p->frag_pct = 100 - mon_p->frag_pct;
 #endif
 }
 
@@ -290,7 +285,7 @@ uint32_t lv_mem_get_size(void * data)
  *   STATIC FUNCTIONS
  **********************/
 
-#if DM_CUSTOM == 0
+#if LV_MEM_CUSTOM == 0
 /**
  * Give the next entry after 'act_e'
  * @param act_e pointer to an entry
@@ -308,7 +303,7 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
         uint8_t * data = &act_e->first_data;
         next_e = (lv_mem_ent_t * )&data[act_e->header.d_size];
         
-        if(&next_e->first_data >= &work_mem[DM_MEM_SIZE]) next_e = NULL;
+        if(&next_e->first_data >= &work_mem[LV_MEM_SIZE]) next_e = NULL;
     }
     
     return next_e;

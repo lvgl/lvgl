@@ -78,12 +78,12 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor of keyboard*/
     lv_obj_t * new_kb = lv_btnm_create(par, copy);
-    dm_assert(new_kb);
+    lv_mem_assert(new_kb);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_kb);
     
     /*Allocate the keyboard type specific extended data*/
     lv_kb_ext_t * ext = lv_obj_allocate_ext_attr(new_kb, sizeof(lv_kb_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
 
     /*Initialize the allocated 'ext' */
 

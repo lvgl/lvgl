@@ -7,14 +7,12 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "misc_conf.h"
-
+#include "lv_conf.h"
+#include "lv_ufs.h"
+#include "lv_ll.h"
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include "lv_ufs.h"
-#include "lv_ll.h"
 
 /*********************
  *      DEFINES
@@ -441,12 +439,16 @@ lv_fs_res_t lv_ufs_readdir_close(void * rddir_p)
  */
 lv_fs_res_t lv_ufs_free (uint32_t * total_p, uint32_t * free_p)
 {
-    dm_mon_t mon;
+
+#if LV_MEM_CUSTOM == 0
+    lv_mem_monitor_t mon;
 
     lv_mem_monitor(&mon);
-    *total_p = DM_MEM_SIZE >> 10;    /*Convert bytes to kB*/
-    *free_p = mon.size_free >> 10;
-
+    *total_p = LV_MEM_SIZE >> 10;    /*Convert bytes to kB*/
+    *free_p = mon.free_size >> 10;
+#else
+    *free_p = 0;
+#endif
     return FS_RES_OK;
 }
 

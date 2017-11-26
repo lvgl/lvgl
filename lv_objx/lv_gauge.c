@@ -13,7 +13,7 @@
 #include "lv_gauge.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include <lvgl/lv_misc/lv_txt.h>
+#include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_trigo.h"
 #include "../lv_misc/lv_math.h"
 #include <stdio.h>
@@ -64,11 +64,11 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor gauge*/
     lv_obj_t * new_gauge = lv_lmeter_create(par, copy);
-    dm_assert(new_gauge);
+    lv_mem_assert(new_gauge);
     
     /*Allocate the gauge type specific extended data*/
     lv_gauge_ext_t * ext = lv_obj_allocate_ext_attr(new_gauge, sizeof(lv_gauge_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
 
     /*Initialize the allocated 'ext' */
     ext->needle_count = 0;

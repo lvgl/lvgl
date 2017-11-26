@@ -60,11 +60,11 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor basic object*/
     lv_obj_t * new_list = lv_page_create(par, copy);
-    dm_assert(new_list);
+    lv_mem_assert(new_list);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_list);
 
     lv_list_ext_t * ext = lv_obj_allocate_ext_attr(new_list, sizeof(lv_list_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
 
     ext->style_img = NULL;
     ext->styles_btn[LV_BTN_STATE_REL] = &lv_style_btn_rel;

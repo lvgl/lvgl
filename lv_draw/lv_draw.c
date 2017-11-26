@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/lv_txt.h>
 #include "lv_conf.h"
 
 #include <stdio.h>
@@ -65,16 +64,12 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
 static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_vpx;
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_vletter;
-#if USE_FSINT != 0
 static void (*map_fp)(const lv_area_t * coords, const lv_area_t * mask, const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale, lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
-#endif
 #else
 static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_rpx;
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_rletter;
-#if USE_LV_IMG != 0 && USE_FSINT != 0
 static void (*map_fp)(const lv_area_t * coords, const lv_area_t * mask, const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale, lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
-#endif
 #endif
 
 
@@ -344,7 +339,6 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
     }
 }
 
-#if USE_FSINT != 0
 /**
  * Draw an image
  * @param coords the coordinates of the image
@@ -389,7 +383,6 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
             bool const_data = false;
 
-#if USE_UFS != 0
             /*If the img. data is inside the MCU then do not use FS reading just a pointer*/
             if(fn[0] == UFS_LETTER) {
                 const_data = true;
@@ -397,7 +390,6 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                 f_data += sizeof(lv_img_raw_header_t);
                 map_fp(coords, &mask_com, (void*)f_data , style->image.opa, header.transp, upscale, style->image.color, style->image.intense);
             }
-#endif
 
             /*Read the img. with the FS interface*/
             if(const_data == false) {
@@ -448,7 +440,6 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
         }
     }
 }
-#endif
 
 /**
  * Draw a line

@@ -14,11 +14,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
 #include <stdint.h>
 #include <stddef.h>
-
 
 /*********************
  *      DEFINES
@@ -30,15 +27,14 @@ extern "C" {
 
 typedef struct
 {
-    uint32_t cnt_free;
-    uint32_t cnt_used;
-    uint32_t size_free;
-    uint32_t size_total;
-    uint32_t size_free_big;
-    uint8_t pct_frag;
-    uint8_t pct_used;
-}dm_mon_t;
-
+    uint32_t free_cnt;
+    uint32_t used_cnt;
+    uint32_t free_size;
+    uint32_t total_size;
+    uint32_t free_biggest_size;
+    uint8_t frag_pct;
+    uint8_t used_pct;
+}lv_mem_monitor_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -82,7 +78,7 @@ void lv_mem_defrag(void);
  * @param mon_p pointer to a dm_mon_p variable,
  *              the result of the analysis will be stored here
  */
-void lv_mem_monitor(dm_mon_t * mon_p);
+void lv_mem_monitor(lv_mem_monitor_t * mon_p);
 
 /**
  * Give the size of an allocated memory
@@ -91,11 +87,22 @@ void lv_mem_monitor(dm_mon_t * mon_p);
  */
 uint32_t lv_mem_get_size(void * data);
 
+
+/**
+ * Halt o NULL pointer
+ * p pointer to a memory
+ */
+static inline  void lv_mem_assert(void *p)
+{
+    if(p == NULL) {while(1);}
+}
+
+
 /**********************
  *      MACROS
  **********************/
 
-#define dm_assert(p) {if(p == NULL) {while(1);}}
+
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -3,7 +3,7 @@
 
 /*Use UTF-8 encoding in the IDE*/
 
-#include "misc_conf.h"
+#include "lv_conf.h"
 
 #if  USE_LV_FONT_DEJAVU_40_LATIN_EXT_B != 0
 

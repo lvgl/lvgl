@@ -7,8 +7,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
 #include <stdint.h>
 #include <string.h>
 

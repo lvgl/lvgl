@@ -14,9 +14,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-#if USE_TRIGO != 0
-
 #include <stdint.h>
 
 /*********************
@@ -42,8 +39,6 @@ int16_t lv_trigo_sin(int16_t angle);
 /**********************
  *      MACROS
  **********************/
-
-#endif /*USE_TRIGO*/
 
 #ifdef __cplusplus
 } /* extern "C" */

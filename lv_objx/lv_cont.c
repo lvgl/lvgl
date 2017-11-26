@@ -65,12 +65,12 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create a basic object*/
     lv_obj_t * new_cont = lv_obj_create(par, copy);
-    dm_assert(new_cont);
+    lv_mem_assert(new_cont);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_cont);
 
     lv_obj_allocate_ext_attr(new_cont, sizeof(lv_cont_ext_t));
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(new_cont);
-    dm_assert(ext);
+    lv_mem_assert(ext);
     ext->hor_fit = 0;
     ext->ver_fit = 0;
     ext->layout = LV_LAYOUT_OFF;

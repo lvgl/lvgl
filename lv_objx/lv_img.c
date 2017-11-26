@@ -7,15 +7,14 @@
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#include "misc_conf.h"
-#if USE_LV_IMG != 0 && USE_FSINT != 0
+#if USE_LV_IMG != 0
 
 #include "lv_img.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"
-#include <lvgl/lv_misc/lv_txt.h>
+#include "../lv_misc/lv_txt.h"
 
 /*********************
  *      DEFINES
@@ -57,12 +56,12 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     
     /*Create a basic object*/
     new_img = lv_obj_create(par, copy);
-    dm_assert(new_img);
+    lv_mem_assert(new_img);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_img);
     
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
     ext->fn = NULL;
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
@@ -103,15 +102,11 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
  */
 lv_fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
 {
-#if USE_UFS != 0
 	const lv_img_raw_header_t * raw_p = (lv_img_raw_header_t *) data;
 	lv_fs_res_t res;
 	res = lv_ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(lv_color_t) + sizeof(lv_img_raw_header_t));
 
 	return res;
-#else
-	return FS_RES_NOT_EX;
-#endif
 }
 
 /*=====================

@@ -1,15 +1,11 @@
 /**
- * @file lv_fs_int.c
+ * @file lv_fs.c
  * 
  */
 
 /*********************
  *      INCLUDES
  *********************/
-
-#include "misc_conf.h"
-#if USE_FSINT != 0
-
 #include "lv_fs.h"
 #include "lv_ll.h"
 #include <string.h>
@@ -389,7 +385,7 @@ void lv_fs_add_drv(lv_fs_drv_t * drv_p)
    /*Save the new driver*/
    lv_fs_drv_t* new_drv;
    new_drv =  lv_ll_ins_head(&drv_ll); 
-   dm_assert(new_drv);
+   lv_mem_assert(new_drv);
    memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));
    
 }
@@ -536,5 +532,3 @@ static lv_fs_drv_t* lv_fs_get_drv(char letter)
     
     return NULL;
 }
-
-#endif

@@ -14,8 +14,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_mem.h"

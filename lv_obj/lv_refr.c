@@ -69,7 +69,7 @@ void lv_refr_init(void)
 
     lv_task_t* task;
     task = lv_task_create(lv_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
-    dm_assert(task);
+    lv_mem_assert(task);
 }
 
 /**

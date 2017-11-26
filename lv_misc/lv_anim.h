@@ -14,9 +14,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-/*For compatibility always include this header*/
-
 #include <stdint.h>
 #include <stdbool.h>
 

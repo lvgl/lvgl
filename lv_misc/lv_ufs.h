@@ -15,8 +15,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
 #include <stdbool.h>
 #include "lv_fs.h"
 #include "lv_mem.h"
@@ -24,6 +22,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define UFS_LETTER 'U'
 
 /**********************
  *      TYPEDEFS

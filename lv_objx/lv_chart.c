@@ -60,11 +60,11 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor basic object*/
     lv_obj_t * new_chart = lv_obj_create(par, copy);
-    dm_assert(new_chart);
+    lv_mem_assert(new_chart);
 
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
     lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
     ext->series.num = 0;
     ext->ymin = LV_CHART_YMIN_DEF;

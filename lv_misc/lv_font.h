@@ -14,7 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
+#include "lv_conf.h"
 
 #include <stdint.h>
 #include <stddef.h>
@@ -101,7 +101,7 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
  */
 static inline uint8_t lv_font_get_width_scale(const lv_font_t * font_p, uint32_t letter)
 {
-    return lv_font_get_width(font_p, letter) >> FONT_ANTIALIAS;
+    return lv_font_get_width(font_p, letter) >> LV_FONT_ANTIALIAS;
 }
 
 /**********************

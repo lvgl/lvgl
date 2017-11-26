@@ -3,8 +3,8 @@
  * 
  */
 
-#ifndef LV_TEXT_H
-#define LV_TEXT_H
+#ifndef LV_TXT_H
+#define LV_TXT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,8 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
 #include <stdbool.h>
 #include "lv_area.h"
 #include "lv_font.h"

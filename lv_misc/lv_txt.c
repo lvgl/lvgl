@@ -6,9 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/lv_misc/lv_txt.h>
-#include "misc_conf.h"
-
+#include "lv_txt.h"
+#include "lv_conf.h"
 #include "lv_math.h"
 
 /*********************
@@ -436,7 +435,7 @@ uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
     if(i == NULL) return *(txt- 1);    /*Get the prev. char */
 
     (*i)--;
-    uint8_t letter = txt[*i)] ;
+    uint8_t letter = txt[*i] ;
 
     return letter;
 #else
@@ -549,8 +548,8 @@ static bool is_break_char(uint32_t letter)
     bool ret = false;
     
     /*Compare the letter to TXT_BREAK_CHARS*/
-    for(i = 0; TXT_BREAK_CHARS[i] != '\0'; i++) {
-        if(letter == TXT_BREAK_CHARS[i]) {
+    for(i = 0; LV_TXT_BREAK_CHARS[i] != '\0'; i++) {
+        if(letter == LV_TXT_BREAK_CHARS[i]) {
             ret = true; /*If match then it is break char*/
             break;
         }

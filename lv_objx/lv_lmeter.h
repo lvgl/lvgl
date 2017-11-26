@@ -14,14 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#include "misc_conf.h"
 #if USE_LV_LMETER != 0
-
-/*Testing of dependencies*/
-#if USE_TRIGO == 0
-#error "lv_lmeter: trigo is required. Enable it in misc_conf.h (USE_TRIGO  1) "
-#endif
-
 
 #include "../lv_obj/lv_obj.h"
 

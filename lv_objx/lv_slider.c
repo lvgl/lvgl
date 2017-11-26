@@ -55,14 +55,14 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor slider*/
     lv_obj_t * new_slider = lv_bar_create(par, copy);
-    dm_assert(new_slider);
+    lv_mem_assert(new_slider);
     
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_slider);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_slider);
 
     /*Allocate the slider type specific extended data*/
     lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(new_slider, sizeof(lv_slider_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
 
     /*Initialize the allocated 'ext' */
     ext->action = NULL;

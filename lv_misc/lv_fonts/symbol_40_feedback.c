@@ -1,4 +1,4 @@
-#include "misc_conf.h"
+#include "lv_conf.h"
 #if  USE_LV_FONT_SYMBOL_40_FEEDBACK != 0
 #include <stdint.h>
 #include "../lv_font.h"

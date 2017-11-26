@@ -6,17 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
+#include "lv_conf.h"
 #include <stddef.h>
 #include <string.h>
-
 #include "lv_task.h"
 #include "lv_anim.h"
-
-#if USE_ANIM != 0
 #include "lv_math.h"
-#include MISC_SYSTICK_INCLUDE
 
 /*********************
  *      DEFINES
@@ -69,8 +64,8 @@ static lv_anim_path_t anim_path_step[] =
 void lv_anim_init(void)
 {
 	lv_ll_init(&anim_ll, sizeof(lv_anim_t));
-	last_task_run = MISC_SYSTICK_GET();
-	lv_task_create(anim_task, ANIM_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
+	last_task_run = lv_tick_get();
+	lv_task_create(anim_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
 }
 
 /**
@@ -84,7 +79,7 @@ void lv_anim_create(lv_anim_t * anim_p)
 
 	/*Add the new animation to the animation linked list*/
 	lv_anim_t * new_anim = lv_ll_ins_head(&anim_ll);
-	dm_assert(new_anim);
+	lv_mem_assert(new_anim);
 
 	/*Initialize the animation descriptor*/
 	anim_p->playback_now = 0;
@@ -173,7 +168,7 @@ lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name)
 static void anim_task (void * param)
 {
 	volatile uint32_t elaps;
-	elaps = MISC_SYSTICK_ELAPS(last_task_run);
+	elaps = lv_tick_elaps(last_task_run);
 
 	lv_anim_t * a;
 	lv_anim_t * a_next;
@@ -215,7 +210,7 @@ static void anim_task (void * param)
 		a = a_next;
 	}
 
-	last_task_run = MISC_SYSTICK_GET();
+	last_task_run = lv_tick_get();
 }
 
 /**
@@ -265,91 +260,3 @@ static bool anim_ready_handler(lv_anim_t * a)
 
 	return invalid;
 }
-
-/*For compatibility add dummy functions*/
-#else
-
-#if USE_LV_TASK != 0
-static void anim_dummy_handler(void * anim_dm);
-#endif
-
-/**
- * Create an animation. Immediately set to end value
- * @param anim_p an initialized 'anim_t' variable. Not required after call.
- */
-void lv_anim_create(lv_anim_t * anim_p)
-{
-
-    /*If no delay simply set the end value end call the callback */
-    if(anim_p->act_time == 0) {
-        if(anim_p->fp != NULL) anim_p->fp(anim_p->var, anim_p->end);
-        if(anim_p->end_cb != NULL) anim_p->end_cb(anim_p->var);
-    }
-    /*With delay set the start value and set a one shot lv_task to set end value and call the callback*/
-    else {
-#if USE_DYN_MEM != 0 && USE_LV_TASK != 0
-        if(anim_p->fp != NULL) anim_p->fp(anim_p->var, anim_p->start);
-        void * anim_dm = dm_alloc(sizeof(lv_anim_t));
-        memcpy(anim_dm, anim_p, sizeof(lv_anim_t));
-        lv_task_t * lv_task = lv_task_create(anim_dummy_handler, -anim_p->act_time, LV_TASK_PRIO_LOW, anim_dm);
-        lv_task_once(lv_task);
-#else
-        if(anim_p->fp != NULL) anim_p->fp(anim_p->var, anim_p->end);
-        if(anim_p->end_cb != NULL) anim_p->end_cb(anim_p->var);
-#endif
-    }
-}
-
-/**
- * Delete an animation for a variable with a given animatior function (Now do nothing)
- * @param var pointer to variable
- * @param fp a function pointer which is animating 'var',
- *           or NULL to ignore it and delete all animation with 'var
- * @return true: at least 1 animation is deleted, false: no animation is deleted
- */
-bool lv_anim_del(void * var, lv_anim_fp_t fp)
-{
-    return false;
-}
-
-/**
- * Calculate the time of an animation with a given speed and the start and end values (Give dummy value)
- * @param speed speed of animation in unit/sec
- * @param start start value of the animation
- * @param end end value of the animation
- * @return the required time [ms] for the animation with the given parameters
- */
-uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
-{
-    return 1;
-}
-
-/**
- * Get a predefine animation path (Give NULL)
- * @param name name of the path from 'anim_path_name_t'
- * @return pointer to the path array
- */
-lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name)
-{
-    return NULL;
-}
-
-#if USE_LV_TASK != 0
-
-/**
- * A One Shot lv_task to handle end callbacks with delay
- * @param anim_dm pointer to temporal dynamically allocated animation
- */
-static void anim_dummy_handler(void * anim_dm)
-{
-    lv_anim_t * anim = anim_dm;
-
-    if(anim->fp != NULL) anim->fp(anim->var, anim->end);
-    if(anim->end_cb != NULL) anim->end_cb(anim->var);
-
-    lv_mem_free(anim_dm);
-}
-#endif
-
-#endif /*USE_ANIM*/
-

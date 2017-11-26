@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 
 /*Test misc. module version*/
-#include "misc/misc.h"
 #include "lv_misc/lv_task.h"
 
 #include "lv_hal/lv_hal.h"
@@ -58,15 +57,6 @@ extern "C" {
 #define LVGL_VERSION_MINOR  0
 #define LVGL_VERSION_PATH   0
 #define LVGL_VERSION_INFO   "beta"
-
-/*Required misc. library version*/
-#define LV_MISC_REQ_MAJOR   5
-#define LV_MISC_REQ_MINOR   0
-#define LV_MISC_REQ_PATCH   0
-
-#if MISC_VERSION_MAJOR != LV_MISC_REQ_MAJOR /*The version major has to match*/
-#error "LV: incompatible misc. module version! See lvgl.h"
-#endif
 
 #if MISC_VERSION_MINOR < LV_MISC_REQ_MINOR /*The version minor has to be the same or greater*/
 #error "LV: incompatible misc. module version! See lvgl.h"

@@ -14,20 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_conf.h"
-#include "misc_conf.h"
-#if USE_LV_IMG != 0 && USE_FSINT != 0
+#if USE_LV_IMG != 0
 
 #include "../lv_obj/lv_obj.h"
 #include "../lv_misc/lv_fs.h"
-
-#ifndef LV_IMG_ENABLE_SYMBOLS
-#define LV_IMG_ENABLE_SYMBOLS 0
-#endif
-
-#if LV_IMG_ENABLE_SYMBOLS != 0
-#include "lv_label.h"
 #include "../lv_misc/lv_fonts/symbol_def.h"
-#endif
+#include "lv_label.h"
 
 /*********************
  *      DEFINES

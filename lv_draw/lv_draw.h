@@ -13,9 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-#include <lvgl/lv_misc/lv_txt.h>
 #include "../lv_obj/lv_style.h"
+#include "../lv_misc/lv_txt.h"
 
 /*********************
  *      DEFINES

@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
 #include "lv_area.h"
 #include "lv_math.h"
 

@@ -14,8 +14,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_mem.h"
@@ -23,7 +21,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define FSINT_MAX_FN_LENGTH  64
+#define LV_FS_MAX_FN_LENGTH  64
 
 /**********************
  *      TYPEDEFS

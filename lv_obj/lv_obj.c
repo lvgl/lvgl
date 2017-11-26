@@ -10,12 +10,14 @@
 #include "lv_conf.h"
 #include "lv_obj.h"
 #include "lv_indev.h"
-#include "../lv_draw/lv_draw.h"
-#include "../lv_draw/lv_draw_rbasic.h"
 #include "lv_refr.h"
 #include "lv_group.h"
-#include "misc/misc.h"
+#include "../lv_draw/lv_draw.h"
+#include "../lv_draw/lv_draw_rbasic.h"
 #include "../lv_misc/lv_anim.h"
+#include "../lv_misc/lv_task.h"
+#include "../lv_misc/lv_fs.h"
+#include "../lv_misc/lv_ufs.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -33,7 +35,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
-static void lv_obj_report_style_mod_core(void * style_p, lv_obj_t * obj);
+static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_childen_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode);
@@ -61,32 +63,13 @@ static lv_ll_t scr_ll;                 /*Linked list of screens*/
  */
 void lv_init(void)
 {
-    /*Initialize misc. library. (Protected against re-initialization)*/
-    misc_init();
-
-#if USE_DYN_MEM != 0
+    /*Initialize the lv_misc modules*/
     lv_mem_init();
-#endif
-
-#if USE_LV_TASK != 0
     lv_task_init();
-#endif
-
-#if USE_FSINT != 0  /*Init is befor other FS inits*/
     lv_fs_init();
-#endif
-
-#if USE_UFS != 0
     lv_ufs_init();
-#endif
-
-#if USE_FONT != 0
     lv_font_init();
-#endif
-
-#if USE_ANIM != 0
     lv_anim_init();
-#endif
 
     /*Clear the screen*/
     lv_area_t scr_area;
@@ -756,7 +739,7 @@ void lv_obj_report_style_mod(void * style)
 {
     lv_obj_t * i;
     LL_READ(scr_ll, i) {
-        lv_obj_report_style_mod_core(style, i);
+        report_style_mod_core(style, i);
     }
 }
 
@@ -1493,7 +1476,7 @@ static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord
  * @param style_p refresh objects only with this style. (ignore is if NULL)
  * @param obj pointer to an object
  */
-static void lv_obj_report_style_mod_core(void * style_p, lv_obj_t * obj)
+static void report_style_mod_core(void * style_p, lv_obj_t * obj)
 {
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
@@ -1502,7 +1485,7 @@ static void lv_obj_report_style_mod_core(void * style_p, lv_obj_t * obj)
             lv_obj_refresh_style(i);
         }
         
-        lv_obj_report_style_mod_core(style_p, i);
+        report_style_mod_core(style_p, i);
     }
 }
 

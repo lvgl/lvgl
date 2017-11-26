@@ -7,11 +7,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
+#include <stddef.h>
 #include "lv_task.h"
 #include "../lv_hal/lv_hal_tick.h"
-#include <stddef.h>
 
 /*********************
  *      DEFINES
@@ -117,14 +115,14 @@ lv_task_t* lv_task_create(void (*task) (void *), uint32_t period, lv_task_prio_t
     lv_task_t* new_lv_task;
     
     new_lv_task = lv_ll_ins_head(&lv_task_ll);
-    dm_assert(new_lv_task);
+    lv_mem_assert(new_lv_task);
     
     new_lv_task->period = period;
     new_lv_task->task = task;
     new_lv_task->prio = prio;
     new_lv_task->param = param;
     new_lv_task->once = 0;
-    new_lv_task->last_run = MISC_SYSTICK_GET();
+    new_lv_task->last_run = lv_tick_get();
 
     return new_lv_task;
 }
@@ -166,7 +164,7 @@ void lv_task_set_period(lv_task_t* lv_task_p, uint32_t period)
  */
 void lv_task_ready(lv_task_t* lv_task_p)
 {
-    lv_task_p->last_run = MISC_SYSTICK_GET() - lv_task_p->period - 1;
+    lv_task_p->last_run = lv_tick_get() - lv_task_p->period - 1;
 }
 
 /**
@@ -185,7 +183,7 @@ void lv_task_once(lv_task_t * lv_task_p)
  */
 void lv_task_reset(lv_task_t* lv_task_p)
 {
-    lv_task_p->last_run = MISC_SYSTICK_GET();
+    lv_task_p->last_run = lv_tick_get();
 }
 
 /**
@@ -224,9 +222,9 @@ static bool lv_task_exec (lv_task_t* lv_task_p, lv_task_prio_t prio_act)
     /*Execute lv_task if its prio is 'prio_act'*/
     if(lv_task_p->prio == prio_act) {
         /*Execute if at least 'period' time elapsed*/
-        uint32_t elp = MISC_SYSTICK_ELAPS(lv_task_p->last_run);
+        uint32_t elp = lv_tick_elaps(lv_task_p->last_run);
         if(elp >= lv_task_p->period) {
-            lv_task_p->last_run = MISC_SYSTICK_GET();
+            lv_task_p->last_run = lv_tick_get();
             lv_task_p->task(lv_task_p->param);
 
             /*Delete if it was a one shot lv_task*/

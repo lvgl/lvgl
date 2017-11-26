@@ -66,12 +66,12 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor object*/
     lv_obj_t * new_btnm = lv_obj_create(par, copy);
-    dm_assert(new_btnm);
+    lv_mem_assert(new_btnm);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_btnm);
     
     /*Allocate the object type specific extended data*/
     lv_btnm_ext_t * ext = lv_obj_allocate_ext_attr(new_btnm, sizeof(lv_btnm_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
     ext->btn_cnt = 0;
     ext->btn_id_pr = LV_BTNM_PR_NONE;
     ext->btn_id_tgl = LV_BTNM_PR_NONE;

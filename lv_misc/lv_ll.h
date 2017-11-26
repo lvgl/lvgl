@@ -14,9 +14,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-
-#if USE_LINKED_LIST != 0
 #include "lv_mem.h"
 #include <stdint.h>
 #include <stddef.h>
@@ -124,8 +121,6 @@ void * lv_ll_get_prev(lv_ll_t * ll_p, void * n_act);
 #define LL_READ(list, i) for(i = lv_ll_get_head(&list); i != NULL; i = lv_ll_get_next(&list, i))
 
 #define LL_READ_BACK(list, i) for(i = lv_ll_get_tail(&list); i != NULL; i = lv_ll_get_prev(&list, i))
-
-#endif /*USE_LINKED_LIST*/
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -75,7 +75,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor object*/
     lv_obj_t * new_ta = lv_page_create(par, copy);
-    dm_assert(new_ta);
+    lv_mem_assert(new_ta);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_ta);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_ta);
     if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(new_ta));
@@ -83,7 +83,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_allocate_ext_attr(new_ta, sizeof(lv_ta_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
     ext->cursor.state = 0;
     ext->pwd_mode = 0;
     ext->pwd_tmp = NULL;
@@ -180,7 +180,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
     if(ext->pwd_mode != 0) {
 
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
-        dm_assert(ext->pwd_tmp);
+        lv_mem_assert(ext->pwd_tmp);
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, letter_buf);
 
         lv_anim_t a;
@@ -219,7 +219,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     lv_label_ins_text(ext->label, ext->cursor.pos, txt);
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + strlen(txt) + 1);
-        dm_assert(ext->pwd_tmp);
+        lv_mem_assert(ext->pwd_tmp);
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
 
@@ -274,7 +274,7 @@ void lv_ta_del_char(lv_obj_t * ta)
         lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, lv_txt_utf8_size(label_txt[byte_pos]));
 #endif
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
-        dm_assert(ext->pwd_tmp);
+        lv_mem_assert(ext->pwd_tmp);
     }
 
     /*Move the cursor to the place of the deleted character*/

@@ -14,9 +14,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-#if USE_AREA != 0
-
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -163,8 +160,6 @@ bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p);
 /**********************
  *      MACROS
  **********************/
-
-#endif /*USE_AREA*/
 
 #ifdef __cplusplus
 } /* extern "C" */

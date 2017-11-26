@@ -14,11 +14,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
-#if USE_CIRC != 0
-
-#include "lv_area.h"
 #include <stddef.h>
+#include "lv_area.h"
 
 /*********************
  *      DEFINES
@@ -73,8 +70,6 @@ void lv_circ_next(lv_point_t * c, lv_coord_t * tmp);
 /**********************
  *      MACROS
  **********************/
-
-#endif /*USE_CIRC*/
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -3,8 +3,8 @@
  * 
  */
 
-#ifndef LV_LV_COLOR_H
-#define LV_LV_COLOR_H
+#ifndef LV_COLOR_H
+#define LV_COLOR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc_conf.h"
+#include "lv_conf.h"
 
 #include <stdint.h>
 

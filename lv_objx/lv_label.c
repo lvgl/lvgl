@@ -68,14 +68,14 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create a basic object*/
     lv_obj_t * new_label = lv_obj_create(par, copy);
-    dm_assert(new_label);
+    lv_mem_assert(new_label);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_label);
     
     /*Extend the basic object to a label object*/
     lv_obj_allocate_ext_attr(new_label, sizeof(lv_label_ext_t));
     
     lv_label_ext_t * ext = lv_obj_get_ext_attr(new_label);
-    dm_assert(ext);
+    lv_mem_assert(ext);
     ext->text = NULL;
     ext->static_txt = 0;
     ext->recolor = 0;

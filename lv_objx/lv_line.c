@@ -53,12 +53,12 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create a basic object*/
     lv_obj_t * new_line = lv_obj_create(par, copy);
-    dm_assert(new_line);
+    lv_mem_assert(new_line);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_line);
 
     /*Extend the basic object to line object*/
     lv_line_ext_t * ext = lv_obj_allocate_ext_attr(new_line, sizeof(lv_line_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
     ext->point_num = 0;
     ext->point_array = NULL;
     ext->auto_size = 1;

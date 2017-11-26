@@ -61,12 +61,12 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor of tab*/
     lv_obj_t * new_tabview = lv_obj_create(par, copy);
-    dm_assert(new_tabview);
+    lv_mem_assert(new_tabview);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_tabview);
     
     /*Allocate the tab type specific extended data*/
     lv_tabview_ext_t * ext = lv_obj_allocate_ext_attr(new_tabview, sizeof(lv_tabview_ext_t));
-    dm_assert(ext);
+    lv_mem_assert(ext);
 
     /*Initialize the allocated 'ext' */
     ext->drag_hor = 0;

@@ -1,4 +1,4 @@
-#include "misc_conf.h"
+#include "lv_conf.h"
 #if  USE_LV_FONT_DEJAVU_20 != 0
 #include <stdint.h>
 #include "../lv_misc/lv_font.h"
