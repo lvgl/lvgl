@@ -8,6 +8,18 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
+/*----------------
+ * Dynamic memory
+ *----------------*/
+#define LV_MEM_CUSTOM      0                /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
+#if LV_MEM_CUSTOM == 0
+#define LV_MEM_SIZE    (32U * 1024U)        /*Size memory used by mem_alloc (in bytes)*/
+#define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
+#else       /*LV_MEM_CUSTOM*/
+#define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
+#define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
+#define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
+#endif  /*DM_CUSTOM*/
 
 /*===================
    Graphical settings
@@ -15,17 +27,21 @@
 
 /* Horizontal and vertical resolution of the library.
  * Screen resolution multiplied by LV_DOWN_SCALE*/
-#define LV_HOR_RES          (480 << LV_ANTIALIAS)
-#define LV_VER_RES          (320 << LV_ANTIALIAS)
+#define LV_HOR_RES          (800 << LV_ANTIALIAS)
+#define LV_VER_RES          (480 << LV_ANTIALIAS)
 #define LV_DPI              (100 << LV_ANTIALIAS)
 
 /* Buffered rendering: >= LV_DOWNSCALE * LV_HOR_RES or 0 to disable buffering*/
-#define LV_VDB_SIZE         (20 * LV_VER_RES)
+#define LV_VDB_SIZE         (40 * LV_VER_RES)
 
 /* Enable anti aliasing
  * If enabled everything will be rendered in double size and filtered to normal size */
-#define LV_ANTIALIAS        1
+#define LV_ANTIALIAS        0
 
+/* Enable anti aliasing only for fonts (texts)
+ * It half the size of the letters so you should use double sized fonts
+ * Much faster then normal anti aliasing  */
+#define LV_FONT_ANTIALIAS   1
 
 /*=================
    Misc. setting
@@ -36,41 +52,107 @@
 #define LV_INV_FIFO_SIZE    32    /*The average number of objects on a screen */
 
 /*Input device settings*/
-#define LV_INDEV_READ_PERIOD      50                        /*Input device read period milliseconds*/
-#define LV_INDEV_POINT_MARKER     0                         /*Mark the pressed points*/
-#define LV_INDEV_DRAG_LIMIT       (10 << LV_ANTIALIAS)      /*Drag threshold in pixels */
-#define LV_INDEV_DRAG_THROW       20                        /*Drag throw slow-down in [%]. Greater value means faster slow-down */
-#define LV_INDEV_LONG_PRESS_TIME  400                       /*Long press time in milliseconds*/
-#define LV_INDEV_LONG_PRESS_REP_TIME 100                    /*Repeated trigger period in long press [ms] */
+#define LV_INDEV_READ_PERIOD            50                     /*Input device read period in milliseconds*/
+#define LV_INDEV_POINT_MARKER           0                      /*Mark the pressed points*/
+#define LV_INDEV_DRAG_LIMIT             (10 << LV_ANTIALIAS)   /*Drag threshold in pixels */
+#define LV_INDEV_DRAG_THROW             20                     /*Drag throw slow-down in [%]. Greater value means faster slow-down */
+#define LV_INDEV_LONG_PRESS_TIME        400                    /*Long press time in milliseconds*/
+#define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
+
+/*Color settings*/
+#define LV_COLOR_DEPTH     24
+#define LV_LV_COLOR_TRANSP     LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
+
+/*Text settings*/
+#define LV_TXT_UTF8             1
+#define LV_TXT_BREAK_CHARS     " ,.;:-_"              /*Can break texts on these chars*/
+
+/*==================
+ *  THEME USAGE
+ *================*/
+#define USE_LV_THEME_TEMPL      0       /*Just for test*/
+#define USE_LV_THEME_DEFAULT    0       /*Built manly from the built-in styles. Consumes very few RAM*/
+#define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
+#define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows (Planned)*/
+#define USE_LV_THEME_ZEN        0       /*Peaceful, mainly black and white theme (Planned)*/
+#define USE_LV_THEME_NIGHT      0       /*Dark elegant theme*/
+
+/*==================
+ *    FONT USAGE
+ *===================*/
+#define LV_FONT_DEFAULT        &lv_font_dejavu_40     /*Always set a default font from the built-in fonts*/
+
+#define USE_LV_FONT_DEJAVU_10              0
+#define USE_LV_FONT_DEJAVU_10_SUP          0
+#define USE_LV_FONT_DEJAVU_10_LATIN_EXT_A  0
+#define USE_LV_FONT_DEJAVU_10_LATIN_EXT_B  0
+#define USE_LV_FONT_DEJAVU_10_CYRILLIC     0
+#define USE_LV_FONT_SYMBOL_10_BASIC        0
+#define USE_LV_FONT_SYMBOL_10_FILE         0
+#define USE_LV_FONT_SYMBOL_10_FEEDBACK     0
+
+#define USE_LV_FONT_DEJAVU_20              0
+#define USE_LV_FONT_DEJAVU_20_SUP          0
+#define USE_LV_FONT_DEJAVU_20_LATIN_EXT_A  0
+#define USE_LV_FONT_DEJAVU_20_LATIN_EXT_B  0
+#define USE_LV_FONT_DEJAVU_20_CYRILLIC     0
+#define USE_LV_FONT_SYMBOL_20_BASIC        0
+#define USE_LV_FONT_SYMBOL_20_FILE         0
+#define USE_LV_FONT_SYMBOL_20_FEEDBACK     0
+
+#define USE_LV_FONT_DEJAVU_30              0
+#define USE_LV_FONT_DEJAVU_30_SUP          0
+#define USE_LV_FONT_DEJAVU_30_LATIN_EXT_A  0
+#define USE_LV_FONT_DEJAVU_30_LATIN_EXT_B  0
+#define USE_LV_FONT_DEJAVU_30_CYRILLIC     0
+#define USE_LV_FONT_SYMBOL_30_BASIC        0
+#define USE_LV_FONT_SYMBOL_30_FILE         0
+#define USE_LV_FONT_SYMBOL_30_FEEDBACK     0
+
+#define USE_LV_FONT_DEJAVU_40              1
+#define USE_LV_FONT_DEJAVU_40_SUP          1
+#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_A  1
+#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_B  1
+#define USE_LV_FONT_DEJAVU_40_CYRILLIC     1
+#define USE_LV_FONT_SYMBOL_40_BASIC        1
+#define USE_LV_FONT_SYMBOL_40_FILE         1
+#define USE_LV_FONT_SYMBOL_40_FEEDBACK     1
+
+#define USE_LV_FONT_DEJAVU_60              0
+#define USE_LV_FONT_DEJAVU_60_SUP          0
+#define USE_LV_FONT_DEJAVU_60_LATIN_EXT_A  0
+#define USE_LV_FONT_DEJAVU_60_LATIN_EXT_B  0
+#define USE_LV_FONT_DEJAVU_60_CYRILLIC     0
+#define USE_LV_FONT_SYMBOL_60_BASIC        0
+#define USE_LV_FONT_SYMBOL_60_FILE         0
+#define USE_LV_FONT_SYMBOL_60_FEEDBACK     0
+
+#define USE_LV_FONT_DEJAVU_80              0
+#define USE_LV_FONT_DEJAVU_80_SUP          0
+#define USE_LV_FONT_DEJAVU_80_LATIN_EXT_A  0
+#define USE_LV_FONT_DEJAVU_80_LATIN_EXT_B  0
+#define USE_LV_FONT_DEJAVU_80_CYRILLIC     0
+#define USE_LV_FONT_SYMBOL_80_BASIC        0
+#define USE_LV_FONT_SYMBOL_80_FILE         0
+#define USE_LV_FONT_SYMBOL_80_FEEDBACK     0
+
+/*==================
+ *  IMAGE USAGE
+ *================*/
+#define LV_IMAGE_ENABLE_ALL    1       /*Unconditionally enable all image maps*/
+#define USE_IMG_BUBBLE_PATTERN 1
+//#define USE_IMG_XYZ      1           /*Enable or disable to compile you image map files*/
+
 
 /*lv_obj (base object) settings*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 #define LV_OBJ_GROUP            1           /*Enable object groups*/
 
-/*Others*/
-#define LV_LV_COLOR_TRANSP     LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
-#define LV_FONT_DEFAULT      &lv_font_dejavu_40    /*Always set a default font from the built-in fonts*/
-
-/*==================
- *  IMAGE USAGE
- * ================*/
-#define LV_IMAGE_ENABLE_ALL    1       /*Unconditionally enable all image maps*/
-//#define USE_IMG_XYZ      1           /*Enable or disable to compile you image map files*/
-
-/*==================
- *  THEME USAGE
- * ================*/
-#define USE_LV_THEME_TEMPL      0       /*Just for test*/
-#define USE_LV_THEME_DEFAULT    0       /*Built manly from the built-in styles. Consumes very few RAM*/
-#define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
-#define USE_LV_THEME_NIGHT      0       /*Dark elegant theme*/
-#define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows (Planned)*/
-#define USE_LV_THEME_ZEN        0       /*Peaceful, mainly black and white theme (Planned)*/
 
 /*==================
  *  LV OBJ X USAGE 
- * ================*/
+ *================*/
 
 /*****************
  * Simple object
