@@ -91,8 +91,8 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data)
 {
     bool cont = false;
 
-    if(indev->driver.get_data) {
-        cont = indev->driver.get_data(data);
+    if(indev->driver.read_fp) {
+        cont = indev->driver.read_fp(data);
     } else {
         memset(data, 0, sizeof(lv_indev_data_t));
     }

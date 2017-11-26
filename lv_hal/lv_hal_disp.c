@@ -112,7 +112,7 @@ lv_disp_t * lv_disp_next(lv_disp_t * disp)
 void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color)
 {
     if(active == NULL) return;
-    if(active->driver.fill != NULL) active->driver.fill(x1, y1, x2, y2, color);
+    if(active->driver.fill_fp != NULL) active->driver.fill_fp(x1, y1, x2, y2, color);
 }
 
 /**
@@ -126,7 +126,7 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t col
 void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_map)
 {
     if(active == NULL) return;
-    if(active->driver.map != NULL)  active->driver.map(x1, y1, x2, y2, color_map);
+    if(active->driver.map_fp != NULL)  active->driver.map_fp(x1, y1, x2, y2, color_map);
 }
 
 
@@ -141,7 +141,7 @@ void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_
 void lv_disp_copy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
 {
     if(active == NULL) return;
-    if(active->driver.copy != NULL) active->driver.copy(dest, src, length, opa);
+    if(active->driver.blend_fp != NULL) active->driver.blend_fp(dest, src, length, opa);
 }
 
 /**
@@ -150,7 +150,7 @@ void lv_disp_copy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv
  */
 bool lv_disp_is_copy_supported(void)
 {
-    if(active->driver.copy) return true;
+    if(active->driver.blend_fp) return true;
     else return false;
 }
 
