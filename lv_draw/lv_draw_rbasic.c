@@ -200,7 +200,7 @@ void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
             map_p += map_width;
         }
     }else {
-        lv_color_t transp_color = LV_LV_COLOR_TRANSP;
+        lv_color_t transp_color = LV_COLOR_TRANSP;
         lv_coord_t row;
         for(row = 0; row < area_get_height(&masked_a); row++) {
             lv_coord_t col;

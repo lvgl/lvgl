@@ -1,7 +1,7 @@
 #include "lv_conf.h"
 #if  USE_LV_FONT_DEJAVU_20_LATIN_EXT_A != 0
 #include <stdint.h>
-#include "../lv_misc/lv_font.h"
+#include "../lv_font.h"
 
 /*Store the image of the letters (glyph) */
 static const uint8_t dejavu_20_latin_ext_a_bitmap[] = 

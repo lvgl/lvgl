@@ -259,7 +259,7 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     uint32_t old_len = strlen(txt_buf);
     uint32_t ins_len = strlen(ins_txt);
     uint32_t new_len = ins_len + old_len;
-#if TXT_UTF8 != 0
+#if LV_TXT_UTF8 != 0
     pos = txt_utf8_get_byte_id(txt_buf, pos);   /*Convert to byte index instead of letter index*/
 #endif
     /*Copy the second part into the end to make place to text to insert*/
@@ -282,7 +282,7 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 {
 
     uint32_t old_len = strlen(txt);
-#if TXT_UTF8 != 0
+#if LV_TXT_UTF8 != 0
     pos = txt_utf8_get_byte_id(txt, pos);   /*Convert to byte index instead of letter index*/
     len = txt_utf8_get_byte_id(&txt[pos], len);
 #endif
@@ -351,7 +351,7 @@ uint32_t txt_unicode_to_utf8(uint32_t letter_uni)
  */
 uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     if(i == NULL) return txt[1];    /*Get the next char */
 
     uint8_t letter = txt[*i] ;
@@ -431,7 +431,7 @@ uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
  */
 uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     if(i == NULL) return *(txt- 1);    /*Get the prev. char */
 
     (*i)--;
@@ -471,7 +471,7 @@ uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
  */
 uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     return utf8_id;     /*In Non UTF-8 no difference*/
 #else
     uint32_t i;
@@ -494,7 +494,7 @@ uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
  */
 uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     return byte_id;     /*In Non UTF-8 no difference*/
 #else
     uint32_t i = 0;
@@ -518,7 +518,7 @@ uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
  */
 uint32_t lv_txt_get_length(const char * txt)
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     return strlen(txt);
 #else
     uint32_t len = 0;

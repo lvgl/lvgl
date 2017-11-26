@@ -20,7 +20,7 @@ extern "C" {
  * - Reserved:          0xE060..0xE07F
  */
 
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
 #define SYMBOL_GLYPH_FIRST  0xC0
 #define SYMBOL_GLYPH_LAST   0xFF
 
@@ -143,7 +143,7 @@ extern "C" {
 #define SYMBOL_BATTERY_EMPTY  "\xEE\x81\x8D"
 #define SYMBOL_BLUETOOTH      "\xEE\x81\x8E"
 
-#endif /*TXT_UTF8*/
+#endif /*LV_TXT_UTF8*/
 
 #ifdef __cplusplus
 } /* extern "C" */

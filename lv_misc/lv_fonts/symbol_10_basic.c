@@ -1,7 +1,7 @@
 #include "lv_conf.h"
 #if  USE_LV_FONT_SYMBOL_10_BASIC != 0
 #include <stdint.h>
-#include "../lv_misc/lv_font.h"
+#include "../lv_font.h"
 
 /*Store the image of the letters (glyph) */
 static const uint8_t symbol_10_basic_bitmap[] = 
@@ -191,7 +191,7 @@ static const uint8_t symbol_10_basic_width[] =
 
 lv_font_t lv_font_symbol_10_basic = 
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     192,        /*First letter's unicode */
     207,        /*Last letter's unicode */
 #else

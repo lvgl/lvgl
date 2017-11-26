@@ -1,7 +1,7 @@
 #include "lv_conf.h"
 #if  USE_LV_FONT_SYMBOL_80_FILE != 0
 #include <stdint.h>
-#include "../lv_misc/lv_font.h"
+#include "../lv_font.h"
 
 /*Store the image of the letters (glyph) */
 static const uint8_t symbol_80_file_bitmap[] = 
@@ -1747,7 +1747,7 @@ static const uint8_t symbol_80_file_width[] =
 
 lv_font_t lv_font_symbol_80_file = 
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     224,        /*First letter's unicode */
     255,        /*Last letter's unicode */
 #else

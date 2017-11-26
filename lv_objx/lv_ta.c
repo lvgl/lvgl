@@ -267,7 +267,7 @@ void lv_ta_del_char(lv_obj_t * ta)
     }
 
     if(ext->pwd_mode != 0) {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
         lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, 1);
 #else
         uint32_t byte_pos = txt_utf8_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
@@ -773,7 +773,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 		uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
 		const char * txt = lv_label_get_text(ta_ext->label);
         uint32_t byte_pos;
-#if TXT_UTF8 != 0
+#if LV_TXT_UTF8 != 0
         byte_pos = txt_utf8_get_byte_id(txt, cur_pos);
 #else
         byte_pos = cur_pos;
@@ -826,7 +826,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 			lv_draw_rect(&cur_area, mask, &cur_style);
 
 			/*Get the current letter*/
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
 			char letter_buf[2];
 			letter_buf[0] = txt[byte_pos];
             letter_buf[1] = '\0';
@@ -919,7 +919,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         else if(c == LV_GROUP_KEY_UP)  lv_ta_cursor_up(ta);
         else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
         else {
-#if TXT_UTF8 != 0
+#if LV_TXT_UTF8 != 0
             /*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
             if((c & 0x80) == 0) {   /*ASCII*/
                 lv_ta_add_char(ta, (char)c);

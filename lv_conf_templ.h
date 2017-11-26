@@ -61,7 +61,7 @@
 
 /*Color settings*/
 #define LV_COLOR_DEPTH     24
-#define LV_LV_COLOR_TRANSP     LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
+#define LV_COLOR_TRANSP     LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
 
 /*Text settings*/
 #define LV_TXT_UTF8             1
@@ -140,15 +140,14 @@
  *  IMAGE USAGE
  *================*/
 #define LV_IMAGE_ENABLE_ALL    1       /*Unconditionally enable all image maps*/
-#define USE_IMG_BUBBLE_PATTERN 1
 //#define USE_IMG_XYZ      1           /*Enable or disable to compile you image map files*/
 
-
-/*lv_obj (base object) settings*/
+/*==================
+ *  LV_OBJ SETTINGS
+ *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 #define LV_OBJ_GROUP            1           /*Enable object groups*/
-
 
 /*==================
  *  LV OBJ X USAGE 

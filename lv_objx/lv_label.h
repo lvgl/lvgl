@@ -54,7 +54,7 @@ typedef struct
     /*New data for this type */
     char * text;                     /*Text of the label*/
     lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     char dot_tmp[LV_LABEL_DOT_NUM + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
 #else
     char dot_tmp[LV_LABEL_DOT_NUM * 4 + 1]; /*Store the character which are replaced by dots (Handled by the library)*/

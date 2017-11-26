@@ -337,7 +337,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
         } else { /*transp == true: Check all pixels */
             lv_coord_t row;
             lv_coord_t col;
-            lv_color_t transp_color = LV_LV_COLOR_TRANSP;
+            lv_color_t transp_color = LV_COLOR_TRANSP;
 
             if(recolor_opa == LV_OPA_TRANSP) {/*No recolor*/
                 if(opa == LV_OPA_COVER)  { /*no opa */
@@ -397,7 +397,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     else {
         lv_coord_t row;
         lv_coord_t col;
-        lv_color_t transp_color = LV_LV_COLOR_TRANSP;
+        lv_color_t transp_color = LV_COLOR_TRANSP;
         lv_color_t lv_color_tmp;
         lv_color_t prev_color = LV_COLOR_BLACK;
         lv_coord_t map_col;

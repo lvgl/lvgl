@@ -30,7 +30,7 @@ typedef struct
 {
     uint32_t w:12;        /*Width of the image map*/
     uint32_t h:12;        /*Height of the image map*/
-    uint32_t transp:1;    /*1: The image contains transparent pixels with LV_LV_COLOR_TRANSP color*/
+    uint32_t transp:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
     uint32_t cd:3;        /*Color depth (0: reserved, 1: 8 bit, 2: 16 bit or 3: 24 bit, 4-7: reserved)*/
     uint32_t res :4;      /*Reserved*/
 }lv_img_raw_header_t;

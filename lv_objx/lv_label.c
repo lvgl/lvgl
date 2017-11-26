@@ -569,7 +569,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
     ext->text = lv_mem_realloc(ext->text, new_len + 1);
 
     if(pos == LV_LABEL_POS_LAST) {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
         pos = old_len;
 #else
         pos = lv_txt_get_length(ext->text);
@@ -812,7 +812,7 @@ static void lv_label_refr_text(lv_obj_t * label)
            uint32_t letter_id = lv_label_get_letter_on(label, &p);
 
 
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
            /*Save letters under the dots and replace them with dots*/
            uint8_t i;
            for(i = 0; i < LV_LABEL_DOT_NUM; i++)  {
@@ -862,7 +862,7 @@ static void lv_label_revert_dots(lv_obj_t *label)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->long_mode != LV_LABEL_LONG_DOT) return;
     if(ext->dot_end == LV_LABEL_DOT_END_INV) return;
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     uint32_t i;
     for(i = 0; i <= LV_LABEL_DOT_NUM; i++) {
         ext->text[ext->dot_end - i] = ext->dot_tmp[LV_LABEL_DOT_NUM - i];

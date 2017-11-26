@@ -611,7 +611,7 @@ static const uint8_t symbol_40_basic_width[] =
 
 lv_font_t lv_font_symbol_40_basic = 
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     192,        /*First letter's unicode */
     207,        /*Last letter's unicode */
 #else
