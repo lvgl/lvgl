@@ -102,8 +102,6 @@ static inline  void lv_mem_assert(void *p)
  *      MACROS
  **********************/
 
-
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

@@ -7,7 +7,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_TA != 0
 
 #include "lv_ta.h"
@@ -15,7 +15,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
-#include <lvgl/lv_misc/lv_txt.h>
+#include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
 
 /*********************

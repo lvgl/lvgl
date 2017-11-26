@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_TABVIEW != 0
 
 
@@ -203,4 +203,4 @@ lv_style_t * lv_tabview_get_style(lv_obj_t *tabview, lv_tabview_style_t type);
 } /* extern "C" */
 #endif
 
-#endif  /*LV_TAB_H*/
+#endif  /*LV_TABVIEW_H*/

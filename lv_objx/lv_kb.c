@@ -7,7 +7,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_KB != 0
 
 #include "lv_kb.h"

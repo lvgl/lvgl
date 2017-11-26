@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_LABEL != 0
 
 #include "lv_label.h"
@@ -14,10 +14,7 @@
 #include "../lv_obj/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_color.h"
-#include <lvgl/lv_misc/lv_txt.h>
 #include "../lv_misc/lv_math.h"
-#include <lvgl/lv_misc/lv_txt.h>
-#include "../lv_misc/lv_anim.h"
 
 /*********************
  *      DEFINES

@@ -131,5 +131,4 @@ void lv_task_enable(bool en);
 } /* extern "C" */
 #endif
 
-
 #endif 

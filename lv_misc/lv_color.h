@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 
 #include <stdint.h>
 
@@ -304,8 +304,8 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b);
  *      MACROS
  **********************/
 
-#endif /*USE_COLOR*/
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+#endif /*USE_COLOR*/

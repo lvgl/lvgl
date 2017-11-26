@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_LIST != 0
 
 #include "lv_list.h"
@@ -162,7 +162,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     w -= pad_hor_tot * 2;
 
     lv_obj_set_width(liste, w);
-#if USE_LV_IMG != 0 && USE_FSINT != 0
+#if USE_LV_IMG != 0
 	if(img_fn != NULL && img_fn[0] != '\0') {
 		lv_obj_t * img = lv_img_create(liste, NULL);
 		lv_img_set_file(img, img_fn);
@@ -297,7 +297,7 @@ lv_obj_t * lv_list_get_btn_label(lv_obj_t * btn)
  */
 lv_obj_t * lv_list_get_btn_img(lv_obj_t * btn)
 {
-#if USE_LV_IMG != 0 && USE_FSINT != 0
+#if USE_LV_IMG != 0
     lv_obj_t * img = lv_obj_get_child(btn, NULL);
     if(img == NULL) return NULL;
 

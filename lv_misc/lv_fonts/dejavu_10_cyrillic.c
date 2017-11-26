@@ -1,4 +1,4 @@
-#include "lv_conf.h"
+#include "../../../lv_conf.h"
 #if  USE_LV_FONT_DEJAVU_10_CYRILLIC != 0
 #include <stdint.h>
 #include "../lv_font.h"

@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  ********************/
-#include <lvgl/lv_obj/lv_indev.h>
-#include "lv_conf.h"
+#include "lv_indev.h"
+#include "../../lv_conf.h"
 
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_obj/lv_group.h"

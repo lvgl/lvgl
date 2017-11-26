@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "lv_conf.h"
+#include "../../../lv_conf.h"
 
 /*
  * With no UTF-8 support (192-255)

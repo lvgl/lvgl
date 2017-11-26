@@ -14,7 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 
 #include <stdint.h>
 #include <stddef.h>
@@ -167,9 +167,9 @@ static inline uint8_t lv_font_get_width_scale(const lv_font_t * font_p, uint32_t
 #include "lv_fonts/symbol_80_file.h"
 #include "lv_fonts/symbol_80_feedback.h"
 
-#endif /*USE_FONT*/
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+#endif /*USE_FONT*/
 

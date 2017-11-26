@@ -2,7 +2,7 @@
  * @file lv_vdb.c
  * 
  */
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if LV_VDB_SIZE != 0
 
 #include "../lv_hal/lv_hal_disp.h"

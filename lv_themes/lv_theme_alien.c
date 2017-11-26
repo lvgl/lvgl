@@ -6,10 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lvgl/lvgl.h"
 #include "lv_theme.h"
-
-#include "lv_conf.h"
 
 #if USE_LV_THEME_ALIEN
 

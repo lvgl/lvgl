@@ -171,8 +171,8 @@ uint32_t lv_txt_get_length(const char * txt);
  *      MACROS
  **********************/
 
-#endif /*USE_TEXT*/
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+#endif /*USE_TXT*/

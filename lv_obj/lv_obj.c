@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "lv_conf.h"
 #include "lv_obj.h"
 #include "lv_indev.h"
 #include "lv_refr.h"

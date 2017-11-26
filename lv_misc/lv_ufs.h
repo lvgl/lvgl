@@ -201,5 +201,4 @@ lv_fs_res_t lv_ufs_free (uint32_t * total_p, uint32_t * free_p);
 } /* extern "C" */
 #endif
 
-
 #endif

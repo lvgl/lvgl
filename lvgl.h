@@ -58,14 +58,6 @@ extern "C" {
 #define LVGL_VERSION_PATH   0
 #define LVGL_VERSION_INFO   "beta"
 
-#if MISC_VERSION_MINOR < LV_MISC_REQ_MINOR /*The version minor has to be the same or greater*/
-#error "LV: incompatible misc. module version! See lvgl.h"
-#endif
-
-#if MISC_VERSION_PATCH < LV_MISC_REQ_PATCH /*The version patch has to be the same or greater*/
-#error "LV: incompatible misc. module version! See lvgl.h"
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/

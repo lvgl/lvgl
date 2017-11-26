@@ -7,7 +7,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #include "lv_mem.h"
 #include "lv_math.h"
 #include <string.h>

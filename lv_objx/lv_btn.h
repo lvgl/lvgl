@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_BTN != 0
 
 /*Testing of dependencies*/
@@ -220,4 +220,4 @@ lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_style_t type);
 } /* extern "C" */
 #endif
 
-#endif  /*lv_btn_H*/
+#endif  /*LV_BTN_H*/
