@@ -728,26 +728,39 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
 
         /*Draw the areas which are not disabled*/
         if(edge_top_refr != 0){
-            mix = (uint32_t)((uint32_t)(coords->y2 - edge_top_area.y1)  * 255) / height;
-            act_color = lv_color_mix(mcolor, gcolor, mix);
+            if(mcolor.full == gcolor.full) act_color = mcolor;
+            else {
+                mix = (uint32_t)((uint32_t)(coords->y2 - edge_top_area.y1)  * 255) / height;
+                act_color = lv_color_mix(mcolor, gcolor, mix);
+            }
             fill_fp(&edge_top_area, mask, act_color, opa);
         }
 
         if(mid_top_refr != 0) {
-            mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
-            act_color = lv_color_mix(mcolor, gcolor, mix);
+            if(mcolor.full == gcolor.full) act_color = mcolor;
+            else {
+                mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
+                act_color = lv_color_mix(mcolor, gcolor, mix);
+            }
             fill_fp(&mid_top_area, mask, act_color, opa);
         }
 
         if(mid_bot_refr != 0) {
-            mix = (uint32_t)((uint32_t)(coords->y2 - mid_bot_area.y1) * 255) / height;
-            act_color = lv_color_mix(mcolor, gcolor, mix);
+            if(mcolor.full == gcolor.full) act_color = mcolor;
+            else {
+                mix = (uint32_t)((uint32_t)(coords->y2 - mid_bot_area.y1) * 255) / height;
+                act_color = lv_color_mix(mcolor, gcolor, mix);
+            }
             fill_fp(&mid_bot_area, mask, act_color, opa);
         }
 
         if(edge_bot_refr != 0) {
-            mix = (uint32_t)((uint32_t)(coords->y2 - edge_bot_area.y1) * 255) / height;
-            act_color = lv_color_mix(mcolor, gcolor, mix);
+
+            if(mcolor.full == gcolor.full) act_color = mcolor;
+            else {
+                mix = (uint32_t)((uint32_t)(coords->y2 - edge_bot_area.y1) * 255) / height;
+                act_color = lv_color_mix(mcolor, gcolor, mix);
+            }
             fill_fp(&edge_bot_area, mask, act_color, opa);
         }
          /*Save the current coordinates*/
@@ -774,21 +787,38 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
         lv_circ_next(&cir, &cir_tmp);
     }
 
-	mix = (uint32_t)((uint32_t)(coords->y2 - edge_top_area.y1)  * 255) / height;
-	act_color = lv_color_mix(mcolor, gcolor, mix);
+
+    if(mcolor.full == gcolor.full) act_color = mcolor;
+    else {
+        mix = (uint32_t)((uint32_t)(coords->y2 - edge_top_area.y1)  * 255) / height;
+        act_color = lv_color_mix(mcolor, gcolor, mix);
+    }
 	fill_fp(&edge_top_area, mask, act_color, opa);
-if(edge_top_area.y1 != mid_top_area.y1) {
-		mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
-		act_color = lv_color_mix(mcolor, gcolor, mix);
+
+	if(edge_top_area.y1 != mid_top_area.y1) {
+
+        if(mcolor.full == gcolor.full) act_color = mcolor;
+        else {
+            mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
+            act_color = lv_color_mix(mcolor, gcolor, mix);
+	    }
 		fill_fp(&mid_top_area, mask, act_color, opa);
 	}
-	mix = (uint32_t)((uint32_t)(coords->y2 - mid_bot_area.y1) * 255) / height;
-	act_color = lv_color_mix(mcolor, gcolor, mix);
+
+    if(mcolor.full == gcolor.full) act_color = mcolor;
+    else {
+        mix = (uint32_t)((uint32_t)(coords->y2 - mid_bot_area.y1) * 255) / height;
+        act_color = lv_color_mix(mcolor, gcolor, mix);
+    }
 	fill_fp(&mid_bot_area, mask, act_color, opa);
 
 	if(edge_bot_area.y1 != mid_bot_area.y1) {
-		mix = (uint32_t)((uint32_t)(coords->y2 - edge_bot_area.y1) * 255) / height;
-		act_color = lv_color_mix(mcolor, gcolor, mix);
+
+        if(mcolor.full == gcolor.full) act_color = mcolor;
+        else {
+            mix = (uint32_t)((uint32_t)(coords->y2 - edge_bot_area.y1) * 255) / height;
+            act_color = lv_color_mix(mcolor, gcolor, mix);
+        }
 		fill_fp(&edge_bot_area, mask, act_color, opa);
 	}
 
