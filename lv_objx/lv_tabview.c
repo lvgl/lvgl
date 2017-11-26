@@ -70,7 +70,8 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->drag_hor = 0;
-    ext->draging = 0;
+    ext->draging = 0;;
+    ext->slide_enable = 1;
     ext->tab_cur = 0;
     ext->point_last.x = 0;
     ext->point_last.y = 0;
@@ -294,6 +295,16 @@ void lv_tabview_set_tab_load_action(lv_obj_t *tabview, lv_tabview_action_t actio
     ext->tab_load_action = action;
 }
 
+/**
+ * Enable horizontal sliding with touch pad
+ * @param tabview pointer to Tab view object
+ * @param en true: enable sliding; false: disable sliding
+ */
+void lv_tabview_set_sliding(lv_obj_t * tabview, bool en)
+{
+    lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
+    ext->slide_enable = en == false ? 0 : 1;
+}
 
 /**
  * Set the animation time of tab view when a new tab is loaded
@@ -306,6 +317,12 @@ void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms)
     ext->anim_time = anim_time_ms;
 }
 
+/**
+ * Set the style of a tab view
+ * @param tabview pointer to a tan view object
+ * @param type which style should be set
+ * @param style pointer to the new style
+ */
 void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t *style)
 {
     lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
@@ -399,6 +416,17 @@ lv_tabview_action_t lv_tabview_get_tab_load_action(lv_obj_t *tabview)
 {
     lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
     return ext->tab_load_action;
+}
+
+/**
+ * Get horizontal sliding is enabled or not
+ * @param tabview pointer to Tab view object
+ * @return true: enable sliding; false: disable sliding
+ */
+bool lv_tabview_get_sliding(lv_obj_t * tabview)
+{
+    lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
+    return ext->slide_enable ? true : false;
 }
 
 /**
@@ -498,15 +526,18 @@ static lv_res_t tabpage_signal(lv_obj_t * tab_page, lv_signal_t sign, void * par
     if(res != LV_RES_OK) return res;
 
     lv_obj_t * cont = lv_obj_get_parent(tab_page);
-    lv_obj_t * tab = lv_obj_get_parent(cont);
+    lv_obj_t * tabview = lv_obj_get_parent(cont);
+
+    if(lv_tabview_get_sliding(tabview) == false) return res;
+
     if(sign == LV_SIGNAL_PRESSED) {
-        tabpage_pressed_hadler(tab, tab_page);
+        tabpage_pressed_hadler(tabview, tab_page);
     }
     else if(sign == LV_SIGNAL_PRESSING) {
-        tabpage_pressing_hadler(tab, tab_page);
+        tabpage_pressing_hadler(tabview, tab_page);
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-        tabpage_press_lost_hadler(tab, tab_page);
+        tabpage_press_lost_hadler(tabview, tab_page);
     }
 
     return res;
@@ -528,15 +559,18 @@ static lv_res_t tabpage_scrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void 
 
     lv_obj_t * tab_page = lv_obj_get_parent(tab_scrl);
     lv_obj_t * cont = lv_obj_get_parent(tab_page);
-    lv_obj_t * tab = lv_obj_get_parent(cont);
+    lv_obj_t * tabview = lv_obj_get_parent(cont);
+
+    if(lv_tabview_get_sliding(tabview) == false) return res;
+
     if(sign == LV_SIGNAL_PRESSED) {
-        tabpage_pressed_hadler(tab, tab_page);
+        tabpage_pressed_hadler(tabview, tab_page);
     }
     else if(sign == LV_SIGNAL_PRESSING) {
-        tabpage_pressing_hadler(tab, tab_page);
+        tabpage_pressing_hadler(tabview, tab_page);
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-        tabpage_press_lost_hadler(tab, tab_page);
+        tabpage_press_lost_hadler(tabview, tab_page);
     }
 
     return res;

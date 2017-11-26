@@ -54,6 +54,7 @@ typedef struct
     uint16_t tab_cur;
     uint16_t tab_cnt;
     uint16_t anim_time;
+    uint8_t slide_enable :1;    /*1: enable horizontal sliding by touch pad*/
     uint8_t draging :1;
     uint8_t drag_hor :1;
     lv_tabview_action_t tab_load_action;
@@ -116,13 +117,25 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en);
 void lv_tabview_set_tab_load_action(lv_obj_t *tabview, lv_tabview_action_t action);
 
 /**
+ * Enable horizontal sliding with touch pad
+ * @param tabview pointer to Tab view object
+ * @param en true: enable sliding; false: disable sliding
+ */
+void lv_tabview_set_sliding(lv_obj_t * tabview, bool en);
+
+/**
  * Set the animation time of tab view when a new tab is loaded
  * @param tabview pointer to Tab view object
  * @param anim_time_ms time of animation in milliseconds
  */
 void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
 
-
+/**
+ * Set the style of a tab view
+ * @param tabview pointer to a tan view object
+ * @param type which style should be set
+ * @param style pointer to the new style
+ */
 void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t *style);
 
 /*=====================
@@ -156,6 +169,13 @@ lv_obj_t * lv_tabview_get_tab(lv_obj_t * tabview, uint16_t id);
  * @param return the current tab load action
  */
 lv_tabview_action_t lv_tabview_get_tab_load_action(lv_obj_t *tabview);
+
+/**
+ * Get horizontal sliding is enabled or not
+ * @param tabview pointer to Tab view object
+ * @return true: enable sliding; false: disable sliding
+ */
+bool lv_tabview_get_sliding(lv_obj_t * tabview);
 
 /**
  * Get the animation time of tab view when a new tab is loaded
