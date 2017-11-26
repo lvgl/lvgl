@@ -75,13 +75,13 @@ static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
 }
 
 /**
- * Get the height of a font. Give the real size on the screen (half size if FONT_ANTIALIAS is enabled)
+ * Get the height of a font. Give the real size on the screen (half size if LV_FONT_ANTIALIAS is enabled)
  * @param font_p pointer to a font
  * @return the height of a font
  */
 static inline uint8_t lv_font_get_height_scale(const lv_font_t * font_p)
 {
-    return font_p->height_row >> FONT_ANTIALIAS;
+    return font_p->height_row >> LV_FONT_ANTIALIAS;
 }
 
 
@@ -94,7 +94,7 @@ static inline uint8_t lv_font_get_height_scale(const lv_font_t * font_p)
 uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
- * Get the width of a letter in a font )Give the real size on the screen (half size if FONT_ANTIALIAS is enabled)
+ * Get the width of a letter in a font )Give the real size on the screen (half size if LV_FONT_ANTIALIAS is enabled)
  * @param font_p pointer to a font
  * @param letter a letter
  * @return the width of a letter

@@ -177,9 +177,9 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     /* Calculate the col/row start/end on the map
      * If font anti alaiassing is enabled use the reduced letter sizes*/
     lv_coord_t col_start = pos_p->x > mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
-    lv_coord_t col_end = pos_p->x + (letter_w >> FONT_ANTIALIAS) < mask_p->x2 ? (letter_w >> FONT_ANTIALIAS) : mask_p->x2 - pos_p->x + 1;
+    lv_coord_t col_end = pos_p->x + (letter_w >> LV_FONT_ANTIALIAS) < mask_p->x2 ? (letter_w >> LV_FONT_ANTIALIAS) : mask_p->x2 - pos_p->x + 1;
     lv_coord_t row_start = pos_p->y > mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
-    lv_coord_t row_end  = pos_p->y + (letter_h >> FONT_ANTIALIAS) < mask_p->y2 ? (letter_h >> FONT_ANTIALIAS) : mask_p->y2 - pos_p->y + 1;
+    lv_coord_t row_end  = pos_p->y + (letter_h >> LV_FONT_ANTIALIAS) < mask_p->y2 ? (letter_h >> LV_FONT_ANTIALIAS) : mask_p->y2 - pos_p->y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
     vdb_buf_tmp += ((pos_p->y - vdb_p->area.y1) * vdb_width)
@@ -189,9 +189,9 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
-    map_p += ((row_start << FONT_ANTIALIAS) * width_byte) + ((col_start << FONT_ANTIALIAS) >> 3);
+    map_p += ((row_start << LV_FONT_ANTIALIAS) * width_byte) + ((col_start << LV_FONT_ANTIALIAS) >> 3);
 
-#if FONT_ANTIALIAS != 0
+#if LV_FONT_ANTIALIAS != 0
     lv_opa_t opa_tmp = opa;
     if(opa_tmp != LV_OPA_COVER) opa_tmp = opa_tmp >> 2;   /*Opacity per pixel (used when sum the pixels)*/
     const uint8_t * map1_p = map_p;
@@ -199,7 +199,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     uint8_t px_cnt;
     for(row = row_start; row < row_end; row ++) {
         col_byte_cnt = 0;
-        col_bit = 7 - ((col_start << FONT_ANTIALIAS) % 8);
+        col_bit = 7 - ((col_start << LV_FONT_ANTIALIAS) % 8);
         for(col = col_start; col < col_end; col ++) {
 
             px_cnt = 0;

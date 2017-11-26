@@ -102,7 +102,7 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     const uint8_t * bitmap_p = lv_font_get_bitmap(font_p, letter);
 
     uint8_t col, col_sub, row;
-#if FONT_ANTIALIAS == 0
+#if LV_FONT_ANTIALIAS == 0
     for(row = 0; row < font_p->height_row; row ++) {
         for(col = 0, col_sub = 7; col < w; col ++, col_sub--) {
             if(*bitmap_p & (1 << col_sub)) {
@@ -151,7 +151,7 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
 
 
                if(px_cnt != 0) {
-                   lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, color_mix(color, LV_COLOR_SILVER, 63 * px_cnt), LV_OPA_COVER);
+                   lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, lv_color_mix(color, LV_COLOR_SILVER, 63 * px_cnt), LV_OPA_COVER);
                }
            }
 
