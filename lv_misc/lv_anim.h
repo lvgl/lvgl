@@ -14,6 +14,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../../../lv_conf.h"
+#if LV_NO_ANIM == 0
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -113,8 +116,11 @@ lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name);
  *      MACROS
  **********************/
 
+#endif /*LV_NO_ANIM == 0*/
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif
+#endif /*LV_ANIM_H*/
+

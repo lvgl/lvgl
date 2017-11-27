@@ -17,6 +17,14 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_NO_ANIM == 0
+#  ifndef LV_TABVIEW_ANIM_TIME
+#    define LV_TABVIEW_ANIM_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#  endif
+#else
+#  undef  LV_TABVIEW_ANIM_TIME
+#  define LV_TABVIEW_ANIM_TIME	0	/*No animations*/
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -240,6 +248,7 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
     if(ext->anim_time == 0 || anim_en == false) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
+#if LV_NO_ANIM == 0
         lv_anim_t a;
         a.var = ext->content;
         a.start = lv_obj_get_x(ext->content);
@@ -254,6 +263,7 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
         a.repeat = 0;
         a.repeat_pause = 0;
         lv_anim_create(&a);
+#endif
     }
 
     /*Move the indicator*/
@@ -264,6 +274,7 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
     if(ext->anim_time == 0 || anim_en == false ) {
         lv_obj_set_x(ext->indic, indic_x);
     } else {
+#if LV_NO_ANIM == 0
         lv_anim_t a;
         a.var = ext->indic;
         a.start = lv_obj_get_x(ext->indic);
@@ -278,6 +289,7 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
         a.repeat = 0;
         a.repeat_pause = 0;
         lv_anim_create(&a);
+#endif
     }
 
     lv_btnm_set_toggle(ext->btns, true, ext->tab_cur);

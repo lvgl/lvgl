@@ -60,12 +60,16 @@
 #define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
 
 /*Color settings*/
-#define LV_COLOR_DEPTH     24
-#define LV_COLOR_TRANSP     LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
+#define LV_COLOR_DEPTH     16
+#define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
 
 /*Text settings*/
 #define LV_TXT_UTF8             1
-#define LV_TXT_BREAK_CHARS     " ,.;:-_"              /*Can break texts on these chars*/
+#define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
+
+/*Feature usage*/
+#define LV_NO_ANIM				0				/*1: disable all animations*/
+#define LV_NO_SHADOW			0				/*1: disable shadows*/
 
 /*==================
  *  THEME USAGE

@@ -39,9 +39,11 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
 static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_mode_t mode);
 static void lv_label_refr_text(lv_obj_t * label);
 static void lv_label_revert_dots(lv_obj_t *label);
+
+#if LV_NO_ANIM == 0
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
 static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
-
+#endif
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -221,11 +223,13 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
+#if LV_NO_ANIM == 0
     /*Delete the old animation (if exists)*/
     lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_x);
     lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_y);
     lv_anim_del(label, (lv_anim_fp_t) lv_label_set_offset_x);
     lv_anim_del(label, (lv_anim_fp_t) lv_label_set_offset_y);
+#endif
     ext->offset.x = 0;
     ext->offset.y = 0;
 
@@ -726,6 +730,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         /*Start scrolling if the label is greater then its parent*/
         if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
+#if LV_NO_ANIM == 0
             lv_obj_t * parent = lv_obj_get_parent(label);
 
             /*Delete the potential previous scroller animations*/
@@ -756,10 +761,12 @@ static void lv_label_refr_text(lv_obj_t * label)
                 anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
                 lv_anim_create(&anim);
             }
+#endif
         }
     }
     /*In roll mode keep the size but start offset animations*/
     else if(ext->long_mode == LV_LABEL_LONG_ROLL) {
+#if LV_NO_ANIM == 0
         lv_anim_t anim;
         anim.var = label;
         anim.repeat = 1;
@@ -794,6 +801,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             lv_anim_del(label, (lv_anim_fp_t) lv_label_set_offset_y);
             ext->offset.y = 0;
         }
+#endif
     }
     else if(ext->long_mode == LV_LABEL_LONG_DOT) {
        if(size.y <= lv_obj_get_height(label)) {                /*No dots are required, the text is short enough*/
@@ -879,6 +887,7 @@ static void lv_label_revert_dots(lv_obj_t *label)
     ext->dot_end = LV_LABEL_DOT_END_INV;
 }
 
+#if LV_NO_ANIM == 0
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
@@ -892,4 +901,5 @@ static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y)
     ext->offset.y = y;
     lv_obj_invalidate(label);
 }
+#endif
 #endif

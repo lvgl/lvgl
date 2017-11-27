@@ -101,6 +101,7 @@ typedef struct
     }line;
 }lv_style_t;
 
+#if LV_NO_ANIM == 0
 typedef struct {
     const lv_style_t * style_start; /*Pointer to the starting style*/
     const lv_style_t * style_end;   /*Pointer to the destination style*/
@@ -128,6 +129,7 @@ a.repeat_pause = 0;
 a.end_cb = NULL;
 lv_style_anim_create(&a);
  */
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -145,11 +147,13 @@ void lv_style_init (void);
  */
 void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
+#if LV_NO_ANIM == 0
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
  */
 void lv_style_anim_create(lv_style_anim_t * anim);
+#endif
 
 /*************************
  *    GLOBAL VARIABLES

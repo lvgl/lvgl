@@ -14,25 +14,31 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_NO_ANIM == 0
 #define LV_STYLE_ANIM_RES       256    /*Animation max in 1024 steps*/
 #define LV_STYLE_ANIM_SHIFT     8      /*log2(LV_STYLE_ANIM_RES)*/
 
 #define VAL_PROP(v1, v2, r)   v1 + (((v2-v1) * r) >> LV_STYLE_ANIM_SHIFT)
 #define STYLE_ATTR_ANIM(attr, r)   if(start->attr != end->attr) act->attr = VAL_PROP(start->attr, end->attr, r)
+#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
+#if LV_NO_ANIM == 0
 typedef struct {
     lv_style_t style_start;   /*Save not only pointers because if same as 'style_anim' then it will be modified too*/
     lv_style_t style_end;
     lv_style_t * style_anim;
 }lv_style_anim_dsc_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if LV_NO_ANIM == 0
 static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -208,8 +214,7 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
     memcpy(dest, src, sizeof(lv_style_t));
 }
 
-
-
+#if LV_NO_ANIM == 0
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
@@ -238,11 +243,11 @@ void lv_style_anim_create(lv_style_anim_t * anim)
 
     lv_anim_create(&a);
 }
-
+#endif
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+#if LV_NO_ANIM == 0
 /**
  * Used by the style animations to set the values of a style according to start and end style.
  * @param dsc the 'animated variable' set by lv_style_anim_create()
@@ -295,3 +300,4 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
         lv_mem_free(dsc);
     }
 }
+#endif

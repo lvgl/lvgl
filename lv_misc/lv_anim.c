@@ -6,12 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_anim.h"
+
+#if LV_NO_ANIM == 0
 #include <stddef.h>
 #include <string.h>
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_task.h"
-#include "lv_anim.h"
 #include "lv_math.h"
 
 /*********************
@@ -261,3 +262,4 @@ static bool anim_ready_handler(lv_anim_t * a)
 
 	return invalid;
 }
+#endif

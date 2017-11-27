@@ -72,6 +72,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask_p, lv_co
 void lv_draw_label(const lv_area_t * cords_p,const lv_area_t * mask_p, const lv_style_t * style_p,
                     const char * txt, lv_txt_flag_t flag, lv_point_t * offset);
 
+#if USE_LV_IMG
 /**
  * Draw an image
  * @param cords_p the coordinates of the image
@@ -80,6 +81,7 @@ void lv_draw_label(const lv_area_t * cords_p,const lv_area_t * mask_p, const lv_
  */
 void lv_draw_img(const lv_area_t * cords_p, const lv_area_t * mask_p,
                  const lv_style_t * style_p, const char * fn);
+#endif
 
 /**
  * Draw a line

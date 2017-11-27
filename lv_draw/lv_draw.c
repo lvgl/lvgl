@@ -45,11 +45,12 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
 static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+#if LV_NO_SHADOW == 0
 static void lv_draw_rect_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style);
 static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_cont_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map);
-
+#endif
 static uint16_t lv_draw_cont_radius_corr(uint16_t r, lv_coord_t w, lv_coord_t h);
 
 
@@ -69,7 +70,9 @@ static void (*map_fp)(const lv_area_t * coords, const lv_area_t * mask, const lv
 static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_rpx;
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_rletter;
+#if USE_LV_IMG
 static void (*map_fp)(const lv_area_t * coords, const lv_area_t * mask, const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale, lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
+#endif
 #endif
 
 
@@ -91,10 +94,11 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
 {
     if(area_get_height(coords) < 1 || area_get_width(coords) < 1) return;
 
+#if LV_NO_SHADOW == 0
     if(style->body.shadow.width != 0) {
         lv_draw_rect_shadow(coords, mask, style);
     }
-
+#endif
     if(style->body.empty == 0){
         lv_draw_rect_main_mid(coords, mask, style);
 
@@ -339,6 +343,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
     }
 }
 
+#if USE_LV_IMG
 /**
  * Draw an image
  * @param coords the coordinates of the image
@@ -440,6 +445,8 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
         }
     }
 }
+#endif
+
 
 /**
  * Draw a line
@@ -1123,6 +1130,8 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     }
 }
 
+#if LV_NO_SHADOW == 0
+
 /**
  * Draw a shadow
  * @param rect pointer to rectangle object
@@ -1422,6 +1431,9 @@ static void lv_draw_cont_shadow_full_straight(const lv_area_t * coords, const lv
     }
 
 }
+
+#endif
+
 static uint16_t lv_draw_cont_radius_corr(uint16_t r, lv_coord_t w, lv_coord_t h)
 {
 	if(r >= (w >> 1)){

@@ -19,7 +19,15 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_MBOX_CLOSE_ANIM_TIME     200 /*Default close anim. time [ms]*/
+
+#if LV_NO_ANIM == 0
+#  ifndef LV_MBOX_CLOSE_ANIM_TIME
+#    define LV_MBOX_CLOSE_ANIM_TIME  200 /*List close animation time)  */
+#  endif
+#else
+#  undef  LV_MBOX_CLOSE_ANIM_TIME
+#  define LV_MBOX_CLOSE_ANIM_TIME	0	/*No animations*/
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -192,6 +200,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
+#if LV_NO_ANIM == 0
     if(ext->anim_time != 0) {
         /*Add shrinking animations*/
         lv_obj_animate(mbox, LV_ANIM_GROW_H| ANIM_OUT, ext->anim_time, delay, NULL);
@@ -202,6 +211,9 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
     } else {
         lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, (void (*)(lv_obj_t*))lv_obj_del);
     }
+#else
+    lv_obj_del(mbox);
+#endif
 }
 
 /**
@@ -210,7 +222,9 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
  */
 void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
+#if LV_NO_ANIM == 0
     lv_anim_del(mbox, NULL);
+#endif
 }
 
 /**

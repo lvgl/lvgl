@@ -67,8 +67,9 @@ void lv_init(void)
     lv_fs_init();
     lv_ufs_init();
     lv_font_init();
+#if LV_NO_ANIM == 0
     lv_anim_init();
-
+#endif
     /*Clear the screen*/
     lv_area_t scr_area;
     lv_area_set(&scr_area, 0, 0, LV_HOR_RES, LV_VER_RES);
@@ -279,10 +280,10 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         /*Set i to the next node*/
         i = i_next;
     }
-    
+#if LV_NO_ANIM == 0
     /*Remove the animations from this object*/
     lv_anim_del(obj, NULL);
-
+#endif
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) { /*It is a screen*/
@@ -909,6 +910,7 @@ void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p)
 }
 #endif
 
+#if LV_NO_ANIM == 0
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -986,6 +988,9 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
 
 	lv_anim_create(&a);
 }
+
+#endif
+
 /*=======================
  * Getter functions
  *======================*/
@@ -1529,7 +1534,9 @@ static void delete_children(lv_obj_t * obj)
    }
 
    /*Remove the animations from this object*/
+#if LV_NO_ANIM == 0
    lv_anim_del(obj, NULL);
+#endif
 
    /*Delete from the group*/
 #if LV_OBJ_GROUP != 0

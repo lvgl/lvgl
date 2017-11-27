@@ -239,6 +239,7 @@ static void indev_proc_task(void * param)
                 indev_proc_point(&i->state);
             }
             else if (i->driver.type == LV_INDEV_TYPE_KEYPAD) {
+#if LV_OBJ_GROUP != 0
                 if(i->group != NULL && data.state == LV_INDEV_EVENT_PR && data.key != 0) {
                     if(data.key == LV_GROUP_KEY_NEXT) {
                         lv_group_focus_next(i->group);
@@ -250,6 +251,7 @@ static void indev_proc_task(void * param)
                         lv_group_send_data(i->group, data.key);
                     }
                 }
+#endif
             }
         }
 

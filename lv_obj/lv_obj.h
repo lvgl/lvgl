@@ -530,6 +530,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_num);
 void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p);
 #endif
 
+#if LV_NO_ANIM == 0
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -539,6 +540,7 @@ void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p);
  * @param cb a function to call when the animation is ready
  */
 void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *));
+#endif
 
 /*=======================
  * Getter functions

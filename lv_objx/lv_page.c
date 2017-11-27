@@ -307,6 +307,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
         lv_obj_set_y(ext->scrl, scrlable_y);
     }
     else {
+#if LV_NO_ANIM == 0
         lv_anim_t a;
         a.act_time = 0;
         a.start = lv_obj_get_y(ext->scrl);
@@ -319,6 +320,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
         a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
         a.fp = (lv_anim_fp_t) lv_obj_set_y;
         lv_anim_create(&a);
+#endif
     }
 }
 

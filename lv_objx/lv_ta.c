@@ -137,7 +137,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_ta);
     }
-    
+
+#if LV_NO_ANIM == 0
     /*Create a cursor blinker animation*/
     lv_anim_t a;
     a.var = new_ta;
@@ -153,6 +154,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     a.playback_pause = 0;
     a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
     lv_anim_create(&a);
+#endif
 
     return new_ta;
 }
@@ -183,6 +185,8 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         lv_mem_assert(ext->pwd_tmp);
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, letter_buf);
 
+#if LV_NO_ANIM == 0
+        /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
         a.fp = (lv_anim_fp_t)pwd_char_hider_anim;
@@ -197,6 +201,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         a.playback_pause = 0;
         a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
         lv_anim_create(&a);
+#endif
     }
 
     /*Move the cursor after the new character*/
@@ -223,6 +228,8 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
 
+#if LV_NO_ANIM == 0
+        /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
         a.fp = (lv_anim_fp_t)pwd_char_hider_anim;
@@ -237,6 +244,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         a.playback_pause = 0;
         a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
         lv_anim_create(&a);
+#endif
     }
 
     /*Move the cursor after the new text*/
@@ -306,6 +314,8 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(txt) + 1);
         strcpy(ext->pwd_tmp, txt);
 
+#if LV_NO_ANIM == 0
+        /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
         a.fp = (lv_anim_fp_t)pwd_char_hider_anim;
@@ -320,6 +330,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         a.playback_pause = 0;
         a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
         lv_anim_create(&a);
+#endif
     }
 }
 
@@ -376,6 +387,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 
     ext->cursor.valid_x = cur_pos.x;
 
+#if LV_NO_ANIM == 0
     /*Reset cursor blink animation*/
     lv_anim_t a;
     a.var = ta;
@@ -391,6 +403,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     a.playback_pause = 0;
     a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
     lv_anim_create(&a);
+#endif
 
 	lv_obj_invalidate(ta);
 }
