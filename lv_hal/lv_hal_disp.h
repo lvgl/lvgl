@@ -46,6 +46,13 @@ typedef struct _disp_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize a display driver with default values.
+ * It is used to surly have known values in the fields ant not memory junk.
+ * After it you can set the fields.
+ * @param driver pointer to driver variable to initialize
+ */
+void lv_disp_drv_init(lv_disp_drv_t *driver);
 
 /**
  * Register an initialized display driver.
@@ -53,7 +60,7 @@ typedef struct _disp_t {
  * @param driver pointer to an initialized 'lv_disp_drv_t' variable (can be local variable)
  * @return pointer to the new display or NULL on error
  */
-lv_disp_t * lv_disp_register(lv_disp_drv_t *driver);
+lv_disp_t * lv_disp_drv_register(lv_disp_drv_t *driver);
 
 /**
  * Set the active display

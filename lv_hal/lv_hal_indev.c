@@ -37,6 +37,18 @@ static lv_indev_t *indev_list = NULL;
  **********************/
 
 /**
+ * Initialize an input device driver with default values.
+ * It is used to surly have known values in the fields ant not memory junk.
+ * After it you can set the fields.
+ * @param driver pointer to driver variable to initialize
+ */
+void lv_indev_drv_init(lv_indev_drv_t *driver)
+{
+    driver->read_fp = NULL;
+    driver->type = LV_INDEV_TYPE_NONE;
+}
+
+/**
  * Register an initialized input device driver.
  * @param driver pointer to an initialized 'lv_indev_drv_t' variable (can be local variable)
  * @return pointer to the new input device or NULL on error

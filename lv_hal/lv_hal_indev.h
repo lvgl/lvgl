@@ -30,6 +30,7 @@ extern "C" {
 
 /*Possible input device types*/
 typedef enum {
+    LV_INDEV_TYPE_NONE,        /*Show uninitialized state*/
     LV_INDEV_TYPE_TOUCHPAD,    /*Touch pad*/
     LV_INDEV_TYPE_MOUSE,       /*Mouse or similar pointer device*/
     LV_INDEV_TYPE_KEYPAD,      /*Keypad or keyboard*/
@@ -104,6 +105,14 @@ typedef struct _lv_indev_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize an input device driver with default values.
+ * It is used to surly have known values in the fields ant not memory junk.
+ * After it you can set the fields.
+ * @param driver pointer to driver variable to initialize
+ */
+void lv_indev_drv_init(lv_indev_drv_t *driver);
 
 /**
  * Register an initialized input device driver.
