@@ -214,7 +214,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     }
 
     if(copy != NULL) {
-    	area_cpy(&new_obj->coords, &copy->coords);
+    	lv_area_copy(&new_obj->coords, &copy->coords);
     	new_obj->ext_size = copy->ext_size;
 
         /*Set free data*/
@@ -357,7 +357,7 @@ void lv_obj_invalidate(lv_obj_t * obj)
         bool union_ok = true;
         /*Start with the original coordinates*/
         lv_coord_t ext_size = obj->ext_size;
-        area_cpy(&area_trunc, &obj->coords);
+        lv_area_copy(&area_trunc, &obj->coords);
         area_trunc.x1 -= ext_size;
         area_trunc.y1 -= ext_size;
         area_trunc.x2 += ext_size;
@@ -1122,7 +1122,7 @@ uint16_t lv_obj_count_children(lv_obj_t * obj)
  */
 void lv_obj_get_coords(lv_obj_t * obj, lv_area_t * cords_p)
 {
-    area_cpy(cords_p, &obj->coords);
+    lv_area_copy(cords_p, &obj->coords);
 }
 
 
@@ -1161,7 +1161,7 @@ lv_coord_t lv_obj_get_y(lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_width(lv_obj_t * obj)
 {
-    return area_get_width(&obj->coords);
+    return lv_area_get_width(&obj->coords);
 }
 
 /**
@@ -1171,7 +1171,7 @@ lv_coord_t lv_obj_get_width(lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_height(lv_obj_t * obj)
 {
-    return area_get_height(&obj->coords);
+    return lv_area_get_height(&obj->coords);
 }
 
 /**

@@ -506,8 +506,8 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_CORD_CHG) {
         if(ext->content != NULL &&
-          (lv_obj_get_width(tabview) != area_get_width(param) ||
-           lv_obj_get_height(tabview) != area_get_height(param)))
+          (lv_obj_get_width(tabview) != lv_area_get_width(param) ||
+           lv_obj_get_height(tabview) != lv_area_get_height(param)))
         {
             tabview_realign(tabview);
         }

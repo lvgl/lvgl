@@ -351,7 +351,7 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     if(sign == LV_SIGNAL_CORD_CHG) {
-        if(lv_obj_get_width(mbox) != area_get_width(param)) {
+        if(lv_obj_get_width(mbox) != lv_area_get_width(param)) {
             mbox_realign(mbox);
 
         }

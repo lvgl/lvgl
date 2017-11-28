@@ -77,8 +77,8 @@ void lv_area_set_height(lv_area_t * area_p, lv_coord_t h)
  */
 void lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y)
 {
-	lv_coord_t w = area_get_width(area_p);
-	lv_coord_t h = area_get_height(area_p);
+	lv_coord_t w = lv_area_get_width(area_p);
+	lv_coord_t h = lv_area_get_height(area_p);
 	area_p->x1 = x;
 	area_p->y1 = y;
 	lv_area_set_width(area_p, w);

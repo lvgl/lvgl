@@ -187,14 +187,14 @@ void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(union_ok == false) return;
 
     /*Go to the first pixel*/
-    lv_coord_t map_width = area_get_width(cords_p);
+    lv_coord_t map_width = lv_area_get_width(cords_p);
     map_p+= (masked_a.y1 - cords_p->y1) * map_width;
     map_p += masked_a.x1 - cords_p->x1;
 
     if(transp == false) {
         lv_coord_t row;
-        lv_coord_t mask_w = area_get_width(&masked_a) - 1;
-        for(row = 0; row < area_get_height(&masked_a); row++) {
+        lv_coord_t mask_w = lv_area_get_width(&masked_a) - 1;
+        for(row = 0; row < lv_area_get_height(&masked_a); row++) {
             lv_disp_map(masked_a.x1, masked_a.y1 + row, masked_a.x1 + mask_w, masked_a.y1 + row, map_p);
 
             map_p += map_width;
@@ -202,9 +202,9 @@ void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     }else {
         lv_color_t transp_color = LV_COLOR_TRANSP;
         lv_coord_t row;
-        for(row = 0; row < area_get_height(&masked_a); row++) {
+        for(row = 0; row < lv_area_get_height(&masked_a); row++) {
             lv_coord_t col;
-            for(col = 0; col < area_get_width(&masked_a); col ++) {
+            for(col = 0; col < lv_area_get_width(&masked_a); col ++) {
                 if(map_p[col].full != transp_color.full) {
                     lv_rpx(masked_a.x1 + col, masked_a.y1 + row, mask_p, map_p[col], opa);
                 }

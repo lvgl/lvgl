@@ -115,10 +115,10 @@ void lv_inv_area(const lv_area_t * area_p)
 
         /*Save the area*/
     	if(inv_buf_p < LV_INV_FIFO_SIZE) {
-            area_cpy(&inv_buf[inv_buf_p].area,&com_area);
+            lv_area_copy(&inv_buf[inv_buf_p].area,&com_area);
     	} else {/*If no place for the area add the screen*/
     	    inv_buf_p = 0;
-            area_cpy(&inv_buf[inv_buf_p].area,&scr_area);
+            lv_area_copy(&inv_buf[inv_buf_p].area,&scr_area);
         }
     	inv_buf_p ++;
     }
@@ -199,7 +199,7 @@ static void lv_refr_join_area(void)
             /*Join two area only if the joined area size is smaller*/
             if(lv_area_get_size(&joined_area) < 
              (lv_area_get_size(&inv_buf[join_in].area) + lv_area_get_size(&inv_buf[join_from].area))) {
-                area_cpy(&inv_buf[join_in].area, &joined_area);
+                lv_area_copy(&inv_buf[join_in].area, &joined_area);
 
                 /*Mark 'join_form' is joined into 'join_in'*/
                 inv_buf[join_from].joined = 1;
@@ -257,8 +257,8 @@ static void lv_refr_area_no_vdb(const lv_area_t * area_p)
 static void lv_refr_area_with_vdb(const lv_area_t * area_p)
 {
     /*Calculate the max row num*/
-    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (area_get_width(area_p));
-    if(max_row > area_get_height(area_p)) max_row = area_get_height(area_p);
+    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (lv_area_get_width(area_p));
+    if(max_row > lv_area_get_height(area_p)) max_row = lv_area_get_height(area_p);
     
     /*Round the row number with downscale*/
 #if LV_ANTIALIAS == 1

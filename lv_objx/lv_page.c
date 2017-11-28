@@ -352,7 +352,7 @@ static bool lv_page_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
 		lv_area_t sb_area;
 		if(ext->sb.hor_draw) {
 		    /*Convert the relative coordinates to absolute*/
-            area_cpy(&sb_area, &ext->sb.hor_area);
+            lv_area_copy(&sb_area, &ext->sb.hor_area);
 		    sb_area.x1 += scrl->coords.x1;
             sb_area.y1 += scrl->coords.y1;
             sb_area.x2 += scrl->coords.x1;
@@ -362,7 +362,7 @@ static bool lv_page_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
 
 		if(ext->sb.ver_draw) {
             /*Convert the relative coordinates to absolute*/
-            area_cpy(&sb_area, &ext->sb.ver_area);
+            lv_area_copy(&sb_area, &ext->sb.ver_area);
             sb_area.x1 += scrl->coords.x1;
             sb_area.y1 += scrl->coords.y1;
             sb_area.x2 += scrl->coords.x1;
@@ -463,8 +463,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Refresh the scrollbar and notify the scrl if the size is changed*/
-        if(ext->scrl != NULL && (lv_obj_get_width(page) != area_get_width(param) ||
-                                 lv_obj_get_height(page) != area_get_height(param)))
+        if(ext->scrl != NULL && (lv_obj_get_width(page) != lv_area_get_width(param) ||
+                                 lv_obj_get_height(page) != lv_area_get_height(param)))
         {
             /*If no hor_fit enabled set the scrollable's width to the page's width*/
             if(lv_cont_get_hor_fit(ext->scrl) == false) {
@@ -540,7 +540,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         lv_obj_get_coords(page, &page_cords);
 
         /*scrollable width smaller then page width? -> align to left*/
-        if(area_get_width(&scrl_cords) + 2 * hpad < area_get_width(&page_cords)) {
+        if(lv_area_get_width(&scrl_cords) + 2 * hpad < lv_area_get_width(&page_cords)) {
             if(scrl_cords.x1 != page_cords.x1 + hpad) {
                 new_x = hpad;
                 refr_x = true;
@@ -548,7 +548,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         } else {
             /*The edges of the scrollable can not be in the page (minus hpad) */
             if(scrl_cords.x2  < page_cords.x2 - hpad) {
-               new_x =  area_get_width(&page_cords) - area_get_width(&scrl_cords) - hpad;   /* Right align */
+               new_x =  lv_area_get_width(&page_cords) - lv_area_get_width(&scrl_cords) - hpad;   /* Right align */
                refr_x = true;
             }
             if (scrl_cords.x1 > page_cords.x1 + hpad) {
@@ -558,7 +558,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         /*scrollable height smaller then page height? -> align to left*/
-        if(area_get_height(&scrl_cords) + 2 * vpad < area_get_height(&page_cords)) {
+        if(lv_area_get_height(&scrl_cords) + 2 * vpad < lv_area_get_height(&page_cords)) {
             if(scrl_cords.y1 != page_cords.y1 + vpad) {
                 new_y = vpad;
                 refr_y = true;
@@ -566,7 +566,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         } else {
             /*The edges of the scrollable can not be in the page (minus vpad) */
             if(scrl_cords.y2 < page_cords.y2 - vpad) {
-               new_y =  area_get_height(&page_cords) - area_get_height(&scrl_cords) - vpad;   /* Bottom align */
+               new_y =  lv_area_get_height(&page_cords) - lv_area_get_height(&scrl_cords) - vpad;   /* Bottom align */
                refr_y = true;
             }
             if (scrl_cords.y1  > page_cords.y1 + vpad) {
@@ -585,7 +585,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         if(page_ext->sb.mode == LV_SB_MODE_DRAG) {
             lv_area_t sb_area_tmp;
             if(page_ext->sb.hor_draw) {
-                area_cpy(&sb_area_tmp, &page_ext->sb.hor_area);
+                lv_area_copy(&sb_area_tmp, &page_ext->sb.hor_area);
                 sb_area_tmp.x1 += page->coords.x1;
                 sb_area_tmp.y1 += page->coords.y1;
                 sb_area_tmp.x2 += page->coords.x2;
@@ -594,7 +594,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 page_ext->sb.hor_draw = 0;
             }
             if(page_ext->sb.ver_draw)  {
-                area_cpy(&sb_area_tmp, &page_ext->sb.ver_area);
+                lv_area_copy(&sb_area_tmp, &page_ext->sb.ver_area);
                 sb_area_tmp.x1 += page->coords.x1;
                 sb_area_tmp.y1 += page->coords.y1;
                 sb_area_tmp.x2 += page->coords.x2;
@@ -656,7 +656,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     /*Invalidate the current (old) scrollbar areas*/
     lv_area_t sb_area_tmp;
     if(ext->sb.hor_draw != 0) {
-        area_cpy(&sb_area_tmp, &ext->sb.hor_area);
+        lv_area_copy(&sb_area_tmp, &ext->sb.hor_area);
         sb_area_tmp.x1 += page->coords.x1;
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x2;
@@ -664,7 +664,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         lv_inv_area(&sb_area_tmp);
     }
     if(ext->sb.ver_draw != 0)  {
-        area_cpy(&sb_area_tmp, &ext->sb.ver_area);
+        lv_area_copy(&sb_area_tmp, &ext->sb.ver_area);
         sb_area_tmp.x1 += page->coords.x1;
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x2;
@@ -718,7 +718,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
 
     /*Invalidate the new scrollbar areas*/
     if(ext->sb.hor_draw != 0) {
-        area_cpy(&sb_area_tmp, &ext->sb.hor_area);
+        lv_area_copy(&sb_area_tmp, &ext->sb.hor_area);
         sb_area_tmp.x1 += page->coords.x1;
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x2;
@@ -726,7 +726,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         lv_inv_area(&sb_area_tmp);
     }
     if(ext->sb.ver_draw != 0)  {
-        area_cpy(&sb_area_tmp, &ext->sb.ver_area);
+        lv_area_copy(&sb_area_tmp, &ext->sb.ver_area);
         sb_area_tmp.x1 += page->coords.x1;
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x2;

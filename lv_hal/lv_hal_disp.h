@@ -32,9 +32,10 @@ extern "C" {
  * Display Driver structure to be registered by HAL
  */
 typedef struct _disp_drv_t {
-    void (*fill_fp)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color);
-    void (*map_fp)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
-    void (*blend_fp)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+    void (*disp_fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color);
+    void (*disp_map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
+    void (*mem_blend)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+    void (*mem_fill)(lv_color_t * dest, uint32_t length, lv_color_t color);
 } lv_disp_drv_t;
 
 typedef struct _disp_t {
@@ -102,20 +103,35 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t col
 void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_map);
 
 /**
- * Copy pixels to a destination memory applying opacity
- * In 'lv_disp_drv_t' 'copy' is optional. (NULL to use the built-in copy function)
+ * Blend pixels to a destination memory from a source memory
+ * In 'lv_disp_drv_t' 'mem_blend' is optional. (NULL if not available)
+ * @param dest a memory address. Blend 'src' here.
+ * @param src pointer to pixel map. Blend it to 'dest'.
+ * @param length number of pixels in 'src'
+ * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
+ */
+void lv_disp_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+
+/**
+ * Fill a memory with a color (GPUs may support it)
+ * In 'lv_disp_drv_t' 'mem_fill' is optional. (NULL if not available)
  * @param dest a memory address. Copy 'src' here.
  * @param src pointer to pixel map. Copy it to 'dest'.
  * @param length number of pixels in 'src'
  * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
  */
-void lv_disp_copy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+void lv_disp_mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color);
+/**
+ * Shows if memory blending (by GPU) is supported or not
+ * @return false: 'mem_blend' is not supported in the driver; true: 'mem_blend' is supported in the driver
+ */
+bool lv_disp_is_mem_blend_supported(void);
 
 /**
- * Shows if 'copy' is supported or not
- * @return false: 'copy' is not supported in the drover; true: 'copy' is supported in the driver
+ * Shows if memory fill (by GPU) is supported or not
+ * @return false: 'mem_fill' is not supported in the drover; true: 'mem_fill' is supported in the driver
  */
-bool lv_disp_is_copy_supported(void);
+bool lv_disp_is_mem_fill_supported(void);
 
 /**********************
  *      MACROS

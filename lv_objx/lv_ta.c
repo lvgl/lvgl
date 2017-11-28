@@ -915,8 +915,8 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {
-            if(lv_obj_get_width(ta) != area_get_width(param) ||
-              lv_obj_get_height(ta) != area_get_height(param)) {
+            if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
+              lv_obj_get_height(ta) != lv_area_get_height(param)) {
                 lv_obj_t * scrl = lv_page_get_scrl(ta);
                 lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);

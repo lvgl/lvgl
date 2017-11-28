@@ -26,6 +26,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define VFILL_HW_ACC_WIDTH_LIMIT    50      /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
 
 /**********************
  *      TYPEDEFS
@@ -34,7 +35,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void sw_color_cpy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa);
 
 /**********************
@@ -68,7 +69,7 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
         return;
     }
 
-    uint32_t vdb_width = area_get_width(&vdb_p->area);
+    uint32_t vdb_width = lv_area_get_width(&vdb_p->area);
 
     /*Make the coordinates relative to VDB*/
     x-=vdb_p->area.x1;
@@ -94,6 +95,10 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p, 
                           lv_color_t color, lv_opa_t opa)
 {
+    /*Used to store color maps for blending*/
+    static lv_color_t color_map[LV_HOR_RES];
+    static lv_coord_t last_width = 0;
+
     lv_area_t res_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
@@ -113,28 +118,65 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     vdb_rel_a.y2 = res_a.y2 - vdb_p->area.y1;
 
     lv_color_t * vdb_buf_tmp = vdb_p->buf;
-    uint32_t vdb_width = area_get_width(&vdb_p->area);
+    uint32_t vdb_width = lv_area_get_width(&vdb_p->area);
     /*Move the vdb_tmp to the first row*/
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
-    if(lv_disp_is_copy_supported() == false) {
+
+    lv_coord_t w = lv_area_get_width(&vdb_rel_a);
+    if(w < VFILL_HW_ACC_WIDTH_LIMIT) {  /*Don't use hw. acc. for every small fill (because of the init overhead)*/
         sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
-    } else {
-        static lv_color_t color_map[LV_HOR_RES];
-        static lv_coord_t last_width = 0;
-        lv_coord_t map_width = area_get_width(&vdb_rel_a);
-        if(color_map[0].full != color.full || last_width != map_width) {
-            uint16_t i;
-            for(i = 0; i < map_width; i++) {
-                color_map[i].full = color.full;
+    } else if(opa == LV_OPA_COVER) {
+        /*Use hw fill if present*/
+        if(lv_disp_is_mem_fill_supported()) {
+            lv_coord_t row;
+            for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+                lv_disp_mem_fill(&vdb_buf_tmp[vdb_rel_a.x1], w, color);
+                vdb_buf_tmp += vdb_width;
+            }
+        }
+        /*Use hw blend if present and the area is not too small*/
+        else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_WIDTH_LIMIT &&
+                lv_disp_is_mem_blend_supported())
+        {
+            if(color_map[0].full != color.full || last_width != w) {
+                uint16_t i;
+                for(i = 0; i < w; i++) {
+                    color_map[i].full = color.full;
+                }
+                last_width = w;
+            }
+            lv_coord_t row;
+            for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_map, w, opa);
+                vdb_buf_tmp += vdb_width;
             }
 
-            last_width = map_width;
         }
-        lv_coord_t row;
-        for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
-            lv_disp_copy(&vdb_buf_tmp[vdb_rel_a.x1], color_map, map_width, opa);
-            vdb_buf_tmp += vdb_width;
+        /*Else use sw fill if no better option*/
+        else {
+            sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
+        }
+    }
+    /*Opacity*/
+    else
+    {
+        if(lv_disp_is_mem_blend_supported() == false) {
+            sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
+        } else {
+            if(color_map[0].full != color.full || last_width != w) {
+                uint16_t i;
+                for(i = 0; i < w; i++) {
+                    color_map[i].full = color.full;
+                }
+
+                last_width = w;
+            }
+            lv_coord_t row;
+            for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_map, w, opa);
+                vdb_buf_tmp += vdb_width;
+            }
         }
     }
 }
@@ -166,7 +208,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
        pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
-    lv_coord_t vdb_width = area_get_width(&vdb_p->area);
+    lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
     lv_color_t * vdb_buf_tmp = vdb_p->buf;
     lv_coord_t col, row;
     uint8_t col_bit;
@@ -295,7 +337,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(upscale != false) ds_shift = 1;
 
     /*If the map starts OUT of the masked area then calc. the first pixel*/
-    lv_coord_t map_width = area_get_width(cords_p) >> ds_shift;
+    lv_coord_t map_width = lv_area_get_width(cords_p) >> ds_shift;
     if(cords_p->y1 < masked_a.y1) {
         map_p += (uint32_t) map_width * ((masked_a.y1 - cords_p->y1) >> ds_shift);
     }
@@ -309,7 +351,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     masked_a.x2 = masked_a.x2 - vdb_p->area.x1;
     masked_a.y2 = masked_a.y2 - vdb_p->area.y1;
 
-    lv_coord_t vdb_width = area_get_width(&vdb_p->area);
+    lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
     lv_color_t * vdb_buf_tmp = vdb_p->buf;
     vdb_buf_tmp += (uint32_t) vdb_width * masked_a.y1; /*Move to the first row*/
 
@@ -319,13 +361,13 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(upscale == false) {
         if(transp == false) { /*Simply copy the pixels to the VDB*/
             lv_coord_t row;
-            lv_coord_t map_useful_w = area_get_width(&masked_a);
+            lv_coord_t map_useful_w = lv_area_get_width(&masked_a);
 
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
-                if(lv_disp_is_copy_supported() == false) {
-                    sw_color_cpy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+                if(lv_disp_is_mem_blend_supported() == false) {
+                    sw_mem_blend(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
                 } else {
-                    lv_disp_copy(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+                    lv_disp_mem_blend(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
                 }
                 map_p += map_width;               /*Next row on the map*/
                 vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
@@ -463,13 +505,13 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
  **********************/
 
 /**
- * Copy pixels to destination memory using opacity
+ * Blend pixels to destination memory using opacity
  * @param dest a memory address. Copy 'src' here.
  * @param src pointer to pixel map. Copy it to 'dest'.
  * @param length number of pixels in 'src'
  * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
  */
-static void sw_color_cpy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
+static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
 {
     if(opa == LV_OPA_COVER) {
         memcpy(dest, src, length * sizeof(lv_color_t));
@@ -494,7 +536,7 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
     /*Set all row in vdb to the given color*/
     lv_coord_t row;
     uint32_t col;
-    lv_coord_t mem_width = area_get_width(mem_area);
+    lv_coord_t mem_width = lv_area_get_width(mem_area);
 
     /*Run simpler function without opacity*/
     if(opa == LV_OPA_COVER) {
@@ -502,6 +544,7 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
         for(col = fill_area->x1; col <= fill_area->x2; col++) {
             mem[col] = color;
         }
+
         /*Copy the first row to all other rows*/
         lv_color_t * mem_first = &mem[fill_area->x1];
         lv_coord_t copy_size =  (fill_area->x2 - fill_area->x1 + 1) * sizeof(lv_color_t);

@@ -479,7 +479,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CORD_CHG) {
         /*Be sure the width of the buttons are correct*/
         lv_coord_t w = lv_obj_get_width(list);
-        if(w != area_get_width(param)) {   /*Width changed*/
+        if(w != lv_area_get_width(param)) {   /*Width changed*/
            refr_btn_width(list);
         }
     }

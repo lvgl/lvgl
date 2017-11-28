@@ -262,8 +262,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         refr_position(roller, false);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
 
-        if(lv_obj_get_width(roller) != area_get_width(param) ||
-           lv_obj_get_height(roller) != area_get_height(param)) {
+        if(lv_obj_get_width(roller) != lv_area_get_width(param) ||
+           lv_obj_get_height(roller) != lv_area_get_height(param)) {
 
             lv_ddlist_set_fix_height(roller, lv_obj_get_height(roller));
             lv_obj_set_height(lv_page_get_scrl(roller),
@@ -363,7 +363,7 @@ static void draw_bg(lv_obj_t *roller, const lv_area_t *mask)
     lv_area_t half_roller;
     lv_coord_t h = lv_obj_get_height(roller);
     bool union_ok;
-    area_cpy(&half_roller, &roller->coords);
+    lv_area_copy(&half_roller, &roller->coords);
 
     half_roller.x1 -= roller->ext_size; /*Add ext size too (e.g. because of shadow draw) */
     half_roller.x2 += roller->ext_size;

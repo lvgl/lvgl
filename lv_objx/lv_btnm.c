@@ -400,14 +400,14 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             /*Skip hidden buttons*/
             if(button_is_hidden(ext->map_p[txt_i])) continue;
 
-			area_cpy(&area_tmp, &ext->button_areas[btn_i]);
+			lv_area_copy(&area_tmp, &ext->button_areas[btn_i]);
 			area_tmp.x1 += area_btnm.x1;
 			area_tmp.y1 += area_btnm.y1;
 			area_tmp.x2 += area_btnm.x1;
 			area_tmp.y2 += area_btnm.y1;
 
-			btn_w = area_get_width(&area_tmp);
-			btn_h = area_get_height(&area_tmp);
+			btn_w = lv_area_get_width(&area_tmp);
+			btn_h = lv_area_get_height(&area_tmp);
 
 			/*Load the style*/
 			if(button_is_inactive(ext->map_p[txt_i])) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_INA);
@@ -437,7 +437,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 			lv_point_t txt_size;
 			lv_txt_get_size(&txt_size, ext->map_p[txt_i], font,
 			             btn_style->text.letter_space, btn_style->text.line_space,
-					     area_get_width(&area_btnm), LV_TXT_FLAG_NONE);
+					     lv_area_get_width(&area_btnm), LV_TXT_FLAG_NONE);
 
 			area_tmp.x1 += (btn_w - txt_size.x) / 2;
 			area_tmp.y1 += (btn_h - txt_size.y) / 2;
@@ -487,7 +487,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         if(btn_pr != ext->btn_id_pr) {
             lv_indev_reset_lpr(param);
             if(ext->btn_id_pr != LV_BTNM_PR_NONE) {
-                area_cpy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
+                lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
                 btn_area.x1 += btnm_area.x1;
                 btn_area.y1 += btnm_area.y1;
                 btn_area.x2 += btnm_area.x1;
@@ -495,7 +495,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 lv_inv_area(&btn_area);
             }
             if(btn_pr != LV_BTNM_PR_NONE) {
-                area_cpy(&btn_area, &ext->button_areas[btn_pr]);
+                lv_area_copy(&btn_area, &ext->button_areas[btn_pr]);
                 btn_area.x1 += btnm_area.x1;
                 btn_area.y1 += btnm_area.y1;
                 btn_area.x2 += btnm_area.x1;
@@ -529,7 +529,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             /*Invalidate to old pressed area*/;
             lv_obj_get_coords(btnm, &btnm_area);
-            area_cpy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
+            lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
             btn_area.x1 += btnm_area.x1;
             btn_area.y1 += btnm_area.y1;
             btn_area.x2 += btnm_area.x1;
@@ -538,7 +538,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             if(ext->toggle != 0) {
                 /*Invalidate to old toggled area*/;
-                area_cpy(&btn_area, &ext->button_areas[ext->btn_id_tgl]);
+                lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_tgl]);
                 btn_area.x1 += btnm_area.x1;
                 btn_area.y1 += btnm_area.y1;
                 btn_area.x2 += btnm_area.x1;
@@ -682,7 +682,7 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
     lv_obj_get_coords(btnm, &btnm_cords);
 
     for(i = 0; i < ext->btn_cnt; i++) {
-        area_cpy(&btn_area, &ext->button_areas[i]);
+        lv_area_copy(&btn_area, &ext->button_areas[i]);
         btn_area.x1 += btnm_cords.x1;
         btn_area.y1 += btnm_cords.y1;
         btn_area.x2 += btnm_cords.x1;

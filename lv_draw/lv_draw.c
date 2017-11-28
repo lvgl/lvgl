@@ -92,7 +92,7 @@ static void (*map_fp)(const lv_area_t * coords, const lv_area_t * mask, const lv
  */
 void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
 {
-    if(area_get_height(coords) < 1 || area_get_width(coords) < 1) return;
+    if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 
 #if LV_NO_SHADOW == 0
     if(style->body.shadow.width != 0) {
@@ -241,7 +241,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
     lv_coord_t w;
 
     if((flag & LV_TXT_FLAG_EXPAND) == 0) {
-        w = area_get_width(coords);
+        w = lv_area_get_width(coords);
     } else {
         lv_point_t p;
         lv_txt_get_size(&p, txt, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, flag);
@@ -367,7 +367,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
             /*If the width is greater then real img. width then it is upscaled */
             bool upscale = false;
-            if(area_get_width(coords) > header.w) upscale = true;
+            if(lv_area_get_width(coords) > header.w) upscale = true;
 
             lv_area_t mask_com;    /*Common area of mask and cords*/
             bool union_ok;
@@ -408,16 +408,16 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                 /* Move the file pointer to the start address according to mask
                  * But take care, the upscaled maps look greater*/
                 uint32_t start_offset = sizeof(lv_img_raw_header_t);
-                start_offset += (area_get_width(coords) >> us_shift) *
+                start_offset += (lv_area_get_width(coords) >> us_shift) *
                                ((mask_com.y1 - coords->y1) >> us_shift) * sizeof(lv_color_t); /*First row*/
                 start_offset += ((mask_com.x1 - coords->x1) >> us_shift) * sizeof(lv_color_t); /*First col*/
                 lv_fs_seek(&file, start_offset);
 
-                uint32_t useful_data = (area_get_width(&mask_com) >> us_shift) * sizeof(lv_color_t);
-                uint32_t next_row = (area_get_width(coords) >> us_shift) * sizeof(lv_color_t) - useful_data;
+                uint32_t useful_data = (lv_area_get_width(&mask_com) >> us_shift) * sizeof(lv_color_t);
+                uint32_t next_row = (lv_area_get_width(coords) >> us_shift) * sizeof(lv_color_t) - useful_data;
 
                 lv_area_t line;
-                area_cpy(&line, &mask_com);
+                lv_area_copy(&line, &mask_com);
                 lv_area_set_height(&line, us_val); /*Create a line area. Hold 2 pixels if upscaled*/
 
                 lv_coord_t row;
@@ -594,8 +594,8 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
     lv_color_t gcolor = style->body.grad_color;
     uint8_t mix;
     lv_opa_t opa = style->body.opa;
-    lv_coord_t height = area_get_height(coords);
-    lv_coord_t width = area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
@@ -645,8 +645,8 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
     lv_color_t act_color;
     lv_opa_t opa = style->body.opa;
     uint8_t mix;
-    lv_coord_t height = area_get_height(coords);
-    lv_coord_t width = area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
@@ -841,8 +841,8 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
 {
     uint16_t radius = style->body.radius;
 
-    lv_coord_t width = area_get_width(coords);
-    lv_coord_t height = area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
     uint16_t bwidth = style->body.border.width;
     lv_opa_t opa = style->body.border.opa;
     lv_border_part_t part = style->body.border.part;
@@ -1004,8 +1004,8 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     /*0 px border width drawn as 1 px, so decrement the bwidth*/
     bwidth--;
 
-    lv_coord_t width = area_get_width(coords);
-    lv_coord_t height = area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
@@ -1141,19 +1141,19 @@ static void lv_draw_rect_shadow(const lv_area_t * coords, const lv_area_t * mask
 {
     /* If mask is in the middle of cords do not draw shadow*/
     lv_coord_t radius = style->body.radius;
-    lv_coord_t width = area_get_width(coords);
-    lv_coord_t height = area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
     radius = lv_draw_cont_radius_corr(radius, width, height);
     lv_area_t area_tmp;
 
     /*Check horizontally without radius*/
-    area_cpy(&area_tmp, coords);
+    lv_area_copy(&area_tmp, coords);
     area_tmp.x1 += radius;
     area_tmp.x2 -= radius;
     if(lv_area_is_in(mask, &area_tmp) != false) return;
 
     /*Check vertically without radius*/
-    area_cpy(&area_tmp, coords);
+    lv_area_copy(&area_tmp, coords);
     area_tmp.y1 += radius;
     area_tmp.y2 -= radius;
     if(lv_area_is_in(mask, &area_tmp) != false) return;
@@ -1169,8 +1169,8 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
 {
     lv_coord_t radius = style->body.radius;
 
-    lv_coord_t width = area_get_width(coords);
-    lv_coord_t height = area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
@@ -1310,8 +1310,8 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
 {
     lv_coord_t radius = style->body.radius;
 
-    lv_coord_t width = area_get_width(coords);
-    lv_coord_t height = area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
@@ -1382,8 +1382,8 @@ static void lv_draw_cont_shadow_full_straight(const lv_area_t * coords, const lv
 
     lv_coord_t radius = style->body.radius;
 
-    lv_coord_t width = area_get_width(coords);
-    lv_coord_t height = area_get_height(coords);
+    lv_coord_t width = lv_area_get_width(coords);
+    lv_coord_t height = lv_area_get_height(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 

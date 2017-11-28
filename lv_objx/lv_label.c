@@ -685,8 +685,8 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
             lv_label_refr_text(label);
     }
     else if (sign == LV_SIGNAL_CORD_CHG) {
-        if(area_get_width(&label->coords) != area_get_width(param) ||
-           area_get_height(&label->coords) != area_get_height(param))
+        if(lv_area_get_width(&label->coords) != lv_area_get_width(param) ||
+           lv_area_get_height(&label->coords) != lv_area_get_height(param))
         {
             lv_label_revert_dots(label);
             lv_label_refr_text(label);

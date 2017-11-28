@@ -201,8 +201,8 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
         lv_cont_refr_layout(cont);
         lv_cont_refr_autofit(cont);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
-        if(lv_obj_get_width(cont) != area_get_width(param) ||
-           lv_obj_get_height(cont) != area_get_height(param)) {
+        if(lv_obj_get_width(cont) != lv_area_get_width(param) ||
+           lv_obj_get_height(cont) != lv_area_get_height(param)) {
             lv_cont_refr_layout(cont);
             lv_cont_refr_autofit(cont);
         }
@@ -582,7 +582,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
            cont->coords.y2 != new_cords.y2) {
 
             lv_obj_invalidate(cont);
-            area_cpy(&cont->coords, &new_cords);
+            lv_area_copy(&cont->coords, &new_cords);
             lv_obj_invalidate(cont);
 
             /*Notify the object about its new coordinates*/

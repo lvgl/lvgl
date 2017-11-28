@@ -243,15 +243,15 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         /*Draw the bar*/
         lv_area_t area_bar;
-        area_cpy(&area_bar, &slider->coords);
+        lv_area_copy(&area_bar, &slider->coords);
         /*Be sure at least vpad/hpad width bar will remain*/
        lv_coord_t pad_ver_bar = style_slider->body.padding.ver;
        lv_coord_t pad_hor_bar = style_slider->body.padding.hor;
-       if(pad_ver_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
-           pad_ver_bar = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+       if(pad_ver_bar * 2 + LV_SLIDER_SIZE_MIN > lv_area_get_height(&area_bar)) {
+           pad_ver_bar = (lv_area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
        }
-       if(pad_hor_bar * 2 + LV_SLIDER_SIZE_MIN > area_get_width(&area_bar)) {
-           pad_hor_bar = (area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+       if(pad_hor_bar * 2 + LV_SLIDER_SIZE_MIN > lv_area_get_width(&area_bar)) {
+           pad_hor_bar = (lv_area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
        }
 
         area_bar.x1 += pad_hor_bar;
@@ -262,16 +262,16 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         /*Draw the indicator*/
         lv_area_t area_indic;
-        area_cpy(&area_indic, &area_bar);
+        lv_area_copy(&area_indic, &area_bar);
 
         /*Be sure at least vpad/hpad width indicator will remain*/
         lv_coord_t pad_ver_indic = style_indic->body.padding.ver;
         lv_coord_t pad_hor_indic = style_indic->body.padding.hor;
-        if(pad_ver_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_height(&area_bar)) {
-            pad_ver_indic = (area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+        if(pad_ver_indic * 2 + LV_SLIDER_SIZE_MIN > lv_area_get_height(&area_bar)) {
+            pad_ver_indic = (lv_area_get_height(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
         }
-        if(pad_hor_indic * 2 + LV_SLIDER_SIZE_MIN > area_get_width(&area_bar)) {
-            pad_hor_indic = (area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
+        if(pad_hor_indic * 2 + LV_SLIDER_SIZE_MIN > lv_area_get_width(&area_bar)) {
+            pad_hor_indic = (lv_area_get_width(&area_bar) - LV_SLIDER_SIZE_MIN) >> 1;
         }
 
         area_indic.x1 += pad_hor_indic;
@@ -279,8 +279,8 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         area_indic.y1 += pad_ver_indic;
         area_indic.y2 -= pad_ver_indic;
 
-        lv_coord_t slider_w = area_get_width(&slider->coords);
-        lv_coord_t slider_h = area_get_height(&slider->coords);
+        lv_coord_t slider_w = lv_area_get_width(&slider->coords);
+        lv_coord_t slider_h = lv_area_get_height(&slider->coords);
 
         lv_coord_t cur_value = lv_slider_get_value(slider);
         lv_coord_t min_value = lv_slider_get_min_value(slider);
@@ -290,11 +290,11 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
 
         if(slider_w >= slider_h) {
-            area_indic.x2 = (int32_t) ((int32_t)area_get_width(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
+            area_indic.x2 = (int32_t) ((int32_t)lv_area_get_width(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
             area_indic.x2 += area_indic.x1;
 
         } else {
-            area_indic.y1 = (int32_t) ((int32_t)area_get_height(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
+            area_indic.y1 = (int32_t) ((int32_t)lv_area_get_height(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
             area_indic.y1 = area_indic.y2 - area_indic.y1;
         }
 
@@ -302,7 +302,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         /*Draw the knob*/
         lv_area_t knob_area;
-        area_cpy(&knob_area, &slider->coords);
+        lv_area_copy(&knob_area, &slider->coords);
 
         if(slider_w >= slider_h) {
             if(ext->knob_in == 0) {
@@ -395,8 +395,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     else if(sign == LV_SIGNAL_CORD_CHG) {
         /* The knob size depends on slider size.
          * During the drawing method the ext. size is used by the knob so refresh the ext. size.*/
-        if(lv_obj_get_width(slider) != area_get_width(param) ||
-          lv_obj_get_height(slider) != area_get_height(param)) {
+        if(lv_obj_get_width(slider) != lv_area_get_width(param) ||
+          lv_obj_get_height(slider) != lv_area_get_height(param)) {
             slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {

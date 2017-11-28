@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_mem.h"
+#include "../lv_obj/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -48,9 +49,10 @@ static lv_disp_t *active;
  */
 void lv_disp_drv_init(lv_disp_drv_t *driver)
 {
-    driver->fill_fp = NULL;
-    driver->map_fp = NULL;
-    driver->blend_fp = NULL;
+    driver->disp_fill = NULL;
+    driver->disp_map = NULL;
+    driver->mem_blend = NULL;
+    driver->mem_fill = NULL;
 }
 
 /**
@@ -73,6 +75,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t *driver)
     if (disp_list == NULL) {
         disp_list = node;
         active = node;
+        lv_obj_invalidate(lv_scr_act());
     } else {
         node->next = disp_list;
     }
@@ -88,6 +91,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t *driver)
 void lv_disp_set_active(lv_disp_t * disp)
 {
     active = disp;
+    lv_obj_invalidate(lv_scr_act());
 }
 
 /**
@@ -125,7 +129,7 @@ lv_disp_t * lv_disp_next(lv_disp_t * disp)
 void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color)
 {
     if(active == NULL) return;
-    if(active->driver.fill_fp != NULL) active->driver.fill_fp(x1, y1, x2, y2, color);
+    if(active->driver.disp_fill != NULL) active->driver.disp_fill(x1, y1, x2, y2, color);
 }
 
 /**
@@ -139,31 +143,54 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t col
 void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_map)
 {
     if(active == NULL) return;
-    if(active->driver.map_fp != NULL)  active->driver.map_fp(x1, y1, x2, y2, color_map);
+    if(active->driver.disp_map != NULL)  active->driver.disp_map(x1, y1, x2, y2, color_map);
 }
 
+/**
+ * Blend pixels to a destination memory from a source memory
+ * In 'lv_disp_drv_t' 'mem_blend' is optional. (NULL if not available)
+ * @param dest a memory address. Blend 'src' here.
+ * @param src pointer to pixel map. Blend it to 'dest'.
+ * @param length number of pixels in 'src'
+ * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
+ */
+void lv_disp_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
+{
+    if(active == NULL) return;
+    if(active->driver.mem_blend != NULL) active->driver.mem_blend(dest, src, length, opa);
+}
 
 /**
- * Copy pixels to a destination memory applying opacity
- * In 'lv_disp_drv_t' 'copy' is optional. (NULL to use the built-in copy function)
+ * Fill a memory with a color (GPUs may support it)
+ * In 'lv_disp_drv_t' 'mem_fill' is optional. (NULL if not available)
  * @param dest a memory address. Copy 'src' here.
  * @param src pointer to pixel map. Copy it to 'dest'.
  * @param length number of pixels in 'src'
  * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
  */
-void lv_disp_copy(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
+void lv_disp_mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color)
 {
     if(active == NULL) return;
-    if(active->driver.blend_fp != NULL) active->driver.blend_fp(dest, src, length, opa);
+    if(active->driver.mem_fill != NULL) active->driver.mem_fill(dest, length, color);
 }
 
 /**
- * Shows if 'copy' is supported or not
- * @return false: 'copy' is not supported in the drover; true: 'copy' is supported in the driver
+ * Shows if memory blending (by GPU) is supported or not
+ * @return false: 'mem_blend' is not supported in the driver; true: 'mem_blend' is supported in the driver
  */
-bool lv_disp_is_copy_supported(void)
+bool lv_disp_is_mem_blend_supported(void)
 {
-    if(active->driver.blend_fp) return true;
+    if(active->driver.mem_blend) return true;
+    else return false;
+}
+
+/**
+ * Shows if memory fill (by GPU) is supported or not
+ * @return false: 'mem_fill' is not supported in the drover; true: 'mem_fill' is supported in the driver
+ */
+bool lv_disp_is_mem_fill_supported(void)
+{
+    if(active->driver.mem_fill) return true;
     else return false;
 }
 

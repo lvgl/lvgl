@@ -443,8 +443,8 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_CORD_CHG) {
         /*If the size is changed refresh the window*/
-        if(area_get_width(param) != lv_obj_get_width(win) ||
-           area_get_height(param) != lv_obj_get_height(win)) {
+        if(lv_area_get_width(param) != lv_obj_get_width(win) ||
+           lv_area_get_height(param) != lv_obj_get_height(win)) {
             lv_win_realign(win);
         }
     }

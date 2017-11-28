@@ -111,7 +111,7 @@ void lv_vdb_flush(void)
 	 * */
 	lv_coord_t x;
 	lv_coord_t y;
-	lv_coord_t w = area_get_width(&vdb_act->area);
+	lv_coord_t w = lv_area_get_width(&vdb_act->area);
 	lv_color_t * in1_buf = vdb_act->buf;      /*Pointer to the first row*/
     lv_color_t * in2_buf = vdb_act->buf + w;  /*Pointer to the second row*/
     lv_color_t * out_buf = vdb_act->buf;      /*Store the result here*/
