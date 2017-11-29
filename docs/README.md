@@ -1,4 +1,4 @@
-# LittleV Graphics Libraray
+# Littlev Graphics Libraray
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
@@ -86,11 +86,15 @@ bool my_input_read(lv_indev_data_t *data) {
     data->point.x = touchpad_x;
     data->point.y = touchpad_y;
     data->state = LV_INDEV_EVENT_PR or LV_INDEV_EVENT_REL;
-
     return false;  /*No buffering so no more data read*/
 ```
 
 #### Keypad or keyboard
+
+`
+indev_drv.type = LV_INDEV_TYPE_KEYPAD;
+indev_drv.read_fp = my_input_read; 
+`
 
 The read function should look like this:
 ```c
@@ -107,15 +111,21 @@ bool keyboard_read(lv_indev_data_t *data) {
 }
 ```
 
+To use a keyboard:
+ * `LV_OBJ_GROUP` has to be enabled in lv_conf.h 
+ * An object goup has to be craeted: `lv_group_create()` and object has to be added: `lv_group_add_obj()`  
+ * The create group has to be assigned to the input device: `lv_indev_set_group(my_indev, group1);` 
+ * Use `LV_GROUP_KEY_...` to navigate among the objects in the group
+ 
 ## Project set-up
 1. Clone or download the lvgl repository: `git clone https://github.com/littlevgl/lvgl.git`
 2. Create project with your prefered IDE and add the lvgl folder
-3. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** next to the lvgl folder
+3. Copy *lvgl/lv_conf_templ.h* as *lv_conf.h* next to the lvgl folder
 4. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
 5. In your *main.c*: #include "lvgl/lvgl.h"   
 6. In your *main function*:
    * lvgl_init();
-   * tick, display and input device initialization (se above)
+   * tick, display and input device initialization (see above)
 10. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
 11. In the main *while(1)* call `lv_task_handler();` and make a few milliseconds delay (e.g. `my_delay_ms(5);`) 
 12. Compile the code and load it to your embedded hardware
