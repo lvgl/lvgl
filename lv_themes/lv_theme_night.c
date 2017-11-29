@@ -458,7 +458,7 @@ static void list_init(void)
     list_btn_pr.body.border.color = lv_color_hsv_to_rgb(_hue, 10, 5);
     list_btn_pr.body.border.width = 0;
     list_btn_pr.body.radius = LV_DPI / 30;
-    list_btn_pr.body.padding.ver = LV_DPI / 6;
+    list_btn_pr.body.padding.ver = LV_DPI / 8;
     list_btn_pr.body.padding.hor = LV_DPI / 8;
     list_btn_pr.text.color = lv_color_hsv_to_rgb(_hue, 5, 80);
 
