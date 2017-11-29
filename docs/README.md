@@ -2,76 +2,114 @@
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-LittlevGL is a graphics library to create Graphical User Interfaces (GUI) on TFT, LCD or monochrome displays for microcontroller based embedded systems.
-
-Transparency, anti-aliassing and smooth animations can be used with no double buffering so typically no external memories are required. Layouts, scrolling, word-wrapping, layers and other features make your job easier. 
-
-The graphics library is written in C and it is completely hardware independent. You can even run it in a PC simulator without any embedded hardware.
+Littlev Graphics Library provides everithing you need to add graphical user interface to your embedded stytem which meets the requirements in the 21th century.
 
 Homepage: http://gl.littlev.hu
 
 ## Key features
-* Hardware independent, support any modern microcontroller
-* High resolution TFTs, monochrome or any type of display supported (24/16/8/1 bit color depth)
-* External RAM, FPU or GPU not required just optional
-* Build GUI from simple graphical objects
-  * Buttons, Labels, Images
-  * Charts, Lists, Bars, Sliders, Text areas etc.
-* Create or delete graphical object dynamically in run time   
-* High level graphical features without double buffering
-  * Antialiassing (font or full screen)
-  * Animations
-  * Transparency
-  * Gradient colors
-  * Smooth dragging and scrolling
-* Built-in features
-  * Layouts (to auto-arrange items)
-  * Scrolling
-  * Auto-size (aligned to the content)
-  * Word wrapping
-  * Layers
-* Customizable appearance with styles
-* Applications for complex tasks
-* Can run in a PC simulator
-* Modular and well-structured source code
-* Actively developed
+- Everithing you need to build a GUI (buttons, charts, list, images etc)
+- Animations, opacity, smooth scrolling, anti aliasing to impress your cutomers
+- Multi language support with UTF-8 support
+- Fully customizable appearance
+- Scalable to operate with a few memory (80 kB flash, 10 kB RAM)
+- Hardware independent to use with any MCU or display (TFT, LCD, monochrome)
+- Touchpad, mouse, keyboard and external button support 
+- Only a sinlge frame buffer required in internal RAM or in an external display conroller 
+- OS, External memory or GPU suppoted but not required  
+- Written in C for maximal compability
+- PC simulator to develop without embedded hardware
+- Tutorials, code exampes, style themes for rapid development
+- Clear online documentation
+- Advanced support, and professional GUI development service
+- Free and open source
 
 ## Porting
-The following functions has to be provided
-* hal/disp `disp_fill(x1, y1, x2, y2, color)` to fill area with a color
-* hal/disp `disp_map(x1, y1, x2, y2, &color_array)` copy a color map to an area
-* hal/disp `disp_color_cpy(dest, src, length, opa)` copy pixel, optional for GPU
-* hal/indev `indev_get(id, &x, &y)` get the *x* and *y* coordinates from an input device (e.g. touch pad)
-* hal/systick `systick_get()` get a system tick with 1 ms resolution
-* hal/systick `systick_elapse(prev_time)` get the elapsed milliseconds sience *prev_time*
+### Tick interface
+The LittlevGL uses a system tick. Your only task is to call `lv_tick_handler()` in every milliseconds in an interrupt.
 
-See the [example HAL](https://github.com/littlevgl/hal) repository!
+### Display interface
+To set up a diplay an 'lv_disp_drv_t' variable has to be initialized:
+```c
+lv_disp_drv_t disp_drv;
+lv_disp_drv_init(&disp_drv);           /*Basic initialization*/
+disp_drv. ... = ...                    /*Initilaize the field here. See below.*/
+disp_drv_register(&disp_drv);
+```
 
-## Requirements
-* [Misc. library](https://github.com/littlevgl/misc) is used by the graphics library
+#### Using internal buffering (VDB)
+The graphics library works with an internal buffering mechanism to to create advances graphics features with only one frame buffer. The inter buffer is called VDB (Virtual Display Buffer) in its size can be adjusted in lv_conf.h.
+When `LV_VDB_SIZE` not zero then the internal buffering is used and you have to provide a function which flushes the buffers content to the display:
+`disp_drv.disp_flush = my_disp_flush;`
+
+In the flush function you can use DMA or any hardware to do the flushing in the background, but when the flushing is ready you **have to call `lv_flush_ready()`**
+
+#### Using harware acceleration (GPU)
+The `mem_blend` and `mem_fill` field of a display driver is used to interface with a GPU. 
+`disp_drv.mem_blend = my_mem_blend;  /*blends two color arrays using opacity*/` 
+`disp_drv.mem_fill = my_mem_fill;    /*fills an array with a color*/` 
+
+The GPU related functions can be used only if internal buffering (VDB) is enabled
+
+#### Unbuffered drawing
+It is possible to draw directly to a framebuffer via two functions:
+`disp_drv.disp_fill = my_mem_blend;  /*fill an area in the frame buffer*/` 
+`disp_drv.disp_map = my_mem_fill;    /*copy a color_map (e.g. image) into the framebuffer*/` 
+
+### Input device interface
+To set up an input device an 'lv_indev_drv_t' variable has to be initialized:
+```c    
+lv_indev_drv_t indev_drv;
+lv_indev_drv_init(&indev_drv);     /*Basic initialization*/
+indev_drv.type = ...               /*See below.*/
+indev_drv.read_fp = ...            /*See below.*/
+lv_indev_register(&indev_drv);
+```
+The `type` can be `LV_INDEV_TYPE_POINTER` (e.g touchpad) or `LV_INDEV_TYPE_KEYPAD` (e.g. keyboard)
+`read_fp` is a function pointer which will be called periodically to report the current state of an input device. It can also buffer data and return `false` when no more data te read ot `true` is the buffer is not empty.
+
+#### Touchpad, mouse or any pointer
+`
+indev_drv.type = LV_INDEV_TYPE_POINTER;
+indev_drv.read_fp = my_input_read; 
+`
+The read function should look like this:
+```c
+bool my_input_read(lv_indev_data_t *data) {
+    data->point.x = touchpad_x;
+    data->point.y = touchpad_y;
+    data->state = LV_INDEV_EVENT_PR or LV_INDEV_EVENT_REL;
+
+    return false;  /*No buffering so no more data read*/
+```
+
+#### Keypad or keyboard
+
+The read function should look like this:
+```c
+bool keyboard_read(lv_indev_data_t *data) {
+    if(key_pressed()) {
+        data->state = LV_INDEV_EVENT_PR;
+        data->key = get_key();
+    } else {
+        data->state = LV_INDEV_EVENT_REL;
+        data->key = 0;
+    }
+
+    return false;   /*No buffering so no more data read*/
+}
+```
 
 ## Project set-up
-1. Clone or download the following repositories:
-   * lvgl:`git clone https://github.com/littlevgl/lvgl.git`  
-   * misc: `git clone https://github.com/littlevgl/misc.git` 
-   * hal: `git clone https://github.com/littlevgl/hal.git`
-2. Create project with your prefered IDE and add the **lvgl**, **misc** and **hal** folders 
-3. Add your projects **root directory as include path** 
-4. Write your display, touch pad and system tick **drivers in hal**
-5. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** and *misc/misc_conf_templ.h* as **misc_conf.h** to the projects root folder
-6. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
-7. In your *main.c* include: 
-   * #include "misc/misc.h" 
-   * #include "misc/os/ptask.h"
-   * #include "lvgl/lvgl.h"   
-8. In your *main.c* intialize:
-   * **misc_init()**;
-   * your_systick_init();
-   * your_disp_init();
-   * your_indev_init();
-   * **lv_init()**;
+1. Clone or download the lvgl repository: `git clone https://github.com/littlevgl/lvgl.git`
+2. Create project with your prefered IDE and add the lvgl folder
+3. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** next to the lvgl folder
+4. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
+5. In your *main.c*: #include "lvgl/lvgl.h"   
+6. In your *main function*:
+   * lvgl_init();
+   * tick, display and input device initialization (se above)
 10. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
-11. In the main *while(1)* call `ptask_handler();` and make a few milliseconds delay (e.g. `your_delay_ms(5);`) 
+11. In the main *while(1)* call `lv_task_handler();` and make a few milliseconds delay (e.g. `my_delay_ms(5);`) 
 12. Compile the code and load it to your embedded hardware
 
 ## PC Simulator
