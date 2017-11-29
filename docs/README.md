@@ -36,7 +36,7 @@ Homepage: http://gl.littlev.hu
 
 ## Porting
 ### Tick interface
-The LittlevGL uses a system tick. Your only task is to call `lv_tick_handler()` in every milliseconds in an interrupt.
+The LittlevGL uses a system tick. The `lv_tick_inc(tick_period)` function periodically and tell the call period in millisecinds. For example: `lv_tick_inc(1)` if called in every milliseconds.
 
 ### Display interface
 To set up a diplay an `lv_disp_drv_t` variable has to be initialized:
