@@ -39,20 +39,12 @@ static void (*tick_callbacks[LV_HAL_TICK_CALLBACK_NUM])(void);
  **********************/
 
 /**
- * You have to call this function in every milliseconds in a timer interrupt
+ * You have to call this function in every milliseconds
  */
-void lv_tick_handler(void)
+void lv_tick_inc(void)
 {
+    tick_irq_flag = 0;
     sys_time++;
-
-    /*Run the callback functions*/
-    uint8_t i;
-    for (i = 0; i < LV_HAL_TICK_CALLBACK_NUM; i++) {
-        if (tick_callbacks[i] != NULL) {
-            tick_callbacks[i]();
-        }
-    }
-    tick_irq_flag = 0;       /*lv_hal_systick_get set it to know there was an IRQ*/
 }
 
 /**
@@ -65,7 +57,7 @@ uint32_t lv_tick_get(void)
     do {
         tick_irq_flag = 1;
         result = sys_time;
-    } while(!tick_irq_flag);     /*Systick IRQ clears this flag. Continue until make a non interrupted cycle */
+    } while(!tick_irq_flag);     /*'lv_tick_inc()' clears this flag which can be in an interrupt. Continue until make a non interrupted cycle */
 
     return result;
 }
@@ -88,62 +80,6 @@ uint32_t lv_tick_elaps(uint32_t prev_tick)
 	}
 
 	return prev_tick;
-}
-
-/**
- * Add a callback function to the systick interrupt
- * @param cb a function pointer
- * @return true: 'cb' added to the systick callbacks, false: 'cb' not added
- */
-bool lv_tick_add_callback(void (*cb) (void))
-{
-    bool suc = false;
-
-    /*Take the semaphore. Be sure it is set*/
-    do {
-        tick_cb_sem = 1;
-    } while(!tick_cb_sem);
-
-    uint8_t i;
-    for (i = 0; i < LV_HAL_TICK_CALLBACK_NUM; i++) {
-        if (tick_callbacks[i] == NULL) {
-            tick_callbacks[i] = cb;
-            suc = true;
-            break;
-        }
-    }
-
-    /*Release the semaphore. Be sure it is cleared*/
-    do {
-        tick_cb_sem = 0;
-    } while(tick_cb_sem);
-
-    return suc;
-}
-
-/**
- * Remove a callback function from the tick callbacks
- * @param cb a function pointer (added with 'lv_hal_tick_add_callback')
- */
-void lv_tick_rem_callback(void (*cb) (void))
-{
-    /*Take the semaphore. Be sure it is set*/
-    do {
-        tick_cb_sem = 1;
-    } while(!tick_cb_sem);
-
-    uint8_t i;
-    for (i = 0; i < LV_HAL_TICK_CALLBACK_NUM; i++) {
-        if (tick_callbacks[i] == cb) {
-            tick_callbacks[i] = NULL;
-            break;
-        }
-    }
-
-    /*Release the semaphore. Be sure it is cleared*/
-    do {
-        tick_cb_sem = 0;
-    } while(tick_cb_sem);
 }
 
 /**********************

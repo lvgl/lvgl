@@ -307,8 +307,8 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     while(indev) {
         dpar = obj;
         while(dpar != NULL) {
-            if(indev->state.act_obj == dpar ||
-               indev->state.last_obj == dpar) {
+            if(indev->proc.act_obj == dpar ||
+               indev->proc.last_obj == dpar) {
                 lv_indev_reset(indev);
                 break;
             } else {

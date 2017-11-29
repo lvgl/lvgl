@@ -31,25 +31,23 @@ extern "C" {
 /*Possible input device types*/
 typedef enum {
     LV_INDEV_TYPE_NONE,        /*Show uninitialized state*/
-    LV_INDEV_TYPE_TOUCHPAD,    /*Touch pad*/
-    LV_INDEV_TYPE_MOUSE,       /*Mouse or similar pointer device*/
+    LV_INDEV_TYPE_POINTER,     /*Touch pad, mouse, external button*/
     LV_INDEV_TYPE_KEYPAD,      /*Keypad or keyboard*/
-    LV_INDEV_TYPE_BUTTON,      /*External (hardware) button assigned to a point on the screen*/
 } lv_hal_indev_type_t;
 
 /*States for input devices*/
 typedef enum {
-    LV_INDEV_EVENT_REL,
-    LV_INDEV_EVENT_PR
-}lv_indev_event_t;
+    LV_INDEV_STATE_REL,
+    LV_INDEV_STATE_PR
+}lv_indev_state_t;
 
 /*Data type when an input device is read */
 typedef struct {
     union {
-        lv_point_t point;      /*For INDEV_TYPE_TOUCHPAD, INDEV_TYPE_POINTER, LV_INDEV_TYPE_BUTTON*/
-        uint32_t key;       /*For INDEV_TYPE_KEYPAD*/
+        lv_point_t point;      /*For INDEV_TYPE_POINTER*/
+        uint32_t key;          /*For INDEV_TYPE_KEYPAD*/
     };
-    lv_indev_event_t state; /*LV_INDEV_EVENT_REL or LV_INDEV_EVENT_PR*/
+    lv_indev_state_t state; /*LV_INDEV_EVENT_REL or LV_INDEV_EVENT_PR*/
 }lv_indev_data_t;
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/
@@ -61,9 +59,9 @@ typedef struct {
 struct _lv_obj_t;
 
 typedef struct _lv_indev_state_t {
-    lv_indev_event_t event;
+    lv_indev_state_t event;
     union {
-        struct {
+        struct {    /*Pointer data*/
             lv_point_t act_point;
             lv_point_t last_point;
             lv_point_t vect;
@@ -76,7 +74,9 @@ typedef struct _lv_indev_state_t {
             uint8_t drag_in_prog        :1;
             uint8_t wait_unil_release   :1;
         };
-        uint32_t last_key;
+        struct {    /*Keypad data*/
+            lv_indev_state_t last_state;
+        };
     };
 
     uint32_t pr_timestamp;          /*Pressed time stamp*/
@@ -86,7 +86,7 @@ typedef struct _lv_indev_state_t {
     uint8_t long_pr_sent        :1;
     uint8_t reset_query         :1;
     uint8_t disabled            :1;
-}lv_indev_state_t;
+}lv_indev_proc_t;
 
 
 struct _lv_obj_t;
@@ -94,7 +94,7 @@ struct _lv_group_t;
 
 typedef struct _lv_indev_t {
     lv_indev_drv_t driver;
-    lv_indev_state_t state;
+    lv_indev_proc_t proc;
     union {
         struct _lv_obj_t *cursor;
         struct _lv_group_t *group;      /*Keypad destination group*/
