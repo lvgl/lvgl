@@ -41,23 +41,28 @@ You can configure the driver for different operation modes.
 #### Using internal buffering (VDB)
 The graphics library works with an internal buffering mechanism to create advances graphics features with only one frame buffer. The internal buffer is called VDB (Virtual Display Buffer) and its size can be adjusted in lv_conf.h.
 When `LV_VDB_SIZE` not zero then the internal buffering is used and you have to provide a function which flushes the buffers content to your display:
-`disp_drv.disp_flush = my_disp_flush;`
+```c
+disp_drv.disp_flush = my_disp_flush;
+```
 
 In the flush function you can use DMA or any hardware to do the flushing in the background, but when the flushing is ready you **have to call `lv_flush_ready()`**
 
 #### Using harware acceleration (GPU)
 If your MCU supports graphical acceration (GPU) then you can use it in the following way. (Using GPU is totally optional)
 The `mem_blend` and `mem_fill` fields of a display driver is used to interface with a GPU. 
-`disp_drv.mem_blend = my_mem_blend;  /*Blends two color arrays using opacity*/` 
-`disp_drv.mem_fill = my_mem_fill;    /*Fills an array with a color*/` 
+```c
+disp_drv.mem_blend = my_mem_blend;  /*Blends two color arrays using opacity*/
+disp_drv.mem_fill = my_mem_fill;    /*Fills an array with a color*/ 
+```
 
 The GPU related functions can be used only if internal buffering (VDB) is enabled
 
 #### Unbuffered drawing
 It is possible to draw directly to a framebuffer when the internal buffeering is dispabled (LV_SDB_SIZE = 0).
-
-`disp_drv.disp_fill = my_mem_blend;  /*fill an area in the frame buffer*/` 
-`disp_drv.disp_map = my_mem_fill;    /*copy a color_map (e.g. image) into the framebuffer*/` 
+```c
+disp_drv.disp_fill = my_mem_blend;  /*fill an area in the frame buffer*/
+disp_drv.disp_map = my_mem_fill;    /*copy a color_map (e.g. image) into the framebuffer*/
+```
 
 Keep in mind this way during refresh some artifacts can be visible because the layers are drawn after each other. And some high level graphics features like anti aliasing, opacity or shadows aren't available in this configuration. 
 
@@ -72,14 +77,16 @@ indev_drv.type = ...               /*See below.*/
 indev_drv.read_fp = ...            /*See below.*/
 lv_indev_register(&indev_drv);
 ```
+
 The `type` can be `LV_INDEV_TYPE_POINTER` (e.g touchpad) or `LV_INDEV_TYPE_KEYPAD` (e.g. keyboard)
 `read_fp` is a function pointer which will be called periodically to report the current state of an input device. It can also buffer data and return `false` when no more data te read ot `true` is the buffer is not empty.
 
 #### Touchpad, mouse or any pointer
-`
+```c
 indev_drv.type = LV_INDEV_TYPE_POINTER;
 indev_drv.read_fp = my_input_read; 
-`
+```
+
 The read function should look like this:
 ```c
 bool my_input_read(lv_indev_data_t *data) {
@@ -90,11 +97,10 @@ bool my_input_read(lv_indev_data_t *data) {
 ```
 
 #### Keypad or keyboard
-
-`
+```c
 indev_drv.type = LV_INDEV_TYPE_KEYPAD;
 indev_drv.read_fp = my_input_read; 
-`
+```
 
 The read function should look like this:
 ```c
@@ -118,7 +124,7 @@ To use a keyboard:
  * Use `LV_GROUP_KEY_...` to navigate among the objects in the group
  
 ## Project set-up
-1. Clone or download the lvgl repository: `git clone https://github.com/littlevgl/lvgl.git`
+1. Clone or download the lvgl repository: `git clone -b dev-5.0 https://github.com/littlevgl/lvgl.git`
 2. Create project with your prefered IDE and add the lvgl folder
 3. Copy *lvgl/lv_conf_templ.h* as *lv_conf.h* next to the lvgl folder
 4. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
@@ -126,9 +132,9 @@ To use a keyboard:
 6. In your *main function*:
    * lvgl_init();
    * tick, display and input device initialization (see above)
-10. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
-11. In the main *while(1)* call `lv_task_handler();` and make a few milliseconds delay (e.g. `my_delay_ms(5);`) 
-12. Compile the code and load it to your embedded hardware
+7. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
+8. In the main *while(1)* call `lv_task_handler();` and make a few milliseconds delay (e.g. `my_delay_ms(5);`) 
+9. Compile the code and load it to your embedded hardware
 
 ## PC Simulator
 If you don't have got an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) to emulate a display on your monitor and a touch pad with your mouse.
