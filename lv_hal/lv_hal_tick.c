@@ -12,7 +12,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_HAL_TICK_CALLBACK_NUM     32
 
 /**********************
  *      TYPEDEFS
@@ -27,8 +26,6 @@
  **********************/
 static uint32_t sys_time = 0;
 static volatile uint8_t tick_irq_flag;
-static volatile uint8_t tick_cb_sem;                            /*Semaphore for tick callbacks*/
-static void (*tick_callbacks[LV_HAL_TICK_CALLBACK_NUM])(void);
 
 /**********************
  *      MACROS
