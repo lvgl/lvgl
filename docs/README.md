@@ -9,7 +9,7 @@ Homepage: http://gl.littlev.hu
 ## Key features
 - Everithing you need to build a GUI (buttons, charts, list, images etc)
 - Animations, opacity, smooth scrolling, anti aliasing to impress your cutomers
-- Multi language support with UTF-8 support
+- Multi language support with UTF-8 decoding
 - Fully customizable appearance
 - Scalable to operate with a few memory (80 kB flash, 10 kB RAM)
 - Hardware independent to use with any MCU or display (TFT, LCD, monochrome)
@@ -28,7 +28,7 @@ Homepage: http://gl.littlev.hu
 The LittlevGL uses a system tick. Your only task is to call `lv_tick_handler()` in every milliseconds in an interrupt.
 
 ### Display interface
-To set up a diplay an 'lv_disp_drv_t' variable has to be initialized:
+To set up a diplay an `lv_disp_drv_t` variable has to be initialized:
 ```c
 lv_disp_drv_t disp_drv;
 lv_disp_drv_init(&disp_drv);           /*Basic initialization*/
@@ -36,27 +36,35 @@ disp_drv. ... = ...                    /*Initilaize the field here. See below.*/
 disp_drv_register(&disp_drv);
 ```
 
+You can configure the driver for different operation modes.
+
 #### Using internal buffering (VDB)
-The graphics library works with an internal buffering mechanism to to create advances graphics features with only one frame buffer. The inter buffer is called VDB (Virtual Display Buffer) in its size can be adjusted in lv_conf.h.
-When `LV_VDB_SIZE` not zero then the internal buffering is used and you have to provide a function which flushes the buffers content to the display:
+The graphics library works with an internal buffering mechanism to create advances graphics features with only one frame buffer. The internal buffer is called VDB (Virtual Display Buffer) and its size can be adjusted in lv_conf.h.
+When `LV_VDB_SIZE` not zero then the internal buffering is used and you have to provide a function which flushes the buffers content to your display:
 `disp_drv.disp_flush = my_disp_flush;`
 
 In the flush function you can use DMA or any hardware to do the flushing in the background, but when the flushing is ready you **have to call `lv_flush_ready()`**
 
 #### Using harware acceleration (GPU)
-The `mem_blend` and `mem_fill` field of a display driver is used to interface with a GPU. 
-`disp_drv.mem_blend = my_mem_blend;  /*blends two color arrays using opacity*/` 
-`disp_drv.mem_fill = my_mem_fill;    /*fills an array with a color*/` 
+If your MCU supports graphical acceration (GPU) then you can use it in the following way. (Using GPU is totally optional)
+The `mem_blend` and `mem_fill` fields of a display driver is used to interface with a GPU. 
+`disp_drv.mem_blend = my_mem_blend;  /*Blends two color arrays using opacity*/` 
+`disp_drv.mem_fill = my_mem_fill;    /*Fills an array with a color*/` 
 
 The GPU related functions can be used only if internal buffering (VDB) is enabled
 
 #### Unbuffered drawing
-It is possible to draw directly to a framebuffer via two functions:
+It is possible to draw directly to a framebuffer when the internal buffeering is dispabled (LV_SDB_SIZE = 0).
+
 `disp_drv.disp_fill = my_mem_blend;  /*fill an area in the frame buffer*/` 
 `disp_drv.disp_map = my_mem_fill;    /*copy a color_map (e.g. image) into the framebuffer*/` 
 
+Keep in mind this way during refresh some artifacts can be visible because the layers are drawn after each other. And some high level graphics features like anti aliasing, opacity or shadows aren't available in this configuration. 
+
+If you use an external display controller which supports accelerated filling (e.g. RA8876) then you can use this feature in `disp_fill`
+
 ### Input device interface
-To set up an input device an 'lv_indev_drv_t' variable has to be initialized:
+To set up an input device an `lv_indev_drv_t` variable has to be initialized:
 ```c    
 lv_indev_drv_t indev_drv;
 lv_indev_drv_init(&indev_drv);     /*Basic initialization*/
