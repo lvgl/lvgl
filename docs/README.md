@@ -14,7 +14,7 @@ Homepage: http://gl.littlev.hu
   * [Input device interface](#input-device-interface)
 * [Project set-up](#project-set-up)
 * [PC simulator](#pc-simulator)
-* [Contributing](#contributong)
+* [Contributing](#contributing)
 * [Donate](#donate)
 
 ## Key features
