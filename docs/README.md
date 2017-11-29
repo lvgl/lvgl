@@ -49,16 +49,16 @@ disp_drv_register(&disp_drv);
 
 You can configure the driver for different operation modes.
 
-#### Using internal buffering (VDB)
+#### Internal buffering (VDB)
 The graphics library works with an internal buffering mechanism to create advances graphics features with only one frame buffer. The internal buffer is called VDB (Virtual Display Buffer) and its size can be adjusted in lv_conf.h.
 When `LV_VDB_SIZE` not zero then the internal buffering is used and you have to provide a function which flushes the buffers content to your display:
 ```c
 disp_drv.disp_flush = my_disp_flush;
 ```
 
-In the flush function you can use DMA or any hardware to do the flushing in the background, but when the flushing is ready you **have to call `lv_flush_ready()`**
+In the flush function you can use DMA or any hardware to do the flushing in the background, but when the flushing is ready you have to call `lv_flush_ready()`
 
-#### Using harware acceleration (GPU)
+#### Hardware acceleration (GPU)
 If your MCU supports graphical acceration (GPU) then you can use it in the following way. (Using GPU is totally optional)
 The `mem_blend` and `mem_fill` fields of a display driver is used to interface with a GPU. 
 ```c
