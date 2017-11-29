@@ -162,8 +162,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         }
     }
     /*Fill with opacity*/
-    else
-    {
+    else {
     	/*Use hw blend if present*/
         if(lv_disp_is_mem_blend_supported()) {
             if(color_map[0].full != color.full || last_width != w) {
