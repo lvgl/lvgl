@@ -40,7 +40,7 @@ typedef struct
 
 /**
  * Get the 'vdb' variable or allocate one in LV_VDB_DOUBLE mode
- * @return pointer to the 'vdb' variable
+ * @return pointer to a 'vdb' variable
  */
 lv_vdb_t * lv_vdb_get(void);
 
@@ -54,7 +54,7 @@ void lv_vdb_flush(void);
  * In 'LV_VDB_DOUBLE' mode  has to be called when 'disp_map()'
  * is ready with copying the map to a frame buffer.
  */
-void lv_vdb_flush_ready(void);
+void lv_flush_ready(void);
 
 /**********************
  *      MACROS

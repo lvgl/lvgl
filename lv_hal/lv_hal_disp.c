@@ -119,17 +119,31 @@ lv_disp_t * lv_disp_next(lv_disp_t * disp)
 }
 
 /**
- * Fill a rectangular area with a color on the active display
+ * Write the content of the internal buffer (VDB) to the display
  * @param x1 left coordinate of the rectangle
  * @param x2 right coordinate of the rectangle
  * @param y1 top coordinate of the rectangle
  * @param y2 bottom coordinate of the rectangle
- * @param color fill color
+ * @param color_p fill color
  */
 void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color)
 {
     if(active == NULL) return;
     if(active->driver.disp_fill != NULL) active->driver.disp_fill(x1, y1, x2, y2, color);
+}
+
+/**
+ * Fill a rectangular area with a color on the active display
+ * @param x1 left coordinate of the rectangle
+ * @param x2 right coordinate of the rectangle
+ * @param y1 top coordinate of the rectangle
+ * @param y2 bottom coordinate of the rectangle
+ * @param color_p pointer to an array of colors
+ */
+void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t *color_p)
+{
+    if(active == NULL) return;
+    if(active->driver.disp_flush != NULL) active->driver.disp_flush(x1, y1, x2, y2, color_p);
 }
 
 /**

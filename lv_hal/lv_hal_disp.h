@@ -32,9 +32,19 @@ extern "C" {
  * Display Driver structure to be registered by HAL
  */
 typedef struct _disp_drv_t {
+    /*Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished*/
+    void (*disp_flush)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
+
+    /*Fill an area with a color on the display*/
     void (*disp_fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color);
+
+    /*Write pixel map (e.g. image) to the display*/
     void (*disp_map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
+
+    /*Blend two memories using opacity (GPU only)*/
     void (*mem_blend)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+
+    /*Fill a memory with a color (GPU only)*/
     void (*mem_fill)(lv_color_t * dest, uint32_t length, lv_color_t color);
 } lv_disp_drv_t;
 
@@ -81,6 +91,16 @@ lv_disp_t * lv_disp_get_active(void);
  * @return the next display or NULL if no more. Give the first display when the parameter is NULL
  */
 lv_disp_t * lv_disp_next(lv_disp_t * disp);
+
+/**
+ * Fill a rectangular area with a color on the active display
+ * @param x1 left coordinate of the rectangle
+ * @param x2 right coordinate of the rectangle
+ * @param y1 top coordinate of the rectangle
+ * @param y2 bottom coordinate of the rectangle
+ * @param color_p pointer to an array of colors
+ */
+void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t *color_p);
 
 /**
  * Fill a rectangular area with a color on the active display

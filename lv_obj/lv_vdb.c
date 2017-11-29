@@ -20,13 +20,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
-#if LV_VDB_DOUBLE != 0
 typedef enum {
     LV_VDB_STATE_FREE = 0,
     LV_VDB_STATE_ACTIVE,
     LV_VDB_STATE_FLUSH,
 } lv_vdb_state_t;
-#endif
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -36,6 +35,7 @@ typedef enum {
  **********************/
 #if LV_VDB_DOUBLE == 0
 static lv_vdb_t vdb;
+static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
 #else
 static lv_vdb_t vdb[2];
 static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
@@ -51,11 +51,14 @@ static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_F
 
 /**
  * Get the 'vdb' variable or allocate one in LV_VDB_DOUBLE mode
- * @return pointer to the 'vdb' variable
+ * @return pointer to a 'vdb' variable
  */
 lv_vdb_t * lv_vdb_get(void)
 {
 #if LV_VDB_DOUBLE == 0
+    /* Wait until VDB become ACTIVE from FLUSH by the
+     * user call of 'lv_flush_ready()' in display drivers's flush function*/
+    while(vdb_state != LV_VDB_STATE_ACTIVE);
     return &vdb;
 #else
     /*If already there is an active do nothing*/
@@ -85,9 +88,11 @@ void lv_vdb_flush(void)
     lv_vdb_t * vdb_act = lv_vdb_get();
     if(vdb_act == NULL) return;
 
-#if LV_VDB_DOUBLE != 0
+#if LV_VDB_DOUBLE == 0
+    vdb_state = LV_VDB_STATE_FLUSH;     /*User call to 'lv_flush_ready()' will set to ACTIVE 'disp_flush'*/
+#else
     /* Wait the pending flush before starting this one
-     * (Don't forget: 'lv_vdb_flush_ready' has to be called when flushing is ready)*/
+     * (Don't forget: 'lv_flush_ready()' has to be called when flushing is ready)*/
     while(vdb_state[0] == LV_VDB_STATE_FLUSH || vdb_state[1] == LV_VDB_STATE_FLUSH);
 
     /*Turn the active VDB to flushing*/
@@ -96,7 +101,7 @@ void lv_vdb_flush(void)
 #endif
 
 #if LV_ANTIALIAS == 0
-	lv_disp_map(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
+	lv_disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
 #else
 	/* Get the average of 2x2 pixels and put the result back to the VDB
 	 * The reading goes much faster then the write back
@@ -146,17 +151,18 @@ void lv_vdb_flush(void)
 
 	/* Now the full the VDB is filtered and the result is stored in the first quarter of it
 	 * Write out the filtered map to the display*/
-	lv_disp_map(vdb_act->area.x1 >> 1, vdb_act->area.y1 >> 1, vdb_act->area.x2 >> 1, vdb_act->area.y2 >> 1, vdb_act->buf);
+	lv_disp_flush(vdb_act->area.x1 >> 1, vdb_act->area.y1 >> 1, vdb_act->area.x2 >> 1, vdb_act->area.y2 >> 1, vdb_act->buf);
 #endif
 }
 
 /**
- * In 'LV_VDB_DOUBLE' mode  has to be called when the 'disp_map'
- * is ready with copying the map to a frame buffer.
+ * Call in the display driver's  'disp_flush' function when the flushing is finished
  */
-void lv_vdb_flush_ready(void)
+void lv_flush_ready(void)
 {
-#if LV_VDB_DOUBLE != 0
+#if LV_VDB_DOUBLE == 0
+    vdb_state = LV_VDB_STATE_ACTIVE;
+#else
     if(vdb_state[0] == LV_VDB_STATE_FLUSH)  vdb_state[0] = LV_VDB_STATE_FREE;
     if(vdb_state[1] == LV_VDB_STATE_FLUSH)  vdb_state[1] = LV_VDB_STATE_FREE;
 #endif

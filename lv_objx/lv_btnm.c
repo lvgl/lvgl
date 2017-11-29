@@ -164,6 +164,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 
 	lv_coord_t btn_h = max_h - ((line_cnt - 1) * btnms->body.padding.inner);
 	btn_h = btn_h / line_cnt;
+	btn_h --;                              /*-1 because e.g. height = 100 means 101 pixels (0..100)*/
 
 	/* Count the units and the buttons in a line
 	 * (A button can be 1,2,3... unit wide)*/
@@ -198,8 +199,9 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 			for(i = 0; i < btn_cnt; i++) {
 				/* one_unit_w = all_unit_w / unit_cnt
 				 * act_unit_w = one_unit_w * button_width
-				 * do this two operation but the multiply first to divide a greater number */
+				 * do this two operations but the multiply first to divide a greater number */
 				act_unit_w = (all_unit_w * get_button_width(map_p_tmp[i])) / unit_cnt;
+				act_unit_w --;                              /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
 				/*Always recalculate act_x because of rounding errors */
 				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->body.padding.inner + btnms->body.padding.hor;
