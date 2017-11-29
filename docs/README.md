@@ -6,6 +6,17 @@ Littlev Graphics Library provides everithing you need to add graphical user inte
 
 Homepage: http://gl.littlev.hu
 
+### Table Of Content
+* [Key features](#key-features)
+* [Porting](#porting)
+  * [Tick interface](#tick-interface)
+  * [Display interface](#display-interface)
+  * [Input device interface](#input-device-interface)
+* [Project set-up](#project-set-up)
+* [PC simulator](#pc-simulator)
+* [Contributing](#contributong)
+* [Donate](#donate)
+
 ## Key features
 - Everithing you need to build a GUI (buttons, charts, list, images etc)
 - Animations, opacity, smooth scrolling, anti aliasing to impress your cutomers
