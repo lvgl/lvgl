@@ -26,7 +26,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define VFILL_HW_ACC_WIDTH_LIMIT    50      /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
+#define VFILL_HW_ACC_SIZE_LIMIT    50      /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
 
 /**********************
  *      TYPEDEFS
@@ -122,11 +122,14 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*Move the vdb_tmp to the first row*/
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
-
     lv_coord_t w = lv_area_get_width(&vdb_rel_a);
-    if(w < VFILL_HW_ACC_WIDTH_LIMIT) {  /*Don't use hw. acc. for every small fill (because of the init overhead)*/
+
+    /*Don't use hw. acc. for every small fill (because of the init overhead)*/
+    if(w < VFILL_HW_ACC_SIZE_LIMIT) {
         sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
-    } else if(opa == LV_OPA_COVER) {
+    }
+    /*Not opaque fill*/
+    else if(opa == LV_OPA_COVER) {
         /*Use hw fill if present*/
         if(lv_disp_is_mem_fill_supported()) {
             lv_coord_t row;
@@ -136,7 +139,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
             }
         }
         /*Use hw blend if present and the area is not too small*/
-        else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_WIDTH_LIMIT &&
+        else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT &&
                 lv_disp_is_mem_blend_supported())
         {
             if(color_map[0].full != color.full || last_width != w) {
@@ -158,12 +161,11 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
             sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
         }
     }
-    /*Opacity*/
+    /*Fill with opacity*/
     else
     {
-        if(lv_disp_is_mem_blend_supported() == false) {
-            sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
-        } else {
+    	/*Use hw blend if present*/
+        if(lv_disp_is_mem_blend_supported()) {
             if(color_map[0].full != color.full || last_width != w) {
                 uint16_t i;
                 for(i = 0; i < w; i++) {
@@ -177,6 +179,11 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_map, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
+
+        }
+        /*Use sw fill with opa if no better option*/
+        else {
+            sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
         }
     }
 }
