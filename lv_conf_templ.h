@@ -73,7 +73,10 @@
 #define LV_TXT_UTF8             1
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
 
-/*Feature usage*/
+/*Group settings*/
+#define LV_GROUP                1                  /*Enable object groups (for keyboards)*/
+
+/*Graphics feature usage*/
 #define LV_NO_ANIM				0				/*1: disable all animations*/
 #define LV_NO_SHADOW			0				/*1: disable shadows*/
 
@@ -147,17 +150,10 @@
 #define USE_LV_FONT_SYMBOL_80_FEEDBACK     0
 
 /*==================
- *  IMAGE USAGE
- *================*/
-#define LV_IMAGE_ENABLE_ALL    1       /*Unconditionally enable all image maps*/
-//#define USE_IMG_XYZ      1           /*Enable or disable to compile you image map files*/
-
-/*==================
  *  LV_OBJ SETTINGS
  *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
-#define LV_OBJ_GROUP            1           /*Enable object groups*/
 
 /*==================
  *  LV OBJ X USAGE 
@@ -180,7 +176,7 @@
 #define USE_LV_LINE     1
 
 /*******************
- * Container object
+ * Container objects
  *******************/
 
 /*Container (dependencies: -*/
@@ -199,7 +195,7 @@
 #endif
 
 /*************************
- * Data visualizer object
+ * Data visualizer objects
  *************************/
 
 /*Bar (dependencies: -)*/
@@ -228,7 +224,7 @@
 #endif
 
 /*************************
- * User input object
+ * User input objects
  *************************/
 
 /*Button (dependencies: lv_cont*/

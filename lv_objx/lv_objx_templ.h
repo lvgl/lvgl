@@ -24,7 +24,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #if USE_LV_TEMPL != 0
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES

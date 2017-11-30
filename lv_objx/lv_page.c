@@ -9,11 +9,11 @@
 #include "../../lv_conf.h"
 #if USE_LV_PAGE != 0
 
-#include "../lv_obj/lv_group.h"
+#include "../lv_core/lv_group.h"
 #include "../lv_objx/lv_page.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
-#include "../lv_obj/lv_refr.h"
+#include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_math.h"
 
@@ -389,7 +389,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(scrl, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-#if LV_OBJ_GROUP != 0
+#if LV_GROUP != 0
         /* If the page is the active in a group and
          * the background (page) is not visible (transparent or empty)
          * then activate the style of the scrollable*/
@@ -407,7 +407,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
 #endif
         ancestor_design(scrl, mask, mode);
 
-#if LV_OBJ_GROUP != 0
+#if LV_GROUP != 0
         scrl->style_p = style_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {

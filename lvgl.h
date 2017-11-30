@@ -19,8 +19,9 @@ extern "C" {
 
 #include "lv_hal/lv_hal.h"
 
-#include "lv_obj/lv_obj.h"
-#include "lv_obj/lv_group.h"
+#include "lv_core/lv_obj.h"
+#include "lv_core/lv_group.h"
+#include "lv_core/lv_vdb.h"
 
 #include "lv_themes/lv_theme.h"
 

@@ -34,7 +34,7 @@ extern "C" {
 #error "lv_win: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
 #endif
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 #include "lv_cont.h"
 #include "lv_btn.h"
 #include "lv_label.h"

@@ -20,7 +20,7 @@ extern "C" {
  *      DEFINES
  *********************/
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
-/*For compatibility in signal function define the keys regardless to LV_OBJ_GROUP*/
+/*For compatibility in signal function define the keys regardless to LV_GROUP*/
 #define LV_GROUP_KEY_UP             17      /*0x11*/
 #define LV_GROUP_KEY_DOWN           18      /*0x12*/
 #define LV_GROUP_KEY_RIGHT          19      /*0x13*/
@@ -30,7 +30,7 @@ extern "C" {
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/
 
-#if LV_OBJ_GROUP  != 0
+#if LV_GROUP  != 0
 /**********************
  *      TYPEDEFS
  **********************/
@@ -125,7 +125,7 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group);
  *      MACROS
  **********************/
 
-#endif /*LV_OBJ_GROUP != 0*/
+#endif /*LV_GROUP != 0*/
 
 #ifdef __cplusplus
 } /* extern "C" */

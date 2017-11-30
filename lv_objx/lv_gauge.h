@@ -21,7 +21,7 @@ extern "C" {
 #error "lv_gauge: lv_lmeter is required. Enable it in lv_conf.h (USE_LV_LMETER  1) "
 #endif
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 #include "lv_lmeter.h"
 #include "lv_label.h"
 #include "lv_line.h"

@@ -21,7 +21,7 @@ extern "C" {
 #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (USE_LV_SLIDER  1)"
 #endif
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 #include "lv_slider.h"
 
 /*********************

@@ -26,7 +26,7 @@ extern "C" {
 #error "lv_tabview: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
 #endif
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 #include "../lv_objx/lv_win.h"
 #include "../lv_objx/lv_page.h"
 

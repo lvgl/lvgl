@@ -11,7 +11,7 @@
 
 #include "lv_roller.h"
 #include "../lv_draw/lv_draw.h"
-#include "../lv_obj/lv_group.h"
+#include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************

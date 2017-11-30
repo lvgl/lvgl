@@ -774,7 +774,7 @@ LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
 void * lv_obj_get_free_ptr(lv_obj_t * obj);
 #endif
 
-#if LV_OBJ_GROUP != 0
+#if LV_GROUP != 0
 /**
  * Get the group of the object
  * @param obj pointer to an object

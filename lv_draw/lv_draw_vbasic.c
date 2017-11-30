@@ -17,7 +17,7 @@
 #if LV_VDB_SIZE != 0
 
 #include <stddef.h>
-#include "../lv_obj/lv_vdb.h"
+#include "../lv_core/lv_vdb.h"
 
 /*********************
  *      INCLUDES

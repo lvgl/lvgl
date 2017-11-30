@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "../lv_hal/lv_hal_indev.h"
-#include "../lv_obj/lv_group.h"
+#include "../lv_core/lv_group.h"
 
 /*********************
  *      DEFINES
@@ -66,7 +66,7 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable);
  */
 void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj);
 
-#if LV_OBJ_GROUP
+#if LV_GROUP
 /**
  * Set a destination group for a keypad input device
  * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_KEYPAD')
