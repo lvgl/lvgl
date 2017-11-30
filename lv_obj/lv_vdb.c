@@ -33,12 +33,31 @@ typedef enum {
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+
 #if LV_VDB_DOUBLE == 0
-static lv_vdb_t vdb;
-static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
+   /*Simple VDB*/
+   static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
+#  if LV_VDB_ADR == 0
+     /*If the buffer address is not specified  simply allocate it*/
+     static lv_color_t vdb_buf[LV_VDB_SIZE];
+     static lv_vdb_t vdb = {.buf = vdb_buf};
+#  else
+     /*If the buffer address is specified use that address*/
+     static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
+#  endif
 #else
-static lv_vdb_t vdb[2];
-static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
+   /*Double VDB*/
+   static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
+#  if LV_VDB_ADR == 0
+   /*If the buffer address is not specified  simply allocate it*/
+   static lv_color_t vdb_buf1[LV_VDB_SIZE];
+   static lv_color_t vdb_buf2[LV_VDB_SIZE];
+   static lv_vdb_t vdb[2] = {{.buf = vdb_buf1}, {.buf = vdb_buf2}};
+#  else
+   /*If the buffer address is specified use that address*/
+   static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *)LV_VDB_ADR}, {.buf = (lv_color_t *)LV_VDB2_ADR}};
+#  endif
 #endif
 
 /**********************

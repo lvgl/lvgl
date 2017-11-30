@@ -42,7 +42,7 @@ static volatile uint8_t tick_irq_flag;
 void lv_tick_inc(uint32_t tick_period)
 {
     tick_irq_flag = 0;
-    sys_time++;
+    sys_time += tick_period;
 }
 
 /**

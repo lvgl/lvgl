@@ -31,12 +31,14 @@
 #define LV_VER_RES          (480 << LV_ANTIALIAS)
 #define LV_DPI              (100 << LV_ANTIALIAS)
 
-/* Buffered rendering: >= LV_DOWNSCALE * LV_HOR_RES or 0 to disable buffering*/
-#define LV_VDB_SIZE         (40 * LV_VER_RES)
+/* Buffered rendering: >= LV_HOR_RES or 0 to disable buffering*/
+#define LV_VDB_SIZE         (40 * LV_HOR_RES)
+#define LV_VDB_ADR			0		/*Place VDB to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
 
 /* Use two Virtual Display buffers (VDB) parallelize rendering and flushing
  * The flushing should use DMA to write the frame buffer in the background*/
-#define LV_VDB_DOUBLE       0
+#define LV_VDB_DOUBLE		0
+#define LV_VDB2_ADR			0		/*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
 
 /* Enable anti aliasing
  * If enabled everything will be rendered in double size and filtered to normal size */
@@ -44,7 +46,7 @@
 
 /* Enable anti aliasing only for fonts (texts)
  * It half the size of the letters so you should use double sized fonts
- * Much faster then normal anti aliasing  */
+ * Much faster then normal anti aliasing (don't use together with LV_ANTIALIAS) */
 #define LV_FONT_ANTIALIAS   1
 
 /*=================
