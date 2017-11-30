@@ -468,16 +468,16 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * indev, lv_obj_t * obj
             }
         }
         
-        /*If then the children was not ok, but this obj is clickable
+        /*If then the children was not ok, and this obj is clickable
          * and it or its parent is not hidden then save this object*/
         if(found_p == NULL && lv_obj_get_click(obj) != false) {
-        	lv_obj_t * i = obj;
-        	while(i != NULL) {
-        		if(lv_obj_get_hidden(i) == true) break;
-        		i = lv_obj_get_parent(i);
+        	lv_obj_t * hidden_i = obj;
+        	while(hidden_i != NULL) {
+        		if(lv_obj_get_hidden(hidden_i) == true) break;
+        		hidden_i = lv_obj_get_parent(hidden_i);
         	}
         	/*No parent found with hidden == true*/
-        	if(i == NULL) found_p = obj;
+        	if(hidden_i == NULL) found_p = obj;
         }
         
     }

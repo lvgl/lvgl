@@ -352,9 +352,9 @@ static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size)
     /* Create the new entry after the current if there is space for it */
     if(e->header.d_size != size) {
         uint8_t * e_data = &e->first_data;
-        lv_mem_ent_t * new_e = (lv_mem_ent_t *)&e_data[size];
-        new_e->header.used = 0;
-        new_e->header.d_size = e->header.d_size - size - sizeof(lv_mem_header_t);
+        lv_mem_ent_t * after_new_e = (lv_mem_ent_t *)&e_data[size];
+        after_new_e->header.used = 0;
+        after_new_e->header.d_size = e->header.d_size - size - sizeof(lv_mem_header_t);
     }
     
     /* Set the new size for the original entry */

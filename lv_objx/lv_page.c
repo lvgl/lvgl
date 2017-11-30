@@ -94,8 +94,14 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t *th = lv_theme_get_current();
         if(th) {
-            lv_page_set_style(new_page, LV_PAGE_STYLE_BG, th->page.bg);
-            lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, th->page.scrl);
+            if(par == NULL){ /*Different styles if it is screen*/
+                lv_page_set_style(new_page, LV_PAGE_STYLE_BG, th->bg);
+                lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, &lv_style_transp);
+            } else {
+                lv_page_set_style(new_page, LV_PAGE_STYLE_BG, th->page.bg);
+                lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, th->page.scrl);
+
+            }
             lv_page_set_style(new_page, LV_PAGE_STYLE_SB, th->page.sb);
         } else {
             lv_page_set_style(new_page, LV_PAGE_STYLE_BG, &lv_style_pretty_color);

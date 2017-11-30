@@ -562,7 +562,6 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         lv_obj_invalidate(btnm);
     }
     else if(sign == LV_SIGNAL_CONTROLL) {
-        lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) ext->btn_id_pr = 0;

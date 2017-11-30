@@ -100,12 +100,6 @@ void lv_init(void)
     /*Init the input device handling*/
     lv_indev_init();
 #endif
-
-    /*Initialize the application level*/
-#if LV_APP_ENABLE != 0
-    lv_app_init();
-#endif
-
 }
 
 /*--------------------
@@ -144,11 +138,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		lv_obj_set_design_func(new_obj, lv_obj_design);
 
 		/*Set free data*/
-#if LV_OBJ_FREE_NUM != 0
+#ifdef LV_OBJ_FREE_NUM_TYPE
 		new_obj->free_num = 0;
 #endif
 
-#if LV_OBJ_FREE_P != 0
+#if LV_OBJ_FREE_PTR != 0
         new_obj->free_ptr = NULL;
 #endif
 
@@ -184,14 +178,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->ext_size = 0;
 
         /*Set appearance*/
-        new_obj->style_p = &lv_style_plain;
+        new_obj->style_p = &lv_style_plain_color;
         
         /*Set virtual functions*/
         lv_obj_set_signal_func(new_obj, lv_obj_signal);
         lv_obj_set_design_func(new_obj, lv_obj_design);
 
         /*Set free data*/
-#if LV_OBJ_FREE_NUM != 0
+#ifdef LV_OBJ_FREE_NUM_TYPE
         new_obj->free_num = 0;
 #endif
 #if LV_OBJ_FREE_PTR != 0
@@ -218,10 +212,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     	new_obj->ext_size = copy->ext_size;
 
         /*Set free data*/
-#if LV_OBJ_FREE_NUM != 0
+#ifdef LV_OBJ_FREE_NUM_TYPE
         new_obj->free_num = copy->free_num;
 #endif
-#if LV_OBJ_FREE_P != 0
+#if LV_OBJ_FREE_PTR != 0
         new_obj->free_ptr = copy->free_ptr;
 #endif
     	/*Set attributes*/

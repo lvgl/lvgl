@@ -274,7 +274,6 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             refr_position(roller, false);
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
-        lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(ext->ddlist.sel_opt_id +1 < ext->ddlist.option_cnt) {
