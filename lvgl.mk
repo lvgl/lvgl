@@ -2,6 +2,12 @@ OBJFILES += \
 $(LVGL_PATH)/lv_draw/lv_draw_vbasic.o \
 $(LVGL_PATH)/lv_draw/lv_draw.o \
 $(LVGL_PATH)/lv_draw/lv_draw_rbasic.o \
+$(LVGL_PATH)/lv_core/lv_group.o \
+$(LVGL_PATH)/lv_core/lv_vdb.o \
+$(LVGL_PATH)/lv_core/lv_obj.o \
+$(LVGL_PATH)/lv_core/lv_style.o \
+$(LVGL_PATH)/lv_core/lv_indev.o \
+$(LVGL_PATH)/lv_core/lv_refr.o \
 $(LVGL_PATH)/lv_misc/lv_font.o \
 $(LVGL_PATH)/lv_misc/lv_circ.o \
 $(LVGL_PATH)/lv_misc/lv_area.o \
@@ -95,11 +101,4 @@ $(LVGL_PATH)/lv_themes/lv_theme_templ.o \
 $(LVGL_PATH)/lv_themes/lv_theme.o \
 $(LVGL_PATH)/lv_themes/lv_theme_night.o \
 $(LVGL_PATH)/lv_themes/lv_theme_default.o \
-$(LVGL_PATH)/lv_obj/lv_group.o \
-$(LVGL_PATH)/lv_obj/lv_vdb.o \
-$(LVGL_PATH)/lv_obj/lv_obj.o \
-$(LVGL_PATH)/lv_obj/lv_style.o \
-$(LVGL_PATH)/lv_obj/lv_indev.o \
-$(LVGL_PATH)/lv_obj/lv_refr.o 
-
 
