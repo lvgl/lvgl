@@ -15,7 +15,7 @@
  *      DEFINES
  *********************/
 #if LV_NO_ANIM == 0
-#define LV_STYLE_ANIM_RES       256    /*Animation max in 1024 steps*/
+#define LV_STYLE_ANIM_RES       255    /*Animation max in 1024 steps*/
 #define LV_STYLE_ANIM_SHIFT     8      /*log2(LV_STYLE_ANIM_RES)*/
 
 #define VAL_PROP(v1, v2, r)   v1 + (((v2-v1) * r) >> LV_STYLE_ANIM_SHIFT)
