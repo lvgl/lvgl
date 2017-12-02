@@ -85,8 +85,7 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p);
  * @param data pointer to an allocated memory
  * @return the size of data memory in bytes
  */
-uint32_t lv_mem_get_size(void * data);
-
+uint32_t lv_mem_get_size(const void * data);
 
 /**
  * Halt o NULL pointer

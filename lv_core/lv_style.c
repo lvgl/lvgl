@@ -15,7 +15,7 @@
  *      DEFINES
  *********************/
 #if LV_NO_ANIM == 0
-#define LV_STYLE_ANIM_RES       255    /*Animation max in 1024 steps*/
+#define LV_STYLE_ANIM_RES       256
 #define LV_STYLE_ANIM_SHIFT     8      /*log2(LV_STYLE_ANIM_RES)*/
 
 #define VAL_PROP(v1, v2, r)   v1 + (((v2-v1) * r) >> LV_STYLE_ANIM_SHIFT)
@@ -27,9 +27,10 @@
  **********************/
 #if LV_NO_ANIM == 0
 typedef struct {
-    lv_style_t style_start;   /*Save not only pointers because if same as 'style_anim' then it will be modified too*/
+    lv_style_t style_start;   /*Save not only pointers because can be same as 'style_anim' then it will be modified too*/
     lv_style_t style_end;
-    lv_style_t * style_anim;
+    lv_style_t *style_anim;
+    void (*end_cb)(void *);
 }lv_style_anim_dsc_t;
 #endif
 
@@ -37,7 +38,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 #if LV_NO_ANIM == 0
-static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val);
+static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val);
+static void style_animation_common_end_cb(void *ptr);
 #endif
 
 /**********************
@@ -226,14 +228,16 @@ void lv_style_anim_create(lv_style_anim_t * anim)
     dsc->style_anim = anim->style_anim;
     memcpy(&dsc->style_start, anim->style_start, sizeof(lv_style_t));
     memcpy(&dsc->style_end, anim->style_end, sizeof(lv_style_t));
+    dsc->end_cb = anim->end_cb;
+
 
     lv_anim_t a;
     a.var = (void*)dsc;
     a.start = 0;
     a.end = LV_STYLE_ANIM_RES;
-    a.fp = (lv_anim_fp_t)lv_style_aimator;
+    a.fp = (lv_anim_fp_t)style_animator;
     a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
-    a.end_cb = anim->end_cb;
+    a.end_cb = style_animation_common_end_cb;
     a.act_time = anim->act_time;
     a.time = anim->time;
     a.playback = anim->playback;
@@ -253,7 +257,7 @@ void lv_style_anim_create(lv_style_anim_t * anim)
  * @param dsc the 'animated variable' set by lv_style_anim_create()
  * @param val the current state of the animation between 0 and LV_STYLE_ANIM_RES
  */
-static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
+static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val)
 {
     const lv_style_t * start = &dsc->style_start;
     const lv_style_t * end = &dsc->style_end;
@@ -271,14 +275,15 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
     STYLE_ATTR_ANIM(line.width, val);
     STYLE_ATTR_ANIM(image.intense, val);
 
-    act->body.main_color = lv_color_mix(end->body.main_color, start->body.main_color, val);
-    act->body.grad_color = lv_color_mix(end->body.grad_color, start->body.grad_color, val);
-    act->body.border.color = lv_color_mix(end->body.border.color, start->body.border.color, val);
-    act->body.shadow.color = lv_color_mix(end->body.shadow.color, start->body.shadow.color, val);
-    act->text.color = lv_color_mix(end->text.color, start->text.color, val);
-    act->image.color = lv_color_mix(end->image.color, start->image.color, val);
-    act->line.color = lv_color_mix(end->line.color, start->line.color, val);
+    lv_opa_t opa = val == LV_STYLE_ANIM_RES ? LV_OPA_COVER : val;
 
+    act->body.main_color = lv_color_mix(end->body.main_color, start->body.main_color, opa);
+    act->body.grad_color = lv_color_mix(end->body.grad_color, start->body.grad_color, opa);
+    act->body.border.color = lv_color_mix(end->body.border.color, start->body.border.color, opa);
+    act->body.shadow.color = lv_color_mix(end->body.shadow.color, start->body.shadow.color, opa);
+    act->text.color = lv_color_mix(end->text.color, start->text.color, opa);
+    act->image.color = lv_color_mix(end->image.color, start->image.color, opa);
+    act->line.color = lv_color_mix(end->line.color, start->line.color, opa);
 
     if(val == 0) {
         act->body.empty = start->body.empty;
@@ -295,9 +300,20 @@ static void lv_style_aimator(lv_style_anim_dsc_t * dsc, int32_t val)
     }
 
     lv_obj_report_style_mod(dsc->style_anim);
-
-    if(val == LV_STYLE_ANIM_RES) {
-        lv_mem_free(dsc);
-    }
 }
+
+/**
+ * Called when a style animation is ready
+ * It called the user defined call back and free the allocated memories
+ * @param ptr the 'animated variable' set by lv_style_anim_create()
+ */
+static void style_animation_common_end_cb(void *ptr)
+{
+    lv_style_anim_dsc_t *dsc = ptr;     /*To avoid casting*/
+
+    if(dsc->end_cb) dsc->end_cb(dsc);
+
+    lv_mem_free(dsc);
+}
+
 #endif

@@ -15,11 +15,12 @@
 #if LV_MEM_CUSTOM == 0
 #define LV_MEM_SIZE    (32U * 1024U)        /*Size memory used by mem_alloc (in bytes)*/
 #define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
+#define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
 #else       /*LV_MEM_CUSTOM*/
 #define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
 #define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
 #define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
-#endif  /*DM_CUSTOM*/
+#endif      /*LV_MEM_CUSTOM*/
 
 /*===================
    Graphical settings

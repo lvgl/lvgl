@@ -278,23 +278,8 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Remove the animations from this object*/
     lv_anim_del(obj, NULL);
 #endif
-    /*Remove the object from parent's children list*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par == NULL) { /*It is a screen*/
-    	lv_ll_rem(&scr_ll, obj);
-    } else {
-    	lv_ll_rem(&(par->child_ll), obj);
-    }
-
-    /* All children deleted.
-     * Now clean up the object specific data*/
-    obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
     
-    /*Delete the base objects*/
-    if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
-    lv_mem_free(obj); /*Free the object itself*/
-
-    /* Reset all display input (indev_proc) if
+    /* Reset all input devices if
      * the currently pressed object is deleted*/
     lv_indev_t * indev = lv_indev_next(NULL);
     lv_obj_t * dpar;
@@ -311,6 +296,22 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         }
         indev = lv_indev_next(indev);
     }
+
+    /*Remove the object from parent's children list*/
+    lv_obj_t * par = lv_obj_get_parent(obj);
+    if(par == NULL) { /*It is a screen*/
+    	lv_ll_rem(&scr_ll, obj);
+    } else {
+    	lv_ll_rem(&(par->child_ll), obj);
+    }
+
+    /* All children deleted.
+     * Now clean up the object specific data*/
+    obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
+
+    /*Delete the base objects*/
+    if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
+    lv_mem_free(obj); /*Free the object itself*/
 
     /*Send a signal to the parent to notify it about the child delete*/
     if(par != NULL) {
@@ -861,7 +862,7 @@ void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp)
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
 {
-    obj->ext_attr = lv_mem_realloc(obj->ext_attr, ext_size); 
+   obj->ext_attr = lv_mem_realloc(obj->ext_attr, ext_size);
     
    return (void*)obj->ext_attr;
 }
@@ -1416,6 +1417,7 @@ static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_m
 		lv_style_t * style = lv_obj_get_style(obj);
 		lv_draw_rect(&obj->coords, mask_p, style);
     }
+
     return true;
 }
 

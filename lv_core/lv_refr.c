@@ -40,7 +40,7 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p);
 static void lv_refr_area_part_vdb(const lv_area_t * area_p);
 #endif
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
-static void lv_refr_make(lv_obj_t * top_p, const lv_area_t * mask_p);
+static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p);
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
 
 /**********************
@@ -246,7 +246,7 @@ static void lv_refr_area_no_vdb(const lv_area_t * area_p)
     top_p = lv_refr_get_top_obj(area_p, lv_scr_act());
     
     /*Do the refreshing*/
-    lv_refr_make(top_p, area_p);
+    lv_refr_obj_and_children(top_p, area_p);
 }
 
 #else
@@ -314,12 +314,11 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
     top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
 
     /*Do the refreshing from the top object*/
-    lv_refr_make(top_p, &start_mask);
+    lv_refr_obj_and_children(top_p, &start_mask);
 
     /*Also refresh top and sys layer unconditionally*/
-    lv_refr_make(lv_layer_top(), &start_mask);
-    lv_refr_make(lv_layer_sys(), &start_mask);
-
+    lv_refr_obj_and_children(lv_layer_top(), &start_mask);
+    lv_refr_obj_and_children(lv_layer_sys(), &start_mask);
 
     /*Flush the content of the VDB*/ 
     lv_vdb_flush();
@@ -368,7 +367,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
  * @param top_p pointer to an objects. Start the drawing from it.
  * @param mask_p pointer to an area, the objects will be drawn only here
  */
-static void lv_refr_make(lv_obj_t * top_p, const lv_area_t * mask_p)
+static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 {
     /* Normally always will be a top_obj (at least the screen)
      * but in special cases (e.g. if the screen has alpha) it won't.

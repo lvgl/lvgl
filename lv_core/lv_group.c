@@ -77,11 +77,13 @@ void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
-    lv_obj_t ** i;
 
+    /*Search the object and remove it from its group */
+    lv_obj_t ** i;
     LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             lv_ll_rem(&g->obj_ll, i);
+            obj->group_p = NULL;
             break;
         }
     }

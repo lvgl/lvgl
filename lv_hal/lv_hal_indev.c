@@ -63,6 +63,9 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t *driver)
     memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
 
     node->next = NULL;
+    node->proc.reset_query = 1;
+    node->cursor = NULL;
+    node->group = NULL;
 
     if (indev_list == NULL) {
         indev_list = node;

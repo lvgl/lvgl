@@ -19,6 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_MEM_ADD_JUNK     0   /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 
 /**********************
  *      TYPEDEFS
@@ -47,7 +48,7 @@ typedef struct
 #if LV_MEM_CUSTOM == 0
 static lv_mem_ent_t  * ent_get_next(lv_mem_ent_t * act_e);
 static void * ent_alloc(lv_mem_ent_t * e, uint32_t size);
-static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size);
+static void ent_trunc(lv_mem_ent_t * e, uint32_t size);
 #endif
 
 /**********************
@@ -113,6 +114,11 @@ void * lv_mem_alloc(uint32_t size)
         }
     //End if there is not next entry OR the alloc. is successful
     }while(e != NULL && alloc == NULL); 
+
+#if LV_MEM_ADD_JUNK
+    if(alloc != NULL) memset(alloc, 0xaa, size);
+#endif
+
 #else  /*Use custom, user defined malloc function*/
     /*Allocate a header too to store the size*/
     alloc = LV_MEM_CUSTOM_ALLOC(size + sizeof(lv_mem_header_t));
@@ -135,11 +141,17 @@ void lv_mem_free(const void * data)
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
+
+#if LV_MEM_ADD_JUNK
+    memset((void*)data, 0xbb, lv_mem_get_size(data));
+#endif
+
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data - sizeof(lv_mem_header_t));
     e->header.used = 0;
 
-#if LV_MEM_CUSTOM == 0 /*Use the free from dyn_mem*/
+#if LV_MEM_CUSTOM == 0
+#if LV_MEM_AUTO_DEFRAG
     /* Make a simple defrag.
      * Join the following free entries after this*/
     lv_mem_ent_t * e_next;
@@ -152,6 +164,7 @@ void lv_mem_free(const void * data)
         }
         e_next = ent_get_next(e_next);
     }
+#endif
 #else /*Use custom, user defined free function*/
     LV_MEM_CUSTOM_FREE(e);
 #endif
@@ -169,11 +182,21 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
     /*data_p could be previously freed pointer (in this case it is invalid)*/
     if(data_p != NULL) {
         lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data_p - sizeof(lv_mem_header_t));
-        if(e->header.used == 0) data_p = NULL;
+        if(e->header.used == 0) {
+            data_p = NULL;
+        }
     }
 
     uint32_t old_size = lv_mem_get_size(data_p);
-    if(old_size == new_size) return data_p;
+    if(old_size == new_size) return data_p;     /*Also avoid reallocating the same memory*/
+
+    /* Only truncate the memory is possible
+     * If the 'old_size' was extended by a header size in 'ent_trunc' it avoids reallocating this same memory */
+    if(new_size < old_size) {
+        lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data_p - sizeof(lv_mem_header_t));
+        ent_trunc(e, new_size);
+        return &e->first_data;
+    }
 
     void * new_p;
     new_p = lv_mem_alloc(new_size);
@@ -271,7 +294,7 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
  * @param data pointer to an allocated memory
  * @return the size of data memory in bytes 
  */
-uint32_t lv_mem_get_size(void * data)
+uint32_t lv_mem_get_size(const void * data)
 {
     if(data == NULL) return 0;
     if(data == &zero_mem) return 0;
@@ -320,7 +343,7 @@ static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
 {
     void * alloc = NULL;
     
-    /*If the memory is free and big enough ten use it */
+    /*If the memory is free and big enough then use it */
     if(e->header.used == 0 && e->header.d_size >= size) {
         /*Truncate the entry to the desired size */
         ent_trunc(e, size),
@@ -338,15 +361,18 @@ static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
  * Truncate the data of entry to the given size
  * @param e Pointer to an entry
  * @param size new size in bytes
- * @return the new entry created from the remaining memory
  */
-static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size)
+static void ent_trunc(lv_mem_ent_t * e, uint32_t size)
 {
-    lv_mem_ent_t * new_e;
+    /*Round the size up to 4*/
+    if(size & 0x3 ) {
+        size = size & (~0x3);
+        size += 4;
+    }
     
-    /*Do let empty space  only for a header withot data*/
+    /*Don't let empty space only for a header without data*/
     if(e->header.d_size == size + sizeof(lv_mem_header_t)) {
-        size += sizeof(lv_mem_header_t);
+        size = e->header.d_size;
     }
 
     /* Create the new entry after the current if there is space for it */
@@ -356,12 +382,9 @@ static lv_mem_ent_t * ent_trunc(lv_mem_ent_t * e, uint32_t size)
         after_new_e->header.used = 0;
         after_new_e->header.d_size = e->header.d_size - size - sizeof(lv_mem_header_t);
     }
-    
+
     /* Set the new size for the original entry */
     e->header.d_size = size;
-    new_e = e;
-    
-    return new_e;
 }
 
 #endif
