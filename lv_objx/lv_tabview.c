@@ -446,7 +446,7 @@ bool lv_tabview_get_sliding(lv_obj_t * tabview)
  * @param tabview pointer to Tab view object
  * @return time of animation in milliseconds
  */
-uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms)
+uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview)
 {
     lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
     return ext->anim_time;
@@ -595,6 +595,8 @@ static lv_res_t tabpage_scrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void 
  */
 static void tabpage_pressed_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
+    (void)tabpage;
+
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     lv_indev_t * indev = lv_indev_get_act();
     lv_indev_get_point(indev, &ext->point_last);

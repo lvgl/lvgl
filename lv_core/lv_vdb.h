@@ -60,7 +60,11 @@ void lv_flush_ready(void);
  *      MACROS
  **********************/
 
-#endif /*LV_VDB_SIZE != 0*/
+#else /*LV_VDB_SIZE != 0*/
+
+/*Just for compatibility*/
+void lv_flush_ready(void);
+#endif
 
 #ifdef __cplusplus
 } /* extern "C" */

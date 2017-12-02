@@ -417,6 +417,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 			else if(btn_i == ext->btn_id_pr && btn_i != ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_PR);
             else if(btn_i != ext->btn_id_pr && btn_i == ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_REL);
             else if(btn_i == ext->btn_id_pr && btn_i == ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_PR);
+            else btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL);    /*Not possible option, just to be sure*/
 
 			/*On the right buttons clear the border if only right borders are drawn*/
 			if(ext->map_p[txt_i + 1][0] == '\0' || ext->map_p[txt_i + 1][0] == '\n') {

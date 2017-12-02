@@ -182,7 +182,7 @@ bool lv_tabview_get_sliding(lv_obj_t * tabview);
  * @param tabview pointer to Tab view object
  * @return time of animation in milliseconds
  */
-uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
+uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview);
 
 /**
  * Get a style of a tab view

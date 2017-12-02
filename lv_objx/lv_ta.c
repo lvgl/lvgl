@@ -1013,7 +1013,8 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
  */
 static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x)
 {
-
+    (void)ta;
+    (void)x;
 }
 
 /**

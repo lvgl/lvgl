@@ -467,7 +467,7 @@ static void lv_win_realign(lv_obj_t * win)
 
     bool first_btn = true;
     lv_obj_t *btn;
-    lv_obj_t *btn_prev;
+    lv_obj_t *btn_prev = NULL;
     /*Refresh the size of all control buttons*/
     btn = lv_obj_get_child_back(ext->header, NULL);
     btn = lv_obj_get_child_back(ext->header, btn);    /*Skip the title*/

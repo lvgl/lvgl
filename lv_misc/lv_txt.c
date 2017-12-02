@@ -224,7 +224,7 @@ bool lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c)
 {
     bool ret = false;
 
-    if(c == LV_TXT_COLOR_CMD[0]) {
+    if(c == (uint32_t)LV_TXT_COLOR_CMD[0]) {
        if(*state == LV_TXT_CMD_STATE_WAIT) { /*Start char*/
            *state = LV_TXT_CMD_STATE_PAR;
            ret = true;
@@ -263,7 +263,7 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     pos = txt_utf8_get_byte_id(txt_buf, pos);   /*Convert to byte index instead of letter index*/
 #endif
     /*Copy the second part into the end to make place to text to insert*/
-    int32_t i;
+    uint32_t i;
     for(i = new_len; i >= pos + ins_len; i--){
         txt_buf[i] = txt_buf[i - ins_len];
     }
@@ -550,7 +550,7 @@ static bool is_break_char(uint32_t letter)
     
     /*Compare the letter to TXT_BREAK_CHARS*/
     for(i = 0; LV_TXT_BREAK_CHARS[i] != '\0'; i++) {
-        if(letter == LV_TXT_BREAK_CHARS[i]) {
+        if(letter == (uint32_t)LV_TXT_BREAK_CHARS[i]) {
             ret = true; /*If match then it is break char*/
             break;
         }

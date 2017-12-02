@@ -1428,6 +1428,8 @@ static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_m
  */
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
+    (void)param;
+
     lv_res_t res = LV_RES_OK;
 
     lv_style_t * style = lv_obj_get_style(obj);

@@ -270,6 +270,9 @@ void * lv_ll_get_prev(lv_ll_t * ll_p, void * n_act)
 
 void lv_ll_swap(lv_ll_t * ll_p, void * n1_p, void * n2_p)
 {
+    (void)(ll_p);
+    (void)(n1_p);
+    (void)(n2_p);
     /*TODO*/
 }
 

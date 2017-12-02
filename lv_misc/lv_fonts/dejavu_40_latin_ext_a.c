@@ -5433,6 +5433,7 @@ lv_font_t lv_font_dejavu_40_latin_ext_a =
     dejavu_40_latin_ext_a_bitmap,    /*Glyph's bitmap*/
     dejavu_40_latin_ext_a_map,    /*Glyph start indexes in the bitmap*/
     dejavu_40_latin_ext_a_width,    /*Glyph widths (columns)*/
+    NULL
 };
 
 #endif /*DEJAVU_40_LATIN_EXT_A_H*/

@@ -428,6 +428,7 @@ lv_fs_res_t lv_ufs_readdir(void * dir_p, char * fn)
  */
 lv_fs_res_t lv_ufs_readdir_close(void * rddir_p)
 {
+    (void)rddir_p;
     return FS_RES_OK;
 }
 

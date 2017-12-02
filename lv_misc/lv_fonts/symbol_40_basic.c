@@ -622,6 +622,7 @@ lv_font_t lv_font_symbol_40_basic =
     symbol_40_basic_bitmap,    /*Glyph's bitmap*/
     symbol_40_basic_map,    /*Glyph start indexes in the bitmap*/
     symbol_40_basic_width,    /*Glyph widths (columns)*/
+    NULL
 };
 
 #endif /*SYMBOL_40_BASIC_H*/

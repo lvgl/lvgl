@@ -903,6 +903,7 @@ lv_font_t lv_font_symbol_60_basic =
     symbol_60_basic_bitmap,    /*Glyph's bitmap*/
     symbol_60_basic_map,    /*Glyph start indexes in the bitmap*/
     symbol_60_basic_width,    /*Glyph widths (columns)*/
+    NULL
 };
 
 #endif /*SYMBOL_60_BASIC_H*/

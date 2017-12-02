@@ -191,4 +191,13 @@ void lv_flush_ready(void)
  *   STATIC FUNCTIONS
  **********************/
 
+#else
+
+/**
+ * Just for compatibility
+ */
+void lv_flush_ready(void)
+{
+    /*Do nothing. It is used only for VDB*/
+}
 #endif

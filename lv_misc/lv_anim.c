@@ -169,6 +169,8 @@ lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name)
  */
 static void anim_task (void * param)
 {
+    (void)param;
+
 	volatile uint32_t elaps;
 	elaps = lv_tick_elaps(last_task_run);
 

@@ -522,7 +522,7 @@ static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t len
     if(opa == LV_OPA_COVER) {
         memcpy(dest, src, length * sizeof(lv_color_t));
     } else {
-        lv_coord_t col;
+        uint32_t col;
         for(col = 0; col < length; col++) {
         	dest[col] = lv_color_mix(src[col], dest[col], opa);
 		}
@@ -541,7 +541,7 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
 {
     /*Set all row in vdb to the given color*/
     lv_coord_t row;
-    uint32_t col;
+    lv_coord_t col;
     lv_coord_t mem_width = lv_area_get_width(mem_area);
 
     /*Run simpler function without opacity*/

@@ -135,21 +135,21 @@ lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb);
  * @param kb pointer to a Keyboard object
  * @return true: show cursor on the current text area, false: hide cursor
  */
-bool lv_kb_get_cursor_manage(lv_obj_t * kb, bool en);
+bool lv_kb_get_cursor_manage(lv_obj_t * kb);
 
 /**
  * Get the callback to call when the "Ok" button is pressed
  * @param kb pointer to Keyboard object
  * @return the ok callback
  */
-lv_action_t lv_kb_get_ok_action(lv_obj_t * kb, lv_action_t action);
+lv_action_t lv_kb_get_ok_action(lv_obj_t * kb);
 
 /**
  * Get the callback to call when the "Hide" button is pressed
  * @param kb pointer to Keyboard object
  * @return the close callback
  */
-lv_action_t lv_kb_get_close_action(lv_obj_t * kb, lv_action_t action);
+lv_action_t lv_kb_get_close_action(lv_obj_t * kb);
 
 /**
  * Get a style of a keyboard

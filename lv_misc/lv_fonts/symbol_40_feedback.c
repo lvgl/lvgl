@@ -664,6 +664,7 @@ lv_font_t lv_font_symbol_40_feedback =
     symbol_40_feedback_bitmap,    /*Glyph's bitmap*/
     symbol_40_feedback_map,    /*Glyph start indexes in the bitmap*/
     symbol_40_feedback_width,    /*Glyph widths (columns)*/
+    NULL
 };
 
 #endif /*SYMBOL_40_FEEDBACK_H*/

@@ -146,6 +146,7 @@ void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
  */
 static void lv_refr_task(void * param)
 {
+    (void)param;
 
     uint32_t start = lv_tick_get();
 
@@ -257,7 +258,7 @@ static void lv_refr_area_no_vdb(const lv_area_t * area_p)
 static void lv_refr_area_with_vdb(const lv_area_t * area_p)
 {
     /*Calculate the max row num*/
-    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (lv_area_get_width(area_p));
+    lv_coord_t max_row = (uint32_t) LV_VDB_SIZE / (lv_area_get_width(area_p));
     if(max_row > lv_area_get_height(area_p)) max_row = lv_area_get_height(area_p);
     
     /*Round the row number with downscale*/

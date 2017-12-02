@@ -4039,6 +4039,7 @@ lv_font_t lv_font_dejavu_40 =
     dejavu_40_bitmap,    /*Glyph's bitmap*/
     dejavu_40_map,    /*Glyph start indexes in the bitmap*/
     dejavu_40_width,    /*Glyph widths (columns)*/
+    NULL
 };
 
 #endif /*DEJAVU_40_H*/

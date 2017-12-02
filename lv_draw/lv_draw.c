@@ -265,7 +265,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
 
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;
-    uint16_t par_start;
+    uint16_t par_start = 0;
     lv_color_t recolor;
 
     if(offset != NULL) {
@@ -285,7 +285,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
             letter = lv_txt_utf8_next(txt, &i);
             /*Handle the re-color command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-                if(letter == LV_TXT_COLOR_CMD[0]) {
+                if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
                         par_start = i + lv_txt_utf8_size(txt[i]);
                         cmd_state = CMD_STATE_PAR;

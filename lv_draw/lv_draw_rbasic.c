@@ -45,6 +45,8 @@
  */
 void lv_rpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t color, lv_opa_t opa)
 {
+    (void)opa;      /*Opa is used only for compatibility with lv_vpx*/
+
     lv_area_t area;
     area.x1 = x;
     area.y1 = y;
@@ -64,6 +66,9 @@ void lv_rpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p, 
               lv_color_t color, lv_opa_t opa)
 {   
+
+    (void)opa;      /*Opa is used only for compatibility with lv_vfill*/
+
     lv_area_t masked_area;
     bool union_ok = true;
     
@@ -93,6 +98,8 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                      const lv_font_t * font_p, uint32_t letter,
                      lv_color_t color, lv_opa_t opa)
 {
+    (void)opa;      /*Opa is used only for compatibility with lv_vletter*/
+
     uint8_t w = lv_font_get_width(font_p, letter);
 
     if(letter == 'C') {
@@ -178,6 +185,11 @@ void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
              const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale,
 			 lv_color_t recolor, lv_opa_t recolor_opa)
 {
+    (void)opa;              /*opa is used only for compatibility with lv_vmap*/
+    (void)recolor_opa;      /*recolor_opa is used only for compatibility with lv_vmap*/
+    (void)recolor;          /*recolor is used only for compatibility with lv_vmap*/
+    (void)upscale;          /*upscale is used only for compatibility with lv_vmap*/
+
     lv_area_t masked_a;
     bool union_ok;
 

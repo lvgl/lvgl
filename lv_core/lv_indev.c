@@ -192,6 +192,8 @@ void lv_indev_wait_release(lv_indev_t * indev)
  */
 static void indev_proc_task(void * param)
 {
+    (void)param;
+
     lv_indev_data_t data;
     lv_indev_t * i;
     i = lv_indev_next(NULL);

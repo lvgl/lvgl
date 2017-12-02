@@ -195,7 +195,7 @@ lv_coord_t lv_chart_get_series_width(lv_obj_t * chart);
  * @param chart pointer to chart object
  * @return dark effect level (LV_OPA_TRANSP to turn off)
  */
-lv_opa_t lv_chart_get_series_darking(lv_obj_t * chart, lv_opa_t dark_eff);
+lv_opa_t lv_chart_get_series_darking(lv_obj_t * chart);
 
 /**
  * Get the style of an chart object

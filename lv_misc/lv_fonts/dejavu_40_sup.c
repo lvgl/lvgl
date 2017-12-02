@@ -4081,6 +4081,7 @@ lv_font_t lv_font_dejavu_40_sup =
     dejavu_40_sup_bitmap,    /*Glyph's bitmap*/
     dejavu_40_sup_map,    /*Glyph start indexes in the bitmap*/
     dejavu_40_sup_width,    /*Glyph widths (columns)*/
+    NULL
 };
 
 #endif /*DEJAVU_40_SUP_H*/

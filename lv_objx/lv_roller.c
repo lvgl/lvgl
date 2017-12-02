@@ -244,7 +244,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
  */
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param)
 {
-    lv_res_t res;
+    lv_res_t res  = LV_RES_OK;
 
     /*Don't let the drop down list to handle the control signals. It works differently*/
     if(sign != LV_SIGNAL_CONTROLL && sign != LV_SIGNAL_FOCUS && sign != LV_SIGNAL_DEFOCUS) {

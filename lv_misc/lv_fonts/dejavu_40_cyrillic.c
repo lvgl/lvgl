@@ -10841,6 +10841,7 @@ lv_font_t lv_font_dejavu_40_cyrillic =
     dejavu_40_cyrillic_bitmap,    /*Glyph's bitmap*/
     dejavu_40_cyrillic_map,    /*Glyph start indexes in the bitmap*/
     dejavu_40_cyrillic_width,    /*Glyph widths (columns)*/
+    NULL
 };
 
 #endif /*DEJAVU_40_CYRILLIC_H*/

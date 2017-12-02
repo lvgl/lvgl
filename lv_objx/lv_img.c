@@ -205,9 +205,9 @@ void lv_img_set_upscale(lv_obj_t * img, bool upscale_en)
     /*Upscale works only if antialiassing is enabled*/
 #if LV_ANTIALIAS == 0
     upscale_en = false;
-#else
-    ext->upscale = (upscale_en == false ? 0 : 1);
 #endif
+    ext->upscale = (upscale_en == false ? 0 : 1);
+
     /*Refresh the image with the new size*/
     lv_img_set_file(img, ext->fn);
 }
