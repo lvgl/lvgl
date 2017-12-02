@@ -918,7 +918,7 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
 	lv_obj_t * par = lv_obj_get_parent(obj);
 
 	/*Get the direction*/
-	bool out = (type & ANIM_DIR_MASK) == ANIM_IN ? false : true;
+	bool out = (type & ANIM_DIR_MASK) == LV_ANIM_IN ? false : true;
 	type = type & (~ANIM_DIR_MASK);
 
 	lv_anim_t a;

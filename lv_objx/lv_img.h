@@ -59,7 +59,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
  * @param data pointer to a color map with lv_img_raw_header_t header
  * @return result of the file operation. FS_RES_OK or any error from lv_fs_res_t
  */
-lv_fs_res_t lv_img_create_file(const char * fn, const color_int_t * data);
+lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data);
 
 /*=====================
  * Setter functions
@@ -139,7 +139,7 @@ static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
  **********************/
 
 /*Use this macro to declare an image in a c file*/
-#define LV_IMG_DECLARE(var_name) extern const color_int_t var_name[];
+#define LV_IMG_DECLARE(var_name) extern const lv_color_int_t var_name[];
 
 #endif  /*USE_LV_IMG*/
 

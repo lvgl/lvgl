@@ -100,7 +100,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
  * @param data pointer to a color map with lv_img_raw_header_t header
  * @return result of the file operation. FS_RES_OK or any error from lv_fs_res_t
  */
-lv_fs_res_t lv_img_create_file(const char * fn, const color_int_t * data)
+lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data)
 {
 	const lv_img_raw_header_t * raw_p = (lv_img_raw_header_t *) data;
 	lv_fs_res_t res;

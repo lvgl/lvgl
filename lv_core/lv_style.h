@@ -106,7 +106,7 @@ typedef struct {
     const lv_style_t * style_start; /*Pointer to the starting style*/
     const lv_style_t * style_end;   /*Pointer to the destination style*/
     lv_style_t * style_anim;        /*Pointer to a style to animate*/
-    lv_anim_cb_t end_cb;               /*Call it when the animation is ready*/
+    lv_anim_cb_t end_cb;            /*Call it when the animation is ready (NULL if unused)*/
     int16_t time;                   /*Animation time in ms*/
     int16_t act_time;               /*Current time in animation. Set to negative to make delay.*/
     uint16_t playback_pause;        /*Wait before play back*/
