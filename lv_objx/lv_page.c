@@ -30,7 +30,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_page_sb_refresh(lv_obj_t * main);
-static bool lv_page_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
+static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mode_t mode);
 static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
@@ -344,35 +344,52 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_page_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode)
+static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-    	return ancestor_design(scrl, mask, mode);
+    	return ancestor_design(page, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-		ancestor_design(scrl, mask, mode);
+        /*Draw without border*/
+        lv_style_t *style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+        lv_coord_t border_width_tmp =  style->body.border.width;
+        style->body.border.width = 0;
+        lv_draw_rect(&page->coords, mask, style);
+        style->body.border.width = border_width_tmp;
+
 	} else if(mode == LV_DESIGN_DRAW_POST) { /*Draw the scroll bars finally*/
-		ancestor_design(scrl, mask, mode);
-		lv_page_ext_t * ext = lv_obj_get_ext_attr(scrl);
+
+        /*Draw only a border*/
+        lv_style_t *style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+        lv_coord_t shadow_width_tmp =  style->body.shadow.width;
+        uint8_t empty_tmp =  style->body.empty;
+        style->body.shadow.width = 0;
+        style->body.empty = 1;
+        lv_draw_rect(&page->coords, mask, style);
+        style->body.shadow.width = shadow_width_tmp;
+        style->body.empty = empty_tmp;
+
+
+		lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
 		/*Draw the scrollbars*/
 		lv_area_t sb_area;
 		if(ext->sb.hor_draw) {
 		    /*Convert the relative coordinates to absolute*/
             lv_area_copy(&sb_area, &ext->sb.hor_area);
-		    sb_area.x1 += scrl->coords.x1;
-            sb_area.y1 += scrl->coords.y1;
-            sb_area.x2 += scrl->coords.x1;
-            sb_area.y2 += scrl->coords.y1;
+		    sb_area.x1 += page->coords.x1;
+            sb_area.y1 += page->coords.y1;
+            sb_area.x2 += page->coords.x1;
+            sb_area.y2 += page->coords.y1;
 			lv_draw_rect(&sb_area, mask, ext->sb.style);
 		}
 
 		if(ext->sb.ver_draw) {
             /*Convert the relative coordinates to absolute*/
             lv_area_copy(&sb_area, &ext->sb.ver_area);
-            sb_area.x1 += scrl->coords.x1;
-            sb_area.y1 += scrl->coords.y1;
-            sb_area.x2 += scrl->coords.x1;
-            sb_area.y2 += scrl->coords.y1;
+            sb_area.x1 += page->coords.x1;
+            sb_area.y1 += page->coords.y1;
+            sb_area.x2 += page->coords.x1;
+            sb_area.y2 += page->coords.y1;
 			lv_draw_rect(&sb_area, mask, ext->sb.style);
 		}
 	}
