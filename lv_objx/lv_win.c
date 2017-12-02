@@ -448,6 +448,12 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
             lv_win_realign(win);
         }
     }
+    else if(sign == LV_SIGNAL_CLEANUP) {
+        ext->header = NULL;     /*These objects were children so they are already invalid*/
+        ext->page = NULL;
+        ext->title = NULL;
+    }
+
 
     return res;
 }

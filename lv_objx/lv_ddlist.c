@@ -460,11 +460,15 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     res = ancestor_signal(ddlist, sign, param);
     if(res != LV_RES_OK) return res;
 
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_ddlist_refr_size(ddlist, 0);
     }
+    else if(sign == LV_SIGNAL_CLEANUP) {
+        ext->label = NULL;
+    }
     else if(sign == LV_SIGNAL_FOCUS) {
-        lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         if(ext->opened == false) {
             ext->opened = true;
             lv_ddlist_refr_size(ddlist, true);
@@ -522,12 +526,17 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
     res = ancestor_scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
 
+    lv_obj_t *ddlist = lv_obj_get_parent(scrl);
+
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         /* Because of the wider selected rectangle ext. size
          * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
-        lv_obj_t *ddlist = lv_obj_get_parent(scrl);
         lv_style_t *style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
         if(scrl->ext_size < style->body.padding.hor) scrl->ext_size = style->body.padding.hor;
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
+        lv_ddlist_ext_t *ext = lv_obj_get_ext_attr(ddlist);
+        ext->label = NULL;      /*The label is already deleted*/
     }
 
     return res;

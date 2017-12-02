@@ -165,8 +165,13 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
 	}
 
 	if(fn != NULL) {
-	    ext->fn = lv_mem_realloc(ext->fn, strlen(fn) + 1);
-		strcpy(ext->fn, fn);
+	    /* Don't refresh if set the the current 'fn'
+	     * 'lv_mem_realloc' first allocates a new mem and then frees the old
+	     * in this case it would free itself so it wouldn't be anything to 'strcpy' */
+	    if(ext->fn != fn) {
+            ext->fn = lv_mem_realloc(ext->fn, strlen(fn) + 1);
+            strcpy(ext->fn, fn);
+	    }
 	} else {
 		ext->fn = NULL;
 	}

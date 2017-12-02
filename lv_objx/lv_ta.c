@@ -91,6 +91,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     ext->cursor.pos = 0;
     ext->cursor.type = LV_CURSOR_LINE;
     ext->cursor.valid_x = 0;
+    ext->one_line = 0;
     ext->label = NULL;
 
 

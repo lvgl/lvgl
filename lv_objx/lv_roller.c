@@ -315,6 +315,9 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     int32_t id = -1;
     lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+
+    if(ext->ddlist.label == NULL) return LV_RES_INV;    /*On delete the ddlist signal deletes the label so nothing left to do here*/
+
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const lv_font_t * font = style_label->text.font;
     lv_coord_t font_h = lv_font_get_height_scale(font);

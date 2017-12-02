@@ -90,6 +90,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
     ext->anim_time = LV_TABVIEW_ANIM_TIME;
     ext->tab_name_ptr = lv_mem_alloc(sizeof(char*));
     ext->tab_name_ptr[0] = "";
+    ext->tab_cnt = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_tabview, lv_tabview_signal);
@@ -503,6 +504,8 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 
         lv_mem_free(ext->tab_name_ptr);
         ext->tab_name_ptr = NULL;
+        ext->btns = NULL;     /*These objects were children so they are already invalid*/
+        ext->content= NULL;
     }
     else if(sign == LV_SIGNAL_CORD_CHG) {
         if(ext->content != NULL &&
