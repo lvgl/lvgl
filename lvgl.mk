@@ -63,7 +63,6 @@ $(LVGL_PATH)/lv_misc/lv_fonts/symbol_10_file.o \
 $(LVGL_PATH)/lv_misc/lv_fonts/dejavu_80_latin_ext_b.o \
 $(LVGL_PATH)/lv_misc/lv_fonts/dejavu_10_latin_ext_a.o \
 $(LVGL_PATH)/lv_misc/lv_mem.o \
-$(LVGL_PATH)/lv_misc/lv_templ.o \
 $(LVGL_PATH)/lv_misc/lv_ll.o \
 $(LVGL_PATH)/lv_misc/lv_color.o \
 $(LVGL_PATH)/lv_misc/lv_txt.o \
@@ -90,7 +89,6 @@ $(LVGL_PATH)/lv_objx/lv_led.o \
 $(LVGL_PATH)/lv_objx/lv_chart.o \
 $(LVGL_PATH)/lv_objx/lv_img.o \
 $(LVGL_PATH)/lv_objx/lv_gauge.o \
-$(LVGL_PATH)/lv_objx/lv_objx_templ.o \
 $(LVGL_PATH)/lv_objx/lv_btnm.o \
 $(LVGL_PATH)/lv_objx/lv_cont.o \
 $(LVGL_PATH)/lv_hal/lv_hal_indev.o \

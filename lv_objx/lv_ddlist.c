@@ -475,14 +475,12 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
-        lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         if(ext->opened != false) {
             ext->opened = false;
             lv_ddlist_refr_size(ddlist, true);
         }
     }
     else if(sign == LV_SIGNAL_CONTROLL) {
-        lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(ext->sel_opt_id + 1 < ext->option_cnt) {
