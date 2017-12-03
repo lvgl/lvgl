@@ -57,7 +57,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
  * Create a file to the RAMFS from a picture data
  * @param fn file name of the new file (e.g. "pic1", will be available at "U:/pic1")
  * @param data pointer to a color map with lv_img_raw_header_t header
- * @return result of the file operation. FS_RES_OK or any error from lv_fs_res_t
+ * @return result of the file operation. LV_FS_RES_OK or any error from lv_fs_res_t
  */
 lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data);
 

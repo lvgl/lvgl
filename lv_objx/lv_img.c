@@ -98,7 +98,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
  * Create a file to the RAMFS from a picture data
  * @param fn file name of the new file (e.g. "pic1", will be available at "U:/pic1")
  * @param data pointer to a color map with lv_img_raw_header_t header
- * @return result of the file operation. FS_RES_OK or any error from lv_fs_res_t
+ * @return result of the file operation. LV_FS_RES_OK or any error from lv_fs_res_t
  */
 lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data)
 {
@@ -128,13 +128,13 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
         lv_fs_res_t res;
         lv_img_raw_header_t header;
         uint32_t rn;
-        res = lv_fs_open(&file, fn, FS_MODE_RD);
-        if(res == FS_RES_OK) {
+        res = lv_fs_open(&file, fn, LV_FS_MODE_RD);
+        if(res == LV_FS_RES_OK) {
             res = lv_fs_read(&file, &header, sizeof(header), &rn);
         }
 
         /*Create a dummy header on fs error*/
-        if(res != FS_RES_OK || rn != sizeof(header)) {
+        if(res != LV_FS_RES_OK || rn != sizeof(header)) {
             header.w = lv_obj_get_width(img);
             header.h = lv_obj_get_height(img);
             header.transp = 0;

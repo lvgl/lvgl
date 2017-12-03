@@ -359,8 +359,8 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
         lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
     } else {
         lv_fs_file_t file;
-        lv_fs_res_t res = lv_fs_open(&file, fn, FS_MODE_RD);
-        if(res == FS_RES_OK) {
+        lv_fs_res_t res = lv_fs_open(&file, fn, LV_FS_MODE_RD);
+        if(res == LV_FS_RES_OK) {
             lv_img_raw_header_t header;
             uint32_t br;
             res = lv_fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
@@ -439,7 +439,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
         lv_fs_close(&file);
 
-        if(res != FS_RES_OK) {
+        if(res != LV_FS_RES_OK) {
             lv_draw_rect(coords, mask, &lv_style_plain);
             lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
         }

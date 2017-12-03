@@ -53,14 +53,14 @@ void lv_fs_init(void)
  * @param file_p pointer to a lv_fs_file_t variable
  * @param path path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_open (lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode)
 {
     file_p->drv = NULL;
     file_p->file_d = NULL;
     
-    if(path == NULL) return FS_RES_INV_PARAM;
+    if(path == NULL) return LV_FS_RES_INV_PARAM;
 
     char letter = path[0];
     
@@ -68,46 +68,50 @@ lv_fs_res_t lv_fs_open (lv_fs_file_t * file_p, const char * path, lv_fs_mode_t m
     
     if(file_p->drv == NULL) {
         file_p->file_d = NULL;
-        return FS_RES_NOT_EX;
+        return LV_FS_RES_NOT_EX;
     }
     
     if(file_p->drv->ready != NULL) {
         if(file_p->drv->ready() == false) {
             file_p->drv = NULL;
             file_p->file_d = NULL;
-            return FS_RES_HW_ERR;
+            return LV_FS_RES_HW_ERR;
         }
     }
     
     file_p->file_d = lv_mem_alloc(file_p->drv->file_size);
     if(file_p->file_d == NULL) {   
         file_p->drv = NULL;
-        return FS_RES_OUT_OF_MEM;  /* Out of memory */
+        return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
     }        
     
     if(file_p->drv->open == NULL) {
-        return FS_RES_NOT_IMP;
+        return LV_FS_RES_NOT_IMP;
     }
     
     const char * real_path = lv_fs_get_real_path(path);
     lv_fs_res_t res = file_p->drv->open(file_p->file_d, real_path, mode);
     
+    if(res != LV_FS_RES_OK) {
+        file_p->drv = NULL;
+    }
+
     return res;
 }
 
 /**
  * Close an already opened file
  * @param file_p pointer to a lv_fs_file_t variable
- * @return  FS_RES_OK or any error from lv_fs_res_t enum
+ * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_close (lv_fs_file_t * file_p)
 {
     if(file_p->drv == NULL) {
-        return FS_RES_INV_PARAM;
+        return LV_FS_RES_INV_PARAM;
     }
     
     if(file_p->drv->close == NULL) {
-        return FS_RES_NOT_IMP;
+        return LV_FS_RES_NOT_IMP;
     }
     
     lv_fs_res_t res = file_p->drv->close(file_p->file_d);
@@ -123,22 +127,22 @@ lv_fs_res_t lv_fs_close (lv_fs_file_t * file_p)
 /**
  * Delete a file
  * @param path path of the file to delete
- * @return  FS_RES_OK or any error from lv_fs_res_t enum
+ * @return  LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_remove (const char * path)
 {
-    if(path == NULL) return FS_RES_INV_PARAM;
+    if(path == NULL) return LV_FS_RES_INV_PARAM;
     lv_fs_drv_t * drv = NULL;
 
     char letter = path[0];
 
     drv = lv_fs_get_drv(letter);
-    if(drv == NULL) return FS_RES_NOT_EX;
+    if(drv == NULL) return LV_FS_RES_NOT_EX;
     if(drv->ready != NULL) {
-       if(drv->ready() == false) return FS_RES_HW_ERR;
+       if(drv->ready() == false) return LV_FS_RES_HW_ERR;
     }
 
-   if(drv->remove == NULL) return FS_RES_NOT_IMP;
+   if(drv->remove == NULL) return LV_FS_RES_NOT_IMP;
 
    const char * real_path = lv_fs_get_real_path(path);
    lv_fs_res_t res = drv->remove(real_path);
@@ -152,13 +156,13 @@ lv_fs_res_t lv_fs_remove (const char * path)
  * @param buf pointer to a buffer where the read bytes are stored
  * @param btr Bytes To Read
  * @param br the number of real read bytes (Bytes Read). NULL if unused.
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_read (lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     if(br != NULL) *br = 0;
-    if(file_p->drv == NULL || file_p->drv == NULL) return FS_RES_INV_PARAM;
-    if(file_p->drv->read == NULL) return FS_RES_NOT_IMP;
+    if(file_p->drv == NULL || file_p->drv == NULL) return LV_FS_RES_INV_PARAM;
+    if(file_p->drv->read == NULL) return LV_FS_RES_NOT_IMP;
     
     uint32_t br_tmp = 0;
     lv_fs_res_t res = file_p->drv->read(file_p->file_d, buf, btr, &br_tmp);
@@ -173,18 +177,18 @@ lv_fs_res_t lv_fs_read (lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_
  * @param buf pointer to a buffer with the bytes to write
  * @param btr Bytes To Write
  * @param br the number of real written bytes (Bytes Written). NULL if unused.
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_write (lv_fs_file_t * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     if(bw != NULL) *bw = 0;
     
     if(file_p->drv == NULL || file_p->drv == NULL) {
-        return FS_RES_INV_PARAM;
+        return LV_FS_RES_INV_PARAM;
     }
     
     if(file_p->drv->write == NULL) {
-        return FS_RES_NOT_IMP;
+        return LV_FS_RES_NOT_IMP;
     }
     
     uint32_t bw_tmp = 0;
@@ -198,16 +202,16 @@ lv_fs_res_t lv_fs_write (lv_fs_file_t * file_p, const void * buf, uint32_t btw, 
  * Set the position of the 'cursor' (read write pointer) in a file
  * @param file_p pointer to a lv_fs_file_t variable
  * @param pos the new position expressed in bytes index (0: start of file)
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_seek (lv_fs_file_t * file_p, uint32_t pos)
 {
     if(file_p->drv == NULL || file_p->drv == NULL) {
-        return FS_RES_INV_PARAM;
+        return LV_FS_RES_INV_PARAM;
     }
     
     if(file_p->drv->seek == NULL) {
-        return FS_RES_NOT_IMP;
+        return LV_FS_RES_NOT_IMP;
     }
         
     lv_fs_res_t res = file_p->drv->seek(file_p->file_d, pos);
@@ -219,18 +223,18 @@ lv_fs_res_t lv_fs_seek (lv_fs_file_t * file_p, uint32_t pos)
  * Give the position of the read write pointer
  * @param file_p pointer to a lv_fs_file_t variable
  * @param pos_p pointer to store the position of the read write pointer
- * @return FS_RES_OK or any error from 'fs_res_t'
+ * @return LV_FS_RES_OK or any error from 'fs_res_t'
  */
 lv_fs_res_t lv_fs_tell (lv_fs_file_t * file_p, uint32_t  * pos)
 {
     if(file_p->drv == NULL || file_p->drv == NULL) {
         pos = 0;
-        return FS_RES_INV_PARAM;
+        return LV_FS_RES_INV_PARAM;
     }
     
     if(file_p->drv->tell == NULL) {
         pos = 0;
-        return FS_RES_NOT_IMP;
+        return LV_FS_RES_NOT_IMP;
     }
         
     lv_fs_res_t res = file_p->drv->tell(file_p->file_d, pos);
@@ -242,18 +246,18 @@ lv_fs_res_t lv_fs_tell (lv_fs_file_t * file_p, uint32_t  * pos)
  * Give the size of a file bytes
  * @param file_p pointer to a lv_fs_file_t variable
  * @param size pointer to a variable to store the size
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_size (lv_fs_file_t * file_p, uint32_t * size)
 {
     if(file_p->drv == NULL || file_p->drv == NULL) {
-        return FS_RES_INV_PARAM;
+        return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->size == NULL) return FS_RES_NOT_IMP;
+    if(file_p->drv->size == NULL) return LV_FS_RES_NOT_IMP;
 
 
-    if(size == NULL) return FS_RES_INV_PARAM;
+    if(size == NULL) return LV_FS_RES_INV_PARAM;
 
     lv_fs_res_t res = file_p->drv->size(file_p->file_d, size);
 
@@ -264,33 +268,33 @@ lv_fs_res_t lv_fs_size (lv_fs_file_t * file_p, uint32_t * size)
  * Initialize a 'fs_read_dir_t' variable for directory reading
  * @param rddir_p pointer to a 'fs_read_dir_t' variable
  * @param path path to a directory
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_readdir_init(lv_fs_readdir_t * rddir_p, const char * path)
+lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
-    if(path == NULL) return FS_RES_INV_PARAM;
+    if(path == NULL) return LV_FS_RES_INV_PARAM;
 
     char letter = path[0];
     
     rddir_p->drv = lv_fs_get_drv(letter);
     
     if(rddir_p->drv == NULL) {
-        rddir_p->rddir_d = NULL;
-        return FS_RES_NOT_EX;
+        rddir_p->dir_d = NULL;
+        return LV_FS_RES_NOT_EX;
     }
     
-    rddir_p->rddir_d = lv_mem_alloc(rddir_p->drv->file_size);
-    if(rddir_p->rddir_d == NULL) {   
-        rddir_p->rddir_d = NULL;
-        return FS_RES_OUT_OF_MEM;  /* Out of memory */
+    rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->file_size);
+    if(rddir_p->dir_d == NULL) {   
+        rddir_p->dir_d = NULL;
+        return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
     }        
     
-    if(rddir_p->drv->rddir_init == NULL) {
-        return FS_RES_NOT_IMP;
+    if(rddir_p->drv->dir_open == NULL) {
+        return LV_FS_RES_NOT_IMP;
     }
     
     const char * real_path = lv_fs_get_real_path(path);
-    lv_fs_res_t res = rddir_p->drv->rddir_init(rddir_p->rddir_d, real_path);
+    lv_fs_res_t res = rddir_p->drv->dir_open(rddir_p->dir_d, real_path);
     
     return res;
 }
@@ -300,19 +304,19 @@ lv_fs_res_t lv_fs_readdir_init(lv_fs_readdir_t * rddir_p, const char * path)
  * The name of the directories will begin with '/'
  * @param rddir_p pointer to an initialized 'fs_read_dir_t' variable
  * @param fn pointer to a buffer to store the filename
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_readdir (lv_fs_readdir_t * rddir_p, char * fn)
+lv_fs_res_t lv_fs_dir_read (lv_fs_dir_t * rddir_p, char * fn)
 {
-    if(rddir_p->drv == NULL || rddir_p->rddir_d == NULL) {
-        return FS_RES_INV_PARAM;
+    if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
+        return LV_FS_RES_INV_PARAM;
     }
     
-    if(rddir_p->drv->rddir == NULL) {
-        return FS_RES_NOT_IMP;
+    if(rddir_p->drv->dir_read == NULL) {
+        return LV_FS_RES_NOT_IMP;
     }
     
-    lv_fs_res_t res = rddir_p->drv->rddir(rddir_p->rddir_d, fn);
+    lv_fs_res_t res = rddir_p->drv->dir_read(rddir_p->dir_d, fn);
     
     return res;   
 }
@@ -320,26 +324,26 @@ lv_fs_res_t lv_fs_readdir (lv_fs_readdir_t * rddir_p, char * fn)
 /**
  * Close the directory reading
  * @param rddir_p pointer to an initialized 'fs_read_dir_t' variable
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_readdir_close (lv_fs_readdir_t * rddir_p)
+lv_fs_res_t lv_fs_dir_close (lv_fs_dir_t * rddir_p)
 {
-    if(rddir_p->drv == NULL || rddir_p->rddir_d == NULL) {
-        return FS_RES_INV_PARAM;
+    if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
+        return LV_FS_RES_INV_PARAM;
     }
     
     lv_fs_res_t res;
            
-    if(rddir_p->drv->rddir_close == NULL) {
-        res =  FS_RES_NOT_IMP;
+    if(rddir_p->drv->dir_close == NULL) {
+        res =  LV_FS_RES_NOT_IMP;
     } else {
-        res = rddir_p->drv->rddir_close(rddir_p->rddir_d);
+        res = rddir_p->drv->dir_close(rddir_p->dir_d);
     }
     
-    lv_mem_free(rddir_p->rddir_d);   /*Clean up*/
-    rddir_p->rddir_d = NULL;
+    lv_mem_free(rddir_p->dir_d);   /*Clean up*/
+    rddir_p->dir_d = NULL;
     rddir_p->drv = NULL;
-    rddir_p->rddir_d = NULL;
+    rddir_p->dir_d = NULL;
     
     return res;
 }
@@ -349,20 +353,20 @@ lv_fs_res_t lv_fs_readdir_close (lv_fs_readdir_t * rddir_p)
  * @param letter the driver letter
  * @param total_p pointer to store the total size [kB]
  * @param free_p pointer to store the free size [kB]
- * @return FS_RES_OK or any error from lv_fs_res_t enum
+ * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_free (char letter, uint32_t * total_p, uint32_t * free_p)
 {
     lv_fs_drv_t * drv = lv_fs_get_drv(letter);
 
     if(drv == NULL) {
-        return FS_RES_INV_PARAM;
+        return LV_FS_RES_INV_PARAM;
     }
 
     lv_fs_res_t res;
 
     if(drv->free == NULL) {
-        res =  FS_RES_NOT_IMP;
+        res =  LV_FS_RES_NOT_IMP;
     } else {
         uint32_t total_tmp = 0;
         uint32_t free_tmp = 0;
@@ -378,7 +382,7 @@ lv_fs_res_t lv_fs_free (char letter, uint32_t * total_p, uint32_t * free_p)
 /**
  * Add a new drive
  * @param drv_p pointer to an lv_fs_drv_t structure which is inited with the 
- * corresponding function pointer. The data will be copied so the variable can be local.
+ * corresponding function pointers. The data will be copied so the variable can be local.
  */
 void lv_fs_add_drv(lv_fs_drv_t * drv_p)
 {
