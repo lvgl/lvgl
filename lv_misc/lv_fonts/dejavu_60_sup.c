@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_DEJAVU_60_SUP != 0
+#if USE_LV_FONT_DEJAVU_60_SUP
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -6001,6 +6002,7 @@ lv_font_t lv_font_dejavu_60_sup =
     dejavu_60_sup_bitmap,    /*Glyph's bitmap*/
     dejavu_60_sup_map,    /*Glyph start indexes in the bitmap*/
     dejavu_60_sup_width,    /*Glyph widths (columns)*/
+    NULL         /*No next page by default*/
 };
 
-#endif /*DEJAVU_60_SUP_H*/
+#endif /*USE_LV_FONT_DEJAVU_60_SUP*/

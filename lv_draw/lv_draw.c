@@ -116,7 +116,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
     }
 }
 
-#if USE_LV_TRIANGE != 0
+#if USE_LV_TRIANGLE != 0
 /**
  *
  * @param points pointer to an array with 3 points

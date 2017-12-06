@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_SYMBOL_40_FILE != 0
+#if USE_LV_FONT_SYMBOL_40_FILE
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -918,7 +919,7 @@ lv_font_t lv_font_symbol_40_file =
     symbol_40_file_bitmap,    /*Glyph's bitmap*/
     symbol_40_file_map,    /*Glyph start indexes in the bitmap*/
     symbol_40_file_width,    /*Glyph widths (columns)*/
-    NULL
+    NULL         /*No next page by default*/
 };
 
-#endif /*SYMBOL_40_FILE_H*/
+#endif /*USE_LV_FONT_SYMBOL_40_FILE*/

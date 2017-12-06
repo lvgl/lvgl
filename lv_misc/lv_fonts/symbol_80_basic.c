@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_SYMBOL_80_BASIC != 0
+#if USE_LV_FONT_SYMBOL_80_BASIC
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -1182,6 +1183,7 @@ lv_font_t lv_font_symbol_80_basic =
     symbol_80_basic_bitmap,    /*Glyph's bitmap*/
     symbol_80_basic_map,    /*Glyph start indexes in the bitmap*/
     symbol_80_basic_width,    /*Glyph widths (columns)*/
+    NULL         /*No next page by default*/
 };
 
-#endif /*SYMBOL_80_BASIC_H*/
+#endif /*USE_LV_FONT_SYMBOL_80_BASIC*/

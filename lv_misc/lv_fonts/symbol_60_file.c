@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_SYMBOL_60_FILE != 0
+#if USE_LV_FONT_SYMBOL_60_FILE
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -1338,6 +1339,7 @@ lv_font_t lv_font_symbol_60_file =
     symbol_60_file_bitmap,    /*Glyph's bitmap*/
     symbol_60_file_map,    /*Glyph start indexes in the bitmap*/
     symbol_60_file_width,    /*Glyph widths (columns)*/
+    NULL         /*No next page by default*/
 };
 
-#endif /*SYMBOL_60_FILE_H*/
+#endif /*USE_LV_FONT_SYMBOL_60_FILE*/

@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_SYMBOL_30_FEEDBACK != 0
+#if USE_LV_FONT_SYMBOL_30_FEEDBACK
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -514,6 +515,7 @@ lv_font_t lv_font_symbol_30_feedback =
     symbol_30_feedback_bitmap,    /*Glyph's bitmap*/
     symbol_30_feedback_map,    /*Glyph start indexes in the bitmap*/
     symbol_30_feedback_width,    /*Glyph widths (columns)*/
+    NULL         /*No next page by default*/
 };
 
-#endif /*SYMBOL_30_FEEDBACK_H*/
+#endif /*USE_LV_FONT_SYMBOL_30_FEEDBACK*/

@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_SYMBOL_80_FEEDBACK != 0
+#if USE_LV_FONT_SYMBOL_80_FEEDBACK
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -1264,6 +1265,7 @@ lv_font_t lv_font_symbol_80_feedback =
     symbol_80_feedback_bitmap,    /*Glyph's bitmap*/
     symbol_80_feedback_map,    /*Glyph start indexes in the bitmap*/
     symbol_80_feedback_width,    /*Glyph widths (columns)*/
+    NULL         /*No next page by default*/
 };
 
-#endif /*SYMBOL_80_FEEDBACK_H*/
+#endif /*USE_LV_FONT_SYMBOL_80_FEEDBACK*/

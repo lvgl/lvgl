@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_DEJAVU_80_LATIN_EXT_B != 0
+#if USE_LV_FONT_DEJAVU_80_LATIN_EXT_B
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -17133,6 +17134,7 @@ lv_font_t lv_font_dejavu_80_latin_ext_b =
     dejavu_80_latin_ext_b_bitmap,    /*Glyph's bitmap*/
     dejavu_80_latin_ext_b_map,    /*Glyph start indexes in the bitmap*/
     dejavu_80_latin_ext_b_width,    /*Glyph widths (columns)*/
+    NULL         /*No next page by default*/
 };
 
-#endif /*DEJAVU_80_LATIN_EXT_B_H*/
+#endif /*USE_LV_FONT_DEJAVU_80_LATIN_EXT_B*/

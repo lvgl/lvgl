@@ -1,5 +1,6 @@
 #include "../../../lv_conf.h"
-#if  USE_LV_FONT_DEJAVU_10 != 0
+#if USE_LV_FONT_DEJAVU_10
+
 #include <stdint.h>
 #include "../lv_font.h"
 
@@ -1189,6 +1190,7 @@ lv_font_t lv_font_dejavu_10 =
     dejavu_10_bitmap,    /*Glyph's bitmap*/
     dejavu_10_map,    /*Glyph start indexes in the bitmap*/
     dejavu_10_width,    /*Glyph widths (columns)*/
+    NULL         /*No next page by default*/
 };
 
-#endif /*DEJAVU_10_H*/
+#endif /*USE_LV_FONT_DEJAVU_10*/

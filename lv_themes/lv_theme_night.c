@@ -329,13 +329,13 @@ static void cb_init(void)
 static void btnm_init(void)
 {
 #if USE_LV_BTNM
-    static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
+    static lv_style_t btnm_bg, rel, pr, tgl_rel, tgl_pr, ina;
 
-    lv_style_copy(&bg, &btn_rel);
-    bg.body.padding.hor = 2 << LV_AA;
-    bg.body.padding.ver = 2 << LV_AA;
-    bg.body.padding.inner = 0;
-    bg.body.border.width =  1<< LV_AA;//LV_BORDER_RIGHT;
+    lv_style_copy(&btnm_bg, &btn_rel);
+    btnm_bg.body.padding.hor = 2 << LV_AA;
+    btnm_bg.body.padding.ver = 2 << LV_AA;
+    btnm_bg.body.padding.inner = 0;
+    btnm_bg.body.border.width =  1<< LV_AA;//LV_BORDER_RIGHT;
 
     lv_style_copy(&rel, &btn_rel);
     rel.body.border.part = LV_BORDER_RIGHT;
@@ -362,7 +362,7 @@ static void btnm_init(void)
     ina.body.border.width = 2 << LV_AA;
     ina.body.radius = 0;
 
-    theme.btnm.bg = &bg;
+    theme.btnm.bg = &btnm_bg;
     theme.btnm.btn.rel = &rel;
     theme.btnm.btn.pr = &pr;
     theme.btnm.btn.tgl_rel = &tgl_rel;
