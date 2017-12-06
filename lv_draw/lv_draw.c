@@ -422,7 +422,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
                 lv_coord_t row;
                 uint32_t act_pos;
-                lv_color_t buf[LV_HOR_RES];
+                lv_color_t buf[useful_data];
                 for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
                     res = lv_fs_read(&file, buf, useful_data, &br);
 
@@ -1167,6 +1167,7 @@ static void lv_draw_rect_shadow(const lv_area_t * coords, const lv_area_t * mask
 
 static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
 {
+
     lv_coord_t radius = style->body.radius;
 
     lv_coord_t width = lv_area_get_width(coords);
@@ -1174,7 +1175,7 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
-    lv_coord_t cruve_x[LV_VER_RES] = {LV_COORD_MIN};
+    lv_coord_t cruve_x[radius + style->body.shadow.width];     /*Stores the 'x' coordinates of a quarter circle.*/
     memset(cruve_x, 0, sizeof(cruve_x));
     lv_point_t circ;
     lv_coord_t circ_tmp;
@@ -1186,16 +1187,15 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
     }
     int16_t row;
 
-    uint16_t opa_h_result[LV_HOR_RES];
     int16_t filter_size = 2 * style->body.shadow.width + 1;
+    uint16_t opa_h_result[filter_size];
 
-    /*TODO recalculate only values are changed*/
     for(row = 0; row < filter_size; row++) {
         opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->body.opa * 2) / (filter_size);
     }
 
     uint16_t p;
-    lv_opa_t opa_v_result[LV_VER_RES];
+    lv_opa_t opa_v_result[radius + style->body.shadow.width];
 
     lv_point_t point_rt;
     lv_point_t point_rb;
@@ -1216,7 +1216,6 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
 
     ofs_lt.x = coords->x1 + radius;
     ofs_lt.y = coords->y1 + radius;
-
 
     for(row = 0; row < radius + style->body.shadow.width; row++) {
         for(p = 0; p < radius + style->body.shadow.width; p++) {
@@ -1315,7 +1314,7 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
-    lv_coord_t cruve_x[LV_VER_RES];     /* TODO Removed = {CORD_MIN};*/
+    lv_coord_t cruve_x[radius + style->body.shadow.width];     /*Stores the 'x' coordinates of a quarter circle.*/
     memset(cruve_x, 0, sizeof(cruve_x));
     lv_point_t circ;
     lv_coord_t circ_tmp;
@@ -1327,8 +1326,8 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
     }
     int16_t row;
 
-    lv_opa_t opa_h_result[LV_HOR_RES];
     int16_t filter_size = 2 * style->body.shadow.width + 1;
+    lv_opa_t opa_h_result[filter_size];
 
     for(row = 0; row < filter_size; row++) {
         opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->body.opa) / (filter_size);

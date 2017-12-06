@@ -73,6 +73,10 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
             lv_color_t recolor, lv_opa_t recolor_opa);
 
 
+/**
+ * Reallocate 'color_map_tmp' to the new hor. res. size. It is used in 'sw_fill'
+ */
+void lv_vdraw_refresh_temp_arrays(void);
 
 /**********************
  *      MACROS

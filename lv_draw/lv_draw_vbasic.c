@@ -50,7 +50,6 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 /**
  * Put a pixel in the Virtual Display Buffer
  * @param x pixel x coordinate
@@ -95,9 +94,8 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p, 
                           lv_color_t color, lv_opa_t opa)
 {
-    /*Used to store color maps for blending*/
-    static lv_color_t color_map[LV_HOR_RES];
-    static lv_coord_t last_width = 0;
+    static lv_color_t color_array_tmp[LV_VER_RES];       /*Used by 'sw_color_fill'*/
+    static lv_coord_t last_width = -1;
 
     lv_area_t res_a;
     bool union_ok;
@@ -142,16 +140,16 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT &&
                 lv_disp_is_mem_blend_supported())
         {
-            if(color_map[0].full != color.full || last_width != w) {
+            if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
                 for(i = 0; i < w; i++) {
-                    color_map[i].full = color.full;
+                    color_array_tmp[i].full = color.full;
                 }
                 last_width = w;
             }
             lv_coord_t row;
             for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
-                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_map, w, opa);
+                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 
@@ -165,17 +163,17 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     else {
     	/*Use hw blend if present*/
         if(lv_disp_is_mem_blend_supported()) {
-            if(color_map[0].full != color.full || last_width != w) {
+            if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
                 for(i = 0; i < w; i++) {
-                    color_map[i].full = color.full;
+                    color_array_tmp[i].full = color.full;
                 }
 
                 last_width = w;
             }
             lv_coord_t row;
             for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
-                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_map, w, opa);
+                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 

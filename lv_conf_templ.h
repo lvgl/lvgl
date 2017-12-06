@@ -28,12 +28,10 @@
 
 /* Horizontal and vertical resolution of the library.
  * Screen resolution multiplied by LV_DOWN_SCALE*/
-#define LV_HOR_RES          (800 << LV_ANTIALIAS)
-#define LV_VER_RES          (480 << LV_ANTIALIAS)
 #define LV_DPI              (100 << LV_ANTIALIAS)
 
-/* Buffered rendering: >= LV_HOR_RES or 0 to disable buffering*/
-#define LV_VDB_SIZE         (40 * LV_HOR_RES)
+/* Buffered rendering: >= lv_disp_hor_res() or 0 to disable buffering*/
+#define LV_VDB_SIZE         (40 * lv_disp_hor_res())
 #define LV_VDB_ADR			0		/*Place VDB to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
 
 /* Use two Virtual Display buffers (VDB) parallelize rendering and flushing
