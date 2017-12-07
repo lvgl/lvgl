@@ -20,41 +20,42 @@
 #define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
 #define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
 #define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
-#endif      /*LV_MEM_CUSTOM*/
+#endif     /*LV_MEM_CUSTOM*/
 
 /*===================
    Graphical settings
  *=====================*/
 
-/* Horizontal and vertical resolution of the library.
- * Screen resolution multiplied by LV_DOWN_SCALE*/
+/* Horizontal and vertical resolution of the library.*/
+#define LV_HOR_RES          800
+#define LV_VER_RES          480
 #define LV_DPI              100
 
-/* Buffered rendering: >= lv_disp_hor_res() or 0 to disable buffering*/
-#define LV_VDB_SIZE         (40 * lv_disp_hor_res())
-#define LV_VDB_ADR			0		/*Place VDB to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
+/* Buffered rendering: >= LV_DOWNSCALE * lv_disp_hor_res() or 0 to disable buffering*/
+#define LV_VDB_SIZE         (20 * 1024 )
+#define LV_VDB_ADR          0       /*Place VDB to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
 
 /* Use two Virtual Display buffers (VDB) parallelize rendering and flushing
  * The flushing should use DMA to write the frame buffer in the background*/
-#define LV_VDB_DOUBLE		0
-#define LV_VDB2_ADR			0		/*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
+#define LV_VDB_DOUBLE       0
+#define LV_VDB2_ADR         0       /*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
 
 /* Enable anti aliasing
  * If enabled everything will be rendered in double size and filtered to normal size */
-#define LV_ANTIALIAS        0
+#define LV_ANTIALIAS        1
 
 /* Enable anti aliasing only for fonts (texts)
  * It half the size of the letters so you should use double sized fonts
- * Much faster then normal anti aliasing (don't use together with LV_ANTIALIAS) */
-#define LV_FONT_ANTIALIAS   1
+ * Much faster then normal anti aliasing  */
+#define LV_FONT_ANTIALIAS   0
+
+/*Screen refresh settings*/
+#define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
+#define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
 
 /*=================
    Misc. setting
  *=================*/
-
-/*Screen refresh settings*/
-#define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
-#define LV_INV_FIFO_SIZE    32    /*The average number of objects on a screen */
 
 /*Input device settings*/
 #define LV_INDEV_READ_PERIOD            50                     /*Input device read period in milliseconds*/
@@ -65,28 +66,30 @@
 #define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
 
 /*Color settings*/
-#define LV_COLOR_DEPTH     16
-#define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn*/
+#define LV_COLOR_DEPTH     24
+#define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn (chroma keying)*/
 
 /*Text settings*/
 #define LV_TXT_UTF8             1
-#define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
+#define LV_TXT_BREAK_CHARS     " ,.;:-_"           /*Can break texts on these chars*/
 
 /*Graphics feature usage*/
-#define LV_NO_ANIM				0				/*1: disable all animations*/
-#define LV_NO_SHADOW			0				/*1: disable shadows*/
+#define USE_LV_ANIMATION        1               /*1: disable all animations*/
+#define USE_LV_SHADOW           1               /*1: disable shadows*/
+#define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
+#define USE_LV_GPU              0               /*1: Enable GPU interface*/
+#define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images aka. lv_img)*/
 
 /*==================
  *  THEME USAGE
  *================*/
 #define USE_LV_THEME_TEMPL      0       /*Just for test*/
-#define USE_LV_THEME_DEFAULT    0       /*Built manly from the built-in styles. Consumes very few RAM*/
-#define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
-#define USE_LV_THEME_NIGHT      0       /*Dark elegant theme*/
-#define USE_LV_THEME_MONO       0       /*Mono color theme for monochrome displays*/
+#define USE_LV_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define USE_LV_THEME_ALIEN      1       /*Dark futuristic theme*/
+#define USE_LV_THEME_NIGHT      1       /*Dark elegant theme*/
+#define USE_LV_THEME_MONO       1       /*Mono color theme for monochrome displays*/
 #define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows (Planned)*/
 #define USE_LV_THEME_ZEN        0       /*Peaceful, mainly black and white theme (Planned)*/
-
 
 /*==================
  *    FONT USAGE
@@ -147,12 +150,11 @@
 #define USE_LV_FONT_SYMBOL_80_FILE         0
 #define USE_LV_FONT_SYMBOL_80_FEEDBACK     0
 
-/*==================
+/*===================
  *  LV_OBJ SETTINGS
  *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
-#define USE_LV_GROUP            1           /*Enable object groups (for keyboards)*/
 
 /*==================
  *  LV OBJ X USAGE 
@@ -165,7 +167,7 @@
 /*Label (dependencies: -*/
 #define USE_LV_LABEL    1
 #if USE_LV_LABEL != 0
-#define LV_LABEL_SCROLL_SPEED   25      /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
+#define LV_LABEL_SCROLL_SPEED       25              /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 
 /*Image (dependencies: lv_label (if symbols are enabled) from misc: FSINT, UFS)*/
