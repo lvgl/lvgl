@@ -14,6 +14,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../../lv_conf.h"
+
+#if USE_LV_FILESYSTEM
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_mem.h"
@@ -235,8 +239,10 @@ const char * lv_fs_get_last(const char * path);
  *      MACROS
  **********************/
 
+#endif /*USE_LV_FILESYSTEM*/
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif
+#endif /*LV_FS_H*/

@@ -128,7 +128,7 @@ void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj)
     lv_obj_set_pos(indev->cursor, indev->proc.act_point.x,  indev->proc.act_point.y);
 }
 
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
 /**
  * Set a destination group for a keypad input device
  * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_KEYPAD')
@@ -227,19 +227,19 @@ static void indev_proc_task(void * param)
                (i->proc.last_point.x != data.point.x ||
                 i->proc.last_point.y != data.point.y))
             {
-                lv_obj_set_pos_scale(i->cursor, data.point.x, data.point.y);
+                lv_obj_set_pos(i->cursor, data.point.x, data.point.y);
             }
 
             if(i->driver.type == LV_INDEV_TYPE_POINTER)
             {
-                i->proc.act_point.x = data.point.x << LV_ANTIALIAS;
-                i->proc.act_point.y = data.point.y << LV_ANTIALIAS;
+                i->proc.act_point.x = data.point.x;
+                i->proc.act_point.y = data.point.y;;
 
                 /*Process the current point*/
                 indev_proc_point(&i->proc);
             }
             else if (i->driver.type == LV_INDEV_TYPE_KEYPAD) {
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
                 if(i->group != NULL && data.key != 0 &&
                    data.state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_REL)
                 {
@@ -289,10 +289,10 @@ static void indev_proc_point(lv_indev_proc_t * indev)
     if(indev->event == LV_INDEV_STATE_PR){
 #if LV_INDEV_POINT_MARKER != 0
         area_t area;
-        area.x1 = (indev->act_point.x >> LV_ANTIALIAS) - (LV_INDEV_POINT_MARKER >> 1);
-        area.y1 = (indev->act_point.y >> LV_ANTIALIAS) - (LV_INDEV_POINT_MARKER >> 1);
-        area.x2 = (indev->act_point.x >> LV_ANTIALIAS) + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        area.y2 = (indev->act_point.y >> LV_ANTIALIAS) + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
+        area.x1 = indev->act_point.x - (LV_INDEV_POINT_MARKER >> 1);
+        area.y1 = indev->act_point.y - (LV_INDEV_POINT_MARKER >> 1);
+        area.x2 = indev->act_point.x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
+        area.y2 = indev->act_point.y + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
         lv_rfill(&area, NULL, LV_COLOR_MAKE(0xFF, 0, 0), LV_OPA_COVER);
 #endif
         indev_proc_press(indev);

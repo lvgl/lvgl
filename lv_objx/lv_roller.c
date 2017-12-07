@@ -429,7 +429,7 @@ static void refr_position(lv_obj_t *roller, bool anim_en)
     if(ext->ddlist.anim_time == 0 || anim_en == false) {
         lv_obj_set_y(roller_scrl, new_y);
     } else {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         lv_anim_t a;
         a.var = roller_scrl;
         a.start = lv_obj_get_y(roller_scrl);

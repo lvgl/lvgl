@@ -15,7 +15,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../lv_conf.h"
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 
 #include <stdint.h>
 #include <stdbool.h>

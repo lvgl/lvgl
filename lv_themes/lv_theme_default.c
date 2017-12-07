@@ -60,7 +60,7 @@ static void basic_init(void)
     sb.body.padding.ver = sb.body.padding.ver / 2;
 
     lv_style_copy(&plain_bordered, &lv_style_plain);
-    plain_bordered.body.border.width = 2 << LV_ANTIALIAS;
+    plain_bordered.body.border.width = 2;
     plain_bordered.body.border.color= LV_COLOR_HEX3(0xbbb);
 
     theme.bg = &lv_style_plain;
@@ -160,8 +160,8 @@ static void sw_init(void)
 {
 #if USE_LV_SW != 0
     lv_style_copy(&sw_bg, &lv_style_pretty);
-    sw_bg.body.padding.hor = 3 << LV_ANTIALIAS;
-    sw_bg.body.padding.ver = 3 << LV_ANTIALIAS;
+    sw_bg.body.padding.hor = 3;
+    sw_bg.body.padding.ver = 3;
 
     theme.sw.bg = &sw_bg;
     theme.sw.indic = &lv_style_pretty_color;
@@ -177,7 +177,7 @@ static void lmeter_init(void)
 
     lv_style_copy(&lmeter, &lv_style_pretty_color);
     lmeter.line.color = LV_COLOR_HEX3(0xddd);
-    lmeter.line.width = 2 << LV_ANTIALIAS;
+    lmeter.line.width = 2;
     lmeter.body.main_color = color_mix(lmeter.body.main_color , LV_COLOR_WHITE, LV_OPA_50);
     lmeter.body.grad_color = color_mix(lmeter.body.grad_color , LV_COLOR_BLACK, LV_OPA_50);
 

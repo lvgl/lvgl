@@ -139,7 +139,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_refresh_style(new_ta);
     }
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
     /*Create a cursor blinker animation*/
     lv_anim_t a;
     a.var = new_ta;
@@ -186,7 +186,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         lv_mem_assert(ext->pwd_tmp);
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, letter_buf);
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -229,7 +229,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -315,7 +315,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(txt) + 1);
         strcpy(ext->pwd_tmp, txt);
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -388,7 +388,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 
     ext->cursor.valid_x = cur_pos.x;
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
     /*Reset cursor blink animation*/
     lv_anim_t a;
     a.var = ta;
@@ -774,13 +774,13 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         	cur_style.body.grad_color = clv_color_tmp;
         	cur_style.body.border.color = clv_color_tmp;
         	cur_style.body.border.opa = LV_OPA_COVER;
-        	cur_style.body.border.width = 1 << LV_ANTIALIAS;
+        	cur_style.body.border.width = 1;
         	cur_style.body.shadow.width = 0;
         	cur_style.body.radius = 0;
         	cur_style.body.empty = 0;
         	cur_style.body.padding.hor = 0;
             cur_style.body.padding.ver = 0;
-            cur_style.line.width = 1 << LV_ANTIALIAS;
+            cur_style.line.width = 1;
             cur_style.body.opa = LV_OPA_COVER;
         }
 
@@ -859,7 +859,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 			cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver+ letter_h;
 
 			cur_style.body.empty = 1;
-			if(cur_style.body.border.width == 0) cur_style.body.border.width = 1 << LV_ANTIALIAS; /*Be sure the border will be drawn*/
+			if(cur_style.body.border.width == 0) cur_style.body.border.width = 1; /*Be sure the border will be drawn*/
 			lv_draw_rect(&cur_area, mask, &cur_style);
 		} else if(ta_ext->cursor.type == LV_CURSOR_UNDERLINE) {
 			cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor;

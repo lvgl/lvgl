@@ -28,7 +28,7 @@
 
 /* Horizontal and vertical resolution of the library.
  * Screen resolution multiplied by LV_DOWN_SCALE*/
-#define LV_DPI              (100 << LV_ANTIALIAS)
+#define LV_DPI              100
 
 /* Buffered rendering: >= lv_disp_hor_res() or 0 to disable buffering*/
 #define LV_VDB_SIZE         (40 * lv_disp_hor_res())
@@ -59,7 +59,7 @@
 /*Input device settings*/
 #define LV_INDEV_READ_PERIOD            50                     /*Input device read period in milliseconds*/
 #define LV_INDEV_POINT_MARKER           0                      /*Mark the pressed points*/
-#define LV_INDEV_DRAG_LIMIT             (10 << LV_ANTIALIAS)   /*Drag threshold in pixels */
+#define LV_INDEV_DRAG_LIMIT             10                     /*Drag threshold in pixels */
 #define LV_INDEV_DRAG_THROW             20                     /*Drag throw slow-down in [%]. Greater value means faster slow-down */
 #define LV_INDEV_LONG_PRESS_TIME        400                    /*Long press time in milliseconds*/
 #define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
@@ -152,7 +152,7 @@
  *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
-#define LV_OBJ_GROUP            1           /*Enable object groups (for keyboards)*/
+#define USE_LV_GROUP            1           /*Enable object groups (for keyboards)*/
 
 /*==================
  *  LV OBJ X USAGE 
@@ -165,7 +165,7 @@
 /*Label (dependencies: -*/
 #define USE_LV_LABEL    1
 #if USE_LV_LABEL != 0
-#define LV_LABEL_SCROLL_SPEED       (25 << LV_ANTIALIAS) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
+#define LV_LABEL_SCROLL_SPEED   25      /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 
 /*Image (dependencies: lv_label (if symbols are enabled) from misc: FSINT, UFS)*/

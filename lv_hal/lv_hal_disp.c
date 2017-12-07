@@ -51,8 +51,12 @@ void lv_disp_drv_init(lv_disp_drv_t *driver)
 {
     driver->disp_fill = NULL;
     driver->disp_map = NULL;
+    driver->disp_flush = NULL;
+
+#if USE_LV_GPU
     driver->mem_blend = NULL;
     driver->mem_fill = NULL;
+#endif
 }
 
 /**
@@ -160,6 +164,8 @@ void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_
     if(active->driver.disp_map != NULL)  active->driver.disp_map(x1, y1, x2, y2, color_map);
 }
 
+#if USE_LV_GPU
+
 /**
  * Blend pixels to a destination memory from a source memory
  * In 'lv_disp_drv_t' 'mem_blend' is optional. (NULL if not available)
@@ -207,6 +213,7 @@ bool lv_disp_is_mem_fill_supported(void)
     if(active->driver.mem_fill) return true;
     else return false;
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

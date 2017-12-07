@@ -115,7 +115,7 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 	lv_obj_invalidate(bar);
 }
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 /**
  * Set a new value with animation on the bar
  * @param bar pointer to a bar object

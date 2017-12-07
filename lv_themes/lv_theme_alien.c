@@ -82,7 +82,7 @@ static void basic_init(void)
     def.body.padding.ver = LV_DPI / 8;
     def.body.padding.inner = LV_DPI / 8;
     def.body.border.color = LV_COLOR_SILVER;
-    def.body.border.width = 1 << LV_ANTIALIAS;
+    def.body.border.width = 1;
     def.body.border.opa = LV_OPA_COVER;
     def.body.shadow.color = LV_COLOR_SILVER;
     def.body.shadow.width = 0;
@@ -90,20 +90,20 @@ static void basic_init(void)
 
     def.text.color = LV_COLOR_HEX3(0xDDD);
     def.text.font = _font;
-    def.text.letter_space = 1 << LV_ANTIALIAS;
-    def.text.line_space = 2 << LV_ANTIALIAS;
+    def.text.letter_space = 1;
+    def.text.line_space = 2;
 
     def.image.color = LV_COLOR_HEX3(0xDDD);
     def.image.intense = LV_OPA_TRANSP;
 
     def.line.color = LV_COLOR_HEX3(0xDDD);
-    def.line.width = 1 << LV_ANTIALIAS;
+    def.line.width = 1;
 
     /*Background*/
     lv_style_copy(&bg, &def);
     bg.body.main_color = LV_COLOR_HEX3(0x333);
     bg.body.grad_color =  LV_COLOR_HEX3(0x333);
-    bg.body.border.width = 2 << LV_ANTIALIAS;
+    bg.body.border.width = 2;
     bg.body.border.color =  LV_COLOR_HEX3(0x666);
     bg.body.shadow.color = LV_COLOR_SILVER;
 
@@ -113,7 +113,7 @@ static void basic_init(void)
     panel.body.main_color = LV_COLOR_HEX3(0x666);
     panel.body.grad_color = LV_COLOR_HEX3(0x666);
     panel.body.border.color = LV_COLOR_HEX3(0xccc);
-    panel.body.border.width = 2 << LV_ANTIALIAS;
+    panel.body.border.width = 2;
     panel.body.border.opa = LV_OPA_60;
     panel.text.color = lv_color_hsv_to_rgb(_hue, 8, 96);
     panel.line.color = lv_color_hsv_to_rgb(_hue, 20, 70);
@@ -124,11 +124,11 @@ static void basic_init(void)
     sb.body.radius = LV_RADIUS_CIRCLE;
     sb.body.border.color = LV_COLOR_SILVER;
     sb.body.border.opa = LV_OPA_40;
-    sb.body.border.width = 1 << LV_ANTIALIAS;
+    sb.body.border.width = 1;
     sb.body.main_color = lv_color_hsv_to_rgb(_hue, 33, 92);
     sb.body.grad_color = lv_color_hsv_to_rgb(_hue, 33, 92);
-    sb.body.padding.hor = 1 << LV_ANTIALIAS;
-    sb.body.padding.ver = 1 << LV_ANTIALIAS;
+    sb.body.padding.hor = 1;
+    sb.body.padding.ver = 1;
     sb.body.padding.inner = LV_DPI / 15;      /*Scrollbar width*/
 
     theme.bg = &bg;
@@ -143,7 +143,7 @@ static void btn_init(void)
     btn_rel.glass = 0;
     btn_rel.body.empty = 1;
     btn_rel.body.radius = LV_RADIUS_CIRCLE;
-    btn_rel.body.border.width = 2 << LV_ANTIALIAS;
+    btn_rel.body.border.width = 2;
     btn_rel.body.border.color = lv_color_hsv_to_rgb(_hue, 70, 90);
     btn_rel.body.border.opa = LV_OPA_80;
     btn_rel.body.padding.hor = LV_DPI / 4;
@@ -226,7 +226,7 @@ static void bar_init(void)
     bar_bg.body.radius = LV_RADIUS_CIRCLE;
     bar_bg.body.main_color = LV_COLOR_WHITE;
     bar_bg.body.grad_color = LV_COLOR_SILVER;
-    bar_bg.body.border.width = 2 << LV_ANTIALIAS;
+    bar_bg.body.border.width = 2;
     bar_bg.body.border.color = LV_COLOR_SILVER;
     bar_bg.body.border.opa = LV_OPA_20;
     bar_bg.body.padding.hor = 0;
@@ -235,7 +235,7 @@ static void bar_init(void)
 
     lv_style_copy(&bar_indic, &def);
     bar_indic.body.radius = LV_RADIUS_CIRCLE;
-    bar_indic.body.border.width = 2 << LV_ANTIALIAS;
+    bar_indic.body.border.width = 2;
     bar_indic.body.border.color = LV_COLOR_SILVER;
     bar_indic.body.border.opa = LV_OPA_70;
     bar_indic.body.padding.hor = 0;
@@ -272,7 +272,7 @@ static void line_init(void)
     static lv_style_t line_decor;
     lv_style_copy(&line_decor, &def);
     line_decor.line.color = lv_color_hsv_to_rgb(_hue, 50, 50);
-    line_decor.line.width = 1 << LV_ANTIALIAS;
+    line_decor.line.width = 1;
 
     theme.line.decor = &line_decor;
 #endif
@@ -304,7 +304,7 @@ static void slider_init(void)
     slider_knob.body.radius = LV_RADIUS_CIRCLE;
     slider_knob.body.main_color = LV_COLOR_WHITE;
     slider_knob.body.grad_color = LV_COLOR_SILVER;
-    slider_knob.body.border.width = 1 << LV_ANTIALIAS;
+    slider_knob.body.border.width = 1;
     slider_knob.body.border.color = LV_COLOR_GRAY;
     slider_knob.body.border.opa = LV_OPA_50;
 
@@ -320,11 +320,11 @@ static void sw_init(void)
     static lv_style_t sw_bg, sw_indic, sw_knob;
     lv_style_copy(&sw_bg, &bar_bg);
     sw_bg.body.opa = LV_OPA_COVER;
-    sw_bg.body.padding.ver = -2  << LV_ANTIALIAS;
-    sw_bg.body.padding.hor = -2  << LV_ANTIALIAS;
+    sw_bg.body.padding.ver = -2 ;
+    sw_bg.body.padding.hor = -2 ;
     sw_bg.body.main_color = LV_COLOR_HEX3(0x666);
     sw_bg.body.grad_color = LV_COLOR_HEX3(0x999);
-    sw_bg.body.border.width = 2 << LV_ANTIALIAS;
+    sw_bg.body.border.width = 2;
     sw_bg.body.border.opa = LV_OPA_50;
 
     lv_style_copy(&sw_indic, &bar_indic);
@@ -351,7 +351,7 @@ static void lmeter_init(void)
     lmeter_bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 80, 80);
     lmeter_bg.body.padding.hor = LV_DPI / 8;         /*Scale line length*/
     lmeter_bg.line.color = LV_COLOR_HEX3(0x222);
-    lmeter_bg.line.width = 2 << LV_ANTIALIAS;
+    lmeter_bg.line.width = 2;
 
     theme.lmeter = &lmeter_bg;
 
@@ -370,7 +370,7 @@ static void gauge_init(void)
     gauge_bg.body.padding.inner = LV_DPI / 8;      /*Label - scale distance*/
     gauge_bg.body.border.color = LV_COLOR_HEX3(0x777);
     gauge_bg.line.color = LV_COLOR_HEX3(0x555);
-    gauge_bg.line.width = 2 << LV_ANTIALIAS;
+    gauge_bg.line.width = 2;
     gauge_bg.text.color = lv_color_hsv_to_rgb(_hue, 10, 90);
     gauge_bg.text.font = _font;
 
@@ -391,7 +391,7 @@ static void cb_init(void)
     static lv_style_t cb_bg, cb_rel, cb_pr, cb_trel, cb_tpr,  cb_ina;
     lv_style_copy(&cb_rel, &bg);
     cb_rel.body.radius = LV_DPI / 20;
-    cb_rel.body.border.width = 1 << LV_ANTIALIAS;
+    cb_rel.body.border.width = 1;
     cb_rel.body.border.color = LV_COLOR_GRAY;
     cb_rel.body.main_color = LV_COLOR_WHITE;
     cb_rel.body.grad_color = LV_COLOR_SILVER;
@@ -409,7 +409,7 @@ static void cb_init(void)
     cb_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 82);
 
     lv_style_copy(&cb_trel, &cb_rel);
-    cb_trel.body.border.width = 4 << LV_ANTIALIAS;
+    cb_trel.body.border.width = 4;
     cb_trel.body.border.color = LV_COLOR_WHITE;
     cb_trel.body.border.opa = LV_OPA_60;
     cb_trel.body.main_color = lv_color_hsv_to_rgb(_hue, 50, 82);
@@ -422,7 +422,7 @@ static void cb_init(void)
     cb_tpr.body.grad_color = lv_color_hsv_to_rgb(_hue, 50, 52);
 
     lv_style_copy(&cb_ina, &cb_trel);
-    cb_ina.body.border.width = 1 << LV_ANTIALIAS;
+    cb_ina.body.border.width = 1;
     cb_ina.body.border.color = LV_COLOR_GRAY;
     cb_ina.body.main_color = LV_COLOR_SILVER;
     cb_ina.body.grad_color = LV_COLOR_SILVER;
@@ -441,7 +441,7 @@ static void btnm_init(void)
 {
 #if USE_LV_BTNM
     lv_style_copy(&btnm_bg, &lv_style_transp_tight);
-    btnm_bg.body.border.width = 1 << LV_ANTIALIAS;
+    btnm_bg.body.border.width = 1;
     btnm_bg.body.border.color = lv_color_hsv_to_rgb(_hue, 60, 80);
     btnm_bg.body.border.opa = LV_OPA_COVER;
     btnm_bg.body.radius = LV_DPI / 8;
@@ -461,7 +461,7 @@ static void btnm_init(void)
 
     lv_style_copy(&btnm_trel, &btnm_rel);
     btnm_trel.body.border.color = lv_color_hsv_to_rgb(_hue, 80, 80);
-    btnm_trel.body.border.width = 3 << LV_ANTIALIAS;
+    btnm_trel.body.border.width = 3;
 
     lv_style_copy(&btnm_ina, &btnm_rel);
     btnm_ina.text.color = lv_color_hsv_to_rgb(_hue, 10, 60);
@@ -527,7 +527,7 @@ static void list_init(void)
     static lv_style_t list_bg, list_rel, list_pr, list_trel, list_tpr, list_ina;
     lv_style_copy(&list_rel, &def);
     list_rel.body.empty = 1;
-    list_rel.body.border.width = 1 << LV_ANTIALIAS;
+    list_rel.body.border.width = 1;
     list_rel.body.border.color = lv_color_hsv_to_rgb(_hue, 50, 85);
     list_rel.body.border.opa = LV_OPA_COVER;
     list_rel.text.color = lv_color_hsv_to_rgb(_hue, 10, 94);
@@ -612,7 +612,7 @@ static void tabview_init(void)
     tab_rel.body.padding.hor = 0;
     tab_rel.body.padding.ver = LV_DPI / 6;
     tab_rel.body.padding.inner = 0;
-    tab_rel.body.border.width = 1 << LV_ANTIALIAS;
+    tab_rel.body.border.width = 1;
     tab_rel.body.border.color = LV_COLOR_SILVER;
     tab_rel.body.border.opa = LV_OPA_40;
     tab_rel.text.color = LV_COLOR_HEX3(0xDDD);
@@ -627,7 +627,7 @@ static void tabview_init(void)
     tab_trel.body.padding.hor = 0;
     tab_trel.body.padding.ver = LV_DPI / 6;
     tab_trel.body.padding.inner = 0;
-    tab_trel.body.border.width = 1 << LV_ANTIALIAS;
+    tab_trel.body.border.width = 1;
     tab_trel.body.border.color = LV_COLOR_SILVER;
     tab_trel.body.border.opa = LV_OPA_40;
     tab_trel.text.color = lv_color_hsv_to_rgb(_hue, 10, 94);
@@ -639,7 +639,7 @@ static void tabview_init(void)
     tab_tpr.body.padding.hor = 0;
     tab_tpr.body.padding.ver = LV_DPI / 6;
     tab_tpr.body.padding.inner = 0;
-    tab_tpr.body.border.width = 1 << LV_ANTIALIAS;
+    tab_tpr.body.border.width = 1;
     tab_tpr.body.border.color = LV_COLOR_SILVER;
     tab_tpr.body.border.opa = LV_OPA_40;
     tab_tpr.text.color = lv_color_hsv_to_rgb(_hue, 10, 94);

@@ -313,7 +313,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
         lv_obj_set_y(ext->scrl, scrlable_y);
     }
     else {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         lv_anim_t a;
         a.act_time = 0;
         a.start = lv_obj_get_y(ext->scrl);
@@ -412,7 +412,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(scrl, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
         /* If the page is the active in a group and
          * the background (page) is not visible (transparent or empty)
          * then activate the style of the scrollable*/
@@ -430,7 +430,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
 #endif
         ancestor_design(scrl, mask, mode);
 
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
         scrl->style_p = style_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {

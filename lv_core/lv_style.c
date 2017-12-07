@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 #define LV_STYLE_ANIM_RES       256
 #define LV_STYLE_ANIM_SHIFT     8      /*log2(LV_STYLE_ANIM_RES)*/
 
@@ -25,7 +25,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 typedef struct {
     lv_style_t style_start;   /*Save not only pointers because can be same as 'style_anim' then it will be modified too*/
     lv_style_t style_end;
@@ -37,7 +37,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val);
 static void style_animation_common_end_cb(void *ptr);
 #endif
@@ -97,8 +97,8 @@ void lv_style_init (void)
     lv_style_scr.text.opa = LV_OPA_COVER;
     lv_style_scr.text.color = LV_COLOR_MAKE(0x30, 0x30, 0x30);
     lv_style_scr.text.font = LV_FONT_DEFAULT;
-    lv_style_scr.text.letter_space = 1 << LV_ANTIALIAS;
-    lv_style_scr.text.line_space = 2 << LV_ANTIALIAS;
+    lv_style_scr.text.letter_space = 2;
+    lv_style_scr.text.line_space = 2;
 
     lv_style_scr.image.opa = LV_OPA_COVER;
     lv_style_scr.image.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
@@ -106,7 +106,7 @@ void lv_style_init (void)
 
     lv_style_scr.line.opa = LV_OPA_COVER;
     lv_style_scr.line.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_scr.line.width = 1 << LV_ANTIALIAS;
+    lv_style_scr.line.width = 1;
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
@@ -216,7 +216,7 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
     memcpy(dest, src, sizeof(lv_style_t));
 }
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
@@ -251,7 +251,7 @@ void lv_style_anim_create(lv_style_anim_t * anim)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 /**
  * Used by the style animations to set the values of a style according to start and end style.
  * @param dsc the 'animated variable' set by lv_style_anim_create()

@@ -94,9 +94,6 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p, 
                           lv_color_t color, lv_opa_t opa)
 {
-    static lv_color_t color_array_tmp[LV_VER_RES];       /*Used by 'sw_color_fill'*/
-    static lv_coord_t last_width = -1;
-
     lv_area_t res_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
@@ -120,8 +117,12 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*Move the vdb_tmp to the first row*/
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
-    lv_coord_t w = lv_area_get_width(&vdb_rel_a);
 
+#if USE_LV_GPU
+    static lv_color_t color_array_tmp[LV_HOR_RES << LV_ANTIALIAS];       /*Used by 'sw_color_fill'*/
+    static lv_coord_t last_width = -1;
+
+    lv_coord_t w = lv_area_get_width(&vdb_rel_a);
     /*Don't use hw. acc. for every small fill (because of the init overhead)*/
     if(w < VFILL_HW_ACC_SIZE_LIMIT) {
         sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
@@ -158,6 +159,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         else {
             sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
         }
+
     }
     /*Fill with opacity*/
     else {
@@ -182,7 +184,11 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         else {
             sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
         }
+
     }
+#else
+    sw_color_fill(&vdb_p->area, vdb_buf_tmp, &vdb_rel_a, color, opa);
+#endif
 }
 
 /**
@@ -267,7 +273,6 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                 map1_p ++;
                 map2_p ++;
             }
-
 
             if(px_cnt != 0) {
                 if(opa == LV_OPA_COVER) *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, 63*px_cnt);
@@ -368,11 +373,15 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
             lv_coord_t map_useful_w = lv_area_get_width(&masked_a);
 
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
+#if USE_LV_GPU
                 if(lv_disp_is_mem_blend_supported() == false) {
                     sw_mem_blend(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
                 } else {
                     lv_disp_mem_blend(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
                 }
+#else
+                sw_mem_blend(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+#endif
                 map_p += map_width;               /*Next row on the map*/
                 vdb_buf_tmp += vdb_width;         /*Next row on the VDB*/
             }
@@ -468,6 +477,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                    vdb_buf_tmp[vdb_col2 + 1].full = map_p[map_col].full;
                }
 
+
                map_p += map_width;
                vdb_buf_tmp += 2 * vdb_width ; /*+ 2 row on the VDB (2 rows are filled because of the upscale)*/
 
@@ -539,6 +549,7 @@ static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t len
  */
 static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa)
 {
+
     /*Set all row in vdb to the given color*/
     lv_coord_t row;
     lv_coord_t col;

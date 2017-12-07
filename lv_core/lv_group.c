@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_group.h"
-#if LV_OBJ_GROUP != 0
+#if USE_LV_GROUP != 0
 #include <stddef.h>
 
 /*********************
@@ -267,4 +267,4 @@ static void style_mod_def(lv_style_t * style)
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
 }
 
-#endif /*LV_OBJ_GROUP != 0*/
+#endif /*USE_LV_GROUP != 0*/

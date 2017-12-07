@@ -22,7 +22,7 @@
  *      DEFINES
  *********************/
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 #  ifndef LV_DDLIST_DEF_ANIM_TIME
 #    define LV_DDLIST_DEF_ANIM_TIME     200     	/*ms*/
 #  endif
@@ -607,7 +607,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
         lv_obj_set_height(ddlist, new_height);
         lv_ddlist_pos_current_option(ddlist);
     } else {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         lv_anim_t a;
         a.var = ddlist;
         a.start = lv_obj_get_height(ddlist);

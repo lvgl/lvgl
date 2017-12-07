@@ -492,7 +492,7 @@ static void lv_win_realign(lv_obj_t * win)
 
     lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.hor, 0);
 
-    lv_obj_set_pos_scale(ext->header, 0, 0);
+    lv_obj_set_pos(ext->header, 0, 0);
 
     lv_obj_set_size( ext->page, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
     lv_obj_align( ext->page, ext->header, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);

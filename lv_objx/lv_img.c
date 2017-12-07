@@ -146,11 +146,10 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
         ext->w = header.w;
         ext->h = header.h;
         ext->transp = header.transp;
-
-#if LV_ANTIALIAS != 0
-        if(ext->upscale != 0) {
-            ext->w *=  2;
-            ext->h *=  2;
+#if LV_ANTIALIAS
+        if(ext->upscale == false) {
+            ext->w = ext->w >> LV_AA;
+            ext->h = ext->h >> LV_AA;
         }
 #endif
 	}

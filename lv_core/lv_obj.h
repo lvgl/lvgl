@@ -264,18 +264,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent);
 void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
 /**
- * Set relative the position of an object (relative to the parent).
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param x new distance from the left side of the parent.
- * @param y new distance from the top of the parent.
- */
-static inline void lv_obj_set_pos_scale(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
-{
-    lv_obj_set_pos(obj, x << LV_ANTIALIAS, y << LV_ANTIALIAS);
-}
-
-/**
  * Set the x coordinate of a object
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent
@@ -283,33 +271,11 @@ static inline void lv_obj_set_pos_scale(lv_obj_t * obj, lv_coord_t x, lv_coord_t
 void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x);
 
 /**
- * Set the x coordinate of a object.
- * The coordinate will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param x new distance from the left side from the parent.
- */
-static inline void lv_obj_set_x_scale(lv_obj_t * obj, lv_coord_t x)
-{
-    lv_obj_set_x(obj, x << LV_ANTIALIAS);
-}
-
-/**
  * Set the y coordinate of a object
  * @param obj pointer to an object
  * @param y new distance from the top of the parent
  */
 void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
-
-/**
- * Set the y coordinate of a object.
- * The coordinate will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param y new distance from the top of the parent.
- */
-static inline void lv_obj_set_y_scale(lv_obj_t * obj, lv_coord_t y)
-{
-    lv_obj_set_y(obj, y << LV_ANTIALIAS);
-}
 
 /**
  * Set the size of an object
@@ -320,18 +286,6 @@ static inline void lv_obj_set_y_scale(lv_obj_t * obj, lv_coord_t y)
 void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
 /**
- * Set the size of an object.
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param w new width
- * @param h new height
- */
-static inline void lv_obj_set_size_scale(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
-{
-    lv_obj_set_size(obj, w << LV_ANTIALIAS, h << LV_ANTIALIAS);
-}
-
-/**
  * Set the width of an object
  * @param obj pointer to an object
  * @param w new width
@@ -339,33 +293,11 @@ static inline void lv_obj_set_size_scale(lv_obj_t * obj, lv_coord_t w, lv_coord_
 void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w);
 
 /**
- * Set the width of an object.
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param w new width
- */
-static inline void lv_obj_set_width_scale(lv_obj_t * obj, lv_coord_t w)
-{
-    lv_obj_set_width(obj, w << LV_ANTIALIAS);
-}
-
-/**
  * Set the height of an object
  * @param obj pointer to an object
  * @param h new height
  */
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
-
-/**
- * Set the height of an object.
- * The coordinate will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object
- * @param h new height
- */
-static inline void lv_obj_set_height_scale(lv_obj_t * obj, lv_coord_t h)
-{
-    lv_obj_set_height(obj, h << LV_ANTIALIAS);
-}
 
 /**
  * Align an object to an other object.
@@ -377,19 +309,6 @@ static inline void lv_obj_set_height_scale(lv_obj_t * obj, lv_coord_t h)
  */
 void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
 
-/**
- * Align an object to an other object.
- * The coordinates will be up scaled LV_ANTIALIAS is enabled.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
- */
-static inline void lv_obj_align_scale(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
-{
-    lv_obj_align(obj, base, align, x_mod << LV_ANTIALIAS, y_mod << LV_ANTIALIAS);
-}
 
 /*---------------------
  * Appearance set
@@ -530,7 +449,7 @@ void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_num);
 void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p);
 #endif
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -774,7 +693,7 @@ LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
 void * lv_obj_get_free_ptr(lv_obj_t * obj);
 #endif
 
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
 /**
  * Get the group of the object
  * @param obj pointer to an object

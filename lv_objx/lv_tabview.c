@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 #  ifndef LV_TABVIEW_ANIM_TIME
 #    define LV_TABVIEW_ANIM_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #  endif
@@ -249,7 +249,7 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
     if(ext->anim_time == 0 || anim_en == false) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         lv_anim_t a;
         a.var = ext->content;
         a.start = lv_obj_get_x(ext->content);
@@ -275,7 +275,7 @@ void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
     if(ext->anim_time == 0 || anim_en == false ) {
         lv_obj_set_x(ext->indic, indic_x);
     } else {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         lv_anim_t a;
         a.var = ext->indic;
         a.start = lv_obj_get_x(ext->indic);

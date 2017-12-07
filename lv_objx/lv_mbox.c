@@ -20,7 +20,7 @@
  *      DEFINES
  *********************/
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 #  ifndef LV_MBOX_CLOSE_ANIM_TIME
 #    define LV_MBOX_CLOSE_ANIM_TIME  200 /*List close animation time)  */
 #  endif
@@ -200,7 +200,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
     if(ext->anim_time != 0) {
         /*Add shrinking animations*/
         lv_obj_animate(mbox, LV_ANIM_GROW_H| LV_ANIM_OUT, ext->anim_time, delay, NULL);
@@ -222,7 +222,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
  */
 void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
     lv_anim_del(mbox, NULL);
 #endif
 }

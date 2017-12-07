@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_fs.h"
+#if USE_LV_FILESYSTEM
+
 #include "lv_ll.h"
 #include <string.h>
 
@@ -536,3 +538,5 @@ static lv_fs_drv_t* lv_fs_get_drv(char letter)
     
     return NULL;
 }
+
+#endif /*USE_LV_FILESYSTEM*/

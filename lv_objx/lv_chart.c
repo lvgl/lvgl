@@ -75,7 +75,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
     ext->type = LV_CHART_TYPE_LINE;
     ext->series.opa = LV_OPA_COVER;
     ext->series.dark = LV_OPA_50;
-    ext->series.width = 2 << LV_ANTIALIAS;
+    ext->series.width = 2;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_chart);

@@ -8,7 +8,7 @@
  *********************/
 #include "lv_anim.h"
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 #include <stddef.h>
 #include <string.h>
 #include "../lv_hal/lv_hal_tick.h"

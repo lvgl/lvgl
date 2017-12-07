@@ -21,7 +21,7 @@
  *********************/
 /*Test configurations*/
 #ifndef LV_LABEL_SCROLL_SPEED
-#define LV_LABEL_SCROLL_SPEED       (25 << LV_ANTIALIAS) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL' mode*/
+#define LV_LABEL_SCROLL_SPEED       (25) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 
 #define ANIM_WAIT_CHAR_COUNT 3
@@ -40,7 +40,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
 static void lv_label_refr_text(lv_obj_t * label);
 static void lv_label_revert_dots(lv_obj_t *label);
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
 static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
 #endif
@@ -223,7 +223,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
     /*Delete the old animation (if exists)*/
     lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_x);
     lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_y);
@@ -629,7 +629,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         lv_style_t * style = lv_obj_get_style(label);
         lv_obj_get_coords(label, &cords);
 
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(label);
         if(lv_group_get_focused(g) == label) {
             lv_draw_rect(&cords, mask, style);
@@ -641,7 +641,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         if(ext->body_draw) lv_draw_rect(&cords, mask, style);
 
         /*TEST: draw a background for the label*/
-//		lv_vfill(&label->coords, mask, LV_COLOR_LIME, LV_OPA_COVER);
+//		lv_draw_rect(&label->coords, mask, &lv_style_plain_color);
 
 		lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
 		if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
@@ -730,7 +730,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         /*Start scrolling if the label is greater then its parent*/
         if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
             lv_obj_t * parent = lv_obj_get_parent(label);
 
             /*Delete the potential previous scroller animations*/
@@ -766,7 +766,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     }
     /*In roll mode keep the size but start offset animations*/
     else if(ext->long_mode == LV_LABEL_LONG_ROLL) {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
         lv_anim_t anim;
         anim.var = label;
         anim.repeat = 1;
@@ -887,7 +887,7 @@ static void lv_label_revert_dots(lv_obj_t *label)
     ext->dot_end = LV_LABEL_DOT_END_INV;
 }
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);

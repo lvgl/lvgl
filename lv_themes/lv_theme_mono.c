@@ -58,18 +58,18 @@ static void basic_init(void)
     def.body.padding.ver = LV_DPI / 10;
     def.body.padding.inner = LV_DPI / 10;
     def.body.border.color = LV_COLOR_BLACK;
-    def.body.border.width = 1 << LV_AA;
+    def.body.border.width = 1;
     def.body.border.opa = LV_OPA_COVER;
     def.body.border.part = LV_BORDER_FULL;
 
     def.text.font = _font;
     def.text.color = LV_COLOR_BLACK;
-    def.text.letter_space = 1 << LV_AA;
-    def.text.line_space = 1 << LV_AA;
+    def.text.letter_space = 1;
+    def.text.line_space = 1;
 
     def.line.color = LV_COLOR_BLACK;
     def.line.opa = LV_OPA_COVER;
-    def.line.width = 1 << LV_AA;
+    def.line.width = 1;
 
     def.image.color = LV_COLOR_BLACK;
     def.image.intense = LV_OPA_TRANSP;

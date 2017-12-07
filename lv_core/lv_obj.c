@@ -64,16 +64,16 @@ void lv_init(void)
     /*Initialize the lv_misc modules*/
     lv_mem_init();
     lv_task_init();
+
+#if USE_LV_FILESYSTEM
     lv_fs_init();
     lv_ufs_init();
+#endif
+
     lv_font_init();
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
     lv_anim_init();
 #endif
-    /*Clear the screen*/
-    lv_area_t scr_area;
-    lv_area_set(&scr_area, 0, 0, LV_HOR_RES, LV_VER_RES);
-    lv_rfill(&scr_area, NULL, LV_COLOR_BLACK, LV_OPA_COVER);
 
     /*Init. the sstyles*/
     lv_style_init();
@@ -146,7 +146,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->free_ptr = NULL;
 #endif
 
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
         new_obj->group_p = NULL;
 #endif
 		/*Set attributes*/
@@ -191,7 +191,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 #if LV_OBJ_FREE_PTR != 0
         new_obj->free_ptr = NULL;
 #endif
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
         new_obj->group_p = NULL;
 #endif
         
@@ -229,7 +229,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
         new_obj->style_p = copy->style_p;
 
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
         /*Add to the same group*/
         if(copy->group_p != NULL) {
             lv_group_add_obj(copy->group_p, new_obj);
@@ -274,7 +274,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         /*Set i to the next node*/
         i = i_next;
     }
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
     /*Remove the animations from this object*/
     lv_anim_del(obj, NULL);
 #endif
@@ -905,7 +905,7 @@ void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p)
 }
 #endif
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -1204,7 +1204,7 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
             par = par->par;
         }
     }
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
     if(obj->group_p) {
         if(lv_group_get_focused(obj->group_p) == obj) {
             style_act = lv_group_mod_style(obj->group_p, style_act);
@@ -1361,7 +1361,7 @@ void * lv_obj_get_free_ptr(lv_obj_t * obj)
 }
 #endif
 
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
 /**
  * Get the group of the object
  * @param obj pointer to an object
@@ -1532,12 +1532,12 @@ static void delete_children(lv_obj_t * obj)
    }
 
    /*Remove the animations from this object*/
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
    lv_anim_del(obj, NULL);
 #endif
 
    /*Delete from the group*/
-#if LV_OBJ_GROUP
+#if USE_LV_GROUP
    if(obj->group_p != NULL) lv_group_remove_obj(obj);
 #endif
 

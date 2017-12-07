@@ -20,7 +20,7 @@
  *********************/
 #define LV_LIST_LAYOUT_DEF	LV_LAYOUT_COL_M
 
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
 #  ifndef LV_LIST_FOCUS_TIME
 #    define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #  endif
@@ -379,7 +379,7 @@ void lv_list_up(lv_obj_t * list)
                 if(ext->anim_time == 0) {
                     lv_obj_set_y(scrl, new_y);
                 } else {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
                     lv_anim_t a;
                     a.var = scrl;
                     a.start = lv_obj_get_y(scrl);
@@ -422,7 +422,7 @@ void lv_list_down(lv_obj_t * list)
             if(ext->anim_time == 0) {
                 lv_obj_set_y(scrl, new_y);
             } else {
-#if LV_NO_ANIM == 0
+#if USE_LV_ANIMATION
                 lv_anim_t a;
                 a.var = scrl;
                 a.start = lv_obj_get_y(scrl);

@@ -81,7 +81,7 @@ static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
  */
 static inline uint8_t lv_font_get_height_scale(const lv_font_t * font_p)
 {
-    return font_p->height_row >> LV_FONT_ANTIALIAS;
+    return (font_p->height_row >> LV_FONT_ANTIALIAS) >> LV_ANTIALIAS;
 }
 
 
@@ -101,7 +101,7 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
  */
 static inline uint8_t lv_font_get_width_scale(const lv_font_t * font_p, uint32_t letter)
 {
-    return lv_font_get_width(font_p, letter) >> LV_FONT_ANTIALIAS;
+    return (lv_font_get_width(font_p, letter) >> LV_FONT_ANTIALIAS) >> LV_ANTIALIAS;
 }
 
 /**********************

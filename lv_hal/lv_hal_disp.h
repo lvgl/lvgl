@@ -41,11 +41,14 @@ typedef struct _disp_drv_t {
     /*Write pixel map (e.g. image) to the display*/
     void (*disp_map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
 
+#if USE_LV_GPU
     /*Blend two memories using opacity (GPU only)*/
     void (*mem_blend)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 
     /*Fill a memory with a color (GPU only)*/
     void (*mem_fill)(lv_color_t * dest, uint32_t length, lv_color_t color);
+#endif
+
 } lv_disp_drv_t;
 
 typedef struct _disp_t {
@@ -122,6 +125,7 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t col
  */
 void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_map);
 
+#if USE_LV_GPU
 /**
  * Blend pixels to a destination memory from a source memory
  * In 'lv_disp_drv_t' 'mem_blend' is optional. (NULL if not available)
@@ -152,7 +156,7 @@ bool lv_disp_is_mem_blend_supported(void);
  * @return false: 'mem_fill' is not supported in the drover; true: 'mem_fill' is supported in the driver
  */
 bool lv_disp_is_mem_fill_supported(void);
-
+#endif
 /**********************
  *      MACROS
  **********************/

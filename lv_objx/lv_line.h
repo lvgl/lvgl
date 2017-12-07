@@ -34,7 +34,6 @@ typedef struct
     uint16_t  point_num;            /*Number of points in 'point_array' */
     uint8_t  auto_size  :1;         /*1: set obj. width to x max and obj. height to y max */
     uint8_t  y_inv      :1;         /*1: y == 0 will be on the bottom*/
-    uint8_t  upscale    :1;         /*1: upscale coordinates with LV_DOWNSCALE*/
 }lv_line_ext_t;
 
 /**********************
@@ -80,13 +79,6 @@ void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en);
 void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en);
 
 /**
- * Enable (or disable) the points' coordinate upscaling (if LV_ANTIALIAS is enabled).
- * @param line pointer to a line object
- * @param unscale_en true: enable the point coordinate upscaling
- */
-void lv_line_set_upscale(lv_obj_t * line, bool unscale_en);
-
-/**
  * Set the style of a line
  * @param line pointer to a line object
  * @param style pointer to a style
@@ -113,13 +105,6 @@ bool lv_line_get_auto_size(lv_obj_t * line);
  * @return true: y inversion is enabled, false: disabled
  */
 bool lv_line_get_y_inv(lv_obj_t * line);
-
-/**
- * Get the point upscale enable attribute
- * @param obj pointer to a line object
- * @return true: point coordinate upscale is enabled, false: disabled
- */
-bool lv_line_get_upscale(lv_obj_t * line);
 
 /**
  * Get the style of an line object

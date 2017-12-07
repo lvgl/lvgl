@@ -49,6 +49,7 @@ static bool is_break_char(uint32_t letter);
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
                     lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag)
 {
+
     size_res->x = 0;
     size_res->y = 0;
 
@@ -104,11 +105,11 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t i = 0;
-    lv_coord_t act_l = 0;
+    lv_coord_t cur_w = 0;
     uint32_t last_break = NO_BREAK_FOUND;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter = 0;
-    
+
     while(txt[i] != '\0') {
         letter = lv_txt_utf8_next(txt, &i);
 
@@ -128,10 +129,10 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             return i;    /*Return with the first letter of the next line*/
 
         } else { /*Check the actual length*/
-            act_l += lv_font_get_width_scale(font, letter);
+            cur_w += lv_font_get_width_scale(font, letter);
 
             /*If the txt is too long then finish, this is the line end*/
-            if(act_l > max_width) {
+            if(cur_w > max_width) {
                 /*If this a break char then break here.*/
                 if(is_break_char(letter)) {
                     /* Now 'i' points to the next char because of txt_utf8_next()
@@ -139,11 +140,11 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                      * Hence do nothing here*/
                 }
                 /*If already a break character is found, then break there*/
-                else if(last_break != NO_BREAK_FOUND ) {
+                if(last_break != NO_BREAK_FOUND ) {
                     i = last_break;
                 } else {
-                    /* Now this character is out of the area but 'i' points to the next char because of txt_utf8_next()
-                     * So step back one char*/
+                    /* Now this character is out of the area so it will be first character of the next line*/
+                    /* But 'i' already points to the next character (because of lv_txt_utf8_next) step beck one*/
                     lv_txt_utf8_prev(txt, &i);
                 }
 
@@ -160,7 +161,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             }
         }
         
-        act_l += letter_space;
+        cur_w += letter_space;
     }
     
     return i;
@@ -197,7 +198,7 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
             width += lv_font_get_width_scale(font, letter);
             width += letter_space;
         }
-        
+
         /*Trim closing spaces. Important when the text is aligned to the middle */
         for(i = length - 1; i > 0; i--) {
             if(txt[i] == ' ') {
