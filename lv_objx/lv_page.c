@@ -412,7 +412,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(scrl, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-#if LV_GROUP != 0
+#if LV_OBJ_GROUP
         /* If the page is the active in a group and
          * the background (page) is not visible (transparent or empty)
          * then activate the style of the scrollable*/
@@ -430,7 +430,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
 #endif
         ancestor_design(scrl, mask, mode);
 
-#if LV_GROUP != 0
+#if LV_OBJ_GROUP
         scrl->style_p = style_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {

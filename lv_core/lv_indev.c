@@ -128,7 +128,7 @@ void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj)
     lv_obj_set_pos(indev->cursor, indev->proc.act_point.x,  indev->proc.act_point.y);
 }
 
-#if LV_GROUP
+#if LV_OBJ_GROUP
 /**
  * Set a destination group for a keypad input device
  * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_KEYPAD')
@@ -239,7 +239,7 @@ static void indev_proc_task(void * param)
                 indev_proc_point(&i->proc);
             }
             else if (i->driver.type == LV_INDEV_TYPE_KEYPAD) {
-#if LV_GROUP != 0
+#if LV_OBJ_GROUP
                 if(i->group != NULL && data.key != 0 &&
                    data.state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_REL)
                 {

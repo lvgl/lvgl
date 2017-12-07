@@ -454,12 +454,14 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
             lv_coord_t map_col_end = masked_a.x2 >> 1;
             lv_coord_t vdb_col;         /*Col. in this row*/
             lv_coord_t vdb_col2;        /*Col. in next row*/
+
             for(row = masked_a.y1; row <= masked_a.y2; row += 2) {
                 map_col_start = masked_a.x1 >> 1;
                 map_col_end = masked_a.x2 >> 1;
                 vdb_col = masked_a.x1;
                 vdb_col2 = masked_a.x1 + vdb_width;
                for(map_col = map_col_start; map_col <= map_col_end; map_col ++, vdb_col += 2, vdb_col2 += 2) {
+
                    vdb_buf_tmp[vdb_col].full = map_p[map_col].full;
                    vdb_buf_tmp[vdb_col + 1].full = map_p[map_col].full;
                    vdb_buf_tmp[vdb_col2].full = map_p[map_col].full;

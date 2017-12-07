@@ -72,9 +72,6 @@
 #define LV_TXT_UTF8             1
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
 
-/*Group settings*/
-#define LV_GROUP                1                  /*Enable object groups (for keyboards)*/
-
 /*Graphics feature usage*/
 #define LV_NO_ANIM				0				/*1: disable all animations*/
 #define LV_NO_SHADOW			0				/*1: disable shadows*/
@@ -155,6 +152,7 @@
  *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
+#define LV_OBJ_GROUP            1           /*Enable object groups (for keyboards)*/
 
 /*==================
  *  LV OBJ X USAGE 

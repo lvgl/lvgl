@@ -629,7 +629,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         lv_style_t * style = lv_obj_get_style(label);
         lv_obj_get_coords(label, &cords);
 
-#if LV_GROUP != 0
+#if LV_OBJ_GROUP
         lv_group_t * g = lv_obj_get_group(label);
         if(lv_group_get_focused(g) == label) {
             lv_draw_rect(&cords, mask, style);

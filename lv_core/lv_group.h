@@ -30,7 +30,7 @@ extern "C" {
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/
 
-#if LV_GROUP  != 0
+#if LV_OBJ_GROUP  != 0
 /**********************
  *      TYPEDEFS
  **********************/
@@ -125,7 +125,7 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group);
  *      MACROS
  **********************/
 
-#endif /*LV_GROUP != 0*/
+#endif /*LV_OBJ_GROUP != 0*/
 
 #ifdef __cplusplus
 } /* extern "C" */

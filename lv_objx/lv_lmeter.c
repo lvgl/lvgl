@@ -242,7 +242,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
         memcpy(&style_tmp, style, sizeof(lv_style_t));
 
 
-#if LV_GROUP
+#if LV_OBJ_GROUP
         lv_group_t *g = lv_obj_get_group(lmeter);
         if(lv_group_get_focused(g) == lmeter) {
             style_tmp.line.width += 1 << LV_ANTIALIAS;

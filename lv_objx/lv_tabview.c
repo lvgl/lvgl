@@ -78,7 +78,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->drag_hor = 0;
-    ext->draging = 0;;
+    ext->draging = 0;
     ext->slide_enable = 1;
     ext->tab_cur = 0;
     ext->point_last.x = 0;
