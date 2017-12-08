@@ -73,11 +73,11 @@
 #define LV_TXT_UTF8             1
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"           /*Can break texts on these chars*/
 
-/*Graphics feature usage*/
+/*Feature usage*/
 #define USE_LV_ANIMATION        1               /*1: disable all animations*/
 #define USE_LV_SHADOW           1               /*1: disable shadows*/
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
-#define USE_LV_GPU              0               /*1: Enable GPU interface*/
+#define USE_LV_GPU              1               /*1: Enable GPU interface*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images aka. lv_img)*/
 
 /*==================
