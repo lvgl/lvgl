@@ -908,7 +908,7 @@ static const uint8_t symbol_40_file_width[] =
 
 lv_font_t lv_font_symbol_40_file = 
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     224,        /*First letter's unicode */
     255,        /*Last letter's unicode */
 #else

@@ -654,7 +654,7 @@ static const uint8_t symbol_40_feedback_width[] =
 
 lv_font_t lv_font_symbol_40_feedback = 
 {
-#if TXT_UTF8 == 0
+#if LV_TXT_UTF8 == 0
     208,        /*First letter's unicode */
     223,        /*Last letter's unicode */
 #else

@@ -7,7 +7,7 @@
 #if USE_LV_FONT_DEJAVU_10_LATIN_EXT_A
 
 #include <stdint.h>
-#include "lvgl/lv_misc/lv_font.h"
+#include "../lv_font.h"
 
 extern lv_font_t lv_font_dejavu_10_latin_ext_a;
 

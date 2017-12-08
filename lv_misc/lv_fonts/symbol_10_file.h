@@ -7,7 +7,7 @@
 #if USE_LV_FONT_SYMBOL_10_FILE
 
 #include <stdint.h>
-#include "lvgl/lv_misc/lv_font.h"
+#include "../lv_font.h"
 
 extern lv_font_t lv_font_symbol_10_file;
 
