@@ -106,7 +106,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
  * @param id index of a tab to load
  * @param anim_en true: set with sliding animation; false: set immediately
  */
-void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en);
+void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en);
 
 /**
  * Set an action to call when a tab is loaded (Good to create content only if required)
@@ -147,7 +147,7 @@ void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t
  * @param tabview pointer to Tab view object
  * @return the active tab index
  */
-uint16_t lv_tabview_get_current_tab(lv_obj_t * tabview);
+uint16_t lv_tabview_get_tab_act(lv_obj_t * tabview);
 
 /**
  * Get the number of tabs

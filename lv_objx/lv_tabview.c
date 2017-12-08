@@ -218,7 +218,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     /*Set the first btn as active*/
     if(ext->tab_cnt == 1) {
         ext->tab_cur = 0;
-        lv_tabview_set_current_tab(tabview, 0, false);
+        lv_tabview_set_tab_act(tabview, 0, false);
         tabview_realign(tabview);       /*To set the proper btns height*/
     }
 
@@ -235,7 +235,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
  * @param id index of a tab to load
  * @param anim_en true: set with sliding animation; false: set immediately
  */
-void lv_tabview_set_current_tab(lv_obj_t * tabview, uint16_t id, bool anim_en)
+void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     lv_style_t * style = lv_obj_get_style(ext->content);
@@ -377,11 +377,11 @@ void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t
  *====================*/
 
 /**
- * Get the index of the currently active btn
+ * Get the index of the currently active tab
  * @param tabview pointer to Tab view object
  * @return the active btn index
  */
-uint16_t lv_tabview_get_current_tab(lv_obj_t * tabview)
+uint16_t lv_tabview_get_tab_act(lv_obj_t * tabview)
 {
     lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
     return ext->tab_cur;
@@ -680,7 +680,7 @@ static void tabpage_press_lost_hadler(lv_obj_t * tabview, lv_obj_t * tabpage)
         if(tab_cur < ext->tab_cnt - 1) tab_cur++;
     }
 
-    lv_tabview_set_current_tab(tabview, tab_cur, true);
+    lv_tabview_set_tab_act(tabview, tab_cur, true);
 }
 
 /**
@@ -701,7 +701,7 @@ static lv_res_t tab_btnm_action(lv_obj_t * tab_btnm, const char * tab_name)
         i++;
     }
 
-    lv_tabview_set_current_tab(tab, i, true);
+    lv_tabview_set_tab_act(tab, i, true);
 
     return LV_RES_OK;
 }
@@ -746,6 +746,6 @@ static void tabview_realign(lv_obj_t * tabview)
 
     lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
 
-    lv_tabview_set_current_tab(tabview, ext->tab_cur, false);
+    lv_tabview_set_tab_act(tabview, ext->tab_cur, false);
 }
 #endif
