@@ -125,10 +125,7 @@ void lv_slider_set_style(lv_obj_t *slider, lv_slider_style_t type, lv_style_t *s
  * @param slider pointer to a slider object
  * @return the value of the slider
  */
-static inline int16_t lv_slider_get_value(lv_obj_t * slider)
-{
-    return lv_bar_get_value(slider);
-}
+int16_t lv_slider_get_value(lv_obj_t * slider);
 
 /**
  * Get the minimum value of a slider
@@ -158,11 +155,11 @@ static inline int16_t lv_slider_get_max_value(lv_obj_t * slider)
 lv_action_t lv_slider_get_action(lv_obj_t * slider);
 
 /**
- * Set the styles of a slider
+ * Give the slider is being dragged or not
  * @param slider pointer to a slider object
- * @return pointer to the knob's style
+ * @return true: drag in progress false: not dragged
  */
-lv_style_t * lv_slider_get_style_knob(lv_obj_t * slider);
+bool lv_slider_is_dragged(lv_obj_t * slider);
 
 /**
  * Get the 'knob in' attribute of a slider
