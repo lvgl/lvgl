@@ -24,11 +24,11 @@
 
 #if USE_LV_ANIMATION
 #  ifndef LV_DDLIST_DEF_ANIM_TIME
-#    define LV_DDLIST_DEF_ANIM_TIME     200     	/*ms*/
+#    define LV_DDLIST_ANIM_TIME     200     	/*ms*/
 #  endif
 #else
-#  undef  LV_DDLIST_DEF_ANIM_TIME
-#  define LV_DDLIST_DEF_ANIM_TIME     0     		/*No animation*/
+#  undef  LV_DDLIST_ANIM_TIME
+#  define LV_DDLIST_ANIM_TIME     0     		/*No animation*/
 #endif
 
 /**********************
@@ -85,7 +85,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
     ext->fix_height = 0;
     ext->sel_opt_id = 0;
     ext->option_cnt = 0;
-    ext->anim_time = LV_DDLIST_DEF_ANIM_TIME;
+    ext->anim_time = LV_DDLIST_ANIM_TIME;
     ext->sel_style = &lv_style_plain_color;
 
     /*The signal and design functions are not copied so set them here*/
