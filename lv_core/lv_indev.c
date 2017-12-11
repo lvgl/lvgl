@@ -314,7 +314,7 @@ static void indev_proc_point(lv_indev_proc_t * indev)
 {
     if(indev->state == LV_INDEV_STATE_PR){
 #if LV_INDEV_POINT_MARKER != 0
-        area_t area;
+        lv_area_t area;
         area.x1 = indev->act_point.x - (LV_INDEV_POINT_MARKER >> 1);
         area.y1 = indev->act_point.y - (LV_INDEV_POINT_MARKER >> 1);
         area.x2 = indev->act_point.x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
