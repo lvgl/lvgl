@@ -174,6 +174,16 @@ void lv_indev_get_vect(lv_indev_t * indev, lv_point_t * point)
 }
 
 /**
+ * Get elapsed time since last press
+ * @param indev pointer to an input device
+ * @return Elapsed ticks (milliseconds) since last press
+ */
+uint32_t lv_indev_get_inactive_time(lv_indev_t * indev)
+{
+    return indev->proc.pr_timestamp;
+}
+
+/**
  * Do nothing until the next release
  * @param indev pointer to an input device
  */
