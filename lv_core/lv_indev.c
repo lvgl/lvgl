@@ -175,12 +175,24 @@ void lv_indev_get_vect(lv_indev_t * indev, lv_point_t * point)
 
 /**
  * Get elapsed time since last press
- * @param indev pointer to an input device
+ * @param indev pointer to an input device (NULL to get the overall smallest inactivity)
  * @return Elapsed ticks (milliseconds) since last press
  */
 uint32_t lv_indev_get_inactive_time(lv_indev_t * indev)
 {
-    return indev->proc.pr_timestamp;
+    uint32_t t;
+
+    if(indev) return t = lv_tick_elaps(indev->last_activity_time);
+
+    lv_indev_t *i;
+    t = UINT16_MAX;
+    i = lv_indev_next(NULL);
+    while(i) {
+        t = LV_MATH_MIN(t, lv_tick_elaps(i->last_activity_time));
+        i = lv_indev_next(i);
+    }
+
+    return t;
 }
 
 /**
@@ -229,7 +241,11 @@ static void indev_proc_task(void * param)
         if(i->proc.disabled == 0) {
             /*Read the data*/
             lv_indev_read(i, &data);
-            i->proc.event = data.state;
+            i->proc.state = data.state;
+
+            if(i->proc.state == LV_INDEV_STATE_PR) {
+                i->last_activity_time = lv_tick_get();
+            }
 
             /*Move the cursor if set and moved*/
             if(i->driver.type == LV_INDEV_TYPE_POINTER &&
@@ -296,7 +312,7 @@ static void indev_proc_task(void * param)
  */
 static void indev_proc_point(lv_indev_proc_t * indev)
 {
-    if(indev->event == LV_INDEV_STATE_PR){
+    if(indev->state == LV_INDEV_STATE_PR){
 #if LV_INDEV_POINT_MARKER != 0
         area_t area;
         area.x1 = indev->act_point.x - (LV_INDEV_POINT_MARKER >> 1);

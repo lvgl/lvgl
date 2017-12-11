@@ -59,7 +59,7 @@ typedef struct {
 struct _lv_obj_t;
 
 typedef struct _lv_indev_state_t {
-    lv_indev_state_t event;
+    lv_indev_state_t state;
     union {
         struct {    /*Pointer data*/
             lv_point_t act_point;
@@ -95,6 +95,7 @@ struct _lv_group_t;
 typedef struct _lv_indev_t {
     lv_indev_drv_t driver;
     lv_indev_proc_t proc;
+    uint32_t last_activity_time;
     union {
         struct _lv_obj_t *cursor;
         struct _lv_group_t *group;      /*Keypad destination group*/
