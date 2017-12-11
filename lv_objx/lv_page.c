@@ -114,8 +114,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     	ext->scrl = lv_cont_create(new_page, copy_ext->scrl);
 	    lv_obj_set_signal_func(ext->scrl, lv_page_scrollable_signal);
 
-        lv_page_set_press_action(new_page, copy_ext->pr_action);
-        lv_page_set_release_action(new_page, copy_ext->rel_action);
+        lv_page_set_pr_action(new_page, copy_ext->pr_action);
+        lv_page_set_rel_action(new_page, copy_ext->rel_action);
         lv_page_set_sb_mode(new_page, copy_ext->sb.mode);
 
         lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
@@ -145,7 +145,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
  * @param page pointer to a page object
  * @param rel_action a function to call when the page is released
  */
-void lv_page_set_release_action(lv_obj_t * page, lv_action_t rel_action)
+void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action)
 {
 	lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 	ext->rel_action = rel_action;
@@ -156,7 +156,7 @@ void lv_page_set_release_action(lv_obj_t * page, lv_action_t rel_action)
  * @param page pointer to a page object
  * @param pr_action a function to call when the page is pressed
  */
-void lv_page_set_press_action(lv_obj_t * page, lv_action_t pr_action)
+void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action)
 {
 	lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 	ext->pr_action = pr_action;

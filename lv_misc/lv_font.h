@@ -19,7 +19,7 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-#include "lv_fonts/symbol_def.h"
+#include "lv_fonts/lv_symbol_def.h"
 
 /*********************
  *      DEFINES

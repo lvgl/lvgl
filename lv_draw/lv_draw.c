@@ -323,7 +323,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
-                        par_start = i + lv_txt_utf8_size(txt[i]);
+                        par_start = i;// + lv_txt_utf8_size(txt[i]);
                         cmd_state = CMD_STATE_PAR;
                         continue;
                     } else if(cmd_state == CMD_STATE_PAR) { /*Other start char in parameter escaped cmd. char */
@@ -338,7 +338,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
                 if(cmd_state == CMD_STATE_PAR) {
                     if(letter == ' ') {
                         /*Get the parameter*/
-                        if(i - par_start == LABEL_RELV_COLOR_PAR_LENGTH) {
+                        if(i - par_start == LABEL_RELV_COLOR_PAR_LENGTH + 1) {
                             char buf[LABEL_RELV_COLOR_PAR_LENGTH + 1];
                             memcpy(buf, &txt[par_start], LABEL_RELV_COLOR_PAR_LENGTH);
                             buf[LABEL_RELV_COLOR_PAR_LENGTH] = '\0';

@@ -18,7 +18,7 @@ extern "C" {
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_misc/lv_fs.h"
-#include "../lv_misc/lv_fonts/symbol_def.h"
+#include "../lv_misc/lv_fonts/lv_symbol_def.h"
 #include "lv_label.h"
 
 /*********************

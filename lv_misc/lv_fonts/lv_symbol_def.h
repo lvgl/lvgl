@@ -1,5 +1,5 @@
-#ifndef SYMBOL_DEF_H
-#define SYMBOL_DEF_H
+#ifndef LV_SYMBOL_DEF_H
+#define LV_SYMBOL_DEF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +28,7 @@ extern "C" {
 #define SYMBOL_LIST      "\xC0"
 #define SYMBOL_OK        "\xC1"
 #define SYMBOL_CLOSE     "\xC2"
-#define SYMBOL_SHUTDOWN  "\xC3"
+#define SYMBOL_POWER  "\xC3"
 #define SYMBOL_SETTINGS  "\xC4"
 #define SYMBOL_HOME      "\xC5"
 #define SYMBOL_REFRESH   "\xC6"
@@ -91,7 +91,7 @@ extern "C" {
 #define SYMBOL_LIST      "\xEE\x80\x80"
 #define SYMBOL_OK        "\xEE\x80\x81"
 #define SYMBOL_CLOSE     "\xEE\x80\x82"
-#define SYMBOL_SHUTDOWN  "\xEE\x80\x83"
+#define SYMBOL_POWER  "\xEE\x80\x83"
 #define SYMBOL_SETTINGS  "\xEE\x80\x84"
 #define SYMBOL_HOME      "\xEE\x80\x85"
 #define SYMBOL_REFRESH   "\xEE\x80\x86"
@@ -150,4 +150,4 @@ extern "C" {
 #endif
 
 
-#endif /*SYMBOL_DEF_H*/
+#endif /*LV_SYMBOL_DEF_H*/

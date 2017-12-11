@@ -24,7 +24,7 @@
  *********************/
 #define LV_GAUGE_DEF_NEEDLE_COLOR       LV_COLOR_RED
 #define LV_GAUGE_DEF_LABEL_COUNT        6
-#define LV_GAUGE_DEF_LINE_COUNT   21      /*Should be: ((label_cnt - 1) * internal_lines) + 1*/
+#define LV_GAUGE_DEF_LINE_COUNT         21      /*Should be: ((label_cnt - 1) * internal_lines) + 1*/
 #define LV_GAUGE_DEF_ANGLE              220
 
 

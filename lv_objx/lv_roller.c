@@ -71,7 +71,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_obj_set_drag(scrl, true);                        /*In ddlist is might be disabled*/
-        lv_page_set_release_action(new_roller, NULL);       /*Roller don't uses it (like ddlist)*/
+        lv_page_set_rel_action(new_roller, NULL);       /*Roller don't uses it (like ddlist)*/
         lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);

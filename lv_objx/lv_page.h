@@ -95,14 +95,14 @@ lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
  * @param page pointer to a page object
  * @param rel_action a function to call when the page is released
  */
-void lv_page_set_release_action(lv_obj_t * page, lv_action_t rel_action);
+void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
 
 /**
  * Set a press action for the page
  * @param page pointer to a page object
  * @param pr_action a function to call when the page is pressed
  */
-void lv_page_set_press_action(lv_obj_t * page, lv_action_t pr_action);
+void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
 
 /**
  * Set the scroll bar mode on a page

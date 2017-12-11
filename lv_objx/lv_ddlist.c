@@ -15,7 +15,7 @@
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
-#include "../lv_misc/lv_fonts/symbol_def.h"
+#include "../lv_misc/lv_fonts/lv_symbol_def.h"
 #include "../lv_misc/lv_anim.h"
 
 /*********************
@@ -101,7 +101,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
 
         ext->label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit(new_ddlist, true, false);
-        lv_page_set_release_action(new_ddlist, lv_ddlist_release_action);
+        lv_page_set_rel_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_DRAG);
         lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
