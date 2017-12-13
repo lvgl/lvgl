@@ -131,9 +131,9 @@ const char * lv_cb_get_text(lv_obj_t * cb);
  * @param cb pointer to a check box object
  * @return true: checked; false: not checked
  */
-static inline bool lv_cb_get_checked(lv_obj_t * cb)
+static inline bool lv_cb_is_checked(lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_REL ? true : false;
+    return lv_btn_get_state(cb) == LV_BTN_STATE_REL ? false : true;
 }
 
 /**

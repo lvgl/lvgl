@@ -23,7 +23,7 @@
  *********************/
 /*Test configuration*/
 
-#ifndef LV_TA_CUR_BLINK_TIME
+#ifndef LV_TA_CURSOR_BLINK_TIME
 #define LV_TA_CURSOR_BLINK_TIME 400    /*ms*/
 #endif
 

@@ -190,7 +190,6 @@ static inline lv_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
  */
 uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
 
-
 /**
  * Get a style of a drop down list
  * @param ddlist pointer to a drop down list object

@@ -81,7 +81,12 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
-	    lv_btn_set_layout(new_btn, LV_LAYOUT_CENTER);
+        /*Set layout if the button is not a screen*/
+        if(par != NULL) {
+            lv_btn_set_layout(new_btn, LV_LAYOUT_CENTER);
+        }
+
+        lv_obj_set_click(new_btn, true);        /*Be sure the button is clickable*/
 
 	    /*Set the default styles*/
         lv_theme_t *th = lv_theme_get_current();

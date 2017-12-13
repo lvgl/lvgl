@@ -325,7 +325,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
  * Delete all children of an object
  * @param obj pointer to an object
  */
-void lv_obj_clear(lv_obj_t *obj)
+void lv_obj_clean(lv_obj_t *obj)
 {
     lv_obj_t *child = lv_obj_get_child(obj, NULL);
 

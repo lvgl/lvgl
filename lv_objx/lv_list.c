@@ -220,9 +220,11 @@ void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style)
     switch (type) {
         case LV_LIST_STYLE_BG:
             lv_page_set_style(list, LV_PAGE_STYLE_BG, style);
+            /*style change signal will call 'refr_btn_width' */
             break;
         case LV_LIST_STYLE_SCRL:
             lv_page_set_style(list, LV_PAGE_STYLE_SCRL, style);
+            refr_btn_width(list);
             break;
         case LV_LIST_STYLE_SB:
             lv_page_set_style(list, LV_PAGE_STYLE_SB, style);
