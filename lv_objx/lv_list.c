@@ -387,7 +387,7 @@ void lv_list_up(lv_obj_t * list)
                     a.start = lv_obj_get_y(scrl);
                     a.end = new_y;
                     a.fp = (lv_anim_fp_t)lv_obj_set_y;
-                    a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+                    a.path = lv_anim_path_linear;
                     a.end_cb = NULL;
                     a.act_time = 0;
                     a.time = LV_LIST_FOCUS_TIME;
@@ -430,7 +430,7 @@ void lv_list_down(lv_obj_t * list)
                 a.start = lv_obj_get_y(scrl);
                 a.end = new_y;
                 a.fp = (lv_anim_fp_t)lv_obj_set_y;
-                a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+                a.path = lv_anim_path_linear;
                 a.end_cb = NULL;
                 a.act_time = 0;
                 a.time = LV_LIST_FOCUS_TIME;

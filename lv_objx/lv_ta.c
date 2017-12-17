@@ -153,7 +153,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     a.repeat_pause = 0;
     a.playback = 1;
     a.playback_pause = 0;
-    a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
+    a.path = lv_anim_path_step;
     lv_anim_create(&a);
 #endif
 
@@ -200,7 +200,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         a.repeat_pause = 0;
         a.playback = 0;
         a.playback_pause = 0;
-        a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
+        a.path = lv_anim_path_step;
         lv_anim_create(&a);
 #endif
     }
@@ -243,7 +243,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         a.repeat_pause = 0;
         a.playback = 0;
         a.playback_pause = 0;
-        a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
+        a.path = lv_anim_path_step;
         lv_anim_create(&a);
 #endif
     }
@@ -329,7 +329,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         a.repeat_pause = 0;
         a.playback = 0;
         a.playback_pause = 0;
-        a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
+        a.path = lv_anim_path_step;
         lv_anim_create(&a);
 #endif
     }
@@ -402,7 +402,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     a.repeat_pause = 0;
     a.playback = 1;
     a.playback_pause = 0;
-    a.path = lv_anim_get_path(LV_ANIM_PATH_STEP);
+    a.path = lv_anim_path_step;
     lv_anim_create(&a);
 #endif
 

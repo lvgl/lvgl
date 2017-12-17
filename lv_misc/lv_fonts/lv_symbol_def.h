@@ -28,7 +28,7 @@ extern "C" {
 #define SYMBOL_LIST      "\xC0"
 #define SYMBOL_OK        "\xC1"
 #define SYMBOL_CLOSE     "\xC2"
-#define SYMBOL_POWER  "\xC3"
+#define SYMBOL_POWER     "\xC3"
 #define SYMBOL_SETTINGS  "\xC4"
 #define SYMBOL_HOME      "\xC5"
 #define SYMBOL_REFRESH   "\xC6"

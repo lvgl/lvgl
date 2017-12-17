@@ -435,7 +435,7 @@ static void refr_position(lv_obj_t *roller, bool anim_en)
         a.start = lv_obj_get_y(roller_scrl);
         a.end = new_y;
         a.fp = (lv_anim_fp_t)lv_obj_set_y;
-        a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+        a.path = lv_anim_path_linear;
         a.end_cb = NULL;
         a.act_time = 0;
         a.time = ext->ddlist.anim_time;

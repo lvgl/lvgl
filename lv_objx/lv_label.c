@@ -744,7 +744,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.start = lv_font_get_width_scale(font, ' ');
             anim.act_time = 0;
             anim.end_cb = NULL;
-            anim.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+            anim.path = lv_anim_path_linear;
             anim.time = 3000;
             anim.playback_pause = (((lv_font_get_width_scale(style->text.font, ' ') + style->text.letter_space) * 1000) /ext->anim_speed)
                                      * ANIM_WAIT_CHAR_COUNT;
@@ -774,7 +774,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.start = lv_font_get_width_scale(font, ' ');
         anim.act_time = 0;
         anim.end_cb = NULL;
-        anim.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+        anim.path = lv_anim_path_linear;
         anim.playback_pause =  (((lv_font_get_width_scale(style->text.font, ' ') + style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;;
         anim.repeat_pause =  anim.playback_pause;
 

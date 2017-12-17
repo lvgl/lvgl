@@ -613,7 +613,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
         a.start = lv_obj_get_height(ddlist);
         a.end = new_height;
         a.fp = (lv_anim_fp_t)lv_obj_set_height;
-        a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+        a.path = lv_anim_path_linear;
         a.end_cb = (lv_anim_cb_t)lv_ddlist_pos_current_option;
         a.act_time = 0;
         a.time = ext->anim_time;

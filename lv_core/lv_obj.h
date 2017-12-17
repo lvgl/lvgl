@@ -332,7 +332,7 @@ void lv_obj_refresh_style(lv_obj_t * obj);
  * @param style pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_obj_report_style_mod(void * style);
+void lv_obj_report_style_mod(lv_style_t * style);
 
 /*-----------------
  * Attribute set

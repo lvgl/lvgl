@@ -729,7 +729,7 @@ void lv_obj_refresh_style(lv_obj_t * obj)
  * @param style pointer to a style. Only the objects with this style will be notified
  *               (NULL to notify all objects)
  */
-void lv_obj_report_style_mod(void * style)
+void lv_obj_report_style_mod(lv_style_t * style)
 {
     lv_obj_t * i;
     LL_READ(scr_ll, i) {
@@ -927,7 +927,7 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
 	a.time = time;
 	a.act_time = (int32_t)-delay;
 	a.end_cb = (void(*)(void*))cb;
-	a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+	a.path = lv_anim_path_linear;
 	a.playback_pause = 0;
 	a.repeat_pause = 0;
 	a.playback = 0;

@@ -74,7 +74,7 @@ lv_indev_t * lv_indev_get_act(void)
 
 /**
  * Reset one or all input devices
- * @param indev
+ * @param indev pointer to an input device to reset or NULL to reset all of them
  */
 void lv_indev_reset(lv_indev_t * indev)
 {
@@ -90,13 +90,13 @@ void lv_indev_reset(lv_indev_t * indev)
 
 /**
  * Reset the long press state of an input device
- * @param indev_proc pointer to an input device
+ * @param indev pointer to an input device
  */
-void lv_indev_reset_lpr(lv_indev_t * indev_proc)
+void lv_indev_reset_lpr(lv_indev_t * indev)
 {
-    indev_proc->proc.long_pr_sent = 0;
-    indev_proc->proc.longpr_rep_timestamp = lv_tick_get();
-    indev_proc->proc.pr_timestamp = lv_tick_get();
+    indev->proc.long_pr_sent = 0;
+    indev->proc.longpr_rep_timestamp = lv_tick_get();
+    indev->proc.pr_timestamp = lv_tick_get();
 }
 
 /**
@@ -115,8 +115,8 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
 }
 
 /**
- * Set a cursor for a mouse input device
- * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_MOUSE')
+ * Set a cursor for a pointer input device
+ * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_POINTER')
  * @param cur_obj pointer to an object to be used as cursor
  */
 void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj)

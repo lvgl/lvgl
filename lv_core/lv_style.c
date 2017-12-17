@@ -133,7 +133,7 @@ void lv_style_init (void)
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
-    lv_style_pretty_color.text.color = LV_COLOR_MAKE(0xd0, 0xd0, 0xd0);
+    lv_style_pretty_color.text.color = LV_COLOR_MAKE(0xe0, 0xe0, 0xe0);
     lv_style_pretty_color.image.color = LV_COLOR_MAKE(0xe0, 0xe0, 0xe0);
     lv_style_pretty_color.line.color = LV_COLOR_MAKE(0xc0, 0xc0, 0xc0);
     lv_style_pretty_color.body.main_color = LV_COLOR_MAKE(0x6b, 0x9a, 0xc7);
@@ -236,7 +236,7 @@ void lv_style_anim_create(lv_style_anim_t * anim)
     a.start = 0;
     a.end = LV_STYLE_ANIM_RES;
     a.fp = (lv_anim_fp_t)style_animator;
-    a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+    a.path = lv_anim_path_linear;
     a.end_cb = style_animation_common_end_cb;
     a.act_time = anim->act_time;
     a.time = anim->time;

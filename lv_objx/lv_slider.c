@@ -420,14 +420,16 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         lv_style_t *knob_style = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
         lv_coord_t shadow_w = knob_style->body.shadow.width;
         if(ext->knob_in == 0) {
-            lv_coord_t x = LV_MATH_MIN(w / 2 + 1 + shadow_w, h / 2 + 1 + shadow_w);      /*The smaller size is the knob diameter*/
+            /* The smaller size is the knob diameter
+             * +2 for the possible rounding error*/
+            lv_coord_t x = LV_MATH_MIN(w / 2 + 2 + shadow_w, h / 2 + 2 + shadow_w);
             if(slider->ext_size < x) slider->ext_size = x;
         } else {
             lv_coord_t pad = LV_MATH_MIN(style->body.padding.hor, style->body.padding.ver);
-            if(pad < 0) {
-                pad = -pad;
-                if(slider->ext_size < pad) slider->ext_size = pad;
-            }
+            if(pad < 0) pad = -pad;
+            if(pad < 1) pad = 1;        /*For possible rounding errors*/
+            if(slider->ext_size < pad) slider->ext_size = pad;
+
             if(slider->ext_size < shadow_w) slider->ext_size = shadow_w;
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {

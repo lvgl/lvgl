@@ -73,10 +73,10 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t *th = lv_theme_get_current();
         if(th) {
-            lv_slider_set_style(new_sw, LV_SW_STYLE_BG, th->sw.bg);
-            lv_slider_set_style(new_sw, LV_SW_STYLE_INDIC, th->sw.indic);
-            lv_slider_set_style(new_sw, LV_SW_STYLE_KNOB_OFF, th->sw.knob_off);
-            lv_slider_set_style(new_sw, LV_SW_STYLE_KNOB_ON, th->sw.knob_on);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_BG, th->sw.bg);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_INDIC, th->sw.indic);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_KNOB_OFF, th->sw.knob_off);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_KNOB_ON, th->sw.knob_on);
         } else {
             /*Let the slider' style*/
         }

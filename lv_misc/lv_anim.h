@@ -28,23 +28,19 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum
-{
-	LV_ANIM_PATH_LIN,
-	LV_ANIM_PATH_STEP,
-}lv_anim_path_name_t;
+struct _lv_anim_t;
 
-typedef uint8_t lv_anim_path_t;
+typedef int32_t(*lv_anim_path_t)(const struct _lv_anim_t*);
 
 typedef void (*lv_anim_fp_t)(void *, int32_t);
 typedef void (*lv_anim_cb_t)(void *);
 
-typedef struct
+typedef struct _lv_anim_t
 {
 	void * var;						/*Variable to animate*/
-	lv_anim_fp_t fp;	/*Animator function*/
-	lv_anim_cb_t end_cb;		/*Call it when the animation is ready*/
-	lv_anim_path_t * path;			/*An array with the steps of animations*/
+	lv_anim_fp_t fp;	            /*Animator function*/
+	lv_anim_cb_t end_cb;		    /*Call it when the animation is ready*/
+	lv_anim_path_t path;			/*An array with the steps of animations*/
 	int32_t start;					/*Start value*/
 	int32_t end;					/*End value*/
 	int16_t time;					/*Animation time in ms*/
@@ -63,7 +59,7 @@ a.var = obj;
 a.start = lv_obj_get_height(obj);
 a.end = new_height;
 a.fp = (lv_anim_fp_t)lv_obj_set_height;
-a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+a.path = lv_anim_path_linear;
 a.end_cb = NULL;
 a.act_time = 0;
 a.time = 200;
@@ -106,12 +102,19 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp);
 uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end);
 
 /**
- * Get a predefine animation path
- * @param name name of the path from 'anim_path_name_t'
- * @return pointer to the path array
+ * Calculate the current value of an animation applying linear characteristic
+ * @param a pointer to an animation
+ * @return the current value to set
  */
-lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name);
+int32_t lv_anim_path_linear(const lv_anim_t *a);
 
+/**
+ * Calculate the current value of an animation applying step characteristic.
+ * (Set end value on the end of the animation)
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_step(const lv_anim_t *a);
 /**********************
  *      MACROS
  **********************/

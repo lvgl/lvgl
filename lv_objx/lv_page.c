@@ -323,7 +323,7 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
         a.playback = 0;
         a.repeat = 0;
         a.var = ext->scrl;
-        a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+        a.path = lv_anim_path_linear;
         a.fp = (lv_anim_fp_t) lv_obj_set_y;
         lv_anim_create(&a);
 #endif

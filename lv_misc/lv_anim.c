@@ -18,10 +18,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define ANIM_PATH_LENGTH		129	/*Elements in a path array*/
-#define ANIM_PATH_START			64  /*In path array a value which corresponds to the start position*/
-#define ANIM_PATH_END			192 /* ... to the end position. Not required, just for clearance.*/
-#define ANIM_PATH_NORM_SHIFT	7 	/*ANIM_PATH_START - ANIM_PATH_END. Must be 2^N. The exponent goes here. */
+#define LV_ANIM_RESOLUTION             1024
+#define LV_ANIM_RES_SHIFT       10
 
 /**********************
  *      TYPEDEFS
@@ -39,18 +37,6 @@ static bool anim_ready_handler(lv_anim_t * a);
 static lv_ll_t anim_ll;
 static uint32_t last_task_run;
 static bool anim_del_global_flag = false;
-
-static lv_anim_path_t anim_path_lin[] =
-		{64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
-		 96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
-		 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
-		 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192};
-
-static lv_anim_path_t anim_path_step[] =
-		{64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-		 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-         64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-         64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 192,};
 
 /**********************
  *      MACROS
@@ -141,24 +127,41 @@ uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 }
 
 /**
- * Get a predefine animation path
- * @param name name of the path from 'anim_path_name_t'
- * @return pointer to the path array
+ * Calculate the current value of an animation applying linear characteristic
+ * @param a pointer to an animation
+ * @return the current value to set
  */
-lv_anim_path_t * lv_anim_get_path(lv_anim_path_name_t name)
+int32_t lv_anim_path_linear(const lv_anim_t *a)
 {
-	switch (name) {
-		case LV_ANIM_PATH_LIN:
-			return anim_path_lin;
-			break;
-		case LV_ANIM_PATH_STEP:
-			return anim_path_step;
-			break;
-		default:
-			return NULL;
-			break;
-	}
+    /*Calculate the current step*/
+
+    uint16_t step;
+    if(a->time == a->act_time) step = LV_ANIM_RESOLUTION; /*Use the last value id the time fully elapsed*/
+    else step = (a->act_time * LV_ANIM_RESOLUTION) / a->time;
+
+
+    /* Get the new value which will be proportional to the current element of 'path_p'
+     * and the 'start' and 'end' values*/
+    int32_t new_value;
+    new_value =  (int32_t) step * (a->end - a->start);
+    new_value = new_value >> LV_ANIM_RES_SHIFT;
+    new_value += a->start;
+
+    return new_value;
 }
+
+/**
+ * Calculate the current value of an animation applying step characteristic.
+ * (Set end value on the end of the animation)
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_step(const lv_anim_t *a)
+{
+    if(a->act_time >= a->time) return a->end;
+    else return a->start;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -185,21 +188,10 @@ static void anim_task (void * param)
 		if(a->act_time >= 0) {
 			if(a->act_time > a->time) a->act_time = a->time;
 
-			/* Get the index of the path array based on the elapsed time*/
-			uint8_t path_i;
-			if(a->time == a->act_time) {
-                path_i = ANIM_PATH_LENGTH - 1; /*Use the last value id the time fully elapsed*/
-			} else {
-                path_i = a->act_time * (ANIM_PATH_LENGTH - 1) / a->time;
-			}
-			/* Get the new value which will be proportional to the current element of 'path_p'
-			 * and the 'start' and 'end' values*/
-			int32_t new_val;
-			new_val =  (int32_t)(a->path[path_i] - ANIM_PATH_START) * (a->end - a->start);
-			new_val = new_val >> ANIM_PATH_NORM_SHIFT;
-			new_val += a->start;
+			int32_t new_value;
+            new_value = a->path(a);
 
-			if(a->fp != NULL) a->fp(a->var, new_val);	/*Apply the calculated value*/
+			if(a->fp != NULL) a->fp(a->var, new_value);	/*Apply the calculated value*/
 
 			/*If the time is elapsed the animation is ready*/
 			if(a->act_time >= a->time) {

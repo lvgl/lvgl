@@ -241,6 +241,7 @@ static void bar_init(void)
     bar_indic.body.padding.hor = 0;
     bar_indic.body.padding.ver = 0;
     bar_indic.body.shadow.width = LV_DPI / 20;
+    bar_indic.body.shadow.color = lv_color_hsv_to_rgb(_hue, 20, 90);
     bar_indic.body.main_color = lv_color_hsv_to_rgb(_hue, 40, 80);
     bar_indic.body.grad_color = lv_color_hsv_to_rgb(_hue, 40, 80);
 

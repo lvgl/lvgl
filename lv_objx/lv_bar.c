@@ -135,7 +135,7 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
     a.start = ext->cur_value;
     a.end = new_value;
     a.fp = (lv_anim_fp_t)lv_bar_set_value;
-    a.path = lv_anim_get_path(LV_ANIM_PATH_LIN);
+    a.path = lv_anim_path_linear;
     a.end_cb = NULL;
     a.act_time = 0;
     a.time = anim_time;

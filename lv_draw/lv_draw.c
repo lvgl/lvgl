@@ -111,7 +111,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
     mask_aa.y2 = (mask->y2 << LV_AA) + 1;
 #endif
 
-#if USE_LV_SHADOW
+#if USE_LV_SHADOW && LV_VDB_SIZE
     if(style->body.shadow.width != 0) {
         lv_draw_rect_shadow(&coord_aa, &mask_aa, style);
     }
@@ -1209,7 +1209,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     }
 }
 
-#if USE_LV_SHADOW
+#if USE_LV_SHADOW && LV_VDB_SIZE
 
 /**
  * Draw a shadow
