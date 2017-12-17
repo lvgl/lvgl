@@ -371,7 +371,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
 {
     lv_style_t style_needle;
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    lv_style_t * style = lv_obj_get_style(gauge);
+    lv_style_t * style = lv_gauge_get_style(gauge);
 
     lv_coord_t r = lv_obj_get_width(gauge) / 2 - style->body.padding.hor;
     lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
@@ -384,7 +384,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     lv_point_t p_end;
     uint8_t i;
 
-    memcpy(&style_needle, style, sizeof(lv_style_t));
+    lv_style_copy(&style_needle, style);
 
     p_mid.x = x_ofs;
     p_mid.y = y_ofs;

@@ -71,6 +71,12 @@ static inline void lv_roller_set_options(lv_obj_t * roller, const char * options
  */
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
 
+/**
+ * Set the height to show the given number of rows (options)
+ * @param roller pointer to a roller object
+ * @param row_cnt number of desired visible rows
+ */
+void lv_roller_set_row_count(lv_obj_t *roller, uint8_t row_cnt);
 
 /**
  * Enable or disable the horizontal fit to the content

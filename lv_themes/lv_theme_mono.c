@@ -170,10 +170,12 @@ static void bar_init(void)
     lv_style_copy(&bar_bg, &light_frame);
     bar_bg.body.padding.hor = LV_DPI / 15;
     bar_bg.body.padding.ver = LV_DPI / 15;
+    bar_bg.body.radius = LV_RADIUS_CIRCLE;
 
     lv_style_copy(&bar_indic, &dark_frame);
     bar_indic.body.padding.hor = LV_DPI / 30;
     bar_indic.body.padding.ver = LV_DPI / 30;
+    bar_indic.body.radius = LV_RADIUS_CIRCLE;
 
     theme.bar.bg = &bar_bg;
     theme.bar.indic = &bar_indic;
@@ -341,7 +343,7 @@ static void ddlist_init(void)
 
 
     theme.ddlist.bg = &light_frame;
-    theme.ddlist.sel = &light_plain;
+    theme.ddlist.sel = &dark_plain;
     theme.ddlist.sb = &dark_frame;
 #endif
 }

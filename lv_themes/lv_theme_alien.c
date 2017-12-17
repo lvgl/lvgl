@@ -564,7 +564,9 @@ static void ddlist_init(void)
 {
 #if USE_LV_DDLIST != 0
     lv_style_copy(&ddlist_bg, &panel);
-    ddlist_bg.text.line_space = LV_DPI / 10;
+    ddlist_bg.text.line_space = LV_DPI / 8;
+    ddlist_bg.body.padding.hor = LV_DPI / 6;
+    ddlist_bg.body.padding.ver = LV_DPI / 6;
 
     lv_style_copy(&ddlist_sel, &panel);
     ddlist_sel.body.main_color = lv_color_hsv_to_rgb(_hue, 45, 70);

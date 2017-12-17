@@ -74,9 +74,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_rel_action(new_roller, NULL);       /*Roller don't uses it (like ddlist)*/
         lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
-        lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
-        lv_ddlist_set_fix_height(new_roller, lv_font_get_height_scale(style_label->text.font) * 3 + style_label->text.line_space * 4);
-
+        lv_roller_set_row_count(new_roller, 3);
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 
         lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
@@ -119,6 +117,18 @@ void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en)
     refr_position(roller, anim_en);
 }
 
+/**
+ * Set the height to show the given number of rows (options)
+ * @param roller pointer to a roller object
+ * @param row_cnt number of desired visible rows
+ */
+void lv_roller_set_row_count(lv_obj_t *roller, uint8_t row_cnt)
+{
+    lv_roller_ext_t *ext = lv_obj_get_ext_attr(roller);
+    lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
+    lv_ddlist_set_fix_height(roller, lv_font_get_height_scale(style_label->text.font) * row_cnt + style_label->text.line_space * (row_cnt + 1));
+
+}
 /**
  * Set a style of a roller
  * @param roller pointer to a roller object
@@ -212,6 +222,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
         const lv_font_t * font = style->text.font;
         lv_coord_t font_h = lv_font_get_height_scale(font);
+
         /*Redraw the text on the selected area with a different color*/
         lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;

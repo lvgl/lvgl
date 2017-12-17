@@ -52,12 +52,13 @@ static lv_font_t * _font;
 static void basic_init(void)
 {
     lv_style_copy(&def, &lv_style_pretty);  /*Initialize the default style*/
+    def.text.font = _font;
 
     lv_style_copy(&bg, &lv_style_plain);
     bg.body.main_color = lv_color_hsv_to_rgb(_hue, 11, 30);
     bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 11, 30);
     bg.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
-
+    bg.text.font = _font;
 
     lv_style_copy(&sb, &def);
     sb.body.main_color = lv_color_hsv_to_rgb(_hue, 30, 60);
@@ -68,7 +69,6 @@ static void basic_init(void)
     sb.body.padding.hor = 0;
     sb.body.radius = LV_DPI / 30;
     sb.body.opa = LV_OPA_COVER;
-
 
     lv_style_copy(&panel, &bg);
     panel.body.main_color = lv_color_hsv_to_rgb(_hue, 11, 18);
@@ -97,7 +97,7 @@ static void btn_init(void)
 {
 #if USE_LV_BTN != 0
 
-    lv_style_copy(&btn_rel, &lv_style_pretty);
+    lv_style_copy(&btn_rel, &def);
     btn_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 40);
     btn_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     btn_rel.body.border.color = LV_COLOR_HEX3(0x111);
@@ -183,7 +183,7 @@ static void led_init(void)
 {
 #if USE_LV_LED != 0
     static lv_style_t led;
-    lv_style_copy(&led, &lv_style_pretty_color);
+    lv_style_copy(&led, &def);
     led.body.shadow.width = LV_DPI / 10;
     led.body.radius = LV_RADIUS_CIRCLE;
     led.body.border.width= LV_DPI / 30;
@@ -205,7 +205,7 @@ static void bar_init(void)
     bar_bg.body.padding.hor = LV_DPI / 16;
     bar_bg.body.radius = LV_RADIUS_CIRCLE;
 
-    lv_style_copy(&bar_indic, &lv_style_pretty);
+    lv_style_copy(&bar_indic, &def);
     bar_indic.body.main_color = lv_color_hsv_to_rgb(_hue, 80, 70);
     bar_indic.body.grad_color = lv_color_hsv_to_rgb(_hue, 80, 70);
     bar_indic.body.border.color = lv_color_hsv_to_rgb(_hue, 20, 15);
@@ -551,9 +551,10 @@ static void win_init(void)
     win_header.body.padding.ver = 0;
 
     static lv_style_t win_btn_pr;
-    lv_style_copy(&win_btn_pr, &lv_style_plain);
+    lv_style_copy(&win_btn_pr, &def);
     win_btn_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     win_btn_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 10);
+    win_btn_pr.text.color = LV_COLOR_HEX3(0xaaa);
 
     theme.win.bg = &win_bg;
     theme.win.sb = &sb;
