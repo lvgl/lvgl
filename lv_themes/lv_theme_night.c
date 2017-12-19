@@ -266,9 +266,15 @@ static void lmeter_init(void)
 static void gauge_init(void)
 {
 #if USE_LV_GAUGE != 0
+    static lv_style_t gauge_bg;
+    lv_style_copy(&gauge_bg, &def);
+    gauge_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 70);
+    gauge_bg.body.grad_color = gauge_bg.body.main_color;
+    gauge_bg.line.color = lv_color_hsv_to_rgb(_hue, 80, 75);
+    gauge_bg.line.width = 3;
+    gauge_bg.text.color = LV_COLOR_HEX3(0xddd);
 
-
-    theme.gauge = &lmeter_bg;
+    theme.gauge = &gauge_bg;
 #endif
 }
 
@@ -335,7 +341,7 @@ static void btnm_init(void)
     btnm_bg.body.padding.hor = 2;
     btnm_bg.body.padding.ver = 2;
     btnm_bg.body.padding.inner = 0;
-    btnm_bg.body.border.width =  1<< LV_AA;//LV_BORDER_RIGHT;
+    btnm_bg.body.border.width =  1;
 
     lv_style_copy(&rel, &btn_rel);
     rel.body.border.part = LV_BORDER_RIGHT;

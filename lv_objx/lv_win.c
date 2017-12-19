@@ -157,7 +157,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const char * img_path, lv_action_t rel
     lv_btn_set_style(btn, LV_BTN_STYLE_REL, ext->style_btn_rel);
     lv_btn_set_style(btn, LV_BTN_STYLE_PR, ext->style_btn_pr);
     lv_obj_set_size(btn, ext->btn_size, ext->btn_size);
-    lv_btn_set_action(btn, LV_BTN_ACTION_REL, rel_action);
+    lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, rel_action);
 
     lv_obj_t * img = lv_img_create(btn, NULL);
     lv_obj_set_click(img, false);

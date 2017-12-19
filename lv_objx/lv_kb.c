@@ -90,7 +90,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     ext->ta = NULL;
     ext->mode = LV_KB_MODE_TEXT;
     ext->cursor_mng = 0;
-    ext->close_action = NULL;
+    ext->hide_action = NULL;
     ext->ok_action = NULL;
 
     /*The signal and design functions are not copied so set them here*/
@@ -122,7 +122,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
         ext->ta = copy_ext->ta;
         ext->mode = copy_ext->mode;
         ext->cursor_mng = copy_ext->cursor_mng;
-        ext->close_action = copy_ext->close_action;
+        ext->hide_action = copy_ext->hide_action;
         ext->ok_action = copy_ext->ok_action;
 
         /*Refresh the style with new signal function*/
@@ -153,7 +153,7 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
 
     ext->ta = ta;
 
-    if(ext->cursor_mng) {
+    if(ext->ta && ext->cursor_mng) {
         cur_type = lv_ta_get_cursor_type(ext->ta);
         lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
     }
@@ -206,10 +206,10 @@ void lv_kb_set_ok_action(lv_obj_t * kb, lv_action_t action)
  * @param kb pointer to Keyboard object
  * @param action a callback with 'lv_action_t' type
  */
-void lv_kb_set_close_action(lv_obj_t * kb, lv_action_t action)
+void lv_kb_set_hide_action(lv_obj_t * kb, lv_action_t action)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    ext->close_action = action;
+    ext->hide_action = action;
 }
 
 /**
@@ -296,10 +296,10 @@ lv_action_t lv_kb_get_ok_action(lv_obj_t * kb)
  * @param kb pointer to Keyboard object
  * @return the close callback
  */
-lv_action_t lv_kb_get_close_action(lv_obj_t * kb)
+lv_action_t lv_kb_get_hide_action(lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    return ext->close_action;
+    return ext->hide_action;
 }
 
 /**
@@ -374,10 +374,12 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
         return LV_RES_OK;
     }
     else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
-        if(ext->close_action) ext->close_action(kb);
+        lv_kb_set_ta(kb, NULL);         /*De-assign the text area*/
+        if(ext->hide_action) ext->hide_action(kb);
         else lv_obj_del(kb);
         return LV_RES_INV;
     } else if(strcmp(txt, SYMBOL_OK) == 0) {
+        lv_kb_set_ta(kb, NULL);         /*De-assign the text area*/
         if(ext->ok_action) ext->ok_action(kb);
         else lv_obj_del(kb);
         return LV_RES_INV;

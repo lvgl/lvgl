@@ -45,7 +45,7 @@ typedef enum
 
 typedef enum
 {
-    LV_BTN_ACTION_REL,
+    LV_BTN_ACTION_CLICK,
     LV_BTN_ACTION_PR,
     LV_BTN_ACTION_LONG_PR,
     LV_BTN_ACTION_LONG_PR_REPEAT,

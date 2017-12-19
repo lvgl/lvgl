@@ -103,7 +103,7 @@ static inline void lv_cb_set_inactive(lv_obj_t * cb)
  */
 static inline void lv_cb_set_action(lv_obj_t * cb, lv_action_t action)
 {
-    lv_btn_set_action(cb, LV_BTN_ACTION_REL, action);
+    lv_btn_set_action(cb, LV_BTN_ACTION_CLICK, action);
 }
 
 
@@ -143,7 +143,7 @@ static inline bool lv_cb_is_checked(lv_obj_t * cb)
  */
 static inline lv_action_t lv_cb_get_action(lv_obj_t * cb)
 {
-    return lv_btn_get_action(cb, LV_BTN_ACTION_REL);
+    return lv_btn_get_action(cb, LV_BTN_ACTION_CLICK);
 }
 
 

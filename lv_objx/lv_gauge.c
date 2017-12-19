@@ -86,6 +86,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
         lv_gauge_set_needle_count(new_gauge, 1, NULL);
+        lv_gauge_set_critical_value(new_gauge, 80);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
 
         /*Set the default styles*/
@@ -167,6 +168,7 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value)
 
     lv_obj_invalidate(gauge);
 }
+
 
 /**
  * Set the scale settings of a gauge
@@ -260,8 +262,6 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
 
         /*Draw the ancestor line meter with max value to show the rainbow like line colors*/
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
-        int16_t value_tmp = ext->lmeter.cur_value;
-        ext->lmeter.cur_value = ext->lmeter.max_value;
         ancestor_design(gauge, mask, mode);           /*To draw lines*/
 
         /*Temporally modify the line meter to draw thicker and longer lines where labels are*/
@@ -269,13 +269,12 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
         lv_style_copy(&style_tmp, style);
         ext->lmeter.line_cnt = ext->label_count;                        /*Only to labels*/
         style_tmp.line.width = style_tmp.line.width * 2;                /*Ticker lines*/
-        style_tmp.body.padding.hor = style_tmp.body.padding.hor * 2;                            /*Longer lines*/
+        style_tmp.body.padding.hor = style_tmp.body.padding.hor * 2;    /*Longer lines*/
         gauge->style_p = &style_tmp;
 
         ancestor_design(gauge, mask, mode);           /*To draw lines*/
 
         ext->lmeter.line_cnt = line_cnt_tmp;          /*Restore the parameters*/
-        ext->lmeter.cur_value = value_tmp;
         gauge->style_p = style_ori_p;                 /*Restore the ORIGINAL style pointer*/
 
         lv_gauge_draw_needle(gauge, mask);

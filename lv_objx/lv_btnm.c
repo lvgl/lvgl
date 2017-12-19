@@ -150,10 +150,10 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 	create_buttons(btnm, map);
 
 	/*Set size and positions of the buttons*/
-	lv_style_t * btnms = lv_obj_get_style(btnm);
-	lv_coord_t max_w = lv_obj_get_width(btnm) - 2 * btnms->body.padding.hor;
-	lv_coord_t max_h = lv_obj_get_height(btnm) - 2 * btnms->body.padding.ver;
-	lv_coord_t act_y = btnms->body.padding.ver;
+	lv_style_t * style_bg = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
+	lv_coord_t max_w = lv_obj_get_width(btnm) - 2 * style_bg->body.padding.hor;
+	lv_coord_t max_h = lv_obj_get_height(btnm) - 2 * style_bg->body.padding.ver;
+	lv_coord_t act_y = style_bg->body.padding.ver;
 
 	/*Count the lines to calculate button height*/
 	uint8_t line_cnt = 1;
@@ -162,7 +162,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 			if(strcmp(map[li], "\n") == 0) line_cnt ++;
 	}
 
-	lv_coord_t btn_h = max_h - ((line_cnt - 1) * btnms->body.padding.inner);
+	lv_coord_t btn_h = max_h - ((line_cnt - 1) * style_bg->body.padding.inner);
 	btn_h = btn_h / line_cnt;
 	btn_h --;                              /*-1 because e.g. height = 100 means 101 pixels (0..100)*/
 
@@ -189,11 +189,11 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 		/*Only deal with the non empty lines*/
 		if(btn_cnt != 0) {
 			/*Calculate the width of all units*/
-			lv_coord_t all_unit_w = max_w - ((btn_cnt-1) * btnms->body.padding.inner);
+			lv_coord_t all_unit_w = max_w - ((btn_cnt-1) * style_bg->body.padding.inner);
 
 			/*Set the button size and positions and set the texts*/
 			uint16_t i;
-			lv_coord_t act_x = btnms->body.padding.hor;
+			lv_coord_t act_x = style_bg->body.padding.hor;
 			lv_coord_t act_unit_w;
 			unit_act_cnt = 0;
 			for(i = 0; i < btn_cnt; i++) {
@@ -204,12 +204,17 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 				act_unit_w --;                              /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
 				/*Always recalculate act_x because of rounding errors */
-				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * btnms->body.padding.inner + btnms->body.padding.hor;
+				act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner + style_bg->body.padding.hor;
 
-				lv_area_set(&ext->button_areas[btn_i], act_x,
-						                         act_y,
-						                         act_x + act_unit_w,
-				                                 act_y + btn_h);
+				/* Set the button's area.
+				 * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding errors*/
+				if(style_bg->body.padding.inner == 0 && act_x != style_bg->body.padding.hor) {
+                    lv_area_set(&ext->button_areas[btn_i],  ext->button_areas[btn_i - 1].x2, act_y,
+	                                                        act_x + act_unit_w, act_y + btn_h);
+				} else {
+                    lv_area_set(&ext->button_areas[btn_i],  act_x, act_y,
+                                                            act_x + act_unit_w, act_y + btn_h);
+				}
 
 				unit_act_cnt += get_button_width(map_p_tmp[i]);
 
@@ -217,7 +222,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 				btn_i ++;
 			}
 		}
-		act_y += btn_h + btnms->body.padding.inner;
+		act_y += btn_h + style_bg->body.padding.inner;
 		if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
 		map_p_tmp = &map_p_tmp[btn_cnt + 1]; /*Set the map to the next line*/
 		i_tot ++;	/*Skip the '\n'*/

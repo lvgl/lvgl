@@ -277,7 +277,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
              p1.x = x_out+ x_ofs;
              p1.y = y_out + y_ofs;
 
-             if(i > level) style_tmp.line.color = style->line.color;
+             if(i >= level) style_tmp.line.color = style->line.color;
              else {
                  style_tmp.line.color = lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) /  ext->line_cnt);
              }

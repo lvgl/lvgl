@@ -68,7 +68,6 @@ typedef enum {
     LV_TABVIEW_STYLE_BTN_PR,
     LV_TABVIEW_STYLE_BTN_TGL_REL,
     LV_TABVIEW_STYLE_BTN_TGL_PR,
-    LV_TABVIEW_STYLE_BTN_INA,
 }lv_tabview_style_t;
 
 /**********************
@@ -126,9 +125,9 @@ void lv_tabview_set_sliding(lv_obj_t * tabview, bool en);
 /**
  * Set the animation time of tab view when a new tab is loaded
  * @param tabview pointer to Tab view object
- * @param anim_time_ms time of animation in milliseconds
+ * @param anim_time time of animation in milliseconds
  */
-void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms);
+void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time);
 
 /**
  * Set the style of a tab view

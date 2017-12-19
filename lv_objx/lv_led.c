@@ -133,7 +133,7 @@ void lv_led_off(lv_obj_t * led)
  * Toggle the state of a LED
  * @param led pointer to a LED object
  */
-void lv_led_tgl(lv_obj_t * led)
+void lv_led_toggle(lv_obj_t * led)
 {
 	uint8_t bright = lv_led_get_bright(led);
 	if(bright > (LV_LED_BRIGHT_OFF + LV_LED_BRIGHT_ON) >> 1) lv_led_off(led);

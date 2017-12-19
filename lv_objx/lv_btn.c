@@ -64,7 +64,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     ext->state = LV_BTN_STATE_REL;
 
     ext->actions[LV_BTN_ACTION_PR] = NULL;
-    ext->actions[LV_BTN_ACTION_REL] = NULL;
+    ext->actions[LV_BTN_ACTION_CLICK] = NULL;
     ext->actions[LV_BTN_ACTION_LONG_PR] = NULL;
     ext->actions[LV_BTN_ACTION_LONG_PR_REPEAT] = NULL;
 
@@ -333,8 +333,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
             }
 
-            if(ext->actions[LV_BTN_ACTION_REL] && state != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_REL](btn);
+            if(ext->actions[LV_BTN_ACTION_CLICK] && state != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_CLICK](btn);
             }
         } else { /*If dragged change back the state*/
             if(ext->state == LV_BTN_STATE_PR) {
@@ -359,13 +359,13 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-            if(ext->actions[LV_BTN_ACTION_REL] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_REL](btn);
+            if(ext->actions[LV_BTN_ACTION_CLICK] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_CLICK](btn);
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             if(lv_btn_get_toggle(btn) != false) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-            if(ext->actions[LV_BTN_ACTION_REL] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_REL](btn);
+            if(ext->actions[LV_BTN_ACTION_CLICK] && lv_btn_get_state(btn) != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_CLICK](btn);
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             if(lv_btn_get_toggle(btn) != false) {
@@ -374,8 +374,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 else if(state == LV_BTN_STATE_TGL_REL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 else if(state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
             }
-            if(ext->actions[LV_BTN_ACTION_REL] && state != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_REL](btn);
+            if(ext->actions[LV_BTN_ACTION_CLICK] && state != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_CLICK](btn);
             }
         }
     }

@@ -69,14 +69,7 @@ void lv_led_off(lv_obj_t * led);
  * Toggle the state of a LED
  * @param led pointer to a LED object
  */
-void lv_led_tgl(lv_obj_t * led);
-
-/**
- * Get the brightness of a LEd object
- * @param led pointer to LED object
- * @return bright 0 (max. dark) ... 255 (max. light)
- */
-uint8_t lv_led_get_bright(lv_obj_t * led);
+void lv_led_toggle(lv_obj_t * led);
 
 /**
  * Set the style of a led
@@ -88,6 +81,12 @@ static inline void lv_led_set_style(lv_obj_t *led, lv_style_t *style)
     lv_obj_set_style(led, style);
 }
 
+/**
+ * Get the brightness of a LEd object
+ * @param led pointer to LED object
+ * @return bright 0 (max. dark) ... 255 (max. light)
+ */
+uint8_t lv_led_get_bright(lv_obj_t * led);
 
 /**
  * Get the style of an led object

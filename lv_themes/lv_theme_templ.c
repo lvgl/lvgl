@@ -45,6 +45,7 @@ static lv_font_t * _font;
 static void basic_init(void)
 {
     lv_style_copy(&def, &lv_style_pretty);  /*Initialize the default style*/
+    def.text.font = _font;
 
     theme.bg = &def;
     theme.panel = &def;

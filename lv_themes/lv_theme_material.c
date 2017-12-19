@@ -61,9 +61,10 @@ static void basic_init(void)
     panel.body.main_color = LV_COLOR_WHITE;
     panel.body.grad_color = LV_COLOR_WHITE;
     panel.body.border.width = 1;
-    panel.body.border.color = LV_COLOR_HEX3(0x999);
+    panel.body.border.color = LV_COLOR_HEX3(0xbbb);
     panel.body.border.opa = LV_OPA_COVER;
     panel.body.shadow.color = DEF_SHADOW_COLOR;
+    panel.body.shadow.type = LV_SHADOW_BOTTOM;
     panel.body.shadow.width = 4;
     panel.body.padding.hor = LV_DPI / 8;
     panel.body.padding.ver = LV_DPI / 8;
@@ -95,7 +96,7 @@ static void btn_init(void)
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&rel, &def);
-    rel.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 75);
+    rel.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
     rel.body.grad_color = rel.body.main_color;
     rel.body.radius = DEF_RADIUS;
     rel.body.padding.hor = LV_DPI / 6;
@@ -108,17 +109,17 @@ static void btn_init(void)
 
 
     lv_style_copy(&pr, &rel);
-    pr.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 65);
+    pr.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 60);
     pr.body.grad_color = pr.body.main_color;
     pr.body.shadow.width = 4;
 
     lv_style_copy(&tgl_rel, &rel);
-    tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 55);
+    tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 50);
     tgl_rel.body.grad_color = tgl_rel.body.main_color;
     tgl_rel.body.shadow.width = 4;
 
     lv_style_copy(&tgl_pr, &tgl_rel);
-    tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 45);
+    tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 40);
     tgl_pr.body.grad_color = tgl_pr.body.main_color;
     tgl_pr.body.shadow.width = 2;
 
@@ -218,7 +219,7 @@ static void bar_init(void)
     bar_bg.body.padding.ver = LV_DPI / 12;
 
     lv_style_copy(&bar_indic, &bar_bg);
-    bar_indic.body.main_color = lv_color_hsv_to_rgb(_hue, 85, 75);
+    bar_indic.body.main_color = lv_color_hsv_to_rgb(_hue, 85, 70);
     bar_indic.body.grad_color = bar_indic.body.main_color;
     bar_indic.body.padding.hor = 0;
     bar_indic.body.padding.ver = 0;
@@ -297,13 +298,14 @@ static void gauge_init(void)
 
     static lv_style_t gauge;
     lv_style_copy(&gauge, &def);
-    gauge.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 90);
-    gauge.body.grad_color = lv_color_hsv_to_rgb(_hue, 95, 80);
+    gauge.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 60);
+    gauge.body.grad_color = gauge.body.main_color;
     gauge.body.padding.hor = LV_DPI / 16;                       /*Scale line length*/
     gauge.body.padding.inner = LV_DPI / 8;
     gauge.body.border.color = LV_COLOR_HEX3(0x999);
     gauge.text.color = LV_COLOR_HEX3(0x333);
     gauge.line.width = 3;
+    gauge.line.color = lv_color_hsv_to_rgb(_hue, 95, 70);
 
     theme.gauge = &gauge;
 #endif
@@ -380,7 +382,7 @@ static void btnm_init(void)
     pr.body.empty = 0;
 
     lv_style_copy(&tgl_rel, &pr);
-    tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 75);
+    tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
     tgl_rel.body.grad_color = tgl_rel.body.main_color;
     tgl_rel.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
 
@@ -425,13 +427,14 @@ static void mbox_init(void)
 {
 #if USE_LV_MBOX
     static lv_style_t pr, rel;
+
     lv_style_copy(&rel, &lv_style_transp);
     rel.glass = 0;
     rel.text.font = _font;
-    rel.text.color = lv_color_hsv_to_rgb(_hue, 85, 85);
+    rel.text.color = lv_color_hsv_to_rgb(_hue, 85, 75);
 
     lv_style_copy(&pr, theme.btnm.btn.pr);
-    pr.text.color = lv_color_hsv_to_rgb(_hue, 85, 65);
+    pr.text.color = lv_color_hsv_to_rgb(_hue, 85, 60);
 
     theme.mbox.bg = theme.panel;
     theme.mbox.btn.bg = &lv_style_transp;
@@ -501,13 +504,13 @@ static void list_init(void)
     pr.text.font = _font;
 
     lv_style_copy(&tgl_rel, &pr);
-    tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 75);
+    tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
     tgl_rel.body.grad_color = tgl_rel.body.main_color;
     tgl_rel.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
 
 
     lv_style_copy(&tgl_pr, &tgl_rel);
-    tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 65);
+    tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 60);
     tgl_pr.body.grad_color = tgl_pr.body.main_color;
     tgl_pr.body.border.width = 0;
 
@@ -538,7 +541,7 @@ static void ddlist_init(void)
 
 
     lv_style_copy(&sel, &bg);
-    sel.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 75);
+    sel.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
     sel.body.grad_color = sel.body.main_color;
     sel.body.border.width = 0;
     sel.body.shadow.width = 0;
@@ -564,7 +567,7 @@ static void roller_init(void)
     roller_bg.glass = 0;
 
     lv_style_copy(&roller_sel, &roller_bg);
-    roller_sel.text.color = lv_color_hsv_to_rgb(_hue, 95, 75);
+    roller_sel.text.color = lv_color_hsv_to_rgb(_hue, 90, 70);
 
 
     theme.roller.bg = &roller_bg;
@@ -578,7 +581,7 @@ static void tabview_init(void)
     static lv_style_t indic, btn_bg, rel, pr, tgl_rel, tgl_pr;
 
     lv_style_copy(&indic, &def);
-    indic.body.main_color = lv_color_hsv_to_rgb(_hue, 95, 75);
+    indic.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
     indic.body.grad_color = indic.body.main_color;
     indic.body.radius = 0;
     indic.body.border.width = 0;
@@ -620,7 +623,7 @@ static void tabview_init(void)
     lv_style_copy(&tgl_rel, &lv_style_transp);
     tgl_rel.glass = 0;
     tgl_rel.text.font = _font;
-    tgl_rel.text.color = lv_color_hsv_to_rgb(_hue, 95, 95);
+    tgl_rel.text.color = lv_color_hsv_to_rgb(_hue, 90, 70);
 
     lv_style_copy(&tgl_pr, &def);
     tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 15, 85);
@@ -628,7 +631,7 @@ static void tabview_init(void)
     tgl_pr.body.border.width = 0;
     tgl_pr.body.empty = 0;
     tgl_pr.body.radius = 0;
-    tgl_pr.text.color = lv_color_hsv_to_rgb(_hue, 95, 95);
+    tgl_pr.text.color = lv_color_hsv_to_rgb(_hue, 90, 60);
 
     theme.tabview.bg = theme.bg;
     theme.tabview.indic = &indic;

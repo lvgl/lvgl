@@ -292,10 +292,10 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
-    lv_style_t * style = lv_obj_get_style(cb);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_set_size(ext->bullet, lv_font_get_height_scale(style->text.font), lv_font_get_height_scale(style->text.font));
+        lv_style_t * label_style = lv_label_get_style(ext->label);
+        lv_obj_set_size(ext->bullet, lv_font_get_height_scale(label_style->text.font), lv_font_get_height_scale(label_style->text.font));
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_PRESSED ||
         sign == LV_SIGNAL_RELEASED ||

@@ -89,6 +89,16 @@ static inline void lv_gauge_set_range(lv_obj_t *gauge, int16_t min, int16_t max)
 }
 
 /**
+ * Set a critical value on the scale. After this value 'line.color' scale lines will be drawn
+ * @param gauge pointer to a gauge object
+ * @param value the critical value
+ */
+static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, int16_t value)
+{
+    lv_lmeter_set_value(gauge, value);
+}
+
+/**
  * Set the scale settings of a gauge
  * @param gauge pointer to a gauge object
  * @param angle angle of the scale (0..360)
@@ -144,6 +154,16 @@ static inline int16_t lv_gauge_get_min_value(lv_obj_t * lmeter)
 static inline int16_t lv_gauge_get_max_value(lv_obj_t * lmeter)
 {
     return lv_lmeter_get_max_value(lmeter);
+}
+
+/**
+ * Get a critical value on the scale.
+ * @param gauge pointer to a gauge object
+ * @return the critical value
+ */
+static inline int16_t lv_gauge_get_critical_value(lv_obj_t * gauge)
+{
+    return lv_lmeter_get_value(gauge);
 }
 
 /**

@@ -105,7 +105,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
  * Turn ON the switch
  * @param sw pointer to a switch object
  */
-void lv_sw_set_on(lv_obj_t *sw)
+void lv_sw_on(lv_obj_t *sw)
 {
     lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 1);
@@ -116,7 +116,7 @@ void lv_sw_set_on(lv_obj_t *sw)
  * Turn OFF the switch
  * @param sw pointer to a switch object
  */
-void lv_sw_set_off(lv_obj_t *sw)
+void lv_sw_off(lv_obj_t *sw)
 {
     lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 0);

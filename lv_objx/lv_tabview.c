@@ -324,10 +324,10 @@ void lv_tabview_set_sliding(lv_obj_t * tabview, bool en)
  * @param tabview pointer to Tab view object
  * @param anim_time_ms time of animation in milliseconds
  */
-void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time_ms)
+void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time)
 {
     lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
-    ext->anim_time = anim_time_ms;
+    ext->anim_time = anim_time;
 }
 
 /**
@@ -360,9 +360,6 @@ void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t
             break;
         case LV_TABVIEW_STYLE_BTN_TGL_PR:
             lv_btnm_set_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR, style);
-            break;
-        case LV_TABVIEW_STYLE_BTN_INA:
-            lv_btnm_set_style(ext->btns, LV_BTNM_STYLE_BTN_INA, style);
             break;
         case LV_TABVIEW_STYLE_INDIC:
             lv_obj_set_style(ext->indic, style);
@@ -470,7 +467,6 @@ lv_style_t * lv_tabview_get_style(lv_obj_t *tabview, lv_tabview_style_t type)
         case LV_TABVIEW_STYLE_BTN_PR:       return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_PR);
         case LV_TABVIEW_STYLE_BTN_TGL_REL:  return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_REL);
         case LV_TABVIEW_STYLE_BTN_TGL_PR:   return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR);
-        case LV_TABVIEW_STYLE_BTN_INA:      return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_INA);
         default: return NULL;
     }
 

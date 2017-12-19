@@ -229,9 +229,13 @@ static void lmeter_init(void)
 static void gauge_init(void)
 {
 #if USE_LV_GAUGE != 0
+    static lv_style_t gauge_bg;
+    lv_style_copy(&gauge_bg, theme.lmeter);
+    gauge_bg.line.color = LV_COLOR_BLACK;
+    gauge_bg.line.width = 3;
 
 
-    theme.gauge = theme.lmeter;
+    theme.gauge = &gauge_bg;
 #endif
 }
 

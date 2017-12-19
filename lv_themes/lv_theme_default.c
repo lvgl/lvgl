@@ -178,8 +178,8 @@ static void lmeter_init(void)
     lv_style_copy(&lmeter, &lv_style_pretty_color);
     lmeter.line.color = LV_COLOR_HEX3(0xddd);
     lmeter.line.width = 2;
-    lmeter.body.main_color = color_mix(lmeter.body.main_color , LV_COLOR_WHITE, LV_OPA_50);
-    lmeter.body.grad_color = color_mix(lmeter.body.grad_color , LV_COLOR_BLACK, LV_OPA_50);
+    lmeter.body.main_color = lv_color_mix(lmeter.body.main_color, LV_COLOR_WHITE, LV_OPA_50);
+    lmeter.body.grad_color = lv_color_mix(lmeter.body.grad_color, LV_COLOR_BLACK, LV_OPA_50);
 
     theme.lmeter = &lmeter;
 #endif
@@ -188,9 +188,15 @@ static void lmeter_init(void)
 static void gauge_init(void)
 {
 #if USE_LV_GAUGE != 0
+    static lv_style_t gauge;
+    lv_style_copy(&gauge, &lmeter);
+    gauge.line.color = lmeter.body.grad_color;
+    gauge.line.width = 3;
+    gauge.body.main_color = LV_COLOR_HEX3(0x888);
+    gauge.body.grad_color = lmeter.body.main_color;
+    gauge.text.color = LV_COLOR_HEX3(0x888);
 
-
-    theme.gauge = &lmeter;
+    theme.gauge = &gauge;
 #endif
 }
 
@@ -286,9 +292,8 @@ static void list_init(void)
 {
 #if USE_LV_LIST != 0
 
-
     theme.list.bg = &lv_style_pretty;
-    theme.list.scrl = &lv_style_transp;
+    theme.list.scrl = &lv_style_transp_fit;
     theme.list.sb = &sb;
     theme.list.btn.rel = &lv_style_btn_rel;
     theme.list.btn.pr = &lv_style_btn_pr;

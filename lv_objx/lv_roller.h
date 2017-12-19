@@ -76,7 +76,7 @@ void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
  * @param roller pointer to a roller object
  * @param row_cnt number of desired visible rows
  */
-void lv_roller_set_row_count(lv_obj_t *roller, uint8_t row_cnt);
+void lv_roller_set_visible_row_count(lv_obj_t *roller, uint8_t row_cnt);
 
 /**
  * Enable or disable the horizontal fit to the content

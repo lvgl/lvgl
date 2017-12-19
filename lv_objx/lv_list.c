@@ -155,7 +155,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STATE_TGL_PR]);
     lv_btn_set_style(liste, LV_BTN_STYLE_INA, ext->styles_btn[LV_BTN_STATE_INA]);
 
-	lv_btn_set_action(liste, LV_BTN_ACTION_REL, rel_action);
+	lv_btn_set_action(liste, LV_BTN_ACTION_CLICK, rel_action);
 	lv_page_glue_obj(liste, true);
 	lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
 	lv_btn_set_fit(liste, false, true);
@@ -565,7 +565,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 
             if(btn != NULL) {
                 lv_action_t rel_action;
-                rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_REL);
+                rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_CLICK);
                 if(rel_action != NULL) rel_action(btn);
             }
         }

@@ -209,7 +209,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
 /**
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete
- * @preturn LV_RES_INV beacuse the object is deleted
+ * @return LV_RES_INV because the object is deleted
  */
 lv_res_t lv_obj_del(lv_obj_t * obj);
 
