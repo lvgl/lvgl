@@ -14,6 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define IDLE_MEAS_PERIOD    500     /*[ms]*/
 
 /**********************
  *      TYPEDEFS
@@ -55,7 +56,13 @@ void lv_task_init(void)
  */
 void lv_task_handler(void)
 {
+    static uint32_t idle_period_start = 0;
+    static uint32_t handler_start = 0;
+    static uint32_t busy_time = 0;
+
 	if(lv_task_run == false) return;
+
+	handler_start = lv_tick_get();
 
     lv_task_t* lv_task_prio_a[LV_TASK_PRIO_NUM]; /*Lists for all prio.*/
     lv_task_prio_t prio_act;
@@ -99,6 +106,19 @@ void lv_task_handler(void)
                 lv_task_prio_a[prio_act] = lv_ll_get_head(&lv_task_ll);
             }
         }
+    }
+
+
+    busy_time += lv_tick_elaps(handler_start);
+    uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
+    if(idle_period_time >= IDLE_MEAS_PERIOD) {
+
+        idle_last = (uint32_t)((uint32_t)busy_time * 100) / IDLE_MEAS_PERIOD;   /*Calculate the busy percentage*/
+        idle_last = idle_last > 100 ? 0 : 100 - idle_last;                      /*But we need idle time*/
+        busy_time = 0;
+        idle_period_start = lv_tick_get();
+
+
     }
 }
 

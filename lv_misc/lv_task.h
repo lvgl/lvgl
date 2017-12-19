@@ -123,6 +123,12 @@ void lv_task_reset(lv_task_t* lv_task_p);
  */
 void lv_task_enable(bool en);
 
+/**
+ * Get idle percentage
+ * @return the lv_task idle in percentage
+ */
+uint8_t lv_task_get_idle(void);
+
 /**********************
  *      MACROS
  **********************/
