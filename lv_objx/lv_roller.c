@@ -17,6 +17,14 @@
 /*********************
  *      DEFINES
  *********************/
+#if USE_LV_ANIMATION
+#  ifndef LV_ROLLER_ANIM_TIME
+#    define LV_ROLLER_ANIM_TIME     200         /*ms*/
+#  endif
+#else
+#  undef  LV_ROLLER_ANIM_TIME
+#  define LV_ROLLER_ANIM_TIME     0             /*No animation*/
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -74,6 +82,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_rel_action(new_roller, NULL);       /*Roller don't uses it (like ddlist)*/
         lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
+        lv_ddlist_set_anim_time(new_roller, LV_ROLLER_ANIM_TIME);
         lv_roller_set_visible_row_count(new_roller, 3);
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 

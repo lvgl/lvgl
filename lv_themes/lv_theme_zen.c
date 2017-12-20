@@ -71,6 +71,13 @@ static void basic_init(void)
     panel.body.padding.ver = LV_DPI / 8;
     panel.body.padding.inner = LV_DPI / 10;
 
+    lv_style_copy(&sb, &def);
+    sb.body.main_color = lv_color_hsv_to_rgb(_hue, 30, 90);
+    sb.body.grad_color = sb.body.main_color;
+    sb.body.border.width = 0;
+    sb.body.radius = LV_RADIUS_CIRCLE;
+    sb.body.padding.inner = LV_DPI / 10;
+
     theme.bg = &bg;
     theme.panel = &panel;
 }
@@ -176,10 +183,10 @@ static void led_init(void)
     led.body.radius = LV_RADIUS_CIRCLE;
     led.body.border.width= LV_DPI / 30;
     led.body.border.opa = LV_OPA_30;
-    led.body.main_color = lv_color_hsv_to_rgb(_hue, 100, 100);
-    led.body.grad_color = lv_color_hsv_to_rgb(_hue, 100, 40);
+    led.body.main_color = lv_color_hsv_to_rgb(_hue, 60, 100);
+    led.body.grad_color = lv_color_hsv_to_rgb(_hue, 60, 40);
     led.body.border.color = lv_color_hsv_to_rgb(_hue, 60, 60);
-    led.body.shadow.color = lv_color_hsv_to_rgb(_hue, 100, 100);
+    led.body.shadow.color = lv_color_hsv_to_rgb(_hue, 80, 100);
 
     theme.led = &led;
 #endif
@@ -272,9 +279,17 @@ static void lmeter_init(void)
 static void gauge_init(void)
 {
 #if USE_LV_GAUGE != 0
+    static lv_style_t gauge;
 
+    lv_style_copy(&gauge, &def);
+    gauge.line.color = lv_color_hsv_to_rgb(_hue, 50, 70);
+    gauge.line.width = 3;
+    gauge.body.main_color = LV_COLOR_HEX3(0x999);
+    gauge.body.grad_color = gauge.body.main_color;
+    gauge.body.padding.hor = LV_DPI / 6;
+    gauge.body.border.color = LV_COLOR_HEX3(0x666);     /*Needle middle color*/
 
-    theme.gauge = &def;
+    theme.gauge = &gauge;
 #endif
 }
 

@@ -21,7 +21,6 @@
 /*********************
  *      DEFINES
  *********************/
-
 #if USE_LV_ANIMATION
 #  ifndef LV_DDLIST_ANIM_TIME
 #    define LV_DDLIST_ANIM_TIME     200     	/*ms*/

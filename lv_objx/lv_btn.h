@@ -65,6 +65,7 @@ typedef struct
     uint8_t long_pr_action_executed :1;           /*1: Long press action executed (Handled by the library)*/
 }lv_btn_ext_t;
 
+/*Styles*/
 typedef enum {
     LV_BTN_STYLE_REL,
     LV_BTN_STYLE_PR,
@@ -137,7 +138,6 @@ static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
 {
     lv_cont_set_fit(btn, hor_en, ver_en);
 }
-
 
 /**
  * Set a style of a button.

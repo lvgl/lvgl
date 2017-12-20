@@ -27,12 +27,12 @@
  *=====================*/
 
 /* Horizontal and vertical resolution of the library.*/
-#define LV_HOR_RES          320
-#define LV_VER_RES          240
+#define LV_HOR_RES          (480)
+#define LV_VER_RES          (320)
 #define LV_DPI              100
 
 /* Buffered rendering: >= LV_DOWNSCALE * lv_disp_hor_res() or 0 to disable buffering*/
-#define LV_VDB_SIZE         (20 * 1024 )
+#define LV_VDB_SIZE         (20  * 1024)
 #define LV_VDB_ADR          0       /*Place VDB to a specific address (e.g. in external RAM) (0: allocate into RAM)*/
 
 /* Use two Virtual Display buffers (VDB) parallelize rendering and flushing
@@ -73,23 +73,23 @@
 #define LV_TXT_UTF8             1
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"           /*Can break texts on these chars*/
 
-/*Feature usage*/
+/*Graphics feature usage*/
 #define USE_LV_ANIMATION        1               /*1: disable all animations*/
 #define USE_LV_SHADOW           1               /*1: disable shadows*/
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
-#define USE_LV_GPU              1               /*1: Enable GPU interface*/
+#define USE_LV_GPU              0               /*1: Enable GPU interface*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images aka. lv_img)*/
 
-/*==================
+/*================
  *  THEME USAGE
  *================*/
 #define USE_LV_THEME_TEMPL      0       /*Just for test*/
-#define USE_LV_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define USE_LV_THEME_DEFAULT    1       /*Built mainly from the built-in styles. Consumes very few RAM*/
 #define USE_LV_THEME_ALIEN      1       /*Dark futuristic theme*/
 #define USE_LV_THEME_NIGHT      1       /*Dark elegant theme*/
 #define USE_LV_THEME_MONO       1       /*Mono color theme for monochrome displays*/
-#define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows (Planned)*/
-#define USE_LV_THEME_ZEN        0       /*Peaceful, mainly black and white theme (Planned)*/
+#define USE_LV_THEME_MATERIAL   1       /*Flat theme with bold colors and light shadows*/
+#define USE_LV_THEME_ZEN        1       /*Peaceful, mainly light theme */
 
 /*==================
  *    FONT USAGE
@@ -202,10 +202,10 @@
 /*Bar (dependencies: -)*/
 #define USE_LV_BAR      1
 
-/*Line meter (dependencies: bar; misc: trigo)*/
+/*Line meter (dependencies: *;)*/
 #define USE_LV_LMETER   1
 
-/*Gauge (dependencies:bar, lmeter; misc: trigo)*/
+/*Gauge (dependencies:bar, lmeter)*/
 #define USE_LV_GAUGE    1
 
 /*Chart (dependencies: -)*/
@@ -220,8 +220,8 @@
 /*Text area (dependencies: lv_label, lv_page)*/
 #define USE_LV_TA       1
 #if USE_LV_TA != 0
-#define LV_TA_CURSOR_BLINK_TIME 400   /*ms*/
-#define LV_TA_PWD_SHOW_TIME  1500    /*ms*/
+#define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
+#define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
 /*************************
@@ -240,9 +240,6 @@
 /*Check box (dependencies: lv_btn, lv_label)*/
 #define USE_LV_CB       1
 
-/*Switch (dependencies: lv_slider)*/
-#define USE_LV_SW       1
-
 /*List (dependencies: lv_page, lv_btn, lv_label, (lv_img optionally for icons ))*/
 #define USE_LV_LIST     1
 #if USE_LV_LIST != 0
@@ -255,11 +252,17 @@
 #define LV_DDLIST_ANIM_TIME     200     /*Open and close default animation time [ms] (0: no animation)*/
 #endif
 
-/*Drop down list (dependencies: lv_ddlist)*/
+/*Roller (dependencies: lv_ddlist)*/
 #define USE_LV_ROLLER    1
+#if USE_LV_ROLLER != 0
+#define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
+#endif
 
 /*Slider (dependencies: lv_bar)*/
 #define USE_LV_SLIDER    1
+
+/*Switch (dependencies: lv_slider)*/
+#define USE_LV_SW       1
 
 #endif /*LV_CONF_H*/
 

@@ -105,6 +105,24 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
  */
 
 
+/**
+ * Set a style of a template.
+ * @param templ pointer to template object
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *style)
+{
+    lv_templ_ext_t *ext = lv_obj_get_ext_attr(templ);
+
+    switch (type) {
+        case LV_TEMPL_STYLE_X:
+            break;
+        case LV_TEMPL_STYLE_Y:
+            break;
+    }
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -112,6 +130,26 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 /*
  * New object specific "get" functions come here
  */
+
+/**
+ * Get style of a template.
+ * @param templ pointer to template object
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_btn_get_style(lv_obj_t * templ, lv_templ_style_t type)
+{
+    lv_templ_ext_t *ext = lv_obj_get_ext_attr(templ);
+
+    switch (type) {
+        case LV_TEMPL_STYLE_X:     return NULL;
+        case LV_TEMPL_STYLE_Y:     return NULL;
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
+}
 
 /*=====================
  * Other functions
