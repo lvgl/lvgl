@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_CB != 0
 
 /*Testing of dependencies*/
@@ -25,7 +25,7 @@ extern "C" {
 #error "lv_cb: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 #include "lv_btn.h"
 #include "lv_label.h"
 
@@ -46,6 +46,15 @@ typedef struct
     lv_obj_t * label;   /*Pointer to label*/
 }lv_cb_ext_t;
 
+typedef enum {
+    LV_CB_STYLE_BG,
+    LV_CB_STYLE_BOX_REL,
+    LV_CB_STYLE_BOX_PR,
+    LV_CB_STYLE_BOX_TGL_REL,
+    LV_CB_STYLE_BOX_TGL_PR,
+    LV_CB_STYLE_BOX_INA,
+}lv_cb_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -58,13 +67,9 @@ typedef struct
  */
 lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the check box
- * @param cb pointer to a check box object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set the text of a check box
@@ -74,6 +79,47 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
 void lv_cb_set_text(lv_obj_t * cb, const char * txt);
 
 /**
+ * Set the state of the check box
+ * @param cb pointer to a check box object
+ * @param checked true: make the check box checked; false: make it unchecked
+ */
+static inline void lv_cb_set_checked(lv_obj_t * cb, bool checked)
+{
+    lv_btn_set_state(cb, checked ? LV_BTN_STATE_TGL_REL : LV_BTN_STATE_REL);
+}
+
+/**
+ * Make the check box inactive (disabled)
+ * @param cb pointer to a check box object
+ */
+static inline void lv_cb_set_inactive(lv_obj_t * cb)
+{
+    lv_btn_set_state(cb, LV_BTN_STATE_INA);
+}
+
+/**
+ * Set a function to call when the check box is clicked
+ * @param cb pointer to a check box object
+ */
+static inline void lv_cb_set_action(lv_obj_t * cb, lv_action_t action)
+{
+    lv_btn_set_action(cb, LV_BTN_ACTION_CLICK, action);
+}
+
+
+/**
+ * Set a style of a check box
+ * @param cb pointer to check box object
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
  * Get the text of a check box
  * @param cb pointer to check box object
  * @return pointer to the text of the check box
@@ -81,11 +127,33 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt);
 const char * lv_cb_get_text(lv_obj_t * cb);
 
 /**
- * Get the bullet (lv_btn) of a check box
- * @param cb pointer to check box object
- * @return pointer to the bullet of the check box (lv_btn)
+ * Get the current state of the check box
+ * @param cb pointer to a check box object
+ * @return true: checked; false: not checked
  */
-lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb);
+static inline bool lv_cb_is_checked(lv_obj_t * cb)
+{
+    return lv_btn_get_state(cb) == LV_BTN_STATE_REL ? false : true;
+}
+
+/**
+ * Get the action of a check box
+ * @param cb pointer to a button object
+ * @return pointer to the action function
+ */
+static inline lv_action_t lv_cb_get_action(lv_obj_t * cb)
+{
+    return lv_btn_get_action(cb, LV_BTN_ACTION_CLICK);
+}
+
+
+/**
+ * Get a style of a button
+ * @param cb pointer to check box object
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type);
 
 /**********************
  *      MACROS

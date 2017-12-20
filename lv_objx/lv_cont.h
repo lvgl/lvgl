@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_CONT != 0
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -29,25 +29,25 @@ extern "C" {
 /*Layout options*/
 typedef enum
 {
-	LV_CONT_LAYOUT_OFF = 0,
-	LV_CONT_LAYOUT_CENTER,
-	LV_CONT_LAYOUT_COL_L,	/*Column left align*/
-	LV_CONT_LAYOUT_COL_M,	/*Column middle align*/
-	LV_CONT_LAYOUT_COL_R,	/*Column right align*/
-	LV_CONT_LAYOUT_ROW_T,	/*Row top align*/
-	LV_CONT_LAYOUT_ROW_M,	/*Row middle align*/
-	LV_CONT_LAYOUT_ROW_B,	/*Row bottom align*/
-	LV_CONT_LAYOUT_PRETTY,	/*Put as many object as possible in row and begin a new row*/
-	LV_CONT_LAYOUT_GRID,	/*Align same-sized object into a grid*/
-}lv_cont_layout_t;
+	LV_LAYOUT_OFF = 0,
+	LV_LAYOUT_CENTER,
+	LV_LAYOUT_COL_L,	/*Column left align*/
+	LV_LAYOUT_COL_M,	/*Column middle align*/
+	LV_LAYOUT_COL_R,	/*Column right align*/
+	LV_LAYOUT_ROW_T,	/*Row top align*/
+	LV_LAYOUT_ROW_M,	/*Row middle align*/
+	LV_LAYOUT_ROW_B,	/*Row bottom align*/
+	LV_LAYOUT_PRETTY,	/*Put as many object as possible in row and begin a new row*/
+	LV_LAYOUT_GRID,	    /*Align same-sized object into a grid*/
+}lv_layout_t;
 
 typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
     /*New data for this type */
-    uint8_t layout  :5;     /*A layout from 'lv_cont_layout_t' enum*/
-    uint8_t hfit_en :1;     /*Enable horizontal padding to involve all children*/
-    uint8_t vfit_en :1;     /*Enable horizontal padding to involve all children*/
+    uint8_t layout  :4;     /*A layout from 'lv_cont_layout_t' enum*/
+    uint8_t hor_fit :1;     /*1: Enable horizontal fit to involve all children*/
+    uint8_t ver_fit :1;     /*1: Enable horizontal fir to involve all children*/
 }lv_cont_ext_t;
 
 /**********************
@@ -62,50 +62,71 @@ typedef struct
  */
 lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the container
- * @param cont pointer to a container object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param);
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
- * Set the layout on a container
+ * Set a layout on a container
  * @param cont pointer to a container object
  * @param layout a layout from 'lv_cont_layout_t'
  */
-void lv_cont_set_layout(lv_obj_t * cont, lv_cont_layout_t layout);
+void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout);
+
 
 /**
  * Enable the horizontal or vertical fit.
  * The container size will be set to involve the children horizontally or vertically.
  * @param cont pointer to a container object
- * @param hor_en true: enable the horizontal padding
- * @param ver_en true: enable the vertical padding
+ * @param hor_en true: enable the horizontal fit
+ * @param ver_en true: enable the vertical fit
  */
 void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en);
+
+/**
+ * Set the style of a container
+ * @param cont pointer to a container object
+ * @param style pointer to the new style
+ */
+static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
+{
+    lv_obj_set_style(cont, style);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the layout of a container
  * @param cont pointer to container object
  * @return the layout from 'lv_cont_layout_t'
  */
-lv_cont_layout_t lv_cont_get_layout(lv_obj_t * cont);
+lv_layout_t lv_cont_get_layout(lv_obj_t * cont);
 
 /**
  * Get horizontal fit enable attribute of a container
  * @param cont pointer to a container object
- * @return true: horizontal padding is enabled
+ * @return true: horizontal fit is enabled; false: disabled
  */
-bool lv_cont_get_hfit(lv_obj_t * cont);
+bool lv_cont_get_hor_fit(lv_obj_t * cont);
 
 /**
  * Get vertical fit enable attribute of a container
  * @param cont pointer to a container object
- * @return true: vertical padding is enabled
+ * @return true: vertical fit is enabled; false: disabled
  */
-bool lv_cont_get_vfit(lv_obj_t * cont);
+bool lv_cont_get_ver_fit(lv_obj_t * cont);
+
+/**
+ * Get the style of a container
+ * @param cont pointer to a container object
+ * @return pointer to the container's style
+ */
+static inline lv_style_t * lv_cont_get_style(lv_obj_t *cont)
+{
+    return lv_obj_get_style(cont);
+}
 
 /**********************
  *      MACROS

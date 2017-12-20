@@ -4,9 +4,10 @@
  */
 
 
-/*Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
- * 					 templ -> object short name with lower case(e.g. btn, label etc)
- *                   TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
+/* TODO Remove these instructions
+ * Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
+ *                    templ -> object short name with lower case(e.g. btn, label etc)
+ *                    TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
  *
  */
 
@@ -20,10 +21,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_TEMPL != 0
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -33,11 +34,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 /*Data of template*/
-typedef struct
-{
-    /*Ext. of ancestor*/
+typedef struct {
+    lv_ANCESTOR_ext_t ANCESTOR; /*Ext. of ancestor*/
     /*New data for this type */
 }lv_templ_ext_t;
+
+
+/*Styles*/
+typedef enum {
+    LV_TEMPL_STYLE_X,
+    LV_TEMPL_STYLE_Y,
+}lv_templ_style_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -51,15 +59,38 @@ typedef struct
  */
 lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the template
- * @param templ pointer to a template object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param);
+/*======================
+ * Add/remove functions
+ *=====================*/
 
+
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
+ * Set a style of a template.
+ * @param templ pointer to template object
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *style);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get style of a template.
+ * @param templ pointer to template object
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_btn_get_style(lv_obj_t * templ, lv_templ_style_t type);
+
+/*=====================
+ * Other functions
+ *====================*/
 
 /**********************
  *      MACROS

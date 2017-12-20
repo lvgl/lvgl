@@ -13,22 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
-#include "misc_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_LMETER != 0
 
-/*Testing of dependencies*/
-#if USE_LV_BAR == 0
-#error "lv_lmeter: lv_bar is required. Enable it in lv_conf.h (USE_LV_BAR  1) "
-#endif
-
-#if USE_TRIGO == 0
-#error "lv_lmeter: trigo is required. Enable it in misc_conf.h (USE_TRIGO  1) "
-#endif
-
-
-#include "../lv_obj/lv_obj.h"
-#include "lv_bar.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -40,10 +28,13 @@ extern "C" {
 /*Data of line meter*/
 typedef struct
 {
-    lv_bar_ext_t bar;            /*Ext. of ancestor*/
+    /*No inherited ext.*/            /*Ext. of ancestor*/
     /*New data for this type */
     uint16_t scale_angle;        /*Angle of the scale in deg. (0..360)*/
-    uint8_t scale_num;           /*Number of scale units */
+    uint8_t line_cnt;            /*Count of lines */
+    int16_t cur_value;
+    int16_t min_value;
+    int16_t max_value;
 }lv_lmeter_ext_t;
 
 /**********************
@@ -58,29 +49,74 @@ typedef struct
  */
 lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
- * Signal function of the line meter
+ * Set a new value on the line meter
  * @param lmeter pointer to a line meter object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
+ * @param value new value
  */
-bool lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
+void lv_lmeter_set_value(lv_obj_t *lmeter, int16_t value);
+
+/**
+ * Set minimum and the maximum values of a line meter
+ * @param lmeter pointer to he line meter object
+ * @param min minimum value
+ * @param max maximum value
+ */
+void lv_lmeter_set_range(lv_obj_t *lmeter, int16_t min, int16_t max);
 
 /**
  * Set the scale settings of a line meter
  * @param lmeter pointer to a line meter object
  * @param angle angle of the scale (0..360)
- * @param num number of scale units
+ * @param line_cnt number of lines
  */
-void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t num);
+void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt);
+
+/**
+ * Set the styles of a line meter
+ * @param lmeter pointer to a line meter object
+ * @param bg set the style of the line meter
+ *  */
+static inline void lv_lmeter_set_style(lv_obj_t *lmeter, lv_style_t *bg)
+{
+    lv_obj_set_style(lmeter, bg);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get the value of a line meter
+ * @param lmeter pointer to a line meter object
+ * @return the value of the line meter
+ */
+int16_t lv_lmeter_get_value(lv_obj_t *lmeter);
+
+/**
+ * Get the minimum value of a line meter
+ * @param lmeter pointer to a line meter object
+ * @return the minimum value of the line meter
+ */
+int16_t lv_lmeter_get_min_value(lv_obj_t * lmeter);
+
+/**
+ * Get the maximum value of a line meter
+ * @param lmeter pointer to a line meter object
+ * @return the maximum value of the line meter
+ */
+int16_t lv_lmeter_get_max_value(lv_obj_t * lmeter);
 
 /**
  * Get the scale number of a line meter
  * @param lmeter pointer to a line meter object
  * @return number of the scale units
  */
-uint8_t lv_lmeter_get_scale_num(lv_obj_t * lmeter);
+uint8_t lv_lmeter_get_line_count(lv_obj_t * lmeter);
 
 /**
  * Get the scale angle of a line meter
@@ -88,6 +124,17 @@ uint8_t lv_lmeter_get_scale_num(lv_obj_t * lmeter);
  * @return angle of the scale
  */
 uint16_t lv_lmeter_get_scale_angle(lv_obj_t * lmeter);
+
+/**
+ * Get the style of a line meter
+ * @param lmeter pointer to a line meter object
+ * @return pointer to the line meter's style
+ */
+static inline lv_style_t * lv_lmeter_get_style_bg(lv_obj_t * lmeter)
+{
+    return lv_obj_get_style(lmeter);
+}
+
 /**********************
  *      MACROS
  **********************/

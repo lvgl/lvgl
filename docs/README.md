@@ -1,83 +1,64 @@
-# LittleV Graphics Libraray
+# Littlev Graphics Libraray
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-LittlevGL is a graphics library to create Graphical User Interfaces (GUI) on TFT, LCD or monochrome displays for microcontroller based embedded systems.
-
-Transparency, anti-aliassing and smooth animations can be used with no double buffering so typically no external memories are required. Layouts, scrolling, word-wrapping, layers and other features make your job easier. 
-
-The graphics library is written in C and it is completely hardware independent. You can even run it in a PC simulator without any embedded hardware.
+Littlev Graphics Library provides everything you need to add graphical user interface (GUI) to your embedded system. LittlevGL is designed to be an all-in-one solution for microcontroller based embedded GUIs where high level graphics feature, easy-to-use graphical elements and low memory footprint are required.
 
 Homepage: http://gl.littlev.hu
 
+### Table Of Content
+* [Key features](#key-features)
+* [Porting](#porting)
+* [Project set-up](#project-set-up)
+* [PC simulator](#pc-simulator)
+* [Contributing](#contributing)
+* [Donate](#donate)
+
 ## Key features
-* Hardware independent, support any modern microcontroller
-* High resolution TFTs, monochrome or any type of display supported (24/16/8/1 bit color depth)
-* External RAM, FPU or GPU not required just optional
-* Build GUI from simple graphical objects
-  * Buttons, Labels, Images
-  * Charts, Lists, Bars, Sliders, Text areas etc.
-* Create or delete graphical object dynamically in run time   
-* High level graphical features without double buffering
-  * Antialiassing (font or full screen)
-  * Animations
-  * Transparency
-  * Gradient colors
-  * Smooth dragging and scrolling
-* Built-in features
-  * Layouts (to auto-arrange items)
-  * Scrolling
-  * Auto-size (aligned to the content)
-  * Word wrapping
-  * Layers
-* Customizable appearance with styles
-* Applications for complex tasks
-* Can run in a PC simulator
-* Modular and well-structured source code
-* Actively developed
+- Powerful building blocks buttons, charts, lists, sliders, images etc
+- Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
+- Various input devices touch pad, mouse, keyboard and external buttons
+- Multi language support with UTF-8 support
+- Fully customizable graphical elements
+
+- Hardware independent to use with any MCU or display
+- Scalable to operate with few memory (80 kB Flash, 10 kB RAM)
+- OS, External memory and GPU supported but not required
+- Single frame buffer operation even with advances graphical effects
+
+- Written in C for maximal compatibility
+- PC simulator to develop without embedded hardware
+- Tutorials, examples, themes for rapid development
+- Advanced support and professional GUI development service
+- Documentation and API references online
+- Free and open source under MIT licence
 
 ## Porting
-The following functions has to be provided
-* hal/disp `disp_fill(x1, y1, x2, y2, color)` to fill area with a color
-* hal/disp `disp_map(x1, y1, x2, y2, &color_array)` copy a color map to an area
-* hal/disp `disp_color_cpy(dest, src, length, opa)` copy pixel, optional for GPU
-* hal/indev `indev_get(id, &x, &y)` get the *x* and *y* coordinates from an input device (e.g. touch pad)
-* hal/systick `systick_get()` get a system tick with 1 ms resolution
-* hal/systick `systick_elapse(prev_time)` get the elapsed milliseconds sience *prev_time*
+In the most sime case you need 4 things:
+1. Call `lv_tick_inc(1)` in every millisecods in a Timer or Task
+2. Register a function which can copy a pixel array to an area of the screen
+3. Register a function which can read an input device. (E.g. touch pad)
+4. Call `lv_task_handler()` periodically in every few milliseconds ()
 
-See the [example HAL](https://github.com/littlevgl/hal) repository!
-
-## Requirements
-* [Misc. library](https://github.com/littlevgl/misc) is used by the graphics library
-
+For more information visit http://gl.littlev.hu/porting
+ 
 ## Project set-up
-1. Clone or download the following repositories:
-   * lvgl:`git clone https://github.com/littlevgl/lvgl.git`  
-   * misc: `git clone https://github.com/littlevgl/misc.git` 
-   * hal: `git clone https://github.com/littlevgl/hal.git`
-2. Create project with your prefered IDE and add the **lvgl**, **misc** and **hal** folders 
-3. Add your projects **root directory as include path** 
-4. Write your display, touch pad and system tick **drivers in hal**
-5. Copy *lvgl/lv_conf_templ.h* as **lv_conf.h** and *misc/misc_conf_templ.h* as **misc_conf.h** to the projects root folder
-6. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
-7. In your *main.c* include: 
-   * #include "misc/misc.h" 
-   * #include "misc/os/ptask.h"
-   * #include "lvgl/lvgl.h"   
-8. In your *main.c* intialize:
-   * **misc_init()**;
-   * your_systick_init();
-   * your_disp_init();
-   * your_indev_init();
-   * **lv_init()**;
-10. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
-11. In the main *while(1)* call `ptask_handler();` and make a few milliseconds delay (e.g. `your_delay_ms(5);`) 
-12. Compile the code and load it to your embedded hardware
+1. Clone or download the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
+2. Create project with your prefered IDE and add the *lvgl* folder
+3. Copy *lvgl/lv_conf_templ.h* as *lv_conf.h* next to the lvgl folder
+4. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
+5. In your *main.c*: #include "lvgl/lvgl.h"   
+6. In your *main function*:
+   * lvgl_init();
+   * tick, display and input device initialization (see above)
+7. To **test** create a label: `lv_obj_t * label = lv_label_create(lv_scr_act(), NULL);`  
+8. In the main *while(1)* call `lv_task_handler();` and make a few milliseconds delay (e.g. `my_delay_ms(5);`) 
+9. Compile the code and load it to your embedded hardware
 
 ## PC Simulator
 If you don't have got an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) to emulate a display on your monitor and a touch pad with your mouse.
 
-There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/proj_pc
+There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/pc_simulator
 
 ## Contributing
 See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md)

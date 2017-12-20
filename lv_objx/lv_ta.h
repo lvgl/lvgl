@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_TA != 0
 
 /*Testing of dependencies*/
@@ -25,18 +25,27 @@ extern "C" {
 #error "lv_ta: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 #include "lv_page.h"
 #include "lv_label.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_TA_CUR_LAST (0x7FFF) /*Put the cursor after the last character*/
+#define LV_TA_CURSOR_LAST (0x7FFF) /*Put the cursor after the last character*/
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef enum {
+    LV_CURSOR_NONE,
+	LV_CURSOR_LINE,
+	LV_CURSOR_BLOCK,
+	LV_CURSOR_OUTLINE,
+	LV_CURSOR_UNDERLINE,
+    LV_CURSOR_HIDDEN = 0x10,    /*Or it to any value to hide the cursor temporally*/
+}lv_cursor_type_t;
 
 /*Data of text area*/
 typedef struct
@@ -45,16 +54,27 @@ typedef struct
     /*New data for this type */
     lv_obj_t * label;           /*Label of the text area*/
     char * pwd_tmp;             /*Used to store the original text in password mode*/
-    cord_t cursor_valid_x;      /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
-    uint16_t cursor_pos;        /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
-    uint8_t cursor_show :1;     /*Show or hide cursor */
     uint8_t pwd_mode :1;        /*Replace characters with '*' */
-    uint8_t cursor_state :1;    /*Indicates that the cursor is visible now or not (Handled by the library)*/
+    uint8_t one_line :1;        /*One line mode (ignore line breaks)*/
+    struct {
+        lv_style_t *style;      /*Style of the cursor (NULL to use label's style)*/
+        lv_coord_t valid_x;         /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
+        uint16_t pos;           /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
+        lv_cursor_type_t type;  /*Shape of the cursor*/
+        uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/
+    }cursor;
 }lv_ta_ext_t;
+
+typedef enum {
+    LV_TA_STYLE_BG,
+    LV_TA_STYLE_SB,
+    LV_TA_STYLE_CURSOR,
+}lv_ta_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
 
 /**
  * Create a text area objects
@@ -64,14 +84,10 @@ typedef struct
  */
 lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the text area
- * @param ta pointer to a text area object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
+
+/*======================
+ * Add/remove functions
+ *=====================*/
 
 /**
  * Insert a character to the current cursor position
@@ -88,6 +104,16 @@ void lv_ta_add_char(lv_obj_t * ta, char c);
 void lv_ta_add_text(lv_obj_t * ta, const char * txt);
 
 /**
+ * Delete a the left character from the current cursor position
+ * @param ta pointer to a text area object
+ */
+void lv_ta_del_char(lv_obj_t * ta);
+
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
  * Set the text of a text area
  * @param ta pointer to a text area
  * @param txt pointer to the text
@@ -95,19 +121,126 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt);
 void lv_ta_set_text(lv_obj_t * ta, const char * txt);
 
 /**
- * Delete a the left character from the current cursor position
- * @param ta pointer to a text area object
- */
-void lv_ta_del(lv_obj_t * ta);
-
-/**
  * Set the cursor position
  * @param obj pointer to a text area object
  * @param pos the new cursor position in character index
  *             < 0 : index from the end of the text
- *             LV_TA_CUR_LAST: go after the last character
+ *             LV_TA_CURSOR_LAST: go after the last character
  */
 void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos);
+
+/**
+ * Set the cursor type.
+ * @param ta pointer to a text area object
+ * @param cur_type: element of 'lv_cursor_type_t'
+ */
+void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type);
+/**
+ * Enable/Disable password mode
+ * @param ta pointer to a text area object
+ * @param pwd_en true: enable, false: disable
+ */
+void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en);
+
+/**
+ * Configure the text area to one line or back to normal
+ * @param ta pointer to a Text area object
+ * @param en true: one line, false: normal
+ */
+void lv_ta_set_one_line(lv_obj_t * ta, bool en);
+
+/**
+ * Set the scroll bar mode of a text area
+ * @param ta pointer to a text area object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_sb_mode_t mode)
+{
+    lv_page_set_sb_mode(ta, mode);
+}
+
+/**
+ * Set a style of a text area
+ * @param ta pointer to a text area object
+ * @param type which style should be set
+ * @param style pointer to a style
+ */
+void lv_ta_set_style(lv_obj_t *ta, lv_ta_style_t type, lv_style_t *style);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get the text of a text area
+ * @param ta pointer to a text area object
+ * @return pointer to the text
+ */
+const char * lv_ta_get_text(lv_obj_t * ta);
+
+/**
+ * Get the label of a text area
+ * @param ta pointer to a text area object
+ * @return pointer to the label object
+ */
+lv_obj_t * lv_ta_get_label(lv_obj_t * ta);
+
+/**
+ * Get the current cursor position in character index
+ * @param ta pointer to a text area object
+ * @return the cursor position
+ */
+uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta);
+
+/**
+ * Get the current cursor visibility.
+ * @param ta pointer to a text area object
+ * @return true: the cursor is drawn, false: the cursor is hidden
+ */
+bool lv_ta_get_cursor_show(lv_obj_t * ta);
+
+/**
+ * Get the current cursor type.
+ * @param ta pointer to a text area object
+ * @return element of 'lv_cursor_type_t'
+ */
+lv_cursor_type_t lv_ta_get_cursor_type(lv_obj_t * ta);
+
+/**
+ * Get the password mode attribute
+ * @param ta pointer to a text area object
+ * @return true: password mode is enabled, false: disabled
+ */
+bool lv_ta_get_pwd_mode(lv_obj_t * ta);
+
+/**
+ * Get the one line configuration attribute
+ * @param ta pointer to a text area object
+ * @return true: one line configuration is enabled, false: disabled
+ */
+bool lv_ta_get_one_line(lv_obj_t * ta);
+
+/**
+ * Get the scroll bar mode of a text area
+ * @param ta pointer to a text area object
+ * @return scrollbar mode from 'lv_page_sb_mode_t' enum
+ */
+static inline lv_sb_mode_t lv_ta_get_sb_mode(lv_obj_t * ta)
+{
+    return lv_page_get_sb_mode(ta);
+}
+
+/**
+ * Get a style of a text area
+ * @param ta pointer to a text area object
+ * @param type which style should be get
+ * @return style pointer to a style
+ */
+lv_style_t * lv_ta_get_style(lv_obj_t *ta, lv_ta_style_t type);
+
+/*=====================
+ * Other functions
+ *====================*/
 
 /**
  * Move the cursor one character right
@@ -132,62 +265,6 @@ void lv_ta_cursor_down(lv_obj_t * ta);
  * @param ta pointer to a text area object
  */
 void lv_ta_cursor_up(lv_obj_t * ta);
-
-/**
- * Get the current cursor visibility.
- * @param ta pointer to a text area object
- * @return show true: show the cursor and blink it, false: hide cursor
- */
-void lv_ta_set_cursor_show(lv_obj_t * ta, bool show);
-
-/**
- * Enable/Disable password mode
- * @param ta ointer to a text area object
- * @param en true: enable, false: disable
- */
-void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en);
-
-/**
- * Configure the Text area to one line or back to normal
- * @param ta pointer to a text area object
- * @param en true: one line, false: normal
- */
-void lv_ta_set_one_line(lv_obj_t * ta, bool en);
-
-/**
- * Get the text of the i the text area
- * @param ta obj pointer to a text area object
- * @return pointer to the text
- */
-const char * lv_ta_get_txt(lv_obj_t * ta);
-
-/**
- * Get the label of a text area
- * @param ta pointer to a text area object
- * @return pointer to the label object
- */
-lv_obj_t * lv_ta_get_label(lv_obj_t * ta);
-
-/**
- * Get the current cursor position in character index
- * @param ta pointer to a text area object
- * @return the cursor position
- */
-uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta);
-
-/**
- * Get the current cursor visibility.
- * @param ta pointer to a text area object
- * @return true: the cursor is drawn, false: the cursor is hidden
- */
-bool lv_ta_get_cursor_show(lv_obj_t * ta);
-
-/**
- * Get the password mode
- * @param ta pointer to a text area object
- * @return true: password mode is enabled, false: disabled
- */
-bool lv_ta_get_pwd_mode(lv_obj_t * ta);
 
 /**********************
  *      MACROS

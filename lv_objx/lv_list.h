@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_LIST != 0
 
 /*Testing of dependencies*/
@@ -29,12 +29,8 @@ extern "C" {
 #error "lv_list: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
-#if USE_LV_IMG == 0
-#error "lv_list: lv_img is required. Enable it in lv_conf.h (USE_LV_IMG  1) "
-#endif
 
-
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 #include "lv_page.h"
 #include "lv_btn.h"
 #include "lv_label.h"
@@ -52,10 +48,21 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t * styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
-    lv_style_t * style_img;    /*Style of the list element images on buttons*/
-    uint8_t sb_out   :1;        /*1: Keep space for the scrollbar*/
+    uint16_t anim_time;                          /*Scroll animation time*/
+    lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
+    lv_style_t *style_img;                       /*Style of the list element images on buttons*/
 }lv_list_ext_t;
+
+typedef enum {
+    LV_LIST_STYLE_BG,
+    LV_LIST_STYLE_SCRL,
+    LV_LIST_STYLE_SB,
+    LV_LIST_STYLE_BTN_REL,
+    LV_LIST_STYLE_BTN_PR,
+    LV_LIST_STYLE_BTN_TGL_REL,
+    LV_LIST_STYLE_BTN_TGL_PR,
+    LV_LIST_STYLE_BTN_INA,
+}lv_list_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -69,13 +76,9 @@ typedef struct
  */
 lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the list
- * @param list pointer to a list object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
+/*======================
+ * Add/remove functions
+ *=====================*/
 
 /**
  * Add a list element to the list
@@ -87,12 +90,94 @@ bool lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
  */
 lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
+ * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
+ * @param list pointer to a list object
+ * @param anim_time duration of animation [ms]
+ */
+void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time);
+
+/**
+ * Set the scroll bar mode of a list
+ * @param list pointer to a list object
+ * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ */
+static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
+{
+    lv_page_set_sb_mode(list, mode);
+}
+
+
+/**
+ * Set a style of a list
+ * @param list pointer to a list object
+ * @param type which style should be set
+ * @param style pointer to a style
+ */
+void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get the text of a list element
+ * @param btn pointer to list element
+ * @return pointer to the text
+ */
+const char * lv_list_get_btn_text(lv_obj_t * btn);
+/**
+ * Get the label object from a list element
+ * @param btn pointer to a list element (button)
+ * @return pointer to the label from the list element or NULL if not found
+ */
+lv_obj_t * lv_list_get_btn_label(lv_obj_t * btn);
+
+/**
+ * Get the image object from a list element
+ * @param btn pointer to a list element (button)
+ * @return pointer to the image from the list element or NULL if not found
+ */
+lv_obj_t * lv_list_get_btn_img(lv_obj_t * btn);
+
+/**
+ * Get scroll animation duration
+ * @param list pointer to a list object
+ * @return duration of animation [ms]
+ */
+uint16_t lv_list_get_anim_time(lv_obj_t *list);
+
+/**
+ * Get the scroll bar mode of a list
+ * @param list pointer to a list object
+ * @return scrollbar mode from 'lv_page_sb_mode_t' enum
+ */
+static inline lv_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
+{
+    return lv_page_get_sb_mode(list);
+}
+
+/**
+ * Get a style of a list
+ * @param list pointer to a list object
+ * @param type which style should be get
+ * @return style pointer to a style
+ *  */
+lv_style_t * lv_list_get_style(lv_obj_t *list, lv_list_style_t type);
+
+/*=====================
+ * Other functions
+ *====================*/
+
 /**
  * Move the list elements up by one
  * @param list pointer a to list object
  */
 void lv_list_up(lv_obj_t * list);
-
 /**
  * Move the list elements down by one
  * @param list pointer to a list object
@@ -100,82 +185,11 @@ void lv_list_up(lv_obj_t * list);
 void lv_list_down(lv_obj_t * list);
 
 /**
- * Enable/Disable to scrollbar outside attribute
- * @param list pointer to list object
- * @param out true: reduce the buttons width therefore scroll bar will be out of the buttons,
- *            false: keep button size and place scroll bar on the buttons
+ * Focus on a list button. It ensures that the button will be visible on the list.
+ * @param btn pointer to a list button to focus
+ * @param anim_en true: scroll with animation, false: without animation
  */
-void lv_list_set_sb_out(lv_obj_t * list, bool out);
-
-/**
- * Enable or disable the text rolling on a list element
- * @param liste pinter to list element
- * @param en true: enable text scrolling, false: disable text scrolling
- */
-void lv_list_set_element_text_roll(lv_obj_t * liste, bool en);
-
-/**
- * Set styles of the list elements of a list in each state
- * @param list pointer to list object
- * @param rel pointer to a style for releases state
- * @param pr  pointer to a style for pressed state
- * @param trel pointer to a style for toggled releases state
- * @param tpr pointer to a style for toggled pressed state
- * @param ina pointer to a style for inactive state
- */
-void lv_list_set_styles_btn(lv_obj_t * list, lv_style_t * rel, lv_style_t * pr,
-                            lv_style_t * trel, lv_style_t * tpr,
-                            lv_style_t * ina);
-
-/**
- * Set the styles of the list element image (typically to set symbol font)
- * @param list pointer to list object
- * @param style pointer to the new style of the button images
- */
-void lv_list_set_style_img(lv_obj_t * list, lv_style_t * style);
-
-/**
- * Get the text of a list element
- * @param liste pointer to list element
- * @return pointer to the text
- */
-const char * lv_list_get_element_text(lv_obj_t * liste);
-
-/**
- * Get the label object from a list element
- * @param liste pointer to a list element (button)
- * @return pointer to the label from the list element or NULL if not found
- */
-lv_obj_t * lv_list_get_element_label(lv_obj_t * liste);
-
-/**
- * Get the image object from a list element
- * @param liste pointer to a list element (button)
- * @return pointer to the image from the list element or NULL if not found
- */
-lv_obj_t * lv_list_get_element_img(lv_obj_t * liste);
-
-/**
- * Get the scroll bar outside attribute
- * @param list pointer to list object
- * @param en true: scroll bar outside the buttons, false: scroll bar inside
- */
-bool lv_list_get_sb_out(lv_obj_t * list, bool en);
-
-/**
- * Get the style of the list elements in a given state
- * @param list pointer to a list object
- * @param state a state from 'lv_btn_state_t' in which style should be get
- * @return pointer to the style in the given state
- */
-lv_style_t * lv_list_get_style_liste(lv_obj_t * list, lv_btn_state_t state);
-
-/**
- * Get the style of the list elements images
- * @param list pointer to a list object
- * @return pointer to the image style
- */
-lv_style_t * lv_list_get_style_img(lv_obj_t * list, lv_btn_state_t state);
+void lv_list_focus(lv_obj_t *btn, bool anim_en);
 
 /**********************
  *      MACROS

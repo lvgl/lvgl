@@ -3,16 +3,17 @@
  * 
  */
 
-/*Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
- * 					 templ -> object short name with lower case(e.g. btn, label etc)
- *                   TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
+/* TODO Remove these instructions
+ * Search an replace: template -> object normal name with lower case (e.g. button, label etc.)
+ *                    templ -> object short name with lower case(e.g. btn, label etc)
+ *                    TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_TEMPL != 0
 
 #include "lv_templ.h"
@@ -29,10 +30,13 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_signal_func_t ancestor_signal;
+static lv_design_func_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -42,12 +46,8 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
  *   GLOBAL FUNCTIONS
  **********************/
 
-/*----------------- 
- * Create function
- *-----------------*/
-
 /**
- * Create a template objects
+ * Create a template object
  * @param par pointer to an object, it will be the parent of the new template
  * @param copy pointer to a template object, if not NULL then the new object will be copied from it
  * @return pointer to the created template
@@ -62,6 +62,8 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     /*Allocate the template type specific extended data*/
     lv_templ_ext_t * ext = lv_obj_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
     dm_assert(ext);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_templ);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_templ);
 
     /*Initialize the allocated 'ext' */
     ext->xyz = 0;
@@ -85,54 +87,81 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     return new_templ;
 }
 
-/**
- * Signal function of the template
- * @param templ pointer to a template object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
+/*======================
+ * Add/remove functions
+ *=====================*/
+
+/*
+ * New object specific "add" or "remove" functions come here
  */
-bool lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
-{
-    bool valid;
 
-    /* Include the ancient signal function */
-    /* TODO update it to the ancestor's signal function*/
-    valid = lv_ANCESTOR_signal(templ, sign, param);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	if(sign == LV_SIGNAL_CLEANUP) {
-            /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    	}
-    }
-    
-    return valid;
-}
 
 /*=====================
  * Setter functions
  *====================*/
 
 /*
- * New object specific "set" function comes here
+ * New object specific "set" functions come here
  */
 
+
+/**
+ * Set a style of a template.
+ * @param templ pointer to template object
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *style)
+{
+    lv_templ_ext_t *ext = lv_obj_get_ext_attr(templ);
+
+    switch (type) {
+        case LV_TEMPL_STYLE_X:
+            break;
+        case LV_TEMPL_STYLE_Y:
+            break;
+    }
+}
 
 /*=====================
  * Getter functions
  *====================*/
 
 /*
- * New object specific "get" function comes here
+ * New object specific "get" functions come here
  */
 
+/**
+ * Get style of a template.
+ * @param templ pointer to template object
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_btn_get_style(lv_obj_t * templ, lv_templ_style_t type)
+{
+    lv_templ_ext_t *ext = lv_obj_get_ext_attr(templ);
+
+    switch (type) {
+        case LV_TEMPL_STYLE_X:     return NULL;
+        case LV_TEMPL_STYLE_Y:     return NULL;
+        default: return NULL;
+    }
+
+    /*To avoid warning*/
+    return NULL;
+}
+
+/*=====================
+ * Other functions
+ *====================*/
+
+/*
+ * New object specific "other" functions come here
+ */
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 /**
  * Handle the drawing related tasks of the templates
@@ -162,5 +191,27 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
     return true;
 }
 
+/**
+ * Signal function of the template
+ * @param templ pointer to a template object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = lv_ancestor_signal(templ, sign, param);
+    if(res != LV_RES_OK) return res;
+
+
+    if(sign == LV_SIGNAL_CLEANUP) {
+        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    }
+
+    return res;
+}
 
 #endif

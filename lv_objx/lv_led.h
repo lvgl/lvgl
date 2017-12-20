@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_LED != 0
 
-#include "../lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -47,15 +47,6 @@ typedef struct
 lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
- * Signal function of the led
- * @param led pointer to a led object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return true: the object is still valid (not deleted), false: the object become invalid
- */
-bool lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param);
-
-/**
  * Set the brightness of a LED object
  * @param led pointer to a LED object
  * @param bright 0 (max. dark) ... 255 (max. light)
@@ -78,7 +69,17 @@ void lv_led_off(lv_obj_t * led);
  * Toggle the state of a LED
  * @param led pointer to a LED object
  */
-void lv_led_tgl(lv_obj_t * led);
+void lv_led_toggle(lv_obj_t * led);
+
+/**
+ * Set the style of a led
+ * @param led pointer to a led object
+ * @param style pointer to a style
+ */
+static inline void lv_led_set_style(lv_obj_t *led, lv_style_t *style)
+{
+    lv_obj_set_style(led, style);
+}
 
 /**
  * Get the brightness of a LEd object
@@ -86,6 +87,16 @@ void lv_led_tgl(lv_obj_t * led);
  * @return bright 0 (max. dark) ... 255 (max. light)
  */
 uint8_t lv_led_get_bright(lv_obj_t * led);
+
+/**
+ * Get the style of an led object
+ * @param led pointer to an led object
+ * @return pointer to the led's style
+ */
+static inline lv_style_t* lv_led_get_style(lv_obj_t *led)
+{
+    return lv_obj_get_style(led);
+}
 
 /**********************
  *      MACROS

@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_CB != 0
 
 #include "lv_cb.h"
-#include "../lv_obj/lv_group.h"
+#include "../lv_core/lv_group.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -23,14 +24,16 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mode);
-static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_mode_t mode);
+static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode);
+static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_f_t ancestor_bg_design_f;
-static lv_design_f_t ancestor_bullet_design_f;
+static lv_design_func_t ancestor_bg_design;
+static lv_design_func_t ancestor_bullet_design;
+static lv_signal_func_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -39,10 +42,6 @@ static lv_design_f_t ancestor_bullet_design_f;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-/*----------------- 
- * Create function
- *-----------------*/
 
 /**
  * Create a check box objects
@@ -54,90 +53,57 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor basic object*/
     lv_obj_t * new_cb = lv_btn_create(par, copy);
-    dm_assert(new_cb);
+    lv_mem_assert(new_cb);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_cb);
+    if(ancestor_bg_design == NULL) ancestor_bg_design = lv_obj_get_design_func(new_cb);
     
-    lv_cb_ext_t * ext = lv_obj_alloc_ext(new_cb, sizeof(lv_cb_ext_t));
-    dm_assert(ext);
+    lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
+    lv_mem_assert(ext);
     ext->bullet = NULL;
     ext->label = NULL;
 
-    if(ancestor_bg_design_f == NULL) ancestor_bg_design_f = lv_obj_get_design_f(new_cb);
-
-    lv_obj_set_signal_f(new_cb, lv_cb_signal);
-    lv_obj_set_design_f(new_cb, lv_cb_design);
+    lv_obj_set_signal_func(new_cb, lv_cb_signal);
+    lv_obj_set_design_func(new_cb, lv_cb_design);
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
         ext->bullet = lv_btn_create(new_cb, NULL);
-        if(ancestor_bullet_design_f == NULL) ancestor_bullet_design_f = lv_obj_get_design_f(ext->bullet);
-        lv_btn_set_styles(new_cb, lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
-                                  lv_style_get(LV_STYLE_TRANSP, NULL), lv_style_get(LV_STYLE_TRANSP, NULL),
-                                  lv_style_get(LV_STYLE_TRANSP, NULL));
-        lv_cont_set_layout(new_cb, LV_CONT_LAYOUT_ROW_M);
-        lv_cont_set_fit(new_cb, true, true);
-        lv_btn_set_tgl(new_cb, true);
-
+        if(ancestor_bullet_design == NULL) ancestor_bullet_design = lv_obj_get_design_func(ext->bullet);
         lv_obj_set_click(ext->bullet, false);
-        lv_btn_set_styles(ext->bullet, lv_style_get(LV_STYLE_PRETTY, NULL), lv_style_get(LV_STYLE_PRETTY_COLOR, NULL),
-                                       lv_style_get(LV_STYLE_BTN_TREL, NULL), lv_style_get(LV_STYLE_BTN_TPR, NULL),
-                                       lv_style_get(LV_STYLE_BTN_INA, NULL));
 
         ext->label = lv_label_create(new_cb, NULL);
-        lv_obj_set_style(ext->label, NULL);     /*Inherit the style of the parent*/
-        lv_label_set_text(ext->label, "Check box");
+
+        lv_cb_set_text(new_cb, "Check box");
+        lv_btn_set_layout(new_cb, LV_LAYOUT_ROW_M);
+        lv_btn_set_fit(new_cb, true, true);
+        lv_btn_set_toggle(new_cb, true);
+
+        /*Set the default styles*/
+        lv_theme_t *th = lv_theme_get_current();
+        if(th) {
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BG, th->cb.bg);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, th->cb.box.rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_PR, th->cb.box.pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_REL, th->cb.box.tgl_rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_PR, th->cb.box.tgl_pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->cb.box.ina);
+        } else {
+            lv_cb_set_style(new_cb,LV_CB_STYLE_BG, &lv_style_transp);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL,&lv_style_pretty);
+        }
     } else {
-    	lv_cb_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
     	ext->label = lv_label_create(new_cb, copy_ext->label);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_cb);
+        lv_obj_refresh_style(new_cb);
     }
 
-    lv_obj_set_design_f(ext->bullet, lv_bullet_design);
+    lv_obj_set_design_func(ext->bullet, lv_bullet_design);
     
     return new_cb;
 }
-
-
-/**
- * Signal function of the check box
- * @param cb pointer to a check box object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
-{
-    bool valid;
-
-    /* Include the ancient signal function */
-    valid = lv_btn_signal(cb, sign, param);
-
-    lv_cb_ext_t * ext = lv_obj_get_ext(cb);
-    lv_style_t * style = lv_obj_get_style(cb);
-
-    /* The object can be deleted so check its validity and then
-     * make the object specific signal handling */
-    if(valid != false) {
-    	if(sign == LV_SIGNAL_STYLE_CHG) {
-    		lv_obj_set_size(ext->bullet, font_get_height(style->font), font_get_height(style->font));
-    	} else if(sign == LV_SIGNAL_PRESSED ||
-            sign == LV_SIGNAL_RELEASED ||
-            sign == LV_SIGNAL_PRESS_LOST) {
-            lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
-        } else if(sign == LV_SIGNAL_CONTROLL) {
-            char c = *((char*)param);
-            if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
-               c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
-               c == LV_GROUP_KEY_ENTER) {
-                lv_btn_set_state(lv_cb_get_bullet(cb), lv_btn_get_state(cb));
-            }
-        }
-    }
-    
-    return valid;
-}
-
 
 /*=====================
  * Setter functions
@@ -150,9 +116,46 @@ bool lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 {
-	lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 	lv_label_set_text(ext->label, txt);
 }
+
+/**
+ * Set a style of a check box
+ * @param cb pointer to check box object
+ * @param type which style should be set
+ * @param style pointer to a style
+ *  */
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style)
+{
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+
+    switch (type) {
+        case LV_CB_STYLE_BG:
+            lv_btn_set_style(cb, LV_BTN_STYLE_REL, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_PR, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_TGL_REL, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_TGL_PR, style);
+            lv_btn_set_style(cb, LV_BTN_STYLE_INA, style);
+            break;
+        case LV_CB_STYLE_BOX_REL:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_REL, style);
+            break;
+        case LV_CB_STYLE_BOX_PR:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_PR, style);
+            break;
+        case LV_CB_STYLE_BOX_TGL_REL:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_REL, style);
+            break;
+        case LV_CB_STYLE_BOX_TGL_PR:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_TGL_PR, style);
+            break;
+        case LV_CB_STYLE_BOX_INA:
+            lv_btn_set_style(ext->bullet, LV_BTN_STYLE_INA, style);
+            break;
+    }
+}
+
 
 
 /*=====================
@@ -166,19 +169,32 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
  */
 const char * lv_cb_get_text(lv_obj_t * cb)
 {
-	lv_cb_ext_t * ext = lv_obj_get_ext(cb);
+	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 	return lv_label_get_text(ext->label);
 }
 
+
 /**
- * Get the bullet (lv_btn) of a check box
+ * Get a style of a button
  * @param cb pointer to check box object
- * @return pointer to the bullet of the check box (lv_btn)
- */
-lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb)
+ * @param type which style should be get
+ * @return style pointer to the style
+ *  */
+lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
 {
-    lv_cb_ext_t * ext = lv_obj_get_ext(cb);
-    return ext->bullet;
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+
+    switch (type) {
+        case LV_CB_STYLE_BOX_REL:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
+        case LV_CB_STYLE_BOX_PR:      return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
+        case LV_CB_STYLE_BOX_TGL_REL: return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
+        case LV_CB_STYLE_BOX_TGL_PR:  return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
+        case LV_CB_STYLE_BOX_INA:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
+        default: return NULL;
+    }
+
+    /*To avoid awrning*/
+    return NULL;
 }
 
 /**********************
@@ -195,22 +211,22 @@ lv_obj_t *  lv_cb_get_bullet(lv_obj_t * cb)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mode)
+static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
     	/*Return false if the object is not covers the mask_p area*/
-    	return ancestor_bg_design_f(cb, mask, mode);
+    	return ancestor_bg_design(cb, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
-        lv_cb_ext_t * cb_ext = lv_obj_get_ext(cb);
-        lv_btn_ext_t * bullet_ext = lv_obj_get_ext(cb_ext->bullet);
+        lv_cb_ext_t * cb_ext = lv_obj_get_ext_attr(cb);
+        lv_btn_ext_t * bullet_ext = lv_obj_get_ext_attr(cb_ext->bullet);
 
         /*Be sure the state of the bullet is the same as the parent button*/
         bullet_ext->state = cb_ext->bg_btn.state;
 
-        return ancestor_bg_design_f(cb, mask, mode);
+        return ancestor_bg_design(cb, mask, mode);
 
     } else {
-        return ancestor_bg_design_f(cb, mask, mode);
+        return ancestor_bg_design(cb, mask, mode);
     }
 
     return true;
@@ -226,12 +242,12 @@ static bool lv_cb_design(lv_obj_t * cb, const area_t * mask, lv_design_mode_t mo
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_mode_t mode)
+static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        return ancestor_bullet_design_f(bullet, mask, mode);
+        return ancestor_bullet_design(bullet, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-#if LV_OBJ_GROUP != 0
+#if USE_LV_GROUP
         /* If the check box is the active in a group and
          * the background is not visible (transparent or empty)
          * then activate the style of the bullet*/
@@ -239,7 +255,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
         lv_obj_t * bg = lv_obj_get_parent(bullet);
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
-        if(style_page->empty != 0 || style_page->opa == OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.empty != 0 || style_page->body.opa == LV_OPA_TRANSP) { /*Background is visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);
@@ -247,16 +263,54 @@ static bool lv_bullet_design(lv_obj_t * bullet, const area_t * mask, lv_design_m
             }
         }
 #endif
-        ancestor_bullet_design_f(bullet, mask, mode);
+        ancestor_bullet_design(bullet, mask, mode);
 
-#if LV_OBJ_GROUP != 0
+#if USE_LV_GROUP
         bullet->style_p = style_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_bullet_design_f(bullet, mask, mode);
+        ancestor_bullet_design(bullet, mask, mode);
     }
 
     return true;
+}
+
+
+/**
+ * Signal function of the check box
+ * @param cb pointer to a check box object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(cb, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+
+    if(sign == LV_SIGNAL_STYLE_CHG) {
+        lv_style_t * label_style = lv_label_get_style(ext->label);
+        lv_obj_set_size(ext->bullet, lv_font_get_height_scale(label_style->text.font), lv_font_get_height_scale(label_style->text.font));
+        lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
+    } else if(sign == LV_SIGNAL_PRESSED ||
+        sign == LV_SIGNAL_RELEASED ||
+        sign == LV_SIGNAL_PRESS_LOST) {
+        lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
+    } else if(sign == LV_SIGNAL_CONTROLL) {
+        char c = *((char*)param);
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
+           c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
+           c == LV_GROUP_KEY_ENTER) {
+            lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
+        }
+    }
+
+    return res;
 }
 
 #endif

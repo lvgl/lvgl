@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_conf.h"
+#include "../../lv_conf.h"
 #if USE_LV_LINE != 0
 
-#include "lvgl/lv_obj/lv_obj.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -30,16 +30,16 @@ extern "C" {
 typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
-    const point_t * point_array;    /*Pointer to an array with the points of the line*/
+    const lv_point_t * point_array;    /*Pointer to an array with the points of the line*/
     uint16_t  point_num;            /*Number of points in 'point_array' */
     uint8_t  auto_size  :1;         /*1: set obj. width to x max and obj. height to y max */
     uint8_t  y_inv      :1;         /*1: y == 0 will be on the bottom*/
-    uint8_t  upscale    :1;         /*1: upscale coordinates with LV_DOWNSCALE*/
 }lv_line_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
 
 /**
  * Create a line objects
@@ -48,13 +48,9 @@ typedef struct
  */
 lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Signal function of the line
- * @param line pointer to a line object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- */
-bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
+/*=====================
+ * Setter functions
+ *====================*/
 
 /**
  * Set an array of points. The line object will connect these points.
@@ -63,31 +59,38 @@ bool lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
  * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
-void lv_line_set_points(lv_obj_t * line, const point_t * point_a, uint16_t point_num);
+void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t point_num);
 
 /**
  * Enable (or disable) the auto-size option. The size of the object will fit to its points.
  * (set width to x max and height to y max)
  * @param line pointer to a line object
- * @param autosize true: auto size is enabled, false: auto size is disabled
+ * @param autosize_en true: auto size is enabled, false: auto size is disabled
  */
-void lv_line_set_auto_size(lv_obj_t * line, bool autosize);
+void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en);
 
 /**
  * Enable (or disable) the y coordinate inversion.
  * If enabled then y will be subtracted from the height of the object,
  * therefore the y=0 coordinate will be on the bottom.
  * @param line pointer to a line object
- * @param yinv true: enable the y inversion, false:disable the y inversion
+ * @param yinv_en true: enable the y inversion, false:disable the y inversion
  */
-void lv_line_set_y_inv(lv_obj_t * line, bool yinv);
+void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en);
 
 /**
- * Enable (or disable) the point coordinate upscaling (compensate LV_DOWNSCALE).
+ * Set the style of a line
  * @param line pointer to a line object
- * @param unscale true: enable the point coordinate upscaling
+ * @param style pointer to a style
  */
-void lv_line_set_upscale(lv_obj_t * line, bool unscale);
+static inline void lv_line_set_style(lv_obj_t *line, lv_style_t *style)
+{
+    lv_obj_set_style(line, style);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the auto size attribute
@@ -104,11 +107,14 @@ bool lv_line_get_auto_size(lv_obj_t * line);
 bool lv_line_get_y_inv(lv_obj_t * line);
 
 /**
- * Get the point upscale enable attribute
- * @param obj pointer to a line object
- * @return true: point coordinate upscale is enabled, false: disabled
+ * Get the style of an line object
+ * @param line pointer to an line object
+ * @return pointer to the line's style
  */
-bool lv_line_get_upscale(lv_obj_t * line);
+static inline lv_style_t* lv_line_get_style(lv_obj_t *line)
+{
+    return lv_obj_get_style(line);
+}
 
 /**********************
  *      MACROS
