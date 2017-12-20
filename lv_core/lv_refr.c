@@ -260,16 +260,18 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     /*Calculate the max row num*/
     lv_coord_t w = lv_area_get_width(area_p);
     lv_coord_t h = lv_area_get_height(area_p);
+    lv_coord_t x2;
+    lv_coord_t y2 = area_p->y2 >= LV_VER_RES ? y2 = LV_VER_RES - 1 : area_p->y2;
 
-    lv_coord_t max_row = (uint32_t) LV_VDB_SIZE / (w << LV_AA);
+    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (w << LV_AA);
     if(max_row > (h << LV_AA)) max_row = (h << LV_AA);
 
     max_row = max_row >> LV_AA ;
 
     /*Always use the full row*/
-    lv_coord_t row;
+    uint32_t row;
     lv_coord_t row_last = 0;
-    for(row = area_p->y1; row  + max_row - 1 <= area_p->y2; row += max_row)  {
+    for(row = area_p->y1; row  + max_row - 1 <= y2; row += max_row)  {
         lv_vdb_t * vdb_p = lv_vdb_get();
 
         /*Calc. the next y coordinates of VDB*/
@@ -277,19 +279,20 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
         vdb_p->area.x2 = area_p->x2;
         vdb_p->area.y1 = row;
         vdb_p->area.y2 = row + max_row - 1;
-        row_last = row + max_row - 1;
+        if(vdb_p->area.y2 > y2) vdb_p->area.y2 = y2;
+        row_last = vdb_p->area.y2;
         lv_refr_area_part_vdb(area_p);
     }
     
     /*If the last y coordinates are not handled yet ...*/
-    if(area_p->y2 != row_last) {
+    if(y2 != row_last) {
         lv_vdb_t * vdb_p = lv_vdb_get();
 
         /*Calc. the next y coordinates of VDB*/
         vdb_p->area.x1 = area_p->x1;
         vdb_p->area.x2 = area_p->x2;
         vdb_p->area.y1 = row;
-        vdb_p->area.y2 = area_p->y2;
+        vdb_p->area.y2 = y2;
 
         /*Refresh this part too*/
         lv_refr_area_part_vdb(area_p);

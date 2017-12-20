@@ -260,6 +260,35 @@ void lv_chart_set_series_darking(lv_obj_t * chart, lv_opa_t dark_eff)
 }
 
 /**
+ * Initialize all data points with a value
+ * @param chart pointer to chart object
+ * @param ser pointer to a data series on 'chart'
+ * @param y the new value  for all points
+ */
+void lv_chart_init_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    uint16_t i;
+    for(i = 0; i < ext->point_cnt; i++) {
+        ser->points[i] = y;
+    }
+    lv_chart_refresh(chart);
+}
+
+/**
+ * Set the value s of points from an array
+ * @param chart pointer to chart object
+ * @param ser pointer to a data series on 'chart'
+ * @param y_array array of 'lv_coord_t' points (with 'points count' elements )
+ */
+void lv_chart_set_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t * y_array)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    memcpy(ser->points, y_array, ext->point_cnt * (sizeof(lv_coord_t)));
+    lv_chart_refresh(chart);
+}
+
+/**
  * Shift all data right and set the most right data on a data line
  * @param chart pointer to chart object
  * @param ser pointer to a data series on 'chart'
