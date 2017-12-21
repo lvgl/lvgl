@@ -2,7 +2,7 @@
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-Littlev Graphics Library provides everything you need to add graphical user interface (GUI) to your embedded system. LittlevGL is designed to be an all-in-one solution for microcontroller based embedded GUIs where high level graphics feature, easy-to-use graphical elements and low memory footprint are required.
+Littlev Graphics Library provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
 
 Homepage: http://gl.littlev.hu
 
@@ -36,16 +36,16 @@ Homepage: http://gl.littlev.hu
 ## Porting
 In the most sime case you need 4 things:
 1. Call `lv_tick_inc(1)` in every millisecods in a Timer or Task
-2. Register a function which can copy a pixel array to an area of the screen
-3. Register a function which can read an input device. (E.g. touch pad)
+2. Register a function which can **copy a pixel array** to an area of the screen
+3. Register a function which can **read an input device**. (E.g. touch pad)
 4. Call `lv_task_handler()` periodically in every few milliseconds ()
 
 For more information visit http://gl.littlev.hu/porting
  
 ## Project set-up
-1. Clone or download the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
-2. Create project with your prefered IDE and add the *lvgl* folder
-3. Copy *lvgl/lv_conf_templ.h* as *lv_conf.h* next to the lvgl folder
+1. **Clone** or download the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
+2. **Create project** with your prefered IDE and add the *lvgl* folder
+3. Copy **lvgl/lv_conf_templ.h** as **lv_conf.h** next to the *lvgl* folder
 4. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
 5. In your *main.c*: #include "lvgl/lvgl.h"   
 6. In your *main function*:
