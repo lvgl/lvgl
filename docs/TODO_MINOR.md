@@ -15,7 +15,7 @@ Here are ideas which are not assigned to a minor version yet:
 - anim. paths: monentum (tnh(x)), curve (exp), shake
 - hover, hover_lost signals
 
-## v5.0 (in progress)
+## v5.0 (released at: 20.12.2017)
 - [x] UTF-8 support
 - [x] lv_tabview: new object type to organise content with tabs
 - [x] lv_sw: new object type, switch, turn on/off by tap (a little slider)
