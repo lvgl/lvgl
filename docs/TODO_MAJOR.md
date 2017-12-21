@@ -6,11 +6,10 @@ Please create an issue to suggest a new feature instead of adding pull request t
 
 ## v5 
 **Architectural changes**
-- [ ] Rename repository from *lvgl* to *littlevgl*
-- [ ] Rename repository from *proj_pc* to *pc_simulator*
+- [x] Rename repository from *proj_pc* to *pc_simulator*
 - [x] Integrate *hal* in LittlevGL as a normal folder
 - [x] Create a new repository for examples
-- [ ] Convert Applications into simple examples 
+- [x] Convert Applications into simple examples 
 - [x] Add tests for all object types
 
 **API changes**
