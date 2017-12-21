@@ -4,7 +4,7 @@ Major versions released typically when API changes are required
 ## Contributing
 Please create an issue to suggest a new feature instead of adding pull request to this file.
 
-## v5 
+## v5 (released at: 20.12.2017)
 **Architectural changes**
 - [x] Rename repository from *proj_pc* to *pc_simulator*
 - [x] Integrate *hal* in LittlevGL as a normal folder
