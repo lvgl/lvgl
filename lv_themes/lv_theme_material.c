@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define DEF_RADIUS           3
+#define DEF_RADIUS           4
 #define DEF_SHADOW_COLOR     LV_COLOR_HEX3(0x888)
 
 /**********************
@@ -50,14 +50,16 @@ static void basic_init(void)
 {
     lv_style_copy(&def, &lv_style_plain);  /*Initialize the default style*/
     def.text.font = _font;
+    def.body.radius = DEF_RADIUS;
 
     static lv_style_t bg, panel;
     lv_style_copy(&bg, &def);
-    bg.body.main_color = LV_COLOR_HEX(0xf8f8f8);
+    bg.body.main_color = LV_COLOR_HEX(0xf0f0f0);
     bg.body.grad_color = bg.body.main_color;
+    bg.body.radius = 0;
 
     lv_style_copy(&panel, &def);
-    panel.body.radius = 3;
+    panel.body.radius = DEF_RADIUS;
     panel.body.main_color = LV_COLOR_WHITE;
     panel.body.grad_color = LV_COLOR_WHITE;
     panel.body.border.width = 1;
