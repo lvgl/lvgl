@@ -227,7 +227,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 		/*If no vertical padding then make sure the last row is at the bottom of 'btnm'*/
 		if(style_bg->body.padding.ver == 0  &&
 		   act_y + btn_h * 2 > max_h) {         /*Last row?*/
-		    btn_h = max_h - act_y;
+		    btn_h = max_h - act_y - 1;
 		}
 
 		if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
