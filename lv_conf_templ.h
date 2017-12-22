@@ -27,8 +27,8 @@
  *=====================*/
 
 /* Horizontal and vertical resolution of the library.*/
-#define LV_HOR_RES          (480)
-#define LV_VER_RES          (320)
+#define LV_HOR_RES          (320)
+#define LV_VER_RES          (240)
 #define LV_DPI              100
 
 /* Buffered rendering: >= LV_DOWNSCALE * lv_disp_hor_res() or 0 to disable buffering*/
@@ -77,19 +77,19 @@
 #define USE_LV_ANIMATION        1               /*1: disable all animations*/
 #define USE_LV_SHADOW           1               /*1: disable shadows*/
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
-#define USE_LV_GPU              0               /*1: Enable GPU interface*/
+#define USE_LV_GPU              1               /*1: Enable GPU interface*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images aka. lv_img)*/
 
 /*================
  *  THEME USAGE
  *================*/
 #define USE_LV_THEME_TEMPL      0       /*Just for test*/
-#define USE_LV_THEME_DEFAULT    1       /*Built mainly from the built-in styles. Consumes very few RAM*/
-#define USE_LV_THEME_ALIEN      1       /*Dark futuristic theme*/
-#define USE_LV_THEME_NIGHT      1       /*Dark elegant theme*/
-#define USE_LV_THEME_MONO       1       /*Mono color theme for monochrome displays*/
-#define USE_LV_THEME_MATERIAL   1       /*Flat theme with bold colors and light shadows*/
-#define USE_LV_THEME_ZEN        1       /*Peaceful, mainly light theme */
+#define USE_LV_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
+#define USE_LV_THEME_NIGHT      0       /*Dark elegant theme*/
+#define USE_LV_THEME_MONO       0       /*Mono color theme for monochrome displays*/
+#define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows*/
+#define USE_LV_THEME_ZEN        0       /*Peaceful, mainly light theme */
 
 /*==================
  *    FONT USAGE
