@@ -2,7 +2,7 @@
 
 ![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
 
-Littlev Graphics Library provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
+LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
 
 Homepage: http://gl.littlev.hu
 
@@ -21,7 +21,7 @@ Homepage: http://gl.littlev.hu
 - Multi language support with UTF-8 support
 - Fully customizable graphical elements
 
-- Hardware independent to use with any MCU or display
+- Hardware independent to use with any microcontroller or display
 - Scalable to operate with few memory (80 kB Flash, 10 kB RAM)
 - OS, External memory and GPU supported but not required
 - Single frame buffer operation even with advances graphical effects
