@@ -190,6 +190,7 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
     uint32_t old_size = lv_mem_get_size(data_p);
     if(old_size == new_size) return data_p;     /*Also avoid reallocating the same memory*/
 
+#if LV_MEM_CUSTOM == 0
     /* Only truncate the memory is possible
      * If the 'old_size' was extended by a header size in 'ent_trunc' it avoids reallocating this same memory */
     if(new_size < old_size) {
@@ -197,6 +198,7 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
         ent_trunc(e, new_size);
         return &e->first_data;
     }
+#endif
 
     void * new_p;
     new_p = lv_mem_alloc(new_size);
