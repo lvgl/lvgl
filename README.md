@@ -16,10 +16,10 @@ Homepage: http://www.gl.littlev.hu
 * [Donate](#donate)
 
 ## Key features
-* Powerful building blocks buttons, charts, lists, sliders, images etc
+* Powerful building: blocks buttons, charts, lists, sliders, images etc
 * Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
-* Various input devices touch pad, mouse, keyboard and external buttons
-* Multi language support with UTF-8 support
+* Various input: devices touch pad, mouse, keyboard and external buttons
+* Multi language support with UTF-8 decoding
 * Fully customizable graphical elements
 * Hardware independent to use with any microcontroller or display
 * Scalable to operate with few memory (80 kB Flash, 10 kB RAM)
