@@ -16,23 +16,21 @@ Homepage: http://www.gl.littlev.hu
 * [Donate](#donate)
 
 ## Key features
-- Powerful building blocks buttons, charts, lists, sliders, images etc
-- Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
-- Various input devices touch pad, mouse, keyboard and external buttons
-- Multi language support with UTF-8 support
-- Fully customizable graphical elements
-
-- Hardware independent to use with any microcontroller or display
-- Scalable to operate with few memory (80 kB Flash, 10 kB RAM)
-- OS, External memory and GPU supported but not required
-- Single frame buffer operation even with advances graphical effects
-
-- Written in C for maximal compatibility
-- PC simulator to develop without embedded hardware
-- Tutorials, examples, themes for rapid development
-- Advanced support and professional GUI development service
-- Documentation and API references online
-- Free and open source under MIT licence
+* Powerful building blocks buttons, charts, lists, sliders, images etc
+* Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
+* Various input devices touch pad, mouse, keyboard and external buttons
+* Multi language support with UTF-8 support
+* Fully customizable graphical elements
+* Hardware independent to use with any microcontroller or display
+* Scalable to operate with few memory (80 kB Flash, 10 kB RAM)
+* OS, External memory and GPU supported but not required
+* Single frame buffer operation even with advances graphical effects
+* Written in C for maximal compatibility
+* PC simulator to develop without embedded hardware
+* Tutorials, examples, themes for rapid development
+* Advanced support and professional GUI development service
+* Documentation and API references online
+* Free and open source under MIT licence
 
 ## Porting
 In the most sime case you need 4 things:
