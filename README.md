@@ -11,6 +11,7 @@ Homepage: http://www.gl.littlev.hu
 * [Porting](#porting)
 * [Project set-up](#project-set-up)
 * [PC simulator](#pc-simulator)
+* [Screenshots](#screenshots)
 * [Contributing](#contributing)
 * [Donate](#donate)
 
@@ -59,6 +60,12 @@ For more information visit http://www.gl.littlev.hu/porting
 If you don't have got an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) to emulate a display on your monitor and a touch pad with your mouse.
 
 There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/pc_simulator
+
+## Screenshots
+![TFT material](http://www.gl.littlev.hu/github_res/tft_material.png)
+![TFT zen](http://www.gl.littlev.hu/github_res/tft_zen.png)
+![TFT alien](http://www.gl.littlev.hu/github_res/tft_alien.png)
+![TFT night](http://www.gl.littlev.hu/github_res/tft_night.png)
 
 ## Contributing
 See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md)
