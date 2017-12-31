@@ -39,7 +39,7 @@ In the most sime case you need 4 things:
 3. Register a function which can **read an input device**. (E.g. touch pad)
 4. Call `lv_task_handler()` periodically in every few milliseconds ()
 
-For more information visit http://www.gl.littlev.hu/porting
+For more information visit https://littlevgl.com/porting
  
 ## Project set-up
 1. **Clone** or download the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
