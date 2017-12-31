@@ -16,9 +16,9 @@ Homepage: https://littlevgl.com
 * [Donate](#donate)
 
 ## Key features
-* Powerful building: blocks buttons, charts, lists, sliders, images etc
+* Powerful building blocks buttons, charts, lists, sliders, images etc
 * Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
-* Various input: devices touch pad, mouse, keyboard and external buttons
+* Various input devices touch pad, mouse, keyboard, encoder etc
 * Multi language support with UTF-8 decoding
 * Fully customizable graphical elements
 * Hardware independent to use with any microcontroller or display
@@ -26,11 +26,11 @@ Homepage: https://littlevgl.com
 * OS, External memory and GPU supported but not required
 * Single frame buffer operation even with advances graphical effects
 * Written in C for maximal compatibility
-* PC simulator to develop without embedded hardware
+* Simulator to develop on PC without embedded hardware
 * Tutorials, examples, themes for rapid development
 * Advanced support and professional GUI development service
 * Documentation and API references online
-* Free and open source under MIT licence
+* Free and open-source under MIT licence
 
 ## Porting
 In the most sime case you need 4 things:
@@ -69,7 +69,7 @@ There is a pre-configured PC project for **Eclipse CDT** in this repository: htt
 See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md)
 
 ## Donate
-If you are pleased with the graphics library and found it useful please support its further development:
+If you are pleased with the graphics library, found it useful or be happy with the support you got, please help its further development:
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GJV3SC5EHDANS)
 
