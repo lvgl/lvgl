@@ -574,6 +574,7 @@ void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t 
 
     /*Make the correction on lie width*/
 	width = ((style->line.width - 1) * width_corr_array[wcor]) >> LINE_WIDTH_CORR_SHIFT;
+	width = width << LV_ANTIALIAS;
 	width_half = width >> 1;
 	width_1 = width & 0x1 ? 1 : 0;
 

@@ -267,7 +267,7 @@ static void lmeter_init(void)
 
     lv_style_copy(&lmeter, &def);
     lmeter.line.color = LV_COLOR_HEX3(0xddd);
-    lmeter.line.width = 3;
+    lmeter.line.width = 2;
     lmeter.body.main_color = lv_color_hsv_to_rgb(_hue, 80, 70);
     lmeter.body.grad_color = lmeter.body.main_color;
     lmeter.body.padding.hor = LV_DPI / 8;
@@ -283,10 +283,10 @@ static void gauge_init(void)
 
     lv_style_copy(&gauge, &def);
     gauge.line.color = lv_color_hsv_to_rgb(_hue, 50, 70);
-    gauge.line.width = 3;
+    gauge.line.width = 2;
     gauge.body.main_color = LV_COLOR_HEX3(0x999);
     gauge.body.grad_color = gauge.body.main_color;
-    gauge.body.padding.hor = LV_DPI / 6;
+    gauge.body.padding.hor = LV_DPI / 12;
     gauge.body.border.color = LV_COLOR_HEX3(0x666);     /*Needle middle color*/
 
     theme.gauge = &gauge;

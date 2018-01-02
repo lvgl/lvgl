@@ -256,7 +256,7 @@ static void lmeter_init(void)
     lmeter_bg.body.padding.inner = LV_DPI / 10;         /*Text padding*/
     lmeter_bg.body.border.color = LV_COLOR_HEX3(0x333);
     lmeter_bg.line.color = LV_COLOR_HEX3(0x555);
-    lmeter_bg.line.width = 2 << LV_ANTIALIAS;
+    lmeter_bg.line.width = 2;
     lmeter_bg.text.color = LV_COLOR_HEX3(0xddd);
 
     theme.lmeter = &lmeter_bg;
@@ -271,7 +271,7 @@ static void gauge_init(void)
     gauge_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 70);
     gauge_bg.body.grad_color = gauge_bg.body.main_color;
     gauge_bg.line.color = lv_color_hsv_to_rgb(_hue, 80, 75);
-    gauge_bg.line.width = 3;
+    gauge_bg.line.width = 2;
     gauge_bg.text.color = LV_COLOR_HEX3(0xddd);
 
     theme.gauge = &gauge_bg;

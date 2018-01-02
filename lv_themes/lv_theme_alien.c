@@ -371,7 +371,7 @@ static void gauge_init(void)
     gauge_bg.body.padding.inner = LV_DPI / 8;      /*Label - scale distance*/
     gauge_bg.body.border.color = LV_COLOR_HEX3(0x777);
     gauge_bg.line.color = lv_color_hsv_to_rgb(_hue, 80, 75);
-    gauge_bg.line.width = 3;
+    gauge_bg.line.width = 2;
     gauge_bg.text.color = lv_color_hsv_to_rgb(_hue, 10, 90);
     gauge_bg.text.font = _font;
 

@@ -191,7 +191,7 @@ static void gauge_init(void)
     static lv_style_t gauge;
     lv_style_copy(&gauge, &lmeter);
     gauge.line.color = lmeter.body.grad_color;
-    gauge.line.width = 3;
+    gauge.line.width = 2;
     gauge.body.main_color = LV_COLOR_HEX3(0x888);
     gauge.body.grad_color = lmeter.body.main_color;
     gauge.text.color = LV_COLOR_HEX3(0x888);
