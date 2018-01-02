@@ -76,7 +76,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_REL] = &lv_style_btn_rel;
     ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_pr;
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
-    ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_tgl_pr;
+    ext->styles_btn[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
     ext->anim_time = LV_LIST_FOCUS_TIME;
 
@@ -149,7 +149,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 	/*Create a list element with the image an the text*/
 	lv_obj_t * liste;
 	liste = lv_btn_create(list, NULL);
-	lv_btn_set_style(liste, LV_BTN_STYLE_REL, ext->styles_btn[LV_BTN_STATE_REL]);
+
+    /*Set the default styles*/
+    lv_btn_set_style(liste, LV_BTN_STYLE_REL, ext->styles_btn[LV_BTN_STATE_REL]);
     lv_btn_set_style(liste, LV_BTN_STYLE_PR, ext->styles_btn[LV_BTN_STATE_PR]);
     lv_btn_set_style(liste, LV_BTN_STYLE_TGL_REL, ext->styles_btn[LV_BTN_STATE_TGL_REL]);
     lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STATE_TGL_PR]);
@@ -500,7 +502,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             btn = get_next_btn(list, btn);
         }
         if(btn_prev != NULL) {
-            lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+            lv_btn_set_state(btn_prev, LV_BTN_STATE_TGL_REL);
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
@@ -508,7 +510,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         lv_obj_t * btn = NULL;
         btn = get_next_btn(list, btn);
         while(btn != NULL) {
-            if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+            if(lv_btn_get_state(btn) == LV_BTN_STATE_TGL_REL) break;
             btn = get_next_btn(list, btn);
         }
 
