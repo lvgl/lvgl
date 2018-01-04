@@ -52,6 +52,16 @@ lv_group_t * lv_group_create(void)
 }
 
 /**
+ * Delete a group object
+ * @param group pointer to a group
+ */
+void lv_group_del(lv_group_t * group)
+{
+    lv_ll_clear(&(group->obj_ll));
+    lv_mem_free(group);
+}
+
+/**
  * Add an object to a group
  * @param group pointer to a group
  * @param obj pointer to an object to add
@@ -83,8 +93,8 @@ void lv_group_remove_obj(lv_obj_t * obj)
     LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             lv_ll_rem(&g->obj_ll, i);
+            lv_mem_free(i);
             obj->group_p = NULL;
-            break;
         }
     }
 
