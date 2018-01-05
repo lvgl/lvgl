@@ -285,7 +285,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
         return LV_FS_RES_NOT_EX;
     }
     
-    rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->file_size);
+    rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->rddir_size);
     if(rddir_p->dir_d == NULL) {   
         rddir_p->dir_d = NULL;
         return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
