@@ -196,10 +196,11 @@ lv_fs_res_t lv_ufs_close (void * file_p)
 lv_fs_res_t lv_ufs_remove(const char * fn)
 {
     lv_ufs_ent_t* ent = lv_ufs_ent_get(fn);
+    if(ent == NULL) return LV_FS_RES_DENIED;	/*File not exists*/
     
     /*Can not be deleted is opened*/
     if(ent->oc != 0) return LV_FS_RES_DENIED;
-    
+
     lv_ll_rem(&file_ll, ent);
     lv_mem_free(ent->fn_d);
     ent->fn_d = NULL;
