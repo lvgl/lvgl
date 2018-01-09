@@ -106,12 +106,23 @@ void lv_inv_area(const lv_area_t * area_p)
     	com_area.y2 = com_area.y2 | 0x1;
 #endif
 
+#if LV_INV_FULL_ROW == 1
+		/*Extend invalid area to be as wide as the screen*/
+		com_area.x1 = 0;
+		com_area.x2 = LV_HOR_RES-1;
+#endif
+
+#if LV_INV_FULL_COL == 1
+		/*Extend invalid area to be as tall as the screen*/
+		com_area.y1 = 0;
+		com_area.y2 = LV_VER_RES-1;
+#endif
+		
     	/*Save only if this area is not in one of the saved areas*/
     	uint16_t i;
     	for(i = 0; i < inv_buf_p; i++) {
     	    if(lv_area_is_in(&com_area, &inv_buf[i].area) != false) return;
     	}
-
 
         /*Save the area*/
     	if(inv_buf_p < LV_INV_FIFO_SIZE) {

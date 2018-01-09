@@ -62,6 +62,8 @@
 /*Screen refresh settings*/
 #define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
 #define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
+#define LV_INV_FULL_ROW     0     /*1: Force invalid areas to be as wide as the screen*/
+#define LV_INV_FULL_COL     0     /*1: Force invalid areas to be as tall as the screen*/
 
 /*=================
    Misc. setting
