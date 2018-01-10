@@ -138,7 +138,7 @@ static inline uint16_t lv_roller_get_selected(lv_obj_t *roller)
  */
 static inline void lv_roller_get_selected_str(lv_obj_t * roller, char * buf)
 {
-    lv_roller_get_selected_str(roller, buf);
+    lv_ddlist_get_selected_str(roller, buf);
 }
 
 /**
