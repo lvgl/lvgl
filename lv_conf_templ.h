@@ -9,6 +9,15 @@
 #define LV_CONF_H
 
 /*----------------
+ * Compiler attribute
+ *----------------*/
+/*
+ * Some Architecture can be customized, like put function or variable
+ * to a specific memory segment.
+ */
+#define LV_TICK_ATTRIBUTE       /* Define a custom attribute to Tick function */
+
+/*----------------
  * Dynamic memory
  *----------------*/
 /*
