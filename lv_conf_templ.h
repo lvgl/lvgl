@@ -9,15 +9,6 @@
 #define LV_CONF_H
 
 /*----------------
- * Compiler attribute
- *----------------*/
-/*
- * Some Architecture can be customized, like put function or variable
- * to a specific memory segment.
- */
-#define LV_TICK_ATTRIBUTE       /* Define a custom attribute to Tick function */
-
-/*----------------
  * Dynamic memory
  *----------------*/
 /*
@@ -98,6 +89,10 @@
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
 #define USE_LV_GPU              1               /*1: Enable GPU interface*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
+
+/*Compiler attributes*/
+#define LV_ATTRIBUTE_TICK_INC                /* Define a custom attribute to tick increment function */
+#define LV_ATTRIBUTE_TASK_HANDLE             /* Define a custom attribute to task handle function */
 
 /*================
  *  THEME USAGE

@@ -40,7 +40,7 @@ static volatile uint8_t tick_irq_flag;
  * You have to call this function periodically
  * @param tick_period the call period of this function in milliseconds
  */
-inline void LV_TICK_ATTRIBUTE lv_tick_inc(uint32_t tick_period)
+inline void LV_ATTRIBUTE_TICK_INC lv_tick_inc(uint32_t tick_period)
 {
     tick_irq_flag = 0;
     sys_time += tick_period;
