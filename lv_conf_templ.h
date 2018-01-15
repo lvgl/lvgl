@@ -92,7 +92,7 @@
 
 /*Compiler attributes*/
 #define LV_ATTRIBUTE_TICK_INC                /* Define a custom attribute to tick increment function */
-#define LV_ATTRIBUTE_TASK_HANDLE             /* Define a custom attribute to task handle function */
+#define LV_ATTRIBUTE_TASK_HANDLER             /* Define a custom attribute to task handler function */
 
 /*================
  *  THEME USAGE

@@ -55,7 +55,7 @@ void lv_task_init(void)
 /**
  * Call it  periodically to handle lv_tasks.
  */
-inline void LV_ATTRIBUTE_TASK_HANDLE lv_task_handler(void)
+inline void LV_ATTRIBUTE_TASK_HANDLER lv_task_handler(void)
 {
     static uint32_t idle_period_start = 0;
     static uint32_t handler_start = 0;
