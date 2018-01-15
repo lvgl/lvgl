@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include "lv_task.h"
 #include "../lv_hal/lv_hal_tick.h"
+#include "../../lv_conf.h"
 
 /*********************
  *      DEFINES
