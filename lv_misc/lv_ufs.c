@@ -8,6 +8,7 @@
  *      INCLUDES
  *********************/
 #include "../../lv_conf.h"
+#if USE_LV_FILESYSTEM
 #include "lv_ufs.h"
 #include "lv_ll.h"
 #include <string.h>
@@ -499,4 +500,6 @@ static lv_ufs_ent_t* lv_ufs_ent_new(const char * fn)
     
     return new_ent;
 }
+
+#endif /*USE_LV_FILESYSTEM*/
 

@@ -15,6 +15,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../../lv_conf.h"
+
+#if USE_LV_FILESYSTEM
+
 #include <stdbool.h>
 #include "lv_fs.h"
 #include "lv_mem.h"
@@ -196,6 +200,8 @@ lv_fs_res_t lv_ufs_free (uint32_t * total_p, uint32_t * free_p);
 /**********************
  *      MACROS
  **********************/
+
+#endif /*USE_LV_FILESYSTEM*/
 
 #ifdef __cplusplus
 } /* extern "C" */
