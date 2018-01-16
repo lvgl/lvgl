@@ -19,6 +19,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_ATTRIBUTE_TICK_INC
+#define LV_ATTRIBUTE_TICK_INC
+#endif
 
 /**********************
  *      TYPEDEFS
