@@ -45,8 +45,10 @@ static bool lv_ta_design(lv_obj_t * ta, const lv_area_t * mask, lv_design_mode_t
 static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
 static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
+#if USE_LV_ANIMATION
 static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
 static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x);
+#endif
 static void pwd_char_hider(lv_obj_t * ta);
 
 /**********************
@@ -987,6 +989,8 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     return res;
 }
 
+#if USE_LV_ANIMATION
+
 /**
  * Called to blink the cursor
  * @param ta pointer to a text area
@@ -1017,6 +1021,8 @@ static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x)
     (void)ta;
     (void)x;
 }
+
+#endif
 
 /**
  * Hide all characters (convert them to '*')
