@@ -9,11 +9,22 @@ Here are ideas which are not assigned to a minor version yet:
 - label: add a horzintal line (e.g. underline or line through).
 - lv_split: new object type, a hor. or ver. line for decoration purpose
 - lv_valset: new object type, a label with "+" and "-" buttons
-- lv_form: new object type, form field with place holder text 
 - lv_listctrl: new object type, a list various controls on th right (sw, cb erc.)
-- lv_inlist: new ibject type, inline drop down list (different open/closed style)
+- lv_inlist: new object type, inline drop down list (a button wich opens a list in place)
+- lv_char: new_object type: characteristic set (like chart with draggable points)
+- lv_vol: new_object type: volume meter (like a bar with segments)
 - anim. paths: monentum (tnh(x)), curve (exp), shake
 - hover, hover_lost signals
+
+## v5.1 (released at: in progress)
+- [ ] Lua interface to craete GUI with script
+- [ ] Font handling extension for effective Chiese font handling (cutsom read functions)
+- [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
+- [ ] lv_img_set_data() for const. image data instead of file system usage
+- [ ] Arabic glyph convert (based on letter position)
+- [ ] Right-to-left write support 
+- [ ] Detached area (for video rendering where LittlevGL don't put pixels) 
+- [ ] lv_ta: add placeholder text
 
 ## v5.0 (released at: 20.12.2017)
 - [x] UTF-8 support
