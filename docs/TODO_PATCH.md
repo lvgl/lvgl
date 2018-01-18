@@ -15,6 +15,7 @@ Please create an issue to introduce a bug instead of adding pull request to this
 - [x] lv_roller: lv_roller_get_selected_str: bugfix (was recursive call)
 - [x] lv_obj_get_style: with NULL style check if the parent is focused and use the focused style
 - [x] lv_roller: add missing action handling
+- [ ] Set 24 bit colors upper byte (alpha) to 0xFF
 
 ## v5.0.1 (released at: 02.01.2018)
 - [x] lv_list: fixed when mouse and keyboard used together
