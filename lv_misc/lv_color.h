@@ -95,6 +95,7 @@ typedef union
         uint8_t blue;
         uint8_t green;
         uint8_t red;
+        uint8_t alpha;
     };
     uint32_t full;
 }lv_color24_t;
@@ -221,18 +222,20 @@ static inline uint32_t lv_color_to24(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
     if(color.full == 0) return 0;
-    else return 0xFFFFFF;
+    else return 0xFFFFFFFF;
 #elif LV_COLOR_DEPTH == 8
     lv_color24_t ret;
     ret.red = color.red * 36;        /*(2^8 - 1)/(2^3 - 1) = 255/7 = 36*/
     ret.green = color.green * 36;    /*(2^8 - 1)/(2^3 - 1) = 255/7 = 36*/
-    ret.blue = color.blue * 85;     /*(2^8 - 1)/(2^2 - 1) = 255/3 = 85*/
+    ret.blue = color.blue * 85;      /*(2^8 - 1)/(2^2 - 1) = 255/3 = 85*/
+    ret.alpha = 0xFF;
     return ret.full;
 #elif LV_COLOR_DEPTH == 16
     lv_color24_t ret;
     ret.red = color.red * 8;       /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
     ret.green = color.green * 4;   /*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
     ret.blue = color.blue * 8;     /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.alpha = 0xFF;
     return ret.full;
 #elif LV_COLOR_DEPTH == 24
     return color.full;
@@ -271,7 +274,7 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #elif LV_COLOR_DEPTH == 16
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8 >> 3, g8 >> 2, r8 >> 3}})
 #elif LV_COLOR_DEPTH == 24
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8, g8, r8}})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8, g8, r8, 0xff}})            /*Fix 0xff alpha*/
 #endif
 #else
 #if LV_COLOR_DEPTH == 1
@@ -281,7 +284,7 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #elif LV_COLOR_DEPTH == 16
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{r8 >> 3, g8 >> 2, b8 >> 3}})
 #elif LV_COLOR_DEPTH == 24
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{r8, g8, b8}})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{0xff, r8, g8, b8}})            /*Fix 0xff alpha*/
 #endif
 #endif
 
