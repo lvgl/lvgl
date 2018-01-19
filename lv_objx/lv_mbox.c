@@ -198,9 +198,9 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t time)
  */
 void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 {
+#if USE_LV_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-#if USE_LV_ANIMATION
     if(ext->anim_time != 0) {
         /*Add shrinking animations*/
         lv_obj_animate(mbox, LV_ANIM_GROW_H| LV_ANIM_OUT, ext->anim_time, delay, NULL);

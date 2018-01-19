@@ -188,7 +188,7 @@
 #define LV_LABEL_SCROLL_SPEED       25     /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 
-/*Image (dependencies: lv_label*/
+/*Image (dependencies: lv_label, lv_filesystem*/
 #define USE_LV_IMG      1
 
 /*Line (dependencies: -*/
@@ -252,7 +252,7 @@
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
 
-/*Keyboard (dependencies: lv_btnm)*/
+/*Keyboard (dependencies: lv_btnm, lv_ta)*/
 #define USE_LV_KB       1
 
 /*Check box (dependencies: lv_btn, lv_label)*/
