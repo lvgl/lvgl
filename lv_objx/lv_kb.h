@@ -16,6 +16,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #if USE_LV_KB != 0
 
+/*Testing of dependencies*/
+#if USE_LV_BTNM == 0
+#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (USE_LV_BTNM  1) "
+#endif
+
+#if USE_LV_TA == 0
+#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (USE_LV_TA  1) "
+#endif
+
 #include "../lv_core/lv_obj.h"
 #include "lv_btnm.h"
 

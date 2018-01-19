@@ -16,6 +16,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #if USE_LV_SLIDER != 0
 
+/*Testing of dependencies*/
+#if USE_LV_BAR == 0
+#error "lv_slider: lv_bar is required. Enable it in lv_conf.h (USE_LV_BAR  1) "
+#endif
+
 #include "../lv_core/lv_obj.h"
 #include "lv_bar.h"
 

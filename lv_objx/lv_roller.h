@@ -16,6 +16,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #if USE_LV_ROLLER != 0
 
+/*Testing of dependencies*/
+#if USE_LV_DDLIST == 0
+#error "lv_roller: lv_ddlist is required. Enable it in lv_conf.h (USE_LV_DDLIST  1) "
+#endif
+
 #include "../lv_core/lv_obj.h"
 #include "lv_ddlist.h"
 

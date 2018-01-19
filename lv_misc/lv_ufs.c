@@ -7,9 +7,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
-#if USE_LV_FILESYSTEM
 #include "lv_ufs.h"
+#if USE_LV_FILESYSTEM
+
 #include "lv_ll.h"
 #include <string.h>
 #include <stdio.h>

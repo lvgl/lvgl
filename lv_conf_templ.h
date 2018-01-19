@@ -204,10 +204,10 @@
 /*Page (dependencies: lv_cont)*/
 #define USE_LV_PAGE     1
 
-/*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
+/*Window (dependencies: lv_btn, lv_label, lv_img, lv_page)*/
 #define USE_LV_WIN      1
 
-/*Tab (dependencies: lv_page, lv_btnm)*/
+/*Tab view (dependencies: lv_page, lv_btnm)*/
 #define USE_LV_TABVIEW      1
 #if USE_LV_TABVIEW != 0
 #define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
@@ -220,7 +220,7 @@
 /*Bar (dependencies: -)*/
 #define USE_LV_BAR      1
 
-/*Line meter (dependencies: *;)*/
+/*Line meter (dependencies: - )*/
 #define USE_LV_LMETER   1
 
 /*Gauge (dependencies:bar, lmeter)*/
@@ -232,7 +232,7 @@
 /*LED (dependencies: -)*/
 #define USE_LV_LED      1
 
-/*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
+/*Message box (dependencies: lv_cont, lv_btnm, lv_label)*/
 #define USE_LV_MBOX     1
 
 /*Text area (dependencies: lv_label, lv_page)*/
