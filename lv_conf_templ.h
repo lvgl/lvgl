@@ -52,12 +52,12 @@
 /* Enable anti-aliasing
  * If enabled everything will be rendered in double size and filtered to normal size.
  * Fonts and Images will be downscaled */
-#define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
+#define LV_ANTIALIAS        0       /*1: Enable anti-aliasing*/
 
 /* Enable anti-aliasing only for fonts (texts)
  * It downscales the fonts to half size so you should use double sized fonts
  * Much faster then normal anti-aliasing  */
-#define LV_FONT_ANTIALIAS   0       /*1: Enable font anti-aliasing*/
+#define LV_FONT_ANTIALIAS   1       /*1: Enable font anti-aliasing*/
 
 /*Screen refresh settings*/
 #define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
@@ -91,7 +91,7 @@
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
 
 /*Compiler attributes*/
-#define LV_ATTRIBUTE_TICK_INC                /* Define a custom attribute to tick increment function */
+#define LV_ATTRIBUTE_TICK_INC                 /* Define a custom attribute to tick increment function */
 #define LV_ATTRIBUTE_TASK_HANDLER             /* Define a custom attribute to task handler function */
 
 /*================
@@ -139,10 +139,10 @@
 #define USE_LV_FONT_SYMBOL_30_FEEDBACK     0
 
 #define USE_LV_FONT_DEJAVU_40              1
-#define USE_LV_FONT_DEJAVU_40_SUP          1
-#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_A  1
-#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_B  1
-#define USE_LV_FONT_DEJAVU_40_CYRILLIC     1
+#define USE_LV_FONT_DEJAVU_40_SUP          0
+#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_A  0
+#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_B  0
+#define USE_LV_FONT_DEJAVU_40_CYRILLIC     0
 #define USE_LV_FONT_SYMBOL_40_BASIC        1
 #define USE_LV_FONT_SYMBOL_40_FILE         1
 #define USE_LV_FONT_SYMBOL_40_FEEDBACK     1
