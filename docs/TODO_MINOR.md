@@ -25,6 +25,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] Right-to-left write support 
 - [ ] Detached area (for video rendering where LittlevGL don't put pixels) 
 - [ ] lv_ta: add placeholder text
+- [ ] lv_ibtn: new object type: an image wich acts as a button (different image for different states)
 
 ## v5.0 (released at: 20.12.2017)
 - [x] UTF-8 support
