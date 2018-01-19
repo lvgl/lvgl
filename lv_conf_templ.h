@@ -52,12 +52,12 @@
 /* Enable anti-aliasing
  * If enabled everything will be rendered in double size and filtered to normal size.
  * Fonts and Images will be downscaled */
-#define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
+#define LV_ANTIALIAS        0       /*1: Enable anti-aliasing*/
 
 /* Enable anti-aliasing only for fonts (texts)
  * It downscales the fonts to half size so you should use double sized fonts
  * Much faster then normal anti-aliasing  */
-#define LV_FONT_ANTIALIAS   0       /*1: Enable font anti-aliasing*/
+#define LV_FONT_ANTIALIAS   1       /*1: Enable font anti-aliasing*/
 
 /*Screen refresh settings*/
 #define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
@@ -89,6 +89,10 @@
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
 #define USE_LV_GPU              1               /*1: Enable GPU interface*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
+
+/*Compiler attributes*/
+#define LV_ATTRIBUTE_TICK_INC                 /* Define a custom attribute to tick increment function */
+#define LV_ATTRIBUTE_TASK_HANDLER             /* Define a custom attribute to task handler function */
 
 /*================
  *  THEME USAGE
@@ -135,10 +139,10 @@
 #define USE_LV_FONT_SYMBOL_30_FEEDBACK     0
 
 #define USE_LV_FONT_DEJAVU_40              1
-#define USE_LV_FONT_DEJAVU_40_SUP          1
-#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_A  1
-#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_B  1
-#define USE_LV_FONT_DEJAVU_40_CYRILLIC     1
+#define USE_LV_FONT_DEJAVU_40_SUP          0
+#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_A  0
+#define USE_LV_FONT_DEJAVU_40_LATIN_EXT_B  0
+#define USE_LV_FONT_DEJAVU_40_CYRILLIC     0
 #define USE_LV_FONT_SYMBOL_40_BASIC        1
 #define USE_LV_FONT_SYMBOL_40_FILE         1
 #define USE_LV_FONT_SYMBOL_40_FEEDBACK     1
@@ -184,7 +188,7 @@
 #define LV_LABEL_SCROLL_SPEED       25     /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 
-/*Image (dependencies: lv_label*/
+/*Image (dependencies: lv_label, lv_filesystem*/
 #define USE_LV_IMG      1
 
 /*Line (dependencies: -*/
@@ -200,10 +204,10 @@
 /*Page (dependencies: lv_cont)*/
 #define USE_LV_PAGE     1
 
-/*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
+/*Window (dependencies: lv_btn, lv_label, lv_img, lv_page)*/
 #define USE_LV_WIN      1
 
-/*Tab (dependencies: lv_page, lv_btnm)*/
+/*Tab view (dependencies: lv_page, lv_btnm)*/
 #define USE_LV_TABVIEW      1
 #if USE_LV_TABVIEW != 0
 #define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
@@ -216,7 +220,7 @@
 /*Bar (dependencies: -)*/
 #define USE_LV_BAR      1
 
-/*Line meter (dependencies: *;)*/
+/*Line meter (dependencies: - )*/
 #define USE_LV_LMETER   1
 
 /*Gauge (dependencies:bar, lmeter)*/
@@ -228,7 +232,7 @@
 /*LED (dependencies: -)*/
 #define USE_LV_LED      1
 
-/*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
+/*Message box (dependencies: lv_cont, lv_btnm, lv_label)*/
 #define USE_LV_MBOX     1
 
 /*Text area (dependencies: lv_label, lv_page)*/
@@ -248,7 +252,7 @@
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
 
-/*Keyboard (dependencies: lv_btnm)*/
+/*Keyboard (dependencies: lv_btnm, lv_ta)*/
 #define USE_LV_KB       1
 
 /*Check box (dependencies: lv_btn, lv_label)*/

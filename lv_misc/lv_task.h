@@ -22,7 +22,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
+#ifndef LV_ATTRIBUTE_TASK_HANDLER
+#define LV_ATTRIBUTE_TASK_HANDLER
+#endif
 /**********************
  *      TYPEDEFS
  **********************/

@@ -52,8 +52,8 @@ void lv_ll_init(lv_ll_t * ll_p, uint32_t n_size)
     ll_p->head = NULL;
     ll_p->tail = NULL;
 
-    if(n_size & 0b11) {
-        n_size &= ~0b11;
+    if(n_size & 0x3) {  /*Round up to 4*/
+        n_size &= ~0x3;
         n_size += 4;
     }
 

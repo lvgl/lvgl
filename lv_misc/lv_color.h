@@ -147,17 +147,17 @@ static inline uint8_t lv_color_to1(lv_color_t color)
 #if LV_COLOR_DEPTH == 1
 	return color.full;
 #elif LV_COLOR_DEPTH == 8
-    if((color.red   & 0b100) ||
-       (color.green & 0b100) ||
-	   (color.blue  & 0b10)) {
+    if((color.red   & 0x4) ||
+       (color.green & 0x4) ||
+	   (color.blue  & 0x2)) {
     	return 1;
     } else {
     	return 0;
     }
 #elif LV_COLOR_DEPTH == 16
-    if((color.red   & 0b10000) ||
-       (color.green & 0b100000) ||
-	   (color.blue  & 0b10000)) {
+    if((color.red   & 0x10) ||
+       (color.green & 0x20) ||
+	   (color.blue  & 0x10)) {
     	return 1;
     } else {
     	return 0;
@@ -261,6 +261,9 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
     return (uint16_t) bright >> 3;
 }
 
+/* The most simple macro to create a color from R,G and B values
+ * The order of bit field is different on Big-endian and Little-endian machines*/
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if LV_COLOR_DEPTH == 1
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){(b8 >> 7 | g8 >> 7 | r8 >> 7)})
 #elif LV_COLOR_DEPTH == 8
@@ -269,6 +272,17 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8 >> 3, g8 >> 2, r8 >> 3}})
 #elif LV_COLOR_DEPTH == 24
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8, g8, r8}})
+#endif
+#else
+#if LV_COLOR_DEPTH == 1
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){(r8 >> 7 | g8 >> 7 | b8 >> 7)})
+#elif LV_COLOR_DEPTH == 8
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{r8 >> 6, g8 >> 5, b8 >> 5}})
+#elif LV_COLOR_DEPTH == 16
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{r8 >> 3, g8 >> 2, b8 >> 3}})
+#elif LV_COLOR_DEPTH == 24
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{r8, g8, b8}})
+#endif
 #endif
 
 #define LV_COLOR_HEX(c) LV_COLOR_MAKE(((uint32_t)((uint32_t)c >> 16) & 0xFF), \

@@ -302,10 +302,10 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
  */
 uint8_t lv_txt_utf8_size(uint8_t c)
 {
-    if((c & 0b10000000) == 0) return 1;
-    else if((c & 0b11100000) == 0b11000000) return 2;
-    else if((c & 0b11110000) == 0b11100000) return 3;
-    else if((c & 0b11111000) == 0b11110000) return 4;
+    if((c & 0x80) == 0) return 1;
+    else if((c & 0xE0) == 0xC0) return 2;
+    else if((c & 0xF0) == 0xE0) return 3;
+    else if((c & 0xF1) == 0xF0) return 4;
     return 0;
 }
 
@@ -381,41 +381,41 @@ uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
     /*Real UTF-8 decode*/
     else {
         /*2 bytes UTF-8 code*/
-        if((txt[*i] & 0b11100000) == 0b11000000) {
-            result = (uint32_t)(txt[*i] & 0b00011111) << 6;
+        if((txt[*i] & 0xE0) == 0xC0) {
+            result = (uint32_t)(txt[*i] & 0x1F) << 6;
             (*i)++;
-            if((txt[*i] & 0b11000000) != 0b10000000) return 0;  /*Invalid UTF-8 code*/
-            result += (txt[*i] & 0b00111111);
-            (*i)++;
-        }
-        /*3 bytes UTF-8 code*/
-        else if((txt[*i] & 0b11110000) == 0b11100000) {
-            result = (uint32_t)(txt[*i] & 0b00001111) << 12;
-            (*i)++;
-
-            if((txt[*i] & 0b11000000) != 0b10000000) return 0;  /*Invalid UTF-8 code*/
-            result += (uint32_t)(txt[*i] & 0b00111111) << 6;
-            (*i)++;
-
-            if((txt[*i] & 0b11000000) != 0b10000000) return 0;  /*Invalid UTF-8 code*/
-            result += (txt[*i] & 0b00111111);
+            if((txt[*i] & 0xC0) != 0x80) return 0;  /*Invalid UTF-8 code*/
+            result += (txt[*i] & 0x3F);
             (*i)++;
         }
         /*3 bytes UTF-8 code*/
-        else if((txt[*i] & 0b11111000) == 0b11110000) {
-            result = (uint32_t)(txt[*i] & 0b00001111) << 18;
+        else if((txt[*i] & 0xF0) == 0xE0) {
+            result = (uint32_t)(txt[*i] & 0x0F) << 12;
             (*i)++;
 
-            if((txt[*i] & 0b11000000) != 0b10000000) return 0;  /*Invalid UTF-8 code*/
-            result += (uint32_t)(txt[*i] & 0b00111111) << 12;
+            if((txt[*i] & 0xC0) != 0x80) return 0;  /*Invalid UTF-8 code*/
+            result += (uint32_t)(txt[*i] & 0x3F) << 6;
             (*i)++;
 
-            if((txt[*i] & 0b11000000) != 0b10000000) return 0;  /*Invalid UTF-8 code*/
-            result += (uint32_t)(txt[*i] & 0b00111111) << 6;
+            if((txt[*i] & 0xC0) != 0x80) return 0;  /*Invalid UTF-8 code*/
+            result += (txt[*i] & 0x3F);
+            (*i)++;
+        }
+        /*4 bytes UTF-8 code*/
+        else if((txt[*i] & 0xF8) == 0xF0) {
+            result = (uint32_t)(txt[*i] & 0x07) << 18;
             (*i)++;
 
-            if((txt[*i] & 0b11000000) != 0b10000000) return 0;  /*Invalid UTF-8 code*/
-            result += (uint32_t)(txt[*i] & 0b00111111) << 6;
+            if((txt[*i] & 0xC0) != 0x80) return 0;  /*Invalid UTF-8 code*/
+            result += (uint32_t)(txt[*i] & 0x3F) << 12;
+            (*i)++;
+
+            if((txt[*i] & 0xC0) != 0x80) return 0;  /*Invalid UTF-8 code*/
+            result += (uint32_t)(txt[*i] & 0x3F) << 6;
+            (*i)++;
+
+            if((txt[*i] & 0xC0) != 0x80) return 0;  /*Invalid UTF-8 code*/
+            result += (uint32_t)(txt[*i] & 0x3F) << 6;
             (*i)++;
         } else {
             (*i)++; /*Not UTF-8 char. Go the next.*/

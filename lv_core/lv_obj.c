@@ -1202,7 +1202,17 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj)
         while(par) {
             if(par->style_p) {
                 if(par->style_p->glass == 0) {
+#if USE_LV_GROUP == 0
                     style_act = par->style_p;
+#else
+                    /*Is a parent is focused then use then focused style*/
+                    lv_group_t *g = lv_obj_get_group(par);
+                    if(lv_group_get_focused(g) == par) {
+                        style_act = lv_group_mod_style(g, par->style_p);
+                    } else {
+                        style_act = par->style_p;
+                    }
+#endif
                     break;
                 }
             }

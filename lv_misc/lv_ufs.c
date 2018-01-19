@@ -7,8 +7,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
 #include "lv_ufs.h"
+#if USE_LV_FILESYSTEM
+
 #include "lv_ll.h"
 #include <string.h>
 #include <stdio.h>
@@ -196,10 +197,11 @@ lv_fs_res_t lv_ufs_close (void * file_p)
 lv_fs_res_t lv_ufs_remove(const char * fn)
 {
     lv_ufs_ent_t* ent = lv_ufs_ent_get(fn);
+    if(ent == NULL) return LV_FS_RES_DENIED;	/*File not exists*/
     
     /*Can not be deleted is opened*/
     if(ent->oc != 0) return LV_FS_RES_DENIED;
-    
+
     lv_ll_rem(&file_ll, ent);
     lv_mem_free(ent->fn_d);
     ent->fn_d = NULL;
@@ -499,4 +501,6 @@ static lv_ufs_ent_t* lv_ufs_ent_new(const char * fn)
     
     return new_ent;
 }
+
+#endif /*USE_LV_FILESYSTEM*/
 

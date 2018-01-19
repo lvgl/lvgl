@@ -27,6 +27,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+#if LV_INDEV_READ_PERIOD != 0
 static void indev_proc_task(void * param);
 static void indev_proc_point(lv_indev_proc_t * indev);
 static void indev_proc_press(lv_indev_proc_t * info);
@@ -34,11 +36,11 @@ static void indev_proc_release(lv_indev_proc_t * state);
 static lv_obj_t * indev_search_obj(const lv_indev_proc_t * indev, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * state);
 static void indev_drag_throw(lv_indev_proc_t * state);
+#endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_task_t *indev_proc_task_p;
 static lv_indev_t *indev_act;
 
 /**********************
@@ -55,9 +57,7 @@ static lv_indev_t *indev_act;
 void lv_indev_init(void)
 {
 #if LV_INDEV_READ_PERIOD != 0
-    indev_proc_task_p = lv_task_create(indev_proc_task, LV_INDEV_READ_PERIOD, LV_TASK_PRIO_MID, NULL);
-#else
-    indev_proc_task_p = lv_task_create(indev_proc_task, 1, LV_TASK_PRIO_OFF); /*Not use lv_indev_proc*/
+    lv_task_create(indev_proc_task, LV_INDEV_READ_PERIOD, LV_TASK_PRIO_MID, NULL);
 #endif
 
     lv_indev_reset(NULL);   /*Reset all input devices*/
@@ -208,6 +208,7 @@ void lv_indev_wait_release(lv_indev_t * indev)
  *   STATIC FUNCTIONS
  **********************/
 
+#if LV_INDEV_READ_PERIOD != 0
 /**
  * Called periodically to handle the input devices
  * @param param unused
@@ -622,3 +623,4 @@ static void indev_drag_throw(lv_indev_proc_t * state)
         drag_obj->signal_func(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
     }
 }
+#endif

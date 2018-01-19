@@ -16,6 +16,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #if USE_LV_ROLLER != 0
 
+/*Testing of dependencies*/
+#if USE_LV_DDLIST == 0
+#error "lv_roller: lv_ddlist is required. Enable it in lv_conf.h (USE_LV_DDLIST  1) "
+#endif
+
 #include "../lv_core/lv_obj.h"
 #include "lv_ddlist.h"
 
@@ -70,6 +75,17 @@ static inline void lv_roller_set_options(lv_obj_t * roller, const char * options
  * @param anim_en true: set with animation; false set immediately
  */
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
+
+
+/**
+ * Set a function to call when a new option is chosen
+ * @param roller pointer to a roller
+ * @param action pointer to a callback function
+ */
+static inline void lv_roller_set_action(lv_obj_t * roller, lv_action_t action)
+{
+    lv_ddlist_set_action(roller, action);
+}
 
 /**
  * Set the height to show the given number of rows (options)
@@ -138,7 +154,7 @@ static inline uint16_t lv_roller_get_selected(lv_obj_t *roller)
  */
 static inline void lv_roller_get_selected_str(lv_obj_t * roller, char * buf)
 {
-    lv_roller_get_selected_str(roller, buf);
+    lv_ddlist_get_selected_str(roller, buf);
 }
 
 /**
