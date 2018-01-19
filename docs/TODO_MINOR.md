@@ -17,6 +17,7 @@ Here are ideas which are not assigned to a minor version yet:
 - hover, hover_lost signals
 
 ## v5.1 (released at: in progress)
+- [x] LV_INV_FULL_ROW and LV_INV_FULL_COL to force full row or column invalidation (refresh)
 - [ ] Lua interface to craete GUI with script
 - [ ] Font handling extension for effective Chiese font handling (cutsom read functions)
 - [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
