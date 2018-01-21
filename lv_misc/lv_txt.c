@@ -415,7 +415,7 @@ uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
             (*i)++;
 
             if((txt[*i] & 0xC0) != 0x80) return 0;  /*Invalid UTF-8 code*/
-            result += (uint32_t)(txt[*i] & 0x3F) << 6;
+            result += txt[*i] & 0x3F;
             (*i)++;
         } else {
             (*i)++; /*Not UTF-8 char. Go the next.*/
