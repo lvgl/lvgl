@@ -15,6 +15,8 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [ ] LV_ANTIALIAS_LINE
 - [ ] LV_ANTIALAIS_RADIUS
 - [ ] LV_ANTIALIAS removal (use other specific anti-alias options)
+- [ ] web based image converter
+- [ ] web based font converter
 
 ## v5 (released at: 20.12.2017)
 **Architectural changes**
