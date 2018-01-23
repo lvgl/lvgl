@@ -4,14 +4,13 @@ Major versions released typically when API changes are required
 ## Contributing
 Please create an issue to suggest a new feature instead of adding pull request to this file.
 
-
 ## v6 (released at: in progrss)
-- [ ] Add the basc functions (e.g. lv_obj_set_width) to very object type as inline
+- [ ] Add the basic functions (e.g. lv_obj_set_width) to every object type as inline
 - [ ] Image storage with header (#65)
 - [ ] Font anti-alias: use 1 bit and grayscale fonts too (better result then downscaling)
-- [ ] LV_ANTIALAIAS_FONT reomval (use other font instead)
+- [ ] LV_ANTIALIAS_FONT removal (use other font instead)
 - [ ] Store image anti-alias in header
-- [ ] lv_img_upscale removal (Generate image with anti-alias flag)
+- [ ] lv_img_upscale removal (generate image with anti-alias flag instead)
 - [ ] LV_ANTIALIAS_LINE
 - [ ] LV_ANTIALAIS_RADIUS
 - [ ] LV_ANTIALIAS removal (use other specific anti-alias options)
