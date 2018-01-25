@@ -514,7 +514,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-	uint8_t i;
+	uint16_t i;
 	lv_point_t p1;
 	lv_point_t p2;
 	lv_coord_t w = lv_obj_get_width(chart);
@@ -562,7 +562,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-	uint8_t i;
+	uint16_t i;
 	lv_area_t cir_a;
 	lv_coord_t w = lv_obj_get_width(chart);
 	lv_coord_t h = lv_obj_get_height(chart);
@@ -611,7 +611,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-	uint8_t i;
+	uint16_t i;
 	lv_area_t col_a;
 	lv_area_t col_mask;
 	bool mask_ret;
