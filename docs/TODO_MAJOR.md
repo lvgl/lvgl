@@ -4,6 +4,19 @@ Major versions released typically when API changes are required
 ## Contributing
 Please create an issue to suggest a new feature instead of adding pull request to this file.
 
+## v6 (released at: in progrss)
+- [ ] Add the basic functions (e.g. lv_obj_set_width) to every object type as inline
+- [ ] Image storage with header (#65)
+- [ ] Font anti-alias: use 1 bit and grayscale fonts too (better result then downscaling)
+- [ ] LV_ANTIALIAS_FONT removal (use other font instead)
+- [ ] Store image anti-alias in header
+- [ ] lv_img_upscale removal (generate image with anti-alias flag instead)
+- [ ] LV_ANTIALIAS_LINE
+- [ ] LV_ANTIALAIS_RADIUS
+- [ ] LV_ANTIALIAS removal (use other specific anti-alias options)
+- [ ] web based image converter
+- [ ] web based font converter
+
 ## v5 (released at: 20.12.2017)
 **Architectural changes**
 - [x] Rename repository from *proj_pc* to *pc_simulator*
