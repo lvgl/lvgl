@@ -1,12 +1,13 @@
 # TODOs for patch versions
 Patch versions (x.y.1, x.y.2) contain bugfixes without changing the API but they can apppear in minor (x.1.0, x.2.0) or major (1.0.0, 2.0.0) versions too.
 
-Bugfixes are done in `bugfix` branche.
-
 The bugfixes of the still not released version are in `beta` branche.
 
 ## Contributing
 Please create an issue to introduce a bug instead of adding pull request to this file.
+
+## v5.0.3 (in progress)
+- [x] lv_chart: Fix the use of point_num more then 256 (Thanks to upbeat27) 
 
 ## v5.0.2 (released at: 19.01.2018)
 - [x] Fix dependencied (Thanks to Zaltora)
