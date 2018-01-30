@@ -310,14 +310,18 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
     lv_color_t recolor;
     lv_coord_t letter_w;
 
+    lv_coord_t x_ofs = 0;
+    lv_coord_t y_ofs = 0;
     if(offset != NULL) {
-        pos.y += offset->y;
+        x_ofs = offset->x << LV_ANTIALIAS << LV_FONT_ANTIALIAS;
+        y_ofs = offset->y << LV_ANTIALIAS << LV_FONT_ANTIALIAS;
+        pos.y += y_ofs;
     }
 
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
         if(offset != NULL) {
-            pos.x += offset->x;
+            pos.x += x_ofs;
         }
         /*Write all letter of a line*/
         cmd_state = CMD_STATE_WAIT;
@@ -369,7 +373,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
             pos.x += letter_w + (style->text.letter_space << LV_AA);
             /* Round error occurs in x position
              * When odd widths are scaled down the last 1 is lost. So the letters seems shorter.
-             * Now calculate according to is to be consequent  */
+             * Now calculate according to it to be consequent  */
             if(letter_w & 0x01) pos.x--;
         }
         /*Go to next line*/

@@ -125,13 +125,6 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
 
 /**
- * Set the control button size of a window
- * @param win pointer to a window object
- * @param size control button size
- */
-void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
-
-/**
  * Set the scroll bar mode of a window
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
