@@ -515,7 +515,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(ext->sel_opt_id + 1 < ext->option_cnt) {
                 ext->sel_opt_id ++;
-                lv_obj_invalidate(ddlist);
+                lv_ddlist_pos_current_option(ddlist);
                 if(ext->action != NULL) {
                     ext->action(ddlist);
                 }
@@ -523,7 +523,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             if(ext->sel_opt_id > 0) {
                 ext->sel_opt_id --;
-                lv_obj_invalidate(ddlist);
+                lv_ddlist_pos_current_option(ddlist);
                 if(ext->action != NULL) {
                     ext->action(ddlist);
                 }
