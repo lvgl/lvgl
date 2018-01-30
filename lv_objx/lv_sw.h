@@ -17,7 +17,7 @@ extern "C" {
 #if USE_LV_SW != 0
 
 /*Testing of dependencies*/
-#if USE_LV_SW == 0
+#if USE_LV_SLIDER == 0
 #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (USE_LV_SLIDER  1)"
 #endif
 
