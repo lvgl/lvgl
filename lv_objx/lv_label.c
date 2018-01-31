@@ -309,6 +309,10 @@ void lv_label_set_anim_speed(lv_obj_t *label, uint16_t anim_speed)
 {
     lv_label_ext_t *ext = lv_obj_get_ext_attr(label);
     ext->anim_speed = anim_speed;
+
+    if(ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+        lv_label_refr_text(label);
+    }
 }
 
 /*=====================
@@ -745,7 +749,6 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.act_time = 0;
             anim.end_cb = NULL;
             anim.path = lv_anim_path_linear;
-            anim.time = 3000;
             anim.playback_pause = (((lv_font_get_width_scale(style->text.font, ' ') + style->text.letter_space) * 1000) /ext->anim_speed)
                                      * ANIM_WAIT_CHAR_COUNT;
             anim.repeat_pause = anim.playback_pause;
@@ -782,7 +785,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         if(size.x > lv_obj_get_width(label)) {
             anim.end = lv_obj_get_width(label) - size.x - lv_font_get_width_scale(font, ' ');
             anim.fp = (lv_anim_fp_t) lv_label_set_offset_x;
-            anim.time = lv_anim_speed_to_time(LV_LABEL_SCROLL_SPEED, anim.start, anim.end);
+            anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
             hor_anim = true;
         } else {
