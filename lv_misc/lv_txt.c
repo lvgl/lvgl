@@ -305,7 +305,7 @@ uint8_t lv_txt_utf8_size(uint8_t c)
     if((c & 0x80) == 0) return 1;
     else if((c & 0xE0) == 0xC0) return 2;
     else if((c & 0xF0) == 0xE0) return 3;
-    else if((c & 0xF1) == 0xF0) return 4;
+    else if((c & 0xF8) == 0xF0) return 4;
     return 0;
 }
 
