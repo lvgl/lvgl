@@ -13,20 +13,31 @@ Here are ideas which are not assigned to a minor version yet:
 - lv_inlist: new object type, inline drop down list (a button wich opens a list in place)
 - lv_char: new_object type: characteristic set (like chart with draggable points)
 - lv_vol: new_object type: volume meter (like a bar with segments)
-- anim. paths: monentum (tnh(x)), curve (exp), shake
-- hover, hover_lost signals
+- Anim. paths: monentum (tnh(x)), curve (exp), shake
+- Hover, hover_lost signals
+- Detached area (for video rendering where LittlevGL don't put pixels) 
+- lv_ta: add placeholder text
 
-## v5.1 (released at: in progress)
-- [x] LV_INV_FULL_ROW and LV_INV_FULL_COL to force full row or column invalidation (refresh)
+
+## v5.2 (planned)
 - [ ] Lua interface to craete GUI with script
-- [ ] Font handling extension for effective Chiese font handling (cutsom read functions)
-- [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
-- [ ] lv_img_set_data() for const. image data instead of file system usage
 - [ ] Arabic glyph convert (based on letter position)
 - [ ] Right-to-left write support 
-- [ ] Detached area (for video rendering where LittlevGL don't put pixels) 
-- [ ] lv_ta: add placeholder text
-- [ ] lv_ibtn: new object type: an image wich acts as a button (different image for different states)
+- [ ] Bit based VDB: 1, 2 or 4 bit
+- [ ] lv_icon: new object type: an image wich acts as a button (different image for different states)
+- [ ] triangle drawing
+
+## v5.1 (released at: in progress)
+- [ ] lv_refr_set_roundig_callback: set a sunction modify the invalidated area for speciel diplay controllers
+- [ ] lv_group_set_focus_callback: set function to call when a new object is focused
+- [ ] lv_obj_get_type() return string, e.g. "lv_slider", "lv_btn" etc
+- [ ] Font handling extension for effective Chiese font handling (cutsom read functions)
+- [ ] Remove LV_FONT_ANTIALIAS and add fonts with BPP (bit-per-pixel): 1, 2, 4 and 8
+- [ ] lv_img: add pixel level opacity option (ARGB8888 or ARGB8565) (make image upscale pointless)
+- [ ] LV_ANTIALIAS rework: meaning anti-alias lines and curves
+- [ ] Merge symbol fonts (basic, file and feedback) into one font
+- [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
+- [ ] lv_img_set_data() for const. image data instead of file system usage
 
 ## v5.0 (released at: 20.12.2017)
 - [x] UTF-8 support
