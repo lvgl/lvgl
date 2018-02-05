@@ -203,11 +203,30 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
 void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p, 
                      const lv_font_t * font_p, uint32_t letter,
                      lv_color_t color, lv_opa_t opa)
-{      
+{
+
+    static uint8_t bpp1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
+    static uint8_t bpp2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
+    static uint8_t bpp4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
+                                        68,  85,  102, 119,
+                                        136, 153, 170, 187,
+                                        204, 221, 238, 255};
+
     if(font_p == NULL) return;
 
     uint8_t letter_w = lv_font_get_width(font_p, letter);
     uint8_t letter_h = lv_font_get_height(font_p);
+    uint8_t bpp = font_p->bpp;  /*Bit per pixel (1,2 or 4)*/
+    uint8_t *bpp_opa_table;                /*Value per pixel (1, 4 or 16)*/
+    uint8_t mask_init;
+    uint8_t mask;
+
+    switch(bpp) {
+        case 1: bpp_opa_table = bpp1_opa_table;  mask_init = 0x80; break;
+        case 2: bpp_opa_table = bpp2_opa_table;  mask_init = 0xC0; break;
+        case 4: bpp_opa_table = bpp4_opa_table;  mask_init = 0xF0; break;
+        default: return;        /*Invalid bpp. Can't render the letter*/
+    }
 
     const uint8_t * map_p = lv_font_get_bitmap(font_p, letter);
 
@@ -223,15 +242,17 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     lv_coord_t col, row;
     uint8_t col_bit;
     uint8_t col_byte_cnt;
-    uint8_t width_byte = letter_w >> 3;    /*Width in bytes (e.g. w = 11 -> 2 bytes wide)*/
-    if(letter_w & 0x7) width_byte++;
+    uint8_t width_byte_scr = letter_w >> 3;      /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
+    if(letter_w & 0x7) width_byte_scr++;
+    uint8_t width_byte_bpp = (letter_w * bpp) >> 3;    /*Width in bytes in the font (e.g. w = 11 -> 2 bytes wide)*/
+    if((letter_w * bpp) & 0x7) width_byte_bpp++;
 
     /* Calculate the col/row start/end on the map
-     * If font anti alaiassing is enabled use the reduced letter sizes*/
+     * If font anti aliasing is enabled use the reduced letter sizes*/
     lv_coord_t col_start = pos_p->x > mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
-    lv_coord_t col_end = pos_p->x + (letter_w >> LV_FONT_ANTIALIAS) < mask_p->x2 ? (letter_w >> LV_FONT_ANTIALIAS) : mask_p->x2 - pos_p->x + 1;
+    lv_coord_t col_end = pos_p->x + letter_w < mask_p->x2 ? letter_w : mask_p->x2 - pos_p->x + 1;
     lv_coord_t row_start = pos_p->y > mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
-    lv_coord_t row_end  = pos_p->y + (letter_h >> LV_FONT_ANTIALIAS) < mask_p->y2 ? (letter_h >> LV_FONT_ANTIALIAS) : mask_p->y2 - pos_p->y + 1;
+    lv_coord_t row_end  = pos_p->y + letter_h < mask_p->y2 ? letter_h : mask_p->y2 - pos_p->y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
     vdb_buf_tmp += ((pos_p->y - vdb_p->area.y1) * vdb_width)
@@ -241,78 +262,36 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
-    map_p += ((row_start << LV_FONT_ANTIALIAS) * width_byte) + ((col_start << LV_FONT_ANTIALIAS) >> 3);
+    map_p += (row_start * width_byte_bpp) + ((col_start * bpp) >> 3);
 
-#if LV_FONT_ANTIALIAS != 0
-    lv_opa_t opa_tmp = opa;
-    if(opa_tmp != LV_OPA_COVER) opa_tmp = opa_tmp >> 2;   /*Opacity per pixel (used when sum the pixels)*/
-    const uint8_t * map1_p = map_p;
-    const uint8_t * map2_p = map_p + width_byte;
-    uint8_t px_cnt;
+    uint8_t letter_px;
     for(row = row_start; row < row_end; row ++) {
         col_byte_cnt = 0;
-        col_bit = 7 - ((col_start << LV_FONT_ANTIALIAS) % 8);
+        col_bit = (col_start * bpp) % 8;
+        mask = mask_init >> col_bit;
         for(col = col_start; col < col_end; col ++) {
+            letter_px = (*map_p & mask) >> (8 - col_bit - bpp);
+            if(letter_px != 0) {
+                *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, bpp_opa_table[letter_px]);
+            }
 
-            px_cnt = 0;
-            if((*map1_p & (1 << col_bit)) != 0) px_cnt++;
-            if((*map2_p & (1 << col_bit)) != 0) px_cnt++;
-            if(col_bit != 0) col_bit --;
+            vdb_buf_tmp++;
+
+            if(col_bit < 8 - bpp) {
+                col_bit += bpp;
+                mask = mask >> bpp;
+            }
             else {
-                col_bit = 7;
+                col_bit = 0;
                 col_byte_cnt ++;
-                map1_p ++;
-                map2_p ++;
-            }
-            if((*map1_p & (1 << col_bit)) != 0) px_cnt++;
-            if((*map2_p & (1 << col_bit)) != 0) px_cnt++;
-            if(col_bit != 0) col_bit --;
-            else {
-                col_bit = 7;
-                col_byte_cnt ++;
-                map1_p ++;
-                map2_p ++;
-            }
-
-            if(px_cnt != 0) {
-                if(opa == LV_OPA_COVER) *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, 63*px_cnt);
-                else *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, opa_tmp * px_cnt);
-            }
-
-           vdb_buf_tmp++;
-        }
-
-        map1_p += width_byte;
-        map2_p += width_byte;
-        map1_p += width_byte - col_byte_cnt;
-        map2_p += width_byte - col_byte_cnt;
-        vdb_buf_tmp += vdb_width  - ((col_end) - (col_start)); /*Next row in VDB*/
-    }
-#else
-    for(row = row_start; row < row_end; row ++) {
-        col_byte_cnt = 0;
-        col_bit = 7 - (col_start % 8);
-        for(col = col_start; col < col_end; col ++) {
-
-            if((*map_p & (1 << col_bit)) != 0) {
-                if(opa == LV_OPA_COVER) *vdb_buf_tmp = color;
-                else *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, opa);
-            }
-
-           vdb_buf_tmp++;
-
-           if(col_bit != 0) col_bit --;
-           else {
-               col_bit = 7;
-               col_byte_cnt ++;
-               map_p ++;
+                mask = mask_init;
+                map_p ++;
             }
         }
 
-        map_p += width_byte - col_byte_cnt;
+        map_p += (width_byte_bpp) - col_byte_cnt;
         vdb_buf_tmp += vdb_width  - (col_end - col_start); /*Next row in VDB*/
     }
-#endif
 }
 
 /**

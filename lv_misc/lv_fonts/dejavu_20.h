@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include "../lv_font.h"
 
-extern lv_font_t lv_font_dejavu_20;
+extern lv_font_t arial_20;
 
 #endif /*USE_LV_FONT_DEJAVU_20*/
 #endif   /*DEJAVU_20_H*/

@@ -29,15 +29,27 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct
+{
+    uint32_t w_px         :8;
+    uint32_t glyph_index  :24;
+}lv_font_glyph_dsc_t;
+
+typedef struct
+{
+    uint32_t unicode         :21;
+    uint32_t glyph_dsc_index :11;
+}lv_font_unicode_map_t;
+
 typedef struct _lv_font_struct
 {
-    uint32_t first_ascii;
-    uint32_t last_ascii;
-    uint8_t height_row;
-    const uint8_t * bitmap;
-    const uint32_t * map;
-    const uint8_t * width;
+    uint32_t unicode_first;
+    uint32_t unicode_last;
+    uint8_t h_px;
+    const uint8_t * glyph_bitmap;
+    const lv_font_glyph_dsc_t * glyph_dsc;
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
+    uint32_t bpp   :3;                     /*Bit per pixel: 1, 2 or 4*/
 }lv_font_t;
 
 /**********************
@@ -71,7 +83,7 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter);
  */
 static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
 {
-    return font_p->height_row;
+    return font_p->h_px;
 }
 
 /**
@@ -81,7 +93,7 @@ static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
  */
 static inline uint8_t lv_font_get_height_scale(const lv_font_t * font_p)
 {
-    return (font_p->height_row >> LV_FONT_ANTIALIAS) >> LV_ANTIALIAS;
+    return (font_p->h_px >> LV_FONT_ANTIALIAS) >> LV_ANTIALIAS;
 }
 
 

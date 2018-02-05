@@ -110,7 +110,7 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
 
     uint8_t col, col_sub, row;
 #if LV_FONT_ANTIALIAS == 0
-    for(row = 0; row < font_p->height_row; row ++) {
+    for(row = 0; row < font_p->h_px; row ++) {
         for(col = 0, col_sub = 7; col < w; col ++, col_sub--) {
             if(*bitmap_p & (1 << col_sub)) {
                 lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, color, opa);
@@ -131,7 +131,7 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
        const uint8_t * map2_p = bitmap_p + width_byte;
        uint8_t px_cnt;
        uint8_t col_byte_cnt;
-       for(row = 0; row < (font_p->height_row >> 1); row ++) {
+       for(row = 0; row < (font_p->h_px >> 1); row ++) {
            col_byte_cnt = 0;
            col_sub = 7;
            for(col = 0; col < (w >> 1); col ++) {

@@ -175,7 +175,7 @@ bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
     if(lv_area_is_point_on(a1_p, &p)) return true;
     
     /*a2 right-top corner is on a1*/
-    p.x = a2_p->x1;
+    p.x = a2_p->x2;
     p.y = a2_p->y1;
     if(lv_area_is_point_on(a1_p, &p)) return true;
     

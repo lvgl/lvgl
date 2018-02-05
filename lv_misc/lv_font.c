@@ -18,6 +18,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    uint32_t glyph_index;
+    uint32_t unicode;
+    uint8_t w_px;
+}asd_glyph_dsc_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -109,7 +114,7 @@ void lv_font_init(void)
 
     /*DEJAVU 20*/
 #if USE_LV_FONT_DEJAVU_20 != 0
-    lv_font_add(&lv_font_dejavu_20, NULL);
+    lv_font_add(&arial_20, NULL);
 #endif
 
 #if USE_LV_FONT_DEJAVU_20_SUP != 0
@@ -446,9 +451,9 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
 {
     const lv_font_t * font_i = font_p;
     while(font_i != NULL) {
-        if(letter >= font_i->first_ascii && letter <= font_i->last_ascii) {
-            uint32_t index = (letter - font_i->first_ascii);
-            return &font_i->bitmap[font_i->map[index]];
+        if(letter >= font_i->unicode_first && letter <= font_i->unicode_last) {
+            uint32_t index = (letter - font_i->unicode_first);
+            return &font_i->glyph_bitmap[font_i->glyph_dsc[index].glyph_index];
         }
 
         font_i = font_i->next_page;
@@ -467,9 +472,9 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
 {
     const lv_font_t * font_i = font_p;
     while(font_i != NULL) {
-        if(letter >= font_i->first_ascii && letter <= font_i->last_ascii) {
-            uint32_t index = (letter - font_i->first_ascii);
-            return font_i->width[index];
+        if(letter >= font_i->unicode_first && letter <= font_i->unicode_last) {
+            uint32_t index = (letter - font_i->unicode_first);
+            return font_i->glyph_dsc[index].w_px;
         }
         font_i = font_i->next_page;
     }
