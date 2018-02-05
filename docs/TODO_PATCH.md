@@ -8,6 +8,13 @@ Please create an issue to introduce a bug instead of adding pull request to this
 
 ## v5.0.3 (in progress)
 - [x] lv_chart: Fix the use of point_num more then 256 (Thanks to upbeat27) 
+- [x] lv_label: fix 'offset' with LV_ANTIALIAS (LV_LABEL_LONG_ROLL was effected)
+- [x] lv_label: anim. time wasn't allyed for LV_LABEL_LONG_ROLL
+- [x] lv_txt_ut8_size fiy for 4 byte characters
+- [x] lv_slider: fix knob_in with not zero min value
+- [ ] lv_area_is_on: handled some cases wrong
+- [ ] lv_indev: buffered indevs (return *true* in indev_read) was handled af non-buffered
+- [ ] drag: don't invalidate if the object wasn't moved
 
 ## v5.0.2 (released at: 19.01.2018)
 - [x] Fix dependencied (Thanks to Zaltora)
