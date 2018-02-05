@@ -126,6 +126,7 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     ext->knob_in = in == false ? 0 : 1;
+    lv_obj_invalidate(slider);
 }
 
 /**
@@ -324,7 +325,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                 knob_area.x1 = area_indic.x2 - slider_h / 2;
                 knob_area.x2 = knob_area.x1 + slider_h;
             } else {
-                knob_area.x1 = (int32_t) ((int32_t)(slider_w - slider_h) * cur_value) / (max_value - min_value);
+                knob_area.x1 = (int32_t) ((int32_t)(slider_w - slider_h) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.x1 += slider->coords.x1;
                 knob_area.x2 = knob_area.x1 + slider_h;
             }
@@ -336,7 +337,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                 knob_area.y1 = area_indic.y1 - slider_w / 2;
                 knob_area.y2 = knob_area.y1 + slider_w;
             } else {
-                knob_area.y2 = (int32_t) ((int32_t)(slider_h - slider_w) * cur_value) / (max_value - min_value);
+                knob_area.y2 = (int32_t) ((int32_t)(slider_h - slider_w) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.y2 = slider->coords.y2 - knob_area.y2;
                 knob_area.y1 = knob_area.y2 - slider_w;
             }
