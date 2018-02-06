@@ -30,6 +30,7 @@
 
 #if LV_INDEV_READ_PERIOD != 0
 static void indev_proc_task(void * param);
+static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_proc_point(lv_indev_proc_t * indev);
 static void indev_proc_press(lv_indev_proc_t * info);
 static void indev_proc_release(lv_indev_proc_t * state);
@@ -226,83 +227,83 @@ static void indev_proc_task(void * param)
         indev_act = i;
 
         /*Handle reset query before processing the point*/
-        if(i->proc.reset_query) {
-            i->proc.act_obj = NULL;
-            i->proc.last_obj = NULL;
-            i->proc.drag_range_out = 0;
-            i->proc.drag_in_prog = 0;
-            i->proc.long_pr_sent = 0;
-            i->proc.pr_timestamp = 0;
-            i->proc.longpr_rep_timestamp = 0;
-            i->proc.drag_sum.x = 0;
-            i->proc.drag_sum.y = 0;
-            i->proc.reset_query = 0;
-        }
+        indev_proc_reset_query_handler(i);
 
         if(i->proc.disabled == 0) {
-            /*Read the data*/
-            lv_indev_read(i, &data);
-            i->proc.state = data.state;
+            bool more_to_read;
+            do{
+                /*Read the data*/
+                more_to_read = lv_indev_read(i, &data);
+                i->proc.state = data.state;
 
-            if(i->proc.state == LV_INDEV_STATE_PR) {
-                i->last_activity_time = lv_tick_get();
-            }
-
-            /*Move the cursor if set and moved*/
-            if(i->driver.type == LV_INDEV_TYPE_POINTER &&
-               i->cursor != NULL &&
-               (i->proc.last_point.x != data.point.x ||
-                i->proc.last_point.y != data.point.y))
-            {
-                lv_obj_set_pos(i->cursor, data.point.x, data.point.y);
-            }
-
-            if(i->driver.type == LV_INDEV_TYPE_POINTER)
-            {
-                i->proc.act_point.x = data.point.x;
-                i->proc.act_point.y = data.point.y;;
-
-                /*Process the current point*/
-                indev_proc_point(&i->proc);
-            }
-            else if (i->driver.type == LV_INDEV_TYPE_KEYPAD) {
-#if USE_LV_GROUP
-                if(i->group != NULL && data.key != 0 &&
-                   data.state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_REL)
-                {
-                    if(data.key == LV_GROUP_KEY_NEXT) {
-                        lv_group_focus_next(i->group);
-                    }
-                    else if(data.key == LV_GROUP_KEY_PREV) {
-                        lv_group_focus_prev(i->group);
-                    }
-                    else {
-                        lv_group_send_data(i->group, data.key);
-                    }
+                if(i->proc.state == LV_INDEV_STATE_PR) {
+                    i->last_activity_time = lv_tick_get();
                 }
-                i->proc.last_state = data.state;
-#endif
-            }
-        }
 
-        /*Handle reset query if it happened in during processing*/
-        if(i->proc.reset_query) {
-            i->proc.act_obj = NULL;
-            i->proc.last_obj = NULL;
-            i->proc.drag_range_out = 0;
-            i->proc.drag_in_prog = 0;
-            i->proc.long_pr_sent = 0;
-            i->proc.pr_timestamp = 0;
-            i->proc.longpr_rep_timestamp = 0;
-            i->proc.drag_sum.x = 0;
-            i->proc.drag_sum.y = 0;
-            i->proc.reset_query = 0;
+                /*Move the cursor if set and moved*/
+                if(i->driver.type == LV_INDEV_TYPE_POINTER &&
+                    i->cursor != NULL &&
+                    (i->proc.last_point.x != data.point.x ||
+                     i->proc.last_point.y != data.point.y))
+                {
+                    lv_obj_set_pos(i->cursor, data.point.x, data.point.y);
+                }
+
+                if(i->driver.type == LV_INDEV_TYPE_POINTER)
+                {
+                    i->proc.act_point.x = data.point.x;
+                    i->proc.act_point.y = data.point.y;;
+
+                    /*Process the current point*/
+                    indev_proc_point(&i->proc);
+                }
+                else if (i->driver.type == LV_INDEV_TYPE_KEYPAD) {
+#if USE_LV_GROUP
+                    if(i->group != NULL && data.key != 0 &&
+                    data.state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_REL)
+                    {
+                        if(data.key == LV_GROUP_KEY_NEXT) {
+                            lv_group_focus_next(i->group);
+                        }
+                        else if(data.key == LV_GROUP_KEY_PREV) {
+                            lv_group_focus_prev(i->group);
+                        }
+                        else {
+                            lv_group_send_data(i->group, data.key);
+                        }
+                    }
+                    i->proc.last_state = data.state;
+#endif
+                }
+                /*Handle reset query if it happened in during processing*/
+                indev_proc_reset_query_handler(i);
+            } while(more_to_read);
         }
 
         i = lv_indev_next(i);    /*Go to the next indev*/
     }
 
     indev_act = NULL;   /*End of indev processing, so no act indev*/
+}
+
+/**
+ * Reset input device if a reset query has been sent to it
+ * @param indev pointer to an input device
+ */
+static void indev_proc_reset_query_handler(lv_indev_t * indev)
+{
+    if(indev->proc.reset_query) {
+        indev->proc.act_obj = NULL;
+        indev->proc.last_obj = NULL;
+        indev->proc.drag_range_out = 0;
+        indev->proc.drag_in_prog = 0;
+        indev->proc.long_pr_sent = 0;
+        indev->proc.pr_timestamp = 0;
+        indev->proc.longpr_rep_timestamp = 0;
+        indev->proc.drag_sum.x = 0;
+        indev->proc.drag_sum.y = 0;
+        indev->proc.reset_query = 0;
+    }
 }
 
 /**
