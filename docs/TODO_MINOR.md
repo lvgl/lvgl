@@ -17,6 +17,7 @@ Here are ideas which are not assigned to a minor version yet:
 - Hover, hover_lost signals
 - Detached area (for video rendering where LittlevGL don't put pixels) 
 - lv_ta: add placeholder text
+- image rotate
 
 
 ## v5.2 (planned)
