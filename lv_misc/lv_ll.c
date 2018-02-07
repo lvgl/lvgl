@@ -94,7 +94,7 @@ void * lv_ll_ins_head(lv_ll_t * ll_p)
  * @param n_act pointer a node
  * @return pointer to the new head
  */
-void * lv_ll_ins_pos(lv_ll_t * ll_p, void * n_act)
+void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
 {
     lv_ll_node_t* n_new;
     lv_ll_node_t* n_prev;
@@ -301,6 +301,61 @@ void * lv_ll_get_prev(lv_ll_t * ll_p, void * n_act)
 
     return prev;
 }
+
+/**
+ * Reordering the list
+ * @param ll_dest pointer to the joind linked list
+ * @param ll_dest pointer to the source linked list
+ * @param f pointer to Sort the callback function
+ */
+void lv_ll_sort(lv_ll_t * ll_dest, lv_ll_t * ll_src, lv_ll_sort_func f)
+{
+    void * dest = NULL;
+    void * src = NULL;
+    void * prev = NULL;
+
+    if((NULL == ll_dest) || (NULL == ll_src) || (NULL == f)){
+        return;
+    }
+
+    while(1)
+    {
+        /*1.Get a head node from the source linked list*/
+        src = lv_ll_get_head(ll_src);
+        if(NULL == src) {
+            break;
+        }
+        lv_ll_rem(ll_src,src);
+
+        /*2.Find out where the source node is inserted in the destination list and insert it*/
+        if(NULL != (dest = f(ll_dest,src))){
+            prev = lv_ll_get_prev(ll_dest,dest);
+            if(prev != NULL){   /*Insert into the intermediate node*/
+                node_set_next(ll_dest,prev,src);
+                node_set_prev(ll_dest,src,prev);
+                node_set_next(ll_dest,src,dest);
+                node_set_prev(ll_dest,dest,src);
+            }else{              /*Insert into the head*/
+                node_set_prev(ll_dest, src, NULL);
+                node_set_next(ll_dest, src, dest);
+                node_set_prev(ll_dest, dest, src);
+                ll_dest->head = src;
+            }
+        }else{                  /*Insert into the tail*/
+            dest = lv_ll_get_tail(ll_dest);
+            node_set_next(ll_dest, src, NULL);
+            node_set_prev(ll_dest, src, dest);
+
+            if(NULL != dest){
+                node_set_next(ll_dest, dest, src);
+            }else{
+                ll_dest->head = src;
+            }
+            ll_dest->tail = src;
+        }
+    }
+}
+
 
 void lv_ll_swap(lv_ll_t * ll_p, void * n1_p, void * n2_p)
 {

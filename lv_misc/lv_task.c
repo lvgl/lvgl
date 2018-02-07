@@ -30,6 +30,8 @@ static bool lv_task_exec(lv_task_t* lv_task_p, lv_task_prio_t prio_act);
  *  STATIC VARIABLES
  **********************/
 static lv_ll_t lv_task_ll;  /*Linked list to store the lv_tasks*/
+static lv_ll_t lv_task_runed_ll;   /*Already run the list*/
+
 static bool lv_task_run = false;
 static uint8_t idle_last = 0;
 
@@ -47,9 +49,27 @@ static uint8_t idle_last = 0;
 void lv_task_init(void)
 {
     lv_ll_init(&lv_task_ll, sizeof(lv_task_t));
+    lv_ll_init(&lv_task_runed_ll, sizeof(lv_task_t));
 
     /*Initially enable the lv_task handling*/
     lv_task_enable(true);
+}
+
+/**
+ * Find n_act node to be inserted in the position of ll_dest list
+ */
+static void * lv_ll_sort_func_task(lv_ll_t * ll_dest,void * n_act)
+{
+    lv_task_t* dest;
+    lv_task_t* src = (lv_task_t*)n_act;
+
+    for(dest = lv_ll_get_head(ll_dest); dest != NULL; dest = lv_ll_get_next(ll_dest, dest)){
+        if(dest->prio <= src->prio){
+            return dest;
+        }
+    }
+
+    return NULL;
 }
 
 /**
@@ -70,6 +90,7 @@ inline void LV_ATTRIBUTE_TASK_HANDLER lv_task_handler(void)
         endFlag = 1;
         LL_READ(lv_task_ll,tmp){
             if(true == lv_task_exec(tmp,tmp->prio)){
+                lv_ll_chg_list(&lv_task_ll,&lv_task_runed_ll,tmp);
                 endFlag = 0;
                 break;
             }
@@ -78,6 +99,8 @@ inline void LV_ATTRIBUTE_TASK_HANDLER lv_task_handler(void)
             break;
         }
     }
+
+    lv_ll_sort(&lv_task_ll,&lv_task_runed_ll,lv_ll_sort_func_task);
 
     busy_time += lv_tick_elaps(handler_start);
     uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
@@ -111,7 +134,7 @@ lv_task_t* lv_task_create(void (*task) (void *), uint32_t period, lv_task_prio_t
     else{
         do{
             if(tmp->prio <= prio){
-                new_lv_task = lv_ll_ins_pos(&lv_task_ll, tmp);
+                new_lv_task = lv_ll_ins_prev(&lv_task_ll, tmp);
                 break;
             }
         }while(NULL != (tmp = lv_ll_get_next(&lv_task_ll,tmp)));
