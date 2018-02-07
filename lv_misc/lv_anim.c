@@ -36,7 +36,6 @@ static bool anim_ready_handler(lv_anim_t * a);
  **********************/
 static lv_ll_t anim_ll;
 static uint32_t last_task_run;
-static bool anim_del_global_flag = false;
 
 /**********************
  *      MACROS
@@ -98,7 +97,6 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
 			lv_ll_rem(&anim_ll, a);
 			lv_mem_free(a);
 			del = true;
-			anim_del_global_flag = true;
 		}
 
 		a = a_next;
@@ -232,9 +230,8 @@ static bool anim_ready_handler(lv_anim_t * a)
 		/*Call the callback function at the end*/
 		/* Check if an animation is deleted in the cb function
 		 * if yes then the caller function has to know this*/
-		anim_del_global_flag = false;
 		if(cb != NULL) cb(p);
-		invalid = anim_del_global_flag;
+		invalid = true;
 	}
 	/*If the animation is not deleted then restart it*/
 	else {

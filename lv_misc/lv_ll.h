@@ -37,6 +37,9 @@ typedef struct
     lv_ll_node_t* tail;
 }lv_ll_t;
 
+typedef void * (* lv_ll_sort_func)(lv_ll_t * ll_dest, void * n_act);
+
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -54,6 +57,15 @@ void lv_ll_init(lv_ll_t * ll_p, uint32_t node_size);
  * @return pointer to the new head
  */
 void * lv_ll_ins_head(lv_ll_t * ll_p);
+
+/**
+ * Insert a new node in front of the n_act node
+ * @param ll_p pointer to linked list
+ * @param n_act pointer a node
+ * @return pointer to the new head
+ */
+void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act);
+
 
 /**
  * Add a new tail to a linked list
@@ -113,6 +125,15 @@ void * lv_ll_get_next(lv_ll_t * ll_p, void * n_act);
  * @return pointer to the previous node
  */
 void * lv_ll_get_prev(lv_ll_t * ll_p, void * n_act);
+
+/**
+ * Reordering the list
+ * @param ll_dest pointer to the joind linked list
+ * @param ll_dest pointer to the source linked list
+ * @param f pointer to Sort the callback function
+ */
+void lv_ll_sort(lv_ll_t * ll_dest, lv_ll_t * ll_src, lv_ll_sort_func f);
+
 
 /**********************
  *      MACROS
