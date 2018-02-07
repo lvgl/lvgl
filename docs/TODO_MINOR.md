@@ -39,6 +39,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] Merge symbol fonts (basic, file and feedback) into one font
 - [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
 - [ ] lv_img_set_data() for const. image data instead of file system usage
+- [ ] lv_obj_set_sticky: new object attribute, to force input device to NOT find new object when the object's pressing is lost
 
 ## v5.0 (released at: 20.12.2017)
 - [x] UTF-8 support
