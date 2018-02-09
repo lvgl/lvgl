@@ -68,7 +68,9 @@ static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_colo
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_vletter;
 #if USE_LV_IMG
-static void (*map_fp)(const lv_area_t * coords, const lv_area_t * mask, const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale, lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
+static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
+        const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+        lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
 #endif
 #else
 /* px_fp used only by shadow drawing the shadows are not drawn with out VDB
@@ -402,114 +404,116 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
  * @param opa opacity of the image (0..255)
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
-             const lv_style_t * style, const char * fn)
+             const lv_style_t * style, const char * fn, const lv_img_dsc_t * data)
 {
-    if(fn == NULL) {
+    if(fn == NULL && data == NULL) {
         lv_draw_rect(coords, mask, &lv_style_plain);
         lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
-    } else {
-        lv_area_t coord_aa;
-        lv_area_t mask_aa;
+    }
+    else if(data) {
 
-#if LV_ANTIALIAS == 0
-        lv_area_copy(&coord_aa, coords);
-        lv_area_copy(&mask_aa, mask);
-#else
-        coord_aa.x1 = coords->x1 << LV_AA;
-        coord_aa.y1 = coords->y1 << LV_AA;
-        coord_aa.x2 = (coords->x2 << LV_AA) + 1;
-        coord_aa.y2 = (coords->y2 << LV_AA) + 1;
-
-        mask_aa.x1 = mask->x1 << LV_AA;
-        mask_aa.y1 = mask->y1 << LV_AA;
-        mask_aa.x2 = (mask->x2 << LV_AA) + 1;
-        mask_aa.y2 = (mask->y2 << LV_AA) + 1;
-#endif
-
-        lv_fs_file_t file;
-        lv_fs_res_t res = lv_fs_open(&file, fn, LV_FS_MODE_RD);
-        if(res == LV_FS_RES_OK) {
-            lv_img_raw_header_t header;
-            uint32_t br;
-            res = lv_fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
-
-            lv_area_t mask_com;    /*Common area of mask and cords*/
-            bool union_ok;
-            union_ok = lv_area_union(&mask_com, &mask_aa, &coord_aa);
-            if(union_ok == false) {
-                lv_fs_close(&file);
-                return;
-            }
-
-
-            /*If the width is greater then real img. width then it is upscaled */
-            bool upscale = false;
-#if LV_ANTIALIAS
-            if(lv_area_get_width(coords) < header.w) {
-                upscale = false;
-                lv_area_set_width(&coord_aa,  header.w);
-            }
-            else upscale = true;
-
-#endif
-
-            bool const_data = false;
-
-            /*If the img. data is inside the MCU then do not use FS reading just a pointer*/
-            if(fn[0] == UFS_LETTER) {
-                const_data = true;
-                uint8_t * f_data = ((lv_ufs_file_t*)file.file_d)->ent->data_d;
-                f_data += sizeof(lv_img_raw_header_t);
-                map_fp(&coord_aa, &mask_com, (void*)f_data , style->image.opa, header.transp, upscale, style->image.color, style->image.intense);
-            }
-
-            /*Read the img. with the FS interface*/
-            if(const_data == false) {
-                uint8_t us_shift = 0;
-                uint8_t us_val = 1;
-                if(upscale != false) {
-                    us_shift = 1;
-                    us_val = 2;
-                }
-
-                /* Move the file pointer to the start address according to mask
-                 * But take care, the upscaled maps look greater*/
-                uint32_t start_offset = sizeof(lv_img_raw_header_t);
-                start_offset += (lv_area_get_width(&coord_aa) >> us_shift) *
-                               ((mask_com.y1 - coord_aa.y1) >> us_shift) * sizeof(lv_color_t); /*First row*/
-                start_offset += ((mask_com.x1 - coord_aa.x1) >> us_shift) * sizeof(lv_color_t); /*First col*/
-                lv_fs_seek(&file, start_offset);
-
-                uint32_t useful_data = (lv_area_get_width(&mask_com) >> us_shift) * sizeof(lv_color_t);
-                uint32_t next_row = (lv_area_get_width(&coord_aa) >> us_shift) * sizeof(lv_color_t) - useful_data;
-
-                lv_area_t line;
-                lv_area_copy(&line, &mask_com);
-                lv_area_set_height(&line, us_val); /*Create a line area. Hold 2 pixels if upscaled*/
-
-                lv_coord_t row;
-                uint32_t act_pos;
-                lv_color_t buf[useful_data];
-                for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
-                    res = lv_fs_read(&file, buf, useful_data, &br);
-
-                    map_fp(&line, &mask_com, buf, style->image.opa, header.transp, upscale,
-                                          style->image.color, style->image.intense);
-
-                    lv_fs_tell(&file, &act_pos);
-                    lv_fs_seek(&file, act_pos + next_row);
-                    line.y1 += us_val;    /*Go down a line*/
-                    line.y2 += us_val;
-                }
-            }
+        lv_area_t mask_com;    /*Common area of mask and coords*/
+        bool union_ok;
+        union_ok = lv_area_union(&mask_com, mask, coords);
+        if(union_ok == false) {
+            return;         /*Out of mask*/
         }
 
-        lv_fs_close(&file);
+        map_fp(coords, mask, data->pixel_map, style->image.opa, data->chroma_key, data->alpha, style->image.color, style->image.intense);
 
-        if(res != LV_FS_RES_OK) {
-            lv_draw_rect(coords, mask, &lv_style_plain);
-            lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
-        }
+    }
+    else {
+//        lv_area_t coord_aa;
+//        lv_area_t mask_aa;
+//
+//#if LV_ANTIALIAS == 0
+//        lv_area_copy(&coord_aa, coords);
+//        lv_area_copy(&mask_aa, mask);
+//
+//        lv_fs_file_t file;
+//        lv_fs_res_t res = lv_fs_open(&file, fn, LV_FS_MODE_RD);
+//        if(res == LV_FS_RES_OK) {
+//            lv_img_raw_header_t header;
+//            uint32_t br;
+//            res = lv_fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
+//
+//            lv_area_t mask_com;    /*Common area of mask and cords*/
+//            bool union_ok;
+//            union_ok = lv_area_union(&mask_com, &mask_aa, &coord_aa);
+//            if(union_ok == false) {
+//                lv_fs_close(&file);
+//                return;
+//            }
+//
+//
+//            /*If the width is greater then real img. width then it is upscaled */
+//            bool upscale = false;
+//#if LV_ANTIALIAS
+//            if(lv_area_get_width(coords) < header.w) {
+//                upscale = false;
+//                lv_area_set_width(&coord_aa,  header.w);
+//            }
+//            else upscale = true;
+//
+//#endif
+//
+//            bool const_data = false;
+//
+//            /*If the img. data is inside the MCU then do not use FS reading just a pointer*/
+//            if(fn[0] == UFS_LETTER) {
+//                const_data = true;
+//                uint8_t * f_data = ((lv_ufs_file_t*)file.file_d)->ent->data_d;
+//                f_data += sizeof(lv_img_raw_header_t);
+//                map_fp(&coord_aa, &mask_com, (void*)f_data , style->image.opa, header.transp, upscale, style->image.color, style->image.intense);
+//            }
+//
+//            /*Read the img. with the FS interface*/
+//            if(const_data == false) {
+//                uint8_t us_shift = 0;
+//                uint8_t us_val = 1;
+//                if(upscale != false) {
+//                    us_shift = 1;
+//                    us_val = 2;
+//                }
+//
+//                /* Move the file pointer to the start address according to mask
+//                 * But take care, the upscaled maps look greater*/
+//                uint32_t start_offset = sizeof(lv_img_raw_header_t);
+//                start_offset += (lv_area_get_width(&coord_aa) >> us_shift) *
+//                               ((mask_com.y1 - coord_aa.y1) >> us_shift) * sizeof(lv_color_t); /*First row*/
+//                start_offset += ((mask_com.x1 - coord_aa.x1) >> us_shift) * sizeof(lv_color_t); /*First col*/
+//                lv_fs_seek(&file, start_offset);
+//
+//                uint32_t useful_data = (lv_area_get_width(&mask_com) >> us_shift) * sizeof(lv_color_t);
+//                uint32_t next_row = (lv_area_get_width(&coord_aa) >> us_shift) * sizeof(lv_color_t) - useful_data;
+//
+//                lv_area_t line;
+//                lv_area_copy(&line, &mask_com);
+//                lv_area_set_height(&line, us_val); /*Create a line area. Hold 2 pixels if upscaled*/
+//
+//                lv_coord_t row;
+//                uint32_t act_pos;
+//                lv_color_t buf[useful_data];
+//                for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
+//                    res = lv_fs_read(&file, buf, useful_data, &br);
+//
+//                    map_fp(&line, &mask_com, buf, style->image.opa, header.transp, upscale,
+//                                          style->image.color, style->image.intense);
+//
+//                    lv_fs_tell(&file, &act_pos);
+//                    lv_fs_seek(&file, act_pos + next_row);
+//                    line.y1 += us_val;    /*Go down a line*/
+//                    line.y2 += us_val;
+//                }
+//            }
+//        }
+//
+//        lv_fs_close(&file);
+//
+//        if(res != LV_FS_RES_OK) {
+//            lv_draw_rect(coords, mask, &lv_style_plain);
+//            lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
+//        }
     }
 }
 #endif

@@ -61,7 +61,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     lv_coord_t act_line_length;
-    uint8_t letter_height = lv_font_get_height_scale(font);
+    uint8_t letter_height = lv_font_get_height(font);
 
     /*Calc. the height and longest line*/
     while (text[line_start] != '\0') {
@@ -129,7 +129,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             return i;    /*Return with the first letter of the next line*/
 
         } else { /*Check the actual length*/
-            cur_w += lv_font_get_width_scale(font, letter);
+            cur_w += lv_font_get_width(font, letter);
 
             /*If the txt is too long then finish, this is the line end*/
             if(cur_w > max_width) {
@@ -195,14 +195,14 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
                     continue;
                 }
             }
-            width += lv_font_get_width_scale(font, letter);
+            width += lv_font_get_width(font, letter);
             width += letter_space;
         }
 
         /*Trim closing spaces. Important when the text is aligned to the middle */
         for(i = length - 1; i > 0; i--) {
             if(txt[i] == ' ') {
-                width -= lv_font_get_width_scale(font, txt[i]);
+                width -= lv_font_get_width(font, txt[i]);
                 width -= letter_space;
             } else {
                 break;

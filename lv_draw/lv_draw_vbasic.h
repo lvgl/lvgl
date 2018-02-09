@@ -69,8 +69,8 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
  * @param recolor_opa the intense of recoloring
  */
 void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
-            const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale,
-            lv_color_t recolor, lv_opa_t recolor_opa);
+        const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+        lv_color_t recolor, lv_opa_t recolor_opa);
 
 
 /**

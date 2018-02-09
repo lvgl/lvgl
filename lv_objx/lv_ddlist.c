@@ -422,7 +422,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         if(ext->opened != 0) {
             lv_style_t *style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
             const lv_font_t * font = style->text.font;
-            lv_coord_t font_h = lv_font_get_height_scale(font);
+            lv_coord_t font_h = lv_font_get_height(font);
 
             /*Draw the selected*/
             lv_area_t rect_area;
@@ -449,7 +449,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 
         lv_style_t *style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
         const lv_font_t * font = style->text.font;
-        lv_coord_t font_h = lv_font_get_height_scale(font);
+        lv_coord_t font_h = lv_font_get_height(font);
 
         lv_area_t area_sel;
         area_sel.y1 = ext->label->coords.y1;
@@ -630,7 +630,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, uint16_t anim_time)
     } else { /*Close the list*/
         const lv_font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->label);
-        lv_coord_t font_h = lv_font_get_height_scale(font);
+        lv_coord_t font_h = lv_font_get_height(font);
         new_height = font_h + 2 * label_style->text.line_space;
     }
     if(anim_time == 0) {
@@ -666,7 +666,7 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_style_t * style = lv_obj_get_style(ddlist);
     const lv_font_t * font = style->text.font;
-    lv_coord_t font_h = lv_font_get_height_scale(font);
+    lv_coord_t font_h = lv_font_get_height(font);
     lv_style_t * label_style = lv_obj_get_style(ext->label);
     lv_obj_t * scrl = lv_page_get_scrl(ddlist);
 

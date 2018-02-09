@@ -19,7 +19,6 @@
 #endif
 
 #include "lv_img.h"
-#include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"
@@ -122,6 +121,26 @@ lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data)
  * Setter functions 
  *====================*/
 
+
+/**
+ * Set the pixel map to display by the image
+ * @param img pointer to an image object
+ * @param data the image data
+ */
+void lv_img_set_data(lv_obj_t * img, lv_img_dsc_t * data)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    ext->px_data = data;
+    ext->w = data->w;
+    ext->h = data->h;
+    ext->transp = data->chroma_key;
+    ext->alpha_byte = data->alpha;
+    lv_obj_set_size(img, data->w, data->h);
+
+    lv_obj_invalidate(img);
+}
+
 /**
  * Set a file to the image
  * @param img pointer to an image object
@@ -129,6 +148,8 @@ lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data)
  */
 void lv_img_set_file(lv_obj_t * img, const char * fn)
 {
+
+    return;
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     
     /*Handle normal images*/
@@ -147,7 +168,6 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
             header.w = lv_obj_get_width(img);
             header.h = lv_obj_get_height(img);
             header.transp = 0;
-            header.cd = 0;
         }
 
         lv_fs_close(&file);
@@ -288,14 +308,14 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
 
     if(mode == LV_DESIGN_COVER_CHK) {
         bool cover = false;
-        if(ext->transp == 0) cover = lv_area_is_in(mask, &img->coords);
+        if(ext->transp == 0 && ext->alpha_byte == 0) cover = lv_area_is_in(mask, &img->coords);
         return cover;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
 		lv_area_t cords;
 /*Create a default style for symbol texts*/
-        bool sym = lv_img_is_symbol(ext->fn);
+        bool sym = false;//lv_img_is_symbol(ext->fn);
 
 		lv_obj_get_coords(img, &cords);
 
@@ -307,7 +327,7 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
 			cords_tmp.x1 = cords.x1;
 			cords_tmp.x2 = cords.x1 + ext->w - 1;
 			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-			    if(sym == false) lv_draw_img(&cords_tmp, mask, style, ext->fn);
+			    if(sym == false) lv_draw_img(&cords_tmp, mask, style, NULL, ext->px_data);
 			    else lv_draw_label(&cords_tmp, mask, style, ext->fn, LV_TXT_FLAG_NONE, NULL);
 
 			}

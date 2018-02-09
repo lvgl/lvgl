@@ -20,6 +20,7 @@ extern "C" {
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_fonts/lv_symbol_def.h"
 #include "lv_label.h"
+#include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -33,12 +34,16 @@ typedef struct
 {
     /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
     /*New data for this type */
-    char* fn;                   /*Image file name. E.g. "U:/my_image"*/
+    union {
+        char* fn;                   /*Image file name. E.g. "U:/my_image"*/
+        lv_img_dsc_t * px_data;     /*Image file name. E.g. "U:/my_image"*/
+    };
     lv_coord_t w;                   /*Width of the image (doubled when upscaled) (Handled by the library)*/
     lv_coord_t h;                   /*Height of the image (doubled when upscaled) (Handled by the library)*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
     uint8_t upscale   :1;       /*1: upscale to double size with antialaissing*/
     uint8_t transp    :1;       /*Transp. bit in the image header (Handled by the library)*/
+    uint8_t alpha_byte :1;      /*Extra byte for every pixel to define opacity*/
 }lv_img_ext_t;
 
 /**********************

@@ -31,9 +31,20 @@ typedef struct
     uint32_t w:12;        /*Width of the image map*/
     uint32_t h:12;        /*Height of the image map*/
     uint32_t transp:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
-    uint32_t cd:3;        /*Color depth (0: reserved, 1: 8 bit, 2: 16 bit or 3: 24 bit, 4-7: reserved)*/
-    uint32_t res :4;      /*Reserved*/
+    uint32_t alpha :1;    /*Every pixel is extended with a 8 bit alpha channel*/
 }lv_img_raw_header_t;
+
+/* Image header it is compatible with
+ * the result image converter utility*/
+typedef struct
+{
+    uint32_t w:12;        /*Width of the image map*/
+    uint32_t h:12;        /*Height of the image map*/
+    uint32_t chroma_key:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
+    uint32_t alpha :1;    /*Every pixel is extended with a 8 bit alpha channel*/
+    const uint8_t * pixel_map;
+}lv_img_dsc_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -79,8 +90,8 @@ void lv_draw_label(const lv_area_t * cords_p,const lv_area_t * mask_p, const lv_
  * @param mask_p the image will be drawn only in this area
  * @param map_p pointer to a lv_color_t array which contains the pixels of the image
  */
-void lv_draw_img(const lv_area_t * cords_p, const lv_area_t * mask_p,
-                 const lv_style_t * style_p, const char * fn);
+void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
+             const lv_style_t * style, const char * fn, const lv_img_dsc_t * data);
 #endif
 
 /**

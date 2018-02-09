@@ -387,7 +387,7 @@ static void mbox_realign(lv_obj_t *mbox)
     if(ext->btnm) {
         lv_style_t *btn_bg_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
         lv_style_t *btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
-        lv_coord_t font_h = lv_font_get_height_scale(btn_rel_style->text.font);
+        lv_coord_t font_h = lv_font_get_height(btn_rel_style->text.font);
         lv_obj_set_size(ext->btnm, w, font_h + 2 * btn_rel_style->body.padding.ver + 2 * btn_bg_style->body.padding.ver);
     }
 }
