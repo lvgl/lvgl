@@ -371,10 +371,13 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
             letter_w = lv_font_get_width(font, letter) >> LV_FONT_ANTIALIAS;
 
             pos.x += letter_w + (style->text.letter_space << LV_AA);
+
+#if LV_ANTIALIAS || LV_FONT_ANTIALIAS
             /* Round error occurs in x position
              * When odd widths are scaled down the last 1 is lost. So the letters seems shorter.
              * Now calculate according to it to be consequent  */
             if(letter_w & 0x01) pos.x--;
+#endif
         }
         /*Go to next line*/
         line_start = line_end;
