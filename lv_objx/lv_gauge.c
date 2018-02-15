@@ -337,10 +337,10 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         /*Calculate the position a scale label*/
         int16_t angle = (i * scale_angle) / (label_num - 1) + angle_ofs;
 
-        lv_coord_t y = (int32_t)((int32_t)lv_trigo_sin(angle) * r) / TRIGO_SIN_MAX;
+        lv_coord_t y = (int32_t)((int32_t)lv_trigo_sin(angle) * r) / LV_TRIGO_SIN_MAX;
         y += y_ofs;
 
-        lv_coord_t x = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r) / TRIGO_SIN_MAX;
+        lv_coord_t x = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r) / LV_TRIGO_SIN_MAX;
         x += x_ofs;
 
         int16_t scale_act = (int32_t)((int32_t)(max - min) * i) /  (label_num - 1);
@@ -390,8 +390,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     for(i = 0; i < ext->needle_count; i++) {
         /*Calculate the end point of a needle*/
         int16_t needle_angle = (ext->values[i] - min) * angle / (max - min) + angle_ofs;
-        p_end.y = (lv_trigo_sin(needle_angle) * r) / TRIGO_SIN_MAX + y_ofs;
-        p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / TRIGO_SIN_MAX + x_ofs;
+        p_end.y = (lv_trigo_sin(needle_angle) * r) / LV_TRIGO_SIN_MAX + y_ofs;
+        p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
 
         /*Draw the needle with the corresponding color*/
         if(ext->needle_colors == NULL) style_needle.line.color = LV_GAUGE_DEF_NEEDLE_COLOR;

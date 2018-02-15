@@ -41,7 +41,6 @@ typedef struct
     lv_coord_t w;                   /*Width of the image (doubled when upscaled) (Handled by the library)*/
     lv_coord_t h;                   /*Height of the image (doubled when upscaled) (Handled by the library)*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
-    uint8_t upscale   :1;       /*1: upscale to double size with antialaissing*/
     uint8_t transp    :1;       /*Transp. bit in the image header (Handled by the library)*/
     uint8_t alpha_byte :1;      /*Extra byte for every pixel to define opacity*/
 }lv_img_ext_t;
@@ -86,14 +85,6 @@ void lv_img_set_file(lv_obj_t * img, const char * fn);
 void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
 
 /**
- * Enable the upscaling if LV_ANTIALIAS is enabled.
- * If enabled the object size will be same as the picture size.
- * @param img pointer to an image
- * @param en true: upscale enable, false: upscale disable
- */
-void lv_img_set_upscale(lv_obj_t * img, bool en);
-
-/**
  * Set the style of an image
  * @param img pointer to an image object
  * @param style pointer to a style
@@ -121,13 +112,6 @@ const char * lv_img_get_file_name(lv_obj_t * img);
  * @return true: auto size is enabled, false: auto size is disabled
  */
 bool lv_img_get_auto_size(lv_obj_t * img);
-
-/**
- * Get the upscale enable attribute
- * @param img pointer to an image
- * @return true: upscale is enabled, false: upscale is disabled
- */
-bool lv_img_get_upscale(lv_obj_t * img);
 
 /**
  * Get the style of an image object

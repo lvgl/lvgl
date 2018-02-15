@@ -109,7 +109,6 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     const uint8_t * bitmap_p = lv_font_get_bitmap(font_p, letter);
 
     uint8_t col, col_sub, row;
-#if LV_FONT_ANTIALIAS == 0
     for(row = 0; row < font_p->h_px; row ++) {
         for(col = 0, col_sub = 7; col < w; col ++, col_sub--) {
             if(*bitmap_p & (1 << col_sub)) {
@@ -124,50 +123,7 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
         /*Go to the next row*/
         if(col_sub != 7) bitmap_p ++;   /*Go to the next byte if it not done in the last step*/
     }
-#else
-       uint8_t width_byte = w >> 3;    /*Width in bytes (e.g. w = 11 -> 2 bytes wide)*/
-       if(w & 0x7) width_byte++;
-       const uint8_t * map1_p = bitmap_p;
-       const uint8_t * map2_p = bitmap_p + width_byte;
-       uint8_t px_cnt;
-       uint8_t col_byte_cnt;
-       for(row = 0; row < (font_p->h_px >> 1); row ++) {
-           col_byte_cnt = 0;
-           col_sub = 7;
-           for(col = 0; col < (w >> 1); col ++) {
 
-               px_cnt = 0;
-               if((*map1_p & (1 << col_sub)) != 0) px_cnt++;
-               if((*map2_p & (1 << col_sub)) != 0) px_cnt++;
-               if(col_sub != 0) col_sub --;
-               else {
-                   col_sub = 7;
-                   col_byte_cnt ++;
-                   map1_p ++;
-                   map2_p ++;
-               }
-               if((*map1_p & (1 << col_sub)) != 0) px_cnt++;
-               if((*map2_p & (1 << col_sub)) != 0) px_cnt++;
-               if(col_sub != 0) col_sub --;
-               else {
-                   col_sub = 7;
-                   col_byte_cnt ++;
-                   map1_p ++;
-                   map2_p ++;
-               }
-
-
-               if(px_cnt != 0) {
-                   lv_rpx(pos_p->x + col, pos_p->y + row, mask_p, lv_color_mix(color, LV_COLOR_SILVER, 63 * px_cnt), LV_OPA_COVER);
-               }
-           }
-
-           map1_p += width_byte;
-           map2_p += width_byte;
-           map1_p += width_byte - col_byte_cnt;
-           map2_p += width_byte - col_byte_cnt;
-       }
-#endif
 }
 
 /**

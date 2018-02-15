@@ -112,9 +112,11 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t po
 			ymax = LV_MATH_MAX(point_a[i].y, ymax);
 		}
 
-		lv_style_t * lines = lv_obj_get_style(line);
-		lv_obj_set_size(line, xmax + lines->line.width, ymax + lines->line.width);
+		lv_style_t * style = lv_line_get_style(line);
+		lv_obj_set_size(line, xmax + style->line.width, ymax + style->line.width);
 	}
+
+	lv_obj_invalidate(line);
 }
 
 /**

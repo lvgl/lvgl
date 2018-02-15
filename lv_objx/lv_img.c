@@ -74,7 +74,6 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
     ext->transp = 0;
-    ext->upscale = 0;
     ext->auto_size = 1;
 
     /*Init the new object*/    
@@ -92,7 +91,6 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     } else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->auto_size = copy_ext->auto_size;
-        ext->upscale = copy_ext->upscale;
     	lv_img_set_file(new_img, copy_ext->fn);
 
         /*Refresh the style with new signal function*/
@@ -175,12 +173,6 @@ void lv_img_set_file(lv_obj_t * img, const char * fn)
         ext->w = header.w;
         ext->h = header.h;
         ext->transp = header.transp;
-#if LV_ANTIALIAS
-        if(ext->upscale == false) {
-            ext->w = ext->w >> LV_AA;
-            ext->h = ext->h >> LV_AA;
-        }
-#endif
 	}
 	/*Handle symbol texts*/
 	else {
@@ -225,25 +217,6 @@ void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en)
     ext->auto_size = (autosize_en == false ? 0 : 1);
 }
 
-/**
- * Enable the upscaling if LV_ANTIALIAS is enabled.
- * If enabled the object size will be same as the picture size.
- * @param img pointer to an image
- * @param upscale_en true: upscale enable, false: upscale disable
- */
-void lv_img_set_upscale(lv_obj_t * img, bool upscale_en)
-{
-    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-    
-    /*Upscale works only if antialiassing is enabled*/
-#if LV_ANTIALIAS == 0
-    upscale_en = false;
-#endif
-    ext->upscale = (upscale_en == false ? 0 : 1);
-
-    /*Refresh the image with the new size*/
-    lv_img_set_file(img, ext->fn);
-}
 
 /*=====================
  * Getter functions 
@@ -273,18 +246,6 @@ bool lv_img_get_auto_size(lv_obj_t * img)
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->auto_size == 0 ? false : true;
-}
-
-/**
- * Get the upscale enable attribute
- * @param img pointer to an image
- * @return true: upscale is enabled, false: upscale is disabled
- */
-bool lv_img_get_upscale(lv_obj_t * img)
-{
-    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-
-    return ext->upscale == 0 ? false : true;
 }
 
 /**********************

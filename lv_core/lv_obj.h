@@ -28,23 +28,23 @@ extern "C" {
 
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES == 0 || LV_VER_RES == 0
-#error "LV: LV_HOR_RES and LV_VER_RES must be greater then 0"
+#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater then 0"
 #endif
 
-#if LV_ANTIALIAS != 0 && LV_ANTIALIAS != 1
-#error "LV: LV_ATIALIAS can be only 0 or 1"
+#if LV_ANTIALIAS > 1
+#error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
 
 #if LV_VDB_SIZE == 0 && LV_ANTIALIAS != 0
-#error "LV: If LV_VDB_SIZE == 0 the antialaissing must be disabled"
+#error "LittlevGL: If LV_VDB_SIZE == 0 the anti-aliasing must be disabled"
 #endif
 
-#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < LV_HOR_RES && LV_ANTIALIAS == 0
-#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
+#if LV_VDB_SIZE > 0 && LV_VDB_SIZE < LV_HOR_RES
+#error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
 #endif
 
 #if LV_VDB_SIZE != 0 && LV_VDB_SIZE < 2 *LV_HOR_RES && LV_ANTIALIAS != 0
-#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= (2 * LV_HOR_RES))"
+#error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= (2 * LV_HOR_RES))"
 #endif
 
 #define LV_ANIM_IN			    0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/

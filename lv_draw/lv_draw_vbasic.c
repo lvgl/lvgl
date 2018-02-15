@@ -128,7 +128,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
 
 #if USE_LV_GPU
-    static lv_color_t color_array_tmp[LV_HOR_RES << LV_ANTIALIAS];       /*Used by 'sw_color_fill'*/
+    static lv_color_t color_array_tmp[LV_HOR_RES];       /*Used by 'lv_disp_mem_blend'*/
     static lv_coord_t last_width = -1;
 
     lv_coord_t w = lv_area_get_width(&vdb_rel_a);

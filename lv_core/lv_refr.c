@@ -98,14 +98,6 @@ void lv_inv_area(const lv_area_t * area_p)
     /*The area is truncated to the screen*/
     if(suc != false)
     {
-#if LV_ANTIALIAS == 1
-    	/*Rounding*/
-    	com_area.x1 = com_area.x1 & (~0x1);
-    	com_area.y1 = com_area.y1 & (~0x1);
-    	com_area.x2 = com_area.x2 | 0x1;
-    	com_area.y2 = com_area.y2 | 0x1;
-#endif
-
     	/*Save only if this area is not in one of the saved areas*/
     	uint16_t i;
     	for(i = 0; i < inv_buf_p; i++) {
@@ -262,10 +254,8 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     lv_coord_t h = lv_area_get_height(area_p);
     lv_coord_t y2 = area_p->y2 >= LV_VER_RES ? y2 = LV_VER_RES - 1 : area_p->y2;
 
-    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (w << LV_AA);
-    if(max_row > (h << LV_AA)) max_row = (h << LV_AA);
-
-    max_row = max_row >> LV_AA ;
+    uint32_t max_row = (uint32_t) LV_VDB_SIZE / w;
+    if(max_row > h) max_row = h;
 
     /*Always use the full row*/
     uint32_t row;
@@ -311,13 +301,6 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
      It will be a part of 'area_p'*/
     lv_area_t start_mask;
     lv_area_union(&start_mask, area_p, &vdb_p->area);
-
-#if LV_ANTIALIAS
-    vdb_p->area.x1 = vdb_p->area.x1 << LV_AA;
-    vdb_p->area.x2 = (vdb_p->area.x2 << LV_AA) + 1;
-    vdb_p->area.y1 = (vdb_p->area.y1 << LV_AA);
-    vdb_p->area.y2 = (vdb_p->area.y2 << LV_AA) + 1;
-#endif
 
     /*Get the most top object which is not covered by others*/
     top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
