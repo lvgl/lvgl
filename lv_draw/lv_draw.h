@@ -38,8 +38,8 @@ typedef struct
  * the result image converter utility*/
 typedef struct
 {
-    uint32_t w:12;        /*Width of the image map*/
-    uint32_t h:12;        /*Height of the image map*/
+    uint32_t w  :12;        /*Width of the image map*/
+    uint32_t h  :12;        /*Height of the image map*/
     uint32_t chroma_key:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
     uint32_t alpha :1;    /*Every pixel is extended with a 8 bit alpha channel*/
     const uint8_t * pixel_map;

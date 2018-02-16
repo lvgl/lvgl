@@ -384,7 +384,8 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 lv_opa_t opa_result = opa;
                 lv_color_t * px_color = (lv_color_t *) &map_p[(uint32_t)col * px_size_byte];
 
-                if(chroma_key && px_color->full == chroma_key_color.full) continue;   /*Handle chroma key*/
+                /*Handle chroma key*/
+                if(chroma_key && px_color->full == chroma_key_color.full) continue;
 
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
@@ -392,8 +393,17 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                     opa_result = (uint32_t)((uint32_t)px_opa * opa_result) >> 8;
                 }
 
-                if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = px_color->full;
-                else vdb_buf_tmp[col] = lv_color_mix(vdb_buf_tmp[col], *px_color, opa_result);
+                /*Re-color the pixel if required*/
+                if(recolor_opa != LV_OPA_TRANSP) {
+                    lv_color_t recolored_px = lv_color_mix(recolor, *px_color, recolor_opa);
+
+                    if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = recolored_px.full;
+                    else vdb_buf_tmp[col] = lv_color_mix(vdb_buf_tmp[col], recolored_px, opa_result);
+                } else {
+                    if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = px_color->full;
+                    else vdb_buf_tmp[col] = lv_color_mix(vdb_buf_tmp[col], *px_color, opa_result);
+                }
+
 
             }
 

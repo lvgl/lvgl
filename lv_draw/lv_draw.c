@@ -29,6 +29,8 @@
 
 #define LABEL_RECOLOR_PAR_LENGTH    6
 
+#define SHADOW_OPA_EXTRA_PRECISION      8       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
+#define SHADOW_BOTTOM_AA_EXTRA_RADIUS   4       /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
 /**********************
  *      TYPEDEFS
  **********************/
@@ -48,7 +50,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
 static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 #if USE_LV_SHADOW && LV_VDB_SIZE
-static void lv_draw_rect_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+static void lv_draw_cont_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style);
 static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_cont_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map);
@@ -110,7 +112,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
 
 #if USE_LV_SHADOW && LV_VDB_SIZE
     if(style->body.shadow.width != 0) {
-        lv_draw_rect_shadow(coords, mask, style);
+        lv_draw_cont_shadow(coords, mask, style);
     }
 #endif
     if(style->body.empty == 0){
@@ -784,7 +786,6 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
  */
 static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
 {
-
     uint16_t radius = style->body.radius;
 
     lv_color_t mcolor = style->body.main_color;
@@ -807,12 +808,16 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
     	work_area.y1 = coords->y1 + radius;
     	work_area.y2 = coords->y2 - radius;
 
-#if LV_ANTIALIAS
         if(style->body.radius != 0) {
-            work_area.y1 += LV_ANTIALIAS * 2;
-            work_area.y2 -= LV_ANTIALIAS * 2;
-        }
+#if LV_ANTIALIAS
+            work_area.y1 += 2;
+            work_area.y2 -= 2;
+#else
+            work_area.y1 += 1;
+            work_area.y2 -= 1;
 #endif
+        }
+
 		fill_fp(&work_area, mask, mcolor, opa);
     } else {
 		lv_coord_t row;
@@ -820,12 +825,15 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
 		lv_coord_t row_end = coords->y2 - radius;
 		lv_color_t act_color;
 
-#if LV_ANTIALIAS
         if(style->body.radius != 0) {
-		    row_start += LV_ANTIALIAS * 2;
-            row_end -= LV_ANTIALIAS * 2;
-		}
+#if LV_ANTIALIAS
+		    row_start += 2;
+            row_end -= 2;
+#else
+            row_start += 1;
+            row_end -= 1;
 #endif
+		}
         if(row_start < 0) row_start = 0;
 
 		for(row = row_start; row <= row_end; row ++)
@@ -923,8 +931,6 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
             out_y_seg_end = cir.y;
             lv_coord_t seg_size = out_y_seg_end - out_y_seg_start;
             lv_point_t aa_p;
-
-            printf("x: %d, y:%d\n", out_x_last, out_y_seg_start);
 
             aa_p.x = out_x_last;
             aa_p.y = out_y_seg_start;
@@ -1117,7 +1123,6 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
 
     /*In some cases the last pixel is not drawn*/
     if(LV_MATH_ABS(aa_p.x - aa_p.y) == seg_size) {
-        printf("body out miss\n");
         aa_p.x = out_x_last;
         aa_p.y = out_x_last;
 
@@ -1673,7 +1678,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
  * @param rect pointer to rectangle object
  * @param mask pointer to a mask area (from the design functions)
  */
-static void lv_draw_rect_shadow(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style)
+static void lv_draw_cont_shadow(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style)
 {
     /* If mask is in the middle of cords do not draw shadow*/
     lv_coord_t radius = style->body.radius;
@@ -1711,7 +1716,12 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
     lv_coord_t height = lv_area_get_height(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
-    lv_coord_t curve_x[radius + swidth];     /*Stores the 'x' coordinates of a quarter circle.*/
+
+    if(radius != 0) radius -= LV_ANTIALIAS;
+    swidth += LV_ANTIALIAS;
+
+
+    lv_coord_t curve_x[radius + swidth + 1];     /*Stores the 'x' coordinates of a quarter circle.*/
     memset(curve_x, 0, sizeof(curve_x));
     lv_point_t circ;
     lv_coord_t circ_tmp;
@@ -1723,12 +1733,12 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
     }
     int16_t line;
 
-    int16_t filter_size = 2 * swidth + 1;
-    uint16_t line_1d_blur[filter_size];
+    int16_t filter_width = 2 * swidth + 1;
+    uint32_t line_1d_blur[filter_width];
 
     /*1D Blur horizontally*/
-    for(line = 0; line < filter_size; line++) {
-        line_1d_blur[line] = (uint32_t)((uint32_t)(filter_size - line) * style->body.opa * 2) / filter_size;
+    for(line = 0; line < filter_width; line++) {
+        line_1d_blur[line] = (uint32_t)((uint32_t)(filter_width - line) * (style->body.opa * 2)  << SHADOW_OPA_EXTRA_PRECISION) / (filter_width * filter_width);
     }
 
     uint16_t col;
@@ -1742,62 +1752,65 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
     lv_point_t ofs_rt;
     lv_point_t ofs_lb;
     lv_point_t ofs_lt;
-    ofs_rb.x = coords->x2 - radius;
-    ofs_rb.y = coords->y2 - radius;
+    ofs_rb.x = coords->x2 - radius - LV_ANTIALIAS;
+    ofs_rb.y = coords->y2 - radius - LV_ANTIALIAS;
 
-    ofs_rt.x = coords->x2 - radius;
-    ofs_rt.y = coords->y1 + radius;
+    ofs_rt.x = coords->x2 - radius - LV_ANTIALIAS;
+    ofs_rt.y = coords->y1 + radius + LV_ANTIALIAS;
 
-    ofs_lb.x = coords->x1 + radius;
-    ofs_lb.y = coords->y2 - radius;
+    ofs_lb.x = coords->x1 + radius + LV_ANTIALIAS;
+    ofs_lb.y = coords->y2 - radius - LV_ANTIALIAS;
 
-    ofs_lt.x = coords->x1 + radius;
-    ofs_lt.y = coords->y1 + radius;
-
-    for(line = 0; line <= radius + swidth; line++) {   /*Check all rows and make the 1D blur to 2D*/
-        for(col = 0; col < radius + swidth; col++) {      /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
+    ofs_lt.x = coords->x1 + radius + LV_ANTIALIAS;
+    ofs_lt.y = coords->y1 + radius + LV_ANTIALIAS;
+    bool line_ready;
+    for(line = 1; line <= radius + swidth; line++) {        /*Check all rows and make the 1D blur to 2D*/
+        line_ready = false;
+        for(col = 1; col < radius + swidth + 1; col++) {        /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
 
             /*Sum the opacities from the lines above and below this 'row'*/
             int16_t line_rel;
-            int16_t col_rel;
             uint32_t px_opa_sum = 0;
             for(line_rel = -swidth; line_rel <= swidth; line_rel ++) {
-                int16_t x_shift;
+                /*Get the relative x position of the 'line_rel' to 'line'*/
+                int16_t col_rel;
                 if(line + line_rel < 0) {                       /*Below the radius, here is the blur of the edge */
-                    x_shift = curve_x[line] + col;
-
-                    if(x_shift - radius <= -swidth) px_opa_sum += style->body.opa * 2;     /*Pointing inside, where no blur*/
-                    else if(x_shift - radius >= swidth) px_opa_sum += 0;                   /*Already no blurred pixels here*/
-                    else px_opa_sum += line_1d_blur[x_shift - radius + swidth];            /*On the 1D blur*/
-                }
-                else if(line + line_rel > radius) {             /*Above the radius, here won't be more 1D blur*/
+                    col_rel = radius - curve_x[line] - col;
+                } else if(line + line_rel > radius) {           /*Above the radius, here won't be more 1D blur*/
                     break;
                 } else {                                        /*Blur from the curve*/
-                    x_shift = curve_x[line_rel] - curve_x[line_rel] + col;
-                    if(x_shift <= -swidth) px_opa_sum += style->body.opa * 2;    /*Inside the not blurred area*/
-                    else if (x_shift >= swidth) px_opa_sum += 0;                /*Outside of the burred area*/
-                    else px_opa_sum += line_1d_blur[x_shift + swidth];         /*In the blur (+ swidth to align to the center)*/
+                    col_rel = curve_x[line + line_rel] - curve_x[line] - col;
                 }
+
+                /*Add the value of the 1D blur on 'col_rel' position*/
+                if(col_rel < -swidth) {                         /*Outside of the burred area. */
+                    if(line_rel == -swidth) line_ready = true;  /*If no data even on the very first line then it wont't be anything else in this line*/
+                    break;                                      /*Break anyway because only smaller 'col_rel' values will come */
+                }
+                else if (col_rel > swidth) px_opa_sum += line_1d_blur[0];       /*Inside the not blurred area*/
+                else px_opa_sum += line_1d_blur[swidth - col_rel];              /*On the 1D blur (+ swidth to align to the center)*/
             }
 
-            line_2d_blur[col] = px_opa_sum / (radius + swidth);
+            line_2d_blur[col] = px_opa_sum >> SHADOW_OPA_EXTRA_PRECISION;
+            if(line_ready) break;
 
         }
+
         /*Flush the line*/
-        point_rt.x = curve_x[line] + ofs_rt.x;
+        point_rt.x = curve_x[line] + ofs_rt.x + 1;
         point_rt.y = ofs_rt.y - line;
 
-        point_rb.x = curve_x[line] + ofs_rb.x;
+        point_rb.x = curve_x[line] + ofs_rb.x + 1;
         point_rb.y = ofs_rb.y + line;
 
-        point_lt.x = ofs_lt.x -  curve_x[line];
+        point_lt.x = ofs_lt.x -  curve_x[line] - 1;
         point_lt.y = ofs_lt.y - line;
 
-        point_lb.x = ofs_lb.x - curve_x[line];
+        point_lb.x = ofs_lb.x - curve_x[line] - 1;
         point_lb.y = ofs_lb.y + line;
 
         uint16_t d;
-        for(d = 0; d < col; d++) {
+        for(d = 1; d <= col; d++) {
 
             if(point_rt.x != point_lt.x) {
                 px_fp(point_lt.x,point_lt.y , mask, style->body.shadow.color, line_2d_blur[d]);
@@ -1820,91 +1833,11 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
             point_rt.x++;
             point_lt.x--;
         }
-//        for(p = 0; p < radius + swidth; p++) {      /*Check all pixels in a row (from the origo to last shadow pixel (radius + swidth))*/
-//           int16_t v;
-//           uint32_t opa_tmp = 0;
-//           int16_t row_v;
-//           bool swidth_out = false;
-//
-//           /* Count the sum of 1D blur 'lines'
-//            * v: relative 1D blur 'line' to this 'row' */
-//           for(v = -swidth; v <= swidth; v++) {
-//               row_v = row + v;
-//               if(row_v < 0) row_v = 0; /*Rows below the corner are the same as the last 1D blur (they are blurred from a straight edge)*/
-//
-//               /*Rows above the bottom are empty so they won't modify the filter*/
-//               if(row_v > radius) {
-//                   break;
-//               }
-//               else
-//               {
-//                   int16_t p_tmp = p - (cruve_x[row_v] - cruve_x[row]);     /*cruve_x[row_v]: 1D blur line start*/
-//                   if(p_tmp < -swidth) { /*Cols before the filtered shadow (still not blurred)*/
-//                       opa_tmp += style->body.opa * 2;
-//                   }
-//                   /*Cols after the filtered shadow (already no effect) */
-//                   else if (p_tmp > swidth) {
-//                       /* If on the current point the  filter top point is already out of swidth then
-//                        * the remaining part will not do not anything on this point*/
-//                       if(v == -swidth) { /*Is the first point?*/
-//                           swidth_out = true;
-//                       }
-//                       break;
-//                   } else {
-//                       opa_tmp += opa_h_result[p_tmp + swidth];
-//                   }
-//               }
-//           }
-//           if(swidth_out == false) {
-//               opa_tmp = opa_tmp / (filter_size);
-//               opa_v_result[p] = opa_tmp > LV_OPA_COVER ? LV_OPA_COVER : opa_tmp;
-//           }
-//           else {
-//               break;
-//           }
-//        }
-//
-//        point_rt.x = cruve_x[row] + ofs_rt.x;
-//        point_rt.y = ofs_rt.y - row;
-//
-//        point_rb.x = cruve_x[row] + ofs_rb.x;
-//        point_rb.y = ofs_rb.y + row;
-//
-//        point_lt.x = ofs_lt.x -  cruve_x[row];
-//        point_lt.y = ofs_lt.y - row;
-//
-//        point_lb.x = ofs_lb.x - cruve_x[row];
-//        point_lb.y = ofs_lb.y + row;
-//
-//        uint16_t d;
-//        for(d = 0; d < p; d++) {
-//
-//            if(point_rt.x != point_lt.x) {
-//                px_fp(point_lt.x,point_lt.y , mask, style->body.shadow.color, opa_v_result[d]);
-//            }
-//
-//            if(point_rb.x != point_lb.x && point_lt.y != point_lb.y) {
-//                px_fp(point_lb.x,point_lb.y , mask, style->body.shadow.color, opa_v_result[d]);
-//            }
-//
-//            if(point_lt.y != point_lb.y) {
-//                px_fp(point_rb.x,point_rb.y , mask, style->body.shadow.color, opa_v_result[d]);
-//            }
-//
-//            px_fp(point_rt.x,point_rt.y , mask, style->body.shadow.color, opa_v_result[d]);
-//
-//
-//            point_rb.x++;
-//            point_lb.x--;
-//
-//            point_rt.x++;
-//            point_lt.x--;
-//        }
-//
-//        /*When the first row is known draw the straight pars with same opa. map*/
-//        if(row == 0) {
-//           lv_draw_cont_shadow_full_straight(coords, mask, style, opa_v_result);
-//        }
+
+        /* Put the first line to the edges too.
+         * It is not correct because blur should be done below the corner too
+         * but is is simple, fast and gives a good enough result*/
+        if(line == 1) lv_draw_cont_shadow_full_straight(coords, mask, style, line_2d_blur);
     }
 }
 
@@ -1917,24 +1850,24 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
     lv_coord_t height = lv_area_get_height(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
+    radius += LV_ANTIALIAS * SHADOW_BOTTOM_AA_EXTRA_RADIUS;
+    swidth+= LV_ANTIALIAS;
 
-    lv_coord_t cruve_x[radius + swidth];     /*Stores the 'x' coordinates of a quarter circle.*/
-    memset(cruve_x, 0, sizeof(cruve_x));
+    lv_coord_t curve_x[radius + 1];             /*Stores the 'x' coordinates of a quarter circle.*/
     lv_point_t circ;
     lv_coord_t circ_tmp;
     lv_circ_init(&circ, &circ_tmp, radius);
     while(lv_circ_cont(&circ)) {
-        cruve_x[LV_CIRC_OCT1_Y(circ)] = LV_CIRC_OCT1_X(circ);
-        cruve_x[LV_CIRC_OCT2_Y(circ)] = LV_CIRC_OCT2_X(circ);
+        curve_x[LV_CIRC_OCT1_Y(circ)] = LV_CIRC_OCT1_X(circ);
+        curve_x[LV_CIRC_OCT2_Y(circ)] = LV_CIRC_OCT2_X(circ);
         lv_circ_next(&circ, &circ_tmp);
     }
+
     int16_t row;
+    lv_opa_t line_1d_blur[swidth];
 
-    int16_t filter_size = 2 * swidth + 1;
-    lv_opa_t opa_h_result[filter_size];
-
-    for(row = 0; row < filter_size; row++) {
-        opa_h_result[row] = (uint32_t)((uint32_t)(filter_size - row) * style->body.opa) / (filter_size);
+    for(row = 0; row < swidth; row++) {
+        line_1d_blur[row] = (uint32_t)((uint32_t)(swidth - row) * style->body.opa) / (swidth);
     }
 
     lv_point_t point_l;
@@ -1944,24 +1877,24 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
     lv_point_t ofs2;
 
     ofs1.x = coords->x1 + radius;
-    ofs1.y = coords->y2 - radius;
+    ofs1.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
 
     ofs2.x = coords->x2 - radius;
-    ofs2.y = coords->y2 - radius;
+    ofs2.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
 
-    for(row = 0; row < radius; row++) {
+    for(row = 0; row <= radius; row++) {
         point_l.x = ofs1.x + radius - row - radius;
-        point_l.y = ofs1.y + cruve_x[row];
+        point_l.y = ofs1.y + curve_x[row];
 
         point_r.x = ofs2.x + row;
-        point_r.y = ofs2.y + cruve_x[row];
+        point_r.y = ofs2.y + curve_x[row];
 
         uint16_t d;
-        for(d = swidth; d < filter_size; d++) {
-            px_fp(point_l.x, point_l.y, mask, style->body.shadow.color, opa_h_result[d]);
+        for(d = 0; d < swidth; d++) {
+            px_fp(point_l.x, point_l.y, mask, style->body.shadow.color, line_1d_blur[d]);
             point_l.y ++;
 
-            px_fp(point_r.x, point_r.y, mask, style->body.shadow.color, opa_h_result[d]);
+            px_fp(point_r.x, point_r.y, mask, style->body.shadow.color, line_1d_blur[d]);
             point_r.y ++;
         }
 
@@ -1973,8 +1906,8 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
     area_mid.y2 = area_mid.y1;
 
     uint16_t d;
-    for(d = swidth; d < filter_size; d++) {
-        fill_fp(&area_mid, mask, style->body.shadow.color, opa_h_result[d]);
+    for(d = 0; d < swidth; d++) {
+        fill_fp(&area_mid, mask, style->body.shadow.color, line_1d_blur[d]);
         area_mid.y1 ++;
         area_mid.y2 ++;
     }
@@ -1982,55 +1915,57 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
 
 static void lv_draw_cont_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map)
 {
-
     lv_coord_t radius = style->body.radius;
-    lv_coord_t swidth = style->body.shadow.width;
+    lv_coord_t swidth = style->body.shadow.width + LV_ANTIALIAS;
     lv_coord_t width = lv_area_get_width(coords);
     lv_coord_t height = lv_area_get_height(coords);
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
+    if(radius == 0) radius += LV_ANTIALIAS;
 
-    lv_area_t sider_area;
-    sider_area.x1 = coords->x2;
-    sider_area.y1 = coords->y1 + radius + 1;
-    sider_area.x2 = sider_area.x1;
-    sider_area.y2 = coords->y2 -  radius - 1;
+    lv_area_t right_area;
+    right_area.x1 = coords->x2 + 1 - LV_ANTIALIAS;
+    right_area.y1 = coords->y1 + radius;
+    right_area.x2 = right_area.x1;
+    right_area.y2 = coords->y2 -  radius;
 
-    lv_area_t sidel_area;
-    sidel_area.x1 = coords->x1;
-    sidel_area.y1 = coords->y1 + radius + 1;
-    sidel_area.x2 = sidel_area.x1;
-    sidel_area.y2 = coords->y2 - radius - 1;
+    lv_area_t left_area;
+    left_area.x1 = coords->x1 - 1 + LV_ANTIALIAS;
+    left_area.y1 = coords->y1 + radius;
+    left_area.x2 = left_area.x1;
+    left_area.y2 = coords->y2 - radius;
 
-    lv_area_t sidet_area;
-    sidet_area.x1 = coords->x1 + radius + 1 + LV_ANTIALIAS;
-    sidet_area.y1 = coords->y1;
-    sidet_area.x2 = coords->x2 - radius - 1;
-    sidet_area.y2 = sidet_area.y1;
+    lv_area_t top_area;
+    top_area.x1 = coords->x1 + radius;
+    top_area.y1 = coords->y1 - 1 + LV_ANTIALIAS;
+    top_area.x2 = coords->x2 - radius;
+    top_area.y2 = top_area.y1;
 
-    lv_area_t sideb_area;
-    sideb_area.x1 = coords->x1 + radius + 1;
-    sideb_area.y1 = coords->y2;
-    sideb_area.x2 = coords->x2 - radius - 1;
-    sideb_area.y2 = sideb_area.y1;
+    lv_area_t bottom_area;
+    bottom_area.x1 = coords->x1 + radius;
+    bottom_area.y1 = coords->y2 + 1 - LV_ANTIALIAS;
+    bottom_area.x2 = coords->x2 - radius;
+    bottom_area.y2 = bottom_area.y1;
 
+    lv_opa_t opa_act;
     int16_t d;
-    for(d = 0; d < swidth; d++) {
-        fill_fp(&sider_area, mask, style->body.shadow.color, map[d]);
-        sider_area.x1++;
-        sider_area.x2++;
+    for(d = 1; d <= swidth; d++) {
+        opa_act = map[d];
+        fill_fp(&right_area, mask, style->body.shadow.color, opa_act);
+        right_area.x1++;
+        right_area.x2++;
 
-        fill_fp(&sidel_area, mask, style->body.shadow.color, map[d]);
-        sidel_area.x1--;
-        sidel_area.x2--;
+        fill_fp(&left_area, mask, style->body.shadow.color, opa_act);
+        left_area.x1--;
+        left_area.x2--;
 
-        fill_fp(&sidet_area, mask, style->body.shadow.color, map[d]);
-        sidet_area.y1--;
-        sidet_area.y2--;
+        fill_fp(&top_area, mask, style->body.shadow.color, opa_act);
+        top_area.y1--;
+        top_area.y2--;
 
-        fill_fp(&sideb_area, mask, style->body.shadow.color, map[d]);
-        sideb_area.y1++;
-        sideb_area.y2++;
+        fill_fp(&bottom_area, mask, style->body.shadow.color, opa_act);
+        bottom_area.y1++;
+        bottom_area.y2++;
     }
 
 }
@@ -2111,7 +2046,6 @@ static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_
     else {
 
         uint8_t id = (uint32_t) ((uint32_t)px_id * (sizeof(opa_map) - 1)) / (seg - 1);
-        printf("id: %d, px/seg: %d/%d\n", id, px_id, seg);
         return (uint32_t) ((uint32_t) opa_map[id] * opa) >> 8;
 
     }
