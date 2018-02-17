@@ -30,16 +30,20 @@ Here are ideas which are not assigned to a minor version yet:
 
 ## v5.1 (released at: in progress)
 - [ ] lv_refr_set_roundig_callback: set a sunction modify the invalidated area for speciel diplay controllers
-- [ ] lv_group_set_focus_callback: set function to call when a new object is focused
-- [ ] lv_obj_get_type() return string, e.g. "lv_slider", "lv_btn" etc
+- [ ] lv_group_set_focus_callback: set function to call when a new object is focused #94
+- [ ] lv_obj_get_type() return string, e.g. "lv_slider", "lv_btn" etc #91
 - [ ] Font handling extension for effective Chiese font handling (cutsom read functions)
 - [ ] Remove LV_FONT_ANTIALIAS and add fonts with BPP (bit-per-pixel): 1, 2, 4 and 8
 - [ ] lv_img: add pixel level opacity option (ARGB8888 or ARGB8565) (make image upscale pointless)
 - [ ] LV_ANTIALIAS rework: meaning anti-alias lines and curves
-- [ ] Merge symbol fonts (basic, file and feedback) into one font
+- [ ] Merge symbol fonts (basic, file and feedback) into one font 
 - [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
 - [ ] lv_img_set_data() for const. image data instead of file system usage
 - [ ] lv_obj_set_sticky: new object attribute, to force input device to NOT find new object when the object's pressing is lost
+- [ ] lv_label: draw style.body.padding.hor/ver greater body if body_draw is enabled 
+- [ ] LV_LAYOUT_PRETTY: in one row align obeóject vertically to middle
+- [ ] Add user data option to lv_indev_drv_t and pass it with lv_indev_data_t to the read function. #115
+- [ ] LV_GROUP_KEY_ENTER_LONG: sent by the library on long press of LV_GROUP_KEY_ENTER to trigger long press of the object #113
 
 ## v5.0 (released at: 20.12.2017)
 - [x] UTF-8 support
