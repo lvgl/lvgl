@@ -7,8 +7,11 @@ Please create an issue to suggest a new feature instead of adding pull request t
 ## v6 (released at: in progrss)
 - [ ] lv_img_upscale removal (generate image with with opacity instead)
 - [ ] disp_map and disp_fill removal
-- [ ] disp_fill, mem_blend, mem_fill rework: usea lv_area_t as parameter an GPU support 2D area
+- [ ] disp_flush, mem_blend, mem_fill rework: usea lv_area_t as parameter an GPU support 2D area
+- [ ] disp_flush: not const color map
+- [ ] ext size removal, enable drawing on full parent.
 - [ ] multiple display support
+
 
 ## v5 (released at: 20.12.2017)
 **Architectural changes**
