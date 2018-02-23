@@ -234,7 +234,7 @@ lv_img_src_t lv_img_get_src_type(const void * src)
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 'A' && u8_p[0] <= 'Z') return LV_IMG_SRC_FILE;    /*It's a driver letter*/
     else if(u8_p[0] >= 127) return LV_IMG_SRC_SYMBOL;               /*After ASCII letteres only symbols (even UTF-8) can be*/
-    else if(((u8_p[0] & 0xFC) >> 2) == LV_IMG_FORMAT_RAW_INTERNAL) return LV_IMG_SRC_VARIABLE;      /*Mask the file format part og of lv_img_t header. IT should be 0 which means C array */
+    else if(((u8_p[0] & 0xFC) >> 2) == LV_IMG_FORMAT_INTERNAL_RAW) return LV_IMG_SRC_VARIABLE;      /*Mask the file format part og of lv_img_t header. IT should be 0 which means C array */
     else return LV_IMG_SRC_UNKNOWN;
 }
 

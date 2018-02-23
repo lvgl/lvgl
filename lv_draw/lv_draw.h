@@ -55,7 +55,7 @@ typedef struct
 
 typedef enum {
     LV_IMG_FORMAT_UNKOWN = 0,
-    LV_IMG_FORMAT_RAW_INTERNAL,       /*'lv_img_t' variable compiled with the code*/
+    LV_IMG_FORMAT_INTERNAL_RAW,       /*'lv_img_t' variable compiled with the code*/
     LV_IMG_FORMAT_FILE_RAW_RGB332,    /*8 bit*/
     LV_IMG_FORMAT_FILE_RAW_RGB565,    /*16 bit*/
     LV_IMG_FORMAT_FILE_RAW_RGB888,    /*24 bit (stored on 32 bit)*/
