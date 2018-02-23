@@ -139,77 +139,78 @@ const int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_
 /**********************
  *      MACROS
  **********************/
+#define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
-/***********************
- *   FONT DECLARATION INCLUDES
- ***********************/
+/******************************
+ *  FONT DECLARATION INCLUDES
+ *****************************/
 
 /*10 px */
 #if USE_LV_FONT_DEJAVU_10
-extern lv_font_t lv_font_dejavu_10;
+LV_FONT_DECLARE(lv_font_dejavu_10);
 #endif
 
 #if USE_LV_FONT_DEJAVU_10_LATIN_SUP
-extern lv_font_t lv_font_dejavu_10_latin_sup;
+LV_FONT_DECLARE(lv_font_dejavu_10_latin_sup);
 #endif
 
 #if USE_LV_FONT_DEJAVU_10_CYRILLIC
-extern lv_font_t lv_font_dejavu_10_cyrillic;
+LV_FONT_DECLARE(lv_font_dejavu_10_cyrillic);
 #endif
 
 #if USE_LV_FONT_SYMBOL_10
-extern lv_font_t lv_font_symbol_10;
+LV_FONT_DECLARE(lv_font_symbol_10);
 #endif
 
 /*20 px */
 #if USE_LV_FONT_DEJAVU_20
-extern lv_font_t lv_font_dejavu_20;
+LV_FONT_DECLARE(lv_font_dejavu_20);
 #endif
 
 #if USE_LV_FONT_DEJAVU_20_LATIN_SUP
-extern lv_font_t lv_font_dejavu_20_latin_sup;
+LV_FONT_DECLARE(lv_font_dejavu_20_latin_sup);
 #endif
 
 #if USE_LV_FONT_DEJAVU_20_CYRILLIC
-extern lv_font_t lv_font_dejavu_20_cyrillic;
+LV_FONT_DECLARE(lv_font_dejavu_20_cyrillic);
 #endif
 
 #if USE_LV_FONT_SYMBOL_20
-extern lv_font_t lv_font_symbol_20;
+LV_FONT_DECLARE(lv_font_symbol_20);
 #endif
 
 /*30 px */
 #if USE_LV_FONT_DEJAVU_30
-extern lv_font_t lv_font_dejavu_30;
+LV_FONT_DECLARE(lv_font_dejavu_30);
 #endif
 
 #if USE_LV_FONT_DEJAVU_30_LATIN_SUP
-extern lv_font_t lv_font_dejavu_30_latin_sup;
+LV_FONT_DECLARE(lv_font_dejavu_30_latin_sup);
 #endif
 
 #if USE_LV_FONT_DEJAVU_30_CYRILLIC
-extern lv_font_t lv_font_dejavu_30_cyrillic;
+LV_FONT_DECLARE(lv_font_dejavu_30_cyrillic);
 #endif
 
 #if USE_LV_FONT_SYMBOL_30
-extern lv_font_t lv_font_symbol_30;
+LV_FONT_DECLARE(lv_font_symbol_30);
 #endif
 
 /*40 px */
 #if USE_LV_FONT_DEJAVU_40
-extern lv_font_t lv_font_dejavu_40;
+LV_FONT_DECLARE(lv_font_dejavu_40);
 #endif
 
 #if USE_LV_FONT_DEJAVU_40_LATIN_SUP
-extern lv_font_t lv_font_dejavu_40_latin_sup;
+LV_FONT_DECLARE(lv_font_dejavu_40_latin_sup);
 #endif
 
 #if USE_LV_FONT_DEJAVU_40_CYRILLIC
-extern lv_font_t lv_font_dejavu_40_cyrillic;
+LV_FONT_DECLARE(lv_font_dejavu_40_cyrillic);
 #endif
 
 #if USE_LV_FONT_SYMBOL_40
-extern lv_font_t lv_font_symbol_40;
+LV_FONT_DECLARE(lv_font_symbol_40);
 #endif
 
 #ifdef __cplusplus
