@@ -46,7 +46,7 @@ void lv_indev_drv_init(lv_indev_drv_t *driver)
 {
     driver->read = NULL;
     driver->type = LV_INDEV_TYPE_NONE;
-    driver->priv = NULL;
+    driver->user_data = NULL;
 }
 
 /**
@@ -108,7 +108,7 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data)
     bool cont = false;
 
     if(indev->driver.read) {
-        data->priv = indev->driver.priv;
+        data->user_data = indev->driver.user_data;
         cont = indev->driver.read(data);
     } else {
         memset(data, 0, sizeof(lv_indev_data_t));

@@ -68,11 +68,15 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
 void lv_img_set_src(lv_obj_t * img, const void * src_img);
 
 /**
- * Set a file to the image
- * @param img pointer to an image object
- * @param fn file name in the RAMFS to set as picture (e.g. "U:/pic1").
+ * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0.
+ * Use 'lv_img_set_src()' instead.
+ * @param img
+ * @param fn
  */
-void lv_img_set_file(lv_obj_t * img, const char * fn);
+static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
+{
+
+}
 
 /**
  * Enable the auto size feature.
@@ -92,11 +96,30 @@ static inline void lv_img_set_style(lv_obj_t *img, lv_style_t *style)
     lv_obj_set_style(img, style);
 }
 
+/**
+ * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
+ * @param img
+ * @param upscale
+ */
+static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
+{
+
+}
+
 /*=====================
  * Getter functions
  *====================*/
 
+/**
+ * Get the type of an image source
+ * @param src pointer to an image source:
+ *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
+ *  - a path to an file (e.g. "S:/folder/image.bin")
+ *  - or a symbol (e.g. SYMBOL_CLOSE)
+ * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
+ */
 lv_img_src_t lv_img_get_src_type(const void * src);
+
 
 /**
  * Get the name of the file set for an image
@@ -104,7 +127,6 @@ lv_img_src_t lv_img_get_src_type(const void * src);
  * @return file name
  */
 const char * lv_img_get_file_name(lv_obj_t * img);
-
 
 /**
  * Get the auto size enable attribute
@@ -121,6 +143,16 @@ bool lv_img_get_auto_size(lv_obj_t * img);
 static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
 {
     return lv_obj_get_style(img);
+}
+
+/**
+ * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
+ * @param img
+ * @return false
+ */
+static inline bool lv_img_get_upscale(lv_obj_t * img)
+{
+    return false;
 }
 
 /**********************

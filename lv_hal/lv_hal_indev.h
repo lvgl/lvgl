@@ -48,14 +48,14 @@ typedef struct {
         uint32_t key;          /*For INDEV_TYPE_KEYPAD*/
     };
     lv_indev_state_t state; /*LV_INDEV_EVENT_REL or LV_INDEV_EVENT_PR*/
-    void *priv;             /*'lv_indev_drv_t.priv' for this driver*/
+    void *user_data;             /*'lv_indev_drv_t.priv' for this driver*/
 }lv_indev_data_t;
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct {
-    lv_hal_indev_type_t type;                       /*Input device type*/
+    lv_hal_indev_type_t type;                   /*Input device type*/
     bool (*read)(lv_indev_data_t *data);        /*Function pointer to read data. Return 'true' if there is still data to be read (buffered)*/
-    void *priv;                                    /*Opaque pointer for driver's use, passed in 'lv_indev_data_t' on read*/
+    void *user_data;                            /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
 }lv_indev_drv_t;
 
 struct _lv_obj_t;

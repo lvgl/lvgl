@@ -199,16 +199,6 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 }
 
 /**
- * Set a file to the image
- * @param img pointer to an image object
- * @param fn file name in the RAMFS to set as picture (e.g. "U:/pic1"). 
- */
-void lv_img_set_file(lv_obj_t * img, const char * fn)
-{
-    lv_img_set_src(img, fn);
-}
-
-/**
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
@@ -226,6 +216,14 @@ void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en)
  * Getter functions 
  *====================*/
 
+/**
+ * Get the type of an image source
+ * @param src pointer to an image source:
+ *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
+ *  - a path to an file (e.g. "S:/folder/image.bin")
+ *  - or a symbol (e.g. SYMBOL_CLOSE)
+ * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
+ */
 lv_img_src_t lv_img_get_src_type(const void * src)
 {
     if(src == NULL) return LV_IMG_SRC_UNKNOWN;
@@ -247,7 +245,8 @@ const char * lv_img_get_file_name(lv_obj_t * img)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    return ext->src;
+    if(ext->src_type == LV_IMG_SRC_FILE) return ext->src;
+    else return "";
 }
 
 

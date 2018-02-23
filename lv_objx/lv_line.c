@@ -71,6 +71,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_line, LV_DPI, LV_DPI);  /*Auto size is enables, but set default size until no points are added*/
 	    lv_obj_set_style(new_line, NULL);           /*Inherit parent's style*/
+	    lv_obj_set_click(new_line, false);
     }
     /*Copy an existing object*/
     else {
