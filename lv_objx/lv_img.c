@@ -37,7 +37,6 @@
  **********************/
 static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
-static bool lv_img_is_symbol(const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -70,10 +69,12 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
     lv_mem_assert(ext);
-    ext->fn = NULL;
+    ext->src = NULL;
+    ext->src_type = LV_IMG_SRC_UNKNOWN;
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
-    ext->transp = 0;
+    ext->chroma_keyed = 0;
+    ext->alpha_byte = 0;
     ext->auto_size = 1;
 
     /*Init the new object*/    
@@ -91,7 +92,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     } else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
     	ext->auto_size = copy_ext->auto_size;
-    	lv_img_set_file(new_img, copy_ext->fn);
+    	lv_img_set_src(new_img, copy_ext->src);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_img);
@@ -100,20 +101,6 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     return new_img;
 }
 
-/**
- * Create a file to the RAMFS from a picture data
- * @param fn file name of the new file (e.g. "pic1", will be available at "U:/pic1")
- * @param data pointer to a color map with lv_img_raw_header_t header
- * @return result of the file operation. LV_FS_RES_OK or any error from lv_fs_res_t
- */
-lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data)
-{
-	const lv_img_raw_header_t * raw_p = (lv_img_raw_header_t *) data;
-	lv_fs_res_t res;
-	res = lv_ufs_create_const(fn, data, raw_p->w * raw_p->h * sizeof(lv_color_t) + sizeof(lv_img_raw_header_t));
-
-	return res;
-}
 
 /*=====================
  * Setter functions 
@@ -125,16 +112,88 @@ lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data)
  * @param img pointer to an image object
  * @param data the image data
  */
-void lv_img_set_data(lv_obj_t * img, lv_img_dsc_t * data)
+void lv_img_set_src(lv_obj_t * img, const void * src_img)
 {
+    lv_img_src_t src_type = lv_img_get_src_type(src_img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    ext->px_data = data;
-    ext->w = data->w;
-    ext->h = data->h;
-    ext->transp = data->chroma_key;
-    ext->alpha_byte = data->alpha;
-    lv_obj_set_size(img, data->w, data->h);
+
+    if(src_type == LV_IMG_SRC_UNKNOWN) {
+        if(ext->src_type == LV_IMG_SRC_SYMBOL || ext->src_type == LV_IMG_SRC_FILE) {
+            lv_mem_free(ext->src);
+        }
+        ext->src = NULL;
+        ext->src_type = LV_IMG_SRC_UNKNOWN;
+        return;
+    }
+
+
+    ext->src_type = src_type;
+
+    if(src_type == LV_IMG_SRC_VARIABLE) {
+        ext->src = src_img;
+        ext->w = ((lv_img_t*)src_img)->header.w;
+        ext->h = ((lv_img_t*)src_img)->header.h;
+        ext->chroma_keyed = ((lv_img_t*)src_img)->header.chroma_keyed;
+        ext->alpha_byte = ((lv_img_t*)src_img)->header.alpha_byte;
+        lv_obj_set_size(img, ext->w, ext->h);
+    }
+
+    else if(src_type == LV_IMG_SRC_FILE) {
+        lv_fs_file_t file;
+        lv_fs_res_t res;
+        lv_img_t img_file_data;
+        uint32_t rn;
+        res = lv_fs_open(&file, src_img, LV_FS_MODE_RD);
+        if(res == LV_FS_RES_OK) {
+            res = lv_fs_read(&file, &img_file_data, sizeof(img_file_data), &rn);
+        }
+
+        /*Create a dummy header on fs error*/
+        if(res != LV_FS_RES_OK || rn != sizeof(img_file_data)) {
+            img_file_data.header.w = lv_obj_get_width(img);
+            img_file_data.header.h = lv_obj_get_height(img);
+            img_file_data.header.chroma_keyed = 0;
+            img_file_data.header.alpha_byte = 0;
+        }
+
+        lv_fs_close(&file);
+
+        ext->w = img_file_data.header.w;
+        ext->h = img_file_data.header.h;
+        ext->chroma_keyed = img_file_data.header.chroma_keyed;
+        ext->alpha_byte = img_file_data.header.alpha_byte;
+
+        /* If the new and the old src are the same then it was only a refresh.*/
+        if(ext->src != src_img) {
+            lv_mem_free(ext->src);
+            char * new_fn = lv_mem_alloc(strlen(src_img) + 1);
+            strcpy(new_fn, src_img);
+            ext->src = new_fn;
+
+        }
+    }
+
+    else if(src_type == LV_IMG_SRC_SYMBOL) {
+        lv_style_t * style = lv_obj_get_style(img);
+        lv_point_t size;
+        lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        ext->w = size.x;
+        ext->h = size.y;
+        ext->chroma_keyed = 1;    /*Symbols always have transparent parts, Important because of cover check in the design function*/
+
+        /* If the new and the old src are the same then it was only a refresh.*/
+        if(ext->src != src_img) {
+            lv_mem_free(ext->src);
+            char * new_txt = lv_mem_alloc(strlen(src_img) + 1);
+            strcpy(new_txt, src_img);
+            ext->src = new_txt;
+        }
+    }
+
+    if(lv_img_get_auto_size(img) != false) {
+        lv_obj_set_size(img, ext->w, ext->h);
+    }
 
     lv_obj_invalidate(img);
 }
@@ -146,62 +205,7 @@ void lv_img_set_data(lv_obj_t * img, lv_img_dsc_t * data)
  */
 void lv_img_set_file(lv_obj_t * img, const char * fn)
 {
-
-    return;
-    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-    
-    /*Handle normal images*/
-	if(lv_img_is_symbol(fn) == false) {
-        lv_fs_file_t file;
-        lv_fs_res_t res;
-        lv_img_raw_header_t header;
-        uint32_t rn;
-        res = lv_fs_open(&file, fn, LV_FS_MODE_RD);
-        if(res == LV_FS_RES_OK) {
-            res = lv_fs_read(&file, &header, sizeof(header), &rn);
-        }
-
-        /*Create a dummy header on fs error*/
-        if(res != LV_FS_RES_OK || rn != sizeof(header)) {
-            header.w = lv_obj_get_width(img);
-            header.h = lv_obj_get_height(img);
-            header.transp = 0;
-        }
-
-        lv_fs_close(&file);
-
-        ext->w = header.w;
-        ext->h = header.h;
-        ext->transp = header.transp;
-	}
-	/*Handle symbol texts*/
-	else {
-        lv_style_t * style = lv_obj_get_style(img);
-        lv_point_t size;
-        lv_txt_get_size(&size, fn, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
-        ext->w = size.x;
-        ext->h = size.y;
-        ext->transp = 1;    /*Symbols always have transparent parts*/
-	}
-
-	if(fn != NULL) {
-	    /* Don't refresh if set the the current 'fn'
-	     * 'lv_mem_realloc' first allocates a new mem and then frees the old
-	     * in this case it would free itself so it wouldn't be anything to 'strcpy' */
-	    if(ext->fn != fn) {
-            ext->fn = lv_mem_realloc(ext->fn, strlen(fn) + 1);
-            strcpy(ext->fn, fn);
-	    }
-	} else {
-		ext->fn = NULL;
-	}
-
-
-    if(lv_img_get_auto_size(img) != false) {
-        lv_obj_set_size(img, ext->w, ext->h);
-    }
-
-    lv_obj_invalidate(img);
+    lv_img_set_src(img, fn);
 }
 
 /**
@@ -222,6 +226,17 @@ void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en)
  * Getter functions 
  *====================*/
 
+lv_img_src_t lv_img_get_src_type(const void * src)
+{
+    if(src == NULL) return LV_IMG_SRC_UNKNOWN;
+    const uint8_t * u8_p = src;
+
+    /*The first byte shows the type of the image source*/
+    if(u8_p[0] >= 'A' && u8_p[0] <= 'Z') return LV_IMG_SRC_FILE;    /*It's a driver letter*/
+    else if(u8_p[0] >= 127) return LV_IMG_SRC_SYMBOL;               /*After ASCII letteres only symbols (even UTF-8) can be*/
+    else if(((u8_p[0] & 0xFC) >> 2) == LV_IMG_FORMAT_RAW_INTERNAL) return LV_IMG_SRC_VARIABLE;      /*Mask the file format part og of lv_img_t header. IT should be 0 which means C array */
+    else return LV_IMG_SRC_UNKNOWN;
+}
 
 /**
  * Get the name of the file set for an image
@@ -232,7 +247,7 @@ const char * lv_img_get_file_name(lv_obj_t * img)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    return ext->fn;
+    return ext->src;
 }
 
 
@@ -269,30 +284,40 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
 
     if(mode == LV_DESIGN_COVER_CHK) {
         bool cover = false;
-        if(ext->transp == 0 && ext->alpha_byte == 0) cover = lv_area_is_in(mask, &img->coords);
+        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return false;
+
+        if(ext->chroma_keyed == 0 && ext->alpha_byte == 0) cover = lv_area_is_in(mask, &img->coords);
         return cover;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
-		lv_area_t cords;
-/*Create a default style for symbol texts*/
-        bool sym = false;//lv_img_is_symbol(ext->fn);
+		lv_area_t coords;
 
-		lv_obj_get_coords(img, &cords);
+		lv_obj_get_coords(img, &coords);
 
-		lv_area_t cords_tmp;
-		cords_tmp.y1 = cords.y1;
-		cords_tmp.y2 = cords.y1 + ext->h - 1;
+		if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_VARIABLE) {
+		    lv_area_t cords_tmp;
+            cords_tmp.y1 = coords.y1;
+            cords_tmp.y2 = coords.y1 + ext->h - 1;
 
-		for(; cords_tmp.y1 < cords.y2; cords_tmp.y1 += ext->h, cords_tmp.y2 += ext->h) {
-			cords_tmp.x1 = cords.x1;
-			cords_tmp.x2 = cords.x1 + ext->w - 1;
-			for(; cords_tmp.x1 < cords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-			    if(sym == false) lv_draw_img(&cords_tmp, mask, style, NULL, ext->px_data);
-			    else lv_draw_label(&cords_tmp, mask, style, ext->fn, LV_TXT_FLAG_NONE, NULL);
+            for(; cords_tmp.y1 < coords.y2; cords_tmp.y1 += ext->h, cords_tmp.y2 += ext->h) {
+                cords_tmp.x1 = coords.x1;
+                cords_tmp.x2 = coords.x1 + ext->w - 1;
+                for(; cords_tmp.x1 < coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
+                    lv_draw_img(&cords_tmp, mask, style, ext->src);
+                }
+            }
+		} else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
+            lv_draw_label(&coords, mask, style, ext->src, LV_TXT_FLAG_NONE, NULL);
 
-			}
+		} else {
+
+		    /*Trigger the error handler of image drawer*/
+            lv_draw_img(&img->coords, mask, style, NULL);
+
 		}
+
+
     }
     
     return true;
@@ -316,36 +341,21 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(sign == LV_SIGNAL_CLEANUP) {
-        lv_mem_free(ext->fn);
+        if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
+            lv_mem_free(ext->src);
+            ext->src = NULL;
+            ext->src_type = LV_IMG_SRC_UNKNOWN;
+        }
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         /*Refresh the file name to refresh the symbol text size*/
-        if(lv_img_is_symbol(ext->fn) != false) {
-            lv_img_set_file(img, ext->fn);
+        if(ext->src_type == LV_IMG_SRC_SYMBOL) {
+            lv_img_set_src(img, ext->src);
+
         }
     }
 
     return res;
 }
-
-
-/**
- * From the settings in lv_conf.h and the file name
- * tells it a filename or a symbol text.
- * @param txt a file name (e.g. "U:/file1") or a symbol (e.g. SYMBOL_OK)
- * @return true: 'txt' is a symbol text, false: 'txt' is a file name
- */
-static bool lv_img_is_symbol(const char * txt)
-{
-    if(txt == NULL) return false;
-
-    /* if txt begins with an upper case letter then it refers to a driver
-     * so it is a file name*/
-    if(txt[0] >= 'A' && txt[0] <= 'Z') return false;
-
-    /*If not returned during the above tests then consider as text*/
-    return true;
-}
-
 
 #endif

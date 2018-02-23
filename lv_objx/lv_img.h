@@ -34,15 +34,14 @@ typedef struct
 {
     /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
     /*New data for this type */
-    union {
-        char* fn;                   /*Image file name. E.g. "U:/my_image"*/
-        lv_img_dsc_t * px_data;     /*Image file name. E.g. "U:/my_image"*/
-    };
-    lv_coord_t w;                   /*Width of the image (doubled when upscaled) (Handled by the library)*/
-    lv_coord_t h;                   /*Height of the image (doubled when upscaled) (Handled by the library)*/
+    const void * src;             /*Image source: Pointer to an array or a file or a symbol*/
+
+    lv_coord_t w;               /*Width of the image (doubled when upscaled) (Handled by the library)*/
+    lv_coord_t h;               /*Height of the image (doubled when upscaled) (Handled by the library)*/
+    uint8_t src_type  :2;       /*See: lv_img_src_t*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
-    uint8_t transp    :1;       /*Transp. bit in the image header (Handled by the library)*/
-    uint8_t alpha_byte :1;      /*Extra byte for every pixel to define opacity*/
+    uint8_t chroma_keyed :1;    /*1: Chroma keyed image, LV_COLOR_TRANSP (lv_conf.h) pixels will be transparent (Handled by the library)*/
+    uint8_t alpha_byte   :1;    /*1: Extra byte for every pixel to define opacity*/
 }lv_img_ext_t;
 
 /**********************
@@ -57,17 +56,16 @@ typedef struct
  */
 lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
 
-/**
- * Create a file to the RAMFS from a picture data
- * @param fn file name of the new file (e.g. "pic1", will be available at "U:/pic1")
- * @param data pointer to a color map with lv_img_raw_header_t header
- * @return result of the file operation. LV_FS_RES_OK or any error from lv_fs_res_t
- */
-lv_fs_res_t lv_img_create_file(const char * fn, const lv_color_int_t * data);
-
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set the pixel map to display by the image
+ * @param img pointer to an image object
+ * @param data the image data
+ */
+void lv_img_set_src(lv_obj_t * img, const void * src_img);
 
 /**
  * Set a file to the image
@@ -97,6 +95,8 @@ static inline void lv_img_set_style(lv_obj_t *img, lv_style_t *style)
 /*=====================
  * Getter functions
  *====================*/
+
+lv_img_src_t lv_img_get_src_type(const void * src);
 
 /**
  * Get the name of the file set for an image
@@ -128,7 +128,7 @@ static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
  **********************/
 
 /*Use this macro to declare an image in a c file*/
-#define LV_IMG_DECLARE(var_name) extern const lv_color_int_t var_name[];
+#define LV_IMG_DECLARE(var_name) extern const lv_img_t var_name;
 
 #endif  /*USE_LV_IMG*/
 

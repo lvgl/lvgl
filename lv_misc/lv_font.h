@@ -49,7 +49,8 @@ typedef struct _lv_font_struct
     const uint8_t * glyph_bitmap;
     const lv_font_glyph_dsc_t * glyph_dsc;
     const uint32_t * unicode_list;
-    const uint8_t * (*get_bitmap)(const struct _lv_font_struct * ,uint32_t);
+    const uint8_t * (*get_bitmap)(const struct _lv_font_struct * ,uint32_t);    /*Get a glyph's  bitmap from a font*/
+    const int16_t (*get_width)(const struct _lv_font_struct * ,uint32_t);       /*Get a glyph's with with a given font*/
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
     uint32_t bpp   :4;                     /*Bit per pixel: 1, 2 or 4*/
 }lv_font_t;
@@ -102,7 +103,7 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
  * @param letter a letter from font (font extensions can have different bpp)
  * @return bpp of the font (or font extension)
  */
-uint8_t lv_font_get_bpp(lv_font_t * font, uint32_t letter);
+uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter);
 
 /**
  * Generic bitmap get function used in 'font->get_bitmap' when the font contains all characters in the range
@@ -119,6 +120,21 @@ const uint8_t * lv_font_get_bitmap_continuous(const lv_font_t * font, uint32_t u
  * @return pointer to the bitmap or NULL if not found
  */
 const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unicode_letter);
+/**
+ * Generic glyph width get function used in 'font->get_width' when the font contains all characters in the range
+ * @param font pointer to font
+ * @param unicode_letter an unicode letter which width should be get
+ * @return width of the gylph or -1 if not found
+ */
+const int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unicode_letter);
+
+/**
+ * Generic glyph width get function used in 'font->get_bitmap' when the font NOT contains all characters in the range (sparse)
+ * @param font pointer to font
+ * @param unicode_letter an unicode letter which width should be get
+ * @return width of the glyph or -1 if not found
+ */
+const int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter);
 
 /**********************
  *      MACROS

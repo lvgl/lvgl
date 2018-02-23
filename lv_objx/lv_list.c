@@ -145,7 +145,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
  * @param rel_action pointer to release action function (like with lv_btn)
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action)
+lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_action_t rel_action)
 {
 	lv_style_t * style = lv_obj_get_style(list);
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
@@ -176,9 +176,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     lv_obj_set_width(liste, w);
 #if USE_LV_IMG != 0
     lv_obj_t * img = NULL;
-	if(img_fn != NULL && img_fn[0] != '\0') {
+	if(img_src) {
 		img = lv_img_create(liste, NULL);
-		lv_img_set_file(img, img_fn);
+		lv_img_set_src(img, img_src);
 		lv_obj_set_style(img, ext->style_img);
 		lv_obj_set_click(img, false);
 		if(img_signal == NULL) img_signal = lv_obj_get_signal_func(img);

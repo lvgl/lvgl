@@ -16658,7 +16658,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_40_glyph_dsc[] =
   {.w_px = 21,	.glyph_index = 29880},	/*Unicode: U+007e (~)*/
 
 #elif USE_LV_FONT_DEJAVU_40 == 8
-  {.w_px = 27,	.glyph_index = 0},	/*Unicode: U+0020 ( )*/
+  {.w_px = 10,	.glyph_index = 0},	/*Unicode: U+0020 ( )*/
   {.w_px = 3,	.glyph_index = 1080},	/*Unicode: U+0021 (!)*/
   {.w_px = 9,	.glyph_index = 1200},	/*Unicode: U+0022 (")*/
   {.w_px = 23,	.glyph_index = 1560},	/*Unicode: U+0023 (#)*/
@@ -16765,7 +16765,8 @@ lv_font_t lv_font_dejavu_40 =
     .glyph_bitmap = lv_font_dejavu_40_glyph_bitmap,	/*Bitmap of glyphs*/
     .glyph_dsc = lv_font_dejavu_40_glyph_dsc,		/*Description of glyphs*/
     .unicode_list = NULL,	/*Every character in the font from 'unicode_first' to 'unicode_last'*/
-    .get_bitmap = lv_font_get_bitmap_continuous,	/*Function pointer to get bitmap*/
+    .get_bitmap = lv_font_get_bitmap_continuous,	/*Function pointer to get glyph bitmap*/
+    .get_width = lv_font_get_width_continuous,      /*Function pointer to get glyph width*/
 #if USE_LV_FONT_DEJAVU_40 == 1
     .bpp = 1,				/*Bit per pixel*/
  #elif USE_LV_FONT_DEJAVU_40 == 2

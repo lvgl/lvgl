@@ -297,6 +297,8 @@ void lv_label_set_body_draw(lv_obj_t *label, bool body_en)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->body_draw = body_en == false ? 0 : 1;
 
+    lv_obj_refresh_ext_size(label);
+
     lv_obj_invalidate(label);
 }
 
@@ -629,20 +631,29 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
     /* A label never covers an area */
     if(mode == LV_DESIGN_COVER_CHK) return false;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_area_t cords;
+        lv_area_t coords;
         lv_style_t * style = lv_obj_get_style(label);
-        lv_obj_get_coords(label, &cords);
+        lv_obj_get_coords(label, &coords);
 
 #if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(label);
         if(lv_group_get_focused(g) == label) {
-            lv_draw_rect(&cords, mask, style);
+            lv_draw_rect(&coords, mask, style);
         }
 #endif
 
         lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
-        if(ext->body_draw) lv_draw_rect(&cords, mask, style);
+        if(ext->body_draw) {
+            lv_area_t bg;
+            lv_obj_get_coords(label, &bg);
+            bg.x1 -= style->body.padding.hor;
+            bg.x2 += style->body.padding.hor;
+            bg.y1 -= style->body.padding.ver;
+            bg.y2 += style->body.padding.ver;
+
+            lv_draw_rect(&bg, mask, style);
+        }
 
         /*TEST: draw a background for the label*/
 //		lv_draw_rect(&label->coords, mask, &lv_style_plain_color);
@@ -653,7 +664,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
         if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
-		lv_draw_label(&cords, mask, style, ext->text, flag, &ext->offset);
+		lv_draw_label(&coords, mask, style, ext->text, flag, &ext->offset);
     }
     return true;
 }
@@ -694,6 +705,13 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
         {
             lv_label_revert_dots(label);
             lv_label_refr_text(label);
+        }
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        if(ext->body_draw) {
+            lv_style_t * style = lv_label_get_style(label);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.hor);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.ver);
         }
     }
 

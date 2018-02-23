@@ -4838,61 +4838,6 @@ static const lv_font_glyph_dsc_t lv_font_symbol_20_glyph_dsc[] =
 #endif
 };
 
-/*List of unicode characters*/
-static const uint32_t lv_font_symbol_20_unicode_list[] = {
-  61441,    /*Unicode: U+f001 ()*/
-  61448,    /*Unicode: U+f008 ()*/
-  61451,    /*Unicode: U+f00b ()*/
-  61452,    /*Unicode: U+f00c ()*/
-  61453,    /*Unicode: U+f00d ()*/
-  61457,    /*Unicode: U+f011 ()*/
-  61459,    /*Unicode: U+f013 ()*/
-  61460,    /*Unicode: U+f014 ()*/
-  61461,    /*Unicode: U+f015 ()*/
-  61465,    /*Unicode: U+f019 ()*/
-  61468,    /*Unicode: U+f01c ()*/
-  61473,    /*Unicode: U+f021 ()*/
-  61478,    /*Unicode: U+f026 ()*/
-  61479,    /*Unicode: U+f027 ()*/
-  61480,    /*Unicode: U+f028 ()*/
-  61502,    /*Unicode: U+f03e ()*/
-  61504,    /*Unicode: U+f040 ()*/
-  61512,    /*Unicode: U+f048 ()*/
-  61515,    /*Unicode: U+f04b ()*/
-  61516,    /*Unicode: U+f04c ()*/
-  61517,    /*Unicode: U+f04d ()*/
-  61521,    /*Unicode: U+f051 ()*/
-  61522,    /*Unicode: U+f052 ()*/
-  61523,    /*Unicode: U+f053 ()*/
-  61524,    /*Unicode: U+f054 ()*/
-  61543,    /*Unicode: U+f067 ()*/
-  61544,    /*Unicode: U+f068 ()*/
-  61553,    /*Unicode: U+f071 ()*/
-  61556,    /*Unicode: U+f074 ()*/
-  61559,    /*Unicode: U+f077 ()*/
-  61560,    /*Unicode: U+f078 ()*/
-  61561,    /*Unicode: U+f079 ()*/
-  61563,    /*Unicode: U+f07b ()*/
-  61587,    /*Unicode: U+f093 ()*/
-  61589,    /*Unicode: U+f095 ()*/
-  61636,    /*Unicode: U+f0c4 ()*/
-  61637,    /*Unicode: U+f0c5 ()*/
-  61639,    /*Unicode: U+f0c7 ()*/
-  61671,    /*Unicode: U+f0e7 ()*/
-  61683,    /*Unicode: U+f0f3 ()*/
-  61724,    /*Unicode: U+f11c ()*/
-  61732,    /*Unicode: U+f124 ()*/
-  61787,    /*Unicode: U+f15b ()*/
-  61931,    /*Unicode: U+f1eb ()*/
-  62016,    /*Unicode: U+f240 ()*/
-  62017,    /*Unicode: U+f241 ()*/
-  62018,    /*Unicode: U+f242 ()*/
-  62019,    /*Unicode: U+f243 ()*/
-  62020,    /*Unicode: U+f244 ()*/
-  62099,    /*Unicode: U+f293 ()*/
-  0,    /*End indicator*/
-};
-
 lv_font_t lv_font_symbol_20 = 
 {
 #if LV_TXT_UTF8
@@ -4903,10 +4848,11 @@ lv_font_t lv_font_symbol_20 =
     .unicode_last = 241,  /*Last Unicode letter in this font*/
 #endif
     .h_px = 20,             /*Font height in pixels*/
+    .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph bitmap*/
+    .get_width = lv_font_get_width_continuous,      /*Function pointer to get glyph width*/
     .glyph_bitmap = lv_font_symbol_20_glyph_bitmap, /*Bitmap of glyphs*/
     .glyph_dsc = lv_font_symbol_20_glyph_dsc,       /*Description of glyphs*/
-    .unicode_list = NULL,                           /*Characters stred in order*/
-    .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get bitmap*/
+    .unicode_list = NULL,                           /*Characters are stored in order*/
 #if USE_LV_FONT_SYMBOL_20 == 1
     .bpp = 1,               /*Bit per pixel*/
  #elif USE_LV_FONT_SYMBOL_20 == 2

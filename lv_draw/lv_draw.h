@@ -19,6 +19,14 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+/*If image pixels contains alpha we need to know how much byte is a pixel*/
+#if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
+# define LV_IMG_PX_SIZE_ALPHA_BYTE   2
+#elif LV_COLOR_DEPTH == 16
+# define LV_IMG_PX_SIZE_ALPHA_BYTE   3
+#elif LV_COLOR_DEPTH == 24
+# define LV_IMG_PX_SIZE_ALPHA_BYTE   4
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -28,22 +36,42 @@ extern "C" {
  * the result image converter utility*/
 typedef struct
 {
-    uint32_t w:12;        /*Width of the image map*/
-    uint32_t h:12;        /*Height of the image map*/
-    uint32_t transp:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
-    uint32_t alpha :1;    /*Every pixel is extended with a 8 bit alpha channel*/
-}lv_img_raw_header_t;
+    union{
+        struct {
+            uint32_t chroma_keyed:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
+            uint32_t alpha_byte  :1;    /*Every pixel is extended with a 8 bit alpha channel*/
+            uint32_t format      :6;    /*See: lv_img_px_format*/
+            uint32_t w:12;              /*Width of the image map*/
+            uint32_t h:12;              /*Height of the image map*/
+        }header;
+        uint8_t src_type;
+    };
 
-/* Image header it is compatible with
- * the result image converter utility*/
-typedef struct
-{
-    uint32_t w  :12;        /*Width of the image map*/
-    uint32_t h  :12;        /*Height of the image map*/
-    uint32_t chroma_key:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
-    uint32_t alpha :1;    /*Every pixel is extended with a 8 bit alpha channel*/
-    const uint8_t * pixel_map;
-}lv_img_dsc_t;
+    union {
+        const uint8_t * pixel_map;  /*For internal images (c arrays) pointer to the pixels array*/
+        uint8_t first_pixel;        /*For external images (binary) the first byte of the pixels (just for convenient)*/
+    };
+}lv_img_t;
+
+typedef enum {
+    LV_IMG_FORMAT_UNKOWN = 0,
+    LV_IMG_FORMAT_RAW_INTERNAL,       /*'lv_img_t' variable compiled with the code*/
+    LV_IMG_FORMAT_FILE_RAW_RGB332,    /*8 bit*/
+    LV_IMG_FORMAT_FILE_RAW_RGB565,    /*16 bit*/
+    LV_IMG_FORMAT_FILE_RAW_RGB888,    /*24 bit (stored on 32 bit)*/
+}lv_img_format_t;
+
+
+typedef enum {
+    LV_IMG_SRC_VARIABLE,
+    LV_IMG_SRC_FILE,
+    LV_IMG_SRC_SYMBOL,
+    LV_IMG_SRC_UNKNOWN,
+}lv_img_src_t;
+
+typedef enum {
+    LV_IMG_FILE_FORMAT_RAW,     /*Raw pixel map row-by-row*/
+}lv_img_file_format;
 
 
 /**********************
@@ -91,7 +119,7 @@ void lv_draw_label(const lv_area_t * cords_p,const lv_area_t * mask_p, const lv_
  * @param map_p pointer to a lv_color_t array which contains the pixels of the image
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
-             const lv_style_t * style, const char * fn, const lv_img_dsc_t * data);
+             const lv_style_t * style, const void * src);
 #endif
 
 /**

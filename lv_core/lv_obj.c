@@ -789,6 +789,7 @@ void lv_obj_set_top(lv_obj_t * obj, bool en)
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en)
 {
+    if(en == true) lv_obj_set_click(obj, true);     /*Drag is useless without enabled clicking*/
     obj->drag = (en == true ? 1 : 0);
 }
 

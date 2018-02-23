@@ -50,10 +50,10 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
 static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
 #if USE_LV_SHADOW && LV_VDB_SIZE
-static void lv_draw_cont_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
-static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style);
-static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
-static void lv_draw_cont_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map);
+static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style);
+static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map);
 #endif
 static uint16_t lv_draw_cont_radius_corr(uint16_t r, lv_coord_t w, lv_coord_t h);
 #if LV_ANTIALIAS != 0
@@ -70,25 +70,35 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
  *  STATIC VARIABLES
  **********************/
 #if LV_VDB_SIZE != 0
-#if USE_LV_SHADOW
+#  if USE_LV_SHADOW
 static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_vpx;
-#endif
+#  endif /*USE_LV_SHADOW*/
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_vletter;
-#if USE_LV_IMG
+#  if USE_LV_IMG
 static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
         const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
         lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
-#endif
-#else
-/* px_fp used only by shadow drawing the shadows are not drawn with out VDB
+#  endif /*USE_LV_IMG*/
+#elif USE_LV_REAL_DRAW != 0
+/* px_fp used only by shadow drawing  but  the shadows are not drawn without VDB
  * static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_rpx;
  */
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_rfill;
 static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_rletter;
-#if USE_LV_IMG
-static void (*map_fp)(const lv_area_t * coords, const lv_area_t * mask, const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale, lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
-#endif
+#  if USE_LV_IMG
+static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
+        const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+        lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
+#  endif /*USE_LV_IMG*/
+#else
+/*Invalid settings. Compiler error will be thrown*/
+static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = NULL;
+static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  NULL;
+static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = NULL;
+static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
+        const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+        lv_color_t recolor, lv_opa_t recolor_opa) = NULL;
 #endif
 
 
@@ -112,7 +122,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
 
 #if USE_LV_SHADOW && LV_VDB_SIZE
     if(style->body.shadow.width != 0) {
-        lv_draw_cont_shadow(coords, mask, style);
+        lv_draw_shadow(coords, mask, style);
     }
 #endif
     if(style->body.empty == 0){
@@ -294,6 +304,11 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
         pos.y += y_ofs;
     }
 
+    /*Real draw need a background color for higher bpp letter*/
+#if LV_VDB_SIZE == 0
+    lv_rletter_set_background(style->body.main_color);
+#endif
+
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
         if(offset != NULL) {
@@ -378,14 +393,84 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
  * @param opa opacity of the image (0..255)
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
-             const lv_style_t * style, const char * fn, const lv_img_dsc_t * data)
+             const lv_style_t * style, const void * src)
 {
-    if(fn == NULL && data == NULL) {
+    if(src == NULL) {
         lv_draw_rect(coords, mask, &lv_style_plain);
-        lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
+        lv_draw_label(coords, mask, &lv_style_plain, "No\ndata", LV_TXT_FLAG_NONE, NULL);
+        return;
     }
-    else if(data) {
 
+    const uint8_t * u8_p = (uint8_t*) src;
+    if(u8_p[0] >= 'A' &&  u8_p[0] <= 'Z') { /*It will be a path of a file*/
+        lv_fs_file_t file;
+        lv_fs_res_t res = lv_fs_open(&file, src, LV_FS_MODE_RD);
+        if(res == LV_FS_RES_OK) {
+            lv_img_t img_data;
+            uint32_t br;
+            res = lv_fs_read(&file, &img_data, sizeof(lv_img_t), &br);
+
+            lv_area_t mask_com;    /*Common area of mask and cords*/
+            bool union_ok;
+            union_ok = lv_area_union(&mask_com, mask, coords);
+            if(union_ok == false) {
+                lv_fs_close(&file);
+                return;
+            }
+
+            uint8_t px_size = 0;
+            switch(img_data.header.format) {
+                case LV_IMG_FORMAT_FILE_RAW_RGB332: px_size = 1; break;
+                case LV_IMG_FORMAT_FILE_RAW_RGB565: px_size = 2; break;
+                case LV_IMG_FORMAT_FILE_RAW_RGB888: px_size = 4; break;
+                default: return;
+            }
+
+            if(img_data.header.alpha_byte) {    /*Correction with the alpha byte*/
+                px_size++;
+                if(img_data.header.format == LV_IMG_FORMAT_FILE_RAW_RGB888) px_size--; /*Stored in the 4 byte anyway*/
+            }
+
+
+            /* Move the file pointer to the start address according to mask*/
+            uint32_t start_offset = sizeof(img_data.header);
+            start_offset += (lv_area_get_width(coords)) * (mask_com.y1 - coords->y1) * px_size;      /*First row*/
+            start_offset += (mask_com.x1 - coords->x1) * px_size;                                    /*First col*/
+            lv_fs_seek(&file, start_offset);
+
+            uint32_t useful_data = lv_area_get_width(&mask_com) * px_size;
+            uint32_t next_row = lv_area_get_width(coords) * px_size - useful_data;
+
+            lv_area_t line;
+            lv_area_copy(&line, &mask_com);
+            lv_area_set_height(&line, 1);
+
+            lv_coord_t row;
+            uint32_t act_pos;
+            lv_color_t buf[lv_area_get_width(&mask_com)];
+            for(row = mask_com.y1; row <= mask_com.y2; row ++) {
+                res = lv_fs_read(&file, buf, useful_data, &br);
+
+                map_fp(&line, &mask_com, (uint8_t *)buf, style->image.opa, img_data.header.chroma_keyed, img_data.header.alpha_byte,
+                        style->image.color, style->image.intense);
+
+                lv_fs_tell(&file, &act_pos);
+                lv_fs_seek(&file, act_pos + next_row);
+                line.y1++;    /*Go down a line*/
+                line.y2++;
+            }
+
+            lv_fs_close(&file);
+
+            if(res != LV_FS_RES_OK) {
+                lv_draw_rect(coords, mask, &lv_style_plain);
+                lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
+            }
+        }
+
+    }
+    else {
+        const lv_img_t * img_var = src;
         lv_area_t mask_com;    /*Common area of mask and coords*/
         bool union_ok;
         union_ok = lv_area_union(&mask_com, mask, coords);
@@ -393,102 +478,10 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             return;         /*Out of mask*/
         }
 
-        map_fp(coords, mask, data->pixel_map, style->image.opa, data->chroma_key, data->alpha, style->image.color, style->image.intense);
+        map_fp(coords, mask, img_var->pixel_map, style->image.opa, img_var->header.chroma_keyed, img_var->header.alpha_byte, style->image.color, style->image.intense);
 
     }
-    else {
-//        lv_area_t coord_aa;
-//        lv_area_t mask_aa;
-//
-//#if LV_ANTIALIAS == 0
-//        lv_area_copy(&coord_aa, coords);
-//        lv_area_copy(&mask_aa, mask);
-//
-//        lv_fs_file_t file;
-//        lv_fs_res_t res = lv_fs_open(&file, fn, LV_FS_MODE_RD);
-//        if(res == LV_FS_RES_OK) {
-//            lv_img_raw_header_t header;
-//            uint32_t br;
-//            res = lv_fs_read(&file, &header, sizeof(lv_img_raw_header_t), &br);
-//
-//            lv_area_t mask_com;    /*Common area of mask and cords*/
-//            bool union_ok;
-//            union_ok = lv_area_union(&mask_com, &mask_aa, &coord_aa);
-//            if(union_ok == false) {
-//                lv_fs_close(&file);
-//                return;
-//            }
-//
-//
-//            /*If the width is greater then real img. width then it is upscaled */
-//            bool upscale = false;
-//#if LV_ANTIALIAS
-//            if(lv_area_get_width(coords) < header.w) {
-//                upscale = false;
-//                lv_area_set_width(&coord_aa,  header.w);
-//            }
-//            else upscale = true;
-//
-//#endif
-//
-//            bool const_data = false;
-//
-//            /*If the img. data is inside the MCU then do not use FS reading just a pointer*/
-//            if(fn[0] == UFS_LETTER) {
-//                const_data = true;
-//                uint8_t * f_data = ((lv_ufs_file_t*)file.file_d)->ent->data_d;
-//                f_data += sizeof(lv_img_raw_header_t);
-//                map_fp(&coord_aa, &mask_com, (void*)f_data , style->image.opa, header.transp, upscale, style->image.color, style->image.intense);
-//            }
-//
-//            /*Read the img. with the FS interface*/
-//            if(const_data == false) {
-//                uint8_t us_shift = 0;
-//                uint8_t us_val = 1;
-//                if(upscale != false) {
-//                    us_shift = 1;
-//                    us_val = 2;
-//                }
-//
-//                /* Move the file pointer to the start address according to mask
-//                 * But take care, the upscaled maps look greater*/
-//                uint32_t start_offset = sizeof(lv_img_raw_header_t);
-//                start_offset += (lv_area_get_width(&coord_aa) >> us_shift) *
-//                               ((mask_com.y1 - coord_aa.y1) >> us_shift) * sizeof(lv_color_t); /*First row*/
-//                start_offset += ((mask_com.x1 - coord_aa.x1) >> us_shift) * sizeof(lv_color_t); /*First col*/
-//                lv_fs_seek(&file, start_offset);
-//
-//                uint32_t useful_data = (lv_area_get_width(&mask_com) >> us_shift) * sizeof(lv_color_t);
-//                uint32_t next_row = (lv_area_get_width(&coord_aa) >> us_shift) * sizeof(lv_color_t) - useful_data;
-//
-//                lv_area_t line;
-//                lv_area_copy(&line, &mask_com);
-//                lv_area_set_height(&line, us_val); /*Create a line area. Hold 2 pixels if upscaled*/
-//
-//                lv_coord_t row;
-//                uint32_t act_pos;
-//                lv_color_t buf[useful_data];
-//                for(row = mask_com.y1; row <= mask_com.y2; row += us_val) {
-//                    res = lv_fs_read(&file, buf, useful_data, &br);
-//
-//                    map_fp(&line, &mask_com, buf, style->image.opa, header.transp, upscale,
-//                                          style->image.color, style->image.intense);
-//
-//                    lv_fs_tell(&file, &act_pos);
-//                    lv_fs_seek(&file, act_pos + next_row);
-//                    line.y1 += us_val;    /*Go down a line*/
-//                    line.y2 += us_val;
-//                }
-//            }
-//        }
-//
-//        lv_fs_close(&file);
-//
-//        if(res != LV_FS_RES_OK) {
-//            lv_draw_rect(coords, mask, &lv_style_plain);
-//            lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
-//        }
-    }
+
 }
 #endif
 
@@ -1678,7 +1671,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
  * @param rect pointer to rectangle object
  * @param mask pointer to a mask area (from the design functions)
  */
-static void lv_draw_cont_shadow(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style)
+static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style)
 {
     /* If mask is in the middle of cords do not draw shadow*/
     lv_coord_t radius = style->body.radius;
@@ -1700,13 +1693,13 @@ static void lv_draw_cont_shadow(const lv_area_t * coords, const lv_area_t * mask
     if(lv_area_is_in(mask, &area_tmp) != false) return;
 
     if(style->body.shadow.type == LV_SHADOW_FULL) {
-        lv_draw_cont_shadow_full(coords, mask, style);
+        lv_draw_shadow_full(coords, mask, style);
     } else if(style->body.shadow.type == LV_SHADOW_BOTTOM) {
-        lv_draw_cont_shadow_bottom(coords, mask, style);
+        lv_draw_shadow_bottom(coords, mask, style);
     }
 }
 
-static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
 {
 
     lv_coord_t radius = style->body.radius;
@@ -1837,12 +1830,12 @@ static void lv_draw_cont_shadow_full(const lv_area_t * coords, const lv_area_t *
         /* Put the first line to the edges too.
          * It is not correct because blur should be done below the corner too
          * but is is simple, fast and gives a good enough result*/
-        if(line == 1) lv_draw_cont_shadow_full_straight(coords, mask, style, line_2d_blur);
+        if(line == 1) lv_draw_shadow_full_straight(coords, mask, style, line_2d_blur);
     }
 }
 
 
-static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
 {
     lv_coord_t radius = style->body.radius;
     lv_coord_t swidth = style->body.shadow.width;
@@ -1913,7 +1906,7 @@ static void lv_draw_cont_shadow_bottom(const lv_area_t * coords, const lv_area_t
     }
 }
 
-static void lv_draw_cont_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map)
+static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map)
 {
     lv_coord_t radius = style->body.radius;
     lv_coord_t swidth = style->body.shadow.width + LV_ANTIALIAS;

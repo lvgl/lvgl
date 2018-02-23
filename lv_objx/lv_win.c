@@ -145,11 +145,11 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 /**
  * Add control button to the header of the window
  * @param win pointer to a window object
- * @param img_path path of an image on the control button
+ * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
  * @param rel_action a function pointer to call when the button is released
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const char * img_path, lv_action_t rel_action)
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_action)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
@@ -161,7 +161,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const char * img_path, lv_action_t rel
 
     lv_obj_t * img = lv_img_create(btn, NULL);
     lv_obj_set_click(img, false);
-    lv_img_set_file(img, img_path);
+    lv_img_set_src(img, img_src);
 
     lv_win_realign(win);
 

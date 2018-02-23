@@ -11309,7 +11309,8 @@ lv_font_t lv_font_dejavu_40_cyrillic =
     .glyph_bitmap = lv_font_dejavu_40_cyrillic_glyph_bitmap,	/*Bitmap of glyphs*/
     .glyph_dsc = lv_font_dejavu_40_cyrillic_glyph_dsc,		/*Description of glyphs*/
     .unicode_list = NULL,	/*Every character in the font from 'unicode_first' to 'unicode_last'*/
-    .get_bitmap = lv_font_get_bitmap_continuous,	/*Function pointer to get bitmap*/
+    .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph bitmap*/
+    .get_width = lv_font_get_width_continuous,      /*Function pointer to get glyph width*/
 #if USE_LV_FONT_DEJAVU_40_CYRILLIC == 1
     .bpp = 1,				/*Bit per pixel*/
  #elif USE_LV_FONT_DEJAVU_40_CYRILLIC == 2

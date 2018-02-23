@@ -43,9 +43,10 @@ extern "C" {
 #error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
 #endif
 
-#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < 2 *LV_HOR_RES && LV_ANTIALIAS != 0
-#error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= (2 * LV_HOR_RES))"
+#if LV_VDB_SIZE == 0 && USE_LV_REAL_DRAW == 0
+#error "LittlevGL: If LV_VDB_SIZE = 0 Real drawing function are required (lv_conf.h: USE_LV_REAL_DRAW 1)"
 #endif
+
 
 #define LV_ANIM_IN			    0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
@@ -224,7 +225,6 @@ void lv_obj_clean(lv_obj_t *obj);
  * @param obj pointer to an object
  */
 void lv_obj_invalidate(lv_obj_t * obj);
-
 
 /*=====================
  * Setter functions

@@ -6849,10 +6849,11 @@ lv_font_t lv_font_symbol_30 =
     .unicode_last = 241,  /*Last Unicode letter in this font*/
 #endif
     .h_px = 30,				/*Font height in pixels*/
-    .glyph_bitmap = lv_font_symbol_30_glyph_bitmap,	/*Bitmap of glyphs*/
+    .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph bitmap*/
+    .get_width = lv_font_get_width_continuous,      /*Function pointer to get glyph width*/
     .glyph_dsc = lv_font_symbol_30_glyph_dsc,		/*Description of glyphs*/
+    .glyph_bitmap = lv_font_symbol_30_glyph_bitmap, /*Bitmap of glyphs*/
     .unicode_list = NULL,                           /*Characters stred in order*/
-    .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get bitmap*/
 #if USE_LV_FONT_SYMBOL_30 == 1
     .bpp = 1,				/*Bit per pixel*/
  #elif USE_LV_FONT_SYMBOL_30 == 2

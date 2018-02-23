@@ -18,6 +18,7 @@
 
 #include <stddef.h>
 #include "../lv_core/lv_vdb.h"
+#include "lv_draw.h"
 
 /*********************
  *      INCLUDES
@@ -27,15 +28,6 @@
  *      DEFINES
  *********************/
 #define VFILL_HW_ACC_SIZE_LIMIT    50      /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
-
-/*If image pixels contains alpha we need to know how much byte is a pixel*/
-#if LV_COLOR_DEPTH == 8
-# define IMG_PIXEL_ALPHA_BYTE_NUM   2
-#elif LV_COLOR_DEPTH == 16
-# define IMG_PIXEL_ALPHA_BYTE_NUM   3
-#elif LV_COLOR_DEPTH == 24
-# define IMG_PIXEL_ALPHA_BYTE_NUM   4
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -254,15 +246,14 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     uint8_t col_byte_cnt;
     uint8_t width_byte_scr = letter_w >> 3;      /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
     if(letter_w & 0x7) width_byte_scr++;
-    uint8_t width_byte_bpp = (letter_w * bpp) >> 3;    /*Width in bytes in the font (e.g. w = 11 -> 2 bytes wide)*/
+    uint8_t width_byte_bpp = (letter_w * bpp) >> 3;    /*Letter width in byte. Real width in the font*/
     if((letter_w * bpp) & 0x7) width_byte_bpp++;
 
-    /* Calculate the col/row start/end on the map
-     * If font anti aliasing is enabled use the reduced letter sizes*/
-    lv_coord_t col_start = pos_p->x > mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
-    lv_coord_t col_end = pos_p->x + letter_w < mask_p->x2 ? letter_w : mask_p->x2 - pos_p->x + 1;
-    lv_coord_t row_start = pos_p->y > mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
-    lv_coord_t row_end  = pos_p->y + letter_h < mask_p->y2 ? letter_h : mask_p->y2 - pos_p->y + 1;
+    /* Calculate the col/row start/end on the map*/
+    lv_coord_t col_start = pos_p->x >= mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
+    lv_coord_t col_end = pos_p->x + letter_w <= mask_p->x2 ? letter_w : mask_p->x2 - pos_p->x + 1;
+    lv_coord_t row_start = pos_p->y >= mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
+    lv_coord_t row_end  = pos_p->y + letter_h <= mask_p->y2 ? letter_h : mask_p->y2 - pos_p->y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
     vdb_buf_tmp += ((pos_p->y - vdb_p->area.y1) * vdb_width)
@@ -305,13 +296,13 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
 }
 
 /**
- * Draw a color map to the display
+ * Draw a color map to the display (image)
  * @param cords_p coordinates the color map
  * @param mask_p the map will drawn only on this area  (truncated to VDB area)
  * @param map_p pointer to a lv_color_t array
- * @param opa opacity of the map (ignored, only for compatibility with lv_vmap)
- * @param transp true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
- * @param upscale true: upscale to double size
+ * @param opa opacity of the map
+ * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
+ * @param alpha_byte true: extra alpha byte is inserted for every pixel
  * @param recolor mix the pixels with this color
  * @param recolor_opa the intense of recoloring
  */
@@ -332,7 +323,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(union_ok == false)  return;
 
     /*The pixel size in byte is different if an alpha byte is added too*/
-    uint8_t px_size_byte = alpha_byte ? IMG_PIXEL_ALPHA_BYTE_NUM : sizeof(lv_color_t);
+    uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
 
     /*If the map starts OUT of the masked area then calc. the first pixel*/
     lv_coord_t map_width = lv_area_get_width(cords_p);
@@ -389,8 +380,9 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
-                    lv_opa_t px_opa = (*(((uint8_t *) px_color) + IMG_PIXEL_ALPHA_BYTE_NUM - 1));
-                    opa_result = (uint32_t)((uint32_t)px_opa * opa_result) >> 8;
+                    lv_opa_t px_opa = (*(((uint8_t *) px_color) + LV_IMG_PX_SIZE_ALPHA_BYTE - 1));
+                    if(px_opa != LV_OPA_COVER) opa_result = (uint32_t)((uint32_t)px_opa * opa_result) >> 8;
+
                 }
 
                 /*Re-color the pixel if required*/
@@ -398,10 +390,10 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                     lv_color_t recolored_px = lv_color_mix(recolor, *px_color, recolor_opa);
 
                     if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = recolored_px.full;
-                    else vdb_buf_tmp[col] = lv_color_mix(vdb_buf_tmp[col], recolored_px, opa_result);
+                    else vdb_buf_tmp[col] = lv_color_mix(recolored_px, vdb_buf_tmp[col], opa_result);
                 } else {
                     if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = px_color->full;
-                    else vdb_buf_tmp[col] = lv_color_mix(vdb_buf_tmp[col], *px_color, opa_result);
+                    else vdb_buf_tmp[col] = lv_color_mix(*px_color, vdb_buf_tmp[col], opa_result);
                 }
 
 

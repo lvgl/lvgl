@@ -58,13 +58,13 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                 lv_color_t color, lv_opa_t opa);
 
 /**
- * Draw a color map to the display
+ * Draw a color map to the display (image)
  * @param cords_p coordinates the color map
- * @param mask_p the map will drawn only on this area
+ * @param mask_p the map will drawn only on this area  (truncated to VDB area)
  * @param map_p pointer to a lv_color_t array
- * @param opa opacity of the map (ignored, only for compatibility with lv_vmap)
- * @param transp true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
- * @param upscale true: upscale to double size
+ * @param opa opacity of the map
+ * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
+ * @param alpha_byte true: extra alpha byte is inserted for every pixel
  * @param recolor mix the pixels with this color
  * @param recolor_opa the intense of recoloring
  */

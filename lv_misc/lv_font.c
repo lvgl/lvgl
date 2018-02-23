@@ -49,7 +49,6 @@ typedef struct {
  */
 void lv_font_init(void)
 {
-
     /*DEJAVU 10*/
 #if USE_LV_FONT_DEJAVU_10 != 0
     lv_font_add(&lv_font_dejavu_10, NULL);
@@ -202,10 +201,8 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
 {
     const lv_font_t * font_i = font_p;
     while(font_i != NULL) {
-        if(letter >= font_i->unicode_first && letter <= font_i->unicode_last) {
-            const uint8_t * bitmap = font_i->get_bitmap(font_i, letter);
-            if(bitmap) return bitmap;
-        }
+        const uint8_t * bitmap = font_i->get_bitmap(font_i, letter);
+        if(bitmap) return bitmap;
 
         font_i = font_i->next_page;
     }
@@ -222,20 +219,11 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
 uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
 {
     const lv_font_t * font_i = font_p;
+    int16_t w;
     while(font_i != NULL) {
-        if(letter >= font_i->unicode_first && letter <= font_i->unicode_last) {
-            if(font_i->unicode_list == NULL){ /*Continuous font*/
-                uint32_t index = (letter - font_i->unicode_first);
-                return font_i->glyph_dsc[index].w_px;
-            } else {                            /*Sparse font*/
-                uint32_t i;
-                for(i = 0; font_i->unicode_list[i] != 0; i++) {
-                    if(font_i->unicode_list[i] == letter) {
-                        return font_i->glyph_dsc[i].w_px;
-                    }
-                }
-            }
-        }
+        w = font_i->get_width(font_i, letter);
+        if(w >= 0) return w;
+
         font_i = font_i->next_page;
     }
 
@@ -248,7 +236,7 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
  * @param letter a letter from font (font extensions can have different bpp)
  * @return bpp of the font (or font extension)
  */
-uint8_t lv_font_get_bpp(lv_font_t * font, uint32_t letter)
+uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter)
 {
     const lv_font_t * font_i = font;
     while(font_i != NULL) {
@@ -270,6 +258,9 @@ return 0;
  */
 const uint8_t * lv_font_get_bitmap_continuous(const lv_font_t * font, uint32_t unicode_letter)
 {
+    /*Check the range*/
+    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
+
     uint32_t index = (unicode_letter - font->unicode_first);
     return &font->glyph_bitmap[font->glyph_dsc[index].glyph_index];
 }
@@ -282,6 +273,9 @@ const uint8_t * lv_font_get_bitmap_continuous(const lv_font_t * font, uint32_t u
  */
 const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unicode_letter)
 {
+    /*Check the range*/
+    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
+
     uint32_t i;
     for(i = 0; font->unicode_list[i] != 0; i++) {
         if(font->unicode_list[i] == unicode_letter) {
@@ -290,6 +284,44 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
     }
 
     return NULL;
+}
+
+/**
+ * Generic glyph width get function used in 'font->get_width' when the font contains all characters in the range
+ * @param font pointer to font
+ * @param unicode_letter an unicode letter which width should be get
+ * @return width of the gylph or -1 if not found
+ */
+const int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unicode_letter)
+{
+    /*Check the range*/
+    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) {
+        return -1;
+    }
+
+    uint32_t index = (unicode_letter - font->unicode_first);
+    return font->glyph_dsc[index].w_px;
+}
+
+/**
+ * Generic glyph width get function used in 'font->get_bitmap' when the font NOT contains all characters in the range (sparse)
+ * @param font pointer to font
+ * @param unicode_letter an unicode letter which width should be get
+ * @return width of the glyph or -1 if not found
+ */
+const int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter)
+{
+    /*Check the range*/
+    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return -1;
+
+    uint32_t i;
+    for(i = 0; font->unicode_list[i] != 0; i++) {
+        if(font->unicode_list[i] == unicode_letter) {
+            return font->glyph_dsc[i].w_px;
+        }
+    }
+
+    return -1;
 }
 
 /**********************
