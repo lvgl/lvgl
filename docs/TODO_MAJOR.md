@@ -11,7 +11,7 @@ Please create an issue to suggest a new feature instead of adding pull request t
 - [ ] disp_flush: not const color map
 - [ ] ext size removal, enable drawing on full parent.
 - [ ] multiple display support
-
+- [ ] lv_ufs removal (was required only in the the old image system)
 
 ## v5 (released at: 20.12.2017)
 **Architectural changes**
