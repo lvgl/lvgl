@@ -38,8 +38,8 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] LV_ANTIALIAS rework: meaning anti-alias lines and curves
 - [x] Merge symbol fonts (basic, file and feedback) into one font 
 - [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
-- [ ] lv_img_set_data() for const. image data instead of file system usage
-- [ ] LV_PROTECT_PRESS_LOST: prevent the input devices to NOT find new object when the object's pressing is lost
+- [x] lv_img_set_src() to handle file path, symbols and const variables with one function
+- [x] LV_PROTECT_PRESS_LOST: prevent the input devices to NOT find new object when the object's pressing is lost
 - [x] lv_label: draw style.body.padding.hor/ver greater body if body_draw is enabled 
 - [x] LV_LAYOUT_PRETTY: in one row align obeóject vertically to middle
 - [x] Add user data option to lv_indev_drv_t and pass it with lv_indev_data_t to the read function. #115
