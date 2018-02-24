@@ -139,6 +139,25 @@ void lv_refr_set_round_cd(void(*cb)(lv_area_t*))
     round_cb = cb;
 }
 
+/**
+ * Get the number of areas in the buffer
+ * @return number of invalid areas
+ */
+uint16_t lv_refr_get_buf_size(void)
+{
+    return inv_buf_p;
+}
+
+/**
+ * Pop (delete) the last 'num' invalidated areas from the buffer
+ * @param num number of areas to delete
+ */
+void lv_refr_pop_from_buf(uint16_t num)
+{
+    if(inv_buf_p < num) inv_buf_p = 0;
+    else inv_buf_p -= num;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

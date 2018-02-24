@@ -11,6 +11,7 @@
 
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_core/lv_group.h"
+#include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rbasic.h"
@@ -646,9 +647,10 @@ static void indev_drag(lv_indev_proc_t * state)
         /*Set new position if the vector is not zero*/
         if(state->vect.x != 0 ||
            state->vect.y != 0) {
-            /*Get the coordinates of the object end modify them*/
+            /*Get the coordinates of the object and modify them*/
             lv_coord_t act_x = lv_obj_get_x(drag_obj);
             lv_coord_t act_y = lv_obj_get_y(drag_obj);
+            uint16_t inv_buf_size = lv_refr_get_buf_size(); /*Get the number of currently invalidated areas*/
 
             lv_obj_set_pos(drag_obj, act_x + state->vect.x, act_y + state->vect.y);
 
@@ -660,7 +662,11 @@ static void indev_drag(lv_indev_proc_t * state)
                 }
                 state->drag_in_prog = 1;
             }
-
+            /*If the object didn't moved then clear the invalidated areas*/
+            else {
+                uint16_t new_inv_buf_size = lv_refr_get_buf_size();
+                lv_refr_pop_from_buf(new_inv_buf_size - inv_buf_size);
+            }
         }
     }
 }
