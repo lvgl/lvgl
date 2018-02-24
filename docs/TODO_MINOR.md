@@ -29,8 +29,8 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] triangle drawing
 
 ## v5.1 (released at: in progress)
-- [ ] lv_refr_set_roundig_callback: set a function to modify the invalidated area for special display controllers
-- [ ] lv_group_set_focus_callback: set function to call when a new object is focused #94
+- [x] lv_refr_set_roundig_callback: set a function to modify the invalidated area for special display controllers
+- [x] lv_group_set_focus_callback: set function to call when a new object is focused #94
 - [ ] lv_obj_get_type() return string, e.g. "lv_slider", "lv_btn" etc #91
 - [x] Font handling extension for effective Chiese font handling (cutsom read functions)
 - [x] Remove LV_FONT_ANTIALIAS and add fonts with BPP (bit-per-pixel): 1, 2, 4 and 8
