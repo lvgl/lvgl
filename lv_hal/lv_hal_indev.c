@@ -61,12 +61,14 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t *driver)
     node = lv_mem_alloc(sizeof(lv_indev_t));
     if (!node) return NULL;
 
+    memset(node, 0, sizeof(lv_indev_t));
     memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
 
     node->next = NULL;
     node->proc.reset_query = 1;
     node->cursor = NULL;
     node->group = NULL;
+    node->btn_points = NULL;
 
     if (indev_list == NULL) {
         indev_list = node;

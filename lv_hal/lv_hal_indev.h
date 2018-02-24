@@ -81,6 +81,7 @@ typedef struct _lv_indev_proc_t {
         };
         struct {    /*Keypad data*/
             lv_indev_state_t last_state;
+            uint32_t last_key;
         };
     };
 

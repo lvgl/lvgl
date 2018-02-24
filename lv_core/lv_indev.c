@@ -349,11 +349,34 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
 #if USE_LV_GROUP
-    if(i->group != NULL && data->key != 0 &&
-       data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_REL)
+    if(i->group == NULL) return;
+
+    /*Key press happened*/
+    if(data->state == LV_INDEV_STATE_PR &&
+       i->proc.last_state == LV_INDEV_STATE_REL)
     {
+        i->proc.pr_timestamp = lv_tick_get();
+    }
+    /*Pressing*/
+    else if(data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_PR) {
+        if(data->key == LV_GROUP_KEY_ENTER &&
+           i->proc.long_pr_sent == 0 &&
+           lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME)
+        {
+
+            lv_group_send_data(i->group, LV_GROUP_KEY_ENTER_LONG);
+            i->proc.long_pr_sent = 1;
+
+        }
+    }
+    /*Release happened*/
+    else if(data->state == LV_INDEV_STATE_REL && i->proc.last_state == LV_INDEV_STATE_PR)
+    {
+        /*The user might clear the key it was released. Always release the pressed key*/
+        data->key = i->proc.last_key;
+
         if(data->key == LV_GROUP_KEY_NEXT) {
-           lv_group_focus_next(i->group);
+                   lv_group_focus_next(i->group);
         }
         else if(data->key == LV_GROUP_KEY_PREV) {
             lv_group_focus_prev(i->group);
@@ -361,8 +384,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         else {
             lv_group_send_data(i->group, data->key);
         }
+
+        i->proc.pr_timestamp = 0;
+        i->proc.long_pr_sent = 0;
     }
+
     i->proc.last_state = data->state;
+    i->proc.last_key = data->key;
 #endif
 }
 
