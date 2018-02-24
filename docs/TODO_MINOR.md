@@ -44,9 +44,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] LV_LAYOUT_PRETTY: in one row align obeóject vertically to middle
 - [x] Add user data option to lv_indev_drv_t and pass it with lv_indev_data_t to the read function. #115
 - [ ] LV_GROUP_KEY_ENTER_LONG: sent by the library on long press of LV_GROUP_KEY_ENTER to trigger long press of the object #113
-- [ ] LV_INDEV_TYPE_BUTTON: for a hatdware buttons which press a point on a screen
-- [ ] USE_LV_DRAW_IMG/LINE, USE_LV_INDEV_POINTER/KEYPAD/BUTTON
-
+- [x] LV_INDEV_TYPE_BUTTON: for a hatdware buttons which press a point on a screen
 
 ## v5.0 (released at: 20.12.2017)
 - [x] UTF-8 support
