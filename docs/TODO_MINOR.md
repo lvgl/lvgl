@@ -27,6 +27,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] Bit based VDB: 1, 2 or 4 bit
 - [ ] lv_icon: new object type: an image wich acts as a button (different image for different states)
 - [ ] triangle drawing
+- [ ] user defined error callback
 
 ## v5.1 (released at: in progress)
 - [x] lv_refr_set_roundig_callback: set a function to modify the invalidated area for special display controllers
@@ -43,7 +44,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] lv_label: draw style.body.padding.hor/ver greater body if body_draw is enabled 
 - [x] LV_LAYOUT_PRETTY: in one row align obeóject vertically to middle
 - [x] Add user data option to lv_indev_drv_t and pass it with lv_indev_data_t to the read function. #115
-- [ ] LV_GROUP_KEY_ENTER_LONG: sent by the library on long press of LV_GROUP_KEY_ENTER to trigger long press of the object #113
+- [x] LV_GROUP_KEY_ENTER_LONG: sent by the library on long press of LV_GROUP_KEY_ENTER to trigger long press of the object #113
 - [x] LV_INDEV_TYPE_BUTTON: for a hatdware buttons which press a point on a screen
 
 ## v5.0 (released at: 20.12.2017)
