@@ -30,7 +30,7 @@
 #define LABEL_RECOLOR_PAR_LENGTH    6
 
 #define SHADOW_OPA_EXTRA_PRECISION      8       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
-#define SHADOW_BOTTOM_AA_EXTRA_RADIUS   4       /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
+#define SHADOW_BOTTOM_AA_EXTRA_RADIUS   3       /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
 /**********************
  *      TYPEDEFS
  **********************/
@@ -1840,7 +1840,7 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
     radius += LV_ANTIALIAS * SHADOW_BOTTOM_AA_EXTRA_RADIUS;
-    swidth+= LV_ANTIALIAS;
+    swidth += LV_ANTIALIAS;
 
     lv_coord_t curve_x[radius + 1];             /*Stores the 'x' coordinates of a quarter circle.*/
     lv_point_t circ;
@@ -1852,46 +1852,53 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
         lv_circ_next(&circ, &circ_tmp);
     }
 
-    int16_t row;
+    int16_t col;
     lv_opa_t line_1d_blur[swidth];
 
-    for(row = 0; row < swidth; row++) {
-        line_1d_blur[row] = (uint32_t)((uint32_t)(swidth - row) * style->body.opa) / (swidth);
+    for(col = 0; col < swidth; col++) {
+        line_1d_blur[col] = (uint32_t)((uint32_t)(swidth - col) * style->body.opa) / (swidth);
     }
 
     lv_point_t point_l;
     lv_point_t point_r;
     lv_area_t area_mid;
-    lv_point_t ofs1;
-    lv_point_t ofs2;
+    lv_point_t ofs_l;
+    lv_point_t ofs_r;
 
-    ofs1.x = coords->x1 + radius;
-    ofs1.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
+    ofs_l.x = coords->x1 + radius;
+    ofs_l.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
 
-    ofs2.x = coords->x2 - radius;
-    ofs2.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
+    ofs_r.x = coords->x2 - radius;
+    ofs_r.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
 
-    for(row = 0; row <= radius; row++) {
-        point_l.x = ofs1.x + radius - row - radius;
-        point_l.y = ofs1.y + curve_x[row];
+    printf("\n\n");
 
-        point_r.x = ofs2.x + row;
-        point_r.y = ofs2.y + curve_x[row];
+    for(col = 0; col <= radius; col++) {
+        point_l.x = ofs_l.x + radius - col - radius;
+        point_l.y = ofs_l.y + curve_x[col];
+
+        point_r.x = ofs_r.x + col;
+        point_r.y = ofs_r.y + curve_x[col];
+
+        printf("lx:%d, rx:%d\n", point_l.x, point_r.x);
 
         uint16_t d;
         for(d = 0; d < swidth; d++) {
             px_fp(point_l.x, point_l.y, mask, style->body.shadow.color, line_1d_blur[d]);
             point_l.y ++;
 
-            px_fp(point_r.x, point_r.y, mask, style->body.shadow.color, line_1d_blur[d]);
-            point_r.y ++;
+            /*Don't overdraw th pixel on the middle*/
+            if(point_r.x > ofs_l.x) {
+                px_fp(point_r.x, point_r.y, mask, style->body.shadow.color, line_1d_blur[d]);
+                point_r.y ++;
+            }
         }
 
     }
 
-    area_mid.x1 = ofs1.x + 1;
-    area_mid.y1 = ofs1.y + radius;
-    area_mid.x2 = ofs2.x - 1;
+    area_mid.x1 = ofs_l.x + 1;
+    area_mid.y1 = ofs_l.y + radius;
+    area_mid.x2 = ofs_r.x - 1;
     area_mid.y2 = area_mid.y1;
 
     uint16_t d;
