@@ -1755,7 +1755,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     bool line_ready;
     for(line = 1; line <= radius + swidth; line++) {        /*Check all rows and make the 1D blur to 2D*/
         line_ready = false;
-        for(col = 1; col < radius + swidth + 1; col++) {        /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
+        for(col = 1; col < radius + swidth + 10; col++) {        /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
 
             /*Sum the opacities from the lines above and below this 'row'*/
             int16_t line_rel;

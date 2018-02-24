@@ -346,12 +346,13 @@ static void indev_proc_press(lv_indev_proc_t * info)
         pr_obj = indev_search_obj(info, lv_layer_top());
         if(pr_obj == NULL) pr_obj = indev_search_obj(info, lv_scr_act());
     }
-    /*If there is last object but it is not dragged also search*/
-    else if(info->drag_in_prog == 0) {/*Now act_obj != NULL*/
+    /*If there is last object but it is not dragged and not protected also search*/
+    else if(info->drag_in_prog == 0 &&
+            lv_obj_is_protected(info->act_obj, LV_PROTECT_PRESS_LOST) == false) {/*Now act_obj != NULL*/
         pr_obj = indev_search_obj(info, lv_layer_top());
         if(pr_obj == NULL) pr_obj = indev_search_obj(info, lv_scr_act());
     }
-    /*If a dragable object was the last then keep it*/
+    /*If a dragable or a protected object was the last then keep it*/
     else {
         
     }

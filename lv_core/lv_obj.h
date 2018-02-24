@@ -117,8 +117,9 @@ typedef struct _lv_obj_t
     void * free_ptr;              /*Application specific pointer (set it freely)*/
 #endif
 
-    void * group_p;             /*Pointer to the group of the object*/
-
+#if USE_LV_GROUP != 0
+    void * group_p;                 /*Pointer to the group of the object*/
+#endif
     /*Attributes and states*/
     uint8_t click     :1;    /*1: Can be pressed by an input device*/
     uint8_t drag      :1;    /*1: Enable the dragging*/
@@ -147,6 +148,7 @@ typedef enum
     LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
     LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_cont layout)*/
     LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
+    LV_PROTECT_PRESS_LOST= 0x10, /*TODO */
 }lv_protect_t;
 
 typedef enum

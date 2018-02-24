@@ -81,7 +81,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_design_func(ext->scrl, lv_scrl_design);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
-		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
+		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
 		lv_cont_set_fit(ext->scrl, false, true);
 
 		/* Add the signal function only if 'scrolling' is created
