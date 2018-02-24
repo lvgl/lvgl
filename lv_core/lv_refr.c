@@ -48,7 +48,8 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
  **********************/
 static lv_join_t inv_buf[LV_INV_FIFO_SIZE];
 static uint16_t inv_buf_p;
-static void (*monitor_cb)(uint32_t, uint32_t);
+static void (*monitor_cb)(uint32_t, uint32_t); /*Monitor the rendering time*/
+static void (*round_cb)(lv_area_t*);           /*If set then called to modify invalidated areas for special display controllers*/
 static uint32_t px_num;
 
 /**********************
@@ -97,18 +98,8 @@ void lv_inv_area(const lv_area_t * area_p)
 
     /*The area is truncated to the screen*/
     if(suc != false) {
-#if LV_INV_FULL_ROW == 1
-		/*Extend invalid area to be as wide as the screen*/
-		com_area.x1 = 0;
-		com_area.x2 = LV_HOR_RES-1;
-#endif
+        if(round_cb) round_cb(&com_area);
 
-#if LV_INV_FULL_COL == 1
-		/*Extend invalid area to be as tall as the screen*/
-		com_area.y1 = 0;
-		com_area.y2 = LV_VER_RES-1;
-#endif
-		
     	/*Save only if this area is not in one of the saved areas*/
     	uint16_t i;
     	for(i = 0; i < inv_buf_p; i++) {
@@ -136,6 +127,16 @@ void lv_inv_area(const lv_area_t * area_p)
 void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
 {
     monitor_cb = cb;
+}
+
+/**
+ * Called when an area is invalidated to modify the coordinates of the area.
+ * Special display controllers may require special coordinate rounding
+ * @param cb pointer to the a function which will modify the area
+ */
+void lv_refr_set_round_cd(void(*cb)(lv_area_t*))
+{
+    round_cb = cb;
 }
 
 /**********************

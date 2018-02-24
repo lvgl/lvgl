@@ -34,13 +34,19 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_group_t;
+
+typedef void (*lv_group_style_mod_func_t)(lv_style_t *);
+typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
+
 typedef struct _lv_group_t
 {
-    lv_ll_t obj_ll;
-    lv_obj_t ** obj_focus;
-    void (*style_mod)(lv_style_t * style);
-    lv_style_t style_tmp;
-    uint8_t frozen:1;
+    lv_ll_t obj_ll;                         /*Linked list to store the objects in the group */
+    lv_obj_t ** obj_focus;                  /*The object in focus*/
+    lv_group_style_mod_func_t style_mod;   /*A function which modifies the style of the focused object*/
+    lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
+    lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
+    uint8_t frozen:1;                       /*1: can't focus to new object*/
 }lv_group_t;
 
 /**********************
@@ -98,13 +104,19 @@ void lv_group_focus_freeze(lv_group_t * group, bool en);
  */
 void lv_group_send_data(lv_group_t * group, uint32_t c);
 
-
 /**
  * Set a function for a group which will modify the object's style if it is in focus
  * @param group pointer to a group
- * @param style_cb the style modifier function pointer
+ * @param style_mod_func the style modifier function pointer
  */
-void lv_group_set_style_mod_cb(lv_group_t * group, void (*style_cb)(lv_style_t * style));
+void lv_group_set_style_mod_cb(lv_group_t * group,lv_group_style_mod_func_t style_mod_func);
+
+/**
+ * Set a function for a group which will be called when a new object is focused
+ * @param group pointer to a group
+ * @param focus_cb the call back function or NULL if unused
+ */
+void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
 
 /**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
@@ -120,6 +132,20 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
  * @return pointer to the focused object
  */
 lv_obj_t * lv_group_get_focused(lv_group_t * group);
+
+/**
+ * Get a the style modifier function of a group
+ * @param group pointer to a group
+ * @return pointer to the style modifier function
+ */
+lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group);
+
+/**
+ * Get the focus callback function of a group
+ * @param group pointer to a group
+ * @return the call back function or NULL if not set
+ */
+lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group);
 
 /**********************
  *      MACROS

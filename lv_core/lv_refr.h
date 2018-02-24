@@ -58,6 +58,13 @@ void lv_inv_area(const lv_area_t * area_p);
  */
 void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t));
 
+/**
+ * Called when an area is invalidated to modify the coordinates of the area.
+ * Special display controllers may require special coordinate rounding
+ * @param cb pointer to the a function which will modify the area
+ */
+void lv_refr_set_round_cd(void(*cb)(lv_area_t*));
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
