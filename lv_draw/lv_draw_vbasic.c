@@ -359,7 +359,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 lv_disp_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
             }
 #else
-            sw_mem_blend(&vdb_buf_tmp[masked_a.x1], &map_p[masked_a.x1], map_useful_w, opa);
+            sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
 #endif
             map_p += map_width * px_size_byte;               /*Next row on the map*/
             vdb_buf_tmp += vdb_width;                        /*Next row on the VDB*/
