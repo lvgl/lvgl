@@ -69,10 +69,6 @@ typedef enum {
     LV_IMG_SRC_UNKNOWN,
 }lv_img_src_t;
 
-typedef enum {
-    LV_IMG_FILE_FORMAT_RAW,     /*Raw pixel map row-by-row*/
-}lv_img_file_format;
-
 
 /**********************
  * GLOBAL PROTOTYPES

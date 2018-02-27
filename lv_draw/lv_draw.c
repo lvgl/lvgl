@@ -70,9 +70,7 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
  *  STATIC VARIABLES
  **********************/
 #if LV_VDB_SIZE != 0
-#  if USE_LV_SHADOW
 static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_vpx;
-#  endif /*USE_LV_SHADOW*/
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_vfill;
 static void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_vletter;
 #  if USE_LV_IMG
@@ -81,7 +79,7 @@ static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
         lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
 #  endif /*USE_LV_IMG*/
 #elif USE_LV_REAL_DRAW != 0
-/* px_fp used only by shadow drawing  but  the shadows are not drawn without VDB
+/* px_fp used only by shadow drawing and anti aliasing
  * static void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_rpx;
  */
 static void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_rfill;
