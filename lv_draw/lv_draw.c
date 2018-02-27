@@ -1869,16 +1869,12 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     ofs_r.x = coords->x2 - radius;
     ofs_r.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
 
-    printf("\n\n");
-
     for(col = 0; col <= radius; col++) {
         point_l.x = ofs_l.x + radius - col - radius;
         point_l.y = ofs_l.y + curve_x[col];
 
         point_r.x = ofs_r.x + col;
         point_r.y = ofs_r.y + curve_x[col];
-
-        printf("lx:%d, rx:%d\n", point_l.x, point_r.x);
 
         uint16_t d;
         for(d = 0; d < swidth; d++) {
