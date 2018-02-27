@@ -370,6 +370,8 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     else {
         lv_color_t chroma_key_color = LV_COLOR_TRANSP;
         lv_coord_t col;
+        lv_color_t last_img_px = LV_COLOR_BLACK;
+        lv_color_t recolored_px = lv_color_mix(recolor, last_img_px, recolor_opa);
         for(row = masked_a.y1; row <= masked_a.y2; row++) {
             for(col = 0; col < map_useful_w; col++) {
                 lv_opa_t opa_result = opa;
@@ -381,13 +383,17 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
                     lv_opa_t px_opa = (*(((uint8_t *) px_color) + LV_IMG_PX_SIZE_ALPHA_BYTE - 1));
-                    if(px_opa != LV_OPA_COVER) opa_result = (uint32_t)((uint32_t)px_opa * opa_result) >> 8;
-
+                    if(px_opa == LV_OPA_TRANSP) continue;
+                    else if(px_opa != LV_OPA_COVER) opa_result = (uint32_t)((uint32_t)px_opa * opa_result) >> 8;
                 }
 
                 /*Re-color the pixel if required*/
                 if(recolor_opa != LV_OPA_TRANSP) {
-                    lv_color_t recolored_px = lv_color_mix(recolor, *px_color, recolor_opa);
+
+                	if(last_img_px.full != px_color->full) {		/*Minor acceleration: calculate only for new colors (save the last)*/
+                		last_img_px = *px_color;
+                		recolored_px = lv_color_mix(recolor, last_img_px, recolor_opa);
+                	}
 
                     if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = recolored_px.full;
                     else vdb_buf_tmp[col] = lv_color_mix(recolored_px, vdb_buf_tmp[col], opa_result);
