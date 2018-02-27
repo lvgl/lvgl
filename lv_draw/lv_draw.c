@@ -1242,40 +1242,39 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
     }
 
     /*If radius == 0 one px on the corners are not drawn by main drawer*/
-    if(radius == 0) {
-
+    if(style->body.radius == 0) {
         /*Left top corner*/
         if(part & (LV_BORDER_TOP | LV_BORDER_LEFT)) {
             work_area.x1 = coords->x1;
-            work_area.x2 = coords->x1;
+            work_area.x2 = coords->x1 + LV_ANTIALIAS;
             work_area.y1 = coords->y1;
-            work_area.y2 = coords->y1;
+            work_area.y2 = coords->y1 + LV_ANTIALIAS;
             fill_fp(&work_area, mask, color, opa);
         }
 
         /*Right top corner*/
         if(part & (LV_BORDER_TOP | LV_BORDER_RIGHT)) {
-            work_area.x1 = coords->x2;
+            work_area.x1 = coords->x2 - LV_ANTIALIAS;
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y1;
-            work_area.y2 = coords->y1;
+            work_area.y2 = coords->y1 + LV_ANTIALIAS;
             fill_fp(&work_area, mask, color, opa);
         }
 
         /*Left bottom corner*/
         if(part & (LV_BORDER_BOTTOM | LV_BORDER_LEFT)) {
             work_area.x1 = coords->x1;
-            work_area.x2 = coords->x1;
-            work_area.y1 = coords->y2;
+            work_area.x2 = coords->x1 + LV_ANTIALIAS;
+            work_area.y1 = coords->y2 - LV_ANTIALIAS;
             work_area.y2 = coords->y2;
             fill_fp(&work_area, mask, color, opa);
         }
 
         /*Right bottom corner*/
         if(part & (LV_BORDER_BOTTOM | LV_BORDER_RIGHT)) {
-            work_area.x1 = coords->x2;
+            work_area.x1 = coords->x2 - LV_ANTIALIAS;
             work_area.x2 = coords->x2;
-            work_area.y1 = coords->y2;
+            work_area.y1 = coords->y2 - LV_ANTIALIAS;
             work_area.y2 = coords->y2;
             fill_fp(&work_area, mask, color, opa);
         }
