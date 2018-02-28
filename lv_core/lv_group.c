@@ -297,6 +297,7 @@ lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
  */
 static void style_mod_def(lv_style_t * style)
 {
+#if LV_COLOR_DEPTH != 1
     /*Make the style to be a little bit orange*/
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_ORANGE;
@@ -309,6 +310,13 @@ static void style_mod_def(lv_style_t * style)
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
+#else
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_BLACK;
+    style->body.border.width = 3;
+
+#endif
+
 }
 
 #endif /*USE_LV_GROUP != 0*/
