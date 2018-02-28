@@ -33,13 +33,13 @@ Here are ideas which are not assigned to a minor version yet:
 ## v5.1 (released at: in progress)
 - [x] lv_refr_set_roundig_callback: set a function to modify the invalidated area for special display controllers
 - [x] lv_group_set_focus_callback: set function to call when a new object is focused #94
-- [ ] lv_obj_get_type() return string, e.g. "lv_slider", "lv_btn" etc #91
+- [x] lv_obj_get_type() return string, e.g. "lv_slider", "lv_btn" etc #91
 - [x] Font handling extension for effective Chiese font handling (cutsom read functions)
 - [x] Remove LV_FONT_ANTIALIAS and add fonts with BPP (bit-per-pixel): 1, 2, 4 and 8
 - [x] lv_img: add pixel level opacity option (ARGB8888 or ARGB8565) (make image upscale pointless)
 - [x] LV_ANTIALIAS rework: meaning anti-alias lines and curves
 - [x] Merge symbol fonts (basic, file and feedback) into one font 
-- [ ] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
+- [x] lv_group: different default style_mod function with LV_COLOR_DEPTH   1
 - [x] lv_img_set_src() to handle file path, symbols and const variables with one function
 - [x] LV_PROTECT_PRESS_LOST: prevent the input devices to NOT find new object when the object's pressing is lost
 - [x] lv_label: draw style.body.padding.hor/ver greater body if body_draw is enabled 
