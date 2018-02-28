@@ -52,6 +52,7 @@ extern "C" {
 #define LV_ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_DIR_MASK		0x80	/*ANIM_IN/ANIM_OUT mask*/
 
+#define LV_MAX_ANCESTOR_NUM     8
 /**********************
  *      TYPEDEFS
  **********************/
@@ -81,6 +82,7 @@ typedef enum
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_STYLE_CHG,
 	LV_SIGNAL_REFR_EXT_SIZE,
+	LV_SIGNAL_GET_TYPE,
 
 	/*Input device related*/
     LV_SIGNAL_PRESSED,
@@ -150,6 +152,12 @@ typedef enum
     LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
     LV_PROTECT_PRESS_LOST= 0x10, /*TODO */
 }lv_protect_t;
+
+
+/*Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
+typedef struct {
+    const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
+}lv_obj_type_t;
 
 typedef enum
 {
@@ -676,6 +684,14 @@ lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
  *         Use it as ext->data1, and NOT da(ext)->data1
  */
 void * lv_obj_get_ext_attr(lv_obj_t * obj);
+
+/**
+ * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
+ * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
+ * @param obj pointer to an object which type should be get
+ * @param buf pointer to an `lv_obj_type_t` buffer to store the types
+ */
+void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
 /**

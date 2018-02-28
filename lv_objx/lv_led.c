@@ -219,6 +219,16 @@ static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param)
     res = ancestor_signal(led, sign, param);
     if(res != LV_RES_OK) return res;
 
+
+    if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_led";
+    }
+
     return res;
 }
 #endif
