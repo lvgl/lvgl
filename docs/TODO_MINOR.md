@@ -28,6 +28,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] lv_icon: new object type: an image wich acts as a button (different image for different states)
 - [ ] triangle drawing
 - [ ] user defined error callback
+- [ ] Support more character coding (e.g. UTF8, UTF16 etc)
 
 ## v5.1 (released at: in progress)
 - [x] lv_refr_set_roundig_callback: set a function to modify the invalidated area for special display controllers
