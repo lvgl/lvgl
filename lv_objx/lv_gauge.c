@@ -1,6 +1,6 @@
 /**
  * @file lv_gauge.c
- * 
+ *
  */
 
 
@@ -65,7 +65,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor gauge*/
     lv_obj_t * new_gauge = lv_lmeter_create(par, copy);
     lv_mem_assert(new_gauge);
-    
+
     /*Allocate the gauge type specific extended data*/
     lv_gauge_ext_t * ext = lv_obj_allocate_ext_attr(new_gauge, sizeof(lv_gauge_ext_t));
     lv_mem_assert(ext);
@@ -106,11 +106,11 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
         for(i = 0; i < ext->needle_count; i++) {
             ext->values[i] = copy_ext->values[i];
         }
-
+        ext->label_count = copy_ext->label_count;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_gauge);
     }
-    
+
     return new_gauge;
 }
 
