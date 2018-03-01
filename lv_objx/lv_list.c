@@ -208,6 +208,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
 void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+#if USE_LV_ANIMATION == 0
+    anim_time = 0;
+#endif
     ext->anim_time = anim_time;
 }
 
@@ -461,6 +464,11 @@ void lv_list_down(lv_obj_t * list)
  */
 void lv_list_focus(lv_obj_t *btn, bool anim_en)
 {
+
+#if USE_LV_ANIMATION == 0
+    anim_en = false;
+#endif
+
     lv_obj_t *list = lv_obj_get_parent(lv_obj_get_parent(btn));
 
     lv_page_focus(list, btn, anim_en == false ? 0 :lv_list_get_anim_time(list));
@@ -560,7 +568,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                     lv_page_focus(list, btn_prev, ext->anim_time);
                 }
             }
-        } else if(c == LV_GROUP_KEY_ENTER) {
+        } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             /*Get the 'pressed' button*/
             lv_obj_t * btn = NULL;
             btn = get_next_btn(list, btn);

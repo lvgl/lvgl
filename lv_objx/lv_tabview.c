@@ -237,6 +237,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
  */
 void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 {
+#if USE_LV_ANIMATION == 0
+    anim_en = false;
+#endif
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     lv_style_t * style = lv_obj_get_style(ext->content);
 
@@ -327,6 +330,9 @@ void lv_tabview_set_sliding(lv_obj_t * tabview, bool en)
 void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time)
 {
     lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
+#if USE_LV_ANIMATION == 0
+    anim_time = 0;
+#endif
     ext->anim_time = anim_time;
 }
 

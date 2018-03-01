@@ -183,12 +183,15 @@ void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action)
 /**
  * Set animation duration
  * @param mbox pointer to a message box object
- * @param time animation length in  milliseconds (0: no animation)
+ * @param anim_time animation length in  milliseconds (0: no animation)
  */
-void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t time)
+void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    ext->anim_time = time;
+#if USE_LV_ANIMATION == 0
+    anim_time = 0;
+#endif
+    ext->anim_time = anim_time;
 }
 
 /**

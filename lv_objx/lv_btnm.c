@@ -585,7 +585,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) ext->btn_id_pr = 0;
             if(ext->btn_id_pr > 0) ext->btn_id_pr--;
             lv_obj_invalidate(btnm);
-        } else if(c == LV_GROUP_KEY_ENTER) {
+        } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             if(ext->action != NULL) {
                 uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
                 if(txt_i != LV_BTNM_PR_NONE) {

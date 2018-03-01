@@ -122,6 +122,9 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
  */
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en)
 {
+#if USE_LV_ANIMATION == 0
+    anim_en = false;
+#endif
     lv_ddlist_set_selected(roller, sel_opt);
     refr_position(roller, anim_en);
 }
@@ -293,23 +296,30 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
         }
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+        ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS) {
+        /*Revert the original state*/
+        if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
+            ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
+            refr_position(roller, true);
+        }
+
+    }
+    else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(ext->ddlist.sel_opt_id +1 < ext->ddlist.option_cnt) {
-
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id + 1, true);
-                if(ext->ddlist.action != NULL) {
-                    ext->ddlist.action(roller);
-                }
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             if(ext->ddlist.sel_opt_id > 0) {
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id - 1, true);
-                if(ext->ddlist.action != NULL) {
-                    ext->ddlist.action(roller);
-                }
             }
+        } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
+            if(ext->ddlist.action) ext->ddlist.action(roller);
         }
     }
     else if(sign == LV_SIGNAL_GET_TYPE) {
@@ -446,6 +456,9 @@ static void draw_bg(lv_obj_t *roller, const lv_area_t *mask)
  */
 static void refr_position(lv_obj_t *roller, bool anim_en)
 {
+#if USE_LV_ANIMATION == 0
+    anim_en = false;
+#endif
     lv_obj_t *roller_scrl = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
