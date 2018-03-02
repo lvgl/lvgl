@@ -134,7 +134,7 @@ void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
  * Special display controllers may require special coordinate rounding
  * @param cb pointer to the a function which will modify the area
  */
-void lv_refr_set_round_cd(void(*cb)(lv_area_t*))
+void lv_refr_set_round_cb(void(*cb)(lv_area_t*))
 {
     round_cb = cb;
 }
