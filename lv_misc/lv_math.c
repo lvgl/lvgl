@@ -85,8 +85,6 @@ void lv_math_num_to_str(int32_t num, char * buf)
     }
 
     (*buf) = '\0';
-
-    printf("Input decimal or binary: %d\nOutput BCD: %X\nOutput str: %s\n", num, output, buf_ori);
 }
 
 /**********************
