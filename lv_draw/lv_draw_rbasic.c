@@ -79,7 +79,7 @@ void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         union_ok = lv_area_union(&masked_area, cords_p, mask_p);
     } else {
         lv_area_t scr_area;
-        lv_area_set(&scr_area, 0, 0, LV_HOR_RES - 1, LV_HOR_RES - 1);
+        lv_area_set(&scr_area, 0, 0, LV_HOR_RES - 1, LV_VER_RES - 1);
         union_ok = lv_area_union(&masked_area, cords_p, &scr_area);
     }
     

@@ -421,7 +421,6 @@ static void page_init(void)
     page_scrl.body.border.width = 1;
     page_scrl.body.radius = LV_DPI / 20;
 
-
     theme.page.bg = &panel;
     theme.page.scrl = &page_scrl;
     theme.page.sb = &sb;
