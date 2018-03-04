@@ -62,6 +62,8 @@ static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_
 #endif
 
 
+static uint8_t hex_char_to_num(char hex);
+
 #if USE_LV_TRIANGLE != 0
 static void point_swap(lv_point_t * p1, lv_point_t * p2);
 #endif
@@ -342,7 +344,11 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
                             memcpy(buf, &txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r,g,b;
-                            sscanf(buf, "%02x%02x%02x", &r, &g, &b);
+                            r = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
+                            g = (hex_char_to_num(buf[2]) << 4) + hex_char_to_num(buf[3]);
+                            b = (hex_char_to_num(buf[4]) << 4) + hex_char_to_num(buf[5]);
+
+//                            sscanf(buf, "%02x%02x%02x", &r, &g, &b);
                             recolor = LV_COLOR_MAKE(r, g, b);
                         } else {
                             recolor.full = style->text.color.full;
@@ -2042,6 +2048,34 @@ static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_
 }
 
 #endif
+
+
+/**
+ * Convert a hexadecimal characters to a number (0..15)
+ * @param hex Pointer to a hexadecimal character (0..9, A..F)
+ * @return the numerical value of `hex` or 0 on error
+ */
+static uint8_t hex_char_to_num(char hex)
+{
+    if(hex >= '0' && hex <= '9') {
+        return hex - '0';
+    }
+
+    if(hex >= 'a') hex -= 'a' - 'A';    /*Convert to upper case*/
+
+    switch(hex) {
+        case 'A': return 10;
+        case 'B': return 11;
+        case 'C': return 12;
+        case 'D': return 13;
+        case 'E': return 14;
+        case 'F': return 15;
+        default: return 0;
+    }
+
+    return 0;
+
+}
 
 #if USE_LV_TRIANGLE != 0
 /**
