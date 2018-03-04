@@ -347,8 +347,6 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
                             r = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
                             g = (hex_char_to_num(buf[2]) << 4) + hex_char_to_num(buf[3]);
                             b = (hex_char_to_num(buf[4]) << 4) + hex_char_to_num(buf[5]);
-
-//                            sscanf(buf, "%02x%02x%02x", &r, &g, &b);
                             recolor = LV_COLOR_MAKE(r, g, b);
                         } else {
                             recolor.full = style->text.color.full;
