@@ -395,6 +395,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
              const lv_style_t * style, const void * src)
 {
+
     if(src == NULL) {
         lv_draw_rect(coords, mask, &lv_style_plain);
         lv_draw_label(coords, mask, &lv_style_plain, "No\ndata", LV_TXT_FLAG_NONE, NULL);
@@ -403,6 +404,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
     const uint8_t * u8_p = (uint8_t*) src;
     if(u8_p[0] >= 'A' &&  u8_p[0] <= 'Z') { /*It will be a path of a file*/
+#if USE_LV_FILESYSTEM
         lv_fs_file_t file;
         lv_fs_res_t res = lv_fs_open(&file, src, LV_FS_MODE_RD);
         if(res == LV_FS_RES_OK) {
@@ -467,7 +469,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                 lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
             }
         }
-
+#endif
     }
     else {
         const lv_img_t * img_var = src;

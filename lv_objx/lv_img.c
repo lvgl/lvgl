@@ -14,10 +14,6 @@
 #error "lv_img: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
-#if USE_LV_FILESYSTEM == 0
-#error "lv_img: lv_fs is required. Enable it in lv_conf.h (USE_LV_FILESYSTEM  1) "
-#endif
-
 #include "lv_img.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_fs.h"
@@ -118,6 +114,11 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
 
+#if USE_LV_FILESYSTEM == 0
+    if(src_type == LV_IMG_SRC_FILE) src_type = LV_IMG_SRC_UNKNOWN;
+#endif
+
+
     if(src_type == LV_IMG_SRC_UNKNOWN) {
         if(ext->src_type == LV_IMG_SRC_SYMBOL || ext->src_type == LV_IMG_SRC_FILE) {
             lv_mem_free(ext->src);
@@ -126,7 +127,6 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         ext->src_type = LV_IMG_SRC_UNKNOWN;
         return;
     }
-
 
     ext->src_type = src_type;
 
@@ -138,7 +138,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         ext->alpha_byte = ((lv_img_t*)src_img)->header.alpha_byte;
         lv_obj_set_size(img, ext->w, ext->h);
     }
-
+#if USE_LV_FILESYSTEM
     else if(src_type == LV_IMG_SRC_FILE) {
         lv_fs_file_t file;
         lv_fs_res_t res;
@@ -173,7 +173,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
         }
     }
-
+#endif
     else if(src_type == LV_IMG_SRC_SYMBOL) {
         lv_style_t * style = lv_obj_get_style(img);
         lv_point_t size;
