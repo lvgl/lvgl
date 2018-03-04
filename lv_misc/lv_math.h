@@ -14,6 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include <stdint.h>
 
 /*********************
  *      DEFINES
@@ -30,6 +31,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_math_num_to_str(int32_t num, char * buf);
 
 /**********************
  *      MACROS

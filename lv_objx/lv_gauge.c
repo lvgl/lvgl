@@ -353,7 +353,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 
         int16_t scale_act = (int32_t)((int32_t)(max - min) * i) /  (label_num - 1);
         scale_act += min;
-        sprintf(scale_txt, "%d", scale_act);
+        lv_math_num_to_str(scale_act, scale_txt);
+//        sprintf(scale_txt, "%d", scale_act);
 
         lv_area_t label_cord;
         lv_point_t label_size;
