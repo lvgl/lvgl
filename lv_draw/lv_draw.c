@@ -1859,7 +1859,7 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     lv_opa_t line_1d_blur[swidth];
 
     for(col = 0; col < swidth; col++) {
-        line_1d_blur[col] = (uint32_t)((uint32_t)(swidth - col) * style->body.opa) / (swidth);
+        line_1d_blur[col] = (uint32_t)((uint32_t)(swidth - col) * style->body.opa / 2) / (swidth);
     }
 
     lv_point_t point_l;
@@ -1875,22 +1875,30 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     ofs_r.y = coords->y2 - radius + 1 - LV_ANTIALIAS;
 
     for(col = 0; col <= radius; col++) {
-        point_l.x = ofs_l.x + radius - col - radius;
+        point_l.x = ofs_l.x - col ;
         point_l.y = ofs_l.y + curve_x[col];
 
         point_r.x = ofs_r.x + col;
         point_r.y = ofs_r.y + curve_x[col];
 
+        lv_opa_t px_opa;
+        int16_t diff = col == 0 ? 0 : curve_x[col-1] - curve_x[col];
         uint16_t d;
         for(d = 0; d < swidth; d++) {
-            px_fp(point_l.x, point_l.y, mask, style->body.shadow.color, line_1d_blur[d]);
+            /*When stepping a pixel in y calculate the average with the pixel from the prev. column to make a blur */
+            if(diff == 0) {
+                px_opa = line_1d_blur[d];
+            } else {
+                px_opa = (uint16_t)((uint16_t)line_1d_blur[d] + line_1d_blur[d - diff]) >> 1;
+            }
+            px_fp(point_l.x, point_l.y, mask, style->body.shadow.color, px_opa);
             point_l.y ++;
 
-            /*Don't overdraw th pixel on the middle*/
+            /*Don't overdraw the pixel on the middle*/
             if(point_r.x > ofs_l.x) {
-                px_fp(point_r.x, point_r.y, mask, style->body.shadow.color, line_1d_blur[d]);
-                point_r.y ++;
+                px_fp(point_r.x, point_r.y, mask, style->body.shadow.color, px_opa);
             }
+            point_r.y ++;
         }
 
     }
