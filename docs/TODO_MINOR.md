@@ -25,7 +25,8 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] Arabic glyph convert (based on letter position)
 - [ ] Right-to-left write support 
 - [ ] Bit based VDB: 1, 2 or 4 bit
-- [ ] lv_icon: new object type: an image wich acts as a button (different image for different states)
+- [ ] lv_icon: new object type: an image wich acts as a button
+- [ ] lv_table: new object type: a table with rows and colums
 - [ ] triangle drawing
 - [ ] user defined error callback
 - [ ] Support more character coding (e.g. UTF8, UTF16 etc)
