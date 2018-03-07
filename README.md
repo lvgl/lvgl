@@ -71,5 +71,5 @@ See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIB
 ## Donate
 If you are pleased with the graphics library, found it useful or be happy with the support you got, please help its further development:
 
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GJV3SC5EHDANS)
+[![Donate](https://littlevgl.com/donate_dir/donate_btn.png)](https://littlevgl.com/donate)
 

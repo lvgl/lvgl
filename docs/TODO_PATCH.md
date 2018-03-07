@@ -1,21 +1,29 @@
 # TODOs for patch versions
 Patch versions (x.y.1, x.y.2) contain bugfixes without changing the API but they can apppear in minor (x.1.0, x.2.0) or major (1.0.0, 2.0.0) versions too.
 
-Bugfixes are done in `bugfix` branche.
-
 The bugfixes of the still not released version are in `beta` branche.
 
 ## Contributing
 Please create an issue to introduce a bug instead of adding pull request to this file.
 
-## v5.0.2 (released at: in progress)
+## v5.0.3 (in progress)
+- [x] lv_chart: Fix the use of point_num more then 256 (Thanks to upbeat27) 
+- [x] lv_label: fix 'offset' with LV_ANTIALIAS (LV_LABEL_LONG_ROLL was effected)
+- [x] lv_label: anim. time wasn't allyed for LV_LABEL_LONG_ROLL
+- [x] lv_txt_ut8_size fiy for 4 byte characters
+- [x] lv_slider: fix knob_in with not zero min value
+- [x] lv_area_is_on: handled some cases wrong
+- [x] lv_indev: buffered indevs (return *true* in indev_read) was handled as non-buffered
+- [x] drag: don't invalidate if the object wasn't moved
+
+## v5.0.2 (released at: 19.01.2018)
 - [x] Fix dependencied (Thanks to Zaltora)
 - [x] lv_group: fix memory leak (Thanks to BenQoo)
 - [x] LV_INDEV_READ_PERIOD 0 build bugfix
 - [x] lv_roller: lv_roller_get_selected_str: bugfix (was recursive call)
 - [x] lv_obj_get_style: with NULL style check if the parent is focused and use the focused style
 - [x] lv_roller: add missing action handling
-- [ ] Set 24 bit colors upper byte (alpha) to 0xFF
+- [x] Set 24 bit colors upper byte (alpha) to 0xFF
 
 ## v5.0.1 (released at: 02.01.2018)
 - [x] lv_list: fixed when mouse and keyboard used together
