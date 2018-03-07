@@ -88,6 +88,15 @@ static inline void lv_line_set_style(lv_obj_t *line, lv_style_t *style)
     lv_obj_set_style(line, style);
 }
 
+/**
+ * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
+ * @param line
+ * @param upscale
+ */
+static inline void lv_line_set_upscale(lv_obj_t * line, bool upcale)
+{
+
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -115,6 +124,17 @@ static inline lv_style_t* lv_line_get_style(lv_obj_t *line)
 {
     return lv_obj_get_style(line);
 }
+
+/**
+ * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
+ * @param line
+ * @return false
+ */
+static inline bool lv_line_get_upscale(lv_obj_t * line)
+{
+    return false;
+}
+
 
 /**********************
  *      MACROS

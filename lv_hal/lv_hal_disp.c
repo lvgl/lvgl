@@ -81,7 +81,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t *driver)
         active = node;
         lv_obj_invalidate(lv_scr_act());
     } else {
-        node->next = disp_list;
+        disp_list->next = node;
     }
 
     return node;

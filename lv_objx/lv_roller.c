@@ -122,6 +122,9 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
  */
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en)
 {
+#if USE_LV_ANIMATION == 0
+    anim_en = false;
+#endif
     lv_ddlist_set_selected(roller, sel_opt);
     refr_position(roller, anim_en);
 }
@@ -135,7 +138,7 @@ void lv_roller_set_visible_row_count(lv_obj_t *roller, uint8_t row_cnt)
 {
     lv_roller_ext_t *ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
-    lv_ddlist_set_fix_height(roller, lv_font_get_height_scale(style_label->text.font) * row_cnt + style_label->text.line_space * (row_cnt));
+    lv_ddlist_set_fix_height(roller, lv_font_get_height(style_label->text.font) * row_cnt + style_label->text.line_space * (row_cnt));
 
 }
 /**
@@ -216,7 +219,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
         const lv_font_t * font = style->text.font;
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-        lv_coord_t font_h = lv_font_get_height_scale(font);
+        lv_coord_t font_h = lv_font_get_height(font);
         lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
@@ -230,7 +233,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
         const lv_font_t * font = style->text.font;
-        lv_coord_t font_h = lv_font_get_height_scale(font);
+        lv_coord_t font_h = lv_font_get_height(font);
 
         /*Redraw the text on the selected area with a different color*/
         lv_area_t rect_area;
@@ -293,24 +296,39 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
         }
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+        ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS) {
+        /*Revert the original state*/
+        if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
+            ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
+            refr_position(roller, true);
+        }
+
+    }
+    else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(ext->ddlist.sel_opt_id +1 < ext->ddlist.option_cnt) {
-
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id + 1, true);
-                if(ext->ddlist.action != NULL) {
-                    ext->ddlist.action(roller);
-                }
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             if(ext->ddlist.sel_opt_id > 0) {
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id - 1, true);
-                if(ext->ddlist.action != NULL) {
-                    ext->ddlist.action(roller);
-                }
             }
+        } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
+            if(ext->ddlist.action) ext->ddlist.action(roller);
         }
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_roller";
     }
 
     return res;
@@ -340,7 +358,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
 
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const lv_font_t * font = style_label->text.font;
-    lv_coord_t font_h = lv_font_get_height_scale(font);
+    lv_coord_t font_h = lv_font_get_height(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
         /*If dragged then align the list to there be an element in the middle*/
@@ -438,11 +456,14 @@ static void draw_bg(lv_obj_t *roller, const lv_area_t *mask)
  */
 static void refr_position(lv_obj_t *roller, bool anim_en)
 {
+#if USE_LV_ANIMATION == 0
+    anim_en = false;
+#endif
     lv_obj_t *roller_scrl = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const lv_font_t * font = style_label->text.font;
-    lv_coord_t font_h = lv_font_get_height_scale(font);
+    lv_coord_t font_h = lv_font_get_height(font);
     lv_coord_t h = lv_obj_get_height(roller);
     int32_t id = ext->ddlist.sel_opt_id;
     lv_coord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;

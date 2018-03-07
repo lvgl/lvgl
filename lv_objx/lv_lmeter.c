@@ -18,6 +18,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_LMETER_LINE_UPSCALE          5                   /*2^x upscale of line to make rounding*/
+#define LV_LMETER_LINE_UPSCALE_MASK     ((1 << LV_LMETER_LINE_UPSCALE) - 1)
 
 /**********************
  *      TYPEDEFS
@@ -28,6 +30,7 @@
  **********************/
 static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * param);
+static lv_coord_t lv_lmeter_coord_round(int32_t x);
 
 /**********************
  *  STATIC VARIABLES
@@ -237,7 +240,6 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
         lv_style_t * style = lv_obj_get_style(lmeter);
-
         lv_style_t style_tmp;
         memcpy(&style_tmp, style, sizeof(lv_style_t));
 
@@ -251,6 +253,8 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 
          lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
          lv_coord_t r_in = r_out - style->body.padding.hor;
+         if(r_in < 1) r_in = 1;
+
          lv_coord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
          lv_coord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
          int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;
@@ -259,14 +263,24 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 
          style_tmp.line.color = style->body.main_color;
 
+         /*Calculate every coordinate in x32 size to make rounding later*/
+         r_out = r_out << LV_LMETER_LINE_UPSCALE;
+         r_in = r_in << LV_LMETER_LINE_UPSCALE;
+
          for(i = 0; i < ext->line_cnt; i++) {
              /*Calculate the position a scale label*/
              int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
 
-             lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) / TRIGO_SIN_MAX;
-             lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) / TRIGO_SIN_MAX;
-             lv_coord_t y_in = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) / TRIGO_SIN_MAX;
-             lv_coord_t x_in = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) / TRIGO_SIN_MAX;
+             lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> LV_TRIGO_SHIFT;
+             lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> LV_TRIGO_SHIFT;
+             lv_coord_t y_in = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> LV_TRIGO_SHIFT;
+             lv_coord_t x_in = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> LV_TRIGO_SHIFT;
+
+             /*Rounding*/
+             x_out = lv_lmeter_coord_round(x_out);
+             x_in  = lv_lmeter_coord_round(x_in);
+             y_out = lv_lmeter_coord_round(y_out);
+             y_in  = lv_lmeter_coord_round(y_in);
 
              lv_point_t p1;
              lv_point_t p2;
@@ -312,9 +326,42 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_lmeter";
+    }
 
     return res;
 }
 
+/**
+ * Round a coordinate which is upscaled  (>=x.5 -> x + 1;   <x.5 -> x)
+ * @param x a coordinate which is greater then it should be
+ * @return the downscaled and rounded coordinate  (+-1)
+ */
+static lv_coord_t lv_lmeter_coord_round(int32_t x)
+{
+#if LV_LMETER_LINE_UPSCALE > 0
+    bool was_negative;
+    if(x < 0) {
+        was_negative = true;
+        x = -x;
+    } else {
+        was_negative = false;
+    }
+
+    x = (x >> LV_LMETER_LINE_UPSCALE) + ((x & LV_LMETER_LINE_UPSCALE_MASK) >> (LV_LMETER_LINE_UPSCALE - 1));
+
+    if(was_negative) x = -x;
+
+    return x;
+#else
+    return x;
+#endif
+}
 
 #endif

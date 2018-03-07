@@ -1,3 +1,4 @@
+
 /**
  * @file lv_slider.c
  * 
@@ -77,6 +78,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
     /*Init the new slider slider*/
     if(copy == NULL) {
         lv_obj_set_click(new_slider, true);
+        lv_obj_set_protect(new_slider, LV_PROTECT_PRESS_LOST);
 
         /*Set the default styles*/
         lv_theme_t *th = lv_theme_get_current();
@@ -421,14 +423,12 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         lv_style_t *knob_style = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
         lv_coord_t shadow_w = knob_style->body.shadow.width;
         if(ext->knob_in == 0) {
-            /* The smaller size is the knob diameter
-             * +2 for the possible rounding error*/
-            lv_coord_t x = LV_MATH_MIN(w / 2 + 2 + shadow_w, h / 2 + 2 + shadow_w);
+            /* The smaller size is the knob diameter*/
+            lv_coord_t x = LV_MATH_MIN(w / 2 + 1 + shadow_w, h / 2 + 1 + shadow_w);
             if(slider->ext_size < x) slider->ext_size = x;
         } else {
             lv_coord_t pad = LV_MATH_MIN(style->body.padding.hor, style->body.padding.ver);
             if(pad < 0) pad = -pad;
-            if(pad < 1) pad = 1;        /*For possible rounding errors*/
             if(slider->ext_size < pad) slider->ext_size = pad;
 
             if(slider->ext_size < shadow_w) slider->ext_size = shadow_w;
@@ -442,6 +442,14 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
             if(ext->action != NULL) ext->action(slider);
         }
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_slider";
     }
 
     return res;

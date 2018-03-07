@@ -71,6 +71,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_line, LV_DPI, LV_DPI);  /*Auto size is enables, but set default size until no points are added*/
 	    lv_obj_set_style(new_line, NULL);           /*Inherit parent's style*/
+	    lv_obj_set_click(new_line, false);
     }
     /*Copy an existing object*/
     else {
@@ -112,9 +113,11 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t po
 			ymax = LV_MATH_MAX(point_a[i].y, ymax);
 		}
 
-		lv_style_t * lines = lv_obj_get_style(line);
-		lv_obj_set_size(line, xmax + lines->line.width, ymax + lines->line.width);
+		lv_style_t * style = lv_line_get_style(line);
+		lv_obj_set_size(line, xmax + style->line.width, ymax + style->line.width);
 	}
+
+	lv_obj_invalidate(line);
 }
 
 /**
@@ -242,6 +245,16 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(line, sign, param);
     if(res != LV_RES_OK) return res;
+
+
+    if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_line";
+    }
 
     return res;
 }

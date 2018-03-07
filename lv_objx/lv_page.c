@@ -81,7 +81,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_design_func(ext->scrl, lv_scrl_design);
 		lv_obj_set_drag(ext->scrl, true);
 		lv_obj_set_drag_throw(ext->scrl, true);
-		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT);
+		lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
 		lv_cont_set_fit(ext->scrl, false, true);
 
 		/* Add the signal function only if 'scrolling' is created
@@ -516,6 +516,14 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         /*Ensure ext. size for the scrollbars if they are out of the page*/
         if(page->ext_size < (-ext->sb.style->body.padding.hor)) page->ext_size = -ext->sb.style->body.padding.hor;
         if(page->ext_size < (-ext->sb.style->body.padding.ver)) page->ext_size = -ext->sb.style->body.padding.ver;
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_page";
     }
 
     return res;

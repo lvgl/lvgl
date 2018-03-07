@@ -28,29 +28,31 @@ extern "C" {
 
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES == 0 || LV_VER_RES == 0
-#error "LV: LV_HOR_RES and LV_VER_RES must be greater then 0"
+#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater then 0"
 #endif
 
-#if LV_ANTIALIAS != 0 && LV_ANTIALIAS != 1
-#error "LV: LV_ATIALIAS can be only 0 or 1"
+#if LV_ANTIALIAS > 1
+#error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
 
 #if LV_VDB_SIZE == 0 && LV_ANTIALIAS != 0
-#error "LV: If LV_VDB_SIZE == 0 the antialaissing must be disabled"
+#error "LittlevGL: If LV_VDB_SIZE == 0 the anti-aliasing must be disabled"
 #endif
 
-#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < LV_HOR_RES && LV_ANTIALIAS == 0
-#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
+#if LV_VDB_SIZE > 0 && LV_VDB_SIZE < LV_HOR_RES
+#error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
 #endif
 
-#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < 2 *LV_HOR_RES && LV_ANTIALIAS != 0
-#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= (2 * LV_HOR_RES))"
+#if LV_VDB_SIZE == 0 && USE_LV_REAL_DRAW == 0
+#error "LittlevGL: If LV_VDB_SIZE = 0 Real drawing function are required (lv_conf.h: USE_LV_REAL_DRAW 1)"
 #endif
+
 
 #define LV_ANIM_IN			    0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_DIR_MASK		0x80	/*ANIM_IN/ANIM_OUT mask*/
 
+#define LV_MAX_ANCESTOR_NUM     8
 /**********************
  *      TYPEDEFS
  **********************/
@@ -80,6 +82,7 @@ typedef enum
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_STYLE_CHG,
 	LV_SIGNAL_REFR_EXT_SIZE,
+	LV_SIGNAL_GET_TYPE,
 
 	/*Input device related*/
     LV_SIGNAL_PRESSED,
@@ -116,8 +119,9 @@ typedef struct _lv_obj_t
     void * free_ptr;              /*Application specific pointer (set it freely)*/
 #endif
 
-    void * group_p;             /*Pointer to the group of the object*/
-
+#if USE_LV_GROUP != 0
+    void * group_p;                 /*Pointer to the group of the object*/
+#endif
     /*Attributes and states*/
     uint8_t click     :1;    /*1: Can be pressed by an input device*/
     uint8_t drag      :1;    /*1: Enable the dragging*/
@@ -146,7 +150,14 @@ typedef enum
     LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
     LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_cont layout)*/
     LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
+    LV_PROTECT_PRESS_LOST= 0x10, /*TODO */
 }lv_protect_t;
+
+
+/*Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
+typedef struct {
+    const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
+}lv_obj_type_t;
 
 typedef enum
 {
@@ -224,7 +235,6 @@ void lv_obj_clean(lv_obj_t *obj);
  * @param obj pointer to an object
  */
 void lv_obj_invalidate(lv_obj_t * obj);
-
 
 /*=====================
  * Setter functions
@@ -674,6 +684,14 @@ lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
  *         Use it as ext->data1, and NOT da(ext)->data1
  */
 void * lv_obj_get_ext_attr(lv_obj_t * obj);
+
+/**
+ * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
+ * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
+ * @param obj pointer to an object which type should be get
+ * @param buf pointer to an `lv_obj_type_t` buffer to store the types
+ */
+void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
 /**

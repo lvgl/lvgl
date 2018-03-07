@@ -245,9 +245,17 @@ static inline uint32_t lv_color_to24(lv_color_t color)
 static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
+#if LV_COLOR_DEPTH != 1
     ret.red =   (uint16_t)((uint16_t) c1.red * mix + (c2.red * (255 - mix))) >> 8;
     ret.green = (uint16_t)((uint16_t) c1.green * mix + (c2.green * (255 - mix))) >> 8;
     ret.blue =  (uint16_t)((uint16_t) c1.blue * mix + (c2.blue * (255 - mix))) >> 8;
+# if LV_COLOR_DEPTH == 24
+    ret.alpha = 0xFF;
+# endif
+#else
+    ret.full = mix > LV_OPA_50 ? c1.full : c2.full;
+#endif
+
     return ret;
 }
 
