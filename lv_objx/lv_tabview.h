@@ -57,6 +57,7 @@ typedef struct
     uint8_t slide_enable :1;    /*1: enable horizontal sliding by touch pad*/
     uint8_t draging :1;
     uint8_t drag_hor :1;
+    uint8_t btns_pos : 1;
     lv_tabview_action_t tab_load_action;
 }lv_tabview_ext_t;
 
@@ -69,6 +70,11 @@ typedef enum {
     LV_TABVIEW_STYLE_BTN_TGL_REL,
     LV_TABVIEW_STYLE_BTN_TGL_PR,
 }lv_tabview_style_t;
+
+typedef enum {
+    LV_TABVIEW_BTNS_POS_TOP,
+    LV_TABVIEW_BTNS_POS_BOTTOM,
+} lv_tabview_btns_pos_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -137,6 +143,13 @@ void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time);
  */
 void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t *style);
 
+/**
+ * Set the position of tab select buttons
+ * @param tabview pointer to a tan view object
+ * @param btns_pos which button position
+ */
+void lv_tabview_set_btns_pos(lv_obj_t *tabview, lv_tabview_btns_pos_t btns_pos);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -190,6 +203,12 @@ uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview);
  * @return style pointer to a style
  */
 lv_style_t * lv_tabview_get_style(lv_obj_t *tabview, lv_tabview_style_t type);
+
+/**
+ * Get position of tab select buttons
+ * @param tabview pointer to a ab view object
+ */
+lv_tabview_btns_pos_t lv_tabview_get_btns_pos(lv_obj_t *tabview);
 
 
 /**********************

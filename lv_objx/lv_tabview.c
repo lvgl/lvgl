@@ -375,6 +375,19 @@ void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t
     }
 }
 
+/**
+ * Set the position of tab select buttons
+ * @param tabview pointer to a tan view object
+ * @param btns_pos which button position
+ */
+void lv_tabview_set_btns_pos(lv_obj_t *tabview, lv_tabview_btns_pos_t btns_pos)
+{
+    lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
+
+    ext->btns_pos = btns_pos;
+    tabview_realign(tabview);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -478,6 +491,16 @@ lv_style_t * lv_tabview_get_style(lv_obj_t *tabview, lv_tabview_style_t type)
 
     /*To avoid warning*/
     return NULL;
+}
+
+/**
+ * Get position of tab select buttons
+ * @param tabview pointer to a ab view object
+ */
+lv_tabview_btns_pos_t lv_tabview_get_btns_pos(lv_obj_t *tabview)
+{
+    lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
+    return ext->btns_pos;
 }
 
 /**********************
@@ -743,7 +766,18 @@ static void tabview_realign(lv_obj_t * tabview)
     }
 
     lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));
-    lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    switch(ext->btns_pos)
+    {
+        case LV_TABVIEW_BTNS_POS_TOP:
+            lv_obj_align(ext->btns, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+            lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+            break;
+        case LV_TABVIEW_BTNS_POS_BOTTOM:
+            lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+            lv_obj_align(ext->btns, ext->content, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+            break;
+    }
+
 
     lv_obj_t * pages = lv_obj_get_child(ext->content, NULL);
     while(pages != NULL) {
