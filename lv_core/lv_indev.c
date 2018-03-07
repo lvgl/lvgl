@@ -36,6 +36,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_proc_t * proc);
 static void indev_proc_release(lv_indev_proc_t * proc);
+static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static lv_obj_t * indev_search_obj(const lv_indev_proc_t * indev, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * state);
 static void indev_drag_throw(lv_indev_proc_t * state);
@@ -251,54 +252,32 @@ static void indev_proc_task(void * param)
         indev_act = i;
 
         /*Handle reset query before processing the point*/
-        if(i->proc.reset_query) {
-            i->proc.act_obj = NULL;
-            i->proc.last_obj = NULL;
-            i->proc.drag_range_out = 0;
-            i->proc.drag_in_prog = 0;
-            i->proc.long_pr_sent = 0;
-            i->proc.pr_timestamp = 0;
-            i->proc.longpr_rep_timestamp = 0;
-            i->proc.drag_sum.x = 0;
-            i->proc.drag_sum.y = 0;
-            i->proc.reset_query = 0;
-        }
+        indev_proc_reset_query_handler(i);
 
         if(i->proc.disabled == 0) {
-            /*Read the data*/
-            lv_indev_read(i, &data);
-            i->proc.state = data.state;
+            bool more_to_read;
+            do {
+                /*Read the data*/
+                more_to_read = lv_indev_read(i, &data);
+                i->proc.state = data.state;
 
-            if(i->proc.state == LV_INDEV_STATE_PR) {
-                i->last_activity_time = lv_tick_get();
-            }
+                if(i->proc.state == LV_INDEV_STATE_PR) {
+                    i->last_activity_time = lv_tick_get();
+                }
 
-            if(i->driver.type == LV_INDEV_TYPE_POINTER) {
-                indev_pointer_proc(i,&data);
-            }
-            else if(i->driver.type == LV_INDEV_TYPE_KEYPAD) {
-                indev_keypad_proc(i, &data);
-            }
-            else if(i->driver.type == LV_INDEV_TYPE_BUTTON) {
-                indev_button_proc(i, &data);
-            }
-
+                if(i->driver.type == LV_INDEV_TYPE_POINTER) {
+                    indev_pointer_proc(i,&data);
+                }
+                else if(i->driver.type == LV_INDEV_TYPE_KEYPAD) {
+                    indev_keypad_proc(i, &data);
+                }
+                else if(i->driver.type == LV_INDEV_TYPE_BUTTON) {
+                    indev_button_proc(i, &data);
+                }
+                /*Handle reset query if it happened in during processing*/
+                indev_proc_reset_query_handler(i);
+            } while(more_to_read);
         }
-
-        /*Handle reset query if it happened in during processing*/
-        if(i->proc.reset_query) {
-            i->proc.act_obj = NULL;
-            i->proc.last_obj = NULL;
-            i->proc.drag_range_out = 0;
-            i->proc.drag_in_prog = 0;
-            i->proc.long_pr_sent = 0;
-            i->proc.pr_timestamp = 0;
-            i->proc.longpr_rep_timestamp = 0;
-            i->proc.drag_sum.x = 0;
-            i->proc.drag_sum.y = 0;
-            i->proc.reset_query = 0;
-        }
-
         i = lv_indev_next(i);    /*Go to the next indev*/
     }
 
@@ -395,10 +374,12 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 #endif
 }
 
+
 /**
- * Process a new point from LV_INDEV_TYPE_BUTTON input device
- * @param i pointer to an input device
- * @param data pointer to the data read from the input device
+ * Process new points from a input device. indev->state.pressed has to be set
+ * @param indev pointer to an input device state
+ * @param x x coordinate of the next point
+ * @param y y coordinate of the next point
  */
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
@@ -570,6 +551,28 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     }
 }
 
+/**
+ * Process a new point from LV_INDEV_TYPE_BUTTON input device
+ * @param i pointer to an input device
+ * @param data pointer to the data read from the input device
+ * Reset input device if a reset query has been sent to it
+ * @param indev pointer to an input device
+ */
+static void indev_proc_reset_query_handler(lv_indev_t * indev)
+{
+    if(indev->proc.reset_query) {
+        indev->proc.act_obj = NULL;
+        indev->proc.last_obj = NULL;
+        indev->proc.drag_range_out = 0;
+        indev->proc.drag_in_prog = 0;
+        indev->proc.long_pr_sent = 0;
+        indev->proc.pr_timestamp = 0;
+        indev->proc.longpr_rep_timestamp = 0;
+        indev->proc.drag_sum.x = 0;
+        indev->proc.drag_sum.y = 0;
+        indev->proc.reset_query = 0;
+    }
+}
 /**
  * Search the most top, clickable object on the last point of an input device
  * @param indev pointer to  an input device
