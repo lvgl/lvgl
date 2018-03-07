@@ -527,12 +527,21 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
+            if(!ext->opened) {
+                ext->opened = 1;
+                lv_ddlist_refr_size(ddlist, true);
+            }
+
             if(ext->sel_opt_id + 1 < ext->option_cnt) {
                 ext->sel_opt_id ++;
                 lv_ddlist_pos_current_option(ddlist);
                 lv_obj_invalidate(ddlist);
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
+            if(!ext->opened) {
+                ext->opened = 1;
+                lv_ddlist_refr_size(ddlist, true);
+            }
             if(ext->sel_opt_id > 0) {
                 ext->sel_opt_id --;
                 lv_ddlist_pos_current_option(ddlist);
@@ -545,7 +554,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 if(ext->action) ext->action(ddlist);
             }
             else {
-                ext->opened = true;
+                ext->opened = 1;
             }
 
             lv_ddlist_refr_size(ddlist, true);
