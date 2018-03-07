@@ -89,6 +89,36 @@ void * lv_ll_ins_head(lv_ll_t * ll_p)
 }
 
 /**
+ * Insert a new node in front of the n_act node
+ * @param ll_p pointer to linked list
+ * @param n_act pointer a node
+ * @return pointer to the new head
+ */
+void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
+{
+    lv_ll_node_t* n_new;
+    lv_ll_node_t* n_prev;
+
+    if(NULL == ll_p || NULL == n_act) return NULL;
+
+    if(lv_ll_get_head(ll_p) == n_act) {
+        n_new = lv_ll_ins_head(ll_p);
+    }
+    else {
+        n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
+        lv_mem_assert(n_new);
+
+        n_prev = lv_ll_get_prev(ll_p, n_act);
+        node_set_next(ll_p, n_prev, n_new);
+        node_set_prev(ll_p, n_new, n_prev);
+        node_set_prev(ll_p, n_act, n_new);
+        node_set_next(ll_p, n_new, n_act);
+    }
+
+    return n_new;
+}
+
+/**
  * Add a new tail to a linked list
  * @param ll_p pointer to linked list
  * @return pointer to the new tail

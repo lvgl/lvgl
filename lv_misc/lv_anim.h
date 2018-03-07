@@ -119,7 +119,7 @@ int32_t lv_anim_path_step(const lv_anim_t *a);
  *      MACROS
  **********************/
 
-#endif /*LV_NO_ANIM == 0*/
+#endif /*USE_LV_ANIMATION == 0*/
 
 #ifdef __cplusplus
 } /* extern "C" */

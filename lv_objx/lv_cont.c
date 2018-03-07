@@ -207,6 +207,14 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
             lv_cont_refr_autofit(cont);
         }
     }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_cont";
+    }
 
     return res;
 }
@@ -436,14 +444,14 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 		else if (obj_num == 1) {
 			lv_obj_align(child_rs, cont, LV_ALIGN_IN_TOP_MID, 0, act_y);
 		}
-        /*If are two object in the row then align them proportionally*/
+        /*If there are two object in the row then align them proportionally*/
         else if (obj_num == 2) {
             lv_obj_t * obj1 = child_rs;
             lv_obj_t * obj2 = lv_ll_get_prev(&cont->child_ll, child_rs);
             w_row = lv_obj_get_width(obj1) + lv_obj_get_width(obj2);
             lv_coord_t pad = (w_obj - w_row) / 3;
-            lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y);
-            lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y);
+            lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + (h_row - lv_obj_get_height(obj1)) / 2);
+            lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + (h_row - lv_obj_get_height(obj2)) / 2);
         }
 		/* Align the children (from child_rs to child_rc)*/
 		else {
@@ -454,7 +462,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 			while(child_tmp != NULL) {
 				if(lv_obj_get_hidden(child_tmp) == false &&
 				   lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
-					lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x, act_y);
+					lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x, act_y + (h_row - lv_obj_get_height(child_tmp)) / 2);
 					act_x += lv_obj_get_width(child_tmp) + new_opad;
 				}
 				if(child_tmp == child_rc) break;

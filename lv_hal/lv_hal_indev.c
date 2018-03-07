@@ -46,6 +46,7 @@ void lv_indev_drv_init(lv_indev_drv_t *driver)
 {
     driver->read = NULL;
     driver->type = LV_INDEV_TYPE_NONE;
+    driver->user_data = NULL;
 }
 
 /**
@@ -60,12 +61,14 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t *driver)
     node = lv_mem_alloc(sizeof(lv_indev_t));
     if (!node) return NULL;
 
+    memset(node, 0, sizeof(lv_indev_t));
     memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
 
     node->next = NULL;
     node->proc.reset_query = 1;
     node->cursor = NULL;
     node->group = NULL;
+    node->btn_points = NULL;
 
     if (indev_list == NULL) {
         indev_list = node;
@@ -107,6 +110,7 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data)
     bool cont = false;
 
     if(indev->driver.read) {
+        data->user_data = indev->driver.user_data;
         cont = indev->driver.read(data);
     } else {
         memset(data, 0, sizeof(lv_indev_data_t));

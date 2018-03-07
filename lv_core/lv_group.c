@@ -158,6 +158,8 @@ void lv_group_focus_next(lv_group_t * group)
     if(group->obj_focus){
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
+
+        if(group->focus_cb) group->focus_cb(group);
     }
 }
 
@@ -184,6 +186,8 @@ void lv_group_focus_prev(lv_group_t * group)
     if(group->obj_focus != NULL){
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
+
+        if(group->focus_cb) group->focus_cb(group);
     }
 
 }
@@ -212,16 +216,26 @@ void lv_group_send_data(lv_group_t * group, uint32_t c)
     act->signal_func(act, LV_SIGNAL_CONTROLL, &c);
 }
 
-
 /**
  * Set a function for a group which will modify the object's style if it is in focus
  * @param group pointer to a group
- * @param style_cb the style modifier function pointer
+ * @param style_mod_func the style modifier function pointer
  */
-void lv_group_set_style_mod_cb(lv_group_t * group, void (*style_cb)(lv_style_t * style))
+void lv_group_set_style_mod_cb(lv_group_t * group,lv_group_style_mod_func_t style_mod_func)
 {
-    group->style_mod = style_cb;
+    group->style_mod = style_mod_func;
     if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
+}
+
+
+/**
+ * Set a function for a group which will be called when a new object is focused
+ * @param group pointer to a group
+ * @param focus_cb the call back function or NULL if unused
+ */
+void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
+{
+    group->focus_cb = focus_cb;
 }
 
 /**
@@ -253,6 +267,26 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
     return *group->obj_focus;
 }
 
+/**
+ * Get a the style modifier function of a group
+ * @param group pointer to a group
+ * @return pointer to the style modifier function
+ */
+lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group)
+{
+    return group->style_mod ;
+}
+
+/**
+ * Get the focus callback function of a group
+ * @param group pointer to a group
+ * @return the call back function or NULL if not set
+ */
+lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
+{
+    return group->focus_cb;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -263,6 +297,7 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
  */
 static void style_mod_def(lv_style_t * style)
 {
+#if LV_COLOR_DEPTH != 1
     /*Make the style to be a little bit orange*/
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_ORANGE;
@@ -275,6 +310,13 @@ static void style_mod_def(lv_style_t * style)
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
+#else
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_BLACK;
+    style->body.border.width = 3;
+
+#endif
+
 }
 
 #endif /*USE_LV_GROUP != 0*/

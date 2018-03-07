@@ -789,6 +789,7 @@ void lv_obj_set_top(lv_obj_t * obj, bool en)
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en)
 {
+    if(en == true) lv_obj_set_click(obj, true);     /*Drag is useless without enabled clicking*/
     obj->drag = (en == true ? 1 : 0);
 }
 
@@ -1352,6 +1353,34 @@ void * lv_obj_get_ext_attr(lv_obj_t * obj)
    return obj->ext_attr;
 }
 
+/**
+ * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
+ * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
+ * @param obj pointer to an object which type should be get
+ * @param buf pointer to an `lv_obj_type_t` buffer to store the types
+ */
+void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
+{
+    lv_obj_type_t tmp;
+
+    memset(buf, 0, sizeof(lv_obj_type_t));
+    memset(&tmp, 0, sizeof(lv_obj_type_t));
+
+    obj->signal_func(obj, LV_SIGNAL_GET_TYPE, &tmp);
+
+    uint8_t cnt;
+    for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
+        if(tmp.type[cnt] == NULL) break;
+    }
+
+
+    /*Swap the order. The real type comes first*/
+    uint8_t i;
+    for(i = 0; i < cnt; i++) {
+        buf->type[i] = tmp.type[cnt - 1 - i];
+    }
+}
+
 #ifdef LV_OBJ_FREE_NUM_TYPE
 /**
  * Get the free number
@@ -1375,6 +1404,7 @@ void * lv_obj_get_free_ptr(lv_obj_t * obj)
     return obj->free_ptr;
 }
 #endif
+
 
 #if USE_LV_GROUP
 /**
@@ -1450,19 +1480,19 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res = LV_RES_OK;
 
     lv_style_t * style = lv_obj_get_style(obj);
-    switch(sign) {
-        case LV_SIGNAL_CHILD_CHG:
-            /*Return 'invalid' if the child change  signal is not enabled*/
-            if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
-            break;
-        case LV_SIGNAL_REFR_EXT_SIZE:
-            if(style->body.shadow.width > obj->ext_size) obj->ext_size = style->body.shadow.width;
-            break;
-        case LV_SIGNAL_STYLE_CHG:
-            lv_obj_refresh_ext_size(obj);
-            break;
-        default:
-            break;
+    if(sign == LV_SIGNAL_CHILD_CHG) {
+        /*Return 'invalid' if the child change signal is not enabled*/
+        if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        if(style->body.shadow.width > obj->ext_size) obj->ext_size = style->body.shadow.width;
+    }
+    else if(sign ==  LV_SIGNAL_STYLE_CHG) {
+        lv_obj_refresh_ext_size(obj);
+    }
+    else if(sign ==  LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        buf->type[0] = "lv_obj";
     }
 
     return res;

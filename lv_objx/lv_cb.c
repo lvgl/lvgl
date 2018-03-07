@@ -295,7 +295,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_style_t * label_style = lv_label_get_style(ext->label);
-        lv_obj_set_size(ext->bullet, lv_font_get_height_scale(label_style->text.font), lv_font_get_height_scale(label_style->text.font));
+        lv_obj_set_size(ext->bullet, lv_font_get_height(label_style->text.font), lv_font_get_height(label_style->text.font));
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_PRESSED ||
         sign == LV_SIGNAL_RELEASED ||
@@ -305,9 +305,17 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
         char c = *((char*)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
            c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
-           c == LV_GROUP_KEY_ENTER) {
+           c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
         }
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_cb";
     }
 
     return res;

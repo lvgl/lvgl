@@ -15,7 +15,7 @@
  *      DEFINES
  *********************/
 #define DEF_RADIUS           4
-#define DEF_SHADOW_COLOR     LV_COLOR_HEX3(0x888)
+#define DEF_SHADOW_COLOR     LV_COLOR_HEX3(0xaaa)
 
 /**********************
  *      TYPEDEFS
@@ -259,7 +259,7 @@ static void sw_init(void)
     sw_indic.body.radius = LV_RADIUS_CIRCLE;
 
     lv_style_copy(&sw_knob_on, theme.slider.knob);
-    sw_knob_on.body.shadow.width = 4;
+    sw_knob_on.body.shadow.width = 3;
     sw_knob_on.body.shadow.type = LV_SHADOW_BOTTOM;
     sw_knob_on.body.shadow.color = DEF_SHADOW_COLOR;
 
@@ -328,7 +328,7 @@ static void cb_init(void)
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&rel,theme.panel);
     rel.body.shadow.type = LV_SHADOW_BOTTOM;
-    rel.body.shadow.width = 2;
+    rel.body.shadow.width = 3;
 
     lv_style_copy(&pr, &rel);
     pr.body.main_color = LV_COLOR_HEX3(0xccc);
@@ -370,7 +370,7 @@ static void btnm_init(void)
     bg.text.color = LV_COLOR_HEX3(0x555);
 
     lv_style_copy(&rel,theme.panel);
-    rel.body.border.part = LV_BORDER_RIGHT| LV_BORDER_BOTTOM;
+    rel.body.border.part = LV_BORDER_RIGHT;
     rel.body.border.width = 1;
     rel.body.border.color = LV_COLOR_HEX3(0xbbb);
     rel.body.empty = 1;
@@ -597,7 +597,7 @@ static void tabview_init(void)
     btn_bg.body.border.color = LV_COLOR_HEX3(0x888);
     btn_bg.body.border.part = LV_BORDER_BOTTOM;
     btn_bg.body.border.opa = LV_OPA_COVER;
-    btn_bg.body.shadow.width = 6;
+    btn_bg.body.shadow.width = 5;
     btn_bg.body.shadow.color = DEF_SHADOW_COLOR;
     btn_bg.body.shadow.type = LV_SHADOW_BOTTOM;
     btn_bg.body.padding.inner = 0;

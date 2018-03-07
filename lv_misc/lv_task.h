@@ -67,7 +67,7 @@ void lv_task_init(void);
 /**
  * Call it  periodically to handle lv_tasks.
  */
-void lv_task_handler(void);
+LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
 
 /**
  * Create a new lv_task

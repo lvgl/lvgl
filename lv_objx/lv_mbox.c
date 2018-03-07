@@ -183,12 +183,15 @@ void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action)
 /**
  * Set animation duration
  * @param mbox pointer to a message box object
- * @param time animation length in  milliseconds (0: no animation)
+ * @param anim_time animation length in  milliseconds (0: no animation)
  */
-void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t time)
+void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    ext->anim_time = time;
+#if USE_LV_ANIMATION == 0
+    anim_time = 0;
+#endif
+    ext->anim_time = anim_time;
 }
 
 /**
@@ -365,6 +368,14 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
             ext->btnm->signal_func(ext->btnm, sign, param);
         }
     }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_mbox";
+    }
 
     return res;
 }
@@ -387,7 +398,7 @@ static void mbox_realign(lv_obj_t *mbox)
     if(ext->btnm) {
         lv_style_t *btn_bg_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
         lv_style_t *btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
-        lv_coord_t font_h = lv_font_get_height_scale(btn_rel_style->text.font);
+        lv_coord_t font_h = lv_font_get_height(btn_rel_style->text.font);
         lv_obj_set_size(ext->btnm, w, font_h + 2 * btn_rel_style->body.padding.ver + 2 * btn_bg_style->body.padding.ver);
     }
 }

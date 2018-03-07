@@ -1,7 +1,7 @@
 
 /**
  * @file lv_kb.c
- * 
+ *
  */
 
 /*********************
@@ -80,7 +80,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     lv_obj_t * new_kb = lv_btnm_create(par, copy);
     lv_mem_assert(new_kb);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_kb);
-    
+
     /*Allocate the keyboard type specific extended data*/
     lv_kb_ext_t * ext = lv_obj_allocate_ext_attr(new_kb, sizeof(lv_kb_ext_t));
     lv_mem_assert(ext);
@@ -128,7 +128,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_kb);
     }
-    
+
     return new_kb;
 }
 
@@ -186,7 +186,12 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
     if(ext->ta) {
         lv_cursor_type_t cur_type;
         cur_type = lv_ta_get_cursor_type(ext->ta);
-        lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
+
+        if(ext->cursor_mng){
+            lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
+        }else{
+            lv_ta_set_cursor_type(ext->ta,  cur_type | LV_CURSOR_HIDDEN);
+        }
     }
 }
 
@@ -345,6 +350,14 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_kb";
     }
 
     return res;

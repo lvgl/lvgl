@@ -121,7 +121,7 @@ uint8_t lv_txt_utf8_size(uint8_t c);
  * @param letter_uni an Unicode letter
  * @return UTF-8 coded character in Little Endian to be compatible with C chars (e.g. 'Á', 'Ű')
  */
-uint32_t txt_unicode_to_utf8(uint32_t letter_uni);
+uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni);
 
 /**
  * Decode an UTF-8 character from a string.

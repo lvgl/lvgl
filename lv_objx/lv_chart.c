@@ -436,6 +436,14 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
         }
         lv_ll_clear(&ext->series_ll);
     }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_chart";
+    }
 
     return res;
 }
@@ -514,7 +522,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-	uint8_t i;
+	uint16_t i;
 	lv_point_t p1;
 	lv_point_t p2;
 	lv_coord_t w = lv_obj_get_width(chart);
@@ -562,7 +570,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-	uint8_t i;
+	uint16_t i;
 	lv_area_t cir_a;
 	lv_coord_t w = lv_obj_get_width(chart);
 	lv_coord_t h = lv_obj_get_height(chart);
@@ -611,7 +619,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-	uint8_t i;
+	uint16_t i;
 	lv_area_t col_a;
 	lv_area_t col_mask;
 	bool mask_ret;

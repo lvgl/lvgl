@@ -145,7 +145,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
  * @param rel_action pointer to release action function (like with lv_btn)
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action)
+lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_action_t rel_action)
 {
 	lv_style_t * style = lv_obj_get_style(list);
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
@@ -176,9 +176,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
     lv_obj_set_width(liste, w);
 #if USE_LV_IMG != 0
     lv_obj_t * img = NULL;
-	if(img_fn != NULL && img_fn[0] != '\0') {
+	if(img_src) {
 		img = lv_img_create(liste, NULL);
-		lv_img_set_file(img, img_fn);
+		lv_img_set_src(img, img_src);
 		lv_obj_set_style(img, ext->style_img);
 		lv_obj_set_click(img, false);
 		if(img_signal == NULL) img_signal = lv_obj_get_signal_func(img);
@@ -208,6 +208,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, l
 void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+#if USE_LV_ANIMATION == 0
+    anim_time = 0;
+#endif
     ext->anim_time = anim_time;
 }
 
@@ -461,6 +464,11 @@ void lv_list_down(lv_obj_t * list)
  */
 void lv_list_focus(lv_obj_t *btn, bool anim_en)
 {
+
+#if USE_LV_ANIMATION == 0
+    anim_en = false;
+#endif
+
     lv_obj_t *list = lv_obj_get_parent(lv_obj_get_parent(btn));
 
     lv_page_focus(list, btn, anim_en == false ? 0 :lv_list_get_anim_time(list));
@@ -560,7 +568,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                     lv_page_focus(list, btn_prev, ext->anim_time);
                 }
             }
-        } else if(c == LV_GROUP_KEY_ENTER) {
+        } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             /*Get the 'pressed' button*/
             lv_obj_t * btn = NULL;
             btn = get_next_btn(list, btn);
@@ -574,6 +582,14 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                 rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_CLICK);
                 if(rel_action != NULL) rel_action(btn);
             }
+        }
+        else if(sign == LV_SIGNAL_GET_TYPE) {
+            lv_obj_type_t * buf = param;
+            uint8_t i;
+            for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+                if(buf->type[i] == NULL) break;
+            }
+            buf->type[i] = "lv_list";
         }
     }
     return res;

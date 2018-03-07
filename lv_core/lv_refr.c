@@ -48,7 +48,8 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
  **********************/
 static lv_join_t inv_buf[LV_INV_FIFO_SIZE];
 static uint16_t inv_buf_p;
-static void (*monitor_cb)(uint32_t, uint32_t);
+static void (*monitor_cb)(uint32_t, uint32_t); /*Monitor the rendering time*/
+static void (*round_cb)(lv_area_t*);           /*If set then called to modify invalidated areas for special display controllers*/
 static uint32_t px_num;
 
 /**********************
@@ -96,22 +97,14 @@ void lv_inv_area(const lv_area_t * area_p)
     suc = lv_area_union(&com_area, area_p, &scr_area);
 
     /*The area is truncated to the screen*/
-    if(suc != false)
-    {
-#if LV_ANTIALIAS == 1
-    	/*Rounding*/
-    	com_area.x1 = com_area.x1 & (~0x1);
-    	com_area.y1 = com_area.y1 & (~0x1);
-    	com_area.x2 = com_area.x2 | 0x1;
-    	com_area.y2 = com_area.y2 | 0x1;
-#endif
+    if(suc != false) {
+        if(round_cb) round_cb(&com_area);
 
     	/*Save only if this area is not in one of the saved areas*/
     	uint16_t i;
     	for(i = 0; i < inv_buf_p; i++) {
     	    if(lv_area_is_in(&com_area, &inv_buf[i].area) != false) return;
     	}
-
 
         /*Save the area*/
     	if(inv_buf_p < LV_INV_FIFO_SIZE) {
@@ -134,6 +127,35 @@ void lv_inv_area(const lv_area_t * area_p)
 void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
 {
     monitor_cb = cb;
+}
+
+/**
+ * Called when an area is invalidated to modify the coordinates of the area.
+ * Special display controllers may require special coordinate rounding
+ * @param cb pointer to the a function which will modify the area
+ */
+void lv_refr_set_round_cb(void(*cb)(lv_area_t*))
+{
+    round_cb = cb;
+}
+
+/**
+ * Get the number of areas in the buffer
+ * @return number of invalid areas
+ */
+uint16_t lv_refr_get_buf_size(void)
+{
+    return inv_buf_p;
+}
+
+/**
+ * Pop (delete) the last 'num' invalidated areas from the buffer
+ * @param num number of areas to delete
+ */
+void lv_refr_pop_from_buf(uint16_t num)
+{
+    if(inv_buf_p < num) inv_buf_p = 0;
+    else inv_buf_p -= num;
 }
 
 /**********************
@@ -262,10 +284,8 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     lv_coord_t h = lv_area_get_height(area_p);
     lv_coord_t y2 = area_p->y2 >= LV_VER_RES ? y2 = LV_VER_RES - 1 : area_p->y2;
 
-    uint32_t max_row = (uint32_t) LV_VDB_SIZE / (w << LV_AA);
-    if(max_row > (h << LV_AA)) max_row = (h << LV_AA);
-
-    max_row = max_row >> LV_AA ;
+    uint32_t max_row = (uint32_t) LV_VDB_SIZE / w;
+    if(max_row > h) max_row = h;
 
     /*Always use the full row*/
     uint32_t row;
@@ -311,13 +331,6 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
      It will be a part of 'area_p'*/
     lv_area_t start_mask;
     lv_area_union(&start_mask, area_p, &vdb_p->area);
-
-#if LV_ANTIALIAS
-    vdb_p->area.x1 = vdb_p->area.x1 << LV_AA;
-    vdb_p->area.x2 = (vdb_p->area.x2 << LV_AA) + 1;
-    vdb_p->area.y1 = (vdb_p->area.y1 << LV_AA);
-    vdb_p->area.y2 = (vdb_p->area.y2 << LV_AA) + 1;
-#endif
 
     /*Get the most top object which is not covered by others*/
     top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());

@@ -368,16 +368,33 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 res = ext->actions[LV_BTN_ACTION_CLICK](btn);
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
-            if(lv_btn_get_toggle(btn) != false) {
-                if(state == LV_BTN_STATE_REL) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                else if(state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
-                else if(state == LV_BTN_STATE_TGL_REL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                else if(state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+            if(!ext->long_pr_action_executed) {
+                if(lv_btn_get_toggle(btn)) {
+                    if(state == LV_BTN_STATE_REL) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                    else if(state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
+                    else if(state == LV_BTN_STATE_TGL_REL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                    else if(state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+                }
+                if(ext->actions[LV_BTN_ACTION_CLICK] && state != LV_BTN_STATE_INA) {
+                    res = ext->actions[LV_BTN_ACTION_CLICK](btn);
+                }
             }
-            if(ext->actions[LV_BTN_ACTION_CLICK] && state != LV_BTN_STATE_INA) {
-                res = ext->actions[LV_BTN_ACTION_CLICK](btn);
+            ext->long_pr_action_executed  = 0;
+        }
+        else if(c == LV_GROUP_KEY_ENTER_LONG) {
+            if(ext->actions[LV_BTN_ACTION_LONG_PR] && state != LV_BTN_STATE_INA) {
+                res = ext->actions[LV_BTN_ACTION_LONG_PR](btn);
+                ext->long_pr_action_executed = 1;
             }
         }
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_btn";
     }
 
     return res;

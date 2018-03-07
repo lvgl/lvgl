@@ -576,22 +576,71 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char*)param);
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+        if(c == LV_GROUP_KEY_RIGHT) {
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) ext->btn_id_pr = 0;
             else ext->btn_id_pr++;
             if(ext->btn_id_pr >= ext->btn_cnt - 1) ext->btn_id_pr = ext->btn_cnt - 1;
             lv_obj_invalidate(btnm);
-        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_GROUP_KEY_LEFT) {
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) ext->btn_id_pr = 0;
             if(ext->btn_id_pr > 0) ext->btn_id_pr--;
             lv_obj_invalidate(btnm);
-        } else if(c == LV_GROUP_KEY_ENTER) {
+        } else if(c == LV_GROUP_KEY_DOWN) {
+            lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
+            /*Find the area below the the current*/
+            if(ext->btn_id_pr  == LV_BTNM_PR_NONE) {
+                ext->btn_id_pr = 0;
+            } else {
+                uint16_t area_below;
+                lv_coord_t pr_center = ext->button_areas[ext->btn_id_pr].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
+
+                for(area_below = ext->btn_id_pr; area_below < ext->btn_cnt; area_below ++) {
+                    if(ext->button_areas[area_below].y1 >  ext->button_areas[ext->btn_id_pr].y1 &&
+                       pr_center >=  ext->button_areas[area_below].x1 &&
+                       pr_center <=  ext->button_areas[area_below].x2 + style->body.padding.hor)
+                    {
+                        break;
+                    }
+                }
+                ext->btn_id_pr = area_below;
+            }
+            lv_obj_invalidate(btnm);
+        } else if(c == LV_GROUP_KEY_UP) {
+            lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
+            /*Find the area below the the current*/
+            if(ext->btn_id_pr  == LV_BTNM_PR_NONE) {
+                ext->btn_id_pr = 0;
+            } else {
+                uint16_t area_above;
+                lv_coord_t pr_center = ext->button_areas[ext->btn_id_pr].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
+
+                for(area_above = ext->btn_id_pr; area_above > 0; area_above --) {
+                    if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_pr].y1 &&
+                       pr_center >=  ext->button_areas[area_above].x1 - style->body.padding.hor &&
+                       pr_center <=  ext->button_areas[area_above].x2)
+                    {
+                        break;
+                    }
+                }
+                ext->btn_id_pr = area_above;
+
+            }
+            lv_obj_invalidate(btnm);
+        }else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             if(ext->action != NULL) {
                 uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
                 if(txt_i != LV_BTNM_PR_NONE) {
                     ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
                 }
             }
+        }
+        else if(sign == LV_SIGNAL_GET_TYPE) {
+            lv_obj_type_t * buf = param;
+            uint8_t i;
+            for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+                if(buf->type[i] == NULL) break;
+            }
+            buf->type[i] = "lv_btnm";
         }
     }
 

@@ -19,7 +19,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define TRIGO_SIN_MAX 32767
+#define LV_TRIGO_SIN_MAX    32767
+#define LV_TRIGO_SHIFT      15      /* >> LV_TRIGO_SHIFT to normalize*/
 
 /**********************
  *      TYPEDEFS
