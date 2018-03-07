@@ -142,6 +142,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT &&
                 lv_disp_is_mem_blend_supported())
         {
+            /*Fill a  one line sized buffer with a color and blend this later*/
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
                 for(i = 0; i < w; i++) {
@@ -149,6 +150,8 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 }
                 last_width = w;
             }
+
+            /*Blend the filled line to every line VDB line-by-line*/
             lv_coord_t row;
             for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
                 lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);

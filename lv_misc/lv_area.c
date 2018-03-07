@@ -166,45 +166,16 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p)
  */
 bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
-    /*Two area are on each other if... */
-    
-    lv_point_t p;
-    /*a2 left-top corner is on a1*/
-    p.x = a2_p->x1;
-    p.y = a2_p->y1;
-    if(lv_area_is_point_on(a1_p, &p)) return true;
-    
-    /*a2 right-top corner is on a1*/
-    p.x = a2_p->x2;
-    p.y = a2_p->y1;
-    if(lv_area_is_point_on(a1_p, &p)) return true;
-    
-    /*a2 left-bottom corner is on a1*/
-    p.x = a2_p->x1;
-    p.y = a2_p->y2;
-    if(lv_area_is_point_on(a1_p, &p)) return true;
-    
-    /*a2 right-bottom corner is on a1*/
-    p.x = a2_p->x2;
-    p.y = a2_p->y2;
-    if(lv_area_is_point_on(a1_p, &p)) return true;
-    
-    /*a2 is horizontally bigger then a1 and covers it*/
-    if((a2_p->x1 <= a1_p->x1 && a2_p->x2 >= a1_p->x2) &&  /*a2 hor. cover a1?*/
-      ((a2_p->y1 <= a1_p->y1 && a2_p->y1 >= a1_p->y2) || /*upper edge is on a1?*/
-       (a2_p->y2 <= a1_p->y1 && a2_p->y2 >= a1_p->y2) ||/* or lower edge is on a1?*/
-       (a2_p->y1 <= a1_p->y1 && a2_p->y2 >= a1_p->y2))) /*or a2 vert bigger then a1*/     
-       return true;
-    
-    /*a2 is vertically bigger then a1 and covers it*/
-    if((a2_p->y1 <= a1_p->y1 && a2_p->y2 >= a1_p->y2) &&  /*a2 vert. cover a1?*/
-      ((a2_p->x1 <= a1_p->x1 && a2_p->x1 >= a1_p->x2) || /*left edge is on a1?*/
-       (a2_p->x2 <= a1_p->x1 && a2_p->x2 >= a1_p->x2) ||/* or right edge is on a1?*/
-       (a2_p->x1 <= a1_p->x1 && a2_p->x2 >= a1_p->x2)))  /*or a2 hor. bigger then a1*/     
-        return true; 
-   
-    /*Else no cover*/
-    return false;
+    if((a1_p->x1 <= a2_p->x2) &&
+       (a1_p->x2 >= a2_p->x1) &&
+       (a1_p->y1 <= a2_p->y2) &&
+       (a1_p->y2 >= a2_p->y1))
+    {
+        return true;
+    } else {
+        return false;
+    }
+
 }
 
 /**
