@@ -37,14 +37,15 @@
  * Convert a number to string
  * @param num a number
  * @param buf pointer to a `char` buffer. The result will be stored here (max 10 elements)
+ * @return same as `buf` (just for convenience)
  */
-void lv_math_num_to_str(int32_t num, char * buf)
+char * lv_math_num_to_str(int32_t num, char * buf)
 {
     char * buf_ori = buf;
     if(num == 0) {
         buf[0] = '0';
         buf[1] = '\0';
-        return;
+        return buf;
     } else if(num < 0) {
         (*buf) = '-';
         buf++;
@@ -85,6 +86,8 @@ void lv_math_num_to_str(int32_t num, char * buf)
     }
 
     (*buf) = '\0';
+
+    return buf_ori;
 }
 
 /**********************
