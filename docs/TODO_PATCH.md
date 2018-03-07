@@ -12,9 +12,9 @@ Please create an issue to introduce a bug instead of adding pull request to this
 - [x] lv_label: anim. time wasn't allyed for LV_LABEL_LONG_ROLL
 - [x] lv_txt_ut8_size fiy for 4 byte characters
 - [x] lv_slider: fix knob_in with not zero min value
-- [ ] lv_area_is_on: handled some cases wrong
+- [x] lv_area_is_on: handled some cases wrong
 - [x] lv_indev: buffered indevs (return *true* in indev_read) was handled as non-buffered
-- [ ] drag: don't invalidate if the object wasn't moved
+- [x] drag: don't invalidate if the object wasn't moved
 
 ## v5.0.2 (released at: 19.01.2018)
 - [x] Fix dependencied (Thanks to Zaltora)
