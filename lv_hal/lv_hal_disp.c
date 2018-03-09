@@ -200,6 +200,7 @@ void lv_disp_mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color)
  */
 bool lv_disp_is_mem_blend_supported(void)
 {
+    if(active == NULL) return false;
     if(active->driver.mem_blend) return true;
     else return false;
 }
@@ -210,6 +211,7 @@ bool lv_disp_is_mem_blend_supported(void)
  */
 bool lv_disp_is_mem_fill_supported(void)
 {
+    if(active == NULL) return false;
     if(active->driver.mem_fill) return true;
     else return false;
 }
