@@ -33,10 +33,11 @@ Homepage: https://littlevgl.com
 ## Porting
 In the most sime case you need 4 things:
 1. Call `lv_tick_inc(1)` in every millisecods in a Timer or Task
-2. Register a function which can **copy a pixel array** to an area of the screen
+2. Register a function which can **copy a pixel array** to an area of the screen.
 3. Register a function which can **read an input device**. (E.g. touch pad)
 4. Call `lv_task_handler()` periodically in every few milliseconds
 For more information visit https://littlevgl.com/porting
+Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
 ## Project set-up
 1. **Clone** or [Download](https://littlevgl.com/download) the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
