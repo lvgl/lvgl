@@ -6,7 +6,10 @@ The bugfixes of the still not released version are in `beta` branche.
 ## Contributing
 Please create an issue to introduce a bug instead of adding pull request to this file.
 
-## v5.0.3 (in progress)
+## v5.1.1 (in progress)
+- [ ] lv_line: set line.width ext. size to not trim parts on x = 0, y = 0 coordinates
+
+## v5.0.3 (09.03.2018)
 - [x] lv_chart: Fix the use of point_num more then 256 (Thanks to upbeat27) 
 - [x] lv_label: fix 'offset' with LV_ANTIALIAS (LV_LABEL_LONG_ROLL was effected)
 - [x] lv_label: anim. time wasn't allyed for LV_LABEL_LONG_ROLL
