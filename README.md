@@ -18,34 +18,32 @@ Homepage: https://littlevgl.com
 ## Key features
 * Powerful building blocks buttons, charts, lists, sliders, images etc
 * Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
-* Various input devices touch pad, mouse, keyboard, encoder etc
+* Various input devices touch pad, mouse, keyboard, encoder, buttons etc
 * Multi language support with UTF-8 decoding
 * Fully customizable graphical elements
 * Hardware independent to use with any microcontroller or display
-* Scalable to operate with few memory (80 kB Flash, 10 kB RAM)
+* Scalable to operate with few memory (50 kB Flash, 10 kB RAM)
 * OS, External memory and GPU supported but not required
 * Single frame buffer operation even with advances graphical effects
 * Written in C for maximal compatibility
 * Simulator to develop on PC without embedded hardware
 * Tutorials, examples, themes for rapid development
-* Advanced support and professional GUI development service
 * Documentation and API references online
-* Free and open-source under MIT licence
 
 ## Porting
 In the most sime case you need 4 things:
 1. Call `lv_tick_inc(1)` in every millisecods in a Timer or Task
-2. Register a function which can **copy a pixel array** to an area of the screen
+2. Register a function which can **copy a pixel array** to an area of the screen.
 3. Register a function which can **read an input device**. (E.g. touch pad)
-4. Call `lv_task_handler()` periodically in every few milliseconds ()
-
+4. Call `lv_task_handler()` periodically in every few milliseconds
 For more information visit https://littlevgl.com/porting
+Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
 ## Project set-up
-1. **Clone** or download the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
+1. **Clone** or [Download](https://littlevgl.com/download) the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
 2. **Create project** with your prefered IDE and add the *lvgl* folder
 3. Copy **lvgl/lv_conf_templ.h** as **lv_conf.h** next to the *lvgl* folder
-4. In the *_conf.h files delete the first `#if 0` and its `#endif`. Let the default configurations at first.
+4. In the lv_conf.h delete the first `#if 0` and its `#endif`. Let the default configurations at first.
 5. In your *main.c*: #include "lvgl/lvgl.h"   
 6. In your *main function*:
    * lvgl_init();
@@ -71,5 +69,4 @@ See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIB
 ## Donate
 If you are pleased with the graphics library, found it useful or be happy with the support you got, please help its further development:
 
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GJV3SC5EHDANS)
-
+[![Donate](https://littlevgl.com/donate_dir/donate_btn.png)](https://littlevgl.com/donate)

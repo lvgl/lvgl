@@ -775,8 +775,9 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.act_time = 0;
             anim.end_cb = NULL;
             anim.path = lv_anim_path_linear;
-            anim.playback_pause = (((lv_font_get_width(style->text.font, ' ') + style->text.letter_space) * 1000) /ext->anim_speed)
-                                     * ANIM_WAIT_CHAR_COUNT;
+
+            anim.playback_pause = (((lv_font_get_width(style->text.font, ' ') +
+                                    style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;
             anim.repeat_pause = anim.playback_pause;
 
             if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {

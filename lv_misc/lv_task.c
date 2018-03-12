@@ -130,7 +130,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
  */
 lv_task_t* lv_task_create(void (*task) (void *), uint32_t period, lv_task_prio_t prio, void * param)
 {
-    lv_task_t* new_lv_task;
+    lv_task_t* new_lv_task = NULL;
     lv_task_t* tmp;
 
     /*Create task lists in order of priority from high to low*/
