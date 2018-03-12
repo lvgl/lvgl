@@ -20,7 +20,7 @@ Here are ideas which are not assigned to a minor version yet:
 - image rotate
 
 
-## v5.2 (planned)
+## v5.2 (in progress)
 - [ ] Lua interface to craete GUI with script
 - [ ] Arabic glyph convert (based on letter position)
 - [ ] Right-to-left write support 
@@ -31,7 +31,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [ ] user defined error callback
 - [ ] Support more character coding (e.g. UTF8, UTF16 etc)
 
-## v5.1 (released at: in progress)
+## v5.1 (released on: 09.03.2018)
 - [x] lv_refr_set_roundig_callback: set a function to modify the invalidated area for special display controllers
 - [x] lv_group_set_focus_callback: set function to call when a new object is focused #94
 - [x] lv_obj_get_type() return string, e.g. "lv_slider", "lv_btn" etc #91
@@ -49,7 +49,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] LV_GROUP_KEY_ENTER_LONG: sent by the library on long press of LV_GROUP_KEY_ENTER to trigger long press of the object #113
 - [x] LV_INDEV_TYPE_BUTTON: for a hatdware buttons which press a point on a screen
 
-## v5.0 (released at: 20.12.2017)
+## v5.0 (released on: 20.12.2017)
 - [x] UTF-8 support
 - [x] lv_tabview: new object type to organise content with tabs
 - [x] lv_sw: new object type, switch, turn on/off by tap (a little slider)
@@ -60,7 +60,7 @@ Here are ideas which are not assigned to a minor version yet:
 - [x] add themes with predefined styles
 - [x] partial border draw in styles
 
-## v4.2 (released at: 17.08.2017)
+## v4.2 (released on: 17.08.2017)
 - [x] Double VDB support: one for rendering, another to transfer former rendered image to frame buffer in the background (e.g. with DMA) [#15](https://github.com/littlevgl/lvgl/issues/15)
 - [x] lv_group: to control without touch pad. Issue [#14](https://github.com/littlevgl/lvgl/issues/14)
 - [x] lv_page: scrl def fit modification: hor:false, ver:true, and always set width to parent width
