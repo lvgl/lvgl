@@ -1,12 +1,11 @@
 
-#include <stdint.h>
 #include "../lv_font.h"
 
-#if USE_LV_FONT_SYMBOL_30 != 0	/*Can be enabled in lv_conf.h*/
+#if USE_LV_FONT_SYMBOL_30 != 0  /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
- * fontawesome-webfont.ttf 30 px Font in U+f000 () .. U+f2ee ()  range with 2 bpp
- * Sparse font with only these characters: 
+ * fontawesome-webfont.ttf 30 px Font in U+f000 () .. U+f2ee ()  range with 1 bpp
+ * Sparse font with only these characters:     
 ***********************************************************************************/
 
 /*Store the image of the letters (glyph)*/
@@ -6628,242 +6627,235 @@ static const uint8_t lv_font_symbol_30_glyph_bitmap[] =
 static const lv_font_glyph_dsc_t lv_font_symbol_30_glyph_dsc[] = 
 {
 #if USE_LV_FONT_SYMBOL_30 == 1
-  {.w_px = 25,	.glyph_index = 0},	/*Unicode: U+f001 ()*/
-  {.w_px = 32,	.glyph_index = 120},	/*Unicode: U+f008 ()*/
-  {.w_px = 29,	.glyph_index = 240},	/*Unicode: U+f00b ()*/
-  {.w_px = 25,	.glyph_index = 360},	/*Unicode: U+f00c ()*/
-  {.w_px = 20,	.glyph_index = 480},	/*Unicode: U+f00d ()*/
-  {.w_px = 25,	.glyph_index = 570},	/*Unicode: U+f011 ()*/
-  {.w_px = 25,	.glyph_index = 690},	/*Unicode: U+f013 ()*/
-  {.w_px = 23,	.glyph_index = 810},	/*Unicode: U+f014 ()*/
-  {.w_px = 27,	.glyph_index = 900},	/*Unicode: U+f015 ()*/
-  {.w_px = 27,	.glyph_index = 1020},	/*Unicode: U+f019 ()*/
-  {.w_px = 25,	.glyph_index = 1140},	/*Unicode: U+f01c ()*/
-  {.w_px = 25,	.glyph_index = 1260},	/*Unicode: U+f021 ()*/
-  {.w_px = 13,	.glyph_index = 1380},	/*Unicode: U+f026 ()*/
-  {.w_px = 19,	.glyph_index = 1440},	/*Unicode: U+f027 ()*/
-  {.w_px = 27,	.glyph_index = 1530},	/*Unicode: U+f028 ()*/
-  {.w_px = 32,	.glyph_index = 1650},	/*Unicode: U+f03e ()*/
-  {.w_px = 25,	.glyph_index = 1770},	/*Unicode: U+f040 ()*/
-  {.w_px = 17,	.glyph_index = 1890},	/*Unicode: U+f048 ()*/
-  {.w_px = 23,	.glyph_index = 1980},	/*Unicode: U+f04b ()*/
-  {.w_px = 25,	.glyph_index = 2070},	/*Unicode: U+f04c ()*/
-  {.w_px = 25,	.glyph_index = 2190},	/*Unicode: U+f04d ()*/
-  {.w_px = 17,	.glyph_index = 2310},	/*Unicode: U+f051 ()*/
-  {.w_px = 25,	.glyph_index = 2400},	/*Unicode: U+f052 ()*/
-  {.w_px = 18,	.glyph_index = 2520},	/*Unicode: U+f053 ()*/
-  {.w_px = 18,	.glyph_index = 2610},	/*Unicode: U+f054 ()*/
-  {.w_px = 23,	.glyph_index = 2700},	/*Unicode: U+f067 ()*/
-  {.w_px = 23,	.glyph_index = 2790},	/*Unicode: U+f068 ()*/
-  {.w_px = 29,	.glyph_index = 2880},	/*Unicode: U+f071 ()*/
-  {.w_px = 29,	.glyph_index = 3000},	/*Unicode: U+f074 ()*/
-  {.w_px = 27,	.glyph_index = 3120},	/*Unicode: U+f077 ()*/
-  {.w_px = 27,	.glyph_index = 3240},	/*Unicode: U+f078 ()*/
-  {.w_px = 32,	.glyph_index = 3360},	/*Unicode: U+f079 ()*/
-  {.w_px = 27,	.glyph_index = 3480},	/*Unicode: U+f07b ()*/
-  {.w_px = 27,	.glyph_index = 3600},	/*Unicode: U+f093 ()*/
-  {.w_px = 23,	.glyph_index = 3720},	/*Unicode: U+f095 ()*/
-  {.w_px = 29,	.glyph_index = 3810},	/*Unicode: U+f0c4 ()*/
-  {.w_px = 29,	.glyph_index = 3930},	/*Unicode: U+f0c5 ()*/
-  {.w_px = 25,	.glyph_index = 4050},	/*Unicode: U+f0c7 ()*/
-  {.w_px = 15,	.glyph_index = 4170},	/*Unicode: U+f0e7 ()*/
-  {.w_px = 27,	.glyph_index = 4230},	/*Unicode: U+f0f3 ()*/
-  {.w_px = 32,	.glyph_index = 4350},	/*Unicode: U+f11c ()*/
-  {.w_px = 23,	.glyph_index = 4470},	/*Unicode: U+f124 ()*/
-  {.w_px = 25,	.glyph_index = 4560},	/*Unicode: U+f15b ()*/
-  {.w_px = 32,	.glyph_index = 4680},	/*Unicode: U+f1eb ()*/
-  {.w_px = 38,	.glyph_index = 4800},	/*Unicode: U+f240 ()*/
-  {.w_px = 38,	.glyph_index = 4950},	/*Unicode: U+f241 ()*/
-  {.w_px = 38,	.glyph_index = 5100},	/*Unicode: U+f242 ()*/
-  {.w_px = 38,	.glyph_index = 5250},	/*Unicode: U+f243 ()*/
-  {.w_px = 38,	.glyph_index = 5400},	/*Unicode: U+f244 ()*/
-  {.w_px = 22,	.glyph_index = 5550},	/*Unicode: U+f293 ()*/
+  {.w_px = 25,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
+  {.w_px = 32,  .glyph_index = 120},    /*Unicode: U+f008 ()*/
+  {.w_px = 29,  .glyph_index = 240},    /*Unicode: U+f00b ()*/
+  {.w_px = 25,  .glyph_index = 360},    /*Unicode: U+f00c ()*/
+  {.w_px = 20,  .glyph_index = 480},    /*Unicode: U+f00d ()*/
+  {.w_px = 25,  .glyph_index = 570},    /*Unicode: U+f011 ()*/
+  {.w_px = 25,  .glyph_index = 690},    /*Unicode: U+f013 ()*/
+  {.w_px = 23,  .glyph_index = 810},    /*Unicode: U+f014 ()*/
+  {.w_px = 27,  .glyph_index = 900},    /*Unicode: U+f015 ()*/
+  {.w_px = 27,  .glyph_index = 1020},   /*Unicode: U+f019 ()*/
+  {.w_px = 25,  .glyph_index = 1140},   /*Unicode: U+f01c ()*/
+  {.w_px = 25,  .glyph_index = 1260},   /*Unicode: U+f021 ()*/
+  {.w_px = 13,  .glyph_index = 1380},   /*Unicode: U+f026 ()*/
+  {.w_px = 19,  .glyph_index = 1440},   /*Unicode: U+f027 ()*/
+  {.w_px = 27,  .glyph_index = 1530},   /*Unicode: U+f028 ()*/
+  {.w_px = 32,  .glyph_index = 1650},   /*Unicode: U+f03e ()*/
+  {.w_px = 25,  .glyph_index = 1770},   /*Unicode: U+f040 ()*/
+  {.w_px = 17,  .glyph_index = 1890},   /*Unicode: U+f048 ()*/
+  {.w_px = 23,  .glyph_index = 1980},   /*Unicode: U+f04b ()*/
+  {.w_px = 25,  .glyph_index = 2070},   /*Unicode: U+f04c ()*/
+  {.w_px = 25,  .glyph_index = 2190},   /*Unicode: U+f04d ()*/
+  {.w_px = 17,  .glyph_index = 2310},   /*Unicode: U+f051 ()*/
+  {.w_px = 25,  .glyph_index = 2400},   /*Unicode: U+f052 ()*/
+  {.w_px = 18,  .glyph_index = 2520},   /*Unicode: U+f053 ()*/
+  {.w_px = 18,  .glyph_index = 2610},   /*Unicode: U+f054 ()*/
+  {.w_px = 23,  .glyph_index = 2700},   /*Unicode: U+f067 ()*/
+  {.w_px = 23,  .glyph_index = 2790},   /*Unicode: U+f068 ()*/
+  {.w_px = 29,  .glyph_index = 2880},   /*Unicode: U+f071 ()*/
+  {.w_px = 29,  .glyph_index = 3000},   /*Unicode: U+f074 ()*/
+  {.w_px = 27,  .glyph_index = 3120},   /*Unicode: U+f077 ()*/
+  {.w_px = 27,  .glyph_index = 3240},   /*Unicode: U+f078 ()*/
+  {.w_px = 32,  .glyph_index = 3360},   /*Unicode: U+f079 ()*/
+  {.w_px = 27,  .glyph_index = 3480},   /*Unicode: U+f07b ()*/
+  {.w_px = 27,  .glyph_index = 3600},   /*Unicode: U+f093 ()*/
+  {.w_px = 23,  .glyph_index = 3720},   /*Unicode: U+f095 ()*/
+  {.w_px = 29,  .glyph_index = 3810},   /*Unicode: U+f0c4 ()*/
+  {.w_px = 29,  .glyph_index = 3930},   /*Unicode: U+f0c5 ()*/
+  {.w_px = 25,  .glyph_index = 4050},   /*Unicode: U+f0c7 ()*/
+  {.w_px = 15,  .glyph_index = 4170},   /*Unicode: U+f0e7 ()*/
+  {.w_px = 27,  .glyph_index = 4230},   /*Unicode: U+f0f3 ()*/
+  {.w_px = 32,  .glyph_index = 4350},   /*Unicode: U+f11c ()*/
+  {.w_px = 23,  .glyph_index = 4470},   /*Unicode: U+f124 ()*/
+  {.w_px = 25,  .glyph_index = 4560},   /*Unicode: U+f15b ()*/
+  {.w_px = 32,  .glyph_index = 4680},   /*Unicode: U+f1eb ()*/
+  {.w_px = 38,  .glyph_index = 4800},   /*Unicode: U+f240 ()*/
+  {.w_px = 38,  .glyph_index = 4950},   /*Unicode: U+f241 ()*/
+  {.w_px = 38,  .glyph_index = 5100},   /*Unicode: U+f242 ()*/
+  {.w_px = 38,  .glyph_index = 5250},   /*Unicode: U+f243 ()*/
+  {.w_px = 38,  .glyph_index = 5400},   /*Unicode: U+f244 ()*/
+  {.w_px = 22,  .glyph_index = 5550},   /*Unicode: U+f293 ()*/
 
 #elif USE_LV_FONT_SYMBOL_30 == 2
-  {.w_px = 25,	.glyph_index = 0},	/*Unicode: U+f001 ()*/
-  {.w_px = 32,	.glyph_index = 210},	/*Unicode: U+f008 ()*/
-  {.w_px = 29,	.glyph_index = 450},	/*Unicode: U+f00b ()*/
-  {.w_px = 25,	.glyph_index = 690},	/*Unicode: U+f00c ()*/
-  {.w_px = 20,	.glyph_index = 900},	/*Unicode: U+f00d ()*/
-  {.w_px = 25,	.glyph_index = 1050},	/*Unicode: U+f011 ()*/
-  {.w_px = 25,	.glyph_index = 1260},	/*Unicode: U+f013 ()*/
-  {.w_px = 23,	.glyph_index = 1470},	/*Unicode: U+f014 ()*/
-  {.w_px = 27,	.glyph_index = 1650},	/*Unicode: U+f015 ()*/
-  {.w_px = 27,	.glyph_index = 1860},	/*Unicode: U+f019 ()*/
-  {.w_px = 25,	.glyph_index = 2070},	/*Unicode: U+f01c ()*/
-  {.w_px = 25,	.glyph_index = 2280},	/*Unicode: U+f021 ()*/
-  {.w_px = 13,	.glyph_index = 2490},	/*Unicode: U+f026 ()*/
-  {.w_px = 19,	.glyph_index = 2610},	/*Unicode: U+f027 ()*/
-  {.w_px = 27,	.glyph_index = 2760},	/*Unicode: U+f028 ()*/
-  {.w_px = 32,	.glyph_index = 2970},	/*Unicode: U+f03e ()*/
-  {.w_px = 25,	.glyph_index = 3210},	/*Unicode: U+f040 ()*/
-  {.w_px = 17,	.glyph_index = 3420},	/*Unicode: U+f048 ()*/
-  {.w_px = 23,	.glyph_index = 3570},	/*Unicode: U+f04b ()*/
-  {.w_px = 25,	.glyph_index = 3750},	/*Unicode: U+f04c ()*/
-  {.w_px = 25,	.glyph_index = 3960},	/*Unicode: U+f04d ()*/
-  {.w_px = 17,	.glyph_index = 4170},	/*Unicode: U+f051 ()*/
-  {.w_px = 25,	.glyph_index = 4320},	/*Unicode: U+f052 ()*/
-  {.w_px = 18,	.glyph_index = 4530},	/*Unicode: U+f053 ()*/
-  {.w_px = 18,	.glyph_index = 4680},	/*Unicode: U+f054 ()*/
-  {.w_px = 23,	.glyph_index = 4830},	/*Unicode: U+f067 ()*/
-  {.w_px = 23,	.glyph_index = 5010},	/*Unicode: U+f068 ()*/
-  {.w_px = 29,	.glyph_index = 5190},	/*Unicode: U+f071 ()*/
-  {.w_px = 29,	.glyph_index = 5430},	/*Unicode: U+f074 ()*/
-  {.w_px = 27,	.glyph_index = 5670},	/*Unicode: U+f077 ()*/
-  {.w_px = 27,	.glyph_index = 5880},	/*Unicode: U+f078 ()*/
-  {.w_px = 32,	.glyph_index = 6090},	/*Unicode: U+f079 ()*/
-  {.w_px = 27,	.glyph_index = 6330},	/*Unicode: U+f07b ()*/
-  {.w_px = 27,	.glyph_index = 6540},	/*Unicode: U+f093 ()*/
-  {.w_px = 23,	.glyph_index = 6750},	/*Unicode: U+f095 ()*/
-  {.w_px = 29,	.glyph_index = 6930},	/*Unicode: U+f0c4 ()*/
-  {.w_px = 29,	.glyph_index = 7170},	/*Unicode: U+f0c5 ()*/
-  {.w_px = 25,	.glyph_index = 7410},	/*Unicode: U+f0c7 ()*/
-  {.w_px = 15,	.glyph_index = 7620},	/*Unicode: U+f0e7 ()*/
-  {.w_px = 27,	.glyph_index = 7740},	/*Unicode: U+f0f3 ()*/
-  {.w_px = 32,	.glyph_index = 7950},	/*Unicode: U+f11c ()*/
-  {.w_px = 23,	.glyph_index = 8190},	/*Unicode: U+f124 ()*/
-  {.w_px = 25,	.glyph_index = 8370},	/*Unicode: U+f15b ()*/
-  {.w_px = 32,	.glyph_index = 8580},	/*Unicode: U+f1eb ()*/
-  {.w_px = 38,	.glyph_index = 8820},	/*Unicode: U+f240 ()*/
-  {.w_px = 38,	.glyph_index = 9120},	/*Unicode: U+f241 ()*/
-  {.w_px = 38,	.glyph_index = 9420},	/*Unicode: U+f242 ()*/
-  {.w_px = 38,	.glyph_index = 9720},	/*Unicode: U+f243 ()*/
-  {.w_px = 38,	.glyph_index = 10020},	/*Unicode: U+f244 ()*/
-  {.w_px = 22,	.glyph_index = 10320},	/*Unicode: U+f293 ()*/
+  {.w_px = 25,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
+  {.w_px = 32,  .glyph_index = 210},    /*Unicode: U+f008 ()*/
+  {.w_px = 29,  .glyph_index = 450},    /*Unicode: U+f00b ()*/
+  {.w_px = 25,  .glyph_index = 690},    /*Unicode: U+f00c ()*/
+  {.w_px = 20,  .glyph_index = 900},    /*Unicode: U+f00d ()*/
+  {.w_px = 25,  .glyph_index = 1050},   /*Unicode: U+f011 ()*/
+  {.w_px = 25,  .glyph_index = 1260},   /*Unicode: U+f013 ()*/
+  {.w_px = 23,  .glyph_index = 1470},   /*Unicode: U+f014 ()*/
+  {.w_px = 27,  .glyph_index = 1650},   /*Unicode: U+f015 ()*/
+  {.w_px = 27,  .glyph_index = 1860},   /*Unicode: U+f019 ()*/
+  {.w_px = 25,  .glyph_index = 2070},   /*Unicode: U+f01c ()*/
+  {.w_px = 25,  .glyph_index = 2280},   /*Unicode: U+f021 ()*/
+  {.w_px = 13,  .glyph_index = 2490},   /*Unicode: U+f026 ()*/
+  {.w_px = 19,  .glyph_index = 2610},   /*Unicode: U+f027 ()*/
+  {.w_px = 27,  .glyph_index = 2760},   /*Unicode: U+f028 ()*/
+  {.w_px = 32,  .glyph_index = 2970},   /*Unicode: U+f03e ()*/
+  {.w_px = 25,  .glyph_index = 3210},   /*Unicode: U+f040 ()*/
+  {.w_px = 17,  .glyph_index = 3420},   /*Unicode: U+f048 ()*/
+  {.w_px = 23,  .glyph_index = 3570},   /*Unicode: U+f04b ()*/
+  {.w_px = 25,  .glyph_index = 3750},   /*Unicode: U+f04c ()*/
+  {.w_px = 25,  .glyph_index = 3960},   /*Unicode: U+f04d ()*/
+  {.w_px = 17,  .glyph_index = 4170},   /*Unicode: U+f051 ()*/
+  {.w_px = 25,  .glyph_index = 4320},   /*Unicode: U+f052 ()*/
+  {.w_px = 18,  .glyph_index = 4530},   /*Unicode: U+f053 ()*/
+  {.w_px = 18,  .glyph_index = 4680},   /*Unicode: U+f054 ()*/
+  {.w_px = 23,  .glyph_index = 4830},   /*Unicode: U+f067 ()*/
+  {.w_px = 23,  .glyph_index = 5010},   /*Unicode: U+f068 ()*/
+  {.w_px = 29,  .glyph_index = 5190},   /*Unicode: U+f071 ()*/
+  {.w_px = 29,  .glyph_index = 5430},   /*Unicode: U+f074 ()*/
+  {.w_px = 27,  .glyph_index = 5670},   /*Unicode: U+f077 ()*/
+  {.w_px = 27,  .glyph_index = 5880},   /*Unicode: U+f078 ()*/
+  {.w_px = 32,  .glyph_index = 6090},   /*Unicode: U+f079 ()*/
+  {.w_px = 27,  .glyph_index = 6330},   /*Unicode: U+f07b ()*/
+  {.w_px = 27,  .glyph_index = 6540},   /*Unicode: U+f093 ()*/
+  {.w_px = 23,  .glyph_index = 6750},   /*Unicode: U+f095 ()*/
+  {.w_px = 29,  .glyph_index = 6930},   /*Unicode: U+f0c4 ()*/
+  {.w_px = 29,  .glyph_index = 7170},   /*Unicode: U+f0c5 ()*/
+  {.w_px = 25,  .glyph_index = 7410},   /*Unicode: U+f0c7 ()*/
+  {.w_px = 15,  .glyph_index = 7620},   /*Unicode: U+f0e7 ()*/
+  {.w_px = 27,  .glyph_index = 7740},   /*Unicode: U+f0f3 ()*/
+  {.w_px = 32,  .glyph_index = 7950},   /*Unicode: U+f11c ()*/
+  {.w_px = 23,  .glyph_index = 8190},   /*Unicode: U+f124 ()*/
+  {.w_px = 25,  .glyph_index = 8370},   /*Unicode: U+f15b ()*/
+  {.w_px = 32,  .glyph_index = 8580},   /*Unicode: U+f1eb ()*/
+  {.w_px = 38,  .glyph_index = 8820},   /*Unicode: U+f240 ()*/
+  {.w_px = 38,  .glyph_index = 9120},   /*Unicode: U+f241 ()*/
+  {.w_px = 38,  .glyph_index = 9420},   /*Unicode: U+f242 ()*/
+  {.w_px = 38,  .glyph_index = 9720},   /*Unicode: U+f243 ()*/
+  {.w_px = 38,  .glyph_index = 10020},  /*Unicode: U+f244 ()*/
+  {.w_px = 22,  .glyph_index = 10320},  /*Unicode: U+f293 ()*/
 
 #elif USE_LV_FONT_SYMBOL_30 == 4
-  {.w_px = 25,	.glyph_index = 0},	/*Unicode: U+f001 ()*/
-  {.w_px = 32,	.glyph_index = 390},	/*Unicode: U+f008 ()*/
-  {.w_px = 29,	.glyph_index = 870},	/*Unicode: U+f00b ()*/
-  {.w_px = 25,	.glyph_index = 1320},	/*Unicode: U+f00c ()*/
-  {.w_px = 20,	.glyph_index = 1710},	/*Unicode: U+f00d ()*/
-  {.w_px = 25,	.glyph_index = 2010},	/*Unicode: U+f011 ()*/
-  {.w_px = 25,	.glyph_index = 2400},	/*Unicode: U+f013 ()*/
-  {.w_px = 23,	.glyph_index = 2790},	/*Unicode: U+f014 ()*/
-  {.w_px = 27,	.glyph_index = 3150},	/*Unicode: U+f015 ()*/
-  {.w_px = 27,	.glyph_index = 3570},	/*Unicode: U+f019 ()*/
-  {.w_px = 25,	.glyph_index = 3990},	/*Unicode: U+f01c ()*/
-  {.w_px = 25,	.glyph_index = 4380},	/*Unicode: U+f021 ()*/
-  {.w_px = 13,	.glyph_index = 4770},	/*Unicode: U+f026 ()*/
-  {.w_px = 19,	.glyph_index = 4980},	/*Unicode: U+f027 ()*/
-  {.w_px = 27,	.glyph_index = 5280},	/*Unicode: U+f028 ()*/
-  {.w_px = 32,	.glyph_index = 5700},	/*Unicode: U+f03e ()*/
-  {.w_px = 25,	.glyph_index = 6180},	/*Unicode: U+f040 ()*/
-  {.w_px = 17,	.glyph_index = 6570},	/*Unicode: U+f048 ()*/
-  {.w_px = 23,	.glyph_index = 6840},	/*Unicode: U+f04b ()*/
-  {.w_px = 25,	.glyph_index = 7200},	/*Unicode: U+f04c ()*/
-  {.w_px = 25,	.glyph_index = 7590},	/*Unicode: U+f04d ()*/
-  {.w_px = 17,	.glyph_index = 7980},	/*Unicode: U+f051 ()*/
-  {.w_px = 25,	.glyph_index = 8250},	/*Unicode: U+f052 ()*/
-  {.w_px = 18,	.glyph_index = 8640},	/*Unicode: U+f053 ()*/
-  {.w_px = 18,	.glyph_index = 8910},	/*Unicode: U+f054 ()*/
-  {.w_px = 23,	.glyph_index = 9180},	/*Unicode: U+f067 ()*/
-  {.w_px = 23,	.glyph_index = 9540},	/*Unicode: U+f068 ()*/
-  {.w_px = 29,	.glyph_index = 9900},	/*Unicode: U+f071 ()*/
-  {.w_px = 29,	.glyph_index = 10350},	/*Unicode: U+f074 ()*/
-  {.w_px = 27,	.glyph_index = 10800},	/*Unicode: U+f077 ()*/
-  {.w_px = 27,	.glyph_index = 11220},	/*Unicode: U+f078 ()*/
-  {.w_px = 32,	.glyph_index = 11640},	/*Unicode: U+f079 ()*/
-  {.w_px = 27,	.glyph_index = 12120},	/*Unicode: U+f07b ()*/
-  {.w_px = 27,	.glyph_index = 12540},	/*Unicode: U+f093 ()*/
-  {.w_px = 23,	.glyph_index = 12960},	/*Unicode: U+f095 ()*/
-  {.w_px = 29,	.glyph_index = 13320},	/*Unicode: U+f0c4 ()*/
-  {.w_px = 29,	.glyph_index = 13770},	/*Unicode: U+f0c5 ()*/
-  {.w_px = 25,	.glyph_index = 14220},	/*Unicode: U+f0c7 ()*/
-  {.w_px = 15,	.glyph_index = 14610},	/*Unicode: U+f0e7 ()*/
-  {.w_px = 27,	.glyph_index = 14850},	/*Unicode: U+f0f3 ()*/
-  {.w_px = 32,	.glyph_index = 15270},	/*Unicode: U+f11c ()*/
-  {.w_px = 23,	.glyph_index = 15750},	/*Unicode: U+f124 ()*/
-  {.w_px = 25,	.glyph_index = 16110},	/*Unicode: U+f15b ()*/
-  {.w_px = 32,	.glyph_index = 16500},	/*Unicode: U+f1eb ()*/
-  {.w_px = 38,	.glyph_index = 16980},	/*Unicode: U+f240 ()*/
-  {.w_px = 38,	.glyph_index = 17550},	/*Unicode: U+f241 ()*/
-  {.w_px = 38,	.glyph_index = 18120},	/*Unicode: U+f242 ()*/
-  {.w_px = 38,	.glyph_index = 18690},	/*Unicode: U+f243 ()*/
-  {.w_px = 38,	.glyph_index = 19260},	/*Unicode: U+f244 ()*/
-  {.w_px = 22,	.glyph_index = 19830},	/*Unicode: U+f293 ()*/
+  {.w_px = 25,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
+  {.w_px = 32,  .glyph_index = 390},    /*Unicode: U+f008 ()*/
+  {.w_px = 29,  .glyph_index = 870},    /*Unicode: U+f00b ()*/
+  {.w_px = 25,  .glyph_index = 1320},   /*Unicode: U+f00c ()*/
+  {.w_px = 20,  .glyph_index = 1710},   /*Unicode: U+f00d ()*/
+  {.w_px = 25,  .glyph_index = 2010},   /*Unicode: U+f011 ()*/
+  {.w_px = 25,  .glyph_index = 2400},   /*Unicode: U+f013 ()*/
+  {.w_px = 23,  .glyph_index = 2790},   /*Unicode: U+f014 ()*/
+  {.w_px = 27,  .glyph_index = 3150},   /*Unicode: U+f015 ()*/
+  {.w_px = 27,  .glyph_index = 3570},   /*Unicode: U+f019 ()*/
+  {.w_px = 25,  .glyph_index = 3990},   /*Unicode: U+f01c ()*/
+  {.w_px = 25,  .glyph_index = 4380},   /*Unicode: U+f021 ()*/
+  {.w_px = 13,  .glyph_index = 4770},   /*Unicode: U+f026 ()*/
+  {.w_px = 19,  .glyph_index = 4980},   /*Unicode: U+f027 ()*/
+  {.w_px = 27,  .glyph_index = 5280},   /*Unicode: U+f028 ()*/
+  {.w_px = 32,  .glyph_index = 5700},   /*Unicode: U+f03e ()*/
+  {.w_px = 25,  .glyph_index = 6180},   /*Unicode: U+f040 ()*/
+  {.w_px = 17,  .glyph_index = 6570},   /*Unicode: U+f048 ()*/
+  {.w_px = 23,  .glyph_index = 6840},   /*Unicode: U+f04b ()*/
+  {.w_px = 25,  .glyph_index = 7200},   /*Unicode: U+f04c ()*/
+  {.w_px = 25,  .glyph_index = 7590},   /*Unicode: U+f04d ()*/
+  {.w_px = 17,  .glyph_index = 7980},   /*Unicode: U+f051 ()*/
+  {.w_px = 25,  .glyph_index = 8250},   /*Unicode: U+f052 ()*/
+  {.w_px = 18,  .glyph_index = 8640},   /*Unicode: U+f053 ()*/
+  {.w_px = 18,  .glyph_index = 8910},   /*Unicode: U+f054 ()*/
+  {.w_px = 23,  .glyph_index = 9180},   /*Unicode: U+f067 ()*/
+  {.w_px = 23,  .glyph_index = 9540},   /*Unicode: U+f068 ()*/
+  {.w_px = 29,  .glyph_index = 9900},   /*Unicode: U+f071 ()*/
+  {.w_px = 29,  .glyph_index = 10350},  /*Unicode: U+f074 ()*/
+  {.w_px = 27,  .glyph_index = 10800},  /*Unicode: U+f077 ()*/
+  {.w_px = 27,  .glyph_index = 11220},  /*Unicode: U+f078 ()*/
+  {.w_px = 32,  .glyph_index = 11640},  /*Unicode: U+f079 ()*/
+  {.w_px = 27,  .glyph_index = 12120},  /*Unicode: U+f07b ()*/
+  {.w_px = 27,  .glyph_index = 12540},  /*Unicode: U+f093 ()*/
+  {.w_px = 23,  .glyph_index = 12960},  /*Unicode: U+f095 ()*/
+  {.w_px = 29,  .glyph_index = 13320},  /*Unicode: U+f0c4 ()*/
+  {.w_px = 29,  .glyph_index = 13770},  /*Unicode: U+f0c5 ()*/
+  {.w_px = 25,  .glyph_index = 14220},  /*Unicode: U+f0c7 ()*/
+  {.w_px = 15,  .glyph_index = 14610},  /*Unicode: U+f0e7 ()*/
+  {.w_px = 27,  .glyph_index = 14850},  /*Unicode: U+f0f3 ()*/
+  {.w_px = 32,  .glyph_index = 15270},  /*Unicode: U+f11c ()*/
+  {.w_px = 23,  .glyph_index = 15750},  /*Unicode: U+f124 ()*/
+  {.w_px = 25,  .glyph_index = 16110},  /*Unicode: U+f15b ()*/
+  {.w_px = 32,  .glyph_index = 16500},  /*Unicode: U+f1eb ()*/
+  {.w_px = 38,  .glyph_index = 16980},  /*Unicode: U+f240 ()*/
+  {.w_px = 38,  .glyph_index = 17550},  /*Unicode: U+f241 ()*/
+  {.w_px = 38,  .glyph_index = 18120},  /*Unicode: U+f242 ()*/
+  {.w_px = 38,  .glyph_index = 18690},  /*Unicode: U+f243 ()*/
+  {.w_px = 38,  .glyph_index = 19260},  /*Unicode: U+f244 ()*/
+  {.w_px = 22,  .glyph_index = 19830},  /*Unicode: U+f293 ()*/
 
 #elif USE_LV_FONT_SYMBOL_30 == 8
-  {.w_px = 25,	.glyph_index = 0},	/*Unicode: U+f001 ()*/
-  {.w_px = 32,	.glyph_index = 750},	/*Unicode: U+f008 ()*/
-  {.w_px = 29,	.glyph_index = 1710},	/*Unicode: U+f00b ()*/
-  {.w_px = 25,	.glyph_index = 2580},	/*Unicode: U+f00c ()*/
-  {.w_px = 20,	.glyph_index = 3330},	/*Unicode: U+f00d ()*/
-  {.w_px = 25,	.glyph_index = 3930},	/*Unicode: U+f011 ()*/
-  {.w_px = 25,	.glyph_index = 4680},	/*Unicode: U+f013 ()*/
-  {.w_px = 23,	.glyph_index = 5430},	/*Unicode: U+f014 ()*/
-  {.w_px = 27,	.glyph_index = 6120},	/*Unicode: U+f015 ()*/
-  {.w_px = 27,	.glyph_index = 6930},	/*Unicode: U+f019 ()*/
-  {.w_px = 25,	.glyph_index = 7740},	/*Unicode: U+f01c ()*/
-  {.w_px = 25,	.glyph_index = 8490},	/*Unicode: U+f021 ()*/
-  {.w_px = 13,	.glyph_index = 9240},	/*Unicode: U+f026 ()*/
-  {.w_px = 19,	.glyph_index = 9630},	/*Unicode: U+f027 ()*/
-  {.w_px = 27,	.glyph_index = 10200},	/*Unicode: U+f028 ()*/
-  {.w_px = 32,	.glyph_index = 11010},	/*Unicode: U+f03e ()*/
-  {.w_px = 25,	.glyph_index = 11970},	/*Unicode: U+f040 ()*/
-  {.w_px = 17,	.glyph_index = 12720},	/*Unicode: U+f048 ()*/
-  {.w_px = 23,	.glyph_index = 13230},	/*Unicode: U+f04b ()*/
-  {.w_px = 25,	.glyph_index = 13920},	/*Unicode: U+f04c ()*/
-  {.w_px = 25,	.glyph_index = 14670},	/*Unicode: U+f04d ()*/
-  {.w_px = 17,	.glyph_index = 15420},	/*Unicode: U+f051 ()*/
-  {.w_px = 25,	.glyph_index = 15930},	/*Unicode: U+f052 ()*/
-  {.w_px = 18,	.glyph_index = 16680},	/*Unicode: U+f053 ()*/
-  {.w_px = 18,	.glyph_index = 17220},	/*Unicode: U+f054 ()*/
-  {.w_px = 23,	.glyph_index = 17760},	/*Unicode: U+f067 ()*/
-  {.w_px = 23,	.glyph_index = 18450},	/*Unicode: U+f068 ()*/
-  {.w_px = 29,	.glyph_index = 19140},	/*Unicode: U+f071 ()*/
-  {.w_px = 29,	.glyph_index = 20010},	/*Unicode: U+f074 ()*/
-  {.w_px = 27,	.glyph_index = 20880},	/*Unicode: U+f077 ()*/
-  {.w_px = 27,	.glyph_index = 21690},	/*Unicode: U+f078 ()*/
-  {.w_px = 32,	.glyph_index = 22500},	/*Unicode: U+f079 ()*/
-  {.w_px = 27,	.glyph_index = 23460},	/*Unicode: U+f07b ()*/
-  {.w_px = 27,	.glyph_index = 24270},	/*Unicode: U+f093 ()*/
-  {.w_px = 23,	.glyph_index = 25080},	/*Unicode: U+f095 ()*/
-  {.w_px = 29,	.glyph_index = 25770},	/*Unicode: U+f0c4 ()*/
-  {.w_px = 29,	.glyph_index = 26640},	/*Unicode: U+f0c5 ()*/
-  {.w_px = 25,	.glyph_index = 27510},	/*Unicode: U+f0c7 ()*/
-  {.w_px = 15,	.glyph_index = 28260},	/*Unicode: U+f0e7 ()*/
-  {.w_px = 27,	.glyph_index = 28710},	/*Unicode: U+f0f3 ()*/
-  {.w_px = 32,	.glyph_index = 29520},	/*Unicode: U+f11c ()*/
-  {.w_px = 23,	.glyph_index = 30480},	/*Unicode: U+f124 ()*/
-  {.w_px = 25,	.glyph_index = 31170},	/*Unicode: U+f15b ()*/
-  {.w_px = 32,	.glyph_index = 31920},	/*Unicode: U+f1eb ()*/
-  {.w_px = 38,	.glyph_index = 32880},	/*Unicode: U+f240 ()*/
-  {.w_px = 38,	.glyph_index = 34020},	/*Unicode: U+f241 ()*/
-  {.w_px = 38,	.glyph_index = 35160},	/*Unicode: U+f242 ()*/
-  {.w_px = 38,	.glyph_index = 36300},	/*Unicode: U+f243 ()*/
-  {.w_px = 38,	.glyph_index = 37440},	/*Unicode: U+f244 ()*/
-  {.w_px = 22,	.glyph_index = 38580},	/*Unicode: U+f293 ()*/
+  {.w_px = 25,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
+  {.w_px = 32,  .glyph_index = 750},    /*Unicode: U+f008 ()*/
+  {.w_px = 29,  .glyph_index = 1710},   /*Unicode: U+f00b ()*/
+  {.w_px = 25,  .glyph_index = 2580},   /*Unicode: U+f00c ()*/
+  {.w_px = 20,  .glyph_index = 3330},   /*Unicode: U+f00d ()*/
+  {.w_px = 25,  .glyph_index = 3930},   /*Unicode: U+f011 ()*/
+  {.w_px = 25,  .glyph_index = 4680},   /*Unicode: U+f013 ()*/
+  {.w_px = 23,  .glyph_index = 5430},   /*Unicode: U+f014 ()*/
+  {.w_px = 27,  .glyph_index = 6120},   /*Unicode: U+f015 ()*/
+  {.w_px = 27,  .glyph_index = 6930},   /*Unicode: U+f019 ()*/
+  {.w_px = 25,  .glyph_index = 7740},   /*Unicode: U+f01c ()*/
+  {.w_px = 25,  .glyph_index = 8490},   /*Unicode: U+f021 ()*/
+  {.w_px = 13,  .glyph_index = 9240},   /*Unicode: U+f026 ()*/
+  {.w_px = 19,  .glyph_index = 9630},   /*Unicode: U+f027 ()*/
+  {.w_px = 27,  .glyph_index = 10200},  /*Unicode: U+f028 ()*/
+  {.w_px = 32,  .glyph_index = 11010},  /*Unicode: U+f03e ()*/
+  {.w_px = 25,  .glyph_index = 11970},  /*Unicode: U+f040 ()*/
+  {.w_px = 17,  .glyph_index = 12720},  /*Unicode: U+f048 ()*/
+  {.w_px = 23,  .glyph_index = 13230},  /*Unicode: U+f04b ()*/
+  {.w_px = 25,  .glyph_index = 13920},  /*Unicode: U+f04c ()*/
+  {.w_px = 25,  .glyph_index = 14670},  /*Unicode: U+f04d ()*/
+  {.w_px = 17,  .glyph_index = 15420},  /*Unicode: U+f051 ()*/
+  {.w_px = 25,  .glyph_index = 15930},  /*Unicode: U+f052 ()*/
+  {.w_px = 18,  .glyph_index = 16680},  /*Unicode: U+f053 ()*/
+  {.w_px = 18,  .glyph_index = 17220},  /*Unicode: U+f054 ()*/
+  {.w_px = 23,  .glyph_index = 17760},  /*Unicode: U+f067 ()*/
+  {.w_px = 23,  .glyph_index = 18450},  /*Unicode: U+f068 ()*/
+  {.w_px = 29,  .glyph_index = 19140},  /*Unicode: U+f071 ()*/
+  {.w_px = 29,  .glyph_index = 20010},  /*Unicode: U+f074 ()*/
+  {.w_px = 27,  .glyph_index = 20880},  /*Unicode: U+f077 ()*/
+  {.w_px = 27,  .glyph_index = 21690},  /*Unicode: U+f078 ()*/
+  {.w_px = 32,  .glyph_index = 22500},  /*Unicode: U+f079 ()*/
+  {.w_px = 27,  .glyph_index = 23460},  /*Unicode: U+f07b ()*/
+  {.w_px = 27,  .glyph_index = 24270},  /*Unicode: U+f093 ()*/
+  {.w_px = 23,  .glyph_index = 25080},  /*Unicode: U+f095 ()*/
+  {.w_px = 29,  .glyph_index = 25770},  /*Unicode: U+f0c4 ()*/
+  {.w_px = 29,  .glyph_index = 26640},  /*Unicode: U+f0c5 ()*/
+  {.w_px = 25,  .glyph_index = 27510},  /*Unicode: U+f0c7 ()*/
+  {.w_px = 15,  .glyph_index = 28260},  /*Unicode: U+f0e7 ()*/
+  {.w_px = 27,  .glyph_index = 28710},  /*Unicode: U+f0f3 ()*/
+  {.w_px = 32,  .glyph_index = 29520},  /*Unicode: U+f11c ()*/
+  {.w_px = 23,  .glyph_index = 30480},  /*Unicode: U+f124 ()*/
+  {.w_px = 25,  .glyph_index = 31170},  /*Unicode: U+f15b ()*/
+  {.w_px = 32,  .glyph_index = 31920},  /*Unicode: U+f1eb ()*/
+  {.w_px = 38,  .glyph_index = 32880},  /*Unicode: U+f240 ()*/
+  {.w_px = 38,  .glyph_index = 34020},  /*Unicode: U+f241 ()*/
+  {.w_px = 38,  .glyph_index = 35160},  /*Unicode: U+f242 ()*/
+  {.w_px = 38,  .glyph_index = 36300},  /*Unicode: U+f243 ()*/
+  {.w_px = 38,  .glyph_index = 37440},  /*Unicode: U+f244 ()*/
+  {.w_px = 22,  .glyph_index = 38580},  /*Unicode: U+f293 ()*/
 
 #endif
 };
-
-
 lv_font_t lv_font_symbol_30 = 
 {    
-#if LV_TXT_UTF8
     .unicode_first = 61440, /*First Unicode letter in this font*/
     .unicode_last = 62190,  /*Last Unicode letter in this font*/
-#else
-    .unicode_first = 192, /*First Unicode letter in this font*/
-    .unicode_last = 241,  /*Last Unicode letter in this font*/
-#endif
-    .h_px = 30,				/*Font height in pixels*/
-    .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph bitmap*/
-    .get_width = lv_font_get_width_continuous,      /*Function pointer to get glyph width*/
-    .glyph_dsc = lv_font_symbol_30_glyph_dsc,		/*Description of glyphs*/
+    .h_px = 30,             /*Font height in pixels*/
     .glyph_bitmap = lv_font_symbol_30_glyph_bitmap, /*Bitmap of glyphs*/
-    .unicode_list = NULL,                           /*Characters stred in order*/
+    .glyph_dsc = lv_font_symbol_30_glyph_dsc,       /*Description of glyphs*/
+    .unicode_list = NULL,
+    .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
+    .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
 #if USE_LV_FONT_SYMBOL_30 == 1
-    .bpp = 1,				/*Bit per pixel*/
+    .bpp = 1,               /*Bit per pixel*/
  #elif USE_LV_FONT_SYMBOL_30 == 2
-    .bpp = 2,				/*Bit per pixel*/
+    .bpp = 2,               /*Bit per pixel*/
  #elif USE_LV_FONT_SYMBOL_30 == 4
-    .bpp = 4,				/*Bit per pixel*/
+    .bpp = 4,               /*Bit per pixel*/
  #elif USE_LV_FONT_SYMBOL_30 == 8
-    .bpp = 8,				/*Bit per pixel*/
+    .bpp = 8,               /*Bit per pixel*/
 #endif
-    .next_page = NULL,		/*Pointer to a font extension*/
+    .next_page = NULL,      /*Pointer to a font extension*/
 };
 
 #endif /*USE_LV_FONT_SYMBOL_30*/

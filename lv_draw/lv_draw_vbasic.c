@@ -276,7 +276,13 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
         for(col = col_start; col < col_end; col ++) {
             letter_px = (*map_p & mask) >> (8 - col_bit - bpp);
             if(letter_px != 0) {
-                *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, bpp == 8 ? letter_px : bpp_opa_table[letter_px]);
+                if(opa == LV_OPA_COVER) {
+                    *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, bpp == 8 ? letter_px : bpp_opa_table[letter_px]);
+                } else {
+                    *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, bpp == 8 ?
+                            (uint16_t)((uint16_t)letter_px * opa) >> 8 :
+                            (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8);
+                }
             }
 
             vdb_buf_tmp++;
