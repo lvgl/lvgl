@@ -83,6 +83,12 @@ typedef enum {
  */
 lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy);
 
+/**
+ * Delete all children of the scrl object, without deleting scrl child.
+ * @param obj pointer to an object
+ */
+void lv_tabview_clean(lv_obj_t *obj);
+
 /*======================
  * Add/remove functions
  *=====================*/
