@@ -136,6 +136,16 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     return new_page;
 }
 
+/**
+ * Delete all children of the scrl object, without deleting scrl child.
+ * @param obj pointer to an object
+ */
+void lv_page_clean(lv_obj_t *obj)
+{
+    lv_obj_t *scrl = lv_page_get_scrl(obj);
+    lv_obj_clean(scrl);
+}
+
 /*=====================
  * Setter functions
  *====================*/

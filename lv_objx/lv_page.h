@@ -80,6 +80,12 @@ typedef enum {
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
 
 /**
+ * Delete all children of the scrl object, without deleting scrl child.
+ * @param obj pointer to an object
+ */
+void lv_page_clean(lv_obj_t *obj);
+
+/**
  * Get the scrollable object of a page
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
