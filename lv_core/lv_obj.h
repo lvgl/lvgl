@@ -724,7 +724,6 @@ void * lv_obj_get_group(lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
-#define LV_SCALE(x) (x << LV_ANTIALIAS)
 
 
 #ifdef __cplusplus
