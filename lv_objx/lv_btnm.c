@@ -602,7 +602,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                         break;
                     }
                 }
-                ext->btn_id_pr = area_below;
+
+                if(area_below < ext->btn_cnt) ext->btn_id_pr = area_below;
             }
             lv_obj_invalidate(btnm);
         } else if(c == LV_GROUP_KEY_UP) {
@@ -611,10 +612,10 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) {
                 ext->btn_id_pr = 0;
             } else {
-                uint16_t area_above;
+                int16_t area_above;
                 lv_coord_t pr_center = ext->button_areas[ext->btn_id_pr].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
 
-                for(area_above = ext->btn_id_pr; area_above > 0; area_above --) {
+                for(area_above = ext->btn_id_pr; area_above >= 0; area_above --) {
                     if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_pr].y1 &&
                        pr_center >=  ext->button_areas[area_above].x1 - style->body.padding.hor &&
                        pr_center <=  ext->button_areas[area_above].x2)
@@ -622,7 +623,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                         break;
                     }
                 }
-                ext->btn_id_pr = area_above;
+                if(area_above >= 0) ext->btn_id_pr = area_above;
 
             }
             lv_obj_invalidate(btnm);
