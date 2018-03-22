@@ -255,6 +255,11 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
         }
         buf->type[i] = "lv_line";
     }
+    else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        lv_style_t * style = lv_line_get_style(line);
+        if(line->ext_size < style->line.width) line->ext_size = style->line.width;
+    }
+
 
     return res;
 }
