@@ -284,6 +284,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     lv_anim_del(obj, NULL);
 #endif
     
+    /*Delete from the group*/
+ #if USE_LV_GROUP
+    if(obj->group_p != NULL) lv_group_remove_obj(obj);
+ #endif
+
     /* Reset all input devices if
      * the currently pressed object is deleted*/
     lv_indev_t * indev = lv_indev_next(NULL);

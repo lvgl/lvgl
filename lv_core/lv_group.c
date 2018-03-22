@@ -47,6 +47,7 @@ lv_group_t * lv_group_create(void)
     group->style_mod = style_mod_def;
     group->obj_focus = NULL;
     group->frozen = 0;
+    group->focus_cb = NULL;
 
     return group;
 }
@@ -88,6 +89,10 @@ void lv_group_remove_obj(lv_obj_t * obj)
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
 
+    if(*g->obj_focus == obj) {
+         lv_group_focus_next(g);
+     }
+
     /*Search the object and remove it from its group */
     lv_obj_t ** i;
     LL_READ(g->obj_ll, i) {
@@ -98,10 +103,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
         }
     }
 
-    if(*g->obj_focus == obj) {
-        g->obj_focus = NULL;
-        lv_group_focus_next(g);
-    }
+
 }
 
 /**
