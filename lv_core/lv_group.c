@@ -102,8 +102,6 @@ void lv_group_remove_obj(lv_obj_t * obj)
             obj->group_p = NULL;
         }
     }
-
-
 }
 
 /**
