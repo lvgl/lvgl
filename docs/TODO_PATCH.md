@@ -8,6 +8,9 @@ Please create an issue to introduce a bug instead of adding pull request to this
 
 ## v5.1.1 (in progress)
 - [ ] lv_line: set line.width ext. size to not trim parts on x = 0, y = 0 coordinates
+- [ ] lv_conf.h: add LV_COMPILER_VLA_SUPPORTED
+- [ ] lv_group_create: init focus_cb
+- [ ] fix of 16 bit image drawing with alpha bytes
 
 ## v5.0.3 (released on: 09.03.2018)
 - [x] lv_chart: Fix the use of point_num more then 256 (Thanks to upbeat27) 
