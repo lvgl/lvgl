@@ -243,6 +243,13 @@
 /*Switch (dependencies: lv_slider)*/
 #define USE_LV_SW       1
 
+/*************************
+ * Non-user section
+ *************************/
+#ifdef _MSC_VER                               /* Disable warnings for Visual Studio*/
+# define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #endif /*LV_CONF_H*/
 
 
