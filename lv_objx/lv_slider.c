@@ -309,11 +309,11 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         if(slider_w >= slider_h) {
             area_indic.x2 = (int32_t) ((int32_t)lv_area_get_width(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.x2 += area_indic.x1;
+            area_indic.x2 = area_indic.x1 + area_indic.x2 - 1;
 
         } else {
             area_indic.y1 = (int32_t) ((int32_t)lv_area_get_height(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.y1 = area_indic.y2 - area_indic.y1;
+            area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
         }
 
         if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic);
