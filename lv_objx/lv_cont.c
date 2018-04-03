@@ -135,7 +135,9 @@ void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
 	ext->ver_fit = ver_en == false ? 0 : 1;
 
 	/*Send a signal to set a new size*/
-	cont->signal_func(cont, LV_SIGNAL_CORD_CHG, cont);
+	lv_area_t area;
+	lv_obj_get_coords(cont, &area);
+	cont->signal_func(cont, LV_SIGNAL_CORD_CHG, &area);
 }
 
 /*=====================
