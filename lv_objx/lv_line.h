@@ -90,8 +90,8 @@ static inline void lv_line_set_style(lv_obj_t *line, lv_style_t *style)
 
 /**
  * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param line
- * @param upscale
+ * @param line -
+ * @param upscale -
  */
 static inline void lv_line_set_upscale(lv_obj_t * line, bool upcale)
 {
@@ -127,7 +127,7 @@ static inline lv_style_t* lv_line_get_style(lv_obj_t *line)
 
 /**
  * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param line
+ * @param line -
  * @return false
  */
 static inline bool lv_line_get_upscale(lv_obj_t * line)

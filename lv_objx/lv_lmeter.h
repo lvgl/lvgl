@@ -80,7 +80,7 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt);
  * Set the styles of a line meter
  * @param lmeter pointer to a line meter object
  * @param bg set the style of the line meter
- *  */
+ */
 static inline void lv_lmeter_set_style(lv_obj_t *lmeter, lv_style_t *bg)
 {
     lv_obj_set_style(lmeter, bg);
