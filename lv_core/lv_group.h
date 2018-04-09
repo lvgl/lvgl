@@ -65,7 +65,7 @@ lv_group_t * lv_group_create(void);
  * Delete a group object
  * @param group pointer to a group
  */
-void lv_group_del(lv_group_t * group)
+void lv_group_del(lv_group_t * group);
 
 /**
  * Add an object to a group
