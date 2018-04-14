@@ -1044,7 +1044,10 @@ static void pwd_char_hider(lv_obj_t * ta)
         int16_t len = lv_txt_get_length(txt);
         bool refr = false;
         uint16_t i;
-        for(i = 0; i < len; i++) txt[i] = '*';
+        for(i = 0; i < len; i++) {
+            txt[i] = '*';
+            refr = true;
+        }
 
         txt[i] = '\0';
 
