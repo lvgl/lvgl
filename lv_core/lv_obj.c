@@ -284,20 +284,17 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     lv_anim_del(obj, NULL);
 #endif
     
+    /*Delete from the group*/
+ #if USE_LV_GROUP
+    if(obj->group_p != NULL) lv_group_remove_obj(obj);
+ #endif
+
     /* Reset all input devices if
      * the currently pressed object is deleted*/
     lv_indev_t * indev = lv_indev_next(NULL);
-    lv_obj_t * dpar;
     while(indev) {
-        dpar = obj;
-        while(dpar != NULL) {
-            if(indev->proc.act_obj == dpar ||
-               indev->proc.last_obj == dpar) {
-                lv_indev_reset(indev);
-                break;
-            } else {
-                dpar = lv_obj_get_parent(dpar);
-            }
+        if(indev->proc.act_obj == obj || indev->proc.last_obj == obj) {
+            lv_indev_reset(indev);
         }
         indev = lv_indev_next(indev);
     }
@@ -1585,6 +1582,16 @@ static void delete_children(lv_obj_t * obj)
 #if USE_LV_GROUP
    if(obj->group_p != NULL) lv_group_remove_obj(obj);
 #endif
+
+   /* Reset the input devices if
+    * the currently pressed object is deleted*/
+   lv_indev_t * indev = lv_indev_next(NULL);
+   while(indev) {
+       if(indev->proc.act_obj == obj || indev->proc.last_obj == obj) {
+           lv_indev_reset(indev);
+       }
+       indev = lv_indev_next(indev);
+   }
 
    /*Remove the object from parent's children list*/
    lv_obj_t * par = lv_obj_get_parent(obj);

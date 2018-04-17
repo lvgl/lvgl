@@ -81,9 +81,10 @@
 #define USE_LV_REAL_DRAW        1               /*1: Enable function which draw directly to the frame buffer instead of VDB (required if LV_VDB_SIZE = 0)*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
 
-/*Compiler attributes*/
-#define LV_ATTRIBUTE_TICK_INC                 /* Define a custom attribute to tick increment function */
-#define LV_ATTRIBUTE_TASK_HANDLER
+/*Compiler settings*/
+#define LV_ATTRIBUTE_TICK_INC                 /* Define a custom attribute to `lv_tick_inc` function */
+#define LV_ATTRIBUTE_TASK_HANDLER             /* Define a custom attribute to `lv_task_handler` function */
+#define LV_COMPILER_VLA_SUPPORTED    1        /* 1: Variable length array is supported*/
 
 /*================
  *  THEME USAGE
@@ -241,6 +242,13 @@
 
 /*Switch (dependencies: lv_slider)*/
 #define USE_LV_SW       1
+
+/*************************
+ * Non-user section
+ *************************/
+#ifdef _MSC_VER                               /* Disable warnings for Visual Studio*/
+# define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #endif /*LV_CONF_H*/
 

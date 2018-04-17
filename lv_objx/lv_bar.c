@@ -286,10 +286,10 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 
 		if(w >= h) {
 		    indic_area.x2 = (int32_t) ((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
-            indic_area.x2 += indic_area.x1;
+            indic_area.x2 = indic_area.x1 + indic_area.x2 - 1;
 		} else {
 		    indic_area.y1 = (int32_t) ((int32_t)h * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
-            indic_area.y1 = indic_area.y2 - indic_area.y1;
+            indic_area.y1 = indic_area.y2 - indic_area.y1 + 1;
 		}
 
 		/*Draw the indicator*/

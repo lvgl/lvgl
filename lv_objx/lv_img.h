@@ -36,8 +36,8 @@ typedef struct
     /*New data for this type */
     const void * src;             /*Image source: Pointer to an array or a file or a symbol*/
 
-    lv_coord_t w;               /*Width of the image (doubled when upscaled) (Handled by the library)*/
-    lv_coord_t h;               /*Height of the image (doubled when upscaled) (Handled by the library)*/
+    lv_coord_t w;               /*Width of the image (Handled by the library)*/
+    lv_coord_t h;               /*Height of the image (Handled by the library)*/
     uint8_t src_type  :2;       /*See: lv_img_src_t*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
     uint8_t chroma_keyed :1;    /*1: Chroma keyed image, LV_COLOR_TRANSP (lv_conf.h) pixels will be transparent (Handled by the library)*/
@@ -70,8 +70,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img);
 /**
  * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0.
  * Use 'lv_img_set_src()' instead.
- * @param img
- * @param fn
+ * @param img -
+ * @param fn -
  */
 static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
 {
@@ -98,8 +98,8 @@ static inline void lv_img_set_style(lv_obj_t *img, lv_style_t *style)
 
 /**
  * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param img
- * @param upscale
+ * @param img -
+ * @param upscale -
  */
 static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
 {
@@ -147,7 +147,7 @@ static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
 
 /**
  * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param img
+ * @param img -
  * @return false
  */
 static inline bool lv_img_get_upscale(lv_obj_t * img)

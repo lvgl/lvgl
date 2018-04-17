@@ -272,8 +272,11 @@ static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val)
     STYLE_ATTR_ANIM(body.padding.inner, val);
     STYLE_ATTR_ANIM(text.line_space, val);
     STYLE_ATTR_ANIM(text.letter_space, val);
+    STYLE_ATTR_ANIM(text.opa, val);
     STYLE_ATTR_ANIM(line.width, val);
+    STYLE_ATTR_ANIM(line.opa, val);
     STYLE_ATTR_ANIM(image.intense, val);
+    STYLE_ATTR_ANIM(image.opa, val);
 
     lv_opa_t opa = val == LV_STYLE_ANIM_RES ? LV_OPA_COVER : val;
 

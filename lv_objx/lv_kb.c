@@ -387,14 +387,18 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
         return LV_RES_OK;
     }
     else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
-        lv_kb_set_ta(kb, NULL);         /*De-assign the text area*/
         if(ext->hide_action) ext->hide_action(kb);
-        else lv_obj_del(kb);
+        else {
+            lv_kb_set_ta(kb, NULL);         /*De-assign the text area  to hide it cursor if needed*/
+            lv_obj_del(kb);
+        }
         return LV_RES_INV;
     } else if(strcmp(txt, SYMBOL_OK) == 0) {
-        lv_kb_set_ta(kb, NULL);         /*De-assign the text area*/
         if(ext->ok_action) ext->ok_action(kb);
-        else lv_obj_del(kb);
+        else {
+            lv_kb_set_ta(kb, NULL);         /*De-assign the text area to hide it cursor if needed*/
+            lv_obj_del(kb);
+        }
         return LV_RES_INV;
     }
 

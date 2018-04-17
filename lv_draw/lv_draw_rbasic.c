@@ -28,7 +28,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_color_t letter_bg_color = LV_COLOR_WHITE;
+static lv_color_t letter_bg_color;
 
 /**********************
  *      MACROS
