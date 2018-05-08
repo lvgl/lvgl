@@ -29,7 +29,7 @@
 
 #define LABEL_RECOLOR_PAR_LENGTH    6
 
-#define SHADOW_OPA_EXTRA_PRECISION      8       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
+#define SHADOW_OPA_EXTRA_PRECISION      0       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
 #define SHADOW_BOTTOM_AA_EXTRA_RADIUS   3       /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
 /**********************
  *      TYPEDEFS
@@ -1789,7 +1789,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     bool line_ready;
     for(line = 1; line <= radius + swidth; line++) {        /*Check all rows and make the 1D blur to 2D*/
         line_ready = false;
-        for(col = 1; col < radius + swidth + 10; col++) {        /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
+        for(col = 1; col < radius + swidth; col++) {        /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
 
             /*Sum the opacities from the lines above and below this 'row'*/
             int16_t line_rel;
@@ -1806,7 +1806,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
                 }
 
                 /*Add the value of the 1D blur on 'col_rel' position*/
-                if(col_rel < -swidth) {                         /*Outside of the burred area. */
+                if(col_rel < -swidth) {                         /*Outside of the blurred area. */
                     if(line_rel == -swidth) line_ready = true;  /*If no data even on the very first line then it wont't be anything else in this line*/
                     break;                                      /*Break anyway because only smaller 'col_rel' values will come */
                 }
@@ -1815,7 +1815,10 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
             }
 
             line_2d_blur[col] = px_opa_sum >> SHADOW_OPA_EXTRA_PRECISION;
-            if(line_ready) break;
+            if(line_ready) {
+                col++;      /*To make this line to the last one ( drawing will go to '< col')*/
+                break;
+            }
 
         }
 
@@ -1833,11 +1836,13 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
         point_lb.y = ofs_lb.y + line;
 
         uint16_t d;
-        for(d = 1; d <= col; d++) {
+        for(d = 1; d < col; d++) {
 
             if(point_rt.x != point_lt.x) {
                 px_fp(point_lt.x,point_lt.y , mask, style->body.shadow.color, line_2d_blur[d]);
             }
+
+            printf("%d, ", line_2d_blur[d]);
 
             if(point_rb.x != point_lb.x && point_lt.y != point_lb.y) {
                 px_fp(point_lb.x,point_lb.y , mask, style->body.shadow.color, line_2d_blur[d]);
@@ -1856,6 +1861,8 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
             point_rt.x++;
             point_lt.x--;
         }
+
+        printf("\n");
 
         /* Put the first line to the edges too.
          * It is not correct because blur should be done below the corner too
