@@ -273,11 +273,21 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             pad_hor_bg = (lv_area_get_width(&area_bg) - LV_SLIDER_SIZE_MIN) >> 1;
         }
 
-        /*Let space only in the perpendicular directions*/
-        area_bg.x1 += slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
-        area_bg.x2 -= slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
-        area_bg.y1 += slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
-        area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
+        if(ext->knob_in) {  /*Enable extra size if the knob is inside */
+            if(pad_hor_bg < 0) {
+                area_bg.x1 += pad_hor_bg;
+                area_bg.x2 -= pad_hor_bg;
+            }
+            if(pad_ver_bg < 0) {
+                area_bg.y1 += pad_hor_bg;
+                area_bg.y2 -= pad_hor_bg;
+            }
+        } else  { /*Let space only in the perpendicular directions*/
+            area_bg.x1 += slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
+            area_bg.x2 -= slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
+            area_bg.y1 += slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
+            area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
+        }
         lv_draw_rect(&area_bg, mask, style_bg);
 
         /*Draw the indicator*/
