@@ -1842,8 +1842,6 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
                 px_fp(point_lt.x,point_lt.y , mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
-            printf("%d, ", line_2d_blur[d]);
-
             if(point_rb.x != point_lb.x && point_lt.y != point_lb.y) {
                 px_fp(point_lb.x,point_lb.y , mask, style->body.shadow.color, line_2d_blur[d]);
             }
@@ -1861,8 +1859,6 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
             point_rt.x++;
             point_lt.x--;
         }
-
-        printf("\n");
 
         /* Put the first line to the edges too.
          * It is not correct because blur should be done below the corner too
