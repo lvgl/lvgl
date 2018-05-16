@@ -170,6 +170,8 @@ void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action)
 void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    if(ext->sb.mode == sb_mode) return;
+
     ext->sb.mode = sb_mode;
     ext->sb.hor_draw = 0;
     ext->sb.ver_draw = 0;

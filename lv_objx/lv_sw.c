@@ -112,6 +112,8 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
  */
 void lv_sw_on(lv_obj_t *sw)
 {
+	if(lv_sw_get_state(sw)) return;		/*Do nothing is already turned on*/
+
     lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 1);
     lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB,ext->style_knob_on);
@@ -123,6 +125,8 @@ void lv_sw_on(lv_obj_t *sw)
  */
 void lv_sw_off(lv_obj_t *sw)
 {
+	if(!lv_sw_get_state(sw)) return;	/*Do nothing is already turned off*/
+
     lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 0);
     lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB,ext->style_knob_off);

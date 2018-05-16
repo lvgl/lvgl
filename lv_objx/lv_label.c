@@ -253,6 +253,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 void lv_label_set_align(lv_obj_t *label, lv_label_align_t align)
 {
     lv_label_ext_t *ext = lv_obj_get_ext_attr(label);
+    if(ext->align == align) return;
 
     ext->align = align;
 
@@ -268,6 +269,7 @@ void lv_label_set_align(lv_obj_t *label, lv_label_align_t align)
 void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if(ext->recolor == recolor_en) return;
 
     ext->recolor = recolor_en == false ? 0 : 1;
 
@@ -282,6 +284,8 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
 void lv_label_set_no_break(lv_obj_t * label, bool no_break_en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if(ext->no_break == no_break_en) return;
+
     ext->no_break = no_break_en == false ? 0 : 1;
 
     lv_label_refr_text(label);
@@ -295,6 +299,8 @@ void lv_label_set_no_break(lv_obj_t * label, bool no_break_en)
 void lv_label_set_body_draw(lv_obj_t *label, bool body_en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if(ext->body_draw == body_en) return;
+
     ext->body_draw = body_en == false ? 0 : 1;
 
     lv_obj_refresh_ext_size(label);
@@ -310,6 +316,8 @@ void lv_label_set_body_draw(lv_obj_t *label, bool body_en)
 void lv_label_set_anim_speed(lv_obj_t *label, uint16_t anim_speed)
 {
     lv_label_ext_t *ext = lv_obj_get_ext_attr(label);
+    if(ext->anim_speed == anim_speed) return;
+
     ext->anim_speed = anim_speed;
 
     if(ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_SCROLL) {

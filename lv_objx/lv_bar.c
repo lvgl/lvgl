@@ -110,6 +110,8 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 {
 	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+	if(ext->cur_value == value) return;
+
 	ext->cur_value = value > ext->max_value ? ext->max_value : value;
     ext->cur_value = ext->cur_value < ext->min_value ? ext->min_value : ext->cur_value;
 	lv_obj_invalidate(bar);
@@ -125,6 +127,8 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value)
 void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+	if(ext->cur_value == value) return;
+
     int16_t new_value;
     new_value = value > ext->max_value ? ext->max_value : value;
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
@@ -157,6 +161,8 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 {
 	lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+	if(ext->min_value == min && ext->max_value == max) return;
+
 	ext->max_value = max;
 	ext->min_value = min;
 	if(ext->cur_value > max) {

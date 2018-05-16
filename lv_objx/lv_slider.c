@@ -127,6 +127,8 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t action)
 void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+    if(ext->knob_in == in) return;
+
     ext->knob_in = in == false ? 0 : 1;
     lv_obj_invalidate(slider);
 }

@@ -129,6 +129,7 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t po
 void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en)
 {
 	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
+	if(ext->auto_size == autosize_en) return;
 
 	ext->auto_size = autosize_en == false ? 0 : 1;
 
@@ -146,6 +147,7 @@ void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en)
 void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en)
 {
 	lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
+	if(ext->y_inv == yinv_en) return;
 
 	ext->y_inv = yinv_en == false ? 0 : 1;
 
