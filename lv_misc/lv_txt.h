@@ -74,14 +74,14 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font_p,
 /**
  * Give the length of a text with a given font
  * @param txt a '\0' terminate string
- * @param char_num number of characters in 'txt'
- * @param font_p pointer to a font
+ * @param length length of 'txt' in character count and not bytes(UTF-8 can be 1,2,3 or 4 bytes long)
+ * @param font pointer to a font
  * @param letter_space letter space
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t lv_txt_get_width(const char * txt, uint16_t char_num,
-                    const lv_font_t * font_p, lv_coord_t letter_space, lv_txt_flag_t flag);
+lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
+                            const lv_font_t * font, lv_coord_t letter_space, lv_txt_flag_t flag);
 
 /**
  * Check next character in a string and decide if te character is part of the command or not

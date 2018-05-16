@@ -49,6 +49,7 @@ extern "C" {
 #include "lv_objx/lv_lmeter.h"
 #include "lv_objx/lv_sw.h"
 #include "lv_objx/lv_kb.h"
+#include "lv_objx/lv_calendar.h"
 
 /*********************
  *      DEFINES

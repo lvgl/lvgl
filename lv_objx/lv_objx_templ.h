@@ -86,7 +86,7 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *sty
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_btn_get_style(lv_obj_t * templ, lv_templ_style_t type);
+lv_style_t * lv_templ_get_style(lv_obj_t * templ, lv_templ_style_t type);
 
 /*=====================
  * Other functions
