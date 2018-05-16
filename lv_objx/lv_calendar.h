@@ -3,14 +3,6 @@
  *
  */
 
-
-/* TODO Remove these instructions
- * Search an replace: calendar -> object normal name with lower case (e.g. button, label etc.)
- *                    calendar -> object short name with lower case(e.g. btn, label etc)
- *                    CALENDAR -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 #ifndef LV_CALENDAR_H
 #define LV_CALENDAR_H
 
@@ -36,8 +28,8 @@ extern "C" {
 
 typedef struct {
     uint16_t year;
-    uint8_t month;
-    uint8_t day;
+    int8_t month;
+    int8_t day;
 }lv_calendar_date_t;
 
 /*Data of calendar*/
@@ -46,14 +38,15 @@ typedef struct {
     /*New data for this type */
     lv_calendar_date_t today;          /*Date of today*/
     lv_calendar_date_t showed_date;   /*Currently visible month (day is ignored)*/
-    lv_calendar_date_t * marked_days;  /*Apply different style on these days (pointer to an array defined by the user)*/
-    uint8_t marked_days_num;           /*Number of elements in `marked_days`*/
+    lv_calendar_date_t * highlighted_dates;  /*Apply different style on these days (pointer to an array defined by the user)*/
+    uint8_t highlighted_dates_num;           /*Number of elements in `highlighted_days`*/
+    int8_t btn_pressing;					/*-1: prev month pressing, +1 next month pressing on the header*/
 
     /*Styles*/
-    lv_style_t * style_main;
     lv_style_t * style_header;
+    lv_style_t * style_header_pr;
     lv_style_t * style_day_names;
-    lv_style_t * style_marked_days;
+    lv_style_t * style_highlighted;
     lv_style_t * style_inactive_days;
     lv_style_t * style_week_box;
     lv_style_t * style_today_box;
@@ -63,8 +56,9 @@ typedef struct {
 typedef enum {
     LV_CALENDAR_STYLE_BG,       /*Also the style of the "normal" date numbers*/
     LV_CALENDAR_STYLE_HEADER,
+    LV_CALENDAR_STYLE_HEADER_PR,
     LV_CALENDAR_STYLE_DAY_NAMES,
-    LV_CALENDAR_STYLE_MARKED_DAYS,
+    LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS,
     LV_CALENDAR_STYLE_INACTIVE_DAYS,
     LV_CALENDAR_STYLE_WEEK_BOX,
     LV_CALENDAR_STYLE_TODAY_BOX,
@@ -93,6 +87,28 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy);
  *====================*/
 
 /**
+ * Set the today's date
+ * @param calendar pointer to a calendar object
+ * @param today pointer to an `lv_calendar_date_t` variable containing the date of today. The value will be saved it can be local variable too.
+ */
+void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today);
+
+/**
+ * Set the currently showed
+ * @param calendar pointer to a calendar object
+ * @param showed pointer to an `lv_calendar_date_t` variable containing the date to show. The value will be saved it can be local variable too.
+ */
+void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed);
+
+/**
+ * Set the the highlighted dates
+ * @param calendar pointer to a calendar object
+ * @param highlighted pointer to an `lv_calendar_date_t` array containing the dates. ONLY A POINTER WILL BE SAVED! CAN'T BE LOCAL ARRAY.
+ * @param data_num number of dates in the array
+ */
+void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num);
+
+/**
  * Set a style of a calendar.
  * @param calendar pointer to calendar object
  * @param type which style should be set
@@ -105,12 +121,40 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
  *====================*/
 
 /**
+ * Get the today's date
+ * @param calendar pointer to a calendar object
+ * @return return pointer to an `lv_calendar_date_t` variable containing the date of today.
+ */
+lv_calendar_date_t * lv_calendar_get_today_date(lv_obj_t * calendar);
+
+/**
+ * Get the currently showed
+ * @param calendar pointer to a calendar object
+ * @return pointer to an `lv_calendar_date_t` variable containing the date is being shown.
+ */
+lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed);
+
+/**
+ * Get the the highlighted dates
+ * @param calendar pointer to a calendar object
+ * @return pointer to an `lv_calendar_date_t` array containing the dates.
+ */
+lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num);
+
+/**
+ * Get the number of the highlighted dates
+ * @param calendar pointer to a calendar object
+ * @return number of highlighted days
+ */
+uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num);
+
+/**
  * Get style of a calendar.
  * @param calendar pointer to calendar object
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_btn_get_style(lv_obj_t * calendar, lv_calendar_style_t type);
+lv_style_t * lv_calendar_get_style(lv_obj_t * calendar, lv_calendar_style_t type);
 
 /*=====================
  * Other functions

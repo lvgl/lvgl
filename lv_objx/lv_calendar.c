@@ -3,13 +3,6 @@
  *
  */
 
-/* TODO Remove these instructions
- * Search an replace: calendar -> object normal name with lower case (e.g. button, label etc.)
- *                    calendar -> object short name with lower case(e.g. btn, label etc)
- *                    CALENDAR -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 /*********************
  *      INCLUDES
  *********************/
@@ -18,6 +11,9 @@
 
 #include "lv_calendar.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_hal/lv_hal_indev.h"
+#include "../lv_misc/lv_math.h"
+#include "../lv_core/lv_indev.h"
 
 /*********************
  *      DEFINES
@@ -38,13 +34,13 @@ typedef enum
  **********************/
 static bool lv_calendar_design(lv_obj_t * calendar, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void * param);
-
 static lv_coord_t get_header_height(lv_obj_t * calendar);
 static void draw_header(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_days(lv_obj_t * calendar, const lv_area_t * mask);
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
-static const char * get_month_name(int32_t year, int32_t month);
+static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int32_t day);
+static const char * get_month_name(int32_t month);
 static uint8_t get_month_length(int32_t year, int32_t month);
 static uint8_t is_leap_year(uint32_t year);
 
@@ -57,6 +53,7 @@ static const char * day_name[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sa
 static const char * month_name[12] = {"January",   "February",   "March",    "April",
                                       "May",       "June",       "July",     "August",
                                       "September", "October",    "November", "December"};
+
 /**********************
  *      MACROS
  **********************/
@@ -85,16 +82,18 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->today.year = 2018;
-    ext->today.month= 5;
-    ext->today.day= 4;
+    ext->today.month= 1;
+    ext->today.day= 1;
 
     ext->showed_date.year = 2018;
-    ext->showed_date.month = 5;
-    ext->showed_date.day= 4;
+    ext->showed_date.month = 1;
+    ext->showed_date.day= 1;
 
-    ext->style_main = &lv_style_pretty;
+    ext->highlighted_dates  = NULL;
+    ext->highlighted_dates_num = 0;
     ext->style_header = &lv_style_plain_color;
-    ext->style_marked_days = &lv_style_plain_color;
+    ext->style_header_pr = &lv_style_pretty_color;
+    ext->style_highlighted = &lv_style_plain_color;
     ext->style_inactive_days = &lv_style_btn_ina;
     ext->style_week_box = &lv_style_plain_color;
     ext->style_today_box = &lv_style_pretty_color;
@@ -106,6 +105,8 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new calendar calendar*/
     if(copy == NULL) {
+    	lv_obj_set_size(new_calendar, LV_DPI * 2, LV_DPI * 2);
+    	lv_obj_set_style(new_calendar, &lv_style_pretty);
 
     }
     /*Copy an existing calendar*/
@@ -132,10 +133,50 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
  * Setter functions
  *====================*/
 
-/*
- * New object specific "set" functions come here
+/**
+ * Set the today's date
+ * @param calendar pointer to a calendar object
+ * @param today pointer to an `lv_calendar_date_t` variable containing the date of today. The value will be saved it can be local variable too.
  */
+void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    ext->today.year = today->year;
+    ext->today.month = today->month;
+    ext->today.day = today->day;
 
+    lv_obj_invalidate(calendar);
+}
+
+/**
+ * Set the currently showed
+ * @param calendar pointer to a calendar object
+ * @param showed pointer to an `lv_calendar_date_t` variable containing the date to show. The value will be saved it can be local variable too.
+ */
+void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    ext->showed_date.year = showed->year;
+    ext->showed_date.month = showed->month;
+    ext->showed_date.day = showed->day;
+
+    lv_obj_invalidate(calendar);
+}
+
+/**
+ * Set the the highlighted dates
+ * @param calendar pointer to a calendar object
+ * @param highlighted pointer to an `lv_calendar_date_t` array containing the dates. ONLY A POINTER WILL BE SAVED! CAN'T BE LOCAL ARRAY.
+ * @param data_num number of dates in the array
+ */
+void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    ext->highlighted_dates = highlighted;
+    ext->highlighted_dates_num = data_num;
+
+    lv_obj_invalidate(calendar);
+}
 
 /**
  * Set a style of a calendar.
@@ -149,7 +190,7 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
 
     switch (type) {
         case LV_CALENDAR_STYLE_BG:
-            ext->style_main = style;
+            lv_obj_set_style(calendar, style);
             break;
         case LV_CALENDAR_STYLE_DAY_NAMES:
             ext->style_day_names = style;
@@ -157,8 +198,11 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
         case LV_CALENDAR_STYLE_HEADER:
             ext->style_header = style;
             break;
-        case LV_CALENDAR_STYLE_MARKED_DAYS:
-            ext->style_marked_days = style;
+        case LV_CALENDAR_STYLE_HEADER_PR:
+            ext->style_header_pr = style;
+            break;
+        case LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS:
+            ext->style_highlighted = style;
             break;
         case LV_CALENDAR_STYLE_INACTIVE_DAYS:
             ext->style_inactive_days = style;
@@ -170,15 +214,58 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
             ext->style_week_box = style;
             break;
     }
+
+    lv_obj_invalidate(calendar);
 }
 
 /*=====================
  * Getter functions
  *====================*/
 
-/*
- * New object specific "get" functions come here
+
+/**
+ * Get the today's date
+ * @param calendar pointer to a calendar object
+ * @return return pointer to an `lv_calendar_date_t` variable containing the date of today.
  */
+lv_calendar_date_t * lv_calendar_get_today_date(lv_obj_t * calendar)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    return &ext->today;
+}
+
+/**
+ * Get the currently showed
+ * @param calendar pointer to a calendar object
+ * @return pointer to an `lv_calendar_date_t` variable containing the date is being shown.
+ */
+lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    return &ext->showed_date;
+}
+
+/**
+ * Get the the highlighted dates
+ * @param calendar pointer to a calendar object
+ * @return pointer to an `lv_calendar_date_t` array containing the dates.
+ */
+lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    return ext->highlighted_dates;
+}
+
+/**
+ * Get the number of the highlighted dates
+ * @param calendar pointer to a calendar object
+ * @return number of highlighted days
+ */
+uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    return ext->highlighted_dates_num;
+}
 
 /**
  * Get style of a calendar.
@@ -191,11 +278,12 @@ lv_style_t * lv_calendar_get_style(lv_obj_t * calendar, lv_calendar_style_t type
     lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
 
     switch (type) {
-        case LV_CALENDAR_STYLE_BG:              return ext->style_main;
+        case LV_CALENDAR_STYLE_BG:              return  lv_obj_get_style(calendar);
         case LV_CALENDAR_STYLE_HEADER:          return ext->style_header;
+        case LV_CALENDAR_STYLE_HEADER_PR:       return ext->style_header_pr;
         case LV_CALENDAR_STYLE_DAY_NAMES:       return ext->style_day_names;
-        case LV_CALENDAR_STYLE_MARKED_DAYS:     return ext->style_marked_days;
-        case LV_CALENDAR_STYLE_INACTIVE_DAYS:     return ext->style_inactive_days;
+        case LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS:     return ext->style_highlighted;
+        case LV_CALENDAR_STYLE_INACTIVE_DAYS:   return ext->style_inactive_days;
         case LV_CALENDAR_STYLE_WEEK_BOX:        return ext->style_week_box;
         case LV_CALENDAR_STYLE_TODAY_BOX:       return ext->style_today_box;
         default: return NULL;
@@ -235,8 +323,7 @@ static bool lv_calendar_design(lv_obj_t * calendar, const lv_area_t * mask, lv_d
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        lv_draw_rect(&calendar->coords, mask, ext->style_main);
+        lv_draw_rect(&calendar->coords, mask, lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG));
 
         draw_header(calendar, mask);
         draw_day_names(calendar, mask);
@@ -270,6 +357,78 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
+    else if(sign == LV_SIGNAL_PRESSING) {
+    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    	lv_area_t header_area;
+    	lv_area_copy(&header_area, &calendar->coords);
+    	header_area.y2 = header_area.y1 + get_header_height(calendar);
+    	lv_indev_t * indev = lv_indev_get_act();
+    	lv_point_t p;
+    	lv_indev_get_point(indev, &p);
+
+    	if(lv_area_is_point_on(&header_area, &p)) {
+    		if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
+    			if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
+    			ext->btn_pressing = -1;
+    		} else {
+    			if(ext->btn_pressing != 1) lv_obj_invalidate(calendar);
+    			ext->btn_pressing = 1;
+    		}
+    	} else {
+			if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
+    		ext->btn_pressing = 0;
+    	}
+    }
+    else if(sign == LV_SIGNAL_PRESS_LOST) {
+    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+		ext->btn_pressing = 0;
+		lv_obj_invalidate(calendar);
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
+    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    	if(ext->btn_pressing < 0) {
+    		if(ext->showed_date.month <= 1) {
+    			ext->showed_date.month = 12;
+    			ext->showed_date.year --;
+    		} else {
+    			ext->showed_date.month --;
+    		}
+    	}
+    	else if(ext->btn_pressing >	 0) {
+    		if(ext->showed_date.month >= 12) {
+    			ext->showed_date.month = 1;
+    			ext->showed_date.year ++;
+    		} else {
+    			ext->showed_date.month ++;
+    		}
+    	}
+
+		ext->btn_pressing = 0;
+		lv_obj_invalidate(calendar);
+
+    }
+    else if(sign == LV_SIGNAL_CONTROLL) {
+    	uint8_t c = *((uint8_t*) param);
+    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    	if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+       		if(ext->showed_date.month >= 12) {
+				ext->showed_date.month = 1;
+				ext->showed_date.year ++;
+			} else {
+				ext->showed_date.month ++;
+			}
+    		lv_obj_invalidate(calendar);
+    	}
+    	else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+    		if(ext->showed_date.month <= 1) {
+				ext->showed_date.month = 12;
+				ext->showed_date.year --;
+			} else {
+				ext->showed_date.month --;
+			}
+    		lv_obj_invalidate(calendar);
+    	}
+    }
     else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
@@ -282,7 +441,11 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     return res;
 }
 
-
+/**
+ * Get the height of a calendar's header based on it's style
+ * @param calendar point to a calendar
+ * @return the header's height
+ */
 static lv_coord_t get_header_height(lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
@@ -290,6 +453,11 @@ static lv_coord_t get_header_height(lv_obj_t * calendar)
     return lv_font_get_height(ext->style_header->text.font) + ext->style_header->body.padding.ver * 2;
 }
 
+/**
+ * Draw the calendar header with month name and arrows
+ * @param calendar point to a calendar
+ * @param mask a mask for drawing
+ */
 static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
@@ -303,19 +471,28 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_rect(&header_area, mask, ext->style_header);
 
     /*Add the month name*/
-//    lv_point_t txt_size;
-//    lv_txt_get_size(&txt_size, month_name[ext->showed_month.month - 1], ext->style_header->text.font,
-//                     ext->style_header->text.letter_space, ext->style_header->text.line_space,  lv_obj_get_width(calendar), LV_TXT_FLAG_NONE);
-
-
     header_area.y1 += ext->style_header->body.padding.ver;
-    header_area.y2 += ext->style_header->body.padding.ver;
-    lv_draw_label(&header_area, mask, ext->style_header, month_name[ext->showed_date.month - 1], LV_TXT_FLAG_CENTER, NULL);
+    lv_draw_label(&header_area, mask, ext->style_header, get_month_name(ext->showed_date.month), LV_TXT_FLAG_CENTER, NULL);
 
-//    lv_coord_t * text_h = lv_
+    /*Add the left arrow*/
+    lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
+    header_area.x1 += ext->style_header->body.padding.hor;
+    lv_draw_label(&header_area, mask, arrow_style, SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL);
+
+    /*Add the right arrow*/
+    arrow_style = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
+    header_area.x1 = header_area.x2 - ext->style_header->body.padding.hor -
+    		         lv_txt_get_width(SYMBOL_RIGHT, 1, arrow_style->text.font,
+    		        		          arrow_style->text.line_space, LV_TXT_FLAG_NONE);
+    lv_draw_label(&header_area, mask, arrow_style, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
 
 }
 
+/**
+ * Draw the day's name below the header
+ * @param calendar point to a calendar
+ * @param mask a mask for drawing
+ */
 static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
@@ -335,32 +512,38 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
 
 }
 
+/**
+ * Draw the date numbers in a matrix
+ * @param calendar point to a calendar
+ * @param mask a mask for drawing
+ */
 static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-
-    lv_coord_t hpad = ext->style_day_names->body.padding.hor;
+    lv_style_t * style_bg = lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG);
+    lv_coord_t hpad = style_bg->body.padding.hor;
     lv_area_t label_area;
     label_area.y1 = calendar->coords.y1 + get_header_height(calendar) +
                     ext->style_day_names->body.padding.ver + lv_font_get_height(ext->style_day_names->text.font) +
-                    ext->style_main->body.padding.ver;
+                    style_bg->body.padding.ver;
     label_area.y2 = label_area.y1 + lv_font_get_height(ext->style_day_names->text.font);
 
     lv_coord_t w = lv_obj_get_width(calendar) - 2 * hpad;
-    lv_coord_t h = calendar->coords.y2 - label_area.y1 - ext->style_main->body.padding.ver;
+    lv_coord_t h = calendar->coords.y2 - label_area.y1 - style_bg->body.padding.ver;
     lv_coord_t box_w = w / 7;
-    lv_coord_t vert_space = (h - (6 * lv_font_get_height(ext->style_main->text.font))) / 5;
+    lv_coord_t vert_space = (h - (6 * lv_font_get_height(style_bg->text.font))) / 5;
 
     uint32_t week;
     uint8_t day_cnt;
     uint8_t month_start_day = get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
     day_draw_state_t draw_state;    /*true: Not the prev. or next month is drawn*/
     lv_style_t * act_style;
+
     /*If starting with the first day of the week then the previous month is not visible*/
     if(month_start_day == 0) {
         day_cnt = 1;
         draw_state = DAY_DRAW_ACT_MONTH;
-        act_style = ext->style_main;
+        act_style = style_bg;
     } else {
         draw_state = DAY_DRAW_PREV_MONTH;
         day_cnt = get_month_length(ext->showed_date.year, ext->showed_date.month - 1); /*Length of the previous month*/
@@ -369,38 +552,48 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     }
 
 
-    bool today_shown = false;
+    bool month_of_today_shown = false;
     if(ext->showed_date.year ==  ext->today.year &&
        ext->showed_date.month ==  ext->today.month)
     {
-        today_shown = true;
+        month_of_today_shown = true;
     }
 
     char buf[3];
+    bool in_week_box = false;
+
+    /*Draw 6 weeks*/
     for(week = 0; week < 6; week++) {
 
-        if(today_shown &&
+    	/*Draw the "week box"*/
+        if(month_of_today_shown &&
           ((draw_state == DAY_DRAW_ACT_MONTH  && ext->today.day >= day_cnt && ext->today.day < day_cnt + 7) ||
-           (draw_state == DAY_DRAW_PREV_MONTH && ext->today.day <= 7)))
+           (draw_state == DAY_DRAW_PREV_MONTH && ext->today.day <= 7 - month_start_day && week == 0)))
         {
             lv_area_t week_box_area;
             lv_area_copy(&week_box_area, &label_area);      /*'label_area' is already set for this row*/
-            week_box_area.x1 = calendar->coords.x1 + ext->style_main->body.padding.hor - ext->style_week_box->body.padding.hor;
-            week_box_area.x2 = calendar->coords.x2 - ext->style_main->body.padding.hor + ext->style_week_box->body.padding.hor;
+            week_box_area.x1 = calendar->coords.x1 + style_bg->body.padding.hor - ext->style_week_box->body.padding.hor;
+            week_box_area.x2 = calendar->coords.x2 - style_bg->body.padding.hor + ext->style_week_box->body.padding.hor;
 
             week_box_area.y1 -= ext->style_week_box->body.padding.ver;
             week_box_area.y2 += ext->style_week_box->body.padding.ver;
             lv_draw_rect(&week_box_area, mask, ext->style_week_box);
+
+            in_week_box = true;
+        } else {
+        	in_week_box = false;
         }
 
-
+        /*Draw the 7 days of a week*/
         uint32_t day;
         for(day = 0; day < 7; day++) {
+        	/*The previous month is over*/
             if(draw_state == DAY_DRAW_PREV_MONTH && day == month_start_day) {
                 draw_state = DAY_DRAW_ACT_MONTH;
                 day_cnt = 1;
-                act_style = ext->style_main;
+                act_style = style_bg;
             }
+            /*The current month is over*/
             if(draw_state == DAY_DRAW_ACT_MONTH &&
                day_cnt > get_month_length(ext->showed_date.year, ext->showed_date.month))
             {
@@ -409,11 +602,11 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
                 act_style = ext->style_inactive_days;
             }
 
-
             label_area.x1 = calendar->coords.x1 + (w * day) / 7 + hpad;
             label_area.x2 = label_area.x1 + box_w;
 
-            if(draw_state == DAY_DRAW_ACT_MONTH && today_shown && ext->today.day == day_cnt) {
+            /*Draw the "tiday box"*/
+            if(draw_state == DAY_DRAW_ACT_MONTH && month_of_today_shown && ext->today.day == day_cnt) {
                 lv_area_t today_box_area;
                 lv_area_copy(&today_box_area, &label_area);
                 today_box_area.x1 = label_area.x1;
@@ -424,34 +617,104 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
                 lv_draw_rect(&today_box_area, mask, ext->style_today_box);
             }
 
+            /*Get the final style : highlighted/week box/today box/normal*/
+            lv_style_t * final_style;
+            if (draw_state == DAY_DRAW_PREV_MONTH &&
+            		is_highlighted(calendar, ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0),
+            				ext->showed_date.month == 1 ? 12 : ext->showed_date.month - 1,
+            						day_cnt))
+            {
+            	final_style = ext->style_highlighted;
+            }
+            else if (draw_state == DAY_DRAW_ACT_MONTH &&
+            		is_highlighted(calendar, ext->showed_date.year,
+            				ext->showed_date.month,
+							day_cnt))
+            {
+            	final_style = ext->style_highlighted;
+            }
+            else if (draw_state == DAY_DRAW_NEXT_MONTH &&
+            		is_highlighted(calendar, ext->showed_date.year + (ext->showed_date.month == 12 ? 1 : 0),
+            				ext->showed_date.month == 12 ? 1 : ext->showed_date.month + 1,
+            						day_cnt))
+            {
+            	final_style = ext->style_highlighted;
+            }
+            else if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH) final_style = ext->style_today_box;
+            else if (in_week_box && draw_state == DAY_DRAW_ACT_MONTH) final_style = ext->style_week_box;
+            else final_style = act_style;
 
-            sprintf(buf, "%d", day_cnt);
-            lv_draw_label(&label_area, mask, act_style, buf, LV_TXT_FLAG_CENTER, NULL);
+            /*Write the day's number*/
+            lv_math_num_to_str(day_cnt, buf);
+            lv_draw_label(&label_area, mask, final_style, buf, LV_TXT_FLAG_CENTER, NULL);
 
+            /*Go to the next day*/
             day_cnt ++;
 
         }
 
-        label_area.y1 += vert_space + lv_font_get_height(ext->style_main->text.font);
-        label_area.y2 += vert_space + lv_font_get_height(ext->style_main->text.font);
+        /*Got to the next weeks row*/
+        label_area.y1 += vert_space + lv_font_get_height(style_bg->text.font);
+        label_area.y2 += vert_space + lv_font_get_height(style_bg->text.font);
     }
 }
 
-static const char * get_month_name(int32_t year, int32_t month)
+/**
+ * Check weather a date is highlighted or not
+ * @param calendar pointer to a calendar object
+ * @param year a year
+ * @param month a  month [1..12]
+ * @param day a day [1..31]
+ * @return true: highlighted
+ */
+static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int32_t day)
+{
+	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+
+	if(ext->highlighted_dates == NULL || ext->highlighted_dates_num == 0) return false;
+
+	uint32_t i;
+	for(i = 0; i < ext->highlighted_dates_num; i++) {
+		if(ext->highlighted_dates[i].year == year &&
+			ext->highlighted_dates[i].month == month &&
+			ext->highlighted_dates[i].day == day)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Get the month name
+ * @param month a month. The range is basically [1..12] but [-11..1] is also supported to handle previous year
+ * @return
+ */
+static const char * get_month_name(int32_t month)
 {
     month --;   /*Range of months id [1..12] but range of indexes is [0..11]*/
-    if(month <=0) year--;   /*Already in the previous year (won't be less then -12 to skip a whole year)*/
-    if(month > 12) year++;  /*ALready in the next year (won't be more then 12 to skip a whole year)*/
-    month = month % 12;
+    if(month < 0) month = 12 + month;
     return month_name[month];
 }
 
+/**
+ * Get the number of days in a month
+ * @param year a year
+ * @param month a month. The range is basically [1..12] but [-11..1] is also supported to handle previous year
+ * @return [28..31]
+ */
 static uint8_t get_month_length(int32_t year, int32_t month)
 {
     month --;   /*Range of months id [1..12] but range of indexes is [0..11]*/
-    if(month <=0) year--;   /*Already in the previous year (won't be less then -12 to skip a whole year)*/
-    if(month > 12) year++;  /*ALready in the next year (won't be more then 12 to skip a whole year)*/
-    month = month % 12;
+    if(month < 0) {
+    	year--;   /*Already in the previous year (won't be less then -12 to skip a whole year)*/
+    	month = 12 + month;	/*`month` is negative, the result will be < 12*/
+    }
+    if(month >= 12) {
+    	year ++;
+    	month -= 12;
+    }
 
     /*month == 1 is february*/
     return (month == 1) ? (28 + is_leap_year(year)) : 31 - month % 7 % 2;
@@ -459,11 +722,23 @@ static uint8_t get_month_length(int32_t year, int32_t month)
 
 }
 
+/**
+ * Tells whether a year is leap year or not
+ * @param year a year
+ * @return 0: not leap year; 1: leap year
+ */
 static uint8_t is_leap_year(uint32_t year)
 {
     return (year % 4) || ((year % 100 == 0) && (year % 400)) ? 0 : 1;
 }
 
+/**
+ * Get the day of the week
+ * @param year a year
+ * @param month a  month
+ * @param day a day
+ * @return [0..6] which means [Sun..Sat]
+ */
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
 {
     uint32_t a = month < 3 ? 1 : 0;
