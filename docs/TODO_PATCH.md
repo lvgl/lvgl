@@ -11,6 +11,17 @@ Please create an issue to introduce a bug instead of adding pull request to this
 - [x] lv_conf.h: add LV_COMPILER_VLA_SUPPORTED
 - [x] lv_group_create: init focus_cb
 - [x] fix of 16 bit image drawing with alpha bytes
+- [x] fix text opacity
+- [x] lv_mbox: enable navigation with LV_GROUP_KEY_DOWN/UP too
+- [x] lv_conf.h: add LV_COMPILER_VLA_SUPPORTED
+- [x] lv_slider: inicator draw bugfix
+- [x] lv_slider: draw greater background on negative padding if knob_in == 1
+- [x] mono theme: fix typo
+- [x] style animations: add opacity handling to image, text and line
+- [x] lv_kb: before ok/close action don't deassign the lv_ta if there is user defined action
+- [x] in lv_objx_set_... functions apply the new value only if it's different from the current
+- [x] don't invalide hidden objects
+- [x] lv_group_del: remove the objects from the groups too
 
 ## v5.0.3 (released on: 09.03.2018)
 - [x] lv_chart: Fix the use of point_num more then 256 (Thanks to upbeat27) 
