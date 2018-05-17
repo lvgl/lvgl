@@ -70,7 +70,7 @@ void lv_refr_init(void)
 
     lv_task_t* task;
     task = lv_task_create(lv_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
-    lv_mem_assert(task);
+    lv_task_ready(task);        /*Be sure the screen will be refreshed immediately on start up*/
 }
 
 /**
@@ -168,6 +168,8 @@ void lv_refr_pop_from_buf(uint16_t num)
  */
 static void lv_refr_task(void * param)
 {
+
+    printf("refr\n");
     (void)param;
 
     uint32_t start = lv_tick_get();
