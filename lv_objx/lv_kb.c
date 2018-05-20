@@ -146,6 +146,7 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     lv_cursor_type_t cur_type;
 
+    /*Hide the cursor of the old Text area if cursor management is enabled*/
     if(ext->ta && ext->cursor_mng) {
         cur_type = lv_ta_get_cursor_type(ext->ta);
         lv_ta_set_cursor_type(ext->ta,  cur_type | LV_CURSOR_HIDDEN);
@@ -153,6 +154,7 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
 
     ext->ta = ta;
 
+    /*Show the cursor of the new Text area if cursor management is enabled*/
     if(ext->ta && ext->cursor_mng) {
         cur_type = lv_ta_get_cursor_type(ext->ta);
         lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
@@ -167,6 +169,8 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
 void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+    if(ext->mode == mode) return;
+
     ext->mode = mode;
     if(mode == LV_KB_MODE_TEXT) lv_btnm_set_map(kb, kb_map_lc);
     else if(mode == LV_KB_MODE_NUM) lv_btnm_set_map(kb, kb_map_num);
@@ -181,6 +185,8 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+    if(ext->cursor_mng == en) return;
+
     ext->cursor_mng = en == false? 0 : 1;
 
     if(ext->ta) {
@@ -387,14 +393,18 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
         return LV_RES_OK;
     }
     else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
-        lv_kb_set_ta(kb, NULL);         /*De-assign the text area*/
         if(ext->hide_action) ext->hide_action(kb);
-        else lv_obj_del(kb);
+        else {
+            lv_kb_set_ta(kb, NULL);         /*De-assign the text area  to hide it cursor if needed*/
+            lv_obj_del(kb);
+        }
         return LV_RES_INV;
     } else if(strcmp(txt, SYMBOL_OK) == 0) {
-        lv_kb_set_ta(kb, NULL);         /*De-assign the text area*/
         if(ext->ok_action) ext->ok_action(kb);
-        else lv_obj_del(kb);
+        else {
+            lv_kb_set_ta(kb, NULL);         /*De-assign the text area to hide it cursor if needed*/
+            lv_obj_del(kb);
+        }
         return LV_RES_INV;
     }
 

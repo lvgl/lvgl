@@ -47,6 +47,7 @@ lv_group_t * lv_group_create(void)
     group->style_mod = style_mod_def;
     group->obj_focus = NULL;
     group->frozen = 0;
+    group->focus_cb = NULL;
 
     return group;
 }
@@ -57,6 +58,18 @@ lv_group_t * lv_group_create(void)
  */
 void lv_group_del(lv_group_t * group)
 {
+	/*Defocus the the currently focussed object*/
+    if(group->obj_focus != NULL) {
+        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        lv_obj_invalidate(*group->obj_focus);
+    }
+
+	/*Remove the objects from the group*/
+	lv_obj_t ** obj;
+	LL_READ(group->obj_ll, obj) {
+		(*obj)->group_p = NULL;
+	}
+
     lv_ll_clear(&(group->obj_ll));
     lv_mem_free(group);
 }
@@ -88,6 +101,10 @@ void lv_group_remove_obj(lv_obj_t * obj)
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
 
+    if(*g->obj_focus == obj) {
+         lv_group_focus_next(g);
+     }
+
     /*Search the object and remove it from its group */
     lv_obj_t ** i;
     LL_READ(g->obj_ll, i) {
@@ -96,11 +113,6 @@ void lv_group_remove_obj(lv_obj_t * obj)
             lv_mem_free(i);
             obj->group_p = NULL;
         }
-    }
-
-    if(*g->obj_focus == obj) {
-        g->obj_focus = NULL;
-        lv_group_focus_next(g);
     }
 }
 
@@ -116,7 +128,6 @@ void lv_group_focus_obj(lv_obj_t * obj)
     if(g->frozen != 0) return;
 
     lv_obj_t ** i;
-
     LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             if(g->obj_focus != NULL) {

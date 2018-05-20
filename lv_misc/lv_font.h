@@ -50,7 +50,7 @@ typedef struct _lv_font_struct
     const lv_font_glyph_dsc_t * glyph_dsc;
     const uint32_t * unicode_list;
     const uint8_t * (*get_bitmap)(const struct _lv_font_struct * ,uint32_t);    /*Get a glyph's  bitmap from a font*/
-    const int16_t (*get_width)(const struct _lv_font_struct * ,uint32_t);       /*Get a glyph's with with a given font*/
+    int16_t (*get_width)(const struct _lv_font_struct * ,uint32_t);       /*Get a glyph's with with a given font*/
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
     uint32_t bpp   :4;                     /*Bit per pixel: 1, 2 or 4*/
 }lv_font_t;
@@ -126,7 +126,7 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
  * @param unicode_letter an unicode letter which width should be get
  * @return width of the gylph or -1 if not found
  */
-const int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unicode_letter);
+int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unicode_letter);
 
 /**
  * Generic glyph width get function used in 'font->get_bitmap' when the font NOT contains all characters in the range (sparse)
@@ -134,7 +134,7 @@ const int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unic
  * @param unicode_letter an unicode letter which width should be get
  * @return width of the glyph or -1 if not found
  */
-const int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter);
+int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter);
 
 /**********************
  *      MACROS

@@ -283,10 +283,10 @@ static void gauge_init(void)
 
     lv_style_copy(&gauge, &def);
     gauge.line.color = lv_color_hsv_to_rgb(_hue, 50, 70);
-    gauge.line.width = 2;
+    gauge.line.width = 1;
     gauge.body.main_color = LV_COLOR_HEX3(0x999);
     gauge.body.grad_color = gauge.body.main_color;
-    gauge.body.padding.hor = LV_DPI / 12;
+    gauge.body.padding.hor = LV_DPI / 16;
     gauge.body.border.color = LV_COLOR_HEX3(0x666);     /*Needle middle color*/
 
     theme.gauge = &gauge;

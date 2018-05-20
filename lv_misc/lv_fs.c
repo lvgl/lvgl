@@ -163,7 +163,7 @@ lv_fs_res_t lv_fs_remove (const char * path)
 lv_fs_res_t lv_fs_read (lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     if(br != NULL) *br = 0;
-    if(file_p->drv == NULL || file_p->drv == NULL) return LV_FS_RES_INV_PARAM;
+    if(file_p->drv == NULL) return LV_FS_RES_INV_PARAM;
     if(file_p->drv->read == NULL) return LV_FS_RES_NOT_IMP;
     
     uint32_t br_tmp = 0;
@@ -185,7 +185,7 @@ lv_fs_res_t lv_fs_write (lv_fs_file_t * file_p, const void * buf, uint32_t btw, 
 {
     if(bw != NULL) *bw = 0;
     
-    if(file_p->drv == NULL || file_p->drv == NULL) {
+    if(file_p->drv == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
     
@@ -208,7 +208,7 @@ lv_fs_res_t lv_fs_write (lv_fs_file_t * file_p, const void * buf, uint32_t btw, 
  */
 lv_fs_res_t lv_fs_seek (lv_fs_file_t * file_p, uint32_t pos)
 {
-    if(file_p->drv == NULL || file_p->drv == NULL) {
+    if(file_p->drv == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
     
@@ -229,7 +229,7 @@ lv_fs_res_t lv_fs_seek (lv_fs_file_t * file_p, uint32_t pos)
  */
 lv_fs_res_t lv_fs_tell (lv_fs_file_t * file_p, uint32_t  * pos)
 {
-    if(file_p->drv == NULL || file_p->drv == NULL) {
+    if(file_p->drv == NULL) {
         pos = 0;
         return LV_FS_RES_INV_PARAM;
     }
@@ -252,7 +252,7 @@ lv_fs_res_t lv_fs_tell (lv_fs_file_t * file_p, uint32_t  * pos)
  */
 lv_fs_res_t lv_fs_size (lv_fs_file_t * file_p, uint32_t * size)
 {
-    if(file_p->drv == NULL || file_p->drv == NULL) {
+    if(file_p->drv == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
 

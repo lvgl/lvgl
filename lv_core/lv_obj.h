@@ -429,7 +429,7 @@ void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp);
  * Allocate a new ext. data for an object
  * @param obj pointer to an object
  * @param ext_size the size of the new ext. data
- * @return Normal pointer to the allocated ext
+ * @return pointer to the allocated ext
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 

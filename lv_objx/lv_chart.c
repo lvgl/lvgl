@@ -159,6 +159,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 void lv_chart_set_div_line_count(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if(ext->hdiv_cnt == hdiv && ext->vdiv_cnt == vdiv) return;
 
 	ext->hdiv_cnt = hdiv;
 	ext->vdiv_cnt = vdiv;
@@ -175,6 +176,7 @@ void lv_chart_set_div_line_count(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv)
 void lv_chart_set_range(lv_obj_t * chart, lv_coord_t ymin, lv_coord_t ymax)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if(ext->ymin == ymin && ext->ymax == ymax) return;
 
 	ext->ymin = ymin;
 	ext->ymax = ymax;
@@ -190,6 +192,8 @@ void lv_chart_set_range(lv_obj_t * chart, lv_coord_t ymin, lv_coord_t ymax)
 void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if(ext->type == type) return;
+
 	ext->type = type;
 
 	lv_chart_refresh(chart);
@@ -203,6 +207,8 @@ void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type)
 void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if(ext->point_cnt == point_cnt) return;
+
 	lv_chart_series_t *ser;
 	uint16_t point_cnt_old = ext->point_cnt;
 	uint16_t i;
@@ -233,6 +239,8 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 void lv_chart_set_series_opa(lv_obj_t * chart, lv_opa_t opa)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(ext->series.opa == opa) return;
+
     ext->series.opa = opa;
     lv_obj_invalidate(chart);
 }
@@ -245,6 +253,8 @@ void lv_chart_set_series_opa(lv_obj_t * chart, lv_opa_t opa)
 void lv_chart_set_series_width(lv_obj_t * chart, lv_coord_t width)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(ext->series.width == width) return;
+
     ext->series.width = width;
     lv_obj_invalidate(chart);
 }
@@ -256,7 +266,10 @@ void lv_chart_set_series_width(lv_obj_t * chart, lv_coord_t width)
 void lv_chart_set_series_darking(lv_obj_t * chart, lv_opa_t dark_eff)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(ext->series.dark == dark_eff) return;
+
     ext->series.dark = dark_eff;
+    lv_obj_invalidate(chart);
 }
 
 /**

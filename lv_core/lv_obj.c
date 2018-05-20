@@ -284,20 +284,17 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     lv_anim_del(obj, NULL);
 #endif
     
+    /*Delete from the group*/
+ #if USE_LV_GROUP
+    if(obj->group_p != NULL) lv_group_remove_obj(obj);
+ #endif
+
     /* Reset all input devices if
      * the currently pressed object is deleted*/
     lv_indev_t * indev = lv_indev_next(NULL);
-    lv_obj_t * dpar;
     while(indev) {
-        dpar = obj;
-        while(dpar != NULL) {
-            if(indev->proc.act_obj == dpar ||
-               indev->proc.last_obj == dpar) {
-                lv_indev_reset(indev);
-                break;
-            } else {
-                dpar = lv_obj_get_parent(dpar);
-            }
+        if(indev->proc.act_obj == obj || indev->proc.last_obj == obj) {
+            lv_indev_reset(indev);
         }
         indev = lv_indev_next(indev);
     }
@@ -346,11 +343,14 @@ void lv_obj_clean(lv_obj_t *obj)
  */
 void lv_obj_invalidate(lv_obj_t * obj)
 {
+	if(lv_obj_get_hidden(obj)) return;
+
     /*Invalidate the object only if it belongs to the 'act_scr'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     if(obj_scr == lv_scr_act() ||
        obj_scr == lv_layer_top() ||
-       obj_scr == lv_layer_sys()) {
+       obj_scr == lv_layer_sys())
+    {
         /*Truncate recursively to the parents*/
         lv_area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
@@ -366,7 +366,8 @@ void lv_obj_invalidate(lv_obj_t * obj)
         /*Check through all parents*/
         while(par != NULL) {
             union_ok = lv_area_union(&area_trunc, &area_trunc, &par->coords);
-            if(union_ok == false) break; /*If no common parts with parent break;*/
+            if(union_ok == false) break; 		/*If no common parts with parent break;*/
+        	if(lv_obj_get_hidden(par)) return;	/*If the parent is hidden then the child is hidden and won't be drawn*/
 
             par = lv_obj_get_parent(par);
         }
@@ -753,12 +754,15 @@ void lv_obj_report_style_mod(lv_style_t * style)
  */
 void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 {
+	if(!obj->hidden) lv_obj_invalidate(obj);	/*Invalidate when not hidden (hidden objects are ignored) */
+
     obj->hidden = en == false ? 0 : 1;
-    
+
+	if(!obj->hidden) lv_obj_invalidate(obj);	/*Invalidate when not hidden (hidden objects are ignored) */
+
     lv_obj_t * par = lv_obj_get_parent(obj);
     par->signal_func(par, LV_SIGNAL_CHILD_CHG, obj);
 
-    lv_obj_invalidate(obj);
 }
 
 /**
@@ -1585,6 +1589,16 @@ static void delete_children(lv_obj_t * obj)
 #if USE_LV_GROUP
    if(obj->group_p != NULL) lv_group_remove_obj(obj);
 #endif
+
+   /* Reset the input devices if
+    * the currently pressed object is deleted*/
+   lv_indev_t * indev = lv_indev_next(NULL);
+   while(indev) {
+       if(indev->proc.act_obj == obj || indev->proc.last_obj == obj) {
+           lv_indev_reset(indev);
+       }
+       indev = lv_indev_next(indev);
+   }
 
    /*Remove the object from parent's children list*/
    lv_obj_t * par = lv_obj_get_parent(obj);

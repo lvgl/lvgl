@@ -211,6 +211,8 @@ void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time)
 #if USE_LV_ANIMATION == 0
     anim_time = 0;
 #endif
+
+    if(ext->anim_time == anim_time) return;
     ext->anim_time = anim_time;
 }
 

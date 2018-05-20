@@ -112,8 +112,10 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
  */
 void lv_lmeter_set_value(lv_obj_t *lmeter, int16_t value)
 {
-    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    ext->cur_value = value > ext->max_value ? ext->max_value : value;
+	lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    if(ext->cur_value == value) return;
+
+	ext->cur_value = value > ext->max_value ? ext->max_value : value;
     ext->cur_value = ext->cur_value < ext->min_value ? ext->min_value : ext->cur_value;
     lv_obj_invalidate(lmeter);
 }
@@ -127,6 +129,8 @@ void lv_lmeter_set_value(lv_obj_t *lmeter, int16_t value)
 void lv_lmeter_set_range(lv_obj_t *lmeter, int16_t min, int16_t max)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    if(ext->min_value == min && ext->max_value == max) return;
+
     ext->max_value = max;
     ext->min_value = min;
     if(ext->cur_value > max) {
@@ -149,6 +153,8 @@ void lv_lmeter_set_range(lv_obj_t *lmeter, int16_t min, int16_t max)
 void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    if(ext->scale_angle == angle && ext->line_cnt == line_cnt) return;
+
     ext->scale_angle = angle;
     ext->line_cnt = line_cnt;
 
