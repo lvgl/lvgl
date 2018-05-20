@@ -168,8 +168,6 @@ void lv_refr_pop_from_buf(uint16_t num)
  */
 static void lv_refr_task(void * param)
 {
-
-    printf("refr\n");
     (void)param;
 
     uint32_t start = lv_tick_get();
