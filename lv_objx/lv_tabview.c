@@ -241,7 +241,6 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     anim_en = false;
 #endif
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    if(ext->tab_cur == id) return;
 
     lv_style_t * style = lv_obj_get_style(ext->content);
 
