@@ -84,7 +84,7 @@ void lv_draw_rect(const lv_area_t * cords_p, const lv_area_t * mask_p, const lv_
 
 
 /*Experimental use for 3D modeling*/
-#define USE_LV_TRIANGLE 0
+#define USE_LV_TRIANGLE 1
 #if USE_LV_TRIANGLE != 0
 /**
  *
@@ -127,6 +127,17 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
  */
 void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t * mask_p,
                   const lv_style_t * style_p);
+
+
+/**********************
+ *  GLOBAL VARIABLES
+ **********************/
+void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
+void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
+void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa);
+void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
+        const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+        lv_color_t recolor, lv_opa_t recolor_opa);
 
 /**********************
  *      MACROS
