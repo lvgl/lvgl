@@ -6,7 +6,7 @@ The bugfixes of the still not released version are in `beta` branche.
 ## Contributing
 Please create an issue to introduce a bug instead of adding pull request to this file.
 
-## v5.1.1 (in progress)
+## v5.1.1 (released on: 20.05.2018)
 - [x] lv_line: set line.width ext. size to not trim parts on x = 0, y = 0 coordinates
 - [x] lv_conf.h: add LV_COMPILER_VLA_SUPPORTED
 - [x] lv_group_create: init focus_cb
