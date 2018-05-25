@@ -128,6 +128,9 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 void lv_draw_line(const lv_point_t * p1, const lv_point_t * p2, const lv_area_t * mask_p,
                   const lv_style_t * style_p);
 
+#if LV_ANTIALIAS != 0
+lv_opa_t antialias_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t line_opa);
+#endif
 
 /**********************
  *  GLOBAL VARIABLES
