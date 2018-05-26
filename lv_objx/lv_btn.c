@@ -384,7 +384,6 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         else if(c == LV_GROUP_KEY_ENTER_LONG) {
             if(ext->actions[LV_BTN_ACTION_LONG_PR] && state != LV_BTN_STATE_INA) {
                 res = ext->actions[LV_BTN_ACTION_LONG_PR](btn);
-                ext->long_pr_action_executed = 1;
             }
         }
     }
