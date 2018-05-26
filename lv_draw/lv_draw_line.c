@@ -196,7 +196,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 		width_half = 0;
 	}
 
-	lv_point_t vect_main, vect_norm;
+	volatile lv_point_t vect_main, vect_norm;
 	vect_main.x = main_line->p2.x - main_line->p1.x;
 	vect_main.y = main_line->p2.y - main_line->p1.y;
 	if(main_line->p1.y < main_line->p2.y) {
@@ -208,18 +208,28 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
 	}
 
+	lv_coord_t shift_y = 0;
+	lv_coord_t shift_x = 0;
+	/*The main line need to be moved to the result line start/end on the desired coordinates*/
+	if((width + 1) * vect_main.x > vect_main.y) {		/*The calculation contains two divisions. Do it only if it will result non zero*/
+		lv_coord_t inters_y = (width * vect_main.x) / vect_main.y;	/*Get the y coordinate (height) of the intersection of "end" and "neg" line"*/
+		shift_y = inters_y / 2;
+		shift_x = (shift_y * vect_norm.y) / vect_norm.x;
+		printf("sx:%d, sy:%d\n", shift_x, shift_y);
+	}
+
 	line_draw_t line_neg;
 	line_draw_t line_pos;
 	line_draw_t line_end;
 	lv_point_t p1_neg, p2_neg, p1_pos, p2_pos, p1_end, p2_end;
-	p1_neg.x = main_line->p1.x - width_half;
-	p1_neg.y = main_line->p1.y;
-	p2_neg.x = main_line->p2.x - width_half;
-	p2_neg.y = main_line->p2.y;
-	p1_pos.x = main_line->p1.x + width_half + width_1;
-	p1_pos.y = main_line->p1.y;
-	p2_pos.x = main_line->p2.x + width_half + width_1;
-	p2_pos.y = main_line->p2.y;
+	p1_neg.x = main_line->p1.x - width_half + shift_x;
+	p1_neg.y = main_line->p1.y - shift_y;
+	p2_neg.x = main_line->p2.x - width_half - shift_x;
+	p2_neg.y = main_line->p2.y + shift_y;
+	p1_pos.x = main_line->p1.x + width_half + width_1 + shift_x;
+	p1_pos.y = main_line->p1.y - shift_y;
+	p2_pos.x = main_line->p2.x + width_half + width_1 - shift_x;
+	p2_pos.y = main_line->p2.y + shift_y;
 	p1_end.x = p1_pos.x;
 	p1_end.y = p1_pos.y;
 	p2_end.x = p1_end.x + vect_norm.x;
@@ -284,6 +294,8 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 	/*Middle part*/
 	if(line_end.p_act.x == line_end.p2.x) line_end.p_act.y ++;	/*If the the perpendicular line is finished (very steep line) then the last y step is missing */
 	lv_coord_t perp_height = line_end.p_act.y - line_pos.p1.y;	/*Height of the perpendicular area*/
+	printf("perp_height: %d\n", perp_height);
+
 	p1_neg.x = draw_area.x1 = draw_area.x2 - width;
 	p1_neg.y = line_end.p_act.y;
 	line_init(&line_neg, &p1_neg, &p2_neg);
