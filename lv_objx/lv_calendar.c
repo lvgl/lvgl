@@ -115,7 +115,25 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy an existing calendar*/
     else {
         lv_calendar_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        ext->today.year = copy_ext->today.year;
+		ext->today.month= copy_ext->today.month;
+		ext->today.day= copy_ext->today.day;
 
+		ext->showed_date.year = copy_ext->showed_date.year;
+		ext->showed_date.month = copy_ext->showed_date.month;
+		ext->showed_date.day= copy_ext->showed_date.day;
+
+		ext->highlighted_dates  = copy_ext->highlighted_dates;
+		ext->highlighted_dates_num = copy_ext->highlighted_dates_num;
+		ext->day_names = copy_ext->day_names;
+		ext->month_names = copy_ext->month_names;
+		ext->style_header = copy_ext->style_header;
+		ext->style_header_pr = copy_ext->style_header_pr;
+		ext->style_highlighted = copy_ext->style_highlighted;
+		ext->style_inactive_days = copy_ext->style_inactive_days;
+		ext->style_week_box = copy_ext->style_week_box;
+		ext->style_today_box = copy_ext->style_today_box;
+		ext->style_day_names = copy_ext->style_day_names;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_calendar);
     }
