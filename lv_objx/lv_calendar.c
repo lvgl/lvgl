@@ -40,7 +40,8 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_days(lv_obj_t * calendar, const lv_area_t * mask);
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int32_t day);
-static const char * get_month_name(int32_t month);
+static const char * get_day_name(lv_obj_t * calendar,uint8_t day);
+static const char * get_month_name(lv_obj_t * calendar, int32_t month);
 static uint8_t get_month_length(int32_t year, int32_t month);
 static uint8_t is_leap_year(uint32_t year);
 
@@ -91,6 +92,8 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
 
     ext->highlighted_dates  = NULL;
     ext->highlighted_dates_num = 0;
+    ext->day_names = NULL;
+    ext->month_names = NULL;
     ext->style_header = &lv_style_plain_color;
     ext->style_header_pr = &lv_style_pretty_color;
     ext->style_highlighted = &lv_style_plain_color;
@@ -167,14 +170,41 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  * Set the the highlighted dates
  * @param calendar pointer to a calendar object
  * @param highlighted pointer to an `lv_calendar_date_t` array containing the dates. ONLY A POINTER WILL BE SAVED! CAN'T BE LOCAL ARRAY.
- * @param data_num number of dates in the array
+ * @param date_num number of dates in the array
  */
-void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num)
+void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num)
 {
     lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
     ext->highlighted_dates = highlighted;
-    ext->highlighted_dates_num = data_num;
+    ext->highlighted_dates_num = date_num;
 
+    lv_obj_invalidate(calendar);
+}
+
+
+/**
+ * Set the name of the days
+ * @param calendar pointer to a calendar object
+ * @param day_names pointer to an array with the names. E.g. `const char * days[7] = {"Sun", "Mon", ...}`
+ *                  Only the pointer will be saved so this variable can't be local which will be destroyed later.
+ */
+void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    ext->day_names = day_names;
+    lv_obj_invalidate(calendar);
+}
+
+/**
+ * Set the name of the month
+ * @param calendar pointer to a calendar object
+ * @param day_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb", ...}`
+ *                  Only the pointer will be saved so this variable can't be local which will be destroyed later.
+ */
+void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    ext->month_names = day_names;
     lv_obj_invalidate(calendar);
 }
 
@@ -239,7 +269,7 @@ lv_calendar_date_t * lv_calendar_get_today_date(lv_obj_t * calendar)
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` variable containing the date is being shown.
  */
-lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed)
+lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar)
 {
     lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
     return &ext->showed_date;
@@ -250,7 +280,7 @@ lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar, lv_calenda
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` array containing the dates.
  */
-lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num)
+lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar)
 {
     lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates;
@@ -261,10 +291,32 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar, lv_c
  * @param calendar pointer to a calendar object
  * @return number of highlighted days
  */
-uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t data_num)
+uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar)
 {
     lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates_num;
+}
+
+/**
+ * Get the name of the days
+ * @param calendar pointer to a calendar object
+ * @return pointer to the array of day names
+ */
+const char ** lv_calendar_get_day_names(lv_obj_t * calendar, const char ** day_names)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    return ext->day_names;
+}
+
+/**
+ * Get the name of the month
+ * @param calendar pointer to a calendar object
+ * @return pointer to the array of month names
+ */
+const char ** lv_calendar_get_month_names(lv_obj_t * calendar, const char ** day_names)
+{
+    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    return ext->month_names;
 }
 
 /**
@@ -432,7 +484,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set date*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_calendar";
@@ -472,7 +524,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 
     /*Add the month name*/
     header_area.y1 += ext->style_header->body.padding.ver;
-    lv_draw_label(&header_area, mask, ext->style_header, get_month_name(ext->showed_date.month), LV_TXT_FLAG_CENTER, NULL);
+    lv_draw_label(&header_area, mask, ext->style_header, get_month_name(calendar, ext->showed_date.month), LV_TXT_FLAG_CENTER, NULL);
 
     /*Add the left arrow*/
     lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
@@ -507,7 +559,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
     for(i = 0; i < 7; i++) {
         label_area.x1 = calendar->coords.x1 + (w * i) / 7 + hpad;
         label_area.x2 = label_area.x1 + box_w;
-        lv_draw_label(&label_area, mask, ext->style_day_names, day_name[i], LV_TXT_FLAG_CENTER, NULL);
+        lv_draw_label(&label_area, mask, ext->style_day_names, get_day_name(calendar, i), LV_TXT_FLAG_CENTER, NULL);
     }
 
 }
@@ -525,8 +577,8 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_area_t label_area;
     label_area.y1 = calendar->coords.y1 + get_header_height(calendar) +
                     ext->style_day_names->body.padding.ver + lv_font_get_height(ext->style_day_names->text.font) +
-                    style_bg->body.padding.ver;
-    label_area.y2 = label_area.y1 + lv_font_get_height(ext->style_day_names->text.font);
+                    style_bg->body.padding.inner;
+    label_area.y2 = label_area.y1 + lv_font_get_height(style_bg->text.font);
 
     lv_coord_t w = lv_obj_get_width(calendar) - 2 * hpad;
     lv_coord_t h = calendar->coords.y2 - label_area.y1 - style_bg->body.padding.ver;
@@ -605,7 +657,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
             label_area.x1 = calendar->coords.x1 + (w * day) / 7 + hpad;
             label_area.x2 = label_area.x1 + box_w;
 
-            /*Draw the "tiday box"*/
+            /*Draw the "today box"*/
             if(draw_state == DAY_DRAW_ACT_MONTH && month_of_today_shown && ext->today.day == day_cnt) {
                 lv_area_t today_box_area;
                 lv_area_copy(&today_box_area, &label_area);
@@ -687,15 +739,33 @@ static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int
 }
 
 /**
+ * Get the day name
+ * @param calendar pointer to a calendar object
+ * @param day a day in [0..6]
+ * @return
+ */
+static const char * get_day_name(lv_obj_t * calendar,uint8_t day)
+{
+
+	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+	if(ext->day_names) return ext->day_names[day];
+	else return day_name[day];
+}
+
+/**
  * Get the month name
+ * @param calendar pointer to a calendar object
  * @param month a month. The range is basically [1..12] but [-11..1] is also supported to handle previous year
  * @return
  */
-static const char * get_month_name(int32_t month)
+static const char * get_month_name(lv_obj_t * calendar, int32_t month)
 {
     month --;   /*Range of months id [1..12] but range of indexes is [0..11]*/
     if(month < 0) month = 12 + month;
-    return month_name[month];
+
+	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+	if(ext->month_names) return ext->month_names[month];
+	else return month_name[month];
 }
 
 /**
