@@ -627,7 +627,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             }
             lv_obj_invalidate(btnm);
-        }else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
+        }else if(c == LV_GROUP_KEY_ENTER) {
             if(ext->action != NULL) {
                 uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
                 if(txt_i != LV_BTNM_PR_NONE) {
