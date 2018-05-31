@@ -19,16 +19,29 @@ Here are ideas which are not assigned to a minor version yet:
 - lv_ta: add placeholder text
 - image rotate
 
-
-## v5.2 (in progress)
-- [ ] Lua interface to craete GUI with script
+## v5.3 (planned)
+Mainly graphical/drawing improvments and Lua support
+- [ ] API extension: turn the relevant "lv_obj" functions to the specific type (lv_btn_set_size)
+- [ ] Lua interface to create GUI with script 
 - [ ] Arabic glyph convert (based on letter position)
+- [ ] Arc rawing
 - [ ] Right-to-left write support 
 - [ ] Bit based VDB: 1, 2 or 4 bit
-- [ ] lv_icon: new object type: an image wich acts as a button
-- [ ] lv_table: new object type: a table with rows and colums
-- [ ] triangle drawing
-- [ ] user defined error callback
+- [ ] Ttriangle drawing
+
+## v5.2 (in progress)
+Mainly new object and new feauters:
+- [ ] New object type: Listview (table) #137
+- [ ] New object type: Calendar
+- [ ] New object type: Icon (button like image) #182
+- [ ] New object type: QR code #199
+- [ ] lv_page: scroll on LV_GROUP_KEY_UP/DOWN/LEFT/RIGHT
+- [ ] lv_obj_align: option in lv_conf.h sav the last alignment's coordinate ad aply it on lv_obj_realign
+- [ ] lv_line: perpndicular line ending
+- [ ] lv_gauge: option to put lables outside of the scale
+- [ ] lv_img: png support #254
+- [ ] lv_tabview: add option to put the tab button to the bottom
+- [ ] Error callback: add an option to register a callback called on error
 - [ ] Support more character coding (e.g. UTF8, UTF16 etc)
 
 ## v5.1 (released on: 09.03.2018)
