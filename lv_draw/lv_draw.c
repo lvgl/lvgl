@@ -452,9 +452,9 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             lv_color_t buf[lv_area_get_width(&mask_com)];
 #else
 # if LV_HOR_RES > LV_VER_RES
-            lv_color_t buf[LV_HOR_RES];
+            uint8_t buf[LV_HOR_RES * px_size];
 # else
-            lv_color_t buf[LV_VER_RES];
+            uint8_t buf[LV_VER_RES * px_size];
 # endif
 #endif
             for(row = mask_com.y1; row <= mask_com.y2; row ++) {
