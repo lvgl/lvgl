@@ -14,8 +14,11 @@
 /*********************
  *      DEFINES
  *********************/
-#define LINE_WIDTH_CORR_BASE 64
+#define LINE_WIDTH_CORR_BASE  64
 #define LINE_WIDTH_CORR_SHIFT 6
+#if LV_COMPILER_VLA_SUPPORTED == 0
+#define LINE_MAX_WIDTH		  64
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -50,6 +53,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 static void line_init(line_draw_t * line, const lv_point_t * p1, const lv_point_t * p2);
 static bool line_next(line_draw_t * line);
 static bool line_next_y(line_draw_t * line);
+static bool line_next_x(line_draw_t * line);
 static void line_ver_aa(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
 static void line_hor_aa(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
 
@@ -83,18 +87,37 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
     lv_point_t p1;
     lv_point_t p2;
 
-    /*Be sure always x1 < x2*/
-    if(point1->x < point2->x) {
-    	p1.x = point1->x;
-    	p1.y = point1->y;
-    	p2.x = point2->x;
-    	p2.y = point2->y;
+    /*If the line if rather vertical then be sure y1 < y2 else x1 < x2*/
+
+    if(LV_MATH_ABS(point1->x-point2->x) > LV_MATH_ABS(point1->y-point2->y)) {
+
+    	/*Steps less in y then x -> rather horizontal*/
+    	if(point1->x < point2->x) {
+			p1.x = point1->x;
+			p1.y = point1->y;
+			p2.x = point2->x;
+			p2.y = point2->y;
+		} else {
+			p1.x = point2->x;
+			p1.y = point2->y;
+			p2.x = point1->x;
+			p2.y = point1->y;
+		}
     } else {
-    	p1.x = point2->x;
-    	p1.y = point2->y;
-    	p2.x = point1->x;
-    	p2.y = point1->y;
+    	/*Steps less in x then y -> rather vertical*/
+		if(point1->y < point2->y) {
+			p1.x = point1->x;
+			p1.y = point1->y;
+			p2.x = point2->x;
+			p2.y = point2->y;
+		} else {
+			p1.x = point2->x;
+			p1.y = point2->y;
+			p2.x = point1->x;
+			p2.y = point1->y;
+		}
     }
+
     line_init(&main_line, &p1, &p2);
 
 
@@ -160,234 +183,303 @@ static void line_draw_ver(line_draw_t * line, const lv_area_t * mask, const lv_s
 
 static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style)
 {
-
 	lv_coord_t width;
-	width = style->line.width - 1;
+	width = style->line.width;
+	lv_coord_t width_safe = width;
 
-
-#if LV_ANTIALIAS != 0
-	width--;    						   /*Because of anti aliasing*/
+#if LV_ANTIALIAS
+	width--;
+	if(width == 0) width_safe = 1;
+	else width_safe = width;
 #endif
 
-	static const uint8_t width_corr_array[] = {
-			64, 64, 64, 64, 64, 64, 64, 64, 64, 65, 65, 65, 65, 65, 66, 66, 66, 66, 66,
-			67, 67, 67, 68, 68, 68, 69, 69, 69, 70, 70, 71, 71, 72, 72, 72, 73, 73, 74,
-			74, 75, 75, 76, 77, 77, 78, 78, 79, 79, 80, 81, 81, 82, 82, 83, 84, 84, 85,
-			86, 86, 87, 88, 88, 89, 90, 91,
-	};
-
-	lv_coord_t width_half;
-	lv_coord_t width_1;
-	uint16_t wcor;
-	if(main_line->hor == false) {
-		wcor = (main_line->dx * LINE_WIDTH_CORR_BASE) / main_line->dy;
-	} else  {
-		wcor = (main_line->dy * LINE_WIDTH_CORR_BASE) / main_line->dx;
-	}
-
-	/*Make the correction on line width*/
-	if(width > 0) {
-		width = (width * width_corr_array[wcor]);
-		width = width >> LINE_WIDTH_CORR_SHIFT;
-		width_half = width >> 1;
-		width_1 = width & 0x1;
-	} else {
-		width_1 = 0;
-		width_half = 0;
-	}
-
-	volatile lv_point_t vect_main, vect_norm;
+	lv_point_t vect_main, vect_norm;
 	vect_main.x = main_line->p2.x - main_line->p1.x;
 	vect_main.y = main_line->p2.y - main_line->p1.y;
-	if(main_line->p1.y < main_line->p2.y) {
-		vect_norm.x = - vect_main.y;
-		vect_norm.y = vect_main.x;
+
+	if(main_line->hor) {
+		if(main_line->p1.y < main_line->p2.y) {
+			vect_norm.x = - vect_main.y;
+			vect_norm.y = vect_main.x;
+		} else {
+			vect_norm.x = vect_main.y;
+			vect_norm.y = -vect_main.x;
+		}
 	} else {
-		vect_norm.x = vect_main.y;
-		vect_norm.y = -vect_main.x;
-		return;
-
+		if(main_line->p1.x < main_line->p2.x) {
+			vect_norm.x = vect_main.y;
+			vect_norm.y = - vect_main.x;
+		} else {
+			vect_norm.x = - vect_main.y;
+			vect_norm.y = vect_main.x;
+		}
 	}
 
-	if(main_line->hor) return;
+	/* In case of a short but tick line the perpendicular ending is longer then the real line.
+	 * it would break the calculations so make the normal vector larger*/
+	vect_norm.x = vect_norm.x << 4;
+	vect_norm.y = vect_norm.y << 4;
 
-	lv_coord_t shift_y = 0;
-	lv_coord_t shift_x = 0;
-	/*The main line need to be moved to the result line start/end on the desired coordinates*/
-	if((width + 1) * vect_main.x > vect_main.y) {		/*The calculation contains two divisions. Do it only if it will result non zero*/
-		lv_coord_t inters_y = (width * vect_main.x) / vect_main.y;	/*Get the y coordinate (height) of the intersection of "end" and "neg" line"*/
-		shift_y = inters_y / 2;
-		shift_x = (shift_y * vect_norm.y) / vect_norm.x;
-		printf("sx:%d, sy:%d\n", shift_x, shift_y);
+	printf("width %d\n", width);
+#if LV_COMPILER_VLA_SUPPORTED
+	lv_point_t pattern[width_safe];
+#else
+	lv_point_t pattern[LINE_MAX_WIDTH];
+#endif
+	int i = 0;
+
+	/*Create a perpendicular pattern (a small line)*/
+	if(width != 0) {
+		line_draw_t pattern_line;
+		lv_point_t p0 = {0,0};
+		line_init(&pattern_line, &p0, &vect_norm);
+
+		for(i = 0; i < width; i ++) {
+			pattern[i].x = pattern_line.p_act.x;
+			pattern[i].y = pattern_line.p_act.y;
+
+			line_next(&pattern_line);
+		}
+	} else {
+		pattern[0].x = 0;
+		pattern[0].y = 0;
 	}
 
-	line_draw_t line_neg;
-	line_draw_t line_pos;
-	line_draw_t line_end;
-	lv_point_t p1_neg, p2_neg, p1_pos, p2_pos, p1_end, p2_end;
-	p1_neg.x = main_line->p1.x - width_half + shift_x;
-	p1_neg.y = main_line->p1.y - shift_y;
-	p2_neg.x = main_line->p2.x - width_half - shift_x;
-	p2_neg.y = main_line->p2.y + shift_y;
-	p1_pos.x = main_line->p1.x + width_half + width_1 + shift_x;
-	p1_pos.y = main_line->p1.y - shift_y;
-	p2_pos.x = main_line->p2.x + width_half + width_1 - shift_x;
-	p2_pos.y = main_line->p2.y + shift_y;
-	p1_end.x = p1_pos.x;
-	p1_end.y = p1_pos.y;
-	p2_end.x = p1_end.x + vect_norm.x;
-	p2_end.y = p1_end.y + vect_norm.y;
+#if LV_ANTIALIAS
+	lv_coord_t aa_last_corner;
+	aa_last_corner = 0;
+#endif
 
-	line_init(&line_pos, &p1_pos, &p2_pos);
-	line_init(&line_end, &p1_end, &p2_end);
+	/* Make the coordinates relative to the center */
+	for(i = 0; i < width; i++) {
+		pattern[i].x -= pattern[width - 1].x / 2;
+		pattern[i].y -= pattern[width - 1].y / 2;
+#if LV_ANTIALIAS
+		if(i != 0) {
+			if(main_line->hor) {
+				if(pattern[i - 1].x != pattern[i].x) {
+					lv_coord_t seg_w = pattern[i].y - pattern[aa_last_corner].y;
+					if(main_line->sy < 0) {
+						line_ver_aa(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y + seg_w + 1,
+									seg_w, mask, style->line.color, LV_OPA_50);
 
+						line_ver_aa(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y + seg_w + 1,
+									-seg_w, mask, style->line.color, LV_OPA_50);
+					} else {
+						line_ver_aa(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y,
+									seg_w, mask, style->line.color, LV_OPA_50);
+
+						line_ver_aa(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y,
+									-seg_w, mask, style->line.color, LV_OPA_50);
+					}
+					aa_last_corner = i;
+				}
+			} else {
+				if(pattern[i - 1].y != pattern[i].y) {
+					lv_coord_t seg_w = pattern[i].x - pattern[aa_last_corner].x;
+					if(main_line->sx < 0) {
+						line_hor_aa(main_line->p1.x + pattern[aa_last_corner].x + seg_w + 1, main_line->p1.y + pattern[aa_last_corner].y - 1,
+									seg_w, mask, style->line.color, LV_OPA_50);
+
+						line_hor_aa(main_line->p2.x + pattern[aa_last_corner].x + seg_w + 1, main_line->p2.y + pattern[aa_last_corner].y + 1,
+									-seg_w, mask, style->line.color, LV_OPA_50);
+					} else {
+						line_hor_aa(main_line->p1.x + pattern[aa_last_corner].x, main_line->p1.y + pattern[aa_last_corner].y - 1,
+									seg_w, mask, style->line.color, LV_OPA_50);
+
+						line_hor_aa(main_line->p2.x + pattern[aa_last_corner].x, main_line->p2.y + pattern[aa_last_corner].y + 1,
+									-seg_w, mask, style->line.color, LV_OPA_50);
+					}
+					aa_last_corner = i;
+				}
+			}
+
+		}
+#endif
+	}
+
+
+
+#if LV_ANTIALIAS
+	/*Add the last part of anti-aliasing for the perpendicular ending*/
+	if(main_line->hor) {
+		lv_coord_t seg_w = pattern[width_safe - 1].y - pattern[aa_last_corner].y;
+		if(main_line->sy < 0) {
+			line_ver_aa(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y + seg_w,
+						seg_w + main_line->sy, mask, style->line.color, LV_OPA_50);
+
+			line_ver_aa(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y + seg_w,
+						-(seg_w + main_line->sy), mask, style->line.color, LV_OPA_50);
+
+		} else {
+			line_ver_aa(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y,
+						seg_w + main_line->sy, mask, style->line.color, LV_OPA_50);
+
+			line_ver_aa(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y,
+						-(seg_w + main_line->sy), mask, style->line.color, LV_OPA_50);
+		}
+	} else {
+		lv_coord_t seg_w = pattern[width_safe - 1].x - pattern[aa_last_corner].x;
+		if(main_line->sx < 0) {
+			line_hor_aa(main_line->p1.x + pattern[aa_last_corner].x + seg_w, main_line->p1.y + pattern[aa_last_corner].y - 1,
+						seg_w + main_line->sx, mask, style->line.color, LV_OPA_50);
+
+			line_hor_aa(main_line->p2.x + pattern[aa_last_corner].x + seg_w, main_line->p2.y + pattern[aa_last_corner].y + 1,
+						-(seg_w + main_line->sx), mask, style->line.color, LV_OPA_50);
+
+		} else {
+			line_hor_aa(main_line->p1.x + pattern[aa_last_corner].x, main_line->p1.y + pattern[aa_last_corner].y - 1,
+						seg_w + main_line->sx, mask, style->line.color, LV_OPA_50);
+
+			line_hor_aa(main_line->p2.x + pattern[aa_last_corner].x , main_line->p2.y + pattern[aa_last_corner].y + 1,
+						-(seg_w + main_line->sx), mask, style->line.color, LV_OPA_50);
+		}
+
+	}
+#endif
+
+#if LV_ANTIALIAS
+
+	/*With with value shift the anti aliasing on the edges (-1, 1 or 0 (zero only in case width == 0))*/
+	lv_coord_t aa_shift1;
+	lv_coord_t aa_shift2;
+
+	if(main_line->hor == false) {
+		if(main_line->sx < 0) {
+			aa_shift1 = -1;
+			aa_shift2 = width == 0 ? 0 : aa_shift1;
+		} else {
+			aa_shift2 = 1;
+			aa_shift1 = width == 0 ? 0 : aa_shift2;
+		}
+	} else {
+		if(main_line->sy < 0) {
+			aa_shift1 = -1;
+			aa_shift2 = width == 0 ? 0 : aa_shift1;
+		} else {
+			aa_shift2 = 1;
+			aa_shift1 = width == 0 ? 0 : aa_shift2;
+		}
+	}
+//	aa_shift1 = main_line->hor ? main_line->sy : main_line->sx;
+//	aa_shift2 = width == 0 ? 0 : aa_shift1;
+
+
+#endif
+
+
+	volatile lv_point_t prev_p;
+	prev_p.x = main_line->p1.x;
+	prev_p.y = main_line->p1.y;
 	lv_area_t draw_area;
+	bool first_run = true;
 
-	/*Top perpendicular end*/
-#if LV_ANTIALIAS
-	volatile lv_point_t aa_last_step_pos;			/*The point where the last step in x occurred*/
-	volatile lv_point_t aa_last_step_end;
-	aa_last_step_pos.x = line_pos.p_act.x;
-	aa_last_step_pos.y = line_pos.p_act.y;
-	aa_last_step_end.x = line_end.p_act.x;
-	aa_last_step_end.y = line_end.p_act.y;
-//
-//	/*On pixel at the top and bottom*/
-//	px_fp(aa_last_step_pos.x, aa_last_step_pos.y - 1, mask, LV_COLOR_AQUA, LV_OPA_80 / 2);
-#endif
-	do {
-		draw_area.x1 = LV_MATH_MIN(line_end.p_act.x, line_pos.p_act.x);
-		draw_area.y1 = LV_MATH_MIN(line_end.p_act.y, line_pos.p_act.y);
-		draw_area.x2 = LV_MATH_MAX(line_end.p_act.x, line_pos.p_act.x);
-		draw_area.y2 = LV_MATH_MAX(line_pos.p_act.y, line_pos.p_act.y);
+	if(main_line->hor) {
+		while(line_next_y(main_line)) {
+			for(i = 0; i < width; i++) {
+				draw_area.x1 = prev_p.x + pattern[i].x;
+				draw_area.y1 = prev_p.y + pattern[i].y;
+				draw_area.x2 = draw_area.x1 + main_line->p_act.x - prev_p.x - 1;
+				draw_area.y2 = draw_area.y1;
+				fill_fp(&draw_area, mask, style->line.color, style->line.opa);
 
-#if LV_ANTIALIAS
-		if(aa_last_step_pos.x != line_pos.p_act.x) {
-			line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p_act.y - aa_last_step_pos.y, mask, LV_COLOR_RED, style->line.opa);
-			aa_last_step_pos.x = line_pos.p_act.x;
-			aa_last_step_pos.y = line_pos.p_act.y;
-		}
-
-		if(aa_last_step_end.y != line_end.p_act.y) {
-			lv_coord_t seg_w = aa_last_step_end.x - line_end.p_act.x;				/*Segment width*/
-			if(line_pos.p_act.x - (aa_last_step_end.x - seg_w) >= width) {
-				seg_w = width - (line_pos.p_act.x - aa_last_step_end.x);
+				/* Fill the gaps
+				 * When stepping in y one pixel remains empty on every corner (don't do this on the first segment ) */
+				if(i != 0 && pattern[i].x != pattern[i - 1].x && !first_run) {
+					px_fp(draw_area.x1 , draw_area.y1 - main_line->sy, mask, style->line.color, style->line.opa);
+				}
 			}
-			line_hor_aa(aa_last_step_end.x - seg_w,  aa_last_step_end.y, seg_w , mask, LV_COLOR_RED, LV_OPA_50);
-			aa_last_step_end.x = line_end.p_act.x;
-			aa_last_step_end.y = line_end.p_act.y;
-		}
-#endif
-		/*Be sure the area is not wide ("x" can be more then where the intersection should be)*/
-		if(lv_area_get_width(&draw_area) > width) {
-			if(width < 0) draw_area.x1 = draw_area.x2;
-			else draw_area.x1 = draw_area.x2 - width;
-		}
-		fill_fp(&draw_area, mask, LV_COLOR_MAGENTA, style->line.opa);
-
-		line_next_y(&line_end);
-		line_next_y(&line_pos);
-
-	}while(lv_area_get_width(&draw_area) < width);
 
 #if LV_ANTIALIAS
-	/*Anti-aliasing of the last perpendicular segment (only one pixel)*/
-	px_fp(draw_area.x1 - 1, draw_area.y1, mask, LV_COLOR_RED, style->line.opa / 2);
+			line_hor_aa(prev_p.x + pattern[0].x, prev_p.y + pattern[0].y - aa_shift1,
+					    -(main_line->p_act.x - prev_p.x), mask, style->line.color, style->line.opa);
+			line_hor_aa(prev_p.x + pattern[width_safe - 1].x, prev_p.y + pattern[width_safe - 1].y + aa_shift2,
+					    main_line->p_act.x - prev_p.x, mask, style->line.color, style->line.opa);
 #endif
 
-	/*Middle part*/
-	if(line_end.p_act.x == line_end.p2.x) line_end.p_act.y ++;	/*If the the perpendicular line is finished (very steep line) then the last y step is missing */
-	lv_coord_t perp_height = line_end.p_act.y - line_pos.p1.y;	/*Height of the perpendicular area*/
-	printf("perp_height: %d\n", perp_height);
+			first_run = false;
 
-	p1_neg.x = draw_area.x1 = draw_area.x2 - width;
-	p1_neg.y = line_end.p_act.y;
-	line_init(&line_neg, &p1_neg, &p2_neg);
-
-#if LV_ANTIALIAS
-	lv_point_t aa_last_step_neg;
-	aa_last_step_neg.x = line_neg.p_act.x;
-	aa_last_step_neg.y = line_neg.p_act.y;
-#endif
-
-	do {
-		draw_area.x1 = LV_MATH_MIN(line_neg.p_act.x, line_pos.p_act.x);
-		draw_area.y1 = LV_MATH_MIN(line_neg.p_act.y, line_pos.p_act.y);
-		draw_area.x2 = LV_MATH_MAX(line_neg.p_act.x, line_pos.p_act.x);
-		draw_area.y2 = LV_MATH_MAX(line_neg.p_act.y, line_pos.p_act.y);
-		fill_fp(&draw_area, mask, LV_COLOR_GREEN,  style->line.opa);
-
-#if LV_ANTIALIAS
-		if(aa_last_step_neg.x != line_neg.p_act.x) {
-			line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p_act.y, mask, LV_COLOR_RED, style->line.opa);
-			aa_last_step_neg.x = line_neg.p_act.x;
-			aa_last_step_neg.y = line_neg.p_act.y;
+			prev_p.x = main_line->p_act.x;
+			prev_p.y = main_line->p_act.y;
 		}
 
-		if(aa_last_step_pos.x != line_pos.p_act.x) {
-			line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p_act.y - aa_last_step_pos.y, mask, LV_COLOR_RED, style->line.opa);
-			aa_last_step_pos.x = line_pos.p_act.x;
-			aa_last_step_pos.y = line_pos.p_act.y;
-		}
-#endif
-		if(!line_next_y(&line_neg)) break;
-		if(!line_next_y(&line_pos)) break;
-	}while(LV_MATH_ABS(line_pos.p_act.y - line_pos.p2.y) >=  LV_MATH_ABS(perp_height));
+		for(i = 0; i < width; i++) {
+			draw_area.x1 = prev_p.x + pattern[i].x;
+			draw_area.y1 = prev_p.y + pattern[i].y;
+			draw_area.x2 = draw_area.x1 + main_line->p_act.x - prev_p.x;
+			draw_area.y2 = draw_area.y1;
+			fill_fp(&draw_area, mask, style->line.color , style->line.opa);
 
-#if LV_ANTIALIAS
-	/*Anti-aliasing of the last segment*/
-	line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p2.y - aa_last_step_pos.y - perp_height + 1, mask, LV_COLOR_RED, style->line.opa);
-
-#endif
-	/*Bottom perpendicular end*/
-	p1_end.x = line_pos.p_act.x;
-	p1_end.y = line_pos.p_act.y;
-	line_init(&line_end, &p1_end, &line_neg.p2);
-#if LV_ANTIALIAS
-	aa_last_step_end.x = line_end.p_act.x;
-	aa_last_step_end.y = line_end.p_act.y;
-#endif
-
-	do {
-		draw_area.x1 = LV_MATH_MIN(line_neg.p_act.x, line_end.p_act.x);
-		draw_area.y1 = LV_MATH_MIN(line_neg.p_act.y, line_end.p_act.y);
-		draw_area.x2 = LV_MATH_MAX(line_neg.p_act.x, line_end.p_act.x);
-		draw_area.y2 = LV_MATH_MAX(line_neg.p_act.y, line_end.p_act.y);
-		fill_fp(&draw_area, mask, LV_COLOR_MAGENTA,  style->line.opa);
-
-#if LV_ANTIALIAS
-		if(aa_last_step_neg.x != line_neg.p_act.x) {
-			line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p_act.y, mask, LV_COLOR_RED, style->line.opa);
-			aa_last_step_neg.x = line_neg.p_act.x;
-			aa_last_step_neg.y = line_neg.p_act.y;
-		}
-
-		if(aa_last_step_end.y != line_end.p_act.y) {
-			lv_coord_t seg_w = aa_last_step_end.x - line_end.p_act.x;				/*Segment width*/
-			if(line_neg.p_act.x - (aa_last_step_end.x - seg_w) >= width) {
-				seg_w = width - (line_neg.p_act.x - aa_last_step_end.x);
+			/* Fill the gaps
+			 * When stepping in y one pixel remains empty on every corner */
+			if(i != 0 && pattern[i].x != pattern[i - 1].x && !first_run) {
+				px_fp(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, style->line.opa);
 			}
-			line_hor_aa(aa_last_step_end.x - seg_w + 1,  aa_last_step_end.y + 1, -seg_w , mask, LV_COLOR_RED, LV_OPA_50);
-			aa_last_step_end.x = line_end.p_act.x;
-			aa_last_step_end.y = line_end.p_act.y;
 		}
 
-#endif
-
-		if(!line_next_y(&line_neg)) break;
-		if(!line_next_y(&line_end)) break;
-
-	}while(1);
-
-
 #if LV_ANTIALIAS
-	line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p2.y - 1, mask, LV_COLOR_RED, style->line.opa);
-	lv_coord_t seg_w = aa_last_step_end.x - line_neg.p2.x + 1;				/*Segment width*/
-	if(line_neg.p2.x - (aa_last_step_end.x - seg_w) >= width) {
-		seg_w = width - (line_neg.p2.x - aa_last_step_end.x);
+			line_hor_aa(prev_p.x + pattern[0].x, prev_p.y + pattern[0].y - aa_shift1,
+					    -(main_line->p_act.x - prev_p.x + 1), mask, style->line.color, style->line.opa);
+			line_hor_aa(prev_p.x + pattern[width_safe - 1].x, prev_p.y + pattern[width_safe - 1].y + aa_shift2,
+					    main_line->p_act.x - prev_p.x + 1, mask, style->line.color, style->line.opa);
+#endif
 	}
-	line_hor_aa(line_neg.p2.x, line_neg.p2.y + 1, -seg_w , mask, LV_COLOR_RED, style->line.opa);
+	/*Rather a vertical line*/
+	else {
+
+		while(line_next_x(main_line)) {
+			for(i = 0; i < width; i++) {
+				draw_area.x1 = prev_p.x + pattern[i].x;
+				draw_area.y1 = prev_p.y + pattern[i].y;
+				draw_area.x2 = draw_area.x1;
+				draw_area.y2 = draw_area.y1 + main_line->p_act.y - prev_p.y - 1;
+
+				fill_fp(&draw_area, mask, style->line.color, style->line.opa);
+
+				/* Fill the gaps
+				 * When stepping in x one pixel remains empty on every corner (don't do this on the first segment ) */
+				if(i != 0 && pattern[i].y != pattern[i - 1].y && !first_run) {
+					px_fp(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, style->line.opa);
+				}
+
+			}
+
+#if LV_ANTIALIAS
+			line_ver_aa(prev_p.x + pattern[0].x - aa_shift1, prev_p.y + pattern[0].y,
+					    -(main_line->p_act.y - prev_p.y), mask, style->line.color, style->line.opa);
+			line_ver_aa(prev_p.x + pattern[width_safe - 1].x + aa_shift2, prev_p.y + pattern[width_safe - 1].y,
+					    main_line->p_act.y - prev_p.y, mask, style->line.color, style->line.opa);
 #endif
+
+			first_run = false;
+
+			prev_p.x = main_line->p_act.x;
+			prev_p.y = main_line->p_act.y;
+		}
+
+		/*Draw the last part*/
+		for(i = 0; i < width; i++) {
+			draw_area.x1 = prev_p.x + pattern[i].x;
+			draw_area.y1 = prev_p.y + pattern[i].y;
+			draw_area.x2 = draw_area.x1;
+			draw_area.y2 = draw_area.y1 + main_line->p_act.y - prev_p.y;
+
+			fill_fp(&draw_area, mask, style->line.color, style->line.opa);
+
+			/* Fill the gaps
+			 * When stepping in x one pixel remains empty on every corner */
+			if(i != 0 && pattern[i].y != pattern[i - 1].y && !first_run) {
+				px_fp(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, style->line.opa);
+			}
+		}
+
+#if LV_ANTIALIAS
+		line_ver_aa(prev_p.x + pattern[0].x - aa_shift1, prev_p.y + pattern[0].y,
+					-(main_line->p_act.y - prev_p.y + 1), mask, style->line.color, style->line.opa);
+		line_ver_aa(prev_p.x + pattern[width_safe - 1].x + aa_shift2, prev_p.y + pattern[width_safe - 1].y,
+					main_line->p_act.y - prev_p.y + 1, mask, style->line.color, style->line.opa);
+#endif
+	}
 }
 
 
@@ -437,6 +529,23 @@ static bool line_next_y(line_draw_t * line)
 	do {
 		if(!line_next(line)) return false;
 	} while(last_y == line->p_act.y);
+
+	return true;
+
+}
+
+/**
+ * Iterate until step one in x direction.
+ * @param line
+ * @return
+ */
+static bool line_next_x(line_draw_t * line)
+{
+	lv_coord_t last_x = line->p_act.x;
+
+	do {
+		if(!line_next(line)) return false;
+	} while(last_x == line->p_act.x);
 
 	return true;
 
