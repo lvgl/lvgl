@@ -205,8 +205,11 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 	} else {
 		vect_norm.x = vect_main.y;
 		vect_norm.y = -vect_main.x;
+		return;
 
 	}
+
+	if(main_line->hor) return;
 
 	lv_coord_t shift_y = 0;
 	lv_coord_t shift_x = 0;
@@ -260,7 +263,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
 #if LV_ANTIALIAS
 		if(aa_last_step_pos.x != line_pos.p_act.x) {
-			line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p_act.y - aa_last_step_pos.y, mask, LV_COLOR_BLUE, LV_OPA_50);
+			line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p_act.y - aa_last_step_pos.y, mask, LV_COLOR_RED, style->line.opa);
 			aa_last_step_pos.x = line_pos.p_act.x;
 			aa_last_step_pos.y = line_pos.p_act.y;
 		}
@@ -277,9 +280,10 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 #endif
 		/*Be sure the area is not wide ("x" can be more then where the intersection should be)*/
 		if(lv_area_get_width(&draw_area) > width) {
-			draw_area.x1 = draw_area.x2 - width;
+			if(width < 0) draw_area.x1 = draw_area.x2;
+			else draw_area.x1 = draw_area.x2 - width;
 		}
-		fill_fp(&draw_area, mask, LV_COLOR_MAGENTA, LV_OPA_50);
+		fill_fp(&draw_area, mask, LV_COLOR_MAGENTA, style->line.opa);
 
 		line_next_y(&line_end);
 		line_next_y(&line_pos);
@@ -288,7 +292,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
 #if LV_ANTIALIAS
 	/*Anti-aliasing of the last perpendicular segment (only one pixel)*/
-	px_fp(draw_area.x1 - 1, draw_area.y1, mask, LV_COLOR_AQUA, LV_OPA_80 / 2);
+	px_fp(draw_area.x1 - 1, draw_area.y1, mask, LV_COLOR_RED, style->line.opa / 2);
 #endif
 
 	/*Middle part*/
@@ -311,17 +315,17 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 		draw_area.y1 = LV_MATH_MIN(line_neg.p_act.y, line_pos.p_act.y);
 		draw_area.x2 = LV_MATH_MAX(line_neg.p_act.x, line_pos.p_act.x);
 		draw_area.y2 = LV_MATH_MAX(line_neg.p_act.y, line_pos.p_act.y);
-		fill_fp(&draw_area, mask, LV_COLOR_GREEN, LV_OPA_50);
+		fill_fp(&draw_area, mask, LV_COLOR_GREEN,  style->line.opa);
 
 #if LV_ANTIALIAS
 		if(aa_last_step_neg.x != line_neg.p_act.x) {
-			line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p_act.y, mask, LV_COLOR_BLUE, LV_OPA_50);
+			line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p_act.y, mask, LV_COLOR_RED, style->line.opa);
 			aa_last_step_neg.x = line_neg.p_act.x;
 			aa_last_step_neg.y = line_neg.p_act.y;
 		}
 
 		if(aa_last_step_pos.x != line_pos.p_act.x) {
-			line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p_act.y - aa_last_step_pos.y, mask, LV_COLOR_ORANGE, LV_OPA_50);
+			line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p_act.y - aa_last_step_pos.y, mask, LV_COLOR_RED, style->line.opa);
 			aa_last_step_pos.x = line_pos.p_act.x;
 			aa_last_step_pos.y = line_pos.p_act.y;
 		}
@@ -332,7 +336,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
 #if LV_ANTIALIAS
 	/*Anti-aliasing of the last segment*/
-	line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p2.y - aa_last_step_pos.y - perp_height + 1, mask, LV_COLOR_RED, LV_OPA_50);
+	line_ver_aa(aa_last_step_pos.x + 1,  aa_last_step_pos.y, line_pos.p2.y - aa_last_step_pos.y - perp_height + 1, mask, LV_COLOR_RED, style->line.opa);
 
 #endif
 	/*Bottom perpendicular end*/
@@ -349,11 +353,11 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 		draw_area.y1 = LV_MATH_MIN(line_neg.p_act.y, line_end.p_act.y);
 		draw_area.x2 = LV_MATH_MAX(line_neg.p_act.x, line_end.p_act.x);
 		draw_area.y2 = LV_MATH_MAX(line_neg.p_act.y, line_end.p_act.y);
-		fill_fp(&draw_area, mask, LV_COLOR_MAGENTA, LV_OPA_50);
+		fill_fp(&draw_area, mask, LV_COLOR_MAGENTA,  style->line.opa);
 
 #if LV_ANTIALIAS
 		if(aa_last_step_neg.x != line_neg.p_act.x) {
-			line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p_act.y, mask, LV_COLOR_BLUE, LV_OPA_50);
+			line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p_act.y, mask, LV_COLOR_RED, style->line.opa);
 			aa_last_step_neg.x = line_neg.p_act.x;
 			aa_last_step_neg.y = line_neg.p_act.y;
 		}
@@ -377,12 +381,12 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
 
 #if LV_ANTIALIAS
-	line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p2.y - 1, mask, LV_COLOR_BLUE, LV_OPA_50);
-	lv_coord_t seg_w = aa_last_step_end.x - line_neg.p2.x;				/*Segment width*/
+	line_ver_aa(aa_last_step_neg.x - 1,  aa_last_step_neg.y, aa_last_step_neg.y - line_neg.p2.y - 1, mask, LV_COLOR_RED, style->line.opa);
+	lv_coord_t seg_w = aa_last_step_end.x - line_neg.p2.x + 1;				/*Segment width*/
 	if(line_neg.p2.x - (aa_last_step_end.x - seg_w) >= width) {
 		seg_w = width - (line_neg.p2.x - aa_last_step_end.x);
 	}
-	line_hor_aa(line_neg.p2.x, line_neg.p2.y + 1, -seg_w , mask, LV_COLOR_LIME, LV_OPA_50);
+	line_hor_aa(line_neg.p2.x, line_neg.p2.y + 1, -seg_w , mask, LV_COLOR_RED, style->line.opa);
 #endif
 }
 
