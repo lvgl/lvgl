@@ -449,7 +449,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             lv_coord_t row;
             uint32_t act_pos;
 #if LV_COMPILER_VLA_SUPPORTED
-            lv_color_t buf[lv_area_get_width(&mask_com)];
+            uint8_t buf[lv_area_get_width(&mask_com) * px_size];
 #else
 # if LV_HOR_RES > LV_VER_RES
             uint8_t buf[LV_HOR_RES * px_size];
