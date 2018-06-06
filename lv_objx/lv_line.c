@@ -215,6 +215,14 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
 		lv_coord_t h = lv_obj_get_height(line);
 		uint16_t i;
 
+		lv_style_t circle_style;
+		lv_style_copy(&circle_style, style);
+		circle_style.body.radius = LV_RADIUS_CIRCLE;
+		circle_style.body.main_color = style->line.color;
+		circle_style.body.grad_color = style->line.color;
+		circle_style.body.opa = style->line.opa;
+		lv_area_t circle_area;
+
 		/*Read all pints and draw the lines*/
 		for (i = 0; i < ext->point_num - 1; i++) {
 
@@ -229,7 +237,20 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
 				p2.y = h - ext->point_array[i + 1].y + y_ofs;
 			}
 			lv_draw_line(&p1, &p2, mask, style);
+
+			circle_area.x1 = p1.x - (style->line.width >> 1);
+			circle_area.y1 = p1.y - (style->line.width >> 1);
+			circle_area.x2 = p1.x + (style->line.width >> 1);
+			circle_area.y2 = p1.y + (style->line.width >> 1);
+//			lv_draw_rect(&circle_area, mask, &circle_style);
 		}
+
+
+		circle_area.x1 = p2.x - (style->line.width >> 1);
+		circle_area.y1 = p2.y - (style->line.width >> 1);
+		circle_area.x2 = p2.x + (style->line.width >> 1);
+		circle_area.y2 = p2.y + (style->line.width >> 1);
+//		lv_draw_rect(&circle_area, mask, &circle_style);
     }
     return true;
 }
