@@ -130,7 +130,7 @@ uint16_t lv_lmeter_get_scale_angle(lv_obj_t * lmeter);
  * @param lmeter pointer to a line meter object
  * @return pointer to the line meter's style
  */
-static inline lv_style_t * lv_lmeter_get_style_bg(lv_obj_t * lmeter)
+static inline lv_style_t * lv_lmeter_get_style(lv_obj_t * lmeter)
 {
     return lv_obj_get_style(lmeter);
 }
