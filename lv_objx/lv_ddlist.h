@@ -48,8 +48,8 @@ typedef struct
     uint16_t sel_opt_id;                 /*Index of the current option*/
     uint16_t sel_opt_id_ori;             /*Store the original index on focus*/
     uint16_t anim_time;                  /*Open/Close animation time [ms]*/
-    uint8_t opened :1;                   /*1: The list is opened*/
-    lv_coord_t fix_height;                   /*Height if the ddlist is opened. (0: auto-size)*/
+    uint8_t opened :1;                   /*1: The list is opened (handled by the library)*/
+    lv_coord_t fix_height;               /*Height of the ddlist when opened. (0: auto-size)*/
 }lv_ddlist_ext_t;
 
 typedef enum {
