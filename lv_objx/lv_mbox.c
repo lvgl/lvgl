@@ -191,6 +191,7 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 #if USE_LV_ANIMATION == 0
     anim_time = 0;
 #endif
+
     ext->anim_time = anim_time;
 }
 

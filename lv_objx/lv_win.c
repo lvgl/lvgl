@@ -216,6 +216,8 @@ void lv_win_set_title(lv_obj_t * win, const char * title)
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    if(ext->btn_size == size) return;
+
     ext->btn_size = size;
 
     lv_win_realign(win);

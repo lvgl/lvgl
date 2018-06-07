@@ -122,6 +122,14 @@ void * lv_ll_get_next(lv_ll_t * ll_p, void * n_act);
  */
 void * lv_ll_get_prev(lv_ll_t * ll_p, void * n_act);
 
+/**
+ * Move a nodw before an other node in the same linked list
+ * @param ll_p pointer to a linked list
+ * @param n_act pointer to node to move
+ * @param n_after pointer to a node which should be after `n_act`
+ */
+void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after);
+
 /**********************
  *      MACROS
  **********************/

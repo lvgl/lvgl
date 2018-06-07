@@ -356,13 +356,15 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->key = i->proc.last_key;
 
         if(data->key == LV_GROUP_KEY_NEXT) {
-                   lv_group_focus_next(i->group);
+        	lv_group_focus_next(i->group);
         }
         else if(data->key == LV_GROUP_KEY_PREV) {
             lv_group_focus_prev(i->group);
         }
-        else {
-            lv_group_send_data(i->group, data->key);
+        else if(data->key == LV_GROUP_KEY_ENTER && i->proc.long_pr_sent) {
+            /*Do nothing. Don't send the ENTER if ENTER_LONG was sent*/
+        } else {
+        	lv_group_send_data(i->group, data->key);
         }
 
         i->proc.pr_timestamp = 0;

@@ -125,6 +125,9 @@ void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en)
 #if USE_LV_ANIMATION == 0
     anim_en = false;
 #endif
+
+    if(lv_roller_get_selected(roller) == sel_opt) return;
+
     lv_ddlist_set_selected(roller, sel_opt);
     refr_position(roller, anim_en);
 }
@@ -320,6 +323,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             }
         } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             if(ext->ddlist.action) ext->ddlist.action(roller);
+            ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;		/*Set the entered value as default*/
         }
     }
     else if(sign == LV_SIGNAL_GET_TYPE) {

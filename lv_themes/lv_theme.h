@@ -258,7 +258,9 @@ lv_theme_t * lv_theme_get_current(void);
 #include "lv_theme_default.h"
 #include "lv_theme_alien.h"
 #include "lv_theme_night.h"
+#include "lv_theme_zen.h"
 #include "lv_theme_mono.h"
+#include "lv_theme_material.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

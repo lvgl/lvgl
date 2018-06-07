@@ -306,6 +306,32 @@ void lv_ll_swap(lv_ll_t * ll_p, void * n1_p, void * n2_p)
     /*TODO*/
 }
 
+/**
+ * Move a nodw before an other node in the same linked list
+ * @param ll_p pointer to a linked list
+ * @param n_act pointer to node to move
+ * @param n_after pointer to a node which should be after `n_act`
+ */
+void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
+{
+    if(n_act == n_after) return;    /*Can't move before itself*/
+
+    if(n_after == NULL) {
+        void * n_before = lv_ll_get_tail(ll_p);
+        node_set_next(ll_p, n_before, n_act);
+        node_set_prev(ll_p, n_act, n_before);
+        node_set_next(ll_p, n_act, NULL);
+        ll_p->tail = n_act;
+    } else {
+        void * n_before = lv_ll_get_prev(ll_p, n_after);
+        /*Move the node between `n_before` and `n_after`*/
+        node_set_next(ll_p, n_before, n_act);
+        node_set_prev(ll_p, n_act, n_before);
+        node_set_prev(ll_p, n_after, n_act);
+        node_set_next(ll_p, n_act, n_after);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

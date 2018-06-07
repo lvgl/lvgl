@@ -46,10 +46,13 @@ If you faced with **something more clomplex** like:
 * affects a whole file, module or even the architecture
 * needs deeper discussion
 
-then please tell
-* what do you experience
-* what do you expect to happen
-* how to reproduce the issue (maybe with an example code)
+then please
+* tell what do you experience
+* tell what do you expect to happen
+* tell how to reproduce the issue 
+* provide a simlified code example (better if can be tested with copy-paste)
+* attache your lv_conf.h (if you feel it's important)
+* logs and long codes should be attached in a file (instead of copying into a comment)
 
 ## How to suggest a feature?
 If you have a good and useful idea open issue to tell it! Please note the followings on suggesting new features:
