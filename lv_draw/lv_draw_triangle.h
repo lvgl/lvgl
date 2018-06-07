@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_rect.h
+ * @file lv_draw_triangle.h
  *
  */
 
-#ifndef LV_DRAW_RECT_H
-#define LV_DRAW_RECT_H
+#ifndef LV_DRAW_TRIANGLE_H
+#define LV_DRAW_TRIANGLE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,14 +26,18 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/*Experimental use for 3D modeling*/
+#define USE_LV_TRIANGLE 1
 
+#if USE_LV_TRIANGLE != 0
 /**
- * Draw a rectangle
- * @param coords the coordinates of the rectangle
- * @param mask the rectangle will be drawn only in this mask
- * @param style pointer to a style
+ *
+ * @param points pointer to an array with 3 points
+ * @param mask the triangle will be drawn only in this mask
+ * @param color color of the triangle
  */
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_color_t color);
+#endif
 
 /**********************
  *      MACROS
@@ -44,4 +48,4 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
 } /* extern "C" */
 #endif
 
-#endif /*LV_DRAW_RECT_H*/
+#endif /*LV_DRAW_TRIANGLE_H*/
