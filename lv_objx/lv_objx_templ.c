@@ -78,7 +78,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing template*/
     else {
-    	lv_templ_ext_t * copy_ext = lv_obj_get_ext_attr((copy);
+    	lv_templ_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_templ);

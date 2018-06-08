@@ -78,6 +78,7 @@ void lv_style_init (void)
     /*Screen style*/
     lv_style_scr.glass = 0;
     lv_style_scr.body.opa = LV_OPA_COVER;
+    lv_style_scr.body.thickness = LV_DPI / 12;
     lv_style_scr.body.main_color = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color = LV_COLOR_WHITE;
     lv_style_scr.body.radius = 0;

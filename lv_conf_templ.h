@@ -155,6 +155,9 @@
 /*Line (dependencies: -*/
 #define USE_LV_LINE     1
 
+/*Arc (dependencies: -)*/
+#define USE_LV_ARC      1
+
 /*******************
  * Container objects
  *******************/

@@ -54,6 +54,7 @@ typedef struct
         lv_color_t main_color;
         lv_color_t grad_color;
         lv_coord_t radius;
+        lv_coord_t thickness;		/*Depending on the object type thickness of something*/
         lv_opa_t opa;
 
         struct {

@@ -40,32 +40,34 @@ static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coor
  * Draw an arc. (Can draw pie too with great thickness.)
  * @param center_x the x coordinate of the center of the arc
  * @param center_y the y coordinate of the center of the arc
- * @param mask the arc will be drawn only in this mask
  * @param radius the radius of the arc
+ * @param mask the arc will be drawn only in this mask
  * @param start_angle the start angle of the arc (0 deg on the bottom, 90 deg on the right)
  * @param end_angle the end angle of the arc
- * @param thickness the thickness of the arc (set the `radius` to draw pie)
+ * @param style style of the arc (`body.thickness`, `body.main_color`, `body.opa` is used)
  */
-void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, const lv_area_t * mask, uint16_t radius,
-		         uint16_t start_angle, uint16_t end_angle, uint16_t tickness)
+void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
+		         uint16_t start_angle, uint16_t end_angle, const lv_style_t * style)
 {
+	lv_coord_t thickness = style->body.thickness;
+	if(thickness > radius) thickness = radius;
+
     lv_coord_t r_out = radius;
-    lv_coord_t r_in = r_out - tickness;
+    lv_coord_t r_in = r_out - thickness;
     int16_t deg_base;
     int16_t deg;
     lv_coord_t x_start[4];
     lv_coord_t x_end[4];
 
-    lv_color_t color = LV_COLOR_RED;
-    lv_opa_t opa = LV_OPA_50;
+    lv_color_t color = style->body.main_color;
+    lv_opa_t opa = style->body.opa;
 
     // Good, may not be the fastest
     // Does not draw overlapping pixels
-    deg = 270;//BSP_LCD_FastAtan2(-r_out, 0);
-    if ((270 >= start_angle) && (270 <= end_angle)) 	hor_line(center_x - r_out + 1, center_y, mask, tickness - 1, color, opa);	// Left Middle
-    if ((90 >= start_angle) && (90 <= end_angle)) 	hor_line(center_x + r_in, center_y,  mask, tickness - 1, color, opa);		// Right Middle
-    if ((180 >= start_angle) && (180 <= end_angle)) 	ver_line(center_x, center_y - r_out + 1,  mask, tickness - 1, color, opa);	// Top Middle
-    if ((0 >= start_angle) && (0 <= end_angle)) 		ver_line(center_x, center_y + r_in,  mask, tickness - 1, color, opa);		// Bottom middle
+    if ((270 >= start_angle) && (270 <= end_angle)) 	hor_line(center_x - r_out + 1, center_y, mask, thickness - 1, color, opa);	// Left Middle
+    if ((90 >= start_angle) && (90 <= end_angle)) 	hor_line(center_x + r_in, center_y,  mask, thickness - 1, color, opa);		// Right Middle
+    if ((180 >= start_angle) && (180 <= end_angle)) 	ver_line(center_x, center_y - r_out + 1,  mask, thickness - 1, color, opa);	// Top Middle
+    if ((0 >= start_angle) && (0 <= end_angle)) 		ver_line(center_x, center_y + r_in,  mask, thickness - 1, color, opa);		// Bottom middle
 
     uint32_t r_out_sqr = r_out * r_out;
     uint32_t r_in_sqr = r_in * r_in;

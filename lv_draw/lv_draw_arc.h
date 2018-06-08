@@ -31,14 +31,14 @@ extern "C" {
  * Draw an arc. (Can draw pie too with great thickness.)
  * @param center_x the x coordinate of the center of the arc
  * @param center_y the y coordinate of the center of the arc
- * @param mask the arc will be drawn only in this mask
  * @param radius the radius of the arc
+ * @param mask the arc will be drawn only in this mask
  * @param start_angle the start angle of the arc (0 deg on the bottom, 90 deg on the right)
  * @param end_angle the end angle of the arc
- * @param thickness the thickness of the arc (set the `radius` to draw pie)
+ * @param style style of the arc (`body.thickness`, `body.main_color`, `body.opa` is used)
  */
-void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, const lv_area_t * mask, uint16_t radius,
-		         uint16_t start_angle, uint16_t end_angle, uint16_t tickness);
+void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
+		         uint16_t start_angle, uint16_t end_angle, const lv_style_t * style);
 
 /**********************
  *      MACROS
