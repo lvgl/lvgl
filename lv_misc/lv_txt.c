@@ -170,7 +170,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 /**
  * Give the length of a text with a given font
  * @param txt a '\0' terminate string
- * @param length length of 'txt' in bytes
+ * @param length length of 'txt' in character count and not bytes(UTF-8 can be 1,2,3 or 4 bytes long)
  * @param font pointer to a font
  * @param letter_space letter space
  * @param flags settings for the text from 'txt_flag_t' enum
@@ -198,6 +198,8 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
             width += lv_font_get_width(font, letter);
             width += letter_space;
         }
+
+        width -= letter_space;	/*Trim the last letter space because there is no letter after it*/
 
         /*Trim closing spaces. Important when the text is aligned to the middle */
         for(i = length - 1; i > 0; i--) {

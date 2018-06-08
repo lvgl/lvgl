@@ -119,4 +119,3 @@ static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
  }
 
 #endif
-

@@ -482,6 +482,46 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
         corner_size = radius + LV_ANTIALIAS;
     }
 
+    /*If radius == 0 is a special case*/
+	if(style->body.radius == 0) {
+		/*Left top corner*/
+		if(part & LV_BORDER_TOP) {
+			work_area.x1 = coords->x1;
+			work_area.x2 = coords->x2;
+			work_area.y1 = coords->y1;
+			work_area.y2 = coords->y1 + bwidth;
+			fill_fp(&work_area, mask, color, opa);
+		}
+
+		/*Right top corner*/
+		if(part & LV_BORDER_RIGHT) {
+			work_area.x1 = coords->x2 - bwidth;
+			work_area.x2 = coords->x2;
+			work_area.y1 = coords->y1 + (part & LV_BORDER_TOP ? bwidth + 1 : 0);
+			work_area.y2 = coords->y2 - (part & LV_BORDER_BOTTOM ? bwidth + 1 : 0);
+			fill_fp(&work_area, mask, color, opa);
+		}
+
+		/*Left bottom corner*/
+		if(part & LV_BORDER_LEFT) {
+			work_area.x1 = coords->x1;
+			work_area.x2 = coords->x1 + bwidth;
+			work_area.y1 = coords->y1 + (part & LV_BORDER_TOP ? bwidth + 1 : 0);
+			work_area.y2 = coords->y2 - (part & LV_BORDER_BOTTOM ? bwidth + 1 : 0);
+			fill_fp(&work_area, mask, color, opa);
+		}
+
+		/*Right bottom corner*/
+		if(part & LV_BORDER_BOTTOM) {
+			work_area.x1 = coords->x1;
+			work_area.x2 = coords->x2;
+			work_area.y1 = coords->y2 - bwidth;
+			work_area.y2 = coords->y2;
+			fill_fp(&work_area, mask, color, opa);
+		}
+		return;
+	}
+
     /* Modify the corner_size if corner is drawn */
     corner_size ++;
 

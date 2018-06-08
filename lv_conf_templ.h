@@ -203,6 +203,9 @@
 #define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
+/*Calendar (dependencies: -)*/
+#define USE_LV_CALENDAR 1
+
 /*************************
  * User input objects
  *************************/

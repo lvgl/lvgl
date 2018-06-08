@@ -29,7 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode);
+static bool lv_templ_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param);
 
 /**********************
@@ -57,11 +57,11 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor of template*/
 	/*TODO modify it to the ancestor create function */
     lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
-    dm_assert(new_templ);
+    lv_mem_assert(new_templ);
     
     /*Allocate the template type specific extended data*/
-    lv_templ_ext_t * ext = lv_obj_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
-    dm_assert(ext);
+    lv_templ_ext_t * ext = lv_obj_allocate_ext_attr(new_templ, sizeof(lv_templ_ext_t));
+    lv_mem_assert(ext);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_templ);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_templ);
 
@@ -69,19 +69,19 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     ext->xyz = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_f(new_templ, lv_templ_signal);
-    lv_obj_set_design_f(new_templ, lv_templ_design);
+    lv_obj_set_signal_func(new_templ, lv_templ_signal);
+    lv_obj_set_design_func(new_templ, lv_templ_design);
 
     /*Init the new template template*/
     if(copy == NULL) {
-        lv_obj_set_style(new_templ, lv_style_get(LV_STYLE_PRETTY, NULL));
+
     }
     /*Copy an existing template*/
     else {
-    	lv_templ_ext_t * copy_ext = lv_obj_get_ext(copy);
+    	lv_templ_ext_t * copy_ext = lv_obj_get_ext_attr((copy);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refr_style(new_templ);
+        lv_obj_refresh_style(new_templ);
     }
     
     return new_templ;
@@ -137,7 +137,7 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *sty
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_btn_get_style(lv_obj_t * templ, lv_templ_style_t type)
+lv_style_t * lv_templ_get_style(lv_obj_t * templ, lv_templ_style_t type)
 {
     lv_templ_ext_t *ext = lv_obj_get_ext_attr(templ);
 
@@ -173,7 +173,7 @@ lv_style_t * lv_btn_get_style(lv_obj_t * templ, lv_templ_style_t type)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mode_t mode)
+static bool lv_templ_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -203,7 +203,7 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = lv_ancestor_signal(templ, sign, param);
+    res = ancestor_signal(templ, sign, param);
     if(res != LV_RES_OK) return res;
 
 

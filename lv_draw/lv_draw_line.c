@@ -14,8 +14,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LINE_WIDTH_CORR_BASE  64
-#define LINE_WIDTH_CORR_SHIFT 6
 #if LV_COMPILER_VLA_SUPPORTED == 0
 #define LINE_MAX_WIDTH		  64
 #endif

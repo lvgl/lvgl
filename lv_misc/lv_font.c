@@ -213,7 +213,7 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
 /**
  * Get the width of a letter in a font
  * @param font_p pointer to a font
- * @param letter a letter
+ * @param letter an UNICODE character code
  * @return the width of a letter
  */
 uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
