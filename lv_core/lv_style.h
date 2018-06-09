@@ -48,11 +48,14 @@ typedef enum
 
 typedef struct
 {
-    uint8_t glass :1;   /*1: Do not inherit this style*/
+    uint8_t glass :1;   		/*1: Do not inherit this style*/
 
     struct {
         lv_color_t main_color;
-        lv_color_t grad_color;
+        union {
+        	lv_color_t grad_color;		/*`grad_color` will be removed in v6.0, use `aux_color` instead*/
+        	lv_color_t aux_color;
+        };
         lv_coord_t radius;
         lv_coord_t thickness;		/*Depending on the object type thickness of something*/
         lv_opa_t opa;

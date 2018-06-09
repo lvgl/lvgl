@@ -23,6 +23,8 @@
 static uint16_t fast_atan2(int x, int y);
 static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color, lv_opa_t opa);
 static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color, lv_opa_t opa);
+static bool deg_test_norm(uint16_t deg, uint16_t start, uint16_t end);
+static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end);
 
 /**********************
  *  STATIC VARIABLES
@@ -62,12 +64,17 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     lv_color_t color = style->body.main_color;
     lv_opa_t opa = style->body.opa;
 
+
+    bool (*deg_test)(uint16_t, uint16_t, uint16_t);
+    if(start_angle <= end_angle) deg_test = deg_test_norm;
+    else deg_test = deg_test_inv;
+
     // Good, may not be the fastest
     // Does not draw overlapping pixels
-    if ((270 >= start_angle) && (270 <= end_angle)) 	hor_line(center_x - r_out + 1, center_y, mask, thickness - 1, color, opa);	// Left Middle
-    if ((90 >= start_angle) && (90 <= end_angle)) 	hor_line(center_x + r_in, center_y,  mask, thickness - 1, color, opa);		// Right Middle
-    if ((180 >= start_angle) && (180 <= end_angle)) 	ver_line(center_x, center_y - r_out + 1,  mask, thickness - 1, color, opa);	// Top Middle
-    if ((0 >= start_angle) && (0 <= end_angle)) 		ver_line(center_x, center_y + r_in,  mask, thickness - 1, color, opa);		// Bottom middle
+    if (deg_test(270, start_angle, end_angle)) 	hor_line(center_x - r_out + 1, center_y, mask, thickness - 1, color, opa);	// Left Middle
+    if (deg_test(90, start_angle, end_angle)) 	hor_line(center_x + r_in, center_y,  mask, thickness - 1, color, opa);		// Right Middle
+    if (deg_test(180, start_angle, end_angle)) 	ver_line(center_x, center_y - r_out + 1,  mask, thickness - 1, color, opa);	// Top Middle
+    if (deg_test(0, start_angle, end_angle)) 	ver_line(center_x, center_y + r_in,  mask, thickness - 1, color, opa);		// Bottom middle
 
     uint32_t r_out_sqr = r_out * r_out;
     uint32_t r_in_sqr = r_in * r_in;
@@ -90,25 +97,32 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
             deg_base =  fast_atan2(xi, yi) - 180;
 
 			deg = 180 + deg_base;
-			if ((deg >= start_angle) && (deg <= end_angle)) {
+			if (deg_test(deg, start_angle, end_angle)) {
 				if(x_start[0] == LV_COORD_MIN) x_start[0] = xi;
-			} else if(x_start[0] != LV_COORD_MIN && x_end[0] == LV_COORD_MIN) x_end[0] = xi - 1;
+			} else if(x_start[0] != LV_COORD_MIN && x_end[0] == LV_COORD_MIN) {
+				x_end[0] = xi - 1;
+			}
 
-
-			deg = 360 - deg_base; //BSP_LCD_FastAtan2(x, -y);
-			if ((deg >= start_angle) && (deg <= end_angle)) {
+			deg = 360 - deg_base;
+			if (deg_test(deg, start_angle, end_angle)) {
 				if(x_start[1] == LV_COORD_MIN) x_start[1] = xi;
-			} else if(x_start[1] != LV_COORD_MIN && x_end[1] == LV_COORD_MIN) x_end[1] = xi - 1;
+			} else if(x_start[1] != LV_COORD_MIN && x_end[1] == LV_COORD_MIN) {
+				x_end[1] = xi - 1;
+			}
 
-			deg = 180 - deg_base; //BSP_LCD_FastAtan2(-x, y);
-			if ((deg >= start_angle) && (deg <= end_angle)) {
+			deg = 180 - deg_base;
+			if (deg_test(deg, start_angle, end_angle)) {
 				if(x_start[2] == LV_COORD_MIN) x_start[2] = xi;
-			} else if(x_start[2] != LV_COORD_MIN && x_end[2] == LV_COORD_MIN) x_end[2] = xi - 1;
+			} else if(x_start[2] != LV_COORD_MIN && x_end[2] == LV_COORD_MIN) {
+				x_end[2] = xi - 1;
+			}
 
-			deg = deg_base; //BSP_LCD_FastAtan2(-x, -y);
-			if ((deg >= start_angle) && (deg <= end_angle)) {
+			deg = deg_base;
+			if (deg_test(deg, start_angle, end_angle)) {
 				if(x_start[3] == LV_COORD_MIN) x_start[3] = xi;
-			} else if(x_start[3] != LV_COORD_MIN && x_end[3] == LV_COORD_MIN) x_end[3] = xi - 1;
+			} else if(x_start[3] != LV_COORD_MIN && x_end[3] == LV_COORD_MIN) {
+				x_end[3] = xi - 1;
+			}
 
             if(r_act_sqr < r_in_sqr) break;	/*No need to continue the iteration in x once we found the inner edge of the arc*/
         }
@@ -240,4 +254,18 @@ static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coor
 	lv_area_set(&area, x, y, x + len, y);
 
 	fill_fp(&area, mask, color, opa);
+}
+
+static bool deg_test_norm(uint16_t deg, uint16_t start, uint16_t end)
+{
+	if(deg >= start && deg <= end) return true;
+	else return false;
+}
+
+static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end)
+{
+	if(deg >= start || deg <= end) {
+		return true;
+	}
+	else return false;
 }

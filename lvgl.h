@@ -27,6 +27,7 @@ extern "C" {
 
 #include "lv_objx/lv_btn.h"
 #include "lv_objx/lv_img.h"
+#include "lv_objx/lv_img.h"
 #include "lv_objx/lv_label.h"
 #include "lv_objx/lv_line.h"
 #include "lv_objx/lv_page.h"
@@ -49,6 +50,8 @@ extern "C" {
 #include "lv_objx/lv_lmeter.h"
 #include "lv_objx/lv_sw.h"
 #include "lv_objx/lv_kb.h"
+#include "lv_objx/lv_arc.h"
+#include "lv_objx/lv_preload.h"
 #include "lv_objx/lv_calendar.h"
 
 /*********************

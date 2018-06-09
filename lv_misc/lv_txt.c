@@ -203,7 +203,7 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
 
         /*Trim closing spaces. Important when the text is aligned to the middle */
         for(i = length - 1; i > 0; i--) {
-            if(txt[i] == ' ') {
+            if(txt[i] == ' ' || txt[i] == '\n' || txt[i] == '\r') {
                 width -= lv_font_get_width(font, txt[i]);
                 width -= letter_space;
             } else {

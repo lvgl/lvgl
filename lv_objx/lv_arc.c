@@ -76,7 +76,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new arc arc*/
     if(copy == NULL) {
-    	lv_arc_set_style(new_arc, &lv_style_plain_color);
+    	lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, &lv_style_plain_color);
     }
     /*Copy an existing arc*/
     else {
@@ -117,8 +117,8 @@ void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
 	if(start > 360) start = 360;
 	if(end > 360) end = 360;
 
-	ext->angle_start = LV_MATH_MIN(start, end);
-	ext->angle_end = LV_MATH_MAX(start, end);
+	ext->angle_start = start;
+	ext->angle_end = end;
 
 	lv_obj_invalidate(arc);
 }
@@ -147,7 +147,7 @@ void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, lv_style_t *style)
  * @param arc pointer to an arc object
  * @return the start angle [0..360]
  */
-uint16_t lv_arc_get_angle_start(lv_obj_t * arc, uint16_t start, uint16_t end)
+uint16_t lv_arc_get_angle_start(lv_obj_t * arc)
 {
 	lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
@@ -159,7 +159,7 @@ uint16_t lv_arc_get_angle_start(lv_obj_t * arc, uint16_t start, uint16_t end)
  * @param arc pointer to an arc object
  * @return the end angle [0..360]
  */
-uint16_t lv_arc_get_angle_end(lv_obj_t * arc, uint16_t start, uint16_t end)
+uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
 {
 	lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 

@@ -14,11 +14,12 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_task.h"
 #include "lv_math.h"
+#include "lv_trigo.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_ANIM_RESOLUTION             1024
+#define LV_ANIM_RESOLUTION      1024
 #define LV_ANIM_RES_SHIFT       10
 
 /**********************
@@ -136,16 +137,44 @@ int32_t lv_anim_path_linear(const lv_anim_t *a)
     /*Calculate the current step*/
 
     uint16_t step;
-    if(a->time == a->act_time) step = LV_ANIM_RESOLUTION; /*Use the last value id the time fully elapsed*/
+    if(a->time == a->act_time) step = LV_ANIM_RESOLUTION; /*Use the last value if the time fully elapsed*/
     else step = (a->act_time * LV_ANIM_RESOLUTION) / a->time;
 
-
-    /* Get the new value which will be proportional to the current element of 'path_p'
-     * and the 'start' and 'end' values*/
+    /* Get the new value which will be proportional to `step`
+     * and the `start` and `end` values*/
     int32_t new_value;
     new_value =  (int32_t) step * (a->end - a->start);
     new_value = new_value >> LV_ANIM_RES_SHIFT;
     new_value += a->start;
+
+    return new_value;
+}
+
+/**
+ * Calculate the current value of an animation applying an "S" characteristic (cosine)
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_momentum(const lv_anim_t *a)
+{
+    /*Calculate the current step*/
+
+    int16_t angle;
+    if(a->time == a->act_time) angle = 180;
+    else angle = (int32_t)((int32_t)a->act_time * 180) / a->time;
+
+    int32_t step = lv_trigo_sin(angle - 90) + LV_TRIGO_SIN_MAX;
+
+
+    /* Get the new value which will be proportional to `step`
+     * and the `start` and `end` values*/
+    int32_t new_value;
+    new_value =  (int32_t) step * (a->end - a->start);
+    new_value = new_value >> 16;
+    new_value += a->start;
+
+
+//    printf("angle: %d, val: %d\n", angle, new_value);
 
     return new_value;
 }
