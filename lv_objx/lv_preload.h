@@ -3,14 +3,6 @@
  * 
  */
 
-
-/* TODO Remove these instructions
- * Search an replace: pre loader -> object normal name with lower case (e.g. button, label etc.)
- *                    preload -> object short name with lower case(e.g. btn, label etc)
- *                    PRELOAD -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 #ifndef LV_PRELOAD_H
 #define LV_PRELOAD_H
 
@@ -43,8 +35,7 @@ typedef enum {
 typedef struct {
     lv_arc_ext_t arc; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_preloader_type_t type;
-    uint16_t indic_length;			/*Length of the spinning indicator in degree*/
+    uint16_t arc_length;			/*Length of the spinning indicator in degree*/
     uint16_t time;					/*Time of one round*/
 }lv_preload_ext_t;
 
@@ -71,6 +62,19 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy);
  * Add/remove functions
  *=====================*/
 
+/**
+ * Set the length of the spinning  arc in degrees
+ * @param preload pointer to a preload object
+ * @param deg length of the arc
+ */
+void lv_preload_set_arc_length(lv_obj_t * preload, uint16_t deg);
+
+/**
+ * Set the spin time of the arc
+ * @param preload pointer to a preload object
+ * @param time time of one round in milliseconds
+ */
+void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time);
 
 /*=====================
  * Setter functions
@@ -87,6 +91,18 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the arc length [degree] of the a pre loader
+ * @param preload pointer to a pre loader object
+ */
+uint16_t lv_preload_get_arc_length(lv_obj_t * preload);
+
+/**
+ * Get the spin time of the arc
+ * @param preload pointer to a pre loader object [milliseconds]
+ */
+uint16_t lv_preload_get_spin_time(lv_obj_t * preload);
 
 /**
  * Get style of a pre loader.

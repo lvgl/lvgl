@@ -17,7 +17,13 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_PRELOAD_DEF_ARC_LENGTH
+# define LV_PRELOAD_DEF_ARC_LENGTH	60  	/*[deg]*/
+#endif
 
+#ifndef LV_PRELOAD_DEF_SPIN_TIME
+# define LV_PRELOAD_DEF_SPIN_TIME	1000    /*[ms]*/
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -62,22 +68,21 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_preload);
 
     /*Initialize the allocated 'ext' */
-    ext->type = LV_PRELOAD_TYPE_SPINNING_ARC;
+    ext->arc_length = LV_PRELOAD_DEF_ARC_LENGTH;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_preload, lv_preload_signal);
     lv_obj_set_design_func(new_preload, lv_preload_design);
-
 
     lv_anim_t a;
     a.var = new_preload;
     a.start = 0;
     a.end = 360;
     a.fp = (lv_anim_fp_t)preload_spin;
-    a.path = lv_anim_path_momentum;
+    a.path = lv_anim_path_ease_in_out;
     a.end_cb = NULL;
     a.act_time = 0;
-    a.time = 1000;
+    a.time = LV_PRELOAD_DEF_SPIN_TIME;
     a.playback = 0;
     a.playback_pause = 0;
     a.repeat = 1;
@@ -91,7 +96,8 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
     /*Copy an existing pre loader*/
     else {
     	lv_preload_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-    	ext->type = copy_ext->type;
+    	ext->arc_length = copy_ext->arc_length;
+    	ext->time = copy_ext->time;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_preload);
     }
@@ -103,19 +109,47 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
  * Add/remove functions
  *=====================*/
 
-/*
- * New object specific "add" or "remove" functions come here
+/**
+ * Set the length of the spinning  arc in degrees
+ * @param preload pointer to a preload object
+ * @param deg length of the arc
  */
+void lv_preload_set_arc_length(lv_obj_t * preload, uint16_t deg)
+{
+	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
+	ext->arc_length = deg;
+}
 
+/**
+ * Set the spin time of the arc
+ * @param preload pointer to a preload object
+ * @param time time of one round in milliseconds
+ */
+void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
+{
+	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
+
+	ext->time = time;
+
+    lv_anim_t a;
+    a.var = preload;
+    a.start = 0;
+    a.end = 360;
+    a.fp = (lv_anim_fp_t)preload_spin;
+    a.path = lv_anim_path_ease_in_out;
+    a.end_cb = NULL;
+    a.act_time = 0;
+    a.time = time;
+    a.playback = 0;
+    a.playback_pause = 0;
+    a.repeat = 1;
+    a.repeat_pause = 0;
+    lv_anim_create(&a);
+}
 /*=====================
  * Setter functions
  *====================*/
-
-/*
- * New object specific "set" functions come here
- */
-
 
 /**
  * Set a style of a pre loader.
@@ -125,8 +159,6 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
  *  */
 void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_t *style)
 {
-    lv_preload_ext_t *ext = lv_obj_get_ext_attr(preload);
-
     switch (type) {
         case LV_PRELOAD_STYLE_MAIN:
         	lv_arc_set_style(preload, LV_ARC_STYLE_MAIN, style);
@@ -138,9 +170,26 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_
  * Getter functions
  *====================*/
 
-/*
- * New object specific "get" functions come here
+/**
+ * Get the arc length [degree] of the a pre loader
+ * @param preload pointer to a pre loader object
  */
+uint16_t lv_preload_get_arc_length(lv_obj_t * preload)
+{
+	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
+	return ext->arc_length;
+
+}
+
+/**
+ * Get the spin time of the arc
+ * @param preload pointer to a pre loader object [milliseconds]
+ */
+uint16_t lv_preload_get_spin_time(lv_obj_t * preload)
+{
+	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
+	return ext->time;
+}
 
 /**
  * Get style of a pre loader.
@@ -150,7 +199,6 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_
  *  */
 lv_style_t * lv_preload_get_style(lv_obj_t * preload, lv_preload_style_t type)
 {
-    lv_preload_ext_t *ext = lv_obj_get_ext_attr(preload);
 
     switch (type) {
         case LV_PRELOAD_STYLE_MAIN:     return lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
@@ -257,8 +305,9 @@ static lv_res_t lv_preload_signal(lv_obj_t * preload, lv_signal_t sign, void * p
 static void preload_spin(void * ptr, int32_t val)
 {
 	lv_obj_t * preload = ptr;
-	uint16_t angle_start = val + 15;
-	uint16_t angle_end = angle_start + 60;
+	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
+	int16_t angle_start = val - ext->arc_length / 2 + 180;
+	int16_t angle_end = angle_start + ext->arc_length;
 
 	angle_start = angle_start % 360;
 	angle_end = angle_end % 360;

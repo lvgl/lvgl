@@ -9,7 +9,6 @@ CSRCS += lv_ll.c
 CSRCS += lv_color.c
 CSRCS += lv_txt.c
 CSRCS += lv_ufs.c
-CSRCS += lv_trigo.c
 CSRCS += lv_math.c
 
 DEPPATH += --dep-path lvgl/lv_misc

@@ -14,7 +14,6 @@
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_task.h"
 #include "lv_math.h"
-#include "lv_trigo.h"
 
 /*********************
  *      DEFINES
