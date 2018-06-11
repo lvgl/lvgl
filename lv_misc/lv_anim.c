@@ -155,28 +155,25 @@ int32_t lv_anim_path_linear(const lv_anim_t *a)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_momentum(const lv_anim_t *a)
+int32_t lv_anim_path_ease_in_out(const lv_anim_t *a)
 {
     /*Calculate the current step*/
 
-    int16_t angle;
-    if(a->time == a->act_time) angle = 180;
-    else angle = (int32_t)((int32_t)a->act_time * 180) / a->time;
+	    uint32_t t;
+	    if(a->time == a->act_time) t = 1024;
+	    else t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = lv_trigo_sin(angle - 90) + LV_TRIGO_SIN_MAX;
+	    int32_t step = lv_bezier3(t, 0, 100, 924, 1024);
+
+//		printf("t: %d, v: %d\n", t, step);
+
+		int32_t new_value;
+		new_value =  (int32_t) step * (a->end - a->start);
+		new_value = new_value >> 10;
+		new_value += a->start;
 
 
-    /* Get the new value which will be proportional to `step`
-     * and the `start` and `end` values*/
-    int32_t new_value;
-    new_value =  (int32_t) step * (a->end - a->start);
-    new_value = new_value >> 16;
-    new_value += a->start;
-
-
-//    printf("angle: %d, val: %d\n", angle, new_value);
-
-    return new_value;
+		return new_value;
 }
 
 /**
