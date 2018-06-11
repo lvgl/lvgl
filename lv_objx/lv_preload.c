@@ -78,7 +78,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
     a.var = new_preload;
     a.start = 0;
     a.end = 360;
-    a.fp = (lv_anim_fp_t)preload_spin;
+    a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
     a.path = lv_anim_path_ease_in_out;
     a.end_cb = NULL;
     a.act_time = 0;
@@ -136,7 +136,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
     a.var = preload;
     a.start = 0;
     a.end = 360;
-    a.fp = (lv_anim_fp_t)preload_spin;
+    a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
     a.path = lv_anim_path_ease_in_out;
     a.end_cb = NULL;
     a.act_time = 0;
@@ -213,9 +213,20 @@ lv_style_t * lv_preload_get_style(lv_obj_t * preload, lv_preload_style_t type)
  * Other functions
  *====================*/
 
-/*
- * New object specific "other" functions come here
- */
+void lv_preload_spinner_animation(void * ptr, int32_t val)
+{
+	lv_obj_t * preload = ptr;
+	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
+	int16_t angle_start = val - ext->arc_length / 2 + 180;
+	int16_t angle_end = angle_start + ext->arc_length;
+
+	angle_start = angle_start % 360;
+	angle_end = angle_end % 360;
+
+	lv_arc_set_angles(preload, angle_start, angle_end);
+
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -259,7 +270,7 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
     	bg_area.x2 = x + r;
     	bg_area.y2 = y + r;
 
-    	lv_draw_rect(&bg_area, mask, &bg_style);
+    	if(style->body.empty == 0) lv_draw_rect(&bg_area, mask, &bg_style);
     	lv_draw_arc(x, y, r, mask, ext->arc.angle_start, ext->arc.angle_end, style);
     }
     /*Post draw when the children are drawn*/
@@ -299,21 +310,6 @@ static lv_res_t lv_preload_signal(lv_obj_t * preload, lv_signal_t sign, void * p
     }
 
     return res;
-}
-
-
-static void preload_spin(void * ptr, int32_t val)
-{
-	lv_obj_t * preload = ptr;
-	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
-	int16_t angle_start = val - ext->arc_length / 2 + 180;
-	int16_t angle_end = angle_start + ext->arc_length;
-
-	angle_start = angle_start % 360;
-	angle_end = angle_end % 360;
-
-	lv_arc_set_angles(preload, angle_start, angle_end);
-
 }
 
 #endif
