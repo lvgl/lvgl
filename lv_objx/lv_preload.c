@@ -33,7 +33,6 @@
  **********************/
 static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_preload_signal(lv_obj_t * preload, lv_signal_t sign, void * param);
-static void preload_spin(void * ptr, int32_t val);
 
 /**********************
  *  STATIC VARIABLES
@@ -250,9 +249,9 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-    	lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
-    	lv_style_t * style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
 
+    	/*Draw a circle as background*/
+    	lv_style_t * style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
     	lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(preload), lv_obj_get_height(preload))) / 2;
     	lv_coord_t x = preload->coords.x1 + lv_obj_get_width(preload) / 2;
     	lv_coord_t y = preload->coords.y1 + lv_obj_get_height(preload) / 2;
@@ -271,7 +270,9 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
     	bg_area.y2 = y + r;
 
     	if(style->body.empty == 0) lv_draw_rect(&bg_area, mask, &bg_style);
-    	lv_draw_arc(x, y, r, mask, ext->arc.angle_start, ext->arc.angle_end, style);
+
+    	/*Draw the arc above the background circle */
+    	ancestor_design(preload, mask, mode);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {

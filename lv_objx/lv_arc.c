@@ -221,7 +221,6 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
     	lv_coord_t x = arc->coords.x1 + lv_obj_get_width(arc) / 2;
     	lv_coord_t y = arc->coords.y1 + lv_obj_get_height(arc) / 2;
 
-
     	lv_draw_arc(x, y, r, mask, ext->angle_start, ext->angle_end, style);
 
     	lv_coord_t thick_2 = style->body.thickness / 2;
