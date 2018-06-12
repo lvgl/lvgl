@@ -175,6 +175,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
 	lv_page_glue_obj(liste, true);
 	lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
 	lv_btn_set_fit(liste, false, true);
+	lv_obj_set_protect(liste, LV_PROTECT_PRESS_LOST);
     if(btn_signal == NULL) btn_signal = lv_obj_get_signal_func(liste);
 
     /*Make the size adjustment*/

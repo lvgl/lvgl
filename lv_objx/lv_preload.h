@@ -115,6 +115,7 @@ lv_style_t * lv_preload_get_style(lv_obj_t * preload, lv_preload_style_t type);
 /*=====================
  * Other functions
  *====================*/
+void lv_preload_spinner_animation(void * ptr, int32_t val);
 
 /**********************
  *      MACROS
