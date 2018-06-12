@@ -75,7 +75,37 @@ typedef enum {
  **********************/
 
 #if LV_ANTIALIAS != 0
-lv_opa_t antialias_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t line_opa);
+
+/**
+ * Get the opacity of a pixel based it's position in a line segment
+ * @param seg segment length
+ * @param px_id position of  of a pixel which opacity should be get [0..seg-1]
+ * @param base_opa the base opacity
+ * @return the opacity of the given pixel
+ */
+ lv_opa_t lv_draw_aa_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t base_opa);
+
+/**
+ * Add a vertical  anti-aliasing segment (pixels with decreasing opacity)
+ * @param x start point x coordinate
+ * @param y start point y coordinate
+ * @param length length of segment (negative value to start from 0 opacity)
+ * @param mask draw only in this area
+ * @param color color of pixels
+ * @param opa maximum opacity
+ */
+void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
+
+/**
+ * Add a horizontal anti-aliasing segment (pixels with decreasing opacity)
+ * @param x start point x coordinate
+ * @param y start point y coordinate
+ * @param length length of segment (negative value to start from 0 opacity)
+ * @param mask draw only in this area
+ * @param color color of pixels
+ * @param opa maximum opacity
+ */
+void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
 #endif
 
 /**********************

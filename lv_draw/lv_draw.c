@@ -78,7 +78,15 @@ static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
  **********************/
 
  #if LV_ANTIALIAS != 0
- lv_opa_t antialias_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t line_opa)
+
+/**
+ * Get the opacity of a pixel based it's position in a line segment
+ * @param seg segment length
+ * @param px_id position of  of a pixel which opacity should be get [0..seg-1]
+ * @param base_opa the base opacity
+ * @return the opacity of the given pixel
+ */
+ lv_opa_t lv_draw_aa_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t base_opa)
  {
      /* How to calculate the opacity of pixels on the edges which makes the anti-aliasing?
       * For example we have a line like this (y = -0.5 * x):
@@ -111,11 +119,61 @@ static void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
                                           seg5, seg6, seg7, seg8};
 
      if(seg == 0) return LV_OPA_TRANSP;
-     else if(seg < 8) return (uint32_t)((uint32_t)seg_map[seg - 1][px_id] * line_opa) >> 8;
+     else if(seg < 8) return (uint32_t)((uint32_t)seg_map[seg - 1][px_id] * base_opa) >> 8;
      else {
-         return ((px_id * 2 + 1) * line_opa) / (2 * seg);
+         return ((px_id * 2 + 1) * base_opa) / (2 * seg);
      }
 
+ }
+
+ /**
+  * Add a vertical  anti-aliasing segment (pixels with decreasing opacity)
+  * @param x start point x coordinate
+  * @param y start point y coordinate
+  * @param length length of segment (negative value to start from 0 opacity)
+  * @param mask draw only in this area
+  * @param color color of pixels
+  * @param opa maximum opacity
+  */
+void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa)
+ {
+ 	bool aa_inv = false;
+ 	if(length < 0) {
+ 		aa_inv = true;
+ 		length = -length;
+ 	}
+
+ 	lv_coord_t i;
+ 	for(i = 0; i < length; i++) {
+ 		lv_opa_t px_opa = lv_draw_aa_get_opa(length, i, opa);
+ 		if(aa_inv) px_opa = opa - px_opa;
+ 		px_fp(x, y + i, mask, color, px_opa);
+ 	}
+ }
+
+ /**
+  * Add a horizontal anti-aliasing segment (pixels with decreasing opacity)
+  * @param x start point x coordinate
+  * @param y start point y coordinate
+  * @param length length of segment (negative value to start from 0 opacity)
+  * @param mask draw only in this area
+  * @param color color of pixels
+  * @param opa maximum opacity
+  */
+void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa)
+ {
+ 	bool aa_inv = false;
+ 	if(length < 0) {
+ 		aa_inv = true;
+ 		length = -length;
+ 	}
+
+ 	lv_coord_t i;
+ 	for(i = 0; i < length; i++) {
+ 		lv_opa_t px_opa = lv_draw_aa_get_opa(length, i, opa);
+ 		if(aa_inv) px_opa = opa - px_opa;
+ 		px_fp(x + i, y, mask, color, px_opa);
+ 	}
  }
 
 #endif

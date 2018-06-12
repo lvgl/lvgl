@@ -253,7 +253,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
                 if(seg_size > CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD) {    /*Use non-linear opa mapping on the first segment*/
                     aa_opa = antialias_get_opa_circ(seg_size, i, style->body.opa);
                 } else {
-                    aa_opa = opa - antialias_get_opa(seg_size, i, style->body.opa);
+                    aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, style->body.opa);
                 }
 
                 px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, aa_color_hor_bottom, aa_opa);
@@ -413,7 +413,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
 
     lv_coord_t i;
     for(i = 0; i  < seg_size; i++) {
-        lv_opa_t aa_opa = opa - antialias_get_opa(seg_size, i, opa);
+        lv_opa_t aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, opa);
         px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, aa_color_hor_top, aa_opa);
         px_fp(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, aa_color_hor_top, aa_opa);
         px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, aa_color_hor_bottom, aa_opa);
@@ -745,7 +745,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                 if(seg_size > CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD) {    /*Use non-linear opa mapping on the first segment*/
                     aa_opa = antialias_get_opa_circ(seg_size, i, style->body.border.opa);
                 } else {
-                    aa_opa = style->body.border.opa - antialias_get_opa(seg_size, i, style->body.border.opa);
+                    aa_opa = style->body.border.opa - lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
                 }
 
                 if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
@@ -790,7 +790,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                if(seg_size > CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD) {    /*Use non-linear opa mapping on the first segment*/
                    aa_opa = style->body.border.opa - antialias_get_opa_circ(seg_size, i, style->body.border.opa);
                } else {
-                   aa_opa = antialias_get_opa(seg_size, i, style->body.border.opa);
+                   aa_opa = lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
                }
 
                if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
@@ -925,7 +925,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
 
     lv_coord_t i;
     for(i = 0; i  < seg_size; i++) {
-        lv_opa_t aa_opa = style->body.border.opa - antialias_get_opa(seg_size, i, style->body.border.opa);
+        lv_opa_t aa_opa = style->body.border.opa - lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
             px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
             px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
@@ -978,7 +978,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     seg_size = in_y_seg_end - in_y_seg_start;
 
     for(i = 0; i  < seg_size; i++) {
-        lv_opa_t aa_opa =  antialias_get_opa(seg_size, i, style->body.border.opa);
+        lv_opa_t aa_opa =  lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
             px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) - 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
         }

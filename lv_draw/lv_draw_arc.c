@@ -76,6 +76,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     if (deg_test(180, start_angle, end_angle)) 	ver_line(center_x, center_y - r_out + 1,  mask, thickness - 1, color, opa);	// Top Middle
     if (deg_test(0, start_angle, end_angle)) 	ver_line(center_x, center_y + r_in,  mask, thickness - 1, color, opa);		// Bottom middle
 
+
+    lv_point_t last_corner_out = {-r_out, -r_out};
     uint32_t r_out_sqr = r_out * r_out;
     uint32_t r_in_sqr = r_in * r_in;
     int16_t xi;
@@ -147,6 +149,12 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     		if(x_end[3] == LV_COORD_MIN) x_end[3] = xi - 1;
         	hor_line(center_x-x_end[3], center_y-yi, mask, LV_MATH_ABS(x_end[3] - x_start[3]), color, opa);
     	}
+
+
+#if LV_ANTIALIAS
+
+
+#endif
 
     }
 }

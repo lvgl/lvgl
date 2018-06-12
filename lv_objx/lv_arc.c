@@ -221,7 +221,32 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
     	lv_coord_t x = arc->coords.x1 + lv_obj_get_width(arc) / 2;
     	lv_coord_t y = arc->coords.y1 + lv_obj_get_height(arc) / 2;
 
+
     	lv_draw_arc(x, y, r, mask, ext->angle_start, ext->angle_end, style);
+
+    	lv_coord_t thick_2 = style->body.thickness / 2;
+    	lv_coord_t cir_x = ((r - thick_2) * lv_trigo_sin(ext->angle_start) >> LV_TRIGO_SHIFT);
+    	lv_coord_t cir_y = ((r - thick_2) * lv_trigo_sin(ext->angle_start + 90) >> LV_TRIGO_SHIFT);
+
+    	if(style->body.radius == LV_RADIUS_CIRCLE) {
+			lv_area_t cir_area;
+			cir_area.x1 = cir_x + x - thick_2;
+			cir_area.y1 = cir_y + y - thick_2;
+			cir_area.x2 = cir_x + x + thick_2;
+			cir_area.y2 = cir_y + y + thick_2;
+
+			lv_draw_rect(&cir_area, mask, &style);
+
+			cir_x = ((r - thick_2) * lv_trigo_sin(ext->angle_end) >> LV_TRIGO_SHIFT);
+			cir_y = ((r - thick_2) * lv_trigo_sin(ext->angle_end + 90) >> LV_TRIGO_SHIFT);
+
+			cir_area.x1 = cir_x + x - thick_2;
+			cir_area.y1 = cir_y + y - thick_2;
+			cir_area.x2 = cir_x + x + thick_2;
+			cir_area.y2 = cir_y + y + thick_2;
+
+			lv_draw_rect(&cir_area, mask, &style);
+    	}
 
     }
     /*Post draw when the children are drawn*/
