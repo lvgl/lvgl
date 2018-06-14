@@ -292,6 +292,7 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
 		lv_area_t coords;
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(img);
 
 		lv_obj_get_coords(img, &coords);
 
@@ -304,16 +305,16 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
                 cords_tmp.x1 = coords.x1;
                 cords_tmp.x2 = coords.x1 + ext->w - 1;
                 for(; cords_tmp.x1 < coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-                    lv_draw_img(&cords_tmp, mask, style, ext->src);
+                    lv_draw_img(&cords_tmp, mask, ext->src, style, opa_scale);
                 }
             }
 		} else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
-            lv_draw_label(&coords, mask, style, ext->src, LV_TXT_FLAG_NONE, NULL);
+            lv_draw_label(&coords, mask, style, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
 
 		} else {
 
 		    /*Trigger the error handler of image drawer*/
-            lv_draw_img(&img->coords, mask, style, NULL);
+            lv_draw_img(&img->coords, mask, NULL, style, opa_scale);
 
 		}
     }

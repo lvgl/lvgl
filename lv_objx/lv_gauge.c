@@ -337,6 +337,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     lv_style_t * style = lv_obj_get_style(gauge);
+    lv_opa_t opa_scale = lv_obj_get_opa_scale(gauge);
     lv_coord_t r = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.hor) - style->body.padding.inner;
     lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
     lv_coord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
@@ -372,7 +373,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, scale_txt, LV_TXT_FLAG_NONE, NULL);
+        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL);
     }
 }
 /**
@@ -385,6 +386,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     lv_style_t style_needle;
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     lv_style_t * style = lv_gauge_get_style(gauge);
+	lv_opa_t opa_scale = lv_obj_get_opa_scale(gauge);
 
     lv_coord_t r = lv_obj_get_width(gauge) / 2 - style->body.padding.hor;
     lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
@@ -411,7 +413,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
         if(ext->needle_colors == NULL) style_needle.line.color = LV_GAUGE_DEF_NEEDLE_COLOR;
         else style_needle.line.color = ext->needle_colors[i];
 
-        lv_draw_line(&p_mid, &p_end, mask, &style_needle);
+        lv_draw_line(&p_mid, &p_end, mask, &style_needle, opa_scale);
     }
 
     /*Draw the needle middle area*/
@@ -427,7 +429,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     nm_cord.x2 = x_ofs + style->body.padding.ver;
     nm_cord.y2 = y_ofs + style->body.padding.ver;
 
-    lv_draw_rect(&nm_cord, mask, &style_neddle_mid);
+    lv_draw_rect(&nm_cord, mask, &style_neddle_mid, lv_obj_get_opa_scale(gauge));
 }
 
 #endif

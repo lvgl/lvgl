@@ -414,7 +414,7 @@ static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_
     	return ancestor_design_f(chart, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		/*Draw the background*/
-        lv_draw_rect(&chart->coords, mask, lv_obj_get_style(chart));
+        lv_draw_rect(&chart->coords, mask, lv_obj_get_style(chart), lv_obj_get_opa_scale(chart));
 
 		lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
@@ -470,6 +470,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
 {
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 	lv_style_t * style = lv_obj_get_style(chart);
+	lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
 
 	uint8_t div_i;
     uint8_t div_i_end;
@@ -500,7 +501,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
             if(div_i == div_i_end) p1.y -= (style->line.width >> 1) + 1;  /*The last line might not be visible*/
 
             p2.y = p1.y;
-            lv_draw_line(&p1, &p2, mask, style);
+            lv_draw_line(&p1, &p2, mask, style, opa_scale);
         }
 	}
 
@@ -522,7 +523,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
             if(div_i == div_i_start) p1.x += (style->line.width >> 1) + 1;  /*The first line might not be visible*/
             if(div_i == div_i_end) p1.x -= (style->line.width >> 1) + 1;  /*The last line might not be visible*/
             p2.x = p1.x;
-            lv_draw_line(&p1, &p2, mask, style);
+            lv_draw_line(&p1, &p2, mask, style, opa_scale);
         }
 	}
 }
@@ -544,14 +545,15 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
     lv_coord_t y_ofs = chart->coords.y1;
 	int32_t y_tmp;
 	lv_chart_series_t *ser;
-	lv_style_t lines;
-	lv_style_copy(&lines, &lv_style_plain);
-	lines.line.opa = ext->series.opa;
-    lines.line.width = ext->series.width;
+	lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
+	lv_style_t style;
+	lv_style_copy(&style, &lv_style_plain);
+	style.line.opa = ext->series.opa;
+    style.line.width = ext->series.width;
 
 	/*Go through all data lines*/
 	LL_READ_BACK(ext->series_ll, ser) {
-		lines.line.color = ser->color;
+		style.line.color = ser->color;
 
 		p1.x = 0 + x_ofs;
 		p2.x = 0 + x_ofs;
@@ -569,7 +571,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
 			y_tmp = y_tmp / (ext->ymax - ext->ymin);
 			p2.y = h - y_tmp + y_ofs;
 
-			lv_draw_line(&p1, &p2, mask, &lines);
+			lv_draw_line(&p1, &p2, mask, &style, opa_scale);
 		}
 	}
 }
@@ -617,7 +619,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
 			cir_a.y2 = cir_a.y1 + style_point.body.radius;
 			cir_a.y1 -= style_point.body.radius;
 
-			lv_draw_rect(&cir_a, mask, &style_point);
+			lv_draw_rect(&cir_a, mask, &style_point, lv_obj_get_opa_scale(chart));
 		}
 		series_cnt++;
 	}
@@ -673,7 +675,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
 
             mask_ret = lv_area_union(&col_mask, mask, &col_a);
             if(mask_ret != false) {
-                lv_draw_rect(&chart->coords, &col_mask, &rects);
+                lv_draw_rect(&chart->coords, &col_mask, &rects, lv_obj_get_opa_scale(chart));
             }
         }
 	}

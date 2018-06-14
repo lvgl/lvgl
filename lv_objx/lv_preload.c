@@ -269,7 +269,7 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
     	bg_area.x2 = x + r;
     	bg_area.y2 = y + r;
 
-    	if(style->body.empty == 0) lv_draw_rect(&bg_area, mask, &bg_style);
+    	if(style->body.empty == 0) lv_draw_rect(&bg_area, mask, &bg_style, lv_obj_get_opa_scale(preload));
 
     	/*Draw the arc above the background circle */
     	ancestor_design(preload, mask, mode);

@@ -431,6 +431,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         ancestor_design(ddlist, mask, mode);
 
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(ddlist);
 
         /*If the list is opened draw a rectangle under the selected item*/
         if(ext->opened != 0) {
@@ -448,7 +449,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
             rect_area.x1 = ddlist->coords.x1;
             rect_area.x2 = ddlist->coords.x2;
 
-            lv_draw_rect(&rect_area, mask, ext->sel_style);
+            lv_draw_rect(&rect_area, mask, ext->sel_style, opa_scale);
         }
     }
     /*Post draw when the children are drawn*/
@@ -457,6 +458,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 
         /*Redraw the text on the selected area with a different color*/
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(ddlist);
 
         /*Redraw only in opened state*/
         if(ext->opened == 0) return true;
@@ -482,7 +484,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
             lv_style_copy(&new_style, style);
             new_style.text.color = sel_style->text.color;
             new_style.text.opa = sel_style->text.opa;
-            lv_draw_label(&ext->label->coords, &mask_sel, &new_style,
+            lv_draw_label(&ext->label->coords, &mask_sel, &new_style, opa_scale,
                           lv_label_get_text(ext->label), LV_TXT_FLAG_NONE, NULL);
         }
     }

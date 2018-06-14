@@ -206,6 +206,7 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
 		if(ext->point_num == 0 || ext->point_array == NULL) return false;
 
 		lv_style_t * style = lv_obj_get_style(line);
+		lv_opa_t opa_scale = lv_obj_get_opa_scale(line);
 		lv_area_t area;
 		lv_obj_get_coords(line, &area);
 		lv_coord_t x_ofs = area.x1;
@@ -214,7 +215,6 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
 		lv_point_t p2;
 		lv_coord_t h = lv_obj_get_height(line);
 		uint16_t i;
-
 		lv_style_t circle_style;
 		lv_style_copy(&circle_style, style);
 		circle_style.body.radius = LV_RADIUS_CIRCLE;
@@ -236,7 +236,7 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
 				p1.y = h - ext->point_array[i].y  + y_ofs;
 				p2.y = h - ext->point_array[i + 1].y + y_ofs;
 			}
-			lv_draw_line(&p1, &p2, mask, style);
+			lv_draw_line(&p1, &p2, mask, style, opa_scale);
 
 			circle_area.x1 = p1.x - (style->line.width >> 1);
 			circle_area.y1 = p1.y - (style->line.width >> 1);

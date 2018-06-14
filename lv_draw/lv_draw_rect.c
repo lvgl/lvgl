@@ -25,14 +25,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
-static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
-static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
-static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 #if USE_LV_SHADOW && LV_VDB_SIZE
-static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
-static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style);
-static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style, lv_opa_t opa_scale);
+static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map);
 #endif
 static uint16_t lv_draw_cont_radius_corr(uint16_t r, lv_coord_t w, lv_coord_t h);
@@ -55,29 +55,30 @@ static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_
  * @param coords the coordinates of the rectangle
  * @param mask the rectangle will be drawn only in this mask
  * @param style pointer to a style
+ * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 
 #if USE_LV_SHADOW && LV_VDB_SIZE
     if(style->body.shadow.width != 0) {
-        lv_draw_shadow(coords, mask, style);
+        lv_draw_shadow(coords, mask, style, opa_scale);
     }
 #endif
     if(style->body.empty == 0){
-        lv_draw_rect_main_mid(coords, mask, style);
+        lv_draw_rect_main_mid(coords, mask, style, opa_scale);
 
         if(style->body.radius != 0) {
-            lv_draw_rect_main_corner(coords, mask, style);
+            lv_draw_rect_main_corner(coords, mask, style, opa_scale);
         }
     }
 
     if(style->body.border.width != 0 && style->body.border.part != LV_BORDER_NONE) {
-        lv_draw_rect_border_straight(coords, mask, style);
+        lv_draw_rect_border_straight(coords, mask, style, opa_scale);
 
         if(style->body.radius != 0) {
-            lv_draw_rect_border_corner(coords, mask, style);
+            lv_draw_rect_border_corner(coords, mask, style, opa_scale);
         }
     }
 }
@@ -91,17 +92,18 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
  * @param coords the coordinates of the original rectangle
  * @param mask the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
+ * @param opa_scale scale down all opacities by the factor
  */
-static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     uint16_t radius = style->body.radius;
 
     lv_color_t mcolor = style->body.main_color;
     lv_color_t gcolor = style->body.grad_color;
     uint8_t mix;
-    lv_opa_t opa = style->body.opa;
     lv_coord_t height = lv_area_get_height(coords);
     lv_coord_t width = lv_area_get_width(coords);
+    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
@@ -160,15 +162,16 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
  * @param coords the coordinates of the original rectangle
  * @param mask the rectangle will be drawn only  on this area
  * @param rects_p pointer to a rectangle style
+ * @param opa_scale scale down all opacities by the factor
  */
-static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     uint16_t radius = style->body.radius;
 
     lv_color_t mcolor = style->body.main_color;
     lv_color_t gcolor = style->body.grad_color;
     lv_color_t act_color;
-    lv_opa_t opa = style->body.opa;
+    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
     uint8_t mix;
     lv_coord_t height = lv_area_get_height(coords);
     lv_coord_t width = lv_area_get_width(coords);
@@ -251,9 +254,9 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
             for(i = 0; i  < seg_size; i++) {
                 lv_opa_t aa_opa;
                 if(seg_size > CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD) {    /*Use non-linear opa mapping on the first segment*/
-                    aa_opa = antialias_get_opa_circ(seg_size, i, style->body.opa);
+                    aa_opa = antialias_get_opa_circ(seg_size, i, opa);
                 } else {
-                    aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, style->body.opa);
+                    aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, opa);
                 }
 
                 px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, aa_color_hor_bottom, aa_opa);
@@ -304,8 +307,8 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
             if(mcolor.full == gcolor.full) act_color = mcolor;
             else {
                 mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
-                act_color = lv_color_mix(mcolor, gcolor, mix);
             }
+                act_color = lv_color_mix(mcolor, gcolor, mix);
             fill_fp(&mid_top_area, mask, act_color, opa);
         }
 
@@ -438,7 +441,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
         aa_color_hor_top = lv_color_mix(gcolor, mcolor, mix);
         aa_color_hor_bottom = lv_color_mix(mcolor, gcolor, mix);
 
-        lv_opa_t aa_opa = style->body.opa >> 1;
+        lv_opa_t aa_opa = opa >> 1;
         px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p), rb_origo.y + LV_CIRC_OCT2_Y(aa_p), mask, aa_color_hor_bottom, aa_opa);
         px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p), lb_origo.y + LV_CIRC_OCT4_Y(aa_p), mask, aa_color_hor_bottom, aa_opa);
         px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p), lt_origo.y + LV_CIRC_OCT6_Y(aa_p), mask, aa_color_hor_top, aa_opa);
@@ -455,15 +458,16 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
  * @param coords the coordinates of the original rectangle
  * @param mask_ the rectangle will be drawn only  on this area
  * @param rstyle pointer to a rectangle style
+ * @param opa_scale scale down all opacities by the factor
  */
-static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     uint16_t radius = style->body.radius;
 
     lv_coord_t width = lv_area_get_width(coords);
     lv_coord_t height = lv_area_get_height(coords);
     uint16_t bwidth = style->body.border.width;
-    lv_opa_t opa = style->body.border.opa;
+	lv_opa_t opa = (uint16_t)((uint16_t) style->body.border.opa * opa_scale) >> 8;
     lv_border_part_t part = style->body.border.part;
     lv_color_t color = style->body.border.color;
     lv_area_t work_area;
@@ -647,16 +651,16 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
  * Draw the corners of a rectangle border
  * @param coords the coordinates of the original rectangle
  * @param mask the rectangle will be drawn only  on this area
- * @param rects_p pointer to a rectangle style
- * @param opa opacity of the rectangle (0..255)
+ * @param style pointer to a style
+ * @param opa_scale scale down all opacities by the factor
  */
-static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style)
+static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style, lv_opa_t opa_scale)
 {
     uint16_t radius = style->body.radius ;
     uint16_t bwidth = style->body.border.width;
     lv_color_t color = style->body.border.color;
-    lv_opa_t opa = style->body.border.opa;
     lv_border_part_t part = style->body.border.part;
+    lv_opa_t opa = (uint16_t)((uint16_t) style->body.border.opa * opa_scale) >> 8;
 
     /*0 px border width drawn as 1 px, so decrement the bwidth*/
     bwidth--;
@@ -743,9 +747,9 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                 lv_opa_t aa_opa;
 
                 if(seg_size > CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD) {    /*Use non-linear opa mapping on the first segment*/
-                    aa_opa = antialias_get_opa_circ(seg_size, i, style->body.border.opa);
+                    aa_opa = antialias_get_opa_circ(seg_size, i, opa);
                 } else {
-                    aa_opa = style->body.border.opa - lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
+                    aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, opa);
                 }
 
                 if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
@@ -788,9 +792,9 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                lv_opa_t aa_opa;
 
                if(seg_size > CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD) {    /*Use non-linear opa mapping on the first segment*/
-                   aa_opa = style->body.border.opa - antialias_get_opa_circ(seg_size, i, style->body.border.opa);
+                   aa_opa = opa - antialias_get_opa_circ(seg_size, i, opa);
                } else {
-                   aa_opa = lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
+                   aa_opa = lv_draw_aa_get_opa(seg_size, i, opa);
                }
 
                if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
@@ -925,7 +929,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
 
     lv_coord_t i;
     for(i = 0; i  < seg_size; i++) {
-        lv_opa_t aa_opa = style->body.border.opa - lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
+        lv_opa_t aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, opa);
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
             px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
             px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
@@ -952,7 +956,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
         aa_p.x = out_x_last;
         aa_p.y = out_x_last;
 
-        lv_opa_t aa_opa = style->body.border.opa >> 1;
+        lv_opa_t aa_opa = opa >> 1;
 
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
             px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p), rb_origo.y + LV_CIRC_OCT2_Y(aa_p), mask, style->body.border.color, aa_opa);
@@ -978,7 +982,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     seg_size = in_y_seg_end - in_y_seg_start;
 
     for(i = 0; i  < seg_size; i++) {
-        lv_opa_t aa_opa =  lv_draw_aa_get_opa(seg_size, i, style->body.border.opa);
+        lv_opa_t aa_opa =  lv_draw_aa_get_opa(seg_size, i, opa);
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
             px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) - 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
         }
@@ -1024,8 +1028,9 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
  * Draw a shadow
  * @param rect pointer to rectangle object
  * @param mask pointer to a mask area (from the design functions)
+ * @param opa_scale scale down all opacities by the factor
  */
-static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style)
+static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style, lv_opa_t opa_scale)
 {
     /* If mask is in the middle of cords do not draw shadow*/
     lv_coord_t radius = style->body.radius;
@@ -1047,13 +1052,13 @@ static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, con
     if(lv_area_is_in(mask, &area_tmp) != false) return;
 
     if(style->body.shadow.type == LV_SHADOW_FULL) {
-        lv_draw_shadow_full(coords, mask, style);
+        lv_draw_shadow_full(coords, mask, style, opa_scale);
     } else if(style->body.shadow.type == LV_SHADOW_BOTTOM) {
-        lv_draw_shadow_bottom(coords, mask, style);
+        lv_draw_shadow_bottom(coords, mask, style, opa_scale);
     }
 }
 
-static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
 
     lv_coord_t radius = style->body.radius;
@@ -1098,8 +1103,9 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 # endif
 #endif
     /*1D Blur horizontally*/
+    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
     for(line = 0; line < filter_width; line++) {
-        line_1d_blur[line] = (uint32_t)((uint32_t)(filter_width - line) * (style->body.opa * 2)  << SHADOW_OPA_EXTRA_PRECISION) / (filter_width * filter_width);
+        line_1d_blur[line] = (uint32_t)((uint32_t)(filter_width - line) * (opa * 2)  << SHADOW_OPA_EXTRA_PRECISION) / (filter_width * filter_width);
     }
 
     uint16_t col;
@@ -1214,7 +1220,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 }
 
 
-static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style)
+static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     lv_coord_t radius = style->body.radius;
     lv_coord_t swidth = style->body.shadow.width;
@@ -1253,8 +1259,9 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
 # endif
 #endif
 
+    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
     for(col = 0; col < swidth; col++) {
-        line_1d_blur[col] = (uint32_t)((uint32_t)(swidth - col) * style->body.opa / 2) / (swidth);
+        line_1d_blur[col] = (uint32_t)((uint32_t)(swidth - col) * opa / 2) / (swidth);
     }
 
     lv_point_t point_l;

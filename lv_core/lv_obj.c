@@ -161,7 +161,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 		new_obj->drag_parent = 0;
 		new_obj->hidden = 0;
 		new_obj->top = 0;
+        new_obj->opa_scale_en = 0;
         new_obj->protect = LV_PROTECT_NONE;
+        new_obj->opa_scale = LV_OPA_COVER;
 
 		new_obj->ext_attr = NULL;
 	 }
@@ -208,6 +210,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->hidden = 0;
         new_obj->top = 0;
         new_obj->protect = LV_PROTECT_NONE;
+        new_obj->opa_scale = LV_OPA_COVER;
+        new_obj->opa_scale_en = 0;
         
         new_obj->ext_attr = NULL;
     }
@@ -230,7 +234,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
         new_obj->drag_parent = copy->drag_parent;
         new_obj->hidden = copy->hidden;
         new_obj->top = copy->top;
+        new_obj->opa_scale_en = copy->opa_scale_en;
         new_obj->protect = copy->protect;
+        new_obj->opa_scale = copy->opa_scale;
 
         new_obj->style_p = copy->style_p;
 
@@ -819,6 +825,27 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
 }
 
 /**
+ * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
+ * @param obj pointer to an object
+ * @param en true: opa scaling is enabled for this object and all children; false: no opa scaling
+ */
+void lv_obj_set_opa_scale_enable(lv_obj_t * obj, bool en)
+{
+    obj->opa_scale_en =  en ? 1 : 0;
+}
+
+/**
+ * Set the opa scale of an object
+ * @param obj pointer to an object
+ * @param opa_scale a factor to scale down opacity [0..255]
+ */
+void lv_obj_set_opa_scale(lv_obj_t * obj, lv_opa_t opa_scale)
+{
+    obj->opa_scale = opa_scale;
+    lv_obj_invalidate(obj);
+}
+
+/**
  * Set a bit or bits in the protect filed
  * @param obj pointer to an object
  * @param prot 'OR'-ed values from lv_obj_prot_t
@@ -1302,6 +1329,33 @@ bool lv_obj_get_drag_parent(lv_obj_t * obj)
 }
 
 /**
+ * Get the opa scale enable parameter
+ * @param obj pointer to an object
+ * @return true: opa scaling is enabled for this object and all children false: no opa scaling
+ */
+lv_opa_t lv_obj_get_opa_scale_enable(lv_obj_t * obj)
+{
+    return obj->opa_scale_en == 0 ? false : true;
+}
+
+/**
+ * Get the opa scale parameter of an object
+ * @param obj pointer to an object
+ * @return opa scale [0..255]
+ */
+lv_opa_t lv_obj_get_opa_scale(lv_obj_t * obj)
+{
+	lv_obj_t * parent = obj;
+
+	while(parent) {
+		if(parent->opa_scale_en) return parent->opa_scale;
+		parent = lv_obj_get_parent(parent);
+	}
+
+	return LV_OPA_COVER;
+}
+
+/**
  * Get the protect field of an object
  * @param obj pointer to an object
  * @return protect field ('OR'ed values of lv_obj_prot_t)
@@ -1464,7 +1518,7 @@ static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_m
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 		lv_style_t * style = lv_obj_get_style(obj);
-		lv_draw_rect(&obj->coords, mask_p, style);
+		lv_draw_rect(&obj->coords, mask_p, style, lv_obj_get_opa_scale(obj));
     }
 
     return true;

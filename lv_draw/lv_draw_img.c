@@ -38,18 +38,22 @@
  * Draw an image
  * @param coords the coordinates of the image
  * @param mask the image will be drawn only in this area
- * @param map_p pointer to a lv_color_t array which contains the pixels of the image
- * @param opa opacity of the image (0..255)
+ * @param src pointer to a lv_color_t array which contains the pixels of the image
+ * @param style style of the image
+ * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
-             const lv_style_t * style, const void * src)
+				 const void * src, const lv_style_t * style, lv_opa_t opa_scale)
 {
 
     if(src == NULL) {
-        lv_draw_rect(coords, mask, &lv_style_plain);
-        lv_draw_label(coords, mask, &lv_style_plain, "No\ndata", LV_TXT_FLAG_NONE, NULL);
+        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL);
         return;
     }
+
+
+    lv_opa_t opa = (uint16_t)((uint16_t) style->image.opa * opa_scale) >> 8;
 
     const uint8_t * u8_p = (uint8_t*) src;
     if(u8_p[0] >= 'A' &&  u8_p[0] <= 'Z') { /*It will be a path of a file*/
@@ -110,7 +114,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             for(row = mask_com.y1; row <= mask_com.y2; row ++) {
                 res = lv_fs_read(&file, buf, useful_data, &br);
 
-                map_fp(&line, &mask_com, (uint8_t *)buf, style->image.opa, img_data.header.chroma_keyed, img_data.header.alpha_byte,
+                map_fp(&line, &mask_com, (uint8_t *)buf, opa, img_data.header.chroma_keyed, img_data.header.alpha_byte,
                         style->image.color, style->image.intense);
 
                 lv_fs_tell(&file, &act_pos);
@@ -122,8 +126,8 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             lv_fs_close(&file);
 
             if(res != LV_FS_RES_OK) {
-                lv_draw_rect(coords, mask, &lv_style_plain);
-                lv_draw_label(coords, mask, &lv_style_plain, "No data", LV_TXT_FLAG_NONE, NULL);
+                lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
+                lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No data", LV_TXT_FLAG_NONE, NULL);
             }
         }
 #endif
@@ -137,7 +141,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             return;         /*Out of mask*/
         }
 
-        map_fp(coords, mask, img_var->pixel_map, style->image.opa, img_var->header.chroma_keyed, img_var->header.alpha_byte, style->image.color, style->image.intense);
+        map_fp(coords, mask, img_var->pixel_map, opa, img_var->header.chroma_keyed, img_var->header.alpha_byte, style->image.color, style->image.intense);
 
     }
 

@@ -47,15 +47,15 @@ static uint8_t hex_char_to_num(char hex);
  * @param coords coordinates of the label
  * @param mask the label will be drawn only in this area
  * @param style pointer to a style
+ * @param opa_scale scale down all opacities by the factor
  * @param txt 0 terminated text to write
  * @param flag settings for the text from 'txt_flag_t' enum
  * @param offset text offset in x and y direction (NULL if unused)
  *
  */
-void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_style_t * style,
+void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
                     const char * txt, lv_txt_flag_t flag, lv_point_t * offset)
 {
-
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
     if((flag & LV_TXT_FLAG_EXPAND) == 0) {
@@ -81,6 +81,8 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
                                     font, style->text.letter_space, flag);
         pos.x += (w - line_length) / 2;
     }
+
+    lv_opa_t opa = (uint16_t)((uint16_t) style->text.opa * opa_scale) >> 8;
 
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;
@@ -153,7 +155,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
 
-            letter_fp(&pos, mask, font, letter, color, style->text.opa);
+            letter_fp(&pos, mask, font, letter, color, opa);
             letter_w = lv_font_get_width(font, letter);
 
             pos.x += letter_w + style->text.letter_space;

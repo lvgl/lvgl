@@ -396,6 +396,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
     	lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
         lv_style_t * bg_style = lv_obj_get_style(btnm);
         lv_style_t * btn_style;
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(btnm);
 
     	lv_area_t area_btnm;
         lv_obj_get_coords(btnm, &area_btnm);
@@ -439,7 +440,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 			    }
 			}
 
-			lv_draw_rect(&area_tmp, mask, btn_style);
+			lv_draw_rect(&area_tmp, mask, btn_style, opa_scale);
 
 			if(border_mod) {
 			    border_mod = false;
@@ -461,7 +462,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
 
 			if(btn_style->glass) btn_style = bg_style;
-			lv_draw_label(&area_tmp, mask, btn_style, ext->map_p[txt_i], LV_TXT_FLAG_NONE, NULL);
+			lv_draw_label(&area_tmp, mask, btn_style, opa_scale,  ext->map_p[txt_i], LV_TXT_FLAG_NONE, NULL);
     	}
     }
     return true;

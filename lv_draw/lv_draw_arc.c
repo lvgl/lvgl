@@ -47,9 +47,10 @@ static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end);
  * @param start_angle the start angle of the arc (0 deg on the bottom, 90 deg on the right)
  * @param end_angle the end angle of the arc
  * @param style style of the arc (`body.thickness`, `body.main_color`, `body.opa` is used)
+ * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
-		         uint16_t start_angle, uint16_t end_angle, const lv_style_t * style)
+		         uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
 {
 	lv_coord_t thickness = style->body.thickness;
 	if(thickness > radius) thickness = radius;
@@ -62,7 +63,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     lv_coord_t x_end[4];
 
     lv_color_t color = style->body.main_color;
-    lv_opa_t opa = style->body.opa;
+    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
 
 
     bool (*deg_test)(uint16_t, uint16_t, uint16_t);

@@ -28,13 +28,14 @@ extern "C" {
 
 /**
  * Draw a line
- * @param p1 first point of the line
- * @param p2 second point of the line
- * @param maskthe line will be drawn only on this area
- * @param lines_p pointer to a line style
+ * @param point1 first point of the line
+ * @param point2 second point of the line
+ * @param mask the line will be drawn only on this area
+ * @param style pointer to a line's style
+ * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * mask,
-                  const lv_style_t * style);
+                  const lv_style_t * style, lv_opa_t opa_scale);
 
 /**********************
  *      MACROS

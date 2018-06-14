@@ -246,6 +246,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
         lv_style_t * style = lv_obj_get_style(lmeter);
+		lv_opa_t opa_scale = lv_obj_get_opa_scale(lmeter);
         lv_style_t style_tmp;
         memcpy(&style_tmp, style, sizeof(lv_style_t));
 
@@ -302,7 +303,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
                  style_tmp.line.color = lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) /  ext->line_cnt);
              }
 
-             lv_draw_line(&p1, &p2, mask, &style_tmp);
+             lv_draw_line(&p1, &p2, mask, &style_tmp, opa_scale);
          }
 
     }

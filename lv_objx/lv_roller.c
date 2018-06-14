@@ -220,6 +220,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         draw_bg(roller, mask);
 
         lv_style_t *style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(roller);
         const lv_font_t * font = style->text.font;
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
         lv_coord_t font_h = lv_font_get_height(font);
@@ -229,7 +230,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
 
-        lv_draw_rect(&rect_area, mask, ext->ddlist.sel_style);
+        lv_draw_rect(&rect_area, mask, ext->ddlist.sel_style, opa_scale);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -237,6 +238,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
         const lv_font_t * font = style->text.font;
         lv_coord_t font_h = lv_font_get_height(font);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(roller);
 
         /*Redraw the text on the selected area with a different color*/
         lv_area_t rect_area;
@@ -253,7 +255,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
             lv_style_copy(&new_style, style);
             new_style.text.color = sel_style->text.color;
             new_style.text.opa = sel_style->text.opa;
-            lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style,
+            lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style, opa_scale,
                           lv_label_get_text(ext->ddlist.label), LV_TXT_FLAG_CENTER, NULL);
         }
     }
@@ -424,7 +426,7 @@ static void draw_bg(lv_obj_t *roller, const lv_area_t *mask)
     half_roller.y2 += style->body.radius;
 
     if(union_ok) {
-        lv_draw_rect(&half_roller, &half_mask, style);
+        lv_draw_rect(&half_roller, &half_mask, style, lv_obj_get_opa_scale(roller));
     }
 
     half_roller.x1 -= roller->ext_size; /*Add ext size too (e.g. because of shadow draw) */
@@ -446,7 +448,7 @@ static void draw_bg(lv_obj_t *roller, const lv_area_t *mask)
 
         style->body.main_color = grad_tmp;
         style->body.grad_color = main_tmp;
-        lv_draw_rect(&half_roller, &half_mask, style);
+        lv_draw_rect(&half_roller, &half_mask, style,lv_obj_get_opa_scale(roller));
         style->body.main_color = main_tmp;
         style->body.grad_color = grad_tmp;
     }

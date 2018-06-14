@@ -220,8 +220,8 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
     	lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(arc), lv_obj_get_height(arc))) / 2;
     	lv_coord_t x = arc->coords.x1 + lv_obj_get_width(arc) / 2;
     	lv_coord_t y = arc->coords.y1 + lv_obj_get_height(arc) / 2;
-
-    	lv_draw_arc(x, y, r, mask, ext->angle_start, ext->angle_end, style);
+    	lv_opa_t opa_scale = lv_obj_get_opa_scale(arc);
+    	lv_draw_arc(x, y, r, mask, ext->angle_start, ext->angle_end, style, opa_scale);
 
 
     	if(style->body.radius == LV_RADIUS_CIRCLE) {
@@ -239,7 +239,7 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
 			cir_area.x2 = cir_x + x + thick_2;
 			cir_area.y2 = cir_y + y + thick_2;
 
-			lv_draw_rect(&cir_area, mask, &cir_style);
+			lv_draw_rect(&cir_area, mask, &cir_style, lv_obj_get_opa_scale(arc));
 
 			cir_x = ((r - thick_2) * lv_trigo_sin(ext->angle_end) >> LV_TRIGO_SHIFT);
 			cir_y = ((r - thick_2) * lv_trigo_sin(ext->angle_end + 90) >> LV_TRIGO_SHIFT);
@@ -249,7 +249,7 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
 			cir_area.x2 = cir_x + x + thick_2;
 			cir_area.y2 = cir_y + y + thick_2;
 
-			lv_draw_rect(&cir_area, mask, &cir_style);
+			lv_draw_rect(&cir_area, mask, &cir_style, lv_obj_get_opa_scale(arc));
     	}
 
     }

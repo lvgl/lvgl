@@ -32,8 +32,9 @@ extern "C" {
  * @param coords the coordinates of the rectangle
  * @param mask the rectangle will be drawn only in this mask
  * @param style pointer to a style
+ * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style);
+void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 
 /**********************
  *      MACROS

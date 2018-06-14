@@ -760,6 +760,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 		lv_obj_t * ta = lv_obj_get_parent(scrl);
 		lv_ta_ext_t * ta_ext = lv_obj_get_ext_attr(ta);
         lv_style_t * label_style = lv_obj_get_style(ta_ext->label);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(ta);
 		if(ta_ext->cursor.type == LV_CURSOR_NONE ||
            (ta_ext->cursor.type & LV_CURSOR_HIDDEN) ||
 		   ta_ext->cursor.state == 0 ||
@@ -838,14 +839,14 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 			cur_area.y1 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver;
 			cur_area.x2 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor + (cur_style.line.width >> 1);
 			cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
-			lv_draw_rect(&cur_area, mask, &cur_style);
+			lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
 		} else if(ta_ext->cursor.type == LV_CURSOR_BLOCK) {
 			cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 - cur_style.body.padding.hor;
 			cur_area.y1 = letter_pos.y + ta_ext->label->coords.y1 - cur_style.body.padding.ver;
 			cur_area.x2 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
 			cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
 
-			lv_draw_rect(&cur_area, mask, &cur_style);
+			lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
 
 			/*Get the current letter*/
 #if LV_TXT_UTF8 == 0
@@ -858,7 +859,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 #endif
             cur_area.x1 += cur_style.body.padding.hor;
             cur_area.y1 += cur_style.body.padding.ver;
-			lv_draw_label(&cur_area, mask, &cur_style, letter_buf, LV_TXT_FLAG_NONE, 0);
+			lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0);
 
 		} else if(ta_ext->cursor.type == LV_CURSOR_OUTLINE) {
 			cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 - cur_style.body.padding.hor;
@@ -868,14 +869,14 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 
 			cur_style.body.empty = 1;
 			if(cur_style.body.border.width == 0) cur_style.body.border.width = 1; /*Be sure the border will be drawn*/
-			lv_draw_rect(&cur_area, mask, &cur_style);
+			lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
 		} else if(ta_ext->cursor.type == LV_CURSOR_UNDERLINE) {
 			cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor;
 			cur_area.y1 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h - (cur_style.line.width >> 1);
 			cur_area.x2 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
 			cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h + (cur_style.line.width >> 1) + (cur_style.line.width & 0x1);
 
-			lv_draw_rect(&cur_area, mask, &cur_style);
+			lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
 		}
 
 	}

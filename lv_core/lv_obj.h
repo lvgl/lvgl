@@ -123,17 +123,17 @@ typedef struct _lv_obj_t
     void * group_p;                 /*Pointer to the group of the object*/
 #endif
     /*Attributes and states*/
-    uint8_t click     :1;    /*1: Can be pressed by an input device*/
-    uint8_t drag      :1;    /*1: Enable the dragging*/
-    uint8_t drag_throw:1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent  :1;    /*1: Parent will be dragged instead*/
-    uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top       :1;    /*1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t reserved     :1;
-
+    uint8_t click         :1;    /*1: Can be pressed by an input device*/
+    uint8_t drag      	  :1;    /*1: Enable the dragging*/
+    uint8_t drag_throw	  :1;    /*1: Enable throwing with drag*/
+    uint8_t drag_parent   :1;    /*1: Parent will be dragged instead*/
+    uint8_t hidden        :1;    /*1: Object is hidden*/
+    uint8_t top           :1;    /*1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t opa_scale_en  :1;	/*1: opa_scale is set*/
+    lv_opa_t opa_scale;			/*Scale down the opacity by this factor. Effects all children as well*/
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
 
-    lv_coord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+    lv_coord_t ext_size;		/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
     LV_OBJ_FREE_NUM_TYPE free_num; 		    /*Application specific identifier (set it freely)*/
@@ -393,6 +393,20 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 
 /**
+ * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
+ * @param obj pointer to an object
+ * @param en true: opa scaling is enabled for this object and all children; false: no opa scaling
+ */
+void lv_obj_set_opa_scale_enable(lv_obj_t * obj, bool en);
+
+/**
+ * Set the opa scale of an object
+ * @param obj pointer to an object
+ * @param opa_scale a factor to scale down opacity [0..255]
+ */
+void lv_obj_set_opa_scale(lv_obj_t * obj, lv_opa_t opa_scale);
+
+/**
  * Set a bit or bits in the protect filed
  * @param obj pointer to an object
  * @param prot 'OR'-ed values from lv_obj_prot_t
@@ -643,6 +657,13 @@ bool lv_obj_get_drag_throw(lv_obj_t * obj);
  * @return true: drag parent is enabled
  */
 bool lv_obj_get_drag_parent(lv_obj_t * obj);
+
+/**
+ * Get the opa scale parameter of an object
+ * @param obj pointer to an object
+ * @return opa scale [0..255]
+ */
+lv_opa_t lv_obj_get_opa_scale(lv_obj_t * obj);
 
 /**
  * Get the protect field of an object

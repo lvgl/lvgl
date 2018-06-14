@@ -299,7 +299,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 		}
 
 		/*Draw the indicator*/
-        lv_draw_rect(&indic_area, mask, style_indic);
+        lv_draw_rect(&indic_area, mask, style_indic, lv_obj_get_opa_scale(bar));
     }
     return true;
 }

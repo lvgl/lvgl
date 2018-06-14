@@ -641,12 +641,13 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_area_t coords;
         lv_style_t * style = lv_obj_get_style(label);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(label);
         lv_obj_get_coords(label, &coords);
 
 #if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(label);
         if(lv_group_get_focused(g) == label) {
-            lv_draw_rect(&coords, mask, style);
+            lv_draw_rect(&coords, mask, style, opa_scale);
         }
 #endif
 
@@ -660,7 +661,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
             bg.y1 -= style->body.padding.ver;
             bg.y2 += style->body.padding.ver;
 
-            lv_draw_rect(&bg, mask, style);
+            lv_draw_rect(&bg, mask, style, lv_obj_get_opa_scale(label));
         }
 
         /*TEST: draw a background for the label*/
@@ -672,7 +673,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
         if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
-		lv_draw_label(&coords, mask, style, ext->text, flag, &ext->offset);
+		lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
     }
     return true;
 }

@@ -365,7 +365,7 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
         lv_style_t *style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
         lv_coord_t border_width_tmp =  style->body.border.width;
         style->body.border.width = 0;
-        lv_draw_rect(&page->coords, mask, style);
+        lv_draw_rect(&page->coords, mask, style, lv_obj_get_opa_scale(page));
         style->body.border.width = border_width_tmp;
 
 	} else if(mode == LV_DESIGN_DRAW_POST) { /*Draw the scroll bars finally*/
@@ -376,7 +376,7 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
         uint8_t empty_tmp =  style->body.empty;
         style->body.shadow.width = 0;
         style->body.empty = 1;
-        lv_draw_rect(&page->coords, mask, style);
+        lv_draw_rect(&page->coords, mask, style, lv_obj_get_opa_scale(page));
         style->body.shadow.width = shadow_width_tmp;
         style->body.empty = empty_tmp;
 
@@ -392,7 +392,7 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
             sb_area.y1 += page->coords.y1;
             sb_area.x2 += page->coords.x1;
             sb_area.y2 += page->coords.y1;
-			lv_draw_rect(&sb_area, mask, ext->sb.style);
+			lv_draw_rect(&sb_area, mask, ext->sb.style, lv_obj_get_opa_scale(page));
 		}
 
 		if(ext->sb.ver_draw) {
@@ -402,7 +402,7 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
             sb_area.y1 += page->coords.y1;
             sb_area.x2 += page->coords.x1;
             sb_area.y2 += page->coords.y1;
-			lv_draw_rect(&sb_area, mask, ext->sb.style);
+			lv_draw_rect(&sb_area, mask, ext->sb.style, lv_obj_get_opa_scale(page));
 		}
 	}
 

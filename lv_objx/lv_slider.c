@@ -290,7 +290,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             area_bg.y1 += slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
             area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
         }
-        lv_draw_rect(&area_bg, mask, style_bg);
+        lv_draw_rect(&area_bg, mask, style_bg, lv_obj_get_opa_scale(slider));
 
         /*Draw the indicator*/
         lv_area_t area_indic;
@@ -328,7 +328,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
         }
 
-        if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic);
+        if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic, lv_obj_get_opa_scale(slider));
 
         /*Draw the knob*/
         lv_area_t knob_area;
@@ -360,7 +360,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         }
 
-        lv_draw_rect(&knob_area, mask, style_knob);
+        lv_draw_rect(&knob_area, mask, style_knob, lv_obj_get_opa_scale(slider));
 
     }
     /*Post draw when the children are drawn*/
