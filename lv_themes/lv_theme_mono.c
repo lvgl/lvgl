@@ -39,6 +39,7 @@ static lv_style_t dark_frame;
 static uint16_t _hue;
 static lv_font_t * _font;
 
+
 /**********************
  *      MACROS
  **********************/
@@ -345,9 +346,11 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if USE_LV_DDLIST != 0
+	static lv_style_t bg;
+	lv_style_copy(&bg, &light_frame);
+	bg.text.line_space = LV_DPI / 12;
 
-
-    theme.ddlist.bg = &light_frame;
+    theme.ddlist.bg = &bg;
     theme.ddlist.sel = &dark_plain;
     theme.ddlist.sb = &dark_frame;
 #endif
@@ -356,9 +359,11 @@ static void ddlist_init(void)
 static void roller_init(void)
 {
 #if USE_LV_ROLLER != 0
+	static lv_style_t bg;
+	lv_style_copy(&bg, &light_frame);
+	bg.text.line_space = LV_DPI / 12;
 
-
-    theme.roller.bg = &light_frame;
+    theme.roller.bg = &bg;
     theme.roller.sel = &dark_frame;
 #endif
 }
