@@ -151,11 +151,13 @@ void lv_style_init (void);
 void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
 #if USE_LV_ANIMATION
+
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
+ * @return pointer to a descriptor. Really this variable will be animated. (Can be used in `lv_anim_del(dsc, NULL)`)
  */
-void lv_style_anim_create(lv_style_anim_t * anim);
+void * lv_style_anim_create(lv_style_anim_t * anim);
 #endif
 
 /*************************
