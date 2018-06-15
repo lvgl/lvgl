@@ -164,8 +164,6 @@ int32_t lv_anim_path_ease_in_out(const lv_anim_t *a)
 
 	    int32_t step = lv_bezier3(t, 0, 100, 924, 1024);
 
-//		printf("t: %d, v: %d\n", t, step);
-
 		int32_t new_value;
 		new_value =  (int32_t) step * (a->end - a->start);
 		new_value = new_value >> 10;
@@ -220,11 +218,7 @@ static void anim_task (void * param)
 
             /*If the time is elapsed the animation is ready*/
             if(a->act_time >= a->time) {
-                bool invalid;
-                invalid = anim_ready_handler(a);
-                if(invalid != false) {
-                    a_next = lv_ll_get_head(&anim_ll);  /*a_next might be invalid if animation delete occurred*/
-                }
+                anim_ready_handler(a);
             }
         }
 
