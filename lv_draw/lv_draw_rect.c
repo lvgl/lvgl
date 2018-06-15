@@ -307,8 +307,8 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
             if(mcolor.full == gcolor.full) act_color = mcolor;
             else {
                 mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
-            }
                 act_color = lv_color_mix(mcolor, gcolor, mix);
+            }
             fill_fp(&mid_top_area, mask, act_color, opa);
         }
 
