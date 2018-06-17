@@ -58,7 +58,7 @@ lv_group_t * lv_group_create(void)
  */
 void lv_group_del(lv_group_t * group)
 {
-	/*Defocus the the currently focussed object*/
+	/*Defocus the the currently focused object*/
     if(group->obj_focus != NULL) {
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
@@ -81,6 +81,8 @@ void lv_group_del(lv_group_t * group)
  */
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
+    if(group == NULL) return;
+
     obj->group_p = group;
     lv_obj_t ** next = lv_ll_ins_tail(&group->obj_ll);
     *next = obj;
@@ -100,10 +102,17 @@ void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
+    if(g->obj_focus == NULL) return;		/*Just to be sure (Not possible if there is at least one object in the group)*/
 
     if(*g->obj_focus == obj) {
          lv_group_focus_next(g);
-     }
+    }
+
+    /* If the focuses object is still the same then it was the only object in the group but it will be deleted.
+     * Set the `obj_focus` to NULL to get back to the initial state of the group with zero objects*/
+    if(*g->obj_focus == obj) {
+    	g->obj_focus = NULL;
+    }
 
     /*Search the object and remove it from its group */
     lv_obj_t ** i;
