@@ -1,6 +1,6 @@
 /**
  * @file lv_vdb.c
- * 
+ *
  */
 #include "../../lv_conf.h"
 #if LV_VDB_SIZE != 0
@@ -36,27 +36,27 @@ typedef enum {
 
 
 #if LV_VDB_DOUBLE == 0
-   /*Simple VDB*/
-   static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
+/*Simple VDB*/
+static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
 #  if LV_VDB_ADR == 0
-     /*If the buffer address is not specified  simply allocate it*/
-     static lv_color_t vdb_buf[LV_VDB_SIZE];
-     static lv_vdb_t vdb = {.buf = vdb_buf};
+/*If the buffer address is not specified  simply allocate it*/
+static lv_color_t vdb_buf[LV_VDB_SIZE];
+static lv_vdb_t vdb = {.buf = vdb_buf};
 #  else
-     /*If the buffer address is specified use that address*/
-     static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
+/*If the buffer address is specified use that address*/
+static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
 #  endif
 #else
-   /*Double VDB*/
-   static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
+/*Double VDB*/
+static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
 #  if LV_VDB_ADR == 0
-   /*If the buffer address is not specified  simply allocate it*/
-   static lv_color_t vdb_buf1[LV_VDB_SIZE];
-   static lv_color_t vdb_buf2[LV_VDB_SIZE];
-   static lv_vdb_t vdb[2] = {{.buf = vdb_buf1}, {.buf = vdb_buf2}};
+/*If the buffer address is not specified  simply allocate it*/
+static lv_color_t vdb_buf1[LV_VDB_SIZE];
+static lv_color_t vdb_buf2[LV_VDB_SIZE];
+static lv_vdb_t vdb[2] = {{.buf = vdb_buf1}, {.buf = vdb_buf2}};
 #  else
-   /*If the buffer address is specified use that address*/
-   static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *)LV_VDB_ADR}, {.buf = (lv_color_t *)LV_VDB2_ADR}};
+/*If the buffer address is specified use that address*/
+static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *)LV_VDB_ADR}, {.buf = (lv_color_t *)LV_VDB2_ADR}};
 #  endif
 #endif
 
@@ -120,7 +120,7 @@ void lv_vdb_flush(void)
 #endif
 
     /*Flush the rendered content to the display*/
-	lv_disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
+    lv_disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
 
 }
 

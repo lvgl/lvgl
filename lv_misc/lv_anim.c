@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_task (void * param);
+static void anim_task(void * param);
 static bool anim_ready_handler(lv_anim_t * a);
 
 /**********************
@@ -131,7 +131,7 @@ uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_linear(const lv_anim_t *a)
+int32_t lv_anim_path_linear(const lv_anim_t * a)
 {
     /*Calculate the current step*/
 
@@ -143,7 +143,7 @@ int32_t lv_anim_path_linear(const lv_anim_t *a)
     /* Get the new value which will be proportional to the current element of 'path_p'
      * and the 'start' and 'end' values*/
     int32_t new_value;
-    new_value =  (int32_t) step * (a->end - a->start);
+    new_value = (int32_t) step * (a->end - a->start);
     new_value = new_value >> LV_ANIM_RES_SHIFT;
     new_value += a->start;
 
@@ -156,7 +156,7 @@ int32_t lv_anim_path_linear(const lv_anim_t *a)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_step(const lv_anim_t *a)
+int32_t lv_anim_path_step(const lv_anim_t * a)
 {
     if(a->act_time >= a->time) return a->end;
     else return a->start;
@@ -170,7 +170,7 @@ int32_t lv_anim_path_step(const lv_anim_t *a)
  * Periodically handle the animations.
  * @param param unused
  */
-static void anim_task (void * param)
+static void anim_task(void * param)
 {
     (void)param;
 
@@ -224,7 +224,7 @@ static bool anim_ready_handler(lv_anim_t * a)
      * - no repeat, play back is enabled and play back is ready */
     if((a->repeat == 0 && a->playback == 0) ||
             (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
-        void (*cb) (void *) = a->end_cb;
+        void (*cb)(void *) = a->end_cb;
         void * p = a->var;
         lv_ll_rem(&anim_ll, a);
         lv_mem_free(a);
@@ -244,7 +244,7 @@ static bool anim_ready_handler(lv_anim_t * a)
             if(a->playback_now == 0) a->act_time = - a->playback_pause;
 
             /*Toggle the play back state*/
-            a->playback_now = a->playback_now == 0 ? 1: 0;
+            a->playback_now = a->playback_now == 0 ? 1 : 0;
             /*Swap the start and end values*/
             int32_t tmp;
             tmp = a->start;

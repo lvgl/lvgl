@@ -53,8 +53,7 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
 
     uint8_t region, remainder, p, q, t;
 
-    if (s == 0)
-    {
+    if(s == 0) {
         r = v;
         g = v;
         b = v;
@@ -68,25 +67,36 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
     q = (v * (255 - ((s * remainder) >> 8))) >> 8;
     t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
 
-    switch (region)
-    {
+    switch(region) {
         case 0:
-            r = v; g = t; b = p;
+            r = v;
+            g = t;
+            b = p;
             break;
         case 1:
-            r = q; g = v; b = p;
+            r = q;
+            g = v;
+            b = p;
             break;
         case 2:
-            r = p; g = v; b = t;
+            r = p;
+            g = v;
+            b = t;
             break;
         case 3:
-            r = p; g = q; b = v;
+            r = p;
+            g = q;
+            b = v;
             break;
         case 4:
-            r = t; g = p; b = v;
+            r = t;
+            g = p;
+            b = v;
             break;
         default:
-            r = v; g = p; b = q;
+            r = v;
+            g = p;
+            b = q;
             break;
     }
 
@@ -110,23 +120,21 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b)
     rgbMax = r > g ? (r > b ? r : b) : (g > b ? g : b);
 
     hsv.v = rgbMax;
-    if (hsv.v == 0)
-    {
+    if(hsv.v == 0) {
         hsv.h = 0;
         hsv.s = 0;
         return hsv;
     }
 
     hsv.s = 255 * (long)(rgbMax - rgbMin) / hsv.v;
-    if (hsv.s == 0)
-    {
+    if(hsv.s == 0) {
         hsv.h = 0;
         return hsv;
     }
 
-    if (rgbMax == r)
+    if(rgbMax == r)
         hsv.h = 0 + 43 * (g - b) / (rgbMax - rgbMin);
-    else if (rgbMax == g)
+    else if(rgbMax == g)
         hsv.h = 85 + 43 * (b - r) / (rgbMax - rgbMin);
     else
         hsv.h = 171 + 43 * (r - g) / (rgbMax - rgbMin);

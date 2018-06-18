@@ -1,6 +1,6 @@
 /**
  * @file lv_vdraw.c
- * 
+ *
  */
 
 #include "../../lv_conf.h"
@@ -65,21 +65,20 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 
     /*Pixel out of the mask*/
     if(x < mask_p->x1 || x > mask_p->x2 ||
-       y < mask_p->y1 || y > mask_p->y2) {
+            y < mask_p->y1 || y > mask_p->y2) {
         return;
     }
 
     uint32_t vdb_width = lv_area_get_width(&vdb_p->area);
 
     /*Make the coordinates relative to VDB*/
-    x-=vdb_p->area.x1;
-    y-=vdb_p->area.y1;
+    x -= vdb_p->area.x1;
+    y -= vdb_p->area.y1;
     lv_color_t * vdb_px_p = vdb_p->buf + y * vdb_width + x;
     if(opa == LV_OPA_COVER) {
         *vdb_px_p = color;
-    }
-    else {
-        *vdb_px_p = lv_color_mix(color,*vdb_px_p, opa);
+    } else {
+        *vdb_px_p = lv_color_mix(color, *vdb_px_p, opa);
     }
 
 }
@@ -92,18 +91,18 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
  * @param color fill color
  * @param opa opacity of the area (0..255)
  */
-void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p, 
-                          lv_color_t color, lv_opa_t opa)
+void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
+              lv_color_t color, lv_opa_t opa)
 {
     lv_area_t res_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
-    
+
     /*Get the union of cord and mask*/
     /* The mask is already truncated to the vdb size
      * in 'lv_refr_area_with_vdb' function */
     union_ok = lv_area_union(&res_a, cords_p, mask_p);
-    
+
     /*If there are common part of the three area then draw to the vdb*/
     if(union_ok == false) return;
 
@@ -133,15 +132,14 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         /*Use hw fill if present*/
         if(lv_disp_is_mem_fill_supported()) {
             lv_coord_t row;
-            for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+            for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
                 lv_disp_mem_fill(&vdb_buf_tmp[vdb_rel_a.x1], w, color);
                 vdb_buf_tmp += vdb_width;
             }
         }
         /*Use hw blend if present and the area is not too small*/
         else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT &&
-                lv_disp_is_mem_blend_supported())
-        {
+                lv_disp_is_mem_blend_supported()) {
             /*Fill a  one line sized buffer with a color and blend this later*/
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
@@ -153,7 +151,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
             /*Blend the filled line to every line VDB line-by-line*/
             lv_coord_t row;
-            for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+            for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
                 lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
@@ -178,7 +176,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 last_width = w;
             }
             lv_coord_t row;
-            for(row = vdb_rel_a.y1;row <= vdb_rel_a.y2; row++) {
+            for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
                 lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
@@ -199,38 +197,52 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
  * Draw a letter in the Virtual Display Buffer
  * @param pos_p left-top coordinate of the latter
  * @param mask_p the letter will be drawn only on this area  (truncated to VDB area)
- * @param font_p pointer to font 
+ * @param font_p pointer to font
  * @param letter a letter to draw
  * @param color color of letter
  * @param opa opacity of letter (0..255)
  */
-void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p, 
-                     const lv_font_t * font_p, uint32_t letter,
-                     lv_color_t color, lv_opa_t opa)
+void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
+                const lv_font_t * font_p, uint32_t letter,
+                lv_color_t color, lv_opa_t opa)
 {
 
     static uint8_t bpp1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
     static uint8_t bpp2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
     static uint8_t bpp4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
-                                        68,  85,  102, 119,
-                                        136, 153, 170, 187,
-                                        204, 221, 238, 255};
+                                         68,  85,  102, 119,
+                                         136, 153, 170, 187,
+                                         204, 221, 238, 255
+                                        };
 
     if(font_p == NULL) return;
 
     uint8_t letter_w = lv_font_get_width(font_p, letter);
     uint8_t letter_h = lv_font_get_height(font_p);
     uint8_t bpp = lv_font_get_bpp(font_p, letter);  /*Bit per pixel (1,2, 4 or 8)*/
-    uint8_t *bpp_opa_table;
+    uint8_t * bpp_opa_table;
     uint8_t mask_init;
     uint8_t mask;
 
     switch(bpp) {
-        case 1: bpp_opa_table = bpp1_opa_table;  mask_init = 0x80; break;
-        case 2: bpp_opa_table = bpp2_opa_table;  mask_init = 0xC0; break;
-        case 4: bpp_opa_table = bpp4_opa_table;  mask_init = 0xF0; break;
-        case 8: bpp_opa_table = NULL;  mask_init = 0xFF; break;             /*No opa table, pixel value will be used directly*/
-        default: return;        /*Invalid bpp. Can't render the letter*/
+        case 1:
+            bpp_opa_table = bpp1_opa_table;
+            mask_init = 0x80;
+            break;
+        case 2:
+            bpp_opa_table = bpp2_opa_table;
+            mask_init = 0xC0;
+            break;
+        case 4:
+            bpp_opa_table = bpp4_opa_table;
+            mask_init = 0xF0;
+            break;
+        case 8:
+            bpp_opa_table = NULL;
+            mask_init = 0xFF;
+            break;             /*No opa table, pixel value will be used directly*/
+        default:
+            return;        /*Invalid bpp. Can't render the letter*/
     }
 
     const uint8_t * map_p = lv_font_get_bitmap(font_p, letter);
@@ -239,7 +251,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
 
     /*If the letter is completely out of mask don't draw it */
     if(pos_p->x + letter_w < mask_p->x1 || pos_p->x > mask_p->x2 ||
-       pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
+            pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
     lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
@@ -260,7 +272,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
 
     /*Set a pointer on VDB to the first pixel of the letter*/
     vdb_buf_tmp += ((pos_p->y - vdb_p->area.y1) * vdb_width)
-                    + pos_p->x - vdb_p->area.x1;
+                   + pos_p->x - vdb_p->area.x1;
 
     /*If the letter is partially out of mask the move there on VDB*/
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
@@ -280,8 +292,8 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                     *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, bpp == 8 ? letter_px : bpp_opa_table[letter_px]);
                 } else {
                     *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, bpp == 8 ?
-                            (uint16_t)((uint16_t)letter_px * opa) >> 8 :
-                            (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8);
+                                                (uint16_t)((uint16_t)letter_px * opa) >> 8 :
+                                                (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8);
                 }
             }
 
@@ -290,8 +302,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
             if(col_bit < 8 - bpp) {
                 col_bit += bpp;
                 mask = mask >> bpp;
-            }
-            else {
+            } else {
                 col_bit = 0;
                 col_byte_cnt ++;
                 mask = mask_init;
@@ -315,7 +326,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
  * @param recolor mix the pixels with this color
  * @param recolor_opa the intense of recoloring
  */
-void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p, 
+void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
              const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
              lv_color_t recolor, lv_opa_t recolor_opa)
 {
@@ -390,19 +401,18 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
 #if LV_COLOR_DEPTH == 8
-                px_color.full = px_color_p[0];
+                    px_color.full = px_color_p[0];
 #elif LV_COLOR_DEPTH == 16
-                /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
-                px_color.full = px_color_p[0] + (px_color_p[1] << 8);
+                    /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
+                    px_color.full = px_color_p[0] + (px_color_p[1] << 8);
 #elif LV_COLOR_DEPTH == 24
-                px_color = *((lv_color_t*)px_color_p);
+                    px_color = *((lv_color_t *)px_color_p);
 #endif
                     lv_opa_t px_opa = *(px_color_p + LV_IMG_PX_SIZE_ALPHA_BYTE - 1);
                     if(px_opa == LV_OPA_TRANSP) continue;
                     else if(px_opa != LV_OPA_COVER) opa_result = (uint32_t)((uint32_t)px_opa * opa_result) >> 8;
-                }
-                else {
-                    px_color = *((lv_color_t*)px_color_p);
+                } else {
+                    px_color = *((lv_color_t *)px_color_p);
                 }
 
                 /*Handle chroma key*/
@@ -483,7 +493,7 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
 
         /*Copy the first row to all other rows*/
         lv_color_t * mem_first = &mem[fill_area->x1];
-        lv_coord_t copy_size =  (fill_area->x2 - fill_area->x1 + 1) * sizeof(lv_color_t);
+        lv_coord_t copy_size = (fill_area->x2 - fill_area->x1 + 1) * sizeof(lv_color_t);
         mem += mem_width;
 
         for(row = fill_area->y1 + 1; row <= fill_area->y2; row++) {

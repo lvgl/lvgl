@@ -68,17 +68,17 @@ uint32_t lv_tick_get(void)
  */
 uint32_t lv_tick_elaps(uint32_t prev_tick)
 {
-	uint32_t act_time = lv_tick_get();
+    uint32_t act_time = lv_tick_get();
 
-	/*If there is no overflow in sys_time simple subtract*/
-	if(act_time >= prev_tick) {
-		prev_tick = act_time - prev_tick;
-	} else {
-		prev_tick = UINT32_MAX - prev_tick + 1;
-		prev_tick += act_time;
-	}
+    /*If there is no overflow in sys_time simple subtract*/
+    if(act_time >= prev_tick) {
+        prev_tick = act_time - prev_tick;
+    } else {
+        prev_tick = UINT32_MAX - prev_tick + 1;
+        prev_tick += act_time;
+    }
 
-	return prev_tick;
+    return prev_tick;
 }
 
 /**********************
