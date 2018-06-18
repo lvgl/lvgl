@@ -1,6 +1,6 @@
 /**
  * @file lv_kb.h
- * 
+ *
  */
 
 #ifndef LV_KB_H
@@ -39,7 +39,7 @@ extern "C" {
 typedef enum {
     LV_KB_MODE_TEXT,
     LV_KB_MODE_NUM,
-}lv_kb_mode_t;
+} lv_kb_mode_t;
 
 
 /*Data of keyboard*/
@@ -51,7 +51,7 @@ typedef struct {
     uint8_t cursor_mng      :1; /*1: automatically show/hide cursor when a text area is assigned or left*/
     lv_action_t  ok_action;     /*Called when the "Ok" button is clicked*/
     lv_action_t  hide_action;  /*Called when the "Hide" button is clicked*/
-}lv_kb_ext_t;
+} lv_kb_ext_t;
 
 typedef enum {
     LV_KB_STYLE_BG,
@@ -60,7 +60,7 @@ typedef enum {
     LV_KB_STYLE_BTN_TGL_REL,
     LV_KB_STYLE_BTN_TGL_PR,
     LV_KB_STYLE_BTN_INA,
-}lv_kb_style_t;
+} lv_kb_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -2,7 +2,7 @@
  * @file hal_indev.h
  *
  * @description Input Device HAL interface layer header file
- * 
+ *
  */
 
 #ifndef HAL_INDEV_H
@@ -40,7 +40,7 @@ typedef enum {
 typedef enum {
     LV_INDEV_STATE_REL = 0,
     LV_INDEV_STATE_PR
-}lv_indev_state_t;
+} lv_indev_state_t;
 
 /*Data type when an input device is read */
 typedef struct {
@@ -51,14 +51,14 @@ typedef struct {
     };
     lv_indev_state_t state;    /*LV_INDEV_EVENT_REL or LV_INDEV_EVENT_PR*/
     void *user_data;           /*'lv_indev_drv_t.priv' for this driver*/
-}lv_indev_data_t;
+} lv_indev_data_t;
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct {
     lv_hal_indev_type_t type;                   /*Input device type*/
     bool (*read)(lv_indev_data_t *data);        /*Function pointer to read data. Return 'true' if there is still data to be read (buffered)*/
     void *user_data;                            /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
-}lv_indev_drv_t;
+} lv_indev_drv_t;
 
 struct _lv_obj_t;
 
@@ -70,7 +70,7 @@ typedef struct _lv_indev_proc_t {
             lv_point_t act_point;
             lv_point_t last_point;
             lv_point_t vect;
-            lv_point_t drag_sum;				/*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
+            lv_point_t drag_sum;                /*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
             struct _lv_obj_t * act_obj;
             struct _lv_obj_t * last_obj;
 
@@ -92,7 +92,7 @@ typedef struct _lv_indev_proc_t {
     uint8_t long_pr_sent        :1;
     uint8_t reset_query         :1;
     uint8_t disabled            :1;
-}lv_indev_proc_t;
+} lv_indev_proc_t;
 
 
 struct _lv_obj_t;

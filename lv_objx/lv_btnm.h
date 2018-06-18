@@ -1,6 +1,6 @@
 /**
  * @file lv_btnm.h
- * 
+ *
  */
 
 
@@ -55,7 +55,7 @@ typedef struct
     uint16_t btn_id_pr;                         /*Index of the currently pressed button (in `button_areas`) or LV_BTNM_PR_NONE*/
     uint16_t btn_id_tgl;                        /*Index of the currently toggled button (in `button_areas`) or LV_BTNM_PR_NONE */
     uint8_t toggle     :1;                      /*Enable toggling*/
-}lv_btnm_ext_t;
+} lv_btnm_ext_t;
 
 typedef enum {
     LV_BTNM_STYLE_BG,
@@ -64,7 +64,7 @@ typedef enum {
     LV_BTNM_STYLE_BTN_TGL_REL,
     LV_BTNM_STYLE_BTN_TGL_PR,
     LV_BTNM_STYLE_BTN_INA,
-}lv_btnm_style_t;
+} lv_btnm_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

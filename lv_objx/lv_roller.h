@@ -1,6 +1,6 @@
 /**
  * @file lv_roller.h
- * 
+ *
  */
 
 #ifndef LV_ROLLER_H
@@ -35,12 +35,12 @@ extern "C" {
 typedef struct {
     lv_ddlist_ext_t ddlist; /*Ext. of ancestor*/
     /*New data for this type */
-}lv_roller_ext_t;
+} lv_roller_ext_t;
 
 typedef enum {
     LV_ROLLER_STYLE_BG,
     LV_ROLLER_STYLE_SEL,
-}lv_roller_style_t;
+} lv_roller_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

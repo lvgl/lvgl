@@ -1,6 +1,6 @@
 /**
  * @file lv_cb.h
- * 
+ *
  */
 
 #ifndef LV_CB_H
@@ -44,7 +44,7 @@ typedef struct
     /*New data for this type */
     lv_obj_t * bullet;  /*Pointer to button*/
     lv_obj_t * label;   /*Pointer to label*/
-}lv_cb_ext_t;
+} lv_cb_ext_t;
 
 typedef enum {
     LV_CB_STYLE_BG,
@@ -53,7 +53,7 @@ typedef enum {
     LV_CB_STYLE_BOX_TGL_REL,
     LV_CB_STYLE_BOX_TGL_PR,
     LV_CB_STYLE_BOX_INA,
-}lv_cb_style_t;
+} lv_cb_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

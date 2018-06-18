@@ -1,6 +1,6 @@
 /**
  * @file lv_led.h
- * 
+ *
  */
 
 #ifndef LV_LED_H
@@ -32,7 +32,7 @@ typedef struct
     /*No inherited ext.*/
     /*New data for this type */
     uint8_t bright;         /*Current brightness of the LED (0..255)*/
-}lv_led_ext_t;
+} lv_led_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

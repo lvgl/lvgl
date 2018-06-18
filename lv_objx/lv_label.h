@@ -1,6 +1,6 @@
 /**
  * @file lv_rect.h
- * 
+ *
  */
 
 #ifndef LV_LABEL_H
@@ -39,13 +39,13 @@ typedef enum
     LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
     LV_LABEL_LONG_DOT,      /*Keep the size and write dots at the end if the text is too long*/
     LV_LABEL_LONG_ROLL,     /*Keep the size and roll the text infinitely*/
-}lv_label_long_mode_t;
+} lv_label_long_mode_t;
 
 /*Label align policy*/
 typedef enum {
     LV_LABEL_ALIGN_LEFT,
     LV_LABEL_ALIGN_CENTER,
-}lv_label_align_t;
+} lv_label_align_t;
 
 /*Data of label*/
 typedef struct
@@ -68,7 +68,7 @@ typedef struct
     uint8_t expand      :1;         /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
     uint8_t no_break    :1;         /*Ignore new line characters*/
     uint8_t body_draw   :1;         /*Draw background body*/
-}lv_label_ext_t;
+} lv_label_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

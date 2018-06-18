@@ -49,7 +49,7 @@ typedef struct _lv_group_t
     lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
     uint8_t frozen:1;                       /*1: can't focus to new object*/
-}lv_group_t;
+} lv_group_t;
 
 /**********************
  * GLOBAL PROTOTYPES

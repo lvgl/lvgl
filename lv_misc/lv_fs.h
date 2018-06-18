@@ -1,6 +1,6 @@
 /**
  * @file lv_fs.h
- * 
+ *
  */
 
 #ifndef LV_FS_H
@@ -45,28 +45,28 @@ typedef enum
     LV_FS_RES_OUT_OF_MEM,  /*Not enough memory for an internal operation*/
     LV_FS_RES_INV_PARAM,   /*Invalid parameter among arguments*/
     LV_FS_RES_UNKNOWN,     /*Other unknown error*/
-}lv_fs_res_t;
+} lv_fs_res_t;
 
 struct __lv_fs_drv_t;
-        
+
 typedef struct
 {
     void * file_d;
     struct __lv_fs_drv_t* drv;
-}lv_fs_file_t;
+} lv_fs_file_t;
 
 
 typedef struct
 {
     void * dir_d;
     struct __lv_fs_drv_t * drv;
-}lv_fs_dir_t;
+} lv_fs_dir_t;
 
 typedef enum
 {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
-}lv_fs_mode_t;
+} lv_fs_mode_t;
 
 typedef struct __lv_fs_drv_t
 {
@@ -74,7 +74,7 @@ typedef struct __lv_fs_drv_t
     uint16_t file_size;
     uint16_t rddir_size;
     bool (*ready) (void);
-    
+
     lv_fs_res_t (*open) (void * file_p, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close) (void * file_p);
     lv_fs_res_t (*remove) (const char * fn);
@@ -85,11 +85,11 @@ typedef struct __lv_fs_drv_t
     lv_fs_res_t (*trunc) (void * file_p);
     lv_fs_res_t (*size) (void * file_p, uint32_t * size_p);
     lv_fs_res_t (*free) (uint32_t * total_p, uint32_t * free_p);
-    
+
     lv_fs_res_t (*dir_open) (void * rddir_p, const char * path);
     lv_fs_res_t (*dir_read) (void * rddir_p, char * fn);
     lv_fs_res_t (*dir_close) (void * rddir_p);
-}lv_fs_drv_t;
+} lv_fs_drv_t;
 
 /**********************
  * GLOBAL PROTOTYPES
