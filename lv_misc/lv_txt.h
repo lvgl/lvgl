@@ -83,6 +83,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font_p,
 lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
                             const lv_font_t * font, lv_coord_t letter_space, lv_txt_flag_t flag);
 
+
 /**
  * Check next character in a string and decide if te character is part of the command or not
  * @param state pointer to a txt_cmd_state_t variable which stores the current state of command processing

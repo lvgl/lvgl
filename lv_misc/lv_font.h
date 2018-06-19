@@ -49,8 +49,8 @@ typedef struct _lv_font_struct
     const uint8_t * glyph_bitmap;
     const lv_font_glyph_dsc_t * glyph_dsc;
     const uint32_t * unicode_list;
-    const uint8_t * (*get_bitmap)(const struct _lv_font_struct * ,uint32_t);    /*Get a glyph's  bitmap from a font*/
-    int16_t (*get_width)(const struct _lv_font_struct * ,uint32_t);       /*Get a glyph's with with a given font*/
+    const uint8_t * (*get_bitmap)(const struct _lv_font_struct *,uint32_t);     /*Get a glyph's  bitmap from a font*/
+    int16_t (*get_width)(const struct _lv_font_struct *,uint32_t);        /*Get a glyph's with with a given font*/
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
     uint32_t bpp   :4;                     /*Bit per pixel: 1, 2 or 4*/
 } lv_font_t;
