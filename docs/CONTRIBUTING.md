@@ -161,3 +161,14 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 ```
 
 Use 4 spaces indentation instead of tab.
+
+You can use **astyle** to format the code. The required config flies are: `docs/astyle_c` and `docs/astyle_h`.
+To format the header files: 
+ `$ find . -type f -name "*.c" | xargs astyle --options=docs/astyle_c`
+ 
+To format the sorce files:
+ `$ find . -type f -name "*.h" | xargs astyle --options=docs/astyle_h`
+ 
+Append `-n` to the end to skip creation of backup file or use `$ find . -type f -name "*.bak"  -delete` (for source file's backups) and `find . -type f -name "*.orig" -delete` (for header file's backups)
+
+
