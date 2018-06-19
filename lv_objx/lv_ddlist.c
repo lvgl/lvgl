@@ -683,6 +683,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     if(anim_en == 0) {
         lv_obj_set_height(ddlist, new_height);
         lv_ddlist_pos_current_option(ddlist);
+        lv_anim_del(ddlist, (lv_anim_fp_t)lv_obj_set_height);  /*If an animation is in progress then it will overwrite this changes*/
     } else {
 #if USE_LV_ANIMATION
         lv_anim_t a;

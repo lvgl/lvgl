@@ -367,6 +367,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         	lv_group_send_data(i->group, data->key);
         }
 
+        if(i->proc.reset_query) return;		/*The object might be deleted in `focus_cb` or due to any other user event*/
+
         i->proc.pr_timestamp = 0;
         i->proc.long_pr_sent = 0;
     }

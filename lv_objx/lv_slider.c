@@ -320,12 +320,12 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
 
         if(slider_w >= slider_h) {
-            area_indic.x2 = (int32_t) ((int32_t)lv_area_get_width(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.x2 = area_indic.x1 + area_indic.x2 - 1;
+            area_indic.x2 = (int32_t) ((int32_t)(lv_area_get_width(&area_indic) - 1) * (cur_value - min_value)) / (max_value - min_value);
+            area_indic.x2 += area_indic.x1 + area_indic.x2;
 
         } else {
-            area_indic.y1 = (int32_t) ((int32_t)lv_area_get_height(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
+            area_indic.y1 = (int32_t) ((int32_t)(lv_area_get_height(&area_indic) - 1) * (cur_value - min_value)) / (max_value - min_value);
+            area_indic.y1 = area_indic.y2 - area_indic.y1;
         }
 
         if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic, lv_obj_get_opa_scale(slider));
@@ -339,7 +339,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                 knob_area.x1 = area_indic.x2 - slider_h / 2;
                 knob_area.x2 = knob_area.x1 + slider_h;
             } else {
-                knob_area.x1 = (int32_t) ((int32_t)(slider_w - slider_h) * (cur_value - min_value)) / (max_value - min_value);
+                knob_area.x1 = (int32_t) ((int32_t)(slider_w - slider_h - 1) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.x1 += slider->coords.x1;
                 knob_area.x2 = knob_area.x1 + slider_h;
             }
@@ -351,7 +351,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                 knob_area.y1 = area_indic.y1 - slider_w / 2;
                 knob_area.y2 = knob_area.y1 + slider_w;
             } else {
-                knob_area.y2 = (int32_t) ((int32_t)(slider_h - slider_w) * (cur_value - min_value)) / (max_value - min_value);
+                knob_area.y2 = (int32_t) ((int32_t)(slider_h - slider_w - 1) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.y2 = slider->coords.y2 - knob_area.y2;
                 knob_area.y1 = knob_area.y2 - slider_w;
             }

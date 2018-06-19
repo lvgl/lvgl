@@ -724,7 +724,7 @@ static void tabpage_press_lost_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
         if(tab_cur < ext->tab_cnt - 1) tab_cur++;
     }
 
-    lv_tabview_set_tab_act(tabview, tab_cur, true);
+    if(tab_cur != ext->tab_cur) lv_tabview_set_tab_act(tabview, tab_cur, true);
 }
 
 /**
