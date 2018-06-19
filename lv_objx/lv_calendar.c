@@ -393,7 +393,8 @@ static bool lv_calendar_design(lv_obj_t * calendar, const lv_area_t * mask, lv_d
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_draw_rect(&calendar->coords, mask, lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG));
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
+        lv_draw_rect(&calendar->coords, mask, lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG), opa_scale);
 
         draw_header(calendar, mask);
         draw_day_names(calendar, mask);
@@ -531,6 +532,7 @@ static lv_coord_t get_header_height(lv_obj_t * calendar)
 static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
 
     lv_area_t header_area;
     header_area.x1 = calendar->coords.x1;
@@ -538,23 +540,23 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     header_area.y1 = calendar->coords.y1;
     header_area.y2 = calendar->coords.y1 + get_header_height(calendar);
 
-    lv_draw_rect(&header_area, mask, ext->style_header);
+    lv_draw_rect(&header_area, mask, ext->style_header, opa_scale);
 
     /*Add the month name*/
     header_area.y1 += ext->style_header->body.padding.ver;
-    lv_draw_label(&header_area, mask, ext->style_header, get_month_name(calendar, ext->showed_date.month), LV_TXT_FLAG_CENTER, NULL);
+    lv_draw_label(&header_area, mask, ext->style_header, get_month_name(calendar, ext->showed_date.month), opa_scale, LV_TXT_FLAG_CENTER, NULL);
 
     /*Add the left arrow*/
     lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 += ext->style_header->body.padding.hor;
-    lv_draw_label(&header_area, mask, arrow_style, SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL);
 
     /*Add the right arrow*/
     arrow_style = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 = header_area.x2 - ext->style_header->body.padding.hor -
     		         lv_txt_get_width(SYMBOL_RIGHT, 1, arrow_style->text.font,
     		        		          arrow_style->text.line_space, LV_TXT_FLAG_NONE);
-    lv_draw_label(&header_area, mask, arrow_style, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
 
 }
 
@@ -566,6 +568,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
 
     lv_coord_t hpad = ext->style_day_names->body.padding.hor;
     lv_coord_t w = lv_obj_get_width(calendar) - 2 * hpad;
@@ -577,7 +580,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
     for(i = 0; i < 7; i++) {
         label_area.x1 = calendar->coords.x1 + (w * i) / 7 + hpad;
         label_area.x2 = label_area.x1 + box_w;
-        lv_draw_label(&label_area, mask, ext->style_day_names, get_day_name(calendar, i), LV_TXT_FLAG_CENTER, NULL);
+        lv_draw_label(&label_area, mask, ext->style_day_names, opa_scale, get_day_name(calendar, i), LV_TXT_FLAG_CENTER, NULL);
     }
 
 }
@@ -593,6 +596,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_style_t * style_bg = lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG);
     lv_coord_t hpad = style_bg->body.padding.hor;
     lv_area_t label_area;
+    lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
     label_area.y1 = calendar->coords.y1 + get_header_height(calendar) +
                     ext->style_day_names->body.padding.ver + lv_font_get_height(ext->style_day_names->text.font) +
                     style_bg->body.padding.inner;
@@ -647,7 +651,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             week_box_area.y1 -= ext->style_week_box->body.padding.ver;
             week_box_area.y2 += ext->style_week_box->body.padding.ver;
-            lv_draw_rect(&week_box_area, mask, ext->style_week_box);
+            lv_draw_rect(&week_box_area, mask, opa_scale, ext->style_week_box);
 
             in_week_box = true;
         } else {
@@ -684,7 +688,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
                 today_box_area.y1 = label_area.y1 - ext->style_today_box->body.padding.ver;
                 today_box_area.y2 = label_area.y2 + ext->style_today_box->body.padding.ver;
-                lv_draw_rect(&today_box_area, mask, ext->style_today_box);
+                lv_draw_rect(&today_box_area, mask, ext->style_today_box, opa_scale);
             }
 
             /*Get the final style : highlighted/week box/today box/normal*/
@@ -716,7 +720,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             /*Write the day's number*/
             lv_math_num_to_str(day_cnt, buf);
-            lv_draw_label(&label_area, mask, final_style, buf, LV_TXT_FLAG_CENTER, NULL);
+            lv_draw_label(&label_area, mask, final_style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL);
 
             /*Go to the next day*/
             day_cnt ++;
