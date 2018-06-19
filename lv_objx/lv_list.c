@@ -584,7 +584,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                     lv_page_focus(list, btn_prev, ext->anim_time);
                 }
             }
-        } else if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
+        } else if(c == LV_GROUP_KEY_ENTER) {
             /*Get the 'pressed' button*/
             lv_obj_t * btn = NULL;
             btn = get_next_btn(list, btn);

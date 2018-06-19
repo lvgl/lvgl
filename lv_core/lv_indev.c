@@ -337,11 +337,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_PR) {
         if(data->key == LV_GROUP_KEY_ENTER &&
                 i->proc.long_pr_sent == 0 &&
-                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
-
-            lv_group_send_data(i->group, LV_GROUP_KEY_ENTER_LONG);
+                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME &&
+				i->group->edit_mode_en)
+        {
+			i->group->editing = i->group->editing ? 0 : 1;		/*Change between edit and navigate*/
+			lv_obj_t * focused = lv_group_get_focused(i->group);
+			if(focused) lv_obj_invalidate(focused);
             i->proc.long_pr_sent = 1;
-
         }
     }
     /*Release happened*/
@@ -353,8 +355,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             lv_group_focus_next(i->group);
         } else if(data->key == LV_GROUP_KEY_PREV) {
             lv_group_focus_prev(i->group);
-        } else if(data->key == LV_GROUP_KEY_ENTER && i->proc.long_pr_sent) {
-            /*Do nothing. Don't send the ENTER if ENTER_LONG was sent*/
+        } else if(data->key == LV_GROUP_KEY_ENTER &&
+        		 (i->proc.long_pr_sent || (i->group->editing == 0 && i->group->edit_mode_en)))
+        {
+            /*Do nothing. Don't send the ENTER if pressed long was sent or in navigation mode*/
         } else {
             lv_group_send_data(i->group, data->key);
         }

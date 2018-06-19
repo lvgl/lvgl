@@ -22,6 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void style_mod_def(lv_style_t * style);
+static void style_mod_edit_def(lv_style_t * style);
 
 /**********************
  *  STATIC VARIABLES
@@ -45,6 +46,7 @@ lv_group_t * lv_group_create(void)
     lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
     group->style_mod = style_mod_def;
+    group->style_mod_edit = style_mod_edit_def;
     group->obj_focus = NULL;
     group->frozen = 0;
     group->focus_cb = NULL;
@@ -247,6 +249,16 @@ void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_func_t sty
     if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
 }
 
+/**
+ * Set a function for a group which will modify the object's style if it is in focus in edit mode
+ * @param group pointer to a group
+ * @param style_mod_func the style modifier function pointer
+ */
+void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func)
+{
+    group->style_mod_edit = style_mod_func;
+    if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
+}
 
 /**
  * Set a function for a group which will be called when a new object is focused
@@ -259,6 +271,31 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
 }
 
 /**
+ * Enable the switching between edit and navigate mode on long press of LV_GROUP_KEY_ENTER.
+ * User can get the current mode and decide the whether to send
+ * LV_GROUP_KEY_PREV/NEXT or LV_GROUP_KEY_LEFT/RIGHT on left/right button.
+ * useful if there is only one encoder to navigate,
+ * (push: ENTER; long push: mode switch; left/right: focus or edit)
+ * @param group pointer to group
+ * @param en true or false to enable or disable this feature.
+ */
+void lv_group_set_edit_enabel(lv_group_t * group, bool en)
+{
+	group->edit_mode_en = en ? 1 : 0;
+}
+
+/**
+ * Manually set the current mode (edit or navigate).
+ * Edit mode needs to be enabled with `lv_group_set_edit_enabel`.
+ * @param group pointer to group
+ * @param edit: true: edit mode; false: navigate mode
+ */
+void lv_group_set_editing(lv_group_t * group, bool edit)
+{
+	group->editing = edit ? 1 : 0;
+}
+
+/**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
  * @param group pointer to group
  * @param style pointer to a style to modify
@@ -268,9 +305,13 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
 {
     lv_style_copy(&group->style_tmp, style);
 
-    if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
-    else style_mod_def(&group->style_tmp);
-
+    if(group->editing) {
+		if(group->style_mod_edit != NULL) group->style_mod_edit(&group->style_tmp);
+		else style_mod_edit_def(&group->style_tmp);
+    } else {
+		if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
+		else style_mod_def(&group->style_tmp);
+    }
     return &group->style_tmp;
 }
 
@@ -298,6 +339,16 @@ lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group)
 }
 
 /**
+ * Get a the style modifier function of a group in edit mode
+ * @param group pointer to a group
+ * @return pointer to the style modifier function
+ */
+lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group)
+{
+    return group->style_mod_edit;
+}
+
+/**
  * Get the focus callback function of a group
  * @param group pointer to a group
  * @return the call back function or NULL if not set
@@ -305,6 +356,16 @@ lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group)
 lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
 {
     return group->focus_cb;
+}
+
+/**
+ * Get the current mode (edit or navigate).
+ * @param group pointer to group
+ * @return true: edit mode; false: navigate mode
+ */
+bool lv_group_get_editing(lv_group_t * group)
+{
+	return group->editing ? true : false;
 }
 
 /**********************
@@ -318,6 +379,7 @@ lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
 static void style_mod_def(lv_style_t * style)
 {
 #if LV_COLOR_DEPTH != 1
+
     /*Make the style to be a little bit orange*/
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_ORANGE;
@@ -333,7 +395,36 @@ static void style_mod_def(lv_style_t * style)
 #else
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
-    style->body.border.width = 3;
+    style->body.border.width = 2;
+
+#endif
+
+}
+
+/**
+ * Default style modifier function
+ * @param style pointer to a style to modify. (Typically group.style_tmp) It will be OVERWRITTEN.
+ */
+static void style_mod_edit_def(lv_style_t * style)
+{
+#if LV_COLOR_DEPTH != 1
+
+    /*Make the style to be a little bit orange*/
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_GREEN;
+
+    /*If not empty or has border then emphasis the border*/
+    if(style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+
+    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
+
+    style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
+#else
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_BLACK;
+    style->body.border.width = 2;
 
 #endif
 

@@ -30,8 +30,6 @@ extern "C" {
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/
 
-#define LV_GROUP_KEY_ENTER_LONG     14      /*0x0E, Sent by the library if ENTER is long pressed*/
-
 #if USE_LV_GROUP  != 0
 /**********************
  *      TYPEDEFS
@@ -46,9 +44,12 @@ typedef struct _lv_group_t
     lv_ll_t obj_ll;                         /*Linked list to store the objects in the group */
     lv_obj_t ** obj_focus;                  /*The object in focus*/
     lv_group_style_mod_func_t style_mod;    /*A function which modifies the style of the focused object*/
+    lv_group_style_mod_func_t style_mod_edit;/*A function which modifies the style of the focused object*/
     lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
     uint8_t frozen:1;                       /*1: can't focus to new object*/
+    uint8_t edit_mode_en:1;                 /*1: By the long press of `LV_GROP_KEY_ENTER` the object can go to edit mode*/
+    uint8_t editing:1;                      /*1: Edit mode, 0: Navigate mode*/
 } lv_group_t;
 
 /**********************
@@ -117,7 +118,14 @@ void lv_group_send_data(lv_group_t * group, uint32_t c);
  * @param group pointer to a group
  * @param style_mod_func the style modifier function pointer
  */
-void lv_group_set_style_mod_cb(lv_group_t * group,lv_group_style_mod_func_t style_mod_func);
+void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func);
+
+/**
+ * Set a function for a group which will modify the object's style if it is in focus in edit mode
+ * @param group pointer to a group
+ * @param style_mod_func the style modifier function pointer
+ */
+void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func);
 
 /**
  * Set a function for a group which will be called when a new object is focused
@@ -125,6 +133,25 @@ void lv_group_set_style_mod_cb(lv_group_t * group,lv_group_style_mod_func_t styl
  * @param focus_cb the call back function or NULL if unused
  */
 void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
+
+/**
+ * Enable the switching between edit and navigate mode on long press of LV_GROUP_KEY_ENTER.
+ * User can get the current mode and decide the whether to send
+ * LV_GROUP_KEY_PREV/NEXT or LV_GROUP_KEY_LEFT/RIGHT on left/right button.
+ * useful if there is only one encoder to navigate,
+ * (push: ENTER; long push: mode switch; left/right: focus or edit)
+ * @param group pointer to group
+ * @param en true or false to enable or disable this feature.
+ */
+void lv_group_set_edit_enabel(lv_group_t * group, bool en);
+
+/**
+ * Manually set the current mode (edit or navigate).
+ * Edit mode needs to be enabled with `lv_group_set_edit_enabel`.
+ * @param group pointer to group
+ * @param edit: true: edit mode; false: navigate mode
+ */
+void lv_group_set_editing(lv_group_t * group, bool edit);
 
 /**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
@@ -149,12 +176,25 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group);
 lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group);
 
 /**
+ * Get a the style modifier function of a group in edit mode
+ * @param group pointer to a group
+ * @return pointer to the style modifier function
+ */
+lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group);
+
+/**
  * Get the focus callback function of a group
  * @param group pointer to a group
  * @return the call back function or NULL if not set
  */
 lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group);
 
+/**
+ * Get the current mode (edit or navigate).
+ * @param group pointer to group
+ * @return true: edit mode; false: navigate mode
+ */
+bool lv_group_get_editing(lv_group_t * group);
 /**********************
  *      MACROS
  **********************/

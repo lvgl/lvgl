@@ -546,7 +546,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 
     /*Add the month name*/
     header_area.y1 += ext->style_header->body.padding.ver;
-    lv_draw_label(&header_area, mask, ext->style_header, get_month_name(calendar, ext->showed_date.month), opa_scale, LV_TXT_FLAG_CENTER, NULL);
+    lv_draw_label(&header_area, mask, ext->style_header, opa_scale, get_month_name(calendar, ext->showed_date.month), LV_TXT_FLAG_CENTER, NULL);
 
     /*Add the left arrow*/
     lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
@@ -651,7 +651,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             week_box_area.y1 -= ext->style_week_box->body.padding.ver;
             week_box_area.y2 += ext->style_week_box->body.padding.ver;
-            lv_draw_rect(&week_box_area, mask, opa_scale, ext->style_week_box);
+            lv_draw_rect(&week_box_area, mask, ext->style_week_box, opa_scale);
 
             in_week_box = true;
         } else {
