@@ -79,6 +79,11 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 	         * So get next element until the current is surely valid*/
 	        next = lv_ll_get_next(&lv_task_ll, act);
 
+	        /*We reach priority of the turned off task. There is nothing more to do.*/
+	        if(act->prio == LV_TASK_PRIO_OFF) {
+	        	break;
+	        }
+
 	        /*Here is the interrupter task. Don't execute it again.*/
 	        if(act == task_interruper) {
 	            task_interruper = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
