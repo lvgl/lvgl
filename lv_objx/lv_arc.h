@@ -1,6 +1,6 @@
 /**
  * @file lv_arc.h
- * 
+ *
  */
 
 
@@ -29,15 +29,15 @@ extern "C" {
 /*Data of arc*/
 typedef struct {
     /*New data for this type */
-	lv_coord_t angle_start;
-	lv_coord_t angle_end;
-}lv_arc_ext_t;
+    lv_coord_t angle_start;
+    lv_coord_t angle_end;
+} lv_arc_ext_t;
 
 
 /*Styles*/
 typedef enum {
     LV_ARC_STYLE_MAIN,
-}lv_arc_style_t;
+} lv_arc_style_t;
 
 
 /**********************

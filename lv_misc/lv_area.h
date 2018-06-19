@@ -1,6 +1,6 @@
 /**
  * @file lv_area.h
- * 
+ *
  */
 
 #ifndef LV_AREA_H
@@ -33,15 +33,15 @@ typedef struct
 {
     lv_coord_t x;
     lv_coord_t y;
-}lv_point_t;
+} lv_point_t;
 
 typedef struct
 {
     lv_coord_t x1;
-    lv_coord_t y1;        
+    lv_coord_t y1;
     lv_coord_t x2;
-    lv_coord_t y2;        
-}lv_area_t;
+    lv_coord_t y2;
+} lv_area_t;
 
 /**********************
  * GLOBAL PROTOTYPES

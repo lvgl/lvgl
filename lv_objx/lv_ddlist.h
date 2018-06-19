@@ -1,6 +1,6 @@
 /**
  * @file lv_ddlist.h
- * 
+ *
  */
 
 #ifndef LV_DDLIST_H
@@ -50,13 +50,13 @@ typedef struct
     uint16_t anim_time;                  /*Open/Close animation time [ms]*/
     uint8_t opened :1;                   /*1: The list is opened (handled by the library)*/
     lv_coord_t fix_height;               /*Height of the ddlist when opened. (0: auto-size)*/
-}lv_ddlist_ext_t;
+} lv_ddlist_ext_t;
 
 typedef enum {
     LV_DDLIST_STYLE_BG,
     LV_DDLIST_STYLE_SEL,
     LV_DDLIST_STYLE_SB,
-}lv_ddlist_style_t;
+} lv_ddlist_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

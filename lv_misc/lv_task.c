@@ -1,7 +1,7 @@
 /**
  * @file lv_task.c
  * An 'lv_task'  is a void (*fp) (void* param) type function which will be called periodically.
- * A priority (5 levels + disable) can be assigned to lv_tasks. 
+ * A priority (5 levels + disable) can be assigned to lv_tasks.
  */
 
 /*********************
@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_task_exec (lv_task_t* lv_task_p);
+static bool lv_task_exec(lv_task_t * lv_task_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -47,7 +47,7 @@ static uint8_t idle_last = 0;
 void lv_task_init(void)
 {
     lv_ll_init(&lv_task_ll, sizeof(lv_task_t));
-    
+
     /*Initially enable the lv_task handling*/
     lv_task_enable(true);
 }
@@ -61,62 +61,62 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     static uint32_t handler_start = 0;
     static uint32_t busy_time = 0;
 
-	if(lv_task_run == false) return;
+    if(lv_task_run == false) return;
 
-	handler_start = lv_tick_get();
+    handler_start = lv_tick_get();
 
-	/* Run all task from the highest to the lowest priority
-	 * If a lower priority task is executed check task again from the highest priority
-	 * but on the priority of executed tasks don't run tasks before the executed*/
-	lv_task_t * task_interruper = NULL;
+    /* Run all task from the highest to the lowest priority
+     * If a lower priority task is executed check task again from the highest priority
+     * but on the priority of executed tasks don't run tasks before the executed*/
+    lv_task_t * task_interruper = NULL;
     lv_task_t * next;
-	bool end_flag;
-	do {
-	    end_flag = true;
-	    lv_task_t * act = lv_ll_get_head(&lv_task_ll);
-	    while(act){
-	        /* The task might be deleted if it runs only once ('once = 1')
-	         * So get next element until the current is surely valid*/
-	        next = lv_ll_get_next(&lv_task_ll, act);
+    bool end_flag;
+    do {
+        end_flag = true;
+        lv_task_t * act = lv_ll_get_head(&lv_task_ll);
+        while(act) {
+            /* The task might be deleted if it runs only once ('once = 1')
+             * So get next element until the current is surely valid*/
+            next = lv_ll_get_next(&lv_task_ll, act);
 
-	        /*We reach priority of the turned off task. There is nothing more to do.*/
-	        if(act->prio == LV_TASK_PRIO_OFF) {
-	        	break;
-	        }
+            /*We reach priority of the turned off task. There is nothing more to do.*/
+            if(act->prio == LV_TASK_PRIO_OFF) {
+                break;
+            }
 
-	        /*Here is the interrupter task. Don't execute it again.*/
-	        if(act == task_interruper) {
-	            task_interruper = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
-	            act = next;
-	            continue;                   /*Load the next task*/
-	        }
+            /*Here is the interrupter task. Don't execute it again.*/
+            if(act == task_interruper) {
+                task_interruper = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
+                act = next;
+                continue;                   /*Load the next task*/
+            }
 
-	        /*Just try to run the tasks with highest priority.*/
-	        if(act->prio == LV_TASK_PRIO_HIGHEST) {
-	            lv_task_exec(act);
-	        }
-	        /*Tasks with higher priority then the interrupted shall be run in every case*/
-	        else if(task_interruper) {
-	            if(act->prio > task_interruper->prio) {
-	                if(lv_task_exec(act)) {
-	                    task_interruper = act;  /*Check all tasks again from the highest priority */
-	                    end_flag = false;
-	                    break;
-	                }
-	            }
-	        }
-	        /* It is no interrupter task or we already reached it earlier.
-	         * Just run the remaining tasks*/
-	        else {
-	            if(lv_task_exec(act)) {
-	                task_interruper = act;  /*Check all tasks again from the highest priority */
-	                end_flag = false;
-	                break;
-	            }
-	        }
-	        act = next;         /*Load the next task*/
-	    }
-	} while(!end_flag);
+            /*Just try to run the tasks with highest priority.*/
+            if(act->prio == LV_TASK_PRIO_HIGHEST) {
+                lv_task_exec(act);
+            }
+            /*Tasks with higher priority then the interrupted shall be run in every case*/
+            else if(task_interruper) {
+                if(act->prio > task_interruper->prio) {
+                    if(lv_task_exec(act)) {
+                        task_interruper = act;  /*Check all tasks again from the highest priority */
+                        end_flag = false;
+                        break;
+                    }
+                }
+            }
+            /* It is no interrupter task or we already reached it earlier.
+             * Just run the remaining tasks*/
+            else {
+                if(lv_task_exec(act)) {
+                    task_interruper = act;  /*Check all tasks again from the highest priority */
+                    end_flag = false;
+                    break;
+                }
+            }
+            act = next;         /*Load the next task*/
+        }
+    } while(!end_flag);
 
     busy_time += lv_tick_elaps(handler_start);
     uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
@@ -139,24 +139,23 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
  * @param param free parameter
  * @return pointer to the new task
  */
-lv_task_t* lv_task_create(void (*task) (void *), uint32_t period, lv_task_prio_t prio, void * param)
+lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void * param)
 {
-    lv_task_t* new_lv_task = NULL;
-    lv_task_t* tmp;
+    lv_task_t * new_lv_task = NULL;
+    lv_task_t * tmp;
 
     /*Create task lists in order of priority from high to low*/
     tmp = lv_ll_get_head(&lv_task_ll);
     if(NULL == tmp) {                               /*First task*/
         new_lv_task = lv_ll_ins_head(&lv_task_ll);
-    }
-    else{
-        do{
-            if(tmp->prio <= prio){
+    } else {
+        do {
+            if(tmp->prio <= prio) {
                 new_lv_task = lv_ll_ins_prev(&lv_task_ll, tmp);
                 break;
             }
-        tmp = lv_ll_get_next(&lv_task_ll,tmp);
-        }while(tmp != NULL);
+            tmp = lv_ll_get_next(&lv_task_ll, tmp);
+        } while(tmp != NULL);
 
         if(tmp == NULL) {   /*Only too high priority tasks were found*/
             new_lv_task = lv_ll_ins_tail(&lv_task_ll);
@@ -180,10 +179,10 @@ lv_task_t* lv_task_create(void (*task) (void *), uint32_t period, lv_task_prio_t
  * Delete a lv_task
  * @param lv_task_p pointer to task created by lv_task_p
  */
-void lv_task_del(lv_task_t* lv_task_p) 
+void lv_task_del(lv_task_t * lv_task_p)
 {
     lv_ll_rem(&lv_task_ll, lv_task_p);
-    
+
     lv_mem_free(lv_task_p);
 }
 
@@ -192,7 +191,7 @@ void lv_task_del(lv_task_t* lv_task_p)
  * @param lv_task_p pointer to a lv_task
  * @param prio the new priority
  */
-void lv_task_set_prio(lv_task_t* lv_task_p, lv_task_prio_t prio)
+void lv_task_set_prio(lv_task_t * lv_task_p, lv_task_prio_t prio)
 {
     /*Find the tasks with new priority*/
     lv_task_t * i;
@@ -217,7 +216,7 @@ void lv_task_set_prio(lv_task_t* lv_task_p, lv_task_prio_t prio)
  * @param lv_task_p pointer to a lv_task
  * @param period the new period
  */
-void lv_task_set_period(lv_task_t* lv_task_p, uint32_t period)
+void lv_task_set_period(lv_task_t * lv_task_p, uint32_t period)
 {
     lv_task_p->period = period;
 }
@@ -226,7 +225,7 @@ void lv_task_set_period(lv_task_t* lv_task_p, uint32_t period)
  * Make a lv_task ready. It will not wait its period.
  * @param lv_task_p pointer to a lv_task.
  */
-void lv_task_ready(lv_task_t* lv_task_p)
+void lv_task_ready(lv_task_t * lv_task_p)
 {
     lv_task_p->last_run = lv_tick_get() - lv_task_p->period - 1;
 }
@@ -241,11 +240,11 @@ void lv_task_once(lv_task_t * lv_task_p)
 }
 
 /**
- * Reset a lv_task. 
+ * Reset a lv_task.
  * It will be called the previously set period milliseconds later.
  * @param lv_task_p pointer to a lv_task.
  */
-void lv_task_reset(lv_task_t* lv_task_p)
+void lv_task_reset(lv_task_t * lv_task_p)
 {
     lv_task_p->last_run = lv_tick_get();
 }
@@ -256,7 +255,7 @@ void lv_task_reset(lv_task_t* lv_task_p)
  */
 void lv_task_enable(bool en)
 {
-	lv_task_run = en;
+    lv_task_run = en;
 }
 
 /**
@@ -274,14 +273,14 @@ uint8_t lv_task_get_idle(void)
  **********************/
 
 /**
- * Execute task if its the priority is appropriate 
+ * Execute task if its the priority is appropriate
  * @param lv_task_p pointer to lv_task
  * @return true: execute, false: not executed
  */
-static bool lv_task_exec (lv_task_t* lv_task_p)
+static bool lv_task_exec(lv_task_t * lv_task_p)
 {
     bool exec = false;
-    
+
     /*Execute if at least 'period' time elapsed*/
     uint32_t elp = lv_tick_elaps(lv_task_p->last_run);
     if(elp >= lv_task_p->period) {
@@ -293,7 +292,7 @@ static bool lv_task_exec (lv_task_t* lv_task_p)
 
         exec = true;
     }
-    
+
     return exec;
 }
 

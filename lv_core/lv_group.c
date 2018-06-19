@@ -58,17 +58,17 @@ lv_group_t * lv_group_create(void)
  */
 void lv_group_del(lv_group_t * group)
 {
-	/*Defocus the the currently focused object*/
+    /*Defocus the the currently focused object*/
     if(group->obj_focus != NULL) {
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
     }
 
-	/*Remove the objects from the group*/
-	lv_obj_t ** obj;
-	LL_READ(group->obj_ll, obj) {
-		(*obj)->group_p = NULL;
-	}
+    /*Remove the objects from the group*/
+    lv_obj_t ** obj;
+    LL_READ(group->obj_ll, obj) {
+        (*obj)->group_p = NULL;
+    }
 
     lv_ll_clear(&(group->obj_ll));
     lv_mem_free(group);
@@ -102,16 +102,16 @@ void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
-    if(g->obj_focus == NULL) return;		/*Just to be sure (Not possible if there is at least one object in the group)*/
+    if(g->obj_focus == NULL) return;        /*Just to be sure (Not possible if there is at least one object in the group)*/
 
     if(*g->obj_focus == obj) {
-         lv_group_focus_next(g);
+        lv_group_focus_next(g);
     }
 
     /* If the focuses object is still the same then it was the only object in the group but it will be deleted.
      * Set the `obj_focus` to NULL to get back to the initial state of the group with zero objects*/
     if(*g->obj_focus == obj) {
-    	g->obj_focus = NULL;
+        g->obj_focus = NULL;
     }
 
     /*Search the object and remove it from its group */
@@ -146,7 +146,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
 
             g->obj_focus = i;
 
-            if(g->obj_focus != NULL){
+            if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
                 lv_obj_invalidate(*g->obj_focus);
             }
@@ -175,7 +175,7 @@ void lv_group_focus_next(lv_group_t * group)
     if(obj_next == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
     group->obj_focus = obj_next;
 
-    if(group->obj_focus){
+    if(group->obj_focus) {
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
 
@@ -203,7 +203,7 @@ void lv_group_focus_prev(lv_group_t * group)
     if(obj_next == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
     group->obj_focus = obj_next;
 
-    if(group->obj_focus != NULL){
+    if(group->obj_focus != NULL) {
         (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
 
@@ -241,7 +241,7 @@ void lv_group_send_data(lv_group_t * group, uint32_t c)
  * @param group pointer to a group
  * @param style_mod_func the style modifier function pointer
  */
-void lv_group_set_style_mod_cb(lv_group_t * group,lv_group_style_mod_func_t style_mod_func)
+void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func)
 {
     group->style_mod = style_mod_func;
     if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);

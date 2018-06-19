@@ -17,12 +17,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum
-{
+typedef enum {
     CMD_STATE_WAIT,
     CMD_STATE_PAR,
     CMD_STATE_IN,
-}cmd_state_t;
+} cmd_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -53,8 +52,8 @@ static uint8_t hex_char_to_num(char hex);
  * @param offset text offset in x and y direction (NULL if unused)
  *
  */
-void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset)
+void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
+                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset)
 {
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
@@ -78,7 +77,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
     /*Align the line to middle if enabled*/
     if(flag & LV_TXT_FLAG_CENTER) {
         line_length = lv_txt_get_width(&txt[line_start], line_end - line_start,
-                                    font, style->text.letter_space, flag);
+                                       font, style->text.letter_space, flag);
         pos.x += (w - line_length) / 2;
     }
 
@@ -123,7 +122,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
                         continue;
                     } else if(cmd_state == CMD_STATE_PAR) { /*Other start char in parameter escaped cmd. char */
                         cmd_state = CMD_STATE_WAIT;
-                    }else if(cmd_state == CMD_STATE_IN) { /*Command end */
+                    } else if(cmd_state == CMD_STATE_IN) { /*Command end */
                         cmd_state = CMD_STATE_WAIT;
                         continue;
                     }
@@ -137,7 +136,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
                             char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
                             memcpy(buf, &txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
-                            int r,g,b;
+                            int r, g, b;
                             r = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
                             g = (hex_char_to_num(buf[2]) << 4) + hex_char_to_num(buf[3]);
                             b = (hex_char_to_num(buf[4]) << 4) + hex_char_to_num(buf[5]);
@@ -168,7 +167,7 @@ void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_sty
         /*Align to middle*/
         if(flag & LV_TXT_FLAG_CENTER) {
             line_length = lv_txt_get_width(&txt[line_start], line_end - line_start,
-                                     font, style->text.letter_space, flag);
+                                           font, style->text.letter_space, flag);
             pos.x += (w - line_length) / 2;
         }
         /*Go the next line position*/
@@ -195,13 +194,20 @@ static uint8_t hex_char_to_num(char hex)
     if(hex >= 'a') hex -= 'a' - 'A';    /*Convert to upper case*/
 
     switch(hex) {
-        case 'A': return 10;
-        case 'B': return 11;
-        case 'C': return 12;
-        case 'D': return 13;
-        case 'E': return 14;
-        case 'F': return 15;
-        default: return 0;
+        case 'A':
+            return 10;
+        case 'B':
+            return 11;
+        case 'C':
+            return 12;
+        case 'D':
+            return 13;
+        case 'E':
+            return 14;
+        case 'F':
+            return 15;
+        default:
+            return 0;
     }
 
     return 0;

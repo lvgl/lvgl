@@ -22,12 +22,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum
-{
+typedef enum {
     DAY_DRAW_PREV_MONTH,
     DAY_DRAW_ACT_MONTH,
     DAY_DRAW_NEXT_MONTH,
-}day_draw_state_t;
+} day_draw_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -40,7 +39,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_days(lv_obj_t * calendar, const lv_area_t * mask);
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int32_t day);
-static const char * get_day_name(lv_obj_t * calendar,uint8_t day);
+static const char * get_day_name(lv_obj_t * calendar, uint8_t day);
 static const char * get_month_name(lv_obj_t * calendar, int32_t month);
 static uint8_t get_month_length(int32_t year, int32_t month);
 static uint8_t is_leap_year(uint32_t year);
@@ -53,7 +52,8 @@ static lv_design_func_t ancestor_design;
 static const char * day_name[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 static const char * month_name[12] = {"January",   "February",   "March",    "April",
                                       "May",       "June",       "July",     "August",
-                                      "September", "October",    "November", "December"};
+                                      "September", "October",    "November", "December"
+                                     };
 
 /**********************
  *      MACROS
@@ -83,12 +83,12 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->today.year = 2018;
-    ext->today.month= 1;
-    ext->today.day= 1;
+    ext->today.month = 1;
+    ext->today.day = 1;
 
     ext->showed_date.year = 2018;
     ext->showed_date.month = 1;
-    ext->showed_date.day= 1;
+    ext->showed_date.day = 1;
 
     ext->highlighted_dates  = NULL;
     ext->highlighted_dates_num = 0;
@@ -108,32 +108,32 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
 
     /*Init the new calendar calendar*/
     if(copy == NULL) {
-    	lv_obj_set_size(new_calendar, LV_DPI * 2, LV_DPI * 2);
-    	lv_obj_set_style(new_calendar, &lv_style_pretty);
+        lv_obj_set_size(new_calendar, LV_DPI * 2, LV_DPI * 2);
+        lv_obj_set_style(new_calendar, &lv_style_pretty);
 
     }
     /*Copy an existing calendar*/
     else {
         lv_calendar_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->today.year = copy_ext->today.year;
-		ext->today.month= copy_ext->today.month;
-		ext->today.day= copy_ext->today.day;
+        ext->today.month = copy_ext->today.month;
+        ext->today.day = copy_ext->today.day;
 
-		ext->showed_date.year = copy_ext->showed_date.year;
-		ext->showed_date.month = copy_ext->showed_date.month;
-		ext->showed_date.day= copy_ext->showed_date.day;
+        ext->showed_date.year = copy_ext->showed_date.year;
+        ext->showed_date.month = copy_ext->showed_date.month;
+        ext->showed_date.day = copy_ext->showed_date.day;
 
-		ext->highlighted_dates  = copy_ext->highlighted_dates;
-		ext->highlighted_dates_num = copy_ext->highlighted_dates_num;
-		ext->day_names = copy_ext->day_names;
-		ext->month_names = copy_ext->month_names;
-		ext->style_header = copy_ext->style_header;
-		ext->style_header_pr = copy_ext->style_header_pr;
-		ext->style_highlighted = copy_ext->style_highlighted;
-		ext->style_inactive_days = copy_ext->style_inactive_days;
-		ext->style_week_box = copy_ext->style_week_box;
-		ext->style_today_box = copy_ext->style_today_box;
-		ext->style_day_names = copy_ext->style_day_names;
+        ext->highlighted_dates  = copy_ext->highlighted_dates;
+        ext->highlighted_dates_num = copy_ext->highlighted_dates_num;
+        ext->day_names = copy_ext->day_names;
+        ext->month_names = copy_ext->month_names;
+        ext->style_header = copy_ext->style_header;
+        ext->style_header_pr = copy_ext->style_header_pr;
+        ext->style_highlighted = copy_ext->style_highlighted;
+        ext->style_inactive_days = copy_ext->style_inactive_days;
+        ext->style_week_box = copy_ext->style_week_box;
+        ext->style_today_box = copy_ext->style_today_box;
+        ext->style_day_names = copy_ext->style_day_names;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_calendar);
     }
@@ -161,7 +161,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
  */
 void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->today.year = today->year;
     ext->today.month = today->month;
     ext->today.day = today->day;
@@ -176,7 +176,7 @@ void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
  */
 void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->showed_date.year = showed->year;
     ext->showed_date.month = showed->month;
     ext->showed_date.day = showed->day;
@@ -192,7 +192,7 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  */
 void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->highlighted_dates = highlighted;
     ext->highlighted_dates_num = date_num;
 
@@ -208,7 +208,7 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t *
  */
 void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->day_names = day_names;
     lv_obj_invalidate(calendar);
 }
@@ -221,7 +221,7 @@ void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names)
  */
 void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->month_names = day_names;
     lv_obj_invalidate(calendar);
 }
@@ -232,11 +232,11 @@ void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_style_t *style)
+void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_style_t * style)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
-    switch (type) {
+    switch(type) {
         case LV_CALENDAR_STYLE_BG:
             lv_obj_set_style(calendar, style);
             break;
@@ -278,7 +278,7 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
  */
 lv_calendar_date_t * lv_calendar_get_today_date(lv_obj_t * calendar)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->today;
 }
 
@@ -289,7 +289,7 @@ lv_calendar_date_t * lv_calendar_get_today_date(lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->showed_date;
 }
 
@@ -300,7 +300,7 @@ lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates;
 }
 
@@ -311,7 +311,7 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar)
  */
 uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates_num;
 }
 
@@ -322,7 +322,7 @@ uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar)
  */
 const char ** lv_calendar_get_day_names(lv_obj_t * calendar, const char ** day_names)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->day_names;
 }
 
@@ -333,7 +333,7 @@ const char ** lv_calendar_get_day_names(lv_obj_t * calendar, const char ** day_n
  */
 const char ** lv_calendar_get_month_names(lv_obj_t * calendar, const char ** day_names)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->month_names;
 }
 
@@ -345,18 +345,27 @@ const char ** lv_calendar_get_month_names(lv_obj_t * calendar, const char ** day
  *  */
 lv_style_t * lv_calendar_get_style(lv_obj_t * calendar, lv_calendar_style_t type)
 {
-    lv_calendar_ext_t *ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
-    switch (type) {
-        case LV_CALENDAR_STYLE_BG:              return  lv_obj_get_style(calendar);
-        case LV_CALENDAR_STYLE_HEADER:          return ext->style_header;
-        case LV_CALENDAR_STYLE_HEADER_PR:       return ext->style_header_pr;
-        case LV_CALENDAR_STYLE_DAY_NAMES:       return ext->style_day_names;
-        case LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS:     return ext->style_highlighted;
-        case LV_CALENDAR_STYLE_INACTIVE_DAYS:   return ext->style_inactive_days;
-        case LV_CALENDAR_STYLE_WEEK_BOX:        return ext->style_week_box;
-        case LV_CALENDAR_STYLE_TODAY_BOX:       return ext->style_today_box;
-        default: return NULL;
+    switch(type) {
+        case LV_CALENDAR_STYLE_BG:
+            return  lv_obj_get_style(calendar);
+        case LV_CALENDAR_STYLE_HEADER:
+            return ext->style_header;
+        case LV_CALENDAR_STYLE_HEADER_PR:
+            return ext->style_header_pr;
+        case LV_CALENDAR_STYLE_DAY_NAMES:
+            return ext->style_day_names;
+        case LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS:
+            return ext->style_highlighted;
+        case LV_CALENDAR_STYLE_INACTIVE_DAYS:
+            return ext->style_inactive_days;
+        case LV_CALENDAR_STYLE_WEEK_BOX:
+            return ext->style_week_box;
+        case LV_CALENDAR_STYLE_TODAY_BOX:
+            return ext->style_today_box;
+        default:
+            return NULL;
     }
 
     /*To avoid warning*/
@@ -427,80 +436,73 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
-    else if(sign == LV_SIGNAL_PRESSING) {
-    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    	lv_area_t header_area;
-    	lv_area_copy(&header_area, &calendar->coords);
-    	header_area.y2 = header_area.y1 + get_header_height(calendar);
-    	lv_indev_t * indev = lv_indev_get_act();
-    	lv_point_t p;
-    	lv_indev_get_point(indev, &p);
+    } else if(sign == LV_SIGNAL_PRESSING) {
+        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+        lv_area_t header_area;
+        lv_area_copy(&header_area, &calendar->coords);
+        header_area.y2 = header_area.y1 + get_header_height(calendar);
+        lv_indev_t * indev = lv_indev_get_act();
+        lv_point_t p;
+        lv_indev_get_point(indev, &p);
 
-    	if(lv_area_is_point_on(&header_area, &p)) {
-    		if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
-    			if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
-    			ext->btn_pressing = -1;
-    		} else {
-    			if(ext->btn_pressing != 1) lv_obj_invalidate(calendar);
-    			ext->btn_pressing = 1;
-    		}
-    	} else {
-			if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
-    		ext->btn_pressing = 0;
-    	}
-    }
-    else if(sign == LV_SIGNAL_PRESS_LOST) {
-    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-		ext->btn_pressing = 0;
-		lv_obj_invalidate(calendar);
-    }
-    else if(sign == LV_SIGNAL_RELEASED) {
-    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    	if(ext->btn_pressing < 0) {
-    		if(ext->showed_date.month <= 1) {
-    			ext->showed_date.month = 12;
-    			ext->showed_date.year --;
-    		} else {
-    			ext->showed_date.month --;
-    		}
-    	}
-    	else if(ext->btn_pressing >	 0) {
-    		if(ext->showed_date.month >= 12) {
-    			ext->showed_date.month = 1;
-    			ext->showed_date.year ++;
-    		} else {
-    			ext->showed_date.month ++;
-    		}
-    	}
+        if(lv_area_is_point_on(&header_area, &p)) {
+            if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
+                if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
+                ext->btn_pressing = -1;
+            } else {
+                if(ext->btn_pressing != 1) lv_obj_invalidate(calendar);
+                ext->btn_pressing = 1;
+            }
+        } else {
+            if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
+            ext->btn_pressing = 0;
+        }
+    } else if(sign == LV_SIGNAL_PRESS_LOST) {
+        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+        ext->btn_pressing = 0;
+        lv_obj_invalidate(calendar);
+    } else if(sign == LV_SIGNAL_RELEASED) {
+        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+        if(ext->btn_pressing < 0) {
+            if(ext->showed_date.month <= 1) {
+                ext->showed_date.month = 12;
+                ext->showed_date.year --;
+            } else {
+                ext->showed_date.month --;
+            }
+        } else if(ext->btn_pressing >  0) {
+            if(ext->showed_date.month >= 12) {
+                ext->showed_date.month = 1;
+                ext->showed_date.year ++;
+            } else {
+                ext->showed_date.month ++;
+            }
+        }
 
-		ext->btn_pressing = 0;
-		lv_obj_invalidate(calendar);
+        ext->btn_pressing = 0;
+        lv_obj_invalidate(calendar);
 
-    }
-    else if(sign == LV_SIGNAL_CONTROLL) {
-    	uint8_t c = *((uint8_t*) param);
-    	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    	if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
-       		if(ext->showed_date.month >= 12) {
-				ext->showed_date.month = 1;
-				ext->showed_date.year ++;
-			} else {
-				ext->showed_date.month ++;
-			}
-    		lv_obj_invalidate(calendar);
-    	}
-    	else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
-    		if(ext->showed_date.month <= 1) {
-				ext->showed_date.month = 12;
-				ext->showed_date.year --;
-			} else {
-				ext->showed_date.month --;
-			}
-    		lv_obj_invalidate(calendar);
-    	}
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+    } else if(sign == LV_SIGNAL_CONTROLL) {
+        uint8_t c = *((uint8_t *) param);
+        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+            if(ext->showed_date.month >= 12) {
+                ext->showed_date.month = 1;
+                ext->showed_date.year ++;
+            } else {
+                ext->showed_date.month ++;
+            }
+            lv_obj_invalidate(calendar);
+        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+            if(ext->showed_date.month <= 1) {
+                ext->showed_date.month = 12;
+                ext->showed_date.year --;
+            } else {
+                ext->showed_date.month --;
+            }
+            lv_obj_invalidate(calendar);
+        }
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set date*/
@@ -554,8 +556,8 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the right arrow*/
     arrow_style = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 = header_area.x2 - ext->style_header->body.padding.hor -
-    		         lv_txt_get_width(SYMBOL_RIGHT, 1, arrow_style->text.font,
-    		        		          arrow_style->text.line_space, LV_TXT_FLAG_NONE);
+                     lv_txt_get_width(SYMBOL_RIGHT, 1, arrow_style->text.font,
+                                      arrow_style->text.line_space, LV_TXT_FLAG_NONE);
     lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
 
 }
@@ -628,8 +630,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
     bool month_of_today_shown = false;
     if(ext->showed_date.year ==  ext->today.year &&
-       ext->showed_date.month ==  ext->today.month)
-    {
+            ext->showed_date.month ==  ext->today.month) {
         month_of_today_shown = true;
     }
 
@@ -639,11 +640,10 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     /*Draw 6 weeks*/
     for(week = 0; week < 6; week++) {
 
-    	/*Draw the "week box"*/
+        /*Draw the "week box"*/
         if(month_of_today_shown &&
-          ((draw_state == DAY_DRAW_ACT_MONTH  && ext->today.day >= day_cnt && ext->today.day < day_cnt + 7) ||
-           (draw_state == DAY_DRAW_PREV_MONTH && ext->today.day <= 7 - month_start_day && week == 0)))
-        {
+                ((draw_state == DAY_DRAW_ACT_MONTH  && ext->today.day >= day_cnt && ext->today.day < day_cnt + 7) ||
+                 (draw_state == DAY_DRAW_PREV_MONTH && ext->today.day <= 7 - month_start_day && week == 0))) {
             lv_area_t week_box_area;
             lv_area_copy(&week_box_area, &label_area);      /*'label_area' is already set for this row*/
             week_box_area.x1 = calendar->coords.x1 + style_bg->body.padding.hor - ext->style_week_box->body.padding.hor;
@@ -655,13 +655,13 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             in_week_box = true;
         } else {
-        	in_week_box = false;
+            in_week_box = false;
         }
 
         /*Draw the 7 days of a week*/
         uint32_t day;
         for(day = 0; day < 7; day++) {
-        	/*The previous month is over*/
+            /*The previous month is over*/
             if(draw_state == DAY_DRAW_PREV_MONTH && day == month_start_day) {
                 draw_state = DAY_DRAW_ACT_MONTH;
                 day_cnt = 1;
@@ -669,8 +669,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
             }
             /*The current month is over*/
             if(draw_state == DAY_DRAW_ACT_MONTH &&
-               day_cnt > get_month_length(ext->showed_date.year, ext->showed_date.month))
-            {
+                    day_cnt > get_month_length(ext->showed_date.year, ext->showed_date.month)) {
                 draw_state = DAY_DRAW_NEXT_MONTH;
                 day_cnt = 1;
                 act_style = ext->style_inactive_days;
@@ -693,29 +692,23 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             /*Get the final style : highlighted/week box/today box/normal*/
             lv_style_t * final_style;
-            if (draw_state == DAY_DRAW_PREV_MONTH &&
-            		is_highlighted(calendar, ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0),
-            				ext->showed_date.month == 1 ? 12 : ext->showed_date.month - 1,
-            						day_cnt))
-            {
-            	final_style = ext->style_highlighted;
-            }
-            else if (draw_state == DAY_DRAW_ACT_MONTH &&
-            		is_highlighted(calendar, ext->showed_date.year,
-            				ext->showed_date.month,
-							day_cnt))
-            {
-            	final_style = ext->style_highlighted;
-            }
-            else if (draw_state == DAY_DRAW_NEXT_MONTH &&
-            		is_highlighted(calendar, ext->showed_date.year + (ext->showed_date.month == 12 ? 1 : 0),
-            				ext->showed_date.month == 12 ? 1 : ext->showed_date.month + 1,
-            						day_cnt))
-            {
-            	final_style = ext->style_highlighted;
-            }
-            else if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH) final_style = ext->style_today_box;
-            else if (in_week_box && draw_state == DAY_DRAW_ACT_MONTH) final_style = ext->style_week_box;
+            if(draw_state == DAY_DRAW_PREV_MONTH &&
+                    is_highlighted(calendar, ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0),
+                                   ext->showed_date.month == 1 ? 12 : ext->showed_date.month - 1,
+                                   day_cnt)) {
+                final_style = ext->style_highlighted;
+            } else if(draw_state == DAY_DRAW_ACT_MONTH &&
+                      is_highlighted(calendar, ext->showed_date.year,
+                                     ext->showed_date.month,
+                                     day_cnt)) {
+                final_style = ext->style_highlighted;
+            } else if(draw_state == DAY_DRAW_NEXT_MONTH &&
+                      is_highlighted(calendar, ext->showed_date.year + (ext->showed_date.month == 12 ? 1 : 0),
+                                     ext->showed_date.month == 12 ? 1 : ext->showed_date.month + 1,
+                                     day_cnt)) {
+                final_style = ext->style_highlighted;
+            } else if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH) final_style = ext->style_today_box;
+            else if(in_week_box && draw_state == DAY_DRAW_ACT_MONTH) final_style = ext->style_week_box;
             else final_style = act_style;
 
             /*Write the day's number*/
@@ -743,21 +736,20 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
  */
 static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int32_t day)
 {
-	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
-	if(ext->highlighted_dates == NULL || ext->highlighted_dates_num == 0) return false;
+    if(ext->highlighted_dates == NULL || ext->highlighted_dates_num == 0) return false;
 
-	uint32_t i;
-	for(i = 0; i < ext->highlighted_dates_num; i++) {
-		if(ext->highlighted_dates[i].year == year &&
-			ext->highlighted_dates[i].month == month &&
-			ext->highlighted_dates[i].day == day)
-		{
-			return true;
-		}
-	}
+    uint32_t i;
+    for(i = 0; i < ext->highlighted_dates_num; i++) {
+        if(ext->highlighted_dates[i].year == year &&
+                ext->highlighted_dates[i].month == month &&
+                ext->highlighted_dates[i].day == day) {
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 /**
@@ -766,12 +758,12 @@ static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int
  * @param day a day in [0..6]
  * @return
  */
-static const char * get_day_name(lv_obj_t * calendar,uint8_t day)
+static const char * get_day_name(lv_obj_t * calendar, uint8_t day)
 {
 
-	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-	if(ext->day_names) return ext->day_names[day];
-	else return day_name[day];
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    if(ext->day_names) return ext->day_names[day];
+    else return day_name[day];
 }
 
 /**
@@ -785,9 +777,9 @@ static const char * get_month_name(lv_obj_t * calendar, int32_t month)
     month --;   /*Range of months id [1..12] but range of indexes is [0..11]*/
     if(month < 0) month = 12 + month;
 
-	lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-	if(ext->month_names) return ext->month_names[month];
-	else return month_name[month];
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    if(ext->month_names) return ext->month_names[month];
+    else return month_name[month];
 }
 
 /**
@@ -800,12 +792,12 @@ static uint8_t get_month_length(int32_t year, int32_t month)
 {
     month --;   /*Range of months id [1..12] but range of indexes is [0..11]*/
     if(month < 0) {
-    	year--;   /*Already in the previous year (won't be less then -12 to skip a whole year)*/
-    	month = 12 + month;	/*`month` is negative, the result will be < 12*/
+        year--;   /*Already in the previous year (won't be less then -12 to skip a whole year)*/
+        month = 12 + month; /*`month` is negative, the result will be < 12*/
     }
     if(month >= 12) {
-    	year ++;
-    	month -= 12;
+        year ++;
+        month -= 12;
     }
 
     /*month == 1 is february*/
@@ -837,7 +829,7 @@ static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
     uint32_t b = year - a;
 
     uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) +
-          b + (b / 4) - (b / 100) + (b / 400)) % 7;
+                            b + (b / 4) - (b / 100) + (b / 400)) % 7;
 
     return day_of_week;
 }

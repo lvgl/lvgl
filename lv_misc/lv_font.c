@@ -1,6 +1,6 @@
 /**
  * @file lv_font.c
- * 
+ *
  */
 
 /*********************
@@ -22,7 +22,7 @@ typedef struct {
     uint32_t glyph_index;
     uint32_t unicode;
     uint8_t w_px;
-}asd_glyph_dsc_t;
+} asd_glyph_dsc_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -179,7 +179,7 @@ void lv_font_init(void)
  * @param dsc_get_fp the font descriptor get function
  * @param parent add this font as charter set extension of 'parent'
  */
-void lv_font_add(lv_font_t *child, lv_font_t *parent)
+void lv_font_add(lv_font_t * child, lv_font_t * parent)
 {
     if(parent == NULL) return;
 
@@ -240,13 +240,13 @@ uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter)
 {
     const lv_font_t * font_i = font;
     while(font_i != NULL) {
-    if(letter >= font_i->unicode_first && letter <= font_i->unicode_last) {
-        return font_i->bpp;
+        if(letter >= font_i->unicode_first && letter <= font_i->unicode_last) {
+            return font_i->bpp;
+        }
+        font_i = font_i->next_page;
     }
-    font_i = font_i->next_page;
-}
 
-return 0;
+    return 0;
 
 }
 

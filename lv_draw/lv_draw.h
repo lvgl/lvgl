@@ -1,6 +1,6 @@
 /**
  * @file lv_draw.h
- * 
+ *
  */
 
 #ifndef LV_DRAW_H
@@ -30,20 +30,20 @@ extern "C" {
 
 /**********************
  *      TYPEDEFS
- **********************/ 
+ **********************/
 
 /* Image header it is compatible with
  * the result image converter utility*/
 typedef struct
 {
-    union{
+    union {
         struct {
             uint32_t chroma_keyed:1;    /*1: The image contains transparent pixels with LV_COLOR_TRANSP color*/
             uint32_t alpha_byte  :1;    /*Every pixel is extended with a 8 bit alpha channel*/
             uint32_t format      :6;    /*See: lv_img_px_format*/
             uint32_t w:12;              /*Width of the image map*/
             uint32_t h:12;              /*Height of the image map*/
-        }header;
+        } header;
         uint8_t src_type;
     };
 
@@ -51,7 +51,7 @@ typedef struct
         const uint8_t * pixel_map;  /*For internal images (c arrays) pointer to the pixels array*/
         uint8_t first_pixel;        /*For external images (binary) the first byte of the pixels (just for convenient)*/
     };
-}lv_img_t;
+} lv_img_t;
 
 typedef enum {
     LV_IMG_FORMAT_UNKOWN = 0,
@@ -59,7 +59,7 @@ typedef enum {
     LV_IMG_FORMAT_FILE_RAW_RGB332,    /*8 bit*/
     LV_IMG_FORMAT_FILE_RAW_RGB565,    /*16 bit*/
     LV_IMG_FORMAT_FILE_RAW_RGB888,    /*24 bit (stored on 32 bit)*/
-}lv_img_format_t;
+} lv_img_format_t;
 
 
 typedef enum {
@@ -67,7 +67,7 @@ typedef enum {
     LV_IMG_SRC_FILE,
     LV_IMG_SRC_SYMBOL,
     LV_IMG_SRC_UNKNOWN,
-}lv_img_src_t;
+} lv_img_src_t;
 
 
 /**********************
@@ -83,7 +83,7 @@ typedef enum {
  * @param base_opa the base opacity
  * @return the opacity of the given pixel
  */
- lv_opa_t lv_draw_aa_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t base_opa);
+lv_opa_t lv_draw_aa_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t base_opa);
 
 /**
  * Add a vertical  anti-aliasing segment (pixels with decreasing opacity)
@@ -115,8 +115,8 @@ void (*px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t col
 void (*fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
 void (*letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa);
 void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
-        const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-        lv_color_t recolor, lv_opa_t recolor_opa);
+               const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+               lv_color_t recolor, lv_opa_t recolor_opa);
 
 /**********************
  *      MACROS

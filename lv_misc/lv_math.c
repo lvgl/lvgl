@@ -24,8 +24,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static int16_t sin0_90_table[] =
-{
+static int16_t sin0_90_table[] = {
     0,     572,    1144,   1715,   2286,   2856,   3425,   3993,   4560,   5126,
     5690,  6252,   6813,   7371,   7927,   8481,   9032,   9580,   10126,  10668,
     11207, 11743,  12275,  12803,  13328,  13848,  14364,  14876,  15383,  15886,
@@ -67,7 +66,7 @@ char * lv_math_num_to_str(int32_t num, char * buf)
     uint32_t output = 0;
     int8_t i;
 
-    for(i = 31; i >= 0; i--){
+    for(i = 31; i >= 0; i--) {
         if((output & 0xF) >= 5)
             output += 3;
         if(((output & 0xF0) >> 4) >= 5)
@@ -115,14 +114,12 @@ int16_t lv_trigo_sin(int16_t angle)
 
     if(angle < 0) angle = 360 + angle;
 
-    if(angle < 90){
+    if(angle < 90) {
         ret = sin0_90_table[angle];
-    } else if(angle >= 90 && angle < 180)
-    {
+    } else if(angle >= 90 && angle < 180) {
         angle = 179 - angle;
         ret = sin0_90_table[angle];
-    } else if(angle >= 180 && angle < 270)
-    {
+    } else if(angle >= 180 && angle < 270) {
         angle = angle - 180;
         ret = - sin0_90_table[angle];
     } else { /*angle >=270*/
@@ -144,19 +141,19 @@ int16_t lv_trigo_sin(int16_t angle)
  */
 int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 {
-	uint32_t t_rem = 1024 - t;
-	uint32_t t_rem2 = (t_rem * t_rem) >> 10;
-	uint32_t t_rem3 = (t_rem2 * t_rem) >> 10;
-	uint32_t t2 = (t * t) >> 10;
-	uint32_t t3 = (t2 * t) >> 10;
+    uint32_t t_rem = 1024 - t;
+    uint32_t t_rem2 = (t_rem * t_rem) >> 10;
+    uint32_t t_rem3 = (t_rem2 * t_rem) >> 10;
+    uint32_t t2 = (t * t) >> 10;
+    uint32_t t3 = (t2 * t) >> 10;
 
 
-	uint32_t v1 = ((uint32_t)t_rem3 * u0) >> 10;
-	uint32_t v2 = ((uint32_t)3 * t_rem2 * t * u1) >> 20;
-	uint32_t v3 = ((uint32_t)3 * t_rem * t2 * u2) >> 20;
-	uint32_t v4 = ((uint32_t)t3 * u3) >> 10;
+    uint32_t v1 = ((uint32_t)t_rem3 * u0) >> 10;
+    uint32_t v2 = ((uint32_t)3 * t_rem2 * t * u1) >> 20;
+    uint32_t v3 = ((uint32_t)3 * t_rem * t2 * u2) >> 20;
+    uint32_t v4 = ((uint32_t)t3 * u3) >> 10;
 
-	return v1 + v2 + v3 + v4;
+    return v1 + v2 + v3 + v4;
 
 }
 

@@ -30,7 +30,7 @@ typedef struct {
     uint16_t year;
     int8_t month;
     int8_t day;
-}lv_calendar_date_t;
+} lv_calendar_date_t;
 
 /*Data of calendar*/
 typedef struct {
@@ -40,9 +40,9 @@ typedef struct {
     lv_calendar_date_t showed_date;   /*Currently visible month (day is ignored)*/
     lv_calendar_date_t * highlighted_dates;  /*Apply different style on these days (pointer to an array defined by the user)*/
     uint8_t highlighted_dates_num;           /*Number of elements in `highlighted_days`*/
-    int8_t btn_pressing;					/*-1: prev month pressing, +1 next month pressing on the header*/
-    const char ** day_names;			/*Pointer to an array with the name of the days (NULL: use default names)*/
-    const char ** month_names;			/*Pointer to an array with the name of the month (NULL. use default names)*/
+    int8_t btn_pressing;                    /*-1: prev month pressing, +1 next month pressing on the header*/
+    const char ** day_names;            /*Pointer to an array with the name of the days (NULL: use default names)*/
+    const char ** month_names;          /*Pointer to an array with the name of the month (NULL. use default names)*/
 
     /*Styles*/
     lv_style_t * style_header;
@@ -52,7 +52,7 @@ typedef struct {
     lv_style_t * style_inactive_days;
     lv_style_t * style_week_box;
     lv_style_t * style_today_box;
-}lv_calendar_ext_t;
+} lv_calendar_ext_t;
 
 /*Styles*/
 typedef enum {
@@ -64,7 +64,7 @@ typedef enum {
     LV_CALENDAR_STYLE_INACTIVE_DAYS,
     LV_CALENDAR_STYLE_WEEK_BOX,
     LV_CALENDAR_STYLE_TODAY_BOX,
-}lv_calendar_style_t;
+} lv_calendar_style_t;
 
 
 /**********************

@@ -1,6 +1,6 @@
 /**
  * @file lv_list.h
- * 
+ *
  */
 
 #ifndef LV_LIST_H
@@ -51,7 +51,7 @@ typedef struct
     uint16_t anim_time;                          /*Scroll animation time*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
-}lv_list_ext_t;
+} lv_list_ext_t;
 
 typedef enum {
     LV_LIST_STYLE_BG,
@@ -62,7 +62,7 @@ typedef enum {
     LV_LIST_STYLE_BTN_TGL_REL,
     LV_LIST_STYLE_BTN_TGL_PR,
     LV_LIST_STYLE_BTN_INA,
-}lv_list_style_t;
+} lv_list_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * 
+ *
  */
 
 #if 0 /*Remove this to enable the content (Delete the last #endif too!)*/
@@ -133,7 +133,7 @@
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 
 /*==================
- *  LV OBJ X USAGE 
+ *  LV OBJ X USAGE
  *================*/
 /*
  * Documentation of the object types: https://littlevgl.com/object-types
@@ -212,8 +212,8 @@
 /*Preload (dependencies: arc)*/
 #define USE_LV_PRELOAD      1
 #if USE_LV_PRELOAD != 0
-#define LV_PRELOAD_DEF_ARC_LENGTH	60  	/*[deg]*/
-#define LV_PRELOAD_DEF_SPIN_TIME	1000    /*[ms]*/
+#define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
+#define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
 #endif
 
 /*************************

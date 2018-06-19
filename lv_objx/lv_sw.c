@@ -1,6 +1,6 @@
 /**
  * @file lv_sw.c
- * 
+ *
  */
 
 /*********************
@@ -56,7 +56,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     lv_mem_assert(new_sw);
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_sw);
-    
+
     /*Allocate the switch type specific extended data*/
     lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
     lv_mem_assert(ext);
@@ -76,7 +76,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
         lv_slider_set_knob_in(new_sw, true);
 
         /*Set the default styles*/
-        lv_theme_t *th = lv_theme_get_current();
+        lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_sw_set_style(new_sw, LV_SW_STYLE_BG, th->sw.bg);
             lv_sw_set_style(new_sw, LV_SW_STYLE_INDIC, th->sw.indic);
@@ -89,7 +89,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing switch*/
     else {
-        lv_sw_ext_t *copy_ext = lv_obj_get_ext_attr(copy);
+        lv_sw_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->style_knob_off = copy_ext->style_knob_off;
         ext->style_knob_on = copy_ext->style_knob_on;
 
@@ -98,7 +98,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_sw);
     }
-    
+
     return new_sw;
 }
 
@@ -110,26 +110,26 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, lv_obj_t * copy)
  * Turn ON the switch
  * @param sw pointer to a switch object
  */
-void lv_sw_on(lv_obj_t *sw)
+void lv_sw_on(lv_obj_t * sw)
 {
-	if(lv_sw_get_state(sw)) return;		/*Do nothing is already turned on*/
+    if(lv_sw_get_state(sw)) return;     /*Do nothing is already turned on*/
 
-    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 1);
-    lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB,ext->style_knob_on);
+    lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
 }
 
 /**
  * Turn OFF the switch
  * @param sw pointer to a switch object
  */
-void lv_sw_off(lv_obj_t *sw)
+void lv_sw_off(lv_obj_t * sw)
 {
-	if(!lv_sw_get_state(sw)) return;	/*Do nothing is already turned off*/
+    if(!lv_sw_get_state(sw)) return;    /*Do nothing is already turned off*/
 
-    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     lv_slider_set_value(sw, 0);
-    lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB,ext->style_knob_off);
+    lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
 }
 
 /**
@@ -138,11 +138,11 @@ void lv_sw_off(lv_obj_t *sw)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style)
+void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
 {
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
-    switch (type) {
+    switch(type) {
         case LV_SLIDER_STYLE_BG:
             lv_slider_set_style(sw, LV_SLIDER_STYLE_BG, style);
             break;
@@ -170,16 +170,21 @@ void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_sw_get_style(lv_obj_t *sw, lv_sw_style_t type)
+lv_style_t * lv_sw_get_style(lv_obj_t * sw, lv_sw_style_t type)
 {
-    lv_sw_ext_t *ext = lv_obj_get_ext_attr(sw);
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
-    switch (type) {
-        case LV_SW_STYLE_BG:    return lv_slider_get_style(sw, LV_SLIDER_STYLE_BG);
-        case LV_SW_STYLE_INDIC: return lv_slider_get_style(sw, LV_SLIDER_STYLE_INDIC);
-        case LV_SW_STYLE_KNOB_OFF:  return ext->style_knob_off;
-        case LV_SW_STYLE_KNOB_ON:  return ext->style_knob_on;
-        default: return NULL;
+    switch(type) {
+        case LV_SW_STYLE_BG:
+            return lv_slider_get_style(sw, LV_SLIDER_STYLE_BG);
+        case LV_SW_STYLE_INDIC:
+            return lv_slider_get_style(sw, LV_SLIDER_STYLE_INDIC);
+        case LV_SW_STYLE_KNOB_OFF:
+            return ext->style_knob_off;
+        case LV_SW_STYLE_KNOB_ON:
+            return ext->style_knob_on;
+        default:
+            return NULL;
     }
 
     /*To avoid warning*/
@@ -216,17 +221,14 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    } else if(sign == LV_SIGNAL_PRESSING) {
         int16_t act_val = ext->slider.drag_value;
         if(act_val != old_val) ext->changed = 1;
-    }
-    else if(sign == LV_SIGNAL_PRESS_LOST) {
+    } else if(sign == LV_SIGNAL_PRESS_LOST) {
         ext->changed = 0;
         if(lv_sw_get_state(sw)) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
         else lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
-    }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->changed == 0) {
             int16_t v = lv_slider_get_value(sw);
             if(v == 0) lv_slider_set_value(sw, 1);
@@ -239,26 +241,22 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(slider_action != NULL) slider_action(sw);
 
         ext->changed = 0;
-    }
-    else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROLL) {
 
-        char c = *((char*)param);
+        char c = *((char *)param);
         if(c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             if(lv_sw_get_state(sw)) lv_sw_off(sw);
             else lv_sw_on(sw);
 
             if(slider_action) slider_action(sw);
-        }
-        else if(c == LV_GROUP_KEY_UP || c== LV_GROUP_KEY_RIGHT) {
+        } else if(c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_RIGHT) {
             lv_sw_on(sw);
             if(slider_action) slider_action(sw);
-        }
-        else if(c == LV_GROUP_KEY_DOWN || c== LV_GROUP_KEY_LEFT) {
+        } else if(c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_LEFT) {
             lv_sw_off(sw);
             if(slider_action) slider_action(sw);
         }
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/

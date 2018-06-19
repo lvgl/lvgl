@@ -1,6 +1,6 @@
 /**
  * @file lv_draw_rbasic.c
- * 
+ *
  */
 
 /*********************
@@ -66,15 +66,15 @@ void lv_rpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
  * @param color fill color
  * @param opa opacity (ignored, only for compatibility with lv_vfill)
  */
-void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p, 
+void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
               lv_color_t color, lv_opa_t opa)
-{   
+{
 
     (void)opa;      /*Opa is used only for compatibility with lv_vfill*/
 
     lv_area_t masked_area;
     bool union_ok = true;
-    
+
     if(mask_p != NULL) {
         union_ok = lv_area_union(&masked_area, cords_p, mask_p);
     } else {
@@ -82,9 +82,9 @@ void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         lv_area_set(&scr_area, 0, 0, LV_HOR_RES - 1, LV_VER_RES - 1);
         union_ok = lv_area_union(&masked_area, cords_p, &scr_area);
     }
-    
-    if(union_ok != false){
-    	lv_disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
+
+    if(union_ok != false) {
+        lv_disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
     }
 }
 
@@ -92,39 +92,53 @@ void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
  * Draw a letter to the display
  * @param pos_p left-top coordinate of the latter
  * @param mask_p the letter will be drawn only on this area
- * @param font_p pointer to font 
+ * @param font_p pointer to font
  * @param letter a letter to draw
  * @param color color of letter
  * @param opa opacity of letter (ignored, only for compatibility with lv_vletter)
  */
 void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
-                     const lv_font_t * font_p, uint32_t letter,
-                     lv_color_t color, lv_opa_t opa)
+                const lv_font_t * font_p, uint32_t letter,
+                lv_color_t color, lv_opa_t opa)
 {
     (void)opa;      /*Opa is used only for compatibility with lv_vletter*/
 
     static uint8_t bpp1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
     static uint8_t bpp2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
     static uint8_t bpp4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
-                                        68,  85,  102, 119,
-                                        136, 153, 170, 187,
-                                        204, 221, 238, 255};
+                                         68,  85,  102, 119,
+                                         136, 153, 170, 187,
+                                         204, 221, 238, 255
+                                        };
 
     if(font_p == NULL) return;
 
     uint8_t letter_w = lv_font_get_width(font_p, letter);
     uint8_t letter_h = lv_font_get_height(font_p);
     uint8_t bpp = lv_font_get_bpp(font_p, letter);  /*Bit per pixel (1,2, 4 or 8)*/
-    uint8_t *bpp_opa_table;
+    uint8_t * bpp_opa_table;
     uint8_t mask_init;
     uint8_t mask;
 
     switch(bpp) {
-        case 1: bpp_opa_table = bpp1_opa_table;  mask_init = 0x80; break;
-        case 2: bpp_opa_table = bpp2_opa_table;  mask_init = 0xC0; break;
-        case 4: bpp_opa_table = bpp4_opa_table;  mask_init = 0xF0; break;
-        case 8: bpp_opa_table = NULL;  mask_init = 0xFF; break;             /*No opa table, pixel value will be used directly*/
-        default: return;        /*Invalid bpp. Can't render the letter*/
+        case 1:
+            bpp_opa_table = bpp1_opa_table;
+            mask_init = 0x80;
+            break;
+        case 2:
+            bpp_opa_table = bpp2_opa_table;
+            mask_init = 0xC0;
+            break;
+        case 4:
+            bpp_opa_table = bpp4_opa_table;
+            mask_init = 0xF0;
+            break;
+        case 8:
+            bpp_opa_table = NULL;
+            mask_init = 0xFF;
+            break;             /*No opa table, pixel value will be used directly*/
+        default:
+            return;        /*Invalid bpp. Can't render the letter*/
     }
 
     const uint8_t * map_p = lv_font_get_bitmap(font_p, letter);
@@ -133,7 +147,7 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
 
     /*If the letter is completely out of mask don't draw it */
     if(pos_p->x + letter_w < mask_p->x1 || pos_p->x > mask_p->x2 ||
-       pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
+            pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
 
     lv_coord_t col, row;
     uint8_t col_bit;
@@ -166,8 +180,7 @@ void lv_rletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
             if(col_bit < 8 - bpp) {
                 col_bit += bpp;
                 mask = mask >> bpp;
-            }
-            else {
+            } else {
                 col_bit = 0;
                 col_byte_cnt ++;
                 mask = mask_init;
@@ -200,8 +213,8 @@ void lv_rletter_set_background(lv_color_t color)
  * @param recolor_opa the intense of recoloring
  */
 void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
-            const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-            lv_color_t recolor, lv_opa_t recolor_opa)
+             const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+             lv_color_t recolor, lv_opa_t recolor_opa)
 {
     if(alpha_byte) return;      /*Pixel level opacity i not supported in real map drawing*/
 
@@ -223,7 +236,7 @@ void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(recolor_opa == LV_OPA_TRANSP && chroma_key == false) {
         lv_coord_t mask_w = lv_area_get_width(&masked_a) - 1;
         for(row = masked_a.y1; row <= masked_a.y2; row++) {
-            lv_disp_map(masked_a.x1, row, masked_a.x1 + mask_w, row, (lv_color_t*)map_p);
+            lv_disp_map(masked_a.x1, row, masked_a.x1 + mask_w, row, (lv_color_t *)map_p);
             map_p += map_width * sizeof(lv_color_t);               /*Next row on the map*/
         }
     } else {

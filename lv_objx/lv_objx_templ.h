@@ -1,6 +1,6 @@
 /**
  * @file lv_templ.h
- * 
+ *
  */
 
 
@@ -37,14 +37,14 @@ extern "C" {
 typedef struct {
     lv_ANCESTOR_ext_t ANCESTOR; /*Ext. of ancestor*/
     /*New data for this type */
-}lv_templ_ext_t;
+} lv_templ_ext_t;
 
 
 /*Styles*/
 typedef enum {
     LV_TEMPL_STYLE_X,
     LV_TEMPL_STYLE_Y,
-}lv_templ_style_t;
+} lv_templ_style_t;
 
 
 /**********************

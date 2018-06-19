@@ -1,6 +1,6 @@
 /**
  * @file lv_preload.h
- * 
+ *
  */
 
 #ifndef LV_PRELOAD_H
@@ -28,22 +28,22 @@ extern "C" {
  **********************/
 
 typedef enum {
-	LV_PRELOAD_TYPE_SPINNING_ARC,
-}lv_preloader_type_t;
+    LV_PRELOAD_TYPE_SPINNING_ARC,
+} lv_preloader_type_t;
 
 /*Data of pre loader*/
 typedef struct {
     lv_arc_ext_t arc; /*Ext. of ancestor*/
     /*New data for this type */
-    uint16_t arc_length;			/*Length of the spinning indicator in degree*/
-    uint16_t time;					/*Time of one round*/
-}lv_preload_ext_t;
+    uint16_t arc_length;            /*Length of the spinning indicator in degree*/
+    uint16_t time;                  /*Time of one round*/
+} lv_preload_ext_t;
 
 
 /*Styles*/
 typedef enum {
-	LV_PRELOAD_STYLE_MAIN,
-}lv_preload_style_t;
+    LV_PRELOAD_STYLE_MAIN,
+} lv_preload_style_t;
 
 
 /**********************

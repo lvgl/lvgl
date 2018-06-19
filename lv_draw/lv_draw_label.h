@@ -39,7 +39,7 @@ extern "C" {
  *
  */
 void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset);
+                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset);
 
 /**********************
  *      MACROS

@@ -103,21 +103,20 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
         /*Calc. the next point of edge1*/
         y1_tmp = edge1.y;
         do {
-            if (edge1.x == tri[1].x && edge1.y == tri[1].y) {
+            if(edge1.x == tri[1].x && edge1.y == tri[1].y) {
 
                 dx1 = LV_MATH_ABS(tri[1].x - tri[2].x);
                 sx1 = tri[1].x < tri[2].x ? 1 : -1;
                 dy1 = LV_MATH_ABS(tri[1].y - tri[2].y);
                 sy1 = tri[1].y < tri[2].y ? 1 : -1;
                 err1 = (dx1 > dy1 ? dx1 : -dy1) / 2;
-            }
-            else if (edge1.x == tri[2].x && edge1.y == tri[2].y) return;
+            } else if(edge1.x == tri[2].x && edge1.y == tri[2].y) return;
             err_tmp1 = err1;
-            if (err_tmp1 >-dx1) {
+            if(err_tmp1 > -dx1) {
                 err1 -= dy1;
                 edge1.x += sx1;
             }
-            if (err_tmp1 < dy1) {
+            if(err_tmp1 < dy1) {
                 err1 += dx1;
                 edge1.y += sy1;
             }
@@ -126,13 +125,13 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
         /*Calc. the next point of edge2*/
         y2_tmp = edge2.y;
         do {
-            if (edge2.x == tri[2].x && edge2.y == tri[2].y) return;
+            if(edge2.x == tri[2].x && edge2.y == tri[2].y) return;
             err_tmp2 = err2;
-            if (err_tmp2 > -dx2) {
+            if(err_tmp2 > -dx2) {
                 err2 -= dy2;
                 edge2.x += sx2;
             }
-            if (err_tmp2 < dy2) {
+            if(err_tmp2 < dy2) {
                 err2 += dx2;
                 edge2.y += sy2;
             }

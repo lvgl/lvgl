@@ -37,27 +37,27 @@ typedef enum
     LV_BORDER_LEFT =   0x04,
     LV_BORDER_RIGHT =  0x08,
     LV_BORDER_FULL =   0x0F,
-}lv_border_part_t;
+} lv_border_part_t;
 
 /*Shadow types*/
 typedef enum
 {
     LV_SHADOW_BOTTOM = 0,
     LV_SHADOW_FULL,
-}lv_shadow_type_t;
+} lv_shadow_type_t;
 
 typedef struct
 {
-    uint8_t glass :1;   		/*1: Do not inherit this style*/
+    uint8_t glass :1;           /*1: Do not inherit this style*/
 
     struct {
         lv_color_t main_color;
         union {
-        	lv_color_t grad_color;		/*`grad_color` will be removed in v6.0, use `aux_color` instead*/
-        	lv_color_t aux_color;
+            lv_color_t grad_color;      /*`grad_color` will be removed in v6.0, use `aux_color` instead*/
+            lv_color_t aux_color;
         };
         lv_coord_t radius;
-        lv_coord_t thickness;		/*Depending on the object type thickness of something*/
+        lv_coord_t thickness;       /*Depending on the object type thickness of something*/
         lv_opa_t opa;
 
         struct {
@@ -65,22 +65,22 @@ typedef struct
             lv_coord_t width;
             lv_border_part_t part;
             lv_opa_t opa;
-        }border;
+        } border;
 
         struct {
             lv_color_t color;
             lv_coord_t width;
             uint8_t type;
-        }shadow;
+        } shadow;
 
         struct {
             lv_coord_t ver;
             lv_coord_t hor;
             lv_coord_t inner;
-        }padding;
+        } padding;
 
         uint8_t empty :1;   /*Transparent background (border still drawn)*/
-    }body;
+    } body;
 
 
     struct {
@@ -89,20 +89,20 @@ typedef struct
         lv_coord_t letter_space;
         lv_coord_t line_space;
         lv_opa_t opa;
-    }text;
+    } text;
 
     struct {
         lv_color_t color;
         lv_opa_t intense;
         lv_opa_t opa;
-    }image;
+    } image;
 
     struct {
         lv_color_t color;
         lv_coord_t width;
         lv_opa_t opa;
-    }line;
-}lv_style_t;
+    } line;
+} lv_style_t;
 
 #if USE_LV_ANIMATION
 typedef struct {
@@ -116,7 +116,7 @@ typedef struct {
     uint16_t repeat_pause;          /*Wait before repeat*/
     uint8_t playback :1;            /*When the animation is ready play it back*/
     uint8_t repeat :1;              /*Repeat the animation infinitely*/
-}lv_style_anim_t;
+} lv_style_anim_t;
 
 /* Example initialization
 lv_style_anim_t a;

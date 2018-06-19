@@ -1,6 +1,6 @@
 /**
  * @file lv_text.h
- * 
+ *
  */
 
 #ifndef LV_TXT_H
@@ -33,14 +33,14 @@ typedef enum
     LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width (Used by the library)*/
     LV_TXT_FLAG_NO_BREAK = 0x04,   /*Ignore line breaks (Used by the library)*/
     LV_TXT_FLAG_CENTER =   0x08,   /*Align the text to the middle*/
-}lv_txt_flag_t;
+} lv_txt_flag_t;
 
 typedef enum
 {
     LV_TXT_CMD_STATE_WAIT,      /*Waiting for command*/
     LV_TXT_CMD_STATE_PAR,       /*Processing the parameter*/
     LV_TXT_CMD_STATE_IN,        /*Processing the command*/
-}lv_txt_cmd_state_t;
+} lv_txt_cmd_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -57,7 +57,7 @@ typedef enum
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
  */
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
-                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
+                     lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -69,7 +69,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @return the index of the first char of the new line
  */
 uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font_p,
-                            lv_coord_t letter_space, lv_coord_t max_l, lv_txt_flag_t flag);
+                              lv_coord_t letter_space, lv_coord_t max_l, lv_txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font

@@ -1,6 +1,6 @@
 /**
  * @file lv_img.h
- * 
+ *
  */
 
 #ifndef LV_IMG_H
@@ -42,7 +42,7 @@ typedef struct
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
     uint8_t chroma_keyed :1;    /*1: Chroma keyed image, LV_COLOR_TRANSP (lv_conf.h) pixels will be transparent (Handled by the library)*/
     uint8_t alpha_byte   :1;    /*1: Extra byte for every pixel to define opacity*/
-}lv_img_ext_t;
+} lv_img_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

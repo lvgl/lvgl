@@ -1,6 +1,6 @@
 /**
  * @file lv_bar.h
- * 
+ *
  */
 
 #ifndef LV_BAR_H
@@ -38,12 +38,12 @@ typedef struct
     int16_t min_value;              /*Minimum value of the bar*/
     int16_t max_value;              /*Maximum value of the bar*/
     lv_style_t *style_indic;        /*Style of the indicator*/
-}lv_bar_ext_t;
+} lv_bar_ext_t;
 
 typedef enum {
     LV_BAR_STYLE_BG,
     LV_BAR_STYLE_INDIC,
-}lv_bar_style_t;
+} lv_bar_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

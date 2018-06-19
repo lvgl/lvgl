@@ -43,7 +43,7 @@
  * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
-				 const void * src, const lv_style_t * style, lv_opa_t opa_scale)
+                 const void * src, const lv_style_t * style, lv_opa_t opa_scale)
 {
 
     if(src == NULL) {
@@ -55,7 +55,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
     lv_opa_t opa = (uint16_t)((uint16_t) style->image.opa * opa_scale) >> 8;
 
-    const uint8_t * u8_p = (uint8_t*) src;
+    const uint8_t * u8_p = (uint8_t *) src;
     if(u8_p[0] >= 'A' &&  u8_p[0] <= 'Z') { /*It will be a path of a file*/
 #if USE_LV_FILESYSTEM
         lv_fs_file_t file;
@@ -75,10 +75,17 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
             uint8_t px_size = 0;
             switch(img_data.header.format) {
-                case LV_IMG_FORMAT_FILE_RAW_RGB332: px_size = 1; break;
-                case LV_IMG_FORMAT_FILE_RAW_RGB565: px_size = 2; break;
-                case LV_IMG_FORMAT_FILE_RAW_RGB888: px_size = 4; break;
-                default: return;
+                case LV_IMG_FORMAT_FILE_RAW_RGB332:
+                    px_size = 1;
+                    break;
+                case LV_IMG_FORMAT_FILE_RAW_RGB565:
+                    px_size = 2;
+                    break;
+                case LV_IMG_FORMAT_FILE_RAW_RGB888:
+                    px_size = 4;
+                    break;
+                default:
+                    return;
             }
 
             if(img_data.header.alpha_byte) {    /*Correction with the alpha byte*/
@@ -115,7 +122,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                 res = lv_fs_read(&file, buf, useful_data, &br);
 
                 map_fp(&line, &mask_com, (uint8_t *)buf, opa, img_data.header.chroma_keyed, img_data.header.alpha_byte,
-                        style->image.color, style->image.intense);
+                       style->image.color, style->image.intense);
 
                 lv_fs_tell(&file, &act_pos);
                 lv_fs_seek(&file, act_pos + next_row);
@@ -131,8 +138,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             }
         }
 #endif
-    }
-    else {
+    } else {
         const lv_img_t * img_var = src;
         lv_area_t mask_com;    /*Common area of mask and coords*/
         bool union_ok;

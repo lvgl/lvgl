@@ -1,6 +1,6 @@
 /**
  * @file lv_win.h
- * 
+ *
  */
 
 #ifndef LV_WIN_H
@@ -61,7 +61,7 @@ typedef struct
     lv_style_t * style_btn_rel;    /*Control button releases style*/
     lv_style_t * style_btn_pr;     /*Control button pressed style*/
     lv_coord_t btn_size;               /*Size of the control buttons (square)*/
-}lv_win_ext_t;
+} lv_win_ext_t;
 
 typedef enum {
     LV_WIN_STYLE_BG,
@@ -71,7 +71,7 @@ typedef enum {
     LV_WIN_STYLE_HEADER,
     LV_WIN_STYLE_BTN_REL,
     LV_WIN_STYLE_BTN_PR,
-}lv_win_style_t;
+} lv_win_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
