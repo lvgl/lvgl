@@ -279,7 +279,7 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
  * @param group pointer to group
  * @param en true or false to enable or disable this feature.
  */
-void lv_group_set_edit_enabel(lv_group_t * group, bool en)
+void lv_group_set_edit_enable(lv_group_t * group, bool en)
 {
 	group->edit_mode_en = en ? 1 : 0;
 }
@@ -424,7 +424,7 @@ static void style_mod_edit_def(lv_style_t * style)
 #else
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
-    style->body.border.width = 2;
+    style->body.border.width = 3;
 
 #endif
 

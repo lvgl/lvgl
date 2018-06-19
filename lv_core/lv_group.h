@@ -143,7 +143,7 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
  * @param group pointer to group
  * @param en true or false to enable or disable this feature.
  */
-void lv_group_set_edit_enabel(lv_group_t * group, bool en);
+void lv_group_set_edit_enable(lv_group_t * group, bool en);
 
 /**
  * Manually set the current mode (edit or navigate).
