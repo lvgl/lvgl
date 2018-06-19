@@ -29,7 +29,7 @@
 
 #define LABEL_RECOLOR_PAR_LENGTH    6
 
-#define SHADOW_OPA_EXTRA_PRECISION      0       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
+#define SHADOW_OPA_EXTRA_PRECISION      8       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
 #define SHADOW_BOTTOM_AA_EXTRA_RADIUS   3       /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
 /**********************
  *      TYPEDEFS
