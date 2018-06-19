@@ -325,7 +325,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         if(slider_w >= slider_h) {
             area_indic.x2 = (int32_t)((int32_t)(lv_area_get_width(&area_indic) - 1) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.x2 += area_indic.x1 + area_indic.x2;
+            area_indic.x2 = area_indic.x1 + area_indic.x2;
 
         } else {
             area_indic.y1 = (int32_t)((int32_t)(lv_area_get_height(&area_indic) - 1) * (cur_value - min_value)) / (max_value - min_value);
