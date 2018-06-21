@@ -448,7 +448,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
             rect_area.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
             rect_area.y1 -= style->text.line_space / 2;
 
-            rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
+            rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
             rect_area.x1 = ddlist->coords.x1;
             rect_area.x2 = ddlist->coords.x2;
 
@@ -474,7 +474,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         area_sel.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
         area_sel.y1 -= style->text.line_space / 2;
 
-        area_sel.y2 = area_sel.y1 + font_h + style->text.line_space;
+        area_sel.y2 = area_sel.y1 + font_h + style->text.line_space - 1;
         area_sel.x1 = ddlist->coords.x1;
         area_sel.x2 = ddlist->coords.x2;
         lv_area_t mask_sel;
