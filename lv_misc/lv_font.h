@@ -18,6 +18,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #include "lv_fonts/lv_symbol_def.h"
 
@@ -52,7 +53,8 @@ typedef struct _lv_font_struct
     const uint8_t * (*get_bitmap)(const struct _lv_font_struct *,uint32_t);     /*Get a glyph's  bitmap from a font*/
     int16_t (*get_width)(const struct _lv_font_struct *,uint32_t);        /*Get a glyph's with with a given font*/
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
-    uint32_t bpp   :4;                     /*Bit per pixel: 1, 2 or 4*/
+    uint32_t bpp   		:4;                /*Bit per pixel: 1, 2 or 4*/
+    uint32_t monospace	:8;				   /*Fix width (0: normal width)*/
 } lv_font_t;
 
 /**********************
@@ -72,12 +74,29 @@ void lv_font_init(void);
 void lv_font_add(lv_font_t *child, lv_font_t *parent);
 
 /**
+ * Tells if font which contains `letter` is monospace or not
+ * @param font_p point to font
+ * @param letter an UNICODE character code
+ * @return true: the letter is monospace; false not monospace
+ */
+bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter);
+
+/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
- * @param letter a letter
+ * @param letter an UNICODE character code
  * @return  pointer to the bitmap of the letter
  */
 const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter);
+
+/**
+ * Get the width of a letter in a font. If `monospace` is set then return with it.
+ * @param font_p pointer to a font
+ * @param letter an UNICODE character code
+ * @return the width of a letter
+ */
+uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
+
 
 /**
  * Get the height of a font
@@ -88,14 +107,6 @@ static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
 {
     return font_p->h_px;
 }
-
-/**
- * Get the width of a letter in a font
- * @param font_p pointer to a font
- * @param letter a letter
- * @return the width of a letter
- */
-uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the bit-per-pixel of font

@@ -217,12 +217,20 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
 
     if(font_p == NULL) return;
 
-    uint8_t letter_w = lv_font_get_width(font_p, letter);
+
+    lv_coord_t pos_x = pos_p->x;
+    lv_coord_t pos_y = pos_p->y;
+    uint8_t letter_w = lv_font_get_real_width(font_p, letter);
     uint8_t letter_h = lv_font_get_height(font_p);
     uint8_t bpp = lv_font_get_bpp(font_p, letter);  /*Bit per pixel (1,2, 4 or 8)*/
     uint8_t * bpp_opa_table;
     uint8_t mask_init;
     uint8_t mask;
+
+    if(lv_font_is_monospace(font_p, letter)) {
+    	pos_x += (lv_font_get_width(font_p, letter) - letter_w) / 2;
+    }
+
 
     switch(bpp) {
         case 1:
@@ -250,8 +258,8 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     if(map_p == NULL) return;
 
     /*If the letter is completely out of mask don't draw it */
-    if(pos_p->x + letter_w < mask_p->x1 || pos_p->x > mask_p->x2 ||
-            pos_p->y + letter_h < mask_p->y1 || pos_p->y > mask_p->y2) return;
+    if(pos_x + letter_w < mask_p->x1 || pos_x > mask_p->x2 ||
+            pos_y + letter_h < mask_p->y1 || pos_y > mask_p->y2) return;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
     lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
@@ -265,14 +273,14 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     if((letter_w * bpp) & 0x7) width_byte_bpp++;
 
     /* Calculate the col/row start/end on the map*/
-    lv_coord_t col_start = pos_p->x >= mask_p->x1 ? 0 : mask_p->x1 - pos_p->x;
-    lv_coord_t col_end = pos_p->x + letter_w <= mask_p->x2 ? letter_w : mask_p->x2 - pos_p->x + 1;
-    lv_coord_t row_start = pos_p->y >= mask_p->y1 ? 0 : mask_p->y1 - pos_p->y;
-    lv_coord_t row_end  = pos_p->y + letter_h <= mask_p->y2 ? letter_h : mask_p->y2 - pos_p->y + 1;
+    lv_coord_t col_start = pos_x >= mask_p->x1 ? 0 : mask_p->x1 - pos_x;
+    lv_coord_t col_end = pos_x + letter_w <= mask_p->x2 ? letter_w : mask_p->x2 - pos_x + 1;
+    lv_coord_t row_start = pos_y >= mask_p->y1 ? 0 : mask_p->y1 - pos_y;
+    lv_coord_t row_end  = pos_y + letter_h <= mask_p->y2 ? letter_h : mask_p->y2 - pos_y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
-    vdb_buf_tmp += ((pos_p->y - vdb_p->area.y1) * vdb_width)
-                   + pos_p->x - vdb_p->area.x1;
+    vdb_buf_tmp += ((pos_y - vdb_p->area.y1) * vdb_width)
+                   + pos_x - vdb_p->area.x1;
 
     /*If the letter is partially out of mask the move there on VDB*/
     vdb_buf_tmp += (row_start * vdb_width) + col_start;

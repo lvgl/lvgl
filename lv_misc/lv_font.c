@@ -18,11 +18,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    uint32_t glyph_index;
-    uint32_t unicode;
-    uint8_t w_px;
-} asd_glyph_dsc_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -192,9 +187,33 @@ void lv_font_add(lv_font_t * child, lv_font_t * parent)
 }
 
 /**
+ * Tells if font which contains `letter` is monospace or not
+ * @param font_p point to font
+ * @param letter an UNICODE character code
+ * @return true: the letter is monospace; false not monospace
+ */
+bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter)
+{
+	const lv_font_t * font_i = font_p;
+	int16_t w;
+	while(font_i != NULL) {
+    w = font_i->get_width(font_i, letter);
+    if(w >= 0) {
+    	/*Glyph found*/
+    	if(font_i->monospace) return true;
+    	return false;
+    }
+
+    font_i = font_i->next_page;
+}
+
+return 0;
+}
+
+/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
- * @param letter a letter
+ * @param letter an UNICODE character code
  * @return  pointer to the bitmap of the letter
  */
 const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
@@ -211,12 +230,37 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
 }
 
 /**
- * Get the width of a letter in a font
+ * Get the width of a letter in a font. If `monospace` is set then return with it.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
  * @return the width of a letter
  */
 uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
+{
+    const lv_font_t * font_i = font_p;
+    int16_t w;
+    while(font_i != NULL) {
+        w = font_i->get_width(font_i, letter);
+        if(w >= 0) {
+        	/*Glyph found*/
+        	uint8_t m = font_i->monospace;
+        	if(m) w = m;
+        	return w;
+        }
+
+        font_i = font_i->next_page;
+    }
+
+    return 0;
+}
+
+/**
+ * Get the width of the letter without overwriting it with the `monospace` attribute
+ * @param font_p pointer to a font
+ * @param letter an UNICODE character code
+ * @return the width of a letter
+ */
+uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter)
 {
     const lv_font_t * font_i = font_p;
     int16_t w;

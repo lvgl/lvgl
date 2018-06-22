@@ -3636,6 +3636,7 @@ lv_font_t lv_font_dejavu_10_cyrillic = {
 #elif USE_LV_FONT_DEJAVU_10_CYRILLIC == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
+	.monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 
