@@ -36,6 +36,7 @@ static bool anim_ready_handler(lv_anim_t * a);
  **********************/
 static lv_ll_t anim_ll;
 static uint32_t last_task_run;
+static bool anim_list_changed;
 
 /**********************
  *      MACROS
@@ -85,9 +86,9 @@ void lv_anim_create(lv_anim_t * anim_p)
  */
 bool lv_anim_del(void * var, lv_anim_fp_t fp)
 {
-    bool del = false;
     lv_anim_t * a;
     lv_anim_t * a_next;
+    bool del = false;
     a = lv_ll_get_head(&anim_ll);
     while(a != NULL) {
         /*'a' might be deleted, so get the next object while 'a' is valid*/
@@ -96,6 +97,7 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
         if(a->var == var && (a->fp == fp || fp == NULL)) {
             lv_ll_rem(&anim_ll, a);
             lv_mem_free(a);
+            anim_list_changed = true;		/*Read by `anim_task`. It need to know if a delete occurred in the linked list*/
             del = true;
         }
 
@@ -197,32 +199,42 @@ static void anim_task(void * param)
 {
     (void)param;
 
-    volatile uint32_t elaps;
-    elaps = lv_tick_elaps(last_task_run);
-
     lv_anim_t * a;
-    lv_anim_t * a_next;
+    LL_READ(anim_ll, a) {
+    	a->has_run = 0;
+    }
+
+    uint32_t elaps = lv_tick_elaps(last_task_run);
     a = lv_ll_get_head(&anim_ll);
+
     while(a != NULL) {
-        /*'a' might be deleted, so get the next object while 'a' is valid*/
-        a_next = lv_ll_get_next(&anim_ll, a);
+		/*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete happened in `anim_ready_handler`
+		 * which could make this linked list reading corrupt because the list is changed meanwhile
+		 */
+		anim_list_changed = false;
 
-        a->act_time += elaps;
-        if(a->act_time >= 0) {
-            if(a->act_time > a->time) a->act_time = a->time;
+    	if(!a->has_run) {
+    		a->has_run = 1;			/*The list readying might be reseted so need to know which anim has run already*/
+			a->act_time += elaps;
+			if(a->act_time >= 0) {
+				if(a->act_time > a->time) a->act_time = a->time;
 
-            int32_t new_value;
-            new_value = a->path(a);
+				int32_t new_value;
+				new_value = a->path(a);
 
-            if(a->fp != NULL) a->fp(a->var, new_value); /*Apply the calculated value*/
+				if(a->fp != NULL) a->fp(a->var, new_value); /*Apply the calculated value*/
 
-            /*If the time is elapsed the animation is ready*/
-            if(a->act_time >= a->time) {
-                anim_ready_handler(a);
-            }
-        }
+				/*If the time is elapsed the animation is ready*/
+				if(a->act_time >= a->time) {
+					anim_ready_handler(a);
+				}
+			}
+		}
 
-        a = a_next;
+    	/* If the linked list changed due to anim. delete then it's not safe to continue
+    	 * the reading of the list from here -> start from the head*/
+    	if(anim_list_changed) a = lv_ll_get_head(&anim_ll);
+    	else a = lv_ll_get_next(&anim_ll, a);
     }
 
     last_task_run = lv_tick_get();
@@ -232,11 +244,10 @@ static void anim_task(void * param)
  * Called when an animation is ready to do the necessary thinks
  * e.g. repeat, play back, delete etc.
  * @param a pointer to an animation descriptor
- * @return true: animation delete occurred
+ * @return true: animation delete occurred nnd the `anim_ll` has changed
  * */
 static bool anim_ready_handler(lv_anim_t * a)
 {
-    bool invalid = false;
 
     /*Delete the animation if
      * - no repeat and no play back (simple one shot animation)
@@ -248,11 +259,10 @@ static bool anim_ready_handler(lv_anim_t * a)
         lv_ll_rem(&anim_ll, a);
         lv_mem_free(a);
 
-        /*Call the callback function at the end*/
+        /* Call the callback function at the end*/
         /* Check if an animation is deleted in the cb function
          * if yes then the caller function has to know this*/
         if(cb != NULL) cb(p);
-        invalid = true;
     }
     /*If the animation is not deleted then restart it*/
     else {
@@ -272,6 +282,6 @@ static bool anim_ready_handler(lv_anim_t * a)
         }
     }
 
-    return invalid;
+    return anim_list_changed;
 }
 #endif
