@@ -8,9 +8,9 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
-/*----------------
+/*===================
  * Dynamic memory
- *----------------*/
+ *===================*/
 
 /* Memory size which will be used by the library
  * to store the graphical objects and other data */
@@ -52,6 +52,12 @@
 /*Screen refresh settings*/
 #define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
 #define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
+
+/*=================
+   System settings
+ *=================*/
+
+#define LV_SIGNALS                      1   /*Setup signal handlers (need a POSIX system)*/
 
 /*=================
    Misc. setting
