@@ -127,6 +127,8 @@ void lv_slider_set_action(lv_obj_t * slider, lv_action_t action)
 void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+    if(ext->knob_in == in) return;
+
     ext->knob_in = in == false ? 0 : 1;
     lv_obj_invalidate(slider);
 }
@@ -273,11 +275,21 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             pad_hor_bg = (lv_area_get_width(&area_bg) - LV_SLIDER_SIZE_MIN) >> 1;
         }
 
-        /*Let space only in the perpendicular directions*/
-        area_bg.x1 += slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
-        area_bg.x2 -= slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
-        area_bg.y1 += slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
-        area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
+        if(ext->knob_in) {  /*Enable extra size if the knob is inside */
+            if(pad_hor_bg < 0) {
+                area_bg.x1 += pad_hor_bg;
+                area_bg.x2 -= pad_hor_bg;
+            }
+            if(pad_ver_bg < 0) {
+                area_bg.y1 += pad_hor_bg;
+                area_bg.y2 -= pad_hor_bg;
+            }
+        } else  { /*Let space only in the perpendicular directions*/
+            area_bg.x1 += slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
+            area_bg.x2 -= slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
+            area_bg.y1 += slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
+            area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
+        }
         lv_draw_rect(&area_bg, mask, style_bg);
 
         /*Draw the indicator*/
@@ -309,11 +321,11 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         if(slider_w >= slider_h) {
             area_indic.x2 = (int32_t) ((int32_t)lv_area_get_width(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.x2 += area_indic.x1;
+            area_indic.x2 = area_indic.x1 + area_indic.x2 - 1;
 
         } else {
             area_indic.y1 = (int32_t) ((int32_t)lv_area_get_height(&area_indic) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.y1 = area_indic.y2 - area_indic.y1;
+            area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
         }
 
         if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic);

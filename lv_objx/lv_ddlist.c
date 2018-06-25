@@ -172,6 +172,7 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options)
 void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    if(ext->sel_opt_id == sel_opt) return;
 
     ext->sel_opt_id = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
 
@@ -203,6 +204,8 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action)
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    if(ext->fix_height == h) return;
+
     ext->fix_height = h;
 
     lv_ddlist_refr_size(ddlist, false);
@@ -217,7 +220,6 @@ void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, bool fit_en)
 {
     lv_cont_set_fit(ddlist, fit_en, lv_cont_get_ver_fit(ddlist));
     lv_page_set_scrl_fit(ddlist, fit_en, lv_page_get_scrl_fit_ver(ddlist));
-
 
     lv_ddlist_refr_size(ddlist, false);
 }

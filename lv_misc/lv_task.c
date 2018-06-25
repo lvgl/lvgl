@@ -69,27 +69,32 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 	 * If a lower priority task is executed check task again from the highest priority
 	 * but on the priority of executed tasks don't run tasks before the executed*/
 	lv_task_t * task_interruper = NULL;
-	lv_task_t * tmp;
+    lv_task_t * next;
 	bool end_flag;
 	do {
 	    end_flag = true;
-	    LL_READ(lv_task_ll,tmp){
+	    lv_task_t * act = lv_ll_get_head(&lv_task_ll);
+	    while(act){
+	        /* The task might be deleted if it runs only once ('once = 1')
+	         * So get next element until the current is surely valid*/
+	        next = lv_ll_get_next(&lv_task_ll, act);
 
 	        /*Here is the interrupter task. Don't execute it again.*/
-	        if(tmp == task_interruper) {
+	        if(act == task_interruper) {
 	            task_interruper = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
-	            continue;
+	            act = next;
+	            continue;                   /*Load the next task*/
 	        }
 
 	        /*Just try to run the tasks with highest priority.*/
-	        if(tmp->prio == LV_TASK_PRIO_HIGHEST) {
-	            lv_task_exec(tmp);
+	        if(act->prio == LV_TASK_PRIO_HIGHEST) {
+	            lv_task_exec(act);
 	        }
 	        /*Tasks with higher priority then the interrupted shall be run in every case*/
 	        else if(task_interruper) {
-	            if(tmp->prio > task_interruper->prio) {
-	                if(lv_task_exec(tmp)) {
-	                    task_interruper = tmp;  /*Check all tasks again from the highest priority */
+	            if(act->prio > task_interruper->prio) {
+	                if(lv_task_exec(act)) {
+	                    task_interruper = act;  /*Check all tasks again from the highest priority */
 	                    end_flag = false;
 	                    break;
 	                }
@@ -98,12 +103,13 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 	        /* It is no interrupter task or we already reached it earlier.
 	         * Just run the remaining tasks*/
 	        else {
-	            if(lv_task_exec(tmp)) {
-	                task_interruper = tmp;  /*Check all tasks again from the highest priority */
+	            if(lv_task_exec(act)) {
+	                task_interruper = act;  /*Check all tasks again from the highest priority */
 	                end_flag = false;
 	                break;
 	            }
 	        }
+	        act = next;         /*Load the next task*/
 	    }
 	} while(!end_flag);
 
@@ -183,15 +189,22 @@ void lv_task_del(lv_task_t* lv_task_p)
  */
 void lv_task_set_prio(lv_task_t* lv_task_p, lv_task_prio_t prio)
 {
-    /*It's easier to create a new task with the new priority rather then modify the linked list*/
-    lv_task_t * new_task = lv_task_create(lv_task_p->task, lv_task_p->period, prio, lv_task_p->param);
-    lv_mem_assert(new_task);
-    new_task->once = lv_task_p->once;
-    new_task->last_run = lv_task_p->last_run;
+    /*Find the tasks with new priority*/
+    lv_task_t * i;
+    LL_READ(lv_task_ll, i) {
+        if(i->prio <= prio) {
+            if(i != lv_task_p) lv_ll_move_before(&lv_task_ll, lv_task_p, i);
+            break;
+        }
+    }
 
-    /*Delete the old task*/
-    lv_ll_rem(&lv_task_ll, lv_task_p);
-    lv_mem_free(lv_task_p);
+    /*There was no such a low priority so far then add the node to the tail*/
+    if(i == NULL) {
+        lv_ll_move_before(&lv_task_ll, lv_task_p, NULL);
+    }
+
+
+    lv_task_p->prio = prio;
 }
 
 /**

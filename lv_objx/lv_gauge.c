@@ -127,20 +127,24 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
 void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_color_t * colors)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    if(ext->values != NULL) {
-        lv_mem_free(ext->values);
-        ext->values = NULL;
+
+    if(ext->needle_count != needle_cnt) {
+		if(ext->values != NULL) {
+			lv_mem_free(ext->values);
+			ext->values = NULL;
+		}
+
+		ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(int16_t));
+
+		int16_t min = lv_gauge_get_min_value(gauge);
+		uint8_t n;
+		for(n = ext->needle_count; n < needle_cnt; n++) {
+			ext->values[n] = min;
+		}
+
+		ext->needle_count = needle_cnt;
     }
 
-    ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(int16_t));
-
-    int16_t min = lv_gauge_get_min_value(gauge);
-    uint8_t n;
-    for(n = ext->needle_count; n < needle_cnt; n++) {
-        ext->values[n] = min;
-    }
-
-    ext->needle_count = needle_cnt;
     ext->needle_colors = colors;
     lv_obj_invalidate(gauge);
 }
@@ -156,6 +160,8 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value)
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
 
     if(needle_id >= ext->needle_count) return;
+    if(ext->values[needle_id] == value) return;
+
 
     int16_t min = lv_gauge_get_min_value(gauge);
     int16_t max = lv_gauge_get_max_value(gauge);
@@ -183,6 +189,7 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     ext->label_count = label_cnt;
+    lv_obj_invalidate(gauge);
 }
 
 /*=====================

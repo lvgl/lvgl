@@ -29,7 +29,7 @@
 
 #define LABEL_RECOLOR_PAR_LENGTH    6
 
-#define SHADOW_OPA_EXTRA_PRECISION      8       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
+#define SHADOW_OPA_EXTRA_PRECISION      0       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
 #define SHADOW_BOTTOM_AA_EXTRA_RADIUS   3       /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
 /**********************
  *      TYPEDEFS
@@ -448,7 +448,15 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
             lv_coord_t row;
             uint32_t act_pos;
+#if LV_COMPILER_VLA_SUPPORTED
             lv_color_t buf[lv_area_get_width(&mask_com)];
+#else
+# if LV_HOR_RES > LV_VER_RES
+            lv_color_t buf[LV_HOR_RES];
+# else
+            lv_color_t buf[LV_VER_RES];
+# endif
+#endif
             for(row = mask_com.y1; row <= mask_com.y2; row ++) {
                 res = lv_fs_read(&file, buf, useful_data, &br);
 
@@ -1713,8 +1721,15 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     if(radius != 0) radius -= LV_ANTIALIAS;
     swidth += LV_ANTIALIAS;
 
-
+#if LV_COMPILER_VLA_SUPPORTED
     lv_coord_t curve_x[radius + swidth + 1];     /*Stores the 'x' coordinates of a quarter circle.*/
+#else
+# if LV_HOR_RES > LV_VER_RES
+    lv_coord_t curve_x[LV_HOR_RES];
+# else
+    lv_coord_t curve_x[LV_VER_RES];
+# endif
+#endif
     memset(curve_x, 0, sizeof(curve_x));
     lv_point_t circ;
     lv_coord_t circ_tmp;
@@ -1727,15 +1742,30 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     int16_t line;
 
     int16_t filter_width = 2 * swidth + 1;
+#if LV_COMPILER_VLA_SUPPORTED
     uint32_t line_1d_blur[filter_width];
-
+#else
+# if LV_HOR_RES > LV_VER_RES
+    uint32_t line_1d_blur[LV_HOR_RES];
+# else
+    uint32_t line_1d_blur[LV_VER_RES];
+# endif
+#endif
     /*1D Blur horizontally*/
     for(line = 0; line < filter_width; line++) {
         line_1d_blur[line] = (uint32_t)((uint32_t)(filter_width - line) * (style->body.opa * 2)  << SHADOW_OPA_EXTRA_PRECISION) / (filter_width * filter_width);
     }
 
     uint16_t col;
+#if LV_COMPILER_VLA_SUPPORTED
     lv_opa_t line_2d_blur[radius + swidth];
+#else
+# if LV_HOR_RES > LV_VER_RES
+    lv_opa_t line_2d_blur[LV_HOR_RES];
+# else
+    lv_opa_t line_2d_blur[LV_VER_RES];
+# endif
+#endif
 
     lv_point_t point_rt;
     lv_point_t point_rb;
@@ -1759,7 +1789,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     bool line_ready;
     for(line = 1; line <= radius + swidth; line++) {        /*Check all rows and make the 1D blur to 2D*/
         line_ready = false;
-        for(col = 1; col < radius + swidth + 10; col++) {        /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
+        for(col = 1; col < radius + swidth; col++) {        /*Check all pixels in a 1D blur line (from the origo to last shadow pixel (radius + swidth))*/
 
             /*Sum the opacities from the lines above and below this 'row'*/
             int16_t line_rel;
@@ -1776,7 +1806,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
                 }
 
                 /*Add the value of the 1D blur on 'col_rel' position*/
-                if(col_rel < -swidth) {                         /*Outside of the burred area. */
+                if(col_rel < -swidth) {                         /*Outside of the blurred area. */
                     if(line_rel == -swidth) line_ready = true;  /*If no data even on the very first line then it wont't be anything else in this line*/
                     break;                                      /*Break anyway because only smaller 'col_rel' values will come */
                 }
@@ -1785,7 +1815,10 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
             }
 
             line_2d_blur[col] = px_opa_sum >> SHADOW_OPA_EXTRA_PRECISION;
-            if(line_ready) break;
+            if(line_ready) {
+                col++;      /*To make this line to the last one ( drawing will go to '< col')*/
+                break;
+            }
 
         }
 
@@ -1803,7 +1836,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
         point_lb.y = ofs_lb.y + line;
 
         uint16_t d;
-        for(d = 1; d <= col; d++) {
+        for(d = 1; d < col; d++) {
 
             if(point_rt.x != point_lt.x) {
                 px_fp(point_lt.x,point_lt.y , mask, style->body.shadow.color, line_2d_blur[d]);
@@ -1845,8 +1878,15 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     radius = lv_draw_cont_radius_corr(radius, width, height);
     radius += LV_ANTIALIAS * SHADOW_BOTTOM_AA_EXTRA_RADIUS;
     swidth += LV_ANTIALIAS;
-
+#if LV_COMPILER_VLA_SUPPORTED
     lv_coord_t curve_x[radius + 1];             /*Stores the 'x' coordinates of a quarter circle.*/
+#else
+# if LV_HOR_RES > LV_VER_RES
+    lv_coord_t curve_x[LV_HOR_RES];
+# else
+    lv_coord_t curve_x[LV_VER_RES];
+# endif
+#endif
     lv_point_t circ;
     lv_coord_t circ_tmp;
     lv_circ_init(&circ, &circ_tmp, radius);
@@ -1857,7 +1897,15 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     }
 
     int16_t col;
+    #if LV_COMPILER_VLA_SUPPORTED
     lv_opa_t line_1d_blur[swidth];
+#else
+# if LV_HOR_RES > LV_VER_RES
+    lv_opa_t line_1d_blur[LV_HOR_RES];
+# else
+    lv_opa_t line_1d_blur[LV_VER_RES];
+# endif
+#endif
 
     for(col = 0; col < swidth; col++) {
         line_1d_blur[col] = (uint32_t)((uint32_t)(swidth - col) * style->body.opa / 2) / (swidth);

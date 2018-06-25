@@ -191,6 +191,7 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 #if USE_LV_ANIMATION == 0
     anim_time = 0;
 #endif
+
     ext->anim_time = anim_time;
 }
 
@@ -348,6 +349,16 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
+    /*Translate LV_GROUP_KEY_UP/DOWN to LV_GROUP_KEY_LEFT/RIGHT */
+    char c_trans = 0;
+    if(sign == LV_SIGNAL_CONTROLL) {
+        c_trans = *((char*)param);
+        if(c_trans == LV_GROUP_KEY_DOWN) c_trans = LV_GROUP_KEY_LEFT;
+        if(c_trans == LV_GROUP_KEY_UP) c_trans = LV_GROUP_KEY_RIGHT;
+
+        param = &c_trans;
+    }
+
     /* Include the ancient signal function */
     res = ancestor_signal(mbox, sign, param);
     if(res != LV_RES_OK) return res;
@@ -356,7 +367,6 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CORD_CHG) {
         if(lv_obj_get_width(mbox) != lv_area_get_width(param)) {
             mbox_realign(mbox);
-
         }
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {

@@ -43,7 +43,7 @@ typedef struct _lv_anim_t
 	lv_anim_path_t path;			/*An array with the steps of animations*/
 	int32_t start;					/*Start value*/
 	int32_t end;					/*End value*/
-	int16_t time;					/*Animation time in ms*/
+	uint16_t time;					/*Animation time in ms*/
 	int16_t act_time;				/*Current time in animation. Set to negative to make delay.*/
 	uint16_t playback_pause;		/*Wait before play back*/
 	uint16_t repeat_pause;			/*Wait before repeat*/

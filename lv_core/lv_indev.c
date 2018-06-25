@@ -655,10 +655,14 @@ static void indev_drag(lv_indev_proc_t * state)
             lv_coord_t act_y = lv_obj_get_y(drag_obj);
             uint16_t inv_buf_size = lv_refr_get_buf_size(); /*Get the number of currently invalidated areas*/
 
+            lv_coord_t prev_x = drag_obj->coords.x1;
+            lv_coord_t prev_y = drag_obj->coords.y1;
+
             lv_obj_set_pos(drag_obj, act_x + state->vect.x, act_y + state->vect.y);
 
             /*Set the drag in progress flag if the object is really moved*/
-            if(lv_obj_get_x(drag_obj) != act_x || lv_obj_get_y(drag_obj) != act_y) {
+
+            if(drag_obj->coords.x1 != prev_x || drag_obj->coords.y1 != prev_y) {
                 if(state->drag_range_out != 0) { /*Send the drag begin signal on first move*/
                     drag_obj->signal_func(drag_obj,  LV_SIGNAL_DRAG_BEGIN, indev_act);
                     if(state->reset_query != 0) return;

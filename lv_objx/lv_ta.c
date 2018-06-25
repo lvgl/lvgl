@@ -347,6 +347,8 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+	if(ext->cursor.pos == pos) return;
+
     uint16_t len = lv_txt_get_length(lv_label_get_text(ext->label));
 
 	if(pos < 0) pos = len + pos;
@@ -419,6 +421,8 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    if(ext->cursor.type == cur_type) return;
+
     ext->cursor.type = cur_type;
     lv_obj_invalidate(ta);
 }
@@ -431,6 +435,7 @@ void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type)
 void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    if(ext->pwd_mode == pwd_en) return;
 
     /*Pwd mode is now enabled*/
     if(ext->pwd_mode == 0 && pwd_en != false) {
@@ -464,8 +469,10 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en)
  */
 void lv_ta_set_one_line(lv_obj_t * ta, bool en)
 {
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+	if(ext->one_line == en) return;
+
     if(en != false) {
-        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
         lv_style_t * style_ta = lv_obj_get_style(ta);
         lv_style_t * style_scrl = lv_obj_get_style(lv_page_get_scrl(ta));
         lv_style_t * style_label = lv_obj_get_style(ext->label);
@@ -478,7 +485,6 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_label_set_no_break(ext->label, true);
         lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.hor, style_ta->body.padding.ver);
     } else {
-        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
         lv_style_t * style_ta = lv_obj_get_style(ta);
 
         ext->one_line = 0;
@@ -1044,7 +1050,10 @@ static void pwd_char_hider(lv_obj_t * ta)
         int16_t len = lv_txt_get_length(txt);
         bool refr = false;
         uint16_t i;
-        for(i = 0; i < len; i++) txt[i] = '*';
+        for(i = 0; i < len; i++) {
+            txt[i] = '*';
+            refr = true;
+        }
 
         txt[i] = '\0';
 

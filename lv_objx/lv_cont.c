@@ -113,6 +113,8 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
 void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout)
 {
 	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
+	if(ext->layout == layout) return;
+
 	ext->layout = layout;
 
 	/*Send a signal to refresh the layout*/
@@ -131,11 +133,15 @@ void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
 {
 	lv_obj_invalidate(cont);
 	lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
+	if(ext->hor_fit == hor_en && ext->ver_fit == ver_en) return;
+
 	ext->hor_fit = hor_en == false ? 0 : 1;
 	ext->ver_fit = ver_en == false ? 0 : 1;
 
 	/*Send a signal to set a new size*/
-	cont->signal_func(cont, LV_SIGNAL_CORD_CHG, cont);
+	lv_area_t area;
+	lv_obj_get_coords(cont, &area);
+	cont->signal_func(cont, LV_SIGNAL_CORD_CHG, &area);
 }
 
 /*=====================

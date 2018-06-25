@@ -366,9 +366,9 @@ static void gauge_init(void)
     lv_style_copy(&gauge_bg, &def);
     gauge_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 70);
     gauge_bg.body.grad_color = gauge_bg.body.main_color;
-    gauge_bg.body.padding.hor = LV_DPI / 12;         /*Scale line length*/
+    gauge_bg.body.padding.hor = LV_DPI / 16;         /*Scale line length*/
     gauge_bg.body.padding.ver = LV_DPI / 10;        /*Needle center size*/
-    gauge_bg.body.padding.inner = LV_DPI / 8;      /*Label - scale distance*/
+    gauge_bg.body.padding.inner = LV_DPI / 12;      /*Label - scale distance*/
     gauge_bg.body.border.color = LV_COLOR_HEX3(0x777);
     gauge_bg.line.color = lv_color_hsv_to_rgb(_hue, 80, 75);
     gauge_bg.line.width = 2;
