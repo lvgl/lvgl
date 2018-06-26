@@ -634,9 +634,12 @@ static lv_res_t lv_ddlist_release_action(lv_obj_t * ddlist)
 
         uint16_t new_opt = 0;
         const char * txt = lv_label_get_text(ext->label);
-        uint16_t i;
-        for(i = 0; i < letter_i; i++) {
-            if(txt[i] == '\n') new_opt ++;
+        uint32_t i = 0;
+        uint32_t line_cnt = 0;
+        uint32_t letter;
+        for(line_cnt = 0; line_cnt < letter_i; line_cnt++) {
+            letter = lv_txt_utf8_next(txt, &i);
+            if(letter == '\n') new_opt ++;
         }
 
         ext->sel_opt_id = new_opt;
