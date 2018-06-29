@@ -103,15 +103,20 @@
 
 /* More info about fonts: https://littlevgl.com/basics#fonts */
 
-/* If you want a custom font, create lv_user_fonts.h and LV_DECLARE_FONT(YourFont_Size) for each one.
- * Remeber to add your custom font using lv_font_add(&YourFont_Size); */
-
 #define USE_CUSTOM_DEFAULT_FONT            0 /* 0: use built-in font, 1: use custom font */
 
 #if USE_CUSTOM_DEFAULT_FONT != 0
+/* If you use custom fonts then remember to add your custom font using lv_font_add(&YourFont_Size); */
+
 #define USE_DEFAULT_FONTS                  1 /* 0: Do not use any built-in fonts */
-#define LV_FONT_DEFAULT                    &YourFont_Size
-#define USE_YOURFONT_SIZE                  0
+#define USE_YOURFONT_8                     0
+#define USE_YOURFONT_10                    4
+
+#define LV_FONT_CUSTOM_DECLARE \
+    LV_FONT_DECLARE(YourFont_8) \       /* repeat for each additional font you use */
+    LV_FONT_DECLARE(YourFont_10)
+
+#define LV_FONT_DEFAULT                    &YourFont_10
 #else
 #define USE_DEFAULT_FONTS                  1 /* 1: Enable each default font as required below */
 #define LV_FONT_DEFAULT                    &lv_font_dejavu_20     /*Always set a default font from the built-in fonts*/

@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_font_init_default_fonts(void);
+void lv_font_add_default_fonts(void);
 
 /******************************
  *  FONT DECLARATION INCLUDES

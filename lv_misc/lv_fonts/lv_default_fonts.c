@@ -43,7 +43,7 @@
 /**
  * Initialize the built-in fonts
  */
-void lv_font_init_default_fonts(void)
+void lv_font_add_default_fonts(void)
 {
     /*DEJAVU 10*/
 #if USE_LV_FONT_DEJAVU_10 != 0

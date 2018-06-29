@@ -12,9 +12,6 @@
 #include "../lv_misc/lv_mem.h"
 
 #include "../lv_misc/lv_fonts/lv_default_fonts.h"
-#if USE_CUSTOM_DEFAULT_FONT > 0
-#include "../../lv_user_fonts.h"
-#endif
 
 /*********************
  *      DEFINES

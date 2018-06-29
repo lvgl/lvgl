@@ -45,13 +45,11 @@ typedef struct {
  **********************/
 
 /**
- * Initialize the built-in fonts
+ * Initialize the font system
  */
 void lv_font_init(void)
 {
-#if USE_DEFAULT_FONTS != 0
-    lv_font_init_default_fonts();
-#endif
+    // Nothing to do
 }
 
 /**
