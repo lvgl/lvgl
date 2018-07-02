@@ -33,6 +33,7 @@ There are few **general rules**
   - usable on small MCUs as well (think about memory footprint)
   - compilable with "non-standard" tools (like Arduino) 
   - the API cleaan and easiy to understand
+  - all configuration should be in `lv_conf.h`. (Instead of modifying the library)
   
 ## How to report a bug?
 If you found a **simple and straightforward bug** like:
