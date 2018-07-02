@@ -20,15 +20,20 @@ As graphical interfaces for embedded systems has an increasing relevance today y
 
 Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/master/docs/CODE_OF_CONDUCT.md)
 
-There a few general rules:
+There are few general rules:
 * We use [GitHub's issue tracker](https://github.com/littlevgl/lvgl/issues)
 * Be kind and respectful. Strating with "Hi" is always a good idea :)
 * If somebedy helped you give a feedback.
-* Always create an issue before creating a [Pull request](https://help.github.com/articles/about-pull-requests/) (maybe somebeody already working on this issue)
 * One issue should be about one topic. If you have other questions please open a new issue.
+* Always create an issue before creating a [Pull request](https://help.github.com/articles/about-pull-requests/) to discuss the idea first
+* Create small, "digestable" Pull requests.  
 * Tell your remarks in a structured way. Use paragraphs and the [Markdown](https://guides.github.com/features/mastering-markdown/) support of GitHub.
 * Be sure you are using the lates version (from `master` branch)
-
+* Keep in mind LittlevGL should be and should remain:
+  - usable on small MCUs as well (think about memory footprint)
+  - compilable with "non-standard" tools (like Arduino) 
+  - the API cleaan and easiy to understand
+  
 ## How to report a bug?
 If you found a **simple and straightforward bug** like:
 * misspelling (in comments function/variable names or grammatical issues in comments)
@@ -65,9 +70,9 @@ Your suggestion can have 4 possible outcomes:
 1. This feature is already exists. In this case you will learn how to achive your goal.
 2. You can simply realize it with the current functionality.
 3. Although it's a new feature but it would break LittlevGL's platform independent and/or resource minimalist nature.
-4. It's really a new feature which would be good to be in LittlevGL. Hurray! In a discussion we figure out the technical details andimplementation options. With the knowledge of how to do it somebody can implement the new feature.
+4. It's really a new feature which would be good to be in LittlevGL. Hurray! In a discussion we figure out the technical details and implementation options. With the knowledge of how to do it somebody can implement the new feature.
 
-Keep in mind if you wouldn't like to do the implementation there is no guarantee that it will be ready in the new future. 
+Keep in mind if you wouldn't like to do the implementation there is no guarantee that it will be ready in the near future. 
 However if you would like to force it, take a look at this page: [Feature request service](http://www.gl.littlev.hu/services#feature)
 
 ## How to implement a feature?
