@@ -20,7 +20,7 @@ As graphical interfaces for embedded systems has an increasing relevance today y
 
 Please, take a look at [CODE_OF_CONDUCT](https://github.com/littlevgl/lvgl/blob/master/docs/CODE_OF_CONDUCT.md)
 
-There are few general rules:
+There are few **general rules**
 * We use [GitHub's issue tracker](https://github.com/littlevgl/lvgl/issues)
 * Be kind and respectful. Strating with "Hi" is always a good idea :)
 * If somebedy helped you give a feedback.
