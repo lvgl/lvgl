@@ -20,6 +20,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#if USE_DEFAULT_FONTS != 0
+#include "../lv_misc/lv_fonts/lv_default_fonts.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -72,6 +76,10 @@ void lv_init(void)
 #endif
 
     lv_font_init();
+#if USE_DEFAULT_FONTS != 0
+    lv_font_add_default_fonts();
+#endif
+
 #if USE_LV_ANIMATION
     lv_anim_init();
 #endif

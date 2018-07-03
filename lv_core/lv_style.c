@@ -11,6 +11,8 @@
 #include "lv_obj.h"
 #include "../lv_misc/lv_mem.h"
 
+#include "../lv_misc/lv_fonts/lv_default_fonts.h"
+
 /*********************
  *      DEFINES
  *********************/
