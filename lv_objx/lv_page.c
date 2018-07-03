@@ -283,6 +283,16 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
  */
 void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 {
+
+#if USE_LV_ANIMATION == 0
+	anim_tiem = 0;
+#endif
+
+	/* Be sure there is no position changing animation in progress
+	 * because it can overide the current changes*/
+	lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_y);
+	lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_pos);
+
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
     lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
