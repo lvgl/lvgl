@@ -57,7 +57,7 @@
    System settings
  *=================*/
 
-#define LV_SIGNALS                      1   /*Setup signal handlers (need a POSIX system)*/
+#define USE_POSIX_SIGNALS   1   /*Setup signal handlers (need a POSIX system)*/
 
 /*=================
    Misc. setting
@@ -260,4 +260,3 @@
 
 
 #endif /*Remove this to enable the content*/
-

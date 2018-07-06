@@ -22,11 +22,11 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef     LV_SIGNALS
-#warning    "LV_SIGNALS not defined! Is lv_conf.h included?"
+#ifndef     USE_POSIX_SIGNALS
+#warning    "USE_POSIX_SIGNALS not defined! Is lv_conf.h up to date?"
 #endif
 
-#define DBGSIGNALS      (LV_SIGNALS && 0)  /* && 0 to disable */
+#define DBGSIGNALS      (USE_POSIX_SIGNALS && 0)  /* && 0 to disable */
 #define DBGSIGNALS_V    (DBGSIGNALS && 0)  /* verbose */
 
 #ifdef  DBGSIGNALS
@@ -44,7 +44,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_SIGNALS
+#if USE_POSIX_SIGNALS
 static void sig_handler_func(int signum, siginfo_t * pinfo, void * p);
 #endif
 static void exit_func(void);
@@ -110,7 +110,7 @@ const char * sig_names [] = {
  */
 void lv_sys_init(void (*user_deinit_func_param)(void))
 {
-#if LV_SIGNALS
+#if USE_POSIX_SIGNALS
     sigset_t set;
     struct sigaction    siga = { 0 };
 
@@ -161,7 +161,7 @@ static void exit_func(void)
 }
 
 
-#if LV_SIGNALS
+#if USE_POSIX_SIGNALS
 /* TODO: Add proper signal handling during lv_init() and hal_init(), i.e.
    Setup a signal halndler for error processing and block all signals
       (some like SIGSKILL and possibly SEGV can not be masked)
@@ -383,4 +383,4 @@ static void sig_handler_func(int signum, siginfo_t * pinfo, void * p)
     }
 }
 #endif /* DBGSIGNALS */
-#endif /* LV_SIGNALS */
+#endif /* USE_POSIX_SIGNALS */
