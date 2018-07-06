@@ -285,13 +285,13 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 {
 
 #if USE_LV_ANIMATION == 0
-	anim_tiem = 0;
-#endif
-
+	anim_time = 0;
+#else
 	/* Be sure there is no position changing animation in progress
 	 * because it can overide the current changes*/
 	lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_y);
 	lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_pos);
+#endif
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
@@ -328,8 +328,8 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 
     if(anim_time == 0) {
         lv_obj_set_y(ext->scrl, scrlable_y);
-    } else {
 #if USE_LV_ANIMATION
+    } else {
         lv_anim_t a;
         a.act_time = 0;
         a.start = lv_obj_get_y(ext->scrl);
@@ -571,8 +571,6 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 #endif
     	}
     }
-
-
     else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
