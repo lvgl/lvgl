@@ -21,7 +21,7 @@
  *      DEFINES
  *********************/
 #define LV_PAGE_SB_MIN_SIZE    (LV_DPI / 8)
-#define LV_PAGE_GROUP_SCROLL_ANIM_TIME	200
+#define LV_PAGE_GROUP_SCROLL_ANIM_TIME  200
 
 /**********************
  *      TYPEDEFS
@@ -285,12 +285,12 @@ void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
 {
 
 #if USE_LV_ANIMATION == 0
-	anim_time = 0;
+    anim_time = 0;
 #else
-	/* Be sure there is no position changing animation in progress
-	 * because it can overide the current changes*/
-	lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_y);
-	lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_pos);
+    /* Be sure there is no position changing animation in progress
+     * because it can overide the current changes*/
+    lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_y);
+    lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_pos);
 #endif
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
@@ -527,51 +527,49 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         if(page->ext_size < (-ext->sb.style->body.padding.hor)) page->ext_size = -ext->sb.style->body.padding.hor;
         if(page->ext_size < (-ext->sb.style->body.padding.ver)) page->ext_size = -ext->sb.style->body.padding.ver;
     } else if(sign == LV_SIGNAL_CONTROLL) {
-    	uint32_t c = *((uint32_t *) param);
-    	lv_obj_t * scrl = lv_page_get_scrl(page);
-    	if(c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_RIGHT) {
+        uint32_t c = *((uint32_t *) param);
+        lv_obj_t * scrl = lv_page_get_scrl(page);
+        if(c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_RIGHT) {
 #if USE_LV_ANIMATION
-    		lv_anim_t a;
-    		a.var = scrl;
-    		a.start = lv_obj_get_y(scrl);
-    		a.end = a.start - LV_DPI / 2;
-    		a.fp = (lv_anim_fp_t)lv_obj_set_y;
-    		a.path = lv_anim_path_linear;
-    		a.end_cb = NULL;
-    		a.act_time = 0;
-    		a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
-    		a.playback = 0;
-    		a.playback_pause = 0;
-    		a.repeat = 0;
-    		a.repeat_pause = 0;
-    		lv_anim_create(&a);
+            lv_anim_t a;
+            a.var = scrl;
+            a.start = lv_obj_get_y(scrl);
+            a.end = a.start - LV_DPI / 2;
+            a.fp = (lv_anim_fp_t)lv_obj_set_y;
+            a.path = lv_anim_path_linear;
+            a.end_cb = NULL;
+            a.act_time = 0;
+            a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
+            a.playback = 0;
+            a.playback_pause = 0;
+            a.repeat = 0;
+            a.repeat_pause = 0;
+            lv_anim_create(&a);
 #else
-    		lv_obj_set_y(scrl, lv_obj_get_y(scrl) - LV_DPI / 2);
+            lv_obj_set_y(scrl, lv_obj_get_y(scrl) - LV_DPI / 2);
 #endif
 
-    	}
-    	else if(c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_LEFT) {
+        } else if(c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_LEFT) {
 #if USE_LV_ANIMATION
-    		lv_anim_t a;
-    		a.var = scrl;
-    		a.start = lv_obj_get_y(scrl);
-    		a.end = a.start + LV_DPI / 2;
-    		a.fp = (lv_anim_fp_t)lv_obj_set_y;
-    		a.path = lv_anim_path_linear;
-    		a.end_cb = NULL;
-    		a.act_time = 0;
-    		a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
-    		a.playback = 0;
-    		a.playback_pause = 0;
-    		a.repeat = 0;
-    		a.repeat_pause = 0;
-    		lv_anim_create(&a);
+            lv_anim_t a;
+            a.var = scrl;
+            a.start = lv_obj_get_y(scrl);
+            a.end = a.start + LV_DPI / 2;
+            a.fp = (lv_anim_fp_t)lv_obj_set_y;
+            a.path = lv_anim_path_linear;
+            a.end_cb = NULL;
+            a.act_time = 0;
+            a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
+            a.playback = 0;
+            a.playback_pause = 0;
+            a.repeat = 0;
+            a.repeat_pause = 0;
+            lv_anim_create(&a);
 #else
-    		lv_obj_set_y(scrl, lv_obj_get_y(scrl) - LV_DPI / 2);
+            lv_obj_set_y(scrl, lv_obj_get_y(scrl) - LV_DPI / 2);
 #endif
-    	}
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+        }
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
