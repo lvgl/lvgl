@@ -141,9 +141,9 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
  **********************/
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
-/******************************
- *  FONT DECLARATION INCLUDES
- *****************************/
+/**********************
+ *  FONT DECLARATION
+ **********************/
 
 /*10 px */
 #if USE_LV_FONT_DEJAVU_10
@@ -212,6 +212,9 @@ LV_FONT_DECLARE(lv_font_dejavu_40_cyrillic);
 #if USE_LV_FONT_SYMBOL_40
 LV_FONT_DECLARE(lv_font_symbol_40);
 #endif
+
+/*Declare the custom (user defined) fonts*/
+LV_FONT_CUSTOM_DECLARE
 
 #ifdef __cplusplus
 } /* extern "C" */
