@@ -449,7 +449,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
             rect_area.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
             rect_area.y1 -= style->text.line_space / 2;
 
-            rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
+            rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
             rect_area.x1 = ddlist->coords.x1;
             rect_area.x2 = ddlist->coords.x2;
 
@@ -476,7 +476,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         area_sel.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
         area_sel.y1 -= style->text.line_space / 2;
 
-        area_sel.y2 = area_sel.y1 + font_h + style->text.line_space;
+        area_sel.y2 = area_sel.y1 + font_h + style->text.line_space - 1;
         area_sel.x1 = ddlist->coords.x1;
         area_sel.x2 = ddlist->coords.x2;
         lv_area_t mask_sel;
@@ -636,9 +636,12 @@ static lv_res_t lv_ddlist_release_action(lv_obj_t * ddlist)
 
         uint16_t new_opt = 0;
         const char * txt = lv_label_get_text(ext->label);
-        uint16_t i;
-        for(i = 0; i < letter_i; i++) {
-            if(txt[i] == '\n') new_opt ++;
+        uint32_t i = 0;
+        uint32_t line_cnt = 0;
+        uint32_t letter;
+        for(line_cnt = 0; line_cnt < letter_i; line_cnt++) {
+            letter = lv_txt_utf8_next(txt, &i);
+            if(letter == '\n') new_opt ++;
         }
 
         ext->sel_opt_id = new_opt;
