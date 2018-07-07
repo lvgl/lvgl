@@ -31,9 +31,10 @@ There are few **general rules**
 * Be sure you are using the lates version (from `master` branch)
 * Keep in mind LittlevGL should be and should remain:
   - usable on small MCUs as well (think about memory footprint)
-  - compilable with "non-standard" tools (like Arduino) 
-  - the API cleaan and easiy to understand
+  - compilable with "non-standard" tools like Arduino (no gcc specific options) 
+  - C compatible (no C++ specific code and features)
   - all configuration should be in `lv_conf.h`. (Instead of modifying the library)
+  - the API clean and easiy to understand
   
 ## How to report a bug?
 If you found a **simple and straightforward bug** like:
