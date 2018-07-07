@@ -245,7 +245,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     lv_style_t * style = lv_obj_get_style(ext->content);
 
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
-    if(ext->tab_load_action) ext->tab_load_action(tabview, id);
+    if(ext->tab_load_action && id != ext->tab_cur) ext->tab_load_action(tabview, id);
 
     ext->tab_cur = id;
 
@@ -690,7 +690,7 @@ static void tabpage_press_lost_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
         if(tab_cur < ext->tab_cnt - 1) tab_cur++;
     }
 
-    if(tab_cur != ext->tab_cur) lv_tabview_set_tab_act(tabview, tab_cur, true);
+    lv_tabview_set_tab_act(tabview, tab_cur, true);
 }
 
 /**
