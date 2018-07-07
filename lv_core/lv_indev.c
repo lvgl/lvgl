@@ -7,7 +7,6 @@
  *      INCLUDES
  ********************/
 #include "lv_indev.h"
-#include "../../lv_conf.h"
 
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_core/lv_group.h"

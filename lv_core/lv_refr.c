@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
 #include <stddef.h>
 #include "lv_refr.h"
 #include "lv_vdb.h"

@@ -3,7 +3,7 @@
  *
  */
 
-#include "../../lv_conf.h"
+#include "lv_draw_vbasic.h"
 
 #include <stdbool.h>
 #include <stdint.h>

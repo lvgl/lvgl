@@ -7,10 +7,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_kb.h"
 #if USE_LV_KB != 0
 
-#include "lv_kb.h"
 #include "lv_ta.h"
 #include "../lv_themes/lv_theme.h"
 

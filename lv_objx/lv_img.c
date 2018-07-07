@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_img.h"
 #if USE_LV_IMG != 0
 
 /*Testing of dependencies*/
@@ -14,7 +14,6 @@
 #error "lv_img: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
-#include "lv_img.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"

@@ -6,11 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "../lv_objx/lv_page.h"
 #if USE_LV_PAGE != 0
 
 #include "../lv_core/lv_group.h"
-#include "../lv_objx/lv_page.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_core/lv_refr.h"

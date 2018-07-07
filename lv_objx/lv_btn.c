@@ -7,11 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf.h"
+#include "lv_btn.h"
 #if USE_LV_BTN != 0
 
 #include <string.h>
-#include "lv_btn.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"

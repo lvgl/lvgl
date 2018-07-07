@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_cb.h"
 #if USE_LV_CB != 0
 
-#include "lv_cb.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
 

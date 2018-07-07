@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_win.h"
 #if USE_LV_WIN != 0
 
-#include "lv_win.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
