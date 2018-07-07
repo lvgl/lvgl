@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_tabview.h"
 #if USE_LV_TABVIEW != 0
 
-#include "lv_tabview.h"
 #include "lv_btnm.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"

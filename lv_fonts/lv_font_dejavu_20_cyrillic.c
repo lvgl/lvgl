@@ -1,5 +1,5 @@
 
-#include "../lv_font.h"
+#include "../lv_misc/lv_font.h"
 
 #if USE_LV_FONT_DEJAVU_20_CYRILLIC != 0 /*Can be enabled in lv_conf.h*/
 

@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
 
 #include <stdio.h>
 #include <stdbool.h>

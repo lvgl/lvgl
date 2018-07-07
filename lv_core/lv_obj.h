@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_style.h"
@@ -21,6 +26,7 @@ extern "C" {
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_log.h"
 
 /*********************
  *      DEFINES

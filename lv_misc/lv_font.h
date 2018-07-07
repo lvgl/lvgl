@@ -14,13 +14,17 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
 
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 
-#include "lv_fonts/lv_symbol_def.h"
+#include "lv_symbol_def.h"
 
 /*********************
  *      DEFINES
@@ -62,7 +66,7 @@ typedef struct _lv_font_struct
  **********************/
 
 /**
- * Initialize the built-in fonts
+ * Initialize the fonts
  */
 void lv_font_init(void);
 
@@ -97,6 +101,14 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter);
  */
 uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
 
+
+/**
+ * Get the width of the letter without overwriting it with the `monospace` attribute
+ * @param font_p pointer to a font
+ * @param letter an UNICODE character code
+ * @return the width of a letter
+ */
+uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the height of a font
@@ -150,79 +162,14 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
 /**********************
  *      MACROS
  **********************/
+
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
+
 /**********************
- *  FONT DECLARATION
+ * ADD BUILT IN FONTS
  **********************/
-
-/*10 px */
-#if USE_LV_FONT_DEJAVU_10
-LV_FONT_DECLARE(lv_font_dejavu_10);
-#endif
-
-#if USE_LV_FONT_DEJAVU_10_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_10_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_10_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_10_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_10
-LV_FONT_DECLARE(lv_font_symbol_10);
-#endif
-
-/*20 px */
-#if USE_LV_FONT_DEJAVU_20
-LV_FONT_DECLARE(lv_font_dejavu_20);
-#endif
-
-#if USE_LV_FONT_DEJAVU_20_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_20_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_20_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_20_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_20
-LV_FONT_DECLARE(lv_font_symbol_20);
-#endif
-
-/*30 px */
-#if USE_LV_FONT_DEJAVU_30
-LV_FONT_DECLARE(lv_font_dejavu_30);
-#endif
-
-#if USE_LV_FONT_DEJAVU_30_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_30_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_30_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_30_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_30
-LV_FONT_DECLARE(lv_font_symbol_30);
-#endif
-
-/*40 px */
-#if USE_LV_FONT_DEJAVU_40
-LV_FONT_DECLARE(lv_font_dejavu_40);
-#endif
-
-#if USE_LV_FONT_DEJAVU_40_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_40_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_40_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_40_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_40
-LV_FONT_DECLARE(lv_font_symbol_40);
-#endif
+#include "../lv_fonts/lv_font_builtin.h"
 
 /*Declare the custom (user defined) fonts*/
 LV_FONT_CUSTOM_DECLARE

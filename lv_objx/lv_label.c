@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_label.h"
 #if USE_LV_LABEL != 0
 
-#include "lv_label.h"
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"

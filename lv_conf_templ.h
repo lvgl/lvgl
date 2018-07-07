@@ -86,6 +86,16 @@
 #define LV_ATTRIBUTE_TASK_HANDLER             /* Define a custom attribute to `lv_task_handler` function */
 #define LV_COMPILER_VLA_SUPPORTED    1        /* 1: Variable length array is supported*/
 
+/*Log settings*/
+#define USE_LV_LOG		1	/*Enable/disable the log module*/
+#if USE_LV_LOG
+#define LV_LOG_INFO		0	/*1: Log a lot of runtime information*/
+#define LV_LOG_WARN		0	/*1: Log is something unexpected happens but succesfully handled*/
+#define LV_LOG_ERROR	1	/*1: Log critical error*/
+#define LV_LOG_USER		1	/*1: Log user defined/user level things */
+#define LV_LOG_PRINTF	0	/*1: Print the log with 'printf'; 0: user need to register a callback*/
+#endif  /*USE_LV_LOG*/
+
 /*================
  *  THEME USAGE
  *================*/

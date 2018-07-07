@@ -6,15 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
 
+#include "lv_cont.h"
 #if USE_LV_CONT != 0
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
-#include "lv_cont.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_draw/lv_draw_vbasic.h"
 #include "../lv_themes/lv_theme.h"

@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_chart.h"
 #if USE_LV_CHART != 0
 
-#include "lv_chart.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 

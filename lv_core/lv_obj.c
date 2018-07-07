@@ -62,6 +62,10 @@ static lv_ll_t scr_ll;                 /*Linked list of screens*/
  */
 void lv_init(void)
 {
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "lv_init called");
+#endif
+
     /*Initialize the lv_misc modules*/
     lv_mem_init();
     lv_task_init();
@@ -100,6 +104,10 @@ void lv_init(void)
 #if LV_INDEV_READ_PERIOD != 0
     /*Init the input device handling*/
     lv_indev_init();
+#endif
+
+#if USE_LV_LOG
+    lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "lv_init finished");
 #endif
 }
 

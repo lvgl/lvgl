@@ -7,10 +7,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_gauge.h"
 #if USE_LV_GAUGE != 0
 
-#include "lv_gauge.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_txt.h"

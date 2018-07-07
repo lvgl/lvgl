@@ -13,9 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
-#if USE_LV_TABVIEW != 0
+#endif
 
+#if USE_LV_TABVIEW != 0
 
 /*Testing of dependencies*/
 #if USE_LV_BTNM == 0

@@ -13,10 +13,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+//#include "lv_templ.h"	/*TODO uncomment this*/
 #if USE_LV_TEMPL != 0
 
-#include "lv_templ.h"
 
 /*********************
  *      DEFINES

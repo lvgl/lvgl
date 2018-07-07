@@ -70,15 +70,11 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     if(start_angle <= end_angle) deg_test = deg_test_norm;
     else deg_test = deg_test_inv;
 
-    // Good, may not be the fastest
-    // Does not draw overlapping pixels
     if(deg_test(270, start_angle, end_angle))  hor_line(center_x - r_out + 1, center_y, mask, thickness - 1, color, opa);   // Left Middle
     if(deg_test(90, start_angle, end_angle))   hor_line(center_x + r_in, center_y,  mask, thickness - 1, color, opa);       // Right Middle
     if(deg_test(180, start_angle, end_angle))  ver_line(center_x, center_y - r_out + 1,  mask, thickness - 1, color, opa);  // Top Middle
     if(deg_test(0, start_angle, end_angle))    ver_line(center_x, center_y + r_in,  mask, thickness - 1, color, opa);       // Bottom middle
 
-
-    lv_point_t last_corner_out = { -r_out, -r_out};
     uint32_t r_out_sqr = r_out * r_out;
     uint32_t r_in_sqr = r_in * r_in;
     int16_t xi;
@@ -153,7 +149,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
 
 #if LV_ANTIALIAS
-
+        /*TODO*/
 
 #endif
 
