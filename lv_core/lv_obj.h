@@ -21,6 +21,7 @@ extern "C" {
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_log.h"
 
 /*********************
  *      DEFINES
