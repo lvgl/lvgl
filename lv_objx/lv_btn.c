@@ -17,6 +17,7 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES
@@ -29,12 +30,24 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static bool lv_btn_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
+static void lv_btn_circle_effect_anim(lv_obj_t * btn, int32_t val);
+static void lv_btn_circle_effect_anim_ready(void * p);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
+static lv_signal_func_t ancestor_signal;
+static lv_design_func_t ancestor_design;
+
+#if USE_LV_ANIMATION
+static lv_point_t ink_point;
+static lv_coord_t ink_radius;
+static lv_obj_t * ink_obj;
+static lv_btn_state_t ink_bg_state;
+static lv_btn_state_t ink_circle_state;
+#endif
 
 /**********************
  *      MACROS
@@ -57,6 +70,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
     new_btn = lv_cont_create(par, copy);
     lv_mem_assert(new_btn);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_btn);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_btn);
 
     /*Allocate the extended data*/
     lv_btn_ext_t * ext = lv_obj_allocate_ext_attr(new_btn, sizeof(lv_btn_ext_t));
@@ -76,8 +90,10 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
 
     ext->long_pr_action_executed = 0;
     ext->toggle = 0;
+    ext->ink_time = 300;
 
     lv_obj_set_signal_func(new_btn, lv_btn_signal);
+    lv_obj_set_design_func(new_btn, lv_btn_design);
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
@@ -289,6 +305,54 @@ lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_style_t type)
  *   STATIC FUNCTIONS
  **********************/
 
+
+/**
+ * Handle the drawing related tasks of the drop down lists
+ * @param btn pointer to an object
+ * @param mask the object will be drawn only in this area
+ * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
+ * @param return true/false, depends on 'mode'
+ */
+static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode_t mode)
+{
+	if(mode == LV_DESIGN_COVER_CHK) {
+		return false;
+	}
+	else if(mode == LV_DESIGN_DRAW_MAIN) {
+
+		ancestor_design(btn, mask, mode);
+#if USE_LV_ANIMATION
+		if(btn != ink_obj) {
+			lv_draw_rect(&btn->coords, mask,btn->style_p, LV_OPA_COVER);
+		} else {
+		    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+			lv_draw_rect(&btn->coords, mask, ext->styles[ink_bg_state], LV_OPA_COVER);
+
+
+			lv_style_t cir_style;
+			lv_style_copy(&cir_style, ext->styles[ink_circle_state]);
+			cir_style.body.radius = LV_RADIUS_CIRCLE;
+
+			lv_area_t cir_area;
+			cir_area.x1 = ink_point.x - ink_radius;
+			cir_area.y1 = ink_point.y - ink_radius;
+			cir_area.x2 = ink_point.x + ink_radius;
+			cir_area.y2 = ink_point.y + ink_radius;
+
+			lv_draw_rect(&cir_area, mask, &cir_style, LV_OPA_COVER);
+		}
+#endif
+	}
+	else if(mode == LV_DESIGN_DRAW_POST) {
+		ancestor_design(btn, mask, mode);
+	}
+
+	return true;
+}
+
 /**
  * Signal function of the button
  * @param btn pointer to a button object
@@ -312,16 +376,52 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         /*Refresh the state*/
         if(ext->state == LV_BTN_STATE_REL) {
             lv_btn_set_state(btn, LV_BTN_STATE_PR);
+#if USE_LV_ANIMATION
+            ink_bg_state = LV_BTN_STATE_REL;
+            ink_circle_state = LV_BTN_STATE_PR;
+#endif
         } else if(ext->state == LV_BTN_STATE_TGL_REL) {
             lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
+#if USE_LV_ANIMATION
+            ink_bg_state = LV_BTN_STATE_TGL_REL;
+            ink_circle_state = LV_BTN_STATE_TGL_PR;
+#endif
         }
 
         ext->long_pr_action_executed = 0;
+
+#if USE_LV_ANIMATION
+        /*Forget the old inked button*/
+        if(ink_obj != NULL && ink_obj != btn) {
+        	lv_anim_del(ink_obj, (lv_anim_fp_t)lv_btn_circle_effect_anim);
+        	lv_obj_invalidate(ink_obj);
+        }
+        /*Save the new data for inking and start it's animation if enabled*/
+        if(ext->ink_time > 0) {
+			lv_indev_get_point(lv_indev_get_act(), &ink_point);
+			ink_obj = btn;
+
+			lv_anim_t a;
+			a.var = btn;
+			a.start = 0;
+			a.end = LV_MATH_MAX(lv_obj_get_width(btn), lv_obj_get_height(btn));
+			a.fp = (lv_anim_fp_t)lv_btn_circle_effect_anim;
+			a.path = lv_anim_path_linear;
+			a.end_cb = lv_btn_circle_effect_anim_ready;
+			a.act_time = 0;
+			a.time = ext->ink_time;
+			a.playback = 0;
+			a.playback_pause = 0;
+			a.repeat = 0;
+			a.repeat_pause = 0;
+			lv_anim_create(&a);
+        }
+#endif
         /*Call the press action, 'param' is the caller indev_proc*/
         if(ext->actions[LV_BTN_ACTION_PR] && state != LV_BTN_STATE_INA) {
             res = ext->actions[LV_BTN_ACTION_PR](btn);
         }
-    } else if(sign ==  LV_SIGNAL_PRESS_LOST) {
+    } else if(sign == LV_SIGNAL_PRESS_LOST) {
         /*Refresh the state*/
         if(ext->state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
         else if(ext->state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
@@ -355,6 +455,13 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
             }
         }
+
+#if USE_LV_ANIMATION
+        /*Draw the toggled state in the inking instead*/
+        if(ext->toggle) {
+        	ink_circle_state = ext->state;
+        }
+#endif
     } else if(sign == LV_SIGNAL_LONG_PRESS) {
         if(ext->actions[LV_BTN_ACTION_LONG_PR] && state != LV_BTN_STATE_INA) {
             ext->long_pr_action_executed = 1;
@@ -390,7 +497,16 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             }
             ext->long_pr_action_executed  = 0;
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
+#if USE_LV_ANIMATION
+    	if(btn == ink_obj) {
+            lv_anim_del(ink_obj, (lv_anim_fp_t)lv_btn_circle_effect_anim);
+            ink_obj = NULL;
+    	}
+#endif
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
@@ -402,5 +518,30 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     return res;
 }
 
+#if USE_LV_ANIMATION
+
+/**
+ * The animator function of inking. CAlled to increase the radius of ink
+ * @param btn pointer to the animated button
+ * @param val the new radius
+ */
+static void lv_btn_circle_effect_anim(lv_obj_t * btn, int32_t val)
+{
+	if(ink_obj) {
+		ink_radius = val;
+		lv_obj_invalidate(ink_obj);
+	}
+}
+
+/**
+ * Called to clean up when the ink animation is ready
+ * @param p unused
+ */
+static void lv_btn_circle_effect_anim_ready(void * p)
+{
+	lv_obj_invalidate(ink_obj);
+	ink_obj = NULL;
+}
+#endif /*USE_LV_ANIMATION*/
 
 #endif
