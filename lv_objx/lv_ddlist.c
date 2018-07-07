@@ -14,7 +14,7 @@
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
-#include "../lv_misc/lv_fonts/lv_symbol_def.h"
+#include "../lv_misc/lv_symbol_def.h"
 #include "../lv_misc/lv_anim.h"
 
 /*********************

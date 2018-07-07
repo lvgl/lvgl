@@ -14,7 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#if LV_CONF_INCLUDE_SIMPLE
+#ifdef LV_CONF_INCLUDE_SIMPLE
 #include "lv_conf.h"
 #else
 #include "../../lv_conf.h"
@@ -24,7 +24,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
-#include "lv_fonts/lv_symbol_def.h"
+#include "../lv_misc/lv_symbol_def.h"
 
 /*********************
  *      DEFINES
@@ -101,6 +101,14 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter);
  */
 uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
 
+
+/**
+ * Get the width of the letter without overwriting it with the `monospace` attribute
+ * @param font_p pointer to a font
+ * @param letter an UNICODE character code
+ * @return the width of a letter
+ */
+uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the height of a font

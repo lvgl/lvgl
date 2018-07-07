@@ -4,8 +4,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "../../../lv_conf.h"
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
+#include "../../lv_conf.h"
+#endif
 
 /*
  * With no UTF-8 support (192-255)

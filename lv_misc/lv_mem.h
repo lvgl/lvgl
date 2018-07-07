@@ -14,7 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#if LV_CONF_INCLUDE_SIMPLE
+#ifdef LV_CONF_INCLUDE_SIMPLE
 #include "lv_conf.h"
 #else
 #include "../../lv_conf.h"

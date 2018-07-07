@@ -15,7 +15,7 @@ CSRCS += lv_font_symbol_20.c
 CSRCS += lv_font_symbol_30.c
 CSRCS += lv_font_symbol_40.c
 
-DEPPATH += --dep-path lvgl/lv_misc/lv_fonts
-VPATH += :lvgl/lv_misc/lv_fonts
+DEPPATH += --dep-path lvgl/lv_fonts
+VPATH += :lvgl/lv_fonts
 
-CFLAGS += "-I$(LVGL_DIR)/lvgl/lv_misc/lv_fonts"
+CFLAGS += "-I$(LVGL_DIR)/lvgl/lv_fonts"
