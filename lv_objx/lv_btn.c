@@ -199,6 +199,22 @@ void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action)
 }
 
 /**
+ * Set time of the ink effect (draw a circle on click to animate in the new state)
+ * @param btn pointer to a button object
+ * @param ink_time the time of the ink animation
+ */
+void lv_btn_set_ink_time(lv_obj_t * btn, uint16_t ink_time)
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+
+#if USE_LV_ANIMATION
+    ink_time = 0;
+#endif
+
+    ext->ink_time = ink_time;
+}
+
+/**
  * Set a style of a button
  * @param btn pointer to a button object
  * @param type which style should be set
@@ -271,6 +287,16 @@ lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type)
     return ext->actions[type];
 }
 
+/**
+ * Get time of the ink effect (draw a circle on click to animate in the new state)
+ * @param btn pointer to a button object
+ * @return the time of the ink animation
+ */
+uint16_t lv_btn_get_ink_time(lv_obj_t * btn)
+{
+    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+    return ext->ink_time;
+}
 /**
  * Get a style of a button
  * @param btn pointer to a button object
