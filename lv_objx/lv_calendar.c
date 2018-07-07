@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_calendar.h"
 #if USE_LV_CALENDAR != 0
 
-#include "lv_calendar.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_misc/lv_math.h"

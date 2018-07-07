@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_preload.h"
 #if USE_LV_PRELOAD != 0
 
-#include "lv_preload.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rect.h"
 #include "../lv_draw/lv_draw_arc.h"
@@ -72,7 +71,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_preload, lv_preload_signal);
     lv_obj_set_design_func(new_preload, lv_preload_design);
-
+#if USE_LV_ANIMATION
     lv_anim_t a;
     a.var = new_preload;
     a.start = 0;
@@ -87,6 +86,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
     a.repeat = 1;
     a.repeat_pause = 0;
     lv_anim_create(&a);
+#endif
 
     /*Init the new pre loader pre loader*/
     if(copy == NULL) {
@@ -130,7 +130,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->time = time;
-
+#if USE_LV_ANIMATION
     lv_anim_t a;
     a.var = preload;
     a.start = 0;
@@ -145,6 +145,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
     a.repeat = 1;
     a.repeat_pause = 0;
     lv_anim_create(&a);
+#endif
 }
 /*=====================
  * Setter functions

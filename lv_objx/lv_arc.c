@@ -3,12 +3,6 @@
  *
  */
 
-/* TODO Remove these instructions
- * Search an replace: arc -> object normal name with lower case (e.g. button, label etc.)
- *                    arc -> object short name with lower case(e.g. btn, label etc)
- *                    ARC -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
 
 /*********************
  *      INCLUDES

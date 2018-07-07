@@ -14,7 +14,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_ARC != 0
 
 #include "../lv_core/lv_obj.h"

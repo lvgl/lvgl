@@ -13,8 +13,22 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_PRELOAD != 0
+
+/*Testing of dependencies*/
+#if USE_LV_ARC == 0
+#error "lv_preload: lv_arc is required. Enable it in lv_conf.h (USE_LV_ARC  1) "
+#endif
+
+#if USE_LV_ANIMATION == 0
+#error "lv_preload: animations are required. Enable it in lv_conf.h (USE_LV_ANIMATION  1) "
+#endif
 
 #include "../lv_core/lv_obj.h"
 #include "lv_arc.h"
