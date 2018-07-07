@@ -229,7 +229,8 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         lv_coord_t font_h = lv_font_get_height(font);
         lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
-        rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
+        if((font_h & 0x1) && (style->text.line_space & 0x1)) rect_area.y1 --;       /*Compensate the two rounding error*/
+        rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
 
@@ -246,7 +247,8 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         /*Redraw the text on the selected area with a different color*/
         lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
-        rect_area.y2 = rect_area.y1 + font_h + style->text.line_space;
+        if((font_h & 0x1) && (style->text.line_space & 0x1)) rect_area.y1 --;       /*Compensate the two rounding error*/
+        rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
         lv_area_t mask_sel;
