@@ -145,7 +145,7 @@ static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
 }
 
 /**
- * Set time of ink effect (draw a circle on click to animate in the new state)
+ * Set time of the ink effect (draw a circle on click to animate in the new state)
  * @param btn pointer to a button object
  * @param ink_time the time of the ink animation
  */
@@ -220,7 +220,7 @@ static inline bool lv_btn_get_ver_fit(lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_set_ink_time(lv_obj_t * btn);
+uint16_t lv_btn_get_ink_time(lv_obj_t * btn);
 
 /**
  * Get style of a button.
