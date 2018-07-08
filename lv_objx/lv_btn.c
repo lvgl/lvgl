@@ -56,6 +56,7 @@ static lv_btn_state_t ink_bg_state;
 static lv_btn_state_t ink_circle_state;
 static bool ink_ready;
 static bool ink_playback;
+static lv_point_t ink_point;
 #endif
 
 /**********************
@@ -403,16 +404,28 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 			/*In the first part of the animation increase the size of the circle (ink effect)
 			  in the second part adjust the radius */
 			lv_area_t cir_area;
+
 			lv_coord_t coord_state = ink_value < LV_BTN_INK_VALUE_MAX / 2 ? ink_value : LV_BTN_INK_VALUE_MAX / 2;
-			cir_area.x1 = btn->coords.x1 + w / 2 - (((w / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.y1 = btn->coords.y1 + h / 2 - (((h / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.x2 = btn->coords.x1 + w / 2 + (((w / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.y2 = btn->coords.y1 + h / 2 + (((h / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			lv_point_t p_act;
+			p_act.x = ink_point.x;
+			p_act.y = ink_point.y;
+			lv_coord_t x_err = (btn->coords.x1 + w / 2) - p_act.x;
+			lv_coord_t y_err = (btn->coords.y1 + h / 2) - p_act.y;
+
+			p_act.x += (x_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
+			p_act.y += (y_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
+
+
+			cir_area.x1 = p_act.x - (((w / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			cir_area.y1 = p_act.y - (((h / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			cir_area.x2 = p_act.x + (((w / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			cir_area.y2 = p_act.y + (((h / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
 
 			lv_coord_t r_state = ink_value > LV_BTN_INK_VALUE_MAX / 2 ? ink_value - LV_BTN_INK_VALUE_MAX / 2 : 0;
 			lv_style_t cir_style;
 			lv_style_copy(&cir_style, ext->styles[ink_circle_state]);
 			cir_style.body.radius = r_max + (((ext->styles[ink_bg_state]->body.radius - r_max) * r_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			cir_style.body.border.width = 0;
 
 			lv_draw_rect(&cir_area, mask, &cir_style, LV_OPA_COVER);
 		}
@@ -473,6 +486,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 			ink_obj = btn;
 			ink_playback = false;
 			ink_ready = false;
+			lv_indev_get_point(lv_indev_get_act(), &ink_point);
 
 			lv_anim_t a;
 			a.var = btn;
@@ -538,6 +552,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         else if(ink_ready && ext->ink_fill_time > 0) {
 			ink_obj = btn;
 			ink_playback = true;	/*It is the playback. If not set `lv_btn_ink_effect_anim_ready` will start its own playback*/
+			lv_indev_get_point(lv_indev_get_act(), &ink_point);
 
 			lv_anim_t a;
 			a.var = ink_obj;
