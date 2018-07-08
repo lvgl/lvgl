@@ -75,6 +75,10 @@ void lv_anim_create(lv_anim_t * anim_p)
 
     /*Set the start value*/
     if(new_anim->fp != NULL) new_anim->fp(new_anim->var, new_anim->start);
+
+    /* Creating an animation changed the linked list.
+     * It's important if it happens in a ready callback. (see `anim_task`)*/
+    anim_list_changed = true;
 }
 
 /**

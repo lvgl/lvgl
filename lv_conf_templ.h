@@ -242,7 +242,7 @@
 #define USE_LV_BTN      1
 #if USE_LV_BTN
 #define LV_BTN_DEF_INK_FILL_TIME	300		/*[ms] Time of fill the button on click with "ink" (0: disable the effect)*/
-#define LV_BTN_DEF_INK_WIAT_TIME	50		/*[ms] Wait before the ink disappears*/
+#define LV_BTN_DEF_INK_WAIT_TIME	50		/*[ms] Wait before the ink disappears*/
 #endif
 
 /*Button matrix (dependencies: -)*/
