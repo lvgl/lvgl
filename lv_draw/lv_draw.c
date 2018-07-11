@@ -273,7 +273,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     }
 
     /*Init variables for the first line*/
-    lv_coord_t line_length = 0;
+    lv_coord_t line_widht = 0;
     uint32_t line_start = 0;
     uint32_t line_end = lv_txt_get_next_line(txt, font, style->text.letter_space, w, flag);
 
@@ -283,9 +283,19 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
     /*Align the line to middle if enabled*/
     if(flag & LV_TXT_FLAG_CENTER) {
-        line_length = lv_txt_get_width(&txt[line_start], line_end - line_start,
+        line_widht = lv_txt_get_width(&txt[line_start], line_end - line_start,
                                        font, style->text.letter_space, flag);
-        pos.x += (w - line_length) / 2;
+        /*Trim closing spaces.*/
+        uint16_t i;
+		for(i = line_end - 1; i > 0; i--) {
+			if(txt[i] == ' ' || txt[i] == '\n' || txt[i] == '\r') {
+				line_widht -= lv_font_get_width(font, txt[i]);
+				line_widht -= style->text.letter_space;
+			} else {
+				break;
+			}
+		}
+        pos.x += (w - line_widht) / 2;
     }
 
     cmd_state_t cmd_state = CMD_STATE_WAIT;
@@ -371,9 +381,19 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         pos.x = coords->x1;
         /*Align to middle*/
         if(flag & LV_TXT_FLAG_CENTER) {
-            line_length = lv_txt_get_width(&txt[line_start], line_end - line_start,
+            line_widht = lv_txt_get_width(&txt[line_start], line_end - line_start,
                                            font, style->text.letter_space, flag);
-            pos.x += (w - line_length) / 2;
+            /*Trim closing spaces.*/
+            uint16_t i;
+    		for(i = line_end - 1; i > line_start; i--) {
+    			if(txt[i] == ' ' || txt[i] == '\n' || txt[i] == '\r') {
+    				line_widht -= lv_font_get_width(font, txt[i]);
+    				line_widht -= style->text.letter_space;
+    			} else {
+    				break;
+    			}
+    		}
+            pos.x += (w - line_widht) / 2;
         }
         /*Go the next line position*/
         pos.y += lv_font_get_height(font);
