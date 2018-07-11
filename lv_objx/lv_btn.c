@@ -21,14 +21,6 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_BTN_DEF_INK_FILL_TIME
-# define LV_BTN_DEF_INK_FILL_TIME		250		/*[ms] Time of fill the button on click with "ink" (0: disable the effect)*/
-#endif
-
-#ifndef LV_BTN_DEF_INK_WAIT_TIME
-# define LV_BTN_DEF_INK_WAIT_TIME		100		/*[ms] Wait before the ink disappears*/
-#endif
-
 #define LV_BTN_INK_VALUE_MAX			1024
 #define LV_BTN_INK_VALUE_MAX_SHIFT		10
 /**********************
@@ -100,8 +92,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
 
     ext->long_pr_action_executed = 0;
     ext->toggle = 0;
-    ext->ink_fill_time = LV_BTN_DEF_INK_FILL_TIME;
-    ext->ink_wait_time = LV_BTN_DEF_INK_WAIT_TIME;
+    ext->ink_fill_time = 0;
+    ext->ink_wait_time = 0;
 
     lv_obj_set_signal_func(new_btn, lv_btn_signal);
     lv_obj_set_design_func(new_btn, lv_btn_design);
@@ -395,14 +387,15 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 			lv_draw_rect(&btn->coords, mask,btn->style_p, LV_OPA_COVER);
 		} else {
 		    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+
+		    /*Draw the normal button*/
 			lv_draw_rect(&btn->coords, mask, ext->styles[ink_bg_state], LV_OPA_COVER);
 
 			lv_coord_t w = lv_obj_get_width(btn);
 			lv_coord_t h = lv_obj_get_height(btn);
 			lv_coord_t r_max = LV_MATH_MIN(w, h) / 2;
 
-			/*In the first part of the animation increase the size of the circle (ink effect)
-			  in the second part adjust the radius */
+			/*In the first part of the animation increase the size of the circle (ink effect) */
 			lv_area_t cir_area;
 
 			lv_coord_t coord_state = ink_value < LV_BTN_INK_VALUE_MAX / 2 ? ink_value : LV_BTN_INK_VALUE_MAX / 2;
@@ -415,18 +408,22 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 			p_act.x += (x_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
 			p_act.y += (y_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
 
+			lv_coord_t half_side = LV_MATH_MAX(w, h) / 2;
+			cir_area.x1 = p_act.x - ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			cir_area.y1 = p_act.y - ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			cir_area.x2 = p_act.x + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			cir_area.y2 = p_act.y + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
 
-			cir_area.x1 = p_act.x - (((w / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.y1 = p_act.y - (((h / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.x2 = p_act.x + (((w / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.y2 = p_act.y + (((h / 2) * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+			lv_area_union(&cir_area, &btn->coords, &cir_area);		/*Limit the area. (It might be too big on the smaller side)*/
 
+			/*In the second part animate the radius. Circle -> body.radius*/
 			lv_coord_t r_state = ink_value > LV_BTN_INK_VALUE_MAX / 2 ? ink_value - LV_BTN_INK_VALUE_MAX / 2 : 0;
 			lv_style_t cir_style;
 			lv_style_copy(&cir_style, ext->styles[ink_circle_state]);
 			cir_style.body.radius = r_max + (((ext->styles[ink_bg_state]->body.radius - r_max) * r_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
 			cir_style.body.border.width = 0;
 
+			/*Draw the circle*/
 			lv_draw_rect(&cir_area, mask, &cir_style, LV_OPA_COVER);
 		}
 #endif
