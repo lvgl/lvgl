@@ -387,9 +387,10 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 			lv_draw_rect(&btn->coords, mask,btn->style_p, LV_OPA_COVER);
 		} else {
 		    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+		    lv_opa_t opa_scale = lv_obj_get_opa_scale(obj);
 
 		    /*Draw the normal button*/
-			lv_draw_rect(&btn->coords, mask, ext->styles[ink_bg_state], LV_OPA_COVER);
+			lv_draw_rect(&btn->coords, mask, ext->styles[ink_bg_state], opa_scale);
 
 			lv_coord_t w = lv_obj_get_width(btn);
 			lv_coord_t h = lv_obj_get_height(btn);
@@ -424,7 +425,7 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 			cir_style.body.border.width = 0;
 
 			/*Draw the circle*/
-			lv_draw_rect(&cir_area, mask, &cir_style, LV_OPA_COVER);
+			lv_draw_rect(&cir_area, mask, &cir_style, opa_scale);
 		}
 #endif
 	}
