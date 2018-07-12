@@ -36,18 +36,19 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
+static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
 static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn);
 static void refr_btn_width(lv_obj_t * list);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t btn_signal;
 #if USE_LV_IMG
 static lv_signal_func_t img_signal;
 #endif
 static lv_signal_func_t label_signal;
-static lv_signal_func_t ancestor_signal;
+static lv_signal_func_t ancestor_page_signal;
+static lv_signal_func_t ancestor_btn_signal;
 
 /**********************
  *      MACROS
@@ -68,7 +69,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor basic object*/
     lv_obj_t * new_list = lv_page_create(par, copy);
     lv_mem_assert(new_list);
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_list);
+    if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_func(new_list);
 
     lv_list_ext_t * ext = lv_obj_allocate_ext_attr(new_list, sizeof(lv_list_ext_t));
     lv_mem_assert(ext);
@@ -163,6 +164,9 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     lv_obj_t * liste;
     liste = lv_btn_create(list, NULL);
 
+    /*Save the original signal function because it will be required in `lv_list_btn_signal`*/
+    if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_func(liste);
+
     /*Set the default styles*/
     lv_btn_set_style(liste, LV_BTN_STYLE_REL, ext->styles_btn[LV_BTN_STATE_REL]);
     lv_btn_set_style(liste, LV_BTN_STYLE_PR, ext->styles_btn[LV_BTN_STATE_PR]);
@@ -175,7 +179,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
     lv_btn_set_fit(liste, false, true);
     lv_obj_set_protect(liste, LV_PROTECT_PRESS_LOST);
-    if(btn_signal == NULL) btn_signal = lv_obj_get_signal_func(liste);
+    lv_obj_set_signal_func(liste, lv_list_btn_signal);
 
     /*Make the size adjustment*/
     lv_coord_t w = lv_obj_get_width(list);
@@ -510,7 +514,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = ancestor_signal(list, sign, param);
+    res = ancestor_page_signal(list, sign, param);
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_CORD_CHG) {
@@ -627,6 +631,50 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     return res;
 }
 
+
+/**
+ * Signal function of the list buttons
+ * @param btn pointer to a button on the list
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_btn_signal(btn, sign, param);
+    if(res != LV_RES_OK) return res;
+
+#if USE_LV_GROUP
+    if(sign == LV_SIGNAL_RELEASED) {
+    	lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+    	lv_group_t * g = lv_obj_get_group(list);
+    	if(lv_group_get_focused(g) == list && lv_indev_is_dragging(lv_indev_get_act()) == false) {
+    		/* Is the list is focused then be sure only button being released
+    		 * has a pressed state to indicate the selected state on the list*/
+    		lv_obj_t * btn_i = get_next_btn(list, NULL);
+    		while(btn_i) {
+    			lv_btn_state_t s = lv_btn_get_state(btn_i);
+    			if(s == LV_BTN_STATE_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_REL);
+    			else if(s == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_TGL_REL);
+    			btn_i = get_next_btn(list, btn_i);
+    		}
+
+    		/*Make the released button "selected" by setting pressed state for it*/
+    		lv_btn_state_t s = lv_btn_get_state(btn);
+			if(s == LV_BTN_STATE_REL) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+			else if(s == LV_BTN_STATE_TGL_REL) lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
+    	}
+
+    }
+#endif
+
+
+    return res;
+}
+
 /**
  * Get the next button from list
  * @param list pointer to a list object
@@ -644,7 +692,7 @@ static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn)
     btn = lv_obj_get_child(scrl, prev_btn);
     if(btn == NULL) return NULL;
 
-    while(btn->signal_func != btn_signal) {
+    while(btn->signal_func != lv_list_btn_signal) {
         btn = lv_obj_get_child(scrl, prev_btn);
         if(btn == NULL) break;
     }
