@@ -219,7 +219,6 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
     vect_norm.x = vect_norm.x << 4;
     vect_norm.y = vect_norm.y << 4;
 
-    printf("width %d\n", width);
 #if LV_COMPILER_VLA_SUPPORTED
     lv_point_t pattern[width_safe];
 #else

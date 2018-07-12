@@ -532,14 +532,14 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             btn = get_next_btn(list, btn);
         }
         if(btn_prev != NULL) {
-            lv_btn_set_state(btn_prev, LV_BTN_STATE_TGL_REL);
+            lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         /*Get the 'pressed' button*/
         lv_obj_t * btn = NULL;
         btn = get_next_btn(list, btn);
         while(btn != NULL) {
-            if(lv_btn_get_state(btn) == LV_BTN_STATE_TGL_REL) break;
+            if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
             btn = get_next_btn(list, btn);
         }
 
@@ -555,15 +555,24 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
             btn = get_next_btn(list, btn);
             while(btn != NULL) {
-                if(lv_btn_get_state(btn) == LV_BTN_STATE_TGL_REL) break;
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
                 btn_prev = btn;
                 btn = get_next_btn(list, btn);
             }
 
+            /*If there is a valid "pressed" button the make the next "pressed"*/
             if(btn_prev != NULL && btn != NULL) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                lv_btn_set_state(btn_prev, LV_BTN_STATE_TGL_REL);
+                lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
                 lv_page_focus(list, btn_prev, ext->anim_time);
+            }
+            /*If there is no "pressed" button the make the first "pressed"*/
+            else {
+            	btn = get_next_btn(list, NULL);
+            	if(btn) {		/*If there are no buttons on the list hen there is no first button*/
+					lv_btn_set_state(btn, LV_BTN_STATE_PR);
+					lv_page_focus(list, btn, ext->anim_time);
+            	}
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             /*Get the last pressed button*/
@@ -571,24 +580,33 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
             btn = get_next_btn(list, btn);
             while(btn != NULL) {
-                if(lv_btn_get_state(btn) == LV_BTN_STATE_TGL_REL) break;
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
                 btn = get_next_btn(list, btn);
             }
 
+            /*If there is a valid "pressed" button the make the next "pressed"*/
             if(btn != NULL) {
-                lv_obj_t * btn_prev = get_next_btn(list, btn);
-                if(btn_prev != NULL) {
+                lv_obj_t * btn_next = get_next_btn(list, btn);
+                if(btn_next != NULL) {
                     lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                    lv_btn_set_state(btn_prev, LV_BTN_STATE_TGL_REL);
-                    lv_page_focus(list, btn_prev, ext->anim_time);
+                    lv_btn_set_state(btn_next, LV_BTN_STATE_PR);
+                    lv_page_focus(list, btn_next, ext->anim_time);
                 }
+            }
+            /*If there is no "pressed" button the make the first "pressed"*/
+            else {
+            	btn = get_next_btn(list, NULL);
+				if(btn) {		/*If there are no buttons on the list hen there is no first button*/
+					lv_btn_set_state(btn, LV_BTN_STATE_PR);
+					lv_page_focus(list, btn, ext->anim_time);
+				}
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             /*Get the 'pressed' button*/
             lv_obj_t * btn = NULL;
             btn = get_next_btn(list, btn);
             while(btn != NULL) {
-                if(lv_btn_get_state(btn) == LV_BTN_STATE_TGL_REL) break;
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
                 btn = get_next_btn(list, btn);
             }
 

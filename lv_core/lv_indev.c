@@ -542,6 +542,23 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     /*Forgot the act obj and send a released signal */
     if(proc->act_obj != NULL) {
         proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
+
+        /*Handle click focus*/
+#if USE_LV_GROUP
+        lv_group_t * g = lv_obj_get_group(proc->act_obj);
+        lv_obj_t * parent = proc->act_obj;
+        while(g == NULL) {
+        	parent = lv_obj_get_parent(parent);
+        	if(parent == NULL) break;
+        	g = lv_obj_get_group(parent);
+        }
+
+        if(g != NULL && parent != NULL)
+        if(lv_group_get_click_focus(g)) {
+        	lv_group_focus_obj(parent);
+        }
+#endif
+
         if(proc->reset_query != 0) return;
         proc->act_obj = NULL;
         proc->pr_timestamp = 0;

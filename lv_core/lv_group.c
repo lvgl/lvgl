@@ -50,6 +50,9 @@ lv_group_t * lv_group_create(void)
     group->obj_focus = NULL;
     group->frozen = 0;
     group->focus_cb = NULL;
+    group->click_focus = 1;
+    group->edit_mode_en = 0;
+    group->editing = 0;
 
     return group;
 }
@@ -141,6 +144,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_obj_t ** i;
     LL_READ(g->obj_ll, i) {
         if(*i == obj) {
+        	if(g->obj_focus == i) return;		/*Don't focus the already focused object again*/
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
                 lv_obj_invalidate(*g->obj_focus);
@@ -150,6 +154,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
 
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
+                if(g->focus_cb) g->focus_cb(g);
                 lv_obj_invalidate(*g->obj_focus);
             }
             break;
@@ -296,6 +301,16 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
 }
 
 /**
+ * Set the `click_focus` attribute. If enabled then the object will be focused then it is clicked.
+ * @param group pointer to group
+ * @param en: true: enable `click_focus`
+ */
+void lv_group_set_click_focus(lv_group_t * group, bool en)
+{
+	group->click_focus = en ? 1 : 0;
+}
+
+/**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
  * @param group pointer to group
  * @param style pointer to a style to modify
@@ -322,7 +337,7 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
  */
 lv_obj_t * lv_group_get_focused(lv_group_t * group)
 {
-    if(group == NULL) return NULL;
+    if(!group) return NULL;
     if(group->obj_focus == NULL) return NULL;
 
     return *group->obj_focus;
@@ -335,6 +350,7 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
  */
 lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group)
 {
+	if(!group) return false;
     return group->style_mod ;
 }
 
@@ -345,6 +361,7 @@ lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group)
  */
 lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group)
 {
+	if(!group) return false;
     return group->style_mod_edit;
 }
 
@@ -355,6 +372,7 @@ lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group)
  */
 lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
 {
+	if(!group) return false;
     return group->focus_cb;
 }
 
@@ -365,7 +383,19 @@ lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
  */
 bool lv_group_get_editing(lv_group_t * group)
 {
+	if(!group) return false;
 	return group->editing ? true : false;
+}
+
+/**
+ * Get the `click_focus` attribute.
+ * @param group pointer to group
+ * @return true: `click_focus` is enabled; false: disabled
+ */
+bool lv_group_get_click_focus(lv_group_t * group)
+{
+	if(!group) return false;
+	return group->click_focus ? true : false;
 }
 
 /**********************

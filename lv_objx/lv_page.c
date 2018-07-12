@@ -73,6 +73,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     ext->sb.ver_draw = 0;
     ext->sb.style = &lv_style_pretty;
     ext->sb.mode = LV_SB_MODE_AUTO;
+    ext->arrow_scroll = 0;
 
     /*Init the new page object*/
     if(copy == NULL) {
@@ -117,6 +118,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
         lv_page_set_pr_action(new_page, copy_ext->pr_action);
         lv_page_set_rel_action(new_page, copy_ext->rel_action);
         lv_page_set_sb_mode(new_page, copy_ext->sb.mode);
+        lv_page_set_arrow_scroll(new_page, copy_ext->arrow_scroll);
+
 
         lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
         lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
@@ -175,7 +178,7 @@ void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action)
 /**
  * Set the scroll bar mode on a page
  * @param page pointer to a page object
- * @param sb.mode the new mode from 'lv_page_sb.mode_t' enum
+ * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
 void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 {
@@ -187,6 +190,17 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
     ext->sb.ver_draw = 0;
     lv_page_sb_refresh(page);
     lv_obj_invalidate(page);
+}
+
+/**
+ * Enable/Disable scrolling with arrows if the page is in group (arrows: LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN)
+ * @param page pointer to a page object
+ * @param en true: enable scrolling with arrows
+ */
+void lv_page_set_arrow_scroll(lv_obj_t * page, bool en)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    ext->arrow_scroll = en ? 1 : 0;
 }
 
 /**
@@ -242,6 +256,17 @@ lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->sb.mode;
+}
+
+/**
+ * Get the the scrolling with arrows (LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
+ * @param page pointer to a page object
+ * @return true: scrolling with arrows is enabled
+ */
+bool lv_page_get_arrow_scroll(lv_obj_t * page, bool en)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    return ext->arrow_scroll ? true : false;
 }
 
 /**
@@ -538,12 +563,13 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_CONTROLL) {
         uint32_t c = *((uint32_t *) param);
         lv_obj_t * scrl = lv_page_get_scrl(page);
-        if(c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_RIGHT) {
+
+        if((c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_RIGHT) && ext->arrow_scroll) {
 #if USE_LV_ANIMATION
             lv_anim_t a;
             a.var = scrl;
             a.start = lv_obj_get_y(scrl);
-            a.end = a.start - LV_DPI / 2;
+            a.end = a.start - lv_obj_get_height(page) / 4;
             a.fp = (lv_anim_fp_t)lv_obj_set_y;
             a.path = lv_anim_path_linear;
             a.end_cb = NULL;
@@ -555,15 +581,15 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             a.repeat_pause = 0;
             lv_anim_create(&a);
 #else
-            lv_obj_set_y(scrl, lv_obj_get_y(scrl) - LV_DPI / 2);
+            lv_obj_set_y(scrl, lv_obj_get_y(scrl) - lv_obj_get_height(page) / 4);
 #endif
 
-        } else if(c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_LEFT) {
+        } else if((c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_LEFT) && ext->arrow_scroll) {
 #if USE_LV_ANIMATION
             lv_anim_t a;
             a.var = scrl;
             a.start = lv_obj_get_y(scrl);
-            a.end = a.start + LV_DPI / 2;
+            a.end = a.start + lv_obj_get_height(page) / 4;
             a.fp = (lv_anim_fp_t)lv_obj_set_y;
             a.path = lv_anim_path_linear;
             a.end_cb = NULL;
@@ -575,7 +601,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             a.repeat_pause = 0;
             lv_anim_create(&a);
 #else
-            lv_obj_set_y(scrl, lv_obj_get_y(scrl) - LV_DPI / 2);
+            lv_obj_set_y(scrl, lv_obj_get_y(scrl) + lv_obj_get_height(page) / 4);
 #endif
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {

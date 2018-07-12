@@ -62,6 +62,7 @@ typedef struct
         uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
         uint8_t mode     :3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } sb;
+    uint8_t arrow_scroll :1;		/*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
 } lv_page_ext_t;
 
 typedef enum {
@@ -118,9 +119,16 @@ void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
 /**
  * Set the scroll bar mode on a page
  * @param page pointer to a page object
- * @param sb.mode the new mode from 'lv_page_sb.mode_t' enum
+ * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
 void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
+
+/**
+ * Enable/Disable scrolling with arrows if the page is in group (arrows: LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN)
+ * @param page pointer to a page object
+ * @param en true: enable scrolling with arrows
+ */
+void lv_page_set_arrow_scroll(lv_obj_t * page, bool en);
 
 /**
  * Set the fit attribute of the scrollable part of a page.
@@ -184,6 +192,14 @@ void lv_page_set_style(lv_obj_t *page, lv_page_style_t type, lv_style_t *style);
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
 lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
+
+
+/**
+ * Get the the scrolling with arrows (LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
+ * @param page pointer to a page object
+ * @return true: scrolling with arrows is enabled
+ */
+bool lv_page_get_arrow_scroll(lv_obj_t * page, bool en);
 
 /**
  * Get width of the scrollable part of a page

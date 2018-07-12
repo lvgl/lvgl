@@ -569,7 +569,17 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 ext->btn_id_tgl = ext->btn_id_pr;
             }
 
+
+
+#if USE_LV_GROUP
+            /*Leave the clicked button as pressed if this the focused object in a group*/
+            lv_group_t * g = lv_obj_get_group(btnm);
+            if(lv_group_get_focused(g) != btnm) {
+            	ext->btn_id_pr = LV_BTNM_PR_NONE;
+            }
+#else
             ext->btn_id_pr = LV_BTNM_PR_NONE;
+#endif
         }
     } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
         ext->btn_id_pr = LV_BTNM_PR_NONE;

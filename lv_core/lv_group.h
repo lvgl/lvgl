@@ -52,9 +52,10 @@ typedef struct _lv_group_t
     lv_group_style_mod_func_t style_mod_edit;/*A function which modifies the style of the focused object*/
     lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
-    uint8_t frozen:1;                       /*1: can't focus to new object*/
-    uint8_t edit_mode_en:1;                 /*1: By the long press of `LV_GROP_KEY_ENTER` the object can go to edit mode*/
-    uint8_t editing:1;                      /*1: Edit mode, 0: Navigate mode*/
+    uint8_t frozen			:1;             /*1: can't focus to new object*/
+    uint8_t edit_mode_en	:1;             /*1: By the long press of `LV_GROP_KEY_ENTER` the object can go to edit mode*/
+    uint8_t editing			:1;             /*1: Edit mode, 0: Navigate mode*/
+    uint8_t click_focus 	:1;				/*1: If an object in a group is clicked by an indev then it will be focused */
 } lv_group_t;
 
 /**********************
@@ -152,11 +153,18 @@ void lv_group_set_edit_enable(lv_group_t * group, bool en);
 
 /**
  * Manually set the current mode (edit or navigate).
- * Edit mode needs to be enabled with `lv_group_set_edit_enabel`.
+ * Edit mode needs to be enabled with `lv_group_set_edit_enable`.
  * @param group pointer to group
  * @param edit: true: edit mode; false: navigate mode
  */
 void lv_group_set_editing(lv_group_t * group, bool edit);
+
+/**
+ * Set the `click_focus` attribute. If enabled then the object will be focused then it is clicked.
+ * @param group pointer to group
+ * @param en: true: enable `click_focus`
+ */
+void lv_group_set_click_focus(lv_group_t * group, bool en);
 
 /**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
@@ -200,6 +208,15 @@ lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group);
  * @return true: edit mode; false: navigate mode
  */
 bool lv_group_get_editing(lv_group_t * group);
+
+/**
+ * Get the `click_focus` attribute.
+ * @param group pointer to group
+ * @return true: `click_focus` is enabled; false: disabled
+ */
+bool lv_group_get_click_focus(lv_group_t * group);
+
+
 /**********************
  *      MACROS
  **********************/
