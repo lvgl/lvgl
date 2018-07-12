@@ -745,6 +745,15 @@ void * lv_obj_get_free_ptr(lv_obj_t * obj);
  * @return the pointer to group of the object
  */
 void * lv_obj_get_group(lv_obj_t * obj);
+
+
+/**
+ * Tell whether the ohe object is the focused object of a group or not.
+ * @param obj pointer to an object
+ * @return true: the object is focused, false: the object is not focused or not in a group
+ */
+bool lv_obj_is_focused(lv_obj_t * obj);
+
 #endif
 
 

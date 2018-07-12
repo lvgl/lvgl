@@ -38,6 +38,7 @@
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
 static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn);
+static lv_obj_t * get_prev_btn(lv_obj_t * list, lv_obj_t * prev_btn);
 static void refr_btn_width(lv_obj_t * list);
 
 /**********************
@@ -49,6 +50,10 @@ static lv_signal_func_t img_signal;
 static lv_signal_func_t label_signal;
 static lv_signal_func_t ancestor_page_signal;
 static lv_signal_func_t ancestor_btn_signal;
+#if USE_LV_GROUP
+/*Used to make the last clicked button pressed (selected) when the list become focused and `click_focus == 1`*/
+static lv_obj_t * last_clicked_btn;
+#endif
 
 /**********************
  *      MACROS
@@ -527,17 +532,22 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         /*Because of the possible change of horizontal and vertical padding refresh buttons width */
         refr_btn_width(list);
     } else if(sign == LV_SIGNAL_FOCUS) {
-        /*Get the first button*/
-        lv_obj_t * btn = NULL;
-        lv_obj_t * btn_prev = NULL;
-        btn = get_next_btn(list, btn);
-        while(btn != NULL) {
-            btn_prev = btn;
-            btn = get_next_btn(list, btn);
-        }
-        if(btn_prev != NULL) {
-            lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
-        }
+#if USE_LV_BTN
+    	/*Mark the last clicked button (if any) as selected because it triggered the focus*/
+    	if(last_clicked_btn) {
+    		lv_btn_set_state(last_clicked_btn, LV_BTN_STATE_PR);
+    	} else {
+    		/*Get the first button and mark it as selected*/
+			lv_obj_t * btn = get_prev_btn(list, NULL);
+			if(btn) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+
+    	}
+#else
+        /*Get the first button and mark it as selected*/
+		lv_obj_t * btn = get_prev_btn(list, NULL);
+		if(btn) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+#endif
+
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         /*Get the 'pressed' button*/
         lv_obj_t * btn = NULL;
@@ -550,34 +560,28 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         if(btn != NULL) {
             lv_btn_set_state(btn, LV_BTN_STATE_REL);
         }
+        last_clicked_btn = NULL;		/*button click will set if comes before focus*/
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
-            /*Get the last pressed button*/
-            lv_obj_t * btn = NULL;
-            lv_obj_t * btn_prev = NULL;
-            lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-            btn = get_next_btn(list, btn);
-            while(btn != NULL) {
-                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
-                btn_prev = btn;
-                btn = get_next_btn(list, btn);
-            }
+        	/*Get the last pressed button*/
+        	lv_obj_t * btn = NULL;
+        	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+        	btn = get_prev_btn(list, btn);
+        	while(btn != NULL) {
+        		if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+        		btn = get_prev_btn(list, btn);
+        	}
 
-            /*If there is a valid "pressed" button the make the next "pressed"*/
-            if(btn_prev != NULL && btn != NULL) {
-                lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
-                lv_page_focus(list, btn_prev, ext->anim_time);
-            }
-            /*If there is no "pressed" button the make the first "pressed"*/
-            else {
-            	btn = get_next_btn(list, NULL);
-            	if(btn) {		/*If there are no buttons on the list hen there is no first button*/
-					lv_btn_set_state(btn, LV_BTN_STATE_PR);
-					lv_page_focus(list, btn, ext->anim_time);
-            	}
-            }
+        	/*If there is a valid "pressed" button the make the previous "pressed"*/
+        	if(btn != NULL) {
+        		lv_obj_t * btn_prev = get_prev_btn(list, btn);
+        		if(btn_prev != NULL) {
+        			lv_btn_set_state(btn, LV_BTN_STATE_REL);
+        			lv_btn_set_state(btn_prev, LV_BTN_STATE_PR);
+        			lv_page_focus(list, btn_prev, ext->anim_time);
+        		}
+        	            }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             /*Get the last pressed button*/
             lv_obj_t * btn = NULL;
@@ -668,6 +672,10 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
 			else if(s == LV_BTN_STATE_TGL_REL) lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
     	}
 
+		/* If `click_focus == 1` then LV_SIGNAL_FOCUS need to know which button triggered the focus
+		 * to mark it as selected (pressed state)*/
+		last_clicked_btn = btn;
+
     }
 #endif
 
@@ -676,10 +684,10 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
 }
 
 /**
- * Get the next button from list
+ * Get the next button from list. (Starts from the bottom button)
  * @param list pointer to a list object
  * @param prev_btn pointer to button. Search the next after it.
- * @return pointer to the next button or NULL
+ * @return pointer to the next button or NULL when no more buttons
  */
 static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn)
 {
@@ -694,6 +702,32 @@ static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn)
 
     while(btn->signal_func != lv_list_btn_signal) {
         btn = lv_obj_get_child(scrl, prev_btn);
+        if(btn == NULL) break;
+    }
+
+    return btn;
+}
+
+
+/**
+ * Get the previous button from list. (Starts from the top button)
+ * @param list pointer to a list object
+ * @param prev_btn pointer to button. Search the previous before it.
+ * @return pointer to the previous button or NULL when no more buttons
+ */
+static lv_obj_t * get_prev_btn(lv_obj_t * list, lv_obj_t * prev_btn)
+{
+    /* Not a good practice but user can add/create objects to the lists manually.
+     * When getting the next button try to be sure that it is at least a button */
+
+    lv_obj_t * btn ;
+    lv_obj_t * scrl = lv_page_get_scrl(list);
+
+    btn = lv_obj_get_child_back(scrl, prev_btn);
+    if(btn == NULL) return NULL;
+
+    while(btn->signal_func != lv_list_btn_signal) {
+        btn = lv_obj_get_child_back(scrl, prev_btn);
         if(btn == NULL) break;
     }
 

@@ -1479,6 +1479,20 @@ void * lv_obj_get_group(lv_obj_t * obj)
 {
     return obj->group_p;
 }
+
+/**
+ * Tell whether the ohe object is the focused object of a group or not.
+ * @param obj pointer to an object
+ * @return true: the object is focused, false: the object is not focused or not in a group
+ */
+bool lv_obj_is_focused(lv_obj_t * obj)
+{
+	if(obj->group_p) {
+		if(lv_group_get_focused(obj->group_p) == obj) return true;
+	}
+
+    return false;
+}
 #endif
 
 /**********************

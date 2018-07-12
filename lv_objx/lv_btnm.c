@@ -585,7 +585,17 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         ext->btn_id_pr = LV_BTNM_PR_NONE;
         lv_obj_invalidate(btnm);
     } else if(sign == LV_SIGNAL_FOCUS) {
+#if USE_LV_GROUP
+    	lv_indev_t * indev = lv_indev_get_act();
+    	if(lv_obj_is_focused(btnm) && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
+    		lv_point_t p;
+    		lv_indev_get_point(indev, &p);
+    		uint16_t btn_i = get_button_from_point(btnm, &p);
+    		ext->btn_id_pr = btn_i;
+    	}
+#else
         ext->btn_id_pr = 0;
+#endif
         lv_obj_invalidate(btnm);
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);

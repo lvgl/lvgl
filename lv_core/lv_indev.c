@@ -76,6 +76,17 @@ lv_indev_t * lv_indev_get_act(void)
 }
 
 /**
+ * Get the type of an input device
+ * @param indev pointer to an input device
+ * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
+ */
+lv_hal_indev_type_t lv_indev_get_type(lv_indev_t * indev)
+{
+	if(indev == NULL) return LV_INDEV_TYPE_NONE;
+
+	return indev->driver.type;
+}
+/**
  * Reset one or all input devices
  * @param indev pointer to an input device to reset or NULL to reset all of them
  */
@@ -162,8 +173,8 @@ void lv_indev_set_button_points(lv_indev_t * indev, lv_point_t * points)
 void lv_indev_get_point(lv_indev_t * indev, lv_point_t * point)
 {
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
-        point->x = 0;
-        point->y = 0;
+        point->x = -1;
+        point->y = -1;
     } else {
         point->x = indev->proc.act_point.x;
         point->y = indev->proc.act_point.y;
