@@ -384,10 +384,11 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 		ancestor_design(btn, mask, mode);
 #if USE_LV_ANIMATION
 		if(btn != ink_obj) {
-			lv_draw_rect(&btn->coords, mask,btn->style_p, LV_OPA_COVER);
+	        lv_style_t * style = lv_obj_get_style(btn);
+			lv_draw_rect(&btn->coords, mask, style, LV_OPA_COVER);
 		} else {
 		    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-		    lv_opa_t opa_scale = lv_obj_get_opa_scale(obj);
+		    lv_opa_t opa_scale = lv_obj_get_opa_scale(btn);
 
 		    /*Draw the normal button*/
 			lv_draw_rect(&btn->coords, mask, ext->styles[ink_bg_state], opa_scale);

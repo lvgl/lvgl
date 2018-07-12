@@ -336,12 +336,18 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_PR) {
         if(data->key == LV_GROUP_KEY_ENTER &&
                 i->proc.long_pr_sent == 0 &&
-                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME &&
-				i->group->edit_mode_en)
+                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME )
         {
-			i->group->editing = i->group->editing ? 0 : 1;		/*Change between edit and navigate*/
-			lv_obj_t * focused = lv_group_get_focused(i->group);
-			if(focused) lv_obj_invalidate(focused);
+            lv_obj_t * focused = lv_group_get_focused(i->group);
+            /*If edit mode is enabled then change between edit and navigate on long press*/
+            if (i->group->edit_mode_en) {
+                i->group->editing = i->group->editing ? 0 : 1;
+                if(focused) lv_obj_invalidate(focused);
+            }
+            /*If edit mode is disabled just send a long press signal*/
+            else {
+                focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
+            }
             i->proc.long_pr_sent = 1;
         }
     }
@@ -355,9 +361,9 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         } else if(data->key == LV_GROUP_KEY_PREV) {
             lv_group_focus_prev(i->group);
         } else if(data->key == LV_GROUP_KEY_ENTER &&
-        		 (i->proc.long_pr_sent || (i->group->editing == 0 && i->group->edit_mode_en)))
+            (i->group->edit_mode_en && i->group->editing == 0))
         {
-            /*Do nothing. Don't send the ENTER if pressed long was sent or in navigation mode*/
+            /*Do nothing. Don't send the ENTER if in navigation mode*/
         } else {
             lv_group_send_data(i->group, data->key);
         }

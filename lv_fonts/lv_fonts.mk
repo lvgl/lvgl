@@ -1,3 +1,4 @@
+CSRCS += lv_font_builtin.c
 CSRCS += lv_font_dejavu_10.c
 CSRCS += lv_font_dejavu_20.c
 CSRCS += lv_font_dejavu_30.c
