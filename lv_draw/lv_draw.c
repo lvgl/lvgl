@@ -477,9 +477,9 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
             uint8_t buf[lv_area_get_width(&mask_com) * px_size];
 #else
 # if LV_HOR_RES > LV_VER_RES
-            uint8_t buf[LV_HOR_RES * px_size];
+            uint8_t buf[LV_HOR_RES * ((LV_COLOR_DEPTH >> 8) + 1)];  /*+1 because of the possible alpha byte*/
 # else
-            uint8_t buf[LV_VER_RES * px_size];
+            uint8_t buf[LV_VER_RES * ((LV_COLOR_DEPTH >> 8) + 1)];
 # endif
 #endif
             for(row = mask_com.y1; row <= mask_com.y2; row ++) {
