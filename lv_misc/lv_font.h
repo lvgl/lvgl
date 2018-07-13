@@ -214,7 +214,9 @@ LV_FONT_DECLARE(lv_font_symbol_40);
 #endif
 
 /*Declare the custom (user defined) fonts*/
+#ifdef LV_FONT_CUSTOM_DECLARE
 LV_FONT_CUSTOM_DECLARE
+#endif
 
 #ifdef __cplusplus
 } /* extern "C" */
