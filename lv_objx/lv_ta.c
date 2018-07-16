@@ -941,6 +941,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         else if(c == LV_GROUP_KEY_LEFT)  lv_ta_cursor_left(ta);
         else if(c == LV_GROUP_KEY_UP)  lv_ta_cursor_up(ta);
         else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
+        else if(c == LV_GROUP_KEY_DEL) lv_ta_del_char(ta);
         else {
 #if LV_TXT_UTF8 != 0
             /*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
