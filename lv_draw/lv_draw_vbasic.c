@@ -101,7 +101,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*Get the union of cord and mask*/
     /* The mask is already truncated to the vdb size
      * in 'lv_refr_area_with_vdb' function */
-    union_ok = lv_area_union(&res_a, cords_p, mask_p);
+    union_ok = lv_area_intersect(&res_a, cords_p, mask_p);
 
     /*If there are common part of the three area then draw to the vdb*/
     if(union_ok == false) return;
@@ -337,7 +337,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*Get the union of map size and mask*/
     /* The mask is already truncated to the vdb size
     * in 'lv_refr_area_with_vdb' function */
-    union_ok = lv_area_union(&masked_a, cords_p, mask_p);
+    union_ok = lv_area_intersect(&masked_a, cords_p, mask_p);
 
     /*If there are common part of the three area then draw to the vdb*/
     if(union_ok == false)  return;

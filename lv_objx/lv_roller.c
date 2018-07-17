@@ -251,7 +251,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         rect_area.x2 = roller->coords.x2;
         lv_area_t mask_sel;
         bool area_ok;
-        area_ok = lv_area_union(&mask_sel, mask, &rect_area);
+        area_ok = lv_area_intersect(&mask_sel, mask, &rect_area);
         if(area_ok) {
             lv_style_t * sel_style = lv_roller_get_style(roller, LV_ROLLER_STYLE_SEL);
             lv_style_t new_style;
@@ -416,7 +416,7 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
     half_roller.y1 -= roller->ext_size;
     half_roller.y2 = roller->coords.y1 + h / 2;
 
-    union_ok = lv_area_union(&half_mask, &half_roller, mask);
+    union_ok = lv_area_intersect(&half_mask, &half_roller, mask);
 
     half_roller.x1 += roller->ext_size; /*Revert ext. size adding*/
     half_roller.x2 -= roller->ext_size;
@@ -433,7 +433,7 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
     half_roller.y1 = roller->coords.y1 + h / 2;
     if((h & 0x1) == 0) half_roller.y1++;    /*With even height the pixels in the middle would be drawn twice*/
 
-    union_ok = lv_area_union(&half_mask, &half_roller, mask);
+    union_ok = lv_area_intersect(&half_mask, &half_roller, mask);
 
     half_roller.x1 += roller->ext_size; /*Revert ext. size adding*/
     half_roller.x2 -= roller->ext_size;

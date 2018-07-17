@@ -364,7 +364,7 @@ void lv_obj_invalidate(lv_obj_t * obj)
 
         /*Check through all parents*/
         while(par != NULL) {
-            union_ok = lv_area_union(&area_trunc, &area_trunc, &par->coords);
+            union_ok = lv_area_intersect(&area_trunc, &area_trunc, &par->coords);
             if(union_ok == false) break;        /*If no common parts with parent break;*/
             if(lv_obj_get_hidden(par)) return;  /*If the parent is hidden then the child is hidden and won't be drawn*/
 

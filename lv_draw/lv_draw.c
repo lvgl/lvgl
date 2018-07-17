@@ -431,7 +431,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
             lv_area_t mask_com;    /*Common area of mask and cords*/
             bool union_ok;
-            union_ok = lv_area_union(&mask_com, mask, coords);
+            union_ok = lv_area_intersect(&mask_com, mask, coords);
             if(union_ok == false) {
                 lv_fs_close(&file);
                 return;
@@ -506,7 +506,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
         const lv_img_t * img_var = src;
         lv_area_t mask_com;    /*Common area of mask and coords*/
         bool union_ok;
-        union_ok = lv_area_union(&mask_com, mask, coords);
+        union_ok = lv_area_intersect(&mask_com, mask, coords);
         if(union_ok == false) {
             return;         /*Out of mask*/
         }

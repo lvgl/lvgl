@@ -102,12 +102,12 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
 
 /**
  * Get the common parts of two areas
- * @param res_p pointer to an area, the result will be stored her
+ * @param res_p pointer to an area, the result will be stored here
  * @param a1_p pointer to the first area
  * @param a2_p pointer to the second area
  * @return false: the two area has NO common parts, res_p is invalid
  */
-bool lv_area_union(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
+bool lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /* Get the smaller area from 'a1_p' and 'a2_p' */
     res_p->x1 = LV_MATH_MAX(a1_p->x1, a2_p->x1);

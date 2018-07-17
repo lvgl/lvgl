@@ -670,7 +670,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
             col_a.y1 = h - y_tmp + chart->coords.y1;
 
-            mask_ret = lv_area_union(&col_mask, mask, &col_a);
+            mask_ret = lv_area_intersect(&col_mask, mask, &col_a);
             if(mask_ret != false) {
                 lv_draw_rect(&chart->coords, &col_mask, &rects);
             }
