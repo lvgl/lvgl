@@ -480,7 +480,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         area_sel.x2 = ddlist->coords.x2;
         lv_area_t mask_sel;
         bool area_ok;
-        area_ok = lv_area_union(&mask_sel, mask, &area_sel);
+        area_ok = lv_area_intersect(&mask_sel, mask, &area_sel);
         if(area_ok) {
             lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_SEL);
             lv_style_t new_style;

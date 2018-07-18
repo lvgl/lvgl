@@ -67,7 +67,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
             lv_area_t mask_com;    /*Common area of mask and cords*/
             bool union_ok;
-            union_ok = lv_area_union(&mask_com, mask, coords);
+            union_ok = lv_area_intersect(&mask_com, mask, coords);
             if(union_ok == false) {
                 lv_fs_close(&file);
                 return;
@@ -109,13 +109,14 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
             lv_coord_t row;
             uint32_t act_pos;
+
 #if LV_COMPILER_VLA_SUPPORTED
             uint8_t buf[lv_area_get_width(&mask_com) * px_size];
 #else
 # if LV_HOR_RES > LV_VER_RES
-            uint8_t buf[LV_HOR_RES * px_size];
+            uint8_t buf[LV_HOR_RES * ((LV_COLOR_DEPTH >> 8) + 1)];  /*+1 because of the possible alpha byte*/
 # else
-            uint8_t buf[LV_VER_RES * px_size];
+            uint8_t buf[LV_VER_RES * ((LV_COLOR_DEPTH >> 8) + 1)];
 # endif
 #endif
             for(row = mask_com.y1; row <= mask_com.y2; row ++) {
@@ -142,7 +143,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
         const lv_img_t * img_var = src;
         lv_area_t mask_com;    /*Common area of mask and coords*/
         bool union_ok;
-        union_ok = lv_area_union(&mask_com, mask, coords);
+        union_ok = lv_area_intersect(&mask_com, mask, coords);
         if(union_ok == false) {
             return;         /*Out of mask*/
         }

@@ -269,6 +269,7 @@ static void indev_proc_task(void * param)
             do {
                 /*Read the data*/
                 more_to_read = lv_indev_read(i, &data);
+                indev_proc_reset_query_handler(i);			/*The active object might deleted even in the read function*/
                 i->proc.state = data.state;
 
                 if(i->proc.state == LV_INDEV_STATE_PR) {

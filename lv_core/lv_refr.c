@@ -92,7 +92,7 @@ void lv_inv_area(const lv_area_t * area_p)
     lv_area_t com_area;
     bool suc;
 
-    suc = lv_area_union(&com_area, area_p, &scr_area);
+    suc = lv_area_intersect(&com_area, area_p, &scr_area);
 
     /*The area is truncated to the screen*/
     if(suc != false) {
@@ -327,7 +327,7 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
     /*Get the new mask from the original area and the act. VDB
      It will be a part of 'area_p'*/
     lv_area_t start_mask;
-    lv_area_union(&start_mask, area_p, &vdb_p->area);
+    lv_area_intersect(&start_mask, area_p, &vdb_p->area);
 
     /*Get the most top object which is not covered by others*/
     top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
@@ -451,7 +451,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     obj_area.y1 -= ext_size;
     obj_area.x2 += ext_size;
     obj_area.y2 += ext_size;
-    union_ok = lv_area_union(&obj_ext_mask, mask_ori_p, &obj_area);
+    union_ok = lv_area_intersect(&obj_ext_mask, mask_ori_p, &obj_area);
 
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
@@ -465,7 +465,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
         lv_obj_get_coords(obj, &obj_area);
-        union_ok = lv_area_union(&obj_mask, mask_ori_p, &obj_area);
+        union_ok = lv_area_intersect(&obj_mask, mask_ori_p, &obj_area);
         if(union_ok != false) {
             lv_area_t mask_child; /*Mask from obj and its child*/
             lv_obj_t * child_p;
@@ -479,7 +479,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
                 child_area.y2 += ext_size;
                 /* Get the union (common parts) of original mask (from obj)
                  * and its child */
-                union_ok = lv_area_union(&mask_child, &obj_mask, &child_area);
+                union_ok = lv_area_intersect(&mask_child, &obj_mask, &child_area);
 
                 /*If the parent and the child has common area then refresh the child */
                 if(union_ok) {

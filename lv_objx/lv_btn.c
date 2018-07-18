@@ -416,7 +416,7 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 			cir_area.x2 = p_act.x + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
 			cir_area.y2 = p_act.y + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
 
-			lv_area_union(&cir_area, &btn->coords, &cir_area);		/*Limit the area. (It might be too big on the smaller side)*/
+			lv_area_intersect(&cir_area, &btn->coords, &cir_area);		/*Limit the area. (It might be too big on the smaller side)*/
 
 			/*In the second part animate the radius. Circle -> body.radius*/
 			lv_coord_t r_state = ink_value > LV_BTN_INK_VALUE_MAX / 2 ? ink_value - LV_BTN_INK_VALUE_MAX / 2 : 0;

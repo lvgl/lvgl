@@ -172,7 +172,9 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
 #include "../lv_fonts/lv_font_builtin.h"
 
 /*Declare the custom (user defined) fonts*/
+#ifdef LV_FONT_CUSTOM_DECLARE
 LV_FONT_CUSTOM_DECLARE
+#endif
 
 #ifdef __cplusplus
 } /* extern "C" */
