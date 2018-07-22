@@ -1,6 +1,6 @@
 /**
  * @file lv_mbox.h
- * 
+ *
  */
 
 #ifndef LV_MBOX_H
@@ -51,7 +51,7 @@ typedef struct
     lv_obj_t *text;             /*Text of the message box*/
     lv_obj_t *btnm;            /*Button matrix for the buttons*/
     uint16_t anim_time;         /*Duration of close animation [ms] (0: no animation)*/
-}lv_mbox_ext_t;
+} lv_mbox_ext_t;
 
 typedef enum {
     LV_MBOX_STYLE_BG,
@@ -61,7 +61,7 @@ typedef enum {
     LV_MBOX_STYLE_BTN_TGL_REL,
     LV_MBOX_STYLE_BTN_TGL_PR,
     LV_MBOX_STYLE_BTN_INA,
-}lv_mbox_style_t;
+} lv_mbox_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -109,9 +109,9 @@ void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action);
 /**
  * Set animation duration
  * @param mbox pointer to a message box object
- * @param time animation length in  milliseconds (0: no animation)
+ * @param anim_time animation length in  milliseconds (0: no animation)
  */
-void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t time);
+void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time);
 
 /**
  * Automatically delete the message box after a given time

@@ -1,6 +1,6 @@
 /**
  * @file lv_tabview.h
- * 
+ *
  */
 
 #ifndef LV_TABVIEW_H
@@ -44,7 +44,7 @@ typedef void (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
 /*Data of tab*/
 typedef struct
 {
-   /*Ext. of ancestor*/
+    /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * btns;
     lv_obj_t * indic;
@@ -58,7 +58,7 @@ typedef struct
     uint8_t draging :1;
     uint8_t drag_hor :1;
     lv_tabview_action_t tab_load_action;
-}lv_tabview_ext_t;
+} lv_tabview_ext_t;
 
 typedef enum {
     LV_TABVIEW_STYLE_BG,
@@ -68,7 +68,7 @@ typedef enum {
     LV_TABVIEW_STYLE_BTN_PR,
     LV_TABVIEW_STYLE_BTN_TGL_REL,
     LV_TABVIEW_STYLE_BTN_TGL_PR,
-}lv_tabview_style_t;
+} lv_tabview_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

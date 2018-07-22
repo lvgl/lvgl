@@ -1,6 +1,6 @@
 /**
  * @file lv_btnm.h
- * 
+ *
  */
 
 
@@ -47,15 +47,15 @@ typedef struct
 {
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
-    const char ** map_p;                            /*Pointer to the current map*/
-    lv_area_t *button_areas;                          /*Array of areas of buttons*/
-    lv_btnm_action_t action;                        /*A function to call when a button is releases*/
+    const char ** map_p;                        /*Pointer to the current map*/
+    lv_area_t *button_areas;                    /*Array of areas of buttons*/
+    lv_btnm_action_t action;                    /*A function to call when a button is releases*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
-    uint16_t btn_cnt;                            /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_pr;                     /*Index of the currently pressed button or LV_BTNM_PR_NONE*/
-    uint16_t btn_id_tgl;                     /*Index of the currently toggled button or LV_BTNM_PR_NONE */
-    uint8_t toggle     :1;                          /*Enable toggling*/
-}lv_btnm_ext_t;
+    uint16_t btn_cnt;                           /*Number of button in 'map_p'(Handled by the library)*/
+    uint16_t btn_id_pr;                         /*Index of the currently pressed button (in `button_areas`) or LV_BTNM_PR_NONE*/
+    uint16_t btn_id_tgl;                        /*Index of the currently toggled button (in `button_areas`) or LV_BTNM_PR_NONE */
+    uint8_t toggle     :1;                      /*Enable toggling*/
+} lv_btnm_ext_t;
 
 typedef enum {
     LV_BTNM_STYLE_BG,
@@ -64,7 +64,7 @@ typedef enum {
     LV_BTNM_STYLE_BTN_TGL_REL,
     LV_BTNM_STYLE_BTN_TGL_PR,
     LV_BTNM_STYLE_BTN_INA,
-}lv_btnm_style_t;
+} lv_btnm_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -15,7 +15,7 @@
  *      DEFINES
  *********************/
 #define DEF_RADIUS           4
-#define DEF_SHADOW_COLOR     LV_COLOR_HEX3(0x888)
+#define DEF_SHADOW_COLOR     LV_COLOR_HEX3(0xaaa)
 
 /**********************
  *      TYPEDEFS
@@ -195,7 +195,7 @@ static void led_init(void)
     lv_style_copy(&led, &def);
     led.body.shadow.width = LV_DPI / 10;
     led.body.radius = LV_RADIUS_CIRCLE;
-    led.body.border.width= LV_DPI / 30;
+    led.body.border.width = LV_DPI / 30;
     led.body.border.opa = LV_OPA_30;
     led.body.main_color = lv_color_hsv_to_rgb(_hue, 100, 100);
     led.body.grad_color = lv_color_hsv_to_rgb(_hue, 100, 100);
@@ -259,7 +259,7 @@ static void sw_init(void)
     sw_indic.body.radius = LV_RADIUS_CIRCLE;
 
     lv_style_copy(&sw_knob_on, theme.slider.knob);
-    sw_knob_on.body.shadow.width = 4;
+    sw_knob_on.body.shadow.width = 3;
     sw_knob_on.body.shadow.type = LV_SHADOW_BOTTOM;
     sw_knob_on.body.shadow.color = DEF_SHADOW_COLOR;
 
@@ -326,9 +326,9 @@ static void cb_init(void)
 {
 #if USE_LV_CB != 0
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
-    lv_style_copy(&rel,theme.panel);
+    lv_style_copy(&rel, theme.panel);
     rel.body.shadow.type = LV_SHADOW_BOTTOM;
-    rel.body.shadow.width = 2;
+    rel.body.shadow.width = 3;
 
     lv_style_copy(&pr, &rel);
     pr.body.main_color = LV_COLOR_HEX3(0xccc);
@@ -363,14 +363,14 @@ static void btnm_init(void)
 #if USE_LV_BTNM
     static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
 
-    lv_style_copy(&bg,theme.panel);
+    lv_style_copy(&bg, theme.panel);
     bg.body.padding.hor = 0;
     bg.body.padding.ver = 0;
     bg.body.padding.inner = 0;
     bg.text.color = LV_COLOR_HEX3(0x555);
 
-    lv_style_copy(&rel,theme.panel);
-    rel.body.border.part = LV_BORDER_RIGHT| LV_BORDER_BOTTOM;
+    lv_style_copy(&rel, theme.panel);
+    rel.body.border.part = LV_BORDER_RIGHT;
     rel.body.border.width = 1;
     rel.body.border.color = LV_COLOR_HEX3(0xbbb);
     rel.body.empty = 1;
@@ -597,7 +597,7 @@ static void tabview_init(void)
     btn_bg.body.border.color = LV_COLOR_HEX3(0x888);
     btn_bg.body.border.part = LV_BORDER_BOTTOM;
     btn_bg.body.border.opa = LV_OPA_COVER;
-    btn_bg.body.shadow.width = 6;
+    btn_bg.body.shadow.width = 5;
     btn_bg.body.shadow.color = DEF_SHADOW_COLOR;
     btn_bg.body.shadow.type = LV_SHADOW_BOTTOM;
     btn_bg.body.padding.inner = 0;
@@ -695,7 +695,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_material_init(uint16_t hue, lv_font_t *font)
+lv_theme_t * lv_theme_material_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
@@ -704,8 +704,8 @@ lv_theme_t * lv_theme_material_init(uint16_t hue, lv_font_t *font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t **style_p = (lv_style_t**) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t*); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme;
+    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
         *style_p = &def;
         style_p++;
     }

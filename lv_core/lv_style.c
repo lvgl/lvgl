@@ -29,9 +29,9 @@
 typedef struct {
     lv_style_t style_start;   /*Save not only pointers because can be same as 'style_anim' then it will be modified too*/
     lv_style_t style_end;
-    lv_style_t *style_anim;
+    lv_style_t * style_anim;
     void (*end_cb)(void *);
-}lv_style_anim_dsc_t;
+} lv_style_anim_dsc_t;
 #endif
 
 /**********************
@@ -39,7 +39,7 @@ typedef struct {
  **********************/
 #if USE_LV_ANIMATION
 static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val);
-static void style_animation_common_end_cb(void *ptr);
+static void style_animation_common_end_cb(void * ptr);
 #endif
 
 /**********************
@@ -70,7 +70,7 @@ lv_style_t lv_style_btn_ina;
 /**
  *  Init the basic styles
  */
-void lv_style_init (void)
+void lv_style_init(void)
 {
     /* Not White/Black/Gray colors are created by HSV model with
      * HUE = 210*/
@@ -232,7 +232,7 @@ void lv_style_anim_create(lv_style_anim_t * anim)
 
 
     lv_anim_t a;
-    a.var = (void*)dsc;
+    a.var = (void *)dsc;
     a.start = 0;
     a.end = LV_STYLE_ANIM_RES;
     a.fp = (lv_anim_fp_t)style_animator;
@@ -272,8 +272,11 @@ static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val)
     STYLE_ATTR_ANIM(body.padding.inner, val);
     STYLE_ATTR_ANIM(text.line_space, val);
     STYLE_ATTR_ANIM(text.letter_space, val);
+    STYLE_ATTR_ANIM(text.opa, val);
     STYLE_ATTR_ANIM(line.width, val);
+    STYLE_ATTR_ANIM(line.opa, val);
     STYLE_ATTR_ANIM(image.intense, val);
+    STYLE_ATTR_ANIM(image.opa, val);
 
     lv_opa_t opa = val == LV_STYLE_ANIM_RES ? LV_OPA_COVER : val;
 
@@ -307,9 +310,9 @@ static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val)
  * It called the user defined call back and free the allocated memories
  * @param ptr the 'animated variable' set by lv_style_anim_create()
  */
-static void style_animation_common_end_cb(void *ptr)
+static void style_animation_common_end_cb(void * ptr)
 {
-    lv_style_anim_dsc_t *dsc = ptr;     /*To avoid casting*/
+    lv_style_anim_dsc_t * dsc = ptr;    /*To avoid casting*/
 
     if(dsc->end_cb) dsc->end_cb(dsc);
 

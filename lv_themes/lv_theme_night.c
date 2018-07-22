@@ -186,7 +186,7 @@ static void led_init(void)
     lv_style_copy(&led, &def);
     led.body.shadow.width = LV_DPI / 10;
     led.body.radius = LV_RADIUS_CIRCLE;
-    led.body.border.width= LV_DPI / 30;
+    led.body.border.width = LV_DPI / 30;
     led.body.border.opa = LV_OPA_30;
     led.body.main_color = lv_color_hsv_to_rgb(_hue, 100, 100);
     led.body.grad_color = lv_color_hsv_to_rgb(_hue, 100, 40);
@@ -256,7 +256,7 @@ static void lmeter_init(void)
     lmeter_bg.body.padding.inner = LV_DPI / 10;         /*Text padding*/
     lmeter_bg.body.border.color = LV_COLOR_HEX3(0x333);
     lmeter_bg.line.color = LV_COLOR_HEX3(0x555);
-    lmeter_bg.line.width = 2;
+    lmeter_bg.line.width = 1;
     lmeter_bg.text.color = LV_COLOR_HEX3(0xddd);
 
     theme.lmeter = &lmeter_bg;
@@ -271,7 +271,7 @@ static void gauge_init(void)
     gauge_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 70);
     gauge_bg.body.grad_color = gauge_bg.body.main_color;
     gauge_bg.line.color = lv_color_hsv_to_rgb(_hue, 80, 75);
-    gauge_bg.line.width = 2;
+    gauge_bg.line.width = 1;
     gauge_bg.text.color = LV_COLOR_HEX3(0xddd);
 
     theme.gauge = &gauge_bg;
@@ -420,7 +420,6 @@ static void page_init(void)
     page_scrl.body.border.color = LV_COLOR_HEX3(0x333);
     page_scrl.body.border.width = 1;
     page_scrl.body.radius = LV_DPI / 20;
-
 
     theme.page.bg = &panel;
     theme.page.scrl = &page_scrl;
@@ -584,7 +583,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t *font)
+lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
@@ -593,8 +592,8 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t *font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t **style_p = (lv_style_t**) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t*); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme;
+    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
         *style_p = &def;
         style_p++;
     }

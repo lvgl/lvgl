@@ -1,6 +1,6 @@
 /**
  * @file lv_templ.c
- * 
+ *
  */
 
 /* TODO Remove these instructions
@@ -55,10 +55,10 @@ static lv_design_func_t ancestor_design;
 lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 {
     /*Create the ancestor of template*/
-	/*TODO modify it to the ancestor create function */
+    /*TODO modify it to the ancestor create function */
     lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
     dm_assert(new_templ);
-    
+
     /*Allocate the template type specific extended data*/
     lv_templ_ext_t * ext = lv_obj_alloc_ext(new_templ, sizeof(lv_templ_ext_t));
     dm_assert(ext);
@@ -78,12 +78,12 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing template*/
     else {
-    	lv_templ_ext_t * copy_ext = lv_obj_get_ext(copy);
+        lv_templ_ext_t * copy_ext = lv_obj_get_ext(copy);
 
         /*Refresh the style with new signal function*/
         lv_obj_refr_style(new_templ);
     }
-    
+
     return new_templ;
 }
 
@@ -111,11 +111,11 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *style)
+void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t * style)
 {
-    lv_templ_ext_t *ext = lv_obj_get_ext_attr(templ);
+    lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
 
-    switch (type) {
+    switch(type) {
         case LV_TEMPL_STYLE_X:
             break;
         case LV_TEMPL_STYLE_Y:
@@ -139,12 +139,15 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *sty
  *  */
 lv_style_t * lv_btn_get_style(lv_obj_t * templ, lv_templ_style_t type)
 {
-    lv_templ_ext_t *ext = lv_obj_get_ext_attr(templ);
+    lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
 
-    switch (type) {
-        case LV_TEMPL_STYLE_X:     return NULL;
-        case LV_TEMPL_STYLE_Y:     return NULL;
-        default: return NULL;
+    switch(type) {
+        case LV_TEMPL_STYLE_X:
+            return NULL;
+        case LV_TEMPL_STYLE_Y:
+            return NULL;
+        default:
+            return NULL;
     }
 
     /*To avoid warning*/
@@ -177,7 +180,7 @@ static bool lv_templ_design(lv_obj_t * templ, const area_t * mask, lv_design_mod
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	return false;
+        return false;
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -209,6 +212,13 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_templ";
     }
 
     return res;

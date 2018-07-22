@@ -1,6 +1,6 @@
 /**
  * @file lv_indev_proc.h
- * 
+ *
  */
 
 #ifndef LV_INDEV_H
@@ -60,40 +60,49 @@ void lv_indev_reset_lpr(lv_indev_t * indev);
 void lv_indev_enable(lv_hal_indev_type_t type, bool enable);
 
 /**
- * Set a cursor for a pointer input device
- * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_POINTER')
+ * Set a cursor for a pointer input device (for LV_INPUT_TYPE_POINTER and LV_INPUT_TYPE_BUTTON)
+ * @param indev pointer to an input device
  * @param cur_obj pointer to an object to be used as cursor
  */
 void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj);
 
 #if USE_LV_GROUP
 /**
- * Set a destination group for a keypad input device
- * @param indev pointer to an input device (type: 'LV_INDEV_TYPE_KEYPAD')
+ * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
+ * @param indev pointer to an input device
  * @param group point to a group
  */
 void lv_indev_set_group(lv_indev_t *indev, lv_group_t *group);
 #endif
+
 /**
- * Get the last point of an input device
+ * Set the an array of points for LV_INDEV_TYPE_BUTTON.
+ * These points will be assigned to the buttons to press a specific point on the screen
+ * @param indev pointer to an input device
+ * @param group point to a group
+ */
+void lv_indev_set_button_points(lv_indev_t *indev, lv_point_t *points);
+
+/**
+ * Get the last point of an input device (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the result
  */
 void lv_indev_get_point(lv_indev_t * indev, lv_point_t * point);
+
 /**
- * Check if there is dragging with an input device or not
+ * Check if there is dragging with an input device or not (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
  * @return true: drag is in progress
  */
 bool lv_indev_is_dragging(lv_indev_t * indev);
 
 /**
- * Get the vector of dragging of an input device
+ * Get the vector of dragging of an input device (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the vector
  */
 void lv_indev_get_vect(lv_indev_t * indev, lv_point_t * point);
-
 /**
  * Get elapsed time since last press
  * @param indev pointer to an input device (NULL to get the overall smallest inactivity)

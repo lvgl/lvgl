@@ -1,6 +1,6 @@
 /**
  * @file lv_gauge.h
- * 
+ *
  */
 
 #ifndef LV_GAUGE_H
@@ -43,7 +43,7 @@ typedef struct
     const lv_color_t * needle_colors;        /*Color of the needles (lv_color_t my_colors[needle_num])*/
     uint8_t needle_count;             /*Number of needles*/
     uint8_t label_count;              /*Number of labels on the scale*/
-}lv_gauge_ext_t;
+} lv_gauge_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

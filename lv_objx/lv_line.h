@@ -34,7 +34,7 @@ typedef struct
     uint16_t  point_num;            /*Number of points in 'point_array' */
     uint8_t  auto_size  :1;         /*1: set obj. width to x max and obj. height to y max */
     uint8_t  y_inv      :1;         /*1: y == 0 will be on the bottom*/
-}lv_line_ext_t;
+} lv_line_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -88,6 +88,15 @@ static inline void lv_line_set_style(lv_obj_t *line, lv_style_t *style)
     lv_obj_set_style(line, style);
 }
 
+/**
+ * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
+ * @param line -
+ * @param upscale -
+ */
+static inline void lv_line_set_upscale(lv_obj_t * line, bool upcale)
+{
+
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -115,6 +124,17 @@ static inline lv_style_t* lv_line_get_style(lv_obj_t *line)
 {
     return lv_obj_get_style(line);
 }
+
+/**
+ * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
+ * @param line -
+ * @return false
+ */
+static inline bool lv_line_get_upscale(lv_obj_t * line)
+{
+    return false;
+}
+
 
 /**********************
  *      MACROS

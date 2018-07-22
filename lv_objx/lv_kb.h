@@ -1,6 +1,6 @@
 /**
  * @file lv_kb.h
- * 
+ *
  */
 
 #ifndef LV_KB_H
@@ -16,6 +16,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #if USE_LV_KB != 0
 
+/*Testing of dependencies*/
+#if USE_LV_BTNM == 0
+#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (USE_LV_BTNM  1) "
+#endif
+
+#if USE_LV_TA == 0
+#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (USE_LV_TA  1) "
+#endif
+
 #include "../lv_core/lv_obj.h"
 #include "lv_btnm.h"
 
@@ -30,7 +39,7 @@ extern "C" {
 typedef enum {
     LV_KB_MODE_TEXT,
     LV_KB_MODE_NUM,
-}lv_kb_mode_t;
+} lv_kb_mode_t;
 
 
 /*Data of keyboard*/
@@ -42,7 +51,7 @@ typedef struct {
     uint8_t cursor_mng      :1; /*1: automatically show/hide cursor when a text area is assigned or left*/
     lv_action_t  ok_action;     /*Called when the "Ok" button is clicked*/
     lv_action_t  hide_action;  /*Called when the "Hide" button is clicked*/
-}lv_kb_ext_t;
+} lv_kb_ext_t;
 
 typedef enum {
     LV_KB_STYLE_BG,
@@ -51,7 +60,7 @@ typedef enum {
     LV_KB_STYLE_BTN_TGL_REL,
     LV_KB_STYLE_BTN_TGL_PR,
     LV_KB_STYLE_BTN_INA,
-}lv_kb_style_t;
+} lv_kb_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

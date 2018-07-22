@@ -4,7 +4,16 @@ Major versions released typically when API changes are required
 ## Contributing
 Please create an issue to suggest a new feature instead of adding pull request to this file.
 
-## v5 (released at: 20.12.2017)
+## v6 (released on: in progrss)
+- [ ] lv_img_upscale removal (generate image with with opacity instead)
+- [ ] disp_map and disp_fill removal
+- [ ] disp_flush, mem_blend, mem_fill rework: usea lv_area_t as parameter an GPU support 2D area
+- [ ] disp_flush: not const color map
+- [ ] ext size removal, enable drawing on full parent.
+- [ ] multiple display support
+- [ ] lv_ufs removal (was required only in the the old image system)
+
+## v5 (released on: 20.12.2017)
 **Architectural changes**
 - [x] Rename repository from *proj_pc* to *pc_simulator*
 - [x] Integrate *hal* in LittlevGL as a normal folder

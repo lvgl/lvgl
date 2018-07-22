@@ -1,6 +1,6 @@
 /**
  * @file lv_refr.h
- * 
+ *
  */
 
 #ifndef LV_REFR_H
@@ -58,6 +58,24 @@ void lv_inv_area(const lv_area_t * area_p);
  */
 void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t));
 
+/**
+ * Called when an area is invalidated to modify the coordinates of the area.
+ * Special display controllers may require special coordinate rounding
+ * @param cb pointer to the a function which will modify the area
+ */
+void lv_refr_set_round_cb(void(*cb)(lv_area_t*));
+
+/**
+ * Get the number of areas in the buffer
+ * @return number of invalid areas
+ */
+uint16_t lv_refr_get_buf_size(void);
+
+/**
+ * Pop (delete) the last 'num' invalidated areas from the buffer
+ * @param num number of areas to delete
+ */
+void lv_refr_pop_from_buf(uint16_t num);
 /**********************
  *   STATIC FUNCTIONS
  **********************/

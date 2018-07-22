@@ -1,6 +1,6 @@
 /**
  * @file lv_draw_vbasic.h
- * 
+ *
  */
 
 #ifndef LV_DRAW_VBASIC_H
@@ -42,7 +42,7 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
  * @param opa opacity of the area (0..255)
  */
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
-                lv_color_t color, lv_opa_t opa);
+              lv_color_t color, lv_opa_t opa);
 
 /**
  * Draw a letter in the Virtual Display Buffer
@@ -58,19 +58,19 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                 lv_color_t color, lv_opa_t opa);
 
 /**
- * Draw a color map to the display
+ * Draw a color map to the display (image)
  * @param cords_p coordinates the color map
- * @param mask_p the map will drawn only on this area
+ * @param mask_p the map will drawn only on this area  (truncated to VDB area)
  * @param map_p pointer to a lv_color_t array
- * @param opa opacity of the map (ignored, only for compatibility with lv_vmap)
- * @param transp true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
- * @param upscale true: upscale to double size
+ * @param opa opacity of the map
+ * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
+ * @param alpha_byte true: extra alpha byte is inserted for every pixel
  * @param recolor mix the pixels with this color
  * @param recolor_opa the intense of recoloring
  */
 void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
-            const lv_color_t * map_p, lv_opa_t opa, bool transp, bool upscale,
-            lv_color_t recolor, lv_opa_t recolor_opa);
+             const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+             lv_color_t recolor, lv_opa_t recolor_opa);
 
 
 /**

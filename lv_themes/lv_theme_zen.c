@@ -181,7 +181,7 @@ static void led_init(void)
     lv_style_copy(&led, &lv_style_pretty_color);
     led.body.shadow.width = LV_DPI / 10;
     led.body.radius = LV_RADIUS_CIRCLE;
-    led.body.border.width= LV_DPI / 30;
+    led.body.border.width = LV_DPI / 30;
     led.body.border.opa = LV_OPA_30;
     led.body.main_color = lv_color_hsv_to_rgb(_hue, 60, 100);
     led.body.grad_color = lv_color_hsv_to_rgb(_hue, 60, 40);
@@ -283,10 +283,10 @@ static void gauge_init(void)
 
     lv_style_copy(&gauge, &def);
     gauge.line.color = lv_color_hsv_to_rgb(_hue, 50, 70);
-    gauge.line.width = 2;
+    gauge.line.width = 1;
     gauge.body.main_color = LV_COLOR_HEX3(0x999);
     gauge.body.grad_color = gauge.body.main_color;
-    gauge.body.padding.hor = LV_DPI / 12;
+    gauge.body.padding.hor = LV_DPI / 16;
     gauge.body.border.color = LV_COLOR_HEX3(0x666);     /*Needle middle color*/
 
     theme.gauge = &gauge;
@@ -305,7 +305,7 @@ static void chart_init(void)
 static void cb_init(void)
 {
 #if USE_LV_CB != 0
-    static lv_style_t rel ,pr, tgl_rel, tgl_pr, ina;
+    static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&rel, &def);
     rel.body.radius = LV_DPI / 20;
     rel.body.shadow.width = 0;
@@ -348,7 +348,7 @@ static void cb_init(void)
 static void btnm_init(void)
 {
 #if USE_LV_BTNM
-    static lv_style_t bg, rel ,pr, tgl_rel, tgl_pr, ina;
+    static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&bg, &lv_style_transp);
     bg.glass = 0;
@@ -397,15 +397,15 @@ static void btnm_init(void)
 static void kb_init(void)
 {
 #if USE_LV_KB
-    static lv_style_t bg, rel ,pr, tgl_rel, tgl_pr, ina;
+    static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&bg, &def);
-     bg.body.main_color = LV_COLOR_HEX3(0x666);
-     bg.body.grad_color = bg.body.main_color;
-     bg.body.padding.hor = 0;
-     bg.body.padding.ver = 0;
-     bg.body.padding.inner = 0;
-     bg.body.radius = 0;
-     bg.body.border.width = 0;
+    bg.body.main_color = LV_COLOR_HEX3(0x666);
+    bg.body.grad_color = bg.body.main_color;
+    bg.body.padding.hor = 0;
+    bg.body.padding.ver = 0;
+    bg.body.padding.inner = 0;
+    bg.body.radius = 0;
+    bg.body.border.width = 0;
 
     lv_style_copy(&rel, &def);
     rel.body.empty = 1;
@@ -676,7 +676,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_zen_init(uint16_t hue, lv_font_t *font)
+lv_theme_t * lv_theme_zen_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
@@ -685,8 +685,8 @@ lv_theme_t * lv_theme_zen_init(uint16_t hue, lv_font_t *font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t **style_p = (lv_style_t**) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t*); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme;
+    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
         *style_p = &def;
         style_p++;
     }

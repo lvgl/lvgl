@@ -1,6 +1,6 @@
 /**
  * @file lv_cb.c
- * 
+ *
  */
 
 /*********************
@@ -56,7 +56,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     lv_mem_assert(new_cb);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_cb);
     if(ancestor_bg_design == NULL) ancestor_bg_design = lv_obj_get_design_func(new_cb);
-    
+
     lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
     lv_mem_assert(ext);
     ext->bullet = NULL;
@@ -79,7 +79,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
         lv_btn_set_toggle(new_cb, true);
 
         /*Set the default styles*/
-        lv_theme_t *th = lv_theme_get_current();
+        lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_cb_set_style(new_cb, LV_CB_STYLE_BG, th->cb.bg);
             lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, th->cb.box.rel);
@@ -88,20 +88,20 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
             lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_PR, th->cb.box.tgl_pr);
             lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->cb.box.ina);
         } else {
-            lv_cb_set_style(new_cb,LV_CB_STYLE_BG, &lv_style_transp);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL,&lv_style_pretty);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BG, &lv_style_transp);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, &lv_style_pretty);
         }
     } else {
-    	lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-    	ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
-    	ext->label = lv_label_create(new_cb, copy_ext->label);
+        lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        ext->bullet = lv_btn_create(new_cb, copy_ext->bullet);
+        ext->label = lv_label_create(new_cb, copy_ext->label);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_cb);
     }
 
     lv_obj_set_design_func(ext->bullet, lv_bullet_design);
-    
+
     return new_cb;
 }
 
@@ -116,8 +116,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 {
-	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
-	lv_label_set_text(ext->label, txt);
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_label_set_text(ext->label, txt);
 }
 
 /**
@@ -126,11 +126,11 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style)
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t * style)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
-    switch (type) {
+    switch(type) {
         case LV_CB_STYLE_BG:
             lv_btn_set_style(cb, LV_BTN_STYLE_REL, style);
             lv_btn_set_style(cb, LV_BTN_STYLE_PR, style);
@@ -169,8 +169,8 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style)
  */
 const char * lv_cb_get_text(lv_obj_t * cb)
 {
-	lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
-	return lv_label_get_text(ext->label);
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    return lv_label_get_text(ext->label);
 }
 
 
@@ -184,13 +184,19 @@ lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
-    switch (type) {
-        case LV_CB_STYLE_BOX_REL:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
-        case LV_CB_STYLE_BOX_PR:      return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
-        case LV_CB_STYLE_BOX_TGL_REL: return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
-        case LV_CB_STYLE_BOX_TGL_PR:  return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
-        case LV_CB_STYLE_BOX_INA:     return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
-        default: return NULL;
+    switch(type) {
+        case LV_CB_STYLE_BOX_REL:
+            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
+        case LV_CB_STYLE_BOX_PR:
+            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
+        case LV_CB_STYLE_BOX_TGL_REL:
+            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
+        case LV_CB_STYLE_BOX_TGL_PR:
+            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
+        case LV_CB_STYLE_BOX_INA:
+            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
+        default:
+            return NULL;
     }
 
     /*To avoid awrning*/
@@ -214,8 +220,8 @@ lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
 static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-    	/*Return false if the object is not covers the mask_p area*/
-    	return ancestor_bg_design(cb, mask, mode);
+        /*Return false if the object is not covers the mask_p area*/
+        return ancestor_bg_design(cb, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
         lv_cb_ext_t * cb_ext = lv_obj_get_ext_attr(cb);
         lv_btn_ext_t * bullet_ext = lv_obj_get_ext_attr(cb_ext->bullet);
@@ -295,19 +301,26 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_style_t * label_style = lv_label_get_style(ext->label);
-        lv_obj_set_size(ext->bullet, lv_font_get_height_scale(label_style->text.font), lv_font_get_height_scale(label_style->text.font));
+        lv_obj_set_size(ext->bullet, lv_font_get_height(label_style->text.font), lv_font_get_height(label_style->text.font));
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_PRESSED ||
-        sign == LV_SIGNAL_RELEASED ||
-        sign == LV_SIGNAL_PRESS_LOST) {
+              sign == LV_SIGNAL_RELEASED ||
+              sign == LV_SIGNAL_PRESS_LOST) {
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_CONTROLL) {
-        char c = *((char*)param);
+        char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
-           c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
-           c == LV_GROUP_KEY_ENTER) {
+                c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP ||
+                c == LV_GROUP_KEY_ENTER || c == LV_GROUP_KEY_ENTER_LONG) {
             lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
         }
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_cb";
     }
 
     return res;

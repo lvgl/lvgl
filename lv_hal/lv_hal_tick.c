@@ -8,6 +8,7 @@
  *********************/
 #include "lv_hal_tick.h"
 #include <stddef.h>
+#include "../../lv_conf.h"
 
 /*********************
  *      DEFINES
@@ -39,7 +40,7 @@ static volatile uint8_t tick_irq_flag;
  * You have to call this function periodically
  * @param tick_period the call period of this function in milliseconds
  */
-void lv_tick_inc(uint32_t tick_period)
+LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
 {
     tick_irq_flag = 0;
     sys_time += tick_period;
@@ -67,17 +68,17 @@ uint32_t lv_tick_get(void)
  */
 uint32_t lv_tick_elaps(uint32_t prev_tick)
 {
-	uint32_t act_time = lv_tick_get();
+    uint32_t act_time = lv_tick_get();
 
-	/*If there is no overflow in sys_time simple subtract*/
-	if(act_time >= prev_tick) {
-		prev_tick = act_time - prev_tick;
-	} else {
-		prev_tick = UINT32_MAX - prev_tick + 1;
-		prev_tick += act_time;
-	}
+    /*If there is no overflow in sys_time simple subtract*/
+    if(act_time >= prev_tick) {
+        prev_tick = act_time - prev_tick;
+    } else {
+        prev_tick = UINT32_MAX - prev_tick + 1;
+        prev_tick += act_time;
+    }
 
-	return prev_tick;
+    return prev_tick;
 }
 
 /**********************

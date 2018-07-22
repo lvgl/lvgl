@@ -23,7 +23,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_theme_t *current_theme;
+static lv_theme_t * current_theme;
 
 /**********************
  *      MACROS
@@ -38,7 +38,7 @@ static lv_theme_t *current_theme;
  * From now, all the created objects will use styles from this theme by default
  * @param th pointer to theme (return value of: 'lv_theme_init_xxx()')
  */
-void lv_theme_set_current(lv_theme_t *th)
+void lv_theme_set_current(lv_theme_t * th)
 {
     current_theme = th;
 }

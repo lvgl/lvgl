@@ -1,6 +1,6 @@
 /**
  * @file lv_vdb.h
- * 
+ *
  */
 
 #ifndef LV_VDB_H
@@ -32,7 +32,7 @@ typedef struct
 {
     lv_area_t area;
     lv_color_t *buf;
-}lv_vdb_t;
+} lv_vdb_t;
 
 /**********************
  * GLOBAL PROTOTYPES

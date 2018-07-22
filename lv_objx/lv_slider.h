@@ -1,6 +1,6 @@
 /**
  * @file lv_slider.h
- * 
+ *
  */
 
 #ifndef LV_SLIDER_H
@@ -15,6 +15,11 @@ extern "C" {
  *********************/
 #include "../../lv_conf.h"
 #if USE_LV_SLIDER != 0
+
+/*Testing of dependencies*/
+#if USE_LV_BAR == 0
+#error "lv_slider: lv_bar is required. Enable it in lv_conf.h (USE_LV_BAR  1) "
+#endif
 
 #include "../lv_core/lv_obj.h"
 #include "lv_bar.h"
@@ -35,15 +40,15 @@ typedef struct
     lv_style_t *style_knob;    /*Style of the knob*/
     int16_t drag_value;          /*Store a temporal value during press until release (Handled by the library)*/
     uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
-}lv_slider_ext_t;
+} lv_slider_ext_t;
 
 /*Built-in styles of slider*/
 typedef enum
 {
-	LV_SLIDER_STYLE_BG,
+    LV_SLIDER_STYLE_BG,
     LV_SLIDER_STYLE_INDIC,
     LV_SLIDER_STYLE_KNOB,
-}lv_slider_style_t;
+} lv_slider_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

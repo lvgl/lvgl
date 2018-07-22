@@ -38,7 +38,7 @@ typedef struct {
         lv_style_t *tgl_rel;
         lv_style_t *tgl_pr;
         lv_style_t *ina;
-    }btn;
+    } btn;
 #endif
 
 #if USE_LV_LABEL != 0
@@ -46,20 +46,20 @@ typedef struct {
         lv_style_t *prim;
         lv_style_t *sec;
         lv_style_t *hint;
-    }label;
+    } label;
 #endif
 
 #if USE_LV_IMG != 0
     struct {
         lv_style_t *light;
         lv_style_t *dark;
-    }img;
+    } img;
 #endif
 
 #if USE_LV_LINE != 0
     struct {
         lv_style_t *decor;
-    }line;
+    } line;
 #endif
 
 #if USE_LV_LED != 0
@@ -70,7 +70,7 @@ typedef struct {
     struct {
         lv_style_t *bg;
         lv_style_t *indic;
-    }bar;
+    } bar;
 #endif
 
 #if USE_LV_SLIDER != 0
@@ -78,7 +78,7 @@ typedef struct {
         lv_style_t *bg;
         lv_style_t *indic;
         lv_style_t *knob;
-    }slider;
+    } slider;
 #endif
 
 #if USE_LV_LMETER != 0
@@ -95,7 +95,7 @@ typedef struct {
         lv_style_t *indic;
         lv_style_t *knob_off;
         lv_style_t *knob_on;
-    }sw;
+    } sw;
 #endif
 
 #if USE_LV_CHART != 0
@@ -111,8 +111,8 @@ typedef struct {
             lv_style_t *tgl_rel;
             lv_style_t *tgl_pr;
             lv_style_t *ina;
-        }box;
-    }cb;
+        } box;
+    } cb;
 #endif
 
 #if USE_LV_BTNM != 0
@@ -124,8 +124,8 @@ typedef struct {
             lv_style_t *tgl_rel;
             lv_style_t *tgl_pr;
             lv_style_t *ina;
-        }btn;
-    }btnm;
+        } btn;
+    } btnm;
 #endif
 
 #if USE_LV_KB != 0
@@ -138,7 +138,7 @@ typedef struct {
             lv_style_t *tgl_pr;
             lv_style_t *ina;
         } btn;
-    }kb;
+    } kb;
 #endif
 
 #if USE_LV_MBOX != 0
@@ -148,8 +148,8 @@ typedef struct {
             lv_style_t *bg;
             lv_style_t *rel;
             lv_style_t *pr;
-        }btn;
-    }mbox;
+        } btn;
+    } mbox;
 #endif
 
 #if USE_LV_PAGE != 0
@@ -157,7 +157,7 @@ typedef struct {
         lv_style_t *bg;
         lv_style_t *scrl;
         lv_style_t *sb;
-    }page;
+    } page;
 #endif
 
 #if USE_LV_TA != 0
@@ -166,7 +166,7 @@ typedef struct {
         lv_style_t *oneline;
         lv_style_t *cursor;
         lv_style_t *sb;
-    }ta;
+    } ta;
 #endif
 
 #if USE_LV_LIST
@@ -180,8 +180,8 @@ typedef struct {
             lv_style_t *tgl_rel;
             lv_style_t *tgl_pr;
             lv_style_t *ina;
-        }btn;
-    }list;
+        } btn;
+    } list;
 #endif
 
 #if USE_LV_DDLIST != 0
@@ -189,14 +189,14 @@ typedef struct {
         lv_style_t *bg;
         lv_style_t *sel;
         lv_style_t *sb;
-    }ddlist;
+    } ddlist;
 #endif
 
 #if USE_LV_ROLLER != 0
     struct {
         lv_style_t *bg;
         lv_style_t *sel;
-    }roller;
+    } roller;
 #endif
 
 #if USE_LV_TABVIEW != 0
@@ -209,8 +209,8 @@ typedef struct {
             lv_style_t *pr;
             lv_style_t *tgl_rel;
             lv_style_t *tgl_pr;
-        }btn;
-    }tabview;
+        } btn;
+    } tabview;
 #endif
 
 #if USE_LV_WIN != 0
@@ -221,14 +221,14 @@ typedef struct {
         struct {
             lv_style_t *bg;
             lv_style_t *scrl;
-        }content;
+        } content;
         struct {
             lv_style_t *rel;
             lv_style_t *pr;
-        }btn;
-    }win;
+        } btn;
+    } win;
 #endif
-}lv_theme_t;
+} lv_theme_t;
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -258,7 +258,9 @@ lv_theme_t * lv_theme_get_current(void);
 #include "lv_theme_default.h"
 #include "lv_theme_alien.h"
 #include "lv_theme_night.h"
+#include "lv_theme_zen.h"
 #include "lv_theme_mono.h"
+#include "lv_theme_material.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

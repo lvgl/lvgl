@@ -55,9 +55,9 @@ extern "C" {
  *********************/
 /*Current version of LittlevGL*/
 #define LVGL_VERSION_MAJOR   5
-#define LVGL_VERSION_MINOR   0
-#define LVGL_VERSION_PATCH   1
-#define LVGL_VERSION_INFO    ""
+#define LVGL_VERSION_MINOR   1
+#define LVGL_VERSION_PATCH   2
+#define LVGL_VERSION_INFO    "beta"
 
 /**********************
  *      TYPEDEFS

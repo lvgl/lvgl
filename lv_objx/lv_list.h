@@ -1,6 +1,6 @@
 /**
  * @file lv_list.h
- * 
+ *
  */
 
 #ifndef LV_LIST_H
@@ -51,7 +51,7 @@ typedef struct
     uint16_t anim_time;                          /*Scroll animation time*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
-}lv_list_ext_t;
+} lv_list_ext_t;
 
 typedef enum {
     LV_LIST_STYLE_BG,
@@ -62,7 +62,7 @@ typedef enum {
     LV_LIST_STYLE_BTN_TGL_REL,
     LV_LIST_STYLE_BTN_TGL_PR,
     LV_LIST_STYLE_BTN_INA,
-}lv_list_style_t;
+} lv_list_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -88,7 +88,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy);
  * @param rel_action pointer to release action function (like with lv_btn)
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const char * img_fn, const char * txt, lv_action_t rel_action);
+lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_action_t rel_action);
 
 /*=====================
  * Setter functions
@@ -110,7 +110,6 @@ static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
 {
     lv_page_set_sb_mode(list, mode);
 }
-
 
 /**
  * Set a style of a list

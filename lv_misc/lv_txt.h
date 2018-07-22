@@ -1,6 +1,6 @@
 /**
  * @file lv_text.h
- * 
+ *
  */
 
 #ifndef LV_TXT_H
@@ -33,14 +33,14 @@ typedef enum
     LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width (Used by the library)*/
     LV_TXT_FLAG_NO_BREAK = 0x04,   /*Ignore line breaks (Used by the library)*/
     LV_TXT_FLAG_CENTER =   0x08,   /*Align the text to the middle*/
-}lv_txt_flag_t;
+} lv_txt_flag_t;
 
 typedef enum
 {
     LV_TXT_CMD_STATE_WAIT,      /*Waiting for command*/
     LV_TXT_CMD_STATE_PAR,       /*Processing the parameter*/
     LV_TXT_CMD_STATE_IN,        /*Processing the command*/
-}lv_txt_cmd_state_t;
+} lv_txt_cmd_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -57,7 +57,7 @@ typedef enum
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
  */
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
-                    lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
+                     lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -69,7 +69,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @return the index of the first char of the new line
  */
 uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font_p,
-                            lv_coord_t letter_space, lv_coord_t max_l, lv_txt_flag_t flag);
+                              lv_coord_t letter_space, lv_coord_t max_l, lv_txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -81,7 +81,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font_p,
  * @return length of a char_num long text
  */
 lv_coord_t lv_txt_get_width(const char * txt, uint16_t char_num,
-                    const lv_font_t * font_p, lv_coord_t letter_space, lv_txt_flag_t flag);
+                            const lv_font_t * font_p, lv_coord_t letter_space, lv_txt_flag_t flag);
 
 /**
  * Check next character in a string and decide if te character is part of the command or not
@@ -121,7 +121,7 @@ uint8_t lv_txt_utf8_size(uint8_t c);
  * @param letter_uni an Unicode letter
  * @return UTF-8 coded character in Little Endian to be compatible with C chars (e.g. 'Á', 'Ű')
  */
-uint32_t txt_unicode_to_utf8(uint32_t letter_uni);
+uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni);
 
 /**
  * Decode an UTF-8 character from a string.

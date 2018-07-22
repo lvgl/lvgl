@@ -39,6 +39,7 @@ static lv_style_t dark_frame;
 static uint16_t _hue;
 static lv_font_t * _font;
 
+
 /**********************
  *      MACROS
  **********************/
@@ -221,6 +222,7 @@ static void lmeter_init(void)
     lmeter_bg.body.padding.hor = LV_DPI / 20;
     lmeter_bg.body.padding.inner = LV_DPI / 8;
     lmeter_bg.line.color = LV_COLOR_WHITE;
+    lmeter_bg.line.width = 1;
 
     theme.lmeter = &lmeter_bg;
 #endif
@@ -232,7 +234,7 @@ static void gauge_init(void)
     static lv_style_t gauge_bg;
     lv_style_copy(&gauge_bg, theme.lmeter);
     gauge_bg.line.color = LV_COLOR_BLACK;
-    gauge_bg.line.width = 3;
+    gauge_bg.line.width = 1;
 
 
     theme.gauge = &gauge_bg;
@@ -344,9 +346,11 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if USE_LV_DDLIST != 0
+    static lv_style_t bg;
+    lv_style_copy(&bg, &light_frame);
+    bg.text.line_space = LV_DPI / 12;
 
-
-    theme.ddlist.bg = &light_frame;
+    theme.ddlist.bg = &bg;
     theme.ddlist.sel = &dark_plain;
     theme.ddlist.sb = &dark_frame;
 #endif
@@ -355,9 +359,11 @@ static void ddlist_init(void)
 static void roller_init(void)
 {
 #if USE_LV_ROLLER != 0
+    static lv_style_t bg;
+    lv_style_copy(&bg, &light_frame);
+    bg.text.line_space = LV_DPI / 12;
 
-
-    theme.roller.bg = &light_frame;
+    theme.roller.bg = &bg;
     theme.roller.sel = &dark_frame;
 #endif
 }
@@ -408,7 +414,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t *font)
+lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
@@ -417,8 +423,8 @@ lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t *font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t **style_p = (lv_style_t**) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t*); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme;
+    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
         *style_p = &def;
         style_p++;
     }
@@ -455,7 +461,7 @@ lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t *font)
  * Get a pointer to the theme
  * @return pointer to the theme
  */
-lv_theme_t * lv_theme_get_templ(void)
+lv_theme_t * lv_theme_get_mono(void)
 {
     return &theme;
 }

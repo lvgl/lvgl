@@ -30,7 +30,7 @@ typedef struct
 {
     lv_coord_t * points;
     lv_color_t color;
-}lv_chart_series_t;
+} lv_chart_series_t;
 
 /*Data of chart */
 typedef struct
@@ -49,16 +49,16 @@ typedef struct
         uint8_t num;   /*Number of data lines in dl_ll*/
         lv_opa_t opa;     /*Opacity of data lines*/
         lv_opa_t dark;    /*Dark level of the point/column bottoms*/
-    }series;
-}lv_chart_ext_t;
+    } series;
+} lv_chart_ext_t;
 
 /*Chart types*/
 typedef enum
 {
-	LV_CHART_TYPE_LINE = 0x01,
-	LV_CHART_TYPE_COLUMN = 0x02,
-	LV_CHART_TYPE_POINT = 0x04,
-}lv_chart_type_t;
+    LV_CHART_TYPE_LINE = 0x01,
+    LV_CHART_TYPE_COLUMN = 0x02,
+    LV_CHART_TYPE_POINT = 0x04,
+} lv_chart_type_t;
 
 
 /**********************

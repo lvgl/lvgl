@@ -1,6 +1,6 @@
 /**
  * @file lv_sw.h
- * 
+ *
  */
 
 #ifndef LV_SW_H
@@ -17,7 +17,7 @@ extern "C" {
 #if USE_LV_SW != 0
 
 /*Testing of dependencies*/
-#if USE_LV_SW == 0
+#if USE_LV_SLIDER == 0
 #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (USE_LV_SLIDER  1)"
 #endif
 
@@ -39,14 +39,14 @@ typedef struct
     lv_style_t *style_knob_off;       /*Style of the knob when the switch is OFF*/
     lv_style_t *style_knob_on;       /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
     uint8_t changed   :1;           /*Indicates the switch explicitly changed by drag*/
-}lv_sw_ext_t;
+} lv_sw_ext_t;
 
 typedef enum {
     LV_SW_STYLE_BG,
     LV_SW_STYLE_INDIC,
     LV_SW_STYLE_KNOB_OFF,
     LV_SW_STYLE_KNOB_ON,
-}lv_sw_style_t;
+} lv_sw_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

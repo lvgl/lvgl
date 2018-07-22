@@ -34,7 +34,7 @@ typedef struct
     uint32_t used_cnt;
     uint8_t used_pct;
     uint8_t frag_pct;
-}lv_mem_monitor_t;
+} lv_mem_monitor_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -93,7 +93,9 @@ uint32_t lv_mem_get_size(const void * data);
  */
 static inline  void lv_mem_assert(void *p)
 {
-    if(p == NULL) {while(1);}
+    if(p == NULL) {
+        while(1);
+    }
 }
 
 

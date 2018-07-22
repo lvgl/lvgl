@@ -1,6 +1,6 @@
 /**
  * @file lv_page.h
- * 
+ *
  */
 
 #ifndef LV_PAGE_H
@@ -39,7 +39,7 @@ typedef enum
     LV_SB_MODE_ON,     /*Always show scrollbars*/
     LV_SB_MODE_DRAG,   /*Show scrollbars when page is being dragged*/
     LV_SB_MODE_AUTO,   /*Show scrollbars when the scrollable container is large enough to be scrolled*/
-}lv_sb_mode_t;
+} lv_sb_mode_t;
 
 /*Data of page*/
 typedef struct
@@ -56,14 +56,14 @@ typedef struct
         uint8_t hor_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
         uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
         uint8_t mode     :3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
-    }sb;
-}lv_page_ext_t;
+    } sb;
+} lv_page_ext_t;
 
 typedef enum {
     LV_PAGE_STYLE_BG,
     LV_PAGE_STYLE_SCRL,
     LV_PAGE_STYLE_SB,
-}lv_page_style_t;
+} lv_page_style_t;
 
 
 /**********************
@@ -160,7 +160,7 @@ static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
  * @param page pointer to a page object
  * @param type which style should be set
  * @param style pointer to a style
- *  */
+ */
 void lv_page_set_style(lv_obj_t *page, lv_page_style_t type, lv_style_t *style);
 
 /*=====================
@@ -229,7 +229,7 @@ static inline bool lv_page_get_scrl_fit_ver(lv_obj_t * page)
  * @param page pointer to page object
  * @param type which style should be get
  * @return style pointer to a style
- *  */
+ */
 lv_style_t * lv_page_get_style(lv_obj_t *page, lv_page_style_t type);
 
 /*=====================

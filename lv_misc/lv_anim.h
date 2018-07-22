@@ -37,21 +37,21 @@ typedef void (*lv_anim_cb_t)(void *);
 
 typedef struct _lv_anim_t
 {
-	void * var;						/*Variable to animate*/
-	lv_anim_fp_t fp;	            /*Animator function*/
-	lv_anim_cb_t end_cb;		    /*Call it when the animation is ready*/
-	lv_anim_path_t path;			/*An array with the steps of animations*/
-	int32_t start;					/*Start value*/
-	int32_t end;					/*End value*/
-	int16_t time;					/*Animation time in ms*/
-	int16_t act_time;				/*Current time in animation. Set to negative to make delay.*/
-	uint16_t playback_pause;		/*Wait before play back*/
-	uint16_t repeat_pause;			/*Wait before repeat*/
-	uint8_t playback :1;			/*When the animation is ready play it back*/
-	uint8_t repeat :1;				/*Repeat the animation infinitely*/
-	/*Animation system use these - user shouldn't set*/
-	uint8_t playback_now :1;		/*Play back is in progress*/
-}lv_anim_t;
+    void * var;                     /*Variable to animate*/
+    lv_anim_fp_t fp;                /*Animator function*/
+    lv_anim_cb_t end_cb;            /*Call it when the animation is ready*/
+    lv_anim_path_t path;            /*An array with the steps of animations*/
+    int32_t start;                  /*Start value*/
+    int32_t end;                    /*End value*/
+    uint16_t time;                  /*Animation time in ms*/
+    int16_t act_time;               /*Current time in animation. Set to negative to make delay.*/
+    uint16_t playback_pause;        /*Wait before play back*/
+    uint16_t repeat_pause;          /*Wait before repeat*/
+    uint8_t playback :1;            /*When the animation is ready play it back*/
+    uint8_t repeat :1;              /*Repeat the animation infinitely*/
+    /*Animation system use these - user shouldn't set*/
+    uint8_t playback_now :1;        /*Play back is in progress*/
+} lv_anim_t;
 
 /*Example initialization
 lv_anim_t a;
@@ -119,7 +119,7 @@ int32_t lv_anim_path_step(const lv_anim_t *a);
  *      MACROS
  **********************/
 
-#endif /*LV_NO_ANIM == 0*/
+#endif /*USE_LV_ANIMATION == 0*/
 
 #ifdef __cplusplus
 } /* extern "C" */

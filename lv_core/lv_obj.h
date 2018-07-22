@@ -1,6 +1,6 @@
 /**
  * @file lv_obj.h
- * 
+ *
  */
 
 #ifndef LV_OBJ_H
@@ -28,29 +28,31 @@ extern "C" {
 
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES == 0 || LV_VER_RES == 0
-#error "LV: LV_HOR_RES and LV_VER_RES must be greater then 0"
+#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater then 0"
 #endif
 
-#if LV_ANTIALIAS != 0 && LV_ANTIALIAS != 1
-#error "LV: LV_ATIALIAS can be only 0 or 1"
+#if LV_ANTIALIAS > 1
+#error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
 
 #if LV_VDB_SIZE == 0 && LV_ANTIALIAS != 0
-#error "LV: If LV_VDB_SIZE == 0 the antialaissing must be disabled"
+#error "LittlevGL: If LV_VDB_SIZE == 0 the anti-aliasing must be disabled"
 #endif
 
-#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < LV_HOR_RES && LV_ANTIALIAS == 0
-#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
+#if LV_VDB_SIZE > 0 && LV_VDB_SIZE < LV_HOR_RES
+#error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
 #endif
 
-#if LV_VDB_SIZE != 0 && LV_VDB_SIZE < 2 *LV_HOR_RES && LV_ANTIALIAS != 0
-#error "LV: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= (2 * LV_HOR_RES))"
+#if LV_VDB_SIZE == 0 && USE_LV_REAL_DRAW == 0
+#error "LittlevGL: If LV_VDB_SIZE = 0 Real drawing function are required (lv_conf.h: USE_LV_REAL_DRAW 1)"
 #endif
 
-#define LV_ANIM_IN			    0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_DIR_MASK		0x80	/*ANIM_IN/ANIM_OUT mask*/
 
+#define LV_ANIM_IN              0x00    /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
+#define LV_ANIM_OUT             0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
+#define LV_ANIM_DIR_MASK        0x80    /*ANIM_IN/ANIM_OUT mask*/
+
+#define LV_MAX_ANCESTOR_NUM     8
 /**********************
  *      TYPEDEFS
  **********************/
@@ -62,7 +64,7 @@ typedef enum
     LV_DESIGN_DRAW_MAIN,
     LV_DESIGN_DRAW_POST,
     LV_DESIGN_COVER_CHK,
-}lv_design_mode_t;
+} lv_design_mode_t;
 
 typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 
@@ -70,18 +72,19 @@ typedef enum
 {
     LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
     LV_RES_OK,           /*The object is valid (no deleted) after the action*/
-}lv_res_t;
+} lv_res_t;
 
 typedef enum
 {
     /*General signals*/
-	LV_SIGNAL_CLEANUP,
+    LV_SIGNAL_CLEANUP,
     LV_SIGNAL_CHILD_CHG,
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_STYLE_CHG,
-	LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_GET_TYPE,
 
-	/*Input device related*/
+    /*Input device related*/
     LV_SIGNAL_PRESSED,
     LV_SIGNAL_PRESSING,
     LV_SIGNAL_PRESS_LOST,
@@ -91,11 +94,11 @@ typedef enum
     LV_SIGNAL_DRAG_BEGIN,
     LV_SIGNAL_DRAG_END,
 
-	/*Group related*/
+    /*Group related*/
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
     LV_SIGNAL_CONTROLL,
-}lv_signal_t;
+} lv_signal_t;
 
 typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
@@ -103,12 +106,12 @@ typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par;    /*Pointer to the parent object*/
     lv_ll_t child_ll;          /*Linked list to store the children objects*/
-    
+
     lv_area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 
     lv_signal_func_t signal_func;     /*Object type specific signal function*/
     lv_design_func_t design_func;     /*Object type specific design function*/
-    
+
     void * ext_attr;                 /*Object type specific extended data*/
     lv_style_t * style_p;       /*Pointer to the object's style*/
 
@@ -116,8 +119,9 @@ typedef struct _lv_obj_t
     void * free_ptr;              /*Application specific pointer (set it freely)*/
 #endif
 
-    void * group_p;             /*Pointer to the group of the object*/
-
+#if USE_LV_GROUP != 0
+    void * group_p;                 /*Pointer to the group of the object*/
+#endif
     /*Attributes and states*/
     uint8_t click     :1;    /*1: Can be pressed by an input device*/
     uint8_t drag      :1;    /*1: Enable the dragging*/
@@ -129,12 +133,12 @@ typedef struct _lv_obj_t
 
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
 
-    lv_coord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+    lv_coord_t ext_size;            /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
-    LV_OBJ_FREE_NUM_TYPE free_num; 		    /*Application specific identifier (set it freely)*/
+    LV_OBJ_FREE_NUM_TYPE free_num;          /*Application specific identifier (set it freely)*/
 #endif
-}lv_obj_t;
+} lv_obj_t;
 
 typedef lv_res_t (*lv_action_t) (struct _lv_obj_t * obj);
 
@@ -146,7 +150,14 @@ typedef enum
     LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
     LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_cont layout)*/
     LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
-}lv_protect_t;
+    LV_PROTECT_PRESS_LOST= 0x10, /*TODO */
+} lv_protect_t;
+
+
+/*Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
+typedef struct {
+    const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
+} lv_obj_type_t;
 
 typedef enum
 {
@@ -171,18 +182,18 @@ typedef enum
     LV_ALIGN_OUT_RIGHT_TOP,
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
-}lv_align_t;
+} lv_align_t;
 
 typedef enum
 {
-	LV_ANIM_NONE = 0,
-	LV_ANIM_FLOAT_TOP, 		/*Float from/to the top*/
-	LV_ANIM_FLOAT_LEFT,		/*Float from/to the left*/
-	LV_ANIM_FLOAT_BOTTOM,	/*Float from/to the bottom*/
-	LV_ANIM_FLOAT_RIGHT,	/*Float from/to the right*/
-	LV_ANIM_GROW_H,			/*Grow/shrink  horizontally*/
-	LV_ANIM_GROW_V,			/*Grow/shrink  vertically*/
-}lv_anim_builtin_t;
+    LV_ANIM_NONE = 0,
+    LV_ANIM_FLOAT_TOP,      /*Float from/to the top*/
+    LV_ANIM_FLOAT_LEFT,     /*Float from/to the left*/
+    LV_ANIM_FLOAT_BOTTOM,   /*Float from/to the bottom*/
+    LV_ANIM_FLOAT_RIGHT,    /*Float from/to the right*/
+    LV_ANIM_GROW_H,         /*Grow/shrink  horizontally*/
+    LV_ANIM_GROW_V,         /*Grow/shrink  vertically*/
+} lv_anim_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -224,7 +235,6 @@ void lv_obj_clean(lv_obj_t *obj);
  * @param obj pointer to an object
  */
 void lv_obj_invalidate(lv_obj_t * obj);
-
 
 /*=====================
  * Setter functions
@@ -419,7 +429,7 @@ void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp);
  * Allocate a new ext. data for an object
  * @param obj pointer to an object
  * @param ext_size the size of the new ext. data
- * @return Normal pointer to the allocated ext
+ * @return pointer to the allocated ext
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 
@@ -674,6 +684,14 @@ lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
  *         Use it as ext->data1, and NOT da(ext)->data1
  */
 void * lv_obj_get_ext_attr(lv_obj_t * obj);
+
+/**
+ * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
+ * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
+ * @param obj pointer to an object which type should be get
+ * @param buf pointer to an `lv_obj_type_t` buffer to store the types
+ */
+void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
 /**

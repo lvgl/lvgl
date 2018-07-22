@@ -22,7 +22,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
+#ifndef LV_ATTRIBUTE_TASK_HANDLER
+#define LV_ATTRIBUTE_TASK_HANDLER
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -38,7 +40,7 @@ typedef enum
     LV_TASK_PRIO_HIGH,
     LV_TASK_PRIO_HIGHEST,
     LV_TASK_PRIO_NUM,
-}lv_task_prio_t;
+} lv_task_prio_t;
 
 /**
  * Descriptor of a lv_task
@@ -51,7 +53,7 @@ typedef struct
     void * param;
     uint8_t prio:3;
     uint8_t once:1;
-}lv_task_t;
+} lv_task_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -65,7 +67,7 @@ void lv_task_init(void);
 /**
  * Call it  periodically to handle lv_tasks.
  */
-void lv_task_handler(void);
+LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
 
 /**
  * Create a new lv_task
@@ -137,4 +139,4 @@ uint8_t lv_task_get_idle(void);
 } /* extern "C" */
 #endif
 
-#endif 
+#endif

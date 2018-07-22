@@ -1,6 +1,6 @@
 /**
  * @file lv_ta.h
- * 
+ *
  */
 
 #ifndef LV_TA_H
@@ -40,12 +40,12 @@ extern "C" {
 
 typedef enum {
     LV_CURSOR_NONE,
-	LV_CURSOR_LINE,
-	LV_CURSOR_BLOCK,
-	LV_CURSOR_OUTLINE,
-	LV_CURSOR_UNDERLINE,
+    LV_CURSOR_LINE,
+    LV_CURSOR_BLOCK,
+    LV_CURSOR_OUTLINE,
+    LV_CURSOR_UNDERLINE,
     LV_CURSOR_HIDDEN = 0x10,    /*Or it to any value to hide the cursor temporally*/
-}lv_cursor_type_t;
+} lv_cursor_type_t;
 
 /*Data of text area*/
 typedef struct
@@ -62,14 +62,14 @@ typedef struct
         uint16_t pos;           /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
         lv_cursor_type_t type;  /*Shape of the cursor*/
         uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/
-    }cursor;
-}lv_ta_ext_t;
+    } cursor;
+} lv_ta_ext_t;
 
 typedef enum {
     LV_TA_STYLE_BG,
     LV_TA_STYLE_SB,
     LV_TA_STYLE_CURSOR,
-}lv_ta_style_t;
+} lv_ta_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
