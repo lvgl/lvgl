@@ -54,7 +54,7 @@ char * lv_math_num_to_str(int32_t num, char * buf)
     uint32_t output = 0;
     int8_t i;
 
-    for(i = 31; i >= 0; i--){
+    for(i = 31; i >= 0; i--) {
         if((output & 0xF) >= 5)
             output += 3;
         if(((output & 0xF0) >> 4) >= 5)

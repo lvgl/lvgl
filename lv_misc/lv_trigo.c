@@ -24,8 +24,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static int16_t sin0_90_table[] =
-{
+static int16_t sin0_90_table[] = {
     0,     572,    1144,   1715,   2286,   2856,   3425,   3993,   4560,   5126,
     5690,  6252,   6813,   7371,   7927,   8481,   9032,   9580,   10126,  10668,
     11207, 11743,  12275,  12803,  13328,  13848,  14364,  14876,  15383,  15886,
@@ -58,14 +57,12 @@ int16_t lv_trigo_sin(int16_t angle)
 
     if(angle < 0) angle = 360 + angle;
 
-    if(angle < 90){
+    if(angle < 90) {
         ret = sin0_90_table[angle];
-    } else if(angle >= 90 && angle < 180)
-    {
+    } else if(angle >= 90 && angle < 180) {
         angle = 179 - angle;
         ret = sin0_90_table[angle];
-    } else if(angle >= 180 && angle < 270)
-    {
+    } else if(angle >= 180 && angle < 270) {
         angle = angle - 180;
         ret = - sin0_90_table[angle];
     } else { /*angle >=270*/

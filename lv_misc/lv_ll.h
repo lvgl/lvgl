@@ -35,7 +35,7 @@ typedef struct
     uint32_t n_size;
     lv_ll_node_t* head;
     lv_ll_node_t* tail;
-}lv_ll_t;
+} lv_ll_t;
 
 /**********************
  * GLOBAL PROTOTYPES

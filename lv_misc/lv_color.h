@@ -1,6 +1,6 @@
 /**
  * @file lv_color.h
- * 
+ *
  */
 
 #ifndef LV_COLOR_H
@@ -64,7 +64,7 @@ typedef union
     uint8_t green :1;
     uint8_t red   :1;
     uint8_t full  :1;
-}lv_color1_t;
+} lv_color1_t;
 
 typedef union
 {
@@ -75,7 +75,7 @@ typedef union
         uint8_t red   :3;
     };
     uint8_t full;
-}lv_color8_t;
+} lv_color8_t;
 
 typedef union
 {
@@ -86,7 +86,7 @@ typedef union
         uint16_t red   :5;
     };
     uint16_t full;
-}lv_color16_t;
+} lv_color16_t;
 
 typedef union
 {
@@ -98,7 +98,7 @@ typedef union
         uint8_t alpha;
     };
     uint32_t full;
-}lv_color24_t;
+} lv_color24_t;
 
 #if LV_COLOR_DEPTH == 1
 typedef uint8_t lv_color_int_t;
@@ -130,14 +130,14 @@ typedef struct
  **********************/
 
 /*In color conversations:
- * - When converting to bigger color type the LSB weight of 1 LSB is calculated 
+ * - When converting to bigger color type the LSB weight of 1 LSB is calculated
  *   E.g. 16 bit Red has 5 bits
  *         8 bit Red has 2 bits
  *        ----------------------
  *        8 bit red LSB = (2^5 - 1) / (2^2 - 1) = 31 / 3 = 10
- * 
+ *
  * - When calculating to smaller color type simply shift out the LSBs
- *   E.g.  8 bit Red has 2 bits 
+ *   E.g.  8 bit Red has 2 bits
  *        16 bit Red has 5 bits
  *        ----------------------
  *         Shift right with 5 - 3 = 2
@@ -146,30 +146,30 @@ typedef struct
 static inline uint8_t lv_color_to1(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
-	return color.full;
+    return color.full;
 #elif LV_COLOR_DEPTH == 8
     if((color.red   & 0x4) ||
-       (color.green & 0x4) ||
-	   (color.blue  & 0x2)) {
-    	return 1;
+            (color.green & 0x4) ||
+            (color.blue  & 0x2)) {
+        return 1;
     } else {
-    	return 0;
+        return 0;
     }
 #elif LV_COLOR_DEPTH == 16
     if((color.red   & 0x10) ||
-       (color.green & 0x20) ||
-	   (color.blue  & 0x10)) {
-    	return 1;
+            (color.green & 0x20) ||
+            (color.blue  & 0x10)) {
+        return 1;
     } else {
-    	return 0;
+        return 0;
     }
 #elif LV_COLOR_DEPTH == 24
     if((color.red   & 0x80) ||
-       (color.green & 0x80) ||
-	   (color.blue  & 0x80)) {
-    	return 1;
+            (color.green & 0x80) ||
+            (color.blue  & 0x80)) {
+        return 1;
     } else {
-    	return 0;
+        return 0;
     }
 #endif
 }
@@ -264,7 +264,7 @@ static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
  * @param color a color
  * @return the brightness [0..255]
  */
-static inline uint8_t lv_color_brightness(lv_color_t color) 
+static inline uint8_t lv_color_brightness(lv_color_t color)
 {
     lv_color24_t c24;
     c24.full = lv_color_to24(color);

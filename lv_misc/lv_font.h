@@ -1,6 +1,6 @@
 /**
  * @file lv_font.h
- * 
+ *
  */
 
 #ifndef LV_FONT_H
@@ -33,13 +33,13 @@ typedef struct
 {
     uint32_t w_px         :8;
     uint32_t glyph_index  :24;
-}lv_font_glyph_dsc_t;
+} lv_font_glyph_dsc_t;
 
 typedef struct
 {
     uint32_t unicode         :21;
     uint32_t glyph_dsc_index :11;
-}lv_font_unicode_map_t;
+} lv_font_unicode_map_t;
 
 typedef struct _lv_font_struct
 {
@@ -49,11 +49,11 @@ typedef struct _lv_font_struct
     const uint8_t * glyph_bitmap;
     const lv_font_glyph_dsc_t * glyph_dsc;
     const uint32_t * unicode_list;
-    const uint8_t * (*get_bitmap)(const struct _lv_font_struct * ,uint32_t);    /*Get a glyph's  bitmap from a font*/
-    int16_t (*get_width)(const struct _lv_font_struct * ,uint32_t);       /*Get a glyph's with with a given font*/
+    const uint8_t * (*get_bitmap)(const struct _lv_font_struct *,uint32_t);     /*Get a glyph's  bitmap from a font*/
+    int16_t (*get_width)(const struct _lv_font_struct *,uint32_t);        /*Get a glyph's with with a given font*/
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
     uint32_t bpp   :4;                     /*Bit per pixel: 1, 2 or 4*/
-}lv_font_t;
+} lv_font_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -141,9 +141,9 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
  **********************/
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
-/******************************
- *  FONT DECLARATION INCLUDES
- *****************************/
+/**********************
+ *  FONT DECLARATION
+ **********************/
 
 /*10 px */
 #if USE_LV_FONT_DEJAVU_10
@@ -211,6 +211,11 @@ LV_FONT_DECLARE(lv_font_dejavu_40_cyrillic);
 
 #if USE_LV_FONT_SYMBOL_40
 LV_FONT_DECLARE(lv_font_symbol_40);
+#endif
+
+/*Declare the custom (user defined) fonts*/
+#ifdef LV_FONT_CUSTOM_DECLARE
+LV_FONT_CUSTOM_DECLARE
 #endif
 
 #ifdef __cplusplus

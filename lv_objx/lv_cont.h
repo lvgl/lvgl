@@ -1,6 +1,6 @@
 /**
  * @file lv_cont.h
- * 
+ *
  */
 
 #ifndef LV_CONT_H
@@ -29,17 +29,17 @@ extern "C" {
 /*Layout options*/
 typedef enum
 {
-	LV_LAYOUT_OFF = 0,
-	LV_LAYOUT_CENTER,
-	LV_LAYOUT_COL_L,	/*Column left align*/
-	LV_LAYOUT_COL_M,	/*Column middle align*/
-	LV_LAYOUT_COL_R,	/*Column right align*/
-	LV_LAYOUT_ROW_T,	/*Row top align*/
-	LV_LAYOUT_ROW_M,	/*Row middle align*/
-	LV_LAYOUT_ROW_B,	/*Row bottom align*/
-	LV_LAYOUT_PRETTY,	/*Put as many object as possible in row and begin a new row*/
-	LV_LAYOUT_GRID,	    /*Align same-sized object into a grid*/
-}lv_layout_t;
+    LV_LAYOUT_OFF = 0,
+    LV_LAYOUT_CENTER,
+    LV_LAYOUT_COL_L,    /*Column left align*/
+    LV_LAYOUT_COL_M,    /*Column middle align*/
+    LV_LAYOUT_COL_R,    /*Column right align*/
+    LV_LAYOUT_ROW_T,    /*Row top align*/
+    LV_LAYOUT_ROW_M,    /*Row middle align*/
+    LV_LAYOUT_ROW_B,    /*Row bottom align*/
+    LV_LAYOUT_PRETTY,   /*Put as many object as possible in row and begin a new row*/
+    LV_LAYOUT_GRID,     /*Align same-sized object into a grid*/
+} lv_layout_t;
 
 typedef struct
 {
@@ -47,8 +47,9 @@ typedef struct
     /*New data for this type */
     uint8_t layout  :4;     /*A layout from 'lv_cont_layout_t' enum*/
     uint8_t hor_fit :1;     /*1: Enable horizontal fit to involve all children*/
-    uint8_t ver_fit :1;     /*1: Enable horizontal fir to involve all children*/
+    uint8_t ver_fit :1;     /*1: Enable horizontal fit to involve all children*/
 }lv_cont_ext_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES

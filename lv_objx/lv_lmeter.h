@@ -1,6 +1,6 @@
 /**
  * @file lv_lmeter.h
- * 
+ *
  */
 
 #ifndef LV_LMETER_H
@@ -35,7 +35,7 @@ typedef struct
     int16_t cur_value;
     int16_t min_value;
     int16_t max_value;
-}lv_lmeter_ext_t;
+} lv_lmeter_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES

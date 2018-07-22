@@ -34,31 +34,31 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt);
 static lv_signal_func_t ancestor_signal;
 
 static const char * kb_map_lc[] = {
-"\2051#", "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207Del", "\n",
-"\226ABC", "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207Enter", "\n",
-"_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
-"\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
+    "\2051#", "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207Del", "\n",
+    "\226ABC", "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207Enter", "\n",
+    "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
+    "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_uc[] = {
-"\2051#", "\204Q", "\204W", "\204E", "\204R", "\204T", "\204Y", "\204U", "\204I", "\204O", "\204P", "\207Del", "\n",
-"\226abc", "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\207Enter", "\n",
-"_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
-"\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
+    "\2051#", "\204Q", "\204W", "\204E", "\204R", "\204T", "\204Y", "\204U", "\204I", "\204O", "\204P", "\207Del", "\n",
+    "\226abc", "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\207Enter", "\n",
+    "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
+    "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_spec[] = {
-"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\202Del", "\n",
-"\222abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
-"\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
-"\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\202Del", "\n",
+    "\222abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+    "\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
+    "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
 };
 
 static const char * kb_map_num[] = {
-"1", "2", "3", "\202"SYMBOL_CLOSE,"\n",
-"4", "5", "6", "\202"SYMBOL_OK, "\n",
-"7", "8", "9", "\202Del", "\n",
-"+/-", "0", ".", SYMBOL_LEFT, SYMBOL_RIGHT, ""
+    "1", "2", "3", "\202"SYMBOL_CLOSE, "\n",
+    "4", "5", "6", "\202"SYMBOL_OK, "\n",
+    "7", "8", "9", "\202Del", "\n",
+    "+/-", "0", ".", SYMBOL_LEFT, SYMBOL_RIGHT, ""
 };
 /**********************
  *      MACROS
@@ -104,7 +104,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
         lv_btnm_set_map(new_kb, kb_map_lc);
 
         /*Set the default styles*/
-        lv_theme_t *th = lv_theme_get_current();
+        lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_kb_set_style(new_kb, LV_KB_STYLE_BG, th->kb.bg);
             lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_REL, th->kb.btn.rel);
@@ -118,7 +118,8 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing keyboard*/
     else {
-    	lv_kb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);ext->ta = NULL;
+        lv_kb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        ext->ta = NULL;
         ext->ta = copy_ext->ta;
         ext->mode = copy_ext->mode;
         ext->cursor_mng = copy_ext->cursor_mng;
@@ -187,15 +188,15 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     if(ext->cursor_mng == en) return;
 
-    ext->cursor_mng = en == false? 0 : 1;
+    ext->cursor_mng = en == false ? 0 : 1;
 
     if(ext->ta) {
         lv_cursor_type_t cur_type;
         cur_type = lv_ta_get_cursor_type(ext->ta);
 
-        if(ext->cursor_mng){
+        if(ext->cursor_mng) {
             lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
-        }else{
+        } else {
             lv_ta_set_cursor_type(ext->ta,  cur_type | LV_CURSOR_HIDDEN);
         }
     }
@@ -229,9 +230,9 @@ void lv_kb_set_hide_action(lv_obj_t * kb, lv_action_t action)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_kb_set_style(lv_obj_t *kb, lv_kb_style_t type, lv_style_t *style)
+void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, lv_style_t * style)
 {
-    switch (type) {
+    switch(type) {
         case LV_KB_STYLE_BG:
             lv_btnm_set_style(kb, LV_BTNM_STYLE_BG, style);
             break;
@@ -319,16 +320,23 @@ lv_action_t lv_kb_get_hide_action(lv_obj_t * kb)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_kb_get_style(lv_obj_t *kb, lv_kb_style_t type)
+lv_style_t * lv_kb_get_style(lv_obj_t * kb, lv_kb_style_t type)
 {
-    switch (type) {
-        case LV_KB_STYLE_BG:          return lv_btnm_get_style(kb, LV_BTNM_STYLE_BG);
-        case LV_KB_STYLE_BTN_REL:     return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_REL);
-        case LV_KB_STYLE_BTN_PR:      return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_PR);
-        case LV_KB_STYLE_BTN_TGL_REL: return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL);
-        case LV_KB_STYLE_BTN_TGL_PR:  return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_PR);
-        case LV_KB_STYLE_BTN_INA:     return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_INA);
-        default: return NULL;
+    switch(type) {
+        case LV_KB_STYLE_BG:
+            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BG);
+        case LV_KB_STYLE_BTN_REL:
+            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_REL);
+        case LV_KB_STYLE_BTN_PR:
+            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_PR);
+        case LV_KB_STYLE_BTN_TGL_REL:
+            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL);
+        case LV_KB_STYLE_BTN_TGL_PR:
+            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_PR);
+        case LV_KB_STYLE_BTN_INA:
+            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_INA);
+        default:
+            return NULL;
     }
 
     /*To avoid warning*/
@@ -356,8 +364,7 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
@@ -383,16 +390,13 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
     if(strcmp(txt, "abc") == 0) {
         lv_btnm_set_map(kb, kb_map_lc);
         return LV_RES_OK;
-    }
-    else if(strcmp(txt, "ABC") == 0) {
+    } else if(strcmp(txt, "ABC") == 0) {
         lv_btnm_set_map(kb, kb_map_uc);
         return LV_RES_OK;
-    }
-    else if(strcmp(txt, "1#") == 0) {
+    } else if(strcmp(txt, "1#") == 0) {
         lv_btnm_set_map(kb, kb_map_spec);
         return LV_RES_OK;
-    }
-    else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
+    } else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
         if(ext->hide_action) ext->hide_action(kb);
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area  to hide it cursor if needed*/

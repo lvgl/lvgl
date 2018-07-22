@@ -90,7 +90,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
 
         /*Set the default styles*/
-        lv_theme_t *th = lv_theme_get_current();
+        lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_gauge_set_style(new_gauge, th->gauge);
         } else {
@@ -99,7 +99,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     }
     /*Copy an existing gauge*/
     else {
-    	lv_gauge_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        lv_gauge_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_gauge_set_needle_count(new_gauge, copy_ext->needle_count, copy_ext->needle_colors);
 
         uint8_t i;
@@ -129,20 +129,20 @@ void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_co
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
 
     if(ext->needle_count != needle_cnt) {
-		if(ext->values != NULL) {
-			lv_mem_free(ext->values);
-			ext->values = NULL;
-		}
+        if(ext->values != NULL) {
+            lv_mem_free(ext->values);
+            ext->values = NULL;
+        }
 
-		ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(int16_t));
+        ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(int16_t));
 
-		int16_t min = lv_gauge_get_min_value(gauge);
-		uint8_t n;
-		for(n = ext->needle_count; n < needle_cnt; n++) {
-			ext->values[n] = min;
-		}
+        int16_t min = lv_gauge_get_min_value(gauge);
+        uint8_t n;
+        for(n = ext->needle_count; n < needle_cnt; n++) {
+            ext->values[n] = min;
+        }
 
-		ext->needle_count = needle_cnt;
+        ext->needle_count = needle_cnt;
     }
 
     ext->needle_colors = colors;
@@ -253,7 +253,7 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
 
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-    	return false;
+        return false;
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -261,9 +261,9 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
         /* Store the real pointer because of 'lv_group'
          * If the object is in focus 'lv_obj_get_style()' will give a pointer to tmp style
          * and to the real object style. It is important because of style change tricks below*/
-        lv_style_t *style_ori_p = gauge->style_p;
-        lv_style_t *style = lv_obj_get_style(gauge);
-        lv_gauge_ext_t *ext = lv_obj_get_ext_attr(gauge);
+        lv_style_t * style_ori_p = gauge->style_p;
+        lv_style_t * style = lv_obj_get_style(gauge);
+        lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
 
         lv_gauge_draw_scale(gauge, mask);
 
@@ -314,8 +314,7 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_mem_free(ext->values);
         ext->values = NULL;
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
@@ -358,14 +357,14 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         lv_coord_t x = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r) / LV_TRIGO_SIN_MAX;
         x += x_ofs;
 
-        int16_t scale_act = (int32_t)((int32_t)(max - min) * i) /  (label_num - 1);
+        int16_t scale_act = (int32_t)((int32_t)(max - min) * i) / (label_num - 1);
         scale_act += min;
         lv_math_num_to_str(scale_act, scale_txt);
 
         lv_area_t label_cord;
         lv_point_t label_size;
         lv_txt_get_size(&label_size, scale_txt, style->text.font,
-                style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+                        style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;

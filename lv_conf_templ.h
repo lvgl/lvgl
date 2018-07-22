@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * 
+ *
  */
 
 #if 0 /*Remove this to enable the content (Delete the last #endif too!)*/
@@ -82,9 +82,11 @@
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
 
 /*Compiler settings*/
-#define LV_ATTRIBUTE_TICK_INC                 /* Define a custom attribute to `lv_tick_inc` function */
-#define LV_ATTRIBUTE_TASK_HANDLER             /* Define a custom attribute to `lv_task_handler` function */
-#define LV_COMPILER_VLA_SUPPORTED    1        /* 1: Variable length array is supported*/
+#define LV_ATTRIBUTE_TICK_INC					/* Define a custom attribute to `lv_tick_inc` function */
+#define LV_ATTRIBUTE_TASK_HANDLER				/* Define a custom attribute to `lv_task_handler` function */
+#define LV_COMPILER_VLA_SUPPORTED    0			/* 1: Variable length array is supported. (In Visual studio it is not supported)*/
+#define LV_COMPILER_NON_CONST_INIT_SUPPORTED 0	/* 1: Initialization with non constant values are supported (In Visual studio it is not supported)*/
+//#define _CRT_SECURE_NO_WARNINGS			    /* Visual Studio needs it to use `strcpy`, `sprintf` etc*/
 
 /*================
  *  THEME USAGE
@@ -104,8 +106,6 @@
 /* More info about fonts: https://littlevgl.com/basics#fonts
  * To enable a built-in font use 1,2,4 or 8 values
  * which will determine the bit-per-pixel */
-#define LV_FONT_DEFAULT        &lv_font_dejavu_20     /*Always set a default font from the built-in fonts*/
-
 #define USE_LV_FONT_DEJAVU_10              0
 #define USE_LV_FONT_DEJAVU_10_LATIN_SUP    0
 #define USE_LV_FONT_DEJAVU_10_CYRILLIC     0
@@ -126,6 +126,16 @@
 #define USE_LV_FONT_DEJAVU_40_CYRILLIC     0
 #define USE_LV_FONT_SYMBOL_40              0
 
+/* Optionally declare your custom fonts here.
+ * You can use these fonts as defult font too
+ * and they will be avialale globally. E.g.
+ * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) \
+ *						          LV_FONT_DECLARE(my_font_2) \
+ */
+#define LV_FONT_CUSTOM_DECLARE
+
+#define LV_FONT_DEFAULT        &lv_font_dejavu_20     /*Always set a default font from the built-in fonts*/
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
@@ -133,7 +143,7 @@
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 
 /*==================
- *  LV OBJ X USAGE 
+ *  LV OBJ X USAGE
  *================*/
 /*
  * Documentation of the object types: https://littlevgl.com/object-types

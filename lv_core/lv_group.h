@@ -26,6 +26,7 @@ extern "C" {
 #define LV_GROUP_KEY_RIGHT          19      /*0x13*/
 #define LV_GROUP_KEY_LEFT           20      /*0x14*/
 #define LV_GROUP_KEY_ESC            27      /*0x1B*/
+#define LV_GROUP_KEY_DEL            28      /*0x1C*/
 #define LV_GROUP_KEY_ENTER          10      /*0x0A, '\n'*/
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/
@@ -45,11 +46,11 @@ typedef struct _lv_group_t
 {
     lv_ll_t obj_ll;                         /*Linked list to store the objects in the group */
     lv_obj_t ** obj_focus;                  /*The object in focus*/
-    lv_group_style_mod_func_t style_mod;   /*A function which modifies the style of the focused object*/
+    lv_group_style_mod_func_t style_mod;    /*A function which modifies the style of the focused object*/
     lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
     uint8_t frozen:1;                       /*1: can't focus to new object*/
-}lv_group_t;
+} lv_group_t;
 
 /**********************
  * GLOBAL PROTOTYPES
