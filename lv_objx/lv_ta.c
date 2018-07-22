@@ -175,6 +175,9 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
+
+//    if(ext->one_line && c == '\n') return;		/*Ignore new lines i	n one line mode*/
+
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     char letter_buf[2];
     letter_buf[0] = c;
