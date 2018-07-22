@@ -146,12 +146,12 @@ void lv_style_init(void)
     lv_style_transp.glass = 1;
     lv_style_transp.body.border.width = 0;
 
-    /*Transparent tight style*/
+    /*Transparent fitting size*/
     memcpy(&lv_style_transp_fit, &lv_style_transp, sizeof(lv_style_t));
     lv_style_transp_fit.body.padding.hor = 0;
     lv_style_transp_fit.body.padding.ver = 0;
 
-    /*Transparent fitting size*/
+    /*Transparent tight style*/
     memcpy(&lv_style_transp_tight, &lv_style_transp_fit, sizeof(lv_style_t));
     lv_style_transp_tight.body.padding.inner = 0;
 
