@@ -91,7 +91,6 @@
 /*Log settings*/
 #define USE_LV_LOG		1	/*Enable/disable the log module*/
 #if USE_LV_LOG
-#if USE_LV_LOG
 /* How important log should be added:
  * LV_LOG_LEVEL_TRACE		A lot of logs to give detailed information
  * LV_LOG_LEVEL_INFO		Log important events
