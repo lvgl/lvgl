@@ -261,6 +261,9 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             lv_sw_off(sw);
             if(slider_action) slider_action(sw);
         }
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    	bool * editable = (bool *)param;
+    	*editable = false;			/*The ancestor slider is editable the switch is not*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

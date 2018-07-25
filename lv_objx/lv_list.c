@@ -570,6 +570,9 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             lv_btn_set_state(btn, LV_BTN_STATE_REL);
         }
         last_clicked_btn = NULL;		/*button click will set if comes before focus*/
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    	bool * editable = (bool *)param;
+    	*editable = true;
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {

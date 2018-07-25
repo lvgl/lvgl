@@ -104,6 +104,7 @@ typedef enum
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
     LV_SIGNAL_CONTROLL,
+    LV_SIGNAL_GET_EDITABLE,
 } lv_signal_t;
 
 typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -135,9 +136,9 @@ typedef struct _lv_obj_t
     uint8_t drag_parent   :1;    /*1: Parent will be dragged instead*/
     uint8_t hidden        :1;    /*1: Object is hidden*/
     uint8_t top           :1;    /*1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t opa_scale_en  :1;   /*1: opa_scale is set*/
-    lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
+    uint8_t opa_scale_en  :1;    /*1: opa_scale is set*/
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
+    lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_size;        /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
@@ -397,6 +398,14 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
  * @param en true: enable the 'drag parent' for the object
  */
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
+
+/**
+ * Set editable parameter Used by groups and keyboard/encoder control.
+ * Editable object has something inside to choose (the elements of a list)
+ * @param obj pointer to an object
+ * @param en true: enable editing
+ */
+void lv_obj_set_editable(lv_obj_t * obj, bool en);
 
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)

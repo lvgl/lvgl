@@ -579,6 +579,9 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         if(ext->btns) {
             ext->btns->signal_func(ext->btns, sign, param);
         }
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    	bool * editable = (bool *)param;
+    	*editable = true;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

@@ -462,6 +462,9 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
             if(ext->action != NULL) ext->action(slider);
         }
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    	bool * editable = (bool *)param;
+    	*editable = true;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

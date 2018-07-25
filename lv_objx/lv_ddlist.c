@@ -574,6 +574,9 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 lv_ddlist_refr_size(ddlist, true);
             }
         }
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    	bool * editable = (bool *)param;
+    	*editable = true;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

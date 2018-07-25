@@ -236,6 +236,10 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     /*Insert the text*/
+
+
+
+
     lv_label_ins_text(ext->label, ext->cursor.pos, txt);
 
     if(ext->pwd_mode != 0) {
@@ -983,6 +987,9 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
 
 #endif
         }
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    	bool * editable = (bool *)param;
+    	*editable = true;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

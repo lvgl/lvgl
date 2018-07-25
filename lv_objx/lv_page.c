@@ -271,7 +271,7 @@ lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page)
  * @param page pointer to a page object
  * @return true: scrolling with arrows is enabled
  */
-bool lv_page_get_arrow_scroll(lv_obj_t * page, bool en)
+bool lv_page_get_arrow_scroll(lv_obj_t * page)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->arrow_scroll ? true : false;
@@ -612,6 +612,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             lv_obj_set_y(scrl, lv_obj_get_y(scrl) + lv_obj_get_height(page) / 4);
 #endif
         }
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    	bool * editable = (bool *)param;
+    	*editable = lv_page_get_arrow_scroll(page);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

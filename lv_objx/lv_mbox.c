@@ -387,9 +387,13 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         mbox_realign(mbox);
 
-    } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS ||
+    		  sign == LV_SIGNAL_CONTROLL || sign == LV_SIGNAL_GET_EDITABLE) {
         if(ext->btnm) {
-            ext->btnm->signal_func(ext->btnm, sign, param);
+
+
+
+        	ext->btnm->signal_func(ext->btnm, sign, param);
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;

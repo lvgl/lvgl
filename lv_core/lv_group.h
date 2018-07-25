@@ -150,7 +150,7 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
  * @param group pointer to group
  * @param en true or false to enable or disable this feature.
  */
-void lv_group_set_edit_enable(lv_group_t * group, bool en);
+void lv_group_enable_edit(lv_group_t * group, bool en);
 
 /**
  * Manually set the current mode (edit or navigate).
@@ -202,6 +202,13 @@ lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group);
  * @return the call back function or NULL if not set
  */
 lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group);
+
+/**
+ * Get the edit mode is enabled or not.
+ * @param group pointer to group
+ * @return true editing is enabled
+ */
+bool lv_group_get_edit_enable(lv_group_t * group, bool en);
 
 /**
  * Get the current mode (edit or navigate).

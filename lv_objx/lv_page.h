@@ -199,7 +199,7 @@ lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
  * @param page pointer to a page object
  * @return true: scrolling with arrows is enabled
  */
-bool lv_page_get_arrow_scroll(lv_obj_t * page, bool en);
+bool lv_page_get_arrow_scroll(lv_obj_t * page);
 
 /**
  * Get width of the scrollable part of a page

@@ -355,10 +355,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
                 i->proc.long_pr_sent == 0 &&
                 lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME )
         {
-            lv_obj_t * focused = lv_group_get_focused(i->group);
-            /*If edit mode is enabled then change between edit and navigate on long press*/
-            if (i->group->edit_mode_en) {
+            /*If edit mode is enabled and the focused obejct is editable then change between edit and navigate on long press*/
+        	lv_obj_t * focused = lv_group_get_focused(i->group);
+        	bool editable = false;
+        	focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
+
+        	if (i->group->edit_mode_en && editable) {
                 i->group->editing = i->group->editing ? 0 : 1;
+                LV_LOG_INFO("Edit mode changed");
                 if(focused) lv_obj_invalidate(focused);
             }
             /*If edit mode is disabled just send a long press signal*/
@@ -373,14 +377,28 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*The user might clear the key it was released. Always release the pressed key*/
         data->key = i->proc.last_key;
 
-        if(data->key == LV_GROUP_KEY_NEXT) {
-            lv_group_focus_next(i->group);
-        } else if(data->key == LV_GROUP_KEY_PREV) {
-            lv_group_focus_prev(i->group);
-        } else if(data->key == LV_GROUP_KEY_ENTER &&
-            (i->group->edit_mode_en && i->group->editing == 0))
+        if((data->key == LV_GROUP_KEY_NEXT) ||
+          ((i->group->edit_mode_en && i->group->editing == 0) &&
+             (data->key == LV_GROUP_KEY_RIGHT || data->key == LV_GROUP_KEY_DOWN)))
         {
-            /*Do nothing. Don't send the ENTER if in navigation mode*/
+            lv_group_focus_next(i->group);
+        }
+        else if((data->key == LV_GROUP_KEY_PREV) ||
+		  ((i->group->edit_mode_en && i->group->editing == 0) &&
+			 (data->key == LV_GROUP_KEY_LEFT || data->key == LV_GROUP_KEY_UP)))
+		{
+			lv_group_focus_prev(i->group);
+		}
+		else if(data->key == LV_GROUP_KEY_ENTER && i->group->edit_mode_en)
+        {
+			lv_obj_t * focused = lv_group_get_focused(i->group);
+			bool editable = false;
+			focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
+        	/* If an ENTER is released  but not long pressed and we are in edit mode or the object is not editable then send the ENTER
+        	 * In navigate mode to editable objects and after releasing the long press  to change mode do not send ENTER*/
+        	if(!i->proc.long_pr_sent && (i->group->editing || !editable)) {
+				lv_group_send_data(i->group, data->key);
+        	}
         } else {
             lv_group_send_data(i->group, data->key);
         }
