@@ -311,6 +311,10 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
      * Now clean up the object specific data*/
     obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
 
+#if LV_OBJ_FREE_PTR != 0
+   if (obj->free_ptr != NULL) lv_mem_free(obj->free_ptr);
+#endif
+
     /*Delete the base objects*/
     if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
     lv_mem_free(obj); /*Free the object itself*/
@@ -1606,6 +1610,10 @@ static void delete_children(lv_obj_t * obj)
 
    /* Clean up the object specific data*/
    obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
+   
+#if LV_OBJ_FREE_PTR != 0
+   if (obj->free_ptr != NULL) lv_mem_free(obj->free_ptr);
+#endif
 
    /*Delete the base objects*/
    if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
