@@ -467,11 +467,17 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
         line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
                                   font, style->text.letter_space, flag);
         x += lv_obj_get_width(label) / 2 - line_w / 2;
+
+    }
+    else if(ext->align == LV_LABEL_ALIGN_RIGHT) {
+    	lv_coord_t line_w;
+    	        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
+    	                                  font, style->text.letter_space, flag);
+    	x += lv_obj_get_width(label) - line_w;
     }
 
     pos->x = x;
     pos->y = y;
-
 }
 
 /**
@@ -657,12 +663,13 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         }
 
         /*TEST: draw a background for the label*/
-//      lv_draw_rect(&label->coords, mask, &lv_style_plain_color);
+      //lv_draw_rect(&label->coords, mask, &lv_style_plain_color, LV_OPA_COVER);
 
         lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
         if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
         if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+        if(ext->align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
     }

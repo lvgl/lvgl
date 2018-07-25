@@ -50,6 +50,7 @@ typedef enum
 typedef enum {
     LV_LABEL_ALIGN_LEFT,
     LV_LABEL_ALIGN_CENTER,
+    LV_LABEL_ALIGN_RIGHT,
 } lv_label_align_t;
 
 /*Data of label*/

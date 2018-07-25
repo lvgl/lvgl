@@ -74,23 +74,21 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     pos.x = coords->x1;
     pos.y = coords->y1;
 
-    /*Align the line to middle if enabled*/
+    /*Align to middle*/
     if(flag & LV_TXT_FLAG_CENTER) {
-        line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
-                                       font, style->text.letter_space, flag);
-        /*Trim closing spaces.*/
-		  uint16_t i;
-		  for(i = line_end - 1; i > 0; i--) {
-			if(txt[i] == ' ' || txt[i] == '\n' || txt[i] == '\r') {
-				line_width -= lv_font_get_width(font, txt[i]);
-				line_width -= style->text.letter_space;
-			} else {
-				break;
-			}
-		  }
+    	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
+    			font, style->text.letter_space, flag);
 
-        pos.x += (w - line_width) / 2;
+    	pos.x += (w - line_width) / 2;
+
     }
+    /*Align to the right*/
+    else if(flag & LV_TXT_FLAG_RIGHT) {
+    	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
+    			font, style->text.letter_space, flag);
+    	pos.x = w - line_width;
+    }
+
 
     lv_opa_t opa = (uint16_t)((uint16_t) style->text.opa * opa_scale) >> 8;
 
@@ -180,19 +178,16 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
                                            font, style->text.letter_space, flag);
 
-            /*Trim closing spaces.*/
-            uint16_t i;
-            for(i = line_end - 1; i > line_start; i--) {
-            	if(txt[i] == ' ' || txt[i] == '\n' || txt[i] == '\r') {
-            		line_width -= lv_font_get_width(font, txt[i]);
-            		line_width -= style->text.letter_space;
-            	} else {
-            		break;
-            	}
-            }
+           pos.x += (w - line_width) / 2;
 
-            pos.x += (w - line_width) / 2;
         }
+        /*Align to the right*/
+        else if(flag & LV_TXT_FLAG_RIGHT) {
+        	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
+        	                                           font, style->text.letter_space, flag);
+        	pos.x = w - line_width;
+        }
+
         /*Go the next line position*/
         pos.y += lv_font_get_height(font);
         pos.y += style->text.line_space;

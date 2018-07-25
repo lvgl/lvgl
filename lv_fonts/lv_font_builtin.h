@@ -114,6 +114,10 @@ LV_FONT_DECLARE(lv_font_dejavu_40_cyrillic);
 LV_FONT_DECLARE(lv_font_symbol_40);
 #endif
 
+#if USE_LV_FONT_MONOSPACE_8
+LV_FONT_DECLARE(lv_font_monospace_8);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
