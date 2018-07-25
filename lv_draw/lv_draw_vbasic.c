@@ -13,6 +13,7 @@
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_font.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_log.h"
 
 #if LV_VDB_SIZE != 0
 
@@ -215,7 +216,12 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                                          204, 221, 238, 255
                                         };
 
-    if(font_p == NULL) return;
+    if(font_p == NULL) {
+#if USE_LV_LOG
+    	lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Font: character's bitmap not found");
+#endif
+		return;
+    }
 
 
     lv_coord_t pos_x = pos_p->x;

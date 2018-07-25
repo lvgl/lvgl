@@ -52,6 +52,11 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Bar create stared");
+#endif
+
     /*Create the ancestor basic object*/
     lv_obj_t * new_bar = lv_obj_create(par, copy);
     lv_mem_assert(new_bar);
@@ -97,6 +102,11 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy)
 
         lv_bar_set_value(new_bar, ext->cur_value);
     }
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Bar create ready");
+#endif
+
     return new_bar;
 }
 

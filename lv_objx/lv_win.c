@@ -46,6 +46,12 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Window create stared");
+#endif
+
+
     /*Create the ancestor object*/
     lv_obj_t * new_win = lv_obj_create(par, copy);
     lv_mem_assert(new_win);
@@ -96,15 +102,12 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->win.content.scrl);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->win.btn.rel);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->win.btn.pr);
-
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_plain);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
-
         }
-
 
         lv_obj_set_signal_func(new_win, lv_win_signal);
         lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
@@ -136,6 +139,12 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
     }
 
     lv_win_realign(new_win);
+
+
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Window create ready");
+#endif
 
     return new_win;
 }

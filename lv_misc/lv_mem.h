@@ -22,6 +22,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+#include "lv_log.h"
 
 /*********************
  *      DEFINES
@@ -93,22 +94,20 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p);
  */
 uint32_t lv_mem_get_size(const void * data);
 
-/**
- * Halt o NULL pointer
- * p pointer to a memory
- */
-static inline  void lv_mem_assert(void *p)
-{
-    if(p == NULL) {
-        while(1);
-    }
-}
-
 
 /**********************
  *      MACROS
  **********************/
 
+/**
+ * Halt on NULL pointer
+ * p pointer to a memory
+ */
+#if USE_LV_LOG == 0
+# define  lv_mem_assert(p) {if(p == NULL) while(1); }
+#else
+# define  lv_mem_assert(p) {if(p == NULL) {lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, "Out of memory!"); while(1); }}
+#endif
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

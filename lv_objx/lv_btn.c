@@ -67,6 +67,11 @@ static lv_point_t ink_point;
  */
 lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
 {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Button create stared");
+#endif
+
     lv_obj_t * new_btn;
 
     new_btn = lv_cont_create(par, copy);
@@ -134,6 +139,11 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_btn);
     }
+
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Button create raedy");
+#endif
 
     return new_btn;
 }

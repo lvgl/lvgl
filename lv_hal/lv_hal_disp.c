@@ -148,7 +148,22 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t col
 void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t * color_p)
 {
     if(active == NULL) return;
-    if(active->driver.disp_flush != NULL) active->driver.disp_flush(x1, y1, x2, y2, color_p);
+    if(active->driver.disp_flush != NULL) {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Disp. flush called");
+#endif
+    	active->driver.disp_flush(x1, y1, x2, y2, color_p);
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Disp. flush finished");
+#endif
+    } else {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Disp. flush: function not set");
+#endif
+    }
 }
 
 /**

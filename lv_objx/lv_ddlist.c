@@ -66,6 +66,11 @@ static lv_design_func_t  ancestor_design;
  */
 lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
 {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Drop down list create stared");
+#endif
+
     /*Create the ancestor drop down list*/
     lv_obj_t * new_ddlist = lv_page_create(par, copy);
     lv_mem_assert(new_ddlist);
@@ -137,6 +142,10 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_ddlist);
     }
+
+    #if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Drop down list create ready");
+#endif
 
     return new_ddlist;
 }

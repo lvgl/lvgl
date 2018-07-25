@@ -27,10 +27,11 @@ extern "C" {
 /*Possible log level. For compatibility declare it independently from `USE_LV_LOG`*/
 typedef enum
 {
-	LV_LOG_LEVEL_INFO = 0,
-	LV_LOG_LEVEL_WARN,
-	LV_LOG_LEVEL_ERROR,
-	LV_LOG_LEVEL_USER,
+	LV_LOG_LEVEL_DEBUG = 0,	/*A lot of logs to show every detail*/
+	LV_LOG_LEVEL_TRACE,		/*Trace the most important calls*/
+	LV_LOG_LEVEL_INFO,		/*Log important events*/
+	LV_LOG_LEVEL_WARN,		/*Log if something unwanted happened but didn't caused problem*/
+	LV_LOG_LEVEL_ERROR,		/*Only critical issue, when the system may fail*/
 	_LV_LOG_LEVEL_NUM
 }lv_log_level_t;
 

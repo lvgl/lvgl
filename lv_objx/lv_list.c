@@ -71,6 +71,11 @@ static lv_obj_t * last_clicked_btn;
  */
 lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "List create stared");
+#endif
+
     /*Create the ancestor basic object*/
     lv_obj_t * new_list = lv_page_create(par, copy);
     lv_mem_assert(new_list);
@@ -137,6 +142,10 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_list);
     }
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "List create ready");
+#endif
 
     return new_list;
 }

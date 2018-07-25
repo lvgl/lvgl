@@ -55,6 +55,11 @@ static lv_design_func_t ancestor_design;
  */
 lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
 {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Preloader create stared");
+#endif
+
     /*Create the ancestor of pre loader*/
     lv_obj_t * new_preload = lv_arc_create(par, copy);
     lv_mem_assert(new_preload);
@@ -103,6 +108,10 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_preload);
     }
+
+    #if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Preloader create ready");
+#endif
 
     return new_preload;
 }

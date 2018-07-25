@@ -8,6 +8,7 @@
  *********************/
 #include <stddef.h>
 #include "lv_font.h"
+#include "lv_log.h"
 
 /*********************
  *      DEFINES
@@ -103,6 +104,9 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
         font_i = font_i->next_page;
     }
 
+#if USE_LV_LOG
+    if(letter >= ' ') lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Font: glyph not found");
+#endif
     return NULL;
 }
 
@@ -128,7 +132,11 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
         font_i = font_i->next_page;
     }
 
+#if USE_LV_LOG
+    if(letter >= ' ') lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Font: character's width not found");
+#endif
     return 0;
+
 }
 
 /**
@@ -148,6 +156,9 @@ uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter)
         font_i = font_i->next_page;
     }
 
+#if USE_LV_LOG
+    if(letter >= ' ') lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Font: character's width not found");
+#endif
     return 0;
 }
 
@@ -167,6 +178,9 @@ uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter)
         font_i = font_i->next_page;
     }
 
+#if USE_LV_LOG
+	if(letter >= ' ') lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Font: character's bpp not found");
+#endif
     return 0;
 
 }

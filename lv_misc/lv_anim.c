@@ -62,6 +62,7 @@ void lv_anim_init(void)
  */
 void lv_anim_create(lv_anim_t * anim_p)
 {
+
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
     if(anim_p->fp != NULL) lv_anim_del(anim_p->var, anim_p->fp);       /*fp == NULL would delete all animations of var*/
 
@@ -80,6 +81,11 @@ void lv_anim_create(lv_anim_t * anim_p)
     /* Creating an animation changed the linked list.
      * It's important if it happens in a ready callback. (see `anim_task`)*/
     anim_list_changed = true;
+
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Animation created");
+#endif
 }
 
 /**

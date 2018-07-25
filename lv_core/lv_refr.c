@@ -167,6 +167,9 @@ void lv_refr_pop_from_buf(uint16_t num)
 static void lv_refr_task(void * param)
 {
     (void)param;
+#if USE_LV_LOG
+    lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "display refresh task started");
+#endif
 
     uint32_t start = lv_tick_get();
 
@@ -186,6 +189,9 @@ static void lv_refr_task(void * param)
             monitor_cb(lv_tick_elaps(start), px_num);
         }
     }
+#if USE_LV_LOG
+    lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "display refresh task finished");
+#endif
 }
 
 

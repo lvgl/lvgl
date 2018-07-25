@@ -159,6 +159,9 @@ void * lv_mem_alloc(uint32_t size)
     }
 #endif
 
+#if USE_LV_LOG
+	if(alloc == NULL) lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Couldn't allocate memory");
+#endif
     return alloc;
 }
 
@@ -241,6 +244,10 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
         }
     }
 
+
+#if USE_LV_LOG
+	if(new_p == NULL) lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Couldn't allocate memory");
+#endif
     return new_p;
 }
 

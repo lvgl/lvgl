@@ -57,6 +57,11 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
 {
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Chart create stared");
+#endif
+
     /*Create the ancestor basic object*/
     lv_obj_t * new_chart = lv_obj_create(par, copy);
     lv_mem_assert(new_chart);
@@ -110,6 +115,11 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_chart);
     }
+
+#if USE_LV_LOG
+	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Chart create ready");
+#endif
+
 
     return new_chart;
 }
