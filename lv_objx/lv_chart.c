@@ -229,7 +229,8 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 
     LL_READ_BACK(ext->series_ll, ser) {
         ser->points = lv_mem_realloc(ser->points, sizeof(lv_coord_t) * point_cnt);
-
+        lv_mem_assert(ser->points);
+        if(ser->points == NULL) return;
         /*Initialize the new points*/
         if(point_cnt > point_cnt_old) {
             for(i = point_cnt_old - 1; i < point_cnt; i++) {

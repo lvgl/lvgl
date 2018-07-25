@@ -190,6 +190,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
         lv_mem_assert(ext->pwd_tmp);
         if(ext->pwd_tmp== NULL) return;
+
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, letter_buf);
 
 #if USE_LV_ANIMATION
@@ -321,6 +322,8 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(txt) + 1);
+        lv_mem_assert(ext->pwd_tmp);
+        if(ext->pwd_tmp == NULL) return;
         strcpy(ext->pwd_tmp, txt);
 
 #if USE_LV_ANIMATION

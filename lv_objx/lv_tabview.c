@@ -223,8 +223,12 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
         name_dm[0] = '\221';
         strcpy(&name_dm[1], name);
     }
+
     ext->tab_cnt++;
     ext->tab_name_ptr = lv_mem_realloc(ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt + 1));
+    lv_mem_assert(ext->tab_name_ptr);
+    if(ext->tab_name_ptr == NULL) return NULL;
+
     ext->tab_name_ptr[ext->tab_cnt - 1] = name_dm;
     ext->tab_name_ptr[ext->tab_cnt] = "";
 

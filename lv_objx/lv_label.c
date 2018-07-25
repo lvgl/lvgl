@@ -112,6 +112,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
         /*In DOT mode save the text byte-to-byte because a '\0' can be in the middle*/
         if(copy_ext->long_mode == LV_LABEL_LONG_DOT) {
             ext->text = lv_mem_realloc(ext->text, lv_mem_get_size(copy_ext->text));
+            lv_mem_assert(ext->text);
+            if(ext->text == NULL) return NULL;
             memcpy(ext->text, copy_ext->text, lv_mem_get_size(copy_ext->text));
         }
 
@@ -148,6 +150,8 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     if(ext->text == text) {
         /*If set its own text then reallocate it (maybe its size changed)*/
         ext->text = lv_mem_realloc(ext->text, strlen(ext->text) + 1);
+        lv_mem_assert(ext->text);
+        if(ext->text == NULL) return;
     } else {
         /*Allocate space for the new text*/
         uint32_t len = strlen(text) + 1;
@@ -591,6 +595,8 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
     uint32_t ins_len = strlen(txt);
     uint32_t new_len = ins_len + old_len;
     ext->text = lv_mem_realloc(ext->text, new_len + 1);
+    lv_mem_assert(ext->text);
+    if(ext->text == NULL) return;
 
     if(pos == LV_LABEL_POS_LAST) {
 #if LV_TXT_UTF8 == 0

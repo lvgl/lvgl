@@ -282,6 +282,7 @@ lv_fs_res_t lv_ufs_write(void * file_p, const void * buf, uint32_t btw, uint32_t
     uint32_t new_size = fp->rwp + btw;
     if(new_size > ent->size) {
         uint8_t * new_data = lv_mem_realloc(ent->data_d, new_size);
+        lv_mem_assert(new_data);
         if(new_data == NULL) return LV_FS_RES_FULL; /*Cannot allocate the new memory*/
 
         ent->data_d = new_data;
@@ -317,6 +318,7 @@ lv_fs_res_t lv_ufs_seek(void * file_p, uint32_t pos)
         if(fp->aw == 0) return LV_FS_RES_DENIED;       /*Not opened for write*/
 
         uint8_t * new_data = lv_mem_realloc(ent->data_d, pos);
+        lv_mem_assert(new_data);
         if(new_data == NULL) return LV_FS_RES_FULL; /*Out of memory*/
 
         ent->data_d = new_data;
@@ -357,6 +359,7 @@ lv_fs_res_t lv_ufs_trunc(void * file_p)
     if(fp->aw == 0) return LV_FS_RES_DENIED; /*Not opened for write*/
 
     void * new_data = lv_mem_realloc(ent->data_d, fp->rwp);
+    lv_mem_assert(new_data);
     if(new_data == NULL) return LV_FS_RES_FULL; /*Out of memory*/
 
     ent->data_d = new_data;
