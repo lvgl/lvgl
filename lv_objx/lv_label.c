@@ -516,8 +516,10 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
     /*Search the line of the index letter */;
     while(txt[line_start] != '\0') {
         new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
-        if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
-        y += letter_height + style->text.line_space;
+
+    	if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
+		y += letter_height + style->text.line_space;
+
         line_start = new_line_start;
     }
 

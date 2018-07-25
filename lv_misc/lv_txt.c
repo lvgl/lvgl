@@ -195,10 +195,13 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
                     continue;
                 }
             }
-            width += lv_font_get_width(font, letter);
-            width += letter_space;
-        }
 
+            /*If NO_BREAK is set and '\n' or '\r' found then ignore this letter */
+            if(((flag & LV_TXT_FLAG_NO_BREAK) == 0) || (letter != '\n' && letter != '\r')) {
+				width += lv_font_get_width(font, letter);
+				width += letter_space;
+            }
+        }
 
         width -= letter_space;  /*Trim the last letter space. Important if the text is center aligned */
     }

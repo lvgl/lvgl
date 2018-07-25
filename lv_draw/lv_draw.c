@@ -365,6 +365,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                 }
             }
 
+
+            if((flag & LV_TXT_FLAG_NO_BREAK) && (letter == '\n' || letter == '\r')) continue;
+
             lv_color_t color = style->text.color;
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
