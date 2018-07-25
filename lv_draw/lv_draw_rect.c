@@ -1371,8 +1371,6 @@ static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area
         bottom_area.y2++;
     }
 
-    printf("\n");
-
 }
 
 #endif

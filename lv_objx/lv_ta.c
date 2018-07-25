@@ -269,7 +269,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     }
 
     /*Move the cursor after the new text*/
-    lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + lv_txt_get_length(txt));
+    lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + lv_txt_get_encoded_length(txt));
 }
 
 /**
@@ -299,8 +299,8 @@ void lv_ta_del_char(lv_obj_t * ta)
 #if LV_TXT_UTF8 == 0
         lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, 1);
 #else
-        uint32_t byte_pos = txt_utf8_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
-        lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, lv_txt_utf8_size(label_txt[byte_pos]));
+        uint32_t byte_pos = txt_encoded_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
+        lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, lv_txt_encoded_size(&label_txt[byte_pos]));
 #endif
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
         lv_mem_assert(ext->pwd_tmp);
@@ -370,7 +370,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->cursor.pos == pos) return;
 
-    uint16_t len = lv_txt_get_length(lv_label_get_text(ext->label));
+    uint16_t len = lv_txt_get_encoded_length(lv_label_get_text(ext->label));
 
     if(pos < 0) pos = len + pos;
 
@@ -821,12 +821,12 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         const char * txt = lv_label_get_text(ta_ext->label);
         uint32_t byte_pos;
 #if LV_TXT_UTF8 != 0
-        byte_pos = txt_utf8_get_byte_id(txt, cur_pos);
+        byte_pos = txt_encoded_get_byte_id(txt, cur_pos);
 #else
         byte_pos = cur_pos;
 #endif
 
-        uint32_t letter = lv_txt_utf8_next(&txt[byte_pos], NULL);
+        uint32_t letter = lv_txt_encoded_next(&txt[byte_pos], NULL);
         lv_coord_t letter_h = lv_font_get_height(label_style->text.font);
         /*Set letter_w (set not 0 on non printable but valid chars)*/
         lv_coord_t letter_w;
@@ -845,8 +845,8 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
             letter_pos.y += letter_h + label_style->text.line_space;
 
             if(letter != '\0') {
-                byte_pos += lv_txt_utf8_size(txt[byte_pos]);
-                letter = lv_txt_utf8_next(&txt[byte_pos], NULL);
+                byte_pos += lv_txt_encoded_size(&txt[byte_pos]);
+                letter = lv_txt_encoded_next(&txt[byte_pos], NULL);
             }
 
             if(letter == '\0' || letter == '\n' || letter == '\r') {
@@ -879,7 +879,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
             letter_buf[1] = '\0';
 #else
             char letter_buf[8] = {0};
-            memcpy(letter_buf, &txt[byte_pos], lv_txt_utf8_size(txt[byte_pos]));
+            memcpy(letter_buf, &txt[byte_pos], lv_txt_encoded_size(&txt[byte_pos]));
 #endif
             cur_area.x1 += cur_style.body.padding.hor;
             cur_area.y1 += cur_style.body.padding.ver;
@@ -1073,7 +1073,7 @@ static void pwd_char_hider(lv_obj_t * ta)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->pwd_mode != 0) {
         char * txt = lv_label_get_text(ext->label);
-        int16_t len = lv_txt_get_length(txt);
+        int16_t len = lv_txt_get_encoded_length(txt);
         bool refr = false;
         uint16_t i;
         for(i = 0; i < len; i++) {

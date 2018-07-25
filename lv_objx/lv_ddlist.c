@@ -650,7 +650,7 @@ static lv_res_t lv_ddlist_release_action(lv_obj_t * ddlist)
         uint32_t line_cnt = 0;
         uint32_t letter;
         for(line_cnt = 0; line_cnt < letter_i; line_cnt++) {
-            letter = lv_txt_utf8_next(txt, &i);
+            letter = lv_txt_encoded_next(txt, &i);
             if(letter == '\n') new_opt ++;
         }
 

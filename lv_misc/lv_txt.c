@@ -23,10 +23,49 @@
  **********************/
 static bool is_break_char(uint32_t letter);
 
+#if LV_TXT_UTF8
+static uint8_t lv_txt_utf8_size(const char * str);
+static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni);
+static uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i);
+static uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i_start);
+static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id);
+static uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id);
+static uint32_t lv_txt_utf8_get_length(const char * txt);
+#else
+static uint8_t lv_txt_ascii_size(const char * str);
+static uint32_t lv_txt_unicode_to_ascii(uint32_t letter_uni);
+static uint32_t lv_txt_ascii_next(const char * txt, uint32_t * i);
+static uint32_t lv_txt_ascii_prev(const char * txt, uint32_t * i_start);
+static uint32_t lv_txt_ascii_get_byte_id(const char * txt, uint32_t utf8_id);
+static uint32_t lv_txt_ascii_get_char_id(const char * txt, uint32_t byte_id);
+static uint32_t lv_txt_ascii_get_length(const char * txt);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
 
+
+/**********************
+ *  GLOBAL VARIABLES
+ **********************/
+#if LV_TXT_UTF8
+uint8_t (*lv_txt_encoded_size)(const char *) = 					lv_txt_utf8_size;
+uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_utf8;
+uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_utf8_next;
+uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_utf8_prev;
+uint32_t (*txt_encoded_get_byte_id)(const char * , uint32_t) =	lv_txt_utf8_get_byte_id;
+uint32_t (*lv_encoded_get_char_id)(const char * , uint32_t) = 	lv_txt_utf8_get_char_id;
+uint32_t (*lv_txt_get_encoded_length)(const char * ) = 			lv_txt_utf8_get_length;
+#else
+uint8_t (*lv_txt_encoded_size)(const char *) = 					lv_txt_ascii_size;
+uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_ascii;
+uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_ascii_next;
+uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_ascii_prev;
+uint32_t (*txt_encoded_get_byte_id)(const char * , uint32_t) =	lv_txt_ascii_get_byte_id;
+uint32_t (*lv_encoded_get_char_id)(const char * , uint32_t) = 	lv_txt_ascii_get_char_id;
+uint32_t (*lv_txt_get_encoded_length)(const char * ) = 			lv_txt_ascii_get_length;
+#endif
 /**********************
  *      MACROS
  **********************/
@@ -110,7 +149,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     uint32_t letter = 0;
 
     while(txt[i] != '\0') {
-        letter = lv_txt_utf8_next(txt, &i);
+        letter = lv_txt_encoded_next(txt, &i);
 
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -122,7 +161,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
         /*Check for new line chars*/
         if(letter == '\n' || letter == '\r') {
             uint32_t i_tmp = i;
-            uint32_t letter_next = lv_txt_utf8_next(txt, &i_tmp);
+            uint32_t letter_next = lv_txt_encoded_next(txt, &i_tmp);
             if(letter == '\r' &&  letter_next == '\n') i = i_tmp;
 
             return i;    /*Return with the first letter of the next line*/
@@ -144,12 +183,12 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                 } else {
                     /* Now this character is out of the area so it will be first character of the next line*/
                     /* But 'i' already points to the next character (because of lv_txt_utf8_next) step beck one*/
-                    lv_txt_utf8_prev(txt, &i);
+                	lv_txt_encoded_prev(txt, &i);
                 }
 
                 /* Do not let to return without doing nothing.
                  * Find at least one character (Avoid infinite loop )*/
-                if(i == 0) lv_txt_utf8_next(txt, &i);
+                if(i == 0) lv_txt_encoded_next(txt, &i);
 
                 return i;
             }
@@ -188,7 +227,7 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
 
     if(length != 0) {
         while(i < length) {
-            letter = lv_txt_utf8_next(txt, &i);
+            letter = lv_txt_encoded_next(txt, &i);
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(lv_txt_is_cmd(&cmd_state, letter) != false) {
                     continue;
@@ -255,7 +294,7 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     uint32_t ins_len = strlen(ins_txt);
     uint32_t new_len = ins_len + old_len;
 #if LV_TXT_UTF8 != 0
-    pos = txt_utf8_get_byte_id(txt_buf, pos);   /*Convert to byte index instead of letter index*/
+    pos = txt_encoded_get_byte_id(txt_buf, pos);   /*Convert to byte index instead of letter index*/
 #endif
     /*Copy the second part into the end to make place to text to insert*/
     uint32_t i;
@@ -278,8 +317,8 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 
     uint32_t old_len = strlen(txt);
 #if LV_TXT_UTF8 != 0
-    pos = txt_utf8_get_byte_id(txt, pos);   /*Convert to byte index instead of letter index*/
-    len = txt_utf8_get_byte_id(&txt[pos], len);
+    pos = txt_encoded_get_byte_id(txt, pos);   /*Convert to byte index instead of letter index*/
+    len = txt_encoded_get_byte_id(&txt[pos], len);
 #endif
 
     /*Copy the second part into the end to make place to text to insert*/
@@ -289,17 +328,24 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
     }
 }
 
+
+/*******************************
+ *   UTF-8 ENCODER/DECOER
+ ******************************/
+
+#if LV_TXT_UTF8
+
 /**
  * Give the size of an UTF-8 coded character
- * @param c A character where the UTF-8 character starts
+ * @param str pointer to a character in a string
  * @return length of the UTF-8 character (1,2,3 or 4). O on invalid code
  */
-uint8_t lv_txt_utf8_size(uint8_t c)
+static uint8_t lv_txt_utf8_size(const char * str)
 {
-    if((c & 0x80) == 0) return 1;
-    else if((c & 0xE0) == 0xC0) return 2;
-    else if((c & 0xF0) == 0xE0) return 3;
-    else if((c & 0xF8) == 0xF0) return 4;
+    if((str[0] & 0x80) == 0) return 1;
+    else if((str[0] & 0xE0) == 0xC0) return 2;
+    else if((str[0] & 0xF0) == 0xE0) return 3;
+    else if((str[0] & 0xF8) == 0xF0) return 4;
     return 0;
 }
 
@@ -309,7 +355,7 @@ uint8_t lv_txt_utf8_size(uint8_t c)
  * @param letter_uni an Unicode letter
  * @return UTF-8 coded character in Little Endian to be compatible with C chars (e.g. 'Á', 'Ű')
  */
-uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
+static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
 {
     if(letter_uni < 128) return letter_uni;
     uint8_t bytes[4];
@@ -343,15 +389,8 @@ uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
  *          NULL to use txt[0] as index
  * @return the decoded Unicode character or 0 on invalid UTF-8 code
  */
-uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
+static uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
 {
-#if LV_TXT_UTF8 == 0
-    if(i == NULL) return txt[1];    /*Get the next char */
-
-    uint8_t letter = txt[*i] ;
-    (*i)++;
-    return letter;
-#else
     /* Unicode to UTF-8
      * 00000000 00000000 00000000 0xxxxxxx -> 0xxxxxxx
      * 00000000 00000000 00000yyy yyxxxxxx -> 110yyyyy 10xxxxxx
@@ -414,7 +453,6 @@ uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
         }
     }
     return result;
-#endif
 }
 
 /**
@@ -423,16 +461,8 @@ uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
  * @param i start byte index in 'txt' where to start. After the call it will point to the previous UTF-8 char in 'txt'.
  * @return the decoded Unicode character or 0 on invalid UTF-8 code
  */
-uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
+static uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
 {
-#if LV_TXT_UTF8 == 0
-    if(i == NULL) return *(txt - 1);   /*Get the prev. char */
-
-    (*i)--;
-    uint8_t letter = txt[*i] ;
-
-    return letter;
-#else
     uint8_t c_size;
     uint8_t cnt = 0;
 
@@ -441,7 +471,7 @@ uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
     do {
         if(cnt >= 4) return 0;      /*No UTF-8 char found before the initial*/
 
-        c_size = lv_txt_utf8_size(txt[*i]);
+        c_size = lv_txt_encoded_size(&txt[*i]);
         if(c_size == 0) {
             if(*i != 0)(*i)--;
             else return 0;
@@ -450,10 +480,10 @@ uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
     } while(c_size == 0);
 
     uint32_t i_tmp = *i;
-    uint32_t letter = lv_txt_utf8_next(txt, &i_tmp);   /*Character found, get it*/
+    uint32_t letter = lv_txt_encoded_next(txt, &i_tmp);   /*Character found, get it*/
 
     return letter;
-#endif
+
 }
 
 /**
@@ -463,19 +493,16 @@ uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i)
  * @param utf8_id character index
  * @return byte index of the 'utf8_id'th letter
  */
-uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
+static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
 {
-#if LV_TXT_UTF8 == 0
-    return utf8_id;     /*In Non UTF-8 no difference*/
-#else
     uint32_t i;
     uint32_t byte_cnt = 0;
     for(i = 0; i < utf8_id; i++) {
-        byte_cnt += lv_txt_utf8_size(txt[byte_cnt]);
+        byte_cnt += lv_txt_encoded_size(&txt[byte_cnt]);
     }
 
     return byte_cnt;
-#endif
+
 }
 
 
@@ -486,22 +513,17 @@ uint32_t txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
  * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
  */
-uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
+static uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
 {
-#if LV_TXT_UTF8 == 0
-    return byte_id;     /*In Non UTF-8 no difference*/
-#else
     uint32_t i = 0;
     uint32_t char_cnt = 0;
 
     while(i < byte_id) {
-        lv_txt_utf8_next(txt, &i); /*'i' points to the next letter so use the prev. value*/
+    	lv_txt_encoded_next(txt, &i); /*'i' points to the next letter so use the prev. value*/
         char_cnt++;
     }
 
     return char_cnt;
-#endif
-
 }
 
 /**
@@ -510,7 +532,7 @@ uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
  * @param txt a '\0' terminated char string
  * @return number of characters
  */
-uint32_t lv_txt_get_length(const char * txt)
+static uint32_t lv_txt_utf8_get_length(const char * txt)
 {
 #if LV_TXT_UTF8 == 0
     return strlen(txt);
@@ -519,7 +541,7 @@ uint32_t lv_txt_get_length(const char * txt)
     uint32_t i = 0;
 
     while(txt[i] != '\0') {
-        lv_txt_utf8_next(txt, &i);
+    	lv_txt_encoded_next(txt, &i);
         len++;
     }
 
@@ -527,6 +549,98 @@ uint32_t lv_txt_get_length(const char * txt)
 #endif
 }
 
+#else
+/**
+ * Give the size of an UTF-8 coded character
+ * @param str pointer to a character in a string
+ * @return length of the UTF-8 character (1,2,3 or 4). O on invalid code
+ */
+static uint8_t lv_txt_ascii_size(const char * str)
+{
+    return 1;
+}
+
+
+/**
+ * Convert an Unicode letter to UTF-8.
+ * @param letter_uni an Unicode letter
+ * @return UTF-8 coded character in Little Endian to be compatible with C chars (e.g. 'Á', 'Ű')
+ */
+static uint32_t lv_txt_unicode_to_ascii(uint32_t letter_uni)
+{
+    if(letter_uni < 128) return letter_uni;
+    else return ' ';
+}
+
+/**
+ * Decode an UTF-8 character from a string.
+ * @param txt pointer to '\0' terminated string
+ * @param i start byte index in 'txt' where to start.
+ *          After call it will point to the next UTF-8 char in 'txt'.
+ *          NULL to use txt[0] as index
+ * @return the decoded Unicode character or 0 on invalid UTF-8 code
+ */
+static uint32_t lv_txt_ascii_next(const char * txt, uint32_t * i)
+{
+    if(i == NULL) return txt[1];    /*Get the next char */
+
+    uint8_t letter = txt[*i] ;
+    (*i)++;
+    return letter;
+}
+
+/**
+ * Get previous UTF-8 character form a string.
+ * @param txt pointer to '\0' terminated string
+ * @param i start byte index in 'txt' where to start. After the call it will point to the previous UTF-8 char in 'txt'.
+ * @return the decoded Unicode character or 0 on invalid UTF-8 code
+ */
+static uint32_t lv_txt_ascii_prev(const char * txt, uint32_t * i)
+{
+    if(i == NULL) return *(txt - 1);   /*Get the prev. char */
+
+    (*i)--;
+    uint8_t letter = txt[*i] ;
+
+    return letter;
+}
+
+/**
+ * Convert a character index (in an UTF-8 text) to byte index.
+ * E.g. in "AÁRT" index of 'R' is 2th char but start at byte 3 because 'Á' is 2 bytes long
+ * @param txt a '\0' terminated UTF-8 string
+ * @param utf8_id character index
+ * @return byte index of the 'utf8_id'th letter
+ */
+static uint32_t lv_txt_ascii_get_byte_id(const char * txt, uint32_t utf8_id)
+{
+    return utf8_id;     /*In Non encoded no difference*/
+}
+
+
+/**
+ * Convert a byte index (in an UTF-8 text) to character index.
+ * E.g. in "AÁRT" index of 'R' is 2th char but start at byte 3 because 'Á' is 2 bytes long
+ * @param txt a '\0' terminated UTF-8 string
+ * @param byte_id byte index
+ * @return character index of the letter at 'byte_id'th position
+ */
+static uint32_t lv_txt_ascii_get_char_id(const char * txt, uint32_t byte_id)
+{
+    return byte_id;     /*In Non encoded no difference*/
+}
+
+/**
+ * Get the number of characters (and NOT bytes) in a string. Decode it with UTF-8 if enabled.
+ * E.g.: "ÁBC" is 3 characters (but 4 bytes)
+ * @param txt a '\0' terminated char string
+ * @return number of characters
+ */
+static uint32_t lv_txt_ascii_get_length(const char * txt)
+{
+    return strlen(txt);
+}
+#endif
 /**********************
  *   STATIC FUNCTIONS
  **********************/
