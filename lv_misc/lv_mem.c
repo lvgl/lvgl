@@ -137,8 +137,8 @@ void * lv_mem_alloc(uint32_t size)
     do {
         //Get the next entry
         e = ent_get_next(e);
-        printf("e size: %d\n", e->header.d_size);
-        //If there is next entry then try to allocate there
+
+        /*If there is next entry then try to allocate there*/
         if(e != NULL) {
             alloc = ent_alloc(e, size);
         }
