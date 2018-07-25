@@ -112,11 +112,11 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(indev->driver.read) {
         data->user_data = indev->driver.user_data;
 #if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Indev read called");
+	lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "Indev read called");
 #endif
         cont = indev->driver.read(data);
 #if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Indev read finished");
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Indev read ready");
 #endif
     } else {
 #if USE_LV_LOG

@@ -71,7 +71,6 @@ typedef struct
     uint8_t align       :2;         /*Align type from 'lv_label_align_t'*/
     uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
     uint8_t expand      :1;         /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
-    uint8_t no_break    :1;         /*Ignore new line characters*/
     uint8_t body_draw   :1;         /*Draw background body*/
 } lv_label_ext_t;
 
@@ -138,13 +137,6 @@ void lv_label_set_align(lv_obj_t *label, lv_label_align_t align);
 void lv_label_set_recolor(lv_obj_t * label, bool recolor_en);
 
 /**
- * Set the label to ignore (or accept) line breaks on '\n'
- * @param label pointer to a label object
- * @param no_break_en true: ignore line breaks, false: make line breaks on '\n'
- */
-void lv_label_set_no_break(lv_obj_t * label, bool no_break_en);
-
-/**
  * Set the label to draw (or not draw) background specified in its style's body
  * @param label pointer to a label object
  * @param body_en true: draw body; false: don't draw body
@@ -199,12 +191,6 @@ lv_label_align_t lv_label_get_align(lv_obj_t * label);
  */
 bool lv_label_get_recolor(lv_obj_t * label);
 
-/**
- * Get the no break attribute
- * @param label pointer to a label object
- * @return true: no_break_enabled (ignore '\n' line breaks); false: make line breaks on '\n'
- */
-bool lv_label_get_no_break(lv_obj_t * label);
 /**
  * Get the body draw attribute
  * @param label pointer to a label object

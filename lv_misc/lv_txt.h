@@ -37,8 +37,7 @@ typedef enum
     LV_TXT_FLAG_NONE =     0x00,
     LV_TXT_FLAG_RECOLOR =  0x01,   /*Enable parsing of recolor command*/
     LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width (Used by the library)*/
-    LV_TXT_FLAG_NO_BREAK = 0x04,   /*Ignore line breaks (Used by the library)*/
-    LV_TXT_FLAG_CENTER =   0x08,   /*Align the text to the middle*/
+    LV_TXT_FLAG_CENTER =   0x04,   /*Align the text to the middle*/
 } lv_txt_flag_t;
 
 typedef enum

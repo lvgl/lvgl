@@ -86,7 +86,6 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->text = NULL;
     ext->static_txt = 0;
     ext->recolor = 0;
-    ext->no_break = 0;
     ext->body_draw = 0;
     ext->align = LV_LABEL_ALIGN_LEFT;
     ext->dot_end = LV_LABEL_DOT_END_INV;
@@ -301,21 +300,6 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
 }
 
 /**
- * Set the label to ignore (or accept) line breaks on '\n'
- * @param label pointer to a label object
- * @param no_break_en true: ignore line breaks, false: make line breaks on '\n'
- */
-void lv_label_set_no_break(lv_obj_t * label, bool no_break_en)
-{
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(ext->no_break == no_break_en) return;
-
-    ext->no_break = no_break_en == false ? 0 : 1;
-
-    lv_label_refr_text(label);
-}
-
-/**
  * Set the label to draw (or not draw) background specified in its style's body
  * @param label pointer to a label object
  * @param body_en true: draw body; false: don't draw body
@@ -399,17 +383,6 @@ bool lv_label_get_recolor(lv_obj_t * label)
 }
 
 /**
- * Get the no break attribute
- * @param label pointer to a label object
- * @return true: no_break_enabled (ignore '\n' line breaks); false: make line breaks on '\n'
- */
-bool lv_label_get_no_break(lv_obj_t * label)
-{
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    return ext->no_break == 0 ? false : true;
-}
-
-/**
  * Get the body draw attribute
  * @param label pointer to a label object
  * @return true: draw body; false: don't draw body
@@ -452,7 +425,6 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
     if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded  the set the max length to very big */
@@ -529,7 +501,6 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
     if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded set the max length to very big */
@@ -696,7 +667,6 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
         if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-        if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
         if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
@@ -781,7 +751,6 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
     lv_txt_get_size(&size, ext->text, font, style->text.letter_space, style->text.line_space, max_w, flag);
 
     /*Set the full size in expand mode*/

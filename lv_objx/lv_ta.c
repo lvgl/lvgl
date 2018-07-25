@@ -187,6 +187,13 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
+    if(ext->one_line && (c == '\n' || c == '\n')) {
+#if USE_LV_LOG
+    	lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Text area: line break ignored in one-line mode");
+#endif
+    	return;
+    }
+
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     char letter_buf[2];
     letter_buf[0] = c;
@@ -234,11 +241,10 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     /*Insert the text*/
-
     lv_label_ins_text(ext->label, ext->cursor.pos, txt);
+
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + strlen(txt) + 1);
         lv_mem_assert(ext->pwd_tmp);
@@ -503,7 +509,6 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_page_set_scrl_fit(ta, true, true);
         lv_obj_set_height(ta, font_h + (style_ta->body.padding.ver + style_scrl->body.padding.ver) * 2);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
-        lv_label_set_no_break(ext->label, true);
         lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.hor, style_ta->body.padding.ver);
     } else {
         lv_style_t * style_ta = lv_obj_get_style(ta);
@@ -511,7 +516,6 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         ext->one_line = 0;
         lv_page_set_scrl_fit(ta, false, true);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
-        lv_label_set_no_break(ext->label, false);
         lv_obj_set_height(ta, LV_TA_DEF_HEIGHT);
         lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.hor, style_ta->body.padding.ver);
     }

@@ -151,12 +151,12 @@ void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t * 
     if(active->driver.disp_flush != NULL) {
 
 #if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Disp. flush called");
+	lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "Disp. flush called");
 #endif
     	active->driver.disp_flush(x1, y1, x2, y2, color_p);
 
 #if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Disp. flush finished");
+	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Disp. flush ready");
 #endif
     } else {
 

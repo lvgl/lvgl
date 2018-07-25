@@ -48,7 +48,6 @@ static bool is_break_char(uint32_t letter);
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
                      lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag)
 {
-
     size_res->x = 0;
     size_res->y = 0;
 
@@ -76,7 +75,8 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
         line_start = new_line_start;
     }
 
-    if(line_start != 0 && (text[line_start - 1] == '\n' || text[line_start - 1] == '\r')) {
+    /*Ma ke the text one line taller if the last character is '\n' or '\r'*/
+    if((line_start != 0) && (text[line_start - 1] == '\n' || text[line_start - 1] == '\r')) {
         size_res->y += letter_height + line_space;
     }
 
@@ -118,9 +118,9 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                 continue;   /*Skip the letter is it is part of a command*/
             }
         }
+
         /*Check for new line chars*/
-        if((flag & LV_TXT_FLAG_NO_BREAK) == 0 && (letter == '\n' || letter == '\r')) {
-            /*Handle \r\n as well*/
+        if(letter == '\n' || letter == '\r') {
             uint32_t i_tmp = i;
             uint32_t letter_next = lv_txt_utf8_next(txt, &i_tmp);
             if(letter == '\r' &&  letter_next == '\n') i = i_tmp;
@@ -194,8 +194,11 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
                     continue;
                 }
             }
-            width += lv_font_get_width(font, letter);
-            width += letter_space;
+
+			width += lv_font_get_width(font, letter);
+			width += letter_space;
+
+
         }
 
         width -= letter_space;  /*Trim the last letter space. Important if the text is center aligned */
