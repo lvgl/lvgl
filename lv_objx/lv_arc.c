@@ -53,10 +53,13 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor of arc*/
     lv_obj_t * new_arc = lv_obj_create(par, copy);
     lv_mem_assert(new_arc);
+    if(new_arc == NULL) return NULL;
 
     /*Allocate the arc type specific extended data*/
     lv_arc_ext_t * ext = lv_obj_allocate_ext_attr(new_arc, sizeof(lv_arc_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_arc);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_arc);
 

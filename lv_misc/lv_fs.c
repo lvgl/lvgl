@@ -82,6 +82,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     file_p->file_d = lv_mem_alloc(file_p->drv->file_size);
+	lv_mem_assert(file_p->file_d);
     if(file_p->file_d == NULL) {
         file_p->drv = NULL;
         return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
@@ -286,6 +287,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
     }
 
     rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->rddir_size);
+	lv_mem_assert(rddir_p->dir_d);
     if(rddir_p->dir_d == NULL) {
         rddir_p->dir_d = NULL;
         return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
@@ -392,8 +394,9 @@ void lv_fs_add_drv(lv_fs_drv_t * drv_p)
     lv_fs_drv_t * new_drv;
     new_drv =  lv_ll_ins_head(&drv_ll);
     lv_mem_assert(new_drv);
-    memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));
+    if(new_drv == NULL) return;
 
+    memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));
 }
 
 /**

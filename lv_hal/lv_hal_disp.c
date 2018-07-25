@@ -70,7 +70,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     lv_disp_t * node;
 
     node = lv_mem_alloc(sizeof(lv_disp_t));
-    if(!node) return NULL;
+    lv_mem_assert(node);
+    if(node == NULL) return NULL;
 
     memcpy(&node->driver, driver, sizeof(lv_disp_drv_t));
     node->next = NULL;

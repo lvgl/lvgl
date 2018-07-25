@@ -59,11 +59,15 @@ lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create a basic object*/
     new_img = lv_obj_create(par, copy);
     lv_mem_assert(new_img);
+    if(new_img == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_img);
 
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->src = NULL;
     ext->src_type = LV_IMG_SRC_UNKNOWN;
     ext->w = lv_obj_get_width(new_img);
@@ -167,6 +171,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         if(ext->src != src_img) {
             lv_mem_free(ext->src);
             char * new_fn = lv_mem_alloc(strlen(src_img) + 1);
+            lv_mem_assert(new_fn);
+            if(new_fn == NULL) return;
             strcpy(new_fn, src_img);
             ext->src = new_fn;
 
@@ -185,6 +191,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         if(ext->src != src_img) {
             lv_mem_free(ext->src);
             char * new_txt = lv_mem_alloc(strlen(src_img) + 1);
+            lv_mem_assert(new_txt);
+            if(new_txt == NULL) return;
             strcpy(new_txt, src_img);
             ext->src = new_txt;
         }

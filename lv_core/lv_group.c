@@ -43,6 +43,8 @@ static void style_mod_edit_def(lv_style_t * style);
 lv_group_t * lv_group_create(void)
 {
     lv_group_t * group = lv_mem_alloc(sizeof(lv_group_t));
+    lv_mem_assert(group);
+    if(group == NULL) return NULL;
     lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
     group->style_mod = style_mod_def;
@@ -90,6 +92,8 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
     obj->group_p = group;
     lv_obj_t ** next = lv_ll_ins_tail(&group->obj_ll);
+    lv_mem_assert(next);
+    if(next == NULL) return;
     *next = obj;
 
     /* If the head and the tail is equal then there is only one object in the linked list.

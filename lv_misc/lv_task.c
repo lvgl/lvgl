@@ -147,10 +147,14 @@ lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t
     tmp = lv_ll_get_head(&lv_task_ll);
     if(NULL == tmp) {                               /*First task*/
         new_lv_task = lv_ll_ins_head(&lv_task_ll);
+        lv_mem_assert(new_lv_task);
+        if(new_lv_task == NULL) return NULL;
     } else {
         do {
             if(tmp->prio <= prio) {
                 new_lv_task = lv_ll_ins_prev(&lv_task_ll, tmp);
+                lv_mem_assert(new_lv_task);
+                if(new_lv_task == NULL) return NULL;
                 break;
             }
             tmp = lv_ll_get_next(&lv_task_ll, tmp);
@@ -158,10 +162,10 @@ lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t
 
         if(tmp == NULL) {   /*Only too high priority tasks were found*/
             new_lv_task = lv_ll_ins_tail(&lv_task_ll);
+            lv_mem_assert(new_lv_task);
+            if(new_lv_task == NULL) return NULL;
         }
     }
-
-    lv_mem_assert(new_lv_task);
 
     new_lv_task->period = period;
     new_lv_task->task = task;

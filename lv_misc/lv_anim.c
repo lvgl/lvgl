@@ -68,6 +68,7 @@ void lv_anim_create(lv_anim_t * anim_p)
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(&anim_ll);
     lv_mem_assert(new_anim);
+    if(new_anim == NULL) return;
 
     /*Initialize the animation descriptor*/
     anim_p->playback_now = 0;

@@ -60,12 +60,16 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor object*/
     lv_obj_t * new_page = lv_cont_create(par, copy);
     lv_mem_assert(new_page);
+    if(new_page == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_page);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_page);
 
     /*Allocate the object type specific extended data*/
     lv_page_ext_t * ext = lv_obj_allocate_ext_attr(new_page, sizeof(lv_page_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->scrl = NULL;
     ext->pr_action = NULL;
     ext->rel_action = NULL;

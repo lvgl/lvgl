@@ -71,12 +71,16 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
 
     new_btn = lv_cont_create(par, copy);
     lv_mem_assert(new_btn);
+    if(new_btn == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_btn);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_btn);
 
     /*Allocate the extended data*/
     lv_btn_ext_t * ext = lv_obj_allocate_ext_attr(new_btn, sizeof(lv_btn_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->state = LV_BTN_STATE_REL;
 
     ext->actions[LV_BTN_ACTION_PR] = NULL;

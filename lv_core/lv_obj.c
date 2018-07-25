@@ -128,6 +128,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     /*Create a screen if the parent is NULL*/
     if(parent == NULL) {
         new_obj = lv_ll_ins_head(&scr_ll);
+        lv_mem_assert(new_obj);
+        if(new_obj == NULL) return NULL;
 
         new_obj->par = NULL; /*Screens has no a parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
@@ -178,6 +180,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     /*parent != NULL create normal obj. on a parent*/
     else {
         new_obj = lv_ll_ins_head(&(parent)->child_ll);
+        lv_mem_assert(new_obj);
+        if(new_obj == NULL) return NULL;
+
 
         new_obj->par = parent; /*Set the parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));

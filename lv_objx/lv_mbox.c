@@ -63,11 +63,15 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor message box*/
     lv_obj_t * new_mbox = lv_cont_create(par, copy);
     lv_mem_assert(new_mbox);
+    if(new_mbox == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_mbox);
 
     /*Allocate the message box type specific extended data*/
     lv_mbox_ext_t * ext = lv_obj_allocate_ext_attr(new_mbox, sizeof(lv_mbox_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->text = NULL;
     ext->btnm = NULL;
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;

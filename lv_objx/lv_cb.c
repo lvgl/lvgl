@@ -53,11 +53,15 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor basic object*/
     lv_obj_t * new_cb = lv_btn_create(par, copy);
     lv_mem_assert(new_cb);
+    if(new_cb == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_cb);
     if(ancestor_bg_design == NULL) ancestor_bg_design = lv_obj_get_design_func(new_cb);
 
     lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->bullet = NULL;
     ext->label = NULL;
 

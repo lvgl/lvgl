@@ -488,11 +488,13 @@ static lv_ufs_ent_t * lv_ufs_ent_new(const char * fn)
 {
     lv_ufs_ent_t * new_ent = NULL;
     new_ent = lv_ll_ins_head(&file_ll);                 /*Create a new file*/
-    if(new_ent == NULL) {
-        return NULL;
-    }
+    lv_mem_assert(new_ent);
+    if(new_ent == NULL) return NULL;
 
     new_ent->fn_d = lv_mem_alloc(strlen(fn)  + 1); /*Save the name*/
+	lv_mem_assert(new_ent->fn_d);
+    if(new_ent->fn_d == NULL) return NULL;
+
     strcpy(new_ent->fn_d, fn);
     new_ent->data_d = NULL;
     new_ent->size = 0;

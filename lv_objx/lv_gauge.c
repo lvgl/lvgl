@@ -63,10 +63,12 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor gauge*/
     lv_obj_t * new_gauge = lv_lmeter_create(par, copy);
     lv_mem_assert(new_gauge);
+    if(new_gauge == NULL) return NULL;
 
     /*Allocate the gauge type specific extended data*/
     lv_gauge_ext_t * ext = lv_obj_allocate_ext_attr(new_gauge, sizeof(lv_gauge_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
     ext->needle_count = 0;

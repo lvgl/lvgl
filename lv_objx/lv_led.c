@@ -55,12 +55,16 @@ lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor basic object*/
     lv_obj_t * new_led = lv_obj_create(par, copy);
     lv_mem_assert(new_led);
+    if(new_led == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_led);
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_led);
 
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->bright = LV_LED_BRIGHT_ON;
 
     lv_obj_set_signal_func(new_led, lv_led_signal);

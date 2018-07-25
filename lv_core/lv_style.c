@@ -226,6 +226,9 @@ void * lv_style_anim_create(lv_style_anim_t * anim)
 {
     lv_style_anim_dsc_t * dsc;
     dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
+    lv_mem_assert(dsc);
+    if(dsc == NULL) return NULL;
+
     dsc->style_anim = anim->style_anim;
     memcpy(&dsc->style_start, anim->style_start, sizeof(lv_style_t));
     memcpy(&dsc->style_end, anim->style_end, sizeof(lv_style_t));

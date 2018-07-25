@@ -60,10 +60,13 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
     /*Create the ancestor basic object*/
     lv_obj_t * new_chart = lv_obj_create(par, copy);
     lv_mem_assert(new_chart);
+    if(new_chart == NULL) return NULL;
 
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
     ext->series.num = 0;
     ext->ymin = LV_CHART_YMIN_DEF;
@@ -125,6 +128,9 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     lv_chart_series_t * ser = lv_ll_ins_head(&ext->series_ll);
+	lv_mem_assert(ser);
+    if(ser == NULL) return NULL;
+
     lv_coord_t def = (ext->ymin + ext->ymax) >> 1;  /*half range as default value*/
 
     if(ser == NULL) return NULL;
@@ -132,6 +138,12 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     ser->color = color;
 
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * ext->point_cnt);
+    lv_mem_assert(ser->points);
+    if(ser->points == NULL) {
+    	lv_ll_rem(&ext->series_ll, ser);
+    	lv_mem_free(ser);
+    	return NULL;
+    }
 
     uint16_t i;
     lv_coord_t * p_tmp = ser->points;
