@@ -86,7 +86,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     else if(flag & LV_TXT_FLAG_RIGHT) {
     	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
     			font, style->text.letter_space, flag);
-    	pos.x = w - line_width;
+    	pos.x += w - line_width;
     }
 
 
@@ -185,7 +185,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         else if(flag & LV_TXT_FLAG_RIGHT) {
         	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
         	                                           font, style->text.letter_space, flag);
-        	pos.x = w - line_width;
+        	pos.x += w - line_width;
         }
 
         /*Go the next line position*/
