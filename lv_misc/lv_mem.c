@@ -20,6 +20,30 @@
  *********************/
 #define LV_MEM_ADD_JUNK     0   /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 
+// Check windows
+#if _WIN32 || _WIN64
+#if _WIN64
+#define ENVIRONMENT64
+#else
+#define ENVIRONMENT32
+#endif
+#endif
+
+// Check GCC
+#if __GNUC__
+#if __x86_64__ || __ppc64__
+#define ENVIRONMENT64
+#else
+#define ENVIRONMENT32
+#endif
+#endif
+
+#ifdef ENVIRONMENT64
+#define MEM_UNIT uint64_t
+#else
+#define MEM_UNIT uint32_t
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -27,10 +51,10 @@
 /*The size of this union must be 4 bytes (uint32_t)*/
 typedef union {
     struct {
-        uint32_t used: 1;       //1: if the entry is used
-        uint32_t d_size: 31;    //Size off the data (1 means 4 bytes)
+    	MEM_UNIT used: 1;       //1: if the entry is used
+    	MEM_UNIT d_size: 31;    //Size off the data (1 means 4 bytes)
     };
-    uint32_t header;            //The header (used + d_size)
+    MEM_UNIT header;            //The header (used + d_size)
 } lv_mem_header_t;
 
 typedef struct {
@@ -51,7 +75,8 @@ static void ent_trunc(lv_mem_ent_t * e, uint32_t size);
  *  STATIC VARIABLES
  **********************/
 #if LV_MEM_CUSTOM == 0
-static LV_MEM_ATTR uint8_t work_mem[LV_MEM_SIZE];    /*Work memory for allocations*/
+static LV_MEM_ATTR MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];    /*Work memory for allocations*/
+static uint8_t * work_mem;
 #endif
 
 static uint32_t zero_mem;       /*Give the address of this variable if 0 byte should be allocated*/
@@ -70,7 +95,8 @@ static uint32_t zero_mem;       /*Give the address of this variable if 0 byte sh
 void lv_mem_init(void)
 {
 #if LV_MEM_CUSTOM == 0
-    lv_mem_ent_t * full = (lv_mem_ent_t *)&work_mem;
+	work_mem = (uint8_t*) work_mem_int;
+    lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */
     full->header.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
@@ -88,12 +114,19 @@ void * lv_mem_alloc(uint32_t size)
         return &zero_mem;
     }
 
+#ifdef ENVIRONMENT64
+    /*Round the size up to 8*/
+    if(size & 0x7) {
+        size = size & (~0x7);
+        size += 8;
+    }
+#else
     /*Round the size up to 4*/
     if(size & 0x3) {
         size = size & (~0x3);
         size += 4;
     }
-
+#endif
     void * alloc = NULL;
 
 #if LV_MEM_CUSTOM == 0 /*Use the allocation from dyn_mem*/
