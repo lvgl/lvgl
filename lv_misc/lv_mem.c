@@ -38,6 +38,7 @@
 #endif
 #endif
 
+
 #ifdef ENVIRONMENT64
 #define MEM_UNIT uint64_t
 #else
@@ -136,7 +137,7 @@ void * lv_mem_alloc(uint32_t size)
     do {
         //Get the next entry
         e = ent_get_next(e);
-
+        printf("e size: %d\n", e->header.d_size);
         //If there is next entry then try to allocate there
         if(e != NULL) {
             alloc = ent_alloc(e, size);
@@ -393,11 +394,19 @@ static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
  */
 static void ent_trunc(lv_mem_ent_t * e, uint32_t size)
 {
+#ifdef ENVIRONMENT64
+    /*Round the size up to 8*/
+    if(size & 0x7) {
+        size = size & (~0x7);
+        size += 8;
+    }
+#else
     /*Round the size up to 4*/
     if(size & 0x3) {
         size = size & (~0x3);
         size += 4;
     }
+#endif
 
     /*Don't let empty space only for a header without data*/
     if(e->header.d_size == size + sizeof(lv_mem_header_t)) {
