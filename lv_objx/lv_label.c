@@ -64,10 +64,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Label create stared");
-#endif
+	LV_LOG_TRACE("label create started");
 
     /*Create a basic object*/
     lv_obj_t * new_label = lv_obj_create(par, copy);
@@ -128,10 +125,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_refresh_style(new_label);
     }
 
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Label create ready");
-#endif
 
+	LV_LOG_INFO("label created");
 
     return new_label;
 }

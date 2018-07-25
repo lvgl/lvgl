@@ -27,8 +27,7 @@ extern "C" {
 /*Possible log level. For compatibility declare it independently from `USE_LV_LOG`*/
 typedef enum
 {
-	LV_LOG_LEVEL_DEBUG = 0,	/*A lot of logs to show every detail*/
-	LV_LOG_LEVEL_TRACE,		/*Trace the most important calls*/
+	LV_LOG_LEVEL_TRACE,		/*A lot of logs to give detailed information*/
 	LV_LOG_LEVEL_INFO,		/*Log important events*/
 	LV_LOG_LEVEL_WARN,		/*Log if something unwanted happened but didn't caused problem*/
 	LV_LOG_LEVEL_ERROR,		/*Only critical issue, when the system may fail*/
@@ -61,11 +60,19 @@ void lv_log_add(lv_log_level_t level, const char * file, uint32_t line, const ch
  *      MACROS
  **********************/
 
+#define LV_LOG_TRACE(dsc) 	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, dsc);
+#define LV_LOG_INFO(dsc) 	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, dsc);
+#define LV_LOG_WARN(dsc) 	lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, dsc);
+#define LV_LOG_ERROR(dsc) 	lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, dsc);
+
 #else /*USE_LV_LOG*/
 
 /*Do nothing if `USE_LV_LOG  0`*/
 #define lv_log_add(level, file, line, dsc) {;}
-
+#define LV_LOG_TRACE(dsc) {;}
+#define LV_LOG_INFO(dsc) {;}
+#define LV_LOG_WARN(dsc) {;}
+#define LV_LOG_ERROR(dsc) {;}
 #endif /*USE_LV_LOG*/
 
 #ifdef __cplusplus

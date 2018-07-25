@@ -90,6 +90,15 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     if(group == NULL) return;
 
+    /*If the object is already in a group and focused then defocuse it*/
+    if(obj->group_p) {
+    	if(lv_obj_is_focused(obj)) {
+    		lv_group_focus_next(obj->group_p);
+
+    		LV_LOG_INFO("group: assign object to an other group");
+    	}
+    }
+
     obj->group_p = group;
     lv_obj_t ** next = lv_ll_ins_tail(&group->obj_ll);
     lv_mem_assert(next);

@@ -46,11 +46,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Window create stared");
-#endif
-
+	LV_LOG_TRACE("window create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_win = lv_obj_create(par, copy);
@@ -140,11 +136,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
 
     lv_win_realign(new_win);
 
-
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Window create ready");
-#endif
+	LV_LOG_INFO("window created");
 
     return new_win;
 }

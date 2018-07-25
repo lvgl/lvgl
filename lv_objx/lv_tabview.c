@@ -66,11 +66,7 @@ static const char * tab_def[] = {""};
  */
 lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Tabview create stared");
-#endif
-
+	LV_LOG_TRACE("tab view create started");
 
     /*Create the ancestor of tab*/
     lv_obj_t * new_tabview = lv_obj_create(par, copy);
@@ -176,9 +172,8 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_refresh_style(new_tabview);
     }
 
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Tabview create ready");
-#endif
+
+	LV_LOG_INFO("tab view created");
 
     return new_tabview;
 }

@@ -106,7 +106,7 @@ uint32_t lv_mem_get_size(const void * data);
 #if USE_LV_LOG == 0
 # define  lv_mem_assert(p) {if(p == NULL) while(1); }
 #else
-# define  lv_mem_assert(p) {if(p == NULL) {lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, "Out of memory!"); while(1); }}
+# define  lv_mem_assert(p) {if(p == NULL) {LV_LOG_ERROR("Out of memory!"); while(1); }}
 #endif
 #ifdef __cplusplus
 } /* extern "C" */

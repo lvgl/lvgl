@@ -62,9 +62,7 @@ static lv_ll_t scr_ll;                 /*Linked list of screens*/
  */
 void lv_init(void)
 {
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "lv_init called");
-#endif
+	LV_LOG_TRACE("lv_init started");
 
     /*Initialize the lv_misc modules*/
     lv_mem_init();
@@ -106,9 +104,8 @@ void lv_init(void)
     lv_indev_init();
 #endif
 
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "lv_init ready");
-#endif
+
+	LV_LOG_INFO("lv_init ready");
 }
 
 /*--------------------
@@ -128,9 +125,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
     lv_obj_t * new_obj = NULL;
     /*Create a screen if the parent is NULL*/
     if(parent == NULL) {
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Screen create started");
-#endif
+    	LV_LOG_TRACE("Screen create started");
 
         new_obj = lv_ll_ins_head(&scr_ll);
         lv_mem_assert(new_obj);
@@ -182,15 +177,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
         new_obj->ext_attr = NULL;
 
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Screen create ready");
-#endif
+        LV_LOG_INFO("Screen create ready");
     }
     /*parent != NULL create normal obj. on a parent*/
     else {
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Object create started");
-#endif
+    	LV_LOG_TRACE("Object create started");
+
         new_obj = lv_ll_ins_head(&(parent)->child_ll);
         lv_mem_assert(new_obj);
         if(new_obj == NULL) return NULL;
@@ -273,9 +265,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 
         lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
 
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Object create ready");
-#endif
+        LV_LOG_INFO("Object create ready");
     }
 
 

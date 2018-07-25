@@ -74,10 +74,7 @@ static lv_signal_func_t scrl_signal;
  */
 lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Text area create stared");
-#endif
+	LV_LOG_TRACE("text area create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_ta = lv_page_create(par, copy);
@@ -167,10 +164,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
     lv_anim_create(&a);
 #endif
 
+	LV_LOG_INFO("text area created");
 
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Text area create ready");
-#endif
     return new_ta;
 }
 
@@ -188,9 +183,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     if(ext->one_line && (c == '\n' || c == '\n')) {
-#if USE_LV_LOG
-    	lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Text area: line break ignored in one-line mode");
-#endif
+    	LV_LOG_INFO("Text area: line break ignored in one-line mode");
     	return;
     }
 

@@ -71,10 +71,7 @@ static lv_obj_t * last_clicked_btn;
  */
 lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "List create stared");
-#endif
+	LV_LOG_TRACE("list create started");
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_list = lv_page_create(par, copy);
@@ -143,9 +140,9 @@ lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_refresh_style(new_list);
     }
 
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "List create ready");
-#endif
+
+	LV_LOG_INFO("list created");
+
 
     return new_list;
 }

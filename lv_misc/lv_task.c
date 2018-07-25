@@ -56,10 +56,7 @@ void lv_task_init(void)
  */
 LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 {
-
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "lv_task_handler started");
-#endif
+	LV_LOG_TRACE("lv_task_handler started");
 
     static uint32_t idle_period_start = 0;
     static uint32_t handler_start = 0;
@@ -134,9 +131,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 
     }
 
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "lv_task_handler finished");
-#endif
+	LV_LOG_TRACE("lv_task_handler ready");
 }
 
 /**

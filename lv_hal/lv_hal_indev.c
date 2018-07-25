@@ -111,17 +111,12 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     if(indev->driver.read) {
         data->user_data = indev->driver.user_data;
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "Indev read called");
-#endif
+
+    	LV_LOG_TRACE("idnev read started");
         cont = indev->driver.read(data);
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Indev read ready");
-#endif
+    	LV_LOG_TRACE("idnev read finished");
     } else {
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Indev read: function not set");
-#endif
+    	LV_LOG_WARN("indev function registered");
         memset(data, 0, sizeof(lv_indev_data_t));
     }
 

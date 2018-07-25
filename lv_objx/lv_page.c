@@ -57,10 +57,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Page create stared");
-#endif
+	LV_LOG_TRACE("page create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_page = lv_cont_create(par, copy);
@@ -145,10 +142,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
 
     lv_page_sb_refresh(new_page);
 
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Page create ready");
-#endif
-
+	LV_LOG_INFO("page created");
 
     return new_page;
 }

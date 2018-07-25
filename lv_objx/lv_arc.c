@@ -51,9 +51,7 @@ static lv_design_func_t ancestor_design;
 lv_obj_t * lv_arc_create(lv_obj_t * par, lv_obj_t * copy)
 {
 
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Arc create stared");
-#endif
+	LV_LOG_TRACE("arc create started");
 
     /*Create the ancestor of arc*/
     lv_obj_t * new_arc = lv_obj_create(par, copy);
@@ -90,9 +88,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, lv_obj_t * copy)
         lv_obj_refresh_style(new_arc);
     }
 
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Arc create ready");
-#endif
+	LV_LOG_INFO("arc created");
 
     return new_arc;
 }

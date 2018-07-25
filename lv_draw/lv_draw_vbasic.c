@@ -217,12 +217,9 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                                         };
 
     if(font_p == NULL) {
-#if USE_LV_LOG
-    	lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, "Font: character's bitmap not found");
-#endif
+    	LV_LOG_WARN("Font: character's bitmap not found");
 		return;
     }
-
 
     lv_coord_t pos_x = pos_p->x;
     lv_coord_t pos_y = pos_p->y;

@@ -53,10 +53,7 @@ static lv_design_func_t ancestor_design;
  */
 lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "template create stared");
-#endif
+	LV_LOG_TRACE("template create started");
 
     /*Create the ancestor of template*/
     /*TODO modify it to the ancestor create function */
@@ -87,9 +84,9 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_templ);
     }
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "template create ready");
-#endif
+
+	LV_LOG_INFO("template created");
+
 
     return new_templ;
 }

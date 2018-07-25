@@ -254,9 +254,7 @@ static void indev_proc_task(void * param)
     (void)param;
 
 
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "indev_proc task started");
-#endif
+	LV_LOG_TRACE("indev task started");
 
     lv_indev_data_t data;
     lv_indev_t * i;
@@ -297,9 +295,7 @@ static void indev_proc_task(void * param)
 
     indev_act = NULL;   /*End of indev processing, so no act indev*/
 
-#if USE_LV_LOG
-    lv_log_add(LV_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "indev_proc task finished");
-#endif
+	LV_LOG_TRACE("indev task finished");
 }
 
 

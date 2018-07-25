@@ -64,10 +64,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
 {
-
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, "Button matrix create stared");
-#endif
+	LV_LOG_TRACE("button matrix create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_btnm = lv_obj_create(par, copy);
@@ -126,9 +123,8 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
         ext->btn_id_tgl = copy_ext->btn_id_tgl;
         lv_btnm_set_map(new_btnm, lv_btnm_get_map(copy));
     }
-#if USE_LV_LOG
-	lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, "Button matrix create ready");
-#endif
+
+	LV_LOG_INFO("button matrix created");
 
     return new_btnm;
 }
