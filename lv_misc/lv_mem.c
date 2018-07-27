@@ -21,28 +21,22 @@
 #define LV_MEM_ADD_JUNK     0   /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 
 // Check windows
-#if _WIN32 || _WIN64
-#if _WIN64
-#define ENVIRONMENT64
-#else
-#define ENVIRONMENT32
-#endif
+#if __WIN64
+# define ENVIRONMENT64
 #endif
 
 // Check GCC
 #if __GNUC__
-#if __x86_64__ || __ppc64__
-#define ENVIRONMENT64
-#else
-#define ENVIRONMENT32
-#endif
+# if __x86_64__ || __ppc64__
+#   define ENVIRONMENT64
+# endif
 #endif
 
 
 #ifdef ENVIRONMENT64
-#define MEM_UNIT uint64_t
+# define MEM_UNIT uint64_t
 #else
-#define MEM_UNIT uint32_t
+# define MEM_UNIT uint32_t
 #endif
 
 /**********************
