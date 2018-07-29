@@ -90,7 +90,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     }
 
 
-    lv_opa_t opa = (uint16_t)((uint16_t) style->text.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->text.opa : (uint16_t)((uint16_t) style->text.opa * opa_scale) >> 8;
 
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;

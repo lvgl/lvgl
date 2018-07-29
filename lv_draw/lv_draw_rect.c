@@ -103,7 +103,7 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
     uint8_t mix;
     lv_coord_t height = lv_area_get_height(coords);
     lv_coord_t width = lv_area_get_width(coords);
-    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
 
     radius = lv_draw_cont_radius_corr(radius, width, height);
 
@@ -170,7 +170,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
     lv_color_t mcolor = style->body.main_color;
     lv_color_t gcolor = style->body.grad_color;
     lv_color_t act_color;
-    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
     uint8_t mix;
     lv_coord_t height = lv_area_get_height(coords);
     lv_coord_t width = lv_area_get_width(coords);
@@ -659,8 +659,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     uint16_t bwidth = style->body.border.width;
     lv_color_t color = style->body.border.color;
     lv_border_part_t part = style->body.border.part;
-    lv_opa_t opa = (uint16_t)((uint16_t) style->body.border.opa * opa_scale) >> 8;
-
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.border.opa : (uint16_t)((uint16_t) style->body.border.opa * opa_scale) >> 8;
     /*0 px border width drawn as 1 px, so decrement the bwidth*/
     bwidth--;
 
@@ -1102,7 +1101,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 # endif
 #endif
     /*1D Blur horizontally*/
-    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
     for(line = 0; line < filter_width; line++) {
         line_1d_blur[line] = (uint32_t)((uint32_t)(filter_width - line) * (opa * 2)  << SHADOW_OPA_EXTRA_PRECISION) / (filter_width * filter_width);
     }
@@ -1257,7 +1256,7 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
 # endif
 #endif
 
-    lv_opa_t opa = (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
     for(col = 0; col < swidth; col++) {
         line_1d_blur[col] = (uint32_t)((uint32_t)(swidth - col) * opa / 2) / (swidth);
     }

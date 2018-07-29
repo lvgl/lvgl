@@ -142,7 +142,7 @@ static void line_draw_hor(line_draw_t * line, const lv_area_t * mask, const lv_s
     lv_coord_t width = style->line.width - 1;
     lv_coord_t width_half = width >> 1;
     lv_coord_t width_1 = width & 0x1;
-    lv_opa_t opa = (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
 
     lv_area_t act_area;
     act_area.x1 = line->p1.x;
@@ -163,7 +163,8 @@ static void line_draw_ver(line_draw_t * line, const lv_area_t * mask, const lv_s
     lv_coord_t width = style->line.width - 1;
     lv_coord_t width_half = width >> 1;
     lv_coord_t width_1 = width & 0x1;
-    lv_opa_t opa = (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+
 
     lv_area_t act_area;
     act_area.x1 = line->p1.x - width_half;
@@ -184,7 +185,8 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
     lv_coord_t width;
     width = style->line.width;
     lv_coord_t width_safe = width;
-    lv_opa_t opa = (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+
 
 #if LV_ANTIALIAS
     width--;

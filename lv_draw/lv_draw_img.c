@@ -53,7 +53,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
     }
 
 
-    lv_opa_t opa = (uint16_t)((uint16_t) style->image.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t) style->image.opa * opa_scale) >> 8;
 
     const uint8_t * u8_p = (uint8_t *) src;
     if(u8_p[0] >= 'A' &&  u8_p[0] <= 'Z') { /*It will be a path of a file*/
