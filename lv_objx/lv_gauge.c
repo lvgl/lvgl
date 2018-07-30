@@ -58,7 +58,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a gauge object, if not NULL then the new object will be copied from it
  * @return pointer to the created gauge
  */
-lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("gauge create started");
 
@@ -208,7 +208,7 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
  * @param needle the id of the needle
  * @return the value of the needle [min,max]
  */
-int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle)
+int16_t lv_gauge_get_value(const lv_obj_t * gauge,  uint8_t needle)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     int16_t min = lv_gauge_get_min_value(gauge);
@@ -223,7 +223,7 @@ int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle)
  * @param gauge pointer to gauge
  * @return count of needles
  */
-uint8_t lv_gauge_get_needle_count(lv_obj_t * gauge)
+uint8_t lv_gauge_get_needle_count(const lv_obj_t * gauge)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     return ext->needle_count;
@@ -234,7 +234,7 @@ uint8_t lv_gauge_get_needle_count(lv_obj_t * gauge)
  * @param gauge pointer to a gauge object
  * @return count of labels
  */
-uint8_t lv_gauge_get_label_count(lv_obj_t * gauge)
+uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     return ext->label_count;

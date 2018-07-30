@@ -64,7 +64,7 @@ static lv_design_func_t  ancestor_design;
  * @param copy pointer to a drop down list object, if not NULL then the new object will be copied from it
  * @return pointer to the created drop down list
  */
-lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("drop down list create started");
 
@@ -280,7 +280,7 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, lv_style_t *
  * @param ddlist pointer to drop down list object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
-const char * lv_ddlist_get_options(lv_obj_t * ddlist)
+const char * lv_ddlist_get_options(const lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return lv_label_get_text(ext->label);
@@ -291,7 +291,7 @@ const char * lv_ddlist_get_options(lv_obj_t * ddlist)
  * @param ddlist pointer to drop down list object
  * @return id of the selected option (0 ... number of option - 1);
  */
-uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist)
+uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -303,7 +303,7 @@ uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist)
  * @param ddlist pointer to ddlist object
  * @param buf pointer to an array to store the string
  */
-void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf)
+void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -328,7 +328,7 @@ void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf)
  * @param ddlist pointer to a drop down list
  * @return  pointer to the call back function
  */
-lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist)
+lv_action_t lv_ddlist_get_action(const lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return ext->action;
@@ -339,7 +339,7 @@ lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist)
  * @param ddlist pointer to a drop down list object
  * @return the height if the ddlist is opened (0: auto size)
  */
-lv_coord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist)
+lv_coord_t lv_ddlist_get_fix_height(const lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return ext->fix_height;
@@ -350,7 +350,7 @@ lv_coord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist)
  * @param ddlist pointer to a drop down list
  * @return open/close animation time [ms]
  */
-uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist)
+uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return ext->anim_time;
@@ -363,7 +363,7 @@ uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ddlist_get_style(lv_obj_t * ddlist, lv_ddlist_style_t type)
+lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 

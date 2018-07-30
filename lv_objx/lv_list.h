@@ -79,7 +79,7 @@ typedef enum {
  * @param copy pointer to a list object, if not NULL then the new object will be copied from it
  * @return pointer to the created list
  */
-lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
@@ -139,34 +139,34 @@ void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style);
  * @param btn pointer to list element
  * @return pointer to the text
  */
-const char * lv_list_get_btn_text(lv_obj_t * btn);
+const char * lv_list_get_btn_text(const lv_obj_t * btn);
 /**
  * Get the label object from a list element
  * @param btn pointer to a list element (button)
  * @return pointer to the label from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_btn_label(lv_obj_t * btn);
+lv_obj_t * lv_list_get_btn_label(const lv_obj_t * btn);
 
 /**
  * Get the image object from a list element
  * @param btn pointer to a list element (button)
  * @return pointer to the image from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_btn_img(lv_obj_t * btn);
+lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn);
 
 /**
  * Get scroll animation duration
  * @param list pointer to a list object
  * @return duration of animation [ms]
  */
-uint16_t lv_list_get_anim_time(lv_obj_t *list);
+uint16_t lv_list_get_anim_time(const lv_obj_t *list);
 
 /**
  * Get the scroll bar mode of a list
  * @param list pointer to a list object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
  */
-static inline lv_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
+static inline lv_sb_mode_t lv_list_get_sb_mode(const lv_obj_t * list)
 {
     return lv_page_get_sb_mode(list);
 }
@@ -177,7 +177,7 @@ static inline lv_sb_mode_t lv_list_get_sb_mode(lv_obj_t * list)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_list_get_style(lv_obj_t *list, lv_list_style_t type);
+lv_style_t * lv_list_get_style(const lv_obj_t *list, lv_list_style_t type);
 
 /*=====================
  * Other functions
@@ -187,19 +187,19 @@ lv_style_t * lv_list_get_style(lv_obj_t *list, lv_list_style_t type);
  * Move the list elements up by one
  * @param list pointer a to list object
  */
-void lv_list_up(lv_obj_t * list);
+void lv_list_up(const lv_obj_t * list);
 /**
  * Move the list elements down by one
  * @param list pointer to a list object
  */
-void lv_list_down(lv_obj_t * list);
+void lv_list_down(const lv_obj_t * list);
 
 /**
  * Focus on a list button. It ensures that the button will be visible on the list.
  * @param btn pointer to a list button to focus
  * @param anim_en true: scroll with animation, false: without animation
  */
-void lv_list_focus(lv_obj_t *btn, bool anim_en);
+void lv_list_focus(const lv_obj_t *btn, bool anim_en);
 
 /**********************
  *      MACROS

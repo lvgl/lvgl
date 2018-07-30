@@ -37,8 +37,8 @@
  **********************/
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
-static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn);
-static lv_obj_t * get_prev_btn(lv_obj_t * list, lv_obj_t * prev_btn);
+static lv_obj_t * get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
+static lv_obj_t * get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
 static void refr_btn_width(lv_obj_t * list);
 
 /**********************
@@ -69,7 +69,7 @@ static lv_obj_t * last_clicked_btn;
  * @param copy pointer to a list object, if not NULL then the new object will be copied from it
  * @return pointer to the created list
  */
-lv_obj_t * lv_list_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("list create started");
 
@@ -312,7 +312,7 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
  * @param btn pointer to list element
  * @return pointer to the text
  */
-const char * lv_list_get_btn_text(lv_obj_t * btn)
+const char * lv_list_get_btn_text(const lv_obj_t * btn)
 {
     lv_obj_t * label = lv_list_get_btn_label(btn);
     if(label == NULL) return "";
@@ -324,7 +324,7 @@ const char * lv_list_get_btn_text(lv_obj_t * btn)
  * @param btn pointer to a list element (button)
  * @return pointer to the label from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_btn_label(lv_obj_t * btn)
+lv_obj_t * lv_list_get_btn_label(const lv_obj_t * btn)
 {
     lv_obj_t * label = lv_obj_get_child(btn, NULL);
     if(label == NULL) return NULL;
@@ -342,7 +342,7 @@ lv_obj_t * lv_list_get_btn_label(lv_obj_t * btn)
  * @param btn pointer to a list element (button)
  * @return pointer to the image from the list element or NULL if not found
  */
-lv_obj_t * lv_list_get_btn_img(lv_obj_t * btn)
+lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn)
 {
 #if USE_LV_IMG != 0
     lv_obj_t * img = lv_obj_get_child(btn, NULL);
@@ -364,7 +364,7 @@ lv_obj_t * lv_list_get_btn_img(lv_obj_t * btn)
  * @param list pointer to a list object
  * @return duration of animation [ms]
  */
-uint16_t lv_list_get_anim_time(lv_obj_t * list)
+uint16_t lv_list_get_anim_time(const lv_obj_t * list)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     return ext->anim_time;
@@ -376,7 +376,7 @@ uint16_t lv_list_get_anim_time(lv_obj_t * list)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_list_get_style(lv_obj_t * list, lv_list_style_t type)
+lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
@@ -412,7 +412,7 @@ lv_style_t * lv_list_get_style(lv_obj_t * list, lv_list_style_t type)
  * Move the list elements up by one
  * @param list pointer a to list object
  */
-void lv_list_up(lv_obj_t * list)
+void lv_list_up(const lv_obj_t * list)
 {
     /*Search the first list element which 'y' coordinate is below the parent
      * and position the list to show this element on the bottom*/
@@ -457,7 +457,7 @@ void lv_list_up(lv_obj_t * list)
  * Move the list elements down by one
  * @param list pointer to a list object
  */
-void lv_list_down(lv_obj_t * list)
+void lv_list_down(const lv_obj_t * list)
 {
     /*Search the first list element which 'y' coordinate is above the parent
      * and position the list to show this element on the top*/
@@ -500,7 +500,7 @@ void lv_list_down(lv_obj_t * list)
  * @param btn pointer to a list button to focus
  * @param anim_en true: scroll with animation, false: without animation
  */
-void lv_list_focus(lv_obj_t * btn, bool anim_en)
+void lv_list_focus(const lv_obj_t * btn, bool anim_en)
 {
 
 #if USE_LV_ANIMATION == 0
@@ -701,7 +701,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
  * @param prev_btn pointer to button. Search the next after it.
  * @return pointer to the next button or NULL when no more buttons
  */
-static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn)
+static lv_obj_t * get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 {
     /* Not a good practice but user can add/create objects to the lists manually.
      * When getting the next button try to be sure that it is at least a button */
@@ -727,7 +727,7 @@ static lv_obj_t * get_next_btn(lv_obj_t * list, lv_obj_t * prev_btn)
  * @param prev_btn pointer to button. Search the previous before it.
  * @return pointer to the previous button or NULL when no more buttons
  */
-static lv_obj_t * get_prev_btn(lv_obj_t * list, lv_obj_t * prev_btn)
+static lv_obj_t * get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 {
     /* Not a good practice but user can add/create objects to the lists manually.
      * When getting the next button try to be sure that it is at least a button */

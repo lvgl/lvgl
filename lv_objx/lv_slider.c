@@ -51,7 +51,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a slider object, if not NULL then the new object will be copied from it
  * @return pointer to the created slider
  */
-lv_obj_t * lv_slider_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("slider create started");
 
@@ -173,7 +173,7 @@ void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, lv_style_t *
  * @param slider pointer to a slider object
  * @return the value of the slider
  */
-int16_t lv_slider_get_value(lv_obj_t * slider)
+int16_t lv_slider_get_value(const lv_obj_t * slider)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
@@ -186,7 +186,7 @@ int16_t lv_slider_get_value(lv_obj_t * slider)
  * @param slider pointer to slider object
  * @return the callback function
  */
-lv_action_t lv_slider_get_action(lv_obj_t * slider)
+lv_action_t lv_slider_get_action(const lv_obj_t * slider)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->action;
@@ -197,7 +197,7 @@ lv_action_t lv_slider_get_action(lv_obj_t * slider)
  * @param slider pointer to a slider object
  * @return true: drag in progress false: not dragged
  */
-bool lv_slider_is_dragged(lv_obj_t * slider)
+bool lv_slider_is_dragged(const lv_obj_t * slider)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->drag_value == LV_SLIDER_NOT_PRESSED ? false : true;
@@ -209,7 +209,7 @@ bool lv_slider_is_dragged(lv_obj_t * slider)
  * @return true: the knob is drawn always in the slider;
  *         false: the knob can be out on the edges
  */
-bool lv_slider_get_knob_in(lv_obj_t * slider)
+bool lv_slider_get_knob_in(const lv_obj_t * slider)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->knob_in == 0 ? false : true;
@@ -221,7 +221,7 @@ bool lv_slider_get_knob_in(lv_obj_t * slider)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_slider_get_style(lv_obj_t * slider, lv_slider_style_t type)
+lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 

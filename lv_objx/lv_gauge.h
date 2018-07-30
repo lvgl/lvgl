@@ -60,7 +60,7 @@ typedef struct
  * @param copy pointer to a gauge object, if not NULL then the new object will be copied from it
  * @return pointer to the created gauge
  */
-lv_obj_t * lv_gauge_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -132,21 +132,21 @@ static inline void lv_gauge_set_style(lv_obj_t *gauge, lv_style_t *bg)
  * @param needle the id of the needle
  * @return the value of the needle [min,max]
  */
-int16_t lv_gauge_get_value(lv_obj_t * gauge,  uint8_t needle);
+int16_t lv_gauge_get_value(const lv_obj_t * gauge,  uint8_t needle);
 
 /**
  * Get the count of needles on a gauge
  * @param gauge pointer to gauge
  * @return count of needles
  */
-uint8_t lv_gauge_get_needle_count(lv_obj_t * gauge);
+uint8_t lv_gauge_get_needle_count(const lv_obj_t * gauge);
 
 /**
  * Get the minimum value of a gauge
  * @param gauge pointer to a gauge object
  * @return the minimum value of the gauge
  */
-static inline int16_t lv_gauge_get_min_value(lv_obj_t * lmeter)
+static inline int16_t lv_gauge_get_min_value(const lv_obj_t * lmeter)
 {
     return lv_lmeter_get_min_value(lmeter);
 }
@@ -156,7 +156,7 @@ static inline int16_t lv_gauge_get_min_value(lv_obj_t * lmeter)
  * @param gauge pointer to a gauge object
  * @return the maximum value of the gauge
  */
-static inline int16_t lv_gauge_get_max_value(lv_obj_t * lmeter)
+static inline int16_t lv_gauge_get_max_value(const lv_obj_t * lmeter)
 {
     return lv_lmeter_get_max_value(lmeter);
 }
@@ -166,7 +166,7 @@ static inline int16_t lv_gauge_get_max_value(lv_obj_t * lmeter)
  * @param gauge pointer to a gauge object
  * @return the critical value
  */
-static inline int16_t lv_gauge_get_critical_value(lv_obj_t * gauge)
+static inline int16_t lv_gauge_get_critical_value(const lv_obj_t * gauge)
 {
     return lv_lmeter_get_value(gauge);
 }
@@ -176,14 +176,14 @@ static inline int16_t lv_gauge_get_critical_value(lv_obj_t * gauge)
  * @param gauge pointer to a gauge object
  * @return count of labels
  */
-uint8_t lv_gauge_get_label_count(lv_obj_t * gauge);
+uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge);
 
 /**
  * Get the scale number of a gauge
  * @param gauge pointer to a gauge object
  * @return number of the scale units
  */
-static inline uint8_t lv_gauge_get_line_count(lv_obj_t * gauge)
+static inline uint8_t lv_gauge_get_line_count(const lv_obj_t * gauge)
 {
     return lv_lmeter_get_line_count(gauge);
 }
@@ -193,7 +193,7 @@ static inline uint8_t lv_gauge_get_line_count(lv_obj_t * gauge)
  * @param gauge pointer to a gauge object
  * @return angle of the scale
  */
-static inline uint16_t lv_gauge_get_scale_angle(lv_obj_t * gauge)
+static inline uint16_t lv_gauge_get_scale_angle(const lv_obj_t * gauge)
 {
     return lv_lmeter_get_scale_angle(gauge);
 }
@@ -203,7 +203,7 @@ static inline uint16_t lv_gauge_get_scale_angle(lv_obj_t * gauge)
  * @param gauge pointer to a gauge object
  * @return pointer to the gauge's style
  */
-static inline lv_style_t * lv_gauge_get_style(lv_obj_t *gauge)
+static inline lv_style_t * lv_gauge_get_style(const lv_obj_t *gauge)
 {
     return lv_obj_get_style(gauge);
 }

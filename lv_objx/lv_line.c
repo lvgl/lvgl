@@ -48,7 +48,7 @@ static lv_signal_func_t ancestor_signal;
  * @param par pointer to an object, it will be the parent of the new line
  * @return pointer to the created line
  */
-lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("line create started");
 
@@ -171,7 +171,7 @@ void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en)
  * @param line pointer to a line object
  * @return true: auto size is enabled, false: disabled
  */
-bool lv_line_get_auto_size(lv_obj_t * line)
+bool lv_line_get_auto_size(const lv_obj_t * line)
 {
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
@@ -183,7 +183,7 @@ bool lv_line_get_auto_size(lv_obj_t * line)
  * @param line pointer to a line object
  * @return true: y inversion is enabled, false: disabled
  */
-bool lv_line_get_y_inv(lv_obj_t * line)
+bool lv_line_get_y_inv(const lv_obj_t * line)
 {
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 

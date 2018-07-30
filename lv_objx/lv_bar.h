@@ -60,7 +60,7 @@ typedef enum {
  * @param copy pointer to a bar object, if not NULL then the new object will be copied from it
  * @return pointer to the created bar
  */
-lv_obj_t * lv_bar_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -107,21 +107,21 @@ void lv_bar_set_style(lv_obj_t *bar, lv_bar_style_t type, lv_style_t *style);
  * @param bar pointer to a bar object
  * @return the value of the bar
  */
-int16_t lv_bar_get_value(lv_obj_t * bar);
+int16_t lv_bar_get_value(const lv_obj_t * bar);
 
 /**
  * Get the minimum value of a bar
  * @param bar pointer to a bar object
  * @return the minimum value of the bar
  */
-int16_t lv_bar_get_min_value(lv_obj_t * bar);
+int16_t lv_bar_get_min_value(const lv_obj_t * bar);
 
 /**
  * Get the maximum value of a bar
  * @param bar pointer to a bar object
  * @return the maximum value of the bar
  */
-int16_t lv_bar_get_max_value(lv_obj_t * bar);
+int16_t lv_bar_get_max_value(const lv_obj_t * bar);
 
 
 /**
@@ -130,7 +130,7 @@ int16_t lv_bar_get_max_value(lv_obj_t * bar);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_bar_get_style(lv_obj_t *bar, lv_bar_style_t type);
+lv_style_t * lv_bar_get_style(const lv_obj_t *bar, lv_bar_style_t type);
 
 /**********************
  *      MACROS

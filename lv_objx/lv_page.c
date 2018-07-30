@@ -55,7 +55,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a page object, if not NULL then the new object will be copied from it
  * @return pointer to the created page
  */
-lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("page create started");
 
@@ -248,7 +248,7 @@ void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, lv_style_t * style
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
  */
-lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
+lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
@@ -260,7 +260,7 @@ lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
-lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page)
+lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->sb.mode;
@@ -271,7 +271,7 @@ lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page)
  * @param page pointer to a page object
  * @return true: scrolling with arrows is enabled
  */
-bool lv_page_get_arrow_scroll(lv_obj_t * page)
+bool lv_page_get_arrow_scroll(const lv_obj_t * page)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->arrow_scroll ? true : false;
@@ -283,7 +283,7 @@ bool lv_page_get_arrow_scroll(lv_obj_t * page)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_page_get_style(lv_obj_t * page, lv_page_style_t type)
+lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
@@ -323,7 +323,7 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
  * @param obj pointer to an object to focus (must be on the page)
  * @param anim_time scroll animation time in milliseconds (0: no animation)
  */
-void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time)
+void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 {
 
 #if USE_LV_ANIMATION == 0

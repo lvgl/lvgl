@@ -348,7 +348,7 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
  * @param group pointer to a group
  * @return pointer to the focused object
  */
-lv_obj_t * lv_group_get_focused(lv_group_t * group)
+lv_obj_t * lv_group_get_focused(const lv_group_t * group)
 {
     if(!group) return NULL;
     if(group->obj_focus == NULL) return NULL;
@@ -361,7 +361,7 @@ lv_obj_t * lv_group_get_focused(lv_group_t * group)
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group)
+lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
 {
 	if(!group) return false;
     return group->style_mod ;
@@ -372,7 +372,7 @@ lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group)
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group)
+lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
 {
 	if(!group) return false;
     return group->style_mod_edit;
@@ -383,7 +383,7 @@ lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group)
  * @param group pointer to a group
  * @return the call back function or NULL if not set
  */
-lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
+lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group)
 {
 	if(!group) return false;
     return group->focus_cb;
@@ -394,7 +394,7 @@ lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group)
  * @param group pointer to group
  * @return true editing is enabled
  */
-bool lv_group_get_edit_enable(lv_group_t * group, bool en)
+bool lv_group_get_edit_enable(const lv_group_t * group, bool en)
 {
 	return group->edit_mode_en ? true : false;
 }
@@ -404,7 +404,7 @@ bool lv_group_get_edit_enable(lv_group_t * group, bool en)
  * @param group pointer to group
  * @return true: edit mode; false: navigate mode
  */
-bool lv_group_get_editing(lv_group_t * group)
+bool lv_group_get_editing(const lv_group_t * group)
 {
 	if(!group) return false;
 	return group->editing ? true : false;
@@ -415,7 +415,7 @@ bool lv_group_get_editing(lv_group_t * group)
  * @param group pointer to group
  * @return true: `click_focus` is enabled; false: disabled
  */
-bool lv_group_get_click_focus(lv_group_t * group)
+bool lv_group_get_click_focus(const lv_group_t * group)
 {
 	if(!group) return false;
 	return group->click_focus ? true : false;

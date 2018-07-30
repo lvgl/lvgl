@@ -65,7 +65,7 @@ typedef struct
  * @param copy pointer to a container object, if not NULL then the new object will be copied from it
  * @return pointer to the created container
  */
-lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -107,28 +107,28 @@ static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
  * @param cont pointer to container object
  * @return the layout from 'lv_cont_layout_t'
  */
-lv_layout_t lv_cont_get_layout(lv_obj_t * cont);
+lv_layout_t lv_cont_get_layout(const lv_obj_t * cont);
 
 /**
  * Get horizontal fit enable attribute of a container
  * @param cont pointer to a container object
  * @return true: horizontal fit is enabled; false: disabled
  */
-bool lv_cont_get_hor_fit(lv_obj_t * cont);
+bool lv_cont_get_hor_fit(const lv_obj_t * cont);
 
 /**
  * Get vertical fit enable attribute of a container
  * @param cont pointer to a container object
  * @return true: vertical fit is enabled; false: disabled
  */
-bool lv_cont_get_ver_fit(lv_obj_t * cont);
+bool lv_cont_get_ver_fit(const lv_obj_t * cont);
 
 /**
  * Get the style of a container
  * @param cont pointer to a container object
  * @return pointer to the container's style
  */
-static inline lv_style_t * lv_cont_get_style(lv_obj_t *cont)
+static inline lv_style_t * lv_cont_get_style(const lv_obj_t *cont)
 {
     return lv_obj_get_style(cont);
 }

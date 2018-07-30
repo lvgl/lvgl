@@ -58,7 +58,7 @@ static lv_signal_func_t ancestor_scrl_signal;
  * @param copy pointer to a roller object, if not NULL then the new object will be copied from it
  * @return pointer to the created roller
  */
-lv_obj_t * lv_roller_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("roller create started");
 
@@ -179,7 +179,7 @@ void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, lv_style_t *
  * @param roller pointer to a roller object
  * @return true: auto size enabled; false: manual width settings enabled
  */
-bool lv_roller_get_hor_fit(lv_obj_t * roller)
+bool lv_roller_get_hor_fit(const lv_obj_t * roller)
 {
     return lv_page_get_scrl_hor_fit(roller);
 }
@@ -190,7 +190,7 @@ bool lv_roller_get_hor_fit(lv_obj_t * roller)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_roller_get_style(lv_obj_t * roller, lv_roller_style_t type)
+lv_style_t * lv_roller_get_style(const lv_obj_t * roller, lv_roller_style_t type)
 {
     switch(type) {
         case LV_ROLLER_STYLE_BG:

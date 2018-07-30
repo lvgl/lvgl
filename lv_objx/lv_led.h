@@ -49,7 +49,7 @@ typedef struct
  * @param copy pointer to a led object, if not NULL then the new object will be copied from it
  * @return pointer to the created led
  */
-lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Set the brightness of a LED object
@@ -91,14 +91,14 @@ static inline void lv_led_set_style(lv_obj_t *led, lv_style_t *style)
  * @param led pointer to LED object
  * @return bright 0 (max. dark) ... 255 (max. light)
  */
-uint8_t lv_led_get_bright(lv_obj_t * led);
+uint8_t lv_led_get_bright(const lv_obj_t * led);
 
 /**
  * Get the style of an led object
  * @param led pointer to an led object
  * @return pointer to the led's style
  */
-static inline lv_style_t* lv_led_get_style(lv_obj_t *led)
+static inline lv_style_t* lv_led_get_style(const lv_obj_t *led)
 {
     return lv_obj_get_style(led);
 }

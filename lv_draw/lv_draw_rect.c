@@ -29,15 +29,20 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
 static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+
 #if USE_LV_SHADOW && LV_VDB_SIZE
 static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map);
 #endif
+
 static uint16_t lv_draw_cont_radius_corr(uint16_t r, lv_coord_t w, lv_coord_t h);
 
+#if LV_ANTIALIAS
 static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_t opa);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -1391,13 +1396,15 @@ static uint16_t lv_draw_cont_radius_corr(uint16_t r, lv_coord_t w, lv_coord_t h)
     return r;
 }
 
+#if LV_ANTIALIAS
+
 /**
  * Approximate the opacity for anti-aliasing.
  * Used  the first segment of a circle which is the longest and have the most non-linearity (cos)
- * @param seg
- * @param px_id
- * @param line_opa
- * @return
+ * @param seg length of the line segment
+ * @param px_id index of pixel on the line segment
+ * @param line_opa opacity of the lien (it will be the max opacity)
+ * @return the desired opacity of the pixel
  */
 static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_t opa)
 {
@@ -1413,3 +1420,5 @@ static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_
     }
 
 }
+
+#endif

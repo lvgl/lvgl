@@ -48,7 +48,7 @@ static lv_design_func_t ancestor_design;
  * @param copy pointer to a arc object, if not NULL then the new object will be copied from it
  * @return pointer to the created arc
  */
-lv_obj_t * lv_arc_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 
 	LV_LOG_TRACE("arc create started");
@@ -174,7 +174,7 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_arc_get_style(lv_obj_t * arc, lv_arc_style_t type)
+lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type)
 {
 
     switch(type) {

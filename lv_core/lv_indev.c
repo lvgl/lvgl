@@ -80,7 +80,7 @@ lv_indev_t * lv_indev_get_act(void)
  * @param indev pointer to an input device
  * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
  */
-lv_hal_indev_type_t lv_indev_get_type(lv_indev_t * indev)
+lv_hal_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
 	if(indev == NULL) return LV_INDEV_TYPE_NONE;
 
@@ -170,7 +170,7 @@ void lv_indev_set_button_points(lv_indev_t * indev, lv_point_t * points)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the result
  */
-void lv_indev_get_point(lv_indev_t * indev, lv_point_t * point)
+void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
 {
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
         point->x = -1;
@@ -186,7 +186,7 @@ void lv_indev_get_point(lv_indev_t * indev, lv_point_t * point)
  * @param indev pointer to an input device
  * @return true: drag is in progress
  */
-bool lv_indev_is_dragging(lv_indev_t * indev)
+bool lv_indev_is_dragging(const lv_indev_t * indev)
 {
     if(indev == NULL) return false;
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return false;
@@ -198,7 +198,7 @@ bool lv_indev_is_dragging(lv_indev_t * indev)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the vector
  */
-void lv_indev_get_vect(lv_indev_t * indev, lv_point_t * point)
+void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
 {
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
         point->x = 0;
@@ -214,7 +214,7 @@ void lv_indev_get_vect(lv_indev_t * indev, lv_point_t * point)
  * @param indev pointer to an input device (NULL to get the overall smallest inactivity)
  * @return Elapsed ticks (milliseconds) since last press
  */
-uint32_t lv_indev_get_inactive_time(lv_indev_t * indev)
+uint32_t lv_indev_get_inactive_time(const lv_indev_t * indev)
 {
     uint32_t t;
 

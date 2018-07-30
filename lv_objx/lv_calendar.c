@@ -68,7 +68,7 @@ static const char * month_name[12] = {"January",   "February",   "March",    "Ap
  * @param copy pointer to a calendar object, if not NULL then the new object will be copied from it
  * @return pointer to the created calendar
  */
-lv_obj_t * lv_calendar_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("calendar create started");
 
@@ -281,7 +281,7 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
  * @param calendar pointer to a calendar object
  * @return return pointer to an `lv_calendar_date_t` variable containing the date of today.
  */
-lv_calendar_date_t * lv_calendar_get_today_date(lv_obj_t * calendar)
+lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->today;
@@ -292,7 +292,7 @@ lv_calendar_date_t * lv_calendar_get_today_date(lv_obj_t * calendar)
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` variable containing the date is being shown.
  */
-lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar)
+lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->showed_date;
@@ -303,7 +303,7 @@ lv_calendar_date_t * lv_calendar_get_showed_date(lv_obj_t * calendar)
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` array containing the dates.
  */
-lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar)
+lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates;
@@ -314,7 +314,7 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(lv_obj_t * calendar)
  * @param calendar pointer to a calendar object
  * @return number of highlighted days
  */
-uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar)
+uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates_num;
@@ -325,7 +325,7 @@ uint16_t lv_calendar_get_highlighted_dates_num(lv_obj_t * calendar)
  * @param calendar pointer to a calendar object
  * @return pointer to the array of day names
  */
-const char ** lv_calendar_get_day_names(lv_obj_t * calendar, const char ** day_names)
+const char ** lv_calendar_get_day_names(const lv_obj_t * calendar, const char ** day_names)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->day_names;
@@ -336,7 +336,7 @@ const char ** lv_calendar_get_day_names(lv_obj_t * calendar, const char ** day_n
  * @param calendar pointer to a calendar object
  * @return pointer to the array of month names
  */
-const char ** lv_calendar_get_month_names(lv_obj_t * calendar, const char ** day_names)
+const char ** lv_calendar_get_month_names(const lv_obj_t * calendar, const char ** day_names)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->month_names;
@@ -348,7 +348,7 @@ const char ** lv_calendar_get_month_names(lv_obj_t * calendar, const char ** day
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_calendar_get_style(lv_obj_t * calendar, lv_calendar_style_t type)
+lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 

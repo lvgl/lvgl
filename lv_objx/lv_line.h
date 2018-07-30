@@ -51,7 +51,7 @@ typedef struct
  * @param par pointer to an object, it will be the parent of the new line
  * @return pointer to the created line
  */
-lv_obj_t * lv_line_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -111,21 +111,21 @@ static inline void lv_line_set_upscale(lv_obj_t * line, bool upcale)
  * @param line pointer to a line object
  * @return true: auto size is enabled, false: disabled
  */
-bool lv_line_get_auto_size(lv_obj_t * line);
+bool lv_line_get_auto_size(const lv_obj_t * line);
 
 /**
  * Get the y inversion attribute
  * @param line pointer to a line object
  * @return true: y inversion is enabled, false: disabled
  */
-bool lv_line_get_y_inv(lv_obj_t * line);
+bool lv_line_get_y_inv(const lv_obj_t * line);
 
 /**
  * Get the style of an line object
  * @param line pointer to an line object
  * @return pointer to the line's style
  */
-static inline lv_style_t* lv_line_get_style(lv_obj_t *line)
+static inline lv_style_t* lv_line_get_style(const lv_obj_t *line)
 {
     return lv_obj_get_style(line);
 }
@@ -135,7 +135,7 @@ static inline lv_style_t* lv_line_get_style(lv_obj_t *line)
  * @param line -
  * @return false
  */
-static inline bool lv_line_get_upscale(lv_obj_t * line)
+static inline bool lv_line_get_upscale(const lv_obj_t * line)
 {
     return false;
 }

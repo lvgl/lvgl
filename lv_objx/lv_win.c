@@ -44,7 +44,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a window object, if not NULL then the new object will be copied from it
  * @return pointer to the created window
  */
-lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("window create started");
 
@@ -309,7 +309,7 @@ void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, lv_style_t * style)
  * @param win pointer to a window object
  * @return title string of the window
  */
-const char * lv_win_get_title(lv_obj_t * win)
+const char * lv_win_get_title(const lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_label_get_text(ext->title);
@@ -320,7 +320,7 @@ const char * lv_win_get_title(lv_obj_t * win)
  * @param win pointer to a window object
  * @return control button size
  */
-lv_coord_t lv_win_get_btn_size(lv_obj_t * win)
+lv_coord_t lv_win_get_btn_size(const lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return ext->btn_size;
@@ -331,7 +331,7 @@ lv_coord_t lv_win_get_btn_size(lv_obj_t * win)
  * @param win pointer to a window object
  * @return the layout of the window (from 'lv_layout_t')
  */
-lv_layout_t lv_win_get_layout(lv_obj_t * win)
+lv_layout_t lv_win_get_layout(const lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_page_get_scrl_layout(ext->page);
@@ -342,7 +342,7 @@ lv_layout_t lv_win_get_layout(lv_obj_t * win)
  * @param win pointer to a window object
  * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
  */
-lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win)
+lv_sb_mode_t lv_win_get_sb_mode(const lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_page_get_sb_mode(ext->page);
@@ -353,7 +353,7 @@ lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win)
  * @param win pointer to a window object
  * @return the width of the content_bg area
  */
-lv_coord_t lv_win_get_width(lv_obj_t * win)
+lv_coord_t lv_win_get_width(const lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_obj_t * scrl = lv_page_get_scrl(ext->page);
@@ -368,7 +368,7 @@ lv_coord_t lv_win_get_width(lv_obj_t * win)
  * @param ctrl_btn pointer to a control button of a window
  * @return pointer to the window of 'ctrl_btn'
  */
-lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn)
+lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn)
 {
     lv_obj_t * header = lv_obj_get_parent(ctrl_btn);
     lv_obj_t * win = lv_obj_get_parent(header);
@@ -382,7 +382,7 @@ lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn)
  * @param type which style window be get
  * @return style pointer to a style
  */
-lv_style_t * lv_win_get_style(lv_obj_t * win, lv_win_style_t type)
+lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 

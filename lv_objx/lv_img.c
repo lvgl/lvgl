@@ -52,7 +52,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a image object, if not NULL then the new object will be copied from it
  * @return pointer to the created image
  */
-lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("image create started");
 
@@ -254,7 +254,7 @@ lv_img_src_t lv_img_get_src_type(const void * src)
  * @param img pointer to an image
  * @return file name
  */
-const char * lv_img_get_file_name(lv_obj_t * img)
+const char * lv_img_get_file_name(const lv_obj_t * img)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
@@ -268,7 +268,7 @@ const char * lv_img_get_file_name(lv_obj_t * img)
  * @param img pointer to an image
  * @return true: auto size is enabled, false: auto size is disabled
  */
-bool lv_img_get_auto_size(lv_obj_t * img)
+bool lv_img_get_auto_size(const lv_obj_t * img)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 

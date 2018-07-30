@@ -73,7 +73,7 @@ static const char * kb_map_num[] = {
  * @param copy pointer to a keyboard object, if not NULL then the new object will be copied from it
  * @return pointer to the created keyboard
  */
-lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("keyboard create started");
 
@@ -271,7 +271,7 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, lv_style_t * style)
  * @param kb pointer to a Keyboard object
  * @return pointer to the assigned Text Area object
  */
-lv_obj_t * lv_kb_get_ta(lv_obj_t * kb)
+lv_obj_t * lv_kb_get_ta(const lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->ta;
@@ -282,7 +282,7 @@ lv_obj_t * lv_kb_get_ta(lv_obj_t * kb)
  * @param kb pointer to a Keyboard object
  * @return the current mode from 'lv_kb_mode_t'
  */
-lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb)
+lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->mode;
@@ -294,7 +294,7 @@ lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb)
  * @param kb pointer to a Keyboard object
  * @return true: show cursor on the current text area, false: hide cursor
  */
-bool lv_kb_get_cursor_manage(lv_obj_t * kb)
+bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->cursor_mng == 0 ? false : true;
@@ -305,7 +305,7 @@ bool lv_kb_get_cursor_manage(lv_obj_t * kb)
  * @param kb pointer to Keyboard object
  * @return the ok callback
  */
-lv_action_t lv_kb_get_ok_action(lv_obj_t * kb)
+lv_action_t lv_kb_get_ok_action(const lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->ok_action;
@@ -316,7 +316,7 @@ lv_action_t lv_kb_get_ok_action(lv_obj_t * kb)
  * @param kb pointer to Keyboard object
  * @return the close callback
  */
-lv_action_t lv_kb_get_hide_action(lv_obj_t * kb)
+lv_action_t lv_kb_get_hide_action(const lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->hide_action;
@@ -328,7 +328,7 @@ lv_action_t lv_kb_get_hide_action(lv_obj_t * kb)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_kb_get_style(lv_obj_t * kb, lv_kb_style_t type)
+lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
 {
     switch(type) {
         case LV_KB_STYLE_BG:

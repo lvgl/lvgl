@@ -55,7 +55,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a chart background object, if not NULL then the new object will be copied from it
  * @return pointer to the created chart background
  */
-lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 
 
@@ -349,7 +349,7 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
  * @param chart pointer to chart object
  * @return type of the chart (from 'lv_chart_t' enum)
  */
-lv_chart_type_t lv_chart_get_type(lv_obj_t * chart)
+lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->type;
@@ -360,7 +360,7 @@ lv_chart_type_t lv_chart_get_type(lv_obj_t * chart)
  * @param chart pointer to chart object
  * @return point number on each data line
  */
-uint16_t lv_chart_get_point_cnt(lv_obj_t * chart)
+uint16_t lv_chart_get_point_cnt(const lv_obj_t * chart)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->point_cnt;
@@ -371,7 +371,7 @@ uint16_t lv_chart_get_point_cnt(lv_obj_t * chart)
  * @param chart pointer to chart object
  * @return the opacity of the data series
  */
-lv_opa_t lv_chart_get_series_opa(lv_obj_t * chart)
+lv_opa_t lv_chart_get_series_opa(const lv_obj_t * chart)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->series.opa;
@@ -382,7 +382,7 @@ lv_opa_t lv_chart_get_series_opa(lv_obj_t * chart)
  * @param chart pointer to chart object
  * @return the width the data series (lines or points)
  */
-lv_coord_t lv_chart_get_series_width(lv_obj_t * chart)
+lv_coord_t lv_chart_get_series_width(const lv_obj_t * chart)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->series.width;
@@ -393,7 +393,7 @@ lv_coord_t lv_chart_get_series_width(lv_obj_t * chart)
  * @param chart pointer to chart object
  * @return dark effect level (LV_OPA_TRANSP to turn off)
  */
-lv_opa_t lv_chart_get_series_darking(lv_obj_t * chart)
+lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->series.dark;

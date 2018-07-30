@@ -48,7 +48,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a check box object, if not NULL then the new object will be copied from it
  * @return pointer to the created check box
  */
-lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 
 	LV_LOG_TRACE("check box create started");
@@ -176,7 +176,7 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t * style)
  * @param cb pointer to check box object
  * @return pointer to the text of the check box
  */
-const char * lv_cb_get_text(lv_obj_t * cb)
+const char * lv_cb_get_text(const lv_obj_t * cb)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     return lv_label_get_text(ext->label);
@@ -189,7 +189,7 @@ const char * lv_cb_get_text(lv_obj_t * cb)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type)
+lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 

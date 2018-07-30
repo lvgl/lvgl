@@ -50,7 +50,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a led object, if not NULL then the new object will be copied from it
  * @return pointer to the created led
  */
-lv_obj_t * lv_led_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("led create started");
 
@@ -159,7 +159,7 @@ void lv_led_toggle(lv_obj_t * led)
  * @param led pointer to LED object
  * @return bright 0 (max. dark) ... 255 (max. light)
  */
-uint8_t lv_led_get_bright(lv_obj_t * led)
+uint8_t lv_led_get_bright(const lv_obj_t * led)
 {
     lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
     return ext->bright;

@@ -88,7 +88,7 @@ typedef enum {
  * @param copy pointer to a window object, if not NULL then the new object will be copied from it
  * @return pointer to the created window
  */
-lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
@@ -165,35 +165,35 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
  * @param win pointer to a window object
  * @return title string of the window
  */
-const char * lv_win_get_title(lv_obj_t * win);
+const char * lv_win_get_title(const lv_obj_t * win);
 
 /**
  * Get the control button size of a window
  * @param win pointer to a window object
  * @return control button size
  */
-lv_coord_t lv_win_get_btn_size(lv_obj_t * win);
+lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
 
 /**
  * Get the layout of a window
  * @param win pointer to a window object
  * @return the layout of the window (from 'lv_layout_t')
  */
-lv_layout_t lv_win_get_layout(lv_obj_t *win);
+lv_layout_t lv_win_get_layout(const lv_obj_t *win);
 
 /**
  * Get the scroll bar mode of a window
  * @param win pointer to a window object
  * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
  */
-lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win);
+lv_sb_mode_t lv_win_get_sb_mode(const lv_obj_t *win);
 
 /**
  * Get width of the content area (page scrollable) of the window
  * @param win pointer to a window object
  * @return the width of the content area
  */
-lv_coord_t lv_win_get_width(lv_obj_t * win);
+lv_coord_t lv_win_get_width(const lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.
@@ -201,7 +201,7 @@ lv_coord_t lv_win_get_width(lv_obj_t * win);
  * @param ctrl_btn pointer to a control button of a window
  * @return pointer to the window of 'ctrl_btn'
  */
-lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn);
+lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn);
 
 /**
  * Get a style of a window
@@ -209,7 +209,7 @@ lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn);
  * @param type which style window be get
  * @return style pointer to a style
  */
-lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type);
+lv_style_t * lv_win_get_style(const lv_obj_t *win, lv_win_style_t type);
 
 /*=====================
  * Other functions

@@ -62,7 +62,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
  */
-lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("label create started");
 
@@ -337,7 +337,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
  * @param label pointer to a label object
  * @return the text of the label
  */
-char * lv_label_get_text(lv_obj_t * label)
+char * lv_label_get_text(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
@@ -349,7 +349,7 @@ char * lv_label_get_text(lv_obj_t * label)
  * @param label pointer to a label object
  * @return the long mode
  */
-lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label)
+lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->long_mode;
@@ -360,7 +360,7 @@ lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label)
  * @param label pointer to a label object
  * @return LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER
  */
-lv_label_align_t lv_label_get_align(lv_obj_t * label)
+lv_label_align_t lv_label_get_align(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->align;
@@ -371,7 +371,7 @@ lv_label_align_t lv_label_get_align(lv_obj_t * label)
  * @param label pointer to a label object
  * @return true: recoloring is enabled, false: disable
  */
-bool lv_label_get_recolor(lv_obj_t * label)
+bool lv_label_get_recolor(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->recolor == 0 ? false : true;
@@ -382,7 +382,7 @@ bool lv_label_get_recolor(lv_obj_t * label)
  * @param label pointer to a label object
  * @return true: draw body; false: don't draw body
  */
-bool lv_label_get_body_draw(lv_obj_t * label)
+bool lv_label_get_body_draw(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->body_draw == 0 ? false : true;
@@ -393,7 +393,7 @@ bool lv_label_get_body_draw(lv_obj_t * label)
  * @param label pointer to a label object
  * @return speed of animation in px/sec unit
  */
-uint16_t lv_label_get_anim_speed(lv_obj_t * label)
+uint16_t lv_label_get_anim_speed(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->anim_speed;
@@ -405,7 +405,7 @@ uint16_t lv_label_get_anim_speed(lv_obj_t * label)
  * @param index index of the letter [0 ... text length]. Expressed in character index, not byte index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
-void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
+void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t * pos)
 {
     const char * txt = lv_label_get_text(label);
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
@@ -487,7 +487,7 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  * Expressed in character index and not byte index (different in UTF-8)
  */
-uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
+uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 {
     const char * txt = lv_label_get_text(label);
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);

@@ -65,7 +65,7 @@ static lv_point_t ink_point;
  * @param copy pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
  */
-lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("button create started");
 
@@ -284,7 +284,7 @@ void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, lv_style_t * style)
  * @param btn pointer to a button object
  * @return the state of the button (from lv_btn_state_t enum)
  */
-lv_btn_state_t lv_btn_get_state(lv_obj_t * btn)
+lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->state;
@@ -295,7 +295,7 @@ lv_btn_state_t lv_btn_get_state(lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return ture: toggle enabled, false: disabled
  */
-bool lv_btn_get_toggle(lv_obj_t * btn)
+bool lv_btn_get_toggle(const lv_obj_t * btn)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
@@ -307,7 +307,7 @@ bool lv_btn_get_toggle(lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return pointer to the release action function
  */
-lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type)
+lv_action_t lv_btn_get_action(const lv_obj_t * btn, lv_btn_action_t type)
 {
     if(type >= LV_BTN_ACTION_NUM) return NULL;
 
@@ -320,7 +320,7 @@ lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_fill_time(lv_obj_t * btn, uint16_t time)
+uint16_t lv_btn_get_ink_fill_time(const lv_obj_t * btn, uint16_t time)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_fill_time;
@@ -332,7 +332,7 @@ uint16_t lv_btn_get_ink_fill_time(lv_obj_t * btn, uint16_t time)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_wait_time(lv_obj_t * btn, uint16_t time)
+uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn, uint16_t time)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_wait_time;
@@ -344,7 +344,7 @@ uint16_t lv_btn_get_ink_wait_time(lv_obj_t * btn, uint16_t time)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_style_t type)
+lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 

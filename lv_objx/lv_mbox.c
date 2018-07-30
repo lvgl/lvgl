@@ -58,7 +58,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a message box object, if not NULL then the new object will be copied from it
  * @return pointer to the created message box
  */
-lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("mesasge box create started");
 
@@ -285,7 +285,7 @@ void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, lv_style_t * style
  * @param mbox pointer to a message box object
  * @return pointer to the text of the message box
  */
-const char * lv_mbox_get_text(lv_obj_t * mbox)
+const char * lv_mbox_get_text(const lv_obj_t * mbox)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
@@ -298,7 +298,7 @@ const char * lv_mbox_get_text(lv_obj_t * mbox)
  * @param btn pointer to a button of a message box
  * @return pointer to the button's message box
  */
-lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn)
+lv_obj_t * lv_mbox_get_from_btn(const lv_obj_t * btn)
 {
     lv_obj_t * mbox = lv_obj_get_parent(btn);
 
@@ -310,7 +310,7 @@ lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn)
  * @param mbox pointer to a message box object
  * @return animation length in  milliseconds (0: no animation)
  */
-uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox)
+uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return ext->anim_time;
@@ -322,7 +322,7 @@ uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_mbox_get_style(lv_obj_t * mbox, lv_mbox_style_t type)
+lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 

@@ -53,7 +53,7 @@ static lv_design_func_t ancestor_design;
  * @param copy pointer to a pre loader object, if not NULL then the new object will be copied from it
  * @return pointer to the created pre loader
  */
-lv_obj_t * lv_preload_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("preload create started");
 
@@ -182,7 +182,7 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_
  * Get the arc length [degree] of the a pre loader
  * @param preload pointer to a pre loader object
  */
-uint16_t lv_preload_get_arc_length(lv_obj_t * preload)
+uint16_t lv_preload_get_arc_length(const lv_obj_t * preload)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->arc_length;
@@ -193,7 +193,7 @@ uint16_t lv_preload_get_arc_length(lv_obj_t * preload)
  * Get the spin time of the arc
  * @param preload pointer to a pre loader object [milliseconds]
  */
-uint16_t lv_preload_get_spin_time(lv_obj_t * preload)
+uint16_t lv_preload_get_spin_time(const lv_obj_t * preload)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->time;
@@ -205,7 +205,7 @@ uint16_t lv_preload_get_spin_time(lv_obj_t * preload)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_preload_get_style(lv_obj_t * preload, lv_preload_style_t type)
+lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type)
 {
 
     switch(type) {
@@ -223,6 +223,11 @@ lv_style_t * lv_preload_get_style(lv_obj_t * preload, lv_preload_style_t type)
  * Other functions
  *====================*/
 
+/**
+ * Automatically in an animation to rotate the arc of spinner.
+ * @param ptr pointer to preloader
+ * @param val the current desired value [0..360]
+ */
 void lv_preload_spinner_animation(void * ptr, int32_t val)
 {
     lv_obj_t * preload = ptr;

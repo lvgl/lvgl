@@ -51,7 +51,7 @@ static lv_design_func_t ancestor_design;
  * @param copy pointer to a template object, if not NULL then the new object will be copied from it
  * @return pointer to the created template
  */
-lv_obj_t * lv_templ_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("template create started");
 
@@ -141,7 +141,7 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t * st
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_templ_get_style(lv_obj_t * templ, lv_templ_style_t type)
+lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type)
 {
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
 

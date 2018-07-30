@@ -222,7 +222,7 @@ void lv_init(void);
  * @param copy pointer to a base object, if not NULL then the new object will be copied from it
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
+lv_obj_t * lv_obj_create(lv_obj_t * parent,const  lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children
@@ -241,7 +241,7 @@ void lv_obj_clean(lv_obj_t *obj);
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
  * @param obj pointer to an object
  */
-void lv_obj_invalidate(lv_obj_t * obj);
+void lv_obj_invalidate(const lv_obj_t * obj);
 
 /*=====================
  * Setter functions
@@ -532,7 +532,7 @@ lv_obj_t * lv_layer_sys(void);
  * @param obj pointer to an object
  * @return pointer to a screen
  */
-lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
+lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj);
 
 /*---------------------
  * Parent/children get
@@ -543,7 +543,7 @@ lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to the parent of  'obj'
  */
-lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
+lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj);
 
 /**
  * Iterate through the children of an object (start from the "youngest, lastly created")
@@ -552,7 +552,7 @@ lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
  *                  and the previous return value later
  * @return the child after 'act_child' or NULL if no more child
  */
-lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
+lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, const lv_obj_t * child);
 
 /**
  * Iterate through the children of an object (start from the "oldest", firstly created)
@@ -561,14 +561,14 @@ lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
  *                  and the previous return value later
  * @return the child after 'act_child' or NULL if no more child
  */
-lv_obj_t * lv_obj_get_child_back(lv_obj_t * obj, lv_obj_t * child);
+lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
 
 /**
  * Count the children of an object (only children directly on 'obj')
  * @param obj pointer to an object
  * @return children number of 'obj'
  */
-uint16_t lv_obj_count_children(lv_obj_t * obj);
+uint16_t lv_obj_count_children(const lv_obj_t * obj);
 
 /*---------------------
  * Coordinate get
@@ -579,42 +579,42 @@ uint16_t lv_obj_count_children(lv_obj_t * obj);
  * @param obj pointer to an object
  * @param cords_p pointer to an area to store the coordinates
  */
-void lv_obj_get_coords(lv_obj_t * obj, lv_area_t * cords_p);
+void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p);
 
 /**
  * Get the x coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent
  */
-lv_coord_t lv_obj_get_x(lv_obj_t * obj);
+lv_coord_t lv_obj_get_x(const lv_obj_t * obj);
 
 /**
  * Get the y coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the top of its parent
  */
-lv_coord_t lv_obj_get_y(lv_obj_t * obj);
+lv_coord_t lv_obj_get_y(const lv_obj_t * obj);
 
 /**
  * Get the width of an object
  * @param obj pointer to an object
  * @return the width
  */
-lv_coord_t lv_obj_get_width(lv_obj_t * obj);
+lv_coord_t lv_obj_get_width(const lv_obj_t * obj);
 
 /**
  * Get the height of an object
  * @param obj pointer to an object
  * @return the height
  */
-lv_coord_t lv_obj_get_height(lv_obj_t * obj);
+lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
 
 /**
  * Get the extended size attribute of an object
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-lv_coord_t lv_obj_get_ext_size(lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj);
 
 /*-----------------
  * Appearance get
@@ -625,7 +625,7 @@ lv_coord_t lv_obj_get_ext_size(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to a style
  */
-lv_style_t * lv_obj_get_style(lv_obj_t * obj);
+lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 
 /*-----------------
  * Attribute get
@@ -636,56 +636,56 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return true: the object is hidden
  */
-bool lv_obj_get_hidden(lv_obj_t * obj);
+bool lv_obj_get_hidden(const lv_obj_t * obj);
 
 /**
  * Get the click enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is clickable
  */
-bool lv_obj_get_click(lv_obj_t * obj);
+bool lv_obj_get_click(const lv_obj_t * obj);
 
 /**
  * Get the top enable attribute of an object
  * @param obj pointer to an object
  * @return true: the auto top feture is enabled
  */
-bool lv_obj_get_top(lv_obj_t * obj);
+bool lv_obj_get_top(const lv_obj_t * obj);
 
 /**
  * Get the drag enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is dragable
  */
-bool lv_obj_get_drag(lv_obj_t * obj);
+bool lv_obj_get_drag(const lv_obj_t * obj);
 
 /**
  * Get the drag thow enable attribute of an object
  * @param obj pointer to an object
  * @return true: drag throw is enabled
  */
-bool lv_obj_get_drag_throw(lv_obj_t * obj);
+bool lv_obj_get_drag_throw(const lv_obj_t * obj);
 
 /**
  * Get the drag parent attribute of an object
  * @param obj pointer to an object
  * @return true: drag parent is enabled
  */
-bool lv_obj_get_drag_parent(lv_obj_t * obj);
+bool lv_obj_get_drag_parent(const lv_obj_t * obj);
 
 /**
  * Get the opa scale parameter of an object
  * @param obj pointer to an object
  * @return opa scale [0..255]
  */
-lv_opa_t lv_obj_get_opa_scale(lv_obj_t * obj);
+lv_opa_t lv_obj_get_opa_scale(const lv_obj_t * obj);
 
 /**
  * Get the protect field of an object
  * @param obj pointer to an object
  * @return protect field ('OR'ed values of lv_obj_prot_t)
  */
-uint8_t lv_obj_get_protect(lv_obj_t * obj);
+uint8_t lv_obj_get_protect(const lv_obj_t * obj);
 
 /**
  * Check at least one bit of a given protect bitfield is set
@@ -693,21 +693,21 @@ uint8_t lv_obj_get_protect(lv_obj_t * obj);
  * @param prot protect bits to test ('OR'ed values of lv_obj_prot_t)
  * @return false: none of the given bits are set, true: at least one bit is set
  */
-bool lv_obj_is_protected(lv_obj_t * obj, uint8_t prot);
+bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
 
 /**
  * Get the signal function of an object
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_func_t   lv_obj_get_signal_func(lv_obj_t * obj);
+lv_signal_func_t   lv_obj_get_signal_func(const lv_obj_t * obj);
 
 /**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
  */
-lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
+lv_design_func_t lv_obj_get_design_func(const lv_obj_t * obj);
 
 /*------------------
  * Other get
@@ -719,7 +719,7 @@ lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
  * @return the ext pointer but not the dynamic version
  *         Use it as ext->data1, and NOT da(ext)->data1
  */
-void * lv_obj_get_ext_attr(lv_obj_t * obj);
+void * lv_obj_get_ext_attr(const lv_obj_t * obj);
 
 /**
  * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
@@ -735,7 +735,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
  * @param obj pointer to an object
  * @return the free number
  */
-LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
+LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(const lv_obj_t * obj);
 #endif
 
 #if LV_OBJ_FREE_PTR != 0
@@ -744,7 +744,7 @@ LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the free pointer
  */
-void * lv_obj_get_free_ptr(lv_obj_t * obj);
+void * lv_obj_get_free_ptr(const lv_obj_t * obj);
 #endif
 
 #if USE_LV_GROUP
@@ -753,7 +753,7 @@ void * lv_obj_get_free_ptr(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the pointer to group of the object
  */
-void * lv_obj_get_group(lv_obj_t * obj);
+void * lv_obj_get_group(const lv_obj_t * obj);
 
 
 /**
@@ -761,7 +761,7 @@ void * lv_obj_get_group(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return true: the object is focused, false: the object is not focused or not in a group
  */
-bool lv_obj_is_focused(lv_obj_t * obj);
+bool lv_obj_is_focused(const lv_obj_t * obj);
 
 #endif
 

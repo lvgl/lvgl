@@ -60,7 +60,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a container object, if not NULL then the new object will be copied from it
  * @return pointer to the created container
  */
-lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 
 
@@ -163,7 +163,7 @@ void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en)
  * @param cont pointer to container object
  * @return the layout from 'lv_cont_layout_t'
  */
-lv_layout_t lv_cont_get_layout(lv_obj_t * cont)
+lv_layout_t lv_cont_get_layout(const lv_obj_t * cont)
 {
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->layout;
@@ -174,7 +174,7 @@ lv_layout_t lv_cont_get_layout(lv_obj_t * cont)
  * @param cont pointer to a container object
  * @return true: horizontal fit is enabled; false: disabled
  */
-bool lv_cont_get_hor_fit(lv_obj_t * cont)
+bool lv_cont_get_hor_fit(const lv_obj_t * cont)
 {
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->hor_fit == 0 ? false : true;
@@ -185,7 +185,7 @@ bool lv_cont_get_hor_fit(lv_obj_t * cont)
  * @param cont pointer to a container object
  * @return true: vertical fit is enabled; false: disabled
  */
-bool lv_cont_get_ver_fit(lv_obj_t * cont)
+bool lv_cont_get_ver_fit(const lv_obj_t * cont)
 {
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->ver_fit == 0 ? false : true;

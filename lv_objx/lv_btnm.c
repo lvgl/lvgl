@@ -62,7 +62,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a button matrix object, if not NULL then the new object will be copied from it
  * @return pointer to the created button matrix
  */
-lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("button matrix create started");
 
@@ -324,7 +324,7 @@ void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, lv_style_t * style
  * @param btnm pointer to a button matrix object
  * @return the current map
  */
-const char ** lv_btnm_get_map(lv_obj_t * btnm)
+const char ** lv_btnm_get_map(const lv_obj_t * btnm)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->map_p;
@@ -335,7 +335,7 @@ const char ** lv_btnm_get_map(lv_obj_t * btnm)
  * @param btnm: pointer to button matrix object
  * @return pointer to the callback function
  */
-lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm)
+lv_btnm_action_t lv_btnm_get_action(const lv_obj_t * btnm)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->action;
@@ -346,7 +346,7 @@ lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm)
  * @param btnm pointer to button matrix object
  * @return  index of the currently toggled button (0: if unset)
  */
-uint16_t lv_btnm_get_toggled(lv_obj_t * btnm)
+uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
@@ -360,7 +360,7 @@ uint16_t lv_btnm_get_toggled(lv_obj_t * btnm)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_btnm_get_style(lv_obj_t * btnm, lv_btnm_style_t type)
+lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 

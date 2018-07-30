@@ -91,7 +91,7 @@ typedef enum {
  * @param copy pointer to a tab object, if not NULL then the new object will be copied from it
  * @return pointer to the created tab
  */
-lv_obj_t * lv_tabview_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
@@ -169,42 +169,42 @@ void lv_tabview_set_btns_pos(lv_obj_t *tabview, lv_tabview_btns_pos_t btns_pos);
  * @param tabview pointer to Tab view object
  * @return the active tab index
  */
-uint16_t lv_tabview_get_tab_act(lv_obj_t * tabview);
+uint16_t lv_tabview_get_tab_act(const lv_obj_t * tabview);
 
 /**
  * Get the number of tabs
  * @param tabview pointer to Tab view object
  * @return tab count
  */
-uint16_t lv_tabview_get_tab_count(lv_obj_t * tabview);
+uint16_t lv_tabview_get_tab_count(const lv_obj_t * tabview);
 /**
  * Get the page (content area) of a tab
  * @param tabview pointer to Tab view object
  * @param id index of the tab (>= 0)
  * @return pointer to page (lv_page) object
  */
-lv_obj_t * lv_tabview_get_tab(lv_obj_t * tabview, uint16_t id);
+lv_obj_t * lv_tabview_get_tab(const lv_obj_t * tabview, uint16_t id);
 
 /**
  * Get the tab load action
  * @param tabview pointer to a tabview object
  * @param return the current tab load action
  */
-lv_tabview_action_t lv_tabview_get_tab_load_action(lv_obj_t *tabview);
+lv_tabview_action_t lv_tabview_get_tab_load_action(const lv_obj_t *tabview);
 
 /**
  * Get horizontal sliding is enabled or not
  * @param tabview pointer to Tab view object
  * @return true: enable sliding; false: disable sliding
  */
-bool lv_tabview_get_sliding(lv_obj_t * tabview);
+bool lv_tabview_get_sliding(const lv_obj_t * tabview);
 
 /**
  * Get the animation time of tab view when a new tab is loaded
  * @param tabview pointer to Tab view object
  * @return time of animation in milliseconds
  */
-uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview);
+uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview);
 
 /**
  * Get a style of a tab view
@@ -212,13 +212,13 @@ uint16_t lv_tabview_get_anim_time(lv_obj_t * tabview);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_tabview_get_style(lv_obj_t *tabview, lv_tabview_style_t type);
+lv_style_t * lv_tabview_get_style(const lv_obj_t *tabview, lv_tabview_style_t type);
 
 /**
  * Get position of tab select buttons
  * @param tabview pointer to a ab view object
  */
-lv_tabview_btns_pos_t lv_tabview_get_btns_pos(lv_obj_t *tabview);
+lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t *tabview);
 
 
 /**********************

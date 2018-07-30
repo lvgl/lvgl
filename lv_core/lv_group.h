@@ -180,49 +180,49 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
  * @param group pointer to a group
  * @return pointer to the focused object
  */
-lv_obj_t * lv_group_get_focused(lv_group_t * group);
+lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
 /**
  * Get a the style modifier function of a group
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_cb(lv_group_t * group);
+lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group);
 
 /**
  * Get a the style modifier function of a group in edit mode
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(lv_group_t * group);
+lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(const lv_group_t * group);
 
 /**
  * Get the focus callback function of a group
  * @param group pointer to a group
  * @return the call back function or NULL if not set
  */
-lv_group_focus_cb_t lv_group_get_focus_cb(lv_group_t * group);
+lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group);
 
 /**
  * Get the edit mode is enabled or not.
  * @param group pointer to group
  * @return true editing is enabled
  */
-bool lv_group_get_edit_enable(lv_group_t * group, bool en);
+bool lv_group_get_edit_enable(const lv_group_t * group, bool en);
 
 /**
  * Get the current mode (edit or navigate).
  * @param group pointer to group
  * @return true: edit mode; false: navigate mode
  */
-bool lv_group_get_editing(lv_group_t * group);
+bool lv_group_get_editing(const lv_group_t * group);
 
 /**
  * Get the `click_focus` attribute.
  * @param group pointer to group
  * @return true: `click_focus` is enabled; false: disabled
  */
-bool lv_group_get_click_focus(lv_group_t * group);
+bool lv_group_get_click_focus(const lv_group_t * group);
 
 
 /**********************

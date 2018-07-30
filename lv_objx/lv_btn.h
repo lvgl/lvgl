@@ -90,7 +90,7 @@ typedef enum {
  * @param copy pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
  */
-lv_obj_t * lv_btn_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -178,28 +178,28 @@ void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, lv_style_t *style);
  * @param btn pointer to a button object
  * @return the state of the button (from lv_btn_state_t enum)
  */
-lv_btn_state_t lv_btn_get_state(lv_obj_t * btn);
+lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn);
 
 /**
  * Get the toggle enable attribute of the button
  * @param btn pointer to a button object
  * @return ture: toggle enabled, false: disabled
  */
-bool lv_btn_get_toggle(lv_obj_t * btn);
+bool lv_btn_get_toggle(const lv_obj_t * btn);
 
 /**
  * Get the release action of a button
  * @param btn pointer to a button object
  * @return pointer to the release action function
  */
-lv_action_t lv_btn_get_action(lv_obj_t * btn, lv_btn_action_t type);
+lv_action_t lv_btn_get_action(const lv_obj_t * btn, lv_btn_action_t type);
 
 /**
  * Get the layout of a button
  * @param btn pointer to button object
  * @return the layout from 'lv_cont_layout_t'
  */
-static inline lv_layout_t lv_btn_get_layout(lv_obj_t * btn)
+static inline lv_layout_t lv_btn_get_layout(const lv_obj_t * btn)
 {
     return lv_cont_get_layout(btn);
 }
@@ -209,7 +209,7 @@ static inline lv_layout_t lv_btn_get_layout(lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return true: horizontal fit is enabled; false: disabled
  */
-static inline bool lv_btn_get_hor_fit(lv_obj_t * btn)
+static inline bool lv_btn_get_hor_fit(const lv_obj_t * btn)
 {
     return lv_cont_get_hor_fit(btn);
 }
@@ -219,7 +219,7 @@ static inline bool lv_btn_get_hor_fit(lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return true: vertical fit is enabled; false: disabled
  */
-static inline bool lv_btn_get_ver_fit(lv_obj_t * btn)
+static inline bool lv_btn_get_ver_fit(const lv_obj_t * btn)
 {
     return lv_cont_get_ver_fit(btn);
 }
@@ -228,14 +228,14 @@ static inline bool lv_btn_get_ver_fit(lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_fill_time(lv_obj_t * btn, uint16_t time);
+uint16_t lv_btn_get_ink_fill_time(const lv_obj_t * btn, uint16_t time);
 
 /**
  * Get the wait time before the ink disappears
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_wait_time(lv_obj_t * btn, uint16_t time);
+uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn, uint16_t time);
 
 /**
  * Get style of a button.
@@ -243,7 +243,7 @@ uint16_t lv_btn_get_ink_wait_time(lv_obj_t * btn, uint16_t time);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_btn_get_style(lv_obj_t * btn, lv_btn_style_t type);
+lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type);
 
 /**********************
  *      MACROS

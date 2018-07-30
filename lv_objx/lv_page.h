@@ -83,7 +83,7 @@ typedef enum {
  * @param copy pointer to a page object, if not NULL then the new object will be copied from it
  * @return pointer to the created page
  */
-lv_obj_t * lv_page_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
@@ -96,7 +96,7 @@ void lv_page_clean(lv_obj_t *obj);
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
  */
-lv_obj_t * lv_page_get_scrl(lv_obj_t * page);
+lv_obj_t * lv_page_get_scrl(const lv_obj_t * page);
 
 /*=====================
  * Setter functions
@@ -191,7 +191,7 @@ void lv_page_set_style(lv_obj_t *page, lv_page_style_t type, lv_style_t *style);
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
-lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
+lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
 
 
 /**
@@ -199,14 +199,14 @@ lv_sb_mode_t lv_page_get_sb_mode(lv_obj_t * page);
  * @param page pointer to a page object
  * @return true: scrolling with arrows is enabled
  */
-bool lv_page_get_arrow_scroll(lv_obj_t * page);
+bool lv_page_get_arrow_scroll(const lv_obj_t * page);
 
 /**
  * Get width of the scrollable part of a page
  * @param page pointer to a page object
  * @return the width of the scrollable
  */
-static inline lv_coord_t lv_page_get_scrl_width(lv_obj_t *page)
+static inline lv_coord_t lv_page_get_scrl_width(const lv_obj_t *page)
 {
     return lv_obj_get_width(lv_page_get_scrl(page));
 }
@@ -216,7 +216,7 @@ static inline lv_coord_t lv_page_get_scrl_width(lv_obj_t *page)
  * @param page pointer to a page object
  * @return the height of the scrollable
  */
-static inline lv_coord_t lv_page_get_scrl_height(lv_obj_t *page)
+static inline lv_coord_t lv_page_get_scrl_height(const lv_obj_t *page)
 {
     return lv_obj_get_height(lv_page_get_scrl(page));
 }
@@ -226,7 +226,7 @@ static inline lv_coord_t lv_page_get_scrl_height(lv_obj_t *page)
 * @param page pointer to page object
 * @return the layout from 'lv_cont_layout_t'
 */
-static inline lv_layout_t lv_page_get_scrl_layout(lv_obj_t * page)
+static inline lv_layout_t lv_page_get_scrl_layout(const lv_obj_t * page)
 {
     return lv_cont_get_layout(lv_page_get_scrl(page));
 }
@@ -236,7 +236,7 @@ static inline lv_layout_t lv_page_get_scrl_layout(lv_obj_t * page)
 * @param page pointer to a page object
 * @return true: horizontal fit is enabled; false: disabled
 */
-static inline bool lv_page_get_scrl_hor_fit(lv_obj_t * page)
+static inline bool lv_page_get_scrl_hor_fit(const lv_obj_t * page)
 {
     return lv_cont_get_hor_fit(lv_page_get_scrl(page));
 }
@@ -246,7 +246,7 @@ static inline bool lv_page_get_scrl_hor_fit(lv_obj_t * page)
 * @param page pointer to a page object
 * @return true: vertical fit is enabled; false: disabled
 */
-static inline bool lv_page_get_scrl_fit_ver(lv_obj_t * page)
+static inline bool lv_page_get_scrl_fit_ver(const lv_obj_t * page)
 {
     return lv_cont_get_ver_fit(lv_page_get_scrl(page));
 }
@@ -257,7 +257,7 @@ static inline bool lv_page_get_scrl_fit_ver(lv_obj_t * page)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_page_get_style(lv_obj_t *page, lv_page_style_t type);
+lv_style_t * lv_page_get_style(const lv_obj_t *page, lv_page_style_t type);
 
 /*=====================
  * Other functions
@@ -276,7 +276,7 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue);
  * @param obj pointer to an object to focus (must be on the page)
  * @param anim_time scroll animation time in milliseconds (0: no animation)
  */
-void lv_page_focus(lv_obj_t * page, lv_obj_t * obj, uint16_t anim_time);
+void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time);
 
 /**********************
  *      MACROS

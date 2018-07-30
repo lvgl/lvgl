@@ -72,7 +72,7 @@ static lv_signal_func_t scrl_signal;
  * @param copy pointer to a text area object, if not NULL then the new object will be copied from it
  * @return pointer to the created text area
  */
-lv_obj_t * lv_ta_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("text area create started");
 
@@ -551,7 +551,7 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
  * @param ta pointer to a text area object
  * @return pointer to the text
  */
-const char * lv_ta_get_text(lv_obj_t * ta)
+const char * lv_ta_get_text(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
@@ -571,7 +571,7 @@ const char * lv_ta_get_text(lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return pointer to the label object
  */
-lv_obj_t * lv_ta_get_label(lv_obj_t * ta)
+lv_obj_t * lv_ta_get_label(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->label;
@@ -583,7 +583,7 @@ lv_obj_t * lv_ta_get_label(lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return the cursor position
  */
-uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta)
+uint16_t lv_ta_get_cursor_pos(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->cursor.pos;
@@ -594,7 +594,7 @@ uint16_t lv_ta_get_cursor_pos(lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return element of 'lv_ta_cursor_type_t'
  */
-lv_cursor_type_t lv_ta_get_cursor_type(lv_obj_t * ta)
+lv_cursor_type_t lv_ta_get_cursor_type(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->cursor.type;
@@ -605,7 +605,7 @@ lv_cursor_type_t lv_ta_get_cursor_type(lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return true: password mode is enabled, false: disabled
  */
-bool lv_ta_get_pwd_mode(lv_obj_t * ta)
+bool lv_ta_get_pwd_mode(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->pwd_mode == 0 ? false : true;
@@ -616,7 +616,7 @@ bool lv_ta_get_pwd_mode(lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return true: one line configuration is enabled, false: disabled
  */
-bool lv_ta_get_one_line(lv_obj_t * ta)
+bool lv_ta_get_one_line(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->one_line == 0 ? false : true;
@@ -628,7 +628,7 @@ bool lv_ta_get_one_line(lv_obj_t * ta)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ta_get_style(lv_obj_t * ta, lv_ta_style_t type)
+lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 

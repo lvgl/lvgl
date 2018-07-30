@@ -50,7 +50,7 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a line meter object, if not NULL then the new object will be copied from it
  * @return pointer to the created line meter
  */
-lv_obj_t * lv_lmeter_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 	LV_LOG_TRACE("line meter create started");
 
@@ -177,7 +177,7 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt)
  * @param lmeter pointer to a line meter object
  * @return the value of the line meter
  */
-int16_t lv_lmeter_get_value(lv_obj_t * lmeter)
+int16_t lv_lmeter_get_value(const lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     return ext->cur_value;
@@ -188,7 +188,7 @@ int16_t lv_lmeter_get_value(lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the minimum value of the line meter
  */
-int16_t lv_lmeter_get_min_value(lv_obj_t * lmeter)
+int16_t lv_lmeter_get_min_value(const lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     return ext->min_value;
@@ -199,7 +199,7 @@ int16_t lv_lmeter_get_min_value(lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the maximum value of the line meter
  */
-int16_t lv_lmeter_get_max_value(lv_obj_t * lmeter)
+int16_t lv_lmeter_get_max_value(const lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     return ext->max_value;
@@ -210,7 +210,7 @@ int16_t lv_lmeter_get_max_value(lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return number of the scale units
  */
-uint8_t lv_lmeter_get_line_count(lv_obj_t * lmeter)
+uint8_t lv_lmeter_get_line_count(const lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     return ext->line_cnt ;
@@ -221,7 +221,7 @@ uint8_t lv_lmeter_get_line_count(lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return angle of the scale
  */
-uint16_t lv_lmeter_get_scale_angle(lv_obj_t * lmeter)
+uint16_t lv_lmeter_get_scale_angle(const lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     return ext->scale_angle;
