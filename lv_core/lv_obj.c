@@ -597,7 +597,7 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align(lv_obj_t * obj, lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
 {
     lv_coord_t new_x = lv_obj_get_x(obj);
     lv_coord_t new_y = lv_obj_get_y(obj);
