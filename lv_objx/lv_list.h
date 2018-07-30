@@ -56,6 +56,9 @@ typedef struct
     uint16_t anim_time;                          /*Scroll animation time*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
+#if USE_LV_GROUP
+    lv_obj_t * selected_btn;
+#endif
 } lv_list_ext_t;
 
 typedef enum {
@@ -104,6 +107,15 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
 /*=====================
  * Setter functions
  *====================*/
+#if USE_LV_GROUP
+
+/**
+ * Make a button selected
+ * @param list pointer to a list object
+ * @param btn pointer to a button to select
+ */
+void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn);
+#endif
 
 /**
  * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
@@ -154,12 +166,25 @@ lv_obj_t * lv_list_get_btn_label(const lv_obj_t * btn);
  */
 lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn);
 
+
+
+#if USE_LV_GROUP
+/**
+ * Get the currently selected button
+ * @param list pointer to a list object
+ * @return pointer to the selected button
+ */
+lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list);
+#endif
+
+
 /**
  * Get scroll animation duration
  * @param list pointer to a list object
  * @return duration of animation [ms]
  */
 uint16_t lv_list_get_anim_time(const lv_obj_t *list);
+
 
 /**
  * Get the scroll bar mode of a list
