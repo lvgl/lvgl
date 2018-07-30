@@ -201,7 +201,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent,const  lv_obj_t * copy)
         new_obj->ext_size = 0;
 
         /*Set appearance*/
-        new_obj->style_p = &lv_style_plain_color;
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            new_obj->style_p = th->panel;
+        } else {
+            new_obj->style_p = &lv_style_plain_color;
+        }
 
         /*Set virtual functions*/
         lv_obj_set_signal_func(new_obj, lv_obj_signal);

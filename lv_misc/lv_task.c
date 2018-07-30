@@ -69,7 +69,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     /* Run all task from the highest to the lowest priority
      * If a lower priority task is executed check task again from the highest priority
      * but on the priority of executed tasks don't run tasks before the executed*/
-    lv_task_t * task_interruper = NULL;
+    lv_task_t * task_interrupter = NULL;
     lv_task_t * next;
     bool end_flag;
     do {
@@ -86,8 +86,8 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             }
 
             /*Here is the interrupter task. Don't execute it again.*/
-            if(act == task_interruper) {
-                task_interruper = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
+            if(act == task_interrupter) {
+                task_interrupter = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
                 act = next;
                 continue;                   /*Load the next task*/
             }
@@ -97,10 +97,10 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
                 lv_task_exec(act);
             }
             /*Tasks with higher priority then the interrupted shall be run in every case*/
-            else if(task_interruper) {
-                if(act->prio > task_interruper->prio) {
+            else if(task_interrupter) {
+                if(act->prio > task_interrupter->prio) {
                     if(lv_task_exec(act)) {
-                        task_interruper = act;  /*Check all tasks again from the highest priority */
+                        task_interrupter = act;  /*Check all tasks again from the highest priority */
                         end_flag = false;
                         break;
                     }
@@ -110,7 +110,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
              * Just run the remaining tasks*/
             else {
                 if(lv_task_exec(act)) {
-                    task_interruper = act;  /*Check all tasks again from the highest priority */
+                    task_interrupter = act;  /*Check all tasks again from the highest priority */
                     end_flag = false;
                     break;
                 }

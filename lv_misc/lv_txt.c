@@ -236,8 +236,6 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
 
 			width += lv_font_get_width(font, letter);
 			width += letter_space;
-
-
         }
 
         width -= letter_space;  /*Trim the last letter space. Important if the text is center aligned */
