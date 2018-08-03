@@ -286,7 +286,33 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     lv_coord_t y2 = area_p->y2 >= LV_VER_RES ? y2 = LV_VER_RES - 1 : area_p->y2;
 
     uint32_t max_row = (uint32_t) LV_VDB_SIZE / w;
+
     if(max_row > h) max_row = h;
+
+
+    /*Round down the lines of VDB if rounding is added*/
+    if(round_cb) {
+    	/**/
+    	lv_area_t tmp;
+    	tmp.x1 = 0;
+    	tmp.x2 = 0;
+    	tmp.y1 = 0;
+    	tmp.y2 = max_row;
+
+    	lv_coord_t y_tmp = max_row;
+    	do {
+    		tmp.y2 = y_tmp;
+    		round_cb(&tmp);
+    		y_tmp --;		/*Decrement the number of line until it is rounded to a smaller value the original. */
+    	} while(tmp.y2 > max_row && y_tmp != 0);
+
+    	if(y_tmp == 0) {
+    		LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to small VDB)");
+    		return;
+    	} else {
+    		max_row = tmp.y2;
+    	}
+    }
 
     /*Always use the full row*/
     uint32_t row;

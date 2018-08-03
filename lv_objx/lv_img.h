@@ -125,6 +125,12 @@ static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
  */
 lv_img_src_t lv_img_get_src_type(const void * src);
 
+/**
+ * Get the source of the image
+ * @param img pointer to an image object
+ * @return the image source (symbol, file name or C array)
+ */
+const void * lv_img_get_src(lv_obj_t * img);
 
 /**
  * Get the name of the file set for an image

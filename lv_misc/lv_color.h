@@ -57,6 +57,17 @@ extern "C" {
 #define LV_OPA_100       255
 #define LV_OPA_COVER     255
 
+#if LV_COLOR_DEPTH == 1
+#define LV_COLOR_SIZE			8
+#elif LV_COLOR_DEPTH == 8
+#define LV_COLOR_SIZE			8
+#elif LV_COLOR_DEPTH == 16
+#define LV_COLOR_SIZE			16
+#elif LV_COLOR_DEPTH == 24
+#define LV_COLOR_SIZE			32
+#else
+#error "Invalid color depth (LV_COLOR_DEPTH in lv_conf.h)"
+#endif
 
 /**********************
  *      TYPEDEFS
