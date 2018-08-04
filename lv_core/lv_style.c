@@ -94,7 +94,7 @@ void lv_style_init(void)
     lv_style_scr.body.shadow.width = 0;
 
     lv_style_scr.text.opa = LV_OPA_COVER;
-    lv_style_scr.text.color = LV_COLOR_BLACK;//MAKE(0x30, 0x30, 0x30);
+    lv_style_scr.text.color = LV_COLOR_MAKE(0x30, 0x30, 0x30);
     lv_style_scr.text.font = LV_FONT_DEFAULT;
     lv_style_scr.text.letter_space = 2;
     lv_style_scr.text.line_space = 2;
@@ -115,7 +115,7 @@ void lv_style_init(void)
     lv_style_plain_color.text.color = LV_COLOR_MAKE(0xf0, 0xf0, 0xf0);
     lv_style_plain_color.image.color = LV_COLOR_MAKE(0xf0, 0xf0, 0xf0);
     lv_style_plain_color.line.color = LV_COLOR_MAKE(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.body.main_color = LV_COLOR_BLACK;//LV_COLOR_MAKE(0x55, 0x96, 0xd8);
+    lv_style_plain_color.body.main_color = LV_COLOR_MAKE(0x55, 0x96, 0xd8);
     lv_style_plain_color.body.grad_color = lv_style_plain_color.body.main_color;
 
     /*Pretty style */
