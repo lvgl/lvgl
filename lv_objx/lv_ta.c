@@ -95,8 +95,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.state = 0;
     ext->pwd_mode = 0;
     ext->pwd_tmp = NULL;
-    ext->accapted_chars = "abc123";
-    ext->max_length = 3;
+    ext->accapted_chars = NULL;
+    ext->max_length = 0;
     ext->cursor.style = NULL;
     ext->cursor.pos = 0;
     ext->cursor.type = LV_CURSOR_LINE;
@@ -136,6 +136,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_ta_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->label = lv_label_create(new_ta, copy_ext->label);
         ext->pwd_mode = copy_ext->pwd_mode;
+        ext->accapted_chars = copy_ext->accapted_chars;
+        ext->max_length = copy_ext->max_length;
         ext->cursor.style = copy_ext->cursor.style;
         ext->cursor.pos = copy_ext->cursor.pos;
         ext->cursor.valid_x = copy_ext->cursor.valid_x;
