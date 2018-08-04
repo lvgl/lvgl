@@ -3,15 +3,14 @@
  *
  */
 
+/*********************
+ *      INCLUDES
+ *********************/
 #include "lv_vdb.h"
 #if LV_VDB_SIZE != 0
 
 #include "../lv_hal/lv_hal_disp.h"
 #include <stddef.h>
-
-/*********************
- *      INCLUDES
- *********************/
 
 /*********************
  *      DEFINES
@@ -33,7 +32,6 @@ typedef enum {
 /**********************
  *  STATIC VARIABLES
  **********************/
-
 
 #if LV_VDB_DOUBLE == 0
 /*Simple VDB*/
