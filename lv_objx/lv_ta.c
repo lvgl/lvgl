@@ -92,7 +92,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
 
-    ext->cursor.state = 0;
+    ext->cursor.state = 1;
     ext->pwd_mode = 0;
     ext->pwd_tmp = NULL;
     ext->accapted_chars = NULL;
@@ -227,6 +227,8 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         a.playback_pause = 0;
         a.path = lv_anim_path_step;
         lv_anim_create(&a);
+#else
+        pwd_char_hider(ta);
 #endif
     }
 
@@ -280,6 +282,8 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         a.playback_pause = 0;
         a.path = lv_anim_path_step;
         lv_anim_create(&a);
+#else
+        pwd_char_hider(ta);
 #endif
     }
 
@@ -369,6 +373,8 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         a.playback_pause = 0;
         a.path = lv_anim_path_step;
         lv_anim_create(&a);
+#else
+        pwd_char_hider(ta);
 #endif
     }
 }
