@@ -59,6 +59,8 @@ typedef struct
     /*New data for this type */
     lv_obj_t * label;           /*Label of the text area*/
     char * pwd_tmp;             /*Used to store the original text in password mode*/
+    const char * accapted_chars;/*Only these characters will be accepted. NULL: accept all*/
+    uint16_t max_length;		/*The max. number of characters. 0: no limit*/
     uint8_t pwd_mode :1;        /*Replace characters with '*' */
     uint8_t one_line :1;        /*One line mode (ignore line breaks)*/
     struct {
@@ -155,6 +157,19 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en);
 void lv_ta_set_one_line(lv_obj_t * ta, bool en);
 
 /**
+ * Set a list of characters. Only these characters will be accepted by the text area
+ * @param ta pointer to  Text Area
+ * @param list list of characters. Only the pointer is saved. E.g. "+-.,0123456789"
+ */
+void lv_ta_set_accepted_chars(lv_obj_t * ta, const char * list);
+/**
+ * Set max length of a Text Area.
+ * @param ta pointer to  Text Area
+ * @param num the maximal number of characters can be added (`lv_ta_set_text` ignores it)
+ */
+void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num);
+
+/**
  * Set the scroll bar mode of a text area
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
@@ -177,7 +192,7 @@ void lv_ta_set_style(lv_obj_t *ta, lv_ta_style_t type, lv_style_t *style);
  *====================*/
 
 /**
- * Get the text of a text area
+ * Get the text of a text area. In password mode it gives the real text (not '*'s).
  * @param ta pointer to a text area object
  * @return pointer to the text
  */
@@ -224,6 +239,20 @@ bool lv_ta_get_pwd_mode(const lv_obj_t * ta);
  * @return true: one line configuration is enabled, false: disabled
  */
 bool lv_ta_get_one_line(const lv_obj_t * ta);
+
+/**
+ * Get a list of accepted characters.
+ * @param ta pointer to  Text Area
+ * @return list of accented characters.
+ */
+const char * lv_ta_get_accepted_chars(lv_obj_t * ta);
+
+/**
+ * Set max length of a Text Area.
+ * @param ta pointer to  Text Area
+ * @return the maximal number of characters to be add
+ */
+uint16_t lv_ta_get_max_length(lv_obj_t * ta);
 
 /**
  * Get the scroll bar mode of a text area

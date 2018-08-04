@@ -49,6 +49,7 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
 static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x);
 #endif
 static void pwd_char_hider(lv_obj_t * ta);
+static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 
 /**********************
  *  STATIC VARIABLES
@@ -94,13 +95,14 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.state = 0;
     ext->pwd_mode = 0;
     ext->pwd_tmp = NULL;
+    ext->accapted_chars = "abc123";
+    ext->max_length = 3;
     ext->cursor.style = NULL;
     ext->cursor.pos = 0;
     ext->cursor.type = LV_CURSOR_LINE;
     ext->cursor.valid_x = 0;
     ext->one_line = 0;
     ext->label = NULL;
-
 
     lv_obj_set_signal_func(new_ta, lv_ta_signal);
     lv_obj_set_signal_func(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);
@@ -187,6 +189,11 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
     	return;
     }
 
+    if(char_is_accepted(ta, c) == false) {
+    	LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");
+    	return;
+    }
+
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     char letter_buf[2];
     letter_buf[0] = c;
@@ -235,11 +242,17 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
+
+    /*If only one character is added check if it is accepted*/
+    if(lv_txt_get_encoded_length(txt) == 1) {
+    	uint32_t c = lv_txt_encoded_next(txt, NULL);
+    	if(char_is_accepted(ta, c) == false) {
+        	LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");
+        	return;
+    	}
+    }
+
     /*Insert the text*/
-
-
-
-
     lv_label_ins_text(ext->label, ext->cursor.pos, txt);
 
     if(ext->pwd_mode != 0) {
@@ -518,6 +531,31 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
     }
 }
 
+
+/**
+ * Set a list of characters. Only these characters will be accepted by the text area
+ * @param ta pointer to  Text Area
+ * @param list list of characters. Only the pointer is saved. E.g. "+-.,0123456789"
+ */
+void lv_ta_set_accepted_chars(lv_obj_t * ta, const char * list)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    ext->accapted_chars = list;
+}
+
+/**
+ * Set max length of a Text Area.
+ * @param ta pointer to  Text Area
+ * @param num the maximal number of characters can be added (`lv_ta_set_text` ignores it)
+ */
+void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    ext->max_length = num;
+}
+
 /**
  * Set a style of a text area
  * @param ta pointer to a text area object
@@ -547,7 +585,7 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
  *====================*/
 
 /**
- * Get the text of a text area
+ * Get the text of a text area. In password mode it gives the real text (not '*'s).
  * @param ta pointer to a text area object
  * @return pointer to the text
  */
@@ -620,6 +658,29 @@ bool lv_ta_get_one_line(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->one_line == 0 ? false : true;
+}
+
+/**
+ * Get a list of accepted characters.
+ * @param ta pointer to  Text Area
+ * @return list of accented characters.
+ */
+const char * lv_ta_get_accepted_chars(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    return ext->accapted_chars;
+}
+
+/**
+ * Set max length of a Text Area.
+ * @param ta pointer to  Text Area
+ * @return the maximal number of characters to be add
+ */
+uint16_t lv_ta_get_max_length(lv_obj_t * ta)
+{
+	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+	return ext->max_length;
 }
 
 /**
@@ -1087,4 +1148,32 @@ static void pwd_char_hider(lv_obj_t * ta)
     }
 }
 
+static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
+{
+	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+	/*If no restriction accept it*/
+	if(ext->accapted_chars == NULL && ext->max_length == 0) return true;
+
+	/*Too many characters?*/
+	if(ext->max_length > 0 &&
+			lv_txt_get_encoded_length(lv_ta_get_text(ta)) >= ext->max_length) {
+		return false;
+	}
+
+	/*Accepted character?*/
+	if(ext->accapted_chars) {
+		uint32_t i = 0;
+		uint32_t a;
+		while(ext->accapted_chars[i] != '\0') {
+			a = lv_txt_encoded_next(ext->accapted_chars, &i);
+			if(a == c) return true;	/*Accepted*/
+		}
+
+		return false;	/*The character wasn't in the list*/
+	} else {
+		return true;	/*If the accepted char list in not specified the accept the character*/
+	}
+
+}
 #endif
