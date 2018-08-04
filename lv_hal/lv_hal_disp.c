@@ -57,6 +57,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->mem_blend = NULL;
     driver->mem_fill = NULL;
 #endif
+
+#if LV_VDB_SIZE
+    driver->vdb_wr = NULL;
+#endif
 }
 
 /**
@@ -224,6 +228,7 @@ bool lv_disp_is_mem_fill_supported(void)
     if(active->driver.mem_fill) return true;
     else return false;
 }
+
 #endif
 
 /**********************

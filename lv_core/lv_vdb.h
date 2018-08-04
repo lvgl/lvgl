@@ -28,6 +28,10 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#ifndef LV_VDB_PX_BPP
+#warning "LV_VDB_PX_BPP is not specified in lv_conf.h. Use the default value (LV_COLOR_SIZE)"
+#define LV_VDB_PX_BPP LV_COLOR_SIZE
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -53,10 +57,8 @@ lv_vdb_t * lv_vdb_get(void);
  */
 void lv_vdb_flush(void);
 
-
 /**
- * In 'LV_VDB_DOUBLE' mode  has to be called when 'disp_map()'
- * is ready with copying the map to a frame buffer.
+ * Call in the display driver's  'disp_flush' function when the flushing is finished
  */
 void lv_flush_ready(void);
 

@@ -250,6 +250,18 @@ lv_img_src_t lv_img_get_src_type(const void * src)
 }
 
 /**
+ * Get the source of the image
+ * @param img pointer to an image object
+ * @return the image source (symbol, file name or C array)
+ */
+const void * lv_img_get_src(lv_obj_t * img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->src;
+}
+
+/**
  * Get the name of the file set for an image
  * @param img pointer to an image
  * @return file name

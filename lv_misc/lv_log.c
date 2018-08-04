@@ -61,7 +61,7 @@ void lv_log_add(lv_log_level_t level, const char * file, uint32_t line, const ch
 	if(level >= LV_LOG_LEVEL) {
 
 #if LV_LOG_PRINTF
-		static const char * lvl_prefix[] = {"Debug", "Trace", "Info", "Warn", "Error"};
+		static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error"};
 		printf("%s: %s \t(%s #%d)\n", lvl_prefix[level], dsc,  file, line);
 #else
 		if(print_cb) print_cb(level, file, line, dsc);

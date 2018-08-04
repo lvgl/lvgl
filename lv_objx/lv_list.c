@@ -119,16 +119,16 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
-        lv_obj_t * copy_btn = lv_obj_get_child_back(lv_page_get_scrl(copy), NULL);
-        lv_obj_t * new_btn;
+        lv_obj_t * copy_btn = get_prev_btn(copy, NULL);
         while(copy_btn) {
-            new_btn = lv_btn_create(new_list, copy_btn);
+        	const void * img_src = NULL;
 #if USE_LV_IMG
             lv_obj_t * copy_img = lv_list_get_btn_img(copy_btn);
-            if(copy_img) lv_img_create(new_btn, copy_img);
+            if(copy_img) img_src = lv_img_get_src(copy_img);
 #endif
-            lv_label_create(new_btn, lv_list_get_btn_label(copy_btn));
-            copy_btn = lv_obj_get_child_back(lv_page_get_scrl(copy), copy_btn);
+        	lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), lv_btn_get_action(copy_btn, LV_BTN_ACTION_CLICK));
+           // new_btn = lv_btn_create(new_list, copy_btn);
+        	copy_btn = get_prev_btn(copy, copy_btn);
         }
 
         lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, copy_ext->styles_btn[LV_BTN_STATE_REL]);
@@ -684,10 +684,9 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     			btn_i = get_next_btn(list, btn_i);
     		}
 
-
+    		/*Make the released button "selected"*/
+    		lv_list_set_btn_selected(list, btn);
     	}
-		/*Make the released button "selected"*/
-		lv_list_set_btn_selected(list, btn);
 
     	/* If `click_focus == 1` then LV_SIGNAL_FOCUS need to know which button triggered the focus
 		 * to mark it as selected (pressed state)*/
