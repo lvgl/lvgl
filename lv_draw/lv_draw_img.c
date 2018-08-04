@@ -33,7 +33,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if USE_LV_IMG
 /**
  * Draw an image
  * @param coords the coordinates of the image
@@ -45,13 +44,11 @@
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                  const void * src, const lv_style_t * style, lv_opa_t opa_scale)
 {
-
     if(src == NULL) {
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
         lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL);
         return;
     }
-
 
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t) style->image.opa * opa_scale) >> 8;
 
@@ -149,11 +146,8 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
         }
 
         map_fp(coords, mask, img_var->pixel_map, opa, img_var->header.chroma_keyed, img_var->header.alpha_byte, style->image.color, style->image.intense);
-
     }
-
 }
-#endif
 
 /**********************
  *   STATIC FUNCTIONS

@@ -27,8 +27,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-#if USE_LV_IMG
-
 /**
  * Draw an image
  * @param coords the coordinates of the image
@@ -39,8 +37,6 @@ extern "C" {
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                  const void * src, const lv_style_t * style, lv_opa_t opa_scale);
-
-#endif
 
 /**********************
  *      MACROS
