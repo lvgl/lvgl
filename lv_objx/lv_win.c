@@ -77,6 +77,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
         lv_page_set_sb_mode(ext->page, LV_SB_MODE_AUTO);
+        lv_page_set_arrow_scroll(ext->page, true);
 
         /*Create a holder for the header*/
         ext->header = lv_obj_create(new_win, NULL);
@@ -472,7 +473,12 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->header = NULL;     /*These objects were children so they are already invalid*/
         ext->page = NULL;
         ext->title = NULL;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
+    }
+    else if(sign == LV_SIGNAL_CONTROLL) {
+    	/*Forward all the control signals to the page*/
+    	ext->page->signal_func(ext->page, sign, param);
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/

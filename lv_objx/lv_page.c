@@ -388,6 +388,62 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
     }
 }
 
+/**
+ * Scroll down the page a little
+ * @param page pointer to a page object
+ */
+void lv_page_scroll_down(lv_obj_t * page)
+{
+	lv_obj_t * scrl = lv_page_get_scrl(page);
+
+#if USE_LV_ANIMATION
+	lv_anim_t a;
+	a.var = scrl;
+	a.start = lv_obj_get_y(scrl);
+	a.end = a.start - lv_obj_get_height(page) / 4;
+	a.fp = (lv_anim_fp_t)lv_obj_set_y;
+	a.path = lv_anim_path_linear;
+	a.end_cb = NULL;
+	a.act_time = 0;
+	a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
+	a.playback = 0;
+	a.playback_pause = 0;
+	a.repeat = 0;
+	a.repeat_pause = 0;
+	lv_anim_create(&a);
+#else
+	lv_obj_set_y(scrl, lv_obj_get_y(scrl) - lv_obj_get_height(page) / 4);
+#endif
+}
+
+
+/**
+ *Scroll up the page a little
+ * @param page pointer to a page object
+ */
+void lv_page_scroll_up(lv_obj_t * page)
+{
+	lv_obj_t * scrl = lv_page_get_scrl(page);
+#if USE_LV_ANIMATION
+	lv_anim_t a;
+	a.var = scrl;
+	a.start = lv_obj_get_y(scrl);
+	a.end = a.start + lv_obj_get_height(page) / 4;
+	a.fp = (lv_anim_fp_t)lv_obj_set_y;
+	a.path = lv_anim_path_linear;
+	a.end_cb = NULL;
+	a.act_time = 0;
+	a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
+	a.playback = 0;
+	a.playback_pause = 0;
+	a.repeat = 0;
+	a.repeat_pause = 0;
+	lv_anim_create(&a);
+#else
+	lv_obj_set_y(scrl, lv_obj_get_y(scrl) + lv_obj_get_height(page) / 4);
+#endif
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -570,47 +626,12 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         if(page->ext_size < (-ext->sb.style->body.padding.ver)) page->ext_size = -ext->sb.style->body.padding.ver;
     } else if(sign == LV_SIGNAL_CONTROLL) {
         uint32_t c = *((uint32_t *) param);
-        lv_obj_t * scrl = lv_page_get_scrl(page);
 
         if((c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_RIGHT) && ext->arrow_scroll) {
-#if USE_LV_ANIMATION
-            lv_anim_t a;
-            a.var = scrl;
-            a.start = lv_obj_get_y(scrl);
-            a.end = a.start - lv_obj_get_height(page) / 4;
-            a.fp = (lv_anim_fp_t)lv_obj_set_y;
-            a.path = lv_anim_path_linear;
-            a.end_cb = NULL;
-            a.act_time = 0;
-            a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
-            a.playback = 0;
-            a.playback_pause = 0;
-            a.repeat = 0;
-            a.repeat_pause = 0;
-            lv_anim_create(&a);
-#else
-            lv_obj_set_y(scrl, lv_obj_get_y(scrl) - lv_obj_get_height(page) / 4);
-#endif
+        	lv_page_scroll_down(page);
 
         } else if((c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_LEFT) && ext->arrow_scroll) {
-#if USE_LV_ANIMATION
-            lv_anim_t a;
-            a.var = scrl;
-            a.start = lv_obj_get_y(scrl);
-            a.end = a.start + lv_obj_get_height(page) / 4;
-            a.fp = (lv_anim_fp_t)lv_obj_set_y;
-            a.path = lv_anim_path_linear;
-            a.end_cb = NULL;
-            a.act_time = 0;
-            a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
-            a.playback = 0;
-            a.playback_pause = 0;
-            a.repeat = 0;
-            a.repeat_pause = 0;
-            lv_anim_create(&a);
-#else
-            lv_obj_set_y(scrl, lv_obj_get_y(scrl) + lv_obj_get_height(page) / 4);
-#endif
+        	lv_page_scroll_up(page);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
     	bool * editable = (bool *)param;

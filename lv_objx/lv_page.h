@@ -278,6 +278,18 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue);
  */
 void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time);
 
+/**
+ * Scroll down the page a little
+ * @param page pointer to a page object
+ */
+void lv_page_scroll_down(lv_obj_t * page);
+
+/**
+ * Scroll up the page a little
+ * @param page pointer to a page object
+ */
+void lv_page_scroll_up(lv_obj_t * page);
+
 /**********************
  *      MACROS
  **********************/

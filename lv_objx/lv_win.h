@@ -223,6 +223,19 @@ lv_style_t * lv_win_get_style(const lv_obj_t *win, lv_win_style_t type);
  */
 void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time);
 
+
+static inline void lv_win_scroll_down(lv_obj_t * win)
+{
+	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+	lv_page_scroll_down(ext->page);
+}
+
+static inline void lv_win_scroll_up(lv_obj_t * win)
+{
+	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+	lv_page_scroll_up(ext->page);
+}
+
 /**********************
  *      MACROS
  **********************/
