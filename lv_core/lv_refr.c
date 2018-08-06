@@ -292,7 +292,6 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
 
     /*Round down the lines of VDB if rounding is added*/
     if(round_cb) {
-    	/**/
     	lv_area_t tmp;
     	tmp.x1 = 0;
     	tmp.x2 = 0;
@@ -303,14 +302,14 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     	do {
     		tmp.y2 = y_tmp;
     		round_cb(&tmp);
-    		y_tmp --;		/*Decrement the number of line until it is rounded to a smaller value the original. */
-    	} while(tmp.y2 > max_row && y_tmp != 0);
+    		y_tmp --;		/*Decrement the number of line until it is rounded to a smaller (or equal) value then the original. */
+    	} while(lv_area_get_height(&tmp) > max_row && y_tmp != 0);
 
     	if(y_tmp == 0) {
     		LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to small VDB)");
     		return;
     	} else {
-    		max_row = tmp.y2;
+    		max_row = tmp.y2 + 1;
     	}
     }
 
