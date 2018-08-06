@@ -13,15 +13,17 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
+#include "../../lv_conf.h"
+#endif
 #include <stdint.h>
 #include <stdbool.h>
 
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_ATTRIBUTE_TICK_INC
-#define LV_ATTRIBUTE_TICK_INC
-#endif
 
 /**********************
  *      TYPEDEFS
