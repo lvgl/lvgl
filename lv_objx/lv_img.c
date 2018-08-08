@@ -72,10 +72,9 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->src = NULL;
     ext->src_type = LV_IMG_SRC_UNKNOWN;
+    ext->cf = LV_IMG_FORMAT_UNKOWN;
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
-    ext->chroma_keyed = 0;
-    ext->alpha_byte = 0;
     ext->auto_size = 1;
 
     /*Init the new object*/
@@ -118,7 +117,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_img_set_src(lv_obj_t * img, const void * src_img)
 {
-    lv_img_src_t src_type = lv_img_get_src_type(src_img);
+    lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
 
@@ -127,6 +126,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 #endif
 
 
+    /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMG_SRC_UNKNOWN) {
         if(ext->src_type == LV_IMG_SRC_SYMBOL || ext->src_type == LV_IMG_SRC_FILE) {
             lv_mem_free(ext->src);
@@ -136,72 +136,29 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         return;
     }
 
+    lv_img_header_t header;
+	lv_img_dsc_get_info(src_img, &header, lv_img_get_style(img));
+
+	/*Save the source*/
+	if(src_type == LV_IMG_SRC_VARIABLE) {
+		ext->src = src_img;
+	}
+	else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
+        /* If the new and the old src are the same then it was only a refresh.*/
+        if(ext->src != src_img) {
+            lv_mem_free(ext->src);
+            char * new_str = lv_mem_alloc(strlen(src_img) + 1);
+            lv_mem_assert(new_str);
+            if(new_str == NULL) return;
+            strcpy(new_str, src_img);
+            ext->src = new_str;
+        }
+	}
+
     ext->src_type = src_type;
-
-    if(src_type == LV_IMG_SRC_VARIABLE) {
-        ext->src = src_img;
-        ext->w = ((lv_img_t *)src_img)->header.w;
-        ext->h = ((lv_img_t *)src_img)->header.h;
-        ext->chroma_keyed = ((lv_img_t *)src_img)->header.chroma_keyed;
-        ext->alpha_byte = ((lv_img_t *)src_img)->header.alpha_byte;
-        lv_obj_set_size(img, ext->w, ext->h);
-    }
-#if USE_LV_FILESYSTEM
-    else if(src_type == LV_IMG_SRC_FILE) {
-        lv_fs_file_t file;
-        lv_fs_res_t res;
-        lv_img_t img_file_data;
-        uint32_t rn;
-        res = lv_fs_open(&file, src_img, LV_FS_MODE_RD);
-        if(res == LV_FS_RES_OK) {
-            res = lv_fs_read(&file, &img_file_data, sizeof(img_file_data), &rn);
-        }
-
-        /*Create a dummy header on fs error*/
-        if(res != LV_FS_RES_OK || rn != sizeof(img_file_data)) {
-            img_file_data.header.w = lv_obj_get_width(img);
-            img_file_data.header.h = lv_obj_get_height(img);
-            img_file_data.header.chroma_keyed = 0;
-            img_file_data.header.alpha_byte = 0;
-        }
-
-        lv_fs_close(&file);
-
-        ext->w = img_file_data.header.w;
-        ext->h = img_file_data.header.h;
-        ext->chroma_keyed = img_file_data.header.chroma_keyed;
-        ext->alpha_byte = img_file_data.header.alpha_byte;
-
-        /* If the new and the old src are the same then it was only a refresh.*/
-        if(ext->src != src_img) {
-            lv_mem_free(ext->src);
-            char * new_fn = lv_mem_alloc(strlen(src_img) + 1);
-            lv_mem_assert(new_fn);
-            if(new_fn == NULL) return;
-            strcpy(new_fn, src_img);
-            ext->src = new_fn;
-
-        }
-    }
-#endif
-    else if(src_type == LV_IMG_SRC_SYMBOL) {
-        lv_style_t * style = lv_obj_get_style(img);
-        lv_point_t size;
-        lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
-        ext->w = size.x;
-        ext->h = size.y;
-        ext->chroma_keyed = 1;    /*Symbols always have transparent parts, Important because of cover check in the design function*/
-
-        /* If the new and the old src are the same then it was only a refresh.*/
-        if(ext->src != src_img) {
-            lv_mem_free(ext->src);
-            char * new_txt = lv_mem_alloc(strlen(src_img) + 1);
-            lv_mem_assert(new_txt);
-            if(new_txt == NULL) return;
-            strcpy(new_txt, src_img);
-            ext->src = new_txt;
-        }
-    }
+	ext->w = header.w;
+	ext->h = header.h;
+	ext->cf = header.color_format;
 
     if(lv_img_get_auto_size(img) != false) {
         lv_obj_set_size(img, ext->w, ext->h);
@@ -228,26 +185,6 @@ void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en)
  * Getter functions
  *====================*/
 
-/**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
- *  - a path to an file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
- */
-lv_img_src_t lv_img_get_src_type(const void * src)
-{
-    if(src == NULL) return LV_IMG_SRC_UNKNOWN;
-    const uint8_t * u8_p = src;
-
-    /*The first byte shows the type of the image source*/
-    if(u8_p[0] >= 'A' && u8_p[0] <= 'Z') return LV_IMG_SRC_FILE;    /*It's a driver letter*/
-    else if(((u8_p[0] & 0xFC) >> 2) == LV_IMG_FORMAT_INTERNAL_RAW) return LV_IMG_SRC_VARIABLE;      /*Mask the file format part og of lv_img_t header. IT should be 0 which means C array */
-    else if(u8_p[0] >= ' ') return LV_IMG_SRC_SYMBOL;               /*Other printable characters are considered symbols*/
-
-    else return LV_IMG_SRC_UNKNOWN;
-}
 
 /**
  * Get the source of the image
@@ -310,9 +247,9 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
         bool cover = false;
         if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return false;
 
-        if(ext->chroma_keyed == 0 && ext->alpha_byte == 0) cover = lv_area_is_in(mask, &img->coords);
-        return cover;
+        if(ext->cf == LV_IMG_FORMAT_TRUE_COLOR) cover = lv_area_is_in(mask, &img->coords);
 
+        return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
         lv_area_t coords;

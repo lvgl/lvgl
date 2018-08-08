@@ -45,8 +45,7 @@ typedef struct
     lv_coord_t h;               /*Height of the image (Handled by the library)*/
     uint8_t src_type  :2;       /*See: lv_img_src_t*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
-    uint8_t chroma_keyed :1;    /*1: Chroma keyed image, LV_COLOR_TRANSP (lv_conf.h) pixels will be transparent (Handled by the library)*/
-    uint8_t alpha_byte   :1;    /*1: Extra byte for every pixel to define opacity*/
+    uint8_t cf :5;    			/*Color format from `lv_img_color_format_t`*/
 } lv_img_ext_t;
 
 /**********************
@@ -116,16 +115,6 @@ static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
  *====================*/
 
 /**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
- *  - a path to an file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
- */
-lv_img_src_t lv_img_get_src_type(const void * src);
-
-/**
  * Get the source of the image
  * @param img pointer to an image object
  * @return the image source (symbol, file name or C array)
@@ -171,7 +160,7 @@ static inline bool lv_img_get_upscale(const lv_obj_t * img)
  **********************/
 
 /*Use this macro to declare an image in a c file*/
-#define LV_IMG_DECLARE(var_name) extern const lv_img_t var_name;
+#define LV_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 
 #endif  /*USE_LV_IMG*/
 
