@@ -389,14 +389,12 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 	}
 	else if(mode == LV_DESIGN_DRAW_MAIN) {
 
-		ancestor_design(btn, mask, mode);
 #if USE_LV_ANIMATION
 		if(btn != ink_obj) {
-	        lv_style_t * style = lv_obj_get_style(btn);
-			lv_draw_rect(&btn->coords, mask, style, LV_OPA_COVER);
+			ancestor_design(btn, mask, mode);
 		} else {
-		    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 		    lv_opa_t opa_scale = lv_obj_get_opa_scale(btn);
+		    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
 		    /*Draw the normal button*/
 			lv_draw_rect(&btn->coords, mask, ext->styles[ink_bg_state], opa_scale);
@@ -436,6 +434,8 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 			/*Draw the circle*/
 			lv_draw_rect(&cir_area, mask, &cir_style, opa_scale);
 		}
+#else
+		ancestor_design(btn, mask, mode);
 #endif
 	}
 	else if(mode == LV_DESIGN_DRAW_POST) {

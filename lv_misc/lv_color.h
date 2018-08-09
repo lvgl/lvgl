@@ -96,9 +96,21 @@ typedef union
 {
     struct
     {
+#if LV_COLOR_16_SWAP == 0
         uint16_t blue  :5;
         uint16_t green :6;
         uint16_t red   :5;
+#else
+//        uint16_t blue  	 :5;
+//        uint16_t green_h :3;
+//        uint16_t green_l :3;
+//        uint16_t red     :5;
+
+        uint16_t green_h :3;
+        uint16_t red   :5;
+        uint16_t blue  :5;
+        uint16_t green_l :3;
+#endif
     };
     uint16_t full;
 } lv_color16_t;
@@ -171,10 +183,17 @@ static inline uint8_t lv_color_to1(lv_color_t color)
         return 0;
     }
 #elif LV_COLOR_DEPTH == 16
+#  if LV_COLOR_16_SWAP == 0
     if((color.red   & 0x10) ||
             (color.green & 0x20) ||
             (color.blue  & 0x10)) {
         return 1;
+#  else
+        if((color.red   & 0x10) ||
+			(color.green_h & 0x20) ||
+			(color.blue  & 0x10)) {
+		return 1;
+#  endif
     } else {
         return 0;
     }
@@ -197,11 +216,20 @@ static inline uint8_t lv_color_to8(lv_color_t color)
 #elif LV_COLOR_DEPTH == 8
     return color.full;
 #elif LV_COLOR_DEPTH == 16
+
+#  if LV_COLOR_16_SWAP == 0
     lv_color8_t ret;
     ret.red = color.red >> 2;       /* 5 - 3  = 2*/
     ret.green = color.green >> 3;   /* 6 - 3  = 3*/
     ret.blue = color.blue >> 3;     /* 5 - 2  = 3*/
     return ret.full;
+#  else
+    lv_color8_t ret;
+    ret.red = color.red >> 2;       /* 5 - 3  = 2*/
+    ret.green = color.green_h;   	/* 6 - 3  = 3*/
+    ret.blue = color.blue >> 3;     /* 5 - 2  = 3*/
+    return ret.full;
+#  endif
 #elif LV_COLOR_DEPTH == 24
     lv_color8_t ret;
     ret.red = color.red >> 5;       /* 8 - 3  = 5*/
@@ -246,12 +274,21 @@ static inline uint32_t lv_color_to24(lv_color_t color)
     ret.alpha = 0xFF;
     return ret.full;
 #elif LV_COLOR_DEPTH == 16
+#  if LV_COLOR_16_SWAP == 0
     lv_color24_t ret;
     ret.red = color.red * 8;       /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
     ret.green = color.green * 4;   /*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
     ret.blue = color.blue * 8;     /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
     ret.alpha = 0xFF;
     return ret.full;
+#  else
+    lv_color24_t ret;
+    ret.red = color.red * 8;       								/*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.green = ((color.green_h << 3) + color.green_l) * 4;   	/*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
+    ret.blue = color.blue * 8;    								 /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.alpha = 0xFF;
+    return ret.full;
+#  endif
 #elif LV_COLOR_DEPTH == 24
     return color.full;
 #endif
@@ -262,7 +299,15 @@ static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
     lv_color_t ret;
 #if LV_COLOR_DEPTH != 1
     ret.red =   (uint16_t)((uint16_t) c1.red * mix + (c2.red * (255 - mix))) >> 8;
+#  if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
+    uint16_t g_1 = (c1.green_h << 3) + c1.green_l;
+    uint16_t g_2 = (c2.green_h << 3) + c2.green_l;
+    uint16_t g_out = (uint16_t)((uint16_t) g_1 * mix + (g_2 * (255 - mix))) >> 8;
+    ret.green_h = g_out >> 3;
+    ret.green_l = g_out & 0x7;
+#  else
     ret.green = (uint16_t)((uint16_t) c1.green * mix + (c2.green * (255 - mix))) >> 8;
+#  endif
     ret.blue =  (uint16_t)((uint16_t) c1.blue * mix + (c2.blue * (255 - mix))) >> 8;
 # if LV_COLOR_DEPTH == 24
     ret.alpha = 0xFF;
@@ -295,7 +340,11 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #elif LV_COLOR_DEPTH == 8
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8 >> 6, g8 >> 5, r8 >> 5}})
 #elif LV_COLOR_DEPTH == 16
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8 >> 3, g8 >> 2, r8 >> 3}})
+#  if LV_COLOR_16_SWAP == 0
+#    define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8 >> 3, g8 >> 2, r8 >> 3}})
+#  else
+#    define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{g8 >> 5, r8 >> 3, b8 >> 3, (g8 >> 2) & 0x7}})
+#  endif
 #elif LV_COLOR_DEPTH == 24
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8, g8, r8, 0xff}})            /*Fix 0xff alpha*/
 #endif
