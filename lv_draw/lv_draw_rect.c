@@ -1064,6 +1064,17 @@ static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, con
 static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
 
+	/* KNOWN ISSUE
+	 * The algorithm calculates the shadow only above the middle point of the radius (speaking about the left top corner).
+	 * It causes an error because it doesn't consider how long the straight edge is which effects the value of bottom of the corner shadow.
+	 * In addition the straight shadow is drawn from the middles point of the radius however
+	 * the ends of the straight parts still should be effected by the corner shadow.
+	 * It also causes an issue in opacity. A smaller radius means smaller average shadow opacity.
+	 * The solution should be to start `line` from `- swidth` and handle if the straight part is short (or zero) and the value is taken from
+	 * the other corner. `col` also should start from `- swidth`
+	 */
+
+
     lv_coord_t radius = style->body.radius;
     lv_coord_t swidth = style->body.shadow.width;
 
@@ -1322,7 +1333,6 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
 
 static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, const lv_opa_t * map)
 {
-	return;
     lv_coord_t radius = style->body.radius;
     lv_coord_t swidth = style->body.shadow.width;// + LV_ANTIALIAS;
     lv_coord_t width = lv_area_get_width(coords);
@@ -1333,26 +1343,26 @@ static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area
 
     lv_area_t right_area;
     right_area.x1 = coords->x2 + 1 - LV_ANTIALIAS;
-    right_area.y1 = coords->y1 + radius + 1;
+    right_area.y1 = coords->y1 + radius + LV_ANTIALIAS;
     right_area.x2 = right_area.x1;
-    right_area.y2 = coords->y2 - radius - 1;
+    right_area.y2 = coords->y2 - radius - LV_ANTIALIAS;
 
     lv_area_t left_area;
     left_area.x1 = coords->x1 - 1 + LV_ANTIALIAS;
-    left_area.y1 = coords->y1 + radius + 1;
+    left_area.y1 = coords->y1 + radius + LV_ANTIALIAS;
     left_area.x2 = left_area.x1;
-    left_area.y2 = coords->y2 - radius - 1;
+    left_area.y2 = coords->y2 - radius - LV_ANTIALIAS;
 
     lv_area_t top_area;
-    top_area.x1 = coords->x1 + radius;
+    top_area.x1 = coords->x1 + radius + LV_ANTIALIAS;
     top_area.y1 = coords->y1 - 1 + LV_ANTIALIAS;
-    top_area.x2 = coords->x2 - radius;
+    top_area.x2 = coords->x2 - radius - LV_ANTIALIAS;
     top_area.y2 = top_area.y1;
 
     lv_area_t bottom_area;
-    bottom_area.x1 = coords->x1 + radius;
+    bottom_area.x1 = coords->x1 + radius + LV_ANTIALIAS;
     bottom_area.y1 = coords->y2 + 1 - LV_ANTIALIAS;
-    bottom_area.x2 = coords->x2 - radius;
+    bottom_area.x2 = coords->x2 - radius - LV_ANTIALIAS;
     bottom_area.y2 = bottom_area.y1;
 
     printf("shadow: ");
