@@ -108,6 +108,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_DRAG);
+        lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_HIDE);
         lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
@@ -682,11 +683,15 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     if(ext->opened) { /*Open the list*/
         if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->body.padding.ver;
         else new_height = ext->fix_height;
+
+        lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
     } else { /*Close the list*/
         const lv_font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->label);
         lv_coord_t font_h = lv_font_get_height(font);
         new_height = font_h + 2 * label_style->text.line_space;
+
+        lv_page_set_sb_mode(ddlist, LV_SB_MODE_HIDE);
     }
 
     if(anim_en == 0) {
