@@ -195,7 +195,10 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 
     if(sb_mode == LV_SB_MODE_HIDE) ext->sb.mode |= LV_SB_MODE_HIDE;					/*Set the hidden flag*/
     else if (sb_mode == LV_SB_MODE_UNHIDE) ext->sb.mode &= (~LV_SB_MODE_HIDE);		/*Clear the hidden flag*/
-    else ext->sb.mode = sb_mode;
+    else {
+    	if(ext->sb.mode & LV_SB_MODE_HIDE) sb_mode |= LV_SB_MODE_HIDE;
+    	ext->sb.mode = sb_mode;
+    }
 
     ext->sb.hor_draw = 0;
     ext->sb.ver_draw = 0;
@@ -487,7 +490,6 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
         lv_draw_rect(&page->coords, mask, style, lv_obj_get_opa_scale(page));
         style->body.shadow.width = shadow_width_tmp;
         style->body.empty = empty_tmp;
-
 
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
