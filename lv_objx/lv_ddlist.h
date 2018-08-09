@@ -220,7 +220,7 @@ void lv_ddlist_open(lv_obj_t * ddlist, bool anim);
  * @param ddlist pointer to drop down list object
  * @param anim true: use animation; false: not use animations
  */
-void lv_ddlist_close_en(lv_obj_t * ddlist, bool anim);
+void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
 
 /**********************
  *      MACROS
