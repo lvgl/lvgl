@@ -736,14 +736,16 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
  */
 void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
 {
-    obj->style_p = style;
+	if(obj->style_p != style)
+	{
+		obj->style_p = style;
 
-    /*Send a signal about style change to every children with NULL style*/
-    refresh_childen_style(obj);
+		/*Send a signal about style change to every children with NULL style*/
+		refresh_childen_style(obj);
 
-    /*Notify the object about the style change too*/
-    lv_obj_refresh_style(obj);
-
+		/*Notify the object about the style change too*/
+		lv_obj_refresh_style(obj);
+	}
 }
 
 /**
