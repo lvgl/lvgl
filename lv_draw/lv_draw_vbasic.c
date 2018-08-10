@@ -62,6 +62,8 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
  */
 void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t color, lv_opa_t opa)
 {
+	if(opa == LV_OPA_TRANSP) return;
+
     lv_vdb_t * vdb_p = lv_vdb_get();
 
     /*Pixel out of the mask*/
@@ -100,6 +102,8 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
               lv_color_t color, lv_opa_t opa)
 {
+	if(opa == LV_OPA_TRANSP) return;
+
     lv_area_t res_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
@@ -219,6 +223,9 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                                          136, 153, 170, 187,
                                          204, 221, 238, 255
                                         };
+
+
+	if(opa == LV_OPA_TRANSP) return;
 
     if(font_p == NULL) {
     	LV_LOG_WARN("Font: character's bitmap not found");
@@ -356,6 +363,8 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
              const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
              lv_color_t recolor, lv_opa_t recolor_opa)
 {
+
+	if(opa == LV_OPA_TRANSP) return;
 
     lv_area_t masked_a;
     bool union_ok;

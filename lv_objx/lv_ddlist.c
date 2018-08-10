@@ -108,6 +108,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_cont_set_fit(new_ddlist, true, false);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_DRAG);
+        lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_HIDE);
         lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
@@ -465,39 +466,40 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_design(ddlist, mask, mode);
-
         /*Redraw the text on the selected area with a different color*/
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         lv_opa_t opa_scale = lv_obj_get_opa_scale(ddlist);
 
         /*Redraw only in opened state*/
-        if(ext->opened == 0) return true;
+        if(ext->opened) {
+			lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
+			const lv_font_t * font = style->text.font;
+			lv_coord_t font_h = lv_font_get_height(font);
 
-        lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-        const lv_font_t * font = style->text.font;
-        lv_coord_t font_h = lv_font_get_height(font);
+			lv_area_t area_sel;
+			area_sel.y1 = ext->label->coords.y1;
+			area_sel.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
+			area_sel.y1 -= style->text.line_space / 2;
 
-        lv_area_t area_sel;
-        area_sel.y1 = ext->label->coords.y1;
-        area_sel.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
-        area_sel.y1 -= style->text.line_space / 2;
-
-        area_sel.y2 = area_sel.y1 + font_h + style->text.line_space - 1;
-        area_sel.x1 = ddlist->coords.x1;
-        area_sel.x2 = ddlist->coords.x2;
-        lv_area_t mask_sel;
-        bool area_ok;
-        area_ok = lv_area_intersect(&mask_sel, mask, &area_sel);
-        if(area_ok) {
-            lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_SEL);
-            lv_style_t new_style;
-            lv_style_copy(&new_style, style);
-            new_style.text.color = sel_style->text.color;
-            new_style.text.opa = sel_style->text.opa;
-            lv_draw_label(&ext->label->coords, &mask_sel, &new_style, opa_scale,
-                          lv_label_get_text(ext->label), LV_TXT_FLAG_NONE, NULL);
+			area_sel.y2 = area_sel.y1 + font_h + style->text.line_space - 1;
+			area_sel.x1 = ddlist->coords.x1;
+			area_sel.x2 = ddlist->coords.x2;
+			lv_area_t mask_sel;
+			bool area_ok;
+			area_ok = lv_area_intersect(&mask_sel, mask, &area_sel);
+			if(area_ok) {
+				lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_SEL);
+				lv_style_t new_style;
+				lv_style_copy(&new_style, style);
+				new_style.text.color = sel_style->text.color;
+				new_style.text.opa = sel_style->text.opa;
+				lv_draw_label(&ext->label->coords, &mask_sel, &new_style, opa_scale,
+							  lv_label_get_text(ext->label), LV_TXT_FLAG_NONE, NULL);
+			}
         }
+
+        /*Draw the scrollbar in the ancestor page design function*/
+        ancestor_design(ddlist, mask, mode);
     }
 
     return true;
@@ -682,11 +684,15 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     if(ext->opened) { /*Open the list*/
         if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->body.padding.ver;
         else new_height = ext->fix_height;
+
+        lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
     } else { /*Close the list*/
         const lv_font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->label);
         lv_coord_t font_h = lv_font_get_height(font);
         new_height = font_h + 2 * label_style->text.line_space;
+
+        lv_page_set_sb_mode(ddlist, LV_SB_MODE_HIDE);
     }
 
     if(anim_en == 0) {

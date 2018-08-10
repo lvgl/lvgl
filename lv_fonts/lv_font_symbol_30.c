@@ -6835,8 +6835,13 @@ static const lv_font_glyph_dsc_t lv_font_symbol_30_glyph_dsc[] = {
 #endif
 };
 lv_font_t lv_font_symbol_30 = {
+#if LV_TXT_UTF8
     .unicode_first = 61440, /*First Unicode letter in this font*/
     .unicode_last = 62190,  /*Last Unicode letter in this font*/
+#else
+    .unicode_first = 192, /*First Unicode letter in this font*/
+    .unicode_last = 241,  /*Last Unicode letter in this font*/
+#endif
     .h_px = 30,             /*Font height in pixels*/
     .glyph_bitmap = lv_font_symbol_30_glyph_bitmap, /*Bitmap of glyphs*/
     .glyph_dsc = lv_font_symbol_30_glyph_dsc,       /*Description of glyphs*/
