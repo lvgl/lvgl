@@ -263,6 +263,28 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
 }
 
 /**
+ * Get the press action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is pressed
+ */
+lv_action_t lv_page_get_pr_action(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    return ext->pr_action;
+}
+
+/**
+ * Get the release action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is released
+ */
+lv_action_t lv_page_get_rel_action(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    return ext->rel_action;
+}
+
+/**
  * Set the scroll bar mode on a page
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum

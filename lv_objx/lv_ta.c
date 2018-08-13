@@ -192,7 +192,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     	return;
     }
 
-    uint32_t c_uni = lv_txt_encoded_next(&c, NULL);
+    uint32_t c_uni = lv_txt_encoded_next((const char *)&c, NULL);
 
     if(char_is_accepted(ta, c_uni) == false) {
     	LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");

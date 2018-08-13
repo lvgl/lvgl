@@ -143,6 +143,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos);
  * @param cur_type: element of 'lv_cursor_type_t'
  */
 void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type);
+
 /**
  * Enable/Disable password mode
  * @param ta pointer to a text area object
@@ -163,12 +164,23 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en);
  * @param list list of characters. Only the pointer is saved. E.g. "+-.,0123456789"
  */
 void lv_ta_set_accepted_chars(lv_obj_t * ta, const char * list);
+
 /**
  * Set max length of a Text Area.
  * @param ta pointer to  Text Area
  * @param num the maximal number of characters can be added (`lv_ta_set_text` ignores it)
  */
 void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num);
+
+/**
+ * Set an action to call when the Text area is clicked
+ * @param ta pointer to a Text area
+ * @param action a function pointer
+ */
+static inline void lv_ta_set_action(lv_obj_t * ta, lv_action_t action)
+{
+	lv_page_set_rel_action(ta, action);
+}
 
 /**
  * Set the scroll bar mode of a text area
@@ -254,6 +266,16 @@ const char * lv_ta_get_accepted_chars(lv_obj_t * ta);
  * @return the maximal number of characters to be add
  */
 uint16_t lv_ta_get_max_length(lv_obj_t * ta);
+
+/**
+ * Set an action to call when the Text area is clicked
+ * @param ta pointer to a Text area
+ * @param action a function pointer
+ */
+static inline lv_action_t lv_ta_get_action(lv_obj_t * ta)
+{
+	return lv_page_get_rel_action(ta);
+}
 
 /**
  * Get the scroll bar mode of a text area

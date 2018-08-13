@@ -78,7 +78,6 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Create a page objects
  * @param par pointer to an object, it will be the parent of the new page
@@ -92,6 +91,20 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param obj pointer to an object
  */
 void lv_page_clean(lv_obj_t *obj);
+
+/**
+ * Get the press action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is pressed
+ */
+lv_action_t lv_page_get_pr_action(lv_obj_t * page);
+
+/**
+ * Get the release action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is released
+ */
+lv_action_t lv_page_get_rel_action(lv_obj_t * page);
 
 /**
  * Get the scrollable object of a page
