@@ -28,8 +28,8 @@ typedef struct {
 
 	/* The first 8 bit is very important to distinguish the different source types.
 	 * For more info see `lv_img_get_src_type()` in lv_img.c */
-	uint32_t color_format      :5;    /*See: lv_img_px_format*/
-	uint32_t always_zero :3;		  /*It the upper bits of the first byte*/
+	uint32_t color_format :5;    /*See: lv_img_px_format*/
+	uint32_t always_zero  :3;		  /*It the upper bits of the first byte. Always zero to look like a non-printable character*/
 
 	uint32_t compression :2;
 
@@ -63,11 +63,6 @@ typedef enum {
 	LV_IMG_FORMAT_ALPHA_2BIT, 			/*Can have one color but 4 different alpha value*/
 	LV_IMG_FORMAT_ALPHA_4BIT, 			/*Can have one color but 16 different alpha value*/
 	LV_IMG_FORMAT_ALPHA_8BIT, 			/*Can have one color but 256 different alpha value*/
-
-	LV_IMG_FORMAT_INDEXED_ALPHA_2BIT, 			/*Can have 2 different colors which are drawn or not*/
-	LV_IMG_FORMAT_INDEXED_ALPHA_4BIT, 			/*Can have 4 different colors but 4 different alpha value*/
-	LV_IMG_FORMAT_INDEXED_ALPHA_8BIT, 			/*Can have 16 different colors but 16 different alpha value*/
-	LV_IMG_FORMAT_INDEXED_ALPHA_16BIT, 			/*Can have 256 different colors but 256 different alpha value*/
 } lv_img_color_format_t;
 
 /* Image header it is compatible with

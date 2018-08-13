@@ -23,6 +23,7 @@
 static bool lv_img_draw_built_in(const lv_area_t * coords, const lv_area_t * mask,
                          const void * src, const lv_style_t * style, lv_opa_t opa_scale);
 static bool lv_img_dsc_get_info_built_in(const char * src, lv_img_header_t * header, const lv_style_t * style);
+static void lv_img_alpha_decode_line(const lv_img_dsc_t * dsc, uint8_t * buf, lv_point_t p, lv_coord_t length);
 
 /**********************
  *  STATIC VARIABLES
@@ -94,21 +95,16 @@ uint8_t lv_img_color_format_get_px_size(lv_img_color_format_t cf)
 
 		case LV_IMG_FORMAT_INDEXED_2BIT:
 		case LV_IMG_FORMAT_ALPHA_2BIT:
-		case LV_IMG_FORMAT_INDEXED_ALPHA_2BIT:
 			return 2;
 
 		case LV_IMG_FORMAT_INDEXED_4BIT:
 		case LV_IMG_FORMAT_ALPHA_4BIT:
-		case LV_IMG_FORMAT_INDEXED_ALPHA_4BIT:
 			return 4;
 
 		case LV_IMG_FORMAT_INDEXED_8BIT:
 		case LV_IMG_FORMAT_ALPHA_8BIT:
-		case LV_IMG_FORMAT_INDEXED_ALPHA_8BIT:
 			return 8;
 
-		case LV_IMG_FORMAT_INDEXED_ALPHA_16BIT:
-			return 16;
 		default:
 			return 0;
 	}
@@ -141,10 +137,6 @@ bool lv_img_color_format_has_alpha(lv_img_color_format_t cf)
 		case LV_IMG_FORMAT_ALPHA_2BIT:
 		case LV_IMG_FORMAT_ALPHA_4BIT:
 		case LV_IMG_FORMAT_ALPHA_8BIT:
-		case LV_IMG_FORMAT_INDEXED_ALPHA_2BIT:
-		case LV_IMG_FORMAT_INDEXED_ALPHA_4BIT:
-		case LV_IMG_FORMAT_INDEXED_ALPHA_8BIT:
-		case LV_IMG_FORMAT_INDEXED_ALPHA_16BIT:
 			return true;
 		default:
 			return false;
@@ -293,17 +285,95 @@ static bool lv_img_draw_built_in(const lv_area_t * coords, const lv_area_t * mas
 		lv_fs_close(&file);
 #endif
     } else {
-        const lv_img_dsc_t * img_var = src;
-        lv_area_t mask_com;    /*Common area of mask and coords*/
-        bool union_ok;
-        union_ok = lv_area_intersect(&mask_com, mask, coords);
-        if(union_ok == false) {
-            return true;         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
-        }
+    	const lv_img_dsc_t * img_var = src;
+    	lv_area_t mask_com;    /*Common area of mask and coords*/
+    	bool union_ok;
+    	union_ok = lv_area_intersect(&mask_com, mask, coords);
+    	if(union_ok == false) {
+    		return true;         /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
+    	}
 
-		bool chroma_keyed = lv_img_color_format_is_chroma_key(img_var->header.color_format);
-		bool alpha_byte = lv_img_color_format_has_alpha(img_var->header.color_format);
+    	bool chroma_keyed = lv_img_color_format_is_chroma_key(img_var->header.color_format);
+    	bool alpha_byte = lv_img_color_format_has_alpha(img_var->header.color_format);
 
-        map_fp(coords, mask, img_var->data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
+    	if(img_var->header.color_format == LV_IMG_FORMAT_TRUE_COLOR ||
+			img_var->header.color_format == LV_IMG_FORMAT_TRUE_COLOR_ALPHA ||
+			img_var->header.color_format == LV_IMG_FORMAT_TRUE_COLOR_CHROMA_KEYED)
+    	{
+    		map_fp(coords, mask, img_var->data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
+    	}
+    	else if(img_var->header.color_format == LV_IMG_FORMAT_ALPHA_1BIT ||
+    			img_var->header.color_format == LV_IMG_FORMAT_ALPHA_2BIT ||
+				img_var->header.color_format == LV_IMG_FORMAT_ALPHA_4BIT ||
+				img_var->header.color_format == LV_IMG_FORMAT_ALPHA_8BIT)
+    	{
+    		uint8_t px_size = lv_img_color_format_get_px_size(img_var->header.color_format);
+#if LV_COMPILER_VLA_SUPPORTED
+    		uint8_t buf[lv_area_get_width(coords) * px_size];
+#else
+# if LV_HOR_RES > LV_VER_RES
+    		uint8_t buf[LV_HOR_RES * ((LV_COLOR_DEPTH >> 8) + 1)];  /*+1 because of the possible alpha byte*/
+# else
+    		uint8_t buf[LV_VER_RES * ((LV_COLOR_DEPTH >> 8) + 1)];
+# endif
+#endif
+
+    		lv_area_t line;
+    		lv_area_copy(&line, mask);
+    		lv_area_set_height(&line, 1);
+
+    		lv_coord_t length = lv_area_get_width(&mask_com);
+
+    		lv_point_t p;
+    		p.x = mask_com.x1 - coords->x1;
+    		p.y = mask_com.y1 - coords->y1;
+    		lv_coord_t row;
+    		for(row = mask_com.y1; row <= mask_com.y2; row++) {
+    			lv_img_alpha_decode_line(img_var, buf, p, length);
+    			map_fp(&line, mask, buf, opa, false, false, style->image.color, style->image.intense);
+    			line.y1++;
+    			line.y2++;
+    			p.y++;
+    		}
+    	}
     }
+	return true;
+
+}
+
+
+static void lv_img_alpha_decode_line(const lv_img_dsc_t * dsc, uint8_t * buf, lv_point_t p, lv_coord_t length)
+{
+	const uint8_t * data_tmp = dsc->data;
+	uint8_t px_size = lv_img_color_format_get_px_size(dsc->header.color_format);
+	uint16_t mask = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
+
+	lv_coord_t w = 0;
+	int8_t pos = 0;
+	switch(dsc->header.color_format) {
+		case LV_IMG_FORMAT_ALPHA_1BIT:
+			w = (dsc->header.w >> 3);		/*E.g. w = 20 -> w = 2 + 1*/
+			if(dsc->header.w & 0x7) w++;
+			data_tmp += w * p.y + (p.x >> 3);      /*First pixel*/
+			pos = 7 - (p.x & 0x7);
+		break;
+	}
+
+	lv_color_t * buf_c = (lv_color_t *) buf;
+	lv_coord_t i;
+	uint8_t byte_act = 0;
+	uint8_t val_act;
+	for(i = 0; i < length; i ++) {
+		val_act = data_tmp[byte_act] & (mask << pos);
+		if(val_act) buf_c[i] = LV_COLOR_RED;
+		else buf_c[i] = LV_COLOR_WHITE;
+
+		pos -= px_size;
+		if(pos < 0) {
+			pos = 8 - px_size;
+			data_tmp++;
+		}
+	}
+
+	printf("\n");
 }

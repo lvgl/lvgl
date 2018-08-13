@@ -630,7 +630,7 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t * font)
  * Get a pointer to the theme
  * @return pointer to the theme
  */
-lv_theme_t * lv_theme_get_deafult(void)
+lv_theme_t * lv_theme_get_night(void)
 {
     return &theme;
 }

@@ -178,11 +178,12 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
  *=====================*/
 
 /**
- * Insert a character to the current cursor position
+ * Insert a character to the current cursor position.
+ * To add a wide char, e.g. 'Á' use `lv_txt_encoded_conv_wc('Á')`
  * @param ta pointer to a text area object
- * @param c a character
+ * @param c a character (e.g. 'a')
  */
-void lv_ta_add_char(lv_obj_t * ta, char c)
+void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
@@ -191,17 +192,19 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
     	return;
     }
 
-    if(char_is_accepted(ta, c) == false) {
+    uint32_t c_uni = lv_txt_encoded_next((const char *)&c, NULL);
+
+    if(char_is_accepted(ta, c_uni) == false) {
     	LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");
     	return;
     }
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
-    char letter_buf[2];
+    uint32_t letter_buf[2];
     letter_buf[0] = c;
     letter_buf[1] = '\0';
 
-    lv_label_ins_text(ext->label, ext->cursor.pos, letter_buf);    /*Insert the character*/
+    lv_label_ins_text(ext->label, ext->cursor.pos, (const char *)letter_buf);    /*Insert the character*/
 
     if(ext->pwd_mode != 0) {
 
@@ -209,7 +212,7 @@ void lv_ta_add_char(lv_obj_t * ta, char c)
         lv_mem_assert(ext->pwd_tmp);
         if(ext->pwd_tmp== NULL) return;
 
-        lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, letter_buf);
+        lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, (const char *)letter_buf);
 
 #if USE_LV_ANIMATION
         /*Auto hide characters*/
@@ -247,13 +250,14 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
 
-    /*If only one character is added check if it is accepted*/
-    if(lv_txt_get_encoded_length(txt) == 1) {
-    	uint32_t c = lv_txt_encoded_next(txt, NULL);
-    	if(char_is_accepted(ta, c) == false) {
-        	LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");
-        	return;
+    /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
+    if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
+    	uint32_t i = 0;
+    	while(txt[i] != '\0') {
+			uint32_t c = lv_txt_encoded_next(txt, &i);
+			lv_ta_add_char(ta,lv_txt_unicode_to_encoded(c));
     	}
+    	return;
     }
 
     /*Insert the text*/
@@ -342,10 +346,23 @@ void lv_ta_del_char(lv_obj_t * ta)
 void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    lv_label_set_text(ext->label, txt);
-    lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
 
-    /*Don't let 'width == 0' because cursor will not be visible*/
+	/*Add the character one-by-one if not all characters are accepted or there is character limit.*/
+	if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
+	   lv_label_set_text(ext->label, "");
+	   lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
+
+	   uint32_t i = 0;
+	   while(txt[i] != '\0') {
+			uint32_t c = lv_txt_encoded_next(txt, &i);
+			lv_ta_add_char(ta,lv_txt_unicode_to_encoded(c));
+		}
+	} else {
+		lv_label_set_text(ext->label, txt);
+		lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
+	}
+
+    /*Don't let 'width == 0' because the cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
         lv_style_t * style = lv_obj_get_style(ext->label);
         lv_obj_set_width(ext->label, lv_font_get_width(style->text.font, ' '));
@@ -1029,32 +1046,13 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/
-        if(c == LV_GROUP_KEY_RIGHT)  lv_ta_cursor_right(ta);
-        else if(c == LV_GROUP_KEY_LEFT)  lv_ta_cursor_left(ta);
-        else if(c == LV_GROUP_KEY_UP)  lv_ta_cursor_up(ta);
+        if(c == LV_GROUP_KEY_RIGHT)  	lv_ta_cursor_right(ta);
+        else if(c == LV_GROUP_KEY_LEFT) lv_ta_cursor_left(ta);
+        else if(c == LV_GROUP_KEY_UP)  	lv_ta_cursor_up(ta);
         else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
-        else if(c == LV_GROUP_KEY_DEL) lv_ta_del_char(ta);
+        else if(c == LV_GROUP_KEY_DEL) 	lv_ta_del_char(ta);
         else {
-#if LV_TXT_UTF8 != 0
-            /*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
-            if((c & 0x80) == 0) {   /*ASCII*/
-                lv_ta_add_char(ta, (char)c);
-            } else {
-                uint32_t swapped[2] = {0, 0};   /*the 2. element is the closing '\0'*/
-                uint8_t c8[4];
-                memcpy(c8, &c, 4);
-                swapped[0] = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
-                char * p = (char *)swapped;
-                uint8_t i;
-                for(i = 0; i < 4; i++) {
-                    if(p[0] == 0) p++; /*Ignore leading zeros (they were in the end originally)*/
-                }
-                lv_ta_add_text(ta, p);
-            }
-#else
-            lv_ta_add_char(ta, (char)c);
-
-#endif
+            lv_ta_add_char(ta, c);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
     	bool * editable = (bool *)param;
@@ -1156,6 +1154,12 @@ static void pwd_char_hider(lv_obj_t * ta)
     }
 }
 
+/**
+ * Test an unicode character if it is accepted or not. Checks max length and accepted char list.
+ * @param ta pointer to a test area object
+ * @param c an unicode character
+ * @return true: accapted; false: rejected
+ */
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
 {
 	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);

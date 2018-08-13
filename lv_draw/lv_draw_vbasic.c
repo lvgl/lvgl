@@ -103,7 +103,6 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
               lv_color_t color, lv_opa_t opa)
 {
-
 	if(opa < LV_OPA_MIN) return;
 	if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
@@ -226,7 +225,6 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                                          136, 153, 170, 187,
                                          204, 221, 238, 255
                                         };
-
 	if(opa < LV_OPA_MIN) return;
 	if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 

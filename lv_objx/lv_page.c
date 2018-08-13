@@ -20,7 +20,7 @@
  *      DEFINES
  *********************/
 #define LV_PAGE_SB_MIN_SIZE    (LV_DPI / 8)
-#define LV_PAGE_GROUP_SCROLL_ANIM_TIME  200
+#define LV_PAGE_SCROLL_ANIM_TIME  200			/*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
 
 /**********************
  *      TYPEDEFS
@@ -193,9 +193,16 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     if(ext->sb.mode == sb_mode) return;
 
-    ext->sb.mode = sb_mode;
+    if(sb_mode == LV_SB_MODE_HIDE) ext->sb.mode |= LV_SB_MODE_HIDE;					/*Set the hidden flag*/
+    else if (sb_mode == LV_SB_MODE_UNHIDE) ext->sb.mode &= (~LV_SB_MODE_HIDE);		/*Clear the hidden flag*/
+    else {
+    	if(ext->sb.mode & LV_SB_MODE_HIDE) sb_mode |= LV_SB_MODE_HIDE;
+    	ext->sb.mode = sb_mode;
+    }
+
     ext->sb.hor_draw = 0;
     ext->sb.ver_draw = 0;
+
     lv_page_sb_refresh(page);
     lv_obj_invalidate(page);
 }
@@ -253,6 +260,28 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
     return ext->scrl;
+}
+
+/**
+ * Get the press action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is pressed
+ */
+lv_action_t lv_page_get_pr_action(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    return ext->pr_action;
+}
+
+/**
+ * Get the release action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is released
+ */
+lv_action_t lv_page_get_rel_action(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    return ext->rel_action;
 }
 
 /**
@@ -389,58 +418,60 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 }
 
 /**
- * Scroll down the page a little
+ * Scroll the page horizontally
  * @param page pointer to a page object
+ * @param dist the distance to scroll (< 0: scroll right; > 0 scroll left)
  */
-void lv_page_scroll_down(lv_obj_t * page)
+void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
 {
 	lv_obj_t * scrl = lv_page_get_scrl(page);
 
 #if USE_LV_ANIMATION
 	lv_anim_t a;
 	a.var = scrl;
-	a.start = lv_obj_get_y(scrl);
-	a.end = a.start - lv_obj_get_height(page) / 4;
-	a.fp = (lv_anim_fp_t)lv_obj_set_y;
+	a.start = lv_obj_get_x(scrl);
+	a.end = a.start + dist;
+	a.fp = (lv_anim_fp_t)lv_obj_set_x;
 	a.path = lv_anim_path_linear;
 	a.end_cb = NULL;
 	a.act_time = 0;
-	a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
+	a.time = LV_PAGE_SCROLL_ANIM_TIME;
 	a.playback = 0;
 	a.playback_pause = 0;
 	a.repeat = 0;
 	a.repeat_pause = 0;
 	lv_anim_create(&a);
 #else
-	lv_obj_set_y(scrl, lv_obj_get_y(scrl) - lv_obj_get_height(page) / 4);
+	lv_obj_set_x(scrl, lv_obj_get_x(scrl) + dist);
 #endif
 }
 
-
 /**
- *Scroll up the page a little
+ * Scroll the page vertically
  * @param page pointer to a page object
+ * @param dist the distance to scroll (< 0: scroll down; > 0 scroll up)
  */
-void lv_page_scroll_up(lv_obj_t * page)
+void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 {
 	lv_obj_t * scrl = lv_page_get_scrl(page);
+
 #if USE_LV_ANIMATION
 	lv_anim_t a;
 	a.var = scrl;
 	a.start = lv_obj_get_y(scrl);
-	a.end = a.start + lv_obj_get_height(page) / 4;
+	a.end = a.start + dist;
 	a.fp = (lv_anim_fp_t)lv_obj_set_y;
 	a.path = lv_anim_path_linear;
 	a.end_cb = NULL;
 	a.act_time = 0;
-	a.time = LV_PAGE_GROUP_SCROLL_ANIM_TIME;
+	a.time = LV_PAGE_SCROLL_ANIM_TIME;
 	a.playback = 0;
 	a.playback_pause = 0;
 	a.repeat = 0;
 	a.repeat_pause = 0;
 	lv_anim_create(&a);
 #else
-	lv_obj_set_y(scrl, lv_obj_get_y(scrl) + lv_obj_get_height(page) / 4);
+	lv_obj_set_y(scrl, lv_obj_get_x(scrl) + dist);
 #endif
 }
 
@@ -482,12 +513,11 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
         style->body.shadow.width = shadow_width_tmp;
         style->body.empty = empty_tmp;
 
-
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
         /*Draw the scrollbars*/
         lv_area_t sb_area;
-        if(ext->sb.hor_draw) {
+        if(ext->sb.hor_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
             /*Convert the relative coordinates to absolute*/
             lv_area_copy(&sb_area, &ext->sb.hor_area);
             sb_area.x1 += page->coords.x1;
@@ -497,7 +527,7 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
             lv_draw_rect(&sb_area, mask, ext->sb.style, lv_obj_get_opa_scale(page));
         }
 
-        if(ext->sb.ver_draw) {
+        if(ext->sb.ver_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
             /*Convert the relative coordinates to absolute*/
             lv_area_copy(&sb_area, &ext->sb.ver_area);
             sb_area.x1 += page->coords.x1;
@@ -627,11 +657,14 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_CONTROLL) {
         uint32_t c = *((uint32_t *) param);
 
-        if((c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_RIGHT) && ext->arrow_scroll) {
-        	lv_page_scroll_down(page);
-
-        } else if((c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_LEFT) && ext->arrow_scroll) {
-        	lv_page_scroll_up(page);
+        if((c == LV_GROUP_KEY_DOWN) && ext->arrow_scroll) {
+        	lv_page_scroll_ver(page, - lv_obj_get_height(page) / 4);
+        } else if((c == LV_GROUP_KEY_UP) && ext->arrow_scroll) {
+        	lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
+        } else if((c == LV_GROUP_KEY_RIGHT) && ext->arrow_scroll) {
+        	lv_page_scroll_hor(page, - lv_obj_get_width(page) / 4);
+        } else if((c == LV_GROUP_KEY_LEFT) && ext->arrow_scroll) {
+        	lv_page_scroll_hor(page,  lv_obj_get_width(page) / 4);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
     	bool * editable = (bool *)param;

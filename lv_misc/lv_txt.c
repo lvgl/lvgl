@@ -26,6 +26,7 @@ static bool is_break_char(uint32_t letter);
 #if LV_TXT_UTF8
 static uint8_t lv_txt_utf8_size(const char * str);
 static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni);
+static uint32_t lv_txt_utf8_conv_wc(uint32_t c);
 static uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i);
 static uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i_start);
 static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id);
@@ -34,6 +35,7 @@ static uint32_t lv_txt_utf8_get_length(const char * txt);
 #else
 static uint8_t lv_txt_ascii_size(const char * str);
 static uint32_t lv_txt_unicode_to_ascii(uint32_t letter_uni);
+static uint32_t lv_txt_ascii_conv_wc(uint32_t c);
 static uint32_t lv_txt_ascii_next(const char * txt, uint32_t * i);
 static uint32_t lv_txt_ascii_prev(const char * txt, uint32_t * i_start);
 static uint32_t lv_txt_ascii_get_byte_id(const char * txt, uint32_t utf8_id);
@@ -52,6 +54,7 @@ static uint32_t lv_txt_ascii_get_length(const char * txt);
 #if LV_TXT_UTF8
 uint8_t (*lv_txt_encoded_size)(const char *) = 					lv_txt_utf8_size;
 uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_utf8;
+uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =					lv_txt_utf8_conv_wc;
 uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_utf8_next;
 uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_utf8_prev;
 uint32_t (*txt_encoded_get_byte_id)(const char * , uint32_t) =	lv_txt_utf8_get_byte_id;
@@ -60,6 +63,7 @@ uint32_t (*lv_txt_get_encoded_length)(const char * ) = 			lv_txt_utf8_get_length
 #else
 uint8_t (*lv_txt_encoded_size)(const char *) = 					lv_txt_ascii_size;
 uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_ascii;
+uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =					lv_txt_ascii_conv_wc;
 uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_ascii_next;
 uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_ascii_prev;
 uint32_t (*txt_encoded_get_byte_id)(const char * , uint32_t) =	lv_txt_ascii_get_byte_id;
@@ -380,6 +384,29 @@ static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
 }
 
 /**
+ * Convert a wide character, e.g. 'Á' little endian to be UTF-8 compatible
+ * @param c a wide character or a  Little endian number
+ * @return `c` in big endian
+ */
+static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
+{
+	/*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
+	if((c & 0x80) != 0) {
+		uint32_t swapped;
+		uint8_t c8[4];
+		memcpy(c8, &c, 4);
+		swapped = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
+		uint8_t i;
+		for(i = 0; i < 4; i++) {
+			if((swapped & 0xFF) == 0) swapped = (swapped >> 8); /*Ignore leading zeros (they were in the end originally)*/
+		}
+		c = swapped;
+	}
+
+	return c;
+}
+
+/**
  * Decode an UTF-8 character from a string.
  * @param txt pointer to '\0' terminated string
  * @param i start byte index in 'txt' where to start.
@@ -568,6 +595,17 @@ static uint32_t lv_txt_unicode_to_ascii(uint32_t letter_uni)
 {
     if(letter_uni < 128) return letter_uni;
     else return ' ';
+}
+
+/**
+ * Convert wide characters to ASCII, however wide characters in ASCII range (e.g. 'A') are ASCII compatible by default.
+ * So this function does nothing just returns with `c`.
+ * @param c a character, e.g. 'A'
+ * @return same as `c`
+ */
+static uint32_t lv_txt_ascii_conv_wc(uint32_t c)
+{
+	return c;
 }
 
 /**

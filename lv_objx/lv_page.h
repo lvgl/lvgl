@@ -40,10 +40,12 @@ extern "C" {
 /*Scrollbar modes: shows when should the scrollbars be visible*/
 typedef enum
 {
-    LV_SB_MODE_OFF,    /*Never show scrollbars*/
-    LV_SB_MODE_ON,     /*Always show scrollbars*/
-    LV_SB_MODE_DRAG,   /*Show scrollbars when page is being dragged*/
-    LV_SB_MODE_AUTO,   /*Show scrollbars when the scrollable container is large enough to be scrolled*/
+    LV_SB_MODE_OFF 	= 0x0,   	/*Never show scrollbars*/
+    LV_SB_MODE_ON  	= 0x1,   	/*Always show scrollbars*/
+    LV_SB_MODE_DRAG = 0x2,   	/*Show scrollbars when page is being dragged*/
+    LV_SB_MODE_AUTO = 0x3,   	/*Show scrollbars when the scrollable container is large enough to be scrolled*/
+	LV_SB_MODE_HIDE = 0x4,	 	/*Hide the scroll bar temporally*/
+	LV_SB_MODE_UNHIDE = 0x5,	/*Unhide the previously hidden scrollbar. Recover it's type too*/
 } lv_sb_mode_t;
 
 /*Data of page*/
@@ -76,7 +78,6 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Create a page objects
  * @param par pointer to an object, it will be the parent of the new page
@@ -90,6 +91,20 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param obj pointer to an object
  */
 void lv_page_clean(lv_obj_t *obj);
+
+/**
+ * Get the press action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is pressed
+ */
+lv_action_t lv_page_get_pr_action(lv_obj_t * page);
+
+/**
+ * Get the release action of the page
+ * @param page pointer to a page object
+ * @return a function to call when the page is released
+ */
+lv_action_t lv_page_get_rel_action(lv_obj_t * page);
 
 /**
  * Get the scrollable object of a page
@@ -279,16 +294,18 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue);
 void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time);
 
 /**
- * Scroll down the page a little
+ * Scroll the page horizontally
  * @param page pointer to a page object
+ * @param dist the distance to scroll (< 0: scroll left; > 0 scroll right)
  */
-void lv_page_scroll_down(lv_obj_t * page);
+void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist);
 
 /**
- * Scroll up the page a little
+ * Scroll the page vertically
  * @param page pointer to a page object
+ * @param dist the distance to scroll (< 0: scroll down; > 0 scroll up)
  */
-void lv_page_scroll_up(lv_obj_t * page);
+void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist);
 
 /**********************
  *      MACROS

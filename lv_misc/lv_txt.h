@@ -135,6 +135,13 @@ extern uint8_t (*lv_txt_encoded_size)(const char *);
 extern uint32_t (*lv_txt_unicode_to_encoded)(uint32_t );
 
 /**
+ * Convert a wide character, e.g. 'Á' little endian to be compatible with the encoded format.
+ * @param c a wide character
+ * @return `c` in the encoded format
+ */
+extern uint32_t (*lv_txt_encoded_conv_wc) (uint32_t c);
+
+/**
  * Decode the next encoded character from a string.
  * @param txt pointer to '\0' terminated string
  * @param i start index in 'txt' where to start.
