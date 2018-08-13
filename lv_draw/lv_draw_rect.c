@@ -1365,13 +1365,10 @@ static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area
     bottom_area.x2 = coords->x2 - radius - LV_ANTIALIAS;
     bottom_area.y2 = bottom_area.y1;
 
-    printf("shadow: ");
-
     lv_opa_t opa_act;
     int16_t d;
     for(d = 1 /*+ LV_ANTIALIAS*/; d <= swidth/* - LV_ANTIALIAS*/; d++) {
         opa_act = map[d];
-        printf("%d, ", opa_act);
 
         fill_fp(&right_area, mask, style->body.shadow.color, opa_act);
         right_area.x1++;
@@ -1389,8 +1386,6 @@ static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area
         bottom_area.y1++;
         bottom_area.y2++;
     }
-
-    printf("\n");
 }
 
 #endif
