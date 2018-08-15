@@ -137,7 +137,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     }
 
     lv_img_header_t header;
-	lv_img_dsc_get_info(src_img, &header, lv_img_get_style(img));
+	lv_img_dsc_get_info(src_img, &header);
 
 	/*Save the source*/
 	if(src_type == LV_IMG_SRC_VARIABLE) {
@@ -153,6 +153,15 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
             strcpy(new_str, src_img);
             ext->src = new_str;
         }
+	}
+
+	if(src_type == LV_IMG_SRC_SYMBOL) {
+	    /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
+	    lv_style_t * style = lv_img_get_style(img);
+	    lv_point_t size;
+	    lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+	    header.w = size.x;
+	    header.h = size.y;
 	}
 
     ext->src_type = src_type;

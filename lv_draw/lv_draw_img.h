@@ -14,10 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_IMG_DECODER_OPEN_FAIL    ((void*)(-1))
 
 /**********************
  *      TYPEDEFS
@@ -48,7 +50,7 @@ typedef enum {
 typedef enum {
     LV_IMG_FORMAT_UNKOWN = 0,
 
-	LV_IMG_FORMAT_RAW,					/*Contains the file's as it is. Needs custom decoder function*/
+	LV_IMG_FORMAT_RAW,          		/*Contains the file as it is. Needs custom decoder function*/
 
 	LV_IMG_FORMAT_TRUE_COLOR,			/*Color format and depth should match with LV_COLOR settings*/
 	LV_IMG_FORMAT_TRUE_COLOR_ALPHA,		/*Same as `LV_IMG_FORMAT_TRUE_COLOR` but every pixel has an alpha byte*/
@@ -89,12 +91,21 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
                  const void * src, const lv_style_t * style, lv_opa_t opa_scale);
 
 
+/**
+ * Get the type of an image source
+ * @param src pointer to an image source:
+ *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
+ *  - a path to a file (e.g. "S:/folder/image.bin")
+ *  - or a symbol (e.g. SYMBOL_CLOSE)
+ * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
+ */
+lv_img_src_t lv_img_src_get_type(const void * src);
 
-bool lv_img_dsc_get_info(const char * src, lv_img_header_t * header, const lv_style_t * style);
+lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header);
 
 uint8_t lv_img_color_format_get_px_size(lv_img_color_format_t cf);
 
-bool lv_img_color_format_is_chroma_key(lv_img_color_format_t cf);
+bool lv_img_color_format_is_chroma_keyed(lv_img_color_format_t cf);
 
 bool lv_img_color_format_has_alpha(lv_img_color_format_t cf);
 

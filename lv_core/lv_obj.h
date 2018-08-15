@@ -76,7 +76,7 @@ typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const lv_area_t * mas
 
 typedef enum
 {
-    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
+    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function or an operation was failed*/
     LV_RES_OK,           /*The object is valid (no deleted) after the action*/
 } lv_res_t;
 
