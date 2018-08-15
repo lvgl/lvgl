@@ -436,15 +436,15 @@ void lv_scr_load(lv_obj_t * scr)
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 {
-	if(obj->par == NULL) {
-		LV_LOG_WARN("Can't set the parent of a screen");
-		return;
-	}
+    if(obj->par == NULL) {
+        LV_LOG_WARN("Can't set the parent of a screen");
+        return;
+    }
 
-	if(parent == NULL) {
-		LV_LOG_WARN("Can't set parent == NULL to an object");
-		return;
-	}
+    if(parent == NULL) {
+        LV_LOG_WARN("Can't set parent == NULL to an object");
+        return;
+    }
 
 
     lv_obj_invalidate(obj);
