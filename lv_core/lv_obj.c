@@ -431,11 +431,22 @@ void lv_scr_load(lv_obj_t * scr)
 
 /**
  * Set a new parent for an object. Its relative position will be the same.
- * @param obj pointer to an object
- * @param parent pointer to the new parent object
+ * @param obj pointer to an object. Can't be a screen.
+ * @param parent pointer to the new parent object. (Can't be NULL)
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 {
+    if(obj->par == NULL) {
+        LV_LOG_WARN("Can't set the parent of a screen");
+        return;
+    }
+
+    if(parent == NULL) {
+        LV_LOG_WARN("Can't set parent == NULL to an object");
+        return;
+    }
+
+
     lv_obj_invalidate(obj);
 
     lv_point_t old_pos;
