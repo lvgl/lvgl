@@ -218,9 +218,9 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                 const lv_font_t * font_p, uint32_t letter,
                 lv_color_t color, lv_opa_t opa)
 {
-    static uint8_t bpp1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
-    static uint8_t bpp2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
-    static uint8_t bpp4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
+    const uint8_t bpp1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
+    const uint8_t bpp2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
+    const uint8_t bpp4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
                                          68,  85,  102, 119,
                                          136, 153, 170, 187,
                                          204, 221, 238, 255

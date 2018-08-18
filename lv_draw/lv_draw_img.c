@@ -257,8 +257,8 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         LV_LOG_WARN("Image draw can't get image info");
         lv_img_decoder_close();
         return LV_RES_INV;
-
     }
+
     bool chroma_keyed = lv_img_color_format_is_chroma_keyed(header.color_format);
     bool alpha_byte = lv_img_color_format_has_alpha(header.color_format);
 
@@ -300,7 +300,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                 LV_LOG_WARN("Image draw can't read the line");
                 return LV_RES_INV;
             }
-            map_fp(&line, mask, buf, opa, false, false, style->image.color, style->image.intense);
+            map_fp(&line, mask, buf, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
             line.y1++;
             line.y2++;
             y++;
@@ -373,7 +373,7 @@ static const uint8_t * lv_img_decoder_open(const void * src)
 
 static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
-    /*Try to raad the line with the custom functions first*/
+    /*Try to read the line with the custom functions first*/
     if(lv_img_decoder_read_line_custom) {
         lv_res_t custom_res;
         custom_res = lv_img_decoder_read_line_custom(x, y, len, buf);
@@ -440,8 +440,32 @@ static void lv_img_decoder_close(void)
 
 static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
+    const lv_opa_t alpha1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
+    const lv_opa_t alpha2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
+    const lv_opa_t alpha4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
+                                          68,  85,  102, 119,
+                                          136, 153, 170, 187,
+                                          204, 221, 238, 255
+                                         };
+
+    /*Simply fill the buffer with the color. Later only the alpha value will be modified.*/
+    lv_color_t bg_color = LV_COLOR_RED;
+    lv_coord_t i;
+    for(i = 0; i < len; i++) {
+#if LV_COLOR_DEPTH == 8
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full;
+#elif LV_COLOR_DEPTH == 16
+        /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full & 0xFF;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = (bg_color.full >> 8) & 0xFF;
+#elif LV_COLOR_DEPTH == 24
+        *((uint32_t*)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = bg_color.full;
+#endif
+    }
+
     const lv_img_dsc_t * img_dsc = decoder_src;
 	const uint8_t * data_tmp = img_dsc->data;
+	const lv_opa_t * opa_table = NULL;
 	uint8_t px_size = lv_img_color_format_get_px_size(img_dsc->header.color_format);
 	uint16_t mask = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
@@ -453,17 +477,36 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 			if(img_dsc->header.w & 0x7) w++;
 			data_tmp += w * y + (x >> 3);      /*First pixel*/
 			pos = 7 - (x & 0x7);
+			opa_table = alpha1_opa_table;
 		break;
+        case LV_IMG_FORMAT_ALPHA_2BIT:
+            w = (img_dsc->header.w >> 2);       /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
+            if(img_dsc->header.w & 0x3) w++;
+            data_tmp += w * y + (x >> 2);      /*First pixel*/
+            pos = 6 - ((x & 0x3) * 2);
+            opa_table = alpha2_opa_table;
+        break;
+        case LV_IMG_FORMAT_ALPHA_4BIT:
+            w = (img_dsc->header.w >> 1);       /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
+            if(img_dsc->header.w & 0x1) w++;
+            data_tmp += w * y + (x >> 1);      /*First pixel*/
+            pos = 4 - ((x & 0x1) * 4);
+            opa_table = alpha4_opa_table;
+        break;
+        case LV_IMG_FORMAT_ALPHA_8BIT:
+            w = img_dsc->header.w;              /*E.g. x = 7 -> w = 7 (bytes)*/
+            data_tmp += w * y + x;      /*First pixel*/
+            pos = 0;
+        break;
 	}
 
-	lv_color_t * buf_c = (lv_color_t *) buf;
-	lv_coord_t i;
 	uint8_t byte_act = 0;
 	uint8_t val_act;
 	for(i = 0; i < len; i ++) {
-		val_act = data_tmp[byte_act] & (mask << pos);
-		if(val_act) buf_c[i] = LV_COLOR_RED;
-		else buf_c[i] = LV_COLOR_WHITE;
+		val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
+
+		buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] =
+		         img_dsc->header.color_format == LV_IMG_FORMAT_ALPHA_8BIT ? val_act : opa_table[val_act];
 
 		pos -= px_size;
 		if(pos < 0) {
