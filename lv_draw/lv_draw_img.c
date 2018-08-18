@@ -23,10 +23,11 @@
 static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask,
                          const void * src, const lv_style_t * style, lv_opa_t opa_scale);
 
-static const uint8_t * lv_img_decoder_open(const void * src);
+static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * style);
 static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 static void lv_img_decoder_close(void);
 static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
 /**********************
  *  STATIC VARIABLES
@@ -34,10 +35,12 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 static const void * decoder_src;
 static lv_img_src_t decoder_src_type;
 static lv_img_header_t decoder_header;
+static const lv_style_t * decoder_style;
 static lv_fs_file_t decoder_file;
+static lv_color_t decoder_index_map[256] = {LV_COLOR_RED, LV_COLOR_BLUE, LV_COLOR_GREEN, LV_COLOR_PURPLE};
 
 lv_res_t (*lv_img_dsc_get_info_custom)(const char * src, lv_img_header_t * header);
-const uint8_t * (*lv_img_decoder_open_custom)(const char * src);
+const uint8_t * (*lv_img_decoder_open_custom)(const char * src, const lv_style_t * style);
 lv_res_t (*lv_img_decoder_read_line_custom)(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 lv_res_t (*lv_img_decoder_close_custom)(void);
 
@@ -262,7 +265,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     bool chroma_keyed = lv_img_color_format_is_chroma_keyed(header.color_format);
     bool alpha_byte = lv_img_color_format_has_alpha(header.color_format);
 
-    const uint8_t * img_data = lv_img_decoder_open(src);
+    const uint8_t * img_data = lv_img_decoder_open(src, style);
     if(img_data == LV_IMG_DECODER_OPEN_FAIL) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_img_decoder_close();
@@ -313,16 +316,17 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 }
 
 
-static const uint8_t * lv_img_decoder_open(const void * src)
+static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * style)
 {
     /*Try to open with the custom functions first*/
     if(lv_img_decoder_open_custom) {
         const uint8_t * custom_res;
-        custom_res = lv_img_decoder_open_custom(src);
+        custom_res = lv_img_decoder_open_custom(src, style);
         if(custom_res != LV_IMG_DECODER_OPEN_FAIL) return custom_res;   /*Custom open supported this source*/
     }
 
     decoder_src = src;
+    decoder_style = style;
     lv_img_src_t decoder_src_type = lv_img_src_get_type(src);
 
     /*It will be a path to a file*/
@@ -350,15 +354,30 @@ static const uint8_t * lv_img_decoder_open(const void * src)
     /*It will be a variable in the RAM/ROM*/
     else if(decoder_src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = src;
-        switch(img_dsc->header.color_format) {
+        lv_img_color_format_t cf = img_dsc->header.color_format;
+        if(cf == LV_IMG_FORMAT_TRUE_COLOR ||
+           cf == LV_IMG_FORMAT_TRUE_COLOR_ALPHA ||
+           cf == LV_IMG_FORMAT_TRUE_COLOR_CHROMA_KEYED)
+        {
             /*In case of uncompressed formats return the whole array*/
-            case LV_IMG_FORMAT_TRUE_COLOR:
-            case LV_IMG_FORMAT_TRUE_COLOR_ALPHA:
-            case LV_IMG_FORMAT_TRUE_COLOR_CHROMA_KEYED:
-                return img_dsc->data;
-            default:
-                /*Else return NULL because the pixel are need to be processed first*/
-                return NULL;
+            return img_dsc->data;
+        }
+        else if(cf == LV_IMG_FORMAT_INDEXED_1BIT ||
+                cf == LV_IMG_FORMAT_INDEXED_2BIT ||
+                cf == LV_IMG_FORMAT_INDEXED_4BIT ||
+                cf == LV_IMG_FORMAT_INDEXED_8BIT)
+        {
+            uint8_t px_size = lv_img_color_format_get_px_size(cf);
+            uint32_t palette_size = 1 << px_size;
+            lv_color24_t * cbuf = (lv_color24_t *) img_dsc->data;
+            uint32_t i;
+            for(i = 0; i < palette_size; i++) {
+                decoder_index_map[i] = LV_COLOR_MAKE(cbuf[i].red, cbuf[i].green, cbuf[i].blue);
+            }
+            return NULL;
+        }
+        else {
+            return NULL;
         }
     } else {
         decoder_src = NULL;
@@ -409,6 +428,12 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
             img_dsc->header.color_format == LV_IMG_FORMAT_ALPHA_8BIT)
          {
              lv_img_built_in_decoder_line_alpha(x, y, len, buf);
+         } if(img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_1BIT ||
+              img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_2BIT ||
+              img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_4BIT ||
+              img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_8BIT)
+         {
+             lv_img_built_in_decoder_line_indexed(x, y, len, buf);
          } else {
              LV_LOG_WARN("Built-in image decoder not supports the color format");
              return false;
@@ -449,7 +474,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
                                          };
 
     /*Simply fill the buffer with the color. Later only the alpha value will be modified.*/
-    lv_color_t bg_color = LV_COLOR_RED;
+    lv_color_t bg_color = decoder_style->image.color;
     lv_coord_t i;
     for(i = 0; i < len; i++) {
 #if LV_COLOR_DEPTH == 8
@@ -517,3 +542,62 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 
 	return LV_RES_OK;
 }
+
+static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
+{
+
+    const lv_img_dsc_t * img_dsc = decoder_src;
+    const uint8_t * data_tmp = img_dsc->data;
+    uint8_t px_size = lv_img_color_format_get_px_size(img_dsc->header.color_format);
+    uint16_t mask = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
+
+    lv_coord_t w = 0;
+    int8_t pos = 0;
+    switch(img_dsc->header.color_format) {
+        case LV_IMG_FORMAT_INDEXED_1BIT:
+            w = (img_dsc->header.w >> 3);       /*E.g. w = 20 -> w = 2 + 1*/
+            if(img_dsc->header.w & 0x7) w++;
+            data_tmp += w * y + (x >> 3);      /*First pixel*/
+            data_tmp += 8;                    /*Skip the palette*/
+            pos = 7 - (x & 0x7);
+        break;
+        case LV_IMG_FORMAT_INDEXED_2BIT:
+            w = (img_dsc->header.w >> 2);       /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
+            if(img_dsc->header.w & 0x3) w++;
+            data_tmp += w * y + (x >> 2);      /*First pixel*/
+            data_tmp += 16;                    /*Skip the palette*/
+            pos = 6 - ((x & 0x3) * 2);
+        break;
+        case LV_IMG_FORMAT_INDEXED_4BIT:
+            w = (img_dsc->header.w >> 1);       /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
+            if(img_dsc->header.w & 0x1) w++;
+            data_tmp += w * y + (x >> 1);      /*First pixel*/
+            data_tmp += 64;                    /*Skip the palette*/
+            pos = 4 - ((x & 0x1) * 4);
+        break;
+        case LV_IMG_FORMAT_INDEXED_8BIT:
+            w = img_dsc->header.w;              /*E.g. x = 7 -> w = 7 (bytes)*/
+            data_tmp += w * y + x;              /*First pixel*/
+            data_tmp += 1024;                    /*Skip the palette*/
+            pos = 0;
+        break;
+    }
+
+    uint8_t byte_act = 0;
+    uint8_t val_act;
+    uint32_t i;
+    lv_color_t * cbuf = (lv_color_t *) buf;
+    for(i = 0; i < len; i ++) {
+        val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
+        cbuf[i] = decoder_index_map[val_act];
+
+        pos -= px_size;
+        if(pos < 0) {
+            pos = 8 - px_size;
+            data_tmp++;
+        }
+    }
+
+    return LV_RES_OK;
+}
+
