@@ -130,6 +130,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->state = copy_ext->state;
         ext->toggle = copy_ext->toggle;
+        ext->ink_fill_time = copy_ext->ink_fill_time;
+        ext->ink_wait_time = copy_ext->ink_wait_time;
         memcpy(ext->actions, copy_ext->actions, sizeof(ext->actions));
         memcpy(ext->styles, copy_ext->styles, sizeof(ext->styles));
 

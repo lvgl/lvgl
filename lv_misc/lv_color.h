@@ -57,8 +57,8 @@ extern "C" {
 #define LV_OPA_100       255
 #define LV_OPA_COVER     255
 
-#define LV_OPA_MIN		0		/*Opacities below this will be transparent*/
-#define LV_OPA_MAX		255		/*Opacities above this will fully cover*/
+#define LV_OPA_MIN		4		/*Opacities below this will be transparent*/
+#define LV_OPA_MAX		251		/*Opacities above this will fully cover*/
 
 #if LV_COLOR_DEPTH == 1
 #define LV_COLOR_SIZE			8
