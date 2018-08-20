@@ -32,6 +32,7 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool decoder_custom;
 static const void * decoder_src;
 static lv_img_src_t decoder_src_type;
 static lv_img_header_t decoder_header;
@@ -39,10 +40,10 @@ static const lv_style_t * decoder_style;
 static lv_fs_file_t decoder_file;
 static lv_color_t decoder_index_map[256] = {LV_COLOR_RED, LV_COLOR_BLUE, LV_COLOR_GREEN, LV_COLOR_PURPLE};
 
-lv_res_t (*lv_img_dsc_get_info_custom)(const char * src, lv_img_header_t * header);
-const uint8_t * (*lv_img_decoder_open_custom)(const char * src, const lv_style_t * style);
-lv_res_t (*lv_img_decoder_read_line_custom)(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
-lv_res_t (*lv_img_decoder_close_custom)(void);
+static lv_img_decoder_info_f_t lv_img_decoder_info_custom;
+static lv_img_decoder_open_f_t lv_img_decoder_open_custom;
+static lv_img_decoder_read_line_f_t lv_img_decoder_read_line_custom;
+static lv_img_decoder_close_f_t lv_img_decoder_close_custom;
 
 /**********************
  *      MACROS
@@ -93,18 +94,18 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
 {
     header->always_zero = 0;
     /*Try to get info with the custom functions first*/
-    if(lv_img_dsc_get_info_custom) {
+    if(lv_img_decoder_info_custom) {
         lv_res_t custom_res;
-        custom_res = lv_img_dsc_get_info_custom(src, header);
-        if(custom_res == LV_RES_OK) return LV_RES_OK;       /*Custom info supported this source*/
+        custom_res = lv_img_decoder_info_custom(src, header);
+        if(custom_res == LV_RES_OK) return LV_RES_OK;       /*Custom info has supported this source*/
     }
 
     lv_img_src_t src_type = lv_img_src_get_type(src);
     if(src_type == LV_IMG_SRC_VARIABLE) {
-        header->color_format =
+        header->cf =
                 header->w = ((lv_img_dsc_t *)src)->header.w;
         header->h = ((lv_img_dsc_t *)src)->header.h;
-        header->color_format = ((lv_img_dsc_t *)src)->header.color_format;
+        header->cf = ((lv_img_dsc_t *)src)->header.cf;
     }
 #if USE_LV_FILESYSTEM
     else if(src_type == LV_IMG_SRC_FILE) {
@@ -120,7 +121,7 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
         if(res != LV_FS_RES_OK || rn != sizeof(lv_img_header_t)) {
             header->w = LV_DPI;
             header->h = LV_DPI;
-            header->color_format = LV_IMG_FORMAT_UNKOWN;
+            header->cf = LV_IMG_FORMAT_UNKOWN;
         }
 
         lv_fs_close(&file);
@@ -132,7 +133,7 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
         header->h = 1;
         /* Symbols always have transparent parts. Important because of cover check in the design function.
          * The actual value doesn't matter because lv_draw_label will draw it*/
-        header->color_format  = LV_IMG_FORMAT_ALPHA_1BIT;
+        header->cf  = LV_IMG_FORMAT_ALPHA_1BIT;
     } else {
         LV_LOG_WARN("Image get info found unknown src type");
         return false;
@@ -183,6 +184,7 @@ bool lv_img_color_format_is_chroma_keyed(lv_img_color_format_t cf)
 {
 	switch(cf) {
 		case LV_IMG_FORMAT_TRUE_COLOR_CHROMA_KEYED:
+        case LV_IMG_FORMAT_RAW_CHROMA_KEYED:
 		case LV_IMG_FORMAT_INDEXED_1BIT:
 		case LV_IMG_FORMAT_INDEXED_2BIT:
 		case LV_IMG_FORMAT_INDEXED_4BIT:
@@ -200,6 +202,7 @@ bool lv_img_color_format_has_alpha(lv_img_color_format_t cf)
 {
 	switch(cf) {
 		case LV_IMG_FORMAT_TRUE_COLOR_ALPHA:
+        case LV_IMG_FORMAT_RAW_ALPHA:
 		case LV_IMG_FORMAT_ALPHA_1BIT:
 		case LV_IMG_FORMAT_ALPHA_2BIT:
 		case LV_IMG_FORMAT_ALPHA_4BIT:
@@ -233,6 +236,21 @@ lv_img_src_t lv_img_src_get_type(const void * src)
     return LV_IMG_SRC_UNKNOWN;
 }
 
+/**
+ * Set custom decoder functions. See the typdefs of the function typed above for more info about them
+ * @param info_fp info get function
+ * @param open_fp open function
+ * @param read_fp read line function
+ * @param close_fp clode function
+ */
+void lv_img_decoder_set_custom(lv_img_decoder_info_f_t  info_fp, lv_img_decoder_open_f_t  open_fp,
+                                lv_img_decoder_read_line_f_t read_fp, lv_img_decoder_close_f_t close_fp)
+{
+    lv_img_decoder_info_custom = info_fp;
+    lv_img_decoder_open_custom = open_fp;
+    lv_img_decoder_read_line_custom= read_fp;
+    lv_img_decoder_close_custom = close_fp;
+}
 
 
 /**********************
@@ -262,8 +280,8 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         return LV_RES_INV;
     }
 
-    bool chroma_keyed = lv_img_color_format_is_chroma_keyed(header.color_format);
-    bool alpha_byte = lv_img_color_format_has_alpha(header.color_format);
+    bool chroma_keyed = lv_img_color_format_is_chroma_keyed(header.cf);
+    bool alpha_byte = lv_img_color_format_has_alpha(header.cf);
 
     const uint8_t * img_data = lv_img_decoder_open(src, style);
     if(img_data == LV_IMG_DECODER_OPEN_FAIL) {
@@ -318,11 +336,16 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 
 static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * style)
 {
+    decoder_custom = false;
+
     /*Try to open with the custom functions first*/
     if(lv_img_decoder_open_custom) {
         const uint8_t * custom_res;
         custom_res = lv_img_decoder_open_custom(src, style);
-        if(custom_res != LV_IMG_DECODER_OPEN_FAIL) return custom_res;   /*Custom open supported this source*/
+        if(custom_res != LV_IMG_DECODER_OPEN_FAIL) {
+            decoder_custom = true;  /*Mark that custom decoder function should be used for this img source.*/
+            return custom_res;      /*Custom open supported this source*/
+        }
     }
 
     decoder_src = src;
@@ -354,7 +377,7 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
     /*It will be a variable in the RAM/ROM*/
     else if(decoder_src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = src;
-        lv_img_color_format_t cf = img_dsc->header.color_format;
+        lv_img_color_format_t cf = img_dsc->header.cf;
         if(cf == LV_IMG_FORMAT_TRUE_COLOR ||
            cf == LV_IMG_FORMAT_TRUE_COLOR_ALPHA ||
            cf == LV_IMG_FORMAT_TRUE_COLOR_CHROMA_KEYED)
@@ -392,17 +415,22 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
 
 static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
-    /*Try to read the line with the custom functions first*/
-    if(lv_img_decoder_read_line_custom) {
-        lv_res_t custom_res;
-        custom_res = lv_img_decoder_read_line_custom(x, y, len, buf);
-        if(custom_res == LV_RES_OK) return LV_RES_OK;       /*Custom read line supported this source*/
+    /*Try to read the line with the custom functions*/
+    if(decoder_custom) {
+        if(lv_img_decoder_read_line_custom) {
+            lv_res_t custom_res;
+            custom_res = lv_img_decoder_read_line_custom(x, y, len, buf);
+            return custom_res;
+        } else {
+            LV_LOG_WARN("Image open with custom decoder but read not supported")
+        }
+        return LV_RES_INV;  /*It"s an error if not returned earlier*/
     }
 
      if(decoder_src_type == LV_IMG_SRC_FILE) {
  #if USE_LV_FILESYSTEM
 
-         uint8_t px_size = lv_img_color_format_get_px_size(decoder_header.color_format);
+         uint8_t px_size = lv_img_color_format_get_px_size(decoder_header.cf);
 
          lv_fs_res_t res;
          uint32_t pos = ((y * decoder_header.w + x) * px_size) >> 3;
@@ -422,16 +450,16 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
      } else {
          const lv_img_dsc_t * img_dsc = decoder_src;
 
-         if(img_dsc->header.color_format == LV_IMG_FORMAT_ALPHA_1BIT ||
-            img_dsc->header.color_format == LV_IMG_FORMAT_ALPHA_2BIT ||
-            img_dsc->header.color_format == LV_IMG_FORMAT_ALPHA_4BIT ||
-            img_dsc->header.color_format == LV_IMG_FORMAT_ALPHA_8BIT)
+         if(img_dsc->header.cf == LV_IMG_FORMAT_ALPHA_1BIT ||
+            img_dsc->header.cf == LV_IMG_FORMAT_ALPHA_2BIT ||
+            img_dsc->header.cf == LV_IMG_FORMAT_ALPHA_4BIT ||
+            img_dsc->header.cf == LV_IMG_FORMAT_ALPHA_8BIT)
          {
              lv_img_built_in_decoder_line_alpha(x, y, len, buf);
-         } if(img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_1BIT ||
-              img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_2BIT ||
-              img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_4BIT ||
-              img_dsc->header.color_format == LV_IMG_FORMAT_INDEXED_8BIT)
+         } else if(img_dsc->header.cf == LV_IMG_FORMAT_INDEXED_1BIT ||
+              img_dsc->header.cf == LV_IMG_FORMAT_INDEXED_2BIT ||
+              img_dsc->header.cf == LV_IMG_FORMAT_INDEXED_4BIT ||
+              img_dsc->header.cf == LV_IMG_FORMAT_INDEXED_8BIT)
          {
              lv_img_built_in_decoder_line_indexed(x, y, len, buf);
          } else {
@@ -446,13 +474,13 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
 
 static void lv_img_decoder_close(void)
 {
-    /*Try to close with the custom functions first*/
-    if(lv_img_decoder_close_custom) {
-        lv_res_t custom_res;
-        custom_res = lv_img_decoder_close_custom();
-        if(custom_res == LV_RES_OK) return;             /*Custom close supported this source*/
+    /*Try to close with the custom functions*/
+    if(decoder_custom) {
+        if(lv_img_decoder_close_custom) lv_img_decoder_close_custom();
+        return;
     }
 
+    /*It was opened with built-in decoder*/
     if(decoder_src) {
         if(decoder_src_type == LV_IMG_SRC_FILE) {
             lv_fs_close(&decoder_file);
@@ -491,12 +519,12 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
     const lv_img_dsc_t * img_dsc = decoder_src;
 	const uint8_t * data_tmp = img_dsc->data;
 	const lv_opa_t * opa_table = NULL;
-	uint8_t px_size = lv_img_color_format_get_px_size(img_dsc->header.color_format);
+	uint8_t px_size = lv_img_color_format_get_px_size(img_dsc->header.cf);
 	uint16_t mask = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
 	lv_coord_t w = 0;
 	int8_t pos = 0;
-	switch(img_dsc->header.color_format) {
+	switch(img_dsc->header.cf) {
 		case LV_IMG_FORMAT_ALPHA_1BIT:
 			w = (img_dsc->header.w >> 3);		/*E.g. w = 20 -> w = 2 + 1*/
 			if(img_dsc->header.w & 0x7) w++;
@@ -531,7 +559,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 		val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
 
 		buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] =
-		         img_dsc->header.color_format == LV_IMG_FORMAT_ALPHA_8BIT ? val_act : opa_table[val_act];
+		         img_dsc->header.cf == LV_IMG_FORMAT_ALPHA_8BIT ? val_act : opa_table[val_act];
 
 		pos -= px_size;
 		if(pos < 0) {
@@ -548,12 +576,12 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
 
     const lv_img_dsc_t * img_dsc = decoder_src;
     const uint8_t * data_tmp = img_dsc->data;
-    uint8_t px_size = lv_img_color_format_get_px_size(img_dsc->header.color_format);
+    uint8_t px_size = lv_img_color_format_get_px_size(img_dsc->header.cf);
     uint16_t mask = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
     lv_coord_t w = 0;
     int8_t pos = 0;
-    switch(img_dsc->header.color_format) {
+    switch(img_dsc->header.cf) {
         case LV_IMG_FORMAT_INDEXED_1BIT:
             w = (img_dsc->header.w >> 3);       /*E.g. w = 20 -> w = 2 + 1*/
             if(img_dsc->header.w & 0x7) w++;
