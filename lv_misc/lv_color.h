@@ -101,11 +101,6 @@ typedef union
         uint16_t green :6;
         uint16_t red   :5;
 #else
-//        uint16_t blue  	 :5;
-//        uint16_t green_h :3;
-//        uint16_t green_l :3;
-//        uint16_t red     :5;
-
         uint16_t green_h :3;
         uint16_t red   :5;
         uint16_t blue  :5;
