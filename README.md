@@ -1,6 +1,6 @@
 # Littlev Graphics Libraray
 
-![LittlevGL cover](http://www.gl.littlev.hu/home/main_cover_small.png)
+![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
 
 LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
 
@@ -11,6 +11,7 @@ Homepage: https://littlevgl.com
 * [Porting](#porting)
 * [Project set-up](#project-set-up)
 * [PC simulator](#pc-simulator)
+* [Related repositories](#related-repositories)
 * [Screenshots](#screenshots)
 * [Contributing](#contributing)
 * [Donate](#donate)
@@ -32,11 +33,11 @@ Homepage: https://littlevgl.com
 
 ## Porting
 In the simplest case you need 4 things:
-1. Call `lv_tick_inc(1)` in every millisecods in a Timer or Task
+1. Call `lv_tick_inc(x)` in every `x` millisecods in a Timer or Task (`x` should be between 1 and 10)
 2. Register a function which can **copy a pixel array** to an area of the screen.
 3. Register a function which can **read an input device**. (E.g. touch pad)
 4. Call `lv_task_handler()` periodically every few milliseconds.
-For more information visit https://littlevgl.com/porting
+For a detailed description visit https://littlevgl.com/porting
 Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
 ## Project set-up
@@ -56,6 +57,12 @@ Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/ma
 If you don't have an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) library to emulate a display on your monitor and a touch pad with your mouse.
 
 There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/pc_simulator
+
+## Related repositories
+* PC simualtor: https://github.com/littlevgl/pc_simulator
+* Projects: https://github.com/littlevgl/lv_projects
+* Examples: https://github.com/littlevgl/lv_examples
+* Drivers: https://github.com/littlevgl/lv_drivers
 
 ## Screenshots
 ![TFT material](http://www.gl.littlev.hu/github_res/tft_material.png)
