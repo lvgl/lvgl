@@ -178,7 +178,7 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
 
 /**
  * Stop the action to call when button is released
- * @param mbox pointer to a message box object
+ * @param pointer to an 'lv_btnm_action_t' action. In the action you need to use `lv_mbox_get_from_btn()` to get the `mbox`.
  * @param pointer to an 'lv_btnm_action_t' action
  */
 void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action)
