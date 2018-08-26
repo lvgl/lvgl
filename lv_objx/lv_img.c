@@ -167,7 +167,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     ext->src_type = src_type;
 	ext->w = header.w;
 	ext->h = header.h;
-	ext->cf = header.color_format;
+	ext->cf = header.cf;
 
     if(lv_img_get_auto_size(img) != false) {
         lv_obj_set_size(img, ext->w, ext->h);
