@@ -156,6 +156,7 @@ void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
  */
 void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
 
+
 /*=====================
  * Getter functions
  *====================*/
@@ -168,32 +169,18 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
 const char * lv_win_get_title(const lv_obj_t * win);
 
 /**
+* Get the content holder object of window (`lv_page`) to allow additional customization
+* @param win pointer to a window object
+* @return the Page object where the window's content is
+*/
+lv_obj_t * lv_win_get_content(const lv_obj_t * win);
+
+/**
  * Get the control button size of a window
  * @param win pointer to a window object
  * @return control button size
  */
 lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
-
-/**
- * Get the layout of a window
- * @param win pointer to a window object
- * @return the layout of the window (from 'lv_layout_t')
- */
-lv_layout_t lv_win_get_layout(const lv_obj_t *win);
-
-/**
- * Get the scroll bar mode of a window
- * @param win pointer to a window object
- * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
- */
-lv_sb_mode_t lv_win_get_sb_mode(const lv_obj_t *win);
-
-/**
- * Get width of the content area (page scrollable) of the window
- * @param win pointer to a window object
- * @return the width of the content area
- */
-lv_coord_t lv_win_get_width(const lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.

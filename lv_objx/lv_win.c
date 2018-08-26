@@ -228,27 +228,6 @@ void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size)
     lv_win_realign(win);
 }
 
-/**
- * Set the layout of the window
- * @param win pointer to a window object
- * @param layout the layout from 'lv_layout_t'
- */
-void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout)
-{
-    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    lv_page_set_scrl_layout(ext->page, layout);
-}
-
-/**
- * Set the scroll bar mode of a window
- * @param win pointer to a window object
- * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
- */
-void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode)
-{
-    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    lv_page_set_sb_mode(ext->page, sb_mode);
-}
 
 /**
  * Set a style of a window
@@ -317,6 +296,17 @@ const char * lv_win_get_title(const lv_obj_t * win)
 }
 
 /**
+* Get the content holder object of window (`lv_page`) to allow additional customization
+* @param win pointer to a window object
+* @return the Page object where the window's content is
+*/
+lv_obj_t * lv_win_get_content(const lv_obj_t * win)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    return ext->page;
+}
+
+/**
  * Get the control button size of a window
  * @param win pointer to a window object
  * @return control button size
@@ -325,42 +315,6 @@ lv_coord_t lv_win_get_btn_size(const lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return ext->btn_size;
-}
-
-/**
- * Get the layout of a window
- * @param win pointer to a window object
- * @return the layout of the window (from 'lv_layout_t')
- */
-lv_layout_t lv_win_get_layout(const lv_obj_t * win)
-{
-    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    return lv_page_get_scrl_layout(ext->page);
-}
-
-/**
- * Get the scroll bar mode of a window
- * @param win pointer to a window object
- * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
- */
-lv_sb_mode_t lv_win_get_sb_mode(const lv_obj_t * win)
-{
-    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    return lv_page_get_sb_mode(ext->page);
-}
-
-/**
- * Get width of the content area (page scrollable) of the window
- * @param win pointer to a window object
- * @return the width of the content_bg area
- */
-lv_coord_t lv_win_get_width(const lv_obj_t * win)
-{
-    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    lv_obj_t * scrl = lv_page_get_scrl(ext->page);
-    lv_style_t * style_scrl = lv_obj_get_style(scrl);
-
-    return lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor;
 }
 
 /**
