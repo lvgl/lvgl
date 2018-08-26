@@ -21,8 +21,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_BTN_INK_VALUE_MAX			1024
-#define LV_BTN_INK_VALUE_MAX_SHIFT		10
+#define LV_BTN_INK_VALUE_MAX			256
+#define LV_BTN_INK_VALUE_MAX_SHIFT		8
 /**********************
  *      TYPEDEFS
  **********************/
@@ -32,8 +32,11 @@
  **********************/
 static bool lv_btn_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
+
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
 static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val);
 static void lv_btn_ink_effect_anim_ready(void * p);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -41,11 +44,11 @@ static void lv_btn_ink_effect_anim_ready(void * p);
 static lv_signal_func_t ancestor_signal;
 static lv_design_func_t ancestor_design;
 
-#if USE_LV_ANIMATION
-static lv_coord_t ink_value;
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
+static lv_coord_t ink_act_value;
 static lv_obj_t * ink_obj;
 static lv_btn_state_t ink_bg_state;
-static lv_btn_state_t ink_circle_state;
+static lv_btn_state_t ink_top_state;
 static bool ink_ready;
 static bool ink_playback;
 static lv_point_t ink_point;
@@ -98,8 +101,11 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->long_pr_action_executed = 0;
     ext->toggle = 0;
-    ext->ink_fill_time = 0;
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
+    ext->ink_in_time = 0;
     ext->ink_wait_time = 0;
+    ext->ink_out_time = 0;
+#endif
 
     lv_obj_set_signal_func(new_btn, lv_btn_signal);
     lv_obj_set_design_func(new_btn, lv_btn_design);
@@ -130,8 +136,11 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->state = copy_ext->state;
         ext->toggle = copy_ext->toggle;
-        ext->ink_fill_time = copy_ext->ink_fill_time;
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
+        ext->ink_in_time = copy_ext->ink_in_time;
         ext->ink_wait_time = copy_ext->ink_wait_time;
+        ext->ink_out_time = copy_ext->ink_out_time;
+#endif
         memcpy(ext->actions, copy_ext->actions, sizeof(ext->actions));
         memcpy(ext->styles, copy_ext->styles, sizeof(ext->styles));
 
@@ -217,15 +226,14 @@ void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action)
  * @param btn pointer to a button object
  * @param time the time of the ink animation
  */
-void lv_btn_set_ink_fill_time(lv_obj_t * btn, uint16_t time)
+void lv_btn_set_ink_in_time(lv_obj_t * btn, uint16_t time)
 {
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-
-#if USE_LV_ANIMATION == 0
-    time = 0;
+    ext->ink_in_time = time;
+#else
+    LV_LOG_WARN("`lv_btn_set_ink_ink_time` has no effect if LV_BTN_INK_EFEFCT or USE_LV_ANIMATION is disabled")
 #endif
-
-    ext->ink_fill_time = time;
 }
 
 /**
@@ -235,13 +243,28 @@ void lv_btn_set_ink_fill_time(lv_obj_t * btn, uint16_t time)
  */
 void lv_btn_set_ink_wait_time(lv_obj_t * btn, uint16_t time)
 {
+
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-
-#if USE_LV_ANIMATION == 0
-    time = 0;
-#endif
-
     ext->ink_wait_time = time;
+#else
+    LV_LOG_WARN("`lv_btn_set_ink_wait_time` has no effect if LV_BTN_INK_EFEFCT or USE_LV_ANIMATION is disabled")
+#endif
+}
+
+/**
+ * Set time of the ink out effect (animate to the released state)
+ * @param btn pointer to a button object
+ * @param time the time of the ink animation
+ */
+void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time)
+{
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
+    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+    ext->ink_out_time = time;
+#else
+    LV_LOG_WARN("`lv_btn_set_ink_out_time` has no effect if LV_BTN_INK_EFEFCT or USE_LV_ANIMATION is disabled")
+#endif
 }
 
 /**
@@ -318,14 +341,18 @@ lv_action_t lv_btn_get_action(const lv_obj_t * btn, lv_btn_action_t type)
 }
 
 /**
- * Get time of the ink effect (draw a circle on click to animate in the new state)
+ * Get time of the ink in effect (draw a circle on click to animate in the new state)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_fill_time(const lv_obj_t * btn, uint16_t time)
+uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn, uint16_t time)
 {
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    return ext->ink_fill_time;
+    return ext->ink_in_time;
+#else
+    return 0;
+#endif
 }
 
 
@@ -336,8 +363,26 @@ uint16_t lv_btn_get_ink_fill_time(const lv_obj_t * btn, uint16_t time)
  */
 uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn, uint16_t time)
 {
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_wait_time;
+#else
+    return 0;
+#endif
+}
+/**
+ * Get time of the ink out effect (animate to the releases state)
+ * @param btn pointer to a button object
+ * @return the time of the ink animation
+ */
+uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn, uint16_t time)
+{
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
+    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+    return ext->ink_in_time;
+#else
+    return 0;
+#endif
 }
 
 /**
@@ -391,7 +436,7 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 	}
 	else if(mode == LV_DESIGN_DRAW_MAIN) {
 
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
 		if(btn != ink_obj) {
 			ancestor_design(btn, mask, mode);
 		} else {
@@ -399,42 +444,54 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 		    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
 		    /*Draw the normal button*/
-			lv_draw_rect(&btn->coords, mask, ext->styles[ink_bg_state], opa_scale);
+		    if(ink_playback == false) {
+		    	lv_style_t style_tmp;
+				lv_style_copy(&style_tmp, ext->styles[ink_bg_state]);
+				style_tmp.body.shadow.width = ext->styles[ink_top_state]->body.shadow.width;
+				lv_draw_rect(&btn->coords, mask, &style_tmp, opa_scale);
 
-			lv_coord_t w = lv_obj_get_width(btn);
-			lv_coord_t h = lv_obj_get_height(btn);
-			lv_coord_t r_max = LV_MATH_MIN(w, h) / 2;
+				lv_coord_t w = lv_obj_get_width(btn);
+				lv_coord_t h = lv_obj_get_height(btn);
+				lv_coord_t r_max = LV_MATH_MIN(w, h) / 2;
 
-			/*In the first part of the animation increase the size of the circle (ink effect) */
-			lv_area_t cir_area;
+				/*In the first part of the animation increase the size of the circle (ink effect) */
+				lv_area_t cir_area;
 
-			lv_coord_t coord_state = ink_value < LV_BTN_INK_VALUE_MAX / 2 ? ink_value : LV_BTN_INK_VALUE_MAX / 2;
-			lv_point_t p_act;
-			p_act.x = ink_point.x;
-			p_act.y = ink_point.y;
-			lv_coord_t x_err = (btn->coords.x1 + w / 2) - p_act.x;
-			lv_coord_t y_err = (btn->coords.y1 + h / 2) - p_act.y;
+				lv_coord_t coord_state = ink_act_value < LV_BTN_INK_VALUE_MAX / 2 ? ink_act_value : LV_BTN_INK_VALUE_MAX / 2;
+				lv_point_t p_act;
+				p_act.x = ink_point.x;
+				p_act.y = ink_point.y;
+				lv_coord_t x_err = (btn->coords.x1 + w / 2) - p_act.x;
+				lv_coord_t y_err = (btn->coords.y1 + h / 2) - p_act.y;
 
-			p_act.x += (x_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
-			p_act.y += (y_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
+				p_act.x += (x_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
+				p_act.y += (y_err * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1);
 
-			lv_coord_t half_side = LV_MATH_MAX(w, h) / 2;
-			cir_area.x1 = p_act.x - ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.y1 = p_act.y - ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.x2 = p_act.x + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_area.y2 = p_act.y + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+				lv_coord_t half_side = LV_MATH_MAX(w, h) / 2;
+				cir_area.x1 = p_act.x - ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+				cir_area.y1 = p_act.y - ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+				cir_area.x2 = p_act.x + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+				cir_area.y2 = p_act.y + ((half_side * coord_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
 
-			lv_area_intersect(&cir_area, &btn->coords, &cir_area);		/*Limit the area. (It might be too big on the smaller side)*/
+				lv_area_intersect(&cir_area, &btn->coords, &cir_area);		/*Limit the area. (It might be too big on the smaller side)*/
 
-			/*In the second part animate the radius. Circle -> body.radius*/
-			lv_coord_t r_state = ink_value > LV_BTN_INK_VALUE_MAX / 2 ? ink_value - LV_BTN_INK_VALUE_MAX / 2 : 0;
-			lv_style_t cir_style;
-			lv_style_copy(&cir_style, ext->styles[ink_circle_state]);
-			cir_style.body.radius = r_max + (((ext->styles[ink_bg_state]->body.radius - r_max) * r_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
-			cir_style.body.border.width = 0;
+				/*In the second part animate the radius. Circle -> body.radius*/
+				lv_coord_t r_state = ink_act_value > LV_BTN_INK_VALUE_MAX / 2 ? ink_act_value - LV_BTN_INK_VALUE_MAX / 2 : 0;
 
-			/*Draw the circle*/
-			lv_draw_rect(&cir_area, mask, &cir_style, opa_scale);
+				lv_style_copy(&style_tmp, ext->styles[ink_top_state]);
+				style_tmp.body.radius = r_max + (((ext->styles[ink_bg_state]->body.radius - r_max) * r_state) >> (LV_BTN_INK_VALUE_MAX_SHIFT - 1));
+				style_tmp.body.border.width = 0;
+
+				/*Draw the circle*/
+				lv_draw_rect(&cir_area, mask, &style_tmp, opa_scale);
+		    }
+		    else {
+		    	lv_style_t res;
+		    	lv_style_copy(&res, ext->styles[ink_bg_state]);
+		    	lv_style_mix(ext->styles[ink_bg_state], ext->styles[ink_top_state], &res, ink_act_value);
+				lv_draw_rect(&btn->coords, mask, &res, opa_scale);
+
+		    }
 		}
 #else
 		ancestor_design(btn, mask, mode);
@@ -470,28 +527,28 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         /*Refresh the state*/
         if(ext->state == LV_BTN_STATE_REL) {
             lv_btn_set_state(btn, LV_BTN_STATE_PR);
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
             ink_bg_state = LV_BTN_STATE_REL;
-            ink_circle_state = LV_BTN_STATE_PR;
+            ink_top_state = LV_BTN_STATE_PR;
 #endif
         } else if(ext->state == LV_BTN_STATE_TGL_REL) {
             lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
             ink_bg_state = LV_BTN_STATE_TGL_REL;
-            ink_circle_state = LV_BTN_STATE_TGL_PR;
+            ink_top_state = LV_BTN_STATE_TGL_PR;
 #endif
         }
 
         ext->long_pr_action_executed = 0;
 
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
         /*Forget the old inked button*/
         if(ink_obj != NULL && ink_obj != btn) {
         	lv_anim_del(ink_obj, (lv_anim_fp_t)lv_btn_ink_effect_anim);
         	lv_obj_invalidate(ink_obj);
         }
         /*Save the new data for inking and start it's animation if enabled*/
-        if(ext->ink_fill_time > 0) {
+        if(ext->ink_in_time > 0) {
 			ink_obj = btn;
 			ink_playback = false;
 			ink_ready = false;
@@ -505,7 +562,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 			a.path = lv_anim_path_linear;
 			a.end_cb = lv_btn_ink_effect_anim_ready;
 			a.act_time = 0;
-			a.time = ext->ink_fill_time;
+			a.time = ext->ink_in_time;
 			a.playback = 0;
 			a.playback_pause = 0;
 			a.repeat = 0;
@@ -552,13 +609,13 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             }
         }
 
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
         /*Draw the toggled state in the inking instead*/
         if(ext->toggle) {
-        	ink_circle_state = ext->state;
+        	ink_top_state = ext->state;
         }
         /*If not a toggle button and the "IN" inking is ready then start an "OUT" inking*/
-        else if(ink_ready && ext->ink_fill_time > 0) {
+        else if(ink_ready && ext->ink_out_time > 0) {
 			ink_obj = btn;
 			ink_playback = true;	/*It is the playback. If not set `lv_btn_ink_effect_anim_ready` will start its own playback*/
 			lv_indev_get_point(lv_indev_get_act(), &ink_point);
@@ -571,7 +628,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 			a.path = lv_anim_path_linear;
 			a.end_cb = lv_btn_ink_effect_anim_ready;
 			a.act_time = 0;
-			a.time = ext->ink_fill_time;
+			a.time = ext->ink_out_time;
 			a.playback = 0;
 			a.playback_pause = 0;
 			a.repeat = 0;
@@ -616,7 +673,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     	if(btn == ink_obj) {
             lv_anim_del(ink_obj, (lv_anim_fp_t)lv_btn_ink_effect_anim);
             ink_obj = NULL;
@@ -635,7 +692,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     return res;
 }
 
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
 
 /**
  * The animator function of inking. CAlled to increase the radius of ink
@@ -645,7 +702,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val)
 {
 	if(ink_obj) {
-		ink_value = val;
+		ink_act_value = val;
 		lv_obj_invalidate(ink_obj);
 	}
 }
@@ -671,7 +728,7 @@ static void lv_btn_ink_effect_anim_ready(void * p)
 		a.path = lv_anim_path_linear;
 		a.end_cb = lv_btn_ink_effect_anim_ready;
 		a.act_time = -ext->ink_wait_time;
-		a.time = ext->ink_fill_time;
+		a.time = ext->ink_out_time;
 		a.playback = 0;
 		a.playback_pause = 0;
 		a.repeat = 0;

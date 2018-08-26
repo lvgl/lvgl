@@ -150,6 +150,16 @@ void lv_style_init (void);
  */
 void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
+
+/**
+ * Mix two styles according to a given ratio
+ * @param start	start style
+ * @param end end style
+ * @param res store the result style here
+ * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
+ */
+void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
+
 #if USE_LV_ANIMATION
 
 /**

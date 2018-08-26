@@ -234,7 +234,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
 /**
  * Make a button selected
  * @param list pointer to a list object
- * @param btn pointer to a button to select
+ * @param btn pointer to a button to selectthe
  */
 void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
 {
@@ -752,6 +752,8 @@ static lv_obj_t * get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 
 static void refr_btn_width(lv_obj_t * list)
 {
+
+	return;
     lv_style_t * style = lv_list_get_style(list, LV_LIST_STYLE_BG);
     lv_style_t * style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
     lv_coord_t w = lv_obj_get_width(list);

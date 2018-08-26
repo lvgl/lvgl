@@ -65,8 +65,11 @@ typedef struct
     lv_action_t actions[LV_BTN_ACTION_NUM];
     lv_style_t * styles[LV_BTN_STATE_NUM];        /*Styles in each state*/
     lv_btn_state_t state;                         /*Current state of the button from 'lv_btn_state_t' enum*/
-    uint16_t ink_fill_time;						  /*[ms ]Time of ink fill effect (0: disable ink effect)*/
+#if LV_BTN_INK_EFFECT
+    uint16_t ink_in_time;						  /*[ms] Time of ink fill effect (0: disable ink effect)*/
     uint16_t ink_wait_time;						  /*[ms] Wait before the ink disappears */
+    uint16_t ink_out_time;						  /*[ms] Time of ink disappearing*/
+#endif
     uint8_t toggle :1;                            /*1: Toggle enabled*/
     uint8_t long_pr_action_executed :1;           /*1: Long press action executed (Handled by the library)*/
 } lv_btn_ext_t;
@@ -150,8 +153,7 @@ static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
  * @param btn pointer to a button object
  * @param time the time of the ink animation
  */
-void lv_btn_set_ink_fill_time(lv_obj_t * btn, uint16_t time);
-
+void lv_btn_set_ink_in_time(lv_obj_t * btn, uint16_t time);
 
 /**
  * Set the wait time before the ink disappears
@@ -160,6 +162,12 @@ void lv_btn_set_ink_fill_time(lv_obj_t * btn, uint16_t time);
  */
 void lv_btn_set_ink_wait_time(lv_obj_t * btn, uint16_t time);
 
+/**
+ * Set time of the ink out effect (animate to the released state)
+ * @param btn pointer to a button object
+ * @param time the time of the ink animation
+ */
+void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time);
 
 /**
  * Set a style of a button.
@@ -223,12 +231,13 @@ static inline bool lv_btn_get_ver_fit(const lv_obj_t * btn)
 {
     return lv_cont_get_ver_fit(btn);
 }
+
 /**
- * Get time of the ink effect (draw a circle on click to animate in the new state)
+ * Get time of the ink in effect (draw a circle on click to animate in the new state)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_fill_time(const lv_obj_t * btn, uint16_t time);
+uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn, uint16_t time);
 
 /**
  * Get the wait time before the ink disappears
@@ -236,6 +245,13 @@ uint16_t lv_btn_get_ink_fill_time(const lv_obj_t * btn, uint16_t time);
  * @return the time of the ink animation
  */
 uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn, uint16_t time);
+
+/**
+ * Get time of the ink out effect (animate to the releases state)
+ * @param btn pointer to a button object
+ * @return the time of the ink animation
+ */
+uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn, uint16_t time);
 
 /**
  * Get style of a button.
