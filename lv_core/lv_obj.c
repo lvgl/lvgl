@@ -1653,7 +1653,7 @@ static void refresh_childen_style(lv_obj_t * obj)
             /*Children with 'glass' parent might be effected if their style == NULL*/
             refresh_childen_style(child);
         }
-        child = lv_obj_get_child(child, NULL);
+        child = lv_obj_get_child(obj, child);
     }
 }
 
