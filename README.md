@@ -32,8 +32,8 @@ Homepage: https://littlevgl.com
 * Documentation and API references online
 
 ## Porting
-In the simplest case you need 4 things:
-1. Call `lv_tick_inc(x)` in every `x` millisecods in a Timer or Task (`x` should be between 1 and 10)
+In the simplest case you need 5 things:
+1. Call `lv_tick_inc(x)` every `x` millisecods in a Timer or Task (`x` should be between 1 and 10)
 2. Register a function which can **copy a pixel array** to an area of the screen.
 3. Register a function which can **read an input device**. (E.g. touch pad)
 4. Copy `lv_conf_templ.h` as `lv_conf.h` and set at least `LV_HOR_RES`, `LV_VER_RES` and `LV_COLOR_DEPTH`. 
