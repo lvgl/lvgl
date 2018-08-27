@@ -37,8 +37,6 @@
  **********************/
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
-static lv_obj_t * get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
-static lv_obj_t * get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
 static void refr_btn_width(lv_obj_t * list);
 
 /**********************
@@ -119,7 +117,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
-        lv_obj_t * copy_btn = get_prev_btn(copy, NULL);
+        lv_obj_t * copy_btn = lv_list_get_next_btn(copy, NULL);
         while(copy_btn) {
         	const void * img_src = NULL;
 #if USE_LV_IMG
@@ -128,7 +126,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
         	lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), lv_btn_get_action(copy_btn, LV_BTN_ACTION_CLICK));
            // new_btn = lv_btn_create(new_list, copy_btn);
-        	copy_btn = get_prev_btn(copy, copy_btn);
+        	copy_btn = lv_list_get_next_btn(copy, copy_btn);
         }
 
         lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, copy_ext->styles_btn[LV_BTN_STATE_REL]);
@@ -326,10 +324,10 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
     if(type == LV_LIST_STYLE_BTN_PR || type == LV_LIST_STYLE_BTN_REL ||
             type == LV_LIST_STYLE_BTN_TGL_REL || type == LV_LIST_STYLE_BTN_TGL_PR ||
             type == LV_LIST_STYLE_BTN_INA) {
-        btn = get_next_btn(list, NULL);
+        btn = lv_list_get_prev_btn(list, NULL);
         while(btn != NULL) {
             lv_btn_set_style(btn, btn_style_refr, ext->styles_btn[btn_style_refr]);
-            btn = get_next_btn(list, btn);
+            btn = lv_list_get_prev_btn(list, btn);
         }
     }
 }
@@ -388,6 +386,57 @@ lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn)
 #else
     return NULL;
 #endif
+}
+
+/**
+ * Get the next button from list. (Starts from the bottom button)
+ * @param list pointer to a list object
+ * @param prev_btn pointer to button. Search the next after it.
+ * @return pointer to the next button or NULL when no more buttons
+ */
+lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
+{
+    /* Not a good practice but user can add/create objects to the lists manually.
+     * When getting the next button try to be sure that it is at least a button */
+
+    lv_obj_t * btn ;
+    lv_obj_t * scrl = lv_page_get_scrl(list);
+
+    btn = lv_obj_get_child(scrl, prev_btn);
+    if(btn == NULL) return NULL;
+
+    while(btn->signal_func != lv_list_btn_signal) {
+        btn = lv_obj_get_child(scrl, prev_btn);
+        if(btn == NULL) break;
+    }
+
+    return btn;
+}
+
+
+/**
+ * Get the previous button from list. (Starts from the top button)
+ * @param list pointer to a list object
+ * @param prev_btn pointer to button. Search the previous before it.
+ * @return pointer to the previous button or NULL when no more buttons
+ */
+lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
+{
+    /* Not a good practice but user can add/create objects to the lists manually.
+     * When getting the next button try to be sure that it is at least a button */
+
+    lv_obj_t * btn ;
+    lv_obj_t * scrl = lv_page_get_scrl(list);
+
+    btn = lv_obj_get_child_back(scrl, prev_btn);
+    if(btn == NULL) return NULL;
+
+    while(btn->signal_func != lv_list_btn_signal) {
+        btn = lv_obj_get_child_back(scrl, prev_btn);
+        if(btn == NULL) break;
+    }
+
+    return btn;
 }
 
 #if USE_LV_GROUP
@@ -464,7 +513,7 @@ void lv_list_up(const lv_obj_t * list)
     lv_obj_t * scrl = lv_page_get_scrl(list);
     lv_obj_t * e;
     lv_obj_t * e_prev = NULL;
-    e = get_next_btn(list, NULL);
+    e = lv_list_get_prev_btn(list, NULL);
     while(e != NULL) {
         if(e->coords.y2 <= list->coords.y2) {
             if(e_prev != NULL) {
@@ -494,7 +543,7 @@ void lv_list_up(const lv_obj_t * list)
             break;
         }
         e_prev = e;
-        e = get_next_btn(list, e);
+        e = lv_list_get_prev_btn(list, e);
     }
 }
 
@@ -508,7 +557,7 @@ void lv_list_down(const lv_obj_t * list)
      * and position the list to show this element on the top*/
     lv_obj_t * scrl = lv_page_get_scrl(list);
     lv_obj_t * e;
-    e = get_next_btn(list, NULL);
+    e = lv_list_get_prev_btn(list, NULL);
     while(e != NULL) {
         if(e->coords.y1 < list->coords.y1) {
             lv_coord_t new_y = -lv_obj_get_y(e);
@@ -536,7 +585,7 @@ void lv_list_down(const lv_obj_t * list)
             }
             break;
         }
-        e = get_next_btn(list, e);
+        e = lv_list_get_prev_btn(list, e);
     }
 }
 
@@ -593,7 +642,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     		lv_list_set_btn_selected(list, last_clicked_btn);
     	} else {
     		/*Get the first button and mark it as selected*/
-    		lv_list_set_btn_selected(list, get_prev_btn(list, NULL));
+    		lv_list_set_btn_selected(list, lv_list_get_next_btn(list, NULL));
     	}
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         /*De-select the selected btn*/
@@ -608,32 +657,32 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
         	/*If there is a valid selected button the make the previous selected*/
         	if(ext->selected_btn) {
-        		lv_obj_t * btn_prev = get_prev_btn(list, ext->selected_btn);
+        		lv_obj_t * btn_prev = lv_list_get_next_btn(list, ext->selected_btn);
         		if(btn_prev) lv_list_set_btn_selected(list, btn_prev);
 			}
         	/*If there is no selected button the make the first selected*/
             else {
-            	lv_obj_t * btn = get_next_btn(list, NULL);
-				if(btn) lv_list_set_btn_selected(list, get_next_btn(list, NULL));	/*If there are no buttons on the list then there is no first button*/
+            	lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
+				if(btn) lv_list_set_btn_selected(list, btn);	/*If there are no buttons on the list then there is no first button*/
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             /*If there is a valid selected button the make the next selected*/
             if(ext->selected_btn != NULL) {
-                lv_obj_t * btn_next = get_next_btn(list, ext->selected_btn);
+                lv_obj_t * btn_next = lv_list_get_prev_btn(list, ext->selected_btn);
                 if(btn_next) lv_list_set_btn_selected(list, btn_next);
             }
             /*If there is no selected button the make the first selected*/
             else {
-            	lv_obj_t * btn = get_next_btn(list, NULL);
-				if(btn) lv_list_set_btn_selected(list, get_next_btn(list, NULL));
+            	lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
+				if(btn) lv_list_set_btn_selected(list, btn);
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             /*Get the 'pressed' button*/
             lv_obj_t * btn = NULL;
-            btn = get_next_btn(list, btn);
+            btn = lv_list_get_prev_btn(list, btn);
             while(btn != NULL) {
                 if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
-                btn = get_next_btn(list, btn);
+                btn = lv_list_get_prev_btn(list, btn);
             }
 
             if(btn != NULL) {
@@ -676,12 +725,12 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     	if(lv_group_get_focused(g) == list && lv_indev_is_dragging(lv_indev_get_act()) == false) {
     		/* Is the list is focused then be sure only the button being released
     		 * has a pressed state to indicate the selected state on the list*/
-    		lv_obj_t * btn_i = get_next_btn(list, NULL);
+    		lv_obj_t * btn_i = lv_list_get_prev_btn(list, NULL);
     		while(btn_i) {
     			lv_btn_state_t s = lv_btn_get_state(btn_i);
     			if(s == LV_BTN_STATE_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_REL);
     			else if(s == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_TGL_REL);
-    			btn_i = get_next_btn(list, btn_i);
+    			btn_i = lv_list_get_prev_btn(list, btn_i);
     		}
 
     		/*Make the released button "selected"*/
@@ -699,67 +748,14 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     return res;
 }
 
-/**
- * Get the next button from list. (Starts from the bottom button)
- * @param list pointer to a list object
- * @param prev_btn pointer to button. Search the next after it.
- * @return pointer to the next button or NULL when no more buttons
- */
-static lv_obj_t * get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
-{
-    /* Not a good practice but user can add/create objects to the lists manually.
-     * When getting the next button try to be sure that it is at least a button */
-
-    lv_obj_t * btn ;
-    lv_obj_t * scrl = lv_page_get_scrl(list);
-
-    btn = lv_obj_get_child(scrl, prev_btn);
-    if(btn == NULL) return NULL;
-
-    while(btn->signal_func != lv_list_btn_signal) {
-        btn = lv_obj_get_child(scrl, prev_btn);
-        if(btn == NULL) break;
-    }
-
-    return btn;
-}
-
-
-/**
- * Get the previous button from list. (Starts from the top button)
- * @param list pointer to a list object
- * @param prev_btn pointer to button. Search the previous before it.
- * @return pointer to the previous button or NULL when no more buttons
- */
-static lv_obj_t * get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
-{
-    /* Not a good practice but user can add/create objects to the lists manually.
-     * When getting the next button try to be sure that it is at least a button */
-
-    lv_obj_t * btn ;
-    lv_obj_t * scrl = lv_page_get_scrl(list);
-
-    btn = lv_obj_get_child_back(scrl, prev_btn);
-    if(btn == NULL) return NULL;
-
-    while(btn->signal_func != lv_list_btn_signal) {
-        btn = lv_obj_get_child_back(scrl, prev_btn);
-        if(btn == NULL) break;
-    }
-
-    return btn;
-}
-
 static void refr_btn_width(lv_obj_t * list)
 {
-
-	return;
     lv_style_t * style = lv_list_get_style(list, LV_LIST_STYLE_BG);
     lv_style_t * style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
     lv_coord_t w = lv_obj_get_width(list);
     lv_coord_t btn_w = w - (style->body.padding.hor + style_scrl->body.padding.hor) * 2;
 
-    lv_obj_t * btn = get_next_btn(list, NULL);
+    lv_obj_t * btn = lv_list_get_prev_btn(list, NULL);
     while(btn) {
         /*Make the size adjustment for each buttons*/
         if(lv_obj_get_width(btn) != btn_w) {
@@ -769,7 +765,7 @@ static void refr_btn_width(lv_obj_t * list)
             lv_obj_set_width(label, btn->coords.x2 - label->coords.x1);
             lv_label_set_text(label, NULL);
         }
-        btn = get_next_btn(list, btn);
+        btn = lv_list_get_prev_btn(list, btn);
     }
 }
 
