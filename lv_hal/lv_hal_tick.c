@@ -15,6 +15,10 @@
 #include "lv_hal_tick.h"
 #include <stddef.h>
 
+#if LV_TICK_CUSTOM == 1
+#include LV_TICK_CUSTOM_INCLUDE
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -57,6 +61,7 @@ LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
  */
 uint32_t lv_tick_get(void)
 {
+#if LV_TICK_CUSTOM == 0
     uint32_t result;
     do {
         tick_irq_flag = 1;
@@ -64,6 +69,9 @@ uint32_t lv_tick_get(void)
     } while(!tick_irq_flag);     /*'lv_tick_inc()' clears this flag which can be in an interrupt. Continue until make a non interrupted cycle */
 
     return result;
+#else
+    return LV_TICK_CUSTOM_SYS_TIME_EXPR;
+#endif
 }
 
 /**
