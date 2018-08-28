@@ -881,7 +881,7 @@ void lv_obj_set_opa_scale(lv_obj_t * obj, lv_opa_t opa_scale)
 /**
  * Set a bit or bits in the protect filed
  * @param obj pointer to an object
- * @param prot 'OR'-ed values from lv_obj_prot_t
+ * @param prot 'OR'-ed values from `lv_protect_t`
  */
 void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot)
 {
@@ -891,7 +891,7 @@ void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot)
 /**
  * Clear a bit or bits in the protect filed
  * @param obj pointer to an object
- * @param prot 'OR'-ed values from lv_obj_prot_t
+ * @param prot 'OR'-ed values from `lv_protect_t`
  */
 void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
 {
@@ -1390,7 +1390,7 @@ lv_opa_t lv_obj_get_opa_scale(const lv_obj_t * obj)
 /**
  * Get the protect field of an object
  * @param obj pointer to an object
- * @return protect field ('OR'ed values of lv_obj_prot_t)
+ * @return protect field ('OR'ed values of `lv_protect_t`)
  */
 uint8_t lv_obj_get_protect(const lv_obj_t * obj)
 {
@@ -1400,7 +1400,7 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj)
 /**
  * Check at least one bit of a given protect bitfield is set
  * @param obj pointer to an object
- * @param prot protect bits to test ('OR'ed values of lv_obj_prot_t)
+ * @param prot protect bits to test ('OR'ed values of `lv_protect_t`)
  * @return false: none of the given bits are set, true: at least one bit is set
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
