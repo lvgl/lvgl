@@ -546,6 +546,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         if(ink_obj != NULL && ink_obj != btn) {
         	lv_anim_del(ink_obj, (lv_anim_fp_t)lv_btn_ink_effect_anim);
         	lv_obj_invalidate(ink_obj);
+        	ink_obj = NULL;
         }
         /*Save the new data for inking and start it's animation if enabled*/
         if(ext->ink_in_time > 0) {
