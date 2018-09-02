@@ -456,7 +456,6 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
 
     if(decoder_src_type == LV_IMG_SRC_FILE) {
 #if USE_LV_FILESYSTEM
-
         uint8_t px_size = lv_img_color_format_get_px_size(decoder_header.cf);
 
         lv_fs_res_t res;
@@ -550,7 +549,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
                                           68,  85,  102, 119,
                                           136, 153, 170, 187,
                                           204, 221, 238, 255
-                                         };
+                                          };
 
     /*Simply fill the buffer with the color. Later only the alpha value will be modified.*/
     lv_color_t bg_color = decoder_style->image.color;
@@ -567,42 +566,69 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 #endif
     }
 
-    const lv_img_dsc_t * img_dsc = decoder_src;
-	const uint8_t * data_tmp = img_dsc->data;
 	const lv_opa_t * opa_table = NULL;
-	uint8_t px_size = lv_img_color_format_get_px_size(img_dsc->header.cf);
+	uint8_t px_size = lv_img_color_format_get_px_size(decoder_header.cf);
 	uint16_t mask = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
 	lv_coord_t w = 0;
+	uint32_t ofs = 0;
 	int8_t pos = 0;
-	switch(img_dsc->header.cf) {
+	switch(decoder_header.cf) {
 		case LV_IMG_FORMAT_ALPHA_1BIT:
-			w = (img_dsc->header.w >> 3);		/*E.g. w = 20 -> w = 2 + 1*/
-			if(img_dsc->header.w & 0x7) w++;
-			data_tmp += w * y + (x >> 3);      /*First pixel*/
+			w = (decoder_header.w >> 3);		/*E.g. w = 20 -> w = 2 + 1*/
+			if(decoder_header.w & 0x7) w++;
+			ofs += w * y + (x >> 3);      /*First pixel*/
 			pos = 7 - (x & 0x7);
 			opa_table = alpha1_opa_table;
 		break;
         case LV_IMG_FORMAT_ALPHA_2BIT:
-            w = (img_dsc->header.w >> 2);       /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
-            if(img_dsc->header.w & 0x3) w++;
-            data_tmp += w * y + (x >> 2);      /*First pixel*/
+            w = (decoder_header.w >> 2);       /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
+            if(decoder_header.w & 0x3) w++;
+            ofs += w * y + (x >> 2);      /*First pixel*/
             pos = 6 - ((x & 0x3) * 2);
             opa_table = alpha2_opa_table;
         break;
         case LV_IMG_FORMAT_ALPHA_4BIT:
-            w = (img_dsc->header.w >> 1);       /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
-            if(img_dsc->header.w & 0x1) w++;
-            data_tmp += w * y + (x >> 1);      /*First pixel*/
+            w = (decoder_header.w >> 1);       /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
+            if(decoder_header.w & 0x1) w++;
+            ofs += w * y + (x >> 1);      /*First pixel*/
             pos = 4 - ((x & 0x1) * 4);
             opa_table = alpha4_opa_table;
         break;
         case LV_IMG_FORMAT_ALPHA_8BIT:
-            w = img_dsc->header.w;              /*E.g. x = 7 -> w = 7 (bytes)*/
-            data_tmp += w * y + x;      /*First pixel*/
+            w = decoder_header.w;              /*E.g. x = 7 -> w = 7 (bytes)*/
+            ofs += w * y + x;      /*First pixel*/
             pos = 0;
         break;
 	}
+
+#if USE_LV_FILESYSTEM
+# if LV_COMPILER_VLA_SUPPORTED
+        uint8_t fs_buf[w];
+# else
+#  if LV_HOR_RES > LV_VER_RES
+        uint8_t fs_buf[LV_HOR_RES];
+#  else
+        uint8_t fs_buf[LV_VER_RES];
+#  endif
+# endif
+#endif
+    const uint8_t * data_tmp = NULL;
+    if(decoder_src_type == LV_IMG_SRC_VARIABLE) {
+        const lv_img_dsc_t * img_dsc = decoder_src;
+        data_tmp = img_dsc->data + ofs;
+    } else {
+#if USE_LV_FILESYSTEM
+        lv_fs_seek(&decoder_file, ofs + 4);     /*+4 to skip the header*/
+        lv_fs_read(&decoder_file, fs_buf, w, NULL);
+        data_tmp = fs_buf;
+#else
+        LV_LOG_WARN("Image built-in indexed line reader can't read file because USE_LV_FILESYSTEM = 0");
+        data_tmp = NULL;        /*To avoid warnings*/
+        return LV_RES_INV;
+#endif
+    }
+
 
 	uint8_t byte_act = 0;
 	uint8_t val_act;
@@ -610,7 +636,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 		val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
 
 		buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] =
-		         img_dsc->header.cf == LV_IMG_FORMAT_ALPHA_8BIT ? val_act : opa_table[val_act];
+		        decoder_header.cf == LV_IMG_FORMAT_ALPHA_8BIT ? val_act : opa_table[val_act];
 
 		pos -= px_size;
 		if(pos < 0) {
@@ -661,15 +687,31 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
         break;
     }
 
-    uint8_t fs_buf[1024];
+#if USE_LV_FILESYSTEM
+# if LV_COMPILER_VLA_SUPPORTED
+        uint8_t fs_buf[w];
+# else
+#  if LV_HOR_RES > LV_VER_RES
+        uint8_t fs_buf[LV_HOR_RES];
+#  else
+        uint8_t fs_buf[LV_VER_RES];
+#  endif
+# endif
+#endif
     const uint8_t * data_tmp = NULL;
     if(decoder_src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = decoder_src;
         data_tmp = img_dsc->data + ofs;
     } else {
+#if USE_LV_FILESYSTEM
         lv_fs_seek(&decoder_file, ofs + 4);     /*+4 to skip the header*/
         lv_fs_read(&decoder_file, fs_buf, w, NULL);
         data_tmp = fs_buf;
+#else
+        LV_LOG_WARN("Image built-in indexed line reader can't read file because USE_LV_FILESYSTEM = 0");
+        data_tmp = NULL;        /*To avoid warnings*/
+        return LV_RES_INV;
+#endif
     }
 
     uint8_t byte_act = 0;

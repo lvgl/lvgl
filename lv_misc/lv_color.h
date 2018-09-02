@@ -104,11 +104,6 @@ typedef union
         uint16_t green :6;
         uint16_t red   :5;
 #else
-//        uint16_t blue  	 :5;
-//        uint16_t green_h :3;
-//        uint16_t green_l :3;
-//        uint16_t red     :5;
-
         uint16_t green_h :3;
         uint16_t red   :5;
         uint16_t blue  :5;
@@ -249,17 +244,32 @@ static inline uint16_t lv_color_to16(lv_color_t color)
     else return 0xFFFF;
 #elif LV_COLOR_DEPTH == 8
     lv_color16_t ret;
+#  if LV_COLOR_16_SWAP == 0
     ret.red = color.red * 4;       /*(2^5 - 1)/(2^3 - 1) = 31/7 = 4*/
     ret.green = color.green * 9;   /*(2^6 - 1)/(2^3 - 1) = 63/7 = 9*/
     ret.blue = color.blue * 10;    /*(2^5 - 1)/(2^2 - 1) = 31/3 = 10*/
+#  else
+    ret.red = color.red * 4;
+    uint8_t g_tmp = color.green * 9;
+    ret.green_h = (g_tmp & 0x1F) >> 3;
+    ret.green_l = g_tmp & 0x07;
+    ret.blue = color.blue * 10;
+#  endif
     return ret.full;
 #elif LV_COLOR_DEPTH == 16
     return color.full;
 #elif LV_COLOR_DEPTH == 24
     lv_color16_t ret;
+#  if LV_COLOR_16_SWAP == 0
     ret.red = color.red >> 3;       /* 8 - 5  = 3*/
     ret.green = color.green >> 2;   /* 8 - 6  = 2*/
     ret.blue = color.blue >> 3;     /* 8 - 5  = 3*/
+#  else
+    ret.red = color.red >> 3;
+    ret.green_h = (color.green & 0xE0) >> 5;
+    ret.green_l = (color.green & 0x1C) >> 2;
+    ret.blue = color.blue >> 3;
+#  endif
     return ret.full;
 #endif
 }
