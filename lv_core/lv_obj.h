@@ -157,7 +157,8 @@ typedef enum
     LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
     LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_cont layout)*/
     LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
-    LV_PROTECT_PRESS_LOST= 0x10, /*TODO */
+    LV_PROTECT_PRESS_LOST= 0x10, /*If the `indev` was pressing this object but swiped out while pressing do not search other object.*/
+    LV_PROTECT_CLICK_FOCUS= 0x20,/*Prevent focusing the object by clicking on it*/
 } lv_protect_t;
 
 

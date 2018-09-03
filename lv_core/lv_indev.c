@@ -385,7 +385,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Release happened*/
     else if(data->state == LV_INDEV_STATE_REL && i->proc.last_state == LV_INDEV_STATE_PR) {
-        /*The user might clear the key it was released. Always release the pressed key*/
+        /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = i->proc.last_key;
 
         if((data->key == LV_GROUP_KEY_NEXT) ||
@@ -591,17 +591,25 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
         /*Handle click focus*/
 #if USE_LV_GROUP
-        lv_group_t * g = lv_obj_get_group(proc->act_obj);
-        lv_obj_t * parent = proc->act_obj;
-        while(g == NULL) {
-        	parent = lv_obj_get_parent(parent);
-        	if(parent == NULL) break;
-        	g = lv_obj_get_group(parent);
-        }
+        /*Check, if the parent is in a group focus on it.*/
+        if(lv_obj_is_protected(proc->act_obj, LV_PROTECT_CLICK_FOCUS) == false) {       /*Respect the click protection*/
+            lv_group_t * g = lv_obj_get_group(proc->act_obj);
+            lv_obj_t * parent = proc->act_obj;
 
-        if(g != NULL && parent != NULL)
-        if(lv_group_get_click_focus(g)) {
-        	lv_group_focus_obj(parent);
+            while(g == NULL) {
+                parent = lv_obj_get_parent(parent);
+                if(parent == NULL) break;
+                if(lv_obj_is_protected(parent, LV_PROTECT_CLICK_FOCUS)) {   /*Ignore is the protected against click focus*/
+                    parent = NULL;
+                    break;
+                }
+                g = lv_obj_get_group(parent);
+            }
+
+            if(g != NULL && parent != NULL)
+            if(lv_group_get_click_focus(g)) {
+                lv_group_focus_obj(parent);
+            }
         }
 #endif
 
