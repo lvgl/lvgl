@@ -75,9 +75,9 @@ extern "C" {
 #define SYMBOL_BATTERY_1       "\xEF"
 #define SYMBOL_BATTERY_EMPTY   "\xF0"
 #define SYMBOL_BLUETOOTH       "\xF1"
+#define SYMBOL_DUMMY           "\xFF"       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
 #else
 #define LV_SYMBOL_GLYPH_FIRST  0xF000
-
 #define SYMBOL_AUDIO           "\xEF\x80\x80"
 #define SYMBOL_VIDEO           "\xEF\x80\x81"
 #define SYMBOL_LIST            "\xEF\x80\x82"
@@ -128,11 +128,8 @@ extern "C" {
 #define SYMBOL_BATTERY_1       "\xEF\x80\xAF"
 #define SYMBOL_BATTERY_EMPTY   "\xEF\x80\xB0"
 #define SYMBOL_BLUETOOTH       "\xEF\x80\xB1"
+#define SYMBOL_DUMMY           "\xEF\x8B\xBF"       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
 #endif
-
-
-
-
 
 
 #ifdef __cplusplus
