@@ -230,13 +230,13 @@ lv_img_src_t lv_img_src_get_type(const void * src)
 
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        return LV_IMG_SRC_FILE;    /*If it's an ASCII character then it's file name*/
+        return LV_IMG_SRC_FILE;     /*If it's an ASCII character then it's file name*/
     }
     else if(u8_p[0] >= 0x80) {
-        return LV_IMG_SRC_SYMBOL;                /*Symbols begins after 0x7F*/
+        return LV_IMG_SRC_SYMBOL;   /*Symbols begins after 0x7F*/
     }
     else {
-        return LV_IMG_SRC_VARIABLE;      							  /*`lv_img_dsc_t` is design to the first byte < 0x20*/
+        return LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is design to the first byte < 0x20*/
     }
 
     return LV_IMG_SRC_UNKNOWN;
