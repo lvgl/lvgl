@@ -289,27 +289,29 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 
         lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-        lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
-        lv_area_t indic_area;
-        lv_area_copy(&indic_area, &bar->coords);
-        indic_area.x1 += style_indic->body.padding.hor;
-        indic_area.x2 -= style_indic->body.padding.hor;
-        indic_area.y1 += style_indic->body.padding.ver;
-        indic_area.y2 -= style_indic->body.padding.ver;
+        if(ext->cur_value != ext->min_value) {
+			lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
+			lv_area_t indic_area;
+			lv_area_copy(&indic_area, &bar->coords);
+			indic_area.x1 += style_indic->body.padding.hor;
+			indic_area.x2 -= style_indic->body.padding.hor;
+			indic_area.y1 += style_indic->body.padding.ver;
+			indic_area.y2 -= style_indic->body.padding.ver;
 
-        lv_coord_t w = lv_area_get_width(&indic_area);
-        lv_coord_t h = lv_area_get_height(&indic_area);
+			lv_coord_t w = lv_area_get_width(&indic_area);
+			lv_coord_t h = lv_area_get_height(&indic_area);
 
-        if(w >= h) {
-            indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
-            indic_area.x2 = indic_area.x1 + indic_area.x2;
-        } else {
-            indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
-            indic_area.y1 = indic_area.y2 - indic_area.y1;
+			if(w >= h) {
+				indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
+				indic_area.x2 = indic_area.x1 + indic_area.x2;
+			} else {
+				indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
+				indic_area.y1 = indic_area.y2 - indic_area.y1;
+			}
+
+			/*Draw the indicator*/
+			lv_draw_rect(&indic_area, mask, style_indic, lv_obj_get_opa_scale(bar));
         }
-
-        /*Draw the indicator*/
-        lv_draw_rect(&indic_area, mask, style_indic, lv_obj_get_opa_scale(bar));
     }
     return true;
 }

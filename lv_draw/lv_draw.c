@@ -49,7 +49,6 @@ void (*map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
                       lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
 #endif
 
-
 /**********************
  *      MACROS
  **********************/
