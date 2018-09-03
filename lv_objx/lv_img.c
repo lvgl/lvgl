@@ -82,13 +82,17 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_set_design_func(new_img, lv_img_design);
 
     if(copy == NULL) {
-        /* Enable auto size for non screens
+        lv_obj_set_click(new_img, false);
+    	/* Enable auto size for non screens
          * because image screens are wallpapers
          * and must be screen sized*/
-        if(par != NULL) ext->auto_size = 1;
-        else ext->auto_size = 0;
-        if(par != NULL) lv_obj_set_style(new_img, NULL);            /*Inherit the style  by default*/
-        else lv_obj_set_style(new_img, &lv_style_plain);            /*Set a style for screens*/
+        if(par != NULL) {
+        	ext->auto_size = 1;
+        	lv_obj_set_style(new_img, NULL);            /*Inherit the style  by default*/
+        } else {
+        	ext->auto_size = 0;
+        	lv_obj_set_style(new_img, &lv_style_plain);            /*Set a style for screens*/
+        }
     } else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->auto_size = copy_ext->auto_size;
