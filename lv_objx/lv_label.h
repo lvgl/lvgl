@@ -120,6 +120,7 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text);
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
+ *                  In LV_LONG_BREAK/LONG/ROLL the size of the label should be set AFTER this function
  */
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 
