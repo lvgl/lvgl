@@ -276,7 +276,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 
         style_tmp.line.color = style->body.main_color;
 
-        /*Calculate every coordinate in x32 size to make rounding later*/
+        /*Calculate every coordinate in a bigger size to make rounding later*/
         r_out = r_out << LV_LMETER_LINE_UPSCALE;
         r_in = r_in << LV_LMETER_LINE_UPSCALE;
 
@@ -363,12 +363,10 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
 static lv_coord_t lv_lmeter_coord_round(int32_t x)
 {
 #if LV_LMETER_LINE_UPSCALE > 0
-    bool was_negative;
+    bool was_negative = false;
     if(x < 0) {
         was_negative = true;
         x = -x;
-    } else {
-        was_negative = false;
     }
 
     x = (x >> LV_LMETER_LINE_UPSCALE) + ((x & LV_LMETER_LINE_UPSCALE_MASK) >> (LV_LMETER_LINE_UPSCALE - 1));

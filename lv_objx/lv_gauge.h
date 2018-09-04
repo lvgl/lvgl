@@ -107,8 +107,9 @@ static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, int16_t value)
  * Set the scale settings of a gauge
  * @param gauge pointer to a gauge object
  * @param angle angle of the scale (0..360)
- * @param line_cnt count of scale lines
- * @param label_cnt count of scale labels
+ * @param line_cnt count of scale lines.
+ * The get a given "subdivision" lines between label, `line_cnt` = (sub_div + 1) * (label_cnt - 1) + 1
+ * @param label_cnt count of scale labels.
  */
 void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt);
 
