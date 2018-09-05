@@ -1620,14 +1620,14 @@ static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord
 
 /**
  * Refresh the style of all children of an object. (Called recursively)
- * @param style_p refresh objects only with this style. (ignore is if NULL)
+ * @param style_p refresh objects only with this style.
  * @param obj pointer to an object
  */
 static void report_style_mod_core(void * style_p, lv_obj_t * obj)
 {
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
-        if(i->style_p == style_p) {
+        if(i->style_p == style_p || style_p == NULL) {
             refresh_childen_style(i);
             lv_obj_refresh_style(i);
         }
