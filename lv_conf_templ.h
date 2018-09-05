@@ -24,11 +24,6 @@
 #define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
 #define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
 #endif     /*LV_MEM_CUSTOM*/
-#define LV_TICK_CUSTOM     0               /*1: use a custom tick source (removing the need to manually update the tick with `lv_tick_inc`) */
-#if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"  /*Header for the sys time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())   /*Expression evaluating to current systime in ms*/
-#endif     /*LV_TICK_CUSTOM*/
 
 /*===================
    Graphical settings
@@ -95,6 +90,14 @@
 #define LV_COMPILER_NON_CONST_INIT_SUPPORTED 0	/* 1: Initialization with non constant values are supported (In Visual studio it is not supported)*/
 //#define _CRT_SECURE_NO_WARNINGS			    /* Visual Studio needs it to use `strcpy`, `sprintf` etc*/
 
+/*HAL settings*/
+#define LV_TICK_CUSTOM     0                        /*1: use a custom tick source (removing the need to manually update the tick with `lv_tick_inc`) */
+#if LV_TICK_CUSTOM == 1
+#define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"         /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current systime in ms*/
+#endif     /*LV_TICK_CUSTOM*/
+
+
 /*Log settings*/
 #define USE_LV_LOG		1	/*Enable/disable the log module*/
 #if USE_LV_LOG
@@ -113,6 +116,8 @@
 /*================
  *  THEME USAGE
  *================*/
+#define LV_THEME_LIVE_UPDATE    0       /*Enable to change the theme in run time. Requires 8..10 kB extra RAM*/
+
 #define USE_LV_THEME_TEMPL      0       /*Just for test*/
 #define USE_LV_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
 #define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
