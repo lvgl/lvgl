@@ -23,6 +23,7 @@
  *********************/
 #define LV_BTN_INK_VALUE_MAX			256
 #define LV_BTN_INK_VALUE_MAX_SHIFT		8
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -209,7 +210,7 @@ void lv_btn_toggle(lv_obj_t * btn)
 }
 
 /**
- * Set a function to call when the button event happens
+ * Set a function to call when a button event happens
  * @param btn pointer to a button object
  * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
  */

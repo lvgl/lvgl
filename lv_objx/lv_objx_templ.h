@@ -78,7 +78,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param templ pointer to template object
  * @param type which style should be set
  * @param style pointer to a style
- *  */
+ */
 void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *style);
 
 /*=====================
@@ -90,7 +90,7 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t *sty
  * @param templ pointer to template object
  * @param type which style should be get
  * @return style pointer to the style
- *  */
+ */
 lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type);
 
 /*=====================

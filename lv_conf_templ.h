@@ -262,6 +262,9 @@
 /*Button (dependencies: lv_cont*/
 #define USE_LV_BTN      1
 
+/*Image Button (dependencies: lv_btn*/
+#define USE_LV_IMGBTN   1
+
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
 

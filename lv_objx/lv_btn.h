@@ -37,7 +37,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Button states*/
+/* Button states
+ * It can be used not only by buttons but other button-like objects too*/
 typedef enum
 {
     LV_BTN_STATE_REL,
@@ -120,7 +121,7 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
 void lv_btn_toggle(lv_obj_t * btn);
 
 /**
- * Set a function to call when the button event happens
+ * Set a function to call when a button event happens
  * @param btn pointer to a button object
  * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
  */

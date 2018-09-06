@@ -27,7 +27,7 @@ extern "C" {
 #include "lv_themes/lv_theme.h"
 
 #include "lv_objx/lv_btn.h"
-#include "lv_objx/lv_img.h"
+#include "lv_objx/lv_imgbtn.h"
 #include "lv_objx/lv_img.h"
 #include "lv_objx/lv_label.h"
 #include "lv_objx/lv_line.h"
