@@ -1,4 +1,4 @@
-# Littlev Graphics Libraray
+# Littlev Graphics Library
 
 ![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
 
