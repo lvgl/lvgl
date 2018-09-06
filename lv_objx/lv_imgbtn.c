@@ -66,7 +66,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->img_src[LV_BTN_STATE_TGL_REL] = NULL;
     ext->img_src[LV_BTN_STATE_TGL_PR] = NULL;;
     ext->img_src[LV_BTN_STATE_INA] = NULL;
-    ext->act_cf = LV_IMG_FORMAT_UNKOWN;
+    ext->act_cf = LV_IMG_CF_UNKOWN;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_imgbtn, lv_imgbtn_signal);
@@ -175,7 +175,7 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
     if(mode == LV_DESIGN_COVER_CHK) {
         lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
         bool cover = false;
-        if(ext->act_cf == LV_IMG_FORMAT_TRUE_COLOR || ext->act_cf == LV_IMG_FORMAT_RAW) {
+        if(ext->act_cf == LV_IMG_CF_TRUE_COLOR || ext->act_cf == LV_IMG_CF_RAW) {
             cover = lv_area_is_in(mask, &imgbtn->coords);
         }
 
@@ -247,7 +247,7 @@ static void refr_img(lv_obj_t * imgbtn)
         ext->act_cf = header.cf;
         lv_obj_set_size(imgbtn, header.w, header.h);
     } else {
-        ext->act_cf = LV_IMG_FORMAT_UNKOWN;
+        ext->act_cf = LV_IMG_CF_UNKOWN;
     }
 
 }

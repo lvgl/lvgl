@@ -39,35 +39,28 @@ typedef struct {
 	uint32_t h:11;              /*Height of the image map*/
 }lv_img_header_t;
 
-
+/*Image color format*/
 typedef enum {
-	LV_IMG_COMPRESSION_NONE,
-	LV_IMG_COMPRESSION_RLE,			/*Run length encoded*/
-	LV_IMG_COMPRESSION_RESERVED1,
-	LV_IMG_COMPRESSION_RESERVED2
-}lv_img_compression_t;
+    LV_IMG_CF_UNKOWN = 0,
 
-typedef enum {
-    LV_IMG_FORMAT_UNKOWN = 0,
+	LV_IMG_CF_RAW,          		/*Contains the file as it is. Needs custom decoder function*/
+    LV_IMG_CF_RAW_ALPHA,            /*Contains the file as it is. The image has alpha. Needs custom decoder function*/
+    LV_IMG_CF_RAW_CHROMA_KEYED,     /*Contains the file as it is. The image is chroma keyed. Needs custom decoder function*/
 
-	LV_IMG_FORMAT_RAW,          		/*Contains the file as it is. Needs custom decoder function*/
-    LV_IMG_FORMAT_RAW_ALPHA,            /*Contains the file as it is. The image has alpha. Needs custom decoder function*/
-    LV_IMG_FORMAT_RAW_CHROMA_KEYED,     /*Contains the file as it is. The image is chroma keyed. Needs custom decoder function*/
+	LV_IMG_CF_TRUE_COLOR,			/*Color format and depth should match with LV_COLOR settings*/
+	LV_IMG_CF_TRUE_COLOR_ALPHA,		/*Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
+	LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED,	/*Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels will be transparent*/
 
-	LV_IMG_FORMAT_TRUE_COLOR,			/*Color format and depth should match with LV_COLOR settings*/
-	LV_IMG_FORMAT_TRUE_COLOR_ALPHA,		/*Same as `LV_IMG_FORMAT_TRUE_COLOR` but every pixel has an alpha byte*/
-	LV_IMG_FORMAT_TRUE_COLOR_CHROMA_KEYED,	/*Same as `LV_IMG_FORMAT_TRUE_COLOR` but LV_COLOR_TRANSP pixels will be transparent*/
+	LV_IMG_CF_INDEXED_1BIT,			/*Can have 2 different colors in a palette (always chroma keyed)*/
+	LV_IMG_CF_INDEXED_2BIT,			/*Can have 4 different colors in a palette (always chroma keyed)*/
+	LV_IMG_CF_INDEXED_4BIT,			/*Can have 16 different colors in a palette (always chroma keyed)*/
+	LV_IMG_CF_INDEXED_8BIT,			/*Can have 256 different colors in a palette (always chroma keyed)*/
 
-	LV_IMG_FORMAT_INDEXED_1BIT,			/*Can have 2 different colors in a palette (always chroma keyed)*/
-	LV_IMG_FORMAT_INDEXED_2BIT,			/*Can have 4 different colors in a palette (always chroma keyed)*/
-	LV_IMG_FORMAT_INDEXED_4BIT,			/*Can have 16 different colors in a palette (always chroma keyed)*/
-	LV_IMG_FORMAT_INDEXED_8BIT,			/*Can have 256 different colors in a palette (always chroma keyed)*/
-
-	LV_IMG_FORMAT_ALPHA_1BIT, 			/*Can have one color and it can be drawn or not*/
-	LV_IMG_FORMAT_ALPHA_2BIT, 			/*Can have one color but 4 different alpha value*/
-	LV_IMG_FORMAT_ALPHA_4BIT, 			/*Can have one color but 16 different alpha value*/
-	LV_IMG_FORMAT_ALPHA_8BIT, 			/*Can have one color but 256 different alpha value*/
-} lv_img_color_format_t;
+	LV_IMG_CF_ALPHA_1BIT, 			/*Can have one color and it can be drawn or not*/
+	LV_IMG_CF_ALPHA_2BIT, 			/*Can have one color but 4 different alpha value*/
+	LV_IMG_CF_ALPHA_4BIT, 			/*Can have one color but 16 different alpha value*/
+	LV_IMG_CF_ALPHA_8BIT, 			/*Can have one color but 256 different alpha value*/
+} lv_img_cf_t;
 
 /* Image header it is compatible with
  * the result image converter utility*/
@@ -154,11 +147,11 @@ void lv_img_decoder_set_custom(lv_img_decoder_info_f_t  info_fp, lv_img_decoder_
 
 lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header);
 
-uint8_t lv_img_color_format_get_px_size(lv_img_color_format_t cf);
+uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf);
 
-bool lv_img_color_format_is_chroma_keyed(lv_img_color_format_t cf);
+bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf);
 
-bool lv_img_color_format_has_alpha(lv_img_color_format_t cf);
+bool lv_img_color_format_has_alpha(lv_img_cf_t cf);
 
 
 /**********************
