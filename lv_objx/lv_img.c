@@ -72,7 +72,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->src = NULL;
     ext->src_type = LV_IMG_SRC_UNKNOWN;
-    ext->cf = LV_IMG_FORMAT_UNKOWN;
+    ext->cf = LV_IMG_CF_UNKOWN;
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
     ext->auto_size = 1;
@@ -123,12 +123,6 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 {
     lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-
-
-#if USE_LV_FILESYSTEM == 0
-    if(src_type == LV_IMG_SRC_FILE) src_type = LV_IMG_SRC_UNKNOWN;
-#endif
-
 
     /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMG_SRC_UNKNOWN) {
@@ -260,7 +254,7 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
         bool cover = false;
         if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return false;
 
-        if(ext->cf == LV_IMG_FORMAT_TRUE_COLOR) cover = lv_area_is_in(mask, &img->coords);
+        if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) cover = lv_area_is_in(mask, &img->coords);
 
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
