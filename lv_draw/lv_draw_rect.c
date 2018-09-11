@@ -1123,7 +1123,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 
     uint16_t col;
 #if LV_COMPILER_VLA_SUPPORTED
-    lv_opa_t line_2d_blur[radius + swidth];
+    lv_opa_t line_2d_blur[radius + swidth + 1];
 #else
 # if LV_HOR_RES > LV_VER_RES
     lv_opa_t line_2d_blur[LV_HOR_RES];
