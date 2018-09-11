@@ -107,6 +107,19 @@ typedef struct {
     lv_style_t *chart;
 #endif
 
+#if USE_LV_CALENDAR != 0
+    struct {
+        lv_style_t *bg;
+        lv_style_t *header;
+        lv_style_t *header_pr;
+        lv_style_t *day_names;
+        lv_style_t *highlighted_days;
+        lv_style_t *inactive_days;
+        lv_style_t *week_box;
+        lv_style_t *today_box;
+    }calendar;
+#endif
+
 #if USE_LV_CB != 0
     struct {
         lv_style_t *bg;

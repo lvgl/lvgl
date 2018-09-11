@@ -177,6 +177,27 @@ lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
 lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn);
 
 /**
+ * Get the layout of a window
+ * @param win pointer to a window object
+ * @return the layout of the window (from 'lv_layout_t')
+ */
+lv_layout_t lv_win_get_layout(lv_obj_t *win);
+
+/**
+ * Get the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
+ */
+lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win);
+
+/**
+ * Get width of the content area (page scrollable) of the window
+ * @param win pointer to a window object
+ * @return the width of the content area
+ */
+lv_coord_t lv_win_get_width(lv_obj_t * win);
+
+/**
  * Get a style of a window
  * @param win pointer to a button object
  * @param type which style window be get

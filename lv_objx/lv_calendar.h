@@ -53,7 +53,7 @@ typedef struct {
     lv_style_t * style_header;
     lv_style_t * style_header_pr;
     lv_style_t * style_day_names;
-    lv_style_t * style_highlighted;
+    lv_style_t * style_highlighted_days;
     lv_style_t * style_inactive_days;
     lv_style_t * style_week_box;
     lv_style_t * style_today_box;
