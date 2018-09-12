@@ -94,7 +94,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy);
  * Delete all children of the scrl object, without deleting scrl child.
  * @param obj pointer to an object
  */
-void lv_win_clear(lv_obj_t *obj);
+void lv_win_clean(lv_obj_t *obj);
 
 /*======================
  * Add/remove functions
@@ -133,20 +133,6 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
  * @return control button size
  */
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
-
-/**
- * Set the scroll bar mode of a window
- * @param win pointer to a window object
- * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
- */
-void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
-
-/**
- * Set the layout of the window
- * @param win pointer to a window object
- * @param layout the layout from 'lv_layout_t'
- */
-void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
 
 /**
  * Set a style of a window
