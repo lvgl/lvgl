@@ -52,12 +52,8 @@ typedef struct
 
     struct {
         lv_color_t main_color;
-        union {
-            lv_color_t grad_color;      /*`grad_color` will be removed in v6.0, use `aux_color` instead*/
-            lv_color_t aux_color;
-        };
+        lv_color_t grad_color;      /*`grad_color` will be removed in v6.0, use `aux_color` instead*/
         lv_coord_t radius;
-        lv_coord_t thickness;       /*Depending on the object type thickness of something*/
         lv_opa_t opa;
 
         struct {
@@ -101,6 +97,7 @@ typedef struct
         lv_color_t color;
         lv_coord_t width;
         lv_opa_t opa;
+        uint8_t rounded :1;     /*1: rounded line endings*/
     } line;
 } lv_style_t;
 

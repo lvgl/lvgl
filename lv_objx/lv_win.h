@@ -135,6 +135,20 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
 
 /**
+ * Set the layout of the window
+ * @param win pointer to a window object
+ * @param layout the layout from 'lv_layout_t'
+ */
+void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
+
+/**
+ * Set the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
+ */
+void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
+
+/**
  * Set a style of a window
  * @param win pointer to a window object
  * @param type which style should be set

@@ -228,15 +228,16 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
         lv_draw_arc(x, y, r, mask, ext->angle_start, ext->angle_end, style, opa_scale);
 
 
-        if(style->body.radius == LV_RADIUS_CIRCLE) {
-            lv_coord_t thick_2 = style->body.thickness / 2;
+        /*Draw circle on the ends if enabled */
+        if(style->line.rounded) {
+            lv_coord_t thick_2 = style->line.width / 2;
             lv_coord_t cir_x = ((r - thick_2) * lv_trigo_sin(ext->angle_start) >> LV_TRIGO_SHIFT);
             lv_coord_t cir_y = ((r - thick_2) * lv_trigo_sin(ext->angle_start + 90) >> LV_TRIGO_SHIFT);
 
             lv_style_t cir_style;
             lv_style_copy(&cir_style, style);
             cir_style.body.empty = 0;
-            cir_style.body.aux_color = style->body.main_color;
+            cir_style.body.grad_color = style->body.main_color;
             lv_area_t cir_area;
             cir_area.x1 = cir_x + x - thick_2;
             cir_area.y1 = cir_y + y - thick_2;

@@ -228,7 +228,6 @@ void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size)
     lv_win_realign(win);
 }
 
-
 /**
  * Set the layout of the window
  * @param win pointer to a window object
