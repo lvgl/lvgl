@@ -62,7 +62,7 @@ void lv_vdb_flush(void);
 /**
  * Set the address of VDB buffer(s) manually. To use this set `LV_VDB_ADR` (and `LV_VDB2_ADR`) to `LV_VDB_ADR_INV` in `lv_conf.h`.
  * It should be called before `lv_init()`.
- * The size of the buffer should be: `((LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3) + ((LV_VDB_SIZE * LV_VDB_PX_BPP) & 0x7) ? 1 : 0`
+ * The size of the buffer should be: `((LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3) + (((LV_VDB_SIZE * LV_VDB_PX_BPP) & 0x7) ? 1 : 0)`
  * @param buf1 address of the VDB.
  * @param buf2 address of the second buffer. `NULL` if `LV_VDB_DOUBLE  0`
  */
