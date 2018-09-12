@@ -52,7 +52,7 @@ static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end);
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
                  uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
 {
-    lv_coord_t thickness = style->body.thickness;
+    lv_coord_t thickness = style->line.width;
     if(thickness > radius) thickness = radius;
 
     lv_coord_t r_out = radius;
