@@ -66,6 +66,10 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 	if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+         LV_LOG_WARN("Invalid VDB pointer");
+         return;
+     }
 
     /*Pixel out of the mask*/
     if(x < mask_p->x1 || x > mask_p->x2 ||
@@ -109,6 +113,10 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     lv_area_t res_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+         LV_LOG_WARN("Invalid VDB pointer");
+         return;
+     }
 
     /*Get the union of cord and mask*/
     /* The mask is already truncated to the vdb size
@@ -277,6 +285,11 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
             pos_y + letter_h < mask_p->y1 || pos_y > mask_p->y2) return;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
+
     lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
     lv_color_t * vdb_buf_tmp = vdb_p->buf;
     lv_coord_t col, row;
@@ -371,6 +384,10 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     lv_area_t masked_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
 
     /*Get the union of map size and mask*/
     /* The mask is already truncated to the vdb size

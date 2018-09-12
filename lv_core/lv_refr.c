@@ -322,6 +322,10 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     lv_coord_t row_last = 0;
     for(row = area_p->y1; row  + max_row - 1 <= y2; row += max_row)  {
         lv_vdb_t * vdb_p = lv_vdb_get();
+        if(!vdb_p) {
+            LV_LOG_WARN("Invalid VDB pointer");
+            return;
+        }
 
         /*Calc. the next y coordinates of VDB*/
         vdb_p->area.x1 = area_p->x1;
@@ -336,6 +340,10 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     /*If the last y coordinates are not handled yet ...*/
     if(y2 != row_last) {
         lv_vdb_t * vdb_p = lv_vdb_get();
+        if(!vdb_p) {
+             LV_LOG_WARN("Invalid VDB pointer");
+             return;
+         }
 
         /*Calc. the next y coordinates of VDB*/
         vdb_p->area.x1 = area_p->x1;
@@ -355,6 +363,10 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
 static void lv_refr_area_part_vdb(const lv_area_t * area_p)
 {
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+         LV_LOG_WARN("Invalid VDB pointer");
+         return;
+     }
     lv_obj_t * top_p;
 
     /*Get the new mask from the original area and the act. VDB

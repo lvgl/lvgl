@@ -38,14 +38,14 @@
  * Required for buffered drawing, opacity and anti-aliasing
  * VDB makes the double buffering, you don't need to deal with it!
  * Typical size: ~1/10 screen */
-#define LV_VDB_SIZE         (8 * LV_HOR_RES)  /*Size of VDB in pixel count (1/10 screen size is good for first)*/
-#define LV_VDB_PX_BPP		LV_COLOR_SIZE	  /*Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays. (Set `disp_drv->vdb_wr` and `disp_drv->vdb_rd` too)*/
-#define LV_VDB_ADR          0                 /*Place VDB to a specific address (e.g. in external RAM) (0: allocate automatically into RAM)*/
+#define LV_VDB_SIZE         (30 * LV_HOR_RES)  /*Size of VDB in pixel count (1/10 screen size is good for first)*/
+#define LV_VDB_PX_BPP       LV_COLOR_SIZE     /*Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays. (Set `disp_drv->vdb_wr` and `disp_drv->vdb_rd` too)*/
+#define LV_VDB_ADR          0                 /*Place VDB to a specific address (e.g. in external RAM) (0: allocate automatically into RAM; LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`)*/
 
 /* Use two Virtual Display buffers (VDB) parallelize rendering and flushing (optional)
  * The flushing should use DMA to write the frame buffer in the background*/
 #define LV_VDB_DOUBLE       0       /*1: Enable the use of 2 VDBs*/
-#define LV_VDB2_ADR         0       /*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate automatically into RAM)*/
+#define LV_VDB2_ADR         0       /*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate automatically into RAM; LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`)*/
 
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
 #define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
