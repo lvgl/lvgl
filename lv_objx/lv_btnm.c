@@ -64,7 +64,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("button matrix create started");
+    LV_LOG_TRACE("button matrix create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_btnm = lv_obj_create(par, copy);
@@ -124,7 +124,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btnm_set_map(new_btnm, lv_btnm_get_map(copy));
     }
 
-	LV_LOG_INFO("button matrix created");
+    LV_LOG_INFO("button matrix created");
 
     return new_btnm;
 }
@@ -505,11 +505,9 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     lv_point_t p;
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_mem_free(ext->button_areas);
-    }
-    else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_CORD_CHG) {
         lv_btnm_set_map(btnm, ext->map_p);
-    }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    } else if(sign == LV_SIGNAL_PRESSING) {
         uint16_t btn_pr;
         /*Search the pressed area*/
         lv_indev_get_point(param, &p);
@@ -549,8 +547,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 }
             }
         }
-    }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_PR_NONE) {
             if(ext->action) {
                 uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
@@ -586,34 +583,31 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             /*Leave the clicked button as pressed if this the focused object in a group*/
             lv_group_t * g = lv_obj_get_group(btnm);
             if(lv_group_get_focused(g) != btnm) {
-            	ext->btn_id_pr = LV_BTNM_PR_NONE;
+                ext->btn_id_pr = LV_BTNM_PR_NONE;
             }
 #else
             ext->btn_id_pr = LV_BTNM_PR_NONE;
 #endif
         }
-    }
-    else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
+    } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
         ext->btn_id_pr = LV_BTNM_PR_NONE;
         lv_obj_invalidate(btnm);
-    }
-    else if(sign == LV_SIGNAL_FOCUS) {
+    } else if(sign == LV_SIGNAL_FOCUS) {
 #if USE_LV_GROUP
-    	lv_indev_t * indev = lv_indev_get_act();
-    	if(lv_obj_is_focused(btnm) && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
-    		lv_point_t p;
-    		lv_indev_get_point(indev, &p);
-    		uint16_t btn_i = get_button_from_point(btnm, &p);
-    		ext->btn_id_pr = btn_i;
-    	} else {
+        lv_indev_t * indev = lv_indev_get_act();
+        if(lv_obj_is_focused(btnm) && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
+            lv_point_t p1;
+            lv_indev_get_point(indev, &p1);
+            uint16_t btn_i = get_button_from_point(btnm, &p1);
+            ext->btn_id_pr = btn_i;
+        } else {
             ext->btn_id_pr = 0;
-    	}
+        }
 #else
         ext->btn_id_pr = 0;
 #endif
         lv_obj_invalidate(btnm);
-    }
-    else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT) {
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) ext->btn_id_pr = 0;
@@ -624,8 +618,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) ext->btn_id_pr = 0;
             if(ext->btn_id_pr > 0) ext->btn_id_pr--;
             lv_obj_invalidate(btnm);
-        }
-        else if(c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_GROUP_KEY_DOWN) {
             lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) {
@@ -645,8 +638,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 if(area_below < ext->btn_cnt) ext->btn_id_pr = area_below;
             }
             lv_obj_invalidate(btnm);
-        }
-        else if(c == LV_GROUP_KEY_UP) {
+        } else if(c == LV_GROUP_KEY_UP) {
             lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_pr  == LV_BTNM_PR_NONE) {
@@ -666,8 +658,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             }
             lv_obj_invalidate(btnm);
-        }
-        else if(c == LV_GROUP_KEY_ENTER) {
+        } else if(c == LV_GROUP_KEY_ENTER) {
             if(ext->action != NULL) {
                 uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
                 if(txt_i != LV_BTNM_PR_NONE) {
@@ -675,19 +666,17 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 }
             }
         }
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+        bool * editable = (bool *)param;
+        *editable = true;
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_btnm";
     }
-	else if(sign == LV_SIGNAL_GET_EDITABLE) {
-		bool * editable = (bool *)param;
-		*editable = true;
-	}
-	else if(sign == LV_SIGNAL_GET_TYPE) {
-		lv_obj_type_t * buf = param;
-		uint8_t i;
-		for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
-			if(buf->type[i] == NULL) break;
-		}
-		buf->type[i] = "lv_btnm";
-	}
 
 
     return res;
