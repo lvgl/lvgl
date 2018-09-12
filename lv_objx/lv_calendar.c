@@ -574,7 +574,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 
     /*Add the year + month name*/
     char txt_buf[64];
-    lv_math_num_to_str(ext->today.year, txt_buf);
+    lv_math_num_to_str(ext->showed_date.year, txt_buf);
     txt_buf[4] =  ' ';
     txt_buf[5] =  '\0';
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));

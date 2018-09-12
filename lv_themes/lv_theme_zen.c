@@ -128,7 +128,6 @@ static void btn_init(void)
 #endif
 }
 
-
 static void label_init(void)
 {
 #if USE_LV_LABEL != 0
@@ -296,9 +295,40 @@ static void gauge_init(void)
 static void chart_init(void)
 {
 #if USE_LV_CHART
-
-
     theme.chart = theme.panel;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR != 0
+    static lv_style_t ina_days;
+    lv_style_copy(&ina_days, &def);
+    ina_days.text.color = lv_color_hsv_to_rgb(_hue, 0, 70);
+
+    static lv_style_t high_days;
+    lv_style_copy(&high_days, &def);
+    high_days.text.color = lv_color_hsv_to_rgb(_hue, 50, 90);
+
+    static lv_style_t week_box;
+    lv_style_copy(&week_box, &def);
+    week_box.body.empty = 1;
+    week_box.body.border.color = theme.panel->body.border.color;
+    week_box.body.padding.ver = LV_DPI / 20;
+
+    static lv_style_t today_box;
+    lv_style_copy(&today_box, &def);
+    today_box.body.main_color = LV_COLOR_WHITE;
+    today_box.body.grad_color = LV_COLOR_WHITE;
+    today_box.body.padding.ver = LV_DPI / 20;
+    today_box.body.radius = 0;
+
+    theme.calendar.bg = theme.panel;
+    theme.calendar.header = &lv_style_transp;
+    theme.calendar.inactive_days = &ina_days;
+    theme.calendar.highlighted_days = &high_days;
+    theme.calendar.week_box = &week_box;
+    theme.calendar.today_box = &week_box;
 #endif
 }
 
@@ -704,6 +734,7 @@ lv_theme_t * lv_theme_zen_init(uint16_t hue, lv_font_t * font)
     lmeter_init();
     gauge_init();
     chart_init();
+    calendar_init();
     cb_init();
     btnm_init();
     kb_init();

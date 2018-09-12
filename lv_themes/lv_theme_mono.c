@@ -244,9 +244,20 @@ static void gauge_init(void)
 static void chart_init(void)
 {
 #if USE_LV_CHART
-
-
     theme.chart = &light_frame;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR
+    static lv_style_t box;
+    lv_style_copy(&box, &light_plain);
+    box.body.padding.ver = LV_DPI / 20;
+
+    /*Can't handle highlighted dates in this theme*/
+    theme.calendar.week_box = &box;
+    theme.calendar.today_box = &box;
 #endif
 }
 
@@ -442,6 +453,7 @@ lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t * font)
     lmeter_init();
     gauge_init();
     chart_init();
+    calendar_init();
     cb_init();
     btnm_init();
     kb_init();

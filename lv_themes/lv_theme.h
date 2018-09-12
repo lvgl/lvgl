@@ -36,6 +36,7 @@ typedef struct {
 #if USE_LV_CONT != 0
     lv_style_t *cont;
 #endif
+
 #if USE_LV_BTN != 0
     struct {
         lv_style_t *rel;
@@ -44,6 +45,17 @@ typedef struct {
         lv_style_t *tgl_pr;
         lv_style_t *ina;
     } btn;
+#endif
+
+
+#if USE_LV_IMGBTN != 0
+    struct {
+        lv_style_t *rel;
+        lv_style_t *pr;
+        lv_style_t *tgl_rel;
+        lv_style_t *tgl_pr;
+        lv_style_t *ina;
+    } imgbtn;
 #endif
 
 #if USE_LV_LABEL != 0

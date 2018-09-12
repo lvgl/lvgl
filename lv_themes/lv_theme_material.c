@@ -288,7 +288,7 @@ static void lmeter_init(void)
     lmeter.body.grad_color = lmeter.body.main_color;
     lmeter.body.padding.hor = LV_DPI / 10;                       /*Scale line length*/
     lmeter.line.color = LV_COLOR_HEX3(0x999);
-    lmeter.line.width = 3;
+    lmeter.line.width = 2;
 
     theme.lmeter = &lmeter;
 #endif
@@ -316,9 +316,45 @@ static void gauge_init(void)
 static void chart_init(void)
 {
 #if USE_LV_CHART
-
-
     theme.chart = theme.panel;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR
+    static lv_style_t ina_days;
+    lv_style_copy(&ina_days, &def);
+    ina_days.text.color = lv_color_hsv_to_rgb(_hue, 0, 70);
+
+    static lv_style_t high_days;
+    lv_style_copy(&high_days, &def);
+    high_days.text.color = lv_color_hsv_to_rgb(_hue, 80, 90);
+
+    static lv_style_t week_box;
+    lv_style_copy(&week_box, &def);
+    week_box.body.main_color = lv_color_hsv_to_rgb(_hue, 40, 100);
+    week_box.body.grad_color = lv_color_hsv_to_rgb(_hue, 40, 100);
+    week_box.body.padding.ver = LV_DPI / 20;
+    week_box.body.padding.hor = theme.panel->body.padding.hor;
+    week_box.body.border.color = theme.panel->body.border.color;
+    week_box.body.border.width = theme.panel->body.border.width;
+    week_box.body.border.part = LV_BORDER_LEFT | LV_BORDER_RIGHT;
+    week_box.body.radius = 0;
+
+    static lv_style_t today_box;
+    lv_style_copy(&today_box, &def);
+    today_box.body.main_color = LV_COLOR_WHITE;
+    today_box.body.grad_color = LV_COLOR_WHITE;
+    today_box.body.padding.ver = LV_DPI / 20;
+    today_box.body.radius = 0;
+
+    theme.calendar.bg = theme.panel;
+    theme.calendar.header = &lv_style_transp;
+    theme.calendar.inactive_days = &ina_days;
+    theme.calendar.highlighted_days = &high_days;
+    theme.calendar.week_box = &week_box;
+    theme.calendar.today_box = &today_box;
 #endif
 }
 
@@ -723,6 +759,7 @@ lv_theme_t * lv_theme_material_init(uint16_t hue, lv_font_t * font)
     lmeter_init();
     gauge_init();
     chart_init();
+    calendar_init();
     cb_init();
     btnm_init();
     kb_init();

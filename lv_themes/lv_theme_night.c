@@ -160,16 +160,6 @@ static void label_init(void)
 #endif
 }
 
-static void img_init(void)
-{
-#if USE_LV_IMG != 0
-
-
-    theme.img.light = &def;
-    theme.img.dark = &def;
-#endif
-}
-
 static void line_init(void)
 {
 #if USE_LV_LINE != 0
@@ -194,6 +184,16 @@ static void led_init(void)
     led.body.shadow.color = lv_color_hsv_to_rgb(_hue, 100, 100);
 
     theme.led = &led;
+#endif
+}
+
+static void img_init(void)
+{
+#if USE_LV_IMG != 0
+
+
+    theme.img.light = &def;
+    theme.img.dark = &def;
 #endif
 }
 
@@ -281,8 +281,65 @@ static void gauge_init(void)
 static void chart_init(void)
 {
 #if USE_LV_CHART
-
     theme.chart = &panel;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR
+    static lv_style_t cal_bg;
+    lv_style_copy(&cal_bg, &bg);
+    cal_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 40);
+    cal_bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 40);
+    cal_bg.body.border.color = LV_COLOR_HEX3(0x333);
+    cal_bg.body.border.width = 1;
+    cal_bg.body.radius = LV_DPI / 20;
+    cal_bg.body.padding.hor = LV_DPI/10;
+    cal_bg.body.padding.ver = LV_DPI/10;
+
+    static lv_style_t cal_header;
+    lv_style_copy(&cal_header, &bg);
+    cal_header.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 20);
+    cal_header.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
+    cal_header.body.radius = 0;
+    cal_header.body.border.width = 1;
+    cal_header.body.border.color = LV_COLOR_HEX3(0x333);
+    cal_header.body.padding.hor = LV_DPI/10;
+    cal_header.body.padding.ver = LV_DPI/10;
+
+    static lv_style_t week_box;
+    lv_style_copy(&week_box, &panel);
+    week_box.body.main_color = lv_color_hsv_to_rgb(_hue, 30, 45);
+    week_box.body.grad_color = lv_color_hsv_to_rgb(_hue, 30, 45);
+    week_box.body.radius = LV_DPI / 20;
+    week_box.body.border.width = 1;
+    week_box.body.padding.hor = LV_DPI / 20;
+    week_box.body.padding.ver = LV_DPI / 25;
+
+    static lv_style_t today_box;
+    lv_style_copy(&today_box, &week_box);
+    today_box.body.main_color = lv_color_hsv_to_rgb(_hue, 80, 70);
+    today_box.body.grad_color = lv_color_hsv_to_rgb(_hue, 80, 70);
+    today_box.body.radius = LV_DPI / 20;
+    today_box.body.padding.hor = LV_DPI / 14;
+    today_box.body.padding.ver = LV_DPI / 14;
+
+    static lv_style_t highlighted_days;
+    lv_style_copy(&highlighted_days, &bg);
+    highlighted_days.text.color = lv_color_hsv_to_rgb(_hue, 40, 80);
+
+    static lv_style_t ina_days;
+    lv_style_copy(&ina_days, &bg);
+    ina_days.text.color = lv_color_hsv_to_rgb(_hue, 0, 60);
+
+    theme.calendar.bg = &cal_bg;
+    theme.calendar.header = &cal_header;
+    theme.calendar.week_box = &week_box;
+    theme.calendar.today_box = &today_box;
+    theme.calendar.highlighted_days = &highlighted_days;
+    theme.calendar.day_names = &cal_bg;
+    theme.calendar.inactive_days = &ina_days;
 #endif
 }
 
@@ -611,6 +668,7 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t * font)
     lmeter_init();
     gauge_init();
     chart_init();
+    calendar_init();
     cb_init();
     btnm_init();
     kb_init();
