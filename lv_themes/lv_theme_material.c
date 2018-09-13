@@ -77,6 +77,7 @@ static void basic_init(void)
     sb.body.main_color = LV_COLOR_BLACK;
     sb.body.grad_color = LV_COLOR_BLACK;
     sb.body.opa = LV_OPA_40;
+    sb.body.padding.hor = LV_DPI / 25;
 
     theme.bg = &bg;
     theme.panel = &panel;

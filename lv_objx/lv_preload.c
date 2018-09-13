@@ -96,6 +96,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new pre loader pre loader*/
     if(copy == NULL) {
         lv_obj_set_style(new_preload, &lv_style_pretty_color);
+        lv_obj_set_size(new_preload, LV_DPI / 2, LV_DPI / 2);
     }
     /*Copy an existing pre loader*/
     else {
