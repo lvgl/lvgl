@@ -238,7 +238,7 @@ void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time);
  */
 static inline void lv_win_scroll_hor(lv_obj_t * win, lv_coord_t dist)
 {
-	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+	lv_win_ext_t * ext = (lv_win_ext_t *)lv_obj_get_ext_attr(win);
 	lv_page_scroll_hor(ext->page, dist);
 }
 /**
@@ -248,7 +248,7 @@ static inline void lv_win_scroll_hor(lv_obj_t * win, lv_coord_t dist)
  */
 static inline void lv_win_scroll_ver(lv_obj_t * win, lv_coord_t dist)
 {
-	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+	lv_win_ext_t * ext = (lv_win_ext_t *)lv_obj_get_ext_attr(win);
 	lv_page_scroll_ver(ext->page, dist);
 }
 
