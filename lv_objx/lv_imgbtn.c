@@ -78,8 +78,6 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing image button*/
     else {
-        lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_imgbtn);
     }
