@@ -13,13 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#if USE_LV_FILESYSTEM
-
 #ifdef LV_CONF_INCLUDE_SIMPLE
 #include "lv_conf.h"
 #else
 #include "../../lv_conf.h"
 #endif
+
+#if USE_LV_FILESYSTEM
 
 #include <stdint.h>
 #include <stdbool.h>
