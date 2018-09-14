@@ -150,7 +150,9 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
             strcpy(new_str, src_img);
             ext->src = new_str;
         }
-    } else if(src_type == LV_IMG_SRC_SYMBOL) {
+    }
+
+    if(src_type == LV_IMG_SRC_SYMBOL) {
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
         lv_style_t * style = lv_img_get_style(img);
         lv_point_t size;
