@@ -39,7 +39,7 @@ typedef enum {
 static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf[((LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3) + (((LV_VDB_SIZE * LV_VDB_PX_BPP) & 0x7) ? 1 : 0)];
+static uint8_t vdb_buf[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb = {.buf = (lv_color_t*)vdb_buf};
 #  else		/*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
@@ -50,8 +50,8 @@ static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
 static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf1[((LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3) + (((LV_VDB_SIZE * LV_VDB_PX_BPP) & 0x7) ? 1 : 0)];
-static uint8_t vdb_buf2[((LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3) + (((LV_VDB_SIZE * LV_VDB_PX_BPP) & 0x7) ? 1 : 0)];
+static uint8_t vdb_buf1[LV_VDB_SIZE_IN_BYTES];
+static uint8_t vdb_buf2[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *) vdb_buf1}, {.buf = (lv_color_t *) vdb_buf2}};
 #  else	/*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
@@ -133,8 +133,7 @@ void lv_vdb_flush(void)
 
 /**
  * Set the address of VDB buffer(s) manually. To use this set `LV_VDB_ADR` (and `LV_VDB2_ADR`) to `LV_VDB_ADR_INV` in `lv_conf.h`.
- * It should be called before `lv_init()`.
- * The size of the buffer should be: `((LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3) + (((LV_VDB_SIZE * LV_VDB_PX_BPP) & 0x7) ? 1 : 0)`
+ * It should be called before `lv_init()`. The size of the buffer should be: `LV_VDB_SIZE_IN_BYTES`
  * @param buf1 address of the VDB.
  * @param buf2 address of the second buffer. `NULL` if `LV_VDB_DOUBLE  0`
  */
