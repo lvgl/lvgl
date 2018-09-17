@@ -33,7 +33,7 @@ Homepage: https://littlevgl.com
 
 ## Porting
 In the simplest case you need 5 things:
-1. Call `lv_tick_inc(x)` every `x` millisecods in a Timer or Task (`x` should be between 1 and 10)
+1. Call `lv_tick_inc(x)` every `x` milliseconds in a Timer or Task (`x` should be between 1 and 10)
 2. Register a function which can **copy a pixel array** to an area of the screen.
 3. Register a function which can **read an input device**. (E.g. touch pad)
 4. Copy `lv_conf_templ.h` as `lv_conf.h` and set at least `LV_HOR_RES`, `LV_VER_RES` and `LV_COLOR_DEPTH`. 
@@ -43,7 +43,7 @@ Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/ma
  
 ## Project set-up
 1. **Clone** or [Download](https://littlevgl.com/download) the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
-2. **Create project** with your prefered IDE and add the *lvgl* folder
+2. **Create project** with your preferred IDE and add the *lvgl* folder
 3. Copy **lvgl/lv_conf_templ.h** as **lv_conf.h** next to the *lvgl* folder
 4. In the lv_conf.h delete the first `#if 0` and its `#endif`. Leave the default configuration for the first try.
 5. In your *main.c*: #include "lvgl/lvgl.h"   
@@ -55,12 +55,12 @@ Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/ma
 9. Compile the code and load it to your embedded hardware
 
 ## PC Simulator
-If you don't have an embedded hardware you can test the graphics library in a PC simulator. The simulator uses [SDL2](https://www.libsdl.org/) library to emulate a display on your monitor and a touch pad with your mouse.
+You can test the graphics library in a PC simulator, if you don't have an embedded hardware. The simulator uses [SDL2](https://www.libsdl.org/) library to emulate a display on your monitor and a touch pad with your mouse.
 
 There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/pc_simulator
 
 ## Related repositories
-* PC simualtor: https://github.com/littlevgl/pc_simulator
+* PC simulator: https://github.com/littlevgl/pc_simulator
 * Projects: https://github.com/littlevgl/lv_projects
 * Examples: https://github.com/littlevgl/lv_examples
 * Drivers: https://github.com/littlevgl/lv_drivers
