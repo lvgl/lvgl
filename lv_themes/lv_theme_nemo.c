@@ -204,7 +204,9 @@ static void label_init(void)
 
     lv_style_copy(&label_prim, &def);
     label_prim.text.font = _font;
-    label_prim.text.color = lv_color_hsv_to_rgb(_hue, 80, 96);
+    label_prim.text.color = lv_color_hsv_to_rgb(_hue, 5, 96);
+    label_prim.body.empty = 1;
+    label_prim.body.border.width = 0;
 
     lv_style_copy(&label_sec, &label_prim);
     label_sec.text.color = lv_color_hsv_to_rgb(_hue, 40, 85);
@@ -384,6 +386,40 @@ static void chart_init(void)
 {
 #if USE_LV_CHART
     theme.chart = &panel;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR != 0
+    static lv_style_t ina_days;
+    lv_style_copy(&ina_days, &def);
+    ina_days.text.color = lv_color_hsv_to_rgb(_hue, 0, 50);
+
+    static lv_style_t high_days;
+    lv_style_copy(&high_days, &def);
+    high_days.text.color = lv_color_hsv_to_rgb(_hue, 50, 90);
+
+    static lv_style_t week_box;
+    lv_style_copy(&week_box, &def);
+    week_box.body.empty = 1;
+    week_box.body.border.color = theme.panel->body.border.color;
+    week_box.body.padding.ver = LV_DPI / 20;
+
+    static lv_style_t today_box;
+    lv_style_copy(&today_box, &def);
+    today_box.body.main_color = LV_COLOR_WHITE;
+    today_box.body.grad_color = LV_COLOR_WHITE;
+    today_box.body.padding.ver = LV_DPI / 20;
+    today_box.body.radius = 0;
+
+    theme.calendar.bg = theme.panel;
+    theme.calendar.header = theme.label.prim;
+    theme.calendar.inactive_days = theme.label.hint;
+    theme.calendar.highlighted_days = theme.label.sec;
+    theme.calendar.week_box = &week_box;
+    theme.calendar.today_box = &week_box;
+    theme.calendar.header_pr= theme.label.prim;
 #endif
 }
 
@@ -670,16 +706,13 @@ static void win_init(void)
 #if USE_LV_WIN != 0
     static lv_style_t win_header;
 
-    lv_style_copy(&win_header, &def);
+    lv_style_copy(&win_header, &panel);
     win_header.body.radius = 0;
     win_header.body.padding.hor = LV_DPI / 12;
     win_header.body.padding.ver = LV_DPI / 20;
-    win_header.body.main_color = lv_color_hsv_to_rgb(_hue, 20, 50);
-    win_header.body.grad_color = win_header.body.main_color;
     win_header.body.border.opa = panel.body.border.opa;
     win_header.body.border.width = panel.body.border.width;
     win_header.body.border.color = lv_color_hsv_to_rgb(_hue, 20, 80);
-    win_header.body.border.part = LV_BORDER_BOTTOM;
     win_header.text.color = lv_color_hsv_to_rgb(_hue, 5, 100);
 
     theme.win.bg = &bg;
@@ -729,6 +762,7 @@ lv_theme_t * lv_theme_nemo_init(uint16_t hue, lv_font_t *font)
     lmeter_init();
     gauge_init();
     chart_init();
+    calendar_init();
     cb_init();
     btnm_init();
     kb_init();
