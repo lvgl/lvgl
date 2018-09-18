@@ -68,7 +68,7 @@ typedef struct
     lv_coord_t btn_size;               /*Size of the control buttons (square)*/
 } lv_win_ext_t;
 
-typedef enum {
+enum {
     LV_WIN_STYLE_BG,
     LV_WIN_STYLE_CONTENT_BG,
     LV_WIN_STYLE_CONTENT_SCRL,
@@ -76,7 +76,8 @@ typedef enum {
     LV_WIN_STYLE_HEADER,
     LV_WIN_STYLE_BTN_REL,
     LV_WIN_STYLE_BTN_PR,
-} lv_win_style_t;
+};
+typedef uint8_t lv_win_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

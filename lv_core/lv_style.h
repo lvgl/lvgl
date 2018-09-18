@@ -29,7 +29,7 @@ extern "C" {
  **********************/
 
 /*Border types (Use 'OR'ed values)*/
-typedef enum
+enum
 {
     LV_BORDER_NONE =   0x00,
     LV_BORDER_BOTTOM = 0x01,
@@ -37,14 +37,16 @@ typedef enum
     LV_BORDER_LEFT =   0x04,
     LV_BORDER_RIGHT =  0x08,
     LV_BORDER_FULL =   0x0F,
-} lv_border_part_t;
+};
+typedef uint8_t lv_border_part_t;
 
 /*Shadow types*/
-typedef enum
+enum
 {
     LV_SHADOW_BOTTOM = 0,
     LV_SHADOW_FULL,
-} lv_shadow_type_t;
+};
+typedef uint8_t lv_shadow_type_t;
 
 typedef struct
 {
@@ -66,7 +68,7 @@ typedef struct
         struct {
             lv_color_t color;
             lv_coord_t width;
-            uint8_t type;
+            lv_shadow_type_t type;
         } shadow;
 
         struct {

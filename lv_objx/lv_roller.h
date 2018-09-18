@@ -42,10 +42,11 @@ typedef struct {
     /*New data for this type */
 } lv_roller_ext_t;
 
-typedef enum {
+enum {
     LV_ROLLER_STYLE_BG,
     LV_ROLLER_STYLE_SEL,
-} lv_roller_style_t;
+};
+typedef uint8_t lv_roller_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

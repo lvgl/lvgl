@@ -22,11 +22,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
+enum {
     DAY_DRAW_PREV_MONTH,
     DAY_DRAW_ACT_MONTH,
     DAY_DRAW_NEXT_MONTH,
-} day_draw_state_t;
+};
+typedef uint8_t day_draw_state_t;
 
 /**********************
  *  STATIC PROTOTYPES

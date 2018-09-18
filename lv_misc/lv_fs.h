@@ -33,7 +33,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum
+enum
 {
     LV_FS_RES_OK = 0,
     LV_FS_RES_HW_ERR,      /*Low level hardware error*/
@@ -48,7 +48,8 @@ typedef enum
     LV_FS_RES_OUT_OF_MEM,  /*Not enough memory for an internal operation*/
     LV_FS_RES_INV_PARAM,   /*Invalid parameter among arguments*/
     LV_FS_RES_UNKNOWN,     /*Other unknown error*/
-} lv_fs_res_t;
+};
+typedef uint8_t lv_fs_res_t;
 
 struct __lv_fs_drv_t;
 
@@ -65,11 +66,12 @@ typedef struct
     struct __lv_fs_drv_t * drv;
 } lv_fs_dir_t;
 
-typedef enum
+enum
 {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
-} lv_fs_mode_t;
+};
+typedef uint8_t lv_fs_mode_t;
 
 typedef struct __lv_fs_drv_t
 {

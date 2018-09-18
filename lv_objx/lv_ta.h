@@ -43,14 +43,15 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
+enum {
     LV_CURSOR_NONE,
     LV_CURSOR_LINE,
     LV_CURSOR_BLOCK,
     LV_CURSOR_OUTLINE,
     LV_CURSOR_UNDERLINE,
     LV_CURSOR_HIDDEN = 0x10,    /*Or it to any value to hide the cursor temporally*/
-} lv_cursor_type_t;
+};
+typedef uint16_t lv_cursor_type_t;
 
 /*Data of text area*/
 typedef struct
@@ -72,11 +73,12 @@ typedef struct
     } cursor;
 } lv_ta_ext_t;
 
-typedef enum {
+enum {
     LV_TA_STYLE_BG,
     LV_TA_STYLE_SB,
     LV_TA_STYLE_CURSOR,
-} lv_ta_style_t;
+};
+typedef uint16_t lv_ta_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

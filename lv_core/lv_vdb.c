@@ -20,11 +20,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
+enum {
     LV_VDB_STATE_FREE = 0,		/*Not used*/
     LV_VDB_STATE_ACTIVE,		/*Being used to render*/
     LV_VDB_STATE_FLUSH,			/*Flushing pixels from it*/
-} lv_vdb_state_t;
+};
+typedef uint8_t lv_vdb_state_t;
 
 /**********************
  *  STATIC PROTOTYPES

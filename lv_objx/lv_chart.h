@@ -58,12 +58,13 @@ typedef struct
 } lv_chart_ext_t;
 
 /*Chart types*/
-typedef enum
+enum
 {
     LV_CHART_TYPE_LINE = 0x01,
     LV_CHART_TYPE_COLUMN = 0x02,
     LV_CHART_TYPE_POINT = 0x04,
-} lv_chart_type_t;
+};
+typedef uint8_t lv_chart_type_t;
 
 
 /**********************

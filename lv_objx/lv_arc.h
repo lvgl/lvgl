@@ -40,9 +40,11 @@ typedef struct {
 
 
 /*Styles*/
-typedef enum {
+enum {
     LV_ARC_STYLE_MAIN,
-} lv_arc_style_t;
+};
+typedef uint8_t lv_arc_style_t;
+
 
 
 /**********************

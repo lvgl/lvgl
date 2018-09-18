@@ -41,11 +41,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
+enum {
     LV_KB_MODE_TEXT,
     LV_KB_MODE_NUM,
-} lv_kb_mode_t;
-
+};
+typedef uint8_t lv_kb_mode_t;
 
 /*Data of keyboard*/
 typedef struct {
@@ -58,14 +58,16 @@ typedef struct {
     lv_action_t  hide_action;  /*Called when the "Hide" button is clicked*/
 } lv_kb_ext_t;
 
-typedef enum {
+enum {
     LV_KB_STYLE_BG,
     LV_KB_STYLE_BTN_REL,
     LV_KB_STYLE_BTN_PR,
     LV_KB_STYLE_BTN_TGL_REL,
     LV_KB_STYLE_BTN_TGL_PR,
     LV_KB_STYLE_BTN_INA,
-} lv_kb_style_t;
+};
+typedef uint8_t lv_kb_style_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -38,7 +38,7 @@ extern "C" {
  **********************/
 
 /*Scrollbar modes: shows when should the scrollbars be visible*/
-typedef enum
+enum
 {
     LV_SB_MODE_OFF 	= 0x0,   	/*Never show scrollbars*/
     LV_SB_MODE_ON  	= 0x1,   	/*Always show scrollbars*/
@@ -46,7 +46,8 @@ typedef enum
     LV_SB_MODE_AUTO = 0x3,   	/*Show scrollbars when the scrollable container is large enough to be scrolled*/
 	LV_SB_MODE_HIDE = 0x4,	 	/*Hide the scroll bar temporally*/
 	LV_SB_MODE_UNHIDE = 0x5,	/*Unhide the previously hidden scrollbar. Recover it's type too*/
-} lv_sb_mode_t;
+};
+typedef uint8_t lv_sb_mode_t;
 
 /*Data of page*/
 typedef struct
@@ -62,17 +63,17 @@ typedef struct
         lv_area_t ver_area;            /*Vertical scrollbar area relative to the page (Handled by the library)*/
         uint8_t hor_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
         uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
-        uint8_t mode     :3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
+        lv_sb_mode_t mode     :3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } sb;
     uint8_t arrow_scroll :1;		/*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
 } lv_page_ext_t;
 
-typedef enum {
+enum {
     LV_PAGE_STYLE_BG,
     LV_PAGE_STYLE_SCRL,
     LV_PAGE_STYLE_SB,
-} lv_page_style_t;
-
+};
+typedef uint8_t lv_page_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

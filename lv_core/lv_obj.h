@@ -65,22 +65,24 @@ extern "C" {
 
 struct _lv_obj_t;
 
-typedef enum
+enum
 {
     LV_DESIGN_DRAW_MAIN,
     LV_DESIGN_DRAW_POST,
     LV_DESIGN_COVER_CHK,
-} lv_design_mode_t;
+};
+typedef uint8_t lv_design_mode_t;
 
 typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 
-typedef enum
+enum
 {
     LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function or an operation was failed*/
     LV_RES_OK,           /*The object is valid (no deleted) after the action*/
-} lv_res_t;
+};
+typedef uint8_t lv_res_t;
 
-typedef enum
+enum
 {
     /*General signals*/
     LV_SIGNAL_CLEANUP,
@@ -105,7 +107,8 @@ typedef enum
     LV_SIGNAL_DEFOCUS,
     LV_SIGNAL_CONTROLL,
     LV_SIGNAL_GET_EDITABLE,
-} lv_signal_t;
+};
+typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
@@ -150,7 +153,7 @@ typedef struct _lv_obj_t
 typedef lv_res_t (*lv_action_t) (struct _lv_obj_t * obj);
 
 /*Protect some attributes (max. 8 bit)*/
-typedef enum
+enum
 {
     LV_PROTECT_NONE      = 0x00,
     LV_PROTECT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
@@ -159,7 +162,8 @@ typedef enum
     LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
     LV_PROTECT_PRESS_LOST= 0x10, /*If the `indev` was pressing this object but swiped out while pressing do not search other object.*/
     LV_PROTECT_CLICK_FOCUS= 0x20,/*Prevent focusing the object by clicking on it*/
-} lv_protect_t;
+};
+typedef uint16_t lv_protect_t;
 
 
 /*Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
@@ -167,7 +171,7 @@ typedef struct {
     const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
 } lv_obj_type_t;
 
-typedef enum
+enum
 {
     LV_ALIGN_CENTER = 0,
     LV_ALIGN_IN_TOP_LEFT,
@@ -190,9 +194,10 @@ typedef enum
     LV_ALIGN_OUT_RIGHT_TOP,
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
-} lv_align_t;
+};
+typedef uint8_t lv_align_t;
 
-typedef enum
+enum
 {
     LV_ANIM_NONE = 0,
     LV_ANIM_FLOAT_TOP,      /*Float from/to the top*/
@@ -201,7 +206,8 @@ typedef enum
     LV_ANIM_FLOAT_RIGHT,    /*Float from/to the right*/
     LV_ANIM_GROW_H,         /*Grow/shrink  horizontally*/
     LV_ANIM_GROW_V,         /*Grow/shrink  vertically*/
-} lv_anim_builtin_t;
+};
+typedef uint8_t lv_anim_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES

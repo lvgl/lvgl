@@ -48,12 +48,13 @@ typedef struct
 } lv_slider_ext_t;
 
 /*Built-in styles of slider*/
-typedef enum
+enum
 {
     LV_SLIDER_STYLE_BG,
     LV_SLIDER_STYLE_INDIC,
     LV_SLIDER_STYLE_KNOB,
-} lv_slider_style_t;
+};
+typedef uint8_t lv_slider_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

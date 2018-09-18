@@ -38,12 +38,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
+enum {
     LV_IMG_SRC_VARIABLE,
     LV_IMG_SRC_FILE,
     LV_IMG_SRC_SYMBOL,
     LV_IMG_SRC_UNKNOWN,
-} lv_img_src_t;
+};
+typedef uint8_t lv_img_src_t;
 
 
 /**********************

@@ -46,10 +46,11 @@ typedef struct {
 
 
 /*Styles*/
-typedef enum {
+enum {
     LV_TEMPL_STYLE_X,
     LV_TEMPL_STYLE_Y,
-} lv_templ_style_t;
+};
+typedef uint8_t lv_templ_style_t;
 
 
 /**********************

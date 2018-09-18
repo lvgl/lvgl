@@ -47,13 +47,14 @@ typedef struct {
 
 
 /*Styles*/
-typedef enum {
+enum {
     LV_IMGBTN_STYLE_REL,
     LV_IMGBTN_STYLE_PR,
     LV_IMGBTN_STYLE_TGL_REL,
     LV_IMGBTN_STYLE_TGL_PR,
     LV_IMGBTN_STYLE_INA,
-} lv_imgbtn_style_t;
+};
+typedef uint8_t lv_imgbtn_style_t;
 
 
 /**********************

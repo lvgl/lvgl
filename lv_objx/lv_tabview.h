@@ -65,7 +65,7 @@ typedef struct
     lv_tabview_action_t tab_load_action;
 } lv_tabview_ext_t;
 
-typedef enum {
+enum {
     LV_TABVIEW_STYLE_BG,
     LV_TABVIEW_STYLE_INDIC,
     LV_TABVIEW_STYLE_BTN_BG,
@@ -73,12 +73,14 @@ typedef enum {
     LV_TABVIEW_STYLE_BTN_PR,
     LV_TABVIEW_STYLE_BTN_TGL_REL,
     LV_TABVIEW_STYLE_BTN_TGL_PR,
-} lv_tabview_style_t;
+};
+typedef uint8_t lv_tabview_style_t;
 
-typedef enum {
+enum {
     LV_TABVIEW_BTNS_POS_TOP,
     LV_TABVIEW_BTNS_POS_BOTTOM,
-} lv_tabview_btns_pos_t;
+};
+typedef uint8_t lv_tabview_btns_pos_t;
 
 /**********************
  * GLOBAL PROTOTYPES

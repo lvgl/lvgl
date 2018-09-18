@@ -60,7 +60,7 @@ typedef struct {
 } lv_calendar_ext_t;
 
 /*Styles*/
-typedef enum {
+enum {
     LV_CALENDAR_STYLE_BG,       /*Also the style of the "normal" date numbers*/
     LV_CALENDAR_STYLE_HEADER,
     LV_CALENDAR_STYLE_HEADER_PR,
@@ -69,7 +69,9 @@ typedef enum {
     LV_CALENDAR_STYLE_INACTIVE_DAYS,
     LV_CALENDAR_STYLE_WEEK_BOX,
     LV_CALENDAR_STYLE_TODAY_BOX,
-} lv_calendar_style_t;
+};
+typedef uint8_t lv_calendar_style_t;
+
 
 
 /**********************

@@ -40,7 +40,7 @@ typedef struct {
 }lv_img_header_t;
 
 /*Image color format*/
-typedef enum {
+enum {
     LV_IMG_CF_UNKOWN = 0,
 
 	LV_IMG_CF_RAW,          		/*Contains the file as it is. Needs custom decoder function*/
@@ -60,7 +60,8 @@ typedef enum {
 	LV_IMG_CF_ALPHA_2BIT, 			/*Can have one color but 4 different alpha value*/
 	LV_IMG_CF_ALPHA_4BIT, 			/*Can have one color but 16 different alpha value*/
 	LV_IMG_CF_ALPHA_8BIT, 			/*Can have one color but 256 different alpha value*/
-} lv_img_cf_t;
+};
+typedef uint8_t lv_img_cf_t;
 
 /* Image header it is compatible with
  * the result image converter utility*/

@@ -17,11 +17,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
+enum {
     CMD_STATE_WAIT,
     CMD_STATE_PAR,
     CMD_STATE_IN,
-} cmd_state_t;
+};
+typedef uint8_t cmd_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
