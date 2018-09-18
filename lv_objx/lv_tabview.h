@@ -45,6 +45,13 @@ extern "C" {
 /* parametes: pointer to a tabview object, tab_id*/
 typedef void (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
 
+
+enum {
+    LV_TABVIEW_BTNS_POS_TOP,
+    LV_TABVIEW_BTNS_POS_BOTTOM,
+};
+typedef uint8_t lv_tabview_btns_pos_t;
+
 /*Data of tab*/
 typedef struct
 {
@@ -61,7 +68,7 @@ typedef struct
     uint8_t slide_enable :1;    /*1: enable horizontal sliding by touch pad*/
     uint8_t draging :1;
     uint8_t drag_hor :1;
-    uint8_t btns_pos : 1;
+    lv_tabview_btns_pos_t btns_pos :1;
     lv_tabview_action_t tab_load_action;
 } lv_tabview_ext_t;
 
@@ -75,12 +82,6 @@ enum {
     LV_TABVIEW_STYLE_BTN_TGL_PR,
 };
 typedef uint8_t lv_tabview_style_t;
-
-enum {
-    LV_TABVIEW_BTNS_POS_TOP,
-    LV_TABVIEW_BTNS_POS_BOTTOM,
-};
-typedef uint8_t lv_tabview_btns_pos_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -63,7 +63,7 @@ typedef struct
         lv_area_t ver_area;            /*Vertical scrollbar area relative to the page (Handled by the library)*/
         uint8_t hor_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
         uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
-        lv_sb_mode_t mode     :3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
+        lv_sb_mode_t mode:3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } sb;
     uint8_t arrow_scroll :1;		/*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
 } lv_page_ext_t;

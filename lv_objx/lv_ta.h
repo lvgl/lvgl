@@ -51,7 +51,7 @@ enum {
     LV_CURSOR_UNDERLINE,
     LV_CURSOR_HIDDEN = 0x10,    /*Or it to any value to hide the cursor temporally*/
 };
-typedef uint16_t lv_cursor_type_t;
+typedef uint8_t lv_cursor_type_t;
 
 /*Data of text area*/
 typedef struct
@@ -68,7 +68,7 @@ typedef struct
         lv_style_t *style;      /*Style of the cursor (NULL to use label's style)*/
         lv_coord_t valid_x;         /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
         uint16_t pos;           /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
-        lv_cursor_type_t type;  /*Shape of the cursor*/
+        lv_cursor_type_t type:2;  /*Shape of the cursor*/
         uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/
     } cursor;
 } lv_ta_ext_t;
@@ -78,7 +78,7 @@ enum {
     LV_TA_STYLE_SB,
     LV_TA_STYLE_CURSOR,
 };
-typedef uint16_t lv_ta_style_t;
+typedef uint8_t lv_ta_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

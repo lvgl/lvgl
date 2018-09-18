@@ -163,7 +163,7 @@ enum
     LV_PROTECT_PRESS_LOST= 0x10, /*If the `indev` was pressing this object but swiped out while pressing do not search other object.*/
     LV_PROTECT_CLICK_FOCUS= 0x20,/*Prevent focusing the object by clicking on it*/
 };
-typedef uint16_t lv_protect_t;
+typedef uint8_t lv_protect_t;
 
 
 /*Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
