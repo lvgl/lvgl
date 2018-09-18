@@ -1,6 +1,6 @@
 /**
  * @file lv_img.h
- * 
+ *
  */
 
 #ifndef LV_IMG_H
@@ -13,12 +13,17 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_IMG != 0
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_misc/lv_fs.h"
-#include "../lv_misc/lv_fonts/lv_symbol_def.h"
+#include "../lv_misc/lv_symbol_def.h"
 #include "lv_label.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -40,9 +45,8 @@ typedef struct
     lv_coord_t h;               /*Height of the image (Handled by the library)*/
     uint8_t src_type  :2;       /*See: lv_img_src_t*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
-    uint8_t chroma_keyed :1;    /*1: Chroma keyed image, LV_COLOR_TRANSP (lv_conf.h) pixels will be transparent (Handled by the library)*/
-    uint8_t alpha_byte   :1;    /*1: Extra byte for every pixel to define opacity*/
-}lv_img_ext_t;
+    uint8_t cf :5;    			/*Color format from `lv_img_color_format_t`*/
+} lv_img_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -54,7 +58,7 @@ typedef struct
  * @param copy pointer to a image object, if not NULL then the new object will be copied from it
  * @return pointer to the created image
  */
-lv_obj_t * lv_img_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -111,36 +115,32 @@ static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
  *====================*/
 
 /**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
- *  - a path to an file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
+ * Get the source of the image
+ * @param img pointer to an image object
+ * @return the image source (symbol, file name or C array)
  */
-lv_img_src_t lv_img_get_src_type(const void * src);
-
+const void * lv_img_get_src(lv_obj_t * img);
 
 /**
  * Get the name of the file set for an image
  * @param img pointer to an image
  * @return file name
  */
-const char * lv_img_get_file_name(lv_obj_t * img);
+const char * lv_img_get_file_name(const lv_obj_t * img);
 
 /**
  * Get the auto size enable attribute
  * @param img pointer to an image
  * @return true: auto size is enabled, false: auto size is disabled
  */
-bool lv_img_get_auto_size(lv_obj_t * img);
+bool lv_img_get_auto_size(const lv_obj_t * img);
 
 /**
  * Get the style of an image object
  * @param img pointer to an image object
  * @return pointer to the image's style
  */
-static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
+static inline lv_style_t* lv_img_get_style(const lv_obj_t *img)
 {
     return lv_obj_get_style(img);
 }
@@ -150,7 +150,7 @@ static inline lv_style_t* lv_img_get_style(lv_obj_t *img)
  * @param img -
  * @return false
  */
-static inline bool lv_img_get_upscale(lv_obj_t * img)
+static inline bool lv_img_get_upscale(const lv_obj_t * img)
 {
     return false;
 }
@@ -160,7 +160,7 @@ static inline bool lv_img_get_upscale(lv_obj_t * img)
  **********************/
 
 /*Use this macro to declare an image in a c file*/
-#define LV_IMG_DECLARE(var_name) extern const lv_img_t var_name;
+#define LV_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 
 #endif  /*USE_LV_IMG*/
 

@@ -39,6 +39,7 @@ static lv_style_t dark_frame;
 static uint16_t _hue;
 static lv_font_t * _font;
 
+
 /**********************
  *      MACROS
  **********************/
@@ -243,9 +244,20 @@ static void gauge_init(void)
 static void chart_init(void)
 {
 #if USE_LV_CHART
-
-
     theme.chart = &light_frame;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR
+    static lv_style_t box;
+    lv_style_copy(&box, &light_plain);
+    box.body.padding.ver = LV_DPI / 20;
+
+    /*Can't handle highlighted dates in this theme*/
+    theme.calendar.week_box = &box;
+    theme.calendar.today_box = &box;
 #endif
 }
 
@@ -345,9 +357,11 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if USE_LV_DDLIST != 0
+    static lv_style_t bg;
+    lv_style_copy(&bg, &light_frame);
+    bg.text.line_space = LV_DPI / 12;
 
-
-    theme.ddlist.bg = &light_frame;
+    theme.ddlist.bg = &bg;
     theme.ddlist.sel = &dark_plain;
     theme.ddlist.sb = &dark_frame;
 #endif
@@ -356,9 +370,11 @@ static void ddlist_init(void)
 static void roller_init(void)
 {
 #if USE_LV_ROLLER != 0
+    static lv_style_t bg;
+    lv_style_copy(&bg, &light_frame);
+    bg.text.line_space = LV_DPI / 12;
 
-
-    theme.roller.bg = &light_frame;
+    theme.roller.bg = &bg;
     theme.roller.sel = &dark_frame;
 #endif
 }
@@ -409,7 +425,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t *font)
+lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
@@ -418,8 +434,8 @@ lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t *font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t **style_p = (lv_style_t**) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t*); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme;
+    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
         *style_p = &def;
         style_p++;
     }
@@ -437,6 +453,7 @@ lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t *font)
     lmeter_init();
     gauge_init();
     chart_init();
+    calendar_init();
     cb_init();
     btnm_init();
     kb_init();

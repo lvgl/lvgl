@@ -15,7 +15,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
 
 #if USE_LV_FILESYSTEM
 
@@ -39,9 +43,9 @@ typedef struct
     uint32_t size;  /*Data length in bytes*/
     uint16_t oc;    /*Open Count*/
     uint8_t const_data :1;
-}lv_ufs_ent_t;
+} lv_ufs_ent_t;
 
-/*File descriptor, used to handle opening an entry more times simultaneously 
+/*File descriptor, used to handle opening an entry more times simultaneously
  Contains unique informations about the specific opening*/
 typedef struct
 {
@@ -49,14 +53,14 @@ typedef struct
     uint32_t rwp;   /*Read Write Pointer*/
     uint8_t ar :1;  /*1: Access for read is enabled */
     uint8_t aw :1;  /*1: Access for write is enabled */
-}lv_ufs_file_t;
+} lv_ufs_file_t;
 
 /* Read directory descriptor.
  * It is used to to iterate through the entries in a directory*/
 typedef struct
 {
     lv_ufs_ent_t * last_ent;
-}lv_ufs_dir_t;
+} lv_ufs_dir_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -1,6 +1,6 @@
 /**
  * @file lv_font.h
- * 
+ *
  */
 
 #ifndef LV_FONT_H
@@ -14,12 +14,17 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
-#include "lv_fonts/lv_symbol_def.h"
+#include "lv_symbol_def.h"
 
 /*********************
  *      DEFINES
@@ -33,13 +38,13 @@ typedef struct
 {
     uint32_t w_px         :8;
     uint32_t glyph_index  :24;
-}lv_font_glyph_dsc_t;
+} lv_font_glyph_dsc_t;
 
 typedef struct
 {
     uint32_t unicode         :21;
     uint32_t glyph_dsc_index :11;
-}lv_font_unicode_map_t;
+} lv_font_unicode_map_t;
 
 typedef struct _lv_font_struct
 {
@@ -49,18 +54,19 @@ typedef struct _lv_font_struct
     const uint8_t * glyph_bitmap;
     const lv_font_glyph_dsc_t * glyph_dsc;
     const uint32_t * unicode_list;
-    const uint8_t * (*get_bitmap)(const struct _lv_font_struct * ,uint32_t);    /*Get a glyph's  bitmap from a font*/
-    int16_t (*get_width)(const struct _lv_font_struct * ,uint32_t);       /*Get a glyph's with with a given font*/
+    const uint8_t * (*get_bitmap)(const struct _lv_font_struct *,uint32_t);     /*Get a glyph's  bitmap from a font*/
+    int16_t (*get_width)(const struct _lv_font_struct *,uint32_t);        /*Get a glyph's with with a given font*/
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
-    uint32_t bpp   :4;                     /*Bit per pixel: 1, 2 or 4*/
-}lv_font_t;
+    uint32_t bpp   		:4;                /*Bit per pixel: 1, 2 or 4*/
+    uint32_t monospace	:8;				   /*Fix width (0: normal width)*/
+} lv_font_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
- * Initialize the built-in fonts
+ * Initialize the fonts
  */
 void lv_font_init(void);
 
@@ -72,12 +78,37 @@ void lv_font_init(void);
 void lv_font_add(lv_font_t *child, lv_font_t *parent);
 
 /**
+ * Tells if font which contains `letter` is monospace or not
+ * @param font_p point to font
+ * @param letter an UNICODE character code
+ * @return true: the letter is monospace; false not monospace
+ */
+bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter);
+
+/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
- * @param letter a letter
+ * @param letter an UNICODE character code
  * @return  pointer to the bitmap of the letter
  */
 const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter);
+
+/**
+ * Get the width of a letter in a font. If `monospace` is set then return with it.
+ * @param font_p pointer to a font
+ * @param letter an UNICODE character code
+ * @return the width of a letter
+ */
+uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
+
+
+/**
+ * Get the width of the letter without overwriting it with the `monospace` attribute
+ * @param font_p pointer to a font
+ * @param letter an UNICODE character code
+ * @return the width of a letter
+ */
+uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the height of a font
@@ -88,14 +119,6 @@ static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
 {
     return font_p->h_px;
 }
-
-/**
- * Get the width of a letter in a font
- * @param font_p pointer to a font
- * @param letter a letter
- * @return the width of a letter
- */
-uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the bit-per-pixel of font
@@ -139,78 +162,18 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
 /**********************
  *      MACROS
  **********************/
+
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
-/******************************
- *  FONT DECLARATION INCLUDES
- *****************************/
 
-/*10 px */
-#if USE_LV_FONT_DEJAVU_10
-LV_FONT_DECLARE(lv_font_dejavu_10);
-#endif
+/**********************
+ * ADD BUILT IN FONTS
+ **********************/
+#include "../lv_fonts/lv_font_builtin.h"
 
-#if USE_LV_FONT_DEJAVU_10_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_10_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_10_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_10_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_10
-LV_FONT_DECLARE(lv_font_symbol_10);
-#endif
-
-/*20 px */
-#if USE_LV_FONT_DEJAVU_20
-LV_FONT_DECLARE(lv_font_dejavu_20);
-#endif
-
-#if USE_LV_FONT_DEJAVU_20_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_20_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_20_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_20_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_20
-LV_FONT_DECLARE(lv_font_symbol_20);
-#endif
-
-/*30 px */
-#if USE_LV_FONT_DEJAVU_30
-LV_FONT_DECLARE(lv_font_dejavu_30);
-#endif
-
-#if USE_LV_FONT_DEJAVU_30_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_30_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_30_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_30_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_30
-LV_FONT_DECLARE(lv_font_symbol_30);
-#endif
-
-/*40 px */
-#if USE_LV_FONT_DEJAVU_40
-LV_FONT_DECLARE(lv_font_dejavu_40);
-#endif
-
-#if USE_LV_FONT_DEJAVU_40_LATIN_SUP
-LV_FONT_DECLARE(lv_font_dejavu_40_latin_sup);
-#endif
-
-#if USE_LV_FONT_DEJAVU_40_CYRILLIC
-LV_FONT_DECLARE(lv_font_dejavu_40_cyrillic);
-#endif
-
-#if USE_LV_FONT_SYMBOL_40
-LV_FONT_DECLARE(lv_font_symbol_40);
+/*Declare the custom (user defined) fonts*/
+#ifdef LV_FONT_CUSTOM_DECLARE
+LV_FONT_CUSTOM_DECLARE
 #endif
 
 #ifdef __cplusplus

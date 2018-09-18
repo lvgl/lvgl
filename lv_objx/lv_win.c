@@ -1,15 +1,14 @@
 /**
  * @file lv_win.c
- * 
+ *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_win.h"
 #if USE_LV_WIN != 0
 
-#include "lv_win.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
@@ -45,23 +44,29 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a window object, if not NULL then the new object will be copied from it
  * @return pointer to the created window
  */
-lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 {
+	LV_LOG_TRACE("window create started");
+
     /*Create the ancestor object*/
     lv_obj_t * new_win = lv_obj_create(par, copy);
     lv_mem_assert(new_win);
+    if(new_win == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_win);
-    
+
     /*Allocate the object type specific extended data*/
     lv_win_ext_t * ext = lv_obj_allocate_ext_attr(new_win, sizeof(lv_win_ext_t));
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->page = NULL;
     ext->header = NULL;
     ext->title = NULL;
     ext->style_header = &lv_style_plain_color;
     ext->style_btn_rel = &lv_style_btn_rel;
     ext->style_btn_pr = &lv_style_btn_pr;
-    ext->btn_size = ( LV_DPI) / 2;
+    ext->btn_size = (LV_DPI) / 2;
 
     /*Init the new window object*/
     if(copy == NULL) {
@@ -72,19 +77,20 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
         lv_page_set_sb_mode(ext->page, LV_SB_MODE_AUTO);
+        lv_page_set_arrow_scroll(ext->page, true);
 
-    	/*Create a holder for the header*/
-    	ext->header = lv_obj_create(new_win, NULL);
-    	/*Move back the header because it is automatically moved to the scrollable */
-    	lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
-    	lv_obj_set_parent(ext->header, new_win);
+        /*Create a holder for the header*/
+        ext->header = lv_obj_create(new_win, NULL);
+        /*Move back the header because it is automatically moved to the scrollable */
+        lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
+        lv_obj_set_parent(ext->header, new_win);
 
-    	/*Create a title on the header*/
-    	ext->title = lv_label_create(ext->header, NULL);
-    	lv_label_set_text(ext->title,"My title");
+        /*Create a title on the header*/
+        ext->title = lv_label_create(ext->header, NULL);
+        lv_label_set_text(ext->title, "My title");
 
-    	/*Set the default styles*/
-        lv_theme_t *th = lv_theme_get_current();
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->win.bg);
             lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->win.sb);
@@ -93,50 +99,58 @@ lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->win.content.scrl);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->win.btn.rel);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->win.btn.pr);
-
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_plain);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
-
         }
-
 
         lv_obj_set_signal_func(new_win, lv_win_signal);
         lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
     }
     /*Copy an existing object*/
     else {
-    	lv_win_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-    	/*Create the objects*/
-    	ext->header = lv_obj_create(new_win, copy_ext->header);
-    	ext->title = lv_label_create(ext->header, copy_ext->title);
+        lv_win_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        /*Create the objects*/
+        ext->header = lv_obj_create(new_win, copy_ext->header);
+        ext->title = lv_label_create(ext->header, copy_ext->title);
         ext->page = lv_page_create(new_win, copy_ext->page);
         ext->btn_size = copy_ext->btn_size;
 
-    	/*Copy the control buttons*/
-    	lv_obj_t * child;
-    	lv_obj_t * cbtn;
-    	child = lv_obj_get_child_back(copy_ext->header, NULL);
+        /*Copy the control buttons*/
+        lv_obj_t * child;
+        lv_obj_t * cbtn;
+        child = lv_obj_get_child_back(copy_ext->header, NULL);
         child = lv_obj_get_child_back(copy_ext->header, child); /*Sip the title*/
-    	while(child != NULL) {
-    		cbtn = lv_btn_create(ext->header, child);
-    		lv_img_create(cbtn, lv_obj_get_child(child, NULL));
-    		child = lv_obj_get_child_back(copy_ext->header, child);
-    	}
+        while(child != NULL) {
+            cbtn = lv_btn_create(ext->header, child);
+            lv_img_create(cbtn, lv_obj_get_child(child, NULL));
+            child = lv_obj_get_child_back(copy_ext->header, child);
+        }
 
         lv_obj_set_signal_func(new_win, lv_win_signal);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_win);
     }
-    
+
     lv_win_realign(new_win);
+
+	LV_LOG_INFO("window created");
 
     return new_win;
 }
 
+/**
+ * Delete all children of the scrl object, without deleting scrl child.
+ * @param obj pointer to an object
+ */
+void lv_win_clean(lv_obj_t * obj)
+{
+    lv_obj_t * scrl = lv_page_get_scrl(obj);
+    lv_obj_clean(scrl);
+}
 
 /*======================
  * Add/remove functions
@@ -153,7 +167,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    lv_obj_t *btn = lv_btn_create(ext->header, NULL);
+    lv_obj_t * btn = lv_btn_create(ext->header, NULL);
     lv_btn_set_style(btn, LV_BTN_STYLE_REL, ext->style_btn_rel);
     lv_btn_set_style(btn, LV_BTN_STYLE_PR, ext->style_btn_pr);
     lv_obj_set_size(btn, ext->btn_size, ext->btn_size);
@@ -179,11 +193,11 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_
  */
 lv_res_t lv_win_close_action(lv_obj_t * btn)
 {
-	lv_obj_t * win = lv_win_get_from_btn(btn);
+    lv_obj_t * win = lv_win_get_from_btn(btn);
 
-	lv_obj_del(win);
+    lv_obj_del(win);
 
-	return LV_RES_INV;
+    return LV_RES_INV;
 }
 
 /**
@@ -193,10 +207,10 @@ lv_res_t lv_win_close_action(lv_obj_t * btn)
  */
 void lv_win_set_title(lv_obj_t * win, const char * title)
 {
-	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-	lv_label_set_text(ext->title, title);
-	lv_win_realign(win);
+    lv_label_set_text(ext->title, title);
+    lv_win_realign(win);
 }
 
 /**
@@ -242,11 +256,11 @@ void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style)
+void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, lv_style_t * style)
 {
-    lv_win_ext_t *ext = lv_obj_get_ext_attr(win);
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    switch (type) {
+    switch(type) {
         case LV_WIN_STYLE_BG:
             lv_obj_set_style(win, style);
             lv_win_realign(win);
@@ -274,7 +288,7 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style)
 
     /*Refresh the existing buttons*/
     if(type == LV_WIN_STYLE_BTN_REL || type == LV_WIN_STYLE_BTN_PR) {
-        lv_obj_t *btn;
+        lv_obj_t * btn;
         btn = lv_obj_get_child_back(ext->header, NULL);
         btn = lv_obj_get_child_back(ext->header, btn);    /*Skip the title*/
         while(btn != NULL) {
@@ -283,7 +297,6 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style)
             btn = lv_obj_get_child_back(ext->header, btn);
         }
     }
-
 }
 
 
@@ -296,10 +309,21 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style)
  * @param win pointer to a window object
  * @return title string of the window
  */
-const char * lv_win_get_title(lv_obj_t * win)
+const char * lv_win_get_title(const lv_obj_t * win)
 {
-	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-	return lv_label_get_text(ext->title);
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    return lv_label_get_text(ext->title);
+}
+
+/**
+* Get the content holder object of window (`lv_page`) to allow additional customization
+* @param win pointer to a window object
+* @return the Page object where the window's content is
+*/
+lv_obj_t * lv_win_get_content(const lv_obj_t * win)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    return ext->page;
 }
 
 /**
@@ -307,10 +331,24 @@ const char * lv_win_get_title(lv_obj_t * win)
  * @param win pointer to a window object
  * @return control button size
  */
-lv_coord_t lv_win_get_btn_size(lv_obj_t * win)
+lv_coord_t lv_win_get_btn_size(const lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return ext->btn_size;
+}
+
+/**
+ * Get the pointer of a widow from one of  its control button.
+ * It is useful in the action of the control buttons where only button is known.
+ * @param ctrl_btn pointer to a control button of a window
+ * @return pointer to the window of 'ctrl_btn'
+ */
+lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn)
+{
+    lv_obj_t * header = lv_obj_get_parent(ctrl_btn);
+    lv_obj_t * win = lv_obj_get_parent(header);
+
+    return win;
 }
 
 /**
@@ -350,38 +388,32 @@ lv_coord_t lv_win_get_width(lv_obj_t * win)
 }
 
 /**
- * Get the pointer of a widow from one of  its control button.
- * It is useful in the action of the control buttons where only button is known.
- * @param ctrl_btn pointer to a control button of a window
- * @return pointer to the window of 'ctrl_btn'
- */
-lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn)
-{
-	lv_obj_t * header = lv_obj_get_parent(ctrl_btn);
-	lv_obj_t * win = lv_obj_get_parent(header);
-
-	return win;
-}
-
-/**
  * Get a style of a window
  * @param win pointer to a button object
  * @param type which style window be get
  * @return style pointer to a style
  */
-lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type)
+lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
 {
-    lv_win_ext_t *ext = lv_obj_get_ext_attr(win);
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    switch (type) {
-        case LV_WIN_STYLE_BG:           return lv_obj_get_style(win);
-        case LV_WIN_STYLE_CONTENT_BG:   return lv_page_get_style(ext->page, LV_PAGE_STYLE_BG);
-        case LV_WIN_STYLE_CONTENT_SCRL: return lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL);
-        case LV_WIN_STYLE_SB:           return lv_page_get_style(ext->page, LV_PAGE_STYLE_SB);
-        case LV_WIN_STYLE_HEADER:       return lv_obj_get_style(ext->header);
-        case LV_WIN_STYLE_BTN_REL:      return ext->style_btn_rel;
-        case LV_WIN_STYLE_BTN_PR:       return ext->style_btn_pr;
-        default: return NULL;
+    switch(type) {
+        case LV_WIN_STYLE_BG:
+            return lv_obj_get_style(win);
+        case LV_WIN_STYLE_CONTENT_BG:
+            return lv_page_get_style(ext->page, LV_PAGE_STYLE_BG);
+        case LV_WIN_STYLE_CONTENT_SCRL:
+            return lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL);
+        case LV_WIN_STYLE_SB:
+            return lv_page_get_style(ext->page, LV_PAGE_STYLE_SB);
+        case LV_WIN_STYLE_HEADER:
+            return lv_obj_get_style(ext->header);
+        case LV_WIN_STYLE_BTN_REL:
+            return ext->style_btn_rel;
+        case LV_WIN_STYLE_BTN_PR:
+            return ext->style_btn_pr;
+        default:
+            return NULL;
     }
 
     /*To avoid warning*/
@@ -400,7 +432,7 @@ lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type)
  */
 void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time)
 {
-    lv_win_ext_t *ext = lv_obj_get_ext_attr(win);
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_focus(ext->page, obj, anim_time);
 }
 
@@ -439,21 +471,22 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
                 }
             }
         }
-    }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
+    } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_win_realign(win);
-    }
-    else if(sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*If the size is changed refresh the window*/
         if(lv_area_get_width(param) != lv_obj_get_width(win) ||
-           lv_area_get_height(param) != lv_obj_get_height(win)) {
+                lv_area_get_height(param) != lv_obj_get_height(win)) {
             lv_win_realign(win);
         }
-    }
-    else if(sign == LV_SIGNAL_CLEANUP) {
+    } else if(sign == LV_SIGNAL_CLEANUP) {
         ext->header = NULL;     /*These objects were children so they are already invalid*/
         ext->page = NULL;
         ext->title = NULL;
+    }
+    else if(sign == LV_SIGNAL_CONTROLL) {
+    	/*Forward all the control signals to the page*/
+    	ext->page->signal_func(ext->page, sign, param);
     }
     else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
@@ -478,12 +511,12 @@ static void lv_win_realign(lv_obj_t * win)
 
     if(ext->page == NULL || ext->header == NULL || ext->title == NULL) return;
 
-    lv_style_t *header_style = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
+    lv_style_t * header_style = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
     lv_obj_set_size(ext->header, lv_obj_get_width(win), ext->btn_size + 2 * header_style->body.padding.ver);
 
     bool first_btn = true;
-    lv_obj_t *btn;
-    lv_obj_t *btn_prev = NULL;
+    lv_obj_t * btn;
+    lv_obj_t * btn_prev = NULL;
     /*Refresh the size of all control buttons*/
     btn = lv_obj_get_child_back(ext->header, NULL);
     btn = lv_obj_get_child_back(ext->header, btn);    /*Skip the title*/
@@ -504,8 +537,8 @@ static void lv_win_realign(lv_obj_t * win)
 
     lv_obj_set_pos(ext->header, 0, 0);
 
-    lv_obj_set_size( ext->page, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
-    lv_obj_align( ext->page, ext->header, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    lv_obj_set_size(ext->page, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
+    lv_obj_align(ext->page, ext->header, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 }
 
 #endif

@@ -19,6 +19,7 @@ extern "C" {
 #include <stdbool.h>
 #include "lv_hal.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_area.h"
 
 /*********************
  *      DEFINES
@@ -41,6 +42,7 @@ typedef struct _disp_drv_t {
     /*Write pixel map (e.g. image) to the display*/
     void (*disp_map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
 
+    /*Optional interface functions to use GPU*/
 #if USE_LV_GPU
     /*Blend two memories using opacity (GPU only)*/
     void (*mem_blend)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
@@ -49,6 +51,10 @@ typedef struct _disp_drv_t {
     void (*mem_fill)(lv_color_t * dest, uint32_t length, lv_color_t color);
 #endif
 
+#if LV_VDB_SIZE
+    /*Optional: Set a pixel in a buffer according to the requirements of the display*/
+    void (*vdb_wr)(uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
+#endif
 } lv_disp_drv_t;
 
 typedef struct _disp_t {

@@ -1,12 +1,15 @@
+CSRCS += lv_arc.c
 CSRCS += lv_bar.c
 CSRCS += lv_cb.c
 CSRCS += lv_ddlist.c
 CSRCS += lv_kb.c
 CSRCS += lv_line.c
 CSRCS += lv_mbox.c
+CSRCS += lv_preload.c
 CSRCS += lv_roller.c
 CSRCS += lv_tabview.c
 CSRCS += lv_btn.c
+CSRCS += lv_calendar.c
 CSRCS += lv_chart.c
 CSRCS += lv_gauge.c
 CSRCS += lv_label.c

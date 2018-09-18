@@ -1,15 +1,14 @@
 /**
  * @file lv_rect.c
- * 
+ *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
+#include "lv_label.h"
 #if USE_LV_LABEL != 0
 
-#include "lv_label.h"
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
@@ -38,7 +37,7 @@
 static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_mode_t mode);
 static void lv_label_refr_text(lv_obj_t * label);
-static void lv_label_revert_dots(lv_obj_t *label);
+static void lv_label_revert_dots(lv_obj_t * label);
 
 #if USE_LV_ANIMATION
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
@@ -63,22 +62,27 @@ static lv_signal_func_t ancestor_signal;
  * @param copy pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
  */
-lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
+lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 {
+	LV_LOG_TRACE("label create started");
+
     /*Create a basic object*/
     lv_obj_t * new_label = lv_obj_create(par, copy);
     lv_mem_assert(new_label);
+    if(new_label == NULL) return NULL;
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_label);
-    
+
     /*Extend the basic object to a label object*/
     lv_obj_allocate_ext_attr(new_label, sizeof(lv_label_ext_t));
-    
+
     lv_label_ext_t * ext = lv_obj_get_ext_attr(new_label);
     lv_mem_assert(ext);
+    if(ext == NULL) return NULL;
+
     ext->text = NULL;
     ext->static_txt = 0;
     ext->recolor = 0;
-    ext->no_break = 0;
     ext->body_draw = 0;
     ext->align = LV_LABEL_ALIGN_LEFT;
     ext->dot_end = LV_LABEL_DOT_END_INV;
@@ -86,14 +90,14 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
     ext->anim_speed = LV_LABEL_SCROLL_SPEED;
     ext->offset.x = 0;
     ext->offset.y = 0;
-	lv_obj_set_design_func(new_label, lv_label_design);
-	lv_obj_set_signal_func(new_label, lv_label_signal);
+    lv_obj_set_design_func(new_label, lv_label_design);
+    lv_obj_set_signal_func(new_label, lv_label_signal);
 
     /*Init the new label*/
     if(copy == NULL) {
-		lv_obj_set_click(new_label, false);
-		lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
-		lv_label_set_text(new_label, "Text");
+        lv_obj_set_click(new_label, false);
+        lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
+        lv_label_set_text(new_label, "Text");
         lv_label_set_style(new_label, NULL);        /*Inherit parent's style*/
     }
     /*Copy 'copy' if not NULL*/
@@ -109,6 +113,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
         /*In DOT mode save the text byte-to-byte because a '\0' can be in the middle*/
         if(copy_ext->long_mode == LV_LABEL_LONG_DOT) {
             ext->text = lv_mem_realloc(ext->text, lv_mem_get_size(copy_ext->text));
+            lv_mem_assert(ext->text);
+            if(ext->text == NULL) return NULL;
             memcpy(ext->text, copy_ext->text, lv_mem_get_size(copy_ext->text));
         }
 
@@ -118,11 +124,15 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_label);
     }
+
+
+	LV_LOG_INFO("label created");
+
     return new_label;
 }
 
 /*=====================
- * Setter functions 
+ * Setter functions
  *====================*/
 
 /**
@@ -133,7 +143,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy)
 void lv_label_set_text(lv_obj_t * label, const char * text)
 {
     lv_obj_invalidate(label);
-    
+
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     /*If text is NULL then refresh */
@@ -145,6 +155,8 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     if(ext->text == text) {
         /*If set its own text then reallocate it (maybe its size changed)*/
         ext->text = lv_mem_realloc(ext->text, strlen(ext->text) + 1);
+        lv_mem_assert(ext->text);
+        if(ext->text == NULL) return;
     } else {
         /*Allocate space for the new text*/
         uint32_t len = strlen(text) + 1;
@@ -154,6 +166,9 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         }
 
         ext->text = lv_mem_alloc(len);
+        lv_mem_assert(ext->text);
+        if(ext->text == NULL) return;
+
         strcpy(ext->text, text);
         ext->static_txt = 0;    /*Now the text is dynamically allocated*/
     }
@@ -185,6 +200,9 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
         ext->text = NULL;
     }
     ext->text = lv_mem_alloc(size + 1);
+    lv_mem_assert(ext->text);
+    if(ext->text == NULL) return;
+
     memcpy(ext->text, array, size);
     ext->text[size] = '\0';
     ext->static_txt = 0;    /*Now the text is dynamically allocated*/
@@ -218,6 +236,7 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text)
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
+ *                  In LV_LONG_BREAK/LONG/ROLL the size of the label should be set AFTER this function
  */
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
@@ -250,9 +269,9 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
  * @param label pointer to a label object
  * @param align 'LV_LABEL_ALIGN_LEFT' or 'LV_LABEL_ALIGN_LEFT'
  */
-void lv_label_set_align(lv_obj_t *label, lv_label_align_t align)
+void lv_label_set_align(lv_obj_t * label, lv_label_align_t align)
 {
-    lv_label_ext_t *ext = lv_obj_get_ext_attr(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->align == align) return;
 
     ext->align = align;
@@ -277,26 +296,11 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
 }
 
 /**
- * Set the label to ignore (or accept) line breaks on '\n'
- * @param label pointer to a label object
- * @param no_break_en true: ignore line breaks, false: make line breaks on '\n'
- */
-void lv_label_set_no_break(lv_obj_t * label, bool no_break_en)
-{
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(ext->no_break == no_break_en) return;
-
-    ext->no_break = no_break_en == false ? 0 : 1;
-
-    lv_label_refr_text(label);
-}
-
-/**
  * Set the label to draw (or not draw) background specified in its style's body
  * @param label pointer to a label object
  * @param body_en true: draw body; false: don't draw body
  */
-void lv_label_set_body_draw(lv_obj_t *label, bool body_en)
+void lv_label_set_body_draw(lv_obj_t * label, bool body_en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->body_draw == body_en) return;
@@ -313,9 +317,9 @@ void lv_label_set_body_draw(lv_obj_t *label, bool body_en)
  * @param label pointer to a label object
  * @param anim_speed speed of animation in px/sec unit
  */
-void lv_label_set_anim_speed(lv_obj_t *label, uint16_t anim_speed)
+void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
 {
-    lv_label_ext_t *ext = lv_obj_get_ext_attr(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->anim_speed == anim_speed) return;
 
     ext->anim_speed = anim_speed;
@@ -326,7 +330,7 @@ void lv_label_set_anim_speed(lv_obj_t *label, uint16_t anim_speed)
 }
 
 /*=====================
- * Getter functions 
+ * Getter functions
  *====================*/
 
 /**
@@ -334,10 +338,10 @@ void lv_label_set_anim_speed(lv_obj_t *label, uint16_t anim_speed)
  * @param label pointer to a label object
  * @return the text of the label
  */
-char * lv_label_get_text(lv_obj_t * label)
+char * lv_label_get_text(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    
+
     return ext->text;
 }
 
@@ -346,7 +350,7 @@ char * lv_label_get_text(lv_obj_t * label)
  * @param label pointer to a label object
  * @return the long mode
  */
-lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label)
+lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->long_mode;
@@ -357,7 +361,7 @@ lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label)
  * @param label pointer to a label object
  * @return LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER
  */
-lv_label_align_t lv_label_get_align(lv_obj_t * label)
+lv_label_align_t lv_label_get_align(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->align;
@@ -368,21 +372,10 @@ lv_label_align_t lv_label_get_align(lv_obj_t * label)
  * @param label pointer to a label object
  * @return true: recoloring is enabled, false: disable
  */
-bool lv_label_get_recolor(lv_obj_t * label)
+bool lv_label_get_recolor(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->recolor == 0 ? false : true;
-}
-
-/**
- * Get the no break attribute
- * @param label pointer to a label object
- * @return true: no_break_enabled (ignore '\n' line breaks); false: make line breaks on '\n'
- */
-bool lv_label_get_no_break(lv_obj_t * label)
-{
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    return ext->no_break == 0 ? false : true;
 }
 
 /**
@@ -390,7 +383,7 @@ bool lv_label_get_no_break(lv_obj_t * label)
  * @param label pointer to a label object
  * @return true: draw body; false: don't draw body
  */
-bool lv_label_get_body_draw(lv_obj_t *label)
+bool lv_label_get_body_draw(const lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->body_draw == 0 ? false : true;
@@ -401,9 +394,9 @@ bool lv_label_get_body_draw(lv_obj_t *label)
  * @param label pointer to a label object
  * @return speed of animation in px/sec unit
  */
-uint16_t lv_label_get_anim_speed(lv_obj_t *label)
+uint16_t lv_label_get_anim_speed(const lv_obj_t * label)
 {
-    lv_label_ext_t *ext = lv_obj_get_ext_attr(label);
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->anim_speed;
 }
 
@@ -413,9 +406,9 @@ uint16_t lv_label_get_anim_speed(lv_obj_t *label)
  * @param index index of the letter [0 ... text length]. Expressed in character index, not byte index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
-void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
+void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t * pos)
 {
-	const char * txt = lv_label_get_text(label);
+    const char * txt = lv_label_get_text(label);
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
@@ -428,7 +421,6 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
     if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded  the set the max length to very big */
@@ -436,10 +428,10 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
         max_w = LV_COORD_MAX;
     }
 
-    index = txt_utf8_get_byte_id(txt, index);
+    index = txt_encoded_get_byte_id(txt, index);
 
     /*Search the line of the index letter */;
-    while (txt[new_line_start] != '\0') {
+    while(txt[new_line_start] != '\0') {
         new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
         if(index < new_line_start || txt[new_line_start] == '\0') break; /*The line of 'index' letter begins at 'line_start'*/
 
@@ -455,13 +447,13 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
 
     /*Calculate the x coordinate*/
     lv_coord_t x = 0;
-	uint32_t i = line_start;
+    uint32_t i = line_start;
     uint32_t cnt = line_start;                      /*Count the letter (in UTF-8 1 letter not 1 byte)*/
-	lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
-	uint32_t letter;
-	while(cnt < index) {
-        cnt += lv_txt_utf8_size(txt[i]);
-	    letter = lv_txt_utf8_next(txt, &i);
+    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+    uint32_t letter;
+    while(cnt < index) {
+        cnt += lv_txt_encoded_size(&txt[i]);
+        letter = lv_txt_encoded_next(txt, &i);
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
             if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
@@ -469,18 +461,24 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
             }
         }
         x += lv_font_get_width(font, letter) + style->text.letter_space;
-	}
+    }
 
-	if(ext->align == LV_LABEL_ALIGN_CENTER) {
-		lv_coord_t line_w;
+    if(ext->align == LV_LABEL_ALIGN_CENTER) {
+        lv_coord_t line_w;
         line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
-                               font, style->text.letter_space, flag);
-		x += lv_obj_get_width(label) / 2 - line_w / 2;
+                                  font, style->text.letter_space, flag);
+        x += lv_obj_get_width(label) / 2 - line_w / 2;
+
+    }
+    else if(ext->align == LV_LABEL_ALIGN_RIGHT) {
+    	lv_coord_t line_w;
+    	        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
+    	                                  font, style->text.letter_space, flag);
+    	x += lv_obj_get_width(label) - line_w;
     }
 
     pos->x = x;
     pos->y = y;
-
 }
 
 /**
@@ -490,9 +488,9 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  * Expressed in character index and not byte index (different in UTF-8)
  */
-uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
+uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 {
-	const char * txt = lv_label_get_text(label);
+    const char * txt = lv_label_get_text(label);
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
@@ -505,7 +503,6 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
     if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded set the max length to very big */
@@ -514,45 +511,47 @@ uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos)
     }
 
     /*Search the line of the index letter */;
-    while (txt[line_start] != '\0') {
-    	new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
+    while(txt[line_start] != '\0') {
+        new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
+
     	if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
-    	y += letter_height + style->text.line_space;
+		y += letter_height + style->text.line_space;
+
         line_start = new_line_start;
     }
 
     /*Calculate the x coordinate*/
     lv_coord_t x = 0;
-	if(ext->align == LV_LABEL_ALIGN_CENTER) {
-		lv_coord_t line_w;
+    if(ext->align == LV_LABEL_ALIGN_CENTER) {
+        lv_coord_t line_w;
         line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
-                               font, style->text.letter_space, flag);
-		x += lv_obj_get_width(label) / 2 - line_w / 2;
+                                  font, style->text.letter_space, flag);
+        x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
 
-	lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
-	uint32_t i = line_start;
+    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+    uint32_t i = line_start;
     uint32_t i_current = i;
-	uint32_t letter;
-	while(i < new_line_start - 1) {
-	    letter = lv_txt_utf8_next(txt, &i);    /*Be careful 'i' already points to the next character*/
-	    /*Handle the recolor command*/
-	    if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+    uint32_t letter;
+    while(i < new_line_start - 1) {
+        letter = lv_txt_encoded_next(txt, &i);    /*Be careful 'i' already points to the next character*/
+        /*Handle the recolor command*/
+        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
             if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
                 continue; /*Skip the letter is it is part of a command*/
             }
-	    }
+        }
 
-	    x += lv_font_get_width(font, letter);
-		if(pos->x < x) {
-		    i = i_current;
-		    break;
-		}
-		x += style->text.letter_space;
-		i_current = i;
-	}
+        x += lv_font_get_width(font, letter);
+        if(pos->x < x) {
+            i = i_current;
+            break;
+        }
+        x += style->text.letter_space;
+        i_current = i;
+    }
 
-	return lv_txt_utf8_get_char_id(txt, i);
+    return lv_encoded_get_char_id(txt, i);
 }
 
 
@@ -582,12 +581,14 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
     uint32_t ins_len = strlen(txt);
     uint32_t new_len = ins_len + old_len;
     ext->text = lv_mem_realloc(ext->text, new_len + 1);
+    lv_mem_assert(ext->text);
+    if(ext->text == NULL) return;
 
     if(pos == LV_LABEL_POS_LAST) {
 #if LV_TXT_UTF8 == 0
         pos = old_len;
 #else
-        pos = lv_txt_get_length(ext->text);
+        pos = lv_txt_get_encoded_length(ext->text);
 #endif
     }
 
@@ -641,12 +642,13 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_area_t coords;
         lv_style_t * style = lv_obj_get_style(label);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(label);
         lv_obj_get_coords(label, &coords);
 
 #if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(label);
         if(lv_group_get_focused(g) == label) {
-            lv_draw_rect(&coords, mask, style);
+            lv_draw_rect(&coords, mask, style, opa_scale);
         }
 #endif
 
@@ -660,19 +662,31 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
             bg.y1 -= style->body.padding.ver;
             bg.y2 += style->body.padding.ver;
 
-            lv_draw_rect(&bg, mask, style);
+            lv_draw_rect(&bg, mask, style, lv_obj_get_opa_scale(label));
         }
 
         /*TEST: draw a background for the label*/
-//		lv_draw_rect(&label->coords, mask, &lv_style_plain_color);
+      //lv_draw_rect(&label->coords, mask, &lv_style_plain_color, LV_OPA_COVER);
 
-		lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
-		if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
+        lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
+        if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-        if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
         if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+        if(ext->align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
-		lv_draw_label(&coords, mask, style, ext->text, flag, &ext->offset);
+        /* In ROLL mode if the text is shorter then the label's width and
+         * the text is aligned to the middle then clear the EXPAND flag.
+         * Due to this `lv_draw_label` can align the text to the middle  */
+        if(ext->long_mode == LV_LABEL_LONG_ROLL && ext->align == LV_LABEL_ALIGN_CENTER) {
+        	lv_point_t size;
+        	lv_txt_get_size(&size, ext->text, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX ,flag);
+        	if(size.x < lv_obj_get_width(label)) {
+        		flag &= ~LV_TXT_FLAG_EXPAND;
+        	}
+        }
+
+
+        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
     }
     return true;
 }
@@ -700,29 +714,24 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
             lv_mem_free(ext->text);
             ext->text = NULL;
         }
-    }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
-            /*Revert dots for proper refresh*/
-            lv_label_revert_dots(label);
+    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+        /*Revert dots for proper refresh*/
+        lv_label_revert_dots(label);
 
-            lv_label_refr_text(label);
-    }
-    else if (sign == LV_SIGNAL_CORD_CHG) {
+        lv_label_refr_text(label);
+    } else if(sign == LV_SIGNAL_CORD_CHG) {
         if(lv_area_get_width(&label->coords) != lv_area_get_width(param) ||
-           lv_area_get_height(&label->coords) != lv_area_get_height(param))
-        {
+                lv_area_get_height(&label->coords) != lv_area_get_height(param)) {
             lv_label_revert_dots(label);
             lv_label_refr_text(label);
         }
-    }
-    else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         if(ext->body_draw) {
             lv_style_t * style = lv_label_get_style(label);
             label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.hor);
             label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.ver);
         }
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
@@ -750,7 +759,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND ||
-       ext->long_mode == LV_LABEL_LONG_SCROLL) {
+            ext->long_mode == LV_LABEL_LONG_SCROLL) {
         max_w = LV_COORD_MAX;
     }
 
@@ -759,7 +768,6 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->no_break != 0) flag |= LV_TXT_FLAG_NO_BREAK;
     lv_txt_get_size(&size, ext->text, font, style->text.letter_space, style->text.line_space, max_w, flag);
 
     /*Set the full size in expand mode*/
@@ -785,7 +793,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.path = lv_anim_path_linear;
 
             anim.playback_pause = (((lv_font_get_width(style->text.font, ' ') +
-                                    style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;
+                                     style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;
             anim.repeat_pause = anim.playback_pause;
 
             if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
@@ -813,7 +821,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.act_time = 0;
         anim.end_cb = NULL;
         anim.path = lv_anim_path_linear;
-        anim.playback_pause =  (((lv_font_get_width(style->text.font, ' ') + style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;;
+        anim.playback_pause = (((lv_font_get_width(style->text.font, ' ') + style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;;
         anim.repeat_pause =  anim.playback_pause;
 
         bool hor_anim = false;
@@ -840,59 +848,58 @@ static void lv_label_refr_text(lv_obj_t * label)
             ext->offset.y = 0;
         }
 #endif
-    }
-    else if(ext->long_mode == LV_LABEL_LONG_DOT) {
-       if(size.y <= lv_obj_get_height(label)) {                /*No dots are required, the text is short enough*/
-           ext->dot_end = LV_LABEL_DOT_END_INV;
-       } else if(lv_txt_get_length(ext->text) <= LV_LABEL_DOT_NUM) {     /*Don't turn to dots all the characters*/
-           ext->dot_end = LV_LABEL_DOT_END_INV;
-       } else {
-           lv_point_t p;
-           p.x = lv_obj_get_width(label) - (lv_font_get_width(style->text.font, '.') + style->text.letter_space) * LV_LABEL_DOT_NUM; /*Shrink with dots*/
-           p.y = lv_obj_get_height(label);
-           p.y -= p.y  % (lv_font_get_height(style->text.font) + style->text.line_space);   /*Round down to the last line*/
-           p.y -= style->text.line_space;                                                      /*Trim the last line space*/
-           uint32_t letter_id = lv_label_get_letter_on(label, &p);
+    } else if(ext->long_mode == LV_LABEL_LONG_DOT) {
+        if(size.y <= lv_obj_get_height(label)) {                /*No dots are required, the text is short enough*/
+            ext->dot_end = LV_LABEL_DOT_END_INV;
+        } else if(lv_txt_get_encoded_length(ext->text) <= LV_LABEL_DOT_NUM) {     /*Don't turn to dots all the characters*/
+            ext->dot_end = LV_LABEL_DOT_END_INV;
+        } else {
+            lv_point_t p;
+            p.x = lv_obj_get_width(label) - (lv_font_get_width(style->text.font, '.') + style->text.letter_space) * LV_LABEL_DOT_NUM; /*Shrink with dots*/
+            p.y = lv_obj_get_height(label);
+            p.y -= p.y  % (lv_font_get_height(style->text.font) + style->text.line_space);   /*Round down to the last line*/
+            p.y -= style->text.line_space;                                                      /*Trim the last line space*/
+            uint32_t letter_id = lv_label_get_letter_on(label, &p);
 
 
 #if LV_TXT_UTF8 == 0
-           /*Save letters under the dots and replace them with dots*/
-           uint8_t i;
-           for(i = 0; i < LV_LABEL_DOT_NUM; i++)  {
-               ext->dot_tmp[i] = ext->text[letter_id + i];
-               ext->text[letter_id + i] = '.';
-           }
+            /*Save letters under the dots and replace them with dots*/
+            uint8_t i;
+            for(i = 0; i < LV_LABEL_DOT_NUM; i++)  {
+                ext->dot_tmp[i] = ext->text[letter_id + i];
+                ext->text[letter_id + i] = '.';
+            }
 
-           ext->dot_tmp[LV_LABEL_DOT_NUM] = ext->text[letter_id + LV_LABEL_DOT_NUM];
-           ext->text[letter_id + LV_LABEL_DOT_NUM] = '\0';
+            ext->dot_tmp[LV_LABEL_DOT_NUM] = ext->text[letter_id + LV_LABEL_DOT_NUM];
+            ext->text[letter_id + LV_LABEL_DOT_NUM] = '\0';
 
-           ext->dot_end = letter_id + LV_LABEL_DOT_NUM;
+            ext->dot_end = letter_id + LV_LABEL_DOT_NUM;
 #else
-           /*Save letters under the dots and replace them with dots*/
-           uint32_t i;
-           uint32_t byte_id = txt_utf8_get_byte_id(ext->text, letter_id);
-           uint32_t byte_id_ori = byte_id;
-           uint8_t len = 0;
-           for(i = 0; i <= LV_LABEL_DOT_NUM; i++)  {
-               len += lv_txt_utf8_size(ext->text[byte_id]);
-               lv_txt_utf8_next(ext->text, &byte_id);
-           }
+            /*Save letters under the dots and replace them with dots*/
+            uint32_t i;
+            uint32_t byte_id = txt_encoded_get_byte_id(ext->text, letter_id);
+            uint32_t byte_id_ori = byte_id;
+            uint8_t len = 0;
+            for(i = 0; i <= LV_LABEL_DOT_NUM; i++)  {
+                len += lv_txt_encoded_size(&ext->text[byte_id]);
+                lv_txt_encoded_next(ext->text, &byte_id);
+            }
 
-           memcpy(ext->dot_tmp, &ext->text[byte_id_ori], len);
-           ext->dot_tmp[len] = '\0';       /*Close with a zero*/
+            memcpy(ext->dot_tmp, &ext->text[byte_id_ori], len);
+            ext->dot_tmp[len] = '\0';       /*Close with a zero*/
 
-           for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
-               ext->text[byte_id_ori + i] = '.';
-           }
-           ext->text[byte_id_ori + LV_LABEL_DOT_NUM] = '\0';
+            for(i = 0; i < LV_LABEL_DOT_NUM; i++) {
+                ext->text[byte_id_ori + i] = '.';
+            }
+            ext->text[byte_id_ori + LV_LABEL_DOT_NUM] = '\0';
 
-           ext->dot_end = letter_id + LV_LABEL_DOT_NUM;
+            ext->dot_end = letter_id + LV_LABEL_DOT_NUM;
 #endif
 
-       }
-   }
+        }
+    }
     /*In break mode only the height can change*/
-    else if (ext->long_mode == LV_LABEL_LONG_BREAK) {
+    else if(ext->long_mode == LV_LABEL_LONG_BREAK) {
         lv_obj_set_height(label, size.y);
     }
 
@@ -900,7 +907,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_obj_invalidate(label);
 }
 
-static void lv_label_revert_dots(lv_obj_t *label)
+static void lv_label_revert_dots(lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->long_mode != LV_LABEL_LONG_DOT) return;
@@ -912,7 +919,7 @@ static void lv_label_revert_dots(lv_obj_t *label)
     }
 #else
     uint32_t letter_i = ext->dot_end - LV_LABEL_DOT_NUM;
-    uint32_t byte_i = txt_utf8_get_byte_id(ext->text, letter_i);
+    uint32_t byte_i = txt_encoded_get_byte_id(ext->text, letter_i);
 
     /*Restore the characters*/
     uint8_t i = 0;

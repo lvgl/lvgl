@@ -1,6 +1,6 @@
 /**
  * @file lv_draw_rbasic..h
- * 
+ *
  */
 
 #ifndef LV_DRAW_RBASIC_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_REAL_DRAW != 0
 
 #include "../lv_misc/lv_color.h"
@@ -42,7 +47,7 @@ void lv_rpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
  * @param opa opacity (ignored, only for compatibility with lv_vfill)
  */
 void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
-                lv_color_t color, lv_opa_t opa);
+              lv_color_t color, lv_opa_t opa);
 
 /**
  * Draw a letter to the display
@@ -76,8 +81,8 @@ void lv_rletter_set_background(lv_color_t color);
  * @param recolor_opa the intense of recoloring
  */
 void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
-            const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-            lv_color_t recolor, lv_opa_t recolor_opa);
+             const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+             lv_color_t recolor, lv_opa_t recolor_opa);
 /**********************
  *      MACROS
  **********************/

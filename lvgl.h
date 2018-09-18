@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 /*Test misc. module version*/
+#include "lv_misc/lv_log.h"
 #include "lv_misc/lv_task.h"
 
 #include "lv_hal/lv_hal.h"
@@ -26,6 +27,7 @@ extern "C" {
 #include "lv_themes/lv_theme.h"
 
 #include "lv_objx/lv_btn.h"
+#include "lv_objx/lv_imgbtn.h"
 #include "lv_objx/lv_img.h"
 #include "lv_objx/lv_label.h"
 #include "lv_objx/lv_line.h"
@@ -49,15 +51,18 @@ extern "C" {
 #include "lv_objx/lv_lmeter.h"
 #include "lv_objx/lv_sw.h"
 #include "lv_objx/lv_kb.h"
+#include "lv_objx/lv_arc.h"
+#include "lv_objx/lv_preload.h"
+#include "lv_objx/lv_calendar.h"
 
 /*********************
  *      DEFINES
  *********************/
 /*Current version of LittlevGL*/
 #define LVGL_VERSION_MAJOR   5
-#define LVGL_VERSION_MINOR   1
-#define LVGL_VERSION_PATCH   1
-#define LVGL_VERSION_INFO    ""
+#define LVGL_VERSION_MINOR   2
+#define LVGL_VERSION_PATCH   0
+#define LVGL_VERSION_INFO    "beta"
 
 /**********************
  *      TYPEDEFS

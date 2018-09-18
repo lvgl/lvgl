@@ -1,6 +1,6 @@
 /**
  * @file lv_area.h
- * 
+ *
  */
 
 #ifndef LV_AREA_H
@@ -33,15 +33,15 @@ typedef struct
 {
     lv_coord_t x;
     lv_coord_t y;
-}lv_point_t;
+} lv_point_t;
 
 typedef struct
 {
     lv_coord_t x1;
-    lv_coord_t y1;        
+    lv_coord_t y1;
     lv_coord_t x2;
-    lv_coord_t y2;        
-}lv_area_t;
+    lv_coord_t y2;
+} lv_area_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -123,7 +123,7 @@ uint32_t lv_area_get_size(const lv_area_t * area_p);
  * @param a2_p pointer to the second area
  * @return false: the two area has NO common parts, res_p is invalid
  */
-bool lv_area_union(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p);
+bool lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p);
 
 /**
  * Join two areas into a third which involves the other two

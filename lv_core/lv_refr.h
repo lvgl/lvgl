@@ -1,6 +1,6 @@
 /**
  * @file lv_refr.h
- * 
+ *
  */
 
 #ifndef LV_REFR_H
@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include <stdbool.h>
-
 
 /*********************
  *      DEFINES

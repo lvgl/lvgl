@@ -6,21 +6,18 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf.h"
-#include "lv_style.h"
 #include "lv_obj.h"
 #include "../lv_misc/lv_mem.h"
 
 /*********************
  *      DEFINES
  *********************/
-#if USE_LV_ANIMATION
-#define LV_STYLE_ANIM_RES       256
-#define LV_STYLE_ANIM_SHIFT     8      /*log2(LV_STYLE_ANIM_RES)*/
+#define STYLE_MIX_MAX       256
+#define STYLE_MIX_SHIFT     8      /*log2(STYLE_MIX_MAX)*/
 
-#define VAL_PROP(v1, v2, r)   v1 + (((v2-v1) * r) >> LV_STYLE_ANIM_SHIFT)
-#define STYLE_ATTR_ANIM(attr, r)   if(start->attr != end->attr) act->attr = VAL_PROP(start->attr, end->attr, r)
-#endif
+#define VAL_PROP(v1, v2, r)   v1 + (((v2-v1) * r) >> STYLE_MIX_SHIFT)
+#define STYLE_ATTR_MIX(attr, r)   if(start->attr != end->attr) {res->attr = VAL_PROP(start->attr, end->attr, r);} else {res->attr = start->attr;}
+
 
 /**********************
  *      TYPEDEFS
@@ -29,9 +26,9 @@
 typedef struct {
     lv_style_t style_start;   /*Save not only pointers because can be same as 'style_anim' then it will be modified too*/
     lv_style_t style_end;
-    lv_style_t *style_anim;
+    lv_style_t * style_anim;
     void (*end_cb)(void *);
-}lv_style_anim_dsc_t;
+} lv_style_anim_dsc_t;
 #endif
 
 /**********************
@@ -39,7 +36,7 @@ typedef struct {
  **********************/
 #if USE_LV_ANIMATION
 static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val);
-static void style_animation_common_end_cb(void *ptr);
+static void style_animation_common_end_cb(void * ptr);
 #endif
 
 /**********************
@@ -70,7 +67,7 @@ lv_style_t lv_style_btn_ina;
 /**
  *  Init the basic styles
  */
-void lv_style_init (void)
+void lv_style_init(void)
 {
     /* Not White/Black/Gray colors are created by HSV model with
      * HUE = 210*/
@@ -106,7 +103,8 @@ void lv_style_init (void)
 
     lv_style_scr.line.opa = LV_OPA_COVER;
     lv_style_scr.line.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_scr.line.width = 1;
+    lv_style_scr.line.width = 2;
+    lv_style_scr.line.rounded = 0;
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
@@ -146,12 +144,12 @@ void lv_style_init (void)
     lv_style_transp.glass = 1;
     lv_style_transp.body.border.width = 0;
 
-    /*Transparent tight style*/
+    /*Transparent fitting size*/
     memcpy(&lv_style_transp_fit, &lv_style_transp, sizeof(lv_style_t));
     lv_style_transp_fit.body.padding.hor = 0;
     lv_style_transp_fit.body.padding.ver = 0;
 
-    /*Transparent fitting size*/
+    /*Transparent tight style*/
     memcpy(&lv_style_transp_tight, &lv_style_transp_fit, sizeof(lv_style_t));
     lv_style_transp_tight.body.padding.inner = 0;
 
@@ -216,25 +214,84 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
     memcpy(dest, src, sizeof(lv_style_t));
 }
 
+
+/**
+ * Mix two styles according to a given ratio
+ * @param start	start style
+ * @param end end style
+ * @param res store the result style here
+ * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
+ */
+void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio)
+{
+	STYLE_ATTR_MIX(body.opa, ratio);
+	STYLE_ATTR_MIX(body.radius, ratio);
+	STYLE_ATTR_MIX(body.border.width, ratio);
+	STYLE_ATTR_MIX(body.border.opa, ratio);
+	STYLE_ATTR_MIX(body.shadow.width, ratio);
+	STYLE_ATTR_MIX(body.padding.hor, ratio);
+	STYLE_ATTR_MIX(body.padding.ver, ratio);
+	STYLE_ATTR_MIX(body.padding.inner, ratio);
+	STYLE_ATTR_MIX(text.line_space, ratio);
+	STYLE_ATTR_MIX(text.letter_space, ratio);
+	STYLE_ATTR_MIX(text.opa, ratio);
+	STYLE_ATTR_MIX(line.width, ratio);
+	STYLE_ATTR_MIX(line.opa, ratio);
+	STYLE_ATTR_MIX(image.intense, ratio);
+	STYLE_ATTR_MIX(image.opa, ratio);
+
+	lv_opa_t opa = ratio == STYLE_MIX_MAX ? LV_OPA_COVER : ratio;
+
+	res->body.main_color = lv_color_mix(end->body.main_color, start->body.main_color, opa);
+	res->body.grad_color = lv_color_mix(end->body.grad_color, start->body.grad_color, opa);
+	res->body.border.color = lv_color_mix(end->body.border.color, start->body.border.color, opa);
+	res->body.shadow.color = lv_color_mix(end->body.shadow.color, start->body.shadow.color, opa);
+	res->text.color = lv_color_mix(end->text.color, start->text.color, opa);
+	res->image.color = lv_color_mix(end->image.color, start->image.color, opa);
+	res->line.color = lv_color_mix(end->line.color, start->line.color, opa);
+
+	if(ratio < (STYLE_MIX_MAX >> 1)) {
+		res->body.empty = start->body.empty;
+		res->body.border.part = start->body.border.part;
+		res->glass = start->glass;
+		res->text.font = start->text.font;
+		res->body.shadow.type = start->body.shadow.type;
+        res->line.rounded = start->line.rounded;
+	} else {
+		res->body.empty = end->body.empty;
+		res->body.border.part = end->body.border.part;
+		res->glass = end->glass;
+		res->text.font = end->text.font;
+		res->body.shadow.type = end->body.shadow.type;
+        res->line.rounded = end->line.rounded;
+	}
+}
+
 #if USE_LV_ANIMATION
+
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
+ * @return pointer to a descriptor. Really this variable will be animated. (Can be used in `lv_anim_del(dsc, NULL)`)
  */
-void lv_style_anim_create(lv_style_anim_t * anim)
+void * lv_style_anim_create(lv_style_anim_t * anim)
 {
     lv_style_anim_dsc_t * dsc;
     dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
+    lv_mem_assert(dsc);
+    if(dsc == NULL) return NULL;
+
     dsc->style_anim = anim->style_anim;
     memcpy(&dsc->style_start, anim->style_start, sizeof(lv_style_t));
     memcpy(&dsc->style_end, anim->style_end, sizeof(lv_style_t));
+    memcpy(dsc->style_anim, anim->style_start, sizeof(lv_style_t));
     dsc->end_cb = anim->end_cb;
 
 
     lv_anim_t a;
-    a.var = (void*)dsc;
+    a.var = (void *)dsc;
     a.start = 0;
-    a.end = LV_STYLE_ANIM_RES;
+    a.end = STYLE_MIX_MAX;
     a.fp = (lv_anim_fp_t)style_animator;
     a.path = lv_anim_path_linear;
     a.end_cb = style_animation_common_end_cb;
@@ -246,7 +303,10 @@ void lv_style_anim_create(lv_style_anim_t * anim)
     a.repeat_pause = anim->repeat_pause;
 
     lv_anim_create(&a);
+
+    return dsc;
 }
+
 #endif
 /**********************
  *   STATIC FUNCTIONS
@@ -263,44 +323,7 @@ static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val)
     const lv_style_t * end = &dsc->style_end;
     lv_style_t * act = dsc->style_anim;
 
-    STYLE_ATTR_ANIM(body.opa, val);
-    STYLE_ATTR_ANIM(body.radius, val);
-    STYLE_ATTR_ANIM(body.border.width, val);
-    STYLE_ATTR_ANIM(body.shadow.width, val);
-    STYLE_ATTR_ANIM(body.padding.hor, val);
-    STYLE_ATTR_ANIM(body.padding.ver, val);
-    STYLE_ATTR_ANIM(body.padding.inner, val);
-    STYLE_ATTR_ANIM(text.line_space, val);
-    STYLE_ATTR_ANIM(text.letter_space, val);
-    STYLE_ATTR_ANIM(text.opa, val);
-    STYLE_ATTR_ANIM(line.width, val);
-    STYLE_ATTR_ANIM(line.opa, val);
-    STYLE_ATTR_ANIM(image.intense, val);
-    STYLE_ATTR_ANIM(image.opa, val);
-
-    lv_opa_t opa = val == LV_STYLE_ANIM_RES ? LV_OPA_COVER : val;
-
-    act->body.main_color = lv_color_mix(end->body.main_color, start->body.main_color, opa);
-    act->body.grad_color = lv_color_mix(end->body.grad_color, start->body.grad_color, opa);
-    act->body.border.color = lv_color_mix(end->body.border.color, start->body.border.color, opa);
-    act->body.shadow.color = lv_color_mix(end->body.shadow.color, start->body.shadow.color, opa);
-    act->text.color = lv_color_mix(end->text.color, start->text.color, opa);
-    act->image.color = lv_color_mix(end->image.color, start->image.color, opa);
-    act->line.color = lv_color_mix(end->line.color, start->line.color, opa);
-
-    if(val == 0) {
-        act->body.empty = start->body.empty;
-        act->glass = start->glass;
-        act->text.font = start->text.font;
-        act->body.shadow.type = start->body.shadow.type;
-    }
-
-    if(val == LV_STYLE_ANIM_RES) {
-        act->body.empty = end->body.empty;
-        act->glass = end->glass;
-        act->text.font = end->text.font;
-        act->body.shadow.type = end->body.shadow.type;
-    }
+    lv_style_mix(start, end, act, val);
 
     lv_obj_report_style_mod(dsc->style_anim);
 }
@@ -310,9 +333,9 @@ static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val)
  * It called the user defined call back and free the allocated memories
  * @param ptr the 'animated variable' set by lv_style_anim_create()
  */
-static void style_animation_common_end_cb(void *ptr)
+static void style_animation_common_end_cb(void * ptr)
 {
-    lv_style_anim_dsc_t *dsc = ptr;     /*To avoid casting*/
+    lv_style_anim_dsc_t * dsc = ptr;    /*To avoid casting*/
 
     if(dsc->end_cb) dsc->end_cb(dsc);
 

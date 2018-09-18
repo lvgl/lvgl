@@ -1,6 +1,6 @@
 /**
  * @file lv_cont.h
- * 
+ *
  */
 
 #ifndef LV_CONT_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_CONT != 0
 
 #include "../lv_core/lv_obj.h"
@@ -29,17 +34,17 @@ extern "C" {
 /*Layout options*/
 typedef enum
 {
-	LV_LAYOUT_OFF = 0,
-	LV_LAYOUT_CENTER,
-	LV_LAYOUT_COL_L,	/*Column left align*/
-	LV_LAYOUT_COL_M,	/*Column middle align*/
-	LV_LAYOUT_COL_R,	/*Column right align*/
-	LV_LAYOUT_ROW_T,	/*Row top align*/
-	LV_LAYOUT_ROW_M,	/*Row middle align*/
-	LV_LAYOUT_ROW_B,	/*Row bottom align*/
-	LV_LAYOUT_PRETTY,	/*Put as many object as possible in row and begin a new row*/
-	LV_LAYOUT_GRID,	    /*Align same-sized object into a grid*/
-}lv_layout_t;
+    LV_LAYOUT_OFF = 0,
+    LV_LAYOUT_CENTER,
+    LV_LAYOUT_COL_L,    /*Column left align*/
+    LV_LAYOUT_COL_M,    /*Column middle align*/
+    LV_LAYOUT_COL_R,    /*Column right align*/
+    LV_LAYOUT_ROW_T,    /*Row top align*/
+    LV_LAYOUT_ROW_M,    /*Row middle align*/
+    LV_LAYOUT_ROW_B,    /*Row bottom align*/
+    LV_LAYOUT_PRETTY,   /*Put as many object as possible in row and begin a new row*/
+    LV_LAYOUT_GRID,     /*Align same-sized object into a grid*/
+} lv_layout_t;
 
 typedef struct
 {
@@ -47,8 +52,9 @@ typedef struct
     /*New data for this type */
     uint8_t layout  :4;     /*A layout from 'lv_cont_layout_t' enum*/
     uint8_t hor_fit :1;     /*1: Enable horizontal fit to involve all children*/
-    uint8_t ver_fit :1;     /*1: Enable horizontal fir to involve all children*/
+    uint8_t ver_fit :1;     /*1: Enable horizontal fit to involve all children*/
 }lv_cont_ext_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -60,7 +66,7 @@ typedef struct
  * @param copy pointer to a container object, if not NULL then the new object will be copied from it
  * @return pointer to the created container
  */
-lv_obj_t * lv_cont_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -102,28 +108,28 @@ static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
  * @param cont pointer to container object
  * @return the layout from 'lv_cont_layout_t'
  */
-lv_layout_t lv_cont_get_layout(lv_obj_t * cont);
+lv_layout_t lv_cont_get_layout(const lv_obj_t * cont);
 
 /**
  * Get horizontal fit enable attribute of a container
  * @param cont pointer to a container object
  * @return true: horizontal fit is enabled; false: disabled
  */
-bool lv_cont_get_hor_fit(lv_obj_t * cont);
+bool lv_cont_get_hor_fit(const lv_obj_t * cont);
 
 /**
  * Get vertical fit enable attribute of a container
  * @param cont pointer to a container object
  * @return true: vertical fit is enabled; false: disabled
  */
-bool lv_cont_get_ver_fit(lv_obj_t * cont);
+bool lv_cont_get_ver_fit(const lv_obj_t * cont);
 
 /**
  * Get the style of a container
  * @param cont pointer to a container object
  * @return pointer to the container's style
  */
-static inline lv_style_t * lv_cont_get_style(lv_obj_t *cont)
+static inline lv_style_t * lv_cont_get_style(const lv_obj_t *cont)
 {
     return lv_obj_get_style(cont);
 }
