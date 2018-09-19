@@ -8,9 +8,9 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
-/*----------------
- * Dynamic memory
- *----------------*/
+/*===================
+   Dynamic memory
+ *===================*/
 
 /* Memory size which will be used by the library
  * to store the graphical objects and other data */
@@ -48,7 +48,7 @@
 #define LV_VDB2_ADR         0       /*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate automatically into RAM; LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`)*/
 
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
-#define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
+#define LV_ANTIALIAS        (LV_VDB_SIZE != 0)       /*1: Enable anti-aliasing*/
 
 /*Screen refresh settings*/
 #define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
@@ -67,9 +67,14 @@
 #define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
 
 /*Color settings*/
+<<<<<<< HEAD
 #define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/32*/
 #define LV_COLOR_16_SWAP   0					  /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
 #define LV_COLOR_SCREEN_TRANSP        0           /*1: Enable screen transparency. Useful for OSD or other overlapping GUIs. Requires ARGB8888 colors*/
+=======
+#define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/24*/
+#define LV_COLOR_16_SWAP   0                      /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
+>>>>>>> Adding missing #ifdef LV_CONF_INCLUDE_SIMPLE
 #define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn (with chroma keying)*/
 
 /*Text settings*/
@@ -85,11 +90,10 @@
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
 
 /*Compiler settings*/
-#define LV_ATTRIBUTE_TICK_INC					/* Define a custom attribute to `lv_tick_inc` function */
-#define LV_ATTRIBUTE_TASK_HANDLER				/* Define a custom attribute to `lv_task_handler` function */
-#define LV_COMPILER_VLA_SUPPORTED    0			/* 1: Variable length array is supported. (In Visual studio it is not supported)*/
-#define LV_COMPILER_NON_CONST_INIT_SUPPORTED 0	/* 1: Initialization with non constant values are supported (In Visual studio it is not supported)*/
-//#define _CRT_SECURE_NO_WARNINGS			    /* Visual Studio needs it to use `strcpy`, `sprintf` etc*/
+#define LV_ATTRIBUTE_TICK_INC                   /* Define a custom attribute to `lv_tick_inc` function */
+#define LV_ATTRIBUTE_TASK_HANDLER               /* Define a custom attribute to `lv_task_handler` function */
+#define LV_COMPILER_VLA_SUPPORTED            0  /* 1: Variable length array is supported*/
+#define LV_COMPILER_NON_CONST_INIT_SUPPORTED 0  /* 1: Initialization with non constant values are supported */
 
 /*HAL settings*/
 #define LV_TICK_CUSTOM     0                        /*1: use a custom tick source (removing the need to manually update the tick with `lv_tick_inc`) */
@@ -100,24 +104,24 @@
 
 
 /*Log settings*/
-#define USE_LV_LOG		1	/*Enable/disable the log module*/
+#define USE_LV_LOG      1   /*Enable/disable the log module*/
 #if USE_LV_LOG
 /* How important log should be added:
- * LV_LOG_LEVEL_TRACE		A lot of logs to give detailed information
- * LV_LOG_LEVEL_INFO		Log important events
- * LV_LOG_LEVEL_WARN		Log if something unwanted happened but didn't caused problem
- * LV_LOG_LEVEL_ERROR		Only critical issue, when the system may fail
+ * LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information
+ * LV_LOG_LEVEL_INFO        Log important events
+ * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't caused problem
+ * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
  */
-#define LV_LOG_LEVEL	LV_LOG_LEVEL_INFO
+#define LV_LOG_LEVEL    LV_LOG_LEVEL_INFO
 /* 1: Print the log with 'printf'; 0: user need to register a callback*/
 
-#define LV_LOG_PRINTF	0
+#define LV_LOG_PRINTF   0
 #endif  /*USE_LV_LOG*/
 
 /*================
  *  THEME USAGE
  *================*/
-#define LV_THEME_LIVE_UPDATE    0       /*Enable to change the theme in run time. Requires 8..10 kB extra RAM*/
+#define LV_THEME_LIVE_UPDATE    0       /*1: Allow theme switching at run time. Uses 8..10 kB of RAM*/
 
 #define USE_LV_THEME_TEMPL      0       /*Just for test*/
 #define USE_LV_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
@@ -135,6 +139,8 @@
 /* More info about fonts: https://littlevgl.com/basics#fonts
  * To enable a built-in font use 1,2,4 or 8 values
  * which will determine the bit-per-pixel */
+#define LV_FONT_DEFAULT        &lv_font_dejavu_20     /*Always set a default font from the built-in fonts*/
+
 #define USE_LV_FONT_DEJAVU_10              0
 #define USE_LV_FONT_DEJAVU_10_LATIN_SUP    0
 #define USE_LV_FONT_DEJAVU_10_CYRILLIC     0
@@ -155,13 +161,13 @@
 #define USE_LV_FONT_DEJAVU_40_CYRILLIC     0
 #define USE_LV_FONT_SYMBOL_40              0
 
-#define USE_LV_FONT_MONOSPACE_8			   0
+#define USE_LV_FONT_MONOSPACE_8            0
 
 /* Optionally declare your custom fonts here.
  * You can use these fonts as defult font too
  * and they will be avialale globally. E.g.
  * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) \
- *						          LV_FONT_DECLARE(my_font_2) \
+ *                                LV_FONT_DECLARE(my_font_2) \
  */
 #define LV_FONT_CUSTOM_DECLARE
 
@@ -272,6 +278,9 @@
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
 
+/*Enable button-state animations - draw a circle on click (dependencies: USE_LV_ANIMATION)*/
+#define LV_BTN_INK_EFFECT   1
+
 /*Keyboard (dependencies: lv_btnm)*/
 #define USE_LV_KB       1
 
@@ -313,4 +322,3 @@
 
 
 #endif /*Remove this to enable the content*/
-
