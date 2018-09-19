@@ -83,6 +83,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btn_set_layout(new_cb, LV_LAYOUT_ROW_M);
         lv_btn_set_fit(new_cb, true, true);
         lv_btn_set_toggle(new_cb, true);
+    	lv_obj_set_protect(new_cb, LV_PROTECT_PRESS_LOST);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
