@@ -78,6 +78,13 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing image button*/
     else {
+        lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+
+        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_REL, copy_ext->img_src[LV_BTN_STATE_REL]);
+        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_PR, copy_ext->img_src[LV_BTN_STATE_PR]);
+        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_TGL_REL, copy_ext->img_src[LV_BTN_STATE_TGL_REL]);
+        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_TGL_PR, copy_ext->img_src[LV_BTN_STATE_TGL_PR]);
+        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_INA, copy_ext->img_src[LV_BTN_STATE_INA]);
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_imgbtn);
     }
@@ -97,7 +104,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param state for which state set the new image (from `lv_btn_state_t`) `
  * @param src pointer to an image source (a C array or path to a file)
  */
-void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, void * src)
+void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src)
 {
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 

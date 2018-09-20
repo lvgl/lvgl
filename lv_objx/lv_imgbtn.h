@@ -84,7 +84,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param state for which state set the new image (from `lv_btn_state_t`) `
  * @param src pointer to an image source (a C array or path to a file)
  */
-void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, void * src);
+void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src);
 
 /**
  * Enable the toggled states. On release the button will change from/to toggled state.
