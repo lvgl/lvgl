@@ -106,6 +106,14 @@ typedef struct {
     lv_style_t *gauge;
 #endif
 
+#if USE_LV_ARC != 0
+    lv_style_t *arc;
+#endif
+
+#if USE_LV_PRELOAD != 0
+    lv_style_t *preload;
+#endif
+
 #if USE_LV_SW != 0
     struct {
         lv_style_t *bg;

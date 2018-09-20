@@ -176,6 +176,24 @@ static void gauge_init(void)
 #endif
 }
 
+static void arc_init(void)
+{
+#if USE_LV_ARC != 0
+
+
+    theme.arc = &def;
+#endif
+}
+
+static void preload_init(void)
+{
+#if USE_LV_PRELOAD != 0
+
+
+    theme.preload = &def;
+#endif
+}
+
 static void chart_init(void)
 {
 #if USE_LV_CHART
@@ -386,6 +404,8 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, lv_font_t * font)
     sw_init();
     lmeter_init();
     gauge_init();
+    arc_init();
+    preload_init();
     chart_init();
     cb_init();
     btnm_init();
