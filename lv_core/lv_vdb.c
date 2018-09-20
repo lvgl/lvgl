@@ -155,9 +155,24 @@ void lv_flush_ready(void)
 {
 #if LV_VDB_DOUBLE == 0
     vdb_state = LV_VDB_STATE_ACTIVE;
+
+#if LV_COLOR_SCREEN_TRANSP
+    memset(vdb_buf, 0x00, LV_VDB_SIZE_IN_BYTES);
+#endif
+
 #else
-    if(vdb_state[0] == LV_VDB_STATE_FLUSH)  vdb_state[0] = LV_VDB_STATE_FREE;
-    if(vdb_state[1] == LV_VDB_STATE_FLUSH)  vdb_state[1] = LV_VDB_STATE_FREE;
+    if(vdb_state[0] == LV_VDB_STATE_FLUSH) {
+#if LV_COLOR_SCREEN_TRANSP
+        memset(vdb_buf[0], 0x00, LV_VDB_SIZE_IN_BYTES);
+#endif
+        vdb_state[0] = LV_VDB_STATE_FREE;
+    }
+    if(vdb_state[1] == LV_VDB_STATE_FLUSH) {
+#if LV_COLOR_SCREEN_TRANSP
+        memset(vdb_buf[1], 0x00, LV_VDB_SIZE_IN_BYTES);
+#endif
+        vdb_state[1] = LV_VDB_STATE_FREE;
+    }
 #endif
 }
 

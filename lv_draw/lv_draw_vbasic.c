@@ -40,6 +40,10 @@
 static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa);
 
+#if LV_COLOR_SCREEN_TRANSP
+static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -88,11 +92,15 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
         disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, x, y, color, opa);
     } else {
         lv_color_t * vdb_px_p = vdb_p->buf + y * vdb_width + x;
+#if LV_COLOR_SCREEN_TRANSP == 0
         if(opa == LV_OPA_COVER) {
             *vdb_px_p = color;
         } else {
             *vdb_px_p = lv_color_mix(color, *vdb_px_p, opa);
         }
+#else
+        *vdb_px_p = color_mix_2_alpha(*vdb_px_p, (*vdb_px_p).alpha, color, opa);
+#endif
     }
 }
 
@@ -340,7 +348,11 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                                         (col + pos_x) - vdb_p->area.x1, (row + pos_y) - vdb_p->area.y1,
                                         color, px_opa);
                 } else {
+#if LV_COLOR_SCREEN_TRANSP == 0
                     *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
+#else
+                    *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).alpha, color, px_opa);
+#endif
                 }
             }
 
@@ -512,7 +524,28 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                     /*Normal native VDB write*/
                     else {
                         if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col] = px_color;
-                        else vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
+                        else {
+#if LV_COLOR_SCREEN_TRANSP == 0
+                            vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
+#else
+                            vdb_buf_tmp[col] = color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].alpha, px_color,  opa_result);
+//                            if(vdb_buf_tmp[col].alpha == LV_OPA_TRANSP) {
+//                                /* When it is the first visible pixel on the transparent screen
+//                                 * simlply use this color and set the pixel opa as backrounds alpha*/
+//                                vdb_buf_tmp[col] = px_color;
+//                                vdb_buf_tmp[col].alpha = opa_result;
+//                            } else {
+//                                /* If already this pixel is already written then for performance reasons
+//                                 * don't care with alpha channel
+//                                 */
+//                                lv_opa_t bg_opa = vdb_buf_tmp[col].alpha;
+//                                vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
+//
+//                                uint16_t opa_tmp = (uint16_t)opa_result + ((bg_opa * (255 - opa_result)) >> 8);
+//                                vdb_buf_tmp[col].alpha = opa_tmp > 0xFF ? 0xFF : opa_tmp ;
+//                            }
+#endif
+                        }
                     }
                 }
             }
@@ -591,21 +624,80 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
         }
         /*Calculate with alpha too*/
         else {
+
+#if LV_COLOR_SCREEN_TRANSP == 0
             lv_color_t bg_tmp = LV_COLOR_BLACK;
             lv_color_t opa_tmp = lv_color_mix(color, bg_tmp, opa);
+#endif
             for(row = fill_area->y1; row <= fill_area->y2; row++) {
                 for(col = fill_area->x1; col <= fill_area->x2; col++) {
+#if LV_COLOR_SCREEN_TRANSP == 0
                     /*If the bg color changed recalculate the result color*/
                     if(mem[col].full != bg_tmp.full) {
                         bg_tmp = mem[col];
                         opa_tmp = lv_color_mix(color, bg_tmp, opa);
                     }
+
                     mem[col] = opa_tmp;
+
+#else
+                    mem[col] = color_mix_2_alpha(mem[col], mem[col].alpha, color, opa);
+#endif
                 }
                 mem += mem_width;
             }
         }
     }
 }
+
+#if LV_COLOR_SCREEN_TRANSP
+
+/**
+ * Mix two colors. Both color can have alpha value. It requires ARGB888 colors.
+ * @param bg_color background color
+ * @param bg_opa alpha of the background color
+ * @param fg_color foreground color
+ * @param fg_opa alpha of the foreground color
+ * @return the mixed color. the alpha channel (color.alpha) contains the result alpha
+ */
+static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa)
+{
+    /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
+    if(fg_opa == LV_OPA_COVER && bg_opa <= LV_OPA_MIN) {
+        fg_color.alpha = fg_opa;
+        return fg_color;
+    }
+    /*Transparent foreground: use the Background*/
+    else if(fg_opa <= LV_OPA_MIN) {
+        return bg_color;
+    }
+    /*Opaque background: use simple mix*/
+    else if (bg_opa >= LV_OPA_MAX) {
+        return lv_color_mix(fg_color, bg_color, fg_opa);
+    }
+    /*Both colors have alpha. Expensive calculation need to be applied*/
+    else {
+        /*Save the parameters and the result. If they will be asked again don't compute again*/
+        static lv_opa_t fg_opa_save = 0;
+        static lv_opa_t bg_opa_save = 0;
+        static lv_color_t c = {0};
+
+        if(fg_opa != fg_opa_save || bg_opa != bg_opa_save) {
+            fg_opa_save = fg_opa;
+            bg_opa_save = bg_opa;
+            /*Info: https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
+            lv_opa_t alpha_res = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
+            if(alpha_res == 0) {
+                while(1);
+            }
+            lv_opa_t ratio = (uint16_t)((uint16_t) fg_opa * 255) / alpha_res;
+            c = lv_color_mix(fg_color, bg_color, ratio);
+            c.alpha = alpha_res;
+        }
+        return c;
+
+    }
+}
+#endif /*LV_COLOR_SCREEN_TRANSP*/
 
 #endif
