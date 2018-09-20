@@ -88,7 +88,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
          * and must be screen sized*/
         if(par != NULL) {
             ext->auto_size = 1;
-            lv_obj_set_style(new_img, NULL);            /*Inherit the style  by default*/
+            lv_obj_set_style(new_img, &lv_style_plain);            /*Inherit the style  by default*/
         } else {
             ext->auto_size = 0;
             lv_obj_set_style(new_img, &lv_style_plain);            /*Set a style for screens*/

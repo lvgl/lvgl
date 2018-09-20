@@ -12,6 +12,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rect.h"
 #include "../lv_draw/lv_draw_arc.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -95,8 +96,16 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new pre loader pre loader*/
     if(copy == NULL) {
-        lv_obj_set_style(new_preload, &lv_style_pretty_color);
         lv_obj_set_size(new_preload, LV_DPI / 2, LV_DPI / 2);
+
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            lv_preload_set_style(new_preload, LV_PRELOAD_STYLE_MAIN, th->preload);
+        } else {
+            lv_obj_set_style(new_preload, &lv_style_pretty_color);
+        }
+
     }
     /*Copy an existing pre loader*/
     else {
