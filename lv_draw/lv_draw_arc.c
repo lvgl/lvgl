@@ -62,7 +62,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     lv_coord_t x_start[4];
     lv_coord_t x_end[4];
 
-    lv_color_t color = style->body.main_color;
+    lv_color_t color = style->line.color;
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
 
 
