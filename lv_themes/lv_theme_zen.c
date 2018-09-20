@@ -300,6 +300,9 @@ static void arc_init(void)
     lv_style_copy(&arc, &def);
     arc.line.width = 10;
     arc.line.color = lv_color_hsv_to_rgb(_hue, 40, 90);
+    arc.line.rounded = 1;
+
+    /*For preloader*/
     arc.body.border.width = 0;
 
     theme.arc = &arc;

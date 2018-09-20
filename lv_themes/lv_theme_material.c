@@ -322,8 +322,12 @@ static void arc_init(void)
     lv_style_copy(&arc, &def);
     arc.line.width = 10;
     arc.line.color = lv_color_hsv_to_rgb(_hue, 90, 90);
+
+    /*For prelaoder*/
     arc.body.border.width = 10;
     arc.body.border.color = lv_color_hsv_to_rgb(_hue, 30, 90);
+    arc.body.padding.hor = 0;
+    arc.body.padding.ver = 0;
 
     theme.arc = &arc;
 #endif
