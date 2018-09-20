@@ -246,6 +246,26 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t  * pos)
 }
 
 /**
+ * Truncate the file size to the current position of the read write pointer
+ * @param file_p pointer to an 'ufs_file_t' variable. (opened with lv_fs_open )
+ * @return LV_FS_RES_OK: no error, the file is read
+ *         any error from lv_fs_res_t enum
+ */
+lv_fs_res_t lv_fs_trunc (lv_fs_file_t * file_p)
+{
+    if(file_p->drv == NULL) {
+        return LV_FS_RES_INV_PARAM;
+    }
+
+    if(file_p->drv->tell == NULL) {
+        return LV_FS_RES_NOT_IMP;
+    }
+
+    lv_fs_res_t res = file_p->drv->trunc(file_p->file_d);
+
+    return res;
+}
+/**
  * Give the size of a file bytes
  * @param file_p pointer to a lv_fs_file_t variable
  * @param size pointer to a variable to store the size
@@ -266,6 +286,40 @@ lv_fs_res_t lv_fs_size(lv_fs_file_t * file_p, uint32_t * size)
 
     return res;
 }
+
+/**
+ * Rename a file
+ * @param oldname path to the file
+ * @param newname path with the new name
+ * @return LV_FS_RES_OK or any error from 'fs_res_t'
+ */
+lv_fs_res_t lv_fs_rename (const char * oldname, const char * newname)
+{
+    if(!oldname || !newname) return LV_FS_RES_INV_PARAM;
+
+    char letter = oldname[0];
+
+    lv_fs_drv_t * drv = lv_fs_get_drv(letter);
+
+    if(!drv) {
+        return LV_FS_RES_NOT_EX;
+    }
+
+    if(drv->ready != NULL) {
+        if(drv->ready() == false) {
+            return LV_FS_RES_HW_ERR;
+        }
+    }
+
+    if(drv->rename == NULL) return LV_FS_RES_NOT_IMP;
+
+    const char * old_real = lv_fs_get_real_path(oldname);
+    const char * new_real = lv_fs_get_real_path(newname);
+    lv_fs_res_t res = drv->rename(old_real, new_real);
+
+    return res;
+}
+
 
 /**
  * Initialize a 'fs_read_dir_t' variable for directory reading
@@ -313,6 +367,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
 {
     if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
+        fn[0] = '\0';
         return LV_FS_RES_INV_PARAM;
     }
 
