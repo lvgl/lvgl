@@ -67,14 +67,9 @@
 #define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
 
 /*Color settings*/
-<<<<<<< HEAD
 #define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/32*/
 #define LV_COLOR_16_SWAP   0					  /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
 #define LV_COLOR_SCREEN_TRANSP        0           /*1: Enable screen transparency. Useful for OSD or other overlapping GUIs. Requires ARGB8888 colors*/
-=======
-#define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/24*/
-#define LV_COLOR_16_SWAP   0                      /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
->>>>>>> Adding missing #ifdef LV_CONF_INCLUDE_SIMPLE
 #define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn (with chroma keying)*/
 
 /*Text settings*/
