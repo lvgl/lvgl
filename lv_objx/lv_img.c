@@ -279,6 +279,7 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
             lv_draw_label(&coords, mask, style, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
+            LV_LOG_WARN("Image source type is unknown in lv_img_design");
             lv_draw_img(&img->coords, mask, NULL, style, opa_scale);
         }
     }
