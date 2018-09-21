@@ -62,14 +62,15 @@ typedef struct
     uint8_t toggle     :1;                      /*Enable toggling*/
 } lv_btnm_ext_t;
 
-typedef enum {
+enum {
     LV_BTNM_STYLE_BG,
     LV_BTNM_STYLE_BTN_REL,
     LV_BTNM_STYLE_BTN_PR,
     LV_BTNM_STYLE_BTN_TGL_REL,
     LV_BTNM_STYLE_BTN_TGL_PR,
     LV_BTNM_STYLE_BTN_INA,
-} lv_btnm_style_t;
+};
+typedef uint8_t lv_btnm_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

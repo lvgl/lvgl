@@ -12,6 +12,7 @@
 
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_arc.h"
+#include "../lv_themes/lv_theme.h"
 
 
 /*********************
@@ -76,7 +77,14 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new arc arc*/
     if(copy == NULL) {
-        lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, &lv_style_plain_color);
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, th->preload);
+        } else {
+            lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, &lv_style_plain_color);
+        }
+
     }
     /*Copy an existing arc*/
     else {
@@ -228,32 +236,34 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
         lv_draw_arc(x, y, r, mask, ext->angle_start, ext->angle_end, style, opa_scale);
 
 
-        if(style->body.radius == LV_RADIUS_CIRCLE) {
-            lv_coord_t thick_2 = style->body.thickness / 2;
-            lv_coord_t cir_x = ((r - thick_2) * lv_trigo_sin(ext->angle_start) >> LV_TRIGO_SHIFT);
-            lv_coord_t cir_y = ((r - thick_2) * lv_trigo_sin(ext->angle_start + 90) >> LV_TRIGO_SHIFT);
+        /*Draw circle on the ends if enabled */
+        if(style->line.rounded) {
+            lv_coord_t thick_half = style->line.width / 2;
+            lv_coord_t cir_x = ((r - thick_half) * lv_trigo_sin(ext->angle_start) >> LV_TRIGO_SHIFT);
+            lv_coord_t cir_y = ((r - thick_half) * lv_trigo_sin(ext->angle_start + 90) >> LV_TRIGO_SHIFT);
 
             lv_style_t cir_style;
-            lv_style_copy(&cir_style, style);
-            cir_style.body.empty = 0;
-            cir_style.body.aux_color = style->body.main_color;
+            lv_style_copy(&cir_style, &lv_style_plain);
+            cir_style.body.grad_color = style->line.color;
+            cir_style.body.main_color = cir_style.body.grad_color;
+            cir_style.body.radius = LV_RADIUS_CIRCLE;
             lv_area_t cir_area;
-            cir_area.x1 = cir_x + x - thick_2;
-            cir_area.y1 = cir_y + y - thick_2;
-            cir_area.x2 = cir_x + x + thick_2;
-            cir_area.y2 = cir_y + y + thick_2;
+            cir_area.x1 = cir_x + x - thick_half;
+            cir_area.y1 = cir_y + y - thick_half;
+            cir_area.x2 = cir_x + x + thick_half;
+            cir_area.y2 = cir_y + y + thick_half;
 
-            lv_draw_rect(&cir_area, mask, &cir_style, lv_obj_get_opa_scale(arc));
+            lv_draw_rect(&cir_area, mask, &cir_style, opa_scale);
 
-            cir_x = ((r - thick_2) * lv_trigo_sin(ext->angle_end) >> LV_TRIGO_SHIFT);
-            cir_y = ((r - thick_2) * lv_trigo_sin(ext->angle_end + 90) >> LV_TRIGO_SHIFT);
+            cir_x = ((r - thick_half) * lv_trigo_sin(ext->angle_end) >> LV_TRIGO_SHIFT);
+            cir_y = ((r - thick_half) * lv_trigo_sin(ext->angle_end + 90) >> LV_TRIGO_SHIFT);
 
-            cir_area.x1 = cir_x + x - thick_2;
-            cir_area.y1 = cir_y + y - thick_2;
-            cir_area.x2 = cir_x + x + thick_2;
-            cir_area.y2 = cir_y + y + thick_2;
+            cir_area.x1 = cir_x + x - thick_half;
+            cir_area.y1 = cir_y + y - thick_half;
+            cir_area.x2 = cir_x + x + thick_half;
+            cir_area.y2 = cir_y + y + thick_half;
 
-            lv_draw_rect(&cir_area, mask, &cir_style, lv_obj_get_opa_scale(arc));
+            lv_draw_rect(&cir_area, mask, &cir_style, opa_scale);
         }
 
     }

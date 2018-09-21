@@ -73,6 +73,7 @@ a.playback = 0;
 a.playback_pause = 0;
 a.repeat = 0;
 a.repeat_pause = 0;
+lv_anim_create(&a);
  */
 /**********************
  * GLOBAL PROTOTYPES

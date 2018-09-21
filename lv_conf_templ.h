@@ -38,14 +38,14 @@
  * Required for buffered drawing, opacity and anti-aliasing
  * VDB makes the double buffering, you don't need to deal with it!
  * Typical size: ~1/10 screen */
-#define LV_VDB_SIZE         (8 * LV_HOR_RES)  /*Size of VDB in pixel count (1/10 screen size is good for first)*/
-#define LV_VDB_PX_BPP		LV_COLOR_SIZE	  /*Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays. (Set `disp_drv->vdb_wr` and `disp_drv->vdb_rd` too)*/
-#define LV_VDB_ADR          0                 /*Place VDB to a specific address (e.g. in external RAM) (0: allocate automatically into RAM)*/
+#define LV_VDB_SIZE         (30 * LV_HOR_RES)  /*Size of VDB in pixel count (1/10 screen size is good for first)*/
+#define LV_VDB_PX_BPP       LV_COLOR_SIZE     /*Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays. (Set `disp_drv->vdb_wr` and `disp_drv->vdb_rd` too)*/
+#define LV_VDB_ADR          0                 /*Place VDB to a specific address (e.g. in external RAM) (0: allocate automatically into RAM; LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`)*/
 
 /* Use two Virtual Display buffers (VDB) parallelize rendering and flushing (optional)
  * The flushing should use DMA to write the frame buffer in the background*/
 #define LV_VDB_DOUBLE       0       /*1: Enable the use of 2 VDBs*/
-#define LV_VDB2_ADR         0       /*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate automatically into RAM)*/
+#define LV_VDB2_ADR         0       /*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate automatically into RAM; LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`)*/
 
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
 #define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
@@ -67,8 +67,9 @@
 #define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
 
 /*Color settings*/
-#define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/24*/
+#define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/32*/
 #define LV_COLOR_16_SWAP   0					  /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
+#define LV_COLOR_SCREEN_TRANSP        0           /*1: Enable screen transparency. Useful for OSD or other overlapping GUIs. Requires ARGB8888 colors*/
 #define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn (with chroma keying)*/
 
 /*Text settings*/
@@ -125,6 +126,7 @@
 #define USE_LV_THEME_MONO       0       /*Mono color theme for monochrome displays*/
 #define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows*/
 #define USE_LV_THEME_ZEN        0       /*Peaceful, mainly light theme */
+#define USE_LV_THEME_NEMO       0       /*Water-like theme based on the movie "Finding Nemo"*/
 
 /*==================
  *    FONT USAGE
@@ -261,7 +263,9 @@
 
 /*Button (dependencies: lv_cont*/
 #define USE_LV_BTN      1
-
+#if USE_LV_BTN != 0
+#define LV_BTN_INK_EFFECT   1       /*1: enable ink effect animation on click. Use `lv_btn_set_ink_in/wait/out_time` to set the animation time*/
+#endif
 /*Image Button (dependencies: lv_btn*/
 #define USE_LV_IMGBTN   1
 

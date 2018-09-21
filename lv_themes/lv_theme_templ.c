@@ -74,6 +74,16 @@ static void btn_init(void)
 #endif
 }
 
+static void imgbtn_init(void)
+{
+#if USE_LV_IMGBTN != 0
+    theme.imgbtn.rel = &def;
+    theme.imgbtn.pr = &def;
+    theme.imgbtn.tgl_rel = &def;
+    theme.imgbtn.tgl_pr = &def;
+    theme.imgbtn.ina = &def;
+#endif
+}
 
 static void label_init(void)
 {
@@ -166,12 +176,44 @@ static void gauge_init(void)
 #endif
 }
 
+static void arc_init(void)
+{
+#if USE_LV_ARC != 0
+
+
+    theme.arc = &def;
+#endif
+}
+
+static void preload_init(void)
+{
+#if USE_LV_PRELOAD != 0
+
+
+    theme.preload = &def;
+#endif
+}
+
 static void chart_init(void)
 {
 #if USE_LV_CHART
 
-
     theme.chart = &def;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR
+
+    theme.calendar.bg = theme.panel;
+    theme.calendar.header = &def;
+    theme.calendar.inactive_days = &def;
+    theme.calendar.highlighted_days = &def;
+    theme.calendar.week_box = &def;
+    theme.calendar.today_box = &def;
+    theme.calendar.header_pr = &def;
+    theme.calendar.day_names = &def;
 #endif
 }
 
@@ -352,6 +394,7 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, lv_font_t * font)
     basic_init();
     cont_init();
     btn_init();
+    imgbtn_init();
     label_init();
     img_init();
     line_init();
@@ -361,6 +404,8 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, lv_font_t * font)
     sw_init();
     lmeter_init();
     gauge_init();
+    arc_init();
+    preload_init();
     chart_init();
     cb_init();
     btnm_init();

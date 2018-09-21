@@ -58,7 +58,7 @@ typedef struct
     uint16_t anim_time;         /*Duration of close animation [ms] (0: no animation)*/
 } lv_mbox_ext_t;
 
-typedef enum {
+enum {
     LV_MBOX_STYLE_BG,
     LV_MBOX_STYLE_BTN_BG,
     LV_MBOX_STYLE_BTN_REL,
@@ -66,7 +66,8 @@ typedef enum {
     LV_MBOX_STYLE_BTN_TGL_REL,
     LV_MBOX_STYLE_BTN_TGL_PR,
     LV_MBOX_STYLE_BTN_INA,
-} lv_mbox_style_t;
+};
+typedef uint8_t lv_mbox_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

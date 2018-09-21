@@ -9,6 +9,7 @@ CSRCS += lv_preload.c
 CSRCS += lv_roller.c
 CSRCS += lv_tabview.c
 CSRCS += lv_btn.c
+CSRCS += lv_calendar.c
 CSRCS += lv_chart.c
 CSRCS += lv_gauge.c
 CSRCS += lv_label.c

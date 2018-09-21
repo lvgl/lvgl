@@ -184,15 +184,10 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 {
     lv_coord_t width;
     width = style->line.width;
-    lv_coord_t width_safe = width;
-    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
-
-
 #if LV_ANTIALIAS
-    width--;
-    if(width == 0) width_safe = 1;
-    else width_safe = width;
+    lv_coord_t width_safe = width;      /*`width_safe` is always >=1*/
 #endif
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
 
     lv_point_t vect_main, vect_norm;
     vect_main.x = main_line->p2.x - main_line->p1.x;
@@ -234,9 +229,22 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
         lv_point_t p0 = {0, 0};
         line_init(&pattern_line, &p0, &vect_norm);
 
-        for(i = 0; i < width; i ++) {
+        uint32_t width_sqr = width * width;
+        for(i = 0; i < width * 2; i ++) {       /*Run until a big number. Meanwhile the real width will be determined as well*/
             pattern[i].x = pattern_line.p_act.x;
             pattern[i].y = pattern_line.p_act.y;
+
+            /*Finish the pattern line if it's length equal to the desired width (Use Pythagoras theorem)*/
+            int32_t  sqr = pattern_line.p_act.x * pattern_line.p_act.x + pattern_line.p_act.y * pattern_line.p_act.y;
+            if(sqr >= width_sqr) {
+                width = i;
+#if LV_ANTIALIAS
+                width--;
+                if(width == 0) width_safe = 1;
+                else width_safe = width;
+#endif
+                break;
+            }
 
             line_next(&pattern_line);
         }

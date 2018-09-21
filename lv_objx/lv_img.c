@@ -54,7 +54,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("image create started");
+    LV_LOG_TRACE("image create started");
 
     lv_obj_t * new_img = NULL;
 
@@ -83,15 +83,15 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 
     if(copy == NULL) {
         lv_obj_set_click(new_img, false);
-    	/* Enable auto size for non screens
+        /* Enable auto size for non screens
          * because image screens are wallpapers
          * and must be screen sized*/
         if(par != NULL) {
-        	ext->auto_size = 1;
-        	lv_obj_set_style(new_img, NULL);            /*Inherit the style  by default*/
+            ext->auto_size = 1;
+            lv_obj_set_style(new_img, &lv_style_plain);            /*Inherit the style  by default*/
         } else {
-        	ext->auto_size = 0;
-        	lv_obj_set_style(new_img, &lv_style_plain);            /*Set a style for screens*/
+            ext->auto_size = 0;
+            lv_obj_set_style(new_img, &lv_style_plain);            /*Set a style for screens*/
         }
     } else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
@@ -103,7 +103,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 
-	LV_LOG_INFO("image created");
+    LV_LOG_INFO("image created");
 
     return new_img;
 }
@@ -135,13 +135,12 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     }
 
     lv_img_header_t header;
-	lv_img_dsc_get_info(src_img, &header);
+    lv_img_dsc_get_info(src_img, &header);
 
-	/*Save the source*/
-	if(src_type == LV_IMG_SRC_VARIABLE) {
-		ext->src = src_img;
-	}
-	else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
+    /*Save the source*/
+    if(src_type == LV_IMG_SRC_VARIABLE) {
+        ext->src = src_img;
+    } else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
         /* If the new and the old src are the same then it was only a refresh.*/
         if(ext->src != src_img) {
             lv_mem_free(ext->src);
@@ -151,21 +150,21 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
             strcpy(new_str, src_img);
             ext->src = new_str;
         }
-	}
+    }
 
-	if(src_type == LV_IMG_SRC_SYMBOL) {
-	    /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
-	    lv_style_t * style = lv_img_get_style(img);
-	    lv_point_t size;
-	    lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
-	    header.w = size.x;
-	    header.h = size.y;
-	}
+    if(src_type == LV_IMG_SRC_SYMBOL) {
+        /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
+        lv_style_t * style = lv_img_get_style(img);
+        lv_point_t size;
+        lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        header.w = size.x;
+        header.h = size.y;
+    }
 
     ext->src_type = src_type;
-	ext->w = header.w;
-	ext->h = header.h;
-	ext->cf = header.cf;
+    ext->w = header.w;
+    ext->h = header.h;
+    ext->cf = header.cf;
 
     if(lv_img_get_auto_size(img) != false) {
         lv_obj_set_size(img, ext->w, ext->h);
@@ -278,12 +277,10 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             lv_draw_label(&coords, mask, style, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
-
         } else {
-
             /*Trigger the error handler of image drawer*/
+            LV_LOG_WARN("Image source type is unknown in lv_img_design");
             lv_draw_img(&img->coords, mask, NULL, style, opa_scale);
-
         }
     }
 

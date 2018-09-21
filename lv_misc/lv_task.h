@@ -37,7 +37,7 @@ extern "C" {
 /**
  * Possible priorities for lv_tasks
  */
-typedef enum
+enum
 {
     LV_TASK_PRIO_OFF = 0,
     LV_TASK_PRIO_LOWEST,
@@ -46,7 +46,8 @@ typedef enum
     LV_TASK_PRIO_HIGH,
     LV_TASK_PRIO_HIGHEST,
     LV_TASK_PRIO_NUM,
-} lv_task_prio_t;
+};
+typedef uint8_t lv_task_prio_t;
 
 /**
  * Descriptor of a lv_task

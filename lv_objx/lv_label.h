@@ -37,21 +37,23 @@ extern "C" {
  **********************/
 
 /*Long mode behaviors. Used in 'lv_label_ext_t' */
-typedef enum
+enum
 {
     LV_LABEL_LONG_EXPAND,   /*Expand the object size to the text size*/
     LV_LABEL_LONG_BREAK,    /*Keep the object width, break the too long lines and expand the object height*/
     LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
     LV_LABEL_LONG_DOT,      /*Keep the size and write dots at the end if the text is too long*/
     LV_LABEL_LONG_ROLL,     /*Keep the size and roll the text infinitely*/
-} lv_label_long_mode_t;
+};
+typedef uint8_t lv_label_long_mode_t;
 
 /*Label align policy*/
-typedef enum {
+enum {
     LV_LABEL_ALIGN_LEFT,
     LV_LABEL_ALIGN_CENTER,
     LV_LABEL_ALIGN_RIGHT,
-} lv_label_align_t;
+};
+typedef uint8_t lv_label_align_t;
 
 /*Data of label*/
 typedef struct

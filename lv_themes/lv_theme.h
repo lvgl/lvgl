@@ -36,6 +36,7 @@ typedef struct {
 #if USE_LV_CONT != 0
     lv_style_t *cont;
 #endif
+
 #if USE_LV_BTN != 0
     struct {
         lv_style_t *rel;
@@ -44,6 +45,17 @@ typedef struct {
         lv_style_t *tgl_pr;
         lv_style_t *ina;
     } btn;
+#endif
+
+
+#if USE_LV_IMGBTN != 0
+    struct {
+        lv_style_t *rel;
+        lv_style_t *pr;
+        lv_style_t *tgl_rel;
+        lv_style_t *tgl_pr;
+        lv_style_t *ina;
+    } imgbtn;
 #endif
 
 #if USE_LV_LABEL != 0
@@ -94,6 +106,14 @@ typedef struct {
     lv_style_t *gauge;
 #endif
 
+#if USE_LV_ARC != 0
+    lv_style_t *arc;
+#endif
+
+#if USE_LV_PRELOAD != 0
+    lv_style_t *preload;
+#endif
+
 #if USE_LV_SW != 0
     struct {
         lv_style_t *bg;
@@ -105,6 +125,19 @@ typedef struct {
 
 #if USE_LV_CHART != 0
     lv_style_t *chart;
+#endif
+
+#if USE_LV_CALENDAR != 0
+    struct {
+        lv_style_t *bg;
+        lv_style_t *header;
+        lv_style_t *header_pr;
+        lv_style_t *day_names;
+        lv_style_t *highlighted_days;
+        lv_style_t *inactive_days;
+        lv_style_t *week_box;
+        lv_style_t *today_box;
+    }calendar;
 #endif
 
 #if USE_LV_CB != 0
@@ -265,7 +298,9 @@ lv_theme_t * lv_theme_get_current(void);
 #include "lv_theme_night.h"
 #include "lv_theme_zen.h"
 #include "lv_theme_mono.h"
+#include "lv_theme_nemo.h"
 #include "lv_theme_material.h"
+
 
 #ifdef __cplusplus
 } /* extern "C" */

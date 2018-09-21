@@ -30,7 +30,7 @@ extern "C" {
 # define LV_IMG_PX_SIZE_ALPHA_BYTE   2
 #elif LV_COLOR_DEPTH == 16
 # define LV_IMG_PX_SIZE_ALPHA_BYTE   3
-#elif LV_COLOR_DEPTH == 24
+#elif LV_COLOR_DEPTH == 32
 # define LV_IMG_PX_SIZE_ALPHA_BYTE   4
 #endif
 
@@ -38,12 +38,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
+enum {
     LV_IMG_SRC_VARIABLE,
     LV_IMG_SRC_FILE,
     LV_IMG_SRC_SYMBOL,
     LV_IMG_SRC_UNKNOWN,
-} lv_img_src_t;
+};
+typedef uint8_t lv_img_src_t;
 
 
 /**********************

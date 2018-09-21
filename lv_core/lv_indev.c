@@ -36,7 +36,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_proc_t * proc);
 static void indev_proc_release(lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
-static lv_obj_t * indev_search_obj(const lv_indev_proc_t * indev, lv_obj_t * obj);
+static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * state);
 static void indev_drag_throw(lv_indev_proc_t * state);
 #endif
@@ -587,8 +587,22 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
     /*Forgot the act obj and send a released signal */
     if(proc->act_obj != NULL) {
-        proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
+        /* If the object was protected against press lost then it possible that
+         * the object is already not pressed but still it is the `act_obj`.
+         * In this case send the `LV_SIGNAL_RELEASED` if the indev is ON the `act_obj` */
+        if(lv_obj_is_protected(proc->act_obj, LV_PROTECT_PRESS_LOST)) {
+            /* Search the object on the current current coordinates.
+             * The start object is the object itself. If not ON it the the result will be NULL*/
+            lv_obj_t * obj_on = indev_search_obj(proc, proc->act_obj);
+            if(obj_on == proc->act_obj) proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
+            else proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
 
+        }
+        /* The simple case: `act_obj` was not protected against press lost.
+         * If it is already not pressed then was handled in `indev_proc_press`*/
+        else {
+            proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
+        }
         /*Handle click focus*/
 #if USE_LV_GROUP
         /*Check, if the parent is in a group focus on it.*/
@@ -651,21 +665,21 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 }
 /**
  * Search the most top, clickable object on the last point of an input device
- * @param indev pointer to  an input device
+ * @param proc pointer to  the `lv_indev_proc_t` part of the input device
  * @param obj pointer to a start object, typically the screen
  * @return pointer to the found object or NULL if there was no suitable object
  */
-static lv_obj_t * indev_search_obj(const lv_indev_proc_t * indev, lv_obj_t * obj)
+static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
 {
     lv_obj_t * found_p = NULL;
 
     /*If the point is on this object*/
     /*Check its children too*/
-    if(lv_area_is_point_on(&obj->coords, &indev->act_point)) {
+    if(lv_area_is_point_on(&obj->coords, &proc->act_point)) {
         lv_obj_t * i;
 
         LL_READ(obj->child_ll, i) {
-            found_p = indev_search_obj(indev, i);
+            found_p = indev_search_obj(proc, i);
 
             /*If a child was found then break*/
             if(found_p != NULL) {

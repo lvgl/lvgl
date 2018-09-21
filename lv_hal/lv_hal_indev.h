@@ -29,18 +29,20 @@ extern "C" {
  **********************/
 
 /*Possible input device types*/
-typedef enum {
+enum {
     LV_INDEV_TYPE_NONE,        /*Show uninitialized state*/
     LV_INDEV_TYPE_POINTER,     /*Touch pad, mouse, external button*/
     LV_INDEV_TYPE_KEYPAD,      /*Keypad or keyboard*/
     LV_INDEV_TYPE_BUTTON,      /*External (hardware button) which is assinged to a specific point of the screen*/
-} lv_hal_indev_type_t;
+};
+typedef uint8_t lv_hal_indev_type_t;
 
 /*States for input devices*/
-typedef enum {
+enum {
     LV_INDEV_STATE_REL = 0,
     LV_INDEV_STATE_PR
-} lv_indev_state_t;
+};
+typedef uint8_t lv_indev_state_t;
 
 /*Data type when an input device is read */
 typedef struct {
@@ -49,8 +51,8 @@ typedef struct {
         uint32_t key;          /*For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
         uint32_t btn;          /*For LV_INDEV_TYPE_BUTTON the currently pressed button*/
     };
-    lv_indev_state_t state;    /*LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
     void *user_data;           /*'lv_indev_drv_t.priv' for this driver*/
+    lv_indev_state_t state;    /*LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
 } lv_indev_data_t;
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/

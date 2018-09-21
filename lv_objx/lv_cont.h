@@ -32,7 +32,7 @@ extern "C" {
  **********************/
 
 /*Layout options*/
-typedef enum
+enum
 {
     LV_LAYOUT_OFF = 0,
     LV_LAYOUT_CENTER,
@@ -44,7 +44,8 @@ typedef enum
     LV_LAYOUT_ROW_B,    /*Row bottom align*/
     LV_LAYOUT_PRETTY,   /*Put as many object as possible in row and begin a new row*/
     LV_LAYOUT_GRID,     /*Align same-sized object into a grid*/
-} lv_layout_t;
+};
+typedef uint8_t lv_layout_t;
 
 typedef struct
 {

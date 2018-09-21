@@ -10,6 +10,7 @@
 #if LV_VDB_SIZE != 0
 
 #include "../lv_hal/lv_hal_disp.h"
+#include "../lv_misc/lv_log.h"
 #include <stddef.h>
 
 /*********************
@@ -19,11 +20,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
+enum {
     LV_VDB_STATE_FREE = 0,		/*Not used*/
     LV_VDB_STATE_ACTIVE,		/*Being used to render*/
     LV_VDB_STATE_FLUSH,			/*Flushing pixels from it*/
-} lv_vdb_state_t;
+};
+typedef uint8_t lv_vdb_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -38,7 +40,7 @@ typedef enum {
 static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf[(LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3];
+static uint8_t vdb_buf[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb = {.buf = (lv_color_t*)vdb_buf};
 #  else		/*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
@@ -49,8 +51,8 @@ static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
 static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf1[(LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3];
-static uint8_t vdb_buf2[(LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3];
+static uint8_t vdb_buf1[LV_VDB_SIZE_IN_BYTES];
+static uint8_t vdb_buf2[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *) vdb_buf1}, {.buf = (lv_color_t *) vdb_buf2}};
 #  else	/*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
@@ -76,6 +78,11 @@ lv_vdb_t * lv_vdb_get(void)
     /* Wait until VDB become ACTIVE from FLUSH by the
      * user call of 'lv_flush_ready()' in display drivers's flush function*/
     while(vdb_state != LV_VDB_STATE_ACTIVE);
+
+    if(vdb.buf == (void*)LV_VDB_ADR_INV) {
+        LV_LOG_ERROR("VDB address is invalid. Use `lv_vdb_set_adr` to set a valid address or use LV_VDB_ADR = 0 in lv_conf.h");
+        return NULL;
+    }
     return &vdb;
 #else
     /*If already there is an active do nothing*/
@@ -103,8 +110,10 @@ lv_vdb_t * lv_vdb_get(void)
 void lv_vdb_flush(void)
 {
     lv_vdb_t * vdb_act = lv_vdb_get();
-    if(vdb_act == NULL) return;
-
+    if(!vdb_act) {
+         LV_LOG_WARN("Invalid VDB pointer");
+         return;
+     }
 #if LV_VDB_DOUBLE == 0
     vdb_state = LV_VDB_STATE_FLUSH;     /*User call to 'lv_flush_ready()' will set to ACTIVE 'disp_flush'*/
 #else
@@ -122,6 +131,23 @@ void lv_vdb_flush(void)
 
 }
 
+
+/**
+ * Set the address of VDB buffer(s) manually. To use this set `LV_VDB_ADR` (and `LV_VDB2_ADR`) to `LV_VDB_ADR_INV` in `lv_conf.h`.
+ * It should be called before `lv_init()`. The size of the buffer should be: `LV_VDB_SIZE_IN_BYTES`
+ * @param buf1 address of the VDB.
+ * @param buf2 address of the second buffer. `NULL` if `LV_VDB_DOUBLE  0`
+ */
+void lv_vdb_set_adr(void * buf1, void * buf2)
+{
+#if LV_VDB_DOUBLE == 0
+    vdb.buf = buf1;
+#else
+    vdb[0].buf = buf1;
+    vdb[1].buf = buf2;
+#endif
+}
+
 /**
  * Call in the display driver's  'disp_flush' function when the flushing is finished
  */
@@ -129,9 +155,24 @@ void lv_flush_ready(void)
 {
 #if LV_VDB_DOUBLE == 0
     vdb_state = LV_VDB_STATE_ACTIVE;
+
+#if LV_COLOR_SCREEN_TRANSP
+    memset(vdb_buf, 0x00, LV_VDB_SIZE_IN_BYTES);
+#endif
+
 #else
-    if(vdb_state[0] == LV_VDB_STATE_FLUSH)  vdb_state[0] = LV_VDB_STATE_FREE;
-    if(vdb_state[1] == LV_VDB_STATE_FLUSH)  vdb_state[1] = LV_VDB_STATE_FREE;
+    if(vdb_state[0] == LV_VDB_STATE_FLUSH) {
+#if LV_COLOR_SCREEN_TRANSP
+        memset(vdb_buf[0], 0x00, LV_VDB_SIZE_IN_BYTES);
+#endif
+        vdb_state[0] = LV_VDB_STATE_FREE;
+    }
+    if(vdb_state[1] == LV_VDB_STATE_FLUSH) {
+#if LV_COLOR_SCREEN_TRANSP
+        memset(vdb_buf[1], 0x00, LV_VDB_SIZE_IN_BYTES);
+#endif
+        vdb_state[1] = LV_VDB_STATE_FREE;
+    }
 #endif
 }
 

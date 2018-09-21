@@ -40,6 +40,10 @@
 static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa);
 
+#if LV_COLOR_SCREEN_TRANSP
+static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -62,10 +66,14 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
  */
 void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t color, lv_opa_t opa)
 {
-	if(opa < LV_OPA_MIN) return;
-	if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+    if(opa < LV_OPA_MIN) return;
+    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+         LV_LOG_WARN("Invalid VDB pointer");
+         return;
+     }
 
     /*Pixel out of the mask*/
     if(x < mask_p->x1 || x > mask_p->x2 ||
@@ -81,14 +89,18 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 
     lv_disp_t * disp = lv_disp_get_active();
     if(disp->driver.vdb_wr) {
-		disp->driver.vdb_wr((uint8_t*)vdb_p->buf, vdb_width, x, y, color, opa);
+        disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, x, y, color, opa);
     } else {
-		lv_color_t * vdb_px_p = vdb_p->buf + y * vdb_width + x;
-		if(opa == LV_OPA_COVER) {
-			*vdb_px_p = color;
-		} else {
-			*vdb_px_p = lv_color_mix(color, *vdb_px_p, opa);
-		}
+        lv_color_t * vdb_px_p = vdb_p->buf + y * vdb_width + x;
+#if LV_COLOR_SCREEN_TRANSP == 0
+        if(opa == LV_OPA_COVER) {
+            *vdb_px_p = color;
+        } else {
+            *vdb_px_p = lv_color_mix(color, *vdb_px_p, opa);
+        }
+#else
+        *vdb_px_p = color_mix_2_alpha(*vdb_px_p, (*vdb_px_p).alpha, color, opa);
+#endif
     }
 }
 
@@ -103,12 +115,16 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
               lv_color_t color, lv_opa_t opa)
 {
-	if(opa < LV_OPA_MIN) return;
-	if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+    if(opa < LV_OPA_MIN) return;
+    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_area_t res_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+         LV_LOG_WARN("Invalid VDB pointer");
+         return;
+     }
 
     /*Get the union of cord and mask*/
     /* The mask is already truncated to the vdb size
@@ -221,16 +237,16 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     const uint8_t bpp1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
     const uint8_t bpp2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
     const uint8_t bpp4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
-                                         68,  85,  102, 119,
-                                         136, 153, 170, 187,
-                                         204, 221, 238, 255
-                                        };
-	if(opa < LV_OPA_MIN) return;
-	if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+                                        68,  85,  102, 119,
+                                        136, 153, 170, 187,
+                                        204, 221, 238, 255
+                                       };
+    if(opa < LV_OPA_MIN) return;
+    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     if(font_p == NULL) {
-    	LV_LOG_WARN("Font: character's bitmap not found");
-		return;
+        LV_LOG_WARN("Font: character's bitmap not found");
+        return;
     }
 
     lv_coord_t pos_x = pos_p->x;
@@ -238,12 +254,12 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     uint8_t letter_w = lv_font_get_real_width(font_p, letter);
     uint8_t letter_h = lv_font_get_height(font_p);
     uint8_t bpp = lv_font_get_bpp(font_p, letter);  /*Bit per pixel (1,2, 4 or 8)*/
-    uint8_t * bpp_opa_table;
+    const uint8_t * bpp_opa_table;
     uint8_t mask_init;
     uint8_t mask;
 
     if(lv_font_is_monospace(font_p, letter)) {
-    	pos_x += (lv_font_get_width(font_p, letter) - letter_w) / 2;
+        pos_x += (lv_font_get_width(font_p, letter) - letter_w) / 2;
     }
 
 
@@ -277,6 +293,11 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
             pos_y + letter_h < mask_p->y1 || pos_y > mask_p->y2) return;
 
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
+
     lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
     lv_color_t * vdb_buf_tmp = vdb_p->buf;
     lv_coord_t col, row;
@@ -314,21 +335,25 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
         for(col = col_start; col < col_end; col ++) {
             letter_px = (*map_p & mask) >> (8 - col_bit - bpp);
             if(letter_px != 0) {
-            	if(opa == LV_OPA_COVER) {
-                	px_opa = bpp == 8 ? letter_px : bpp_opa_table[letter_px];
-            	} else {
-            		px_opa = bpp == 8 ?
-        					(uint16_t)((uint16_t)letter_px * opa) >> 8 :
-							(uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
-            	}
+                if(opa == LV_OPA_COVER) {
+                    px_opa = bpp == 8 ? letter_px : bpp_opa_table[letter_px];
+                } else {
+                    px_opa = bpp == 8 ?
+                             (uint16_t)((uint16_t)letter_px * opa) >> 8 :
+                             (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
+                }
 
-            	if(disp->driver.vdb_wr) {
-            		disp->driver.vdb_wr((uint8_t*)vdb_p->buf, vdb_width,
-            				            (col + pos_x) - vdb_p->area.x1, (row + pos_y) - vdb_p->area.y1,
-										 color, px_opa);
-            	} else {
-					*vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
-            	}
+                if(disp->driver.vdb_wr) {
+                    disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width,
+                                        (col + pos_x) - vdb_p->area.x1, (row + pos_y) - vdb_p->area.y1,
+                                        color, px_opa);
+                } else {
+#if LV_COLOR_SCREEN_TRANSP == 0
+                    *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
+#else
+                    *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).alpha, color, px_opa);
+#endif
+                }
             }
 
             vdb_buf_tmp++;
@@ -365,12 +390,16 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
              lv_color_t recolor, lv_opa_t recolor_opa)
 {
 
-	if(opa < LV_OPA_MIN) return;
-	if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+    if(opa < LV_OPA_MIN) return;
+    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_area_t masked_a;
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
+    if(!vdb_p) {
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
 
     /*Get the union of map size and mask*/
     /* The mask is already truncated to the vdb size
@@ -411,33 +440,33 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*The simplest case just copy the pixels into the VDB*/
     if(chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
 
-    	/*Use the custom VDB write function is exists*/
-    	if(disp->driver.vdb_wr) {
-			lv_coord_t col;
-			for(row = masked_a.y1; row <= masked_a.y2; row++) {
-				for(col = 0; col < map_useful_w; col++) {
-					lv_color_t px_color = (lv_color_t) *((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
-					disp->driver.vdb_wr((uint8_t*)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa);
-				}
-				map_p += map_width * px_size_byte;	/*Next row on the map*/
-			}
-    	}
-    	/*Normal native VDB*/
-    	else {
-    		for(row = masked_a.y1; row <= masked_a.y2; row++) {
+        /*Use the custom VDB write function is exists*/
+        if(disp->driver.vdb_wr) {
+            lv_coord_t col;
+            for(row = masked_a.y1; row <= masked_a.y2; row++) {
+                for(col = 0; col < map_useful_w; col++) {
+                    lv_color_t px_color = (lv_color_t) * ((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
+                    disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa);
+                }
+                map_p += map_width * px_size_byte;  /*Next row on the map*/
+            }
+        }
+        /*Normal native VDB*/
+        else {
+            for(row = masked_a.y1; row <= masked_a.y2; row++) {
 #if USE_LV_GPU
-    			if(lv_disp_is_mem_blend_supported() == false) {
-    				sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
-    			} else {
-    				lv_disp_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
-    			}
+                if(lv_disp_is_mem_blend_supported() == false) {
+                    sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
+                } else {
+                    lv_disp_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
+                }
 #else
-    			sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
+                sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
 #endif
-    			map_p += map_width * px_size_byte;               /*Next row on the map*/
-    			vdb_buf_tmp += vdb_width;                        /*Next row on the VDB*/
-    		}
-    	}
+                map_p += map_width * px_size_byte;               /*Next row on the map*/
+                vdb_buf_tmp += vdb_width;                        /*Next row on the VDB*/
+            }
+        }
     }
 
     /*In the other cases every pixel need to be checked one-by-one*/
@@ -459,7 +488,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
 #elif LV_COLOR_DEPTH == 16
                     /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
                     px_color.full = px_color_p[0] + (px_color_p[1] << 8);
-#elif LV_COLOR_DEPTH == 24
+#elif LV_COLOR_DEPTH == 32
                     px_color = *((lv_color_t *)px_color_p);
 #endif
                     lv_opa_t px_opa = *(px_color_p + LV_IMG_PX_SIZE_ALPHA_BYTE - 1);
@@ -480,28 +509,49 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                     }
                     /*Handle custom VDB write is present*/
                     if(disp->driver.vdb_wr) {
-    					disp->driver.vdb_wr((uint8_t*)vdb_p->buf, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
+                        disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
                     }
                     /*Normal native VDB write*/
                     else {
-						if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = recolored_px.full;
-						else vdb_buf_tmp[col] = lv_color_mix(recolored_px, vdb_buf_tmp[col], opa_result);
+                        if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = recolored_px.full;
+                        else vdb_buf_tmp[col] = lv_color_mix(recolored_px, vdb_buf_tmp[col], opa_result);
                     }
                 } else {
                     /*Handle custom VDB write is present*/
                     if(disp->driver.vdb_wr) {
-                    	disp->driver.vdb_wr((uint8_t*)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa_result);
-					}
-					/*Normal native VDB write*/
-					else {
-						if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col] = px_color;
-						else vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
-					}
+                        disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa_result);
+                    }
+                    /*Normal native VDB write*/
+                    else {
+                        if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col] = px_color;
+                        else {
+#if LV_COLOR_SCREEN_TRANSP == 0
+                            vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
+#else
+                            vdb_buf_tmp[col] = color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].alpha, px_color,  opa_result);
+//                            if(vdb_buf_tmp[col].alpha == LV_OPA_TRANSP) {
+//                                /* When it is the first visible pixel on the transparent screen
+//                                 * simlply use this color and set the pixel opa as backrounds alpha*/
+//                                vdb_buf_tmp[col] = px_color;
+//                                vdb_buf_tmp[col].alpha = opa_result;
+//                            } else {
+//                                /* If already this pixel is already written then for performance reasons
+//                                 * don't care with alpha channel
+//                                 */
+//                                lv_opa_t bg_opa = vdb_buf_tmp[col].alpha;
+//                                vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
+//
+//                                uint16_t opa_tmp = (uint16_t)opa_result + ((bg_opa * (255 - opa_result)) >> 8);
+//                                vdb_buf_tmp[col].alpha = opa_tmp > 0xFF ? 0xFF : opa_tmp ;
+//                            }
+#endif
+                        }
+                    }
                 }
             }
 
-            map_p += map_width * px_size_byte;	/*Next row on the map*/
-            vdb_buf_tmp += vdb_width;         	/*Next row on the VDB*/
+            map_p += map_width * px_size_byte;  /*Next row on the map*/
+            vdb_buf_tmp += vdb_width;           /*Next row on the VDB*/
         }
     }
 }
@@ -546,49 +596,108 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
 
     lv_disp_t * disp = lv_disp_get_active();
     if(disp->driver.vdb_wr) {
-		for(col = fill_area->x1; col <= fill_area->x2; col++) {
-			for(row = fill_area->y1; row <= fill_area->y2; row++) {
-				disp->driver.vdb_wr((uint8_t*)mem, mem_width, col, row, color, opa);
-			}
-		}
+        for(col = fill_area->x1; col <= fill_area->x2; col++) {
+            for(row = fill_area->y1; row <= fill_area->y2; row++) {
+                disp->driver.vdb_wr((uint8_t *)mem, mem_width, col, row, color, opa);
+            }
+        }
     } else {
-		mem += fill_area->y1 * mem_width;  /*Go to the first row*/
+        mem += fill_area->y1 * mem_width;  /*Go to the first row*/
 
-		/*Run simpler function without opacity*/
-		if(opa == LV_OPA_COVER) {
+        /*Run simpler function without opacity*/
+        if(opa == LV_OPA_COVER) {
 
-			/*Fill the first row with 'color'*/
-			for(col = fill_area->x1; col <= fill_area->x2; col++) {
-				mem[col] = color;
-			}
+            /*Fill the first row with 'color'*/
+            for(col = fill_area->x1; col <= fill_area->x2; col++) {
+                mem[col] = color;
+            }
 
-			/*Copy the first row to all other rows*/
-			lv_color_t * mem_first = &mem[fill_area->x1];
-			lv_coord_t copy_size = (fill_area->x2 - fill_area->x1 + 1) * sizeof(lv_color_t);
-			mem += mem_width;
+            /*Copy the first row to all other rows*/
+            lv_color_t * mem_first = &mem[fill_area->x1];
+            lv_coord_t copy_size = (fill_area->x2 - fill_area->x1 + 1) * sizeof(lv_color_t);
+            mem += mem_width;
 
-			for(row = fill_area->y1 + 1; row <= fill_area->y2; row++) {
-				memcpy(&mem[fill_area->x1], mem_first, copy_size);
-				mem += mem_width;
-			}
-		}
-		/*Calculate with alpha too*/
-		else {
-			lv_color_t bg_tmp = LV_COLOR_BLACK;
-			lv_color_t opa_tmp = lv_color_mix(color, bg_tmp, opa);
-			for(row = fill_area->y1; row <= fill_area->y2; row++) {
-				for(col = fill_area->x1; col <= fill_area->x2; col++) {
-					/*If the bg color changed recalculate the result color*/
-					if(mem[col].full != bg_tmp.full) {
-						bg_tmp = mem[col];
-						opa_tmp = lv_color_mix(color, bg_tmp, opa);
-					}
-					mem[col] = opa_tmp;
-				}
-				mem += mem_width;
-			}
-		}
+            for(row = fill_area->y1 + 1; row <= fill_area->y2; row++) {
+                memcpy(&mem[fill_area->x1], mem_first, copy_size);
+                mem += mem_width;
+            }
+        }
+        /*Calculate with alpha too*/
+        else {
+
+#if LV_COLOR_SCREEN_TRANSP == 0
+            lv_color_t bg_tmp = LV_COLOR_BLACK;
+            lv_color_t opa_tmp = lv_color_mix(color, bg_tmp, opa);
+#endif
+            for(row = fill_area->y1; row <= fill_area->y2; row++) {
+                for(col = fill_area->x1; col <= fill_area->x2; col++) {
+#if LV_COLOR_SCREEN_TRANSP == 0
+                    /*If the bg color changed recalculate the result color*/
+                    if(mem[col].full != bg_tmp.full) {
+                        bg_tmp = mem[col];
+                        opa_tmp = lv_color_mix(color, bg_tmp, opa);
+                    }
+
+                    mem[col] = opa_tmp;
+
+#else
+                    mem[col] = color_mix_2_alpha(mem[col], mem[col].alpha, color, opa);
+#endif
+                }
+                mem += mem_width;
+            }
+        }
     }
 }
+
+#if LV_COLOR_SCREEN_TRANSP
+
+/**
+ * Mix two colors. Both color can have alpha value. It requires ARGB888 colors.
+ * @param bg_color background color
+ * @param bg_opa alpha of the background color
+ * @param fg_color foreground color
+ * @param fg_opa alpha of the foreground color
+ * @return the mixed color. the alpha channel (color.alpha) contains the result alpha
+ */
+static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa)
+{
+    /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
+    if(fg_opa == LV_OPA_COVER && bg_opa <= LV_OPA_MIN) {
+        fg_color.alpha = fg_opa;
+        return fg_color;
+    }
+    /*Transparent foreground: use the Background*/
+    else if(fg_opa <= LV_OPA_MIN) {
+        return bg_color;
+    }
+    /*Opaque background: use simple mix*/
+    else if (bg_opa >= LV_OPA_MAX) {
+        return lv_color_mix(fg_color, bg_color, fg_opa);
+    }
+    /*Both colors have alpha. Expensive calculation need to be applied*/
+    else {
+        /*Save the parameters and the result. If they will be asked again don't compute again*/
+        static lv_opa_t fg_opa_save = 0;
+        static lv_opa_t bg_opa_save = 0;
+        static lv_color_t c = {0};
+
+        if(fg_opa != fg_opa_save || bg_opa != bg_opa_save) {
+            fg_opa_save = fg_opa;
+            bg_opa_save = bg_opa;
+            /*Info: https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
+            lv_opa_t alpha_res = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
+            if(alpha_res == 0) {
+                while(1);
+            }
+            lv_opa_t ratio = (uint16_t)((uint16_t) fg_opa * 255) / alpha_res;
+            c = lv_color_mix(fg_color, bg_color, ratio);
+            c.alpha = alpha_res;
+        }
+        return c;
+
+    }
+}
+#endif /*LV_COLOR_SCREEN_TRANSP*/
 
 #endif

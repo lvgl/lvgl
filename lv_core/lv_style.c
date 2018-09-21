@@ -75,7 +75,6 @@ void lv_style_init(void)
     /*Screen style*/
     lv_style_scr.glass = 0;
     lv_style_scr.body.opa = LV_OPA_COVER;
-    lv_style_scr.body.thickness = LV_DPI / 12;
     lv_style_scr.body.main_color = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color = LV_COLOR_WHITE;
     lv_style_scr.body.radius = 0;
@@ -104,7 +103,8 @@ void lv_style_init(void)
 
     lv_style_scr.line.opa = LV_OPA_COVER;
     lv_style_scr.line.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_scr.line.width = 1;
+    lv_style_scr.line.width = 2;
+    lv_style_scr.line.rounded = 0;
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
@@ -256,12 +256,14 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
 		res->glass = start->glass;
 		res->text.font = start->text.font;
 		res->body.shadow.type = start->body.shadow.type;
+        res->line.rounded = start->line.rounded;
 	} else {
 		res->body.empty = end->body.empty;
 		res->body.border.part = end->body.border.part;
 		res->glass = end->glass;
 		res->text.font = end->text.font;
 		res->body.shadow.type = end->body.shadow.type;
+        res->line.rounded = end->line.rounded;
 	}
 }
 

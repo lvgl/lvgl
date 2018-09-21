@@ -13,7 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
 #include <stdint.h>
 
 /*********************
@@ -25,14 +29,15 @@ extern "C" {
  **********************/
 
 /*Possible log level. For compatibility declare it independently from `USE_LV_LOG`*/
-typedef enum
+enum
 {
 	LV_LOG_LEVEL_TRACE,		/*A lot of logs to give detailed information*/
 	LV_LOG_LEVEL_INFO,		/*Log important events*/
 	LV_LOG_LEVEL_WARN,		/*Log if something unwanted happened but didn't caused problem*/
 	LV_LOG_LEVEL_ERROR,		/*Only critical issue, when the system may fail*/
 	_LV_LOG_LEVEL_NUM
-}lv_log_level_t;
+};
+typedef uint8_t lv_log_level_t;
 
 #if USE_LV_LOG
 

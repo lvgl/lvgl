@@ -41,9 +41,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
+enum {
     LV_PRELOAD_TYPE_SPINNING_ARC,
-} lv_preloader_type_t;
+};
+typedef uint8_t lv_preloader_type_t;
 
 /*Data of pre loader*/
 typedef struct {
@@ -55,10 +56,10 @@ typedef struct {
 
 
 /*Styles*/
-typedef enum {
+enum {
     LV_PRELOAD_STYLE_MAIN,
-} lv_preload_style_t;
-
+};
+typedef uint8_t lv_preload_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

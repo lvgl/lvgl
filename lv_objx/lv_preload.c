@@ -12,6 +12,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rect.h"
 #include "../lv_draw/lv_draw_arc.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -95,7 +96,16 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new pre loader pre loader*/
     if(copy == NULL) {
-        lv_obj_set_style(new_preload, &lv_style_pretty_color);
+        lv_obj_set_size(new_preload, LV_DPI / 2, LV_DPI / 2);
+
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            lv_preload_set_style(new_preload, LV_PRELOAD_STYLE_MAIN, th->preload);
+        } else {
+            lv_obj_set_style(new_preload, &lv_style_pretty_color);
+        }
+
     }
     /*Copy an existing pre loader*/
     else {
@@ -268,25 +278,28 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
 
         /*Draw a circle as background*/
         lv_style_t * style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
-        lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(preload), lv_obj_get_height(preload))) / 2;
-        lv_coord_t x = preload->coords.x1 + lv_obj_get_width(preload) / 2;
-        lv_coord_t y = preload->coords.y1 + lv_obj_get_height(preload) / 2;
+        if(style->body.border.width > 0) {
+            lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(preload), lv_obj_get_height(preload))) / 2;
+            r -= LV_MATH_MIN(style->body.padding.hor, style->body.padding.ver);
 
-        lv_style_t bg_style;
-        lv_style_copy(&bg_style, &lv_style_plain);
-        bg_style.body.empty = 1;
-        bg_style.body.radius = LV_RADIUS_CIRCLE;
-        bg_style.body.border.color = style->body.aux_color;
-        bg_style.body.border.width = style->body.thickness;
+            lv_coord_t x = preload->coords.x1 + lv_obj_get_width(preload) / 2;
+            lv_coord_t y = preload->coords.y1 + lv_obj_get_height(preload) / 2;
 
-        lv_area_t bg_area;
-        bg_area.x1 = x - r;
-        bg_area.y1 = y - r;
-        bg_area.x2 = x + r;
-        bg_area.y2 = y + r;
+            lv_style_t bg_style;
+            lv_style_copy(&bg_style, &lv_style_plain);
+            bg_style.body.empty = 1;
+            bg_style.body.radius = LV_RADIUS_CIRCLE;
+            bg_style.body.border.color = style->body.border.color;
+            bg_style.body.border.width = style->body.border.width;
 
-        if(style->body.empty == 0) lv_draw_rect(&bg_area, mask, &bg_style, lv_obj_get_opa_scale(preload));
+            lv_area_t bg_area;
+            bg_area.x1 = x - r;
+            bg_area.y1 = y - r;
+            bg_area.x2 = x + r;
+            bg_area.y2 = y + r;
 
+            lv_draw_rect(&bg_area, mask, &bg_style, lv_obj_get_opa_scale(preload));
+        }
         /*Draw the arc above the background circle */
         ancestor_design(preload, mask, mode);
     }

@@ -68,7 +68,7 @@ typedef struct
     lv_coord_t btn_size;               /*Size of the control buttons (square)*/
 } lv_win_ext_t;
 
-typedef enum {
+enum {
     LV_WIN_STYLE_BG,
     LV_WIN_STYLE_CONTENT_BG,
     LV_WIN_STYLE_CONTENT_SCRL,
@@ -76,7 +76,8 @@ typedef enum {
     LV_WIN_STYLE_HEADER,
     LV_WIN_STYLE_BTN_REL,
     LV_WIN_STYLE_BTN_PR,
-} lv_win_style_t;
+};
+typedef uint8_t lv_win_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -94,7 +95,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy);
  * Delete all children of the scrl object, without deleting scrl child.
  * @param obj pointer to an object
  */
-void lv_win_clear(lv_obj_t *obj);
+void lv_win_clean(lv_obj_t *obj);
 
 /*======================
  * Add/remove functions
@@ -135,18 +136,18 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
 
 /**
- * Set the scroll bar mode of a window
- * @param win pointer to a window object
- * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
- */
-void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
-
-/**
  * Set the layout of the window
  * @param win pointer to a window object
  * @param layout the layout from 'lv_layout_t'
  */
 void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
+
+/**
+ * Set the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
+ */
+void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
 
 /**
  * Set a style of a window
@@ -191,6 +192,27 @@ lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
 lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn);
 
 /**
+ * Get the layout of a window
+ * @param win pointer to a window object
+ * @return the layout of the window (from 'lv_layout_t')
+ */
+lv_layout_t lv_win_get_layout(lv_obj_t *win);
+
+/**
+ * Get the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
+ */
+lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win);
+
+/**
+ * Get width of the content area (page scrollable) of the window
+ * @param win pointer to a window object
+ * @return the width of the content area
+ */
+lv_coord_t lv_win_get_width(lv_obj_t * win);
+
+/**
  * Get a style of a window
  * @param win pointer to a button object
  * @param type which style window be get
@@ -217,7 +239,7 @@ void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time);
  */
 static inline void lv_win_scroll_hor(lv_obj_t * win, lv_coord_t dist)
 {
-	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+	lv_win_ext_t * ext = (lv_win_ext_t *)lv_obj_get_ext_attr(win);
 	lv_page_scroll_hor(ext->page, dist);
 }
 /**
@@ -227,7 +249,7 @@ static inline void lv_win_scroll_hor(lv_obj_t * win, lv_coord_t dist)
  */
 static inline void lv_win_scroll_ver(lv_obj_t * win, lv_coord_t dist)
 {
-	lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+	lv_win_ext_t * ext = (lv_win_ext_t *)lv_obj_get_ext_attr(win);
 	lv_page_scroll_ver(ext->page, dist);
 }
 

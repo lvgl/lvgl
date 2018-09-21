@@ -45,10 +45,11 @@ typedef struct
     lv_style_t *style_indic;        /*Style of the indicator*/
 } lv_bar_ext_t;
 
-typedef enum {
+enum {
     LV_BAR_STYLE_BG,
     LV_BAR_STYLE_INDIC,
-} lv_bar_style_t;
+};
+typedef uint8_t lv_bar_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -32,21 +32,23 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum
+enum
 {
     LV_TXT_FLAG_NONE =     0x00,
     LV_TXT_FLAG_RECOLOR =  0x01,   /*Enable parsing of recolor command*/
     LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width (Used by the library)*/
     LV_TXT_FLAG_CENTER =   0x04,   /*Align the text to the middle*/
 	LV_TXT_FLAG_RIGHT  =   0x08,   /*Align the text to the right*/
-} lv_txt_flag_t;
+};
+typedef uint8_t lv_txt_flag_t;
 
-typedef enum
+enum
 {
     LV_TXT_CMD_STATE_WAIT,      /*Waiting for command*/
     LV_TXT_CMD_STATE_PAR,       /*Processing the parameter*/
     LV_TXT_CMD_STATE_IN,        /*Processing the command*/
-} lv_txt_cmd_state_t;
+};
+typedef uint8_t lv_txt_cmd_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES

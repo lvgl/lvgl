@@ -51,14 +51,15 @@ typedef struct
     lv_obj_t * label;   /*Pointer to label*/
 } lv_cb_ext_t;
 
-typedef enum {
+enum {
     LV_CB_STYLE_BG,
     LV_CB_STYLE_BOX_REL,
     LV_CB_STYLE_BOX_PR,
     LV_CB_STYLE_BOX_TGL_REL,
     LV_CB_STYLE_BOX_TGL_PR,
     LV_CB_STYLE_BOX_INA,
-} lv_cb_style_t;
+};
+typedef uint8_t lv_cb_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES

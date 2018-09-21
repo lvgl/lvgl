@@ -61,7 +61,7 @@ typedef struct
 #endif
 } lv_list_ext_t;
 
-typedef enum {
+enum {
     LV_LIST_STYLE_BG,
     LV_LIST_STYLE_SCRL,
     LV_LIST_STYLE_SB,
@@ -70,7 +70,9 @@ typedef enum {
     LV_LIST_STYLE_BTN_TGL_REL,
     LV_LIST_STYLE_BTN_TGL_PR,
     LV_LIST_STYLE_BTN_INA,
-} lv_list_style_t;
+};
+typedef uint8_t lv_list_style_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -88,7 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy);
  * Delete all children of the scrl object, without deleting scrl child.
  * @param obj pointer to an object
  */
-void lv_list_clear(lv_obj_t *obj);
+void lv_list_clean(lv_obj_t *obj);
 
 /*======================
  * Add/remove functions
