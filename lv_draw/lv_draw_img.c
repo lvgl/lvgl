@@ -151,11 +151,8 @@ uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf)
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
             return LV_COLOR_SIZE;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
-#if LV_COLOR_DEPTH != 24
-            return LV_COLOR_SIZE;
-#else
-            return LV_COLOR_SIZE + 1;
-#endif
+            return LV_IMG_PX_SIZE_ALPHA_BYTE;
+
         case LV_IMG_CF_INDEXED_1BIT:
         case LV_IMG_CF_ALPHA_1BIT:
             return 1;
@@ -396,15 +393,15 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
               cf == LV_IMG_CF_INDEXED_2BIT ||
               cf == LV_IMG_CF_INDEXED_4BIT ||
               cf == LV_IMG_CF_INDEXED_8BIT) {
-        lv_color24_t palette_file[256];
-        lv_color24_t * palette_p = NULL;
+        lv_color32_t palette_file[256];
+        lv_color32_t * palette_p = NULL;
         uint8_t px_size = lv_img_color_format_get_px_size(cf);
         uint32_t palette_size = 1 << px_size;
 
         if(decoder_src_type == LV_IMG_SRC_FILE) {
 #if USE_LV_FILESYSTEM
             lv_fs_seek(&decoder_file, 4);   /*Skip the header*/
-            lv_fs_read(&decoder_file, palette_file, palette_size * sizeof(lv_color24_t), NULL);
+            lv_fs_read(&decoder_file, palette_file, palette_size * sizeof(lv_color32_t), NULL);
             palette_p = palette_file;
 #else
             palette_file[0] = 0;       /*Just to solve warnings*/
@@ -545,7 +542,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
         /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full & 0xFF;
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = (bg_color.full >> 8) & 0xFF;
-#elif LV_COLOR_DEPTH == 24
+#elif LV_COLOR_DEPTH == 32
         *((uint32_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = bg_color.full;
 #endif
     }

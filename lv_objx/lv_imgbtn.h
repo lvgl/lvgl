@@ -41,7 +41,7 @@ extern "C" {
 typedef struct {
     lv_btn_ext_t btn; /*Ext. of ancestor*/
     /*New data for this type */
-    void * img_src[LV_BTN_STATE_NUM];       /*Store images to each state*/
+    const void * img_src[LV_BTN_STATE_NUM];       /*Store images to each state*/
     lv_img_cf_t act_cf;           /*Color format of the currently active image*/
 } lv_imgbtn_ext_t;
 

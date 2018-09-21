@@ -30,7 +30,7 @@ extern "C" {
 # define LV_IMG_PX_SIZE_ALPHA_BYTE   2
 #elif LV_COLOR_DEPTH == 16
 # define LV_IMG_PX_SIZE_ALPHA_BYTE   3
-#elif LV_COLOR_DEPTH == 24
+#elif LV_COLOR_DEPTH == 32
 # define LV_IMG_PX_SIZE_ALPHA_BYTE   4
 #endif
 
