@@ -263,7 +263,9 @@
 
 /*Button (dependencies: lv_cont*/
 #define USE_LV_BTN      1
-
+#if USE_LV_BTN != 0
+#define LV_BTN_INK_EFFECT   1       /*1: enable ink effect animation on click. Use `lv_btn_set_ink_in/wait/out_time` to set the animation time*/
+#endif
 /*Image Button (dependencies: lv_btn*/
 #define USE_LV_IMGBTN   1
 

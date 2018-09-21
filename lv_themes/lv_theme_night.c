@@ -278,6 +278,34 @@ static void gauge_init(void)
 #endif
 }
 
+static void arc_init(void)
+{
+#if USE_LV_ARC != 0
+
+    static lv_style_t arc;
+    lv_style_copy(&arc, &def);
+    arc.line.width = 8;
+    arc.line.color = lv_color_hsv_to_rgb(_hue, 80, 70);
+    arc.line.rounded = 1;
+
+    /*For preloader*/
+    arc.body.border.width = 7;
+    arc.body.border.color = lv_color_hsv_to_rgb(_hue, 11, 48);
+    arc.body.padding.hor = 1;
+    arc.body.padding.ver = 1;
+
+    theme.arc = &arc;
+#endif
+}
+
+static void preload_init(void)
+{
+#if USE_LV_PRELOAD != 0
+
+    theme.preload = theme.arc;
+#endif
+}
+
 static void chart_init(void)
 {
 #if USE_LV_CHART
@@ -667,6 +695,8 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t * font)
     sw_init();
     lmeter_init();
     gauge_init();
+    arc_init();
+    preload_init();
     chart_init();
     calendar_init();
     cb_init();
