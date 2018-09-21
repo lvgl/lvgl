@@ -96,6 +96,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     lv_fs_res_t res = file_p->drv->open(file_p->file_d, real_path, mode);
 
     if(res != LV_FS_RES_OK) {
+        lv_mem_free(file_p->file_d);
+        file_p->file_d = NULL;
         file_p->drv = NULL;
     }
 
