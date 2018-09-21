@@ -265,16 +265,14 @@
 /*Button (dependencies: lv_cont*/
 #define USE_LV_BTN      1
 #if USE_LV_BTN != 0
-#define LV_BTN_INK_EFFECT   1       /*1: enable ink effect animation on click. Use `lv_btn_set_ink_in/wait/out_time` to set the animation time*/
+#define LV_BTN_INK_EFFECT   1       /*Enable button-state animations - draw a circle on click (dependencies: USE_LV_ANIMATION)*/
 #endif
+
 /*Image Button (dependencies: lv_btn*/
 #define USE_LV_IMGBTN   1
 
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
-
-/*Enable button-state animations - draw a circle on click (dependencies: USE_LV_ANIMATION)*/
-#define LV_BTN_INK_EFFECT   1
 
 /*Keyboard (dependencies: lv_btnm)*/
 #define USE_LV_KB       1
