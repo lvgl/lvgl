@@ -104,6 +104,8 @@ void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
 {
 	/*Set the brightness*/
 	lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
+	if(ext->bright == bright) return;
+
 	ext->bright = bright;
 
 	/*Invalidate the object there fore it will be redrawn*/

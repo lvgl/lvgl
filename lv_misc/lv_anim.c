@@ -115,7 +115,9 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
 uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 {
     int32_t d = LV_MATH_ABS((int32_t) start - end);
-    uint16_t time = (int32_t)((int32_t)(d * 1000) / speed);
+    uint32_t time = (int32_t)((int32_t)(d * 1000) / speed);
+
+    if(time > UINT16_MAX) time = UINT16_MAX;
 
     if(time == 0) {
         time++;

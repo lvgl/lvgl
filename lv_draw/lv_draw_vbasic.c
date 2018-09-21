@@ -167,7 +167,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     }
     /*Fill with opacity*/
     else {
-    	/*Use hw blend if present*/
+        /*Use hw blend if present*/
         if(lv_disp_is_mem_blend_supported()) {
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
@@ -317,7 +317,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
  */
 void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p, 
              const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-			 lv_color_t recolor, lv_opa_t recolor_opa)
+             lv_color_t recolor, lv_opa_t recolor_opa)
 {
     lv_area_t masked_a;
     bool union_ok;
@@ -384,31 +384,43 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
         for(row = masked_a.y1; row <= masked_a.y2; row++) {
             for(col = 0; col < map_useful_w; col++) {
                 lv_opa_t opa_result = opa;
-                lv_color_t * px_color = (lv_color_t *) &map_p[(uint32_t)col * px_size_byte];
-
-                /*Handle chroma key*/
-                if(chroma_key && px_color->full == chroma_key_color.full) continue;
+                uint8_t * px_color_p = (uint8_t *) &map_p[(uint32_t)col * px_size_byte];
+                lv_color_t px_color;
 
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
-                    lv_opa_t px_opa = (*(((uint8_t *) px_color) + LV_IMG_PX_SIZE_ALPHA_BYTE - 1));
+#if LV_COLOR_DEPTH == 8
+                px_color.full = px_color_p[0];
+#elif LV_COLOR_DEPTH == 16
+                /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
+                px_color.full = px_color_p[0] + (px_color_p[1] << 8);
+#elif LV_COLOR_DEPTH == 24
+                px_color = *((lv_color_t*)px_color_p);
+#endif
+                    lv_opa_t px_opa = *(px_color_p + LV_IMG_PX_SIZE_ALPHA_BYTE - 1);
                     if(px_opa == LV_OPA_TRANSP) continue;
                     else if(px_opa != LV_OPA_COVER) opa_result = (uint32_t)((uint32_t)px_opa * opa_result) >> 8;
                 }
+                else {
+                    px_color = *((lv_color_t*)px_color_p);
+                }
+
+                /*Handle chroma key*/
+                if(chroma_key && px_color.full == chroma_key_color.full) continue;
 
                 /*Re-color the pixel if required*/
                 if(recolor_opa != LV_OPA_TRANSP) {
 
-                	if(last_img_px.full != px_color->full) {		/*Minor acceleration: calculate only for new colors (save the last)*/
-                		last_img_px = *px_color;
-                		recolored_px = lv_color_mix(recolor, last_img_px, recolor_opa);
-                	}
+                    if(last_img_px.full != px_color.full) {     /*Minor acceleration: calculate only for new colors (save the last)*/
+                        last_img_px = px_color;
+                        recolored_px = lv_color_mix(recolor, last_img_px, recolor_opa);
+                    }
 
                     if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = recolored_px.full;
                     else vdb_buf_tmp[col] = lv_color_mix(recolored_px, vdb_buf_tmp[col], opa_result);
                 } else {
-                    if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col].full = px_color->full;
-                    else vdb_buf_tmp[col] = lv_color_mix(*px_color, vdb_buf_tmp[col], opa_result);
+                    if(opa_result == LV_OPA_COVER) vdb_buf_tmp[col] = px_color;
+                    else vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
                 }
 
 
@@ -441,8 +453,8 @@ static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t len
     } else {
         uint32_t col;
         for(col = 0; col < length; col++) {
-        	dest[col] = lv_color_mix(src[col], dest[col], opa);
-		}
+            dest[col] = lv_color_mix(src[col], dest[col], opa);
+        }
     }
 }
 

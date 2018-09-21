@@ -125,6 +125,9 @@ void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en)
 #if USE_LV_ANIMATION == 0
     anim_en = false;
 #endif
+
+    if(lv_roller_get_selected(roller) == sel_opt) return;
+
     lv_ddlist_set_selected(roller, sel_opt);
     refr_position(roller, anim_en);
 }
