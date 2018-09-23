@@ -283,10 +283,25 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask area*/
-        return  ancestor_design_f(bar, mask, mode);;
+        return  ancestor_design_f(bar, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-        ancestor_design_f(bar, mask, mode);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(bar);
 
+#if USE_LV_GROUP == 0
+        ancestor_design_f(bar, mask, mode);
+#else
+        /* Draw the borders later if the bar is focused.
+         * At value = 100% the indicator can cover to whole background and the focused style won't be visible*/
+        if(lv_obj_is_focused(bar)) {
+            lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
+            lv_style_t style_tmp;
+            lv_style_copy(&style_tmp, style_bg);
+            style_tmp.body.border.width = 0;
+            lv_draw_rect(&bar->coords, mask, &style_tmp, opa_scale);
+        } else {
+            ancestor_design_f(bar, mask, mode);
+        }
+#endif
         lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
         if(ext->cur_value != ext->min_value) {
@@ -310,8 +325,22 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 			}
 
 			/*Draw the indicator*/
-			lv_draw_rect(&indic_area, mask, style_indic, lv_obj_get_opa_scale(bar));
+			lv_draw_rect(&indic_area, mask, style_indic, opa_scale);
         }
+    }else if(mode == LV_DESIGN_DRAW_POST) {
+#if USE_LV_GROUP
+        /*Draw the border*/
+        if(lv_obj_is_focused(bar)) {
+            lv_opa_t opa_scale = lv_obj_get_opa_scale(bar);
+            lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
+            lv_style_t style_tmp;
+            lv_style_copy(&style_tmp, style_bg);
+            style_tmp.body.empty = 1;
+            style_tmp.body.shadow.width = 0;
+            lv_draw_rect(&bar->coords, mask, &style_tmp, opa_scale);
+        }
+#endif
+
     }
     return true;
 }

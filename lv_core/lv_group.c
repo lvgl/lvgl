@@ -394,7 +394,7 @@ lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group)
  * @param group pointer to group
  * @return true editing is enabled
  */
-bool lv_group_get_edit_enable(const lv_group_t * group, bool en)
+bool lv_group_get_edit_enable(const lv_group_t * group)
 {
 	return group->edit_mode_en ? true : false;
 }

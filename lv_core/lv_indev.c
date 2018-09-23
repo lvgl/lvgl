@@ -366,13 +366,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
                 i->proc.long_pr_sent == 0 &&
                 lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME )
         {
-            /*If edit mode is enabled and the focused obejct is editable then change between edit and navigate on long press*/
+            /*If edit mode is enabled and the focused obeject is editable then change between edit and navigate on long press*/
         	lv_obj_t * focused = lv_group_get_focused(i->group);
         	bool editable = false;
         	focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
         	if (i->group->edit_mode_en && editable) {
                 i->group->editing = i->group->editing ? 0 : 1;
+                focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
                 LV_LOG_INFO("Edit mode changed");
                 if(focused) lv_obj_invalidate(focused);
             }

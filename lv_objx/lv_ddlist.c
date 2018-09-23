@@ -526,7 +526,13 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_CLEANUP) {
         ext->label = NULL;
     } else if(sign == LV_SIGNAL_FOCUS) {
-        if(ext->opened == false) {
+
+        /*Open the list if editing*/
+        lv_group_t * g = lv_obj_get_group(ddlist);
+        bool editing = true;
+        if(lv_group_get_edit_enable(g)) editing = lv_group_get_editing(g);
+
+        if(ext->opened == false && editing) {
             ext->opened = true;
             lv_ddlist_refr_size(ddlist, true);
             ext->sel_opt_id_ori = ext->sel_opt_id;

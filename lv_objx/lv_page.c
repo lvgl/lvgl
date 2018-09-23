@@ -557,9 +557,9 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
         return ancestor_design(scrl, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 #if USE_LV_GROUP
-        /* If the page is the active in a group and
+        /* If the page is focused in a group and
          * the background (page) is not visible (transparent or empty)
-         * then activate the style of the scrollable*/
+         * then "activate" the style of the scrollable*/
         lv_style_t * style_ori = lv_obj_get_style(scrl);
         lv_obj_t * page = lv_obj_get_parent(scrl);
         lv_style_t * style_page = lv_obj_get_style(page);

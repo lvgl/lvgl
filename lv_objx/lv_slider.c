@@ -269,6 +269,8 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         lv_style_t * style_knob = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
         lv_style_t * style_indic = lv_slider_get_style(slider, LV_SLIDER_STYLE_INDIC);
 
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(slider);
+
         lv_coord_t slider_w = lv_area_get_width(&slider->coords);
         lv_coord_t slider_h = lv_area_get_height(&slider->coords);
 
@@ -301,7 +303,23 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             area_bg.y1 += slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
             area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
         }
+
+
+#if USE_LV_GROUP == 0
         lv_draw_rect(&area_bg, mask, style_bg, lv_obj_get_opa_scale(slider));
+#else
+        /* Draw the borders later if the bar is focused.
+         * At value = 100% the indicator can cover to whole background and the focused style won't be visible*/
+        if(lv_obj_is_focused(slider)) {
+            lv_style_t style_tmp;
+            lv_style_copy(&style_tmp, style_bg);
+            style_tmp.body.border.width = 0;
+            lv_draw_rect(&area_bg, mask, &style_tmp, opa_scale);
+        } else {
+            lv_draw_rect(&area_bg, mask, style_bg, opa_scale);
+        }
+#endif
+
 
         /*Draw the indicator*/
         lv_area_t area_indic;
@@ -339,7 +357,20 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             area_indic.y1 = area_indic.y2 - area_indic.y1;
         }
 
-        if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic, lv_obj_get_opa_scale(slider));
+        if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic, opa_scale);
+
+        /*Before the knob add the border if required*/
+#if USE_LV_GROUP
+        /* Draw the borders later if the bar is focused.
+         * At value = 100% the indicator can cover to whole background and the focused style won't be visible*/
+        if(lv_obj_is_focused(slider)) {
+            lv_style_t style_tmp;
+            lv_style_copy(&style_tmp, style_bg);
+            style_tmp.body.empty = 1;
+            style_tmp.body.shadow.width = 0;
+            lv_draw_rect(&area_bg, mask, &style_tmp, opa_scale);
+        }
+#endif
 
         /*Draw the knob*/
         lv_area_t knob_area;
@@ -371,7 +402,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         }
 
-        lv_draw_rect(&knob_area, mask, style_knob, lv_obj_get_opa_scale(slider));
+        lv_draw_rect(&knob_area, mask, style_knob, opa_scale);
 
     }
     /*Post draw when the children are drawn*/
@@ -455,7 +486,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_ENTER) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
             if(ext->action != NULL) ext->action(slider);
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {

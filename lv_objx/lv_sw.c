@@ -250,7 +250,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_ENTER) {
-            if(lv_sw_get_state(sw)) lv_sw_off(sw);
+            if(old_val) lv_sw_off(sw);
             else lv_sw_on(sw);
 
             if(slider_action) slider_action(sw);
