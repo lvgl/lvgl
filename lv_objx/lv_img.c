@@ -124,8 +124,18 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
+#if LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
+    switch(src_type) {
+        case LV_IMG_SRC_FILE:       LV_LOG_INFO("lv_img_set_src:  `LV_IMG_SRC_FILE` type found"); break;
+        case LV_IMG_SRC_VARIABLE:   LV_LOG_INFO("lv_img_set_src:  `LV_IMG_SRC_VARIABLE` type found"); break;
+        case LV_IMG_SRC_SYMBOL:     LV_LOG_INFO("lv_img_set_src:  `LV_IMG_SRC_SYMBOL` type found"); break;
+        default: LV_LOG_WARN("lv_img_set_src:  unknown type");
+    }
+#endif
+
     /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMG_SRC_UNKNOWN) {
+        LV_LOG_WARN("lv_img_set_src: unknown image type");
         if(ext->src_type == LV_IMG_SRC_SYMBOL || ext->src_type == LV_IMG_SRC_FILE) {
             lv_mem_free(ext->src);
         }
@@ -139,8 +149,11 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
+        LV_LOG_INFO("lv_img_set_src:  `LV_IMG_SRC_VARIABLE` type found");
         ext->src = src_img;
     } else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
+
+
         /* If the new and the old src are the same then it was only a refresh.*/
         if(ext->src != src_img) {
             lv_mem_free(ext->src);
@@ -264,6 +277,7 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
         lv_obj_get_coords(img, &coords);
 
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_VARIABLE) {
+            LV_LOG_TRACE("lv_img_design: start to draw image");
             lv_area_t cords_tmp;
             cords_tmp.y1 = coords.y1;
             cords_tmp.y2 = coords.y1 + ext->h - 1;
@@ -276,10 +290,11 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
                 }
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
+            LV_LOG_TRACE("lv_img_design: start to draw symbol");
             lv_draw_label(&coords, mask, style, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
-            LV_LOG_WARN("Image source type is unknown in lv_img_design");
+            LV_LOG_WARN("lv_img_design: image source type is unknown");
             lv_draw_img(&img->coords, mask, NULL, style, opa_scale);
         }
     }
