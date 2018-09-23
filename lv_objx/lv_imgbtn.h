@@ -143,7 +143,7 @@ void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t *
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to an image source (a C array or path to a file)
  */
-void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state);
+const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state);
 
 /**
  * Get the current state of the image button

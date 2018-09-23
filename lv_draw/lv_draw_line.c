@@ -182,11 +182,7 @@ static void line_draw_ver(line_draw_t * line, const lv_area_t * mask, const lv_s
 
 static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
-    lv_coord_t width;
-    width = style->line.width;
-#if LV_ANTIALIAS
-    lv_coord_t width_safe = width;      /*`width_safe` is always >=1*/
-#endif
+
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
 
     lv_point_t vect_main, vect_norm;
@@ -216,8 +212,16 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
     vect_norm.x = vect_norm.x << 4;
     vect_norm.y = vect_norm.y << 4;
 
+    lv_coord_t width;
+    width = style->line.width;
+#if LV_ANTIALIAS
+    lv_coord_t width_safe;              /*`width_safe` is always >=1*/
+#endif
+
+    /* The pattern stores the points of the line ending. It has the good direction and length.
+     * The worth case is the 45° line where pattern can have 1.41 x `width` points*/
 #if LV_COMPILER_VLA_SUPPORTED
-    lv_point_t pattern[width_safe];
+    lv_point_t pattern[width * 2];
 #else
     lv_point_t pattern[LINE_MAX_WIDTH];
 #endif
@@ -230,7 +234,8 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
         line_init(&pattern_line, &p0, &vect_norm);
 
         uint32_t width_sqr = width * width;
-        for(i = 0; i < width * 2; i ++) {       /*Run until a big number. Meanwhile the real width will be determined as well*/
+        /* Run for a lot of times. Meanwhile the real width will be determined as well */
+        for(i = 0; i < sizeof(pattern); i ++) {
             pattern[i].x = pattern_line.p_act.x;
             pattern[i].y = pattern_line.p_act.y;
 

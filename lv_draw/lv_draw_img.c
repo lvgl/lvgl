@@ -233,6 +233,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
         return LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is design to the first byte < 0x20*/
     }
 
+    LV_LOG_WARN("lv_img_src_get_type: unknown image type");
     return LV_IMG_SRC_UNKNOWN;
 }
 

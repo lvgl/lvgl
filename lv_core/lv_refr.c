@@ -284,8 +284,8 @@ static void lv_refr_area_no_vdb(const lv_area_t * area_p)
     lv_refr_obj_and_children(top_p, area_p);
 
     /*Also refresh top and sys layer unconditionally*/
-    lv_refr_obj_and_children(lv_layer_top(), &start_mask);
-    lv_refr_obj_and_children(lv_layer_sys(), &start_mask);
+    lv_refr_obj_and_children(lv_layer_top(), area_p);
+    lv_refr_obj_and_children(lv_layer_sys(), area_p);
 }
 
 #else

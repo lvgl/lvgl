@@ -134,7 +134,7 @@ void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t *
  * @param state the state where to get the image (from `lv_btn_state_t`) `
  * @return pointer to an image source (a C array or path to a file)
  */
-void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state)
+const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
@@ -191,7 +191,7 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
         /*Just draw an image*/
         lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
         lv_btn_state_t state = lv_imgbtn_get_state(imgbtn);
-        void * src = ext->img_src[state];
+        const void * src = ext->img_src[state];
         lv_style_t * style = lv_imgbtn_get_style(imgbtn, state);
         lv_opa_t opa_scale = lv_obj_get_opa_scale(imgbtn);
         lv_draw_img(&imgbtn->coords, mask, src, style, opa_scale);
@@ -244,7 +244,7 @@ static void refr_img(lv_obj_t * imgbtn)
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
     lv_btn_state_t state = lv_imgbtn_get_state(imgbtn);
     lv_img_header_t header;
-    void * src = ext->img_src[state];
+    const void * src = ext->img_src[state];
 
     lv_res_t info_res;
     info_res = lv_img_dsc_get_info(src, &header);

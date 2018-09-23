@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_label.h"
+#include "lv_draw_rbasic.h"
 #include "../lv_misc/lv_math.h"
 
 /*********************
