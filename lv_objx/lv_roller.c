@@ -315,7 +315,18 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             refr_position(roller, false);
         }
     } else if(sign == LV_SIGNAL_FOCUS) {
-        ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
+        lv_group_t * g = lv_obj_get_group(roller);
+        bool editing = true;
+        if(lv_group_get_edit_enable(g)) editing = lv_group_get_editing(g);
+
+        if(editing) ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
+        else {
+            /*Revert the original state. Important when moving from edit->navigate mode*/
+            if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
+                ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
+                refr_position(roller, true);
+            }
+        }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         /*Revert the original state*/
         if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
