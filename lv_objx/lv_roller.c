@@ -316,17 +316,27 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
     } else if(sign == LV_SIGNAL_FOCUS) {
         lv_group_t * g = lv_obj_get_group(roller);
-        bool editing = true;
-        if(lv_group_get_edit_enable(g)) editing = lv_group_get_editing(g);
+        bool editing = lv_group_get_editing(g);
+        lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
-        if(editing) ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
-        else {
-            /*Revert the original state. Important when moving from edit->navigate mode*/
-            if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
-                ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
-                refr_position(roller, true);
+        /*Encoders need special handling*/
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            /*In navigate mode revert the original value*/
+            if(!editing) {
+                if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
+                    ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
+                    refr_position(roller, true);
+                }
             }
+            /*Save the current state when entered to edit mode*/
+            else {
+                ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
+            }
+        } else {
+            ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;      /*Save the current value. Used to revert this state if ENER wont't be pressed*/
+
         }
+
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         /*Revert the original state*/
         if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
@@ -347,6 +357,10 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         } else if(c == LV_GROUP_KEY_ENTER) {
             if(ext->ddlist.action) ext->ddlist.action(roller);
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
+
+            lv_group_t * g = lv_obj_get_group(roller);
+            bool editing = lv_group_get_editing(g);
+            if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;

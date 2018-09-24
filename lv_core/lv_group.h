@@ -54,7 +54,6 @@ typedef struct _lv_group_t
     lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
     uint8_t frozen			:1;             /*1: can't focus to new object*/
-    uint8_t edit_mode_en	:1;             /*1: By the long press of `LV_GROP_KEY_ENTER` the object can go to edit mode*/
     uint8_t editing			:1;             /*1: Edit mode, 0: Navigate mode*/
     uint8_t click_focus 	:1;				/*1: If an object in a group is clicked by an indev then it will be focused */
 } lv_group_t;
@@ -142,19 +141,7 @@ void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_func_
 void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
 
 /**
- * Enable the switching between edit and navigate mode on long press of LV_GROUP_KEY_ENTER.
- * User can get the current mode and decide the whether to send
- * LV_GROUP_KEY_PREV/NEXT or LV_GROUP_KEY_LEFT/RIGHT on left/right button.
- * useful if there is only one encoder to navigate,
- * (push: ENTER; long push: mode switch; left/right: focus or edit)
- * @param group pointer to group
- * @param en true or false to enable or disable this feature.
- */
-void lv_group_enable_edit(lv_group_t * group, bool en);
-
-/**
  * Manually set the current mode (edit or navigate).
- * Edit mode needs to be enabled with `lv_group_set_edit_enable`.
  * @param group pointer to group
  * @param edit: true: edit mode; false: navigate mode
  */
@@ -202,13 +189,6 @@ lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(const lv_group_t * grou
  * @return the call back function or NULL if not set
  */
 lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group);
-
-/**
- * Get the edit mode is enabled or not.
- * @param group pointer to group
- * @return true editing is enabled
- */
-bool lv_group_get_edit_enable(const lv_group_t * group);
 
 /**
  * Get the current mode (edit or navigate).

@@ -486,7 +486,16 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_ENTER) {
+        lv_group_t * g = lv_obj_get_group(slider);
+        bool editing = lv_group_get_editing(g);
+        lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+
+        /*Encoders need special handling*/
+        if(indev_type == LV_INDEV_TYPE_ENCODER && c == LV_GROUP_KEY_ENTER) {
+            if(editing) lv_group_set_editing(g, false);
+        }
+
+        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
             if(ext->action != NULL) ext->action(slider);
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {

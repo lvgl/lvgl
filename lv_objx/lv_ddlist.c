@@ -526,19 +526,36 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_CLEANUP) {
         ext->label = NULL;
     } else if(sign == LV_SIGNAL_FOCUS) {
-
-        /*Open the list if editing*/
         lv_group_t * g = lv_obj_get_group(ddlist);
-        bool editing = true;
-        if(lv_group_get_edit_enable(g)) editing = lv_group_get_editing(g);
+        bool editing = lv_group_get_editing(g);
+        lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
-        if(ext->opened == false && editing) {
-            ext->opened = true;
-            lv_ddlist_refr_size(ddlist, true);
-            ext->sel_opt_id_ori = ext->sel_opt_id;
+        /*Encoders need special handling*/
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            /*Open the list if editing*/
+            if(editing) {
+                ext->opened = true;
+                ext->sel_opt_id_ori = ext->sel_opt_id;
+                lv_ddlist_refr_size(ddlist, true);
+            }
+            /*Close the lift if navigating*/
+            else {
+                ext->opened = false;
+                ext->sel_opt_id = ext->sel_opt_id_ori;
+                lv_ddlist_refr_size(ddlist, true);
+
+            }
+        }
+        else {
+            /*Open the list if closed*/
+            if(!ext->opened) {
+                ext->opened = true;
+                ext->sel_opt_id_ori = ext->sel_opt_id;      /*Save the current value. Used to revert this state if ENER wont't be pressed*/
+                lv_ddlist_refr_size(ddlist, true);
+            }
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
-        if(ext->opened != false) {
+        if(ext->opened) {
             ext->opened = false;
             ext->sel_opt_id = ext->sel_opt_id_ori;
             lv_ddlist_refr_size(ddlist, true);
@@ -571,6 +588,10 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 ext->sel_opt_id_ori = ext->sel_opt_id;
                 ext->opened = 0;
                 if(ext->action) ext->action(ddlist);
+
+                lv_group_t * g = lv_obj_get_group(ddlist);
+                bool editing = lv_group_get_editing(g);
+                if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
             } else {
                 ext->opened = 1;
             }

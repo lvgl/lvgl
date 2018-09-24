@@ -53,7 +53,6 @@ lv_group_t * lv_group_create(void)
     group->frozen = 0;
     group->focus_cb = NULL;
     group->click_focus = 1;
-    group->edit_mode_en = 0;
     group->editing = 0;
 
     return group;
@@ -289,22 +288,7 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
 }
 
 /**
- * Enable the switching between edit and navigate mode on long press of LV_GROUP_KEY_ENTER.
- * User can get the current mode and decide the whether to send
- * LV_GROUP_KEY_PREV/NEXT or LV_GROUP_KEY_LEFT/RIGHT on left/right button.
- * useful if there is only one encoder to navigate,
- * (push: ENTER; long push: mode switch; left/right: focus or edit)
- * @param group pointer to group
- * @param en true or false to enable or disable this feature.
- */
-void lv_group_enable_edit(lv_group_t * group, bool en)
-{
-	group->edit_mode_en = en ? 1 : 0;
-}
-
-/**
  * Manually set the current mode (edit or navigate).
- * Edit mode needs to be enabled with `lv_group_set_edit_enabel`.
  * @param group pointer to group
  * @param edit: true: edit mode; false: navigate mode
  */
@@ -387,16 +371,6 @@ lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group)
 {
 	if(!group) return false;
     return group->focus_cb;
-}
-
-/**
- * Get the edit mode is enabled or not.
- * @param group pointer to group
- * @return true editing is enabled
- */
-bool lv_group_get_edit_enable(const lv_group_t * group)
-{
-	return group->edit_mode_en ? true : false;
 }
 
 /**
