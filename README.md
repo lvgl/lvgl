@@ -2,7 +2,7 @@
 
 ![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
 
-**LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**
+**LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
 https://littlevgl.com
 
 ## Key features
