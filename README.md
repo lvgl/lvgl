@@ -2,34 +2,23 @@
 
 ![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
 
-LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.
-
-Homepage: https://littlevgl.com
-
-### Table Of Content
-* [Key features](#key-features)
-* [Porting](#porting)
-* [Project set-up](#project-set-up)
-* [PC simulator](#pc-simulator)
-* [Related repositories](#related-repositories)
-* [Screenshots](#screenshots)
-* [Contributing](#contributing)
-* [Donate](#donate)
+**LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**
+https://littlevgl.com
 
 ## Key features
-* Powerful building blocks: buttons, charts, lists, sliders, images, etc.
-* Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
-* Various input devices: touch pad, mouse, keyboard, encoder, buttons, etc.
-* Multi-language support with UTF-8 encoding
-* Fully customizable graphical elements
-* Hardware independent to use with any microcontroller or display
-* Scalable to operate with little memory (50 kB Flash, 10 kB RAM)
-* OS, External memory and GPU supported but not required
-* Single frame buffer operation even with advances graphical effects
-* Written in C for maximal compatibility
-* Simulator to develop on PC without embedded hardware
-* Tutorials, examples, themes for rapid development
-* Documentation and API references online
+* **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
+* **Advanced graphics** with animations, anti-aliasing, opacity, smooth scrolling
+* **Various input devices** touch pad, mouse, keyboard, encoder, buttons, etc.
+* **Multi-language support** with UTF-8 encoding
+* **Fully customizable** graphical elements
+* **Hardware independent** to use with any microcontroller or display
+* **Scalable** to operate with little memory (50 kB Flash, 10 kB RAM)
+* **OS, External memory and GPU** supported but not required
+* **Single frame buffer** operation even with advances graphical effects
+* **Written in C** for maximal compatibility
+* **Simulator** to develop on PC without embedded hardware
+* **Tutorials, examples, themes** for rapid development
+* **Documentation** and API references online
 
 ## Porting
 In the simplest case you need 5 things:
