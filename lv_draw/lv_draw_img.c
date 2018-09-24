@@ -38,7 +38,7 @@ static lv_img_src_t decoder_src_type;
 static lv_img_header_t decoder_header;
 static const lv_style_t * decoder_style;
 static lv_fs_file_t decoder_file;
-static lv_color_t decoder_index_map[256] = {{{0}}};
+static lv_color_t decoder_index_map[256];
 
 static lv_img_decoder_info_f_t lv_img_decoder_info_custom;
 static lv_img_decoder_open_f_t lv_img_decoder_open_custom;
@@ -408,7 +408,7 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
             palette_file[0] = 0;       /*Just to solve warnings*/
 #endif
         } else {
-            palette_p = (lv_color_t *)((lv_img_dsc_t *)decoder_src)->data;
+            palette_p = (lv_color32_t *)((lv_img_dsc_t *)decoder_src)->data;
         }
 
         uint32_t i;
@@ -545,6 +545,8 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = (bg_color.full >> 8) & 0xFF;
 #elif LV_COLOR_DEPTH == 32
         *((uint32_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = bg_color.full;
+#else
+#error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
 #endif
     }
 
