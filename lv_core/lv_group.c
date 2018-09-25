@@ -295,6 +295,8 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
 void lv_group_set_editing(lv_group_t * group, bool edit)
 {
 	group->editing = edit ? 1 : 0;
+	lv_obj_t * focused = lv_group_get_focused(group);
+	lv_obj_invalidate(focused);
 }
 
 /**
