@@ -193,6 +193,10 @@
 
 /*Image (dependencies: lv_label*/
 #define USE_LV_IMG      1
+#if USE_LV_IMG != 0
+#define LV_IMG_CF_INDEXED   1       /*Enable indexed (palette) images*/
+#define LV_IMG_CF_ALPHA     1       /*Enable alpha indexed images*/
+#endif
 
 /*Line (dependencies: -*/
 #define USE_LV_LINE     1

@@ -425,7 +425,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
         /*In edit mode send LEFT/RIGHT keys*/
         if(lv_group_get_editing(i->group)) {
-            uint32_t s;
+            int32_t s;
             if(data->enc_diff < 0) {
                 for(s = 0; s < -data->enc_diff; s++) lv_group_send_data(i->group, LV_GROUP_KEY_LEFT);
             } else if(data->enc_diff > 0) {
@@ -433,7 +433,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
         }
         /*In navigate mode focus on the next/prev objects*/
-        else {uint32_t s;
+        else {
+            int32_t s;
             if(data->enc_diff < 0) {
                 for(s = 0; s < -data->enc_diff; s++) lv_group_focus_prev(i->group);
             } else if(data->enc_diff > 0) {

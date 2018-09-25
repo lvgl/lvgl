@@ -235,12 +235,12 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
         uint32_t width_sqr = width * width;
         /* Run for a lot of times. Meanwhile the real width will be determined as well */
-        for(i = 0; i < sizeof(pattern); i ++) {
+        for(i = 0; i < (uint32_t)sizeof(pattern); i ++) {
             pattern[i].x = pattern_line.p_act.x;
             pattern[i].y = pattern_line.p_act.y;
 
             /*Finish the pattern line if it's length equal to the desired width (Use Pythagoras theorem)*/
-            int32_t  sqr = pattern_line.p_act.x * pattern_line.p_act.x + pattern_line.p_act.y * pattern_line.p_act.y;
+            uint32_t  sqr = pattern_line.p_act.x * pattern_line.p_act.x + pattern_line.p_act.y * pattern_line.p_act.y;
             if(sqr >= width_sqr) {
                 width = i;
 #if LV_ANTIALIAS

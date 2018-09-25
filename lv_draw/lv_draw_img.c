@@ -38,7 +38,9 @@ static lv_img_src_t decoder_src_type;
 static lv_img_header_t decoder_header;
 static const lv_style_t * decoder_style;
 static lv_fs_file_t decoder_file;
+#if LV_IMG_CF_INDEXED
 static lv_color_t decoder_index_map[256];
+#endif
 
 static lv_img_decoder_info_f_t lv_img_decoder_info_custom;
 static lv_img_decoder_open_f_t lv_img_decoder_open_custom;
@@ -394,6 +396,8 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
               cf == LV_IMG_CF_INDEXED_2BIT ||
               cf == LV_IMG_CF_INDEXED_4BIT ||
               cf == LV_IMG_CF_INDEXED_8BIT) {
+
+#if LV_IMG_CF_INDEXED
         lv_color32_t palette_file[256];
         lv_color32_t * palette_p = NULL;
         uint8_t px_size = lv_img_color_format_get_px_size(cf);
@@ -416,11 +420,20 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
             decoder_index_map[i] = LV_COLOR_MAKE(palette_p[i].red, palette_p[i].green, palette_p[i].blue);
         }
         return NULL;
+#else
+        LV_LOG_WARN("Indexed (palette) images are not enabled in lv_conf.h. See LV_IMG_CF_INDEXED");
+        return LV_IMG_DECODER_OPEN_FAIL;
+#endif
     } else if(cf == LV_IMG_CF_ALPHA_1BIT ||
               cf == LV_IMG_CF_ALPHA_2BIT ||
               cf == LV_IMG_CF_ALPHA_4BIT ||
               cf == LV_IMG_CF_ALPHA_8BIT) {
+#if LV_IMG_CF_ALPHA
         return NULL;   /*Nothing to process*/
+#else
+        LV_LOG_WARN("Alpha indexed images are not enabled in lv_conf.h. See LV_IMG_CF_ALPHA");
+        return LV_IMG_DECODER_OPEN_FAIL;
+#endif
     } else {
         LV_LOG_WARN("Image decoder open: unknown color format")
         return LV_IMG_DECODER_OPEN_FAIL;
@@ -468,6 +481,7 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
                   decoder_header.cf == LV_IMG_CF_ALPHA_2BIT ||
                   decoder_header.cf == LV_IMG_CF_ALPHA_4BIT ||
                   decoder_header.cf == LV_IMG_CF_ALPHA_8BIT) {
+
             lv_img_built_in_decoder_line_alpha(x, y, len, buf);
         } else if(decoder_header.cf == LV_IMG_CF_INDEXED_1BIT ||
                   decoder_header.cf == LV_IMG_CF_INDEXED_2BIT ||
@@ -522,9 +536,10 @@ static void lv_img_decoder_close(void)
     }
 }
 
-
 static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
+
+#if LV_IMG_CF_ALPHA
     const lv_opa_t alpha1_opa_table[2] =  {0, 255};                   /*Opacity mapping with bpp = 1 (Just for compatibility)*/
     const lv_opa_t alpha2_opa_table[4] =  {0, 85, 170, 255};          /*Opacity mapping with bpp = 2*/
     const lv_opa_t alpha4_opa_table[16] = {0,   17,  34,  51,         /*Opacity mapping with bpp = 4*/
@@ -537,7 +552,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
     lv_color_t bg_color = decoder_style->image.color;
     lv_coord_t i;
     for(i = 0; i < len; i++) {
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full;
 #elif LV_COLOR_DEPTH == 16
         /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
@@ -607,7 +622,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
         lv_fs_read(&decoder_file, fs_buf, w, NULL);
         data_tmp = fs_buf;
 #else
-        LV_LOG_WARN("Image built-in indexed line reader can't read file because USE_LV_FILESYSTEM = 0");
+        LV_LOG_WARN("Image built-in alpha line reader can't read file because USE_LV_FILESYSTEM = 0");
         data_tmp = NULL;        /*To avoid warnings*/
         return LV_RES_INV;
 #endif
@@ -630,11 +645,17 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
     }
 
     return LV_RES_OK;
+
+#else
+    LV_LOG_WARN("Image built-in alpha line reader failed because LV_IMG_CF_ALPHA is 0 in lv_conf.h");
+    return LV_RES_INV;
+#endif
 }
 
 static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
 
+#if LV_IMG_CF_INDEXED
     uint8_t px_size = lv_img_color_format_get_px_size(decoder_header.cf);
     uint16_t mask = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
@@ -700,7 +721,7 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
 
     uint8_t byte_act = 0;
     uint8_t val_act;
-    uint32_t i;
+    lv_coord_t i;
     lv_color_t * cbuf = (lv_color_t *) buf;
     for(i = 0; i < len; i ++) {
         val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
@@ -714,5 +735,8 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
     }
 
     return LV_RES_OK;
+#else
+    LV_LOG_WARN("Image built-in indexed line reader failed because LV_IMG_CF_INDEXED is 0 in lv_conf.h");
+    return LV_RES_INV;
+#endif
 }
-

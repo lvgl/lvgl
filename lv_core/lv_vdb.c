@@ -141,6 +141,7 @@ void lv_vdb_flush(void)
 void lv_vdb_set_adr(void * buf1, void * buf2)
 {
 #if LV_VDB_DOUBLE == 0
+    (void) buf2;   /*unused*/
     vdb.buf = buf1;
 #else
     vdb[0].buf = buf1;
