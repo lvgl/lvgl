@@ -675,6 +675,18 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
         if(ext->align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
+        /* In ROLL mode the CENTER and RIGHT are pointless so remove them.
+         * (In addition they will result mis-alignment is this case)*/
+        if((ext->long_mode == LV_LABEL_LONG_ROLL) &&
+            (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
+        	lv_point_t size;
+        	lv_txt_get_size(&size, ext->text, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX ,flag);
+        	if(size.x > lv_obj_get_width(label)) {
+        		flag &= ~LV_TXT_FLAG_RIGHT;
+        		flag &= ~LV_TXT_FLAG_CENTER;
+        	}
+        }
+
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
     }
     return true;
