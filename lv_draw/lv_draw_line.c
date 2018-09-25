@@ -225,7 +225,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 #else
     lv_point_t pattern[LINE_MAX_WIDTH];
 #endif
-    int i = 0;
+    lv_coord_t i = 0;
 
     /*Create a perpendicular pattern (a small line)*/
     if(width != 0) {
@@ -235,7 +235,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
         uint32_t width_sqr = width * width;
         /* Run for a lot of times. Meanwhile the real width will be determined as well */
-        for(i = 0; i < (uint32_t)sizeof(pattern); i ++) {
+        for(i = 0; i < (lv_coord_t)sizeof(pattern); i ++) {
             pattern[i].x = pattern_line.p_act.x;
             pattern[i].y = pattern_line.p_act.y;
 

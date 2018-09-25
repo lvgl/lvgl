@@ -100,7 +100,8 @@ static inline void lv_line_set_style(lv_obj_t *line, lv_style_t *style)
  */
 static inline void lv_line_set_upscale(lv_obj_t * line, bool upcale)
 {
-
+    (void) line;
+    (void) upcale;
 }
 /*=====================
  * Getter functions
@@ -137,6 +138,7 @@ static inline lv_style_t* lv_line_get_style(const lv_obj_t *line)
  */
 static inline bool lv_line_get_upscale(const lv_obj_t * line)
 {
+    (void) line;
     return false;
 }
 

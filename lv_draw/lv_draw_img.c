@@ -37,7 +37,9 @@ static const void * decoder_src;
 static lv_img_src_t decoder_src_type;
 static lv_img_header_t decoder_header;
 static const lv_style_t * decoder_style;
+#if USE_LV_FILESYSTEM
 static lv_fs_file_t decoder_file;
+#endif
 #if LV_IMG_CF_INDEXED
 static lv_color_t decoder_index_map[256];
 #endif
@@ -359,7 +361,6 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
     lv_res_t header_res;
     header_res = lv_img_dsc_get_info(src, &decoder_header);
     if(header_res == LV_RES_INV) {
-        lv_fs_close(&decoder_file);
         decoder_src = NULL;
         decoder_src_type = LV_IMG_SRC_UNKNOWN;
         LV_LOG_WARN("Built-in image decoder can't get the header info");
@@ -398,7 +399,10 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
               cf == LV_IMG_CF_INDEXED_8BIT) {
 
 #if LV_IMG_CF_INDEXED
+#if USE_LV_FILESYSTEM
         lv_color32_t palette_file[256];
+#endif
+
         lv_color32_t * palette_p = NULL;
         uint8_t px_size = lv_img_color_format_get_px_size(cf);
         uint32_t palette_size = 1 << px_size;
@@ -408,8 +412,6 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
             lv_fs_seek(&decoder_file, 4);   /*Skip the header*/
             lv_fs_read(&decoder_file, palette_file, palette_size * sizeof(lv_color32_t), NULL);
             palette_p = palette_file;
-#else
-            palette_file[0] = 0;       /*Just to solve warnings*/
 #endif
         } else {
             palette_p = (lv_color32_t *)((lv_img_dsc_t *)decoder_src)->data;
@@ -528,9 +530,11 @@ static void lv_img_decoder_close(void)
 
     /*It was opened with built-in decoder*/
     if(decoder_src) {
+#if USE_LV_FILESYSTEM
         if(decoder_src_type == LV_IMG_SRC_FILE) {
             lv_fs_close(&decoder_file);
         }
+#endif
         decoder_src_type = LV_IMG_SRC_UNKNOWN;
         decoder_src = NULL;
     }

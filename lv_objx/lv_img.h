@@ -79,7 +79,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img);
  */
 static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
 {
-
+    (void) img;
+    (void) fn;
 }
 
 /**
@@ -107,7 +108,8 @@ static inline void lv_img_set_style(lv_obj_t *img, lv_style_t *style)
  */
 static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
 {
-
+    (void) img;
+    (void) upcale;
 }
 
 /*=====================
@@ -152,6 +154,7 @@ static inline lv_style_t* lv_img_get_style(const lv_obj_t *img)
  */
 static inline bool lv_img_get_upscale(const lv_obj_t * img)
 {
+    (void)img;
     return false;
 }
 
