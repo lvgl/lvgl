@@ -44,6 +44,7 @@ enum
     LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
     LV_LABEL_LONG_DOT,      /*Keep the size and write dots at the end if the text is too long*/
     LV_LABEL_LONG_ROLL,     /*Keep the size and roll the text infinitely*/
+    LV_LABEL_LONG_CROP,     /*Keep the size and crop the text out of it*/
 };
 typedef uint8_t lv_label_long_mode_t;
 

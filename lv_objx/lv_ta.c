@@ -322,7 +322,7 @@ void lv_ta_del_char(lv_obj_t * ta)
 #if LV_TXT_UTF8 == 0
         lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, 1);
 #else
-        uint32_t byte_pos = txt_encoded_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
+        uint32_t byte_pos = lv_txt_encoded_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
         lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, lv_txt_encoded_size(&label_txt[byte_pos]));
 #endif
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
@@ -534,7 +534,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->one_line == en) return;
 
-    if(en != false) {
+    if(en) {
         lv_style_t * style_ta = lv_obj_get_style(ta);
         lv_style_t * style_scrl = lv_obj_get_style(lv_page_get_scrl(ta));
         lv_style_t * style_label = lv_obj_get_style(ext->label);
@@ -556,6 +556,40 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
     }
 }
 
+/**
+ * Set the alignment of the text area.
+ * In one line mode the text can be scrolled only with `LV_LABEL_ALIGN_LEFT`.
+ * This function should be called if the size of text area changes.
+ * @param ta pointer to a text are object
+ * @param align the desired alignment from `lv_label_align_t`. (LV_LABEL_ALIGN_LEFT/CENTER/RIGHT)
+ */
+void lv_ta_set_text_align(lv_obj_t * ta, lv_label_align_t align)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_obj_t * label = lv_ta_get_label(ta);
+    if(!ext->one_line) {
+        lv_label_set_align(label, align);
+    } else {
+        /*Normal left align. Just let the text expand*/
+        if(align == LV_LABEL_ALIGN_LEFT) {
+            lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND);
+            lv_page_set_scrl_fit(ta, true, false);
+            lv_label_set_align(label, align);
+
+        }
+        /*Else use fix label width equal to the Text area width*/
+        else {
+            lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
+            lv_page_set_scrl_fit(ta, false, false);
+            lv_page_set_scrl_width(ta, 1);      /*To refresh the scrollable's width*/
+            lv_label_set_align(label, align);
+
+            lv_style_t * bg_style = lv_ta_get_style(ta, LV_TA_STYLE_BG);
+            lv_obj_set_width(label, lv_obj_get_width(ta) - 2 * bg_style->body.padding.hor);
+        }
+
+    }
+}
 
 /**
  * Set a list of characters. Only these characters will be accepted by the text area
@@ -868,22 +902,22 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
     } else if(mode == LV_DESIGN_DRAW_POST) {
         scrl_design(scrl, mask, mode);
 
-        /*Draw the cursor too*/
+        /*Draw the cursor*/
         lv_obj_t * ta = lv_obj_get_parent(scrl);
-        lv_ta_ext_t * ta_ext = lv_obj_get_ext_attr(ta);
-        lv_style_t * label_style = lv_obj_get_style(ta_ext->label);
+        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+        lv_style_t * label_style = lv_obj_get_style(ext->label);
         lv_opa_t opa_scale = lv_obj_get_opa_scale(ta);
-        if(ta_ext->cursor.type == LV_CURSOR_NONE ||
-                (ta_ext->cursor.type & LV_CURSOR_HIDDEN) ||
-                ta_ext->cursor.state == 0 ||
+        if(ext->cursor.type == LV_CURSOR_NONE ||
+                (ext->cursor.type & LV_CURSOR_HIDDEN) ||
+                ext->cursor.state == 0 ||
                 label_style->body.opa == LV_OPA_TRANSP) {
             return true;    /*The cursor is not visible now*/
         }
 
 
         lv_style_t cur_style;
-        if(ta_ext->cursor.style != NULL) {
-            lv_style_copy(&cur_style, ta_ext->cursor.style);
+        if(ext->cursor.style != NULL) {
+            lv_style_copy(&cur_style, ext->cursor.style);
         } else {
             /*If cursor style is not specified then use the modified label style */
             lv_style_copy(&cur_style, label_style);
@@ -904,10 +938,10 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         }
 
         uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
-        const char * txt = lv_label_get_text(ta_ext->label);
+        const char * txt = lv_label_get_text(ext->label);
         uint32_t byte_pos;
 #if LV_TXT_UTF8 != 0
-        byte_pos = txt_encoded_get_byte_id(txt, cur_pos);
+        byte_pos = lv_txt_encoded_get_byte_id(txt, cur_pos);
 #else
         byte_pos = cur_pos;
 #endif
@@ -923,10 +957,13 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         }
 
         lv_point_t letter_pos;
-        lv_label_get_letter_pos(ta_ext->label, cur_pos, &letter_pos);
+        lv_label_get_letter_pos(ext->label, cur_pos, &letter_pos);
+
+        /*In one line mode the cursor can be only in the first line */
+        if(ext->one_line && letter_pos.y > letter_h) return true;
 
         /*If the cursor is out of the text (most right) draw it to the next line*/
-        if(letter_pos.x + ta_ext->label->coords.x1 + letter_w > ta_ext->label->coords.x2 && ta_ext->one_line == 0) {
+        if(letter_pos.x + ext->label->coords.x1 + letter_w > ext->label->coords.x2 && ext->one_line == 0) {
             letter_pos.x = 0;
             letter_pos.y += letter_h + label_style->text.line_space;
 
@@ -944,17 +981,17 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 
         /*Draw he cursor according to the type*/
         lv_area_t cur_area;
-        if(ta_ext->cursor.type == LV_CURSOR_LINE) {
-            cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor - (cur_style.line.width >> 1) - (cur_style.line.width & 0x1);
-            cur_area.y1 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver;
-            cur_area.x2 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor + (cur_style.line.width >> 1);
-            cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
+        if(ext->cursor.type == LV_CURSOR_LINE) {
+            cur_area.x1 = letter_pos.x + ext->label->coords.x1 + cur_style.body.padding.hor - (cur_style.line.width >> 1) - (cur_style.line.width & 0x1);
+            cur_area.y1 = letter_pos.y + ext->label->coords.y1 + cur_style.body.padding.ver;
+            cur_area.x2 = letter_pos.x + ext->label->coords.x1 + cur_style.body.padding.hor + (cur_style.line.width >> 1);
+            cur_area.y2 = letter_pos.y + ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
-        } else if(ta_ext->cursor.type == LV_CURSOR_BLOCK) {
-            cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 - cur_style.body.padding.hor;
-            cur_area.y1 = letter_pos.y + ta_ext->label->coords.y1 - cur_style.body.padding.ver;
-            cur_area.x2 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
-            cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
+        } else if(ext->cursor.type == LV_CURSOR_BLOCK) {
+            cur_area.x1 = letter_pos.x + ext->label->coords.x1 - cur_style.body.padding.hor;
+            cur_area.y1 = letter_pos.y + ext->label->coords.y1 - cur_style.body.padding.ver;
+            cur_area.x2 = letter_pos.x + ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
+            cur_area.y2 = letter_pos.y + ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
 
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
 
@@ -971,20 +1008,20 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
             cur_area.y1 += cur_style.body.padding.ver;
             lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0);
 
-        } else if(ta_ext->cursor.type == LV_CURSOR_OUTLINE) {
-            cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 - cur_style.body.padding.hor;
-            cur_area.y1 = letter_pos.y + ta_ext->label->coords.y1 - cur_style.body.padding.ver;
-            cur_area.x2 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
-            cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
+        } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
+            cur_area.x1 = letter_pos.x + ext->label->coords.x1 - cur_style.body.padding.hor;
+            cur_area.y1 = letter_pos.y + ext->label->coords.y1 - cur_style.body.padding.ver;
+            cur_area.x2 = letter_pos.x + ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
+            cur_area.y2 = letter_pos.y + ext->label->coords.y1 + cur_style.body.padding.ver + letter_h;
 
             cur_style.body.empty = 1;
             if(cur_style.body.border.width == 0) cur_style.body.border.width = 1; /*Be sure the border will be drawn*/
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
-        } else if(ta_ext->cursor.type == LV_CURSOR_UNDERLINE) {
-            cur_area.x1 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor;
-            cur_area.y1 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h - (cur_style.line.width >> 1);
-            cur_area.x2 = letter_pos.x + ta_ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
-            cur_area.y2 = letter_pos.y + ta_ext->label->coords.y1 + cur_style.body.padding.ver + letter_h + (cur_style.line.width >> 1) + (cur_style.line.width & 0x1);
+        } else if(ext->cursor.type == LV_CURSOR_UNDERLINE) {
+            cur_area.x1 = letter_pos.x + ext->label->coords.x1 + cur_style.body.padding.hor;
+            cur_area.y1 = letter_pos.y + ext->label->coords.y1 + cur_style.body.padding.ver + letter_h - (cur_style.line.width >> 1);
+            cur_area.x2 = letter_pos.x + ext->label->coords.x1 + cur_style.body.padding.hor + letter_w;
+            cur_area.y2 = letter_pos.y + ext->label->coords.y1 + cur_style.body.padding.ver + letter_h + (cur_style.line.width >> 1) + (cur_style.line.width & 0x1);
 
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
         }

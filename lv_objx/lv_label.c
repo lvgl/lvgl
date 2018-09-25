@@ -252,7 +252,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
     ext->offset.x = 0;
     ext->offset.y = 0;
 
-    if(long_mode == LV_LABEL_LONG_ROLL) ext->expand = 1;
+    if(long_mode == LV_LABEL_LONG_ROLL || long_mode == LV_LABEL_LONG_CROP) ext->expand = 1;
     else ext->expand = 0;
 
     /*Restore the character under the dots*/
@@ -428,7 +428,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
         max_w = LV_COORD_MAX;
     }
 
-    index = txt_encoded_get_byte_id(txt, index);
+    index = lv_txt_encoded_get_byte_id(txt, index);
 
     /*Search the line of the index letter */;
     while(txt[new_line_start] != '\0') {
@@ -474,7 +474,8 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
     	lv_coord_t line_w;
     	        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
     	                                  font, style->text.letter_space, flag);
-    	x += lv_obj_get_width(label) - line_w;
+
+        x += lv_obj_get_width(label) - line_w;
     }
 
     pos->x = x;
@@ -674,18 +675,6 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
         if(ext->align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
-        /* In ROLL mode if the text is shorter then the label's width and
-         * the text is aligned to the middle then clear the EXPAND flag.
-         * Due to this `lv_draw_label` can align the text to the middle  */
-        if(ext->long_mode == LV_LABEL_LONG_ROLL && ext->align == LV_LABEL_ALIGN_CENTER) {
-        	lv_point_t size;
-        	lv_txt_get_size(&size, ext->text, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX ,flag);
-        	if(size.x < lv_obj_get_width(label)) {
-        		flag &= ~LV_TXT_FLAG_EXPAND;
-        	}
-        }
-
-
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
     }
     return true;
@@ -877,7 +866,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 #else
             /*Save letters under the dots and replace them with dots*/
             uint32_t i;
-            uint32_t byte_id = txt_encoded_get_byte_id(ext->text, letter_id);
+            uint32_t byte_id = lv_txt_encoded_get_byte_id(ext->text, letter_id);
             uint32_t byte_id_ori = byte_id;
             uint8_t len = 0;
             for(i = 0; i <= LV_LABEL_DOT_NUM; i++)  {
@@ -902,6 +891,10 @@ static void lv_label_refr_text(lv_obj_t * label)
     else if(ext->long_mode == LV_LABEL_LONG_BREAK) {
         lv_obj_set_height(label, size.y);
     }
+    /*Do not set the size in Clip mode*/
+    else if(ext->long_mode == LV_LABEL_LONG_CROP) {
+        /*Do nothing*/
+    }
 
 
     lv_obj_invalidate(label);
@@ -919,7 +912,7 @@ static void lv_label_revert_dots(lv_obj_t * label)
     }
 #else
     uint32_t letter_i = ext->dot_end - LV_LABEL_DOT_NUM;
-    uint32_t byte_i = txt_encoded_get_byte_id(ext->text, letter_i);
+    uint32_t byte_i = lv_txt_encoded_get_byte_id(ext->text, letter_i);
 
     /*Restore the characters*/
     uint8_t i = 0;

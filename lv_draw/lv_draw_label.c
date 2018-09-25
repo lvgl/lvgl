@@ -60,8 +60,10 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
     if((flag & LV_TXT_FLAG_EXPAND) == 0) {
+        /*Normally use the label's width as width*/
         w = lv_area_get_width(coords);
     } else {
+        /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
         lv_txt_get_size(&p, txt, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, flag);
         w = p.x;
@@ -81,14 +83,14 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
     			font, style->text.letter_space, flag);
 
-    	pos.x += (w - line_width) / 2;
+    	pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
     else if(flag & LV_TXT_FLAG_RIGHT) {
     	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
     			font, style->text.letter_space, flag);
-    	pos.x += w - line_width;
+    	pos.x += lv_area_get_width(coords) - line_width;
     }
 
 
@@ -180,14 +182,14 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
                                            font, style->text.letter_space, flag);
 
-           pos.x += (w - line_width) / 2;
+           pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
         }
         /*Align to the right*/
         else if(flag & LV_TXT_FLAG_RIGHT) {
         	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
         	                                           font, style->text.letter_space, flag);
-        	pos.x += w - line_width;
+        	pos.x += lv_area_get_width(coords) - line_width;
         }
 
         /*Go the next line position*/

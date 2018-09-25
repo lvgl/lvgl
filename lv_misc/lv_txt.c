@@ -57,7 +57,7 @@ uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_utf8;
 uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =					lv_txt_utf8_conv_wc;
 uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_utf8_next;
 uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_utf8_prev;
-uint32_t (*txt_encoded_get_byte_id)(const char * , uint32_t) =	lv_txt_utf8_get_byte_id;
+uint32_t (*lv_txt_encoded_get_byte_id)(const char * , uint32_t) = lv_txt_utf8_get_byte_id;
 uint32_t (*lv_encoded_get_char_id)(const char * , uint32_t) = 	lv_txt_utf8_get_char_id;
 uint32_t (*lv_txt_get_encoded_length)(const char * ) = 			lv_txt_utf8_get_length;
 #else
@@ -66,7 +66,7 @@ uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_ascii;
 uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =					lv_txt_ascii_conv_wc;
 uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_ascii_next;
 uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_ascii_prev;
-uint32_t (*txt_encoded_get_byte_id)(const char * , uint32_t) =	lv_txt_ascii_get_byte_id;
+uint32_t (*lv_txt_encoded_get_byte_id)(const char * , uint32_t) = lv_txt_ascii_get_byte_id;
 uint32_t (*lv_encoded_get_char_id)(const char * , uint32_t) = 	lv_txt_ascii_get_char_id;
 uint32_t (*lv_txt_get_encoded_length)(const char * ) = 			lv_txt_ascii_get_length;
 #endif
@@ -296,7 +296,7 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     uint32_t ins_len = strlen(ins_txt);
     uint32_t new_len = ins_len + old_len;
 #if LV_TXT_UTF8 != 0
-    pos = txt_encoded_get_byte_id(txt_buf, pos);   /*Convert to byte index instead of letter index*/
+    pos = lv_txt_encoded_get_byte_id(txt_buf, pos);   /*Convert to byte index instead of letter index*/
 #endif
     /*Copy the second part into the end to make place to text to insert*/
     uint32_t i;
@@ -319,8 +319,8 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 
     uint32_t old_len = strlen(txt);
 #if LV_TXT_UTF8 != 0
-    pos = txt_encoded_get_byte_id(txt, pos);   /*Convert to byte index instead of letter index*/
-    len = txt_encoded_get_byte_id(&txt[pos], len);
+    pos = lv_txt_encoded_get_byte_id(txt, pos);   /*Convert to byte index instead of letter index*/
+    len = lv_txt_encoded_get_byte_id(&txt[pos], len);
 #endif
 
     /*Copy the second part into the end to make place to text to insert*/

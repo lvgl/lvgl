@@ -36,7 +36,7 @@ enum
 {
     LV_TXT_FLAG_NONE =     0x00,
     LV_TXT_FLAG_RECOLOR =  0x01,   /*Enable parsing of recolor command*/
-    LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width (Used by the library)*/
+    LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width to avoid automatic word wrapping*/
     LV_TXT_FLAG_CENTER =   0x04,   /*Align the text to the middle*/
 	LV_TXT_FLAG_RIGHT  =   0x08,   /*Align the text to the right*/
 };
@@ -168,7 +168,7 @@ extern uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *);
  * @param enc_id letter index
  * @return byte index of the 'enc_id'th letter
  */
-extern uint32_t (*txt_encoded_get_byte_id)(const char *, uint32_t);
+extern uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t);
 
 /**
  * Convert a byte index (in an encoded text) to character index.
