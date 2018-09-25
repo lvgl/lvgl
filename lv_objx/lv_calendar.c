@@ -349,7 +349,7 @@ uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
  * @param calendar pointer to a calendar object
  * @return pointer to the array of day names
  */
-const char ** lv_calendar_get_day_names(const lv_obj_t * calendar, const char ** day_names)
+const char ** lv_calendar_get_day_names(const lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->day_names;
@@ -360,7 +360,7 @@ const char ** lv_calendar_get_day_names(const lv_obj_t * calendar, const char **
  * @param calendar pointer to a calendar object
  * @return pointer to the array of month names
  */
-const char ** lv_calendar_get_month_names(const lv_obj_t * calendar, const char ** day_names)
+const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->month_names;

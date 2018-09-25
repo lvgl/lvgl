@@ -242,21 +242,21 @@ static inline bool lv_btn_get_ver_fit(const lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn, uint16_t time);
+uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn);
 
 /**
  * Get the wait time before the ink disappears
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn, uint16_t time);
+uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn);
 
 /**
  * Get time of the ink out effect (animate to the releases state)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn, uint16_t time);
+uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn);
 
 /**
  * Get style of a button.

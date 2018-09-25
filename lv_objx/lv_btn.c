@@ -346,7 +346,7 @@ lv_action_t lv_btn_get_action(const lv_obj_t * btn, lv_btn_action_t type)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn, uint16_t time)
+uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn)
 {
 #if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
@@ -362,7 +362,7 @@ uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn, uint16_t time)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn, uint16_t time)
+uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn)
 {
 #if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
@@ -376,7 +376,7 @@ uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn, uint16_t time)
  * @param btn pointer to a button object
  * @return the time of the ink animation
  */
-uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn, uint16_t time)
+uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn)
 {
 #if USE_LV_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
@@ -703,9 +703,9 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
  */
 static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val)
 {
-	if(ink_obj) {
+	if(btn) {
 		ink_act_value = val;
-		lv_obj_invalidate(ink_obj);
+		lv_obj_invalidate(btn);
 	}
 }
 
@@ -715,6 +715,8 @@ static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val)
  */
 static void lv_btn_ink_effect_anim_ready(void * p)
 {
+    (void) p;    /*Unused*/
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(ink_obj);
     lv_btn_state_t state = lv_btn_get_state(ink_obj);
 

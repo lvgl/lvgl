@@ -367,19 +367,20 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
         return LV_IMG_DECODER_OPEN_FAIL;
     }
 
-#if USE_LV_FILESYSTEM
     /*Open the file if it's a file*/
     if(decoder_src_type == LV_IMG_SRC_FILE) {
+#if USE_LV_FILESYSTEM
         lv_fs_res_t res = lv_fs_open(&decoder_file, src, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) {
             LV_LOG_WARN("Built-in image decoder can't open the file");
             return LV_IMG_DECODER_OPEN_FAIL;
         }
-    }
 #else
     LV_LOG_WARN("Image built-in decoder can read file because USE_LV_FILESYSTEM = 0");
     return LV_IMG_DECODER_OPEN_FAIL;
 #endif
+    }
+
 
     /*Process the different color formats*/
     lv_img_cf_t cf = decoder_header.cf;
@@ -408,12 +409,17 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
         uint32_t palette_size = 1 << px_size;
 
         if(decoder_src_type == LV_IMG_SRC_FILE) {
+            /*Read the palette from file*/
 #if USE_LV_FILESYSTEM
             lv_fs_seek(&decoder_file, 4);   /*Skip the header*/
             lv_fs_read(&decoder_file, palette_file, palette_size * sizeof(lv_color32_t), NULL);
             palette_p = palette_file;
+#else
+            LV_LOG_WARN("Image built-in decoder can read the palette because USE_LV_FILESYSTEM = 0");
+            return LV_IMG_DECODER_OPEN_FAIL;
 #endif
         } else {
+            /*The palette begins in the beginning of the image data. Just point to it.*/
             palette_p = (lv_color32_t *)((lv_img_dsc_t *)decoder_src)->data;
         }
 

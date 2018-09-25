@@ -210,7 +210,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
         lv_mem_assert(ext->pwd_tmp);
-        if(ext->pwd_tmp== NULL) return;
+        if(ext->pwd_tmp == NULL) return;
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, (const char *)letter_buf);
 
