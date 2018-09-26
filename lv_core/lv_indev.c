@@ -380,6 +380,16 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = i->proc.last_key;
 
+        /* Edit mode is not used by KEYPAD devices.
+         * So leave edit mode if we are in it before focusing on the next/prev object*/
+        if(data->key == LV_GROUP_KEY_NEXT || data->key == LV_GROUP_KEY_PREV) {
+            if(lv_group_get_editing(i->group)) {
+                lv_group_set_editing(i->group, false);
+                lv_obj_t * focused = lv_group_get_focused(i->group);
+                focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
+            }
+        }
+
         if(data->key == LV_GROUP_KEY_NEXT)
         {
             lv_group_focus_next(i->group);
@@ -420,9 +430,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Process the steps first. They are valid only with released button*/
     if(data->state == LV_INDEV_STATE_REL) {
-        lv_obj_t * focused = lv_group_get_focused(i->group);
-        bool editable = false;
-        focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
         /*In edit mode send LEFT/RIGHT keys*/
         if(lv_group_get_editing(i->group)) {
             int32_t s;
@@ -683,6 +690,13 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         }
         /*Handle click focus*/
 #if USE_LV_GROUP
+        /*Edit mode is not used by POINTER devices. So leave edit mode if we are in it*/
+        lv_group_t * act_g = lv_obj_get_group(proc->act_obj);
+        if(lv_group_get_editing(act_g)) {
+            lv_group_set_editing(act_g, false);
+            proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
+        }
+
         /*Check, if the parent is in a group focus on it.*/
         if(lv_obj_is_protected(proc->act_obj, LV_PROTECT_CLICK_FOCUS) == false) {       /*Respect the click protection*/
             lv_group_t * g = lv_obj_get_group(proc->act_obj);

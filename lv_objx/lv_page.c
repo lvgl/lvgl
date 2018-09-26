@@ -662,9 +662,17 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         } else if((c == LV_GROUP_KEY_UP) && ext->arrow_scroll) {
         	lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
         } else if((c == LV_GROUP_KEY_RIGHT) && ext->arrow_scroll) {
-        	lv_page_scroll_hor(page, - lv_obj_get_width(page) / 4);
+            /*If the page can be scrolled horizontally because it's not wide enough then scroll it vertically*/
+            if(lv_page_get_scrl_width(page) < lv_obj_get_width(page)) lv_page_scroll_ver(page, - lv_obj_get_height(page) / 4);
+            else lv_page_scroll_hor(page, - lv_obj_get_width(page) / 4);
         } else if((c == LV_GROUP_KEY_LEFT) && ext->arrow_scroll) {
-        	lv_page_scroll_hor(page,  lv_obj_get_width(page) / 4);
+            /*If the page can be scrolled horizontally because it's not wide enough then scroll it vertically*/
+            if(lv_page_get_scrl_width(page) < lv_obj_get_width(page)) lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
+            else lv_page_scroll_hor(page,  lv_obj_get_width(page) / 4);
+        } else if(c == LV_GROUP_KEY_ENTER) {
+            /*On ENTER leave edit mode*/
+//            lv_group_t * g = lv_obj_get_group(page);
+//            if(lv_group_get_editing(g)) lv_group_set_editing(g, false);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
     	bool * editable = (bool *)param;

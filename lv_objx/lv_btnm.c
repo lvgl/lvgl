@@ -18,7 +18,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_BTNM_PR_NONE         0xFFFF
 
 /**********************
  *      TYPEDEFS
@@ -595,11 +594,17 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_FOCUS) {
 #if USE_LV_GROUP
         lv_indev_t * indev = lv_indev_get_act();
-        if(lv_obj_is_focused(btnm) && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
+        lv_hal_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type == LV_INDEV_TYPE_POINTER) {
+            /*Select the clicked button*/
             lv_point_t p1;
             lv_indev_get_point(indev, &p1);
             uint16_t btn_i = get_button_from_point(btnm, &p1);
             ext->btn_id_pr = btn_i;
+        } else  if (indev_type == LV_INDEV_TYPE_ENCODER){
+            /*In navigation mode don't select any button but in edit mode select the fist*/
+            if(lv_group_get_editing(lv_obj_get_group(btnm))) ext->btn_id_pr = 0;
+            else ext->btn_id_pr = LV_BTNM_PR_NONE;
         } else {
             ext->btn_id_pr = 0;
         }

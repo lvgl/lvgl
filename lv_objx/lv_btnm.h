@@ -38,6 +38,8 @@ extern "C" {
 #define LV_BTNM_REPEAT_DISABLE_MASK     0x10
 #define LV_BTNM_INACTIVE_MASK   0x20
 
+
+#define LV_BTNM_PR_NONE         0xFFFF
 /**********************
  *      TYPEDEFS
  **********************/
