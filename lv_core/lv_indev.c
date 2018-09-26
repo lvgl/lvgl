@@ -371,8 +371,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         {
             /*On enter long press leave edit mode.*/
         	lv_obj_t * focused = lv_group_get_focused(i->group);
-            focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
-            i->proc.long_pr_sent = 1;
+        	if(focused) {
+                focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
+                i->proc.long_pr_sent = 1;
+        	}
         }
     }
     /*Release happened*/
@@ -386,7 +388,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(lv_group_get_editing(i->group)) {
                 lv_group_set_editing(i->group, false);
                 lv_obj_t * focused = lv_group_get_focused(i->group);
-                focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
+                if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
             }
         }
 
@@ -462,18 +464,19 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         {
             /*On enter long press leave edit mode.*/
             lv_obj_t * focused = lv_group_get_focused(i->group);
+
             bool editable = false;
-            focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
+            if(focused) focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
             if (editable) {
                 i->group->editing = i->group->editing ? 0 : 1;
-                focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
+                if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
                 LV_LOG_INFO("Edit mode changed");
                 if(focused) lv_obj_invalidate(focused);
             }
             /*If not editable then just send a long press signal*/
             else {
-                focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
+                if(focused) focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
             }
             i->proc.long_pr_sent = 1;
         }
@@ -482,7 +485,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_REL && i->proc.last_state == LV_INDEV_STATE_PR) {
         lv_obj_t * focused = lv_group_get_focused(i->group);
         bool editable = false;
-        focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
+        if(focused) focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
         /*The button was released on a non-editable object. Just send enter*/
         if (!editable) {
@@ -495,7 +498,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*If the focused object is editable and now in navigate mode then enter edit mode*/
         else if(editable && !i->group->editing && !i->proc.long_pr_sent) {
             i->group->editing = i->group->editing ? 0 : 1;
-            focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
+            if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
             LV_LOG_INFO("Edit mode changed (edit)");
             if(focused) lv_obj_invalidate(focused);
         }
