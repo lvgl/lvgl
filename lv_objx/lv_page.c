@@ -709,11 +709,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
     lv_page_ext_t * page_ext = lv_obj_get_ext_attr(page);
 
     if(sign == LV_SIGNAL_CORD_CHG) {
-        /*Be sure the width of the scrollable is correct*/
-        if(lv_cont_get_hor_fit(scrl) == false) {
-            lv_obj_set_width(scrl, lv_obj_get_width(page) - 2 * page_style->body.padding.hor);
-        }
-
         /*Limit the position of the scrollable object to be always visible
          * (Do not let its edge inner then its parent respective edge)*/
         lv_coord_t new_x;
