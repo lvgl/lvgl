@@ -27,6 +27,17 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+// Check windows
+#if __WIN64
+# define LV_MEM_ENV64
+#endif
+
+// Check GCC
+#if __GNUC__
+# if __x86_64__ || __ppc64__
+#   define LV_MEM_ENV64
+# endif
+#endif
 
 /**********************
  *      TYPEDEFS

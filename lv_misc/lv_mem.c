@@ -20,24 +20,13 @@
  *********************/
 #define LV_MEM_ADD_JUNK     0   /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 
-// Check windows
-#if __WIN64
-# define ENVIRONMENT64
-#endif
 
-// Check GCC
-#if __GNUC__
-# if __x86_64__ || __ppc64__
-#   define ENVIRONMENT64
-# endif
-#endif
-
-
-#ifdef ENVIRONMENT64
+#ifdef LV_MEM_ENV64
 # define MEM_UNIT uint64_t
 #else
 # define MEM_UNIT uint32_t
 #endif
+
 
 /**********************
  *      TYPEDEFS
@@ -109,7 +98,7 @@ void * lv_mem_alloc(uint32_t size)
         return &zero_mem;
     }
 
-#ifdef ENVIRONMENT64
+#ifdef LV_MEM_ENV64
     /*Round the size up to 8*/
     if(size & 0x7) {
         size = size & (~0x7);
@@ -393,7 +382,7 @@ static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
  */
 static void ent_trunc(lv_mem_ent_t * e, uint32_t size)
 {
-#ifdef ENVIRONMENT64
+#ifdef LV_MEM_ENV64
     /*Round the size up to 8*/
     if(size & 0x7) {
         size = size & (~0x7);
