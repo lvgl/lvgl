@@ -335,25 +335,19 @@ static void calendar_init(void)
     lv_style_copy(&high_days, &def);
     high_days.text.color = lv_color_hsv_to_rgb(_hue, 50, 90);
 
-    static lv_style_t week_box;
-    lv_style_copy(&week_box, &def);
-    week_box.body.empty = 1;
-    week_box.body.border.color = theme.panel->body.border.color;
-    week_box.body.padding.ver = LV_DPI / 20;
-
     static lv_style_t today_box;
     lv_style_copy(&today_box, &def);
-    today_box.body.main_color = LV_COLOR_WHITE;
-    today_box.body.grad_color = LV_COLOR_WHITE;
+    today_box.body.empty = 1;
+    today_box.body.border.color = theme.panel->body.border.color;
     today_box.body.padding.ver = LV_DPI / 20;
-    today_box.body.radius = 0;
+    today_box.body.radius = LV_RADIUS_CIRCLE;
 
     theme.calendar.bg = theme.panel;
     theme.calendar.header = &lv_style_transp;
     theme.calendar.inactive_days = &ina_days;
     theme.calendar.highlighted_days = &high_days;
-    theme.calendar.week_box = &week_box;
-    theme.calendar.today_box = &week_box;
+    theme.calendar.week_box = &lv_style_transp_fit;
+    theme.calendar.today_box = &today_box;
 #endif
 }
 
