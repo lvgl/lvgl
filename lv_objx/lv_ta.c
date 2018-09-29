@@ -972,7 +972,18 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         }
         buf->type[i] = "lv_ta";
     }
-
+    else if (sign == LV_SIGNAL_DEFOCUS)
+    {
+        lv_cursor_type_t cur_type;
+        cur_type = lv_ta_get_cursor_type(ta);
+        lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
+    }
+    else if (sign == LV_SIGNAL_FOCUS)
+    {
+        lv_cursor_type_t cur_type;
+        cur_type = lv_ta_get_cursor_type(ta);
+        lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
+    }
     return res;
 }
 
