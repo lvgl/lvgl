@@ -11,12 +11,9 @@ extern "C" {
 #endif
 
 /*
- * With no UTF-8 support (192-255)
- * - Basic symbols:         0xC0..0xCF
- * - Feedback symbols:      0xD0..0xDF
- * - File symbols:          0xE0..0xFF
+ * With no UTF-8 support (192- 255) (192..241 is used)
  *
- * With UTF-8 support (in Supplemental Private Use Area-A)
+ * With UTF-8 support (in Supplemental Private Use Area-A): 0xF800 .. 0xF831
  * - Basic symbols:     0xE000..0xE01F
  * - File symbols:      0xE020..0xE03F
  * - Feedback symbols:  0xE040..0xE05F
@@ -75,60 +72,63 @@ extern "C" {
 #define SYMBOL_BATTERY_1       "\xEF"
 #define SYMBOL_BATTERY_EMPTY   "\xF0"
 #define SYMBOL_BLUETOOTH       "\xF1"
+#define LV_SYMBOL_GLYPH_LAST   0xF1
 #define SYMBOL_DUMMY           "\xFF"       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
+
 #else
-#define LV_SYMBOL_GLYPH_FIRST  0xF000
-#define SYMBOL_AUDIO           "\xEF\x80\x80"
-#define SYMBOL_VIDEO           "\xEF\x80\x81"
-#define SYMBOL_LIST            "\xEF\x80\x82"
-#define SYMBOL_OK              "\xEF\x80\x83"
-#define SYMBOL_CLOSE           "\xEF\x80\x84"
-#define SYMBOL_POWER           "\xEF\x80\x85"
-#define SYMBOL_SETTINGS        "\xEF\x80\x86"
-#define SYMBOL_TRASH           "\xEF\x80\x87"
-#define SYMBOL_HOME            "\xEF\x80\x88"
-#define SYMBOL_DOWNLOAD        "\xEF\x80\x89"
-#define SYMBOL_DRIVE           "\xEF\x80\x8A"
-#define SYMBOL_REFRESH         "\xEF\x80\x8B"
-#define SYMBOL_MUTE            "\xEF\x80\x8C"
-#define SYMBOL_VOLUME_MID      "\xEF\x80\x8D"
-#define SYMBOL_VOLUME_MAX      "\xEF\x80\x8E"
-#define SYMBOL_IMAGE           "\xEF\x80\x8F"
-#define SYMBOL_EDIT            "\xEF\x80\x90"
-#define SYMBOL_PREV            "\xEF\x80\x91"
-#define SYMBOL_PLAY            "\xEF\x80\x92"
-#define SYMBOL_PAUSE           "\xEF\x80\x93"
-#define SYMBOL_STOP            "\xEF\x80\x94"
-#define SYMBOL_NEXT            "\xEF\x80\x95"
-#define SYMBOL_EJECT           "\xEF\x80\x96"
-#define SYMBOL_LEFT            "\xEF\x80\x97"
-#define SYMBOL_RIGHT           "\xEF\x80\x98"
-#define SYMBOL_PLUS            "\xEF\x80\x99"
-#define SYMBOL_MINUS           "\xEF\x80\x9A"
-#define SYMBOL_WARNING         "\xEF\x80\x9B"
-#define SYMBOL_SHUFFLE         "\xEF\x80\x9C"
-#define SYMBOL_UP              "\xEF\x80\x9D"
-#define SYMBOL_DOWN            "\xEF\x80\x9E"
-#define SYMBOL_LOOP            "\xEF\x80\x9F"
-#define SYMBOL_DIRECTORY       "\xEF\x80\xA0"
-#define SYMBOL_UPLOAD          "\xEF\x80\xA1"
-#define SYMBOL_CALL            "\xEF\x80\xA2"
-#define SYMBOL_CUT             "\xEF\x80\xA3"
-#define SYMBOL_COPY            "\xEF\x80\xA4"
-#define SYMBOL_SAVE            "\xEF\x80\xA5"
-#define SYMBOL_CHARGE          "\xEF\x80\xA6"
-#define SYMBOL_BELL            "\xEF\x80\xA7"
-#define SYMBOL_KEYBOARD        "\xEF\x80\xA8"
-#define SYMBOL_GPS             "\xEF\x80\xA9"
-#define SYMBOL_FILE            "\xEF\x80\xAA"
-#define SYMBOL_WIFI            "\xEF\x80\xAB"
-#define SYMBOL_BATTERY_FULL    "\xEF\x80\xAC"
-#define SYMBOL_BATTERY_3       "\xEF\x80\xAD"
-#define SYMBOL_BATTERY_2       "\xEF\x80\xAE"
-#define SYMBOL_BATTERY_1       "\xEF\x80\xAF"
-#define SYMBOL_BATTERY_EMPTY   "\xEF\x80\xB0"
-#define SYMBOL_BLUETOOTH       "\xEF\x80\xB1"
-#define SYMBOL_DUMMY           "\xEF\x8B\xBF"       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
+#define LV_SYMBOL_GLYPH_FIRST  0xF800
+#define SYMBOL_AUDIO           "\xEF\xA0\x80"
+#define SYMBOL_VIDEO           "\xEF\xA0\x81"
+#define SYMBOL_LIST            "\xEF\xA0\x82"
+#define SYMBOL_OK              "\xEF\xA0\x83"
+#define SYMBOL_CLOSE           "\xEF\xA0\x84"
+#define SYMBOL_POWER           "\xEF\xA0\x85"
+#define SYMBOL_SETTINGS        "\xEF\xA0\x86"
+#define SYMBOL_TRASH           "\xEF\xA0\x87"
+#define SYMBOL_HOME            "\xEF\xA0\x88"
+#define SYMBOL_DOWNLOAD        "\xEF\xA0\x89"
+#define SYMBOL_DRIVE           "\xEF\xA0\x8A"
+#define SYMBOL_REFRESH         "\xEF\xA0\x8B"
+#define SYMBOL_MUTE            "\xEF\xA0\x8C"
+#define SYMBOL_VOLUME_MID      "\xEF\xA0\x8D"
+#define SYMBOL_VOLUME_MAX      "\xEF\xA0\x8E"
+#define SYMBOL_IMAGE           "\xEF\xA0\x8F"
+#define SYMBOL_EDIT            "\xEF\xA0\x90"
+#define SYMBOL_PREV            "\xEF\xA0\x91"
+#define SYMBOL_PLAY            "\xEF\xA0\x92"
+#define SYMBOL_PAUSE           "\xEF\xA0\x93"
+#define SYMBOL_STOP            "\xEF\xA0\x94"
+#define SYMBOL_NEXT            "\xEF\xA0\x95"
+#define SYMBOL_EJECT           "\xEF\xA0\x96"
+#define SYMBOL_LEFT            "\xEF\xA0\x97"
+#define SYMBOL_RIGHT           "\xEF\xA0\x98"
+#define SYMBOL_PLUS            "\xEF\xA0\x99"
+#define SYMBOL_MINUS           "\xEF\xA0\x9A"
+#define SYMBOL_WARNING         "\xEF\xA0\x9B"
+#define SYMBOL_SHUFFLE         "\xEF\xA0\x9C"
+#define SYMBOL_UP              "\xEF\xA0\x9D"
+#define SYMBOL_DOWN            "\xEF\xA0\x9E"
+#define SYMBOL_LOOP            "\xEF\xA0\x9F"
+#define SYMBOL_DIRECTORY       "\xEF\xA0\xA0"
+#define SYMBOL_UPLOAD          "\xEF\xA0\xA1"
+#define SYMBOL_CALL            "\xEF\xA0\xA2"
+#define SYMBOL_CUT             "\xEF\xA0\xA3"
+#define SYMBOL_COPY            "\xEF\xA0\xA4"
+#define SYMBOL_SAVE            "\xEF\xA0\xA5"
+#define SYMBOL_CHARGE          "\xEF\xA0\xA6"
+#define SYMBOL_BELL            "\xEF\xA0\xA7"
+#define SYMBOL_KEYBOARD        "\xEF\xA0\xA8"
+#define SYMBOL_GPS             "\xEF\xA0\xA9"
+#define SYMBOL_FILE            "\xEF\xA0\xAA"
+#define SYMBOL_WIFI            "\xEF\xA0\xAB"
+#define SYMBOL_BATTERY_FULL    "\xEF\xA0\xAC"
+#define SYMBOL_BATTERY_3       "\xEF\xA0\xAD"
+#define SYMBOL_BATTERY_2       "\xEF\xA0\xAE"
+#define SYMBOL_BATTERY_1       "\xEF\xA0\xAF"
+#define SYMBOL_BATTERY_EMPTY   "\xEF\xA0\xB0"
+#define SYMBOL_BLUETOOTH       "\xEF\xA0\xB1"
+#define LV_SYMBOL_GLYPH_LAST   0xF831
+#define SYMBOL_DUMMY           "\xEF\xA3\xBF"       /*Invalid symbol at (U+F831). If written before a string then `lv_img` will show it as a label*/
 #endif
 
 
