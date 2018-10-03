@@ -462,8 +462,8 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
                 btn_style->body.border.part = LV_BORDER_RIGHT;
             }
 
-
             /*Calculate the size of the text*/
+            if(btn_style->glass) btn_style = bg_style;
             const lv_font_t * font = btn_style->text.font;
             lv_point_t txt_size;
             lv_txt_get_size(&txt_size, ext->map_p[txt_i], font,
@@ -476,7 +476,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
 
-            if(btn_style->glass) btn_style = bg_style;
             lv_draw_label(&area_tmp, mask, btn_style, opa_scale,  ext->map_p[txt_i], LV_TXT_FLAG_NONE, NULL);
         }
     }
