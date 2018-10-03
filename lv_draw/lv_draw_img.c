@@ -307,11 +307,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 #if LV_COMPILER_VLA_SUPPORTED
         uint8_t buf[(lv_area_get_width(&mask_com) * (LV_COLOR_SIZE + 1))];
 #else
-# if LV_HOR_RES > LV_VER_RES
-        uint8_t buf[LV_HOR_RES * ((LV_COLOR_DEPTH >> 8) + 1)];  /*+1 because of the possible alpha byte*/
-# else
-        uint8_t buf[LV_VER_RES * ((LV_COLOR_DEPTH >> 8) + 1)];
-# endif
+        uint8_t buf[LV_HOR_RES * ((LV_COLOR_DEPTH >> 3) + 1)];  /*+1 because of the possible alpha byte*/
 #endif
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
@@ -615,11 +611,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 # if LV_COMPILER_VLA_SUPPORTED
     uint8_t fs_buf[w];
 # else
-#  if LV_HOR_RES > LV_VER_RES
     uint8_t fs_buf[LV_HOR_RES];
-#  else
-    uint8_t fs_buf[LV_VER_RES];
-#  endif
 # endif
 #endif
     const uint8_t * data_tmp = NULL;
@@ -706,11 +698,7 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
 # if LV_COMPILER_VLA_SUPPORTED
     uint8_t fs_buf[w];
 # else
-#  if LV_HOR_RES > LV_VER_RES
     uint8_t fs_buf[LV_HOR_RES];
-#  else
-    uint8_t fs_buf[LV_VER_RES];
-#  endif
 # endif
 #endif
     const uint8_t * data_tmp = NULL;
