@@ -2846,6 +2846,7 @@ lv_font_t lv_font_symbol_10 = {
     .h_px = 10,             /*Font height in pixels*/
     .glyph_bitmap = lv_font_symbol_10_glyph_bitmap, /*Bitmap of glyphs*/
     .glyph_dsc = lv_font_symbol_10_glyph_dsc,       /*Description of glyphs*/
+    .glyph_cnt = 50,            /*Number of glyphs in the font*/
     .unicode_list = NULL,
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/

@@ -5416,6 +5416,7 @@ lv_font_t lv_font_dejavu_10_latin_sup = {
     .h_px = 10,             /*Font height in pixels*/
     .glyph_bitmap = lv_font_dejavu_10_latin_sup_glyph_bitmap,   /*Bitmap of glyphs*/
     .glyph_dsc = lv_font_dejavu_10_latin_sup_glyph_dsc,     /*Description of glyphs*/
+    .glyph_cnt = 96,            /*Number of glyphs in the font*/
     .unicode_list = NULL,   /*Every character in the font from 'unicode_first' to 'unicode_last'*/
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
