@@ -20,15 +20,17 @@ extern "C" {
 #endif
 
 /*Error checking*/
+#if LV_COLOR_DEPTH == 24
+#error "LV_COLOR_DEPTH  24 is deprecated. Use LV_COLOR_DEPTH  32 instead (lv_conf.h)"
+#endif
+
 #if LV_COLOR_DEPTH != 32 && LV_COLOR_SCREEN_TRANSP != 0
 #error "LV_COLOR_SCREEN_TRANSP requires LV_COLOR_DEPTH == 32. Set it in lv_conf.h"
 #endif
 
-
 #if LV_COLOR_DEPTH != 16 && LV_COLOR_16_SWAP != 0
 #error "LV_COLOR_16_SWAP requires LV_COLOR_DEPTH == 16. Set it in lv_conf.h"
 #endif
-
 
 
 #include <stdint.h>
