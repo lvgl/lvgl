@@ -301,7 +301,7 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     lv_coord_t h = lv_area_get_height(area_p);
     lv_coord_t y2 = area_p->y2 >= LV_VER_RES ? y2 = LV_VER_RES - 1 : area_p->y2;
 
-    lv_coord_t max_row = (uint32_t) LV_VDB_SIZE / w;
+    int32_t max_row = (uint32_t) LV_VDB_SIZE / w;
 
     if(max_row > h) max_row = h;
 

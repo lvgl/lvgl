@@ -321,5 +321,4 @@
 
 #endif /*LV_CONF_H*/
 
-
-#endif /*Remove this to enable the content*/
+#endif /*End of "Content enable"*/
