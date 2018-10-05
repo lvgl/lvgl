@@ -62,7 +62,7 @@ extern "C" {
 #define LVGL_VERSION_MAJOR   5
 #define LVGL_VERSION_MINOR   2
 #define LVGL_VERSION_PATCH   0
-#define LVGL_VERSION_INFO    "beta"
+#define LVGL_VERSION_INFO    ""
 
 /**********************
  *      TYPEDEFS
