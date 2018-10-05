@@ -69,7 +69,7 @@ static lv_obj_t * last_clicked_btn;
  */
 lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("list create started");
+    LV_LOG_TRACE("list create started");
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_list = lv_page_create(par, copy);
@@ -119,14 +119,14 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_t * copy_btn = lv_list_get_next_btn(copy, NULL);
         while(copy_btn) {
-        	const void * img_src = NULL;
+            const void * img_src = NULL;
 #if USE_LV_IMG
             lv_obj_t * copy_img = lv_list_get_btn_img(copy_btn);
             if(copy_img) img_src = lv_img_get_src(copy_img);
 #endif
-        	lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), lv_btn_get_action(copy_btn, LV_BTN_ACTION_CLICK));
-           // new_btn = lv_btn_create(new_list, copy_btn);
-        	copy_btn = lv_list_get_next_btn(copy, copy_btn);
+            lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), lv_btn_get_action(copy_btn, LV_BTN_ACTION_CLICK));
+            // new_btn = lv_btn_create(new_list, copy_btn);
+            copy_btn = lv_list_get_next_btn(copy, copy_btn);
         }
 
         lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, copy_ext->styles_btn[LV_BTN_STATE_REL]);
@@ -140,7 +140,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 
-	LV_LOG_INFO("list created");
+    LV_LOG_INFO("list created");
 
 
     return new_list;
@@ -236,23 +236,23 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
  */
 void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
 {
-	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
-	if(ext->selected_btn) {
-		lv_btn_state_t s = lv_btn_get_state(ext->selected_btn);
-		if(s == LV_BTN_STATE_PR) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_REL);
-		else if(s == LV_BTN_STATE_TGL_PR) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_REL);
-	}
+    if(ext->selected_btn) {
+        lv_btn_state_t s = lv_btn_get_state(ext->selected_btn);
+        if(s == LV_BTN_STATE_PR) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_REL);
+        else if(s == LV_BTN_STATE_TGL_PR) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_REL);
+    }
 
-	ext->selected_btn = btn;
+    ext->selected_btn = btn;
 
-	if(ext->selected_btn) {
-		lv_btn_state_t s = lv_btn_get_state(ext->selected_btn);
-		if(s == LV_BTN_STATE_REL) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_PR);
-		else if(s == LV_BTN_STATE_TGL_REL) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_PR);
+    if(ext->selected_btn) {
+        lv_btn_state_t s = lv_btn_get_state(ext->selected_btn);
+        if(s == LV_BTN_STATE_REL) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_PR);
+        else if(s == LV_BTN_STATE_TGL_REL) lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_PR);
 
         lv_page_focus(list, ext->selected_btn, ext->anim_time);
-	}
+    }
 }
 
 #endif
@@ -448,7 +448,7 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-	return ext->selected_btn;
+    return ext->selected_btn;
 }
 
 #endif
@@ -625,7 +625,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     res = ancestor_page_signal(list, sign, param);
     if(res != LV_RES_OK) return res;
 
-	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
     if(sign == LV_SIGNAL_CORD_CHG) {
         /*Be sure the width of the buttons are correct*/
@@ -660,24 +660,24 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         /*De-select the selected btn*/
-    	lv_list_set_btn_selected(list, NULL);
-        last_clicked_btn = NULL;		/*button click will be set if click happens before focus*/
+        lv_list_set_btn_selected(list, NULL);
+        last_clicked_btn = NULL;        /*button click will be set if click happens before focus*/
         ext->selected_btn = NULL;
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
-    	bool * editable = (bool *)param;
-    	*editable = true;
+        bool * editable = (bool *)param;
+        *editable = true;
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
-        	/*If there is a valid selected button the make the previous selected*/
-        	if(ext->selected_btn) {
-        		lv_obj_t * btn_prev = lv_list_get_next_btn(list, ext->selected_btn);
-        		if(btn_prev) lv_list_set_btn_selected(list, btn_prev);
-			}
-        	/*If there is no selected button the make the first selected*/
+            /*If there is a valid selected button the make the previous selected*/
+            if(ext->selected_btn) {
+                lv_obj_t * btn_prev = lv_list_get_next_btn(list, ext->selected_btn);
+                if(btn_prev) lv_list_set_btn_selected(list, btn_prev);
+            }
+            /*If there is no selected button the make the first selected*/
             else {
-            	lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
-				if(btn) lv_list_set_btn_selected(list, btn);	/*If there are no buttons on the list then there is no first button*/
+                lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
+                if(btn) lv_list_set_btn_selected(list, btn);    /*If there are no buttons on the list then there is no first button*/
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             /*If there is a valid selected button the make the next selected*/
@@ -687,8 +687,8 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             }
             /*If there is no selected button the make the first selected*/
             else {
-            	lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
-				if(btn) lv_list_set_btn_selected(list, btn);
+                lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
+                if(btn) lv_list_set_btn_selected(list, btn);
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             /*Get the 'pressed' button*/
@@ -734,26 +734,26 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
 
 #if USE_LV_GROUP
     if(sign == LV_SIGNAL_RELEASED) {
-    	lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
-    	lv_group_t * g = lv_obj_get_group(list);
-    	if(lv_group_get_focused(g) == list && lv_indev_is_dragging(lv_indev_get_act()) == false) {
-    		/* Is the list is focused then be sure only the button being released
-    		 * has a pressed state to indicate the selected state on the list*/
-    		lv_obj_t * btn_i = lv_list_get_prev_btn(list, NULL);
-    		while(btn_i) {
-    			lv_btn_state_t s = lv_btn_get_state(btn_i);
-    			if(s == LV_BTN_STATE_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_REL);
-    			else if(s == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_TGL_REL);
-    			btn_i = lv_list_get_prev_btn(list, btn_i);
-    		}
+        lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_group_t * g = lv_obj_get_group(list);
+        if(lv_group_get_focused(g) == list && lv_indev_is_dragging(lv_indev_get_act()) == false) {
+            /* Is the list is focused then be sure only the button being released
+             * has a pressed state to indicate the selected state on the list*/
+            lv_obj_t * btn_i = lv_list_get_prev_btn(list, NULL);
+            while(btn_i) {
+                lv_btn_state_t s = lv_btn_get_state(btn_i);
+                if(s == LV_BTN_STATE_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_REL);
+                else if(s == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn_i, LV_BTN_STATE_TGL_REL);
+                btn_i = lv_list_get_prev_btn(list, btn_i);
+            }
 
-    		/*Make the released button "selected"*/
-    		lv_list_set_btn_selected(list, btn);
-    	}
+            /*Make the released button "selected"*/
+            lv_list_set_btn_selected(list, btn);
+        }
 
-    	/* If `click_focus == 1` then LV_SIGNAL_FOCUS need to know which button triggered the focus
-		 * to mark it as selected (pressed state)*/
-		last_clicked_btn = btn;
+        /* If `click_focus == 1` then LV_SIGNAL_FOCUS need to know which button triggered the focus
+         * to mark it as selected (pressed state)*/
+        last_clicked_btn = btn;
 
     }
 #endif

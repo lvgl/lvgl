@@ -52,7 +52,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("led create started");
+    LV_LOG_TRACE("led create started");
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_led = lv_obj_create(par, copy);
@@ -94,7 +94,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 
-	LV_LOG_INFO("led created");
+    LV_LOG_INFO("led created");
 
     return new_led;
 }

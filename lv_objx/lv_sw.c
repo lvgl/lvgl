@@ -50,7 +50,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("switch create started");
+    LV_LOG_TRACE("switch create started");
 
     /*Create the ancestor of switch*/
     lv_obj_t * new_sw = lv_slider_create(par, copy);
@@ -102,7 +102,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_sw);
     }
 
-	LV_LOG_INFO("switch created");
+    LV_LOG_INFO("switch created");
 
     return new_sw;
 }
@@ -262,8 +262,8 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             if(slider_action) slider_action(sw);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
-    	bool * editable = (bool *)param;
-    	*editable = false;			/*The ancestor slider is editable the switch is not*/
+        bool * editable = (bool *)param;
+        *editable = false;          /*The ancestor slider is editable the switch is not*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

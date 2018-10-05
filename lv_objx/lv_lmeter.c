@@ -52,12 +52,12 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("line meter create started");
+    LV_LOG_TRACE("line meter create started");
 
     /*Create the ancestor of line meter*/
     lv_obj_t * new_lmeter = lv_obj_create(par, copy);
     lv_mem_assert(new_lmeter);
-    if(new_lmeter== NULL) return NULL;
+    if(new_lmeter == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_lmeter);
 
@@ -102,7 +102,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_lmeter);
     }
 
-	LV_LOG_INFO("line meter created");
+    LV_LOG_INFO("line meter created");
 
     return new_lmeter;
 }

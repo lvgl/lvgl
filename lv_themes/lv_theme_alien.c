@@ -450,7 +450,7 @@ static void calendar_init(void)
     theme.calendar.today_box = &today_box;
     theme.calendar.day_names = &color_text;
     theme.calendar.highlighted_days = &color_text;
-    theme.calendar.inactive_days= &gray_text;
+    theme.calendar.inactive_days = &gray_text;
 #endif
 }
 

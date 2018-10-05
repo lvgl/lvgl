@@ -289,7 +289,7 @@ static void led_init(void)
     lv_style_copy(&led, &lv_style_pretty_color);
     led.body.shadow.width = LV_DPI / 10;
     led.body.radius = LV_RADIUS_CIRCLE;
-    led.body.border.width= LV_DPI / 30;
+    led.body.border.width = LV_DPI / 30;
     led.body.border.opa = LV_OPA_30;
     led.body.main_color = lv_color_hsv_to_rgb(_hue, 100, 100);
     led.body.grad_color = lv_color_hsv_to_rgb(_hue, 100, 40);
@@ -444,7 +444,7 @@ static void calendar_init(void)
     theme.calendar.highlighted_days = theme.label.sec;
     theme.calendar.week_box = &week_box;
     theme.calendar.today_box = &week_box;
-    theme.calendar.header_pr= theme.label.prim;
+    theme.calendar.header_pr = theme.label.prim;
 #endif
 }
 
@@ -760,7 +760,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_nemo_init(uint16_t hue, lv_font_t *font)
+lv_theme_t * lv_theme_nemo_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
@@ -769,8 +769,8 @@ lv_theme_t * lv_theme_nemo_init(uint16_t hue, lv_font_t *font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t **style_p = (lv_style_t**) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t*); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme;
+    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
         *style_p = &def;
         style_p++;
     }

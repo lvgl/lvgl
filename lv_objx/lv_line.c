@@ -50,7 +50,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("line create started");
+    LV_LOG_TRACE("line create started");
 
     /*Create a basic object*/
     lv_obj_t * new_line = lv_obj_create(par, copy);
@@ -90,7 +90,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 
-	LV_LOG_INFO("line created");
+    LV_LOG_INFO("line created");
 
     return new_line;
 }

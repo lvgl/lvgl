@@ -137,7 +137,7 @@ typedef struct {
         lv_style_t *inactive_days;
         lv_style_t *week_box;
         lv_style_t *today_box;
-    }calendar;
+    } calendar;
 #endif
 
 #if USE_LV_CB != 0

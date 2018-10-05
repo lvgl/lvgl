@@ -80,17 +80,17 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
     /*Align to middle*/
     if(flag & LV_TXT_FLAG_CENTER) {
-    	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
-    			font, style->text.letter_space, flag);
+        line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
+                                      font, style->text.letter_space, flag);
 
-    	pos.x += (lv_area_get_width(coords) - line_width) / 2;
+        pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
     else if(flag & LV_TXT_FLAG_RIGHT) {
-    	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
-    			font, style->text.letter_space, flag);
-    	pos.x += lv_area_get_width(coords) - line_width;
+        line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
+                                      font, style->text.letter_space, flag);
+        pos.x += lv_area_get_width(coords) - line_width;
     }
 
 
@@ -180,16 +180,16 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         /*Align to middle*/
         if(flag & LV_TXT_FLAG_CENTER) {
             line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
-                                           font, style->text.letter_space, flag);
+                                          font, style->text.letter_space, flag);
 
-           pos.x += (lv_area_get_width(coords) - line_width) / 2;
+            pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
         }
         /*Align to the right*/
         else if(flag & LV_TXT_FLAG_RIGHT) {
-        	line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
-        	                                           font, style->text.letter_space, flag);
-        	pos.x += lv_area_get_width(coords) - line_width;
+            line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
+                                          font, style->text.letter_space, flag);
+            pos.x += lv_area_get_width(coords) - line_width;
         }
 
         /*Go the next line position*/

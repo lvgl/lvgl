@@ -56,7 +56,7 @@ typedef struct _lv_anim_t
     uint8_t repeat :1;              /*Repeat the animation infinitely*/
     /*Animation system use these - user shouldn't set*/
     uint8_t playback_now :1;        /*Play back is in progress*/
-    uint32_t has_run     :1;		/*Indicates the animation has run it this round*/
+    uint32_t has_run     :1;        /*Indicates the animation has run it this round*/
 } lv_anim_t;
 
 /*Example initialization

@@ -72,7 +72,7 @@ static const char * month_name[12] = {"January",   "February",   "March",    "Ap
  */
 lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("calendar create started");
+    LV_LOG_TRACE("calendar create started");
 
     /*Create the ancestor of calendar*/
     lv_obj_t * new_calendar = lv_obj_create(par, copy);
@@ -165,7 +165,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_calendar);
     }
 
-	LV_LOG_INFO("calendar created");
+    LV_LOG_INFO("calendar created");
 
     return new_calendar;
 }
@@ -580,7 +580,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     txt_buf[5] =  '\0';
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
     header_area.y1 += ext->style_header->body.padding.ver;
-    lv_draw_label(&header_area, mask, ext->style_header, opa_scale, txt_buf , LV_TXT_FLAG_CENTER, NULL);
+    lv_draw_label(&header_area, mask, ext->style_header, opa_scale, txt_buf, LV_TXT_FLAG_CENTER, NULL);
 
     /*Add the left arrow*/
     lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;

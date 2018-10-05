@@ -43,7 +43,7 @@
  */
 void lv_font_init(void)
 {
-	lv_font_builtin_init();
+    lv_font_builtin_init();
 }
 
 /**
@@ -72,20 +72,20 @@ void lv_font_add(lv_font_t * child, lv_font_t * parent)
  */
 bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter)
 {
-	const lv_font_t * font_i = font_p;
-	int16_t w;
-	while(font_i != NULL) {
-    w = font_i->get_width(font_i, letter);
-    if(w >= 0) {
-    	/*Glyph found*/
-    	if(font_i->monospace) return true;
-    	return false;
+    const lv_font_t * font_i = font_p;
+    int16_t w;
+    while(font_i != NULL) {
+        w = font_i->get_width(font_i, letter);
+        if(w >= 0) {
+            /*Glyph found*/
+            if(font_i->monospace) return true;
+            return false;
+        }
+
+        font_i = font_i->next_page;
     }
 
-    font_i = font_i->next_page;
-}
-
-return 0;
+    return 0;
 }
 
 /**
@@ -120,10 +120,10 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
     while(font_i != NULL) {
         w = font_i->get_width(font_i, letter);
         if(w >= 0) {
-        	/*Glyph found*/
-        	uint8_t m = font_i->monospace;
-        	if(m) w = m;
-        	return w;
+            /*Glyph found*/
+            uint8_t m = font_i->monospace;
+            if(m) w = m;
+            return w;
         }
 
         font_i = font_i->next_page;

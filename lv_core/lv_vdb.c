@@ -21,9 +21,9 @@
  *      TYPEDEFS
  **********************/
 enum {
-    LV_VDB_STATE_FREE = 0,		/*Not used*/
-    LV_VDB_STATE_ACTIVE,		/*Being used to render*/
-    LV_VDB_STATE_FLUSH,			/*Flushing pixels from it*/
+    LV_VDB_STATE_FREE = 0,      /*Not used*/
+    LV_VDB_STATE_ACTIVE,        /*Being used to render*/
+    LV_VDB_STATE_FLUSH,         /*Flushing pixels from it*/
 };
 typedef uint8_t lv_vdb_state_t;
 
@@ -41,12 +41,12 @@ static volatile lv_vdb_state_t vdb_state = LV_VDB_STATE_ACTIVE;
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
 static uint8_t vdb_buf[LV_VDB_SIZE_IN_BYTES];
-static lv_vdb_t vdb = {.buf = (lv_color_t*)vdb_buf};
-#  else		/*LV_VDB_ADR != 0*/
+static lv_vdb_t vdb = {.buf = (lv_color_t *)vdb_buf};
+#  else     /*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
 static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
 #  endif
-#else		/*LV_VDB_DOUBLE != 0*/
+#else       /*LV_VDB_DOUBLE != 0*/
 /*Double VDB*/
 static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_FREE};
 #  if LV_VDB_ADR == 0
@@ -54,7 +54,7 @@ static volatile lv_vdb_state_t vdb_state[2] = {LV_VDB_STATE_FREE, LV_VDB_STATE_F
 static uint8_t vdb_buf1[LV_VDB_SIZE_IN_BYTES];
 static uint8_t vdb_buf2[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *) vdb_buf1}, {.buf = (lv_color_t *) vdb_buf2}};
-#  else	/*LV_VDB_ADR != 0*/
+#  else /*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
 static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *)LV_VDB_ADR}, {.buf = (lv_color_t *)LV_VDB2_ADR}};
 #  endif
@@ -79,7 +79,7 @@ lv_vdb_t * lv_vdb_get(void)
      * user call of 'lv_flush_ready()' in display drivers's flush function*/
     while(vdb_state != LV_VDB_STATE_ACTIVE);
 
-    if(vdb.buf == (void*)LV_VDB_ADR_INV) {
+    if(vdb.buf == (void *)LV_VDB_ADR_INV) {
         LV_LOG_ERROR("VDB address is invalid. Use `lv_vdb_set_adr` to set a valid address or use LV_VDB_ADR = 0 in lv_conf.h");
         return NULL;
     }
@@ -111,9 +111,9 @@ void lv_vdb_flush(void)
 {
     lv_vdb_t * vdb_act = lv_vdb_get();
     if(!vdb_act) {
-         LV_LOG_WARN("Invalid VDB pointer");
-         return;
-     }
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
 #if LV_VDB_DOUBLE == 0
     vdb_state = LV_VDB_STATE_FLUSH;     /*User call to 'lv_flush_ready()' will set to ACTIVE 'disp_flush'*/
 #else

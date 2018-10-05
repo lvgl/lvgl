@@ -495,7 +495,7 @@ static lv_ufs_ent_t * lv_ufs_ent_new(const char * fn)
     if(new_ent == NULL) return NULL;
 
     new_ent->fn_d = lv_mem_alloc(strlen(fn)  + 1); /*Save the name*/
-	lv_mem_assert(new_ent->fn_d);
+    lv_mem_assert(new_ent->fn_d);
     if(new_ent->fn_d == NULL) return NULL;
 
     strcpy(new_ent->fn_d, fn);

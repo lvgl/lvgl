@@ -1064,15 +1064,15 @@ static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, con
 static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
 
-	/* KNOWN ISSUE
-	 * The algorithm calculates the shadow only above the middle point of the radius (speaking about the left top corner).
-	 * It causes an error because it doesn't consider how long the straight edge is which effects the value of bottom of the corner shadow.
-	 * In addition the straight shadow is drawn from the middles point of the radius however
-	 * the ends of the straight parts still should be effected by the corner shadow.
-	 * It also causes an issue in opacity. A smaller radius means smaller average shadow opacity.
-	 * The solution should be to start `line` from `- swidth` and handle if the straight part is short (or zero) and the value is taken from
-	 * the other corner. `col` also should start from `- swidth`
-	 */
+    /* KNOWN ISSUE
+     * The algorithm calculates the shadow only above the middle point of the radius (speaking about the left top corner).
+     * It causes an error because it doesn't consider how long the straight edge is which effects the value of bottom of the corner shadow.
+     * In addition the straight shadow is drawn from the middles point of the radius however
+     * the ends of the straight parts still should be effected by the corner shadow.
+     * It also causes an issue in opacity. A smaller radius means smaller average shadow opacity.
+     * The solution should be to start `line` from `- swidth` and handle if the straight part is short (or zero) and the value is taken from
+     * the other corner. `col` also should start from `- swidth`
+     */
 
 
     lv_coord_t radius = style->body.radius;
@@ -1203,19 +1203,19 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
         for(d = 1; d < col; d++) {
 
             if(point_lt.x < ofs_lt.x && point_lt.y < ofs_lt.y) {
-                px_fp(point_lt.x, point_lt.y , mask, style->body.shadow.color, line_2d_blur[d]);
+                px_fp(point_lt.x, point_lt.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             if(point_lb.x < ofs_lb.x && point_lb.y > ofs_lb.y) {
-                px_fp(point_lb.x, point_lb.y , mask, style->body.shadow.color, line_2d_blur[d]);
+                px_fp(point_lb.x, point_lb.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             if(point_rt.x > ofs_rt.x && point_rt.y < ofs_rt.y) {
-                px_fp(point_rt.x, point_rt.y , mask, style->body.shadow.color, line_2d_blur[d]);
+                px_fp(point_rt.x, point_rt.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             if(point_rb.x > ofs_rb.x && point_rb.y > ofs_rb.y) {
-                px_fp(point_rb.x, point_rb.y , mask, style->body.shadow.color, line_2d_blur[d]);
+                px_fp(point_rb.x, point_rb.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             point_rb.x++;

@@ -61,7 +61,7 @@ typedef struct
     lv_obj_t * label;           /*Label of the text area*/
     char * pwd_tmp;             /*Used to store the original text in password mode*/
     const char * accapted_chars;/*Only these characters will be accepted. NULL: accept all*/
-    uint16_t max_length;		/*The max. number of characters. 0: no limit*/
+    uint16_t max_length;        /*The max. number of characters. 0: no limit*/
     uint8_t pwd_mode :1;        /*Replace characters with '*' */
     uint8_t one_line :1;        /*One line mode (ignore line breaks)*/
     struct {
@@ -190,7 +190,7 @@ void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num);
  */
 static inline void lv_ta_set_action(lv_obj_t * ta, lv_action_t action)
 {
-	lv_page_set_rel_action(ta, action);
+    lv_page_set_rel_action(ta, action);
 }
 
 /**
@@ -285,7 +285,7 @@ uint16_t lv_ta_get_max_length(lv_obj_t * ta);
  */
 static inline lv_action_t lv_ta_get_action(lv_obj_t * ta)
 {
-	return lv_page_get_rel_action(ta);
+    return lv_page_get_rel_action(ta);
 }
 
 /**

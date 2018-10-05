@@ -59,7 +59,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 
 
-	LV_LOG_TRACE("chart create started");
+    LV_LOG_TRACE("chart create started");
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_chart = lv_obj_create(par, copy);
@@ -115,7 +115,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_chart);
     }
 
-	LV_LOG_INFO("chart created");
+    LV_LOG_INFO("chart created");
 
 
     return new_chart;
@@ -135,7 +135,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     lv_chart_series_t * ser = lv_ll_ins_head(&ext->series_ll);
-	lv_mem_assert(ser);
+    lv_mem_assert(ser);
     if(ser == NULL) return NULL;
 
     lv_coord_t def = (ext->ymin + ext->ymax) >> 1;  /*half range as default value*/
@@ -147,9 +147,9 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * ext->point_cnt);
     lv_mem_assert(ser->points);
     if(ser->points == NULL) {
-    	lv_ll_rem(&ext->series_ll, ser);
-    	lv_mem_free(ser);
-    	return NULL;
+        lv_ll_rem(&ext->series_ll, ser);
+        lv_mem_free(ser);
+        return NULL;
     }
 
     uint16_t i;

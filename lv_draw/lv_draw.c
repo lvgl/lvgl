@@ -38,15 +38,15 @@ void (*const px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color
 void (*const fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_vfill;
 void (*const letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_vletter;
 void (*const map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
-               const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-               lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
+                     const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+                     lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
 #else
 void (*const px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_rpx;
 void (*const fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_rfill;
 void (*const letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_rletter;
 void (*const map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
-                      const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-                      lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
+                     const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+                     lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
 #endif
 
 /**********************

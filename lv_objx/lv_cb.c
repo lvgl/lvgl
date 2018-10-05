@@ -51,7 +51,7 @@ static lv_signal_func_t ancestor_signal;
 lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 
-	LV_LOG_TRACE("check box create started");
+    LV_LOG_TRACE("check box create started");
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_cb = lv_btn_create(par, copy);
@@ -110,7 +110,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_set_design_func(ext->bullet, lv_bullet_design);
 
 
-	LV_LOG_INFO("check box created");
+    LV_LOG_INFO("check box created");
 
     return new_cb;
 }

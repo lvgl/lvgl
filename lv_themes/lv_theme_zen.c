@@ -354,7 +354,7 @@ static void calendar_init(void)
 static void cb_init(void)
 {
 #if USE_LV_CB != 0
-    static lv_style_t rel , pr, tgl_rel, tgl_pr, ina;
+    static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&rel, &def);
     rel.body.radius = LV_DPI / 20;
     rel.body.shadow.width = 0;
@@ -397,7 +397,7 @@ static void cb_init(void)
 static void btnm_init(void)
 {
 #if USE_LV_BTNM
-    static lv_style_t bg, rel , pr, tgl_rel, tgl_pr, ina;
+    static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&bg, &lv_style_transp);
     bg.glass = 0;
@@ -446,7 +446,7 @@ static void btnm_init(void)
 static void kb_init(void)
 {
 #if USE_LV_KB
-    static lv_style_t bg, rel , pr, tgl_rel, tgl_pr, ina;
+    static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&bg, &def);
     bg.body.main_color = LV_COLOR_HEX3(0x666);
     bg.body.grad_color = bg.body.main_color;

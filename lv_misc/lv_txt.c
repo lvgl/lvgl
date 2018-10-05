@@ -52,23 +52,23 @@ static uint32_t lv_txt_ascii_get_length(const char * txt);
  *  GLOBAL VARIABLES
  **********************/
 #if LV_TXT_UTF8
-uint8_t (*lv_txt_encoded_size)(const char *) = 					lv_txt_utf8_size;
-uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_utf8;
-uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =					lv_txt_utf8_conv_wc;
-uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_utf8_next;
-uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_utf8_prev;
-uint32_t (*lv_txt_encoded_get_byte_id)(const char * , uint32_t) = lv_txt_utf8_get_byte_id;
-uint32_t (*lv_encoded_get_char_id)(const char * , uint32_t) = 	lv_txt_utf8_get_char_id;
-uint32_t (*lv_txt_get_encoded_length)(const char * ) = 			lv_txt_utf8_get_length;
+uint8_t (*lv_txt_encoded_size)(const char *) =                  lv_txt_utf8_size;
+uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) =               lv_txt_unicode_to_utf8;
+uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =                  lv_txt_utf8_conv_wc;
+uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *) =    lv_txt_utf8_next;
+uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *) =   lv_txt_utf8_prev;
+uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_utf8_get_byte_id;
+uint32_t (*lv_encoded_get_char_id)(const char *, uint32_t) =   lv_txt_utf8_get_char_id;
+uint32_t (*lv_txt_get_encoded_length)(const char *) =          lv_txt_utf8_get_length;
 #else
-uint8_t (*lv_txt_encoded_size)(const char *) = 					lv_txt_ascii_size;
-uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) = 				lv_txt_unicode_to_ascii;
-uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =					lv_txt_ascii_conv_wc;
-uint32_t (*lv_txt_encoded_next)(const char * , uint32_t *) =	lv_txt_ascii_next;
-uint32_t (*lv_txt_encoded_prev)(const char * , uint32_t * ) =	lv_txt_ascii_prev;
-uint32_t (*lv_txt_encoded_get_byte_id)(const char * , uint32_t) = lv_txt_ascii_get_byte_id;
-uint32_t (*lv_encoded_get_char_id)(const char * , uint32_t) = 	lv_txt_ascii_get_char_id;
-uint32_t (*lv_txt_get_encoded_length)(const char * ) = 			lv_txt_ascii_get_length;
+uint8_t (*lv_txt_encoded_size)(const char *) =                  lv_txt_ascii_size;
+uint32_t (*lv_txt_unicode_to_encoded)(uint32_t) =               lv_txt_unicode_to_ascii;
+uint32_t (*lv_txt_encoded_conv_wc)(uint32_t) =                  lv_txt_ascii_conv_wc;
+uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *) =    lv_txt_ascii_next;
+uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *) =   lv_txt_ascii_prev;
+uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_ascii_get_byte_id;
+uint32_t (*lv_encoded_get_char_id)(const char *, uint32_t) =   lv_txt_ascii_get_char_id;
+uint32_t (*lv_txt_get_encoded_length)(const char *) =          lv_txt_ascii_get_length;
 #endif
 /**********************
  *      MACROS
@@ -187,7 +187,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                 } else {
                     /* Now this character is out of the area so it will be first character of the next line*/
                     /* But 'i' already points to the next character (because of lv_txt_utf8_next) step beck one*/
-                	lv_txt_encoded_prev(txt, &i);
+                    lv_txt_encoded_prev(txt, &i);
                 }
 
                 /* Do not let to return without doing nothing.
@@ -238,8 +238,8 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
                 }
             }
 
-			width += lv_font_get_width(font, letter);
-			width += letter_space;
+            width += lv_font_get_width(font, letter);
+            width += letter_space;
         }
 
         width -= letter_space;  /*Trim the last letter space. Important if the text is center aligned */
@@ -390,20 +390,20 @@ static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
  */
 static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
 {
-	/*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
-	if((c & 0x80) != 0) {
-		uint32_t swapped;
-		uint8_t c8[4];
-		memcpy(c8, &c, 4);
-		swapped = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
-		uint8_t i;
-		for(i = 0; i < 4; i++) {
-			if((swapped & 0xFF) == 0) swapped = (swapped >> 8); /*Ignore leading zeros (they were in the end originally)*/
-		}
-		c = swapped;
-	}
+    /*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
+    if((c & 0x80) != 0) {
+        uint32_t swapped;
+        uint8_t c8[4];
+        memcpy(c8, &c, 4);
+        swapped = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
+        uint8_t i;
+        for(i = 0; i < 4; i++) {
+            if((swapped & 0xFF) == 0) swapped = (swapped >> 8); /*Ignore leading zeros (they were in the end originally)*/
+        }
+        c = swapped;
+    }
 
-	return c;
+    return c;
 }
 
 /**
@@ -544,7 +544,7 @@ static uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id)
     uint32_t char_cnt = 0;
 
     while(i < byte_id) {
-    	lv_txt_encoded_next(txt, &i); /*'i' points to the next letter so use the prev. value*/
+        lv_txt_encoded_next(txt, &i); /*'i' points to the next letter so use the prev. value*/
         char_cnt++;
     }
 
@@ -566,7 +566,7 @@ static uint32_t lv_txt_utf8_get_length(const char * txt)
     uint32_t i = 0;
 
     while(txt[i] != '\0') {
-    	lv_txt_encoded_next(txt, &i);
+        lv_txt_encoded_next(txt, &i);
         len++;
     }
 
@@ -605,7 +605,7 @@ static uint32_t lv_txt_unicode_to_ascii(uint32_t letter_uni)
  */
 static uint32_t lv_txt_ascii_conv_wc(uint32_t c)
 {
-	return c;
+    return c;
 }
 
 /**

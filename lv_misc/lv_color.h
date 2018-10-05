@@ -71,17 +71,17 @@ extern "C" {
 #define LV_OPA_100       255
 #define LV_OPA_COVER     255
 
-#define LV_OPA_MIN		16		/*Opacities below this will be transparent*/
-#define LV_OPA_MAX		251		/*Opacities above this will fully cover*/
+#define LV_OPA_MIN      16      /*Opacities below this will be transparent*/
+#define LV_OPA_MAX      251     /*Opacities above this will fully cover*/
 
 #if LV_COLOR_DEPTH == 1
-#define LV_COLOR_SIZE			8
+#define LV_COLOR_SIZE           8
 #elif LV_COLOR_DEPTH == 8
-#define LV_COLOR_SIZE			8
+#define LV_COLOR_SIZE           8
 #elif LV_COLOR_DEPTH == 16
-#define LV_COLOR_SIZE			16
+#define LV_COLOR_SIZE           16
 #elif LV_COLOR_DEPTH == 32
-#define LV_COLOR_SIZE			32
+#define LV_COLOR_SIZE           32
 #else
 #error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
 #endif
@@ -201,10 +201,10 @@ static inline uint8_t lv_color_to1(lv_color_t color)
             (color.blue  & 0x10)) {
         return 1;
 #  else
-        if((color.red   & 0x10) ||
-			(color.green_h & 0x20) ||
-			(color.blue  & 0x10)) {
-		return 1;
+    if((color.red   & 0x10) ||
+            (color.green_h & 0x20) ||
+            (color.blue  & 0x10)) {
+        return 1;
 #  endif
     } else {
         return 0;
@@ -238,7 +238,7 @@ static inline uint8_t lv_color_to8(lv_color_t color)
 #  else
     lv_color8_t ret;
     ret.red = color.red >> 2;       /* 5 - 3  = 2*/
-    ret.green = color.green_h;   	/* 6 - 3  = 3*/
+    ret.green = color.green_h;      /* 6 - 3  = 3*/
     ret.blue = color.blue >> 3;     /* 5 - 2  = 3*/
     return ret.full;
 #  endif
@@ -310,9 +310,9 @@ static inline uint32_t lv_color_to32(lv_color_t color)
     return ret.full;
 #  else
     lv_color32_t ret;
-    ret.red = color.red * 8;       								/*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
-    ret.green = ((color.green_h << 3) + color.green_l) * 4;   	/*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
-    ret.blue = color.blue * 8;    								 /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.red = color.red * 8;                                    /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.green = ((color.green_h << 3) + color.green_l) * 4;     /*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
+    ret.blue = color.blue * 8;                                   /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
     ret.alpha = 0xFF;
     return ret.full;
 #  endif

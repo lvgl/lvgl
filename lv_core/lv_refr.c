@@ -180,7 +180,7 @@ static void lv_refr_task(void * param)
 {
     (void)param;
 
-	LV_LOG_TRACE("display refresh task started");
+    LV_LOG_TRACE("display refresh task started");
 
     uint32_t start = lv_tick_get();
 
@@ -201,7 +201,7 @@ static void lv_refr_task(void * param)
         }
     }
 
-	LV_LOG_TRACE("display refresh task finished");
+    LV_LOG_TRACE("display refresh task finished");
 }
 
 
@@ -308,25 +308,25 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
 
     /*Round down the lines of VDB if rounding is added*/
     if(round_cb) {
-    	lv_area_t tmp;
-    	tmp.x1 = 0;
-    	tmp.x2 = 0;
-    	tmp.y1 = 0;
-    	tmp.y2 = max_row;
+        lv_area_t tmp;
+        tmp.x1 = 0;
+        tmp.x2 = 0;
+        tmp.y1 = 0;
+        tmp.y2 = max_row;
 
-    	lv_coord_t y_tmp = max_row;
-    	do {
-    		tmp.y2 = y_tmp;
-    		round_cb(&tmp);
-    		y_tmp --;		/*Decrement the number of line until it is rounded to a smaller (or equal) value then the original. */
-    	} while(lv_area_get_height(&tmp) > max_row && y_tmp != 0);
+        lv_coord_t y_tmp = max_row;
+        do {
+            tmp.y2 = y_tmp;
+            round_cb(&tmp);
+            y_tmp --;       /*Decrement the number of line until it is rounded to a smaller (or equal) value then the original. */
+        } while(lv_area_get_height(&tmp) > max_row && y_tmp != 0);
 
-    	if(y_tmp == 0) {
-    		LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to small VDB)");
-    		return;
-    	} else {
-    		max_row = tmp.y2 + 1;
-    	}
+        if(y_tmp == 0) {
+            LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to small VDB)");
+            return;
+        } else {
+            max_row = tmp.y2 + 1;
+        }
     }
 
     /*Always use the full row*/
@@ -353,9 +353,9 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     if(y2 != row_last) {
         lv_vdb_t * vdb_p = lv_vdb_get();
         if(!vdb_p) {
-             LV_LOG_WARN("Invalid VDB pointer");
-             return;
-         }
+            LV_LOG_WARN("Invalid VDB pointer");
+            return;
+        }
 
         /*Calc. the next y coordinates of VDB*/
         vdb_p->area.x1 = area_p->x1;
@@ -376,9 +376,9 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
 {
     lv_vdb_t * vdb_p = lv_vdb_get();
     if(!vdb_p) {
-         LV_LOG_WARN("Invalid VDB pointer");
-         return;
-     }
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
     lv_obj_t * top_p;
 
     /*Get the new mask from the original area and the act. VDB

@@ -323,8 +323,8 @@ static void calendar_init(void)
     cal_bg.body.border.color = LV_COLOR_HEX3(0x333);
     cal_bg.body.border.width = 1;
     cal_bg.body.radius = LV_DPI / 20;
-    cal_bg.body.padding.hor = LV_DPI/10;
-    cal_bg.body.padding.ver = LV_DPI/10;
+    cal_bg.body.padding.hor = LV_DPI / 10;
+    cal_bg.body.padding.ver = LV_DPI / 10;
 
     static lv_style_t cal_header;
     lv_style_copy(&cal_header, &bg);
@@ -333,8 +333,8 @@ static void calendar_init(void)
     cal_header.body.radius = 0;
     cal_header.body.border.width = 1;
     cal_header.body.border.color = LV_COLOR_HEX3(0x333);
-    cal_header.body.padding.hor = LV_DPI/10;
-    cal_header.body.padding.ver = LV_DPI/10;
+    cal_header.body.padding.hor = LV_DPI / 10;
+    cal_header.body.padding.ver = LV_DPI / 10;
 
     static lv_style_t week_box;
     lv_style_copy(&week_box, &panel);

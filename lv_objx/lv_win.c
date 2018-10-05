@@ -46,7 +46,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("window create started");
+    LV_LOG_TRACE("window create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_win = lv_obj_create(par, copy);
@@ -137,7 +137,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_win_realign(new_win);
 
-	LV_LOG_INFO("window created");
+    LV_LOG_INFO("window created");
 
     return new_win;
 }
@@ -233,7 +233,7 @@ void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size)
  * @param win pointer to a window object
  * @param layout the layout from 'lv_layout_t'
  */
-void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout)
+void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_set_scrl_layout(ext->page, layout);
@@ -244,7 +244,7 @@ void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout)
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
  */
-void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode)
+void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_set_sb_mode(ext->page, sb_mode);
@@ -356,7 +356,7 @@ lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn)
  * @param win pointer to a window object
  * @return the layout of the window (from 'lv_layout_t')
  */
-lv_layout_t lv_win_get_layout(lv_obj_t *win)
+lv_layout_t lv_win_get_layout(lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_page_get_scrl_layout(ext->page);
@@ -367,7 +367,7 @@ lv_layout_t lv_win_get_layout(lv_obj_t *win)
  * @param win pointer to a window object
  * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
  */
-lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win)
+lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_page_get_sb_mode(ext->page);
@@ -483,12 +483,10 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->header = NULL;     /*These objects were children so they are already invalid*/
         ext->page = NULL;
         ext->title = NULL;
-    }
-    else if(sign == LV_SIGNAL_CONTROLL) {
-    	/*Forward all the control signals to the page*/
-    	ext->page->signal_func(ext->page, sign, param);
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+    } else if(sign == LV_SIGNAL_CONTROLL) {
+        /*Forward all the control signals to the page*/
+        ext->page->signal_func(ext->page, sign, param);
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/

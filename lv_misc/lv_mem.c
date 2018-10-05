@@ -35,8 +35,8 @@
 /*The size of this union must be 4 bytes (uint32_t)*/
 typedef union {
     struct {
-    	MEM_UNIT used: 1;       //1: if the entry is used
-    	MEM_UNIT d_size: 31;    //Size off the data (1 means 4 bytes)
+        MEM_UNIT used: 1;       //1: if the entry is used
+        MEM_UNIT d_size: 31;    //Size off the data (1 means 4 bytes)
     };
     MEM_UNIT header;            //The header (used + d_size)
 } lv_mem_header_t;
@@ -79,7 +79,7 @@ static uint32_t zero_mem;       /*Give the address of this variable if 0 byte sh
 void lv_mem_init(void)
 {
 #if LV_MEM_CUSTOM == 0
-	work_mem = (uint8_t*) work_mem_int;
+    work_mem = (uint8_t *) work_mem_int;
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */

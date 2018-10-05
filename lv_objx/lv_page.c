@@ -20,7 +20,7 @@
  *      DEFINES
  *********************/
 #define LV_PAGE_SB_MIN_SIZE    (LV_DPI / 8)
-#define LV_PAGE_SCROLL_ANIM_TIME  200			/*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
+#define LV_PAGE_SCROLL_ANIM_TIME  200           /*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
 
 /**********************
  *      TYPEDEFS
@@ -57,7 +57,7 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("page create started");
+    LV_LOG_TRACE("page create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_page = lv_cont_create(par, copy);
@@ -142,7 +142,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_page_sb_refresh(new_page);
 
-	LV_LOG_INFO("page created");
+    LV_LOG_INFO("page created");
 
     return new_page;
 }
@@ -193,11 +193,11 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     if(ext->sb.mode == sb_mode) return;
 
-    if(sb_mode == LV_SB_MODE_HIDE) ext->sb.mode |= LV_SB_MODE_HIDE;					/*Set the hidden flag*/
-    else if (sb_mode == LV_SB_MODE_UNHIDE) ext->sb.mode &= (~LV_SB_MODE_HIDE);		/*Clear the hidden flag*/
+    if(sb_mode == LV_SB_MODE_HIDE) ext->sb.mode |= LV_SB_MODE_HIDE;                 /*Set the hidden flag*/
+    else if(sb_mode == LV_SB_MODE_UNHIDE) ext->sb.mode &= (~LV_SB_MODE_HIDE);       /*Clear the hidden flag*/
     else {
-    	if(ext->sb.mode & LV_SB_MODE_HIDE) sb_mode |= LV_SB_MODE_HIDE;
-    	ext->sb.mode = sb_mode;
+        if(ext->sb.mode & LV_SB_MODE_HIDE) sb_mode |= LV_SB_MODE_HIDE;
+        ext->sb.mode = sb_mode;
     }
 
     ext->sb.hor_draw = 0;
@@ -424,25 +424,25 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
  */
 void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
 {
-	lv_obj_t * scrl = lv_page_get_scrl(page);
+    lv_obj_t * scrl = lv_page_get_scrl(page);
 
 #if USE_LV_ANIMATION
-	lv_anim_t a;
-	a.var = scrl;
-	a.start = lv_obj_get_x(scrl);
-	a.end = a.start + dist;
-	a.fp = (lv_anim_fp_t)lv_obj_set_x;
-	a.path = lv_anim_path_linear;
-	a.end_cb = NULL;
-	a.act_time = 0;
-	a.time = LV_PAGE_SCROLL_ANIM_TIME;
-	a.playback = 0;
-	a.playback_pause = 0;
-	a.repeat = 0;
-	a.repeat_pause = 0;
-	lv_anim_create(&a);
+    lv_anim_t a;
+    a.var = scrl;
+    a.start = lv_obj_get_x(scrl);
+    a.end = a.start + dist;
+    a.fp = (lv_anim_fp_t)lv_obj_set_x;
+    a.path = lv_anim_path_linear;
+    a.end_cb = NULL;
+    a.act_time = 0;
+    a.time = LV_PAGE_SCROLL_ANIM_TIME;
+    a.playback = 0;
+    a.playback_pause = 0;
+    a.repeat = 0;
+    a.repeat_pause = 0;
+    lv_anim_create(&a);
 #else
-	lv_obj_set_x(scrl, lv_obj_get_x(scrl) + dist);
+    lv_obj_set_x(scrl, lv_obj_get_x(scrl) + dist);
 #endif
 }
 
@@ -453,25 +453,25 @@ void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
  */
 void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 {
-	lv_obj_t * scrl = lv_page_get_scrl(page);
+    lv_obj_t * scrl = lv_page_get_scrl(page);
 
 #if USE_LV_ANIMATION
-	lv_anim_t a;
-	a.var = scrl;
-	a.start = lv_obj_get_y(scrl);
-	a.end = a.start + dist;
-	a.fp = (lv_anim_fp_t)lv_obj_set_y;
-	a.path = lv_anim_path_linear;
-	a.end_cb = NULL;
-	a.act_time = 0;
-	a.time = LV_PAGE_SCROLL_ANIM_TIME;
-	a.playback = 0;
-	a.playback_pause = 0;
-	a.repeat = 0;
-	a.repeat_pause = 0;
-	lv_anim_create(&a);
+    lv_anim_t a;
+    a.var = scrl;
+    a.start = lv_obj_get_y(scrl);
+    a.end = a.start + dist;
+    a.fp = (lv_anim_fp_t)lv_obj_set_y;
+    a.path = lv_anim_path_linear;
+    a.end_cb = NULL;
+    a.act_time = 0;
+    a.time = LV_PAGE_SCROLL_ANIM_TIME;
+    a.playback = 0;
+    a.playback_pause = 0;
+    a.repeat = 0;
+    a.repeat_pause = 0;
+    lv_anim_create(&a);
 #else
-	lv_obj_set_y(scrl, lv_obj_get_x(scrl) + dist);
+    lv_obj_set_y(scrl, lv_obj_get_x(scrl) + dist);
 #endif
 }
 
@@ -663,9 +663,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         uint32_t c = *((uint32_t *) param);
 
         if((c == LV_GROUP_KEY_DOWN) && ext->arrow_scroll) {
-        	lv_page_scroll_ver(page, - lv_obj_get_height(page) / 4);
+            lv_page_scroll_ver(page, - lv_obj_get_height(page) / 4);
         } else if((c == LV_GROUP_KEY_UP) && ext->arrow_scroll) {
-        	lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
+            lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
         } else if((c == LV_GROUP_KEY_RIGHT) && ext->arrow_scroll) {
             /*If the page can be scrolled horizontally because it's not wide enough then scroll it vertically*/
             if(lv_page_get_scrl_width(page) < lv_obj_get_width(page)) lv_page_scroll_ver(page, - lv_obj_get_height(page) / 4);
@@ -676,8 +676,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             else lv_page_scroll_hor(page,  lv_obj_get_width(page) / 4);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
-    	bool * editable = (bool *)param;
-    	*editable = lv_page_get_arrow_scroll(page);
+        bool * editable = (bool *)param;
+        *editable = lv_page_get_arrow_scroll(page);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

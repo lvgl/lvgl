@@ -112,11 +112,11 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(indev->driver.read) {
         data->user_data = indev->driver.user_data;
 
-    	LV_LOG_TRACE("idnev read started");
+        LV_LOG_TRACE("idnev read started");
         cont = indev->driver.read(data);
-    	LV_LOG_TRACE("idnev read finished");
+        LV_LOG_TRACE("idnev read finished");
     } else {
-    	LV_LOG_WARN("indev function registered");
+        LV_LOG_WARN("indev function registered");
         memset(data, 0, sizeof(lv_indev_data_t));
     }
 

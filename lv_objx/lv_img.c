@@ -127,10 +127,17 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
 #if LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
     switch(src_type) {
-        case LV_IMG_SRC_FILE:       LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found"); break;
-        case LV_IMG_SRC_VARIABLE:   LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found"); break;
-        case LV_IMG_SRC_SYMBOL:     LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found"); break;
-        default: LV_LOG_WARN("lv_img_set_src: unknown type");
+        case LV_IMG_SRC_FILE:
+            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found");
+            break;
+        case LV_IMG_SRC_VARIABLE:
+            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found");
+            break;
+        case LV_IMG_SRC_SYMBOL:
+            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found");
+            break;
+        default:
+            LV_LOG_WARN("lv_img_set_src: unknown type");
     }
 #endif
 

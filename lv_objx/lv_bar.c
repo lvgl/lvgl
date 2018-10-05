@@ -52,12 +52,12 @@ static lv_signal_func_t ancestor_signal;
  */
 lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("lv_bar create started");
+    LV_LOG_TRACE("lv_bar create started");
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_bar = lv_obj_create(par, copy);
     lv_mem_assert(new_bar);
-    if(new_bar== NULL) return NULL;
+    if(new_bar == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_bar);
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_bar);
@@ -100,7 +100,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_bar_set_value(new_bar, ext->cur_value);
     }
 
-	LV_LOG_INFO("bar created");
+    LV_LOG_INFO("bar created");
 
     return new_bar;
 }
@@ -305,29 +305,29 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
         lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
         if(ext->cur_value != ext->min_value) {
-			lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
-			lv_area_t indic_area;
-			lv_area_copy(&indic_area, &bar->coords);
-			indic_area.x1 += style_indic->body.padding.hor;
-			indic_area.x2 -= style_indic->body.padding.hor;
-			indic_area.y1 += style_indic->body.padding.ver;
-			indic_area.y2 -= style_indic->body.padding.ver;
+            lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
+            lv_area_t indic_area;
+            lv_area_copy(&indic_area, &bar->coords);
+            indic_area.x1 += style_indic->body.padding.hor;
+            indic_area.x2 -= style_indic->body.padding.hor;
+            indic_area.y1 += style_indic->body.padding.ver;
+            indic_area.y2 -= style_indic->body.padding.ver;
 
-			lv_coord_t w = lv_area_get_width(&indic_area);
-			lv_coord_t h = lv_area_get_height(&indic_area);
+            lv_coord_t w = lv_area_get_width(&indic_area);
+            lv_coord_t h = lv_area_get_height(&indic_area);
 
-			if(w >= h) {
-				indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
-				indic_area.x2 = indic_area.x1 + indic_area.x2;
-			} else {
-				indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
-				indic_area.y1 = indic_area.y2 - indic_area.y1;
-			}
+            if(w >= h) {
+                indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
+                indic_area.x2 = indic_area.x1 + indic_area.x2;
+            } else {
+                indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
+                indic_area.y1 = indic_area.y2 - indic_area.y1;
+            }
 
-			/*Draw the indicator*/
-			lv_draw_rect(&indic_area, mask, style_indic, opa_scale);
+            /*Draw the indicator*/
+            lv_draw_rect(&indic_area, mask, style_indic, opa_scale);
         }
-    }else if(mode == LV_DESIGN_DRAW_POST) {
+    } else if(mode == LV_DESIGN_DRAW_POST) {
 #if USE_LV_GROUP
         /*Draw the border*/
         if(lv_obj_is_focused(bar)) {

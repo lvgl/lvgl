@@ -83,9 +83,9 @@ lv_indev_t * lv_indev_get_act(void)
  */
 lv_hal_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
-	if(indev == NULL) return LV_INDEV_TYPE_NONE;
+    if(indev == NULL) return LV_INDEV_TYPE_NONE;
 
-	return indev->driver.type;
+    return indev->driver.type;
 }
 /**
  * Reset one or all input devices
@@ -266,7 +266,7 @@ static void indev_proc_task(void * param)
     (void)param;
 
 
-	LV_LOG_TRACE("indev task started");
+    LV_LOG_TRACE("indev task started");
 
     lv_indev_data_t data;
     lv_indev_t * i;
@@ -284,7 +284,7 @@ static void indev_proc_task(void * param)
             do {
                 /*Read the data*/
                 more_to_read = lv_indev_read(i, &data);
-                indev_proc_reset_query_handler(i);			/*The active object might deleted even in the read function*/
+                indev_proc_reset_query_handler(i);          /*The active object might deleted even in the read function*/
                 i->proc.state = data.state;
 
                 if(i->proc.state == LV_INDEV_STATE_PR) {
@@ -309,7 +309,7 @@ static void indev_proc_task(void * param)
 
     indev_act = NULL;   /*End of indev processing, so no act indev*/
 
-	LV_LOG_TRACE("indev task finished");
+    LV_LOG_TRACE("indev task finished");
 }
 
 
@@ -367,14 +367,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_PR) {
         if(data->key == LV_GROUP_KEY_ENTER &&
                 i->proc.long_pr_sent == 0 &&
-                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME )
-        {
+                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
             /*On enter long press leave edit mode.*/
-        	lv_obj_t * focused = lv_group_get_focused(i->group);
-        	if(focused) {
+            lv_obj_t * focused = lv_group_get_focused(i->group);
+            if(focused) {
                 focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
                 i->proc.long_pr_sent = 1;
-        	}
+            }
         }
     }
     /*Release happened*/
@@ -392,19 +391,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
         }
 
-        if(data->key == LV_GROUP_KEY_NEXT)
-        {
+        if(data->key == LV_GROUP_KEY_NEXT) {
             lv_group_focus_next(i->group);
-        }
-        else if(data->key == LV_GROUP_KEY_PREV)
-		{
-			lv_group_focus_prev(i->group);
-		}
-		else if(data->key == LV_GROUP_KEY_ENTER)
-        {
-		    if (!i->proc.long_pr_sent) {
-		        lv_group_send_data(i->group, data->key);
-		    }
+        } else if(data->key == LV_GROUP_KEY_PREV) {
+            lv_group_focus_prev(i->group);
+        } else if(data->key == LV_GROUP_KEY_ENTER) {
+            if(!i->proc.long_pr_sent) {
+                lv_group_send_data(i->group, data->key);
+            }
         } else {
             lv_group_send_data(i->group, data->key);
         }
@@ -460,15 +454,14 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_PR) {
         if(i->proc.long_pr_sent == 0 &&
-           lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME )
-        {
+                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
             /*On enter long press leave edit mode.*/
             lv_obj_t * focused = lv_group_get_focused(i->group);
 
             bool editable = false;
             if(focused) focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
-            if (editable) {
+            if(editable) {
                 i->group->editing = i->group->editing ? 0 : 1;
                 if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
                 LV_LOG_INFO("Edit mode changed");
@@ -488,11 +481,11 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         if(focused) focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
         /*The button was released on a non-editable object. Just send enter*/
-        if (!editable) {
+        if(!editable) {
             lv_group_send_data(i->group, LV_GROUP_KEY_ENTER);
         }
         /*An object is being edited and the button is releases. Just send enter */
-        else if (i->group->editing) {
+        else if(i->group->editing) {
             if(!i->proc.long_pr_sent) lv_group_send_data(i->group, LV_GROUP_KEY_ENTER);  /*Ignore long pressed enter release because it comes from mode switch*/
         }
         /*If the focused object is editable and now in navigate mode then enter edit mode*/
@@ -716,9 +709,9 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             }
 
             if(g != NULL && parent != NULL)
-            if(lv_group_get_click_focus(g)) {
-                lv_group_focus_obj(parent);
-            }
+                if(lv_group_get_click_focus(g)) {
+                    lv_group_focus_obj(parent);
+                }
         }
 #endif
 

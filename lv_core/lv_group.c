@@ -91,11 +91,11 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
     /*If the object is already in a group and focused then defocuse it*/
     if(obj->group_p) {
-    	if(lv_obj_is_focused(obj)) {
-    		lv_group_focus_next(obj->group_p);
+        if(lv_obj_is_focused(obj)) {
+            lv_group_focus_next(obj->group_p);
 
-    		LV_LOG_INFO("group: assign object to an other group");
-    	}
+            LV_LOG_INFO("group: assign object to an other group");
+        }
     }
 
     obj->group_p = group;
@@ -156,7 +156,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_obj_t ** i;
     LL_READ(g->obj_ll, i) {
         if(*i == obj) {
-        	if(g->obj_focus == i) return;		/*Don't focus the already focused object again*/
+            if(g->obj_focus == i) return;       /*Don't focus the already focused object again*/
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
                 lv_obj_invalidate(*g->obj_focus);
@@ -294,9 +294,9 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
  */
 void lv_group_set_editing(lv_group_t * group, bool edit)
 {
-	group->editing = edit ? 1 : 0;
-	lv_obj_t * focused = lv_group_get_focused(group);
-	lv_obj_invalidate(focused);
+    group->editing = edit ? 1 : 0;
+    lv_obj_t * focused = lv_group_get_focused(group);
+    lv_obj_invalidate(focused);
 }
 
 /**
@@ -306,7 +306,7 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
  */
 void lv_group_set_click_focus(lv_group_t * group, bool en)
 {
-	group->click_focus = en ? 1 : 0;
+    group->click_focus = en ? 1 : 0;
 }
 
 /**
@@ -320,11 +320,11 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
     lv_style_copy(&group->style_tmp, style);
 
     if(group->editing) {
-		if(group->style_mod_edit != NULL) group->style_mod_edit(&group->style_tmp);
-		else style_mod_edit_def(&group->style_tmp);
+        if(group->style_mod_edit != NULL) group->style_mod_edit(&group->style_tmp);
+        else style_mod_edit_def(&group->style_tmp);
     } else {
-		if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
-		else style_mod_def(&group->style_tmp);
+        if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
+        else style_mod_def(&group->style_tmp);
     }
     return &group->style_tmp;
 }
@@ -349,7 +349,7 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
  */
 lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
 {
-	if(!group) return false;
+    if(!group) return false;
     return group->style_mod ;
 }
 
@@ -360,7 +360,7 @@ lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
  */
 lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
 {
-	if(!group) return false;
+    if(!group) return false;
     return group->style_mod_edit;
 }
 
@@ -371,7 +371,7 @@ lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(const lv_group_t * grou
  */
 lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group)
 {
-	if(!group) return false;
+    if(!group) return false;
     return group->focus_cb;
 }
 
@@ -382,8 +382,8 @@ lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group)
  */
 bool lv_group_get_editing(const lv_group_t * group)
 {
-	if(!group) return false;
-	return group->editing ? true : false;
+    if(!group) return false;
+    return group->editing ? true : false;
 }
 
 /**
@@ -393,8 +393,8 @@ bool lv_group_get_editing(const lv_group_t * group)
  */
 bool lv_group_get_click_focus(const lv_group_t * group)
 {
-	if(!group) return false;
-	return group->click_focus ? true : false;
+    if(!group) return false;
+    return group->click_focus ? true : false;
 }
 
 /**********************

@@ -38,7 +38,7 @@ enum
     LV_TXT_FLAG_RECOLOR =  0x01,   /*Enable parsing of recolor command*/
     LV_TXT_FLAG_EXPAND =   0x02,   /*Ignore width to avoid automatic word wrapping*/
     LV_TXT_FLAG_CENTER =   0x04,   /*Align the text to the middle*/
-	LV_TXT_FLAG_RIGHT  =   0x08,   /*Align the text to the right*/
+    LV_TXT_FLAG_RIGHT  =   0x08,   /*Align the text to the right*/
 };
 typedef uint8_t lv_txt_flag_t;
 
@@ -151,7 +151,7 @@ extern uint32_t (*lv_txt_encoded_conv_wc) (uint32_t c);
  *                NULL to use txt[0] as index
  * @return the decoded Unicode character or 0 on invalid data code
  */
-extern uint32_t (*lv_txt_encoded_next)(const char * , uint32_t * );
+extern uint32_t (*lv_txt_encoded_next)(const char *, uint32_t * );
 
 /**
  * Get the previous encoded character form a string.
@@ -177,7 +177,7 @@ extern uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t);
  * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
  */
-extern uint32_t (*lv_encoded_get_char_id)(const char * , uint32_t);
+extern uint32_t (*lv_encoded_get_char_id)(const char *, uint32_t);
 
 /**
  * Get the number of characters (and NOT bytes) in a string.

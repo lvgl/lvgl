@@ -55,12 +55,12 @@ static lv_theme_t current_theme;
  * From now, all the created objects will use styles from this theme by default
  * @param th pointer to theme (return value of: 'lv_theme_init_xxx()')
  */
-void lv_theme_set_current(lv_theme_t *th)
+void lv_theme_set_current(lv_theme_t * th)
 {
 #if LV_THEME_LIVE_UPDATE == 0
     current_theme = th;
 #else
-    uint32_t style_num = sizeof(lv_theme_t) / sizeof(lv_style_t*);      /*Number of styles in a theme*/
+    uint32_t style_num = sizeof(lv_theme_t) / sizeof(lv_style_t *);     /*Number of styles in a theme*/
 
     if(!inited) {
         /*It's not sure `th_styles` is big enough. Check it now!*/
@@ -74,7 +74,7 @@ void lv_theme_set_current(lv_theme_t *th)
         lv_style_t ** cur_th_style_p = (lv_style_t **) &current_theme;
         for(i = 0; i < style_num; i++) {
             uint64_t adr = (uint64_t)&th_styles[i];
-            memcpy(&cur_th_style_p[i], &adr, sizeof(lv_style_t*));
+            memcpy(&cur_th_style_p[i], &adr, sizeof(lv_style_t *));
         }
         inited = true;
     }
@@ -85,7 +85,7 @@ void lv_theme_set_current(lv_theme_t *th)
     lv_style_t ** th_style = (lv_style_t **) th;
     for(i = 0; i < style_num; i++) {
         uint64_t s = (uint64_t)th_style[i];
-        if(s) memcpy(&th_styles[i], (void*)s, sizeof(lv_style_t));
+        if(s) memcpy(&th_styles[i], (void *)s, sizeof(lv_style_t));
     }
 
     /*Let the object know their style might change*/

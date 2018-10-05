@@ -75,7 +75,7 @@ static lv_signal_func_t scrl_signal;
  */
 lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("text area create started");
+    LV_LOG_TRACE("text area create started");
 
     /*Create the ancestor object*/
     lv_obj_t * new_ta = lv_page_create(par, copy);
@@ -168,7 +168,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_anim_create(&a);
 #endif
 
-	LV_LOG_INFO("text area created");
+    LV_LOG_INFO("text area created");
 
     return new_ta;
 }
@@ -188,15 +188,15 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     if(ext->one_line && (c == '\n' || c == '\n')) {
-    	LV_LOG_INFO("Text area: line break ignored in one-line mode");
-    	return;
+        LV_LOG_INFO("Text area: line break ignored in one-line mode");
+        return;
     }
 
     uint32_t c_uni = lv_txt_encoded_next((const char *)&c, NULL);
 
     if(char_is_accepted(ta, c_uni) == false) {
-    	LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");
-    	return;
+        LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");
+        return;
     }
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
@@ -252,12 +252,12 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
     if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
-    	uint32_t i = 0;
-    	while(txt[i] != '\0') {
-			uint32_t c = lv_txt_encoded_next(txt, &i);
-			lv_ta_add_char(ta,lv_txt_unicode_to_encoded(c));
-    	}
-    	return;
+        uint32_t i = 0;
+        while(txt[i] != '\0') {
+            uint32_t c = lv_txt_encoded_next(txt, &i);
+            lv_ta_add_char(ta, lv_txt_unicode_to_encoded(c));
+        }
+        return;
     }
 
     /*Insert the text*/
@@ -347,20 +347,20 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-	/*Add the character one-by-one if not all characters are accepted or there is character limit.*/
-	if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
-	   lv_label_set_text(ext->label, "");
-	   lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
+    /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
+    if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
+        lv_label_set_text(ext->label, "");
+        lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
 
-	   uint32_t i = 0;
-	   while(txt[i] != '\0') {
-			uint32_t c = lv_txt_encoded_next(txt, &i);
-			lv_ta_add_char(ta,lv_txt_unicode_to_encoded(c));
-		}
-	} else {
-		lv_label_set_text(ext->label, txt);
-		lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
-	}
+        uint32_t i = 0;
+        while(txt[i] != '\0') {
+            uint32_t c = lv_txt_encoded_next(txt, &i);
+            lv_ta_add_char(ta, lv_txt_unicode_to_encoded(c));
+        }
+    } else {
+        lv_label_set_text(ext->label, txt);
+        lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
+    }
 
     /*Don't let 'width == 0' because the cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
@@ -738,8 +738,8 @@ const char * lv_ta_get_accepted_chars(lv_obj_t * ta)
  */
 uint16_t lv_ta_get_max_length(lv_obj_t * ta)
 {
-	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-	return ext->max_length;
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    return ext->max_length;
 }
 
 /**
@@ -1083,17 +1083,17 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/
-        if(c == LV_GROUP_KEY_RIGHT)  	lv_ta_cursor_right(ta);
+        if(c == LV_GROUP_KEY_RIGHT)     lv_ta_cursor_right(ta);
         else if(c == LV_GROUP_KEY_LEFT) lv_ta_cursor_left(ta);
-        else if(c == LV_GROUP_KEY_UP)  	lv_ta_cursor_up(ta);
+        else if(c == LV_GROUP_KEY_UP)   lv_ta_cursor_up(ta);
         else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
-        else if(c == LV_GROUP_KEY_DEL) 	lv_ta_del_char(ta);
+        else if(c == LV_GROUP_KEY_DEL)  lv_ta_del_char(ta);
         else {
             lv_ta_add_char(ta, c);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
-    	bool * editable = (bool *)param;
-    	*editable = true;
+        bool * editable = (bool *)param;
+        *editable = true;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
@@ -1101,15 +1101,11 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_ta";
-    }
-    else if (sign == LV_SIGNAL_DEFOCUS)
-    {
+    } else if(sign == LV_SIGNAL_DEFOCUS) {
         lv_cursor_type_t cur_type;
         cur_type = lv_ta_get_cursor_type(ta);
         lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
-    }
-    else if (sign == LV_SIGNAL_FOCUS)
-    {
+    } else if(sign == LV_SIGNAL_FOCUS) {
         lv_cursor_type_t cur_type;
         cur_type = lv_ta_get_cursor_type(ta);
         lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
@@ -1210,30 +1206,30 @@ static void pwd_char_hider(lv_obj_t * ta)
  */
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
 {
-	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-	/*If no restriction accept it*/
-	if(ext->accapted_chars == NULL && ext->max_length == 0) return true;
+    /*If no restriction accept it*/
+    if(ext->accapted_chars == NULL && ext->max_length == 0) return true;
 
-	/*Too many characters?*/
-	if(ext->max_length > 0 &&
-			lv_txt_get_encoded_length(lv_ta_get_text(ta)) >= ext->max_length) {
-		return false;
-	}
+    /*Too many characters?*/
+    if(ext->max_length > 0 &&
+            lv_txt_get_encoded_length(lv_ta_get_text(ta)) >= ext->max_length) {
+        return false;
+    }
 
-	/*Accepted character?*/
-	if(ext->accapted_chars) {
-		uint32_t i = 0;
-		uint32_t a;
-		while(ext->accapted_chars[i] != '\0') {
-			a = lv_txt_encoded_next(ext->accapted_chars, &i);
-			if(a == c) return true;	/*Accepted*/
-		}
+    /*Accepted character?*/
+    if(ext->accapted_chars) {
+        uint32_t i = 0;
+        uint32_t a;
+        while(ext->accapted_chars[i] != '\0') {
+            a = lv_txt_encoded_next(ext->accapted_chars, &i);
+            if(a == c) return true; /*Accepted*/
+        }
 
-		return false;	/*The character wasn't in the list*/
-	} else {
-		return true;	/*If the accepted char list in not specified the accept the character*/
-	}
+        return false;   /*The character wasn't in the list*/
+    } else {
+        return true;    /*If the accepted char list in not specified the accept the character*/
+    }
 
 }
 #endif

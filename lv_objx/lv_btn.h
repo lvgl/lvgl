@@ -70,9 +70,9 @@ typedef struct
     lv_style_t * styles[LV_BTN_STATE_NUM];        /*Styles in each state*/
     lv_btn_state_t state;                         /*Current state of the button from 'lv_btn_state_t' enum*/
 #if LV_BTN_INK_EFFECT
-    uint16_t ink_in_time;						  /*[ms] Time of ink fill effect (0: disable ink effect)*/
-    uint16_t ink_wait_time;						  /*[ms] Wait before the ink disappears */
-    uint16_t ink_out_time;						  /*[ms] Time of ink disappearing*/
+    uint16_t ink_in_time;                         /*[ms] Time of ink fill effect (0: disable ink effect)*/
+    uint16_t ink_wait_time;                       /*[ms] Wait before the ink disappears */
+    uint16_t ink_out_time;                        /*[ms] Time of ink disappearing*/
 #endif
     uint8_t toggle :1;                            /*1: Toggle enabled*/
     uint8_t long_pr_action_executed :1;           /*1: Long press action executed (Handled by the library)*/

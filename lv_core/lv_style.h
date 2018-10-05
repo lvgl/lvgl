@@ -152,7 +152,7 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
 /**
  * Mix two styles according to a given ratio
- * @param start	start style
+ * @param start start style
  * @param end end style
  * @param res store the result style here
  * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style

@@ -64,7 +64,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
 {
 
 
-	LV_LOG_TRACE("container create started");
+    LV_LOG_TRACE("container create started");
 
     /*Create a basic object*/
     lv_obj_t * new_cont = lv_obj_create(par, copy);
@@ -105,10 +105,10 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_cont);
     }
 
-	LV_LOG_INFO("container created");
+    LV_LOG_INFO("container created");
 
 
-	return new_cont;
+    return new_cont;
 }
 
 /*=====================
@@ -301,7 +301,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
         if(lv_obj_get_hidden(child) != false ||
                 lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
-        lv_obj_align(child, cont, align, hpad_corr , last_cord);
+        lv_obj_align(child, cont, align, hpad_corr, last_cord);
         last_cord += lv_obj_get_height(child) + style->body.padding.inner;
     }
 

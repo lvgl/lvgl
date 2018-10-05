@@ -57,8 +57,8 @@ typedef struct _lv_font_struct
     int16_t (*get_width)(const struct _lv_font_struct *,uint32_t);        /*Get a glyph's with with a given font*/
     struct _lv_font_struct * next_page;    /*Pointer to a font extension*/
     uint32_t h_px       :8;
-    uint32_t bpp   		:4;                /*Bit per pixel: 1, 2 or 4*/
-    uint32_t monospace	:8;				   /*Fix width (0: normal width)*/
+    uint32_t bpp        :4;                /*Bit per pixel: 1, 2 or 4*/
+    uint32_t monospace  :8;                /*Fix width (0: normal width)*/
     uint16_t glyph_cnt;                    /*Number of glyphs (letters) in the font*/
 } lv_font_t;
 

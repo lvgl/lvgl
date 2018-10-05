@@ -62,7 +62,7 @@ void lv_anim_init(void)
  */
 void lv_anim_create(lv_anim_t * anim_p)
 {
-	LV_LOG_TRACE("animation create started")
+    LV_LOG_TRACE("animation create started")
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
     if(anim_p->fp != NULL) lv_anim_del(anim_p->var, anim_p->fp);       /*fp == NULL would delete all animations of var*/
 
@@ -82,7 +82,7 @@ void lv_anim_create(lv_anim_t * anim_p)
      * It's important if it happens in a ready callback. (see `anim_task`)*/
     anim_list_changed = true;
 
-	LV_LOG_TRACE("animation created")
+    LV_LOG_TRACE("animation created")
 }
 
 /**
@@ -105,7 +105,7 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
         if(a->var == var && (a->fp == fp || fp == NULL)) {
             lv_ll_rem(&anim_ll, a);
             lv_mem_free(a);
-            anim_list_changed = true;		/*Read by `anim_task`. It need to know if a delete occurred in the linked list*/
+            anim_list_changed = true;       /*Read by `anim_task`. It need to know if a delete occurred in the linked list*/
             del = true;
         }
 
@@ -209,40 +209,40 @@ static void anim_task(void * param)
 
     lv_anim_t * a;
     LL_READ(anim_ll, a) {
-    	a->has_run = 0;
+        a->has_run = 0;
     }
 
     uint32_t elaps = lv_tick_elaps(last_task_run);
     a = lv_ll_get_head(&anim_ll);
 
     while(a != NULL) {
-		/*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete happened in `anim_ready_handler`
-		 * which could make this linked list reading corrupt because the list is changed meanwhile
-		 */
-		anim_list_changed = false;
+        /*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete happened in `anim_ready_handler`
+         * which could make this linked list reading corrupt because the list is changed meanwhile
+         */
+        anim_list_changed = false;
 
-    	if(!a->has_run) {
-    		a->has_run = 1;			/*The list readying might be reseted so need to know which anim has run already*/
-			a->act_time += elaps;
-			if(a->act_time >= 0) {
-				if(a->act_time > a->time) a->act_time = a->time;
+        if(!a->has_run) {
+            a->has_run = 1;         /*The list readying might be reseted so need to know which anim has run already*/
+            a->act_time += elaps;
+            if(a->act_time >= 0) {
+                if(a->act_time > a->time) a->act_time = a->time;
 
-				int32_t new_value;
-				new_value = a->path(a);
+                int32_t new_value;
+                new_value = a->path(a);
 
-				if(a->fp != NULL) a->fp(a->var, new_value); /*Apply the calculated value*/
+                if(a->fp != NULL) a->fp(a->var, new_value); /*Apply the calculated value*/
 
-				/*If the time is elapsed the animation is ready*/
-				if(a->act_time >= a->time) {
-					anim_ready_handler(a);
-				}
-			}
-		}
+                /*If the time is elapsed the animation is ready*/
+                if(a->act_time >= a->time) {
+                    anim_ready_handler(a);
+                }
+            }
+        }
 
-    	/* If the linked list changed due to anim. delete then it's not safe to continue
-    	 * the reading of the list from here -> start from the head*/
-    	if(anim_list_changed) a = lv_ll_get_head(&anim_ll);
-    	else a = lv_ll_get_next(&anim_ll, a);
+        /* If the linked list changed due to anim. delete then it's not safe to continue
+         * the reading of the list from here -> start from the head*/
+        if(anim_list_changed) a = lv_ll_get_head(&anim_ll);
+        else a = lv_ll_get_next(&anim_ll, a);
     }
 
     last_task_run = lv_tick_get();

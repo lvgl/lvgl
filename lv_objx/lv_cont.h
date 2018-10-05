@@ -54,7 +54,7 @@ typedef struct
     uint8_t layout  :4;     /*A layout from 'lv_cont_layout_t' enum*/
     uint8_t hor_fit :1;     /*1: Enable horizontal fit to involve all children*/
     uint8_t ver_fit :1;     /*1: Enable horizontal fit to involve all children*/
-}lv_cont_ext_t;
+} lv_cont_ext_t;
 
 
 /**********************

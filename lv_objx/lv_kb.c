@@ -75,7 +75,7 @@ static const char * kb_map_num[] = {
  */
 lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("keyboard create started");
+    LV_LOG_TRACE("keyboard create started");
 
     /*Create the ancestor of keyboard*/
     lv_obj_t * new_kb = lv_btnm_create(par, copy);
@@ -135,7 +135,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 
-	LV_LOG_INFO("keyboard created");
+    LV_LOG_INFO("keyboard created");
 
 
     return new_kb;

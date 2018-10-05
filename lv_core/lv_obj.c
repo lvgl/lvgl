@@ -62,7 +62,7 @@ static lv_ll_t scr_ll;                 /*Linked list of screens*/
  */
 void lv_init(void)
 {
-	LV_LOG_TRACE("lv_init started");
+    LV_LOG_TRACE("lv_init started");
 
     /*Initialize the lv_misc modules*/
     lv_mem_init();
@@ -105,7 +105,7 @@ void lv_init(void)
 #endif
 
 
-	LV_LOG_INFO("lv_init ready");
+    LV_LOG_INFO("lv_init ready");
 }
 
 /*--------------------
@@ -119,13 +119,13 @@ void lv_init(void)
  * @param copy pointer to a base object, if not NULL then the new object will be copied from it
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent,const  lv_obj_t * copy)
+lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 {
 
     lv_obj_t * new_obj = NULL;
     /*Create a screen if the parent is NULL*/
     if(parent == NULL) {
-    	LV_LOG_TRACE("Screen create started");
+        LV_LOG_TRACE("Screen create started");
 
         new_obj = lv_ll_ins_head(&scr_ll);
         lv_mem_assert(new_obj);
@@ -181,7 +181,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent,const  lv_obj_t * copy)
     }
     /*parent != NULL create normal obj. on a parent*/
     else {
-    	LV_LOG_TRACE("Object create started");
+        LV_LOG_TRACE("Object create started");
 
         new_obj = lv_ll_ins_head(&(parent)->child_ll);
         lv_mem_assert(new_obj);
@@ -1099,8 +1099,8 @@ lv_obj_t * lv_layer_sys(void)
  */
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 {
-	const lv_obj_t * par = obj;
-	const lv_obj_t * act_p;
+    const lv_obj_t * par = obj;
+    const lv_obj_t * act_p;
 
     do {
         act_p = par;
@@ -1377,7 +1377,7 @@ lv_opa_t lv_obj_get_opa_scale_enable(const lv_obj_t * obj)
  */
 lv_opa_t lv_obj_get_opa_scale(const lv_obj_t * obj)
 {
-	 const lv_obj_t * parent = obj;
+    const lv_obj_t * parent = obj;
 
     while(parent) {
         if(parent->opa_scale_en) return parent->opa_scale;
@@ -1514,9 +1514,9 @@ void * lv_obj_get_group(const lv_obj_t * obj)
  */
 bool lv_obj_is_focused(const lv_obj_t * obj)
 {
-	if(obj->group_p) {
-		if(lv_group_get_focused(obj->group_p) == obj) return true;
-	}
+    if(obj->group_p) {
+        if(lv_group_get_focused(obj->group_p) == obj) return true;
+    }
 
     return false;
 }

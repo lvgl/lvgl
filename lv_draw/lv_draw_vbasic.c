@@ -71,9 +71,9 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
 
     lv_vdb_t * vdb_p = lv_vdb_get();
     if(!vdb_p) {
-         LV_LOG_WARN("Invalid VDB pointer");
-         return;
-     }
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
 
     /*Pixel out of the mask*/
     if(x < mask_p->x1 || x > mask_p->x2 ||
@@ -122,9 +122,9 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     bool union_ok;
     lv_vdb_t * vdb_p = lv_vdb_get();
     if(!vdb_p) {
-         LV_LOG_WARN("Invalid VDB pointer");
-         return;
-     }
+        LV_LOG_WARN("Invalid VDB pointer");
+        return;
+    }
 
     /*Get the union of cord and mask*/
     /* The mask is already truncated to the vdb size
@@ -672,7 +672,7 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
         return bg_color;
     }
     /*Opaque background: use simple mix*/
-    else if (bg_opa >= LV_OPA_MAX) {
+    else if(bg_opa >= LV_OPA_MAX) {
         return lv_color_mix(fg_color, bg_color, fg_opa);
     }
     /*Both colors have alpha. Expensive calculation need to be applied*/

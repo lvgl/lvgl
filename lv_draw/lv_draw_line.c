@@ -343,7 +343,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
             lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x, main_line->p1.y + pattern[aa_last_corner].y - 1,
                                seg_w + main_line->sx, mask, style->line.color, opa);
 
-            lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x , main_line->p2.y + pattern[aa_last_corner].y + 1,
+            lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x, main_line->p2.y + pattern[aa_last_corner].y + 1,
                                -(seg_w + main_line->sx), mask, style->line.color, opa);
         }
 
@@ -395,7 +395,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
                 /* Fill the gaps
                  * When stepping in y one pixel remains empty on every corner (don't do this on the first segment ) */
                 if(i != 0 && pattern[i].x != pattern[i - 1].x && !first_run) {
-                    px_fp(draw_area.x1 , draw_area.y1 - main_line->sy, mask, style->line.color, opa);
+                    px_fp(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, opa);
                 }
             }
 
@@ -417,7 +417,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
             draw_area.y1 = prev_p.y + pattern[i].y;
             draw_area.x2 = draw_area.x1 + main_line->p_act.x - prev_p.x;
             draw_area.y2 = draw_area.y1;
-            fill_fp(&draw_area, mask, style->line.color , opa);
+            fill_fp(&draw_area, mask, style->line.color, opa);
 
             /* Fill the gaps
              * When stepping in y one pixel remains empty on every corner */

@@ -9173,7 +9173,7 @@ lv_font_t lv_font_dejavu_20 = {
 #elif USE_LV_FONT_DEJAVU_20 == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
-	.monospace = 0,
+    .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 

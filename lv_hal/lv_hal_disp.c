@@ -154,12 +154,12 @@ void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t * 
     if(active == NULL) return;
     if(active->driver.disp_flush != NULL) {
 
-    	LV_LOG_TRACE("disp flush  started");
-    	active->driver.disp_flush(x1, y1, x2, y2, color_p);
-    	LV_LOG_TRACE("disp flush ready");
+        LV_LOG_TRACE("disp flush  started");
+        active->driver.disp_flush(x1, y1, x2, y2, color_p);
+        LV_LOG_TRACE("disp flush ready");
 
     } else {
-    	LV_LOG_WARN("disp flush function registered");
+        LV_LOG_WARN("disp flush function registered");
     }
 }
 

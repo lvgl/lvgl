@@ -82,7 +82,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     file_p->file_d = lv_mem_alloc(file_p->drv->file_size);
-	lv_mem_assert(file_p->file_d);
+    lv_mem_assert(file_p->file_d);
     if(file_p->file_d == NULL) {
         file_p->drv = NULL;
         return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
@@ -253,7 +253,7 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t  * pos)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_trunc (lv_fs_file_t * file_p)
+lv_fs_res_t lv_fs_trunc(lv_fs_file_t * file_p)
 {
     if(file_p->drv == NULL) {
         return LV_FS_RES_INV_PARAM;
@@ -295,7 +295,7 @@ lv_fs_res_t lv_fs_size(lv_fs_file_t * file_p, uint32_t * size)
  * @param newname path with the new name
  * @return LV_FS_RES_OK or any error from 'fs_res_t'
  */
-lv_fs_res_t lv_fs_rename (const char * oldname, const char * newname)
+lv_fs_res_t lv_fs_rename(const char * oldname, const char * newname)
 {
     if(!oldname || !newname) return LV_FS_RES_INV_PARAM;
 
@@ -343,7 +343,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
     }
 
     rddir_p->dir_d = lv_mem_alloc(rddir_p->drv->rddir_size);
-	lv_mem_assert(rddir_p->dir_d);
+    lv_mem_assert(rddir_p->dir_d);
     if(rddir_p->dir_d == NULL) {
         rddir_p->dir_d = NULL;
         return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */

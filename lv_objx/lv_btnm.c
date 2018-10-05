@@ -600,7 +600,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             lv_indev_get_point(indev, &p1);
             uint16_t btn_i = get_button_from_point(btnm, &p1);
             ext->btn_id_pr = btn_i;
-        } else  if (indev_type == LV_INDEV_TYPE_ENCODER){
+        } else  if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*In navigation mode don't select any button but in edit mode select the fist*/
             if(lv_group_get_editing(lv_obj_get_group(btnm))) ext->btn_id_pr = 0;
             else ext->btn_id_pr = LV_BTNM_PR_NONE;

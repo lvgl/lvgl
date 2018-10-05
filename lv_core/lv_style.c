@@ -217,54 +217,54 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
 
 /**
  * Mix two styles according to a given ratio
- * @param start	start style
+ * @param start start style
  * @param end end style
  * @param res store the result style here
  * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
  */
 void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio)
 {
-	STYLE_ATTR_MIX(body.opa, ratio);
-	STYLE_ATTR_MIX(body.radius, ratio);
-	STYLE_ATTR_MIX(body.border.width, ratio);
-	STYLE_ATTR_MIX(body.border.opa, ratio);
-	STYLE_ATTR_MIX(body.shadow.width, ratio);
-	STYLE_ATTR_MIX(body.padding.hor, ratio);
-	STYLE_ATTR_MIX(body.padding.ver, ratio);
-	STYLE_ATTR_MIX(body.padding.inner, ratio);
-	STYLE_ATTR_MIX(text.line_space, ratio);
-	STYLE_ATTR_MIX(text.letter_space, ratio);
-	STYLE_ATTR_MIX(text.opa, ratio);
-	STYLE_ATTR_MIX(line.width, ratio);
-	STYLE_ATTR_MIX(line.opa, ratio);
-	STYLE_ATTR_MIX(image.intense, ratio);
-	STYLE_ATTR_MIX(image.opa, ratio);
+    STYLE_ATTR_MIX(body.opa, ratio);
+    STYLE_ATTR_MIX(body.radius, ratio);
+    STYLE_ATTR_MIX(body.border.width, ratio);
+    STYLE_ATTR_MIX(body.border.opa, ratio);
+    STYLE_ATTR_MIX(body.shadow.width, ratio);
+    STYLE_ATTR_MIX(body.padding.hor, ratio);
+    STYLE_ATTR_MIX(body.padding.ver, ratio);
+    STYLE_ATTR_MIX(body.padding.inner, ratio);
+    STYLE_ATTR_MIX(text.line_space, ratio);
+    STYLE_ATTR_MIX(text.letter_space, ratio);
+    STYLE_ATTR_MIX(text.opa, ratio);
+    STYLE_ATTR_MIX(line.width, ratio);
+    STYLE_ATTR_MIX(line.opa, ratio);
+    STYLE_ATTR_MIX(image.intense, ratio);
+    STYLE_ATTR_MIX(image.opa, ratio);
 
-	lv_opa_t opa = ratio == STYLE_MIX_MAX ? LV_OPA_COVER : ratio;
+    lv_opa_t opa = ratio == STYLE_MIX_MAX ? LV_OPA_COVER : ratio;
 
-	res->body.main_color = lv_color_mix(end->body.main_color, start->body.main_color, opa);
-	res->body.grad_color = lv_color_mix(end->body.grad_color, start->body.grad_color, opa);
-	res->body.border.color = lv_color_mix(end->body.border.color, start->body.border.color, opa);
-	res->body.shadow.color = lv_color_mix(end->body.shadow.color, start->body.shadow.color, opa);
-	res->text.color = lv_color_mix(end->text.color, start->text.color, opa);
-	res->image.color = lv_color_mix(end->image.color, start->image.color, opa);
-	res->line.color = lv_color_mix(end->line.color, start->line.color, opa);
+    res->body.main_color = lv_color_mix(end->body.main_color, start->body.main_color, opa);
+    res->body.grad_color = lv_color_mix(end->body.grad_color, start->body.grad_color, opa);
+    res->body.border.color = lv_color_mix(end->body.border.color, start->body.border.color, opa);
+    res->body.shadow.color = lv_color_mix(end->body.shadow.color, start->body.shadow.color, opa);
+    res->text.color = lv_color_mix(end->text.color, start->text.color, opa);
+    res->image.color = lv_color_mix(end->image.color, start->image.color, opa);
+    res->line.color = lv_color_mix(end->line.color, start->line.color, opa);
 
-	if(ratio < (STYLE_MIX_MAX >> 1)) {
-		res->body.empty = start->body.empty;
-		res->body.border.part = start->body.border.part;
-		res->glass = start->glass;
-		res->text.font = start->text.font;
-		res->body.shadow.type = start->body.shadow.type;
+    if(ratio < (STYLE_MIX_MAX >> 1)) {
+        res->body.empty = start->body.empty;
+        res->body.border.part = start->body.border.part;
+        res->glass = start->glass;
+        res->text.font = start->text.font;
+        res->body.shadow.type = start->body.shadow.type;
         res->line.rounded = start->line.rounded;
-	} else {
-		res->body.empty = end->body.empty;
-		res->body.border.part = end->body.border.part;
-		res->glass = end->glass;
-		res->text.font = end->text.font;
-		res->body.shadow.type = end->body.shadow.type;
+    } else {
+        res->body.empty = end->body.empty;
+        res->body.border.part = end->body.border.part;
+        res->glass = end->glass;
+        res->text.font = end->text.font;
+        res->body.shadow.type = end->body.shadow.type;
         res->line.rounded = end->line.rounded;
-	}
+    }
 }
 
 #if USE_LV_ANIMATION

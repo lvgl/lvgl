@@ -372,8 +372,8 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
             return LV_IMG_DECODER_OPEN_FAIL;
         }
 #else
-    LV_LOG_WARN("Image built-in decoder can read file because USE_LV_FILESYSTEM = 0");
-    return LV_IMG_DECODER_OPEN_FAIL;
+        LV_LOG_WARN("Image built-in decoder can read file because USE_LV_FILESYSTEM = 0");
+        return LV_IMG_DECODER_OPEN_FAIL;
 #endif
     }
 

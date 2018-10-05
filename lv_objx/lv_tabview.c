@@ -66,7 +66,7 @@ static const char * tab_def[] = {""};
  */
 lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("tab view create started");
+    LV_LOG_TRACE("tab view create started");
 
     /*Create the ancestor of tab*/
     lv_obj_t * new_tabview = lv_obj_create(par, copy);
@@ -99,11 +99,11 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new tab tab*/
     if(copy == NULL) {
-    	 ext->tab_name_ptr = lv_mem_alloc(sizeof(char *));
-		lv_mem_assert(ext->tab_name_ptr);
-		if(ext->tab_name_ptr == NULL) return NULL;
-		ext->tab_name_ptr[0] = "";
-		ext->tab_cnt = 0;
+        ext->tab_name_ptr = lv_mem_alloc(sizeof(char *));
+        lv_mem_assert(ext->tab_name_ptr);
+        if(ext->tab_name_ptr == NULL) return NULL;
+        ext->tab_name_ptr[0] = "";
+        ext->tab_cnt = 0;
 
         lv_obj_set_size(new_tabview, LV_HOR_RES, LV_VER_RES);
 
@@ -174,7 +174,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 
-	LV_LOG_INFO("tab view created");
+    LV_LOG_INFO("tab view created");
 
     return new_tabview;
 }
@@ -581,8 +581,8 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             ext->btns->signal_func(ext->btns, sign, param);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
-    	bool * editable = (bool *)param;
-    	*editable = true;
+        bool * editable = (bool *)param;
+        *editable = true;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

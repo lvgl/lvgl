@@ -60,7 +60,7 @@ static lv_signal_func_t ancestor_scrl_signal;
  */
 lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-	LV_LOG_TRACE("roller create started");
+    LV_LOG_TRACE("roller create started");
 
     /*Create the ancestor of roller*/
     lv_obj_t * new_roller = lv_ddlist_create(par, copy);
@@ -112,7 +112,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 
-	LV_LOG_INFO("roller created");
+    LV_LOG_INFO("roller created");
 
 
     return new_roller;
