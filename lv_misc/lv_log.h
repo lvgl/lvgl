@@ -24,22 +24,21 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/*Possible log level. For compatibility declare it independently from `USE_LV_LOG`*/
+
+#define LV_LOG_LEVEL_TRACE 0     /*A lot of logs to give detailed information*/
+#define LV_LOG_LEVEL_INFO  1     /*Log important events*/
+#define LV_LOG_LEVEL_WARN  2     /*Log if something unwanted happened but didn't caused problem*/
+#define LV_LOG_LEVEL_ERROR 3     /*Only critical issue, when the system may fail*/
+#define _LV_LOG_LEVEL_NUM  4
+
+typedef uint8_t lv_log_level_t;
+
+#if USE_LV_LOG
 /**********************
  *      TYPEDEFS
  **********************/
 
-/*Possible log level. For compatibility declare it independently from `USE_LV_LOG`*/
-enum
-{
-	LV_LOG_LEVEL_TRACE,		/*A lot of logs to give detailed information*/
-	LV_LOG_LEVEL_INFO,		/*Log important events*/
-	LV_LOG_LEVEL_WARN,		/*Log if something unwanted happened but didn't caused problem*/
-	LV_LOG_LEVEL_ERROR,		/*Only critical issue, when the system may fail*/
-	_LV_LOG_LEVEL_NUM
-};
-typedef uint8_t lv_log_level_t;
-
-#if USE_LV_LOG
 
 /**********************
  * GLOBAL PROTOTYPES

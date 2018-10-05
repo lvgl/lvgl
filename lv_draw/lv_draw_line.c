@@ -214,9 +214,6 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
 
     lv_coord_t width;
     width = style->line.width;
-#if LV_ANTIALIAS
-    lv_coord_t width_safe;              /*`width_safe` is always >=1*/
-#endif
 
     /* The pattern stores the points of the line ending. It has the good direction and length.
      * The worth case is the 45° line where pattern can have 1.41 x `width` points*/
@@ -245,8 +242,7 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
                 width = i;
 #if LV_ANTIALIAS
                 width--;
-                if(width == 0) width_safe = 1;
-                else width_safe = width;
+
 #endif
                 break;
             }
@@ -259,6 +255,9 @@ static void line_draw_skew(line_draw_t * main_line, const lv_area_t * mask, cons
     }
 
 #if LV_ANTIALIAS
+    lv_coord_t width_safe = width;
+    if(width == 0) width_safe = 1;
+
     lv_coord_t aa_last_corner;
     aa_last_corner = 0;
 #endif

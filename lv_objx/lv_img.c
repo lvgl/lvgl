@@ -18,6 +18,7 @@
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"
 #include "../lv_misc/lv_txt.h"
+#include "../lv_misc/lv_log.h"
 
 /*********************
  *      DEFINES
