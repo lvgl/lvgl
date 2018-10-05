@@ -558,16 +558,21 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 #if USE_LV_GROUP
         /* If the page is focused in a group and
-         * the background (page) is not visible (transparent or empty)
+         * the background object is not visible (transparent or empty)
          * then "activate" the style of the scrollable*/
-        lv_style_t * style_ori = lv_obj_get_style(scrl);
+        lv_style_t * style_scrl_ori = lv_obj_get_style(scrl);
         lv_obj_t * page = lv_obj_get_parent(scrl);
         lv_style_t * style_page = lv_obj_get_style(page);
         lv_group_t * g = lv_obj_get_group(page);
-        if(style_page->body.empty != 0 || style_page->body.opa == LV_OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.empty || style_page->body.opa == LV_OPA_TRANSP) { /*Is the background visible?*/
             if(lv_group_get_focused(g) == page) {
                 lv_style_t * style_mod;
-                style_mod = lv_group_mod_style(g, style_ori);
+                style_mod = lv_group_mod_style(g, style_scrl_ori);
+                /*Be sure the scrollable is not transparent or empty (at least it should have a border)*/
+                if((style_mod->body.empty || style_mod->body.opa == LV_OPA_TRANSP) && style_mod->body.border.width == 0) {
+                    style_mod->body.border.width = LV_DPI / 20;
+                    style_mod->body.empty = 0;
+                }
                 scrl->style_p = style_mod;  /*Temporally change the style to the activated */
             }
         }
@@ -575,7 +580,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
         ancestor_design(scrl, mask, mode);
 
 #if USE_LV_GROUP
-        scrl->style_p = style_ori;  /*Revert the style*/
+        scrl->style_p = style_scrl_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(scrl, mask, mode);
@@ -669,10 +674,6 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             /*If the page can be scrolled horizontally because it's not wide enough then scroll it vertically*/
             if(lv_page_get_scrl_width(page) < lv_obj_get_width(page)) lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
             else lv_page_scroll_hor(page,  lv_obj_get_width(page) / 4);
-        } else if(c == LV_GROUP_KEY_ENTER) {
-            /*On ENTER leave edit mode*/
-//            lv_group_t * g = lv_obj_get_group(page);
-//            if(lv_group_get_editing(g)) lv_group_set_editing(g, false);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
     	bool * editable = (bool *)param;
