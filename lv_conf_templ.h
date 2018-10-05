@@ -3,7 +3,11 @@
  *
  */
 
-#if 0 /*Remove this to enable the content (Delete the last #endif too!)*/
+/*
+ * COPY THIS FILE AS lv_conf.h
+ */
+
+#if 0 /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -51,7 +55,7 @@
 #define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
 
 /*Screen refresh settings*/
-#define LV_REFR_PERIOD      50    /*Screen refresh period in milliseconds*/
+#define LV_REFR_PERIOD      30    /*Screen refresh period in milliseconds*/
 #define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
 
 /*=================
@@ -159,8 +163,8 @@
 #define USE_LV_FONT_MONOSPACE_8            0
 
 /* Optionally declare your custom fonts here.
- * You can use these fonts as defult font too
- * and they will be avialale globally. E.g.
+ * You can use these fonts as default font too
+ * and they will be available globally. E.g.
  * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) \
  *                                LV_FONT_DECLARE(my_font_2) \
  */
