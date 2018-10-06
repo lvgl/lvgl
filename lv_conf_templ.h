@@ -138,8 +138,6 @@
 /* More info about fonts: https://littlevgl.com/basics#fonts
  * To enable a built-in font use 1,2,4 or 8 values
  * which will determine the bit-per-pixel */
-#define LV_FONT_DEFAULT        &lv_font_dejavu_20     /*Always set a default font from the built-in fonts*/
-
 #define USE_LV_FONT_DEJAVU_10              0
 #define USE_LV_FONT_DEJAVU_10_LATIN_SUP    0
 #define USE_LV_FONT_DEJAVU_10_CYRILLIC     0
