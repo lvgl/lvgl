@@ -1,6 +1,6 @@
 /**
  * @file lv_templ.h
- * 
+ *
  */
 
 #ifndef LV_TEMPL_H

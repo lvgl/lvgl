@@ -160,16 +160,6 @@ static void label_init(void)
 #endif
 }
 
-static void img_init(void)
-{
-#if USE_LV_IMG != 0
-
-
-    theme.img.light = &def;
-    theme.img.dark = &def;
-#endif
-}
-
 static void line_init(void)
 {
 #if USE_LV_LINE != 0
@@ -186,7 +176,7 @@ static void led_init(void)
     lv_style_copy(&led, &def);
     led.body.shadow.width = LV_DPI / 10;
     led.body.radius = LV_RADIUS_CIRCLE;
-    led.body.border.width= LV_DPI / 30;
+    led.body.border.width = LV_DPI / 30;
     led.body.border.opa = LV_OPA_30;
     led.body.main_color = lv_color_hsv_to_rgb(_hue, 100, 100);
     led.body.grad_color = lv_color_hsv_to_rgb(_hue, 100, 40);
@@ -194,6 +184,16 @@ static void led_init(void)
     led.body.shadow.color = lv_color_hsv_to_rgb(_hue, 100, 100);
 
     theme.led = &led;
+#endif
+}
+
+static void img_init(void)
+{
+#if USE_LV_IMG != 0
+
+
+    theme.img.light = &def;
+    theme.img.dark = &def;
 #endif
 }
 
@@ -278,11 +278,96 @@ static void gauge_init(void)
 #endif
 }
 
+static void arc_init(void)
+{
+#if USE_LV_ARC != 0
+
+    static lv_style_t arc;
+    lv_style_copy(&arc, &def);
+    arc.line.width = 8;
+    arc.line.color = lv_color_hsv_to_rgb(_hue, 80, 70);
+    arc.line.rounded = 1;
+
+    /*For preloader*/
+    arc.body.border.width = 7;
+    arc.body.border.color = lv_color_hsv_to_rgb(_hue, 11, 48);
+    arc.body.padding.hor = 1;
+    arc.body.padding.ver = 1;
+
+    theme.arc = &arc;
+#endif
+}
+
+static void preload_init(void)
+{
+#if USE_LV_PRELOAD != 0
+
+    theme.preload = theme.arc;
+#endif
+}
+
 static void chart_init(void)
 {
 #if USE_LV_CHART
-
     theme.chart = &panel;
+#endif
+}
+
+static void calendar_init(void)
+{
+#if USE_LV_CALENDAR
+    static lv_style_t cal_bg;
+    lv_style_copy(&cal_bg, &bg);
+    cal_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 40);
+    cal_bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 40);
+    cal_bg.body.border.color = LV_COLOR_HEX3(0x333);
+    cal_bg.body.border.width = 1;
+    cal_bg.body.radius = LV_DPI / 20;
+    cal_bg.body.padding.hor = LV_DPI / 10;
+    cal_bg.body.padding.ver = LV_DPI / 10;
+
+    static lv_style_t cal_header;
+    lv_style_copy(&cal_header, &bg);
+    cal_header.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 20);
+    cal_header.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
+    cal_header.body.radius = 0;
+    cal_header.body.border.width = 1;
+    cal_header.body.border.color = LV_COLOR_HEX3(0x333);
+    cal_header.body.padding.hor = LV_DPI / 10;
+    cal_header.body.padding.ver = LV_DPI / 10;
+
+    static lv_style_t week_box;
+    lv_style_copy(&week_box, &panel);
+    week_box.body.main_color = lv_color_hsv_to_rgb(_hue, 30, 45);
+    week_box.body.grad_color = lv_color_hsv_to_rgb(_hue, 30, 45);
+    week_box.body.radius = LV_DPI / 20;
+    week_box.body.border.width = 1;
+    week_box.body.padding.hor = LV_DPI / 20;
+    week_box.body.padding.ver = LV_DPI / 25;
+
+    static lv_style_t today_box;
+    lv_style_copy(&today_box, &week_box);
+    today_box.body.main_color = lv_color_hsv_to_rgb(_hue, 80, 70);
+    today_box.body.grad_color = lv_color_hsv_to_rgb(_hue, 80, 70);
+    today_box.body.radius = LV_DPI / 20;
+    today_box.body.padding.hor = LV_DPI / 14;
+    today_box.body.padding.ver = LV_DPI / 14;
+
+    static lv_style_t highlighted_days;
+    lv_style_copy(&highlighted_days, &bg);
+    highlighted_days.text.color = lv_color_hsv_to_rgb(_hue, 40, 80);
+
+    static lv_style_t ina_days;
+    lv_style_copy(&ina_days, &bg);
+    ina_days.text.color = lv_color_hsv_to_rgb(_hue, 0, 60);
+
+    theme.calendar.bg = &cal_bg;
+    theme.calendar.header = &cal_header;
+    theme.calendar.week_box = &week_box;
+    theme.calendar.today_box = &today_box;
+    theme.calendar.highlighted_days = &highlighted_days;
+    theme.calendar.day_names = &cal_bg;
+    theme.calendar.inactive_days = &ina_days;
 #endif
 }
 
@@ -583,7 +668,7 @@ static void win_init(void)
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
-lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t *font)
+lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
@@ -592,8 +677,8 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t *font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t **style_p = (lv_style_t**) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t*); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme;
+    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
         *style_p = &def;
         style_p++;
     }
@@ -610,7 +695,10 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t *font)
     sw_init();
     lmeter_init();
     gauge_init();
+    arc_init();
+    preload_init();
     chart_init();
+    calendar_init();
     cb_init();
     btnm_init();
     kb_init();
@@ -630,7 +718,7 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t *font)
  * Get a pointer to the theme
  * @return pointer to the theme
  */
-lv_theme_t * lv_theme_get_deafult(void)
+lv_theme_t * lv_theme_get_night(void)
 {
     return &theme;
 }

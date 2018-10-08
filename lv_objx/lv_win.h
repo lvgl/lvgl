@@ -1,6 +1,6 @@
 /**
  * @file lv_win.h
- * 
+ *
  */
 
 #ifndef LV_WIN_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_WIN != 0
 
 /*Testing of dependencies*/
@@ -61,9 +66,9 @@ typedef struct
     lv_style_t * style_btn_rel;    /*Control button releases style*/
     lv_style_t * style_btn_pr;     /*Control button pressed style*/
     lv_coord_t btn_size;               /*Size of the control buttons (square)*/
-}lv_win_ext_t;
+} lv_win_ext_t;
 
-typedef enum {
+enum {
     LV_WIN_STYLE_BG,
     LV_WIN_STYLE_CONTENT_BG,
     LV_WIN_STYLE_CONTENT_SCRL,
@@ -71,7 +76,8 @@ typedef enum {
     LV_WIN_STYLE_HEADER,
     LV_WIN_STYLE_BTN_REL,
     LV_WIN_STYLE_BTN_PR,
-}lv_win_style_t;
+};
+typedef uint8_t lv_win_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -83,8 +89,13 @@ typedef enum {
  * @param copy pointer to a window object, if not NULL then the new object will be copied from it
  * @return pointer to the created window
  */
-lv_obj_t * lv_win_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy);
 
+/**
+ * Delete all children of the scrl object, without deleting scrl child.
+ * @param obj pointer to an object
+ */
+void lv_win_clean(lv_obj_t *obj);
 
 /*======================
  * Add/remove functions
@@ -125,18 +136,18 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
 
 /**
- * Set the scroll bar mode of a window
- * @param win pointer to a window object
- * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
- */
-void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
-
-/**
  * Set the layout of the window
  * @param win pointer to a window object
  * @param layout the layout from 'lv_layout_t'
  */
 void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
+
+/**
+ * Set the scroll bar mode of a window
+ * @param win pointer to a window object
+ * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
+ */
+void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
 
 /**
  * Set a style of a window
@@ -145,6 +156,7 @@ void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
  * @param style pointer to a style
  */
 void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
+
 
 /*=====================
  * Getter functions
@@ -155,14 +167,29 @@ void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
  * @param win pointer to a window object
  * @return title string of the window
  */
-const char * lv_win_get_title(lv_obj_t * win);
+const char * lv_win_get_title(const lv_obj_t * win);
+
+/**
+* Get the content holder object of window (`lv_page`) to allow additional customization
+* @param win pointer to a window object
+* @return the Page object where the window's content is
+*/
+lv_obj_t * lv_win_get_content(const lv_obj_t * win);
 
 /**
  * Get the control button size of a window
  * @param win pointer to a window object
  * @return control button size
  */
-lv_coord_t lv_win_get_btn_size(lv_obj_t * win);
+lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
+
+/**
+ * Get the pointer of a widow from one of  its control button.
+ * It is useful in the action of the control buttons where only button is known.
+ * @param ctrl_btn pointer to a control button of a window
+ * @return pointer to the window of 'ctrl_btn'
+ */
+lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn);
 
 /**
  * Get the layout of a window
@@ -186,20 +213,12 @@ lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win);
 lv_coord_t lv_win_get_width(lv_obj_t * win);
 
 /**
- * Get the pointer of a widow from one of  its control button.
- * It is useful in the action of the control buttons where only button is known.
- * @param ctrl_btn pointer to a control button of a window
- * @return pointer to the window of 'ctrl_btn'
- */
-lv_obj_t * lv_win_get_from_btn(lv_obj_t * ctrl_btn);
-
-/**
  * Get a style of a window
  * @param win pointer to a button object
  * @param type which style window be get
  * @return style pointer to a style
  */
-lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type);
+lv_style_t * lv_win_get_style(const lv_obj_t *win, lv_win_style_t type);
 
 /*=====================
  * Other functions
@@ -212,6 +231,27 @@ lv_style_t * lv_win_get_style(lv_obj_t *win, lv_win_style_t type);
  * @param anim_time scroll animation time in milliseconds (0: no animation)
  */
 void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time);
+
+/**
+ * Scroll the window horizontally
+ * @param win pointer to a window object
+ * @param dist the distance to scroll (< 0: scroll right; > 0 scroll left)
+ */
+static inline void lv_win_scroll_hor(lv_obj_t * win, lv_coord_t dist)
+{
+    lv_win_ext_t * ext = (lv_win_ext_t *)lv_obj_get_ext_attr(win);
+    lv_page_scroll_hor(ext->page, dist);
+}
+/**
+ * Scroll the window vertically
+ * @param win pointer to a window object
+ * @param dist the distance to scroll (< 0: scroll down; > 0 scroll up)
+ */
+static inline void lv_win_scroll_ver(lv_obj_t * win, lv_coord_t dist)
+{
+    lv_win_ext_t * ext = (lv_win_ext_t *)lv_obj_get_ext_attr(win);
+    lv_page_scroll_ver(ext->page, dist);
+}
 
 /**********************
  *      MACROS

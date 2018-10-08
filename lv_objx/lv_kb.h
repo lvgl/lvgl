@@ -1,6 +1,6 @@
 /**
  * @file lv_kb.h
- * 
+ *
  */
 
 #ifndef LV_KB_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_KB != 0
 
 /*Testing of dependencies*/
@@ -36,11 +41,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
+enum {
     LV_KB_MODE_TEXT,
     LV_KB_MODE_NUM,
-}lv_kb_mode_t;
-
+};
+typedef uint8_t lv_kb_mode_t;
 
 /*Data of keyboard*/
 typedef struct {
@@ -51,16 +56,18 @@ typedef struct {
     uint8_t cursor_mng      :1; /*1: automatically show/hide cursor when a text area is assigned or left*/
     lv_action_t  ok_action;     /*Called when the "Ok" button is clicked*/
     lv_action_t  hide_action;  /*Called when the "Hide" button is clicked*/
-}lv_kb_ext_t;
+} lv_kb_ext_t;
 
-typedef enum {
+enum {
     LV_KB_STYLE_BG,
     LV_KB_STYLE_BTN_REL,
     LV_KB_STYLE_BTN_PR,
     LV_KB_STYLE_BTN_TGL_REL,
     LV_KB_STYLE_BTN_TGL_PR,
     LV_KB_STYLE_BTN_INA,
-}lv_kb_style_t;
+};
+typedef uint8_t lv_kb_style_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -72,7 +79,7 @@ typedef enum {
  * @param copy pointer to a keyboard object, if not NULL then the new object will be copied from it
  * @return pointer to the created keyboard
  */
-lv_obj_t * lv_kb_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -141,35 +148,35 @@ void lv_kb_set_style(lv_obj_t *kb, lv_kb_style_t type, lv_style_t *style);
  * @param kb pointer to a Keyboard object
  * @return pointer to the assigned Text Area object
  */
-lv_obj_t * lv_kb_get_ta(lv_obj_t * kb);
+lv_obj_t * lv_kb_get_ta(const lv_obj_t * kb);
 
 /**
  * Set a new a mode (text or number map)
  * @param kb pointer to a Keyboard object
  * @return the current mode from 'lv_kb_mode_t'
  */
-lv_kb_mode_t lv_kb_get_mode(lv_obj_t * kb);
+lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb);
 
 /**
  * Get the current cursor manage mode.
  * @param kb pointer to a Keyboard object
  * @return true: show cursor on the current text area, false: hide cursor
  */
-bool lv_kb_get_cursor_manage(lv_obj_t * kb);
+bool lv_kb_get_cursor_manage(const lv_obj_t * kb);
 
 /**
  * Get the callback to call when the "Ok" button is pressed
  * @param kb pointer to Keyboard object
  * @return the ok callback
  */
-lv_action_t lv_kb_get_ok_action(lv_obj_t * kb);
+lv_action_t lv_kb_get_ok_action(const lv_obj_t * kb);
 
 /**
  * Get the callback to call when the "Hide" button is pressed
  * @param kb pointer to Keyboard object
  * @return the close callback
  */
-lv_action_t lv_kb_get_hide_action(lv_obj_t * kb);
+lv_action_t lv_kb_get_hide_action(const lv_obj_t * kb);
 
 /**
  * Get a style of a keyboard
@@ -177,7 +184,7 @@ lv_action_t lv_kb_get_hide_action(lv_obj_t * kb);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_kb_get_style(lv_obj_t *kb, lv_kb_style_t type);
+lv_style_t * lv_kb_get_style(const lv_obj_t *kb, lv_kb_style_t type);
 
 /**********************
  *      MACROS

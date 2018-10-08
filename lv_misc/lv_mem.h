@@ -14,12 +14,30 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
+#include "../../lv_conf.h"
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
+#include "lv_log.h"
 
 /*********************
  *      DEFINES
  *********************/
+// Check windows
+#ifdef __WIN64
+# define LV_MEM_ENV64
+#endif
+
+// Check GCC
+#ifdef __GNUC__
+# if __x86_64__ || __ppc64__
+#   define LV_MEM_ENV64
+# endif
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -34,7 +52,7 @@ typedef struct
     uint32_t used_cnt;
     uint8_t used_pct;
     uint8_t frag_pct;
-}lv_mem_monitor_t;
+} lv_mem_monitor_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -87,20 +105,20 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p);
  */
 uint32_t lv_mem_get_size(const void * data);
 
-/**
- * Halt o NULL pointer
- * p pointer to a memory
- */
-static inline  void lv_mem_assert(void *p)
-{
-    if(p == NULL) {while(1);}
-}
-
 
 /**********************
  *      MACROS
  **********************/
 
+/**
+ * Halt on NULL pointer
+ * p pointer to a memory
+ */
+#if USE_LV_LOG == 0
+# define  lv_mem_assert(p) {if(p == NULL) while(1); }
+#else
+# define  lv_mem_assert(p) {if(p == NULL) {LV_LOG_ERROR("Out of memory!"); while(1); }}
+#endif
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

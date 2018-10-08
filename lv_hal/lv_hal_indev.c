@@ -2,7 +2,7 @@
  * @file hal_indev.c
  *
  * @description Input device HAL interface
- * 
+ *
  */
 
 /*********************
@@ -22,7 +22,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_indev_t *indev_list = NULL;
+static lv_indev_t * indev_list = NULL;
 
 /**********************
  *  STATIC VARIABLES
@@ -42,7 +42,7 @@ static lv_indev_t *indev_list = NULL;
  * After it you can set the fields.
  * @param driver pointer to driver variable to initialize
  */
-void lv_indev_drv_init(lv_indev_drv_t *driver)
+void lv_indev_drv_init(lv_indev_drv_t * driver)
 {
     driver->read = NULL;
     driver->type = LV_INDEV_TYPE_NONE;
@@ -54,12 +54,12 @@ void lv_indev_drv_init(lv_indev_drv_t *driver)
  * @param driver pointer to an initialized 'lv_indev_drv_t' variable (can be local variable)
  * @return pointer to the new input device or NULL on error
  */
-lv_indev_t * lv_indev_drv_register(lv_indev_drv_t *driver)
+lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
 {
-    lv_indev_t *node;
+    lv_indev_t * node;
 
     node = lv_mem_alloc(sizeof(lv_indev_t));
-    if (!node) return NULL;
+    if(!node) return NULL;
 
     memset(node, 0, sizeof(lv_indev_t));
     memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
@@ -70,11 +70,11 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t *driver)
     node->group = NULL;
     node->btn_points = NULL;
 
-    if (indev_list == NULL) {
+    if(indev_list == NULL) {
         indev_list = node;
     } else {
-        lv_indev_t *last = indev_list;
-        while (last->next)
+        lv_indev_t * last = indev_list;
+        while(last->next)
             last = last->next;
 
         last->next = node;
@@ -105,14 +105,18 @@ lv_indev_t * lv_indev_next(lv_indev_t * indev)
  * @param data input device will write its data here
  * @return false: no more data; true: there more data to read (buffered)
  */
-bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t *data)
+bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     bool cont = false;
 
     if(indev->driver.read) {
         data->user_data = indev->driver.user_data;
+
+        LV_LOG_TRACE("idnev read started");
         cont = indev->driver.read(data);
+        LV_LOG_TRACE("idnev read finished");
     } else {
+        LV_LOG_WARN("indev function registered");
         memset(data, 0, sizeof(lv_indev_data_t));
     }
 

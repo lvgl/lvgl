@@ -30,8 +30,8 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_disp_t *disp_list = NULL;
-static lv_disp_t *active;
+static lv_disp_t * disp_list = NULL;
+static lv_disp_t * active;
 
 /**********************
  *      MACROS
@@ -47,7 +47,7 @@ static lv_disp_t *active;
  * After it you can set the fields.
  * @param driver pointer to driver variable to initialize
  */
-void lv_disp_drv_init(lv_disp_drv_t *driver)
+void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
     driver->disp_fill = NULL;
     driver->disp_map = NULL;
@@ -57,6 +57,10 @@ void lv_disp_drv_init(lv_disp_drv_t *driver)
     driver->mem_blend = NULL;
     driver->mem_fill = NULL;
 #endif
+
+#if LV_VDB_SIZE
+    driver->vdb_wr = NULL;
+#endif
 }
 
 /**
@@ -65,18 +69,19 @@ void lv_disp_drv_init(lv_disp_drv_t *driver)
  * @param driver pointer to an initialized 'lv_disp_drv_t' variable (can be local variable)
  * @return pointer to the new display or NULL on error
  */
-lv_disp_t * lv_disp_drv_register(lv_disp_drv_t *driver)
+lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 {
-    lv_disp_t *node;
+    lv_disp_t * node;
 
     node = lv_mem_alloc(sizeof(lv_disp_t));
-    if (!node) return NULL;
+    lv_mem_assert(node);
+    if(node == NULL) return NULL;
 
-    memcpy(&node->driver,driver, sizeof(lv_disp_drv_t));
+    memcpy(&node->driver, driver, sizeof(lv_disp_drv_t));
     node->next = NULL;
 
     /* Set first display as active by default */
-    if (disp_list == NULL) {
+    if(disp_list == NULL) {
         disp_list = node;
         active = node;
         lv_obj_invalidate(lv_scr_act());
@@ -144,10 +149,18 @@ void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t col
  * @param y2 bottom coordinate of the rectangle
  * @param color_p pointer to an array of colors
  */
-void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t *color_p)
+void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t * color_p)
 {
     if(active == NULL) return;
-    if(active->driver.disp_flush != NULL) active->driver.disp_flush(x1, y1, x2, y2, color_p);
+    if(active->driver.disp_flush != NULL) {
+
+        LV_LOG_TRACE("disp flush  started");
+        active->driver.disp_flush(x1, y1, x2, y2, color_p);
+        LV_LOG_TRACE("disp flush ready");
+
+    } else {
+        LV_LOG_WARN("disp flush function registered");
+    }
 }
 
 /**
@@ -215,6 +228,7 @@ bool lv_disp_is_mem_fill_supported(void)
     if(active->driver.mem_fill) return true;
     else return false;
 }
+
 #endif
 
 /**********************

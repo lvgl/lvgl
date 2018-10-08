@@ -1,6 +1,6 @@
 /**
  * @file lv_ddlist.h
- * 
+ *
  */
 
 #ifndef LV_DDLIST_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_DDLIST != 0
 
 /*Testing of dependencies*/
@@ -48,15 +53,16 @@ typedef struct
     uint16_t sel_opt_id;                 /*Index of the current option*/
     uint16_t sel_opt_id_ori;             /*Store the original index on focus*/
     uint16_t anim_time;                  /*Open/Close animation time [ms]*/
-    uint8_t opened :1;                   /*1: The list is opened*/
-    lv_coord_t fix_height;                   /*Height if the ddlist is opened. (0: auto-size)*/
-}lv_ddlist_ext_t;
+    uint8_t opened :1;                   /*1: The list is opened (handled by the library)*/
+    lv_coord_t fix_height;               /*Height of the ddlist when opened. (0: auto-size)*/
+} lv_ddlist_ext_t;
 
-typedef enum {
+enum {
     LV_DDLIST_STYLE_BG,
     LV_DDLIST_STYLE_SEL,
     LV_DDLIST_STYLE_SB,
-}lv_ddlist_style_t;
+};
+typedef uint8_t lv_ddlist_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -67,7 +73,7 @@ typedef enum {
  * @param copy pointer to a drop down list object, if not NULL then the new object will be copied from it
  * @return pointer to the created drop down list
  */
-lv_obj_t * lv_ddlist_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -144,42 +150,42 @@ void lv_ddlist_set_style(lv_obj_t *ddlist, lv_ddlist_style_t type, lv_style_t *s
  * @param ddlist pointer to drop down list object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
-const char * lv_ddlist_get_options(lv_obj_t * ddlist);
+const char * lv_ddlist_get_options(const lv_obj_t * ddlist);
 
 /**
  * Get the selected option
  * @param ddlist pointer to drop down list object
  * @return id of the selected option (0 ... number of option - 1);
  */
-uint16_t lv_ddlist_get_selected(lv_obj_t * ddlist);
+uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist);
 
 /**
  * Get the current selected option as a string
  * @param ddlist pointer to ddlist object
  * @param buf pointer to an array to store the string
  */
-void lv_ddlist_get_selected_str(lv_obj_t * ddlist, char * buf);
+void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf);
 
 /**
  * Get the "option selected" callback function
  * @param ddlist pointer to a drop down list
  * @return  pointer to the call back function
  */
-lv_action_t lv_ddlist_get_action(lv_obj_t * ddlist);
+lv_action_t lv_ddlist_get_action(const lv_obj_t * ddlist);
 
 /**
  * Get the fix height value.
  * @param ddlist pointer to a drop down list object
  * @return the height if the ddlist is opened (0: auto size)
  */
-lv_coord_t lv_ddlist_get_fix_height(lv_obj_t * ddlist);
+lv_coord_t lv_ddlist_get_fix_height(const lv_obj_t * ddlist);
 
 /**
  * Get the scroll bar mode of a drop down list
  * @param ddlist pointer to a  drop down list object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
  */
-static inline lv_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
+static inline lv_sb_mode_t lv_ddlist_get_sb_mode(const lv_obj_t * ddlist)
 {
     return lv_page_get_sb_mode(ddlist);
 }
@@ -189,7 +195,7 @@ static inline lv_sb_mode_t lv_ddlist_get_sb_mode(lv_obj_t * ddlist)
  * @param ddlist pointer to a drop down list
  * @return open/close animation time [ms]
  */
-uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
+uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist);
 
 /**
  * Get a style of a drop down list
@@ -197,7 +203,7 @@ uint16_t lv_ddlist_get_anim_time(lv_obj_t * ddlist);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ddlist_get_style(lv_obj_t *ddlist, lv_ddlist_style_t type);
+lv_style_t * lv_ddlist_get_style(const lv_obj_t *ddlist, lv_ddlist_style_t type);
 
 /*=====================
  * Other functions
@@ -215,7 +221,7 @@ void lv_ddlist_open(lv_obj_t * ddlist, bool anim);
  * @param ddlist pointer to drop down list object
  * @param anim true: use animation; false: not use animations
  */
-void lv_ddlist_close_en(lv_obj_t * ddlist, bool anim);
+void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
 
 /**********************
  *      MACROS

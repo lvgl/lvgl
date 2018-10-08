@@ -1,6 +1,6 @@
 /**
  * @file lv_obj.h
- * 
+ *
  */
 
 #ifndef LV_OBJ_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_style.h"
@@ -21,6 +26,7 @@ extern "C" {
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_log.h"
 
 /*********************
  *      DEFINES
@@ -48,9 +54,9 @@ extern "C" {
 #endif
 
 
-#define LV_ANIM_IN			    0x00	/*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_OUT				0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_DIR_MASK		0x80	/*ANIM_IN/ANIM_OUT mask*/
+#define LV_ANIM_IN              0x00    /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
+#define LV_ANIM_OUT             0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
+#define LV_ANIM_DIR_MASK        0x80    /*ANIM_IN/ANIM_OUT mask*/
 
 #define LV_MAX_ANCESTOR_NUM     8
 /**********************
@@ -59,32 +65,34 @@ extern "C" {
 
 struct _lv_obj_t;
 
-typedef enum
+enum
 {
     LV_DESIGN_DRAW_MAIN,
     LV_DESIGN_DRAW_POST,
     LV_DESIGN_COVER_CHK,
-}lv_design_mode_t;
+};
+typedef uint8_t lv_design_mode_t;
 
 typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 
-typedef enum
+enum
 {
-    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function*/
+    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function or an operation was failed*/
     LV_RES_OK,           /*The object is valid (no deleted) after the action*/
-}lv_res_t;
+};
+typedef uint8_t lv_res_t;
 
-typedef enum
+enum
 {
     /*General signals*/
-	LV_SIGNAL_CLEANUP,
+    LV_SIGNAL_CLEANUP,
     LV_SIGNAL_CHILD_CHG,
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_STYLE_CHG,
-	LV_SIGNAL_REFR_EXT_SIZE,
-	LV_SIGNAL_GET_TYPE,
+    LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_GET_TYPE,
 
-	/*Input device related*/
+    /*Input device related*/
     LV_SIGNAL_PRESSED,
     LV_SIGNAL_PRESSING,
     LV_SIGNAL_PRESS_LOST,
@@ -94,11 +102,13 @@ typedef enum
     LV_SIGNAL_DRAG_BEGIN,
     LV_SIGNAL_DRAG_END,
 
-	/*Group related*/
+    /*Group related*/
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
     LV_SIGNAL_CONTROLL,
-}lv_signal_t;
+    LV_SIGNAL_GET_EDITABLE,
+};
+typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
@@ -106,12 +116,12 @@ typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par;    /*Pointer to the parent object*/
     lv_ll_t child_ll;          /*Linked list to store the children objects*/
-    
+
     lv_area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 
     lv_signal_func_t signal_func;     /*Object type specific signal function*/
     lv_design_func_t design_func;     /*Object type specific design function*/
-    
+
     void * ext_attr;                 /*Object type specific extended data*/
     lv_style_t * style_p;       /*Pointer to the object's style*/
 
@@ -123,43 +133,45 @@ typedef struct _lv_obj_t
     void * group_p;                 /*Pointer to the group of the object*/
 #endif
     /*Attributes and states*/
-    uint8_t click     :1;    /*1: Can be pressed by an input device*/
-    uint8_t drag      :1;    /*1: Enable the dragging*/
-    uint8_t drag_throw:1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent  :1;    /*1: Parent will be dragged instead*/
-    uint8_t hidden       :1;    /*1: Object is hidden*/
-    uint8_t top       :1;    /*1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t reserved     :1;
+    uint8_t click         :1;    /*1: Can be pressed by an input device*/
+    uint8_t drag          :1;    /*1: Enable the dragging*/
+    uint8_t drag_throw    :1;    /*1: Enable throwing with drag*/
+    uint8_t drag_parent   :1;    /*1: Parent will be dragged instead*/
+    uint8_t hidden        :1;    /*1: Object is hidden*/
+    uint8_t top           :1;    /*1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t opa_scale_en  :1;    /*1: opa_scale is set*/
+    uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from `lv_protect_t`*/
+    lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
-    uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from lv_obj_prot_t*/
-
-    lv_coord_t ext_size;			/*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+    lv_coord_t ext_size;        /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
-    LV_OBJ_FREE_NUM_TYPE free_num; 		    /*Application specific identifier (set it freely)*/
+    LV_OBJ_FREE_NUM_TYPE free_num;          /*Application specific identifier (set it freely)*/
 #endif
-}lv_obj_t;
+} lv_obj_t;
 
 typedef lv_res_t (*lv_action_t) (struct _lv_obj_t * obj);
 
 /*Protect some attributes (max. 8 bit)*/
-typedef enum
+enum
 {
     LV_PROTECT_NONE      = 0x00,
     LV_PROTECT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
     LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
     LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_cont layout)*/
     LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
-    LV_PROTECT_PRESS_LOST= 0x10, /*TODO */
-}lv_protect_t;
+    LV_PROTECT_PRESS_LOST= 0x10, /*If the `indev` was pressing this object but swiped out while pressing do not search other object.*/
+    LV_PROTECT_CLICK_FOCUS= 0x20,/*Prevent focusing the object by clicking on it*/
+};
+typedef uint8_t lv_protect_t;
 
 
 /*Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
 typedef struct {
     const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
-}lv_obj_type_t;
+} lv_obj_type_t;
 
-typedef enum
+enum
 {
     LV_ALIGN_CENTER = 0,
     LV_ALIGN_IN_TOP_LEFT,
@@ -182,18 +194,20 @@ typedef enum
     LV_ALIGN_OUT_RIGHT_TOP,
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
-}lv_align_t;
+};
+typedef uint8_t lv_align_t;
 
-typedef enum
+enum
 {
-	LV_ANIM_NONE = 0,
-	LV_ANIM_FLOAT_TOP, 		/*Float from/to the top*/
-	LV_ANIM_FLOAT_LEFT,		/*Float from/to the left*/
-	LV_ANIM_FLOAT_BOTTOM,	/*Float from/to the bottom*/
-	LV_ANIM_FLOAT_RIGHT,	/*Float from/to the right*/
-	LV_ANIM_GROW_H,			/*Grow/shrink  horizontally*/
-	LV_ANIM_GROW_V,			/*Grow/shrink  vertically*/
-}lv_anim_builtin_t;
+    LV_ANIM_NONE = 0,
+    LV_ANIM_FLOAT_TOP,      /*Float from/to the top*/
+    LV_ANIM_FLOAT_LEFT,     /*Float from/to the left*/
+    LV_ANIM_FLOAT_BOTTOM,   /*Float from/to the bottom*/
+    LV_ANIM_FLOAT_RIGHT,    /*Float from/to the right*/
+    LV_ANIM_GROW_H,         /*Grow/shrink  horizontally*/
+    LV_ANIM_GROW_V,         /*Grow/shrink  vertically*/
+};
+typedef uint8_t lv_anim_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -215,7 +229,7 @@ void lv_init(void);
  * @param copy pointer to a base object, if not NULL then the new object will be copied from it
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
+lv_obj_t * lv_obj_create(lv_obj_t * parent,const  lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children
@@ -234,7 +248,7 @@ void lv_obj_clean(lv_obj_t *obj);
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
  * @param obj pointer to an object
  */
-void lv_obj_invalidate(lv_obj_t * obj);
+void lv_obj_invalidate(const lv_obj_t * obj);
 
 /*=====================
  * Setter functions
@@ -256,8 +270,8 @@ void lv_scr_load(lv_obj_t * scr);
 
 /**
  * Set a new parent for an object. Its relative position will be the same.
- * @param obj pointer to an object
- * @param parent pointer to the new parent object
+ * @param obj pointer to an object. Can't be a screen.
+ * @param parent pointer to the new parent object. (Can't be NULL)
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent);
 
@@ -317,7 +331,7 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align(lv_obj_t * obj,lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
+void lv_obj_align(lv_obj_t * obj,const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
 
 
 /*---------------------
@@ -393,16 +407,38 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 
 /**
+ * Set editable parameter Used by groups and keyboard/encoder control.
+ * Editable object has something inside to choose (the elements of a list)
+ * @param obj pointer to an object
+ * @param en true: enable editing
+ */
+void lv_obj_set_editable(lv_obj_t * obj, bool en);
+
+/**
+ * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
+ * @param obj pointer to an object
+ * @param en true: opa scaling is enabled for this object and all children; false: no opa scaling
+ */
+void lv_obj_set_opa_scale_enable(lv_obj_t * obj, bool en);
+
+/**
+ * Set the opa scale of an object
+ * @param obj pointer to an object
+ * @param opa_scale a factor to scale down opacity [0..255]
+ */
+void lv_obj_set_opa_scale(lv_obj_t * obj, lv_opa_t opa_scale);
+
+/**
  * Set a bit or bits in the protect filed
  * @param obj pointer to an object
- * @param prot 'OR'-ed values from lv_obj_prot_t
+ * @param prot 'OR'-ed values from `lv_protect_t`
  */
 void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
 
 /**
  * Clear a bit or bits in the protect filed
  * @param obj pointer to an object
- * @param prot 'OR'-ed values from lv_obj_prot_t
+ * @param prot 'OR'-ed values from `lv_protect_t`
  */
 void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
 
@@ -503,7 +539,7 @@ lv_obj_t * lv_layer_sys(void);
  * @param obj pointer to an object
  * @return pointer to a screen
  */
-lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
+lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj);
 
 /*---------------------
  * Parent/children get
@@ -514,7 +550,7 @@ lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to the parent of  'obj'
  */
-lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
+lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj);
 
 /**
  * Iterate through the children of an object (start from the "youngest, lastly created")
@@ -523,7 +559,7 @@ lv_obj_t * lv_obj_get_parent(lv_obj_t * obj);
  *                  and the previous return value later
  * @return the child after 'act_child' or NULL if no more child
  */
-lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
+lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, const lv_obj_t * child);
 
 /**
  * Iterate through the children of an object (start from the "oldest", firstly created)
@@ -532,14 +568,14 @@ lv_obj_t * lv_obj_get_child(lv_obj_t * obj, lv_obj_t * child);
  *                  and the previous return value later
  * @return the child after 'act_child' or NULL if no more child
  */
-lv_obj_t * lv_obj_get_child_back(lv_obj_t * obj, lv_obj_t * child);
+lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
 
 /**
  * Count the children of an object (only children directly on 'obj')
  * @param obj pointer to an object
  * @return children number of 'obj'
  */
-uint16_t lv_obj_count_children(lv_obj_t * obj);
+uint16_t lv_obj_count_children(const lv_obj_t * obj);
 
 /*---------------------
  * Coordinate get
@@ -550,42 +586,42 @@ uint16_t lv_obj_count_children(lv_obj_t * obj);
  * @param obj pointer to an object
  * @param cords_p pointer to an area to store the coordinates
  */
-void lv_obj_get_coords(lv_obj_t * obj, lv_area_t * cords_p);
+void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p);
 
 /**
  * Get the x coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent
  */
-lv_coord_t lv_obj_get_x(lv_obj_t * obj);
+lv_coord_t lv_obj_get_x(const lv_obj_t * obj);
 
 /**
  * Get the y coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the top of its parent
  */
-lv_coord_t lv_obj_get_y(lv_obj_t * obj);
+lv_coord_t lv_obj_get_y(const lv_obj_t * obj);
 
 /**
  * Get the width of an object
  * @param obj pointer to an object
  * @return the width
  */
-lv_coord_t lv_obj_get_width(lv_obj_t * obj);
+lv_coord_t lv_obj_get_width(const lv_obj_t * obj);
 
 /**
  * Get the height of an object
  * @param obj pointer to an object
  * @return the height
  */
-lv_coord_t lv_obj_get_height(lv_obj_t * obj);
+lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
 
 /**
  * Get the extended size attribute of an object
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-lv_coord_t lv_obj_get_ext_size(lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj);
 
 /*-----------------
  * Appearance get
@@ -596,7 +632,7 @@ lv_coord_t lv_obj_get_ext_size(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to a style
  */
-lv_style_t * lv_obj_get_style(lv_obj_t * obj);
+lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 
 /*-----------------
  * Attribute get
@@ -607,71 +643,78 @@ lv_style_t * lv_obj_get_style(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return true: the object is hidden
  */
-bool lv_obj_get_hidden(lv_obj_t * obj);
+bool lv_obj_get_hidden(const lv_obj_t * obj);
 
 /**
  * Get the click enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is clickable
  */
-bool lv_obj_get_click(lv_obj_t * obj);
+bool lv_obj_get_click(const lv_obj_t * obj);
 
 /**
  * Get the top enable attribute of an object
  * @param obj pointer to an object
  * @return true: the auto top feture is enabled
  */
-bool lv_obj_get_top(lv_obj_t * obj);
+bool lv_obj_get_top(const lv_obj_t * obj);
 
 /**
  * Get the drag enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is dragable
  */
-bool lv_obj_get_drag(lv_obj_t * obj);
+bool lv_obj_get_drag(const lv_obj_t * obj);
 
 /**
  * Get the drag thow enable attribute of an object
  * @param obj pointer to an object
  * @return true: drag throw is enabled
  */
-bool lv_obj_get_drag_throw(lv_obj_t * obj);
+bool lv_obj_get_drag_throw(const lv_obj_t * obj);
 
 /**
  * Get the drag parent attribute of an object
  * @param obj pointer to an object
  * @return true: drag parent is enabled
  */
-bool lv_obj_get_drag_parent(lv_obj_t * obj);
+bool lv_obj_get_drag_parent(const lv_obj_t * obj);
+
+/**
+ * Get the opa scale parameter of an object
+ * @param obj pointer to an object
+ * @return opa scale [0..255]
+ */
+lv_opa_t lv_obj_get_opa_scale(const lv_obj_t * obj);
 
 /**
  * Get the protect field of an object
  * @param obj pointer to an object
- * @return protect field ('OR'ed values of lv_obj_prot_t)
+ * @return protect field ('OR'ed values of `lv_protect_t`)
  */
-uint8_t lv_obj_get_protect(lv_obj_t * obj);
+uint8_t lv_obj_get_protect(const lv_obj_t * obj);
 
 /**
  * Check at least one bit of a given protect bitfield is set
  * @param obj pointer to an object
- * @param prot protect bits to test ('OR'ed values of lv_obj_prot_t)
+ * @param prot protect bits to test ('OR'ed values of `lv_protect_t`)
  * @return false: none of the given bits are set, true: at least one bit is set
  */
-bool lv_obj_is_protected(lv_obj_t * obj, uint8_t prot);
+bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
 
 /**
  * Get the signal function of an object
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_func_t   lv_obj_get_signal_func(lv_obj_t * obj);
+lv_signal_func_t   lv_obj_get_signal_func(const lv_obj_t * obj);
 
 /**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
  */
-lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
+lv_design_func_t lv_obj_get_design_func(const lv_obj_t * obj);
 
 /*------------------
  * Other get
@@ -683,7 +726,7 @@ lv_design_func_t lv_obj_get_design_func(lv_obj_t * obj);
  * @return the ext pointer but not the dynamic version
  *         Use it as ext->data1, and NOT da(ext)->data1
  */
-void * lv_obj_get_ext_attr(lv_obj_t * obj);
+void * lv_obj_get_ext_attr(const lv_obj_t * obj);
 
 /**
  * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
@@ -699,7 +742,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
  * @param obj pointer to an object
  * @return the free number
  */
-LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
+LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(const lv_obj_t * obj);
 #endif
 
 #if LV_OBJ_FREE_PTR != 0
@@ -708,7 +751,7 @@ LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the free pointer
  */
-void * lv_obj_get_free_ptr(lv_obj_t * obj);
+void * lv_obj_get_free_ptr(const lv_obj_t * obj);
 #endif
 
 #if USE_LV_GROUP
@@ -717,14 +760,22 @@ void * lv_obj_get_free_ptr(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the pointer to group of the object
  */
-void * lv_obj_get_group(lv_obj_t * obj);
+void * lv_obj_get_group(const lv_obj_t * obj);
+
+
+/**
+ * Tell whether the ohe object is the focused object of a group or not.
+ * @param obj pointer to an object
+ * @return true: the object is focused, false: the object is not focused or not in a group
+ */
+bool lv_obj_is_focused(const lv_obj_t * obj);
+
 #endif
 
 
 /**********************
  *      MACROS
  **********************/
-#define LV_SCALE(x) (x << LV_ANTIALIAS)
 
 
 #ifdef __cplusplus

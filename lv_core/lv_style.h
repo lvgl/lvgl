@@ -29,7 +29,7 @@ extern "C" {
  **********************/
 
 /*Border types (Use 'OR'ed values)*/
-typedef enum
+enum
 {
     LV_BORDER_NONE =   0x00,
     LV_BORDER_BOTTOM = 0x01,
@@ -37,22 +37,24 @@ typedef enum
     LV_BORDER_LEFT =   0x04,
     LV_BORDER_RIGHT =  0x08,
     LV_BORDER_FULL =   0x0F,
-}lv_border_part_t;
+};
+typedef uint8_t lv_border_part_t;
 
 /*Shadow types*/
-typedef enum
+enum
 {
     LV_SHADOW_BOTTOM = 0,
     LV_SHADOW_FULL,
-}lv_shadow_type_t;
+};
+typedef uint8_t lv_shadow_type_t;
 
 typedef struct
 {
-    uint8_t glass :1;   /*1: Do not inherit this style*/
+    uint8_t glass :1;           /*1: Do not inherit this style*/
 
     struct {
         lv_color_t main_color;
-        lv_color_t grad_color;
+        lv_color_t grad_color;      /*`grad_color` will be removed in v6.0, use `aux_color` instead*/
         lv_coord_t radius;
         lv_opa_t opa;
 
@@ -61,22 +63,22 @@ typedef struct
             lv_coord_t width;
             lv_border_part_t part;
             lv_opa_t opa;
-        }border;
+        } border;
 
         struct {
             lv_color_t color;
             lv_coord_t width;
-            uint8_t type;
-        }shadow;
+            lv_shadow_type_t type;
+        } shadow;
 
         struct {
             lv_coord_t ver;
             lv_coord_t hor;
             lv_coord_t inner;
-        }padding;
+        } padding;
 
         uint8_t empty :1;   /*Transparent background (border still drawn)*/
-    }body;
+    } body;
 
 
     struct {
@@ -85,20 +87,21 @@ typedef struct
         lv_coord_t letter_space;
         lv_coord_t line_space;
         lv_opa_t opa;
-    }text;
+    } text;
 
     struct {
         lv_color_t color;
         lv_opa_t intense;
         lv_opa_t opa;
-    }image;
+    } image;
 
     struct {
         lv_color_t color;
         lv_coord_t width;
         lv_opa_t opa;
-    }line;
-}lv_style_t;
+        uint8_t rounded :1;     /*1: rounded line endings*/
+    } line;
+} lv_style_t;
 
 #if USE_LV_ANIMATION
 typedef struct {
@@ -112,7 +115,7 @@ typedef struct {
     uint16_t repeat_pause;          /*Wait before repeat*/
     uint8_t playback :1;            /*When the animation is ready play it back*/
     uint8_t repeat :1;              /*Repeat the animation infinitely*/
-}lv_style_anim_t;
+} lv_style_anim_t;
 
 /* Example initialization
 lv_style_anim_t a;
@@ -146,12 +149,24 @@ void lv_style_init (void);
  */
 void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
+
+/**
+ * Mix two styles according to a given ratio
+ * @param start start style
+ * @param end end style
+ * @param res store the result style here
+ * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
+ */
+void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
+
 #if USE_LV_ANIMATION
+
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
+ * @return pointer to a descriptor. Really this variable will be animated. (Can be used in `lv_anim_del(dsc, NULL)`)
  */
-void lv_style_anim_create(lv_style_anim_t * anim);
+void * lv_style_anim_create(lv_style_anim_t * anim);
 #endif
 
 /*************************

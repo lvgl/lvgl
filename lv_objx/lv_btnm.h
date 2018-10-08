@@ -1,6 +1,6 @@
 /**
  * @file lv_btnm.h
- * 
+ *
  */
 
 
@@ -14,7 +14,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_BTNM != 0
 
 #include "../lv_core/lv_obj.h"
@@ -33,6 +38,8 @@ extern "C" {
 #define LV_BTNM_REPEAT_DISABLE_MASK     0x10
 #define LV_BTNM_INACTIVE_MASK   0x20
 
+
+#define LV_BTNM_PR_NONE         0xFFFF
 /**********************
  *      TYPEDEFS
  **********************/
@@ -55,16 +62,17 @@ typedef struct
     uint16_t btn_id_pr;                         /*Index of the currently pressed button (in `button_areas`) or LV_BTNM_PR_NONE*/
     uint16_t btn_id_tgl;                        /*Index of the currently toggled button (in `button_areas`) or LV_BTNM_PR_NONE */
     uint8_t toggle     :1;                      /*Enable toggling*/
-}lv_btnm_ext_t;
+} lv_btnm_ext_t;
 
-typedef enum {
+enum {
     LV_BTNM_STYLE_BG,
     LV_BTNM_STYLE_BTN_REL,
     LV_BTNM_STYLE_BTN_PR,
     LV_BTNM_STYLE_BTN_TGL_REL,
     LV_BTNM_STYLE_BTN_TGL_PR,
     LV_BTNM_STYLE_BTN_INA,
-}lv_btnm_style_t;
+};
+typedef uint8_t lv_btnm_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -76,7 +84,7 @@ typedef enum {
  * @param copy pointer to a button matrix object, if not NULL then the new object will be copied from it
  * @return pointer to the created button matrix
  */
-lv_obj_t * lv_btnm_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -130,14 +138,14 @@ void lv_btnm_set_style(lv_obj_t *btnm, lv_btnm_style_t type, lv_style_t *style);
  * @param btnm pointer to a button matrix object
  * @return the current map
  */
-const char ** lv_btnm_get_map(lv_obj_t * btnm);
+const char ** lv_btnm_get_map(const lv_obj_t * btnm);
 
 /**
  * Get a the callback function of the buttons on a button matrix
  * @param btnm: pointer to button matrix object
  * @return pointer to the callback function
  */
-lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm);
+lv_btnm_action_t lv_btnm_get_action(const lv_obj_t * btnm);
 
 
 /**
@@ -145,7 +153,7 @@ lv_btnm_action_t lv_btnm_get_action(lv_obj_t * btnm);
  * @param btnm pointer to button matrix object
  * @return  index of the currently toggled button (0: if unset)
  */
-uint16_t lv_btnm_get_toggled(lv_obj_t * btnm);
+uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm);
 
 /**
  * Get a style of a button matrix
@@ -153,7 +161,7 @@ uint16_t lv_btnm_get_toggled(lv_obj_t * btnm);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_btnm_get_style(lv_obj_t *btnm, lv_btnm_style_t type);
+lv_style_t * lv_btnm_get_style(const lv_obj_t *btnm, lv_btnm_style_t type);
 
 /**********************
  *      MACROS

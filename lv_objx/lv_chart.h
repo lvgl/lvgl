@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_CHART != 0
 
 #include "../lv_core/lv_obj.h"
@@ -30,7 +35,7 @@ typedef struct
 {
     lv_coord_t * points;
     lv_color_t color;
-}lv_chart_series_t;
+} lv_chart_series_t;
 
 /*Data of chart */
 typedef struct
@@ -49,16 +54,17 @@ typedef struct
         uint8_t num;   /*Number of data lines in dl_ll*/
         lv_opa_t opa;     /*Opacity of data lines*/
         lv_opa_t dark;    /*Dark level of the point/column bottoms*/
-    }series;
-}lv_chart_ext_t;
+    } series;
+} lv_chart_ext_t;
 
 /*Chart types*/
-typedef enum
+enum
 {
-	LV_CHART_TYPE_LINE = 0x01,
-	LV_CHART_TYPE_COLUMN = 0x02,
-	LV_CHART_TYPE_POINT = 0x04,
-}lv_chart_type_t;
+    LV_CHART_TYPE_LINE = 0x01,
+    LV_CHART_TYPE_COLUMN = 0x02,
+    LV_CHART_TYPE_POINT = 0x04,
+};
+typedef uint8_t lv_chart_type_t;
 
 
 /**********************
@@ -71,7 +77,7 @@ typedef enum
  * @param copy pointer to a chart background object, if not NULL then the new object will be copied from it
  * @return pointer to the created chart background
  */
-lv_obj_t * lv_chart_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*======================
  * Add/remove functions
@@ -183,42 +189,42 @@ static inline void lv_chart_set_style(lv_obj_t *chart, lv_style_t *style)
  * @param chart pointer to chart object
  * @return type of the chart (from 'lv_chart_t' enum)
  */
-lv_chart_type_t lv_chart_get_type(lv_obj_t * chart);
+lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart);
 
 /**
  * Get the data point number per data line on chart
  * @param chart pointer to chart object
  * @return point number on each data line
  */
-uint16_t lv_chart_get_point_cnt(lv_obj_t * chart);
+uint16_t lv_chart_get_point_cnt(const lv_obj_t * chart);
 
 /**
  * Get the opacity of the data series
  * @param chart pointer to chart object
  * @return the opacity of the data series
  */
-lv_opa_t lv_chart_get_series_opa(lv_obj_t * chart);
+lv_opa_t lv_chart_get_series_opa(const lv_obj_t * chart);
 
 /**
  * Get the data series width
  * @param chart pointer to chart object
  * @return the width the data series (lines or points)
  */
-lv_coord_t lv_chart_get_series_width(lv_obj_t * chart);
+lv_coord_t lv_chart_get_series_width(const lv_obj_t * chart);
 
 /**
  * Get the dark effect level on the bottom of the points or columns
  * @param chart pointer to chart object
  * @return dark effect level (LV_OPA_TRANSP to turn off)
  */
-lv_opa_t lv_chart_get_series_darking(lv_obj_t * chart);
+lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart);
 
 /**
  * Get the style of an chart object
  * @param chart pointer to an chart object
  * @return pointer to the chart's style
  */
-static inline lv_style_t* lv_chart_get_style(lv_obj_t *chart)
+static inline lv_style_t* lv_chart_get_style(const lv_obj_t *chart)
 {
     return lv_obj_get_style(chart);
 }

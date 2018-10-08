@@ -14,6 +14,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
+#include "../../lv_conf.h"
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_mem.h"
@@ -31,7 +37,7 @@ extern "C" {
 /**
  * Possible priorities for lv_tasks
  */
-typedef enum
+enum
 {
     LV_TASK_PRIO_OFF = 0,
     LV_TASK_PRIO_LOWEST,
@@ -40,7 +46,8 @@ typedef enum
     LV_TASK_PRIO_HIGH,
     LV_TASK_PRIO_HIGHEST,
     LV_TASK_PRIO_NUM,
-}lv_task_prio_t;
+};
+typedef uint8_t lv_task_prio_t;
 
 /**
  * Descriptor of a lv_task
@@ -53,7 +60,7 @@ typedef struct
     void * param;
     uint8_t prio:3;
     uint8_t once:1;
-}lv_task_t;
+} lv_task_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -139,4 +146,4 @@ uint8_t lv_task_get_idle(void);
 } /* extern "C" */
 #endif
 
-#endif 
+#endif

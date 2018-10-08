@@ -1,6 +1,6 @@
 /**
  * @file lv_cb.h
- * 
+ *
  */
 
 #ifndef LV_CB_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_CB != 0
 
 /*Testing of dependencies*/
@@ -44,16 +49,17 @@ typedef struct
     /*New data for this type */
     lv_obj_t * bullet;  /*Pointer to button*/
     lv_obj_t * label;   /*Pointer to label*/
-}lv_cb_ext_t;
+} lv_cb_ext_t;
 
-typedef enum {
+enum {
     LV_CB_STYLE_BG,
     LV_CB_STYLE_BOX_REL,
     LV_CB_STYLE_BOX_PR,
     LV_CB_STYLE_BOX_TGL_REL,
     LV_CB_STYLE_BOX_TGL_PR,
     LV_CB_STYLE_BOX_INA,
-}lv_cb_style_t;
+};
+typedef uint8_t lv_cb_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -65,7 +71,7 @@ typedef enum {
  * @param copy pointer to a check box object, if not NULL then the new object will be copied from it
  * @return pointer to the created check box
  */
-lv_obj_t * lv_cb_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -124,14 +130,14 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style);
  * @param cb pointer to check box object
  * @return pointer to the text of the check box
  */
-const char * lv_cb_get_text(lv_obj_t * cb);
+const char * lv_cb_get_text(const lv_obj_t * cb);
 
 /**
  * Get the current state of the check box
  * @param cb pointer to a check box object
  * @return true: checked; false: not checked
  */
-static inline bool lv_cb_is_checked(lv_obj_t * cb)
+static inline bool lv_cb_is_checked(const lv_obj_t * cb)
 {
     return lv_btn_get_state(cb) == LV_BTN_STATE_REL ? false : true;
 }
@@ -141,7 +147,7 @@ static inline bool lv_cb_is_checked(lv_obj_t * cb)
  * @param cb pointer to a button object
  * @return pointer to the action function
  */
-static inline lv_action_t lv_cb_get_action(lv_obj_t * cb)
+static inline lv_action_t lv_cb_get_action(const lv_obj_t * cb)
 {
     return lv_btn_get_action(cb, LV_BTN_ACTION_CLICK);
 }
@@ -153,7 +159,7 @@ static inline lv_action_t lv_cb_get_action(lv_obj_t * cb)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_cb_get_style(lv_obj_t * cb, lv_cb_style_t type);
+lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type);
 
 /**********************
  *      MACROS

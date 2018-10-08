@@ -6,9 +6,18 @@
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
+#include "../../lv_conf.h"
+#endif
+
 #include "lv_hal_tick.h"
 #include <stddef.h>
-#include "../../lv_conf.h"
+
+#if LV_TICK_CUSTOM == 1
+#include LV_TICK_CUSTOM_INCLUDE
+#endif
 
 /*********************
  *      DEFINES
@@ -52,6 +61,7 @@ LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
  */
 uint32_t lv_tick_get(void)
 {
+#if LV_TICK_CUSTOM == 0
     uint32_t result;
     do {
         tick_irq_flag = 1;
@@ -59,6 +69,9 @@ uint32_t lv_tick_get(void)
     } while(!tick_irq_flag);     /*'lv_tick_inc()' clears this flag which can be in an interrupt. Continue until make a non interrupted cycle */
 
     return result;
+#else
+    return LV_TICK_CUSTOM_SYS_TIME_EXPR;
+#endif
 }
 
 /**
@@ -68,17 +81,17 @@ uint32_t lv_tick_get(void)
  */
 uint32_t lv_tick_elaps(uint32_t prev_tick)
 {
-	uint32_t act_time = lv_tick_get();
+    uint32_t act_time = lv_tick_get();
 
-	/*If there is no overflow in sys_time simple subtract*/
-	if(act_time >= prev_tick) {
-		prev_tick = act_time - prev_tick;
-	} else {
-		prev_tick = UINT32_MAX - prev_tick + 1;
-		prev_tick += act_time;
-	}
+    /*If there is no overflow in sys_time simple subtract*/
+    if(act_time >= prev_tick) {
+        prev_tick = act_time - prev_tick;
+    } else {
+        prev_tick = UINT32_MAX - prev_tick + 1;
+        prev_tick += act_time;
+    }
 
-	return prev_tick;
+    return prev_tick;
 }
 
 /**********************

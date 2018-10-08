@@ -1,6 +1,6 @@
 /**
  * @file lv_rect.h
- * 
+ *
  */
 
 #ifndef LV_LABEL_H
@@ -13,13 +13,18 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_LABEL != 0
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_misc/lv_font.h"
 #include "../lv_misc/lv_txt.h"
-#include "../lv_misc/lv_fonts/lv_symbol_def.h"
+#include "../lv_misc/lv_symbol_def.h"
 
 /*********************
  *      DEFINES
@@ -32,20 +37,24 @@ extern "C" {
  **********************/
 
 /*Long mode behaviors. Used in 'lv_label_ext_t' */
-typedef enum
+enum
 {
     LV_LABEL_LONG_EXPAND,   /*Expand the object size to the text size*/
     LV_LABEL_LONG_BREAK,    /*Keep the object width, break the too long lines and expand the object height*/
     LV_LABEL_LONG_SCROLL,   /*Expand the object size and scroll the text on the parent (move the label object)*/
     LV_LABEL_LONG_DOT,      /*Keep the size and write dots at the end if the text is too long*/
     LV_LABEL_LONG_ROLL,     /*Keep the size and roll the text infinitely*/
-}lv_label_long_mode_t;
+    LV_LABEL_LONG_CROP,     /*Keep the size and crop the text out of it*/
+};
+typedef uint8_t lv_label_long_mode_t;
 
 /*Label align policy*/
-typedef enum {
+enum {
     LV_LABEL_ALIGN_LEFT,
     LV_LABEL_ALIGN_CENTER,
-}lv_label_align_t;
+    LV_LABEL_ALIGN_RIGHT,
+};
+typedef uint8_t lv_label_align_t;
 
 /*Data of label*/
 typedef struct
@@ -66,9 +75,8 @@ typedef struct
     uint8_t align       :2;         /*Align type from 'lv_label_align_t'*/
     uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
     uint8_t expand      :1;         /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
-    uint8_t no_break    :1;         /*Ignore new line characters*/
     uint8_t body_draw   :1;         /*Draw background body*/
-}lv_label_ext_t;
+} lv_label_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -81,7 +89,7 @@ typedef struct
  * @param copy pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
  */
-lv_obj_t * lv_label_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -115,6 +123,7 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text);
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
+ *                  In LV_LONG_BREAK/LONG/ROLL the size of the label should be set AFTER this function
  */
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 
@@ -131,13 +140,6 @@ void lv_label_set_align(lv_obj_t *label, lv_label_align_t align);
  * @param recolor_en true: enable recoloring, false: disable
  */
 void lv_label_set_recolor(lv_obj_t * label, bool recolor_en);
-
-/**
- * Set the label to ignore (or accept) line breaks on '\n'
- * @param label pointer to a label object
- * @param no_break_en true: ignore line breaks, false: make line breaks on '\n'
- */
-void lv_label_set_no_break(lv_obj_t * label, bool no_break_en);
 
 /**
  * Set the label to draw (or not draw) background specified in its style's body
@@ -171,48 +173,42 @@ static inline void lv_label_set_style(lv_obj_t *label, lv_style_t *style)
  * @param label pointer to a label object
  * @return the text of the label
  */
-char * lv_label_get_text(lv_obj_t * label);
+char * lv_label_get_text(const lv_obj_t * label);
 
 /**
  * Get the long mode of a label
  * @param label pointer to a label object
  * @return the long mode
  */
-lv_label_long_mode_t lv_label_get_long_mode(lv_obj_t * label);
+lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * label);
 
 /**
  * Get the align attribute
  * @param label pointer to a label object
  * @return LV_LABEL_ALIGN_LEFT or LV_LABEL_ALIGN_CENTER
  */
-lv_label_align_t lv_label_get_align(lv_obj_t * label);
+lv_label_align_t lv_label_get_align(const lv_obj_t * label);
 
 /**
  * Get the recoloring attribute
  * @param label pointer to a label object
  * @return true: recoloring is enabled, false: disable
  */
-bool lv_label_get_recolor(lv_obj_t * label);
+bool lv_label_get_recolor(const lv_obj_t * label);
 
-/**
- * Get the no break attribute
- * @param label pointer to a label object
- * @return true: no_break_enabled (ignore '\n' line breaks); false: make line breaks on '\n'
- */
-bool lv_label_get_no_break(lv_obj_t * label);
 /**
  * Get the body draw attribute
  * @param label pointer to a label object
  * @return true: draw body; false: don't draw body
  */
-bool lv_label_get_body_draw(lv_obj_t *label);
+bool lv_label_get_body_draw(const lv_obj_t *label);
 
 /**
  * Get the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
  * @param label pointer to a label object
  * @return speed of animation in px/sec unit
  */
-uint16_t lv_label_get_anim_speed(lv_obj_t *label);
+uint16_t lv_label_get_anim_speed(const lv_obj_t *label);
 
 /**
  * Get the relative x and y coordinates of a letter
@@ -220,7 +216,7 @@ uint16_t lv_label_get_anim_speed(lv_obj_t *label);
  * @param index index of the letter [0 ... text length]. Expressed in character index, not byte index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
-void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos);
+void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t * pos);
 
 /**
  * Get the index of letter on a relative point of a label
@@ -229,14 +225,14 @@ void lv_label_get_letter_pos(lv_obj_t * label, uint16_t index, lv_point_t * pos)
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  * Expressed in character index and not byte index (different in UTF-8)
  */
-uint16_t lv_label_get_letter_on(lv_obj_t * label, lv_point_t * pos);
+uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
 
 /**
  * Get the style of an label object
  * @param label pointer to an label object
  * @return pointer to the label's style
  */
-static inline lv_style_t* lv_label_get_style(lv_obj_t *label)
+static inline lv_style_t* lv_label_get_style(const lv_obj_t *label)
 {
     return lv_obj_get_style(label);
 }

@@ -1,6 +1,6 @@
 /**
  * @file lv_draw_vbasic.h
- * 
+ *
  */
 
 #ifndef LV_DRAW_VBASIC_H
@@ -13,7 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
 
 #if LV_VDB_SIZE != 0
 
@@ -42,7 +46,7 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
  * @param opa opacity of the area (0..255)
  */
 void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
-                lv_color_t color, lv_opa_t opa);
+              lv_color_t color, lv_opa_t opa);
 
 /**
  * Draw a letter in the Virtual Display Buffer
@@ -69,8 +73,8 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
  * @param recolor_opa the intense of recoloring
  */
 void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
-        const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-        lv_color_t recolor, lv_opa_t recolor_opa);
+             const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
+             lv_color_t recolor, lv_opa_t recolor_opa);
 
 
 /**

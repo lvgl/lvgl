@@ -1,6 +1,6 @@
 /**
  * @file lv_mbox.h
- * 
+ *
  */
 
 #ifndef LV_MBOX_H
@@ -13,7 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lv_conf.h"
+#else
 #include "../../lv_conf.h"
+#endif
+
 #if USE_LV_MBOX != 0
 
 /*Testing of dependencies*/
@@ -51,9 +56,9 @@ typedef struct
     lv_obj_t *text;             /*Text of the message box*/
     lv_obj_t *btnm;            /*Button matrix for the buttons*/
     uint16_t anim_time;         /*Duration of close animation [ms] (0: no animation)*/
-}lv_mbox_ext_t;
+} lv_mbox_ext_t;
 
-typedef enum {
+enum {
     LV_MBOX_STYLE_BG,
     LV_MBOX_STYLE_BTN_BG,
     LV_MBOX_STYLE_BTN_REL,
@@ -61,7 +66,8 @@ typedef enum {
     LV_MBOX_STYLE_BTN_TGL_REL,
     LV_MBOX_STYLE_BTN_TGL_PR,
     LV_MBOX_STYLE_BTN_INA,
-}lv_mbox_style_t;
+};
+typedef uint8_t lv_mbox_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -73,7 +79,7 @@ typedef enum {
  * @param copy pointer to a message box object, if not NULL then the new object will be copied from it
  * @return pointer to the created message box
  */
-lv_obj_t * lv_mbox_create(lv_obj_t * par, lv_obj_t * copy);
+lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*======================
  * Add/remove functions
@@ -102,7 +108,7 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
 /**
  * Stop the action to call when button is released
  * @param mbox pointer to a message box object
- * @param pointer to an 'lv_btnm_action_t' action
+ * @param pointer to an 'lv_btnm_action_t' action. In the action you need to use `lv_mbox_get_from_btn()` to get the `mbox`.
  */
 void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action);
 
@@ -143,7 +149,7 @@ void lv_mbox_set_style(lv_obj_t *mbox, lv_mbox_style_t type, lv_style_t *style);
  * @param mbox pointer to a message box object
  * @return pointer to the text of the message box
  */
-const char * lv_mbox_get_text(lv_obj_t * mbox);
+const char * lv_mbox_get_text(const lv_obj_t * mbox);
 
 /**
  * Get the message box object from one of its button.
@@ -151,14 +157,14 @@ const char * lv_mbox_get_text(lv_obj_t * mbox);
  * @param btn pointer to a button of a message box
  * @return pointer to the button's message box
  */
-lv_obj_t * lv_mbox_get_from_btn(lv_obj_t * btn);
+lv_obj_t * lv_mbox_get_from_btn(const lv_obj_t * btn);
 
 /**
  * Get the animation duration (close animation time)
  * @param mbox pointer to a message box object
  * @return animation length in  milliseconds (0: no animation)
  */
-uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox);
+uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox);
 
 
 /**
@@ -167,7 +173,7 @@ uint16_t lv_mbox_get_anim_time(lv_obj_t * mbox);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_mbox_get_style(lv_obj_t *mbox, lv_mbox_style_t type);
+lv_style_t * lv_mbox_get_style(const lv_obj_t *mbox, lv_mbox_style_t type);
 
 /**********************
  *      MACROS
