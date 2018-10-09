@@ -23,6 +23,7 @@ extern "C" {
 #include "lv_core/lv_obj.h"
 #include "lv_core/lv_group.h"
 #include "lv_core/lv_vdb.h"
+#include "lv_core/lv_refr.h"
 
 #include "lv_themes/lv_theme.h"
 
@@ -62,7 +63,7 @@ extern "C" {
 #define LVGL_VERSION_MAJOR   5
 #define LVGL_VERSION_MINOR   2
 #define LVGL_VERSION_PATCH   0
-#define LVGL_VERSION_INFO    ""
+#define LVGL_VERSION_INFO    "rc"
 
 /**********************
  *      TYPEDEFS
