@@ -233,6 +233,8 @@ void lv_btn_set_ink_in_time(lv_obj_t * btn, uint16_t time)
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     ext->ink_in_time = time;
 #else
+    (void)btn; /*Unused*/
+    (void)time; /*Unused*/
     LV_LOG_WARN("`lv_btn_set_ink_ink_time` has no effect if LV_BTN_INK_EFEFCT or USE_LV_ANIMATION is disabled")
 #endif
 }
@@ -249,6 +251,8 @@ void lv_btn_set_ink_wait_time(lv_obj_t * btn, uint16_t time)
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     ext->ink_wait_time = time;
 #else
+    (void)btn; /*Unused*/
+    (void)time; /*Unused*/
     LV_LOG_WARN("`lv_btn_set_ink_wait_time` has no effect if LV_BTN_INK_EFEFCT or USE_LV_ANIMATION is disabled")
 #endif
 }
@@ -264,6 +268,8 @@ void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time)
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     ext->ink_out_time = time;
 #else
+    (void)btn; /*Unused*/
+    (void)time; /*Unused*/
     LV_LOG_WARN("`lv_btn_set_ink_out_time` has no effect if LV_BTN_INK_EFEFCT or USE_LV_ANIMATION is disabled")
 #endif
 }
@@ -352,6 +358,7 @@ uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn)
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_in_time;
 #else
+    (void)btn; /*Unused*/
     return 0;
 #endif
 }
@@ -368,6 +375,7 @@ uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn)
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_wait_time;
 #else
+    (void)btn; /*Unused*/
     return 0;
 #endif
 }
@@ -382,6 +390,7 @@ uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn)
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_in_time;
 #else
+    (void)btn; /*Unused*/
     return 0;
 #endif
 }

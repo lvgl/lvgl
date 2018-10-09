@@ -315,8 +315,11 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             refr_position(roller, false);
         }
     } else if(sign == LV_SIGNAL_FOCUS) {
+        bool editing = false;
+#if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(roller);
-        bool editing = lv_group_get_editing(g);
+        editing = lv_group_get_editing(g);
+#endif
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
@@ -357,10 +360,12 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         } else if(c == LV_GROUP_KEY_ENTER) {
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
             if(ext->ddlist.action) ext->ddlist.action(roller);
-
+#if USE_LV_GROUP
             lv_group_t * g = lv_obj_get_group(roller);
             bool editing = lv_group_get_editing(g);
+
             if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
+#endif
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;

@@ -411,6 +411,9 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     i->proc.last_state = data->state;
     i->proc.last_key = data->key;
+#else
+    (void)data; /*Unused*/
+    (void)i; /*Unused*/
 #endif
 }
 
@@ -504,6 +507,9 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     i->proc.last_state = data->state;
     i->proc.last_key = data->key;
+#else
+    (void)data; /*Unused*/
+    (void)i; /*Unused*/
 #endif
 }
 

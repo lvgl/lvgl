@@ -224,6 +224,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, (void (*)(lv_obj_t *))lv_obj_del);
     }
 #else
+    (void)delay; /*Unused*/
     lv_obj_del(mbox);
 #endif
 }
@@ -236,6 +237,8 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
 #if USE_LV_ANIMATION
     lv_anim_del(mbox, NULL);
+#else
+    (void)mbox; /*Unused*/
 #endif
 }
 
