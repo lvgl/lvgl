@@ -89,7 +89,9 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
     ext->anim_time = LV_LIST_FOCUS_TIME;
+#if USE_LV_GROUP
     ext->selected_btn = NULL;
+#endif
 
     lv_obj_set_signal_func(new_list, lv_list_signal);
 
@@ -640,16 +642,18 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         /*With ENCODER select the first button only in edit mode*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-
+#if USE_LV_GROUP
             lv_group_t * g = lv_obj_get_group(list);
             if(lv_group_get_editing(g)) {
                 lv_list_set_btn_selected(list, lv_list_get_next_btn(list, NULL));
             } else {
                 lv_list_set_btn_selected(list, NULL);
             }
+#endif
         }
         /*Else select the clicked button*/
         else {
+#if USE_LV_GROUP
             /*Mark the last clicked button (if any) as selected because it triggered the focus*/
             if(last_clicked_btn) {
                 lv_list_set_btn_selected(list, last_clicked_btn);
@@ -657,16 +661,21 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                 /*Get the first button and mark it as selected*/
                 lv_list_set_btn_selected(list, lv_list_get_next_btn(list, NULL));
             }
+#endif
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
+#if USE_LV_GROUP
         /*De-select the selected btn*/
         lv_list_set_btn_selected(list, NULL);
+
         last_clicked_btn = NULL;        /*button click will be set if click happens before focus*/
         ext->selected_btn = NULL;
+#endif
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable = true;
     } else if(sign == LV_SIGNAL_CONTROLL) {
+#if USE_LV_GROUP
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             /*If there is a valid selected button the make the previous selected*/
@@ -704,7 +713,9 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                 rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_CLICK);
                 if(rel_action != NULL) rel_action(btn);
             }
-        } else if(sign == LV_SIGNAL_GET_TYPE) {
+        } else
+#endif
+	if(sign == LV_SIGNAL_GET_TYPE) {
             lv_obj_type_t * buf = param;
             uint8_t i;
             for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/

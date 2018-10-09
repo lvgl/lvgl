@@ -485,6 +485,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             if(slider->ext_size < shadow_w) slider->ext_size = shadow_w;
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
+#if USE_LV_GROUP
         char c = *((char *)param);
         lv_group_t * g = lv_obj_get_group(slider);
         bool editing = lv_group_get_editing(g);
@@ -502,6 +503,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
             if(ext->action != NULL) ext->action(slider);
         }
+#endif
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable = true;
