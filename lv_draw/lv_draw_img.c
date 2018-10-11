@@ -155,7 +155,7 @@ uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf)
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
             return LV_COLOR_SIZE;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
-            return LV_IMG_PX_SIZE_ALPHA_BYTE;
+            return LV_IMG_PX_SIZE_ALPHA_BYTE << 3;
 
         case LV_IMG_CF_INDEXED_1BIT:
         case LV_IMG_CF_ALPHA_1BIT:
@@ -469,6 +469,7 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
                 decoder_header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
                 decoder_header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
             uint32_t pos = ((y * decoder_header.w + x) * px_size) >> 3;
+            pos += 4;    /*Skip the header*/
             res = lv_fs_seek(&decoder_file, pos);
             if(res != LV_FS_RES_OK) {
                 LV_LOG_WARN("Built-in image decoder seek failed");
