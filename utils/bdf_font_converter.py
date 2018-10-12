@@ -109,11 +109,9 @@ def parse_args():
     ''' Parse CLI arguments into an object and a dictionary '''
     parser = argparse.ArgumentParser()
     parser.add_argument('bdf_fn', type=str, default='imgs',
-            help='Directory containing all the PNGs')
+            help='BDF Filename')
     parser.add_argument('font_name', type=str, default='font_name',
-            help='Name of the font')
-    parser.add_argument('--starting', type=int, default=61440,
-            help='Starting utf8 value')
+            help='Name of the font to be generated')
     args = parser.parse_args()
     dargs = vars(args)
     return (args, dargs)
