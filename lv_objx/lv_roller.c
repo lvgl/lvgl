@@ -503,8 +503,10 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
 #if USE_LV_ANIMATION == 0
     anim_en = false;
 #endif
-    lv_obj_t * roller_scrl = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    if(ext->ddlist.label == NULL) return;	/*Probably the roller is being deleted if the label is NULL.*/
+
+    lv_obj_t * roller_scrl = lv_page_get_scrl(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const lv_font_t * font = style_label->text.font;
     lv_coord_t font_h = lv_font_get_height(font);

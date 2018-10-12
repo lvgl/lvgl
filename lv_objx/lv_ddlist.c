@@ -708,6 +708,9 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     anim_en = false;
 #endif
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    if(ext->label == NULL) return;	/*Probably the ddlist is being deleted if the label is NULL.*/
+
     lv_style_t * style = lv_obj_get_style(ddlist);
     lv_coord_t new_height;
     if(ext->opened) { /*Open the list*/
@@ -756,6 +759,9 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    if(ext->label == NULL) return;	/*Probably the ddlist is being deleted if the label is NULL.*/
+
     lv_style_t * style = lv_obj_get_style(ddlist);
     const lv_font_t * font = style->text.font;
     lv_coord_t font_h = lv_font_get_height(font);
