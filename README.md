@@ -1,3 +1,5 @@
+Fork to make it a compatible esp-idf esp32 component.
+
 # Littlev Graphics Library
 
 ![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
