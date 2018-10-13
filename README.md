@@ -48,6 +48,21 @@ You can test the graphics library in a PC simulator, if you don't have an embedd
 
 There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/pc_simulator
 
+## Utilities
+Programs and scripts that assist the development of LittlevGL projects.
+
+### BDF Font Converter
+`utils/bdf_font_converter.py` converts [BDF](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) files into a LittlevGL compatible c file. This converter is useful for generating pixel-perfect fonts, especially for monochrome displays.
+
+Help can be printed out by:
+```
+python bdf_font_converter.py --help
+```
+
+Typical use case (generates `crox3hb.c`):
+```
+python bdf_font_converter.py win_crox3hb.bdf crox3hb
+```
 ## Related repositories
 * PC simulator: https://github.com/littlevgl/pc_simulator
 * Projects: https://github.com/littlevgl/lv_projects
