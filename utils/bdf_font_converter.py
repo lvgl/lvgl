@@ -37,7 +37,6 @@ class Glyph:
                 (self.encoding, self.name, self.dwidth[0]) )
         for line in self.bitmap:
             pixel_art = ' //'
-            n_bytes = len(line) / 2
             for i in range(0, len(line), 2):
                 # Parse Pixel Art
                 bits = bin( int(line[i:i+2], 16) )[2:].zfill(8)
@@ -122,6 +121,8 @@ def parse_args():
             help='BDF Filename')
     parser.add_argument('font_name', type=str, default='font_name',
             help='Name of the font to be generated')
+    parser.add_argument('--toggle', '-t', action='store_true',
+            help='''Wrap entire file in "#if USE" macro''')
     args = parser.parse_args()
     dargs = vars(args)
     return (args, dargs)
@@ -139,6 +140,11 @@ def main():
     out.write('''
 #include "../lv_misc/lv_font.h"
 ''')
+
+    if args.toggle:
+        out.write('''
+#if USE_%s != 0  /*Can be enabled in lv_conf.h*/
+''' % args.font_name.upper())
 
     #################
     # WRITE BITMAPS #
@@ -196,6 +202,7 @@ lv_font_t %s =
     .monospace = 0,				/*Fix width (0: if not used)*/
     .next_page = NULL,		/*Pointer to a font extension*/
 };
+
 ''' % (args.font_name,
     glyphs[0].get_encoding(),
     glyphs[-1].get_encoding(),
@@ -205,6 +212,8 @@ lv_font_t %s =
     len(glyphs),
     ) )
 
+    if args.toggle:
+        out.write("#endif")
     out.close()
 
 if __name__=='__main__':
