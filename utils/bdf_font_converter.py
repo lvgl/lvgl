@@ -10,6 +10,8 @@ import math
 
 
 class Glyph:
+    pixel_art_0 = '.'
+    pixel_art_1 = '%'
     def __init__(self, props ):
         for k, v in props.items():
             setattr(self, k, v)
@@ -34,10 +36,19 @@ class Glyph:
         f.write('''/*Unicode: U+%04x ( %s ) , Width: %d */\n''' %
                 (self.encoding, self.name, self.dwidth[0]) )
         for line in self.bitmap:
+            pixel_art = '   //'
             for i in range(0, len(line), 2):
+                # Parse Pixel Art
+                bits = bin( int(line[i:i+2], 16) )[2:].zfill(8)
+                bits = bits.replace('0', self.pixel_art_0)
+                bits = bits.replace('1', self.pixel_art_1)
+                pixel_art += bits
+
+                # Parse Hex
                 f.write("0x%s," % line[i:i+2])
-                if(i > 0):
+                if i > 0:
                     f.write(" ")
+            f.write(pixel_art)
             f.write("\n")
         f.write("\n\n")
 
