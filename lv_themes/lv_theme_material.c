@@ -718,7 +718,7 @@ static void win_init(void)
     lv_style_copy(&header, &def);
     header.body.main_color = LV_COLOR_HEX3(0xccc);
     header.body.grad_color = header.body.main_color;
-    header.body.radius = DEF_RADIUS;
+    header.body.radius = 0;
     header.body.border.width = 1;
     header.body.border.color = LV_COLOR_HEX3(0xbbb);
     header.body.border.part = LV_BORDER_BOTTOM;

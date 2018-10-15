@@ -189,6 +189,30 @@ bool lv_cont_get_ver_fit(const lv_obj_t * cont)
     return ext->ver_fit == 0 ? false : true;
 }
 
+/**
+ * Get that width reduced by the horizontal padding. Useful if a layout is used.
+ * @param cont pointer to a container object
+ * @return the width which still fits into the container
+ */
+lv_coord_t lv_cont_get_fit_width(lv_obj_t * cont)
+{
+    lv_style_t * style = lv_cont_get_style(cont);
+
+    return lv_obj_get_width(cont) - 2 * style->body.padding.hor;
+}
+
+/**
+ * Get that height reduced by the vertical padding. Useful if a layout is used.
+ * @param cont pointer to a container object
+ * @return the height which still fits into the container
+ */
+lv_coord_t lv_cont_get_fit_height(lv_obj_t * cont)
+{
+    lv_style_t * style = lv_cont_get_style(cont);
+
+    return lv_obj_get_width(cont) - 2 * style->body.padding.hor;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

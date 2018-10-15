@@ -307,6 +307,32 @@ bool lv_page_get_arrow_scroll(const lv_obj_t * page)
 }
 
 /**
+ * Get that width which can be set to the children to still not cause overflow (show scrollbars)
+ * @param page pointer to a page object
+ * @return the width which still fits into the page
+ */
+lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
+{
+    lv_style_t * bg_style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+
+    return lv_obj_get_width(page) - 2 * (bg_style->body.padding.hor + scrl_style->body.padding.hor);
+}
+
+/**
+ * Get that height which can be set to the children to still not cause overflow (show scrollbars)
+ * @param page pointer to a page object
+ * @return the height which still fits into the page
+ */
+lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
+{
+    lv_style_t * bg_style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+
+    return lv_obj_get_height(page) - 2 * (bg_style->body.padding.ver + scrl_style->body.padding.ver);
+}
+
+/**
  * Get a style of a page
  * @param page pointer to page object
  * @param type which style should be get
