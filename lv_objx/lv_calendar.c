@@ -102,6 +102,10 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->highlighted_dates_num = 0;
     ext->day_names = NULL;
     ext->month_names = NULL;
+    ext->actions[LV_CALENDAR_ACTION_PR] = NULL;
+    ext->actions[LV_CALENDAR_ACTION_CLICK] = NULL;
+    ext->actions[LV_CALENDAR_ACTION_LONG_PR] = NULL;
+    ext->actions[LV_CALENDAR_ACTION_LONG_PR_REPEAT] = NULL;
     ext->style_header = &lv_style_plain_color;
     ext->style_header_pr = &lv_style_pretty_color;
     ext->style_highlighted_days = &lv_style_plain_color;
@@ -156,6 +160,9 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->highlighted_dates  = copy_ext->highlighted_dates;
         ext->highlighted_dates_num = copy_ext->highlighted_dates_num;
         ext->day_names = copy_ext->day_names;
+        
+        memcpy(ext->actions, copy_ext->actions, sizeof(ext->actions));
+        
         ext->month_names = copy_ext->month_names;
         ext->style_header = copy_ext->style_header;
         ext->style_header_pr = copy_ext->style_header_pr;
