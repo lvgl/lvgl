@@ -138,6 +138,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
             lv_ll_rem(&g->obj_ll, i);
             lv_mem_free(i);
             obj->group_p = NULL;
+            break;
         }
     }
 }
