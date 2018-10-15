@@ -586,14 +586,14 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             if(ext->opened) {
-                ext->sel_opt_id_ori = ext->sel_opt_id;
-                ext->opened = 0;
-                if(ext->action) ext->action(ddlist);
 #if USE_LV_GROUP
                 lv_group_t * g = lv_obj_get_group(ddlist);
                 bool editing = lv_group_get_editing(g);
                 if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
 #endif
+                ext->sel_opt_id_ori = ext->sel_opt_id;
+                ext->opened = 0;
+                if(ext->action) res = ext->action(ddlist);
             } else {
                 ext->opened = 1;
             }

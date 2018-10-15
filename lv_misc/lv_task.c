@@ -31,6 +31,7 @@ static bool lv_task_exec(lv_task_t * lv_task_p);
 static lv_ll_t lv_task_ll;  /*Linked list to store the lv_tasks*/
 static bool lv_task_run = false;
 static uint8_t idle_last = 0;
+static bool task_deleted;
 
 /**********************
  *      MACROS
@@ -197,6 +198,8 @@ void lv_task_del(lv_task_t * lv_task_p)
     lv_ll_rem(&lv_task_ll, lv_task_p);
 
     lv_mem_free(lv_task_p);
+
+    task_deleted = true;
 }
 
 /**
@@ -298,11 +301,13 @@ static bool lv_task_exec(lv_task_t * lv_task_p)
     uint32_t elp = lv_tick_elaps(lv_task_p->last_run);
     if(elp >= lv_task_p->period) {
         lv_task_p->last_run = lv_tick_get();
+        task_deleted  = false;
         lv_task_p->task(lv_task_p->param);
 
         /*Delete if it was a one shot lv_task*/
-        if(lv_task_p->once != 0) lv_task_del(lv_task_p);
-
+        if(task_deleted == false) {			/*The task might be deleted by itself as well*/
+        	if(lv_task_p->once != 0) lv_task_del(lv_task_p);
+        }
         exec = true;
     }
 
