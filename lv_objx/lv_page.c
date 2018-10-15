@@ -650,12 +650,12 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_PRESSED) {
         if(ext->pr_action != NULL) {
-            ext->pr_action(page);
+            res = ext->pr_action(page);
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             if(ext->rel_action != NULL) {
-                ext->rel_action(page);
+                res = ext->rel_action(page);
             }
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
@@ -794,12 +794,12 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
     } else if(sign == LV_SIGNAL_PRESSED) {
         if(page_ext->pr_action != NULL) {
-            page_ext->pr_action(page);
+            res = page_ext->pr_action(page);
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             if(page_ext->rel_action != NULL) {
-                page_ext->rel_action(page);
+                res = page_ext->rel_action(page);
             }
         }
     }

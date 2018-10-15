@@ -690,6 +690,9 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         else {
             proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
         }
+
+        if(proc->reset_query != 0) return;
+
         /*Handle click focus*/
 #if USE_LV_GROUP
         /*Edit mode is not used by POINTER devices. So leave edit mode if we are in it*/
