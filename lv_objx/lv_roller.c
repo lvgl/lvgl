@@ -358,15 +358,16 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id - 1, true);
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
-#if USE_LV_GROUP
-			lv_group_t * g = lv_obj_get_group(roller);
-			bool editing = lv_group_get_editing(g);
-
-			if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
-
-#endif
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
             if(ext->ddlist.action) res = ext->ddlist.action(roller);
+#if USE_LV_GROUP
+            if(res == LV_RES_OK) {
+                lv_group_t * g = lv_obj_get_group(roller);
+                bool editing = lv_group_get_editing(g);
+
+                if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
+            }
+#endif
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
