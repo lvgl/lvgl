@@ -25,7 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
-static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt);
+static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -104,7 +104,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_kb, LV_HOR_RES, LV_VER_RES / 2);
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
-        lv_btnm_set_action(new_kb, lv_app_kb_action);
+        lv_btnm_set_action(new_kb, lv_kb_def_action);
         lv_btnm_set_map(new_kb, kb_map_lc);
 
         /*Set the default styles*/
@@ -390,9 +390,10 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
  * @param i the index of the released button from the current btnm map
  * @return LV_ACTION_RES_INV if the btnm is deleted else LV_ACTION_RES_OK
  */
-static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
+static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+    lv_res_t res = LV_RES_OK;
 
     /*Do the corresponding action according to the text of the button*/
     if(strcmp(txt, "abc") == 0) {
@@ -405,22 +406,24 @@ static lv_res_t lv_app_kb_action(lv_obj_t * kb, const char * txt)
         lv_btnm_set_map(kb, kb_map_spec);
         return LV_RES_OK;
     } else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
-        if(ext->hide_action) ext->hide_action(kb);
+        if(ext->hide_action) res = ext->hide_action(kb);
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area  to hide it cursor if needed*/
             lv_obj_del(kb);
         }
         return LV_RES_INV;
     } else if(strcmp(txt, SYMBOL_OK) == 0) {
-        if(ext->ok_action) ext->ok_action(kb);
+        if(ext->ok_action) res = ext->ok_action(kb);
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area to hide it cursor if needed*/
-            lv_obj_del(kb);
+            res = lv_obj_del(kb);
         }
-        return LV_RES_INV;
     }
 
-    if(ext->ta == NULL) return LV_RES_OK;
+    if(res != LV_RES_OK) return res;	/*The keyboard might be deleted in the actions*/
+
+    /*Add the characters to the text area if set*/
+    if(ext->ta == NULL) return res;
 
     if(strcmp(txt, "Enter") == 0)lv_ta_add_char(ext->ta, '\n');
     else if(strcmp(txt, SYMBOL_LEFT) == 0) lv_ta_cursor_left(ext->ta);

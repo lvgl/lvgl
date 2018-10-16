@@ -767,8 +767,14 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
         last_clicked_btn = btn;
 
     }
-#endif
+    if(sign == LV_SIGNAL_CLEANUP) {
 
+        lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_obj_t * sel = lv_list_get_btn_selected(list);
+        if(sel == btn) lv_list_set_btn_selected(list, lv_list_get_next_btn(list, btn));
+    }
+
+#endif
 
     return res;
 }
