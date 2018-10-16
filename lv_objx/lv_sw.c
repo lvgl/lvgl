@@ -243,9 +243,10 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(lv_sw_get_state(sw)) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
         else lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
 
-        if(slider_action != NULL) slider_action(sw);
-
         ext->changed = 0;
+
+        if(slider_action != NULL) res = slider_action(sw);
+
     } else if(sign == LV_SIGNAL_CONTROLL) {
 
         char c = *((char *)param);
@@ -253,13 +254,13 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             if(old_val) lv_sw_off(sw);
             else lv_sw_on(sw);
 
-            if(slider_action) slider_action(sw);
+            if(slider_action) res = slider_action(sw);
         } else if(c == LV_GROUP_KEY_UP || c == LV_GROUP_KEY_RIGHT) {
             lv_sw_on(sw);
-            if(slider_action) slider_action(sw);
+            if(slider_action) res = slider_action(sw);
         } else if(c == LV_GROUP_KEY_DOWN || c == LV_GROUP_KEY_LEFT) {
             lv_sw_off(sw);
-            if(slider_action) slider_action(sw);
+            if(slider_action) res = slider_action(sw);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
@@ -274,7 +275,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     }
 
     /*Restore the callback*/
-    ext->slider.action = slider_action;
+    if(res == LV_RES_OK) ext->slider.action = slider_action;
 
     return res;
 }
