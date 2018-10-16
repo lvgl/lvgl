@@ -138,6 +138,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
             lv_ll_rem(&g->obj_ll, i);
             lv_mem_free(i);
             obj->group_p = NULL;
+            break;
         }
     }
 }
@@ -152,6 +153,9 @@ void lv_group_focus_obj(lv_obj_t * obj)
     if(g == NULL) return;
 
     if(g->frozen != 0) return;
+
+    /*On defocus edit mode must be leaved*/
+    lv_group_set_editing(g, false);
 
     lv_obj_t ** i;
     LL_READ(g->obj_ll, i) {
@@ -294,8 +298,15 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
  */
 void lv_group_set_editing(lv_group_t * group, bool edit)
 {
-    group->editing = edit ? 1 : 0;
+    uint8_t en_val = edit ? 1 : 0;
+
+    if(en_val == group->editing) return;        /*Do not set the same mode again*/
+
+    group->editing = en_val;
     lv_obj_t * focused = lv_group_get_focused(group);
+
+    if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
+
     lv_obj_invalidate(focused);
 }
 
