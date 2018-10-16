@@ -97,11 +97,11 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->showed_date.year = 2018;
     ext->showed_date.month = 1;
     ext->showed_date.day = 1;
-    
+
     ext->pressed_date.year = 0;
     ext->pressed_date.month = 0;
     ext->pressed_date.day = 0;
- 
+
     ext->highlighted_dates  = NULL;
     ext->highlighted_dates_num = 0;
     ext->day_names = NULL;
@@ -164,9 +164,9 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->highlighted_dates  = copy_ext->highlighted_dates;
         ext->highlighted_dates_num = copy_ext->highlighted_dates_num;
         ext->day_names = copy_ext->day_names;
-        
+
         memcpy(ext->actions, copy_ext->actions, sizeof(ext->actions));
-        
+
         ext->month_names = copy_ext->month_names;
         ext->style_header = copy_ext->style_header;
         ext->style_header_pr = copy_ext->style_header_pr;
@@ -359,6 +359,17 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->showed_date;
+}
+
+/**
+ * Get the the pressed date.
+ * @param calendar pointer to a calendar object
+ * @return pointer to an `lv_calendar_date_t` variable containing the pressed date.
+ */
+lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar)
+{
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    return &ext->pressed_date;
 }
 
 /**
@@ -669,7 +680,7 @@ static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touche
             ext->pressed_date.year = ext->showed_date.year + (ext->showed_date.month == 12 ? 1 : 0);
             ext->pressed_date.month = ext->showed_date.month == 12 ? 1 : (ext->showed_date.month + 1);
             ext->pressed_date.day = i_pos + 1 - get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1)
-                                                                                                                                                                                                                                                                                   - get_month_length(ext->showed_date.year, ext->showed_date.month);
+                                                                                                                                                                                                                                                                                           - get_month_length(ext->showed_date.year, ext->showed_date.month);
         }
         return true;
     }else {
