@@ -37,6 +37,16 @@ typedef struct {
     int8_t day;
 } lv_calendar_date_t;
 
+enum
+{
+    LV_CALENDAR_ACTION_CLICK,
+    LV_CALENDAR_ACTION_PR,
+    LV_CALENDAR_ACTION_LONG_PR,
+    LV_CALENDAR_ACTION_LONG_PR_REPEAT,
+    LV_CALENDAR_ACTION_NUM,
+};
+typedef uint8_t lv_calendar_action_t;
+
 /*Data of calendar*/
 typedef struct {
     /*None*/ /*Ext. of ancestor*/
@@ -46,8 +56,10 @@ typedef struct {
     lv_calendar_date_t * highlighted_dates;  /*Apply different style on these days (pointer to an array defined by the user)*/
     uint8_t highlighted_dates_num;           /*Number of elements in `highlighted_days`*/
     int8_t btn_pressing;                    /*-1: prev month pressing, +1 next month pressing on the header*/
+    lv_calendar_date_t pressed_date;
     const char ** day_names;            /*Pointer to an array with the name of the days (NULL: use default names)*/
     const char ** month_names;          /*Pointer to an array with the name of the month (NULL. use default names)*/
+    lv_action_t actions[LV_CALENDAR_ACTION_NUM];
 
     /*Styles*/
     lv_style_t * style_header;
@@ -71,6 +83,7 @@ enum {
     LV_CALENDAR_STYLE_TODAY_BOX,
 };
 typedef uint8_t lv_calendar_style_t;
+
 
 
 
