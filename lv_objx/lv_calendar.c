@@ -99,8 +99,8 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->showed_date.day = 1;
     
     ext->pressed_date.year = 0;
-    ext->pressed_date.month = 0
-    ext->pressed_date.day = 0
+    ext->pressed_date.month = 0;
+    ext->pressed_date.day = 0;
  
     ext->highlighted_dates  = NULL;
     ext->highlighted_dates_num = 0;

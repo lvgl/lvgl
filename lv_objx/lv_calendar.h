@@ -109,6 +109,13 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
+ * Set a function to call when a calendar event happens
+ * @param calendar pointer to a calendar object
+ * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
+ */
+void lv_calendar_set_action(lv_obj_t * calendar, lv_calendar_action_t type, lv_action_t action);
+
+/**
  * Set the today's date
  * @param calendar pointer to a calendar object
  * @param today pointer to an `lv_calendar_date_t` variable containing the date of today. The value will be saved it can be local variable too.
@@ -129,7 +136,6 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  * @param date_num number of dates in the array
  */
 void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num);
-
 
 /**
  * Set the name of the days
@@ -158,6 +164,13 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the action of a calendar
+ * @param calendar pointer to a calendar object
+ * @return pointer to the action function
+ */
+lv_action_t lv_calendar_get_action(const lv_obj_t * calendar, lv_calendar_action_t type);
 
 /**
  * Get the today's date
