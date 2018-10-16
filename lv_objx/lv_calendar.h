@@ -107,7 +107,6 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy);
 /*=====================
  * Setter functions
  *====================*/
-
 /**
  * Set a function to call when a calendar event happens
  * @param calendar pointer to a calendar object
@@ -137,6 +136,7 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  */
 void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num);
 
+
 /**
  * Set the name of the days
  * @param calendar pointer to a calendar object
@@ -164,7 +164,6 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
 /*=====================
  * Getter functions
  *====================*/
-
 /**
  * Get the action of a calendar
  * @param calendar pointer to a calendar object
@@ -185,6 +184,13 @@ lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar);
  * @return pointer to an `lv_calendar_date_t` variable containing the date is being shown.
  */
 lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
+
+/**
+ * Get the the pressed date.
+ * @param calendar pointer to a calendar object
+ * @return pointer to an `lv_calendar_date_t` variable containing the pressed date.
+ */
+lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar);
 
 /**
  * Get the the highlighted dates
