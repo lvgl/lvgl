@@ -276,6 +276,8 @@ void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, lv_style_t * style
             break;
     }
 
+    mbox_realign(mbox);
+
 }
 
 

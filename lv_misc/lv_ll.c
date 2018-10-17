@@ -321,7 +321,10 @@ void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
     if(n_act == n_after) return;    /*Can't move before itself*/
 
 
-    void * n_before = lv_ll_get_prev(ll_p, n_after);
+    void * n_before;
+    if(n_after != NULL) n_before = lv_ll_get_prev(ll_p, n_after);
+    else n_before = lv_ll_get_tail(ll_p);        /*if `n_after` is NULL `n_act` should be the new tail*/
+
     if(n_act == n_before) return;   /*Already before `n_after`*/
 
     /*It's much easier to remove from the list and add again*/
