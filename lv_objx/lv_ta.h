@@ -68,7 +68,7 @@ typedef struct
         lv_style_t *style;      /*Style of the cursor (NULL to use label's style)*/
         lv_coord_t valid_x;         /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
         uint16_t pos;           /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
-        lv_cursor_type_t type:2;  /*Shape of the cursor*/
+        lv_cursor_type_t type:3;  /*Shape of the cursor*/
         uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/
     } cursor;
 } lv_ta_ext_t;
