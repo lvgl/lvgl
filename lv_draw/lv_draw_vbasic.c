@@ -483,7 +483,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
                     px_color.full = px_color_p[0];
 #elif LV_COLOR_DEPTH == 16
                     /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
