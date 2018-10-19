@@ -32,6 +32,7 @@ extern "C" {
 #define LV_GROUP_KEY_LEFT           20      /*0x14*/
 #define LV_GROUP_KEY_ESC            27      /*0x1B*/
 #define LV_GROUP_KEY_DEL            28      /*0x1C*/
+#define LV_GROUP_KEY_BACKSPACE      29      /*0x1D*/
 #define LV_GROUP_KEY_ENTER          10      /*0x0A, '\n'*/
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/

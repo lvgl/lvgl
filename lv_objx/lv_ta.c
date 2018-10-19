@@ -1087,7 +1087,12 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         else if(c == LV_GROUP_KEY_LEFT) lv_ta_cursor_left(ta);
         else if(c == LV_GROUP_KEY_UP)   lv_ta_cursor_up(ta);
         else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
-        else if(c == LV_GROUP_KEY_DEL)  lv_ta_del_char(ta);
+        else if(c == LV_GROUP_KEY_BACKSPACE) lv_ta_del_char(ta);
+        else if(c == LV_GROUP_KEY_DEL)  {
+            uint16_t cp = lv_ta_get_cursor_pos(ta);
+            lv_ta_set_cursor_pos(ta, cp + 1);
+            if(cp != lv_ta_get_cursor_pos(ta)) lv_ta_del_char(ta);
+        }
         else {
             lv_ta_add_char(ta, c);
         }
