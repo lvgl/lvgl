@@ -408,7 +408,7 @@ lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
     if(btn == NULL) return NULL;
 
     while(btn->signal_func != lv_list_btn_signal) {
-        btn = lv_obj_get_child(scrl, prev_btn);
+        btn = lv_obj_get_child(scrl, btn);
         if(btn == NULL) break;
     }
 
@@ -434,7 +434,7 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
     if(btn == NULL) return NULL;
 
     while(btn->signal_func != lv_list_btn_signal) {
-        btn = lv_obj_get_child_back(scrl, prev_btn);
+        btn = lv_obj_get_child_back(scrl, btn);
         if(btn == NULL) break;
     }
 
