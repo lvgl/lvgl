@@ -883,7 +883,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
 				lv_draw_label(&a, mask, style, opa_scale, txt, LV_TXT_FLAG_CENTER, NULL);
             }
         }
-        if (shouldPutUnitsInLabel(ext))
+        if (lv_chart_should_put_units_in_label(ext))
         	sprintf(txt, "%lu", ext->x_axis.end_value);
         else
         	sprintf(txt, "%lu%s", ext->x_axis.end_value, ext->x_axis.units == NULL ? "" : ext->x_axis.units);
@@ -907,7 +907,7 @@ static void lv_chart_draw_x_axis_label(lv_obj_t * chart, const lv_area_t * mask)
 		label_area.y2 = label_area.y1 + 100; /*Text Y end coordinate. Just make it big enough for simplicity*/
         char txt[strlens(ext->x_axis.label) + strlens(ext->y_axis.units) + 6];
 
-		if (shouldPutUnitsInLabel(ext))
+		if (lv_chart_should_put_units_in_label(ext))
 			sprintf(txt, "%s (%s)", ext->x_axis.label, ext->x_axis.units == NULL ? "" : ext->x_axis.units);
 		else
 			sprintf(txt, "%s", ext->x_axis.label);
