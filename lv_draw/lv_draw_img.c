@@ -720,7 +720,7 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
 
     uint8_t byte_act = 0;
     uint8_t val_act;
-    lv_coord_t i;
+    uint32_t i;
     lv_color_t * cbuf = (lv_color_t *) buf;
     for(i = 0; i < len; i ++) {
         val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;

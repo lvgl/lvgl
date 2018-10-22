@@ -11,6 +11,8 @@
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
+#include "../lv_misc/lv_math.h"
+#include <stdio.h>
 
 /*********************
  *      DEFINES
@@ -20,6 +22,7 @@
 #define LV_CHART_HDIV_DEF   3
 #define LV_CHART_VDIV_DEF   5
 #define LV_CHART_PNUM_DEF   10
+#define LV_CHART_AXIS_MARGIN 20
 
 /**********************
  *      TYPEDEFS
@@ -34,6 +37,7 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask);
+static void lv_chart_draw_axes(lv_obj_t * chart, const lv_area_t * mask);
 
 /**********************
  *  STATIC VARIABLES
@@ -44,6 +48,7 @@ static lv_signal_func_t ancestor_signal;
 /**********************
  *      MACROS
  **********************/
+#define strlens(s) (s==NULL?0:strlen(s))
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -82,6 +87,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->series.opa = LV_OPA_COVER;
     ext->series.dark = LV_OPA_50;
     ext->series.width = 2;
+    memset(&ext->x_axis, 0, sizeof(ext->x_axis));
+    memset(&ext->y_axis, 0, sizeof(ext->y_axis));
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_chart);
@@ -110,6 +117,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->vdiv_cnt = ext_copy->vdiv_cnt;
         ext->point_cnt = ext_copy->point_cnt;
         ext->series.opa =  ext_copy->series.opa;
+        ext->x_axis = ext_copy->x_axis;
+        ext->y_axis = ext_copy->y_axis;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_chart);
@@ -340,6 +349,49 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
 
 }
 
+/**
+ * Set the x-axis label of a chart
+ * @param chart pointer to a chart object
+ * @param text  pointer to the label text (not copied)
+ */
+void lv_chart_set_x_label(lv_obj_t* chart, const char* text)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    ext->x_axis.label = text;
+    lv_obj_refresh_ext_size(chart);
+}
+
+/**
+ * Set the x/y-axis ticks of a chart
+ * @param chart pointer to a chart object
+ * @param num_tick_marks  	number of tick marks to show on the axis.
+ * @param start_value  		start value of axis in units.
+ * @param end_value  		end value of axis in units.
+ * @param show_tick_labels  show tick label text above ticks?
+ * @param units  			units label for the axis
+ */
+void lv_chart_set_x_ticks(lv_obj_t* chart, uint8_t num_tick_marks, uint32_t start_value,
+		uint32_t end_value, bool show_labels, const char* units)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    ext->x_axis.num_tick_marks = num_tick_marks;
+    ext->x_axis.start_value = start_value;
+    ext->x_axis.end_value = end_value;
+    ext->x_axis.show_tick_labels = show_labels;
+    ext->x_axis.units = units;
+}
+
+void lv_chart_set_y_ticks(lv_obj_t* chart, uint8_t num_tick_marks, uint32_t start_value,
+		uint32_t end_value, bool show_labels, const char* units)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    ext->y_axis.num_tick_marks = num_tick_marks;
+    ext->y_axis.start_value = start_value;
+    ext->y_axis.end_value = end_value;
+    ext->y_axis.show_tick_labels = show_labels;
+    ext->y_axis.units = units;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -399,6 +451,47 @@ lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart)
     return ext->series.dark;
 }
 
+/**
+ * Get the x/y-axis range values
+ * @param chart pointer to a chart object
+ * @param start_value  returns the start value of the axis
+ * @param end_value  returns the end value of the axis
+ */
+void lv_chart_get_x_range(lv_obj_t* chart, uint32_t* start_value, uint32_t* end_value)
+{
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if (start_value != NULL)
+		*start_value = ext->x_axis.start_value;
+	if (end_value != NULL)
+		*end_value = ext->x_axis.end_value;
+}
+
+void lv_chart_get_y_range(lv_obj_t* chart, uint32_t* start_value, uint32_t* end_value)
+{
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if (start_value != NULL)
+		*start_value = ext->y_axis.start_value;
+	if (end_value != NULL)
+		*end_value = ext->y_axis.end_value;
+}
+
+/**
+ * Tells whether the x/y-axis ticks are visible
+ * @param chart pointer to a chart object
+ * return true if ticks are visible
+ */
+bool lv_chart_is_x_ticks_visible(lv_obj_t* chart)
+{
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	return ext->x_axis.num_tick_marks > 0;
+}
+
+bool lv_chart_is_y_ticks_visible(lv_obj_t* chart)
+{
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	return ext->y_axis.num_tick_marks > 0;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -442,6 +535,7 @@ static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_
         if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, mask);
         if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, mask);
         if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, mask);
+        lv_chart_draw_axes(chart, mask);
     }
     return true;
 }
@@ -474,6 +568,10 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_chart";
+    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+        if(ext->x_axis.label != NULL && chart->ext_size < LV_CHART_AXIS_MARGIN)
+        	chart->ext_size = LV_CHART_AXIS_MARGIN;  /*Provide extra px draw area around the chart for axis names*/
     }
 
     return res;
@@ -698,4 +796,132 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
         }
     }
 }
+
+static bool lv_chart_should_put_units_in_label(lv_chart_ext_t * ext)
+{
+	if (ext->x_axis.label != NULL && ext->x_axis.units != NULL)
+		return true;
+	return false;
+}
+
+static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+
+    if(ext->y_axis.num_tick_marks != 0) {
+        const lv_style_t * style = lv_obj_get_style(chart);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
+
+        uint8_t div_i;
+        uint8_t div_i_end;
+        uint8_t div_i_start;
+        lv_point_t p1;
+        lv_point_t p2;
+        lv_coord_t x_ofs = chart->coords.x1;
+        lv_coord_t y_ofs = chart->coords.y1;
+        lv_coord_t h = lv_obj_get_height(chart);
+        char txt[11 + LV_MATH_MAX(strlens(ext->x_axis.units), strlens(ext->y_axis.units))];
+
+		div_i_start = 1;
+		div_i_end = ext->y_axis.num_tick_marks;
+
+        p1.x = 0 + x_ofs;
+        p2.x = p1.x + 5;
+        int div_units = (ext->y_axis.end_value - ext->y_axis.start_value) / ext->y_axis.num_tick_marks;
+        for(div_i = div_i_start; div_i <= div_i_end; div_i++) {
+        	p2.y = p1.y = y_ofs + (int32_t)((int32_t)h * div_i) / (ext->y_axis.num_tick_marks + 1);
+            lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            int line_mid_y = 10;
+            if (ext->y_axis.show_tick_labels)
+            {
+				sprintf(txt, "%d", (div_i_end-div_i+1) * div_units);
+				lv_area_t a = {p2.x + 5, p1.y - line_mid_y, p2.x + 200, p1.y + line_mid_y};
+				lv_draw_label(&a, mask, style, opa_scale, txt, LV_TXT_FLAG_NONE, NULL);
+            }
+        }
+    }
+}
+
+static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+
+    if(ext->x_axis.num_tick_marks != 0) {
+        const lv_style_t * style = lv_obj_get_style(chart);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
+
+        uint8_t div_i;
+        uint8_t div_i_end;
+        uint8_t div_i_start;
+        lv_point_t p1;
+        lv_point_t p2;
+        lv_coord_t x_ofs = chart->coords.x1;
+        lv_coord_t y_ofs = chart->coords.y1;
+        lv_coord_t w = lv_obj_get_width(chart);
+        lv_coord_t h = lv_obj_get_height(chart);
+        char txt[11 + LV_MATH_MAX(strlens(ext->x_axis.units), strlens(ext->y_axis.units))];
+
+		div_i_start = 1;
+		div_i_end = ext->x_axis.num_tick_marks;
+
+        p2.y = h + y_ofs;
+        p1.y = p2.y - 10;
+
+		sprintf(txt, "%lu", ext->x_axis.start_value);
+		lv_area_t a = {x_ofs + 2, p1.y - 20, x_ofs + 100, p1.y};
+		lv_draw_label(&a, mask, style, opa_scale, txt, LV_TXT_FLAG_NONE, NULL);
+
+        float div_units = (float)(ext->x_axis.end_value - ext->x_axis.start_value) / (ext->x_axis.num_tick_marks + 1);
+        for(div_i = div_i_start; div_i <= div_i_end; div_i ++) {
+        	p2.x = p1.x = x_ofs + (int32_t)((int32_t)w * div_i) / (ext->x_axis.num_tick_marks + 1);
+            lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            if (ext->x_axis.show_tick_labels)
+            {
+            	float labelTxt = ((float)(div_i) * div_units) + 0.5;
+				sprintf(txt, "%lu", (uint32_t)(labelTxt) + ext->x_axis.start_value);
+				lv_area_t a = {p1.x - 100, p1.y - 20, p1.x + 100, p1.y};
+				lv_draw_label(&a, mask, style, opa_scale, txt, LV_TXT_FLAG_CENTER, NULL);
+            }
+        }
+        if (shouldPutUnitsInLabel(ext))
+        	sprintf(txt, "%lu", ext->x_axis.end_value);
+        else
+        	sprintf(txt, "%lu%s", ext->x_axis.end_value, ext->x_axis.units == NULL ? "" : ext->x_axis.units);
+        lv_coord_t x_end = chart->coords.x2;
+		lv_area_t b = {x_end - 200, p1.y-20, x_end - 2, p1.y};
+		lv_draw_label(&b, mask, style, opa_scale, txt, LV_TXT_FLAG_RIGHT, NULL);
+    }
+}
+
+static void lv_chart_draw_x_axis_label(lv_obj_t * chart, const lv_area_t * mask)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+
+    if (ext->x_axis.label != NULL)
+    {
+        const lv_style_t * style = lv_obj_get_style(chart);
+		lv_area_t label_area;
+		label_area.x1 = chart->coords.x1;   /*Text X start coordinate*/
+		label_area.y1 = chart->coords.y2 + 2;   /*Text Y start coordinate*/
+		label_area.x2 = chart->coords.x2;    /*Text X end coordinate. Just make it big enough for simplicity*/
+		label_area.y2 = label_area.y1 + 100; /*Text Y end coordinate. Just make it big enough for simplicity*/
+        char txt[strlens(ext->x_axis.label) + strlens(ext->y_axis.units) + 6];
+
+		if (shouldPutUnitsInLabel(ext))
+			sprintf(txt, "%s (%s)", ext->x_axis.label, ext->x_axis.units == NULL ? "" : ext->x_axis.units);
+		else
+			sprintf(txt, "%s", ext->x_axis.label);
+
+		/*Draw a label*/
+		lv_draw_label(&label_area, mask, style, lv_obj_get_opa_scale(chart), txt, LV_TXT_FLAG_CENTER, NULL);
+    }
+}
+
+static void lv_chart_draw_axes(lv_obj_t * chart, const lv_area_t * mask)
+{
+    lv_chart_draw_y_ticks(chart, mask);
+    lv_chart_draw_x_ticks(chart, mask);
+    lv_chart_draw_x_axis_label(chart, mask);
+}
+
 #endif

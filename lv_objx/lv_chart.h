@@ -40,6 +40,17 @@ typedef struct
 /*Data of chart */
 typedef struct
 {
+	uint8_t num_tick_marks;
+	uint32_t start_value;
+	uint32_t end_value;
+	bool show_tick_labels;
+	const char* units;
+	const char* label;
+} lv_chart_axis_cfg_t;
+
+/*Data of chart */
+typedef struct
+{
     /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
     lv_ll_t series_ll;       /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
@@ -49,6 +60,8 @@ typedef struct
     uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint16_t point_cnt;   /*Point number in a data line*/
     uint8_t type    :3;   /*Line, column or point chart (from 'lv_chart_type_t')*/
+    lv_chart_axis_cfg_t y_axis;
+    lv_chart_axis_cfg_t x_axis;
     struct {
         lv_coord_t width;  /*Line width or point radius*/
         uint8_t num;   /*Number of data lines in dl_ll*/
@@ -180,6 +193,28 @@ static inline void lv_chart_set_style(lv_obj_t *chart, lv_style_t *style)
     lv_obj_set_style(chart, style);
 }
 
+/**
+ * Set the x-axis label of a chart
+ * @param chart pointer to a chart object
+ * @param text  pointer to the label text (not copied)
+ */
+void lv_chart_set_x_label(lv_obj_t* chart, const char* text);
+
+/**
+ * Set the x/y-axis ticks of a chart
+ * @param chart pointer to a chart object
+ * @param num_tick_marks  	number of tick marks to show on the axis.
+ * @param start_value  		start value of axis in units.
+ * @param end_value  		end value of axis in units.
+ * @param show_tick_labels  show tick label text above ticks?
+ * @param units  			units label for the axis
+ */
+void lv_chart_set_x_ticks(lv_obj_t* chart, uint8_t num_tick_marks, uint32_t start_value,
+		uint32_t end_value,	bool show_tick_labels, const char* units);
+void lv_chart_set_y_ticks(lv_obj_t* chart, uint8_t num_tick_marks, uint32_t start_value,
+		uint32_t end_value, bool show_tick_labels, const char* units);
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -228,6 +263,25 @@ static inline lv_style_t* lv_chart_get_style(const lv_obj_t *chart)
 {
     return lv_obj_get_style(chart);
 }
+
+/**
+ * Get the x/y-axis range values
+ * @param chart pointer to a chart object
+ * @param start_value  returns the start value of the axis
+ * @param end_value  returns the end value of the axis
+ */
+void lv_chart_get_x_range(lv_obj_t* chart, uint32_t* start_value, uint32_t* end_value);
+void lv_chart_get_y_range(lv_obj_t* chart, uint32_t* start_value, uint32_t* end_value);
+
+/**
+ * Tells whether the x/y-axis ticks are visible
+ * @param chart pointer to a chart object
+ * return true if ticks are visible
+ */
+bool lv_chart_is_x_ticks_visible(lv_obj_t* chart);
+bool lv_chart_is_y_ticks_visible(lv_obj_t* chart);
+
+
 
 /*=====================
  * Other functions
