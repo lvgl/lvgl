@@ -122,7 +122,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
     if(g->obj_focus == NULL) return;        /*Just to be sure (Not possible if there is at least one object in the group)*/
 
     if(*g->obj_focus == obj) {
-        lv_group_focus_next(g);
+        lv_group_focus_prev(g);
     }
 
     /* If the focuses object is still the same then it was the only object in the group but it will be deleted.
