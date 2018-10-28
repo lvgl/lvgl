@@ -593,15 +593,10 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
         lv_obj_t * page = lv_obj_get_parent(scrl);
         lv_style_t * style_page = lv_obj_get_style(page);
         lv_group_t * g = lv_obj_get_group(page);
-        if(style_page->body.empty || style_page->body.opa == LV_OPA_TRANSP) { /*Is the background visible?*/
+        if((style_page->body.empty || style_page->body.opa == LV_OPA_TRANSP) && style_page->body.border.width == 0) { /*Is the background visible?*/
             if(lv_group_get_focused(g) == page) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_scrl_ori);
-                /*Be sure the scrollable is not transparent or empty (at least it should have a border)*/
-                if((style_mod->body.empty || style_mod->body.opa == LV_OPA_TRANSP) && style_mod->body.border.width == 0) {
-                    style_mod->body.border.width = LV_DPI / 20;
-                    style_mod->body.empty = 0;
-                }
                 scrl->style_p = style_mod;  /*Temporally change the style to the activated */
             }
         }
