@@ -305,7 +305,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         lv_coord_t width = lv_area_get_width(&mask_com);
 
 #if LV_COMPILER_VLA_SUPPORTED
-        uint8_t buf[(lv_area_get_width(&mask_com) * (LV_COLOR_SIZE + 1))];
+        uint8_t buf[(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1))];
 #else
         uint8_t buf[LV_HOR_RES * ((LV_COLOR_DEPTH >> 3) + 1)];  /*+1 because of the possible alpha byte*/
 #endif
