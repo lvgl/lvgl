@@ -56,7 +56,13 @@ typedef struct _lv_group_t
     uint8_t frozen          :1;             /*1: can't focus to new object*/
     uint8_t editing         :1;             /*1: Edit mode, 0: Navigate mode*/
     uint8_t click_focus     :1;             /*1: If an object in a group is clicked by an indev then it will be focused */
+    uint8_t refocus_policy  :1;             /*1: Focus prev if focused on deletion. 0: Focus prev if focused on deletion.*/
 } lv_group_t;
+
+typedef enum _lv_group_refocus_policy_t {
+    LV_GROUP_REFOCUS_POLICY_NEXT = 0,
+    LV_GROUP_REFOCUS_POLICY_PREV = 1
+} lv_group_refocus_policy_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -139,6 +145,13 @@ void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_func_
  * @param focus_cb the call back function or NULL if unused
  */
 void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
+
+/**
+ * Set whether the next or previous item in a group is focused if the currently focussed obj is deleted.
+ * @param group pointer to a group
+ * @param new refocus policy enum
+ */
+void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t policy);
 
 /**
  * Manually set the current mode (edit or navigate).
