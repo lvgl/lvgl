@@ -275,8 +275,10 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 
     lv_style_t * style = lv_obj_get_style(ext->content);
 
+    lv_res_t res = LV_RES_OK;
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
-    if(ext->tab_load_action && id != ext->tab_cur) ext->tab_load_action(tabview, id);
+    if(ext->tab_load_action && id != ext->tab_cur) res = ext->tab_load_action(tabview, id);
+    if(res != LV_RES_OK) return;        /*Prevent the tab loading*/
 
     ext->tab_cur = id;
 
