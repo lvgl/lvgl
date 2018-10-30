@@ -91,6 +91,13 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
 
+/**
+ * Clear the point of a serie
+ * @param chart pointer to a chart object
+ * @param serie pointer to the chart's serie to clear
+ */
+void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie);
+
 /*=====================
  * Setter functions
  *====================*/
