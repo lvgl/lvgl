@@ -778,6 +778,10 @@ void lv_obj_report_style_mod(lv_style_t * style)
 {
     lv_obj_t * i;
     LL_READ(scr_ll, i) {
+        if(i->style_p == style || style == NULL) {
+            lv_obj_refresh_style(i);
+        }
+
         report_style_mod_core(style, i);
     }
 }

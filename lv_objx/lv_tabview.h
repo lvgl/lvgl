@@ -42,8 +42,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* parametes: pointer to a tabview object, tab_id*/
-typedef void (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
+/* parametes: pointer to a tabview object, tab_id
+ * return: LV_RES_INV: to prevent the loading of the tab;  LV_RES_OK: if everything is fine*/
+typedef lv_res_t (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
 
 
 enum {

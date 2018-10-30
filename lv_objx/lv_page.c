@@ -307,6 +307,32 @@ bool lv_page_get_arrow_scroll(const lv_obj_t * page)
 }
 
 /**
+ * Get that width which can be set to the children to still not cause overflow (show scrollbars)
+ * @param page pointer to a page object
+ * @return the width which still fits into the page
+ */
+lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
+{
+    lv_style_t * bg_style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+
+    return lv_obj_get_width(page) - 2 * (bg_style->body.padding.hor + scrl_style->body.padding.hor);
+}
+
+/**
+ * Get that height which can be set to the children to still not cause overflow (show scrollbars)
+ * @param page pointer to a page object
+ * @return the height which still fits into the page
+ */
+lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
+{
+    lv_style_t * bg_style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+
+    return lv_obj_get_height(page) - 2 * (bg_style->body.padding.ver + scrl_style->body.padding.ver);
+}
+
+/**
  * Get a style of a page
  * @param page pointer to page object
  * @param type which style should be get
@@ -355,6 +381,8 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
 void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 {
 
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+
 #if USE_LV_ANIMATION == 0
     anim_time = 0;
 #else
@@ -362,9 +390,10 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
      * because it can overide the current changes*/
     lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_y);
     lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_pos);
+    lv_anim_del(ext->scrl, (lv_anim_fp_t)lv_obj_set_y);
+    lv_anim_del(ext->scrl, (lv_anim_fp_t)lv_obj_set_pos);
 #endif
 
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
     lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
@@ -564,15 +593,10 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
         lv_obj_t * page = lv_obj_get_parent(scrl);
         lv_style_t * style_page = lv_obj_get_style(page);
         lv_group_t * g = lv_obj_get_group(page);
-        if(style_page->body.empty || style_page->body.opa == LV_OPA_TRANSP) { /*Is the background visible?*/
+        if((style_page->body.empty || style_page->body.opa == LV_OPA_TRANSP) && style_page->body.border.width == 0) { /*Is the background visible?*/
             if(lv_group_get_focused(g) == page) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_scrl_ori);
-                /*Be sure the scrollable is not transparent or empty (at least it should have a border)*/
-                if((style_mod->body.empty || style_mod->body.opa == LV_OPA_TRANSP) && style_mod->body.border.width == 0) {
-                    style_mod->body.border.width = LV_DPI / 20;
-                    style_mod->body.empty = 0;
-                }
                 scrl->style_p = style_mod;  /*Temporally change the style to the activated */
             }
         }
@@ -647,12 +671,12 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_PRESSED) {
         if(ext->pr_action != NULL) {
-            ext->pr_action(page);
+            res = ext->pr_action(page);
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             if(ext->rel_action != NULL) {
-                ext->rel_action(page);
+                res = ext->rel_action(page);
             }
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
@@ -791,12 +815,12 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
     } else if(sign == LV_SIGNAL_PRESSED) {
         if(page_ext->pr_action != NULL) {
-            page_ext->pr_action(page);
+            res = page_ext->pr_action(page);
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             if(page_ext->rel_action != NULL) {
-                page_ext->rel_action(page);
+                res = page_ext->rel_action(page);
             }
         }
     }

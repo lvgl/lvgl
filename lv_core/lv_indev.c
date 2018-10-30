@@ -384,11 +384,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         /* Edit mode is not used by KEYPAD devices.
          * So leave edit mode if we are in it before focusing on the next/prev object*/
         if(data->key == LV_GROUP_KEY_NEXT || data->key == LV_GROUP_KEY_PREV) {
-            if(lv_group_get_editing(i->group)) {
-                lv_group_set_editing(i->group, false);
-                lv_obj_t * focused = lv_group_get_focused(i->group);
-                if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
-            }
+            lv_group_set_editing(i->group, false);
         }
 
         if(data->key == LV_GROUP_KEY_NEXT) {
@@ -465,10 +461,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(focused) focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
             if(editable) {
-                i->group->editing = i->group->editing ? 0 : 1;
-                if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
-                LV_LOG_INFO("Edit mode changed");
-                if(focused) lv_obj_invalidate(focused);
+                lv_group_set_editing(i->group, lv_group_get_editing(i->group) ? false : true);  /*Toggle edit mode on long press*/
             }
             /*If not editable then just send a long press signal*/
             else {
@@ -493,10 +486,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
         /*If the focused object is editable and now in navigate mode then enter edit mode*/
         else if(editable && !i->group->editing && !i->proc.long_pr_sent) {
-            i->group->editing = i->group->editing ? 0 : 1;
-            if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);      /*Focus again. Some object do something on navigate->edit change*/
-            LV_LOG_INFO("Edit mode changed (edit)");
-            if(focused) lv_obj_invalidate(focused);
+            lv_group_set_editing(i->group, lv_group_get_editing(i->group) ? false : true);  /*Toggle edit mode on long press*/
         }
 
         if(i->proc.reset_query) return;     /*The object might be deleted in `focus_cb` or due to any other user event*/
@@ -690,13 +680,15 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         else {
             proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
         }
+
+        if(proc->reset_query != 0) return;
+
         /*Handle click focus*/
 #if USE_LV_GROUP
         /*Edit mode is not used by POINTER devices. So leave edit mode if we are in it*/
         lv_group_t * act_g = lv_obj_get_group(proc->act_obj);
         if(lv_group_get_editing(act_g)) {
             lv_group_set_editing(act_g, false);
-            proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
         }
 
         /*Check, if the parent is in a group focus on it.*/

@@ -136,6 +136,13 @@ static void basic_init(void)
 
 }
 
+static void cont_init(void)
+{
+#if USE_LV_CONT != 0
+    theme.cont = &panel;
+#endif
+}
+
 static void btn_init(void)
 {
 #if USE_LV_BTN != 0
@@ -785,6 +792,7 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
     }
 
     basic_init();
+    cont_init();
     btn_init();
     label_init();
     bar_init();

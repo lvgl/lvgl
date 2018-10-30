@@ -266,6 +266,7 @@ static bool anim_ready_handler(lv_anim_t * a)
         void * p = a->var;
         lv_ll_rem(&anim_ll, a);
         lv_mem_free(a);
+        anim_list_changed = true;
 
         /* Call the callback function at the end*/
         /* Check if an animation is deleted in the cb function
