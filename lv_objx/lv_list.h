@@ -199,7 +199,7 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
  * @param btn pointer to a list element (button)
  * @return the index of the button in the list, or -1 of the button not in this list
  */
-int lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn);
+int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn);
 
 /**
  * Get the number of buttons in the list
