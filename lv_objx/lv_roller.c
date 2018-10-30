@@ -416,6 +416,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
         ext->ddlist.sel_opt_id = id;
+        ext->ddlist.sel_opt_id_ori = id;
         if(ext->ddlist.action) res = ext->ddlist.action(roller);
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If picked an option by clicking then set it*/
@@ -427,6 +428,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
             if(id < 0) id = 0;
             if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
             ext->ddlist.sel_opt_id = id;
+            ext->ddlist.sel_opt_id_ori = id;
             if(ext->ddlist.action) res = ext->ddlist.action(roller);
         }
     }
