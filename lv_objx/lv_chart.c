@@ -20,6 +20,7 @@
 #define LV_CHART_HDIV_DEF   3
 #define LV_CHART_VDIV_DEF   5
 #define LV_CHART_PNUM_DEF   10
+#define LV_CHART_POINT_DEF  -1
 
 /**********************
  *      TYPEDEFS
@@ -138,7 +139,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     lv_mem_assert(ser);
     if(ser == NULL) return NULL;
 
-    lv_coord_t def = (ext->ymin + ext->ymax) >> 1;  /*half range as default value*/
+    lv_coord_t def = LV_CHART_POINT_DEF;
 
     if(ser == NULL) return NULL;
 
@@ -162,6 +163,24 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     ext->series.num++;
 
     return ser;
+}
+
+/**
+ * Clear the point of a serie
+ * @param chart pointer to a chart object
+ * @param serie pointer to the chart's serie to clear
+ */
+void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
+{
+    if(chart == NULL || serie == NULL)
+        return;
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(ext == NULL)
+        return;
+    for(uint32_t i = 0; i < ext->point_cnt; i++)
+    {
+        serie->points[i] = -1;
+    }
 }
 
 /*=====================
@@ -230,7 +249,7 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
     lv_chart_series_t * ser;
     uint16_t point_cnt_old = ext->point_cnt;
     uint16_t i;
-    lv_coord_t def = (ext->ymin + ext->ymax) >> 1;  /*half range as default value*/
+    lv_coord_t def = LV_CHART_POINT_DEF;
 
     if(point_cnt < 1) point_cnt = 1;
 
@@ -589,7 +608,8 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
             p2.y = h - y_tmp + y_ofs;
 
-            lv_draw_line(&p1, &p2, mask, &style, opa_scale);
+            if(ser->points[i - 1] >= 0 && ser->points[i] >= 0)
+                lv_draw_line(&p1, &p2, mask, &style, opa_scale);
         }
     }
 }
@@ -637,7 +657,8 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
             cir_a.y2 = cir_a.y1 + style_point.body.radius;
             cir_a.y1 -= style_point.body.radius;
 
-            lv_draw_rect(&cir_a, mask, &style_point, lv_obj_get_opa_scale(chart));
+            if(ser->points[i] >= 0)
+                lv_draw_rect(&cir_a, mask, &style_point, lv_obj_get_opa_scale(chart));
         }
         series_cnt++;
     }
@@ -692,7 +713,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
             col_a.y1 = h - y_tmp + chart->coords.y1;
 
             mask_ret = lv_area_intersect(&col_mask, mask, &col_a);
-            if(mask_ret != false) {
+            if(mask_ret != false && ser->points[i] >= 0) {
                 lv_draw_rect(&chart->coords, &col_mask, &rects, lv_obj_get_opa_scale(chart));
             }
         }
