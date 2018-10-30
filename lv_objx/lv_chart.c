@@ -164,6 +164,27 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     return ser;
 }
 
+/**
+ * Clear the point of a serie
+ * @param chart pointer to a chart object
+ * @param serie pointer to the chart's serie to clear
+ */
+void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
+{
+    if(chart == NULL || serie == NULL)
+        return;
+
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+
+    if(ext == NULL)
+        return;
+
+    for(uint32_t i = 0; i < ext->point_cnt; i++)
+    {
+        serie->points[i] = -1;
+    }
+}
+
 /*=====================
  * Setter functions
  *====================*/
