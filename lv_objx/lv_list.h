@@ -56,6 +56,7 @@ typedef struct
     uint16_t anim_time;                          /*Scroll animation time*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
+    uint32_t size; /*the number of items(buttons) in the list*/
 #if USE_LV_GROUP
     lv_obj_t * selected_btn;
 #endif
@@ -105,6 +106,14 @@ void lv_list_clean(lv_obj_t *obj);
  * @return pointer to the new list element which can be customized (a button)
  */
 lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_action_t rel_action);
+
+/**
+ * Remove the index of the button in the list
+ * @param list pointer to a list object
+ * @param index pointer to a the button's index in the list, index must be 0 <= index < lv_list_ext_t.size
+ * @return true: successfully deleted
+ */
+bool lv_list_remove(const lv_obj_t * list, uint32_t index);
 
 /*=====================
  * Setter functions
@@ -183,6 +192,21 @@ lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
  * @return pointer to the previous button or NULL when no more buttons
  */
 lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
+
+/**
+ * Get the index of the button in the list
+ * @param list pointer to a list object
+ * @param btn pointer to a list element (button)
+ * @return the index of the button in the list, or -1 of the button not in this list
+ */
+int lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn);
+
+/**
+ * Get the number of buttons in the list
+ * @param list pointer to a list object
+ * @return the number of buttons in the list
+ */
+uint32_t lv_list_get_size(const lv_obj_t * list);
 
 #if USE_LV_GROUP
 /**
