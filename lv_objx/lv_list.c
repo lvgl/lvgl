@@ -156,6 +156,8 @@ void lv_list_clean(lv_obj_t * obj)
 {
     lv_obj_t * scrl = lv_page_get_scrl(obj);
     lv_obj_clean(scrl);
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(obj);
+    ext->size = 0;
 }
 
 /*======================
