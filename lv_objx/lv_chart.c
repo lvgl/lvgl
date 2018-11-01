@@ -20,7 +20,6 @@
 #define LV_CHART_HDIV_DEF   3
 #define LV_CHART_VDIV_DEF   5
 #define LV_CHART_PNUM_DEF   10
-#define LV_CHART_POINT_DEF  -1
 
 /**********************
  *      TYPEDEFS

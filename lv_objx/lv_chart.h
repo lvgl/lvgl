@@ -27,6 +27,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_CHART_POINT_DEF  (LV_COORD_MIN)
 
 /**********************
  *      TYPEDEFS
