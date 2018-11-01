@@ -240,8 +240,7 @@ bool lv_list_remove(const lv_obj_t * list, uint32_t index)
 	int count = 0;
 	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
 	while(e != NULL) {
-		if(count == index)
-		{
+		if(count == index) {
 			lv_obj_del(e);
 			ext->size --;
 			return true;
@@ -479,8 +478,7 @@ int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn)
 	int index = 0;
 	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
 	while(e != NULL) {
-		if(e == btn)
-		{
+		if(e == btn) {
 			return index;
 		}
 		index ++;
