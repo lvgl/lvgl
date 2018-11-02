@@ -112,7 +112,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
 #if USE_LV_GROUP
 
 /**
- * Make a button selected
+ * Make a button selected. Can be used while navigating in the list with a keypad.
  * @param list pointer to a list object
  * @param btn pointer to a button to select
  */
@@ -186,7 +186,7 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
 
 #if USE_LV_GROUP
 /**
- * Get the currently selected button
+ * Get the currently selected button. Can be used while navigating in the list with a keypad.
  * @param list pointer to a list object
  * @return pointer to the selected button
  */
