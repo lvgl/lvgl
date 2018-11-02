@@ -27,6 +27,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_CHART_POINT_DEF  (LV_COORD_MIN)
 
 /**********************
  *      TYPEDEFS
@@ -90,6 +91,13 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
  * @return pointer to the allocated data series
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
+
+/**
+ * Clear the point of a serie
+ * @param chart pointer to a chart object
+ * @param serie pointer to the chart's serie to clear
+ */
+void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie);
 
 /*=====================
  * Setter functions
