@@ -156,6 +156,8 @@ void lv_list_clean(lv_obj_t * obj)
 {
     lv_obj_t * scrl = lv_page_get_scrl(obj);
     lv_obj_clean(scrl);
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(obj);
+    ext->size = 0;
 }
 
 /*======================
@@ -174,7 +176,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
 {
     lv_style_t * style = lv_obj_get_style(list);
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-
+    ext->size ++;
     /*Create a list element with the image an the text*/
     lv_obj_t * liste;
     liste = lv_btn_create(list, NULL);
@@ -223,6 +225,30 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     }
 
     return liste;
+}
+
+/**
+ * Remove the index of the button in the list
+ * @param list pointer to a list object
+ * @param index pointer to a the button's index in the list, index must be 0 <= index < lv_list_ext_t.size
+ * @return true: successfully deleted
+ */
+bool lv_list_remove(const lv_obj_t * list, uint32_t index)
+{
+	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+	if(index < 0 && index >= ext->size) return false;
+	int count = 0;
+	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
+	while(e != NULL) {
+		if(count == index) {
+			lv_obj_del(e);
+			ext->size --;
+			return true;
+		}
+        e = lv_list_get_next_btn(list, e);
+		count ++;
+	}
+	return false;
 }
 
 /*=====================
@@ -439,6 +465,37 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
     }
 
     return btn;
+}
+
+/**
+ * Get the index of the button in the list
+ * @param list pointer to a list object
+ * @param btn pointer to a list element (button)
+ * @return the index of the button in the list, or -1 of the button not in this list
+ */
+int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn)
+{
+	int index = 0;
+	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
+	while(e != NULL) {
+		if(e == btn) {
+			return index;
+		}
+		index ++;
+        e = lv_list_get_next_btn(list, e);
+	}
+	return -1;
+}
+
+/**
+ * Get the number of buttons in the list
+ * @param list pointer to a list object
+ * @return the number of buttons in the list
+ */
+uint32_t lv_list_get_size(const lv_obj_t * list)
+{
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+    return ext->size;
 }
 
 #if USE_LV_GROUP
