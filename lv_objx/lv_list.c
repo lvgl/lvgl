@@ -236,8 +236,8 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
 bool lv_list_remove(const lv_obj_t * list, uint32_t index)
 {
 	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-	if(index < 0 && index >= ext->size) return false;
-	int count = 0;
+	if(index >= ext->size) return false;
+	uint32_t count = 0;
 	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
 	while(e != NULL) {
 		if(count == index) {
