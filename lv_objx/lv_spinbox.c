@@ -3,13 +3,6 @@
  *
  */
 
-/* TODO Remove these instructions
- * Search an replace: spinbox -> object normal name with lower case (e.g. button, label etc.)
- *                    templ -> object short name with lower case(e.g. btn, label etc)
- *                    TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 /*********************
  *      INCLUDES
  *********************/
@@ -59,7 +52,6 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 	LV_LOG_TRACE("spinbox create started");
 
 	/*Create the ancestor of spinbox*/
-	/*TODO modify it to the ancestor create function */
 	lv_obj_t * new_spinbox = lv_ta_create(par, copy);
 	lv_mem_assert(new_spinbox);
 	if(new_spinbox == NULL) return NULL;
@@ -71,7 +63,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 	if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_spinbox);
 	if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_spinbox);
 
-	/*Initialize the allocated 'ext' */
+	/*Initialize the allocated 'ext'*/
 	ext->ta.one_line = 1;
 	ext->ta.pwd_mode = 0;
 	ext->ta.accapted_chars = "1234567890+-.";
@@ -84,7 +76,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 	ext->rangeMax = 99999;
 	ext->rangeMin = -99999;
 
-	lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK | LV_CURSOR_HIDDEN); //hidden by default
+	lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK | LV_CURSOR_HIDDEN); /*hidden by default*/
 	lv_ta_set_cursor_pos(new_spinbox, 4);
 
 
@@ -358,11 +350,11 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 		{
 			if(ext->valueDigit - ext->step >= ext->rangeMin)
 			{
-				//Special mode when zero crossing
+				/*Special mode when zero crossing*/
 				if((ext->valueDigit - ext->step) < 0 && ext->valueDigit > 0)
 				{
 					ext->valueDigit = -ext->valueDigit;
-				}//end special mode
+				}/*end special mode*/
 
 				ext->valueDigit -= ext->step;
 			}
@@ -374,11 +366,11 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 		{
 			if(ext->valueDigit + ext->step <= ext->rangeMax)
 			{
-				//Special mode when zero crossing
+				/*Special mode when zero crossing*/
 				if((ext->valueDigit + ext->step) > 0 && ext->valueDigit < 0)
 				{
 					ext->valueDigit = -ext->valueDigit;
-				}//end special mode
+				}/*end special mode*/
 				ext->valueDigit += ext->step;
 			}
 			lv_spinbox_updatevalue(spinbox);
@@ -394,7 +386,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 		}
 		else
 		{
-			if(c == '\n')
+			if(c == LV_GROUP_KEY_ENTER)
 			{
 				int p = lv_ta_get_cursor_pos(spinbox);
 				if(p == ext->digitCount + 1)
