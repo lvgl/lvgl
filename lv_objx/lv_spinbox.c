@@ -165,6 +165,8 @@ void lv_spinbox_set_int(const lv_obj_t * spinbox, int32_t i)
 		i = ext->rangeMin;
 
 	ext->valueDigit = i;
+
+	lv_spinbox_updatevalue(spinbox);
 }
 
 void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position)
