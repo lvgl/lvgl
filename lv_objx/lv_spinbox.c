@@ -24,8 +24,6 @@
 static bool lv_spinbox_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * param);
 static void lv_spinbox_updatevalue(lv_obj_t * spinbox);
-static int32_t lv_spinbox_double_to_int(lv_obj_t * spinbox, double d);
-static double lv_spinbox_int_to_double(lv_obj_t * spinbox, int32_t i);
 
 /**********************
  *  STATIC VARIABLES
@@ -68,8 +66,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 	ext->ta.pwd_mode = 0;
 	ext->ta.accapted_chars = "1234567890+-.";
 
-	ext->value = 0.0;
-	ext->valueDigit = 0;
+	ext->value = 0;
 	ext->decPointPos = 2;
 	ext->digitCount = 5;
 	ext->step = 100;
@@ -130,6 +127,40 @@ void lv_spinbox_step_previous(lv_obj_t * spinbox)
 	lv_spinbox_updatevalue(spinbox);
 }
 
+
+void lv_spinbox_increment(lv_obj_t * spinbox)
+{
+	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+
+	if(ext->value + ext->step <= ext->rangeMax)
+	{
+		/*Special mode when zero crossing*/
+		if((ext->value + ext->step) > 0 && ext->value < 0)
+		{
+			ext->value = -ext->value;
+		}/*end special mode*/
+		ext->value += ext->step;
+	}
+	lv_spinbox_updatevalue(spinbox);
+}
+
+void lv_spinbox_decrement(lv_obj_t * spinbox)
+{
+	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+
+	if(ext->value - ext->step >= ext->rangeMin)
+	{
+		/*Special mode when zero crossing*/
+		if((ext->value - ext->step) < 0 && ext->value > 0)
+		{
+			ext->value = -ext->value;
+		}/*end special mode*/
+		ext->value -= ext->step;
+	}
+	lv_spinbox_updatevalue(spinbox);
+}
+
+
 /*======================
  * Add/remove functions
  *=====================*/
@@ -143,17 +174,7 @@ void lv_spinbox_step_previous(lv_obj_t * spinbox)
  * Setter functions
  *====================*/
 
-/*
- * New object specific "set" functions come here
- */
-void lv_spinbox_set_double(const lv_obj_t * spinbox, double d)
-{
-	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-	if(ext == NULL)
-		return;
-}
-
-void lv_spinbox_set_int(const lv_obj_t * spinbox, int32_t i)
+void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i)
 {
 	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 	if(ext == NULL)
@@ -164,7 +185,7 @@ void lv_spinbox_set_int(const lv_obj_t * spinbox, int32_t i)
 	if(i < ext->rangeMin)
 		i = ext->rangeMin;
 
-	ext->valueDigit = i;
+	ext->value = i;
 
 	lv_spinbox_updatevalue(spinbox);
 }
@@ -187,7 +208,7 @@ void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, 
 	lv_spinbox_updatevalue(spinbox);
 }
 
-void lv_spinbox_set_range_int(const lv_obj_t * spinbox, int32_t rangeMin, int32_t rangeMax)
+void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t rangeMin, int32_t rangeMax)
 {
 	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 	if(ext == NULL)
@@ -196,28 +217,16 @@ void lv_spinbox_set_range_int(const lv_obj_t * spinbox, int32_t rangeMin, int32_
 	ext->rangeMax = rangeMax;
 	ext->rangeMin = rangeMin;
 
-	if(ext->valueDigit > ext->rangeMax)
+	if(ext->value > ext->rangeMax)
 	{
-		ext->valueDigit = ext->rangeMax;
+		ext->value = ext->rangeMax;
 		lv_obj_invalidate(spinbox);
 	}
-	if(ext->valueDigit < ext->rangeMin)
+	if(ext->value < ext->rangeMin)
 	{
-		ext->valueDigit = ext->rangeMin;
+		ext->value = ext->rangeMin;
 		lv_obj_invalidate(spinbox);
 	}
-}
-
-void lv_spinbox_set_range_double(const lv_obj_t * spinbox, double rangeMin, double rangeMax)
-{
-	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-	if(ext == NULL)
-		return;
-
-	double rMinDouble = lv_spinbox_double_to_int(spinbox, rangeMin);
-	double rMaxDouble = lv_spinbox_double_to_int(spinbox, rangeMax);
-
-	lv_spinbox_set_range_int(spinbox, rMinDouble, rMaxDouble);
 }
 
 
@@ -272,6 +281,13 @@ lv_style_t * lv_spinbox_get_style(const lv_obj_t * templ, lv_spinbox_style_t typ
 	return NULL;
 }
 
+
+int32_t lv_spinbox_get_value(const lv_obj_t * spinbox)
+{
+	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+
+	return ext->value;
+}
 /*=====================
  * Other functions
  *====================*/
@@ -350,33 +366,11 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 		uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/
 		if(c == LV_GROUP_KEY_RIGHT)
 		{
-			if(ext->valueDigit - ext->step >= ext->rangeMin)
-			{
-				/*Special mode when zero crossing*/
-				if((ext->valueDigit - ext->step) < 0 && ext->valueDigit > 0)
-				{
-					ext->valueDigit = -ext->valueDigit;
-				}/*end special mode*/
-
-				ext->valueDigit -= ext->step;
-			}
-
-			lv_spinbox_updatevalue(spinbox);
-			lv_label_set_text(ext->ta.label, (char*)ext->digits);
+			lv_spinbox_decrement(spinbox);
 		}
 		else if(c == LV_GROUP_KEY_LEFT)
 		{
-			if(ext->valueDigit + ext->step <= ext->rangeMax)
-			{
-				/*Special mode when zero crossing*/
-				if((ext->valueDigit + ext->step) > 0 && ext->valueDigit < 0)
-				{
-					ext->valueDigit = -ext->valueDigit;
-				}/*end special mode*/
-				ext->valueDigit += ext->step;
-			}
-			lv_spinbox_updatevalue(spinbox);
-			lv_label_set_text(ext->ta.label, (char*)ext->digits);
+			lv_spinbox_increment(spinbox);
 		}
 		else if(c == LV_GROUP_KEY_UP)
 		{
@@ -418,7 +412,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 {
 	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-	int32_t v = ext->valueDigit;
+	int32_t v = ext->value;
 	int32_t intDigits, decDigits;
 	uint8_t dc = ext->digitCount;
 
@@ -470,36 +464,6 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 	}
 
 	lv_ta_set_cursor_pos(spinbox, cPos);
-}
-
-static double lv_spinbox_int_to_double(lv_obj_t * spinbox, int32_t i)
-{
-	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-
-	/*
-	if(i > ext->rangeMax)
-		i = ext->rangeMax;
-	if(i < ext->rangeMin)
-		i = ext->rangeMin;
-	*/
-
-	return (double)( i / (10 * (ext->digitCount - ext->decPointPos)));
-}
-
-static int32_t lv_spinbox_double_to_int(lv_obj_t * spinbox, double d)
-{
-	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-
-	int32_t i = (int32_t)(d * (10 * (ext->digitCount - ext->decPointPos)));
-
-	/*
-	if(i > ext->rangeMax)
-		i = ext->rangeMax;
-	if(i < ext->rangeMin)
-		i = ext->rangeMin;
-	*/
-
-	return i;
 }
 
 #endif

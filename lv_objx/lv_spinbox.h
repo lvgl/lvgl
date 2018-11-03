@@ -37,8 +37,7 @@ extern "C" {
 typedef struct {
     lv_ta_ext_t ta; /*Ext. of ancestor*/
     /*New data for this type */
-    double value;
-    int32_t valueDigit;
+    int32_t value;
     int32_t rangeMax;
     int32_t rangeMin;
     int32_t step;
@@ -72,6 +71,8 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy);
 
 void lv_spinbox_step_next(lv_obj_t * spinbox);
 void lv_spinbox_step_previous(lv_obj_t * spinbox);
+void lv_spinbox_increment(lv_obj_t * spinbox);
+void lv_spinbox_decrement(lv_obj_t * spinbox);
 
 
 /*======================
@@ -91,12 +92,9 @@ void lv_spinbox_step_previous(lv_obj_t * spinbox);
  */
 void lv_spinbox_set_style(lv_obj_t * templ, lv_spinbox_style_t type, lv_style_t *style);
 
-
-void lv_spinbox_set_double(const lv_obj_t * spinbox, double d);
-void lv_spinbox_set_int(const lv_obj_t * spinbox, int32_t i);
+void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i);
 void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
-void lv_spinbox_set_range_int(const lv_obj_t * spinbox, int32_t rangeMin, int32_t rangeMax);
-void lv_spinbox_set_range_double(const lv_obj_t * spinbox, double rangeMin, double rangeMax);
+void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t rangeMin, int32_t rangeMax);
 
 
 /*=====================
@@ -111,9 +109,7 @@ void lv_spinbox_set_range_double(const lv_obj_t * spinbox, double rangeMin, doub
  */
 lv_style_t * lv_spinbox_get_style(const lv_obj_t * templ, lv_spinbox_style_t type);
 
-
-double lv_spinbox_get_double(const lv_obj_t * spinbox);
-int32_t lv_spinbox_get_int(const lv_obj_t * spinbox);
+int32_t lv_spinbox_get_value(const lv_obj_t * spinbox);
 
 /*=====================
  * Other functions
