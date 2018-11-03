@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.c
+ * @file lv_spinbox.c
  *
  */
 
@@ -21,7 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_spinbox_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_mode_t mode);
+static bool lv_spinbox_design(lv_obj_t * spinbox, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * param);
 static void lv_spinbox_updatevalue(lv_obj_t * spinbox);
 
@@ -232,7 +232,7 @@ void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t rangeMin, int32_t ra
 
 /**
  * Set a style of a spinbox.
- * @param templ pointer to spinbox object
+ * @param spinbox pointer to spinbox object
  * @param type which style should be set
  * @param style pointer to a style
  */
@@ -264,13 +264,13 @@ void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type, lv_style_
 
 /**
  * Get style of a spinbox.
- * @param templ pointer to spinbox object
+ * @param spinbox pointer to spinbox object
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_spinbox_get_style(const lv_obj_t * templ, lv_spinbox_style_t type)
+lv_style_t * lv_spinbox_get_style(const lv_obj_t * spinbox, lv_spinbox_style_t type)
 {
-	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(templ);
+	lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
 	switch(type) {
 	default:
@@ -302,7 +302,7 @@ int32_t lv_spinbox_get_value(const lv_obj_t * spinbox)
 
 /**
  * Handle the drawing related tasks of the spinboxs
- * @param templ pointer to an object
+ * @param spinbox pointer to an object
  * @param mask the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
@@ -310,7 +310,7 @@ int32_t lv_spinbox_get_value(const lv_obj_t * spinbox)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_spinbox_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_mode_t mode)
+static bool lv_spinbox_design(lv_obj_t * spinbox, const lv_area_t * mask, lv_design_mode_t mode)
 {
 	/*Return false if the object is not covers the mask_p area*/
 	if(mode == LV_DESIGN_COVER_CHK) {
@@ -330,7 +330,7 @@ static bool lv_spinbox_design(lv_obj_t * templ, const lv_area_t * mask, lv_desig
 
 /**
  * Signal function of the spinbox
- * @param templ pointer to a spinbox object
+ * @param spinbox pointer to a spinbox object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted

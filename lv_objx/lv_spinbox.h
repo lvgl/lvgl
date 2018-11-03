@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.h
+ * @file lv_spinbox.h
  *
  */
 
@@ -33,7 +33,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of template*/
+/*Data of spinbox*/
 typedef struct {
     lv_ta_ext_t ta; /*Ext. of ancestor*/
     /*New data for this type */
@@ -62,16 +62,35 @@ typedef uint8_t lv_spinbox_style_t;
  **********************/
 
 /**
- * Create a template objects
- * @param par pointer to an object, it will be the parent of the new template
- * @param copy pointer to a template object, if not NULL then the new object will be copied from it
- * @return pointer to the created template
+ * Create a spinbox objects
+ * @param par pointer to an object, it will be the parent of the new spinbox
+ * @param copy pointer to a spinbox object, if not NULL then the new object will be copied from it
+ * @return pointer to the created spinbox
  */
 lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy);
 
+/**
+ * Select next lower digit for edition by dividing the step by 10
+ * @param spinbox pointer to spinbox
+ */
 void lv_spinbox_step_next(lv_obj_t * spinbox);
+
+/**
+ * Select next higher digit for edition by multiplying the step by 10
+ * @param spinbox pointer to spinbox
+ */
 void lv_spinbox_step_previous(lv_obj_t * spinbox);
+
+/**
+ * Increment spinbox value by one step
+ * @param spinbox pointer to spinbox
+ */
 void lv_spinbox_increment(lv_obj_t * spinbox);
+
+/**
+ * Decrement spinbox value by one step
+ * @param spinbox pointer to spinbox
+ */
 void lv_spinbox_decrement(lv_obj_t * spinbox);
 
 
@@ -85,15 +104,34 @@ void lv_spinbox_decrement(lv_obj_t * spinbox);
  *====================*/
 
 /**
- * Set a style of a template.
+ * Set a style of a spinbox.
  * @param templ pointer to template object
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_spinbox_set_style(lv_obj_t * templ, lv_spinbox_style_t type, lv_style_t *style);
+void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type, lv_style_t *style);
 
+/**
+ * Set spinbox value
+ * @param spinbox pointer to spinbox
+ * @param i value to be set
+ */
 void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i);
+
+/**
+ * Set spinbox digit format (digit count and decimal format)
+ * @param spinbox pointer to spinbox
+ * @param digit_count number of digit excluding the decimal separator and the sign
+ * @param separator_position number of digit before the decimal point. If 0, decimal point is not shown
+ */
 void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
+
+/**
+ * Set spinbox value range
+ * @param spinbox pointer to spinbox
+ * @param i rangeMin maximum value, inclusive
+ * @param i rangeMax minimum value, inclusive
+ */
 void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t rangeMin, int32_t rangeMax);
 
 
@@ -102,13 +140,18 @@ void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t rangeMin, int32_t ra
  *====================*/
 
 /**
- * Get style of a template.
+ * Get style of a spinbox.
  * @param templ pointer to template object
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_spinbox_get_style(const lv_obj_t * templ, lv_spinbox_style_t type);
+lv_style_t * lv_spinbox_get_style(const lv_obj_t * spinbox, lv_spinbox_style_t type);
 
+/**
+ * Get the spinbox numeral value (user has to convert to float according to its digit format)
+ * @param spinbox pointer to spinbox
+ * @return value integer value of the spinbox
+ */
 int32_t lv_spinbox_get_value(const lv_obj_t * spinbox);
 
 /*=====================
@@ -119,7 +162,7 @@ int32_t lv_spinbox_get_value(const lv_obj_t * spinbox);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_TEMPL*/
+#endif  /*USE_LV_SPINBOX*/
 
 #ifdef __cplusplus
 } /* extern "C" */
