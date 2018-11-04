@@ -38,11 +38,11 @@ typedef struct {
     lv_ta_ext_t ta; /*Ext. of ancestor*/
     /*New data for this type */
     int32_t value;
-    int32_t rangeMax;
-    int32_t rangeMin;
+    int32_t range_max;
+    int32_t range_min;
     int32_t step;
-    uint8_t digitCount:4;
-    uint8_t decPointPos:4;      /*if 0, there is no separator and the number is an integer*/
+    uint8_t digit_count:4;
+    uint8_t dec_point_pos:4;      /*if 0, there is no separator and the number is an integer*/
     uint8_t digits[1+1+LV_SPINBOX_MAX_DIGIT_COUNT];     /*1 sign, 1 point, 16 num digits*/
 
 } lv_spinbox_ext_t;
@@ -69,6 +69,77 @@ typedef uint8_t lv_spinbox_style_t;
  */
 lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy);
 
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
+ * Set a style of a spinbox.
+ * @param templ pointer to template object
+ * @param type which style should be set
+ * @param style pointer to a style
+ */
+static inline void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type, lv_style_t *style)
+{
+    lv_ta_set_style(spinbox, type, style);
+}
+
+/**
+ * Set spinbox value
+ * @param spinbox pointer to spinbox
+ * @param i value to be set
+ */
+void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i);
+
+/**
+ * Set spinbox digit format (digit count and decimal format)
+ * @param spinbox pointer to spinbox
+ * @param digit_count number of digit excluding the decimal separator and the sign
+ * @param separator_position number of digit before the decimal point. If 0, decimal point is not shown
+ */
+void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
+
+/**
+ * Set spinbox step
+ * @param spinbox pointer to spinbox
+ * @param step steps on increment/decrement
+ */
+void lv_spinbox_set_step(const lv_obj_t * spinbox, uint32_t step);
+
+/**
+ * Set spinbox value range
+ * @param spinbox pointer to spinbox
+ * @param range_min maximum value, inclusive
+ * @param range_max minimum value, inclusive
+ */
+void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t range_min, int32_t range_max);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get style of a spinbox.
+ * @param templ pointer to template object
+ * @param type which style should be get
+ * @return style pointer to the style
+ */
+static inline lv_style_t * lv_spinbox_get_style(const lv_obj_t * spinbox, lv_spinbox_style_t type)
+{
+    return lv_ta_get_style(spinbox, type);
+}
+
+/**
+ * Get the spinbox numeral value (user has to convert to float according to its digit format)
+ * @param spinbox pointer to spinbox
+ * @return value integer value of the spinbox
+ */
+int32_t lv_spinbox_get_value(const lv_obj_t * spinbox);
+
+/*=====================
+ * Other functions
+ *====================*/
+
 /**
  * Select next lower digit for edition by dividing the step by 10
  * @param spinbox pointer to spinbox
@@ -93,70 +164,6 @@ void lv_spinbox_increment(lv_obj_t * spinbox);
  */
 void lv_spinbox_decrement(lv_obj_t * spinbox);
 
-
-/*======================
- * Add/remove functions
- *=====================*/
-
-
-/*=====================
- * Setter functions
- *====================*/
-
-/**
- * Set a style of a spinbox.
- * @param templ pointer to template object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type, lv_style_t *style);
-
-/**
- * Set spinbox value
- * @param spinbox pointer to spinbox
- * @param i value to be set
- */
-void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i);
-
-/**
- * Set spinbox digit format (digit count and decimal format)
- * @param spinbox pointer to spinbox
- * @param digit_count number of digit excluding the decimal separator and the sign
- * @param separator_position number of digit before the decimal point. If 0, decimal point is not shown
- */
-void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
-
-/**
- * Set spinbox value range
- * @param spinbox pointer to spinbox
- * @param i rangeMin maximum value, inclusive
- * @param i rangeMax minimum value, inclusive
- */
-void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t rangeMin, int32_t rangeMax);
-
-
-/*=====================
- * Getter functions
- *====================*/
-
-/**
- * Get style of a spinbox.
- * @param templ pointer to template object
- * @param type which style should be get
- * @return style pointer to the style
- */
-lv_style_t * lv_spinbox_get_style(const lv_obj_t * spinbox, lv_spinbox_style_t type);
-
-/**
- * Get the spinbox numeral value (user has to convert to float according to its digit format)
- * @param spinbox pointer to spinbox
- * @return value integer value of the spinbox
- */
-int32_t lv_spinbox_get_value(const lv_obj_t * spinbox);
-
-/*=====================
- * Other functions
- *====================*/
 
 /**********************
  *      MACROS
