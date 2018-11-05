@@ -461,11 +461,15 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(focused) focused->signal_func(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
             if(editable) {
-                lv_group_set_editing(i->group, lv_group_get_editing(i->group) ? false : true);  /*Toggle edit mode on long press*/
+                if(i->group->obj_ll.head != i->group->obj_ll.tail)
+                    lv_group_set_editing(i->group, lv_group_get_editing(i->group) ? false : true);  /*Toggle edit mode on long press*/
+                else if(focused)
+                    focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
             }
             /*If not editable then just send a long press signal*/
             else {
-                if(focused) focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
+                if(focused) //  && (i->group->obj_ll.head != i->group->obj_ll.tail)
+                    focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
             }
             i->proc.long_pr_sent = 1;
         }
@@ -482,7 +486,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
         /*An object is being edited and the button is releases. Just send enter */
         else if(i->group->editing) {
-            if(!i->proc.long_pr_sent) lv_group_send_data(i->group, LV_GROUP_KEY_ENTER);  /*Ignore long pressed enter release because it comes from mode switch*/
+            if(!i->proc.long_pr_sent || i->group->obj_ll.head == i->group->obj_ll.tail)
+                lv_group_send_data(i->group, LV_GROUP_KEY_ENTER);  /*Ignore long pressed enter release because it comes from mode switch*/
         }
         /*If the focused object is editable and now in navigate mode then enter edit mode*/
         else if(editable && !i->group->editing && !i->proc.long_pr_sent) {
