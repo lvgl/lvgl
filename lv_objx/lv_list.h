@@ -57,6 +57,7 @@ typedef struct
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
 #if USE_LV_GROUP
+    lv_obj_t * last_sel;                          /* Last btn selected */
     lv_obj_t * selected_btn;
 #endif
 } lv_list_ext_t;
