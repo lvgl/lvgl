@@ -205,6 +205,18 @@ void lv_spinbox_set_value_changed_cb(const lv_obj_t * spinbox, lv_spinbox_value_
     ext->value_changed_cb = cb;
 }
 
+/**
+ * Set spinbox left padding in digits count (added between sign and first digit)
+ * @param spinbox pointer to spinbox
+ * @param cb Callback function called on value change event
+ */
+void lv_spinbox_set_padding_left(const lv_obj_t * spinbox, uint8_t padding)
+{
+    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+    ext->digit_padding_left = padding;
+    lv_spinbox_updatevalue(spinbox);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -387,7 +399,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
             if(c == LV_GROUP_KEY_ENTER)
             {
                 int p = lv_ta_get_cursor_pos(spinbox);
-                if(p == ext->digit_count + 1)
+                if(p == (1 + ext->digit_padding_left + ext->digit_count))
                 {
                     for(int i = 0; i < ext->digit_count; i++)
                         lv_spinbox_step_previous(spinbox);
@@ -422,6 +434,12 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     ext->digits[0] = v>=0 ? '+' : '-';
 
+    int pl; /*padding left*/
+    for(pl = 0; pl < ext->digit_padding_left; pl++)
+    {
+        ext->digits[1 + pl] = ' ';
+    }
+
     int i = 0;
     uint8_t digits[16];
 
@@ -436,30 +454,31 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     int k;
     for(k = 0; k < intDigits; k++)
     {
-        ext->digits[1 + k] = '0' + digits[--i];
+        ext->digits[1 + pl + k] = '0' + digits[--i];
     }
 
-    ext->digits[1 + intDigits] = '.';
+    ext->digits[1 + pl + intDigits] = '.';
 
     int d;
 
     for(d = 0; d < decDigits; d++)
     {
-        ext->digits[1 + intDigits + 1 + d] = '0' + digits[--i];
+        ext->digits[1 + pl + intDigits + 1 + d] = '0' + digits[--i];
     }
 
-    ext->digits[1 + intDigits + 1 + decDigits] = '\0';
+    ext->digits[1 + pl + intDigits + 1 + decDigits] = '\0';
 
     lv_label_set_text(ext->ta.label, (char*)ext->digits);
 
     int32_t step = ext->step;
-    uint8_t cPos = ext->digit_count;
+    uint8_t cPos = ext->digit_count + pl;
     while(step >= 10)
     {
         step /= 10;
         cPos--;
     }
-    if(cPos > intDigits)
+
+    if(cPos > pl + intDigits )
     {
         cPos ++;
     }

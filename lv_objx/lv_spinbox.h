@@ -127,6 +127,12 @@ void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t range_min, int32_t r
  */
 void lv_spinbox_set_value_changed_cb(const lv_obj_t * spinbox, lv_spinbox_value_changed_cb_t cb);
 
+/**
+ * Set spinbox left padding in digits count (added between sign and first digit)
+ * @param spinbox pointer to spinbox
+ * @param cb Callback function called on value change event
+ */
+void lv_spinbox_set_padding_left(const lv_obj_t * spinbox, uint8_t padding);
 
 /*=====================
  * Getter functions
