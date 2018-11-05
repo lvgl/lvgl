@@ -90,6 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
     ext->anim_time = LV_LIST_FOCUS_TIME;
 #if USE_LV_GROUP
+    ext->last_sel = NULL;
     ext->selected_btn = NULL;
 #endif
 
