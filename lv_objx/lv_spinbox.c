@@ -146,7 +146,7 @@ void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, 
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT)
         digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
 
-    if(separator_position < LV_SPINBOX_MAX_DIGIT_COUNT)
+    if(separator_position > LV_SPINBOX_MAX_DIGIT_COUNT)
         separator_position = LV_SPINBOX_MAX_DIGIT_COUNT;
 
     ext->digit_count = digit_count;
