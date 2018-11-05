@@ -43,6 +43,8 @@ typedef struct {
     int32_t step;
     uint8_t digitCount:4;
     uint8_t decPointPos:4;      /*if 0, there is no separator and the number is an integer*/
+    uint8_t digitPaddingLeft:4;
+    uint8_t digitPaddingRight:4;
     uint8_t digits[1+1+LV_SPINBOX_MAX_DIGIT_COUNT];     /*1 sign, 1 point, 16 num digits*/
 
 } lv_spinbox_ext_t;
