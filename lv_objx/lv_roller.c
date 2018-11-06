@@ -192,17 +192,21 @@ bool lv_roller_get_hor_fit(const lv_obj_t * roller)
  *  */
 lv_style_t * lv_roller_get_style(const lv_obj_t * roller, lv_roller_style_t type)
 {
+    lv_style_t * style = NULL;
+
     switch(type) {
         case LV_ROLLER_STYLE_BG:
-            return lv_obj_get_style(roller);
+            style = lv_obj_get_style(roller);
+            break;
         case LV_ROLLER_STYLE_SEL:
-            return lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
+            style = lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************

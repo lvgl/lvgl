@@ -177,23 +177,28 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
  */
 lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
     switch(type) {
         case LV_SW_STYLE_BG:
-            return lv_slider_get_style(sw, LV_SLIDER_STYLE_BG);
+            style = lv_slider_get_style(sw, LV_SLIDER_STYLE_BG);
+            break;
         case LV_SW_STYLE_INDIC:
-            return lv_slider_get_style(sw, LV_SLIDER_STYLE_INDIC);
+            style = lv_slider_get_style(sw, LV_SLIDER_STYLE_INDIC);
+            break;
         case LV_SW_STYLE_KNOB_OFF:
-            return ext->style_knob_off;
+            style = ext->style_knob_off;
+            break;
         case LV_SW_STYLE_KNOB_ON:
-            return ext->style_knob_on;
+            style = ext->style_knob_on;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 /**********************
  *   STATIC FUNCTIONS

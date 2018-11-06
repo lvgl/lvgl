@@ -765,10 +765,9 @@ lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
             break;
         default:
             style = NULL;
-            break
+            break;
     }
 
-    /*To avoid warning*/
     return style;
 }
 

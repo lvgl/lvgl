@@ -374,31 +374,40 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
  *  */
 lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
     switch(type) {
         case LV_CALENDAR_STYLE_BG:
-            return  lv_obj_get_style(calendar);
+            style = lv_obj_get_style(calendar);
+            break;
         case LV_CALENDAR_STYLE_HEADER:
-            return ext->style_header;
+            style = ext->style_header;
+            break;
         case LV_CALENDAR_STYLE_HEADER_PR:
-            return ext->style_header_pr;
+            style = ext->style_header_pr;
+            break;
         case LV_CALENDAR_STYLE_DAY_NAMES:
-            return ext->style_day_names;
+            style = ext->style_day_names;
+            break;
         case LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS:
-            return ext->style_highlighted_days;
+            style = ext->style_highlighted_days;
+            break;
         case LV_CALENDAR_STYLE_INACTIVE_DAYS:
-            return ext->style_inactive_days;
+            style = ext->style_inactive_days;
+            break;
         case LV_CALENDAR_STYLE_WEEK_BOX:
-            return ext->style_week_box;
+            style = ext->style_week_box;
+            break;
         case LV_CALENDAR_STYLE_TODAY_BOX:
-            return ext->style_today_box;
+            style = ext->style_today_box;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================

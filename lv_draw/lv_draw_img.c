@@ -147,41 +147,48 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
 
 uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf)
 {
+    uint8_t px_size = 0;
+
     switch(cf) {
         case LV_IMG_CF_UNKOWN:
         case LV_IMG_CF_RAW:
-            return 0;
+            px_size = 0;
+            break;
         case LV_IMG_CF_TRUE_COLOR:
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-            return LV_COLOR_SIZE;
+            px_size = LV_COLOR_SIZE;
+            break;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
-            return LV_IMG_PX_SIZE_ALPHA_BYTE << 3;
-
+            px_size = LV_IMG_PX_SIZE_ALPHA_BYTE << 3;
+            break;
         case LV_IMG_CF_INDEXED_1BIT:
         case LV_IMG_CF_ALPHA_1BIT:
-            return 1;
-
+            px_size = 1;
+            break;
         case LV_IMG_CF_INDEXED_2BIT:
         case LV_IMG_CF_ALPHA_2BIT:
-            return 2;
-
+            px_size = 2;
+            break;
         case LV_IMG_CF_INDEXED_4BIT:
         case LV_IMG_CF_ALPHA_4BIT:
-            return 4;
-
+            px_size = 4;
+            break;
         case LV_IMG_CF_INDEXED_8BIT:
         case LV_IMG_CF_ALPHA_8BIT:
-            return 8;
-
+            px_size = 8;
+            break;
         default:
-            return 0;
+            px_size = 0;
+            break;
     }
 
-    return 0;
+    return px_size;
 }
 
 bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf)
 {
+    bool is_chroma_keyed = false;
+
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
         case LV_IMG_CF_RAW_CHROMA_KEYED:
@@ -189,17 +196,21 @@ bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf)
         case LV_IMG_CF_INDEXED_2BIT:
         case LV_IMG_CF_INDEXED_4BIT:
         case LV_IMG_CF_INDEXED_8BIT:
-            return true;
+            is_chroma_keyed = true;
+            break;
         default:
-            return false;
+            is_chroma_keyed = false;
+            break;
     }
 
-    return false;
+    return is_chroma_keyed;
 }
 
 
 bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
 {
+    bool has_alpha = false;
+
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
         case LV_IMG_CF_RAW_ALPHA:
@@ -207,12 +218,14 @@ bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
         case LV_IMG_CF_ALPHA_2BIT:
         case LV_IMG_CF_ALPHA_4BIT:
         case LV_IMG_CF_ALPHA_8BIT:
-            return true;
+            has_alpha = true;
+            break;
         default:
-            return false;
+            has_alpha = false;
+            break;
     }
 
-    return false;
+    return has_alpha;
 }
 
 /**

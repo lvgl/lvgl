@@ -217,16 +217,18 @@ uint16_t lv_preload_get_spin_time(const lv_obj_t * preload)
  *  */
 lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type)
 {
+    lv_style_t * style = NULL;
 
     switch(type) {
         case LV_PRELOAD_STYLE_MAIN:
-            return lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
+            style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================
