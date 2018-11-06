@@ -718,13 +718,11 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             }
 
             if(btn != NULL) {
+                lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+                ext->last_sel = btn;
                 lv_action_t rel_action;
                 rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_CLICK);
-                if(rel_action != NULL) {
-                    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-                    ext->last_sel = btn;
-                    rel_action(btn);
-                }
+                if(rel_action != NULL) rel_action(btn);
             }
         }
 #endif
