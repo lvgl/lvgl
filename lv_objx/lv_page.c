@@ -340,21 +340,25 @@ lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
  *  */
 lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
     switch(type) {
         case LV_PAGE_STYLE_BG:
-            return lv_obj_get_style(page);
+            style = lv_obj_get_style(page);
+            break;
         case LV_PAGE_STYLE_SCRL:
-            return lv_obj_get_style(ext->scrl);
+            style = lv_obj_get_style(ext->scrl);
+            break;
         case LV_PAGE_STYLE_SB:
-            return ext->sb.style;
+            style = ext->sb.style;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================

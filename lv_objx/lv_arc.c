@@ -184,16 +184,18 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
  *  */
 lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type)
 {
+    lv_style_t * style = NULL;
 
     switch(type) {
         case LV_ARC_STYLE_MAIN:
-            return lv_obj_get_style(arc);
+            style = lv_obj_get_style(arc);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================

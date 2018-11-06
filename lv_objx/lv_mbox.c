@@ -329,29 +329,37 @@ uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
  */
 lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     switch(type) {
         case LV_MBOX_STYLE_BG:
-            return lv_obj_get_style(mbox);
+            style = lv_obj_get_style(mbox);
+            break;
         case LV_MBOX_STYLE_BTN_BG:
-            return lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BG);
+            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BG);
+            break;
         case LV_MBOX_STYLE_BTN_REL:
-            return lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_REL);
+            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_REL);
+            break;
         case LV_MBOX_STYLE_BTN_PR:
-            return lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_PR);
+            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_PR);
+            break;
         case LV_MBOX_STYLE_BTN_TGL_REL:
-            return lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL);
+            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL);
+            break;
         case LV_MBOX_STYLE_BTN_TGL_PR:
-            return lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR);
+            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR);
+            break;
         case LV_MBOX_STYLE_BTN_INA:
-            return lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_INA);
+            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_INA);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 

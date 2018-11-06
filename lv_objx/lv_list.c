@@ -474,31 +474,40 @@ uint16_t lv_list_get_anim_time(const lv_obj_t * list)
  *  */
 lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
     switch(type) {
         case LV_LIST_STYLE_BG:
-            return lv_page_get_style(list, LV_PAGE_STYLE_BG);
+            style = lv_page_get_style(list, LV_PAGE_STYLE_BG);
+            break;
         case LV_LIST_STYLE_SCRL:
-            return lv_page_get_style(list, LV_PAGE_STYLE_SB);
+            style = lv_page_get_style(list, LV_PAGE_STYLE_SB);
+            break;
         case LV_LIST_STYLE_SB:
-            return lv_page_get_style(list, LV_PAGE_STYLE_SCRL);
+            style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL);
+            break;
         case LV_LIST_STYLE_BTN_REL:
-            return ext->styles_btn[LV_BTN_STATE_REL];
+            style = ext->styles_btn[LV_BTN_STATE_REL];
+            break;
         case LV_LIST_STYLE_BTN_PR:
-            return ext->styles_btn[LV_BTN_STATE_PR];
+            style = ext->styles_btn[LV_BTN_STATE_PR];
+            break;
         case LV_LIST_STYLE_BTN_TGL_REL:
-            return ext->styles_btn[LV_BTN_STATE_TGL_REL];
+            style = ext->styles_btn[LV_BTN_STATE_TGL_REL];
+            break;
         case LV_LIST_STYLE_BTN_TGL_PR:
-            return ext->styles_btn[LV_BTN_STATE_TGL_PR];
+            style = ext->styles_btn[LV_BTN_STATE_TGL_PR];
+            break;
         case LV_LIST_STYLE_BTN_INA:
-            return ext->styles_btn[LV_BTN_STATE_INA];
+            style = ext->styles_btn[LV_BTN_STATE_INA];
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 /*=====================
  * Other functions
