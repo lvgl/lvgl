@@ -368,7 +368,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
             {
-                lv_spinbox_decrement(spinbox);
+                lv_spinbox_increment(spinbox);
             }
             else
             {
@@ -379,7 +379,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
             {
-                lv_spinbox_increment(spinbox);
+                lv_spinbox_decrement(spinbox);
             }
             else
             {
