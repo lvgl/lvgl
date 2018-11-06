@@ -468,7 +468,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
             /*If not editable then just send a long press signal*/
             else {
-                if(focused) //  && (i->group->obj_ll.head != i->group->obj_ll.tail)
+                if(focused)
                     focused->signal_func(focused, LV_SIGNAL_LONG_PRESS, indev_act);
             }
             i->proc.long_pr_sent = 1;
