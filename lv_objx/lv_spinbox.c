@@ -22,7 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * param);
-static void lv_spinbox_updatevalue(lv_obj_t * spinbox);
+static void lv_spinbox_updatevalue(const lv_obj_t * spinbox);
 
 /**********************
  *  STATIC VARIABLES
@@ -422,7 +422,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     return res;
 }
 
-static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
+static void lv_spinbox_updatevalue(const lv_obj_t * spinbox)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     int32_t v = ext->value;
