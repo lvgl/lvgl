@@ -90,6 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
     ext->anim_time = LV_LIST_FOCUS_TIME;
 #if USE_LV_GROUP
+    ext->last_sel = NULL;
     ext->selected_btn = NULL;
 #endif
 
@@ -712,8 +713,15 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             if(last_clicked_btn) {
                 lv_list_set_btn_selected(list, last_clicked_btn);
             } else {
-                /*Get the first button and mark it as selected*/
-                lv_list_set_btn_selected(list, lv_list_get_next_btn(list, NULL));
+                lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+                if(NULL != ext->last_sel) {
+                    /* Select the last used button */
+                    lv_list_set_btn_selected(list, ext->last_sel);
+                }
+                else {
+                    /*Get the first button and mark it as selected*/
+                    lv_list_set_btn_selected(list, lv_list_get_next_btn(list, NULL));
+                }
             }
         }
 #endif
@@ -767,6 +775,8 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             }
 
             if(btn != NULL) {
+                lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+                ext->last_sel = btn;
                 lv_action_t rel_action;
                 rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_CLICK);
                 if(rel_action != NULL) rel_action(btn);

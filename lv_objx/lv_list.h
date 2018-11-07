@@ -58,6 +58,7 @@ typedef struct
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
     uint32_t size; /*the number of items(buttons) in the list*/
 #if USE_LV_GROUP
+    lv_obj_t * last_sel;                          /* Last btn selected */
     lv_obj_t * selected_btn;
 #endif
 } lv_list_ext_t;
