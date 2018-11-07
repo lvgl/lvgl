@@ -65,7 +65,9 @@ typedef struct
         uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
         lv_sb_mode_t mode:3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } sb;
-    uint8_t arrow_scroll :1;        /*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
+    uint8_t arrow_scroll   :1;        /*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
+    uint8_t scroll_prop    :1;        /*1: Propagate the scrolling the the parent if the edge is reached*/
+    uint8_t scroll_prop_ip :1;        /*1: Scroll propagation is in progress (used by the library)*/
 } lv_page_ext_t;
 
 enum {
@@ -147,6 +149,13 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
 void lv_page_set_arrow_scroll(lv_obj_t * page, bool en);
 
 /**
+ * Enable the scroll propagation feature. If enabled then the page will move its parent if there is no more space to scroll.
+ * @param page pointer to a Page
+ * @param en true or false to enable/disable scroll propagation
+ */
+void lv_page_set_scroll_propagation(lv_obj_t * page, bool en);
+
+/**
  * Set the fit attribute of the scrollable part of a page.
  * It means it can set its size automatically to involve all children.
  * (Can be set separately horizontally and vertically)
@@ -217,6 +226,12 @@ lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
  */
 bool lv_page_get_arrow_scroll(const lv_obj_t * page);
 
+/**
+ * Get the scroll propagation property
+ * @param page pointer to a Page
+ * @return true or false
+ */
+bool lv_page_get_scroll_propagation(lv_obj_t * page);
 
 /**
  * Get that width which can be set to the children to still not cause overflow (show scrollbars)

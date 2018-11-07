@@ -103,6 +103,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.valid_x = 0;
     ext->one_line = 0;
     ext->label = NULL;
+    ext->page.scroll_prop = 1;
 
     lv_obj_set_signal_func(new_ta, lv_ta_signal);
     lv_obj_set_signal_func(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);

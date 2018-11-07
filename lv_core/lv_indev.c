@@ -212,6 +212,12 @@ bool lv_indev_is_dragging(const lv_indev_t * indev)
  */
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
 {
+    if(indev == NULL) {
+        point->x = 0;
+        point->y = 0;
+        return;
+    }
+
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
         point->x = 0;
         point->y = 0;
@@ -588,6 +594,8 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->drag_in_prog = 0;
             proc->drag_sum.x = 0;
             proc->drag_sum.y = 0;
+            proc->vect.x = 0;
+            proc->vect.y = 0;
 
             /*Search for 'top' attribute*/
             lv_obj_t * i = pr_obj;
@@ -890,14 +898,19 @@ static void indev_drag_throw(lv_indev_proc_t * state)
 
     if(state->vect.x != 0 ||
             state->vect.y != 0) {
-        /*Get the coordinates  and modify them*/
+        /*Get the coordinates and modify them*/
+        lv_area_t coords_ori;
+        lv_obj_get_coords(drag_obj, &coords_ori);
         lv_coord_t act_x = lv_obj_get_x(drag_obj) + state->vect.x;
         lv_coord_t act_y = lv_obj_get_y(drag_obj) + state->vect.y;
         lv_obj_set_pos(drag_obj, act_x, act_y);
 
+        lv_area_t coord_new;
+        lv_obj_get_coords(drag_obj, &coord_new);
+
         /*If non of the coordinates are changed then do not continue throwing*/
-        if((lv_obj_get_x(drag_obj) != act_x || state->vect.x == 0) &&
-                (lv_obj_get_y(drag_obj) != act_y || state->vect.y == 0)) {
+        if((coords_ori.x1 == coord_new.x1 || state->vect.x == 0) &&
+                (coords_ori.y1 == coord_new.y1 || state->vect.y == 0)) {
             state->drag_in_prog = 0;
             state->vect.x = 0;
             state->vect.y = 0;

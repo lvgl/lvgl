@@ -713,7 +713,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             if(lv_group_get_editing(g)) {
                 lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
                 if(NULL != ext->last_sel) {
-                    /* Select the last used button */
+                    /* Select the    last used button */
                     lv_list_set_btn_selected(list, ext->last_sel);
                 }
                 else {
