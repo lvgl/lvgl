@@ -250,19 +250,22 @@ int16_t lv_bar_get_max_value(const lv_obj_t * bar)
  */
 lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     switch(type) {
         case LV_BAR_STYLE_BG:
-            return lv_obj_get_style(bar);
+            style = lv_obj_get_style(bar);
+            break;
         case LV_BAR_STYLE_INDIC:
-            return ext->style_indic;
+            style = ext->style_indic;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************

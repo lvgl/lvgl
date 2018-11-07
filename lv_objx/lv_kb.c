@@ -330,25 +330,33 @@ lv_action_t lv_kb_get_hide_action(const lv_obj_t * kb)
  */
 lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
 {
+    lv_style_t * style = NULL;
+
     switch(type) {
         case LV_KB_STYLE_BG:
-            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BG);
+            style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BG);
+            break;
         case LV_KB_STYLE_BTN_REL:
-            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_REL);
+            style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_REL);
+            break;
         case LV_KB_STYLE_BTN_PR:
-            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_PR);
+            style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_PR);
+            break;
         case LV_KB_STYLE_BTN_TGL_REL:
-            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL);
+            style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL);
+            break;
         case LV_KB_STYLE_BTN_TGL_PR:
-            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_PR);
+            style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_PR);
+            break;
         case LV_KB_STYLE_BTN_INA:
-            return lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_INA);
+            style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_INA);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************

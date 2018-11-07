@@ -223,21 +223,25 @@ bool lv_slider_get_knob_in(const lv_obj_t * slider)
  */
 lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     switch(type) {
         case LV_SLIDER_STYLE_BG:
-            return lv_bar_get_style(slider, LV_BAR_STYLE_BG);
+            style = lv_bar_get_style(slider, LV_BAR_STYLE_BG);
+            break;
         case LV_SLIDER_STYLE_INDIC:
-            return lv_bar_get_style(slider, LV_BAR_STYLE_INDIC);
+            style = lv_bar_get_style(slider, LV_BAR_STYLE_INDIC);
+            break;
         case LV_SLIDER_STYLE_KNOB:
-            return ext->style_knob;
+            style = ext->style_knob;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************

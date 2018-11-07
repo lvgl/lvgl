@@ -511,27 +511,34 @@ uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview)
  */
 lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
     switch(type) {
         case LV_TABVIEW_STYLE_BG:
-            return lv_obj_get_style(tabview);
+            style = lv_obj_get_style(tabview);
+            break;
         case LV_TABVIEW_STYLE_BTN_BG:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BG);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BG);
+            break;
         case LV_TABVIEW_STYLE_BTN_REL:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_REL);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_REL);
+            break;
         case LV_TABVIEW_STYLE_BTN_PR:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_PR);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_PR);
+            break;
         case LV_TABVIEW_STYLE_BTN_TGL_REL:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_REL);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_REL);
+            break;
         case LV_TABVIEW_STYLE_BTN_TGL_PR:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**

@@ -192,25 +192,31 @@ const char * lv_cb_get_text(const lv_obj_t * cb)
  *  */
 lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     switch(type) {
         case LV_CB_STYLE_BOX_REL:
-            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
+            style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL);
+            break;
         case LV_CB_STYLE_BOX_PR:
-            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
+            style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR);
+            break;
         case LV_CB_STYLE_BOX_TGL_REL:
-            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
+            style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL);
+            break;
         case LV_CB_STYLE_BOX_TGL_PR:
-            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
+            style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_PR);
+            break;
         case LV_CB_STYLE_BOX_INA:
-            return lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
+            style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_INA);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid awrning*/
-    return NULL;
+    return style;
 }
 
 /**********************
@@ -229,9 +235,11 @@ lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
  */
 static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode)
 {
+    bool result = true;
+
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask_p area*/
-        return ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
         lv_cb_ext_t * cb_ext = lv_obj_get_ext_attr(cb);
         lv_btn_ext_t * bullet_ext = lv_obj_get_ext_attr(cb_ext->bullet);
@@ -239,13 +247,13 @@ static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t
         /*Be sure the state of the bullet is the same as the parent button*/
         bullet_ext->state = cb_ext->bg_btn.state;
 
-        return ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, mask, mode);
 
     } else {
-        return ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, mask, mode);
     }
 
-    return true;
+    return result;
 }
 
 /**
