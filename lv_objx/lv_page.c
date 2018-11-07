@@ -220,7 +220,6 @@ void lv_page_set_arrow_scroll(lv_obj_t * page, bool en)
     ext->arrow_scroll = en ? 1 : 0;
 }
 
-
 /**
  * Enable the scroll propagation feature. If enabled then the page will move its parent if there is no more space to scroll.
  * @param page pointer to a Page
@@ -770,9 +769,12 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         bool refr_y = false;
         lv_area_t page_coords;
         lv_area_t scrl_coords;
+        lv_obj_get_coords(scrl, &scrl_coords);
+        lv_obj_get_coords(page, &page_coords);
+
         lv_area_t * ori_coords = (lv_area_t *) param;
-        lv_coord_t diff_x = scrl->coords.y1 - ori_coords->y1;
-        lv_coord_t diff_y = scrl->coords.x1 - ori_coords->x1;
+        lv_coord_t diff_x = scrl->coords.x1 - ori_coords->x1;
+        lv_coord_t diff_y = scrl->coords.y1 - ori_coords->y1;
         lv_coord_t hpad = page_style->body.padding.hor;
         lv_coord_t vpad = page_style->body.padding.ver;
         lv_obj_t * page_parent = lv_obj_get_parent(page);
@@ -781,8 +783,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         lv_point_t drag_vect;
         lv_indev_get_vect(indev, &drag_vect);
 
-        lv_obj_get_coords(scrl, &scrl_coords);
-        lv_obj_get_coords(page, &page_coords);
 
         /* Start the scroll propagation if there is drag vector on the indev, but the drag is not started yet
          * and the scrollable is in a corner. It will enable the scroll propagation only when a new scroll begins and not
@@ -795,6 +795,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
                 if(lv_obj_get_parent(page_parent) != NULL) {    /*Do not propagate the scroll to a screen*/
                     page_ext->scroll_prop_ip = 1;
+                    printf("ip\n");
                 }
             }
         }
@@ -808,6 +809,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         } else {
             /*If the scroll propagation is in progress revert the original coordinates (don't let the page scroll)*/
             if(page_ext->scroll_prop_ip) {
+                printf("x ctrl: %d, diff:%d, vect:%d, oc:%d, pc:%d\n", new_x, diff_x, drag_vect.x, ori_coords->x1, page_coords.x1);
                 if(drag_vect.x == diff_x) {   /*`scrl` is bouncing: drag pos. it somewhere and here it is reverted. Handle only the pos. because of drag*/
                     new_x = ori_coords->x1 - page_coords.x1;
                     refr_x = true;
@@ -849,7 +851,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             }
         }
 
-        if(refr_x != false || refr_y != false) {
+        if(refr_x || refr_y) {
             lv_obj_set_pos(scrl, new_x, new_y);
 
             if(page_ext->scroll_prop_ip) {
