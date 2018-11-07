@@ -711,7 +711,15 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             lv_group_t * g = lv_obj_get_group(list);
             if(lv_group_get_editing(g)) {
-                lv_list_set_btn_selected(list, lv_list_get_next_btn(list, NULL));
+                lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+                if(NULL != ext->last_sel) {
+                    /* Select the last used button */
+                    lv_list_set_btn_selected(list, ext->last_sel);
+                }
+                else {
+                    /*Get the first button and mark it as selected*/
+                    lv_list_set_btn_selected(list, lv_list_get_next_btn(list, NULL));
+                }
             } else {
                 lv_list_set_btn_selected(list, NULL);
             }
