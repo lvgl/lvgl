@@ -238,20 +238,25 @@ bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
  */
 lv_img_src_t lv_img_src_get_type(const void * src)
 {
-    if(src == NULL) return LV_IMG_SRC_UNKNOWN;
+    lv_img_src_t img_src_type = LV_IMG_SRC_UNKNOWN;
+
+    if(src == NULL) return img_src_type;
     const uint8_t * u8_p = src;
 
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        return LV_IMG_SRC_FILE;     /*If it's an ASCII character then it's file name*/
+        img_src_type = LV_IMG_SRC_FILE;     /*If it's an ASCII character then it's file name*/
     } else if(u8_p[0] >= 0x80) {
-        return LV_IMG_SRC_SYMBOL;   /*Symbols begins after 0x7F*/
+        img_src_type = LV_IMG_SRC_SYMBOL;   /*Symbols begins after 0x7F*/
     } else {
-        return LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is design to the first byte < 0x20*/
+        img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is design to the first byte < 0x20*/
     }
 
-    LV_LOG_WARN("lv_img_src_get_type: unknown image type");
-    return LV_IMG_SRC_UNKNOWN;
+    if (LV_IMG_SRC_UNKNOWN == img_src_type) {
+        LV_LOG_WARN("lv_img_src_get_type: unknown image type");
+    }
+
+    return img_src_type;
 }
 
 /**
