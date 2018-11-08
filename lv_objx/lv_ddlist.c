@@ -545,7 +545,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				if (area_ok)
 				{
 					lv_draw_label(&area_sel, &mask_sel, &new_style, opa_scale,
-					CUSTOM_SYMBOL_DOWN, LV_TXT_FLAG_NONE, NULL);
+					SYMBOL_DOWN, LV_TXT_FLAG_NONE, NULL);
 				}
 			}
 		}
