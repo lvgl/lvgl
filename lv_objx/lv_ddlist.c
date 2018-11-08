@@ -92,8 +92,9 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->option_cnt = 0;
     ext->anim_time = LV_DDLIST_ANIM_TIME;
     ext->sel_style = &lv_style_plain_color;
+#if LV_DDLIST_USE_STYLE_INDC != 0
     ext->roller_ddlist = 1;
-
+#endif
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_ddlist, lv_ddlist_signal);
     lv_obj_set_signal_func(lv_page_get_scrl(new_ddlist), lv_ddlist_scrl_signal);
