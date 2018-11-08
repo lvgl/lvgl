@@ -369,7 +369,7 @@ lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
             style = lv_obj_get_style(btnm);
             break;
         case LV_BTNM_STYLE_BTN_REL:
-            style ext->styles_btn[LV_BTN_STATE_REL];
+            style = ext->styles_btn[LV_BTN_STATE_REL];
             break;
         case LV_BTNM_STYLE_BTN_PR:
             style = ext->styles_btn[LV_BTN_STATE_PR];
