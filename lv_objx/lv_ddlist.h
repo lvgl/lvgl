@@ -54,6 +54,7 @@ typedef struct
     uint16_t sel_opt_id_ori;             /*Store the original index on focus*/
     uint16_t anim_time;                  /*Open/Close animation time [ms]*/
     uint8_t opened :1;                   /*1: The list is opened (handled by the library)*/
+    uint8_t roller_ddlist :1;            /*0: The list is roller, otherwise ddlist*/
     lv_coord_t fix_height;               /*Height of the ddlist when opened. (0: auto-size)*/
 } lv_ddlist_ext_t;
 
