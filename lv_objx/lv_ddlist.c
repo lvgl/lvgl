@@ -497,6 +497,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                               lv_label_get_text(ext->label), LV_TXT_FLAG_NONE, NULL);
             }
         }
+#if LV_DDLIST_USE_STYLE_INDC != 0
 		//Add a down symbol in ddlist
 		else
 		{
@@ -532,7 +533,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				}
 			}
 		}
-
+#endif
         /*Draw the scrollbar in the ancestor page design function*/
         ancestor_design(ddlist, mask, mode);
     }
