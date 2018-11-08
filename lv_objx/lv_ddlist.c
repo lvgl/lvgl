@@ -417,23 +417,6 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim_en)
     ext->opened = 0;
     lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
     lv_ddlist_refr_size(ddlist, anim_en);
-    //modify2
-	lv_area_t area_off;
-	area_off.y1 = ext->label->coords.y1;
-	area_off.y1 = ext->label->coords.y1;
-	area_off.x1 = ext->label->coords.x2;
-	area_off.x2 = area_off.x1 + 12;
-	area_off.y2 = ext->label->coords.y2;
-		lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-		lv_style_t new_style;
-		lv_style_copy(&new_style, sel_style);
-		new_style.text.color = sel_style->text.color;
-		new_style.text.opa = sel_style->text.opa;
-		lv_obj_t *t;
-		t = lv_label_create(ddlist,NULL);
-		lv_obj_set_style(t, &new_style);
-		lv_label_set_text(t, CUSTOM_SYMBOL_DOWN);
-		lv_obj_set_pos(t, area_off.x1,area_off.y2);
 }
 
 /**********************
