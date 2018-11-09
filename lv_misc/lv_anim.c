@@ -116,6 +116,19 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
 }
 
 /**
+ * Get the number of currently running animations
+ * @return the number of running animations
+ */
+uint16_t lv_anim_count_running(void)
+{
+    uint16_t cnt = 0;
+    lv_anim_t * a;
+    LL_READ(anim_ll, a) cnt++;
+
+    return cnt++;
+}
+
+/**
  * Calculate the time of an animation with a given speed and the start and end values
  * @param speed speed of animation in unit/sec
  * @param start start value of the animation
