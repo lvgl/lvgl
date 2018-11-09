@@ -795,7 +795,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
                 if(lv_obj_get_parent(page_parent) != NULL) {    /*Do not propagate the scroll to a screen*/
                     page_ext->scroll_prop_ip = 1;
-                    printf("ip\n");
                 }
             }
         }
@@ -809,7 +808,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         } else {
             /*If the scroll propagation is in progress revert the original coordinates (don't let the page scroll)*/
             if(page_ext->scroll_prop_ip) {
-                printf("x ctrl: %d, diff:%d, vect:%d, oc:%d, pc:%d\n", new_x, diff_x, drag_vect.x, ori_coords->x1, page_coords.x1);
                 if(drag_vect.x == diff_x) {   /*`scrl` is bouncing: drag pos. it somewhere and here it is reverted. Handle only the pos. because of drag*/
                     new_x = ori_coords->x1 - page_coords.x1;
                     refr_x = true;
