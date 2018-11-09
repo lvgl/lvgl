@@ -103,7 +103,6 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.valid_x = 0;
     ext->one_line = 0;
     ext->label = NULL;
-    ext->page.scroll_prop = 1;
 
     lv_obj_set_signal_func(new_ta, lv_ta_signal);
     lv_obj_set_signal_func(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);
@@ -1116,9 +1115,22 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         cur_type = lv_ta_get_cursor_type(ta);
         lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
     } else if(sign == LV_SIGNAL_FOCUS) {
+#if USE_LV_GROUP
         lv_cursor_type_t cur_type;
         cur_type = lv_ta_get_cursor_type(ta);
-        lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
+        lv_group_t * g = lv_obj_get_group(ta);
+        bool editing = lv_group_get_editing(g);
+        lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+
+        /*Encoders need special handling*/
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            if(editing) lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
+            else lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
+        }
+        else {
+            lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
+        }
+#endif
     }
     return res;
 }
