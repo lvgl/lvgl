@@ -109,10 +109,6 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
      * In this case automatically activate it*/
     if(lv_ll_get_head(&group->obj_ll) == next) {
         lv_group_refocus(group);
-        if(!lv_group_get_editing(group))
-        {
-        	lv_group_set_editing(group, true);
-        }
     }
 }
 
