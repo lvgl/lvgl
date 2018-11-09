@@ -74,7 +74,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
-    ext->ddlist.roller_ddlist = 0;  /*Do not draw arrow by default*/
+    ext->ddlist.draw_arrow = 0;  /*Do not draw arrow by default*/
     
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_roller, lv_roller_signal);
