@@ -511,7 +511,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
             }
         }
 
-		//Add a down symbol in ddlist
+		/*Add a down symbol in ddlist*/
 		else
 		{
 			/*Draw a arrow in ddlist if enabled*/
@@ -536,7 +536,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				lv_coord_t w = lv_obj_get_width(ddlist);
 				area_sel.x1 = ddlist->coords.x2 - 20;
 				area_sel.x2 = ddlist->coords.x2 + w;
-				area_sel.y1 += 2;
+				area_sel.y1 += (font_h/2-5);	/* Height of the symbol is about 10ppx */
 				lv_area_t mask_sel;
 				bool area_ok;
 				area_ok = lv_area_intersect(&mask_sel, mask, &area_sel);
