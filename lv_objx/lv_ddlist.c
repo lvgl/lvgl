@@ -536,24 +536,20 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				lv_style_copy(&new_style, style);
 				new_style.text.color = sel_style->text.color;
 				new_style.text.opa = sel_style->text.opa;
-				lv_area_t area_sel;
-				area_sel.y1 = ext->label->coords.y1;
-				area_sel.y1 += ext->sel_opt_id * (font_h + style->text.line_space);
-				area_sel.y1 -= style->text.line_space / 2;
+				lv_area_t area_arrow;
+				area_arrow.x2 = ddlist->coords.x2 - style->body.padding.hor;
+				area_arrow.x1 = area_arrow.x2 - lv_txt_get_width(SYMBOL_DOWN, 1, sel_style->text.font, 0, 0);
 
-				area_sel.y2 = area_sel.y1 + font_h + style->text.line_space - 1;
-				area_sel.x1 = ddlist->coords.x1;
-				area_sel.x2 = ddlist->coords.x2;
-				lv_coord_t w = lv_obj_get_width(ddlist);
-				area_sel.x1 = ddlist->coords.x2 - 20;
-				area_sel.x2 = ddlist->coords.x2 + w;
-				area_sel.y1 += (font_h/2-5);	/* Height of the symbol is about 10ppx */
-				lv_area_t mask_sel;
+				area_arrow.y1 = ddlist->coords.y1 + style->text.line_space;
+				area_arrow.y2 = area_arrow.y1 + font_h;
+
+
+				lv_area_t mask_arrow;
 				bool area_ok;
-				area_ok = lv_area_intersect(&mask_sel, mask, &area_sel);
+				area_ok = lv_area_intersect(&mask_arrow, mask, &area_arrow);
 				if (area_ok)
 				{
-					lv_draw_label(&area_sel, &mask_sel, &new_style, opa_scale,
+					lv_draw_label(&area_arrow, &mask_arrow, &new_style, opa_scale,
 					SYMBOL_DOWN, LV_TXT_FLAG_NONE, NULL);		/*Use a down arrow in ddlist, you can replace it with your custom symbol*/
 				}
 			}
