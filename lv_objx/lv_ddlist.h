@@ -54,9 +54,8 @@ typedef struct
     uint16_t sel_opt_id_ori;             /*Store the original index on focus*/
     uint16_t anim_time;                  /*Open/Close animation time [ms]*/
     uint8_t opened :1;                   /*1: The list is opened (handled by the library)*/
-#if LV_DDLIST_USE_STYLE_INDC != 0
-    uint8_t roller_ddlist :1;            /*0: The list is roller, otherwise ddlist*/
-#endif
+    uint8_t draw_arrow :1;               /*1: Draw arrow*/
+
     lv_coord_t fix_height;               /*Height of the ddlist when opened. (0: auto-size)*/
 } lv_ddlist_ext_t;
 
@@ -81,6 +80,13 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy);
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set arrow draw in a drop down list
+ * @param ddlist pointer to drop down list object
+ * @param en enable/disable a arrow draw. E.g. "true" for draw.
+ */
+void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en);
 
 /**
  * Set the options in a drop down list from a string
@@ -147,6 +153,12 @@ void lv_ddlist_set_style(lv_obj_t *ddlist, lv_ddlist_style_t type, lv_style_t *s
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get arrow draw in a drop down list
+ * @param ddlist pointer to drop down list object
+ */
+bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist);
 
 /**
  * Get the options of a drop down list

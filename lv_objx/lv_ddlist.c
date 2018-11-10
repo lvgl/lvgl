@@ -92,9 +92,8 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->option_cnt = 0;
     ext->anim_time = LV_DDLIST_ANIM_TIME;
     ext->sel_style = &lv_style_plain_color;
-#if LV_DDLIST_USE_STYLE_INDC != 0
-    ext->roller_ddlist = 1;
-#endif
+    ext->draw_arrow = 0;  /*Do not draw arrow by default*/
+
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_ddlist, lv_ddlist_signal);
     lv_obj_set_signal_func(lv_page_get_scrl(new_ddlist), lv_ddlist_scrl_signal);
@@ -152,6 +151,19 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set arrow draw in a drop down list
+ * @param ddlist pointer to drop down list object
+ * @param en enable/disable a arrow draw. E.g. "true" for draw.
+ */
+void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    /*Set the flag*/
+    ext->draw_arrow = en;
+}
 
 /**
  * Set the options in a drop down list from a string
@@ -277,6 +289,17 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, lv_style_t *
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get arrow draw in a drop down list
+ * @param ddlist pointer to drop down list object
+ */
+bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    return ext->draw_arrow;
+}
 
 /**
  * Get the options of a drop down list
@@ -498,11 +521,12 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                               lv_label_get_text(ext->label), LV_TXT_FLAG_NONE, NULL);
             }
         }
-#if LV_DDLIST_USE_STYLE_INDC != 0
-		//Add a down symbol in ddlist
+
+		/*Add a down symbol in ddlist*/
 		else
 		{
-			if(ext->roller_ddlist)
+			/*Draw a arrow in ddlist if enabled*/
+			if(ext->draw_arrow)
 			{
 				lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
 				const lv_font_t * font = style->text.font;
@@ -523,18 +547,17 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				lv_coord_t w = lv_obj_get_width(ddlist);
 				area_sel.x1 = ddlist->coords.x2 - 20;
 				area_sel.x2 = ddlist->coords.x2 + w;
-				area_sel.y1 += 2;
+				area_sel.y1 += (font_h/2-5);	/* Height of the symbol is about 10ppx */
 				lv_area_t mask_sel;
 				bool area_ok;
 				area_ok = lv_area_intersect(&mask_sel, mask, &area_sel);
 				if (area_ok)
 				{
 					lv_draw_label(&area_sel, &mask_sel, &new_style, opa_scale,
-					SYMBOL_DOWN, LV_TXT_FLAG_NONE, NULL);
+					SYMBOL_DOWN, LV_TXT_FLAG_NONE, NULL);		/*Use a down arrow in ddlist, you can replace it with your custom symbol*/
 				}
 			}
 		}
-#endif
         /*Draw the scrollbar in the ancestor page design function*/
         ancestor_design(ddlist, mask, mode);
     }
