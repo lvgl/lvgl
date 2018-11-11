@@ -360,10 +360,13 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 void lv_obj_clean(lv_obj_t * obj)
 {
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
-
+    lv_obj_t * child_next;
     while(child) {
+        /* Read the next child before deleting the current
+         * because the next couldn't be read from a deleted (invalid) node*/
+        child_next = lv_obj_get_child(obj, child);
         lv_obj_del(child);
-        child = lv_obj_get_child(obj, child);
+        child = child_next;
     }
 }
 
