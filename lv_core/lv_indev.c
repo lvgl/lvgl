@@ -585,7 +585,10 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             if(proc->reset_query != 0) return;
         }
 
-        if(pr_obj != NULL) {
+        proc->act_obj = pr_obj;           /*Save the pressed object*/
+        proc->last_obj = proc->act_obj;   /*Refresh the last_obj*/
+
+        if(proc->act_obj != NULL) {
             /* Save the time when the obj pressed.
              * It is necessary to count the long press time.*/
             proc->pr_timestamp = lv_tick_get();
@@ -598,7 +601,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->vect.y = 0;
 
             /*Search for 'top' attribute*/
-            lv_obj_t * i = pr_obj;
+            lv_obj_t * i = proc->act_obj;
             lv_obj_t * last_top = NULL;
             while(i != NULL) {
                 if(i->top != 0) last_top = i;
@@ -614,13 +617,10 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             }
 
             /*Send a signal about the press*/
-            pr_obj->signal_func(pr_obj, LV_SIGNAL_PRESSED, indev_act);
+            proc->act_obj->signal_func(proc->act_obj, LV_SIGNAL_PRESSED, indev_act);
             if(proc->reset_query != 0) return;
         }
     }
-
-    proc->act_obj = pr_obj;            /*Save the pressed object*/
-    proc->last_obj = proc->act_obj;   /*Refresh the last_obj*/
 
     /*Calculate the vector*/
     proc->vect.x = proc->act_point.x - proc->last_point.x;
