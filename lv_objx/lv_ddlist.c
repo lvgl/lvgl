@@ -137,6 +137,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->option_cnt = copy_ext->option_cnt;
         ext->sel_style = copy_ext->sel_style;
         ext->anim_time = copy_ext->anim_time;
+        ext->draw_arrow = copy_ext->draw_arrow;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_ddlist);
@@ -382,7 +383,6 @@ uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist)
     return ext->anim_time;
 }
 
-
 /**
  * Get a style of a drop down list
  * @param ddlist pointer to a drop down list object
@@ -522,7 +522,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
             }
         }
 
-		/*Add a down symbol in ddlist*/
+		/*Add a down symbol in ddlist when closed*/
 		else
 		{
 			lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);	/*fix a bomb here*/
