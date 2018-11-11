@@ -525,6 +525,8 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 		/*Add a down symbol in ddlist*/
 		else
 		{
+			lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);	/*fix a bomb here*/
+			
 			/*Draw a arrow in ddlist if enabled*/
 			if(ext->draw_arrow)
 			{
