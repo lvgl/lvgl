@@ -292,7 +292,7 @@
 #define LV_LIST_FOCUS_TIME  100 /*Default animation time of focusing to a list element [ms] (0: no animation)  */
 #endif
 
-/*Drop down list (dependencies: lv_page, lv_label)*/
+/*Drop down list (dependencies: lv_page, lv_label, lv_symbol_def.h)*/
 #define USE_LV_DDLIST    1
 #if USE_LV_DDLIST != 0
 #define LV_DDLIST_ANIM_TIME     200     /*Open and close default animation time [ms] (0: no animation)*/
