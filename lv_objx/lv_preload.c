@@ -92,6 +92,21 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     a.repeat = 1;
     a.repeat_pause = 0;
     lv_anim_create(&a);
+
+    lv_anim_t b;
+    b.var = new_preload;
+    b.start = ext->arc_length;
+    b.end = 360;
+    b.fp = (lv_anim_fp_t)lv_preload_set_arc_length;
+    b.path = lv_anim_path_ease_in_out;
+    b.end_cb = NULL;
+    b.act_time = 0;
+    b.time = LV_PRELOAD_DEF_SPIN_TIME;
+    b.playback = 1;
+    b.playback_pause = 0;
+    b.repeat = 1;
+    b.repeat_pause = 100;
+    lv_anim_create(&b);
 #endif
 
     /*Init the new pre loader pre loader*/
