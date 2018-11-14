@@ -93,6 +93,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     a.repeat_pause = 0;
     lv_anim_create(&a);
 
+#if LV_PRELOAD_DOUBLE_ANIM
     lv_anim_t b;
     b.var = new_preload;
     b.start = ext->arc_length;
@@ -107,7 +108,8 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     b.repeat = 1;
     b.repeat_pause = 0;
     lv_anim_create(&b);
-#endif
+#endif // LV_PRELOAD_DOUBLE_ANIM
+#endif // USE_LV_ANIMATION
 
     /*Init the new pre loader pre loader*/
     if(copy == NULL) {
