@@ -165,6 +165,28 @@ void lv_sw_off(lv_obj_t * sw)
     if(!lv_sw_get_state(sw)) return;    /*Do nothing is already turned off*/
 
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+#if USE_LV_ANIMATION
+    if(lv_sw_get_anim_time(sw) > 0) {
+    	if(ext->anim_act) {
+    		lv_anim_del(sw, NULL);
+    		ext->anim_act = 0;
+    	}
+    	ext->cur_anim.var = sw;
+    	ext->cur_anim.start = LV_SWITCH_SLIDER_ANIM_MAX;
+    	ext->cur_anim.end = 0;
+    	ext->cur_anim.fp = (lv_anim_fp_t)lv_slider_set_value;
+    	ext->cur_anim.path = lv_anim_path_linear;
+    	ext->cur_anim.end_cb = (lv_anim_cb_t)lv_sw_clear_anim;
+    	ext->cur_anim.act_time = 0;
+    	ext->cur_anim.time = lv_sw_get_anim_time(sw);
+    	ext->cur_anim.playback = 0;
+    	ext->cur_anim.playback_pause = 0;
+    	ext->cur_anim.repeat = 0;
+    	ext->cur_anim.repeat_pause = 0;
+    	ext->anim_act = 1;
+    	lv_anim_create(&ext->cur_anim);
+    } else /* continues below if statement */
+#endif
     lv_slider_set_value(sw, 0);
     lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
 }
@@ -197,16 +219,20 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
     }
 }
 
-
+#if USE_LV_ANIMATION
 void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time)
 {
 	lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+	bool sw_state = lv_sw_get_state(sw);
+	uint16_t max = anim_time > 0 ? LV_SWITCH_SLIDER_ANIM_MAX : 1;
 	ext->anim_time = anim_time;
 	if(anim_time > 0) {
 		lv_slider_set_range(sw, 0, LV_SWITCH_SLIDER_ANIM_MAX);
 	} else
 		lv_slider_set_range(sw, 0, 1);
+	lv_slider_set_value(sw, sw_state ? max : 0);
 }
+#endif
 
 /*=====================
  * Getter functions
@@ -244,11 +270,13 @@ lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
     return style;
 }
 
+#if USE_LV_ANIMATION
 uint16_t lv_sw_get_anim_time(const lv_obj_t *sw)
 {
 	lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 	return ext->anim_time;
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
