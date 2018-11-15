@@ -296,12 +296,20 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(lv_sw_get_anim_time(sw) > 0) {
         	/* Keep forcing the slider to old_val */
         	lv_slider_set_value(sw, old_val);
+        	ext->slider.drag_value = old_val;
         }
 #endif
     } else if(sign == LV_SIGNAL_PRESS_LOST) {
         ext->changed = 0;
         if(lv_sw_get_state(sw)) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
         else lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
+#if USE_LV_ANIMATION
+        if(lv_sw_get_anim_time(sw) > 0) {
+        	/* Keep forcing the slider to old_val */
+        	lv_slider_set_value(sw, old_val);
+        	ext->slider.drag_value = old_val;
+        }
+#endif
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->changed == 0) {
             int16_t v = lv_slider_get_value(sw);
