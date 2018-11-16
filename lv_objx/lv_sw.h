@@ -32,6 +32,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_SWITCH_SLIDER_ANIM_MAX 1000
 
 /**********************
  *      TYPEDEFS
@@ -43,7 +44,7 @@ typedef struct
     /*New data for this type */
     lv_style_t *style_knob_off;     /*Style of the knob when the switch is OFF*/
     lv_style_t *style_knob_on;      /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
-    uint8_t tmp_state   :1;         /*Saves the initial state of the switch when it begins to drag*/
+    uint8_t changed   :1;           /*Indicates the switch explicitly changed by drag*/
 #if USE_LV_ANIMATION
     uint16_t anim_time;				/*switch animation time */
 #endif
@@ -124,7 +125,7 @@ void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time);
  */
 static inline bool lv_sw_get_state(const lv_obj_t *sw)
 {
-    return lv_bar_get_value(sw) == 0 ? false : true;
+    return lv_bar_get_value(sw) < LV_SWITCH_SLIDER_ANIM_MAX / 2 ? false : true;
 }
 
 /**
