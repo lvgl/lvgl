@@ -41,13 +41,11 @@ typedef struct
 {
     lv_slider_ext_t slider;         /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t *style_knob_off;       /*Style of the knob when the switch is OFF*/
-    lv_style_t *style_knob_on;       /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
-    uint8_t changed   :1;           /*Indicates the switch explicitly changed by drag*/
+    lv_style_t *style_knob_off;     /*Style of the knob when the switch is OFF*/
+    lv_style_t *style_knob_on;      /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
+    uint8_t tmp_state   :1;         /*Saves the initial state of the switch when it begins to drag*/
 #if USE_LV_ANIMATION
     uint16_t anim_time;				/*switch animation time */
-    lv_anim_t cur_anim;			/*current active animation */
-    uint8_t	anim_act  :1;
 #endif
 } lv_sw_ext_t;
 
