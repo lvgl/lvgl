@@ -45,7 +45,8 @@ typedef struct {
    uint16_t prev_hue;
    uint16_t prev_saturation;
    uint16_t prev_value;
-   uint8_t wheel_mode;
+   uint8_t wheel_mode:2;
+   uint8_t wheel_fixed:1;
    uint32_t last_clic;
 } lv_cpicker_ext_t;
 
@@ -68,6 +69,7 @@ enum {
     LV_CPICKER_WHEEL_SAT,
     LV_CPICKER_WHEEL_VAL
 };
+typedef uint8_t lv_cpicker_wheel_mode_t;
 
 
 
@@ -141,6 +143,20 @@ void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color);
  * @param action callback function
  */
 void lv_cpicker_set_action(lv_obj_t * cpicker, lv_action_t action);
+
+/**
+ * Set the current wheel mode.
+ * @param cpicker pointer to colorpicker object
+ * @param mode wheel mode (hue/sat/val)
+ */
+void lv_cpicker_set_wheel_mode(lv_obj_t * cpicker, lv_cpicker_wheel_mode_t mode);
+
+/**
+ * Set if the wheel mode is changed on long press on center
+ * @param cpicker pointer to colorpicker object
+ * @param fixed_mode mode cannot be changed if set
+ */
+void lv_cpicker_set_wheel_fixed(lv_obj_t * cpicker, bool fixed_mode);
 
 /*=====================
  * Getter functions

@@ -79,9 +79,10 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->saturation = 100;
     ext->value = 100;
     ext->ind.style = &lv_style_plain;
-    ext->ind.type = LV_CPICKER_IND_CIRCLE;
+    ext->ind.type = LV_CPICKER_DEF_IND_TYPE;
     ext->value_changed = NULL;
     ext->wheel_mode = LV_CPICKER_WHEEL_HUE;
+    ext->wheel_fixed = 0;
     ext->last_clic = 0;
 
     /*The signal and design functions are not copied so set them here*/
@@ -167,13 +168,13 @@ void lv_cpicker_set_ind_type(lv_obj_t * cpicker, lv_cpicker_ind_type_t type)
 /**
  * Set the current hue of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @param hue current selected hue
+ * @param hue current selected hue [0..360]
  */
 void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
-    ext->hue = hue;
+    ext->hue = hue % 360;
 
     lv_obj_invalidate(cpicker);
 }
@@ -181,13 +182,13 @@ void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 /**
  * Set the current saturation of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @param sat current selected saturation
+ * @param sat current selected saturation [0..100]
  */
 void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint16_t sat)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
-    ext->saturation = sat;
+    ext->saturation = sat % 100;
 
     lv_obj_invalidate(cpicker);
 }
@@ -195,13 +196,13 @@ void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint16_t sat)
 /**
  * Set the current value of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @param val current selected value
+ * @param val current selected value [0..100]
  */
 void lv_cpicker_set_value(lv_obj_t * cpicker, uint16_t val)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
-    ext->value = val;
+    ext->value = val % 100;
 
     lv_obj_invalidate(cpicker);
 }
@@ -231,6 +232,30 @@ void lv_cpicker_set_action(lv_obj_t * cpicker, lv_action_t action)
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
     ext->value_changed = action;
+}
+
+/**
+ * Set the current wheel mode.
+ * @param cpicker pointer to colorpicker object
+ * @param mode wheel mode (hue/sat/val)
+ */
+void lv_cpicker_set_wheel_mode(lv_obj_t * cpicker, lv_cpicker_wheel_mode_t mode)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    ext->wheel_mode = mode;
+}
+
+/**
+ * Set if the wheel mode is changed on long press on center
+ * @param cpicker pointer to colorpicker object
+ * @param fixed_mode mode cannot be changed if set
+ */
+void lv_cpicker_set_wheel_fixed(lv_obj_t * cpicker, bool fixed_mode)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    ext->wheel_fixed = fixed_mode;
 }
 
 /*=====================
@@ -623,27 +648,30 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_LONG_PRESS)
     {
-        lv_indev_t * indev = param;
-        lv_coord_t xp = indev->proc.act_point.x - x;
-        lv_coord_t yp = indev->proc.act_point.y - y;
-
-        if((xp*xp + yp*yp) < r_in*r_in)
+        if(!ext->wheel_fixed)
         {
-            switch(ext->wheel_mode)
-            {
-            case LV_CPICKER_WHEEL_HUE:
-                ext->prev_hue = ext->hue;
-                break;
-            case LV_CPICKER_WHEEL_SAT:
-                ext->prev_saturation = ext->saturation;
-                break;
-            case LV_CPICKER_WHEEL_VAL:
-                ext->prev_value = ext->value;
-                break;
-            }
+            lv_indev_t * indev = param;
+            lv_coord_t xp = indev->proc.act_point.x - x;
+            lv_coord_t yp = indev->proc.act_point.y - y;
 
-            ext->wheel_mode = (ext->wheel_mode + 1) % 3;
-            lv_obj_invalidate(cpicker);
+            if((xp*xp + yp*yp) < (r_in*r_in))
+            {
+                switch(ext->wheel_mode)
+                {
+                case LV_CPICKER_WHEEL_HUE:
+                    ext->prev_hue = ext->hue;
+                    break;
+                case LV_CPICKER_WHEEL_SAT:
+                    ext->prev_saturation = ext->saturation;
+                    break;
+                case LV_CPICKER_WHEEL_VAL:
+                    ext->prev_value = ext->value;
+                    break;
+                }
+
+                ext->wheel_mode = (ext->wheel_mode + 1) % 3;
+                lv_obj_invalidate(cpicker);
+            }
         }
     }
     else if(sign == LV_SIGNAL_CONTROLL)
