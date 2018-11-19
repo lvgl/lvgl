@@ -41,6 +41,8 @@ typedef struct {
         lv_style_t * style;
         uint8_t type;
     }ind;
+   lv_action_t value_changed;
+   uint16_t prev_hue;
 } lv_cpicker_ext_t;
 
 
@@ -103,6 +105,13 @@ void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue);
  */
 void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color);
 
+/**
+ * Set the action callback on value change event.
+ * @param cpicker pointer to colorpicker object
+ * @param action callback function
+ */
+void lv_cpicker_set_action(lv_obj_t * cpicker, lv_action_t action);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -128,6 +137,13 @@ uint16_t lv_cpicker_get_hue(lv_obj_t * cpicker);
  * @return color current selected color
  */
 lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker);
+
+/**
+ * Get the action callback called on value change event.
+ * @param cpicker pointer to colorpicker object
+ * @return action callback function
+ */
+lv_action_t lv_cpicker_get_action(lv_obj_t * cpicker);
 
 /*=====================
  * Other functions

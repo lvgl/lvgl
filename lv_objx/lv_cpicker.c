@@ -4,7 +4,7 @@
  */
 
 /* TODO Remove these instructions
- * Search an replace: cpickerate -> object normal name with lower case (e.g. button, label etc.)
+ * Search an replace: color_picker -> object normal name with lower case (e.g. button, label etc.)
  *                    cpicker -> object short name with lower case(e.g. btn, label etc)
  *                    CPICKER -> object short name with upper case (e.g. BTN, LABEL etc.)
  *
@@ -17,6 +17,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_arc.h"
 #include "../lv_themes/lv_theme.h"
+#include "../lv_core/lv_indev.h"
 
 #if USE_LV_CPICKER != 0
 
@@ -33,6 +34,8 @@
  **********************/
 static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
+static uint16_t fast_atan2(int x, int y);
+static uint16_t fast_sqrt(unsigned int x);
 
 /**********************
  *  STATIC VARIABLES
@@ -49,16 +52,16 @@ static lv_design_func_t ancestor_design;
  **********************/
 
 /**
- * Create a cpickerate object
- * @param par pointer to an object, it will be the parent of the new cpickerate
- * @param copy pointer to a cpickerate object, if not NULL then the new object will be copied from it
- * @return pointer to the created cpickerate
+ * Create a color_picker object
+ * @param par pointer to an object, it will be the parent of the new color_picker
+ * @param copy pointer to a color_picker object, if not NULL then the new object will be copied from it
+ * @return pointer to the created color_picker
  */
 lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("cpickerate create started");
+    LV_LOG_TRACE("color_picker create started");
 
-    /*Create the ancestor of cpickerate*/
+    /*Create the ancestor of color_picker*/
     /*TODO modify it to the ancestor create function */
     lv_obj_t * new_cpicker = lv_obj_create(par, copy);
     lv_mem_assert(new_cpicker);
@@ -73,16 +76,18 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->hue = 0;
+    ext->prev_hue = 0;
     ext->saturation = 100;
     ext->value = 100;
     ext->ind.style = &lv_style_plain;
     ext->ind.type = LV_CPICKER_IND_CIRCLE;
+    ext->value_changed = NULL;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_cpicker, lv_cpicker_signal);
     lv_obj_set_design_func(new_cpicker, lv_cpicker_design);
 
-    /*Init the new cpicker cpickerate*/
+    /*Init the new cpicker color_picker*/
     if(copy == NULL) {
 
         /*Set the default styles*/
@@ -98,7 +103,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
         }
     }
 
-    /*Copy an existing cpickerate*/
+    /*Copy an existing color_picker*/
     else {
         lv_cpicker_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
@@ -130,8 +135,8 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 
 
 /**
- * Set a style of a cpickerate.
- * @param cpicker pointer to cpickerate object
+ * Set a style of a color_picker.
+ * @param cpicker pointer to color_picker object
  * @param type which style should be set
  * @param style pointer to a style
  */
@@ -179,6 +184,18 @@ void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
     lv_obj_invalidate(cpicker);
 }
 
+/**
+ * Set the action callback on value change event.
+ * @param cpicker pointer to colorpicker object
+ * @param action callback function
+ */
+void lv_cpicker_set_action(lv_obj_t * cpicker, lv_action_t action)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    ext->value_changed = action;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -188,8 +205,8 @@ void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
  */
 
 /**
- * Get style of a cpickerate.
- * @param cpicker pointer to cpickerate object
+ * Get style of a color_picker.
+ * @param cpicker pointer to color_picker object
  * @param type which style should be get
  * @return style pointer to the style
  */
@@ -234,6 +251,18 @@ lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker)
     return lv_color_hsv_to_rgb(ext->hue, ext->saturation, ext->value);
 }
 
+/**
+ * Get the action callback called on value change event.
+ * @param cpicker pointer to colorpicker object
+ * @return action callback function
+ */
+lv_action_t lv_cpicker_get_action(lv_obj_t * cpicker)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    return ext->value_changed;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -247,7 +276,7 @@ lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker)
  **********************/
 
 /**
- * Handle the drawing related tasks of the cpickerates
+ * Handle the drawing related tasks of the color_picker
  * @param cpicker pointer to an object
  * @param mask the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
@@ -356,19 +385,67 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
 }
 
 /**
- * Signal function of the cpickerate
- * @param cpicker pointer to a cpickerate object
+ * Signal function of the color_picker
+ * @param cpicker pointer to a color_picker object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param)
 {
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
     lv_res_t res;
 
     /* Include the ancient signal function */
     res = ancestor_signal(cpicker, sign, param);
     if(res != LV_RES_OK) return res;
+
+    lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
+    lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
+    lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
+
+    if(sign == LV_SIGNAL_PRESSED)
+    {
+        ext->prev_hue = ext->hue;
+    }
+
+    if(sign == LV_SIGNAL_PRESSING)
+    {
+        lv_indev_t * indev = param;
+        lv_coord_t xp = indev->proc.act_point.x - x;
+        lv_coord_t yp = indev->proc.act_point.y - y;
+
+        if(fast_sqrt(xp*xp + yp+yp) < r)
+        {
+            ext->hue = fast_atan2(xp, yp);
+            lv_obj_invalidate(cpicker);
+        }
+    }
+
+    if(sign == LV_SIGNAL_PRESS_LOST)
+    {
+        ext->hue = ext->prev_hue;
+        lv_obj_invalidate(cpicker);
+    }
+
+    if(sign == LV_SIGNAL_RELEASED)
+    {
+        lv_indev_t * indev = param;
+        lv_coord_t xp = indev->proc.act_point.x - x;
+        lv_coord_t yp = indev->proc.act_point.y - y;
+
+        if(fast_sqrt(xp*xp + yp+yp) < r)
+        {
+            ext->hue = fast_atan2(xp, yp);
+            lv_obj_invalidate(cpicker);
+
+            ext->prev_hue = ext->hue;
+
+            if(ext->value_changed != NULL)
+                ext->value_changed(cpicker);
+        }
+    }
 
 
     if(sign == LV_SIGNAL_CLEANUP) {
@@ -383,6 +460,96 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     }
 
     return res;
+}
+
+static uint16_t fast_atan2(int x, int y)
+{
+    // Fast XY vector to integer degree algorithm - Jan 2011 www.RomanBlack.com
+    // Converts any XY values including 0 to a degree value that should be
+    // within +/- 1 degree of the accurate value without needing
+    // large slow trig functions like ArcTan() or ArcCos().
+    // NOTE! at least one of the X or Y values must be non-zero!
+    // This is the full version, for all 4 quadrants and will generate
+    // the angle in integer degrees from 0-360.
+    // Any values of X and Y are usable including negative values provided
+    // they are between -1456 and 1456 so the 16bit multiply does not overflow.
+
+    unsigned char negflag;
+    unsigned char tempdegree;
+    unsigned char comp;
+    unsigned int degree;     // this will hold the result
+    //signed int x;            // these hold the XY vector at the start
+    //signed int y;            // (and they will be destroyed)
+    unsigned int ux;
+    unsigned int uy;
+
+    // Save the sign flags then remove signs and get XY as unsigned ints
+    negflag = 0;
+    if(x < 0) {
+        negflag += 0x01;    // x flag bit
+        x = (0 - x);        // is now +
+    }
+    ux = x;                // copy to unsigned var before multiply
+    if(y < 0) {
+        negflag += 0x02;    // y flag bit
+        y = (0 - y);        // is now +
+    }
+    uy = y;                // copy to unsigned var before multiply
+
+    // 1. Calc the scaled "degrees"
+    if(ux > uy) {
+        degree = (uy * 45) / ux;   // degree result will be 0-45 range
+        negflag += 0x10;    // octant flag bit
+    } else {
+        degree = (ux * 45) / uy;   // degree result will be 0-45 range
+    }
+
+    // 2. Compensate for the 4 degree error curve
+    comp = 0;
+    tempdegree = degree;    // use an unsigned char for speed!
+    if(tempdegree > 22) {    // if top half of range
+        if(tempdegree <= 44) comp++;
+        if(tempdegree <= 41) comp++;
+        if(tempdegree <= 37) comp++;
+        if(tempdegree <= 32) comp++;  // max is 4 degrees compensated
+    } else { // else is lower half of range
+        if(tempdegree >= 2) comp++;
+        if(tempdegree >= 6) comp++;
+        if(tempdegree >= 10) comp++;
+        if(tempdegree >= 15) comp++;  // max is 4 degrees compensated
+    }
+    degree += comp;   // degree is now accurate to +/- 1 degree!
+
+    // Invert degree if it was X>Y octant, makes 0-45 into 90-45
+    if(negflag & 0x10) degree = (90 - degree);
+
+    // 3. Degree is now 0-90 range for this quadrant,
+    // need to invert it for whichever quadrant it was in
+    if(negflag & 0x02) { // if -Y
+        if(negflag & 0x01)   // if -Y -X
+            degree = (180 + degree);
+        else        // else is -Y +X
+            degree = (180 - degree);
+    } else { // else is +Y
+        if(negflag & 0x01)   // if +Y -X
+            degree = (360 - degree);
+    }
+    return degree;
+}
+
+/*IAR Application Note AN-G002*/
+static uint16_t fast_sqrt(unsigned int x)
+{
+    uint16_t a,b;
+    b = x;
+    a = x = 0x3f;
+    x = b/x;
+    a = x = (x+a)>>1;
+    x = b/x;
+    a = x = (x+a)>>1;
+    x = b/x;
+    x = (x+a)>>1;
+    return(x);
 }
 
 #endif
