@@ -179,6 +179,34 @@ void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 }
 
 /**
+ * Set the current saturation of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @param sat current selected saturation
+ */
+void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint16_t sat)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    ext->saturation = sat;
+
+    lv_obj_invalidate(cpicker);
+}
+
+/**
+ * Set the current value of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @param val current selected value
+ */
+void lv_cpicker_set_value(lv_obj_t * cpicker, uint16_t val)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    ext->value = val;
+
+    lv_obj_invalidate(cpicker);
+}
+
+/**
  * Set the current color of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param color current selected color

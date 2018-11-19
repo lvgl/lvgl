@@ -115,6 +115,20 @@ void lv_cpicker_set_ind_type(lv_obj_t * cpicker, lv_cpicker_ind_type_t type);
 void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue);
 
 /**
+ * Set the current saturation of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @param sat current selected saturation
+ */
+void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint16_t sat);
+
+/**
+ * Set the current value of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @param val current selected value
+ */
+void lv_cpicker_set_value(lv_obj_t * cpicker, uint16_t val);
+
+/**
  * Set the current color of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param color current selected color
