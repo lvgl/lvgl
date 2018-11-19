@@ -43,6 +43,9 @@ typedef struct {
     }ind;
    lv_action_t value_changed;
    uint16_t prev_hue;
+   uint16_t prev_saturation;
+   uint16_t prev_value;
+   uint8_t wheel_mode;
 } lv_cpicker_ext_t;
 
 
@@ -59,6 +62,11 @@ enum {
 };
 typedef uint8_t lv_cpicker_ind_type_t;
 
+enum {
+    LV_CPICKER_WHEEL_HUE,
+    LV_CPICKER_WHEEL_SAT,
+    LV_CPICKER_WHEEL_VAL
+};
 
 
 

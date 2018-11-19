@@ -81,6 +81,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->ind.style = &lv_style_plain;
     ext->ind.type = LV_CPICKER_IND_CIRCLE;
     ext->value_changed = NULL;
+    ext->wheel_mode = LV_CPICKER_WHEEL_HUE;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_cpicker, lv_cpicker_signal);
@@ -300,10 +301,29 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
         lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(cpicker);
 
-        for(uint16_t i = 0; i < 360; i++)
+        if(ext->wheel_mode == LV_CPICKER_WHEEL_HUE)
         {
-            styleCopy.line.color = lv_color_hsv_to_rgb(i, ext->saturation, ext->value);
-            lv_draw_arc(x, y, r, mask, i, i + 1, &styleCopy, opa_scale);
+            for(uint16_t i = 0; i < 360; i++)
+            {
+                styleCopy.line.color = lv_color_hsv_to_rgb(i, ext->saturation, ext->value);
+                lv_draw_arc(x, y, r, mask, i, i + 1, &styleCopy, opa_scale);
+            }
+        }
+        else if(ext->wheel_mode == LV_CPICKER_WHEEL_SAT)
+        {
+            for(uint16_t i = 0; i < 360; i++)
+            {
+                styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, i*100/360, ext->value);
+                lv_draw_arc(x, y, r, mask, i, i + 1, &styleCopy, opa_scale);
+            }
+        }
+        else if(ext->wheel_mode == LV_CPICKER_WHEEL_VAL)
+        {
+            for(uint16_t i = 0; i < 360; i++)
+            {
+                styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, i*100/360);
+                lv_draw_arc(x, y, r, mask, i, i + 1, &styleCopy, opa_scale);
+            }
         }
 
         //draw the center color indicator
@@ -320,7 +340,6 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
         styleCopy.body.radius = LV_RADIUS_CIRCLE;
         lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
 
-
         //Draw the current hue indicator
         switch(ext->ind.type)
         {
@@ -329,11 +348,26 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
             lv_point_t start;
             lv_point_t end;
 
-            start.x = x + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(ext->hue) >> LV_TRIGO_SHIFT);
-            start.y = y + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(ext->hue + 90) >> LV_TRIGO_SHIFT);
+            uint16_t angle;
 
-            end.x = x + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(ext->hue) >> LV_TRIGO_SHIFT);
-            end.y = y + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(ext->hue + 90) >> LV_TRIGO_SHIFT);
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                angle = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                angle = ext->saturation * 360 / 100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                angle = ext->value * 360 / 100;
+                break;
+            }
+
+            start.x = x + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            start.y = y + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+
+            end.x = x + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            end.y = y + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
 
             lv_draw_line(&start, &end, mask, ext->ind.style, opa_scale);
             if(ext->ind.style->line.rounded)
@@ -357,14 +391,29 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
         {
             lv_area_t circle_area;
             uint32_t cx, cy;
-            cx = x + ((r - style->line.width/2) * lv_trigo_sin(ext->hue) >> LV_TRIGO_SHIFT);
-            cy = y + ((r - style->line.width/2) * lv_trigo_sin(ext->hue + 90) >> LV_TRIGO_SHIFT);
+
+            uint16_t angle;
+
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                angle = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                angle = ext->saturation * 360 / 100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                angle = ext->value * 360 / 100;
+                break;
+            }
+
+            cx = x + ((r - style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            cy = y + ((r - style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
 
             circle_area.x1 = cx - style->line.width/2;
             circle_area.y1 = cy - style->line.width/2;
             circle_area.x2 = cx + style->line.width/2;
             circle_area.y2 = cy + style->line.width/2;
-
 
             ext->ind.style->body.radius = LV_RADIUS_CIRCLE;
             lv_draw_rect(&circle_area, mask, ext->ind.style, opa_scale);
@@ -396,7 +445,11 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     res = ancestor_signal(cpicker, sign, param);
     if(res != LV_RES_OK) return res;
 
-    lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
+    lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+
+    lv_coord_t r_out = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
+    lv_coord_t r_in = r_out - style->line.width - style->body.padding.inner;
+
     lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
     lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
 
@@ -414,7 +467,18 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_PRESSED)
     {
-        ext->prev_hue = ext->hue;
+        switch(ext->wheel_mode)
+        {
+        case LV_CPICKER_WHEEL_HUE:
+            ext->prev_hue = ext->hue;
+            break;
+        case LV_CPICKER_WHEEL_SAT:
+            ext->prev_saturation = ext->saturation;
+            break;
+        case LV_CPICKER_WHEEL_VAL:
+            ext->prev_value = ext->value;
+            break;
+        }
     }
     else if(sign == LV_SIGNAL_PRESSING)
     {
@@ -422,15 +486,40 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_coord_t xp = indev->proc.act_point.x - x;
         lv_coord_t yp = indev->proc.act_point.y - y;
 
-        if((xp*xp + yp*yp) < r*r)
+        if((xp*xp + yp*yp) < (r_out*r_out) && (xp*xp + yp*yp) >= (r_in*r_in))
         {
-            ext->hue = fast_atan2(xp, yp);
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                ext->hue = fast_atan2(xp, yp);
+                ext->prev_hue = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                ext->saturation = fast_atan2(xp, yp) * 100.0 / 360.0;
+                ext->prev_saturation = ext->saturation;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                ext->value = fast_atan2(xp, yp) * 100.0 / 360.0;
+                ext->prev_value = ext->value;
+                break;
+            }
             lv_obj_invalidate(cpicker);
         }
     }
     else if(sign == LV_SIGNAL_PRESS_LOST)
     {
-        ext->hue = ext->prev_hue;
+        switch(ext->wheel_mode)
+        {
+        case LV_CPICKER_WHEEL_HUE:
+            ext->prev_hue = ext->hue;
+            break;
+        case LV_CPICKER_WHEEL_SAT:
+            ext->prev_saturation = ext->saturation;
+            break;
+        case LV_CPICKER_WHEEL_VAL:
+            ext->prev_value = ext->value;
+            break;
+        }
         lv_obj_invalidate(cpicker);
     }
     else if(sign == LV_SIGNAL_RELEASED)
@@ -439,15 +528,53 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_coord_t xp = indev->proc.act_point.x - x;
         lv_coord_t yp = indev->proc.act_point.y - y;
 
-        if((xp*xp + yp*yp) < r*r)
+        if((xp*xp + yp*yp) < (r_out*r_out) && (xp*xp + yp*yp) >= (r_in*r_in))
         {
-            ext->hue = fast_atan2(xp, yp);
-            lv_obj_invalidate(cpicker);
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                ext->hue = fast_atan2(xp, yp);
+                ext->prev_hue = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                ext->saturation = fast_atan2(xp, yp) * 100.0 / 360.0;
+                ext->prev_saturation = ext->saturation;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                ext->value = fast_atan2(xp, yp) * 100.0 / 360.0;
+                ext->prev_value = ext->value;
+                break;
+            }
 
-            ext->prev_hue = ext->hue;
+            lv_obj_invalidate(cpicker);
 
             if(ext->value_changed != NULL)
                 ext->value_changed(cpicker);
+        }
+    }
+    else if(sign == LV_SIGNAL_LONG_PRESS)
+    {
+        lv_indev_t * indev = param;
+        lv_coord_t xp = indev->proc.act_point.x - x;
+        lv_coord_t yp = indev->proc.act_point.y - y;
+
+        if((xp*xp + yp*yp) < r_in*r_in)
+        {
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                ext->prev_hue = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                ext->prev_saturation = ext->saturation;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                ext->prev_value = ext->value;
+                break;
+            }
+
+            ext->wheel_mode = (ext->wheel_mode + 1) % 3;
+            lv_obj_invalidate(cpicker);
         }
     }
     else if(sign == LV_SIGNAL_CONTROLL)
