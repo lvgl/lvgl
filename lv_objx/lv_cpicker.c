@@ -679,28 +679,72 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/
         if(c == LV_GROUP_KEY_RIGHT)
         {
-            ext->hue++;
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                ext->hue = (ext->hue + 1) % 360;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                ext->saturation = (ext->saturation + 1) % 100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                ext->value = (ext->value + 1) % 100;
+                break;
+            }
             lv_obj_invalidate(cpicker);
             if(ext->value_changed != NULL)
                 ext->value_changed(cpicker);
         }
         else if(c == LV_GROUP_KEY_LEFT)
         {
-            ext->hue--;
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                ext->hue = ext->hue > 0?(ext->hue - 1):360;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                ext->saturation = ext->saturation > 0?(ext->saturation - 1):100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                ext->value = ext->value > 0?(ext->value - 1):100;
+                break;
+            }
             lv_obj_invalidate(cpicker);
             if(ext->value_changed != NULL)
                 ext->value_changed(cpicker);
         }
         else if(c == LV_GROUP_KEY_UP)
         {
-            ext->hue++;
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                ext->hue = (ext->hue + 1) % 360;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                ext->saturation = (ext->saturation + 1) % 100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                ext->value = (ext->value + 1) % 100;
+                break;
+            }
             lv_obj_invalidate(cpicker);
             if(ext->value_changed != NULL)
                 ext->value_changed(cpicker);
         }
         else if(c == LV_GROUP_KEY_DOWN)
         {
-            ext->hue--;
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                ext->hue = ext->hue > 0?(ext->hue - 1):360;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                ext->saturation = ext->saturation > 0?(ext->saturation - 1):100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                ext->value = ext->value > 0?(ext->value - 1):100;
+                break;
+            }
             lv_obj_invalidate(cpicker);
             if(ext->value_changed != NULL)
                 ext->value_changed(cpicker);
