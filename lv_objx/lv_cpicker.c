@@ -35,7 +35,6 @@
 static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
 static uint16_t fast_atan2(int x, int y);
-static uint16_t fast_sqrt(unsigned int x);
 
 /**********************
  *  STATIC VARIABLES
@@ -427,7 +426,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_coord_t xp = indev->proc.act_point.x - x;
         lv_coord_t yp = indev->proc.act_point.y - y;
 
-        if(fast_sqrt(xp*xp + yp+yp) < r)
+        if((xp*xp + yp*yp) < r*r)
         {
             ext->hue = fast_atan2(xp, yp);
             lv_obj_invalidate(cpicker);
@@ -444,7 +443,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_coord_t xp = indev->proc.act_point.x - x;
         lv_coord_t yp = indev->proc.act_point.y - y;
 
-        if(fast_sqrt(xp*xp + yp+yp) < r)
+        if((xp*xp + yp*yp) < r*r)
         {
             ext->hue = fast_atan2(xp, yp);
             lv_obj_invalidate(cpicker);
@@ -564,21 +563,6 @@ static uint16_t fast_atan2(int x, int y)
             degree = (360 - degree);
     }
     return degree;
-}
-
-/*IAR Application Note AN-G002*/
-static uint16_t fast_sqrt(unsigned int x)
-{
-    uint16_t a,b;
-    b = x;
-    a = x = 0x3f;
-    x = b/x;
-    a = x = (x+a)>>1;
-    x = b/x;
-    a = x = (x+a)>>1;
-    x = b/x;
-    x = (x+a)>>1;
-    return(x);
 }
 
 #endif
