@@ -92,11 +92,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            if(par == NULL) { /*Different styles if it is screen*/
-                lv_cpicker_set_style(new_cpicker, LV_CPICKER_STYLE_MAIN, th->bg);
-            } else {
-                lv_cpicker_set_style(new_cpicker, LV_CPICKER_STYLE_MAIN, th->page.bg);
-            }
+            lv_cpicker_set_style(new_cpicker, LV_CPICKER_STYLE_MAIN, th->bg);
         } else {
             lv_cpicker_set_style(new_cpicker, LV_CPICKER_STYLE_MAIN, &lv_style_plain);
         }
