@@ -405,12 +405,23 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
     lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
 
-    if(sign == LV_SIGNAL_PRESSED)
+
+
+    if(sign == LV_SIGNAL_CLEANUP) {
+        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_cpicker";
+    }
+    else if(sign == LV_SIGNAL_PRESSED)
     {
         ext->prev_hue = ext->hue;
     }
-
-    if(sign == LV_SIGNAL_PRESSING)
+    else if(sign == LV_SIGNAL_PRESSING)
     {
         lv_indev_t * indev = param;
         lv_coord_t xp = indev->proc.act_point.x - x;
@@ -422,14 +433,12 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
             lv_obj_invalidate(cpicker);
         }
     }
-
-    if(sign == LV_SIGNAL_PRESS_LOST)
+    else if(sign == LV_SIGNAL_PRESS_LOST)
     {
         ext->hue = ext->prev_hue;
         lv_obj_invalidate(cpicker);
     }
-
-    if(sign == LV_SIGNAL_RELEASED)
+    else if(sign == LV_SIGNAL_RELEASED)
     {
         lv_indev_t * indev = param;
         lv_coord_t xp = indev->proc.act_point.x - x;
@@ -446,20 +455,40 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 ext->value_changed(cpicker);
         }
     }
-
-
-    if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
+    else if(sign == LV_SIGNAL_CONTROLL)
+    {
+        uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/
+        if(c == LV_GROUP_KEY_RIGHT)
+        {
+            ext->hue++;
+            lv_obj_invalidate(cpicker);
+            if(ext->value_changed != NULL)
+                ext->value_changed(cpicker);
         }
-        buf->type[i] = "lv_cpicker";
+        else if(c == LV_GROUP_KEY_LEFT)
+        {
+            ext->hue--;
+            lv_obj_invalidate(cpicker);
+            if(ext->value_changed != NULL)
+                ext->value_changed(cpicker);
+        }
+        else if(c == LV_GROUP_KEY_UP)
+        {
+            ext->hue++;
+            lv_obj_invalidate(cpicker);
+            if(ext->value_changed != NULL)
+                ext->value_changed(cpicker);
+        }
+        else if(c == LV_GROUP_KEY_DOWN)
+        {
+            ext->hue--;
+            lv_obj_invalidate(cpicker);
+            if(ext->value_changed != NULL)
+                ext->value_changed(cpicker);
+        }
     }
 
-    return res;
+    return LV_RES_OK;
 }
 
 static uint16_t fast_atan2(int x, int y)
