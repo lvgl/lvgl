@@ -82,6 +82,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->ind.type = LV_CPICKER_IND_CIRCLE;
     ext->value_changed = NULL;
     ext->wheel_mode = LV_CPICKER_WHEEL_HUE;
+    ext->last_clic = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_cpicker, lv_cpicker_signal);
@@ -149,6 +150,18 @@ void lv_cpicker_set_style(lv_obj_t * cpicker, lv_cpicker_style_t type, lv_style_
         lv_obj_invalidate(cpicker);
         break;
     }
+}
+
+/**
+ * Set a type of a colorpicker indicator.
+ * @param cpicker pointer to colorpicker object
+ * @param type indicator type
+ */
+void lv_cpicker_set_ind_type(lv_obj_t * cpicker, lv_cpicker_ind_type_t type)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    ext->ind.type = type;
+    lv_obj_invalidate(cpicker);
 }
 
 /**
@@ -478,6 +491,34 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         case LV_CPICKER_WHEEL_VAL:
             ext->prev_value = ext->value;
             break;
+        }
+
+        lv_indev_t * indev = param;
+        lv_coord_t xp = indev->proc.act_point.x - x;
+        lv_coord_t yp = indev->proc.act_point.y - y;
+
+        if((xp*xp + yp*yp) < (r_in*r_in))
+        {
+            if(lv_tick_elaps(ext->last_clic) < 400)
+            {
+                switch(ext->wheel_mode)
+                {
+                case LV_CPICKER_WHEEL_HUE:
+                    ext->hue = 0;
+                    ext->prev_hue = ext->hue;
+                    break;
+                case LV_CPICKER_WHEEL_SAT:
+                    ext->saturation = 100;
+                    ext->prev_saturation = ext->saturation;
+                    break;
+                case LV_CPICKER_WHEEL_VAL:
+                    ext->value = 100;
+                    ext->prev_value = ext->value;
+                    break;
+                }
+                lv_obj_invalidate(cpicker);
+            }
+            ext->last_clic = lv_tick_get();
         }
     }
     else if(sign == LV_SIGNAL_PRESSING)

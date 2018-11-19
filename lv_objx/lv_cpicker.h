@@ -46,6 +46,7 @@ typedef struct {
    uint16_t prev_saturation;
    uint16_t prev_value;
    uint8_t wheel_mode;
+   uint32_t last_clic;
 } lv_cpicker_ext_t;
 
 
@@ -98,6 +99,13 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param style pointer to a style
  */
 void lv_cpicker_set_style(lv_obj_t * cpicker, lv_cpicker_style_t type, lv_style_t *style);
+
+/**
+ * Set a type of a colorpicker indicator.
+ * @param cpicker pointer to colorpicker object
+ * @param type indicator type
+ */
+void lv_cpicker_set_ind_type(lv_obj_t * cpicker, lv_cpicker_ind_type_t type);
 
 /**
  * Set the current hue of a colorpicker.
