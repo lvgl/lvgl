@@ -264,9 +264,8 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if((old_val < threshold && ext->slider.drag_value > threshold) ||
                 (old_val > threshold && ext->slider.drag_value < threshold))
         {
-            ext->changed = 1;
+            ext->changed = 1;       /*If explicitly changed don't need to be toggled on release*/
         }
-        printf("tmp: %d\n", ext->changed);
     }
     else if(sign == LV_SIGNAL_PRESS_LOST) {
         if(lv_sw_get_state(sw)) {
