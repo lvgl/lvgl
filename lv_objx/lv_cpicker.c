@@ -41,13 +41,22 @@
 #endif
 
 #ifndef LV_CPICKER_DEF_QF /*quantization factor*/
-#define LV_CPICKER_DEF_QF 4
+#define LV_CPICKER_DEF_QF 1
 #endif
 
 #if LV_CPICKER_DEF_QF == 0
 #undef LV_CPICKER_DEF_QF
 #define LV_CPICKER_DEF_QF 1
 #endif
+
+#ifndef LV_CPICKER_USE_TRI /*Use triangle approximation instead of arc (work for low quantization)*/
+#define LV_CPICKER_USE_TRI 0
+#endif
+
+#if LV_CPICKER_USE_TRI
+#define TRI_OFFSET 4
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -389,12 +398,30 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
         lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(cpicker);
 
+#if LV_CPICKER_USE_TRI
+        lv_point_t triangle_points[3];
+#endif
+
         if(ext->wheel_mode == LV_CPICKER_WHEEL_HUE)
         {
             for(uint16_t i = 0; i <= 360; i+= LV_CPICKER_DEF_QF)
             {
                 styleCopy.line.color = lv_color_hsv_to_rgb(i, ext->saturation, ext->value);
+
+#if LV_CPICKER_USE_TRI
+                triangle_points[0].x = x;
+                triangle_points[0].y = y;
+
+                triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+
+                lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
+#else
                 lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
+#endif
             }
         }
         else if(ext->wheel_mode == LV_CPICKER_WHEEL_SAT)
@@ -402,7 +429,21 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
             for(uint16_t i = 0; i <= 360; i += LV_CPICKER_DEF_QF)
             {
                 styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, i*100/360, ext->value);
+
+#if LV_CPICKER_USE_TRI
+                triangle_points[0].x = x;
+                triangle_points[0].y = y;
+
+                triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+
+                lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
+#else
                 lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
+#endif
             }
         }
         else if(ext->wheel_mode == LV_CPICKER_WHEEL_VAL)
@@ -410,23 +451,50 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
             for(uint16_t i = 0; i <= 360; i += LV_CPICKER_DEF_QF)
             {
                 styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, i*100/360);
-                lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
+#if LV_CPICKER_USE_TRI
+                triangle_points[0].x = x;
+                triangle_points[0].y = y;
+
+                triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+
+                lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
+#else
+    lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
+#endif
             }
         }
 
-        //draw the center color indicator
+        //if using triangle we need to draw a white circle to make a separation
         lv_area_t center_area;
 
+        uint16_t wradius = r - styleCopy.line.width;
+        center_area.x1 = x - wradius;
+        center_area.y1 = y - wradius;
+        center_area.x2 = x + wradius;
+        center_area.y2 = y + wradius;
+
+        styleCopy.body.main_color = LV_COLOR_WHITE;
+        styleCopy.body.grad_color = styleCopy.body.main_color;
+        styleCopy.body.radius = LV_RADIUS_CIRCLE;
+        lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
+
+        //draw the center color indicator
+        lv_area_t center_ind_area;
+
         uint16_t radius = r - styleCopy.line.width - style->body.padding.inner;
-        center_area.x1 = x - radius;
-        center_area.y1 = y - radius;
-        center_area.x2 = x + radius;
-        center_area.y2 = y + radius;
+        center_ind_area.x1 = x - radius;
+        center_ind_area.y1 = y - radius;
+        center_ind_area.x2 = x + radius;
+        center_ind_area.y2 = y + radius;
 
         styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, ext->value);
         styleCopy.body.grad_color = styleCopy.body.main_color;
         styleCopy.body.radius = LV_RADIUS_CIRCLE;
-        lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
+        lv_draw_rect(&center_ind_area, mask, &styleCopy, opa_scale);
 
         //Draw the current hue indicator
         switch(ext->ind.type)
