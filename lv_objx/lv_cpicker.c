@@ -24,7 +24,30 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_CPICKER_DEF_HUE
+#define LV_CPICKER_DEF_HUE 0
+#endif
 
+#ifndef LV_CPICKER_DEF_SAT
+#define LV_CPICKER_DEF_SAT 0
+#endif
+
+#ifndef LV_CPICKER_DEF_VAL
+#define LV_CPICKER_DEF_VAL 0
+#endif
+
+#ifndef LV_CPICKER_DEF_IND_TYPE
+#define LV_CPICKER_DEF_IND_TYPE LV_CPICKER_IND_CIRCLE
+#endif
+
+#ifndef LV_CPICKER_DEF_QF /*quantization factor*/
+#define LV_CPICKER_DEF_QF 4
+#endif
+
+#if LV_CPICKER_DEF_QF == 0
+#undef LV_CPICKER_DEF_QF
+#define LV_CPICKER_DEF_QF 1
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -368,26 +391,26 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
 
         if(ext->wheel_mode == LV_CPICKER_WHEEL_HUE)
         {
-            for(uint16_t i = 0; i < 360; i++)
+            for(uint16_t i = 0; i <= 360; i+= LV_CPICKER_DEF_QF)
             {
                 styleCopy.line.color = lv_color_hsv_to_rgb(i, ext->saturation, ext->value);
-                lv_draw_arc(x, y, r, mask, i, i + 1, &styleCopy, opa_scale);
+                lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
             }
         }
         else if(ext->wheel_mode == LV_CPICKER_WHEEL_SAT)
         {
-            for(uint16_t i = 0; i < 360; i++)
+            for(uint16_t i = 0; i <= 360; i += LV_CPICKER_DEF_QF)
             {
                 styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, i*100/360, ext->value);
-                lv_draw_arc(x, y, r, mask, i, i + 1, &styleCopy, opa_scale);
+                lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
             }
         }
         else if(ext->wheel_mode == LV_CPICKER_WHEEL_VAL)
         {
-            for(uint16_t i = 0; i < 360; i++)
+            for(uint16_t i = 0; i <= 360; i += LV_CPICKER_DEF_QF)
             {
                 styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, i*100/360);
-                lv_draw_arc(x, y, r, mask, i, i + 1, &styleCopy, opa_scale);
+                lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
             }
         }
 
