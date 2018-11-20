@@ -277,6 +277,9 @@
 
 /*Image Button (dependencies: lv_btn*/
 #define USE_LV_IMGBTN   1
+#if USE_LV_IMGBTN
+#define LV_IMGBTN_TILED 1           /*1: The imgbtn requires left, mid and right parts and the width can be set freely*/
+#endif
 
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1
