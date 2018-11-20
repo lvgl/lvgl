@@ -44,7 +44,9 @@ typedef struct
     /*New data for this type */
     lv_style_t *style_knob_off;     /*Style of the knob when the switch is OFF*/
     lv_style_t *style_knob_on;      /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
+    lv_coord_t start_x;
     uint8_t changed   :1;           /*Indicates the switch state explicitly changed by drag*/
+    uint8_t slided  :1;
 #if USE_LV_ANIMATION
     uint16_t anim_time;				/*switch animation time */
 #endif
@@ -85,6 +87,18 @@ void lv_sw_on(lv_obj_t *sw);
  * @param sw pointer to a switch object
  */
 void lv_sw_off(lv_obj_t *sw);
+
+/**
+ * Turn ON the switch with an animation
+ * @param sw pointer to a switch object
+ */
+void lv_sw_on_anim(lv_obj_t * sw);
+
+/**
+ * Turn OFF the switch with an animation
+ * @param sw pointer to a switch object
+ */
+void lv_sw_off_anim(lv_obj_t * sw);
 
 /**
  * Set a function which will be called when the switch is toggled by the user
