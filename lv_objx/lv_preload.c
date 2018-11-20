@@ -24,6 +24,12 @@
 #ifndef LV_PRELOAD_DEF_SPIN_TIME
 # define LV_PRELOAD_DEF_SPIN_TIME   1000    /*[ms]*/
 #endif
+
+#ifndef LV_PRELOAD_DEF_ANIM
+# define LV_PRELOAD_DEF_ANIM        LV_PRELOAD_TYPE_SPINNING_ARC    /*animation type*/
+#endif
+
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -73,26 +79,12 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->arc_length = LV_PRELOAD_DEF_ARC_LENGTH;
+    ext->anim_type = LV_PRELOAD_DEF_ANIM;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_preload, lv_preload_signal);
     lv_obj_set_design_func(new_preload, lv_preload_design);
-#if USE_LV_ANIMATION
-    lv_anim_t a;
-    a.var = new_preload;
-    a.start = 0;
-    a.end = 360;
-    a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
-    a.path = lv_anim_path_ease_in_out;
-    a.end_cb = NULL;
-    a.act_time = 0;
-    a.time = LV_PRELOAD_DEF_SPIN_TIME;
-    a.playback = 0;
-    a.playback_pause = 0;
-    a.repeat = 1;
-    a.repeat_pause = 0;
-    lv_anim_create(&a);
-#endif
+
 
     /*Init the new pre loader pre loader*/
     if(copy == NULL) {
@@ -106,6 +98,8 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_obj_set_style(new_preload, &lv_style_pretty_color);
         }
 
+        ext->time = LV_PRELOAD_DEF_SPIN_TIME;
+
     }
     /*Copy an existing pre loader*/
     else {
@@ -115,6 +109,8 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_preload);
     }
+
+    lv_preload_set_animation_type(new_preload, ext->anim_type);
 
 
     LV_LOG_INFO("preload created");
@@ -148,22 +144,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->time = time;
-#if USE_LV_ANIMATION
-    lv_anim_t a;
-    a.var = preload;
-    a.start = 0;
-    a.end = 360;
-    a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
-    a.path = lv_anim_path_ease_in_out;
-    a.end_cb = NULL;
-    a.act_time = 0;
-    a.time = time;
-    a.playback = 0;
-    a.playback_pause = 0;
-    a.repeat = 1;
-    a.repeat_pause = 0;
-    lv_anim_create(&a);
-#endif
+    lv_preload_set_animation_type(preload, ext->anim_type);
 }
 /*=====================
  * Setter functions
@@ -178,10 +159,83 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
 void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_t * style)
 {
     switch(type) {
-        case LV_PRELOAD_STYLE_MAIN:
-            lv_arc_set_style(preload, LV_ARC_STYLE_MAIN, style);
-            break;
+    case LV_PRELOAD_STYLE_MAIN:
+        lv_arc_set_style(preload, LV_ARC_STYLE_MAIN, style);
+        break;
     }
+}
+
+/**
+ * Set the animation type of a preloadeer.
+ * @param preload pointer to pre loader object
+ * @param type animation type of the preload
+ *  */
+void lv_preload_set_animation_type(lv_obj_t * preload, lv_preloader_type_t type)
+{
+#if USE_LV_ANIMATION
+    lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
+
+    /*delete previous animation*/
+    //lv_anim_del(preload, NULL);
+    switch(type)
+    {
+    case LV_PRELOAD_TYPE_FILLSPIN_ARC:
+    {
+        ext->anim_type = LV_PRELOAD_TYPE_FILLSPIN_ARC;
+        lv_anim_t a;
+        a.var = preload;
+        a.start = 0;
+        a.end = 360;
+        a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
+        a.path = lv_anim_path_ease_in_out;
+        a.end_cb = NULL;
+        a.act_time = 0;
+        a.time = ext->time;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.repeat = 1;
+        a.repeat_pause = 0;
+        lv_anim_create(&a);
+
+        lv_anim_t b;
+        b.var = preload;
+        b.start = ext->arc_length;
+        b.end = 360 - ext->arc_length;
+        b.fp = (lv_anim_fp_t)lv_preload_set_arc_length;
+        b.path = lv_anim_path_ease_in_out;
+        b.end_cb = NULL;
+        b.act_time = 0;
+        b.time = ext->time;
+        b.playback = 1;
+        b.playback_pause = 0;
+        b.repeat = 1;
+        b.repeat_pause = 0;
+        lv_anim_create(&b);
+        break;
+    }
+    case LV_PRELOAD_TYPE_SPINNING_ARC:
+    default:
+    {
+        ext->anim_type = LV_PRELOAD_TYPE_SPINNING_ARC;
+        lv_anim_t a;
+        a.var = preload;
+        a.start = 0;
+        a.end = 360;
+        a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
+        a.path = lv_anim_path_ease_in_out;
+        a.end_cb = NULL;
+        a.act_time = 0;
+        a.time = ext->time;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.repeat = 1;
+        a.repeat_pause = 0;
+        lv_anim_create(&a);
+        break;
+    }
+    }
+
+#endif //USE_LV_ANIMATION
 }
 
 /*=====================
@@ -220,15 +274,26 @@ lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t t
     lv_style_t * style = NULL;
 
     switch(type) {
-        case LV_PRELOAD_STYLE_MAIN:
-            style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
-            break;
-        default:
-            style = NULL;
-            break;
+    case LV_PRELOAD_STYLE_MAIN:
+        style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
+        break;
+    default:
+        style = NULL;
+        break;
     }
 
     return style;
+}
+
+/**
+ * Get the animation type of a preloadeer.
+ * @param preload pointer to pre loader object
+ * @return animation type
+ *  */
+lv_preloader_type_t lv_preload_get_animation_type(lv_obj_t * preload)
+{
+    lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
+    return ext->anim_type;
 }
 
 /*=====================
