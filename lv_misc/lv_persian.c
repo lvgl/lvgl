@@ -1,24 +1,52 @@
+/**
+ * @file lv_persian.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
 #include "lv_persian.h"
 
-persian_map_t*lv_find_persian_letter(uint32_t letterCode) {
-	for (int i = 0; i < sizeof(persian_lookup_table); i++) {
-		if (persian_lookup_table[i].letter_code == letterCode) {
-			return (persian_map_t*) &persian_lookup_table[i];
-		}
-	}
-	return NULL;
-}
+/*********************
+ *      DEFINES
+ *********************/
 
-uint32_t lv_get_converted_persian_letter(uint32_t preLetter, uint32_t letter,
-		uint32_t nextLetter) {
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+static persian_map_t*lv_find_persian_letter(uint32_t letterCode);
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+/**
+ * return an object from lookup table based on letter sent to function
+ * @param letter_code the utf8 code
+ * @return type of persian_map_t
+ */
+uint32_t lv_get_converted_persian_letter(uint32_t previous_letter, uint32_t letter,
+		uint32_t next_letter) {
 	persian_map_t *nextPersianLetter = NULL, *persianLetter = NULL,
 			*prePersianLetter = NULL;
-	if ((preLetter > 0x600) && (preLetter < 0x6FF)) {
-		prePersianLetter = lv_find_persian_letter(preLetter);
+	if ((previous_letter > 0x600) && (previous_letter < 0x6FF)) {
+		prePersianLetter = lv_find_persian_letter(previous_letter);
 	}
 	persianLetter = lv_find_persian_letter(letter);
-	if ((nextLetter > 0x600) && (nextLetter < 0x6FF)) {
-		nextPersianLetter = lv_find_persian_letter(nextLetter);
+	if ((next_letter > 0x600) && (next_letter < 0x6FF)) {
+		nextPersianLetter = lv_find_persian_letter(next_letter);
 	}
 	if (persianLetter != NULL) {
 		if (prePersianLetter != NULL) {
@@ -55,6 +83,14 @@ uint32_t lv_get_converted_persian_letter(uint32_t preLetter, uint32_t letter,
 	return letter;
 }
 
+/**
+ * return the converted letter .In some languages like farsi and arabic based on the position of a letter in
+ * a word the shape of the letter will change . this function process the position of letter then return the result letter
+ * @param pre_letter the previous letter in the current word
+ * @param letter  current letter that shoul be processed
+ * @param next_letter the next letter in the current word
+ * @return the converted letter
+ */
 uint8_t* lv_get_reversed_buffer(uint8_t*buffer, uint16_t start, uint16_t end) {
 	struct text_block_s block;
 	struct text_block_s *current_block;
@@ -144,4 +180,18 @@ uint8_t* lv_get_reversed_buffer(uint8_t*buffer, uint16_t start, uint16_t end) {
 		last_block = block.next;
 	}
 	return reversed_buff;
+}
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+persian_map_t*lv_find_persian_letter(uint32_t letterCode) {
+	for (int i = 0; i < sizeof(persian_lookup_table); i++) {
+		if (persian_lookup_table[i].letter_code == letterCode) {
+			return (persian_map_t*) &persian_lookup_table[i];
+		}
+	}
+	return NULL;
 }

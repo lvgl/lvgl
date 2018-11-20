@@ -1,7 +1,28 @@
-#ifndef _LV_PERSIAN_H_
-#define _LV_PERSIAN_H_
+/**
+ * @file lv_templ.h
+ *
+ */
+
+#ifndef LV_PERSIAN_H
+#define LV_PERSIAN_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "lvgl.h"
 
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
 typedef struct {
 	uint16_t letter_code;
 	uint16_t alone_code;
@@ -19,12 +40,31 @@ struct text_block_s {
 	bool utf;
 	struct text_block_s*next;
 };
-
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+/**
+ * return an object from lookup table based on letter sent to function
+ * @param letter_code the utf8 code
+ * @return type of persian_map_t
+ */
 persian_map_t* lv_get_persian_letter(uint32_t letter_code);
 uint8_t* lv_get_reversed_buffer(uint8_t*buffer, uint16_t start,
 		uint16_t end);
+/**
+ * return the converted letter .In some languages like farsi and arabic based on the position of a letter in 
+ * a word the shape of the letter will change . this function process the position of letter then return the result letter
+ * @param pre_letter the previous letter in the current word
+ * @param letter  current letter that shoul be processed
+ * @param next_letter the next letter in the current word
+ * @return the converted letter
+ */
+
 uint32_t lv_get_converted_persian_letter(uint32_t pre_letter, uint32_t letter,
 		uint32_t next_letter);
+/**********************
+ *      Look up table
+ **********************/
 
 static const persian_map_t persian_lookup_table[] = { { .letter_code = 1570,
 		.alone_code = 65153, .prefix_code = 65153, .middle_code = 65153,
@@ -127,5 +167,8 @@ static const persian_map_t persian_lookup_table[] = { { .letter_code = 1570,
 				.connect_to_next = 1 }, //ی
 		};
 
-
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
+
+#endif /*LV_PERSIAN_H*/
