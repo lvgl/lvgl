@@ -47,6 +47,7 @@ typedef struct {
    uint16_t prev_value;
    uint8_t wheel_mode:2;
    uint8_t wheel_fixed:1;
+   uint8_t type:1;
    uint32_t last_clic;
 } lv_cpicker_ext_t;
 
@@ -63,6 +64,12 @@ enum {
     LV_CPICKER_IND_CIRCLE,
 };
 typedef uint8_t lv_cpicker_ind_type_t;
+
+enum {
+    LV_CPICKER_TYPE_RECT,
+    LV_CPICKER_TYPE_DISC,
+};
+typedef uint8_t lv_cpicker_type_t;
 
 enum {
     LV_CPICKER_WHEEL_HUE,
