@@ -54,7 +54,7 @@
 #endif
 
 #if LV_CPICKER_USE_TRI
-#define TRI_OFFSET 2
+#define TRI_OFFSET 4
 #endif
 
 /**********************
