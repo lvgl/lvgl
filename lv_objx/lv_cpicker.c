@@ -468,6 +468,7 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
             }
         }
 
+#if LV_CPICKER_USE_TRI
         //if using triangle we need to draw a white circle to make a separation
         lv_area_t center_area;
 
@@ -481,6 +482,7 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
         styleCopy.body.grad_color = styleCopy.body.main_color;
         styleCopy.body.radius = LV_RADIUS_CIRCLE;
         lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
+#endif
 
         //draw the center color indicator
         lv_area_t center_ind_area;
