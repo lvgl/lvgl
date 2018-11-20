@@ -115,10 +115,10 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_cpicker);
 
     /*Initialize the allocated 'ext' */
-    ext->hue = 0;
-    ext->prev_hue = 0;
-    ext->saturation = 100;
-    ext->value = 100;
+    ext->hue = LV_CPICKER_DEF_HUE;
+    ext->prev_hue = ext->hue;
+    ext->saturation = LV_CPICKER_DEF_SAT;
+    ext->value = LV_CPICKER_DEF_VAL;
     ext->ind.style = &lv_style_plain;
     ext->ind.type = LV_CPICKER_DEF_IND_TYPE;
     ext->value_changed = NULL;
@@ -1251,6 +1251,120 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
         {
         case LV_CPICKER_IND_LINE:
         {
+            lv_area_t line_area;
+            lv_point_t point1, point2;
+            lv_coord_t x1, y1, x2, y2;
+            uint16_t angle;
+
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                angle = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                angle = ext->saturation * 360 / 100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                angle = ext->value * 360 / 100;
+                break;
+            }
+
+            x1 = x + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            y1 = y + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+            x2 = x + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            y2 = y + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+
+            point1.x = x1;
+            point1.y = y1;
+            point2.x = x2;
+            point2.y = y2;
+
+            //if(LV_MATH_ABS(point1.x - point2.x) > LV_MATH_ABS(point1.y - point2.y))
+            //{
+            /*Steps less in y then x -> rather horizontal*/
+            if(point1.x < point2.x) {
+                line_area.x1 = point1.x;
+                //line_area.y1 = point1.y;
+                line_area.x2 = point2.x;
+                //line_area.y2 = point2.y;
+            } else {
+                line_area.x1 = point2.x;
+                //line_area.y1 = point2.y;
+                line_area.x2 = point1.x;
+                //line_area.y2 = point1.y;
+            }
+            //} else {
+            /*Steps less in x then y -> rather vertical*/
+            if(point1.y < point2.y) {
+                //line_area.x1 = point1.x;
+                line_area.y1 = point1.y;
+                //line_area.x2 = point2.x;
+                line_area.y2 = point2.y;
+            } else {
+                //line_area.x1 = point2.x;
+                line_area.y1 = point2.y;
+                line_area.x2 = point1.x;
+                //line_area.y2 = point1.y;
+            }
+            //}
+
+            line_area.x1 -= 2*ext->ind.style->line.width;
+            line_area.y1 -= 2*ext->ind.style->line.width;
+            line_area.x2 += 2*ext->ind.style->line.width;
+            line_area.y2 += 2*ext->ind.style->line.width;
+
+            lv_inv_area(&line_area);
+
+
+            angle = ext->prev_pos;
+
+            x1 = x + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            y1 = y + ((r - style->line.width + ext->ind.style->body.padding.inner + ext->ind.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+
+            x2 = x + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            y2 = y + ((r - ext->ind.style->body.padding.inner - ext->ind.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+
+            point1.x = x1;
+            point1.y = y1;
+            point2.x = x2;
+            point2.y = y2;
+
+            //if(LV_MATH_ABS(point1.x - point2.x) > LV_MATH_ABS(point1.y - point2.y))
+            //{
+            /*rather horizontal*/
+            if(point1.x < point2.x) {
+                line_area.x1 = point1.x;
+                //line_area.y1 = point1.y;
+                line_area.x2 = point2.x;
+                //line_area.y2 = point2.y;
+            } else {
+                line_area.x1 = point2.x;
+                //line_area.y1 = point2.y;
+                line_area.x2 = point1.x;
+                //line_area.y2 = point1.y;
+            }
+            //} else {
+            /*rather vertical*/
+            if(point1.y < point2.y) {
+                //line_area.x1 = point1.x;
+                line_area.y1 = point1.y;
+                //line_area.x2 = point2.x;
+                line_area.y2 = point2.y;
+            } else {
+                //line_area.x1 = point2.x;
+                line_area.y1 = point2.y;
+                //line_area.x2 = point1.x;
+                line_area.y2 = point1.y;
+            }
+            //}
+
+            line_area.x1 -= 2*ext->ind.style->line.width;
+            line_area.y1 -= 2*ext->ind.style->line.width;
+            line_area.x2 += 2*ext->ind.style->line.width;
+            line_area.y2 += 2*ext->ind.style->line.width;
+
+            lv_inv_area(&line_area);
+
             break;
         }
         case LV_CPICKER_IND_CIRCLE:
@@ -1296,23 +1410,24 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             circle_ind_area.y2 = cy + style->line.width/2;
 
             lv_inv_area(&circle_ind_area);
-
-
-
-            /*invalidate center*/
-            lv_area_t center_col_area;
-
-            uint16_t radius = r - styleCopy.line.width - style->body.padding.inner;
-            center_col_area.x1 = x - radius;
-            center_col_area.y1 = y - radius;
-            center_col_area.x2 = x + radius;
-            center_col_area.y2 = y + radius;
-
-            lv_inv_area(&center_col_area);
-
             break;
         }
         }
+
+        /*invalidate center*/
+        lv_area_t center_col_area;
+
+        uint16_t radius = r - styleCopy.line.width - style->body.padding.inner;
+        center_col_area.x1 = x - radius;
+        center_col_area.y1 = y - radius;
+        center_col_area.x2 = x + radius;
+        center_col_area.y2 = y + radius;
+
+        lv_inv_area(&center_col_area);
+    }
+    else if(ext->type == LV_CPICKER_TYPE_RECT)
+    {
+
     }
 }
 
