@@ -341,15 +341,26 @@ lv_btnm_action_t lv_btnm_get_action(const lv_obj_t * btnm)
 }
 
 /**
+ * Get the pressed button
+ * @param btnm pointer to button matrix object
+ * @return  index of the currently pressed button (LV_BTNM_PR_NONE: if unset)
+ */
+uint16_t lv_btnm_get_pressed(const lv_obj_t * btnm)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+    return ext->btn_id_pr;
+}
+
+/**
  * Get the toggled button
  * @param btnm pointer to button matrix object
- * @return  index of the currently toggled button (0: if unset)
+ * @return  index of the currently toggled button (LV_BTNM_PR_NONE: if unset)
  */
 uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
-    if(ext->toggle == 0) return 0;
+    if(ext->toggle == 0) return LV_BTNM_PR_NONE;
     else return ext->btn_id_tgl;
 }
 
@@ -581,7 +592,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 					}
 
 		#if USE_LV_GROUP
-					/*Leave the clicked button as pressed if this the focused object in a group*/
+					/*Leave the clicked button when releases if this not the focused object in a group*/
 					lv_group_t * g = lv_obj_get_group(btnm);
 					if(lv_group_get_focused(g) != btnm) {
 						ext->btn_id_pr = LV_BTNM_PR_NONE;
