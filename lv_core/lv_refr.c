@@ -515,10 +515,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 
         /* Redraw the object */
         lv_style_t * style = lv_obj_get_style(obj);
-        if(style->body.opa != LV_OPA_TRANSP) {
-            obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
-            //tick_wait_ms(100);  /*DEBUG: Wait after every object draw to see the order of drawing*/
-        }
+        obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
+        //tick_wait_ms(100);  /*DEBUG: Wait after every object draw to see the order of drawing*/
+
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
         lv_obj_get_coords(obj, &obj_area);
@@ -547,8 +546,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         }
 
         /* If all the children are redrawn make 'post draw' design */
-        if(style->body.opa != LV_OPA_TRANSP) {
-            obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
-        }
+        obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
+
     }
 }

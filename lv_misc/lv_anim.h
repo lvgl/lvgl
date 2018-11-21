@@ -130,6 +130,13 @@ int32_t lv_anim_path_linear(const lv_anim_t *a);
 int32_t lv_anim_path_ease_in_out(const lv_anim_t *a);
 
 /**
+ * Calculate the current value of an animation with overshoot at the end
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_overshoot(const lv_anim_t * a);
+
+/**
  * Calculate the current value of an animation applying step characteristic.
  * (Set end value on the end of the animation)
  * @param a pointer to an animation

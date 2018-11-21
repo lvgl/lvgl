@@ -262,6 +262,7 @@
 #if USE_LV_PRELOAD != 0
 #define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
 #define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
+#define LV_PRELOAD_DEF_ANIM         LV_PRELOAD_TYPE_SPINNING_ARC
 #endif
 
 /*************************
