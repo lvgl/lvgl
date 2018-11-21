@@ -6,10 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lv_misc/lv_persian.h>
 #include "lv_draw_label.h"
 #include "lv_draw_rbasic.h"
 #include "../lv_misc/lv_math.h"
+
+#if LV_TXT_RTL
+#include <lv_misc/lv_persian.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -131,14 +134,14 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
 		cmd_state = CMD_STATE_WAIT;
 		i = line_start;
 		uint32_t letter;
-		// my code
+#if LV_TXT_RTL
 		uint32_t previous_letter;
 		uint32_t current_letter;
 		reversed_index = 0;
 		uint8_t noWidth = 0;
-		// end my code
+#endif
 		while (i < line_end) {
-			// my code
+#if LV_TXT_RTL
 			//if it's necessary make the txt buffer reversed
 			if (!reversed_index) {
 				reversed_buffer = lv_get_reversed_buffer((uint8_t*) txt, i,
@@ -169,7 +172,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
 				previous_letter = current_letter;
 			}
 
-			// end my code
+#else
+			lv_txt_encoded_next(txt, &i);
+#endif
 			/*Handle the re-color command*/
 			if ((flag & LV_TXT_FLAG_RECOLOR) != 0) {
 				if (letter == (uint32_t) LV_TXT_COLOR_CMD[0]) {
@@ -218,21 +223,23 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
 
 			letter_fp(&pos, mask, font, letter, color, opa);
 			letter_w = lv_font_get_width(font, letter);
-			//my code
+#if LV_TXT_RTL
 			if (noWidth) {
 				pos.x += letter_w + 0;
 
 			} else {
 				pos.x += letter_w + style->text.letter_space;
 			}
-			//end my code;
+#else
+			pos.x += letter_w + style->text.letter_space;
+#endif
 		}
-		//my code
+#if LV_TXT_RTL
 		// free the allocated temporary buffer
 		if (((const char*)reversed_buffer != txt) && (reversed_buffer != NULL)) {
 			lv_mem_free(reversed_buffer);
 		}
-		// end my code
+#endif
 		/*Go to next line*/
 		line_start = line_end;
 		line_end += lv_txt_get_next_line(&txt[line_start], font,
