@@ -453,6 +453,30 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             start_angle = 0; //Default
             end_angle = 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; //Default
 
+            if(mask->x1 != cpicker->coords.x1 || mask->x2 != cpicker->coords.x2
+                    || mask->y1 != cpicker->coords.y1 || mask->y2 != cpicker->coords.y2)
+            {
+                int16_t a1, a2, a3, a4;
+                a1 = lv_atan2(mask->x2 - x, mask->y2 - y);
+                a2 = lv_atan2(mask->x2 - x, mask->y1 - y);
+                a3 = lv_atan2(mask->x1 - x, mask->y1 - y);
+                a4 = lv_atan2(mask->x1 - x, mask->y2 - y);
+
+                start_angle = LV_MATH_MIN(LV_MATH_MIN(a1, a2), LV_MATH_MIN(a3, a4));
+                start_angle = start_angle / (LV_CPICKER_DEF_QF) * (LV_CPICKER_DEF_QF);
+
+                end_angle = LV_MATH_MAX(LV_MATH_MAX(a1, a2), LV_MATH_MAX(a3, a4));
+                end_angle = end_angle / (LV_CPICKER_DEF_QF) * (LV_CPICKER_DEF_QF) + LV_CPICKER_DEF_QF;
+
+                /*ensure area overlaps*/
+                if((start_angle - LV_CPICKER_DEF_QF) < 0)
+                {
+                    start_angle += 360;
+                    end_angle += 360;
+                }
+                start_angle = (start_angle - LV_CPICKER_DEF_QF);
+            }
+
 
             if(ext->wheel_mode == LV_CPICKER_WHEEL_HUE)
             {
@@ -649,6 +673,17 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             break;
         }
         }
+
+        /*
+        //code to color the drawn area
+        static uint32_t c = 0;
+        lv_style_t style2;
+        lv_style_copy(&style2, &lv_style_plain);
+        style2.body.main_color.full = c;
+        style2.body.grad_color.full = c;
+        c += 0x123445678;
+        lv_draw_rect(mask, mask, &style2, opa_scale);
+         */
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -787,7 +822,7 @@ static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
                     ext->prev_value = ext->value;
                     break;
                 }
-                lv_cpicker_invalidate_indicator(cpicker);
+                //lv_cpicker_invalidate_indicator(cpicker);
             }
             ext->last_clic = lv_tick_get();
         }
@@ -1265,6 +1300,20 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
     if(ext->type == LV_CPICKER_TYPE_DISC)
     {
+        /*invalidate center*/
+        lv_area_t center_col_area;
+
+        uint32_t rin = r - styleCopy.line.width;
+
+        uint16_t radius = sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
+
+        center_col_area.x1 = x - radius;
+        center_col_area.y1 = y - radius;
+        center_col_area.x2 = x + radius;
+        center_col_area.y2 = y + radius;
+
+        lv_inv_area(&center_col_area);
+
         switch(ext->ind.type)
         {
         case LV_CPICKER_IND_LINE:
@@ -1431,20 +1480,6 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             break;
         }
         }
-
-        /*invalidate center*/
-        lv_area_t center_col_area;
-
-        uint32_t rin = r - styleCopy.line.width;
-
-        uint16_t radius = sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
-
-        center_col_area.x1 = x - radius;
-        center_col_area.y1 = y - radius;
-        center_col_area.x2 = x + radius;
-        center_col_area.y2 = y + radius;
-
-        lv_inv_area(&center_col_area);
     }
     else if(ext->type == LV_CPICKER_TYPE_RECT)
     {
