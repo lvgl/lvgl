@@ -49,7 +49,7 @@ typedef struct
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
     uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint16_t point_cnt;   /*Point number in a data line*/
-    uint8_t type    :3;   /*Line, column or point chart (from 'lv_chart_type_t')*/
+    uint8_t type    :4;   /*Line, column or point chart (from 'lv_chart_type_t')*/
     struct {
         lv_coord_t width;  /*Line width or point radius*/
         uint8_t num;   /*Number of data lines in dl_ll*/
@@ -64,6 +64,7 @@ enum
     LV_CHART_TYPE_LINE = 0x01,
     LV_CHART_TYPE_COLUMN = 0x02,
     LV_CHART_TYPE_POINT = 0x04,
+    LV_CHART_TYPE_VERTICAL_LINE = 0x08,
 };
 typedef uint8_t lv_chart_type_t;
 
