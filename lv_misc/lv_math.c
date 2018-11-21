@@ -238,6 +238,29 @@ uint16_t lv_atan2(int x, int y)
     return degree;
 }
 
+/**
+ * Calculate the sqrt of an integer.
+ * @param x
+ * @return the sqrt of x
+ */
+uint16_t lv_sqrt(uint32_t x)
+{
+    uint16_t res=0;
+    uint16_t add= 0x8000;
+    int i;
+    for(i=0;i<16;i++)
+    {
+        uint16_t temp=res | add;
+        uint32_t g2=temp*temp;
+        if (x>=g2)
+        {
+            res=temp;
+        }
+        add>>=1;
+    }
+    return res;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

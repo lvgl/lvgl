@@ -428,7 +428,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         //2a^2 <= d^2
         //a^2<=(d^2)/2
         //a <= sqrt((d^2)/2)
-        uint16_t radius = sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
+        uint16_t radius = lv_sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
 
         center_ind_area.x1 = x - radius;
         center_ind_area.y1 = y - radius;
@@ -1305,7 +1305,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
         uint32_t rin = r - styleCopy.line.width;
 
-        uint16_t radius = sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
+        uint16_t radius = lv_sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
 
         center_col_area.x1 = x - radius;
         center_col_area.y1 = y - radius;
