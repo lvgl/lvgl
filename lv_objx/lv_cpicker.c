@@ -417,129 +417,147 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(cpicker);
 
-#if LV_CPICKER_USE_TRI
-        lv_point_t triangle_points[3];
-#endif
+        uint8_t redraw_wheel = 0;
 
-        if(ext->wheel_mode == LV_CPICKER_WHEEL_HUE)
-        {
-            for(uint16_t i = 0; i <= 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; i+= LV_CPICKER_DEF_QF)
-            {
-                styleCopy.line.color = lv_color_hsv_to_rgb(i, ext->saturation, ext->value);
-
-#if LV_CPICKER_USE_TRI
-                triangle_points[0].x = x;
-                triangle_points[0].y = y;
-
-                triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-                triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-
-                if(i != (360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF))
-                {
-                    triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
-                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
-                }
-                else
-                {
-                    /*the last triangle is drawn without additional overlapping pixels*/
-                    triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
-                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
-                }
-
-                lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
-#else
-                lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
-#endif
-            }
-        }
-        else if(ext->wheel_mode == LV_CPICKER_WHEEL_SAT)
-        {
-            for(uint16_t i = 0; i <= 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; i += LV_CPICKER_DEF_QF)
-            {
-                styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, i*100/360, ext->value);
-
-#if LV_CPICKER_USE_TRI
-                triangle_points[0].x = x;
-                triangle_points[0].y = y;
-
-                triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-                triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-
-                if(i != (360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF))
-                {
-                    /*the last triangle is drawn without additional overlapping pixels*/
-                    triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
-                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
-                }
-                else
-                {
-                    triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
-                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
-                }
-
-                lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
-#else
-                lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
-#endif
-            }
-        }
-        else if(ext->wheel_mode == LV_CPICKER_WHEEL_VAL)
-        {
-            for(uint16_t i = 0; i <= 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; i += LV_CPICKER_DEF_QF)
-            {
-                styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, i*100/360);
-#if LV_CPICKER_USE_TRI
-                triangle_points[0].x = x;
-                triangle_points[0].y = y;
-
-                triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-                triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-
-                if(i != (360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF))
-                {
-                    /*the last triangle is drawn without additional overlapping pixels*/
-                    triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
-                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
-                }
-                else
-                {
-                    triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
-                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
-                }
-                lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
-#else
-                lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
-#endif
-            }
-        }
-
-#if LV_CPICKER_USE_TRI
-        //if using triangle we need to draw a white circle to make a separation
-        lv_area_t center_area;
-
-        uint16_t wradius = r - styleCopy.line.width;
-        center_area.x1 = x - wradius;
-        center_area.y1 = y - wradius;
-        center_area.x2 = x + wradius;
-        center_area.y2 = y + wradius;
-
-        /*
-        styleCopy.body.main_color = LV_COLOR_WHITE;
-        styleCopy.body.grad_color = styleCopy.body.main_color;
-         */
-        styleCopy.body.radius = LV_RADIUS_CIRCLE;
-        lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
-#endif
-
-        //draw the center color indicator
         lv_area_t center_ind_area;
 
-        uint16_t radius = r - styleCopy.line.width - style->body.padding.inner;
+        uint32_t rin = r - styleCopy.line.width;
+        //the square area (a and b being sides) should fit into the center of diameter d
+        //we have:
+        //a^2+b^2<=d^2
+        //2a^2 <= d^2
+        //a^2<=(d^2)/2
+        //a <= sqrt((d^2)/2)
+        uint16_t radius = sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
+
         center_ind_area.x1 = x - radius;
         center_ind_area.y1 = y - radius;
         center_ind_area.x2 = x + radius;
         center_ind_area.y2 = y + radius;
 
+        if(mask->x1 < center_ind_area.x1 || mask->x2 > center_ind_area.x2
+                || mask->y1 < center_ind_area.y1 || mask->y2 > center_ind_area.y2)
+        {
+            redraw_wheel = 1;
+        }
+
+#if LV_CPICKER_USE_TRI
+        lv_point_t triangle_points[3];
+#endif
+
+        if(redraw_wheel)
+        {
+            //todo: redraw only partially the wheel
+            //so select the sart and end angle based on the area
+            uint16_t start_angle, end_angle;
+            start_angle = 0; //Default
+            end_angle = 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; //Default
+
+
+            if(ext->wheel_mode == LV_CPICKER_WHEEL_HUE)
+            {
+                for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
+                {
+                    styleCopy.line.color = lv_color_hsv_to_rgb(i, ext->saturation, ext->value);
+
+#if LV_CPICKER_USE_TRI
+                    triangle_points[0].x = x;
+                    triangle_points[0].y = y;
+
+                    triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                    triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                    if(i != end_angle)
+                    {
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+                    }
+                    else
+                    {
+                        /*the last triangle is drawn without additional overlapping pixels*/
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
+                    }
+
+                    lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
+#else
+                    lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
+#endif
+                }
+            }
+            else if(ext->wheel_mode == LV_CPICKER_WHEEL_SAT)
+            {
+                for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
+                {
+                    styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, i*100/360, ext->value);
+
+#if LV_CPICKER_USE_TRI
+                    triangle_points[0].x = x;
+                    triangle_points[0].y = y;
+
+                    triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                    triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                    if(i != end_angle)
+                    {
+                        /*the last triangle is drawn without additional overlapping pixels*/
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+                    }
+                    else
+                    {
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
+                    }
+
+                    lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
+#else
+                    lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
+#endif
+                }
+            }
+            else if(ext->wheel_mode == LV_CPICKER_WHEEL_VAL)
+            {
+                for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
+                {
+                    styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, i*100/360);
+#if LV_CPICKER_USE_TRI
+                    triangle_points[0].x = x;
+                    triangle_points[0].y = y;
+
+                    triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                    triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                    if(i != end_angle)
+                    {
+                        /*the last triangle is drawn without additional overlapping pixels*/
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+                    }
+                    else
+                    {
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
+                    }
+                    lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
+#else
+                    lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
+#endif
+                }
+            }
+        }
+
+        //draw center background
+        lv_area_t center_area;
+        uint16_t wradius = r - styleCopy.line.width;
+        center_area.x1 = x - wradius;
+        center_area.y1 = y - wradius;
+        center_area.x2 = x + wradius;
+        center_area.y2 = y + wradius;
+        styleCopy.body.radius = LV_RADIUS_CIRCLE;
+        lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
+
+        //draw the center color indicator
         styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, ext->value);
         styleCopy.body.grad_color = styleCopy.body.main_color;
         styleCopy.body.radius = LV_RADIUS_CIRCLE;
@@ -1417,7 +1435,10 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
         /*invalidate center*/
         lv_area_t center_col_area;
 
-        uint16_t radius = r - styleCopy.line.width - style->body.padding.inner;
+        uint32_t rin = r - styleCopy.line.width;
+
+        uint16_t radius = sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
+
         center_col_area.x1 = x - radius;
         center_col_area.y1 = y - radius;
         center_col_area.x2 = x + radius;
