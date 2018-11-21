@@ -59,6 +59,13 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
     if(tri[0].x == tri[1].x && tri[1].x == tri[2].x) return;
     if(tri[0].y == tri[1].y && tri[1].y == tri[2].y) return;
 
+
+    /*Chech out of mask*/
+    if(tri[0].x < mask->x1 && tri[1].x < mask->x1 && tri[2].x < mask->x1) return;   /*Out of the mask on the left*/
+    if(tri[0].x > mask->x2 && tri[1].x > mask->x2 && tri[2].x > mask->x2) return;   /*Out of the mask on the right*/
+    if(tri[0].y < mask->y1 && tri[1].y < mask->y1 && tri[2].y < mask->y1) return;   /*Out of the mask on the top*/
+    if(tri[0].y > mask->y2 && tri[1].y > mask->y2 && tri[2].y > mask->y2) return;   /*Out of the mask on the bottom*/
+
     /*Draw the triangle*/
     lv_point_t edge1;
     lv_coord_t dx1 = LV_MATH_ABS(tri[0].x - tri[1].x);
