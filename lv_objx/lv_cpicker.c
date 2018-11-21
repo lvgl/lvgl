@@ -482,7 +482,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             {
                 for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
                 {
-                    styleCopy.line.color = lv_color_hsv_to_rgb(i, ext->saturation, ext->value);
+                    styleCopy.line.color = lv_color_hsv_to_rgb(i%360, ext->saturation, ext->value);
 
 #if LV_CPICKER_USE_TRI
                     triangle_points[0].x = x;
@@ -491,16 +491,18 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                     triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
                     triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
 
-                    if(i != end_angle)
-                    {
-                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
-                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
-                    }
-                    else
+                    if(i >= end_angle && start_angle == 0 && end_angle == (360 - LV_CPICKER_DEF_QF))
                     {
                         /*the last triangle is drawn without additional overlapping pixels*/
                         triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
                         triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
+
+                    }
+                    else
+                    {
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+
                     }
 
                     lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
