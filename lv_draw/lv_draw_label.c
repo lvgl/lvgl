@@ -59,10 +59,11 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
 		const lv_style_t * style, lv_opa_t opa_scale, const char * txt,
 		lv_txt_flag_t flag, lv_point_t * offset) {
 
-	// my code
+#if LV_TXT_RTL
 	uint8_t *reversed_buffer = NULL;
 	uint32_t reversed_index = 0;
-	// end my code
+#endif
+
 	const lv_font_t * font = style->text.font;
 	lv_coord_t w;
 	if ((flag & LV_TXT_FLAG_EXPAND) == 0) {
