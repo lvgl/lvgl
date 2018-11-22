@@ -49,17 +49,18 @@
 #define LV_CPICKER_DEF_QF 1
 #endif
 
-#if LV_CPICKER_DEF_QF == 0
+#define LV_CPICKER_MINIMUM_QF 4
+#if LV_CPICKER_DEF_QF < LV_CPICKER_MINIMUM_QF
 #undef LV_CPICKER_DEF_QF
-#define LV_CPICKER_DEF_QF 1
+#define LV_CPICKER_DEF_QF LV_CPICKER_MINIMUM_QF
 #endif
 
-#ifndef LV_CPICKER_USE_TRI /*Use triangle approximation instead of arc (work for low quantization)*/
-#define LV_CPICKER_USE_TRI 0
+#ifndef LV_CPICKER_USE_TRI /*Use triangle approximation instead of arc*/
+#define LV_CPICKER_USE_TRI 1
 #endif
 
 #if LV_CPICKER_USE_TRI
-#define TRI_OFFSET LV_MATH_MIN(LV_CPICKER_DEF_QF + 2, 4)
+#define TRI_OFFSET 4
 #endif
 
 /**********************
@@ -435,6 +436,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         center_ind_area.x2 = x + radius;
         center_ind_area.y2 = y + radius;
 
+        /*redraw the wheel only if the mask intersect with the wheel*/
         if(mask->x1 < center_ind_area.x1 || mask->x2 > center_ind_area.x2
                 || mask->y1 < center_ind_area.y1 || mask->y2 > center_ind_area.y2)
         {
@@ -445,38 +447,40 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         lv_point_t triangle_points[3];
 #endif
 
-        uint16_t start_angle, end_angle;
+        int16_t start_angle, end_angle;
         start_angle = 0; //Default
         end_angle = 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; //Default
 
         if(redraw_wheel)
         {
-            //todo: redraw only partially the wheel
-            //so select the start and end angle based on the area
+            /*if the mask does not include the center of the object
+             * redrawing all the wheel is not necessary;
+             * only a given angular range
+             */
             lv_point_t center = {x, y};
             if(!lv_area_is_point_on(mask, &center)
-                    && (mask->x1 != cpicker->coords.x1 || mask->x2 != cpicker->coords.x2
-                            || mask->y1 != cpicker->coords.y1 || mask->y2 != cpicker->coords.y2))
+                    /*
+              && (mask->x1 != cpicker->coords.x1 || mask->x2 != cpicker->coords.x2
+              ||  mask->y1 != cpicker->coords.y1 || mask->y2 != cpicker->coords.y2)
+                     */
+            )
             {
-                int16_t dr, ur, ul, dl, c; //angle from center of object to each corners and center point of the area
-                lv_coord_t area_cx = mask->x1 + ((mask->x2 - mask->x1) / 2);
-                lv_coord_t area_cy = mask->y1 + ((mask->y2 - mask->y1) / 2);
-
+                /*get angle from center of object to each corners of the area*/
+                int16_t dr, ur, ul, dl;
                 dr = lv_atan2(mask->x2 - x, mask->y2 - y);
                 ur = lv_atan2(mask->x2 - x, mask->y1 - y);
                 ul = lv_atan2(mask->x1 - x, mask->y1 - y);
                 dl = lv_atan2(mask->x1 - x, mask->y2 - y);
-                c = lv_atan2(area_cx - x, area_cy - y);
 
-
+                /* check area position from object axis*/
                 uint8_t left = (mask->x2 < x && mask->x1 < x);
                 uint8_t onYaxis = (mask->x2 > x && mask->x1 < x);
                 uint8_t right = (mask->x2 > x && mask->x1 > x);
-
                 uint8_t top = (mask->y2 < y && mask->y1 < y);
                 uint8_t onXaxis = (mask->y2 > y && mask->y1 < y);
                 uint8_t bottom = (mask->y2 > y && mask->y1 > x);
 
+                /*store angular range*/
                 if(right && bottom)
                 {
                     start_angle = dl;
@@ -518,42 +522,27 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                     end_angle = ur;
                 }
 
-
-                /*
-                start_angle /= LV_CPICKER_DEF_QF;
-                end_angle /= LV_CPICKER_DEF_QF;
-
-                if((start_angle - 1) < 0)
-                {
-                    start_angle += (360 / LV_CPICKER_DEF_QF);
-                    end_angle += (360 / LV_CPICKER_DEF_QF);
-                }
-                start_angle -= LV_CPICKER_DEF_QF;
-                end_angle += LV_CPICKER_DEF_QF;
-
-                start_angle *= LV_CPICKER_DEF_QF;
-                end_angle *= LV_CPICKER_DEF_QF;
-                 */
-
-
-
+                /*rollover angle*/
                 if(start_angle > end_angle)
                 {
                     end_angle +=  360;
                 }
 
+                /*round to QF factor*/
                 start_angle = start_angle/LV_CPICKER_DEF_QF*LV_CPICKER_DEF_QF;
-                end_angle = end_angle/LV_CPICKER_DEF_QF*LV_CPICKER_DEF_QF + LV_CPICKER_DEF_QF;
+                end_angle = end_angle/LV_CPICKER_DEF_QF*LV_CPICKER_DEF_QF;;
 
+                /*shift angle if necessary before adding offset*/
                 if((start_angle - LV_CPICKER_DEF_QF) < 0)
                 {
                     start_angle += 360;
                     end_angle += 360;
                 }
 
+                /*ensure overlapping by adding offset*/
                 start_angle -= LV_CPICKER_DEF_QF;
+                end_angle += LV_CPICKER_DEF_QF;
             }
-
 
             if(ext->wheel_mode == LV_CPICKER_WHEEL_HUE)
             {
@@ -567,6 +556,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
                     triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
                     triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
 
                     if(i == end_angle || i == (360 - LV_CPICKER_DEF_QF))
                     {
