@@ -175,6 +175,7 @@
  *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
+#define LV_OBJ_REAILGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 
 /*==================
  *  LV OBJ X USAGE

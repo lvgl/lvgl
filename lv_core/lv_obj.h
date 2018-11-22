@@ -112,6 +112,44 @@ typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
+enum
+{
+    LV_ALIGN_CENTER = 0,
+    LV_ALIGN_IN_TOP_LEFT,
+    LV_ALIGN_IN_TOP_MID,
+    LV_ALIGN_IN_TOP_RIGHT,
+    LV_ALIGN_IN_BOTTOM_LEFT,
+    LV_ALIGN_IN_BOTTOM_MID,
+    LV_ALIGN_IN_BOTTOM_RIGHT,
+    LV_ALIGN_IN_LEFT_MID,
+    LV_ALIGN_IN_RIGHT_MID,
+    LV_ALIGN_OUT_TOP_LEFT,
+    LV_ALIGN_OUT_TOP_MID,
+    LV_ALIGN_OUT_TOP_RIGHT,
+    LV_ALIGN_OUT_BOTTOM_LEFT,
+    LV_ALIGN_OUT_BOTTOM_MID,
+    LV_ALIGN_OUT_BOTTOM_RIGHT,
+    LV_ALIGN_OUT_LEFT_TOP,
+    LV_ALIGN_OUT_LEFT_MID,
+    LV_ALIGN_OUT_LEFT_BOTTOM,
+    LV_ALIGN_OUT_RIGHT_TOP,
+    LV_ALIGN_OUT_RIGHT_MID,
+    LV_ALIGN_OUT_RIGHT_BOTTOM,
+};
+typedef uint8_t lv_align_t;
+
+#if LV_OBJ_REAILGN
+typedef struct {
+    struct _lv_obj_t * base;
+    lv_coord_t xofs;
+    lv_coord_t yofs;
+    lv_align_t align;
+    uint8_t auto_realign :1;
+    uint8_t origo_align  :1;        /*1: the oigo (center of the object) was aligned with `lv_obj_align_origo`*/
+}lv_reailgn_t;
+#endif
+
+
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par;    /*Pointer to the parent object*/
@@ -144,6 +182,9 @@ typedef struct _lv_obj_t
     lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_size;        /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+#if LV_OBJ_REAILGN
+    lv_reailgn_t realign;
+#endif
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
     LV_OBJ_FREE_NUM_TYPE free_num;          /*Application specific identifier (set it freely)*/
@@ -170,32 +211,6 @@ typedef uint8_t lv_protect_t;
 typedef struct {
     const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
 } lv_obj_type_t;
-
-enum
-{
-    LV_ALIGN_CENTER = 0,
-    LV_ALIGN_IN_TOP_LEFT,
-    LV_ALIGN_IN_TOP_MID,
-    LV_ALIGN_IN_TOP_RIGHT,
-    LV_ALIGN_IN_BOTTOM_LEFT,
-    LV_ALIGN_IN_BOTTOM_MID,
-    LV_ALIGN_IN_BOTTOM_RIGHT,
-    LV_ALIGN_IN_LEFT_MID,
-    LV_ALIGN_IN_RIGHT_MID,
-    LV_ALIGN_OUT_TOP_LEFT,
-    LV_ALIGN_OUT_TOP_MID,
-    LV_ALIGN_OUT_TOP_RIGHT,
-    LV_ALIGN_OUT_BOTTOM_LEFT,
-    LV_ALIGN_OUT_BOTTOM_MID,
-    LV_ALIGN_OUT_BOTTOM_RIGHT,
-    LV_ALIGN_OUT_LEFT_TOP,
-    LV_ALIGN_OUT_LEFT_MID,
-    LV_ALIGN_OUT_LEFT_BOTTOM,
-    LV_ALIGN_OUT_RIGHT_TOP,
-    LV_ALIGN_OUT_RIGHT_MID,
-    LV_ALIGN_OUT_RIGHT_BOTTOM,
-};
-typedef uint8_t lv_align_t;
 
 enum
 {
@@ -333,6 +348,18 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
  */
 void lv_obj_align(lv_obj_t * obj,const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
 
+/**
+ * Realign the object based on the last `lv_obj_align` parameters.
+ * @param obj pointer to an object
+ */
+void lv_obj_realign(lv_obj_t * obj);
+
+/**
+ * Enable the automatic realign of the object when its size has changed based on the last `lv_obj_align` parameters.
+ * @param obj pointer to an object
+ * @param en true: enable auto realign; false: disable auto realign
+ */
+void lv_obj_set_auto_realign(lv_obj_t * obj, bool en);
 
 /*---------------------
  * Appearance set
@@ -622,6 +649,13 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
  * @return the extended size attribute
  */
 lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj);
+
+/**
+ * Get the automatic realign property of the object.
+ * @param obj pointer to an object
+ * @return  true: auto realign is enabled; false: auto realign is disabled
+ */
+bool lv_obj_get_auto_realign(lv_obj_t * obj);
 
 /*-----------------
  * Appearance get
