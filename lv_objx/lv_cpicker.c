@@ -226,7 +226,7 @@ void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 
     ext->hue = hue % 360;
 
-    lv_obj_invalidate(cpicker);
+    lv_cpicker_invalidate_indicator(cpicker);
 }
 
 /**
@@ -445,36 +445,113 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         lv_point_t triangle_points[3];
 #endif
 
+        uint16_t start_angle, end_angle;
+        start_angle = 0; //Default
+        end_angle = 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; //Default
+
         if(redraw_wheel)
         {
             //todo: redraw only partially the wheel
-            //so select the sart and end angle based on the area
-            uint16_t start_angle, end_angle;
-            start_angle = 0; //Default
-            end_angle = 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; //Default
-
-            if(mask->x1 != cpicker->coords.x1 || mask->x2 != cpicker->coords.x2
-                    || mask->y1 != cpicker->coords.y1 || mask->y2 != cpicker->coords.y2)
+            //so select the start and end angle based on the area
+            lv_point_t center = {x, y};
+            if(!lv_area_is_point_on(mask, &center)
+                    && (mask->x1 != cpicker->coords.x1 || mask->x2 != cpicker->coords.x2
+                            || mask->y1 != cpicker->coords.y1 || mask->y2 != cpicker->coords.y2))
             {
-                int16_t a1, a2, a3, a4;
-                a1 = lv_atan2(mask->x2 - x, mask->y2 - y);
-                a2 = lv_atan2(mask->x2 - x, mask->y1 - y);
-                a3 = lv_atan2(mask->x1 - x, mask->y1 - y);
-                a4 = lv_atan2(mask->x1 - x, mask->y2 - y);
+                int16_t dr, ur, ul, dl, c; //angle from center of object to each corners and center point of the area
+                lv_coord_t area_cx = mask->x1 + ((mask->x2 - mask->x1) / 2);
+                lv_coord_t area_cy = mask->y1 + ((mask->y2 - mask->y1) / 2);
 
-                start_angle = LV_MATH_MIN(LV_MATH_MIN(a1, a2), LV_MATH_MIN(a3, a4));
-                start_angle = start_angle / (LV_CPICKER_DEF_QF) * (LV_CPICKER_DEF_QF);
+                dr = lv_atan2(mask->x2 - x, mask->y2 - y);
+                ur = lv_atan2(mask->x2 - x, mask->y1 - y);
+                ul = lv_atan2(mask->x1 - x, mask->y1 - y);
+                dl = lv_atan2(mask->x1 - x, mask->y2 - y);
+                c = lv_atan2(area_cx - x, area_cy - y);
 
-                end_angle = LV_MATH_MAX(LV_MATH_MAX(a1, a2), LV_MATH_MAX(a3, a4));
-                end_angle = end_angle / (LV_CPICKER_DEF_QF) * (LV_CPICKER_DEF_QF) + LV_CPICKER_DEF_QF;
 
-                /*ensure area overlaps*/
+                uint8_t left = (mask->x2 < x && mask->x1 < x);
+                uint8_t onYaxis = (mask->x2 > x && mask->x1 < x);
+                uint8_t right = (mask->x2 > x && mask->x1 > x);
+
+                uint8_t top = (mask->y2 < y && mask->y1 < y);
+                uint8_t onXaxis = (mask->y2 > y && mask->y1 < y);
+                uint8_t bottom = (mask->y2 > y && mask->y1 > x);
+
+                if(right && bottom)
+                {
+                    start_angle = dl;
+                    end_angle = ur;
+                }
+                else if(right && onXaxis)
+                {
+                    start_angle = dl;
+                    end_angle = ul;
+                }
+                else if(right && top)
+                {
+                    start_angle = dr;
+                    end_angle = ul;
+                }
+                else if(onYaxis && top)
+                {
+                    start_angle = dr;
+                    end_angle = dl;
+                }
+                else if(left && top)
+                {
+                    start_angle = ur;
+                    end_angle = dl;
+                }
+                else if(left && onXaxis)
+                {
+                    start_angle = ur;
+                    end_angle = dr;
+                }
+                else if(left && bottom)
+                {
+                    start_angle = ul;
+                    end_angle = dr;
+                }
+                else if(onYaxis && bottom)
+                {
+                    start_angle = ul;
+                    end_angle = ur;
+                }
+
+
+                /*
+                start_angle /= LV_CPICKER_DEF_QF;
+                end_angle /= LV_CPICKER_DEF_QF;
+
+                if((start_angle - 1) < 0)
+                {
+                    start_angle += (360 / LV_CPICKER_DEF_QF);
+                    end_angle += (360 / LV_CPICKER_DEF_QF);
+                }
+                start_angle -= LV_CPICKER_DEF_QF;
+                end_angle += LV_CPICKER_DEF_QF;
+
+                start_angle *= LV_CPICKER_DEF_QF;
+                end_angle *= LV_CPICKER_DEF_QF;
+                 */
+
+
+
+                if(start_angle > end_angle)
+                {
+                    end_angle +=  360;
+                }
+
+                start_angle = start_angle/LV_CPICKER_DEF_QF*LV_CPICKER_DEF_QF;
+                end_angle = end_angle/LV_CPICKER_DEF_QF*LV_CPICKER_DEF_QF + LV_CPICKER_DEF_QF;
+
                 if((start_angle - LV_CPICKER_DEF_QF) < 0)
                 {
                     start_angle += 360;
                     end_angle += 360;
                 }
-                start_angle = (start_angle - LV_CPICKER_DEF_QF);
+
+                start_angle -= LV_CPICKER_DEF_QF;
             }
 
 
@@ -675,6 +752,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             break;
         }
         }
+
 
         /*
         //code to color the drawn area
