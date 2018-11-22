@@ -110,6 +110,8 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     bool cont = false;
 
     if(indev->driver.read) {
+        memset(data, 0, sizeof(data));
+        data->state = LV_INDEV_STATE_REL;
         data->user_data = indev->driver.user_data;
 
         LV_LOG_TRACE("idnev read started");
