@@ -201,7 +201,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->ext_size = 0;
 
         /*Init realign*/
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
         new_obj->realign.align = LV_ALIGN_CENTER;
         new_obj->realign.xofs = 0;
         new_obj->realign.yofs = 0;
@@ -591,7 +591,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_obj_invalidate(obj);
 
     /*Automatically realign the object if required*/
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
     if(obj->realign.auto_realign) lv_obj_realign(obj);
 #endif
 }
@@ -751,7 +751,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     lv_obj_set_pos(obj, new_x, new_y);
 
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align = align;
     obj->realign.xofs = x_mod;
@@ -900,7 +900,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 
     lv_obj_set_pos(obj, new_x, new_y);
 
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align = align;
     obj->realign.xofs = x_mod;
@@ -916,12 +916,12 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
  */
 void lv_obj_realign(lv_obj_t * obj)
 {
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
     if(obj->realign.origo_align) lv_obj_align_origo(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
     else lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
 #else
     (void) obj;
-    LV_LOG_WARN("lv_obj_realaign: no effect because LV_OBJ_REAILGN = 0");
+    LV_LOG_WARN("lv_obj_realaign: no effect because LV_OBJ_REALIGN = 0");
 #endif
 }
 
@@ -932,12 +932,12 @@ void lv_obj_realign(lv_obj_t * obj)
  */
 void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
 {
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
     obj->realign.auto_realign = en ? 1 : 0;
 #else
     (void) obj;
     (void) en;
-    LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_OBJ_REAILGN = 0");
+    LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_OBJ_REALIGN = 0");
 #endif
 }
 
@@ -1467,7 +1467,7 @@ lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj)
  */
 bool lv_obj_get_auto_realign(lv_obj_t * obj)
 {
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
     return obj->realign.auto_realign ? true : false;
 #else
     (void) obj;

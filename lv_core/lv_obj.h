@@ -138,7 +138,7 @@ enum
 };
 typedef uint8_t lv_align_t;
 
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
 typedef struct {
     struct _lv_obj_t * base;
     lv_coord_t xofs;
@@ -182,7 +182,7 @@ typedef struct _lv_obj_t
     lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_size;        /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
-#if LV_OBJ_REAILGN
+#if LV_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif
 
