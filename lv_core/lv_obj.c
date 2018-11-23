@@ -761,7 +761,6 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 #endif
 }
 
-
 /**
  * Align an object to an other object.
  * @param obj pointer to an object to align
