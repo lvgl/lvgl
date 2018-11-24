@@ -16,6 +16,9 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_ATTRIBUTE_FLUSH_READY
+#define LV_ATTRIBUTE_FLUSH_READY
+#endif
 
 /**********************
  *      TYPEDEFS
