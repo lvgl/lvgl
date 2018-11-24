@@ -326,6 +326,9 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
         case LV_LIST_STYLE_SB:
             lv_page_set_style(list, LV_PAGE_STYLE_SB, style);
             break;
+        case LV_LIST_STYLE_EDGE_FLASH:
+            lv_page_set_style(list, LV_PAGE_STYLE_EDGE_FLASH, style);
+            break;
         case LV_LIST_STYLE_BTN_REL:
             ext->styles_btn[LV_BTN_STATE_REL] = style;
             btn_style_refr = LV_BTN_STYLE_REL;
@@ -544,6 +547,9 @@ lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
             break;
         case LV_LIST_STYLE_SB:
             style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL);
+            break;
+        case LV_LIST_STYLE_EDGE_FLASH:
+            style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH);
             break;
         case LV_LIST_STYLE_BTN_REL:
             style = ext->styles_btn[LV_BTN_STATE_REL];
