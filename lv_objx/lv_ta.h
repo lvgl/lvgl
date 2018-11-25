@@ -264,7 +264,7 @@ uint16_t lv_ta_get_cursor_pos(const lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return true: the cursor is drawn, false: the cursor is hidden
  */
-bool lv_ta_get_cursor_show(const lv_obj_t * ta);
+//bool lv_ta_get_cursor_show(const lv_obj_t * ta);
 
 /**
  * Get the current cursor type.
