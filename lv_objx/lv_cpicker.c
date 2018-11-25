@@ -657,6 +657,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -704,6 +705,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -739,6 +741,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -1422,6 +1425,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -1540,6 +1544,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -1585,6 +1590,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
