@@ -453,7 +453,7 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
  * @param obj pointer to an object
  * @param en true: enable editing
  */
-void lv_obj_set_editable(lv_obj_t * obj, bool en);
+//void lv_obj_set_editable(lv_obj_t * obj, bool en);
 
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
