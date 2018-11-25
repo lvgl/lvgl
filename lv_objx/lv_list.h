@@ -67,6 +67,7 @@ enum {
     LV_LIST_STYLE_BG,
     LV_LIST_STYLE_SCRL,
     LV_LIST_STYLE_SB,
+    LV_LIST_STYLE_EDGE_FLASH,
     LV_LIST_STYLE_BTN_REL,
     LV_LIST_STYLE_BTN_PR,
     LV_LIST_STYLE_BTN_TGL_REL,
@@ -154,6 +155,16 @@ static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
 static inline void lv_list_set_scroll_propagation(lv_obj_t * list, bool en)
 {
     lv_page_set_scroll_propagation(list, en);
+}
+
+/**
+ * Enable the edge flash effect. (Show an arc when the an edge is reached)
+ * @param list pointer to a List
+ * @param en true or false to enable/disable end flash
+ */
+static inline void lv_list_set_edge_flash(lv_obj_t * list, bool en)
+{
+    lv_page_set_edge_flash(list, en);
 }
 
 /**
@@ -255,6 +266,16 @@ static inline lv_sb_mode_t lv_list_get_sb_mode(const lv_obj_t * list)
 static inline bool lv_list_get_scroll_propagation(lv_obj_t * list)
 {
     return lv_page_get_scroll_propagation(list);
+}
+
+/**
+ * Get the scroll propagation property
+ * @param list pointer to a List
+ * @return true or false
+ */
+static inline bool lv_list_get_edge_flash(lv_obj_t * list)
+{
+    return lv_page_get_edge_flash(list);
 }
 
 /**

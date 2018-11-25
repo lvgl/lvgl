@@ -199,6 +199,10 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
         return;
     }
 
+    /*Disable edge flash. If a new line was added it could show edge flash effect*/
+    bool edge_flash_en = lv_ta_get_edge_flash(ta);
+    lv_ta_set_edge_flash(ta, false);
+
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
     uint32_t letter_buf[2];
     letter_buf[0] = c;
@@ -237,6 +241,9 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 
     /*Move the cursor after the new character*/
     lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + 1);
+
+    /*Revert the original edge flash state*/
+    lv_ta_set_edge_flash(ta, edge_flash_en);
 }
 
 /**
@@ -259,6 +266,10 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         }
         return;
     }
+
+    /*Disable edge flash. If a new line was added it could show edge flash effect*/
+    bool edge_flash_en = lv_ta_get_edge_flash(ta);
+    lv_ta_set_edge_flash(ta, false);
 
     /*Insert the text*/
     lv_label_ins_text(ext->label, ext->cursor.pos, txt);
@@ -293,6 +304,9 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     /*Move the cursor after the new text*/
     lv_ta_set_cursor_pos(ta, lv_ta_get_cursor_pos(ta) + lv_txt_get_encoded_length(txt));
+
+    /*Revert the original edge flash state*/
+    lv_ta_set_edge_flash(ta, edge_flash_en);
 }
 
 /**
@@ -632,6 +646,9 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
         case LV_TA_STYLE_SB:
             lv_page_set_style(ta, LV_PAGE_STYLE_SB, style);
             break;
+        case LV_TA_STYLE_EDGE_FLASH:
+            lv_page_set_style(ta, LV_PAGE_STYLE_EDGE_FLASH, style);
+            break;
         case LV_TA_STYLE_CURSOR:
             ext->cursor.style = style;
             lv_obj_refresh_ext_size(lv_page_get_scrl(ta)); /*Refresh ext. size because of cursor drawing*/
@@ -759,6 +776,9 @@ lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
             break;
         case LV_TA_STYLE_SB:
             style = lv_page_get_style(ta, LV_PAGE_STYLE_SB);
+            break;
+        case LV_TA_STYLE_EDGE_FLASH:
+            style = lv_page_get_style(ta, LV_PAGE_STYLE_EDGE_FLASH);
             break;
         case LV_TA_STYLE_CURSOR:
             style = ext->cursor.style;
