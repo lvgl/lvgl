@@ -127,6 +127,7 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
     (void) tileview;    /*Unused*/
     lv_obj_set_free_ptr(element, lv_obj_get_signal_func(element));
     lv_obj_set_signal_func(element, element_signal_func);
+    lv_obj_set_drag_parent(element, true);
 }
 
 
@@ -363,7 +364,6 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             lv_coord_t w = lv_obj_get_width(tileview);
             if(ext->drag_top_en == 0) {
                 if(y > -(ext->act_id.y * h) && indev->proc.vect.y > 0 && ext->drag_hor == 0) {
-                    printf("top: y:%d\n", y);
                     if(ext->page.edge_flash.enabled &&
                             ext->page.edge_flash.left_ip == 0 && ext->page.edge_flash.right_ip == 0 &&
                             ext->page.edge_flash.top_ip == 0 && ext->page.edge_flash.bottom_ip == 0) {
@@ -375,7 +375,6 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                 }
             }
             if(ext->drag_bottom_en == 0 && indev->proc.vect.y < 0 && ext->drag_hor == 0) {
-                printf("bottom: y:%d\n", y);
                 if(y < -(ext->act_id.y * h)) {
                     if(ext->page.edge_flash.enabled &&
                             ext->page.edge_flash.left_ip == 0 && ext->page.edge_flash.right_ip == 0 &&
@@ -389,7 +388,6 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             }
             if(ext->drag_left_en == 0) {
                 if(x > -(ext->act_id.x * w) && indev->proc.vect.x > 0 && ext->drag_ver == 0) {
-                    printf("left: x:%d\n", x);
                     if(ext->page.edge_flash.enabled &&
                             ext->page.edge_flash.left_ip == 0 && ext->page.edge_flash.right_ip == 0 &&
                             ext->page.edge_flash.top_ip == 0 && ext->page.edge_flash.bottom_ip == 0) {
@@ -401,7 +399,6 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                 }
             }
             if(ext->drag_right_en == 0 && indev->proc.vect.x < 0 && ext->drag_ver == 0) {
-                printf("right: x:%d\n", x);
                 if(x < -(ext->act_id.x * w)) {
                     if(ext->page.edge_flash.enabled &&
                             ext->page.edge_flash.left_ip == 0 && ext->page.edge_flash.right_ip == 0 &&
