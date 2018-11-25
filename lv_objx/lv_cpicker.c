@@ -34,11 +34,11 @@
 #endif
 
 #ifndef LV_CPICKER_DEF_SAT
-#define LV_CPICKER_DEF_SAT 0
+#define LV_CPICKER_DEF_SAT 100
 #endif
 
 #ifndef LV_CPICKER_DEF_VAL
-#define LV_CPICKER_DEF_VAL 0
+#define LV_CPICKER_DEF_VAL 100
 #endif
 
 #ifndef LV_CPICKER_DEF_IND_TYPE
@@ -226,7 +226,7 @@ void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 
     ext->hue = hue % 360;
 
-    lv_cpicker_invalidate_indicator(cpicker);
+    lv_obj_invalidate(cpicker);
 }
 
 /**
@@ -239,6 +239,7 @@ void lv_cpicker_set_ring_color(lv_obj_t * cpicker, lv_color_t ring_color)
 	lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
 	ext->ring_color = ring_color;
+    lv_obj_invalidate(cpicker);
 }
 
 
