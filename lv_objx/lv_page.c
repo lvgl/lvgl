@@ -37,7 +37,6 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
 static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
-static void edge_flash_anim_start(lv_obj_t * page);
 static void edge_flash_anim(void * page, int32_t v);
 static void edge_flash_anim_end(void * page);
 
@@ -572,6 +571,34 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 #endif
 }
 
+
+/**
+ * Not intended to use directly by the user but by other object types internally.
+ * Start an edge flash animation. Exactly one `ext->edge_flash.xxx_ip` should be set
+ * @param page
+ */
+void lv_page_start_edge_flash(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    if(ext->edge_flash.enabled) {
+        lv_anim_t a;
+        a.var = page;
+        a.start = 0;
+        a.end = LV_PAGE_END_FLASH_SIZE;
+        a.fp = (lv_anim_fp_t)edge_flash_anim;
+        a.path = lv_anim_path_linear;
+        a.end_cb = edge_flash_anim_end;
+        a.act_time = 0;
+        a.time = LV_PAGE_END_ANIM_TIME;
+        a.playback = 1;
+        a.playback_pause = LV_PAGE_END_ANIM_WAIT_TIME;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        lv_anim_create(&a);
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -652,8 +679,8 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
             flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
         }
         else if(ext->edge_flash.right_ip) {
-            flash_area.x1 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
-            flash_area.x2 = page->coords.x2 - ext->edge_flash.state;
+            flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
+            flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
             flash_area.y1 = page->coords.y1 - page_h;
             flash_area.y2 = page->coords.y2 + page_h;
         }
@@ -901,7 +928,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 if(page_ext->edge_flash.enabled &&
                         page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
                         page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
-                    edge_flash_anim_start(page);
+                    lv_page_start_edge_flash(page);
                     page_ext->edge_flash.right_ip = 1;
                 }
             }
@@ -911,7 +938,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 if(page_ext->edge_flash.enabled &&
                         page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
                         page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
-                    edge_flash_anim_start(page);
+                    lv_page_start_edge_flash(page);
                     page_ext->edge_flash.left_ip = 1;
                 }
             }
@@ -938,7 +965,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 if(page_ext->edge_flash.enabled &&
                         page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
                         page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
-                    edge_flash_anim_start(page);
+                    lv_page_start_edge_flash(page);
                     page_ext->edge_flash.bottom_ip = 1;
                 }
             }
@@ -948,7 +975,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 if(page_ext->edge_flash.enabled &&
                         page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
                         page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
-                    edge_flash_anim_start(page);
+                    lv_page_start_edge_flash(page);
                     page_ext->edge_flash.top_ip = 1;
                 }
             }
@@ -1119,28 +1146,6 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         sb_area_tmp.x2 += page->coords.x1;
         sb_area_tmp.y2 += page->coords.y1;
         lv_inv_area(&sb_area_tmp);
-    }
-}
-
-static void edge_flash_anim_start(lv_obj_t * page)
-{
-
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    if(ext->edge_flash.enabled) {
-        lv_anim_t a;
-        a.var = page;
-        a.start = 0;
-        a.end = LV_PAGE_END_FLASH_SIZE;
-        a.fp = (lv_anim_fp_t)edge_flash_anim;
-        a.path = lv_anim_path_linear;
-        a.end_cb = edge_flash_anim_end;
-        a.act_time = 0;
-        a.time = LV_PAGE_END_ANIM_TIME;
-        a.playback = 1;
-        a.playback_pause = LV_PAGE_END_ANIM_WAIT_TIME;
-        a.repeat = 0;
-        a.repeat_pause = 0;
-        lv_anim_create(&a);
     }
 }
 

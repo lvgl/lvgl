@@ -363,6 +363,12 @@ void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist);
  */
 void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist);
 
+/**
+ * Not intended to use directly by the user but by other object types internally.
+ * Start an edge flash animation. Exactly one `ext->edge_flash.xxx_ip` should be set
+ * @param page
+ */
+void lv_page_start_edge_flash(lv_obj_t * page);
 /**********************
  *      MACROS
  **********************/
