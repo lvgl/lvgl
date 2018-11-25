@@ -59,9 +59,7 @@
 #define LV_CPICKER_USE_TRI 1
 #endif
 
-#if LV_CPICKER_USE_TRI
 #define TRI_OFFSET 4
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -443,13 +441,11 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             redraw_wheel = 1;
         }
 
-#if LV_CPICKER_USE_TRI
         lv_point_t triangle_points[3];
-#endif
 
         int16_t start_angle, end_angle;
         start_angle = 0; //Default
-        end_angle = 360 - LV_CPICKER_USE_TRI*LV_CPICKER_DEF_QF; //Default
+        end_angle = 360 - LV_CPICKER_DEF_QF; //Default
 
         if(redraw_wheel)
         {
@@ -550,7 +546,6 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                 {
                     styleCopy.line.color = lv_color_hsv_to_rgb(i%360, ext->saturation, ext->value);
 
-#if LV_CPICKER_USE_TRI
                     triangle_points[0].x = x;
                     triangle_points[0].y = y;
 
@@ -573,9 +568,6 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                     }
 
                     lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
-#else
-                    lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
-#endif
                 }
             }
             else if(ext->wheel_mode == LV_CPICKER_WHEEL_SAT)
@@ -584,7 +576,6 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                 {
                     styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, (i%360)*100/360, ext->value);
 
-#if LV_CPICKER_USE_TRI
                     triangle_points[0].x = x;
                     triangle_points[0].y = y;
 
@@ -604,9 +595,6 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                     }
 
                     lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
-#else
-                    lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
-#endif
                 }
             }
             else if(ext->wheel_mode == LV_CPICKER_WHEEL_VAL)
@@ -615,7 +603,6 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                 {
                     styleCopy.line.color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, (i%360)*100/360);
 
-#if LV_CPICKER_USE_TRI
                     triangle_points[0].x = x;
                     triangle_points[0].y = y;
 
@@ -636,9 +623,6 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                     }
 
                     lv_draw_triangle(triangle_points, mask, styleCopy.line.color);
-#else
-                    lv_draw_arc(x, y, r, mask, i, i + LV_CPICKER_DEF_QF - 1, &styleCopy, opa_scale);
-#endif
                 }
             }
         }
@@ -662,6 +646,8 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         //Draw the current hue indicator
         switch(ext->ind.type)
         {
+        case LV_CPICKER_IND_NONE:
+            break;
         case LV_CPICKER_IND_LINE:
         {
             lv_point_t start;
@@ -739,6 +725,44 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             circle_area.y1 = cy - style->line.width/2;
             circle_area.x2 = cx + style->line.width/2;
             circle_area.y2 = cy + style->line.width/2;
+
+            ext->ind.style->body.radius = LV_RADIUS_CIRCLE;
+            lv_draw_rect(&circle_area, mask, ext->ind.style, opa_scale);
+            break;
+        }
+        case LV_CPICKER_IND_INDISC:
+        {
+            lv_area_t circle_area;
+            uint32_t cx, cy;
+
+            uint16_t angle;
+
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                angle = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                angle = ext->saturation * 360 / 100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                angle = ext->value * 360 / 100;
+                break;
+            }
+
+            /*save the angle to refresh the area later*/
+            ext->prev_pos = angle;
+
+            uint16_t ind_radius = lv_sqrt((4*rin*rin)/2)/2 + 1 - style->body.padding.inner;
+            ind_radius = (ind_radius + rin) / 2;
+
+            cx = x + ((ind_radius) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            cy = y + ((ind_radius) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+
+            circle_area.x1 = cx - ext->ind.style->line.width/2;
+            circle_area.y1 = cy - ext->ind.style->line.width/2;
+            circle_area.x2 = cx + ext->ind.style->line.width/2;
+            circle_area.y2 = cy + ext->ind.style->line.width/2;
 
             ext->ind.style->body.radius = LV_RADIUS_CIRCLE;
             lv_draw_rect(&circle_area, mask, ext->ind.style, opa_scale);
@@ -1378,7 +1402,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
         uint32_t rin = r - styleCopy.line.width;
 
-        uint16_t radius = lv_sqrt((4*rin*rin)/2)/2 - style->body.padding.inner;
+        uint16_t radius = lv_sqrt((4*rin*rin)/2)/2 + 1 - style->body.padding.inner;
 
         center_col_area.x1 = x - radius;
         center_col_area.y1 = y - radius;
@@ -1548,6 +1572,54 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             circle_ind_area.y1 = cy - style->line.width/2;
             circle_ind_area.x2 = cx + style->line.width/2;
             circle_ind_area.y2 = cy + style->line.width/2;
+
+            lv_inv_area(&circle_ind_area);
+            break;
+        }
+        case LV_CPICKER_IND_INDISC:
+        {
+            lv_area_t circle_ind_area;
+            uint32_t cx, cy;
+
+            uint16_t angle;
+
+            switch(ext->wheel_mode)
+            {
+            case LV_CPICKER_WHEEL_HUE:
+                angle = ext->hue;
+                break;
+            case LV_CPICKER_WHEEL_SAT:
+                angle = ext->saturation * 360 / 100;
+                break;
+            case LV_CPICKER_WHEEL_VAL:
+                angle = ext->value * 360 / 100;
+                break;
+            }
+
+            uint16_t ind_radius = lv_sqrt((4*rin*rin)/2)/2 + 1 - style->body.padding.inner;
+            ind_radius = (ind_radius + rin) / 2;
+
+            cx = x + ((ind_radius) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            cy = y + ((ind_radius) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+
+            circle_ind_area.x1 = cx - ext->ind.style->line.width/2;
+            circle_ind_area.y1 = cy - ext->ind.style->line.width/2;
+            circle_ind_area.x2 = cx + ext->ind.style->line.width/2;
+            circle_ind_area.y2 = cy + ext->ind.style->line.width/2;
+
+            lv_inv_area(&circle_ind_area);
+
+
+            /* invalidate last position*/
+            angle = ext->prev_pos;
+
+            cx = x + ((ind_radius) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+            cy = y + ((ind_radius) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
+
+            circle_ind_area.x1 = cx - ext->ind.style->line.width/2;
+            circle_ind_area.y1 = cy - ext->ind.style->line.width/2;
+            circle_ind_area.x2 = cx + ext->ind.style->line.width/2;
+            circle_ind_area.y2 = cy + ext->ind.style->line.width/2;
 
             lv_inv_area(&circle_ind_area);
             break;
