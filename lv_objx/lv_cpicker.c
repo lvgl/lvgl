@@ -637,6 +637,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         center_area.y1 = y - wradius;
         center_area.x2 = x + wradius;
         center_area.y2 = y + wradius;
+	styleCopy.body.grad_color = styleCopy.body.main_color;
         styleCopy.body.radius = LV_RADIUS_CIRCLE;
         lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
 
