@@ -227,6 +227,12 @@
 #define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
 #endif
 
+/*Tileview (dependencies: lv_page) */
+#define USE_LV_TILEVIEW    1
+#if USE_LV_TILEVIEW
+#define LV_TILEVIEW_ANIM_TIME   300     /*Time of slide animation [ms] (0: no animation)*/
+#endif
+
 /*************************
  * Data visualizer objects
  *************************/
