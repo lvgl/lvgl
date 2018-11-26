@@ -65,7 +65,7 @@ enum {
     LV_CPICKER_IND_NONE,
     LV_CPICKER_IND_LINE,
     LV_CPICKER_IND_CIRCLE,
-    LV_CPICKER_IND_INDISC
+    LV_CPICKER_IND_IN
 };
 typedef uint8_t lv_cpicker_ind_type_t;
 
