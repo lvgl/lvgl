@@ -239,12 +239,10 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
     if(t >= 0 && t < 408){
         /*Go down*/
         t = (t * 2500) >> 10;      /*[0..1024] range*/
-        printf("1. ");
     }
     else if(t >= 408 && t < 614) {
         /*First bounce back*/
         t -= 408;
-        printf("2. ");
         t = t * 5;      /*to [0..1024] range*/
         t = 1024 - t;
         diff = diff / 6;
@@ -253,7 +251,6 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
         /*Fall back*/
         t -= 614;
         t = t * 5;      /*to [0..1024] range*/
-        printf("3. ");
         diff = diff / 6;
     }
     else if(t >= 819 && t < 921) {
@@ -261,20 +258,16 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
         t -= 819;
         t = t * 10;      /*to [0..1024] range*/
         t = 1024 - t;
-        printf("4. ");
         diff = diff / 16;
     }
     else if(t >= 921 && t <= 1024) {
         /*Fall back*/
         t -= 921;
         t = t * 10;      /*to [0..1024] range*/
-        printf("5. ");
         diff = diff / 16;
     }
 
     if(t > 1024) t = 1024;
-
-    printf("t:%d\n", t);
 
     int32_t step = lv_bezier3(t, 1024, 1024, 800, 0);
 
