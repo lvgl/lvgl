@@ -221,6 +221,74 @@ int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 }
 
 /**
+ * Calculate the current value of an animation with 3 bounces
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_bounce(const lv_anim_t * a)
+{
+    /*Calculate the current step*/
+    uint32_t t;
+    if(a->time == a->act_time) t = 1024;
+    else t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
+
+    int32_t diff = (a->end - a->start);
+
+    /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
+
+    if(t >= 0 && t < 408){
+        /*Go down*/
+        t = (t * 2500) >> 10;      /*[0..1024] range*/
+        printf("1. ");
+    }
+    else if(t >= 408 && t < 614) {
+        /*First bounce back*/
+        t -= 408;
+        printf("2. ");
+        t = t * 5;      /*to [0..1024] range*/
+        t = 1024 - t;
+        diff = diff / 6;
+    }
+    else if(t >= 614 && t < 819) {
+        /*Fall back*/
+        t -= 614;
+        t = t * 5;      /*to [0..1024] range*/
+        printf("3. ");
+        diff = diff / 6;
+    }
+    else if(t >= 819 && t < 921) {
+        /*Second bounce back*/
+        t -= 819;
+        t = t * 10;      /*to [0..1024] range*/
+        t = 1024 - t;
+        printf("4. ");
+        diff = diff / 16;
+    }
+    else if(t >= 921 && t <= 1024) {
+        /*Fall back*/
+        t -= 921;
+        t = t * 10;      /*to [0..1024] range*/
+        printf("5. ");
+        diff = diff / 16;
+    }
+
+    if(t > 1024) t = 1024;
+
+    printf("t:%d\n", t);
+
+    int32_t step = lv_bezier3(t, 1024, 1024, 800, 0);
+
+    int32_t new_value;
+
+    new_value = (int32_t) step * diff;
+    new_value = new_value >> 10;
+    new_value = a->end - new_value;
+
+
+    return new_value;
+}
+
+/**
  * Calculate the current value of an animation applying step characteristic.
  * (Set end value on the end of the animation)
  * @param a pointer to an animation
