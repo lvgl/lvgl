@@ -821,11 +821,12 @@ static void indev_drag(lv_indev_proc_t * state)
 
     if(lv_obj_get_drag(drag_obj) == false) return;
 
-    /*If still there is no drag then count the movement*/
-    if(state->drag_range_out == 0) {
-        state->drag_sum.x += state->vect.x;
-        state->drag_sum.y += state->vect.y;
+    /*Count the movement by drag*/
+    state->drag_sum.x += state->vect.x;
+    state->drag_sum.y += state->vect.y;
 
+    /*Enough move?*/
+    if(state->drag_range_out == 0) {
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
         if(LV_MATH_ABS(state->drag_sum.x) >= LV_INDEV_DRAG_LIMIT ||
                 LV_MATH_ABS(state->drag_sum.y) >= LV_INDEV_DRAG_LIMIT) {

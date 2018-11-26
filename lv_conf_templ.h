@@ -91,6 +91,7 @@
 /*Compiler settings*/
 #define LV_ATTRIBUTE_TICK_INC                   /* Define a custom attribute to `lv_tick_inc` function */
 #define LV_ATTRIBUTE_TASK_HANDLER               /* Define a custom attribute to `lv_task_handler` function */
+#define LV_ATTRIBUTE_FLUSH_READY                /* Define a custom attribute to `lv_flush_ready` function */
 #define LV_COMPILER_VLA_SUPPORTED            1  /* 1: Variable length array is supported*/
 #define LV_COMPILER_NON_CONST_INIT_SUPPORTED 1  /* 1: Initialization with non constant values are supported */
 
@@ -175,6 +176,7 @@
  *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
+#define LV_OBJ_REALIGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 
 /*==================
  *  LV OBJ X USAGE
@@ -223,6 +225,12 @@
 #define USE_LV_TABVIEW      1
 #if USE_LV_TABVIEW != 0
 #define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
+#endif
+
+/*Tileview (dependencies: lv_page) */
+#define USE_LV_TILEVIEW    1
+#if USE_LV_TILEVIEW
+#define LV_TILEVIEW_ANIM_TIME   300     /*Time of slide animation [ms] (0: no animation)*/
 #endif
 
 /*************************
@@ -277,6 +285,9 @@
 
 /*Image Button (dependencies: lv_btn*/
 #define USE_LV_IMGBTN   1
+#if USE_LV_IMGBTN
+#define LV_IMGBTN_TILED 1           /*1: The imgbtn requires left, mid and right parts and the width can be set freely*/
+#endif
 
 /*Button matrix (dependencies: -)*/
 #define USE_LV_BTNM     1

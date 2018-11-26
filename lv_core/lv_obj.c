@@ -200,6 +200,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
                              LV_OBJ_DEF_HEIGHT;
         new_obj->ext_size = 0;
 
+        /*Init realign*/
+#if LV_OBJ_REALIGN
+        new_obj->realign.align = LV_ALIGN_CENTER;
+        new_obj->realign.xofs = 0;
+        new_obj->realign.yofs = 0;
+        new_obj->realign.base = NULL;
+        new_obj->realign.auto_realign = 0;
+#endif
         /*Set appearance*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
@@ -581,6 +589,11 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
+
+    /*Automatically realign the object if required*/
+#if LV_OBJ_REALIGN
+    if(obj->realign.auto_realign) lv_obj_realign(obj);
+#endif
 }
 
 /**
@@ -737,6 +750,194 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     new_y -= par_abs_y;
 
     lv_obj_set_pos(obj, new_x, new_y);
+
+#if LV_OBJ_REALIGN
+    /*Save the last align parameters to use them in `lv_obj_realign`*/
+    obj->realign.align = align;
+    obj->realign.xofs = x_mod;
+    obj->realign.yofs = y_mod;
+    obj->realign.base = base;
+    obj->realign.origo_align = 0;
+#endif
+}
+
+/**
+ * Align an object to an other object.
+ * @param obj pointer to an object to align
+ * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
+ * @param align type of alignment (see 'lv_align_t' enum)
+ * @param x_mod x coordinate shift after alignment
+ * @param y_mod y coordinate shift after alignment
+ */
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+{
+    lv_coord_t new_x = lv_obj_get_x(obj);
+    lv_coord_t new_y = lv_obj_get_y(obj);
+
+    lv_coord_t obj_w_half =  lv_obj_get_width(obj) / 2;
+    lv_coord_t obj_h_half = lv_obj_get_height(obj) / 2;
+
+    if(base == NULL) {
+        base = lv_obj_get_parent(obj);
+    }
+
+    switch(align) {
+        case LV_ALIGN_CENTER:
+            new_x = lv_obj_get_width(base) / 2 - obj_w_half;
+            new_y = lv_obj_get_height(base) / 2 - obj_h_half;
+            break;
+
+        case LV_ALIGN_IN_TOP_LEFT:
+            new_x = -obj_w_half;
+            new_y = -obj_h_half;
+            break;
+        case LV_ALIGN_IN_TOP_MID:
+            new_x = lv_obj_get_width(base) / 2 - obj_w_half;
+            new_y = -obj_h_half;
+            break;
+
+        case LV_ALIGN_IN_TOP_RIGHT:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = -obj_h_half;
+            break;
+
+        case LV_ALIGN_IN_BOTTOM_LEFT:
+            new_x = -obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+        case LV_ALIGN_IN_BOTTOM_MID:
+            new_x = lv_obj_get_width(base) / 2 - obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+
+        case LV_ALIGN_IN_BOTTOM_RIGHT:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+
+        case LV_ALIGN_IN_LEFT_MID:
+            new_x = -obj_w_half;
+            new_y = lv_obj_get_height(base) / 2 - obj_h_half;
+            break;
+
+        case LV_ALIGN_IN_RIGHT_MID:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = lv_obj_get_height(base) / 2 - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_TOP_LEFT:
+            new_x = -obj_w_half;
+            new_y = -obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_TOP_MID:
+            new_x = lv_obj_get_width(base) / 2 - obj_w_half;
+            new_y = -obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_TOP_RIGHT:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_BOTTOM_LEFT:
+            new_x = -obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_BOTTOM_MID:
+            new_x = lv_obj_get_width(base) / 2 - obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_BOTTOM_RIGHT:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_LEFT_TOP:
+            new_x = - obj_w_half ;
+            new_y = - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_LEFT_MID:
+            new_x = - obj_w_half;
+            new_y = lv_obj_get_height(base) / 2 - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_LEFT_BOTTOM:
+            new_x = - obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_RIGHT_TOP:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = -obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_RIGHT_MID:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = lv_obj_get_height(base) / 2 - obj_h_half;
+            break;
+
+        case LV_ALIGN_OUT_RIGHT_BOTTOM:
+            new_x = lv_obj_get_width(base) - obj_w_half;
+            new_y = lv_obj_get_height(base) - obj_h_half;
+            break;
+    }
+
+    /*Bring together the coordination system of base and obj*/
+    lv_obj_t * par = lv_obj_get_parent(obj);
+    lv_coord_t base_abs_x = base->coords.x1;
+    lv_coord_t base_abs_y = base->coords.y1;
+    lv_coord_t par_abs_x = par->coords.x1;
+    lv_coord_t par_abs_y = par->coords.y1;
+    new_x += x_mod + base_abs_x;
+    new_y += y_mod + base_abs_y;
+    new_x -= par_abs_x;
+    new_y -= par_abs_y;
+
+    lv_obj_set_pos(obj, new_x, new_y);
+
+#if LV_OBJ_REALIGN
+    /*Save the last align parameters to use them in `lv_obj_realign`*/
+    obj->realign.align = align;
+    obj->realign.xofs = x_mod;
+    obj->realign.yofs = y_mod;
+    obj->realign.base = base;
+    obj->realign.origo_align = 1;
+#endif
+}
+
+/**
+ * Realign the object based on the last `lv_obj_align` parameters.
+ * @param obj pointer to an object
+ */
+void lv_obj_realign(lv_obj_t * obj)
+{
+#if LV_OBJ_REALIGN
+    if(obj->realign.origo_align) lv_obj_align_origo(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
+    else lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
+#else
+    (void) obj;
+    LV_LOG_WARN("lv_obj_realaign: no effect because LV_OBJ_REALIGN = 0");
+#endif
+}
+
+/**
+ * Enable the automatic realign of the object when its size has changed based on the last `lv_obj_align` parameters.
+ * @param obj pointer to an object
+ * @param en true: enable auto realign; false: disable auto realign
+ */
+void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
+{
+#if LV_OBJ_REALIGN
+    obj->realign.auto_realign = en ? 1 : 0;
+#else
+    (void) obj;
+    (void) en;
+    LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_OBJ_REALIGN = 0");
+#endif
 }
 
 /*---------------------
@@ -757,7 +958,6 @@ void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
 
     /*Notify the object about the style change too*/
     lv_obj_refresh_style(obj);
-
 }
 
 /**
@@ -1257,6 +1457,21 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
 lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj)
 {
     return obj->ext_size;
+}
+
+/**
+ * Get the automatic realign property of the object.
+ * @param obj pointer to an object
+ * @return  true: auto realign is enabled; false: auto realign is disabled
+ */
+bool lv_obj_get_auto_realign(lv_obj_t * obj)
+{
+#if LV_OBJ_REALIGN
+    return obj->realign.auto_realign ? true : false;
+#else
+    (void) obj;
+    return false;
+#endif
 }
 
 /*-----------------
