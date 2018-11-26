@@ -34,11 +34,11 @@
 #endif
 
 #ifndef LV_CPICKER_DEF_SAT
-#define LV_CPICKER_DEF_SAT 0
+#define LV_CPICKER_DEF_SAT 100
 #endif
 
 #ifndef LV_CPICKER_DEF_VAL
-#define LV_CPICKER_DEF_VAL 0
+#define LV_CPICKER_DEF_VAL 100
 #endif
 
 #ifndef LV_CPICKER_DEF_IND_TYPE
@@ -125,6 +125,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->wheel_fixed = 0;
     ext->last_clic = 0;
     ext->type = LV_CPICKER_DEF_TYPE;
+    ext->ring_color = LV_COLOR_WHITE;
 
     /*The signal and design functions are not copied so set them here*/
     if(ext->type == LV_CPICKER_TYPE_DISC)
@@ -225,8 +226,22 @@ void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 
     ext->hue = hue % 360;
 
-    lv_cpicker_invalidate_indicator(cpicker);
+    lv_obj_invalidate(cpicker);
 }
+
+/**
+ * Set the ring color of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @param ring_color new ring color
+ */
+void lv_cpicker_set_ring_color(lv_obj_t * cpicker, lv_color_t ring_color)
+{
+	lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+	ext->ring_color = ring_color;
+    lv_obj_invalidate(cpicker);
+}
+
 
 /**
  * Set the current saturation of a colorpicker.
@@ -336,6 +351,18 @@ lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_style_t t
 
     /*To avoid warning*/
     return NULL;
+}
+
+/**
+ * Get the ring color of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @return current ring color
+ */
+lv_color_t lv_cpicker_get_ring_color(const lv_obj_t * cpicker)
+{
+	lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+	return ext->ring_color;
 }
 
 /**
@@ -634,6 +661,8 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         center_area.y1 = y - wradius;
         center_area.x2 = x + wradius;
         center_area.y2 = y + wradius;
+	styleCopy.body.main_color = ext->ring_color;
+	styleCopy.body.grad_color = styleCopy.body.main_color;
         styleCopy.body.radius = LV_RADIUS_CIRCLE;
         lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
 
@@ -657,6 +686,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -704,6 +734,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -739,6 +770,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -1422,6 +1454,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -1540,6 +1573,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
@@ -1585,6 +1619,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 
             switch(ext->wheel_mode)
             {
+	    default:
             case LV_CPICKER_WHEEL_HUE:
                 angle = ext->hue;
                 break;
