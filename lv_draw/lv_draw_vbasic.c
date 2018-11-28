@@ -680,7 +680,7 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
         /*Save the parameters and the result. If they will be asked again don't compute again*/
         static lv_opa_t fg_opa_save = 0;
         static lv_opa_t bg_opa_save = 0;
-        static lv_color_t c = {0};
+        static lv_color_t c = {{0}};
 
         if(fg_opa != fg_opa_save || bg_opa != bg_opa_save) {
             fg_opa_save = fg_opa;
