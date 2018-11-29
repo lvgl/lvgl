@@ -49,6 +49,7 @@ extern "C" {
 #include "lv_objx/lv_tabview.h"
 #include "lv_objx/lv_mbox.h"
 #include "lv_objx/lv_gauge.h"
+#include "lv_objx/lv_knob.h"
 #include "lv_objx/lv_lmeter.h"
 #include "lv_objx/lv_sw.h"
 #include "lv_objx/lv_kb.h"

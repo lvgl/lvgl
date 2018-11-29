@@ -200,6 +200,21 @@ static void gauge_init(void)
 #endif
 }
 
+static void knob_init(void)
+{
+#if USE_LV_KNOB != 0
+    static lv_style_t knob;
+    lv_style_copy(&knob, &lmeter);
+    knob.line.color = lmeter.body.grad_color;
+    knob.line.width = 2;
+    knob.body.main_color = LV_COLOR_HEX3(0x888);
+    knob.body.grad_color = lmeter.body.main_color;
+    knob.text.color = LV_COLOR_HEX3(0x888);
+
+    theme.knob = &knob;
+#endif
+}
+
 static void chart_init(void)
 {
 #if USE_LV_CHART
@@ -393,6 +408,7 @@ lv_theme_t * lv_theme_default_init(uint16_t hue, lv_font_t * font)
     sw_init();
     lmeter_init();
     gauge_init();
+    knob_init();
     chart_init();
     cb_init();
     btnm_init();

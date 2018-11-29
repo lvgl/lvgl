@@ -106,6 +106,10 @@ typedef struct {
     lv_style_t *gauge;
 #endif
 
+#if USE_LV_KNOB != 0
+    lv_style_t *knob;
+#endif
+
 #if USE_LV_ARC != 0
     lv_style_t *arc;
 #endif
