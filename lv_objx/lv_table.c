@@ -160,6 +160,7 @@ void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col,
      format.format_byte = ext->cell_data[cell][0];
      format.right_merge = en ? 1 : 0;
      ext->cell_data[cell][0] = format.format_byte;
+     refr_size(table);
 }
 
 
@@ -445,10 +446,14 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
             }
 
             txt_w -= 2 * ext->cell_style->body.padding.hor;
+            printf("r:%d, c:%d, txt_w:%d\n", row_id, col, txt_w);
+
             lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, ext->cell_style->text.font,
                     ext->cell_style->text.letter_space, ext->cell_style->text.line_space, txt_w, LV_TXT_FLAG_NONE);
 
             h_max = LV_MATH_MAX(txt_size.y, h_max);
+            cell += col_merge;
+            col += col_merge;
         }
     }
 
