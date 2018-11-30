@@ -992,7 +992,7 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             lv_style_copy(&styleCopy, ext->ind.style);
             styleCopy.body.radius = LV_RADIUS_CIRCLE;
 
-            lv_draw_rect(&circle_ind_area, &gradient_area, &styleCopy, opa_scale);
+            lv_draw_rect(&circle_ind_area, mask, &styleCopy, opa_scale);
             break;
         }
         case LV_CPICKER_IND_IN:
