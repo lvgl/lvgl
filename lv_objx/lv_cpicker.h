@@ -41,16 +41,15 @@ typedef struct {
         lv_style_t * style;
         uint8_t type;
     }ind;
-    lv_action_t value_changed;
-    uint16_t prev_hue;
-    uint16_t prev_saturation;
-    uint16_t prev_value;
-    uint16_t prev_pos;
-    uint8_t wheel_mode:2;
-    uint8_t wheel_fixed:1;
-    uint8_t type:1;
-    uint32_t last_clic;
-    lv_color_t ring_color;
+   lv_action_t value_changed;
+   uint16_t prev_hue;
+   uint16_t prev_saturation;
+   uint16_t prev_value;
+   uint16_t prev_pos;
+   uint8_t wheel_mode:2;
+   uint8_t wheel_fixed:1;
+   uint8_t type:1;
+   uint32_t last_clic;
 } lv_cpicker_ext_t;
 
 
@@ -128,13 +127,6 @@ void lv_cpicker_set_ind_type(lv_obj_t * cpicker, lv_cpicker_ind_type_t type);
 void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue);
 
 /**
- * Set the ring color of a colorpicker.
- * @param cpicker pointer to colorpicker object
- * @param ring_color new ring color
- */
-void lv_cpicker_set_ring_color(lv_obj_t * cpicker, lv_color_t ring_color);
-
-/**
  * Set the current saturation of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param sat current selected saturation
@@ -187,13 +179,6 @@ void lv_cpicker_set_wheel_fixed(lv_obj_t * cpicker, bool fixed_mode);
  * @return style pointer to the style
  */
 lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_style_t type);
-
-/**
- * Get the ring color of a colorpicker.
- * @param cpicker pointer to colorpicker object
- * @return current ring color
- */
-lv_color_t lv_cpicker_get_ring_color(const lv_obj_t * cpicker);
 
 /**
  * Get the current hue of a colorpicker.
