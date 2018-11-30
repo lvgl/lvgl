@@ -41,16 +41,16 @@ typedef struct {
         lv_style_t * style;
         uint8_t type;
     }ind;
-   lv_action_t value_changed;
-   uint16_t prev_hue;
-   uint16_t prev_saturation;
-   uint16_t prev_value;
-   uint16_t prev_pos;
-   uint8_t wheel_mode:2;
-   uint8_t wheel_fixed:1;
-   uint8_t type:1;
-   uint32_t last_clic;
-   lv_color_t ring_color;
+    lv_action_t value_changed;
+    uint16_t prev_hue;
+    uint16_t prev_saturation;
+    uint16_t prev_value;
+    uint16_t prev_pos;
+    uint8_t wheel_mode:2;
+    uint8_t wheel_fixed:1;
+    uint8_t type:1;
+    uint32_t last_clic;
+    lv_color_t ring_color;
 } lv_cpicker_ext_t;
 
 
