@@ -36,6 +36,7 @@ typedef struct
 {
     lv_coord_t * points;
     lv_color_t color;
+    uint16_t start_point;
 } lv_chart_series_t;
 
 /*Data of chart */
