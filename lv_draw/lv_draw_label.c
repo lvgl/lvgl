@@ -214,31 +214,32 @@ static uint8_t hex_char_to_num(char hex)
     if(hex >= '0' && hex <= '9') {
         result = hex - '0';
     }
+    else {
+        if(hex >= 'a') hex -= 'a' - 'A';    /*Convert to upper case*/
 
-    if(hex >= 'a') hex -= 'a' - 'A';    /*Convert to upper case*/
-
-    switch(hex) {
-        case 'A':
-            result = 10;
-            break;
-        case 'B':
-            result = 11;
-            break;
-        case 'C':
-            result = 12;
-            break;
-        case 'D':
-            result = 13;
-            break;
-        case 'E':
-            result = 14;
-            break;
-        case 'F':
-            result = 15;
-            break;
-        default:
-            result = 0;
-            break;
+        switch(hex) {
+            case 'A':
+                result = 10;
+                break;
+            case 'B':
+                result = 11;
+                break;
+            case 'C':
+                result = 12;
+                break;
+            case 'D':
+                result = 13;
+                break;
+            case 'E':
+                result = 14;
+                break;
+            case 'F':
+                result = 15;
+                break;
+            default:
+                result = 0;
+                break;
+        }
     }
 
     return result;
