@@ -119,6 +119,13 @@ bool lv_list_remove(const lv_obj_t * list, uint32_t index);
 /*=====================
  * Setter functions
  *====================*/
+ 
+/**
+ * Make a single button selected in the list, deselect others, should be called in list btns call back.
+ * @param btn pointer to the currently pressed list btn object
+ */
+void lv_list_set_btn_single_selected(lv_obj_t *btn);
+    
 #if USE_LV_GROUP
 
 /**
