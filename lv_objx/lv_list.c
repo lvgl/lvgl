@@ -38,6 +38,7 @@
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
 static void refr_btn_width(lv_obj_t * list);
+static void lv_list_btn_single_selected(lv_obj_t *btn);
 
 /**********************
  *  STATIC VARIABLES
@@ -89,6 +90,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
     ext->anim_time = LV_LIST_FOCUS_TIME;
+	ext->single_selected_mode = false;
+	
 #if USE_LV_GROUP
     ext->last_sel = NULL;
     ext->selected_btn = NULL;
@@ -257,26 +260,15 @@ bool lv_list_remove(const lv_obj_t * list, uint32_t index)
  *====================*/
 
 /**
- * Make a single button selected in the list, deselect others, should be called in list btns call back.
- * @param btn pointer to the currently pressed list btn object
+ * Set single button selected mode, only one button will be selected if enabled.
+ * @param list pointer to the currently pressed list object
+ * @param mode, enable(true)/disable(false) single selected mode.
  */
-void lv_list_set_btn_single_selected(lv_obj_t *btn)
+void lv_list_set_btn_single_selected_mode(lv_obj_t *list, bool mode)
 {
-	lv_obj_t *list = lv_obj_get_parent(lv_obj_get_parent(btn));
+	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
-	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
-	do
-	{
-		if(e == btn)
-		{
-			lv_btn_set_state(e, LV_BTN_STATE_TGL_REL);
-		}
-		else
-		{
-			lv_btn_set_state(e, LV_BTN_STATE_REL);
-		}
-		e = lv_list_get_next_btn(list, e);
-	} while (e != NULL);
+	ext->single_selected_mode = mode;
 }
 
 #if USE_LV_GROUP
@@ -387,6 +379,17 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get single button selected mode.
+ * @param list pointer to the currently pressed list object.
+ */
+bool lv_list_get_btn_single_selected_mode(lv_obj_t *list)
+{
+	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+
+	return (ext->single_selected_mode);
+}
 
 /**
  * Get the text of a list element
@@ -850,8 +853,9 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     res = ancestor_btn_signal(btn, sign, param);
     if(res != LV_RES_OK) return res;
 
-#if USE_LV_GROUP
     if(sign == LV_SIGNAL_RELEASED) {
+		
+#if USE_LV_GROUP
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
         lv_group_t * g = lv_obj_get_group(list);
         if(lv_group_get_focused(g) == list && lv_indev_is_dragging(lv_indev_get_act()) == false) {
@@ -872,8 +876,15 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
         /* If `click_focus == 1` then LV_SIGNAL_FOCUS need to know which button triggered the focus
          * to mark it as selected (pressed state)*/
         last_clicked_btn = btn;
-
+#endif
+		lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+        if(lv_indev_is_dragging(lv_indev_get_act()) == false && ext->single_selected_mode)
+        {
+        	lv_list_btn_single_selected(btn);
+        }
     }
+	
+#if USE_LV_GROUP
     if(sign == LV_SIGNAL_CLEANUP) {
 
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
@@ -907,5 +918,27 @@ static void refr_btn_width(lv_obj_t * list)
     }
 }
 
+/**
+ * Make a single button selected in the list, deselect others, should be called in list btns call back.
+ * @param btn pointer to the currently pressed list btn object
+ */
+static void lv_list_btn_single_selected(lv_obj_t *btn)
+{
+	lv_obj_t *list = lv_obj_get_parent(lv_obj_get_parent(btn));
+
+	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
+	do
+	{
+		if(e == btn)
+		{
+			lv_btn_set_state(e, LV_BTN_STATE_TGL_REL);
+		}
+		else
+		{
+			lv_btn_set_state(e, LV_BTN_STATE_REL);
+		}
+		e = lv_list_get_next_btn(list, e);
+	} while (e != NULL);
+}
 
 #endif
