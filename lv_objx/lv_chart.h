@@ -36,6 +36,7 @@ typedef struct
 {
     lv_coord_t * points;
     lv_color_t color;
+    uint16_t start_point;
 } lv_chart_series_t;
 
 /*Data of chart */
@@ -52,9 +53,9 @@ typedef struct
     uint8_t type    :4;   /*Line, column or point chart (from 'lv_chart_type_t')*/
     struct {
         lv_coord_t width;  /*Line width or point radius*/
-        uint8_t num;   /*Number of data lines in dl_ll*/
-        lv_opa_t opa;     /*Opacity of data lines*/
-        lv_opa_t dark;    /*Dark level of the point/column bottoms*/
+        uint8_t num;       /*Number of data lines in dl_ll*/
+        lv_opa_t opa;      /*Opacity of data lines*/
+        lv_opa_t dark;     /*Dark level of the point/column bottoms*/
     } series;
 } lv_chart_ext_t;
 

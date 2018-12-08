@@ -368,6 +368,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(data->state == LV_INDEV_STATE_PR &&
             i->proc.last_state == LV_INDEV_STATE_REL) {
         i->proc.pr_timestamp = lv_tick_get();
+        lv_obj_t * focused = lv_group_get_focused(i->group);
+        if(focused) {
+            focused->signal_func(focused, LV_SIGNAL_PRESSED, indev_act);
+        }
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_PR) {

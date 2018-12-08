@@ -119,12 +119,10 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
 /**
  * Register an object on the tileview. The register object will able to slide the tileview
- * @param tileview pointer to a tileview object
  * @param element pointer to an object
  */
-void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
+void lv_tileview_add_element(lv_obj_t * element)
 {
-    (void) tileview;    /*Unused*/
     lv_obj_set_free_ptr(element, lv_obj_get_signal_func(element));
     lv_obj_set_signal_func(element, element_signal_func);
     lv_obj_set_drag_parent(element, true);
