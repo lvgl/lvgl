@@ -341,6 +341,9 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
         case LV_LIST_STYLE_SB:
             lv_page_set_style(list, LV_PAGE_STYLE_SB, style);
             break;
+        case LV_LIST_STYLE_EDGE_FLASH:
+            lv_page_set_style(list, LV_PAGE_STYLE_EDGE_FLASH, style);
+            break;
         case LV_LIST_STYLE_BTN_REL:
             ext->styles_btn[LV_BTN_STATE_REL] = style;
             btn_style_refr = LV_BTN_STYLE_REL;
@@ -570,6 +573,9 @@ lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
             break;
         case LV_LIST_STYLE_SB:
             style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL);
+            break;
+        case LV_LIST_STYLE_EDGE_FLASH:
+            style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH);
             break;
         case LV_LIST_STYLE_BTN_REL:
             style = ext->styles_btn[LV_BTN_STATE_REL];
@@ -854,9 +860,11 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_RELEASED) {
-		
-#if USE_LV_GROUP
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+        ext->page.scroll_prop_ip = 0;
+
+#if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(list);
         if(lv_group_get_focused(g) == list && lv_indev_is_dragging(lv_indev_get_act()) == false) {
             /* Is the list is focused then be sure only the button being released
@@ -877,22 +885,25 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
          * to mark it as selected (pressed state)*/
         last_clicked_btn = btn;
 #endif
-		lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
         if(lv_indev_is_dragging(lv_indev_get_act()) == false && ext->single_selected_mode)
         {
         	lv_list_btn_single_selected(btn);
         }
     }
-	
-#if USE_LV_GROUP
-    if(sign == LV_SIGNAL_CLEANUP) {
+    else if(sign == LV_SIGNAL_PRESS_LOST) {
+        lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+        ext->page.scroll_prop_ip = 0;
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
 
+#if USE_LV_GROUP
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
         lv_obj_t * sel = lv_list_get_btn_selected(list);
         if(sel == btn) lv_list_set_btn_selected(list, lv_list_get_next_btn(list, btn));
+#endif
     }
 
-#endif
 
     return res;
 }

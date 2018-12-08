@@ -16,6 +16,9 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_ATTRIBUTE_FLUSH_READY
+#define LV_ATTRIBUTE_FLUSH_READY
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -152,7 +155,7 @@ void lv_vdb_set_adr(void * buf1, void * buf2)
 /**
  * Call in the display driver's  'disp_flush' function when the flushing is finished
  */
-void lv_flush_ready(void)
+LV_ATTRIBUTE_FLUSH_READY void lv_flush_ready(void)
 {
 #if LV_VDB_DOUBLE == 0
     vdb_state = LV_VDB_STATE_ACTIVE;

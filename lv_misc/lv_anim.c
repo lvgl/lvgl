@@ -116,6 +116,19 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
 }
 
 /**
+ * Get the number of currently running animations
+ * @return the number of running animations
+ */
+uint16_t lv_anim_count_running(void)
+{
+    uint16_t cnt = 0;
+    lv_anim_t * a;
+    LL_READ(anim_ll, a) cnt++;
+
+    return cnt++;
+}
+
+/**
  * Calculate the time of an animation with a given speed and the start and end values
  * @param speed speed of animation in unit/sec
  * @param start start value of the animation
@@ -178,6 +191,91 @@ int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
     new_value = (int32_t) step * (a->end - a->start);
     new_value = new_value >> 10;
     new_value += a->start;
+
+
+    return new_value;
+}
+
+/**
+ * Calculate the current value of an animation with overshoot at the end
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_overshoot(const lv_anim_t * a)
+{
+    /*Calculate the current step*/
+
+    uint32_t t;
+    if(a->time == a->act_time) t = 1024;
+    else t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
+
+    int32_t step = lv_bezier3(t, 0, 600, 1300, 1024);
+
+    int32_t new_value;
+    new_value = (int32_t) step * (a->end - a->start);
+    new_value = new_value >> 10;
+    new_value += a->start;
+
+
+    return new_value;
+}
+
+/**
+ * Calculate the current value of an animation with 3 bounces
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_bounce(const lv_anim_t * a)
+{
+    /*Calculate the current step*/
+    uint32_t t;
+    if(a->time == a->act_time) t = 1024;
+    else t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
+
+    int32_t diff = (a->end - a->start);
+
+    /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
+
+    if(t >= 0 && t < 408){
+        /*Go down*/
+        t = (t * 2500) >> 10;      /*[0..1024] range*/
+    }
+    else if(t >= 408 && t < 614) {
+        /*First bounce back*/
+        t -= 408;
+        t = t * 5;      /*to [0..1024] range*/
+        t = 1024 - t;
+        diff = diff / 6;
+    }
+    else if(t >= 614 && t < 819) {
+        /*Fall back*/
+        t -= 614;
+        t = t * 5;      /*to [0..1024] range*/
+        diff = diff / 6;
+    }
+    else if(t >= 819 && t < 921) {
+        /*Second bounce back*/
+        t -= 819;
+        t = t * 10;      /*to [0..1024] range*/
+        t = 1024 - t;
+        diff = diff / 16;
+    }
+    else if(t >= 921 && t <= 1024) {
+        /*Fall back*/
+        t -= 921;
+        t = t * 10;      /*to [0..1024] range*/
+        diff = diff / 16;
+    }
+
+    if(t > 1024) t = 1024;
+
+    int32_t step = lv_bezier3(t, 1024, 1024, 800, 0);
+
+    int32_t new_value;
+
+    new_value = (int32_t) step * diff;
+    new_value = new_value >> 10;
+    new_value = a->end - new_value;
 
 
     return new_value;

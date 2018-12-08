@@ -147,11 +147,17 @@ const char ** lv_btnm_get_map(const lv_obj_t * btnm);
  */
 lv_btnm_action_t lv_btnm_get_action(const lv_obj_t * btnm);
 
+/**
+ * Get the pressed button
+ * @param btnm pointer to button matrix object
+ * @return  index of the currently pressed button (LV_BTNM_PR_NONE: if unset)
+ */
+uint16_t lv_btnm_get_pressed(const lv_obj_t * btnm);
 
 /**
  * Get the toggled button
  * @param btnm pointer to button matrix object
- * @return  index of the currently toggled button (0: if unset)
+ * @return  index of the currently toggled button (LV_BTNM_PR_NONE: if unset)
  */
 uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm);
 

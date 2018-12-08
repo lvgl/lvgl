@@ -19,8 +19,11 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_PAGE_SB_MIN_SIZE    (LV_DPI / 8)
-#define LV_PAGE_SCROLL_ANIM_TIME  200           /*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
+#define LV_PAGE_SB_MIN_SIZE             (LV_DPI / 8)
+#define LV_PAGE_SCROLL_ANIM_TIME        200           /*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
+#define LV_PAGE_END_FLASH_SIZE          (LV_DPI / 4)
+#define LV_PAGE_END_ANIM_TIME           300
+#define LV_PAGE_END_ANIM_WAIT_TIME      300
 
 /**********************
  *      TYPEDEFS
@@ -34,6 +37,8 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
 static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
+static void edge_flash_anim(void * page, int32_t v);
+static void edge_flash_anim_end(void * page);
 
 /**********************
  *  STATIC VARIABLES
@@ -79,6 +84,13 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->sb.ver_draw = 0;
     ext->sb.style = &lv_style_pretty;
     ext->sb.mode = LV_SB_MODE_AUTO;
+    ext->edge_flash.enabled = 0;
+    ext->edge_flash.bottom_ip = 0;
+    ext->edge_flash.top_ip = 0;
+    ext->edge_flash.left_ip = 0;
+    ext->edge_flash.right_ip = 0;
+    ext->edge_flash.state = 0;
+    ext->edge_flash.style = &lv_style_plain_color;
     ext->arrow_scroll = 0;
     ext->scroll_prop = 0;
     ext->scroll_prop_ip = 0;
@@ -166,7 +178,7 @@ void lv_page_clean(lv_obj_t * obj)
 /**
  * Set a release action for the page
  * @param page pointer to a page object
- * @param rel_action a function to call when the page is released
+ * @param rel_action a function to call when the page is release
  */
 void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action)
 {
@@ -232,6 +244,17 @@ void lv_page_set_scroll_propagation(lv_obj_t * page, bool en)
 }
 
 /**
+ * Enable the edge flash effect. (Show an arc when the an edge is reached)
+ * @param page pointer to a Page
+ * @param en true or false to enable/disable end flash
+ */
+void lv_page_set_edge_flash(lv_obj_t * page, bool en)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    ext->edge_flash.enabled = en ? 1 : 0;
+}
+
+/**
  * Set a style of a page
  * @param page pointer to a page object
  * @param type which style should be set
@@ -255,6 +278,9 @@ void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, lv_style_t * style
             lv_page_sb_refresh(page);
             lv_obj_refresh_ext_size(page);
             lv_obj_invalidate(page);
+            break;
+        case LV_PAGE_STYLE_EDGE_FLASH:
+            ext->edge_flash.style = style;
             break;
     }
 }
@@ -331,6 +357,17 @@ bool lv_page_get_scroll_propagation(lv_obj_t * page)
 }
 
 /**
+ * Get the edge flash effect property.
+ * @param page pointer to a Page
+ * return true or false
+ */
+bool lv_page_get_edge_flash(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    return ext->edge_flash.enabled == 0 ? false : true;
+}
+
+/**
  * Get that width which can be set to the children to still not cause overflow (show scrollbars)
  * @param page pointer to a page object
  * @return the width which still fits into the page
@@ -376,6 +413,9 @@ lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
             break;
         case LV_PAGE_STYLE_SB:
             style = ext->sb.style;
+            break;
+        case LV_PAGE_STYLE_EDGE_FLASH:
+            style = ext->edge_flash.style;
             break;
         default:
             style = NULL;
@@ -531,6 +571,34 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 #endif
 }
 
+
+/**
+ * Not intended to use directly by the user but by other object types internally.
+ * Start an edge flash animation. Exactly one `ext->edge_flash.xxx_ip` should be set
+ * @param page
+ */
+void lv_page_start_edge_flash(lv_obj_t * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    if(ext->edge_flash.enabled) {
+        lv_anim_t a;
+        a.var = page;
+        a.start = 0;
+        a.end = LV_PAGE_END_FLASH_SIZE;
+        a.fp = (lv_anim_fp_t)edge_flash_anim;
+        a.path = lv_anim_path_linear;
+        a.end_cb = edge_flash_anim_end;
+        a.act_time = 0;
+        a.time = LV_PAGE_END_ANIM_TIME;
+        a.playback = 1;
+        a.playback_pause = LV_PAGE_END_ANIM_WAIT_TIME;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        lv_anim_create(&a);
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -592,6 +660,46 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
             sb_area.y2 += page->coords.y1;
             lv_draw_rect(&sb_area, mask, ext->sb.style, lv_obj_get_opa_scale(page));
         }
+
+
+        lv_coord_t page_w = lv_obj_get_width(page);
+        lv_coord_t page_h = lv_obj_get_height(page);
+        lv_area_t flash_area;
+
+        if(ext->edge_flash.top_ip) {
+            flash_area.x1 = page->coords.x1 - page_w;
+            flash_area.x2 = page->coords.x2 + page_w;
+            flash_area.y1 = page->coords.y1 - 3 * page_w + ext->edge_flash.state;
+            flash_area.y2 = page->coords.y1 + ext->edge_flash.state;
+        }
+        else if(ext->edge_flash.bottom_ip) {
+            flash_area.x1 = page->coords.x1 - page_w;
+            flash_area.x2 = page->coords.x2 + page_w;
+            flash_area.y1 = page->coords.y2 - ext->edge_flash.state;
+            flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
+        }
+        else if(ext->edge_flash.right_ip) {
+            flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
+            flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
+            flash_area.y1 = page->coords.y1 - page_h;
+            flash_area.y2 = page->coords.y2 + page_h;
+        }
+        else if(ext->edge_flash.left_ip) {
+            flash_area.x1 = page->coords.x1 - 3 * page_h + ext->edge_flash.state;
+            flash_area.x2 = page->coords.x1 + ext->edge_flash.state;
+            flash_area.y1 = page->coords.y1 - page_h;
+            flash_area.y2 = page->coords.y2 + page_h;
+        }
+
+        if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip || ext->edge_flash.bottom_ip) {
+            lv_style_t flash_style;
+            lv_style_copy(&flash_style, ext->edge_flash.style);
+            flash_style.body.radius = LV_RADIUS_CIRCLE;
+            uint32_t opa = (flash_style.body.opa * ext->edge_flash.state) / LV_PAGE_END_FLASH_SIZE;
+            flash_style.body.opa = opa;
+            lv_draw_rect(&flash_area, mask, &flash_style, lv_obj_get_opa_scale(page));
+        }
+
     }
 
     return true;
@@ -800,7 +908,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         /*scrollable width smaller then page width? -> align to left*/
-        if(lv_area_get_width(&scrl_coords) + 2 * hpad < lv_area_get_width(&page_coords)) {
+        if(lv_area_get_width(&scrl_coords) + 2 * hpad <= lv_area_get_width(&page_coords)) {
             if(scrl_coords.x1 != page_coords.x1 + hpad) {
                 new_x = hpad;
                 refr_x = true;
@@ -817,15 +925,27 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             else if(scrl_coords.x2  < page_coords.x2 - hpad) {
                 new_x =  lv_area_get_width(&page_coords) - lv_area_get_width(&scrl_coords) - hpad;   /* Right align */
                 refr_x = true;
+                if(page_ext->edge_flash.enabled &&
+                        page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
+                        page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
+                    lv_page_start_edge_flash(page);
+                    page_ext->edge_flash.right_ip = 1;
+                }
             }
             else if(scrl_coords.x1 > page_coords.x1 + hpad) {
                 new_x = hpad;  /*Left align*/
                 refr_x = true;
+                if(page_ext->edge_flash.enabled &&
+                        page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
+                        page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
+                    lv_page_start_edge_flash(page);
+                    page_ext->edge_flash.left_ip = 1;
+                }
             }
         }
 
         /*scrollable height smaller then page height? -> align to left*/
-        if(lv_area_get_height(&scrl_coords) + 2 * vpad < lv_area_get_height(&page_coords)) {
+        if(lv_area_get_height(&scrl_coords) + 2 * vpad <= lv_area_get_height(&page_coords)) {
             if(scrl_coords.y1 != page_coords.y1 + vpad) {
                 new_y = vpad;
                 refr_y = true;
@@ -842,10 +962,22 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             else if(scrl_coords.y2 < page_coords.y2 - vpad) {
                 new_y =  lv_area_get_height(&page_coords) - lv_area_get_height(&scrl_coords) - vpad;   /* Bottom align */
                 refr_y = true;
+                if(page_ext->edge_flash.enabled &&
+                        page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
+                        page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
+                    lv_page_start_edge_flash(page);
+                    page_ext->edge_flash.bottom_ip = 1;
+                }
             }
             else if(scrl_coords.y1  > page_coords.y1 + vpad) {
                 new_y = vpad;  /*Top align*/
                 refr_y = true;
+                if(page_ext->edge_flash.enabled &&
+                        page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
+                        page_ext->edge_flash.top_ip == 0 && page_ext->edge_flash.bottom_ip == 0) {
+                    lv_page_start_edge_flash(page);
+                    page_ext->edge_flash.top_ip = 1;
+                }
             }
         }
 
@@ -1015,6 +1147,23 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         sb_area_tmp.y2 += page->coords.y1;
         lv_inv_area(&sb_area_tmp);
     }
+}
+
+static void edge_flash_anim(void * page, int32_t v)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    ext->edge_flash.state = v;
+    lv_obj_invalidate(page);
+}
+
+static void edge_flash_anim_end(void * page)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    ext->edge_flash.top_ip = 0;
+    ext->edge_flash.bottom_ip = 0;
+    ext->edge_flash.left_ip = 0;
+    ext->edge_flash.right_ip = 0;
+    lv_obj_invalidate(page);
 }
 
 #endif

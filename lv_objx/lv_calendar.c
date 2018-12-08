@@ -801,7 +801,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
     label_area.y1 = calendar->coords.y1 + get_header_height(calendar) +
             ext->style_day_names->body.padding.ver + lv_font_get_height(ext->style_day_names->text.font) + 
-            ext->style_day_names->body.padding.ver + style_bg->body.padding.inner;
+            ext->style_day_names->body.padding.ver;
     label_area.y2 = label_area.y1 + lv_font_get_height(style_bg->text.font);
 
     lv_coord_t w = lv_obj_get_width(calendar) - 2 * hpad;
