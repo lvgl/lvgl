@@ -287,6 +287,12 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, lv_style_t *
     }
 }
 
+void lv_ddlist_set_align(lv_obj_t *ddlist, lv_label_align_t align)
+{
+	lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+	lv_label_set_align(ext->label, align);
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -407,6 +413,14 @@ lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type
     /*To avoid warning*/
     return NULL;
 }
+
+lv_label_align_t lv_ddlist_get_align(const lv_obj_t *ddlist)
+{
+	lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+	return lv_label_get_align(ext->label);
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -446,6 +460,29 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim_en)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * Get the text alignment flag for a drop down list.
+ * @param ddlist drop down list
+ * @return text alignment flag
+ */
+static lv_txt_flag_t lv_ddlist_get_txt_flag(const lv_obj_t *ddlist)
+{
+	lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+	lv_label_align_t align = lv_label_get_align(ext->label);
+
+	switch(align)
+	{
+	default:
+	case LV_LABEL_ALIGN_LEFT:
+		return LV_TXT_FLAG_NONE;
+	case LV_LABEL_ALIGN_CENTER:
+		return LV_TXT_FLAG_CENTER;
+	case LV_LABEL_ALIGN_RIGHT:
+		return LV_TXT_FLAG_RIGHT;
+	}
+}
 
 /**
  * Handle the drawing related tasks of the drop down lists
@@ -517,8 +554,9 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                 lv_style_copy(&new_style, style);
                 new_style.text.color = sel_style->text.color;
                 new_style.text.opa = sel_style->text.opa;
+                lv_txt_flag_t flag = lv_ddlist_get_txt_flag(ddlist);
                 lv_draw_label(&ext->label->coords, &mask_sel, &new_style, opa_scale,
-                              lv_label_get_text(ext->label), LV_TXT_FLAG_NONE, NULL);
+                              lv_label_get_text(ext->label), flag, NULL);
             }
         }
 
