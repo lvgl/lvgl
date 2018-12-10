@@ -90,7 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
     ext->anim_time = LV_LIST_FOCUS_TIME;
-	ext->single_selected_mode = false;
+	ext->single_mode = false;
 	
 #if USE_LV_GROUP
     ext->last_sel = NULL;
@@ -264,11 +264,11 @@ bool lv_list_remove(const lv_obj_t * list, uint32_t index)
  * @param list pointer to the currently pressed list object
  * @param mode, enable(true)/disable(false) single selected mode.
  */
-void lv_list_set_btn_single_selected_mode(lv_obj_t *list, bool mode)
+void lv_list_set_single_mode(lv_obj_t *list, bool mode)
 {
 	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
-	ext->single_selected_mode = mode;
+	ext->single_mode = mode;
 }
 
 #if USE_LV_GROUP
@@ -387,11 +387,11 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
  * Get single button selected mode.
  * @param list pointer to the currently pressed list object.
  */
-bool lv_list_get_btn_single_selected_mode(lv_obj_t *list)
+bool lv_list_get_single_mode(lv_obj_t *list)
 {
 	lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
-	return (ext->single_selected_mode);
+	return (ext->single_mode);
 }
 
 /**
@@ -885,7 +885,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
          * to mark it as selected (pressed state)*/
         last_clicked_btn = btn;
 #endif
-        if(lv_indev_is_dragging(lv_indev_get_act()) == false && ext->single_selected_mode)
+        if(lv_indev_is_dragging(lv_indev_get_act()) == false && ext->single_mode)
         {
         	lv_list_btn_single_selected(btn);
         }
