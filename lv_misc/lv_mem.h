@@ -34,7 +34,7 @@ extern "C" {
 
 // Check GCC
 #ifdef __GNUC__
-# if __x86_64__ || __ppc64__
+# if defined(__x86_64__) || defined(__ppc64__)
 #   define LV_MEM_ENV64
 # endif
 #endif
