@@ -150,6 +150,13 @@ void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
  *  */
 void lv_ddlist_set_style(lv_obj_t *ddlist, lv_ddlist_style_t type, lv_style_t *style);
 
+/**
+ * Set the alignment of the labels in a drop down list
+ * @param ddlist pointer to a drop down list object
+ * @param align alignment of labels
+ */
+void lv_ddlist_set_align(lv_obj_t *ddlist, lv_label_align_t align);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -219,6 +226,13 @@ uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist);
  * @return style pointer to a style
  */
 lv_style_t * lv_ddlist_get_style(const lv_obj_t *ddlist, lv_ddlist_style_t type);
+
+/**
+ * Get the alignment of the labels in a drop down list
+ * @param ddlist pointer to a drop down list object
+ * @return alignment of labels
+ */
+lv_label_align_t lv_ddlist_get_align(const lv_obj_t *ddlist);
 
 /*=====================
  * Other functions
