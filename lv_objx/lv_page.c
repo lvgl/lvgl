@@ -571,7 +571,6 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 #endif
 }
 
-
 /**
  * Not intended to use directly by the user but by other object types internally.
  * Start an edge flash animation. Exactly one `ext->edge_flash.xxx_ip` should be set
@@ -579,6 +578,7 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
  */
 void lv_page_start_edge_flash(lv_obj_t * page)
 {
+#if USE_LV_ANIMATION
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     if(ext->edge_flash.enabled) {
         lv_anim_t a;
@@ -596,6 +596,7 @@ void lv_page_start_edge_flash(lv_obj_t * page)
         a.repeat_pause = 0;
         lv_anim_create(&a);
     }
+#endif
 }
 
 
