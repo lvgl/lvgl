@@ -57,6 +57,7 @@ typedef struct
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
     uint32_t size; /*the number of items(buttons) in the list*/
+    bool single_mode; /* whether single selected mode is enabled */
 #if USE_LV_GROUP
     lv_obj_t * last_sel;                          /* Last btn selected */
     lv_obj_t * selected_btn;
@@ -120,6 +121,14 @@ bool lv_list_remove(const lv_obj_t * list, uint32_t index);
 /*=====================
  * Setter functions
  *====================*/
+ 
+/**
+ * Set single button selected mode, only one button will be selected if enabled.
+ * @param list pointer to the currently pressed list object
+ * @param mode, enable(true)/disable(false) single selected mode.
+ */
+void lv_list_set_single_mode(lv_obj_t *list, bool mode);
+    
 #if USE_LV_GROUP
 
 /**
@@ -179,6 +188,12 @@ void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style);
  * Getter functions
  *====================*/
 
+/**
+ * Get single button selected mode.
+ * @param list pointer to the currently pressed list object.
+ */
+bool lv_list_get_single_mode(lv_obj_t *list);
+    
 /**
  * Get the text of a list element
  * @param btn pointer to list element
