@@ -81,10 +81,11 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing image button*/
     else {
-        lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 #if LV_IMGBTN_TILED == 0
         memset(ext->img_src, 0, sizeof(ext->img_src));
 #else
+        lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+
         memcpy(ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
         memcpy(ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
         memcpy(ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
@@ -163,7 +164,7 @@ void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t *
  */
 const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
-    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+// lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
     return NULL;//ext->img_src[state];
 }
