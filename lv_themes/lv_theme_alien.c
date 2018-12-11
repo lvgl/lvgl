@@ -28,8 +28,6 @@
 
 static uint16_t _hue;
 static lv_font_t * _font;
-static lv_font_t * _font;
-static lv_font_t * _font;
 
 static lv_theme_t theme;
 static lv_style_t def;
