@@ -391,10 +391,10 @@ lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn)
 }
 
 /**
- * Get the next button from list. (Starts from the bottom button)
+ * Get the previous button from list. (Starts from the top button)
  * @param list pointer to a list object
- * @param prev_btn pointer to button. Search the next after it.
- * @return pointer to the next button or NULL when no more buttons
+ * @param prev_btn pointer to button. Search the previous before it.
+ * @return pointer to the previous button or NULL when no more buttons
  */
 lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 {
@@ -416,11 +416,12 @@ lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 }
 
 
-/**
- * Get the previous button from list. (Starts from the top button)
+
+ /**
+ * Get the next button from list. (Starts from the bottom button)
  * @param list pointer to a list object
- * @param prev_btn pointer to button. Search the previous before it.
- * @return pointer to the previous button or NULL when no more buttons
+ * @param prev_btn pointer to button. Search the next after it.
+ * @return pointer to the next button or NULL when no more buttons
  */
 lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 {
