@@ -334,10 +334,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_align_t obj_align = LV_ALIGN_IN_LEFT_MID;
-
-    {
+    if(ext->ddlist.label) {
         lv_label_align_t label_align = lv_label_get_align(ext->ddlist.label);
-
         if(LV_LABEL_ALIGN_CENTER == label_align) obj_align = LV_ALIGN_CENTER;
         else if(LV_LABEL_ALIGN_RIGHT == label_align) obj_align = LV_ALIGN_IN_RIGHT_MID;
     }

@@ -470,6 +470,9 @@ static lv_txt_flag_t lv_ddlist_get_txt_flag(const lv_obj_t *ddlist)
 {
 	lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
+	/*The label might be already deleted so just return with some value*/
+	if(!ext->label) return LV_TXT_FLAG_CENTER;
+
 	lv_label_align_t align = lv_label_get_align(ext->label);
 
 	switch(align)
