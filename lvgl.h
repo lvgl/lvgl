@@ -36,6 +36,7 @@ extern "C" {
 #include "lv_objx/lv_cont.h"
 #include "lv_objx/lv_list.h"
 #include "lv_objx/lv_chart.h"
+#include "lv_objx/lv_table.h"
 #include "lv_objx/lv_cb.h"
 #include "lv_objx/lv_bar.h"
 #include "lv_objx/lv_slider.h"
