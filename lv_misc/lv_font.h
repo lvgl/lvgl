@@ -73,8 +73,9 @@ void lv_font_init(void);
 
 /**
  * Create a pair from font name and font dsc. get function. After it 'font_get' can be used for this font
- * @param child pointer to a font to join to the 'parent'
- * @param parent pointer to a font. 'child' will be joined here
+ * @param name name of the font
+ * @param dsc_get_fp the font descriptor get function
+ * @param parent add this font as character set extension of 'parent'
  */
 void lv_font_add(lv_font_t *child, lv_font_t *parent);
 

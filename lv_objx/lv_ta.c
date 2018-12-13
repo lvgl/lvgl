@@ -966,11 +966,12 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         uint32_t byte_pos;
 #if LV_TXT_UTF8 != 0
         byte_pos = lv_txt_encoded_get_byte_id(txt, cur_pos);
+        uint32_t letter = lv_txt_encoded_next(&txt[byte_pos], NULL);
 #else
         byte_pos = cur_pos;
+        uint32_t letter = txt[byte_pos];
 #endif
 
-        uint32_t letter = lv_txt_encoded_next(&txt[byte_pos], NULL);
         lv_coord_t letter_h = lv_font_get_height(label_style->text.font);
         /*Set letter_w (set not 0 on non printable but valid chars)*/
         lv_coord_t letter_w;
@@ -1002,6 +1003,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
                 letter_w = lv_font_get_width(label_style->text.font, letter);
             }
         }
+
 
         /*Draw he cursor according to the type*/
         lv_area_t cur_area;
