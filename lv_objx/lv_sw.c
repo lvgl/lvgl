@@ -206,13 +206,15 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
             break;
     }
 }
-#if USE_LV_ANIMATION
+
 void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time)
 {
+#if USE_LV_ANIMATION
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->anim_time = anim_time;
-}
 #endif
+}
+
 
 /*=====================
  * Getter functions
