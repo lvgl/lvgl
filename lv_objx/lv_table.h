@@ -21,14 +21,20 @@ extern "C" {
 
 #if USE_LV_TABLE != 0
 
+/*Testing of dependencies*/
+#if USE_LV_LABEL == 0
+#error "lv_table: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#endif
+
 #include "../lv_core/lv_obj.h"
 #include "lv_label.h"
 
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_TABLE_COL_MAX
 #define LV_TABLE_COL_MAX    12
-
+#endif
 /**********************
  *      TYPEDEFS
  **********************/

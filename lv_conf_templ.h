@@ -247,6 +247,12 @@
 /*Chart (dependencies: -)*/
 #define USE_LV_CHART    1
 
+/*Table (dependencies: lv_label)*/
+#define USE_LV_TABLE    1
+#if USE_LV_TABLE
+#define LV_TABLE_COL_MAX    12
+#endif
+
 /*LED (dependencies: -)*/
 #define USE_LV_LED      1
 
