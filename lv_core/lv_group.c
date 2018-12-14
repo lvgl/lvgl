@@ -204,7 +204,10 @@ void lv_group_focus_next(lv_group_t * group)
     if(group->obj_focus == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
     else obj_next = lv_ll_get_next(&group->obj_ll, group->obj_focus);
 
-    if(obj_next == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
+    if(obj_next == NULL) {
+        if(group->wrap) obj_next = lv_ll_get_head(&group->obj_ll);
+        else obj_next = lv_ll_get_tail(&group->obj_ll);
+    }
     group->obj_focus = obj_next;
 
     if(group->obj_focus) {
@@ -232,7 +235,10 @@ void lv_group_focus_prev(lv_group_t * group)
     if(group->obj_focus == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
     else obj_next = lv_ll_get_prev(&group->obj_ll, group->obj_focus);
 
-    if(obj_next == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
+    if(obj_next == NULL) {
+        if(group->wrap) obj_next = lv_ll_get_tail(&group->obj_ll);
+        else  obj_next = lv_ll_get_head(&group->obj_ll);
+    }
     group->obj_focus = obj_next;
 
     if(group->obj_focus != NULL) {
@@ -341,6 +347,16 @@ static void lv_group_refocus(lv_group_t *g) {
 }
 
 /**
+ * Set whether focus next/prev will allow wrapping from first->last or last->first.
+ * @param group pointer to group
+ * @param en: true: enable `click_focus`
+ */
+void lv_group_set_wrap(lv_group_t * group, bool en)
+{
+    group->wrap = en ? 1 : 0;
+}
+
+/**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
  * @param group pointer to group
  * @param style pointer to a style to modify
@@ -426,6 +442,17 @@ bool lv_group_get_click_focus(const lv_group_t * group)
 {
     if(!group) return false;
     return group->click_focus ? true : false;
+}
+
+/**
+ * Get whether focus next/prev will allow wrapping from first->last or last->first object.
+ * @param group pointer to group
+ * @param en: true: wrapping enabled; false: wrapping disabled
+ */
+bool lv_group_get_wrap(lv_group_t * group)
+{
+    if(!group) return false;
+    return group->wrap ? true : false;
 }
 
 /**********************

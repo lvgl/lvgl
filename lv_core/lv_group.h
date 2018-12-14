@@ -58,6 +58,7 @@ typedef struct _lv_group_t
     uint8_t editing         :1;             /*1: Edit mode, 0: Navigate mode*/
     uint8_t click_focus     :1;             /*1: If an object in a group is clicked by an indev then it will be focused */
     uint8_t refocus_policy  :1;             /*1: Focus prev if focused on deletion. 0: Focus prev if focused on deletion.*/
+    uint8_t wrap            :1;             /*1: Focus next/prev can wrap at end of list. 0: Focus next/prev stops at end of list.*/
 } lv_group_t;
 
 typedef enum _lv_group_refocus_policy_t {
@@ -169,6 +170,13 @@ void lv_group_set_editing(lv_group_t * group, bool edit);
 void lv_group_set_click_focus(lv_group_t * group, bool en);
 
 /**
+ * Set whether focus next/prev will allow wrapping from first->last or last->first object.
+ * @param group pointer to group
+ * @param en: true: wrapping enabled; false: wrapping disabled
+ */
+void lv_group_set_wrap(lv_group_t * group, bool en);
+
+/**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
  * @param group pointer to group
  * @param style pointer to a style to modify
@@ -218,6 +226,12 @@ bool lv_group_get_editing(const lv_group_t * group);
  */
 bool lv_group_get_click_focus(const lv_group_t * group);
 
+/**
+ * Get whether focus next/prev will allow wrapping from first->last or last->first object.
+ * @param group pointer to group
+ * @param en: true: wrapping enabled; false: wrapping disabled
+ */
+bool lv_group_get_wrap(lv_group_t * group);
 
 /**********************
  *      MACROS
