@@ -419,19 +419,17 @@ static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt)
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area  to hide it cursor if needed*/
             lv_obj_del(kb);
         }
-        return LV_RES_INV;
+        return res;
     } else if(strcmp(txt, SYMBOL_OK) == 0) {
         if(ext->ok_action) res = ext->ok_action(kb);
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area to hide it cursor if needed*/
             res = lv_obj_del(kb);
         }
+        return res;
     }
 
     if(res != LV_RES_OK) return res;	/*The keyboard might be deleted in the actions*/
-
-    /*If it's the OK or Close button do nothing */
-    if((strcmp(txt, SYMBOL_OK) == 0) || (strcmp(txt, SYMBOL_CLOSE) == 0)) return LV_RES_OK;
 
     /*Add the characters to the text area if set*/
     if(ext->ta == NULL) return res;
