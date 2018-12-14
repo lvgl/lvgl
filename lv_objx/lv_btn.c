@@ -674,10 +674,11 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         } else if(c == LV_GROUP_KEY_ENTER) {
             if(!ext->long_pr_action_executed) {
                 if(lv_btn_get_toggle(btn)) {
-                    if(state == LV_BTN_STATE_REL) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                    else if(state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
-                    else if(state == LV_BTN_STATE_TGL_REL) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                    else if(state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_PR);
+                    if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                    else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                } else {
+                    if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                    else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
                 }
                 if(ext->actions[LV_BTN_ACTION_CLICK] && state != LV_BTN_STATE_INA) {
                     res = ext->actions[LV_BTN_ACTION_CLICK](btn);
