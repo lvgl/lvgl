@@ -430,6 +430,9 @@ static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt)
 
     if(res != LV_RES_OK) return res;	/*The keyboard might be deleted in the actions*/
 
+    /*If it's the OK or Close button do nothing */
+    if((strcmp(txt, SYMBOL_OK) == 0) || (strcmp(txt, SYMBOL_CLOSE) == 0)) return LV_RES_OK;
+
     /*Add the characters to the text area if set*/
     if(ext->ta == NULL) return res;
 
