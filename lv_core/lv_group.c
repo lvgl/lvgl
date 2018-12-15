@@ -342,6 +342,7 @@ void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t p
 static void lv_group_refocus(lv_group_t *g) {
     /*Refocus must temporarily allow wrapping to work correctly*/
     uint8_t temp_wrap = g->wrap;
+    g->wrap = 1;
 
     if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_NEXT)
         lv_group_focus_next(g);
