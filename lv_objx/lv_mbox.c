@@ -280,6 +280,18 @@ void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, lv_style_t * style
 
 }
 
+/**
+ * Set whether recoloring is enabled
+ * @param btnm pointer to button matrix object
+ * @param en whether recoloring is enabled
+ */
+void lv_mbox_set_recolor(lv_obj_t * mbox, bool en)
+{
+	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+
+	if(ext->btnm)
+		lv_btnm_set_recolor(ext->btnm, en);
+}
 
 /*=====================
  * Getter functions
@@ -360,6 +372,21 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
     }
 
     return style;
+}
+
+/**
+ * Get whether recoloring is enabled
+ * @param btnm pointer to button matrix object
+ * @return whether recoloring is enabled
+ */
+bool lv_mbox_get_recolor(const lv_obj_t * mbox)
+{
+	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+
+	if(!ext->btnm)
+		return false;
+
+	return lv_btnm_get_recolor(ext->btnm);
 }
 
 
