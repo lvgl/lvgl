@@ -495,6 +495,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     format.format_byte = ext->cell_data[cell][0];
 
                     switch(format.align) {
+                    default:
                     case LV_LABEL_ALIGN_LEFT:
                         txt_flags = LV_TXT_FLAG_NONE;
                         break;
