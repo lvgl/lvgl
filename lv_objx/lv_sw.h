@@ -160,14 +160,12 @@ static inline lv_action_t lv_sw_get_action(const lv_obj_t * slider)
  */
 lv_style_t * lv_sw_get_style(const lv_obj_t *sw, lv_sw_style_t type);
 
-#if USE_LV_ANIMATION
 /**
  * Get the animation time of the switch
  * @param sw pointer to a  switch object
  * @return style pointer to a style
  */
 uint16_t lv_sw_get_anim_time(const lv_obj_t *sw);
-#endif
 
 /**********************
  *      MACROS

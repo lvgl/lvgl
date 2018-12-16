@@ -154,11 +154,8 @@ void lv_sw_off(lv_obj_t * sw)
 void lv_sw_on_anim(lv_obj_t * sw)
 {
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-#if USE_LV_ANIMATION
     if(lv_sw_get_anim_time(sw) > 0)lv_sw_anim_to_value(sw, LV_SWITCH_SLIDER_ANIM_MAX);
-    else
-#endif
-	lv_slider_set_value(sw, LV_SWITCH_SLIDER_ANIM_MAX);
+    else lv_slider_set_value(sw, LV_SWITCH_SLIDER_ANIM_MAX);
 
     lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
 }
@@ -170,11 +167,8 @@ void lv_sw_on_anim(lv_obj_t * sw)
 void lv_sw_off_anim(lv_obj_t * sw)
 {
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-#if USE_LV_ANIMATION
     if(lv_sw_get_anim_time(sw) > 0)  lv_sw_anim_to_value(sw, 0);
-    else
-#endif
-	lv_slider_set_value(sw, 0);
+    else lv_slider_set_value(sw, 0);
 
     lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
 }
@@ -393,9 +387,9 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     return res;
 }
 
-#if USE_LV_ANIMATION
 static void lv_sw_anim_to_value(lv_obj_t * sw, int16_t value)
 {
+#if USE_LV_ANIMATION
     lv_anim_t a;
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     a.var = sw;
@@ -411,7 +405,7 @@ static void lv_sw_anim_to_value(lv_obj_t * sw, int16_t value)
     a.repeat = 0;
     a.repeat_pause = 0;
     lv_anim_create(&a);
-}
 #endif
+}
 
 #endif
