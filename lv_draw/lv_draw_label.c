@@ -129,7 +129,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         while(i < line_end) {
             letter = lv_txt_encoded_next(txt, &i);
 
-//            if(pos.y + line_height < mask->y1) continue;
+            if(pos.y + line_height < mask->y1) continue;
 
             /*Handle the re-color command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -200,7 +200,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         /*Go the next line position*/
         pos.y += line_height;
 
-//        if(pos.y > mask->y2) return;
+        if(pos.y > mask->y2) return;
     }
 }
 
