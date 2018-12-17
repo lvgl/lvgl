@@ -92,6 +92,7 @@ enum
     LV_SIGNAL_REFR_EXT_SIZE,
     LV_SIGNAL_GET_TYPE,
 
+	LV_INDEV_SIGNAL_START,
     /*Input device related*/
     LV_SIGNAL_PRESSED,
     LV_SIGNAL_PRESSING,
@@ -101,6 +102,7 @@ enum
     LV_SIGNAL_LONG_PRESS_REP,
     LV_SIGNAL_DRAG_BEGIN,
     LV_SIGNAL_DRAG_END,
+	LV_INDEV_SIGNAL_END,
 
     /*Group related*/
     LV_SIGNAL_FOCUS,

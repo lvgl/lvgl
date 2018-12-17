@@ -1810,6 +1810,14 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res = LV_RES_OK;
 
     lv_style_t * style = lv_obj_get_style(obj);
+
+    lv_indev_t *indev_act = lv_indev_get_act();
+
+    if(sign > LV_INDEV_SIGNAL_START && sign < LV_INDEV_SIGNAL_END) {
+		if(indev_act != NULL && indev_act->feedback != NULL)
+			indev_act->feedback(indev_act, sign);
+    }
+
     if(sign == LV_SIGNAL_CHILD_CHG) {
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
