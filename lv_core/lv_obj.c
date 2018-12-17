@@ -1813,7 +1813,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     lv_indev_t *indev_act = lv_indev_get_act();
 
-    if(sign > LV_INDEV_SIGNAL_START && sign < LV_INDEV_SIGNAL_END) {
+    if(sign > _LV_SIGNAL_FEEDBACK_SECTION_START && sign < _LV_SIGNAL_FEEDBACK_SECTION_END) {
 		if(indev_act != NULL && indev_act->feedback != NULL)
 			indev_act->feedback(indev_act, sign);
     }
