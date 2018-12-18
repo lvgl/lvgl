@@ -220,11 +220,12 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     }
 #endif
     if(txt != NULL) {
+        lv_coord_t btn_hor_pad = ext->styles_btn[LV_BTN_STYLE_REL]->body.padding.hor;
         lv_obj_t * label = lv_label_create(liste, NULL);
         lv_label_set_text(label, txt);
         lv_obj_set_click(label, false);
         lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
-        lv_obj_set_width(label, liste->coords.x2 - label->coords.x1);
+        lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - btn_hor_pad);
         if(label_signal == NULL) label_signal = lv_obj_get_signal_func(label);
     }
 

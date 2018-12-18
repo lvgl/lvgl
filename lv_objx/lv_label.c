@@ -787,7 +787,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.var = label;
             anim.repeat = 1;
             anim.playback = 1;
-            anim.start = lv_font_get_width(font, ' ');
+            anim.start = 0;
             anim.act_time = 0;
             anim.end_cb = NULL;
             anim.path = lv_anim_path_linear;
@@ -797,7 +797,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.repeat_pause = anim.playback_pause;
 
             if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
-                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label) - lv_font_get_width(font, ' ');
+                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label);
                 anim.fp = (lv_anim_fp_t) lv_obj_set_x;
                 anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
                 lv_anim_create(&anim);
@@ -817,7 +817,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.var = label;
         anim.repeat = 1;
         anim.playback = 1;
-        anim.start = lv_font_get_width(font, ' ');
+        anim.start = 0;
         anim.act_time = 0;
         anim.end_cb = NULL;
         anim.path = lv_anim_path_linear;
@@ -826,7 +826,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
-            anim.end = lv_obj_get_width(label) - size.x - lv_font_get_width(font, ' ');
+            anim.end = lv_obj_get_width(label) - size.x;
             anim.fp = (lv_anim_fp_t) lv_label_set_offset_x;
             anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
