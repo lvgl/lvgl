@@ -136,7 +136,7 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
  */
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 {
-    if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return;
+    if(indev->driver.type != LV_INDEV_TYPE_POINTER) return;
 
     indev->cursor = cur_obj;
     lv_obj_set_parent(indev->cursor, lv_layer_sys());
