@@ -22,6 +22,11 @@ extern "C" {
 
 #if USE_LV_SPINBOX != 0
 
+/*Testing of dependencies*/
+#if USE_LV_TA == 0
+#error "lv_spinbox: lv_ta is required. Enable it in lv_conf.h (USE_LV_TA  1) "
+#endif
+
 #include "../lv_core/lv_obj.h"
 #include "../lv_objx/lv_ta.h"
 
@@ -95,7 +100,7 @@ static inline void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t t
  * @param spinbox pointer to spinbox
  * @param i value to be set
  */
-void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i);
+void lv_spinbox_set_value(lv_obj_t * spinbox, int32_t i);
 
 /**
  * Set spinbox digit format (digit count and decimal format)
@@ -103,14 +108,14 @@ void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i);
  * @param digit_count number of digit excluding the decimal separator and the sign
  * @param separator_position number of digit before the decimal point. If 0, decimal point is not shown
  */
-void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
+void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
 
 /**
  * Set spinbox step
  * @param spinbox pointer to spinbox
  * @param step steps on increment/decrement
  */
-void lv_spinbox_set_step(const lv_obj_t * spinbox, uint32_t step);
+void lv_spinbox_set_step(lv_obj_t * spinbox, uint32_t step);
 
 /**
  * Set spinbox value range
@@ -118,21 +123,21 @@ void lv_spinbox_set_step(const lv_obj_t * spinbox, uint32_t step);
  * @param range_min maximum value, inclusive
  * @param range_max minimum value, inclusive
  */
-void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t range_min, int32_t range_max);
+void lv_spinbox_set_range(lv_obj_t * spinbox, int32_t range_min, int32_t range_max);
 
 /**
  * Set spinbox callback on calue change
  * @param spinbox pointer to spinbox
  * @param cb Callback function called on value change event
  */
-void lv_spinbox_set_value_changed_cb(const lv_obj_t * spinbox, lv_spinbox_value_changed_cb_t cb);
+void lv_spinbox_set_value_changed_cb(lv_obj_t * spinbox, lv_spinbox_value_changed_cb_t cb);
 
 /**
  * Set spinbox left padding in digits count (added between sign and first digit)
  * @param spinbox pointer to spinbox
  * @param cb Callback function called on value change event
  */
-void lv_spinbox_set_padding_left(const lv_obj_t * spinbox, uint8_t padding);
+void lv_spinbox_set_padding_left(lv_obj_t * spinbox, uint8_t padding);
 
 /*=====================
  * Getter functions
@@ -144,7 +149,7 @@ void lv_spinbox_set_padding_left(const lv_obj_t * spinbox, uint8_t padding);
  * @param type which style should be get
  * @return style pointer to the style
  */
-static inline lv_style_t * lv_spinbox_get_style(const lv_obj_t * spinbox, lv_spinbox_style_t type)
+static inline lv_style_t * lv_spinbox_get_style(lv_obj_t * spinbox, lv_spinbox_style_t type)
 {
     return lv_ta_get_style(spinbox, type);
 }
@@ -154,7 +159,7 @@ static inline lv_style_t * lv_spinbox_get_style(const lv_obj_t * spinbox, lv_spi
  * @param spinbox pointer to spinbox
  * @return value integer value of the spinbox
  */
-int32_t lv_spinbox_get_value(const lv_obj_t * spinbox);
+int32_t lv_spinbox_get_value(lv_obj_t * spinbox);
 
 /*=====================
  * Other functions
