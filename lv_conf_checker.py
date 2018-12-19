@@ -1,3 +1,8 @@
+'''
+Generates a chechker file for lv_conf.h from lv_conf_templ.h define all the not defined values
+'''
+
+
 import re
 
 fin = open("lv_conf_templ.h", "r");
@@ -6,6 +11,7 @@ fout = open("lv_conf_checker.h", "w");
 
 fout.write(
 '/**\n\
+ * GENERATED FILE, DO NOT EDIT IT!\n\
  * @file lv_conf_checker.h\n\
  * Make sure all the defines of lv_conf.h have a default value\n\
 **/\n\
@@ -14,7 +20,6 @@ fout.write(
 #define  LV_CONF_CHECKER_H\n\
 '
 )  
-
 
 inlines = fin.read().splitlines();
 
