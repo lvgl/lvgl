@@ -301,7 +301,10 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             LV_LOG_TRACE("lv_img_design: start to draw symbol");
-            lv_draw_label(&coords, mask, style, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
+            lv_style_t style_mod;
+            lv_style_copy(&style_mod, style);
+            style_mod.text.color = style->image.color;
+            lv_draw_label(&coords, mask, &style_mod, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");

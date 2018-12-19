@@ -128,7 +128,6 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
             if(copy_img) img_src = lv_img_get_src(copy_img);
 #endif
             lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), lv_btn_get_action(copy_btn, LV_BTN_ACTION_CLICK));
-            // new_btn = lv_btn_create(new_list, copy_btn);
             copy_btn = lv_list_get_next_btn(copy, copy_btn);
         }
 
