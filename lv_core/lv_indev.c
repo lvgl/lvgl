@@ -136,7 +136,7 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
  */
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 {
-    if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return;
+    if(indev->driver.type != LV_INDEV_TYPE_POINTER) return;
 
     indev->cursor = cur_obj;
     lv_obj_set_parent(indev->cursor, lv_layer_sys());
@@ -368,6 +368,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(data->state == LV_INDEV_STATE_PR &&
             i->proc.last_state == LV_INDEV_STATE_REL) {
         i->proc.pr_timestamp = lv_tick_get();
+        lv_obj_t * focused = lv_group_get_focused(i->group);
+        if(focused && data->key == LV_GROUP_KEY_ENTER) {
+            focused->signal_func(focused, LV_SIGNAL_PRESSED, indev_act);
+        }
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && i->proc.last_state == LV_INDEV_STATE_PR) {

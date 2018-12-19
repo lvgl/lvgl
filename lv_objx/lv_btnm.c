@@ -314,6 +314,14 @@ void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, lv_style_t * style
     }
 }
 
+void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+
+    ext->recolor = en;
+    lv_obj_invalidate(btnm);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -402,6 +410,13 @@ lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
     return style;
 }
 
+bool lv_btnm_get_recolor(const lv_obj_t * btnm)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+
+    return ext->recolor;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -424,6 +439,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
+
         ancestor_design_f(btnm, mask, mode);
 
         lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
@@ -437,10 +453,15 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
         lv_area_t area_tmp;
         lv_coord_t btn_w;
         lv_coord_t btn_h;
-        bool border_mod = false;
 
         uint16_t btn_i = 0;
         uint16_t txt_i = 0;
+
+        lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
+
+        if(ext->recolor)
+        	txt_flag = LV_TXT_FLAG_RECOLOR;
+
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i ++, txt_i ++) {
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
@@ -465,20 +486,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             else if(btn_i == ext->btn_id_pr && btn_i == ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_PR);
             else btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL);    /*Not possible option, just to be sure*/
 
-            /*On the right buttons clear the border if only right borders are drawn*/
-            if(ext->map_p[txt_i + 1][0] == '\0' || ext->map_p[txt_i + 1][0] == '\n') {
-                if(btn_style->body.border.part == LV_BORDER_RIGHT) {
-                    btn_style->body.border.part  = LV_BORDER_NONE;
-                    border_mod = true;
-                }
-            }
-
             lv_draw_rect(&area_tmp, mask, btn_style, opa_scale);
-
-            if(border_mod) {
-                border_mod = false;
-                btn_style->body.border.part = LV_BORDER_RIGHT;
-            }
 
             /*Calculate the size of the text*/
             if(btn_style->glass) btn_style = bg_style;
@@ -486,15 +494,14 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             lv_point_t txt_size;
             lv_txt_get_size(&txt_size, ext->map_p[txt_i], font,
                             btn_style->text.letter_space, btn_style->text.line_space,
-                            lv_area_get_width(&area_btnm), LV_TXT_FLAG_NONE);
+                            lv_area_get_width(&area_btnm), txt_flag);
 
             area_tmp.x1 += (btn_w - txt_size.x) / 2;
             area_tmp.y1 += (btn_h - txt_size.y) / 2;
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-
-            lv_draw_label(&area_tmp, mask, btn_style, opa_scale,  ext->map_p[txt_i], LV_TXT_FLAG_NONE, NULL);
+            lv_draw_label(&area_tmp, mask, btn_style, opa_scale,  ext->map_p[txt_i], txt_flag, NULL);
         }
     }
     return true;

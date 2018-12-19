@@ -731,7 +731,6 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
     col_a.y2 = chart->coords.y2;
 
     lv_coord_t x_act;
-    printf("\n", y_tmp);
 
     /*Go through all points*/
     for(i = 0; i < ext->point_cnt; i ++) {
@@ -749,7 +748,6 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
             lv_coord_t p_act = (ser->start_point + i) % ext->point_cnt;
             y_tmp = (int32_t)((int32_t) ser->points[p_act] - ext->ymin) * h;
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
-            printf("ytmp:%d\n", y_tmp);
             col_a.y1 = h - y_tmp + chart->coords.y1;
 
             mask_ret = lv_area_intersect(&col_mask, mask, &col_a);

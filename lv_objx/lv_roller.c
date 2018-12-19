@@ -22,7 +22,7 @@
 #  endif
 #else
 #  undef  LV_ROLLER_ANIM_TIME
-#  define LV_ROLLER_ANIM_TIME     0             /*No animation*/
+#  define LV_ROLLER_ANIM_TIME       0           /*No animation*/
 #endif
 
 /**********************
@@ -75,7 +75,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
     ext->ddlist.draw_arrow = 0;  /*Do not draw arrow by default*/
-    
+
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_roller, lv_roller_signal);
     lv_obj_set_design_func(new_roller, lv_roller_design);
@@ -124,6 +124,19 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
  *====================*/
 
 /**
+ * Set the align of the roller's options (left or center)
+ * @param roller - pointer to a roller object
+ * @param align - one of lv_label_align_t values (left, right, center)
+ */
+void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
+{
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    lv_mem_assert(ext);
+    if(ext->ddlist.label == NULL) return;   /*Probably the roller is being deleted if the label is NULL.*/
+    lv_label_set_align(ext->ddlist.label, align);
+}
+
+/**
  * Set the selected option
  * @param roller pointer to a roller object
  * @param sel_opt id of the selected option (0 ... number of option - 1);
@@ -151,8 +164,8 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     lv_ddlist_set_fix_height(roller, lv_font_get_height(style_label->text.font) * row_cnt + style_label->text.line_space * (row_cnt));
-
 }
+
 /**
  * Set a style of a roller
  * @param roller pointer to a roller object
@@ -174,6 +187,19 @@ void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, lv_style_t *
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
+ * @param roller pointer to a roller object
+ * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
+ */
+lv_label_align_t lv_roller_get_align(const lv_obj_t * roller)
+{
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    lv_mem_assert(ext);
+    lv_mem_assert(ext->ddlist.label);
+    return lv_label_get_align(ext->ddlist.label);
+}
 
 /**
  * Get the auto width set attribute
@@ -209,7 +235,6 @@ lv_style_t * lv_roller_get_style(const lv_obj_t * roller, lv_roller_style_t type
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 /**
  * Handle the drawing related tasks of the rollers
@@ -266,11 +291,23 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         if(area_ok) {
             lv_style_t * sel_style = lv_roller_get_style(roller, LV_ROLLER_STYLE_SEL);
             lv_style_t new_style;
+            lv_txt_flag_t txt_align = LV_TXT_FLAG_NONE;
+
+            {
+                lv_label_align_t label_align = lv_label_get_align(ext->ddlist.label);
+
+                if(LV_LABEL_ALIGN_CENTER == label_align) {
+                    txt_align |= LV_TXT_FLAG_CENTER;
+                } else if(LV_LABEL_ALIGN_RIGHT == label_align) {
+                    txt_align |= LV_TXT_FLAG_RIGHT;
+                }
+            }
+
             lv_style_copy(&new_style, style);
             new_style.text.color = sel_style->text.color;
             new_style.text.opa = sel_style->text.opa;
             lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style, opa_scale,
-                          lv_label_get_text(ext->ddlist.label), LV_TXT_FLAG_CENTER, NULL);
+                          lv_label_get_text(ext->ddlist.label), txt_align, NULL);
         }
     }
 
@@ -296,10 +333,17 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     }
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    lv_align_t obj_align = LV_ALIGN_IN_LEFT_MID;
+    if(ext->ddlist.label) {
+        lv_label_align_t label_align = lv_label_get_align(ext->ddlist.label);
+        if(LV_LABEL_ALIGN_CENTER == label_align) obj_align = LV_ALIGN_CENTER;
+        else if(LV_LABEL_ALIGN_RIGHT == label_align) obj_align = LV_ALIGN_IN_RIGHT_MID;
+    }
+
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_set_height(lv_page_get_scrl(roller),
                           lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
-        lv_obj_align(ext->ddlist.label, NULL, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
         lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
         refr_position(roller, false);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
@@ -311,7 +355,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             lv_obj_set_height(lv_page_get_scrl(roller),
                               lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
 
-            lv_obj_align(ext->ddlist.label, NULL, LV_ALIGN_CENTER, 0, 0);
+            lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
         }
@@ -337,14 +381,12 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;      /*Save the current value. Used to revert this state if ENER wont't be pressed*/
 
         }
-
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         /*Revert the original state*/
         if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
             ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
             refr_position(roller, true);
         }
-
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
@@ -486,7 +528,6 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
         style->body.main_color = main_tmp;
         style->body.grad_color = grad_tmp;
     }
-
 }
 
 /**

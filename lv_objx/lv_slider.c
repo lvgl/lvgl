@@ -490,11 +490,13 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
+
+        ext->drag_value = LV_SLIDER_NOT_PRESSED;
+
 #if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(slider);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER && c == LV_GROUP_KEY_ENTER) {
             if(editing) lv_group_set_editing(g, false);

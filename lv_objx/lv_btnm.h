@@ -62,6 +62,7 @@ typedef struct
     uint16_t btn_id_pr;                         /*Index of the currently pressed button (in `button_areas`) or LV_BTNM_PR_NONE*/
     uint16_t btn_id_tgl;                        /*Index of the currently toggled button (in `button_areas`) or LV_BTNM_PR_NONE */
     uint8_t toggle     :1;                      /*Enable toggling*/
+    uint8_t	recolor    :1;                      /*Enable button recoloring*/
 } lv_btnm_ext_t;
 
 enum {
@@ -129,6 +130,13 @@ void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
  */
 void lv_btnm_set_style(lv_obj_t *btnm, lv_btnm_style_t type, lv_style_t *style);
 
+/**
+ * Set whether recoloring is enabled
+ * @param btnm pointer to button matrix object
+ * @param en whether recoloring is enabled
+ */
+void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -168,6 +176,13 @@ uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm);
  * @return style pointer to a style
  */
 lv_style_t * lv_btnm_get_style(const lv_obj_t *btnm, lv_btnm_style_t type);
+
+/**
+ * Find whether recoloring is enabled
+ * @param btnm pointer to button matrix object
+ * @return whether recoloring is enabled
+ */
+bool lv_btnm_get_recolor(const lv_obj_t * btnm);
 
 /**********************
  *      MACROS

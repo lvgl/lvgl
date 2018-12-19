@@ -115,6 +115,8 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     lv_rletter_set_background(style->body.main_color);
 #endif
 
+    lv_coord_t line_height = lv_font_get_height(font) + style->text.line_space;
+
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
         if(offset != NULL) {
@@ -126,6 +128,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         uint32_t letter;
         while(i < line_end) {
             letter = lv_txt_encoded_next(txt, &i);
+
+            if(pos.y + line_height < mask->y1) continue;
+
             /*Handle the re-color command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
@@ -193,8 +198,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         }
 
         /*Go the next line position*/
-        pos.y += lv_font_get_height(font);
-        pos.y += style->text.line_space;
+        pos.y += line_height;
+
+        if(pos.y > mask->y2) return;
     }
 }
 
