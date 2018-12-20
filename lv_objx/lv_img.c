@@ -155,19 +155,25 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     lv_img_header_t header;
     lv_img_dsc_get_info(src_img, &header);
 
+
+
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
         LV_LOG_INFO("lv_img_set_src:  `LV_IMG_SRC_VARIABLE` type found");
+
+        /*If memory was allocated because of the previous `src_type` then free it*/
+        if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
+            lv_mem_free(ext->src);
+        }
         ext->src = src_img;
     } else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
-
-
         /* If the new and the old src are the same then it was only a refresh.*/
         if(ext->src != src_img) {
+        	/*If memory was allocated because of the previous `src_type` then free it*/
             if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
-                lv_mem_free(ext->src); /*If memory was allocated because of the previous `src_type` then free it*/
+                lv_mem_free(ext->src);
             }
-            char * new_str = lv_mem_alloc(strlen(src_img) + 1);
+        	char * new_str = lv_mem_alloc(strlen(src_img) + 1);
             lv_mem_assert(new_str);
             if(new_str == NULL) return;
             strcpy(new_str, src_img);
