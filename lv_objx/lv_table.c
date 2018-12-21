@@ -146,10 +146,18 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
 void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
 {
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+    uint16_t old_row_cnt = ext->row_cnt;
     ext->row_cnt = row_cnt;
 
     if(ext->row_cnt > 0 && ext->col_cnt > 0) {
         ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char*));
+
+        /*Initilize the new fields*/
+        if(old_row_cnt < row_cnt) {
+			uint16_t old_cell_cnt = old_row_cnt * ext->col_cnt;
+			uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
+			memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+        }
     }
     else {
         lv_mem_free(ext->cell_data);
@@ -173,10 +181,18 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt)
     }
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+    uint16_t old_col_cnt = ext->col_cnt;
     ext->col_cnt = col_cnt;
 
     if(ext->row_cnt > 0 && ext->col_cnt > 0) {
         ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char*));
+        /*Initilize the new fields*/
+        if(old_col_cnt < col_cnt) {
+        	uint16_t old_cell_cnt = old_col_cnt * ext->row_cnt;
+        	uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
+        	memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+        }
+
     }
     else {
         lv_mem_free(ext->cell_data);

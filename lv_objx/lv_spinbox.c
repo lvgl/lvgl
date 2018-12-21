@@ -22,7 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * param);
-static void lv_spinbox_updatevalue(const lv_obj_t * spinbox);
+static void lv_spinbox_updatevalue(lv_obj_t * spinbox);
 
 /**********************
  *  STATIC VARIABLES
@@ -115,7 +115,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param spinbox pointer to spinbox
  * @param i value to be set
  */
-void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i)
+void lv_spinbox_set_value(lv_obj_t * spinbox, int32_t i)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL)
@@ -137,7 +137,7 @@ void lv_spinbox_set_value(const lv_obj_t * spinbox, int32_t i)
  * @param digit_count number of digit excluding the decimal separator and the sign
  * @param separator_position number of digit before the decimal point. If 0, decimal point is not shown
  */
-void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position)
+void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL)
@@ -160,7 +160,7 @@ void lv_spinbox_set_digit_format(const lv_obj_t * spinbox, uint8_t digit_count, 
  * @param spinbox pointer to spinbox
  * @param step steps on increment/decrement
  */
-void lv_spinbox_set_step(const lv_obj_t * spinbox, uint32_t step)
+void lv_spinbox_set_step(lv_obj_t * spinbox, uint32_t step)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL) return;
@@ -174,7 +174,7 @@ void lv_spinbox_set_step(const lv_obj_t * spinbox, uint32_t step)
  * @param range_min maximum value, inclusive
  * @param range_max minimum value, inclusive
  */
-void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t range_min, int32_t range_max)
+void lv_spinbox_set_range(lv_obj_t * spinbox, int32_t range_min, int32_t range_max)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL) return;
@@ -199,7 +199,7 @@ void lv_spinbox_set_range(const lv_obj_t * spinbox, int32_t range_min, int32_t r
  * @param spinbox pointer to spinbox
  * @param cb Callback function called on value change event
  */
-void lv_spinbox_set_value_changed_cb(const lv_obj_t * spinbox, lv_spinbox_value_changed_cb_t cb)
+void lv_spinbox_set_value_changed_cb(lv_obj_t * spinbox, lv_spinbox_value_changed_cb_t cb)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     ext->value_changed_cb = cb;
@@ -210,7 +210,7 @@ void lv_spinbox_set_value_changed_cb(const lv_obj_t * spinbox, lv_spinbox_value_
  * @param spinbox pointer to spinbox
  * @param cb Callback function called on value change event
  */
-void lv_spinbox_set_padding_left(const lv_obj_t * spinbox, uint8_t padding)
+void lv_spinbox_set_padding_left(lv_obj_t * spinbox, uint8_t padding)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     ext->digit_padding_left = padding;
@@ -226,7 +226,7 @@ void lv_spinbox_set_padding_left(const lv_obj_t * spinbox, uint8_t padding)
  * @param spinbox pointer to spinbox
  * @return value integer value of the spinbox
  */
-int32_t lv_spinbox_get_value(const lv_obj_t * spinbox)
+int32_t lv_spinbox_get_value(lv_obj_t * spinbox)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
@@ -422,7 +422,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     return res;
 }
 
-static void lv_spinbox_updatevalue(const lv_obj_t * spinbox)
+static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     int32_t v = ext->value;
