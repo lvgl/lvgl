@@ -520,7 +520,7 @@ char * lv_fs_up(char * path)
         if(path[i] == '/' || path[i] == '\\') break;
     }
 
-    path[i] = '\0';
+    if(i > 0) path[i] = '\0';
 
     return path;
 }

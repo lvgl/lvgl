@@ -141,6 +141,15 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->coords.y2 = LV_VER_RES - 1;
         new_obj->ext_size = 0;
 
+        /*Init realign*/
+#if LV_OBJ_REALIGN
+        new_obj->realign.align = LV_ALIGN_CENTER;
+        new_obj->realign.xofs = 0;
+        new_obj->realign.yofs = 0;
+        new_obj->realign.base = NULL;
+        new_obj->realign.auto_realign = 0;
+#endif
+
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
@@ -256,6 +265,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 #if LV_OBJ_FREE_PTR != 0
         new_obj->free_ptr = copy->free_ptr;
 #endif
+
+        /*Copy realign*/
+#if LV_OBJ_REALIGN
+        new_obj->realign.align = copy->realign.align;
+        new_obj->realign.xofs = copy->realign.xofs;
+        new_obj->realign.yofs = copy->realign.yofs;
+        new_obj->realign.base = copy->realign.base;
+        new_obj->realign.auto_realign = copy->realign.auto_realign;
+#endif
+
         /*Set attributes*/
         new_obj->click = copy->click;
         new_obj->drag = copy->drag;
@@ -263,6 +282,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->drag_parent = copy->drag_parent;
         new_obj->hidden = copy->hidden;
         new_obj->top = copy->top;
+
         new_obj->opa_scale_en = copy->opa_scale_en;
         new_obj->protect = copy->protect;
         new_obj->opa_scale = copy->opa_scale;
