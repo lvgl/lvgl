@@ -83,6 +83,8 @@ void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en);
  */
 void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en);
 
+#define lv_line_set_y_inv lv_line_set_y_invert      /*The name was inconsistent. In v.6.0 only `lv_line_set_y_invert`will work */
+
 /**
  * Set the style of a line
  * @param line pointer to a line object
@@ -119,7 +121,7 @@ bool lv_line_get_auto_size(const lv_obj_t * line);
  * @param line pointer to a line object
  * @return true: y inversion is enabled, false: disabled
  */
-bool lv_line_get_y_inv(const lv_obj_t * line);
+bool lv_line_get_y_invert(const lv_obj_t * line);
 
 /**
  * Get the style of an line object

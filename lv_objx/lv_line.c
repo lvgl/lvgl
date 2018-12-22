@@ -82,7 +82,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_line_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_line_set_auto_size(new_line, lv_line_get_auto_size(copy));
-        lv_line_set_y_invert(new_line, lv_line_get_y_inv(copy));
+        lv_line_set_y_invert(new_line, lv_line_get_y_invert(copy));
         lv_line_set_auto_size(new_line, lv_line_get_auto_size(copy));
         lv_line_set_points(new_line, copy_ext->point_array, copy_ext->point_num);
         /*Refresh the style with new signal function*/
@@ -183,7 +183,7 @@ bool lv_line_get_auto_size(const lv_obj_t * line)
  * @param line pointer to a line object
  * @return true: y inversion is enabled, false: disabled
  */
-bool lv_line_get_y_inv(const lv_obj_t * line)
+bool lv_line_get_y_invert(const lv_obj_t * line)
 {
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
