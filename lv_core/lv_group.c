@@ -373,11 +373,9 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
     lv_style_copy(&group->style_tmp, style);
 
     if(group->editing) {
-        if(group->style_mod_edit != NULL) group->style_mod_edit(&group->style_tmp);
-        else style_mod_edit_def(&group->style_tmp);
+        if(group->style_mod_edit) group->style_mod_edit(&group->style_tmp);
     } else {
-        if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
-        else style_mod_def(&group->style_tmp);
+        if(group->style_mod) group->style_mod(&group->style_tmp);
     }
     return &group->style_tmp;
 }
