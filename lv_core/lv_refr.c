@@ -515,7 +515,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 
         /* Redraw the object */
         obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
-        //tick_wait_ms(100);  /*DEBUG: Wait after every object draw to see the order of drawing*/
+        //usleep(5 * 1000);  /*DEBUG: Wait after every object draw to see the order of drawing*/
 
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
