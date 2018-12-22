@@ -150,9 +150,9 @@ void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type);
 /**
  * Enable/Disable password mode
  * @param ta pointer to a text area object
- * @param pwd_en true: enable, false: disable
+ * @param en true: enable, false: disable
  */
-void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en);
+void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en);
 
 /**
  * Configure the text area to one line or back to normal

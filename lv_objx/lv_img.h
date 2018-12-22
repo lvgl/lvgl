@@ -87,7 +87,7 @@ static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param autosize_en true: auto size enable, false: auto size disable
+ * @param en true: auto size enable, false: auto size disable
  */
 void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
 

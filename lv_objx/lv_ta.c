@@ -503,15 +503,15 @@ void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type)
 /**
  * Enable/Disable password mode
  * @param ta pointer to a text area object
- * @param pwd_en true: enable, false: disable
+ * @param en true: enable, false: disable
  */
-void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en)
+void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    if(ext->pwd_mode == pwd_en) return;
+    if(ext->pwd_mode == en) return;
 
     /*Pwd mode is now enabled*/
-    if(ext->pwd_mode == 0 && pwd_en != false) {
+    if(ext->pwd_mode == 0 && en != false) {
         char * txt = lv_label_get_text(ext->label);
         uint16_t len = strlen(txt);
         ext->pwd_tmp = lv_mem_alloc(len + 1);
@@ -529,13 +529,13 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool pwd_en)
         lv_label_set_text(ext->label, NULL);
     }
     /*Pwd mode is now disabled*/
-    else if(ext->pwd_mode == 1 && pwd_en == false) {
+    else if(ext->pwd_mode == 1 && en == false) {
         lv_label_set_text(ext->label, ext->pwd_tmp);
         lv_mem_free(ext->pwd_tmp);
         ext->pwd_tmp = NULL;
     }
 
-    ext->pwd_mode = pwd_en == false ? 0 : 1;
+    ext->pwd_mode = en == false ? 0 : 1;
 }
 
 /**

@@ -168,9 +168,9 @@ void lv_tabview_set_btns_pos(lv_obj_t *tabview, lv_tabview_btns_pos_t btns_pos);
 /**
  * Set whether tab buttons are hidden
  * @param tabview pointer to a tab view object
- * @param hidden whether tab buttons are hidden
+ * @param en whether tab buttons are hidden
  */
-void lv_tabview_set_btns_hidden(lv_obj_t *tabview, bool hidden);
+void lv_tabview_set_btns_hidden(lv_obj_t *tabview, bool en);
 
 /*=====================
  * Getter functions

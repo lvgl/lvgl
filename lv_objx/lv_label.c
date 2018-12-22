@@ -283,14 +283,14 @@ void lv_label_set_align(lv_obj_t * label, lv_label_align_t align)
 /**
  * Enable the recoloring by in-line commands
  * @param label pointer to a label object
- * @param recolor_en true: enable recoloring, false: disable
+ * @param en true: enable recoloring, false: disable
  */
-void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
+void lv_label_set_recolor(lv_obj_t * label, bool en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(ext->recolor == recolor_en) return;
+    if(ext->recolor == en) return;
 
-    ext->recolor = recolor_en == false ? 0 : 1;
+    ext->recolor = en == false ? 0 : 1;
 
     lv_label_refr_text(label);  /*Refresh the text because the potential colo codes in text needs to be hided or revealed*/
 }
@@ -298,14 +298,14 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
 /**
  * Set the label to draw (or not draw) background specified in its style's body
  * @param label pointer to a label object
- * @param body_en true: draw body; false: don't draw body
+ * @param en true: draw body; false: don't draw body
  */
-void lv_label_set_body_draw(lv_obj_t * label, bool body_en)
+void lv_label_set_body_draw(lv_obj_t * label, bool en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(ext->body_draw == body_en) return;
+    if(ext->body_draw == en) return;
 
-    ext->body_draw = body_en == false ? 0 : 1;
+    ext->body_draw = en == false ? 0 : 1;
 
     lv_obj_refresh_ext_size(label);
 

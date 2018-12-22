@@ -206,13 +206,13 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param autosize_en true: auto size enable, false: auto size disable
+ * @param en true: auto size enable, false: auto size disable
  */
-void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en)
+void lv_img_set_auto_size(lv_obj_t * img, bool en)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    ext->auto_size = (autosize_en == false ? 0 : 1);
+    ext->auto_size = (en == false ? 0 : 1);
 }
 
 
