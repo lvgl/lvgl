@@ -91,7 +91,6 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         if(txt[line_start] == '\0') return;
     }
 
-    printf("\n");
     /*Align to middle*/
     if(flag & LV_TXT_FLAG_CENTER) {
         line_width = lv_txt_get_width(&txt[line_start], line_end - line_start,
