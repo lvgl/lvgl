@@ -14,7 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-/*Test misc. module version*/
+#include "lv_version.h"
+
 #include "lv_misc/lv_log.h"
 #include "lv_misc/lv_task.h"
 
@@ -62,11 +63,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/*Current version of LittlevGL*/
-#define LVGL_VERSION_MAJOR   5
-#define LVGL_VERSION_MINOR   3
-#define LVGL_VERSION_PATCH   0
-#define LVGL_VERSION_INFO    "dev"
 
 /**********************
  *      TYPEDEFS
