@@ -236,7 +236,7 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
 
-    if(t >= 0 && t < 408){
+    if(t < 408){
         /*Go down*/
         t = (t * 2500) >> 10;      /*[0..1024] range*/
     }
