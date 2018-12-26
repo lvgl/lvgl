@@ -147,41 +147,48 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
 
 uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf)
 {
+    uint8_t px_size = 0;
+
     switch(cf) {
         case LV_IMG_CF_UNKOWN:
         case LV_IMG_CF_RAW:
-            return 0;
+            px_size = 0;
+            break;
         case LV_IMG_CF_TRUE_COLOR:
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-            return LV_COLOR_SIZE;
+            px_size = LV_COLOR_SIZE;
+            break;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
-            return LV_IMG_PX_SIZE_ALPHA_BYTE;
-
+            px_size = LV_IMG_PX_SIZE_ALPHA_BYTE << 3;
+            break;
         case LV_IMG_CF_INDEXED_1BIT:
         case LV_IMG_CF_ALPHA_1BIT:
-            return 1;
-
+            px_size = 1;
+            break;
         case LV_IMG_CF_INDEXED_2BIT:
         case LV_IMG_CF_ALPHA_2BIT:
-            return 2;
-
+            px_size = 2;
+            break;
         case LV_IMG_CF_INDEXED_4BIT:
         case LV_IMG_CF_ALPHA_4BIT:
-            return 4;
-
+            px_size = 4;
+            break;
         case LV_IMG_CF_INDEXED_8BIT:
         case LV_IMG_CF_ALPHA_8BIT:
-            return 8;
-
+            px_size = 8;
+            break;
         default:
-            return 0;
+            px_size = 0;
+            break;
     }
 
-    return 0;
+    return px_size;
 }
 
 bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf)
 {
+    bool is_chroma_keyed = false;
+
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
         case LV_IMG_CF_RAW_CHROMA_KEYED:
@@ -189,17 +196,21 @@ bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf)
         case LV_IMG_CF_INDEXED_2BIT:
         case LV_IMG_CF_INDEXED_4BIT:
         case LV_IMG_CF_INDEXED_8BIT:
-            return true;
+            is_chroma_keyed = true;
+            break;
         default:
-            return false;
+            is_chroma_keyed = false;
+            break;
     }
 
-    return false;
+    return is_chroma_keyed;
 }
 
 
 bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
 {
+    bool has_alpha = false;
+
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
         case LV_IMG_CF_RAW_ALPHA:
@@ -207,12 +218,14 @@ bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
         case LV_IMG_CF_ALPHA_2BIT:
         case LV_IMG_CF_ALPHA_4BIT:
         case LV_IMG_CF_ALPHA_8BIT:
-            return true;
+            has_alpha = true;
+            break;
         default:
-            return false;
+            has_alpha = false;
+            break;
     }
 
-    return false;
+    return has_alpha;
 }
 
 /**
@@ -225,20 +238,25 @@ bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
  */
 lv_img_src_t lv_img_src_get_type(const void * src)
 {
-    if(src == NULL) return LV_IMG_SRC_UNKNOWN;
+    lv_img_src_t img_src_type = LV_IMG_SRC_UNKNOWN;
+
+    if(src == NULL) return img_src_type;
     const uint8_t * u8_p = src;
 
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        return LV_IMG_SRC_FILE;     /*If it's an ASCII character then it's file name*/
+        img_src_type = LV_IMG_SRC_FILE;     /*If it's an ASCII character then it's file name*/
     } else if(u8_p[0] >= 0x80) {
-        return LV_IMG_SRC_SYMBOL;   /*Symbols begins after 0x7F*/
+        img_src_type = LV_IMG_SRC_SYMBOL;   /*Symbols begins after 0x7F*/
     } else {
-        return LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is design to the first byte < 0x20*/
+        img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is design to the first byte < 0x20*/
     }
 
-    LV_LOG_WARN("lv_img_src_get_type: unknown image type");
-    return LV_IMG_SRC_UNKNOWN;
+    if (LV_IMG_SRC_UNKNOWN == img_src_type) {
+        LV_LOG_WARN("lv_img_src_get_type: unknown image type");
+    }
+
+    return img_src_type;
 }
 
 /**
@@ -305,7 +323,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         lv_coord_t width = lv_area_get_width(&mask_com);
 
 #if LV_COMPILER_VLA_SUPPORTED
-        uint8_t buf[(lv_area_get_width(&mask_com) * (LV_COLOR_SIZE + 1))];
+        uint8_t buf[(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1))];
 #else
         uint8_t buf[LV_HOR_RES * ((LV_COLOR_DEPTH >> 3) + 1)];  /*+1 because of the possible alpha byte*/
 #endif
@@ -469,6 +487,7 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
                 decoder_header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
                 decoder_header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
             uint32_t pos = ((y * decoder_header.w + x) * px_size) >> 3;
+            pos += 4;    /*Skip the header*/
             res = lv_fs_seek(&decoder_file, pos);
             if(res != LV_FS_RES_OK) {
                 LV_LOG_WARN("Built-in image decoder seek failed");

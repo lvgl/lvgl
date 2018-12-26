@@ -275,8 +275,10 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 
     lv_style_t * style = lv_obj_get_style(ext->content);
 
+    lv_res_t res = LV_RES_OK;
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
-    if(ext->tab_load_action && id != ext->tab_cur) ext->tab_load_action(tabview, id);
+    if(ext->tab_load_action && id != ext->tab_cur) res = ext->tab_load_action(tabview, id);
+    if(res != LV_RES_OK) return;        /*Prevent the tab loading*/
 
     ext->tab_cur = id;
 
@@ -509,27 +511,34 @@ uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview)
  */
 lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
     switch(type) {
         case LV_TABVIEW_STYLE_BG:
-            return lv_obj_get_style(tabview);
+            style = lv_obj_get_style(tabview);
+            break;
         case LV_TABVIEW_STYLE_BTN_BG:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BG);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BG);
+            break;
         case LV_TABVIEW_STYLE_BTN_REL:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_REL);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_REL);
+            break;
         case LV_TABVIEW_STYLE_BTN_PR:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_PR);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_PR);
+            break;
         case LV_TABVIEW_STYLE_BTN_TGL_REL:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_REL);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_REL);
+            break;
         case LV_TABVIEW_STYLE_BTN_TGL_PR:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**
@@ -577,8 +586,26 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             tabview_realign(tabview);
         }
     } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROLL) {
+        /* The button matrix is not in a group (the tab view is in it) but it should handle the group signals.
+         * So propagate the related signals to the button matrix manually*/
         if(ext->btns) {
             ext->btns->signal_func(ext->btns, sign, param);
+        }
+        if(sign == LV_SIGNAL_FOCUS) {
+            lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+            /*With ENCODER select the first button only in edit mode*/
+            if(indev_type == LV_INDEV_TYPE_ENCODER) {
+                lv_group_t * g = lv_obj_get_group(tabview);
+                if(lv_group_get_editing(g)) {
+                    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+                    btnm_ext->btn_id_pr = 0;
+                    lv_obj_invalidate(ext->btns);
+                }
+            } else {
+                lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+                btnm_ext->btn_id_pr = 0;
+                lv_obj_invalidate(ext->btns);
+            }
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;

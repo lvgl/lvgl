@@ -157,7 +157,7 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p)
 
 /**
  * Remove the node 'node_p' from 'll_p' linked list.
- * It Dose not free the the memory of node.
+ * It does not free the the memory of node.
  * @param ll_p pointer to the linked list of 'node_p'
  * @param node_p pointer to node in 'll_p' linked list
  */
@@ -321,7 +321,10 @@ void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
     if(n_act == n_after) return;    /*Can't move before itself*/
 
 
-    void * n_before = lv_ll_get_prev(ll_p, n_after);
+    void * n_before;
+    if(n_after != NULL) n_before = lv_ll_get_prev(ll_p, n_after);
+    else n_before = lv_ll_get_tail(ll_p);        /*if `n_after` is NULL `n_act` should be the new tail*/
+
     if(n_act == n_before) return;   /*Already before `n_after`*/
 
     /*It's much easier to remove from the list and add again*/

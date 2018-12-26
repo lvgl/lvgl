@@ -445,7 +445,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
             lv_coord_t col;
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
                 for(col = 0; col < map_useful_w; col++) {
-                    lv_color_t px_color = (lv_color_t) * ((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
+                    lv_color_t px_color = *((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
                     disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa);
                 }
                 map_p += map_width * px_size_byte;  /*Next row on the map*/
@@ -483,7 +483,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
                     px_color.full = px_color_p[0];
 #elif LV_COLOR_DEPTH == 16
                     /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/

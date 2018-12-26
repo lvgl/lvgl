@@ -209,28 +209,38 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
  */
 static uint8_t hex_char_to_num(char hex)
 {
+    uint8_t result = 0;
+
     if(hex >= '0' && hex <= '9') {
-        return hex - '0';
+        result = hex - '0';
+    }
+    else {
+        if(hex >= 'a') hex -= 'a' - 'A';    /*Convert to upper case*/
+
+        switch(hex) {
+            case 'A':
+                result = 10;
+                break;
+            case 'B':
+                result = 11;
+                break;
+            case 'C':
+                result = 12;
+                break;
+            case 'D':
+                result = 13;
+                break;
+            case 'E':
+                result = 14;
+                break;
+            case 'F':
+                result = 15;
+                break;
+            default:
+                result = 0;
+                break;
+        }
     }
 
-    if(hex >= 'a') hex -= 'a' - 'A';    /*Convert to upper case*/
-
-    switch(hex) {
-        case 'A':
-            return 10;
-        case 'B':
-            return 11;
-        case 'C':
-            return 12;
-        case 'D':
-            return 13;
-        case 'E':
-            return 14;
-        case 'F':
-            return 15;
-        default:
-            return 0;
-    }
-
-    return 0;
+    return result;
 }

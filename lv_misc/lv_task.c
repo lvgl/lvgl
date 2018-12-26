@@ -31,6 +31,9 @@ static bool lv_task_exec(lv_task_t * lv_task_p);
 static lv_ll_t lv_task_ll;  /*Linked list to store the lv_tasks*/
 static bool lv_task_run = false;
 static uint8_t idle_last = 0;
+static bool task_deleted;
+static bool task_created;
+static lv_task_t  * task_act;
 
 /**********************
  *      MACROS
@@ -79,33 +82,35 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     bool end_flag;
     do {
         end_flag = true;
-        lv_task_t * act = lv_ll_get_head(&lv_task_ll);
-        while(act) {
+        task_deleted = false;
+        task_created = false;
+        task_act = lv_ll_get_head(&lv_task_ll);
+        while(task_act) {
             /* The task might be deleted if it runs only once ('once = 1')
              * So get next element until the current is surely valid*/
-            next = lv_ll_get_next(&lv_task_ll, act);
+            next = lv_ll_get_next(&lv_task_ll, task_act);
 
             /*We reach priority of the turned off task. There is nothing more to do.*/
-            if(act->prio == LV_TASK_PRIO_OFF) {
+            if(task_act->prio == LV_TASK_PRIO_OFF) {
                 break;
             }
 
             /*Here is the interrupter task. Don't execute it again.*/
-            if(act == task_interrupter) {
+            if(task_act == task_interrupter) {
                 task_interrupter = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
-                act = next;
+                task_act = next;
                 continue;                   /*Load the next task*/
             }
 
             /*Just try to run the tasks with highest priority.*/
-            if(act->prio == LV_TASK_PRIO_HIGHEST) {
-                lv_task_exec(act);
+            if(task_act->prio == LV_TASK_PRIO_HIGHEST) {
+                lv_task_exec(task_act);
             }
             /*Tasks with higher priority then the interrupted shall be run in every case*/
             else if(task_interrupter) {
-                if(act->prio > task_interrupter->prio) {
-                    if(lv_task_exec(act)) {
-                        task_interrupter = act;  /*Check all tasks again from the highest priority */
+                if(task_act->prio > task_interrupter->prio) {
+                    if(lv_task_exec(task_act)) {
+                        task_interrupter = task_act;  /*Check all tasks again from the highest priority */
                         end_flag = false;
                         break;
                     }
@@ -114,13 +119,17 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             /* It is no interrupter task or we already reached it earlier.
              * Just run the remaining tasks*/
             else {
-                if(lv_task_exec(act)) {
-                    task_interrupter = act;  /*Check all tasks again from the highest priority */
+                if(lv_task_exec(task_act)) {
+                    task_interrupter = task_act;  /*Check all tasks again from the highest priority */
                     end_flag = false;
                     break;
                 }
             }
-            act = next;         /*Load the next task*/
+
+            if(task_deleted) break;     /*If a task was deleted then this or the next item might be corrupted*/
+            if(task_created) break;     /*If a task was deleted then this or the next item might be corrupted*/
+
+            task_act = next;         /*Load the next task*/
         }
     } while(!end_flag);
 
@@ -185,6 +194,8 @@ lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t
     new_lv_task->once = 0;
     new_lv_task->last_run = lv_tick_get();
 
+    task_created = true;
+
     return new_lv_task;
 }
 
@@ -197,6 +208,8 @@ void lv_task_del(lv_task_t * lv_task_p)
     lv_ll_rem(&lv_task_ll, lv_task_p);
 
     lv_mem_free(lv_task_p);
+
+    if(task_act == lv_task_p) task_deleted = true;      /*The active task was deleted*/
 }
 
 /**
@@ -298,11 +311,16 @@ static bool lv_task_exec(lv_task_t * lv_task_p)
     uint32_t elp = lv_tick_elaps(lv_task_p->last_run);
     if(elp >= lv_task_p->period) {
         lv_task_p->last_run = lv_tick_get();
+        task_deleted = false;
+        task_created = false;
         lv_task_p->task(lv_task_p->param);
 
         /*Delete if it was a one shot lv_task*/
-        if(lv_task_p->once != 0) lv_task_del(lv_task_p);
-
+        if(task_deleted == false) {			/*The task might be deleted by itself as well*/
+        	if(lv_task_p->once != 0) {
+        	    lv_task_del(lv_task_p);
+        	}
+        }
         exec = true;
     }
 

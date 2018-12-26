@@ -250,19 +250,22 @@ int16_t lv_bar_get_max_value(const lv_obj_t * bar)
  */
 lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     switch(type) {
         case LV_BAR_STYLE_BG:
-            return lv_obj_get_style(bar);
+            style = lv_obj_get_style(bar);
+            break;
         case LV_BAR_STYLE_INDIC:
-            return ext->style_indic;
+            style = ext->style_indic;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************
@@ -317,11 +320,11 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
             lv_coord_t h = lv_area_get_height(&indic_area);
 
             if(w >= h) {
-                indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
-                indic_area.x2 = indic_area.x1 + indic_area.x2;
+                indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
+                indic_area.x2 = indic_area.x1 + indic_area.x2 - 1;
             } else {
-                indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value - 1)) / (ext->max_value - ext->min_value);
-                indic_area.y1 = indic_area.y2 - indic_area.y1;
+                indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
+                indic_area.y1 = indic_area.y2 - indic_area.y1 + 1;
             }
 
             /*Draw the indicator*/

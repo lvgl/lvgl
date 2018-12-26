@@ -750,21 +750,25 @@ uint16_t lv_ta_get_max_length(lv_obj_t * ta)
  */
 lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     switch(type) {
         case LV_TA_STYLE_BG:
-            return lv_page_get_style(ta, LV_PAGE_STYLE_BG);
+            style = lv_page_get_style(ta, LV_PAGE_STYLE_BG);
+            break;
         case LV_TA_STYLE_SB:
-            return lv_page_get_style(ta, LV_PAGE_STYLE_SB);
+            style = lv_page_get_style(ta, LV_PAGE_STYLE_SB);
+            break;
         case LV_TA_STYLE_CURSOR:
-            return ext->cursor.style;
+            style = ext->cursor.style;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================

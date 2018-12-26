@@ -223,21 +223,25 @@ bool lv_slider_get_knob_in(const lv_obj_t * slider)
  */
 lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     switch(type) {
         case LV_SLIDER_STYLE_BG:
-            return lv_bar_get_style(slider, LV_BAR_STYLE_BG);
+            style = lv_bar_get_style(slider, LV_BAR_STYLE_BG);
+            break;
         case LV_SLIDER_STYLE_INDIC:
-            return lv_bar_get_style(slider, LV_BAR_STYLE_INDIC);
+            style = lv_bar_get_style(slider, LV_BAR_STYLE_INDIC);
+            break;
         case LV_SLIDER_STYLE_KNOB:
-            return ext->style_knob;
+            style = ext->style_knob;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************
@@ -349,12 +353,12 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
 
         if(slider_w >= slider_h) {
-            area_indic.x2 = (int32_t)((int32_t)(lv_area_get_width(&area_indic) - 1) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.x2 = area_indic.x1 + area_indic.x2;
+            area_indic.x2 = (int32_t)((int32_t)(lv_area_get_width(&area_indic)) * (cur_value - min_value)) / (max_value - min_value);
+            area_indic.x2 = area_indic.x1 + area_indic.x2 - 1;
 
         } else {
-            area_indic.y1 = (int32_t)((int32_t)(lv_area_get_height(&area_indic) - 1) * (cur_value - min_value)) / (max_value - min_value);
-            area_indic.y1 = area_indic.y2 - area_indic.y1;
+            area_indic.y1 = (int32_t)((int32_t)(lv_area_get_height(&area_indic)) * (cur_value - min_value)) / (max_value - min_value);
+            area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
         }
 
         if(cur_value != min_value) lv_draw_rect(&area_indic, mask, style_indic, opa_scale);
@@ -455,13 +459,13 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
         if(tmp != ext->drag_value) {
             ext->drag_value = tmp;
-            if(ext->action != NULL) ext->action(slider);
             lv_obj_invalidate(slider);
+            if(ext->action != NULL) res = ext->action(slider);
         }
     } else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         lv_slider_set_value(slider, ext->drag_value);
         ext->drag_value = LV_SLIDER_NOT_PRESSED;
-        if(ext->action != NULL) ext->action(slider);
+        if(ext->action != NULL) res = ext->action(slider);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /* The knob size depends on slider size.
          * During the drawing method the ext. size is used by the knob so refresh the ext. size.*/
@@ -486,6 +490,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
+#if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(slider);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -494,13 +499,13 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         if(indev_type == LV_INDEV_TYPE_ENCODER && c == LV_GROUP_KEY_ENTER) {
             if(editing) lv_group_set_editing(g, false);
         }
-
+#endif
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
-            if(ext->action != NULL) ext->action(slider);
+            if(ext->action != NULL) res = ext->action(slider);
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
-            if(ext->action != NULL) ext->action(slider);
+            if(ext->action != NULL) res = ext->action(slider);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;

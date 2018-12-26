@@ -361,27 +361,34 @@ uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm)
  */
 lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     switch(type) {
         case LV_BTNM_STYLE_BG:
-            return lv_obj_get_style(btnm);
+            style = lv_obj_get_style(btnm);
+            break;
         case LV_BTNM_STYLE_BTN_REL:
-            return ext->styles_btn[LV_BTN_STATE_REL];
+            style = ext->styles_btn[LV_BTN_STATE_REL];
+            break;
         case LV_BTNM_STYLE_BTN_PR:
-            return ext->styles_btn[LV_BTN_STATE_PR];
+            style = ext->styles_btn[LV_BTN_STATE_PR];
+            break;
         case LV_BTNM_STYLE_BTN_TGL_REL:
-            return ext->styles_btn[LV_BTN_STATE_TGL_REL];
+            style = ext->styles_btn[LV_BTN_STATE_TGL_REL];
+            break;
         case LV_BTNM_STYLE_BTN_TGL_PR:
-            return ext->styles_btn[LV_BTN_STATE_TGL_PR];
+            style = ext->styles_btn[LV_BTN_STATE_TGL_PR];
+            break;
         case LV_BTNM_STYLE_BTN_INA:
-            return ext->styles_btn[LV_BTN_STATE_INA];
+            style = ext->styles_btn[LV_BTN_STATE_INA];
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************
@@ -541,51 +548,50 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             if(txt_i != LV_BTNM_PR_NONE) {
                 if(button_is_repeat_disabled(ext->map_p[txt_i]) == false &&
                         button_is_inactive(ext->map_p[txt_i]) == false) {
-                    ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
+                    res = ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
                 }
             }
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_PR_NONE) {
-            if(ext->action) {
-                uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
-                if(txt_i != LV_BTNM_PR_NONE && button_is_inactive(ext->map_p[txt_i]) == false) {
-                    ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
-                }
+            uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
+            if(button_is_inactive(ext->map_p[txt_i]) == false && txt_i != LV_BTNM_PR_NONE) {        /*Ignore the inactive buttons anf click between the buttons*/
+                if(ext->action) res = ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
+                if(res == LV_RES_OK) {
+
+					/*Invalidate to old pressed area*/;
+					lv_obj_get_coords(btnm, &btnm_area);
+					lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
+					btn_area.x1 += btnm_area.x1;
+					btn_area.y1 += btnm_area.y1;
+					btn_area.x2 += btnm_area.x1;
+					btn_area.y2 += btnm_area.y1;
+					lv_inv_area(&btn_area);
+
+					if(ext->toggle != 0) {
+						/*Invalidate to old toggled area*/;
+						lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_tgl]);
+						btn_area.x1 += btnm_area.x1;
+						btn_area.y1 += btnm_area.y1;
+						btn_area.x2 += btnm_area.x1;
+						btn_area.y2 += btnm_area.y1;
+						lv_inv_area(&btn_area);
+						ext->btn_id_tgl = ext->btn_id_pr;
+
+					}
+
+		#if USE_LV_GROUP
+					/*Leave the clicked button as pressed if this the focused object in a group*/
+					lv_group_t * g = lv_obj_get_group(btnm);
+					if(lv_group_get_focused(g) != btnm) {
+						ext->btn_id_pr = LV_BTNM_PR_NONE;
+					}
+		#else
+					ext->btn_id_pr = LV_BTNM_PR_NONE;
+		#endif
+
+				}
             }
-
-            /*Invalidate to old pressed area*/;
-            lv_obj_get_coords(btnm, &btnm_area);
-            lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
-            btn_area.x1 += btnm_area.x1;
-            btn_area.y1 += btnm_area.y1;
-            btn_area.x2 += btnm_area.x1;
-            btn_area.y2 += btnm_area.y1;
-            lv_inv_area(&btn_area);
-
-            if(ext->toggle != 0) {
-                /*Invalidate to old toggled area*/;
-                lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_tgl]);
-                btn_area.x1 += btnm_area.x1;
-                btn_area.y1 += btnm_area.y1;
-                btn_area.x2 += btnm_area.x1;
-                btn_area.y2 += btnm_area.y1;
-                lv_inv_area(&btn_area);
-
-                ext->btn_id_tgl = ext->btn_id_pr;
-            }
-
-
-
-#if USE_LV_GROUP
-            /*Leave the clicked button as pressed if this the focused object in a group*/
-            lv_group_t * g = lv_obj_get_group(btnm);
-            if(lv_group_get_focused(g) != btnm) {
-                ext->btn_id_pr = LV_BTNM_PR_NONE;
-            }
-#else
-            ext->btn_id_pr = LV_BTNM_PR_NONE;
-#endif
         }
     } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
         ext->btn_id_pr = LV_BTNM_PR_NONE;
@@ -666,7 +672,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             if(ext->action != NULL) {
                 uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
                 if(txt_i != LV_BTNM_PR_NONE) {
-                    ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
+                    res = ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
                 }
             }
         }

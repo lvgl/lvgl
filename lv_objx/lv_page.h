@@ -217,6 +217,21 @@ lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
  */
 bool lv_page_get_arrow_scroll(const lv_obj_t * page);
 
+
+/**
+ * Get that width which can be set to the children to still not cause overflow (show scrollbars)
+ * @param page pointer to a page object
+ * @return the width which still fits into the page
+ */
+lv_coord_t lv_page_get_fit_width(lv_obj_t * page);
+
+/**
+ * Get that height which can be set to the children to still not cause overflow (show scrollbars)
+ * @param page pointer to a page object
+ * @return the height which still fits into the page
+ */
+lv_coord_t lv_page_get_fit_height(lv_obj_t * page);
+
 /**
  * Get width of the scrollable part of a page
  * @param page pointer to a page object

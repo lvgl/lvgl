@@ -28,8 +28,6 @@
 
 static uint16_t _hue;
 static lv_font_t * _font;
-static lv_font_t * _font;
-static lv_font_t * _font;
 
 static lv_theme_t theme;
 static lv_style_t def;
@@ -134,6 +132,13 @@ static void basic_init(void)
     theme.bg = &bg;
     theme.panel = &panel;
 
+}
+
+static void cont_init(void)
+{
+#if USE_LV_CONT != 0
+    theme.cont = &panel;
+#endif
 }
 
 static void btn_init(void)
@@ -785,6 +790,7 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
     }
 
     basic_init();
+    cont_init();
     btn_init();
     label_init();
     bar_init();
