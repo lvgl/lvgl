@@ -89,7 +89,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     if(group == NULL) return;
 
-    /*If the object is already in a group and focused then defocuse it*/
+    /*If the object is already in a group and focused then defocus it*/
     if(obj->group_p) {
         if(lv_obj_is_focused(obj)) {
             lv_group_focus_next(obj->group_p);
