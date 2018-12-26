@@ -600,7 +600,7 @@ static void refr_size(lv_obj_t * table)
     w += bg_style->body.padding.hor * 2;
     h += bg_style->body.padding.ver * 2;
 
-    lv_obj_set_size(table, w, h);
+    lv_obj_set_size(table, w + 1, h + 1);
     lv_obj_invalidate(table);
 }
 
