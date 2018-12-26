@@ -8,7 +8,6 @@
  *********************/
 #include "lv_theme.h"
 
-
 #if USE_LV_THEME_MATERIAL
 
 /*********************
@@ -434,7 +433,7 @@ static void btnm_init(void)
     bg.text.color = LV_COLOR_HEX3(0x555);
 
     lv_style_copy(&rel, theme.panel);
-    rel.body.border.part = LV_BORDER_RIGHT;
+    rel.body.border.part = LV_BORDER_FULL | LV_BORDER_INTERNAL;
     rel.body.border.width = 1;
     rel.body.border.color = LV_COLOR_HEX3(0xbbb);
     rel.body.empty = 1;

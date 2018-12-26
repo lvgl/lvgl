@@ -35,7 +35,7 @@ static bool button_is_inactive(const char * btn_str);
 const char * cut_ctrl_byte(const char * btn_str);
 static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p);
 static uint16_t get_button_text(lv_obj_t * btnm, uint16_t btn_id);
-static void create_buttons(lv_obj_t * btnm, const char ** map);
+static void allocate_btn_areas(lv_obj_t * btnm, const char ** map);
 
 /**********************
  *  STATIC VARIABLES
@@ -154,7 +154,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
     ext->map_p = map;
 
     /*Analyze the map and create the required number of buttons*/
-    create_buttons(btnm, map);
+    allocate_btn_areas(btnm, map);
 
     /*Set size and positions of the buttons*/
     lv_style_t * style_bg = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
@@ -231,10 +231,9 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
         }
         act_y += btn_h + style_bg->body.padding.inner;
 
-        /*If no vertical padding then make sure the last row is at the bottom of 'btnm'*/
-        if(style_bg->body.padding.ver == 0  &&
-                act_y + btn_h * 2 > max_h) {         /*Last row?*/
-            btn_h = max_h - act_y - 1;
+        /*Make sure the last row is at the bottom of 'btnm'*/
+        if(act_y + btn_h * 2 > max_h) {         /*Last row?*/
+            btn_h = max_h - act_y + style_bg->body.padding.ver - 1;
         }
 
         if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
@@ -456,15 +455,16 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
         uint16_t btn_i = 0;
         uint16_t txt_i = 0;
-
+        lv_style_t style_tmp;
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
 
-        if(ext->recolor)
-        	txt_flag = LV_TXT_FLAG_RECOLOR;
+        if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
 
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i ++, txt_i ++) {
             /*Search the next valid text in the map*/
-            while(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
+            while(strcmp(ext->map_p[txt_i], "\n") == 0) {
+                txt_i ++;
+            }
 
             /*Skip hidden buttons*/
             if(button_is_hidden(ext->map_p[txt_i])) continue;
@@ -486,7 +486,29 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             else if(btn_i == ext->btn_id_pr && btn_i == ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_PR);
             else btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL);    /*Not possible option, just to be sure*/
 
-            lv_draw_rect(&area_tmp, mask, btn_style, opa_scale);
+            lv_style_copy(&style_tmp, btn_style);
+
+            /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
+            if(style_tmp.body.border.part & LV_BORDER_INTERNAL) {
+                if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.ver) {
+                    style_tmp.body.border.part &= ~LV_BORDER_TOP;
+                }
+                if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.ver) {
+                    style_tmp.body.border.part &= ~LV_BORDER_BOTTOM;
+                }
+
+                if(txt_i == 0) {
+                    style_tmp.body.border.part &= ~LV_BORDER_LEFT;
+                }
+                else if(strcmp(ext->map_p[txt_i - 1],"\n") == 0) {
+                    style_tmp.body.border.part &= ~LV_BORDER_LEFT;
+                }
+
+                if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
+                        style_tmp.body.border.part &= ~LV_BORDER_RIGHT;
+                }
+            }
+            lv_draw_rect(&area_tmp, mask, &style_tmp, opa_scale);
 
             /*Calculate the size of the text*/
             if(btn_style->glass) btn_style = bg_style;
@@ -577,38 +599,38 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 if(ext->action) res = ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
                 if(res == LV_RES_OK) {
 
-					/*Invalidate to old pressed area*/;
-					lv_obj_get_coords(btnm, &btnm_area);
-					lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
-					btn_area.x1 += btnm_area.x1;
-					btn_area.y1 += btnm_area.y1;
-					btn_area.x2 += btnm_area.x1;
-					btn_area.y2 += btnm_area.y1;
-					lv_inv_area(&btn_area);
+                    /*Invalidate to old pressed area*/;
+                    lv_obj_get_coords(btnm, &btnm_area);
+                    lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_pr]);
+                    btn_area.x1 += btnm_area.x1;
+                    btn_area.y1 += btnm_area.y1;
+                    btn_area.x2 += btnm_area.x1;
+                    btn_area.y2 += btnm_area.y1;
+                    lv_inv_area(&btn_area);
 
-					if(ext->toggle != 0) {
-						/*Invalidate to old toggled area*/;
-						lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_tgl]);
-						btn_area.x1 += btnm_area.x1;
-						btn_area.y1 += btnm_area.y1;
-						btn_area.x2 += btnm_area.x1;
-						btn_area.y2 += btnm_area.y1;
-						lv_inv_area(&btn_area);
-						ext->btn_id_tgl = ext->btn_id_pr;
+                    if(ext->toggle != 0) {
+                        /*Invalidate to old toggled area*/;
+                        lv_area_copy(&btn_area, &ext->button_areas[ext->btn_id_tgl]);
+                        btn_area.x1 += btnm_area.x1;
+                        btn_area.y1 += btnm_area.y1;
+                        btn_area.x2 += btnm_area.x1;
+                        btn_area.y2 += btnm_area.y1;
+                        lv_inv_area(&btn_area);
+                        ext->btn_id_tgl = ext->btn_id_pr;
 
-					}
+                    }
 
-		#if USE_LV_GROUP
-					/*Leave the clicked button when releases if this not the focused object in a group*/
-					lv_group_t * g = lv_obj_get_group(btnm);
-					if(lv_group_get_focused(g) != btnm) {
-						ext->btn_id_pr = LV_BTNM_PR_NONE;
-					}
-		#else
-					ext->btn_id_pr = LV_BTNM_PR_NONE;
-		#endif
+        #if USE_LV_GROUP
+                    /*Leave the clicked button when releases if this not the focused object in a group*/
+                    lv_group_t * g = lv_obj_get_group(btnm);
+                    if(lv_group_get_focused(g) != btnm) {
+                        ext->btn_id_pr = LV_BTNM_PR_NONE;
+                    }
+        #else
+                    ext->btn_id_pr = LV_BTNM_PR_NONE;
+        #endif
 
-				}
+                }
             }
         }
     } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
@@ -715,7 +737,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
  * @param btnm pointer to button matrix object
  * @param map_p pointer to a string array
  */
-static void create_buttons(lv_obj_t * btnm, const char ** map)
+static void allocate_btn_areas(lv_obj_t * btnm, const char ** map)
 {
     /*Count the buttons in the map*/
     uint16_t btn_cnt = 0;

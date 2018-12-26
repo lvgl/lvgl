@@ -429,29 +429,29 @@ static void btnm_init(void)
     btnm_bg.body.border.width =  1;
 
     lv_style_copy(&rel, &btn_rel);
-    rel.body.border.part = LV_BORDER_RIGHT;
-    rel.body.border.width = 2;
-    rel.body.radius = 0;
+    rel.body.border.part = LV_BORDER_FULL | LV_BORDER_INTERNAL;
+    rel.body.border.width = 1;
+    rel.body.radius = 2;
 
     lv_style_copy(&pr, &btn_pr);
-    pr.body.border.part = LV_BORDER_RIGHT;
-    pr.body.border.width = 2;
-    pr.body.radius = 0;
+    pr.body.border.part = rel.body.border.part;
+    pr.body.border.width = rel.body.border.width;
+    pr.body.radius = rel.body.radius;
 
     lv_style_copy(&tgl_rel, &btn_tgl_rel);
-    tgl_rel.body.border.part = LV_BORDER_RIGHT;
-    tgl_rel.body.border.width = 2;
-    tgl_rel.body.radius = 0;
+    tgl_rel.body.border.part = rel.body.border.part;
+    tgl_rel.body.border.width = rel.body.border.width;
+    tgl_rel.body.radius = rel.body.radius;
 
     lv_style_copy(&tgl_pr, &btn_tgl_pr);
-    tgl_pr.body.border.part = LV_BORDER_RIGHT;
-    tgl_pr.body.border.width = 2;
-    tgl_pr.body.radius = 0;
+    tgl_pr.body.border.part = rel.body.border.part;
+    tgl_pr.body.border.width = rel.body.border.width;
+    tgl_pr.body.radius = rel.body.radius;
 
     lv_style_copy(&ina, &btn_ina);
-    ina.body.border.part = LV_BORDER_RIGHT;
-    ina.body.border.width = 2;
-    ina.body.radius = 0;
+    ina.body.border.part = rel.body.border.part;
+    ina.body.border.width = rel.body.border.width;
+    ina.body.radius = rel.body.radius;
 
     theme.btnm.bg = &btnm_bg;
     theme.btnm.btn.rel = &rel;
