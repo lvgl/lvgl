@@ -344,6 +344,8 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(ext->changed == 0) {
             if(lv_sw_get_state(sw)) lv_sw_off_anim(sw);
             else lv_sw_on_anim(sw);
+
+            if(slider_action != NULL) res = slider_action(sw);
         }
         /*If the switch was dragged then calculate the new state based on the current position*/
         else {
