@@ -34,7 +34,7 @@ extern "C" {
 
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES == 0 || LV_VER_RES == 0
-#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater then 0"
+#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater than 0"
 #endif
 
 #if LV_ANTIALIAS > 1
@@ -701,7 +701,7 @@ bool lv_obj_get_click(const lv_obj_t * obj);
 /**
  * Get the top enable attribute of an object
  * @param obj pointer to an object
- * @return true: the auto top feture is enabled
+ * @return true: the auto top feature is enabled
  */
 bool lv_obj_get_top(const lv_obj_t * obj);
 
@@ -713,7 +713,7 @@ bool lv_obj_get_top(const lv_obj_t * obj);
 bool lv_obj_get_drag(const lv_obj_t * obj);
 
 /**
- * Get the drag thow enable attribute of an object
+ * Get the drag throw enable attribute of an object
  * @param obj pointer to an object
  * @return true: drag throw is enabled
  */
@@ -810,7 +810,7 @@ void * lv_obj_get_group(const lv_obj_t * obj);
 
 
 /**
- * Tell whether the ohe object is the focused object of a group or not.
+ * Tell whether the object is the focused object of a group or not.
  * @param obj pointer to an object
  * @return true: the object is focused, false: the object is not focused or not in a group
  */

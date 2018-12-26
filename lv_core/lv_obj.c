@@ -81,7 +81,7 @@ void lv_init(void)
     /*Init. the sstyles*/
     lv_style_init();
 
-    /*Init. the screen refresh system*/
+    /*Initialize the screen refresh system*/
     lv_refr_init();
 
     /*Create the default screen*/
@@ -1587,7 +1587,7 @@ bool lv_obj_get_drag(const lv_obj_t * obj)
 }
 
 /**
- * Get the drag thow enable attribute of an object
+ * Get the drag throw enable attribute of an object
  * @param obj pointer to an object
  * @return true: drag throw is enabled
  */

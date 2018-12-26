@@ -58,7 +58,7 @@ void lv_log_register_print(void f(lv_log_level_t, const char *, uint32_t,  const
  * @param line line number in the source code where the log added
  * @param dsc description of the log
  */
-void lv_log_add(lv_log_level_t level, const char * file, uint32_t line, const char * dsc);
+void lv_log_add(lv_log_level_t level, const char * file, int line, const char * dsc);
 
 /**********************
  *      MACROS
