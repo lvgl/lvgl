@@ -5,6 +5,8 @@
 **LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
 https://littlevgl.com
 
+Check out the [References](https://blog.littlevgl.com/2018-12-26/references) where LittlevGL was used. You can add your project too!
+
 ## Key features
 * **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
 * **Advanced graphics** with animations, anti-aliasing, opacity, smooth scrolling
