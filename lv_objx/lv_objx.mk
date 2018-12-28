@@ -29,7 +29,7 @@ CSRCS += lv_page.c
 CSRCS += lv_sw.c
 CSRCS += lv_win.c
 
-DEPPATH += --dep-path lvgl/lv_objx
-VPATH += :lvgl/lv_objx
+DEPPATH += --dep-path $(LVGL_DIR)/lvgl/lv_objx
+VPATH += :$(LVGL_DIR)/lvgl/lv_objx
 
 CFLAGS += "-I$(LVGL_DIR)/lvgl/lv_objx"
