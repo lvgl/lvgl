@@ -107,6 +107,13 @@ void lv_vdb_flush(void)
     /*Flush the rendered content to the display*/
     lv_disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
 
+
+#if LV_VDB_TRUE_DOUBLE_BUFFERED
+    while(vdb_flushing);
+    memcpy(vdb[(vdb_active + 1) & 0x1].buf, vdb[vdb_active].buf, LV_VDB_SIZE_IN_BYTES);
+#endif
+
+
 #if LV_VDB_DOUBLE
     /*Make the other VDB active. The content of the current will be kept until the next flush*/
     vdb_active++;

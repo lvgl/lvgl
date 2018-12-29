@@ -16,6 +16,9 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_INV_FIFO_SIZE
+#define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -195,7 +198,19 @@ static void lv_refr_task(void * param)
 
     /* In the callback lv_obj_inv can occur
      * therefore be sure the inv_buf is cleared prior to it*/
-    if(refr_done != false) {
+    if(refr_done) {
+#if LV_VDB_TRUE_DOUBLE_BUFFERED
+        lv_vdb_t * vdb_p = lv_vdb_get();
+        vdb_p->area.x1 = 0;
+        vdb_p->area.x2 = LV_HOR_RES-1;
+        vdb_p->area.y1 = 0;
+        vdb_p->area.y2 = LV_VER_RES - 1;
+
+        /*Flush the content of the VDB*/
+        lv_vdb_flush();
+#endif
+
+
         if(monitor_cb != NULL) {
             monitor_cb(lv_tick_elaps(start), px_num);
         }
@@ -296,6 +311,8 @@ static void lv_refr_area_no_vdb(const lv_area_t * area_p)
  */
 static void lv_refr_area_with_vdb(const lv_area_t * area_p)
 {
+
+#if LV_VDB_TRUE_DOUBLE_BUFFERED == 0
     /*Calculate the max row num*/
     lv_coord_t w = lv_area_get_width(area_p);
     lv_coord_t h = lv_area_get_height(area_p);
@@ -366,6 +383,14 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
         /*Refresh this part too*/
         lv_refr_area_part_vdb(area_p);
     }
+#else
+    lv_vdb_t * vdb_p = lv_vdb_get();
+    vdb_p->area.x1 = 0;
+    vdb_p->area.x2 = LV_HOR_RES-1;
+    vdb_p->area.y1 = 0;
+    vdb_p->area.y2 = LV_VER_RES - 1;
+    lv_refr_area_part_vdb(area_p);
+#endif
 }
 
 /**
@@ -396,8 +421,12 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
     lv_refr_obj_and_children(lv_layer_top(), &start_mask);
     lv_refr_obj_and_children(lv_layer_sys(), &start_mask);
 
+    /* In true double buffered mode flush only once when all areas were rendered.
+     * In normal mode flush after every area */
+#if LV_VDB_TRUE_DOUBLE_BUFFERED == 0
     /*Flush the content of the VDB*/
     lv_vdb_flush();
+#endif
 }
 
 #endif /*LV_VDB_SIZE == 0*/
