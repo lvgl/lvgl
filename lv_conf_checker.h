@@ -1,11 +1,11 @@
 /**
+ * GENERATED FILE, DO NOT EDIT IT!
  * @file lv_conf_checker.h
  * Make sure all the defines of lv_conf.h have a default value
 **/
 
 #ifndef LV_CONF_CHECKER_H
 #define  LV_CONF_CHECKER_H
-
 /*===================
    Dynamic memory
  *===================*/
@@ -13,11 +13,11 @@
 /* Memory size which will be used by the library
  * to store the graphical objects and other data */
 #ifndef LV_MEM_CUSTOM
-#define LV_MEM_CUSTOM       0               /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
+#define LV_MEM_CUSTOM      0                /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
 #endif
 #if LV_MEM_CUSTOM == 0
 #ifndef LV_MEM_SIZE
-#define LV_MEM_SIZE    (32U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#define LV_MEM_SIZE    (64U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
 #endif
 #ifndef LV_MEM_ATTR
 #define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
@@ -43,36 +43,15 @@
 
 /* Horizontal and vertical resolution of the library.*/
 #ifndef LV_HOR_RES
-#define LV_HOR_RES          (320)
+#define LV_HOR_RES          (480)
 #endif
 #ifndef LV_VER_RES
-#define LV_VER_RES          (240)
+#define LV_VER_RES          (320)
 #endif
+/* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide
+ * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI
 #define LV_DPI              100
-#endif
-
-/* Size of VDB (Virtual Display Buffer: the internal graphics buffer).
- * Required for buffered drawing, opacity and anti-aliasing
- * VDB makes the double buffering, you don't need to deal with it!
- * Typical size: ~1/10 screen */
-#ifndef LV_VDB_SIZE
-#define LV_VDB_SIZE         (30 * LV_HOR_RES)  /*Size of VDB in pixel count (1/10 screen size is good for first)*/
-#endif
-#ifndef LV_VDB_PX_BPP
-#define LV_VDB_PX_BPP       LV_COLOR_SIZE      /*Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays. (Special formats are handled with `disp_drv->vdb_wr`)*/
-#endif
-#ifndef LV_VDB_ADR
-#define LV_VDB_ADR          0                  /*Place VDB to a specific address (e.g. in external RAM) (0: allocate automatically into RAM; LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`)*/
-#endif
-
-/* Use two Virtual Display buffers (VDB) parallelize rendering and flushing (optional)
- * The flushing should use DMA to write the frame buffer in the background*/
-#ifndef LV_VDB_DOUBLE
-#define LV_VDB_DOUBLE       0       /*1: Enable the use of 2 VDBs*/
-#endif
-#ifndef LV_VDB2_ADR
-#define LV_VDB2_ADR         0       /*Place VDB2 to a specific address (e.g. in external RAM) (0: allocate automatically into RAM; LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`)*/
 #endif
 
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
@@ -80,12 +59,64 @@
 #define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
 #endif
 
-/*Screen refresh settings*/
+/*Screen refresh period in milliseconds*/
 #ifndef LV_REFR_PERIOD
-#define LV_REFR_PERIOD      30    /*Screen refresh period in milliseconds*/
+#define LV_REFR_PERIOD      30
 #endif
-#ifndef LV_INV_FIFO_SIZE
-#define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
+
+/*-----------------
+ *  VDB settings
+ *----------------*/
+
+/* VDB (Virtual Display Buffer) is an internal graphics buffer.
+ * To images will be drawn into this buffer first and then
+ * the buffer will be passed to your `disp_drv.disp_flush` function to
+ * copy it to your frame buffer.
+ * VDB is required for: buffered drawing, opacity, anti-aliasing and shadows
+ * Learn more: https://docs.littlevgl.com/#Drawing*/
+
+/* Size of the VDB in pixels. Typical size: ~1/10 screen. Must be >= LV_HOR_RES
+ * Setting it to 0 will disable VDB and `disp_drv.disp_fill` and `disp_drv.disp_map` functions
+ * will be called to draw to the frame buffer directly*/
+#ifndef LV_VDB_SIZE
+#define LV_VDB_SIZE         ((LV_VER_RES * LV_HOR_RES) / 10)
+#endif
+
+ /* Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays.
+  * Special formats are handled with `disp_drv.vdb_wr`)*/
+#ifndef LV_VDB_PX_BPP
+#define LV_VDB_PX_BPP       LV_COLOR_SIZE       /*LV_COLOR_SIZE comes from LV_COLOR_DEPTH below to set 8, 16 or 32 bit pixel size automatically */
+#endif
+
+ /* Place VDB to a specific address (e.g. in external RAM)
+  * 0: allocate automatically into RAM
+  * LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`*/
+#ifndef LV_VDB_ADR
+#define LV_VDB_ADR          0
+#endif
+
+/* Use two Virtual Display buffers (VDB) parallelize rendering and flushing (optional)
+ * The flushing should use DMA to write the frame buffer in the background */
+#ifndef LV_VDB_DOUBLE
+#define LV_VDB_DOUBLE       0
+#endif
+
+/* Place VDB2 to a specific address (e.g. in external RAM)
+ * 0: allocate automatically into RAM
+ * LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`*/
+#ifndef LV_VDB2_ADR
+#define LV_VDB2_ADR         0
+#endif
+
+/* Using true double buffering in `disp_drv.disp_flush` you will always get the image of the whole screen.
+ * Your only task is to set the rendered image (`color_p` parameter) as frame buffer address or send it to your display.
+ * The best if you do in the blank period of you display to avoid tearing effect.
+ * Requires:
+ * - LV_VDB_SIZE = LV_HOR_RES * LV_VER_RES
+ * - LV_VDB_DOUBLE = 1
+ */
+#ifndef LV_VDB_TRUE_DOUBLE_BUFFERED
+#define LV_VDB_TRUE_DOUBLE_BUFFERED 0
 #endif
 
 /*=================
@@ -114,13 +145,13 @@
 
 /*Color settings*/
 #ifndef LV_COLOR_DEPTH
-#define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/32*/
+#define LV_COLOR_DEPTH     32                     /*Color depth: 1/8/16/32*/
 #endif
 #ifndef LV_COLOR_16_SWAP
 #define LV_COLOR_16_SWAP   0                      /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
 #endif
 #ifndef LV_COLOR_SCREEN_TRANSP
-#define LV_COLOR_SCREEN_TRANSP          0         /*1: Enable screen transparency. Useful for OSD or other overlapping GUIs. Requires ARGB8888 colors*/
+#define LV_COLOR_SCREEN_TRANSP        0           /*1: Enable screen transparency. Useful for OSD or other overlapping GUIs. Requires ARGB8888 colors*/
 #endif
 #ifndef LV_COLOR_TRANSP
 #define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn (with chroma keying)*/
@@ -134,7 +165,7 @@
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
 #endif
 
-/*Graphics feature usage*/
+/*Feature usage*/
 #ifndef USE_LV_ANIMATION
 #define USE_LV_ANIMATION        1               /*1: Enable all animations*/
 #endif
@@ -151,7 +182,7 @@
 #define USE_LV_REAL_DRAW        1               /*1: Enable function which draw directly to the frame buffer instead of VDB (required if LV_VDB_SIZE = 0)*/
 #endif
 #ifndef USE_LV_FILESYSTEM
-#define USE_LV_FILESYSTEM       1               /*1: Enable file system (required by images*/
+#define USE_LV_FILESYSTEM       1               /*1: Enable file system (might be required for images*/
 #endif
 
 /*Compiler settings*/
@@ -160,9 +191,6 @@
 #endif
 #ifndef LV_ATTRIBUTE_TASK_HANDLER
 #define LV_ATTRIBUTE_TASK_HANDLER               /* Define a custom attribute to `lv_task_handler` function */
-#endif
-#ifndef LV_ATTRIBUTE_FLUSH_READY
-#define LV_ATTRIBUTE_FLUSH_READY                /* Define a custom attribute to `lv_flush_ready` function */
 #endif
 #ifndef LV_COMPILER_VLA_SUPPORTED
 #define LV_COMPILER_VLA_SUPPORTED            1  /* 1: Variable length array is supported*/
@@ -184,6 +212,7 @@
 #endif
 #endif     /*LV_TICK_CUSTOM*/
 
+
 /*Log settings*/
 #ifndef USE_LV_LOG
 #define USE_LV_LOG      1   /*Enable/disable the log module*/
@@ -196,11 +225,12 @@
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
  */
 #ifndef LV_LOG_LEVEL
-#define LV_LOG_LEVEL    LV_LOG_LEVEL_INFO
+#define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 #endif
+/* 1: Print the log with 'printf'; 0: user need to register a callback*/
 
 #ifndef LV_LOG_PRINTF
-#define LV_LOG_PRINTF   0   /* 1: Print the log with 'printf'; 0: user need to register a callback*/
+#define LV_LOG_PRINTF   1
 #endif
 #endif  /*USE_LV_LOG*/
 
@@ -208,95 +238,95 @@
  *  THEME USAGE
  *================*/
 #ifndef LV_THEME_LIVE_UPDATE
-#define LV_THEME_LIVE_UPDATE    0       /*1: Allow theme switching at run time. Uses 8..10 kB of RAM*/
+#define LV_THEME_LIVE_UPDATE    1       /*1: Allow theme switching at run time. Uses 8..10 kB of RAM*/
 #endif
 
 #ifndef USE_LV_THEME_TEMPL
 #define USE_LV_THEME_TEMPL      0       /*Just for test*/
 #endif
 #ifndef USE_LV_THEME_DEFAULT
-#define USE_LV_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define USE_LV_THEME_DEFAULT    1       /*Built mainly from the built-in styles. Consumes very few RAM*/
 #endif
 #ifndef USE_LV_THEME_ALIEN
-#define USE_LV_THEME_ALIEN      0       /*Dark futuristic theme*/
+#define USE_LV_THEME_ALIEN      1       /*Dark futuristic theme*/
 #endif
 #ifndef USE_LV_THEME_NIGHT
-#define USE_LV_THEME_NIGHT      0       /*Dark elegant theme*/
+#define USE_LV_THEME_NIGHT      1       /*Dark elegant theme*/
 #endif
 #ifndef USE_LV_THEME_MONO
-#define USE_LV_THEME_MONO       0       /*Mono color theme for monochrome displays*/
+#define USE_LV_THEME_MONO       1       /*Mono color theme for monochrome displays*/
 #endif
 #ifndef USE_LV_THEME_MATERIAL
-#define USE_LV_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows*/
+#define USE_LV_THEME_MATERIAL   1       /*Flat theme with bold colors and light shadows*/
 #endif
 #ifndef USE_LV_THEME_ZEN
-#define USE_LV_THEME_ZEN        0       /*Peaceful, mainly light theme */
+#define USE_LV_THEME_ZEN        1       /*Peaceful, mainly light theme */
 #endif
 #ifndef USE_LV_THEME_NEMO
-#define USE_LV_THEME_NEMO       0       /*Water-like theme based on the movie "Finding Nemo"*/
+#define USE_LV_THEME_NEMO       1       /*Water-like theme based on the movie "Finding Nemo"*/
 #endif
 
 /*==================
  *    FONT USAGE
  *===================*/
 
-/* More info about fonts: https://littlevgl.com/basics#fonts
+/* More info about fonts: https://docs.littlevgl.com/#Fonts
  * To enable a built-in font use 1,2,4 or 8 values
- * which will determine the bit-per-pixel */
+ * which will determine the bit-per-pixel. Higher value means smoother fonts */
 #ifndef USE_LV_FONT_DEJAVU_10
-#define USE_LV_FONT_DEJAVU_10              0
+#define USE_LV_FONT_DEJAVU_10              4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_10_LATIN_SUP
-#define USE_LV_FONT_DEJAVU_10_LATIN_SUP    0
+#define USE_LV_FONT_DEJAVU_10_LATIN_SUP    4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_10_CYRILLIC
-#define USE_LV_FONT_DEJAVU_10_CYRILLIC     0
+#define USE_LV_FONT_DEJAVU_10_CYRILLIC     4
 #endif
 #ifndef USE_LV_FONT_SYMBOL_10
-#define USE_LV_FONT_SYMBOL_10              0
+#define USE_LV_FONT_SYMBOL_10              4
 #endif
 
 #ifndef USE_LV_FONT_DEJAVU_20
 #define USE_LV_FONT_DEJAVU_20              4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_20_LATIN_SUP
-#define USE_LV_FONT_DEJAVU_20_LATIN_SUP    0
+#define USE_LV_FONT_DEJAVU_20_LATIN_SUP    4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_20_CYRILLIC
-#define USE_LV_FONT_DEJAVU_20_CYRILLIC     0
+#define USE_LV_FONT_DEJAVU_20_CYRILLIC     4
 #endif
 #ifndef USE_LV_FONT_SYMBOL_20
 #define USE_LV_FONT_SYMBOL_20              4
 #endif
 
 #ifndef USE_LV_FONT_DEJAVU_30
-#define USE_LV_FONT_DEJAVU_30              0
+#define USE_LV_FONT_DEJAVU_30              4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_30_LATIN_SUP
-#define USE_LV_FONT_DEJAVU_30_LATIN_SUP    0
+#define USE_LV_FONT_DEJAVU_30_LATIN_SUP    4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_30_CYRILLIC
-#define USE_LV_FONT_DEJAVU_30_CYRILLIC     0
+#define USE_LV_FONT_DEJAVU_30_CYRILLIC     4
 #endif
 #ifndef USE_LV_FONT_SYMBOL_30
-#define USE_LV_FONT_SYMBOL_30              0
+#define USE_LV_FONT_SYMBOL_30              4
 #endif
 
 #ifndef USE_LV_FONT_DEJAVU_40
-#define USE_LV_FONT_DEJAVU_40              0
+#define USE_LV_FONT_DEJAVU_40              4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_40_LATIN_SUP
-#define USE_LV_FONT_DEJAVU_40_LATIN_SUP    0
+#define USE_LV_FONT_DEJAVU_40_LATIN_SUP    4
 #endif
 #ifndef USE_LV_FONT_DEJAVU_40_CYRILLIC
-#define USE_LV_FONT_DEJAVU_40_CYRILLIC     0
+#define USE_LV_FONT_DEJAVU_40_CYRILLIC     4
 #endif
 #ifndef USE_LV_FONT_SYMBOL_40
-#define USE_LV_FONT_SYMBOL_40              0
+#define USE_LV_FONT_SYMBOL_40              4
 #endif
 
 #ifndef USE_LV_FONT_MONOSPACE_8
-#define USE_LV_FONT_MONOSPACE_8            0
+#define USE_LV_FONT_MONOSPACE_8            1
 #endif
 
 /* Optionally declare your custom fonts here.
@@ -308,6 +338,7 @@
 #ifndef LV_FONT_CUSTOM_DECLARE
 #define LV_FONT_CUSTOM_DECLARE
 #endif
+
 
 #ifndef LV_FONT_DEFAULT
 #define LV_FONT_DEFAULT        &lv_font_dejavu_20     /*Always set a default font from the built-in fonts*/
@@ -322,15 +353,15 @@
 #ifndef LV_OBJ_FREE_PTR
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 #endif
-#ifndef LV_OBJ_REALIGN
-#define LV_OBJ_REALIGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+#ifndef LV_OBJ_REAILGN
+#define LV_OBJ_REAILGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 #endif
 
 /*==================
  *  LV OBJ X USAGE
  *================*/
 /*
- * Documentation of the object types: https://littlevgl.com/object-types
+ * Documentation of the object types: https://docs.littlevgl.com/#Object-types
  */
 
 /*****************
