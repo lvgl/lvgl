@@ -108,12 +108,6 @@ void lv_vdb_flush(void)
     lv_disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
 
 
-#if LV_VDB_TRUE_DOUBLE_BUFFERED
-    while(vdb_flushing);
-    memcpy(vdb[(vdb_active + 1) & 0x1].buf, vdb[vdb_active].buf, LV_VDB_SIZE_IN_BYTES);
-#endif
-
-
 #if LV_VDB_DOUBLE
     /*Make the other VDB active. The content of the current will be kept until the next flush*/
     vdb_active++;
@@ -123,6 +117,14 @@ void lv_vdb_flush(void)
 #  if LV_COLOR_SCREEN_TRANSP
         memset(vdb[vdb_active].buf, 0x00, LV_VDB_SIZE_IN_BYTES);
 #  endif  /*LV_COLOR_SCREEN_TRANSP*/
+
+    /* With true double buffering the flushing should be only the address change of the current frame buffer
+     * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
+     * The changes will be written to the new VDB.*/
+#if LV_VDB_TRUE_DOUBLE_BUFFERED
+        while(vdb_flushing);
+        memcpy(vdb[vdb_active].buf, vdb[(vdb_active + 1) & 0x1].buf, LV_VDB_SIZE_IN_BYTES);
+#endif
 
 #endif  /*#if LV_VDB_DOUBLE*/
 

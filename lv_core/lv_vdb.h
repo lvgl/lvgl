@@ -35,6 +35,12 @@ extern "C" {
 #define LV_VDB_PX_BPP LV_COLOR_SIZE
 #endif
 
+
+#if LV_VDB_TRUE_DOUBLE_BUFFERED && (LV_VDB_SIZE != LV_HOR_RES * LV_VER_RES || LV_VDB_DOUBLE == 0)
+#error "With LV_VDB_TRUE_DOUBLE_BUFFERED: (LV_VDB_SIZE = LV_HOR_RES * LV_VER_RES and LV_VDB_DOUBLE = 1 is required"
+#endif
+
+
 /* The size of VDB in bytes.
  * (LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3): just divide by 8 to convert bits to bytes
  * (((LV_VDB_SIZE * LV_VDB_PX_BPP) & 0x7) ? 1 : 0): add an extra byte to round up.
