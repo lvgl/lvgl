@@ -121,10 +121,10 @@ void lv_vdb_flush(void)
     /* With true double buffering the flushing should be only the address change of the current frame buffer
      * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
      * The changes will be written to the new VDB.*/
-#if LV_VDB_TRUE_DOUBLE_BUFFERED
+#  if LV_VDB_TRUE_DOUBLE_BUFFERED
         while(vdb_flushing);
         memcpy(vdb[vdb_active].buf, vdb[(vdb_active + 1) & 0x1].buf, LV_VDB_SIZE_IN_BYTES);
-#endif
+#  endif
 
 #endif  /*#if LV_VDB_DOUBLE*/
 

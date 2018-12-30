@@ -122,7 +122,7 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
  ***************************************************************/
 
 /**
- * Give the size of an encoded  character
+ * Give the size of an encoded character
  * @param str pointer to a character in a string
  * @return length of the encoded character (1,2,3 ...). O in invalid
  */
