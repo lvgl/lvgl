@@ -193,6 +193,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
             btn_cnt ++;
         }
 
+
         /*Only deal with the non empty lines*/
         if(btn_cnt != 0) {
             /*Calculate the width of all units*/
@@ -232,7 +233,7 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
         act_y += btn_h + style_bg->body.padding.inner;
 
         /*Make sure the last row is at the bottom of 'btnm'*/
-        if(act_y + btn_h * 2 > max_h) {         /*Last row?*/
+        if(map_p_tmp[btn_cnt][0] == '\0') {         /*Last row?*/
             btn_h = max_h - act_y + style_bg->body.padding.ver - 1;
         }
 
