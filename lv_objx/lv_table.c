@@ -276,7 +276,7 @@ void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_
 {
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
      if(row >= ext->row_cnt || col >= ext->col_cnt) {
-         LV_LOG_WARN("lv_table_set_cell_align: invalid row or column");
+         LV_LOG_WARN("lv_table_set_cell_type: invalid row or column");
          return;
      }
      uint32_t cell = row * ext->col_cnt + col;
@@ -460,15 +460,15 @@ lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
      if(row >= ext->row_cnt || col >= ext->col_cnt) {
          LV_LOG_WARN("lv_table_get_cell_type: invalid row or column");
-         return 0;    /*Just return with something*/
+         return 1;    /*Just return with something*/
      }
      uint32_t cell = row * ext->col_cnt + col;
 
-     if(ext->cell_data[cell] == NULL) return 0;    /*Just return with something*/
+     if(ext->cell_data[cell] == NULL) return 1;    /*Just return with something*/
      else {
          lv_table_cell_format_t format;
          format.format_byte = ext->cell_data[cell][0];
-         return format.align;
+         return format.type + 1;        /*0,1,2,3 is stored but user sees 1,2,3,4*/
      }
 }
 
