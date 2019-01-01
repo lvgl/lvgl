@@ -31,7 +31,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_btn_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_design_mode_t mode);
+static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
 
 #if USE_LV_ANIMATION && LV_BTN_INK_EFFECT

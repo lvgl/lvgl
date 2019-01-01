@@ -174,7 +174,7 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
  **********************/
 
 
-static void line_draw_hor(line_draw_t * line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+static void line_draw_hor(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     lv_coord_t width = style->line.width - 1;
     lv_coord_t width_half = width >> 1;
@@ -182,10 +182,10 @@ static void line_draw_hor(line_draw_t * line, const lv_area_t * mask, const lv_s
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
 
     lv_area_t act_area;
-    act_area.x1 = line->p1.x;
-    act_area.x2 = line->p2.x;
-    act_area.y1 = line->p1.y - width_half - width_1;
-    act_area.y2 = line->p2.y + width_half ;
+    act_area.x1 = main_line->p1.x;
+    act_area.x2 = main_line->p2.x;
+    act_area.y1 = main_line->p1.y - width_half - width_1;
+    act_area.y2 = main_line->p2.y + width_half ;
 
     lv_area_t draw_area;
     draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
@@ -195,7 +195,7 @@ static void line_draw_hor(line_draw_t * line, const lv_area_t * mask, const lv_s
     fill_fp(&draw_area, mask, style->line.color, opa);
 }
 
-static void line_draw_ver(line_draw_t * line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     lv_coord_t width = style->line.width - 1;
     lv_coord_t width_half = width >> 1;
@@ -204,10 +204,10 @@ static void line_draw_ver(line_draw_t * line, const lv_area_t * mask, const lv_s
 
 
     lv_area_t act_area;
-    act_area.x1 = line->p1.x - width_half;
-    act_area.x2 = line->p2.x + width_half + width_1;
-    act_area.y1 = line->p1.y;
-    act_area.y2 = line->p2.y;
+    act_area.x1 = main_line->p1.x - width_half;
+    act_area.x2 = main_line->p2.x + width_half + width_1;
+    act_area.y1 = main_line->p1.y;
+    act_area.y2 = main_line->p2.y;
 
     lv_area_t draw_area;
     draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);

@@ -32,7 +32,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_page_sb_refresh(lv_obj_t * main);
+static void lv_page_sb_refresh(lv_obj_t * page);
 static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mode_t mode);
 static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
@@ -1042,7 +1042,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
  */
 static void lv_page_sb_refresh(lv_obj_t * page)
 {
-
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_style_t * style = lv_obj_get_style(page);
     lv_obj_t * scrl = ext->scrl;
