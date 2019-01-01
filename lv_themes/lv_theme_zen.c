@@ -27,8 +27,10 @@
  *  STATIC VARIABLES
  **********************/
 static lv_theme_t theme;
-static lv_style_t def;
 /*Static style definitions*/
+static lv_style_t def;
+static lv_style_t bg;
+static lv_style_t panel;
 static lv_style_t sb;
 
 /*Saved input parameters*/
@@ -45,8 +47,6 @@ static lv_font_t * _font;
 
 static void basic_init(void)
 {
-    static lv_style_t bg;
-    static lv_style_t panel;
 
     lv_style_copy(&def, &lv_style_pretty);  /*Initialize the default style*/
     def.body.border.opa = LV_OPA_COVER;
@@ -560,6 +560,15 @@ static void ta_init(void)
 #endif
 }
 
+static void spinbox_init(void)
+{
+#if USE_LV_SPINBOX
+    theme.spinbox.bg= &panel;
+    theme.spinbox.cursor = theme.ta.cursor;
+    theme.spinbox.sb = theme.ta.sb;
+#endif
+}
+
 static void list_init(void)
 {
 #if USE_LV_LIST != 0
@@ -682,6 +691,30 @@ static void tabview_init(void)
 #endif
 }
 
+static void tileview_init(void)
+{
+#if USE_LV_TILEVIEW != 0
+    theme.tileview.bg = &lv_style_transp_tight;
+    theme.tileview.scrl = &lv_style_transp_tight;
+    theme.tileview.sb = theme.page.sb;
+#endif
+}
+
+static void table_init(void)
+{
+#if USE_LV_TABLE != 0
+    static lv_style_t cell;
+    lv_style_copy(&cell, &panel);
+    cell.body.radius = 0;
+    cell.body.border.width = 1;
+    cell.body.shadow.width = 0;
+    cell.body.padding.hor = LV_DPI / 12;
+    cell.body.padding.ver = LV_DPI / 12;
+
+    theme.table.bg = &lv_style_transp_tight;
+    theme.table.cell = &cell;
+#endif
+}
 
 static void win_init(void)
 {
@@ -762,10 +795,13 @@ lv_theme_t * lv_theme_zen_init(uint16_t hue, lv_font_t * font)
     mbox_init();
     page_init();
     ta_init();
+    spinbox_init();
     list_init();
     ddlist_init();
     roller_init();
     tabview_init();
+    tileview_init();
+    table_init();
     win_init();
 
     return &theme;

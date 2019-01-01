@@ -37,7 +37,7 @@ static lv_theme_t * current_theme;
 /* Store the styles in this array.
  * Can't determine the size in compile time because sizeof is not evaluated (should be `sizeof(lv_theme_t) / sizeof(lv_style_t*)`).
  * Error will be generated in run time if too small.*/
-static lv_style_t th_styles[100];
+static lv_style_t th_styles[120];
 static bool inited = false;
 static lv_theme_t current_theme;
 #endif

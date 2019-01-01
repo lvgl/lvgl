@@ -9,6 +9,7 @@
 #include "lv_spinbox.h"
 
 #if USE_LV_SPINBOX != 0
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -83,7 +84,13 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new spinbox spinbox*/
     if(copy == NULL) {
-        /*Already inited above*/
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_BG, th->spinbox.bg);
+            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_CURSOR, th->spinbox.cursor);
+            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_SB, th->spinbox.sb);
+        }
     }
     /*Copy an existing spinbox*/
     else {

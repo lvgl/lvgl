@@ -12,6 +12,7 @@
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_label.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -82,7 +83,14 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new table table*/
     if(copy == NULL) {
-        lv_table_set_style(new_table, LV_TABLE_STYLE_BG, &lv_style_plain_color);
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, th->table.bg);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL, th->table.cell);
+        } else {
+            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, &lv_style_plain_color);
+        }
     }
     /*Copy an existing table*/
     else {
