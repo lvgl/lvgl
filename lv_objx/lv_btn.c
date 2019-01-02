@@ -684,7 +684,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                     res = ext->actions[LV_BTN_ACTION_CLICK](btn);
                 }
             }
-            if( LV_RES_INV != res ) {
+            if(res != LV_RES_INV) {
                 ext->long_pr_action_executed  = 0;
             }
         }
