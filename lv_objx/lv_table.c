@@ -562,7 +562,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
         lv_point_t txt_size;
         lv_area_t cell_area;
         lv_area_t txt_area;
-        lv_txt_flag_t txt_flags;
+        lv_txt_flag_t txt_flags = LV_TXT_FLAG_NONE;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(table);
 
         uint16_t col;
