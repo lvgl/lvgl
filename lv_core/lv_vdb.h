@@ -31,8 +31,7 @@ extern "C" {
 #define LV_VDB_ADR_INV  8       /*8 is still too small to be valid but it's aligned on 64 bit machines as well*/
 
 #ifndef LV_VDB_PX_BPP
-#warning "LV_VDB_PX_BPP is not specified in lv_conf.h. Use the default value (LV_COLOR_SIZE)"
-#define LV_VDB_PX_BPP LV_COLOR_SIZE
+#define LV_VDB_PX_BPP LV_COLOR_SIZE     /* Default is LV_COLOR_SIZE */
 #endif
 
 /* The size of VDB in bytes.
