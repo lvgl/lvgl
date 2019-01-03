@@ -29,7 +29,6 @@
  **********************/
 static lv_theme_t theme;
 static lv_style_t def;
-static lv_style_t bg, panel;
 
 /*Static style definitions*/
 static lv_style_t sb;
@@ -48,6 +47,8 @@ static lv_font_t * _font;
 
 static void basic_init(void)
 {
+    static lv_style_t bg, panel;
+
     lv_style_copy(&def, &lv_style_plain);  /*Initialize the default style*/
     def.text.font = _font;
     def.body.radius = DEF_RADIUS;
@@ -543,7 +544,7 @@ static void ta_init(void)
 static void spinbox_init(void)
 {
 #if USE_LV_SPINBOX
-    theme.spinbox.bg= &panel;
+    theme.spinbox.bg= theme.panel;
     theme.spinbox.cursor = theme.ta.cursor;
     theme.spinbox.sb = theme.ta.sb;
 #endif
@@ -730,7 +731,7 @@ static void table_init(void)
 {
 #if USE_LV_TABLE != 0
     static lv_style_t cell;
-    lv_style_copy(&cell, &panel);
+    lv_style_copy(&cell, theme.panel);
     cell.body.radius = 0;
     cell.body.border.width = 1;
     cell.body.padding.hor = LV_DPI / 12;
