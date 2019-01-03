@@ -346,7 +346,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
-    lv_res_t res;
+    lv_res_t res = LV_RES_OK;
 
     /* Include the ancient signal function */
     if(sign != LV_SIGNAL_CONTROLL)
