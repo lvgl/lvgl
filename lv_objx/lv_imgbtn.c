@@ -156,6 +156,7 @@ void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t *
  * Getter functions
  *====================*/
 
+#if LV_IMGBTN_TILED == 0
 /**
  * Get the images in a  given state
  * @param imgbtn pointer to an image button object
@@ -164,10 +165,52 @@ void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t *
  */
 const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
-// lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
-    return NULL;//ext->img_src[state];
+    return ext->img_src[state];
 }
+#else
+
+/**
+ * Get the left image in a given state
+ * @param imgbtn pointer to an image button object
+ * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @return pointer to the left image source (a C array or path to a file)
+ */
+const void * lv_imgbtn_get_src_left(lv_obj_t * imgbtn, lv_btn_state_t state)
+{
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+
+    return ext->img_src_left[state];
+}
+
+/**
+ * Get the middle image in a given state
+ * @param imgbtn pointer to an image button object
+ * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @return pointer to the middle image source (a C array or path to a file)
+ */
+const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_btn_state_t state)
+{
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+
+    return ext->img_src_middle[state];
+}
+
+/**
+ * Get the right image in a given state
+ * @param imgbtn pointer to an image button object
+ * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @return pointer to the left image source (a C array or path to a file)
+ */
+const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_btn_state_t state)
+{
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+
+    return ext->img_src_right[state];
+}
+
+#endif
 
 /**
  * Get style of a image button.

@@ -597,7 +597,6 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                 for(col_merge = 0; col_merge + col < ext->col_cnt - 1; col_merge ++) {
 
                     if(ext->cell_data[cell + col_merge] != NULL) {
-                        lv_table_cell_format_t format;
                         format.format_byte = ext->cell_data[cell + col_merge][0];
                         if(format.right_merge) cell_area.x2 += ext->col_w[col + col_merge + 1];
                         else break;

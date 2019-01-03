@@ -704,7 +704,7 @@ static void table_init(void)
 {
 #if USE_LV_TABLE != 0
     static lv_style_t cell;
-    lv_style_copy(&cell, theme.panel;);
+    lv_style_copy(&cell, theme.panel);
     cell.body.radius = 0;
     cell.body.border.width = 1;
     cell.body.shadow.width = 0;
