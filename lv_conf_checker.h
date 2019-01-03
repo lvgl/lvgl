@@ -353,8 +353,8 @@
 #ifndef LV_OBJ_FREE_PTR
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 #endif
-#ifndef LV_OBJ_REAILGN
-#define LV_OBJ_REAILGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+#ifndef LV_OBJ_REALIGN
+#define LV_OBJ_REALIGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 #endif
 
 /*==================

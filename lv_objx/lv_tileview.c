@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include "lv_cont.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -89,11 +90,18 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new tileview*/
     if(copy == NULL) {
         lv_obj_set_size(new_tileview, LV_HOR_RES, LV_VER_RES);
-
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), false);
         lv_page_set_scrl_fit(new_tileview, true, true);
-        lv_page_set_style(new_tileview, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
-        lv_page_set_style(new_tileview, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_BG, th->tileview.bg);
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_SCRL, th->tileview.scrl);
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_SB, th->tileview.sb);
+        } else {
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
+        }
     }
     /*Copy an existing tileview*/
     else {

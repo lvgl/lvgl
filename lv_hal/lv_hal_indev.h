@@ -115,7 +115,7 @@ typedef struct _lv_indev_t {
     union {
         struct _lv_obj_t *cursor;       /*Cursor for LV_INPUT_TYPE_POINTER*/
         struct _lv_group_t *group;      /*Keypad destination group*/
-        lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
+        const lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
 
     };
     struct _lv_indev_t *next;

@@ -900,20 +900,21 @@ void lv_ta_cursor_up(lv_obj_t * ta)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return true/false, depends on 'mode'
  */
-static bool lv_ta_design(lv_obj_t * ta, const lv_area_t * masp, lv_design_mode_t mode)
+static bool lv_ta_design(lv_obj_t * ta, const lv_area_t * mask, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask_p area*/
-        return ancestor_design(ta, masp, mode);
+        return ancestor_design(ta, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw the object*/
-        ancestor_design(ta, masp, mode);
+        ancestor_design(ta, mask, mode);
 
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_design(ta, masp, mode);
+        ancestor_design(ta, mask, mode);
     }
     return true;
 }
+
 
 /**
  * An extended scrollable design of the page. Calls the normal design function and draws a cursor.

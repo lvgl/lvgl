@@ -45,27 +45,27 @@ static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * nex
 /**
  * Initialize linked list
  * @param ll_dsc pointer to ll_dsc variable
- * @param n_size the size of 1 node in bytes
+ * @param node_size the size of 1 node in bytes
  */
-void lv_ll_init(lv_ll_t * ll_p, uint32_t n_size)
+void lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
 {
     ll_p->head = NULL;
     ll_p->tail = NULL;
 #ifdef LV_MEM_ENV64
     /*Round the size up to 8*/
-    if(n_size & 0x7) {
-        n_size = n_size & (~0x7);
-        n_size += 8;
+    if(node_size & 0x7) {
+        node_size = node_size & (~0x7);
+        node_size += 8;
     }
 #else
     /*Round the size up to 4*/
-    if(n_size & 0x3) {
-        n_size = n_size & (~0x3);
-        n_size += 4;
+    if(node_size & 0x3) {
+        node_size = node_size & (~0x3);
+        node_size += 4;
     }
 #endif
 
-    ll_p->n_size = n_size;
+    ll_p->n_size = node_size;
 }
 
 /**

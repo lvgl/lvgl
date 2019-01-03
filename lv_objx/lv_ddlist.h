@@ -243,14 +243,14 @@ lv_label_align_t lv_ddlist_get_align(const lv_obj_t *ddlist);
  * @param ddlist pointer to drop down list object
  * @param anim_en true: use animation; false: not use animations
  */
-void lv_ddlist_open(lv_obj_t * ddlist, bool anim);
+void lv_ddlist_open(lv_obj_t * ddlist, bool anim_en);
 
 /**
  * Close (Collapse) the drop down list
  * @param ddlist pointer to drop down list object
- * @param anim true: use animation; false: not use animations
+ * @param anim_en true: use animation; false: not use animations
  */
-void lv_ddlist_close(lv_obj_t * ddlist, bool anim);
+void lv_ddlist_close(lv_obj_t * ddlist, bool anim_en);
 
 /**********************
  *      MACROS

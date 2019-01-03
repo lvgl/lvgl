@@ -35,6 +35,8 @@ extern "C" {
 #ifndef LV_TABLE_COL_MAX
 #define LV_TABLE_COL_MAX    12
 #endif
+
+#define LV_TABLE_CELL_STYLE_CNT 4
 /**********************
  *      TYPEDEFS
  **********************/
@@ -43,6 +45,7 @@ typedef union {
     struct {
         uint8_t align:3;
         uint8_t right_merge:1;
+        uint8_t type:2;
     };
     uint8_t format_byte;
 }lv_table_cell_format_t;
@@ -53,7 +56,7 @@ typedef struct {
     uint16_t col_cnt;
     uint16_t row_cnt;
     char ** cell_data;
-    lv_style_t * cell_style;
+    lv_style_t * cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
 } lv_table_ext_t;
 
@@ -61,7 +64,10 @@ typedef struct {
 /*Styles*/
 enum {
     LV_TABLE_STYLE_BG,
-    LV_TABLE_STYLE_CELL,
+    LV_TABLE_STYLE_CELL1,
+    LV_TABLE_STYLE_CELL2,
+    LV_TABLE_STYLE_CELL3,
+    LV_TABLE_STYLE_CELL4,
 };
 typedef uint8_t lv_table_style_t;
 
@@ -123,6 +129,15 @@ void lv_table_set_col_width(lv_obj_t * table, uint16_t col_id, lv_coord_t w);
 void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_label_align_t align);
 
 /**
+ * Set the type of a cell.
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @param type 1,2,3 or 4. The cell style will be chosen accordingly.
+ */
+void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_t type);
+
+/**
  * Merge a cell with the right neighbor. The value of the cell to the right won't be displayed.
  * @param table table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
@@ -182,6 +197,15 @@ lv_coord_t lv_table_get_col_width(lv_obj_t * table, uint16_t col_id);
  * @return LV_LABEL_ALIGN_LEFT (default in case of error) or LV_LABEL_ALIGN_CENTER or LV_LABEL_ALIGN_RIGHT
  */
 lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_t col);
+
+/**
+ * Get the type of a cell
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @return 1,2,3 or 4
+ */
+lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t col);
 
 /**
  * Get the cell merge attribute.

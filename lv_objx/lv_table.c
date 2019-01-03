@@ -12,6 +12,7 @@
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_label.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -67,7 +68,10 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->cell_data = NULL;
-    ext->cell_style = &lv_style_plain;
+    ext->cell_style[0] = &lv_style_plain;
+    ext->cell_style[1] = &lv_style_plain;
+    ext->cell_style[2] = &lv_style_plain;
+    ext->cell_style[3] = &lv_style_plain;
     ext->col_cnt = 0;
     ext->row_cnt = 0;
 
@@ -82,12 +86,25 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new table table*/
     if(copy == NULL) {
-        lv_table_set_style(new_table, LV_TABLE_STYLE_BG, &lv_style_plain_color);
+        /*Set the default styles*/
+        lv_theme_t * th = lv_theme_get_current();
+        if(th) {
+            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, th->table.bg);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL1, th->table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL2, th->table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL3, th->table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL4, th->table.cell);
+        } else {
+            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, &lv_style_plain_color);
+        }
     }
     /*Copy an existing table*/
     else {
         lv_table_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->cell_style = copy_ext->cell_style;
+        ext->cell_style[0] = copy_ext->cell_style[0];
+        ext->cell_style[1] = copy_ext->cell_style[1];
+        ext->cell_style[2] = copy_ext->cell_style[2];
+        ext->cell_style[3] = copy_ext->cell_style[3];
         ext->col_cnt = copy_ext->col_cnt;
         ext->row_cnt = copy_ext->row_cnt;
 
@@ -129,6 +146,7 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     else {
         format.align = LV_LABEL_ALIGN_LEFT;
         format.right_merge = 0;
+        format.type = 0;
     }
 
 
@@ -237,12 +255,44 @@ void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_la
 
      if(ext->cell_data[cell] == NULL) {
          ext->cell_data[cell] = lv_mem_alloc(2);        /*+1: trailing '\0; +1: format byte*/
+         ext->cell_data[cell][0] = 0;
          ext->cell_data[cell][1] = '\0';
      }
 
      lv_table_cell_format_t format;
      format.format_byte = ext->cell_data[cell][0];
      format.align = align;
+     ext->cell_data[cell][0] = format.format_byte;
+}
+
+/**
+ * Set the type of a cell.
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @param type 1,2,3 or 4. The cell style will be chosen accordingly.
+ */
+void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_t type)
+{
+    lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+     if(row >= ext->row_cnt || col >= ext->col_cnt) {
+         LV_LOG_WARN("lv_table_set_cell_type: invalid row or column");
+         return;
+     }
+     uint32_t cell = row * ext->col_cnt + col;
+
+     if(ext->cell_data[cell] == NULL) {
+         ext->cell_data[cell] = lv_mem_alloc(2);        /*+1: trailing '\0; +1: format byte*/
+         ext->cell_data[cell][0] = 0;
+         ext->cell_data[cell][1] = '\0';
+     }
+
+     if(type > 0) type--;   /*User gives 1,2,3,4 but easier to handle 0, 1, 2, 3*/
+     if(type >= LV_TABLE_CELL_STYLE_CNT) type = LV_TABLE_CELL_STYLE_CNT - 1;
+
+     lv_table_cell_format_t format;
+     format.format_byte = ext->cell_data[cell][0];
+     format.type = type;
      ext->cell_data[cell][0] = format.format_byte;
 }
 
@@ -265,6 +315,7 @@ void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col,
 
     if(ext->cell_data[cell] == NULL) {
         ext->cell_data[cell] = lv_mem_alloc(2);        /*+1: trailing '\0; +1: format byte*/
+        ext->cell_data[cell][0] = 0;
         ext->cell_data[cell][1] = '\0';
     }
 
@@ -290,9 +341,21 @@ void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, lv_style_t * st
             lv_obj_set_style(table, style);
             refr_size(table);
             break;
-        case LV_TABLE_STYLE_CELL:
-            ext->cell_style = style;
-            lv_obj_invalidate(table);
+        case LV_TABLE_STYLE_CELL1:
+            ext->cell_style[0] = style;
+            refr_size(table);
+            break;
+        case LV_TABLE_STYLE_CELL2:
+            ext->cell_style[1] = style;
+            refr_size(table);
+            break;
+        case LV_TABLE_STYLE_CELL3:
+            ext->cell_style[2] = style;
+            refr_size(table);
+            break;
+        case LV_TABLE_STYLE_CELL4:
+            ext->cell_style[3] = style;
+            refr_size(table);
             break;
     }
 }
@@ -386,6 +449,30 @@ lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_
 }
 
 /**
+ * Get the type of a cell
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @return 1,2,3 or 4
+ */
+lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t col)
+{
+    lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+     if(row >= ext->row_cnt || col >= ext->col_cnt) {
+         LV_LOG_WARN("lv_table_get_cell_type: invalid row or column");
+         return 1;    /*Just return with something*/
+     }
+     uint32_t cell = row * ext->col_cnt + col;
+
+     if(ext->cell_data[cell] == NULL) return 1;    /*Just return with something*/
+     else {
+         lv_table_cell_format_t format;
+         format.format_byte = ext->cell_data[cell][0];
+         return format.type + 1;        /*0,1,2,3 is stored but user sees 1,2,3,4*/
+     }
+}
+
+/**
  * Get the cell merge attribute.
  * @param table table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
@@ -425,8 +512,17 @@ lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type)
         case LV_TABLE_STYLE_BG:
             style =  lv_obj_get_style(table);
             break;
-        case LV_TABLE_STYLE_CELL:
-            style = ext->cell_style;
+        case LV_TABLE_STYLE_CELL1:
+            style = ext->cell_style[0];
+            break;
+        case LV_TABLE_STYLE_CELL2:
+            style = ext->cell_style[1];
+            break;
+        case LV_TABLE_STYLE_CELL3:
+            style = ext->cell_style[2];
+            break;
+        case LV_TABLE_STYLE_CELL4:
+            style = ext->cell_style[3];
             break;
         default:
             return NULL;
@@ -461,11 +557,13 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
 
         lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
         lv_style_t * bg_style = lv_obj_get_style(table);
+        lv_style_t * cell_style;
         lv_coord_t h_row;
         lv_point_t txt_size;
         lv_area_t cell_area;
         lv_area_t txt_area;
-        lv_txt_flag_t txt_flags;
+        lv_txt_flag_t txt_flags = LV_TXT_FLAG_NONE;
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(table);
 
         uint16_t col;
         uint16_t row;
@@ -482,6 +580,16 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
 
             for(col = 0; col < ext->col_cnt; col++) {
 
+                lv_table_cell_format_t format;
+                if(ext->cell_data[cell]) {
+                    format.format_byte = ext->cell_data[cell][0];
+                } else {
+                    format.right_merge = 0;
+                    format.align = LV_LABEL_ALIGN_LEFT;
+                    format.type = 0;
+                }
+
+                cell_style = ext->cell_style[format.type];
                 cell_area.x1 = cell_area.x2;
                 cell_area.x2 = cell_area.x1 + ext->col_w[col];
 
@@ -489,7 +597,6 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                 for(col_merge = 0; col_merge + col < ext->col_cnt - 1; col_merge ++) {
 
                     if(ext->cell_data[cell + col_merge] != NULL) {
-                        lv_table_cell_format_t format;
                         format.format_byte = ext->cell_data[cell + col_merge][0];
                         if(format.right_merge) cell_area.x2 += ext->col_w[col + col_merge + 1];
                         else break;
@@ -499,16 +606,23 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                 }
 
 
-                lv_draw_rect(&cell_area, mask, ext->cell_style, LV_OPA_COVER);
+                lv_draw_rect(&cell_area, mask, cell_style, opa_scale);
 
                 if(ext->cell_data[cell]) {
-                    txt_area.x1 = cell_area.x1 + ext->cell_style->body.padding.hor;
-                    txt_area.x2 = cell_area.x2 - ext->cell_style->body.padding.hor;
-                    txt_area.y1 = cell_area.y1 + ext->cell_style->body.padding.ver;
-                    txt_area.y2 = cell_area.y2 - ext->cell_style->body.padding.ver;
+                    txt_area.x1 = cell_area.x1 + cell_style->body.padding.hor;
+                    txt_area.x2 = cell_area.x2 - cell_style->body.padding.hor;
+                    txt_area.y1 = cell_area.y1 + cell_style->body.padding.ver;
+                    txt_area.y2 = cell_area.y2 - cell_style->body.padding.ver;
 
-                    lv_table_cell_format_t format;
-                    format.format_byte = ext->cell_data[cell][0];
+                    lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
+                                              cell_style->text.letter_space, cell_style->text.line_space, lv_area_get_width(&txt_area), txt_flags);
+
+
+                    txt_area.x1 = cell_area.x1 + cell_style->body.padding.hor;
+                    txt_area.x2 = cell_area.x2 - cell_style->body.padding.hor;
+
+                    txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
+                    txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
 
                     switch(format.align) {
                     default:
@@ -523,10 +637,27 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                         break;
                     }
 
-                    lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, ext->cell_style->text.font,
-                            ext->cell_style->text.letter_space, ext->cell_style->text.line_space, lv_area_get_width(&txt_area), txt_flags);
+                    lv_draw_label(&txt_area, mask, cell_style, opa_scale, ext->cell_data[cell] + 1, txt_flags, NULL);
 
-                    lv_draw_label(&txt_area, mask, ext->cell_style, LV_OPA_COVER, ext->cell_data[cell] + 1, txt_flags, NULL);
+                    /*Draw lines after '\n's*/
+                    lv_point_t p1;
+                    lv_point_t p2;
+                    p1.x = cell_area.x1;
+                    p2.x = cell_area.x2;
+                    uint16_t i;
+                    for(i = 1; ext->cell_data[cell][i] != '\0'; i++) {
+                        if(ext->cell_data[cell][i] == '\n') {
+                            ext->cell_data[cell][i] = '\0';
+                            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
+                                                     cell_style->text.letter_space, cell_style->text.line_space, lv_area_get_width(&txt_area), txt_flags);
+
+                            p1.y = txt_area.y1 + txt_size.y + cell_style->text.line_space / 2;
+                            p2.y = txt_area.y1 + txt_size.y + cell_style->text.line_space / 2;
+                            lv_draw_line(&p1, &p2, mask, cell_style, opa_scale);
+
+                            ext->cell_data[cell][i] = '\n';
+                        }
+                    }
                 }
 
                 cell += col_merge + 1;
@@ -609,11 +740,12 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
     lv_point_t txt_size;
     lv_coord_t txt_w;
+    lv_style_t * cell_style;
 
     uint16_t row_start = row_id * ext->col_cnt;
     uint16_t cell;
     uint16_t col;
-    lv_coord_t h_max = lv_font_get_height(ext->cell_style->text.font);
+    lv_coord_t h_max = lv_font_get_height(ext->cell_style[0]->text.font + 2 * ext->cell_style[0]->body.padding.ver);
 
     for(cell = row_start, col = 0; cell < row_start + ext->col_cnt; cell++, col ++) {
         if(ext->cell_data[cell] != NULL) {
@@ -632,18 +764,22 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
                 }
             }
 
-            txt_w -= 2 * ext->cell_style->body.padding.hor;
+            lv_table_cell_format_t format;
+            format.format_byte = ext->cell_data[cell][0];
+            cell_style = ext->cell_style[format.type];
 
-            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, ext->cell_style->text.font,
-                    ext->cell_style->text.letter_space, ext->cell_style->text.line_space, txt_w, LV_TXT_FLAG_NONE);
+            txt_w -= 2 * cell_style->body.padding.hor;
 
-            h_max = LV_MATH_MAX(txt_size.y, h_max);
+            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
+                    cell_style->text.letter_space, cell_style->text.line_space, txt_w, LV_TXT_FLAG_NONE);
+
+            h_max = LV_MATH_MAX(txt_size.y + 2 * cell_style->body.padding.ver, h_max);
             cell += col_merge;
             col += col_merge;
         }
     }
 
-    return h_max + 2 * ext->cell_style->body.padding.ver;
+    return h_max;
 }
 
 #endif

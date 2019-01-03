@@ -522,6 +522,15 @@ static void ta_init(void)
 #endif
 }
 
+static void spinbox_init(void)
+{
+#if USE_LV_SPINBOX
+    theme.spinbox.bg= &panel;
+    theme.spinbox.cursor = theme.ta.cursor;
+    theme.spinbox.sb = theme.ta.sb;
+#endif
+}
+
 static void list_init(void)
 {
 #if USE_LV_LIST != 0
@@ -539,6 +548,7 @@ static void list_init(void)
     list_btn_rel.body.border.width = 1;
     list_btn_rel.body.radius = LV_DPI / 10;
     list_btn_rel.text.color = lv_color_hsv_to_rgb(_hue, 5, 80);
+    list_btn_rel.image.color = lv_color_hsv_to_rgb(_hue, 5, 80);
     list_btn_rel.body.padding.ver = LV_DPI / 6;
     list_btn_rel.body.padding.hor = LV_DPI / 8;
 
@@ -547,16 +557,15 @@ static void list_init(void)
     list_btn_pr.body.grad_color = btn_pr.body.main_color;
     list_btn_pr.body.border.color = lv_color_hsv_to_rgb(_hue, 10, 5);
     list_btn_pr.body.border.width = 0;
-    list_btn_pr.body.radius = LV_DPI / 30;
     list_btn_pr.body.padding.ver = LV_DPI / 6;
     list_btn_pr.body.padding.hor = LV_DPI / 8;
     list_btn_pr.text.color = lv_color_hsv_to_rgb(_hue, 5, 80);
+    list_btn_pr.image.color = lv_color_hsv_to_rgb(_hue, 5, 80);
 
     lv_style_copy(&list_btn_tgl_rel, &list_btn_rel);
     list_btn_tgl_rel.body.empty = 0;
     list_btn_tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 8);
     list_btn_tgl_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 8);
-    list_btn_tgl_rel.body.radius = LV_DPI / 30;
 
     lv_style_copy(&list_btn_tgl_pr, &list_btn_tgl_rel);
     list_btn_tgl_pr.body.main_color = btn_tgl_pr.body.main_color;
@@ -622,6 +631,30 @@ static void tabview_init(void)
 #endif
 }
 
+static void tileview_init(void)
+{
+#if USE_LV_TILEVIEW != 0
+    theme.tileview.bg = &lv_style_transp_tight;
+    theme.tileview.scrl = &lv_style_transp_tight;
+    theme.tileview.sb = theme.page.sb;
+#endif
+}
+
+static void table_init(void)
+{
+#if USE_LV_TABLE != 0
+    static lv_style_t cell;
+    lv_style_copy(&cell, &panel);
+    cell.body.radius = 0;
+    cell.body.border.width = 1;
+    cell.body.padding.hor = LV_DPI / 12;
+    cell.body.padding.ver = LV_DPI / 12;
+
+
+    theme.table.bg = &lv_style_transp_tight;
+    theme.table.cell = &cell;
+#endif
+}
 
 static void win_init(void)
 {
@@ -705,10 +738,13 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t * font)
     mbox_init();
     page_init();
     ta_init();
+    spinbox_init();
     list_init();
     ddlist_init();
     roller_init();
     tabview_init();
+    tileview_init();
+    table_init();
     win_init();
 
     return &theme;
