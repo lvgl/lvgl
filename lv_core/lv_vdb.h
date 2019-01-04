@@ -85,6 +85,24 @@ void lv_vdb_set_adr(void * buf1, void * buf2);
  */
 void lv_flush_ready(void);
 
+/**
+ * Get currently active VDB, where the drawing happens. Used with `LV_VDB_DOUBLE  1`
+ * @return pointer to the active VDB. If `LV_VDB_DOUBLE  0` give the single VDB
+ */
+lv_vdb_t * lv_vdb_get_active(void);
+
+/**
+ * Get currently inactive VDB, which is being displayed or being flushed. Used with `LV_VDB_DOUBLE  1`
+ * @return pointer to the inactive VDB. If `LV_VDB_DOUBLE  0` give the single VDB
+ */
+lv_vdb_t * lv_vdb_get_inactive(void);
+
+/**
+ * Whether the flushing is in progress or not
+ * @return true: flushing is in progress; false: flushing ready
+ */
+bool lv_vdb_is_flushing(void);
+
 /**********************
  *      MACROS
  **********************/

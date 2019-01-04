@@ -118,14 +118,6 @@ void lv_vdb_flush(void)
         memset(vdb[vdb_active].buf, 0x00, LV_VDB_SIZE_IN_BYTES);
 #  endif  /*LV_COLOR_SCREEN_TRANSP*/
 
-    /* With true double buffering the flushing should be only the address change of the current frame buffer
-     * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
-     * The changes will be written to the new VDB.*/
-#  if LV_VDB_TRUE_DOUBLE_BUFFERED
-        while(vdb_flushing);
-        memcpy(vdb[vdb_active].buf, vdb[(vdb_active + 1) & 0x1].buf, LV_VDB_SIZE_IN_BYTES);
-#  endif
-
 #endif  /*#if LV_VDB_DOUBLE*/
 
 }
@@ -158,6 +150,34 @@ LV_ATTRIBUTE_FLUSH_READY void lv_flush_ready(void)
 #if LV_VDB_DOUBLE == 0 && LV_COLOR_SCREEN_TRANSP
     memset(vdb_buf, 0x00, LV_VDB_SIZE_IN_BYTES);
 #endif
+}
+
+/**
+ * Get currently active VDB, where the drawing happens. Used with `LV_VDB_DOUBLE  1`
+ * @return pointer to the active VDB. If `LV_VDB_DOUBLE  0` give the single VDB
+ */
+lv_vdb_t * lv_vdb_get_active(void)
+{
+    return &vdb[vdb_active];
+}
+
+/**
+ * Get currently inactive VDB, which is being displayed or being flushed. Used with `LV_VDB_DOUBLE  1`
+ * @return pointer to the inactive VDB. If `LV_VDB_DOUBLE  0` give the single VDB
+ */
+lv_vdb_t * lv_vdb_get_inactive(void)
+{
+    return &vdb[(vdb_active + 1) & 0x1];
+
+}
+
+/**
+ * Whether the flushing is in progress or not
+ * @return true: flushing is in progress; false: flushing ready
+ */
+bool lv_vdb_is_flushing(void)
+{
+    return vdb_flushing;
 }
 
 /**********************

@@ -191,14 +191,10 @@ static void lv_refr_task(void * param)
 
     lv_refr_areas();
 
-    bool refr_done = false;
-    if(inv_buf_p != 0) refr_done = true;
-    memset(inv_buf, 0, sizeof(inv_buf));
-    inv_buf_p = 0;
+    /*If refresh happened ...*/
+    if(inv_buf_p != 0) {
 
-    /* In the callback lv_obj_inv can occur
-     * therefore be sure the inv_buf is cleared prior to it*/
-    if(refr_done) {
+        /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
 #if LV_VDB_TRUE_DOUBLE_BUFFERED
         lv_vdb_t * vdb_p = lv_vdb_get();
         vdb_p->area.x1 = 0;
@@ -208,9 +204,41 @@ static void lv_refr_task(void * param)
 
         /*Flush the content of the VDB*/
         lv_vdb_flush();
+
+        /* With true double buffering the flushing should be only the address change of the current frame buffer
+         * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
+         * The changes will be written to the new VDB.*/
+        //            while(vdb_flushing);
+        lv_vdb_t * vdb_act = lv_vdb_get_active();
+        lv_vdb_t * vdb_ina = lv_vdb_get_inactive();
+
+        uint8_t * buf_act = (uint8_t *) vdb_act->buf;
+        uint8_t * buf_inv = (uint8_t *) vdb_ina->buf;
+
+
+        uint16_t a;
+        for(a = 0; a < inv_buf_p; a++) {
+            if(inv_buf[a].joined == 0) {
+                lv_coord_t y;
+                uint32_t start_offs = ((LV_HOR_RES * inv_buf[a].area.y1 + inv_buf[a].area.x1) * LV_VDB_PX_BPP) >> 3;
+                uint32_t line_length = (lv_area_get_width(&inv_buf[a].area) * LV_VDB_PX_BPP) >> 3;
+
+                for(y = inv_buf[a].area.y1; y <= inv_buf[a].area.y2; y++) {
+
+                    memcpy(buf_act + start_offs, buf_inv + start_offs, line_length);
+
+                    start_offs += (LV_HOR_RES * LV_VDB_PX_BPP) >> 3;
+                }
+            }
+        }
+
 #endif
 
+        /*Clean up*/
+        memset(inv_buf, 0, sizeof(inv_buf));
+        inv_buf_p = 0;
 
+        /*Call monitor cb if present*/
         if(monitor_cb != NULL) {
             monitor_cb(lv_tick_elaps(start), px_num);
         }
