@@ -215,6 +215,7 @@ static void lv_refr_task(void * param)
         uint8_t * buf_act = (uint8_t *) vdb_act->buf;
         uint8_t * buf_inv = (uint8_t *) vdb_ina->buf;
 
+        while(lv_vdb_is_flushing());
 
         uint16_t a;
         for(a = 0; a < inv_buf_p; a++) {
