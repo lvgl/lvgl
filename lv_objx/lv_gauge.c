@@ -24,7 +24,8 @@
 #define LV_GAUGE_DEF_LABEL_COUNT        6
 #define LV_GAUGE_DEF_LINE_COUNT         21      /*Should be: ((label_cnt - 1) * internal_lines) + 1*/
 #define LV_GAUGE_DEF_ANGLE              220
-
+#define LV_GAUGE_INTERPOLATE_SHIFT		5		/*Interpolate the needle drawing between to degrees*/
+#define LV_GAUGE_INTERPOLATE_MASK		0x1F
 
 /**********************
  *      TYPEDEFS
@@ -406,6 +407,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     int16_t max = lv_gauge_get_max_value(gauge);
     lv_point_t p_mid;
     lv_point_t p_end;
+    lv_point_t p_end_low;
+    lv_point_t p_end_high;
     uint8_t i;
 
     lv_style_copy(&style_needle, style);
@@ -414,9 +417,28 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     p_mid.y = y_ofs;
     for(i = 0; i < ext->needle_count; i++) {
         /*Calculate the end point of a needle*/
-        int16_t needle_angle = (ext->values[i] - min) * angle / (max - min) + angle_ofs;
-        p_end.y = (lv_trigo_sin(needle_angle) * r) / LV_TRIGO_SIN_MAX + y_ofs;
-        p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
+        int16_t needle_angle = (ext->values[i] - min) * angle * (1 << LV_GAUGE_INTERPOLATE_SHIFT)  / (max - min); //+ angle_ofs;
+
+
+        int16_t needle_angle_low = (needle_angle >> LV_GAUGE_INTERPOLATE_SHIFT) + angle_ofs;
+        int16_t needle_angle_high = needle_angle_low + 1;
+
+
+        p_end_low.y = (lv_trigo_sin(needle_angle_low) * r) / LV_TRIGO_SIN_MAX + y_ofs;
+        p_end_low.x = (lv_trigo_sin(needle_angle_low + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
+
+        p_end_high.y = (lv_trigo_sin(needle_angle_high) * r) / LV_TRIGO_SIN_MAX + y_ofs;
+        p_end_high.x = (lv_trigo_sin(needle_angle_high + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
+
+        uint16_t rem = needle_angle & ((1 << LV_GAUGE_INTERPOLATE_SHIFT) - 1);
+        int16_t x_mod = ((LV_MATH_ABS(p_end_high.x  - p_end_low.x)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
+        int16_t y_mod = ((LV_MATH_ABS(p_end_high.y  - p_end_low.y)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
+
+        if(p_end_high.x < p_end_low.x) x_mod = -x_mod;
+        if(p_end_high.y < p_end_low.y) y_mod = -y_mod;
+
+        p_end.x = p_end_low.x + x_mod;
+        p_end.y = p_end_low.y + y_mod;
 
         /*Draw the needle with the corresponding color*/
         if(ext->needle_colors == NULL) style_needle.line.color = LV_GAUGE_DEF_NEEDLE_COLOR;
