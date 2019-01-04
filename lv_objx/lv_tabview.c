@@ -92,6 +92,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->tab_load_action = NULL;
     ext->btns_pos = LV_TABVIEW_BTNS_POS_TOP;
     ext->anim_time = LV_TABVIEW_ANIM_TIME;
+    ext->btns_hide = 0;
 
 
     /*The signal and design functions are not copied so set them here*/
