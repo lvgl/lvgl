@@ -175,6 +175,28 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
             /*If the txt is too long then finish, this is the line end*/
             if(cur_w > max_width) {
+                /* Continue searching for next breakable character to see if the next word will fit */
+                uint32_t i_tmp = i;
+                cur_w = 0;
+                while(txt[i_tmp] != 0) {
+                    letter = lv_txt_encoded_next(txt, &i_tmp);
+                    /*Check for new line chars*/
+                    if(letter == '\n' || letter == '\r') {
+                        uint32_t i_tmp2 = i;
+                        uint32_t letter_next = lv_txt_encoded_next(txt, &i_tmp2);
+                        if(letter == '\r' &&  letter_next == '\n') i = i_tmp2;
+                        break;
+                    } 
+                    else if (is_break_char(letter)) {
+                        break;
+                    }
+                    lv_coord_t letter_width = lv_font_get_width(font, letter);
+                    cur_w += letter_width;
+                    if(cur_w > max_width) {
+                        return i;
+                    }
+                }
+
                 /*If this a break char then break here.*/
                 if(is_break_char(letter)) {
                     /* Now 'i' points to the next char because of txt_utf8_next()
