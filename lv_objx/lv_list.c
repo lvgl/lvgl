@@ -91,6 +91,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
     ext->anim_time = LV_LIST_FOCUS_TIME;
 	ext->single_mode = false;
+    ext->size = 0;
 	
 #if USE_LV_GROUP
     ext->last_sel = NULL;
@@ -227,6 +228,16 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
         lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - btn_hor_pad);
         if(label_signal == NULL) label_signal = lv_obj_get_signal_func(label);
     }
+#if USE_LV_GROUP
+    /* If this is the first item to be added to the list and the list is
+     * focussed, select it */
+    {
+        lv_group_t *g = lv_obj_get_group(list);
+        if(ext->size == 1 && lv_group_get_focused(g) == list) {
+            lv_list_set_btn_selected(list, liste);
+        }
+    }
+#endif
 
     return liste;
 }
