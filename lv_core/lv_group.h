@@ -124,8 +124,9 @@ void lv_group_focus_freeze(lv_group_t * group, bool en);
  * Send a control character to the focuses object of a group
  * @param group pointer to a group
  * @param c a character (use LV_GROUP_KEY_.. to navigate)
+ * @return result of focused object in group.
  */
-void lv_group_send_data(lv_group_t * group, uint32_t c);
+lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c);
 
 /**
  * Set a function for a group which will modify the object's style if it is in focus
