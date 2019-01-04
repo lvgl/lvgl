@@ -75,7 +75,7 @@ uint32_t lv_tick_get(void)
 }
 
 /**
- * Get the elapsed milliseconds science a previous time stamp
+ * Get the elapsed milliseconds since a previous time stamp
  * @param prev_tick a previous time stamp (return value of systick_get() )
  * @return the elapsed milliseconds since 'prev_tick'
  */
