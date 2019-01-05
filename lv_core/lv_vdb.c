@@ -158,7 +158,11 @@ LV_ATTRIBUTE_FLUSH_READY void lv_flush_ready(void)
  */
 lv_vdb_t * lv_vdb_get_active(void)
 {
+#if LV_VDB_DOUBLE == 0
+    return &vdb;
+#else
     return &vdb[vdb_active];
+#endif
 }
 
 /**
@@ -167,8 +171,11 @@ lv_vdb_t * lv_vdb_get_active(void)
  */
 lv_vdb_t * lv_vdb_get_inactive(void)
 {
+#if LV_VDB_DOUBLE == 0
+    return &vdb;
+#else
     return &vdb[(vdb_active + 1) & 0x1];
-
+#endif
 }
 
 /**
