@@ -149,12 +149,14 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     uint32_t i = 0;
     lv_coord_t cur_w = 0;
     lv_coord_t w_at_last_break = 0;
+    uint32_t n_char_since_last_break = 0;
     uint32_t last_break = NO_BREAK_FOUND;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter = 0;
 
     while(txt[i] != '\0') {
         letter = lv_txt_encoded_next(txt, &i);
+        n_char_since_last_break++;
 
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -176,32 +178,37 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
             /*If the txt is too long then finish, this is the line end*/
             if(cur_w > max_width) {
-                /* Continue searching for next breakable character to see if the next word will fit */
                 if( last_break != NO_BREAK_FOUND ) {
-                    uint32_t i_tmp = i;
-                    cur_w -= w_at_last_break;
-                    while(txt[i_tmp] != 0) {
-                        letter = lv_txt_encoded_next(txt, &i_tmp);
-                        /*Check for new line chars*/
-                        if(letter == '\n' || letter == '\r') {
-                            uint32_t i_tmp2 = i_tmp;
-                            uint32_t letter_next = lv_txt_encoded_next(txt, &i_tmp2);
-                            if(letter == '\r' &&  letter_next == '\n') i = i_tmp2;
-                            i = last_break;
-                            break;
-                        } 
-                        else if (is_break_char(letter)) {
-                            i = last_break;
-                            break;
+                    /* Continue searching for next breakable character to see if the next word will fit */
+                    if( n_char_since_last_break <= LV_TXT_LINE_BREAK_LONG_MIN_LEN ) {
+                        i = last_break;
+                    }
+                    else {
+                        uint32_t i_tmp = i;
+                        cur_w -= w_at_last_break;
+                        while(txt[i_tmp] != '\0') {
+                            letter = lv_txt_encoded_next(txt, &i_tmp);
+                            /*Check for new line chars*/
+                            if(letter == '\n' || letter == '\r') {
+                                uint32_t i_tmp2 = i_tmp;
+                                uint32_t letter_next = lv_txt_encoded_next(txt, &i_tmp2);
+                                if(letter == '\r' &&  letter_next == '\n') i = i_tmp2;
+                                i = last_break;
+                                break;
+                            } 
+                            else if (is_break_char(letter)) {
+                                i = last_break;
+                                break;
+                            }
+                            lv_coord_t letter_width = lv_font_get_width(font, letter);
+                            cur_w += letter_width;
+                            if(cur_w > max_width) {
+                                /* Current letter already exceeds, return previous */
+                                lv_txt_encoded_prev(txt, &i);
+                                break;
+                            }
+                            cur_w += letter_space;
                         }
-                        lv_coord_t letter_width = lv_font_get_width(font, letter);
-                        cur_w += letter_width;
-                        if(cur_w > max_width) {
-                            /* Current letter already exceeds, return previous */
-                            lv_txt_encoded_prev(txt, &i);
-                            break;
-                        }
-                        cur_w += letter_space;
                     }
                 } else {
                     /* Now this character is out of the area so it will be first character of the next line*/
@@ -220,6 +227,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             else if(is_break_char(letter)) {
                 last_break = i; /*Save the first char index  after break*/
                 w_at_last_break = cur_w;
+                n_char_since_last_break = 0;
             }
         }
 
