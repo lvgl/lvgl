@@ -789,6 +789,7 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
         p2.x = 0 + x_ofs;
         y_tmp = (int32_t)((int32_t) ser->points[0] - ext->ymin) * h;
         y_tmp = y_tmp / (ext->ymax - ext->ymin);
+        p1.y = LV_COORD_MIN;
         p2.y = h - y_tmp + y_ofs;
 
         if(ext->point_cnt == w)
