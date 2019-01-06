@@ -193,6 +193,10 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
             btn_cnt ++;
         }
 
+        /*Make sure the last row is at the bottom of 'btnm'*/
+        if(map_p_tmp[btn_cnt][0] == '\0') {         /*Last row?*/
+            btn_h = max_h - act_y + style_bg->body.padding.ver - 1;
+        }
 
         /*Only deal with the non empty lines*/
         if(btn_cnt != 0) {
@@ -232,10 +236,6 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
         }
         act_y += btn_h + style_bg->body.padding.inner;
 
-        /*Make sure the last row is at the bottom of 'btnm'*/
-        if(map_p_tmp[btn_cnt][0] == '\0') {         /*Last row?*/
-            btn_h = max_h - act_y + style_bg->body.padding.ver - 1;
-        }
 
         if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
         map_p_tmp = &map_p_tmp[btn_cnt + 1]; /*Set the map to the next line*/
