@@ -212,7 +212,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 /**
  * Give the length of a text with a given font
  * @param txt a '\0' terminate string
- * @param length length of 'txt' in character count and not bytes(UTF-8 can be 1,2,3 or 4 bytes long)
+ * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in UTF-8)
  * @param font pointer to a font
  * @param letter_space letter space
  * @param flags settings for the text from 'txt_flag_t' enum
@@ -224,13 +224,13 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
-    uint32_t i = 0, j;
+    uint32_t i = 0;
     lv_coord_t width = 0;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter;
 
     if(length != 0) {
-        for(j=0; j< length; j++){
+        while(i< length){
             letter = lv_txt_encoded_next(txt, &i);
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(lv_txt_is_cmd(&cmd_state, letter) != false) {

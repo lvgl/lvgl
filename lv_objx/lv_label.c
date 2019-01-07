@@ -440,22 +440,32 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
     }
 
     /*If the last character is line break then go to the next line*/
-    if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
-        y += letter_height + style->text.line_space;
-        line_start = index;
+    if(index > 0) {
+        if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
+            y += letter_height + style->text.line_space;
+            line_start = index;
+        }
     }
 
     /*Calculate the x coordinate*/
-    lv_coord_t x = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
+    lv_coord_t x = lv_txt_get_width(&txt[line_start], index - line_start,
                             font, style->text.letter_space, flag);
 
+    if(index != line_start) x += style->text.letter_space;
+
     if(ext->align == LV_LABEL_ALIGN_CENTER) {
-        x += lv_obj_get_width(label) / 2 - x / 2;
+        lv_coord_t line_w;
+        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
+                                  font, style->text.letter_space, flag);
+        x += lv_obj_get_width(label) / 2 - line_w / 2;
 
     } else if(ext->align == LV_LABEL_ALIGN_RIGHT) {
-        x += lv_obj_get_width(label) - x;
-    }
+        lv_coord_t line_w;
+        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
+                                  font, style->text.letter_space, flag);
 
+        x += lv_obj_get_width(label) - line_w;
+    }
     pos->x = x;
     pos->y = y;
 }

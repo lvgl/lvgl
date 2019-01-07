@@ -14,6 +14,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
+#include <strings.h>
 
 /*********************
  *      DEFINES
@@ -756,7 +757,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the right arrow*/
     arrow_style = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 = header_area.x2 - ext->style_header->body.padding.hor -
-            lv_txt_get_width(SYMBOL_RIGHT, 1, arrow_style->text.font,
+            lv_txt_get_width(SYMBOL_RIGHT, strlen(SYMBOL_RIGHT), arrow_style->text.font,
                     arrow_style->text.line_space, LV_TXT_FLAG_NONE);
     lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
 
