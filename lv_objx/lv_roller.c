@@ -163,7 +163,8 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
 {
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
-    lv_ddlist_set_fix_height(roller, lv_font_get_height(style_label->text.font) * row_cnt + style_label->text.line_space * (row_cnt-1));
+    uint8_t n_line_space = (row_cnt > 1) ? row_cnt - 1 : 1;
+    lv_ddlist_set_fix_height(roller, lv_font_get_height(style_label->text.font) * row_cnt + style_label->text.line_space * n_line_space);
 }
 
 /**
