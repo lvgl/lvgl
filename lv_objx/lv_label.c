@@ -446,21 +446,14 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
     }
 
     /*Calculate the x coordinate*/
-    lv_coord_t x = lv_txt_get_width(&txt[line_start], index,
+    lv_coord_t x = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
                             font, style->text.letter_space, flag);
 
     if(ext->align == LV_LABEL_ALIGN_CENTER) {
-        lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
-                                  font, style->text.letter_space, flag);
-        x += lv_obj_get_width(label) / 2 - line_w / 2;
+        x += lv_obj_get_width(label) / 2 - x / 2;
 
     } else if(ext->align == LV_LABEL_ALIGN_RIGHT) {
-        lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
-                                  font, style->text.letter_space, flag);
-
-        x += lv_obj_get_width(label) - line_w;
+        x += lv_obj_get_width(label) - x;
     }
 
     pos->x = x;
