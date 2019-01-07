@@ -24,8 +24,8 @@
 #define LV_PAGE_END_FLASH_SIZE          (LV_DPI / 4)
 #define LV_PAGE_END_ANIM_TIME           300
 #define LV_PAGE_END_ANIM_WAIT_TIME      300
-#define LV_PAGE_END_VPAD                0     /* Apply padding to bottom */
-#define LV_PAGE_END_HPAD                0     /* Apply padding to right */
+#define LV_PAGE_END_VPAD                1     /* Apply padding to bottom */
+#define LV_PAGE_END_HPAD                1     /* Apply padding to right */
 
 /**********************
  *      TYPEDEFS
