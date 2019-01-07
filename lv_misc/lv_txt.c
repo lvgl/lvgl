@@ -224,13 +224,13 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
-    uint32_t i = 0;
+    uint32_t i = 0, j;
     lv_coord_t width = 0;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter;
 
     if(length != 0) {
-        while(i < length) {
+        for(j=0; j< length; j++){
             letter = lv_txt_encoded_next(txt, &i);
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(lv_txt_is_cmd(&cmd_state, letter) != false) {
@@ -238,11 +238,16 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length,
                 }
             }
 
-            width += lv_font_get_width(font, letter);
-            width += letter_space;
+            lv_coord_t char_width = lv_font_get_width(font, letter);
+            if(char_width > 0){
+                width += lv_font_get_width(font, letter);
+                width += letter_space;
+            }
         }
 
-        width -= letter_space;  /*Trim the last letter space. Important if the text is center aligned */
+        if(width > 0) {
+            width -= letter_space;  /*Trim the last letter space. Important if the text is center aligned */
+        }
     }
 
     return width;
