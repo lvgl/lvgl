@@ -24,6 +24,8 @@
 #define LV_PAGE_END_FLASH_SIZE          (LV_DPI / 4)
 #define LV_PAGE_END_ANIM_TIME           300
 #define LV_PAGE_END_ANIM_WAIT_TIME      300
+#define LV_PAGE_END_VPAD                0     /* Apply padding to bottom */
+#define LV_PAGE_END_HPAD                0     /* Apply padding to right */
 
 /**********************
  *      TYPEDEFS
@@ -909,7 +911,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         /*scrollable width smaller then page width? -> align to left*/
-        if(lv_area_get_width(&scrl_coords) + 2 * hpad <= lv_area_get_width(&page_coords)) {
+        if(lv_area_get_width(&scrl_coords) + (LV_PAGE_END_HPAD+1)*hpad <= lv_area_get_width(&page_coords)) {
             if(scrl_coords.x1 != page_coords.x1 + hpad) {
                 new_x = hpad;
                 refr_x = true;
@@ -946,7 +948,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         /*scrollable height smaller then page height? -> align to left*/
-        if(lv_area_get_height(&scrl_coords) + 2 * vpad <= lv_area_get_height(&page_coords)) {
+        if(lv_area_get_height(&scrl_coords) + (LV_PAGE_END_VPAD+1)*vpad <= lv_area_get_height(&page_coords)) {
             if(scrl_coords.y1 != page_coords.y1 + vpad) {
                 new_y = vpad;
                 refr_y = true;
@@ -1095,7 +1097,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     }
 
     /*Horizontal scrollbar*/
-    if(scrl_w <= obj_w - 2 * hpad) {        /*Full sized scroll bar*/
+    if(scrl_w <= obj_w - (LV_PAGE_END_HPAD+1)*hpad) {        /*Full sized scroll bar*/
         lv_area_set_width(&ext->sb.hor_area, obj_w - 2 * sb_hor_pad);
         lv_area_set_pos(&ext->sb.hor_area, sb_hor_pad, obj_h - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.ver);
         if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG)  ext->sb.hor_draw = 0;
@@ -1113,7 +1115,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     }
 
     /*Vertical scrollbar*/
-    if(scrl_h <= obj_h - 2 * vpad) {        /*Full sized scroll bar*/
+    if(scrl_h <= obj_h - (LV_PAGE_END_VPAD+1)*vpad) {        /*Full sized scroll bar*/
         lv_area_set_height(&ext->sb.ver_area,  obj_h - 2 * sb_ver_pad);
         lv_area_set_pos(&ext->sb.ver_area, obj_w - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.hor, sb_ver_pad);
         if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG)  ext->sb.ver_draw = 0;
