@@ -43,9 +43,10 @@ extern "C" {
 
 typedef union {
     struct {
-        uint8_t align:3;
+        uint8_t align:2;
         uint8_t right_merge:1;
         uint8_t type:2;
+        uint8_t crop:1;
     };
     uint8_t format_byte;
 }lv_table_cell_format_t;
@@ -138,6 +139,15 @@ void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_la
 void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_t type);
 
 /**
+ * Set the cell crop. (Don't adjust the height of the cell according to its content)
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @param crop true: crop the cell content; false: set the cell height to the content.
+ */
+void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool crop);
+
+/**
  * Merge a cell with the right neighbor. The value of the cell to the right won't be displayed.
  * @param table table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
@@ -206,6 +216,16 @@ lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_
  * @return 1,2,3 or 4
  */
 lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t col);
+
+
+/**
+ * Get the crop property of a cell
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @return true: text crop enabled; false: disabled
+ */
+lv_label_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col);
 
 /**
  * Get the cell merge attribute.

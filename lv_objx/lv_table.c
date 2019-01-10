@@ -147,6 +147,7 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
         format.align = LV_LABEL_ALIGN_LEFT;
         format.right_merge = 0;
         format.type = 0;
+        format.crop = 0;
     }
 
 
@@ -295,6 +296,35 @@ void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_
      format.type = type;
      ext->cell_data[cell][0] = format.format_byte;
 }
+
+/**
+ * Set the cell crop. (Don't adjust the height of the cell according to its content)
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @param crop true: crop the cell content; false: set the cell height to the content.
+ */
+void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool crop)
+{
+    lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+     if(row >= ext->row_cnt || col >= ext->col_cnt) {
+         LV_LOG_WARN("lv_table_set_cell_crop: invalid row or column");
+         return;
+     }
+     uint32_t cell = row * ext->col_cnt + col;
+
+     if(ext->cell_data[cell] == NULL) {
+         ext->cell_data[cell] = lv_mem_alloc(2);        /*+1: trailing '\0; +1: format byte*/
+         ext->cell_data[cell][0] = 0;
+         ext->cell_data[cell][1] = '\0';
+     }
+
+     lv_table_cell_format_t format;
+     format.format_byte = ext->cell_data[cell][0];
+     format.crop = crop;
+     ext->cell_data[cell][0] = format.format_byte;
+}
+
 
 /**
  * Merge a cell with the right neighbor. The value of the cell to the right won't be displayed.
@@ -473,6 +503,30 @@ lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t
 }
 
 /**
+ * Get the crop property of a cell
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @return true: text crop enabled; false: disabled
+ */
+lv_label_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col)
+{
+    lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+     if(row >= ext->row_cnt || col >= ext->col_cnt) {
+         LV_LOG_WARN("lv_table_get_cell_crop: invalid row or column");
+         return false;    /*Just return with something*/
+     }
+     uint32_t cell = row * ext->col_cnt + col;
+
+     if(ext->cell_data[cell] == NULL) return false;    /*Just return with something*/
+     else {
+         lv_table_cell_format_t format;
+         format.format_byte = ext->cell_data[cell][0];
+         return format.crop;
+     }
+}
+
+/**
  * Get the cell merge attribute.
  * @param table table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
@@ -605,7 +659,6 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     }
                 }
 
-
                 lv_draw_rect(&cell_area, mask, cell_style, opa_scale);
 
                 if(ext->cell_data[cell]) {
@@ -617,12 +670,11 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
                                               cell_style->text.letter_space, cell_style->text.line_space, lv_area_get_width(&txt_area), txt_flags);
 
-
-                    txt_area.x1 = cell_area.x1 + cell_style->body.padding.hor;
-                    txt_area.x2 = cell_area.x2 - cell_style->body.padding.hor;
-
-                    txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
-                    txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
+                    /*Align the content to the middle if not cropped*/
+                    if(format.crop == 0) {
+                        txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
+                        txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
+                    }
 
                     switch(format.align) {
                     default:
@@ -768,14 +820,21 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
             format.format_byte = ext->cell_data[cell][0];
             cell_style = ext->cell_style[format.type];
 
-            txt_w -= 2 * cell_style->body.padding.hor;
+            /*With text crop assume 1 line*/
+            if(format.crop) {
+                h_max = LV_MATH_MAX(lv_font_get_height(cell_style->text.font) + 2 * cell_style->body.padding.ver, h_max);
+            }
+            /*Without text crop calculate the height of the text in the cell*/
+            else {
+                txt_w -= 2 * cell_style->body.padding.hor;
 
-            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
-                    cell_style->text.letter_space, cell_style->text.line_space, txt_w, LV_TXT_FLAG_NONE);
+                lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
+                        cell_style->text.letter_space, cell_style->text.line_space, txt_w, LV_TXT_FLAG_NONE);
 
-            h_max = LV_MATH_MAX(txt_size.y + 2 * cell_style->body.padding.ver, h_max);
-            cell += col_merge;
-            col += col_merge;
+                h_max = LV_MATH_MAX(txt_size.y + 2 * cell_style->body.padding.ver, h_max);
+                cell += col_merge;
+                col += col_merge;
+            }
         }
     }
 
