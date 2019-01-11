@@ -19,6 +19,11 @@
 #include "../lv_misc/lv_ufs.h"
 #include <stdint.h>
 #include <string.h>
+#include "../lv_misc/lv_gc.h"
+
+#if defined(LV_GC_INCLUDE)
+#   include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
 
 /*********************
  *      DEFINES
@@ -43,11 +48,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_obj_t * def_scr = NULL;
-static lv_obj_t * act_scr = NULL;
-static lv_obj_t * top_layer = NULL;
-static lv_obj_t * sys_layer = NULL;
-static lv_ll_t scr_ll;                 /*Linked list of screens*/
 
 /**********************
  *      MACROS
@@ -62,6 +62,11 @@ static lv_ll_t scr_ll;                 /*Linked list of screens*/
  */
 void lv_init(void)
 {
+    LV_GC_ROOT(def_scr) = NULL;
+    LV_GC_ROOT(act_scr) = NULL;
+    LV_GC_ROOT(top_layer) = NULL;
+    LV_GC_ROOT(sys_layer) = NULL;
+
     LV_LOG_TRACE("lv_init started");
 
     /*Initialize the lv_misc modules*/
@@ -85,19 +90,19 @@ void lv_init(void)
     lv_refr_init();
 
     /*Create the default screen*/
-    lv_ll_init(&scr_ll, sizeof(lv_obj_t));
-    def_scr = lv_obj_create(NULL, NULL);
+    lv_ll_init(&LV_GC_ROOT(scr_ll), sizeof(lv_obj_t));
+    LV_GC_ROOT(def_scr) = lv_obj_create(NULL, NULL);
 
-    act_scr = def_scr;
+    LV_GC_ROOT(act_scr) = LV_GC_ROOT(def_scr);
 
-    top_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(top_layer, &lv_style_transp_fit);
+    LV_GC_ROOT(top_layer) = lv_obj_create(NULL, NULL);
+    lv_obj_set_style(LV_GC_ROOT(top_layer), &lv_style_transp_fit);
 
-    sys_layer = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(sys_layer, &lv_style_transp_fit);
+    LV_GC_ROOT(sys_layer) = lv_obj_create(NULL, NULL);
+    lv_obj_set_style(LV_GC_ROOT(sys_layer), &lv_style_transp_fit);
 
     /*Refresh the screen*/
-    lv_obj_invalidate(act_scr);
+    lv_obj_invalidate(LV_GC_ROOT(act_scr));
 
 #if LV_INDEV_READ_PERIOD != 0
     /*Init the input device handling*/
@@ -127,7 +132,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
     if(parent == NULL) {
         LV_LOG_TRACE("Screen create started");
 
-        new_obj = lv_ll_ins_head(&scr_ll);
+        new_obj = lv_ll_ins_head(&LV_GC_ROOT(scr_ll));
         lv_mem_assert(new_obj);
         if(new_obj == NULL) return NULL;
 
@@ -350,7 +355,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) { /*It is a screen*/
-        lv_ll_rem(&scr_ll, obj);
+        lv_ll_rem(&LV_GC_ROOT(scr_ll), obj);
     } else {
         lv_ll_rem(&(par->child_ll), obj);
     }
@@ -406,7 +411,7 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 {
     if(lv_obj_get_hidden(obj)) return;
 
-    /*Invalidate the object only if it belongs to the 'act_scr'*/
+    /*Invalidate the object only if it belongs to the 'LV_GC_ROOT(act_scr)'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     if(obj_scr == lv_scr_act() ||
             obj_scr == lv_layer_top() ||
@@ -451,9 +456,9 @@ void lv_obj_invalidate(const lv_obj_t * obj)
  */
 void lv_scr_load(lv_obj_t * scr)
 {
-    act_scr = scr;
+    LV_GC_ROOT(act_scr) = scr;
 
-    lv_obj_invalidate(act_scr);
+    lv_obj_invalidate(LV_GC_ROOT(act_scr));
 }
 
 /*--------------------
@@ -1000,7 +1005,7 @@ void lv_obj_refresh_style(lv_obj_t * obj)
 void lv_obj_report_style_mod(lv_style_t * style)
 {
     lv_obj_t * i;
-    LL_READ(scr_ll, i) {
+    LL_READ(LV_GC_ROOT(scr_ll), i) {
         if(i->style_p == style || style == NULL) {
             lv_obj_refresh_style(i);
         }
@@ -1297,7 +1302,7 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  */
 lv_obj_t * lv_scr_act(void)
 {
-    return act_scr;
+    return LV_GC_ROOT(act_scr);
 }
 
 /**
@@ -1306,7 +1311,7 @@ lv_obj_t * lv_scr_act(void)
  */
 lv_obj_t * lv_layer_top(void)
 {
-    return top_layer;
+    return LV_GC_ROOT(top_layer);
 }
 
 /**
@@ -1316,7 +1321,7 @@ lv_obj_t * lv_layer_top(void)
  */
 lv_obj_t * lv_layer_sys(void)
 {
-    return sys_layer;
+    return LV_GC_ROOT(sys_layer);
 }
 
 /**

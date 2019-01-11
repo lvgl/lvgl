@@ -14,6 +14,12 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_core/lv_obj.h"
+#include "../lv_misc/lv_gc.h"
+
+#if defined(LV_GC_INCLUDE)
+#   include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
+
 
 /*********************
  *      DEFINES
@@ -30,7 +36,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_disp_t * disp_list = NULL;
 static lv_disp_t * active;
 
 /**********************
@@ -49,6 +54,7 @@ static lv_disp_t * active;
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
+    LV_GC_ROOT(disp_list) = NULL;
     driver->disp_fill = NULL;
     driver->disp_map = NULL;
     driver->disp_flush = NULL;
@@ -81,12 +87,12 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     node->next = NULL;
 
     /* Set first display as active by default */
-    if(disp_list == NULL) {
-        disp_list = node;
+    if(LV_GC_ROOT(disp_list) == NULL) {
+        LV_GC_ROOT(disp_list) = node;
         active = node;
         lv_obj_invalidate(lv_scr_act());
     } else {
-        disp_list->next = node;
+        ((lv_disp_t*)LV_GC_ROOT(disp_list))->next = node;
     }
 
     return node;
@@ -120,10 +126,10 @@ lv_disp_t * lv_disp_get_active(void)
 lv_disp_t * lv_disp_next(lv_disp_t * disp)
 {
     if(disp == NULL) {
-        return disp_list;
+        return LV_GC_ROOT(disp_list);
     } else {
-        if(disp_list->next == NULL) return NULL;
-        else return disp_list->next;
+        if(((lv_disp_t*)LV_GC_ROOT(disp_list))->next == NULL) return NULL;
+        else return ((lv_disp_t*)LV_GC_ROOT(disp_list))->next;
     }
 }
 
