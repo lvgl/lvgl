@@ -185,7 +185,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_fp(&pos, mask, font, letter, color, opa);
             letter_w = lv_font_get_width(font, letter);
 
-            pos.x += letter_w + style->text.letter_space;
+            if(letter_w > 0){
+                pos.x += letter_w + style->text.letter_space;
+            }
         }
         /*Go to next line*/
         line_start = line_end;

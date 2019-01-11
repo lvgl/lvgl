@@ -82,7 +82,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 /**
  * Give the length of a text with a given font
  * @param txt a '\0' terminate string
- * @param length length of 'txt' in character count and not bytes(UTF-8 can be 1,2,3 or 4 bytes long)
+ * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in UTF-8)
  * @param font pointer to a font
  * @param letter_space letter space
  * @param flags settings for the text from 'txt_flag_t' enum

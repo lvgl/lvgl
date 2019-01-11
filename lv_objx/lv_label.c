@@ -440,28 +440,18 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
     }
 
     /*If the last character is line break then go to the next line*/
-    if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
-        y += letter_height + style->text.line_space;
-        line_start = index;
+    if(index > 0) {
+        if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
+            y += letter_height + style->text.line_space;
+            line_start = index;
+        }
     }
 
     /*Calculate the x coordinate*/
-    lv_coord_t x = 0;
-    uint32_t i = line_start;
-    uint32_t cnt = line_start;                      /*Count the letter (in UTF-8 1 letter not 1 byte)*/
-    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
-    uint32_t letter;
-    while(cnt < index) {
-        cnt += lv_txt_encoded_size(&txt[i]);
-        letter = lv_txt_encoded_next(txt, &i);
-        /*Handle the recolor command*/
-        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-            if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-                continue; /*Skip the letter is it is part of a command*/
-            }
-        }
-        x += lv_font_get_width(font, letter) + style->text.letter_space;
-    }
+    lv_coord_t x = lv_txt_get_width(&txt[line_start], index - line_start,
+                            font, style->text.letter_space, flag);
+
+    if(index != line_start) x += style->text.letter_space;
 
     if(ext->align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
@@ -476,7 +466,6 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
 
         x += lv_obj_get_width(label) - line_w;
     }
-
     pos->x = x;
     pos->y = y;
 }

@@ -1281,7 +1281,7 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, cur_pos, &letter_pos);
 
     /*If the cursor is out of the text (most right) draw it to the next line*/
-    if(letter_pos.x + ext->label->coords.x1 + letter_w > ext->label->coords.x2 && ext->one_line == 0) {
+    if(letter_pos.x + ext->label->coords.x1 + letter_w > ext->label->coords.x2 && ext->one_line == 0 && lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
         letter_pos.x = 0;
         letter_pos.y += letter_h + label_style->text.line_space;
 
