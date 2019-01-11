@@ -580,7 +580,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				new_style.text.opa = sel_style->text.opa;
 				lv_area_t area_arrow;
 				area_arrow.x2 = ddlist->coords.x2 - style->body.padding.hor;
-				area_arrow.x1 = area_arrow.x2 - lv_txt_get_width(strlen(SYMBOL_DOWN), 1, sel_style->text.font, 0, 0);
+				area_arrow.x1 = area_arrow.x2 - lv_txt_get_width(SYMBOL_DOWN, (strlen(SYMBOL_DOWN), sel_style->text.font, 0, 0);
 
 				area_arrow.y1 = ddlist->coords.y1 + style->text.line_space;
 				area_arrow.y2 = area_arrow.y1 + font_h;
