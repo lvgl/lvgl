@@ -616,7 +616,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
         lv_point_t txt_size;
         lv_area_t cell_area;
         lv_area_t txt_area;
-        lv_txt_flag_t txt_flags = LV_TXT_FLAG_NONE;
+        lv_txt_flag_t txt_flags;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(table);
 
         uint16_t col;
@@ -674,23 +674,30 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     if(format.crop == 0) {
                         txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
                         txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
+                        txt_flags = LV_TXT_FLAG_NONE;
+                    } else {
+                        txt_flags = LV_TXT_FLAG_EXPAND;
                     }
 
                     switch(format.align) {
                     default:
                     case LV_LABEL_ALIGN_LEFT:
-                        txt_flags = LV_TXT_FLAG_NONE;
+                        txt_flags |= LV_TXT_FLAG_NONE;
                         break;
                     case LV_LABEL_ALIGN_RIGHT:
-                        txt_flags = LV_TXT_FLAG_RIGHT;
+                        txt_flags |= LV_TXT_FLAG_RIGHT;
                         break;
                     case LV_LABEL_ALIGN_CENTER:
-                        txt_flags = LV_TXT_FLAG_CENTER;
+                        txt_flags |= LV_TXT_FLAG_CENTER;
                         break;
                     }
 
-                    lv_draw_label(&txt_area, mask, cell_style, opa_scale, ext->cell_data[cell] + 1, txt_flags, NULL);
-
+                    lv_area_t label_mask;
+                    bool label_mask_ok;
+                    label_mask_ok = lv_area_intersect(&label_mask, mask, &cell_area);
+                    if(label_mask_ok) {
+                        lv_draw_label(&txt_area, &label_mask, cell_style, opa_scale, ext->cell_data[cell] + 1, txt_flags, NULL);
+                    }
                     /*Draw lines after '\n's*/
                     lv_point_t p1;
                     lv_point_t p2;
