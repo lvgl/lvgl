@@ -13,6 +13,7 @@
  *      DEFINES
  *********************/
 #define NO_BREAK_FOUND  UINT32_MAX
+#define LV_TXT_LINE_BREAK_LONG_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
 
 /**********************
  *      TYPEDEFS
