@@ -194,7 +194,7 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
-    return ext->img_src_middle[state];
+    return ext->img_src_mid[state];
 }
 
 /**
