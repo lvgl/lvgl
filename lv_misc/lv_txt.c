@@ -13,7 +13,9 @@
  *      DEFINES
  *********************/
 #define NO_BREAK_FOUND  UINT32_MAX
-#define LV_TXT_LINE_BREAK_LONG_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
+#define LV_TXT_LINE_BREAK_LONG_LEN 12 /* If a character is at least this long, will break wherever "prettiest" */
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3 /* Minimum number of characters of a word to put on a line after a break */
 
 /**********************
  *      TYPEDEFS
@@ -156,6 +158,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     uint32_t letter = 0;
 
     while(txt[i] != '\0') {
+        lv_coord_t letter_width;
         letter = lv_txt_encoded_next(txt, &i);
         n_char_since_last_break++;
 
@@ -175,13 +178,16 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             return i;    /*Return with the first letter of the next line*/
 
         } else { /*Check the actual length*/
-            cur_w += lv_font_get_width(font, letter);
+            letter_width = lv_font_get_width(font, letter);
+            cur_w += letter_width; 
 
-            /*If the txt is too long then finish, this is the line end*/
+            /*If the txt is too long then finish, this is the line endi.
+             * The current character doesn't fit. */
             if(cur_w > max_width) {
                 if( last_break != NO_BREAK_FOUND ) {
                     /* Continue searching for next breakable character to see if the next word will fit */
-                    if(  0 || n_char_since_last_break <= LV_TXT_LINE_BREAK_LONG_MIN_LEN ) {
+                    uint32_t n_char_fit = n_char_since_last_break;
+                    if(  0 || n_char_since_last_break <= LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN ) {
                         i = last_break;
                     }
                     else {
@@ -189,15 +195,23 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                         cur_w -= w_at_last_break + letter_space; /*ignore the first letter_space after the break char */
                         while(txt[i_tmp] != '\0') {
                             letter = lv_txt_encoded_next(txt, &i_tmp);
+                            n_char_since_last_break++;
                             /*Check for new line chars*/
-                            if(letter == '\n' || letter == '\r') {
-                                i = last_break;
+                            if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
+                                if(n_char_since_last_break >= LV_TXT_LINE_BREAK_LONG_LEN) {
+                                    /* Figure out the prettiest place to break */
+                                    uint32_t char_remain;
+                                    for(char_remain=n_char_since_last_break - n_char_fit;
+                                            char_remain < LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN;
+                                            char_remain++){
+                                        lv_txt_encoded_prev(txt, &i);
+                                    }
+                                }
+                                else{
+                                    i = last_break;
+                                }
                                 break;
                             } 
-                            else if (is_break_char(letter)) {
-                                i = last_break;
-                                break;
-                            }
                             lv_coord_t letter_width = lv_font_get_width(font, letter);
                             cur_w += letter_width;
                             if(cur_w > max_width) {
@@ -205,10 +219,25 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                                 lv_txt_encoded_prev(txt, &i);
                                 break;
                             }
-                            cur_w += letter_space;
+                            if(letter_width > 0){
+                                cur_w += letter_space;
+                            }
                         }
                         if(txt[i_tmp] == '\0') {
-                            i = last_break;
+                            if(n_char_since_last_break >= LV_TXT_LINE_BREAK_LONG_LEN) {
+                                /* Figure out the prettiest place to break */
+                                uint32_t char_remain;
+                                lv_txt_encoded_prev(txt, &i);
+                                for(char_remain=n_char_since_last_break - n_char_fit;
+                                        char_remain < LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN;
+                                        char_remain++){
+                                    lv_txt_encoded_prev(txt, &i);
+                                }
+                            }
+                            else{
+                                i = last_break;
+                            }
+ 
                         }
                     }
                 } else {
@@ -232,7 +261,9 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             }
         }
 
-        cur_w += letter_space;
+        if(letter_width > 0) {
+            cur_w += letter_space;
+        }
     }
 
     return i;
