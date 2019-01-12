@@ -232,7 +232,7 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
 
 /**
  * Get the index of the button in the list
- * @param list pointer to a list object
+ * @param list pointer to a list object. If NULL, assumes btn is part of a list.
  * @param btn pointer to a list element (button)
  * @return the index of the button in the list, or -1 of the button not in this list
  */

@@ -511,13 +511,17 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 
 /**
  * Get the index of the button in the list
- * @param list pointer to a list object
+ * @param list pointer to a list object. If NULL, assumes btn is part of a list.
  * @param btn pointer to a list element (button)
  * @return the index of the button in the list, or -1 of the button not in this list
  */
 int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn)
 {
 	int index = 0;
+    if( list == NULL ){
+        /* no list provided, assuming btn is part of a list */
+        list = lv_obj_get_parent(lv_obj_get_parent(btn));
+    }
 	lv_obj_t * e = lv_list_get_next_btn(list, NULL);
 	while(e != NULL) {
 		if(e == btn) {
