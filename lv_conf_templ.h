@@ -35,6 +35,7 @@
 /* Horizontal and vertical resolution of the library.*/
 #define LV_HOR_RES          (480)
 #define LV_VER_RES          (320)
+
 /* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI              100
@@ -371,7 +372,7 @@
 /*--END OF LV_CONF_H--*/
 
 /*Be sure every define has a default value*/
-#include "lv_conf_checker.h"
+#include "lvgl/lv_conf_checker.h"
 
 #endif /*LV_CONF_H*/
 
