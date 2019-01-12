@@ -13,9 +13,18 @@
  *      DEFINES
  *********************/
 #define NO_BREAK_FOUND  UINT32_MAX
+
+#ifndef LV_TXT_LINE_BREAK_LONG_LEN
 #define LV_TXT_LINE_BREAK_LONG_LEN 12 /* If a character is at least this long, will break wherever "prettiest" */
+#endif
+
+#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
 #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
+#endif
+
+#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
 #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 0 /* Minimum number of characters of a word to put on a line after a break */
+#endif
 
 /**********************
  *      TYPEDEFS
