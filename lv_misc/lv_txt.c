@@ -15,7 +15,7 @@
 #define NO_BREAK_FOUND  UINT32_MAX
 #define LV_TXT_LINE_BREAK_LONG_LEN 12 /* If a character is at least this long, will break wherever "prettiest" */
 #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
-#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3 /* Minimum number of characters of a word to put on a line after a break */
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 4 /* Minimum number of characters of a word to put on a line after a break */
 
 /**********************
  *      TYPEDEFS
@@ -187,7 +187,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             if(cur_w > max_width) {
                 if( last_break != NO_BREAK_FOUND ) {
                     /* Continue searching for next breakable character to see if the next word will fit */
-                    uint32_t n_char_fit = n_char_since_last_break;
+                    uint32_t n_char_fit = n_char_since_last_break - 1;
                     if(  n_char_since_last_break <= LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN ) {
                         i = last_break;
                     }
