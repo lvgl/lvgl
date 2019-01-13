@@ -14,6 +14,18 @@
  *********************/
 #define NO_BREAK_FOUND  UINT32_MAX
 
+#ifndef LV_TXT_LINE_BREAK_LONG_LEN
+#define LV_TXT_LINE_BREAK_LONG_LEN 12 /* If a character is at least this long, will break wherever "prettiest" */
+#endif
+
+#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
+#endif
+
+#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 0 /* Minimum number of characters of a word to put on a line after a break */
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -148,11 +160,14 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     uint32_t i = 0;
     lv_coord_t cur_w = 0;
+    lv_coord_t w_at_last_break = 0;
+    uint32_t n_char_since_last_break = 0; /* Used count word length of long words */
     uint32_t last_break = NO_BREAK_FOUND;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter = 0;
 
     while(txt[i] != '\0') {
+        lv_coord_t letter_width;
         letter = lv_txt_encoded_next(txt, &i);
 
         /*Handle the recolor command*/
@@ -161,6 +176,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                 continue;   /*Skip the letter is it is part of a command*/
             }
         }
+
 
         /*Check for new line chars*/
         if(letter == '\n' || letter == '\r') {
@@ -171,19 +187,80 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
             return i;    /*Return with the first letter of the next line*/
 
         } else { /*Check the actual length*/
-            cur_w += lv_font_get_width(font, letter);
+            n_char_since_last_break++;
+            letter_width = lv_font_get_width(font, letter);
+            cur_w += letter_width; 
 
-            /*If the txt is too long then finish, this is the line end*/
+            /* Get the length of the current work and determine best place 
+             * to break the line. */
             if(cur_w > max_width) {
-                /*If this a break char then break here.*/
-                if(is_break_char(letter)) {
-                    /* Now 'i' points to the next char because of txt_utf8_next()
-                     * But we need the first char of the next line so keep it.
-                     * Hence do nothing here*/
-                }
-                /*If already a break character is found, then break there*/
-                if(last_break != NO_BREAK_FOUND) {
-                    i = last_break;
+                if( last_break != NO_BREAK_FOUND ) {
+                    /* Continue searching for next breakable character to see if the next word will fit */
+                    uint32_t n_char_fit = n_char_since_last_break - 1;
+                    if(  n_char_since_last_break <= LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN ) {
+                        i = last_break;
+                    }
+                    else {
+                        uint32_t i_tmp = i;
+                        cur_w -= w_at_last_break + letter_space; /*ignore the first letter_space after the break char */
+                        bool other = true;
+                        while(txt[i_tmp] != '\0') {
+                            letter = lv_txt_encoded_next(txt, &i_tmp);
+
+                            /*Handle the recolor command*/
+                            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+                                if(lv_txt_is_cmd(&cmd_state, letter) != false) {
+                                    continue;   /*Skip the letter is it is part of a command*/
+                                }
+                            }
+
+                            /*Check for new line chars*/
+                            if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
+                                if(n_char_since_last_break >= LV_TXT_LINE_BREAK_LONG_LEN) {
+                                    /* Figure out the prettiest place to break */
+                                    uint32_t char_remain;
+                                    lv_txt_encoded_prev(txt, &i);
+                                    for(char_remain=n_char_since_last_break - n_char_fit;
+                                            char_remain < LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN;
+                                            char_remain++) {
+                                        lv_txt_encoded_prev(txt, &i);
+                                    }
+                                }
+                                else{
+                                    i = last_break;
+                                }
+                                other = false;
+                                break;
+                            } 
+                            n_char_since_last_break++;
+                            lv_coord_t letter_width = lv_font_get_width(font, letter);
+                            cur_w += letter_width;
+                            if(cur_w > max_width) {
+                                /* Current letter already exceeds, return previous */
+                                lv_txt_encoded_prev(txt, &i);
+                                other = false;
+                                break;
+                            }
+                            if(letter_width > 0){
+                                cur_w += letter_space;
+                            }
+                        }
+                        if( other ) {
+                            if(n_char_since_last_break >= LV_TXT_LINE_BREAK_LONG_LEN) {
+                                /* Figure out the prettiest place to break */
+                                uint32_t char_remain;
+                                lv_txt_encoded_prev(txt, &i);
+                                for(char_remain=n_char_since_last_break - n_char_fit;
+                                        char_remain < LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN;
+                                        char_remain++){
+                                    lv_txt_encoded_prev(txt, &i);
+                                }
+                            }
+                            else{
+                                i = last_break;
+                            }
+                        }
+                    }
                 } else {
                     /* Now this character is out of the area so it will be first character of the next line*/
                     /* But 'i' already points to the next character (because of lv_txt_utf8_next) step beck one*/
@@ -200,10 +277,17 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
              * txt can be broken here later */
             else if(is_break_char(letter)) {
                 last_break = i; /*Save the first char index  after break*/
+                w_at_last_break = cur_w;
+                if(letter_width > 0) {
+                    w_at_last_break += letter_space;
+                }
+                n_char_since_last_break = 0;
             }
         }
 
-        cur_w += letter_space;
+        if(letter_width > 0) {
+            cur_w += letter_space;
+        }
     }
 
     return i;
