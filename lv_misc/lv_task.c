@@ -56,22 +56,21 @@ void lv_task_init(void)
 
 /**
  * Call it  periodically to handle lv_tasks.
- * @return true: no error; false: error ocurred
  */
-LV_ATTRIBUTE_TASK_HANDLER bool lv_task_handler(void)
+LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 {
     LV_LOG_TRACE("lv_task_handler started");
 
     /*Avoid concurrent running of the task handler*/
     static bool task_handler_mutex = false;
-    if(task_handler_mutex) return true;
+    if(task_handler_mutex) return;
     task_handler_mutex = true;
 
     static uint32_t idle_period_start = 0;
     static uint32_t handler_start = 0;
     static uint32_t busy_time = 0;
 
-    if(lv_task_run == false) return true;
+    if(lv_task_run == false) return;
 
     handler_start = lv_tick_get();
 
@@ -149,7 +148,6 @@ LV_ATTRIBUTE_TASK_HANDLER bool lv_task_handler(void)
     task_handler_mutex = false;     /*Release the mutex*/
 
     LV_LOG_TRACE("lv_task_handler ready");
-    return true;
 }
 
 /**
