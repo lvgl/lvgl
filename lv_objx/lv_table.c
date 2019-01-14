@@ -641,6 +641,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     format.right_merge = 0;
                     format.align = LV_LABEL_ALIGN_LEFT;
                     format.type = 0;
+                    format.crop = 1;
                 }
 
                 cell_style = ext->cell_style[format.type];
