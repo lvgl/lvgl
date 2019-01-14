@@ -805,7 +805,7 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
     uint16_t row_start = row_id * ext->col_cnt;
     uint16_t cell;
     uint16_t col;
-    lv_coord_t h_max = lv_font_get_height(ext->cell_style[0]->text.font + 2 * ext->cell_style[0]->body.padding.ver);
+    lv_coord_t h_max = lv_font_get_height(ext->cell_style[0]->text.font) + 2 * ext->cell_style[0]->body.padding.ver;
 
     for(cell = row_start, col = 0; cell < row_start + ext->col_cnt; cell++, col ++) {
         if(ext->cell_data[cell] != NULL) {
