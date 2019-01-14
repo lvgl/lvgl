@@ -277,7 +277,7 @@
 /*Line meter (dependencies: *;)*/
 #define USE_LV_LMETER   1
 
-/*Gauge (dependencies:bar, lmeter)*/
+/*Gauge (dependencies:lv_bar, lv_lmeter)*/
 #define USE_LV_GAUGE    1
 
 /*Chart (dependencies: -)*/
@@ -308,7 +308,7 @@
 /*Calendar (dependencies: -)*/
 #define USE_LV_CALENDAR 1
 
-/*Preload (dependencies: arc)*/
+/*Preload (dependencies: lv_arc)*/
 #define USE_LV_PRELOAD      1
 #if USE_LV_PRELOAD != 0
 #define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
@@ -316,6 +316,8 @@
 #define LV_PRELOAD_DEF_ANIM         LV_PRELOAD_TYPE_SPINNING_ARC
 #endif
 
+/*Canvas (dependencies: lv_img)*/
+#define USE_LV_CANVAS       1
 /*************************
  * User input objects
  *************************/
