@@ -23,7 +23,7 @@
 #endif
 
 #ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
-#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 0 /* Minimum number of characters of a word to put on a line after a break */
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 1 /* Minimum number of characters of a word to put on a line after a break */
 #endif
 
 /**********************

@@ -112,7 +112,7 @@
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
 #define LV_TXT_LINE_BREAK_LONG_LEN 12 /* If a character is at least this long, will break wherever "prettiest" */
 #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
-#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 0 /* Minimum number of characters of a word to put on a line after a break */
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 1 /* Minimum number of characters of a word to put on a line after a break */
 
 /*Feature usage*/
 #define USE_LV_ANIMATION        1               /*1: Enable all animations*/
