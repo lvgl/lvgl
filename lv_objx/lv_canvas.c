@@ -95,8 +95,8 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
 /**
  * Set the color of a pixel on the canvas
  * @param canvas
- * @param x x coordiante of the point to set
- * @param y x coordiante of the point to set
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
  * @param c color of the point
  */
 void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c)
@@ -114,6 +114,34 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
     memcpy((void*)&ext->dsc.data[px], &c, sizeof(lv_color_t));
 }
 
+/**
+ * Copy a buffer to the canvas
+ * @param canvas pointer to a canvas object
+ * @param to_copy buffer to copy. The color format has to match with the canvas's buffer color format
+ * @param w width of the buffer to copy
+ * @param h height of the buffer to copy
+ * @param x left side of the destination position
+ * @param y top side of the destination position
+ */
+void lv_canvas_copy_to_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y)
+{
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+      if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
+          LV_LOG_WARN("lv_canvas_copy_to_buf: x or y out of the canvas");
+          return;
+      }
+
+      uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
+      uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+      uint8_t * to_copy8 = (uint8_t *) to_copy;
+      lv_coord_t i;
+      for(i = 0; i < h; i++) {
+          memcpy(&ext->dsc.data[px], to_copy8, w * px_size);
+          px += ext->dsc.header.w * px_size;
+          to_copy8 += w * px_size;
+      }
+
+}
 
 /*=====================
  * Setter functions
@@ -121,14 +149,14 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
 
 /**
  * Set a buffer for the canvas.
- * @param buf a buffer where the contant of the canvas will be.
+ * @param buf a buffer where the content of the canvas will be.
  * The required size is (lv_img_color_format_get_px_size(cf) * w * h) / 8)
  * It can be allocated with `lv_mem_alloc()` or
  * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
  * it can be an address in RAM or external SRAM
- * @param canvas pointer to a canvas obejct
+ * @param canvas pointer to a canvas object
  * @param w width of the canvas
- * @param h hight of the canvas
+ * @param h height of the canvas
  * @param cf color format. The following formats are supported:
  * LV_IMG_CF_TRUE_COLOR,  LV_IMG_CF_TRUE_COLOR_ALPHA, LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED
  *

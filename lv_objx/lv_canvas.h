@@ -71,6 +71,17 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy);
  */
 void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c);
 
+/**
+ * Copy a buffer to the canvas
+ * @param canvas pointer to a canvas object
+ * @param to_copy buffer to copy. The color format has to match with the canvas's buffer color format
+ * @param w width of the buffer to copy
+ * @param h height of the buffer to copy
+ * @param x left side of the destination position
+ * @param y top side of the destination position
+ */
+void lv_canvas_copy_to_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
+
 /*=====================
  * Setter functions
  *====================*/
