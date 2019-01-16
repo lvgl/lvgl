@@ -90,6 +90,7 @@ enum
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_STYLE_CHG,
     LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_LANG_CHG,
     LV_SIGNAL_GET_TYPE,
 
 	_LV_SIGNAL_FEEDBACK_SECTION_START,
@@ -549,6 +550,16 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
 /*=======================
  * Getter functions
  *======================*/
+
+/*--------------
+ * Language
+ *--------------*/
+
+/**
+ * Return with ID of the currently selected language
+ * @return pointer to the active screen object (loaded by 'lv_scr_load()')
+ */
+lv_obj_t * lv_lang_act(void);
 
 /*------------------
  * Screen get
