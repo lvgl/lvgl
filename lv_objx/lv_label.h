@@ -132,7 +132,7 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text);
  *  Only the pointer is saved so the variable must be global, static, or dynamically allocated.
  *  NULL to disable multiple language for the label.
  */
-void lv_label_set_text_multi(lv_obj_t * label, const char ** texts);
+void lv_label_set_text_multi_lang(lv_obj_t * label, const char ** texts);
 
 /**
  * Set the behavior of the label with longer text then the object size
@@ -195,7 +195,7 @@ char * lv_label_get_text(const lv_obj_t * label);
  * @param label pointer to a label object
  * @return pointer to the array storing the texts. NULL if not specified.
  */
-const char ** lv_label_get_text_multi(lv_obj_t * label);
+const char ** lv_label_get_text_multi_lang(lv_obj_t * label);
 
 /**
  * Get the long mode of a label
