@@ -1,5 +1,5 @@
 /**
- * @file lv_port_disp_templ.c
+ * @file lv_port_fs_templ.c
  *
  */
 
@@ -37,7 +37,6 @@ typedef struct {
 }dir_t;
 
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -60,6 +59,10 @@ static lv_fs_res_t fs_dir_close (void * rddir_p);
 
 /**********************
  *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
  **********************/
 
 /**********************
