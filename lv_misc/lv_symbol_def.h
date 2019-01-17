@@ -22,115 +22,182 @@ extern "C" {
 
 #if LV_TXT_UTF8 == 0
 #define LV_SYMBOL_GLYPH_FIRST  0xC0
-#define SYMBOL_AUDIO           "\xC0"
-#define SYMBOL_VIDEO           "\xC1"
-#define SYMBOL_LIST            "\xC2"
-#define SYMBOL_OK              "\xC3"
-#define SYMBOL_CLOSE           "\xC4"
-#define SYMBOL_POWER           "\xC5"
-#define SYMBOL_SETTINGS        "\xC6"
-#define SYMBOL_TRASH           "\xC7"
-#define SYMBOL_HOME            "\xC8"
-#define SYMBOL_DOWNLOAD        "\xC9"
-#define SYMBOL_DRIVE           "\xCA"
-#define SYMBOL_REFRESH         "\xCB"
-#define SYMBOL_MUTE            "\xCC"
-#define SYMBOL_VOLUME_MID      "\xCD"
-#define SYMBOL_VOLUME_MAX      "\xCE"
-#define SYMBOL_IMAGE           "\xCF"
-#define SYMBOL_EDIT            "\xD0"
-#define SYMBOL_PREV            "\xD1"
-#define SYMBOL_PLAY            "\xD2"
-#define SYMBOL_PAUSE           "\xD3"
-#define SYMBOL_STOP            "\xD4"
-#define SYMBOL_NEXT            "\xD5"
-#define SYMBOL_EJECT           "\xD6"
-#define SYMBOL_LEFT            "\xD7"
-#define SYMBOL_RIGHT           "\xD8"
-#define SYMBOL_PLUS            "\xD9"
-#define SYMBOL_MINUS           "\xDA"
-#define SYMBOL_WARNING         "\xDB"
-#define SYMBOL_SHUFFLE         "\xDC"
-#define SYMBOL_UP              "\xDD"
-#define SYMBOL_DOWN            "\xDE"
-#define SYMBOL_LOOP            "\xDF"
-#define SYMBOL_DIRECTORY       "\xE0"
-#define SYMBOL_UPLOAD          "\xE1"
-#define SYMBOL_CALL            "\xE2"
-#define SYMBOL_CUT             "\xE3"
-#define SYMBOL_COPY            "\xE4"
-#define SYMBOL_SAVE            "\xE5"
-#define SYMBOL_CHARGE          "\xE6"
-#define SYMBOL_BELL            "\xE7"
-#define SYMBOL_KEYBOARD        "\xE8"
-#define SYMBOL_GPS             "\xE9"
-#define SYMBOL_FILE            "\xEA"
-#define SYMBOL_WIFI            "\xEB"
-#define SYMBOL_BATTERY_FULL    "\xEC"
-#define SYMBOL_BATTERY_3       "\xED"
-#define SYMBOL_BATTERY_2       "\xEE"
-#define SYMBOL_BATTERY_1       "\xEF"
-#define SYMBOL_BATTERY_EMPTY   "\xF0"
-#define SYMBOL_BLUETOOTH       "\xF1"
+#define SYMBOL_AUDIO           _SYMBOL_VALUE1(C0)
+#define SYMBOL_VIDEO           _SYMBOL_VALUE1(C1)
+#define SYMBOL_LIST            _SYMBOL_VALUE1(C2)
+#define SYMBOL_OK              _SYMBOL_VALUE1(C3)
+#define SYMBOL_CLOSE           _SYMBOL_VALUE1(C4)
+#define SYMBOL_POWER           _SYMBOL_VALUE1(C5)
+#define SYMBOL_SETTINGS        _SYMBOL_VALUE1(C6)
+#define SYMBOL_TRASH           _SYMBOL_VALUE1(C7)
+#define SYMBOL_HOME            _SYMBOL_VALUE1(C8)
+#define SYMBOL_DOWNLOAD        _SYMBOL_VALUE1(C9)
+#define SYMBOL_DRIVE           _SYMBOL_VALUE1(CA)
+#define SYMBOL_REFRESH         _SYMBOL_VALUE1(CB)
+#define SYMBOL_MUTE            _SYMBOL_VALUE1(CC)
+#define SYMBOL_VOLUME_MID      _SYMBOL_VALUE1(CD)
+#define SYMBOL_VOLUME_MAX      _SYMBOL_VALUE1(CE)
+#define SYMBOL_IMAGE           _SYMBOL_VALUE1(CF)
+#define SYMBOL_EDIT            _SYMBOL_VALUE1(D0)
+#define SYMBOL_PREV            _SYMBOL_VALUE1(D1)
+#define SYMBOL_PLAY            _SYMBOL_VALUE1(D2)
+#define SYMBOL_PAUSE           _SYMBOL_VALUE1(D3)
+#define SYMBOL_STOP            _SYMBOL_VALUE1(D4)
+#define SYMBOL_NEXT            _SYMBOL_VALUE1(D5)
+#define SYMBOL_EJECT           _SYMBOL_VALUE1(D6)
+#define SYMBOL_LEFT            _SYMBOL_VALUE1(D7)
+#define SYMBOL_RIGHT           _SYMBOL_VALUE1(D8)
+#define SYMBOL_PLUS            _SYMBOL_VALUE1(D9)
+#define SYMBOL_MINUS           _SYMBOL_VALUE1(DA)
+#define SYMBOL_WARNING         _SYMBOL_VALUE1(DB)
+#define SYMBOL_SHUFFLE         _SYMBOL_VALUE1(DC)
+#define SYMBOL_UP              _SYMBOL_VALUE1(DD)
+#define SYMBOL_DOWN            _SYMBOL_VALUE1(DE)
+#define SYMBOL_LOOP            _SYMBOL_VALUE1(DF)
+#define SYMBOL_DIRECTORY       _SYMBOL_VALUE1(E0)
+#define SYMBOL_UPLOAD          _SYMBOL_VALUE1(E1)
+#define SYMBOL_CALL            _SYMBOL_VALUE1(E2)
+#define SYMBOL_CUT             _SYMBOL_VALUE1(E3)
+#define SYMBOL_COPY            _SYMBOL_VALUE1(E4)
+#define SYMBOL_SAVE            _SYMBOL_VALUE1(E5)
+#define SYMBOL_CHARGE          _SYMBOL_VALUE1(E6)
+#define SYMBOL_BELL            _SYMBOL_VALUE1(E7)
+#define SYMBOL_KEYBOARD        _SYMBOL_VALUE1(E8)
+#define SYMBOL_GPS             _SYMBOL_VALUE1(E9)
+#define SYMBOL_FILE            _SYMBOL_VALUE1(EA)
+#define SYMBOL_WIFI            _SYMBOL_VALUE1(EB)
+#define SYMBOL_BATTERY_FULL    _SYMBOL_VALUE1(EC)
+#define SYMBOL_BATTERY_3       _SYMBOL_VALUE1(ED)
+#define SYMBOL_BATTERY_2       _SYMBOL_VALUE1(EE)
+#define SYMBOL_BATTERY_1       _SYMBOL_VALUE1(EF)
+#define SYMBOL_BATTERY_EMPTY   _SYMBOL_VALUE1(F0)
+#define SYMBOL_BLUETOOTH       _SYMBOL_VALUE1(F1)
 #define LV_SYMBOL_GLYPH_LAST   0xF1
-#define SYMBOL_DUMMY           "\xFF"       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
+#define SYMBOL_DUMMY           _SYMBOL_VALUE1(xFF)       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
 
 #else
 #define LV_SYMBOL_GLYPH_FIRST  0xF800
-#define SYMBOL_AUDIO           "\xEF\xA0\x80"
-#define SYMBOL_VIDEO           "\xEF\xA0\x81"
-#define SYMBOL_LIST            "\xEF\xA0\x82"
-#define SYMBOL_OK              "\xEF\xA0\x83"
-#define SYMBOL_CLOSE           "\xEF\xA0\x84"
-#define SYMBOL_POWER           "\xEF\xA0\x85"
-#define SYMBOL_SETTINGS        "\xEF\xA0\x86"
-#define SYMBOL_TRASH           "\xEF\xA0\x87"
-#define SYMBOL_HOME            "\xEF\xA0\x88"
-#define SYMBOL_DOWNLOAD        "\xEF\xA0\x89"
-#define SYMBOL_DRIVE           "\xEF\xA0\x8A"
-#define SYMBOL_REFRESH         "\xEF\xA0\x8B"
-#define SYMBOL_MUTE            "\xEF\xA0\x8C"
-#define SYMBOL_VOLUME_MID      "\xEF\xA0\x8D"
-#define SYMBOL_VOLUME_MAX      "\xEF\xA0\x8E"
-#define SYMBOL_IMAGE           "\xEF\xA0\x8F"
-#define SYMBOL_EDIT            "\xEF\xA0\x90"
-#define SYMBOL_PREV            "\xEF\xA0\x91"
-#define SYMBOL_PLAY            "\xEF\xA0\x92"
-#define SYMBOL_PAUSE           "\xEF\xA0\x93"
-#define SYMBOL_STOP            "\xEF\xA0\x94"
-#define SYMBOL_NEXT            "\xEF\xA0\x95"
-#define SYMBOL_EJECT           "\xEF\xA0\x96"
-#define SYMBOL_LEFT            "\xEF\xA0\x97"
-#define SYMBOL_RIGHT           "\xEF\xA0\x98"
-#define SYMBOL_PLUS            "\xEF\xA0\x99"
-#define SYMBOL_MINUS           "\xEF\xA0\x9A"
-#define SYMBOL_WARNING         "\xEF\xA0\x9B"
-#define SYMBOL_SHUFFLE         "\xEF\xA0\x9C"
-#define SYMBOL_UP              "\xEF\xA0\x9D"
-#define SYMBOL_DOWN            "\xEF\xA0\x9E"
-#define SYMBOL_LOOP            "\xEF\xA0\x9F"
-#define SYMBOL_DIRECTORY       "\xEF\xA0\xA0"
-#define SYMBOL_UPLOAD          "\xEF\xA0\xA1"
-#define SYMBOL_CALL            "\xEF\xA0\xA2"
-#define SYMBOL_CUT             "\xEF\xA0\xA3"
-#define SYMBOL_COPY            "\xEF\xA0\xA4"
-#define SYMBOL_SAVE            "\xEF\xA0\xA5"
-#define SYMBOL_CHARGE          "\xEF\xA0\xA6"
-#define SYMBOL_BELL            "\xEF\xA0\xA7"
-#define SYMBOL_KEYBOARD        "\xEF\xA0\xA8"
-#define SYMBOL_GPS             "\xEF\xA0\xA9"
-#define SYMBOL_FILE            "\xEF\xA0\xAA"
-#define SYMBOL_WIFI            "\xEF\xA0\xAB"
-#define SYMBOL_BATTERY_FULL    "\xEF\xA0\xAC"
-#define SYMBOL_BATTERY_3       "\xEF\xA0\xAD"
-#define SYMBOL_BATTERY_2       "\xEF\xA0\xAE"
-#define SYMBOL_BATTERY_1       "\xEF\xA0\xAF"
-#define SYMBOL_BATTERY_EMPTY   "\xEF\xA0\xB0"
-#define SYMBOL_BLUETOOTH       "\xEF\xA0\xB1"
+#define SYMBOL_AUDIO           _SYMBOL_VALUE3(EF,A0,80)
+#define SYMBOL_VIDEO           _SYMBOL_VALUE3(EF,A0,81)
+#define SYMBOL_LIST            _SYMBOL_VALUE3(EF,A0,82)
+#define SYMBOL_OK              _SYMBOL_VALUE3(EF,A0,83)
+#define SYMBOL_CLOSE           _SYMBOL_VALUE3(EF,A0,84)
+#define SYMBOL_POWER           _SYMBOL_VALUE3(EF,A0,85)
+#define SYMBOL_SETTINGS        _SYMBOL_VALUE3(EF,A0,86)
+#define SYMBOL_TRASH           _SYMBOL_VALUE3(EF,A0,87)
+#define SYMBOL_HOME            _SYMBOL_VALUE3(EF,A0,88)
+#define SYMBOL_DOWNLOAD        _SYMBOL_VALUE3(EF,A0,89)
+#define SYMBOL_DRIVE           _SYMBOL_VALUE3(EF,A0,8A)
+#define SYMBOL_REFRESH         _SYMBOL_VALUE3(EF,A0,8B)
+#define SYMBOL_MUTE            _SYMBOL_VALUE3(EF,A0,8C)
+#define SYMBOL_VOLUME_MID      _SYMBOL_VALUE3(EF,A0,8D)
+#define SYMBOL_VOLUME_MAX      _SYMBOL_VALUE3(EF,A0,8E)
+#define SYMBOL_IMAGE           _SYMBOL_VALUE3(EF,A0,8F)
+#define SYMBOL_EDIT            _SYMBOL_VALUE3(EF,A0,90)
+#define SYMBOL_PREV            _SYMBOL_VALUE3(EF,A0,91)
+#define SYMBOL_PLAY            _SYMBOL_VALUE3(EF,A0,92)
+#define SYMBOL_PAUSE           _SYMBOL_VALUE3(EF,A0,93)
+#define SYMBOL_STOP            _SYMBOL_VALUE3(EF,A0,94)
+#define SYMBOL_NEXT            _SYMBOL_VALUE3(EF,A0,95)
+#define SYMBOL_EJECT           _SYMBOL_VALUE3(EF,A0,96)
+#define SYMBOL_LEFT            _SYMBOL_VALUE3(EF,A0,97)
+#define SYMBOL_RIGHT           _SYMBOL_VALUE3(EF,A0,98)
+#define SYMBOL_PLUS            _SYMBOL_VALUE3(EF,A0,99)
+#define SYMBOL_MINUS           _SYMBOL_VALUE3(EF,A0,9A)
+#define SYMBOL_WARNING         _SYMBOL_VALUE3(EF,A0,9B)
+#define SYMBOL_SHUFFLE         _SYMBOL_VALUE3(EF,A0,9C)
+#define SYMBOL_UP              _SYMBOL_VALUE3(EF,A0,9D)
+#define SYMBOL_DOWN            _SYMBOL_VALUE3(EF,A0,9E)
+#define SYMBOL_LOOP            _SYMBOL_VALUE3(EF,A0,9F)
+#define SYMBOL_DIRECTORY       _SYMBOL_VALUE3(EF,A0,A0)
+#define SYMBOL_UPLOAD          _SYMBOL_VALUE3(EF,A0,A1)
+#define SYMBOL_CALL            _SYMBOL_VALUE3(EF,A0,A2)
+#define SYMBOL_CUT             _SYMBOL_VALUE3(EF,A0,A3)
+#define SYMBOL_COPY            _SYMBOL_VALUE3(EF,A0,A4)
+#define SYMBOL_SAVE            _SYMBOL_VALUE3(EF,A0,A5)
+#define SYMBOL_CHARGE          _SYMBOL_VALUE3(EF,A0,A6)
+#define SYMBOL_BELL            _SYMBOL_VALUE3(EF,A0,A7)
+#define SYMBOL_KEYBOARD        _SYMBOL_VALUE3(EF,A0,A8)
+#define SYMBOL_GPS             _SYMBOL_VALUE3(EF,A0,A9)
+#define SYMBOL_FILE            _SYMBOL_VALUE3(EF,A0,AA)
+#define SYMBOL_WIFI            _SYMBOL_VALUE3(EF,A0,AB)
+#define SYMBOL_BATTERY_FULL    _SYMBOL_VALUE3(EF,A0,AC)
+#define SYMBOL_BATTERY_3       _SYMBOL_VALUE3(EF,A0,AD)
+#define SYMBOL_BATTERY_2       _SYMBOL_VALUE3(EF,A0,AE)
+#define SYMBOL_BATTERY_1       _SYMBOL_VALUE3(EF,A0,AF)
+#define SYMBOL_BATTERY_EMPTY   _SYMBOL_VALUE3(EF,A0,B0)
+#define SYMBOL_BLUETOOTH       _SYMBOL_VALUE3(EF,A0,B1)
 #define LV_SYMBOL_GLYPH_LAST   0xF831
-#define SYMBOL_DUMMY           "\xEF\xA3\xBF"       /*Invalid symbol at (U+F831). If written before a string then `lv_img` will show it as a label*/
+#define SYMBOL_DUMMY           _SYMBOL_VALUE3(EF,A3,BF)       /*Invalid symbol at (U+F831). If written before a string then `lv_img` will show it as a label*/
 #endif
 
+#define _SYMBOL_VALUE1(x) (0x ## x)
+#define _SYMBOL_VALUE3(x, y, z) (0x ## z ## y ## x)
+#define _SYMBOL_NUMSTR(sym) LV_ ## sym ## _NUMSTR = sym
+
+enum
+{
+    _SYMBOL_NUMSTR(SYMBOL_AUDIO),
+    _SYMBOL_NUMSTR(SYMBOL_VIDEO),
+    _SYMBOL_NUMSTR(SYMBOL_LIST),
+    _SYMBOL_NUMSTR(SYMBOL_OK),
+    _SYMBOL_NUMSTR(SYMBOL_CLOSE),
+    _SYMBOL_NUMSTR(SYMBOL_POWER),
+    _SYMBOL_NUMSTR(SYMBOL_SETTINGS),
+    _SYMBOL_NUMSTR(SYMBOL_TRASH),
+    _SYMBOL_NUMSTR(SYMBOL_HOME),
+    _SYMBOL_NUMSTR(SYMBOL_DOWNLOAD),
+    _SYMBOL_NUMSTR(SYMBOL_DRIVE),
+    _SYMBOL_NUMSTR(SYMBOL_REFRESH),
+    _SYMBOL_NUMSTR(SYMBOL_MUTE),
+    _SYMBOL_NUMSTR(SYMBOL_VOLUME_MID),
+    _SYMBOL_NUMSTR(SYMBOL_VOLUME_MAX),
+    _SYMBOL_NUMSTR(SYMBOL_IMAGE),
+    _SYMBOL_NUMSTR(SYMBOL_EDIT),
+    _SYMBOL_NUMSTR(SYMBOL_PREV),
+    _SYMBOL_NUMSTR(SYMBOL_PLAY),
+    _SYMBOL_NUMSTR(SYMBOL_PAUSE),
+    _SYMBOL_NUMSTR(SYMBOL_STOP),
+    _SYMBOL_NUMSTR(SYMBOL_NEXT),
+    _SYMBOL_NUMSTR(SYMBOL_EJECT),
+    _SYMBOL_NUMSTR(SYMBOL_LEFT),
+    _SYMBOL_NUMSTR(SYMBOL_RIGHT),
+    _SYMBOL_NUMSTR(SYMBOL_PLUS),
+    _SYMBOL_NUMSTR(SYMBOL_MINUS),
+    _SYMBOL_NUMSTR(SYMBOL_WARNING),
+    _SYMBOL_NUMSTR(SYMBOL_SHUFFLE),
+    _SYMBOL_NUMSTR(SYMBOL_UP),
+    _SYMBOL_NUMSTR(SYMBOL_DOWN),
+    _SYMBOL_NUMSTR(SYMBOL_LOOP),
+    _SYMBOL_NUMSTR(SYMBOL_DIRECTORY),
+    _SYMBOL_NUMSTR(SYMBOL_UPLOAD),
+    _SYMBOL_NUMSTR(SYMBOL_CALL),
+    _SYMBOL_NUMSTR(SYMBOL_CUT),
+    _SYMBOL_NUMSTR(SYMBOL_COPY),
+    _SYMBOL_NUMSTR(SYMBOL_SAVE),
+    _SYMBOL_NUMSTR(SYMBOL_CHARGE),
+    _SYMBOL_NUMSTR(SYMBOL_BELL),
+    _SYMBOL_NUMSTR(SYMBOL_KEYBOARD),
+    _SYMBOL_NUMSTR(SYMBOL_GPS),
+    _SYMBOL_NUMSTR(SYMBOL_FILE),
+    _SYMBOL_NUMSTR(SYMBOL_WIFI),
+    _SYMBOL_NUMSTR(SYMBOL_BATTERY_FULL),
+    _SYMBOL_NUMSTR(SYMBOL_BATTERY_3),
+    _SYMBOL_NUMSTR(SYMBOL_BATTERY_2),
+    _SYMBOL_NUMSTR(SYMBOL_BATTERY_1),
+    _SYMBOL_NUMSTR(SYMBOL_BATTERY_EMPTY),
+    _SYMBOL_NUMSTR(SYMBOL_BLUETOOTH),
+    _SYMBOL_NUMSTR(SYMBOL_DUMMY),
+};
+
+#undef _SYMBOL_VALUE1
+#undef _SYMBOL_VALUE3
+
+#define _SYMBOL_STR_(x) #x
+#define _SYMBOL_STR(x) _SYMBOL_STR_(x)
+#define _SYMBOL_CHAR(c) \x ## c
+#define _SYMBOL_VALUE1(x) _SYMBOL_STR(_SYMBOL_CHAR(x))
+#define _SYMBOL_VALUE3(x, y, z) _SYMBOL_STR(_SYMBOL_CHAR(x)_SYMBOL_CHAR(y)_SYMBOL_CHAR(z))
 
 #ifdef __cplusplus
 } /* extern "C" */

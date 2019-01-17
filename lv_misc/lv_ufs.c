@@ -53,7 +53,7 @@ static bool inited = false;
  */
 void lv_ufs_init(void)
 {
-    lv_ll_init(&LV_GC_ROOT(file_ll), sizeof(lv_ufs_ent_t));
+    lv_ll_init(&LV_GC_ROOT(_file_ll), sizeof(lv_ufs_ent_t));
 
     lv_fs_drv_t ufs_drv;
     memset(&ufs_drv, 0, sizeof(lv_fs_drv_t));    /*Initialization*/
@@ -207,7 +207,7 @@ lv_fs_res_t lv_ufs_remove(const char * fn)
     /*Can not be deleted is opened*/
     if(ent->oc != 0) return LV_FS_RES_DENIED;
 
-    lv_ll_rem(&LV_GC_ROOT(file_ll), ent);
+    lv_ll_rem(&LV_GC_ROOT(_file_ll), ent);
     lv_mem_free(ent->fn_d);
     ent->fn_d = NULL;
     if(ent->const_data == 0) {
@@ -417,9 +417,9 @@ lv_fs_res_t lv_ufs_dir_read(void * dir_p, char * fn)
     lv_ufs_dir_t * ufs_dir_p = dir_p;
 
     if(ufs_dir_p->last_ent == NULL) {
-        ufs_dir_p->last_ent = lv_ll_get_head(&LV_GC_ROOT(file_ll));
+        ufs_dir_p->last_ent = lv_ll_get_head(&LV_GC_ROOT(_file_ll));
     } else {
-        ufs_dir_p->last_ent = lv_ll_get_next(&LV_GC_ROOT(file_ll), ufs_dir_p->last_ent);
+        ufs_dir_p->last_ent = lv_ll_get_next(&LV_GC_ROOT(_file_ll), ufs_dir_p->last_ent);
     }
 
     if(ufs_dir_p->last_ent != NULL) {
@@ -477,7 +477,7 @@ static lv_ufs_ent_t * lv_ufs_ent_get(const char * fn)
 {
     lv_ufs_ent_t * fp;
 
-    LL_READ(LV_GC_ROOT(file_ll), fp) {
+    LL_READ(LV_GC_ROOT(_file_ll), fp) {
         if(strcmp(fp->fn_d, fn) == 0) {
             return fp;
         }
@@ -495,7 +495,7 @@ static lv_ufs_ent_t * lv_ufs_ent_get(const char * fn)
 static lv_ufs_ent_t * lv_ufs_ent_new(const char * fn)
 {
     lv_ufs_ent_t * new_ent = NULL;
-    new_ent = lv_ll_ins_head(&LV_GC_ROOT(file_ll));                 /*Create a new file*/
+    new_ent = lv_ll_ins_head(&LV_GC_ROOT(_file_ll));                 /*Create a new file*/
     lv_mem_assert(new_ent);
     if(new_ent == NULL) return NULL;
 

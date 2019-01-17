@@ -56,7 +56,7 @@ static bool anim_list_changed;
  */
 void lv_anim_init(void)
 {
-    lv_ll_init(&LV_GC_ROOT(anim_ll), sizeof(lv_anim_t));
+    lv_ll_init(&LV_GC_ROOT(_anim_ll), sizeof(lv_anim_t));
     last_task_run = lv_tick_get();
     lv_task_create(anim_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
 }
@@ -72,7 +72,7 @@ void lv_anim_create(lv_anim_t * anim_p)
     if(anim_p->fp != NULL) lv_anim_del(anim_p->var, anim_p->fp);       /*fp == NULL would delete all animations of var*/
 
     /*Add the new animation to the animation linked list*/
-    lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(anim_ll));
+    lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(_anim_ll));
     lv_mem_assert(new_anim);
     if(new_anim == NULL) return;
 
@@ -102,13 +102,13 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
     lv_anim_t * a;
     lv_anim_t * a_next;
     bool del = false;
-    a = lv_ll_get_head(&LV_GC_ROOT(anim_ll));
+    a = lv_ll_get_head(&LV_GC_ROOT(_anim_ll));
     while(a != NULL) {
         /*'a' might be deleted, so get the next object while 'a' is valid*/
-        a_next = lv_ll_get_next(&LV_GC_ROOT(anim_ll), a);
+        a_next = lv_ll_get_next(&LV_GC_ROOT(_anim_ll), a);
 
         if(a->var == var && (a->fp == fp || fp == NULL)) {
-            lv_ll_rem(&LV_GC_ROOT(anim_ll), a);
+            lv_ll_rem(&LV_GC_ROOT(_anim_ll), a);
             lv_mem_free(a);
             anim_list_changed = true;       /*Read by `anim_task`. It need to know if a delete occurred in the linked list*/
             del = true;
@@ -357,12 +357,12 @@ static void anim_task(void * param)
     (void)param;
 
     lv_anim_t * a;
-    LL_READ(LV_GC_ROOT(anim_ll), a) {
+    LL_READ(LV_GC_ROOT(_anim_ll), a) {
         a->has_run = 0;
     }
 
     uint32_t elaps = lv_tick_elaps(last_task_run);
-    a = lv_ll_get_head(&LV_GC_ROOT(anim_ll));
+    a = lv_ll_get_head(&LV_GC_ROOT(_anim_ll));
 
     while(a != NULL) {
         /*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete happened in `anim_ready_handler`
@@ -390,8 +390,8 @@ static void anim_task(void * param)
 
         /* If the linked list changed due to anim. delete then it's not safe to continue
          * the reading of the list from here -> start from the head*/
-        if(anim_list_changed) a = lv_ll_get_head(&LV_GC_ROOT(anim_ll));
-        else a = lv_ll_get_next(&LV_GC_ROOT(anim_ll), a);
+        if(anim_list_changed) a = lv_ll_get_head(&LV_GC_ROOT(_anim_ll));
+        else a = lv_ll_get_next(&LV_GC_ROOT(_anim_ll), a);
     }
 
     last_task_run = lv_tick_get();
@@ -401,7 +401,7 @@ static void anim_task(void * param)
  * Called when an animation is ready to do the necessary thinks
  * e.g. repeat, play back, delete etc.
  * @param a pointer to an animation descriptor
- * @return true: animation delete occurred nnd the `LV_GC_ROOT(anim_ll)` has changed
+ * @return true: animation delete occurred nnd the `LV_GC_ROOT(_anim_ll)` has changed
  * */
 static bool anim_ready_handler(lv_anim_t * a)
 {
@@ -413,7 +413,7 @@ static bool anim_ready_handler(lv_anim_t * a)
             (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
         void (*cb)(void *) = a->end_cb;
         void * p = a->var;
-        lv_ll_rem(&LV_GC_ROOT(anim_ll), a);
+        lv_ll_rem(&LV_GC_ROOT(_anim_ll), a);
         lv_mem_free(a);
         anim_list_changed = true;
 
