@@ -30,18 +30,18 @@ extern "C" {
  *********************/
 
 #define LV_GC_ROOTS(prefix) \
-    prefix lv_ll_t lv_task_ll;      /*Linked list to store the lv_tasks*/ \
-    prefix lv_ll_t scr_ll;          /*Linked list of screens*/ \
-    prefix lv_ll_t drv_ll;\
-    prefix lv_ll_t file_ll;\
-    prefix lv_ll_t anim_ll;\
-    prefix void * def_scr;\
-    prefix void * act_scr;\
-    prefix void * top_layer;\
-    prefix void * sys_layer;\
-    prefix void * task_act;\
-    prefix void * indev_list;\
-    prefix void * disp_list;\
+    prefix lv_ll_t _lv_task_ll;      /*Linked list to store the lv_tasks*/ \
+    prefix lv_ll_t _scr_ll;          /*Linked list of screens*/ \
+    prefix lv_ll_t _drv_ll;\
+    prefix lv_ll_t _file_ll;\
+    prefix lv_ll_t _anim_ll;\
+    prefix void * _def_scr;\
+    prefix void * _act_scr;\
+    prefix void * _top_layer;\
+    prefix void * _sys_layer;\
+    prefix void * _task_act;\
+    prefix void * _indev_list;\
+    prefix void * _disp_list;\
     
     
 #define LV_NO_PREFIX
