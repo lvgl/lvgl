@@ -87,33 +87,33 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
         end_flag = true;
         task_deleted = false;
         task_created = false;
-        LV_GC_ROOT(_task_act) = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
-        while(LV_GC_ROOT(_task_act)) {
+        LV_GC_ROOT(_lv_task_act) = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
+        while(LV_GC_ROOT(_lv_task_act)) {
             /* The task might be deleted if it runs only once ('once = 1')
              * So get next element until the current is surely valid*/
-            next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), LV_GC_ROOT(_task_act));
+            next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), LV_GC_ROOT(_lv_task_act));
 
             /*We reach priority of the turned off task. There is nothing more to do.*/
-            if(((lv_task_t *)LV_GC_ROOT(_task_act))->prio == LV_TASK_PRIO_OFF) {
+            if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio == LV_TASK_PRIO_OFF) {
                 break;
             }
 
             /*Here is the interrupter task. Don't execute it again.*/
-            if(LV_GC_ROOT(_task_act) == task_interrupter) {
+            if(LV_GC_ROOT(_lv_task_act) == task_interrupter) {
                 task_interrupter = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
-                LV_GC_ROOT(_task_act) = next;
+                LV_GC_ROOT(_lv_task_act) = next;
                 continue;                   /*Load the next task*/
             }
 
             /*Just try to run the tasks with highest priority.*/
-            if(((lv_task_t *)LV_GC_ROOT(_task_act))->prio == LV_TASK_PRIO_HIGHEST) {
-                lv_task_exec(LV_GC_ROOT(_task_act));
+            if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio == LV_TASK_PRIO_HIGHEST) {
+                lv_task_exec(LV_GC_ROOT(_lv_task_act));
             }
             /*Tasks with higher priority then the interrupted shall be run in every case*/
             else if(task_interrupter) {
-                if(((lv_task_t *)LV_GC_ROOT(_task_act))->prio > task_interrupter->prio) {
-                    if(lv_task_exec(LV_GC_ROOT(_task_act))) {
-                        task_interrupter = LV_GC_ROOT(_task_act);  /*Check all tasks again from the highest priority */
+                if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio > task_interrupter->prio) {
+                    if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
+                        task_interrupter = LV_GC_ROOT(_lv_task_act);  /*Check all tasks again from the highest priority */
                         end_flag = false;
                         break;
                     }
@@ -122,8 +122,8 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             /* It is no interrupter task or we already reached it earlier.
              * Just run the remaining tasks*/
             else {
-                if(lv_task_exec(LV_GC_ROOT(_task_act))) {
-                    task_interrupter = LV_GC_ROOT(_task_act);  /*Check all tasks again from the highest priority */
+                if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
+                    task_interrupter = LV_GC_ROOT(_lv_task_act);  /*Check all tasks again from the highest priority */
                     end_flag = false;
                     break;
                 }
@@ -132,7 +132,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             if(task_deleted) break;     /*If a task was deleted then this or the next item might be corrupted*/
             if(task_created) break;     /*If a task was deleted then this or the next item might be corrupted*/
 
-            LV_GC_ROOT(_task_act) = next;         /*Load the next task*/
+            LV_GC_ROOT(_lv_task_act) = next;         /*Load the next task*/
         }
     } while(!end_flag);
 
@@ -212,7 +212,7 @@ void lv_task_del(lv_task_t * lv_task_p)
 
     lv_mem_free(lv_task_p);
 
-    if(LV_GC_ROOT(_task_act) == lv_task_p) task_deleted = true;      /*The active task was deleted*/
+    if(LV_GC_ROOT(_lv_task_act) == lv_task_p) task_deleted = true;      /*The active task was deleted*/
 }
 
 /**
