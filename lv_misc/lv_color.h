@@ -392,14 +392,18 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #endif
 #endif
 
-#define LV_COLOR_HEX(c) LV_COLOR_MAKE(((uint32_t)((uint32_t)c >> 16) & 0xFF), \
-                                ((uint32_t)((uint32_t)c >> 8) & 0xFF), \
-                                ((uint32_t) c & 0xFF))
+static inline lv_color_t LV_COLOR_HEX(uint32_t c){
+   return LV_COLOR_MAKE(((uint32_t)(c >> 16) & 0xFF), 
+            ((uint32_t)(c >> 8) & 0xFF), 
+            (c & 0xFF));
+}
 
 /*Usage LV_COLOR_HEX3(0x16C) which means LV_COLOR_HEX(0x1166CC)*/
-#define LV_COLOR_HEX3(c) LV_COLOR_MAKE((((c >> 4) & 0xF0) | ((c >> 8) & 0xF)),   \
-                                ((uint32_t)(c & 0xF0)       | ((c & 0xF0) >> 4)), \
-                                ((uint32_t)(c & 0xF)         | ((c & 0xF) << 4)))
+static inline lv_color_t LV_COLOR_HEX3(uint32_t c){
+   return LV_COLOR_MAKE((((c >> 4) & 0xF0) | ((c >> 8) & 0xF)),
+            ((uint32_t)(c & 0xF0)       | ((c & 0xF0) >> 4)), 
+            ((uint32_t)(c & 0xF)         | ((c & 0xF) << 4)));
+}
 
 
 /**
