@@ -341,7 +341,7 @@ lv_btnm_action_t lv_btnm_get_action(const lv_obj_t * btnm)
 }
 
 /**
- * Get the toggled button
+ * Get the id of the button of the toggled button
  * @param btnm pointer to button matrix object
  * @return  index of the currently toggled button (0: if unset)
  */
@@ -351,6 +351,18 @@ uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm)
 
     if(ext->toggle == 0) return 0;
     else return ext->btn_id_tgl;
+}
+
+/**
+ * Get the id of the button of the pressed button
+ * @param btnm pointer to button matrix object
+ * @return  index of the currently pressed button
+ */
+uint16_t lv_btnm_get_pressed(const lv_obj_t * btnm)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+
+    return ext->btn_id_pr;
 }
 
 /**
