@@ -370,7 +370,7 @@
 /*************************
  * Non-user section
  *************************/
-#ifdef _MSC_VER                               /* Disable warnings for Visual Studio*/
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
