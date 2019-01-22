@@ -121,6 +121,19 @@ uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end);
  */
 int32_t lv_anim_path_linear(const lv_anim_t *a);
 
+/**
+ * Calculate the current value of an animation slowing down the start phase
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_ease_in(const lv_anim_t * a);
+
+/**
+ * Calculate the current value of an animation slowing down the end phase
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_ease_out(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation applying an "S" characteristic (cosine)

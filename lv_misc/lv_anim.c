@@ -157,7 +157,6 @@ uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end)
 int32_t lv_anim_path_linear(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-
     uint16_t step;
     if(a->time == a->act_time) step = LV_ANIM_RESOLUTION; /*Use the last value if the time fully elapsed*/
     else step = (a->act_time * LV_ANIM_RESOLUTION) / a->time;
@@ -168,6 +167,53 @@ int32_t lv_anim_path_linear(const lv_anim_t * a)
     new_value = (int32_t) step * (a->end - a->start);
     new_value = new_value >> LV_ANIM_RES_SHIFT;
     new_value += a->start;
+
+    return new_value;
+}
+
+/**
+ * Calculate the current value of an animation slowing down the start phase
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_ease_in(const lv_anim_t * a)
+{
+    /*Calculate the current step*/
+    uint32_t t;
+    if(a->time == a->act_time) t = 1024;
+    else t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
+
+    int32_t step = lv_bezier3(t, 0, 1, 1, 1024);
+
+    int32_t new_value;
+    new_value = (int32_t) step * (a->end - a->start);
+    new_value = new_value >> 10;
+    new_value += a->start;
+
+
+    return new_value;
+}
+
+/**
+ * Calculate the current value of an animation slowing down the end phase
+ * @param a pointer to an animation
+ * @return the current value to set
+ */
+int32_t lv_anim_path_ease_out(const lv_anim_t * a)
+{
+    /*Calculate the current step*/
+
+    uint32_t t;
+    if(a->time == a->act_time) t = 1024;
+    else t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
+
+    int32_t step = lv_bezier3(t, 0, 1023, 1023, 1024);
+
+    int32_t new_value;
+    new_value = (int32_t) step * (a->end - a->start);
+    new_value = new_value >> 10;
+    new_value += a->start;
+
 
     return new_value;
 }
