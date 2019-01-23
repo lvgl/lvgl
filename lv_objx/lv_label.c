@@ -761,7 +761,6 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
     } else if(sign == LV_SIGNAL_LANG_CHG) {
 #if USE_LV_MULTI_LANG
         if(ext->lang_txt_id != LV_LANG_TXT_ID_NONE) {
-            uint8_t lang = lv_lang_act();
             const char * lang_txt = lv_lang_get_text(ext->lang_txt_id);
             if(lang_txt) {
                 lv_label_set_text(label, lang_txt);

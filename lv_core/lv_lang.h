@@ -51,7 +51,7 @@ void lv_lang_set_text_func(const void * (*fp)(uint16_t));
  * @param txt_id an ID of the text to get
  * @return the `txt_id` txt on the set language
  */
-void * lv_lang_get_text(uint16_t txt_id);
+const void * lv_lang_get_text(uint16_t txt_id);
 
 /**
  * Return with ID of the currently selected language
