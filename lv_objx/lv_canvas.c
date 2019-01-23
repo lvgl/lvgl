@@ -123,25 +123,65 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  * @param x left side of the destination position
  * @param y top side of the destination position
  */
-void lv_canvas_copy_to_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y)
+void lv_canvas_copy_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y)
 {
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-      if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
-          LV_LOG_WARN("lv_canvas_copy_to_buf: x or y out of the canvas");
-          return;
-      }
+    if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
+        LV_LOG_WARN("lv_canvas_copy_buf: x or y out of the canvas");
+        return;
+    }
 
-      uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
-      uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
-      uint8_t * to_copy8 = (uint8_t *) to_copy;
-      lv_coord_t i;
-      for(i = 0; i < h; i++) {
-          memcpy(&ext->dsc.data[px], to_copy8, w * px_size);
-          px += ext->dsc.header.w * px_size;
-          to_copy8 += w * px_size;
-      }
-
+    uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
+    uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+    uint8_t * to_copy8 = (uint8_t *) to_copy;
+    lv_coord_t i;
+    for(i = 0; i < h; i++) {
+        memcpy(&ext->dsc.data[px], to_copy8, w * px_size);
+        px += ext->dsc.header.w * px_size;
+        to_copy8 += w * px_size;
+    }
 }
+
+/**
+ * Multiply a buffer with the canvas
+ * @param canvas pointer to a canvas object
+ * @param to_copy buffer to copy (multiply). LV_IMG_CF_TRUE_COLOR_ALPHA is not supported
+ * @param w width of the buffer to copy
+ * @param h height of the buffer to copy
+ * @param x left side of the destination position
+ * @param y top side of the destination position
+ */
+void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y)
+{
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
+        LV_LOG_WARN("lv_canvas_mult_buf: x or y out of the canvas");
+        return;
+    }
+
+    if(ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
+        LV_LOG_WARN("lv_canvas_mult_buf: LV_IMG_CF_TRUE_COLOR_ALPHA is not supported");
+        return;
+    }
+
+    uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
+    uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+    lv_color_t * copy_buf_color = (lv_color_t *) to_copy;
+    lv_color_t * canvas_buf_color = (lv_color_t *) &ext->dsc.data[px];
+
+    lv_coord_t i;
+    lv_coord_t j;
+    for(i = 0; i < h; i++) {
+        for(j = 0; j < w; j++) {
+            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 8;
+            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 8;
+            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 8;
+        }
+        copy_buf_color += w;
+        canvas_buf_color += ext->dsc.header.w;
+    }
+}
+
 
 /*=====================
  * Setter functions
@@ -183,9 +223,9 @@ void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_
 void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t * style)
 {
     switch(type) {
-        case LV_CANVAS_STYLE_MAIN:
-            lv_img_set_style(canvas, style);
-            break;
+    case LV_CANVAS_STYLE_MAIN:
+        lv_img_set_style(canvas, style);
+        break;
     }
 }
 
@@ -205,11 +245,11 @@ lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type
     lv_style_t * style = NULL;
 
     switch(type) {
-        case LV_CANVAS_STYLE_MAIN:
-            style = lv_img_get_style(canvas);
-            break;
-        default:
-            style =  NULL;
+    case LV_CANVAS_STYLE_MAIN:
+        style = lv_img_get_style(canvas);
+        break;
+    default:
+        style =  NULL;
     }
 
     return style;
@@ -238,7 +278,6 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(canvas, sign, param);
     if(res != LV_RES_OK) return res;
-
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

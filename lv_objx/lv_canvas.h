@@ -80,7 +80,18 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  * @param x left side of the destination position
  * @param y top side of the destination position
  */
-void lv_canvas_copy_to_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
+void lv_canvas_copy_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
+
+/**
+ * Multiply a buffer with the canvas
+ * @param canvas pointer to a canvas object
+ * @param to_copy buffer to copy (multiply). LV_IMG_CF_TRUE_COLOR_ALPHA is not supported
+ * @param w width of the buffer to copy
+ * @param h height of the buffer to copy
+ * @param x left side of the destination position
+ * @param y top side of the destination position
+ */
+void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
 
 /*=====================
  * Setter functions
