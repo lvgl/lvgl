@@ -761,7 +761,7 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_func_t   lv_obj_get_signal_func(const lv_obj_t * obj);
+lv_signal_func_t lv_obj_get_signal_func(const lv_obj_t * obj);
 
 /**
  * Get the design function of an object
