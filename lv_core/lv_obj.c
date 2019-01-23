@@ -35,7 +35,6 @@
  **********************/
 static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
-static void lang_set_core(lv_obj_t * obj);
 static void refresh_childen_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode);
@@ -49,9 +48,6 @@ static lv_obj_t * act_scr = NULL;
 static lv_obj_t * top_layer = NULL;
 static lv_obj_t * sys_layer = NULL;
 static lv_ll_t scr_ll;                 /*Linked list of screens*/
-#if USE_LV_MULTI_LANG
-static uint8_t lang_act = 0;
-#endif
 
 /**********************
  *      MACROS
@@ -458,33 +454,6 @@ void lv_scr_load(lv_obj_t * scr)
     act_scr = scr;
 
     lv_obj_invalidate(act_scr);
-}
-
-/*--------------
- * Language
- *--------------*/
-
-/**
- * Change the language
- * @param lang_id the id of the
- */
-void lv_lang_set(uint8_t lang_id)
-{
-#if USE_LV_MULTI_LANG
-    lang_act = lang_id;
-
-    lv_obj_t * i;
-    LL_READ(scr_ll, i) {
-        i->signal_func(i, LV_SIGNAL_LANG_CHG, NULL);
-
-        lang_set_core(i);
-    }
-#else
-    LV_LOG_WARN("lv_lang_act: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
-    return 0;
-#endif
-
-
 }
 
 /*--------------------
@@ -1318,24 +1287,6 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Getter functions
  *======================*/
 
-/*--------------
- * Language
- *--------------*/
-
-/**
- * Return with ID of the currently selected language
- * @return pointer to the active screen object (loaded by 'lv_scr_load()')
- */
-lv_obj_t * lv_lang_act(void)
-{
-#if USE_LV_MULTI_LANG
-    return lang_act;
-#else
-    LV_LOG_WARN("lv_lang_act: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
-    return 0;
-#endif
-}
-
 /*------------------
  * Screen get
  *-----------------*/
@@ -1936,21 +1887,6 @@ static void report_style_mod_core(void * style_p, lv_obj_t * obj)
         }
 
         report_style_mod_core(style_p, i);
-    }
-}
-
-
-/**
- * Change the language of the children. (Called recursively)
- * @param obj pointer to an object
- */
-static void lang_set_core(lv_obj_t * obj)
-{
-    lv_obj_t * i;
-    LL_READ(obj->child_ll, i) {
-        i->signal_func(i, LV_SIGNAL_LANG_CHG, NULL);
-
-        lang_set_core(i);
     }
 }
 

@@ -69,8 +69,8 @@ typedef struct
     char dot_tmp[LV_LABEL_DOT_NUM * 4 + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
 #endif
 
-#if USE_LV_MULTI_LANG > 0
-    const char ** multi_lang_texts; /*Store multiple languages statically (only the pointer is saved)*/
+#if USE_LV_MULTI_LANG
+    uint16_t lang_txt_id;            /*The ID of the text to to display*/
 #endif
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;            /*Speed of scroll and roll animation in px/sec unit*/
@@ -124,16 +124,13 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_static_text(lv_obj_t * label, const char * text);
 
 
-/**
- * Set the text for the multiple languages
- * @param label pointer to a label object
- * @param texts '\0' terminated character strings like `const char * txts[] = {"dog", "hund"}`.
- *  The number of elements must be `USE_LV_MULTI_LANG`.
- *  Only the pointer is saved so the variable must be global, static, or dynamically allocated.
- *  NULL to disable multiple language for the label.
- */
-void lv_label_set_text_multi_lang(lv_obj_t * label, const char ** texts);
 
+/**
+ *Set a text ID which means a the same text but on different languages
+ * @param label pointer to a label object
+ * @param txt_id ID of the text
+ */
+void lv_label_set_text_lang(lv_obj_t * label, uint32_t txt_id);
 /**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
@@ -191,11 +188,11 @@ static inline void lv_label_set_style(lv_obj_t *label, lv_style_t *style)
 char * lv_label_get_text(const lv_obj_t * label);
 
 /**
- * Get the array which stores the texts for multiple languages
+ * Get the text ID of the label. (Used by the multi-language feature)
  * @param label pointer to a label object
- * @return pointer to the array storing the texts. NULL if not specified.
+ * @return ID of the text
  */
-const char ** lv_label_get_text_multi_lang(lv_obj_t * label);
+uint16_t lv_label_get_text_lang(lv_obj_t * label);
 
 /**
  * Get the long mode of a label

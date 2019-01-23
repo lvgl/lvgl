@@ -1,0 +1,124 @@
+/**
+ * @file lv_lang.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+#include "lv_lang.h"
+#include "lv_obj.h"
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+static void lang_set_core(lv_obj_t * obj);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+static uint8_t lang_act = 0;
+static void * (*get_txt)(uint16_t);
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+/**
+ * Change the language
+ * @param lang_id the id of the
+ */
+void lv_lang_set(uint8_t lang_id)
+{
+#if USE_LV_MULTI_LANG
+    lang_act = lang_id;
+
+//    TODO make scr_ll global
+//    lv_obj_t * i;
+//    LL_READ(scr_ll, i) {
+//        i->signal_func(i, LV_SIGNAL_LANG_CHG, NULL);
+//
+//        lang_set_core(i);
+//    }
+
+    lang_set_core(lv_scr_act());
+
+#else
+    LV_LOG_WARN("lv_lang_act: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ");
+    return;
+#endif
+
+}
+
+/**
+ * Set a function to get the texts of the set languages from a `txt_id`
+ * @param fp a function pointer to get the texts
+ */
+void lv_lang_set_text_func(void * (*fp)(uint16_t))
+{
+    get_txt = fp;
+}
+
+/**
+ * Use the function set by `lv_lang_set_text_func` to get the `txt_id` text in the set language
+ * @param txt_id an ID of the text to get
+ * @return the `txt_id` txt on the set language
+ */
+void * lv_lang_get_text(uint16_t txt_id)
+{
+    if(get_txt == NULL) {
+        LV_LOG_WARN("lv_lang_get_text: text_func is not specified");
+        return NULL;                    /*No text_get function specified */
+    }
+    if(txt_id == LV_LANG_TXT_ID_NONE) {
+        LV_LOG_WARN("lv_lang_get_text: attempts to get invalid text ID");
+        return NULL;      /*Invalid txt_id*/
+    }
+
+    return get_txt(txt_id);
+}
+
+
+/**
+ * Return with ID of the currently selected language
+ * @return pointer to the active screen object (loaded by 'lv_scr_load()')
+ */
+uint8_t lv_lang_act(void)
+{
+#if USE_LV_MULTI_LANG
+    return lang_act;
+#else
+    LV_LOG_WARN("lv_lang_act: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
+    return 0;
+#endif
+}
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+/**
+ * Change the language of the children. (Called recursively)
+ * @param obj pointer to an object
+ */
+static void lang_set_core(lv_obj_t * obj)
+{
+    lv_obj_t * i;
+    LL_READ(obj->child_ll, i) {
+        i->signal_func(i, LV_SIGNAL_LANG_CHG, NULL);
+
+        lang_set_core(i);
+    }
+}

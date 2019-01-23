@@ -59,6 +59,7 @@ extern "C" {
 #define LV_ANIM_DIR_MASK        0x80    /*ANIM_IN/ANIM_OUT mask*/
 
 #define LV_MAX_ANCESTOR_NUM     8
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -550,16 +551,6 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
 /*=======================
  * Getter functions
  *======================*/
-
-/*--------------
- * Language
- *--------------*/
-
-/**
- * Return with ID of the currently selected language
- * @return pointer to the active screen object (loaded by 'lv_scr_load()')
- */
-lv_obj_t * lv_lang_act(void);
 
 /*------------------
  * Screen get
