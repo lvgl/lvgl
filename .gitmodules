@@ -1,3 +1,0 @@
-[submodule "micropython/pycparser"]
-	path = micropython/pycparser
-	url = https://github.com/eliben/pycparser.git
