@@ -78,6 +78,9 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
     ext->auto_size = 1;
+#if USE_LV_MULTI_LANG
+    ext->lang_txt_id = LV_LANG_TXT_ID_NONE;
+#endif
 
     /*Init the new object*/
     lv_obj_set_signal_func(new_img, lv_img_signal);
@@ -265,6 +268,21 @@ const char * lv_img_get_file_name(const lv_obj_t * img)
     else return "";
 }
 
+/**
+ * Get the source ID of the image. (Used by the multi-language feature)
+ * @param img pointer to an image
+ * @return ID of the source
+ */
+uint16_t lv_img_get_text_lang(lv_obj_t * img)
+{
+#if USE_LV_MULTI_LANG
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    return ext->lang_txt_id;
+#else
+    LV_LOG_WARN("lv_img_get_text_lang: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
+    return NULL;
+#endif
+}
 
 /**
  * Get the auto size enable attribute

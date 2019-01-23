@@ -95,6 +95,13 @@ static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
 }
 
 /**
+ * Set an ID which means a the same source but on different languages
+ * @param img pointer to an image object
+ * @param src_id ID of the source
+ */
+void lv_img_set_src_multi(lv_obj_t * img, uint32_t txt_id);
+
+/**
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
@@ -140,6 +147,13 @@ const void * lv_img_get_src(lv_obj_t * img);
  * @return file name
  */
 const char * lv_img_get_file_name(const lv_obj_t * img);
+
+/**
+ * Get the source ID of the image. (Used by the multi-language feature)
+ * @param img pointer to an image
+ * @return ID of the source
+ */
+uint16_t lv_img_get_text_lang(lv_obj_t * img);
 
 /**
  * Get the auto size enable attribute
