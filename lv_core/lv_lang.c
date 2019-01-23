@@ -25,7 +25,7 @@ static void lang_set_core(lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 static uint8_t lang_act = 0;
-static void * (*get_txt)(uint16_t);
+static const void * (*get_txt)(uint16_t);
 
 /**********************
  *      MACROS
@@ -65,7 +65,7 @@ void lv_lang_set(uint8_t lang_id)
  * Set a function to get the texts of the set languages from a `txt_id`
  * @param fp a function pointer to get the texts
  */
-void lv_lang_set_text_func(void * (*fp)(uint16_t))
+void lv_lang_set_text_func(const void * (*fp)(uint16_t))
 {
     get_txt = fp;
 }
