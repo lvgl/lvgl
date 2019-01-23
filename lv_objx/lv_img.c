@@ -14,6 +14,7 @@
 #error "lv_img: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
+#include "../lv_core/lv_lang.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"
@@ -203,6 +204,24 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 }
 
 /**
+ * Set an ID which means a the same source but on different languages
+ * @param img pointer to an image object
+ * @param src_id ID of the source
+ */
+void lv_img_set_src_multi(lv_obj_t * img, uint32_t txt_id)
+{
+#if USE_LV_MULTI_LANG
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    ext->lang_txt_id = txt_id;
+
+    /*Apply the new language*/
+    img->signal_func(img, LV_SIGNAL_LANG_CHG, NULL);
+#else
+    LV_LOG_WARN("lv_img_set_src_multi: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
+#endif
+}
+
+/**
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
@@ -350,6 +369,17 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
             lv_img_set_src(img, ext->src);
 
         }
+    } else if(sign == LV_SIGNAL_LANG_CHG) {
+#if USE_LV_MULTI_LANG
+        if(ext->lang_txt_id != LV_LANG_TXT_ID_NONE) {
+            const char * lang_src = lv_lang_get_text(ext->lang_txt_id);
+            if(lang_src) {
+                lv_img_set_src(img, lang_src);
+            } else {
+                LV_LOG_WARN("lv_lang_get_text return NULL for an image's source");
+            }
+        }
+#endif
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

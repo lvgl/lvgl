@@ -70,7 +70,7 @@ typedef struct
 #endif
 
 #if USE_LV_MULTI_LANG
-    uint16_t lang_txt_id;            /*The ID of the text to to display*/
+    uint16_t lang_txt_id;            /*The ID of the text to display*/
 #endif
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;            /*Speed of scroll and roll animation in px/sec unit*/
@@ -123,14 +123,13 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
  */
 void lv_label_set_static_text(lv_obj_t * label, const char * text);
 
-
-
 /**
  *Set a text ID which means a the same text but on different languages
  * @param label pointer to a label object
  * @param txt_id ID of the text
  */
 void lv_label_set_text_lang(lv_obj_t * label, uint32_t txt_id);
+
 /**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
