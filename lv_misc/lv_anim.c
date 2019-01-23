@@ -128,7 +128,7 @@ uint16_t lv_anim_count_running(void)
 {
     uint16_t cnt = 0;
     lv_anim_t * a;
-    LL_READ(anim_ll, a) cnt++;
+    LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
 
     return cnt++;
 }
