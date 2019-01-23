@@ -44,7 +44,7 @@ void lv_lang_set(uint8_t lang_id);
  * Set a function to get the texts of the set languages from a `txt_id`
  * @param fp a function pointer to get the texts
  */
-void lv_lang_set_text_func(void * (*fp)(uint16_t));
+void lv_lang_set_text_func(const void * (*fp)(uint16_t));
 
 /**
  * Use the function set by `lv_lang_set_text_func` to get the `txt_id` text in the set language
