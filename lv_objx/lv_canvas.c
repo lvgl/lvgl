@@ -77,7 +77,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing canvas*/
     else {
-        lv_canvas_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        //lv_canvas_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_canvas);
@@ -136,7 +136,7 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
     uint8_t * to_copy8 = (uint8_t *) to_copy;
     lv_coord_t i;
     for(i = 0; i < h; i++) {
-        memcpy(&ext->dsc.data[px], to_copy8, w * px_size);
+        memcpy((void*)&ext->dsc.data[px], to_copy8, w * px_size);
         px += ext->dsc.header.w * px_size;
         to_copy8 += w * px_size;
     }
@@ -241,7 +241,7 @@ void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t *
  */
 lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type)
 {
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    // lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
     lv_style_t * style = NULL;
 
     switch(type) {
