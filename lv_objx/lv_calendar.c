@@ -14,7 +14,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
-#include <strings.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
