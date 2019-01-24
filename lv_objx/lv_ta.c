@@ -221,7 +221,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, (const char *)letter_buf);
 
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -284,7 +284,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
 
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -391,7 +391,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         if(ext->pwd_tmp == NULL) return;
         strcpy(ext->pwd_tmp, txt);
 
-#if USE_LV_ANIMATION
+#if USE_LV_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
