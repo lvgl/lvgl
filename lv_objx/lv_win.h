@@ -65,7 +65,8 @@ typedef struct
     lv_style_t * style_header;      /*Style of the header container*/
     lv_style_t * style_btn_rel;    /*Control button releases style*/
     lv_style_t * style_btn_pr;     /*Control button pressed style*/
-    lv_coord_t btn_size;               /*Size of the control buttons (square)*/
+    lv_coord_t btn_width;               /*Size of the control buttons */
+    lv_coord_t btn_height;               /*Size of the control buttons */
 } lv_win_ext_t;
 
 enum {
@@ -133,7 +134,7 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
  * @param win pointer to a window object
  * @return control button size
  */
-void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
+void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t w, lv_coord_t h);
 
 /**
  * Set the layout of the window
@@ -156,6 +157,7 @@ void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
  * @param style pointer to a style
  */
 void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
+
 
 /**
  * Set drag status of a window. If set to 'true' window can be dragged like on a PC.
@@ -183,11 +185,18 @@ const char * lv_win_get_title(const lv_obj_t * win);
 lv_obj_t * lv_win_get_content(const lv_obj_t * win);
 
 /**
- * Get the control button size of a window
+ * Get the control button width of a window
  * @param win pointer to a window object
  * @return control button size
  */
-lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
+lv_coord_t lv_win_get_btn_width(const lv_obj_t * win);
+
+/**
+ * Get the control button height of a window
+ * @param win pointer to a window object
+ * @return control button size
+ */
+lv_coord_t lv_win_get_btn_height(const lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.
