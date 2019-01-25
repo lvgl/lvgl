@@ -72,6 +72,15 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c);
 
 /**
+ * Get the color of a pixel on the canvas
+ * @param canvas
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @param c color of the point
+ */
+void lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t * c);
+
+/**
  * Copy a buffer to the canvas
  * @param canvas pointer to a canvas object
  * @param to_copy buffer to copy. The color format has to match with the canvas's buffer color format
@@ -138,6 +147,14 @@ lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type
 /*=====================
  * Other functions
  *====================*/
+void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_coord_t radius, lv_color_t color);
+void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color);
+void lv_canvas_draw_triangle(lv_obj_t * canvas, lv_point_t * points, lv_color_t color);
+void lv_canvas_draw_rect(lv_obj_t * canvas, lv_point_t * points, lv_color_t color);
+void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color);
+void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color, lv_color_t bg_color);
+void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t boundary_color);
+void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t bg_color);
 
 /**********************
  *      MACROS

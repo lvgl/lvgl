@@ -115,6 +115,28 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
 }
 
 /**
+ * Get the color of a pixel on the canvas
+ * @param canvas
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @param c color of the point
+ */
+void lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t * c)
+{
+
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    if(x >= ext->dsc.header.w || y >= ext->dsc.header.h) {
+        LV_LOG_WARN("lv_canvas_get_px: x or y out of the canvas");
+        return;
+    }
+
+    uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
+    uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+
+    memcpy(c, (void*)&ext->dsc.data[px], sizeof(lv_color_t));
+}
+
+/**
  * Copy a buffer to the canvas
  * @param canvas pointer to a canvas object
  * @param to_copy buffer to copy. The color format has to match with the canvas's buffer color format
@@ -259,6 +281,192 @@ lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type
  * Other functions
  *====================*/
 
+/**
+ * Draw circle function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param x0 x coordinate of the circle
+ * @param y0 y coordinate of the circle
+ * @param radius radius of the circle
+ * @param color border color of the circle
+ */
+void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_coord_t radius, lv_color_t color)
+{
+    int x = radius;
+    int y = 0;
+    int err = 0;
+
+    while (x >= y)
+    {
+        lv_canvas_set_px(canvas, x0 + x, y0 + y, color);
+        lv_canvas_set_px(canvas, x0 + y, y0 + x, color);
+        lv_canvas_set_px(canvas, x0 - y, y0 + x, color);
+        lv_canvas_set_px(canvas, x0 - x, y0 + y, color);
+        lv_canvas_set_px(canvas, x0 - x, y0 - y, color);
+        lv_canvas_set_px(canvas, x0 - y, y0 - x, color);
+        lv_canvas_set_px(canvas, x0 + y, y0 - x, color);
+        lv_canvas_set_px(canvas, x0 + x, y0 - y, color);
+
+        if (err <= 0)
+        {
+            y += 1;
+            err += 2*y + 1;
+        }
+
+        if (err > 0)
+        {
+            x -= 1;
+            err -= 2*x + 1;
+        }
+    }
+}
+
+/**
+ * Draw line function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param point1 start point of the line
+ * @param point2 end point of the line
+ * @param color color of the line
+ */
+void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color)
+{
+  lv_coord_t x0, y0, x1, y1;
+
+  x0 = point1.x;
+  y0 = point1.y;
+  x1 = point2.x;
+  y1 = point2.y;
+
+  int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+  int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+  int err = (dx>dy ? dx : -dy)/2, e2;
+ 
+  for(;;){
+    // setPixel(x0,y0);
+    lv_canvas_set_px(canvas, x0, y0, color);
+
+    if (x0==x1 && y0==y1) break;
+    e2 = err;
+    if (e2 >-dx) { err -= dy; x0 += sx; }
+    if (e2 < dy) { err += dx; y0 += sy; }
+  }
+}
+
+/**
+ * Draw triangle function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the triangle
+ * @param color line color of the triangle
+ */
+void lv_canvas_draw_triangle(lv_obj_t * canvas, lv_point_t * points, lv_color_t color)
+{ 
+  lv_canvas_draw_polygon(canvas, points, 3, color);
+}
+
+/**
+ * Draw rectangle function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the rectangle
+ * @param color line color of the rectangle
+ */
+void lv_canvas_draw_rect(lv_obj_t * canvas, lv_point_t * points, lv_color_t color)
+{ 
+  lv_canvas_draw_polygon(canvas, points, 4, color);
+}
+
+/**
+ * Draw polygon function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the polygon
+ * @param size edge count of the polygon
+ * @param color line color of the polygon
+ */
+void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color)
+{ 
+  uint8_t i;
+
+  for(i=0; i < (size - 1); i++) {
+    lv_canvas_draw_line(canvas, points[i], points[i + 1], color);
+  }
+
+  lv_canvas_draw_line(canvas, points[size - 1], points[0], color);
+}
+
+/**
+ * Fill polygon function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the polygon
+ * @param size edge count of the polygon
+ * @param color line color of the polygon
+ * @param bg_color background color of the polygon
+ */
+void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color, lv_color_t bg_color)
+{
+  uint32_t x = 0, y = 0;
+  uint8_t i;
+
+  for(i=0; i<size; i++) {
+    x += points[i].x;
+    y += points[i].y;
+  }
+
+  x = x / size;
+  y = y / size;
+
+  // lv_canvas_flood_fill(canvas, (lv_coord_t) x, (lv_coord_t) y, color, bg_color);
+  lv_canvas_boundary_fill4(canvas, (lv_coord_t) x, (lv_coord_t) y, color, color);
+}
+
+/**
+ * Boundary fill function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param x x coordinate of the start position (seed)
+ * @param y y coordinate of the start position (seed)
+ * @param fill_color fill color of the area
+ * @param boundary_color edge/boundary color of the area
+ */
+void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t boundary_color)
+{
+    lv_color_t c;
+
+    lv_canvas_get_px(canvas, x, y, &c);
+
+    if(c.full != boundary_color.full &&
+       c.full != fill_color.full)
+    {
+      // putpixel(x, y, fill_color);
+      lv_canvas_set_px(canvas, x, y, fill_color);
+
+      lv_canvas_boundary_fill4(canvas, x + 1,     y, fill_color, boundary_color);
+      lv_canvas_boundary_fill4(canvas,     x, y + 1, fill_color, boundary_color);
+      lv_canvas_boundary_fill4(canvas, x - 1,     y, fill_color, boundary_color);
+      lv_canvas_boundary_fill4(canvas,     x, y - 1, fill_color, boundary_color);
+    }
+}
+
+/**
+ * Flood fill function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param x x coordinate of the start position (seed)
+ * @param y y coordinate of the start position (seed)
+ * @param fill_color fill color of the area
+ * @param bg_color background color of the area
+ */
+void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t bg_color)
+{
+  lv_color_t c;
+
+  lv_canvas_get_px(canvas, x, y, &c);
+
+  if(c.full == bg_color.full)
+  {
+    lv_canvas_set_px(canvas, x, y, fill_color);
+
+    lv_canvas_flood_fill(canvas, x+1,   y, fill_color, bg_color);
+    lv_canvas_flood_fill(canvas,   x, y+1, fill_color, bg_color);
+    lv_canvas_flood_fill(canvas, x-1,   y, fill_color, bg_color);
+    lv_canvas_flood_fill(canvas,   x, y-1, fill_color, bg_color);
+  }
+}
 
 /**********************
  *   STATIC FUNCTIONS
