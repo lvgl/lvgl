@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdlib.h>
 #include "lv_canvas.h"
 #if USE_LV_CANVAS != 0
 
