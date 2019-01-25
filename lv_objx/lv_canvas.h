@@ -147,13 +147,79 @@ lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type
 /*=====================
  * Other functions
  *====================*/
+
+/**
+ * Draw circle function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param x0 x coordinate of the circle
+ * @param y0 y coordinate of the circle
+ * @param radius radius of the circle
+ * @param color border color of the circle
+ */
 void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_coord_t radius, lv_color_t color);
+
+/**
+ * Draw line function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param point1 start point of the line
+ * @param point2 end point of the line
+ * @param color color of the line
+ */
 void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color);
+
+/**
+ * Draw triangle function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the triangle
+ * @param color line color of the triangle
+ */
 void lv_canvas_draw_triangle(lv_obj_t * canvas, lv_point_t * points, lv_color_t color);
+
+/**
+ * Draw rectangle function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the rectangle
+ * @param color line color of the rectangle
+ */
 void lv_canvas_draw_rect(lv_obj_t * canvas, lv_point_t * points, lv_color_t color);
+
+/**
+ * Draw polygon function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the polygon
+ * @param size edge count of the polygon
+ * @param color line color of the polygon
+ */
 void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color);
+
+/**
+ * Fill polygon function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param points edge points of the polygon
+ * @param size edge count of the polygon
+ * @param color line color of the polygon
+ * @param bg_color background color of the polygon
+ */
 void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color, lv_color_t bg_color);
+
+/**
+ * Boundary fill function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param x x coordinate of the start position (seed)
+ * @param y y coordinate of the start position (seed)
+ * @param fill_color fill color of the area
+ * @param boundary_color edge/boundary color of the area
+ */
 void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t boundary_color);
+
+/**
+ * Flood fill function of the canvas
+ * @param canvas pointer to a canvas object
+ * @param x x coordinate of the start position (seed)
+ * @param y y coordinate of the start position (seed)
+ * @param fill_color fill color of the area
+ * @param bg_color background color of the area
+ */
 void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t bg_color);
 
 /**********************
