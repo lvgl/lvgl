@@ -79,7 +79,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img);
  * @param img pointer to an image object
  * @param src_id ID of the source
  */
-void lv_img_set_src_multi(lv_obj_t * img, uint32_t txt_id);
+void lv_img_set_src_id(lv_obj_t * img, uint32_t txt_id);
 
 
 /**
@@ -95,11 +95,11 @@ static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
 }
 
 /**
- * Set an ID which means a the same source but on different languages
+ * Set an ID which means a the same source but in different languages
  * @param img pointer to an image object
  * @param src_id ID of the source
  */
-void lv_img_set_src_multi(lv_obj_t * img, uint32_t txt_id);
+void lv_img_set_src_id(lv_obj_t * img, uint32_t src_id);
 
 /**
  * Enable the auto size feature.

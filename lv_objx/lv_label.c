@@ -238,11 +238,11 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text)
 }
 
 /**
- *Set a text ID which means a the same text but on different languages
+ *Set a text ID which refers a the same text but in a different languages
  * @param label pointer to a label object
  * @param txt_id ID of the text
  */
-void lv_label_set_text_lang(lv_obj_t * label, uint32_t txt_id)
+void lv_label_set_text_id(lv_obj_t * label, uint32_t txt_id)
 {
 #if USE_LV_MULTI_LANG
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);

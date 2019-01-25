@@ -128,7 +128,7 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text);
  * @param label pointer to a label object
  * @param txt_id ID of the text
  */
-void lv_label_set_text_lang(lv_obj_t * label, uint32_t txt_id);
+void lv_label_set_text_id(lv_obj_t * label, uint32_t txt_id);
 
 /**
  * Set the behavior of the label with longer text then the object size

@@ -207,20 +207,20 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 }
 
 /**
- * Set an ID which means a the same source but on different languages
+ * Set an ID which means a the same source but in different languages
  * @param img pointer to an image object
  * @param src_id ID of the source
  */
-void lv_img_set_src_multi(lv_obj_t * img, uint32_t txt_id)
+void lv_img_set_src_id(lv_obj_t * img, uint32_t src_id)
 {
 #if USE_LV_MULTI_LANG
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-    ext->lang_txt_id = txt_id;
+    ext->lang_txt_id = lv_img_set_src_id;
 
     /*Apply the new language*/
     img->signal_func(img, LV_SIGNAL_LANG_CHG, NULL);
 #else
-    LV_LOG_WARN("lv_img_set_src_multi: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
+    LV_LOG_WARN("lv_img_set_src_id: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
 #endif
 }
 
