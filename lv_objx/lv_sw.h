@@ -89,6 +89,13 @@ void lv_sw_on(lv_obj_t *sw);
 void lv_sw_off(lv_obj_t *sw);
 
 /**
+ * Toggle the position of the switch
+ * @param sw pointer to a switch object
+ * @return resulting state of the switch.
+ */
+bool lv_sw_toggle(lv_obj_t *sw);
+
+/**
  * Turn ON the switch with an animation
  * @param sw pointer to a switch object
  */
@@ -99,6 +106,13 @@ void lv_sw_on_anim(lv_obj_t * sw);
  * @param sw pointer to a switch object
  */
 void lv_sw_off_anim(lv_obj_t * sw);
+
+/**
+ * Toggle the position of the switch with an animation
+ * @param sw pointer to a switch object
+ * @return resulting state of the switch.
+ */
+bool lv_sw_toggle_anim(lv_obj_t *sw);
 
 /**
  * Set a function which will be called when the switch is toggled by the user

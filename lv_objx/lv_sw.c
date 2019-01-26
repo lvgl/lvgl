@@ -148,6 +148,22 @@ void lv_sw_off(lv_obj_t * sw)
 }
 
 /**
+ * Toggle the position of the switch
+ * @param sw pointer to a switch object
+ * @return resulting state of the switch.
+ */
+bool lv_sw_toggle(lv_obj_t *sw) {
+    bool state = lv_sw_get_state(sw);
+    if(state) {
+        lv_sw_off(sw);
+    }
+    else {
+        lv_sw_on(sw);
+    }
+    return !state;
+}
+
+/**
  * Turn ON the switch with an animation
  * @param sw pointer to a switch object
  */
@@ -171,6 +187,22 @@ void lv_sw_off_anim(lv_obj_t * sw)
     else lv_slider_set_value(sw, 0);
 
     lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
+}
+
+/**
+ * Toggle the position of the switch with an animation
+ * @param sw pointer to a switch object
+ * @return resulting state of the switch.
+ */
+bool lv_sw_toggle_anim(lv_obj_t *sw) {
+    bool state = lv_sw_get_state(sw);
+    if(state) {
+        lv_sw_off_anim(sw);
+    }
+    else {
+        lv_sw_on_anim(sw);
+    }
+    return !state;
 }
 
 /**
