@@ -203,7 +203,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     lv_obj_set_signal_func(liste, lv_list_btn_signal);
 
     /*Make the size adjustment*/
-    lv_coord_t w = lv_obj_get_width(list);
+    lv_coord_t w = lv_page_get_scrl_width(list);
     lv_style_t  * style_scrl = lv_obj_get_style(lv_page_get_scrl(list));
     lv_coord_t pad_hor_tot = style->body.padding.hor + style_scrl->body.padding.hor;
     w -= pad_hor_tot * 2;
