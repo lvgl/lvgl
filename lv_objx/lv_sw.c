@@ -190,6 +190,22 @@ void lv_sw_off_anim(lv_obj_t * sw)
 }
 
 /**
+ * Toggle the position of the switch with an animation
+ * @param sw pointer to a switch object
+ * @return resulting state of the switch.
+ */
+bool lv_sw_toggle_anim(lv_obj_t *sw) {
+    bool state = lv_sw_get_state(sw);
+    if(state) {
+        lv_sw_off_anim(sw);
+    }
+    else {
+        lv_sw_on_anim(sw);
+    }
+    return !state;
+}
+
+/**
  * Set a style of a switch
  * @param sw pointer to a switch object
  * @param type which style should be set
