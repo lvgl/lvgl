@@ -50,6 +50,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  **********************/
 
 /**********************
+ *  GLOBAL VARIABLES
+ **********************/
+LV_ROOTS; /* See lv_misc/lv_gc.h */
+
+/**********************
  *      MACROS
  **********************/
 
@@ -1926,8 +1931,8 @@ static void delete_children(lv_obj_t * obj)
     lv_obj_t * i_next;
     i = lv_ll_get_head(&(obj->child_ll));
 
-    /*Remove from the group; remove before transversing children so that 
-     * the object still has access to all children during the 
+    /*Remove from the group; remove before transversing children so that
+     * the object still has access to all children during the
      * LV_SIGNAL_DEFOCUS call*/
 #if USE_LV_GROUP
     if(obj->group_p != NULL) lv_group_remove_obj(obj);
