@@ -190,7 +190,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    if(ext->one_line && (c == '\n' || c == '\n')) {
+    if(ext->one_line && (c == '\n' || c == '\r')) {
         LV_LOG_INFO("Text area: line break ignored in one-line mode");
         return;
     }
