@@ -11,6 +11,7 @@
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_group.h"
+#include "../lv_core/lv_lang.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
@@ -90,6 +91,9 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_speed = LV_LABEL_SCROLL_SPEED;
     ext->offset.x = 0;
     ext->offset.y = 0;
+#if USE_LV_MULTI_LANG
+    ext->lang_txt_id = LV_LANG_TXT_ID_NONE;
+#endif
     lv_obj_set_design_func(new_label, lv_label_design);
     lv_obj_set_signal_func(new_label, lv_label_signal);
 
@@ -175,6 +179,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     lv_label_refr_text(label);
 }
+
 /**
  * Set a new text for a label from a character array. The array don't has to be '\0' terminated.
  * Memory will be allocated to store the array by the label.
@@ -233,6 +238,24 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text)
 }
 
 /**
+ *Set a text ID which refers a the same text but in a different languages
+ * @param label pointer to a label object
+ * @param txt_id ID of the text
+ */
+void lv_label_set_text_id(lv_obj_t * label, uint32_t txt_id)
+{
+#if USE_LV_MULTI_LANG
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    ext->lang_txt_id = txt_id;
+
+    /*Apply the new language*/
+    label->signal_func(label, LV_SIGNAL_LANG_CHG, NULL);
+#else
+    LV_LOG_WARN("lv_label_set_text_multi: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
+#endif
+}
+
+/**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
@@ -277,7 +300,6 @@ void lv_label_set_align(lv_obj_t * label, lv_label_align_t align)
     ext->align = align;
 
     lv_obj_invalidate(label);       /*Enough to invalidate because alignment is only drawing related (lv_refr_label_text() not required)*/
-
 }
 
 /**
@@ -345,6 +367,22 @@ char * lv_label_get_text(const lv_obj_t * label)
     return ext->text;
 }
 
+/**
+ * Get the text ID of the label. (Used by the multi-language feature)
+ * @param label pointer to a label object
+ * @return ID of the text
+ */
+uint16_t lv_label_get_text_lang(lv_obj_t * label)
+{
+#if USE_LV_MULTI_LANG
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    return ext->lang_txt_id;
+#else
+    LV_LOG_WARN("lv_label_get_text_multi: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
+    return NULL;
+#endif
+
+}
 /**
  * Get the long mode of a label
  * @param label pointer to a label object
@@ -720,6 +758,17 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
             label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.hor);
             label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.ver);
         }
+    } else if(sign == LV_SIGNAL_LANG_CHG) {
+#if USE_LV_MULTI_LANG
+        if(ext->lang_txt_id != LV_LANG_TXT_ID_NONE) {
+            const char * lang_txt = lv_lang_get_text(ext->lang_txt_id);
+            if(lang_txt) {
+                lv_label_set_text(label, lang_txt);
+            } else {
+                LV_LOG_WARN("lv_lang_get_text return NULL for a label's text");
+            }
+        }
+#endif
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

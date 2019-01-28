@@ -1895,7 +1895,6 @@ static void report_style_mod_core(void * style_p, lv_obj_t * obj)
     }
 }
 
-
 /**
  * Recursively refresh the style of the children. Go deeper until a not NULL style is found
  * because the NULL styles are inherited from the parent
