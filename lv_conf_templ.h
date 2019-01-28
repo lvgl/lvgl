@@ -19,15 +19,23 @@
  * to store the graphical objects and other data */
 #define LV_MEM_CUSTOM      0                /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
 #if LV_MEM_CUSTOM == 0
-#define LV_MEM_SIZE    (64U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
-#define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
-#define LV_MEM_ADR          0               /*Set an address for memory pool instead of allocation it as an array. Can be in external SRAM too.*/
-#define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
+#  define LV_MEM_SIZE    (64U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#  define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
+#  define LV_MEM_ADR          0               /*Set an address for memory pool instead of allocation it as an array. Can be in external SRAM too.*/
+#  define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
 #else       /*LV_MEM_CUSTOM*/
-#define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
-#define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
-#define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
+#  define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
+#  define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
+#  define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
 #endif     /*LV_MEM_CUSTOM*/
+
+/* Garbage Collector settings.  */
+#define LV_ENABLE_GC 0
+#if LV_ENABLE_GC != 0
+#  define LV_MEM_CUSTOM_REALLOC   your_realloc           /*Wrapper to realloc*/
+#  define LV_MEM_CUSTOM_GET_SIZE  your_mem_get_size      /*Wrapper to lv_mem_get_size*/
+#  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
+#endif /* LV_ENABLE_GC */
 
 /*===================
    Graphical settings
@@ -147,10 +155,10 @@
  * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't caused problem
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
  */
-#define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
+#  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 /* 1: Print the log with 'printf'; 0: user need to register a callback*/
 
-#define LV_LOG_PRINTF   1
+#  define LV_LOG_PRINTF   1
 #endif  /*USE_LV_LOG*/
 
 /*================
@@ -228,14 +236,14 @@
 /*Label (dependencies: -*/
 #define USE_LV_LABEL    1
 #if USE_LV_LABEL != 0
-#define LV_LABEL_SCROLL_SPEED       25     /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
+#  define LV_LABEL_SCROLL_SPEED       25     /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 
 /*Image (dependencies: lv_label*/
 #define USE_LV_IMG      1
 #if USE_LV_IMG != 0
-#define LV_IMG_CF_INDEXED   1       /*Enable indexed (palette) images*/
-#define LV_IMG_CF_ALPHA     1       /*Enable alpha indexed images*/
+#  define LV_IMG_CF_INDEXED   1       /*Enable indexed (palette) images*/
+#  define LV_IMG_CF_ALPHA     1       /*Enable alpha indexed images*/
 #endif
 
 /*Line (dependencies: -*/
@@ -259,14 +267,14 @@
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
 #define USE_LV_TABVIEW      1
-#if USE_LV_TABVIEW != 0
-#define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
+#  if USE_LV_TABVIEW != 0
+#  define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
 #endif
 
 /*Tileview (dependencies: lv_page) */
 #define USE_LV_TILEVIEW     1
 #if USE_LV_TILEVIEW
-#define LV_TILEVIEW_ANIM_TIME   300     /*Time of slide animation [ms] (0: no animation)*/
+#  define LV_TILEVIEW_ANIM_TIME   300     /*Time of slide animation [ms] (0: no animation)*/
 #endif
 
 /*************************
@@ -288,7 +296,7 @@
 /*Table (dependencies: lv_label)*/
 #define USE_LV_TABLE    1
 #if USE_LV_TABLE
-#define LV_TABLE_COL_MAX    12
+#  define LV_TABLE_COL_MAX    12
 #endif
 
 /*LED (dependencies: -)*/
@@ -300,8 +308,8 @@
 /*Text area (dependencies: lv_label, lv_page)*/
 #define USE_LV_TA       1
 #if USE_LV_TA != 0
-#define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
-#define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
+#  define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
+#  define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
 /*Spinbox (dependencies: lv_ta)*/
@@ -313,9 +321,9 @@
 /*Preload (dependencies: lv_arc)*/
 #define USE_LV_PRELOAD      1
 #if USE_LV_PRELOAD != 0
-#define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
-#define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
-#define LV_PRELOAD_DEF_ANIM         LV_PRELOAD_TYPE_SPINNING_ARC
+#  define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
+#  define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
+#  define LV_PRELOAD_DEF_ANIM         LV_PRELOAD_TYPE_SPINNING_ARC
 #endif
 
 /*Canvas (dependencies: lv_img)*/
@@ -327,13 +335,13 @@
 /*Button (dependencies: lv_cont*/
 #define USE_LV_BTN      1
 #if USE_LV_BTN != 0
-#define LV_BTN_INK_EFFECT   1       /*Enable button-state animations - draw a circle on click (dependencies: USE_LV_ANIMATION)*/
+#  define LV_BTN_INK_EFFECT   1       /*Enable button-state animations - draw a circle on click (dependencies: USE_LV_ANIMATION)*/
 #endif
 
 /*Image Button (dependencies: lv_btn*/
 #define USE_LV_IMGBTN   1
 #if USE_LV_IMGBTN
-#define LV_IMGBTN_TILED 0           /*1: The imgbtn requires left, mid and right parts and the width can be set freely*/
+#  define LV_IMGBTN_TILED 0           /*1: The imgbtn requires left, mid and right parts and the width can be set freely*/
 #endif
 
 /*Button matrix (dependencies: -)*/
@@ -348,19 +356,19 @@
 /*List (dependencies: lv_page, lv_btn, lv_label, (lv_img optionally for icons ))*/
 #define USE_LV_LIST     1
 #if USE_LV_LIST != 0
-#define LV_LIST_FOCUS_TIME  100 /*Default animation time of focusing to a list element [ms] (0: no animation)  */
+#  define LV_LIST_FOCUS_TIME  100 /*Default animation time of focusing to a list element [ms] (0: no animation)  */
 #endif
 
 /*Drop down list (dependencies: lv_page, lv_label, lv_symbol_def.h)*/
 #define USE_LV_DDLIST    1
 #if USE_LV_DDLIST != 0
-#define LV_DDLIST_ANIM_TIME     200     /*Open and close default animation time [ms] (0: no animation)*/
+#  define LV_DDLIST_ANIM_TIME     200     /*Open and close default animation time [ms] (0: no animation)*/
 #endif
 
 /*Roller (dependencies: lv_ddlist)*/
 #define USE_LV_ROLLER    1
 #if USE_LV_ROLLER != 0
-#define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
+#  define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
 #endif
 
 /*Slider (dependencies: lv_bar)*/
@@ -373,7 +381,7 @@
  * Non-user section
  *************************/
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
-#define _CRT_SECURE_NO_WARNINGS
+#  define _CRT_SECURE_NO_WARNINGS
 #endif
 
 /*--END OF LV_CONF_H--*/

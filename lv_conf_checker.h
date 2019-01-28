@@ -16,29 +16,45 @@
 #define LV_MEM_CUSTOM      0                /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
 #endif
 #if LV_MEM_CUSTOM == 0
-#ifndef LV_MEM_SIZE
-#define LV_MEM_SIZE    (64U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#ifndef define
+#  define LV_MEM_SIZE    (64U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
 #endif
-#ifndef LV_MEM_ATTR
-#define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
+#ifndef define
+#  define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
 #endif
-#ifndef LV_MEM_ADR
-#define LV_MEM_ADR          0               /*Set an address for memory pool instead of allocation it as an array. Can be in external SRAM too.*/
+#ifndef define
+#  define LV_MEM_ADR          0               /*Set an address for memory pool instead of allocation it as an array. Can be in external SRAM too.*/
 #endif
-#ifndef LV_MEM_AUTO_DEFRAG
-#define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
+#ifndef define
+#  define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
 #endif
 #else       /*LV_MEM_CUSTOM*/
-#ifndef LV_MEM_CUSTOM_INCLUDE
-#define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
+#ifndef define
+#  define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
 #endif
-#ifndef LV_MEM_CUSTOM_ALLOC
-#define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
+#ifndef define
+#  define LV_MEM_CUSTOM_ALLOC   malloc       /*Wrapper to malloc*/
 #endif
-#ifndef LV_MEM_CUSTOM_FREE
-#define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
+#ifndef define
+#  define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
 #endif
 #endif     /*LV_MEM_CUSTOM*/
+
+/* Garbage Collector settings.  */
+#ifndef LV_ENABLE_GC
+#define LV_ENABLE_GC 0
+#endif
+#if LV_ENABLE_GC != 0
+#ifndef define
+#  define LV_MEM_CUSTOM_REALLOC   your_realloc           /*Wrapper to realloc*/
+#endif
+#ifndef define
+#  define LV_MEM_CUSTOM_GET_SIZE  your_mem_get_size      /*Wrapper to lv_mem_get_size*/
+#endif
+#ifndef define
+#  define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
+#endif
+#endif /* LV_ENABLE_GC */
 
 /*===================
    Graphical settings
@@ -240,13 +256,13 @@
  * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't caused problem
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
  */
-#ifndef LV_LOG_LEVEL
-#define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
+#ifndef define
+#  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 #endif
 /* 1: Print the log with 'printf'; 0: user need to register a callback*/
 
-#ifndef LV_LOG_PRINTF
-#define LV_LOG_PRINTF   1
+#ifndef define
+#  define LV_LOG_PRINTF   1
 #endif
 #endif  /*USE_LV_LOG*/
 
@@ -389,8 +405,8 @@
 #define USE_LV_LABEL    1
 #endif
 #if USE_LV_LABEL != 0
-#ifndef LV_LABEL_SCROLL_SPEED
-#define LV_LABEL_SCROLL_SPEED       25     /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
+#ifndef define
+#  define LV_LABEL_SCROLL_SPEED       25     /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 #endif
 
@@ -399,11 +415,11 @@
 #define USE_LV_IMG      1
 #endif
 #if USE_LV_IMG != 0
-#ifndef LV_IMG_CF_INDEXED
-#define LV_IMG_CF_INDEXED   1       /*Enable indexed (palette) images*/
+#ifndef define
+#  define LV_IMG_CF_INDEXED   1       /*Enable indexed (palette) images*/
 #endif
-#ifndef LV_IMG_CF_ALPHA
-#define LV_IMG_CF_ALPHA     1       /*Enable alpha indexed images*/
+#ifndef define
+#  define LV_IMG_CF_ALPHA     1       /*Enable alpha indexed images*/
 #endif
 #endif
 
@@ -440,9 +456,9 @@
 #ifndef USE_LV_TABVIEW
 #define USE_LV_TABVIEW      1
 #endif
-#if USE_LV_TABVIEW != 0
-#ifndef LV_TABVIEW_ANIM_TIME
-#define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
+#  if USE_LV_TABVIEW != 0
+#ifndef define
+#  define LV_TABVIEW_ANIM_TIME    300     /*Time of slide animation [ms] (0: no animation)*/
 #endif
 #endif
 
@@ -451,8 +467,8 @@
 #define USE_LV_TILEVIEW     1
 #endif
 #if USE_LV_TILEVIEW
-#ifndef LV_TILEVIEW_ANIM_TIME
-#define LV_TILEVIEW_ANIM_TIME   300     /*Time of slide animation [ms] (0: no animation)*/
+#ifndef define
+#  define LV_TILEVIEW_ANIM_TIME   300     /*Time of slide animation [ms] (0: no animation)*/
 #endif
 #endif
 
@@ -485,8 +501,8 @@
 #define USE_LV_TABLE    1
 #endif
 #if USE_LV_TABLE
-#ifndef LV_TABLE_COL_MAX
-#define LV_TABLE_COL_MAX    12
+#ifndef define
+#  define LV_TABLE_COL_MAX    12
 #endif
 #endif
 
@@ -505,11 +521,11 @@
 #define USE_LV_TA       1
 #endif
 #if USE_LV_TA != 0
-#ifndef LV_TA_CURSOR_BLINK_TIME
-#define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
+#ifndef define
+#  define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
 #endif
-#ifndef LV_TA_PWD_SHOW_TIME
-#define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
+#ifndef define
+#  define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 #endif
 
@@ -528,14 +544,14 @@
 #define USE_LV_PRELOAD      1
 #endif
 #if USE_LV_PRELOAD != 0
-#ifndef LV_PRELOAD_DEF_ARC_LENGTH
-#define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
+#ifndef define
+#  define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
 #endif
-#ifndef LV_PRELOAD_DEF_SPIN_TIME
-#define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
+#ifndef define
+#  define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
 #endif
-#ifndef LV_PRELOAD_DEF_ANIM
-#define LV_PRELOAD_DEF_ANIM         LV_PRELOAD_TYPE_SPINNING_ARC
+#ifndef define
+#  define LV_PRELOAD_DEF_ANIM         LV_PRELOAD_TYPE_SPINNING_ARC
 #endif
 #endif
 
@@ -552,8 +568,8 @@
 #define USE_LV_BTN      1
 #endif
 #if USE_LV_BTN != 0
-#ifndef LV_BTN_INK_EFFECT
-#define LV_BTN_INK_EFFECT   1       /*Enable button-state animations - draw a circle on click (dependencies: USE_LV_ANIMATION)*/
+#ifndef define
+#  define LV_BTN_INK_EFFECT   1       /*Enable button-state animations - draw a circle on click (dependencies: USE_LV_ANIMATION)*/
 #endif
 #endif
 
@@ -562,8 +578,8 @@
 #define USE_LV_IMGBTN   1
 #endif
 #if USE_LV_IMGBTN
-#ifndef LV_IMGBTN_TILED
-#define LV_IMGBTN_TILED 0           /*1: The imgbtn requires left, mid and right parts and the width can be set freely*/
+#ifndef define
+#  define LV_IMGBTN_TILED 0           /*1: The imgbtn requires left, mid and right parts and the width can be set freely*/
 #endif
 #endif
 
@@ -587,8 +603,8 @@
 #define USE_LV_LIST     1
 #endif
 #if USE_LV_LIST != 0
-#ifndef LV_LIST_FOCUS_TIME
-#define LV_LIST_FOCUS_TIME  100 /*Default animation time of focusing to a list element [ms] (0: no animation)  */
+#ifndef define
+#  define LV_LIST_FOCUS_TIME  100 /*Default animation time of focusing to a list element [ms] (0: no animation)  */
 #endif
 #endif
 
@@ -597,8 +613,8 @@
 #define USE_LV_DDLIST    1
 #endif
 #if USE_LV_DDLIST != 0
-#ifndef LV_DDLIST_ANIM_TIME
-#define LV_DDLIST_ANIM_TIME     200     /*Open and close default animation time [ms] (0: no animation)*/
+#ifndef define
+#  define LV_DDLIST_ANIM_TIME     200     /*Open and close default animation time [ms] (0: no animation)*/
 #endif
 #endif
 
@@ -607,8 +623,8 @@
 #define USE_LV_ROLLER    1
 #endif
 #if USE_LV_ROLLER != 0
-#ifndef LV_ROLLER_ANIM_TIME
-#define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
+#ifndef define
+#  define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
 #endif
 #endif
 
@@ -626,8 +642,8 @@
  * Non-user section
  *************************/
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
+#ifndef define
+#  define _CRT_SECURE_NO_WARNINGS
 #endif
 #endif
 
