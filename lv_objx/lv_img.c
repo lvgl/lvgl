@@ -215,7 +215,7 @@ void lv_img_set_src_id(lv_obj_t * img, uint32_t src_id)
 {
 #if USE_LV_MULTI_LANG
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-    ext->lang_txt_id = lv_img_set_src_id;
+    ext->lang_txt_id = src_id;
 
     /*Apply the new language*/
     img->signal_func(img, LV_SIGNAL_LANG_CHG, NULL);
