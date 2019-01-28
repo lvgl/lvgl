@@ -379,11 +379,11 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         if(slider_w >= slider_h) {
             if(ext->knob_in == 0) {
                 knob_area.x1 = area_indic.x2 - slider_h / 2;
-                knob_area.x2 = knob_area.x1 + slider_h;
+                knob_area.x2 = knob_area.x1 + slider_h - 1;
             } else {
                 knob_area.x1 = (int32_t)((int32_t)(slider_w - slider_h - 1) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.x1 += slider->coords.x1;
-                knob_area.x2 = knob_area.x1 + slider_h;
+                knob_area.x2 = knob_area.x1 + slider_h - 1;
             }
 
             knob_area.y1 = slider->coords.y1;
@@ -391,19 +391,17 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         } else {
             if(ext->knob_in == 0) {
                 knob_area.y1 = area_indic.y1 - slider_w / 2;
-                knob_area.y2 = knob_area.y1 + slider_w;
+                knob_area.y2 = knob_area.y1 + slider_w - 1;
             } else {
                 knob_area.y2 = (int32_t)((int32_t)(slider_h - slider_w - 1) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.y2 = slider->coords.y2 - knob_area.y2;
-                knob_area.y1 = knob_area.y2 - slider_w;
+                knob_area.y1 = knob_area.y2 - slider_w - 1;
             }
             knob_area.x1 = slider->coords.x1;
             knob_area.x2 = slider->coords.x2;
 
         }
-
         lv_draw_rect(&knob_area, mask, style_knob, opa_scale);
-
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
