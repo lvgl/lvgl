@@ -22,6 +22,9 @@
 #ifndef LV_MEM_ATTR
 #define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
 #endif
+#ifndef LV_MEM_ADR
+#define LV_MEM_ADR          0               /*Set an address for memory pool instead of allocation it as an array. Can be in external SRAM too.*/
+#endif
 #ifndef LV_MEM_AUTO_DEFRAG
 #define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
 #endif
@@ -48,6 +51,7 @@
 #ifndef LV_VER_RES
 #define LV_VER_RES          (320)
 #endif
+
 /* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI
@@ -163,6 +167,15 @@
 #endif
 #ifndef LV_TXT_BREAK_CHARS
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
+#endif
+#ifndef LV_TXT_LINE_BREAK_LONG_LEN
+#define LV_TXT_LINE_BREAK_LONG_LEN 12 /* If a character is at least this long, will break wherever "prettiest" */
+#endif
+#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN 3 /* Minimum number of characters of a word to put on a line before a break */
+#endif
+#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 1 /* Minimum number of characters of a word to put on a line after a break */
 #endif
 
 /*Feature usage*/
@@ -454,7 +467,7 @@
 #define USE_LV_LMETER   1
 #endif
 
-/*Gauge (dependencies:bar, lmeter)*/
+/*Gauge (dependencies:lv_bar, lv_lmeter)*/
 #ifndef USE_LV_GAUGE
 #define USE_LV_GAUGE    1
 #endif
@@ -507,7 +520,7 @@
 #define USE_LV_CALENDAR 1
 #endif
 
-/*Preload (dependencies: arc)*/
+/*Preload (dependencies: lv_arc)*/
 #ifndef USE_LV_PRELOAD
 #define USE_LV_PRELOAD      1
 #endif
@@ -523,6 +536,10 @@
 #endif
 #endif
 
+/*Canvas (dependencies: lv_img)*/
+#ifndef USE_LV_CANVAS
+#define USE_LV_CANVAS       1
+#endif
 /*************************
  * User input objects
  *************************/
@@ -605,7 +622,7 @@
 /*************************
  * Non-user section
  *************************/
-#ifdef _MSC_VER                               /* Disable warnings for Visual Studio*/
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
