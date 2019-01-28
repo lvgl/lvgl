@@ -7,7 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_lang.h"
+#if USE_LV_MULTI_LANG
+
 #include "lv_obj.h"
+#include "../lv_misc/lv_gc.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -41,24 +45,16 @@ static const void * (*get_txt)(uint16_t);
  */
 void lv_lang_set(uint8_t lang_id)
 {
-#if USE_LV_MULTI_LANG
     lang_act = lang_id;
 
-//    TODO make scr_ll global
-//    lv_obj_t * i;
-//    LL_READ(scr_ll, i) {
-//        i->signal_func(i, LV_SIGNAL_LANG_CHG, NULL);
-//
-//        lang_set_core(i);
-//    }
+    lv_obj_t * i;
+    LL_READ(LV_GC_ROOT(_lv_scr_ll), i) {
+        i->signal_func(i, LV_SIGNAL_LANG_CHG, NULL);
+
+        lang_set_core(i);
+    }
 
     lang_set_core(lv_scr_act());
-
-#else
-    LV_LOG_WARN("lv_lang_act: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ");
-    return;
-#endif
-
 }
 
 /**
@@ -96,12 +92,7 @@ const void * lv_lang_get_text(uint16_t txt_id)
  */
 uint8_t lv_lang_act(void)
 {
-#if USE_LV_MULTI_LANG
     return lang_act;
-#else
-    LV_LOG_WARN("lv_lang_act: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
-    return 0;
-#endif
 }
 
 
@@ -122,3 +113,5 @@ static void lang_set_core(lv_obj_t * obj)
         lang_set_core(i);
     }
 }
+
+#endif /*USE_LV_MULTI_LANG*/

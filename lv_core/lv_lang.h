@@ -19,6 +19,8 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
+#if USE_LV_MULTI_LANG
+
 #include <stdint.h>
 
 /*********************
@@ -63,6 +65,7 @@ uint8_t lv_lang_act(void);
  *      MACROS
  **********************/
 
+#endif /*USE_LV_MULTI_LANG*/
 
 #ifdef __cplusplus
 } /* extern "C" */
