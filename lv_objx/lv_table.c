@@ -663,10 +663,17 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                 lv_draw_rect(&cell_area, mask, cell_style, opa_scale);
 
                 if(ext->cell_data[cell]) {
+
                     txt_area.x1 = cell_area.x1 + cell_style->body.padding.hor;
                     txt_area.x2 = cell_area.x2 - cell_style->body.padding.hor;
                     txt_area.y1 = cell_area.y1 + cell_style->body.padding.ver;
                     txt_area.y2 = cell_area.y2 - cell_style->body.padding.ver;
+                    /*Align the content to the middle if not cropped*/
+                    if(format.crop == 0) {
+                        txt_flags = LV_TXT_FLAG_NONE;
+                    } else {
+                        txt_flags = LV_TXT_FLAG_EXPAND;
+                    }
 
                     lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
                                               cell_style->text.letter_space, cell_style->text.line_space, lv_area_get_width(&txt_area), txt_flags);
@@ -675,9 +682,6 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     if(format.crop == 0) {
                         txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
                         txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
-                        txt_flags = LV_TXT_FLAG_NONE;
-                    } else {
-                        txt_flags = LV_TXT_FLAG_EXPAND;
                     }
 
                     switch(format.align) {

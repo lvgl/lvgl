@@ -233,15 +233,15 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                                 break;
                             } 
                             n_char_since_last_break++;
-                            lv_coord_t letter_width = lv_font_get_width(font, letter);
-                            cur_w += letter_width;
+                            lv_coord_t letter_width2 = lv_font_get_width(font, letter);
+                            cur_w += letter_width2;
                             if(cur_w > max_width) {
                                 /* Current letter already exceeds, return previous */
                                 lv_txt_encoded_prev(txt, &i);
                                 other = false;
                                 break;
                             }
-                            if(letter_width > 0){
+                            if(letter_width2 > 0){
                                 cur_w += letter_space;
                             }
                         }
