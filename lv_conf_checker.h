@@ -197,6 +197,9 @@
 #ifndef USE_LV_FILESYSTEM
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (might be required for images*/
 #endif
+#ifndef USE_LV_MULTI_LANG
+#define USE_LV_MULTI_LANG       0               /* Number of languages for labels to store (0: to disable this feature)*/
+#endif
 
 /*Compiler settings*/
 #ifndef LV_ATTRIBUTE_TICK_INC
