@@ -33,12 +33,12 @@
 * **Documentation** and API references online
 
 ### Supported devices
-Basically, every device which is capable of driving a display is suitable to run LittlevGL. The minimal requirements:
+Basically, every modern controller - which is able to drive a display - is suitable to run LittlevGL. The minimal requirements:
 - **16, 32 or 64-bit** microcontroller or processor
 - **&gt; 16 MHz** clock speed
-- **8 kB RAM for static data** and **&gt; 2 KB RAM for dynamic data** (graphical objects)
-- **64 kB flash** (program memory)
-- **Optionally ~1/10 screen sized memory** for internal buffering (at 240 × 320, 16-bit colors it means 15 kB)
+- **&gt; 8 kB RAM for static data** and **&gt; 2 KB RAM for dynamic data** (graphical objects)
+- **$gt; 64 kB flash** (program memory)
+- **Optionally ~1/10 screen sized memory** for buffered drawing (on 240 × 320, 16-bit colors it's 15 kB)
 
 Just to mention some **platforms**:
 - STM32F1, STM32F3, [STM32F4](https://blog.littlevgl.com/2017-07-15/stm32f429_disco_port), [STM32F7](https://github.com/littlevgl/stm32f746_disco_no_os_sw4stm32)
