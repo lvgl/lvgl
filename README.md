@@ -11,7 +11,7 @@
 
 [Website](https://littlevgl.com) &middot; [Live demo](https://littlevgl.com/live-demo) &middot; [Simulator](https://docs.littlevgl.com/#PC-simulator) &middot; [Docs](https://docs.littlevgl.com/) &middot; [Blog](https://blog.littlevgl.com/) 
 
-:star: Star the project if you like it!
+:star: Star the project if you like it! :star: 
 
 ### Features
 * **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
