@@ -63,6 +63,7 @@ In the most simple case you need to do 5 things:
 3. Register a function which can **read an input device**. (E.g. touch pad)
 4. Copy `lv_conf_templ.h` as `lv_conf.h` next to `lvgl` and set at least `LV_HOR_RES`, `LV_VER_RES` and `LV_COLOR_DEPTH`. 
 5. Call `lv_task_handler()` periodically every few milliseconds.
+
 For a detailed description visit https://docs.littlevgl.com/#Porting
 Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
