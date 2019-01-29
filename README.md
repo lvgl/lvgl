@@ -1,13 +1,19 @@
-# Littlev Graphics Library
+# Littlev Graphics Library &nbsp;
+
+![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)
+![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)
+![licence](https://img.shields.io/badge/licence-MIT-blue.svg)
+![version](https://img.shields.io/badge/version-5.2-blue.svg)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource)
 
 ![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
 
+
+### | [Website](https://littlevgl.com) | [Live demo](https://littlevgl.com/live-demo) | [Simulator](https://docs.littlevgl.com/#PC-simulator) | [Docs](https://docs.littlevgl.com/) | [Blog](https://blog.littlevgl.com/) | 
+
 **LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
-https://littlevgl.com
 
-Check out the [References](https://blog.littlevgl.com/2018-12-26/references) where LittlevGL was used. You can add your project too!
-
-## Key features
+### Features
 * **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
 * **Advanced graphics** with animations, anti-aliasing, opacity, smooth scrolling
 * **Various input devices** touch pad, mouse, keyboard, encoder, buttons, etc.
@@ -22,7 +28,7 @@ Check out the [References](https://blog.littlevgl.com/2018-12-26/references) whe
 * **Tutorials, examples, themes** for rapid development
 * **Documentation** and API references online
 
-## Porting
+### Porting
 In the simplest case you need 5 things:
 1. Call `lv_tick_inc(x)` every `x` milliseconds in a Timer or Task (`x` should be between 1 and 10)
 2. Register a function which can **copy a pixel array** to an area of the screen.
@@ -32,7 +38,7 @@ In the simplest case you need 5 things:
 For a detailed description visit https://docs.littlevgl.com/#Porting
 Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
-## Project set-up
+### Project set-up
 1. **Clone** or [Download](https://littlevgl.com/download) the lvgl repository: `git clone  https://github.com/littlevgl/lvgl.git`
 2. **Create project** with your preferred IDE and add the *lvgl* folder
 3. Copy **lvgl/lv_conf_templ.h** as **lv_conf.h** next to the *lvgl* folder
@@ -45,22 +51,16 @@ Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/ma
 8. In the main *while(1)* call `lv_task_handler();` and make a few milliseconds delay (e.g. `my_delay_ms(5);`) 
 9. Compile the code and load it to your embedded hardware
 
-## PC Simulator
+### PC Simulator
 You can test the graphics library in a PC simulator, if you don't have an embedded hardware. The simulator uses [SDL2](https://www.libsdl.org/) library to emulate a display on your monitor and a touch pad with your mouse.
 
 There is a pre-configured PC project for **Eclipse CDT** in this repository: https://github.com/littlevgl/pc_simulator
 
-## Related repositories
+### Related repositories
 * PC simulator: https://github.com/littlevgl/pc_simulator
 * Projects: https://github.com/littlevgl/lv_projects
 * Examples: https://github.com/littlevgl/lv_examples
 * Drivers: https://github.com/littlevgl/lv_drivers
-
-## Screenshots
-![TFT material](http://www.gl.littlev.hu/github_res/tft_material.png)
-![TFT zen](http://www.gl.littlev.hu/github_res/tft_zen.png)
-![TFT alien](http://www.gl.littlev.hu/github_res/tft_alien.png)
-![TFT night](http://www.gl.littlev.hu/github_res/tft_night.png)
 
 ## Contributing
 See [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md)
