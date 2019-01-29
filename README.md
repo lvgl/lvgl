@@ -1,17 +1,17 @@
-# Littlev Graphics Library &nbsp;
+# Littlev Graphics Library  &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource) [![](https://img.shields.io/github/stars/badges/shields.svg?label=Stars&style=social)](https://github.com/littlevgl/lvgl)
 
 ![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)
 ![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)
 ![licence](https://img.shields.io/badge/licence-MIT-blue.svg)
 ![version](https://img.shields.io/badge/version-5.2-blue.svg)
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource)
 
 ![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
 
-
-### | [Website](https://littlevgl.com) | [Live demo](https://littlevgl.com/live-demo) | [Simulator](https://docs.littlevgl.com/#PC-simulator) | [Docs](https://docs.littlevgl.com/) | [Blog](https://blog.littlevgl.com/) | 
-
 **LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
+
+[Website](https://littlevgl.com) &middot; [Live demo](https://littlevgl.com/live-demo) &middot; [Simulator](https://docs.littlevgl.com/#PC-simulator) &middot; [Docs](https://docs.littlevgl.com/) &middot; [Blog](https://blog.littlevgl.com/) 
+
+:star: Star the project if you like it!
 
 ### Features
 * **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
