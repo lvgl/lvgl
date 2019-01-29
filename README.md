@@ -1,12 +1,14 @@
-# Littlev Graphics Library  &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource)
+# LittlevGL - Free and Open-source Embedded GUI Library  &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource)
 
 ![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)
 ![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)
 ![licence](https://img.shields.io/badge/licence-MIT-blue.svg)
 ![version](https://img.shields.io/badge/version-5.2-blue.svg)
-![language](https://img.shields.io/badge/topic-GUI-yellow.svg)
+![topic](https://img.shields.io/badge/topic-GUI-yellow.svg)
+![target](https://img.shields.io/badge/target-EMBEDDED-yellow.svg)
 ![language](https://img.shields.io/badge/language-C/C++-yellow.svg)
-![LittlevGL cover](https://littlevgl.com/docs/themes/lv_theme_intro.png)
+
+![LittlevGL cover](https://littlevgl.com/github/cover2_opt.gif)
 
 **LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
 
@@ -38,13 +40,13 @@ Basically, every device which is capable of driving a display is suitable to run
 - **64 kB flash** (program memory)
 - **Optionally ~1/10 screen sized memory** for internal buffering (at 240 × 320, 16-bit colors it means 15 kB)
 
-Just to mention **a few platforms**:
+Just to mention some **platforms**:
 - STM32F1, STM32F3, [STM32F4](https://blog.littlevgl.com/2017-07-15/stm32f429_disco_port), [STM32F7](https://github.com/littlevgl/stm32f746_disco_no_os_sw4stm32)
 - Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 - NXP Kinetis, LPC, iMX
 - [Linux frame buffer](https://blog.littlevgl.com/2018-01-03/linux_fb) (/dev/fb)
 - [Raspberry PI](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
-- Espressif [ESP32](https://github.com/littlevgl/esp32_ili9431)
+- [Espressif ESP32](https://github.com/littlevgl/esp32_ili9431)
 - Nordic nrf52
 - Quectell M66
 
