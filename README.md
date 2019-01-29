@@ -1,4 +1,4 @@
-# Littlev Graphics Library  &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource) [![](https://img.shields.io/github/stars/badges/shields.svg?label=Stars&style=social)](https://github.com/littlevgl/lvgl)
+# Littlev Graphics Library  &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource)
 
 ![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)
 ![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)
