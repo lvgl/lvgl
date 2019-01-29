@@ -280,7 +280,7 @@ uint16_t lv_img_get_src_id(lv_obj_t * img)
     return ext->lang_txt_id;
 #else
     LV_LOG_WARN("lv_img_get_text_lang: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
-    return NULL;
+    return 0;
 #endif
 }
 

@@ -379,7 +379,7 @@ uint16_t lv_label_get_text_id(lv_obj_t * label)
     return ext->lang_txt_id;
 #else
     LV_LOG_WARN("lv_label_get_text_multi: multiple languages are not enabled. See lv_conf.h USE_LV_MULTI_LANG ")
-    return NULL;
+    return 0;
 #endif
 
 }
