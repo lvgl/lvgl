@@ -36,7 +36,8 @@ for i in inlines:
   if('/*--END OF LV_CONF_H--*/' in i): break  
     
   if(re.search('^ *# *define .*$', i)): 
-    new = re.sub(' +', ' ', i)                 #Remove extra white spaces
+    new = re.sub('^ *# *define', '#define ', i)       
+    new = re.sub(' +', ' ', new)                 #Remove extra white spaces
     splitted = new.split(' ')
     fout.write('#ifndef ' + splitted[1] + '\n')
     fout.write(i + '\n') 
