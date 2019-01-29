@@ -38,8 +38,8 @@ Basically, every device which is capable of driving a display is suitable to run
 - 64 kB program memory (flash)
 - Optionally ~1/10 screen sized memory for internal buffering (at 240 × 320, 16-bit colors it means 15 kB)
 
-Just to mention a few platforms:
-- STM32F1, STM32F3, [STM32F4](https://blog.littlevgl.com/2017-07-15/stm32f429_disco_port), [STM32F7]()
+Just to mention **a few platforms**:
+- STM32F1, STM32F3, [STM32F4](https://blog.littlevgl.com/2017-07-15/stm32f429_disco_port), [STM32F7](https://github.com/littlevgl/stm32f746_disco_no_os_sw4stm32)
 - Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 - NXP Kinetis, LPC, iMX
 - [Linux frame buffer](https://blog.littlevgl.com/2018-01-03/linux_fb) (/dev/fb)
