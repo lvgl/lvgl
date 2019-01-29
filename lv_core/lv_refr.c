@@ -10,6 +10,7 @@
 #include "lv_refr.h"
 #include "lv_vdb.h"
 #include "../lv_hal/lv_hal_tick.h"
+#include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_mem.h"
 
@@ -186,6 +187,11 @@ static void lv_refr_task(void * param)
     LV_LOG_TRACE("display refresh task started");
 
     uint32_t start = lv_tick_get();
+
+    if(lv_disp_get_active() == NULL) {
+        LV_LOG_TRACE("No display is registered");
+        return;
+    }
 
     lv_refr_join_area();
 
