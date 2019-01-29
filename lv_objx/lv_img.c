@@ -273,7 +273,7 @@ const char * lv_img_get_file_name(const lv_obj_t * img)
  * @param img pointer to an image
  * @return ID of the source
  */
-uint16_t lv_img_get_text_lang(lv_obj_t * img)
+uint16_t lv_img_get_src_id(lv_obj_t * img)
 {
 #if USE_LV_MULTI_LANG
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);

@@ -191,7 +191,7 @@ char * lv_label_get_text(const lv_obj_t * label);
  * @param label pointer to a label object
  * @return ID of the text
  */
-uint16_t lv_label_get_text_lang(lv_obj_t * label);
+uint16_t lv_label_get_text_id(lv_obj_t * label);
 
 /**
  * Get the long mode of a label
