@@ -1,4 +1,9 @@
-# LittlevGL - Free Open-source Embedded GUI Library
+ 
+<img src="https://littlevgl.com/github/logo_small5.png" align="right" />
+
+## LittlevGL - Free Open-source Embedded GUI Library
+
+
 ![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)
 ![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)
 ![licence](https://img.shields.io/badge/licence-MIT-blue.svg)
@@ -59,12 +64,55 @@ Try LittlevGL in a simulator on you PC without any embedded hardware. Choose a p
 | Cross-platform<br>with SDL | Native Windows | Cross-platform<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 ### Porting to an embedded hardware
-In the most simple case you need to do 5 things:
-1. Call `lv_tick_inc(x)` every `x` milliseconds in a Timer or Task (`x` should be between 1 and 10)
-2. Register a function which can **copy a pixel array** to an area of the screen.
-3. Register a function which can **read an input device**. (E.g. touch pad)
-4. Copy `lv_conf_templ.h` as `lv_conf.h` next to `lvgl` and set at least `LV_HOR_RES`, `LV_VER_RES` and `LV_COLOR_DEPTH`. 
-5. Call `lv_task_handler()` periodically every few milliseconds.
+In the most simple case you need to do these steps:
+1. Copy `lv_conf_templ.h` as `lv_conf.h` next to `lvgl` and set at least `LV_HOR_RES`, `LV_VER_RES` and `LV_COLOR_DEPTH`. 
+2. Call `lv_tick_inc(x)` every `x` milliseconds in a Timer or Task (`x` should be between 1 and 10)
+3. Call `lv_init()`
+4. Register a function which can **copy a pixel array** to an area of the screen:
+```c
+    lv_disp_drv_t disp_drv;               /*Descriptor of a display driver*/
+    lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
+    disp_drv.disp_flush = disp_flush;     /*Set your driver function*/
+    lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+    
+void disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p)
+{
+    int32_t x, y;
+    for(y = y1; y <= y2; y++) {
+        for(x = x1; x <= x2; x++) {
+            sep_pixel(x, y, *color_p);  /* Put a pixel to the display.*/
+            color_p++;
+        }
+    }
+
+    lv_flush_ready();                  /* Tell you are ready with the flushing*/
+}
+    
+```
+5. Register a function which can **read an input device**. E.g. for a touch pad:
+```c
+    lv_indev_drv_init(&indev_drv);             /*Descriptor of a input device driver*/
+    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
+    indev_drv.read = touchpad_read;            /*Set your driver function*/
+    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
+
+bool touchpad_read(lv_indev_data_t * data)
+{
+    static lv_coord_t last_x = 0;
+    static lv_coord_t last_y = 0;
+
+    /*Save the state and save the pressed cooridnate*/
+    data->state = touchpad_is_pressed() ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL; 
+    if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
+   
+    /*Set the coordinates (if released use the last pressed cooridantes)*/
+    data->point.x = last_x;
+    data->point.y = last_y;
+
+    return false; /*Return `false` because we are not buffering and no more data to read*/
+}
+```
+6. Call `lv_task_handler()` periodically every few milliseconds.
 
 For a detailed description check the [Online documatation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
