@@ -214,12 +214,11 @@ static void lv_refr_task(void * param)
         /* With true double buffering the flushing should be only the address change of the current frame buffer
          * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
          * The changes will be written to the new VDB.*/
-        //            while(vdb_flushing);
         lv_vdb_t * vdb_act = lv_vdb_get_active();
         lv_vdb_t * vdb_ina = lv_vdb_get_inactive();
 
         uint8_t * buf_act = (uint8_t *) vdb_act->buf;
-        uint8_t * buf_inv = (uint8_t *) vdb_ina->buf;
+        uint8_t * buf_ina = (uint8_t *) vdb_ina->buf;
 
         while(lv_vdb_is_flushing());
 
@@ -231,9 +230,7 @@ static void lv_refr_task(void * param)
                 uint32_t line_length = (lv_area_get_width(&inv_buf[a].area) * LV_VDB_PX_BPP) >> 3;
 
                 for(y = inv_buf[a].area.y1; y <= inv_buf[a].area.y2; y++) {
-
-                    memcpy(buf_act + start_offs, buf_inv + start_offs, line_length);
-
+                    memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
                     start_offs += (LV_HOR_RES * LV_VDB_PX_BPP) >> 3;
                 }
             }
