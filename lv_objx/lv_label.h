@@ -186,12 +186,14 @@ static inline void lv_label_set_style(lv_obj_t *label, lv_style_t *style)
  */
 char * lv_label_get_text(const lv_obj_t * label);
 
+#if USE_LV_MULTI_LANG
 /**
  * Get the text ID of the label. (Used by the multi-language feature)
  * @param label pointer to a label object
  * @return ID of the text
  */
 uint16_t lv_label_get_text_id(lv_obj_t * label);
+#endif
 
 /**
  * Get the long mode of a label
