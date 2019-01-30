@@ -7,7 +7,7 @@
 ![target](https://img.shields.io/badge/target-EMBEDDED-yellow.svg)
 ![language](https://img.shields.io/badge/language-C/C++-yellow.svg)
 
-![LittlevGL cover](https://littlevgl.com/github/cover2_opt.gif)
+![LittlevGL cover](https://littlevgl.com/github/cover3.gif)
 
 **LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
 
