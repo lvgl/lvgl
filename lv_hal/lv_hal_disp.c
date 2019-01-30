@@ -54,7 +54,6 @@ static lv_disp_t * active;
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
-    LV_GC_ROOT(_lv_disp_list) = NULL;
     driver->disp_fill = NULL;
     driver->disp_map = NULL;
     driver->disp_flush = NULL;

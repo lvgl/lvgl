@@ -49,7 +49,6 @@
  */
 void lv_indev_drv_init(lv_indev_drv_t * driver)
 {
-    LV_GC_ROOT(_lv_indev_list) = NULL;
     driver->read = NULL;
     driver->type = LV_INDEV_TYPE_NONE;
     driver->user_data = NULL;

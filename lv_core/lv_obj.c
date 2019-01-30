@@ -66,6 +66,8 @@ void lv_init(void)
     LV_GC_ROOT(_lv_act_scr) = NULL;
     LV_GC_ROOT(_lv_top_layer) = NULL;
     LV_GC_ROOT(_lv_sys_layer) = NULL;
+    LV_GC_ROOT(_lv_disp_list) = NULL;
+    LV_GC_ROOT(_lv_indev_list) = NULL;
 
     LV_LOG_TRACE("lv_init started");
 
