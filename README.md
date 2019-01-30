@@ -70,10 +70,10 @@ In the most simple case you need to do these steps:
 3. Call `lv_init()`
 4. Register a function which can **copy a pixel array** to an area of the screen:
 ```c
-    lv_disp_drv_t disp_drv;               /*Descriptor of a display driver*/
-    lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
-    disp_drv.disp_flush = disp_flush;     /*Set your driver function*/
-    lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+lv_disp_drv_t disp_drv;               /*Descriptor of a display driver*/
+lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
+disp_drv.disp_flush = disp_flush;     /*Set your driver function*/
+lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
     
 void disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p)
 {
@@ -91,10 +91,10 @@ void disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t
 ```
 5. Register a function which can **read an input device**. E.g. for a touch pad:
 ```c
-    lv_indev_drv_init(&indev_drv);             /*Descriptor of a input device driver*/
-    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
-    indev_drv.read = touchpad_read;            /*Set your driver function*/
-    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
+lv_indev_drv_init(&indev_drv);             /*Descriptor of a input device driver*/
+indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
+indev_drv.read = touchpad_read;            /*Set your driver function*/
+lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
 bool touchpad_read(lv_indev_data_t * data)
 {
@@ -116,6 +116,65 @@ bool touchpad_read(lv_indev_data_t * data)
 
 For a detailed description check the [Online documatation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
+ 
+### Code examples
+#### Create a button with a label and assign a click callback
+```c
+lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);     /*Add a button the current screen*/
+lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
+lv_obj_set_size(btn, 100, 50);                          /*Set its size*/
+
+lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, btn_action);/*Assign a callback to the button*/
+lv_obj_t * label = lv_label_create(btn, NULL);          /*Add a label to the button*/
+lv_label_set_text(label, "Button");                     /*Set the labels text*/
+
+lv_res_t btn_action(lv_obj_t * btn)
+{
+    printf("Clicked\n");
+    return LV_RES_OK;
+}
+```
+![Simple button with LittelvGL](https://littlevgl.com/github/btn1.gif)
+
+#### Modify the styles
+```c
+static lv_style_t style_btn_rel;                        /*A variable to store the released style*/
+lv_style_copy(&style_btn_rel, &lv_style_plain);         /*Initialize from a built-in style*/
+style_btn_rel.body.border.color = LV_COLOR_HEX3(0x269);
+style_btn_rel.body.border.width = 1;
+style_btn_rel.body.main_color = LV_COLOR_HEX3(0xADF);
+style_btn_rel.body.grad_color = LV_COLOR_HEX3(0x46B);
+style_btn_rel.body.shadow.width = 4;
+style_btn_rel.body.shadow.type = LV_SHADOW_BOTTOM;
+style_btn_rel.body.radius = LV_RADIUS_CIRCLE;
+style_btn_rel.text.color = LV_COLOR_HEX3(0xDEF);
+
+static lv_style_t style_btn_pr;                         /*A variable to store the pressed style*/
+lv_style_copy(&style_btn_pr, &style_btn_rel);           /*Initialize from a built-in style*/
+style_btn_pr.body.border.color = LV_COLOR_HEX3(0x46B);
+style_btn_pr.body.main_color = LV_COLOR_HEX3(0x8BD);
+style_btn_pr.body.grad_color = LV_COLOR_HEX3(0x24A);
+style_btn_pr.body.shadow.width = 2;
+style_btn_pr.text.color = LV_COLOR_HEX3(0xBCD);
+
+lv_btn_set_style(btn, LV_BTN_STYLE_REL, &style_btn_rel);    /*Set the buton's released style*/
+lv_btn_set_style(btn, LV_BTN_STYLE_PR, &style_btn_pr);      /*Set the buton's pressed style*/
+```
+
+![Simple button with LittelvGL](https://littlevgl.com/github/btn2.gif)
+
+#### Enable a fancy effect
+```c
+/*Add some effects when the button is clicked*/
+lv_btn_set_ink_in_time(btn, 300);
+lv_btn_set_ink_wait_time(btn, 100);
+lv_btn_set_ink_out_time(btn, 300);
+```
+
+![Simple button with LittelvGL](https://littlevgl.com/github/btn3.gif)
+
+Check out the [Documentation](https://docs.littlevgl.com/) for more!
+
 ### Contributing
 To ask questions and discuss topics we use [GitHub's Issue tracker](https://github.com/littlevgl/lvgl/issues). 
 You contribute in several ways:
