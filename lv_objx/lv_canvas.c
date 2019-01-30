@@ -328,6 +328,9 @@ void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_c
  * @param point2 end point of the line
  * @param color color of the line
  */
+/*
+ * NOTE: The lv_canvas_draw_line function originates from https://github.com/jb55/bresenham-line.c.
+ */
 void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color)
 {
   lv_coord_t x0, y0, x1, y1;
