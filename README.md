@@ -24,7 +24,7 @@
 * **Multi-language support** with UTF-8 encoding
 * **Fully customizable** graphical elements
 * **Hardware independent** to use with any microcontroller or display
-* **Scalable** to operate with little memory (50 kB Flash, 10 kB RAM)
+* **Scalable** to operate with little memory (64 kB Flash, 10 kB RAM)
 * **OS, External memory and GPU** supported but not required
 * **Single frame buffer** operation even with advances graphical effects
 * **Written in C** for maximal compatibility
