@@ -1,5 +1,4 @@
-# LittlevGL - Free Open-source Embedded GUI Library  &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource)
-
+# LittlevGL - Free Open-source Embedded GUI Library
 ![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)
 ![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)
 ![licence](https://img.shields.io/badge/licence-MIT-blue.svg)
@@ -12,9 +11,10 @@
 
 **LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
 
-:star: **Star the project if you like it!** :star: 
+:star: **Star the project if you like it!** :star: <br>
+![twitter](https://littlevgl.com/github/twitter.png) **And share with you firends** [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&via=kisvegabor&hashtags=littlevgl,embedded,gui,free,opensource)
 
-**[Website](https://littlevgl.com) &middot; [Live demo](https://littlevgl.com/live-demo) &middot; [Simulator](https://docs.littlevgl.com/#PC-simulator) &middot; [Docs](https://docs.littlevgl.com/) &middot; [Blog](https://blog.littlevgl.com/)**
+### [Website](https://littlevgl.com) &middot; [Live demo](https://littlevgl.com/live-demo) &middot; [Simulator](https://docs.littlevgl.com/#PC-simulator) &middot; [Docs](https://docs.littlevgl.com/) &middot; [Blog](https://blog.littlevgl.com/)
 
 
 ### Features
@@ -37,7 +37,7 @@ Basically, every modern controller - which is able to drive a display - is suita
 - **16, 32 or 64-bit** microcontroller or processor
 - **&gt; 16 MHz** clock speed
 - **&gt; 8 kB RAM for static data** and **&gt; 2 KB RAM for dynamic data** (graphical objects)
-- **$gt; 64 kB flash** (program memory)
+- **&gt; 64 kB flash** program memory
 - **Optionally ~1/10 screen sized memory** for buffered drawing (on 240 × 320, 16-bit colors it's 15 kB)
 
 Just to mention some **platforms**:
@@ -66,20 +66,19 @@ In the most simple case you need to do 5 things:
 4. Copy `lv_conf_templ.h` as `lv_conf.h` next to `lvgl` and set at least `LV_HOR_RES`, `LV_VER_RES` and `LV_COLOR_DEPTH`. 
 5. Call `lv_task_handler()` periodically every few milliseconds.
 
-For a detailed description visit https://docs.littlevgl.com/#Porting
-Or check the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
+For a detailed description check the [Online documatation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
 ### Contributing
 To ask questions and discuss topics we use [GitHub's Issue tracker](https://github.com/littlevgl/lvgl/issues). 
 You contribute in several ways:
 - **Answer other's question** click the Watch button on the top to get notified about the issues
-- **Report and/or fix bugs** using the issue tracker in Pull-request
-- **Suggest and/or implement new features** using the issue tracker in Pull-request
+- **Report and/or fix bugs** using the issue tracker and in Pull-request
+- **Suggest and/or implement new features** using the issue tracker and in Pull-request
 - **Improve and/or translate the documentation** learn more [here](https://github.com/littlevgl/docs)
 - **Write a blog post about your experiences** learn more [here](https://github.com/littlevgl/blog)
 - **Upload your project or product as a reference** to [this site](https://blog.littlevgl.com/2018-12-26/references)
 
-Before contributing, please read [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md).
+Before contributing, please read [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md).  
 For more info read this [blog post](https://blog.littlevgl.com/2018-12-06/contributing).
 
 ### Donate
