@@ -1,23 +1,25 @@
-# LittlevGL - Free Open-source Embedded GUI Library
+<h1 align="center"> LittlevGL - Open-source Embedded GUI Library</h1>
+<p align="center">
+<img src="https://img.shields.io/badge/licence-MIT-blue.svg">
+<img src="https://img.shields.io/badge/version-v5.2-blue.svg">
+<br>
+<img src="https://littlevgl.com/github/cover3.gif">
+</p>
 
-[![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)](#)
-[![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)](#)
-[![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](#)
-[![version](https://img.shields.io/badge/version-5.2-blue.svg)](#)
-[![topic](https://img.shields.io/badge/topic-GUI-yellow.svg)](#)
-[![target](https://img.shields.io/badge/target-EMBEDDED-yellow.svg)](#)
-[![language](https://img.shields.io/badge/language-C/C++-yellow.svg)](#)
-
-[![LittlevGL cover](https://littlevgl.com/github/cover3.gif)](#)
-
+<p align="center" style="max-width:400px;">
 LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.  
+</p>
 
-
-#### [Website](https://littlevgl.com) &middot; [Live demo](https://littlevgl.com/live-demo) &middot; [Simulator](https://docs.littlevgl.com/#PC-simulator) &middot; [Docs](https://docs.littlevgl.com/) &middot; [Blog](https://blog.littlevgl.com/)
+<h4 align="center">
+<a href="https://littlevgl.com">Website </a> &middot; 
+<a href="https://littlevgl.com/live-demo">Live demo</a> &middot; 
+<a href="https://docs.littlevgl.com/#PC-simulator">Simulator</a> &middot; 
+<a href="https://docs.littlevgl.com/">Docs</a> &middot;
+<a href="https://blog.littlevgl.com/">Blog</a>
+</p>
 
 Star the project if you like it! :star: <br>
-And share with your friends [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&hashtags=littlevgl,embedded,gui,free,opensource) 
-
+And share with your friends <a href="https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&hashtags=littlevgl,embedded,gui,free,opensource"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"></a>
 
 ### Features
 * **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
