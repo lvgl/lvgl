@@ -164,6 +164,8 @@ void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_c
  * @param point1 start point of the line
  * @param point2 end point of the line
  * @param color color of the line
+ *
+ * NOTE: The lv_canvas_draw_line function originates from https://github.com/jb55/bresenham-line.c.
  */
 void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color);
 
@@ -197,20 +199,20 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size,
  * @param canvas pointer to a canvas object
  * @param points edge points of the polygon
  * @param size edge count of the polygon
- * @param color line color of the polygon
- * @param bg_color background color of the polygon
+ * @param boundary_color line color of the polygon
+ * @param fill_color fill color of the polygon
  */
-void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color, lv_color_t bg_color);
-
+void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t boundary_color, lv_color_t fill_color);
+    
 /**
  * Boundary fill function of the canvas
  * @param canvas pointer to a canvas object
  * @param x x coordinate of the start position (seed)
  * @param y y coordinate of the start position (seed)
- * @param fill_color fill color of the area
  * @param boundary_color edge/boundary color of the area
+ * @param fill_color fill color of the area 
  */
-void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t boundary_color);
+void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t boundary_color, lv_color_t fill_color);
 
 /**
  * Flood fill function of the canvas
