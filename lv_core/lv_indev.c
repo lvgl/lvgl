@@ -870,6 +870,8 @@ static void indev_drag(lv_indev_proc_t * state)
 
             lv_coord_t prev_x = drag_obj->coords.x1;
             lv_coord_t prev_y = drag_obj->coords.y1;
+            lv_coord_t prev_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
+            lv_coord_t prev_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
 
             lv_obj_set_pos(drag_obj, act_x + state->vect.x, act_y + state->vect.y);
 
@@ -884,8 +886,15 @@ static void indev_drag(lv_indev_proc_t * state)
             }
             /*If the object didn't moved then clear the invalidated areas*/
             else {
-                uint16_t new_inv_buf_size = lv_refr_get_buf_size();
-                lv_refr_pop_from_buf(new_inv_buf_size - inv_buf_size);
+                /*In a special case if the object is moved on a page and
+                 * the scrollable has fit == true and the object is dragged of the page then
+                 * while its coordinate is not changing only the parent's size is reduced */
+                lv_coord_t act_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
+                lv_coord_t act_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
+                if(act_par_w == prev_par_w && act_par_h == prev_par_h) {
+                    uint16_t new_inv_buf_size = lv_refr_get_buf_size();
+                    lv_refr_pop_from_buf(new_inv_buf_size - inv_buf_size);
+                }
             }
         }
     }
