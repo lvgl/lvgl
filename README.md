@@ -1,7 +1,4 @@
- <img src="https://littlevgl.com/logo/symbol/faviconit/favicon-48.png" align="right" />
-
-# LittlevGL - Free Open-source Embedded GUI Library
-
+ # LittlevGL - Free Open-source Embedded GUI Library
 
 [![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)](#)
 [![status](https://img.shields.io/badge/status-ACTIVE-brightgreen.svg)](#)
@@ -13,10 +10,11 @@
 
 [![LittlevGL cover](https://littlevgl.com/github/cover3.gif)](#)
 
-**LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.**  
+LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint.  
 
-:star: **Star the project if you like it!** :star: <br>
-[![twitter](https://littlevgl.com/github/twitter.png)](#) **And share with your firends** [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&hashtags=littlevgl,embedded,gui,free,opensource)
+
+Star the project if you like it! &nbsp; :star: <br>
+And share with your friends [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&hashtags=littlevgl,embedded,gui,free,opensource)
 
 ### [Website](https://littlevgl.com) &middot; [Live demo](https://littlevgl.com/live-demo) &middot; [Simulator](https://docs.littlevgl.com/#PC-simulator) &middot; [Docs](https://docs.littlevgl.com/) &middot; [Blog](https://blog.littlevgl.com/)
 
