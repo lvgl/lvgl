@@ -340,8 +340,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2
   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
   int err = (dx>dy ? dx : -dy)/2, e2;
  
-  for(;;){
-    // setPixel(x0,y0);
+  for(;;){    
     lv_canvas_set_px(canvas, x0, y0, color);
 
     if (x0==x1 && y0==y1) break;
@@ -396,10 +395,10 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size,
  * @param canvas pointer to a canvas object
  * @param points edge points of the polygon
  * @param size edge count of the polygon
- * @param color line color of the polygon
- * @param bg_color background color of the polygon
+ * @param boundary_color line color of the polygon
+ * @param fill_color fill color of the polygon
  */
-void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color, lv_color_t bg_color)
+void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t boundary_color, lv_color_t fill_color)
 {
   uint32_t x = 0, y = 0;
   uint8_t i;
@@ -412,8 +411,7 @@ void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size,
   x = x / size;
   y = y / size;
 
-  // lv_canvas_flood_fill(canvas, (lv_coord_t) x, (lv_coord_t) y, color, bg_color);
-  lv_canvas_boundary_fill4(canvas, (lv_coord_t) x, (lv_coord_t) y, color, color);
+  lv_canvas_boundary_fill4(canvas, (lv_coord_t) x, (lv_coord_t) y, boundary_color, fill_color);
 }
 
 /**
@@ -421,10 +419,10 @@ void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size,
  * @param canvas pointer to a canvas object
  * @param x x coordinate of the start position (seed)
  * @param y y coordinate of the start position (seed)
- * @param fill_color fill color of the area
  * @param boundary_color edge/boundary color of the area
+ * @param fill_color fill color of the area 
  */
-void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color, lv_color_t boundary_color)
+void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t boundary_color, lv_color_t fill_color)
 {
     lv_color_t c;
 
@@ -433,13 +431,12 @@ void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_
     if(c.full != boundary_color.full &&
        c.full != fill_color.full)
     {
-      // putpixel(x, y, fill_color);
       lv_canvas_set_px(canvas, x, y, fill_color);
 
-      lv_canvas_boundary_fill4(canvas, x + 1,     y, fill_color, boundary_color);
-      lv_canvas_boundary_fill4(canvas,     x, y + 1, fill_color, boundary_color);
-      lv_canvas_boundary_fill4(canvas, x - 1,     y, fill_color, boundary_color);
-      lv_canvas_boundary_fill4(canvas,     x, y - 1, fill_color, boundary_color);
+      lv_canvas_boundary_fill4(canvas, x + 1,     y, boundary_color, fill_color);
+      lv_canvas_boundary_fill4(canvas,     x, y + 1, boundary_color, fill_color);
+      lv_canvas_boundary_fill4(canvas, x - 1,     y, boundary_color, fill_color);
+      lv_canvas_boundary_fill4(canvas,     x, y - 1, boundary_color, fill_color);
     }
 }
 
