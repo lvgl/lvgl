@@ -89,10 +89,36 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     return new_canvas;
 }
 
-/*======================
- * Add/remove functions
- *=====================*/
+/*=====================
+ * Setter functions
+ *====================*/
 
+/**
+ * Set a buffer for the canvas.
+ * @param buf a buffer where the content of the canvas will be.
+ * The required size is (lv_img_color_format_get_px_size(cf) * w * h) / 8)
+ * It can be allocated with `lv_mem_alloc()` or
+ * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
+ * it can be an address in RAM or external SRAM
+ * @param canvas pointer to a canvas object
+ * @param w width of the canvas
+ * @param h height of the canvas
+ * @param cf color format. The following formats are supported:
+ *      LV_IMG_CF_TRUE_COLOR, LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, LV_IMG_CF_INDEXES_1/2/4/8BIT
+ *
+ */
+void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
+{
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+
+    ext->dsc.header.cf = cf;
+    ext->dsc.header.w = w;
+    ext->dsc.header.h = h;
+    ext->dsc.data = buf;
+    ext->dsc.data_size = (lv_img_color_format_get_px_size(cf) * w * h) / 8;
+
+    lv_img_set_src(canvas, &ext->dsc);
+}
 /**
  * Set the color of a pixel on the canvas
  * @param canvas
@@ -109,33 +135,151 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
         return;
     }
 
-    uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
-    uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+    uint8_t * buf_u8 = (uint8_t *) ext->dsc.data;
 
-    memcpy((void*)&ext->dsc.data[px], &c, sizeof(lv_color_t));
+    if(ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR ||
+            ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
+    {
+        uint32_t px = ext->dsc.header.w * y * sizeof(lv_color_t) + x * sizeof(lv_color_t);
+
+        memcpy(&buf_u8[px], &c, sizeof(lv_color_t));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_1BIT) {
+        buf_u8 += 4 * 2;
+        uint8_t bit = x & 0x7;
+        x = x >> 3;
+
+        uint32_t px = (ext->dsc.header.w >> 3) * y + x;
+        buf_u8[px] = buf_u8[px] & ~(1 << (7 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_2BIT) {
+        buf_u8 += 4 * 4;
+        uint8_t bit = (x & 0x3) * 2;
+        x = x >> 2;
+
+        uint32_t px = (ext->dsc.header.w >> 2) * y + x;
+
+        buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_4BIT) {
+        buf_u8 += 4 * 16;
+        uint8_t bit = (x & 0x1) * 4;
+        x = x >> 1;
+
+        uint32_t px = (ext->dsc.header.w >> 1) * y + x;
+
+        buf_u8[px] = buf_u8[px] & ~(0xF << (4 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        buf_u8 += 4 * 256;
+        uint32_t px = ext->dsc.header.w * y + x;
+        buf_u8[px] = c.full;
+    }
 }
+
+/**
+ * Set a style of a canvas.
+ * @param canvas pointer to canvas object
+ * @param type which style should be set
+ * @param style pointer to a style
+ */
+void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t * style)
+{
+    switch(type) {
+    case LV_CANVAS_STYLE_MAIN:
+        lv_img_set_style(canvas, style);
+        break;
+    }
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 /**
  * Get the color of a pixel on the canvas
  * @param canvas
  * @param x x coordinate of the point to set
  * @param y x coordinate of the point to set
- * @param c color of the point
+ * @return color of the point
  */
-void lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t * c)
+lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
 {
-
+    lv_color_t p_color = LV_COLOR_BLACK;
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
     if(x >= ext->dsc.header.w || y >= ext->dsc.header.h) {
         LV_LOG_WARN("lv_canvas_get_px: x or y out of the canvas");
-        return;
+        return p_color;
     }
 
-    uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
-    uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+    uint8_t * buf_u8 = (uint8_t *) ext->dsc.data;
 
-    memcpy(c, (void*)&ext->dsc.data[px], sizeof(lv_color_t));
+    if(ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR ||
+            ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
+    {
+        uint32_t px = ext->dsc.header.w * y * sizeof(lv_color_t) + x * sizeof(lv_color_t);
+        memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_1BIT) {
+        buf_u8 += 4 * 2;
+        uint8_t bit = x & 0x7;
+        x = x >> 3;
+
+        uint32_t px = (ext->dsc.header.w >> 3) * y + x;
+        p_color.full = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_2BIT) {
+        buf_u8 += 4 * 4;
+        uint8_t bit = (x & 0x3) * 2;
+        x = x >> 2;
+
+        uint32_t px = (ext->dsc.header.w >> 2) * y + x;
+        p_color.full = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_4BIT) {
+        buf_u8 += 4 * 16;
+        uint8_t bit = (x & 0x1) * 4;
+        x = x >> 1;
+
+        uint32_t px = (ext->dsc.header.w >> 1) * y + x;
+        p_color.full = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        buf_u8 += 4 * 256;
+        uint32_t px = ext->dsc.header.w * y + x;
+        p_color.full = buf_u8[px];
+    }
+    return p_color;
 }
+
+/**
+ * Get style of a canvas.
+ * @param canvas pointer to canvas object
+ * @param type which style should be get
+ * @return style pointer to the style
+ */
+lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type)
+{
+    // lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    lv_style_t * style = NULL;
+
+    switch(type) {
+    case LV_CANVAS_STYLE_MAIN:
+        style = lv_img_get_style(canvas);
+        break;
+    default:
+        style =  NULL;
+    }
+
+    return style;
+}
+
+/*=====================
+ * Other functions
+ *====================*/
 
 /**
  * Copy a buffer to the canvas
@@ -146,7 +290,7 @@ void lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  * @param x left side of the destination position
  * @param y top side of the destination position
  */
-void lv_canvas_copy_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y)
+void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y)
 {
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
     if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
@@ -204,83 +348,6 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
         canvas_buf_color += ext->dsc.header.w;
     }
 }
-
-
-/*=====================
- * Setter functions
- *====================*/
-
-/**
- * Set a buffer for the canvas.
- * @param buf a buffer where the content of the canvas will be.
- * The required size is (lv_img_color_format_get_px_size(cf) * w * h) / 8)
- * It can be allocated with `lv_mem_alloc()` or
- * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
- * it can be an address in RAM or external SRAM
- * @param canvas pointer to a canvas object
- * @param w width of the canvas
- * @param h height of the canvas
- * @param cf color format. The following formats are supported:
- * LV_IMG_CF_TRUE_COLOR,  LV_IMG_CF_TRUE_COLOR_ALPHA, LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED
- *
- */
-void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
-{
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-
-    ext->dsc.header.cf = cf;
-    ext->dsc.header.w = w;
-    ext->dsc.header.h = h;
-    ext->dsc.data = buf;
-    ext->dsc.data_size = (lv_img_color_format_get_px_size(cf) * w * h) / 8;
-
-    lv_img_set_src(canvas, &ext->dsc);
-}
-
-/**
- * Set a style of a canvas.
- * @param canvas pointer to canvas object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t * style)
-{
-    switch(type) {
-    case LV_CANVAS_STYLE_MAIN:
-        lv_img_set_style(canvas, style);
-        break;
-    }
-}
-
-/*=====================
- * Getter functions
- *====================*/
-
-/**
- * Get style of a canvas.
- * @param canvas pointer to canvas object
- * @param type which style should be get
- * @return style pointer to the style
- */
-lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type)
-{
-    // lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    lv_style_t * style = NULL;
-
-    switch(type) {
-    case LV_CANVAS_STYLE_MAIN:
-        style = lv_img_get_style(canvas);
-        break;
-    default:
-        style =  NULL;
-    }
-
-    return style;
-}
-
-/*=====================
- * Other functions
- *====================*/
 
 /**
  * Draw circle function of the canvas
@@ -432,7 +499,7 @@ void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_
 {
     lv_color_t c;
 
-    lv_canvas_get_px(canvas, x, y, &c);
+    c = lv_canvas_get_px(canvas, x, y);
 
     if(c.full != boundary_color.full &&
        c.full != fill_color.full)
@@ -458,7 +525,7 @@ void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_colo
 {
   lv_color_t c;
 
-  lv_canvas_get_px(canvas, x, y, &c);
+  c = lv_canvas_get_px(canvas, x, y);
 
   if(c.full == bg_color.full)
   {
