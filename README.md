@@ -1,5 +1,5 @@
  
-<img src="https://littlevgl.com/github/logo_small5.png" align="right" />
+<img src="https://littlevgl.com/logo/symbol/faviconit/favicon-57.png" align="right" />
 
 ## LittlevGL - Free Open-source Embedded GUI Library
 
@@ -20,7 +20,6 @@
 ![twitter](https://littlevgl.com/github/twitter.png) **And share with your firends** [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&hashtags=littlevgl,embedded,gui,free,opensource)
 
 ### [Website](https://littlevgl.com) &middot; [Live demo](https://littlevgl.com/live-demo) &middot; [Simulator](https://docs.littlevgl.com/#PC-simulator) &middot; [Docs](https://docs.littlevgl.com/) &middot; [Blog](https://blog.littlevgl.com/)
-
 
 ### Features
 * **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
@@ -186,7 +185,6 @@ You contribute in several ways:
 - **Upload your project or product as a reference** to [this site](https://blog.littlevgl.com/2018-12-26/references)
 
 Before contributing, please read [CONTRIBUTING.md](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md).  
-For more info read this [blog post](https://blog.littlevgl.com/2018-12-06/contributing).
 
 ### Donate
 If you are pleased with the library, found it useful, or you are happy with the support you got, please help its further development:
