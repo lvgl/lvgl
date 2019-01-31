@@ -16,7 +16,7 @@ LittlevGL provides everything you need to create a Graphical User Interface (GUI
 <a href="https://docs.littlevgl.com/#PC-simulator">Simulator</a> &middot; 
 <a href="https://docs.littlevgl.com/">Docs</a> &middot;
 <a href="https://blog.littlevgl.com/">Blog</a>
-</p>
+</h4>
 
 Star the project if you like it! :star: <br>
 And share with your friends <a href="https://twitter.com/intent/tweet?text=LittlevGL%20is%20a%20free%20and%20open%20source%20embedded%20GUI%20library%20with%20easy-to-use%20graphical%20elements,%20beautiful%20visual%20effects%20and%20low%20memory%20footprint.&url=https://littlevgl.com/&hashtags=littlevgl,embedded,gui,free,opensource"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"></a>
