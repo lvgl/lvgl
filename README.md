@@ -7,7 +7,7 @@
 </p>
 
 <h4 align="center">
-LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint. 
+LittlevGL provides everything you need to create a Graphical User Interface (GUI)<br> on embedded systems with easy-to-use graphical elements, <br>beautiful visual effects and low memory footprint. 
 </h4>
 
 <h4 align="center">
