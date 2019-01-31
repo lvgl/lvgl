@@ -114,6 +114,13 @@ void lv_fs_init(void);
 void lv_fs_add_drv(lv_fs_drv_t * drv_p);
 
 /**
+ * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be returned.
+ * @param letter letter of the drive
+ * @return true: drive is ready; false: drive is not ready
+ */
+bool lv_fs_is_ready(char letter);
+
+/**
  * Open a file
  * @param file_p pointer to a lv_fs_file_t variable
  * @param path path to the file beginning with the driver letter (e.g. S:/folder/file.txt)

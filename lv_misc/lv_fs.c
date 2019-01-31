@@ -52,7 +52,21 @@ void lv_fs_init(void)
     lv_ll_init(&LV_GC_ROOT(_lv_drv_ll), sizeof(lv_fs_drv_t));
 }
 
+/**
+ * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be returned.
+ * @param letter letter of the drive
+ * @return true: drive is ready; false: drive is not ready
+ */
+bool lv_fs_is_ready(char letter)
+{
+    lv_fs_drv_t * drv = lv_fs_get_drv(letter);
 
+    if(drv == NULL) return false;                      /*An unknown driver in not ready*/
+
+    if(drv->ready == NULL) return true;                /*Assume the driver is always ready if no handler provided*/
+
+    return drv->ready();
+}
 
 /**
  * Open a file
