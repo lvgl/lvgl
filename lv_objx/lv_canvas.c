@@ -109,10 +109,53 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
         return;
     }
 
-    uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
-    uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+    uint8_t * buf_u8 = (uint8_t *) ext->dsc.data;
 
-    memcpy((void*)&ext->dsc.data[px], &c, sizeof(lv_color_t));
+    if(ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR ||
+            ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
+            ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
+    {
+        uint32_t px_size = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
+        uint32_t px = ext->dsc.header.w * y * px_size + x * px_size;
+
+        memcpy(&buf_u8[px], &c, sizeof(lv_color_t));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_1BIT) {
+        buf_u8 += 4 * 2;
+        uint8_t bit = x & 0x7;
+        x = x >> 3;
+
+        uint32_t px = (ext->dsc.header.w >> 3) * y + x;
+        buf_u8[px] = buf_u8[px] & ~(1 << (7 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_2BIT) {
+        buf_u8 += 4 * 4;
+        uint8_t bit = (x & 0x3) * 2;
+        x = x >> 2;
+
+        uint32_t px = (ext->dsc.header.w >> 2) * y + x;
+
+        buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_4BIT) {
+        buf_u8 += 4 * 16;
+        uint8_t bit = (x & 0x1) * 4;
+        x = x >> 1;
+
+        uint32_t px = (ext->dsc.header.w >> 1) * y + x;
+
+            buf_u8[px] = buf_u8[px] & ~(0xF << (4 - bit));
+            buf_u8[px] = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
+    }
+    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        buf_u8 += 4 * 256;
+        uint32_t px = ext->dsc.header.w * y + x;
+        buf_u8[px] = c.full;
+    }
+
+
 }
 
 /**
@@ -197,8 +240,17 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
     for(i = 0; i < h; i++) {
         for(j = 0; j < w; j++) {
             canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 8;
-            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 8;
             canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 8;
+#if LV_COLOR_16_SWAP == 0
+            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 8;
+#else
+            uint8_t green_canvas = (canvas_buf_color[j].green_h << 3) + canvas_buf_color[j].green_l;
+            uint8_t green_buffer = (copy_buf_color[j].green_h << 3) + copy_buf_color[j].green_l;
+            uint8_t green_result = (uint16_t) ((uint16_t) green_canvas * green_buffer) >> 8;
+            canvas_buf_color[j].green_h = green_result >> 3;
+            canvas_buf_color[j].green_l = green_result & 0x7;
+
+#endif
         }
         copy_buf_color += w;
         canvas_buf_color += ext->dsc.header.w;
