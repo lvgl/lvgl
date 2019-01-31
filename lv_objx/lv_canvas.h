@@ -108,17 +108,16 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
 
 /**
  * Set a buffer for the canvas.
- * @param buf a buffer where the contant of the canvas will be.
+ * @param buf a buffer where the content of the canvas will be.
  * The required size is (lv_img_color_format_get_px_size(cf) * w * h) / 8)
  * It can be allocated with `lv_mem_alloc()` or
  * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
  * it can be an address in RAM or external SRAM
- * @param canvas pointer to a canvas obejct
+ * @param canvas pointer to a canvas object
  * @param w width of the canvas
- * @param h hight of the canvas
+ * @param h height of the canvas
  * @param cf color format. The following formats are supported:
- * LV_IMG_CF_TRUE_COLOR,  LV_IMG_CF_TRUE_COLOR_ALPHA, LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED
- *
+ * LV_IMG_CF_TRUE_COLOR, LV_IMG_CF_TRUE_COLOR_ALPHA, LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, LV_IMG_CF_INDEXED_1/2/4/8BIT
  */
 void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
 
