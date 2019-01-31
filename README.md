@@ -1,7 +1,6 @@
- 
-<img src="https://littlevgl.com/logo/symbol/faviconit/favicon-57.png" align="right" />
+ <img src="https://littlevgl.com/logo/symbol/faviconit/favicon-48.png" align="right" />
 
-## LittlevGL - Free Open-source Embedded GUI Library
+# LittlevGL - Free Open-source Embedded GUI Library
 
 
 ![price](https://img.shields.io/badge/price-FREE-brightgreen.svg)
@@ -55,7 +54,9 @@ Just to mention some **platforms**:
 - Quectell M66
 
 ### Quick start in a simulator
-Try LittlevGL in a simulator on you PC without any embedded hardware. Choose a project with your favourite IDE:
+The easiest way to get started with LittlevGL is to run it in a simulator on your PC without any embedded hardware. 
+
+Choose a project with your favourite IDE:
 
 |   Eclipse   | CodeBlock  | Visual Studio | PlatfomIO | Qt Creator |
 |-------------|----------- |---------------|-----------|------------|
