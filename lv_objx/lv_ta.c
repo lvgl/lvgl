@@ -156,7 +156,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*Wrap the labels signal function and make it clickable*/
-    if(label_signal_original) label_signal_original = lv_obj_get_signal_func(ext->label);
+    if(label_signal_original == NULL) label_signal_original = lv_obj_get_signal_func(ext->label);
     lv_obj_set_signal_func(ext->label, label_signal_wrapper);
     lv_obj_set_click(ext->label, true);
 
