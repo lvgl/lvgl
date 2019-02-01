@@ -1,7 +1,7 @@
 <h1 align="center"> LittlevGL - Open-source Embedded GUI Library</h1>
 <p align="center">
-<img src="https://img.shields.io/badge/licence-MIT-blue.svg">
-<img src="https://img.shields.io/badge/version-v5.2-blue.svg">
+<a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
+<a href="https://github.com/littlevgl/lvgl/releases/tag/v5.3"><img src="https://img.shields.io/badge/version-v5.3-blue.svg"></a>
 <br>
 <img src="https://littlevgl.com/github/cover3.gif">
 </p>
