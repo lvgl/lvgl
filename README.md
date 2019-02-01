@@ -3,7 +3,7 @@
 <a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
 <a href="https://github.com/littlevgl/lvgl/releases/tag/v5.3"><img src="https://img.shields.io/badge/version-v5.3-blue.svg"></a>
 <br>
-<img src="https://littlevgl.com/github/cover3.gif">
+<img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
 </p>
 
 <p align="center">
