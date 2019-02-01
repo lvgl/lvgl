@@ -53,6 +53,7 @@ static void pwd_char_hider(lv_obj_t * ta);
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
 static void refr_cursor_area(lv_obj_t * ta);
+static lv_res_t label_signal_wrapper(lv_obj_t * ta, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,6 +62,7 @@ static lv_design_func_t ancestor_design;
 static lv_design_func_t scrl_design;
 static lv_signal_func_t ancestor_signal;
 static lv_signal_func_t scrl_signal;
+static lv_signal_func_t label_signal_original;
 
 /**********************
  *      MACROS
@@ -152,6 +154,11 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_ta);
     }
+
+    /*Wrap the labels signal function and make it clickable*/
+    if(label_signal_original) label_signal_original = lv_obj_get_signal_func(ext->label);
+    lv_obj_set_signal_func(ext->label, label_signal_wrapper);
+    lv_obj_set_click(ext->label, true);
 
 #if USE_LV_ANIMATION
     /*Create a cursor blinker animation*/
@@ -1090,7 +1097,36 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
             lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
         }
 #endif
+    } else if(sign == LV_SIGNAL_PRESSED) {
+        lv_indev_t * indev = (lv_indev_t *)param;
+        lv_area_t label_coords;
+        uint16_t index_of_char_at_position;
+
+        lv_obj_get_coords(ext->label, &label_coords);
+
+        lv_point_t relative_position = {
+            indev->proc.act_point.x - label_coords.x1,
+            indev->proc.act_point.y - label_coords.y1
+        };
+
+        lv_coord_t label_width = lv_obj_get_width(ext->label);
+
+        /*Check if the click happend on the left side of the area ouside the label*/
+        if (relative_position.x < 0) {
+            index_of_char_at_position = 0;
+        }
+        /*Check if the click happend on the right side of the area ouside the label*/
+        else if (relative_position.x >= label_width) {
+            index_of_char_at_position = LV_TA_CURSOR_LAST;
+        }
+        else {
+            index_of_char_at_position = lv_label_get_letter_on(ext->label, &relative_position);
+
+        }
+
+        lv_ta_set_cursor_pos(ta, index_of_char_at_position);
     }
+
     return res;
 }
 
@@ -1345,4 +1381,27 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_inv_area(&area_tmp);
 }
 
+static lv_res_t label_signal_wrapper(lv_obj_t * label, lv_signal_t sign, void * param)
+{
+    if(sign == LV_SIGNAL_PRESSED) {
+        lv_obj_t * parent;
+
+        parent = lv_obj_get_parent(label);
+        /*Get the parent (ta) of the parent (scrl part)*/
+        parent = parent ? lv_obj_get_parent(parent) : NULL;
+
+        /*Forward the pressed event to the parent, which is the ta*/
+        if(parent) {
+            lv_signal_func_t parent_signal = lv_obj_get_signal_func(parent);
+
+            if(parent_signal) {
+                if(parent_signal(parent, sign, param) != LV_RES_OK) return LV_RES_INV;
+            }
+        }
+    }
+
+    if(label_signal_original) return label_signal_original(label, sign, param);
+
+    return LV_RES_OK;
+}
 #endif
