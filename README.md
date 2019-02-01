@@ -154,7 +154,7 @@ style_btn_rel.body.radius = LV_RADIUS_CIRCLE;
 style_btn_rel.text.color = LV_COLOR_HEX3(0xDEF);
 
 static lv_style_t style_btn_pr;                         /*A variable to store the pressed style*/
-lv_style_copy(&style_btn_pr, &style_btn_rel);           /*Initialize from a built-in style*/
+lv_style_copy(&style_btn_pr, &style_btn_rel);           /*Initialize from the released style*/
 style_btn_pr.body.border.color = LV_COLOR_HEX3(0x46B);
 style_btn_pr.body.main_color = LV_COLOR_HEX3(0x8BD);
 style_btn_pr.body.grad_color = LV_COLOR_HEX3(0x24A);
