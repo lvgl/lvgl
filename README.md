@@ -105,7 +105,7 @@ bool touchpad_read(lv_indev_data_t * data)
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
 
-    /*Save the state and save the pressed cooridnate*/
+    /*Save the state and save the pressed coordinate*/
     data->state = touchpad_is_pressed() ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL; 
     if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
    
@@ -116,9 +116,9 @@ bool touchpad_read(lv_indev_data_t * data)
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 ```
-6. Call `lv_task_handler()` periodically every few milliseconds.
+6. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in Timer interrupt or in an Operation system task.
 
-For a detailed description check the [Online documatation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
+For a detailed description check the [Documatation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
  
 ### Code examples
