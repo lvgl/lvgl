@@ -13,6 +13,7 @@ CSRCS += lv_tileview.c
 CSRCS += lv_btn.c
 CSRCS += lv_calendar.c
 CSRCS += lv_chart.c
+CSRCS += lv_canvas.c
 CSRCS += lv_gauge.c
 CSRCS += lv_label.c
 CSRCS += lv_list.c

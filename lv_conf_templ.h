@@ -29,7 +29,8 @@
 #  define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
 #endif     /*LV_MEM_CUSTOM*/
 
-/* Garbage Collector settings.  */
+/* Garbage Collector settings
+ * Used if lvgl is binded to higher language and the memory is managed by that language */
 #define LV_ENABLE_GC 0
 #if LV_ENABLE_GC != 0
 #  define LV_MEM_CUSTOM_REALLOC   your_realloc           /*Wrapper to realloc*/
@@ -60,7 +61,7 @@
  *----------------*/
 
 /* VDB (Virtual Display Buffer) is an internal graphics buffer.
- * To images will be drawn into this buffer first and then
+ * The GUI will be drawn into this buffer first and then
  * the buffer will be passed to your `disp_drv.disp_flush` function to
  * copy it to your frame buffer.
  * VDB is required for: buffered drawing, opacity, anti-aliasing and shadows
@@ -80,7 +81,7 @@
   * LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`*/
 #define LV_VDB_ADR          0
 
-/* Use two Virtual Display buffers (VDB) parallelize rendering and flushing (optional)
+/* Use two Virtual Display buffers (VDB) to parallelize rendering and flushing
  * The flushing should use DMA to write the frame buffer in the background */
 #define LV_VDB_DOUBLE       0
 
@@ -111,7 +112,7 @@
 #define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
 
 /*Color settings*/
-#define LV_COLOR_DEPTH     32                     /*Color depth: 1/8/16/32*/
+#define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/32*/
 #define LV_COLOR_16_SWAP   0                      /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
 #define LV_COLOR_SCREEN_TRANSP        0           /*1: Enable screen transparency. Useful for OSD or other overlapping GUIs. Requires ARGB8888 colors*/
 #define LV_COLOR_TRANSP    LV_COLOR_LIME          /*Images pixels with this color will not be drawn (with chroma keying)*/
@@ -141,7 +142,7 @@
 /*HAL settings*/
 #define LV_TICK_CUSTOM     0                        /*1: use a custom tick source (removing the need to manually update the tick with `lv_tick_inc`) */
 #if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"         /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "sonething.h"         /*Header for the sys time function*/
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current systime in ms*/
 #endif     /*LV_TICK_CUSTOM*/
 
@@ -158,7 +159,7 @@
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 /* 1: Print the log with 'printf'; 0: user need to register a callback*/
 
-#  define LV_LOG_PRINTF   1
+#  define LV_LOG_PRINTF   0
 #endif  /*USE_LV_LOG*/
 
 /*================
@@ -220,7 +221,7 @@
  *==================*/
 #define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
-#define LV_OBJ_REALIGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+#define LV_OBJ_REALIGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 
 /*==================
  *  LV OBJ X USAGE
