@@ -11,6 +11,7 @@
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_group.h"
+#include "../lv_core/lv_lang.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
@@ -90,6 +91,9 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_speed = LV_LABEL_SCROLL_SPEED;
     ext->offset.x = 0;
     ext->offset.y = 0;
+#if USE_LV_MULTI_LANG
+    ext->lang_txt_id = LV_LANG_TXT_ID_NONE;
+#endif
     lv_obj_set_design_func(new_label, lv_label_design);
     lv_obj_set_signal_func(new_label, lv_label_signal);
 
@@ -175,6 +179,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     lv_label_refr_text(label);
 }
+
 /**
  * Set a new text for a label from a character array. The array don't has to be '\0' terminated.
  * Memory will be allocated to store the array by the label.
@@ -232,6 +237,22 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text)
     lv_label_refr_text(label);
 }
 
+#if USE_LV_MULTI_LANG
+/**
+ *Set a text ID which refers a the same text but in a different languages
+ * @param label pointer to a label object
+ * @param txt_id ID of the text
+ */
+void lv_label_set_text_id(lv_obj_t * label, uint32_t txt_id)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    ext->lang_txt_id = txt_id;
+
+    /*Apply the new language*/
+    label->signal_func(label, LV_SIGNAL_LANG_CHG, NULL);
+}
+#endif
+
 /**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
@@ -277,20 +298,19 @@ void lv_label_set_align(lv_obj_t * label, lv_label_align_t align)
     ext->align = align;
 
     lv_obj_invalidate(label);       /*Enough to invalidate because alignment is only drawing related (lv_refr_label_text() not required)*/
-
 }
 
 /**
  * Enable the recoloring by in-line commands
  * @param label pointer to a label object
- * @param recolor_en true: enable recoloring, false: disable
+ * @param en true: enable recoloring, false: disable
  */
-void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
+void lv_label_set_recolor(lv_obj_t * label, bool en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(ext->recolor == recolor_en) return;
+    if(ext->recolor == en) return;
 
-    ext->recolor = recolor_en == false ? 0 : 1;
+    ext->recolor = en == false ? 0 : 1;
 
     lv_label_refr_text(label);  /*Refresh the text because the potential colo codes in text needs to be hided or revealed*/
 }
@@ -298,14 +318,14 @@ void lv_label_set_recolor(lv_obj_t * label, bool recolor_en)
 /**
  * Set the label to draw (or not draw) background specified in its style's body
  * @param label pointer to a label object
- * @param body_en true: draw body; false: don't draw body
+ * @param en true: draw body; false: don't draw body
  */
-void lv_label_set_body_draw(lv_obj_t * label, bool body_en)
+void lv_label_set_body_draw(lv_obj_t * label, bool en)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(ext->body_draw == body_en) return;
+    if(ext->body_draw == en) return;
 
-    ext->body_draw = body_en == false ? 0 : 1;
+    ext->body_draw = en == false ? 0 : 1;
 
     lv_obj_refresh_ext_size(label);
 
@@ -344,6 +364,19 @@ char * lv_label_get_text(const lv_obj_t * label)
 
     return ext->text;
 }
+
+#if USE_LV_MULTI_LANG
+/**
+ * Get the text ID of the label. (Used by the multi-language feature)
+ * @param label pointer to a label object
+ * @return ID of the text
+ */
+uint16_t lv_label_get_text_id(lv_obj_t * label)
+{
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    return ext->lang_txt_id;
+}
+#endif
 
 /**
  * Get the long mode of a label
@@ -440,28 +473,18 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
     }
 
     /*If the last character is line break then go to the next line*/
-    if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
-        y += letter_height + style->text.line_space;
-        line_start = index;
+    if(index > 0) {
+        if((txt[index - 1] == '\n' || txt[index - 1] == '\r') && txt[index] == '\0') {
+            y += letter_height + style->text.line_space;
+            line_start = index;
+        }
     }
 
     /*Calculate the x coordinate*/
-    lv_coord_t x = 0;
-    uint32_t i = line_start;
-    uint32_t cnt = line_start;                      /*Count the letter (in UTF-8 1 letter not 1 byte)*/
-    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
-    uint32_t letter;
-    while(cnt < index) {
-        cnt += lv_txt_encoded_size(&txt[i]);
-        letter = lv_txt_encoded_next(txt, &i);
-        /*Handle the recolor command*/
-        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-            if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-                continue; /*Skip the letter is it is part of a command*/
-            }
-        }
-        x += lv_font_get_width(font, letter) + style->text.letter_space;
-    }
+    lv_coord_t x = lv_txt_get_width(&txt[line_start], index - line_start,
+                            font, style->text.letter_space, flag);
+
+    if(index != line_start) x += style->text.letter_space;
 
     if(ext->align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
@@ -476,7 +499,6 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
 
         x += lv_obj_get_width(label) - line_w;
     }
-
     pos->x = x;
     pos->y = y;
 }
@@ -731,6 +753,17 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
             label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.hor);
             label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.ver);
         }
+    } else if(sign == LV_SIGNAL_LANG_CHG) {
+#if USE_LV_MULTI_LANG
+        if(ext->lang_txt_id != LV_LANG_TXT_ID_NONE) {
+            const char * lang_txt = lv_lang_get_text(ext->lang_txt_id);
+            if(lang_txt) {
+                lv_label_set_text(label, lang_txt);
+            } else {
+                LV_LOG_WARN("lv_lang_get_text return NULL for a label's text");
+            }
+        }
+#endif
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
@@ -787,7 +820,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.var = label;
             anim.repeat = 1;
             anim.playback = 1;
-            anim.start = lv_font_get_width(font, ' ');
+            anim.start = 0;
             anim.act_time = 0;
             anim.end_cb = NULL;
             anim.path = lv_anim_path_linear;
@@ -797,7 +830,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             anim.repeat_pause = anim.playback_pause;
 
             if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
-                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label) - lv_font_get_width(font, ' ');
+                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label);
                 anim.fp = (lv_anim_fp_t) lv_obj_set_x;
                 anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
                 lv_anim_create(&anim);
@@ -817,7 +850,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.var = label;
         anim.repeat = 1;
         anim.playback = 1;
-        anim.start = lv_font_get_width(font, ' ');
+        anim.start = 0;
         anim.act_time = 0;
         anim.end_cb = NULL;
         anim.path = lv_anim_path_linear;
@@ -826,7 +859,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
-            anim.end = lv_obj_get_width(label) - size.x - lv_font_get_width(font, ' ');
+            anim.end = lv_obj_get_width(label) - size.x;
             anim.fp = (lv_anim_fp_t) lv_label_set_offset_x;
             anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);

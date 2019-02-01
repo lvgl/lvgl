@@ -38,6 +38,7 @@
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t * mbox);
 static lv_res_t lv_mbox_close_action(lv_obj_t * btn, const char * txt);
+static void lv_mbox_close_end_cb(lv_obj_t * mbox);
 
 /**********************
  *  STATIC VARIABLES
@@ -216,12 +217,12 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
     if(ext->anim_time != 0) {
         /*Add shrinking animations*/
         lv_obj_animate(mbox, LV_ANIM_GROW_H | LV_ANIM_OUT, ext->anim_time, delay, NULL);
-        lv_obj_animate(mbox, LV_ANIM_GROW_V | LV_ANIM_OUT, ext->anim_time, delay, (void (*)(lv_obj_t *))lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_GROW_V | LV_ANIM_OUT, ext->anim_time, delay, lv_mbox_close_end_cb);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, false, false);
     } else {
-        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, (void (*)(lv_obj_t *))lv_obj_del);
+        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_mbox_close_end_cb);
     }
 #else
     (void)delay; /*Unused*/
@@ -280,6 +281,18 @@ void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, lv_style_t * style
 
 }
 
+/**
+ * Set whether recoloring is enabled
+ * @param btnm pointer to button matrix object
+ * @param en whether recoloring is enabled
+ */
+void lv_mbox_set_recolor(lv_obj_t * mbox, bool en)
+{
+	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+
+	if(ext->btnm)
+		lv_btnm_set_recolor(ext->btnm, en);
+}
 
 /*=====================
  * Getter functions
@@ -360,6 +373,21 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
     }
 
     return style;
+}
+
+/**
+ * Get whether recoloring is enabled
+ * @param btnm pointer to button matrix object
+ * @return whether recoloring is enabled
+ */
+bool lv_mbox_get_recolor(const lv_obj_t * mbox)
+{
+	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+
+	if(!ext->btnm)
+		return false;
+
+	return lv_btnm_get_recolor(ext->btnm);
 }
 
 
@@ -469,4 +497,8 @@ static lv_res_t lv_mbox_close_action(lv_obj_t * btn, const char * txt)
     return LV_RES_OK;
 }
 
+static void lv_mbox_close_end_cb(lv_obj_t * mbox)
+{
+    lv_obj_del(mbox);
+}
 #endif

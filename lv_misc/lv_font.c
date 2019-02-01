@@ -47,10 +47,9 @@ void lv_font_init(void)
 }
 
 /**
- * Create a pair from font name and font dsc. get function. After it 'font_get' can be used for this font
- * @param name name of the font
- * @param dsc_get_fp the font descriptor get function
- * @param parent add this font as charter set extension of 'parent'
+ * Add a font to an other to extend the character set.
+ * @param child the font to add
+ * @param parent this font will be extended. Using it later will contain the characters from `child`
  */
 void lv_font_add(lv_font_t * child, lv_font_t * parent)
 {
@@ -63,6 +62,24 @@ void lv_font_add(lv_font_t * child, lv_font_t * parent)
     parent->next_page = child;
 
 }
+
+/**
+ * Remove a font from a character set.
+ * @param child the font to remove
+ * @param parent remove `child` from here
+ */
+void lv_font_remove(lv_font_t * child, lv_font_t * parent)
+{
+    if(parent == NULL) return;
+    if(child == NULL) return;
+
+    while(parent->next_page != child) {
+        parent = parent->next_page; /*Got to the last page and add the new font there*/
+    }
+
+    parent->next_page = child->next_page;
+}
+
 
 /**
  * Tells if font which contains `letter` is monospace or not

@@ -89,7 +89,14 @@ void lv_indev_set_group(lv_indev_t *indev, lv_group_t *group);
  * @param indev pointer to an input device
  * @param group point to a group
  */
-void lv_indev_set_button_points(lv_indev_t *indev, lv_point_t *points);
+void lv_indev_set_button_points(lv_indev_t *indev, const lv_point_t *points);
+
+/**
+ * Set feedback callback for indev.
+ * @param indev pointer to an input device
+ * @param feedback feedback callback
+ */
+void lv_indev_set_feedback(lv_indev_t *indev, lv_indev_feedback_t feedback);
 
 /**
  * Get the last point of an input device (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
@@ -124,6 +131,13 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
  * @return Elapsed ticks (milliseconds) since last press
  */
 uint32_t lv_indev_get_inactive_time(const lv_indev_t * indev);
+
+/**
+ * Get feedback callback for indev.
+ * @param indev pointer to an input device
+ * @return feedback callback
+ */
+lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t *indev);
 
 /**
  * Do nothing until the next release

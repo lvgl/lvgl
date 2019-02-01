@@ -14,7 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-/*Test misc. module version*/
+#include "lv_version.h"
+
 #include "lv_misc/lv_log.h"
 #include "lv_misc/lv_task.h"
 
@@ -22,6 +23,7 @@ extern "C" {
 
 #include "lv_core/lv_obj.h"
 #include "lv_core/lv_group.h"
+#include "lv_core/lv_lang.h"
 #include "lv_core/lv_vdb.h"
 #include "lv_core/lv_refr.h"
 
@@ -36,6 +38,7 @@ extern "C" {
 #include "lv_objx/lv_cont.h"
 #include "lv_objx/lv_list.h"
 #include "lv_objx/lv_chart.h"
+#include "lv_objx/lv_table.h"
 #include "lv_objx/lv_cb.h"
 #include "lv_objx/lv_bar.h"
 #include "lv_objx/lv_slider.h"
@@ -45,8 +48,10 @@ extern "C" {
 #include "lv_objx/lv_ddlist.h"
 #include "lv_objx/lv_roller.h"
 #include "lv_objx/lv_ta.h"
+#include "lv_objx/lv_canvas.h"
 #include "lv_objx/lv_win.h"
 #include "lv_objx/lv_tabview.h"
+#include "lv_objx/lv_tileview.h"
 #include "lv_objx/lv_mbox.h"
 #include "lv_objx/lv_gauge.h"
 #include "lv_objx/lv_lmeter.h"
@@ -55,15 +60,11 @@ extern "C" {
 #include "lv_objx/lv_arc.h"
 #include "lv_objx/lv_preload.h"
 #include "lv_objx/lv_calendar.h"
+#include "lv_objx/lv_spinbox.h"
 
 /*********************
  *      DEFINES
  *********************/
-/*Current version of LittlevGL*/
-#define LVGL_VERSION_MAJOR   5
-#define LVGL_VERSION_MINOR   2
-#define LVGL_VERSION_PATCH   1
-#define LVGL_VERSION_INFO    "dev"
 
 /**********************
  *      TYPEDEFS

@@ -426,6 +426,9 @@ static void win_init(void)
  */
 lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t * font)
 {
+
+    (void)hue;  /*Unused*/
+
     if(font == NULL) font = LV_FONT_DEFAULT;
 
     _font = font;

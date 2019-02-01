@@ -23,6 +23,7 @@
  **********************/
 static void style_mod_def(lv_style_t * style);
 static void style_mod_edit_def(lv_style_t * style);
+static void lv_group_refocus(lv_group_t *g);
 
 /**********************
  *  STATIC VARIABLES
@@ -89,10 +90,10 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     if(group == NULL) return;
 
-    /*If the object is already in a group and focused then defocuse it*/
+    /*If the object is already in a group and focused then defocus it*/
     if(obj->group_p) {
         if(lv_obj_is_focused(obj)) {
-            lv_group_focus_next(obj->group_p);
+            lv_group_refocus(obj->group_p);
 
             LV_LOG_INFO("group: assign object to an other group");
         }
@@ -107,7 +108,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     /* If the head and the tail is equal then there is only one object in the linked list.
      * In this case automatically activate it*/
     if(lv_ll_get_head(&group->obj_ll) == next) {
-        lv_group_focus_next(group);
+        lv_group_refocus(group);
     }
 }
 
@@ -121,8 +122,16 @@ void lv_group_remove_obj(lv_obj_t * obj)
     if(g == NULL) return;
     if(g->obj_focus == NULL) return;        /*Just to be sure (Not possible if there is at least one object in the group)*/
 
+    /*Focus on the next object*/
     if(*g->obj_focus == obj) {
-        lv_group_focus_next(g);
+        /*If this is the only object in the group then focus to nothing.*/
+        if(lv_ll_get_head(&g->obj_ll) == g->obj_focus && lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
+            (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        }
+        /*If there more objects in the group then focus to the next/prev object*/
+        else {
+            lv_group_refocus(g);
+        }
     }
 
     /* If the focuses object is still the same then it was the only object in the group but it will be deleted.
@@ -195,7 +204,10 @@ void lv_group_focus_next(lv_group_t * group)
     if(group->obj_focus == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
     else obj_next = lv_ll_get_next(&group->obj_ll, group->obj_focus);
 
-    if(obj_next == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
+    if(obj_next == NULL) {
+        if(group->wrap) obj_next = lv_ll_get_head(&group->obj_ll);
+        else obj_next = lv_ll_get_tail(&group->obj_ll);
+    }
     group->obj_focus = obj_next;
 
     if(group->obj_focus) {
@@ -223,7 +235,10 @@ void lv_group_focus_prev(lv_group_t * group)
     if(group->obj_focus == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
     else obj_next = lv_ll_get_prev(&group->obj_ll, group->obj_focus);
 
-    if(obj_next == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
+    if(obj_next == NULL) {
+        if(group->wrap) obj_next = lv_ll_get_tail(&group->obj_ll);
+        else  obj_next = lv_ll_get_head(&group->obj_ll);
+    }
     group->obj_focus = obj_next;
 
     if(group->obj_focus != NULL) {
@@ -250,13 +265,14 @@ void lv_group_focus_freeze(lv_group_t * group, bool en)
  * Send a control character to the focuses object of a group
  * @param group pointer to a group
  * @param c a character (use LV_GROUP_KEY_.. to navigate)
+ * @return result of focused object in group.
  */
-void lv_group_send_data(lv_group_t * group, uint32_t c)
+lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
 {
     lv_obj_t * act = lv_group_get_focused(group);
-    if(act == NULL) return;
+    if(act == NULL) return LV_RES_OK;
 
-    act->signal_func(act, LV_SIGNAL_CONTROLL, &c);
+    return act->signal_func(act, LV_SIGNAL_CONTROLL, &c);
 }
 
 /**
@@ -320,6 +336,33 @@ void lv_group_set_click_focus(lv_group_t * group, bool en)
     group->click_focus = en ? 1 : 0;
 }
 
+void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t policy) {
+    group->refocus_policy = policy & 0x01;
+}
+
+static void lv_group_refocus(lv_group_t *g) {
+    /*Refocus must temporarily allow wrapping to work correctly*/
+    uint8_t temp_wrap = g->wrap;
+    g->wrap = 1;
+
+    if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_NEXT)
+        lv_group_focus_next(g);
+    else if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_PREV)
+        lv_group_focus_prev(g);
+    /*Restore wrap property*/
+    g->wrap = temp_wrap;
+}
+
+/**
+ * Set whether focus next/prev will allow wrapping from first->last or last->first.
+ * @param group pointer to group
+ * @param en: true: enable `click_focus`
+ */
+void lv_group_set_wrap(lv_group_t * group, bool en)
+{
+    group->wrap = en ? 1 : 0;
+}
+
 /**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
  * @param group pointer to group
@@ -331,11 +374,9 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
     lv_style_copy(&group->style_tmp, style);
 
     if(group->editing) {
-        if(group->style_mod_edit != NULL) group->style_mod_edit(&group->style_tmp);
-        else style_mod_edit_def(&group->style_tmp);
+        if(group->style_mod_edit) group->style_mod_edit(&group->style_tmp);
     } else {
-        if(group->style_mod != NULL) group->style_mod(&group->style_tmp);
-        else style_mod_def(&group->style_tmp);
+        if(group->style_mod) group->style_mod(&group->style_tmp);
     }
     return &group->style_tmp;
 }
@@ -406,6 +447,17 @@ bool lv_group_get_click_focus(const lv_group_t * group)
 {
     if(!group) return false;
     return group->click_focus ? true : false;
+}
+
+/**
+ * Get whether focus next/prev will allow wrapping from first->last or last->first object.
+ * @param group pointer to group
+ * @param en: true: wrapping enabled; false: wrapping disabled
+ */
+bool lv_group_get_wrap(lv_group_t * group)
+{
+    if(!group) return false;
+    return group->wrap ? true : false;
 }
 
 /**********************

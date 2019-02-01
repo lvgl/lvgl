@@ -8,7 +8,6 @@
  *********************/
 #include "lv_theme.h"
 
-
 #if USE_LV_THEME_MATERIAL
 
 /*********************
@@ -48,11 +47,12 @@ static lv_font_t * _font;
 
 static void basic_init(void)
 {
+    static lv_style_t bg, panel;
+
     lv_style_copy(&def, &lv_style_plain);  /*Initialize the default style*/
     def.text.font = _font;
     def.body.radius = DEF_RADIUS;
 
-    static lv_style_t bg, panel;
     lv_style_copy(&bg, &def);
     bg.body.main_color = LV_COLOR_HEX(0xf0f0f0);
     bg.body.grad_color = bg.body.main_color;
@@ -434,7 +434,7 @@ static void btnm_init(void)
     bg.text.color = LV_COLOR_HEX3(0x555);
 
     lv_style_copy(&rel, theme.panel);
-    rel.body.border.part = LV_BORDER_RIGHT;
+    rel.body.border.part = LV_BORDER_FULL | LV_BORDER_INTERNAL;
     rel.body.border.width = 1;
     rel.body.border.color = LV_COLOR_HEX3(0xbbb);
     rel.body.empty = 1;
@@ -538,6 +538,15 @@ static void ta_init(void)
     theme.ta.oneline = &oneline;
     theme.ta.cursor = NULL;     /*Let library to calculate the cursor's style*/
     theme.ta.sb = &sb;
+#endif
+}
+
+static void spinbox_init(void)
+{
+#if USE_LV_SPINBOX
+    theme.spinbox.bg= theme.panel;
+    theme.spinbox.cursor = theme.ta.cursor;
+    theme.spinbox.sb = theme.ta.sb;
 #endif
 }
 
@@ -709,6 +718,30 @@ static void tabview_init(void)
 #endif
 }
 
+static void tileview_init(void)
+{
+#if USE_LV_TILEVIEW != 0
+    theme.tileview.bg = &lv_style_transp_tight;
+    theme.tileview.scrl = &lv_style_transp_tight;
+    theme.tileview.sb = theme.page.sb;
+#endif
+}
+
+static void table_init(void)
+{
+#if USE_LV_TABLE != 0
+    static lv_style_t cell;
+    lv_style_copy(&cell, theme.panel);
+    cell.body.radius = 0;
+    cell.body.border.width = 1;
+    cell.body.padding.hor = LV_DPI / 12;
+    cell.body.padding.ver = LV_DPI / 12;
+
+
+    theme.table.bg = &lv_style_transp_tight;
+    theme.table.cell = &cell;
+#endif
+}
 
 static void win_init(void)
 {
@@ -718,7 +751,7 @@ static void win_init(void)
     lv_style_copy(&header, &def);
     header.body.main_color = LV_COLOR_HEX3(0xccc);
     header.body.grad_color = header.body.main_color;
-    header.body.radius = DEF_RADIUS;
+    header.body.radius = 0;
     header.body.border.width = 1;
     header.body.border.color = LV_COLOR_HEX3(0xbbb);
     header.body.border.part = LV_BORDER_BOTTOM;
@@ -796,10 +829,13 @@ lv_theme_t * lv_theme_material_init(uint16_t hue, lv_font_t * font)
     mbox_init();
     page_init();
     ta_init();
+    spinbox_init();
     list_init();
     ddlist_init();
     roller_init();
     tabview_init();
+    tileview_init();
+    table_init();
     win_init();
 
     return &theme;

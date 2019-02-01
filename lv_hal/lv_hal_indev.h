@@ -19,6 +19,7 @@ extern "C" {
 #include <stdint.h>
 #include "lv_hal.h"
 #include "../lv_misc/lv_area.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -98,6 +99,9 @@ typedef struct _lv_indev_proc_t {
     uint8_t disabled            :1;
 } lv_indev_proc_t;
 
+struct _lv_indev_t;
+
+typedef void (*lv_indev_feedback_t)(struct _lv_indev_t *, lv_signal_t);
 
 struct _lv_obj_t;
 struct _lv_group_t;
@@ -106,11 +110,12 @@ struct _lv_group_t;
 typedef struct _lv_indev_t {
     lv_indev_drv_t driver;
     lv_indev_proc_t proc;
+    lv_indev_feedback_t feedback;
     uint32_t last_activity_time;
     union {
         struct _lv_obj_t *cursor;       /*Cursor for LV_INPUT_TYPE_POINTER*/
         struct _lv_group_t *group;      /*Keypad destination group*/
-        lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
+        const lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
 
     };
     struct _lv_indev_t *next;

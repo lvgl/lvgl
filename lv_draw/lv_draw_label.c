@@ -69,14 +69,27 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         w = p.x;
     }
 
+    lv_coord_t line_height = lv_font_get_height(font) + style->text.line_space;
+
+
     /*Init variables for the first line*/
     lv_coord_t line_width = 0;
-    uint32_t line_start = 0;
-    uint32_t line_end = lv_txt_get_next_line(txt, font, style->text.letter_space, w, flag);
-
     lv_point_t pos;
     pos.x = coords->x1;
     pos.y = coords->y1;
+
+    uint32_t line_start = 0;
+    uint32_t line_end = lv_txt_get_next_line(txt, font, style->text.letter_space, w, flag);
+
+    /*Go the first visible line*/
+    while(pos.y + line_height < mask->y1) {
+        /*Go to next line*/
+        line_start = line_end;
+        line_end += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
+        pos.y += line_height;
+
+        if(txt[line_start] == '\0') return;
+    }
 
     /*Align to middle*/
     if(flag & LV_TXT_FLAG_CENTER) {
@@ -115,6 +128,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     lv_rletter_set_background(style->body.main_color);
 #endif
 
+
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
         if(offset != NULL) {
@@ -126,6 +140,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         uint32_t letter;
         while(i < line_end) {
             letter = lv_txt_encoded_next(txt, &i);
+
             /*Handle the re-color command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
@@ -170,7 +185,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_fp(&pos, mask, font, letter, color, opa);
             letter_w = lv_font_get_width(font, letter);
 
-            pos.x += letter_w + style->text.letter_space;
+            if(letter_w > 0){
+                pos.x += letter_w + style->text.letter_space;
+            }
         }
         /*Go to next line*/
         line_start = line_end;
@@ -193,8 +210,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         }
 
         /*Go the next line position*/
-        pos.y += lv_font_get_height(font);
-        pos.y += style->text.line_space;
+        pos.y += line_height;
+
+        if(pos.y > mask->y2) return;
     }
 }
 

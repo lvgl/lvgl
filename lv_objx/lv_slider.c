@@ -293,14 +293,10 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         }
 
         if(ext->knob_in) {  /*Enable extra size if the knob is inside */
-            if(pad_hor_bg < 0) {
-                area_bg.x1 += pad_hor_bg;
-                area_bg.x2 -= pad_hor_bg;
-            }
-            if(pad_ver_bg < 0) {
-                area_bg.y1 += pad_hor_bg;
-                area_bg.y2 -= pad_hor_bg;
-            }
+            area_bg.x1 += pad_hor_bg;
+            area_bg.x2 -= pad_hor_bg;
+            area_bg.y1 += pad_hor_bg;
+            area_bg.y2 -= pad_hor_bg;
         } else  { /*Let space only in the perpendicular directions*/
             area_bg.x1 += slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
             area_bg.x2 -= slider_w < slider_h ? pad_hor_bg : 0;   /*Pad only for vertical slider*/
@@ -383,11 +379,11 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         if(slider_w >= slider_h) {
             if(ext->knob_in == 0) {
                 knob_area.x1 = area_indic.x2 - slider_h / 2;
-                knob_area.x2 = knob_area.x1 + slider_h;
+                knob_area.x2 = knob_area.x1 + slider_h - 1;
             } else {
                 knob_area.x1 = (int32_t)((int32_t)(slider_w - slider_h - 1) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.x1 += slider->coords.x1;
-                knob_area.x2 = knob_area.x1 + slider_h;
+                knob_area.x2 = knob_area.x1 + slider_h - 1;
             }
 
             knob_area.y1 = slider->coords.y1;
@@ -395,19 +391,17 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         } else {
             if(ext->knob_in == 0) {
                 knob_area.y1 = area_indic.y1 - slider_w / 2;
-                knob_area.y2 = knob_area.y1 + slider_w;
+                knob_area.y2 = knob_area.y1 + slider_w - 1;
             } else {
                 knob_area.y2 = (int32_t)((int32_t)(slider_h - slider_w - 1) * (cur_value - min_value)) / (max_value - min_value);
                 knob_area.y2 = slider->coords.y2 - knob_area.y2;
-                knob_area.y1 = knob_area.y2 - slider_w;
+                knob_area.y1 = knob_area.y2 - slider_w - 1;
             }
             knob_area.x1 = slider->coords.x1;
             knob_area.x2 = slider->coords.x2;
 
         }
-
         lv_draw_rect(&knob_area, mask, style_knob, opa_scale);
-
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -490,11 +484,13 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
+
+        ext->drag_value = LV_SLIDER_NOT_PRESSED;
+
 #if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(slider);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER && c == LV_GROUP_KEY_ENTER) {
             if(editing) lv_group_set_editing(g, false);

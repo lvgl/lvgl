@@ -82,7 +82,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_line_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_line_set_auto_size(new_line, lv_line_get_auto_size(copy));
-        lv_line_set_y_invert(new_line, lv_line_get_y_inv(copy));
+        lv_line_set_y_invert(new_line, lv_line_get_y_invert(copy));
         lv_line_set_auto_size(new_line, lv_line_get_auto_size(copy));
         lv_line_set_points(new_line, copy_ext->point_array, copy_ext->point_num);
         /*Refresh the style with new signal function*/
@@ -132,17 +132,17 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t po
  * Enable (or disable) the auto-size option. The size of the object will fit to its points.
  * (set width to x max and height to y max)
  * @param line pointer to a line object
- * @param autosize_en true: auto size is enabled, false: auto size is disabled
+ * @param en true: auto size is enabled, false: auto size is disabled
  */
-void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en)
+void lv_line_set_auto_size(lv_obj_t * line, bool en)
 {
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
-    if(ext->auto_size == autosize_en) return;
+    if(ext->auto_size == en) return;
 
-    ext->auto_size = autosize_en == false ? 0 : 1;
+    ext->auto_size = en == false ? 0 : 1;
 
     /*Refresh the object*/
-    if(autosize_en) lv_line_set_points(line, ext->point_array, ext->point_num);
+    if(en) lv_line_set_points(line, ext->point_array, ext->point_num);
 }
 
 /**
@@ -150,14 +150,14 @@ void lv_line_set_auto_size(lv_obj_t * line, bool autosize_en)
  * If enabled then y will be subtracted from the height of the object,
  * therefore the y=0 coordinate will be on the bottom.
  * @param line pointer to a line object
- * @param yinv_en true: enable the y inversion, false:disable the y inversion
+ * @param en true: enable the y inversion, false:disable the y inversion
  */
-void lv_line_set_y_invert(lv_obj_t * line, bool yinv_en)
+void lv_line_set_y_invert(lv_obj_t * line, bool en)
 {
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
-    if(ext->y_inv == yinv_en) return;
+    if(ext->y_inv == en) return;
 
-    ext->y_inv = yinv_en == false ? 0 : 1;
+    ext->y_inv = en == false ? 0 : 1;
 
     lv_obj_invalidate(line);
 }
@@ -183,7 +183,7 @@ bool lv_line_get_auto_size(const lv_obj_t * line)
  * @param line pointer to a line object
  * @return true: y inversion is enabled, false: disabled
  */
-bool lv_line_get_y_inv(const lv_obj_t * line)
+bool lv_line_get_y_invert(const lv_obj_t * line)
 {
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 

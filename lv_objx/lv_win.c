@@ -299,6 +299,18 @@ void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, lv_style_t * style)
     }
 }
 
+/**
+ * Set drag status of a window. If set to 'true' window can be dragged like on a PC.
+ * @param win pointer to a window object
+ * @param en whether dragging is enabled
+ */
+void lv_win_set_drag(lv_obj_t *win, bool en)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    lv_obj_t * win_header = ext->header;
+    lv_obj_set_drag_parent(win_header, en);
+    lv_obj_set_drag(win, en);
+}
 
 /*=====================
  * Getter functions

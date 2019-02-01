@@ -43,6 +43,9 @@ typedef struct
 
     lv_coord_t w;               /*Width of the image (Handled by the library)*/
     lv_coord_t h;               /*Height of the image (Handled by the library)*/
+#if USE_LV_MULTI_LANG
+    uint16_t lang_txt_id;       /*The ID of the image to display. */
+#endif
     uint8_t src_type  :2;       /*See: lv_img_src_t*/
     uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
     uint8_t cf :5;              /*Color format from `lv_img_color_format_t`*/
@@ -71,6 +74,15 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy);
  */
 void lv_img_set_src(lv_obj_t * img, const void * src_img);
 
+#if USE_LV_MULTI_LANG
+/**
+ * Set an ID which means a the same source but on different languages
+ * @param img pointer to an image object
+ * @param src_id ID of the source
+ */
+void lv_img_set_src_id(lv_obj_t * img, uint32_t txt_id);
+#endif
+
 /**
  * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0.
  * Use 'lv_img_set_src()' instead.
@@ -87,7 +99,7 @@ static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param autosize_en true: auto size enable, false: auto size disable
+ * @param en true: auto size enable, false: auto size disable
  */
 void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
 
@@ -129,6 +141,15 @@ const void * lv_img_get_src(lv_obj_t * img);
  * @return file name
  */
 const char * lv_img_get_file_name(const lv_obj_t * img);
+
+#if USE_LV_MULTI_LANG
+/**
+ * Get the source ID of the image. (Used by the multi-language feature)
+ * @param img pointer to an image
+ * @return ID of the source
+ */
+uint16_t lv_img_get_src_id(lv_obj_t * img);
+#endif
 
 /**
  * Get the auto size enable attribute

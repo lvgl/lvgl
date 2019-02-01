@@ -164,9 +164,10 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.color = LV_COLOR_MAKE(0x0b, 0x19, 0x28);
     lv_style_btn_rel.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
     lv_style_btn_rel.body.border.opa = LV_OPA_70;
-    lv_style_btn_rel.text.color = LV_COLOR_MAKE(0xff, 0xff, 0xff);
     lv_style_btn_rel.body.shadow.color = LV_COLOR_GRAY;
     lv_style_btn_rel.body.shadow.width = 0;
+    lv_style_btn_rel.text.color = LV_COLOR_MAKE(0xff, 0xff, 0xff);
+    lv_style_btn_rel.image.color = LV_COLOR_MAKE(0xff, 0xff, 0xff);
 
     /*Button pressed style*/
     memcpy(&lv_style_btn_pr, &lv_style_btn_rel, sizeof(lv_style_t));

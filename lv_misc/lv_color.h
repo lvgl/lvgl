@@ -57,19 +57,21 @@ extern "C" {
 #define LV_COLOR_PURPLE  LV_COLOR_MAKE(0x80,0x00,0x80)
 #define LV_COLOR_ORANGE  LV_COLOR_MAKE(0xFF,0xA5,0x00)
 
-#define LV_OPA_TRANSP    0
-#define LV_OPA_0         0
-#define LV_OPA_10        25
-#define LV_OPA_20        51
-#define LV_OPA_30        76
-#define LV_OPA_40        102
-#define LV_OPA_50        127
-#define LV_OPA_60        153
-#define LV_OPA_70        178
-#define LV_OPA_80        204
-#define LV_OPA_90        229
-#define LV_OPA_100       255
-#define LV_OPA_COVER     255
+enum {
+    LV_OPA_TRANSP =  0,
+    LV_OPA_0      =  0,
+    LV_OPA_10     =  25,
+    LV_OPA_20     =  51,
+    LV_OPA_30     =  76,
+    LV_OPA_40     =  102,
+    LV_OPA_50     =  127,
+    LV_OPA_60     =  153,
+    LV_OPA_70     =  178,
+    LV_OPA_80     =  204,
+    LV_OPA_90     =  229,
+    LV_OPA_100    =  255,
+    LV_OPA_COVER  =  255,
+};
 
 #define LV_OPA_MIN      16      /*Opacities below this will be transparent*/
 #define LV_OPA_MAX      251     /*Opacities above this will fully cover*/
@@ -390,6 +392,7 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #endif
 #endif
 
+
 #define LV_COLOR_HEX(c) LV_COLOR_MAKE(((uint32_t)((uint32_t)c >> 16) & 0xFF), \
                                 ((uint32_t)((uint32_t)c >> 8) & 0xFF), \
                                 ((uint32_t) c & 0xFF))
@@ -398,6 +401,14 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #define LV_COLOR_HEX3(c) LV_COLOR_MAKE((((c >> 4) & 0xF0) | ((c >> 8) & 0xF)),   \
                                 ((uint32_t)(c & 0xF0)       | ((c & 0xF0) >> 4)), \
                                 ((uint32_t)(c & 0xF)         | ((c & 0xF) << 4)))
+
+static inline lv_color_t lv_color_hex(uint32_t c){
+    return LV_COLOR_HEX(c);
+}
+
+static inline lv_color_t lv_color_hex3(uint32_t c){
+    return LV_COLOR_HEX3(c);
+}
 
 
 /**

@@ -27,6 +27,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_CHART_POINT_DEF  (LV_COORD_MIN)
 
 /**********************
  *      TYPEDEFS
@@ -35,6 +36,7 @@ typedef struct
 {
     lv_coord_t * points;
     lv_color_t color;
+    uint16_t start_point;
 } lv_chart_series_t;
 
 /*Data of chart */
@@ -48,12 +50,12 @@ typedef struct
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
     uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint16_t point_cnt;   /*Point number in a data line*/
-    uint8_t type    :3;   /*Line, column or point chart (from 'lv_chart_type_t')*/
+    uint8_t type    :4;   /*Line, column or point chart (from 'lv_chart_type_t')*/
     struct {
         lv_coord_t width;  /*Line width or point radius*/
-        uint8_t num;   /*Number of data lines in dl_ll*/
-        lv_opa_t opa;     /*Opacity of data lines*/
-        lv_opa_t dark;    /*Dark level of the point/column bottoms*/
+        uint8_t num;       /*Number of data lines in dl_ll*/
+        lv_opa_t opa;      /*Opacity of data lines*/
+        lv_opa_t dark;     /*Dark level of the point/column bottoms*/
     } series;
 } lv_chart_ext_t;
 
@@ -63,6 +65,7 @@ enum
     LV_CHART_TYPE_LINE = 0x01,
     LV_CHART_TYPE_COLUMN = 0x02,
     LV_CHART_TYPE_POINT = 0x04,
+    LV_CHART_TYPE_VERTICAL_LINE = 0x08,
 };
 typedef uint8_t lv_chart_type_t;
 
@@ -90,6 +93,13 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
  * @return pointer to the allocated data series
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
+
+/**
+ * Clear the point of a serie
+ * @param chart pointer to a chart object
+ * @param serie pointer to the chart's serie to clear
+ */
+void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie);
 
 /*=====================
  * Setter functions
