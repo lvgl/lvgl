@@ -53,7 +53,6 @@ static void pwd_char_hider(lv_obj_t * ta);
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
 static void refr_cursor_area(lv_obj_t * ta);
-static lv_res_t label_signal_wrapper(lv_obj_t * ta, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
@@ -62,7 +61,6 @@ static lv_design_func_t ancestor_design;
 static lv_design_func_t scrl_design;
 static lv_signal_func_t ancestor_signal;
 static lv_signal_func_t scrl_signal;
-static lv_signal_func_t label_signal_original;
 
 /**********************
  *      MACROS
@@ -154,11 +152,6 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_ta);
     }
-
-    /*Wrap the labels signal function and make it clickable*/
-    if(label_signal_original == NULL) label_signal_original = lv_obj_get_signal_func(ext->label);
-    lv_obj_set_signal_func(ext->label, label_signal_wrapper);
-    lv_obj_set_click(ext->label, true);
 
 #if USE_LV_ANIMATION
     /*Create a cursor blinker animation*/
@@ -1097,7 +1090,34 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
             lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
         }
 #endif
-    } else if(sign == LV_SIGNAL_PRESSED) {
+    }
+    return res;
+}
+
+/**
+ * Signal function of the scrollable part of the text area
+ * @param scrl pointer to scrollable part of a text area object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = scrl_signal(scrl, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    lv_obj_t * ta = lv_obj_get_parent(scrl);
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        /*Set ext. size because the cursor might be out of this object*/
+        lv_style_t * style_label = lv_obj_get_style(ext->label);
+        lv_coord_t font_h = lv_font_get_height(style_label->text.font);
+        scrl->ext_size = LV_MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
+    }
+    else if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_t * indev = (lv_indev_t *)param;
         lv_area_t label_coords;
         uint16_t index_of_char_at_position;
@@ -1127,32 +1147,6 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         lv_ta_set_cursor_pos(ta, index_of_char_at_position);
     }
 
-    return res;
-}
-
-/**
- * Signal function of the scrollable part of the text area
- * @param scrl pointer to scrollable part of a text area object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
-{
-    lv_res_t res;
-
-    /* Include the ancient signal function */
-    res = scrl_signal(scrl, sign, param);
-    if(res != LV_RES_OK) return res;
-
-    if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-        /*Set ext. size because the cursor might be out of this object*/
-        lv_obj_t * ta = lv_obj_get_parent(scrl);
-        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-        lv_style_t * style_label = lv_obj_get_style(ext->label);
-        lv_coord_t font_h = lv_font_get_height(style_label->text.font);
-        scrl->ext_size = LV_MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
-    }
 
     return res;
 }
@@ -1381,27 +1375,4 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_inv_area(&area_tmp);
 }
 
-static lv_res_t label_signal_wrapper(lv_obj_t * label, lv_signal_t sign, void * param)
-{
-    if(sign == LV_SIGNAL_PRESSED) {
-        lv_obj_t * parent;
-
-        parent = lv_obj_get_parent(label);
-        /*Get the parent (ta) of the parent (scrl part)*/
-        parent = parent ? lv_obj_get_parent(parent) : NULL;
-
-        /*Forward the pressed event to the parent, which is the ta*/
-        if(parent) {
-            lv_signal_func_t parent_signal = lv_obj_get_signal_func(parent);
-
-            if(parent_signal) {
-                if(parent_signal(parent, sign, param) != LV_RES_OK) return LV_RES_INV;
-            }
-        }
-    }
-
-    if(label_signal_original) return label_signal_original(label, sign, param);
-
-    return LV_RES_OK;
-}
 #endif
