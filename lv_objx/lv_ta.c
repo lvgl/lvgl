@@ -53,6 +53,7 @@ static void pwd_char_hider(lv_obj_t * ta);
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
 static void refr_cursor_area(lv_obj_t * ta);
+static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_source);
 
 /**********************
  *  STATIC VARIABLES
@@ -1100,6 +1101,9 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         }
 #endif
     }
+    else if(sign == LV_SIGNAL_PRESSED) {
+        update_cursor_position_on_click(ta, (lv_indev_t *) param);
+    }
     return res;
 }
 
@@ -1118,14 +1122,18 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     res = scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
 
+    lv_obj_t * ta = lv_obj_get_parent(scrl);
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         /*Set ext. size because the cursor might be out of this object*/
-        lv_obj_t * ta = lv_obj_get_parent(scrl);
-        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
         lv_style_t * style_label = lv_obj_get_style(ext->label);
         lv_coord_t font_h = lv_font_get_height(style_label->text.font);
         scrl->ext_size = LV_MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
     }
+    else if(sign == LV_SIGNAL_PRESSED) {
+        update_cursor_position_on_click(ta, (lv_indev_t *)param);
+    }
+
 
     return res;
 }
@@ -1352,6 +1360,36 @@ static void refr_cursor_area(lv_obj_t * ta)
     area_tmp.x2 += ext->label->coords.x1;
     area_tmp.y2 += ext->label->coords.y1;
     lv_inv_area(&area_tmp);
+}
+
+static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_source)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    lv_area_t label_coords;
+    uint16_t index_of_char_at_position;
+
+    lv_obj_get_coords(ext->label, &label_coords);
+
+    lv_point_t relative_position;
+    relative_position.x = click_source->proc.act_point.x - label_coords.x1;
+    relative_position.y = click_source->proc.act_point.y - label_coords.y1;
+
+    lv_coord_t label_width = lv_obj_get_width(ext->label);
+
+    /*Check if the click happened on the left side of the area outside the label*/
+    if (relative_position.x < 0) {
+        index_of_char_at_position = 0;
+    }
+    /*Check if the click happened on the right side of the area outside the label*/
+    else if (relative_position.x >= label_width) {
+        index_of_char_at_position = LV_TA_CURSOR_LAST;
+    }
+    else {
+        index_of_char_at_position = lv_label_get_letter_on(ext->label, &relative_position);
+    }
+
+    lv_ta_set_cursor_pos(ta, index_of_char_at_position);
 }
 
 #endif
