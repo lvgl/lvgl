@@ -33,6 +33,10 @@ extern "C" {
  * Display Driver structure to be registered by HAL
  */
 typedef struct _disp_drv_t {
+    lv_coord_t hor_res;
+
+    lv_coord_t ver_res;
+
     /*Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished*/
     void (*disp_flush)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
 
@@ -59,6 +63,10 @@ typedef struct _disp_drv_t {
 
 typedef struct _disp_t {
     lv_disp_drv_t driver;
+    lv_area_t inv_buf[32];
+    lv_ll_t scr_ll;
+    lv_obj_t * act_scr;
+    lv_obj_t * top_scr;
     struct _disp_t *next;
 } lv_disp_t;
 
