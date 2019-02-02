@@ -67,6 +67,7 @@ typedef struct _disp_t {
     lv_ll_t scr_ll;
     lv_obj_t * act_scr;
     lv_obj_t * top_scr;
+    uint8_t orientation:2;
     struct _disp_t *next;
 } lv_disp_t;
 
