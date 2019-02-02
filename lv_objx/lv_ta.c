@@ -432,7 +432,7 @@ void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     /*Create the placeholder label only when it is needed*/
-    if (ext->placeholder == NULL) {
+    if(ext->placeholder == NULL) {
         ext->placeholder = lv_label_create(ta, NULL);
 
         lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_CROP);
@@ -733,7 +733,7 @@ const char * lv_ta_get_placeholder_text(lv_obj_t * ta)
 
     const char * txt = NULL;
 
-    if (ext->placeholder) txt = lv_label_get_text(ext->label);
+    if(ext->placeholder) txt = lv_label_get_text(ext->label);
 
     return txt;
 }
@@ -842,7 +842,7 @@ lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
             style = ext->cursor.style;
             break;
         case LV_TA_STYLE_PLACEHOLDER:
-            if (ext->placeholder) style = lv_label_get_style(ext->placeholder);
+            if(ext->placeholder) style = lv_label_get_style(ext->placeholder);
             break;
         default:
             style = NULL;
@@ -1101,8 +1101,8 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
             }
         }
         /*Set the placeholder width according to the text area width*/
-        if (ext->placeholder) {
-            if (lv_obj_get_width(ta) != lv_area_get_width(param) ||
+        if(ext->placeholder) {
+            if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
                    lv_obj_get_height(ta) != lv_area_get_height(param)) {
                 lv_obj_t * scrl = lv_page_get_scrl(ta);
                 lv_style_t * style_scrl = lv_obj_get_style(scrl);
@@ -1417,9 +1417,9 @@ static void refr_cursor_area(lv_obj_t * ta)
 static void placeholder_update(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    const char *ta_text;
+    const char * ta_text;
 
-    if (ext->placeholder == NULL) return;
+    if(ext->placeholder == NULL) return;
 
     ta_text = lv_ta_get_text(ta);
 
