@@ -53,6 +53,7 @@ static void pwd_char_hider(lv_obj_t * ta);
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
 static void refr_cursor_area(lv_obj_t * ta);
+static void placeholder_update(lv_obj_t * ta);
 
 /**********************
  *  STATIC VARIABLES
@@ -247,6 +248,8 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 
     /*Revert the original edge flash state*/
     lv_ta_set_edge_flash(ta, edge_flash_en);
+
+    placeholder_update(ta);
 }
 
 /**
@@ -310,6 +313,8 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     /*Revert the original edge flash state*/
     lv_ta_set_edge_flash(ta, edge_flash_en);
+
+    placeholder_update(ta);
 }
 
 /**
@@ -349,6 +354,8 @@ void lv_ta_del_char(lv_obj_t * ta)
 
     /*Move the cursor to the place of the deleted character*/
     lv_ta_set_cursor_pos(ta, ext->cursor.pos - 1);
+
+    placeholder_update(ta);
 }
 
 /*=====================
@@ -411,6 +418,29 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         pwd_char_hider(ta);
 #endif
     }
+
+    placeholder_update(ta);
+}
+
+/**
+* Set the placeholder text of a text area
+* @param ta pointer to a text area
+* @param txt pointer to the text
+*/
+void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    /*Create the placeholder label only when it is needed*/
+    if (ext->placeholder == NULL) {
+        ext->placeholder = lv_label_create(ta, NULL);
+
+        lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_CROP);
+    }
+
+    lv_label_set_text(ext->placeholder, txt);
+
+    placeholder_update(ta);
 }
 
 /**
@@ -663,6 +693,9 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
             lv_obj_refresh_ext_size(lv_page_get_scrl(ta)); /*Refresh ext. size because of cursor drawing*/
             refr_cursor_area(ta);
             break;
+        case LV_TA_STYLE_PLACEHOLDER:
+            if(ext->placeholder) lv_label_set_style(ext->placeholder, style);
+            break;
     }
 }
 
@@ -689,6 +722,21 @@ const char * lv_ta_get_text(const lv_obj_t * ta)
     return txt;
 }
 
+/**
+* Get the placeholder text of a text area
+* @param ta pointer to a text area object
+* @return pointer to the text
+*/
+const char * lv_ta_get_placeholder_text(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    const char * txt = NULL;
+
+    if (ext->placeholder) txt = lv_label_get_text(ext->label);
+
+    return txt;
+}
 
 /**
  * Get the label of a text area
@@ -792,6 +840,9 @@ lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
             break;
         case LV_TA_STYLE_CURSOR:
             style = ext->cursor.style;
+            break;
+        case LV_TA_STYLE_PLACEHOLDER:
+            if (ext->placeholder) style = lv_label_get_style(ext->placeholder);
             break;
         default:
             style = NULL;
@@ -1026,6 +1077,11 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
                 /*In not one line mode refresh the Label width because 'hpad' can modify it*/
                 lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
                 lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);         /*Be sure the Label is in the correct position*/
+
+                if(ext->placeholder) {
+                    lv_obj_set_width(ext->placeholder, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
+                    lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.hor, style_scrl->body.padding.ver);         /*Be sure the Label is in the correct position*/
+                }
             }
             lv_label_set_text(ext->label, NULL);
 
@@ -1040,6 +1096,19 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
                 lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
                 lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);
                 lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
+
+                refr_cursor_area(ta);
+            }
+        }
+        /*Set the placeholder width according to the text area width*/
+        if (ext->placeholder) {
+            if (lv_obj_get_width(ta) != lv_area_get_width(param) ||
+                   lv_obj_get_height(ta) != lv_area_get_height(param)) {
+                lv_obj_t * scrl = lv_page_get_scrl(ta);
+                lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                lv_obj_set_width(ext->placeholder, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
+                lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.hor, style_scrl->body.padding.ver);
+                lv_label_set_text(ext->placeholder, NULL);    /*Refresh the label*/
 
                 refr_cursor_area(ta);
             }
@@ -1343,6 +1412,21 @@ static void refr_cursor_area(lv_obj_t * ta)
     area_tmp.x2 += ext->label->coords.x1;
     area_tmp.y2 += ext->label->coords.y1;
     lv_inv_area(&area_tmp);
+}
+
+static void placeholder_update(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    const char *ta_text;
+
+    if (ext->placeholder == NULL) return;
+
+    ta_text = lv_ta_get_text(ta);
+
+    uint32_t len = ta_text == NULL ? 0 : strlen(ta_text);
+
+    if(len == 0) lv_obj_set_hidden(ext->placeholder, false);
+    else lv_obj_set_hidden(ext->placeholder, true);
 }
 
 #endif
