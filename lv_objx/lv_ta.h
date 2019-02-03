@@ -124,6 +124,12 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt);
  */
 void lv_ta_del_char(lv_obj_t * ta);
 
+/**
+ * Delete the right character from the current cursor position
+ * @param ta pointer to a text area object
+ */
+void lv_ta_del_char_forward(lv_obj_t * ta);
+
 /*=====================
  * Setter functions
  *====================*/
