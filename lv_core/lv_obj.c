@@ -64,9 +64,10 @@ static bool _lv_initialized = false;
  */
 void lv_init(void)
 {
-    if (_lv_initialized) return;
-    _lv_initialized = true;
-
+    /* Do nothing if already initialized */
+    if (_lv_initialized)
+         return;
+    
     LV_GC_ROOT(_lv_def_scr) = NULL;
     LV_GC_ROOT(_lv_act_scr) = NULL;
     LV_GC_ROOT(_lv_top_layer) = NULL;
@@ -116,7 +117,7 @@ void lv_init(void)
     lv_indev_init();
 #endif
 
-
+    _lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
 }
 
