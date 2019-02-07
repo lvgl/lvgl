@@ -70,7 +70,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new window object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
+        lv_obj_set_size(new_win, LV_DPI * 3, LV_DPI * 3);
         lv_obj_set_pos(new_win, 0, 0);
         lv_obj_set_style(new_win, &lv_style_pretty);
 
@@ -107,7 +107,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         lv_obj_set_signal_func(new_win, lv_win_signal);
-        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
     }
     /*Copy an existing object*/
     else {

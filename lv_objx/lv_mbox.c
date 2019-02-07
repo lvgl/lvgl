@@ -91,7 +91,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_cont_set_layout(new_mbox, LV_LAYOUT_COL_M);
         lv_cont_set_fit(new_mbox, false, true);
-        lv_obj_set_width(new_mbox, LV_HOR_RES / 2);
+        lv_obj_set_width(new_mbox, LV_DPI * 2);
         lv_obj_align(new_mbox, NULL, LV_ALIGN_CENTER, 0, 0);
 
         /*Set the default styles*/

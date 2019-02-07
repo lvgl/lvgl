@@ -102,8 +102,8 @@ void lv_inv_area(const lv_area_t * area_p)
     lv_area_t scr_area;
     scr_area.x1 = 0;
     scr_area.y1 = 0;
-    scr_area.x2 = LV_HOR_RES - 1;
-    scr_area.y2 = LV_VER_RES - 1;
+    scr_area.x2 = LV_HOR_RES_MAX - 1;
+    scr_area.y2 = LV_VER_RES_MAX - 1;
 
     lv_area_t com_area;
     bool suc;
@@ -346,7 +346,7 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
     /*Calculate the max row num*/
     lv_coord_t w = lv_area_get_width(area_p);
     lv_coord_t h = lv_area_get_height(area_p);
-    lv_coord_t y2 = area_p->y2 >= LV_VER_RES ? y2 = LV_VER_RES - 1 : area_p->y2;
+    lv_coord_t y2 = area_p->y2 >= lv_disp_get_ver_res(NULL) ? y2 = lv_disp_get_ver_res(NULL) - 1 : area_p->y2;
 
     int32_t max_row = (uint32_t) LV_VDB_SIZE / w;
 

@@ -20,6 +20,7 @@ extern "C" {
 #include "lv_hal.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES

@@ -62,10 +62,10 @@
 
 /* Horizontal and vertical resolution of the library.*/
 #ifndef LV_HOR_RES
-#define LV_HOR_RES          (480)
+//#define LV_HOR_RES          (480)
 #endif
 #ifndef LV_VER_RES
-#define LV_VER_RES          (320)
+//#define LV_VER_RES          (320)
 #endif
 
 /* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide

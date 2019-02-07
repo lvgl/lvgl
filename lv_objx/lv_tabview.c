@@ -106,7 +106,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->tab_name_ptr[0] = "";
         ext->tab_cnt = 0;
 
-        lv_obj_set_size(new_tabview, LV_HOR_RES, LV_VER_RES);
+        lv_obj_set_size(new_tabview, LV_DPI * 3, LV_DPI * 2);
 
         ext->btns = lv_btnm_create(new_tabview, NULL);
         lv_obj_set_height(ext->btns, 3 * LV_DPI / 4);
@@ -123,7 +123,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_cont_set_fit(ext->content, true, false);
         lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
         lv_cont_set_style(ext->content, &lv_style_transp_tight);
-        lv_obj_set_height(ext->content, LV_VER_RES - lv_obj_get_height(ext->btns));
+        lv_obj_set_height(ext->content, lv_obj_get_height(new_tabview) - lv_obj_get_height(ext->btns));
         lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 
         /*Set the default styles*/

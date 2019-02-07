@@ -144,8 +144,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         /*Set coordinates to full screen size*/
         new_obj->coords.x1 = 0;
         new_obj->coords.y1 = 0;
-        new_obj->coords.x2 = LV_HOR_RES - 1;
-        new_obj->coords.y2 = LV_VER_RES - 1;
+        new_obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
+        new_obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
         new_obj->ext_size = 0;
 
         /*Init realign*/
