@@ -49,6 +49,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  *  STATIC VARIABLES
  **********************/
 
+static bool _lv_initialized = false;
+
 /**********************
  *      MACROS
  **********************/
@@ -62,6 +64,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  */
 void lv_init(void)
 {
+    if (_lv_initialized) return;
+    _lv_initialized = true;
+
     LV_GC_ROOT(_lv_def_scr) = NULL;
     LV_GC_ROOT(_lv_act_scr) = NULL;
     LV_GC_ROOT(_lv_top_layer) = NULL;
