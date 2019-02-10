@@ -761,6 +761,7 @@ static void win_init(void)
     header.body.padding.hor = 0;
     header.body.padding.ver = 0;
     header.text.color = LV_COLOR_HEX3(0x333);
+    header.image.color = LV_COLOR_HEX3(0x333);
 
     lv_style_copy(&pr, &def);
     pr.body.main_color = LV_COLOR_HEX3(0xbbb);

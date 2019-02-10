@@ -114,6 +114,7 @@ static void basic_init(void)
     panel.body.border.width = 2;
     panel.body.border.opa = LV_OPA_60;
     panel.text.color = lv_color_hsv_to_rgb(_hue, 8, 96);
+    panel.image.color = lv_color_hsv_to_rgb(_hue, 8, 96);
     panel.line.color = lv_color_hsv_to_rgb(_hue, 20, 70);
 
     /*Scrollbar*/

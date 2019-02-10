@@ -59,6 +59,7 @@ static void basic_init(void)
     bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 11, 30);
     bg.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
     bg.text.font = _font;
+    bg.image.color = lv_color_hsv_to_rgb(_hue, 5, 95);
 
     lv_style_copy(&sb, &def);
     sb.body.main_color = lv_color_hsv_to_rgb(_hue, 30, 60);

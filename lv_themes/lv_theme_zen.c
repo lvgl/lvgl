@@ -52,6 +52,7 @@ static void basic_init(void)
     def.body.border.opa = LV_OPA_COVER;
     def.text.font = _font;
     def.text.color = LV_COLOR_HEX3(0x444);
+    def.image.color = LV_COLOR_HEX3(0x444);
 
     lv_style_copy(&bg, &def);
     bg.body.main_color = LV_COLOR_WHITE;
@@ -731,6 +732,7 @@ static void win_init(void)
     header.body.border.part = LV_BORDER_BOTTOM;
     header.body.border.color = lv_color_hsv_to_rgb(_hue, 10, 90);
     header.text.color = LV_COLOR_HEX3(0x666);
+    header.image.color = LV_COLOR_HEX3(0x666);
 
     lv_style_copy(&rel, &def);
     rel.body.empty = 1;
