@@ -129,8 +129,8 @@ static void btn_init(void)
     lv_style_copy(&btn_ina, &btn_rel);
     btn_ina.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     btn_ina.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
-    btn_ina.text.color = LV_COLOR_HEX3(0xaaa);
     btn_ina.body.shadow.width = 0;
+    btn_ina.text.color = LV_COLOR_HEX3(0xaaa);
 
     theme.btn.rel = &btn_rel;
     theme.btn.pr = &btn_pr;
@@ -678,6 +678,7 @@ static void win_init(void)
     win_btn_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     win_btn_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     win_btn_pr.text.color = LV_COLOR_HEX3(0xaaa);
+    win_btn_pr.image.color = LV_COLOR_HEX3(0xaaa);
 
     theme.win.bg = &win_bg;
     theme.win.sb = &sb;

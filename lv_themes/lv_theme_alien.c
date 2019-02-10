@@ -615,6 +615,7 @@ static void list_init(void)
     list_rel.body.border.opa = LV_OPA_COVER;
     list_rel.text.color = lv_color_hsv_to_rgb(_hue, 10, 94);
     list_rel.text.font = _font;
+    list_rel.image.color = lv_color_hsv_to_rgb(_hue, 10, 94);
 
     lv_style_copy(&list_pr, &list_rel);
     list_pr.body.empty = 0;
@@ -622,6 +623,7 @@ static void list_init(void)
     list_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.text.color = lv_color_hsv_to_rgb(_hue, 7, 96);
+    list_pr.image.color = lv_color_hsv_to_rgb(_hue, 7, 96);
 
     lv_style_copy(&list_trel, &list_rel);
     lv_style_copy(&list_tpr, &list_pr);
@@ -787,6 +789,7 @@ static void win_init(void)
     header.body.border.color = lv_color_hsv_to_rgb(_hue, 20, 80);
     header.body.border.part = LV_BORDER_BOTTOM;
     header.text.color = lv_color_hsv_to_rgb(_hue, 5, 100);
+    header.image.color = lv_color_hsv_to_rgb(_hue, 5, 100);
 
     theme.win.bg = &bg;
     theme.win.sb = &sb;

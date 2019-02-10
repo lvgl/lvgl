@@ -109,8 +109,8 @@ static void btn_init(void)
 
     lv_style_copy(&pr, &rel);
     pr.body.border.color = lv_color_hsv_to_rgb(_hue, 40, 60);
-    pr.text.color = lv_color_hsv_to_rgb(_hue, 40, 60);
     pr.body.shadow.width = 0;
+    pr.text.color = lv_color_hsv_to_rgb(_hue, 40, 60);
 
     lv_style_copy(&tgl_pr, &pr);
     tgl_pr.body.border.color = lv_color_hsv_to_rgb(_hue, 40, 50);
@@ -584,18 +584,22 @@ static void list_init(void)
     rel.body.padding.hor = LV_DPI / 8;
     rel.body.padding.ver = LV_DPI / 8;
     rel.text.color = LV_COLOR_HEX3(0x666);
+    rel.image.color = LV_COLOR_HEX3(0x666);
 
     lv_style_copy(&pr, &rel);
     pr.text.color = theme.btn.pr->text.color;
+    pr.image.color = theme.btn.pr->image.color;
 
     lv_style_copy(&tgl_rel, &rel);
     tgl_rel.text.color = lv_color_hsv_to_rgb(_hue, 50, 90);
 
     lv_style_copy(&tgl_pr, &rel);
     tgl_pr.text.color = theme.btn.tgl_pr->text.color;
+    tgl_pr.image.color = theme.btn.tgl_pr->image.color;
 
     lv_style_copy(&ina, &rel);
     ina.text.color = theme.btn.ina->text.color;
+    ina.image.color = theme.btn.ina->image.color;
 
     theme.list.sb = &sb;
     theme.list.bg = &bg;
@@ -732,9 +736,11 @@ static void win_init(void)
     rel.body.empty = 1;
     rel.body.border.width = 0;
     rel.text.color =  LV_COLOR_HEX3(0x666);
+    rel.image.color =  LV_COLOR_HEX3(0x666);
 
     lv_style_copy(&pr, &rel);
     pr.text.color = LV_COLOR_HEX3(0x333);
+    pr.image.color = LV_COLOR_HEX3(0x333);
 
     theme.win.bg = theme.panel;
     theme.win.sb = &sb;
