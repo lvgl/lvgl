@@ -17,6 +17,7 @@
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"
+#include "../lv_hal/lv_hal.h"
 #include <stdint.h>
 #include <string.h>
 #include "../lv_misc/lv_gc.h"
@@ -62,13 +63,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  */
 void lv_init(void)
 {
-    LV_GC_ROOT(_lv_def_scr) = NULL;
-    LV_GC_ROOT(_lv_act_scr) = NULL;
-    LV_GC_ROOT(_lv_top_layer) = NULL;
-    LV_GC_ROOT(_lv_sys_layer) = NULL;
-    LV_GC_ROOT(_lv_disp_list) = NULL;
-    LV_GC_ROOT(_lv_indev_list) = NULL;
-
     LV_LOG_TRACE("lv_init started");
 
     /*Initialize the lv_misc modules*/
@@ -91,20 +85,9 @@ void lv_init(void)
     /*Initialize the screen refresh system*/
     lv_refr_init();
 
-    /*Create the default screen*/
-    lv_ll_init(&LV_GC_ROOT(_lv_scr_ll), sizeof(lv_obj_t));
-    LV_GC_ROOT(_lv_def_scr) = lv_obj_create(NULL, NULL);
+    lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
+    lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
-    LV_GC_ROOT(_lv_act_scr) = LV_GC_ROOT(_lv_def_scr);
-
-    LV_GC_ROOT(_lv_top_layer) = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(LV_GC_ROOT(_lv_top_layer), &lv_style_transp_fit);
-
-    LV_GC_ROOT(_lv_sys_layer) = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(LV_GC_ROOT(_lv_sys_layer), &lv_style_transp_fit);
-
-    /*Refresh the screen*/
-    lv_obj_invalidate(LV_GC_ROOT(_lv_act_scr));
 
 #if LV_INDEV_READ_PERIOD != 0
     /*Init the input device handling*/
@@ -133,8 +116,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
     /*Create a screen if the parent is NULL*/
     if(parent == NULL) {
         LV_LOG_TRACE("Screen create started");
+        lv_disp_t * disp = lv_disp_get_last();
+        if(!disp) {
+            LV_LOG_WARN("lv_obj_create: not display created to so far. No place to assign the new screen")
+        }
 
-        new_obj = lv_ll_ins_head(&LV_GC_ROOT(_lv_scr_ll));
+        new_obj = lv_ll_ins_head(&disp->scr_ll);
         lv_mem_assert(new_obj);
         if(new_obj == NULL) return NULL;
 
@@ -357,7 +344,8 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) { /*It is a screen*/
-        lv_ll_rem(&LV_GC_ROOT(_lv_scr_ll), obj);
+        lv_disp_t * d = lv_scr_get_disp(obj);
+        lv_ll_rem(&d->scr_ll, obj);
     } else {
         lv_ll_rem(&(par->child_ll), obj);
     }
@@ -415,9 +403,9 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 
     /*Invalidate the object only if it belongs to the 'LV_GC_ROOT(_lv_act_scr)'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    if(obj_scr == lv_scr_act() ||
-            obj_scr == lv_layer_top() ||
-            obj_scr == lv_layer_sys()) {
+    lv_disp_t * disp = lv_scr_get_disp(obj_scr);
+    if(obj_scr == lv_scr_act(disp) ||
+            obj_scr == lv_layer_top(disp)) {
         /*Truncate recursively to the parents*/
         lv_area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
@@ -448,9 +436,24 @@ void lv_obj_invalidate(const lv_obj_t * obj)
  * Setter functions
  *====================*/
 
+
 /*--------------
  * Screen set
  *--------------*/
+lv_disp_t * lv_scr_get_disp(lv_obj_t * scr)
+{
+    lv_disp_t * d;
+
+    LL_READ(LV_GC_ROOT(_lv_disp_ll), d) {
+        lv_obj_t * s;
+        LL_READ(d->scr_ll, s) {
+            if(s == scr) return d;
+        }
+    }
+
+    LV_LOG_WARN("lv_scr_get_disp: screen not found")
+    return NULL;
+}
 
 /**
  * Load a new screen
@@ -458,9 +461,11 @@ void lv_obj_invalidate(const lv_obj_t * obj)
  */
 void lv_scr_load(lv_obj_t * scr)
 {
-    LV_GC_ROOT(_lv_act_scr) = scr;
+    lv_disp_t * d = lv_scr_get_disp(scr);
 
-    lv_obj_invalidate(LV_GC_ROOT(_lv_act_scr));
+    d->act_scr = scr;
+
+    lv_obj_invalidate(scr);
 }
 
 /*--------------------
@@ -1006,13 +1011,17 @@ void lv_obj_refresh_style(lv_obj_t * obj)
  */
 void lv_obj_report_style_mod(lv_style_t * style)
 {
-    lv_obj_t * i;
-    LL_READ(LV_GC_ROOT(_lv_scr_ll), i) {
-        if(i->style_p == style || style == NULL) {
-            lv_obj_refresh_style(i);
-        }
+    lv_disp_t * d = lv_disp_get_next(NULL);
 
-        report_style_mod_core(style, i);
+    while(d) {
+        lv_obj_t * i;
+        LL_READ(d->scr_ll, i) {
+            if(i->style_p == style || style == NULL) {
+                lv_obj_refresh_style(i);
+            }
+
+            report_style_mod_core(style, i);
+        }
     }
 }
 
@@ -1302,28 +1311,30 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Return with a pointer to the active screen
  * @return pointer to the active screen object (loaded by 'lv_scr_load()')
  */
-lv_obj_t * lv_scr_act(void)
+lv_obj_t * lv_scr_act(lv_disp_t * disp)
 {
-    return LV_GC_ROOT(_lv_act_scr);
+    if(!disp) disp = lv_disp_get_last();
+    if(!disp) {
+        LV_LOG_WARN("lv_layer_top: no display registered to get its top layer");
+        return NULL;
+    }
+
+    return disp->act_scr;
 }
 
 /**
  * Return with the top layer. (Same on every screen and it is above the normal screen layer)
  * @return pointer to the top layer object  (transparent screen sized lv_obj)
  */
-lv_obj_t * lv_layer_top(void)
+lv_obj_t * lv_layer_top(lv_disp_t * disp)
 {
-    return LV_GC_ROOT(_lv_top_layer);
-}
+    if(!disp) disp = lv_disp_get_last();
+    if(!disp) {
+        LV_LOG_WARN("lv_layer_top: no display registered to get its top layer");
+        return NULL;
+    }
 
-/**
- * Return with the system layer. (Same on every screen and it is above the all other layers)
- * It is used for example by the cursor
- * @return pointer to the system layer object (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_sys(void)
-{
-    return LV_GC_ROOT(_lv_sys_layer);
+    return disp->top_layer;
 }
 
 /**

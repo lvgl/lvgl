@@ -1,12 +1,12 @@
 /**
- * @file hal_disp.h
+ * @file lv_hal_disp.h
  *
  * @description Display Driver HAL interface header file
  *
  */
 
-#ifndef HAL_DISP_H
-#define HAL_DISP_H
+#ifndef LV_HAL_DISP_H
+#define LV_HAL_DISP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +20,7 @@ extern "C" {
 #include "lv_hal.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
-#include "../lv_core/lv_obj.h"
+#include "../lv_misc/lv_ll.h"
 
 /*********************
  *      DEFINES
@@ -62,14 +62,15 @@ typedef struct _disp_drv_t {
 #endif
 } lv_disp_drv_t;
 
+struct _lv_obj_t;
+
 typedef struct _disp_t {
     lv_disp_drv_t driver;
     lv_area_t inv_buf[32];
     lv_ll_t scr_ll;
-    lv_obj_t * act_scr;
-    lv_obj_t * top_scr;
+    struct _lv_obj_t * act_scr;
+    struct _lv_obj_t * top_layer;
     uint8_t orientation:2;
-    struct _disp_t *next;
 } lv_disp_t;
 
 /**********************
@@ -92,17 +93,8 @@ void lv_disp_drv_init(lv_disp_drv_t *driver);
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t *driver);
 
-/**
- * Set the active display
- * @param disp pointer to a display (return value of 'lv_disp_register')
- */
-void lv_disp_set_active(lv_disp_t * disp);
 
-/**
- * Get a pointer to the active display
- * @return pointer to the active display
- */
-lv_disp_t * lv_disp_get_active(void);
+lv_disp_t * lv_disp_get_last(void);
 
 /**
  * Get the next display.

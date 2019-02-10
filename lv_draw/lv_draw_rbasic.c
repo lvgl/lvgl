@@ -9,7 +9,7 @@
 #include "lv_draw_rbasic.h"
 #if USE_LV_REAL_DRAW != 0
 
-#include "../lv_hal/lv_hal_disp.h"
+#include "../lv_hal/lv_hal.h"
 #include "../lv_misc/lv_font.h"
 #include "lv_draw.h"
 

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_hal/lv_hal_disp.h"
+#include "../lv_hal/lv_hal.h"
 
 /*********************
  *      DEFINES

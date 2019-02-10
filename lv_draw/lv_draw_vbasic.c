@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../lv_hal/lv_hal_disp.h"
+#include "../lv_hal/lv_hal.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_font.h"
 #include "../lv_misc/lv_color.h"

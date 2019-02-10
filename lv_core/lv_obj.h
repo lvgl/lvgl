@@ -27,6 +27,7 @@ extern "C" {
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_hal/lv_hal.h"
 
 /*********************
  *      DEFINES
@@ -276,6 +277,8 @@ void lv_obj_invalidate(const lv_obj_t * obj);
 /*--------------
  * Screen set
  *--------------*/
+
+lv_disp_t * lv_scr_get_disp(lv_obj_t * scr);
 
 /**
  * Load a new screen
@@ -560,20 +563,13 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Return with a pointer to the active screen
  * @return pointer to the active screen object (loaded by 'lv_scr_load()')
  */
-lv_obj_t * lv_scr_act(void);
+lv_obj_t * lv_scr_act(lv_disp_t * disp);
 
 /**
  * Return with the top layer. (Same on every screen and it is above the normal screen layer)
  * @return pointer to the top layer object  (transparent screen sized lv_obj)
  */
-lv_obj_t * lv_layer_top(void);
-
-/**
- * Return with the system layer. (Same on every screen and it is above the all other layers)
- * It is used for example by the cursor
- * @return pointer to the system layer object (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_sys(void);
+lv_obj_t * lv_layer_top(lv_disp_t * disp);
 
 /**
  * Return with the screen of an object
