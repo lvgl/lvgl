@@ -110,12 +110,12 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BG, th->kb.bg);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_REL, th->kb.btn.rel);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_PR, th->kb.btn.pr);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_REL, th->kb.btn.tgl_rel);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_PR, th->kb.btn.tgl_pr);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_INA, th->kb.btn.ina);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BG, th->style.kb.bg);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_REL, th->style.kb.btn.rel);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_PR, th->style.kb.btn.pr);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_REL, th->style.kb.btn.tgl_rel);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_PR, th->style.kb.btn.tgl_pr);
+            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_INA, th->style.kb.btn.ina);
         } else {
             /*Let the button matrix's styles*/
         }

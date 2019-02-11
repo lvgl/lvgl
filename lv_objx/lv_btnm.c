@@ -103,12 +103,12 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BG, th->btnm.bg);
-            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_REL, th->btnm.btn.rel);
-            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_PR, th->btnm.btn.pr);
-            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_REL, th->btnm.btn.tgl_rel);
-            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_PR, th->btnm.btn.tgl_pr);
-            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_INA, th->btnm.btn.ina);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BG, th->style.btnm.bg);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_REL, th->style.btnm.btn.rel);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_PR, th->style.btnm.btn.pr);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_REL, th->style.btnm.btn.tgl_rel);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_PR, th->style.btnm.btn.tgl_pr);
+            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_INA, th->style.btnm.btn.ina);
         } else {
             lv_obj_set_style(new_btnm, &lv_style_pretty);
         }

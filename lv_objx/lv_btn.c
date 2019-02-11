@@ -123,11 +123,11 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_REL, th->btn.rel);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_PR, th->btn.pr);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_REL, th->btn.tgl_rel);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->btn.tgl_pr);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->btn.ina);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_REL, th->style.btn.rel);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_PR, th->style.btn.pr);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_REL, th->style.btn.tgl_rel);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->style.btn.tgl_pr);
+            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->style.btn.ina);
         } else {
             lv_obj_set_style(new_btn, ext->styles[LV_BTN_STATE_REL]);
         }

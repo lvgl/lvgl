@@ -86,9 +86,9 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_BG, th->slider.bg);
-            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_INDIC, th->slider.indic);
-            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_KNOB, th->slider.knob);
+            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_BG, th->style.slider.bg);
+            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_INDIC, th->style.slider.indic);
+            lv_slider_set_style(new_slider, LV_SLIDER_STYLE_KNOB, th->style.slider.knob);
         } else {
             lv_slider_set_style(new_slider, LV_SLIDER_STYLE_KNOB, ext->style_knob);
         }

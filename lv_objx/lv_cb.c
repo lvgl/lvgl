@@ -88,12 +88,12 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BG, th->cb.bg);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, th->cb.box.rel);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_PR, th->cb.box.pr);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_REL, th->cb.box.tgl_rel);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_PR, th->cb.box.tgl_pr);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->cb.box.ina);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BG, th->style.cb.bg);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, th->style.cb.box.rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_PR, th->style.cb.box.pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_REL, th->style.cb.box.tgl_rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_PR, th->style.cb.box.tgl_pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->style.cb.box.ina);
         } else {
             lv_cb_set_style(new_cb, LV_CB_STYLE_BG, &lv_style_transp);
             lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, &lv_style_pretty);

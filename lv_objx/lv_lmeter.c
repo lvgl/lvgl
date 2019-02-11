@@ -84,7 +84,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_lmeter_set_style(new_lmeter, th->lmeter);
+            lv_lmeter_set_style(new_lmeter, th->style.lmeter);
         } else {
             lv_lmeter_set_style(new_lmeter, &lv_style_pretty_color);
         }

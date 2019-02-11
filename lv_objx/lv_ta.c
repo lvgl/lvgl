@@ -129,8 +129,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_ta_set_style(new_ta, LV_TA_STYLE_BG, th->ta.area);
-            lv_ta_set_style(new_ta, LV_TA_STYLE_SB, th->ta.sb);
+            lv_ta_set_style(new_ta, LV_TA_STYLE_BG, th->style.ta.area);
+            lv_ta_set_style(new_ta, LV_TA_STYLE_SB, th->style.ta.sb);
         } else {
             lv_ta_set_style(new_ta, LV_TA_STYLE_BG, &lv_style_pretty);
         }

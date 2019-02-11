@@ -87,9 +87,9 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_BG, th->spinbox.bg);
-            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_CURSOR, th->spinbox.cursor);
-            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_SB, th->spinbox.sb);
+            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_BG, th->style.spinbox.bg);
+            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_CURSOR, th->style.spinbox.cursor);
+            lv_spinbox_set_style(new_spinbox, LV_SPINBOX_STYLE_SB, th->style.spinbox.sb);
         }
     }
     /*Copy an existing spinbox*/

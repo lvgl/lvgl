@@ -60,7 +60,7 @@ void lv_theme_set_current(lv_theme_t * th)
 #if LV_THEME_LIVE_UPDATE == 0
     current_theme = th;
 #else
-    uint32_t style_num = sizeof(lv_theme_t) / sizeof(lv_style_t *);     /*Number of styles in a theme*/
+    uint32_t style_num = sizeof(th->style) / sizeof(lv_style_t *);     /*Number of styles in a theme*/
 
     if(!inited) {
         /*It's not sure `th_styles` is big enough. Check it now!*/
@@ -71,7 +71,7 @@ void lv_theme_set_current(lv_theme_t * th)
 
         /*Initialize the style pointers `current_theme` to point to the `th_styles` style array */
         uint16_t i;
-        lv_style_t ** cur_th_style_p = (lv_style_t **) &current_theme;
+        lv_style_t ** cur_th_style_p = (lv_style_t **) &current_theme.style;
         for(i = 0; i < style_num; i++) {
             uintptr_t adr = (uintptr_t)&th_styles[i];
             memcpy(&cur_th_style_p[i], &adr, sizeof(lv_style_t *));
@@ -82,7 +82,7 @@ void lv_theme_set_current(lv_theme_t * th)
 
     /*Copy the styles pointed by the new theme to the `th_styles` style array*/
     uint16_t i;
-    lv_style_t ** th_style = (lv_style_t **) th;
+    lv_style_t ** th_style = (lv_style_t **) &th->style;
     for(i = 0; i < style_num; i++) {
         uintptr_t s = (uintptr_t)th_style[i];
         if(s) memcpy(&th_styles[i], (void *)s, sizeof(lv_style_t));

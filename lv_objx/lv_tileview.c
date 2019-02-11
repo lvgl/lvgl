@@ -95,9 +95,9 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_page_set_style(new_tileview, LV_PAGE_STYLE_BG, th->tileview.bg);
-            lv_page_set_style(new_tileview, LV_PAGE_STYLE_SCRL, th->tileview.scrl);
-            lv_page_set_style(new_tileview, LV_PAGE_STYLE_SB, th->tileview.sb);
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_BG, th->style.tileview.bg);
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_SCRL, th->style.tileview.scrl);
+            lv_page_set_style(new_tileview, LV_PAGE_STYLE_SB, th->style.tileview.sb);
         } else {
             lv_page_set_style(new_tileview, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
             lv_page_set_style(new_tileview, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);

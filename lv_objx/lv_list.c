@@ -109,14 +109,14 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_list_set_style(new_list, LV_LIST_STYLE_BG, th->list.bg);
-            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, th->list.scrl);
-            lv_list_set_style(new_list, LV_LIST_STYLE_SB, th->list.sb);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, th->list.btn.rel);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, th->list.btn.pr);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, th->list.btn.tgl_rel);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, th->list.btn.tgl_pr);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, th->list.btn.ina);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BG, th->style.list.bg);
+            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, th->style.list.scrl);
+            lv_list_set_style(new_list, LV_LIST_STYLE_SB, th->style.list.sb);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, th->style.list.btn.rel);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, th->style.list.btn.pr);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, th->style.list.btn.tgl_rel);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, th->style.list.btn.tgl_pr);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, th->style.list.btn.ina);
         } else {
             lv_list_set_style(new_list, LV_LIST_STYLE_BG, &lv_style_transp_fit);
             lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, &lv_style_pretty);

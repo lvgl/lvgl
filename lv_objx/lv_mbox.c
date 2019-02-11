@@ -97,7 +97,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->mbox.bg);
+            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->style.mbox.bg);
         } else {
             lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, &lv_style_pretty);
         }
@@ -144,9 +144,9 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_map, lv_btnm_action_t a
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->mbox.btn.bg);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->mbox.btn.rel);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->mbox.btn.pr);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->style.mbox.btn.bg);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->style.mbox.btn.rel);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->style.mbox.btn.pr);
         } else {
             lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, &lv_style_transp_fit);
         }

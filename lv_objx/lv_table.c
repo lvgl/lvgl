@@ -89,11 +89,11 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, th->table.bg);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL1, th->table.cell);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL2, th->table.cell);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL3, th->table.cell);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL4, th->table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, th->style.table.bg);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL1, th->style.table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL2, th->style.table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL3, th->style.table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL4, th->style.table.cell);
         } else {
             lv_table_set_style(new_table, LV_TABLE_STYLE_BG, &lv_style_plain_color);
         }

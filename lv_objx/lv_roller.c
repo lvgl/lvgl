@@ -96,8 +96,8 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_BG, th->roller.bg);
-            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_SEL, th->roller.sel);
+            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_BG, th->style.roller.bg);
+            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_SEL, th->style.roller.sel);
         } else {
             /*Let the ddlist's style*/
             lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/

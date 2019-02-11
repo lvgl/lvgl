@@ -63,19 +63,19 @@ static void basic_init(void)
     plain_bordered.body.border.width = 2;
     plain_bordered.body.border.color = LV_COLOR_HEX3(0xbbb);
 
-    theme.bg = &lv_style_plain;
-    theme.panel = &lv_style_pretty;
+    theme.style.bg = &lv_style_plain;
+    theme.style.panel = &lv_style_pretty;
 
 }
 
 static void btn_init(void)
 {
 #if USE_LV_BTN != 0
-    theme.btn.rel = &lv_style_btn_rel;
-    theme.btn.pr = &lv_style_btn_pr;
-    theme.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.btn.tgl_pr =  &lv_style_btn_tgl_pr;
-    theme.btn.ina =  &lv_style_btn_ina;
+    theme.style.btn.rel = &lv_style_btn_rel;
+    theme.style.btn.pr = &lv_style_btn_pr;
+    theme.style.btn.tgl_rel = &lv_style_btn_tgl_rel;
+    theme.style.btn.tgl_pr =  &lv_style_btn_tgl_pr;
+    theme.style.btn.ina =  &lv_style_btn_ina;
 #endif
 }
 
@@ -92,9 +92,9 @@ static void label_init(void)
     label_hint.text.color = LV_COLOR_HEX3(0xaaa);
 
 
-    theme.label.prim = &label_prim;
-    theme.label.sec = &label_sec;
-    theme.label.hint = &label_hint;
+    theme.style.label.prim = &label_prim;
+    theme.style.label.sec = &label_sec;
+    theme.style.label.hint = &label_hint;
 #endif
 }
 
@@ -104,8 +104,8 @@ static void img_init(void)
 #if USE_LV_IMG != 0
 
 
-    theme.img.light = &def;
-    theme.img.dark = &def;
+    theme.style.img.light = &def;
+    theme.style.img.dark = &def;
 #endif
 }
 
@@ -113,7 +113,7 @@ static void line_init(void)
 {
 #if USE_LV_LINE != 0
 
-    theme.line.decor = &def;
+    theme.style.line.decor = &def;
 #endif
 }
 
@@ -130,7 +130,7 @@ static void led_init(void)
     led.body.shadow.color = led.body.main_color;
 
 
-    theme.led = &led;
+    theme.style.led = &led;
 #endif
 }
 
@@ -138,8 +138,8 @@ static void bar_init(void)
 {
 #if USE_LV_BAR
 
-    theme.bar.bg = &lv_style_pretty;
-    theme.bar.indic = &lv_style_pretty_color;
+    theme.style.bar.bg = &lv_style_pretty;
+    theme.style.bar.indic = &lv_style_pretty_color;
 #endif
 }
 
@@ -150,9 +150,9 @@ static void slider_init(void)
     slider_bg.body.padding.hor = LV_DPI / 20;
     slider_bg.body.padding.ver = LV_DPI / 20;
 
-    theme.slider.bg = &slider_bg;
-    theme.slider.indic = &lv_style_pretty_color;
-    theme.slider.knob = &lv_style_pretty;
+    theme.style.slider.bg = &slider_bg;
+    theme.style.slider.indic = &lv_style_pretty_color;
+    theme.style.slider.knob = &lv_style_pretty;
 #endif
 }
 
@@ -163,10 +163,10 @@ static void sw_init(void)
     sw_bg.body.padding.hor = 3;
     sw_bg.body.padding.ver = 3;
 
-    theme.sw.bg = &sw_bg;
-    theme.sw.indic = &lv_style_pretty_color;
-    theme.sw.knob_off = &lv_style_pretty;
-    theme.sw.knob_on = &lv_style_pretty;
+    theme.style.sw.bg = &sw_bg;
+    theme.style.sw.indic = &lv_style_pretty_color;
+    theme.style.sw.knob_off = &lv_style_pretty;
+    theme.style.sw.knob_on = &lv_style_pretty;
 #endif
 }
 
@@ -181,7 +181,7 @@ static void lmeter_init(void)
     lmeter.body.main_color = lv_color_mix(lmeter.body.main_color, LV_COLOR_WHITE, LV_OPA_50);
     lmeter.body.grad_color = lv_color_mix(lmeter.body.grad_color, LV_COLOR_BLACK, LV_OPA_50);
 
-    theme.lmeter = &lmeter;
+    theme.style.lmeter = &lmeter;
 #endif
 }
 
@@ -196,7 +196,7 @@ static void gauge_init(void)
     gauge.body.grad_color = lmeter.body.main_color;
     gauge.text.color = LV_COLOR_HEX3(0x888);
 
-    theme.gauge = &gauge;
+    theme.style.gauge = &gauge;
 #endif
 }
 
@@ -205,7 +205,7 @@ static void chart_init(void)
 #if USE_LV_CHART
 
 
-    theme.chart = &lv_style_pretty;
+    theme.style.chart = &lv_style_pretty;
 #endif
 }
 
@@ -214,12 +214,12 @@ static void cb_init(void)
 #if USE_LV_CB != 0
 
 
-    theme.cb.bg = &lv_style_transp;
-    theme.cb.box.rel = &lv_style_pretty;
-    theme.cb.box.pr = &lv_style_btn_pr;
-    theme.cb.box.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.cb.box.tgl_pr = &lv_style_btn_tgl_pr;
-    theme.cb.box.ina = &lv_style_btn_ina;
+    theme.style.cb.bg = &lv_style_transp;
+    theme.style.cb.box.rel = &lv_style_pretty;
+    theme.style.cb.box.pr = &lv_style_btn_pr;
+    theme.style.cb.box.tgl_rel = &lv_style_btn_tgl_rel;
+    theme.style.cb.box.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.style.cb.box.ina = &lv_style_btn_ina;
 #endif
 }
 
@@ -229,12 +229,12 @@ static void btnm_init(void)
 #if USE_LV_BTNM
 
 
-    theme.btnm.bg = &lv_style_pretty;
-    theme.btnm.btn.rel = &lv_style_btn_rel;
-    theme.btnm.btn.pr = &lv_style_btn_pr;
-    theme.btnm.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.btnm.btn.tgl_pr = &lv_style_btn_tgl_pr;
-    theme.btnm.btn.ina = &lv_style_btn_ina;
+    theme.style.btnm.bg = &lv_style_pretty;
+    theme.style.btnm.btn.rel = &lv_style_btn_rel;
+    theme.style.btnm.btn.pr = &lv_style_btn_pr;
+    theme.style.btnm.btn.tgl_rel = &lv_style_btn_tgl_rel;
+    theme.style.btnm.btn.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.style.btnm.btn.ina = &lv_style_btn_ina;
 #endif
 }
 
@@ -243,12 +243,12 @@ static void kb_init(void)
 #if USE_LV_KB
 
 
-    theme.kb.bg = &lv_style_pretty;
-    theme.kb.btn.rel = &lv_style_btn_rel;
-    theme.kb.btn.pr = &lv_style_btn_pr;
-    theme.kb.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.kb.btn.tgl_pr = &lv_style_btn_tgl_pr;
-    theme.kb.btn.ina = &lv_style_btn_ina;
+    theme.style.kb.bg = &lv_style_pretty;
+    theme.style.kb.btn.rel = &lv_style_btn_rel;
+    theme.style.kb.btn.pr = &lv_style_btn_pr;
+    theme.style.kb.btn.tgl_rel = &lv_style_btn_tgl_rel;
+    theme.style.kb.btn.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.style.kb.btn.ina = &lv_style_btn_ina;
 #endif
 
 }
@@ -258,10 +258,10 @@ static void mbox_init(void)
 #if USE_LV_MBOX
 
 
-    theme.mbox.bg = &lv_style_pretty;
-    theme.mbox.btn.bg = &lv_style_transp;
-    theme.mbox.btn.rel = &lv_style_btn_rel;
-    theme.mbox.btn.pr = &lv_style_btn_tgl_pr;
+    theme.style.mbox.bg = &lv_style_pretty;
+    theme.style.mbox.btn.bg = &lv_style_transp;
+    theme.style.mbox.btn.rel = &lv_style_btn_rel;
+    theme.style.mbox.btn.pr = &lv_style_btn_tgl_pr;
 #endif
 }
 
@@ -270,9 +270,9 @@ static void page_init(void)
 #if USE_LV_PAGE
 
 
-    theme.page.bg = &lv_style_pretty;
-    theme.page.scrl = &lv_style_transp_tight;
-    theme.page.sb = &sb;
+    theme.style.page.bg = &lv_style_pretty;
+    theme.style.page.scrl = &lv_style_transp_tight;
+    theme.style.page.sb = &sb;
 #endif
 }
 
@@ -281,10 +281,10 @@ static void ta_init(void)
 #if USE_LV_TA
 
 
-    theme.ta.area = &lv_style_pretty;
-    theme.ta.oneline = &lv_style_pretty;
-    theme.ta.cursor = NULL;
-    theme.ta.sb = &sb;
+    theme.style.ta.area = &lv_style_pretty;
+    theme.style.ta.oneline = &lv_style_pretty;
+    theme.style.ta.cursor = NULL;
+    theme.style.ta.sb = &sb;
 #endif
 }
 
@@ -292,14 +292,14 @@ static void list_init(void)
 {
 #if USE_LV_LIST != 0
 
-    theme.list.bg = &lv_style_pretty;
-    theme.list.scrl = &lv_style_transp_fit;
-    theme.list.sb = &sb;
-    theme.list.btn.rel = &lv_style_btn_rel;
-    theme.list.btn.pr = &lv_style_btn_pr;
-    theme.list.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.list.btn.tgl_pr = &lv_style_btn_tgl_pr;
-    theme.list.btn.ina = &lv_style_btn_ina;
+    theme.style.list.bg = &lv_style_pretty;
+    theme.style.list.scrl = &lv_style_transp_fit;
+    theme.style.list.sb = &sb;
+    theme.style.list.btn.rel = &lv_style_btn_rel;
+    theme.style.list.btn.pr = &lv_style_btn_pr;
+    theme.style.list.btn.tgl_rel = &lv_style_btn_tgl_rel;
+    theme.style.list.btn.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.style.list.btn.ina = &lv_style_btn_ina;
 #endif
 }
 
@@ -308,9 +308,9 @@ static void ddlist_init(void)
 #if USE_LV_DDLIST != 0
 
 
-    theme.ddlist.bg = &lv_style_pretty;
-    theme.ddlist.sel = &lv_style_plain_color;
-    theme.ddlist.sb = &sb;
+    theme.style.ddlist.bg = &lv_style_pretty;
+    theme.style.ddlist.sel = &lv_style_plain_color;
+    theme.style.ddlist.sb = &sb;
 #endif
 }
 
@@ -319,8 +319,8 @@ static void roller_init(void)
 #if USE_LV_ROLLER != 0
 
 
-    theme.roller.bg = &lv_style_pretty;
-    theme.roller.sel = &lv_style_plain_color;
+    theme.style.roller.bg = &lv_style_pretty;
+    theme.style.roller.sel = &lv_style_plain_color;
 #endif
 }
 
@@ -329,13 +329,13 @@ static void tabview_init(void)
 #if USE_LV_TABVIEW != 0
 
 
-    theme.tabview.bg = &plain_bordered;
-    theme.tabview.indic = &lv_style_plain_color;
-    theme.tabview.btn.bg = &lv_style_transp;
-    theme.tabview.btn.rel = &lv_style_btn_rel;
-    theme.tabview.btn.pr = &lv_style_btn_pr;
-    theme.tabview.btn.tgl_rel = &lv_style_btn_tgl_rel;
-    theme.tabview.btn.tgl_pr = &lv_style_btn_tgl_pr;
+    theme.style.tabview.bg = &plain_bordered;
+    theme.style.tabview.indic = &lv_style_plain_color;
+    theme.style.tabview.btn.bg = &lv_style_transp;
+    theme.style.tabview.btn.rel = &lv_style_btn_rel;
+    theme.style.tabview.btn.pr = &lv_style_btn_pr;
+    theme.style.tabview.btn.tgl_rel = &lv_style_btn_tgl_rel;
+    theme.style.tabview.btn.tgl_pr = &lv_style_btn_tgl_pr;
 #endif
 }
 
@@ -345,13 +345,13 @@ static void win_init(void)
 #if USE_LV_WIN != 0
 
 
-    theme.win.bg = &plain_bordered;
-    theme.win.sb = &sb;
-    theme.win.header = &lv_style_plain_color;
-    theme.win.content.bg = &lv_style_transp;
-    theme.win.content.scrl = &lv_style_transp;
-    theme.win.btn.rel = &lv_style_btn_rel;
-    theme.win.btn.pr = &lv_style_btn_pr;
+    theme.style.win.bg = &plain_bordered;
+    theme.style.win.sb = &sb;
+    theme.style.win.header = &lv_style_plain_color;
+    theme.style.win.content.bg = &lv_style_transp;
+    theme.style.win.content.scrl = &lv_style_transp;
+    theme.style.win.btn.rel = &lv_style_btn_rel;
+    theme.style.win.btn.pr = &lv_style_btn_pr;
 #endif
 }
 
