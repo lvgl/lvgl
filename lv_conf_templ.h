@@ -142,7 +142,7 @@
 /*HAL settings*/
 #define LV_TICK_CUSTOM     0                        /*1: use a custom tick source (removing the need to manually update the tick with `lv_tick_inc`) */
 #if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "sonething.h"         /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "something.h"         /*Header for the sys time function*/
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current systime in ms*/
 #endif     /*LV_TICK_CUSTOM*/
 
