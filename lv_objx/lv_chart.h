@@ -62,10 +62,10 @@ typedef struct
 /*Chart types*/
 enum
 {
-    LV_CHART_TYPE_LINE = 0x01,
-    LV_CHART_TYPE_COLUMN = 0x02,
-    LV_CHART_TYPE_POINT = 0x04,
-    LV_CHART_TYPE_VERTICAL_LINE = 0x08,
+    LV_CHART_TYPE_LINE = 0x01,              /*Connect the points with lines*/
+    LV_CHART_TYPE_COLUMN = 0x02,            /*Draw columns*/
+    LV_CHART_TYPE_POINT = 0x04,             /*Draw circles on the points*/
+    LV_CHART_TYPE_VERTICAL_LINE = 0x08,     /*Draw vertical lines on points (useful when chart width == point count)*/
 };
 typedef uint8_t lv_chart_type_t;
 
