@@ -94,6 +94,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     lv_obj_set_style(node->top_layer, &lv_style_transp);
     lv_obj_set_style(node->sys_layer, &lv_style_transp);
 
+    node->inv_p = 0;
+
     return node;
 }
 

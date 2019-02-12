@@ -19,17 +19,10 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_INV_FIFO_SIZE
-#define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
-#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    lv_area_t area;
-    uint8_t joined;
-} lv_join_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -50,8 +43,6 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_join_t inv_buf[LV_INV_FIFO_SIZE];
-static uint16_t inv_buf_p;
 static void (*monitor_cb)(uint32_t, uint32_t); /*Monitor the rendering time*/
 static void (*round_cb)(lv_area_t *);          /*If set then called to modify invalidated areas for special display controllers*/
 static uint32_t px_num;
@@ -70,9 +61,6 @@ static lv_disp_t * disp_refr;                   /*Display being refreshed*/
  */
 void lv_refr_init(void)
 {
-    inv_buf_p = 0;
-    memset(inv_buf, 0, sizeof(inv_buf));
-
     lv_task_t * task;
     task = lv_task_create(lv_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
     lv_task_ready(task);        /*Be sure the screen will be refreshed immediately on start up*/
@@ -91,22 +79,26 @@ void lv_refr_now(void)
 
 
 /**
- * Invalidate an area
- * @param area_p pointer to area which should be invalidated
+ * Invalidate an area on display to redraw it
+ * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
+ * @param disp pointer to display where the area should be invalidated (NULL can be used if there is only one display)
  */
-void lv_inv_area(const lv_area_t * area_p)
+void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
 {
+    if(!disp) disp = lv_disp_get_last();
+    if(!disp) return;
+
     /*Clear the invalidate buffer if the parameter is NULL*/
     if(area_p == NULL) {
-        inv_buf_p = 0;
+        disp->inv_p = 0;
         return;
     }
 
     lv_area_t scr_area;
     scr_area.x1 = 0;
     scr_area.y1 = 0;
-    scr_area.x2 = LV_HOR_RES_MAX - 1;
-    scr_area.y2 = LV_VER_RES_MAX - 1;
+    scr_area.x2 = disp->driver.hor_res - 1;
+    scr_area.y2 = disp->driver.ver_res - 1;
 
     lv_area_t com_area;
     bool suc;
@@ -119,18 +111,18 @@ void lv_inv_area(const lv_area_t * area_p)
 
         /*Save only if this area is not in one of the saved areas*/
         uint16_t i;
-        for(i = 0; i < inv_buf_p; i++) {
-            if(lv_area_is_in(&com_area, &inv_buf[i].area) != false) return;
+        for(i = 0; i < disp->inv_p; i++) {
+            if(lv_area_is_in(&com_area, &disp->inv_areas[i]) != false) return;
         }
 
         /*Save the area*/
-        if(inv_buf_p < LV_INV_FIFO_SIZE) {
-            lv_area_copy(&inv_buf[inv_buf_p].area, &com_area);
+        if(disp->inv_p < LV_INV_BUF_SIZE) {
+            lv_area_copy(&disp->inv_areas[disp->inv_p], &com_area);
         } else {/*If no place for the area add the screen*/
-            inv_buf_p = 0;
-            lv_area_copy(&inv_buf[inv_buf_p].area, &scr_area);
+            disp->inv_p = 0;
+            lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
         }
-        inv_buf_p ++;
+        disp->inv_p ++;
     }
 }
 
@@ -154,25 +146,6 @@ void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t))
 void lv_refr_set_round_cb(void(*cb)(lv_area_t *))
 {
     round_cb = cb;
-}
-
-/**
- * Get the number of areas in the buffer
- * @return number of invalid areas
- */
-uint16_t lv_refr_get_buf_size(void)
-{
-    return inv_buf_p;
-}
-
-/**
- * Pop (delete) the last 'num' invalidated areas from the buffer
- * @param num number of areas to delete
- */
-void lv_refr_pop_from_buf(uint16_t num)
-{
-    if(inv_buf_p < num) inv_buf_p = 0;
-    else inv_buf_p -= num;
 }
 
 /**
@@ -208,7 +181,7 @@ static void lv_refr_task(void * param)
         lv_refr_areas();
 
         /*If refresh happened ...*/
-        if(inv_buf_p != 0) {
+        if(disp_refr->inv_p != 0) {
 
             /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
     #if LV_VDB_TRUE_DOUBLE_BUFFERED
@@ -247,8 +220,9 @@ static void lv_refr_task(void * param)
     #endif
 
             /*Clean up*/
-            memset(inv_buf, 0, sizeof(inv_buf));
-            inv_buf_p = 0;
+            memset(disp_refr->inv_areas, 0, sizeof(disp_refr->inv_areas));
+            memset(disp_refr->inv_area_joined, 0, sizeof(disp_refr->inv_area_joined));
+            disp_refr->inv_p = 0;
 
             /*Call monitor cb if present*/
             if(monitor_cb != NULL) {
@@ -269,32 +243,32 @@ static void lv_refr_join_area(void)
     uint32_t join_from;
     uint32_t join_in;
     lv_area_t joined_area;
-    for(join_in = 0; join_in < inv_buf_p; join_in++) {
-        if(inv_buf[join_in].joined != 0) continue;
+    for(join_in = 0; join_in < disp_refr->inv_p; join_in++) {
+        if(disp_refr->inv_area_joined[join_in] != 0) continue;
 
         /*Check all areas to join them in 'join_in'*/
-        for(join_from = 0; join_from < inv_buf_p; join_from++) {
+        for(join_from = 0; join_from < disp_refr->inv_p; join_from++) {
             /*Handle only unjoined areas and ignore itself*/
-            if(inv_buf[join_from].joined != 0 || join_in == join_from) {
+            if(disp_refr->inv_area_joined[join_from] != 0 || join_in == join_from) {
                 continue;
             }
 
             /*Check if the areas are on each other*/
-            if(lv_area_is_on(&inv_buf[join_in].area,
-                             &inv_buf[join_from].area) == false) {
+            if(lv_area_is_on(&disp_refr->inv_areas[join_in],
+                             &disp_refr->inv_areas[join_from]) == false) {
                 continue;
             }
 
-            lv_area_join(&joined_area, &inv_buf[join_in].area,
-                         &inv_buf[join_from].area);
+            lv_area_join(&joined_area, &disp_refr->inv_areas[join_in],
+                         &disp_refr->inv_areas[join_from]);
 
             /*Join two area only if the joined area size is smaller*/
             if(lv_area_get_size(&joined_area) <
-                    (lv_area_get_size(&inv_buf[join_in].area) + lv_area_get_size(&inv_buf[join_from].area))) {
-                lv_area_copy(&inv_buf[join_in].area, &joined_area);
+                    (lv_area_get_size(&disp_refr->inv_areas[join_in]) + lv_area_get_size(&disp_refr->inv_areas[join_from]))) {
+                lv_area_copy(&disp_refr->inv_areas[join_in], &joined_area);
 
                 /*Mark 'join_form' is joined into 'join_in'*/
-                inv_buf[join_from].joined = 1;
+                disp_refr->inv_area_joined[join_from] = 1;
             }
         }
     }
@@ -308,17 +282,17 @@ static void lv_refr_areas(void)
     px_num = 0;
     uint32_t i;
 
-    for(i = 0; i < inv_buf_p; i++) {
+    for(i = 0; i < disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
-        if(inv_buf[i].joined == 0) {
+        if(disp_refr->inv_area_joined[i] == 0) {
             /*If there is no VDB do simple drawing*/
 #if LV_VDB_SIZE == 0
             lv_refr_area_no_vdb(&inv_buf[i].area);
 #else
             /*If VDB is used...*/
-            lv_refr_area_with_vdb(&inv_buf[i].area);
+            lv_refr_area_with_vdb(&disp_refr->inv_areas[i]);
 #endif
-            if(monitor_cb != NULL) px_num += lv_area_get_size(&inv_buf[i].area);
+            if(monitor_cb != NULL) px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
         }
     }
 

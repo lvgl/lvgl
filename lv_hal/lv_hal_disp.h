@@ -25,6 +25,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_INV_BUF_SIZE
+#define LV_INV_BUF_SIZE    32    /*Buffer size for invalid areas */
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -66,7 +69,9 @@ struct _lv_obj_t;
 
 typedef struct _disp_t {
     lv_disp_drv_t driver;
-    lv_area_t inv_buf[32];
+    lv_area_t inv_areas[LV_INV_BUF_SIZE];
+    uint8_t inv_area_joined[LV_INV_BUF_SIZE];
+    uint16_t inv_p;
     lv_ll_t scr_ll;
     struct _lv_obj_t * act_scr;
     struct _lv_obj_t * top_layer;

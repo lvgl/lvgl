@@ -436,7 +436,7 @@ void lv_obj_invalidate(const lv_obj_t * obj)
             par = lv_obj_get_parent(par);
         }
 
-        if(union_ok != false) lv_inv_area(&area_trunc);
+        if(union_ok) lv_inv_area(disp, &area_trunc);
     }
 }
 
@@ -449,21 +449,6 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 /*--------------
  * Screen set
  *--------------*/
-lv_disp_t * lv_scr_get_disp(lv_obj_t * scr)
-{
-    lv_disp_t * d;
-
-    LL_READ(LV_GC_ROOT(_lv_disp_ll), d) {
-        lv_obj_t * s;
-        LL_READ(d->scr_ll, s) {
-            if(s == scr) return d;
-        }
-    }
-
-    LV_LOG_WARN("lv_scr_get_disp: screen not found")
-    return NULL;
-}
-
 /**
  * Load a new screen
  * @param scr pointer to a screen
@@ -1377,6 +1362,29 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
     } while(par != NULL);
 
     return (lv_obj_t *)act_p;
+}
+
+lv_disp_t * lv_scr_get_disp(lv_obj_t * scr)
+{
+    lv_disp_t * d;
+
+    LL_READ(LV_GC_ROOT(_lv_disp_ll), d) {
+        lv_obj_t * s;
+        LL_READ(d->scr_ll, s) {
+            if(s == scr) return d;
+        }
+    }
+
+    LV_LOG_WARN("lv_scr_get_disp: screen not found")
+    return NULL;
+}
+
+
+
+lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
+{
+    lv_obj_t * scr = lv_obj_get_screen(obj);
+    return lv_scr_get_disp(scr);
 }
 
 /*---------------------

@@ -278,8 +278,6 @@ void lv_obj_invalidate(const lv_obj_t * obj);
  * Screen set
  *--------------*/
 
-lv_disp_t * lv_scr_get_disp(lv_obj_t * scr);
-
 /**
  * Load a new screen
  * @param scr pointer to a screen
@@ -583,6 +581,11 @@ lv_obj_t * lv_layer_sys(lv_disp_t * disp);
  * @return pointer to a screen
  */
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj);
+
+
+lv_disp_t * lv_scr_get_disp(lv_obj_t * scr);
+
+lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj);
 
 /*---------------------
  * Parent/children get

@@ -54,10 +54,11 @@ void lv_refr_init(void);
 void lv_refr_now(void);
 
 /**
- * Invalidate an area
- * @param area_p pointer to area which should be invalidated
+ * Invalidate an area on display to redraw it
+ * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
+ * @param disp pointer to display where the area should be invalidated (NULL can be used if there is only one display)
  */
-void lv_inv_area(const lv_area_t * area_p);
+void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
 
 /**
  * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels
