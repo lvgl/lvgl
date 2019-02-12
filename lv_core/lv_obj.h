@@ -572,6 +572,12 @@ lv_obj_t * lv_scr_act(lv_disp_t * disp);
 lv_obj_t * lv_layer_top(lv_disp_t * disp);
 
 /**
+ * Return with the sys. layer. (Same on every screen and it is above the normal screen layer)
+ * @return pointer to the sys layer object  (transparent screen sized lv_obj)
+ */
+lv_obj_t * lv_layer_sys(lv_disp_t * disp);
+
+/**
  * Return with the screen of an object
  * @param obj pointer to an object
  * @return pointer to a screen

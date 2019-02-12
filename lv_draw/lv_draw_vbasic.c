@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "../lv_core/lv_refr.h"
 #include "../lv_hal/lv_hal.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_font.h"
@@ -29,6 +30,10 @@
  *      DEFINES
  *********************/
 #define VFILL_HW_ACC_SIZE_LIMIT    50      /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
+
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -87,7 +92,7 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
     x -= vdb_p->area.x1;
     y -= vdb_p->area.y1;
 
-    lv_disp_t * disp = lv_disp_get_active();
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
     if(disp->driver.vdb_wr) {
         disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, x, y, color, opa);
     } else {
@@ -134,6 +139,8 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*If there are common part of the three area then draw to the vdb*/
     if(union_ok == false) return;
 
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+
     lv_area_t vdb_rel_a;   /*Stores relative coordinates on vdb*/
     vdb_rel_a.x1 = res_a.x1 - vdb_p->area.x1;
     vdb_rel_a.y1 = res_a.y1 - vdb_p->area.y1;
@@ -147,7 +154,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
 
 #if USE_LV_GPU
-    static lv_color_t color_array_tmp[LV_HOR_RES_MAX];       /*Used by 'lv_disp_mem_blend'*/
+    static LV_ATTRIBUTE_MEM_ALIGN lv_color_t color_array_tmp[LV_HOR_RES_MAX];       /*Used by 'lv_disp_mem_blend'*/
     static lv_coord_t last_width = -1;
 
     lv_coord_t w = lv_area_get_width(&vdb_rel_a);
@@ -158,16 +165,16 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*Not opaque fill*/
     else if(opa == LV_OPA_COVER) {
         /*Use hw fill if present*/
-        if(lv_disp_is_mem_fill_supported()) {
+        if(disp->driver.mem_fill) {
             lv_coord_t row;
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                lv_disp_mem_fill(&vdb_buf_tmp[vdb_rel_a.x1], w, color);
+                disp->driver.mem_fill(&vdb_buf_tmp[vdb_rel_a.x1], w, color);
                 vdb_buf_tmp += vdb_width;
             }
         }
         /*Use hw blend if present and the area is not too small*/
         else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT &&
-                lv_disp_is_mem_blend_supported()) {
+                disp->driver.mem_blend) {
             /*Fill a  one line sized buffer with a color and blend this later*/
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
@@ -180,7 +187,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
             /*Blend the filled line to every line VDB line-by-line*/
             lv_coord_t row;
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
+                disp->driver.mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 
@@ -194,7 +201,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*Fill with opacity*/
     else {
         /*Use hw blend if present*/
-        if(lv_disp_is_mem_blend_supported()) {
+        if(disp->driver.mem_blend) {
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
                 for(i = 0; i < w; i++) {
@@ -205,7 +212,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
             }
             lv_coord_t row;
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                lv_disp_mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
+                disp->driver.mem_blend(&vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 
@@ -324,7 +331,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     /*Move on the map too*/
     map_p += (row_start * width_byte_bpp) + ((col_start * bpp) >> 3);
 
-    lv_disp_t * disp = lv_disp_get_active();
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
 
     uint8_t letter_px;
     lv_opa_t px_opa;
@@ -435,7 +442,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     lv_coord_t row;
     lv_coord_t map_useful_w = lv_area_get_width(&masked_a);
 
-    lv_disp_t * disp = lv_disp_get_active();
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
 
     /*The simplest case just copy the pixels into the VDB*/
     if(chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
@@ -455,10 +462,10 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
         else {
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
 #if USE_LV_GPU
-                if(lv_disp_is_mem_blend_supported() == false) {
+                if(disp->driver.mem_blend == false) {
                     sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 } else {
-                    lv_disp_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
+                    disp->driver.mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 }
 #else
                 sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
@@ -529,21 +536,6 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                             vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
 #else
                             vdb_buf_tmp[col] = color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].alpha, px_color,  opa_result);
-//                            if(vdb_buf_tmp[col].alpha == LV_OPA_TRANSP) {
-//                                /* When it is the first visible pixel on the transparent screen
-//                                 * simlply use this color and set the pixel opa as backrounds alpha*/
-//                                vdb_buf_tmp[col] = px_color;
-//                                vdb_buf_tmp[col].alpha = opa_result;
-//                            } else {
-//                                /* If already this pixel is already written then for performance reasons
-//                                 * don't care with alpha channel
-//                                 */
-//                                lv_opa_t bg_opa = vdb_buf_tmp[col].alpha;
-//                                vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
-//
-//                                uint16_t opa_tmp = (uint16_t)opa_result + ((bg_opa * (255 - opa_result)) >> 8);
-//                                vdb_buf_tmp[col].alpha = opa_tmp > 0xFF ? 0xFF : opa_tmp ;
-//                            }
 #endif
                         }
                     }
@@ -594,7 +586,7 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
     lv_coord_t col;
     lv_coord_t mem_width = lv_area_get_width(mem_area);
 
-    lv_disp_t * disp = lv_disp_get_active();
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
     if(disp->driver.vdb_wr) {
         for(col = fill_area->x1; col <= fill_area->x2; col++) {
             for(row = fill_area->y1; row <= fill_area->y2; row++) {

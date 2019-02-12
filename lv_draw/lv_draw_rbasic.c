@@ -11,6 +11,7 @@
 
 #include "../lv_hal/lv_hal.h"
 #include "../lv_misc/lv_font.h"
+#include "../lv_core/lv_refr.h"
 #include "lv_draw.h"
 
 /*********************
@@ -84,7 +85,11 @@ void lv_rfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     }
 
     if(union_ok != false) {
-        lv_disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
+
+        lv_disp_t * disp = lv_refr_get_disp_refreshing();
+        if(disp->driver.disp_fill) {
+            disp->driver.disp_fill(masked_area.x1, masked_area.y1, masked_area.x2, masked_area.y2, color);
+        }
     }
 }
 
@@ -227,6 +232,9 @@ void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     /*If there are common part of the mask and map then draw the map*/
     if(union_ok == false) return;
 
+    lv_disp_t * disp =  lv_refr_get_disp_refreshing();
+    if(disp->driver.disp_map == NULL) return;
+
     /*Go to the first pixel*/
     lv_coord_t map_width = lv_area_get_width(cords_p);
     map_p += (masked_a.y1 - cords_p->y1) * map_width * sizeof(lv_color_t);
@@ -236,7 +244,7 @@ void lv_rmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(recolor_opa == LV_OPA_TRANSP && chroma_key == false) {
         lv_coord_t mask_w = lv_area_get_width(&masked_a) - 1;
         for(row = masked_a.y1; row <= masked_a.y2; row++) {
-            lv_disp_map(masked_a.x1, row, masked_a.x1 + mask_w, row, (lv_color_t *)map_p);
+            disp->driver.disp_map(masked_a.x1, row, masked_a.x1 + mask_w, row, (lv_color_t *)map_p);
             map_p += map_width * sizeof(lv_color_t);               /*Next row on the map*/
         }
     } else {

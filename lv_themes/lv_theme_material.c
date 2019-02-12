@@ -72,6 +72,7 @@ static void basic_init(void)
     panel.body.padding.ver = LV_DPI / 8;
     panel.body.padding.inner = LV_DPI / 12;
     panel.text.color = LV_COLOR_HEX3(0x333);
+    panel.image.color = LV_COLOR_HEX3(0x333);
 
     lv_style_copy(&sb, &def);
     sb.body.main_color = LV_COLOR_BLACK;
@@ -109,6 +110,7 @@ static void btn_init(void)
     rel.body.shadow.type = LV_SHADOW_BOTTOM;
     rel.body.shadow.width = 6;
     rel.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
+    rel.image.color = lv_color_hsv_to_rgb(_hue, 5, 95);
 
 
     lv_style_copy(&pr, &rel);
@@ -131,6 +133,7 @@ static void btn_init(void)
     ina.body.grad_color = ina.body.main_color;
     ina.body.shadow.width = 0;
     ina.text.color = lv_color_hsv_to_rgb(_hue, 95, 5);
+    ina.image.color = lv_color_hsv_to_rgb(_hue, 95, 5);
 
     theme.btn.rel = &rel;
     theme.btn.pr = &pr;
@@ -760,6 +763,7 @@ static void win_init(void)
     header.body.padding.hor = 0;
     header.body.padding.ver = 0;
     header.text.color = LV_COLOR_HEX3(0x333);
+    header.image.color = LV_COLOR_HEX3(0x333);
 
     lv_style_copy(&pr, &def);
     pr.body.main_color = LV_COLOR_HEX3(0xbbb);
@@ -768,6 +772,7 @@ static void win_init(void)
     pr.body.empty = 0;
     pr.body.radius = 0;
     pr.text.color = LV_COLOR_HEX3(0x111);
+    pr.image.color = LV_COLOR_HEX3(0x111);
 
 
     theme.win.bg = theme.panel;

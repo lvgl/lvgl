@@ -17,9 +17,7 @@ extern "C" {
  *********************/
 #include <stdbool.h>
 #include <stdint.h>
-#include "lv_hal.h"
 #include "../lv_misc/lv_area.h"
-//#include "../lv_core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -28,6 +26,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _disp_t;
 
 /*Possible input device types*/
 enum {
@@ -62,9 +62,8 @@ typedef struct {
 typedef struct {
     lv_hal_indev_type_t type;                   /*Input device type*/
     bool (*read)(lv_indev_data_t *data);        /*Function pointer to read data. Return 'true' if there is still data to be read (buffered)*/
-    lv_disp_t * disp;
+    struct _disp_t * disp;
     void *user_data;                            /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
-
 } lv_indev_drv_t;
 
 struct _lv_obj_t;
@@ -114,7 +113,6 @@ typedef struct _lv_indev_t {
     lv_indev_proc_t proc;
     lv_indev_feedback_t feedback;
     uint32_t last_activity_time;
-    lv_disp_t * disp;
     union {
         struct _lv_obj_t *cursor;       /*Cursor for LV_INPUT_TYPE_POINTER*/
         struct _lv_group_t *group;      /*Keypad destination group*/

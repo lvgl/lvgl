@@ -11,6 +11,7 @@
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
+#include "lv_hal_disp.h"
 
 #if defined(LV_GC_INCLUDE)
 #   include LV_GC_INCLUDE

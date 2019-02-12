@@ -11,6 +11,7 @@
 
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_core/lv_refr.h"
 #include <stddef.h>
 
 /*********************
@@ -18,6 +19,10 @@
  *********************/
 #ifndef LV_ATTRIBUTE_FLUSH_READY
 #define LV_ATTRIBUTE_FLUSH_READY
+#endif
+
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
 /**********************
@@ -36,7 +41,7 @@
 #if LV_VDB_DOUBLE == 0
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf[LV_VDB_SIZE_IN_BYTES];
+static LV_ATTRIBUTE_MEM_ALIGN uint8_t vdb_buf[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb = {.buf = (lv_color_t *)vdb_buf};
 #  else     /*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
@@ -49,8 +54,8 @@ static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
 static uint8_t vdb_active = 0;
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf1[LV_VDB_SIZE_IN_BYTES];
-static uint8_t vdb_buf2[LV_VDB_SIZE_IN_BYTES];
+static LV_ATTRIBUTE_MEM_ALIGN uint8_t vdb_buf1[LV_VDB_SIZE_IN_BYTES];
+static LV_ATTRIBUTE_MEM_ALIGN uint8_t vdb_buf2[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *) vdb_buf1}, {.buf = (lv_color_t *) vdb_buf2}};
 #  else /*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
@@ -105,7 +110,8 @@ void lv_vdb_flush(void)
     vdb_flushing = true;
 
     /*Flush the rendered content to the display*/
-    lv_disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    if(disp->driver.disp_flush) disp->driver.disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
 
 
 #if LV_VDB_DOUBLE

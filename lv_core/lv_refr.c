@@ -9,10 +9,12 @@
 #include <stddef.h>
 #include "lv_refr.h"
 #include "lv_vdb.h"
+#include "lv_disp.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_mem.h"
+#include "../lv_misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -53,6 +55,7 @@ static uint16_t inv_buf_p;
 static void (*monitor_cb)(uint32_t, uint32_t); /*Monitor the rendering time*/
 static void (*round_cb)(lv_area_t *);          /*If set then called to modify invalidated areas for special display controllers*/
 static uint32_t px_num;
+static lv_disp_t * disp_refr;                   /*Display being refreshed*/
 
 /**********************
  *      MACROS
@@ -172,6 +175,15 @@ void lv_refr_pop_from_buf(uint16_t num)
     else inv_buf_p -= num;
 }
 
+/**
+ * Get the display which is being refreshed
+ * @return the display being refreshed
+ */
+lv_disp_t * lv_refr_get_disp_refreshing(void)
+{
+    return disp_refr;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -184,69 +196,68 @@ static void lv_refr_task(void * param)
 {
     (void)param;
 
-    LV_LOG_TRACE("display refresh task started");
+    LV_LOG_TRACE("lv_refr_task: started");
 
     uint32_t start = lv_tick_get();
 
-    if(lv_disp_get_active() == NULL) {
-        LV_LOG_TRACE("No display is registered");
-        return;
-    }
+    LL_READ(LV_GC_ROOT(_lv_disp_ll), disp_refr) {
+        LV_LOG_TRACE("lv_refr_task: refreshing a display");
 
-    lv_refr_join_area();
+        lv_refr_join_area();
 
-    lv_refr_areas();
+        lv_refr_areas();
 
-    /*If refresh happened ...*/
-    if(inv_buf_p != 0) {
+        /*If refresh happened ...*/
+        if(inv_buf_p != 0) {
 
-        /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
-#if LV_VDB_TRUE_DOUBLE_BUFFERED
-        lv_vdb_t * vdb_p = lv_vdb_get();
-        vdb_p->area.x1 = 0;
-        vdb_p->area.x2 = LV_HOR_RES-1;
-        vdb_p->area.y1 = 0;
-        vdb_p->area.y2 = LV_VER_RES - 1;
+            /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
+    #if LV_VDB_TRUE_DOUBLE_BUFFERED
+            lv_vdb_t * vdb_p = lv_vdb_get();
+            vdb_p->area.x1 = 0;
+            vdb_p->area.x2 = LV_HOR_RES-1;
+            vdb_p->area.y1 = 0;
+            vdb_p->area.y2 = LV_VER_RES - 1;
 
-        /*Flush the content of the VDB*/
-        lv_vdb_flush();
+            /*Flush the content of the VDB*/
+            lv_vdb_flush();
 
-        /* With true double buffering the flushing should be only the address change of the current frame buffer
-         * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
-         * The changes will be written to the new VDB.*/
-        lv_vdb_t * vdb_act = lv_vdb_get_active();
-        lv_vdb_t * vdb_ina = lv_vdb_get_inactive();
+            /* With true double buffering the flushing should be only the address change of the current frame buffer
+             * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
+             * The changes will be written to the new VDB.*/
+            lv_vdb_t * vdb_act = lv_vdb_get_active();
+            lv_vdb_t * vdb_ina = lv_vdb_get_inactive();
 
-        uint8_t * buf_act = (uint8_t *) vdb_act->buf;
-        uint8_t * buf_ina = (uint8_t *) vdb_ina->buf;
+            uint8_t * buf_act = (uint8_t *) vdb_act->buf;
+            uint8_t * buf_ina = (uint8_t *) vdb_ina->buf;
 
-        uint16_t a;
-        for(a = 0; a < inv_buf_p; a++) {
-            if(inv_buf[a].joined == 0) {
-                lv_coord_t y;
-                uint32_t start_offs = ((LV_HOR_RES * inv_buf[a].area.y1 + inv_buf[a].area.x1) * LV_VDB_PX_BPP) >> 3;
-                uint32_t line_length = (lv_area_get_width(&inv_buf[a].area) * LV_VDB_PX_BPP) >> 3;
+            uint16_t a;
+            for(a = 0; a < inv_buf_p; a++) {
+                if(inv_buf[a].joined == 0) {
+                    lv_coord_t y;
+                    uint32_t start_offs = ((LV_HOR_RES * inv_buf[a].area.y1 + inv_buf[a].area.x1) * LV_VDB_PX_BPP) >> 3;
+                    uint32_t line_length = (lv_area_get_width(&inv_buf[a].area) * LV_VDB_PX_BPP) >> 3;
 
-                for(y = inv_buf[a].area.y1; y <= inv_buf[a].area.y2; y++) {
-                    memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
-                    start_offs += (LV_HOR_RES * LV_VDB_PX_BPP) >> 3;
+                    for(y = inv_buf[a].area.y1; y <= inv_buf[a].area.y2; y++) {
+                        memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
+                        start_offs += (LV_HOR_RES * LV_VDB_PX_BPP) >> 3;
+                    }
                 }
             }
-        }
 
-#endif
+    #endif
 
-        /*Clean up*/
-        memset(inv_buf, 0, sizeof(inv_buf));
-        inv_buf_p = 0;
+            /*Clean up*/
+            memset(inv_buf, 0, sizeof(inv_buf));
+            inv_buf_p = 0;
 
-        /*Call monitor cb if present*/
-        if(monitor_cb != NULL) {
-            monitor_cb(lv_tick_elaps(start), px_num);
+            /*Call monitor cb if present*/
+            if(monitor_cb != NULL) {
+                monitor_cb(lv_tick_elaps(start), px_num);
+            }
         }
     }
 
-    LV_LOG_TRACE("display refresh task finished");
+    LV_LOG_TRACE("lv_refr_task: ready");
 }
 
 
@@ -442,14 +453,14 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
     lv_area_intersect(&start_mask, area_p, &vdb_p->area);
 
     /*Get the most top object which is not covered by others*/
-    top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act());
+    top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act(disp_refr));
 
     /*Do the refreshing from the top object*/
     lv_refr_obj_and_children(top_p, &start_mask);
 
     /*Also refresh top and sys layer unconditionally*/
-    lv_refr_obj_and_children(lv_layer_top(), &start_mask);
-    lv_refr_obj_and_children(lv_layer_sys(), &start_mask);
+    lv_refr_obj_and_children(lv_layer_top(disp_refr), &start_mask);
+    lv_refr_obj_and_children(lv_layer_sys(disp_refr), &start_mask);
 
     /* In true double buffered mode flush only once when all areas were rendered.
      * In normal mode flush after every area */
@@ -507,7 +518,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
     /* Normally always will be a top_obj (at least the screen)
      * but in special cases (e.g. if the screen has alpha) it won't.
      * In this case use the screen directly */
-    if(top_p == NULL) top_p = lv_scr_act();
+    if(top_p == NULL) top_p = lv_scr_act(disp_refr);
 
     /*Refresh the top object and its children*/
     lv_refr_obj(top_p, mask_p);

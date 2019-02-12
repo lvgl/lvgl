@@ -40,7 +40,8 @@
 #endif
 #endif     /*LV_MEM_CUSTOM*/
 
-/* Garbage Collector settings.  */
+/* Garbage Collector settings
+ * Used if lvgl is binded to higher language and the memory is managed by that language */
 #ifndef LV_ENABLE_GC
 #define LV_ENABLE_GC 0
 #endif
@@ -89,7 +90,7 @@
  *----------------*/
 
 /* VDB (Virtual Display Buffer) is an internal graphics buffer.
- * To images will be drawn into this buffer first and then
+ * The GUI will be drawn into this buffer first and then
  * the buffer will be passed to your `disp_drv.disp_flush` function to
  * copy it to your frame buffer.
  * VDB is required for: buffered drawing, opacity, anti-aliasing and shadows
@@ -115,7 +116,7 @@
 #define LV_VDB_ADR          0
 #endif
 
-/* Use two Virtual Display buffers (VDB) parallelize rendering and flushing (optional)
+/* Use two Virtual Display buffers (VDB) to parallelize rendering and flushing
  * The flushing should use DMA to write the frame buffer in the background */
 #ifndef LV_VDB_DOUBLE
 #define LV_VDB_DOUBLE       0
@@ -165,7 +166,7 @@
 
 /*Color settings*/
 #ifndef LV_COLOR_DEPTH
-#define LV_COLOR_DEPTH     32                     /*Color depth: 1/8/16/32*/
+#define LV_COLOR_DEPTH     16                     /*Color depth: 1/8/16/32*/
 #endif
 #ifndef LV_COLOR_16_SWAP
 #define LV_COLOR_16_SWAP   0                      /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
@@ -224,6 +225,9 @@
 #ifndef LV_ATTRIBUTE_TASK_HANDLER
 #define LV_ATTRIBUTE_TASK_HANDLER               /* Define a custom attribute to `lv_task_handler` function */
 #endif
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN                  /* With size optimization (-Os) the compiler might not align data to 4 or 8 byte boundary. This alignment will be explicitly applied where needed.*/
+#endif
 #ifndef LV_COMPILER_VLA_SUPPORTED
 #define LV_COMPILER_VLA_SUPPORTED            1  /* 1: Variable length array is supported*/
 #endif
@@ -237,7 +241,7 @@
 #endif
 #if LV_TICK_CUSTOM == 1
 #ifndef LV_TICK_CUSTOM_INCLUDE
-#define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"         /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "sonething.h"         /*Header for the sys time function*/
 #endif
 #ifndef LV_TICK_CUSTOM_SYS_TIME_EXPR
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current systime in ms*/
@@ -262,7 +266,7 @@
 /* 1: Print the log with 'printf'; 0: user need to register a callback*/
 
 #ifndef LV_LOG_PRINTF
-#  define LV_LOG_PRINTF   1
+#  define LV_LOG_PRINTF   0
 #endif
 #endif  /*USE_LV_LOG*/
 
@@ -386,7 +390,7 @@
 #define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
 #endif
 #ifndef LV_OBJ_REALIGN
-#define LV_OBJ_REALIGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+#define LV_OBJ_REALIGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 #endif
 
 /*==================

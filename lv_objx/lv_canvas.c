@@ -340,9 +340,27 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
     lv_coord_t j;
     for(i = 0; i < h; i++) {
         for(j = 0; j < w; j++) {
+#if LV_COLOR_DEPTH == 32
             canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 8;
             canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 8;
             canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 8;
+#elif LV_COLOR_DEPTH == 16
+
+            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 5;
+            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 5;
+#  if LV_COLOR_16_SWAP == 0
+            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 6;
+#  else
+            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 6;
+            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 6;
+            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 6;
+#  endif    /*LV_COLOR_16_SWAP*/
+
+#elif LV_COLOR_DEPTH == 8
+            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 3;
+            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 3;
+            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 2;
+#endif
         }
         copy_buf_color += w;
         canvas_buf_color += ext->dsc.header.w;

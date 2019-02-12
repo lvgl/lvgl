@@ -1,9 +1,9 @@
 <h1 align="center"> LittlevGL - Open-source Embedded GUI Library</h1>
 <p align="center">
-<img src="https://img.shields.io/badge/licence-MIT-blue.svg">
-<img src="https://img.shields.io/badge/version-v5.2-blue.svg">
+<a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
+<a href="https://github.com/littlevgl/lvgl/releases/tag/v5.3"><img src="https://img.shields.io/badge/version-5.3-blue.svg"></a>
 <br>
-<img src="https://littlevgl.com/github/cover3.gif">
+<img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
 </p>
 
 <p align="center">
@@ -62,7 +62,7 @@ The easiest way to get started with LittlevGL is to run it in a simulator on you
 
 Choose a project with your favourite IDE:
 
-|   Eclipse   | CodeBlock  | Visual Studio | PlatfomIO | Qt Creator |
+|   Eclipse   | CodeBlock  | Visual Studio | PlatformIO | Qt Creator |
 |-------------|----------- |---------------|-----------|------------|
 |  [![Eclipse](https://littlevgl.com/logo/ide/eclipse.jpg)](https://github.com/littlevgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://littlevgl.com/logo/ide/codeblocks.jpg)](https://github.com/littlevgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://littlevgl.com/logo/ide/visualstudio.jpg)](https://github.com/littlevgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://littlevgl.com/logo/ide/platformio.jpg)](https://github.com/littlevgl/pc_simulator_sdl_platformio) | [![QtCreator](https://littlevgl.com/logo/ide/qtcreator.jpg)](https://blog.littlevgl.com/2019-01-03/qt-creator) |
 | Cross-platform<br>with SDL | Native Windows | Cross-platform<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
@@ -105,20 +105,20 @@ bool touchpad_read(lv_indev_data_t * data)
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
 
-    /*Save the state and save the pressed cooridnate*/
+    /*Save the state and save the pressed coordinate*/
     data->state = touchpad_is_pressed() ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL; 
     if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
    
-    /*Set the coordinates (if released use the last pressed cooridantes)*/
+    /*Set the coordinates (if released use the last pressed coordinates)*/
     data->point.x = last_x;
     data->point.y = last_y;
 
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 ```
-6. Call `lv_task_handler()` periodically every few milliseconds.
+6. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in Timer interrupt or in an Operation system task.
 
-For a detailed description check the [Online documatation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
+For a detailed description check the [Documentation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
  
  
 ### Code examples
@@ -154,15 +154,15 @@ style_btn_rel.body.radius = LV_RADIUS_CIRCLE;
 style_btn_rel.text.color = LV_COLOR_HEX3(0xDEF);
 
 static lv_style_t style_btn_pr;                         /*A variable to store the pressed style*/
-lv_style_copy(&style_btn_pr, &style_btn_rel);           /*Initialize from a built-in style*/
+lv_style_copy(&style_btn_pr, &style_btn_rel);           /*Initialize from the released style*/
 style_btn_pr.body.border.color = LV_COLOR_HEX3(0x46B);
 style_btn_pr.body.main_color = LV_COLOR_HEX3(0x8BD);
 style_btn_pr.body.grad_color = LV_COLOR_HEX3(0x24A);
 style_btn_pr.body.shadow.width = 2;
 style_btn_pr.text.color = LV_COLOR_HEX3(0xBCD);
 
-lv_btn_set_style(btn, LV_BTN_STYLE_REL, &style_btn_rel);    /*Set the buton's released style*/
-lv_btn_set_style(btn, LV_BTN_STYLE_PR, &style_btn_pr);      /*Set the buton's pressed style*/
+lv_btn_set_style(btn, LV_BTN_STYLE_REL, &style_btn_rel);    /*Set the button's released style*/
+lv_btn_set_style(btn, LV_BTN_STYLE_PR, &style_btn_pr);      /*Set the button's pressed style*/
 ```
 
 ![Simple button with LittelvGL](https://littlevgl.com/github/btn2.gif)

@@ -36,7 +36,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_disp_t * active;
 
 /**********************
  *      MACROS
@@ -91,11 +90,14 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     node->act_scr = lv_obj_create(NULL, NULL);  /*Create a default screen on the display*/
     node->top_layer = lv_obj_create(NULL, NULL);  /*Create top layer on the display*/
+    node->sys_layer = lv_obj_create(NULL, NULL);  /*Create top layer on the display*/
+    lv_obj_set_style(node->top_layer, &lv_style_transp);
+    lv_obj_set_style(node->sys_layer, &lv_style_transp);
 
     return node;
 }
 
-void * lv_disp_get_next(lv_disp_t * disp)
+lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
 {
     if(disp == NULL) return lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
     else return lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
@@ -121,7 +123,7 @@ lv_disp_t * lv_disp_next(lv_disp_t * disp)
 
 lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_active();
+    if(disp == NULL) disp = lv_disp_get_last();
 
     if(disp == NULL) return LV_HOR_RES_MAX;
     else return disp->driver.hor_res;
@@ -130,115 +132,11 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
 
 lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_active();
+    if(disp == NULL) disp = lv_disp_get_last();
 
     if(disp == NULL) return LV_VER_RES_MAX;
     else return disp->driver.ver_res;
 }
-
-/**
- * Write the content of the internal buffer (VDB) to the display
- * @param x1 left coordinate of the rectangle
- * @param x2 right coordinate of the rectangle
- * @param y1 top coordinate of the rectangle
- * @param y2 bottom coordinate of the rectangle
- * @param color_p fill color
- */
-void lv_disp_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color)
-{
-    if(active == NULL) return;
-    if(active->driver.disp_fill != NULL) active->driver.disp_fill(x1, y1, x2, y2, color);
-}
-
-/**
- * Fill a rectangular area with a color on the active display
- * @param x1 left coordinate of the rectangle
- * @param x2 right coordinate of the rectangle
- * @param y1 top coordinate of the rectangle
- * @param y2 bottom coordinate of the rectangle
- * @param color_p pointer to an array of colors
- */
-void lv_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t * color_p)
-{
-    if(active == NULL) return;
-    if(active->driver.disp_flush != NULL) {
-
-        LV_LOG_TRACE("disp flush  started");
-        active->driver.disp_flush(x1, y1, x2, y2, color_p);
-        LV_LOG_TRACE("disp flush ready");
-
-    } else {
-        LV_LOG_WARN("disp flush function registered");
-    }
-}
-
-/**
- * Put a color map to a rectangular area on the active display
- * @param x1 left coordinate of the rectangle
- * @param x2 right coordinate of the rectangle
- * @param y1 top coordinate of the rectangle
- * @param y2 bottom coordinate of the rectangle
- * @param color_map pointer to an array of colors
- */
-void lv_disp_map(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_map)
-{
-    if(active == NULL) return;
-    if(active->driver.disp_map != NULL)  active->driver.disp_map(x1, y1, x2, y2, color_map);
-}
-
-#if USE_LV_GPU
-
-/**
- * Blend pixels to a destination memory from a source memory
- * In 'lv_disp_drv_t' 'mem_blend' is optional. (NULL if not available)
- * @param dest a memory address. Blend 'src' here.
- * @param src pointer to pixel map. Blend it to 'dest'.
- * @param length number of pixels in 'src'
- * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
- */
-void lv_disp_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
-{
-    if(active == NULL) return;
-    if(active->driver.mem_blend != NULL) active->driver.mem_blend(dest, src, length, opa);
-}
-
-/**
- * Fill a memory with a color (GPUs may support it)
- * In 'lv_disp_drv_t' 'mem_fill' is optional. (NULL if not available)
- * @param dest a memory address. Copy 'src' here.
- * @param src pointer to pixel map. Copy it to 'dest'.
- * @param length number of pixels in 'src'
- * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
- */
-void lv_disp_mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color)
-{
-    if(active == NULL) return;
-    if(active->driver.mem_fill != NULL) active->driver.mem_fill(dest, length, color);
-}
-
-/**
- * Shows if memory blending (by GPU) is supported or not
- * @return false: 'mem_blend' is not supported in the driver; true: 'mem_blend' is supported in the driver
- */
-bool lv_disp_is_mem_blend_supported(void)
-{
-    if(active == NULL) return false;
-    if(active->driver.mem_blend) return true;
-    else return false;
-}
-
-/**
- * Shows if memory fill (by GPU) is supported or not
- * @return false: 'mem_fill' is not supported in the drover; true: 'mem_fill' is supported in the driver
- */
-bool lv_disp_is_mem_fill_supported(void)
-{
-    if(active == NULL) return false;
-    if(active->driver.mem_fill) return true;
-    else return false;
-}
-
-#endif
 
 /**********************
  *   STATIC FUNCTIONS

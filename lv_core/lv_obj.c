@@ -50,6 +50,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  *  STATIC VARIABLES
  **********************/
 
+static bool _lv_initialized = false;
+
 /**********************
  *      MACROS
  **********************/
@@ -63,6 +65,12 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  */
 void lv_init(void)
 {
+    /* Do nothing if already initialized */
+    if (_lv_initialized) {
+        LV_LOG_WARN("lv_init: already inited");
+        return;
+    }
+
     LV_LOG_TRACE("lv_init started");
 
     /*Initialize the lv_misc modules*/
@@ -94,7 +102,7 @@ void lv_init(void)
     lv_indev_init();
 #endif
 
-
+    _lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
 }
 
@@ -405,7 +413,8 @@ void lv_obj_invalidate(const lv_obj_t * obj)
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     lv_disp_t * disp = lv_scr_get_disp(obj_scr);
     if(obj_scr == lv_scr_act(disp) ||
-            obj_scr == lv_layer_top(disp)) {
+            obj_scr == lv_layer_top(disp)||
+            obj_scr == lv_layer_sys(disp)) {
         /*Truncate recursively to the parents*/
         lv_area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
@@ -1315,7 +1324,7 @@ lv_obj_t * lv_scr_act(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_last();
     if(!disp) {
-        LV_LOG_WARN("lv_layer_top: no display registered to get its top layer");
+        LV_LOG_WARN("lv_scr_act: no display registered to get its top layer");
         return NULL;
     }
 
@@ -1335,6 +1344,21 @@ lv_obj_t * lv_layer_top(lv_disp_t * disp)
     }
 
     return disp->top_layer;
+}
+
+/**
+ * Return with the sys. layer. (Same on every screen and it is above the normal screen layer)
+ * @return pointer to the sys layer object  (transparent screen sized lv_obj)
+ */
+lv_obj_t * lv_layer_sys(lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_last();
+    if(!disp) {
+        LV_LOG_WARN("lv_layer_sys: no display registered to get its top layer");
+        return NULL;
+    }
+
+    return disp->sys_layer;
 }
 
 /**
