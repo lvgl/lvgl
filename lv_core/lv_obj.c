@@ -38,9 +38,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
+static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
-static void refresh_childen_style(lv_obj_t * obj);
+static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -551,7 +551,7 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->coords.x2 += diff.x;
     obj->coords.y2 += diff.y;
 
-    refresh_childen_position(obj, diff.x, diff.y);
+    refresh_children_position(obj, diff.x, diff.y);
 
     /*Inform the object about its new coordinates*/
     obj->signal_func(obj, LV_SIGNAL_CORD_CHG, &ori);
@@ -987,7 +987,7 @@ void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
     obj->style_p = style;
 
     /*Send a signal about style change to every children with NULL style*/
-    refresh_childen_style(obj);
+    refresh_children_style(obj);
 
     /*Notify the object about the style change too*/
     lv_obj_refresh_style(obj);
@@ -1872,7 +1872,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
  * @param x_diff x coordinate shift
  * @param y_diff y coordinate shift
  */
-static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
+static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
 {
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
@@ -1881,7 +1881,7 @@ static void refresh_childen_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord
         i->coords.x2 += x_diff;
         i->coords.y2 += y_diff;
 
-        refresh_childen_position(i, x_diff, y_diff);
+        refresh_children_position(i, x_diff, y_diff);
     }
 }
 
@@ -1895,7 +1895,7 @@ static void report_style_mod_core(void * style_p, lv_obj_t * obj)
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
         if(i->style_p == style_p || style_p == NULL) {
-            refresh_childen_style(i);
+            refresh_children_style(i);
             lv_obj_refresh_style(i);
         }
 
@@ -1908,16 +1908,16 @@ static void report_style_mod_core(void * style_p, lv_obj_t * obj)
  * because the NULL styles are inherited from the parent
  * @param obj pointer to an object
  */
-static void refresh_childen_style(lv_obj_t * obj)
+static void refresh_children_style(lv_obj_t * obj)
 {
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child != NULL) {
         if(child->style_p == NULL) {
-            refresh_childen_style(child);     /*Check children too*/
+            refresh_children_style(child);     /*Check children too*/
             lv_obj_refresh_style(child);       /*Notify the child about the style change*/
         } else if(child->style_p->glass) {
             /*Children with 'glass' parent might be effected if their style == NULL*/
-            refresh_childen_style(child);
+            refresh_children_style(child);
         }
         child = lv_obj_get_child(obj, child);
     }
