@@ -376,8 +376,8 @@ lv_theme_t * lv_theme_default_init(uint16_t hue, lv_font_t * font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t ** style_p = (lv_style_t **) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme.style;
+    for(i = 0; i < LV_THEME_STYLE_COUNT; i++) {
         *style_p = &def;
         style_p++;
     }

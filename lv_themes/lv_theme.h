@@ -314,6 +314,9 @@ lv_theme_t * lv_theme_get_current(void);
  *    MACROS
  **********************/
 
+/* Returns number of styles within the `lv_theme_t` structure. */
+#define LV_THEME_STYLE_COUNT    (sizeof(((lv_theme_t *)0)->style) / sizeof(lv_style_t *))
+
 /**********************
  *     POST INCLUDE
  *********************/

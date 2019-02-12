@@ -35,7 +35,7 @@ static lv_theme_t * current_theme;
  * (The pointers in the theme points to the styles declared by the theme itself) */
 
 /* Store the styles in this array. */
-static lv_style_t th_styles[sizeof(((lv_theme_t *)0)->style) / sizeof(lv_style_t *)];
+static lv_style_t th_styles[LV_THEME_STYLE_COUNT];
 static bool inited = false;
 static lv_theme_t current_theme;
 #endif
