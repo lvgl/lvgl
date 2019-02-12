@@ -110,6 +110,7 @@ static void btn_init(void)
     rel.body.shadow.type = LV_SHADOW_BOTTOM;
     rel.body.shadow.width = 6;
     rel.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
+    rel.image.color = lv_color_hsv_to_rgb(_hue, 5, 95);
 
 
     lv_style_copy(&pr, &rel);
@@ -132,6 +133,7 @@ static void btn_init(void)
     ina.body.grad_color = ina.body.main_color;
     ina.body.shadow.width = 0;
     ina.text.color = lv_color_hsv_to_rgb(_hue, 95, 5);
+    ina.image.color = lv_color_hsv_to_rgb(_hue, 95, 5);
 
     theme.btn.rel = &rel;
     theme.btn.pr = &pr;

@@ -157,6 +157,7 @@ static void btn_init(void)
     btn_rel.body.padding.inner = LV_DPI / 10;
     btn_rel.text.color = lv_color_hsv_to_rgb(_hue, 8, 96);
     btn_rel.text.font = _font;
+    btn_rel.image.color = lv_color_hsv_to_rgb(_hue, 8, 96);
 
     lv_style_copy(&btn_pr, &btn_rel);
     btn_pr.body.opa = LV_OPA_COVER;
@@ -166,6 +167,7 @@ static void btn_init(void)
     btn_pr.body.border.opa = LV_OPA_60;
     btn_pr.text.font = _font;
     btn_pr.text.color = lv_color_hsv_to_rgb(_hue, 10, 100);
+    btn_pr.image.color = lv_color_hsv_to_rgb(_hue, 10, 100);
 
     lv_style_copy(&btn_trel, &btn_pr);
     btn_trel.body.opa = LV_OPA_COVER;
@@ -176,6 +178,7 @@ static void btn_init(void)
     btn_trel.body.border.color = lv_color_hsv_to_rgb(_hue, 80, 90);
     btn_trel.text.font = _font;
     btn_trel.text.color = lv_color_hsv_to_rgb(_hue, 0, 100);
+    btn_trel.image.color = lv_color_hsv_to_rgb(_hue, 0, 100);
 
     lv_style_copy(&btn_tpr, &btn_trel);
     btn_tpr.body.opa = LV_OPA_COVER;
@@ -186,6 +189,7 @@ static void btn_init(void)
     btn_tpr.body.border.color = lv_color_hsv_to_rgb(_hue, 80, 70);
     btn_tpr.text.font = _font;
     btn_tpr.text.color = lv_color_hsv_to_rgb(_hue, 10, 90);
+    btn_tpr.image.color = lv_color_hsv_to_rgb(_hue, 10, 90);
 
     lv_style_copy(&btn_ina, &btn_rel);
     btn_ina.body.border.opa = LV_OPA_60;

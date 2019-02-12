@@ -107,19 +107,23 @@ static void btn_init(void)
     rel.body.padding.hor = LV_DPI / 4;
     rel.body.padding.ver = LV_DPI / 8;
     rel.text.color = lv_color_hsv_to_rgb(_hue, 40, 90);
+    rel.image.color = lv_color_hsv_to_rgb(_hue, 40, 90);
 
     lv_style_copy(&pr, &rel);
     pr.body.border.color = lv_color_hsv_to_rgb(_hue, 40, 60);
     pr.body.shadow.width = 0;
     pr.text.color = lv_color_hsv_to_rgb(_hue, 40, 60);
+    pr.image.color = lv_color_hsv_to_rgb(_hue, 40, 60);
 
     lv_style_copy(&tgl_pr, &pr);
     tgl_pr.body.border.color = lv_color_hsv_to_rgb(_hue, 40, 50);
     tgl_pr.text.color = lv_color_hsv_to_rgb(_hue, 40, 50);
+    tgl_pr.image.color = lv_color_hsv_to_rgb(_hue, 40, 50);
 
     lv_style_copy(&ina, &tgl_pr);
     ina.body.border.color = LV_COLOR_HEX3(0xbbb);
     ina.text.color = LV_COLOR_HEX3(0xbbb);
+    ina.image.color = LV_COLOR_HEX3(0xbbb);
 
     theme.btn.rel = &rel;
     theme.btn.pr = &pr;
