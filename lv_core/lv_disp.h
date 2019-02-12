@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_hal/lv_hal.h"
+#include "lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -26,6 +27,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
 /**
  * Get the number of areas in the buffer

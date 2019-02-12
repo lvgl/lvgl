@@ -111,7 +111,7 @@ void lv_vdb_flush(void)
 
     /*Flush the rendered content to the display*/
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    if(disp->driver.disp_flush) disp->driver.disp_flush(vdb_act->area.x1, vdb_act->area.y1, vdb_act->area.x2, vdb_act->area.y2, vdb_act->buf);
+    if(disp->driver.disp_flush) disp->driver.disp_flush(disp, &vdb_act->area, vdb_act->buf);
 
 
 #if LV_VDB_DOUBLE

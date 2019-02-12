@@ -33,6 +33,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct _disp_t;
+
 /**
  * Display Driver structure to be registered by HAL
  */
@@ -42,7 +44,7 @@ typedef struct _disp_drv_t {
     lv_coord_t ver_res;
 
     /*Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished*/
-    void (*disp_flush)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
+    void (*disp_flush)(struct _disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
 
     /*Fill an area with a color on the display*/
     void (*disp_fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color);
@@ -68,15 +70,16 @@ typedef struct _disp_drv_t {
 struct _lv_obj_t;
 
 typedef struct _disp_t {
+    void * user_data;
     lv_disp_drv_t driver;
-    lv_area_t inv_areas[LV_INV_BUF_SIZE];
-    uint8_t inv_area_joined[LV_INV_BUF_SIZE];
-    uint16_t inv_p;
     lv_ll_t scr_ll;
     struct _lv_obj_t * act_scr;
     struct _lv_obj_t * top_layer;
     struct _lv_obj_t * sys_layer;
-    uint8_t orientation:2;
+    lv_area_t inv_areas[LV_INV_BUF_SIZE];
+    uint8_t inv_area_joined[LV_INV_BUF_SIZE];
+    uint16_t inv_p        :10;
+    uint16_t orientation  :2;
 } lv_disp_t;
 
 /**********************
