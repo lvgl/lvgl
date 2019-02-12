@@ -79,9 +79,12 @@ static volatile bool vdb_flushing = false;
  */
 lv_vdb_t * lv_vdb_get(void)
 {
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+
 #if LV_VDB_DOUBLE == 0
     /* Wait until VDB is flushing.
      * (Until this user calls of 'lv_flush_ready()' in the display drivers's flush function*/
+
     while(vdb_flushing);
 
     return &vdb;

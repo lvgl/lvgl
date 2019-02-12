@@ -48,13 +48,13 @@ typedef uint8_t lv_indev_state_t;
 
 /*Data type when an input device is read */
 typedef struct {
+    void *user_data;           /*'lv_indev_drv_t.priv' for this driver*/
     union {
         lv_point_t point;      /*For LV_INDEV_TYPE_POINTER the currently pressed point*/
         uint32_t key;          /*For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
         uint32_t btn;          /*For LV_INDEV_TYPE_BUTTON the currently pressed button*/
         int16_t enc_diff;      /*For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
     };
-    void *user_data;           /*'lv_indev_drv_t.priv' for this driver*/
     lv_indev_state_t state;    /*LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
 } lv_indev_data_t;
 

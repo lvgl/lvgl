@@ -66,6 +66,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 
 #if LV_VDB_SIZE
     driver->vdb_wr = NULL;
+    driver->vdb = NULL;
+    driver->vdb2 = NULL;
+    driver->vdb_size = 0;
+    driver->vdb_double = 0;
 #endif
 }
 
@@ -77,26 +81,27 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 {
-
-    lv_disp_t * node = lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
-    if(!node) {
-        lv_mem_assert(node);
+    lv_disp_t * disp = lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
+    if(!disp) {
+        lv_mem_assert(disp);
         return NULL;
     }
 
-    memcpy(&node->driver, driver, sizeof(lv_disp_drv_t));
+    memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
 
-    lv_ll_init(&node->scr_ll, sizeof(lv_obj_t));
+    lv_ll_init(&disp->scr_ll, sizeof(lv_obj_t));
 
-    node->act_scr = lv_obj_create(NULL, NULL);  /*Create a default screen on the display*/
-    node->top_layer = lv_obj_create(NULL, NULL);  /*Create top layer on the display*/
-    node->sys_layer = lv_obj_create(NULL, NULL);  /*Create top layer on the display*/
-    lv_obj_set_style(node->top_layer, &lv_style_transp);
-    lv_obj_set_style(node->sys_layer, &lv_style_transp);
+    disp->act_scr = lv_obj_create(NULL, NULL);  /*Create a default screen on the display*/
+    disp->top_layer = lv_obj_create(NULL, NULL);  /*Create top layer on the display*/
+    disp->sys_layer = lv_obj_create(NULL, NULL);  /*Create top layer on the display*/
+    lv_obj_set_style(disp->top_layer, &lv_style_transp);
+    lv_obj_set_style(disp->sys_layer, &lv_style_transp);
 
-    node->inv_p = 0;
+    disp->inv_p = 0;
+    disp->vdb_act = 0;
+    disp->vdb_flushing = 0;
 
-    return node;
+    return disp;
 }
 
 lv_disp_t * lv_disp_get_next(lv_disp_t * disp)

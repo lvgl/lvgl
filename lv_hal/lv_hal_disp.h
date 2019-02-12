@@ -39,6 +39,8 @@ struct _disp_t;
  * Display Driver structure to be registered by HAL
  */
 typedef struct _disp_drv_t {
+    void * user_data;
+
     lv_coord_t hor_res;
 
     lv_coord_t ver_res;
@@ -62,6 +64,11 @@ typedef struct _disp_drv_t {
 #endif
 
 #if LV_VDB_SIZE
+    void * vdb;
+    void * vdb2;
+    uint32_t vdb_size;
+    uint32_t vdb_double :1;
+
     /*Optional: Set a pixel in a buffer according to the requirements of the display*/
     void (*vdb_wr)(uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
 #endif
@@ -70,7 +77,6 @@ typedef struct _disp_drv_t {
 struct _lv_obj_t;
 
 typedef struct _disp_t {
-    void * user_data;
     lv_disp_drv_t driver;
     lv_ll_t scr_ll;
     struct _lv_obj_t * act_scr;
@@ -78,8 +84,10 @@ typedef struct _disp_t {
     struct _lv_obj_t * sys_layer;
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
-    uint16_t inv_p        :10;
-    uint16_t orientation  :2;
+    uint32_t inv_p        :10;
+    uint32_t orientation  :2;
+    uint32_t vdb_flushing :1;
+    uint32_t vdb_act      :1;
 } lv_disp_t;
 
 /**********************
