@@ -82,7 +82,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing image button*/
     else {
 #if LV_IMGBTN_TILED == 0
-        memset(ext->img_src, 0, sizeof(ext->img_src));
+        memcpy(ext->img_src, copy_ext->img_src, sizeof(ext->img_src));
 #else
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
