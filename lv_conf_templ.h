@@ -136,6 +136,7 @@
 /*Compiler settings*/
 #define LV_ATTRIBUTE_TICK_INC                   /* Define a custom attribute to `lv_tick_inc` function */
 #define LV_ATTRIBUTE_TASK_HANDLER               /* Define a custom attribute to `lv_task_handler` function */
+#define LV_ATTRIBUTE_MEM_ALIGN                  /* With size optimization (-Os) the compiler might not align data to 4 or 8 byte boundary. This alignment will be explicitly applied where needed.*/
 #define LV_COMPILER_VLA_SUPPORTED            1  /* 1: Variable length array is supported*/
 #define LV_COMPILER_NON_CONST_INIT_SUPPORTED 1  /* 1: Initialization with non constant values are supported */
 
