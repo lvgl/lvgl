@@ -8,6 +8,7 @@
  *********************/
 #include "lv_group.h"
 #if USE_LV_GROUP != 0
+#include "../lv_themes/lv_theme.h"
 #include <stddef.h>
 
 /*********************
@@ -48,13 +49,14 @@ lv_group_t * lv_group_create(void)
     if(group == NULL) return NULL;
     lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
-    group->style_mod = style_mod_def;
-    group->style_mod_edit = style_mod_edit_def;
     group->obj_focus = NULL;
     group->frozen = 0;
     group->focus_cb = NULL;
     group->click_focus = 1;
     group->editing = 0;
+
+    /*Initialize style modification callbacks from current theme*/
+    lv_group_report_style_mod(group);
 
     return group;
 }
@@ -520,6 +522,23 @@ static void style_mod_edit_def(lv_style_t * style)
 
 #endif
 
+}
+
+/**
+ * Notify the group that current theme changed and style modification callbacks need to be refreshed.
+ * @param group pointer to group
+ */
+void lv_group_report_style_mod(lv_group_t * group)
+{
+    group->style_mod = style_mod_def;
+    group->style_mod_edit = style_mod_edit_def;
+    lv_theme_t * th = lv_theme_get_current();
+    if(th) {
+        if (th->group.style_mod)
+            group->style_mod = th->group.style_mod;
+        if (th->group.style_mod_edit)
+            group->style_mod_edit = th->group.style_mod_edit;
+    }
 }
 
 #endif /*USE_LV_GROUP != 0*/

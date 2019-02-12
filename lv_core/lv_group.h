@@ -236,6 +236,12 @@ bool lv_group_get_click_focus(const lv_group_t * group);
  */
 bool lv_group_get_wrap(lv_group_t * group);
 
+/**
+ * Notify the group that current theme changed and style modification callbacks need to be refreshed.
+ * @param group pointer to group
+ */
+void lv_group_report_style_mod(lv_group_t * group);
+
 /**********************
  *      MACROS
  **********************/

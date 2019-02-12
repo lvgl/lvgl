@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_style.h"
+#include "../lv_core/lv_group.h"
 
 /*********************
  *    DEFINES
@@ -291,6 +292,12 @@ typedef struct {
         } win;
 #endif
     } style;
+
+    struct
+    {
+        lv_group_style_mod_func_t style_mod;
+        lv_group_style_mod_func_t style_mod_edit;
+    } group;
 } lv_theme_t;
 
 /**********************
