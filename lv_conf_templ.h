@@ -382,6 +382,13 @@
 /*************************
  * Non-user section
  *************************/
+
+#if LV_INDEV_DRAG_THROW <= 0
+#warning "LV_INDEV_DRAG_THROW must be greater than 0"
+#undef LV_INDEV_DRAG_THROW
+#define LV_INDEV_DRAG_THROW 1
+#endif
+
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
 #  define _CRT_SECURE_NO_WARNINGS
 #endif
