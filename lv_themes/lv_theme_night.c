@@ -59,6 +59,7 @@ static void basic_init(void)
     bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 11, 30);
     bg.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
     bg.text.font = _font;
+    bg.image.color = lv_color_hsv_to_rgb(_hue, 5, 95);
 
     lv_style_copy(&sb, &def);
     sb.body.main_color = lv_color_hsv_to_rgb(_hue, 30, 60);
@@ -109,6 +110,7 @@ static void btn_init(void)
     btn_rel.body.shadow.color = LV_COLOR_HEX3(0x111);
     btn_rel.body.shadow.width = LV_DPI / 30;
     btn_rel.text.color = LV_COLOR_HEX3(0xeee);
+    btn_rel.image.color  = LV_COLOR_HEX3(0xeee);
 
     lv_style_copy(&btn_pr, &btn_rel);
     btn_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 30);
@@ -119,18 +121,21 @@ static void btn_init(void)
     btn_tgl_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 40);
     btn_tgl_rel.body.shadow.width = LV_DPI / 40;
     btn_tgl_rel.text.color = LV_COLOR_HEX3(0xddd);
+    btn_tgl_rel.image.color = LV_COLOR_HEX3(0xddd);
 
     lv_style_copy(&btn_tgl_pr, &btn_rel);
     btn_tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     btn_tgl_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 30);
     btn_tgl_pr.body.shadow.width = LV_DPI / 30;
     btn_tgl_pr.text.color = LV_COLOR_HEX3(0xddd);
+    btn_tgl_pr.image.color = LV_COLOR_HEX3(0xddd);
 
     lv_style_copy(&btn_ina, &btn_rel);
     btn_ina.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     btn_ina.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
-    btn_ina.text.color = LV_COLOR_HEX3(0xaaa);
     btn_ina.body.shadow.width = 0;
+    btn_ina.text.color = LV_COLOR_HEX3(0xaaa);
+    btn_ina.image.color = LV_COLOR_HEX3(0xaaa);
 
     theme.btn.rel = &btn_rel;
     theme.btn.pr = &btn_pr;
@@ -678,6 +683,7 @@ static void win_init(void)
     win_btn_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     win_btn_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     win_btn_pr.text.color = LV_COLOR_HEX3(0xaaa);
+    win_btn_pr.image.color = LV_COLOR_HEX3(0xaaa);
 
     theme.win.bg = &win_bg;
     theme.win.sb = &sb;

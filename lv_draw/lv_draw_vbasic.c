@@ -30,6 +30,10 @@
  *********************/
 #define VFILL_HW_ACC_SIZE_LIMIT    50      /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
 
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -147,7 +151,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
 
 #if USE_LV_GPU
-    static lv_color_t color_array_tmp[LV_HOR_RES];       /*Used by 'lv_disp_mem_blend'*/
+    static LV_ATTRIBUTE_MEM_ALIGN lv_color_t color_array_tmp[LV_HOR_RES];       /*Used by 'lv_disp_mem_blend'*/
     static lv_coord_t last_width = -1;
 
     lv_coord_t w = lv_area_get_width(&vdb_rel_a);
@@ -529,21 +533,6 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                             vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
 #else
                             vdb_buf_tmp[col] = color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].alpha, px_color,  opa_result);
-//                            if(vdb_buf_tmp[col].alpha == LV_OPA_TRANSP) {
-//                                /* When it is the first visible pixel on the transparent screen
-//                                 * simlply use this color and set the pixel opa as backrounds alpha*/
-//                                vdb_buf_tmp[col] = px_color;
-//                                vdb_buf_tmp[col].alpha = opa_result;
-//                            } else {
-//                                /* If already this pixel is already written then for performance reasons
-//                                 * don't care with alpha channel
-//                                 */
-//                                lv_opa_t bg_opa = vdb_buf_tmp[col].alpha;
-//                                vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
-//
-//                                uint16_t opa_tmp = (uint16_t)opa_result + ((bg_opa * (255 - opa_result)) >> 8);
-//                                vdb_buf_tmp[col].alpha = opa_tmp > 0xFF ? 0xFF : opa_tmp ;
-//                            }
 #endif
                         }
                     }

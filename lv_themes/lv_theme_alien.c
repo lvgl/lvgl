@@ -114,6 +114,7 @@ static void basic_init(void)
     panel.body.border.width = 2;
     panel.body.border.opa = LV_OPA_60;
     panel.text.color = lv_color_hsv_to_rgb(_hue, 8, 96);
+    panel.image.color = lv_color_hsv_to_rgb(_hue, 8, 96);
     panel.line.color = lv_color_hsv_to_rgb(_hue, 20, 70);
 
     /*Scrollbar*/
@@ -156,6 +157,7 @@ static void btn_init(void)
     btn_rel.body.padding.inner = LV_DPI / 10;
     btn_rel.text.color = lv_color_hsv_to_rgb(_hue, 8, 96);
     btn_rel.text.font = _font;
+    btn_rel.image.color = lv_color_hsv_to_rgb(_hue, 8, 96);
 
     lv_style_copy(&btn_pr, &btn_rel);
     btn_pr.body.opa = LV_OPA_COVER;
@@ -165,6 +167,7 @@ static void btn_init(void)
     btn_pr.body.border.opa = LV_OPA_60;
     btn_pr.text.font = _font;
     btn_pr.text.color = lv_color_hsv_to_rgb(_hue, 10, 100);
+    btn_pr.image.color = lv_color_hsv_to_rgb(_hue, 10, 100);
 
     lv_style_copy(&btn_trel, &btn_pr);
     btn_trel.body.opa = LV_OPA_COVER;
@@ -175,6 +178,7 @@ static void btn_init(void)
     btn_trel.body.border.color = lv_color_hsv_to_rgb(_hue, 80, 90);
     btn_trel.text.font = _font;
     btn_trel.text.color = lv_color_hsv_to_rgb(_hue, 0, 100);
+    btn_trel.image.color = lv_color_hsv_to_rgb(_hue, 0, 100);
 
     lv_style_copy(&btn_tpr, &btn_trel);
     btn_tpr.body.opa = LV_OPA_COVER;
@@ -185,6 +189,7 @@ static void btn_init(void)
     btn_tpr.body.border.color = lv_color_hsv_to_rgb(_hue, 80, 70);
     btn_tpr.text.font = _font;
     btn_tpr.text.color = lv_color_hsv_to_rgb(_hue, 10, 90);
+    btn_tpr.image.color = lv_color_hsv_to_rgb(_hue, 10, 90);
 
     lv_style_copy(&btn_ina, &btn_rel);
     btn_ina.body.border.opa = LV_OPA_60;
@@ -615,6 +620,7 @@ static void list_init(void)
     list_rel.body.border.opa = LV_OPA_COVER;
     list_rel.text.color = lv_color_hsv_to_rgb(_hue, 10, 94);
     list_rel.text.font = _font;
+    list_rel.image.color = lv_color_hsv_to_rgb(_hue, 10, 94);
 
     lv_style_copy(&list_pr, &list_rel);
     list_pr.body.empty = 0;
@@ -622,6 +628,7 @@ static void list_init(void)
     list_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.text.color = lv_color_hsv_to_rgb(_hue, 7, 96);
+    list_pr.image.color = lv_color_hsv_to_rgb(_hue, 7, 96);
 
     lv_style_copy(&list_trel, &list_rel);
     lv_style_copy(&list_tpr, &list_pr);
@@ -787,6 +794,7 @@ static void win_init(void)
     header.body.border.color = lv_color_hsv_to_rgb(_hue, 20, 80);
     header.body.border.part = LV_BORDER_BOTTOM;
     header.text.color = lv_color_hsv_to_rgb(_hue, 5, 100);
+    header.image.color = lv_color_hsv_to_rgb(_hue, 5, 100);
 
     theme.win.bg = &bg;
     theme.win.sb = &sb;

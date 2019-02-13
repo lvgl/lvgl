@@ -20,6 +20,10 @@
 #define LV_ATTRIBUTE_FLUSH_READY
 #endif
 
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -36,7 +40,7 @@
 #if LV_VDB_DOUBLE == 0
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf[LV_VDB_SIZE_IN_BYTES];
+static LV_ATTRIBUTE_MEM_ALIGN uint8_t vdb_buf[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb = {.buf = (lv_color_t *)vdb_buf};
 #  else     /*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
@@ -49,8 +53,8 @@ static lv_vdb_t vdb = {.buf = (lv_color_t *)LV_VDB_ADR};
 static uint8_t vdb_active = 0;
 #  if LV_VDB_ADR == 0
 /*If the buffer address is not specified  simply allocate it*/
-static uint8_t vdb_buf1[LV_VDB_SIZE_IN_BYTES];
-static uint8_t vdb_buf2[LV_VDB_SIZE_IN_BYTES];
+static LV_ATTRIBUTE_MEM_ALIGN uint8_t vdb_buf1[LV_VDB_SIZE_IN_BYTES];
+static LV_ATTRIBUTE_MEM_ALIGN uint8_t vdb_buf2[LV_VDB_SIZE_IN_BYTES];
 static lv_vdb_t vdb[2] = {{.buf = (lv_color_t *) vdb_buf1}, {.buf = (lv_color_t *) vdb_buf2}};
 #  else /*LV_VDB_ADR != 0*/
 /*If the buffer address is specified use that address*/
