@@ -35,6 +35,25 @@ extern "C" {
 
 struct _disp_t;
 
+
+typedef struct
+{
+    void * buf_act;
+    void * buf1;
+    void * buf2;
+    uint32_t size;                      /*In pixel count*/
+    struct {
+        uint32_t double_buffered   :1;
+        uint32_t true_double_buffered   :1;
+    }mode;
+
+    lv_area_t area;
+    struct {
+        uint32_t flushing   :1;
+    }internal;
+}lv_vdb_t;
+
+
 /**
  * Display Driver structure to be registered by HAL
  */
@@ -45,14 +64,10 @@ typedef struct _disp_drv_t {
 
     lv_coord_t ver_res;
 
+    lv_vdb_t * buffer;
+
     /*Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished*/
     void (*disp_flush)(struct _disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
-
-    /*Fill an area with a color on the display*/
-    void (*disp_fill)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t color);
-
-    /*Write pixel map (e.g. image) to the display*/
-    void (*disp_map)(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t * color_p);
 
     /*Optional interface functions to use GPU*/
 #if USE_LV_GPU
@@ -63,15 +78,8 @@ typedef struct _disp_drv_t {
     void (*mem_fill)(lv_color_t * dest, uint32_t length, lv_color_t color);
 #endif
 
-#if LV_VDB_SIZE
-    void * vdb;
-    void * vdb2;
-    uint32_t vdb_size;
-    uint32_t vdb_double :1;
-
     /*Optional: Set a pixel in a buffer according to the requirements of the display*/
     void (*vdb_wr)(uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
-#endif
 } lv_disp_drv_t;
 
 struct _lv_obj_t;
@@ -113,6 +121,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t *driver);
 
 lv_disp_t * lv_disp_get_last(void);
 
+lv_vdb_t * lv_disp_get_vdb(lv_disp_t * disp);
 /**
  * Get the next display.
  * @param disp pointer to the current display. NULL to initialize.
@@ -124,6 +133,9 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp);
 lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp);
 lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp);
 
+bool lv_disp_is_double_vdb(lv_disp_t * disp);
+
+bool lv_disp_is_true_double_buffered(lv_disp_t * disp);
 /**********************
  *      MACROS
  **********************/

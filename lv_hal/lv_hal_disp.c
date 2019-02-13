@@ -53,8 +53,6 @@
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
-    driver->disp_fill = NULL;
-    driver->disp_map = NULL;
     driver->disp_flush = NULL;
     driver->hor_res = LV_HOR_RES_MAX;
     driver->ver_res = LV_VER_RES_MAX;
@@ -64,13 +62,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->mem_fill = NULL;
 #endif
 
-#if LV_VDB_SIZE
     driver->vdb_wr = NULL;
-    driver->vdb = NULL;
-    driver->vdb2 = NULL;
-    driver->vdb_size = 0;
-    driver->vdb_double = 0;
-#endif
 }
 
 /**
@@ -104,6 +96,11 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     return disp;
 }
 
+/**
+ * Get the next display.
+ * @param disp pointer to the current display. NULL to initialize.
+ * @return the next display or NULL if no more. Give the first display when the parameter is NULL
+ */
 lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
 {
     if(disp == NULL) return lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
@@ -116,16 +113,9 @@ lv_disp_t * lv_disp_get_last(void)
     return lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
 }
 
-
-/**
- * Get the next display.
- * @param disp pointer to the current display. NULL to initialize.
- * @return the next display or NULL if no more. Give the first display when the parameter is NULL
- */
-lv_disp_t * lv_disp_next(lv_disp_t * disp)
+lv_vdb_t * lv_disp_get_vdb(lv_disp_t * disp)
 {
-    if(disp == NULL) return lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
-    else return lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
+    return disp->driver.buffer;
 }
 
 lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
@@ -143,6 +133,18 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 
     if(disp == NULL) return LV_VER_RES_MAX;
     else return disp->driver.ver_res;
+}
+
+bool lv_disp_is_double_vdb(lv_disp_t * disp)
+{
+    if(disp->driver.buffer->buf1 && disp->driver.buffer->buf2) return true;
+    else return false;
+}
+
+bool lv_disp_is_true_double_buffered(lv_disp_t * disp)
+{
+    if(lv_disp_is_double_vdb(disp) && disp->driver.buffer->size == disp->driver.hor_res * disp->driver.ver_res) return true;
+    else return false;
 }
 
 /**********************

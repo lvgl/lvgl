@@ -8,7 +8,6 @@
  *********************/
 #include <stddef.h>
 #include "lv_refr.h"
-#include "lv_vdb.h"
 #include "lv_disp.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_hal/lv_hal_disp.h"
@@ -30,15 +29,12 @@
 static void lv_refr_task(void * param);
 static void lv_refr_join_area(void);
 static void lv_refr_areas(void);
-#if LV_VDB_SIZE == 0
-static void lv_refr_area_no_vdb(const lv_area_t * area_p);
-#else
-static void lv_refr_area_with_vdb(const lv_area_t * area_p);
-static void lv_refr_area_part_vdb(const lv_area_t * area_p);
-#endif
+static void lv_refr_area(const lv_area_t * area_p);
+static void lv_refr_area_part(const lv_area_t * area_p);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p);
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p);
+static void lv_refr_vdb_flush(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -64,6 +60,19 @@ void lv_refr_init(void)
     lv_task_t * task;
     task = lv_task_create(lv_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
     lv_task_ready(task);        /*Be sure the screen will be refreshed immediately on start up*/
+}
+
+/**
+ * Call in the display driver's  'disp_flush' function when the flushing is finished
+ */
+LV_ATTRIBUTE_FLUSH_READY void lv_flush_ready(lv_disp_t * disp)
+{
+    disp->driver.buffer->internal.flushing = 0;
+
+    /*If the screen is transparent initialize it when the flushing is ready*/
+#if LV_VDB_DOUBLE == 0 && LV_COLOR_SCREEN_TRANSP
+    memset(vdb_buf, 0x00, LV_VDB_SIZE_IN_BYTES);
+#endif
 }
 
 /**
@@ -126,6 +135,7 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     }
 }
 
+
 /**
  * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels
  * @param cb pointer to a callback function (void my_refr_cb(uint32_t time_ms, uint32_t px_num))
@@ -182,42 +192,35 @@ static void lv_refr_task(void * param)
 
         /*If refresh happened ...*/
         if(disp_refr->inv_p != 0) {
-
             /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
-    #if LV_VDB_TRUE_DOUBLE_BUFFERED
-            lv_vdb_t * vdb_p = lv_vdb_get();
-            vdb_p->area.x1 = 0;
-            vdb_p->area.x2 = LV_HOR_RES-1;
-            vdb_p->area.y1 = 0;
-            vdb_p->area.y2 = LV_VER_RES - 1;
+            if(lv_disp_is_true_double_buffered(disp_refr)) {
+                lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
 
-            /*Flush the content of the VDB*/
-            lv_vdb_flush();
+                /*Flush the content of the VDB*/
+                lv_refr_vdb_flush();
 
-            /* With true double buffering the flushing should be only the address change of the current frame buffer
-             * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
-             * The changes will be written to the new VDB.*/
-            lv_vdb_t * vdb_act = lv_vdb_get_active();
-            lv_vdb_t * vdb_ina = lv_vdb_get_inactive();
+                /* With true double buffering the flushing should be only the address change of the current frame buffer.
+                 * Wait until the address change is ready and copy the changed content to the other frame buffer (new active VDB)
+                 * to keep the buffers synchronized*/
+                while(vdb->internal.flushing);
 
-            uint8_t * buf_act = (uint8_t *) vdb_act->buf;
-            uint8_t * buf_ina = (uint8_t *) vdb_ina->buf;
+                uint8_t * buf_act = (uint8_t *) vdb->buf_act;
+                uint8_t * buf_ina = (uint8_t *) vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
 
-            uint16_t a;
-            for(a = 0; a < inv_buf_p; a++) {
-                if(inv_buf[a].joined == 0) {
-                    lv_coord_t y;
-                    uint32_t start_offs = ((LV_HOR_RES * inv_buf[a].area.y1 + inv_buf[a].area.x1) * LV_VDB_PX_BPP) >> 3;
-                    uint32_t line_length = (lv_area_get_width(&inv_buf[a].area) * LV_VDB_PX_BPP) >> 3;
+                uint16_t a;
+                for(a = 0; a < disp_refr->inv_p; a++) {
+                    if(disp_refr->inv_area_joined[a] == 0) {
+                        lv_coord_t y;
+                        uint32_t start_offs = ((disp_refr->driver.hor_res * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * LV_VDB_PX_BPP) >> 3;
+                        uint32_t line_length = (lv_area_get_width(&disp_refr->inv_areas[a]) * LV_VDB_PX_BPP) >> 3;
 
-                    for(y = inv_buf[a].area.y1; y <= inv_buf[a].area.y2; y++) {
-                        memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
-                        start_offs += (LV_HOR_RES * LV_VDB_PX_BPP) >> 3;
+                        for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
+                            memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
+                            start_offs += (LV_HOR_RES * LV_VDB_PX_BPP) >> 3;
+                        }
                     }
                 }
-            }
-
-    #endif
+            }   /*End of true double buffer handling*/
 
             /*Clean up*/
             memset(disp_refr->inv_areas, 0, sizeof(disp_refr->inv_areas));
@@ -285,146 +288,112 @@ static void lv_refr_areas(void)
     for(i = 0; i < disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
         if(disp_refr->inv_area_joined[i] == 0) {
-            /*If there is no VDB do simple drawing*/
-#if LV_VDB_SIZE == 0
-            lv_refr_area_no_vdb(&inv_buf[i].area);
-#else
-            /*If VDB is used...*/
-            lv_refr_area_with_vdb(&disp_refr->inv_areas[i]);
-#endif
+
+            lv_refr_area(&disp_refr->inv_areas[i]);
+
             if(monitor_cb != NULL) px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
         }
     }
-
 }
-
-#if LV_VDB_SIZE == 0
-/**
- * Refresh an area if there is no Virtual Display Buffer
- * @param area_p pointer to an area to refresh
- */
-static void lv_refr_area_no_vdb(const lv_area_t * area_p)
-{
-    lv_obj_t * top_p;
-
-    /*Get top object which is not covered by others*/
-    top_p = lv_refr_get_top_obj(area_p, lv_scr_act());
-
-    /*Do the refreshing*/
-    lv_refr_obj_and_children(top_p, area_p);
-
-    /*Also refresh top and sys layer unconditionally*/
-    lv_refr_obj_and_children(lv_layer_top(), area_p);
-    lv_refr_obj_and_children(lv_layer_sys(), area_p);
-}
-
-#else
 
 /**
  * Refresh an area if there is Virtual Display Buffer
  * @param area_p  pointer to an area to refresh
  */
-static void lv_refr_area_with_vdb(const lv_area_t * area_p)
+static void lv_refr_area(const lv_area_t * area_p)
 {
-
-#if LV_VDB_TRUE_DOUBLE_BUFFERED == 0
-    /*Calculate the max row num*/
-    lv_coord_t w = lv_area_get_width(area_p);
-    lv_coord_t h = lv_area_get_height(area_p);
-    lv_coord_t y2 = area_p->y2 >= lv_disp_get_ver_res(NULL) ? y2 = lv_disp_get_ver_res(NULL) - 1 : area_p->y2;
-
-    int32_t max_row = (uint32_t) LV_VDB_SIZE / w;
-
-    if(max_row > h) max_row = h;
-
-
-    /*Round down the lines of VDB if rounding is added*/
-    if(round_cb) {
-        lv_area_t tmp;
-        tmp.x1 = 0;
-        tmp.x2 = 0;
-        tmp.y1 = 0;
-        tmp.y2 = max_row;
-
-        lv_coord_t y_tmp = max_row;
-        do {
-            tmp.y2 = y_tmp;
-            round_cb(&tmp);
-            y_tmp --;       /*Decrement the number of line until it is rounded to a smaller (or equal) value then the original. */
-        } while(lv_area_get_height(&tmp) > max_row && y_tmp != 0);
-
-        if(y_tmp == 0) {
-            LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to small VDB)");
-            return;
-        } else {
-            max_row = tmp.y2 + 1;
-        }
+    /*True double buffering: there are two screen sized buffers. Just redraw directly into a buffer*/
+    if(lv_disp_is_true_double_buffered(disp_refr)) {
+        lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
+        vdb->area.x1 = 0;
+        vdb->area.x2 = LV_HOR_RES-1;
+        vdb->area.y1 = 0;
+        vdb->area.y2 = LV_VER_RES - 1;
+        lv_refr_area_part(area_p);
     }
+    /*The buffer is smaller: refresh the area in parts*/
+    else {
+        lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
+        /*Calculate the max row num*/
+        lv_coord_t w = lv_area_get_width(area_p);
+        lv_coord_t h = lv_area_get_height(area_p);
+        lv_coord_t y2 = area_p->y2 >= lv_disp_get_ver_res(NULL) ? y2 = lv_disp_get_ver_res(NULL) - 1 : area_p->y2;
 
-    /*Always use the full row*/
-    lv_coord_t row;
-    lv_coord_t row_last = 0;
-    for(row = area_p->y1; row  + max_row - 1 <= y2; row += max_row)  {
-        lv_vdb_t * vdb_p = lv_vdb_get();
-        if(!vdb_p) {
-            LV_LOG_WARN("Invalid VDB pointer");
-            return;
-        }
+        int32_t max_row = (uint32_t) vdb->size / w;
 
-        /*Calc. the next y coordinates of VDB*/
-        vdb_p->area.x1 = area_p->x1;
-        vdb_p->area.x2 = area_p->x2;
-        vdb_p->area.y1 = row;
-        vdb_p->area.y2 = row + max_row - 1;
-        if(vdb_p->area.y2 > y2) vdb_p->area.y2 = y2;
-        row_last = vdb_p->area.y2;
-        lv_refr_area_part_vdb(area_p);
-    }
+        if(max_row > h) max_row = h;
 
-    /*If the last y coordinates are not handled yet ...*/
-    if(y2 != row_last) {
-        lv_vdb_t * vdb_p = lv_vdb_get();
-        if(!vdb_p) {
-            LV_LOG_WARN("Invalid VDB pointer");
-            return;
+        /*Round down the lines of VDB if rounding is added*/
+        if(round_cb) {
+            lv_area_t tmp;
+            tmp.x1 = 0;
+            tmp.x2 = 0;
+            tmp.y1 = 0;
+            tmp.y2 = max_row;
+
+            lv_coord_t y_tmp = max_row;
+            do {
+                tmp.y2 = y_tmp;
+                round_cb(&tmp);
+                y_tmp --;       /*Decrement the number of line until it is rounded to a smaller (or equal) value then the original. */
+            } while(lv_area_get_height(&tmp) > max_row && y_tmp != 0);
+
+            if(y_tmp == 0) {
+                LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to small VDB)");
+                return;
+            } else {
+                max_row = tmp.y2 + 1;
+            }
         }
 
-        /*Calc. the next y coordinates of VDB*/
-        vdb_p->area.x1 = area_p->x1;
-        vdb_p->area.x2 = area_p->x2;
-        vdb_p->area.y1 = row;
-        vdb_p->area.y2 = y2;
+        /*Always use the full row*/
+        lv_coord_t row;
+        lv_coord_t row_last = 0;
+        for(row = area_p->y1; row  + max_row - 1 <= y2; row += max_row)  {
+            /*Calc. the next y coordinates of VDB*/
+            vdb->area.x1 = area_p->x1;
+            vdb->area.x2 = area_p->x2;
+            vdb->area.y1 = row;
+            vdb->area.y2 = row + max_row - 1;
+            if(vdb->area.y2 > y2) vdb->area.y2 = y2;
+            row_last = vdb->area.y2;
+            lv_refr_area_part(area_p);
+        }
 
-        /*Refresh this part too*/
-        lv_refr_area_part_vdb(area_p);
+        /*If the last y coordinates are not handled yet ...*/
+        if(y2 != row_last) {
+            /*Calc. the next y coordinates of VDB*/
+            vdb->area.x1 = area_p->x1;
+            vdb->area.x2 = area_p->x2;
+            vdb->area.y1 = row;
+            vdb->area.y2 = y2;
+
+            /*Refresh this part too*/
+            lv_refr_area_part(area_p);
+        }
     }
-#else
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    vdb_p->area.x1 = 0;
-    vdb_p->area.x2 = LV_HOR_RES-1;
-    vdb_p->area.y1 = 0;
-    vdb_p->area.y2 = LV_VER_RES - 1;
-    lv_refr_area_part_vdb(area_p);
-#endif
 }
 
 /**
  * Refresh a part of an area which is on the actual Virtual Display Buffer
  * @param area_p pointer to an area to refresh
  */
-static void lv_refr_area_part_vdb(const lv_area_t * area_p)
+static void lv_refr_area_part(const lv_area_t * area_p)
 {
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    if(!vdb_p) {
-        LV_LOG_WARN("Invalid VDB pointer");
-        return;
+
+    lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
+
+    /*In non double buffered mode, before rendering the next part wait until the previous image is flushed*/
+    if(lv_disp_is_double_vdb(disp_refr) == false) {
+        while(vdb->internal.flushing);
     }
+
     lv_obj_t * top_p;
 
     /*Get the new mask from the original area and the act. VDB
      It will be a part of 'area_p'*/
     lv_area_t start_mask;
-    lv_area_intersect(&start_mask, area_p, &vdb_p->area);
+    lv_area_intersect(&start_mask, area_p, &vdb->area);
 
     /*Get the most top object which is not covered by others*/
     top_p = lv_refr_get_top_obj(&start_mask, lv_scr_act(disp_refr));
@@ -438,13 +407,10 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
 
     /* In true double buffered mode flush only once when all areas were rendered.
      * In normal mode flush after every area */
-#if LV_VDB_TRUE_DOUBLE_BUFFERED == 0
-    /*Flush the content of the VDB*/
-    lv_vdb_flush();
-#endif
+    if(lv_disp_is_true_double_buffered(disp_refr) == false) {
+        lv_refr_vdb_flush();
+    }
 }
-
-#endif /*LV_VDB_SIZE == 0*/
 
 /**
  * Search the most top object which fully covers an area
@@ -591,5 +557,35 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         /* If all the children are redrawn make 'post draw' design */
         obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
 
+    }
+}
+
+/**
+ * Flush the content of the VDB
+ */
+static void lv_refr_vdb_flush(void)
+{
+    lv_vdb_t * vdb = lv_disp_get_vdb(lv_refr_get_disp_refreshing());
+
+    /*In double buffered mode wait until the other buffer is flushed before flushing the current one*/
+    if(vdb->buf1 && vdb->buf2) {
+        while(vdb->internal.flushing);
+    }
+
+    vdb->internal.flushing = 1;
+
+    /*Flush the rendered content to the display*/
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    if(disp->driver.disp_flush) disp->driver.disp_flush(disp, &vdb->area, vdb->buf_act);
+
+
+    if(vdb->buf1 && vdb->buf2) {
+        if(vdb->buf_act == vdb->buf1) vdb->buf_act = vdb->buf2;
+        else vdb->buf_act = vdb->buf1;
+
+    /*If the screen is transparent initialize it when the new VDB is selected*/
+#  if LV_COLOR_SCREEN_TRANSP
+        memset(vdb[vdb_active].buf, 0x00, LV_VDB_SIZE_IN_BYTES);
+#  endif  /*LV_COLOR_SCREEN_TRANSP*/
     }
 }

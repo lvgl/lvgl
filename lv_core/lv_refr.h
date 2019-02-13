@@ -19,6 +19,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_ATTRIBUTE_FLUSH_READY
+#  define LV_ATTRIBUTE_FLUSH_READY
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -46,6 +49,11 @@ extern "C" {
 void lv_refr_init(void);
 
 /**
+ * Call in the display driver's  'disp_flush' function when the flushing is finished
+ */
+LV_ATTRIBUTE_FLUSH_READY void lv_flush_ready(lv_disp_t * disp);
+
+/**
  * Redraw the invalidated areas now.
  * Normally the redrawing is periodically executed in `lv_task_handler` but a long blocking process can
  * prevent the call of `lv_task_handler`. In this case if the the GUI is updated in the process (e.g. progress bar)
@@ -59,6 +67,7 @@ void lv_refr_now(void);
  * @param disp pointer to display where the area should be invalidated (NULL can be used if there is only one display)
  */
 void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
+
 
 /**
  * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels

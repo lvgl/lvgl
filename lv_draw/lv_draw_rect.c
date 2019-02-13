@@ -30,7 +30,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
 static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 
-#if USE_LV_SHADOW && LV_VDB_SIZE
+#if USE_LV_SHADOW
 static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
@@ -66,7 +66,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 
-#if USE_LV_SHADOW && LV_VDB_SIZE
+#if USE_LV_SHADOW
     if(style->body.shadow.width != 0) {
         lv_draw_shadow(coords, mask, style, opa_scale);
     }
@@ -133,7 +133,7 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
 #endif
         }
 
-        fill_fp(&work_area, mask, mcolor, opa);
+        lv_draw_fill(&work_area, mask, mcolor, opa);
     } else {
         lv_coord_t row;
         lv_coord_t row_start = coords->y1 + radius;
@@ -157,7 +157,7 @@ static void lv_draw_rect_main_mid(const lv_area_t * coords, const lv_area_t * ma
             mix = (uint32_t)((uint32_t)(coords->y2 - work_area.y1) * 255) / height;
             act_color = lv_color_mix(mcolor, gcolor, mix);
 
-            fill_fp(&work_area, mask, act_color, opa);
+            lv_draw_fill(&work_area, mask, act_color, opa);
         }
     }
 }
@@ -263,19 +263,19 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
                     aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, opa);
                 }
 
-                px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, aa_color_hor_bottom, aa_opa);
-                px_fp(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, aa_color_hor_bottom, aa_opa);
-                px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, aa_color_hor_top, aa_opa);
-                px_fp(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, aa_color_hor_top, aa_opa);
+                lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, aa_color_hor_bottom, aa_opa);
+                lv_draw_px(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, aa_color_hor_bottom, aa_opa);
+                lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, aa_color_hor_top, aa_opa);
+                lv_draw_px(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, aa_color_hor_top, aa_opa);
 
                 mix = (uint32_t)((uint32_t)(radius - out_y_seg_start + i) * 255) / height;
                 aa_color_ver = lv_color_mix(mcolor, gcolor, mix);
-                px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
-                px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
+                lv_draw_px(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
+                lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
 
                 aa_color_ver = lv_color_mix(gcolor, mcolor, mix);
-                px_fp(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
-                px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
+                lv_draw_px(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
+                lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
             }
 
             out_x_last = cir.x;
@@ -304,7 +304,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
                 mix = (uint32_t)((uint32_t)(coords->y2 - edge_top_area.y1)  * 255) / height;
                 act_color = lv_color_mix(mcolor, gcolor, mix);
             }
-            fill_fp(&edge_top_area, mask, act_color, opa);
+            lv_draw_fill(&edge_top_area, mask, act_color, opa);
         }
 
         if(mid_top_refr != 0) {
@@ -313,7 +313,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
                 mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
                 act_color = lv_color_mix(mcolor, gcolor, mix);
             }
-            fill_fp(&mid_top_area, mask, act_color, opa);
+            lv_draw_fill(&mid_top_area, mask, act_color, opa);
         }
 
         if(mid_bot_refr != 0) {
@@ -322,7 +322,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
                 mix = (uint32_t)((uint32_t)(coords->y2 - mid_bot_area.y1) * 255) / height;
                 act_color = lv_color_mix(mcolor, gcolor, mix);
             }
-            fill_fp(&mid_bot_area, mask, act_color, opa);
+            lv_draw_fill(&mid_bot_area, mask, act_color, opa);
         }
 
         if(edge_bot_refr != 0) {
@@ -332,7 +332,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
                 mix = (uint32_t)((uint32_t)(coords->y2 - edge_bot_area.y1) * 255) / height;
                 act_color = lv_color_mix(mcolor, gcolor, mix);
             }
-            fill_fp(&edge_bot_area, mask, act_color, opa);
+            lv_draw_fill(&edge_bot_area, mask, act_color, opa);
         }
 
         /*Save the current coordinates*/
@@ -364,7 +364,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
         mix = (uint32_t)((uint32_t)(coords->y2 - edge_top_area.y1)  * 255) / height;
         act_color = lv_color_mix(mcolor, gcolor, mix);
     }
-    fill_fp(&edge_top_area, mask, act_color, opa);
+    lv_draw_fill(&edge_top_area, mask, act_color, opa);
 
     if(edge_top_area.y1 != mid_top_area.y1) {
 
@@ -373,7 +373,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
             mix = (uint32_t)((uint32_t)(coords->y2 - mid_top_area.y1) * 255) / height;
             act_color = lv_color_mix(mcolor, gcolor, mix);
         }
-        fill_fp(&mid_top_area, mask, act_color, opa);
+        lv_draw_fill(&mid_top_area, mask, act_color, opa);
     }
 
     if(mcolor.full == gcolor.full) act_color = mcolor;
@@ -381,7 +381,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
         mix = (uint32_t)((uint32_t)(coords->y2 - mid_bot_area.y1) * 255) / height;
         act_color = lv_color_mix(mcolor, gcolor, mix);
     }
-    fill_fp(&mid_bot_area, mask, act_color, opa);
+    lv_draw_fill(&mid_bot_area, mask, act_color, opa);
 
     if(edge_bot_area.y1 != mid_bot_area.y1) {
 
@@ -390,7 +390,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
             mix = (uint32_t)((uint32_t)(coords->y2 - edge_bot_area.y1) * 255) / height;
             act_color = lv_color_mix(mcolor, gcolor, mix);
         }
-        fill_fp(&edge_bot_area, mask, act_color, opa);
+        lv_draw_fill(&edge_bot_area, mask, act_color, opa);
     }
 
 
@@ -400,11 +400,11 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
     edge_top_area.x2 = coords->x2 - radius - 2;
     edge_top_area.y1 = coords->y1;
     edge_top_area.y2 = coords->y1;
-    fill_fp(&edge_top_area, mask, style->body.main_color, opa);
+    lv_draw_fill(&edge_top_area, mask, style->body.main_color, opa);
 
     edge_top_area.y1 = coords->y2;
     edge_top_area.y2 = coords->y2;
-    fill_fp(&edge_top_area, mask, style->body.grad_color, opa);
+    lv_draw_fill(&edge_top_area, mask, style->body.grad_color, opa);
 
     /*Last parts of the anti-alias*/
     out_y_seg_end = cir.y;
@@ -421,19 +421,19 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
     lv_coord_t i;
     for(i = 0; i  < seg_size; i++) {
         lv_opa_t aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, opa);
-        px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, aa_color_hor_top, aa_opa);
-        px_fp(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, aa_color_hor_top, aa_opa);
-        px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, aa_color_hor_bottom, aa_opa);
-        px_fp(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, aa_color_hor_bottom, aa_opa);
+        lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, aa_color_hor_top, aa_opa);
+        lv_draw_px(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, aa_color_hor_top, aa_opa);
+        lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, aa_color_hor_bottom, aa_opa);
+        lv_draw_px(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, aa_color_hor_bottom, aa_opa);
 
         mix = (uint32_t)((uint32_t)(radius - out_y_seg_start + i) * 255) / height;
         aa_color_ver = lv_color_mix(mcolor, gcolor, mix);
-        px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
-        px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
+        lv_draw_px(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
+        lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, aa_color_ver, aa_opa);
 
         aa_color_ver = lv_color_mix(gcolor, mcolor, mix);
-        px_fp(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
-        px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
+        lv_draw_px(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
+        lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, aa_color_ver, aa_opa);
     }
 
     /*In some cases the last pixel is not drawn*/
@@ -446,10 +446,10 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
         aa_color_hor_bottom = lv_color_mix(mcolor, gcolor, mix);
 
         lv_opa_t aa_opa = opa >> 1;
-        px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p), rb_origo.y + LV_CIRC_OCT2_Y(aa_p), mask, aa_color_hor_bottom, aa_opa);
-        px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p), lb_origo.y + LV_CIRC_OCT4_Y(aa_p), mask, aa_color_hor_bottom, aa_opa);
-        px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p), lt_origo.y + LV_CIRC_OCT6_Y(aa_p), mask, aa_color_hor_top, aa_opa);
-        px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p), rt_origo.y + LV_CIRC_OCT8_Y(aa_p), mask, aa_color_hor_top, aa_opa);
+        lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p), rb_origo.y + LV_CIRC_OCT2_Y(aa_p), mask, aa_color_hor_bottom, aa_opa);
+        lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p), lb_origo.y + LV_CIRC_OCT4_Y(aa_p), mask, aa_color_hor_bottom, aa_opa);
+        lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p), lt_origo.y + LV_CIRC_OCT6_Y(aa_p), mask, aa_color_hor_top, aa_opa);
+        lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p), rt_origo.y + LV_CIRC_OCT8_Y(aa_p), mask, aa_color_hor_top, aa_opa);
     }
 
 #endif
@@ -498,7 +498,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y1;
             work_area.y2 = coords->y1 + bwidth;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Right top corner*/
@@ -507,7 +507,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y1 + (part & LV_BORDER_TOP ? bwidth + 1 : 0);
             work_area.y2 = coords->y2 - (part & LV_BORDER_BOTTOM ? bwidth + 1 : 0);
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Left bottom corner*/
@@ -516,7 +516,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x1 + bwidth;
             work_area.y1 = coords->y1 + (part & LV_BORDER_TOP ? bwidth + 1 : 0);
             work_area.y2 = coords->y2 - (part & LV_BORDER_BOTTOM ? bwidth + 1 : 0);
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Right bottom corner*/
@@ -525,7 +525,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y2 - bwidth;
             work_area.y2 = coords->y2;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
         return;
     }
@@ -544,14 +544,14 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
     if(part & LV_BORDER_LEFT) {
         work_area.x1 = coords->x1;
         work_area.x2 = work_area.x1 + bwidth;
-        fill_fp(&work_area, mask, color, opa);
+        lv_draw_fill(&work_area, mask, color, opa);
     }
 
     /*Right border*/
     if(part & LV_BORDER_RIGHT) {
         work_area.x2 = coords->x2;
         work_area.x1 = work_area.x2 - bwidth;
-        fill_fp(&work_area, mask, color, opa);
+        lv_draw_fill(&work_area, mask, color, opa);
     }
 
     work_area.x1 = coords->x1 + corner_size - length_corr;
@@ -561,14 +561,14 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
     if(part & LV_BORDER_TOP) {
         work_area.y1 = coords->y1;
         work_area.y2 = coords->y1 + bwidth;
-        fill_fp(&work_area, mask, color, opa);
+        lv_draw_fill(&work_area, mask, color, opa);
     }
 
     /*Lower border*/
     if(part & LV_BORDER_BOTTOM) {
         work_area.y2 = coords->y2;
         work_area.y1 = work_area.y2 - bwidth;
-        fill_fp(&work_area, mask, color, opa);
+        lv_draw_fill(&work_area, mask, color, opa);
     }
 
     /*Draw the a remaining rectangles if the radius is smaller then bwidth */
@@ -579,7 +579,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x1 + radius + LV_ANTIALIAS;
             work_area.y1 = coords->y1 + radius + 1 + LV_ANTIALIAS;
             work_area.y2 = coords->y1 + bwidth;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Right top correction*/
@@ -588,7 +588,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y1 + radius + 1 + LV_ANTIALIAS;
             work_area.y2 = coords->y1 + bwidth;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Left bottom correction*/
@@ -597,7 +597,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x1 + radius + LV_ANTIALIAS;
             work_area.y1 = coords->y2 - bwidth;
             work_area.y2 = coords->y2 - radius - 1 - LV_ANTIALIAS;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Right bottom correction*/
@@ -606,7 +606,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y2 - bwidth;
             work_area.y2 = coords->y2 - radius - 1 - LV_ANTIALIAS;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
     }
 
@@ -618,7 +618,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x1 + LV_ANTIALIAS;
             work_area.y1 = coords->y1;
             work_area.y2 = coords->y1 + LV_ANTIALIAS;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Right top corner*/
@@ -627,7 +627,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y1;
             work_area.y2 = coords->y1 + LV_ANTIALIAS;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Left bottom corner*/
@@ -636,7 +636,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x1 + LV_ANTIALIAS;
             work_area.y1 = coords->y2 - LV_ANTIALIAS;
             work_area.y2 = coords->y2;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
 
         /*Right bottom corner*/
@@ -645,7 +645,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             work_area.x2 = coords->x2;
             work_area.y1 = coords->y2 - LV_ANTIALIAS;
             work_area.y2 = coords->y2;
-            fill_fp(&work_area, mask, color, opa);
+            lv_draw_fill(&work_area, mask, color, opa);
         }
     }
 }
@@ -756,24 +756,24 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                 }
 
                 if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
-                    px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
-                    px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
                 }
 
                 if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
-                    px_fp(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
-                    px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
                 }
 
 
                 if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
-                    px_fp(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
-                    px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
                 }
 
                 if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
-                    px_fp(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
-                    px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
                 }
             }
 
@@ -801,37 +801,37 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                 }
 
                 if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
-                    px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) - 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(rb_origo.x + LV_CIRC_OCT1_X(aa_p) - 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
                 }
 
                 if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
-                    px_fp(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
                 }
 
                 if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
-                    px_fp(lt_origo.x + LV_CIRC_OCT5_X(aa_p) + 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(lt_origo.x + LV_CIRC_OCT5_X(aa_p) + 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
                 }
 
                 if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
-                    px_fp(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+                    lv_draw_px(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
                 }
 
                 /*Be sure the pixels on the middle are not drawn twice*/
                 if(LV_CIRC_OCT1_X(aa_p) - 1 != LV_CIRC_OCT2_X(aa_p) + i) {
                     if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
-                        px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+                        lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
                     }
 
                     if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
-                        px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p) + 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+                        lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p) + 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
                     }
 
                     if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
-                        px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+                        lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
                     }
 
                     if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
-                        px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p) - 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+                        lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p) - 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
                     }
                 }
 
@@ -851,13 +851,13 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
             circ_area.x2 = rb_origo.x + LV_CIRC_OCT1_X(cir_out);
             circ_area.y1 = rb_origo.y + LV_CIRC_OCT1_Y(cir_out);
             circ_area.y2 = rb_origo.y + LV_CIRC_OCT1_Y(cir_out);
-            fill_fp(&circ_area, mask, color, opa);
+            lv_draw_fill(&circ_area, mask, color, opa);
 
             circ_area.x1 = rb_origo.x + LV_CIRC_OCT2_X(cir_out);
             circ_area.x2 = rb_origo.x + LV_CIRC_OCT2_X(cir_out);
             circ_area.y1 = rb_origo.y + LV_CIRC_OCT2_Y(cir_out) - act_w1;
             circ_area.y2 = rb_origo.y + LV_CIRC_OCT2_Y(cir_out);
-            fill_fp(&circ_area, mask, color, opa);
+            lv_draw_fill(&circ_area, mask, color, opa);
         }
 
         /*Draw the octets to the left bottom corner*/
@@ -866,13 +866,13 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
             circ_area.x2 = lb_origo.x + LV_CIRC_OCT3_X(cir_out);
             circ_area.y1 = lb_origo.y + LV_CIRC_OCT3_Y(cir_out) - act_w2;
             circ_area.y2 = lb_origo.y + LV_CIRC_OCT3_Y(cir_out);
-            fill_fp(&circ_area, mask, color, opa);
+            lv_draw_fill(&circ_area, mask, color, opa);
 
             circ_area.x1 = lb_origo.x + LV_CIRC_OCT4_X(cir_out);
             circ_area.x2 = lb_origo.x + LV_CIRC_OCT4_X(cir_out) + act_w1;
             circ_area.y1 = lb_origo.y + LV_CIRC_OCT4_Y(cir_out);
             circ_area.y2 = lb_origo.y + LV_CIRC_OCT4_Y(cir_out);
-            fill_fp(&circ_area, mask, color, opa);
+            lv_draw_fill(&circ_area, mask, color, opa);
         }
 
         /*Draw the octets to the left top corner*/
@@ -883,14 +883,14 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                 circ_area.x2 = lt_origo.x + LV_CIRC_OCT5_X(cir_out) + act_w2;
                 circ_area.y1 = lt_origo.y + LV_CIRC_OCT5_Y(cir_out);
                 circ_area.y2 = lt_origo.y + LV_CIRC_OCT5_Y(cir_out);
-                fill_fp(&circ_area, mask, color, opa);
+                lv_draw_fill(&circ_area, mask, color, opa);
             }
 
             circ_area.x1 = lt_origo.x + LV_CIRC_OCT6_X(cir_out);
             circ_area.x2 = lt_origo.x + LV_CIRC_OCT6_X(cir_out);
             circ_area.y1 = lt_origo.y + LV_CIRC_OCT6_Y(cir_out);
             circ_area.y2 = lt_origo.y + LV_CIRC_OCT6_Y(cir_out) + act_w1;
-            fill_fp(&circ_area, mask, color, opa);
+            lv_draw_fill(&circ_area, mask, color, opa);
         }
 
         /*Draw the octets to the right top corner*/
@@ -899,7 +899,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
             circ_area.x2 = rt_origo.x + LV_CIRC_OCT7_X(cir_out);
             circ_area.y1 = rt_origo.y + LV_CIRC_OCT7_Y(cir_out);
             circ_area.y2 = rt_origo.y + LV_CIRC_OCT7_Y(cir_out) + act_w2;
-            fill_fp(&circ_area, mask, color, opa);
+            lv_draw_fill(&circ_area, mask, color, opa);
 
             /*Don't draw if the lines are common in the middle*/
             if(rb_origo.y + LV_CIRC_OCT1_Y(cir_out) > rt_origo.y + LV_CIRC_OCT8_Y(cir_out)) {
@@ -907,7 +907,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
                 circ_area.x2 = rt_origo.x + LV_CIRC_OCT8_X(cir_out);
                 circ_area.y1 = rt_origo.y + LV_CIRC_OCT8_Y(cir_out);
                 circ_area.y2 = rt_origo.y + LV_CIRC_OCT8_Y(cir_out);
-                fill_fp(&circ_area, mask, color, opa);
+                lv_draw_fill(&circ_area, mask, color, opa);
             }
         }
         lv_circ_next(&cir_out, &tmp_out);
@@ -934,23 +934,23 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     for(i = 0; i  < seg_size; i++) {
         lv_opa_t aa_opa = opa - lv_draw_aa_get_opa(seg_size, i, opa);
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
-            px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
-            px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+            lv_draw_px(rb_origo.x + LV_CIRC_OCT1_X(aa_p) + 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+            lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
-            px_fp(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
-            px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+            lv_draw_px(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+            lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p) - 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
-            px_fp(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
-            px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+            lv_draw_px(lt_origo.x + LV_CIRC_OCT5_X(aa_p) - 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+            lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
-            px_fp(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
-            px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+            lv_draw_px(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+            lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p) + 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
         }
     }
 
@@ -962,19 +962,19 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
         lv_opa_t aa_opa = opa >> 1;
 
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
-            px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p), rb_origo.y + LV_CIRC_OCT2_Y(aa_p), mask, style->body.border.color, aa_opa);
+            lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p), rb_origo.y + LV_CIRC_OCT2_Y(aa_p), mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
-            px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p), lb_origo.y + LV_CIRC_OCT4_Y(aa_p), mask, style->body.border.color, aa_opa);
+            lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p), lb_origo.y + LV_CIRC_OCT4_Y(aa_p), mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
-            px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p), lt_origo.y + LV_CIRC_OCT6_Y(aa_p), mask, style->body.border.color, aa_opa);
+            lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p), lt_origo.y + LV_CIRC_OCT6_Y(aa_p), mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
-            px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p), rt_origo.y + LV_CIRC_OCT8_Y(aa_p), mask, style->body.border.color, aa_opa);
+            lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p), rt_origo.y + LV_CIRC_OCT8_Y(aa_p), mask, style->body.border.color, aa_opa);
         }
     }
 
@@ -987,36 +987,36 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
     for(i = 0; i  < seg_size; i++) {
         lv_opa_t aa_opa =  lv_draw_aa_get_opa(seg_size, i, opa);
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
-            px_fp(rb_origo.x + LV_CIRC_OCT1_X(aa_p) - 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+            lv_draw_px(rb_origo.x + LV_CIRC_OCT1_X(aa_p) - 1, rb_origo.y + LV_CIRC_OCT1_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
-            px_fp(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+            lv_draw_px(lb_origo.x + LV_CIRC_OCT3_X(aa_p) - i, lb_origo.y + LV_CIRC_OCT3_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
-            px_fp(lt_origo.x + LV_CIRC_OCT5_X(aa_p) + 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+            lv_draw_px(lt_origo.x + LV_CIRC_OCT5_X(aa_p) + 1, lt_origo.y + LV_CIRC_OCT5_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
         }
 
         if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
-            px_fp(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+            lv_draw_px(rt_origo.x + LV_CIRC_OCT7_X(aa_p) + i, rt_origo.y + LV_CIRC_OCT7_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
         }
 
         if(LV_CIRC_OCT1_X(aa_p) - 1 != LV_CIRC_OCT2_X(aa_p) + i) {
             if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_RIGHT)) {
-                px_fp(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
+                lv_draw_px(rb_origo.x + LV_CIRC_OCT2_X(aa_p) + i, rb_origo.y + LV_CIRC_OCT2_Y(aa_p) - 1, mask, style->body.border.color, aa_opa);
             }
 
             if((part & LV_BORDER_BOTTOM) && (part & LV_BORDER_LEFT)) {
-                px_fp(lb_origo.x + LV_CIRC_OCT4_X(aa_p) + 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
+                lv_draw_px(lb_origo.x + LV_CIRC_OCT4_X(aa_p) + 1, lb_origo.y + LV_CIRC_OCT4_Y(aa_p) + i, mask, style->body.border.color, aa_opa);
             }
 
             if((part & LV_BORDER_TOP) && (part & LV_BORDER_LEFT)) {
-                px_fp(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
+                lv_draw_px(lt_origo.x + LV_CIRC_OCT6_X(aa_p) - i, lt_origo.y + LV_CIRC_OCT6_Y(aa_p) + 1, mask, style->body.border.color, aa_opa);
             }
 
             if((part & LV_BORDER_TOP) && (part & LV_BORDER_RIGHT)) {
-                px_fp(rt_origo.x + LV_CIRC_OCT8_X(aa_p) - 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
+                lv_draw_px(rt_origo.x + LV_CIRC_OCT8_X(aa_p) - 1, rt_origo.y + LV_CIRC_OCT8_Y(aa_p) - i, mask, style->body.border.color, aa_opa);
             }
         }
     }
@@ -1025,7 +1025,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
 
 }
 
-#if USE_LV_SHADOW && LV_VDB_SIZE
+#if USE_LV_SHADOW
 
 /**
  * Draw a shadow
@@ -1203,19 +1203,19 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
         for(d = 1; d < col; d++) {
 
             if(point_lt.x < ofs_lt.x && point_lt.y < ofs_lt.y) {
-                px_fp(point_lt.x, point_lt.y, mask, style->body.shadow.color, line_2d_blur[d]);
+                lv_draw_px(point_lt.x, point_lt.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             if(point_lb.x < ofs_lb.x && point_lb.y > ofs_lb.y) {
-                px_fp(point_lb.x, point_lb.y, mask, style->body.shadow.color, line_2d_blur[d]);
+                lv_draw_px(point_lb.x, point_lb.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             if(point_rt.x > ofs_rt.x && point_rt.y < ofs_rt.y) {
-                px_fp(point_rt.x, point_rt.y, mask, style->body.shadow.color, line_2d_blur[d]);
+                lv_draw_px(point_rt.x, point_rt.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             if(point_rb.x > ofs_rb.x && point_rb.y > ofs_rb.y) {
-                px_fp(point_rb.x, point_rb.y, mask, style->body.shadow.color, line_2d_blur[d]);
+                lv_draw_px(point_rb.x, point_rb.y, mask, style->body.shadow.color, line_2d_blur[d]);
             }
 
             point_rb.x++;
@@ -1306,12 +1306,12 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
             } else {
                 px_opa = (uint16_t)((uint16_t)line_1d_blur[d] + line_1d_blur[d - diff]) >> 1;
             }
-            px_fp(point_l.x, point_l.y, mask, style->body.shadow.color, px_opa);
+            lv_draw_px(point_l.x, point_l.y, mask, style->body.shadow.color, px_opa);
             point_l.y ++;
 
             /*Don't overdraw the pixel on the middle*/
             if(point_r.x > ofs_l.x) {
-                px_fp(point_r.x, point_r.y, mask, style->body.shadow.color, px_opa);
+                lv_draw_px(point_r.x, point_r.y, mask, style->body.shadow.color, px_opa);
             }
             point_r.y ++;
         }
@@ -1325,7 +1325,7 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
 
     uint16_t d;
     for(d = 0; d < swidth; d++) {
-        fill_fp(&area_mid, mask, style->body.shadow.color, line_1d_blur[d]);
+        lv_draw_fill(&area_mid, mask, style->body.shadow.color, line_1d_blur[d]);
         area_mid.y1 ++;
         area_mid.y2 ++;
     }
@@ -1370,19 +1370,19 @@ static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area
     for(d = 1 /*+ LV_ANTIALIAS*/; d <= swidth/* - LV_ANTIALIAS*/; d++) {
         opa_act = map[d];
 
-        fill_fp(&right_area, mask, style->body.shadow.color, opa_act);
+        lv_draw_fill(&right_area, mask, style->body.shadow.color, opa_act);
         right_area.x1++;
         right_area.x2++;
 
-        fill_fp(&left_area, mask, style->body.shadow.color, opa_act);
+        lv_draw_fill(&left_area, mask, style->body.shadow.color, opa_act);
         left_area.x1--;
         left_area.x2--;
 
-        fill_fp(&top_area, mask, style->body.shadow.color, opa_act);
+        lv_draw_fill(&top_area, mask, style->body.shadow.color, opa_act);
         top_area.y1--;
         top_area.y2--;
 
-        fill_fp(&bottom_area, mask, style->body.shadow.color, opa_act);
+        lv_draw_fill(&bottom_area, mask, style->body.shadow.color, opa_act);
         bottom_area.y1++;
         bottom_area.y2++;
     }

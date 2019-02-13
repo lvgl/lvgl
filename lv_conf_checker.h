@@ -100,7 +100,7 @@
  * Setting it to 0 will disable VDB and `disp_drv.disp_fill` and `disp_drv.disp_map` functions
  * will be called to draw to the frame buffer directly*/
 #ifndef LV_VDB_SIZE
-#define LV_VDB_SIZE         ((LV_VER_RES * LV_HOR_RES) / 10)
+//#define LV_VDB_SIZE         ((LV_VER_RES * LV_HOR_RES) / 10)
 #endif
 
  /* Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays.
@@ -113,7 +113,7 @@
   * 0: allocate automatically into RAM
   * LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`*/
 #ifndef LV_VDB_ADR
-#define LV_VDB_ADR          0
+//#define LV_VDB_ADR          0
 #endif
 
 /* Use two Virtual Display buffers (VDB) to parallelize rendering and flushing

@@ -42,19 +42,6 @@ extern "C" {
 #error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
 
-#if LV_VDB_SIZE == 0 && LV_ANTIALIAS != 0
-#error "LittlevGL: If LV_VDB_SIZE == 0 the anti-aliasing must be disabled"
-#endif
-
-#if LV_VDB_SIZE > 0 && LV_VDB_SIZE < LV_HOR_RES
-#error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
-#endif
-
-#if LV_VDB_SIZE == 0 && USE_LV_REAL_DRAW == 0
-#error "LittlevGL: If LV_VDB_SIZE = 0 Real drawing function are required (lv_conf.h: USE_LV_REAL_DRAW 1)"
-#endif
-
-
 #define LV_ANIM_IN              0x00    /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_OUT             0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_DIR_MASK        0x80    /*ANIM_IN/ANIM_OUT mask*/

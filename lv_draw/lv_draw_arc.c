@@ -239,7 +239,7 @@ static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coor
     lv_area_t area;
     lv_area_set(&area, x, y, x, y + len);
 
-    fill_fp(&area, mask, color, opa);
+    lv_draw_fill(&area, mask, color, opa);
 }
 
 static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color, lv_opa_t opa)
@@ -247,7 +247,7 @@ static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coor
     lv_area_t area;
     lv_area_set(&area, x, y, x + len, y);
 
-    fill_fp(&area, mask, color, opa);
+    lv_draw_fill(&area, mask, color, opa);
 }
 
 static bool deg_test_norm(uint16_t deg, uint16_t start, uint16_t end)

@@ -1,9 +1,9 @@
 /**
- * @file lv_vdraw.c
+ * @file lv_draw_basic.c
  *
  */
 
-#include "lv_draw_vbasic.h"
+#include "lv_draw_basic.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -16,10 +16,7 @@
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_log.h"
 
-#if LV_VDB_SIZE != 0
-
 #include <stddef.h>
-#include "../lv_core/lv_vdb.h"
 #include "lv_draw.h"
 
 /*********************
@@ -69,16 +66,11 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
  * @param color pixel color
  * @param opa opacity of the area (0..255)
  */
-void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t color, lv_opa_t opa)
+void lv_draw_px(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t color, lv_opa_t opa)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    if(!vdb_p) {
-        LV_LOG_WARN("Invalid VDB pointer");
-        return;
-    }
 
     /*Pixel out of the mask*/
     if(x < mask_p->x1 || x > mask_p->x2 ||
@@ -86,17 +78,19 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
         return;
     }
 
-    uint32_t vdb_width = lv_area_get_width(&vdb_p->area);
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
+    uint32_t vdb_width = lv_area_get_width(&vdb->area);
 
     /*Make the coordinates relative to VDB*/
-    x -= vdb_p->area.x1;
-    y -= vdb_p->area.y1;
+    x -= vdb->area.x1;
+    y -= vdb->area.y1;
 
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
     if(disp->driver.vdb_wr) {
-        disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, x, y, color, opa);
+        disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, x, y, color, opa);
     } else {
-        lv_color_t * vdb_px_p = vdb_p->buf + y * vdb_width + x;
+        lv_color_t * vdb_px_p = vdb->buf_act;
+        vdb_px_p += y * vdb_width + x;
 #if LV_COLOR_SCREEN_TRANSP == 0
         if(opa == LV_OPA_COVER) {
             *vdb_px_p = color;
@@ -117,7 +111,7 @@ void lv_vpx(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t col
  * @param color fill color
  * @param opa opacity of the area (0..255)
  */
-void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
+void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p,
               lv_color_t color, lv_opa_t opa)
 {
     if(opa < LV_OPA_MIN) return;
@@ -125,11 +119,6 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
     lv_area_t res_a;
     bool union_ok;
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    if(!vdb_p) {
-        LV_LOG_WARN("Invalid VDB pointer");
-        return;
-    }
 
     /*Get the union of cord and mask*/
     /* The mask is already truncated to the vdb size
@@ -140,15 +129,16 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(union_ok == false) return;
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
 
     lv_area_t vdb_rel_a;   /*Stores relative coordinates on vdb*/
-    vdb_rel_a.x1 = res_a.x1 - vdb_p->area.x1;
-    vdb_rel_a.y1 = res_a.y1 - vdb_p->area.y1;
-    vdb_rel_a.x2 = res_a.x2 - vdb_p->area.x1;
-    vdb_rel_a.y2 = res_a.y2 - vdb_p->area.y1;
+    vdb_rel_a.x1 = res_a.x1 - vdb->area.x1;
+    vdb_rel_a.y1 = res_a.y1 - vdb->area.y1;
+    vdb_rel_a.x2 = res_a.x2 - vdb->area.x1;
+    vdb_rel_a.y2 = res_a.y2 - vdb->area.y1;
 
-    lv_color_t * vdb_buf_tmp = vdb_p->buf;
-    uint32_t vdb_width = lv_area_get_width(&vdb_p->area);
+    lv_color_t * vdb_buf_tmp = vdb->buf_act;
+    uint32_t vdb_width = lv_area_get_width(&vdb->area);
     /*Move the vdb_tmp to the first row*/
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
@@ -160,7 +150,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     lv_coord_t w = lv_area_get_width(&vdb_rel_a);
     /*Don't use hw. acc. for every small fill (because of the init overhead)*/
     if(w < VFILL_HW_ACC_SIZE_LIMIT) {
-        sw_color_fill(&vdb_p->area, vdb_p->buf, &vdb_rel_a, color, opa);
+        sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
     }
     /*Not opaque fill*/
     else if(opa == LV_OPA_COVER) {
@@ -194,7 +184,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         }
         /*Else use sw fill if no better option*/
         else {
-            sw_color_fill(&vdb_p->area, vdb_p->buf, &vdb_rel_a, color, opa);
+            sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
         }
 
     }
@@ -219,12 +209,12 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
         }
         /*Use sw fill with opa if no better option*/
         else {
-            sw_color_fill(&vdb_p->area, vdb_p->buf, &vdb_rel_a, color, opa);
+            sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
         }
 
     }
 #else
-    sw_color_fill(&vdb_p->area, vdb_p->buf, &vdb_rel_a, color, opa);
+    sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
 #endif
 }
 
@@ -237,7 +227,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
  * @param color color of letter
  * @param opa opacity of letter (0..255)
  */
-void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
+void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                 const lv_font_t * font_p, uint32_t letter,
                 lv_color_t color, lv_opa_t opa)
 {
@@ -299,14 +289,11 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     if(pos_x + letter_w < mask_p->x1 || pos_x > mask_p->x2 ||
             pos_y + letter_h < mask_p->y1 || pos_y > mask_p->y2) return;
 
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    if(!vdb_p) {
-        LV_LOG_WARN("Invalid VDB pointer");
-        return;
-    }
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
 
-    lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
-    lv_color_t * vdb_buf_tmp = vdb_p->buf;
+    lv_coord_t vdb_width = lv_area_get_width(&vdb->area);
+    lv_color_t * vdb_buf_tmp = vdb->buf_act;
     lv_coord_t col, row;
     uint8_t col_bit;
     uint8_t col_byte_cnt;
@@ -322,16 +309,14 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
     lv_coord_t row_end  = pos_y + letter_h <= mask_p->y2 ? letter_h : mask_p->y2 - pos_y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
-    vdb_buf_tmp += ((pos_y - vdb_p->area.y1) * vdb_width)
-                   + pos_x - vdb_p->area.x1;
+    vdb_buf_tmp += ((pos_y - vdb->area.y1) * vdb_width)
+                   + pos_x - vdb->area.x1;
 
     /*If the letter is partially out of mask the move there on VDB*/
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
     map_p += (row_start * width_byte_bpp) + ((col_start * bpp) >> 3);
-
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
 
     uint8_t letter_px;
     lv_opa_t px_opa;
@@ -351,8 +336,8 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                 }
 
                 if(disp->driver.vdb_wr) {
-                    disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width,
-                                        (col + pos_x) - vdb_p->area.x1, (row + pos_y) - vdb_p->area.y1,
+                    disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width,
+                                        (col + pos_x) - vdb->area.x1, (row + pos_y) - vdb->area.y1,
                                         color, px_opa);
                 } else {
 #if LV_COLOR_SCREEN_TRANSP == 0
@@ -392,7 +377,7 @@ void lv_vletter(const lv_point_t * pos_p, const lv_area_t * mask_p,
  * @param recolor mix the pixels with this color
  * @param recolor_opa the intense of recoloring
  */
-void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
+void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
              const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
              lv_color_t recolor, lv_opa_t recolor_opa)
 {
@@ -402,11 +387,6 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
     lv_area_t masked_a;
     bool union_ok;
-    lv_vdb_t * vdb_p = lv_vdb_get();
-    if(!vdb_p) {
-        LV_LOG_WARN("Invalid VDB pointer");
-        return;
-    }
 
     /*Get the union of map size and mask*/
     /* The mask is already truncated to the vdb size
@@ -428,21 +408,22 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
         map_p += (masked_a.x1 - cords_p->x1) * px_size_byte;
     }
 
-    /*Stores coordinates relative to the current VDB*/
-    masked_a.x1 = masked_a.x1 - vdb_p->area.x1;
-    masked_a.y1 = masked_a.y1 - vdb_p->area.y1;
-    masked_a.x2 = masked_a.x2 - vdb_p->area.x1;
-    masked_a.y2 = masked_a.y2 - vdb_p->area.y1;
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
 
-    lv_coord_t vdb_width = lv_area_get_width(&vdb_p->area);
-    lv_color_t * vdb_buf_tmp = vdb_p->buf;
+    /*Stores coordinates relative to the current VDB*/
+    masked_a.x1 = masked_a.x1 - vdb->area.x1;
+    masked_a.y1 = masked_a.y1 - vdb->area.y1;
+    masked_a.x2 = masked_a.x2 - vdb->area.x1;
+    masked_a.y2 = masked_a.y2 - vdb->area.y1;
+
+    lv_coord_t vdb_width = lv_area_get_width(&vdb->area);
+    lv_color_t * vdb_buf_tmp = vdb->buf_act;
     vdb_buf_tmp += (uint32_t) vdb_width * masked_a.y1; /*Move to the first row*/
     vdb_buf_tmp += (uint32_t) masked_a.x1; /*Move to the first col*/
 
     lv_coord_t row;
     lv_coord_t map_useful_w = lv_area_get_width(&masked_a);
-
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
 
     /*The simplest case just copy the pixels into the VDB*/
     if(chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
@@ -453,7 +434,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
                 for(col = 0; col < map_useful_w; col++) {
                     lv_color_t px_color = *((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
-                    disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa);
+                    disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa);
                 }
                 map_p += map_width * px_size_byte;  /*Next row on the map*/
             }
@@ -516,7 +497,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                     }
                     /*Handle custom VDB write is present*/
                     if(disp->driver.vdb_wr) {
-                        disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
+                        disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
                     }
                     /*Normal native VDB write*/
                     else {
@@ -526,7 +507,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 } else {
                     /*Handle custom VDB write is present*/
                     if(disp->driver.vdb_wr) {
-                        disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa_result);
+                        disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa_result);
                     }
                     /*Normal native VDB write*/
                     else {
@@ -692,4 +673,3 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
 }
 #endif /*LV_COLOR_SCREEN_TRANSP*/
 
-#endif

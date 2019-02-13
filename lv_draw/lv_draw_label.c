@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_label.h"
-#include "lv_draw_rbasic.h"
 #include "../lv_misc/lv_math.h"
 
 /*********************
@@ -123,12 +122,6 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         pos.y += y_ofs;
     }
 
-    /*Real draw need a background color for higher bpp letter*/
-#if LV_VDB_SIZE == 0
-    lv_rletter_set_background(style->body.main_color);
-#endif
-
-
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
         if(offset != NULL) {
@@ -182,7 +175,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
 
-            letter_fp(&pos, mask, font, letter, color, opa);
+            lv_draw_letter(&pos, mask, font, letter, color, opa);
             letter_w = lv_font_get_width(font, letter);
 
             if(letter_w > 0){

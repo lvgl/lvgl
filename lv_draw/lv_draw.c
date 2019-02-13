@@ -10,12 +10,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "lv_draw.h"
-#include "lv_draw_rbasic.h"
-#include "lv_draw_vbasic.h"
-#include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_misc/lv_ufs.h"
-#include "../lv_objx/lv_img.h"
 
 /*********************
  *      DEFINES
@@ -32,22 +27,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-#if LV_VDB_SIZE != 0
-void (*const px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_vpx;
-void (*const fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_vfill;
-void (*const letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_vletter;
-void (*const map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
-                     const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-                     lv_color_t recolor, lv_opa_t recolor_opa) = lv_vmap;
-#else
-void (*const px_fp)(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) = lv_rpx;
-void (*const fill_fp)(const lv_area_t * coords, const lv_area_t * mask, lv_color_t color, lv_opa_t opa) =  lv_rfill;
-void (*const letter_fp)(const lv_point_t * pos_p, const lv_area_t * mask, const lv_font_t * font_p, uint32_t letter, lv_color_t color, lv_opa_t opa) = lv_rletter;
-void (*const map_fp)(const lv_area_t * cords_p, const lv_area_t * mask_p,
-                     const uint8_t * map_p, lv_opa_t opa, bool chroma_key, bool alpha_byte,
-                     lv_color_t recolor, lv_opa_t recolor_opa) = lv_rmap;
-#endif
 
 /**********************
  *      MACROS
@@ -132,7 +111,7 @@ void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
     for(i = 0; i < length; i++) {
         lv_opa_t px_opa = lv_draw_aa_get_opa(length, i, opa);
         if(aa_inv) px_opa = opa - px_opa;
-        px_fp(x, y + i, mask, color, px_opa);
+        lv_draw_px(x, y + i, mask, color, px_opa);
     }
 }
 
@@ -157,7 +136,7 @@ void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
     for(i = 0; i < length; i++) {
         lv_opa_t px_opa = lv_draw_aa_get_opa(length, i, opa);
         if(aa_inv) px_opa = opa - px_opa;
-        px_fp(x + i, y, mask, color, px_opa);
+        lv_draw_px(x + i, y, mask, color, px_opa);
     }
 }
 

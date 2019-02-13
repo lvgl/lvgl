@@ -15,7 +15,6 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_draw/lv_draw_rbasic.h"
 
 /*********************
  *      DEFINES
@@ -367,14 +366,6 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->proc.act_point.y = data->point.y;
 
     if(i->proc.state == LV_INDEV_STATE_PR) {
-#if LV_INDEV_POINT_MARKER != 0
-        lv_area_t area;
-        area.x1 = i->proc.act_point.x - (LV_INDEV_POINT_MARKER >> 1);
-        area.y1 = i->proc.act_point.y - (LV_INDEV_POINT_MARKER >> 1);
-        area.x2 = i->proc.act_point.x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        area.y2 = i->proc.act_point.y + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        lv_rfill(&area, NULL, LV_COLOR_MAKE(0xFF, 0, 0), LV_OPA_COVER);
-#endif
         indev_proc_press(&i->proc);
     } else {
         indev_proc_release(&i->proc);
