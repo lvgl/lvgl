@@ -67,16 +67,15 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->ta.accapted_chars = "1234567890+-.";
 
     ext->value = 0;
-    ext->dec_point_pos = 2;
+    ext->dec_point_pos = 0;
     ext->digit_count = 5;
-    ext->step = 100;
+    ext->digit_padding_left = 0;
+    ext->step = 1;
     ext->range_max = 99999;
     ext->range_min = -99999;
     ext->value_changed_cb = NULL;
 
     lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK | LV_CURSOR_HIDDEN); /*hidden by default*/
-    lv_ta_set_cursor_pos(new_spinbox, 4);
-
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_spinbox, lv_spinbox_signal);
@@ -450,8 +449,8 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     int i = 0;
     uint8_t digits[16];
 
-    if(v < 0)
-        v = -v;
+    if(v < 0) v = -v;
+
     for(i = 0; i < dc; i++)
     {
         digits[i] = v%10;
@@ -464,18 +463,24 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
         ext->digits[1 + pl + k] = '0' + digits[--i];
     }
 
-    ext->digits[1 + pl + intDigits] = '.';
+    if(ext->dec_point_pos != 0) {
+        ext->digits[1 + pl + intDigits] = '.';
 
-    int d;
+        int d;
 
-    for(d = 0; d < decDigits; d++)
-    {
-        ext->digits[1 + pl + intDigits + 1 + d] = '0' + digits[--i];
+        for(d = 0; d < decDigits; d++)
+        {
+            ext->digits[1 + pl + intDigits + 1 + d] = '0' + digits[--i];
+        }
+
+        ext->digits[1 + pl + intDigits + 1 + decDigits] = '\0';
+    } else {
+        ext->digits[1 + pl + intDigits] = '\0';
+
     }
 
-    ext->digits[1 + pl + intDigits + 1 + decDigits] = '\0';
 
-    lv_label_set_text(ext->ta.label, (char*)ext->digits);
+    lv_ta_set_text(spinbox, (char*)ext->digits);
 
     int32_t step = ext->step;
     uint8_t cPos = ext->digit_count + pl;

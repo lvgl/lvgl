@@ -764,12 +764,18 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
  */
 static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mask)
 {
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    lv_coord_t w = lv_obj_get_width(chart);
+    /*Vertical lines works only if the width == point count. Else use the normal line type*/
+    if(ext->point_cnt != w) {
+        lv_chart_draw_lines(chart, mask);
+        return;
+    }
 
     uint16_t i;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t w = lv_obj_get_width(chart);
     lv_coord_t h = lv_obj_get_height(chart);
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
@@ -789,47 +795,28 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
         p2.x = 0 + x_ofs;
         y_tmp = (int32_t)((int32_t) ser->points[0] - ext->ymin) * h;
         y_tmp = y_tmp / (ext->ymax - ext->ymin);
-        p1.y = LV_COORD_MIN;
         p2.y = h - y_tmp + y_ofs;
+        p1.y = p2.y;
 
-        if(ext->point_cnt == w)
+        for(i = 0; i < ext->point_cnt; i++)
         {
-            for(i = 0; i < ext->point_cnt; i++)
+
+            y_tmp = (int32_t)((int32_t) ser->points[i] - ext->ymin) * h;
+            y_tmp = y_tmp / (ext->ymax - ext->ymin);
+            p2.y = h - y_tmp + y_ofs;
+
+            if(p1.y == p2.y)
             {
+                p2.x++;
+            }
 
-                y_tmp = (int32_t)((int32_t) ser->points[i] - ext->ymin) * h;
-                y_tmp = y_tmp / (ext->ymax - ext->ymin);
-                p2.y = h - y_tmp + y_ofs;
-
-                if(p1.y == p2.y)
-                {
-                    p2.x++;
-                }
-
+            if(ser->points[i] != LV_CHART_POINT_DEF) {
                 lv_draw_line(&p1, &p2, mask, &style, opa_scale);
-
-                p2.x = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
-                p1.x = p2.x;
-                p1.y = p2.y;
             }
-        }
-        else
-        {
-            for(i = 1; i < ext->point_cnt; i ++) {
-                p1.x = p2.x;
-                p1.y = p2.y;
 
-                p2.x = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
-
-                y_tmp = (int32_t)((int32_t) ser->points[i] - ext->ymin) * h;
-                y_tmp = y_tmp / (ext->ymax - ext->ymin);
-                p2.y = h - y_tmp + y_ofs;
-
-                if(ser->points[i - 1] >= 0 && ser->points[i] >= 0)
-                {
-                    lv_draw_line(&p1, &p2, mask, &style, opa_scale);
-                }
-            }
+            p2.x = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
+            p1.x = p2.x;
+            p1.y = p2.y;
         }
     }
 }

@@ -567,7 +567,7 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
     a.repeat_pause = 0;
     lv_anim_create(&a);
 #else
-    lv_obj_set_y(scrl, lv_obj_get_x(scrl) + dist);
+    lv_obj_set_y(scrl, lv_obj_get_y(scrl) + dist);
 #endif
 }
 
