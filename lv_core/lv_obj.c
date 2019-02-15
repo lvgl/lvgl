@@ -91,6 +91,10 @@ void lv_init(void)
     lv_anim_init();
 #endif
 
+#if USE_LV_GROUP
+    lv_group_init();
+#endif
+
     /*Init. the sstyles*/
     lv_style_init();
 

@@ -85,6 +85,11 @@ void lv_theme_set_current(lv_theme_t * th)
 
     /*Let the object know their style might change*/
     lv_obj_report_style_mod(NULL);
+
+#if USE_LV_GROUP
+    lv_group_report_style_mod(NULL);
+#endif
+
 #endif
 }
 
