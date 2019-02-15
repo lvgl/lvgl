@@ -763,16 +763,10 @@ static void style_mod(lv_style_t * style)
 #if LV_COLOR_DEPTH != 1
     /*Make the style to be a little bit orange*/
     style->body.border.opa = LV_OPA_COVER;
-    style->body.border.color = LV_COLOR_ORANGE;
+    style->body.border.color = lv_color_hsv_to_rgb(_hue, 40, 50);
 
     /*If not empty or has border then emphasis the border*/
     if (style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
-
-    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
-    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
-    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
-
-    style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
 #else
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
