@@ -70,7 +70,10 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new window object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_win, LV_DPI * 3, LV_DPI * 3);
+        lv_obj_t * disp = lv_obj_get_disp(new_win);
+        lv_coord_t hres = lv_disp_get_hor_res(disp);
+        lv_coord_t vres = lv_disp_get_ver_res(disp);
+        lv_obj_set_size(new_win, hres, vres);
         lv_obj_set_pos(new_win, 0, 0);
         lv_obj_set_style(new_win, &lv_style_pretty);
 

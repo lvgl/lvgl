@@ -106,7 +106,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->tab_name_ptr[0] = "";
         ext->tab_cnt = 0;
 
-        lv_disp_t * disp = lv_obj_get_disp(par);
+        lv_disp_t * disp = lv_obj_get_disp(new_tabview);
         lv_obj_set_size(new_tabview, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
 
         ext->btns = lv_btnm_create(new_tabview, NULL);
