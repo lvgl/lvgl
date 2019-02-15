@@ -69,8 +69,8 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->value = 0;
     ext->dec_point_pos = 0;
-    ext->digit_count = 8;
-    ext->digit_padding_left = 2;
+    ext->digit_count = 5;
+    ext->digit_padding_left = 0;
     ext->step = 1;
     ext->range_max = 99999;
     ext->range_min = -99999;
@@ -264,9 +264,10 @@ void lv_spinbox_step_next(lv_obj_t * spinbox)
 void lv_spinbox_step_previous(lv_obj_t * spinbox)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-
+    int32_t step_limit;
+    step_limit = LV_MATH_MAX(ext->range_max, (ext->range_min < 0 ? (-ext->range_min) : ext->range_min));
     int32_t new_step = ext->step * 10;
-    if(new_step <= ext->range_max) ext->step = new_step;
+    if(new_step <= step_limit) ext->step = new_step;
 
     lv_spinbox_updatevalue(spinbox);
 }
