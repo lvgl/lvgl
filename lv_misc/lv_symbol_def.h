@@ -73,7 +73,7 @@ extern "C" {
 #define SYMBOL_BATTERY_EMPTY   _SYMBOL_VALUE1(F0)
 #define SYMBOL_BLUETOOTH       _SYMBOL_VALUE1(F1)
 #define LV_SYMBOL_GLYPH_LAST   0xF1
-#define SYMBOL_DUMMY           _SYMBOL_VALUE1(xFF)       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
+#define SYMBOL_DUMMY           _SYMBOL_VALUE1(FF)       /*Invalid symbol. If written before a string then `lv_img` will show it as a label*/
 
 #else
 #define LV_SYMBOL_GLYPH_FIRST  0xF800
