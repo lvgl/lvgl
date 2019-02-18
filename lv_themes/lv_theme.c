@@ -81,7 +81,7 @@ void lv_theme_set_current(lv_theme_t * th)
     }
 
     /*Copy group style modification callback functions*/
-    current_theme.group = th->group;
+    memcpy(&current_theme.group, &th->group, sizeof(th->group));
 
     /*Let the object know their style might change*/
     lv_obj_report_style_mod(NULL);
