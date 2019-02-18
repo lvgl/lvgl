@@ -8,6 +8,7 @@
  *********************/
 #include "lv_math.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 /*********************
  *      DEFINES
