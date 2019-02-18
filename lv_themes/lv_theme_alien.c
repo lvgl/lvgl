@@ -806,6 +806,8 @@ static void win_init(void)
 #endif
 }
 
+#if USE_LV_GROUP
+
 static void style_mod(lv_style_t * style)
 {
 #if LV_COLOR_DEPTH != 1
@@ -840,6 +842,8 @@ static void style_mod_edit(lv_style_t * style)
     style->body.border.width = 3;
 #endif
 }
+
+#endif /*USE_LV_GROUP*/
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -897,8 +901,10 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
     table_init();
     win_init();
 
+#if USE_LV_GROUP
     theme.group.style_mod = style_mod;
     theme.group.style_mod_edit = style_mod_edit;
+#endif
 
     return &theme;
 }

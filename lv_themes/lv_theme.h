@@ -293,11 +293,13 @@ typedef struct {
 #endif
     } style;
 
+#if USE_LV_GROUP
     struct
     {
         lv_group_style_mod_func_t style_mod;
         lv_group_style_mod_func_t style_mod_edit;
     } group;
+#endif
 } lv_theme_t;
 
 /**********************
