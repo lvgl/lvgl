@@ -385,7 +385,7 @@ static void refr_img(lv_obj_t * imgbtn)
         ext->act_cf = LV_IMG_CF_UNKOWN;
     }
 
-
+    lv_obj_invalidate(imgbtn);
 }
 
 #endif
