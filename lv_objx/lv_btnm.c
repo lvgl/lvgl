@@ -269,6 +269,30 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
 }
 
 /**
+ * Set the button control map (hidden, disabled etc.) for a button matrix. The
+ * control map array will be copied and so may be deallocated after this
+ * function returns.
+ * @param btnm pointer to a button matrix object
+ * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes. The
+ *                 length of the array and position of the elements must match
+ *                 that when the map was set via `lv_btnm_set_map` (i.e. one
+ *                 element for each button AND new line).
+ *                 The control bits are:
+ *                 - bit 5   : 1 = inactive (disabled)
+ *                 - bit 4   : 1 = no repeat (on long press)
+ *                 - bit 3   : 1 = hidden
+ *                 - bit 2..0: Relative width compared to the buttons in the
+ *                             same row. [1..7]
+ */
+void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, lv_btn_ctrl_t * ctrl_map)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+    memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btn_ctrl_t) * ext->btn_cnt);
+
+    lv_btnm_set_map(btnm, ext->map_p);
+}
+
+/**
  * Set a new callback function for the buttons (It will be called when a button is released)
  * @param btnm: pointer to button matrix object
  * @param cb pointer to a callback function
@@ -348,7 +372,9 @@ void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en)
 /**
  * Show/hide a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to hide/show
+ * @param btn_idx 0 based index of the button to hide/show. The index must
+ *                match the index of the element in the map that was passed to
+ *                `lv_btnm_set_map`.
  * @param hidden true: hide the button
  */
 void lv_btnm_set_btn_hidden(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden)
@@ -366,7 +392,9 @@ void lv_btnm_set_btn_hidden(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden
 /**
  * Enable/disable a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to enable/disable
+ * @param btn_idx 0 based index of the button to enable/disable. The index must
+ *                match the index of the element in the map that was passed to
+ *                `lv_btnm_set_map`.
  * @param disabled true: disable the button
  */
 void lv_btnm_set_btn_disabled(const lv_obj_t * btnm, uint16_t btn_idx, bool disabled)
@@ -384,7 +412,9 @@ void lv_btnm_set_btn_disabled(const lv_obj_t * btnm, uint16_t btn_idx, bool disa
 /**
  * Enable/disable long press for a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify
+ * @param btn_idx 0 based index of the button to modify. The index must match
+ *                the index of the element in the map that was passed to
+ *                `lv_btnm_set_map`.
  * @param disabled true: disable repeat
  */
 void lv_btnm_set_btn_disable_repeat(const lv_obj_t * btnm, uint16_t btn_idx, bool disabled)
@@ -402,7 +432,9 @@ void lv_btnm_set_btn_disable_repeat(const lv_obj_t * btnm, uint16_t btn_idx, boo
 /***
  * Set hidden/disabled/repeat flags for a single button.
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify
+ * @param btn_idx 0 based index of the button to modify. The index must match
+ *                the index of the element in the map that was passed to
+ *                `lv_btnm_set_map`.
  * @param hidden true: hide the button
  * @param disabled true: disable the button
  * @param disable_repeat true: disable repeat
@@ -427,10 +459,12 @@ void lv_btnm_set_btn_flags(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden,
  * Set a single buttons relative width.
  * This method will cause the matrix be regenerated and is a relatively
  * expensive operation. It is recommended that initial width be specified using
- * the control characters when calling lv_btnm_set_map and this method only be
- * used for dynamic changes.
+ * the control characters when calling `lv_btnm_set_map` or via
+ * `lv_btnm_set_ctrl_map` and this method only be used for dynamic changes.
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify
+ * @param btn_idx 0 based index of the button to modify. The index must match
+ *                the index of the element in the map that was passed to
+ *                `lv_btnm_set_map`.
  * @param width Relative width compared to the buttons in the same row. [1..7]
  */
 void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_idx, uint8_t width) {
