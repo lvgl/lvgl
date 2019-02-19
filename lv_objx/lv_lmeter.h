@@ -36,6 +36,7 @@ typedef struct
     /*No inherited ext.*/            /*Ext. of ancestor*/
     /*New data for this type */
     uint16_t scale_angle;        /*Angle of the scale in deg. (0..360)*/
+	uint16_t Offset_angle;       // by leo
     uint8_t line_cnt;            /*Count of lines */
     int16_t cur_value;
     int16_t min_value;
@@ -72,6 +73,9 @@ void lv_lmeter_set_value(lv_obj_t *lmeter, int16_t value);
  * @param max maximum value
  */
 void lv_lmeter_set_range(lv_obj_t *lmeter, int16_t min, int16_t max);
+
+
+void lv_lmeter_set_OffsetByLeo(lv_obj_t * lmeter, uint16_t Offset);
 
 /**
  * Set the scale settings of a line meter
@@ -139,6 +143,8 @@ static inline lv_style_t * lv_lmeter_get_style(const lv_obj_t * lmeter)
 {
     return lv_obj_get_style(lmeter);
 }
+
+
 
 /**********************
  *      MACROS
