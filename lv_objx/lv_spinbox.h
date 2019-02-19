@@ -50,11 +50,9 @@ typedef struct {
     int32_t range_max;
     int32_t range_min;
     int32_t step;
-    uint8_t digit_count:4;
-    uint8_t dec_point_pos:4;      /*if 0, there is no separator and the number is an integer*/
-    uint8_t digit_padding_left:4;
-    uint8_t digit_padding_right:4;
-    uint8_t digits[1+1+LV_SPINBOX_MAX_DIGIT_COUNT];     /*1 sign, 1 point, 16 num digits*/
+    uint16_t digit_count:4;
+    uint16_t dec_point_pos:4;      /*if 0, there is no separator and the number is an integer*/
+    uint16_t digit_padding_left:4;
     lv_spinbox_value_changed_cb_t value_changed_cb;
 } lv_spinbox_ext_t;
 
