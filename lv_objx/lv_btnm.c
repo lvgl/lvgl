@@ -35,8 +35,8 @@ static bool button_is_inactive(lv_btn_ctrl_t ctrl_bits);
 const char * cut_ctrl_byte(const char * btn_str);
 static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p);
 static uint16_t get_button_text(lv_obj_t * btnm, uint16_t btn_id);
-static void parse_control_bytes(lv_obj_t * btnm, const char ** map);
-static void allocate_btn_areas_and_controls(lv_obj_t * btnm, const char ** map);
+static void parse_control_bytes(const lv_obj_t * btnm, const char ** map);
+static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char ** map);
 static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx);
 static bool maps_are_identical(const char ** map1, const char ** map2);
 
@@ -153,7 +153,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
  *             Example (practically use octal numbers): "\224abc": "abc" text
  *             with 4 width and no long press.
  */
-void lv_btnm_set_map(lv_obj_t * btnm, const char ** map)
+void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
 {
     if(map == NULL) return;
 
@@ -874,7 +874,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
  * @param btnm pointer to button matrix object
  * @param map_p pointer to a string array
  */
-static void allocate_btn_areas_and_controls(lv_obj_t * btnm, const char ** map)
+static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char ** map)
 {
     /*Count the buttons in the map*/
     uint16_t btn_cnt = 0;
@@ -911,7 +911,7 @@ static void allocate_btn_areas_and_controls(lv_obj_t * btnm, const char ** map)
  * @param btnm pointer to button matrix object
  * @param map_p pointer to a string array
  */
-static void parse_control_bytes(lv_obj_t * btnm, const char ** map)
+static void parse_control_bytes(const lv_obj_t * btnm, const char ** map)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 

@@ -114,7 +114,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy);
  *             - bit 2..0: button relative width
  *             Example (practically use octal numbers): "\224abc": "abc" text with 4 width and no long press
  */
-void lv_btnm_set_map(lv_obj_t * btnm, const char ** map);
+void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map);
 
 /**
  * Set the button control map (hidden, disabled etc.) for a button matrix. The
