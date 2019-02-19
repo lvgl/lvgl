@@ -212,7 +212,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
         /*Count the buttons in a line*/
         while(strcmp(map_p_tmp[btn_cnt], "\n") != 0 &&
                 strlen(map_p_tmp[btn_cnt]) != 0) { /*Check a line*/
-            unit_cnt += get_button_width(ext->ctrl_bits[btn_cnt]);
+            unit_cnt += get_button_width(ext->ctrl_bits[btn_i + btn_cnt]);
             btn_cnt ++;
         }
 
@@ -235,7 +235,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
                 /* one_unit_w = all_unit_w / unit_cnt
                  * act_unit_w = one_unit_w * button_width
                  * do this two operations but the multiply first to divide a greater number */
-                act_unit_w = (all_unit_w * get_button_width(ext->ctrl_bits[i])) / unit_cnt;
+                act_unit_w = (all_unit_w * get_button_width(ext->ctrl_bits[btn_i])) / unit_cnt;
                 act_unit_w --;                              /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
@@ -251,7 +251,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
                                 act_x + act_unit_w, act_y + btn_h);
                 }
 
-                unit_act_cnt += get_button_width(ext->ctrl_bits[i]);
+                unit_act_cnt += get_button_width(ext->ctrl_bits[btn_i]);
 
                 i_tot ++;
                 btn_i ++;
@@ -624,7 +624,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             }
 
             /*Skip hidden buttons*/
-            if(button_is_hidden(ext->ctrl_bits[txt_i])) continue;
+            if(button_is_hidden(ext->ctrl_bits[btn_i])) continue;
 
             lv_area_copy(&area_tmp, &ext->button_areas[btn_i]);
             area_tmp.x1 += area_btnm.x1;
@@ -636,7 +636,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             btn_h = lv_area_get_height(&area_tmp);
 
             /*Load the style*/
-            if(button_is_inactive(ext->ctrl_bits[txt_i])) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_INA);
+            if(button_is_inactive(ext->ctrl_bits[btn_i])) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_INA);
             else if(btn_i != ext->btn_id_pr && btn_i != ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL);
             else if(btn_i == ext->btn_id_pr && btn_i != ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_PR);
             else if(btn_i != ext->btn_id_pr && btn_i == ext->btn_id_tgl) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_REL);
@@ -734,8 +734,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         if(ext->action && ext->btn_id_pr != LV_BTNM_PR_NONE) {
             uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
             if(txt_i != LV_BTNM_PR_NONE) {
-                if(button_is_repeat_disabled(ext->ctrl_bits[txt_i]) == false &&
-                        button_is_inactive(ext->ctrl_bits[txt_i]) == false) {
+                if(button_is_repeat_disabled(ext->ctrl_bits[ext->btn_id_pr]) == false &&
+                        button_is_inactive(ext->ctrl_bits[ext->btn_id_pr]) == false) {
                     res = ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
                 }
             }
@@ -743,7 +743,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_PR_NONE) {
             uint16_t txt_i = get_button_text(btnm, ext->btn_id_pr);
-            if(button_is_inactive(ext->ctrl_bits[txt_i]) == false && txt_i != LV_BTNM_PR_NONE) {        /*Ignore the inactive buttons anf click between the buttons*/
+            if(button_is_inactive(ext->ctrl_bits[ext->btn_id_pr]) == false && txt_i != LV_BTNM_PR_NONE) {        /*Ignore the inactive buttons and clicks between the buttons*/
                 if(ext->action) res = ext->action(btnm, cut_ctrl_byte(ext->map_p[txt_i]));
                 if(res == LV_RES_OK) {
 
