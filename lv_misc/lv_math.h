@@ -19,9 +19,18 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_MATH_MIN(a,b) ((a) < (b) ? (a) : (b))
-#define LV_MATH_MAX(a,b) ((a) > (b) ? (a) : (b))
-#define LV_MATH_ABS(x) ((x) > 0 ? (x) : (-(x)))
+#define SIN_MATH_PRECISION_A_HALF     1
+#define SIN_MATH_PRECISION_QUATER     2
+#define SIN_MATH_PRECISION_EIGHTH     3
+#define SIN_MATH_PRECISION_A_DEGREE   4	
+
+// choose sin precision
+#define SIN_MATH_PRECISION  SIN_MATH_PRECISION_A_HALF
+	
+	
+#define LV_MATH_MIN(a,b) (a<b?a:b)
+#define LV_MATH_MAX(a,b) (a>b?a:b)
+#define LV_MATH_ABS(x) ((x)>0?(x):(-(x)))
 
 #define LV_TRIGO_SIN_MAX    32767
 #define LV_TRIGO_SHIFT      15      /* >> LV_TRIGO_SHIFT to normalize*/
@@ -49,7 +58,7 @@ char * lv_math_num_to_str(int32_t num, char * buf);
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-int16_t lv_trigo_sin(int16_t angle);
+float lv_trigo_sinByLeo(float angle);
 
 /**
  * Calculate a value of a Cubic Bezier function.
