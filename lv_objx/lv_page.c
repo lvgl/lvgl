@@ -499,7 +499,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
         scrlable_y += page_h - obj_h;
     }
     /*Out of the page on the left*/
-    else if((obj_w <= page_w && left_err > 0) ||
+    if((obj_w <= page_w && left_err > 0) ||
             (obj_w > page_w && left_err < right_err)) {
         /*Calculate a new position and let some space above*/
         scrlable_x = -(obj_x - style_scrl->body.padding.ver - style->body.padding.ver);
