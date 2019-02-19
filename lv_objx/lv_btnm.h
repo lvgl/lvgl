@@ -167,9 +167,7 @@ void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en);
 /**
  * Show/hide a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to hide/show. The index must
- *                match the index of the element in the map that was passed to
- *                `lv_btnm_set_map`.
+ * @param btn_idx 0 based index of the button to modify.
  * @param hidden true: hide the button
  */
 void lv_btnm_set_btn_hidden(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden);
@@ -177,9 +175,7 @@ void lv_btnm_set_btn_hidden(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden
 /**
  * Enable/disable a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to enable/disable. The index must
- *                match the index of the element in the map that was passed to
- *                `lv_btnm_set_map`.
+ * @param btn_idx 0 based index of the button to modify.
  * @param disabled true: disable the button
  */
 void lv_btnm_set_btn_disabled(const lv_obj_t * btnm, uint16_t btn_idx, bool disabled);
@@ -187,9 +183,7 @@ void lv_btnm_set_btn_disabled(const lv_obj_t * btnm, uint16_t btn_idx, bool disa
 /**
  * Enable/disable long press for a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify. The index must match
- *                the index of the element in the map that was passed to
- *                `lv_btnm_set_map`.
+ * @param btn_idx 0 based index of the button to modify.
  * @param disabled true: disable repeat
  */
 void lv_btnm_set_btn_disable_repeat(const lv_obj_t * btnm, uint16_t btn_idx, bool disabled);
@@ -197,9 +191,7 @@ void lv_btnm_set_btn_disable_repeat(const lv_obj_t * btnm, uint16_t btn_idx, boo
 /***
  * Set hidden/disabled/repeat flags for a single button.
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify. The index must match
- *                the index of the element in the map that was passed to
- *                `lv_btnm_set_map`.
+ * @param btn_idx 0 based index of the button to modify.
  * @param hidden true: hide the button
  * @param disabled true: disable the button
  * @param disable_repeat true: disable repeat
@@ -213,9 +205,7 @@ void lv_btnm_set_btn_flags(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden,
  * the control characters when calling `lv_btnm_set_map` or via
  * `lv_btnm_set_ctrl_map` and this method only be used for dynamic changes.
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify. The index must match
- *                the index of the element in the map that was passed to
- *                `lv_btnm_set_map`.
+ * @param btn_idx 0 based index of the button to modify.
  * @param width Relative width compared to the buttons in the same row. [1..7]
  */
 void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_idx, uint8_t width);
