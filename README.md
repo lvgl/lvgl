@@ -104,10 +104,10 @@ void my_disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_
 ```c
 lv_indev_drv_init(&indev_drv);             /*Descriptor of a input device driver*/
 indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
-indev_drv.read = touchpad_read;            /*Set your driver function*/
+indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-bool touchpad_read(lv_indev_data_t * data)
+bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
@@ -123,9 +123,9 @@ bool touchpad_read(lv_indev_data_t * data)
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 ```
-6. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in Timer interrupt or in an Operation system task.
+6. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in a Timer interrupt or in an Operation system task.
 
-For a detailed description check the [Documentation](https://docs.littlevgl.com/#Porting) or the [Porting tutorial](https://github.com/littlevgl/lv_examples/blob/master/lv_tutorial/0_porting/lv_tutorial_porting.c)
+For a detailed description check the [Documentation](https://docs.littlevgl.com/#Porting) or the [Porting examples](https://github.com/littlevgl/lvgl/tree/multi-disp/lv_porting).
  
  
 ### Code examples
