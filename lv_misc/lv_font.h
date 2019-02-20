@@ -171,7 +171,7 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
  *      MACROS
  **********************/
 
-#define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
+#define LV_FONT_DECLARE(font_name) extern lv_font_t font_name
 
 
 /**********************
