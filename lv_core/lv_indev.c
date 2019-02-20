@@ -126,12 +126,12 @@ void lv_indev_reset_lpr(lv_indev_t * indev)
 void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
 {
 
-//    lv_indev_t * i = lv_indev_next(NULL);
-//
-//    while(i) {
-//        if(i->driver.type == type) i->proc.disabled = enable == false ? 1 : 0;
-//        i = lv_indev_next(i);
-//    }
+    lv_indev_t * i = lv_indev_next(NULL);
+
+    while(i) {
+        if(i->driver.type == type) i->proc.disabled = enable == false ? 1 : 0;
+        i = lv_indev_next(i);
+    }
 }
 
 /**
@@ -144,7 +144,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     if(indev->driver.type != LV_INDEV_TYPE_POINTER) return;
 
     indev->cursor = cur_obj;
-    lv_obj_set_parent(indev->cursor, lv_layer_sys(indev->driver.disp));
+    lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
     lv_obj_set_pos(indev->cursor, indev->proc.act_point.x,  indev->proc.act_point.y);
 }
 
@@ -250,22 +250,19 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
 uint32_t lv_indev_get_inactive_time(const lv_indev_t * indev)
 {
 
-    //TODO
-//    uint32_t t;
-//
-//    if(indev) return t = lv_tick_elaps(indev->last_activity_time);
-//
-//    lv_indev_t * i;
-//    t = UINT16_MAX;
-//    i = lv_indev_next(NULL);
-//    while(i) {
-//        t = LV_MATH_MIN(t, lv_tick_elaps(i->last_activity_time));
-//        i = lv_indev_next(i);
-//    }
-//
-//    return t;
+    uint32_t t;
 
-    return 0;
+    if(indev) return t = lv_tick_elaps(indev->last_activity_time);
+
+    lv_indev_t * i;
+    t = UINT16_MAX;
+    i = lv_indev_next(NULL);
+    while(i) {
+        t = LV_MATH_MIN(t, lv_tick_elaps(i->last_activity_time));
+        i = lv_indev_next(i);
+    }
+
+    return t;
 }
 
 /**
@@ -547,8 +544,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    i->proc.act_point.x = i->btn_points[data->btn].x;
-    i->proc.act_point.y = i->btn_points[data->btn].y;
+    i->proc.act_point.x = i->btn_points[data->btn_id].x;
+    i->proc.act_point.y = i->btn_points[data->btn_id].y;
 
     /*Still the same point is pressed*/
     if(i->proc.last_point.x == i->proc.act_point.x &&
@@ -586,16 +583,16 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
     /*If there is no last object then search*/
     if(proc->act_obj == NULL) {
-        pr_obj = indev_search_obj(proc, lv_layer_sys(disp));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_layer_top(disp));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act(disp));
+        pr_obj = indev_search_obj(proc, lv_disp_get_layer_sys(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_layer_top(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_scr_act(disp));
     }
     /*If there is last object but it is not dragged and not protected also search*/
     else if(proc->drag_in_prog == 0 &&
             lv_obj_is_protected(proc->act_obj, LV_PROTECT_PRESS_LOST) == false) {/*Now act_obj != NULL*/
-        pr_obj = indev_search_obj(proc, lv_layer_sys(disp));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_layer_top(disp));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act(disp));
+        pr_obj = indev_search_obj(proc, lv_disp_get_layer_sys(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_layer_top(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_scr_act(disp));
     }
     /*If a dragable or a protected object was the last then keep it*/
     else {

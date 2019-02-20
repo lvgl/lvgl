@@ -10,6 +10,7 @@
 #include "lv_indev.h"
 #include "lv_refr.h"
 #include "lv_group.h"
+#include "lv_disp.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_anim.h"
@@ -356,7 +357,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) { /*It is a screen*/
-        lv_disp_t * d = lv_scr_get_disp(obj);
+        lv_disp_t * d = lv_obj_get_disp(obj);
         lv_ll_rem(&d->scr_ll, obj);
     } else {
         lv_ll_rem(&(par->child_ll), obj);
@@ -415,10 +416,10 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 
     /*Invalidate the object only if it belongs to the 'LV_GC_ROOT(_lv_act_scr)'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    lv_disp_t * disp = lv_scr_get_disp(obj_scr);
-    if(obj_scr == lv_scr_act(disp) ||
-            obj_scr == lv_layer_top(disp)||
-            obj_scr == lv_layer_sys(disp)) {
+    lv_disp_t * disp = lv_obj_get_disp(obj_scr);
+    if(obj_scr == lv_disp_get_scr_act(disp) ||
+            obj_scr == lv_disp_get_layer_top(disp)||
+            obj_scr == lv_disp_get_layer_sys(disp)) {
         /*Truncate recursively to the parents*/
         lv_area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
@@ -448,23 +449,6 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 /*=====================
  * Setter functions
  *====================*/
-
-
-/*--------------
- * Screen set
- *--------------*/
-/**
- * Load a new screen
- * @param scr pointer to a screen
- */
-void lv_scr_load(lv_obj_t * scr)
-{
-    lv_disp_t * d = lv_scr_get_disp(scr);
-
-    d->act_scr = scr;
-
-    lv_obj_invalidate(scr);
-}
 
 /*--------------------
  * Parent/children set
@@ -1302,55 +1286,6 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Getter functions
  *======================*/
 
-/*------------------
- * Screen get
- *-----------------*/
-
-/**
- * Return with a pointer to the active screen
- * @return pointer to the active screen object (loaded by 'lv_scr_load()')
- */
-lv_obj_t * lv_scr_act(lv_disp_t * disp)
-{
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("lv_scr_act: no display registered to get its top layer");
-        return NULL;
-    }
-
-    return disp->act_scr;
-}
-
-/**
- * Return with the top layer. (Same on every screen and it is above the normal screen layer)
- * @return pointer to the top layer object  (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_top(lv_disp_t * disp)
-{
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("lv_layer_top: no display registered to get its top layer");
-        return NULL;
-    }
-
-    return disp->top_layer;
-}
-
-/**
- * Return with the sys. layer. (Same on every screen and it is above the normal screen layer)
- * @return pointer to the sys layer object  (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_sys(lv_disp_t * disp)
-{
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("lv_layer_sys: no display registered to get its top layer");
-        return NULL;
-    }
-
-    return disp->sys_layer;
-}
-
 /**
  * Return with the screen of an object
  * @param obj pointer to an object
@@ -1369,10 +1304,19 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
     return (lv_obj_t *)act_p;
 }
 
-lv_disp_t * lv_scr_get_disp(lv_obj_t * scr)
+/**
+ * Get the display of an object
+ * @param scr pointer to an object
+ * @return pointer the object's display
+ */
+lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
 {
-    lv_disp_t * d;
+    const lv_obj_t * scr;
 
+    if(obj->par == NULL) scr = obj;         /*`obj` is a screen*/
+    else scr = lv_obj_get_screen(obj);      /*get the screen of `obj`*/
+
+    lv_disp_t * d;
     LL_READ(LV_GC_ROOT(_lv_disp_ll), d) {
         lv_obj_t * s;
         LL_READ(d->scr_ll, s) {
@@ -1382,14 +1326,6 @@ lv_disp_t * lv_scr_get_disp(lv_obj_t * scr)
 
     LV_LOG_WARN("lv_scr_get_disp: screen not found")
     return NULL;
-}
-
-
-
-lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
-{
-    lv_obj_t * scr = lv_obj_get_screen(obj);
-    return lv_scr_get_disp(scr);
 }
 
 /*---------------------

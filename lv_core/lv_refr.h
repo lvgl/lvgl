@@ -60,20 +60,6 @@ void lv_refr_now(void);
  */
 void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
 
-
-/**
- * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels
- * @param cb pointer to a callback function (void my_refr_cb(uint32_t time_ms, uint32_t px_num))
- */
-void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t));
-
-/**
- * Called when an area is invalidated to modify the coordinates of the area.
- * Special display controllers may require special coordinate rounding
- * @param cb pointer to the a function which will modify the area
- */
-void lv_refr_set_round_cb(void(*cb)(lv_area_t*));
-
 /**
  * Get the number of areas in the buffer
  * @return number of invalid areas

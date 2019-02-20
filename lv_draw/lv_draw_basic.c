@@ -79,15 +79,15 @@ void lv_draw_px(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t
     }
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
     uint32_t vdb_width = lv_area_get_width(&vdb->area);
 
     /*Make the coordinates relative to VDB*/
     x -= vdb->area.x1;
     y -= vdb->area.y1;
 
-    if(disp->driver.vdb_wr) {
-        disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, x, y, color, opa);
+    if(disp->driver.set_px_cb) {
+        disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, x, y, color, opa);
     } else {
         lv_color_t * vdb_px_p = vdb->buf_act;
         vdb_px_p += y * vdb_width + x;
@@ -129,7 +129,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(union_ok == false) return;
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
     lv_area_t vdb_rel_a;   /*Stores relative coordinates on vdb*/
     vdb_rel_a.x1 = res_a.x1 - vdb->area.x1;
@@ -290,7 +290,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p,
             pos_y + letter_h < mask_p->y1 || pos_y > mask_p->y2) return;
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
     lv_coord_t vdb_width = lv_area_get_width(&vdb->area);
     lv_color_t * vdb_buf_tmp = vdb->buf_act;
@@ -335,8 +335,8 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                              (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
                 }
 
-                if(disp->driver.vdb_wr) {
-                    disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width,
+                if(disp->driver.set_px_cb) {
+                    disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width,
                                         (col + pos_x) - vdb->area.x1, (row + pos_y) - vdb->area.y1,
                                         color, px_opa);
                 } else {
@@ -409,7 +409,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
     }
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
     /*Stores coordinates relative to the current VDB*/
     masked_a.x1 = masked_a.x1 - vdb->area.x1;
@@ -429,12 +429,12 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
 
         /*Use the custom VDB write function is exists*/
-        if(disp->driver.vdb_wr) {
+        if(disp->driver.set_px_cb) {
             lv_coord_t col;
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
                 for(col = 0; col < map_useful_w; col++) {
                     lv_color_t px_color = *((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
-                    disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa);
+                    disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa);
                 }
                 map_p += map_width * px_size_byte;  /*Next row on the map*/
             }
@@ -496,8 +496,8 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
                         recolored_px = lv_color_mix(recolor, last_img_px, recolor_opa);
                     }
                     /*Handle custom VDB write is present*/
-                    if(disp->driver.vdb_wr) {
-                        disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
+                    if(disp->driver.set_px_cb) {
+                        disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
                     }
                     /*Normal native VDB write*/
                     else {
@@ -506,8 +506,8 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
                     }
                 } else {
                     /*Handle custom VDB write is present*/
-                    if(disp->driver.vdb_wr) {
-                        disp->driver.vdb_wr((uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa_result);
+                    if(disp->driver.set_px_cb) {
+                        disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa_result);
                     }
                     /*Normal native VDB write*/
                     else {
@@ -568,10 +568,10 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
     lv_coord_t mem_width = lv_area_get_width(mem_area);
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    if(disp->driver.vdb_wr) {
+    if(disp->driver.set_px_cb) {
         for(col = fill_area->x1; col <= fill_area->x2; col++) {
             for(row = fill_area->y1; row <= fill_area->y2; row++) {
-                disp->driver.vdb_wr((uint8_t *)mem, mem_width, col, row, color, opa);
+                disp->driver.set_px_cb(disp, (uint8_t *)mem, mem_width, col, row, color, opa);
             }
         }
     } else {

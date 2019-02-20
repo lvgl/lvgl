@@ -50,10 +50,9 @@
  */
 void lv_indev_drv_init(lv_indev_drv_t * driver)
 {
-    driver->read = NULL;
+    memset(driver, 0, sizeof(lv_indev_drv_t));
+
     driver->type = LV_INDEV_TYPE_NONE;
-    driver->disp = NULL;
-    driver->user_data = NULL;
 }
 
 /**
@@ -110,13 +109,11 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     bool cont = false;
 
     memset(data, 0, sizeof(lv_indev_data_t));
-    data->state = LV_INDEV_STATE_REL;
 
-    if(indev->driver.read) {
-        data->user_data = indev->driver.user_data;
+    if(indev->driver.read_cb) {
 
         LV_LOG_TRACE("idnev read started");
-        cont = indev->driver.read(data);
+        cont = indev->driver.read_cb(indev, data);
         LV_LOG_TRACE("idnev read finished");
     } else {
         LV_LOG_WARN("indev function registered");

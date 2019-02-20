@@ -261,16 +261,6 @@ void lv_obj_invalidate(const lv_obj_t * obj);
  * Setter functions
  *====================*/
 
-/*--------------
- * Screen set
- *--------------*/
-
-/**
- * Load a new screen
- * @param scr pointer to a screen
- */
-void lv_scr_load(lv_obj_t * scr);
-
 /*--------------------
  * Parent/children set
  *--------------------*/
@@ -540,28 +530,6 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Getter functions
  *======================*/
 
-/*------------------
- * Screen get
- *-----------------*/
-
-/**
- * Return with a pointer to the active screen
- * @return pointer to the active screen object (loaded by 'lv_scr_load()')
- */
-lv_obj_t * lv_scr_act(lv_disp_t * disp);
-
-/**
- * Return with the top layer. (Same on every screen and it is above the normal screen layer)
- * @return pointer to the top layer object  (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_top(lv_disp_t * disp);
-
-/**
- * Return with the sys. layer. (Same on every screen and it is above the normal screen layer)
- * @return pointer to the sys layer object  (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_sys(lv_disp_t * disp);
-
 /**
  * Return with the screen of an object
  * @param obj pointer to an object
@@ -569,9 +537,11 @@ lv_obj_t * lv_layer_sys(lv_disp_t * disp);
  */
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj);
 
-
-lv_disp_t * lv_scr_get_disp(lv_obj_t * scr);
-
+/**
+ * Get the display of an object
+ * @param scr pointer to an object
+ * @return pointer the object's display
+ */
 lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj);
 
 /*---------------------

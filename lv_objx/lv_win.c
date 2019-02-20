@@ -10,6 +10,7 @@
 #if USE_LV_WIN != 0
 
 #include "../lv_themes/lv_theme.h"
+#include "../lv_core/lv_disp.h"
 
 /*********************
  *      DEFINES
@@ -70,7 +71,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new window object*/
     if(copy == NULL) {
-        lv_obj_t * disp = lv_obj_get_disp(new_win);
+        lv_disp_t * disp = lv_obj_get_disp(new_win);
         lv_coord_t hres = lv_disp_get_hor_res(disp);
         lv_coord_t vres = lv_disp_get_ver_res(disp);
         lv_obj_set_size(new_win, hres, vres);
