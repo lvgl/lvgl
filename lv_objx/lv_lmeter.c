@@ -289,9 +289,9 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
             style_tmp.line.width += 1;
         }
 #endif
-		float angle;
+		int16_t angle;
 		int16_t level;
-		uint8_t i;
+		uint32_t i;
 
         lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
         lv_coord_t r_in = r_out - style->body.padding.hor;
@@ -302,11 +302,11 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 		int16_t angle_ofs;
 		if( ext->Offset_angle == 0xffff )
 		{
-			angle_ofs = 90 + (360 - ext->scale_angle) / 2;
+			angle_ofs = 900 + (360 - ext->scale_angle) * 5; // by leo
 		}
 		else
 		{
-			angle_ofs = ext->Offset_angle;
+			angle_ofs = ext->Offset_angle * 10; // by leo
 		}
         level = (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
         
@@ -319,20 +319,12 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 
         for(i = 0; i < ext->line_cnt; i++) {
             /*Calculate the position a scale label*/
-			angle = ((float)(i * ext->scale_angle) / (ext->line_cnt - 1)) + angle_ofs; // by Leo
-			
-			
-			lv_coord_t y_out = (int32_t)(lv_trigo_sinByLeo(angle) * r_out);
-            lv_coord_t x_out = (int32_t)(lv_trigo_sinByLeo(angle + 90.0) * r_out) ;
-            lv_coord_t y_in = (int32_t)(lv_trigo_sinByLeo(angle) * r_in);
-            lv_coord_t x_in = (int32_t)(lv_trigo_sinByLeo(angle + 90.0) * r_in);
+			angle = (int16_t)((int32_t)(i * ext->scale_angle * 10) / (ext->line_cnt - 1)) + angle_ofs; // by Leo
 
-			/*
-			lv_coord_t y_out = FloatToIntgerByLeo( (lv_trigo_sinByLeo(angle) * r_out) );
-            lv_coord_t x_out = FloatToIntgerByLeo( (lv_trigo_sinByLeo(angle + 90.0) * r_out ) );
-            lv_coord_t y_in =  FloatToIntgerByLeo( (lv_trigo_sinByLeo(angle) * r_in) );
-            lv_coord_t x_in =  FloatToIntgerByLeo ( (lv_trigo_sinByLeo(angle + 90.0) * r_in) );
-			*/
+			lv_coord_t y_out = (int16_t)(((int32_t)lv_trigo_sinByLeo(angle) * r_out) >> LV_TRIGO_SHIFT);
+            lv_coord_t x_out = (int16_t)(((int32_t)lv_trigo_sinByLeo(angle + 900) * r_out) >> LV_TRIGO_SHIFT);
+            lv_coord_t y_in = (int16_t)(((int32_t)lv_trigo_sinByLeo(angle) * r_in) >> LV_TRIGO_SHIFT);
+            lv_coord_t x_in = (int16_t)(((int32_t)lv_trigo_sinByLeo(angle + 900) * r_in) >> LV_TRIGO_SHIFT);
 			
             /*Rounding*/
             x_out = lv_lmeter_coord_round(x_out);
@@ -352,7 +344,6 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
             if(i >= level) style_tmp.line.color = style->line.color;
             else {
                 style_tmp.line.color = lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) /  ext->line_cnt);
-				//style->body.Mix_color = style_tmp.line.color;
             }
 
             lv_draw_line(&p1, &p2, mask, &style_tmp, opa_scale);
