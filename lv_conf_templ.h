@@ -43,8 +43,8 @@
  *===================*/
 
 /* Horizontal and vertical resolution of the library.*/
-#define LV_HOR_RES          (480)
-#define LV_VER_RES          (320)
+#define LV_HOR_RES_MAX          (480)
+#define LV_VER_RES_MAX          (320)
 
 /* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
@@ -55,49 +55,6 @@
 
 /*Screen refresh period in milliseconds*/
 #define LV_REFR_PERIOD      30
-
-/*-----------------
- *  VDB settings
- *----------------*/
-
-/* VDB (Virtual Display Buffer) is an internal graphics buffer.
- * The GUI will be drawn into this buffer first and then
- * the buffer will be passed to your `disp_drv.disp_flush` function to
- * copy it to your frame buffer.
- * VDB is required for: buffered drawing, opacity, anti-aliasing and shadows
- * Learn more: https://docs.littlevgl.com/#Drawing*/
-
-/* Size of the VDB in pixels. Typical size: ~1/10 screen. Must be >= LV_HOR_RES
- * Setting it to 0 will disable VDB and `disp_drv.disp_fill` and `disp_drv.disp_map` functions
- * will be called to draw to the frame buffer directly*/
-#define LV_VDB_SIZE         ((LV_VER_RES * LV_HOR_RES) / 10)
-
- /* Bit-per-pixel of VDB. Useful for monochrome or non-standard color format displays.
-  * Special formats are handled with `disp_drv.vdb_wr`)*/
-#define LV_VDB_PX_BPP       LV_COLOR_SIZE       /*LV_COLOR_SIZE comes from LV_COLOR_DEPTH below to set 8, 16 or 32 bit pixel size automatically */
-
- /* Place VDB to a specific address (e.g. in external RAM)
-  * 0: allocate automatically into RAM
-  * LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`*/
-#define LV_VDB_ADR          0
-
-/* Use two Virtual Display buffers (VDB) to parallelize rendering and flushing
- * The flushing should use DMA to write the frame buffer in the background */
-#define LV_VDB_DOUBLE       0
-
-/* Place VDB2 to a specific address (e.g. in external RAM)
- * 0: allocate automatically into RAM
- * LV_VDB_ADR_INV: to replace it later with `lv_vdb_set_adr()`*/
-#define LV_VDB2_ADR         0
-
-/* Using true double buffering in `disp_drv.disp_flush` you will always get the image of the whole screen.
- * Your only task is to set the rendered image (`color_p` parameter) as frame buffer address or send it to your display.
- * The best if you do in the blank period of you display to avoid tearing effect.
- * Requires:
- * - LV_VDB_SIZE = LV_HOR_RES * LV_VER_RES
- * - LV_VDB_DOUBLE = 1
- */
-#define LV_VDB_TRUE_DOUBLE_BUFFERED 0
 
 /*=================
    Misc. setting

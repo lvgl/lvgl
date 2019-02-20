@@ -101,7 +101,7 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
 
     /*The area is truncated to the screen*/
     if(suc != false) {
-        if(disp_refr->driver.rounder_cb) disp_refr->driver.rounder_cb(disp_refr, &com_area);
+        if(disp->driver.rounder_cb) disp->driver.rounder_cb(disp_refr, &com_area);
 
         /*Save only if this area is not in one of the saved areas*/
         uint16_t i;

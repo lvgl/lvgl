@@ -70,10 +70,6 @@ typedef struct _disp_drv_t {
     void (*flush_cb)(struct _disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
     lv_disp_user_data_t flush_user_data;
 
-    /* OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the number of flushed pixels */
-    void (*monitor_cb)(struct _disp_t * disp, uint32_t time, uint32_t px);
-    lv_disp_user_data_t monitor_user_data;
-
     /* OPTIONAL: Extend the invalidated areas to match with the display drivers requirements
      * E.g. round `y` to, 8, 16 ..) on a monochrome display*/
     void (*rounder_cb)(struct _disp_t * disp, lv_area_t * area);
@@ -84,6 +80,10 @@ typedef struct _disp_drv_t {
      * Note: Much slower then drawing with supported color formats. */
     void (*set_px_cb)(struct _disp_t * disp, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
     lv_disp_user_data_t set_px_user_data;
+
+    /* Called after every refresh cycle to tell the rendering and flushing time + the number of flushed pixels */
+    void (*monitor_cb)(struct _disp_t * disp, uint32_t time, uint32_t px);
+    lv_disp_user_data_t monitor_user_data;
 
 #if USE_LV_GPU
     /*OPTIONAL: Blend two memories using opacity (GPU only)*/
@@ -98,11 +98,16 @@ typedef struct _disp_drv_t {
 struct _lv_obj_t;
 
 typedef struct _disp_t {
+    /*Driver to the display*/
     lv_disp_drv_t driver;
+
+    /*Screens of the display*/
     lv_ll_t scr_ll;
     struct _lv_obj_t * act_scr;
     struct _lv_obj_t * top_layer;
     struct _lv_obj_t * sys_layer;
+
+    /*Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint32_t inv_p        :10;
