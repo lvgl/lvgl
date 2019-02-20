@@ -130,14 +130,14 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_BG, th->calendar.bg);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER, th->calendar.header);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER_PR, th->calendar.header_pr);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_DAY_NAMES, th->calendar.day_names);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_WEEK_BOX, th->calendar.week_box);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_TODAY_BOX, th->calendar.today_box);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, th->calendar.highlighted_days);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_INACTIVE_DAYS, th->calendar.inactive_days);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_BG, th->style.calendar.bg);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER, th->style.calendar.header);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER_PR, th->style.calendar.header_pr);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_DAY_NAMES, th->style.calendar.day_names);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_WEEK_BOX, th->style.calendar.week_box);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_TODAY_BOX, th->style.calendar.today_box);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, th->style.calendar.highlighted_days);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_INACTIVE_DAYS, th->style.calendar.inactive_days);
         } else {
             lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_BG, &lv_style_pretty);
             lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER, ext->style_header);

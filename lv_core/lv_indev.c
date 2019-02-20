@@ -582,18 +582,20 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
     if(proc->wait_unil_release != 0) return;
 
+    lv_disp_t * disp = indev_act->driver.disp;
+
     /*If there is no last object then search*/
     if(proc->act_obj == NULL) {
-        pr_obj = indev_search_obj(proc, lv_layer_sys(NULL));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_layer_top(NULL));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act(NULL));
+        pr_obj = indev_search_obj(proc, lv_layer_sys(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_layer_top(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act(disp));
     }
     /*If there is last object but it is not dragged and not protected also search*/
     else if(proc->drag_in_prog == 0 &&
             lv_obj_is_protected(proc->act_obj, LV_PROTECT_PRESS_LOST) == false) {/*Now act_obj != NULL*/
-        pr_obj = indev_search_obj(proc, lv_layer_sys(NULL));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_layer_top(NULL));
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act(NULL));
+        pr_obj = indev_search_obj(proc, lv_layer_sys(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_layer_top(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act(disp));
     }
     /*If a dragable or a protected object was the last then keep it*/
     else {

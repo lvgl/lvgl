@@ -63,19 +63,6 @@ void lv_refr_init(void)
 }
 
 /**
- * Call in the display driver's  'disp_flush' function when the flushing is finished
- */
-LV_ATTRIBUTE_FLUSH_READY void lv_flush_ready(lv_disp_t * disp)
-{
-    disp->driver.buffer->internal.flushing = 0;
-
-    /*If the screen is transparent initialize it when the flushing is ready*/
-#if LV_VDB_DOUBLE == 0 && LV_COLOR_SCREEN_TRANSP
-    memset(vdb_buf, 0x00, LV_VDB_SIZE_IN_BYTES);
-#endif
-}
-
-/**
  * Redraw the invalidated areas now.
  * Normally the redrawing is periodically executed in `lv_task_handler` but a long blocking process can
  * prevent the call of `lv_task_handler`. In this case if the the GUI is updated in the process (e.g. progress bar)
@@ -94,7 +81,7 @@ void lv_refr_now(void)
  */
 void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
 {
-    if(!disp) disp = lv_disp_get_last();
+    if(!disp) disp = lv_disp_get_default();
     if(!disp) return;
 
     /*Clear the invalidate buffer if the parameter is NULL*/
@@ -194,7 +181,7 @@ static void lv_refr_task(void * param)
         if(disp_refr->inv_p != 0) {
             /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
             if(lv_disp_is_true_double_buffered(disp_refr)) {
-                lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
+                lv_disp_buf_t * vdb = lv_disp_get_vdb(disp_refr);
 
                 /*Flush the content of the VDB*/
                 lv_refr_vdb_flush();
@@ -202,7 +189,7 @@ static void lv_refr_task(void * param)
                 /* With true double buffering the flushing should be only the address change of the current frame buffer.
                  * Wait until the address change is ready and copy the changed content to the other frame buffer (new active VDB)
                  * to keep the buffers synchronized*/
-                while(vdb->internal.flushing);
+                while(vdb->flushing);
 
                 uint8_t * buf_act = (uint8_t *) vdb->buf_act;
                 uint8_t * buf_ina = (uint8_t *) vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
@@ -304,7 +291,7 @@ static void lv_refr_area(const lv_area_t * area_p)
 {
     /*True double buffering: there are two screen sized buffers. Just redraw directly into a buffer*/
     if(lv_disp_is_true_double_buffered(disp_refr)) {
-        lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
+        lv_disp_buf_t * vdb = lv_disp_get_vdb(disp_refr);
         vdb->area.x1 = 0;
         vdb->area.x2 = LV_HOR_RES-1;
         vdb->area.y1 = 0;
@@ -313,7 +300,7 @@ static void lv_refr_area(const lv_area_t * area_p)
     }
     /*The buffer is smaller: refresh the area in parts*/
     else {
-        lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
+        lv_disp_buf_t * vdb = lv_disp_get_vdb(disp_refr);
         /*Calculate the max row num*/
         lv_coord_t w = lv_area_get_width(area_p);
         lv_coord_t h = lv_area_get_height(area_p);
@@ -381,11 +368,11 @@ static void lv_refr_area(const lv_area_t * area_p)
 static void lv_refr_area_part(const lv_area_t * area_p)
 {
 
-    lv_vdb_t * vdb = lv_disp_get_vdb(disp_refr);
+    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp_refr);
 
     /*In non double buffered mode, before rendering the next part wait until the previous image is flushed*/
     if(lv_disp_is_double_vdb(disp_refr) == false) {
-        while(vdb->internal.flushing);
+        while(vdb->flushing);
     }
 
     lv_obj_t * top_p;
@@ -565,14 +552,14 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
  */
 static void lv_refr_vdb_flush(void)
 {
-    lv_vdb_t * vdb = lv_disp_get_vdb(lv_refr_get_disp_refreshing());
+    lv_disp_buf_t * vdb = lv_disp_get_vdb(lv_refr_get_disp_refreshing());
 
     /*In double buffered mode wait until the other buffer is flushed before flushing the current one*/
     if(vdb->buf1 && vdb->buf2) {
-        while(vdb->internal.flushing);
+        while(vdb->flushing);
     }
 
-    vdb->internal.flushing = 1;
+    vdb->flushing = 1;
 
     /*Flush the rendered content to the display*/
     lv_disp_t * disp = lv_refr_get_disp_refreshing();

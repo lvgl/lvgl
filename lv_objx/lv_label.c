@@ -555,7 +555,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     uint32_t i = line_start;
     uint32_t i_current = i;
     uint32_t letter;
-    while(i < new_line_start - 1) {
+    while(i <= new_line_start - 1) {
         letter = lv_txt_encoded_next(txt, &i);    /*Be careful 'i' already points to the next character*/
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {

@@ -96,8 +96,8 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_BG, th->roller.bg);
-            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_SEL, th->roller.sel);
+            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_BG, th->style.roller.bg);
+            lv_roller_set_style(new_roller, LV_ROLLER_STYLE_SEL, th->style.roller.sel);
         } else {
             /*Let the ddlist's style*/
             lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/
@@ -361,6 +361,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             refr_position(roller, false);
         }
     } else if(sign == LV_SIGNAL_FOCUS) {
+#if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(roller);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -382,12 +383,15 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;      /*Save the current value. Used to revert this state if ENER wont't be pressed*/
 
         }
+#endif
     } else if(sign == LV_SIGNAL_DEFOCUS) {
+#if USE_LV_GROUP
         /*Revert the original state*/
         if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
             ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
             refr_position(roller, true);
         }
+#endif
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
@@ -402,9 +406,11 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
             if(ext->ddlist.action) ext->ddlist.action(roller);
 
+#if USE_LV_GROUP
             lv_group_t * g = lv_obj_get_group(roller);
             bool editing = lv_group_get_editing(g);
             if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
+#endif
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;

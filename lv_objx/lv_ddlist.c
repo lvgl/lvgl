@@ -118,9 +118,9 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, th->ddlist.bg);
-            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, th->ddlist.sel);
-            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, th->ddlist.sb);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, th->style.ddlist.bg);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, th->style.ddlist.sel);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, th->style.ddlist.sb);
         } else {
             lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, &lv_style_pretty);
             lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, &lv_style_plain_color);
@@ -624,6 +624,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_CLEANUP) {
         ext->label = NULL;
     } else if(sign == LV_SIGNAL_FOCUS) {
+#if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(ddlist);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -651,6 +652,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 lv_ddlist_refr_size(ddlist, true);
             }
         }
+#endif
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         if(ext->opened) {
             ext->opened = false;
@@ -686,9 +688,11 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 ext->opened = 0;
                 if(ext->action) ext->action(ddlist);
 
+#if USE_LV_GROUP
                 lv_group_t * g = lv_obj_get_group(ddlist);
                 bool editing = lv_group_get_editing(g);
                 if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
+#endif
             } else {
                 ext->opened = 1;
             }

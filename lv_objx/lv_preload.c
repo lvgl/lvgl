@@ -93,7 +93,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_preload_set_style(new_preload, LV_PRELOAD_STYLE_MAIN, th->preload);
+            lv_preload_set_style(new_preload, LV_PRELOAD_STYLE_MAIN, th->style.preload);
         } else {
             lv_obj_set_style(new_preload, &lv_style_pretty_color);
         }

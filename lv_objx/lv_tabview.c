@@ -130,13 +130,13 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BG, th->tabview.bg);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, th->tabview.indic);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, th->tabview.btn.bg);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_REL, th->tabview.btn.rel);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_PR, th->tabview.btn.pr);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_REL, th->tabview.btn.tgl_rel);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_PR, th->tabview.btn.tgl_pr);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BG, th->style.tabview.bg);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, th->style.tabview.indic);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, th->style.tabview.btn.bg);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_REL, th->style.tabview.btn.rel);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_PR, th->style.tabview.btn.pr);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_REL, th->style.tabview.btn.tgl_rel);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_PR, th->style.tabview.btn.tgl_pr);
         } else {
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BG, &lv_style_plain);
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_transp);
@@ -622,12 +622,14 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
+#if USE_LV_GROUP
                 lv_group_t * g = lv_obj_get_group(tabview);
                 if(lv_group_get_editing(g)) {
                     lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
                     btnm_ext->btn_id_pr = 0;
                     lv_obj_invalidate(ext->btns);
                 }
+#endif
             } else {
                 lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
                 btnm_ext->btn_id_pr = 0;

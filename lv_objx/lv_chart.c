@@ -95,7 +95,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_chart_set_style(new_chart, th->chart);
+            lv_chart_set_style(new_chart, th->style.chart);
         } else {
             lv_chart_set_style(new_chart, &lv_style_pretty);
         }
@@ -175,9 +175,10 @@ void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
     if(chart == NULL || serie == NULL)
         return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    if(ext == NULL)
-        return;
-    for(uint32_t i = 0; i < ext->point_cnt; i++)
+    if(ext == NULL) return;
+
+    uint32_t i;
+    for(i = 0; i < ext->point_cnt; i++)
     {
         serie->points[i] = LV_CHART_POINT_DEF;
     }

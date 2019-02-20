@@ -19,9 +19,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_ATTRIBUTE_FLUSH_READY
-#  define LV_ATTRIBUTE_FLUSH_READY
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -47,11 +44,6 @@ extern "C" {
  * Initialize the screen refresh subsystem
  */
 void lv_refr_init(void);
-
-/**
- * Call in the display driver's  'disp_flush' function when the flushing is finished
- */
-LV_ATTRIBUTE_FLUSH_READY void lv_flush_ready(lv_disp_t * disp);
 
 /**
  * Redraw the invalidated areas now.

@@ -79,7 +79,7 @@ void lv_draw_px(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t
     }
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
     uint32_t vdb_width = lv_area_get_width(&vdb->area);
 
     /*Make the coordinates relative to VDB*/
@@ -129,7 +129,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     if(union_ok == false) return;
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
 
     lv_area_t vdb_rel_a;   /*Stores relative coordinates on vdb*/
     vdb_rel_a.x1 = res_a.x1 - vdb->area.x1;
@@ -290,7 +290,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p,
             pos_y + letter_h < mask_p->y1 || pos_y > mask_p->y2) return;
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
 
     lv_coord_t vdb_width = lv_area_get_width(&vdb->area);
     lv_color_t * vdb_buf_tmp = vdb->buf_act;
@@ -409,7 +409,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
     }
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    lv_vdb_t * vdb = lv_disp_get_vdb(disp);
+    lv_disp_buf_t * vdb = lv_disp_get_vdb(disp);
 
     /*Stores coordinates relative to the current VDB*/
     masked_a.x1 = masked_a.x1 - vdb->area.x1;

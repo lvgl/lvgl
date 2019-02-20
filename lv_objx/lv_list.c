@@ -109,14 +109,14 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_list_set_style(new_list, LV_LIST_STYLE_BG, th->list.bg);
-            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, th->list.scrl);
-            lv_list_set_style(new_list, LV_LIST_STYLE_SB, th->list.sb);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, th->list.btn.rel);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, th->list.btn.pr);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, th->list.btn.tgl_rel);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, th->list.btn.tgl_pr);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, th->list.btn.ina);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BG, th->style.list.bg);
+            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, th->style.list.scrl);
+            lv_list_set_style(new_list, LV_LIST_STYLE_SB, th->style.list.sb);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, th->style.list.btn.rel);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, th->style.list.btn.pr);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, th->style.list.btn.tgl_rel);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, th->style.list.btn.tgl_pr);
+            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, th->style.list.btn.ina);
         } else {
             lv_list_set_style(new_list, LV_LIST_STYLE_BG, &lv_style_transp_fit);
             lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, &lv_style_pretty);
@@ -300,6 +300,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
     }
 
     ext->selected_btn = btn;
+    ext->last_sel = btn;
 
     if(ext->selected_btn) {
         lv_btn_state_t s = lv_btn_get_state(ext->selected_btn);
@@ -760,7 +761,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             lv_group_t * g = lv_obj_get_group(list);
             if(lv_group_get_editing(g)) {
                 lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-                if(NULL != ext->last_sel) {
+                if(ext->last_sel) {
                     /* Select the    last used button */
                     lv_list_set_btn_selected(list, ext->last_sel);
                 }
@@ -779,7 +780,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                 lv_list_set_btn_selected(list, last_clicked_btn);
             } else {
                 lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-                if(NULL != ext->last_sel) {
+                if(ext->last_sel) {
                     /* Select the last used button */
                     lv_list_set_btn_selected(list, ext->last_sel);
                 }

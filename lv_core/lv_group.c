@@ -8,7 +8,9 @@
  *********************/
 #include "lv_group.h"
 #if USE_LV_GROUP != 0
+#include "../lv_themes/lv_theme.h"
 #include <stddef.h>
+#include "../lv_misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -23,7 +25,8 @@
  **********************/
 static void style_mod_def(lv_style_t * style);
 static void style_mod_edit_def(lv_style_t * style);
-static void lv_group_refocus(lv_group_t *g);
+static void refresh_theme(lv_group_t * g, lv_theme_t * th);
+static void lv_group_refocus(lv_group_t * g);
 
 /**********************
  *  STATIC VARIABLES
@@ -38,23 +41,34 @@ static void lv_group_refocus(lv_group_t *g);
  **********************/
 
 /**
+ * Init. the group module
+ */
+void lv_group_init(void)
+{
+    lv_ll_init(&LV_GC_ROOT(_lv_group_ll), sizeof(lv_group_t));
+}
+
+/**
  * Create a new object group
  * @return pointer to the new object group
  */
 lv_group_t * lv_group_create(void)
 {
-    lv_group_t * group = lv_mem_alloc(sizeof(lv_group_t));
+    lv_group_t * group = lv_ll_ins_head(&LV_GC_ROOT(_lv_group_ll));
     lv_mem_assert(group);
     if(group == NULL) return NULL;
     lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
-    group->style_mod = style_mod_def;
-    group->style_mod_edit = style_mod_edit_def;
     group->obj_focus = NULL;
     group->frozen = 0;
     group->focus_cb = NULL;
     group->click_focus = 1;
     group->editing = 0;
+    group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
+    group->wrap = 1;
+
+    /*Initialize style modification callbacks from current theme*/
+    refresh_theme(group, lv_theme_get_current());
 
     return group;
 }
@@ -460,6 +474,25 @@ bool lv_group_get_wrap(lv_group_t * group)
     return group->wrap ? true : false;
 }
 
+/**
+ * Notify the group that current theme changed and style modification callbacks need to be refreshed.
+ * @param group pointer to group. If NULL then all groups are notified.
+ */
+void lv_group_report_style_mod(lv_group_t * group)
+{
+    lv_theme_t * th = lv_theme_get_current();
+
+    if(group != NULL) {
+        refresh_theme(group, th);
+        return;
+    }
+
+    lv_group_t * i;
+    LL_READ(LV_GC_ROOT(_lv_group_ll), i) {
+        refresh_theme(i, th);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -520,6 +553,18 @@ static void style_mod_edit_def(lv_style_t * style)
 
 #endif
 
+}
+
+static void refresh_theme(lv_group_t * g, lv_theme_t * th)
+{
+    g->style_mod = style_mod_def;
+    g->style_mod_edit = style_mod_edit_def;
+    if(th) {
+        if(th->group.style_mod)
+            g->style_mod = th->group.style_mod;
+        if(th->group.style_mod_edit)
+            g->style_mod_edit = th->group.style_mod_edit;
+    }
 }
 
 #endif /*USE_LV_GROUP != 0*/

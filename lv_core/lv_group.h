@@ -36,6 +36,8 @@ extern "C" {
 #define LV_GROUP_KEY_ENTER          10      /*0x0A, '\n'*/
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/
+#define LV_GROUP_KEY_HOME           2       /*0x02, STX*/
+#define LV_GROUP_KEY_END            3       /*0x03, ETX*/
 
 #if USE_LV_GROUP  != 0
 /**********************
@@ -69,6 +71,12 @@ typedef enum _lv_group_refocus_policy_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+* Init. the group module
+* @remarks Internal function, do not call directly.
+*/
+void lv_group_init(void);
 
 /**
  * Create a new object group
@@ -233,6 +241,12 @@ bool lv_group_get_click_focus(const lv_group_t * group);
  * @param en: true: wrapping enabled; false: wrapping disabled
  */
 bool lv_group_get_wrap(lv_group_t * group);
+
+/**
+ * Notify the group that current theme changed and style modification callbacks need to be refreshed.
+ * @param group pointer to group. If NULL then all groups are notified.
+ */
+void lv_group_report_style_mod(lv_group_t * group);
 
 /**********************
  *      MACROS

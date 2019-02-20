@@ -88,10 +88,10 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_sw_set_style(new_sw, LV_SW_STYLE_BG, th->sw.bg);
-            lv_sw_set_style(new_sw, LV_SW_STYLE_INDIC, th->sw.indic);
-            lv_sw_set_style(new_sw, LV_SW_STYLE_KNOB_OFF, th->sw.knob_off);
-            lv_sw_set_style(new_sw, LV_SW_STYLE_KNOB_ON, th->sw.knob_on);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_BG, th->style.sw.bg);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_INDIC, th->style.sw.indic);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_KNOB_OFF, th->style.sw.knob_off);
+            lv_sw_set_style(new_sw, LV_SW_STYLE_KNOB_ON, th->style.sw.knob_on);
         } else {
             /*Let the slider' style*/
         }
