@@ -58,7 +58,7 @@ char * lv_math_num_to_str(int32_t num, char * buf);
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-float lv_trigo_sinByLeo(float angle);
+int16_t lv_trigo_sinByLeo(int16_t angle);
 
 /**
  * Calculate a value of a Cubic Bezier function.
