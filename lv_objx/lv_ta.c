@@ -1470,9 +1470,12 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_so
 
     lv_obj_get_coords(ext->label, &label_coords);
 
+    lv_point_t point_act;
+    lv_indev_get_point(click_source, &point_act);
+    if(point_act.x < 0 || point_act.y < 0) return; /*Ignore event from keypad*/
     lv_point_t relative_position;
-    relative_position.x = click_source->proc.act_point.x - label_coords.x1;
-    relative_position.y = click_source->proc.act_point.y - label_coords.y1;
+    relative_position.x = point_act.x - label_coords.x1;
+    relative_position.y = point_act.y - label_coords.y1;
 
     lv_coord_t label_width = lv_obj_get_width(ext->label);
 
