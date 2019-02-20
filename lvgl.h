@@ -23,7 +23,7 @@ extern "C" {
 
 #include "lv_core/lv_obj.h"
 #include "lv_core/lv_group.h"
-#include "lv_core/lv_lang.h"
+#include "lv_core/lv_i18n.h"
 #include "lv_core/lv_vdb.h"
 #include "lv_core/lv_refr.h"
 

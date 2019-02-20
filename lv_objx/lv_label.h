@@ -69,9 +69,6 @@ typedef struct
     char dot_tmp[LV_LABEL_DOT_NUM * 4 + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
 #endif
 
-#if USE_LV_MULTI_LANG
-    uint16_t lang_txt_id;            /*The ID of the text to display*/
-#endif
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;            /*Speed of scroll and roll animation in px/sec unit*/
     lv_point_t offset;              /*Text draw position offset*/
@@ -122,15 +119,6 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
  * @param text pointer to a text. NULL to refresh with the current text.
  */
 void lv_label_set_static_text(lv_obj_t * label, const char * text);
-
-/**
- *Set a text ID which means a the same text but on different languages
- * @param label pointer to a label object
- * @param txt_id ID of the text
- */
-#if USE_LV_MULTI_LANG
-void lv_label_set_text_id(lv_obj_t * label, uint32_t txt_id);
-#endif
 
 /**
  * Set the behavior of the label with longer text then the object size
@@ -187,15 +175,6 @@ static inline void lv_label_set_style(lv_obj_t *label, lv_style_t *style)
  * @return the text of the label
  */
 char * lv_label_get_text(const lv_obj_t * label);
-
-#if USE_LV_MULTI_LANG
-/**
- * Get the text ID of the label. (Used by the multi-language feature)
- * @param label pointer to a label object
- * @return ID of the text
- */
-uint16_t lv_label_get_text_id(lv_obj_t * label);
-#endif
 
 /**
  * Get the long mode of a label
