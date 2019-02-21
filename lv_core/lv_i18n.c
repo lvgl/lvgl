@@ -28,8 +28,8 @@ static const void * lv_i18n_get_text_core(lv_i18n_trans_t * trans, const char * 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_i18n_lang_t ** languages;
-static lv_i18n_lang_t * local_lang;
+static const lv_i18n_lang_t ** languages;
+static const lv_i18n_lang_t * local_lang;
 
 /**********************
  *      MACROS
@@ -70,7 +70,6 @@ void lv_i18n_set_local(const char * lang_code)
         return;
     }
 
-
     uint16_t i;
     for(i = 0; languages[i] != NULL; i++) {
         if(strcmp(languages[i]->name, lang_code) == 0)  break;  /*A language has found*/
@@ -99,7 +98,7 @@ const void * lv_i18n_get_text(const char * msg_id)
         return msg_id;
     }
 
-    lv_i18n_lang_t * lang = local_lang;
+    const lv_i18n_lang_t * lang = local_lang;
 
     if(lang->simple == NULL) {
         if(lang == languages[0]) {
@@ -152,70 +151,71 @@ const void * lv_i18n_get_text(const char * msg_id)
 const void * lv_i18n_get_text_plural(const char * msg_id, int32_t num)
 {
     if(local_lang == NULL) {
-         LV_LOG_WARN("lv_i18n_get_text_plural: No language selected");
-         return msg_id;
-     }
+        LV_LOG_WARN("lv_i18n_get_text_plural: No language selected");
+        return msg_id;
+    }
 
-     lv_i18n_lang_t * lang = local_lang;
-     if(lang->plurals == NULL || lang->plural_rule == NULL) {
-         if(lang == languages[0]) {
-             LV_LOG_WARN("lv_i18n_get_text_plural: No plurals or plural rule has defined even on the default language");
-             return msg_id;
-         } else {
-             LV_LOG_WARN("lv_i18n_get_text_plural: o plurals or plural rule has defined for the language. Fallback to the default language");
-             lang = languages[0];
-         }
+    const lv_i18n_lang_t * lang = local_lang;
 
-         if(lang->plurals == NULL) {
-             LV_LOG_WARN("lv_i18n_get_text_plural: o plurals or plural rule has defined even on the default language");
-             return msg_id;
-         }
-     }
+    if(lang->plurals == NULL || lang->plural_rule == NULL) {
+        if(lang == languages[0]) {
+            LV_LOG_WARN("lv_i18n_get_text_plural: No plurals or plural rule has defined even on the default language");
+            return msg_id;
+        } else {
+            LV_LOG_WARN("lv_i18n_get_text_plural: o plurals or plural rule has defined for the language. Fallback to the default language");
+            lang = languages[0];
+        }
 
-     lv_i18n_plural_type_t ptype = lang->plural_rule(num);
+        if(lang->plurals == NULL) {
+            LV_LOG_WARN("lv_i18n_get_text_plural: o plurals or plural rule has defined even on the default language");
+            return msg_id;
+        }
+    }
 
-     if(lang->plurals[ptype] == NULL) {
-         if(lang == languages[0]) {
-             LV_LOG_WARN("lv_i18n_get_text_plural: No translations of the required plural form even on the default language.");
-             return msg_id;
-         } else {
-             LV_LOG_WARN("lv_i18n_get_text_plural:No translations of the required plural form for the language. Fallback to the default language");
-             lang = languages[0];
-         }
-     }
+    lv_i18n_plural_type_t ptype = lang->plural_rule(num);
 
-     /*Find the translation*/
-     const void * txt = lv_i18n_get_text_core(lang->plurals[ptype], msg_id);
-     if(txt == NULL) {
-         if(lang == languages[0]) {
-             LV_LOG_WARN("lv_i18n_get_text_plural: No translation found even on the default language");
-             return msg_id;
-         } else {
-             LV_LOG_WARN("lv_i18n_get_text_plural: No translation found on this language. Fallback to the default language");
-             lang = languages[0];
-         }
-     }
+    if(lang->plurals[ptype] == NULL) {
+        if(lang == languages[0]) {
+            LV_LOG_WARN("lv_i18n_get_text_plural: No translations of the required plural form even on the default language.");
+            return msg_id;
+        } else {
+            LV_LOG_WARN("lv_i18n_get_text_plural:No translations of the required plural form for the language. Fallback to the default language");
+            lang = languages[0];
+        }
+    }
 
-     /*Try again with the default language*/
-     if(lang->plurals == NULL || lang->plural_rule == NULL) {
-         LV_LOG_WARN("lv_i18n_get_text_plural: No plurals or plural rule has defined even on the default language");
-         return msg_id;
-     }
+    /*Find the translation*/
+    const void * txt = lv_i18n_get_text_core(lang->plurals[ptype], msg_id);
+    if(txt == NULL) {
+        if(lang == languages[0]) {
+            LV_LOG_WARN("lv_i18n_get_text_plural: No translation found even on the default language");
+            return msg_id;
+        } else {
+            LV_LOG_WARN("lv_i18n_get_text_plural: No translation found on this language. Fallback to the default language");
+            lang = languages[0];
+        }
+    }
 
-     ptype = lang->plural_rule(num);
-     if(lang->plurals[ptype] == NULL) {
-         LV_LOG_WARN("lv_i18n_get_text_plural: No translations of the required plural form even on the default language.");
-         return msg_id;
-     }
+    /*Try again with the default language*/
+    if(lang->plurals == NULL || lang->plural_rule == NULL) {
+        LV_LOG_WARN("lv_i18n_get_text_plural: No plurals or plural rule has defined even on the default language");
+        return msg_id;
+    }
 
-     txt = lv_i18n_get_text_core(lang->plurals[ptype], msg_id);
+    ptype = lang->plural_rule(num);
+    if(lang->plurals[ptype] == NULL) {
+        LV_LOG_WARN("lv_i18n_get_text_plural: No translations of the required plural form even on the default language.");
+        return msg_id;
+    }
 
-     if(txt == NULL) {
-         LV_LOG_WARN("lv_i18n_get_text_plural: No translation found even on the default language");
-         return msg_id;
-     }
+    txt = lv_i18n_get_text_core(lang->plurals[ptype], msg_id);
 
-     return txt;
+    if(txt == NULL) {
+        LV_LOG_WARN("lv_i18n_get_text_plural: No translation found even on the default language");
+        return msg_id;
+    }
+
+    return txt;
 }
 
 /**
