@@ -26,6 +26,7 @@
 static void style_mod_def(lv_style_t * style);
 static void style_mod_edit_def(lv_style_t * style);
 static void refresh_theme(lv_group_t * g, lv_theme_t * th);
+static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *), void * (*move)(const lv_ll_t *, const void *));
 static void lv_group_refocus(lv_group_t * g);
 
 /**********************
@@ -207,29 +208,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
  */
 void lv_group_focus_next(lv_group_t * group)
 {
-    if(group->frozen) return;
-
-    if(group->obj_focus) {
-        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-        lv_obj_invalidate(*group->obj_focus);
-    }
-
-    lv_obj_t ** obj_next;
-    if(group->obj_focus == NULL) obj_next = lv_ll_get_head(&group->obj_ll);
-    else obj_next = lv_ll_get_next(&group->obj_ll, group->obj_focus);
-
-    if(obj_next == NULL) {
-        if(group->wrap) obj_next = lv_ll_get_head(&group->obj_ll);
-        else obj_next = lv_ll_get_tail(&group->obj_ll);
-    }
-    group->obj_focus = obj_next;
-
-    if(group->obj_focus) {
-        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
-        lv_obj_invalidate(*group->obj_focus);
-
-        if(group->focus_cb) group->focus_cb(group);
-    }
+    focus_next_core(group, lv_ll_get_head, lv_ll_get_next);
 }
 
 /**
@@ -238,30 +217,7 @@ void lv_group_focus_next(lv_group_t * group)
  */
 void lv_group_focus_prev(lv_group_t * group)
 {
-    if(group->frozen) return;
-
-    if(group->obj_focus) {
-        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-        lv_obj_invalidate(*group->obj_focus);
-    }
-
-    lv_obj_t ** obj_next;
-    if(group->obj_focus == NULL) obj_next = lv_ll_get_tail(&group->obj_ll);
-    else obj_next = lv_ll_get_prev(&group->obj_ll, group->obj_focus);
-
-    if(obj_next == NULL) {
-        if(group->wrap) obj_next = lv_ll_get_tail(&group->obj_ll);
-        else  obj_next = lv_ll_get_head(&group->obj_ll);
-    }
-    group->obj_focus = obj_next;
-
-    if(group->obj_focus != NULL) {
-        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
-        lv_obj_invalidate(*group->obj_focus);
-
-        if(group->focus_cb) group->focus_cb(group);
-    }
-
+    focus_next_core(group, lv_ll_get_tail, lv_ll_get_prev);
 }
 
 /**
@@ -565,6 +521,63 @@ static void refresh_theme(lv_group_t * g, lv_theme_t * th)
         if(th->group.style_mod_edit)
             g->style_mod_edit = th->group.style_mod_edit;
     }
+}
+
+static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *), void * (*move)(const lv_ll_t *, const void *))
+{
+    if (group->frozen) return;
+
+    lv_obj_t ** obj_next = group->obj_focus;
+    lv_obj_t ** obj_sentinel = NULL;
+    bool can_move = true;
+    bool can_begin = true;
+
+    for(;;) {
+        if(obj_next == NULL) {
+            if(group->wrap || obj_sentinel == NULL) {
+                if(!can_begin) return;
+                obj_next = begin(&group->obj_ll);
+                can_move = false;
+                can_begin = false;
+            } else {
+                /*Currently focused object is the last/first in the group, keep it that way*/
+                return;
+            }
+        }
+
+        if(obj_sentinel == NULL) {
+            obj_sentinel = obj_next;
+            if(obj_sentinel == NULL) return; /*Group is empty*/
+        }
+
+        if(can_move) {
+            obj_next = move(&group->obj_ll, obj_next);
+
+            /*Give up if we walked the entire list and haven't found another visible object*/
+            if(obj_next == obj_sentinel) return;
+        }
+
+        can_move = true;
+
+        if(obj_next == NULL) continue;
+
+        /*Hidden objects don't receive focus*/
+        if(!lv_obj_get_hidden(*obj_next)) break;
+    }
+
+    if(obj_next == group->obj_focus) return; /*There's only one visible object and it's already focused*/
+
+    if(group->obj_focus) {
+        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        lv_obj_invalidate(*group->obj_focus);
+    }
+
+    group->obj_focus = obj_next;
+
+    (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+    lv_obj_invalidate(*group->obj_focus);
+
+    if(group->focus_cb) group->focus_cb(group);
 }
 
 #endif /*USE_LV_GROUP != 0*/
