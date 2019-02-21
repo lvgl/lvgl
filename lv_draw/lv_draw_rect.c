@@ -1089,9 +1089,9 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     lv_coord_t curve_x[radius + swidth + 1];     /*Stores the 'x' coordinates of a quarter circle.*/
 #else
 # if LV_HOR_RES > LV_VER_RES
-    lv_coord_t curve_x[LV_HOR_RES];
+    lv_coord_t curve_x[LV_HOR_RES_MAX];
 # else
-    lv_coord_t curve_x[LV_VER_RES];
+    lv_coord_t curve_x[LV_VER_RES_MAX];
 # endif
 #endif
     memset(curve_x, 0, sizeof(curve_x));
@@ -1110,9 +1110,9 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     uint32_t line_1d_blur[filter_width];
 #else
 # if LV_HOR_RES > LV_VER_RES
-    uint32_t line_1d_blur[LV_HOR_RES];
+    uint32_t line_1d_blur[LV_HOR_RES_MAX];
 # else
-    uint32_t line_1d_blur[LV_VER_RES];
+    uint32_t line_1d_blur[LV_VER_RES_MAX];
 # endif
 #endif
     /*1D Blur horizontally*/
@@ -1126,9 +1126,9 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     lv_opa_t line_2d_blur[radius + swidth + 1];
 #else
 # if LV_HOR_RES > LV_VER_RES
-    lv_opa_t line_2d_blur[LV_HOR_RES];
+    lv_opa_t line_2d_blur[LV_HOR_RES_MAX];
 # else
-    lv_opa_t line_2d_blur[LV_VER_RES];
+    lv_opa_t line_2d_blur[LV_VER_RES_MAX];
 # endif
 #endif
 
@@ -1247,9 +1247,9 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     lv_coord_t curve_x[radius + 1];             /*Stores the 'x' coordinates of a quarter circle.*/
 #else
 # if LV_HOR_RES > LV_VER_RES
-    lv_coord_t curve_x[LV_HOR_RES];
+    lv_coord_t curve_x[LV_HOR_RES_MAX];
 # else
-    lv_coord_t curve_x[LV_VER_RES];
+    lv_coord_t curve_x[LV_VER_RES_MAX];
 # endif
 #endif
     lv_point_t circ;
@@ -1266,9 +1266,9 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     lv_opa_t line_1d_blur[swidth];
 #else
 # if LV_HOR_RES > LV_VER_RES
-    lv_opa_t line_1d_blur[LV_HOR_RES];
+    lv_opa_t line_1d_blur[LV_HOR_RES_MAX];
 # else
-    lv_opa_t line_1d_blur[LV_VER_RES];
+    lv_opa_t line_1d_blur[LV_VER_RES_MAX];
 # endif
 #endif
 
