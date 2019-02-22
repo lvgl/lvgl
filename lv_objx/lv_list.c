@@ -300,7 +300,9 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
     }
 
     ext->selected_btn = btn;
-    ext->last_sel = btn;
+    if( btn != NULL ) {
+        ext->last_sel = btn;
+    }
 
     if(ext->selected_btn) {
         lv_btn_state_t s = lv_btn_get_state(ext->selected_btn);
