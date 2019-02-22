@@ -82,6 +82,8 @@ v_disp_buf_init(&disp_buf1, buf, NULL, LV_HOR_RES_MAX * 10);    /*Initialize the
 ```c
 lv_disp_drv_t disp_drv;               /*Descriptor of a display driver*/
 lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
+disp_drv.hor_res = 480;               /*Set the horizontal resolution*/
+disp_drv.ver_res = 320;               /*Set the vertical resolution*/
 disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
 disp_drv.buffer = &disp_buf;          /*Assign the buffer to teh display*/
 lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
