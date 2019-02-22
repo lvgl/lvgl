@@ -129,7 +129,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-#if LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
+#if USE_LV_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
     switch(src_type) {
         case LV_IMG_SRC_FILE:
             LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found");
