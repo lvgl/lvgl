@@ -101,7 +101,7 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
 
     /*The area is truncated to the screen*/
     if(suc != false) {
-        if(disp->driver.rounder_cb) disp->driver.rounder_cb(disp_refr, &com_area);
+        if(disp->driver.rounder_cb) disp->driver.rounder_cb(&disp_refr->driver, &com_area);
 
         /*Save only if this area is not in one of the saved areas*/
         uint16_t i;
@@ -192,7 +192,7 @@ static void lv_refr_task(void * param)
 
             /*Call monitor cb if present*/
             if(disp_refr->driver.monitor_cb) {
-                disp_refr->driver.monitor_cb(disp_refr, lv_tick_elaps(start), px_num);
+                disp_refr->driver.monitor_cb(&disp_refr->driver, lv_tick_elaps(start), px_num);
             }
         }
     }
@@ -297,7 +297,7 @@ static void lv_refr_area(const lv_area_t * area_p)
             lv_coord_t y_tmp = max_row;
             do {
                 tmp.y2 = y_tmp;
-                disp_refr->driver.rounder_cb(disp_refr, &tmp);
+                disp_refr->driver.rounder_cb(&disp_refr->driver, &tmp);
                 y_tmp --;       /*Decrement the number of line until it is rounded to a smaller (or equal) value then the original. */
             } while(lv_area_get_height(&tmp) > max_row && y_tmp != 0);
 
@@ -539,7 +539,7 @@ static void lv_refr_vdb_flush(void)
 
     /*Flush the rendered content to the display*/
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    if(disp->driver.flush_cb) disp->driver.flush_cb(disp, &vdb->area, vdb->buf_act);
+    if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
 
 
     if(vdb->buf1 && vdb->buf2) {

@@ -87,7 +87,7 @@ void lv_draw_px(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t
     y -= vdb->area.y1;
 
     if(disp->driver.set_px_cb) {
-        disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, x, y, color, opa);
+        disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width, x, y, color, opa);
     } else {
         lv_color_t * vdb_px_p = vdb->buf_act;
         vdb_px_p += y * vdb_width + x;
@@ -336,7 +336,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p,
                 }
 
                 if(disp->driver.set_px_cb) {
-                    disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width,
+                    disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width,
                                         (col + pos_x) - vdb->area.x1, (row + pos_y) - vdb->area.y1,
                                         color, px_opa);
                 } else {
@@ -434,7 +434,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
                 for(col = 0; col < map_useful_w; col++) {
                     lv_color_t px_color = *((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
-                    disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa);
+                    disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa);
                 }
                 map_p += map_width * px_size_byte;  /*Next row on the map*/
             }
@@ -497,7 +497,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
                     }
                     /*Handle custom VDB write is present*/
                     if(disp->driver.set_px_cb) {
-                        disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
+                        disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, recolored_px, opa_result);
                     }
                     /*Normal native VDB write*/
                     else {
@@ -507,7 +507,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
                 } else {
                     /*Handle custom VDB write is present*/
                     if(disp->driver.set_px_cb) {
-                        disp->driver.set_px_cb(disp, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa_result);
+                        disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width, col + masked_a.x1, row, px_color, opa_result);
                     }
                     /*Normal native VDB write*/
                     else {
@@ -571,7 +571,7 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
     if(disp->driver.set_px_cb) {
         for(col = fill_area->x1; col <= fill_area->x2; col++) {
             for(row = fill_area->y1; row <= fill_area->y2; row++) {
-                disp->driver.set_px_cb(disp, (uint8_t *)mem, mem_width, col, row, color, opa);
+                disp->driver.set_px_cb(&disp->driver, (uint8_t *)mem, mem_width, col, row, color, opa);
             }
         }
     } else {

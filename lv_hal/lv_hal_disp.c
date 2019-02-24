@@ -180,11 +180,12 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 }
 
 /**
- * Call in the display driver's `flush` function when the flushing is finished
+ * Call in the display driver's `flush_cb` function when the flushing is finished
+ * @param disp_drv pointer to display driver in `flush_cb` where this function is called
  */
-LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_t * disp)
+LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
 {
-    disp->driver.buffer->flushing = 0;
+    disp_drv->buffer->flushing = 0;
 
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP

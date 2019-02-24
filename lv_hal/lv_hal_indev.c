@@ -113,7 +113,7 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(indev->driver.read_cb) {
 
         LV_LOG_TRACE("idnev read started");
-        cont = indev->driver.read_cb(indev, data);
+        cont = indev->driver.read_cb(&indev->driver, data);
         LV_LOG_TRACE("idnev read finished");
     } else {
         LV_LOG_WARN("indev function registered");
