@@ -28,7 +28,7 @@ static const void * lv_i18n_get_text_core(lv_i18n_trans_t * trans, const char * 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static const lv_i18n_lang_t ** languages;
+static const lv_i18n_lang_pack_t * languages;
 static const lv_i18n_lang_t * local_lang;
 
 /**********************
@@ -42,32 +42,36 @@ static const lv_i18n_lang_t * local_lang;
 /**
  * Set the languages for internationalization
  * @param langs pointer to the array of languages. (Last element has to be `NULL`)
+ * @return 0: no error; < 0: error
  */
-void lv_i18n_init(const lv_i18n_lang_t ** langs)
+int lv_i18n_init(const lv_i18n_lang_pack_t * langs)
 {
     if(langs == NULL) {
         LV_LOG_WARN("lv_i18n_init: `langs` can't be NULL");
-        return;
+        return -1;
     }
 
     if(langs[0] == NULL) {
-        LV_LOG_WARN("lv_i18n_init: `langs` need to contain at lest one translation");
-        return;
+        LV_LOG_WARN("lv_i18n_init: `langs` need to contain at least one translation");
+        return -1;
     }
 
     languages = langs;
     local_lang = langs[0];     /*Automatically select the first language*/
+
+    return 0;
 }
 
 /**
  * Change the localization (language)
  * @param lang_code name of the translation to use. E.g. "en_GB"
+ * @return 0: no error; < 0: error
  */
-void lv_i18n_set_local(const char * lang_code)
+int lv_i18n_set_local(const char * lang_code)
 {
     if(languages == NULL) {
         LV_LOG_WARN("lv_i18n_set_local: The languages are not set with lv_i18n_init() yet");
-        return;
+        return -1;
     }
 
     uint16_t i;
@@ -78,12 +82,14 @@ void lv_i18n_set_local(const char * lang_code)
     /*The language wasn't found*/
     if(languages[i] == NULL) {
         LV_LOG_WARN("lv_i18n_set_local: The selected language doesn't found");
-        return;
+        return -1;
     }
 
     local_lang = languages[i];
 
     LV_LOG_INFO("lv_i18n_set_local: new local selected")
+
+    return 0;
 }
 
 /**

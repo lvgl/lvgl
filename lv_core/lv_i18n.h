@@ -54,6 +54,8 @@ typedef struct {
     uint8_t (*plural_rule)(int32_t num);                    /*Function pointer to get the correct plural form for a number*/
 }lv_i18n_lang_t;
 
+typedef lv_i18n_lang_t * lv_i18n_lang_pack_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -61,14 +63,16 @@ typedef struct {
 /**
  * Set the languages for internationalization
  * @param langs pointer to the array of languages. (Last element has to be `NULL`)
+ * @return 0: no error; < 0: error
  */
-void lv_i18n_init(const lv_i18n_lang_t ** langs);
+int lv_i18n_init(const lv_i18n_lang_pack_t * langs);
 
 /**
  * Change the localization (language)
  * @param lang_code name of the translation to use. E.g. "en_GB"
+ * @return 0: no error; < 0: error
  */
-void lv_i18n_set_local(const char * lang_code);
+int lv_i18n_set_local(const char * lang_code);
 
 /**
  * Get the translation from a message ID
