@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const void * lv_i18n_get_text_core(lv_i18n_trans_t * trans, const char * msg_id);
+static const void * lv_i18n_get_text_core(const lv_i18n_trans_t * trans, const char * msg_id);
 
 /**********************
  *  STATIC VARIABLES
@@ -238,7 +238,7 @@ const void *  lv_i18n_get_current_local(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static const void * lv_i18n_get_text_core(lv_i18n_trans_t * trans, const char * msg_id)
+static const void * lv_i18n_get_text_core(const lv_i18n_trans_t * trans, const char * msg_id)
 {
     uint16_t i;
     for(i = 0; trans[i].msg_id != NULL; i++) {

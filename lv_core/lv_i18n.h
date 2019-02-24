@@ -49,12 +49,12 @@ typedef struct {
 
 typedef struct {
     const char * name;                                      /*E.g. "en_GB"*/
-    lv_i18n_trans_t * simple;                               /*Translations of simple texts where no plurals are used*/
-    lv_i18n_trans_t * plurals[_LV_I18N_PLURAL_TYPE_NUM];    /*Translations of the plural forms*/
+    const lv_i18n_trans_t * simple;                               /*Translations of simple texts where no plurals are used*/
+    const lv_i18n_trans_t * plurals[_LV_I18N_PLURAL_TYPE_NUM];    /*Translations of the plural forms*/
     uint8_t (*plural_rule)(int32_t num);                    /*Function pointer to get the correct plural form for a number*/
 }lv_i18n_lang_t;
 
-typedef lv_i18n_lang_t * lv_i18n_lang_pack_t;
+typedef const lv_i18n_lang_t * lv_i18n_lang_pack_t;
 
 /**********************
  * GLOBAL PROTOTYPES
