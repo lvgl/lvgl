@@ -49,10 +49,10 @@ typedef uint8_t lv_layout_t;
 
 
 typedef enum {
-    LV_FIT_NONE,
-    LV_FIT_TIGHT,
-    LV_FIT_FLOOD,
-    LV_FIT_FILL,
+    LV_FIT_NONE,         /*Do not change the size automatically*/
+    LV_FIT_TIGHT,        /*Involve the children*/
+    LV_FIT_FLOOD,        /*Align the size to the parent's edge*/
+    LV_FIT_FILL,         /*Align the size to the parent's edge first but if there is an object out of it then involve it*/
 }lv_fit_t;
 
 typedef struct
