@@ -624,6 +624,13 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par != NULL) par->signal_func(par, LV_SIGNAL_CHILD_CHG, obj);
 
+
+    /*Tell the children the paren's size has changed*/
+    lv_obj_t * i;
+    LL_READ(obj->child_ll, i) {
+       i->signal_func(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
+    }
+
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
 

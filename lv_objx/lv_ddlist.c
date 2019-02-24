@@ -104,10 +104,10 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_page_set_scrl_fit(new_ddlist, true, true);
+        lv_page_set_scrl_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_TIGHT);
 
         ext->label = lv_label_create(new_ddlist, NULL);
-        lv_cont_set_fit(new_ddlist, true, false);
+        lv_cont_set_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_NONE);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_DRAG);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_HIDE);
@@ -238,12 +238,11 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 /**
  * Enable or disable the horizontal fit to the content
  * @param ddlist pointer to a drop down list
- * @param en true: enable auto fit; false: disable auto fit
+ * @param fit fit mode fron `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
  */
-void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, bool en)
+void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, lv_fit_t fit)
 {
-    lv_cont_set_fit(ddlist, en, lv_cont_get_ver_fit(ddlist));
-    lv_page_set_scrl_fit(ddlist, en, lv_page_get_scrl_fit_ver(ddlist));
+    lv_cont_set_fit2(ddlist, fit, lv_cont_get_fit_top(ddlist));
 
     lv_ddlist_refr_size(ddlist, false);
 }

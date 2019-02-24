@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_mem.h"
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 /*********************
  *      DEFINES
@@ -130,6 +131,12 @@ void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act);
  */
 void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after);
 
+/**
+ * Check if a linked list is empty
+ * @param ll_p pointer to a linked list
+ * @return true: the linked list is empty; false: not empty
+ */
+bool lv_ll_is_empty(lv_ll_t * ll_p);
 /**********************
  *      MACROS
  **********************/

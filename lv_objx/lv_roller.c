@@ -84,8 +84,8 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_obj_set_drag(scrl, true);                        /*In ddlist is might be disabled*/
-        lv_page_set_rel_action(new_roller, NULL);       /*Roller don't uses it (like ddlist)*/
-        lv_page_set_scrl_fit(new_roller, true, false);      /*Height is specified directly*/
+        lv_page_set_rel_action(new_roller, NULL);           /*Roller don't uses it (like ddlist)*/
+        lv_page_set_scrl_fit2(new_roller, LV_FIT_TIGHT, LV_FIT_NONE);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_ddlist_set_anim_time(new_roller, LV_ROLLER_ANIM_TIME);
         lv_roller_set_visible_row_count(new_roller, 3);
@@ -209,7 +209,7 @@ lv_label_align_t lv_roller_get_align(const lv_obj_t * roller)
  */
 bool lv_roller_get_hor_fit(const lv_obj_t * roller)
 {
-    return lv_page_get_scrl_hor_fit(roller);
+    return lv_page_get_scrl_fit_left(roller);
 }
 
 /**

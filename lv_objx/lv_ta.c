@@ -115,6 +115,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new text area object*/
     if(copy == NULL) {
+        lv_page_set_scrl_fit2(new_ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
+
         ext->label = lv_label_create(new_ta, NULL);
 
         lv_obj_set_design_func(ext->page.scrl, lv_ta_scrollable_design);
@@ -607,7 +609,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_coord_t font_h =  lv_font_get_height(style_label->text.font);
 
         ext->one_line = 1;
-        lv_page_set_scrl_fit(ta, true, true);
+        lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
         lv_obj_set_height(ta, font_h + (style_ta->body.padding.ver + style_scrl->body.padding.ver) * 2);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_EXPAND);
@@ -616,7 +618,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_style_t * style_ta = lv_obj_get_style(ta);
 
         ext->one_line = 0;
-        lv_page_set_scrl_fit(ta, false, true);
+        lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_BREAK);
 
@@ -645,19 +647,18 @@ void lv_ta_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Normal left align. Just let the text expand*/
         if(align == LV_LABEL_ALIGN_LEFT) {
             lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND);
-            lv_page_set_scrl_fit(ta, true, false);
+            lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
             lv_label_set_align(label, align);
 
         }
         /*Else use fix label width equal to the Text area width*/
         else {
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
-            lv_page_set_scrl_fit(ta, false, false);
-            lv_page_set_scrl_width(ta, 1);      /*To refresh the scrollable's width*/
+            lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_FLOOD);
             lv_label_set_align(label, align);
 
             lv_style_t * bg_style = lv_ta_get_style(ta, LV_TA_STYLE_BG);
-            lv_obj_set_width(label, lv_obj_get_width(ta) - 2 * bg_style->body.padding.hor);
+            lv_obj_set_width(label, lv_page_get_fit_width(ta));
         }
     }
 

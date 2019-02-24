@@ -102,6 +102,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new list object*/
     if(copy == NULL) {
+        lv_page_set_scrl_fit2(new_list, LV_FIT_FLOOD, LV_FIT_TIGHT);
         lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
         lv_page_set_scrl_layout(new_list, LV_LIST_LAYOUT_DEF);
         lv_list_set_sb_mode(new_list, LV_SB_MODE_DRAG);
@@ -198,7 +199,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     lv_btn_set_action(liste, LV_BTN_ACTION_CLICK, rel_action);
     lv_page_glue_obj(liste, true);
     lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
-    lv_btn_set_fit(liste, false, true);
+    lv_btn_set_fit2(liste, LV_FIT_FLOOD, LV_FIT_TIGHT);
     lv_obj_set_protect(liste, LV_PROTECT_PRESS_LOST);
     lv_obj_set_signal_func(liste, lv_list_btn_signal);
 
