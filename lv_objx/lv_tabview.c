@@ -120,7 +120,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(ext->indic, false);
 
         ext->content = lv_cont_create(new_tabview, NULL);
-        lv_cont_set_fit(ext->content, true, false);
+        lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
         lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
         lv_cont_set_style(ext->content, &lv_style_transp_tight);
         lv_obj_set_height(ext->content, LV_VER_RES - lv_obj_get_height(ext->btns));

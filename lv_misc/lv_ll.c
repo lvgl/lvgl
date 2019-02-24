@@ -340,6 +340,21 @@ void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
     if(n_after == NULL) ll_p->tail = n_act;
 }
 
+/**
+ * Check if a linked list is empty
+ * @param ll_p pointer to a linked list
+ * @return true: the linked list is empty; false: not empty
+ */
+bool lv_ll_is_empty(lv_ll_t * ll_p)
+{
+    if(ll_p == NULL) return true;
+
+    if(ll_p->head == NULL && ll_p->tail == NULL) return true;
+
+    return false;
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

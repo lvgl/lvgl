@@ -103,7 +103,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_drag(ext->scrl, true);
         lv_obj_set_drag_throw(ext->scrl, true);
         lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
-        lv_cont_set_fit(ext->scrl, false, true);
+        lv_cont_set_fit4(ext->scrl, LV_FIT_FILL, LV_FIT_FILL, LV_FIT_FILL, LV_FIT_FILL);
 
         /* Add the signal function only if 'scrolling' is created
          * because everything has to be ready before any signal is received*/
@@ -765,7 +765,6 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    lv_style_t * style = lv_obj_get_style(page);
     lv_obj_t * child;
     if(sign == LV_SIGNAL_CHILD_CHG) { /*Automatically move children to the scrollable object*/
         child = lv_obj_get_child(page, NULL);
@@ -773,18 +772,21 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             if(lv_obj_is_protected(child, LV_PROTECT_PARENT) == false) {
                 lv_obj_t * tmp = child;
                 child = lv_obj_get_child(page, child); /*Get the next child before move this*/
+
+                /*Reposition the child to take padding into account*/
+                lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+                child->coords.x1 += style->body.padding.hor;
+                child->coords.x2 += style->body.padding.hor;
+                child->coords.y1 += style->body.padding.ver;
+                child->coords.y2 += style->body.padding.ver;
+
                 lv_obj_set_parent(tmp, ext->scrl);
             } else {
                 child = lv_obj_get_child(page, child);
             }
         }
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
-        /*If no hor_fit enabled set the scrollable's width to the page's width*/
-        if(lv_cont_get_hor_fit(ext->scrl) == false) {
-            lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.hor);
-        } else {
-            ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
-        }
+        ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
 
         /*The scrollbars are important only if they are visible now*/
         if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
@@ -796,10 +798,6 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         if(ext->scrl != NULL && (lv_obj_get_width(page) != lv_area_get_width(param) ||
                                  lv_obj_get_height(page) != lv_area_get_height(param))) {
             /*If no hor_fit enabled set the scrollable's width to the page's width*/
-            if(lv_cont_get_hor_fit(ext->scrl) == false) {
-                lv_obj_set_width(ext->scrl, lv_obj_get_width(page) - 2 * style->body.padding.hor);
-            }
-
             ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
 
             /*The scrollbars are important only if they are visible now*/

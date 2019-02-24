@@ -81,7 +81,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_cb_set_text(new_cb, "Check box");
         lv_btn_set_layout(new_cb, LV_LAYOUT_ROW_M);
-        lv_btn_set_fit(new_cb, true, true);
+        lv_btn_set_fit(new_cb, LV_FIT_TIGHT);
         lv_btn_set_toggle(new_cb, true);
         lv_obj_set_protect(new_cb, LV_PROTECT_PRESS_LOST);
 
