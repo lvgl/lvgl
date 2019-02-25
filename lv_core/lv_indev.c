@@ -550,15 +550,8 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Still the same point is pressed*/
     if(i->proc.last_point.x == i->proc.act_point.x &&
             i->proc.last_point.y == i->proc.act_point.y &&
-            data->state == LV_INDEV_STATE_PR) {
-#if LV_INDEV_POINT_MARKER != 0
-        lv_area_t area;
-        area.x1 = i->proc.act_point.x - (LV_INDEV_POINT_MARKER >> 1);
-        area.y1 = i->proc.act_point.y - (LV_INDEV_POINT_MARKER >> 1);
-        area.x2 = i->proc.act_point.x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        area.y2 = i->proc.act_point.y + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        lv_rfill(&area, NULL, LV_COLOR_MAKE(0xFF, 0, 0), LV_OPA_COVER);
-#endif
+            data->state == LV_INDEV_STATE_PR)
+    {
         indev_proc_press(&i->proc);
     } else {
         /*If a new point comes always make a release*/

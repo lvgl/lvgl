@@ -62,10 +62,50 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
  */
 void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
+/*------------------------------------------------
+ * To improve backward compatibility
+ * Recommended only if you have one display
+ *------------------------------------------------*/
+
+/**
+ * Get the active screen of the default display
+ * @return pointer to the active screen
+ */
+static inline lv_obj_t * lv_scr_act(void)
+{
+    return lv_disp_get_scr_act(lv_disp_get_default());
+
+}
+
+/**
+ * Get the top layer  of the default display
+ * @return pointer to the top layer
+ */
+static inline lv_obj_t * lv_top_layer(void)
+{
+    return lv_disp_get_layer_top(lv_disp_get_default());
+}
+
+/**
+ * Get the active screen of the deafult display
+ * @return  pointer to the sys layer
+ */
+static inline lv_obj_t * lv_sys_layer(void)
+{
+    return lv_disp_get_layer_sys(lv_disp_get_default());
+}
+
 /**********************
  *      MACROS
  **********************/
 
+/*------------------------------------------------
+ * To improve backward compatibility
+ * Recommended only if you have one display
+ *------------------------------------------------*/
+
+#define LV_HOR_RES (lv_disp_get_hor_res(lv_disp_get_default());)
+#define LV_VER_RES (lv_disp_get_ver_res(lv_disp_get_default());)
 
 #ifdef __cplusplus
 } /* extern "C" */

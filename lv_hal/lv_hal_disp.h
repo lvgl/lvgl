@@ -69,22 +69,22 @@ typedef struct _disp_drv_t {
 
     /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
-    lv_disp_user_data_t flush_user_data;
+    lv_disp_drv_user_data_t flush_user_data;
 
     /* OPTIONAL: Extend the invalidated areas to match with the display drivers requirements
      * E.g. round `y` to, 8, 16 ..) on a monochrome display*/
     void (*rounder_cb)(struct _disp_drv_t * disp_drv, lv_area_t * area);
-    lv_disp_user_data_t rounder_user_data;
+    lv_disp_drv_user_data_t rounder_user_data;
 
     /* OPTIONAL: Set a pixel in a buffer according to the special requirements of the display
      * Can be used for color format not supported in LittelvGL. E.g. 2 bit -> 4 gray scales
      * Note: Much slower then drawing with supported color formats. */
     void (*set_px_cb)(struct _disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
-    lv_disp_user_data_t set_px_user_data;
+    lv_disp_drv_user_data_t set_px_user_data;
 
     /* OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the number of flushed pixels */
     void (*monitor_cb)(struct _disp_drv_t * disp_drv, uint32_t time, uint32_t px);
-    lv_disp_user_data_t monitor_user_data;
+    lv_disp_drv_user_data_t monitor_user_data;
 
 #if USE_LV_GPU
     /*OPTIONAL: Blend two memories using opacity (GPU only)*/

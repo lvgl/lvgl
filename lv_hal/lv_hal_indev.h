@@ -72,7 +72,7 @@ typedef struct {
 typedef struct _lv_indev_drv_t {
     lv_hal_indev_type_t type;                                   /*Input device type*/
     bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t *data);        /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb (buffered)*/
-    lv_indev_user_data_t read_user_data;                        /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
+    lv_indev_drv_user_data_t read_user_data;                        /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
     struct _disp_t * disp;                                      /*Pointer to the assigned display*/
 } lv_indev_drv_t;
 
