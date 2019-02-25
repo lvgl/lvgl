@@ -27,32 +27,20 @@ extern "C" {
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_hal/lv_hal.h"
 
 /*********************
  *      DEFINES
  *********************/
 
 /*Error check of lv_conf.h*/
-#if LV_HOR_RES == 0 || LV_VER_RES == 0
+#if LV_HOR_RES_MAX == 0 || LV_VER_RES_MAX == 0
 #error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater than 0"
 #endif
 
 #if LV_ANTIALIAS > 1
 #error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
-
-#if LV_VDB_SIZE == 0 && LV_ANTIALIAS != 0
-#error "LittlevGL: If LV_VDB_SIZE == 0 the anti-aliasing must be disabled"
-#endif
-
-#if LV_VDB_SIZE > 0 && LV_VDB_SIZE < LV_HOR_RES
-#error "LittlevGL: Small Virtual Display Buffer (lv_conf.h: LV_VDB_SIZE >= LV_HOR_RES)"
-#endif
-
-#if LV_VDB_SIZE == 0 && USE_LV_REAL_DRAW == 0
-#error "LittlevGL: If LV_VDB_SIZE = 0 Real drawing function are required (lv_conf.h: USE_LV_REAL_DRAW 1)"
-#endif
-
 
 #define LV_ANIM_IN              0x00    /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_OUT             0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
@@ -273,16 +261,6 @@ void lv_obj_invalidate(const lv_obj_t * obj);
 /*=====================
  * Setter functions
  *====================*/
-
-/*--------------
- * Screen set
- *--------------*/
-
-/**
- * Load a new screen
- * @param scr pointer to a screen
- */
-void lv_scr_load(lv_obj_t * scr);
 
 /*--------------------
  * Parent/children set
@@ -553,35 +531,19 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
  * Getter functions
  *======================*/
 
-/*------------------
- * Screen get
- *-----------------*/
-
-/**
- * Return with a pointer to the active screen
- * @return pointer to the active screen object (loaded by 'lv_scr_load()')
- */
-lv_obj_t * lv_scr_act(void);
-
-/**
- * Return with the top layer. (Same on every screen and it is above the normal screen layer)
- * @return pointer to the top layer object  (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_top(void);
-
-/**
- * Return with the system layer. (Same on every screen and it is above the all other layers)
- * It is used for example by the cursor
- * @return pointer to the system layer object (transparent screen sized lv_obj)
- */
-lv_obj_t * lv_layer_sys(void);
-
 /**
  * Return with the screen of an object
  * @param obj pointer to an object
  * @return pointer to a screen
  */
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj);
+
+/**
+ * Get the display of an object
+ * @param scr pointer to an object
+ * @return pointer the object's display
+ */
+lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj);
 
 /*---------------------
  * Parent/children get

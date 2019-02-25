@@ -1232,13 +1232,14 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
         if(ext->cursor.type != LV_CURSOR_NONE &&
                 (ext->cursor.type & LV_CURSOR_HIDDEN) == 0)
         {
+            lv_disp_t * disp  = lv_obj_get_disp(ta);
             lv_area_t area_tmp;
             lv_area_copy(&area_tmp, &ext->cursor.area);
             area_tmp.x1 += ext->label->coords.x1;
             area_tmp.y1 += ext->label->coords.y1;
             area_tmp.x2 += ext->label->coords.x1;
             area_tmp.y2 += ext->label->coords.y1;
-            lv_inv_area(&area_tmp);
+            lv_inv_area(disp, &area_tmp);
         }
     }
 }
@@ -1423,13 +1424,14 @@ static void refr_cursor_area(lv_obj_t * ta)
     }
 
     /*Save the new area*/
+    lv_disp_t * disp  = lv_obj_get_disp(ta);
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, &ext->cursor.area);
     area_tmp.x1 += ext->label->coords.x1;
     area_tmp.y1 += ext->label->coords.y1;
     area_tmp.x2 += ext->label->coords.x1;
     area_tmp.y2 += ext->label->coords.y1;
-    lv_inv_area(&area_tmp);
+    lv_inv_area(disp, &area_tmp);
 
     lv_area_copy(&ext->cursor.area, &cur_area);
 
@@ -1438,7 +1440,7 @@ static void refr_cursor_area(lv_obj_t * ta)
     area_tmp.y1 += ext->label->coords.y1;
     area_tmp.x2 += ext->label->coords.x1;
     area_tmp.y2 += ext->label->coords.y1;
-    lv_inv_area(&area_tmp);
+    lv_inv_area(disp, &area_tmp);
 }
 
 static void placeholder_update(lv_obj_t * ta)

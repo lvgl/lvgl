@@ -102,7 +102,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new keyboard keyboard*/
     if(copy == NULL) {
-        lv_obj_set_size(new_kb, LV_HOR_RES, LV_VER_RES / 2);
+        lv_obj_set_size(new_kb, LV_DPI * 3, LV_DPI * 2);
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_btnm_set_action(new_kb, lv_kb_def_action);
         lv_btnm_set_map(new_kb, kb_map_lc);

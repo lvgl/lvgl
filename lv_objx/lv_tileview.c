@@ -89,7 +89,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new tileview*/
     if(copy == NULL) {
-        lv_obj_set_size(new_tileview, LV_HOR_RES, LV_VER_RES);
+        lv_obj_set_size(new_tileview, LV_DPI * 3, LV_DPI * 3);
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), false);
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
         /*Set the default styles*/
@@ -506,8 +506,8 @@ static void drag_end_handler(lv_obj_t * tileview)
     lv_obj_t * scrl = lv_page_get_scrl(tileview);
     lv_point_t p;
 
-    p.x = - (scrl->coords.x1 - LV_HOR_RES / 2);
-    p.y = - (scrl->coords.y1 - LV_VER_RES / 2);
+    p.x = - (scrl->coords.x1 - lv_obj_get_width(tileview) / 2);
+    p.y = - (scrl->coords.y1 - lv_obj_get_height(tileview) / 2);
 
     /*From the drag vector (drag throw) predict the end position*/
     if(ext->drag_hor) {

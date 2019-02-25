@@ -54,7 +54,7 @@ void lv_lang_set(uint8_t lang_id)
         lang_set_core(i);
     }
 
-    lang_set_core(lv_scr_act());
+    lang_set_core(lv_scr_act(NULL));
 }
 
 /**

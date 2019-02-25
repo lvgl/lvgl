@@ -7,14 +7,14 @@
  *      INCLUDES
  ********************/
 #include "lv_indev.h"
+#include "lv_disp.h"
+#include "lv_obj.h"
 
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_draw/lv_draw_rbasic.h"
-#include "lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -125,6 +125,7 @@ void lv_indev_reset_lpr(lv_indev_t * indev)
  */
 void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
 {
+
     lv_indev_t * i = lv_indev_next(NULL);
 
     while(i) {
@@ -143,7 +144,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     if(indev->driver.type != LV_INDEV_TYPE_POINTER) return;
 
     indev->cursor = cur_obj;
-    lv_obj_set_parent(indev->cursor, lv_layer_sys());
+    lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
     lv_obj_set_pos(indev->cursor, indev->proc.act_point.x,  indev->proc.act_point.y);
 }
 
@@ -248,6 +249,7 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
  */
 uint32_t lv_indev_get_inactive_time(const lv_indev_t * indev)
 {
+
     uint32_t t;
 
     if(indev) return t = lv_tick_elaps(indev->last_activity_time);
@@ -361,14 +363,6 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->proc.act_point.y = data->point.y;
 
     if(i->proc.state == LV_INDEV_STATE_PR) {
-#if LV_INDEV_POINT_MARKER != 0
-        lv_area_t area;
-        area.x1 = i->proc.act_point.x - (LV_INDEV_POINT_MARKER >> 1);
-        area.y1 = i->proc.act_point.y - (LV_INDEV_POINT_MARKER >> 1);
-        area.x2 = i->proc.act_point.x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        area.y2 = i->proc.act_point.y + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        lv_rfill(&area, NULL, LV_COLOR_MAKE(0xFF, 0, 0), LV_OPA_COVER);
-#endif
         indev_proc_press(&i->proc);
     } else {
         indev_proc_release(&i->proc);
@@ -550,21 +544,14 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    i->proc.act_point.x = i->btn_points[data->btn].x;
-    i->proc.act_point.y = i->btn_points[data->btn].y;
+    i->proc.act_point.x = i->btn_points[data->btn_id].x;
+    i->proc.act_point.y = i->btn_points[data->btn_id].y;
 
     /*Still the same point is pressed*/
     if(i->proc.last_point.x == i->proc.act_point.x &&
             i->proc.last_point.y == i->proc.act_point.y &&
-            data->state == LV_INDEV_STATE_PR) {
-#if LV_INDEV_POINT_MARKER != 0
-        lv_area_t area;
-        area.x1 = i->proc.act_point.x - (LV_INDEV_POINT_MARKER >> 1);
-        area.y1 = i->proc.act_point.y - (LV_INDEV_POINT_MARKER >> 1);
-        area.x2 = i->proc.act_point.x + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        area.y2 = i->proc.act_point.y + ((LV_INDEV_POINT_MARKER >> 1) | 0x1);
-        lv_rfill(&area, NULL, LV_COLOR_MAKE(0xFF, 0, 0), LV_OPA_COVER);
-#endif
+            data->state == LV_INDEV_STATE_PR)
+    {
         indev_proc_press(&i->proc);
     } else {
         /*If a new point comes always make a release*/
@@ -585,16 +572,20 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
     if(proc->wait_unil_release != 0) return;
 
+    lv_disp_t * disp = indev_act->driver.disp;
+
     /*If there is no last object then search*/
     if(proc->act_obj == NULL) {
-        pr_obj = indev_search_obj(proc, lv_layer_top());
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act());
+        pr_obj = indev_search_obj(proc, lv_disp_get_layer_sys(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_layer_top(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_scr_act(disp));
     }
     /*If there is last object but it is not dragged and not protected also search*/
     else if(proc->drag_in_prog == 0 &&
             lv_obj_is_protected(proc->act_obj, LV_PROTECT_PRESS_LOST) == false) {/*Now act_obj != NULL*/
-        pr_obj = indev_search_obj(proc, lv_layer_top());
-        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_scr_act());
+        pr_obj = indev_search_obj(proc, lv_disp_get_layer_sys(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_layer_top(disp));
+        if(pr_obj == NULL) pr_obj = indev_search_obj(proc, lv_disp_get_scr_act(disp));
     }
     /*If a dragable or a protected object was the last then keep it*/
     else {
@@ -870,7 +861,7 @@ static void indev_drag(lv_indev_proc_t * state)
             /*Get the coordinates of the object and modify them*/
             lv_coord_t act_x = lv_obj_get_x(drag_obj);
             lv_coord_t act_y = lv_obj_get_y(drag_obj);
-            uint16_t inv_buf_size = lv_refr_get_buf_size(); /*Get the number of currently invalidated areas*/
+            uint16_t inv_buf_size = lv_disp_get_inv_buf_size(indev_act->driver.disp); /*Get the number of currently invalidated areas*/
 
             lv_coord_t prev_x = drag_obj->coords.x1;
             lv_coord_t prev_y = drag_obj->coords.y1;
@@ -896,8 +887,8 @@ static void indev_drag(lv_indev_proc_t * state)
                 lv_coord_t act_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
                 lv_coord_t act_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
                 if(act_par_w == prev_par_w && act_par_h == prev_par_h) {
-                    uint16_t new_inv_buf_size = lv_refr_get_buf_size();
-                    lv_refr_pop_from_buf(new_inv_buf_size - inv_buf_size);
+                    uint16_t new_inv_buf_size = lv_disp_get_inv_buf_size(indev_act->driver.disp);
+                    lv_disp_pop_from_inv_buf(indev_act->driver.disp, new_inv_buf_size - inv_buf_size);
                 }
             }
         }
