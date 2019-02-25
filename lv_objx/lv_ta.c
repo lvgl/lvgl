@@ -658,7 +658,6 @@ void lv_ta_set_text_align(lv_obj_t * ta, lv_label_align_t align)
             lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_FLOOD);
             lv_label_set_align(label, align);
 
-            lv_style_t * bg_style = lv_ta_get_style(ta, LV_TA_STYLE_BG);
             lv_obj_set_width(label, lv_page_get_fit_width(ta));
         }
     }
