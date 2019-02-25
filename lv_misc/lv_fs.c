@@ -434,7 +434,7 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
  * @param free_p pointer to store the free size [kB]
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_free(char letter, uint32_t * total_p, uint32_t * free_p)
+lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
 {
     lv_fs_drv_t * drv = lv_fs_get_drv(letter);
 
@@ -444,12 +444,12 @@ lv_fs_res_t lv_fs_free(char letter, uint32_t * total_p, uint32_t * free_p)
 
     lv_fs_res_t res;
 
-    if(drv->free == NULL) {
+    if(drv->free_space == NULL) {
         res =  LV_FS_RES_NOT_IMP;
     } else {
         uint32_t total_tmp = 0;
         uint32_t free_tmp = 0;
-        res = drv->free(&total_tmp, &free_tmp);
+        res = drv->free_space(&total_tmp, &free_tmp);
 
         if(total_p != NULL) *total_p = total_tmp;
         if(free_p != NULL) *free_p = free_tmp;
