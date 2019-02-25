@@ -161,6 +161,12 @@
 #ifndef USE_LV_I18N
 #define USE_LV_I18N             1               /*1: Enable InternationalizatioN (multi-language) support*/
 #endif
+#ifndef USE_LV_USER_DATA_SINGLE
+#define USE_LV_USER_DATA_SINGLE 1               /*1: Add a `user_data` to drivers and objects*/
+#endif
+#ifndef USE_LV_USER_DATA_MULTI
+#define USE_LV_USER_DATA_MULTI  0               /*1: Add separate `user_data` for every callback*/
+#endif
 
 /*Compiler settings*/
 #ifndef LV_ATTRIBUTE_TICK_INC

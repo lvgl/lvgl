@@ -90,11 +90,9 @@
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
 #define USE_LV_GPU              1               /*1: Enable GPU interface*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (might be required for images*/
-<<<<<<< HEAD
 #define USE_LV_I18N             1               /*1: Enable InternationalizatioN (multi-language) support*/
-=======
-#define USE_LV_I18N             0               /*1: Enable InternationalizatioN (multi-language) support*/
->>>>>>> i18n
+#define USE_LV_USER_DATA_SINGLE 1               /*1: Add a `user_data` to drivers and objects*/
+#define USE_LV_USER_DATA_MULTI  0               /*1: Add separate `user_data` for every callback*/
 
 /*Compiler settings*/
 #define LV_ATTRIBUTE_TICK_INC                   /* Define a custom attribute to `lv_tick_inc` function */
