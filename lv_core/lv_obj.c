@@ -367,7 +367,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
      * the currently pressed object is deleted*/
     lv_indev_t * indev = lv_indev_next(NULL);
     while(indev) {
-        if(indev->proc.act_obj == obj || indev->proc.last_obj == obj) {
+        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
         }
         indev = lv_indev_next(indev);
@@ -1945,7 +1945,7 @@ static void delete_children(lv_obj_t * obj)
      * the currently pressed object is deleted*/
     lv_indev_t * indev = lv_indev_next(NULL);
     while(indev) {
-        if(indev->proc.act_obj == obj || indev->proc.last_obj == obj) {
+        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
         }
         indev = lv_indev_next(indev);
