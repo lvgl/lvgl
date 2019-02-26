@@ -93,6 +93,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_time = LV_DDLIST_ANIM_TIME;
     ext->sel_style = &lv_style_plain_color;
     ext->draw_arrow = 0;  /*Do not draw arrow by default*/
+    ext->stay_open = 1;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_ddlist, lv_ddlist_signal);
@@ -103,7 +104,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_page_set_scrl_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_TIGHT);
+        lv_page_set_scrl_fit2(new_ddlist, LV_FIT_FLOOD, LV_FIT_TIGHT);
 
         ext->label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_NONE);
@@ -150,19 +151,6 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set arrow draw in a drop down list
- * @param ddlist pointer to drop down list object
- * @param en enable/disable a arrow draw. E.g. "true" for draw.
- */
-void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-
-    /*Set the flag*/
-    ext->draw_arrow = en;
-}
 
 /**
  * Set the options in a drop down list from a string
@@ -226,12 +214,39 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
  * @param ddlist pointer to a drop down list
  * @param fit fit mode fron `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
  */
-void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, lv_fit_t fit)
+void lv_ddlist_set_fit(lv_obj_t * ddlist, lv_fit_t fit)
 {
-    lv_cont_set_fit2(ddlist, fit, lv_cont_get_fit_top(ddlist));
+    lv_cont_set_fit2(ddlist, fit, LV_FIT_NONE);
 
     lv_ddlist_refr_size(ddlist, false);
 }
+
+/**
+ * Set arrow draw in a drop down list
+ * @param ddlist pointer to drop down list object
+ * @param en enable/disable a arrow draw. E.g. "true" for draw.
+ */
+void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    /*Set the flag*/
+    ext->draw_arrow = en ? 1 : 0;
+}
+
+/**
+ * Leave the list opened when a new value is selected
+ * @param ddlist pointer to drop down list object
+ * @param en enable/disable "stay open" feature
+ */
+void lv_ddlist_set_stay_open(lv_obj_t * ddlist, bool en)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    /*Set the flag*/
+    ext->stay_open = en ? 1 : 0;
+}
+
 
 /**
  * Set the open/close animation time.
@@ -283,16 +298,6 @@ void lv_ddlist_set_align(lv_obj_t *ddlist, lv_label_align_t align)
  * Getter functions
  *====================*/
 
-/**
- * Get arrow draw in a drop down list
- * @param ddlist pointer to drop down list object
- */
-bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-
-    return ext->draw_arrow;
-}
 
 /**
  * Get the options of a drop down list
@@ -351,6 +356,28 @@ lv_coord_t lv_ddlist_get_fix_height(const lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return ext->fix_height;
+}
+
+/**
+ * Get arrow draw in a drop down list
+ * @param ddlist pointer to drop down list object
+ */
+bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    return ext->draw_arrow ? true : false;
+}
+
+/**
+ * Get whether the drop down list stay open after selecting a  value or not
+ * @param ddlist pointer to drop down list object
+ */
+bool lv_ddlist_get_stay_open(lv_obj_t * ddlist)
+{
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    return ext->stay_open ? true : false;
 }
 
 /**
@@ -720,7 +747,9 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
         if(scrl->ext_size < style->body.padding.hor) scrl->ext_size = style->body.padding.hor;
     }
     else if(sign == LV_SIGNAL_RELEASED) {
-        release_handler(ddlist);
+        if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
+            release_handler(ddlist);
+        }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
@@ -742,9 +771,8 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
     if(ext->opened == 0) { /*Open the list*/
         ext->opened = 1;
         lv_obj_set_drag(lv_page_get_scrl(ddlist), true);
+        lv_ddlist_refr_size(ddlist, true);
     } else {
-        ext->opened = 0;
-        lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
 
         /*Search the clicked option*/
         lv_indev_t * indev = lv_indev_get_act();
@@ -768,8 +796,15 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
         ext->sel_opt_id = new_opt;
 
         lv_obj_send_event(ddlist, LV_EVENT_VALUE_CHANGED);
+
+        if(ext->stay_open == 0) {
+            ext->opened = 0;
+            lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
+            lv_ddlist_refr_size(ddlist, true);
+        } else {
+            lv_obj_invalidate(ddlist);
+        }
     }
-    lv_ddlist_refr_size(ddlist, true);
 
     return LV_RES_OK;
 

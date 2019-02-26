@@ -105,7 +105,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->style.win.btn.pr);
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_plain);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_plain);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_transp_fit);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
         }
@@ -133,10 +133,10 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         lv_obj_set_signal_cb(new_win, lv_win_signal);
-
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_win);
     }
+
+    /*Refresh the style with new signal function*/
+    lv_obj_refresh_style(new_win);
 
     lv_win_realign(new_win);
 

@@ -87,6 +87,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_page_set_scrl_fit2(new_roller, LV_FIT_TIGHT, LV_FIT_NONE);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_ddlist_set_anim_time(new_roller, LV_ROLLER_ANIM_TIME);
+        lv_ddlist_set_stay_open(new_roller, true);
         lv_roller_set_visible_row_count(new_roller, 3);
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 

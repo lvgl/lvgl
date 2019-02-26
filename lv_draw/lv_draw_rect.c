@@ -71,7 +71,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
         lv_draw_shadow(coords, mask, style, opa_scale);
     }
 #endif
-    if(style->body.empty == 0 && style->body.opa >= LV_OPA_MIN) {
+    if(style->body.opa > LV_OPA_MIN) {
         lv_draw_rect_main_mid(coords, mask, style, opa_scale);
 
         if(style->body.radius != 0) {

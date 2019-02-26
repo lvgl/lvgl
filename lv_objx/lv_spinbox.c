@@ -63,8 +63,6 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_spinbox);
 
     /*Initialize the allocated 'ext'*/
-    ext->ta.one_line = 1;
-    ext->ta.pwd_mode = 0;
     ext->ta.accapted_chars = "1234567890+-. ";
 
     ext->value = 0;
@@ -77,6 +75,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->value_changed_cb = NULL;
 
     lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK | LV_CURSOR_HIDDEN); /*hidden by default*/
+    lv_ta_set_one_line(new_spinbox, true);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_spinbox, lv_spinbox_signal);

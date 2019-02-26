@@ -104,7 +104,7 @@ void lv_roller_set_visible_row_count(lv_obj_t *roller, uint8_t row_cnt);
  */
 static inline void lv_roller_set_hor_fit(lv_obj_t * roller, bool en)
 {
-    lv_ddlist_set_hor_fit(roller, en);
+    lv_ddlist_set_fit(roller, en);
 }
 
 /**

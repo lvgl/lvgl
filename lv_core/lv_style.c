@@ -78,8 +78,8 @@ void lv_style_init(void)
     lv_style_scr.body.main_color = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color = LV_COLOR_WHITE;
     lv_style_scr.body.radius = 0;
-    lv_style_scr.body.padding.ver = LV_DPI / 12;
-    lv_style_scr.body.padding.hor = LV_DPI / 12;
+    lv_style_scr.body.padding.ver = 0;
+    lv_style_scr.body.padding.hor = 0;
     lv_style_scr.body.padding.inner = LV_DPI / 12;
 
     lv_style_scr.body.border.color = LV_COLOR_BLACK;
@@ -108,6 +108,8 @@ void lv_style_init(void)
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
+    lv_style_plain.body.padding.hor = LV_DPI / 12;
+    lv_style_plain.body.padding.ver = LV_DPI / 12;
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
@@ -140,9 +142,9 @@ void lv_style_init(void)
 
     /*Transparent style*/
     memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_transp.body.empty = 1;
     lv_style_transp.glass = 1;
     lv_style_transp.body.border.width = 0;
+    lv_style_transp.body.opa = LV_OPA_TRANSP;
 
     /*Transparent fitting size*/
     memcpy(&lv_style_transp_fit, &lv_style_transp, sizeof(lv_style_t));
@@ -252,14 +254,12 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
     res->line.color = lv_color_mix(end->line.color, start->line.color, opa);
 
     if(ratio < (STYLE_MIX_MAX >> 1)) {
-        res->body.empty = start->body.empty;
         res->body.border.part = start->body.border.part;
         res->glass = start->glass;
         res->text.font = start->text.font;
         res->body.shadow.type = start->body.shadow.type;
         res->line.rounded = start->line.rounded;
     } else {
-        res->body.empty = end->body.empty;
         res->body.border.part = end->body.border.part;
         res->glass = end->glass;
         res->text.font = end->text.font;

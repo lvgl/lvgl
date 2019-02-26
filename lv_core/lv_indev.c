@@ -43,7 +43,7 @@ static void indev_proc_release(lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * state);
-static void indev_drag_throw(lv_indev_proc_t * state);
+static void indev_drag_throw(lv_indev_proc_t * proc);
 #endif
 
 /**********************
@@ -425,7 +425,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         } else if(data->key == LV_GROUP_KEY_ENTER) {
             if(!i->proc.long_pr_sent) {
                 focused->signal_cb(focused, LV_SIGNAL_RELEASED, indev_act);
-                lv_obj_send_event(focused, LV_EVENT_RELEASED);
                 lv_obj_send_event(focused, LV_EVENT_CLICKED);
             }
         } else {
@@ -618,7 +617,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
              * It is necessary to count the long press time.*/
             proc->pr_timestamp = lv_tick_get();
             proc->long_pr_sent = 0;
-            proc->drag_range_out = 0;
+            proc->drag_limit_out = 0;
             proc->drag_in_prog = 0;
             proc->drag_sum.x = 0;
             proc->drag_sum.y = 0;
@@ -651,6 +650,21 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     /*Calculate the vector*/
     proc->vect.x = proc->act_point.x - proc->last_point.x;
     proc->vect.y = proc->act_point.y - proc->last_point.y;
+
+    proc->drawg_throw_vect.x = (proc->drawg_throw_vect.x * 5) >> 3;
+    proc->drawg_throw_vect.y = (proc->drawg_throw_vect.y * 5) >> 3;
+
+    if(proc->drawg_throw_vect.x < 0) proc->drawg_throw_vect.x++;
+    else if(proc->drawg_throw_vect.x > 0) proc->drawg_throw_vect.x--;
+
+    if(proc->drawg_throw_vect.y < 0) proc->drawg_throw_vect.y++;
+    else if(proc->drawg_throw_vect.y > 0) proc->drawg_throw_vect.y--;
+
+    proc->drawg_throw_vect.x += (proc->vect.x * 4) >> 3;
+    proc->drawg_throw_vect.y += (proc->vect.y * 4) >> 3;
+
+    printf("dtv:%d\n", proc->drawg_throw_vect.y);
+
 
     /*If there is active object and it can be dragged run the drag*/
     if(proc->act_obj != NULL) {
@@ -715,9 +729,10 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             lv_obj_t * obj_on = indev_search_obj(proc, proc->act_obj);
             if(obj_on == proc->act_obj) {
                 proc->act_obj->signal_cb(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
-                lv_obj_send_event(proc->act_obj, LV_EVENT_RELEASED);
                 if(proc->long_pr_sent == 0 && proc->drag_in_prog == 0) {
                     lv_obj_send_event(proc->act_obj, LV_EVENT_CLICKED);
+                } else {
+                    lv_obj_send_event(proc->act_obj, LV_EVENT_RELEASED);
                 }
             }
             else {
@@ -730,9 +745,11 @@ static void indev_proc_release(lv_indev_proc_t * proc)
          * If it is already not pressed then was handled in `indev_proc_press`*/
         else {
             proc->act_obj->signal_cb(proc->act_obj, LV_SIGNAL_RELEASED, indev_act);
-            lv_obj_send_event(proc->act_obj, LV_SIGNAL_RELEASED);
+
             if(proc->long_pr_sent == 0 && proc->drag_in_prog == 0) {
                 lv_obj_send_event(proc->act_obj, LV_EVENT_CLICKED);
+            } else {
+                lv_obj_send_event(proc->act_obj, LV_SIGNAL_RELEASED);
             }
         }
 
@@ -794,7 +811,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
     if(indev->proc.reset_query) {
         indev->proc.act_obj = NULL;
         indev->proc.last_obj = NULL;
-        indev->proc.drag_range_out = 0;
+        indev->proc.drag_limit_out = 0;
         indev->proc.drag_in_prog = 0;
         indev->proc.long_pr_sent = 0;
         indev->proc.pr_timestamp = 0;
@@ -868,19 +885,20 @@ static void indev_drag(lv_indev_proc_t * state)
     state->drag_sum.y += state->vect.y;
 
     /*Enough move?*/
-    if(state->drag_range_out == 0) {
+    if(state->drag_limit_out == 0) {
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
         if(LV_MATH_ABS(state->drag_sum.x) >= LV_INDEV_DRAG_LIMIT ||
                 LV_MATH_ABS(state->drag_sum.y) >= LV_INDEV_DRAG_LIMIT) {
-            state->drag_range_out = 1;
+            state->drag_limit_out = 1;
         }
     }
 
-    /*If the drag limit is stepped over then handle the dragging*/
-    if(state->drag_range_out != 0) {
+    /*If the drag limit is exceeded handle the dragging*/
+    if(state->drag_limit_out != 0) {
         /*Set new position if the vector is not zero*/
         if(state->vect.x != 0 ||
-                state->vect.y != 0) {
+                state->vect.y != 0)
+        {
             /*Get the coordinates of the object and modify them*/
             lv_coord_t act_x = lv_obj_get_x(drag_obj);
             lv_coord_t act_y = lv_obj_get_y(drag_obj);
@@ -894,9 +912,8 @@ static void indev_drag(lv_indev_proc_t * state)
             lv_obj_set_pos(drag_obj, act_x + state->vect.x, act_y + state->vect.y);
 
             /*Set the drag in progress flag if the object is really moved*/
-
             if(drag_obj->coords.x1 != prev_x || drag_obj->coords.y1 != prev_y) {
-                if(state->drag_range_out != 0) { /*Send the drag begin signal on first move*/
+                if(state->drag_in_prog != 0) { /*Send the drag begin signal on first move*/
                     drag_obj->signal_cb(drag_obj,  LV_SIGNAL_DRAG_BEGIN, indev_act);
                     if(state->reset_query != 0) return;
                 }
@@ -922,12 +939,13 @@ static void indev_drag(lv_indev_proc_t * state)
  * Handle throwing by drag if the drag is ended
  * @param indev pointer to an input device state
  */
-static void indev_drag_throw(lv_indev_proc_t * state)
+static void indev_drag_throw(lv_indev_proc_t * proc)
 {
-    if(state->drag_in_prog == 0) return;
+    if(proc->drag_in_prog == 0) return;
 
     /*Set new position if the vector is not zero*/
-    lv_obj_t * drag_obj = state->last_obj;
+    lv_obj_t * drag_obj = proc->last_obj;
+
 
     /*If drag parent is active check recursively the drag_parent attribute*/
     while(lv_obj_get_drag_parent(drag_obj) != false &&
@@ -935,45 +953,50 @@ static void indev_drag_throw(lv_indev_proc_t * state)
         drag_obj = lv_obj_get_parent(drag_obj);
     }
 
-    if(drag_obj == NULL) return;
+    if(drag_obj == NULL) {
+        return;
+    }
 
     /*Return if the drag throw is not enabled*/
     if(lv_obj_get_drag_throw(drag_obj) == false) {
-        state->drag_in_prog = 0;
+        proc->drag_in_prog = 0;
         drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
         return;
     }
 
     /*Reduce the vectors*/
-    state->vect.x = state->vect.x * (100 - LV_INDEV_DRAG_THROW) / 100;
-    state->vect.y = state->vect.y * (100 - LV_INDEV_DRAG_THROW) / 100;
+    proc->drawg_throw_vect.x = proc->drawg_throw_vect.x * (100 - LV_INDEV_DRAG_THROW) / 100;
+    proc->drawg_throw_vect.y = proc->drawg_throw_vect.y * (100 - LV_INDEV_DRAG_THROW) / 100;
 
-    if(state->vect.x != 0 ||
-            state->vect.y != 0) {
+    if(proc->drawg_throw_vect.x != 0 ||
+            proc->drawg_throw_vect.y != 0) {
         /*Get the coordinates and modify them*/
         lv_area_t coords_ori;
         lv_obj_get_coords(drag_obj, &coords_ori);
-        lv_coord_t act_x = lv_obj_get_x(drag_obj) + state->vect.x;
-        lv_coord_t act_y = lv_obj_get_y(drag_obj) + state->vect.y;
+        lv_coord_t act_x = lv_obj_get_x(drag_obj) + proc->drawg_throw_vect.x;
+        lv_coord_t act_y = lv_obj_get_y(drag_obj) + proc->drawg_throw_vect.y;
         lv_obj_set_pos(drag_obj, act_x, act_y);
 
         lv_area_t coord_new;
         lv_obj_get_coords(drag_obj, &coord_new);
 
         /*If non of the coordinates are changed then do not continue throwing*/
-        if((coords_ori.x1 == coord_new.x1 || state->vect.x == 0) &&
-                (coords_ori.y1 == coord_new.y1 || state->vect.y == 0)) {
-            state->drag_in_prog = 0;
-            state->vect.x = 0;
-            state->vect.y = 0;
+        if((coords_ori.x1 == coord_new.x1 || proc->drawg_throw_vect.x == 0) &&
+                (coords_ori.y1 == coord_new.y1 || proc->drawg_throw_vect.y == 0)) {
+            proc->drag_in_prog = 0;
+            proc->vect.x = 0;
+            proc->vect.y = 0;
+            proc->drawg_throw_vect.x = 0;
+            proc->drawg_throw_vect.y = 0;
             drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
 
         }
     }
     /*If the vectors become 0 -> drag_in_prog = 0 and send a drag end signal*/
     else {
-        state->drag_in_prog = 0;
+        proc->drag_in_prog = 0;
         drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
     }
+
 }
 #endif

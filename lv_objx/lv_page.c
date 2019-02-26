@@ -585,12 +585,12 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
         /*Draw only a border*/
         lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
         lv_coord_t shadow_width_tmp =  style->body.shadow.width;
-        uint8_t empty_tmp =  style->body.empty;
+        lv_opa_t opa_tmp =  style->body.opa;
         style->body.shadow.width = 0;
-        style->body.empty = 1;
+        style->body.opa = LV_OPA_TRANSP;
         lv_draw_rect(&page->coords, mask, style, lv_obj_get_opa_scale(page));
         style->body.shadow.width = shadow_width_tmp;
-        style->body.empty = empty_tmp;
+        style->body.opa = opa_tmp;
 
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
@@ -677,16 +677,24 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 #if USE_LV_GROUP
         /* If the page is focused in a group and
-         * the background object is not visible (transparent or empty)
+         * the background object is not visible (transparent)
          * then "activate" the style of the scrollable*/
         lv_style_t * style_scrl_ori = lv_obj_get_style(scrl);
         lv_obj_t * page = lv_obj_get_parent(scrl);
         lv_style_t * style_page = lv_obj_get_style(page);
         lv_group_t * g = lv_obj_get_group(page);
-        if((style_page->body.empty || style_page->body.opa == LV_OPA_TRANSP) && style_page->body.border.width == 0) { /*Is the background visible?*/
+        if((style_page->body.opa == LV_OPA_TRANSP) && style_page->body.border.width == 0) { /*Is the background visible?*/
             if(lv_group_get_focused(g) == page) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_scrl_ori);
+                /*If still not visible modify the style a littel bit*/
+                if((style_mod->body.opa == LV_OPA_TRANSP) && style_mod->body.border.width == 0) {
+                    style_mod->body.opa = LV_OPA_50;
+                    style_mod->body.border.width = 1;
+                    style_mod = lv_group_mod_style(g, style_mod);
+                }
+
+
                 scrl->style_p = style_mod;  /*Temporally change the style to the activated */
             }
         }
@@ -729,10 +737,10 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 
                 /*Reposition the child to take padding into account*/
                 lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
-                child->coords.x1 += style->body.padding.hor;
-                child->coords.x2 += style->body.padding.hor;
-                child->coords.y1 += style->body.padding.ver;
-                child->coords.y2 += style->body.padding.ver;
+                tmp->coords.x1 += style->body.padding.hor;
+                tmp->coords.x2 += style->body.padding.hor;
+                tmp->coords.y1 += style->body.padding.ver;
+                tmp->coords.y2 += style->body.padding.ver;
 
                 lv_obj_set_parent(tmp, ext->scrl);
             } else {

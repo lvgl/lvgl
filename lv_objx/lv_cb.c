@@ -273,13 +273,13 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 #if USE_LV_GROUP
         /* If the check box is the active in a group and
-         * the background is not visible (transparent or empty)
+         * the background is not visible (transparent)
          * then activate the style of the bullet*/
         lv_style_t * style_ori = lv_obj_get_style(bullet);
         lv_obj_t * bg = lv_obj_get_parent(bullet);
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
-        if(style_page->body.empty != 0 || style_page->body.opa == LV_OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.opa == LV_OPA_TRANSP) { /*Is the Background visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);

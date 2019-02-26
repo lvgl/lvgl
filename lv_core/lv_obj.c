@@ -232,7 +232,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
             new_obj->style_p = &lv_style_plain_color;
         }
 
-        /*Set virtual functions*/
+        /*Set callbacks*/
         lv_obj_set_signal_cb(new_obj, lv_obj_signal);
         lv_obj_set_design_cb(new_obj, lv_obj_design);
 
@@ -1813,11 +1813,15 @@ static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_m
 {
     if(mode == LV_DESIGN_COVER_CHK) {
 
+        /*Most trivial test. The mask is fully  IN the object? If no it surely not covers it*/
+        if(lv_area_is_in(mask_p, &obj->coords) == false) return false;
+
+        /*Can cover the area only if fully solid (no opacity)*/
+        lv_style_t * style = lv_obj_get_style(obj);
+        if(style->body.opa != LV_OPA_COVER) return false;
+
         /* Because of the radius it is not sure the area is covered
          * Check the areas where there is no radius*/
-        lv_style_t * style = lv_obj_get_style(obj);
-        if(style->body.empty != 0) return false;
-
         uint16_t r = style->body.radius;
 
         if(r == LV_RADIUS_CIRCLE) return false;
