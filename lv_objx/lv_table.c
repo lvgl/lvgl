@@ -33,8 +33,8 @@ static void refr_size(lv_obj_t * table);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_scrl_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_scrl_design;
 
 /**********************
  *      MACROS
@@ -81,8 +81,8 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_table, lv_table_signal);
-    lv_obj_set_design_func(new_table, lv_table_design);
+    lv_obj_set_signal_cb(new_table, lv_table_signal);
+    lv_obj_set_design_cb(new_table, lv_table_design);
 
     /*Init the new table table*/
     if(copy == NULL) {

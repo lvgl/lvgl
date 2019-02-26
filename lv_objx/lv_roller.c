@@ -41,8 +41,8 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_signal_func_t ancestor_scrl_signal;
+static lv_signal_cb_t ancestor_signal;
+static lv_signal_cb_t ancestor_scrl_signal;
 
 /**********************
  *      MACROS
@@ -77,21 +77,20 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->ddlist.draw_arrow = 0;  /*Do not draw arrow by default*/
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_roller, lv_roller_signal);
-    lv_obj_set_design_func(new_roller, lv_roller_design);
+    lv_obj_set_signal_cb(new_roller, lv_roller_signal);
+    lv_obj_set_design_cb(new_roller, lv_roller_design);
 
     /*Init the new roller roller*/
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
-        lv_obj_set_drag(scrl, true);                        /*In ddlist is might be disabled*/
-        lv_page_set_rel_action(new_roller, NULL);           /*Roller don't uses it (like ddlist)*/
+        lv_obj_set_drag(scrl, true);                                        /*In ddlist it might be disabled*/
         lv_page_set_scrl_fit2(new_roller, LV_FIT_TIGHT, LV_FIT_NONE);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_ddlist_set_anim_time(new_roller, LV_ROLLER_ANIM_TIME);
         lv_roller_set_visible_row_count(new_roller, 3);
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 
-        lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
+        lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -107,7 +106,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_ddlist_open(new_roller, false);
-        lv_obj_set_signal_func(scrl, lv_roller_scrl_signal);
+        lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
         lv_obj_refresh_style(new_roller);        /*Refresh the style with new signal function*/
     }
@@ -404,7 +403,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
-            if(ext->ddlist.action) ext->ddlist.action(roller);
+            lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
 
 #if USE_LV_GROUP
             lv_group_t * g = lv_obj_get_group(roller);
@@ -459,7 +458,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
         ext->ddlist.sel_opt_id = id;
-        if(ext->ddlist.action) ext->ddlist.action(roller);
+        lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If picked an option by clicking then set it*/
         if(!lv_indev_is_dragging(indev)) {
@@ -470,7 +469,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
             if(id < 0) id = 0;
             if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
             ext->ddlist.sel_opt_id = id;
-            if(ext->ddlist.action) ext->ddlist.action(roller);
+            lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
         }
     }
 

@@ -38,7 +38,7 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -80,8 +80,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->auto_size = 1;
 
     /*Init the new object*/
-    lv_obj_set_signal_func(new_img, lv_img_signal);
-    lv_obj_set_design_func(new_img, lv_img_design);
+    lv_obj_set_signal_cb(new_img, lv_img_signal);
+    lv_obj_set_design_cb(new_img, lv_img_design);
 
     if(copy == NULL) {
         lv_obj_set_click(new_img, false);

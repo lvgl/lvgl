@@ -33,8 +33,8 @@ static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design_f;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design_f;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -69,8 +69,8 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->bright = LV_LED_BRIGHT_ON;
 
-    lv_obj_set_signal_func(new_led, lv_led_signal);
-    lv_obj_set_design_func(new_led, lv_led_design);
+    lv_obj_set_signal_cb(new_led, lv_led_signal);
+    lv_obj_set_design_cb(new_led, lv_led_design);
 
     /*Init the new led object*/
     if(copy == NULL) {

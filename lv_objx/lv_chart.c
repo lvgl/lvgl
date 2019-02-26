@@ -39,8 +39,8 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design_f;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design_f;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -85,8 +85,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_chart);
 
-    lv_obj_set_signal_func(new_chart, lv_chart_signal);
-    lv_obj_set_design_func(new_chart, lv_chart_design);
+    lv_obj_set_signal_cb(new_chart, lv_chart_signal);
+    lv_obj_set_design_cb(new_chart, lv_chart_design);
 
     /*Init the new chart background object*/
     if(copy == NULL) {

@@ -41,7 +41,6 @@ typedef struct
 {
     lv_bar_ext_t bar;       /*Ext. of ancestor*/
     /*New data for this type */
-    lv_action_t action;             /*Function to call when a new value is set*/
     lv_style_t *style_knob;    /*Style of the knob*/
     int16_t drag_value;          /*Store a temporal value during press until release (Handled by the library)*/
     uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
@@ -105,13 +104,6 @@ static inline void lv_slider_set_range(lv_obj_t *slider, int16_t min, int16_t ma
 }
 
 /**
- * Set a function which will be called when a new value is set on the slider
- * @param slider pointer to slider object
- * @param action a callback function
- */
-void lv_slider_set_action(lv_obj_t * slider, lv_action_t action);
-
-/**
  * Set the 'knob in' attribute of a slider
  * @param slider pointer to slider object
  * @param in true: the knob is drawn always in the slider;
@@ -157,13 +149,6 @@ static inline int16_t lv_slider_get_max_value(const lv_obj_t * slider)
 {
     return lv_bar_get_max_value(slider);
 }
-
-/**
- * Get the slider action function
- * @param slider pointer to slider object
- * @return the callback function
- */
-lv_action_t lv_slider_get_action(const lv_obj_t * slider);
 
 /**
  * Give the slider is being dragged or not

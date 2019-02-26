@@ -34,7 +34,7 @@ static lv_coord_t lv_lmeter_coord_round(int32_t x);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -74,8 +74,8 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_lmeter, lv_lmeter_signal);
-    lv_obj_set_design_func(new_lmeter, lv_lmeter_design);
+    lv_obj_set_signal_cb(new_lmeter, lv_lmeter_signal);
+    lv_obj_set_design_cb(new_lmeter, lv_lmeter_design);
 
     /*Init the new line meter line meter*/
     if(copy == NULL) {

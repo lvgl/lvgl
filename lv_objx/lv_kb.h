@@ -54,8 +54,6 @@ typedef struct {
     lv_obj_t *ta;               /*Pointer to the assigned text area*/
     lv_kb_mode_t mode;          /*Key map type*/
     uint8_t cursor_mng      :1; /*1: automatically show/hide cursor when a text area is assigned or left*/
-    lv_action_t  ok_action;     /*Called when the "Ok" button is clicked*/
-    lv_action_t  hide_action;  /*Called when the "Hide" button is clicked*/
 } lv_kb_ext_t;
 
 enum {
@@ -107,20 +105,6 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode);
 void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en);
 
 /**
- * Set call back to call when the "Ok" button is pressed
- * @param kb pointer to Keyboard object
- * @param action a callback with 'lv_action_t' type
- */
-void lv_kb_set_ok_action(lv_obj_t * kb, lv_action_t action);
-
-/**
- * Set call back to call when the "Hide" button is pressed
- * @param kb pointer to Keyboard object
- * @param action a callback with 'lv_action_t' type
- */
-void lv_kb_set_hide_action(lv_obj_t * kb, lv_action_t action);
-
-/**
  * Set a new map for the keyboard
  * @param kb pointer to a Keyboard object
  * @param map pointer to a string array to describe the map.
@@ -163,20 +147,6 @@ lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb);
  * @return true: show cursor on the current text area, false: hide cursor
  */
 bool lv_kb_get_cursor_manage(const lv_obj_t * kb);
-
-/**
- * Get the callback to call when the "Ok" button is pressed
- * @param kb pointer to Keyboard object
- * @return the ok callback
- */
-lv_action_t lv_kb_get_ok_action(const lv_obj_t * kb);
-
-/**
- * Get the callback to call when the "Hide" button is pressed
- * @param kb pointer to Keyboard object
- * @return the close callback
- */
-lv_action_t lv_kb_get_hide_action(const lv_obj_t * kb);
 
 /**
  * Get a style of a keyboard

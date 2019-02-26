@@ -59,10 +59,10 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_so
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design;
-static lv_design_func_t scrl_design;
-static lv_signal_func_t ancestor_signal;
-static lv_signal_func_t scrl_signal;
+static lv_design_cb_t ancestor_design;
+static lv_design_cb_t scrl_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_signal_cb_t scrl_signal;
 
 /**********************
  *      MACROS
@@ -110,9 +110,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->label = NULL;
     ext->placeholder = NULL;
 
-    lv_obj_set_signal_func(new_ta, lv_ta_signal);
-    lv_obj_set_signal_func(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);
-    lv_obj_set_design_func(new_ta, lv_ta_design);
+    lv_obj_set_signal_cb(new_ta, lv_ta_signal);
+    lv_obj_set_signal_cb(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);
+    lv_obj_set_design_cb(new_ta, lv_ta_design);
 
     /*Init the new text area object*/
     if(copy == NULL) {
@@ -120,7 +120,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->label = lv_label_create(new_ta, NULL);
 
-        lv_obj_set_design_func(ext->page.scrl, lv_ta_scrollable_design);
+        lv_obj_set_design_cb(ext->page.scrl, lv_ta_scrollable_design);
 
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         lv_label_set_text(ext->label, "Text area");
@@ -140,7 +140,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing object*/
     else {
-        lv_obj_set_design_func(ext->page.scrl, lv_ta_scrollable_design);
+        lv_obj_set_design_cb(ext->page.scrl, lv_ta_scrollable_design);
         lv_ta_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->label = lv_label_create(new_ta, copy_ext->label);
         ext->pwd_mode = copy_ext->pwd_mode;
@@ -254,6 +254,8 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     lv_ta_set_edge_flash(ta, edge_flash_en);
 
     placeholder_update(ta);
+
+    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
 }
 
 /**
@@ -319,6 +321,8 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     lv_ta_set_edge_flash(ta, edge_flash_en);
 
     placeholder_update(ta);
+
+    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
 }
 
 /**
@@ -360,6 +364,8 @@ void lv_ta_del_char(lv_obj_t * ta)
     lv_ta_set_cursor_pos(ta, ext->cursor.pos - 1);
 
     placeholder_update(ta);
+
+    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
 }
 
 /**

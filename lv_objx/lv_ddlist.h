@@ -48,7 +48,6 @@ typedef struct
     /*New data for this type */
     lv_obj_t *label;                     /*Label for the options*/
     lv_style_t * sel_style;              /*Style of the selected option*/
-    lv_action_t action;                  /*Pointer to function to call when an option is selected*/
     uint16_t option_cnt;                 /*Number of options*/
     uint16_t sel_opt_id;                 /*Index of the current option*/
     uint16_t sel_opt_id_ori;             /*Store the original index on focus*/
@@ -101,13 +100,6 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options);
  * @param sel_opt id of the selected option (0 ... number of option - 1);
  */
 void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
-
-/**
- * Set a function to call when a new option is chosen
- * @param ddlist pointer to a drop down list
- * @param action pointer to a call back function
- */
-void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action);
 
 /**
  * Set the fix height for the drop down list
@@ -189,12 +181,6 @@ uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist);
  */
 void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf);
 
-/**
- * Get the "option selected" callback function
- * @param ddlist pointer to a drop down list
- * @return  pointer to the call back function
- */
-lv_action_t lv_ddlist_get_action(const lv_obj_t * ddlist);
 
 /**
  * Get the fix height value.

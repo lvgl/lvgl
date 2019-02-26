@@ -135,16 +135,6 @@ static inline void lv_imgbtn_toggle(lv_obj_t * imgbtn)
 }
 
 /**
- * Set a function to call when a button event happens
- * @param imgbtn pointer to an image button object
- * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
- */
-static inline void lv_imgbtn_set_action(lv_obj_t * imgbtn, lv_btn_action_t type, lv_action_t action)
-{
-    lv_btn_set_action(imgbtn, type, action);
-}
-
-/**
  * Set a style of a image button.
  * @param imgbtn pointer to image button object
  * @param type which style should be set
@@ -211,16 +201,6 @@ static inline lv_btn_state_t lv_imgbtn_get_state(const lv_obj_t * imgbtn)
 static inline bool lv_imgbtn_get_toggle(const lv_obj_t * imgbtn)
 {
     return lv_btn_get_toggle(imgbtn);
-}
-
-/**
- * Get the release action of a image button
- * @param imgbtn pointer to a image button object
- * @return pointer to the release action function
- */
-static inline lv_action_t lv_imgbtn_get_action(const lv_obj_t * imgbtn, lv_btn_action_t type)
-{
-    return lv_btn_get_action(imgbtn, type);
 }
 
 /**

@@ -47,7 +47,7 @@ static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -91,8 +91,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_speed = LV_LABEL_SCROLL_SPEED;
     ext->offset.x = 0;
     ext->offset.y = 0;
-    lv_obj_set_design_func(new_label, lv_label_design);
-    lv_obj_set_signal_func(new_label, lv_label_signal);
+    lv_obj_set_design_cb(new_label, lv_label_design);
+    lv_obj_set_signal_cb(new_label, lv_label_signal);
 
     /*Init the new label*/
     if(copy == NULL) {

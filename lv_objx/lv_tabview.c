@@ -45,9 +45,9 @@ static void tabview_realign(lv_obj_t * tabview);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_signal_func_t page_signal;
-static lv_signal_func_t page_scrl_signal;
+static lv_signal_cb_t ancestor_signal;
+static lv_signal_cb_t page_signal;
+static lv_signal_cb_t page_scrl_signal;
 static const char * tab_def[] = {""};
 
 /**********************
@@ -96,7 +96,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_tabview, lv_tabview_signal);
+    lv_obj_set_signal_cb(new_tabview, lv_tabview_signal);
 
     /*Init the new tab tab*/
     if(copy == NULL) {
@@ -214,8 +214,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
 
     if(page_signal == NULL) page_signal = lv_obj_get_signal_func(h);
     if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(h));
-    lv_obj_set_signal_func(h, tabpage_signal);
-    lv_obj_set_signal_func(lv_page_get_scrl(h), tabpage_scrl_signal);
+    lv_obj_set_signal_cb(h, tabpage_signal);
+    lv_obj_set_signal_cb(lv_page_get_scrl(h), tabpage_scrl_signal);
 
     /*Extend the button matrix map with the new name*/
     char * name_dm;
@@ -616,7 +616,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         /* The button matrix is not in a group (the tab view is in it) but it should handle the group signals.
          * So propagate the related signals to the button matrix manually*/
         if(ext->btns) {
-            ext->btns->signal_func(ext->btns, sign, param);
+            ext->btns->signal_cb(ext->btns, sign, param);
         }
         if(sign == LV_SIGNAL_FOCUS) {
             lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());

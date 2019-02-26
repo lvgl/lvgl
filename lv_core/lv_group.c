@@ -82,7 +82,7 @@ void lv_group_del(lv_group_t * group)
 {
     /*Defocus the the currently focused object*/
     if(group->obj_focus != NULL) {
-        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
     }
 
@@ -141,7 +141,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
     if(*g->obj_focus == obj) {
         /*If this is the only object in the group then focus to nothing.*/
         if(lv_ll_get_head(&g->obj_ll) == g->obj_focus && lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
-            (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+            (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         }
         /*If there more objects in the group then focus to the next/prev object*/
         else {
@@ -186,14 +186,14 @@ void lv_group_focus_obj(lv_obj_t * obj)
         if(*i == obj) {
             if(g->obj_focus == i) return;       /*Don't focus the already focused object again*/
             if(g->obj_focus != NULL) {
-                (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+                (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
                 lv_obj_invalidate(*g->obj_focus);
             }
 
             g->obj_focus = i;
 
             if(g->obj_focus != NULL) {
-                (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
+                (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
                 if(g->focus_cb) g->focus_cb(g);
                 lv_obj_invalidate(*g->obj_focus);
             }
@@ -242,7 +242,7 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return LV_RES_OK;
 
-    return act->signal_func(act, LV_SIGNAL_CONTROLL, &c);
+    return act->signal_cb(act, LV_SIGNAL_CONTROLL, &c);
 }
 
 /**
@@ -291,7 +291,7 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
     group->editing = en_val;
     lv_obj_t * focused = lv_group_get_focused(group);
 
-    if(focused) focused->signal_func(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
+    if(focused) focused->signal_cb(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave edit mode*/
 
     lv_obj_invalidate(focused);
 }
@@ -568,13 +568,13 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
     if(obj_next == group->obj_focus) return; /*There's only one visible object and it's already focused*/
 
     if(group->obj_focus) {
-        (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         lv_obj_invalidate(*group->obj_focus);
     }
 
     group->obj_focus = obj_next;
 
-    (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+    (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
     lv_obj_invalidate(*group->obj_focus);
 
     if(group->focus_cb) group->focus_cb(group);

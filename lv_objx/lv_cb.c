@@ -30,9 +30,9 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_bg_design;
-static lv_design_func_t ancestor_bullet_design;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_bg_design;
+static lv_design_cb_t ancestor_bullet_design;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -68,8 +68,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->bullet = NULL;
     ext->label = NULL;
 
-    lv_obj_set_signal_func(new_cb, lv_cb_signal);
-    lv_obj_set_design_func(new_cb, lv_cb_design);
+    lv_obj_set_signal_cb(new_cb, lv_cb_signal);
+    lv_obj_set_design_cb(new_cb, lv_cb_design);
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
@@ -107,7 +107,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_cb);
     }
 
-    lv_obj_set_design_func(ext->bullet, lv_bullet_design);
+    lv_obj_set_design_cb(ext->bullet, lv_bullet_design);
 
 
     LV_LOG_INFO("check box created");

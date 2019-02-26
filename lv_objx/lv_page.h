@@ -55,8 +55,6 @@ typedef struct
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * scrl;            /*The scrollable object on the background*/
-    lv_action_t rel_action;     /*Function to call when the page is released*/
-    lv_action_t pr_action;      /*Function to call when the page is pressed*/
     struct {
         lv_style_t *style;          /*Style of scrollbars*/
         lv_area_t hor_area;            /*Horizontal scrollbar area relative to the page. (Handled by the library) */
@@ -107,20 +105,6 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_page_clean(lv_obj_t *obj);
 
 /**
- * Get the press action of the page
- * @param page pointer to a page object
- * @return a function to call when the page is pressed
- */
-lv_action_t lv_page_get_pr_action(lv_obj_t * page);
-
-/**
- * Get the release action of the page
- * @param page pointer to a page object
- * @return a function to call when the page is released
- */
-lv_action_t lv_page_get_rel_action(lv_obj_t * page);
-
-/**
  * Get the scrollable object of a page
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
@@ -130,20 +114,6 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page);
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set a release action for the page
- * @param page pointer to a page object
- * @param rel_action a function to call when the page is released
- */
-void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
-
-/**
- * Set a press action for the page
- * @param page pointer to a page object
- * @param pr_action a function to call when the page is pressed
- */
-void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
 
 /**
  * Set the scroll bar mode on a page

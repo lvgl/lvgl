@@ -29,7 +29,7 @@ static void lv_win_realign(lv_obj_t * win);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -110,7 +110,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
         }
 
-        lv_obj_set_signal_func(new_win, lv_win_signal);
+        lv_obj_set_signal_cb(new_win, lv_win_signal);
     }
     /*Copy an existing object*/
     else {
@@ -132,7 +132,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
             child = lv_obj_get_child_back(copy_ext->header, child);
         }
 
-        lv_obj_set_signal_func(new_win, lv_win_signal);
+        lv_obj_set_signal_cb(new_win, lv_win_signal);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_win);
@@ -163,10 +163,10 @@ void lv_win_clean(lv_obj_t * obj)
  * Add control button to the header of the window
  * @param win pointer to a window object
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
- * @param rel_action a function pointer to call when the button is released
+ * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_action)
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t event_cb)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
@@ -174,7 +174,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_
     lv_btn_set_style(btn, LV_BTN_STYLE_REL, ext->style_btn_rel);
     lv_btn_set_style(btn, LV_BTN_STYLE_PR, ext->style_btn_pr);
     lv_obj_set_size(btn, ext->btn_size, ext->btn_size);
-    lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, rel_action);
+    lv_obj_set_event_cb(btn, event_cb);
 
     lv_obj_t * img = lv_img_create(btn, NULL);
     lv_obj_set_click(img, false);
@@ -508,7 +508,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->title = NULL;
     } else if(sign == LV_SIGNAL_CONTROLL) {
         /*Forward all the control signals to the page*/
-        ext->page->signal_func(ext->page, sign, param);
+        ext->page->signal_cb(ext->page, sign, param);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

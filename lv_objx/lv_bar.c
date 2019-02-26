@@ -33,8 +33,8 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design_f;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design_f;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -73,8 +73,8 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->sym = 0;
     ext->style_indic = &lv_style_pretty_color;
 
-    lv_obj_set_signal_func(new_bar, lv_bar_signal);
-    lv_obj_set_design_func(new_bar, lv_bar_design);
+    lv_obj_set_signal_cb(new_bar, lv_bar_signal);
+    lv_obj_set_design_cb(new_bar, lv_bar_design);
 
     /*Init the new  bar object*/
     if(copy == NULL) {

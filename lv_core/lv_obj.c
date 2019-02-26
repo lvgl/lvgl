@@ -165,8 +165,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
             new_obj->style_p = &lv_style_scr;
         }
         /*Set virtual functions*/
-        lv_obj_set_signal_func(new_obj, lv_obj_signal);
-        lv_obj_set_design_func(new_obj, lv_obj_design);
+        lv_obj_set_signal_cb(new_obj, lv_obj_signal);
+        lv_obj_set_design_cb(new_obj, lv_obj_design);
 
         /*Set free data*/
 #ifdef LV_OBJ_FREE_NUM_TYPE
@@ -233,8 +233,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         }
 
         /*Set virtual functions*/
-        lv_obj_set_signal_func(new_obj, lv_obj_signal);
-        lv_obj_set_design_func(new_obj, lv_obj_design);
+        lv_obj_set_signal_cb(new_obj, lv_obj_signal);
+        lv_obj_set_design_cb(new_obj, lv_obj_design);
 
         /*Set free data*/
 #ifdef LV_OBJ_FREE_NUM_TYPE
@@ -311,7 +311,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 
     /*Send a signal to the parent to notify it about the new child*/
     if(parent != NULL) {
-        parent->signal_func(parent, LV_SIGNAL_CHILD_CHG, new_obj);
+        parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, new_obj);
 
         /*Invalidate the area if not screen created*/
         lv_obj_invalidate(new_obj);
@@ -375,7 +375,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
     /* All children deleted.
      * Now clean up the object specific data*/
-    obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
+    obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
 
     /*Delete the base objects*/
     if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
@@ -383,7 +383,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
     /*Send a signal to the parent to notify it about the child delete*/
     if(par != NULL) {
-        par->signal_func(par, LV_SIGNAL_CHILD_CHG, NULL);
+        par->signal_cb(par, LV_SIGNAL_CHILD_CHG, NULL);
     }
 
     return LV_RES_INV;
@@ -485,10 +485,10 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_set_pos(obj, old_pos.x, old_pos.y);
 
     /*Notify the original parent because one of its children is lost*/
-    old_par->signal_func(old_par, LV_SIGNAL_CHILD_CHG, NULL);
+    old_par->signal_cb(old_par, LV_SIGNAL_CHILD_CHG, NULL);
 
     /*Notify the new parent about the child*/
-    parent->signal_func(parent, LV_SIGNAL_CHILD_CHG, obj);
+    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
 
     lv_obj_invalidate(obj);
 }
@@ -535,10 +535,10 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     refresh_children_position(obj, diff.x, diff.y);
 
     /*Inform the object about its new coordinates*/
-    obj->signal_func(obj, LV_SIGNAL_CORD_CHG, &ori);
+    obj->signal_cb(obj, LV_SIGNAL_CORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
-    par->signal_func(par, LV_SIGNAL_CHILD_CHG, obj);
+    par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -595,16 +595,16 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
 
     /*Send a signal to the object with its new coordinates*/
-    obj->signal_func(obj, LV_SIGNAL_CORD_CHG, &ori);
+    obj->signal_cb(obj, LV_SIGNAL_CORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
     lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par != NULL) par->signal_func(par, LV_SIGNAL_CHILD_CHG, obj);
+    if(par != NULL) par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Tell the children the parent's size has changed*/
     lv_obj_t * i;
     LL_READ(obj->child_ll, i) {
-       i->signal_func(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
+       i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
     }
 
     /*Invalidate the new area*/
@@ -987,7 +987,7 @@ void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style)
 void lv_obj_refresh_style(lv_obj_t * obj)
 {
     lv_obj_invalidate(obj);
-    obj->signal_func(obj, LV_SIGNAL_STYLE_CHG, NULL);
+    obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
     lv_obj_invalidate(obj);
 
 }
@@ -1032,7 +1032,7 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool en)
     if(!obj->hidden) lv_obj_invalidate(obj);    /*Invalidate when not hidden (hidden objects are ignored) */
 
     lv_obj_t * par = lv_obj_get_parent(obj);
-    par->signal_func(par, LV_SIGNAL_CHILD_CHG, obj);
+    par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
 
 }
 
@@ -1132,24 +1132,55 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
 }
 
 /**
- * Set the signal function of an object.
+ * Set a an event handler function for an object.
+ * Used by the user to react on event which happens with the object.
+ * @param obj pointer to an object
+ * @param cb the new event function
+ */
+void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb)
+{
+    obj->event_cb = cb;
+}
+
+/**
+ * Send an event to the object
+ * @param obj pointer to an object
+ * @param event the type of the event from `lv_event_t`.
+ */
+void lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
+{
+    if(obj->event_cb) obj->event_cb(obj, event);
+}
+
+/**
+ * Set the a signal function of an object. Used internally by the library.
  * Always call the previous signal function in the new.
  * @param obj pointer to an object
- * @param fp the new signal function
+ * @param cb the new signal function
  */
-void lv_obj_set_signal_func(lv_obj_t * obj, lv_signal_func_t fp)
+void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb)
 {
-    obj->signal_func = fp;
+    obj->signal_cb = cb;
+}
+
+/**
+ * Send an event to the object
+ * @param obj pointer to an object
+ * @param event the type of the event from `lv_event_t`.
+ */
+void lv_obj_send_signal(lv_obj_t * obj, lv_signal_t signal, void * param)
+{
+    if(obj->signal_cb) obj->signal_cb(obj, signal, param);
 }
 
 /**
  * Set a new design function for an object
  * @param obj pointer to an object
- * @param fp the new design function
+ * @param cb the new design function
  */
-void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp)
+void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t cb)
 {
-    obj->design_func = fp;
+    obj->design_cb = cb;
 }
 
 /*----------------
@@ -1176,7 +1207,7 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
 void lv_obj_refresh_ext_size(lv_obj_t * obj)
 {
     obj->ext_size = 0;
-    obj->signal_func(obj, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+    obj->signal_cb(obj, LV_SIGNAL_REFR_EXT_SIZE, NULL);
 
     lv_obj_invalidate(obj);
 }
@@ -1656,9 +1687,9 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_func_t lv_obj_get_signal_func(const lv_obj_t * obj)
+lv_signal_cb_t lv_obj_get_signal_func(const lv_obj_t * obj)
 {
-    return obj->signal_func;
+    return obj->signal_cb;
 }
 
 /**
@@ -1666,9 +1697,9 @@ lv_signal_func_t lv_obj_get_signal_func(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the design function
  */
-lv_design_func_t lv_obj_get_design_func(const lv_obj_t * obj)
+lv_design_cb_t lv_obj_get_design_func(const lv_obj_t * obj)
 {
-    return obj->design_func;
+    return obj->design_cb;
 }
 
 /*------------------
@@ -1699,7 +1730,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     memset(buf, 0, sizeof(lv_obj_type_t));
     memset(&tmp, 0, sizeof(lv_obj_type_t));
 
-    obj->signal_func(obj, LV_SIGNAL_GET_TYPE, &tmp);
+    obj->signal_cb(obj, LV_SIGNAL_GET_TYPE, &tmp);
 
     uint8_t cnt;
     for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
@@ -1956,7 +1987,7 @@ static void delete_children(lv_obj_t * obj)
     lv_ll_rem(&(par->child_ll), obj);
 
     /* Clean up the object specific data*/
-    obj->signal_func(obj, LV_SIGNAL_CLEANUP, NULL);
+    obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
 
     /*Delete the base objects*/
     if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);

@@ -43,7 +43,7 @@ static void lv_mbox_close_end_cb(lv_obj_t * mbox);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -80,7 +80,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_mbox, lv_mbox_signal);
+    lv_obj_set_signal_cb(new_mbox, lv_mbox_signal);
 
     /*Init the new message box message box*/
     if(copy == NULL) {
@@ -431,7 +431,7 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS ||
               sign == LV_SIGNAL_CONTROLL || sign == LV_SIGNAL_GET_EDITABLE) {
         if(ext->btnm) {
-            ext->btnm->signal_func(ext->btnm, sign, param);
+            ext->btnm->signal_cb(ext->btnm, sign, param);
         }
 
         /* The button matrix with ENCODER input supposes it's in a group but in this case it isn't (Only the message box's container)

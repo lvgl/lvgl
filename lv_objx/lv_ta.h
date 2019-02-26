@@ -202,16 +202,6 @@ void lv_ta_set_accepted_chars(lv_obj_t * ta, const char * list);
 void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num);
 
 /**
- * Set an action to call when the Text area is clicked
- * @param ta pointer to a Text area
- * @param action a function pointer
- */
-static inline void lv_ta_set_action(lv_obj_t * ta, lv_action_t action)
-{
-    lv_page_set_rel_action(ta, action);
-}
-
-/**
  * Set the scroll bar mode of a text area
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
@@ -322,16 +312,6 @@ const char * lv_ta_get_accepted_chars(lv_obj_t * ta);
  * @return the maximal number of characters to be add
  */
 uint16_t lv_ta_get_max_length(lv_obj_t * ta);
-
-/**
- * Set an action to call when the Text area is clicked
- * @param ta pointer to a Text area
- * @param action a function pointer
- */
-static inline lv_action_t lv_ta_get_action(lv_obj_t * ta)
-{
-    return lv_page_get_rel_action(ta);
-}
 
 /**
  * Get the scroll bar mode of a text area

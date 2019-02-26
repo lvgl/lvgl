@@ -26,8 +26,8 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -70,7 +70,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_img_set_src(new_canvas, &ext->dsc);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_canvas, lv_canvas_signal);
+    lv_obj_set_signal_cb(new_canvas, lv_canvas_signal);
 
     /*Init the new canvas canvas*/
     if(copy == NULL) {

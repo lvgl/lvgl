@@ -39,12 +39,13 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static void edge_flash_anim(void * page, int32_t v);
 static void edge_flash_anim_end(void * page);
+static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -78,8 +79,6 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     ext->scrl = NULL;
-    ext->pr_action = NULL;
-    ext->rel_action = NULL;
     ext->sb.hor_draw = 0;
     ext->sb.ver_draw = 0;
     ext->sb.style = &lv_style_pretty;
@@ -98,17 +97,18 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new page object*/
     if(copy == NULL) {
         ext->scrl = lv_cont_create(new_page, NULL);
-        lv_obj_set_signal_func(ext->scrl, lv_page_scrollable_signal);
-        lv_obj_set_design_func(ext->scrl, lv_scrl_design);
+        lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
+        lv_obj_set_design_cb(ext->scrl, lv_scrl_design);
         lv_obj_set_drag(ext->scrl, true);
         lv_obj_set_drag_throw(ext->scrl, true);
         lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
         lv_cont_set_fit4(ext->scrl, LV_FIT_FILL, LV_FIT_FILL, LV_FIT_FILL, LV_FIT_FILL);
+        lv_obj_set_event_cb(ext->scrl, scrl_def_event_cb);      /*Propagate some event to the background object by default for convenience */
 
         /* Add the signal function only if 'scrolling' is created
          * because everything has to be ready before any signal is received*/
-        lv_obj_set_signal_func(new_page, lv_page_signal);
-        lv_obj_set_design_func(new_page, lv_page_design);
+        lv_obj_set_signal_cb(new_page, lv_page_signal);
+        lv_obj_set_design_cb(new_page, lv_page_design);
 
         lv_page_set_sb_mode(new_page, ext->sb.mode);
 
@@ -133,10 +133,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     } else {
         lv_page_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->scrl = lv_cont_create(new_page, copy_ext->scrl);
-        lv_obj_set_signal_func(ext->scrl, lv_page_scrollable_signal);
+        lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
 
-        lv_page_set_pr_action(new_page, copy_ext->pr_action);
-        lv_page_set_rel_action(new_page, copy_ext->rel_action);
         lv_page_set_sb_mode(new_page, copy_ext->sb.mode);
         lv_page_set_arrow_scroll(new_page, copy_ext->arrow_scroll);
 
@@ -147,8 +145,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
         /* Add the signal function only if 'scrolling' is created
          * because everything has to be ready before any signal is received*/
-        lv_obj_set_signal_func(new_page, lv_page_signal);
-        lv_obj_set_design_func(new_page, lv_page_design);
+        lv_obj_set_signal_cb(new_page, lv_page_signal);
+        lv_obj_set_design_cb(new_page, lv_page_design);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_page);
@@ -174,28 +172,6 @@ void lv_page_clean(lv_obj_t * obj)
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set a release action for the page
- * @param page pointer to a page object
- * @param rel_action a function to call when the page is release
- */
-void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action)
-{
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    ext->rel_action = rel_action;
-}
-
-/**
- * Set a press action for the page
- * @param page pointer to a page object
- * @param pr_action a function to call when the page is pressed
- */
-void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action)
-{
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    ext->pr_action = pr_action;
-}
 
 /**
  * Set the scroll bar mode on a page
@@ -299,28 +275,6 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
     return ext->scrl;
-}
-
-/**
- * Get the press action of the page
- * @param page pointer to a page object
- * @return a function to call when the page is pressed
- */
-lv_action_t lv_page_get_pr_action(lv_obj_t * page)
-{
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    return ext->pr_action;
-}
-
-/**
- * Get the release action of the page
- * @param page pointer to a page object
- * @return a function to call when the page is released
- */
-lv_action_t lv_page_get_rel_action(lv_obj_t * page)
-{
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    return ext->rel_action;
 }
 
 /**
@@ -786,7 +740,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             }
         }
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
-        ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
+        ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
 
         /*The scrollbars are important only if they are visible now*/
         if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
@@ -798,20 +752,10 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         if(ext->scrl != NULL && (lv_obj_get_width(page) != lv_area_get_width(param) ||
                                  lv_obj_get_height(page) != lv_area_get_height(param))) {
             /*If no hor_fit enabled set the scrollable's width to the page's width*/
-            ext->scrl->signal_func(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
+            ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
 
             /*The scrollbars are important only if they are visible now*/
             if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
-        }
-    } else if(sign == LV_SIGNAL_PRESSED) {
-        if(ext->pr_action != NULL) {
-            res = ext->pr_action(page);
-        }
-    } else if(sign == LV_SIGNAL_RELEASED) {
-        if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
-            if(ext->rel_action != NULL) {
-                res = ext->rel_action(page);
-            }
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         /*Ensure ext. size for the scrollbars if they are out of the page*/
@@ -1019,21 +963,35 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 page_ext->sb.ver_draw = 0;
             }
         }
-    } else if(sign == LV_SIGNAL_PRESSED) {
-        if(page_ext->pr_action != NULL) {
-            res = page_ext->pr_action(page);
-        }
-    } else if(sign == LV_SIGNAL_RELEASED) {
-        if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
-            if(page_ext->rel_action != NULL) {
-                res = page_ext->rel_action(page);
-            }
-        }
     }
 
     return res;
 }
 
+
+/**
+ * Propagate the input device related event of the scrollable to the parent page background
+ * It is used by default if the scrollable's event is not specified
+ * @param scrl pointer to the page's scrollable object
+ * @param event type of the event
+ */
+static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
+{
+    lv_obj_t * page = lv_obj_get_parent(scrl);
+
+    if(event == LV_EVENT_PRESSED ||
+            event == LV_EVENT_PRESSING ||
+            event == LV_EVENT_PRESS_LOST ||
+            event == LV_EVENT_RELEASED ||
+            event == LV_EVENT_CLICKED ||
+            event == LV_EVENT_LONG_PRESSED ||
+            event == LV_EVENT_LONG_PRESSED_REPEAT ||
+            event == LV_EVENT_LONG_HOVER_IN ||
+            event == LV_EVENT_LONG_HOVER_OUT)
+    {
+        lv_obj_send_event(page, event);
+    }
+}
 
 /**
  * Refresh the position and size of the scroll bars.

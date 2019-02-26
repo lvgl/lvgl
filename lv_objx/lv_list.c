@@ -44,11 +44,11 @@ static void lv_list_btn_single_selected(lv_obj_t *btn);
  *  STATIC VARIABLES
  **********************/
 #if USE_LV_IMG
-static lv_signal_func_t img_signal;
+static lv_signal_cb_t img_signal;
 #endif
-static lv_signal_func_t label_signal;
-static lv_signal_func_t ancestor_page_signal;
-static lv_signal_func_t ancestor_btn_signal;
+static lv_signal_cb_t label_signal;
+static lv_signal_cb_t ancestor_page_signal;
+static lv_signal_cb_t ancestor_btn_signal;
 #if USE_LV_GROUP
 /*Used to make the last clicked button pressed (selected) when the list become focused and `click_focus == 1`*/
 static lv_obj_t * last_clicked_btn;
@@ -98,7 +98,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->selected_btn = NULL;
 #endif
 
-    lv_obj_set_signal_func(new_list, lv_list_signal);
+    lv_obj_set_signal_cb(new_list, lv_list_signal);
 
     /*Init the new list object*/
     if(copy == NULL) {
@@ -132,7 +132,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_obj_t * copy_img = lv_list_get_btn_img(copy_btn);
             if(copy_img) img_src = lv_img_get_src(copy_img);
 #endif
-            lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), lv_btn_get_action(copy_btn, LV_BTN_ACTION_CLICK));
+            lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), copy_btn->event_cb);
             copy_btn = lv_list_get_next_btn(copy, copy_btn);
         }
 
@@ -174,10 +174,10 @@ void lv_list_clean(lv_obj_t * obj)
  * @param list pointer to list object
  * @param img_fn file name of an image before the text (NULL if unused)
  * @param txt text of the list element (NULL if unused)
- * @param rel_action pointer to release action function (like with lv_btn)
+ * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_action_t rel_action)
+lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_event_cb_t event_cb)
 {
     lv_style_t * style = lv_obj_get_style(list);
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
@@ -196,12 +196,12 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STATE_TGL_PR]);
     lv_btn_set_style(liste, LV_BTN_STYLE_INA, ext->styles_btn[LV_BTN_STATE_INA]);
 
-    lv_btn_set_action(liste, LV_BTN_ACTION_CLICK, rel_action);
+    lv_obj_set_event_cb(liste, event_cb);
     lv_page_glue_obj(liste, true);
     lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
     lv_btn_set_fit2(liste, LV_FIT_FLOOD, LV_FIT_TIGHT);
     lv_obj_set_protect(liste, LV_PROTECT_PRESS_LOST);
-    lv_obj_set_signal_func(liste, lv_list_btn_signal);
+    lv_obj_set_signal_cb(liste, lv_list_btn_signal);
 
     /*Make the size adjustment*/
     lv_coord_t w = lv_obj_get_width(list);
@@ -431,7 +431,7 @@ lv_obj_t * lv_list_get_btn_label(const lv_obj_t * btn)
     lv_obj_t * label = lv_obj_get_child(btn, NULL);
     if(label == NULL) return NULL;
 
-    while(label->signal_func != label_signal) {
+    while(label->signal_cb != label_signal) {
         label = lv_obj_get_child(btn, label);
         if(label == NULL) break;
     }
@@ -450,7 +450,7 @@ lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn)
     lv_obj_t * img = lv_obj_get_child(btn, NULL);
     if(img == NULL) return NULL;
 
-    while(img->signal_func != img_signal) {
+    while(img->signal_cb != img_signal) {
         img = lv_obj_get_child(btn, img);
         if(img == NULL) break;
     }
@@ -478,7 +478,7 @@ lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
     btn = lv_obj_get_child(scrl, prev_btn);
     if(btn == NULL) return NULL;
 
-    while(btn->signal_func != lv_list_btn_signal) {
+    while(btn->signal_cb != lv_list_btn_signal) {
         btn = lv_obj_get_child(scrl, btn);
         if(btn == NULL) break;
     }
@@ -505,7 +505,7 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
     btn = lv_obj_get_child_back(scrl, prev_btn);
     if(btn == NULL) return NULL;
 
-    while(btn->signal_func != lv_list_btn_signal) {
+    while(btn->signal_cb != lv_list_btn_signal) {
         btn = lv_obj_get_child_back(scrl, btn);
         if(btn == NULL) break;
     }
@@ -846,9 +846,6 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             if(btn != NULL) {
                 lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
                 ext->last_sel = btn;
-                lv_action_t rel_action;
-                rel_action = lv_btn_get_action(btn, LV_BTN_ACTION_CLICK);
-                if(rel_action != NULL) rel_action(btn);
             }
         }
 #endif

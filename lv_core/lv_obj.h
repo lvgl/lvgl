@@ -62,7 +62,7 @@ enum
 };
 typedef uint8_t lv_design_mode_t;
 
-typedef bool (* lv_design_func_t) (struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
+typedef bool (* lv_design_cb_t) (struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 
 enum
 {
@@ -70,6 +70,30 @@ enum
     LV_RES_OK,           /*The object is valid (no deleted) after the action*/
 };
 typedef uint8_t lv_res_t;
+
+
+typedef enum {
+    LV_EVENT_PRESSED,
+    LV_EVENT_PRESSING,
+    LV_EVENT_PRESS_LOST,
+    LV_EVENT_RELEASED,
+    LV_EVENT_CLICKED,
+    LV_EVENT_LONG_PRESSED,
+    LV_EVENT_LONG_PRESSED_REPEAT,
+    LV_EVENT_LONG_HOVER_IN,
+    LV_EVENT_LONG_HOVER_OUT,
+    LV_EVENT_DRAG_BEGIN,
+    LV_EVENT_DRAG_END,
+    LV_EVENT_DRAG_THROW_BEGIN,
+    LV_EVENT_FOCUSED,
+    LV_EVENT_DEFOCUSED,
+    LV_EVENT_VALUE_CHANGED,
+    LV_EVENT_REFRESH,
+    LV_EVENT_APPLY,         /*"Ok", "Apply" or similar specific button has clicked*/
+    LV_EVENT_CANCEL,        /*"Close", "Cancel" or similar specific button has clicked*/
+}lv_event_t;
+
+typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
 
 enum
 {
@@ -102,7 +126,7 @@ enum
 };
 typedef uint8_t lv_signal_t;
 
-typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
+typedef lv_res_t (* lv_signal_cb_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
 enum
 {
@@ -149,8 +173,9 @@ typedef struct _lv_obj_t
 
     lv_area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 
-    lv_signal_func_t signal_func;     /*Object type specific signal function*/
-    lv_design_func_t design_func;     /*Object type specific design function*/
+    lv_event_cb_t event_cb;
+    lv_signal_cb_t signal_cb;     /*Object type specific signal function*/
+    lv_design_cb_t design_cb;     /*Object type specific design function*/
 
     void * ext_attr;                 /*Object type specific extended data*/
     lv_style_t * style_p;       /*Pointer to the object's style*/
@@ -182,8 +207,6 @@ typedef struct _lv_obj_t
     LV_OBJ_FREE_NUM_TYPE free_num;          /*Application specific identifier (set it freely)*/
 #endif
 } lv_obj_t;
-
-typedef lv_res_t (*lv_action_t) (struct _lv_obj_t * obj);
 
 /*Protect some attributes (max. 8 bit)*/
 enum
@@ -462,19 +485,41 @@ void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
 void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
 
 /**
- * Set the signal function of an object.
+ * Set a an event handler function for an object.
+ * Used by the user to react on event which happens with the object.
+ * @param obj pointer to an object
+ * @param cb the new event function
+ */
+void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb);
+
+/**
+ * Send an event to the object
+ * @param obj pointer to an object
+ * @param event the type of the event from `lv_event_t`.
+ */
+void lv_obj_send_event(lv_obj_t * obj, lv_event_t event);
+
+/**
+ * Set the a signal function of an object. Used internally by the library.
  * Always call the previous signal function in the new.
  * @param obj pointer to an object
- * @param fp the new signal function
+ * @param cb the new signal function
  */
-void lv_obj_set_signal_func(lv_obj_t * obj, lv_signal_func_t fp);
+void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb);
+
+/**
+ * Send an event to the object
+ * @param obj pointer to an object
+ * @param event the type of the event from `lv_event_t`.
+ */
+void lv_obj_send_signal(lv_obj_t * obj, lv_signal_t signal, void * param);
 
 /**
  * Set a new design function for an object
  * @param obj pointer to an object
- * @param fp the new design function
+ * @param cb the new design function
  */
-void lv_obj_set_design_func(lv_obj_t * obj, lv_design_func_t fp);
+void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t cb);
 
 /*----------------
  * Other set
@@ -725,14 +770,14 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_func_t lv_obj_get_signal_func(const lv_obj_t * obj);
+lv_signal_cb_t lv_obj_get_signal_func(const lv_obj_t * obj);
 
 /**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
  */
-lv_design_func_t lv_obj_get_design_func(const lv_obj_t * obj);
+lv_design_cb_t lv_obj_get_design_func(const lv_obj_t * obj);
 
 /*------------------
  * Other get

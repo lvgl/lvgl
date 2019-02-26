@@ -33,7 +33,7 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -69,8 +69,8 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->auto_size = 1;
     ext->y_inv = 0;
 
-    lv_obj_set_design_func(new_line, lv_line_design);
-    lv_obj_set_signal_func(new_line, lv_line_signal);
+    lv_obj_set_design_cb(new_line, lv_line_design);
+    lv_obj_set_signal_cb(new_line, lv_line_signal);
 
     /*Init the new line*/
     if(copy == NULL) {

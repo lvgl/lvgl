@@ -43,8 +43,8 @@ static lv_res_t lv_preload_signal(lv_obj_t * preload, lv_signal_t sign, void * p
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -82,8 +82,8 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_type = LV_PRELOAD_DEF_ANIM;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_preload, lv_preload_signal);
-    lv_obj_set_design_func(new_preload, lv_preload_design);
+    lv_obj_set_signal_cb(new_preload, lv_preload_signal);
+    lv_obj_set_design_cb(new_preload, lv_preload_design);
 
 
     /*Init the new pre loader pre loader*/

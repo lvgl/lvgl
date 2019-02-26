@@ -105,10 +105,10 @@ void lv_win_clean(lv_obj_t *obj);
  * Add control button to the header of the window
  * @param win pointer to a window object
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
- * @param rel_action a function pointer to call when the button is released
+ * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_action);
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t event_cb);
 
 /*=====================
  * Setter functions

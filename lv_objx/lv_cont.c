@@ -44,7 +44,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -84,7 +84,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->fit_bottom = LV_FIT_NONE;
     ext->layout = LV_LAYOUT_OFF;
 
-    lv_obj_set_signal_func(new_cont, lv_cont_signal);
+    lv_obj_set_signal_cb(new_cont, lv_cont_signal);
 
     /*Init the new container*/
     if(copy == NULL) {
@@ -131,7 +131,7 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout)
     ext->layout = layout;
 
     /*Send a signal to refresh the layout*/
-    cont->signal_func(cont, LV_SIGNAL_CHILD_CHG, NULL);
+    cont->signal_cb(cont, LV_SIGNAL_CHILD_CHG, NULL);
 }
 
 /**
@@ -161,7 +161,7 @@ void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t t
     ext->fit_bottom = bottom;
 
     /*Send a signal to refresh the layout*/
-    cont->signal_func(cont, LV_SIGNAL_CHILD_CHG, NULL);
+    cont->signal_cb(cont, LV_SIGNAL_CHILD_CHG, NULL);
 }
 
 /*=====================
@@ -705,16 +705,16 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         lv_obj_invalidate(cont);
 
         /*Notify the object about its new coordinates*/
-        cont->signal_func(cont, LV_SIGNAL_CORD_CHG, &ori);
+        cont->signal_cb(cont, LV_SIGNAL_CORD_CHG, &ori);
 
         /*Inform the parent about the new coordinates*/
         lv_obj_t * par = lv_obj_get_parent(cont);
-        par->signal_func(par, LV_SIGNAL_CHILD_CHG, cont);
+        par->signal_cb(par, LV_SIGNAL_CHILD_CHG, cont);
 
         /*Tell the children the parent's size has changed*/
         lv_obj_t * i;
         LL_READ(cont->child_ll, i) {
-           i->signal_func(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
+           i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
         }
     }
 

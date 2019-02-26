@@ -91,16 +91,6 @@ static inline void lv_roller_set_options(lv_obj_t * roller, const char * options
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
 
 /**
- * Set a function to call when a new option is chosen
- * @param roller pointer to a roller
- * @param action pointer to a callback function
- */
-static inline void lv_roller_set_action(lv_obj_t * roller, lv_action_t action)
-{
-    lv_ddlist_set_action(roller, action);
-}
-
-/**
  * Set the height to show the given number of rows (options)
  * @param roller pointer to a roller object
  * @param row_cnt number of desired visible rows
@@ -174,16 +164,6 @@ static inline uint16_t lv_roller_get_selected(const lv_obj_t *roller)
 static inline void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf)
 {
     lv_ddlist_get_selected_str(roller, buf);
-}
-
-/**
- * Get the "option selected" callback function
- * @param roller pointer to a roller
- * @return  pointer to the call back function
- */
-static inline lv_action_t lv_roller_get_action(const lv_obj_t * roller)
-{
-    return lv_ddlist_get_action(roller);
 }
 
 /**

@@ -29,8 +29,8 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -79,8 +79,8 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK | LV_CURSOR_HIDDEN); /*hidden by default*/
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_spinbox, lv_spinbox_signal);
-    lv_obj_set_design_func(new_spinbox, ancestor_design);        /*Leave the Text area's design function*/
+    lv_obj_set_signal_cb(new_spinbox, lv_spinbox_signal);
+    lv_obj_set_design_cb(new_spinbox, ancestor_design);        /*Leave the Text area's design function*/
 
     /*Init the new spinbox spinbox*/
     if(copy == NULL) {

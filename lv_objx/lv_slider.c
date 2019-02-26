@@ -34,8 +34,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design_f;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design_f;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -69,14 +69,13 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
-    ext->action = NULL;
     ext->drag_value = LV_SLIDER_NOT_PRESSED;
     ext->style_knob = &lv_style_pretty;
     ext->knob_in = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_slider, lv_slider_signal);
-    lv_obj_set_design_func(new_slider, lv_slider_design);
+    lv_obj_set_signal_cb(new_slider, lv_slider_signal);
+    lv_obj_set_design_cb(new_slider, lv_slider_design);
 
     /*Init the new slider slider*/
     if(copy == NULL) {
@@ -97,7 +96,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_slider_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->style_knob = copy_ext->style_knob;
-        ext->action = copy_ext->action;
         ext->knob_in = copy_ext->knob_in;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_slider);
@@ -113,17 +111,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set a function which will be called when a new value is set on the slider
- * @param slider pointer to slider object
- * @param action a callback function
- */
-void lv_slider_set_action(lv_obj_t * slider, lv_action_t action)
-{
-    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    ext->action = action;
-}
 
 /**
  * Set the 'knob in' attribute of a slider
@@ -179,17 +166,6 @@ int16_t lv_slider_get_value(const lv_obj_t * slider)
 
     if(ext->drag_value != LV_SLIDER_NOT_PRESSED) return ext->drag_value;
     else return lv_bar_get_value(slider);
-}
-
-/**
- * Get the slider action function
- * @param slider pointer to slider object
- * @return the callback function
- */
-lv_action_t lv_slider_get_action(const lv_obj_t * slider)
-{
-    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    return ext->action;
 }
 
 /**
@@ -454,18 +430,18 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         if(tmp != ext->drag_value) {
             ext->drag_value = tmp;
             lv_obj_invalidate(slider);
-            if(ext->action != NULL) res = ext->action(slider);
+            lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED);
         }
     } else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         lv_slider_set_value(slider, ext->drag_value);
         ext->drag_value = LV_SLIDER_NOT_PRESSED;
-        if(ext->action != NULL) res = ext->action(slider);
+        lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /* The knob size depends on slider size.
          * During the drawing method the ext. size is used by the knob so refresh the ext. size.*/
         if(lv_obj_get_width(slider) != lv_area_get_width(param) ||
                 lv_obj_get_height(slider) != lv_area_get_height(param)) {
-            slider->signal_func(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+            slider->signal_cb(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         lv_style_t * style = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
@@ -498,10 +474,10 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 #endif
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
-            if(ext->action != NULL) res = ext->action(slider);
+            lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED);
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
-            if(ext->action != NULL) res = ext->action(slider);
+            lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;

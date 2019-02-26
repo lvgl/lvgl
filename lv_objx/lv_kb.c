@@ -30,7 +30,7 @@ static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 static const char * kb_map_lc[] = {
     "\2051#", "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207Bksp", "\n",
@@ -94,11 +94,9 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->ta = NULL;
     ext->mode = LV_KB_MODE_TEXT;
     ext->cursor_mng = 0;
-    ext->hide_action = NULL;
-    ext->ok_action = NULL;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_kb, lv_kb_signal);
+    lv_obj_set_signal_cb(new_kb, lv_kb_signal);
 
     /*Init the new keyboard keyboard*/
     if(copy == NULL) {
@@ -127,8 +125,6 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->ta = copy_ext->ta;
         ext->mode = copy_ext->mode;
         ext->cursor_mng = copy_ext->cursor_mng;
-        ext->hide_action = copy_ext->hide_action;
-        ext->ok_action = copy_ext->ok_action;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_kb);
@@ -211,28 +207,6 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
 }
 
 /**
- * Set call back to call when the "Ok" button is pressed
- * @param kb pointer to Keyboard object
- * @param action a callback with 'lv_action_t' type
- */
-void lv_kb_set_ok_action(lv_obj_t * kb, lv_action_t action)
-{
-    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    ext->ok_action = action;
-}
-
-/**
- * Set call back to call when the "Hide" button is pressed
- * @param kb pointer to Keyboard object
- * @param action a callback with 'lv_action_t' type
- */
-void lv_kb_set_hide_action(lv_obj_t * kb, lv_action_t action)
-{
-    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    ext->hide_action = action;
-}
-
-/**
  * Set a style of a keyboard
  * @param kb pointer to a keyboard object
  * @param type which style should be set
@@ -298,28 +272,6 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->cursor_mng == 0 ? false : true;
-}
-
-/**
- * Get the callback to call when the "Ok" button is pressed
- * @param kb pointer to Keyboard object
- * @return the ok callback
- */
-lv_action_t lv_kb_get_ok_action(const lv_obj_t * kb)
-{
-    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    return ext->ok_action;
-}
-
-/**
- * Get the callback to call when the "Hide" button is pressed
- * @param kb pointer to Keyboard object
- * @return the close callback
- */
-lv_action_t lv_kb_get_hide_action(const lv_obj_t * kb)
-{
-    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    return ext->hide_action;
 }
 
 /**
@@ -414,14 +366,14 @@ static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt)
         lv_btnm_set_map(kb, kb_map_spec);
         return LV_RES_OK;
     } else if(strcmp(txt, SYMBOL_CLOSE) == 0) {
-        if(ext->hide_action) res = ext->hide_action(kb);
+        if(kb->event_cb) lv_obj_send_event(kb, LV_EVENT_CANCEL);
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area  to hide it cursor if needed*/
             lv_obj_del(kb);
         }
         return res;
     } else if(strcmp(txt, SYMBOL_OK) == 0) {
-        if(ext->ok_action) res = ext->ok_action(kb);
+        if(kb->event_cb) lv_obj_send_event(kb, LV_EVENT_APPLY);
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area to hide it cursor if needed*/
             res = lv_obj_del(kb);

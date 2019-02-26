@@ -44,8 +44,8 @@ static const char * lv_btnm_def_map[] = {"Btn1", "Btn2", "Btn3", "\n",
                                          "\002Btn4", "Btn5", ""
                                         };
 
-static lv_design_func_t ancestor_design_f;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design_f;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -92,8 +92,8 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_btnm);
 
-    lv_obj_set_signal_func(new_btnm, lv_btnm_signal);
-    lv_obj_set_design_func(new_btnm, lv_btnm_design);
+    lv_obj_set_signal_cb(new_btnm, lv_btnm_signal);
+    lv_obj_set_design_cb(new_btnm, lv_btnm_design);
 
     /*Init the new button matrix object*/
     if(copy == NULL) {

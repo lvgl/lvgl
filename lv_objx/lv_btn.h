@@ -50,23 +50,11 @@ enum
 };
 typedef uint8_t lv_btn_state_t;
 
-enum
-{
-    LV_BTN_ACTION_CLICK,
-    LV_BTN_ACTION_PR,
-    LV_BTN_ACTION_LONG_PR,
-    LV_BTN_ACTION_LONG_PR_REPEAT,
-    LV_BTN_ACTION_NUM,
-};
-typedef uint8_t lv_btn_action_t;
-
-
 /*Data of button*/
 typedef struct
 {
     lv_cont_ext_t cont; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_action_t actions[LV_BTN_ACTION_NUM];
     lv_style_t * styles[LV_BTN_STATE_NUM];        /*Styles in each state*/
     lv_btn_state_t state;                         /*Current state of the button from 'lv_btn_state_t' enum*/
 #if LV_BTN_INK_EFFECT
@@ -75,7 +63,6 @@ typedef struct
     uint16_t ink_out_time;                        /*[ms] Time of ink disappearing*/
 #endif
     uint8_t toggle :1;                            /*1: Toggle enabled*/
-    uint8_t long_pr_action_executed :1;           /*1: Long press action executed (Handled by the library)*/
 } lv_btn_ext_t;
 
 /*Styles*/
@@ -123,13 +110,6 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
  * @param btn pointer to a button object
  */
 void lv_btn_toggle(lv_obj_t * btn);
-
-/**
- * Set a function to call when a button event happens
- * @param btn pointer to a button object
- * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
- */
-void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action);
 
 /**
  * Set the layout on a button
@@ -224,13 +204,6 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn);
  * @return ture: toggle enabled, false: disabled
  */
 bool lv_btn_get_toggle(const lv_obj_t * btn);
-
-/**
- * Get the release action of a button
- * @param btn pointer to a button object
- * @return pointer to the release action function
- */
-lv_action_t lv_btn_get_action(const lv_obj_t * btn, lv_btn_action_t type);
 
 /**
  * Get the layout of a button

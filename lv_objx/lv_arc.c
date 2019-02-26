@@ -32,8 +32,8 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -72,8 +72,8 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->angle_end = 315;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_arc, lv_arc_signal);
-    lv_obj_set_design_func(new_arc, lv_arc_design);
+    lv_obj_set_signal_cb(new_arc, lv_arc_signal);
+    lv_obj_set_design_cb(new_arc, lv_arc_design);
 
     /*Init the new arc arc*/
     if(copy == NULL) {
