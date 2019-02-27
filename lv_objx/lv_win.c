@@ -10,6 +10,7 @@
 #if USE_LV_WIN != 0
 
 #include "../lv_themes/lv_theme.h"
+#include "../lv_core/lv_disp.h"
 
 /*********************
  *      DEFINES
@@ -70,7 +71,10 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new window object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
+        lv_disp_t * disp = lv_obj_get_disp(new_win);
+        lv_coord_t hres = lv_disp_get_hor_res(disp);
+        lv_coord_t vres = lv_disp_get_ver_res(disp);
+        lv_obj_set_size(new_win, hres, vres);
         lv_obj_set_pos(new_win, 0, 0);
         lv_obj_set_style(new_win, &lv_style_pretty);
 
@@ -92,13 +96,13 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->win.bg);
-            lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->win.sb);
-            lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, th->win.header);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, th->win.content.bg);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->win.content.scrl);
-            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->win.btn.rel);
-            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->win.btn.pr);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->style.win.bg);
+            lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->style.win.sb);
+            lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, th->style.win.header);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, th->style.win.content.bg);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->style.win.content.scrl);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->style.win.btn.rel);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->style.win.btn.pr);
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_plain);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_plain);
@@ -107,7 +111,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         lv_obj_set_signal_func(new_win, lv_win_signal);
-        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
     }
     /*Copy an existing object*/
     else {

@@ -90,14 +90,14 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_text(ext->text, "Message");
 
         lv_cont_set_layout(new_mbox, LV_LAYOUT_COL_M);
-        lv_cont_set_fit(new_mbox, false, true);
-        lv_obj_set_width(new_mbox, LV_HOR_RES / 2);
+        lv_cont_set_fit2(new_mbox, LV_FIT_NONE, LV_FIT_TIGHT);
+        lv_obj_set_width(new_mbox, LV_DPI * 2);
         lv_obj_align(new_mbox, NULL, LV_ALIGN_CENTER, 0, 0);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->mbox.bg);
+            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->style.mbox.bg);
         } else {
             lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, &lv_style_pretty);
         }
@@ -144,9 +144,9 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_map, lv_btnm_action_t a
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->mbox.btn.bg);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->mbox.btn.rel);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->mbox.btn.pr);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->style.mbox.btn.bg);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->style.mbox.btn.rel);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->style.mbox.btn.pr);
         } else {
             lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, &lv_style_transp_fit);
         }
@@ -220,7 +220,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         lv_obj_animate(mbox, LV_ANIM_GROW_V | LV_ANIM_OUT, ext->anim_time, delay, lv_mbox_close_end_cb);
 
         /*Disable fit to let shrinking work*/
-        lv_cont_set_fit(mbox, false, false);
+        lv_cont_set_fit(mbox, LV_FIT_NONE);
     } else {
         lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_mbox_close_end_cb);
     }

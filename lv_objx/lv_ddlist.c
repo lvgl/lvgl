@@ -104,10 +104,10 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
-        lv_page_set_scrl_fit(new_ddlist, true, true);
+        lv_page_set_scrl_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_TIGHT);
 
         ext->label = lv_label_create(new_ddlist, NULL);
-        lv_cont_set_fit(new_ddlist, true, false);
+        lv_cont_set_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_NONE);
         lv_page_set_rel_action(new_ddlist, lv_ddlist_release_action);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_DRAG);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_HIDE);
@@ -118,9 +118,9 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, th->ddlist.bg);
-            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, th->ddlist.sel);
-            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, th->ddlist.sb);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, th->style.ddlist.bg);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, th->style.ddlist.sel);
+            lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, th->style.ddlist.sb);
         } else {
             lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, &lv_style_pretty);
             lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, &lv_style_plain_color);
@@ -238,12 +238,11 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 /**
  * Enable or disable the horizontal fit to the content
  * @param ddlist pointer to a drop down list
- * @param en true: enable auto fit; false: disable auto fit
+ * @param fit fit mode fron `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
  */
-void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, bool en)
+void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, lv_fit_t fit)
 {
-    lv_cont_set_fit(ddlist, en, lv_cont_get_ver_fit(ddlist));
-    lv_page_set_scrl_fit(ddlist, en, lv_page_get_scrl_fit_ver(ddlist));
+    lv_cont_set_fit2(ddlist, fit, lv_cont_get_fit_top(ddlist));
 
     lv_ddlist_refr_size(ddlist, false);
 }
@@ -624,6 +623,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_CLEANUP) {
         ext->label = NULL;
     } else if(sign == LV_SIGNAL_FOCUS) {
+#if USE_LV_GROUP
         lv_group_t * g = lv_obj_get_group(ddlist);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -651,6 +651,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 lv_ddlist_refr_size(ddlist, true);
             }
         }
+#endif
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         if(ext->opened) {
             ext->opened = false;
@@ -686,9 +687,11 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 ext->opened = 0;
                 if(ext->action) ext->action(ddlist);
 
+#if USE_LV_GROUP
                 lv_group_t * g = lv_obj_get_group(ddlist);
                 bool editing = lv_group_get_editing(g);
                 if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
+#endif
             } else {
                 ext->opened = 1;
             }

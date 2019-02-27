@@ -95,7 +95,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_gauge_set_style(new_gauge, th->gauge);
+            lv_gauge_set_style(new_gauge, th->style.gauge);
         } else {
             lv_gauge_set_style(new_gauge, &lv_style_pretty_color);
         }

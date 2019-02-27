@@ -81,11 +81,10 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing image button*/
     else {
-#if LV_IMGBTN_TILED == 0
-        memset(ext->img_src, 0, sizeof(ext->img_src));
-#else
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-
+#if LV_IMGBTN_TILED == 0
+        memcpy(ext->img_src, copy_ext->img_src, sizeof(ext->img_src));
+#else
         memcpy(ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
         memcpy(ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
         memcpy(ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
@@ -386,7 +385,7 @@ static void refr_img(lv_obj_t * imgbtn)
         ext->act_cf = LV_IMG_CF_UNKOWN;
     }
 
-
+    lv_obj_invalidate(imgbtn);
 }
 
 #endif

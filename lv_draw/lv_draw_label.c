@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_label.h"
-#include "lv_draw_rbasic.h"
 #include "../lv_misc/lv_math.h"
 
 /*********************
@@ -78,6 +77,14 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     pos.x = coords->x1;
     pos.y = coords->y1;
 
+    lv_coord_t x_ofs = 0;
+    lv_coord_t y_ofs = 0;
+    if(offset != NULL) {
+        x_ofs = offset->x;
+        y_ofs = offset->y;
+        pos.y += y_ofs;
+    }
+
     uint32_t line_start = 0;
     uint32_t line_end = lv_txt_get_next_line(txt, font, style->text.letter_space, w, flag);
 
@@ -114,20 +121,6 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     uint16_t par_start = 0;
     lv_color_t recolor;
     lv_coord_t letter_w;
-
-    lv_coord_t x_ofs = 0;
-    lv_coord_t y_ofs = 0;
-    if(offset != NULL) {
-        x_ofs = offset->x;
-        y_ofs = offset->y;
-        pos.y += y_ofs;
-    }
-
-    /*Real draw need a background color for higher bpp letter*/
-#if LV_VDB_SIZE == 0
-    lv_rletter_set_background(style->body.main_color);
-#endif
-
 
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
@@ -182,7 +175,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
 
-            letter_fp(&pos, mask, font, letter, color, opa);
+            lv_draw_letter(&pos, mask, font, letter, color, opa);
             letter_w = lv_font_get_width(font, letter);
 
             if(letter_w > 0){

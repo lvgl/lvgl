@@ -108,6 +108,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.valid_x = 0;
     ext->one_line = 0;
     ext->label = NULL;
+    ext->placeholder = NULL;
 
     lv_obj_set_signal_func(new_ta, lv_ta_signal);
     lv_obj_set_signal_func(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);
@@ -115,6 +116,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new text area object*/
     if(copy == NULL) {
+        lv_page_set_scrl_fit2(new_ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
+
         ext->label = lv_label_create(new_ta, NULL);
 
         lv_obj_set_design_func(ext->page.scrl, lv_ta_scrollable_design);
@@ -129,8 +132,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_ta_set_style(new_ta, LV_TA_STYLE_BG, th->ta.area);
-            lv_ta_set_style(new_ta, LV_TA_STYLE_SB, th->ta.sb);
+            lv_ta_set_style(new_ta, LV_TA_STYLE_BG, th->style.ta.area);
+            lv_ta_set_style(new_ta, LV_TA_STYLE_SB, th->style.ta.sb);
         } else {
             lv_ta_set_style(new_ta, LV_TA_STYLE_BG, &lv_style_pretty);
         }
@@ -607,7 +610,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_coord_t font_h =  lv_font_get_height(style_label->text.font);
 
         ext->one_line = 1;
-        lv_page_set_scrl_fit(ta, true, true);
+        lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
         lv_obj_set_height(ta, font_h + (style_ta->body.padding.ver + style_scrl->body.padding.ver) * 2);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_EXPAND);
@@ -616,7 +619,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_style_t * style_ta = lv_obj_get_style(ta);
 
         ext->one_line = 0;
-        lv_page_set_scrl_fit(ta, false, true);
+        lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_BREAK);
 
@@ -645,19 +648,17 @@ void lv_ta_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Normal left align. Just let the text expand*/
         if(align == LV_LABEL_ALIGN_LEFT) {
             lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND);
-            lv_page_set_scrl_fit(ta, true, false);
+            lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
             lv_label_set_align(label, align);
 
         }
         /*Else use fix label width equal to the Text area width*/
         else {
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
-            lv_page_set_scrl_fit(ta, false, false);
-            lv_page_set_scrl_width(ta, 1);      /*To refresh the scrollable's width*/
+            lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_FLOOD);
             lv_label_set_align(label, align);
 
-            lv_style_t * bg_style = lv_ta_get_style(ta, LV_TA_STYLE_BG);
-            lv_obj_set_width(label, lv_obj_get_width(ta) - 2 * bg_style->body.padding.hor);
+            lv_obj_set_width(label, lv_page_get_fit_width(ta));
         }
     }
 
@@ -1230,13 +1231,14 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
         if(ext->cursor.type != LV_CURSOR_NONE &&
                 (ext->cursor.type & LV_CURSOR_HIDDEN) == 0)
         {
+            lv_disp_t * disp  = lv_obj_get_disp(ta);
             lv_area_t area_tmp;
             lv_area_copy(&area_tmp, &ext->cursor.area);
             area_tmp.x1 += ext->label->coords.x1;
             area_tmp.y1 += ext->label->coords.y1;
             area_tmp.x2 += ext->label->coords.x1;
             area_tmp.y2 += ext->label->coords.y1;
-            lv_inv_area(&area_tmp);
+            lv_inv_area(disp, &area_tmp);
         }
     }
 }
@@ -1421,13 +1423,14 @@ static void refr_cursor_area(lv_obj_t * ta)
     }
 
     /*Save the new area*/
+    lv_disp_t * disp  = lv_obj_get_disp(ta);
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, &ext->cursor.area);
     area_tmp.x1 += ext->label->coords.x1;
     area_tmp.y1 += ext->label->coords.y1;
     area_tmp.x2 += ext->label->coords.x1;
     area_tmp.y2 += ext->label->coords.y1;
-    lv_inv_area(&area_tmp);
+    lv_inv_area(disp, &area_tmp);
 
     lv_area_copy(&ext->cursor.area, &cur_area);
 
@@ -1436,7 +1439,7 @@ static void refr_cursor_area(lv_obj_t * ta)
     area_tmp.y1 += ext->label->coords.y1;
     area_tmp.x2 += ext->label->coords.x1;
     area_tmp.y2 += ext->label->coords.y1;
-    lv_inv_area(&area_tmp);
+    lv_inv_area(disp, &area_tmp);
 }
 
 static void placeholder_update(lv_obj_t * ta)
@@ -1470,9 +1473,12 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_so
 
     lv_obj_get_coords(ext->label, &label_coords);
 
+    lv_point_t point_act;
+    lv_indev_get_point(click_source, &point_act);
+    if(point_act.x < 0 || point_act.y < 0) return; /*Ignore event from keypad*/
     lv_point_t relative_position;
-    relative_position.x = click_source->proc.act_point.x - label_coords.x1;
-    relative_position.y = click_source->proc.act_point.y - label_coords.y1;
+    relative_position.x = point_act.x - label_coords.x1;
+    relative_position.y = point_act.y - label_coords.y1;
 
     lv_coord_t label_width = lv_obj_get_width(ext->label);
 

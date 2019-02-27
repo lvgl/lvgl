@@ -80,7 +80,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, th->arc);
+            lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, th->style.arc);
         } else {
             lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, &lv_style_plain_color);
         }

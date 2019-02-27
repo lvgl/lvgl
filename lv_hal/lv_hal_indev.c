@@ -11,6 +11,7 @@
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
+#include "lv_hal_disp.h"
 
 #if defined(LV_GC_INCLUDE)
 #   include LV_GC_INCLUDE
@@ -49,9 +50,9 @@
  */
 void lv_indev_drv_init(lv_indev_drv_t * driver)
 {
-    driver->read = NULL;
+    memset(driver, 0, sizeof(lv_indev_drv_t));
+
     driver->type = LV_INDEV_TYPE_NONE;
-    driver->user_data = NULL;
 }
 
 /**
@@ -61,29 +62,27 @@ void lv_indev_drv_init(lv_indev_drv_t * driver)
  */
 lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
 {
-    lv_indev_t * node;
 
-    node = lv_mem_alloc(sizeof(lv_indev_t));
-    if(!node) return NULL;
+    if(driver->disp == NULL) driver->disp = lv_disp_get_default();
+
+    if(driver->disp == NULL) {
+        LV_LOG_WARN("lv_indev_drv_register: no display registered hence can't attache the indev to a display");
+        return NULL;
+    }
+
+    lv_indev_t * node = lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
+    if(!node) {
+        lv_mem_assert(node);
+        return NULL;
+    }
 
     memset(node, 0, sizeof(lv_indev_t));
     memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
 
-    node->next = NULL;
     node->proc.reset_query = 1;
     node->cursor = NULL;
     node->group = NULL;
     node->btn_points = NULL;
-
-    if(LV_GC_ROOT(_lv_indev_list) == NULL) {
-        LV_GC_ROOT(_lv_indev_list) = node;
-    } else {
-        lv_indev_t * last = LV_GC_ROOT(_lv_indev_list);
-        while(last->next)
-            last = last->next;
-
-        last->next = node;
-    }
 
     return node;
 }
@@ -95,13 +94,8 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
  */
 lv_indev_t * lv_indev_next(lv_indev_t * indev)
 {
-
-    if(indev == NULL) {
-        return LV_GC_ROOT(_lv_indev_list);
-    } else {
-        if(indev->next == NULL) return NULL;
-        else return indev->next;
-    }
+    if(indev == NULL) return lv_ll_get_head(LV_GC_ROOT(&_lv_indev_ll));
+    else return lv_ll_get_next(LV_GC_ROOT(&_lv_indev_ll), indev);
 }
 
 /**
@@ -115,13 +109,11 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     bool cont = false;
 
     memset(data, 0, sizeof(lv_indev_data_t));
-    data->state = LV_INDEV_STATE_REL;
 
-    if(indev->driver.read) {
-        data->user_data = indev->driver.user_data;
+    if(indev->driver.read_cb) {
 
         LV_LOG_TRACE("idnev read started");
-        cont = indev->driver.read(data);
+        cont = indev->driver.read_cb(&indev->driver, data);
         LV_LOG_TRACE("idnev read finished");
     } else {
         LV_LOG_WARN("indev function registered");

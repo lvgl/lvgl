@@ -79,7 +79,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_led_set_style(new_led, th->led);
+            lv_led_set_style(new_led, th->style.led);
         } else {
             lv_led_set_style(new_led, &lv_style_pretty_color);
         }

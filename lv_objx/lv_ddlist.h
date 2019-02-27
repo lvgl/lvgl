@@ -117,12 +117,13 @@ void lv_ddlist_set_action(lv_obj_t * ddlist, lv_action_t action);
  */
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h);
 
+
 /**
  * Enable or disable the horizontal fit to the content
  * @param ddlist pointer to a drop down list
- * @param en true: enable auto fit; false: disable auto fit
+ * @param fit fit mode fron `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
  */
-void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, bool en);
+void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, lv_fit_t fit);
 
 /**
  * Set the scroll bar mode of a drop down list

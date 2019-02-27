@@ -72,7 +72,7 @@ void lv_ufs_init(void)
     ufs_drv.tell = lv_ufs_tell;
     ufs_drv.size = lv_ufs_size;
     ufs_drv.trunc = lv_ufs_trunc;
-    ufs_drv.free = lv_ufs_free;
+    ufs_drv.free_space = lv_ufs_free;
 
     ufs_drv.dir_open = lv_ufs_dir_open;
     ufs_drv.dir_read = lv_ufs_dir_read;

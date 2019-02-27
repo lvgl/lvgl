@@ -98,7 +98,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
         draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
         draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
         draw_area.x2--; /*Do not draw most right pixel because it will be drawn by the adjacent triangle*/
-        fill_fp(&draw_area, mask, color, LV_OPA_50);
+        lv_draw_fill(&draw_area, mask, color, LV_OPA_COVER);
 
         /*Calc. the next point of edge1*/
         y1_tmp = edge1.y;

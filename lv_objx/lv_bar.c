@@ -84,8 +84,8 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_bar_set_style(new_bar, LV_BAR_STYLE_BG, th->bar.bg);
-            lv_bar_set_style(new_bar, LV_BAR_STYLE_INDIC, th->bar.indic);
+            lv_bar_set_style(new_bar, LV_BAR_STYLE_BG, th->style.bar.bg);
+            lv_bar_set_style(new_bar, LV_BAR_STYLE_INDIC, th->style.bar.indic);
         } else {
             lv_obj_set_style(new_bar, &lv_style_pretty);
         }
