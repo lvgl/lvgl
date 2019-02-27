@@ -50,7 +50,7 @@ typedef struct
     void * buf_act;
     uint32_t size;                      /*In pixel count*/
     lv_area_t area;
-    uint32_t flushing   :1;
+    volatile uint32_t flushing   :1;
 }lv_disp_buf_t;
 
 
