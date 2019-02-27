@@ -47,9 +47,6 @@ typedef struct
     lv_coord_t start_x;
     uint8_t changed   :1;           /*Indicates the switch state explicitly changed by drag*/
     uint8_t slided  :1;
-#if USE_LV_ANIMATION
-    uint16_t anim_time;				/*switch animation time */
-#endif
 } lv_sw_ext_t;
 
 enum {
@@ -132,15 +129,15 @@ static inline void lv_sw_set_action(lv_obj_t * sw, lv_action_t action)
  */
 void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style);
 
-#if USE_LV_ANIMATION
 /**
  * Set the animation time of the switch
  * @param sw pointer to a  switch object
  * @param anim_time animation time
- * @return style pointer to a style
  */
-void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time);
-#endif
+inline void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time) {
+    lv_slider_set_anim_time(sw, anim_time);
+}
+
 
 /*=====================
  * Getter functions
@@ -176,10 +173,12 @@ lv_style_t * lv_sw_get_style(const lv_obj_t *sw, lv_sw_style_t type);
 
 /**
  * Get the animation time of the switch
- * @param sw pointer to a  switch object
- * @return style pointer to a style
+ * @param sw pointer to a switch object
+ * @return animation time in milliseconds
  */
-uint16_t lv_sw_get_anim_time(const lv_obj_t *sw);
+inline uint16_t lv_sw_get_anim_time(const lv_obj_t *sw) {
+    return lv_slider_get_anim_time( sw );
+}
 
 /**********************
  *      MACROS

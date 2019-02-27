@@ -73,6 +73,9 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->drag_value = LV_SLIDER_NOT_PRESSED;
     ext->style_knob = &lv_style_pretty;
     ext->knob_in = 0;
+#if USE_LV_ANIMATION
+    ext->anim_time = 0;
+#endif
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_func(new_slider, lv_slider_signal);
@@ -164,6 +167,20 @@ void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, lv_style_t *
     }
 }
 
+/**
+ * Set the animation time of the slider
+ * @param slider pointer to a slider object
+ * @param anim_time animation time
+ */
+void lv_slider_set_anim_time(lv_obj_t *slider, uint16_t anim_time)
+{
+#if USE_LV_ANIMATION
+    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+    ext->anim_time = anim_time;
+#endif
+}
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -242,6 +259,21 @@ lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type
     }
 
     return style;
+}
+
+/**
+ * Get the animation time of the slider
+ * @param slider pointer to a slider object
+ * @return animation time in milliseconds
+ */
+uint16_t lv_slider_get_anim_time(const lv_obj_t *slider)
+{
+#if USE_LV_ANIMATION
+	lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+	return ext->anim_time;
+#else
+	return 0;
+#endif
 }
 
 /**********************
@@ -497,10 +529,18 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
 #endif
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+#if USE_LV_ANIMATION
+            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) + 1, lv_slider_get_anim_time(slider));
+#else
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
+#endif
             if(ext->action != NULL) res = ext->action(slider);
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+#if USE_LV_ANIMATION
+            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) - 1, lv_slider_get_anim_time(slider));
+#else
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
+#endif
             if(ext->action != NULL) res = ext->action(slider);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
@@ -517,4 +557,5 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
     return res;
 }
+
 #endif

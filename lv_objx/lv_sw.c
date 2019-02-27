@@ -70,7 +70,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->changed = 0;
 #if USE_LV_ANIMATION
-    ext->anim_time = 0;
+    ext->slider.anim_time = 0;
 #endif
     ext->style_knob_off = ext->slider.style_knob;
     ext->style_knob_on = ext->slider.style_knob;
@@ -103,7 +103,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->style_knob_off = copy_ext->style_knob_off;
         ext->style_knob_on = copy_ext->style_knob_on;
 #if USE_LV_ANIMATION
-        ext->anim_time = copy_ext->anim_time;
+        ext->slider.anim_time = copy_ext->slider.anim_time;
 #endif
 
         if(lv_sw_get_state(new_sw)) lv_slider_set_style(new_sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
@@ -233,14 +233,6 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
     }
 }
 
-void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time)
-{
-#if USE_LV_ANIMATION
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-    ext->anim_time = anim_time;
-#endif
-}
-
 
 /*=====================
  * Getter functions
@@ -278,16 +270,6 @@ lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
     return style;
 }
 
-uint16_t lv_sw_get_anim_time(const lv_obj_t *sw)
-{
-
-#if USE_LV_ANIMATION
-	lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-	return ext->anim_time;
-#else
-	return 0;
-#endif
-}
 
 /**********************
  *   STATIC FUNCTIONS

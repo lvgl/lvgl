@@ -45,6 +45,9 @@ typedef struct
     lv_style_t *style_knob;    /*Style of the knob*/
     int16_t drag_value;          /*Store a temporal value during press until release (Handled by the library)*/
     uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
+#if USE_LV_ANIMATION
+    uint16_t anim_time;				/*switch animation time */
+#endif
 } lv_slider_ext_t;
 
 /*Built-in styles of slider*/
@@ -127,6 +130,13 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in);
  */
 void lv_slider_set_style(lv_obj_t *slider, lv_slider_style_t type, lv_style_t *style);
 
+/**
+ * Set the animation time of the slider
+ * @param slider pointer to a slider object
+ * @param anim_time animation time
+ */
+void lv_slider_set_anim_time(lv_obj_t *slider, uint16_t anim_time);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -180,7 +190,6 @@ bool lv_slider_is_dragged(const lv_obj_t * slider);
  */
 bool lv_slider_get_knob_in(const lv_obj_t * slider);
 
-
 /**
  * Get a style of a slider
  * @param slider pointer to a slider object
@@ -188,6 +197,13 @@ bool lv_slider_get_knob_in(const lv_obj_t * slider);
  * @return style pointer to a style
  */
 lv_style_t * lv_slider_get_style(const lv_obj_t *slider, lv_slider_style_t type);
+
+/**
+ * Get the animation time of the slider
+ * @param slider pointer to a slider object
+ * @return animation time in milliseconds
+ */
+uint16_t lv_slider_get_anim_time(const lv_obj_t *slider);
 
 /**********************
  *      MACROS
