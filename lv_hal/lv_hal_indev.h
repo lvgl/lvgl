@@ -93,7 +93,7 @@ typedef struct _lv_indev_proc_t {
             lv_point_t last_point;
             lv_point_t vect;
             lv_point_t drag_sum;                /*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
-            lv_point_t drawg_throw_vect;
+            lv_point_t drag_throw_vect;
             struct _lv_obj_t * act_obj;
             struct _lv_obj_t * last_obj;
 
@@ -101,12 +101,12 @@ typedef struct _lv_indev_proc_t {
             uint8_t drag_limit_out      :1;
             uint8_t drag_in_prog        :1;
             uint8_t wait_unil_release   :1;
-        };
+        }pointer;
         struct {    /*Keypad data*/
             lv_indev_state_t last_state;
             uint32_t last_key;
-        };
-    };
+        }keypad;
+    }types;
 
     uint32_t pr_timestamp;          /*Pressed time stamp*/
     uint32_t longpr_rep_timestamp;  /*Long press repeat time stamp*/
