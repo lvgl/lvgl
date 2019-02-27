@@ -53,7 +53,7 @@ extern "C" {
 typedef lv_res_t (*lv_btnm_action_t) (lv_obj_t *, const char *txt);
 
 /* Type to store button control bits (disabled, hidden etc.) */
-typedef uint8_t lv_btn_ctrl_t;
+typedef uint8_t lv_btnm_ctrl_t;
 
 /*Data of button matrix*/
 typedef struct
@@ -62,7 +62,7 @@ typedef struct
     /*New data for this type */
     const char ** map_p;                        /*Pointer to the current map*/
     lv_area_t *button_areas;                    /*Array of areas of buttons*/
-    lv_btn_ctrl_t *ctrl_bits;                   /*Array of control bytes*/
+    lv_btnm_ctrl_t *ctrl_bits;                   /*Array of control bytes*/
     lv_btnm_action_t action;                    /*A function to call when a button is releases*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
     uint16_t btn_cnt;                           /*Number of button in 'map_p'(Handled by the library)*/
@@ -132,7 +132,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map);
  *                 - bit 2..0: Relative width compared to the buttons in the
  *                             same row. [1..7]
  */
-void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, lv_btn_ctrl_t * ctrl_map);
+void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t * ctrl_map);
 
 /**
  * Set a new callback function for the buttons (It will be called when a button is released)
