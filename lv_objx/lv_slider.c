@@ -532,7 +532,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 #if USE_LV_ANIMATION
             lv_slider_set_value_anim(slider, lv_slider_get_value(slider) + 1, 
                     lv_slider_get_anim_time(slider));
-            // animations's end_b will call user's callback
+            // animations's end_cb will call user's callback
 #else
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
             if(ext->action != NULL) res = ext->action(slider);
@@ -541,7 +541,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 #if USE_LV_ANIMATION
             lv_slider_set_value_anim(slider, lv_slider_get_value(slider) - 1,
                     lv_slider_get_anim_time(slider));
-            // animations's end_b will call user's callback
+            // animations's end_cb will call user's callback
 #else
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
             if(ext->action != NULL) res = ext->action(slider);
