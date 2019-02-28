@@ -382,12 +382,12 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
  */
 bool lv_mbox_get_recolor(const lv_obj_t * mbox)
 {
-	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-	if(!ext->btnm)
-		return false;
+    if(!ext->btnm)
+        return false;
 
-	return lv_btnm_get_recolor(ext->btnm);
+    return lv_btnm_get_recolor(ext->btnm);
 }
 
 /**
