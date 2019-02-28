@@ -47,6 +47,9 @@ typedef struct
     uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
 #if USE_LV_ANIMATION
     uint16_t anim_time;				/*switch animation time */
+    int16_t anim_min;               /* Temporarily stores user min during animations */
+    int16_t anim_max;               /* Temporarily stores user max during animations */
+    int16_t anim_cur;               /* Temporarily stores user current value during animations */
 #endif
 } lv_slider_ext_t;
 
@@ -91,10 +94,7 @@ static inline void lv_slider_set_value(lv_obj_t * slider, int16_t value)
  * @param value new value
  * @param anim_time animation time in milliseconds
  */
-static inline void lv_slider_set_value_anim(lv_obj_t * slider, int16_t value, uint16_t anim_time)
-{
-    lv_bar_set_value_anim(slider, value, anim_time);
-}
+void lv_slider_set_value_anim(lv_obj_t * slider, int16_t value, uint16_t anim_time);
 
 /**
  * Set minimum and the maximum values of a bar

@@ -530,18 +530,22 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 #endif
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
 #if USE_LV_ANIMATION
-            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) + 1, lv_slider_get_anim_time(slider));
+            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) + 1, 
+                    lv_slider_get_anim_time(slider));
+            // animations's end_b will call user's callback
 #else
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
-#endif
             if(ext->action != NULL) res = ext->action(slider);
+#endif
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
 #if USE_LV_ANIMATION
-            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) - 1, lv_slider_get_anim_time(slider));
+            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) - 1,
+                    lv_slider_get_anim_time(slider));
+            // animations's end_b will call user's callback
 #else
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
-#endif
             if(ext->action != NULL) res = ext->action(slider);
+#endif
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
@@ -556,6 +560,64 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     }
 
     return res;
+}
+
+#define ANIM_MAX_VAL ((uint32_t)1000) // todo: change based on resolution
+
+/**
+ * Restore the correct number of slider values
+ *
+ */
+static void lv_slider_anim_cb( void *p ){
+    lv_obj_t *slider = p;
+    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+
+    /* Restore the original Range */
+    lv_slider_set_range(slider, ext->anim_min, ext->anim_max);
+    lv_slider_set_value(slider, ext->anim_cur);
+
+    /* Call User Callback */
+    // todo: limitation: the user callback CANNOT delete the slider
+    if(ext->action != NULL) ext->action(slider);
+}
+
+void lv_slider_set_value_anim(lv_obj_t * slider, int16_t value, uint16_t anim_time)
+{
+#if USE_LV_ANIMATION
+    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
+
+    /* Set the slider range to a higher value to allow intermediate animations.
+     * The User's slider range will be restored in the anim end_cb*/
+    ext->anim_min = lv_slider_get_min_value(slider);
+    ext->anim_max = lv_slider_get_max_value(slider);
+
+    int16_t range = lv_slider_get_max_value(slider) - lv_slider_get_min_value(slider);
+
+    int16_t anim_src_val = (ANIM_MAX_VAL *
+            (lv_slider_get_value(slider) - lv_slider_get_min_value(slider))) /
+            range;
+
+    int16_t anim_dst_val = (ANIM_MAX_VAL * (value - lv_slider_get_min_value(slider))) / range;
+
+    lv_slider_set_range(slider, 0, ANIM_MAX_VAL);
+    ext->anim_cur = value;
+
+    /* Define the animation */
+    lv_anim_t a;
+    a.var = slider;
+    a.start = anim_src_val;
+    a.end = anim_dst_val;
+    a.fp = (lv_anim_fp_t)lv_slider_set_value;
+    a.path = lv_anim_path_linear;
+    a.end_cb = lv_slider_anim_cb;
+    a.act_time = 0;
+    a.time = anim_time;
+    a.playback = 0;
+    a.playback_pause = 0;
+    a.repeat = 0;
+    a.repeat_pause = 0;
+    lv_anim_create(&a);
+#endif
 }
 
 #endif
