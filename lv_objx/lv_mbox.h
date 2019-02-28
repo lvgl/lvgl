@@ -184,7 +184,7 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t *mbox, lv_mbox_style_t type);
 
 /**
  * Get whether recoloring is enabled
- * @param btnm pointer to button matrix object
+ * @param mbox pointer to a message box object
  * @return whether recoloring is enabled
  */
 bool lv_mbox_get_recolor(const lv_obj_t * mbox);
