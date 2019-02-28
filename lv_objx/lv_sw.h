@@ -135,7 +135,7 @@ void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style);
  * @param sw pointer to a  switch object
  * @param anim_time animation time
  */
-inline void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time) {
+static inline void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time) {
     lv_slider_set_anim_time(sw, anim_time);
 }
 
@@ -177,7 +177,7 @@ lv_style_t * lv_sw_get_style(const lv_obj_t *sw, lv_sw_style_t type);
  * @param sw pointer to a switch object
  * @return animation time in milliseconds
  */
-inline uint16_t lv_sw_get_anim_time(const lv_obj_t *sw) {
+static inline uint16_t lv_sw_get_anim_time(const lv_obj_t *sw) {
     return lv_slider_get_anim_time( sw );
 }
 
