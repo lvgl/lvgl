@@ -57,12 +57,10 @@ typedef uint8_t lv_indev_state_t;
 
 /*Data type when an input device is read */
 typedef struct {
-    union {
-        lv_point_t point;          /*For LV_INDEV_TYPE_POINTER the currently pressed point*/
-        uint32_t key;              /*For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
-        uint32_t btn_id;           /*For LV_INDEV_TYPE_BUTTON the currently pressed button*/
-        int16_t enc_diff;              /*For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
-    };
+    lv_point_t point;          /*For LV_INDEV_TYPE_POINTER the currently pressed point*/
+    uint32_t key;              /*For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
+    uint32_t btn_id;           /*For LV_INDEV_TYPE_BUTTON the currently pressed button*/
+    int16_t enc_diff;          /*For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
     lv_indev_state_t state;    /*LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
 
@@ -132,7 +130,7 @@ typedef struct _lv_indev_t {
         struct _lv_group_t *group;      /*Keypad destination group*/
         const lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
 
-    };
+    }custom_data;
 } lv_indev_t;
 
 /**********************
