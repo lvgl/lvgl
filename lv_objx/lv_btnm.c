@@ -84,6 +84,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->action = NULL;
     ext->map_p = NULL;
     ext->toggle = 0;
+    ext->recolor = 0;
     ext->styles_btn[LV_BTN_STATE_REL] = &lv_style_btn_rel;
     ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_pr;
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
