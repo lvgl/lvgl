@@ -32,7 +32,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_SWITCH_SLIDER_ANIM_MAX 1000
+/* Set to 2 instead of 1 so that there is a measurable half-way point */
+#define LV_SWITCH_SLIDER_ANIM_MAX 2
 
 /**********************
  *      TYPEDEFS

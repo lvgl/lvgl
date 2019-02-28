@@ -80,7 +80,6 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new switch switch*/
     if(copy == NULL) {
-        lv_slider_set_range(new_sw, 0, 1);
         lv_obj_set_size(new_sw, 2 * LV_DPI / 3, LV_DPI / 3);
         lv_slider_set_knob_in(new_sw, true);
         lv_slider_set_range(new_sw, 0, LV_SWITCH_SLIDER_ANIM_MAX);
@@ -403,25 +402,8 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     return res;
 }
 
-static void lv_sw_anim_to_value(lv_obj_t * sw, int16_t value)
+static inline void lv_sw_anim_to_value(lv_obj_t * sw, int16_t value)
 {
-#if USE_LV_ANIMATION
-    lv_anim_t a;
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-    a.var = sw;
-    a.start = ext->slider.bar.cur_value;
-    a.end = value;
-    a.fp = (lv_anim_fp_t)lv_slider_set_value;
-    a.path = lv_anim_path_linear;
-    a.end_cb = NULL;
-    a.act_time = 0;
-    a.time = lv_sw_get_anim_time(sw);
-    a.playback = 0;
-    a.playback_pause = 0;
-    a.repeat = 0;
-    a.repeat_pause = 0;
-    lv_anim_create(&a);
-#endif
+    lv_slider_set_value_anim(sw, value, lv_sw_get_anim_time(sw));
 }
-
 #endif
