@@ -562,8 +562,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     return res;
 }
 
-#define ANIM_MAX_VAL ((uint32_t)1000) // todo: change based on resolution
-
 /**
  * Restore the correct number of slider values
  *
@@ -586,20 +584,37 @@ void lv_slider_set_value_anim(lv_obj_t * slider, int16_t value, uint16_t anim_ti
 #if USE_LV_ANIMATION
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
+    /* Determine animation range based on slider pixel resolution */
+    uint32_t anim_max_val;
+    {
+        lv_coord_t slider_w = lv_area_get_width(&slider->coords);
+        lv_coord_t slider_h = lv_area_get_height(&slider->coords);
+        if(slider_w > slider_h) {
+            anim_max_val = slider_w;
+        }
+        else {
+            anim_max_val = slider_h;
+        }
+#if LV_ANTIALIAS
+        anim_max_val *= 4;
+#endif
+    }
+
     /* Set the slider range to a higher value to allow intermediate animations.
      * The User's slider range will be restored in the anim end_cb*/
     ext->anim_min = lv_slider_get_min_value(slider);
     ext->anim_max = lv_slider_get_max_value(slider);
 
-    int16_t range = lv_slider_get_max_value(slider) - lv_slider_get_min_value(slider);
+    int16_t anim_src_val, anim_dst_val;
+    {
+        int16_t range = lv_slider_get_max_value(slider) - lv_slider_get_min_value(slider);
+        anim_src_val = (anim_max_val *
+                (lv_slider_get_value(slider) - lv_slider_get_min_value(slider))) /
+                range;
+        anim_dst_val = (anim_max_val * (value - lv_slider_get_min_value(slider))) / range;
+    }
 
-    int16_t anim_src_val = (ANIM_MAX_VAL *
-            (lv_slider_get_value(slider) - lv_slider_get_min_value(slider))) /
-            range;
-
-    int16_t anim_dst_val = (ANIM_MAX_VAL * (value - lv_slider_get_min_value(slider))) / range;
-
-    lv_slider_set_range(slider, 0, ANIM_MAX_VAL);
+    lv_slider_set_range(slider, 0, anim_max_val);
     ext->anim_cur = value;
 
     /* Define the animation */
