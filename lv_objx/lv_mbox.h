@@ -189,6 +189,14 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t *mbox, lv_mbox_style_t type);
  */
 bool lv_mbox_get_recolor(const lv_obj_t * mbox);
 
+/**
+ * Get message box button matrix
+ * @param mbox pointer to a message box object
+ * @return pointer to button matrix object
+ * @remarks return value will be NULL unless `lv_mbox_add_btns` has been already called
+ */
+lv_obj_t * lv_mbox_get_btnm(lv_obj_t * mbox);
+
 /**********************
  *      MACROS
  **********************/
