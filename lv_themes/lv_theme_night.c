@@ -547,7 +547,7 @@ static void list_init(void)
     list_bg.body.padding.inner = 0;
 
     lv_style_copy(&list_btn_rel, &bg);
-    list_btn_rel.body.empty = 1;
+    list_btn_rel.body.opa = LV_OPA_TRANSP;
     list_btn_rel.body.border.part = LV_BORDER_BOTTOM;
     list_btn_rel.body.border.color = lv_color_hsv_to_rgb(_hue, 10, 5);
     list_btn_rel.body.border.width = 1;
@@ -568,7 +568,7 @@ static void list_init(void)
     list_btn_pr.image.color = lv_color_hsv_to_rgb(_hue, 5, 80);
 
     lv_style_copy(&list_btn_tgl_rel, &list_btn_rel);
-    list_btn_tgl_rel.body.empty = 0;
+    list_btn_tgl_rel.body.opa = LV_OPA_COVER;
     list_btn_tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 8);
     list_btn_tgl_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 8);
 
@@ -705,7 +705,7 @@ static void style_mod(lv_style_t * style)
     style->body.border.color = lv_color_hsv_to_rgb(_hue, 80, 70);
 
     /*If not empty or has border then emphasis the border*/
-    if (style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+    if (style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 #else
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
@@ -721,7 +721,7 @@ static void style_mod_edit(lv_style_t * style)
     style->body.border.color = LV_COLOR_GREEN;
 
     /*If not empty or has border then emphasis the border*/
-    if (style->body.empty == 0 || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+    if (style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 #else
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;

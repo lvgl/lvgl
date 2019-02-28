@@ -80,9 +80,9 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
 
     node->proc.reset_query = 1;
-    node->cursor = NULL;
-    node->group = NULL;
-    node->btn_points = NULL;
+    node->custom_data.cursor = NULL;
+    node->custom_data.group = NULL;
+    node->custom_data.btn_points = NULL;
 
     return node;
 }

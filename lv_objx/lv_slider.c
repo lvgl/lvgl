@@ -342,7 +342,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         if(lv_obj_is_focused(slider)) {
             lv_style_t style_tmp;
             lv_style_copy(&style_tmp, style_bg);
-            style_tmp.body.empty = 1;
+            style_tmp.body.opa = LV_OPA_TRANSP;
             style_tmp.body.shadow.width = 0;
             lv_draw_rect(&area_bg, mask, &style_tmp, opa_scale);
         }

@@ -354,7 +354,7 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
 
             lv_style_t bg_style;
             lv_style_copy(&bg_style, &lv_style_plain);
-            bg_style.body.empty = 1;
+            bg_style.body.opa = LV_OPA_TRANSP;
             bg_style.body.radius = LV_RADIUS_CIRCLE;
             bg_style.body.border.color = style->body.border.color;
             bg_style.body.border.width = style->body.border.width;

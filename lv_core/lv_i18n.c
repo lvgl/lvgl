@@ -163,17 +163,17 @@ const char * lv_i18n_get_text_plural(const char * msg_id, int32_t num)
 
     const lv_i18n_lang_t * lang = local_lang;
 
-    if(lang->plurals == NULL || lang->plural_rule == NULL) {
+    if(lang->plural_rule == NULL) {
         if(lang == languages[0]) {
-            LV_LOG_WARN("lv_i18n_get_text_plural: No plurals or plural rule has defined even on the default language");
+            LV_LOG_WARN("lv_i18n_get_text_plural: No plural rule has defined even on the default language");
             return msg_id;
         } else {
-            LV_LOG_WARN("lv_i18n_get_text_plural: o plurals or plural rule has defined for the language. Fallback to the default language");
+            LV_LOG_WARN("lv_i18n_get_text_plural: No plural rule has defined for the language. Fallback to the default language");
             lang = languages[0];
         }
 
-        if(lang->plurals == NULL) {
-            LV_LOG_WARN("lv_i18n_get_text_plural: o plurals or plural rule has defined even on the default language");
+        if(lang->plural_rule == NULL) {
+            LV_LOG_WARN("lv_i18n_get_text_plural: No plural rule has defined even on the default language");
             return msg_id;
         }
     }

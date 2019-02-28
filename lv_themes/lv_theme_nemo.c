@@ -75,7 +75,6 @@ static void basic_init(void)
     def.body.opa = LV_OPA_COVER;
     def.glass = 0;
 
-    def.body.empty = 0;
     def.body.main_color = LV_COLOR_HEX3(0x222);
     def.body.grad_color = LV_COLOR_HEX3(0x222);
     def.body.radius = 0;
@@ -142,7 +141,7 @@ static void btn_init(void)
 #if USE_LV_BTN != 0
     lv_style_copy(&btn_rel, &def);
     btn_rel.glass = 0;
-    btn_rel.body.empty = 1;
+    btn_rel.body.opa = LV_OPA_TRANSP;
     btn_rel.body.radius = LV_RADIUS_CIRCLE;
     btn_rel.body.border.width = 2;
     btn_rel.body.border.color = lv_color_hsv_to_rgb(_hue, 70, 90);
@@ -155,7 +154,6 @@ static void btn_init(void)
 
     lv_style_copy(&btn_pr, &btn_rel);
     btn_pr.body.opa = LV_OPA_COVER;
-    btn_pr.body.empty = 0;
     btn_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 50, 50);
     btn_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 50, 50);
     btn_pr.body.border.opa = LV_OPA_60;
@@ -164,7 +162,6 @@ static void btn_init(void)
 
     lv_style_copy(&btn_trel, &btn_pr);
     btn_trel.body.opa = LV_OPA_COVER;
-    btn_trel.body.empty = 0;
     btn_trel.body.main_color = lv_color_hsv_to_rgb(_hue, 50, 60);
     btn_trel.body.grad_color = lv_color_hsv_to_rgb(_hue, 50, 60);
     btn_trel.body.border.opa = LV_OPA_60;
@@ -174,7 +171,6 @@ static void btn_init(void)
 
     lv_style_copy(&btn_tpr, &btn_trel);
     btn_tpr.body.opa = LV_OPA_COVER;
-    btn_tpr.body.empty = 0;
     btn_tpr.body.main_color = lv_color_hsv_to_rgb(_hue, 50, 50);
     btn_tpr.body.grad_color = lv_color_hsv_to_rgb(_hue, 50, 50);
     btn_tpr.body.border.opa = LV_OPA_60;
@@ -205,8 +201,6 @@ static void label_init(void)
     lv_style_copy(&label_prim, &def);
     label_prim.text.font = _font;
     label_prim.text.color = lv_color_hsv_to_rgb(_hue, 5, 96);
-    label_prim.body.empty = 1;
-    label_prim.body.border.width = 0;
 
     lv_style_copy(&label_sec, &label_prim);
     label_sec.text.color = lv_color_hsv_to_rgb(_hue, 40, 85);
@@ -427,7 +421,7 @@ static void calendar_init(void)
 
     static lv_style_t week_box;
     lv_style_copy(&week_box, &def);
-    week_box.body.empty = 1;
+    week_box.body.opa = LV_OPA_TRANSP;
     week_box.body.border.color = theme.style.panel->body.border.color;
     week_box.body.padding.ver = LV_DPI / 20;
 
@@ -460,7 +454,7 @@ static void cb_init(void)
     cb_rel.body.grad_color = LV_COLOR_SILVER;
 
     lv_style_copy(&cb_bg, &bg);
-    cb_bg.body.empty = 1;
+    cb_bg.body.opa = LV_OPA_TRANSP;
     cb_bg.body.border.width = 0;
     cb_bg.body.padding.inner =  LV_DPI / 8;
     cb_bg.body.padding.hor =  0;
@@ -510,7 +504,7 @@ static void btnm_init(void)
     btnm_bg.body.radius = LV_DPI / 8;
 
     lv_style_copy(&btnm_rel, &lv_style_plain);
-    btnm_rel.body.empty = 1;
+    btnm_rel.body.opa = LV_OPA_TRANSP;
     btnm_rel.body.radius = LV_DPI / 8;
     btnm_rel.text.color = lv_color_hsv_to_rgb(_hue, 60, 80);
     btnm_rel.text.font = _font;
@@ -598,7 +592,7 @@ static void list_init(void)
 #if USE_LV_LIST != 0
     static lv_style_t list_bg, list_rel, list_pr, list_trel, list_tpr, list_ina;
     lv_style_copy(&list_rel, &def);
-    list_rel.body.empty = 1;
+    list_rel.body.opa = LV_OPA_TRANSP;
     list_rel.body.border.width = 1;
     list_rel.body.border.color = lv_color_hsv_to_rgb(_hue, 50, 85);
     list_rel.body.border.opa = LV_OPA_COVER;
@@ -606,7 +600,7 @@ static void list_init(void)
     list_rel.text.font = _font;
 
     lv_style_copy(&list_pr, &list_rel);
-    list_pr.body.empty = 0;
+    list_pr.body.opa = LV_OPA_TRANSP;
     list_pr.body.opa = LV_OPA_COVER;
     list_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 34, 41);
@@ -666,7 +660,7 @@ static void roller_init(void)
     roller_bg.body.shadow.width = 0;
 
     lv_style_copy(&roller_sel, &panel);
-    roller_sel.body.empty = 1;
+    roller_sel.body.opa = LV_OPA_TRANSP;
     roller_sel.body.radius = 0;
     roller_sel.text.opa = LV_OPA_COVER;
     roller_sel.text.color = lv_color_hsv_to_rgb(_hue, 70, 95);
@@ -697,7 +691,7 @@ static void tabview_init(void)
     tab_pr.body.grad_color = LV_COLOR_HEX3(0x500);
 
     lv_style_copy(&tab_trel, &def);
-    tab_trel.body.empty = 1;
+    tab_trel.body.opa = LV_OPA_TRANSP;
     tab_trel.body.padding.hor = 0;
     tab_trel.body.padding.ver = LV_DPI / 6;
     tab_trel.body.padding.inner = 0;

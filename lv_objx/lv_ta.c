@@ -1059,7 +1059,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
             lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0);
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
-            cur_style.body.empty = 1;
+            cur_style.body.opa = LV_OPA_TRANSP;
             if(cur_style.body.border.width == 0) cur_style.body.border.width = 1; /*Be sure the border will be drawn*/
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
         } else if(ext->cursor.type == LV_CURSOR_UNDERLINE) {
@@ -1214,6 +1214,21 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
         lv_coord_t font_h = lv_font_get_height(style_label->text.font);
         scrl->ext_size = LV_MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
     }
+    else if(sign == LV_SIGNAL_CORD_CHG) {
+        /*Set the label width according to the text area width*/
+        if(ext->label) {
+            if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
+                    lv_obj_get_height(ta) != lv_area_get_height(param)) {
+                lv_obj_t * scrl = lv_page_get_scrl(ta);
+                lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
+                lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);
+                lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
+
+                refr_cursor_area(ta);
+            }
+        }
+    }
     else if(sign == LV_SIGNAL_PRESSED) {
         update_cursor_position_on_click(ta, (lv_indev_t *)param);
     }
@@ -1342,7 +1357,7 @@ static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
         style_res->body.border.width = 1;
         style_res->body.shadow.width = 0;
         style_res->body.radius = 0;
-        style_res->body.empty = 0;
+        style_res->body.opa = LV_OPA_COVER;
         style_res->body.padding.hor = 0;
         style_res->body.padding.ver = 0;
         style_res->line.width = 1;
