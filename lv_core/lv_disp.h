@@ -81,7 +81,7 @@ static inline lv_obj_t * lv_scr_act(void)
  * Get the top layer  of the default display
  * @return pointer to the top layer
  */
-static inline lv_obj_t * lv_top_layer(void)
+static inline lv_obj_t * lv_layer_top(void)
 {
     return lv_disp_get_layer_top(lv_disp_get_default());
 }
@@ -90,10 +90,16 @@ static inline lv_obj_t * lv_top_layer(void)
  * Get the active screen of the deafult display
  * @return  pointer to the sys layer
  */
-static inline lv_obj_t * lv_sys_layer(void)
+static inline lv_obj_t * lv_layer_sys(void)
 {
     return lv_disp_get_layer_sys(lv_disp_get_default());
 }
+
+static inline void lv_scr_load(lv_obj_t * scr)
+{
+    lv_disp_set_scr_act(scr);
+}
+
 
 /**********************
  *      MACROS
@@ -104,8 +110,8 @@ static inline lv_obj_t * lv_sys_layer(void)
  * Recommended only if you have one display
  *------------------------------------------------*/
 
-#define LV_HOR_RES (lv_disp_get_hor_res(lv_disp_get_default());)
-#define LV_VER_RES (lv_disp_get_ver_res(lv_disp_get_default());)
+#define LV_HOR_RES lv_disp_get_hor_res(lv_disp_get_default())
+#define LV_VER_RES lv_disp_get_ver_res(lv_disp_get_default())
 
 #ifdef __cplusplus
 } /* extern "C" */

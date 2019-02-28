@@ -35,6 +35,7 @@ LittlevGL provides everything you need to create a Graphical User Interface (GUI
 * **OS, External memory and GPU** supported but not required
 * **Single frame buffer** operation even with advances graphical effects
 * **Written in C** for maximal compatibility
+* **Micropython Binding** exposes [LittlevGL API in Micropython](https://blog.littlevgl.com/2019-02-20/micropython-bindings)
 * **Simulator** to develop on PC without embedded hardware
 * **Tutorials, examples, themes** for rapid development
 * **Documentation** and API references online
@@ -185,6 +186,22 @@ lv_btn_set_ink_out_time(btn, 300);
 ```
 
 ![Simple button with LittelvGL](https://littlevgl.com/github/btn3.gif)
+
+#### Use LittlevGL from Micropython
+```python
+
+# Create a Button and a Label
+
+scr = lv.obj()
+btn = lv.btn(scr)
+btn.align(lv.scr_act(), lv.ALIGN.CENTER, 0, 0)
+label = lv.label(btn)
+label.set_text("Button")
+
+# Load the screen
+
+lv.scr_load(scr)
+```
 
 Check out the [Documentation](https://docs.littlevgl.com/) for more!
 
