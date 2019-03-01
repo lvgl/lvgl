@@ -170,6 +170,11 @@ void lv_btn_set_toggle(lv_obj_t * btn, bool tgl)
  */
 void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 {
+
+    if(state == LV_BTN_STATE_REL) {
+        printf("asd\n");
+    }
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     if(ext->state != state) {
         ext->state = state;
@@ -493,6 +498,7 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
  */
 static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 {
+
     lv_res_t res;
 
     /* Include the ancient signal function */
@@ -562,8 +568,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If not dragged and it was not long press action then
          *change state and run the action*/
-        lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_is_dragging(param) == false && indev->proc.long_pr_sent == 0) {
+        if(lv_indev_is_dragging(param) == false) {
             if(ext->state == LV_BTN_STATE_PR && tgl == false) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
             } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == false) {
@@ -573,6 +578,11 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == true) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
             }
+
+            if(tgl) {
+                lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
+            }
+
         } else { /*If dragged change back the state*/
             if(ext->state == LV_BTN_STATE_PR) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
@@ -616,16 +626,14 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_REL);
         } else if(c == LV_GROUP_KEY_ENTER) {
-            lv_indev_t * indev = lv_indev_get_act();
-            if(!indev->proc.long_pr_sent) {
-                if(lv_btn_get_toggle(btn)) {
-                    if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                    else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                } else {
-                    if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                    else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                }
+            if(lv_btn_get_toggle(btn)) {
+                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+            } else {
+                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
             }
+            lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
         }
     } else if(sign == LV_SIGNAL_CLEANUP) {
 #if USE_LV_ANIMATION && LV_BTN_INK_EFFECT

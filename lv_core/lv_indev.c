@@ -388,58 +388,92 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(g == NULL) return;
 
     lv_obj_t * focused = lv_group_get_focused(g);
+    if(focused == NULL) return;
 
     /*Key press happened*/
     if(data->state == LV_INDEV_STATE_PR &&
-            i->proc.types.keypad.last_state == LV_INDEV_STATE_REL) {
+            i->proc.types.keypad.last_state == LV_INDEV_STATE_REL)
+    {
         i->proc.pr_timestamp = lv_tick_get();
 
-        lv_obj_t * focused = lv_group_get_focused(g);
-        if(focused && data->key == LV_GROUP_KEY_ENTER) {
-            focused->signal_cb(focused, LV_SIGNAL_PRESSED, indev_act);
+        /*Simulate a press on the object if ENTER was pressed*/
+        if(data->key == LV_GROUP_KEY_ENTER) {
             lv_obj_send_event(focused, LV_EVENT_PRESSED);
+            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
+        }
+        /*Move the focus on NEXT*/
+        else if(data->key == LV_GROUP_KEY_NEXT) {
+            lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
+            lv_group_focus_next(g);
+            if(i->proc.reset_query) return;             /*The object might be deleted*/
+        }
+        /*Move the focus on PREV*/
+        else if(data->key == LV_GROUP_KEY_PREV) {
+            lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
+            lv_group_focus_prev(g);
+            if(i->proc.reset_query) return;             /*The object might be deleted*/
+        }
+        /*Just send other keys to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
+        else {
+            lv_group_send_data(g, data->key);
         }
     }
     /*Pressing*/
-    else if(data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
-        if(data->key == LV_GROUP_KEY_ENTER &&
-                i->proc.long_pr_sent == 0 &&
-                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
-            /*On enter long press leave edit mode.*/
-            lv_obj_t * focused = lv_group_get_focused(g);
-            if(focused) {
-                focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS, indev_act);
-                i->proc.long_pr_sent = 1;
+    else if(data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR)
+    {
+        /*Long press time has elapsed?*/
+        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
+            i->proc.long_pr_sent = 1;
+            if(data->key == LV_GROUP_KEY_ENTER) {
+                i->proc.longpr_rep_timestamp = lv_tick_get();
                 lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
+            }
+        }
+        /*Long press repeated time has elapsed?*/
+        else if(i->proc.long_pr_sent != 0 && lv_tick_elaps(i->proc.longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
+
+            i->proc.longpr_rep_timestamp = lv_tick_get();
+
+            /*Send LONG_PRESS_REP on ENTER*/
+            if(data->key == LV_GROUP_KEY_ENTER) {
+                lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED_REPEAT);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
+            }
+            /*Move the focus on NEXT again*/
+            else if(data->key == LV_GROUP_KEY_NEXT) {
+                lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
+                lv_group_focus_next(g);
+                if(i->proc.reset_query) return;             /*The object might be deleted*/
+            }
+            /*Move the focus on PREV again*/
+            else if(data->key == LV_GROUP_KEY_PREV) {
+                lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
+                lv_group_focus_prev(g);
+                if(i->proc.reset_query) return;             /*The object might be deleted*/
+            }
+            /*Just send other keys again to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
+            else {
+                lv_group_send_data(g, data->key);
+                if(i->proc.reset_query) return;             /*The object might be deleted*/
             }
         }
     }
     /*Release happened*/
-    else if(data->state == LV_INDEV_STATE_REL && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
+    else if(data->state == LV_INDEV_STATE_REL && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR)
+    {
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = i->proc.types.keypad.last_key;
+        if(data->key == LV_GROUP_KEY_ENTER) {
 
-        /* Edit mode is not used by KEYPAD devices.
-         * So leave edit mode if we are in it before focusing on the next/prev object*/
-        if(data->key == LV_GROUP_KEY_NEXT || data->key == LV_GROUP_KEY_PREV) {
-            lv_group_set_editing(g, false);
-        }
-
-        if(data->key == LV_GROUP_KEY_NEXT) {
-            lv_group_focus_next(g);
-        } else if(data->key == LV_GROUP_KEY_PREV) {
-            lv_group_focus_prev(g);
-        } else if(data->key == LV_GROUP_KEY_ENTER) {
-            if(!i->proc.long_pr_sent) {
-                focused->signal_cb(focused, LV_SIGNAL_RELEASED, indev_act);
+            if(i->proc.long_pr_sent == 0) {
                 lv_obj_send_event(focused, LV_EVENT_CLICKED);
+            } else {
+                lv_obj_send_event(focused, LV_EVENT_RELEASED);
             }
-        } else {
-            lv_group_send_data(g, data->key);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
         }
-
-        if(i->proc.reset_query) return;     /*The object might be deleted in `focus_cb` or due to any other user event*/
-
         i->proc.pr_timestamp = 0;
         i->proc.long_pr_sent = 0;
     }
@@ -754,7 +788,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
                 lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
             } else {
-                lv_obj_send_event(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED);
+                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
             }
         }
 
