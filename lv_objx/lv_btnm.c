@@ -275,8 +275,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
  * @param btnm pointer to a button matrix object
  * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes. The
  *                 length of the array and position of the elements must match
- *                 that when the map was set via `lv_btnm_set_map` (i.e. one
- *                 element for each button AND new line).
+ *                 the number and order of the individual buttons (i.e. excludes
+ *                 newline entries).
  *                 The control bits are:
  *                 - bit 5   : 1 = inactive (disabled)
  *                 - bit 4   : 1 = no repeat (on long press)
