@@ -304,11 +304,10 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
         }
 
-
 #if USE_LV_GROUP == 0
         lv_draw_rect(&area_bg, mask, style_bg, lv_obj_get_opa_scale(slider));
 #else
-        /* Draw the borders later if the bar is focused.
+        /* Draw the borders later if the slider is focused.
          * At value = 100% the indicator can cover to whole background and the focused style won't be visible*/
         if(lv_obj_is_focused(slider)) {
             lv_style_t style_tmp;
@@ -319,7 +318,6 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             lv_draw_rect(&area_bg, mask, style_bg, opa_scale);
         }
 #endif
-
 
         /*Draw the indicator*/
         lv_area_t area_indic;
@@ -349,11 +347,31 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
 
         if(slider_w >= slider_h) {
-            area_indic.x2 = (int32_t)((int32_t)(lv_area_get_width(&area_indic)) * (cur_value - min_value)) / (max_value - min_value);
+            lv_coord_t indic_w = lv_area_get_width(&area_indic);
+            if(ext->bar.anim_state != LV_BAR_ANIM_STATE_INV) {
+                /*Calculate the coordinates of anim. start and end*/
+                lv_coord_t anim_start_x = (int32_t)((int32_t)indic_w * (ext->bar.anim_start - min_value)) / (max_value - min_value);
+                lv_coord_t anim_end_x = (int32_t)((int32_t)indic_w * (ext->bar.anim_end - min_value)) / (max_value - min_value);
+
+                /*Calculate the real position based on `anim_state` (between `anim_start` and `anim_end`)*/
+                area_indic.x2 = anim_start_x + (((anim_end_x - anim_start_x) * ext->bar.anim_state) >> 8);
+            } else {
+                area_indic.x2 = (int32_t)((int32_t)indic_w * (cur_value - min_value)) / (max_value - min_value);
+            }
             area_indic.x2 = area_indic.x1 + area_indic.x2 - 1;
 
         } else {
-            area_indic.y1 = (int32_t)((int32_t)(lv_area_get_height(&area_indic)) * (cur_value - min_value)) / (max_value - min_value);
+            lv_coord_t indic_h = lv_area_get_height(&area_indic);
+            if(ext->bar.anim_state != LV_BAR_ANIM_STATE_INV) {
+                /*Calculate the coordinates of anim. start and end*/
+                lv_coord_t anim_start_y = (int32_t)((int32_t)indic_h * (ext->bar.anim_start - min_value)) / (max_value - min_value);
+                lv_coord_t anim_end_y = (int32_t)((int32_t)indic_h * (ext->bar.anim_end - min_value)) / (max_value - min_value);
+
+                /*Calculate the real position based on `anim_state` (between `anim_start` and `anim_end`)*/
+                area_indic.y1 = anim_start_y + (((anim_end_y - anim_start_y) * ext->bar.anim_state) >> 8);
+            } else {
+                area_indic.y1 = (int32_t)((int32_t)indic_h * (cur_value - min_value)) / (max_value - min_value);
+            }
             area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
         }
 
@@ -497,10 +515,10 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
 #endif
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
-            lv_slider_set_value(slider, lv_slider_get_value(slider) + 1);
+            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) + 1, 200);
             if(ext->action != NULL) res = ext->action(slider);
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
-            lv_slider_set_value(slider, lv_slider_get_value(slider) - 1);
+            lv_slider_set_value_anim(slider, lv_slider_get_value(slider) - 1, 200);
             if(ext->action != NULL) res = ext->action(slider);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {

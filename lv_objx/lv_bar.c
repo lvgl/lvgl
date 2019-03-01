@@ -30,6 +30,9 @@
 static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 
+static void lv_bar_animate(void * bar, int32_t value);
+static void lv_bar_anim_ready(void * bar);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -70,6 +73,9 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->cur_value = 0;
+    ext->anim_start = 0;
+    ext->anim_end = 0;
+    ext->anim_state = LV_BAR_ANIM_STATE_INV;
     ext->sym = 0;
     ext->style_indic = &lv_style_pretty_color;
 
@@ -142,13 +148,26 @@ void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time)
     new_value = value > ext->max_value ? ext->max_value : value;
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
 
+    if(ext->cur_value == new_value) return;
+
+    /*NO animation in progress -> simply set the values*/
+    if(ext->anim_state == LV_BAR_ANIM_STATE_INV) {
+        ext->anim_start = ext->cur_value;
+        ext->anim_end = new_value;
+    }
+    /*Animation in progress. Start from the animation end value*/
+    else {
+        ext->anim_start = ext->anim_end;
+        ext->anim_end = new_value;
+    }
+
     lv_anim_t a;
     a.var = bar;
-    a.start = ext->cur_value;
-    a.end = new_value;
-    a.fp = (lv_anim_fp_t)lv_bar_set_value;
+    a.start = LV_BAR_ANIM_STATE_START;
+    a.end = LV_BAR_ANIM_STATE_END;
+    a.fp = (lv_anim_fp_t)lv_bar_animate;
     a.path = lv_anim_path_linear;
-    a.end_cb = NULL;
+    a.end_cb = lv_bar_anim_ready;
     a.act_time = 0;
     a.time = anim_time;
     a.playback = 0;
@@ -229,7 +248,10 @@ void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, lv_style_t * style)
 int16_t lv_bar_get_value(const lv_obj_t * bar)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-    return ext->cur_value;
+    /*If animated tell that it's already at the end value*/
+    if(ext->anim_state != LV_BAR_ANIM_STATE_INV) return ext->anim_end;
+    /*No animation, simple return the current value*/
+    else return ext->cur_value;
 }
 
 /**
@@ -330,7 +352,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 #endif
         lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-        if(ext->cur_value != ext->min_value || ext->sym) {
+        if(ext->cur_value != ext->min_value || ext->sym || ext->anim_start != LV_BAR_ANIM_STATE_INV) {
             lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
             lv_area_t indic_area;
             lv_area_copy(&indic_area, &bar->coords);
@@ -344,9 +366,18 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 
             if(w >= h) {
                 /*Horizontal*/
-                indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
-                indic_area.x2 = indic_area.x1 + indic_area.x2 - 1;
+                if(ext->anim_state != LV_BAR_ANIM_STATE_INV) {
+                    /*Calculate the coordinates of anim. start and end*/
+                    lv_coord_t anim_start_x = (int32_t)((int32_t)w * (ext->anim_start - ext->min_value)) / (ext->max_value - ext->min_value);
+                    lv_coord_t anim_end_x = (int32_t)((int32_t)w * (ext->anim_end - ext->min_value)) / (ext->max_value - ext->min_value);
 
+                    /*Calculate the real position based on `anim_state` (between `anim_start` and `anim_end`)*/
+                    indic_area.x2 = anim_start_x + (((anim_end_x - anim_start_x) * ext->anim_state) >> LV_BAR_ANIM_STATE_NORM);
+                } else {
+                    indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
+                }
+
+                indic_area.x2 = indic_area.x1 + indic_area.x2 - 1;
                 if(ext->sym && ext->min_value < 0 && ext->max_value > 0) {
                     /*Calculate the coordinate of the zero point*/
                     lv_coord_t zero;
@@ -358,7 +389,17 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
                     }
                 }
             } else {
-                indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
+                if(ext->anim_state != LV_BAR_ANIM_STATE_INV) {
+                    /*Calculate the coordinates of anim. start and end*/
+                    lv_coord_t anim_start_y = (int32_t)((int32_t)h * (ext->anim_start - ext->min_value)) / (ext->max_value - ext->min_value);
+                    lv_coord_t anim_end_y = (int32_t)((int32_t)h * (ext->anim_end - ext->min_value)) / (ext->max_value - ext->min_value);
+
+                    /*Calculate the real position based on `anim_state` (between `anim_start` and `anim_end`)*/
+                    indic_area.y1 = anim_start_y + (((anim_end_y - anim_start_y) * ext->anim_state) >> LV_BAR_ANIM_STATE_NORM);
+                } else {
+                    indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
+                }
+
                 indic_area.y1 = indic_area.y2 - indic_area.y1 + 1;
 
                 if(ext->sym && ext->min_value < 0 && ext->max_value > 0) {
@@ -425,5 +466,20 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     return res;
 }
 
+
+static void lv_bar_animate(void * bar, int32_t value)
+{
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    ext->anim_state = value;
+    lv_obj_invalidate(bar);
+}
+
+static void lv_bar_anim_ready(void * bar)
+{
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    ext->anim_state = LV_BAR_ANIM_STATE_INV;
+    lv_bar_set_value(bar, ext->anim_end);
+
+}
 
 #endif
