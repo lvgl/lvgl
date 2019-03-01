@@ -110,11 +110,11 @@ void lv_roller_set_visible_row_count(lv_obj_t *roller, uint8_t row_cnt);
 /**
  * Enable or disable the horizontal fit to the content
  * @param roller pointer to a roller
- * @param en true: enable auto fit; false: disable auto fit
+ * @param fit fit mode from `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
  */
-static inline void lv_roller_set_hor_fit(lv_obj_t * roller, bool en)
+static inline void lv_roller_set_hor_fit(lv_obj_t * roller, lv_fit_t fit)
 {
-    lv_ddlist_set_hor_fit(roller, en);
+    lv_ddlist_set_hor_fit(roller, fit);
 }
 
 /**
