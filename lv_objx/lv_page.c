@@ -464,6 +464,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
     lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
     lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
+    /*If obj is higher then the page focus where the "error" is smaller*/
     lv_coord_t obj_y = obj->coords.y1 - ext->scrl->coords.y1;
     lv_coord_t obj_h = lv_obj_get_height(obj);
     lv_coord_t scrlable_y = lv_obj_get_y(ext->scrl);
@@ -471,8 +472,6 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 
     lv_coord_t top_err = -(scrlable_y + obj_y);
     lv_coord_t bot_err = scrlable_y + obj_y + obj_h - page_h;
-
-    /*If obj is higher then the page focus where the "error" is smaller*/
 
     /*Out of the page on the top*/
     if((obj_h <= page_h && top_err > 0) ||
@@ -488,13 +487,36 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
         scrlable_y = -(obj_y + style_scrl->body.padding.ver + style->body.padding.ver);
         scrlable_y -= style_scrl->body.padding.ver;
         scrlable_y += page_h - obj_h;
-    } else {
-        /*Already in focus*/
-        return;
+    }
+
+    /*If obj is wider then the page focus where the "error" is smaller*/
+    lv_coord_t obj_x = obj->coords.x1 - ext->scrl->coords.x1;
+    lv_coord_t obj_w = lv_obj_get_width(obj);
+    lv_coord_t scrlable_x = lv_obj_get_x(ext->scrl);
+    lv_coord_t page_w = lv_obj_get_width(page);
+
+    lv_coord_t left_err = -(scrlable_x + obj_x);
+    lv_coord_t right_err = scrlable_x + obj_x + obj_w - page_w;
+
+    /*Out of the page on the top*/
+    if((obj_w <= page_w && left_err > 0) ||
+            (obj_w > page_w && left_err < right_err)) {
+        /*Calculate a new position and let some space above*/
+        scrlable_x = -(obj_x - style_scrl->body.padding.hor- style->body.padding.hor);
+        scrlable_x += style_scrl->body.padding.hor;
+    }
+    /*Out of the page on the bottom*/
+    else if((obj_w <= page_w && right_err > 0) ||
+            (obj_w > page_w && left_err >= right_err)) {
+        /*Calculate a new position and let some space below*/
+        scrlable_x = -(obj_x + style_scrl->body.padding.hor + style->body.padding.hor);
+        scrlable_x -= style_scrl->body.padding.hor;
+        scrlable_x += page_w - obj_w;
     }
 
     if(anim_time == 0) {
         lv_obj_set_y(ext->scrl, scrlable_y);
+        lv_obj_set_x(ext->scrl, scrlable_x);
 #if USE_LV_ANIMATION
     } else {
         lv_anim_t a;
@@ -508,6 +530,11 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
         a.var = ext->scrl;
         a.path = lv_anim_path_linear;
         a.fp = (lv_anim_fp_t) lv_obj_set_y;
+        lv_anim_create(&a);
+
+        a.start = lv_obj_get_x(ext->scrl);
+        a.end = scrlable_x;
+        a.fp = (lv_anim_fp_t) lv_obj_set_x;
         lv_anim_create(&a);
 #endif
     }

@@ -41,9 +41,9 @@ typedef struct
 {
     lv_bar_ext_t bar;       /*Ext. of ancestor*/
     /*New data for this type */
-    lv_action_t action;             /*Function to call when a new value is set*/
-    lv_style_t *style_knob;    /*Style of the knob*/
-    int16_t drag_value;          /*Store a temporal value during press until release (Handled by the library)*/
+    lv_action_t action;         /*Function to call when a new value is set*/
+    lv_style_t *style_knob;     /*Style of the knob*/
+    int16_t drag_value;         /*Store a temporal value during press until release (Handled by the library)*/
     uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
 } lv_slider_ext_t;
 
@@ -76,21 +76,11 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy);
  * Set a new value on the slider
  * @param slider pointer to a slider object
  * @param value new value
+ * @param anim true: set the value with an animation; false: change the value immediatelly
  */
-static inline void lv_slider_set_value(lv_obj_t * slider, int16_t value)
+static inline void lv_slider_set_value(lv_obj_t * slider, int16_t value, bool anim)
 {
-    lv_bar_set_value(slider, value);
-}
-
-/**
- * Set a new value with animation on a slider
- * @param slider pointer to a slider object
- * @param value new value
- * @param anim_time animation time in milliseconds
- */
-static inline void lv_slider_set_value_anim(lv_obj_t * slider, int16_t value, uint16_t anim_time)
-{
-    lv_bar_set_value_anim(slider, value, anim_time);
+    lv_bar_set_value(slider, value, anim);
 }
 
 /**
