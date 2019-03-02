@@ -773,27 +773,18 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     /*Forgot the act obj and send a released signal */
     if(proc->types.pointer.act_obj != NULL) {
         /* If the object was protected against press lost then it possible that
-         * the object is already not pressed but still it is the `types.pointer.act_obj`.
-         * In this case send the `LV_SIGNAL_RELEASED` if the indev is ON the `types.pointer.act_obj` */
+         * the object is already not pressed but still it is the `act_obj`.
+         * In this case send the `LV_SIGNAL_RELEASED/CLICKED` of `LV_SIGNAL_PRESS_LOST`  if the indev is ON the `types.pointer.act_obj` */
         if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_PRESS_LOST)) {
-            /* Search the object on the current current coordinates.
-             * The start object is the object itself. If not ON it the the result will be NULL*/
-            lv_obj_t * obj_on = indev_search_obj(proc, proc->types.pointer.act_obj);
-            if(obj_on == proc->types.pointer.act_obj) {
-                proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
-                if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
-                    lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
-                } else {
-                    lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
-                }
-            }
-            else {
-                proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
-                lv_obj_send_event(proc->types.pointer.act_obj, LV_SIGNAL_PRESS_LOST);
+            proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
+            if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
+                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
+            } else {
+                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
             }
         }
         /* The simple case: `types.pointer.act_obj` was not protected against press lost.
-         * If it is already not pressed then was handled in `indev_proc_press`*/
+         * If it is already not pressed then was `indev_proc_press` would set `act_obj = NULL`*/
         else {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
 
