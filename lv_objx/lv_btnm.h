@@ -142,6 +142,13 @@ void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t * ctrl_map
 void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t action);
 
 /**
+ * Set the pressed button
+ * @param btnm pointer to button matrix object
+ * @param id index of the currently pressed button (`LV_BTNM_PR_NONE` to unpress)
+ */
+void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id);
+
+/**
  * Enable or disable button toggling
  * @param btnm pointer to button matrix object
  * @param en true: enable toggling; false: disable toggling
