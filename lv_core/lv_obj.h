@@ -180,10 +180,6 @@ typedef struct _lv_obj_t
     void * ext_attr;                 /*Object type specific extended data*/
     lv_style_t * style_p;       /*Pointer to the object's style*/
 
-#if LV_OBJ_FREE_PTR != 0
-    void * free_ptr;              /*Application specific pointer (set it freely)*/
-#endif
-
 #if USE_LV_GROUP != 0
     void * group_p;                 /*Pointer to the group of the object*/
 #endif
@@ -195,6 +191,7 @@ typedef struct _lv_obj_t
     uint8_t hidden        :1;    /*1: Object is hidden*/
     uint8_t top           :1;    /*1: If the object or its children is clicked it goes to the foreground*/
     uint8_t opa_scale_en  :1;    /*1: opa_scale is set*/
+    uint8_t event_parent :1;     /*1: Send the object's events to the parent too. */
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from `lv_protect_t`*/
     lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
@@ -203,9 +200,16 @@ typedef struct _lv_obj_t
     lv_reailgn_t realign;
 #endif
 
-#ifdef LV_OBJ_FREE_NUM_TYPE
-    LV_OBJ_FREE_NUM_TYPE free_num;          /*Application specific identifier (set it freely)*/
+#if USE_LV_USER_DATA_SINGLE
+    lv_obj_user_data_t user_data;
 #endif
+
+#if USE_LV_USER_DATA_MULTI
+    lv_obj_user_data_t event_user_data;
+    lv_obj_user_data_t signal_user_data;
+    lv_obj_user_data_t design_user_data;
+#endif
+
 } lv_obj_t;
 
 /*Protect some attributes (max. 8 bit)*/
@@ -539,26 +543,6 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
  */
 void lv_obj_refresh_ext_size(lv_obj_t * obj);
 
-#ifdef LV_OBJ_FREE_NUM_TYPE
-/**
- * Set an application specific number for an object.
- * It can help to identify objects in the application.
- * @param obj pointer to an object
- * @param free_num the new free number
- */
-void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_num);
-#endif
-
-#if LV_OBJ_FREE_PTR != 0
-/**
- * Set an application specific  pointer for an object.
- * It can help to identify objects in the application.
- * @param obj pointer to an object
- * @param free_p the new free pinter
- */
-void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p);
-#endif
-
 #if USE_LV_ANIMATION
 /**
  * Animate an object
@@ -799,22 +783,14 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj);
  */
 void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
-#ifdef LV_OBJ_FREE_NUM_TYPE
+
+#if USE_LV_USER_DATA_SINGLE
 /**
- * Get the free number
+ * Get a pointer to the pbject's user data
  * @param obj pointer to an object
  * @return the free number
  */
-LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(const lv_obj_t * obj);
-#endif
-
-#if LV_OBJ_FREE_PTR != 0
-/**
- * Get the free pointer
- * @param obj pointer to an object
- * @return the free pointer
- */
-void * lv_obj_get_free_ptr(const lv_obj_t * obj);
+lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj);
 #endif
 
 #if USE_LV_GROUP

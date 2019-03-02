@@ -61,7 +61,7 @@
 #endif
 #if LV_MEM_CUSTOM == 0
 #ifndef LV_MEM_SIZE
-#  define LV_MEM_SIZE    (16U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#  define LV_MEM_SIZE    (32U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
 #endif
 #ifndef LV_MEM_ATTR
 #  define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/

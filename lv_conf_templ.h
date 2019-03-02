@@ -182,8 +182,7 @@ typedef void * lv_indev_drv_user_data_t;                /*Type of user data in t
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
-#define LV_OBJ_FREE_NUM_TYPE    uint32_t    /*Type of free number attribute (comment out disable free number)*/
-#define LV_OBJ_FREE_PTR         1           /*Enable the free pointer attribute*/
+typedef void * lv_obj_user_data_t;          /*Declare the type of the user data of object (can be e.g. `void *`, `int`, `struct`)*/
 #define LV_OBJ_REALIGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 
 /*==================

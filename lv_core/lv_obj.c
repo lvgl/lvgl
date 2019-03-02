@@ -164,17 +164,19 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         } else {
             new_obj->style_p = &lv_style_scr;
         }
-        /*Set virtual functions*/
+        /*Set the callbacks*/
         lv_obj_set_signal_cb(new_obj, lv_obj_signal);
         lv_obj_set_design_cb(new_obj, lv_obj_design);
+        new_obj->event_cb = NULL;
 
-        /*Set free data*/
-#ifdef LV_OBJ_FREE_NUM_TYPE
-        new_obj->free_num = 0;
+        /*Init. user date*/
+#if USE_LV_USER_DATA_SINGLE
+        memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
-
-#if LV_OBJ_FREE_PTR != 0
-        new_obj->free_ptr = NULL;
+#if USE_LV_USER_DATA_MULTI
+        memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
+        memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
+        memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
 #if USE_LV_GROUP
@@ -232,17 +234,21 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
             new_obj->style_p = &lv_style_plain_color;
         }
 
-        /*Set callbacks*/
+        /*Set the callbacks*/
         lv_obj_set_signal_cb(new_obj, lv_obj_signal);
         lv_obj_set_design_cb(new_obj, lv_obj_design);
+        new_obj->event_cb = NULL;
 
-        /*Set free data*/
-#ifdef LV_OBJ_FREE_NUM_TYPE
-        new_obj->free_num = 0;
+        /*Init. user date*/
+#if USE_LV_USER_DATA_SINGLE
+        memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
-#if LV_OBJ_FREE_PTR != 0
-        new_obj->free_ptr = NULL;
+#if USE_LV_USER_DATA_MULTI
+        memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
+        memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
+        memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
+
 #if USE_LV_GROUP
         new_obj->group_p = NULL;
 #endif
@@ -261,16 +267,19 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->ext_attr = NULL;
     }
 
+    /*Copy the attributes if required*/
     if(copy != NULL) {
         lv_area_copy(&new_obj->coords, &copy->coords);
         new_obj->ext_size = copy->ext_size;
 
         /*Set free data*/
-#ifdef LV_OBJ_FREE_NUM_TYPE
-        new_obj->free_num = copy->free_num;
+#if USE_LV_USER_DATA_SINGLE
+        memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
-#if LV_OBJ_FREE_PTR != 0
-        new_obj->free_ptr = copy->free_ptr;
+#if USE_LV_USER_DATA_MULTI
+        memcpy(&new_obj->event_user_data, &copy->event_user_data, sizeof(lv_obj_user_data_t));
+        memcpy(&new_obj->signal_user_data, &copy->signal_user_data, sizeof(lv_obj_user_data_t));
+        memcpy(&new_obj->design_user_data, &copy->design_user_data, sizeof(lv_obj_user_data_t));
 #endif
 
         /*Copy realign*/
@@ -282,7 +291,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->realign.auto_realign = copy->realign.auto_realign;
 #endif
 
-        /*Set attributes*/
+        /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied the the derived object type (e.g. `lv_btn`)*/
+        new_obj-> event_cb = copy->event_cb;
+
+        /*Copy attributes*/
         new_obj->click = copy->click;
         new_obj->drag = copy->drag;
         new_obj->drag_throw = copy->drag_throw;
@@ -1150,6 +1162,10 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb)
 void lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
 {
     if(obj->event_cb) obj->event_cb(obj, event);
+
+    if(obj->event_parent && obj->par) {
+        lv_obj_send_event(obj->par, event);
+    }
 }
 
 /**
@@ -1211,32 +1227,6 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj)
 
     lv_obj_invalidate(obj);
 }
-
-#ifdef LV_OBJ_FREE_NUM_TYPE
-/**
- * Set an application specific number for an object.
- * It can help to identify objects in the application.
- * @param obj pointer to an object
- * @param free_num the new free number
- */
-void lv_obj_set_free_num(lv_obj_t * obj, LV_OBJ_FREE_NUM_TYPE free_num)
-{
-    obj->free_num = free_num;
-}
-#endif
-
-#if LV_OBJ_FREE_PTR != 0
-/**
- * Set an application specific  pointer for an object.
- * It can help to identify objects in the application.
- * @param obj pointer to an object
- * @param free_p the new free pinter
- */
-void lv_obj_set_free_ptr(lv_obj_t * obj, void * free_p)
-{
-    obj->free_ptr = free_p;
-}
-#endif
 
 #if USE_LV_ANIMATION
 /**
@@ -1745,30 +1735,17 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     }
 }
 
-#ifdef LV_OBJ_FREE_NUM_TYPE
+#if USE_LV_USER_DATA_SINGLE
 /**
- * Get the free number
+ * Get a pointer to the pbject's user data
  * @param obj pointer to an object
  * @return the free number
  */
-LV_OBJ_FREE_NUM_TYPE lv_obj_get_free_num(const lv_obj_t * obj)
+lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj)
 {
-    return obj->free_num;
+    return &obj->user_data;
 }
 #endif
-
-#if LV_OBJ_FREE_PTR != 0
-/**
- * Get the free pointer
- * @param obj pointer to an object
- * @return the free pointer
- */
-void * lv_obj_get_free_ptr(const lv_obj_t * obj)
-{
-    return obj->free_ptr;
-}
-#endif
-
 
 #if USE_LV_GROUP
 /**
