@@ -32,7 +32,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_SWITCH_SLIDER_ANIM_MAX 1000
+#define LV_SW_MAX_VALUE 100
 
 /**********************
  *      TYPEDEFS
@@ -79,40 +79,24 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy);
 /**
  * Turn ON the switch
  * @param sw pointer to a switch object
+ * @param anim true: set the value with an animation; false: change the value immediatelly
  */
-void lv_sw_on(lv_obj_t *sw);
+void lv_sw_on(lv_obj_t *sw, bool anim);
 
 /**
  * Turn OFF the switch
  * @param sw pointer to a switch object
+ * @param anim true: set the value with an animation; false: change the value immediatelly
  */
-void lv_sw_off(lv_obj_t *sw);
+void lv_sw_off(lv_obj_t *sw, bool anim);
 
 /**
  * Toggle the position of the switch
  * @param sw pointer to a switch object
+ * @param anim true: set the value with an animation; false: change the value immediatelly
  * @return resulting state of the switch.
  */
-bool lv_sw_toggle(lv_obj_t *sw);
-
-/**
- * Turn ON the switch with an animation
- * @param sw pointer to a switch object
- */
-void lv_sw_on_anim(lv_obj_t * sw);
-
-/**
- * Turn OFF the switch with an animation
- * @param sw pointer to a switch object
- */
-void lv_sw_off_anim(lv_obj_t * sw);
-
-/**
- * Toggle the position of the switch with an animation
- * @param sw pointer to a switch object
- * @return resulting state of the switch.
- */
-bool lv_sw_toggle_anim(lv_obj_t *sw);
+bool lv_sw_toggle(lv_obj_t *sw, bool anim);
 
 /**
  * Set a style of a switch
@@ -143,7 +127,7 @@ void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time);
  */
 static inline bool lv_sw_get_state(const lv_obj_t *sw)
 {
-    return lv_bar_get_value(sw) < LV_SWITCH_SLIDER_ANIM_MAX / 2 ? false : true;
+    return lv_bar_get_value(sw) < LV_SW_MAX_VALUE / 2 ? false : true;
 }
 
 /**

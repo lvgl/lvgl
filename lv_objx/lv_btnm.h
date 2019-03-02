@@ -99,20 +99,20 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
- * Set a new map. Buttons will be created/deleted according to the map. The
- * button matrix keeps a reference to the map and so the string array must not
- * be deallocated during the life of the matrix.
+ * Set the button control map (hidden, disabled etc.) for a button matrix. The
+ * control map array will be copied and so may be deallocated after this
+ * function returns.
  * @param btnm pointer to a button matrix object
- * @param map pointer a string array. The last string has to be: "".
- *            Use "\n" to begin a new line.
- *            The first byte can be a control data:
- *             - bit 7: always 1
- *             - bit 6: always 0
- *             - bit 5: inactive (disabled)
- *             - bit 4: no repeat (on long press)
- *             - bit 3: hidden
- *             - bit 2..0: button relative width
- *             Example (practically use octal numbers): "\224abc": "abc" text with 4 width and no long press
+ * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes. The
+ *                 length of the array and position of the elements must match
+ *                 the number and order of the individual buttons (i.e. excludes
+ *                 newline entries).
+ *                 The control bits are:
+ *                 - bit 5   : 1 = inactive (disabled)
+ *                 - bit 4   : 1 = no repeat (on long press)
+ *                 - bit 3   : 1 = hidden
+ *                 - bit 2..0: Relative width compared to the buttons in the
+ *                             same row. [1..7]
  */
 void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map);
 

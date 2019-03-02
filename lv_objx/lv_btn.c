@@ -170,11 +170,6 @@ void lv_btn_set_toggle(lv_obj_t * btn, bool tgl)
  */
 void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 {
-
-    if(state == LV_BTN_STATE_REL) {
-        printf("asd\n");
-    }
-
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     if(ext->state != state) {
         ext->state = state;

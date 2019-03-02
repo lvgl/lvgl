@@ -29,6 +29,10 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_BAR_ANIM_STATE_START   0
+#define LV_BAR_ANIM_STATE_END     256
+#define LV_BAR_ANIM_STATE_INV     -1
+#define LV_BAR_ANIM_STATE_NORM     8        /*log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
 
 /**********************
  *      TYPEDEFS
@@ -42,6 +46,10 @@ typedef struct
     int16_t cur_value;              /*Current value of the bar*/
     int16_t min_value;              /*Minimum value of the bar*/
     int16_t max_value;              /*Maximum value of the bar*/
+    int16_t anim_start;
+    int16_t anim_end;
+    int16_t anim_state;
+    uint16_t anim_time;
     uint8_t sym    :1;              /*Symmetric: means the center is around zero value*/
     lv_style_t *style_indic;        /*Style of the indicator*/
 } lv_bar_ext_t;
@@ -72,17 +80,9 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy);
  * Set a new value on the bar
  * @param bar pointer to a bar object
  * @param value new value
+ * @param anim true: set the value with an animation; false: change the value immediatelly
  */
-void lv_bar_set_value(lv_obj_t * bar, int16_t value);
-
-/**
- * Set a new value with animation on the bar
- * @param bar pointer to a bar object
- * @param value new value
- * @param anim_time animation time in milliseconds
- */
-void lv_bar_set_value_anim(lv_obj_t * bar, int16_t value, uint16_t anim_time);
-
+void lv_bar_set_value(lv_obj_t * bar, int16_t value, bool anim);
 
 /**
  * Set minimum and the maximum values of a bar
