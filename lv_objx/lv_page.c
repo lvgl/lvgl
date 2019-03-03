@@ -409,8 +409,10 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 #else
     /* Be sure there is no position changing animation in progress
      * because it can overide the current changes*/
+    lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_x);
     lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_y);
     lv_anim_del(page, (lv_anim_fp_t)lv_obj_set_pos);
+    lv_anim_del(ext->scrl, (lv_anim_fp_t)lv_obj_set_x);
     lv_anim_del(ext->scrl, (lv_anim_fp_t)lv_obj_set_y);
     lv_anim_del(ext->scrl, (lv_anim_fp_t)lv_obj_set_pos);
 #endif
