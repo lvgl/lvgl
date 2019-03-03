@@ -377,17 +377,29 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
 
 /**
  * Get whether recoloring is enabled
- * @param btnm pointer to button matrix object
+ * @param mbox pointer to a message box object
  * @return whether recoloring is enabled
  */
 bool lv_mbox_get_recolor(const lv_obj_t * mbox)
 {
-	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-	if(!ext->btnm)
-		return false;
+    if(!ext->btnm)
+        return false;
 
-	return lv_btnm_get_recolor(ext->btnm);
+    return lv_btnm_get_recolor(ext->btnm);
+}
+
+/**
+ * Get message box button matrix
+ * @param mbox pointer to a message box object
+ * @return pointer to button matrix object
+ * @remarks return value will be NULL unless `lv_mbox_add_btns` has been already called
+ */
+lv_obj_t * lv_mbox_get_btnm(lv_obj_t * mbox)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    return ext->btnm;
 }
 
 

@@ -120,14 +120,26 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
  *====================*/
 
 /**
- * Set the text of a check box
+ * Set the text of a check box. `txt` will be copied and may be deallocated
+ * after this function returns.
  * @param cb pointer to a check box
- * @param txt the text of the check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_text(ext->label, txt);
+}
+
+/**
+ * Set the text of a check box. `txt` must not be deallocated during the life
+ * of this checkbox.
+ * @param cb pointer to a check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
+ */
+void lv_cb_set_static_text(lv_obj_t * cb, const char * txt) {
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_label_set_static_text(ext->label, txt);
 }
 
 /**

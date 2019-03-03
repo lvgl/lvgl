@@ -304,6 +304,25 @@ void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t action)
 }
 
 /**
+ * Set the pressed button
+ * @param btnm pointer to button matrix object
+ * @param id index of the currently pressed button (`LV_BTNM_PR_NONE` to unpress)
+ */
+void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+
+    if (id >= ext->btn_cnt && id != LV_BTNM_PR_NONE)
+        return;
+
+    if (id == ext->btn_id_pr)
+        return;
+
+    ext->btn_id_pr = id;
+    lv_obj_invalidate(btnm);
+}
+
+/**
  * Enable or disable button toggling
  * @param btnm pointer to button matrix object
  * @param en true: enable toggling; false: disable toggling

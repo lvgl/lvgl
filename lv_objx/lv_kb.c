@@ -84,6 +84,7 @@ static const char * kb_map_num[] = {
 static const lv_btnm_ctrl_t kb_ctrl_num_map[] = {
      1, 1, 1, 2,
      1, 1, 1, 2,
+     1, 1, 1, 2,
      1, 1, 1, 1, 1
 };
 /**********************
