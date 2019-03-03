@@ -777,8 +777,9 @@ static void win_init(void)
 
 #if USE_LV_GROUP
 
-static void style_mod(lv_style_t * style)
+static void style_mod(lv_group_t * group, lv_style_t * style)
 {
+    (void) group;   /*Unused*/
 #if LV_COLOR_DEPTH != 1
     style->body.border.width = 2;
     style->body.border.color = LV_COLOR_SILVER;
@@ -793,6 +794,29 @@ static void style_mod(lv_style_t * style)
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
     style->body.border.width = 2;
+#endif
+}
+
+static void style_mod_edit(lv_group_t * group, lv_style_t * style)
+{
+    (void) group;   /*Unused*/
+#if LV_COLOR_DEPTH != 1
+    /*Make the style to be a little bit orange*/
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_GREEN;
+
+    /*If not empty or has border then emphasis the border*/
+    if (style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+
+    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
+
+    style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
+#else
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_BLACK;
+    style->body.border.width = 3;
 #endif
 }
 
@@ -855,7 +879,7 @@ lv_theme_t * lv_theme_nemo_init(uint16_t hue, lv_font_t * font)
 
 #if USE_LV_GROUP
     theme.group.style_mod = style_mod;
-    theme.group.style_mod_edit = style_mod;
+    theme.group.style_mod_edit = style_mod_edit;
 #endif
 
     return &theme;

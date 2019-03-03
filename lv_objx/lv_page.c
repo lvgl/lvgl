@@ -1024,7 +1024,9 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
             event == LV_EVENT_LONG_PRESSED ||
             event == LV_EVENT_LONG_PRESSED_REPEAT ||
             event == LV_EVENT_LONG_HOVER_IN ||
-            event == LV_EVENT_LONG_HOVER_OUT)
+            event == LV_EVENT_LONG_HOVER_OUT ||
+            event == LV_EVENT_FOCUSED ||
+            event == LV_EVENT_DEFOCUSED)
     {
         lv_obj_send_event(page, event);
     }

@@ -1161,6 +1161,8 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb)
  */
 void lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
 {
+    if(obj == NULL) return;
+
     if(obj->event_cb) obj->event_cb(obj, event);
 
     if(obj->event_parent && obj->par) {

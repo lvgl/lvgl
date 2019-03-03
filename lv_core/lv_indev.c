@@ -661,6 +661,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         if(proc->types.pointer.act_obj != NULL) {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
             lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_PRESS_LOST);
+
             if(proc->reset_query != 0) return;
         }
 
@@ -770,8 +771,8 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         proc->types.pointer.wait_unil_release = 0;
     }
 
-    /*Forgot the act obj and send a released signal */
-    if(proc->types.pointer.act_obj != NULL) {
+    /*Forget the act obj and send a released signal */
+    if(proc->types.pointer.act_obj) {
         /* If the object was protected against press lost then it possible that
          * the object is already not pressed but still it is the `act_obj`.
          * In this case send the `LV_SIGNAL_RELEASED/CLICKED` of `LV_SIGNAL_PRESS_LOST`  if the indev is ON the `types.pointer.act_obj` */
@@ -800,14 +801,11 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         /*Handle click focus*/
 #if USE_LV_GROUP
         /*Edit mode is not used by POINTER devices. So leave edit mode if we are in it*/
-        lv_group_t * act_g = lv_obj_get_group(proc->types.pointer.act_obj);
-        if(lv_group_get_editing(act_g)) {
-            lv_group_set_editing(act_g, false);
-        }
+        lv_group_t * g = lv_obj_get_group(proc->types.pointer.act_obj);
+        if(lv_group_get_editing(g)) lv_group_set_editing(g, false);
 
         /*Check, if the parent is in a group focus on it.*/
-        if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_CLICK_FOCUS) == false) {       /*Respect the click protection*/
-            lv_group_t * g = lv_obj_get_group(proc->types.pointer.act_obj);
+        if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_CLICK_FOCUS) == false) {       /*Respect the click focus protection*/
             lv_obj_t * parent = proc->types.pointer.act_obj;
 
             while(g == NULL) {
@@ -820,12 +818,24 @@ static void indev_proc_release(lv_indev_proc_t * proc)
                 g = lv_obj_get_group(parent);
             }
 
-            if(g != NULL && parent != NULL)
+            /* If a pareit is in a group make it focused.
+             * `LV_EVENT_FOCUSED/DEFOCUSED` will be sent by `lv_group_focus_obj`*/
+            if(g && parent) {
                 if(lv_group_get_click_focus(g)) {
                     lv_group_focus_obj(parent);
                 }
+            }
         }
 #endif
+
+        /* Send defocus to the lastly "active" object and foucus to the new one.
+         * If the one of them is in group then it possible that `lv_group_focus_obj` alraedy sent
+         * a focus/defucus signal because of `click focus`*/
+        if(proc->types.pointer.last_pressed != proc->types.pointer.act_obj) {
+            lv_obj_send_event(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED);
+            lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_FOCUSED);
+            proc->types.pointer.last_pressed = proc->types.pointer.act_obj;
+        }
 
         if(proc->reset_query != 0) return;
         proc->types.pointer.act_obj = NULL;
@@ -853,6 +863,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
     if(indev->proc.reset_query) {
         indev->proc.types.pointer.act_obj = NULL;
         indev->proc.types.pointer.last_obj = NULL;
+        indev->proc.types.pointer.last_pressed = NULL;
         indev->proc.types.pointer.drag_limit_out = 0;
         indev->proc.types.pointer.drag_in_prog = 0;
         indev->proc.long_pr_sent = 0;
