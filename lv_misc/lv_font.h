@@ -72,11 +72,18 @@ typedef struct _lv_font_struct
 void lv_font_init(void);
 
 /**
- * Create a pair from font name and font dsc. get function. After it 'font_get' can be used for this font
- * @param child pointer to a font to join to the 'parent'
- * @param parent pointer to a font. 'child' will be joined here
+ * Add a font to an other to extend the character set.
+ * @param child the font to add
+ * @param parent this font will be extended. Using it later will contain the characters from `child`
  */
 void lv_font_add(lv_font_t *child, lv_font_t *parent);
+
+/**
+ * Remove a font from a character set.
+ * @param child the font to remove
+ * @param parent remove `child` from here
+ */
+void lv_font_remove(lv_font_t * child, lv_font_t * parent);
 
 /**
  * Tells if font which contains `letter` is monospace or not

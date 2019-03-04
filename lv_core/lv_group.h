@@ -31,7 +31,8 @@ extern "C" {
 #define LV_GROUP_KEY_RIGHT          19      /*0x13*/
 #define LV_GROUP_KEY_LEFT           20      /*0x14*/
 #define LV_GROUP_KEY_ESC            27      /*0x1B*/
-#define LV_GROUP_KEY_DEL            28      /*0x1C*/
+#define LV_GROUP_KEY_DEL            127     /*0x7F*/
+#define LV_GROUP_KEY_BACKSPACE      8       /*0x08*/
 #define LV_GROUP_KEY_ENTER          10      /*0x0A, '\n'*/
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/
@@ -56,7 +57,14 @@ typedef struct _lv_group_t
     uint8_t frozen          :1;             /*1: can't focus to new object*/
     uint8_t editing         :1;             /*1: Edit mode, 0: Navigate mode*/
     uint8_t click_focus     :1;             /*1: If an object in a group is clicked by an indev then it will be focused */
+    uint8_t refocus_policy  :1;             /*1: Focus prev if focused on deletion. 0: Focus prev if focused on deletion.*/
+    uint8_t wrap            :1;             /*1: Focus next/prev can wrap at end of list. 0: Focus next/prev stops at end of list.*/
 } lv_group_t;
+
+typedef enum _lv_group_refocus_policy_t {
+    LV_GROUP_REFOCUS_POLICY_NEXT = 0,
+    LV_GROUP_REFOCUS_POLICY_PREV = 1
+} lv_group_refocus_policy_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -116,8 +124,9 @@ void lv_group_focus_freeze(lv_group_t * group, bool en);
  * Send a control character to the focuses object of a group
  * @param group pointer to a group
  * @param c a character (use LV_GROUP_KEY_.. to navigate)
+ * @return result of focused object in group.
  */
-void lv_group_send_data(lv_group_t * group, uint32_t c);
+lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c);
 
 /**
  * Set a function for a group which will modify the object's style if it is in focus
@@ -141,6 +150,13 @@ void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_func_
 void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
 
 /**
+ * Set whether the next or previous item in a group is focused if the currently focussed obj is deleted.
+ * @param group pointer to a group
+ * @param new refocus policy enum
+ */
+void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t policy);
+
+/**
  * Manually set the current mode (edit or navigate).
  * @param group pointer to group
  * @param edit: true: edit mode; false: navigate mode
@@ -153,6 +169,13 @@ void lv_group_set_editing(lv_group_t * group, bool edit);
  * @param en: true: enable `click_focus`
  */
 void lv_group_set_click_focus(lv_group_t * group, bool en);
+
+/**
+ * Set whether focus next/prev will allow wrapping from first->last or last->first object.
+ * @param group pointer to group
+ * @param en: true: wrapping enabled; false: wrapping disabled
+ */
+void lv_group_set_wrap(lv_group_t * group, bool en);
 
 /**
  * Modify a style with the set 'style_mod' function. The input style remains unchanged.
@@ -204,6 +227,12 @@ bool lv_group_get_editing(const lv_group_t * group);
  */
 bool lv_group_get_click_focus(const lv_group_t * group);
 
+/**
+ * Get whether focus next/prev will allow wrapping from first->last or last->first object.
+ * @param group pointer to group
+ * @param en: true: wrapping enabled; false: wrapping disabled
+ */
+bool lv_group_get_wrap(lv_group_t * group);
 
 /**********************
  *      MACROS

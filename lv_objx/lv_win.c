@@ -101,7 +101,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->win.btn.pr);
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_plain);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_transp);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_plain);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
         }
@@ -299,6 +299,18 @@ void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, lv_style_t * style)
     }
 }
 
+/**
+ * Set drag status of a window. If set to 'true' window can be dragged like on a PC.
+ * @param win pointer to a window object
+ * @param en whether dragging is enabled
+ */
+void lv_win_set_drag(lv_obj_t *win, bool en)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    lv_obj_t * win_header = ext->header;
+    lv_obj_set_drag_parent(win_header, en);
+    lv_obj_set_drag(win, en);
+}
 
 /*=====================
  * Getter functions
@@ -395,29 +407,37 @@ lv_coord_t lv_win_get_width(lv_obj_t * win)
  */
 lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     switch(type) {
         case LV_WIN_STYLE_BG:
-            return lv_obj_get_style(win);
+            style = lv_obj_get_style(win);
+            break;
         case LV_WIN_STYLE_CONTENT_BG:
-            return lv_page_get_style(ext->page, LV_PAGE_STYLE_BG);
+            style = lv_page_get_style(ext->page, LV_PAGE_STYLE_BG);
+            break;
         case LV_WIN_STYLE_CONTENT_SCRL:
-            return lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL);
+            style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL);
+            break;
         case LV_WIN_STYLE_SB:
-            return lv_page_get_style(ext->page, LV_PAGE_STYLE_SB);
+            style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SB);
+            break;
         case LV_WIN_STYLE_HEADER:
-            return lv_obj_get_style(ext->header);
+            style = lv_obj_get_style(ext->header);
+            break;
         case LV_WIN_STYLE_BTN_REL:
-            return ext->style_btn_rel;
+            style = ext->style_btn_rel;
+            break;
         case LV_WIN_STYLE_BTN_PR:
-            return ext->style_btn_pr;
+            style = ext->style_btn_pr;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================

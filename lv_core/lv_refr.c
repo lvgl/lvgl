@@ -10,12 +10,16 @@
 #include "lv_refr.h"
 #include "lv_vdb.h"
 #include "../lv_hal/lv_hal_tick.h"
+#include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_mem.h"
 
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_INV_FIFO_SIZE
+#define LV_INV_FIFO_SIZE    32    /*The average count of objects on a screen */
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -73,9 +77,9 @@ void lv_refr_init(void)
 
 /**
  * Redraw the invalidated areas now.
- * Normally the redarwing is peridocally executed in `lv_task_handler` but a long blocking process can
+ * Normally the redrawing is periodically executed in `lv_task_handler` but a long blocking process can
  * prevent the call of `lv_task_handler`. In this case if the the GUI is updated in the process (e.g. progress bar)
- * this function can be called when the screen shoud be updated.
+ * this function can be called when the screen should be updated.
  */
 void lv_refr_now(void)
 {
@@ -184,18 +188,59 @@ static void lv_refr_task(void * param)
 
     uint32_t start = lv_tick_get();
 
+    if(lv_disp_get_active() == NULL) {
+        LV_LOG_TRACE("No display is registered");
+        return;
+    }
+
     lv_refr_join_area();
 
     lv_refr_areas();
 
-    bool refr_done = false;
-    if(inv_buf_p != 0) refr_done = true;
-    memset(inv_buf, 0, sizeof(inv_buf));
-    inv_buf_p = 0;
+    /*If refresh happened ...*/
+    if(inv_buf_p != 0) {
 
-    /* In the callback lv_obj_inv can occur
-     * therefore be sure the inv_buf is cleared prior to it*/
-    if(refr_done != false) {
+        /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
+#if LV_VDB_TRUE_DOUBLE_BUFFERED
+        lv_vdb_t * vdb_p = lv_vdb_get();
+        vdb_p->area.x1 = 0;
+        vdb_p->area.x2 = LV_HOR_RES-1;
+        vdb_p->area.y1 = 0;
+        vdb_p->area.y2 = LV_VER_RES - 1;
+
+        /*Flush the content of the VDB*/
+        lv_vdb_flush();
+
+        /* With true double buffering the flushing should be only the address change of the current frame buffer
+         * Wait until the address change is ready and copy the active content to the other frame buffer (new active VDB)
+         * The changes will be written to the new VDB.*/
+        lv_vdb_t * vdb_act = lv_vdb_get_active();
+        lv_vdb_t * vdb_ina = lv_vdb_get_inactive();
+
+        uint8_t * buf_act = (uint8_t *) vdb_act->buf;
+        uint8_t * buf_ina = (uint8_t *) vdb_ina->buf;
+
+        uint16_t a;
+        for(a = 0; a < inv_buf_p; a++) {
+            if(inv_buf[a].joined == 0) {
+                lv_coord_t y;
+                uint32_t start_offs = ((LV_HOR_RES * inv_buf[a].area.y1 + inv_buf[a].area.x1) * LV_VDB_PX_BPP) >> 3;
+                uint32_t line_length = (lv_area_get_width(&inv_buf[a].area) * LV_VDB_PX_BPP) >> 3;
+
+                for(y = inv_buf[a].area.y1; y <= inv_buf[a].area.y2; y++) {
+                    memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
+                    start_offs += (LV_HOR_RES * LV_VDB_PX_BPP) >> 3;
+                }
+            }
+        }
+
+#endif
+
+        /*Clean up*/
+        memset(inv_buf, 0, sizeof(inv_buf));
+        inv_buf_p = 0;
+
+        /*Call monitor cb if present*/
         if(monitor_cb != NULL) {
             monitor_cb(lv_tick_elaps(start), px_num);
         }
@@ -296,6 +341,8 @@ static void lv_refr_area_no_vdb(const lv_area_t * area_p)
  */
 static void lv_refr_area_with_vdb(const lv_area_t * area_p)
 {
+
+#if LV_VDB_TRUE_DOUBLE_BUFFERED == 0
     /*Calculate the max row num*/
     lv_coord_t w = lv_area_get_width(area_p);
     lv_coord_t h = lv_area_get_height(area_p);
@@ -366,6 +413,14 @@ static void lv_refr_area_with_vdb(const lv_area_t * area_p)
         /*Refresh this part too*/
         lv_refr_area_part_vdb(area_p);
     }
+#else
+    lv_vdb_t * vdb_p = lv_vdb_get();
+    vdb_p->area.x1 = 0;
+    vdb_p->area.x2 = LV_HOR_RES-1;
+    vdb_p->area.y1 = 0;
+    vdb_p->area.y2 = LV_VER_RES - 1;
+    lv_refr_area_part_vdb(area_p);
+#endif
 }
 
 /**
@@ -396,8 +451,12 @@ static void lv_refr_area_part_vdb(const lv_area_t * area_p)
     lv_refr_obj_and_children(lv_layer_top(), &start_mask);
     lv_refr_obj_and_children(lv_layer_sys(), &start_mask);
 
+    /* In true double buffered mode flush only once when all areas were rendered.
+     * In normal mode flush after every area */
+#if LV_VDB_TRUE_DOUBLE_BUFFERED == 0
     /*Flush the content of the VDB*/
     lv_vdb_flush();
+#endif
 }
 
 #endif /*LV_VDB_SIZE == 0*/
@@ -514,11 +573,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     if(union_ok != false) {
 
         /* Redraw the object */
-        lv_style_t * style = lv_obj_get_style(obj);
-        if(style->body.opa != LV_OPA_TRANSP) {
-            obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
-            //tick_wait_ms(100);  /*DEBUG: Wait after every object draw to see the order of drawing*/
-        }
+        obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
+        //usleep(5 * 1000);  /*DEBUG: Wait after every object draw to see the order of drawing*/
+
 
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
         lv_obj_get_coords(obj, &obj_area);
@@ -547,8 +604,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         }
 
         /* If all the children are redrawn make 'post draw' design */
-        if(style->body.opa != LV_OPA_TRANSP) {
-            obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
-        }
+        obj->design_func(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
+
     }
 }

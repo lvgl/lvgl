@@ -42,8 +42,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* parametes: pointer to a tabview object, tab_id*/
-typedef void (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
+/* parametes: pointer to a tabview object, tab_id
+ * return: LV_RES_INV: to prevent the loading of the tab;  LV_RES_OK: if everything is fine*/
+typedef lv_res_t (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
 
 
 enum {
@@ -68,6 +69,7 @@ typedef struct
     uint8_t slide_enable :1;    /*1: enable horizontal sliding by touch pad*/
     uint8_t draging :1;
     uint8_t drag_hor :1;
+    uint8_t btns_hide :1;
     lv_tabview_btns_pos_t btns_pos :1;
     lv_tabview_action_t tab_load_action;
 } lv_tabview_ext_t;
@@ -158,10 +160,17 @@ void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t
 
 /**
  * Set the position of tab select buttons
- * @param tabview pointer to a tan view object
+ * @param tabview pointer to a tab view object
  * @param btns_pos which button position
  */
 void lv_tabview_set_btns_pos(lv_obj_t *tabview, lv_tabview_btns_pos_t btns_pos);
+
+/**
+ * Set whether tab buttons are hidden
+ * @param tabview pointer to a tab view object
+ * @param en whether tab buttons are hidden
+ */
+void lv_tabview_set_btns_hidden(lv_obj_t *tabview, bool en);
 
 /*=====================
  * Getter functions
@@ -223,6 +232,12 @@ lv_style_t * lv_tabview_get_style(const lv_obj_t *tabview, lv_tabview_style_t ty
  */
 lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t *tabview);
 
+/**
+ * Get whether tab buttons are hidden
+ * @param tabview pointer to a tab view object
+ * @return whether tab buttons are hidden
+ */
+bool lv_tabview_get_btns_hidden(const lv_obj_t *tabview);
 
 /**********************
  *      MACROS

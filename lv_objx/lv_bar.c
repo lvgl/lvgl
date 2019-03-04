@@ -70,6 +70,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->cur_value = 0;
+    ext->sym = 0;
     ext->style_indic = &lv_style_pretty_color;
 
     lv_obj_set_signal_func(new_bar, lv_bar_signal);
@@ -94,6 +95,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->max_value = ext_copy->max_value;
         ext->cur_value = ext_copy->cur_value;
         ext->style_indic = ext_copy->style_indic;
+        ext->sym = ext_copy->sym;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_bar);
 
@@ -183,6 +185,16 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
     lv_obj_invalidate(bar);
 }
 
+/**
+ * Make the bar symmetric to zero. The indicator will grow from zero instead of the minimum position.
+ * @param bar pointer to a bar object
+ * @param en true: enable disable symmetric behavior; false: disable
+ */
+void lv_bar_set_sym(lv_obj_t * bar, bool en)
+{
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    ext->sym = en ? 1 : 0;
+}
 
 /**
  * Set a style of a bar
@@ -243,6 +255,17 @@ int16_t lv_bar_get_max_value(const lv_obj_t * bar)
 }
 
 /**
+ * Get whether the bar is symmetric or not.
+ * @param bar pointer to a bar object
+ * @return true: symmetric is enabled; false: disable
+ */
+bool lv_bar_get_sym(lv_obj_t * bar)
+{
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    return ext->sym ? true : false;
+}
+
+/**
  * Get a style of a bar
  * @param bar pointer to a bar object
  * @param type which style should be get
@@ -250,19 +273,22 @@ int16_t lv_bar_get_max_value(const lv_obj_t * bar)
  */
 lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     switch(type) {
         case LV_BAR_STYLE_BG:
-            return lv_obj_get_style(bar);
+            style = lv_obj_get_style(bar);
+            break;
         case LV_BAR_STYLE_INDIC:
-            return ext->style_indic;
+            style = ext->style_indic;
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************
@@ -304,7 +330,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 #endif
         lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-        if(ext->cur_value != ext->min_value) {
+        if(ext->cur_value != ext->min_value || ext->sym) {
             lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
             lv_area_t indic_area;
             lv_area_copy(&indic_area, &bar->coords);
@@ -317,12 +343,36 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
             lv_coord_t h = lv_area_get_height(&indic_area);
 
             if(w >= h) {
+                /*Horizontal*/
                 indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
                 indic_area.x2 = indic_area.x1 + indic_area.x2 - 1;
+
+                if(ext->sym && ext->min_value < 0 && ext->max_value > 0) {
+                    /*Calculate the coordinate of the zero point*/
+                    lv_coord_t zero;
+                    zero = indic_area.x1 + (-ext->min_value * w) / (ext->max_value - ext->min_value);
+                    if(indic_area.x2 > zero) indic_area.x1 = zero;
+                    else {
+                        indic_area.x1 = indic_area.x2;
+                        indic_area.x2 = zero;
+                    }
+                }
             } else {
                 indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
                 indic_area.y1 = indic_area.y2 - indic_area.y1 + 1;
+
+                if(ext->sym && ext->min_value < 0 && ext->max_value > 0) {
+                    /*Calculate the coordinate of the zero point*/
+                    lv_coord_t zero;
+                    zero = indic_area.y2 - (-ext->min_value * h) / (ext->max_value - ext->min_value);
+                    if(indic_area.y1 < zero) indic_area.y2 = zero;
+                    else {
+                        indic_area.y2 = indic_area.y1;
+                        indic_area.y1 = zero;
+                    }
+                }
             }
+
 
             /*Draw the indicator*/
             lv_draw_rect(&indic_area, mask, style_indic, opa_scale);

@@ -14,6 +14,7 @@
 #error "lv_img: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
 #endif
 
+#include "../lv_core/lv_lang.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_ufs.h"
@@ -77,6 +78,9 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
     ext->auto_size = 1;
+#if USE_LV_MULTI_LANG
+    ext->lang_txt_id = LV_LANG_TXT_ID_NONE;
+#endif
 
     /*Init the new object*/
     lv_obj_set_signal_func(new_img, lv_img_signal);
@@ -155,17 +159,25 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     lv_img_header_t header;
     lv_img_dsc_get_info(src_img, &header);
 
+
+
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
         LV_LOG_INFO("lv_img_set_src:  `LV_IMG_SRC_VARIABLE` type found");
+
+        /*If memory was allocated because of the previous `src_type` then free it*/
+        if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
+            lv_mem_free(ext->src);
+        }
         ext->src = src_img;
     } else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
-
-
         /* If the new and the old src are the same then it was only a refresh.*/
         if(ext->src != src_img) {
-            lv_mem_free(ext->src);
-            char * new_str = lv_mem_alloc(strlen(src_img) + 1);
+        	/*If memory was allocated because of the previous `src_type` then free it*/
+            if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
+                lv_mem_free(ext->src);
+            }
+        	char * new_str = lv_mem_alloc(strlen(src_img) + 1);
             lv_mem_assert(new_str);
             if(new_str == NULL) return;
             strcpy(new_str, src_img);
@@ -194,17 +206,33 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     lv_obj_invalidate(img);
 }
 
+#if USE_LV_MULTI_LANG
+/**
+ * Set an ID which means a the same source but in different languages
+ * @param img pointer to an image object
+ * @param src_id ID of the source
+ */
+void lv_img_set_src_id(lv_obj_t * img, uint32_t src_id)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    ext->lang_txt_id = src_id;
+
+    /*Apply the new language*/
+    img->signal_func(img, LV_SIGNAL_LANG_CHG, NULL);
+}
+#endif
+
 /**
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
- * @param autosize_en true: auto size enable, false: auto size disable
+ * @param en true: auto size enable, false: auto size disable
  */
-void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en)
+void lv_img_set_auto_size(lv_obj_t * img, bool en)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    ext->auto_size = (autosize_en == false ? 0 : 1);
+    ext->auto_size = (en == false ? 0 : 1);
 }
 
 
@@ -238,6 +266,18 @@ const char * lv_img_get_file_name(const lv_obj_t * img)
     else return "";
 }
 
+#if USE_LV_MULTI_LANG
+/**
+ * Get the source ID of the image. (Used by the multi-language feature)
+ * @param img pointer to an image
+ * @return ID of the source
+ */
+uint16_t lv_img_get_src_id(lv_obj_t * img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    return ext->lang_txt_id;
+}
+#endif
 
 /**
  * Get the auto size enable attribute
@@ -299,7 +339,10 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             LV_LOG_TRACE("lv_img_design: start to draw symbol");
-            lv_draw_label(&coords, mask, style, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
+            lv_style_t style_mod;
+            lv_style_copy(&style_mod, style);
+            style_mod.text.color = style->image.color;
+            lv_draw_label(&coords, mask, &style_mod, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
@@ -339,6 +382,17 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
             lv_img_set_src(img, ext->src);
 
         }
+    } else if(sign == LV_SIGNAL_LANG_CHG) {
+#if USE_LV_MULTI_LANG
+        if(ext->lang_txt_id != LV_LANG_TXT_ID_NONE) {
+            const char * lang_src = lv_lang_get_text(ext->lang_txt_id);
+            if(lang_src) {
+                lv_img_set_src(img, lang_src);
+            } else {
+                LV_LOG_WARN("lv_lang_get_text return NULL for an image's source");
+            }
+        }
+#endif
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

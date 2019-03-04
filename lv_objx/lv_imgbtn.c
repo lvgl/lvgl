@@ -61,11 +61,14 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_imgbtn);
 
     /*Initialize the allocated 'ext' */
-    ext->img_src[LV_BTN_STATE_REL] = NULL;
-    ext->img_src[LV_BTN_STATE_PR] = NULL;
-    ext->img_src[LV_BTN_STATE_TGL_REL] = NULL;
-    ext->img_src[LV_BTN_STATE_TGL_PR] = NULL;;
-    ext->img_src[LV_BTN_STATE_INA] = NULL;
+#if LV_IMGBTN_TILED == 0
+    memset(ext->img_src, 0, sizeof(ext->img_src));
+#else
+    memset(ext->img_src_left, 0, sizeof(ext->img_src_left));
+    memset(ext->img_src_mid, 0, sizeof(ext->img_src_mid));
+    memset(ext->img_src_right, 0, sizeof(ext->img_src_right));
+#endif
+
     ext->act_cf = LV_IMG_CF_UNKOWN;
 
     /*The signal and design functions are not copied so set them here*/
@@ -79,12 +82,13 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing image button*/
     else {
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-
-        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_REL, copy_ext->img_src[LV_BTN_STATE_REL]);
-        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_PR, copy_ext->img_src[LV_BTN_STATE_PR]);
-        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_TGL_REL, copy_ext->img_src[LV_BTN_STATE_TGL_REL]);
-        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_TGL_PR, copy_ext->img_src[LV_BTN_STATE_TGL_PR]);
-        lv_imgbtn_set_src(new_imgbtn, LV_BTN_STATE_INA, copy_ext->img_src[LV_BTN_STATE_INA]);
+#if LV_IMGBTN_TILED == 0
+        memcpy(ext->img_src, copy_ext->img_src, sizeof(ext->img_src));
+#else
+        memcpy(ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
+        memcpy(ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
+        memcpy(ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
+#endif
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_imgbtn);
     }
@@ -98,6 +102,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
  * Setter functions
  *====================*/
 
+#if LV_IMGBTN_TILED == 0
 /**
  * Set images for a state of the image button
  * @param imgbtn pointer to an image button object
@@ -112,6 +117,28 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
 
     refr_img(imgbtn);
 }
+
+#else
+/**
+ * Set images for a state of the image button
+ * @param imgbtn pointer to an image button object
+ * @param state for which state set the new image (from `lv_btn_state_t`) `
+ * @param src_left pointer to an image source for the left side of the button (a C array or path to a file)
+ * @param src_mid pointer to an image source for the middle of the button (ideally 1px wide) (a C array or path to a file)
+ * @param src_right pointer to an image source for the right side of the button (a C array or path to a file)
+ */
+void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left, const void * src_mid, const void * src_right)
+{
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+
+    ext->img_src_left[state] = src_left;
+    ext->img_src_mid[state] = src_mid;
+    ext->img_src_right[state] = src_right;
+
+    refr_img(imgbtn);
+}
+
+#endif
 
 /**
  * Set a style of a image button.
@@ -128,6 +155,7 @@ void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t *
  * Getter functions
  *====================*/
 
+#if LV_IMGBTN_TILED == 0
 /**
  * Get the images in a  given state
  * @param imgbtn pointer to an image button object
@@ -140,6 +168,48 @@ const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state)
 
     return ext->img_src[state];
 }
+#else
+
+/**
+ * Get the left image in a given state
+ * @param imgbtn pointer to an image button object
+ * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @return pointer to the left image source (a C array or path to a file)
+ */
+const void * lv_imgbtn_get_src_left(lv_obj_t * imgbtn, lv_btn_state_t state)
+{
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+
+    return ext->img_src_left[state];
+}
+
+/**
+ * Get the middle image in a given state
+ * @param imgbtn pointer to an image button object
+ * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @return pointer to the middle image source (a C array or path to a file)
+ */
+const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_btn_state_t state)
+{
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+
+    return ext->img_src_mid[state];
+}
+
+/**
+ * Get the right image in a given state
+ * @param imgbtn pointer to an image button object
+ * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @return pointer to the left image source (a C array or path to a file)
+ */
+const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_btn_state_t state)
+{
+    lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
+
+    return ext->img_src_right[state];
+}
+
+#endif
 
 /**
  * Get style of a image button.
@@ -191,10 +261,62 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
         /*Just draw an image*/
         lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
         lv_btn_state_t state = lv_imgbtn_get_state(imgbtn);
-        const void * src = ext->img_src[state];
         lv_style_t * style = lv_imgbtn_get_style(imgbtn, state);
         lv_opa_t opa_scale = lv_obj_get_opa_scale(imgbtn);
+
+#if LV_IMGBTN_TILED == 0
+        const void * src = ext->img_src[state];
         lv_draw_img(&imgbtn->coords, mask, src, style, opa_scale);
+#else
+        const void * src;
+        lv_img_header_t header;
+        lv_area_t coords;
+        lv_coord_t left_w = 0;
+        lv_coord_t right_w = 0;
+
+        src = ext->img_src_left[state];
+        if(src) {
+            lv_img_dsc_get_info(src, &header);
+            left_w = header.w;
+            coords.x1 = imgbtn->coords.x1;
+            coords.y1 = imgbtn->coords.y1;
+            coords.x2 = coords.x1 + header.w - 1;
+            coords.y2 = coords.y1 + header.h - 1;
+            lv_draw_img(&coords, mask, src, style, opa_scale);
+        }
+
+        src = ext->img_src_right[state];
+        if(src) {
+            lv_img_dsc_get_info(src, &header);
+            right_w = header.w;
+            coords.x1 = imgbtn->coords.x2 - header.w + 1;
+            coords.y1 = imgbtn->coords.y1;
+            coords.x2 = imgbtn->coords.x2;
+            coords.y2 = imgbtn->coords.y1 + header.h - 1;
+            lv_draw_img(&coords, mask, src, style, opa_scale);
+        }
+
+        src = ext->img_src_mid[state];
+        if(src) {
+            lv_coord_t obj_w = lv_obj_get_width(imgbtn);
+            lv_coord_t i;
+            lv_img_dsc_get_info(src, &header);
+
+            coords.x1 = imgbtn->coords.x1 + left_w ;
+            coords.y1 = imgbtn->coords.y1;
+            coords.x2 = coords.x1 + header.w - 1;
+            coords.y2 = imgbtn->coords.y1 + header.h - 1;
+
+            for(i = 0; i < obj_w - right_w - left_w; i += header.w) {
+                lv_draw_img(&coords, mask, src, style, opa_scale);
+                coords.x1 = coords.x2 + 1;
+                coords.x2 += header.w;
+            }
+        }
+
+
+#endif
+
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -243,17 +365,27 @@ static void refr_img(lv_obj_t * imgbtn)
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
     lv_btn_state_t state = lv_imgbtn_get_state(imgbtn);
     lv_img_header_t header;
+
+#if LV_IMGBTN_TILED == 0
     const void * src = ext->img_src[state];
+#else
+    const void * src = ext->img_src_mid[state];
+#endif
 
     lv_res_t info_res;
     info_res = lv_img_dsc_get_info(src, &header);
     if(info_res == LV_RES_OK) {
         ext->act_cf = header.cf;
+#if LV_IMGBTN_TILED == 0
         lv_obj_set_size(imgbtn, header.w, header.h);
+#else
+        lv_obj_set_height(imgbtn, header.h);
+#endif
     } else {
         ext->act_cf = LV_IMG_CF_UNKOWN;
     }
 
+    lv_obj_invalidate(imgbtn);
 }
 
 #endif

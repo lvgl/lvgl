@@ -56,8 +56,11 @@ typedef struct
     uint16_t anim_time;                          /*Scroll animation time*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
+    uint32_t size; /*the number of items(buttons) in the list*/
+    bool single_mode; /* whether single selected mode is enabled */
 #if USE_LV_GROUP
-    lv_obj_t * selected_btn;
+    lv_obj_t * last_sel;                          /* The last selected button. It will be reverted when the list is focused again */
+    lv_obj_t * selected_btn;                      /* The button is currently being selected*/
 #endif
 } lv_list_ext_t;
 
@@ -65,6 +68,7 @@ enum {
     LV_LIST_STYLE_BG,
     LV_LIST_STYLE_SCRL,
     LV_LIST_STYLE_SB,
+    LV_LIST_STYLE_EDGE_FLASH,
     LV_LIST_STYLE_BTN_REL,
     LV_LIST_STYLE_BTN_PR,
     LV_LIST_STYLE_BTN_TGL_REL,
@@ -106,13 +110,29 @@ void lv_list_clean(lv_obj_t *obj);
  */
 lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_action_t rel_action);
 
+/**
+ * Remove the index of the button in the list
+ * @param list pointer to a list object
+ * @param index pointer to a the button's index in the list, index must be 0 <= index < lv_list_ext_t.size
+ * @return true: successfully deleted
+ */
+bool lv_list_remove(const lv_obj_t * list, uint32_t index);
+
 /*=====================
  * Setter functions
  *====================*/
+ 
+/**
+ * Set single button selected mode, only one button will be selected if enabled.
+ * @param list pointer to the currently pressed list object
+ * @param mode, enable(true)/disable(false) single selected mode.
+ */
+void lv_list_set_single_mode(lv_obj_t *list, bool mode);
+    
 #if USE_LV_GROUP
 
 /**
- * Make a button selected
+ * Make a button selected. Can be used while navigating in the list with a keypad.
  * @param list pointer to a list object
  * @param btn pointer to a button to select
  */
@@ -137,6 +157,26 @@ static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
 }
 
 /**
+ * Enable the scroll propagation feature. If enabled then the List will move its parent if there is no more space to scroll.
+ * @param list pointer to a List
+ * @param en true or false to enable/disable scroll propagation
+ */
+static inline void lv_list_set_scroll_propagation(lv_obj_t * list, bool en)
+{
+    lv_page_set_scroll_propagation(list, en);
+}
+
+/**
+ * Enable the edge flash effect. (Show an arc when the an edge is reached)
+ * @param list pointer to a List
+ * @param en true or false to enable/disable end flash
+ */
+static inline void lv_list_set_edge_flash(lv_obj_t * list, bool en)
+{
+    lv_page_set_edge_flash(list, en);
+}
+
+/**
  * Set a style of a list
  * @param list pointer to a list object
  * @param type which style should be set
@@ -148,6 +188,12 @@ void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style);
  * Getter functions
  *====================*/
 
+/**
+ * Get single button selected mode.
+ * @param list pointer to the currently pressed list object.
+ */
+bool lv_list_get_single_mode(lv_obj_t *list);
+    
 /**
  * Get the text of a list element
  * @param btn pointer to list element
@@ -184,9 +230,24 @@ lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
  */
 lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn);
 
+/**
+ * Get the index of the button in the list
+ * @param list pointer to a list object. If NULL, assumes btn is part of a list.
+ * @param btn pointer to a list element (button)
+ * @return the index of the button in the list, or -1 of the button not in this list
+ */
+int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn);
+
+/**
+ * Get the number of buttons in the list
+ * @param list pointer to a list object
+ * @return the number of buttons in the list
+ */
+uint32_t lv_list_get_size(const lv_obj_t * list);
+
 #if USE_LV_GROUP
 /**
- * Get the currently selected button
+ * Get the currently selected button. Can be used while navigating in the list with a keypad.
  * @param list pointer to a list object
  * @return pointer to the selected button
  */
@@ -210,6 +271,26 @@ uint16_t lv_list_get_anim_time(const lv_obj_t *list);
 static inline lv_sb_mode_t lv_list_get_sb_mode(const lv_obj_t * list)
 {
     return lv_page_get_sb_mode(list);
+}
+
+/**
+ * Get the scroll propagation property
+ * @param list pointer to a List
+ * @return true or false
+ */
+static inline bool lv_list_get_scroll_propagation(lv_obj_t * list)
+{
+    return lv_page_get_scroll_propagation(list);
+}
+
+/**
+ * Get the scroll propagation property
+ * @param list pointer to a List
+ * @return true or false
+ */
+static inline bool lv_list_get_edge_flash(lv_obj_t * list)
+{
+    return lv_page_get_edge_flash(list);
 }
 
 /**

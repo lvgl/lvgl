@@ -36,7 +36,6 @@ static lv_style_t light_frame;
 static lv_style_t dark_frame;
 
 /*Saved input parameters*/
-static uint16_t _hue;
 static lv_font_t * _font;
 
 
@@ -421,15 +420,17 @@ static void win_init(void)
 
 /**
  * Initialize the mono theme
- * @param hue [0..360] hue value from HSV color space to define the theme's base color
+ * @param hue [0..360] hue value from HSV color space to define the theme's base color; is not used in lv_theme_mono
  * @param font pointer to a font (NULL to use the default)
  * @return pointer to the initialized theme
  */
 lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t * font)
 {
+
+    (void)hue;  /*Unused*/
+
     if(font == NULL) font = LV_FONT_DEFAULT;
 
-    _hue = hue;
     _font = font;
 
     /*For backward compatibility initialize all theme elements with a default style */

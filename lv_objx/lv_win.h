@@ -157,6 +157,12 @@ void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
  */
 void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
 
+/**
+ * Set drag status of a window. If set to 'true' window can be dragged like on a PC.
+ * @param win pointer to a window object
+ * @param en whether dragging is enabled
+ */
+void lv_win_set_drag(lv_obj_t *win, bool en);
 
 /*=====================
  * Getter functions
@@ -219,6 +225,16 @@ lv_coord_t lv_win_get_width(lv_obj_t * win);
  * @return style pointer to a style
  */
 lv_style_t * lv_win_get_style(const lv_obj_t *win, lv_win_style_t type);
+
+/**
+ * Get drag status of a window. If set to 'true' window can be dragged like on a PC.
+ * @param win pointer to a window object
+ * @return whether window is draggable
+ */
+static inline bool lv_win_get_drag(const lv_obj_t *win)
+{
+    return lv_obj_get_drag(win);
+}
 
 /*=====================
  * Other functions

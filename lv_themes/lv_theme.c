@@ -37,7 +37,7 @@ static lv_theme_t * current_theme;
 /* Store the styles in this array.
  * Can't determine the size in compile time because sizeof is not evaluated (should be `sizeof(lv_theme_t) / sizeof(lv_style_t*)`).
  * Error will be generated in run time if too small.*/
-static lv_style_t th_styles[100];
+static lv_style_t th_styles[120];
 static bool inited = false;
 static lv_theme_t current_theme;
 #endif
@@ -73,7 +73,7 @@ void lv_theme_set_current(lv_theme_t * th)
         uint16_t i;
         lv_style_t ** cur_th_style_p = (lv_style_t **) &current_theme;
         for(i = 0; i < style_num; i++) {
-            uint64_t adr = (uint64_t)&th_styles[i];
+            uintptr_t adr = (uintptr_t)&th_styles[i];
             memcpy(&cur_th_style_p[i], &adr, sizeof(lv_style_t *));
         }
         inited = true;
@@ -84,7 +84,7 @@ void lv_theme_set_current(lv_theme_t * th)
     uint16_t i;
     lv_style_t ** th_style = (lv_style_t **) th;
     for(i = 0; i < style_num; i++) {
-        uint64_t s = (uint64_t)th_style[i];
+        uintptr_t s = (uintptr_t)th_style[i];
         if(s) memcpy(&th_styles[i], (void *)s, sizeof(lv_style_t));
     }
 

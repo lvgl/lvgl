@@ -34,7 +34,7 @@ extern "C" {
 
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES == 0 || LV_VER_RES == 0
-#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater then 0"
+#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater than 0"
 #endif
 
 #if LV_ANTIALIAS > 1
@@ -59,6 +59,7 @@ extern "C" {
 #define LV_ANIM_DIR_MASK        0x80    /*ANIM_IN/ANIM_OUT mask*/
 
 #define LV_MAX_ANCESTOR_NUM     8
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -90,8 +91,10 @@ enum
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_STYLE_CHG,
     LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_LANG_CHG,
     LV_SIGNAL_GET_TYPE,
 
+	_LV_SIGNAL_FEEDBACK_SECTION_START,
     /*Input device related*/
     LV_SIGNAL_PRESSED,
     LV_SIGNAL_PRESSING,
@@ -106,11 +109,50 @@ enum
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
     LV_SIGNAL_CONTROLL,
+    _LV_SIGNAL_FEEDBACK_SECTION_END,
     LV_SIGNAL_GET_EDITABLE,
 };
 typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (* lv_signal_func_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
+
+enum
+{
+    LV_ALIGN_CENTER = 0,
+    LV_ALIGN_IN_TOP_LEFT,
+    LV_ALIGN_IN_TOP_MID,
+    LV_ALIGN_IN_TOP_RIGHT,
+    LV_ALIGN_IN_BOTTOM_LEFT,
+    LV_ALIGN_IN_BOTTOM_MID,
+    LV_ALIGN_IN_BOTTOM_RIGHT,
+    LV_ALIGN_IN_LEFT_MID,
+    LV_ALIGN_IN_RIGHT_MID,
+    LV_ALIGN_OUT_TOP_LEFT,
+    LV_ALIGN_OUT_TOP_MID,
+    LV_ALIGN_OUT_TOP_RIGHT,
+    LV_ALIGN_OUT_BOTTOM_LEFT,
+    LV_ALIGN_OUT_BOTTOM_MID,
+    LV_ALIGN_OUT_BOTTOM_RIGHT,
+    LV_ALIGN_OUT_LEFT_TOP,
+    LV_ALIGN_OUT_LEFT_MID,
+    LV_ALIGN_OUT_LEFT_BOTTOM,
+    LV_ALIGN_OUT_RIGHT_TOP,
+    LV_ALIGN_OUT_RIGHT_MID,
+    LV_ALIGN_OUT_RIGHT_BOTTOM,
+};
+typedef uint8_t lv_align_t;
+
+#if LV_OBJ_REALIGN
+typedef struct {
+    const struct _lv_obj_t * base;
+    lv_coord_t xofs;
+    lv_coord_t yofs;
+    lv_align_t align;
+    uint8_t auto_realign :1;
+    uint8_t origo_align  :1;        /*1: the oigo (center of the object) was aligned with `lv_obj_align_origo`*/
+}lv_reailgn_t;
+#endif
+
 
 typedef struct _lv_obj_t
 {
@@ -144,6 +186,9 @@ typedef struct _lv_obj_t
     lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_size;        /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+#if LV_OBJ_REALIGN
+    lv_reailgn_t realign;
+#endif
 
 #ifdef LV_OBJ_FREE_NUM_TYPE
     LV_OBJ_FREE_NUM_TYPE free_num;          /*Application specific identifier (set it freely)*/
@@ -170,32 +215,6 @@ typedef uint8_t lv_protect_t;
 typedef struct {
     const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
 } lv_obj_type_t;
-
-enum
-{
-    LV_ALIGN_CENTER = 0,
-    LV_ALIGN_IN_TOP_LEFT,
-    LV_ALIGN_IN_TOP_MID,
-    LV_ALIGN_IN_TOP_RIGHT,
-    LV_ALIGN_IN_BOTTOM_LEFT,
-    LV_ALIGN_IN_BOTTOM_MID,
-    LV_ALIGN_IN_BOTTOM_RIGHT,
-    LV_ALIGN_IN_LEFT_MID,
-    LV_ALIGN_IN_RIGHT_MID,
-    LV_ALIGN_OUT_TOP_LEFT,
-    LV_ALIGN_OUT_TOP_MID,
-    LV_ALIGN_OUT_TOP_RIGHT,
-    LV_ALIGN_OUT_BOTTOM_LEFT,
-    LV_ALIGN_OUT_BOTTOM_MID,
-    LV_ALIGN_OUT_BOTTOM_RIGHT,
-    LV_ALIGN_OUT_LEFT_TOP,
-    LV_ALIGN_OUT_LEFT_MID,
-    LV_ALIGN_OUT_LEFT_BOTTOM,
-    LV_ALIGN_OUT_RIGHT_TOP,
-    LV_ALIGN_OUT_RIGHT_MID,
-    LV_ALIGN_OUT_RIGHT_BOTTOM,
-};
-typedef uint8_t lv_align_t;
 
 enum
 {
@@ -333,6 +352,28 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
  */
 void lv_obj_align(lv_obj_t * obj,const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
 
+/**
+ * Align an object to an other object.
+ * @param obj pointer to an object to align
+ * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
+ * @param align type of alignment (see 'lv_align_t' enum)
+ * @param x_mod x coordinate shift after alignment
+ * @param y_mod y coordinate shift after alignment
+ */
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
+
+/**
+ * Realign the object based on the last `lv_obj_align` parameters.
+ * @param obj pointer to an object
+ */
+void lv_obj_realign(lv_obj_t * obj);
+
+/**
+ * Enable the automatic realign of the object when its size has changed based on the last `lv_obj_align` parameters.
+ * @param obj pointer to an object
+ * @param en true: enable auto realign; false: disable auto realign
+ */
+void lv_obj_set_auto_realign(lv_obj_t * obj, bool en);
 
 /*---------------------
  * Appearance set
@@ -412,7 +453,7 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
  * @param obj pointer to an object
  * @param en true: enable editing
  */
-void lv_obj_set_editable(lv_obj_t * obj, bool en);
+//void lv_obj_set_editable(lv_obj_t * obj, bool en);
 
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
@@ -623,6 +664,13 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
  */
 lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj);
 
+/**
+ * Get the automatic realign property of the object.
+ * @param obj pointer to an object
+ * @return  true: auto realign is enabled; false: auto realign is disabled
+ */
+bool lv_obj_get_auto_realign(lv_obj_t * obj);
+
 /*-----------------
  * Appearance get
  *---------------*/
@@ -655,7 +703,7 @@ bool lv_obj_get_click(const lv_obj_t * obj);
 /**
  * Get the top enable attribute of an object
  * @param obj pointer to an object
- * @return true: the auto top feture is enabled
+ * @return true: the auto top feature is enabled
  */
 bool lv_obj_get_top(const lv_obj_t * obj);
 
@@ -667,7 +715,7 @@ bool lv_obj_get_top(const lv_obj_t * obj);
 bool lv_obj_get_drag(const lv_obj_t * obj);
 
 /**
- * Get the drag thow enable attribute of an object
+ * Get the drag throw enable attribute of an object
  * @param obj pointer to an object
  * @return true: drag throw is enabled
  */
@@ -679,6 +727,14 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj);
  * @return true: drag parent is enabled
  */
 bool lv_obj_get_drag_parent(const lv_obj_t * obj);
+
+
+/**
+ * Get the opa scale enable parameter
+ * @param obj pointer to an object
+ * @return true: opa scaling is enabled for this object and all children; false: no opa scaling
+ */
+lv_opa_t lv_obj_get_opa_scale_enable(const lv_obj_t * obj);
 
 /**
  * Get the opa scale parameter of an object
@@ -707,7 +763,7 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_func_t   lv_obj_get_signal_func(const lv_obj_t * obj);
+lv_signal_func_t lv_obj_get_signal_func(const lv_obj_t * obj);
 
 /**
  * Get the design function of an object
@@ -764,7 +820,7 @@ void * lv_obj_get_group(const lv_obj_t * obj);
 
 
 /**
- * Tell whether the ohe object is the focused object of a group or not.
+ * Tell whether the object is the focused object of a group or not.
  * @param obj pointer to an object
  * @return true: the object is focused, false: the object is not focused or not in a group
  */

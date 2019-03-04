@@ -153,7 +153,7 @@ void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, lv_style_t * style)
  *====================*/
 
 /**
- * Get the start angles of an arc.
+ * Get the start angle of an arc.
  * @param arc pointer to an arc object
  * @return the start angle [0..360]
  */
@@ -165,7 +165,7 @@ uint16_t lv_arc_get_angle_start(lv_obj_t * arc)
 }
 
 /**
- * Get the end angles of an arc.
+ * Get the end angle of an arc.
  * @param arc pointer to an arc object
  * @return the end angle [0..360]
  */
@@ -173,7 +173,7 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
 {
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
-    return ext->angle_start;
+    return ext->angle_end;
 }
 
 /**
@@ -184,16 +184,18 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
  *  */
 lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type)
 {
+    lv_style_t * style = NULL;
 
     switch(type) {
         case LV_ARC_STYLE_MAIN:
-            return lv_obj_get_style(arc);
+            style = lv_obj_get_style(arc);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================

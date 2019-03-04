@@ -8836,13 +8836,8 @@ static const lv_font_glyph_dsc_t lv_font_symbol_40_glyph_dsc[] = {
 };
 
 lv_font_t lv_font_symbol_40 = {
-#if LV_TXT_UTF8
     .unicode_first = LV_SYMBOL_GLYPH_FIRST, /*First Unicode letter in this font*/
     .unicode_last = LV_SYMBOL_GLYPH_LAST,  /*Last Unicode letter in this font*/
-#else
-    .unicode_first = LV_SYMBOL_GLYPH_FIRST, /*First Unicode letter in this font*/
-    .unicode_last = LV_SYMBOL_GLYPH_LAST,  /*Last Unicode letter in this font*/
-#endif
     .h_px = 40,             /*Font height in pixels*/
     .glyph_bitmap = lv_font_symbol_40_glyph_bitmap, /*Bitmap of glyphs*/
     .glyph_dsc = lv_font_symbol_40_glyph_dsc,       /*Description of glyphs*/

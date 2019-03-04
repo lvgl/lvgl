@@ -207,6 +207,14 @@ typedef struct {
     } ta;
 #endif
 
+#if USE_LV_SPINBOX != 0
+    struct {
+        lv_style_t *bg;
+        lv_style_t *cursor;
+        lv_style_t *sb;
+    } spinbox;
+#endif
+
 #if USE_LV_LIST
     struct {
         lv_style_t *bg;
@@ -249,6 +257,21 @@ typedef struct {
             lv_style_t *tgl_pr;
         } btn;
     } tabview;
+#endif
+
+#if USE_LV_TILEVIEW != 0
+    struct {
+        lv_style_t *bg;
+        lv_style_t *scrl;
+        lv_style_t *sb;
+    } tileview;
+#endif
+
+#if USE_LV_TABLE != 0
+    struct {
+        lv_style_t *bg;
+        lv_style_t *cell;
+    } table;
 #endif
 
 #if USE_LV_WIN != 0

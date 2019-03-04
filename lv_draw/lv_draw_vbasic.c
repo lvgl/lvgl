@@ -30,6 +30,10 @@
  *********************/
 #define VFILL_HW_ACC_SIZE_LIMIT    50      /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
 
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -147,7 +151,7 @@ void lv_vfill(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
 
 #if USE_LV_GPU
-    static lv_color_t color_array_tmp[LV_HOR_RES];       /*Used by 'lv_disp_mem_blend'*/
+    static LV_ATTRIBUTE_MEM_ALIGN lv_color_t color_array_tmp[LV_HOR_RES];       /*Used by 'lv_disp_mem_blend'*/
     static lv_coord_t last_width = -1;
 
     lv_coord_t w = lv_area_get_width(&vdb_rel_a);
@@ -445,7 +449,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
             lv_coord_t col;
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
                 for(col = 0; col < map_useful_w; col++) {
-                    lv_color_t px_color = (lv_color_t) * ((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
+                    lv_color_t px_color = *((lv_color_t *)&map_p[(uint32_t)col * px_size_byte]);
                     disp->driver.vdb_wr((uint8_t *)vdb_p->buf, vdb_width, col + masked_a.x1, row, px_color, opa);
                 }
                 map_p += map_width * px_size_byte;  /*Next row on the map*/
@@ -483,7 +487,7 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
 
                 /*Calculate with the pixel level alpha*/
                 if(alpha_byte) {
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
                     px_color.full = px_color_p[0];
 #elif LV_COLOR_DEPTH == 16
                     /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
@@ -529,21 +533,6 @@ void lv_vmap(const lv_area_t * cords_p, const lv_area_t * mask_p,
                             vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
 #else
                             vdb_buf_tmp[col] = color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].alpha, px_color,  opa_result);
-//                            if(vdb_buf_tmp[col].alpha == LV_OPA_TRANSP) {
-//                                /* When it is the first visible pixel on the transparent screen
-//                                 * simlply use this color and set the pixel opa as backrounds alpha*/
-//                                vdb_buf_tmp[col] = px_color;
-//                                vdb_buf_tmp[col].alpha = opa_result;
-//                            } else {
-//                                /* If already this pixel is already written then for performance reasons
-//                                 * don't care with alpha channel
-//                                 */
-//                                lv_opa_t bg_opa = vdb_buf_tmp[col].alpha;
-//                                vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
-//
-//                                uint16_t opa_tmp = (uint16_t)opa_result + ((bg_opa * (255 - opa_result)) >> 8);
-//                                vdb_buf_tmp[col].alpha = opa_tmp > 0xFF ? 0xFF : opa_tmp ;
-//                            }
 #endif
                         }
                     }
@@ -680,7 +669,7 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
         /*Save the parameters and the result. If they will be asked again don't compute again*/
         static lv_opa_t fg_opa_save = 0;
         static lv_opa_t bg_opa_save = 0;
-        static lv_color_t c = {0};
+        static lv_color_t c = {{0}};
 
         if(fg_opa != fg_opa_save || bg_opa != bg_opa_save) {
             fg_opa_save = fg_opa;

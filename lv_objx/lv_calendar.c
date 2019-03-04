@@ -14,6 +14,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
+#include <string.h>
 
 /*********************
  *      DEFINES
@@ -424,31 +425,40 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
  *  */
 lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
     switch(type) {
-    case LV_CALENDAR_STYLE_BG:
-        return  lv_obj_get_style(calendar);
-    case LV_CALENDAR_STYLE_HEADER:
-        return ext->style_header;
-    case LV_CALENDAR_STYLE_HEADER_PR:
-        return ext->style_header_pr;
-    case LV_CALENDAR_STYLE_DAY_NAMES:
-        return ext->style_day_names;
-    case LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS:
-        return ext->style_highlighted_days;
-    case LV_CALENDAR_STYLE_INACTIVE_DAYS:
-        return ext->style_inactive_days;
-    case LV_CALENDAR_STYLE_WEEK_BOX:
-        return ext->style_week_box;
-    case LV_CALENDAR_STYLE_TODAY_BOX:
-        return ext->style_today_box;
-    default:
-        return NULL;
+        case LV_CALENDAR_STYLE_BG:
+            style = lv_obj_get_style(calendar);
+            break;
+        case LV_CALENDAR_STYLE_HEADER:
+            style = ext->style_header;
+            break;
+        case LV_CALENDAR_STYLE_HEADER_PR:
+            style = ext->style_header_pr;
+            break;
+        case LV_CALENDAR_STYLE_DAY_NAMES:
+            style = ext->style_day_names;
+            break;
+        case LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS:
+            style = ext->style_highlighted_days;
+            break;
+        case LV_CALENDAR_STYLE_INACTIVE_DAYS:
+            style = ext->style_inactive_days;
+            break;
+        case LV_CALENDAR_STYLE_WEEK_BOX:
+            style = ext->style_week_box;
+            break;
+        case LV_CALENDAR_STYLE_TODAY_BOX:
+            style = ext->style_today_box;
+            break;
+        default:
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /*=====================
@@ -747,7 +757,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the right arrow*/
     arrow_style = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 = header_area.x2 - ext->style_header->body.padding.hor -
-            lv_txt_get_width(SYMBOL_RIGHT, 1, arrow_style->text.font,
+            lv_txt_get_width(SYMBOL_RIGHT, strlen(SYMBOL_RIGHT), arrow_style->text.font,
                     arrow_style->text.line_space, LV_TXT_FLAG_NONE);
     lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
 
@@ -791,8 +801,8 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_area_t label_area;
     lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
     label_area.y1 = calendar->coords.y1 + get_header_height(calendar) +
-            ext->style_day_names->body.padding.ver + lv_font_get_height(ext->style_day_names->text.font) +
-            style_bg->body.padding.inner;
+            ext->style_day_names->body.padding.ver + lv_font_get_height(ext->style_day_names->text.font) + 
+            ext->style_day_names->body.padding.ver;
     label_area.y2 = label_area.y1 + lv_font_get_height(style_bg->text.font);
 
     lv_coord_t w = lv_obj_get_width(calendar) - 2 * hpad;

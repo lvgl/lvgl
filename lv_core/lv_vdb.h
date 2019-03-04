@@ -31,9 +31,14 @@ extern "C" {
 #define LV_VDB_ADR_INV  8       /*8 is still too small to be valid but it's aligned on 64 bit machines as well*/
 
 #ifndef LV_VDB_PX_BPP
-#warning "LV_VDB_PX_BPP is not specified in lv_conf.h. Use the default value (LV_COLOR_SIZE)"
-#define LV_VDB_PX_BPP LV_COLOR_SIZE
+#define LV_VDB_PX_BPP LV_COLOR_SIZE     /* Default is LV_COLOR_SIZE */
 #endif
+
+
+#if LV_VDB_TRUE_DOUBLE_BUFFERED && (LV_VDB_SIZE != LV_HOR_RES * LV_VER_RES || LV_VDB_DOUBLE == 0)
+#error "With LV_VDB_TRUE_DOUBLE_BUFFERED: (LV_VDB_SIZE = LV_HOR_RES * LV_VER_RES and LV_VDB_DOUBLE = 1 is required"
+#endif
+
 
 /* The size of VDB in bytes.
  * (LV_VDB_SIZE * LV_VDB_PX_BPP) >> 3): just divide by 8 to convert bits to bytes
@@ -78,6 +83,24 @@ void lv_vdb_set_adr(void * buf1, void * buf2);
  * Call in the display driver's  'disp_flush' function when the flushing is finished
  */
 void lv_flush_ready(void);
+
+/**
+ * Get currently active VDB, where the drawing happens. Used with `LV_VDB_DOUBLE  1`
+ * @return pointer to the active VDB. If `LV_VDB_DOUBLE  0` give the single VDB
+ */
+lv_vdb_t * lv_vdb_get_active(void);
+
+/**
+ * Get currently inactive VDB, which is being displayed or being flushed. Used with `LV_VDB_DOUBLE  1`
+ * @return pointer to the inactive VDB. If `LV_VDB_DOUBLE  0` give the single VDB
+ */
+lv_vdb_t * lv_vdb_get_inactive(void);
+
+/**
+ * Whether the flushing is in progress or not
+ * @return true: flushing is in progress; false: flushing ready
+ */
+bool lv_vdb_is_flushing(void);
 
 /**********************
  *      MACROS

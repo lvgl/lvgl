@@ -32,7 +32,7 @@ extern "C" {
 #define LV_LOG_LEVEL_ERROR 3     /*Only critical issue, when the system may fail*/
 #define _LV_LOG_LEVEL_NUM  4
 
-typedef uint8_t lv_log_level_t;
+typedef int8_t lv_log_level_t;
 
 #if USE_LV_LOG
 /**********************
@@ -58,7 +58,7 @@ void lv_log_register_print(void f(lv_log_level_t, const char *, uint32_t,  const
  * @param line line number in the source code where the log added
  * @param dsc description of the log
  */
-void lv_log_add(lv_log_level_t level, const char * file, uint32_t line, const char * dsc);
+void lv_log_add(lv_log_level_t level, const char * file, int line, const char * dsc);
 
 /**********************
  *      MACROS

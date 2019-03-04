@@ -61,16 +61,20 @@ typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
     /*New data for this type */
-    char * text;                     /*Text of the label*/
-    lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
+    char * text;                            /*Text of the label*/
+    lv_label_long_mode_t long_mode;         /*Determinate what to do with the long texts*/
 #if LV_TXT_UTF8 == 0
-    char dot_tmp[LV_LABEL_DOT_NUM + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
+    char dot_tmp[LV_LABEL_DOT_NUM + 1];     /*Store the character which are replaced by dots (Handled by the library)*/
 #else
     char dot_tmp[LV_LABEL_DOT_NUM * 4 + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
 #endif
+
+#if USE_LV_MULTI_LANG
+    uint16_t lang_txt_id;            /*The ID of the text to display*/
+#endif
     uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;            /*Speed of scroll and roll animation in px/sec unit*/
-    lv_point_t offset;                 /*Text draw position offset*/
+    lv_point_t offset;              /*Text draw position offset*/
     uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
     uint8_t align       :2;         /*Align type from 'lv_label_align_t'*/
     uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
@@ -120,6 +124,15 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_static_text(lv_obj_t * label, const char * text);
 
 /**
+ *Set a text ID which means a the same text but on different languages
+ * @param label pointer to a label object
+ * @param txt_id ID of the text
+ */
+#if USE_LV_MULTI_LANG
+void lv_label_set_text_id(lv_obj_t * label, uint32_t txt_id);
+#endif
+
+/**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
@@ -137,16 +150,16 @@ void lv_label_set_align(lv_obj_t *label, lv_label_align_t align);
 /**
  * Enable the recoloring by in-line commands
  * @param label pointer to a label object
- * @param recolor_en true: enable recoloring, false: disable
+ * @param en true: enable recoloring, false: disable
  */
-void lv_label_set_recolor(lv_obj_t * label, bool recolor_en);
+void lv_label_set_recolor(lv_obj_t * label, bool en);
 
 /**
  * Set the label to draw (or not draw) background specified in its style's body
  * @param label pointer to a label object
- * @param body_en true: draw body; false: don't draw body
+ * @param en true: draw body; false: don't draw body
  */
-void lv_label_set_body_draw(lv_obj_t *label, bool body_en);
+void lv_label_set_body_draw(lv_obj_t *label, bool en);
 
 /**
  * Set the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
@@ -174,6 +187,15 @@ static inline void lv_label_set_style(lv_obj_t *label, lv_style_t *style)
  * @return the text of the label
  */
 char * lv_label_get_text(const lv_obj_t * label);
+
+#if USE_LV_MULTI_LANG
+/**
+ * Get the text ID of the label. (Used by the multi-language feature)
+ * @param label pointer to a label object
+ * @return ID of the text
+ */
+uint16_t lv_label_get_text_id(lv_obj_t * label);
+#endif
 
 /**
  * Get the long mode of a label

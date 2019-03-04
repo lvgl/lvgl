@@ -45,27 +45,27 @@ static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * nex
 /**
  * Initialize linked list
  * @param ll_dsc pointer to ll_dsc variable
- * @param n_size the size of 1 node in bytes
+ * @param node_size the size of 1 node in bytes
  */
-void lv_ll_init(lv_ll_t * ll_p, uint32_t n_size)
+void lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
 {
     ll_p->head = NULL;
     ll_p->tail = NULL;
 #ifdef LV_MEM_ENV64
     /*Round the size up to 8*/
-    if(n_size & 0x7) {
-        n_size = n_size & (~0x7);
-        n_size += 8;
+    if(node_size & 0x7) {
+        node_size = node_size & (~0x7);
+        node_size += 8;
     }
 #else
     /*Round the size up to 4*/
-    if(n_size & 0x3) {
-        n_size = n_size & (~0x3);
-        n_size += 4;
+    if(node_size & 0x3) {
+        node_size = node_size & (~0x3);
+        node_size += 4;
     }
 #endif
 
-    ll_p->n_size = n_size;
+    ll_p->n_size = node_size;
 }
 
 /**
@@ -157,7 +157,7 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p)
 
 /**
  * Remove the node 'node_p' from 'll_p' linked list.
- * It Dose not free the the memory of node.
+ * It does not free the the memory of node.
  * @param ll_p pointer to the linked list of 'node_p'
  * @param node_p pointer to node in 'll_p' linked list
  */
@@ -321,7 +321,10 @@ void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
     if(n_act == n_after) return;    /*Can't move before itself*/
 
 
-    void * n_before = lv_ll_get_prev(ll_p, n_after);
+    void * n_before;
+    if(n_after != NULL) n_before = lv_ll_get_prev(ll_p, n_after);
+    else n_before = lv_ll_get_tail(ll_p);        /*if `n_after` is NULL `n_act` should be the new tail*/
+
     if(n_act == n_before) return;   /*Already before `n_after`*/
 
     /*It's much easier to remove from the list and add again*/

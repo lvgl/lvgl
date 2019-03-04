@@ -28,8 +28,6 @@
 
 static uint16_t _hue;
 static lv_font_t * _font;
-static lv_font_t * _font;
-static lv_font_t * _font;
 
 static lv_theme_t theme;
 static lv_style_t def;
@@ -116,6 +114,7 @@ static void basic_init(void)
     panel.body.border.width = 2;
     panel.body.border.opa = LV_OPA_60;
     panel.text.color = lv_color_hsv_to_rgb(_hue, 8, 96);
+    panel.image.color = lv_color_hsv_to_rgb(_hue, 8, 96);
     panel.line.color = lv_color_hsv_to_rgb(_hue, 20, 70);
 
     /*Scrollbar*/
@@ -136,6 +135,13 @@ static void basic_init(void)
 
 }
 
+static void cont_init(void)
+{
+#if USE_LV_CONT != 0
+    theme.cont = &panel;
+#endif
+}
+
 static void btn_init(void)
 {
 #if USE_LV_BTN != 0
@@ -151,6 +157,7 @@ static void btn_init(void)
     btn_rel.body.padding.inner = LV_DPI / 10;
     btn_rel.text.color = lv_color_hsv_to_rgb(_hue, 8, 96);
     btn_rel.text.font = _font;
+    btn_rel.image.color = lv_color_hsv_to_rgb(_hue, 8, 96);
 
     lv_style_copy(&btn_pr, &btn_rel);
     btn_pr.body.opa = LV_OPA_COVER;
@@ -160,6 +167,7 @@ static void btn_init(void)
     btn_pr.body.border.opa = LV_OPA_60;
     btn_pr.text.font = _font;
     btn_pr.text.color = lv_color_hsv_to_rgb(_hue, 10, 100);
+    btn_pr.image.color = lv_color_hsv_to_rgb(_hue, 10, 100);
 
     lv_style_copy(&btn_trel, &btn_pr);
     btn_trel.body.opa = LV_OPA_COVER;
@@ -170,6 +178,7 @@ static void btn_init(void)
     btn_trel.body.border.color = lv_color_hsv_to_rgb(_hue, 80, 90);
     btn_trel.text.font = _font;
     btn_trel.text.color = lv_color_hsv_to_rgb(_hue, 0, 100);
+    btn_trel.image.color = lv_color_hsv_to_rgb(_hue, 0, 100);
 
     lv_style_copy(&btn_tpr, &btn_trel);
     btn_tpr.body.opa = LV_OPA_COVER;
@@ -180,6 +189,7 @@ static void btn_init(void)
     btn_tpr.body.border.color = lv_color_hsv_to_rgb(_hue, 80, 70);
     btn_tpr.text.font = _font;
     btn_tpr.text.color = lv_color_hsv_to_rgb(_hue, 10, 90);
+    btn_tpr.image.color = lv_color_hsv_to_rgb(_hue, 10, 90);
 
     lv_style_copy(&btn_ina, &btn_rel);
     btn_ina.body.border.opa = LV_OPA_60;
@@ -590,6 +600,15 @@ static void ta_init(void)
 #endif
 }
 
+static void spinbox_init(void)
+{
+#if USE_LV_SPINBOX
+    theme.spinbox.bg= &panel;
+    theme.spinbox.cursor = theme.ta.cursor;
+    theme.spinbox.sb = theme.ta.sb;
+#endif
+}
+
 static void list_init(void)
 {
 #if USE_LV_LIST != 0
@@ -601,6 +620,7 @@ static void list_init(void)
     list_rel.body.border.opa = LV_OPA_COVER;
     list_rel.text.color = lv_color_hsv_to_rgb(_hue, 10, 94);
     list_rel.text.font = _font;
+    list_rel.image.color = lv_color_hsv_to_rgb(_hue, 10, 94);
 
     lv_style_copy(&list_pr, &list_rel);
     list_pr.body.empty = 0;
@@ -608,6 +628,7 @@ static void list_init(void)
     list_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.text.color = lv_color_hsv_to_rgb(_hue, 7, 96);
+    list_pr.image.color = lv_color_hsv_to_rgb(_hue, 7, 96);
 
     lv_style_copy(&list_trel, &list_rel);
     lv_style_copy(&list_tpr, &list_pr);
@@ -732,6 +753,31 @@ static void tabview_init(void)
 #endif
 }
 
+static void tileview_init(void)
+{
+#if USE_LV_TILEVIEW != 0
+    theme.tileview.bg = &lv_style_transp_tight;
+    theme.tileview.scrl = &lv_style_transp_tight;
+    theme.tileview.sb = theme.page.sb;
+#endif
+}
+
+static void table_init(void)
+{
+#if USE_LV_TABLE != 0
+    static lv_style_t cell;
+    lv_style_copy(&cell, &panel);
+    cell.body.radius = 0;
+    cell.body.border.width = 1;
+    cell.body.padding.hor = LV_DPI / 12;
+    cell.body.padding.ver = LV_DPI / 12;
+
+
+    theme.table.bg = &lv_style_transp_tight;
+    theme.table.cell = &cell;
+#endif
+}
+
 static void win_init(void)
 {
 #if USE_LV_WIN != 0
@@ -748,6 +794,7 @@ static void win_init(void)
     header.body.border.color = lv_color_hsv_to_rgb(_hue, 20, 80);
     header.body.border.part = LV_BORDER_BOTTOM;
     header.text.color = lv_color_hsv_to_rgb(_hue, 5, 100);
+    header.image.color = lv_color_hsv_to_rgb(_hue, 5, 100);
 
     theme.win.bg = &bg;
     theme.win.sb = &sb;
@@ -785,6 +832,7 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
     }
 
     basic_init();
+    cont_init();
     btn_init();
     label_init();
     bar_init();
@@ -805,10 +853,13 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
     mbox_init();
     page_init();
     ta_init();
+    spinbox_init();
     list_init();
     ddlist_init();
     roller_init();
     tabview_init();
+    tileview_init();
+    table_init();
     win_init();
 
     return &theme;

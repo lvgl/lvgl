@@ -11,10 +11,23 @@
 
 #include "lv_ll.h"
 #include <string.h>
+#include "lv_gc.h"
+
+#if defined(LV_GC_INCLUDE)
+#   include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
 
 /*********************
  *      DEFINES
  *********************/
+
+/* "free" is used as a function pointer (in lv_fs_drv_t).
+ * We must make sure "free" was not defined to a platform specific
+ * free function, otherwise compilation would fail.
+ */
+#ifdef free
+#undef free
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -30,7 +43,6 @@ static lv_fs_drv_t * lv_fs_get_drv(char letter);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_ll_t drv_ll;
 
 /**********************
  *      MACROS
@@ -45,10 +57,24 @@ static lv_ll_t drv_ll;
  */
 void lv_fs_init(void)
 {
-    lv_ll_init(&drv_ll, sizeof(lv_fs_drv_t));
+    lv_ll_init(&LV_GC_ROOT(_lv_drv_ll), sizeof(lv_fs_drv_t));
 }
 
+/**
+ * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be returned.
+ * @param letter letter of the drive
+ * @return true: drive is ready; false: drive is not ready
+ */
+bool lv_fs_is_ready(char letter)
+{
+    lv_fs_drv_t * drv = lv_fs_get_drv(letter);
 
+    if(drv == NULL) return false;                      /*An unknown driver in not ready*/
+
+    if(drv->ready == NULL) return true;                /*Assume the driver is always ready if no handler provided*/
+
+    return drv->ready();
+}
 
 /**
  * Open a file
@@ -449,7 +475,7 @@ void lv_fs_add_drv(lv_fs_drv_t * drv_p)
 {
     /*Save the new driver*/
     lv_fs_drv_t * new_drv;
-    new_drv =  lv_ll_ins_head(&drv_ll);
+    new_drv =  lv_ll_ins_head(&LV_GC_ROOT(_lv_drv_ll));
     lv_mem_assert(new_drv);
     if(new_drv == NULL) return;
 
@@ -466,7 +492,7 @@ char  * lv_fs_get_letters(char * buf)
     lv_fs_drv_t * drv;
     uint8_t i = 0;
 
-    LL_READ(drv_ll, drv) {
+    LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
         buf[i] = drv->letter;
         i++;
     }
@@ -520,7 +546,7 @@ char * lv_fs_up(char * path)
         if(path[i] == '/' || path[i] == '\\') break;
     }
 
-    path[i] = '\0';
+    if(i > 0) path[i] = '\0';
 
     return path;
 }
@@ -589,7 +615,7 @@ static lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t * drv;
 
-    LL_READ(drv_ll, drv) {
+    LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
         if(drv->letter == letter) {
             return drv;
         }

@@ -92,6 +92,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->tab_load_action = NULL;
     ext->btns_pos = LV_TABVIEW_BTNS_POS_TOP;
     ext->anim_time = LV_TABVIEW_ANIM_TIME;
+    ext->btns_hide = 0;
 
 
     /*The signal and design functions are not copied so set them here*/
@@ -275,8 +276,10 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 
     lv_style_t * style = lv_obj_get_style(ext->content);
 
+    lv_res_t res = LV_RES_OK;
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
-    if(ext->tab_load_action && id != ext->tab_cur) ext->tab_load_action(tabview, id);
+    if(ext->tab_load_action && id != ext->tab_cur) res = ext->tab_load_action(tabview, id);
+    if(res != LV_RES_OK) return;        /*Prevent the tab loading*/
 
     ext->tab_cur = id;
 
@@ -420,6 +423,19 @@ void lv_tabview_set_btns_pos(lv_obj_t * tabview, lv_tabview_btns_pos_t btns_pos)
     tabview_realign(tabview);
 }
 
+/**
+ * Set whether tab buttons are hidden
+ * @param tabview pointer to a tab view object
+ * @param en whether tab buttons are hidden
+ */
+void lv_tabview_set_btns_hidden(lv_obj_t *tabview, bool en)
+{
+	lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+
+	ext->btns_hide = en;
+	tabview_realign(tabview);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -509,27 +525,34 @@ uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview)
  */
 lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_style_t type)
 {
+    lv_style_t * style = NULL;
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
     switch(type) {
         case LV_TABVIEW_STYLE_BG:
-            return lv_obj_get_style(tabview);
+            style = lv_obj_get_style(tabview);
+            break;
         case LV_TABVIEW_STYLE_BTN_BG:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BG);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BG);
+            break;
         case LV_TABVIEW_STYLE_BTN_REL:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_REL);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_REL);
+            break;
         case LV_TABVIEW_STYLE_BTN_PR:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_PR);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_PR);
+            break;
         case LV_TABVIEW_STYLE_BTN_TGL_REL:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_REL);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_REL);
+            break;
         case LV_TABVIEW_STYLE_BTN_TGL_PR:
-            return lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR);
+            style = lv_btnm_get_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR);
+            break;
         default:
-            return NULL;
+            style = NULL;
+            break;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**
@@ -540,6 +563,18 @@ lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t * tabview)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     return ext->btns_pos;
+}
+
+/**
+ * Get whether tab buttons are hidden
+ * @param tabview pointer to a tab view object
+ * @return whether tab buttons are hidden
+ */
+bool lv_tabview_get_btns_hidden(const lv_obj_t *tabview)
+{
+	lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+
+	return ext->btns_hide;
 }
 
 /**********************
@@ -586,12 +621,14 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
+#if USE_LV_GROUP
                 lv_group_t * g = lv_obj_get_group(tabview);
                 if(lv_group_get_editing(g)) {
                     lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
                     btnm_ext->btn_id_pr = 0;
                     lv_obj_invalidate(ext->btns);
                 }
+#endif
             } else {
                 lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
                 btnm_ext->btn_id_pr = 0;
@@ -801,7 +838,16 @@ static void tabview_realign(lv_obj_t * tabview)
 
     lv_obj_set_width(ext->btns, lv_obj_get_width(tabview));
 
-    if(ext->tab_cnt != 0) {
+    if(ext->btns_hide) {
+    	lv_obj_set_hidden(ext->btns, true);
+    	lv_obj_set_hidden(ext->indic, true);
+    	lv_obj_set_height(ext->content, lv_obj_get_height(tabview));
+    	lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+    }
+    else if(ext->tab_cnt != 0) {
+    	lv_obj_set_hidden(ext->btns, false);
+    	lv_obj_set_hidden(ext->indic, false);
+
         lv_style_t * style_btn_bg = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_BTN_BG);
         lv_style_t * style_btn_rel = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_BTN_REL);
 
@@ -815,20 +861,20 @@ static void tabview_realign(lv_obj_t * tabview)
                                  2 * style_btn_rel->body.padding.ver +
                                  2 * style_btn_bg->body.padding.ver;
         lv_obj_set_height(ext->btns, btns_height);
-    }
 
-    lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));
-    switch(ext->btns_pos) {
-        case LV_TABVIEW_BTNS_POS_TOP:
-            lv_obj_align(ext->btns, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
-            lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
-            break;
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
-            lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
-            lv_obj_align(ext->btns, ext->content, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
-            break;
-    }
+        lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));
 
+        switch(ext->btns_pos) {
+			case LV_TABVIEW_BTNS_POS_TOP:
+				lv_obj_align(ext->btns, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+				lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+				break;
+			case LV_TABVIEW_BTNS_POS_BOTTOM:
+				lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+				lv_obj_align(ext->btns, ext->content, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+				break;
+		}
+    }
 
     lv_obj_t * pages = lv_obj_get_child(ext->content, NULL);
     while(pages != NULL) {
@@ -838,7 +884,9 @@ static void tabview_realign(lv_obj_t * tabview)
         pages = lv_obj_get_child(ext->content, pages);
     }
 
-    lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+    if(!ext->btns_hide) {
+    	lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+    }
 
     lv_tabview_set_tab_act(tabview, ext->tab_cur, false);
 }

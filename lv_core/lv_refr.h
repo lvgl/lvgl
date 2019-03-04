@@ -47,9 +47,9 @@ void lv_refr_init(void);
 
 /**
  * Redraw the invalidated areas now.
- * Normally the redarwing is peridocally executed in `lv_task_handler` but a long blocking process can
+ * Normally the redrawing is periodically executed in `lv_task_handler` but a long blocking process can
  * prevent the call of `lv_task_handler`. In this case if the the GUI is updated in the process (e.g. progress bar)
- * this function can be called when the screen shoud be updated.
+ * this function can be called when the screen should be updated.
  */
 void lv_refr_now(void);
 

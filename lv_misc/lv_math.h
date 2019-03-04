@@ -19,9 +19,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_MATH_MIN(a,b) (a<b?a:b)
-#define LV_MATH_MAX(a,b) (a>b?a:b)
-#define LV_MATH_ABS(x) ((x)>0?(x):(-(x)))
+#define LV_MATH_MIN(a,b) ((a) < (b) ? (a) : (b))
+#define LV_MATH_MAX(a,b) ((a) > (b) ? (a) : (b))
+#define LV_MATH_ABS(x) ((x) > 0 ? (x) : (-(x)))
 
 #define LV_TRIGO_SIN_MAX    32767
 #define LV_TRIGO_SHIFT      15      /* >> LV_TRIGO_SHIFT to normalize*/

@@ -10,6 +10,12 @@
  *********************/
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_misc/lv_mem.h"
+#include "../lv_misc/lv_gc.h"
+
+#if defined(LV_GC_INCLUDE)
+#   include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
+
 
 /*********************
  *      DEFINES
@@ -22,7 +28,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_indev_t * indev_list = NULL;
 
 /**********************
  *  STATIC VARIABLES
@@ -70,10 +75,10 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     node->group = NULL;
     node->btn_points = NULL;
 
-    if(indev_list == NULL) {
-        indev_list = node;
+    if(LV_GC_ROOT(_lv_indev_list) == NULL) {
+        LV_GC_ROOT(_lv_indev_list) = node;
     } else {
-        lv_indev_t * last = indev_list;
+        lv_indev_t * last = LV_GC_ROOT(_lv_indev_list);
         while(last->next)
             last = last->next;
 
@@ -92,7 +97,7 @@ lv_indev_t * lv_indev_next(lv_indev_t * indev)
 {
 
     if(indev == NULL) {
-        return indev_list;
+        return LV_GC_ROOT(_lv_indev_list);
     } else {
         if(indev->next == NULL) return NULL;
         else return indev->next;
@@ -109,6 +114,9 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     bool cont = false;
 
+    memset(data, 0, sizeof(lv_indev_data_t));
+    data->state = LV_INDEV_STATE_REL;
+
     if(indev->driver.read) {
         data->user_data = indev->driver.user_data;
 
@@ -117,7 +125,6 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
         LV_LOG_TRACE("idnev read finished");
     } else {
         LV_LOG_WARN("indev function registered");
-        memset(data, 0, sizeof(lv_indev_data_t));
     }
 
     return cont;

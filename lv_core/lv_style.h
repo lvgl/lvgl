@@ -31,12 +31,13 @@ extern "C" {
 /*Border types (Use 'OR'ed values)*/
 enum
 {
-    LV_BORDER_NONE =   0x00,
-    LV_BORDER_BOTTOM = 0x01,
-    LV_BORDER_TOP =    0x02,
-    LV_BORDER_LEFT =   0x04,
-    LV_BORDER_RIGHT =  0x08,
-    LV_BORDER_FULL =   0x0F,
+    LV_BORDER_NONE =     0x00,
+    LV_BORDER_BOTTOM =   0x01,
+    LV_BORDER_TOP =      0x02,
+    LV_BORDER_LEFT =     0x04,
+    LV_BORDER_RIGHT =    0x08,
+    LV_BORDER_FULL =     0x0F,
+    LV_BORDER_INTERNAL = 0x10,    /*FOR matrix-like objects (e.g. Button matrix)*/
 };
 typedef uint8_t lv_border_part_t;
 
@@ -183,7 +184,7 @@ extern lv_style_t lv_style_pretty_color;
 extern lv_style_t lv_style_btn_rel;
 extern lv_style_t lv_style_btn_pr;
 extern lv_style_t lv_style_btn_tgl_rel;
-extern lv_style_t lv_style_btn_tgl_pr;;
+extern lv_style_t lv_style_btn_tgl_pr;
 extern lv_style_t lv_style_btn_ina;
 
 /**********************

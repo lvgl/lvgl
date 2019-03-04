@@ -70,19 +70,19 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
 /**
  * Get the next line of text. Check line length and break chars too.
  * @param txt a '\0' terminated string
- * @param font_p pointer to a font
+ * @param font pointer to a font
  * @param letter_space letter space
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid line breaks
- * @param flags settings for the text from 'txt_flag_t' enum
- * @return the index of the first char of the new line
+ * @param flags settings for the text from 'txt_flag_type' enum
+ * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
-uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font_p,
-                              lv_coord_t letter_space, lv_coord_t max_l, lv_txt_flag_t flag);
+uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
+                              lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font
  * @param txt a '\0' terminate string
- * @param length length of 'txt' in character count and not bytes(UTF-8 can be 1,2,3 or 4 bytes long)
+ * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in UTF-8)
  * @param font pointer to a font
  * @param letter_space letter space
  * @param flags settings for the text from 'txt_flag_t' enum
@@ -122,7 +122,7 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
  ***************************************************************/
 
 /**
- * Give the size of an encoded  character
+ * Give the size of an encoded character
  * @param str pointer to a character in a string
  * @return length of the encoded character (1,2,3 ...). O in invalid
  */

@@ -140,6 +140,13 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox);
  */
 void lv_mbox_set_style(lv_obj_t *mbox, lv_mbox_style_t type, lv_style_t *style);
 
+/**
+ * Set whether recoloring is enabled. Must be called after `lv_mbox_add_btns`.
+ * @param btnm pointer to button matrix object
+ * @param en whether recoloring is enabled
+ */
+void lv_mbox_set_recolor(lv_obj_t * mbox, bool en);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -174,6 +181,13 @@ uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox);
  * @return style pointer to a style
  */
 lv_style_t * lv_mbox_get_style(const lv_obj_t *mbox, lv_mbox_style_t type);
+
+/**
+ * Get whether recoloring is enabled
+ * @param btnm pointer to button matrix object
+ * @return whether recoloring is enabled
+ */
+bool lv_mbox_get_recolor(const lv_obj_t * mbox);
 
 /**********************
  *      MACROS
