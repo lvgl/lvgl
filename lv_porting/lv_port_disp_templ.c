@@ -53,7 +53,7 @@ void lv_port_disp_init(void)
      * Create a buffer for drawing
      *----------------------------*/
 
-    /* LittlevGL requires a buffer where it draw the objects. The buffer's has to be greater than 1 display row
+    /* LittlevGL requires a buffer where it draws the objects. The buffer's has to be greater than 1 display row
      *
      * There are three buffering configurations:
      * 1. Create ONE buffer with some rows: 
