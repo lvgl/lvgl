@@ -334,6 +334,8 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     if(res != LV_RES_OK) return res;
 
     lv_obj_t * tileview = lv_obj_get_parent(scrl);
+    lv_style_t * style_bg = lv_tileview_get_style(tileview, LV_TILEVIEW_STYLE_BG);
+
 
     /*Apply constraint on moving of the tileview*/
     if(sign == LV_SIGNAL_CORD_CHG) {
@@ -377,7 +379,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                         lv_page_start_edge_flash(tileview);
                     }
 
-                    lv_obj_set_y(scrl, -ext->act_id.y * h);
+                    lv_obj_set_y(scrl, -ext->act_id.y * h + style_bg->body.padding.ver);
                 }
             }
             if(ext->drag_bottom_en == 0 && indev->proc.vect.y < 0 && ext->drag_hor == 0) {
@@ -390,7 +392,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                     }
                 }
 
-                lv_obj_set_y(scrl, -ext->act_id.y * h);
+                lv_obj_set_y(scrl, -ext->act_id.y * h + style_bg->body.padding.ver);
             }
             if(ext->drag_left_en == 0) {
                 if(x > -(ext->act_id.x * w) && indev->proc.vect.x > 0 && ext->drag_ver == 0) {
@@ -401,7 +403,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                         lv_page_start_edge_flash(tileview);
                     }
 
-                    lv_obj_set_x(scrl, -ext->act_id.x * w);
+                    lv_obj_set_x(scrl, -ext->act_id.x * w + style_bg->body.padding.hor);
                 }
             }
             if(ext->drag_right_en == 0 && indev->proc.vect.x < 0 && ext->drag_ver == 0) {
@@ -414,12 +416,12 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                     }
                 }
 
-                lv_obj_set_x(scrl, -ext->act_id.x * w);
+                lv_obj_set_x(scrl, -ext->act_id.x * w + style_bg->body.padding.hor);
             }
 
             /*Apply the drag constraints*/
-            if(ext->drag_ver == 0) lv_obj_set_y(scrl, - ext->act_id.y * lv_obj_get_height(tileview));
-            if(ext->drag_hor == 0) lv_obj_set_x(scrl, - ext->act_id.x * lv_obj_get_width(tileview));
+            if(ext->drag_ver == 0) lv_obj_set_y(scrl, - ext->act_id.y * lv_obj_get_height(tileview) + style_bg->body.padding.ver);
+            if(ext->drag_hor == 0) lv_obj_set_x(scrl, - ext->act_id.x * lv_obj_get_width(tileview) + style_bg->body.padding.hor);
         }
     }
 
