@@ -124,7 +124,7 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
         if(res != LV_FS_RES_OK || rn != sizeof(lv_img_header_t)) {
             header->w = LV_DPI;
             header->h = LV_DPI;
-            header->cf = LV_IMG_CF_UNKOWN;
+            header->cf = LV_IMG_CF_UNKNOWN;
         }
 
         lv_fs_close(&file);
@@ -150,7 +150,7 @@ uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf)
     uint8_t px_size = 0;
 
     switch(cf) {
-        case LV_IMG_CF_UNKOWN:
+        case LV_IMG_CF_UNKNOWN:
         case LV_IMG_CF_RAW:
             px_size = 0;
             break;
@@ -234,7 +234,7 @@ bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
  *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
  *  - a path to a file (e.g. "S:/folder/image.bin")
  *  - or a symbol (e.g. SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
+ * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
 lv_img_src_t lv_img_src_get_type(const void * src)
 {
