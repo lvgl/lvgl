@@ -239,16 +239,49 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
 
 /**
  * Set an offset for the source of an image.
- * so the image will be displayed from this new origin.
+ * so the image will be displayed from the new origin.
  * @param img pointer to an image
- * @param en true: auto size enable, false: auto size disable
+ * @param x: the new offset along x axis.
+ * @param y: the new offset along y axis.
  */
-void lv_img_set_offset(lv_obj_t *img, lv_point_t offset)
+void lv_img_set_offset(lv_obj_t *img, lv_coord_t x, lv_coord_t y)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    if((ext->offset.x < ext->w - 1) && (ext->offset.y < ext->h - 1))
-	    ext->offset = offset;
+    if((x < ext->w - 1) && (y < ext->h - 1)) {
+        ext->offset.x = x;
+        ext->offset.y = y;
+    }
+}
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param x: the new offset along x axis.
+ */
+void lv_img_set_offset_x(lv_obj_t *img, lv_coord_t x)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    if(x < ext->w - 1) {
+        ext->offset.x = x;
+    }
+}
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param y: the new offset along y axis.
+ */
+void lv_img_set_offset_y(lv_obj_t *img, lv_coord_t y)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    if(y < ext->h - 1) {
+        ext->offset.y = y;
+    }
 }
 
 /*=====================
