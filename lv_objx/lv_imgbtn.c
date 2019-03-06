@@ -69,7 +69,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     memset(ext->img_src_right, 0, sizeof(ext->img_src_right));
 #endif
 
-    ext->act_cf = LV_IMG_CF_UNKOWN;
+    ext->act_cf = LV_IMG_CF_UNKNOWN;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_imgbtn, lv_imgbtn_signal);
@@ -382,7 +382,7 @@ static void refr_img(lv_obj_t * imgbtn)
         lv_obj_set_height(imgbtn, header.h);
 #endif
     } else {
-        ext->act_cf = LV_IMG_CF_UNKOWN;
+        ext->act_cf = LV_IMG_CF_UNKNOWN;
     }
 
     lv_obj_invalidate(imgbtn);

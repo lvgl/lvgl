@@ -28,6 +28,9 @@ static void style_mod_edit_def(lv_group_t * group, lv_style_t * style);
 static void refresh_theme(lv_group_t * g, lv_theme_t * th);
 static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *), void * (*move)(const lv_ll_t *, const void *));
 static void lv_group_refocus(lv_group_t * g);
+static void obj_to_foreground(lv_obj_t * obj);
+
+
 
 /**********************
  *  STATIC VARIABLES
@@ -68,7 +71,15 @@ lv_group_t * lv_group_create(void)
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap = 1;
 
+#if USE_LV_USER_DATA_SINGLE
+    memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
+#endif
 
+#if USE_LV_USER_DATA_MULTI
+    memset(&group->focus_user_data, 0, sizeof(lv_group_user_data_t));
+    memset(&group->style_mod_user_data, 0, sizeof(lv_group_user_data_t));
+    memset(&group->style_mod_edit_user_data, 0, sizeof(lv_group_user_data_t));
+#endif
 
 
     /*Initialize style modification callbacks from current theme*/
@@ -201,6 +212,9 @@ void lv_group_focus_obj(lv_obj_t * obj)
                 if(g->focus_cb) g->focus_cb(g);
                 lv_obj_send_event(*g->obj_focus, LV_EVENT_FOCUSED);
                 lv_obj_invalidate(*g->obj_focus);
+
+                /*If the object or its parent has `top == true` bring it to the foregorund*/
+                obj_to_foreground(*g->obj_focus);
             }
             break;
         }
@@ -318,19 +332,6 @@ void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t p
     group->refocus_policy = policy & 0x01;
 }
 
-static void lv_group_refocus(lv_group_t *g) {
-    /*Refocus must temporarily allow wrapping to work correctly*/
-    uint8_t temp_wrap = g->wrap;
-    g->wrap = 1;
-
-    if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_NEXT)
-        lv_group_focus_next(g);
-    else if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_PREV)
-        lv_group_focus_prev(g);
-    /*Restore wrap property*/
-    g->wrap = temp_wrap;
-}
-
 /**
  * Set whether focus next/prev will allow wrapping from first->last or last->first.
  * @param group pointer to group
@@ -372,6 +373,19 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
 
     return *group->obj_focus;
 }
+
+#if USE_LV_USER_DATA_SINGLE
+/**
+ * Get a pointer to the group's user data
+ * @param group pointer to an group
+ * @return pointer to the user data
+ */
+lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
+{
+    return &group->user_data;
+}
+#endif
+
 
 /**
  * Get a the style modifier function of a group
@@ -461,6 +475,19 @@ void lv_group_report_style_mod(lv_group_t * group)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void lv_group_refocus(lv_group_t *g) {
+    /*Refocus must temporarily allow wrapping to work correctly*/
+    uint8_t temp_wrap = g->wrap;
+    g->wrap = 1;
+
+    if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_NEXT)
+        lv_group_focus_next(g);
+    else if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_PREV)
+        lv_group_focus_prev(g);
+    /*Restore wrap property*/
+    g->wrap = temp_wrap;
+}
 
 /**
  * Default style modifier function
@@ -590,9 +617,32 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
 
     (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
     lv_obj_send_event(*group->obj_focus, LV_EVENT_FOCUSED);
+
+    /*If the object or its parent has `top == true` bring it to the foregorund*/
+    obj_to_foreground(*group->obj_focus);
+
     lv_obj_invalidate(*group->obj_focus);
 
     if(group->focus_cb) group->focus_cb(group);
+}
+
+static void obj_to_foreground(lv_obj_t * obj)
+{
+    /*Search for 'top' attribute*/
+    lv_obj_t * i = obj;
+    lv_obj_t * last_top = NULL;
+    while(i != NULL) {
+        if(i->top != 0) last_top = i;
+        i = lv_obj_get_parent(i);
+    }
+
+    if(last_top != NULL) {
+        /*Move the last_top object to the foreground*/
+        lv_obj_t * par = lv_obj_get_parent(last_top);
+        /*After list change it will be the new head*/
+        lv_ll_chg_list(&par->child_ll, &par->child_ll, last_top);
+        lv_obj_invalidate(last_top);
+    }
 }
 
 #endif /*USE_LV_GROUP != 0*/

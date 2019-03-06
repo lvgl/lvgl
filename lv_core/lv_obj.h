@@ -786,9 +786,9 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
 #if USE_LV_USER_DATA_SINGLE
 /**
- * Get a pointer to the pbject's user data
+ * Get a pointer to the object's user data
  * @param obj pointer to an object
- * @return the free number
+ * @return pointer to the user data
  */
 lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj);
 #endif

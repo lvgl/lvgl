@@ -1208,6 +1208,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
     lv_obj_t * ta = lv_obj_get_parent(scrl);
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         /*Set ext. size because the cursor might be out of this object*/
         lv_style_t * style_label = lv_obj_get_style(ext->label);
@@ -1219,6 +1220,9 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
         if(ext->label) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
                     lv_obj_get_height(ta) != lv_area_get_height(param)) {
+
+                lv_obj_t * scrl = lv_page_get_scrl(ta);
+
                 lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
                 lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);
@@ -1231,7 +1235,6 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     else if(sign == LV_SIGNAL_PRESSED) {
         update_cursor_position_on_click(ta, (lv_indev_t *)param);
     }
-
 
     return res;
 }

@@ -21,6 +21,14 @@
  *      DEFINES
  *********************/
 
+/* "free" is used as a function pointer (in lv_fs_drv_t).
+ * We must make sure "free" was not defined to a platform specific
+ * free function, otherwise compilation would fail.
+ */
+#ifdef free
+#undef free
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

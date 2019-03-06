@@ -210,6 +210,18 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
  */
 lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
+#if USE_LV_USER_DATA_SINGLE
+/**
+ * Get a pointer to the group's user data
+ * @param group pointer to an group
+ * @return pointer to the user data
+ */
+lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
+{
+    return &group->user_data;
+}
+#endif
+
 /**
  * Get a the style modifier function of a group
  * @param group pointer to a group
