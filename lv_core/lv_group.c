@@ -28,6 +28,9 @@ static void style_mod_edit_def(lv_style_t * style);
 static void refresh_theme(lv_group_t * g, lv_theme_t * th);
 static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *), void * (*move)(const lv_ll_t *, const void *));
 static void lv_group_refocus(lv_group_t * g);
+static void obj_to_foreground(lv_obj_t * obj);
+
+
 
 /**********************
  *  STATIC VARIABLES
@@ -196,6 +199,9 @@ void lv_group_focus_obj(lv_obj_t * obj)
                 (*g->obj_focus)->signal_func(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
                 if(g->focus_cb) g->focus_cb(g);
                 lv_obj_invalidate(*g->obj_focus);
+
+                /*If the object or its parent has `top == true` bring it to the foregorund*/
+                obj_to_foreground(*g->obj_focus);
             }
             break;
         }
@@ -575,9 +581,32 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
     group->obj_focus = obj_next;
 
     (*group->obj_focus)->signal_func(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
+
+    /*If the object or its parent has `top == true` bring it to the foregorund*/
+    obj_to_foreground(*group->obj_focus);
+
     lv_obj_invalidate(*group->obj_focus);
 
     if(group->focus_cb) group->focus_cb(group);
+}
+
+static void obj_to_foreground(lv_obj_t * obj)
+{
+    /*Search for 'top' attribute*/
+    lv_obj_t * i = obj;
+    lv_obj_t * last_top = NULL;
+    while(i != NULL) {
+        if(i->top != 0) last_top = i;
+        i = lv_obj_get_parent(i);
+    }
+
+    if(last_top != NULL) {
+        /*Move the last_top object to the foreground*/
+        lv_obj_t * par = lv_obj_get_parent(last_top);
+        /*After list change it will be the new head*/
+        lv_ll_chg_list(&par->child_ll, &par->child_ll, last_top);
+        lv_obj_invalidate(last_top);
+    }
 }
 
 #endif /*USE_LV_GROUP != 0*/
