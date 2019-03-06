@@ -103,13 +103,30 @@ static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
  */
 void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
 
- /**
+/**
  * Set an offset for the source of an image.
- * so the image will be displayed from this new origin.
+ * so the image will be displayed from the new origin.
  * @param img pointer to an image
- * @param en true: auto size enable, false: auto size disable
+ * @param x: the new offset along x axis.
+ * @param y: the new offset along y axis.
  */
-void lv_img_set_offset(lv_obj_t *img, lv_point_t offset);
+void lv_img_set_offset(lv_obj_t *img, lv_coord_t x, lv_coord_t y);
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param x: the new offset along x axis.
+ */
+void lv_img_set_offset_x(lv_obj_t *img, lv_coord_t x);
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param y: the new offset along y axis.
+ */
+void lv_img_set_offset_y(lv_obj_t *img, lv_coord_t y);
     
 /**
  * Set the style of an image
