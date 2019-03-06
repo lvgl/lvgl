@@ -88,6 +88,9 @@
 #define USE_LV_ANIMATION        1               /*1: Enable all animations*/
 #define USE_LV_SHADOW           1               /*1: Enable shadows*/
 #define USE_LV_GROUP            1               /*1: Enable object groups (for keyboards)*/
+#if USE_LV_GROUP
+typedef void * lv_group_user_data_t;
+#endif  /*USE_LV_GROUP*/
 #define USE_LV_GPU              1               /*1: Enable GPU interface*/
 #define USE_LV_FILESYSTEM       1               /*1: Enable file system (might be required for images*/
 #define USE_LV_I18N             1               /*1: Enable InternationalizatioN (multi-language) support*/
