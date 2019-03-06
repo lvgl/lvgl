@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include <stddef.h>
+ #include <stdlib.h>
+
 #include "lv_font.h"
 #include "lv_log.h"
 
@@ -21,6 +23,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static int lv_font_codeCompare (const void* pRef, const void* pElement);
 
 /**********************
  *  STATIC VARIABLES
@@ -216,11 +220,17 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
 
-    uint32_t i;
-    for(i = 0; font->unicode_list[i] != 0; i++) {
-        if(font->unicode_list[i] == unicode_letter) {
-            return &font->glyph_bitmap[font->glyph_dsc[i].glyph_index];
-        }
+    uint32_t* pUnicode;
+
+    pUnicode = bsearch(&unicode_letter,
+                       (uint32_t*) font->unicode_list,
+                       font->glyph_cnt,
+                       sizeof(uint32_t*),
+                       lv_font_codeCompare);
+
+    if (pUnicode != NULL) {
+        uint32_t idx = (uint32_t) (pUnicode - font->unicode_list);
+        return &font->glyph_bitmap[font->glyph_dsc[idx].glyph_index];
     }
 
     return NULL;
@@ -254,11 +264,17 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return -1;
 
-    uint32_t i;
-    for(i = 0; font->unicode_list[i] != 0; i++) {
-        if(font->unicode_list[i] == unicode_letter) {
-            return font->glyph_dsc[i].w_px;
-        }
+    uint32_t* pUnicode;
+
+    pUnicode = bsearch(&unicode_letter,
+                       (uint32_t*) font->unicode_list,
+                       font->glyph_cnt,
+                       sizeof(uint32_t*),
+                       lv_font_codeCompare);
+
+    if (pUnicode != NULL) {
+        uint32_t idx = (uint32_t) (pUnicode - font->unicode_list);
+        return font->glyph_dsc[idx].w_px;
     }
 
     return -1;
@@ -267,3 +283,22 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/** Code Comparator.
+ *
+ *  Compares the value of both input arguments.
+ *
+ *  @param[in]  pRef        Pointer to the reference.
+ *  @param[in]  pElement    Pointer to the element to compare.
+ *
+ *  @return Result of comparison.
+ *  @retval < 0   Reference is greater than element.
+ *  @retval = 0   Reference is equal to element.
+ *  @retval > 0   Reference is less than element.
+ *
+ */
+static int lv_font_codeCompare (const void* pRef,
+                                const void* pElement)
+{
+    return (*(uint32_t*) pRef) - (*(uint32_t*) pElement);
+}
