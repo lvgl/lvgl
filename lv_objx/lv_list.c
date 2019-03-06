@@ -846,7 +846,8 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             if(btn != NULL) {
                 lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
                 ext->last_sel = btn;
-                lv_obj_send_event(btn, LV_EVENT_CLICKED);
+                res = lv_obj_send_event(btn, LV_EVENT_CLICKED);
+                if(res != LV_RES_OK) return res;
             }
         }
 #endif

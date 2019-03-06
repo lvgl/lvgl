@@ -575,7 +575,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             }
 
             if(tgl) {
-                lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
+                res = lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
+                if(res != LV_RES_OK) return res;
             }
 
         } else { /*If dragged change back the state*/
@@ -628,7 +629,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
             }
-            lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
+            res = lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
+            if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_CLEANUP) {
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT

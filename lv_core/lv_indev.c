@@ -466,10 +466,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->key = i->proc.types.keypad.last_key;
         if(data->key == LV_GROUP_KEY_ENTER) {
             if(i->proc.long_pr_sent == 0) {
-                lv_obj_send_event(focused, LV_EVENT_CLICKED);
-            } else {
-                lv_obj_send_event(focused, LV_EVENT_RELEASED);
+                lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
             }
+
+            lv_obj_send_event(focused, LV_EVENT_CLICKED);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+            lv_obj_send_event(focused, LV_EVENT_RELEASED);
             if(i->proc.reset_query) return;         /*The object might be deleted*/
         }
         i->proc.pr_timestamp = 0;
@@ -566,7 +569,10 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*The button was released on a non-editable object. Just send enter*/
         if(editable == false) {
             lv_group_send_data(g, LV_GROUP_KEY_ENTER);
-            if(i->proc.long_pr_sent == 0) lv_obj_send_event(focused, LV_EVENT_CLICKED);
+            if(i->proc.long_pr_sent == 0) lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+            lv_obj_send_event(focused, LV_EVENT_CLICKED);
             if(i->proc.reset_query) return;         /*The object might be deleted*/
 
             lv_obj_send_event(focused, LV_EVENT_RELEASED);
@@ -578,7 +584,10 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         else if(g->editing) {
             if(!i->proc.long_pr_sent || lv_ll_is_empty(&g->obj_ll)) {
                 lv_group_send_data(g, LV_GROUP_KEY_ENTER);  /*Ignore long pressed enter release because it comes from mode switch*/
-                lv_obj_send_event(focused, LV_EVENT_CLICKED);
+                lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+                lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
                 if(i->proc.reset_query) return;         /*The object might be deleted*/
             }
         }
@@ -783,9 +792,12 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_PRESS_LOST)) {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
             if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
-                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
+                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_SHORT_CLICKED);
                 if(proc->reset_query) return;         /*The object might be deleted*/
             }
+
+            lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
+            if(proc->reset_query) return;         /*The object might be deleted*/
 
             lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
             if(proc->reset_query) return;         /*The object might be deleted*/
@@ -796,13 +808,15 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
 
             if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
-                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
+                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_SHORT_CLICKED);
                 if(proc->reset_query) return;         /*The object might be deleted*/
             }
 
-            lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
+            lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
             if(proc->reset_query) return;         /*The object might be deleted*/
 
+            lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
+            if(proc->reset_query) return;         /*The object might be deleted*/
         }
 
         if(proc->reset_query != 0) return;

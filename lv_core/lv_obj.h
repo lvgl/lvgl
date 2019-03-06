@@ -73,15 +73,16 @@ typedef uint8_t lv_res_t;
 
 
 typedef enum {
-    LV_EVENT_PRESSED,
-    LV_EVENT_PRESSING,
-    LV_EVENT_PRESS_LOST,
-    LV_EVENT_RELEASED,
-    LV_EVENT_CLICKED,
-    LV_EVENT_LONG_PRESSED,
-    LV_EVENT_LONG_PRESSED_REPEAT,
-    LV_EVENT_LONG_HOVER_IN,
-    LV_EVENT_LONG_HOVER_OUT,
+    LV_EVENT_PRESSED,           /*The object has been pressed*/
+    LV_EVENT_PRESSING,          /*The object is being pressed (called continuously while pressing)*/
+    LV_EVENT_PRESS_LOST,        /*Still pressing but slid from the objects*/
+    LV_EVENT_SHORT_CLICKED,     /*Released before long press time. Not called if dragged.*/
+    LV_EVENT_LONG_PRESSED,      /*Pressing for `LV_INDEV_LONG_PRESS_TIME` time.  Not called if dragged.*/
+    LV_EVENT_LONG_PRESSED_REPEAT, /*Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
+    LV_EVENT_CLICKED,           /*Called on release if not dragged (regardless to long press)*/
+    LV_EVENT_RELEASED,          /*Called in every cases when the object has been released*/
+    LV_EVENT_LONG_HOVER_IN,     /*TODO*/
+    LV_EVENT_LONG_HOVER_OUT,    /*TODO*/
     LV_EVENT_DRAG_BEGIN,
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,

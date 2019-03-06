@@ -441,6 +441,8 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
     }
 
     placeholder_update(ta);
+
+    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
 }
 
 /**

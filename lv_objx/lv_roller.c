@@ -404,7 +404,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
-            lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+            res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+            if(res != LV_RES_OK) return res;
 
 #if LV_USE_GROUP
             lv_group_t * g = lv_obj_get_group(roller);
@@ -459,7 +460,8 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
         ext->ddlist.sel_opt_id = id;
-        lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+        res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+        if(res != LV_RES_OK) return res;
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If picked an option by clicking then set it*/
         if(!lv_indev_is_dragging(indev)) {
@@ -470,7 +472,8 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
             if(id < 0) id = 0;
             if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
             ext->ddlist.sel_opt_id = id;
-            lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+            res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+            if(res != LV_RES_OK) return res;
         }
     }
 

@@ -63,8 +63,6 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_spinbox);
 
     /*Initialize the allocated 'ext'*/
-    ext->ta.accapted_chars = "1234567890+-. ";
-
     ext->value = 0;
     ext->dec_point_pos = 0;
     ext->digit_count = 5;
@@ -72,7 +70,6 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->step = 1;
     ext->range_max = 99999;
     ext->range_min = -99999;
-    ext->value_changed_cb = NULL;
 
     lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK | LV_CURSOR_HIDDEN); /*hidden by default*/
     lv_ta_set_one_line(new_spinbox, true);
@@ -199,17 +196,6 @@ void lv_spinbox_set_range(lv_obj_t * spinbox, int32_t range_min, int32_t range_m
 }
 
 /**
- * Set spinbox callback on calue change
- * @param spinbox pointer to spinbox
- * @param cb Callback function called on value change event
- */
-void lv_spinbox_set_value_changed_cb(lv_obj_t * spinbox, lv_spinbox_value_changed_cb_t cb)
-{
-    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-    ext->value_changed_cb = cb;
-}
-
-/**
  * Set spinbox left padding in digits count (added between sign and first digit)
  * @param spinbox pointer to spinbox
  * @param cb Callback function called on value change event
@@ -288,7 +274,6 @@ void lv_spinbox_increment(lv_obj_t * spinbox)
         ext->value = ext->range_max;
     }
 
-    if(ext->value_changed_cb != NULL)  ext->value_changed_cb(spinbox, ext->value);
     lv_spinbox_updatevalue(spinbox);
 }
 
@@ -308,7 +293,6 @@ void lv_spinbox_decrement(lv_obj_t * spinbox)
         ext->value = ext->range_min;
     }
 
-    if(ext->value_changed_cb != NULL) ext->value_changed_cb(spinbox, ext->value);
     lv_spinbox_updatevalue(spinbox);
 }
 
@@ -449,7 +433,6 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     /*Refresh the text*/
     lv_ta_set_text(spinbox, (char*)buf);
-
 
     /*Set the cursor position*/
     int32_t step = ext->step;
