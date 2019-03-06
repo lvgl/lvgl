@@ -37,7 +37,7 @@ static const void * decoder_src;
 static lv_img_src_t decoder_src_type;
 static lv_img_header_t decoder_header;
 static const lv_style_t * decoder_style;
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
 static lv_fs_file_t decoder_file;
 #endif
 #if LV_IMG_CF_INDEXED
@@ -110,7 +110,7 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
         header->h = ((lv_img_dsc_t *)src)->header.h;
         header->cf = ((lv_img_dsc_t *)src)->header.cf;
     }
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
     else if(src_type == LV_IMG_SRC_FILE) {
         lv_fs_file_t file;
         lv_fs_res_t res;
@@ -233,7 +233,7 @@ bool lv_img_color_format_has_alpha(lv_img_cf_t cf)
  * @param src pointer to an image source:
  *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
  *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. SYMBOL_CLOSE)
+ *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
  * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
 lv_img_src_t lv_img_src_get_type(const void * src)
@@ -383,14 +383,14 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
 
     /*Open the file if it's a file*/
     if(decoder_src_type == LV_IMG_SRC_FILE) {
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
         lv_fs_res_t res = lv_fs_open(&decoder_file, src, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) {
             LV_LOG_WARN("Built-in image decoder can't open the file");
             return LV_IMG_DECODER_OPEN_FAIL;
         }
 #else
-        LV_LOG_WARN("Image built-in decoder can read file because USE_LV_FILESYSTEM = 0");
+        LV_LOG_WARN("Image built-in decoder can read file because LV_USE_FILESYSTEM = 0");
         return LV_IMG_DECODER_OPEN_FAIL;
 #endif
     }
@@ -414,7 +414,7 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
               cf == LV_IMG_CF_INDEXED_8BIT) {
 
 #if LV_IMG_CF_INDEXED
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
         lv_color32_t palette_file[256];
 #endif
 
@@ -424,12 +424,12 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
 
         if(decoder_src_type == LV_IMG_SRC_FILE) {
             /*Read the palette from file*/
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
             lv_fs_seek(&decoder_file, 4);   /*Skip the header*/
             lv_fs_read(&decoder_file, palette_file, palette_size * sizeof(lv_color32_t), NULL);
             palette_p = palette_file;
 #else
-            LV_LOG_WARN("Image built-in decoder can read the palette because USE_LV_FILESYSTEM = 0");
+            LV_LOG_WARN("Image built-in decoder can read the palette because LV_USE_FILESYSTEM = 0");
             return LV_IMG_DECODER_OPEN_FAIL;
 #endif
         } else {
@@ -478,7 +478,7 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
     }
 
     if(decoder_src_type == LV_IMG_SRC_FILE) {
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
         uint8_t px_size = lv_img_color_format_get_px_size(decoder_header.cf);
 
         lv_fs_res_t res;
@@ -516,7 +516,7 @@ static lv_res_t lv_img_decoder_read_line(lv_coord_t x, lv_coord_t y, lv_coord_t 
             return false;
         }
 #else
-        LV_LOG_WARN("Image built-in decoder can't read file because USE_LV_FILESYSTEM = 0");
+        LV_LOG_WARN("Image built-in decoder can't read file because LV_USE_FILESYSTEM = 0");
         return false;
 #endif
     } else if(decoder_src_type == LV_IMG_SRC_VARIABLE) {
@@ -551,7 +551,7 @@ static void lv_img_decoder_close(void)
 
     /*It was opened with built-in decoder*/
     if(decoder_src) {
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
         if(decoder_src_type == LV_IMG_SRC_FILE) {
             lv_fs_close(&decoder_file);
         }
@@ -626,7 +626,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
             break;
     }
 
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
 # if LV_COMPILER_VLA_SUPPORTED
     uint8_t fs_buf[w];
 # else
@@ -638,12 +638,12 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
         const lv_img_dsc_t * img_dsc = decoder_src;
         data_tmp = img_dsc->data + ofs;
     } else {
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
         lv_fs_seek(&decoder_file, ofs + 4);     /*+4 to skip the header*/
         lv_fs_read(&decoder_file, fs_buf, w, NULL);
         data_tmp = fs_buf;
 #else
-        LV_LOG_WARN("Image built-in alpha line reader can't read file because USE_LV_FILESYSTEM = 0");
+        LV_LOG_WARN("Image built-in alpha line reader can't read file because LV_USE_FILESYSTEM = 0");
         data_tmp = NULL;        /*To avoid warnings*/
         return LV_RES_INV;
 #endif
@@ -713,7 +713,7 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
             break;
     }
 
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
 # if LV_COMPILER_VLA_SUPPORTED
     uint8_t fs_buf[w];
 # else
@@ -725,12 +725,12 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
         const lv_img_dsc_t * img_dsc = decoder_src;
         data_tmp = img_dsc->data + ofs;
     } else {
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
         lv_fs_seek(&decoder_file, ofs + 4);     /*+4 to skip the header*/
         lv_fs_read(&decoder_file, fs_buf, w, NULL);
         data_tmp = fs_buf;
 #else
-        LV_LOG_WARN("Image built-in indexed line reader can't read file because USE_LV_FILESYSTEM = 0");
+        LV_LOG_WARN("Image built-in indexed line reader can't read file because LV_USE_FILESYSTEM = 0");
         data_tmp = NULL;        /*To avoid warnings*/
         return LV_RES_INV;
 #endif

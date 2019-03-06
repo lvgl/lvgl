@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_cb.h"
-#if USE_LV_CB != 0
+#if LV_USE_CB != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
@@ -283,7 +283,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_bullet_design(bullet, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /* If the check box is the active in a group and
          * the background is not visible (transparent)
          * then activate the style of the bullet*/
@@ -301,7 +301,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
 #endif
         ancestor_bullet_design(bullet, mask, mode);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         bullet->style_p = style_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {

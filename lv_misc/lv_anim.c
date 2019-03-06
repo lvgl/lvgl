@@ -8,7 +8,7 @@
  *********************/
 #include "lv_anim.h"
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 #include <stddef.h>
 #include <string.h>
 #include "../lv_hal/lv_hal_tick.h"
@@ -128,7 +128,7 @@ uint16_t lv_anim_count_running(void)
 {
     uint16_t cnt = 0;
     lv_anim_t * a;
-    LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
+    LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
 
     return cnt++;
 }
@@ -357,7 +357,7 @@ static void anim_task(void * param)
     (void)param;
 
     lv_anim_t * a;
-    LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
+    LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
         a->has_run = 0;
     }
 

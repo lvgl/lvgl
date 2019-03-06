@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_roller.h"
-#if USE_LV_ROLLER != 0
+#if LV_USE_ROLLER != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 #  ifndef LV_ROLLER_ANIM_TIME
 #    define LV_ROLLER_ANIM_TIME     200         /*ms*/
 #  endif
@@ -144,7 +144,7 @@ void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
  */
 void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, bool anim_en)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_en = false;
 #endif
 
@@ -361,7 +361,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             refr_position(roller, false);
         }
     } else if(sign == LV_SIGNAL_FOCUS) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(roller);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -385,7 +385,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
 #endif
     } else if(sign == LV_SIGNAL_DEFOCUS) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /*Revert the original state*/
         if(ext->ddlist.sel_opt_id != ext->ddlist.sel_opt_id_ori) {
             ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id_ori;
@@ -406,7 +406,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
             lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
             lv_group_t * g = lv_obj_get_group(roller);
             bool editing = lv_group_get_editing(g);
             if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
@@ -544,7 +544,7 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
  */
 static void refr_position(lv_obj_t * roller, bool anim_en)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_en = false;
 #endif
     lv_obj_t * roller_scrl = lv_page_get_scrl(roller);
@@ -560,7 +560,7 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
     if(ext->ddlist.anim_time == 0 || anim_en == false) {
         lv_obj_set_y(roller_scrl, new_y);
     } else {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
         lv_anim_t a;
         a.var = roller_scrl;
         a.start = lv_obj_get_y(roller_scrl);

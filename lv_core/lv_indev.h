@@ -74,7 +74,7 @@ void lv_indev_enable(lv_hal_indev_type_t type, bool enable);
  */
 void lv_indev_set_cursor(lv_indev_t *indev, lv_obj_t *cur_obj);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 /**
  * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device

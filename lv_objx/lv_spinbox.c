@@ -8,7 +8,7 @@
  *********************/
 #include "lv_spinbox.h"
 
-#if USE_LV_SPINBOX != 0
+#if LV_USE_SPINBOX != 0
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
 

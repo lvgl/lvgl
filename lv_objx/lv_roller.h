@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_ROLLER != 0
+#if LV_USE_ROLLER != 0
 
 /*Testing of dependencies*/
-#if USE_LV_DDLIST == 0
-#error "lv_roller: lv_ddlist is required. Enable it in lv_conf.h (USE_LV_DDLIST  1) "
+#if LV_USE_DDLIST == 0
+#error "lv_roller: lv_ddlist is required. Enable it in lv_conf.h (LV_USE_DDLIST  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -195,7 +195,7 @@ lv_style_t * lv_roller_get_style(const lv_obj_t *roller, lv_roller_style_t type)
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_ROLLER*/
+#endif  /*LV_USE_ROLLER*/
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -143,12 +143,12 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 {
     if(indev->driver.type != LV_INDEV_TYPE_POINTER) return;
 
-    indev->custom_data.cursor = cur_obj;
-    lv_obj_set_parent(indev->custom_data.cursor, lv_disp_get_layer_sys(indev->driver.disp));
-    lv_obj_set_pos(indev->custom_data.cursor, indev->proc.types.pointer.act_point.x,  indev->proc.types.pointer.act_point.y);
+    indev->cursor = cur_obj;
+    lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
+    lv_obj_set_pos(indev->cursor, indev->proc.types.pointer.act_point.x,  indev->proc.types.pointer.act_point.y);
 }
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 /**
  * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device
@@ -157,7 +157,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
 {
     if(indev->driver.type == LV_INDEV_TYPE_KEYPAD || indev->driver.type == LV_INDEV_TYPE_ENCODER) {
-        indev->custom_data.group = group;
+        indev->group = group;
     }
 }
 #endif
@@ -171,7 +171,7 @@ void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
 void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t * points)
 {
     if(indev->driver.type == LV_INDEV_TYPE_BUTTON) {
-        indev->custom_data.btn_points = points;
+        indev->btn_points = points;
     }
 }
 
@@ -326,7 +326,6 @@ static void indev_proc_task(void * param)
                 if(i->proc.state == LV_INDEV_STATE_PR) {
                     i->last_activity_time = lv_tick_get();
                 }
-
                 if(i->driver.type == LV_INDEV_TYPE_POINTER) {
                     indev_pointer_proc(i, &data);
                 } else if(i->driver.type == LV_INDEV_TYPE_KEYPAD) {
@@ -357,10 +356,10 @@ static void indev_proc_task(void * param)
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
     /*Move the cursor if set and moved*/
-    if(i->custom_data.cursor != NULL &&
+    if(i->cursor != NULL &&
             (i->proc.types.pointer.last_point.x != data->point.x ||
              i->proc.types.pointer.last_point.y != data->point.y)) {
-        lv_obj_set_pos(i->custom_data.cursor, data->point.x, data->point.y);
+        lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
     }
 
     i->proc.types.pointer.act_point.x = data->point.x;
@@ -383,8 +382,8 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-#if USE_LV_GROUP
-    lv_group_t * g = i->custom_data.group;
+#if LV_USE_GROUP
+    lv_group_t * g = i->group;
     if(g == NULL) return;
 
     lv_obj_t * focused = lv_group_get_focused(g);
@@ -399,8 +398,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*Simulate a press on the object if ENTER was pressed*/
         if(data->key == LV_GROUP_KEY_ENTER) {
             lv_obj_send_event(focused, LV_EVENT_PRESSED);
-            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
             if(i->proc.reset_query) return;     /*The object might be deleted*/
+            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
         }
         /*Move the focus on NEXT*/
         else if(data->key == LV_GROUP_KEY_NEXT) {
@@ -492,8 +491,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-#if USE_LV_GROUP
-    lv_group_t * g = i->custom_data.group;
+#if LV_USE_GROUP
+    lv_group_t * g = i->group;
     if(g == NULL) return;
 
     lv_obj_t * focused = lv_group_get_focused(g);
@@ -534,7 +533,10 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.types.keypad.last_state == LV_INDEV_STATE_REL)
     {
         i->proc.pr_timestamp = lv_tick_get();
-        if(lv_group_get_editing(g) == true || editable == false) lv_obj_send_event(focused, LV_EVENT_PRESSED);
+        if(lv_group_get_editing(g) == true || editable == false) {
+            lv_obj_send_event(focused, LV_EVENT_PRESSED);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
+        }
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
@@ -547,11 +549,13 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 else {
                     /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
                     lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED);
+                    if(i->proc.reset_query) return;         /*The object might be deleted*/
                 }
             }
             /*If not editable then just send a long press signal*/
             else {
                 lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
             }
             i->proc.long_pr_sent = 1;
         }
@@ -563,7 +567,10 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         if(editable == false) {
             lv_group_send_data(g, LV_GROUP_KEY_ENTER);
             if(i->proc.long_pr_sent == 0) lv_obj_send_event(focused, LV_EVENT_CLICKED);
-            else lv_obj_send_event(focused, LV_EVENT_RELEASED);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+            lv_obj_send_event(focused, LV_EVENT_RELEASED);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
 
             if(i->proc.reset_query) return;         /*The object might be deleted*/
         }
@@ -572,7 +579,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(!i->proc.long_pr_sent || lv_ll_is_empty(&g->obj_ll)) {
                 lv_group_send_data(g, LV_GROUP_KEY_ENTER);  /*Ignore long pressed enter release because it comes from mode switch*/
                 lv_obj_send_event(focused, LV_EVENT_CLICKED);
-
                 if(i->proc.reset_query) return;         /*The object might be deleted*/
             }
         }
@@ -580,8 +586,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         else if(editable && !g->editing && !i->proc.long_pr_sent) {
             lv_group_set_editing(g, true);  /*Set edit mode*/
         }
-
-        if(i->proc.reset_query) return;     /*The object might be deleted in `focus_cb` or due to any other user event*/
 
         i->proc.pr_timestamp = 0;
         i->proc.long_pr_sent = 0;
@@ -603,8 +607,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    i->proc.types.pointer.act_point.x = i->custom_data.btn_points[data->btn_id].x;
-    i->proc.types.pointer.act_point.y = i->custom_data.btn_points[data->btn_id].y;
+    i->proc.types.pointer.act_point.x = i->btn_points[data->btn_id].x;
+    i->proc.types.pointer.act_point.y = i->btn_points[data->btn_id].y;
 
     /*Still the same point is pressed*/
     if(i->proc.types.pointer.last_point.x == i->proc.types.pointer.act_point.x &&
@@ -624,6 +628,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 /**
  * Process the pressed state of LV_INDEV_TYPE_POINER input devices
  * @param indev pointer to an input device 'proc'
+ * @return LV_RES_OK: no indev reset required; LV_RES_INV: indev reset is required
  */
 static void indev_proc_press(lv_indev_proc_t * proc)
 {
@@ -661,8 +666,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         if(proc->types.pointer.act_obj != NULL) {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
             lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_PRESS_LOST);
-
-            if(proc->reset_query != 0) return;
+            if(proc->reset_query) return;         /*The object might be deleted*/
         }
 
         proc->types.pointer.act_obj = pr_obj;           /*Save the pressed object*/
@@ -699,7 +703,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             /*Send a signal about the press*/
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESSED, indev_act);
             lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_PRESSED);
-            if(proc->reset_query != 0) return;
+            if(proc->reset_query) return;         /*The object might be deleted*/
         }
     }
 
@@ -723,7 +727,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     if(proc->types.pointer.act_obj != NULL) {
         proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESSING, indev_act);
         lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_PRESSING);
-        if(proc->reset_query != 0) return;
+        if(proc->reset_query) return;         /*The object might be deleted*/
 
         indev_drag(proc);
         if(proc->reset_query != 0) return;
@@ -734,7 +738,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             if(lv_tick_elaps(proc->pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
                 pr_obj->signal_cb(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
                 lv_obj_send_event(pr_obj, LV_EVENT_LONG_PRESSED);
-                if(proc->reset_query != 0) return;
+                if(proc->reset_query) return;         /*The object might be deleted*/
 
                 /*Mark the signal sending to do not send it again*/
                 proc->long_pr_sent = 1;
@@ -749,7 +753,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             if(lv_tick_elaps(proc->longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
                 pr_obj->signal_cb(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
                 lv_obj_send_event(pr_obj, LV_EVENT_LONG_PRESSED_REPEAT);
-                if(proc->reset_query != 0) return;
+                if(proc->reset_query) return;         /*The object might be deleted*/
                 proc->longpr_rep_timestamp = lv_tick_get();
 
             }
@@ -775,31 +779,36 @@ static void indev_proc_release(lv_indev_proc_t * proc)
     if(proc->types.pointer.act_obj) {
         /* If the object was protected against press lost then it possible that
          * the object is already not pressed but still it is the `act_obj`.
-         * In this case send the `LV_SIGNAL_RELEASED/CLICKED` of `LV_SIGNAL_PRESS_LOST`  if the indev is ON the `types.pointer.act_obj` */
+         * In this case send the `LV_SIGNAL_RELEASED/CLICKED` instead of `LV_SIGNAL_PRESS_LOST` if the indev is ON the `types.pointer.act_obj` */
         if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_PRESS_LOST)) {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
             if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
                 lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
-            } else {
-                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
+                if(proc->reset_query) return;         /*The object might be deleted*/
             }
+
+            lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
+            if(proc->reset_query) return;         /*The object might be deleted*/
         }
-        /* The simple case: `types.pointer.act_obj` was not protected against press lost.
+        /* The simple case: `act_obj` was not protected against press lost.
          * If it is already not pressed then was `indev_proc_press` would set `act_obj = NULL`*/
         else {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
 
             if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
                 lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_CLICKED);
-            } else {
-                lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
+                if(proc->reset_query) return;         /*The object might be deleted*/
             }
+
+            lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_RELEASED);
+            if(proc->reset_query) return;         /*The object might be deleted*/
+
         }
 
         if(proc->reset_query != 0) return;
 
         /*Handle click focus*/
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /*Edit mode is not used by POINTER devices. So leave edit mode if we are in it*/
         lv_group_t * g = lv_obj_get_group(proc->types.pointer.act_obj);
         if(lv_group_get_editing(g)) lv_group_set_editing(g, false);
@@ -833,7 +842,11 @@ static void indev_proc_release(lv_indev_proc_t * proc)
          * a focus/defucus signal because of `click focus`*/
         if(proc->types.pointer.last_pressed != proc->types.pointer.act_obj) {
             lv_obj_send_event(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED);
+            if(proc->reset_query) return;           /*Not so strict as it's only the previous object and indev not uses it.*/
+
             lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_FOCUSED);
+            if(proc->reset_query) return;         /*The object might be deleted*/
+
             proc->types.pointer.last_pressed = proc->types.pointer.act_obj;
         }
 
@@ -891,7 +904,7 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
     if(lv_area_is_point_on(&obj->coords, &proc->types.pointer.act_point)) {
         lv_obj_t * i;
 
-        LL_READ(obj->child_ll, i) {
+        LV_LL_READ(obj->child_ll, i) {
             found_p = indev_search_obj(proc, i);
 
             /*If a child was found then break*/

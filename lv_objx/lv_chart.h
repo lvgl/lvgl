@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_CHART != 0
+#if LV_USE_CHART != 0
 
 #include "../lv_core/lv_obj.h"
 #include "lv_line.h"
@@ -253,7 +253,7 @@ void lv_chart_refresh(lv_obj_t * chart);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CHART*/
+#endif  /*LV_USE_CHART*/
 
 #ifdef __cplusplus
 } /* extern "C" */

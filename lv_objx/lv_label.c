@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_label.h"
-#if USE_LV_LABEL != 0
+#if LV_USE_LABEL != 0
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_group.h"
@@ -40,7 +40,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
 static void lv_label_refr_text(lv_obj_t * label);
 static void lv_label_revert_dots(lv_obj_t * label);
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x);
 static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
 #endif
@@ -244,7 +244,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     /*Delete the old animation (if exists)*/
     lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_x);
     lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_y);
@@ -635,7 +635,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         lv_opa_t opa_scale = lv_obj_get_opa_scale(label);
         lv_obj_get_coords(label, &coords);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(label);
         if(lv_group_get_focused(g) == label) {
             lv_draw_rect(&coords, mask, style, opa_scale);
@@ -766,7 +766,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         /*Start scrolling if the label is greater then its parent*/
         if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
             lv_obj_t * parent = lv_obj_get_parent(label);
 
             /*Delete the potential previous scroller animations*/
@@ -802,7 +802,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     }
     /*In roll mode keep the size but start offset animations*/
     else if(ext->long_mode == LV_LABEL_LONG_ROLL) {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
         lv_anim_t anim;
         anim.var = label;
         anim.repeat = 1;
@@ -926,7 +926,7 @@ static void lv_label_revert_dots(lv_obj_t * label)
     ext->dot_end = LV_LABEL_DOT_END_INV;
 }
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 static void lv_label_set_offset_x(lv_obj_t * label, lv_coord_t x)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);

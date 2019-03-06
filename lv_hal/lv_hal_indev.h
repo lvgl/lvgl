@@ -71,11 +71,11 @@ typedef struct _lv_indev_drv_t {
     lv_hal_indev_type_t type;                                   /*Input device type*/
     bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t *data);        /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb (buffered)*/
 
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
     lv_indev_drv_user_data_t read_user_data;                        /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
 #endif
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
     lv_indev_drv_user_data_t user_data;
 #endif
     struct _disp_t * disp;                                      /*Pointer to the assigned display*/
@@ -127,12 +127,9 @@ typedef struct _lv_indev_t {
     lv_indev_proc_t proc;
     lv_indev_feedback_t feedback;
     uint32_t last_activity_time;
-    union {
-        struct _lv_obj_t *cursor;       /*Cursor for LV_INPUT_TYPE_POINTER*/
-        struct _lv_group_t *group;      /*Keypad destination group*/
-        const lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
-
-    }custom_data;
+    struct _lv_obj_t *cursor;       /*Cursor for LV_INPUT_TYPE_POINTER*/
+    struct _lv_group_t *group;      /*Keypad destination group*/
+    const lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
 } lv_indev_t;
 
 /**********************

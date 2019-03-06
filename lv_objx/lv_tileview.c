@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_tileview.h"
-#if USE_LV_TILEVIEW != 0
+#if LV_USE_TILEVIEW != 0
 
 #include <stdbool.h>
 #include "lv_cont.h"
@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 #  ifndef LV_TILEVIEW_ANIM_TIME
 #    define LV_TILEVIEW_ANIM_TIME  300 /*Animation time loading a tile [ms] (0: no animation)  */
 #  endif
@@ -164,7 +164,7 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * val
  */
 void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, bool anim_en)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_en = false;
 #endif
 
@@ -192,7 +192,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
     lv_coord_t y_coord = -y * lv_obj_get_height(tileview);
     lv_obj_t * scrl = lv_page_get_scrl(tileview);
     if(anim_en) {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
         lv_coord_t x_act = lv_obj_get_x(scrl);
         lv_coord_t y_act = lv_obj_get_y(scrl);
 

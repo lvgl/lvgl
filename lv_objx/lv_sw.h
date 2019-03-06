@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_SW != 0
+#if LV_USE_SW != 0
 
 /*Testing of dependencies*/
-#if USE_LV_SLIDER == 0
-#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (USE_LV_SLIDER  1)"
+#if LV_USE_SLIDER == 0
+#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1)"
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -47,7 +47,7 @@ typedef struct
     lv_coord_t start_x;
     uint8_t changed   :1;           /*Indicates the switch state explicitly changed by drag*/
     uint8_t slided  :1;
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     uint16_t anim_time;				/*switch animation time */
 #endif
 } lv_sw_ext_t;
@@ -106,7 +106,7 @@ bool lv_sw_toggle(lv_obj_t *sw, bool anim);
  */
 void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style);
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 /**
  * Set the animation time of the switch
  * @param sw pointer to a  switch object
@@ -149,7 +149,7 @@ uint16_t lv_sw_get_anim_time(const lv_obj_t *sw);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_SW*/
+#endif  /*LV_USE_SW*/
 
 #ifdef __cplusplus
 } /* extern "C" */

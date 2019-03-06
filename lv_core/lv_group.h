@@ -39,7 +39,7 @@ extern "C" {
 #define LV_GROUP_KEY_HOME           2       /*0x02, STX*/
 #define LV_GROUP_KEY_END            3       /*0x03, ETX*/
 
-#if USE_LV_GROUP  != 0
+#if LV_USE_GROUP  != 0
 /**********************
  *      TYPEDEFS
  **********************/
@@ -56,11 +56,11 @@ typedef struct _lv_group_t
     lv_group_style_mod_func_t style_mod_edit;/*A function which modifies the style of the focused object*/
     lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
     lv_group_user_data_t    user_data;
 #endif
 
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
     lv_group_user_data_t    focus_user_data;
     lv_group_user_data_t    style_mod_user_data;
     lv_group_user_data_t    style_mod_edit_user_data;
@@ -210,16 +210,14 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
  */
 lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
 /**
  * Get a pointer to the group's user data
  * @param group pointer to an group
  * @return pointer to the user data
  */
-lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
-{
-    return &group->user_data;
-}
+lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group);
+
 #endif
 
 /**
@@ -274,7 +272,7 @@ void lv_group_report_style_mod(lv_group_t * group);
  *      MACROS
  **********************/
 
-#endif /*USE_LV_GROUP != 0*/
+#endif /*LV_USE_GROUP != 0*/
 
 #ifdef __cplusplus
 } /* extern "C" */

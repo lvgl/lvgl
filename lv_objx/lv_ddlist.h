@@ -19,15 +19,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_DDLIST != 0
+#if LV_USE_DDLIST != 0
 
 /*Testing of dependencies*/
-#if USE_LV_PAGE == 0
-#error "lv_ddlist: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#if LV_USE_PAGE == 0
+#error "lv_ddlist: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
 #endif
 
-#if USE_LV_LABEL == 0
-#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -257,7 +257,7 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim_en);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_DDLIST*/
+#endif  /*LV_USE_DDLIST*/
 
 #ifdef __cplusplus
 } /* extern "C" */

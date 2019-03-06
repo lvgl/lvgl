@@ -8,11 +8,11 @@
  *********************/
 #include "lv_sw.h"
 
-#if USE_LV_SW != 0
+#if LV_USE_SW != 0
 
 /*Testing of dependencies*/
-#if USE_LV_SLIDER == 0
-#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (USE_LV_SLIDER  1) "
+#if LV_USE_SLIDER == 0
+#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1) "
 #endif
 
 #include "../lv_themes/lv_theme.h"
@@ -68,7 +68,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->changed = 0;
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     ext->anim_time = 0;
 #endif
     ext->style_knob_off = ext->slider.style_knob;
@@ -100,7 +100,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_sw_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->style_knob_off = copy_ext->style_knob_off;
         ext->style_knob_on = copy_ext->style_knob_on;
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
         ext->anim_time = copy_ext->anim_time;
 #endif
 
@@ -128,7 +128,7 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_sw_on(lv_obj_t * sw, bool anim)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim = false;
 #endif
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
@@ -143,7 +143,7 @@ void lv_sw_on(lv_obj_t * sw, bool anim)
  */
 void lv_sw_off(lv_obj_t * sw, bool anim)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim = false;
 #endif
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
@@ -159,7 +159,7 @@ void lv_sw_off(lv_obj_t * sw, bool anim)
  */
 bool lv_sw_toggle(lv_obj_t *sw, bool anim)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim = false;
 #endif
 
@@ -200,7 +200,7 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
 
 void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->anim_time = anim_time;
 #endif
@@ -246,7 +246,7 @@ lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
 uint16_t lv_sw_get_anim_time(const lv_obj_t *sw)
 {
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 	lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 	return ext->anim_time;
 #else

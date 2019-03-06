@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_calendar.h"
-#if USE_LV_CALENDAR != 0
+#if LV_USE_CALENDAR != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_hal/lv_hal_indev.h"
@@ -690,14 +690,14 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the left arrow*/
     lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 += ext->style_header->body.padding.hor;
-    lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL);
 
     /*Add the right arrow*/
     arrow_style = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 = header_area.x2 - ext->style_header->body.padding.hor -
-            lv_txt_get_width(SYMBOL_RIGHT, strlen(SYMBOL_RIGHT), arrow_style->text.font,
+            lv_txt_get_width(LV_SYMBOL_RIGHT, strlen(LV_SYMBOL_RIGHT), arrow_style->text.font,
                     arrow_style->text.line_space, LV_TXT_FLAG_NONE);
-    lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
 
 }
 

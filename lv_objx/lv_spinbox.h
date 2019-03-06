@@ -20,11 +20,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_SPINBOX != 0
+#if LV_USE_SPINBOX != 0
 
 /*Testing of dependencies*/
-#if USE_LV_TA == 0
-#error "lv_spinbox: lv_ta is required. Enable it in lv_conf.h (USE_LV_TA  1) "
+#if LV_USE_TA == 0
+#error "lv_spinbox: lv_ta is required. Enable it in lv_conf.h (LV_USE_TA  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -192,7 +192,7 @@ void lv_spinbox_decrement(lv_obj_t * spinbox);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_SPINBOX*/
+#endif  /*LV_USE_SPINBOX*/
 
 #ifdef __cplusplus
 } /* extern "C" */

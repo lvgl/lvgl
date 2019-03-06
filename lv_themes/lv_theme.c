@@ -80,7 +80,7 @@ void lv_theme_set_current(lv_theme_t * th)
         if(s) memcpy(&th_styles[i], (void *)s, sizeof(lv_style_t));
     }
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     /*Copy group style modification callback functions*/
     memcpy(&current_theme.group, &th->group, sizeof(th->group));
 #endif
@@ -88,7 +88,7 @@ void lv_theme_set_current(lv_theme_t * th)
     /*Let the object know their style might change*/
     lv_obj_report_style_mod(NULL);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     lv_group_report_style_mod(NULL);
 #endif
 

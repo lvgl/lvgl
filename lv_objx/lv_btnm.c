@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_btnm.h"
-#if USE_LV_BTNM != 0
+#if LV_USE_BTNM != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
@@ -765,7 +765,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
                     }
 
-        #if USE_LV_GROUP
+        #if LV_USE_GROUP
                     /*Leave the clicked button when releases if this not the focused object in a group*/
                     lv_group_t * g = lv_obj_get_group(btnm);
                     if(lv_group_get_focused(g) != btnm) {
@@ -782,7 +782,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         ext->btn_id_pr = LV_BTNM_PR_NONE;
         lv_obj_invalidate(btnm);
     } else if(sign == LV_SIGNAL_FOCUS) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_indev_t * indev = lv_indev_get_act();
         lv_hal_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_POINTER) {

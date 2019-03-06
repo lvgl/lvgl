@@ -8,7 +8,7 @@
  *********************/
 #include "lv_line.h"
 
-#if USE_LV_LINE != 0
+#if LV_USE_LINE != 0
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_math.h"
 #include <stdbool.h>

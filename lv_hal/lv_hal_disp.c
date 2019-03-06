@@ -61,7 +61,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->ver_res = LV_VER_RES_MAX;
     driver->buffer = NULL;
 
-#if USE_LV_GPU
+#if LV_USE_GPU
     driver->mem_blend = NULL;
     driver->mem_fill = NULL;
 #endif

@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_gauge.h"
-#if USE_LV_GAUGE != 0
+#if LV_USE_GAUGE != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"

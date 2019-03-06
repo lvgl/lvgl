@@ -83,18 +83,18 @@ typedef struct _disp_drv_t {
     void (*monitor_cb)(struct _disp_drv_t * disp_drv, uint32_t time, uint32_t px);
 
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
     lv_disp_drv_user_data_t user_data;
 #endif
 
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
     lv_disp_drv_user_data_t flush_user_data;
     lv_disp_drv_user_data_t rounder_user_data;
     lv_disp_drv_user_data_t set_px_user_data;
     lv_disp_drv_user_data_t monitor_user_data;
 #endif
 
-#if USE_LV_GPU
+#if LV_USE_GPU
     /*OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*mem_blend)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 

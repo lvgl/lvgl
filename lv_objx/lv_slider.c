@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_slider.h"
-#if USE_LV_SLIDER != 0
+#if LV_USE_SLIDER != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
@@ -280,7 +280,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             area_bg.y2 -= slider_w > slider_h ? pad_ver_bg : 0;   /*Pad only for horizontal slider*/
         }
 
-#if USE_LV_GROUP == 0
+#if LV_USE_GROUP == 0
         lv_draw_rect(&area_bg, mask, style_bg, lv_obj_get_opa_scale(slider));
 #else
         /* Draw the borders later if the slider is focused.
@@ -357,7 +357,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         }
 
         /*Before the knob add the border if required*/
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /* Draw the borders later if the bar is focused.
          * At value = 100% the indicator can cover to whole background and the focused style won't be visible*/
         if(lv_obj_is_focused(slider)) {
@@ -503,7 +503,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
         ext->drag_value = LV_SLIDER_NOT_PRESSED;
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(slider);
         bool editing = lv_group_get_editing(g);
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());

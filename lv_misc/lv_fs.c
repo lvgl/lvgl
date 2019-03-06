@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_fs.h"
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
 
 #include "lv_ll.h"
 #include <string.h>
@@ -492,7 +492,7 @@ char  * lv_fs_get_letters(char * buf)
     lv_fs_drv_t * drv;
     uint8_t i = 0;
 
-    LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
+    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
         buf[i] = drv->letter;
         i++;
     }
@@ -615,7 +615,7 @@ static lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t * drv;
 
-    LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
+    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
         if(drv->letter == letter) {
             return drv;
         }
@@ -624,4 +624,4 @@ static lv_fs_drv_t * lv_fs_get_drv(char letter)
     return NULL;
 }
 
-#endif /*USE_LV_FILESYSTEM*/
+#endif /*LV_USE_FILESYSTEM*/

@@ -25,7 +25,7 @@
 static void disp_init(void);
 
 static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
-#if USE_LV_GPU
+#if LV_USE_GPU
 static void mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 static void mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color);
 #endif
@@ -103,7 +103,7 @@ void lv_port_disp_init(void)
     /*Set a display buffer*/
     disp_drv.buffer = &disp_buf_2;
 
-#if USE_LV_GPU
+#if LV_USE_GPU
     /*Optionally add functions to access the GPU. (Only in buffered mode, LV_VDB_SIZE != 0)*/
 
     /*Blend two color array using opacity*/
@@ -151,7 +151,7 @@ static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * co
 
 
 /*OPTIONAL: GPU INTERFACE*/
-#if USE_LV_GPU
+#if LV_USE_GPU
 
 /* If your MCU has hardware accelerator (GPU) then you can use it to blend to memories using opacity
  * It can be used only in buffered mode (LV_VDB_SIZE != 0 in lv_conf.h)*/
@@ -177,6 +177,6 @@ static void mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color)
     }
 }
 
-#endif  /*USE_LV_GPU*/
+#endif  /*LV_USE_GPU*/
 
 #endif

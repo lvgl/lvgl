@@ -145,7 +145,7 @@ static void lv_refr_task(void * param)
 
     uint32_t start = lv_tick_get();
 
-    LL_READ(LV_GC_ROOT(_lv_disp_ll), disp_refr) {
+    LV_LL_READ(LV_GC_ROOT(_lv_disp_ll), disp_refr) {
         LV_LOG_TRACE("lv_refr_task: refreshing a display");
 
         lv_refr_join_area();
@@ -388,7 +388,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
     /*If this object is fully cover the draw area check the children too */
     if(lv_area_is_in(area_p, &obj->coords) && obj->hidden == 0) {
-        LL_READ(obj->child_ll, i)        {
+        LV_LL_READ(obj->child_ll, i)        {
             found_p = lv_refr_get_top_obj(area_p, i);
 
             /*If a children is ok then break*/
@@ -498,7 +498,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             lv_area_t mask_child; /*Mask from obj and its child*/
             lv_obj_t * child_p;
             lv_area_t child_area;
-            LL_READ_BACK(obj->child_ll, child_p) {
+            LV_LL_READ_BACK(obj->child_ll, child_p) {
                 lv_obj_get_coords(child_p, &child_area);
                 ext_size = child_p->ext_size;
                 child_area.x1 -= ext_size;

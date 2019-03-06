@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_list.h"
-#if USE_LV_LIST != 0
+#if LV_USE_LIST != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
@@ -19,7 +19,7 @@
  *********************/
 #define LV_LIST_LAYOUT_DEF  LV_LAYOUT_COL_M
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 #  ifndef LV_LIST_FOCUS_TIME
 #    define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #  endif
@@ -43,13 +43,13 @@ static void lv_list_btn_single_selected(lv_obj_t *btn);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if USE_LV_IMG
+#if LV_USE_IMG
 static lv_signal_cb_t img_signal;
 #endif
 static lv_signal_cb_t label_signal;
 static lv_signal_cb_t ancestor_page_signal;
 static lv_signal_cb_t ancestor_btn_signal;
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 /*Used to make the last clicked button pressed (selected) when the list become focused and `click_focus == 1`*/
 static lv_obj_t * last_clicked_btn;
 #endif
@@ -93,7 +93,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->single_mode = false;
     ext->size = 0;
     
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     ext->last_sel = NULL;
     ext->selected_btn = NULL;
 #endif
@@ -128,7 +128,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_t * copy_btn = lv_list_get_next_btn(copy, NULL);
         while(copy_btn) {
             const void * img_src = NULL;
-#if USE_LV_IMG
+#if LV_USE_IMG
             lv_obj_t * copy_img = lv_list_get_btn_img(copy_btn);
             if(copy_img) img_src = lv_img_get_src(copy_img);
 #endif
@@ -210,7 +210,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     w -= pad_hor_tot * 2;
 
     lv_obj_set_width(liste, w);
-#if USE_LV_IMG != 0
+#if LV_USE_IMG != 0
     lv_obj_t * img = NULL;
     if(img_src) {
         img = lv_img_create(liste, NULL);
@@ -229,7 +229,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
         lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - btn_hor_pad);
         if(label_signal == NULL) label_signal = lv_obj_get_signal_func(label);
     }
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     /* If this is the first item to be added to the list and the list is
      * focussed, select it */
     {
@@ -283,7 +283,7 @@ void lv_list_set_single_mode(lv_obj_t *list, bool mode)
     ext->single_mode = mode;
 }
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 
 /**
  * Make a button selected
@@ -324,7 +324,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
 void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_time = 0;
 #endif
 
@@ -446,7 +446,7 @@ lv_obj_t * lv_list_get_btn_label(const lv_obj_t * btn)
  */
 lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn)
 {
-#if USE_LV_IMG != 0
+#if LV_USE_IMG != 0
     lv_obj_t * img = lv_obj_get_child(btn, NULL);
     if(img == NULL) return NULL;
 
@@ -548,7 +548,7 @@ uint32_t lv_list_get_size(const lv_obj_t * list)
     return ext->size;
 }
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 /**
  * Get the currently selected button
  * @param list pointer to a list object
@@ -643,7 +643,7 @@ void lv_list_up(const lv_obj_t * list)
                 if(ext->anim_time == 0) {
                     lv_obj_set_y(scrl, new_y);
                 } else {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
                     lv_anim_t a;
                     a.var = scrl;
                     a.start = lv_obj_get_y(scrl);
@@ -686,7 +686,7 @@ void lv_list_down(const lv_obj_t * list)
             if(ext->anim_time == 0) {
                 lv_obj_set_y(scrl, new_y);
             } else {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
                 lv_anim_t a;
                 a.var = scrl;
                 a.start = lv_obj_get_y(scrl);
@@ -718,7 +718,7 @@ void lv_list_down(const lv_obj_t * list)
 void lv_list_focus(const lv_obj_t * btn, bool anim_en)
 {
 
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_en = false;
 #endif
 
@@ -757,7 +757,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         refr_btn_width(list);
     } else if(sign == LV_SIGNAL_FOCUS) {
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         /*With ENCODER select the first button only in edit mode*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
@@ -796,7 +796,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 #endif
     } else if(sign == LV_SIGNAL_DEFOCUS) {
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /*De-select the selected btn*/
         lv_list_set_btn_selected(list, NULL);
         last_clicked_btn = NULL;        /*button click will be set if click happens before focus*/
@@ -808,7 +808,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         *editable = true;
     } else if(sign == LV_SIGNAL_CONTROLL) {
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
@@ -882,7 +882,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
         lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
         ext->page.scroll_prop_ip = 0;
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(list);
         if(lv_group_get_focused(g) == list && lv_indev_is_dragging(lv_indev_get_act()) == false) {
             /* Is the list is focused then be sure only the button being released
@@ -915,7 +915,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
         lv_obj_t * sel = lv_list_get_btn_selected(list);
         if(sel == btn) lv_list_set_btn_selected(list, lv_list_get_next_btn(list, btn));

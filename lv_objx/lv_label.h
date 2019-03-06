@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_LABEL != 0
+#if LV_USE_LABEL != 0
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_misc/lv_font.h"
@@ -265,7 +265,7 @@ void lv_label_cut_text(lv_obj_t * label, uint32_t pos,  uint32_t cnt);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_LABEL*/
+#endif  /*LV_USE_LABEL*/
 
 #ifdef __cplusplus
 } /* extern "C" */

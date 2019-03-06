@@ -180,7 +180,7 @@ typedef struct _lv_obj_t
     void * ext_attr;                 /*Object type specific extended data*/
     lv_style_t * style_p;       /*Pointer to the object's style*/
 
-#if USE_LV_GROUP != 0
+#if LV_USE_GROUP != 0
     void * group_p;                 /*Pointer to the group of the object*/
 #endif
     /*Attributes and states*/
@@ -200,11 +200,11 @@ typedef struct _lv_obj_t
     lv_reailgn_t realign;
 #endif
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
     lv_obj_user_data_t user_data;
 #endif
 
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
     lv_obj_user_data_t event_user_data;
     lv_obj_user_data_t signal_user_data;
     lv_obj_user_data_t design_user_data;
@@ -500,8 +500,9 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb);
  * Send an event to the object
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.
+ * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-void lv_obj_send_event(lv_obj_t * obj, lv_event_t event);
+lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event);
 
 /**
  * Set the a signal function of an object. Used internally by the library.
@@ -543,7 +544,7 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
  */
 void lv_obj_refresh_ext_size(lv_obj_t * obj);
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -784,7 +785,7 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj);
 void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
 /**
  * Get a pointer to the object's user data
  * @param obj pointer to an object
@@ -793,7 +794,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj);
 #endif
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 /**
  * Get the group of the object
  * @param obj pointer to an object

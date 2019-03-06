@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_I18N
+#if LV_USE_I18N
 
 #include <stdint.h>
 
@@ -99,7 +99,7 @@ const char * lv_i18n_get_current_local(void);
  *      MACROS
  **********************/
 
-#endif /*USE_LV_I18N*/
+#endif /*LV_USE_I18N*/
 
 #ifdef __cplusplus
 } /* extern "C" */

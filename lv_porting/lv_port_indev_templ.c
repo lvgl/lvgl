@@ -110,7 +110,7 @@ void lv_port_indev_init(void)
 
     /*Set cursor. For simplicity set a HOME symbol now.*/
     lv_obj_t * mouse_cursor = lv_img_create(lv_disp_get_scr_act(NULL), NULL);
-    lv_img_set_src(mouse_cursor, SYMBOL_HOME);
+    lv_img_set_src(mouse_cursor, LV_SYMBOL_HOME);
     lv_indev_set_cursor(indev_mouse, mouse_cursor);
 
     /*------------------

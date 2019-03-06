@@ -19,15 +19,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_KB != 0
+#if LV_USE_KB != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BTNM == 0
-#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (USE_LV_BTNM  1) "
+#if LV_USE_BTNM == 0
+#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNM  1) "
 #endif
 
-#if USE_LV_TA == 0
-#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (USE_LV_TA  1) "
+#if LV_USE_TA == 0
+#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (LV_USE_TA  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -160,7 +160,7 @@ lv_style_t * lv_kb_get_style(const lv_obj_t *kb, lv_kb_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_KB*/
+#endif  /*LV_USE_KB*/
 
 #ifdef __cplusplus
 } /* extern "C" */

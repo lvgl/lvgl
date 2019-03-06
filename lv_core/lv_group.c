@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_group.h"
-#if USE_LV_GROUP != 0
+#if LV_USE_GROUP != 0
 #include "../lv_themes/lv_theme.h"
 #include <stddef.h>
 #include "../lv_misc/lv_gc.h"
@@ -71,11 +71,11 @@ lv_group_t * lv_group_create(void)
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap = 1;
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
     memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
 #endif
 
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
     memset(&group->focus_user_data, 0, sizeof(lv_group_user_data_t));
     memset(&group->style_mod_user_data, 0, sizeof(lv_group_user_data_t));
     memset(&group->style_mod_edit_user_data, 0, sizeof(lv_group_user_data_t));
@@ -102,7 +102,7 @@ void lv_group_del(lv_group_t * group)
 
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
-    LL_READ(group->obj_ll, obj) {
+    LV_LL_READ(group->obj_ll, obj) {
         (*obj)->group_p = NULL;
     }
 
@@ -171,7 +171,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
 
     /*Search the object and remove it from its group */
     lv_obj_t ** i;
-    LL_READ(g->obj_ll, i) {
+    LV_LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             lv_ll_rem(&g->obj_ll, i);
             lv_mem_free(i);
@@ -196,7 +196,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_group_set_editing(g, false);
 
     lv_obj_t ** i;
-    LL_READ(g->obj_ll, i) {
+    LV_LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             if(g->obj_focus == i) return;       /*Don't focus the already focused object again*/
             if(g->obj_focus != NULL) {
@@ -374,7 +374,7 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
     return *group->obj_focus;
 }
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
 /**
  * Get a pointer to the group's user data
  * @param group pointer to an group
@@ -467,7 +467,7 @@ void lv_group_report_style_mod(lv_group_t * group)
     }
 
     lv_group_t * i;
-    LL_READ(LV_GC_ROOT(_lv_group_ll), i) {
+    LV_LL_READ(LV_GC_ROOT(_lv_group_ll), i) {
         refresh_theme(i, th);
     }
 }
@@ -645,4 +645,4 @@ static void obj_to_foreground(lv_obj_t * obj)
     }
 }
 
-#endif /*USE_LV_GROUP != 0*/
+#endif /*LV_USE_GROUP != 0*/

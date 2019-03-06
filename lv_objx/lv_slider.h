@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_SLIDER != 0
+#if LV_USE_SLIDER != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BAR == 0
-#error "lv_slider: lv_bar is required. Enable it in lv_conf.h (USE_LV_BAR  1) "
+#if LV_USE_BAR == 0
+#error "lv_slider: lv_bar is required. Enable it in lv_conf.h (LV_USE_BAR  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -168,7 +168,7 @@ lv_style_t * lv_slider_get_style(const lv_obj_t *slider, lv_slider_style_t type)
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_SLIDER*/
+#endif  /*LV_USE_SLIDER*/
 
 #ifdef __cplusplus
 } /* extern "C" */

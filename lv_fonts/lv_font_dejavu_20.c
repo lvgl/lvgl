@@ -1,7 +1,7 @@
 
 #include "../lv_misc/lv_font.h"
 
-#if USE_LV_FONT_DEJAVU_20 != 0  /*Can be enabled in lv_conf.h*/
+#if LV_USE_FONT_DEJAVU_20 != 0  /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
  * DejaVuSans.ttf 20 px Font in U+0020 ( ) .. U+007e (~)  range with 1 bpp
@@ -9,7 +9,7 @@
 
 /*Store the image of the letters (glyph)*/
 static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
-#if USE_LV_FONT_DEJAVU_20 == 1
+#if LV_USE_FONT_DEJAVU_20 == 1
     /*Unicode: U+0020 ( ) , Width: 6 */
     0x00,  //......
     0x00,  //......
@@ -2196,7 +2196,7 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_20 == 2
+#elif LV_USE_FONT_DEJAVU_20 == 2
     /*Unicode: U+0020 ( ) , Width: 6 */
     0x00, 0x00,  //......
     0x00, 0x00,  //......
@@ -4383,7 +4383,7 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_20 == 4
+#elif LV_USE_FONT_DEJAVU_20 == 4
     /*Unicode: U+0020 ( ) , Width: 6 */
     0x00, 0x00, 0x00,  //......
     0x00, 0x00, 0x00,  //......
@@ -6570,7 +6570,7 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_20 == 8
+#elif LV_USE_FONT_DEJAVU_20 == 8
     /*Unicode: U+0020 ( ) , Width: 6 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //......
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //......
@@ -8763,7 +8763,7 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
 
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_dejavu_20_glyph_dsc[] = {
-#if USE_LV_FONT_DEJAVU_20 == 1
+#if LV_USE_FONT_DEJAVU_20 == 1
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 2,   .glyph_index = 20}, /*Unicode: U+0021 (!)*/
     {.w_px = 6,   .glyph_index = 40}, /*Unicode: U+0022 (")*/
@@ -8860,7 +8860,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_20_glyph_dsc[] = {
     {.w_px = 8,   .glyph_index = 2900},   /*Unicode: U+007d (})*/
     {.w_px = 11,  .glyph_index = 2920},   /*Unicode: U+007e (~)*/
 
-#elif USE_LV_FONT_DEJAVU_20 == 2
+#elif LV_USE_FONT_DEJAVU_20 == 2
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 2,   .glyph_index = 40}, /*Unicode: U+0021 (!)*/
     {.w_px = 6,   .glyph_index = 60}, /*Unicode: U+0022 (")*/
@@ -8957,7 +8957,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_20_glyph_dsc[] = {
     {.w_px = 8,   .glyph_index = 4520},   /*Unicode: U+007d (})*/
     {.w_px = 11,  .glyph_index = 4560},   /*Unicode: U+007e (~)*/
 
-#elif USE_LV_FONT_DEJAVU_20 == 4
+#elif LV_USE_FONT_DEJAVU_20 == 4
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 2,   .glyph_index = 60}, /*Unicode: U+0021 (!)*/
     {.w_px = 6,   .glyph_index = 80}, /*Unicode: U+0022 (")*/
@@ -9054,7 +9054,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_20_glyph_dsc[] = {
     {.w_px = 8,   .glyph_index = 8220},   /*Unicode: U+007d (})*/
     {.w_px = 11,  .glyph_index = 8300},   /*Unicode: U+007e (~)*/
 
-#elif USE_LV_FONT_DEJAVU_20 == 8
+#elif LV_USE_FONT_DEJAVU_20 == 8
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 2,   .glyph_index = 120},    /*Unicode: U+0021 (!)*/
     {.w_px = 6,   .glyph_index = 160},    /*Unicode: U+0022 (")*/
@@ -9164,17 +9164,17 @@ lv_font_t lv_font_dejavu_20 = {
     .unicode_list = NULL,   /*Every character in the font from 'unicode_first' to 'unicode_last'*/
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
-#if USE_LV_FONT_DEJAVU_20 == 1
+#if LV_USE_FONT_DEJAVU_20 == 1
     .bpp = 1,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_20 == 2
+#elif LV_USE_FONT_DEJAVU_20 == 2
     .bpp = 2,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_20 == 4
+#elif LV_USE_FONT_DEJAVU_20 == 4
     .bpp = 4,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_20 == 8
+#elif LV_USE_FONT_DEJAVU_20 == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
     .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 
-#endif /*USE_LV_FONT_DEJAVU_20*/
+#endif /*LV_USE_FONT_DEJAVU_20*/

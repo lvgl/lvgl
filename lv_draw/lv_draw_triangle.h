@@ -27,9 +27,9 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 /*Experimental use for 3D modeling*/
-#define USE_LV_TRIANGLE 1
+#define LV_USE_TRIANGLE 1
 
-#if USE_LV_TRIANGLE != 0
+#if LV_USE_TRIANGLE != 0
 /**
  *
  * @param points pointer to an array with 3 points

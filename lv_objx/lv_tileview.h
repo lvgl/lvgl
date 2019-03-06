@@ -20,7 +20,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_TILEVIEW != 0
+#if LV_USE_TILEVIEW != 0
 
 #include "../lv_objx/lv_page.h"
 
@@ -154,7 +154,7 @@ lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_TILEVIEW*/
+#endif  /*LV_USE_TILEVIEW*/
 
 #ifdef __cplusplus
 } /* extern "C" */

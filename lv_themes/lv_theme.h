@@ -35,11 +35,11 @@ typedef struct {
         lv_style_t *bg;
         lv_style_t *panel;
 
-#if USE_LV_CONT != 0
+#if LV_USE_CONT != 0
         lv_style_t *cont;
 #endif
 
-#if USE_LV_BTN != 0
+#if LV_USE_BTN != 0
         struct {
             lv_style_t *rel;
             lv_style_t *pr;
@@ -50,7 +50,7 @@ typedef struct {
 #endif
 
 
-#if USE_LV_IMGBTN != 0
+#if LV_USE_IMGBTN != 0
         struct {
             lv_style_t *rel;
             lv_style_t *pr;
@@ -60,7 +60,7 @@ typedef struct {
         } imgbtn;
 #endif
 
-#if USE_LV_LABEL != 0
+#if LV_USE_LABEL != 0
         struct {
             lv_style_t *prim;
             lv_style_t *sec;
@@ -68,31 +68,31 @@ typedef struct {
         } label;
 #endif
 
-#if USE_LV_IMG != 0
+#if LV_USE_IMG != 0
         struct {
             lv_style_t *light;
             lv_style_t *dark;
         } img;
 #endif
 
-#if USE_LV_LINE != 0
+#if LV_USE_LINE != 0
         struct {
             lv_style_t *decor;
         } line;
 #endif
 
-#if USE_LV_LED != 0
+#if LV_USE_LED != 0
         lv_style_t *led;
 #endif
 
-#if USE_LV_BAR != 0
+#if LV_USE_BAR != 0
         struct {
             lv_style_t *bg;
             lv_style_t *indic;
         } bar;
 #endif
 
-#if USE_LV_SLIDER != 0
+#if LV_USE_SLIDER != 0
         struct {
             lv_style_t *bg;
             lv_style_t *indic;
@@ -100,23 +100,23 @@ typedef struct {
         } slider;
 #endif
 
-#if USE_LV_LMETER != 0
+#if LV_USE_LMETER != 0
         lv_style_t *lmeter;
 #endif
 
-#if USE_LV_GAUGE != 0
+#if LV_USE_GAUGE != 0
         lv_style_t *gauge;
 #endif
 
-#if USE_LV_ARC != 0
+#if LV_USE_ARC != 0
         lv_style_t *arc;
 #endif
 
-#if USE_LV_PRELOAD != 0
+#if LV_USE_PRELOAD != 0
         lv_style_t *preload;
 #endif
 
-#if USE_LV_SW != 0
+#if LV_USE_SW != 0
         struct {
             lv_style_t *bg;
             lv_style_t *indic;
@@ -125,11 +125,11 @@ typedef struct {
         } sw;
 #endif
 
-#if USE_LV_CHART != 0
+#if LV_USE_CHART != 0
         lv_style_t *chart;
 #endif
 
-#if USE_LV_CALENDAR != 0
+#if LV_USE_CALENDAR != 0
         struct {
             lv_style_t *bg;
             lv_style_t *header;
@@ -142,7 +142,7 @@ typedef struct {
         } calendar;
 #endif
 
-#if USE_LV_CB != 0
+#if LV_USE_CB != 0
         struct {
             lv_style_t *bg;
             struct {
@@ -155,7 +155,7 @@ typedef struct {
         } cb;
 #endif
 
-#if USE_LV_BTNM != 0
+#if LV_USE_BTNM != 0
         struct {
             lv_style_t *bg;
             struct {
@@ -168,7 +168,7 @@ typedef struct {
         } btnm;
 #endif
 
-#if USE_LV_KB != 0
+#if LV_USE_KB != 0
         struct {
             lv_style_t *bg;
             struct {
@@ -181,7 +181,7 @@ typedef struct {
         } kb;
 #endif
 
-#if USE_LV_MBOX != 0
+#if LV_USE_MBOX != 0
         struct {
             lv_style_t *bg;
             struct {
@@ -192,7 +192,7 @@ typedef struct {
         } mbox;
 #endif
 
-#if USE_LV_PAGE != 0
+#if LV_USE_PAGE != 0
         struct {
             lv_style_t *bg;
             lv_style_t *scrl;
@@ -200,7 +200,7 @@ typedef struct {
         } page;
 #endif
 
-#if USE_LV_TA != 0
+#if LV_USE_TA != 0
         struct {
             lv_style_t *area;
             lv_style_t *oneline;
@@ -209,7 +209,7 @@ typedef struct {
         } ta;
 #endif
 
-#if USE_LV_SPINBOX != 0
+#if LV_USE_SPINBOX != 0
         struct {
             lv_style_t *bg;
             lv_style_t *cursor;
@@ -217,7 +217,7 @@ typedef struct {
         } spinbox;
 #endif
 
-#if USE_LV_LIST
+#if LV_USE_LIST
         struct {
             lv_style_t *bg;
             lv_style_t *scrl;
@@ -232,7 +232,7 @@ typedef struct {
         } list;
 #endif
 
-#if USE_LV_DDLIST != 0
+#if LV_USE_DDLIST != 0
         struct {
             lv_style_t *bg;
             lv_style_t *sel;
@@ -240,14 +240,14 @@ typedef struct {
         } ddlist;
 #endif
 
-#if USE_LV_ROLLER != 0
+#if LV_USE_ROLLER != 0
         struct {
             lv_style_t *bg;
             lv_style_t *sel;
         } roller;
 #endif
 
-#if USE_LV_TABVIEW != 0
+#if LV_USE_TABVIEW != 0
         struct {
             lv_style_t *bg;
             lv_style_t *indic;
@@ -261,7 +261,7 @@ typedef struct {
         } tabview;
 #endif
 
-#if USE_LV_TILEVIEW != 0
+#if LV_USE_TILEVIEW != 0
         struct {
             lv_style_t *bg;
             lv_style_t *scrl;
@@ -269,14 +269,14 @@ typedef struct {
         } tileview;
 #endif
 
-#if USE_LV_TABLE != 0
+#if LV_USE_TABLE != 0
         struct {
             lv_style_t *bg;
             lv_style_t *cell;
         } table;
 #endif
 
-#if USE_LV_WIN != 0
+#if LV_USE_WIN != 0
         struct {
             lv_style_t *bg;
             lv_style_t *sb;
@@ -293,7 +293,7 @@ typedef struct {
 #endif
     } style;
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     struct
     {
         lv_group_style_mod_func_t style_mod;

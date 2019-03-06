@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_lmeter.h"
-#if USE_LV_LMETER != 0
+#if LV_USE_LMETER != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -257,7 +257,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
         memcpy(&style_tmp, style, sizeof(lv_style_t));
 
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(lmeter);
         if(lv_group_get_focused(g) == lmeter) {
             style_tmp.line.width += 1;

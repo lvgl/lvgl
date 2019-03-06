@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_mbox.h"
-#if USE_LV_MBOX != 0
+#if LV_USE_MBOX != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
@@ -19,7 +19,7 @@
  *      DEFINES
  *********************/
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 #  ifndef LV_MBOX_CLOSE_ANIM_TIME
 #    define LV_MBOX_CLOSE_ANIM_TIME  200 /*List close animation time)  */
 #  endif
@@ -197,7 +197,7 @@ void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action)
 void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_time = 0;
 #endif
 
@@ -211,7 +211,7 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
  */
 void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     if(ext->anim_time != 0) {
@@ -236,7 +236,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
  */
 void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_anim_del(mbox, NULL);
 #else
     (void)mbox; /*Unused*/
@@ -449,7 +449,7 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
         /* The button matrix with ENCODER input supposes it's in a group but in this case it isn't (Only the message box's container)
          * So so some actions here instead*/
         if(sign == LV_SIGNAL_FOCUS) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
             lv_indev_t * indev = lv_indev_get_act();
             lv_hal_indev_type_t indev_type = lv_indev_get_type(indev);
             if(indev_type == LV_INDEV_TYPE_ENCODER) {

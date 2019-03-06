@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_preload.h"
-#if USE_LV_PRELOAD != 0
+#if LV_USE_PRELOAD != 0
 
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rect.h"
@@ -172,7 +172,7 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_
  *  */
 void lv_preload_set_animation_type(lv_obj_t * preload, lv_preloader_type_t type)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     /*delete previous animation*/
@@ -235,7 +235,7 @@ void lv_preload_set_animation_type(lv_obj_t * preload, lv_preloader_type_t type)
     }
     }
 
-#endif //USE_LV_ANIMATION
+#endif //LV_USE_ANIMATION
 }
 
 /*=====================

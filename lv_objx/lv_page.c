@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../lv_objx/lv_page.h"
-#if USE_LV_PAGE != 0
+#if LV_USE_PAGE != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
@@ -404,7 +404,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_time = 0;
 #else
     /* Be sure there is no position changing animation in progress
@@ -473,7 +473,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
     if(anim_time == 0) {
         lv_obj_set_y(ext->scrl, scrlable_y);
         lv_obj_set_x(ext->scrl, scrlable_x);
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     } else {
         lv_anim_t a;
         a.act_time = 0;
@@ -505,7 +505,7 @@ void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
 {
     lv_obj_t * scrl = lv_page_get_scrl(page);
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_anim_t a;
     a.var = scrl;
     a.start = lv_obj_get_x(scrl);
@@ -534,7 +534,7 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 {
     lv_obj_t * scrl = lv_page_get_scrl(page);
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_anim_t a;
     a.var = scrl;
     a.start = lv_obj_get_y(scrl);
@@ -561,7 +561,7 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
  */
 void lv_page_start_edge_flash(lv_obj_t * page)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     if(ext->edge_flash.enabled) {
         lv_anim_t a;
@@ -704,7 +704,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(scrl, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /* If the page is focused in a group and
          * the background object is not visible (transparent)
          * then "activate" the style of the scrollable*/
@@ -730,7 +730,7 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
 #endif
         ancestor_design(scrl, mask, mode);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         scrl->style_p = style_scrl_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {

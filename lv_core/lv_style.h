@@ -102,7 +102,7 @@ typedef struct
     } line;
 } lv_style_t;
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 typedef struct {
     const lv_style_t * style_start; /*Pointer to the starting style*/
     const lv_style_t * style_end;   /*Pointer to the destination style*/
@@ -158,7 +158,7 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
  */
 void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable

@@ -22,7 +22,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 typedef struct {
     lv_style_t style_start;   /*Save not only pointers because can be same as 'style_anim' then it will be modified too*/
     lv_style_t style_end;
@@ -34,7 +34,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val);
 static void style_animation_common_end_cb(void * ptr);
 #endif
@@ -268,7 +268,7 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
     }
 }
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
@@ -312,7 +312,7 @@ void * lv_style_anim_create(lv_style_anim_t * anim)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 /**
  * Used by the style animations to set the values of a style according to start and end style.
  * @param dsc the 'animated variable' set by lv_style_anim_create()

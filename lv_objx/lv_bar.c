@@ -9,7 +9,7 @@
  *      INCLUDES
  *********************/
 #include "lv_bar.h"
-#if USE_LV_BAR != 0
+#if LV_USE_BAR != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -126,7 +126,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_bar_set_value(lv_obj_t * bar, int16_t value, bool anim)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim = false;
 #endif
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
@@ -142,7 +142,7 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, bool anim)
         ext->cur_value = new_value;
         lv_obj_invalidate(bar);
     } else {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
         /*No animation in progress -> simply set the values*/
         if(ext->anim_state == LV_BAR_ANIM_STATE_INV) {
             ext->anim_start = ext->cur_value;
@@ -329,7 +329,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_opa_t opa_scale = lv_obj_get_opa_scale(bar);
 
-#if USE_LV_GROUP == 0
+#if LV_USE_GROUP == 0
         ancestor_design_f(bar, mask, mode);
 #else
         /* Draw the borders later if the bar is focused.
@@ -413,7 +413,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
             lv_draw_rect(&indic_area, mask, style_indic, opa_scale);
         }
     } else if(mode == LV_DESIGN_DRAW_POST) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /*Draw the border*/
         if(lv_obj_is_focused(bar)) {
             lv_opa_t opa_scale = lv_obj_get_opa_scale(bar);

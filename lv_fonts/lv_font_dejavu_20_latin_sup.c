@@ -1,7 +1,7 @@
 
 #include "../lv_misc/lv_font.h"
 
-#if USE_LV_FONT_DEJAVU_20_LATIN_SUP != 0    /*Can be enabled in lv_conf.h*/
+#if LV_USE_FONT_DEJAVU_20_LATIN_SUP != 0    /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
  * DejaVuSans.ttf 20 px Font in U+00a0 ( ) .. U+00ff (ÿ)  range with 1 bpp
@@ -9,7 +9,7 @@
 
 /*Store the image of the letters (glyph)*/
 static const uint8_t lv_font_dejavu_20_latin_sup_glyph_bitmap[] = {
-#if USE_LV_FONT_DEJAVU_20_LATIN_SUP == 1
+#if LV_USE_FONT_DEJAVU_20_LATIN_SUP == 1
     /*Unicode: U+00a0 ( ) , Width: 6 */
     0x00,  //......
     0x00,  //......
@@ -2219,7 +2219,7 @@ static const uint8_t lv_font_dejavu_20_latin_sup_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 2
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 2
     /*Unicode: U+00a0 ( ) , Width: 6 */
     0x00, 0x00,  //......
     0x00, 0x00,  //......
@@ -4429,7 +4429,7 @@ static const uint8_t lv_font_dejavu_20_latin_sup_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 4
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 4
     /*Unicode: U+00a0 ( ) , Width: 6 */
     0x00, 0x00, 0x00,  //......
     0x00, 0x00, 0x00,  //......
@@ -6639,7 +6639,7 @@ static const uint8_t lv_font_dejavu_20_latin_sup_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 8
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 8
     /*Unicode: U+00a0 ( ) , Width: 6 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //......
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //......
@@ -8855,7 +8855,7 @@ static const uint8_t lv_font_dejavu_20_latin_sup_glyph_bitmap[] = {
 
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_dejavu_20_latin_sup_glyph_dsc[] = {
-#if USE_LV_FONT_DEJAVU_20_LATIN_SUP == 1
+#if LV_USE_FONT_DEJAVU_20_LATIN_SUP == 1
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+00a0 ( )*/
     {.w_px = 2,   .glyph_index = 20}, /*Unicode: U+00a1 (¡)*/
     {.w_px = 8,   .glyph_index = 40}, /*Unicode: U+00a2 (¢)*/
@@ -8953,7 +8953,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_20_latin_sup_glyph_dsc[] = {
     {.w_px = 9,   .glyph_index = 2840},   /*Unicode: U+00fe (þ)*/
     {.w_px = 12,  .glyph_index = 2880},   /*Unicode: U+00ff (ÿ)*/
 
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 2
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 2
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+00a0 ( )*/
     {.w_px = 2,   .glyph_index = 40}, /*Unicode: U+00a1 (¡)*/
     {.w_px = 8,   .glyph_index = 60}, /*Unicode: U+00a2 (¢)*/
@@ -9051,7 +9051,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_20_latin_sup_glyph_dsc[] = {
     {.w_px = 9,   .glyph_index = 4740},   /*Unicode: U+00fe (þ)*/
     {.w_px = 12,  .glyph_index = 4800},   /*Unicode: U+00ff (ÿ)*/
 
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 4
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 4
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+00a0 ( )*/
     {.w_px = 2,   .glyph_index = 60}, /*Unicode: U+00a1 (¡)*/
     {.w_px = 8,   .glyph_index = 80}, /*Unicode: U+00a2 (¢)*/
@@ -9149,7 +9149,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_20_latin_sup_glyph_dsc[] = {
     {.w_px = 9,   .glyph_index = 8660},   /*Unicode: U+00fe (þ)*/
     {.w_px = 12,  .glyph_index = 8760},   /*Unicode: U+00ff (ÿ)*/
 
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 8
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 8
     {.w_px = 6,   .glyph_index = 0},  /*Unicode: U+00a0 ( )*/
     {.w_px = 2,   .glyph_index = 120},    /*Unicode: U+00a1 (¡)*/
     {.w_px = 8,   .glyph_index = 160},    /*Unicode: U+00a2 (¢)*/
@@ -9260,17 +9260,17 @@ lv_font_t lv_font_dejavu_20_latin_sup = {
     .unicode_list = NULL,   /*Every character in the font from 'unicode_first' to 'unicode_last'*/
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
-#if USE_LV_FONT_DEJAVU_20_LATIN_SUP == 1
+#if LV_USE_FONT_DEJAVU_20_LATIN_SUP == 1
     .bpp = 1,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 2
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 2
     .bpp = 2,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 4
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 4
     .bpp = 4,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_20_LATIN_SUP == 8
+#elif LV_USE_FONT_DEJAVU_20_LATIN_SUP == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
     .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 
-#endif /*USE_LV_FONT_DEJAVU_20_LATIN_SUP*/
+#endif /*LV_USE_FONT_DEJAVU_20_LATIN_SUP*/

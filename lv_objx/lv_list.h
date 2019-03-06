@@ -19,19 +19,19 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_LIST != 0
+#if LV_USE_LIST != 0
 
 /*Testing of dependencies*/
-#if USE_LV_PAGE == 0
-#error "lv_list: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#if LV_USE_PAGE == 0
+#error "lv_list: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
 #endif
 
-#if USE_LV_BTN == 0
-#error "lv_list: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#if LV_USE_BTN == 0
+#error "lv_list: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
 #endif
 
-#if USE_LV_LABEL == 0
-#error "lv_list: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_list: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 
@@ -58,7 +58,7 @@ typedef struct
     lv_style_t *style_img;                       /*Style of the list element images on buttons*/
     uint32_t size; /*the number of items(buttons) in the list*/
     bool single_mode; /* whether single selected mode is enabled */
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     lv_obj_t * last_sel;                          /* The last selected button. It will be reverted when the list is focused again */
     lv_obj_t * selected_btn;                      /* The button is currently being selected*/
 #endif
@@ -129,7 +129,7 @@ bool lv_list_remove(const lv_obj_t * list, uint32_t index);
  */
 void lv_list_set_single_mode(lv_obj_t *list, bool mode);
     
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 
 /**
  * Make a button selected. Can be used while navigating in the list with a keypad.
@@ -245,7 +245,7 @@ int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn);
  */
 uint32_t lv_list_get_size(const lv_obj_t * list);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 /**
  * Get the currently selected button. Can be used while navigating in the list with a keypad.
  * @param list pointer to a list object
@@ -327,7 +327,7 @@ void lv_list_focus(const lv_obj_t *btn, bool anim_en);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_LIST*/
+#endif  /*LV_USE_LIST*/
 
 #ifdef __cplusplus
 } /* extern "C" */

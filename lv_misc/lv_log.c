@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_log.h"
-#if USE_LV_LOG
+#if LV_USE_LOG
 
 #if LV_LOG_PRINTF
 #include <stdio.h>
@@ -73,4 +73,4 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*USE_LV_LOG*/
+#endif /*LV_USE_LOG*/

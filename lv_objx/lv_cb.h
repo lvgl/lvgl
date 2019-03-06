@@ -19,15 +19,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_CB != 0
+#if LV_USE_CB != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BTN == 0
-#error "lv_cb: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#if LV_USE_BTN == 0
+#error "lv_cb: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
 #endif
 
-#if USE_LV_LABEL == 0
-#error "lv_cb: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_cb: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -153,7 +153,7 @@ lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CB*/
+#endif  /*LV_USE_CB*/
 
 #ifdef __cplusplus
 } /* extern "C" */

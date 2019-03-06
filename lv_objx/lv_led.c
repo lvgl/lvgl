@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_led.h"
-#if USE_LV_LED != 0
+#if LV_USE_LED != 0
 
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"

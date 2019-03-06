@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_tabview.h"
-#if USE_LV_TABVIEW != 0
+#if LV_USE_TABVIEW != 0
 
 #include "lv_btnm.h"
 #include "../lv_themes/lv_theme.h"
@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 #  ifndef LV_TABVIEW_ANIM_TIME
 #    define LV_TABVIEW_ANIM_TIME  300 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #  endif
@@ -269,7 +269,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
  */
 void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 {
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_en = false;
 #endif
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
@@ -287,7 +287,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     if(ext->anim_time == 0 || anim_en == false) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
         lv_anim_t a;
         a.var = ext->content;
         a.start = lv_obj_get_x(ext->content);
@@ -313,7 +313,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     if(ext->anim_time == 0 || anim_en == false) {
         lv_obj_set_x(ext->indic, indic_x);
     } else {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
         lv_anim_t a;
         a.var = ext->indic;
         a.start = lv_obj_get_x(ext->indic);
@@ -365,7 +365,7 @@ void lv_tabview_set_sliding(lv_obj_t * tabview, bool en)
 void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time)
 {
     lv_tabview_ext_t  * ext = lv_obj_get_ext_attr(tabview);
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_time = 0;
 #endif
     ext->anim_time = anim_time;
@@ -621,7 +621,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
                 lv_group_t * g = lv_obj_get_group(tabview);
                 if(lv_group_get_editing(g)) {
                     lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);

@@ -7,11 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_img.h"
-#if USE_LV_IMG != 0
+#if LV_USE_IMG != 0
 
 /*Testing of dependencies*/
-#if USE_LV_LABEL == 0
-#error "lv_img: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_i18n.h"
@@ -125,7 +125,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-#if USE_LV_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
+#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
     switch(src_type) {
         case LV_IMG_SRC_FILE:
             LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found");

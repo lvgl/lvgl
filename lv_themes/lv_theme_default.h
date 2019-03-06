@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_THEME_DEFAULT
+#if LV_USE_THEME_DEFAULT
 
 /*********************
  *      DEFINES

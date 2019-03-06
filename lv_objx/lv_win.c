@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_win.h"
-#if USE_LV_WIN != 0
+#if LV_USE_WIN != 0
 
 #include "../lv_themes/lv_theme.h"
 #include "../lv_core/lv_disp.h"
@@ -190,17 +190,17 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t ev
  *====================*/
 
 /**
- * A release action which can be assigned to a window control button to close it
- * @param btn pointer to the released button
- * @return always LV_ACTION_RES_INV because the button is deleted with the window
+ * Can be assigned to a window control button to close the window
+ * @param btn pointer to the control button on teh widows header
+ * @param evet the event type
  */
-lv_res_t lv_win_close_action(lv_obj_t * btn)
+void lv_win_close_event(lv_obj_t * btn, lv_event_t event)
 {
-    lv_obj_t * win = lv_win_get_from_btn(btn);
+    if(event == LV_EVENT_RELEASED) {
+        lv_obj_t * win = lv_win_get_from_btn(btn);
 
-    lv_obj_del(win);
-
-    return LV_RES_INV;
+        lv_obj_del(win);
+    }
 }
 
 /**

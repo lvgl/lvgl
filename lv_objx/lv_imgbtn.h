@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_IMGBTN != 0
+#if LV_USE_IMGBTN != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BTN == 0
-#error "lv_imgbtn: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#if LV_USE_BTN == 0
+#error "lv_imgbtn: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -219,7 +219,7 @@ lv_style_t * lv_imgbtn_get_style(const lv_obj_t * imgbtn, lv_imgbtn_style_t type
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_IMGBTN*/
+#endif  /*LV_USE_IMGBTN*/
 
 #ifdef __cplusplus
 } /* extern "C" */

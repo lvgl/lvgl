@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_BTN != 0
+#if LV_USE_BTN != 0
 
 /*Testing of dependencies*/
-#if USE_LV_CONT == 0
-#error "lv_btn: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
+#if LV_USE_CONT == 0
+#error "lv_btn: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT  1) "
 #endif
 
 #include "lv_cont.h"
@@ -289,7 +289,7 @@ lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_BUTTON*/
+#endif  /*LV_USE_BUTTON*/
 
 #ifdef __cplusplus
 } /* extern "C" */

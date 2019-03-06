@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_PAGE != 0
+#if LV_USE_PAGE != 0
 
 /*Testing of dependencies*/
-#if USE_LV_CONT == 0
-#error "lv_page: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
+#if LV_USE_CONT == 0
+#error "lv_page: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT  1) "
 #endif
 
 #include "lv_cont.h"
@@ -388,7 +388,7 @@ void lv_page_start_edge_flash(lv_obj_t * page);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_PAGE*/
+#endif  /*LV_USE_PAGE*/
 
 #ifdef __cplusplus
 } /* extern "C" */

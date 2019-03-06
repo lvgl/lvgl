@@ -20,7 +20,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_BTNM != 0
+#if LV_USE_BTNM != 0
 
 #include "../lv_core/lv_obj.h"
 #include "lv_label.h"
@@ -269,7 +269,7 @@ bool lv_btnm_get_recolor(const lv_obj_t * btnm);
  *      MACROS
  **********************/
 
-#endif /*USE_LV_BTNM*/
+#endif /*LV_USE_BTNM*/
 
 #ifdef __cplusplus
 } /* extern "C" */

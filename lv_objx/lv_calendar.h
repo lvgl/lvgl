@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_CALENDAR != 0
+#if LV_USE_CALENDAR != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -214,7 +214,7 @@ lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CALENDAR*/
+#endif  /*LV_USE_CALENDAR*/
 
 #ifdef __cplusplus
 } /* extern "C" */

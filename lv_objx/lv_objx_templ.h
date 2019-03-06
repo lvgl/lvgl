@@ -27,7 +27,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_TEMPL != 0
+#if LV_USE_TEMPL != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -102,7 +102,7 @@ lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_TEMPL*/
+#endif  /*LV_USE_TEMPL*/
 
 #ifdef __cplusplus
 } /* extern "C" */

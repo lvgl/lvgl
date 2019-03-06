@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_i18n.h"
-#if USE_LV_I18N
+#if LV_USE_I18N
 
 #include "lv_obj.h"
 #include "../lv_misc/lv_gc.h"
@@ -253,4 +253,4 @@ static const void * lv_i18n_get_text_core(const lv_i18n_trans_t * trans, const c
 
 }
 
-#endif /*USE_LV_I18N*/
+#endif /*LV_USE_I18N*/

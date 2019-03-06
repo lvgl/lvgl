@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_ta.h"
-#if USE_LV_TA != 0
+#if LV_USE_TA != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_refr.h"
@@ -45,7 +45,7 @@ static bool lv_ta_design(lv_obj_t * ta, const lv_area_t * mask, lv_design_mode_t
 static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
 static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
 static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x);
 #endif
@@ -158,7 +158,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_ta);
     }
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     /*Create a cursor blinker animation*/
     lv_anim_t a;
     a.var = new_ta;
@@ -226,7 +226,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, (const char *)letter_buf);
 
-#if USE_LV_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
+#if LV_USE_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -293,7 +293,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
 
-#if USE_LV_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
+#if LV_USE_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -419,7 +419,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         if(ext->pwd_tmp == NULL) return;
         strcpy(ext->pwd_tmp, txt);
 
-#if USE_LV_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
+#if LV_USE_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
         a.var = ta;
@@ -523,7 +523,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 
     ext->cursor.valid_x = cur_pos.x;
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     /*Reset cursor blink animation*/
     lv_anim_t a;
     a.var = ta;
@@ -1168,7 +1168,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         cur_type = lv_ta_get_cursor_type(ta);
         lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
     } else if(sign == LV_SIGNAL_FOCUS) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_cursor_type_t cur_type;
         cur_type = lv_ta_get_cursor_type(ta);
         lv_group_t * g = lv_obj_get_group(ta);
@@ -1239,7 +1239,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     return res;
 }
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 
 /**
  * Called to blink the cursor

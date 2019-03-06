@@ -1,7 +1,7 @@
 
 #include "../lv_misc/lv_font.h"
 
-#if USE_LV_FONT_DEJAVU_30_CYRILLIC != 0 /*Can be enabled in lv_conf.h*/
+#if LV_USE_FONT_DEJAVU_30_CYRILLIC != 0 /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
  * DejaVuSans.ttf 30 px Font in U+0410 (А) .. U+044f (я)  range with 1 bpp
@@ -9,7 +9,7 @@
 
 /*Store the image of the letters (glyph)*/
 static const uint8_t lv_font_dejavu_30_cyrillic_glyph_bitmap[] = {
-#if USE_LV_FONT_DEJAVU_30_CYRILLIC == 1
+#if LV_USE_FONT_DEJAVU_30_CYRILLIC == 1
     /*Unicode: U+0410 (А) , Width: 17 */
     0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00,  //.................
@@ -2123,7 +2123,7 @@ static const uint8_t lv_font_dejavu_30_cyrillic_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 2
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 2
     /*Unicode: U+0410 (А) , Width: 17 */
     0x00, 0x00, 0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00, 0x00, 0x00,  //.................
@@ -4237,7 +4237,7 @@ static const uint8_t lv_font_dejavu_30_cyrillic_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 4
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 4
     /*Unicode: U+0410 (А) , Width: 17 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
@@ -6351,7 +6351,7 @@ static const uint8_t lv_font_dejavu_30_cyrillic_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 8
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 8
     /*Unicode: U+0410 (А) , Width: 17 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
@@ -8471,7 +8471,7 @@ static const uint8_t lv_font_dejavu_30_cyrillic_glyph_bitmap[] = {
 
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_dejavu_30_cyrillic_glyph_dsc[] = {
-#if USE_LV_FONT_DEJAVU_30_CYRILLIC == 1
+#if LV_USE_FONT_DEJAVU_30_CYRILLIC == 1
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+0410 (А)*/
     {.w_px = 13,  .glyph_index = 90}, /*Unicode: U+0411 (Б)*/
     {.w_px = 13,  .glyph_index = 150},    /*Unicode: U+0412 (В)*/
@@ -8537,7 +8537,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_30_cyrillic_glyph_dsc[] = {
     {.w_px = 18,  .glyph_index = 4260},   /*Unicode: U+044e (ю)*/
     {.w_px = 12,  .glyph_index = 4350},   /*Unicode: U+044f (я)*/
 
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 2
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 2
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+0410 (А)*/
     {.w_px = 13,  .glyph_index = 150},    /*Unicode: U+0411 (Б)*/
     {.w_px = 13,  .glyph_index = 270},    /*Unicode: U+0412 (В)*/
@@ -8603,7 +8603,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_30_cyrillic_glyph_dsc[] = {
     {.w_px = 18,  .glyph_index = 7680},   /*Unicode: U+044e (ю)*/
     {.w_px = 12,  .glyph_index = 7830},   /*Unicode: U+044f (я)*/
 
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 4
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 4
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+0410 (А)*/
     {.w_px = 13,  .glyph_index = 270},    /*Unicode: U+0411 (Б)*/
     {.w_px = 13,  .glyph_index = 480},    /*Unicode: U+0412 (В)*/
@@ -8669,7 +8669,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_30_cyrillic_glyph_dsc[] = {
     {.w_px = 18,  .glyph_index = 14520},  /*Unicode: U+044e (ю)*/
     {.w_px = 12,  .glyph_index = 14790},  /*Unicode: U+044f (я)*/
 
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 8
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 8
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+0410 (А)*/
     {.w_px = 13,  .glyph_index = 510},    /*Unicode: U+0411 (Б)*/
     {.w_px = 13,  .glyph_index = 900},    /*Unicode: U+0412 (В)*/
@@ -8748,17 +8748,17 @@ lv_font_t lv_font_dejavu_30_cyrillic = {
     .unicode_list = NULL,   /*Every character in the font from 'unicode_first' to 'unicode_last'*/
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
-#if USE_LV_FONT_DEJAVU_30_CYRILLIC == 1
+#if LV_USE_FONT_DEJAVU_30_CYRILLIC == 1
     .bpp = 1,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 2
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 2
     .bpp = 2,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 4
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 4
     .bpp = 4,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_30_CYRILLIC == 8
+#elif LV_USE_FONT_DEJAVU_30_CYRILLIC == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
     .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 
-#endif /*USE_LV_FONT_DEJAVU_30_CYRILLIC*/
+#endif /*LV_USE_FONT_DEJAVU_30_CYRILLIC*/

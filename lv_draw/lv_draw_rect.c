@@ -30,7 +30,7 @@ static void lv_draw_rect_main_corner(const lv_area_t * coords, const lv_area_t *
 static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 
-#if USE_LV_SHADOW
+#if LV_USE_SHADOW
 static void lv_draw_shadow(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask, const  lv_style_t * style, lv_opa_t opa_scale);
 static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
@@ -66,7 +66,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 
-#if USE_LV_SHADOW
+#if LV_USE_SHADOW
     if(style->body.shadow.width != 0) {
         lv_draw_shadow(coords, mask, style, opa_scale);
     }
@@ -1025,7 +1025,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
 
 }
 
-#if USE_LV_SHADOW
+#if LV_USE_SHADOW
 
 /**
  * Draw a shadow

@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_IMG != 0
+#if LV_USE_IMG != 0
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_misc/lv_fs.h"
@@ -165,7 +165,7 @@ static inline bool lv_img_get_upscale(const lv_obj_t * img)
 /*Use this macro to declare an image in a c file*/
 #define LV_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 
-#endif  /*USE_LV_IMG*/
+#endif  /*LV_USE_IMG*/
 
 #ifdef __cplusplus
 } /* extern "C" */

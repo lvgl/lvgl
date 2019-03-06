@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_CONT != 0
+#if LV_USE_CONT != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -204,7 +204,7 @@ static inline lv_style_t * lv_cont_get_style(const lv_obj_t *cont)
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CONT*/
+#endif  /*LV_USE_CONT*/
 
 #ifdef __cplusplus
 } /* extern "C" */

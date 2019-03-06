@@ -141,9 +141,9 @@ bool lv_ll_is_empty(lv_ll_t * ll_p);
  *      MACROS
  **********************/
 
-#define LL_READ(list, i) for(i = lv_ll_get_head(&list); i != NULL; i = lv_ll_get_next(&list, i))
+#define LV_LL_READ(list, i) for(i = lv_ll_get_head(&list); i != NULL; i = lv_ll_get_next(&list, i))
 
-#define LL_READ_BACK(list, i) for(i = lv_ll_get_tail(&list); i != NULL; i = lv_ll_get_prev(&list, i))
+#define LV_LL_READ_BACK(list, i) for(i = lv_ll_get_tail(&list); i != NULL; i = lv_ll_get_prev(&list, i))
 
 #ifdef __cplusplus
 } /* extern "C" */

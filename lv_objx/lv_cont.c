@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_cont.h"
-#if USE_LV_CONT != 0
+#if LV_USE_CONT != 0
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -359,7 +359,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
     lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
     /* Align the children */
     lv_coord_t last_cord = style->body.padding.ver;
-    LL_READ_BACK(cont->child_ll, child) {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
                 lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
@@ -409,7 +409,7 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 
     /* Align the children */
     lv_coord_t last_cord = style->body.padding.hor;
-    LL_READ_BACK(cont->child_ll, child) {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
                 lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
@@ -431,7 +431,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
     uint32_t obj_num = 0;
     lv_coord_t h_tot = 0;
 
-    LL_READ(cont->child_ll, child) {
+    LV_LL_READ(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
                 lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         h_tot += lv_obj_get_height(child) + style->body.padding.inner;
@@ -448,7 +448,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 
     /* Align the children */
     lv_coord_t last_cord = - (h_tot / 2);
-    LL_READ_BACK(cont->child_ll, child) {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
                 lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
@@ -582,7 +582,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     lv_coord_t act_x = style->body.padding.hor;
     lv_coord_t act_y = style->body.padding.ver;
     uint16_t obj_cnt = 0;
-    LL_READ_BACK(cont->child_ll, child) {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false ||
                 lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
@@ -648,7 +648,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         tight_area.x2 = LV_COORD_MIN;
         tight_area.y2 = LV_COORD_MIN;
 
-        LL_READ(cont->child_ll, i) {
+        LV_LL_READ(cont->child_ll, i) {
             if(lv_obj_get_hidden(i) != false) continue;
             tight_area.x1 = LV_MATH_MIN(tight_area.x1, i->coords.x1);
             tight_area.y1 = LV_MATH_MIN(tight_area.y1, i->coords.y1);
@@ -713,7 +713,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 
         /*Tell the children the parent's size has changed*/
         lv_obj_t * i;
-        LL_READ(cont->child_ll, i) {
+        LV_LL_READ(cont->child_ll, i) {
            i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
         }
     }

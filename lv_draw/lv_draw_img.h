@@ -131,7 +131,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
  * @param src pointer to an image source:
  *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
  *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. SYMBOL_CLOSE)
+ *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
  * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
 lv_img_src_t lv_img_src_get_type(const void * src);

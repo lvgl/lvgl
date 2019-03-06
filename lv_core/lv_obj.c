@@ -48,9 +48,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static bool _lv_initialized = false;
-
+static bool lv_initialized = false;
+static lv_obj_t * obj_act_event;        /*Stores the which event is currently being executed*/
+static bool obj_act_event_deleted;      /*Shows that the object was deleted in the event function*/
 /**********************
  *      MACROS
  **********************/
@@ -65,7 +65,7 @@ static bool _lv_initialized = false;
 void lv_init(void)
 {
     /* Do nothing if already initialized */
-    if (_lv_initialized) {
+    if (lv_initialized) {
         LV_LOG_WARN("lv_init: already inited");
         return;
     }
@@ -76,16 +76,16 @@ void lv_init(void)
     lv_mem_init();
     lv_task_init();
 
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
     lv_fs_init();
 #endif
 
     lv_font_init();
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_anim_init();
 #endif
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     lv_group_init();
 #endif
 
@@ -104,7 +104,7 @@ void lv_init(void)
     lv_indev_init();
 #endif
 
-    _lv_initialized = true;
+    lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
 }
 
@@ -168,16 +168,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->event_cb = NULL;
 
         /*Init. user date*/
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
         memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
         memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
         memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         new_obj->group_p = NULL;
 #endif
         /*Set attributes*/
@@ -238,16 +238,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->event_cb = NULL;
 
         /*Init. user date*/
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
         memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
         memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
         memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         new_obj->group_p = NULL;
 #endif
 
@@ -271,10 +271,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->ext_size = copy->ext_size;
 
         /*Set free data*/
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
         memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
-#if USE_LV_USER_DATA_MULTI
+#if LV_USE_USER_DATA_MULTI
         memcpy(&new_obj->event_user_data, &copy->event_user_data, sizeof(lv_obj_user_data_t));
         memcpy(&new_obj->signal_user_data, &copy->signal_user_data, sizeof(lv_obj_user_data_t));
         memcpy(&new_obj->design_user_data, &copy->design_user_data, sizeof(lv_obj_user_data_t));
@@ -306,7 +306,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 
         new_obj->style_p = copy->style_p;
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /*Add to the same group*/
         if(copy->group_p != NULL) {
             lv_group_add_obj(copy->group_p, new_obj);
@@ -339,13 +339,15 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 {
     lv_obj_invalidate(obj);
 
+    if(obj_act_event == obj) obj_act_event_deleted = true;
+
     /*Delete from the group*/
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     if(obj->group_p != NULL) lv_group_remove_obj(obj);
 #endif
 
     /*Remove the animations from this object*/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
 #endif
 
@@ -374,10 +376,13 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     }
 
     /* Reset all input devices if
-     * the currently pressed object is deleted*/
+     * the object to delete is used*/
     lv_indev_t * indev = lv_indev_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
+            lv_indev_reset(indev);
+        }
+        if(lv_group_get_focused(indev->group) == obj) {
             lv_indev_reset(indev);
         }
         indev = lv_indev_next(indev);
@@ -613,7 +618,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     /*Tell the children the parent's size has changed*/
     lv_obj_t * i;
-    LL_READ(obj->child_ll, i) {
+    LV_LL_READ(obj->child_ll, i) {
        i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
     }
 
@@ -1013,7 +1018,7 @@ void lv_obj_report_style_mod(lv_style_t * style)
 
     while(d) {
         lv_obj_t * i;
-        LL_READ(d->scr_ll, i) {
+        LV_LL_READ(d->scr_ll, i) {
             if(i->style_p == style || style == NULL) {
                 lv_obj_refresh_style(i);
             }
@@ -1156,16 +1161,25 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb)
  * Send an event to the object
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.
+ * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-void lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
+lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
 {
-    if(obj == NULL) return;
+    if(obj == NULL) return LV_RES_OK;
 
+    obj_act_event = obj;
+    obj_act_event_deleted = false;
     if(obj->event_cb) obj->event_cb(obj, event);
+    obj_act_event = NULL;
+
+    if(obj_act_event_deleted) return LV_RES_INV;
 
     if(obj->event_parent && obj->par) {
-        lv_obj_send_event(obj->par, event);
+        lv_res_t res = lv_obj_send_event(obj->par, event);
+        if(res != LV_RES_OK) return LV_RES_INV;
     }
+
+    return LV_RES_OK;
 }
 
 /**
@@ -1228,7 +1242,7 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 }
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 /**
  * Animate an object
  * @param obj pointer to an object to animate
@@ -1344,9 +1358,9 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
     else scr = lv_obj_get_screen(obj);      /*get the screen of `obj`*/
 
     lv_disp_t * d;
-    LL_READ(LV_GC_ROOT(_lv_disp_ll), d) {
+    LV_LL_READ(LV_GC_ROOT(_lv_disp_ll), d) {
         lv_obj_t * s;
-        LL_READ(d->scr_ll, s) {
+        LV_LL_READ(d->scr_ll, s) {
             if(s == scr) return d;
         }
     }
@@ -1419,7 +1433,7 @@ uint16_t lv_obj_count_children(const lv_obj_t * obj)
     lv_obj_t * i;
     uint16_t cnt = 0;
 
-    LL_READ(obj->child_ll, i) cnt++;
+    LV_LL_READ(obj->child_ll, i) cnt++;
 
     return cnt;
 }
@@ -1530,7 +1544,7 @@ lv_style_t * lv_obj_get_style(const lv_obj_t * obj)
         while(par) {
             if(par->style_p) {
                 if(par->style_p->glass == 0) {
-#if USE_LV_GROUP == 0
+#if LV_USE_GROUP == 0
                     style_act = par->style_p;
 #else
                     /*Is a parent is focused then use then focused style*/
@@ -1547,7 +1561,7 @@ lv_style_t * lv_obj_get_style(const lv_obj_t * obj)
             par = par->par;
         }
     }
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     if(obj->group_p) {
         if(lv_group_get_focused(obj->group_p) == obj) {
             style_act = lv_group_mod_style(obj->group_p, style_act);
@@ -1735,7 +1749,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     }
 }
 
-#if USE_LV_USER_DATA_SINGLE
+#if LV_USE_USER_DATA_SINGLE
 /**
  * Get a pointer to the object's user data
  * @param obj pointer to an object
@@ -1747,7 +1761,7 @@ lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj)
 }
 #endif
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
 /**
  * Get the group of the object
  * @param obj pointer to an object
@@ -1871,7 +1885,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
 {
     lv_obj_t * i;
-    LL_READ(obj->child_ll, i) {
+    LV_LL_READ(obj->child_ll, i) {
         i->coords.x1 += x_diff;
         i->coords.y1 += y_diff;
         i->coords.x2 += x_diff;
@@ -1889,7 +1903,7 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style_p, lv_obj_t * obj)
 {
     lv_obj_t * i;
-    LL_READ(obj->child_ll, i) {
+    LV_LL_READ(obj->child_ll, i) {
         if(i->style_p == style_p || style_p == NULL) {
             refresh_children_style(i);
             lv_obj_refresh_style(i);
@@ -1925,6 +1939,9 @@ static void refresh_children_style(lv_obj_t * obj)
  */
 static void delete_children(lv_obj_t * obj)
 {
+
+    if(obj_act_event == obj) obj_act_event_deleted = true;
+
     lv_obj_t * i;
     lv_obj_t * i_next;
     i = lv_ll_get_head(&(obj->child_ll));
@@ -1932,7 +1949,7 @@ static void delete_children(lv_obj_t * obj)
     /*Remove from the group; remove before transversing children so that 
      * the object still has access to all children during the 
      * LV_SIGNAL_DEFOCUS call*/
-#if USE_LV_GROUP
+#if LV_USE_GROUP
     if(obj->group_p != NULL) lv_group_remove_obj(obj);
 #endif
 
@@ -1948,16 +1965,18 @@ static void delete_children(lv_obj_t * obj)
     }
 
     /*Remove the animations from this object*/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
 #endif
 
-
     /* Reset the input devices if
-     * the currently pressed object is deleted*/
+     * the object to delete is used*/
     lv_indev_t * indev = lv_indev_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
+            lv_indev_reset(indev);
+        }
+        if(lv_group_get_focused(indev->group) == obj) {
             lv_indev_reset(indev);
         }
         indev = lv_indev_next(indev);

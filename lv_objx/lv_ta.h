@@ -19,15 +19,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_TA != 0
+#if LV_USE_TA != 0
 
 /*Testing of dependencies*/
-#if USE_LV_PAGE == 0
-#error "lv_ta: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#if LV_USE_PAGE == 0
+#error "lv_ta: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
 #endif
 
-#if USE_LV_LABEL == 0
-#error "lv_ta: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_ta: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -383,7 +383,7 @@ void lv_ta_cursor_up(lv_obj_t * ta);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_TA_H*/
+#endif  /*LV_USE_TA_H*/
 
 #ifdef __cplusplus
 } /* extern "C" */

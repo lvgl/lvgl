@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_imgbtn.h"
-#if USE_LV_IMGBTN != 0
+#if LV_USE_IMGBTN != 0
 
 /*********************
  *      DEFINES

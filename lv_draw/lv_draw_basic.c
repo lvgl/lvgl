@@ -143,7 +143,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p,
     vdb_buf_tmp += vdb_width * vdb_rel_a.y1;
 
 
-#if USE_LV_GPU
+#if LV_USE_GPU
     static LV_ATTRIBUTE_MEM_ALIGN lv_color_t color_array_tmp[LV_HOR_RES_MAX];       /*Used by 'lv_disp_mem_blend'*/
     static lv_coord_t last_width = -1;
 
@@ -442,7 +442,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p,
         /*Normal native VDB*/
         else {
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
-#if USE_LV_GPU
+#if LV_USE_GPU
                 if(disp->driver.mem_blend == false) {
                     sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 } else {

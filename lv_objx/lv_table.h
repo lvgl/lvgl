@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_TABLE != 0
+#if LV_USE_TABLE != 0
 
 /*Testing of dependencies*/
-#if USE_LV_LABEL == 0
-#error "lv_table: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_table: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -252,7 +252,7 @@ lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_TABLE*/
+#endif  /*LV_USE_TABLE*/
 
 #ifdef __cplusplus
 } /* extern "C" */

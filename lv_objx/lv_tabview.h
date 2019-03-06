@@ -19,15 +19,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_TABVIEW != 0
+#if LV_USE_TABVIEW != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BTNM == 0
-#error "lv_tabview: lv_btnm is required. Enable it in lv_conf.h (USE_LV_BTNM  1) "
+#if LV_USE_BTNM == 0
+#error "lv_tabview: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNM  1) "
 #endif
 
-#if USE_LV_PAGE == 0
-#error "lv_tabview: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#if LV_USE_PAGE == 0
+#error "lv_tabview: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -243,7 +243,7 @@ bool lv_tabview_get_btns_hidden(const lv_obj_t *tabview);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_TABVIEW*/
+#endif  /*LV_USE_TABVIEW*/
 
 #ifdef __cplusplus
 } /* extern "C" */
