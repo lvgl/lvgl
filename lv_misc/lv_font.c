@@ -225,7 +225,7 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
     pUnicode = bsearch(&unicode_letter,
                        (uint32_t*) font->unicode_list,
                        font->glyph_cnt,
-                       sizeof(uint32_t*),
+                       sizeof(uint32_t),
                        lv_font_codeCompare);
 
     if (pUnicode != NULL) {
@@ -269,7 +269,7 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
     pUnicode = bsearch(&unicode_letter,
                        (uint32_t*) font->unicode_list,
                        font->glyph_cnt,
-                       sizeof(uint32_t*),
+                       sizeof(uint32_t),
                        lv_font_codeCompare);
 
     if (pUnicode != NULL) {
