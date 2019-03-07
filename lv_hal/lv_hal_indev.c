@@ -110,8 +110,14 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     memset(data, 0, sizeof(lv_indev_data_t));
 
-    if(indev->driver.read_cb) {
+    /* For touchpad sometimes users don't the last pressed coordinate on release.
+     * So be sure a coordinates are initialized to the last point */
+    if(indev->driver.type == LV_INDEV_TYPE_POINTER) {
+        data->point.x = indev->proc.types.pointer.act_point.x;
+        data->point.y = indev->proc.types.pointer.act_point.y;
+    }
 
+    if(indev->driver.read_cb) {
         LV_LOG_TRACE("idnev read started");
         cont = indev->driver.read_cb(&indev->driver, data);
         LV_LOG_TRACE("idnev read finished");
