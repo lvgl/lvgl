@@ -343,6 +343,30 @@ bool lv_img_get_auto_size(const lv_obj_t * img)
     return ext->auto_size == 0 ? false : true;
 }
 
+/**
+ * Get the offset.x attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.x value.
+ */
+lv_coord_t lv_img_get_offset_x(lv_obj_t *img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->offset.x;
+}
+
+/**
+ * Get the offset.y attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.y value.
+ */
+lv_coord_t lv_img_get_offset_y(lv_obj_t *img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->offset.y;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
