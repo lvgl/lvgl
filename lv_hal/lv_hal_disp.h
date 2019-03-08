@@ -161,6 +161,12 @@ void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver);
 
 /**
+ * Remove a display
+ * @param disp pointer to display
+ */
+void lv_disp_remove(lv_disp_t * disp);
+
+/**
  * Set a default screen. The new screens will be created on it by default.
  * @param disp pointer to a display
  */

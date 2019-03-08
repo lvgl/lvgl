@@ -310,6 +310,7 @@ static void indev_proc_task(void * param)
 
     /*Read and process all indevs*/
     while(i) {
+        if(i->driver.disp == NULL) continue;   /*Not assigned to any displays*/
         indev_act = i;
 
         /*Handle reset query before processing the point*/

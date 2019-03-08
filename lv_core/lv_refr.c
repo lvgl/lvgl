@@ -280,7 +280,7 @@ static void lv_refr_area(const lv_area_t * area_p)
         /*Calculate the max row num*/
         lv_coord_t w = lv_area_get_width(area_p);
         lv_coord_t h = lv_area_get_height(area_p);
-        lv_coord_t y2 = area_p->y2 >= lv_disp_get_ver_res(NULL) ? y2 = lv_disp_get_ver_res(NULL) - 1 : area_p->y2;
+        lv_coord_t y2 = area_p->y2 >= lv_disp_get_ver_res(disp_refr) ? y2 = lv_disp_get_ver_res(disp_refr) - 1 : area_p->y2;
 
         int32_t max_row = (uint32_t) vdb->size / w;
 

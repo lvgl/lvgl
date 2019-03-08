@@ -136,6 +136,31 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 }
 
 /**
+ * Remove a display
+ * @param disp pointer to display
+ */
+void lv_disp_remove(lv_disp_t * disp)
+{
+    bool was_default = false;
+    if(disp == lv_disp_get_default()) was_default = true;
+
+    /*Detach the input devices */
+    lv_indev_t * indev;
+    indev = lv_indev_next(NULL);
+    while(indev) {
+        if(indev->driver.disp == disp) {
+            indev->driver.disp = NULL;
+        }
+        indev = lv_indev_next(indev);
+    }
+
+    lv_ll_rem(&LV_GC_ROOT(_lv_disp_ll), disp);
+    lv_mem_free(disp);
+
+    if(was_default) lv_disp_set_default(lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
+}
+
+/**
  * Set a default screen. The new screens will be created on it by default.
  * @param disp pointer to a display
  */
