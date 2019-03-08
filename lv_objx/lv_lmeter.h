@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_LMETER != 0
+#if LV_USE_LMETER != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -144,7 +144,7 @@ static inline lv_style_t * lv_lmeter_get_style(const lv_obj_t * lmeter)
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_LMETER*/
+#endif  /*LV_USE_LMETER*/
 
 #ifdef __cplusplus
 } /* extern "C" */

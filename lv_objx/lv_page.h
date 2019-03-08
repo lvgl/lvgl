@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_PAGE != 0
+#if LV_USE_PAGE != 0
 
 /*Testing of dependencies*/
-#if USE_LV_CONT == 0
-#error "lv_page: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
+#if LV_USE_CONT == 0
+#error "lv_page: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT  1) "
 #endif
 
 #include "lv_cont.h"
@@ -55,8 +55,6 @@ typedef struct
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * scrl;            /*The scrollable object on the background*/
-    lv_action_t rel_action;     /*Function to call when the page is released*/
-    lv_action_t pr_action;      /*Function to call when the page is pressed*/
     struct {
         lv_style_t *style;          /*Style of scrollbars*/
         lv_area_t hor_area;            /*Horizontal scrollbar area relative to the page. (Handled by the library) */
@@ -107,20 +105,6 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_page_clean(lv_obj_t *obj);
 
 /**
- * Get the press action of the page
- * @param page pointer to a page object
- * @return a function to call when the page is pressed
- */
-lv_action_t lv_page_get_pr_action(lv_obj_t * page);
-
-/**
- * Get the release action of the page
- * @param page pointer to a page object
- * @return a function to call when the page is released
- */
-lv_action_t lv_page_get_rel_action(lv_obj_t * page);
-
-/**
  * Get the scrollable object of a page
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
@@ -130,20 +114,6 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page);
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set a release action for the page
- * @param page pointer to a page object
- * @param rel_action a function to call when the page is released
- */
-void lv_page_set_rel_action(lv_obj_t * page, lv_action_t rel_action);
-
-/**
- * Set a press action for the page
- * @param page pointer to a page object
- * @param pr_action a function to call when the page is pressed
- */
-void lv_page_set_pr_action(lv_obj_t * page, lv_action_t pr_action);
 
 /**
  * Set the scroll bar mode on a page
@@ -173,17 +143,42 @@ void lv_page_set_scroll_propagation(lv_obj_t * page, bool en);
  */
 void lv_page_set_edge_flash(lv_obj_t * page, bool en);
 
+
 /**
- * Set the fit attribute of the scrollable part of a page.
- * It means it can set its size automatically to involve all children.
- * (Can be set separately horizontally and vertically)
+ * Set the fit policy in all 4 directions separately.
+ * It tell how to change the page size automatically.
  * @param page pointer to a page object
- * @param hor_en true: enable horizontal fit
- * @param ver_en true: enable vertical fit
+ * @param left left fit policy from `lv_fit_t`
+ * @param right right fit policy from `lv_fit_t`
+ * @param top bottom fit policy from `lv_fit_t`
+ * @param bottom bottom fit policy from `lv_fit_t`
  */
-static inline void lv_page_set_scrl_fit(lv_obj_t *page, bool hor_en, bool ver_en)
+static inline void lv_page_set_scrl_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
 {
-    lv_cont_set_fit(lv_page_get_scrl(page), hor_en, ver_en);
+    lv_cont_set_fit4(lv_page_get_scrl(page), left, right, top, bottom);
+}
+
+/**
+ * Set the fit policy horizontally and vertically separately.
+ * It tell how to change the page size automatically.
+ * @param page pointer to a page object
+ * @param hot horizontal fit policy from `lv_fit_t`
+ * @param ver vertical fit policy from `lv_fit_t`
+ */
+static inline void lv_page_set_scrl_fit2(lv_obj_t * page, lv_fit_t hor, lv_fit_t ver)
+{
+    lv_cont_set_fit2(lv_page_get_scrl(page), hor, ver);
+}
+
+/**
+ * Set the fit policyin all 4 direction at once.
+ * It tell how to change the page size automatically.
+ * @param page pointer to a button object
+ * @param fit fit policy from `lv_fit_t`
+ */
+static inline void lv_page_set_scrl_fit(lv_obj_t * page, lv_fit_t fit)
+{
+    lv_cont_set_fit(lv_page_get_scrl(page), fit);
 }
 
 /**
@@ -303,23 +298,43 @@ static inline lv_layout_t lv_page_get_scrl_layout(const lv_obj_t * page)
 }
 
 /**
-* Get horizontal fit attribute of the scrollable part of a page
-* @param page pointer to a page object
-* @return true: horizontal fit is enabled; false: disabled
-*/
-static inline bool lv_page_get_scrl_hor_fit(const lv_obj_t * page)
+ * Get the left fit mode
+ * @param page pointer to a page object
+ * @return an element of `lv_fit_t`
+ */
+static inline lv_fit_t lv_page_get_scrl_fit_left(const lv_obj_t * page)
 {
-    return lv_cont_get_hor_fit(lv_page_get_scrl(page));
+    return lv_cont_get_fit_left(lv_page_get_scrl(page));
 }
 
 /**
-* Get vertical fit attribute of the scrollable part of a page
-* @param page pointer to a page object
-* @return true: vertical fit is enabled; false: disabled
-*/
-static inline bool lv_page_get_scrl_fit_ver(const lv_obj_t * page)
+ * Get the right fit mode
+ * @param page pointer to a page object
+ * @return an element of `lv_fit_t`
+ */
+static inline lv_fit_t lv_page_get_scrl_fit_right(const lv_obj_t * page)
 {
-    return lv_cont_get_ver_fit(lv_page_get_scrl(page));
+    return lv_cont_get_fit_right(lv_page_get_scrl(page));
+}
+
+/**
+ * Get the top fit mode
+ * @param page pointer to a page object
+ * @return an element of `lv_fit_t`
+ */
+static inline lv_fit_t lv_page_get_scrl_get_fit_top(const lv_obj_t * page)
+{
+    return lv_cont_get_fit_top(lv_page_get_scrl(page));
+}
+
+/**
+ * Get the bottom fit mode
+ * @param page pointer to a page object
+ * @return an element of `lv_fit_t`
+ */
+static inline lv_fit_t lv_page_get_scrl_fit_bottom(const lv_obj_t * page)
+{
+    return lv_cont_get_fit_bottom(lv_page_get_scrl(page));
 }
 
 /**
@@ -373,7 +388,7 @@ void lv_page_start_edge_flash(lv_obj_t * page);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_PAGE*/
+#endif  /*LV_USE_PAGE*/
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -54,23 +54,11 @@ void lv_refr_init(void);
 void lv_refr_now(void);
 
 /**
- * Invalidate an area
- * @param area_p pointer to area which should be invalidated
+ * Invalidate an area on display to redraw it
+ * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
+ * @param disp pointer to display where the area should be invalidated (NULL can be used if there is only one display)
  */
-void lv_inv_area(const lv_area_t * area_p);
-
-/**
- * Set a function to call after every refresh to announce the refresh time and the number of refreshed pixels
- * @param cb pointer to a callback function (void my_refr_cb(uint32_t time_ms, uint32_t px_num))
- */
-void lv_refr_set_monitor_cb(void (*cb)(uint32_t, uint32_t));
-
-/**
- * Called when an area is invalidated to modify the coordinates of the area.
- * Special display controllers may require special coordinate rounding
- * @param cb pointer to the a function which will modify the area
- */
-void lv_refr_set_round_cb(void(*cb)(lv_area_t*));
+void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
 
 /**
  * Get the number of areas in the buffer
@@ -83,6 +71,13 @@ uint16_t lv_refr_get_buf_size(void);
  * @param num number of areas to delete
  */
 void lv_refr_pop_from_buf(uint16_t num);
+
+/**
+ * Get the display which is being refreshed
+ * @return the display being refreshed
+ */
+lv_disp_t * lv_refr_get_disp_refreshing(void);
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

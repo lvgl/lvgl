@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_LINE != 0
+#if LV_USE_LINE != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -149,7 +149,7 @@ static inline bool lv_line_get_upscale(const lv_obj_t * line)
  *      MACROS
  **********************/
 
-#endif /*USE_LV_LINE*/
+#endif /*LV_USE_LINE*/
 
 #ifdef __cplusplus
 } /* extern "C" */

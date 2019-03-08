@@ -19,15 +19,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_CB != 0
+#if LV_USE_CB != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BTN == 0
-#error "lv_cb: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#if LV_USE_BTN == 0
+#error "lv_cb: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
 #endif
 
-#if USE_LV_LABEL == 0
-#error "lv_cb: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_cb: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -78,11 +78,20 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
- * Set the text of a check box
+ * Set the text of a check box. `txt` will be copied and may be deallocated
+ * after this function returns.
  * @param cb pointer to a check box
- * @param txt the text of the check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt);
+
+/**
+ * Set the text of a check box. `txt` must not be deallocated during the life
+ * of this checkbox.
+ * @param cb pointer to a check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
+ */
+void lv_cb_set_static_text(lv_obj_t * cb, const char * txt);
 
 /**
  * Set the state of the check box
@@ -102,16 +111,6 @@ static inline void lv_cb_set_inactive(lv_obj_t * cb)
 {
     lv_btn_set_state(cb, LV_BTN_STATE_INA);
 }
-
-/**
- * Set a function to call when the check box is clicked
- * @param cb pointer to a check box object
- */
-static inline void lv_cb_set_action(lv_obj_t * cb, lv_action_t action)
-{
-    lv_btn_set_action(cb, LV_BTN_ACTION_CLICK, action);
-}
-
 
 /**
  * Set a style of a check box
@@ -143,17 +142,6 @@ static inline bool lv_cb_is_checked(const lv_obj_t * cb)
 }
 
 /**
- * Get the action of a check box
- * @param cb pointer to a button object
- * @return pointer to the action function
- */
-static inline lv_action_t lv_cb_get_action(const lv_obj_t * cb)
-{
-    return lv_btn_get_action(cb, LV_BTN_ACTION_CLICK);
-}
-
-
-/**
  * Get a style of a button
  * @param cb pointer to check box object
  * @param type which style should be get
@@ -165,7 +153,7 @@ lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CB*/
+#endif  /*LV_USE_CB*/
 
 #ifdef __cplusplus
 } /* extern "C" */

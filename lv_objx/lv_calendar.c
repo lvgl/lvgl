@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_calendar.h"
-#if USE_LV_CALENDAR != 0
+#if LV_USE_CALENDAR != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_hal/lv_hal_indev.h"
@@ -52,8 +52,8 @@ static uint8_t is_leap_year(uint32_t year);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 static const char * day_name[7] = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
 static const char * month_name[12] = {"January",   "February",   "March",    "April",
         "May",       "June",       "July",     "August",
@@ -107,10 +107,6 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->highlighted_dates_num = 0;
     ext->day_names = NULL;
     ext->month_names = NULL;
-    ext->actions[LV_CALENDAR_ACTION_PR] = NULL;
-    ext->actions[LV_CALENDAR_ACTION_CLICK] = NULL;
-    ext->actions[LV_CALENDAR_ACTION_LONG_PR] = NULL;
-    ext->actions[LV_CALENDAR_ACTION_LONG_PR_REPEAT] = NULL;
     ext->style_header = &lv_style_plain_color;
     ext->style_header_pr = &lv_style_pretty_color;
     ext->style_highlighted_days = &lv_style_plain_color;
@@ -120,8 +116,8 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->style_day_names = &lv_style_pretty;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_calendar, lv_calendar_signal);
-    lv_obj_set_design_func(new_calendar, lv_calendar_design);
+    lv_obj_set_signal_cb(new_calendar, lv_calendar_signal);
+    lv_obj_set_design_cb(new_calendar, lv_calendar_design);
 
     /*Init the new calendar calendar*/
     if(copy == NULL) {
@@ -130,14 +126,14 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_BG, th->calendar.bg);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER, th->calendar.header);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER_PR, th->calendar.header_pr);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_DAY_NAMES, th->calendar.day_names);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_WEEK_BOX, th->calendar.week_box);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_TODAY_BOX, th->calendar.today_box);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, th->calendar.highlighted_days);
-            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_INACTIVE_DAYS, th->calendar.inactive_days);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_BG, th->style.calendar.bg);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER, th->style.calendar.header);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER_PR, th->style.calendar.header_pr);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_DAY_NAMES, th->style.calendar.day_names);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_WEEK_BOX, th->style.calendar.week_box);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_TODAY_BOX, th->style.calendar.today_box);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, th->style.calendar.highlighted_days);
+            lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_INACTIVE_DAYS, th->style.calendar.inactive_days);
         } else {
             lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_BG, &lv_style_pretty);
             lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HEADER, ext->style_header);
@@ -147,9 +143,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_TODAY_BOX, ext->style_today_box);
             lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, ext->style_highlighted_days);
             lv_calendar_set_style(new_calendar, LV_CALENDAR_STYLE_INACTIVE_DAYS, ext->style_inactive_days);
-
         }
-
     }
     /*Copy an existing calendar*/
     else {
@@ -165,8 +159,6 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->highlighted_dates  = copy_ext->highlighted_dates;
         ext->highlighted_dates_num = copy_ext->highlighted_dates_num;
         ext->day_names = copy_ext->day_names;
-
-        memcpy(ext->actions, copy_ext->actions, sizeof(ext->actions));
 
         ext->month_names = copy_ext->month_names;
         ext->style_header = copy_ext->style_header;
@@ -197,19 +189,6 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set a function to call when a calendar event happens
- * @param calendar pointer to a calendar object
- * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
- */
-void lv_calendar_set_action(lv_obj_t * calendar, lv_calendar_action_t type, lv_action_t action)
-{
-    if(type >= LV_CALENDAR_ACTION_NUM) return;
-
-    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    ext->actions[type] = action;
-}
 
 /**
  * Set the today's date
@@ -326,19 +305,6 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_sty
 /*=====================
  * Getter functions
  *====================*/
-
-/**
- * Get the action of a calendar
- * @param calendar pointer to a calendar object
- * @return pointer to the action function
- */
-lv_action_t lv_calendar_get_action(const lv_obj_t * calendar, lv_calendar_action_t type)
-{
-    if(type >= LV_CALENDAR_ACTION_NUM) return NULL;
-
-    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    return ext->actions[type];
-}
 
 /**
  * Get the today's date
@@ -525,20 +491,6 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_PRESSED) {
-        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        /*Call the press action, 'param' is the caller indev_proc*/
-        if(ext->actions[LV_CALENDAR_ACTION_PR]) {
-            lv_indev_t * indev = lv_indev_get_act();
-            lv_point_t p;
-            lv_indev_get_point(indev, &p);
-
-            if(calculate_touched_day(calendar, &p)){
-                if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
-                ext->btn_pressing = 0;
-                res = ext->actions[LV_CALENDAR_ACTION_PR](calendar);
-            }
-        }
     } else if(sign == LV_SIGNAL_PRESSING) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         lv_area_t header_area;
@@ -592,26 +544,13 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         }
         else if(ext->pressed_date.year != 0)
         {
-            if(ext->actions[LV_CALENDAR_ACTION_CLICK]) {
-                res = ext->actions[LV_CALENDAR_ACTION_CLICK](calendar);
-            }
+            res = lv_obj_send_event(calendar, LV_EVENT_VALUE_CHANGED);
+            if(res != LV_RES_OK) return res;
         }
 
         ext->pressed_date.year = 0;
         ext->btn_pressing = 0;
         lv_obj_invalidate(calendar);
-
-
-    } else if(sign == LV_SIGNAL_LONG_PRESS) {
-        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        if(ext->actions[LV_CALENDAR_ACTION_LONG_PR] && (ext->pressed_date.year != 0)) {
-            res = ext->actions[LV_CALENDAR_ACTION_LONG_PR](calendar);
-        }
-    } else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        if(ext->actions[LV_CALENDAR_ACTION_LONG_PR_REPEAT] && (ext->pressed_date.year != 0)) {
-            res = ext->actions[LV_CALENDAR_ACTION_LONG_PR_REPEAT](calendar);
-        }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         uint8_t c = *((uint8_t *) param);
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
@@ -752,14 +691,14 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the left arrow*/
     lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 += ext->style_header->body.padding.hor;
-    lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL);
 
     /*Add the right arrow*/
     arrow_style = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 = header_area.x2 - ext->style_header->body.padding.hor -
-            lv_txt_get_width(SYMBOL_RIGHT, strlen(SYMBOL_RIGHT), arrow_style->text.font,
+            lv_txt_get_width(LV_SYMBOL_RIGHT, strlen(LV_SYMBOL_RIGHT), arrow_style->text.font,
                     arrow_style->text.line_space, LV_TXT_FLAG_NONE);
-    lv_draw_label(&header_area, mask, arrow_style, opa_scale, SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL);
 
 }
 

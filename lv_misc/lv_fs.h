@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_FILESYSTEM
+#if LV_USE_FILESYSTEM
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -90,7 +90,7 @@ typedef struct __lv_fs_drv_t
     lv_fs_res_t (*trunc) (void * file_p);
     lv_fs_res_t (*size) (void * file_p, uint32_t * size_p);
     lv_fs_res_t (*rename) (const char * oldname, const char * newname);
-    lv_fs_res_t (*free) (uint32_t * total_p, uint32_t * free_p);
+    lv_fs_res_t (*free_space) (uint32_t * total_p, uint32_t * free_p);
 
     lv_fs_res_t (*dir_open) (void * rddir_p, const char * path);
     lv_fs_res_t (*dir_read) (void * rddir_p, char * fn);
@@ -234,7 +234,7 @@ lv_fs_res_t lv_fs_dir_close (lv_fs_dir_t * rddir_p);
  * @param free_p pointer to store the free size [kB]
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_free (char letter, uint32_t * total_p, uint32_t * free_p);
+lv_fs_res_t lv_fs_free_space (char letter, uint32_t * total_p, uint32_t * free_p);
 
 /**
  * Fill a buffer with the letters of existing drivers
@@ -268,7 +268,7 @@ const char * lv_fs_get_last(const char * path);
  *      MACROS
  **********************/
 
-#endif /*USE_LV_FILESYSTEM*/
+#endif /*LV_USE_FILESYSTEM*/
 
 #ifdef __cplusplus
 } /* extern "C" */

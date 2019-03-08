@@ -36,14 +36,16 @@ extern "C" {
 #define LV_GROUP_KEY_ENTER          10      /*0x0A, '\n'*/
 #define LV_GROUP_KEY_NEXT           9       /*0x09, '\t'*/
 #define LV_GROUP_KEY_PREV           11      /*0x0B, '*/
+#define LV_GROUP_KEY_HOME           2       /*0x02, STX*/
+#define LV_GROUP_KEY_END            3       /*0x03, ETX*/
 
-#if USE_LV_GROUP  != 0
+#if LV_USE_GROUP  != 0
 /**********************
  *      TYPEDEFS
  **********************/
 struct _lv_group_t;
 
-typedef void (*lv_group_style_mod_func_t)(lv_style_t *);
+typedef void (*lv_group_style_mod_func_t)(struct _lv_group_t *, lv_style_t *);
 typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
 
 typedef struct _lv_group_t
@@ -54,6 +56,16 @@ typedef struct _lv_group_t
     lv_group_style_mod_func_t style_mod_edit;/*A function which modifies the style of the focused object*/
     lv_group_focus_cb_t focus_cb;           /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;                   /*Stores the modified style of the focused object */
+#if LV_USE_USER_DATA_SINGLE
+    lv_group_user_data_t    user_data;
+#endif
+
+#if LV_USE_USER_DATA_MULTI
+    lv_group_user_data_t    focus_user_data;
+    lv_group_user_data_t    style_mod_user_data;
+    lv_group_user_data_t    style_mod_edit_user_data;
+#endif
+
     uint8_t frozen          :1;             /*1: can't focus to new object*/
     uint8_t editing         :1;             /*1: Edit mode, 0: Navigate mode*/
     uint8_t click_focus     :1;             /*1: If an object in a group is clicked by an indev then it will be focused */
@@ -69,6 +81,12 @@ typedef enum _lv_group_refocus_policy_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+* Init. the group module
+* @remarks Internal function, do not call directly.
+*/
+void lv_group_init(void);
 
 /**
  * Create a new object group
@@ -192,6 +210,16 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
  */
 lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
+#if LV_USE_USER_DATA_SINGLE
+/**
+ * Get a pointer to the group's user data
+ * @param group pointer to an group
+ * @return pointer to the user data
+ */
+lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group);
+
+#endif
+
 /**
  * Get a the style modifier function of a group
  * @param group pointer to a group
@@ -234,11 +262,17 @@ bool lv_group_get_click_focus(const lv_group_t * group);
  */
 bool lv_group_get_wrap(lv_group_t * group);
 
+/**
+ * Notify the group that current theme changed and style modification callbacks need to be refreshed.
+ * @param group pointer to group. If NULL then all groups are notified.
+ */
+void lv_group_report_style_mod(lv_group_t * group);
+
 /**********************
  *      MACROS
  **********************/
 
-#endif /*USE_LV_GROUP != 0*/
+#endif /*LV_USE_GROUP != 0*/
 
 #ifdef __cplusplus
 } /* extern "C" */

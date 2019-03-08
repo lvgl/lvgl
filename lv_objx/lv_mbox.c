@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_mbox.h"
-#if USE_LV_MBOX != 0
+#if LV_USE_MBOX != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
@@ -19,7 +19,7 @@
  *      DEFINES
  *********************/
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 #  ifndef LV_MBOX_CLOSE_ANIM_TIME
 #    define LV_MBOX_CLOSE_ANIM_TIME  200 /*List close animation time)  */
 #  endif
@@ -43,7 +43,7 @@ static void lv_mbox_close_end_cb(lv_obj_t * mbox);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -80,7 +80,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_mbox, lv_mbox_signal);
+    lv_obj_set_signal_cb(new_mbox, lv_mbox_signal);
 
     /*Init the new message box message box*/
     if(copy == NULL) {
@@ -90,14 +90,14 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_text(ext->text, "Message");
 
         lv_cont_set_layout(new_mbox, LV_LAYOUT_COL_M);
-        lv_cont_set_fit(new_mbox, false, true);
-        lv_obj_set_width(new_mbox, LV_HOR_RES / 2);
+        lv_cont_set_fit2(new_mbox, LV_FIT_NONE, LV_FIT_TIGHT);
+        lv_obj_set_width(new_mbox, LV_DPI * 2);
         lv_obj_align(new_mbox, NULL, LV_ALIGN_CENTER, 0, 0);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->mbox.bg);
+            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->style.mbox.bg);
         } else {
             lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, &lv_style_pretty);
         }
@@ -144,9 +144,9 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_map, lv_btnm_action_t a
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->mbox.btn.bg);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->mbox.btn.rel);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->mbox.btn.pr);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->style.mbox.btn.bg);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->style.mbox.btn.rel);
+            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->style.mbox.btn.pr);
         } else {
             lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, &lv_style_transp_fit);
         }
@@ -197,7 +197,7 @@ void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action)
 void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-#if USE_LV_ANIMATION == 0
+#if LV_USE_ANIMATION == 0
     anim_time = 0;
 #endif
 
@@ -211,7 +211,7 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
  */
 void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     if(ext->anim_time != 0) {
@@ -220,7 +220,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         lv_obj_animate(mbox, LV_ANIM_GROW_V | LV_ANIM_OUT, ext->anim_time, delay, lv_mbox_close_end_cb);
 
         /*Disable fit to let shrinking work*/
-        lv_cont_set_fit(mbox, false, false);
+        lv_cont_set_fit(mbox, LV_FIT_NONE);
     } else {
         lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_mbox_close_end_cb);
     }
@@ -236,7 +236,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
  */
 void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_anim_del(mbox, NULL);
 #else
     (void)mbox; /*Unused*/
@@ -377,17 +377,29 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
 
 /**
  * Get whether recoloring is enabled
- * @param btnm pointer to button matrix object
+ * @param mbox pointer to a message box object
  * @return whether recoloring is enabled
  */
 bool lv_mbox_get_recolor(const lv_obj_t * mbox)
 {
-	lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-	if(!ext->btnm)
-		return false;
+    if(!ext->btnm)
+        return false;
 
-	return lv_btnm_get_recolor(ext->btnm);
+    return lv_btnm_get_recolor(ext->btnm);
+}
+
+/**
+ * Get message box button matrix
+ * @param mbox pointer to a message box object
+ * @return pointer to button matrix object
+ * @remarks return value will be NULL unless `lv_mbox_add_btns` has been already called
+ */
+lv_obj_t * lv_mbox_get_btnm(lv_obj_t * mbox)
+{
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    return ext->btnm;
 }
 
 
@@ -431,13 +443,13 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS ||
               sign == LV_SIGNAL_CONTROLL || sign == LV_SIGNAL_GET_EDITABLE) {
         if(ext->btnm) {
-            ext->btnm->signal_func(ext->btnm, sign, param);
+            ext->btnm->signal_cb(ext->btnm, sign, param);
         }
 
         /* The button matrix with ENCODER input supposes it's in a group but in this case it isn't (Only the message box's container)
          * So so some actions here instead*/
         if(sign == LV_SIGNAL_FOCUS) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
             lv_indev_t * indev = lv_indev_get_act();
             lv_hal_indev_type_t indev_type = lv_indev_get_type(indev);
             if(indev_type == LV_INDEV_TYPE_ENCODER) {

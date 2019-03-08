@@ -22,7 +22,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 typedef struct {
     lv_style_t style_start;   /*Save not only pointers because can be same as 'style_anim' then it will be modified too*/
     lv_style_t style_end;
@@ -34,7 +34,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val);
 static void style_animation_common_end_cb(void * ptr);
 #endif
@@ -78,8 +78,8 @@ void lv_style_init(void)
     lv_style_scr.body.main_color = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color = LV_COLOR_WHITE;
     lv_style_scr.body.radius = 0;
-    lv_style_scr.body.padding.ver = LV_DPI / 12;
-    lv_style_scr.body.padding.hor = LV_DPI / 12;
+    lv_style_scr.body.padding.ver = 0;
+    lv_style_scr.body.padding.hor = 0;
     lv_style_scr.body.padding.inner = LV_DPI / 12;
 
     lv_style_scr.body.border.color = LV_COLOR_BLACK;
@@ -108,6 +108,8 @@ void lv_style_init(void)
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
+    lv_style_plain.body.padding.hor = LV_DPI / 12;
+    lv_style_plain.body.padding.ver = LV_DPI / 12;
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
@@ -140,9 +142,9 @@ void lv_style_init(void)
 
     /*Transparent style*/
     memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_transp.body.empty = 1;
     lv_style_transp.glass = 1;
     lv_style_transp.body.border.width = 0;
+    lv_style_transp.body.opa = LV_OPA_TRANSP;
 
     /*Transparent fitting size*/
     memcpy(&lv_style_transp_fit, &lv_style_transp, sizeof(lv_style_t));
@@ -252,14 +254,12 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
     res->line.color = lv_color_mix(end->line.color, start->line.color, opa);
 
     if(ratio < (STYLE_MIX_MAX >> 1)) {
-        res->body.empty = start->body.empty;
         res->body.border.part = start->body.border.part;
         res->glass = start->glass;
         res->text.font = start->text.font;
         res->body.shadow.type = start->body.shadow.type;
         res->line.rounded = start->line.rounded;
     } else {
-        res->body.empty = end->body.empty;
         res->body.border.part = end->body.border.part;
         res->glass = end->glass;
         res->text.font = end->text.font;
@@ -268,7 +268,7 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
     }
 }
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
@@ -312,7 +312,7 @@ void * lv_style_anim_create(lv_style_anim_t * anim)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 /**
  * Used by the style animations to set the values of a style according to start and end style.
  * @param dsc the 'animated variable' set by lv_style_anim_create()

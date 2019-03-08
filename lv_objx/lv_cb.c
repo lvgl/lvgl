@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_cb.h"
-#if USE_LV_CB != 0
+#if LV_USE_CB != 0
 
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
@@ -30,9 +30,9 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_bg_design;
-static lv_design_func_t ancestor_bullet_design;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_bg_design;
+static lv_design_cb_t ancestor_bullet_design;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -68,8 +68,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->bullet = NULL;
     ext->label = NULL;
 
-    lv_obj_set_signal_func(new_cb, lv_cb_signal);
-    lv_obj_set_design_func(new_cb, lv_cb_design);
+    lv_obj_set_signal_cb(new_cb, lv_cb_signal);
+    lv_obj_set_design_cb(new_cb, lv_cb_design);
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
@@ -81,19 +81,19 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_cb_set_text(new_cb, "Check box");
         lv_btn_set_layout(new_cb, LV_LAYOUT_ROW_M);
-        lv_btn_set_fit(new_cb, true, true);
+        lv_btn_set_fit(new_cb, LV_FIT_TIGHT);
         lv_btn_set_toggle(new_cb, true);
         lv_obj_set_protect(new_cb, LV_PROTECT_PRESS_LOST);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BG, th->cb.bg);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, th->cb.box.rel);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_PR, th->cb.box.pr);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_REL, th->cb.box.tgl_rel);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_PR, th->cb.box.tgl_pr);
-            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->cb.box.ina);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BG, th->style.cb.bg);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, th->style.cb.box.rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_PR, th->style.cb.box.pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_REL, th->style.cb.box.tgl_rel);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_TGL_PR, th->style.cb.box.tgl_pr);
+            lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_INA, th->style.cb.box.ina);
         } else {
             lv_cb_set_style(new_cb, LV_CB_STYLE_BG, &lv_style_transp);
             lv_cb_set_style(new_cb, LV_CB_STYLE_BOX_REL, &lv_style_pretty);
@@ -107,7 +107,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_cb);
     }
 
-    lv_obj_set_design_func(ext->bullet, lv_bullet_design);
+    lv_obj_set_design_cb(ext->bullet, lv_bullet_design);
 
 
     LV_LOG_INFO("check box created");
@@ -120,14 +120,26 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
  *====================*/
 
 /**
- * Set the text of a check box
+ * Set the text of a check box. `txt` will be copied and may be deallocated
+ * after this function returns.
  * @param cb pointer to a check box
- * @param txt the text of the check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_text(ext->label, txt);
+}
+
+/**
+ * Set the text of a check box. `txt` must not be deallocated during the life
+ * of this checkbox.
+ * @param cb pointer to a check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
+ */
+void lv_cb_set_static_text(lv_obj_t * cb, const char * txt) {
+    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_label_set_static_text(ext->label, txt);
 }
 
 /**
@@ -271,15 +283,15 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_bullet_design(bullet, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         /* If the check box is the active in a group and
-         * the background is not visible (transparent or empty)
+         * the background is not visible (transparent)
          * then activate the style of the bullet*/
         lv_style_t * style_ori = lv_obj_get_style(bullet);
         lv_obj_t * bg = lv_obj_get_parent(bullet);
         lv_style_t * style_page = lv_obj_get_style(bg);
         lv_group_t * g = lv_obj_get_group(bg);
-        if(style_page->body.empty != 0 || style_page->body.opa == LV_OPA_TRANSP) { /*Background is visible?*/
+        if(style_page->body.opa == LV_OPA_TRANSP) { /*Is the Background visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
                 style_mod = lv_group_mod_style(g, style_ori);
@@ -289,7 +301,7 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
 #endif
         ancestor_bullet_design(bullet, mask, mode);
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         bullet->style_p = style_ori;  /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {

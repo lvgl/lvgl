@@ -42,6 +42,8 @@ for i in inlines:
     fout.write('#ifndef ' + splitted[1] + '\n')
     fout.write(i + '\n') 
     fout.write('#endif\n')
+  elif(re.search('^ *typedef .*;.*$', i)):
+    continue;   #igonre typedefs to avoide redeclaration
   else:
     fout.write(i + '\n')  
     

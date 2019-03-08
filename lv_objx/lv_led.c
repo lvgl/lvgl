@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_led.h"
-#if USE_LV_LED != 0
+#if LV_USE_LED != 0
 
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
@@ -33,8 +33,8 @@ static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design_f;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design_f;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -69,8 +69,8 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->bright = LV_LED_BRIGHT_ON;
 
-    lv_obj_set_signal_func(new_led, lv_led_signal);
-    lv_obj_set_design_func(new_led, lv_led_design);
+    lv_obj_set_signal_cb(new_led, lv_led_signal);
+    lv_obj_set_design_cb(new_led, lv_led_design);
 
     /*Init the new led object*/
     if(copy == NULL) {
@@ -79,7 +79,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_led_set_style(new_led, th->led);
+            lv_led_set_style(new_led, th->style.led);
         } else {
             lv_led_set_style(new_led, &lv_style_pretty_color);
         }

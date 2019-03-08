@@ -7,9 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_win.h"
-#if USE_LV_WIN != 0
+#if LV_USE_WIN != 0
 
 #include "../lv_themes/lv_theme.h"
+#include "../lv_core/lv_disp.h"
 
 /*********************
  *      DEFINES
@@ -28,7 +29,7 @@ static void lv_win_realign(lv_obj_t * win);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -70,7 +71,10 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new window object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
+        lv_disp_t * disp = lv_obj_get_disp(new_win);
+        lv_coord_t hres = lv_disp_get_hor_res(disp);
+        lv_coord_t vres = lv_disp_get_ver_res(disp);
+        lv_obj_set_size(new_win, hres, vres);
         lv_obj_set_pos(new_win, 0, 0);
         lv_obj_set_style(new_win, &lv_style_pretty);
 
@@ -92,22 +96,21 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->win.bg);
-            lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->win.sb);
-            lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, th->win.header);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, th->win.content.bg);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->win.content.scrl);
-            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->win.btn.rel);
-            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->win.btn.pr);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->style.win.bg);
+            lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->style.win.sb);
+            lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, th->style.win.header);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, th->style.win.content.bg);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->style.win.content.scrl);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->style.win.btn.rel);
+            lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->style.win.btn.pr);
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_plain);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_plain);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_transp_fit);
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
         }
 
-        lv_obj_set_signal_func(new_win, lv_win_signal);
-        lv_obj_set_size(new_win, LV_HOR_RES, LV_VER_RES);
+        lv_obj_set_signal_cb(new_win, lv_win_signal);
     }
     /*Copy an existing object*/
     else {
@@ -129,11 +132,11 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
             child = lv_obj_get_child_back(copy_ext->header, child);
         }
 
-        lv_obj_set_signal_func(new_win, lv_win_signal);
-
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_win);
+        lv_obj_set_signal_cb(new_win, lv_win_signal);
     }
+
+    /*Refresh the style with new signal function*/
+    lv_obj_refresh_style(new_win);
 
     lv_win_realign(new_win);
 
@@ -160,10 +163,10 @@ void lv_win_clean(lv_obj_t * obj)
  * Add control button to the header of the window
  * @param win pointer to a window object
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
- * @param rel_action a function pointer to call when the button is released
+ * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_action)
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t event_cb)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
@@ -171,7 +174,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_
     lv_btn_set_style(btn, LV_BTN_STYLE_REL, ext->style_btn_rel);
     lv_btn_set_style(btn, LV_BTN_STYLE_PR, ext->style_btn_pr);
     lv_obj_set_size(btn, ext->btn_size, ext->btn_size);
-    lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, rel_action);
+    lv_obj_set_event_cb(btn, event_cb);
 
     lv_obj_t * img = lv_img_create(btn, NULL);
     lv_obj_set_click(img, false);
@@ -187,17 +190,17 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_action_t rel_
  *====================*/
 
 /**
- * A release action which can be assigned to a window control button to close it
- * @param btn pointer to the released button
- * @return always LV_ACTION_RES_INV because the button is deleted with the window
+ * Can be assigned to a window control button to close the window
+ * @param btn pointer to the control button on teh widows header
+ * @param evet the event type
  */
-lv_res_t lv_win_close_action(lv_obj_t * btn)
+void lv_win_close_event(lv_obj_t * btn, lv_event_t event)
 {
-    lv_obj_t * win = lv_win_get_from_btn(btn);
+    if(event == LV_EVENT_RELEASED) {
+        lv_obj_t * win = lv_win_get_from_btn(btn);
 
-    lv_obj_del(win);
-
-    return LV_RES_INV;
+        lv_obj_del(win);
+    }
 }
 
 /**
@@ -505,7 +508,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->title = NULL;
     } else if(sign == LV_SIGNAL_CONTROLL) {
         /*Forward all the control signals to the page*/
-        ext->page->signal_func(ext->page, sign, param);
+        ext->page->signal_cb(ext->page, sign, param);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

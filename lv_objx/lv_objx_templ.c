@@ -14,7 +14,7 @@
  *      INCLUDES
  *********************/
 //#include "lv_templ.h" /*TODO uncomment this*/
-#if USE_LV_TEMPL != 0
+#if LV_USE_TEMPL != 0
 
 /*********************
  *      DEFINES

@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_BTN != 0
+#if LV_USE_BTN != 0
 
 /*Testing of dependencies*/
-#if USE_LV_CONT == 0
-#error "lv_btn: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
+#if LV_USE_CONT == 0
+#error "lv_btn: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT  1) "
 #endif
 
 #include "lv_cont.h"
@@ -50,23 +50,11 @@ enum
 };
 typedef uint8_t lv_btn_state_t;
 
-enum
-{
-    LV_BTN_ACTION_CLICK,
-    LV_BTN_ACTION_PR,
-    LV_BTN_ACTION_LONG_PR,
-    LV_BTN_ACTION_LONG_PR_REPEAT,
-    LV_BTN_ACTION_NUM,
-};
-typedef uint8_t lv_btn_action_t;
-
-
 /*Data of button*/
 typedef struct
 {
     lv_cont_ext_t cont; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_action_t actions[LV_BTN_ACTION_NUM];
     lv_style_t * styles[LV_BTN_STATE_NUM];        /*Styles in each state*/
     lv_btn_state_t state;                         /*Current state of the button from 'lv_btn_state_t' enum*/
 #if LV_BTN_INK_EFFECT
@@ -75,7 +63,6 @@ typedef struct
     uint16_t ink_out_time;                        /*[ms] Time of ink disappearing*/
 #endif
     uint8_t toggle :1;                            /*1: Toggle enabled*/
-    uint8_t long_pr_action_executed :1;           /*1: Long press action executed (Handled by the library)*/
 } lv_btn_ext_t;
 
 /*Styles*/
@@ -125,13 +112,6 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state);
 void lv_btn_toggle(lv_obj_t * btn);
 
 /**
- * Set a function to call when a button event happens
- * @param btn pointer to a button object
- * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
- */
-void lv_btn_set_action(lv_obj_t * btn, lv_btn_action_t type, lv_action_t action);
-
-/**
  * Set the layout on a button
  * @param btn pointer to a button object
  * @param layout a layout from 'lv_cont_layout_t'
@@ -142,15 +122,40 @@ static inline void lv_btn_set_layout(lv_obj_t * btn, lv_layout_t layout)
 }
 
 /**
- * Enable the horizontal or vertical fit.
- * The button size will be set to involve the children horizontally or vertically.
+ * Set the fit policy in all 4 directions separately.
+ * It tell how to change the button size automatically.
  * @param btn pointer to a button object
- * @param hor_en true: enable the horizontal fit
- * @param ver_en true: enable the vertical fit
+ * @param left left fit policy from `lv_fit_t`
+ * @param right right fit policy from `lv_fit_t`
+ * @param top bottom fit policy from `lv_fit_t`
+ * @param bottom bottom fit policy from `lv_fit_t`
  */
-static inline void lv_btn_set_fit(lv_obj_t * btn, bool hor_en, bool ver_en)
+static inline void lv_btn_set_fit4(lv_obj_t * btn, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
 {
-    lv_cont_set_fit(btn, hor_en, ver_en);
+    lv_cont_set_fit4(btn, left, right, top, bottom);
+}
+
+/**
+ * Set the fit policy horizontally and vertically separately.
+ * It tell how to change the button size automatically.
+ * @param btn pointer to a button object
+ * @param hot horizontal fit policy from `lv_fit_t`
+ * @param ver vertical fit policy from `lv_fit_t`
+ */
+static inline void lv_btn_set_fit2(lv_obj_t * btn, lv_fit_t hor, lv_fit_t ver)
+{
+    lv_cont_set_fit2(btn, hor, ver);
+}
+
+/**
+ * Set the fit policy in all 4 direction at once.
+ * It tell how to change the button size automatically.
+ * @param btn pointer to a button object
+ * @param fit fit policy from `lv_fit_t`
+ */
+static inline void lv_btn_set_fit(lv_obj_t * cont, lv_fit_t fit)
+{
+    lv_cont_set_fit(cont, fit);
 }
 
 /**
@@ -201,13 +206,6 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn);
 bool lv_btn_get_toggle(const lv_obj_t * btn);
 
 /**
- * Get the release action of a button
- * @param btn pointer to a button object
- * @return pointer to the release action function
- */
-lv_action_t lv_btn_get_action(const lv_obj_t * btn, lv_btn_action_t type);
-
-/**
  * Get the layout of a button
  * @param btn pointer to button object
  * @return the layout from 'lv_cont_layout_t'
@@ -218,24 +216,45 @@ static inline lv_layout_t lv_btn_get_layout(const lv_obj_t * btn)
 }
 
 /**
- * Get horizontal fit enable attribute of a button
+ * Get the left fit mode
  * @param btn pointer to a button object
- * @return true: horizontal fit is enabled; false: disabled
+ * @return an element of `lv_fit_t`
  */
-static inline bool lv_btn_get_hor_fit(const lv_obj_t * btn)
+static inline lv_fit_t lv_btn_get_fit_left(const lv_obj_t * btn)
 {
-    return lv_cont_get_hor_fit(btn);
+    return lv_cont_get_fit_left(btn);
 }
 
 /**
- * Get vertical fit enable attribute of a container
+ * Get the right fit mode
  * @param btn pointer to a button object
- * @return true: vertical fit is enabled; false: disabled
+ * @return an element of `lv_fit_t`
  */
-static inline bool lv_btn_get_ver_fit(const lv_obj_t * btn)
+static inline lv_fit_t lv_btn_get_fit_right(const lv_obj_t * btn)
 {
-    return lv_cont_get_ver_fit(btn);
+    return lv_cont_get_fit_right(btn);
 }
+
+/**
+ * Get the top fit mode
+ * @param btn pointer to a button object
+ * @return an element of `lv_fit_t`
+ */
+static inline lv_fit_t lv_btn_get_fit_top(const lv_obj_t * btn)
+{
+    return lv_cont_get_fit_top(btn);
+}
+
+/**
+ * Get the bottom fit mode
+ * @param btn pointer to a button object
+ * @return an element of `lv_fit_t`
+ */
+static inline lv_fit_t lv_btn_get_fit_bottom(const lv_obj_t * btn)
+{
+    return lv_cont_get_fit_bottom(btn);
+}
+
 
 /**
  * Get time of the ink in effect (draw a circle on click to animate in the new state)
@@ -270,7 +289,7 @@ lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_BUTTON*/
+#endif  /*LV_USE_BUTTON*/
 
 #ifdef __cplusplus
 } /* extern "C" */

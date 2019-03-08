@@ -1,7 +1,7 @@
 
 #include "../lv_misc/lv_font.h"
 
-#if USE_LV_FONT_SYMBOL_20 != 0  /*Can be enabled in lv_conf.h*/
+#if LV_USE_FONT_SYMBOL_20 != 0  /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
  * fontawesome-webfont.ttf 20 px Font in U+f000 () .. U+f2ee ()  range with 1 bpp
@@ -10,7 +10,7 @@
 
 /*Store the image of the letters (glyph)*/
 static const uint8_t lv_font_symbol_20_glyph_bitmap[] = {
-#if USE_LV_FONT_SYMBOL_20 == 1
+#if LV_USE_FONT_SYMBOL_20 == 1
     /*Unicode: U+f001 () , Width: 17 */
     0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00,  //.................
@@ -1162,7 +1162,7 @@ static const uint8_t lv_font_symbol_20_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_SYMBOL_20 == 2
+#elif LV_USE_FONT_SYMBOL_20 == 2
     /*Unicode: U+f001 () , Width: 17 */
     0x00, 0x00, 0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00, 0x00, 0x00,  //.................
@@ -2314,7 +2314,7 @@ static const uint8_t lv_font_symbol_20_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_SYMBOL_20 == 4
+#elif LV_USE_FONT_SYMBOL_20 == 4
     /*Unicode: U+f001 () , Width: 17 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
@@ -3466,7 +3466,7 @@ static const uint8_t lv_font_symbol_20_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_SYMBOL_20 == 8
+#elif LV_USE_FONT_SYMBOL_20 == 8
     /*Unicode: U+f001 () , Width: 17 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //.................
@@ -4624,7 +4624,7 @@ static const uint8_t lv_font_symbol_20_glyph_bitmap[] = {
 
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_symbol_20_glyph_dsc[] = {
-#if USE_LV_FONT_SYMBOL_20 == 1
+#if LV_USE_FONT_SYMBOL_20 == 1
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 21,  .glyph_index = 60}, /*Unicode: U+f008 ()*/
     {.w_px = 19,  .glyph_index = 120},    /*Unicode: U+f00b ()*/
@@ -4676,7 +4676,7 @@ static const lv_font_glyph_dsc_t lv_font_symbol_20_glyph_dsc[] = {
     {.w_px = 25,  .glyph_index = 2660},   /*Unicode: U+f244 ()*/
     {.w_px = 14,  .glyph_index = 2740},   /*Unicode: U+f293 ()*/
 
-#elif USE_LV_FONT_SYMBOL_20 == 2
+#elif LV_USE_FONT_SYMBOL_20 == 2
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 21,  .glyph_index = 100},    /*Unicode: U+f008 ()*/
     {.w_px = 19,  .glyph_index = 220},    /*Unicode: U+f00b ()*/
@@ -4728,7 +4728,7 @@ static const lv_font_glyph_dsc_t lv_font_symbol_20_glyph_dsc[] = {
     {.w_px = 25,  .glyph_index = 4640},   /*Unicode: U+f244 ()*/
     {.w_px = 14,  .glyph_index = 4780},   /*Unicode: U+f293 ()*/
 
-#elif USE_LV_FONT_SYMBOL_20 == 4
+#elif LV_USE_FONT_SYMBOL_20 == 4
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 21,  .glyph_index = 180},    /*Unicode: U+f008 ()*/
     {.w_px = 19,  .glyph_index = 400},    /*Unicode: U+f00b ()*/
@@ -4780,7 +4780,7 @@ static const lv_font_glyph_dsc_t lv_font_symbol_20_glyph_dsc[] = {
     {.w_px = 25,  .glyph_index = 8640},   /*Unicode: U+f244 ()*/
     {.w_px = 14,  .glyph_index = 8900},   /*Unicode: U+f293 ()*/
 
-#elif USE_LV_FONT_SYMBOL_20 == 8
+#elif LV_USE_FONT_SYMBOL_20 == 8
     {.w_px = 17,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 21,  .glyph_index = 340},    /*Unicode: U+f008 ()*/
     {.w_px = 19,  .glyph_index = 760},    /*Unicode: U+f00b ()*/
@@ -4845,17 +4845,17 @@ lv_font_t lv_font_symbol_20 = {
     .unicode_list = NULL,
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
-#if USE_LV_FONT_SYMBOL_20 == 1
+#if LV_USE_FONT_SYMBOL_20 == 1
     .bpp = 1,               /*Bit per pixel*/
-#elif USE_LV_FONT_SYMBOL_20 == 2
+#elif LV_USE_FONT_SYMBOL_20 == 2
     .bpp = 2,               /*Bit per pixel*/
-#elif USE_LV_FONT_SYMBOL_20 == 4
+#elif LV_USE_FONT_SYMBOL_20 == 4
     .bpp = 4,               /*Bit per pixel*/
-#elif USE_LV_FONT_SYMBOL_20 == 8
+#elif LV_USE_FONT_SYMBOL_20 == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
     .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 
-#endif /*USE_LV_FONT_SYMBOL_20*/
+#endif /*LV_USE_FONT_SYMBOL_20*/

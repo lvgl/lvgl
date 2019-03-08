@@ -20,7 +20,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -167,7 +167,7 @@ int32_t lv_anim_path_step(const lv_anim_t *a);
  *      MACROS
  **********************/
 
-#endif /*USE_LV_ANIMATION == 0*/
+#endif /*LV_USE_ANIMATION == 0*/
 
 #ifdef __cplusplus
 } /* extern "C" */

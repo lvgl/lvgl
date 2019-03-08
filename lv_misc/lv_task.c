@@ -224,7 +224,7 @@ void lv_task_set_prio(lv_task_t * lv_task_p, lv_task_prio_t prio)
 {
     /*Find the tasks with new priority*/
     lv_task_t * i;
-    LL_READ(LV_GC_ROOT(_lv_task_ll), i) {
+    LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i) {
         if(i->prio <= prio) {
             if(i != lv_task_p) lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), lv_task_p, i);
             break;

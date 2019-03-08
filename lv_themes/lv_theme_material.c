@@ -8,7 +8,7 @@
  *********************/
 #include "lv_theme.h"
 
-#if USE_LV_THEME_MATERIAL
+#if LV_USE_THEME_MATERIAL
 
 /*********************
  *      DEFINES
@@ -80,23 +80,23 @@ static void basic_init(void)
     sb.body.opa = LV_OPA_40;
     sb.body.padding.hor = LV_DPI / 25;
 
-    theme.bg = &bg;
-    theme.panel = &panel;
+    theme.style.bg = &bg;
+    theme.style.panel = &panel;
 
 }
 
 static void cont_init(void)
 {
-#if USE_LV_CONT != 0
+#if LV_USE_CONT != 0
 
 
-    theme.cont = theme.panel;
+    theme.style.cont = theme.style.panel;
 #endif
 }
 
 static void btn_init(void)
 {
-#if USE_LV_BTN != 0
+#if LV_USE_BTN != 0
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&rel, &def);
@@ -135,18 +135,18 @@ static void btn_init(void)
     ina.text.color = lv_color_hsv_to_rgb(_hue, 95, 5);
     ina.image.color = lv_color_hsv_to_rgb(_hue, 95, 5);
 
-    theme.btn.rel = &rel;
-    theme.btn.pr = &pr;
-    theme.btn.tgl_rel = &tgl_rel;
-    theme.btn.tgl_pr =  &tgl_pr;
-    theme.btn.ina =  &ina;
+    theme.style.btn.rel = &rel;
+    theme.style.btn.pr = &pr;
+    theme.style.btn.tgl_rel = &tgl_rel;
+    theme.style.btn.tgl_pr =  &tgl_pr;
+    theme.style.btn.ina =  &ina;
 #endif
 }
 
 
 static void label_init(void)
 {
-#if USE_LV_LABEL != 0
+#if LV_USE_LABEL != 0
     static lv_style_t prim, sec, hint;
 
     lv_style_copy(&prim, &def);
@@ -159,15 +159,15 @@ static void label_init(void)
     lv_style_copy(&hint, &prim);
     hint.text.color = lv_color_hsv_to_rgb(_hue, 40, 90);
 
-    theme.label.prim = &prim;
-    theme.label.sec = &sec;
-    theme.label.hint = &hint;
+    theme.style.label.prim = &prim;
+    theme.style.label.sec = &sec;
+    theme.style.label.hint = &hint;
 #endif
 }
 
 static void img_init(void)
 {
-#if USE_LV_IMG != 0
+#if LV_USE_IMG != 0
     static lv_style_t img_light, img_dark;
     lv_style_copy(&img_light, &def);
     img_light.image.color = lv_color_hsv_to_rgb(_hue, 15, 85);
@@ -178,23 +178,23 @@ static void img_init(void)
     img_light.image.intense = LV_OPA_80;
 
 
-    theme.img.light = &def;
-    theme.img.dark = &def;
+    theme.style.img.light = &def;
+    theme.style.img.dark = &def;
 #endif
 }
 
 static void line_init(void)
 {
-#if USE_LV_LINE != 0
+#if LV_USE_LINE != 0
 
 
-    theme.line.decor = &def;
+    theme.style.line.decor = &def;
 #endif
 }
 
 static void led_init(void)
 {
-#if USE_LV_LED != 0
+#if LV_USE_LED != 0
     static lv_style_t led;
     lv_style_copy(&led, &def);
     led.body.shadow.width = LV_DPI / 10;
@@ -207,13 +207,13 @@ static void led_init(void)
     led.body.shadow.color = lv_color_hsv_to_rgb(_hue, 100, 100);
 
 
-    theme.led = &led;
+    theme.style.led = &led;
 #endif
 }
 
 static void bar_init(void)
 {
-#if USE_LV_BAR
+#if LV_USE_BAR
     static lv_style_t bar_bg, bar_indic;
 
     lv_style_copy(&bar_bg, &def);
@@ -230,39 +230,39 @@ static void bar_init(void)
     bar_indic.body.padding.hor = 0;
     bar_indic.body.padding.ver = 0;
 
-    theme.bar.bg = &bar_bg;
-    theme.bar.indic = &bar_indic;
+    theme.style.bar.bg = &bar_bg;
+    theme.style.bar.indic = &bar_indic;
 #endif
 }
 
 static void slider_init(void)
 {
-#if USE_LV_SLIDER != 0
+#if LV_USE_SLIDER != 0
     static lv_style_t knob;
 
     lv_style_copy(&knob, &def);
     knob.body.radius = LV_RADIUS_CIRCLE;
     knob.body.border.width = 0;
-    knob.body.main_color = theme.bar.indic->body.main_color;
+    knob.body.main_color = theme.style.bar.indic->body.main_color;
     knob.body.grad_color = knob.body.main_color;
 
-    theme.slider.bg = theme.bar.bg;
-    theme.slider.indic = theme.bar.indic;
-    theme.slider.knob = &knob;
+    theme.style.slider.bg = theme.style.bar.bg;
+    theme.style.slider.indic = theme.style.bar.indic;
+    theme.style.slider.knob = &knob;
 #endif
 }
 
 static void sw_init(void)
 {
-#if USE_LV_SW != 0
+#if LV_USE_SW != 0
     static lv_style_t sw_bg, sw_indic, sw_knob_off, sw_knob_on;
-    lv_style_copy(&sw_bg, theme.slider.bg);
+    lv_style_copy(&sw_bg, theme.style.slider.bg);
     sw_bg.body.radius = LV_RADIUS_CIRCLE;
 
-    lv_style_copy(&sw_indic, theme.slider.bg);
+    lv_style_copy(&sw_indic, theme.style.slider.bg);
     sw_indic.body.radius = LV_RADIUS_CIRCLE;
 
-    lv_style_copy(&sw_knob_on, theme.slider.knob);
+    lv_style_copy(&sw_knob_on, theme.style.slider.knob);
     sw_knob_on.body.shadow.width = 3;
     sw_knob_on.body.shadow.type = LV_SHADOW_BOTTOM;
     sw_knob_on.body.shadow.color = DEF_SHADOW_COLOR;
@@ -275,17 +275,17 @@ static void sw_init(void)
     sw_knob_off.body.border.color = LV_COLOR_HEX3(0x999);
     sw_knob_off.body.border.opa = LV_OPA_COVER;
 
-    theme.sw.bg = &sw_bg;
-    theme.sw.indic = &sw_indic;
-    theme.sw.knob_off = &sw_knob_off;
-    theme.sw.knob_on = &sw_knob_on;
+    theme.style.sw.bg = &sw_bg;
+    theme.style.sw.indic = &sw_indic;
+    theme.style.sw.knob_off = &sw_knob_off;
+    theme.style.sw.knob_on = &sw_knob_on;
 #endif
 }
 
 
 static void lmeter_init(void)
 {
-#if USE_LV_LMETER != 0
+#if LV_USE_LMETER != 0
     static lv_style_t lmeter;
     lv_style_copy(&lmeter, &def);
     lmeter.body.main_color = lv_color_hsv_to_rgb(_hue, 75, 90);
@@ -294,13 +294,13 @@ static void lmeter_init(void)
     lmeter.line.color = LV_COLOR_HEX3(0x999);
     lmeter.line.width = 2;
 
-    theme.lmeter = &lmeter;
+    theme.style.lmeter = &lmeter;
 #endif
 }
 
 static void gauge_init(void)
 {
-#if USE_LV_GAUGE != 0
+#if LV_USE_GAUGE != 0
 
     static lv_style_t gauge;
     lv_style_copy(&gauge, &def);
@@ -313,13 +313,13 @@ static void gauge_init(void)
     gauge.line.width = 3;
     gauge.line.color = lv_color_hsv_to_rgb(_hue, 95, 70);
 
-    theme.gauge = &gauge;
+    theme.style.gauge = &gauge;
 #endif
 }
 
 static void arc_init(void)
 {
-#if USE_LV_ARC != 0
+#if LV_USE_ARC != 0
 
     static lv_style_t arc;
     lv_style_copy(&arc, &def);
@@ -332,28 +332,28 @@ static void arc_init(void)
     arc.body.padding.hor = 0;
     arc.body.padding.ver = 0;
 
-    theme.arc = &arc;
+    theme.style.arc = &arc;
 #endif
 }
 
 static void preload_init(void)
 {
-#if USE_LV_PRELOAD != 0
+#if LV_USE_PRELOAD != 0
 
-    theme.preload = theme.arc;
+    theme.style.preload = theme.style.arc;
 #endif
 }
 
 static void chart_init(void)
 {
-#if USE_LV_CHART
-    theme.chart = theme.panel;
+#if LV_USE_CHART
+    theme.style.chart = theme.style.panel;
 #endif
 }
 
 static void calendar_init(void)
 {
-#if USE_LV_CALENDAR
+#if LV_USE_CALENDAR
     static lv_style_t ina_days;
     lv_style_copy(&ina_days, &def);
     ina_days.text.color = lv_color_hsv_to_rgb(_hue, 0, 70);
@@ -367,9 +367,9 @@ static void calendar_init(void)
     week_box.body.main_color = lv_color_hsv_to_rgb(_hue, 40, 100);
     week_box.body.grad_color = lv_color_hsv_to_rgb(_hue, 40, 100);
     week_box.body.padding.ver = LV_DPI / 20;
-    week_box.body.padding.hor = theme.panel->body.padding.hor;
-    week_box.body.border.color = theme.panel->body.border.color;
-    week_box.body.border.width = theme.panel->body.border.width;
+    week_box.body.padding.hor = theme.style.panel->body.padding.hor;
+    week_box.body.border.color = theme.style.panel->body.border.color;
+    week_box.body.border.width = theme.style.panel->body.border.width;
     week_box.body.border.part = LV_BORDER_LEFT | LV_BORDER_RIGHT;
     week_box.body.radius = 0;
 
@@ -380,20 +380,20 @@ static void calendar_init(void)
     today_box.body.padding.ver = LV_DPI / 20;
     today_box.body.radius = 0;
 
-    theme.calendar.bg = theme.panel;
-    theme.calendar.header = &lv_style_transp;
-    theme.calendar.inactive_days = &ina_days;
-    theme.calendar.highlighted_days = &high_days;
-    theme.calendar.week_box = &week_box;
-    theme.calendar.today_box = &today_box;
+    theme.style.calendar.bg = theme.style.panel;
+    theme.style.calendar.header = &lv_style_transp;
+    theme.style.calendar.inactive_days = &ina_days;
+    theme.style.calendar.highlighted_days = &high_days;
+    theme.style.calendar.week_box = &week_box;
+    theme.style.calendar.today_box = &today_box;
 #endif
 }
 
 static void cb_init(void)
 {
-#if USE_LV_CB != 0
+#if LV_USE_CB != 0
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
-    lv_style_copy(&rel, theme.panel);
+    lv_style_copy(&rel, theme.style.panel);
     rel.body.shadow.type = LV_SHADOW_BOTTOM;
     rel.body.shadow.width = 3;
 
@@ -413,34 +413,34 @@ static void cb_init(void)
     tgl_pr.body.grad_color = tgl_pr.body.main_color;
     tgl_pr.body.shadow.width = 0;
 
-    lv_style_copy(&ina, theme.btn.ina);
+    lv_style_copy(&ina, theme.style.btn.ina);
 
-    theme.cb.bg = &lv_style_transp;
-    theme.cb.box.rel = &rel;
-    theme.cb.box.pr = &pr;
-    theme.cb.box.tgl_rel = &tgl_rel;
-    theme.cb.box.tgl_pr = &tgl_pr;
-    theme.cb.box.ina = &ina;
+    theme.style.cb.bg = &lv_style_transp;
+    theme.style.cb.box.rel = &rel;
+    theme.style.cb.box.pr = &pr;
+    theme.style.cb.box.tgl_rel = &tgl_rel;
+    theme.style.cb.box.tgl_pr = &tgl_pr;
+    theme.style.cb.box.ina = &ina;
 #endif
 }
 
 
 static void btnm_init(void)
 {
-#if USE_LV_BTNM
+#if LV_USE_BTNM
     static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
 
-    lv_style_copy(&bg, theme.panel);
+    lv_style_copy(&bg, theme.style.panel);
     bg.body.padding.hor = 0;
     bg.body.padding.ver = 0;
     bg.body.padding.inner = 0;
     bg.text.color = LV_COLOR_HEX3(0x555);
 
-    lv_style_copy(&rel, theme.panel);
+    lv_style_copy(&rel, theme.style.panel);
     rel.body.border.part = LV_BORDER_FULL | LV_BORDER_INTERNAL;
     rel.body.border.width = 1;
     rel.body.border.color = LV_COLOR_HEX3(0xbbb);
-    rel.body.empty = 1;
+    rel.body.opa = LV_OPA_TRANSP;
     rel.body.shadow.width = 0;
 
     lv_style_copy(&pr, &rel);
@@ -448,7 +448,7 @@ static void btnm_init(void)
     pr.body.main_color = LV_COLOR_HEX3(0xddd);
     pr.body.grad_color = pr.body.main_color;
     pr.body.border.width = 0;
-    pr.body.empty = 0;
+    pr.body.opa = LV_OPA_COVER;
 
     lv_style_copy(&tgl_rel, &pr);
     tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
@@ -465,36 +465,36 @@ static void btnm_init(void)
     ina.body.main_color = LV_COLOR_HEX3(0xccc);
     ina.body.grad_color = ina.body.main_color;
 
-    theme.btnm.bg = &bg;
-    theme.btnm.btn.rel = &rel;
-    theme.btnm.btn.pr = &pr;
-    theme.btnm.btn.tgl_rel = &tgl_rel;
-    theme.btnm.btn.tgl_pr = &tgl_pr;
-    theme.btnm.btn.ina = &def;
+    theme.style.btnm.bg = &bg;
+    theme.style.btnm.btn.rel = &rel;
+    theme.style.btnm.btn.pr = &pr;
+    theme.style.btnm.btn.tgl_rel = &tgl_rel;
+    theme.style.btnm.btn.tgl_pr = &tgl_pr;
+    theme.style.btnm.btn.ina = &def;
 #endif
 }
 
 static void kb_init(void)
 {
-#if USE_LV_KB
+#if LV_USE_KB
 
     static lv_style_t rel;
     lv_style_copy(&rel, &lv_style_transp);
     rel.text.font = _font;
 
-    theme.kb.bg = theme.btnm.bg;
-    theme.kb.btn.rel = &rel;
-    theme.kb.btn.pr = theme.btnm.btn.pr;
-    theme.kb.btn.tgl_rel = theme.btnm.btn.tgl_rel;
-    theme.kb.btn.tgl_pr = theme.btnm.btn.tgl_pr;
-    theme.kb.btn.ina = theme.btnm.btn.ina;
+    theme.style.kb.bg = theme.style.btnm.bg;
+    theme.style.kb.btn.rel = &rel;
+    theme.style.kb.btn.pr = theme.style.btnm.btn.pr;
+    theme.style.kb.btn.tgl_rel = theme.style.btnm.btn.tgl_rel;
+    theme.style.kb.btn.tgl_pr = theme.style.btnm.btn.tgl_pr;
+    theme.style.kb.btn.ina = theme.style.btnm.btn.ina;
 #endif
 
 }
 
 static void mbox_init(void)
 {
-#if USE_LV_MBOX
+#if LV_USE_MBOX
     static lv_style_t pr, rel;
 
     lv_style_copy(&rel, &lv_style_transp);
@@ -502,34 +502,34 @@ static void mbox_init(void)
     rel.text.font = _font;
     rel.text.color = lv_color_hsv_to_rgb(_hue, 85, 75);
 
-    lv_style_copy(&pr, theme.btnm.btn.pr);
+    lv_style_copy(&pr, theme.style.btnm.btn.pr);
     pr.text.color = lv_color_hsv_to_rgb(_hue, 85, 60);
 
-    theme.mbox.bg = theme.panel;
-    theme.mbox.btn.bg = &lv_style_transp;
-    theme.mbox.btn.rel = &rel;
-    theme.mbox.btn.pr = &pr;
+    theme.style.mbox.bg = theme.style.panel;
+    theme.style.mbox.btn.bg = &lv_style_transp;
+    theme.style.mbox.btn.rel = &rel;
+    theme.style.mbox.btn.pr = &pr;
 #endif
 }
 
 static void page_init(void)
 {
-#if USE_LV_PAGE
+#if LV_USE_PAGE
 
 
-    theme.page.bg = theme.panel;
-    theme.page.scrl = &lv_style_transp;
-    theme.page.sb = &sb;
+    theme.style.page.bg = theme.style.panel;
+    theme.style.page.scrl = &lv_style_transp;
+    theme.style.page.sb = &sb;
 #endif
 }
 
 static void ta_init(void)
 {
-#if USE_LV_TA
+#if LV_USE_TA
     static lv_style_t oneline;
 
     lv_style_copy(&oneline, &def);
-    oneline.body.empty = 1;
+    oneline.body.opa = LV_OPA_TRANSP;
     oneline.body.radius = 0;
     oneline.body.border.part = LV_BORDER_BOTTOM;
     oneline.body.border.width = 3;
@@ -537,29 +537,29 @@ static void ta_init(void)
     oneline.body.border.opa = LV_OPA_COVER;
     oneline.text.color = LV_COLOR_HEX3(0x333);
 
-    theme.ta.area = theme.panel;
-    theme.ta.oneline = &oneline;
-    theme.ta.cursor = NULL;     /*Let library to calculate the cursor's style*/
-    theme.ta.sb = &sb;
+    theme.style.ta.area = theme.style.panel;
+    theme.style.ta.oneline = &oneline;
+    theme.style.ta.cursor = NULL;     /*Let library to calculate the cursor's style*/
+    theme.style.ta.sb = &sb;
 #endif
 }
 
 static void spinbox_init(void)
 {
-#if USE_LV_SPINBOX
-    theme.spinbox.bg= theme.panel;
-    theme.spinbox.cursor = theme.ta.cursor;
-    theme.spinbox.sb = theme.ta.sb;
+#if LV_USE_SPINBOX
+    theme.style.spinbox.bg= theme.style.panel;
+    theme.style.spinbox.cursor = theme.style.ta.cursor;
+    theme.style.spinbox.sb = theme.style.ta.sb;
 #endif
 }
 
 static void list_init(void)
 {
-#if USE_LV_LIST != 0
+#if LV_USE_LIST != 0
 
     static lv_style_t list_bg, rel, pr, tgl_rel, tgl_pr, ina;
 
-    lv_style_copy(&list_bg, theme.panel);
+    lv_style_copy(&list_bg, theme.style.panel);
     list_bg.body.padding.hor = 0;
     list_bg.body.padding.ver = 0;
     list_bg.body.padding.inner = 0;
@@ -577,7 +577,7 @@ static void list_init(void)
     pr.body.main_color = LV_COLOR_HEX3(0xddd);
     pr.body.grad_color = pr.body.main_color;
     pr.body.border.width = 0;
-    pr.body.empty = 0;
+    pr.body.opa = LV_OPA_COVER;
     pr.body.radius = DEF_RADIUS;
     pr.text.font = _font;
 
@@ -597,26 +597,25 @@ static void list_init(void)
     ina.body.grad_color = ina.body.main_color;
 
 
-    theme.list.sb = &sb;
-    theme.list.bg = &list_bg;
-    theme.list.scrl = &lv_style_transp_tight;
-    theme.list.btn.rel = &rel;
-    theme.list.btn.pr = &pr;
-    theme.list.btn.tgl_rel = &tgl_rel;
-    theme.list.btn.tgl_pr = &tgl_pr;
-    theme.list.btn.ina = &ina;
+    theme.style.list.sb = &sb;
+    theme.style.list.bg = &list_bg;
+    theme.style.list.scrl = &lv_style_transp_tight;
+    theme.style.list.btn.rel = &rel;
+    theme.style.list.btn.pr = &pr;
+    theme.style.list.btn.tgl_rel = &tgl_rel;
+    theme.style.list.btn.tgl_pr = &tgl_pr;
+    theme.style.list.btn.ina = &ina;
 #endif
 }
 
 static void ddlist_init(void)
 {
-#if USE_LV_DDLIST != 0
+#if LV_USE_DDLIST != 0
     static lv_style_t bg, sel;
-    lv_style_copy(&bg, theme.panel);
+    lv_style_copy(&bg, theme.style.panel);
     bg.body.padding.hor = LV_DPI / 6;
     bg.body.padding.ver = LV_DPI / 6;
     bg.text.line_space = LV_DPI / 8;
-
 
     lv_style_copy(&sel, &bg);
     sel.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
@@ -626,15 +625,15 @@ static void ddlist_init(void)
     sel.text.color = lv_color_hsv_to_rgb(_hue, 5, 95);
 
 
-    theme.ddlist.bg = &bg;
-    theme.ddlist.sel = &sel;
-    theme.ddlist.sb = &sb;
+    theme.style.ddlist.bg = &bg;
+    theme.style.ddlist.sel = &sel;
+    theme.style.ddlist.sb = &sb;
 #endif
 }
 
 static void roller_init(void)
 {
-#if USE_LV_ROLLER != 0
+#if LV_USE_ROLLER != 0
     static lv_style_t roller_bg, roller_sel;
 
     lv_style_copy(&roller_bg, &lv_style_transp);
@@ -648,14 +647,14 @@ static void roller_init(void)
     roller_sel.text.color = lv_color_hsv_to_rgb(_hue, 90, 70);
 
 
-    theme.roller.bg = &roller_bg;
-    theme.roller.sel = &roller_sel;
+    theme.style.roller.bg = &roller_bg;
+    theme.style.roller.sel = &roller_sel;
 #endif
 }
 
 static void tabview_init(void)
 {
-#if USE_LV_TABVIEW != 0
+#if LV_USE_TABVIEW != 0
     static lv_style_t indic, btn_bg, rel, pr, tgl_rel, tgl_pr;
 
     lv_style_copy(&indic, &def);
@@ -690,7 +689,7 @@ static void tabview_init(void)
     pr.body.main_color = LV_COLOR_HEX3(0xbbb);
     pr.body.grad_color = pr.body.main_color;
     pr.body.border.width = 0;
-    pr.body.empty = 0;
+    pr.body.opa = LV_OPA_COVER;
     pr.body.radius = 0;
     pr.body.border.width = 1;
     pr.body.border.color = LV_COLOR_HEX3(0x888);
@@ -707,48 +706,48 @@ static void tabview_init(void)
     tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 15, 85);
     tgl_pr.body.grad_color = tgl_pr.body.main_color;
     tgl_pr.body.border.width = 0;
-    tgl_pr.body.empty = 0;
+    tgl_pr.body.opa = LV_OPA_COVER;
     tgl_pr.body.radius = 0;
     tgl_pr.text.color = lv_color_hsv_to_rgb(_hue, 90, 60);
 
-    theme.tabview.bg = theme.bg;
-    theme.tabview.indic = &indic;
-    theme.tabview.btn.bg = &btn_bg;
-    theme.tabview.btn.rel = &rel;
-    theme.tabview.btn.pr = &pr;
-    theme.tabview.btn.tgl_rel = &tgl_rel;
-    theme.tabview.btn.tgl_pr = &tgl_pr;
+    theme.style.tabview.bg = theme.style.bg;
+    theme.style.tabview.indic = &indic;
+    theme.style.tabview.btn.bg = &btn_bg;
+    theme.style.tabview.btn.rel = &rel;
+    theme.style.tabview.btn.pr = &pr;
+    theme.style.tabview.btn.tgl_rel = &tgl_rel;
+    theme.style.tabview.btn.tgl_pr = &tgl_pr;
 #endif
 }
 
 static void tileview_init(void)
 {
-#if USE_LV_TILEVIEW != 0
-    theme.tileview.bg = &lv_style_transp_tight;
-    theme.tileview.scrl = &lv_style_transp_tight;
-    theme.tileview.sb = theme.page.sb;
+#if LV_USE_TILEVIEW != 0
+    theme.style.tileview.bg = &lv_style_transp_tight;
+    theme.style.tileview.scrl = &lv_style_transp_tight;
+    theme.style.tileview.sb = theme.style.page.sb;
 #endif
 }
 
 static void table_init(void)
 {
-#if USE_LV_TABLE != 0
+#if LV_USE_TABLE != 0
     static lv_style_t cell;
-    lv_style_copy(&cell, theme.panel);
+    lv_style_copy(&cell, theme.style.panel);
     cell.body.radius = 0;
     cell.body.border.width = 1;
     cell.body.padding.hor = LV_DPI / 12;
     cell.body.padding.ver = LV_DPI / 12;
 
 
-    theme.table.bg = &lv_style_transp_tight;
-    theme.table.cell = &cell;
+    theme.style.table.bg = &lv_style_transp_tight;
+    theme.style.table.cell = &cell;
 #endif
 }
 
 static void win_init(void)
 {
-#if USE_LV_WIN != 0
+#if LV_USE_WIN != 0
     static lv_style_t header, pr;
 
     lv_style_copy(&header, &def);
@@ -769,21 +768,71 @@ static void win_init(void)
     pr.body.main_color = LV_COLOR_HEX3(0xbbb);
     pr.body.grad_color = pr.body.main_color;
     pr.body.border.width = 0;
-    pr.body.empty = 0;
+    pr.body.opa = LV_OPA_COVER;
     pr.body.radius = 0;
     pr.text.color = LV_COLOR_HEX3(0x111);
     pr.image.color = LV_COLOR_HEX3(0x111);
 
 
-    theme.win.bg = theme.panel;
-    theme.win.sb = &sb;
-    theme.win.header = &header;
-    theme.win.content.bg = &lv_style_transp;
-    theme.win.content.scrl = &lv_style_transp;
-    theme.win.btn.rel = &lv_style_transp;
-    theme.win.btn.pr = &pr;
+    theme.style.win.bg = theme.style.panel;
+    theme.style.win.sb = &sb;
+    theme.style.win.header = &header;
+    theme.style.win.content.bg = &lv_style_transp;
+    theme.style.win.content.scrl = &lv_style_transp;
+    theme.style.win.btn.rel = &lv_style_transp;
+    theme.style.win.btn.pr = &pr;
 #endif
 }
+
+#if LV_USE_GROUP
+
+static void style_mod(lv_group_t * group, lv_style_t * style)
+{
+    (void) group;   /*Unused*/
+#if LV_COLOR_DEPTH != 1
+    /*Make the style to be a little bit orange*/
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = lv_color_hsv_to_rgb(_hue, 90, 70);
+
+    /*If not empty or has border then emphasis the border*/
+    if (style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+
+    style->body.main_color = lv_color_mix(style->body.main_color, lv_color_hsv_to_rgb(_hue, 90, 70), LV_OPA_70);
+    style->body.grad_color = lv_color_mix(style->body.grad_color, lv_color_hsv_to_rgb(_hue, 90, 70), LV_OPA_70);
+    style->body.shadow.color = lv_color_mix(style->body.shadow.color, lv_color_hsv_to_rgb(_hue, 90, 70), LV_OPA_60);
+
+    style->text.color = lv_color_mix(style->text.color, lv_color_hsv_to_rgb(_hue, 90, 70), LV_OPA_70);
+#else
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_BLACK;
+    style->body.border.width = 2;
+#endif
+}
+
+static void style_mod_edit(lv_group_t * group, lv_style_t * style)
+{
+    (void) group;   /*Unused*/
+#if LV_COLOR_DEPTH != 1
+    /*Make the style to be a little bit orange*/
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_GREEN;
+
+    /*If not empty or has border then emphasis the border*/
+    if (style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+
+    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
+
+    style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
+#else
+    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.color = LV_COLOR_BLACK;
+    style->body.border.width = 3;
+#endif
+}
+
+#endif /*LV_USE_GROUP*/
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -806,8 +855,8 @@ lv_theme_t * lv_theme_material_init(uint16_t hue, lv_font_t * font)
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t ** style_p = (lv_style_t **) &theme;
-    for(i = 0; i < sizeof(lv_theme_t) / sizeof(lv_style_t *); i++) {
+    lv_style_t ** style_p = (lv_style_t **) &theme.style;
+    for(i = 0; i < LV_THEME_STYLE_COUNT; i++) {
         *style_p = &def;
         style_p++;
     }
@@ -842,6 +891,11 @@ lv_theme_t * lv_theme_material_init(uint16_t hue, lv_font_t * font)
     tileview_init();
     table_init();
     win_init();
+
+#if LV_USE_GROUP
+    theme.group.style_mod = style_mod;
+    theme.group.style_mod_edit = style_mod_edit;
+#endif
 
     return &theme;
 }

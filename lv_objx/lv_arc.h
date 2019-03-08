@@ -20,7 +20,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_ARC != 0
+#if LV_USE_ARC != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -118,7 +118,7 @@ lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_ARC*/
+#endif  /*LV_USE_ARC*/
 
 #ifdef __cplusplus
 } /* extern "C" */

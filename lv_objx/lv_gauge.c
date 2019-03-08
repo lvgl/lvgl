@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_gauge.h"
-#if USE_LV_GAUGE != 0
+#if LV_USE_GAUGE != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -42,8 +42,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -82,8 +82,8 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_gauge);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_gauge, lv_gauge_signal);
-    lv_obj_set_design_func(new_gauge, lv_gauge_design);
+    lv_obj_set_signal_cb(new_gauge, lv_gauge_signal);
+    lv_obj_set_design_cb(new_gauge, lv_gauge_design);
 
     /*Init the new gauge gauge*/
     if(copy == NULL) {
@@ -95,7 +95,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_gauge_set_style(new_gauge, th->gauge);
+            lv_gauge_set_style(new_gauge, th->style.gauge);
         } else {
             lv_gauge_set_style(new_gauge, &lv_style_pretty_color);
         }

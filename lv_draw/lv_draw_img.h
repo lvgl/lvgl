@@ -41,7 +41,7 @@ typedef struct {
 
 /*Image color format*/
 enum {
-    LV_IMG_CF_UNKOWN = 0,
+    LV_IMG_CF_UNKNOWN = 0,
 
     LV_IMG_CF_RAW,                  /*Contains the file as it is. Needs custom decoder function*/
     LV_IMG_CF_RAW_ALPHA,            /*Contains the file as it is. The image has alpha. Needs custom decoder function*/
@@ -131,8 +131,8 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
  * @param src pointer to an image source:
  *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
  *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKOWN
+ *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
+ * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
 lv_img_src_t lv_img_src_get_type(const void * src);
 

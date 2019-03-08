@@ -19,15 +19,15 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_TA != 0
+#if LV_USE_TA != 0
 
 /*Testing of dependencies*/
-#if USE_LV_PAGE == 0
-#error "lv_ta: lv_page is required. Enable it in lv_conf.h (USE_LV_PAGE  1) "
+#if LV_USE_PAGE == 0
+#error "lv_ta: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
 #endif
 
-#if USE_LV_LABEL == 0
-#error "lv_ta: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_ta: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -59,6 +59,7 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;           /*Label of the text area*/
+    lv_obj_t * placeholder;     /*Place holder label of the text area, only visible if text is an empty string*/
     char * pwd_tmp;             /*Used to store the original text in password mode*/
     const char * accapted_chars;/*Only these characters will be accepted. NULL: accept all*/
     uint16_t max_length;        /*The max. number of characters. 0: no limit*/
@@ -80,6 +81,7 @@ enum {
     LV_TA_STYLE_SB,
     LV_TA_STYLE_EDGE_FLASH,
     LV_TA_STYLE_CURSOR,
+    LV_TA_STYLE_PLACEHOLDER,
 };
 typedef uint8_t lv_ta_style_t;
 
@@ -122,6 +124,12 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt);
  */
 void lv_ta_del_char(lv_obj_t * ta);
 
+/**
+ * Delete the right character from the current cursor position
+ * @param ta pointer to a text area object
+ */
+void lv_ta_del_char_forward(lv_obj_t * ta);
+
 /*=====================
  * Setter functions
  *====================*/
@@ -132,6 +140,13 @@ void lv_ta_del_char(lv_obj_t * ta);
  * @param txt pointer to the text
  */
 void lv_ta_set_text(lv_obj_t * ta, const char * txt);
+
+/**
+* Set the placeholder text of a text area
+* @param ta pointer to a text area
+* @param txt pointer to the text
+*/
+void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt);
 
 /**
  * Set the cursor position
@@ -187,16 +202,6 @@ void lv_ta_set_accepted_chars(lv_obj_t * ta, const char * list);
 void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num);
 
 /**
- * Set an action to call when the Text area is clicked
- * @param ta pointer to a Text area
- * @param action a function pointer
- */
-static inline void lv_ta_set_action(lv_obj_t * ta, lv_action_t action)
-{
-    lv_page_set_rel_action(ta, action);
-}
-
-/**
  * Set the scroll bar mode of a text area
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
@@ -244,6 +249,13 @@ void lv_ta_set_style(lv_obj_t *ta, lv_ta_style_t type, lv_style_t *style);
  * @return pointer to the text
  */
 const char * lv_ta_get_text(const lv_obj_t * ta);
+
+/**
+* Get the placeholder text of a text area
+* @param ta pointer to a text area object
+* @return pointer to the text
+*/
+const char * lv_ta_get_placeholder_text(lv_obj_t * ta);
 
 /**
  * Get the label of a text area
@@ -300,16 +312,6 @@ const char * lv_ta_get_accepted_chars(lv_obj_t * ta);
  * @return the maximal number of characters to be add
  */
 uint16_t lv_ta_get_max_length(lv_obj_t * ta);
-
-/**
- * Set an action to call when the Text area is clicked
- * @param ta pointer to a Text area
- * @param action a function pointer
- */
-static inline lv_action_t lv_ta_get_action(lv_obj_t * ta)
-{
-    return lv_page_get_rel_action(ta);
-}
 
 /**
  * Get the scroll bar mode of a text area
@@ -381,7 +383,7 @@ void lv_ta_cursor_up(lv_obj_t * ta);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_TA_H*/
+#endif  /*LV_USE_TA_H*/
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -19,19 +19,19 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_MBOX != 0
+#if LV_USE_MBOX != 0
 
 /*Testing of dependencies*/
-#if USE_LV_CONT == 0
-#error "lv_mbox: lv_cont is required. Enable it in lv_conf.h (USE_LV_CONT  1) "
+#if LV_USE_CONT == 0
+#error "lv_mbox: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT  1) "
 #endif
 
-#if USE_LV_BTNM == 0
-#error "lv_mbox: lv_btnm is required. Enable it in lv_conf.h (USE_LV_BTNM  1) "
+#if LV_USE_BTNM == 0
+#error "lv_mbox: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNM  1) "
 #endif
 
-#if USE_LV_LABEL == 0
-#error "lv_mbox: lv_label is required. Enable it in lv_conf.h (USE_LV_LABEL  1) "
+#if LV_USE_LABEL == 0
+#error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 
@@ -184,17 +184,25 @@ lv_style_t * lv_mbox_get_style(const lv_obj_t *mbox, lv_mbox_style_t type);
 
 /**
  * Get whether recoloring is enabled
- * @param btnm pointer to button matrix object
+ * @param mbox pointer to a message box object
  * @return whether recoloring is enabled
  */
 bool lv_mbox_get_recolor(const lv_obj_t * mbox);
+
+/**
+ * Get message box button matrix
+ * @param mbox pointer to a message box object
+ * @return pointer to button matrix object
+ * @remarks return value will be NULL unless `lv_mbox_add_btns` has been already called
+ */
+lv_obj_t * lv_mbox_get_btnm(lv_obj_t * mbox);
 
 /**********************
  *      MACROS
  **********************/
 
 
-#endif  /*USE_LV_MBOX*/
+#endif  /*LV_USE_MBOX*/
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_style.h"
+#include "../lv_core/lv_group.h"
 
 /*********************
  *    DEFINES
@@ -30,132 +31,15 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_style_t *bg;
-    lv_style_t *panel;
-
-#if USE_LV_CONT != 0
-    lv_style_t *cont;
-#endif
-
-#if USE_LV_BTN != 0
-    struct {
-        lv_style_t *rel;
-        lv_style_t *pr;
-        lv_style_t *tgl_rel;
-        lv_style_t *tgl_pr;
-        lv_style_t *ina;
-    } btn;
-#endif
-
-
-#if USE_LV_IMGBTN != 0
-    struct {
-        lv_style_t *rel;
-        lv_style_t *pr;
-        lv_style_t *tgl_rel;
-        lv_style_t *tgl_pr;
-        lv_style_t *ina;
-    } imgbtn;
-#endif
-
-#if USE_LV_LABEL != 0
-    struct {
-        lv_style_t *prim;
-        lv_style_t *sec;
-        lv_style_t *hint;
-    } label;
-#endif
-
-#if USE_LV_IMG != 0
-    struct {
-        lv_style_t *light;
-        lv_style_t *dark;
-    } img;
-#endif
-
-#if USE_LV_LINE != 0
-    struct {
-        lv_style_t *decor;
-    } line;
-#endif
-
-#if USE_LV_LED != 0
-    lv_style_t *led;
-#endif
-
-#if USE_LV_BAR != 0
     struct {
         lv_style_t *bg;
-        lv_style_t *indic;
-    } bar;
+        lv_style_t *panel;
+
+#if LV_USE_CONT != 0
+        lv_style_t *cont;
 #endif
 
-#if USE_LV_SLIDER != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *indic;
-        lv_style_t *knob;
-    } slider;
-#endif
-
-#if USE_LV_LMETER != 0
-    lv_style_t *lmeter;
-#endif
-
-#if USE_LV_GAUGE != 0
-    lv_style_t *gauge;
-#endif
-
-#if USE_LV_ARC != 0
-    lv_style_t *arc;
-#endif
-
-#if USE_LV_PRELOAD != 0
-    lv_style_t *preload;
-#endif
-
-#if USE_LV_SW != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *indic;
-        lv_style_t *knob_off;
-        lv_style_t *knob_on;
-    } sw;
-#endif
-
-#if USE_LV_CHART != 0
-    lv_style_t *chart;
-#endif
-
-#if USE_LV_CALENDAR != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *header;
-        lv_style_t *header_pr;
-        lv_style_t *day_names;
-        lv_style_t *highlighted_days;
-        lv_style_t *inactive_days;
-        lv_style_t *week_box;
-        lv_style_t *today_box;
-    } calendar;
-#endif
-
-#if USE_LV_CB != 0
-    struct {
-        lv_style_t *bg;
-        struct {
-            lv_style_t *rel;
-            lv_style_t *pr;
-            lv_style_t *tgl_rel;
-            lv_style_t *tgl_pr;
-            lv_style_t *ina;
-        } box;
-    } cb;
-#endif
-
-#if USE_LV_BTNM != 0
-    struct {
-        lv_style_t *bg;
+#if LV_USE_BTN != 0
         struct {
             lv_style_t *rel;
             lv_style_t *pr;
@@ -163,131 +47,258 @@ typedef struct {
             lv_style_t *tgl_pr;
             lv_style_t *ina;
         } btn;
-    } btnm;
 #endif
 
-#if USE_LV_KB != 0
-    struct {
-        lv_style_t *bg;
+
+#if LV_USE_IMGBTN != 0
         struct {
             lv_style_t *rel;
             lv_style_t *pr;
             lv_style_t *tgl_rel;
             lv_style_t *tgl_pr;
             lv_style_t *ina;
-        } btn;
-    } kb;
+        } imgbtn;
 #endif
 
-#if USE_LV_MBOX != 0
-    struct {
-        lv_style_t *bg;
+#if LV_USE_LABEL != 0
+        struct {
+            lv_style_t *prim;
+            lv_style_t *sec;
+            lv_style_t *hint;
+        } label;
+#endif
+
+#if LV_USE_IMG != 0
+        struct {
+            lv_style_t *light;
+            lv_style_t *dark;
+        } img;
+#endif
+
+#if LV_USE_LINE != 0
+        struct {
+            lv_style_t *decor;
+        } line;
+#endif
+
+#if LV_USE_LED != 0
+        lv_style_t *led;
+#endif
+
+#if LV_USE_BAR != 0
         struct {
             lv_style_t *bg;
-            lv_style_t *rel;
-            lv_style_t *pr;
-        } btn;
-    } mbox;
+            lv_style_t *indic;
+        } bar;
 #endif
 
-#if USE_LV_PAGE != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *scrl;
-        lv_style_t *sb;
-    } page;
-#endif
-
-#if USE_LV_TA != 0
-    struct {
-        lv_style_t *area;
-        lv_style_t *oneline;
-        lv_style_t *cursor;
-        lv_style_t *sb;
-    } ta;
-#endif
-
-#if USE_LV_SPINBOX != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *cursor;
-        lv_style_t *sb;
-    } spinbox;
-#endif
-
-#if USE_LV_LIST
-    struct {
-        lv_style_t *bg;
-        lv_style_t *scrl;
-        lv_style_t *sb;
-        struct {
-            lv_style_t *rel;
-            lv_style_t *pr;
-            lv_style_t *tgl_rel;
-            lv_style_t *tgl_pr;
-            lv_style_t *ina;
-        } btn;
-    } list;
-#endif
-
-#if USE_LV_DDLIST != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *sel;
-        lv_style_t *sb;
-    } ddlist;
-#endif
-
-#if USE_LV_ROLLER != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *sel;
-    } roller;
-#endif
-
-#if USE_LV_TABVIEW != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *indic;
+#if LV_USE_SLIDER != 0
         struct {
             lv_style_t *bg;
-            lv_style_t *rel;
-            lv_style_t *pr;
-            lv_style_t *tgl_rel;
-            lv_style_t *tgl_pr;
-        } btn;
-    } tabview;
+            lv_style_t *indic;
+            lv_style_t *knob;
+        } slider;
 #endif
 
-#if USE_LV_TILEVIEW != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *scrl;
-        lv_style_t *sb;
-    } tileview;
+#if LV_USE_LMETER != 0
+        lv_style_t *lmeter;
 #endif
 
-#if USE_LV_TABLE != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *cell;
-    } table;
+#if LV_USE_GAUGE != 0
+        lv_style_t *gauge;
 #endif
 
-#if USE_LV_WIN != 0
-    struct {
-        lv_style_t *bg;
-        lv_style_t *sb;
-        lv_style_t *header;
+#if LV_USE_ARC != 0
+        lv_style_t *arc;
+#endif
+
+#if LV_USE_PRELOAD != 0
+        lv_style_t *preload;
+#endif
+
+#if LV_USE_SW != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *indic;
+            lv_style_t *knob_off;
+            lv_style_t *knob_on;
+        } sw;
+#endif
+
+#if LV_USE_CHART != 0
+        lv_style_t *chart;
+#endif
+
+#if LV_USE_CALENDAR != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *header;
+            lv_style_t *header_pr;
+            lv_style_t *day_names;
+            lv_style_t *highlighted_days;
+            lv_style_t *inactive_days;
+            lv_style_t *week_box;
+            lv_style_t *today_box;
+        } calendar;
+#endif
+
+#if LV_USE_CB != 0
+        struct {
+            lv_style_t *bg;
+            struct {
+                lv_style_t *rel;
+                lv_style_t *pr;
+                lv_style_t *tgl_rel;
+                lv_style_t *tgl_pr;
+                lv_style_t *ina;
+            } box;
+        } cb;
+#endif
+
+#if LV_USE_BTNM != 0
+        struct {
+            lv_style_t *bg;
+            struct {
+                lv_style_t *rel;
+                lv_style_t *pr;
+                lv_style_t *tgl_rel;
+                lv_style_t *tgl_pr;
+                lv_style_t *ina;
+            } btn;
+        } btnm;
+#endif
+
+#if LV_USE_KB != 0
+        struct {
+            lv_style_t *bg;
+            struct {
+                lv_style_t *rel;
+                lv_style_t *pr;
+                lv_style_t *tgl_rel;
+                lv_style_t *tgl_pr;
+                lv_style_t *ina;
+            } btn;
+        } kb;
+#endif
+
+#if LV_USE_MBOX != 0
+        struct {
+            lv_style_t *bg;
+            struct {
+                lv_style_t *bg;
+                lv_style_t *rel;
+                lv_style_t *pr;
+            } btn;
+        } mbox;
+#endif
+
+#if LV_USE_PAGE != 0
         struct {
             lv_style_t *bg;
             lv_style_t *scrl;
-        } content;
+            lv_style_t *sb;
+        } page;
+#endif
+
+#if LV_USE_TA != 0
         struct {
-            lv_style_t *rel;
-            lv_style_t *pr;
-        } btn;
-    } win;
+            lv_style_t *area;
+            lv_style_t *oneline;
+            lv_style_t *cursor;
+            lv_style_t *sb;
+        } ta;
+#endif
+
+#if LV_USE_SPINBOX != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *cursor;
+            lv_style_t *sb;
+        } spinbox;
+#endif
+
+#if LV_USE_LIST
+        struct {
+            lv_style_t *bg;
+            lv_style_t *scrl;
+            lv_style_t *sb;
+            struct {
+                lv_style_t *rel;
+                lv_style_t *pr;
+                lv_style_t *tgl_rel;
+                lv_style_t *tgl_pr;
+                lv_style_t *ina;
+            } btn;
+        } list;
+#endif
+
+#if LV_USE_DDLIST != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *sel;
+            lv_style_t *sb;
+        } ddlist;
+#endif
+
+#if LV_USE_ROLLER != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *sel;
+        } roller;
+#endif
+
+#if LV_USE_TABVIEW != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *indic;
+            struct {
+                lv_style_t *bg;
+                lv_style_t *rel;
+                lv_style_t *pr;
+                lv_style_t *tgl_rel;
+                lv_style_t *tgl_pr;
+            } btn;
+        } tabview;
+#endif
+
+#if LV_USE_TILEVIEW != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *scrl;
+            lv_style_t *sb;
+        } tileview;
+#endif
+
+#if LV_USE_TABLE != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *cell;
+        } table;
+#endif
+
+#if LV_USE_WIN != 0
+        struct {
+            lv_style_t *bg;
+            lv_style_t *sb;
+            lv_style_t *header;
+            struct {
+                lv_style_t *bg;
+                lv_style_t *scrl;
+            } content;
+            struct {
+                lv_style_t *rel;
+                lv_style_t *pr;
+            } btn;
+        } win;
+#endif
+    } style;
+
+#if LV_USE_GROUP
+    struct
+    {
+        lv_group_style_mod_func_t style_mod;
+        lv_group_style_mod_func_t style_mod_edit;
+    } group;
 #endif
 } lv_theme_t;
 
@@ -311,6 +322,9 @@ lv_theme_t * lv_theme_get_current(void);
 /**********************
  *    MACROS
  **********************/
+
+/* Returns number of styles within the `lv_theme_t` structure. */
+#define LV_THEME_STYLE_COUNT    (sizeof(((lv_theme_t *)0)->style) / sizeof(lv_style_t *))
 
 /**********************
  *     POST INCLUDE

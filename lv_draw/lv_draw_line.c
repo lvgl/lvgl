@@ -192,7 +192,7 @@ static void line_draw_hor(line_draw_t * main_line, const lv_area_t * mask, const
     draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
     draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
     draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
-    fill_fp(&draw_area, mask, style->line.color, opa);
+    lv_draw_fill(&draw_area, mask, style->line.color, opa);
 }
 
 static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
@@ -214,7 +214,7 @@ static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const
     draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
     draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
     draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
-    fill_fp(&draw_area, mask, style->line.color, opa);
+    lv_draw_fill(&draw_area, mask, style->line.color, opa);
 }
 
 static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
@@ -436,12 +436,12 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
                 draw_area.y1 = prev_p.y + pattern[i].y;
                 draw_area.x2 = draw_area.x1 + main_line->p_act.x - prev_p.x - 1;
                 draw_area.y2 = draw_area.y1;
-                fill_fp(&draw_area, mask, style->line.color, opa);
+                lv_draw_fill(&draw_area, mask, style->line.color, opa);
 
                 /* Fill the gaps
                  * When stepping in y one pixel remains empty on every corner (don't do this on the first segment ) */
                 if(i != 0 && pattern[i].x != pattern[i - 1].x && !first_run) {
-                    px_fp(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, opa);
+                    lv_draw_px(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, opa);
                 }
             }
 
@@ -463,12 +463,12 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
             draw_area.y1 = prev_p.y + pattern[i].y;
             draw_area.x2 = draw_area.x1 + main_line->p_act.x - prev_p.x;
             draw_area.y2 = draw_area.y1;
-            fill_fp(&draw_area, mask, style->line.color, opa);
+            lv_draw_fill(&draw_area, mask, style->line.color, opa);
 
             /* Fill the gaps
              * When stepping in y one pixel remains empty on every corner */
             if(i != 0 && pattern[i].x != pattern[i - 1].x && !first_run) {
-                px_fp(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, opa);
+                lv_draw_px(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, opa);
             }
         }
 
@@ -489,12 +489,12 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
                 draw_area.x2 = draw_area.x1;
                 draw_area.y2 = draw_area.y1 + main_line->p_act.y - prev_p.y - 1;
 
-                fill_fp(&draw_area, mask, style->line.color, opa);
+                lv_draw_fill(&draw_area, mask, style->line.color, opa);
 
                 /* Fill the gaps
                  * When stepping in x one pixel remains empty on every corner (don't do this on the first segment ) */
                 if(i != 0 && pattern[i].y != pattern[i - 1].y && !first_run) {
-                    px_fp(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, opa);
+                    lv_draw_px(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, opa);
                 }
 
             }
@@ -519,12 +519,12 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
             draw_area.x2 = draw_area.x1;
             draw_area.y2 = draw_area.y1 + main_line->p_act.y - prev_p.y;
 
-            fill_fp(&draw_area, mask, style->line.color, opa);
+            lv_draw_fill(&draw_area, mask, style->line.color, opa);
 
             /* Fill the gaps
              * When stepping in x one pixel remains empty on every corner */
             if(i != 0 && pattern[i].y != pattern[i - 1].y && !first_run) {
-                px_fp(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, opa);
+                lv_draw_px(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, opa);
             }
         }
 

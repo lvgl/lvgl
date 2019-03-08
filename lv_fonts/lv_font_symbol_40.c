@@ -1,7 +1,7 @@
 
 #include "../lv_misc/lv_font.h"
 
-#if USE_LV_FONT_SYMBOL_40 != 0  /*Can be enabled in lv_conf.h*/
+#if LV_USE_FONT_SYMBOL_40 != 0  /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
  * fontawesome-webfont.ttf 40 px Font in U+f000 () .. U+f2ee ()  range with 1 bpp
@@ -10,7 +10,7 @@
 
 /*Store the image of the letters (glyph)*/
 static const uint8_t lv_font_symbol_40_glyph_bitmap[] = {
-#if USE_LV_FONT_SYMBOL_40 == 1
+#if LV_USE_FONT_SYMBOL_40 == 1
     /*Unicode: U+f001 () , Width: 34 */
     0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
     0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
@@ -2162,7 +2162,7 @@ static const uint8_t lv_font_symbol_40_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_SYMBOL_40 == 2
+#elif LV_USE_FONT_SYMBOL_40 == 2
     /*Unicode: U+f001 () , Width: 34 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
@@ -4314,7 +4314,7 @@ static const uint8_t lv_font_symbol_40_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_SYMBOL_40 == 4
+#elif LV_USE_FONT_SYMBOL_40 == 4
     /*Unicode: U+f001 () , Width: 34 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
@@ -6466,7 +6466,7 @@ static const uint8_t lv_font_symbol_40_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_SYMBOL_40 == 8
+#elif LV_USE_FONT_SYMBOL_40 == 8
     /*Unicode: U+f001 () , Width: 34 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  //..................................
@@ -8624,7 +8624,7 @@ static const uint8_t lv_font_symbol_40_glyph_bitmap[] = {
 
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_symbol_40_glyph_dsc[] = {
-#if USE_LV_FONT_SYMBOL_40 == 1
+#if LV_USE_FONT_SYMBOL_40 == 1
     {.w_px = 34,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 42,  .glyph_index = 200},    /*Unicode: U+f008 ()*/
     {.w_px = 39,  .glyph_index = 440},    /*Unicode: U+f00b ()*/
@@ -8676,7 +8676,7 @@ static const lv_font_glyph_dsc_t lv_font_symbol_40_glyph_dsc[] = {
     {.w_px = 51,  .glyph_index = 9320},   /*Unicode: U+f244 ()*/
     {.w_px = 29,  .glyph_index = 9600},   /*Unicode: U+f293 ()*/
 
-#elif USE_LV_FONT_SYMBOL_40 == 2
+#elif LV_USE_FONT_SYMBOL_40 == 2
     {.w_px = 34,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 42,  .glyph_index = 360},    /*Unicode: U+f008 ()*/
     {.w_px = 39,  .glyph_index = 800},    /*Unicode: U+f00b ()*/
@@ -8728,7 +8728,7 @@ static const lv_font_glyph_dsc_t lv_font_symbol_40_glyph_dsc[] = {
     {.w_px = 51,  .glyph_index = 17400},  /*Unicode: U+f244 ()*/
     {.w_px = 29,  .glyph_index = 17920},  /*Unicode: U+f293 ()*/
 
-#elif USE_LV_FONT_SYMBOL_40 == 4
+#elif LV_USE_FONT_SYMBOL_40 == 4
     {.w_px = 34,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 42,  .glyph_index = 680},    /*Unicode: U+f008 ()*/
     {.w_px = 39,  .glyph_index = 1520},   /*Unicode: U+f00b ()*/
@@ -8780,7 +8780,7 @@ static const lv_font_glyph_dsc_t lv_font_symbol_40_glyph_dsc[] = {
     {.w_px = 51,  .glyph_index = 34000},  /*Unicode: U+f244 ()*/
     {.w_px = 29,  .glyph_index = 35040},  /*Unicode: U+f293 ()*/
 
-#elif USE_LV_FONT_SYMBOL_40 == 8
+#elif LV_USE_FONT_SYMBOL_40 == 8
     {.w_px = 34,  .glyph_index = 0},  /*Unicode: U+f001 ()*/
     {.w_px = 42,  .glyph_index = 1360},   /*Unicode: U+f008 ()*/
     {.w_px = 39,  .glyph_index = 3040},   /*Unicode: U+f00b ()*/
@@ -8845,17 +8845,17 @@ lv_font_t lv_font_symbol_40 = {
     .unicode_list = NULL,
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
-#if USE_LV_FONT_SYMBOL_40 == 1
+#if LV_USE_FONT_SYMBOL_40 == 1
     .bpp = 1,               /*Bit per pixel*/
-#elif USE_LV_FONT_SYMBOL_40 == 2
+#elif LV_USE_FONT_SYMBOL_40 == 2
     .bpp = 2,               /*Bit per pixel*/
-#elif USE_LV_FONT_SYMBOL_40 == 4
+#elif LV_USE_FONT_SYMBOL_40 == 4
     .bpp = 4,               /*Bit per pixel*/
-#elif USE_LV_FONT_SYMBOL_40 == 8
+#elif LV_USE_FONT_SYMBOL_40 == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
     .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 
-#endif /*USE_LV_FONT_SYMBOL_40*/
+#endif /*LV_USE_FONT_SYMBOL_40*/

@@ -24,7 +24,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/*Possible log level. For compatibility declare it independently from `USE_LV_LOG`*/
+/*Possible log level. For compatibility declare it independently from `LV_USE_LOG`*/
 
 #define LV_LOG_LEVEL_TRACE 0     /*A lot of logs to give detailed information*/
 #define LV_LOG_LEVEL_INFO  1     /*Log important events*/
@@ -34,7 +34,7 @@ extern "C" {
 
 typedef int8_t lv_log_level_t;
 
-#if USE_LV_LOG
+#if LV_USE_LOG
 /**********************
  *      TYPEDEFS
  **********************/
@@ -69,15 +69,15 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
 #define LV_LOG_WARN(dsc)    lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, dsc);
 #define LV_LOG_ERROR(dsc)   lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, dsc);
 
-#else /*USE_LV_LOG*/
+#else /*LV_USE_LOG*/
 
-/*Do nothing if `USE_LV_LOG  0`*/
+/*Do nothing if `LV_USE_LOG  0`*/
 #define lv_log_add(level, file, line, dsc) {;}
 #define LV_LOG_TRACE(dsc) {;}
 #define LV_LOG_INFO(dsc) {;}
 #define LV_LOG_WARN(dsc) {;}
 #define LV_LOG_ERROR(dsc) {;}
-#endif /*USE_LV_LOG*/
+#endif /*LV_USE_LOG*/
 
 #ifdef __cplusplus
 } /* extern "C" */

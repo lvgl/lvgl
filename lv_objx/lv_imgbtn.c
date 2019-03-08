@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_imgbtn.h"
-#if USE_LV_IMGBTN != 0
+#if LV_USE_IMGBTN != 0
 
 /*********************
  *      DEFINES
@@ -27,8 +27,8 @@ static void refr_img(lv_obj_t * imgbtn);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -69,11 +69,11 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     memset(ext->img_src_right, 0, sizeof(ext->img_src_right));
 #endif
 
-    ext->act_cf = LV_IMG_CF_UNKOWN;
+    ext->act_cf = LV_IMG_CF_UNKNOWN;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_imgbtn, lv_imgbtn_signal);
-    lv_obj_set_design_func(new_imgbtn, lv_imgbtn_design);
+    lv_obj_set_signal_cb(new_imgbtn, lv_imgbtn_signal);
+    lv_obj_set_design_cb(new_imgbtn, lv_imgbtn_design);
 
     /*Init the new image button image button*/
     if(copy == NULL) {
@@ -382,7 +382,7 @@ static void refr_img(lv_obj_t * imgbtn)
         lv_obj_set_height(imgbtn, header.h);
 #endif
     } else {
-        ext->act_cf = LV_IMG_CF_UNKOWN;
+        ext->act_cf = LV_IMG_CF_UNKNOWN;
     }
 
     lv_obj_invalidate(imgbtn);

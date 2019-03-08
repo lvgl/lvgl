@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_chart.h"
-#if USE_LV_CHART != 0
+#if LV_USE_CHART != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -39,8 +39,8 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_func_t ancestor_design_f;
-static lv_signal_func_t ancestor_signal;
+static lv_design_cb_t ancestor_design_f;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -85,17 +85,17 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_chart);
 
-    lv_obj_set_signal_func(new_chart, lv_chart_signal);
-    lv_obj_set_design_func(new_chart, lv_chart_design);
+    lv_obj_set_signal_cb(new_chart, lv_chart_signal);
+    lv_obj_set_design_cb(new_chart, lv_chart_design);
 
     /*Init the new chart background object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_chart, LV_HOR_RES / 3, LV_VER_RES / 3);
+        lv_obj_set_size(new_chart, LV_DPI * 3, LV_DPI * 2);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_chart_set_style(new_chart, th->chart);
+            lv_chart_set_style(new_chart, th->style.chart);
         } else {
             lv_chart_set_style(new_chart, &lv_style_pretty);
         }
@@ -257,7 +257,7 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 
     if(point_cnt < 1) point_cnt = 1;
 
-    LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser) {
         if(ser->start_point != 0) {
             lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * point_cnt);
             lv_mem_assert(new_points);
@@ -511,7 +511,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_coord_t ** datal;
         lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-        LL_READ(ext->series_ll, datal) {
+        LV_LL_READ(ext->series_ll, datal) {
             lv_mem_free(*datal);
         }
         lv_ll_clear(&ext->series_ll);
@@ -620,7 +620,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
     style.line.width = ext->series.width;
 
     /*Go through all data lines*/
-    LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser) {
         style.line.color = ser->color;
 
         p1.x = 0 + x_ofs;
@@ -674,13 +674,12 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_copy(&style_point, &lv_style_plain);
 
     style_point.body.border.width = 0;
-    style_point.body.empty = 0;
     style_point.body.radius = LV_RADIUS_CIRCLE;
     style_point.body.opa = ext->series.opa;
     style_point.body.radius = ext->series.width;
 
     /*Go through all data lines*/
-    LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser) {
         style_point.body.main_color = ser->color;
         style_point.body.grad_color = lv_color_mix(LV_COLOR_BLACK, ser->color, ext->series.dark);
 
@@ -725,7 +724,6 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
 
     lv_style_copy(&rects, &lv_style_plain);
     rects.body.border.width = 0;
-    rects.body.empty = 0;
     rects.body.radius = 0;
     rects.body.opa = ext->series.opa;
 
@@ -739,7 +737,7 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
         x_act += chart->coords.x1 + x_ofs;
 
         /*Draw the current point of all data line*/
-        LL_READ_BACK(ext->series_ll, ser) {
+        LV_LL_READ_BACK(ext->series_ll, ser) {
             rects.body.main_color = ser->color;
             rects.body.grad_color = lv_color_mix(LV_COLOR_BLACK, ser->color, ext->series.dark);
             col_a.x1 = x_act;
@@ -789,7 +787,7 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
     style.line.width = ext->series.width;
 
     /*Go through all data lines*/
-    LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser) {
         style.line.color = ser->color;
 
         p1.x = 0 + x_ofs;

@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_CANVAS != 0
+#if LV_USE_CANVAS != 0
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_objx/lv_img.h"
@@ -220,7 +220,7 @@ void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_colo
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CANVAS*/
+#endif  /*LV_USE_CANVAS*/
 
 #ifdef __cplusplus
 } /* extern "C" */

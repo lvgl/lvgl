@@ -1,7 +1,7 @@
 
 #include "../lv_misc/lv_font.h"
 
-#if USE_LV_FONT_DEJAVU_10 != 0  /*Can be enabled in lv_conf.h*/
+#if LV_USE_FONT_DEJAVU_10 != 0  /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
  * DejaVuSans.ttf 10 px Font in U+0020 ( ) .. U+007e (~)  range with 1 bpp
@@ -9,7 +9,7 @@
 
 /*Store the image of the letters (glyph)*/
 static const uint8_t lv_font_dejavu_10_glyph_bitmap[] = {
-#if USE_LV_FONT_DEJAVU_10 == 1
+#if LV_USE_FONT_DEJAVU_10 == 1
     /*Unicode: U+0020 ( ) , Width: 3 */
     0x00,  //...
     0x00,  //...
@@ -1246,7 +1246,7 @@ static const uint8_t lv_font_dejavu_10_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_10 == 2
+#elif LV_USE_FONT_DEJAVU_10 == 2
     /*Unicode: U+0020 ( ) , Width: 3 */
     0x00,  //...
     0x00,  //...
@@ -2483,7 +2483,7 @@ static const uint8_t lv_font_dejavu_10_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_10 == 4
+#elif LV_USE_FONT_DEJAVU_10 == 4
     /*Unicode: U+0020 ( ) , Width: 3 */
     0x00, 0x00,  //...
     0x00, 0x00,  //...
@@ -3720,7 +3720,7 @@ static const uint8_t lv_font_dejavu_10_glyph_bitmap[] = {
 
 
 
-#elif USE_LV_FONT_DEJAVU_10 == 8
+#elif LV_USE_FONT_DEJAVU_10 == 8
     /*Unicode: U+0020 ( ) , Width: 3 */
     0x00, 0x00, 0x00,  //...
     0x00, 0x00, 0x00,  //...
@@ -4963,7 +4963,7 @@ static const uint8_t lv_font_dejavu_10_glyph_bitmap[] = {
 
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_dejavu_10_glyph_dsc[] = {
-#if USE_LV_FONT_DEJAVU_10 == 1
+#if LV_USE_FONT_DEJAVU_10 == 1
     {.w_px = 3,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 1,   .glyph_index = 10}, /*Unicode: U+0021 (!)*/
     {.w_px = 3,   .glyph_index = 20}, /*Unicode: U+0022 (")*/
@@ -5060,7 +5060,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_10_glyph_dsc[] = {
     {.w_px = 3,   .glyph_index = 930},    /*Unicode: U+007d (})*/
     {.w_px = 5,   .glyph_index = 940},    /*Unicode: U+007e (~)*/
 
-#elif USE_LV_FONT_DEJAVU_10 == 2
+#elif LV_USE_FONT_DEJAVU_10 == 2
     {.w_px = 3,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 1,   .glyph_index = 10}, /*Unicode: U+0021 (!)*/
     {.w_px = 3,   .glyph_index = 20}, /*Unicode: U+0022 (")*/
@@ -5157,7 +5157,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_10_glyph_dsc[] = {
     {.w_px = 3,   .glyph_index = 1220},   /*Unicode: U+007d (})*/
     {.w_px = 5,   .glyph_index = 1230},   /*Unicode: U+007e (~)*/
 
-#elif USE_LV_FONT_DEJAVU_10 == 4
+#elif LV_USE_FONT_DEJAVU_10 == 4
     {.w_px = 3,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 1,   .glyph_index = 20}, /*Unicode: U+0021 (!)*/
     {.w_px = 3,   .glyph_index = 30}, /*Unicode: U+0022 (")*/
@@ -5254,7 +5254,7 @@ static const lv_font_glyph_dsc_t lv_font_dejavu_10_glyph_dsc[] = {
     {.w_px = 3,   .glyph_index = 2010},   /*Unicode: U+007d (})*/
     {.w_px = 5,   .glyph_index = 2030},   /*Unicode: U+007e (~)*/
 
-#elif USE_LV_FONT_DEJAVU_10 == 8
+#elif LV_USE_FONT_DEJAVU_10 == 8
     {.w_px = 3,   .glyph_index = 0},  /*Unicode: U+0020 ( )*/
     {.w_px = 1,   .glyph_index = 30}, /*Unicode: U+0021 (!)*/
     {.w_px = 3,   .glyph_index = 40}, /*Unicode: U+0022 (")*/
@@ -5364,17 +5364,17 @@ lv_font_t lv_font_dejavu_10 = {
     .unicode_list = NULL,   /*Every character in the font from 'unicode_first' to 'unicode_last'*/
     .get_bitmap = lv_font_get_bitmap_continuous,    /*Function pointer to get glyph's bitmap*/
     .get_width = lv_font_get_width_continuous,  /*Function pointer to get glyph's width*/
-#if USE_LV_FONT_DEJAVU_10 == 1
+#if LV_USE_FONT_DEJAVU_10 == 1
     .bpp = 1,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_10 == 2
+#elif LV_USE_FONT_DEJAVU_10 == 2
     .bpp = 2,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_10 == 4
+#elif LV_USE_FONT_DEJAVU_10 == 4
     .bpp = 4,               /*Bit per pixel*/
-#elif USE_LV_FONT_DEJAVU_10 == 8
+#elif LV_USE_FONT_DEJAVU_10 == 8
     .bpp = 8,               /*Bit per pixel*/
 #endif
     .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 
-#endif /*USE_LV_FONT_DEJAVU_10*/
+#endif /*LV_USE_FONT_DEJAVU_10*/

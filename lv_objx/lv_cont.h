@@ -19,7 +19,7 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_CONT != 0
+#if LV_USE_CONT != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -47,13 +47,23 @@ enum
 };
 typedef uint8_t lv_layout_t;
 
+
+typedef enum {
+    LV_FIT_NONE,         /*Do not change the size automatically*/
+    LV_FIT_TIGHT,        /*Involve the children*/
+    LV_FIT_FLOOD,        /*Align the size to the parent's edge*/
+    LV_FIT_FILL,         /*Align the size to the parent's edge first but if there is an object out of it then involve it*/
+}lv_fit_t;
+
 typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
     /*New data for this type */
-    uint8_t layout  :4;     /*A layout from 'lv_cont_layout_t' enum*/
-    uint8_t hor_fit :1;     /*1: Enable horizontal fit to involve all children*/
-    uint8_t ver_fit :1;     /*1: Enable horizontal fit to involve all children*/
+    uint8_t layout  :4;     /*A layout from 'lv_layout_t' enum*/
+    uint8_t fit_left :2;    /*A fit type from `lv_fit_t` enum */
+    uint8_t fit_right :2;   /*A fit type from `lv_fit_t` enum */
+    uint8_t fit_top :2;     /*A fit type from `lv_fit_t` enum */
+    uint8_t fit_bottom :2;  /*A fit type from `lv_fit_t` enum */
 } lv_cont_ext_t;
 
 
@@ -80,15 +90,41 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy);
  */
 void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout);
 
+/**
+ * Set the fit policy in all 4 directions separately.
+ * It tell how to change the container's size automatically.
+ * @param cont pointer to a container object
+ * @param left left fit policy from `lv_fit_t`
+ * @param right right fit policy from `lv_fit_t`
+ * @param top bottom fit policy from `lv_fit_t`
+ * @param bottom bottom fit policy from `lv_fit_t`
+ */
+void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom);
 
 /**
- * Enable the horizontal or vertical fit.
- * The container size will be set to involve the children horizontally or vertically.
+ * Set the fit policy horizontally and vertically separately.
+ * It tell how to change the container's size automatically.
  * @param cont pointer to a container object
- * @param hor_en true: enable the horizontal fit
- * @param ver_en true: enable the vertical fit
+ * @param hot horizontal fit policy from `lv_fit_t`
+ * @param ver vertical fit policy from `lv_fit_t`
  */
-void lv_cont_set_fit(lv_obj_t * cont, bool hor_en, bool ver_en);
+static inline void lv_cont_set_fit2(lv_obj_t * cont, lv_fit_t hor, lv_fit_t ver)
+{
+    lv_cont_set_fit4(cont, hor, hor, ver, ver);
+}
+
+
+/**
+ * Set the fit policyin all 4 direction at once.
+ * It tell how to change the container's size automatically.
+ * @param cont pointer to a container object
+ * @param fit fit policy from `lv_fit_t`
+ */
+static inline void lv_cont_set_fit(lv_obj_t * cont, lv_fit_t fit)
+{
+    lv_cont_set_fit4(cont, fit, fit, fit, fit);
+}
+
 
 /**
  * Set the style of a container
@@ -112,18 +148,32 @@ static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
 lv_layout_t lv_cont_get_layout(const lv_obj_t * cont);
 
 /**
- * Get horizontal fit enable attribute of a container
+ * Get left fit mode of a container
  * @param cont pointer to a container object
- * @return true: horizontal fit is enabled; false: disabled
+ * @return an element of `lv_fit_t`
  */
-bool lv_cont_get_hor_fit(const lv_obj_t * cont);
+lv_fit_t lv_cont_get_fit_left(const lv_obj_t * cont);
 
 /**
- * Get vertical fit enable attribute of a container
+ * Get right fit mode of a container
  * @param cont pointer to a container object
- * @return true: vertical fit is enabled; false: disabled
+ * @return an element of `lv_fit_t`
  */
-bool lv_cont_get_ver_fit(const lv_obj_t * cont);
+lv_fit_t lv_cont_get_fit_right(const lv_obj_t * cont);
+
+/**
+ * Get top fit mode of a container
+ * @param cont pointer to a container object
+ * @return an element of `lv_fit_t`
+ */
+lv_fit_t lv_cont_get_fit_top(const lv_obj_t * cont);
+
+/**
+ * Get bottom fit mode of a container
+ * @param cont pointer to a container object
+ * @return an element of `lv_fit_t`
+ */
+lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont);
 
 
 /**
@@ -154,7 +204,7 @@ static inline lv_style_t * lv_cont_get_style(const lv_obj_t *cont)
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CONT*/
+#endif  /*LV_USE_CONT*/
 
 #ifdef __cplusplus
 } /* extern "C" */

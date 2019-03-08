@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_preload.h"
-#if USE_LV_PRELOAD != 0
+#if LV_USE_PRELOAD != 0
 
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rect.h"
@@ -43,8 +43,8 @@ static lv_res_t lv_preload_signal(lv_obj_t * preload, lv_signal_t sign, void * p
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -82,8 +82,8 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_type = LV_PRELOAD_DEF_ANIM;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_preload, lv_preload_signal);
-    lv_obj_set_design_func(new_preload, lv_preload_design);
+    lv_obj_set_signal_cb(new_preload, lv_preload_signal);
+    lv_obj_set_design_cb(new_preload, lv_preload_design);
 
 
     /*Init the new pre loader pre loader*/
@@ -93,7 +93,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_preload_set_style(new_preload, LV_PRELOAD_STYLE_MAIN, th->preload);
+            lv_preload_set_style(new_preload, LV_PRELOAD_STYLE_MAIN, th->style.preload);
         } else {
             lv_obj_set_style(new_preload, &lv_style_pretty_color);
         }
@@ -172,7 +172,7 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_
  *  */
 void lv_preload_set_animation_type(lv_obj_t * preload, lv_preloader_type_t type)
 {
-#if USE_LV_ANIMATION
+#if LV_USE_ANIMATION
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     /*delete previous animation*/
@@ -235,7 +235,7 @@ void lv_preload_set_animation_type(lv_obj_t * preload, lv_preloader_type_t type)
     }
     }
 
-#endif //USE_LV_ANIMATION
+#endif //LV_USE_ANIMATION
 }
 
 /*=====================
@@ -354,7 +354,7 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
 
             lv_style_t bg_style;
             lv_style_copy(&bg_style, &lv_style_plain);
-            bg_style.body.empty = 1;
+            bg_style.body.opa = LV_OPA_TRANSP;
             bg_style.body.radius = LV_RADIUS_CIRCLE;
             bg_style.body.border.color = style->body.border.color;
             bg_style.body.border.width = style->body.border.width;

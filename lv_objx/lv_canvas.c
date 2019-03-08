@@ -8,7 +8,7 @@
  *********************/
 #include <stdlib.h>
 #include "lv_canvas.h"
-#if USE_LV_CANVAS != 0
+#if LV_USE_CANVAS != 0
 
 /*********************
  *      DEFINES
@@ -26,8 +26,8 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -70,7 +70,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_img_set_src(new_canvas, &ext->dsc);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_canvas, lv_canvas_signal);
+    lv_obj_set_signal_cb(new_canvas, lv_canvas_signal);
 
     /*Init the new canvas canvas*/
     if(copy == NULL) {
@@ -341,25 +341,25 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
     for(i = 0; i < h; i++) {
         for(j = 0; j < w; j++) {
 #if LV_COLOR_DEPTH == 32
-            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 8;
-            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 8;
-            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 8;
+            canvas_buf_color[j].ch.red = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 8;
+            canvas_buf_color[j].ch.green = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.green * copy_buf_color[j].ch.green) >> 8;
+            canvas_buf_color[j].ch.blue = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.blue * copy_buf_color[j].ch.blue) >> 8;
 #elif LV_COLOR_DEPTH == 16
 
-            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 5;
-            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 5;
+            canvas_buf_color[j].ch.red = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 5;
+            canvas_buf_color[j].ch.blue = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.blue * copy_buf_color[j].ch.blue) >> 5;
 #  if LV_COLOR_16_SWAP == 0
-            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 6;
+            canvas_buf_color[j].ch.green = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.green * copy_buf_color[j].ch.green) >> 6;
 #  else
-            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 6;
-            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 6;
-            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 6;
+            canvas_buf_color[j].ch.red = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 6;
+            canvas_buf_color[j].ch.blue = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.blue * copy_buf_color[j].ch.blue) >> 6;
+            canvas_buf_color[j].ch.red = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 6;
 #  endif    /*LV_COLOR_16_SWAP*/
 
 #elif LV_COLOR_DEPTH == 8
-            canvas_buf_color[j].red = (uint16_t) ((uint16_t) canvas_buf_color[j].red * copy_buf_color[j].red) >> 3;
-            canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 3;
-            canvas_buf_color[j].blue = (uint16_t) ((uint16_t) canvas_buf_color[j].blue * copy_buf_color[j].blue) >> 2;
+            canvas_buf_color[j].ch.red = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 3;
+            canvas_buf_color[j].ch.green = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.green * copy_buf_color[j].ch.green) >> 3;
+            canvas_buf_color[j].ch.blue = (uint16_t) ((uint16_t) canvas_buf_color[j].ch.blue * copy_buf_color[j].ch.blue) >> 2;
 #endif
         }
         copy_buf_color += w;

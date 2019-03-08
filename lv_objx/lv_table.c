@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_table.h"
-#if USE_LV_TABLE != 0
+#if LV_USE_TABLE != 0
 
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
@@ -33,8 +33,8 @@ static void refr_size(lv_obj_t * table);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_scrl_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_scrl_design;
 
 /**********************
  *      MACROS
@@ -81,19 +81,19 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_table, lv_table_signal);
-    lv_obj_set_design_func(new_table, lv_table_design);
+    lv_obj_set_signal_cb(new_table, lv_table_signal);
+    lv_obj_set_design_cb(new_table, lv_table_design);
 
     /*Init the new table table*/
     if(copy == NULL) {
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, th->table.bg);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL1, th->table.cell);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL2, th->table.cell);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL3, th->table.cell);
-            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL4, th->table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_BG, th->style.table.bg);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL1, th->style.table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL2, th->style.table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL3, th->style.table.cell);
+            lv_table_set_style(new_table, LV_TABLE_STYLE_CELL4, th->style.table.cell);
         } else {
             lv_table_set_style(new_table, LV_TABLE_STYLE_BG, &lv_style_plain_color);
         }

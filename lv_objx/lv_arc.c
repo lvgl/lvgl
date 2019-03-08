@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_arc.h"
-#if USE_LV_ARC != 0
+#if LV_USE_ARC != 0
 
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_arc.h"
@@ -32,8 +32,8 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -72,15 +72,15 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->angle_end = 315;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_arc, lv_arc_signal);
-    lv_obj_set_design_func(new_arc, lv_arc_design);
+    lv_obj_set_signal_cb(new_arc, lv_arc_signal);
+    lv_obj_set_design_cb(new_arc, lv_arc_design);
 
     /*Init the new arc arc*/
     if(copy == NULL) {
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, th->arc);
+            lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, th->style.arc);
         } else {
             lv_arc_set_style(new_arc, LV_ARC_STYLE_MAIN, &lv_style_plain_color);
         }

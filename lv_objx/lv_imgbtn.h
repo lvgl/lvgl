@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_IMGBTN != 0
+#if LV_USE_IMGBTN != 0
 
 /*Testing of dependencies*/
-#if USE_LV_BTN == 0
-#error "lv_imgbtn: lv_btn is required. Enable it in lv_conf.h (USE_LV_BTN  1) "
+#if LV_USE_BTN == 0
+#error "lv_imgbtn: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -135,16 +135,6 @@ static inline void lv_imgbtn_toggle(lv_obj_t * imgbtn)
 }
 
 /**
- * Set a function to call when a button event happens
- * @param imgbtn pointer to an image button object
- * @param action type of event form 'lv_action_t' (press, release, long press, long press repeat)
- */
-static inline void lv_imgbtn_set_action(lv_obj_t * imgbtn, lv_btn_action_t type, lv_action_t action)
-{
-    lv_btn_set_action(imgbtn, type, action);
-}
-
-/**
  * Set a style of a image button.
  * @param imgbtn pointer to image button object
  * @param type which style should be set
@@ -214,16 +204,6 @@ static inline bool lv_imgbtn_get_toggle(const lv_obj_t * imgbtn)
 }
 
 /**
- * Get the release action of a image button
- * @param imgbtn pointer to a image button object
- * @return pointer to the release action function
- */
-static inline lv_action_t lv_imgbtn_get_action(const lv_obj_t * imgbtn, lv_btn_action_t type)
-{
-    return lv_btn_get_action(imgbtn, type);
-}
-
-/**
  * Get style of a image button.
  * @param imgbtn pointer to image button object
  * @param type which style should be get
@@ -239,7 +219,7 @@ lv_style_t * lv_imgbtn_get_style(const lv_obj_t * imgbtn, lv_imgbtn_style_t type
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_IMGBTN*/
+#endif  /*LV_USE_IMGBTN*/
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_lmeter.h"
-#if USE_LV_LMETER != 0
+#if LV_USE_LMETER != 0
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -34,7 +34,7 @@ static lv_coord_t lv_lmeter_coord_round(int32_t x);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
+static lv_signal_cb_t ancestor_signal;
 
 /**********************
  *      MACROS
@@ -74,8 +74,8 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_lmeter, lv_lmeter_signal);
-    lv_obj_set_design_func(new_lmeter, lv_lmeter_design);
+    lv_obj_set_signal_cb(new_lmeter, lv_lmeter_signal);
+    lv_obj_set_design_cb(new_lmeter, lv_lmeter_design);
 
     /*Init the new line meter line meter*/
     if(copy == NULL) {
@@ -84,7 +84,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_lmeter_set_style(new_lmeter, th->lmeter);
+            lv_lmeter_set_style(new_lmeter, th->style.lmeter);
         } else {
             lv_lmeter_set_style(new_lmeter, &lv_style_pretty_color);
         }
@@ -257,7 +257,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
         memcpy(&style_tmp, style, sizeof(lv_style_t));
 
 
-#if USE_LV_GROUP
+#if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(lmeter);
         if(lv_group_get_focused(g) == lmeter) {
             style_tmp.line.width += 1;

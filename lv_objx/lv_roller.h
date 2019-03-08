@@ -19,11 +19,11 @@ extern "C" {
 #include "../../lv_conf.h"
 #endif
 
-#if USE_LV_ROLLER != 0
+#if LV_USE_ROLLER != 0
 
 /*Testing of dependencies*/
-#if USE_LV_DDLIST == 0
-#error "lv_roller: lv_ddlist is required. Enable it in lv_conf.h (USE_LV_DDLIST  1) "
+#if LV_USE_DDLIST == 0
+#error "lv_roller: lv_ddlist is required. Enable it in lv_conf.h (LV_USE_DDLIST  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -91,16 +91,6 @@ static inline void lv_roller_set_options(lv_obj_t * roller, const char * options
 void lv_roller_set_selected(lv_obj_t *roller, uint16_t sel_opt, bool anim_en);
 
 /**
- * Set a function to call when a new option is chosen
- * @param roller pointer to a roller
- * @param action pointer to a callback function
- */
-static inline void lv_roller_set_action(lv_obj_t * roller, lv_action_t action)
-{
-    lv_ddlist_set_action(roller, action);
-}
-
-/**
  * Set the height to show the given number of rows (options)
  * @param roller pointer to a roller object
  * @param row_cnt number of desired visible rows
@@ -110,11 +100,11 @@ void lv_roller_set_visible_row_count(lv_obj_t *roller, uint8_t row_cnt);
 /**
  * Enable or disable the horizontal fit to the content
  * @param roller pointer to a roller
- * @param en true: enable auto fit; false: disable auto fit
+ * @param fit fit mode from `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
  */
-static inline void lv_roller_set_hor_fit(lv_obj_t * roller, bool en)
+static inline void lv_roller_set_hor_fit(lv_obj_t * roller, lv_fit_t fit)
 {
-    lv_ddlist_set_hor_fit(roller, en);
+    lv_ddlist_set_fit(roller, fit);
 }
 
 /**
@@ -177,16 +167,6 @@ static inline void lv_roller_get_selected_str(const lv_obj_t * roller, char * bu
 }
 
 /**
- * Get the "option selected" callback function
- * @param roller pointer to a roller
- * @return  pointer to the call back function
- */
-static inline lv_action_t lv_roller_get_action(const lv_obj_t * roller)
-{
-    return lv_ddlist_get_action(roller);
-}
-
-/**
  * Get the open/close animation time.
  * @param roller pointer to a roller
  * @return open/close animation time [ms]
@@ -215,7 +195,7 @@ lv_style_t * lv_roller_get_style(const lv_obj_t *roller, lv_roller_style_t type)
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_ROLLER*/
+#endif  /*LV_USE_ROLLER*/
 
 #ifdef __cplusplus
 } /* extern "C" */
