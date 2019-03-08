@@ -24,7 +24,6 @@ extern "C" {
 #include "lv_core/lv_obj.h"
 #include "lv_core/lv_group.h"
 
-#include "lv_core/lv_i18n.h"
 #include "lv_core/lv_refr.h"
 #include "lv_core/lv_disp.h"
 

@@ -11,7 +11,6 @@
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_group.h"
-#include "../lv_core/lv_i18n.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
