@@ -61,7 +61,7 @@
 #endif
 #if LV_MEM_CUSTOM == 0
 #ifndef LV_MEM_SIZE
-#  define LV_MEM_SIZE    (32U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#  define LV_MEM_SIZE    (32U * 1024U)        /*Size of the memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
 #endif
 #ifndef LV_MEM_ATTR
 #  define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
@@ -152,14 +152,13 @@
 #ifndef LV_USE_GROUP
 #define LV_USE_GROUP            1               /*1: Enable object groups (for keyboards)*/
 #endif
+#if LV_USE_GROUP
+#endif  /*LV_USE_GROUP*/
 #ifndef LV_USE_GPU
 #define LV_USE_GPU              1               /*1: Enable GPU interface*/
 #endif
 #ifndef LV_USE_FILESYSTEM
 #define LV_USE_FILESYSTEM       1               /*1: Enable file system (might be required for images*/
-#endif
-#ifndef LV_USE_I18N
-#define LV_USE_I18N             1               /*1: Enable InternationalizatioN (multi-language) support*/
 #endif
 #ifndef LV_USE_USER_DATA_SINGLE
 #define LV_USE_USER_DATA_SINGLE 1               /*1: Add a `user_data` to drivers and objects*/
@@ -228,25 +227,25 @@
 #define LV_USE_THEME_TEMPL      0       /*Just for test*/
 #endif
 #ifndef LV_USE_THEME_DEFAULT
-#define LV_USE_THEME_DEFAULT    1       /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define LV_USE_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
 #endif
 #ifndef LV_USE_THEME_ALIEN
-#define LV_USE_THEME_ALIEN      1       /*Dark futuristic theme*/
+#define LV_USE_THEME_ALIEN      0       /*Dark futuristic theme*/
 #endif
 #ifndef LV_USE_THEME_NIGHT
-#define LV_USE_THEME_NIGHT      1       /*Dark elegant theme*/
+#define LV_USE_THEME_NIGHT      0       /*Dark elegant theme*/
 #endif
 #ifndef LV_USE_THEME_MONO
-#define LV_USE_THEME_MONO       1       /*Mono color theme for monochrome displays*/
+#define LV_USE_THEME_MONO       0       /*Mono color theme for monochrome displays*/
 #endif
 #ifndef LV_USE_THEME_MATERIAL
-#define LV_USE_THEME_MATERIAL   1       /*Flat theme with bold colors and light shadows*/
+#define LV_USE_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows*/
 #endif
 #ifndef LV_USE_THEME_ZEN
-#define LV_USE_THEME_ZEN        1       /*Peaceful, mainly light theme */
+#define LV_USE_THEME_ZEN        0       /*Peaceful, mainly light theme */
 #endif
 #ifndef LV_USE_THEME_NEMO
-#define LV_USE_THEME_NEMO       1       /*Water-like theme based on the movie "Finding Nemo"*/
+#define LV_USE_THEME_NEMO       0       /*Water-like theme based on the movie "Finding Nemo"*/
 #endif
 
 /*==================
@@ -309,7 +308,7 @@
 #endif
 
 #ifndef LV_USE_FONT_MONOSPACE_8
-#define LV_USE_FONT_MONOSPACE_8            1
+#define LV_USE_FONT_MONOSPACE_8            0
 #endif
 
 /* Optionally declare your custom fonts here.
@@ -331,7 +330,7 @@
  *  LV_OBJ SETTINGS
  *==================*/
 #ifndef LV_OBJ_REALIGN
-#define LV_OBJ_REALIGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+#define LV_OBJ_REALIGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 #endif
 
 /*==================

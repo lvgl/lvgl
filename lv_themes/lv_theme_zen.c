@@ -760,8 +760,9 @@ static void win_init(void)
 
 #if LV_USE_GROUP
 
-static void style_mod(lv_style_t * style)
+static void style_mod(lv_group_t * group, lv_style_t * style)
 {
+    (void) group;       /*Unused*/
 #if LV_COLOR_DEPTH != 1
     /*Make the style to be a little bit orange*/
     style->body.border.opa = LV_OPA_COVER;
@@ -776,8 +777,10 @@ static void style_mod(lv_style_t * style)
 #endif
 }
 
-static void style_mod_edit(lv_style_t * style)
+static void style_mod_edit(lv_group_t * group, lv_style_t * style)
 {
+    (void) group;       /*Unused*/
+
 #if LV_COLOR_DEPTH != 1
     /*Make the style to be a little bit orange*/
     style->body.border.opa = LV_OPA_COVER;

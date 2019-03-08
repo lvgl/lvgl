@@ -46,7 +46,7 @@
  * to store the graphical objects and other data */
 #define LV_MEM_CUSTOM      0                /*1: use custom malloc/free, 0: use the built-in lv_mem_alloc/lv_mem_free*/
 #if LV_MEM_CUSTOM == 0
-#  define LV_MEM_SIZE    (32U * 1024U)        /*Size memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
+#  define LV_MEM_SIZE    (32U * 1024U)        /*Size of the memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
 #  define LV_MEM_ATTR                         /*Complier prefix for big array declaration*/
 #  define LV_MEM_ADR          0               /*Set an address for memory pool instead of allocation it as an array. Can be in external SRAM too.*/
 #  define LV_MEM_AUTO_DEFRAG  1               /*Automatically defrag on free*/
@@ -93,7 +93,6 @@ typedef void * lv_group_user_data_t;
 #endif  /*LV_USE_GROUP*/
 #define LV_USE_GPU              1               /*1: Enable GPU interface*/
 #define LV_USE_FILESYSTEM       1               /*1: Enable file system (might be required for images*/
-#define LV_USE_I18N             1               /*1: Enable InternationalizatioN (multi-language) support*/
 #define LV_USE_USER_DATA_SINGLE 1               /*1: Add a `user_data` to drivers and objects*/
 #define LV_USE_USER_DATA_MULTI  0               /*1: Add separate `user_data` for every callback*/
 
@@ -134,13 +133,13 @@ typedef void * lv_indev_drv_user_data_t;                /*Type of user data in t
 #define LV_THEME_LIVE_UPDATE    0       /*1: Allow theme switching at run time. Uses 8..10 kB of RAM*/
 
 #define LV_USE_THEME_TEMPL      0       /*Just for test*/
-#define LV_USE_THEME_DEFAULT    1       /*Built mainly from the built-in styles. Consumes very few RAM*/
-#define LV_USE_THEME_ALIEN      1       /*Dark futuristic theme*/
-#define LV_USE_THEME_NIGHT      1       /*Dark elegant theme*/
-#define LV_USE_THEME_MONO       1       /*Mono color theme for monochrome displays*/
-#define LV_USE_THEME_MATERIAL   1       /*Flat theme with bold colors and light shadows*/
-#define LV_USE_THEME_ZEN        1       /*Peaceful, mainly light theme */
-#define LV_USE_THEME_NEMO       1       /*Water-like theme based on the movie "Finding Nemo"*/
+#define LV_USE_THEME_DEFAULT    0       /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define LV_USE_THEME_ALIEN      0       /*Dark futuristic theme*/
+#define LV_USE_THEME_NIGHT      0       /*Dark elegant theme*/
+#define LV_USE_THEME_MONO       0       /*Mono color theme for monochrome displays*/
+#define LV_USE_THEME_MATERIAL   0       /*Flat theme with bold colors and light shadows*/
+#define LV_USE_THEME_ZEN        0       /*Peaceful, mainly light theme */
+#define LV_USE_THEME_NEMO       0       /*Water-like theme based on the movie "Finding Nemo"*/
 
 /*==================
  *    FONT USAGE
@@ -169,7 +168,7 @@ typedef void * lv_indev_drv_user_data_t;                /*Type of user data in t
 #define LV_USE_FONT_DEJAVU_40_CYRILLIC     0
 #define LV_USE_FONT_SYMBOL_40              0
 
-#define LV_USE_FONT_MONOSPACE_8            1
+#define LV_USE_FONT_MONOSPACE_8            0
 
 /* Optionally declare your custom fonts here.
  * You can use these fonts as default font too
@@ -186,7 +185,7 @@ typedef void * lv_indev_drv_user_data_t;                /*Type of user data in t
  *  LV_OBJ SETTINGS
  *==================*/
 typedef void * lv_obj_user_data_t;          /*Declare the type of the user data of object (can be e.g. `void *`, `int`, `struct`)*/
-#define LV_OBJ_REALIGN          1           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+#define LV_OBJ_REALIGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 
 /*==================
  *  LV OBJ X USAGE

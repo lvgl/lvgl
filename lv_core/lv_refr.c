@@ -192,6 +192,7 @@ static void lv_refr_task(void * param)
 
             /*Call monitor cb if present*/
             if(disp_refr->driver.monitor_cb) {
+                printf("%d ms\n", lv_tick_elaps(start));
                 disp_refr->driver.monitor_cb(&disp_refr->driver, lv_tick_elaps(start), px_num);
             }
         }
@@ -528,10 +529,10 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
  */
 static void lv_refr_vdb_flush(void)
 {
-    lv_disp_buf_t * vdb = lv_disp_get_buf(lv_refr_get_disp_refreshing());
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
     /*In double buffered mode wait until the other buffer is flushed before flushing the current one*/
-    if(vdb->buf1 && vdb->buf2) {
+    if(lv_disp_is_double_buf(disp_refr)) {
         while(vdb->flushing);
     }
 
