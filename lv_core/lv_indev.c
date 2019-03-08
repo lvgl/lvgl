@@ -285,7 +285,7 @@ lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t *indev)
  */
 void lv_indev_wait_release(lv_indev_t * indev)
 {
-    indev->proc.types.pointer.wait_unil_release = 1;
+    indev->proc.types.pointer.wait_until_release = 1;
 }
 
 /**********************
@@ -644,7 +644,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 {
     lv_obj_t * pr_obj = proc->types.pointer.act_obj;
 
-    if(proc->types.pointer.wait_unil_release != 0) return;
+    if(proc->types.pointer.wait_until_release != 0) return;
 
     lv_disp_t * disp = indev_act->driver.disp;
 
@@ -777,12 +777,12 @@ static void indev_proc_press(lv_indev_proc_t * proc)
  */
 static void indev_proc_release(lv_indev_proc_t * proc)
 {
-    if(proc->types.pointer.wait_unil_release != 0) {
+    if(proc->types.pointer.wait_until_release != 0) {
         proc->types.pointer.act_obj = NULL;
         proc->types.pointer.last_obj = NULL;
         proc->pr_timestamp = 0;
         proc->longpr_rep_timestamp = 0;
-        proc->types.pointer.wait_unil_release = 0;
+        proc->types.pointer.wait_until_release = 0;
     }
 
     /*Forget the act obj and send a released signal */
