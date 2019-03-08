@@ -184,6 +184,20 @@ uint16_t lv_img_get_src_id(lv_obj_t * img);
 bool lv_img_get_auto_size(const lv_obj_t * img);
 
 /**
+ * Get the offset.x attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.x value.
+ */
+lv_coord_t lv_img_get_offset_x(lv_obj_t *img);
+
+/**
+ * Get the offset.y attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.y value.
+ */
+lv_coord_t lv_img_get_offset_y(lv_obj_t *img);
+    
+/**
  * Get the style of an image object
  * @param img pointer to an image object
  * @return pointer to the image's style
