@@ -251,6 +251,7 @@ void lv_img_set_offset(lv_obj_t *img, lv_coord_t x, lv_coord_t y)
     if((x < ext->w - 1) && (y < ext->h - 1)) {
         ext->offset.x = x;
         ext->offset.y = y;
+        lv_obj_invalidate(img);
     }
 }
 
@@ -266,7 +267,9 @@ void lv_img_set_offset_x(lv_obj_t *img, lv_coord_t x)
 
     if(x < ext->w - 1) {
         ext->offset.x = x;
+        lv_obj_invalidate(img);
     }
+
 }
 
 /**
@@ -281,6 +284,7 @@ void lv_img_set_offset_y(lv_obj_t *img, lv_coord_t y)
 
     if(y < ext->h - 1) {
         ext->offset.y = y;
+        lv_obj_invalidate(img);
     }
 }
 
