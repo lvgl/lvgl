@@ -192,7 +192,6 @@ static void lv_refr_task(void * param)
 
             /*Call monitor cb if present*/
             if(disp_refr->driver.monitor_cb) {
-                printf("%d ms\n", lv_tick_elaps(start));
                 disp_refr->driver.monitor_cb(&disp_refr->driver, lv_tick_elaps(start), px_num);
             }
         }
