@@ -40,7 +40,7 @@ typedef struct
     /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
     /*New data for this type */
     const void * src;             /*Image source: Pointer to an array or a file or a symbol*/
-
+    lv_point_t offset;
     lv_coord_t w;               /*Width of the image (Handled by the library)*/
     lv_coord_t h;               /*Height of the image (Handled by the library)*/
     uint8_t src_type  :2;       /*See: lv_img_src_t*/
@@ -92,6 +92,31 @@ static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
 void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
 
 /**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param x: the new offset along x axis.
+ * @param y: the new offset along y axis.
+ */
+void lv_img_set_offset(lv_obj_t *img, lv_coord_t x, lv_coord_t y);
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param x: the new offset along x axis.
+ */
+void lv_img_set_offset_x(lv_obj_t *img, lv_coord_t x);
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param y: the new offset along y axis.
+ */
+void lv_img_set_offset_y(lv_obj_t *img, lv_coord_t y);
+    
+/**
  * Set the style of an image
  * @param img pointer to an image object
  * @param style pointer to a style
@@ -137,6 +162,20 @@ const char * lv_img_get_file_name(const lv_obj_t * img);
  */
 bool lv_img_get_auto_size(const lv_obj_t * img);
 
+/**
+ * Get the offset.x attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.x value.
+ */
+lv_coord_t lv_img_get_offset_x(lv_obj_t *img);
+
+/**
+ * Get the offset.y attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.y value.
+ */
+lv_coord_t lv_img_get_offset_y(lv_obj_t *img);
+    
 /**
  * Get the style of an image object
  * @param img pointer to an image object
