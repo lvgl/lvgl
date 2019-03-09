@@ -4,7 +4,6 @@ CSRCS += lv_disp.c
 CSRCS += lv_obj.c
 CSRCS += lv_refr.c
 CSRCS += lv_style.c
-CSRCS += lv_lang.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/lvgl/lv_core
 VPATH += :$(LVGL_DIR)/lvgl/lv_core

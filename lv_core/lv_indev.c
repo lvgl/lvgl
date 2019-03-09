@@ -675,6 +675,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         /*If a new object found the previous was lost, so send a signal*/
         if(proc->types.pointer.act_obj != NULL) {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESS_LOST, indev_act);
+            if(proc->reset_query) return;         /*The object might be deleted*/
             lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_PRESS_LOST);
             if(proc->reset_query) return;         /*The object might be deleted*/
         }
@@ -712,6 +713,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
             /*Send a signal about the press*/
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESSED, indev_act);
+            if(proc->reset_query) return;         /*The object might be deleted*/
             lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_PRESSED);
             if(proc->reset_query) return;         /*The object might be deleted*/
         }
@@ -736,6 +738,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     /*If there is active object and it can be dragged run the drag*/
     if(proc->types.pointer.act_obj != NULL) {
         proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_PRESSING, indev_act);
+        if(proc->reset_query) return;         /*The object might be deleted*/
         lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_PRESSING);
         if(proc->reset_query) return;         /*The object might be deleted*/
 
@@ -747,6 +750,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             /*Send a signal about the long press if enough time elapsed*/
             if(lv_tick_elaps(proc->pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
                 pr_obj->signal_cb(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
+                if(proc->reset_query) return;         /*The object might be deleted*/
                 lv_obj_send_event(pr_obj, LV_EVENT_LONG_PRESSED);
                 if(proc->reset_query) return;         /*The object might be deleted*/
 
@@ -762,6 +766,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             /*Send a signal about the long press repeate if enough time elapsed*/
             if(lv_tick_elaps(proc->longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
                 pr_obj->signal_cb(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
+                if(proc->reset_query) return;         /*The object might be deleted*/
                 lv_obj_send_event(pr_obj, LV_EVENT_LONG_PRESSED_REPEAT);
                 if(proc->reset_query) return;         /*The object might be deleted*/
                 proc->longpr_rep_timestamp = lv_tick_get();
@@ -792,6 +797,8 @@ static void indev_proc_release(lv_indev_proc_t * proc)
          * In this case send the `LV_SIGNAL_RELEASED/CLICKED` instead of `LV_SIGNAL_PRESS_LOST` if the indev is ON the `types.pointer.act_obj` */
         if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_PRESS_LOST)) {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
+            if(proc->reset_query) return;         /*The object might be deleted*/
+
             if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
                 lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_SHORT_CLICKED);
                 if(proc->reset_query) return;         /*The object might be deleted*/
@@ -807,6 +814,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
          * If it is already not pressed then was `indev_proc_press` would set `act_obj = NULL`*/
         else {
             proc->types.pointer.act_obj->signal_cb(proc->types.pointer.act_obj, LV_SIGNAL_RELEASED, indev_act);
+            if(proc->reset_query) return;         /*The object might be deleted*/
 
             if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
                 lv_obj_send_event(proc->types.pointer.act_obj, LV_EVENT_SHORT_CLICKED);
@@ -999,7 +1007,6 @@ static void indev_drag(lv_indev_proc_t * state)
             if(drag_obj->coords.x1 != prev_x || drag_obj->coords.y1 != prev_y) {
                 if(state->types.pointer.drag_in_prog != 0) { /*Send the drag begin signal on first move*/
                     drag_obj->signal_cb(drag_obj,  LV_SIGNAL_DRAG_BEGIN, indev_act);
-
                     if(state->reset_query != 0) return;
                 }
                 state->types.pointer.drag_in_prog = 1;
@@ -1073,6 +1080,7 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
             proc->types.pointer.drag_throw_vect.x = 0;
             proc->types.pointer.drag_throw_vect.y = 0;
             drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
+            if(proc->reset_query) return;         /*The object might be deleted*/
 
         }
     }
@@ -1080,6 +1088,7 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
     else {
         proc->types.pointer.drag_in_prog = 0;
         drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
+        if(proc->reset_query) return;         /*The object might be deleted*/
     }
 
 }

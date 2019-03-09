@@ -8,7 +8,6 @@ CSRCS += lv_mem.c
 CSRCS += lv_ll.c
 CSRCS += lv_color.c
 CSRCS += lv_txt.c
-CSRCS += lv_ufs.c
 CSRCS += lv_math.c
 CSRCS += lv_log.c
 CSRCS += lv_gc.c

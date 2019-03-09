@@ -1223,8 +1223,6 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
                     lv_obj_get_height(ta) != lv_area_get_height(param)) {
 
-                lv_obj_t * scrl = lv_page_get_scrl(ta);
-
                 lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_obj_get_width(scrl) - 2 * style_scrl->body.padding.hor);
                 lv_obj_set_pos(ext->label, style_scrl->body.padding.hor, style_scrl->body.padding.ver);

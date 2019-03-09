@@ -691,7 +691,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
             if(ext->opened) {
                 ext->sel_opt_id_ori = ext->sel_opt_id;
                 ext->opened = 0;
-                lv_res_t res = lv_obj_send_event(ddlist, LV_EVENT_VALUE_CHANGED);
+                res = lv_obj_send_event(ddlist, LV_EVENT_VALUE_CHANGED);
                 if(res != LV_RES_OK) return res;
 #if LV_USE_GROUP
                 lv_group_t * g = lv_obj_get_group(ddlist);

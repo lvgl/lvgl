@@ -623,7 +623,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
     lv_area_t tight_area;
     lv_area_t ori;
     lv_style_t * style = lv_obj_get_style(cont);
-    lv_obj_t * i;
+    lv_obj_t * child_i;
     lv_coord_t hpad = style->body.padding.hor;
     lv_coord_t vpad = style->body.padding.ver;
 
@@ -648,12 +648,12 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         tight_area.x2 = LV_COORD_MIN;
         tight_area.y2 = LV_COORD_MIN;
 
-        LV_LL_READ(cont->child_ll, i) {
-            if(lv_obj_get_hidden(i) != false) continue;
-            tight_area.x1 = LV_MATH_MIN(tight_area.x1, i->coords.x1);
-            tight_area.y1 = LV_MATH_MIN(tight_area.y1, i->coords.y1);
-            tight_area.x2 = LV_MATH_MAX(tight_area.x2, i->coords.x2);
-            tight_area.y2 = LV_MATH_MAX(tight_area.y2, i->coords.y2);
+        LV_LL_READ(cont->child_ll, child_i) {
+            if(lv_obj_get_hidden(child_i) != false) continue;
+            tight_area.x1 = LV_MATH_MIN(tight_area.x1, child_i->coords.x1);
+            tight_area.y1 = LV_MATH_MIN(tight_area.y1, child_i->coords.y1);
+            tight_area.x2 = LV_MATH_MAX(tight_area.x2, child_i->coords.x2);
+            tight_area.y2 = LV_MATH_MAX(tight_area.y2, child_i->coords.y2);
         }
 
         tight_area.x1 -= hpad;
@@ -708,13 +708,11 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         cont->signal_cb(cont, LV_SIGNAL_CORD_CHG, &ori);
 
         /*Inform the parent about the new coordinates*/
-        lv_obj_t * par = lv_obj_get_parent(cont);
         par->signal_cb(par, LV_SIGNAL_CHILD_CHG, cont);
 
         /*Tell the children the parent's size has changed*/
-        lv_obj_t * i;
-        LV_LL_READ(cont->child_ll, i) {
-           i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
+        LV_LL_READ(cont->child_ll, child_i) {
+           child_i->signal_cb(child_i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
         }
     }
 
