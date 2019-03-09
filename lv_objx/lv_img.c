@@ -76,6 +76,9 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->w = lv_obj_get_width(new_img);
     ext->h = lv_obj_get_height(new_img);
     ext->auto_size = 1;
+    ext->offset.x = 0;
+    ext->offset.y = 0;
+
 
     /*Init the new object*/
     lv_obj_set_signal_cb(new_img, lv_img_signal);
@@ -214,6 +217,56 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
     ext->auto_size = (en == false ? 0 : 1);
 }
 
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param x: the new offset along x axis.
+ * @param y: the new offset along y axis.
+ */
+void lv_img_set_offset(lv_obj_t *img, lv_coord_t x, lv_coord_t y)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    if((x < ext->w - 1) && (y < ext->h - 1)) {
+        ext->offset.x = x;
+        ext->offset.y = y;
+        lv_obj_invalidate(img);
+    }
+}
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param x: the new offset along x axis.
+ */
+void lv_img_set_offset_x(lv_obj_t *img, lv_coord_t x)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    if(x < ext->w - 1) {
+        ext->offset.x = x;
+        lv_obj_invalidate(img);
+    }
+
+}
+
+/**
+ * Set an offset for the source of an image.
+ * so the image will be displayed from the new origin.
+ * @param img pointer to an image
+ * @param y: the new offset along y axis.
+ */
+void lv_img_set_offset_y(lv_obj_t *img, lv_coord_t y)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    if(y < ext->h - 1) {
+        ext->offset.y = y;
+        lv_obj_invalidate(img);
+    }
+}
 
 /*=====================
  * Getter functions
@@ -257,6 +310,30 @@ bool lv_img_get_auto_size(const lv_obj_t * img)
     return ext->auto_size == 0 ? false : true;
 }
 
+/**
+ * Get the offset.x attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.x value.
+ */
+lv_coord_t lv_img_get_offset_x(lv_obj_t *img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->offset.x;
+}
+
+/**
+ * Get the offset.y attribute of the img object.
+ * @param img pointer to an image
+ * @return offset.y value.
+ */
+lv_coord_t lv_img_get_offset_y(lv_obj_t *img)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->offset.y;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -291,6 +368,9 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
         lv_obj_get_coords(img, &coords);
 
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_VARIABLE) {
+            coords.x1 -= ext->offset.x;
+            coords.y1 -= ext->offset.y;
+            
             LV_LOG_TRACE("lv_img_design: start to draw image");
             lv_area_t cords_tmp;
             cords_tmp.y1 = coords.y1;
