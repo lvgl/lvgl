@@ -159,6 +159,49 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 
 }
 
+
+/**
+ * Performs a binary search within the given list.
+ *
+ * @note Code extracted out of https://github.com/torvalds/linux/blob/master/lib/bsearch.c
+ *
+ * @warning The contents of the array should already be in ascending sorted order
+ * under the provided comparison function.
+ *
+ * @note The key need not have the same type as the elements in
+ * the array, e.g. key could be a string and the comparison function
+ * could compare the string with the struct's name field.  However, if
+ * the key and elements in the array are of the same type, you can use
+ * the same comparison function for both sort() and bsearch().
+ *
+ * @param key  pointer to item being searched for
+ * @param base pointer to first element to search
+ * @param num  number of elements
+ * @param size size of each element
+ * @param cmp  pointer to comparison function
+ */
+void * lv_bsearch(const void * key, const void * base, uint32_t num, uint32_t size, int32_t (* cmp)(const void * key, const void * elt))
+{
+  const char * pivot;
+  int32_t result;
+
+  while (num > 0) {
+    pivot = ((char*)base) + (num >> 1) * size;
+    result = cmp(key, pivot);
+
+    if (result == 0)
+      return (void *)pivot;
+
+    if (result > 0) {
+      base = pivot + size;
+      num--;
+    }
+    num >>= 1;
+  }
+
+  return NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

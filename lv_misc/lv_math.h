@@ -62,6 +62,28 @@ int16_t lv_trigo_sin(int16_t angle);
  */
 int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3);
 
+/**
+ * Performs a binary search within the given list.
+ *
+ * @note Code extracted out of https://github.com/torvalds/linux/blob/master/lib/bsearch.c
+ *
+ * @warning The contents of the array should already be in ascending sorted order
+ * under the provided comparison function.
+ *
+ * @note The key need not have the same type as the elements in
+ * the array, e.g. key could be a string and the comparison function
+ * could compare the string with the struct's name field.  However, if
+ * the key and elements in the array are of the same type, you can use
+ * the same comparison function for both sort() and bsearch().
+ *
+ * @param key  pointer to item being searched for
+ * @param base pointer to first element to search
+ * @param num  number of elements
+ * @param size size of each element
+ * @param cmp  pointer to comparison function (see #lv_font_codeCompare as a comparison function example)
+ */
+void * lv_bsearch(const void * key, const void * base, uint32_t num, uint32_t size, int32_t (* cmp)(const void * key, const void * elt));
+
 /**********************
  *      MACROS
  **********************/

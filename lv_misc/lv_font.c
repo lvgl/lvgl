@@ -6,11 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
- #include <stdlib.h>
 
 #include "lv_font.h"
 #include "lv_log.h"
+#include "lv_math.h"
 
 /*********************
  *      DEFINES
@@ -24,7 +23,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int lv_font_codeCompare (const void* pRef, const void* pElement);
+static int32_t lv_font_codeCompare (const void* pRef, const void* pElement);
 
 /**********************
  *  STATIC VARIABLES
@@ -222,11 +221,11 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
 
     uint32_t* pUnicode;
 
-    pUnicode = bsearch(&unicode_letter,
-                       (uint32_t*) font->unicode_list,
-                       font->glyph_cnt,
-                       sizeof(uint32_t),
-                       lv_font_codeCompare);
+    pUnicode = lv_bsearch(&unicode_letter,
+                          (uint32_t*) font->unicode_list,
+                          font->glyph_cnt,
+                          sizeof(uint32_t),
+                          lv_font_codeCompare);
 
     if (pUnicode != NULL) {
         uint32_t idx = (uint32_t) (pUnicode - font->unicode_list);
@@ -266,11 +265,11 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
 
     uint32_t* pUnicode;
 
-    pUnicode = bsearch(&unicode_letter,
-                       (uint32_t*) font->unicode_list,
-                       font->glyph_cnt,
-                       sizeof(uint32_t),
-                       lv_font_codeCompare);
+    pUnicode = lv_bsearch(&unicode_letter,
+                          (uint32_t*) font->unicode_list,
+                          font->glyph_cnt,
+                          sizeof(uint32_t),
+                          lv_font_codeCompare);
 
     if (pUnicode != NULL) {
         uint32_t idx = (uint32_t) (pUnicode - font->unicode_list);
@@ -297,8 +296,8 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
  *  @retval > 0   Reference is less than element.
  *
  */
-static int lv_font_codeCompare (const void* pRef,
-                                const void* pElement)
+static int32_t lv_font_codeCompare (const void* pRef,
+                                    const void* pElement)
 {
     return (*(uint32_t*) pRef) - (*(uint32_t*) pElement);
 }
