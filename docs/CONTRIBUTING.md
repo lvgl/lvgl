@@ -14,6 +14,12 @@ But first, start with the most Frequently Asked Questions.
 
 ## FAQ about contributing
 
+### What license does my code need to be under?
+
+Any code added to LittlevGL must be licensed under [MIT](https://choosealicense.com/licenses/mit/) or another license that is fully compatible. Contributions under other licenses are highly likely to be rejected.
+
+If you borrow code from another project, please make sure to add their copyright notice to your contribution.
+
 ### Where can I write my question and remarks?
 
 We use [GitHub's issue tracker](https://github.com/littlevgl/lvgl/issues) to ask questions., report bugs and suggest features. But there are some simple rules:
