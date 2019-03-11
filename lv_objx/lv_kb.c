@@ -41,7 +41,7 @@ static const char * kb_map_lc[] = {
 
 static const lv_btnm_ctrl_t kb_ctrl_lc_map[] = {
         5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
-        (6 | LV_BTNM_REPEAT_DISABLE_MASK), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
+        (6 | LV_BTNM_BTN_NO_REPEAT), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         2, 2, 6, 2, 2
 };
@@ -55,7 +55,7 @@ static const char * kb_map_uc[] = {
 
 static const lv_btnm_ctrl_t kb_ctrl_uc_map[] = {
         5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
-        (6 | LV_BTNM_REPEAT_DISABLE_MASK), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
+        (6 | LV_BTNM_BTN_NO_REPEAT), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         2, 2, 6, 2, 2
 };
@@ -69,7 +69,7 @@ static const char * kb_map_spec[] = {
 
 static const lv_btnm_ctrl_t kb_ctrl_spec_map[] = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
-        (2 | LV_BTNM_REPEAT_DISABLE_MASK), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        (2 | LV_BTNM_BTN_NO_REPEAT), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         2, 2, 6, 2, 2
 };

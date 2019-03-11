@@ -31,26 +31,17 @@ extern "C" {
  *********************/
 
 /*Control byte*/
-#define LV_BTNM_CTRL_CODE       0x80    /*The control byte has to begin (if present) with 0b10xxxxxx*/
-                                        /*This is only true when using control chars in calls to    */
-                                        /*`lv_btnm_set_map`. These bits are ignored in when calling */
-                                        /*`lv_btnm_set_ctrl_map`                                    */
-#define LV_BTNM_CTRL_MASK       0xC0
-#define LV_BTNM_WIDTH_MASK      0x07
-#define LV_BTNM_HIDE_MASK       0x08
-#define LV_BTNM_REPEAT_DISABLE_MASK     0x10
-#define LV_BTNM_INACTIVE_MASK   0x20
-
+#define LV_BTNM_WIDTH_MASK              0x07
+#define LV_BTNM_BTN_HIDDEN              0x08
+#define LV_BTNM_BTN_NO_REPEAT           0x10
+#define LV_BTNM_BTN_INACTIVE            0x20
+#define LV_BTNM_BTN_TOGGLE              0x40
+#define LV_BTNM_BTN_TOGGLE_STATE        0x80
 
 #define LV_BTNM_PR_NONE         0xFFFF
 /**********************
  *      TYPEDEFS
  **********************/
-
-/* Type of callback function which is called when a button is released or long pressed on the button matrix
- * Parameters: button matrix, text of the released button
- * return LV_ACTION_RES_INV if  the button matrix is deleted else LV_ACTION_RES_OK*/
-typedef lv_res_t (*lv_btnm_action_t) (lv_obj_t *, const char *txt);
 
 /* Type to store button control bits (disabled, hidden etc.) */
 typedef uint8_t lv_btnm_ctrl_t;
@@ -63,12 +54,10 @@ typedef struct
     const char ** map_p;                        /*Pointer to the current map*/
     lv_area_t *button_areas;                    /*Array of areas of buttons*/
     lv_btnm_ctrl_t *ctrl_bits;                   /*Array of control bytes*/
-    lv_btnm_action_t action;                    /*A function to call when a button is releases*/
     lv_style_t *styles_btn[LV_BTN_STATE_NUM];   /*Styles of buttons in each state*/
     uint16_t btn_cnt;                           /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_pr;                         /*Index of the currently pressed button (in `button_areas`) or LV_BTNM_PR_NONE*/
-    uint16_t btn_id_tgl;                        /*Index of the currently toggled button (in `button_areas`) or LV_BTNM_PR_NONE */
-    uint8_t toggle     :1;                      /*Enable toggling*/
+    uint16_t btn_id_pr;                         /*Index of the currently pressed button or LV_BTNM_PR_NONE*/
+    uint16_t btn_id_act;                        /*Index of the active button (being pressed/released etc) or LV_BTNM_PR_NONE */
     uint8_t	recolor    :1;                      /*Enable button recoloring*/
 } lv_btnm_ext_t;
 
@@ -99,6 +88,15 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
+ * Set a new map. Buttons will be created/deleted according to the map. The
+ * button matrix keeps a reference to the map and so the string array must not
+ * be deallocated during the life of the matrix.
+ * @param btnm pointer to a button matrix object
+ * @param map pointer a string array. The last string has to be: "". Use "\n" to make a line break.
+ */
+void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map);
+
+/**
  * Set the button control map (hidden, disabled etc.) for a button matrix. The
  * control map array will be copied and so may be deallocated after this
  * function returns.
@@ -114,47 +112,15 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy);
  *                 - bit 2..0: Relative width compared to the buttons in the
  *                             same row. [1..7]
  */
-void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map);
-
-/**
- * Set the button control map (hidden, disabled etc.) for a button matrix. The
- * control map array will be copied and so may be deallocated after this
- * function returns.
- * @param btnm pointer to a button matrix object
- * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes. The
- *                 length of the array and position of the elements must match
- *                 that when the map was set via `lv_btnm_set_map` (i.e. one
- *                 element for each button AND new line).
- *                 The control bits are:
- *                 - bit 5   : 1 = inactive (disabled)
- *                 - bit 4   : 1 = no repeat (on long press)
- *                 - bit 3   : 1 = hidden
- *                 - bit 2..0: Relative width compared to the buttons in the
- *                             same row. [1..7]
- */
 void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t * ctrl_map);
 
 /**
- * Set a new callback function for the buttons (It will be called when a button is released)
- * @param btnm: pointer to button matrix object
- * @param action pointer to a callback function
- */
-void lv_btnm_set_action(lv_obj_t * btnm, lv_btnm_action_t action);
-
-/**
- * Set the pressed button
+ * Set the pressed button i.e. visually highlight it.
+ * Mainly used a when the btnm is in a group to show the selected button
  * @param btnm pointer to button matrix object
  * @param id index of the currently pressed button (`LV_BTNM_PR_NONE` to unpress)
  */
 void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id);
-
-/**
- * Enable or disable button toggling
- * @param btnm pointer to button matrix object
- * @param en true: enable toggling; false: disable toggling
- * @param id index of the currently toggled button (ignored if 'en' == false)
- */
-void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
 
 /**
  * Set a style of a button matrix
@@ -162,12 +128,12 @@ void lv_btnm_set_toggle(lv_obj_t * btnm, bool en, uint16_t id);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_btnm_set_style(lv_obj_t *btnm, lv_btnm_style_t type, lv_style_t *style);
+void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, lv_style_t * style);
 
 /**
- * Set whether recoloring is enabled
+ * Enable recoloring of button's texts
  * @param btnm pointer to button matrix object
- * @param en whether recoloring is enabled
+ * @param en true: enable recoloring; false: disable
  */
 void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en);
 
@@ -182,20 +148,28 @@ void lv_btnm_set_btn_hidden(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden
 /**
  * Enable/disable a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify.
+ * @param btn_id 0 based index of the button to modify.
  * @param disabled true: disable the button
  */
-void lv_btnm_set_btn_disabled(const lv_obj_t * btnm, uint16_t btn_idx, bool disabled);
+void lv_btnm_set_btn_inactive(const lv_obj_t * btnm, uint16_t btn_id, bool disabled);
 
 /**
  * Enable/disable long press for a single button in the matrix
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify.
+ * @param btn_id 0 based index of the button to modify.
  * @param disabled true: disable repeat
  */
-void lv_btnm_set_btn_disable_repeat(const lv_obj_t * btnm, uint16_t btn_idx, bool disabled);
+void lv_btnm_set_btn_no_repeat(const lv_obj_t * btnm, uint16_t btn_id, bool disabled);
 
-/***
+/**
+ * Make the a single button button toggled or not toggled.
+ * @param btnm pointer to button matrix object
+ * @param btn_id index of button (not counting "\n")
+ * @param en true: enable toggling; false: disable toggling
+ */
+void lv_btnm_set_btn_toggle_state(lv_obj_t * btnm, uint16_t btn_id, bool toggle);
+
+/**
  * Set hidden/disabled/repeat flags for a single button.
  * @param btnm pointer to button matrix object
  * @param btn_idx 0 based index of the button to modify.
@@ -203,19 +177,18 @@ void lv_btnm_set_btn_disable_repeat(const lv_obj_t * btnm, uint16_t btn_idx, boo
  * @param disabled true: disable the button
  * @param disable_repeat true: disable repeat
  */
-void lv_btnm_set_btn_flags(const lv_obj_t * btnm, uint16_t btn_idx, bool hidden, bool disabled, bool disable_repeat);
+void lv_btnm_set_btn_flags(const lv_obj_t * btnm, uint16_t btn_id, bool hidden, bool disabled, bool disable_repeat, bool toggle, bool toggle_state);
 
 /**
  * Set a single buttons relative width.
  * This method will cause the matrix be regenerated and is a relatively
  * expensive operation. It is recommended that initial width be specified using
- * the control characters when calling `lv_btnm_set_map` or via
  * `lv_btnm_set_ctrl_map` and this method only be used for dynamic changes.
  * @param btnm pointer to button matrix object
- * @param btn_idx 0 based index of the button to modify.
+ * @param btn_id 0 based index of the button to modify.
  * @param width Relative width compared to the buttons in the same row. [1..7]
  */
-void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_idx, uint8_t width);
+void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width);
 
 
 /*=====================
@@ -230,25 +203,76 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_idx, uint8_t widt
 const char ** lv_btnm_get_map(const lv_obj_t * btnm);
 
 /**
- * Get a the callback function of the buttons on a button matrix
- * @param btnm: pointer to button matrix object
- * @return pointer to the callback function
+ * Check whether the button's text can use recolor or not
+ * @param btnm pointer to button matrix object
+ * @return true: text recolor enable; false: disabled
  */
-lv_btnm_action_t lv_btnm_get_action(const lv_obj_t * btnm);
+bool lv_btnm_get_recolor(const lv_obj_t * btnm);
 
 /**
- * Get the pressed button
+ * Get the index of the lastly "activated" button by the user (pressed, released etc)
+ * Useful in the the `event_cb` to get the text of the button, check if hidden etc.
  * @param btnm pointer to button matrix object
- * @return  index of the currently pressed button (LV_BTNM_PR_NONE: if unset)
+ * @return  index of the last released button (LV_BTNM_PR_NONE: if unset)
  */
-uint16_t lv_btnm_get_pressed(const lv_obj_t * btnm);
+uint16_t lv_btnm_get_active_btn(const lv_obj_t * btnm);
 
 /**
- * Get the toggled button
+ * Get the pressed button's index.
+ * The button be really pressed by the user or manually set to pressed with `lv_btnm_set_pressed`
  * @param btnm pointer to button matrix object
- * @return  index of the currently toggled button (LV_BTNM_PR_NONE: if unset)
+ * @return  index of the pressed button (LV_BTNM_PR_NONE: if unset)
  */
-uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm);
+uint16_t lv_btnm_get_pressed_btn(const lv_obj_t * btnm);
+
+/**
+ * Get the button's text
+ * @param btnm pointer to button matrix object
+ * @param btn_index the index a button not counting new line characters. (The return value of lv_btnm_get_pressed/released)
+ * @return  text of btn_index` button
+ */
+uint16_t lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id);
+
+/**
+ * Check whether "no repeat" for a button is set or not.
+ * The `LV_EVENT_LONG_PRESS_REPEAT` will be sent anyway but it can be ignored by the user if this function returns `true`
+ * @param btnm pointer to a button matrix object
+ * @param btn_index the index a button not counting new line characters. (The return value of lv_btnm_get_pressed/released)
+ * @return true: long press repeat is disabled; false: long press repeat enabled
+ */
+bool lv_btnm_is_btn_no_repeate(lv_obj_t * btnm, uint16_t btn_id);
+
+/**
+ * Check whether a button for a button is hidden or not.
+ * Events will be sent anyway but they can be ignored by the user if this function returns `true`
+ * @param btnm pointer to a button matrix object
+ * @param btn_id the index a button not counting new line characters. (The return value of lv_btnm_get_pressed/released)
+ * @return true: hidden; false: not hidden
+ */
+bool lv_btnm_is_btn_hidden(lv_obj_t * btnm, uint16_t btn_id);
+
+/**
+ * Check whether a button for a button is inactive or not.
+ * Events will be sent anyway but they can be ignored by the user if this function returns `true`
+ * @param btnm pointer to a button matrix object
+ * @param btn_id the index a button not counting new line characters. (The return value of lv_btnm_get_pressed/released)
+ * @return true: inactive; false: not inactive
+ */
+bool lv_btnm_is_btn_inactive(lv_obj_t * btnm, uint16_t btn_id);
+
+/**
+ * Check if the button can be toggled or not
+ * @param btnm pointer to button matrix object
+ * @return  btn_id index a of a button not counting "\n". (The return value of lv_btnm_get_pressed/released)
+ */
+bool lv_btnm_is_btn_toggle(const lv_obj_t * btnm, int16_t btn_id);
+
+/**
+ * Check if the button is toggled or not
+ * @param btnm pointer to button matrix object
+ * @return  btn_id index a of a button not counting "\n". (The return value of lv_btnm_get_pressed/released)
+ */
+bool lv_btnm_get_btn_toggle_state(const lv_obj_t * btnm, int16_t btn_id);
 
 /**
  * Get a style of a button matrix
@@ -256,15 +280,7 @@ uint16_t lv_btnm_get_toggled(const lv_obj_t * btnm);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_btnm_get_style(const lv_obj_t *btnm, lv_btnm_style_t type);
-
-/**
- * Find whether recoloring is enabled
- * @param btnm pointer to button matrix object
- * @return whether recoloring is enabled
- */
-bool lv_btnm_get_recolor(const lv_obj_t * btnm);
-
+lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type);
 /**********************
  *      MACROS
  **********************/
