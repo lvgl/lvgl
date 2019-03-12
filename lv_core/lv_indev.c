@@ -541,13 +541,15 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     bool editable = false;
     focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
-
     /*Button press happened*/
     if(data->state == LV_INDEV_STATE_PR &&
             i->proc.types.keypad.last_state == LV_INDEV_STATE_REL)
     {
         i->proc.pr_timestamp = lv_tick_get();
         if(lv_group_get_editing(g) == true || editable == false) {
+            focused->signal_cb(focused, LV_SIGNAL_PRESSED, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
+
             lv_obj_send_event(focused, LV_EVENT_PRESSED);
             if(i->proc.reset_query) return;         /*The object might be deleted*/
         }
@@ -558,16 +560,15 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
             /*On enter long press toggle edit mode.*/
             if(editable) {
-                if(lv_ll_is_empty(&g->obj_ll) == false)
+                /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
+                if(lv_ll_is_empty(&g->obj_ll) == false) {
                     lv_group_set_editing(g, lv_group_get_editing(g) ? false : true);  /*Toggle edit mode on long press*/
-                else {
-                    /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
-                    lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED);
-                    if(i->proc.reset_query) return;         /*The object might be deleted*/
                 }
             }
             /*If not editable then just send a long press signal*/
             else {
+                focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS, NULL);
+                if(i->proc.reset_query) return;     /*The object might be deleted*/
                 lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED);
                 if(i->proc.reset_query) return;         /*The object might be deleted*/
             }
@@ -580,6 +581,9 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*The button was released on a non-editable object. Just send enter*/
         if(editable == false) {
             lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+            focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
+
             if(i->proc.long_pr_sent == 0) lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
             if(i->proc.reset_query) return;         /*The object might be deleted*/
 
@@ -588,18 +592,24 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             lv_obj_send_event(focused, LV_EVENT_RELEASED);
             if(i->proc.reset_query) return;         /*The object might be deleted*/
-
-            if(i->proc.reset_query) return;         /*The object might be deleted*/
         }
-        /*An object is being edited and the button is releases. Just send enter */
+        /*An object is being edited and the button is released. */
         else if(g->editing) {
+            /*Ignore long pressed enter release because it comes from mode switch*/
             if(!i->proc.long_pr_sent || lv_ll_is_empty(&g->obj_ll)) {
-                lv_group_send_data(g, LV_GROUP_KEY_ENTER);  /*Ignore long pressed enter release because it comes from mode switch*/
-                lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
-                if(i->proc.reset_query) return;         /*The object might be deleted*/
+                focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
+                if(i->proc.reset_query) return;     /*The object might be deleted*/
 
                 lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
                 if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+                lv_obj_send_event(focused, LV_EVENT_CLICKED);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+                lv_obj_send_event(focused, LV_EVENT_RELEASED);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+                lv_group_send_data(g, LV_GROUP_KEY_ENTER);
             }
         }
         /*If the focused object is editable and now in navigate mode then on enter switch edit mode*/
