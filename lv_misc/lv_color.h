@@ -402,7 +402,15 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
                                 (uint8_t) ((uint32_t)(c & 0xF0)     | ((c & 0xF0) >> 4)), \
                                 (uint8_t) ((uint32_t)(c & 0xF)      | ((c & 0xF) << 4)))
 
+static inline lv_color_t lv_color_hex(uint32_t c){		
+    return LV_COLOR_HEX(c);		
+}		
 
+static inline lv_color_t lv_color_hex3(uint32_t c){		
+    return LV_COLOR_HEX3(c);		
+}
+
+ 
 /**
  * Convert a HSV color to RGB
  * @param h hue [0..359]
