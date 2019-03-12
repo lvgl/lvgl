@@ -335,6 +335,27 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         }
         buf->type[i] = "lv_spinbox";
     }
+    else if(sign == LV_SIGNAL_RELEASED) {
+        /*If released with an ENCODER then move to the nexxt digit*/
+        lv_indev_t * indev = lv_indev_get_act();
+        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+            if(lv_group_get_editing(lv_obj_get_group(spinbox))) {
+                if(ext->step > 1) {
+                    lv_spinbox_step_next(spinbox);
+                } else {
+                    /*Restart from the MSB*/
+                    ext->step = 1;
+                    uint32_t i;
+                    for(i = 0; i < ext->digit_count; i++) {
+                        int32_t new_step = ext->step * 10;
+                        if(new_step >= ext->range_max) break;
+                        ext->step = new_step;
+                    }
+                    lv_spinbox_step_previous(spinbox);
+                }
+            }
+        }
+    }
     else if(sign == LV_SIGNAL_CONTROLL) {
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
@@ -352,22 +373,6 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         }
         else if(c == LV_GROUP_KEY_DOWN)  {
             lv_spinbox_decrement(spinbox);
-        }
-        else if(c == LV_GROUP_KEY_ENTER) {
-
-            if(ext->step > 1) {
-                lv_spinbox_step_next(spinbox);
-            } else {
-                /*Restart from the MSB*/
-                ext->step = 1;
-                uint32_t i;
-                for(i = 0; i < ext->digit_count; i++) {
-                    int32_t new_step = ext->step * 10;
-                    if(new_step >= ext->range_max) break;
-                    ext->step = new_step;
-                }
-                lv_spinbox_step_previous(spinbox);
-            }
         }
         else {
             lv_ta_add_char(spinbox, c);

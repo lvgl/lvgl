@@ -92,7 +92,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_time = LV_LIST_FOCUS_TIME;
     ext->single_mode = false;
     ext->size = 0;
-    
+
 #if LV_USE_GROUP
     ext->last_sel = NULL;
     ext->selected_btn = NULL;
@@ -345,40 +345,40 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
     lv_obj_t * btn;
 
     switch(type) {
-        case LV_LIST_STYLE_BG:
-            lv_page_set_style(list, LV_PAGE_STYLE_BG, style);
-            /*style change signal will call 'refr_btn_width' */
-            break;
-        case LV_LIST_STYLE_SCRL:
-            lv_page_set_style(list, LV_PAGE_STYLE_SCRL, style);
-            refr_btn_width(list);
-            break;
-        case LV_LIST_STYLE_SB:
-            lv_page_set_style(list, LV_PAGE_STYLE_SB, style);
-            break;
-        case LV_LIST_STYLE_EDGE_FLASH:
-            lv_page_set_style(list, LV_PAGE_STYLE_EDGE_FLASH, style);
-            break;
-        case LV_LIST_STYLE_BTN_REL:
-            ext->styles_btn[LV_BTN_STATE_REL] = style;
-            btn_style_refr = LV_BTN_STYLE_REL;
-            break;
-        case LV_LIST_STYLE_BTN_PR:
-            ext->styles_btn[LV_BTN_STATE_PR] = style;
-            btn_style_refr = LV_BTN_STYLE_PR;
-            break;
-        case LV_LIST_STYLE_BTN_TGL_REL:
-            ext->styles_btn[LV_BTN_STATE_TGL_REL] = style;
-            btn_style_refr = LV_BTN_STYLE_TGL_REL;
-            break;
-        case LV_LIST_STYLE_BTN_TGL_PR:
-            ext->styles_btn[LV_BTN_STATE_TGL_PR] = style;
-            btn_style_refr = LV_BTN_STYLE_TGL_PR;
-            break;
-        case LV_LIST_STYLE_BTN_INA:
-            ext->styles_btn[LV_BTN_STATE_INA] = style;
-            btn_style_refr = LV_BTN_STYLE_INA;
-            break;
+    case LV_LIST_STYLE_BG:
+        lv_page_set_style(list, LV_PAGE_STYLE_BG, style);
+        /*style change signal will call 'refr_btn_width' */
+        break;
+    case LV_LIST_STYLE_SCRL:
+        lv_page_set_style(list, LV_PAGE_STYLE_SCRL, style);
+        refr_btn_width(list);
+        break;
+    case LV_LIST_STYLE_SB:
+        lv_page_set_style(list, LV_PAGE_STYLE_SB, style);
+        break;
+    case LV_LIST_STYLE_EDGE_FLASH:
+        lv_page_set_style(list, LV_PAGE_STYLE_EDGE_FLASH, style);
+        break;
+    case LV_LIST_STYLE_BTN_REL:
+        ext->styles_btn[LV_BTN_STATE_REL] = style;
+        btn_style_refr = LV_BTN_STYLE_REL;
+        break;
+    case LV_LIST_STYLE_BTN_PR:
+        ext->styles_btn[LV_BTN_STATE_PR] = style;
+        btn_style_refr = LV_BTN_STYLE_PR;
+        break;
+    case LV_LIST_STYLE_BTN_TGL_REL:
+        ext->styles_btn[LV_BTN_STATE_TGL_REL] = style;
+        btn_style_refr = LV_BTN_STYLE_TGL_REL;
+        break;
+    case LV_LIST_STYLE_BTN_TGL_PR:
+        ext->styles_btn[LV_BTN_STATE_TGL_PR] = style;
+        btn_style_refr = LV_BTN_STYLE_TGL_PR;
+        break;
+    case LV_LIST_STYLE_BTN_INA:
+        ext->styles_btn[LV_BTN_STATE_INA] = style;
+        btn_style_refr = LV_BTN_STYLE_INA;
+        break;
     }
 
 
@@ -488,7 +488,7 @@ lv_obj_t * lv_list_get_prev_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
 
 
 
- /**
+/**
  * Get the next button from list. (Starts from the bottom button)
  * @param list pointer to a list object
  * @param prev_btn pointer to button. Search the next after it.
@@ -585,36 +585,36 @@ lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
     switch(type) {
-        case LV_LIST_STYLE_BG:
-            style = lv_page_get_style(list, LV_PAGE_STYLE_BG);
-            break;
-        case LV_LIST_STYLE_SCRL:
-            style = lv_page_get_style(list, LV_PAGE_STYLE_SB);
-            break;
-        case LV_LIST_STYLE_SB:
-            style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL);
-            break;
-        case LV_LIST_STYLE_EDGE_FLASH:
-            style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH);
-            break;
-        case LV_LIST_STYLE_BTN_REL:
-            style = ext->styles_btn[LV_BTN_STATE_REL];
-            break;
-        case LV_LIST_STYLE_BTN_PR:
-            style = ext->styles_btn[LV_BTN_STATE_PR];
-            break;
-        case LV_LIST_STYLE_BTN_TGL_REL:
-            style = ext->styles_btn[LV_BTN_STATE_TGL_REL];
-            break;
-        case LV_LIST_STYLE_BTN_TGL_PR:
-            style = ext->styles_btn[LV_BTN_STATE_TGL_PR];
-            break;
-        case LV_LIST_STYLE_BTN_INA:
-            style = ext->styles_btn[LV_BTN_STATE_INA];
-            break;
-        default:
-            style = NULL;
-            break;
+    case LV_LIST_STYLE_BG:
+        style = lv_page_get_style(list, LV_PAGE_STYLE_BG);
+        break;
+    case LV_LIST_STYLE_SCRL:
+        style = lv_page_get_style(list, LV_PAGE_STYLE_SB);
+        break;
+    case LV_LIST_STYLE_SB:
+        style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL);
+        break;
+    case LV_LIST_STYLE_EDGE_FLASH:
+        style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH);
+        break;
+    case LV_LIST_STYLE_BTN_REL:
+        style = ext->styles_btn[LV_BTN_STATE_REL];
+        break;
+    case LV_LIST_STYLE_BTN_PR:
+        style = ext->styles_btn[LV_BTN_STATE_PR];
+        break;
+    case LV_LIST_STYLE_BTN_TGL_REL:
+        style = ext->styles_btn[LV_BTN_STATE_TGL_REL];
+        break;
+    case LV_LIST_STYLE_BTN_TGL_PR:
+        style = ext->styles_btn[LV_BTN_STATE_TGL_PR];
+        break;
+    case LV_LIST_STYLE_BTN_INA:
+        style = ext->styles_btn[LV_BTN_STATE_INA];
+        break;
+    default:
+        style = NULL;
+        break;
     }
 
     return style;
@@ -752,10 +752,55 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         if(w != lv_area_get_width(param)) {   /*Width changed*/
             refr_btn_width(list);
         }
-    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+    }
+    else if(sign == LV_SIGNAL_RELEASED ||
+            sign == LV_SIGNAL_PRESSED ||
+            sign == LV_SIGNAL_PRESSING ||
+            sign == LV_SIGNAL_LONG_PRESS ||
+            sign == LV_SIGNAL_LONG_PRESS_REP)
+    {
+        /*If pressed/released etc by a KEYPAD or ENCODER delegate signal to the button*/
+        lv_indev_t * indev = lv_indev_get_act();
+        lv_hal_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type == LV_INDEV_TYPE_KEYPAD ||
+                (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(list))))
+        {
+            /*Get the 'pressed' button*/
+            lv_obj_t * btn = NULL;
+            btn = lv_list_get_prev_btn(list, btn);
+            while(btn != NULL) {
+                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
+                btn = lv_list_get_prev_btn(list, btn);
+            }
+            lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+
+            if(btn) {
+                if(sign == LV_SIGNAL_PRESSED) {
+                    lv_obj_send_event(btn, LV_EVENT_PRESSED);
+                }
+                else if(sign == LV_SIGNAL_PRESSING) {
+                    lv_obj_send_event(btn, LV_EVENT_PRESSING);
+                }
+                else if(sign == LV_SIGNAL_LONG_PRESS) {
+                    lv_obj_send_event(btn, LV_EVENT_LONG_PRESSED);
+                }
+                else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
+                    lv_obj_send_event(btn, LV_EVENT_LONG_PRESSED_REPEAT);
+                }
+                else if(sign == LV_SIGNAL_RELEASED) {
+                    ext->last_sel = btn;
+                    if(indev->proc.long_pr_sent == 0) lv_obj_send_event(btn, LV_EVENT_SHORT_CLICKED);
+                    lv_obj_send_event(btn, LV_EVENT_CLICKED);
+                    lv_obj_send_event(btn, LV_EVENT_RELEASED);
+                }
+            }
+        }
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
         /*Because of the possible change of horizontal and vertical padding refresh buttons width */
         refr_btn_width(list);
-    } else if(sign == LV_SIGNAL_FOCUS) {
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
 
 #if LV_USE_GROUP
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -833,21 +878,6 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             else {
                 lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
                 if(btn) lv_list_set_btn_selected(list, btn);
-            }
-        } else if(c == LV_GROUP_KEY_ENTER) {
-            /*Get the 'pressed' button*/
-            lv_obj_t * btn = NULL;
-            btn = lv_list_get_prev_btn(list, btn);
-            while(btn != NULL) {
-                if(lv_btn_get_state(btn) == LV_BTN_STATE_PR) break;
-                btn = lv_list_get_prev_btn(list, btn);
-            }
-
-            if(btn != NULL) {
-                lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-                ext->last_sel = btn;
-                res = lv_obj_send_event(btn, LV_EVENT_CLICKED);
-                if(res != LV_RES_OK) return res;
             }
         }
 #endif

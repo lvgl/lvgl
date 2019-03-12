@@ -402,16 +402,6 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             if(ext->ddlist.sel_opt_id > 0) {
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id - 1, true);
             }
-        } else if(c == LV_GROUP_KEY_ENTER) {
-            ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;        /*Set the entered value as default*/
-            res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
-            if(res != LV_RES_OK) return res;
-
-#if LV_USE_GROUP
-            lv_group_t * g = lv_obj_get_group(roller);
-            bool editing = lv_group_get_editing(g);
-            if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
-#endif
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
@@ -472,6 +462,12 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
             if(id < 0) id = 0;
             if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
             ext->ddlist.sel_opt_id = id;
+            ext->ddlist.sel_opt_id_ori = id;
+#if LV_USE_GROUP
+            lv_group_t * g = lv_obj_get_group(roller);
+            bool editing = lv_group_get_editing(g);
+            if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
+#endif
             res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
             if(res != LV_RES_OK) return res;
         }

@@ -402,7 +402,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(i->proc.reset_query) return;     /*The object might be deleted*/
             lv_obj_send_event(focused, LV_EVENT_PRESSED);
             if(i->proc.reset_query) return;     /*The object might be deleted*/
-            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
         }
         /*Move the focus on NEXT*/
         else if(data->key == LV_GROUP_KEY_NEXT) {
@@ -587,7 +586,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
         /*The button was released on a non-editable object. Just send enter*/
         if(editable == false) {
-            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
             focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
             if(i->proc.reset_query) return;     /*The object might be deleted*/
 

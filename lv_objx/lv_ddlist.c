@@ -687,14 +687,6 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 lv_ddlist_pos_current_option(ddlist);
                 lv_obj_invalidate(ddlist);
             }
-        } else if(c == LV_GROUP_KEY_ENTER) {
-            lv_indev_t * indev = lv_indev_get_act();
-            if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
-                lv_group_t * g = lv_obj_get_group(ddlist);
-                if(lv_group_get_editing(g)) {
-                    lv_group_set_editing(g, false);
-                }
-            }
         } else if(c == LV_GROUP_KEY_ESC) {
             if(ext->opened) {
                 ext->opened = 0;
@@ -767,8 +759,16 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
         lv_ddlist_refr_size(ddlist, true);
     } else {
 
-        /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
+        /*Leave edit mode once a new item is selected*/
         lv_indev_t * indev = lv_indev_get_act();
+        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+            lv_group_t * g = lv_obj_get_group(ddlist);
+            if(lv_group_get_editing(g)) {
+                lv_group_set_editing(g, false);
+            }
+        }
+
+        /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
             lv_point_t p;
             lv_indev_get_point(indev, &p);
