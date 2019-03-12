@@ -367,13 +367,29 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    else if(sign == LV_SIGNAL_PRESSED) {
         lv_kb_def_event_cb(kb);
     }
     else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
         bool no_rep = lv_btnm_get_btn_no_repeate(kb, lv_btnm_get_active_btn(kb));
         if(no_rep == false) lv_kb_def_event_cb(kb);
     }
+    else if(sign == LV_SIGNAL_FOCUS) {
+        lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+        /*Show the cursor of the new Text area if cursor management is enabled*/
+        if(ext->ta && ext->cursor_mng) {
+            lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
+            lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
+        }
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS) {
+          lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+          /*Show the cursor of the new Text area if cursor management is enabled*/
+          if(ext->ta && ext->cursor_mng) {
+              lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
+              lv_ta_set_cursor_type(ext->ta,  cur_type | LV_CURSOR_HIDDEN);
+          }
+      }
     else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

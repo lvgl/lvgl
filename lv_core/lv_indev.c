@@ -398,6 +398,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
         /*Simulate a press on the object if ENTER was pressed*/
         if(data->key == LV_GROUP_KEY_ENTER) {
+            focused->signal_cb(focused, LV_SIGNAL_PRESSED, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
             lv_obj_send_event(focused, LV_EVENT_PRESSED);
             if(i->proc.reset_query) return;     /*The object might be deleted*/
             lv_group_send_data(g, LV_GROUP_KEY_ENTER);
@@ -427,6 +429,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.long_pr_sent = 1;
             if(data->key == LV_GROUP_KEY_ENTER) {
                 i->proc.longpr_rep_timestamp = lv_tick_get();
+                focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS, NULL);
+                if(i->proc.reset_query) return;     /*The object might be deleted*/
                 lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED);
                 if(i->proc.reset_query) return;         /*The object might be deleted*/
             }
@@ -438,6 +442,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             /*Send LONG_PRESS_REP on ENTER*/
             if(data->key == LV_GROUP_KEY_ENTER) {
+                focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS_REP, NULL);
+                if(i->proc.reset_query) return;     /*The object might be deleted*/
                 lv_obj_send_event(focused, LV_EVENT_LONG_PRESSED_REPEAT);
                 if(i->proc.reset_query) return;         /*The object might be deleted*/
             }
@@ -466,6 +472,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = i->proc.types.keypad.last_key;
         if(data->key == LV_GROUP_KEY_ENTER) {
+
+            focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
+
             if(i->proc.long_pr_sent == 0) {
                 lv_obj_send_event(focused, LV_EVENT_SHORT_CLICKED);
             }

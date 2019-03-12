@@ -1489,6 +1489,15 @@ static void placeholder_update(lv_obj_t * ta)
 
 static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_source)
 {
+    if(click_source == NULL) return;
+
+    if(lv_indev_get_type(click_source) == LV_INDEV_TYPE_KEYPAD ||
+            lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER)
+    {
+        return;
+    }
+
+
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     lv_area_t label_coords;

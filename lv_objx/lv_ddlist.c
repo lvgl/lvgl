@@ -93,7 +93,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_time = LV_DDLIST_ANIM_TIME;
     ext->sel_style = &lv_style_plain_color;
     ext->draw_arrow = 0;  /*Do not draw arrow by default*/
-    ext->stay_open = 1;
+    ext->stay_open = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_ddlist, lv_ddlist_signal);
@@ -688,21 +688,21 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 lv_obj_invalidate(ddlist);
             }
         } else if(c == LV_GROUP_KEY_ENTER) {
-            if(ext->opened) {
-                ext->sel_opt_id_ori = ext->sel_opt_id;
-                ext->opened = 0;
-                res = lv_obj_send_event(ddlist, LV_EVENT_VALUE_CHANGED);
-                if(res != LV_RES_OK) return res;
-#if LV_USE_GROUP
-                lv_group_t * g = lv_obj_get_group(ddlist);
-                bool editing = lv_group_get_editing(g);
-                if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
-#endif
-            } else {
-                ext->opened = 1;
-            }
-
-            lv_ddlist_refr_size(ddlist, true);
+//            if(ext->opened) {
+//                ext->sel_opt_id_ori = ext->sel_opt_id;
+//                ext->opened = 0;
+//                res = lv_obj_send_event(ddlist, LV_EVENT_VALUE_CHANGED);
+//                if(res != LV_RES_OK) return res;
+//#if LV_USE_GROUP
+//                lv_group_t * g = lv_obj_get_group(ddlist);
+//                bool editing = lv_group_get_editing(g);
+//                if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
+//#endif
+//            } else {
+//                ext->opened = 1;
+//            }
+//
+//            lv_ddlist_refr_size(ddlist, true);
         } else if(c == LV_GROUP_KEY_ESC) {
             if(ext->opened) {
                 ext->opened = 0;
@@ -775,26 +775,30 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
         lv_ddlist_refr_size(ddlist, true);
     } else {
 
-        /*Search the clicked option*/
+        /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
         lv_indev_t * indev = lv_indev_get_act();
-        lv_point_t p;
-        lv_indev_get_point(indev, &p);
-        p.x -= ext->label->coords.x1;
-        p.y -= ext->label->coords.y1;
-        uint16_t letter_i;
-        letter_i = lv_label_get_letter_on(ext->label, &p);
+        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
+            lv_point_t p;
+            lv_indev_get_point(indev, &p);
+            p.x -= ext->label->coords.x1;
+            p.y -= ext->label->coords.y1;
+            uint16_t letter_i;
+            letter_i = lv_label_get_letter_on(ext->label, &p);
 
-        uint16_t new_opt = 0;
-        const char * txt = lv_label_get_text(ext->label);
-        uint32_t i = 0;
-        uint32_t line_cnt = 0;
-        uint32_t letter;
-        for(line_cnt = 0; line_cnt < letter_i; line_cnt++) {
-            letter = lv_txt_encoded_next(txt, &i);
-            if(letter == '\n') new_opt ++;
+            uint16_t new_opt = 0;
+            const char * txt = lv_label_get_text(ext->label);
+            uint32_t i = 0;
+            uint32_t line_cnt = 0;
+            uint32_t letter;
+            for(line_cnt = 0; line_cnt < letter_i; line_cnt++) {
+                letter = lv_txt_encoded_next(txt, &i);
+                if(letter == '\n') new_opt ++;
+            }
+
+            ext->sel_opt_id = new_opt;
         }
 
-        ext->sel_opt_id = new_opt;
+        ext->sel_opt_id_ori = ext->sel_opt_id;
 
         lv_res_t res = lv_obj_send_event(ddlist, LV_EVENT_VALUE_CHANGED);
         if(res != LV_RES_OK) return res;

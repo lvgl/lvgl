@@ -621,17 +621,18 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-        } else if(c == LV_GROUP_KEY_ENTER) {
-            if(lv_btn_get_toggle(btn)) {
-                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-            } else {
-                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-            }
-            res = lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
-            if(res != LV_RES_OK) return res;
         }
+//        else if(c == LV_GROUP_KEY_ENTER) {
+//            if(lv_btn_get_toggle(btn)) {
+//                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+//                else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+//            } else {
+//                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+//                else if(state == LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+//            }
+//            res = lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
+//            if(res != LV_RES_OK) return res;
+//        }
     } else if(sign == LV_SIGNAL_CLEANUP) {
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
         if(btn == ink_obj) {

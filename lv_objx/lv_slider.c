@@ -475,7 +475,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-        lv_slider_set_value(slider, ext->drag_value, false);
+        if(ext->drag_value != LV_SLIDER_NOT_PRESSED) lv_slider_set_value(slider, ext->drag_value, false);
         ext->drag_value = LV_SLIDER_NOT_PRESSED;
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /* The knob size depends on slider size.

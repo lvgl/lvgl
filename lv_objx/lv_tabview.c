@@ -586,7 +586,15 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         if(ext->btns) {
             ext->btns->signal_cb(ext->btns, sign, param);
         }
-        if(sign == LV_SIGNAL_FOCUS) {
+
+        if(sign == LV_SIGNAL_CONTROLL) {
+            /*Simulate a click when enter is pressed*/
+            char c = *((char *)param);
+            if(c == LV_GROUP_KEY_ENTER) {
+                lv_obj_send_event(ext->btns, LV_EVENT_CLICKED);
+            }
+        }
+        else if(sign == LV_SIGNAL_FOCUS) {
             lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {

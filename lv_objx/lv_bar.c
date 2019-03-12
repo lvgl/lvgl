@@ -73,7 +73,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->cur_value = 0;
-    ext->anim_time = 500;
+    ext->anim_time = 200;
     ext->anim_start = 0;
     ext->anim_end = 0;
     ext->anim_state = LV_BAR_ANIM_STATE_INV;
