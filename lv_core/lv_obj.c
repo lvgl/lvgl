@@ -190,6 +190,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->opa_scale_en = 0;
         new_obj->protect = LV_PROTECT_NONE;
         new_obj->opa_scale = LV_OPA_COVER;
+        new_obj->parent_event = 0;
 
         new_obj->ext_attr = NULL;
 
@@ -299,6 +300,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->drag_parent = copy->drag_parent;
         new_obj->hidden = copy->hidden;
         new_obj->top = copy->top;
+        new_obj->parent_event = copy->parent_event;
 
         new_obj->opa_scale_en = copy->opa_scale_en;
         new_obj->protect = copy->protect;
@@ -1105,6 +1107,16 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
 }
 
 /**
+ * Propagate the events to the parent too
+ * @param obj pointer to an object
+ * @param en true: enable the event propagation
+ */
+void lv_obj_set_parent_event(lv_obj_t * obj, bool en)
+{
+    obj->parent_event = (en == true ? 1 : 0);
+}
+
+/**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
  * @param obj pointer to an object
  * @param en true: opa scaling is enabled for this object and all children; false: no opa scaling
@@ -1174,7 +1186,7 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
 
     if(obj_act_event_deleted) return LV_RES_INV;
 
-    if(obj->event_parent && obj->par) {
+    if(obj->parent_event && obj->par) {
         lv_res_t res = lv_obj_send_event(obj->par, event);
         if(res != LV_RES_OK) return LV_RES_INV;
     }
@@ -1636,6 +1648,16 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj)
 bool lv_obj_get_drag_parent(const lv_obj_t * obj)
 {
     return obj->drag_parent == 0 ? false : true;
+}
+
+/**
+ * Get the drag parent attribute of an object
+ * @param obj pointer to an object
+ * @return true: drag parent is enabled
+ */
+bool lv_obj_get_parent_event(const lv_obj_t * obj)
+{
+    return obj->parent_event == 0 ? false : true;
 }
 
 /**

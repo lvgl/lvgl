@@ -42,11 +42,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* parametes: pointer to a tabview object, tab_id
- * return: LV_RES_INV: to prevent the loading of the tab;  LV_RES_OK: if everything is fine*/
-typedef lv_res_t (*lv_tabview_action_t)(lv_obj_t *, uint16_t);
-
-
 enum {
     LV_TABVIEW_BTNS_POS_TOP,
     LV_TABVIEW_BTNS_POS_BOTTOM,
@@ -71,7 +66,6 @@ typedef struct
     uint8_t drag_hor :1;
     uint8_t btns_hide :1;
     lv_tabview_btns_pos_t btns_pos :1;
-    lv_tabview_action_t tab_load_action;
 } lv_tabview_ext_t;
 
 enum {
@@ -127,14 +121,6 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
  * @param anim_en true: set with sliding animation; false: set immediately
  */
 void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en);
-
-/**
- * Set an action to call when a tab is loaded (Good to create content only if required)
- * lv_tabview_get_act() still gives the current (old) tab (to remove content from here)
- * @param tabview pointer to a tabview object
- * @param action pointer to a function to call when a tab is loaded
- */
-void lv_tabview_set_tab_load_action(lv_obj_t *tabview, lv_tabview_action_t action);
 
 /**
  * Enable horizontal sliding with touch pad
@@ -196,13 +182,6 @@ uint16_t lv_tabview_get_tab_count(const lv_obj_t * tabview);
  * @return pointer to page (lv_page) object
  */
 lv_obj_t * lv_tabview_get_tab(const lv_obj_t * tabview, uint16_t id);
-
-/**
- * Get the tab load action
- * @param tabview pointer to a tabview object
- * @param return the current tab load action
- */
-lv_tabview_action_t lv_tabview_get_tab_load_action(const lv_obj_t *tabview);
 
 /**
  * Get horizontal sliding is enabled or not

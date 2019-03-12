@@ -134,7 +134,7 @@ void lv_tileview_add_element(lv_obj_t * element)
 {
     /* Let objects eventto propaget to the scrollable part of the tileview.
      * It is required the handle dargging of the tileview with the element.*/
-    element->event_parent = 1;
+    element->parent_event = 1;
     lv_obj_set_drag_parent(element, true);
 }
 

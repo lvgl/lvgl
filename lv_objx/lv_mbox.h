@@ -90,9 +90,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param mbox pointer to message box object
  * @param btn_map button descriptor (button matrix map).
  *                E.g.  a const char *txt[] = {"ok", "close", ""} (Can not be local variable)
- * @param action a function which will be called when a button is released
  */
-void lv_mbox_add_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t action);
+void lv_mbox_add_btns(lv_obj_t * mbox, const char **btn_mapaction);
 
 /*=====================
  * Setter functions
@@ -104,13 +103,6 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char **btn_map, lv_btnm_action_t ac
  * @param txt a '\0' terminated character string which will be the message box text
  */
 void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
-
-/**
- * Stop the action to call when button is released
- * @param mbox pointer to a message box object
- * @param pointer to an 'lv_btnm_action_t' action. In the action you need to use `lv_mbox_get_from_btn()` to get the `mbox`.
- */
-void lv_mbox_set_action(lv_obj_t * mbox, lv_btnm_action_t action);
 
 /**
  * Set animation duration
@@ -159,12 +151,20 @@ void lv_mbox_set_recolor(lv_obj_t * mbox, bool en);
 const char * lv_mbox_get_text(const lv_obj_t * mbox);
 
 /**
- * Get the message box object from one of its button.
- * It is useful in the button release actions where only the button is known
- * @param btn pointer to a button of a message box
- * @return pointer to the button's message box
+ * Get the index of the lastly "activated" button by the user (pressed, released etc)
+ * Useful in the the `event_cb`.
+ * @param btnm pointer to button matrix object
+ * @return  index of the last released button (LV_BTNM_BTN_NONE: if unset)
  */
-lv_obj_t * lv_mbox_get_from_btn(const lv_obj_t * btn);
+uint16_t lv_mbox_get_active_btn(lv_obj_t * mbox);
+
+/**
+ * Get the text of the lastly "activated" button by the user (pressed, released etc)
+ * Useful in the the `event_cb`.
+ * @param btnm pointer to button matrix object
+ * @return text of the last released button (NULL: if unset)
+ */
+const char * lv_mbox_get_active_btn_text(lv_obj_t * mbox);
 
 /**
  * Get the animation duration (close animation time)

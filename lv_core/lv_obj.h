@@ -192,7 +192,7 @@ typedef struct _lv_obj_t
     uint8_t hidden        :1;    /*1: Object is hidden*/
     uint8_t top           :1;    /*1: If the object or its children is clicked it goes to the foreground*/
     uint8_t opa_scale_en  :1;    /*1: opa_scale is set*/
-    uint8_t event_parent :1;     /*1: Send the object's events to the parent too. */
+    uint8_t parent_event :1;     /*1: Send the object's events to the parent too. */
     uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from `lv_protect_t`*/
     lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
@@ -454,12 +454,11 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 
 /**
- * Set editable parameter Used by groups and keyboard/encoder control.
- * Editable object has something inside to choose (the elements of a list)
+ * Propagate the events to the parent too
  * @param obj pointer to an object
- * @param en true: enable editing
+ * @param en true: enable the event propagation
  */
-//void lv_obj_set_editable(lv_obj_t * obj, bool en);
+void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
@@ -721,6 +720,12 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj);
  */
 bool lv_obj_get_drag_parent(const lv_obj_t * obj);
 
+/**
+ * Get the drag parent attribute of an object
+ * @param obj pointer to an object
+ * @return true: drag parent is enabled
+ */
+bool lv_obj_get_parent_event(const lv_obj_t * obj);
 
 /**
  * Get the opa scale enable parameter
