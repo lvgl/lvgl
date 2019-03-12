@@ -538,13 +538,13 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     focused = lv_group_get_focused(g);
     if(focused == NULL) return;
 
-    bool editable = false;
-    focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
-
     /*Button press happened*/
     if(data->state == LV_INDEV_STATE_PR &&
             i->proc.types.keypad.last_state == LV_INDEV_STATE_REL)
     {
+        bool editable = false;
+        focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
+
         i->proc.pr_timestamp = lv_tick_get();
         if(lv_group_get_editing(g) == true || editable == false) {
             focused->signal_cb(focused, LV_SIGNAL_PRESSED, NULL);
@@ -557,7 +557,11 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
         if(i->proc.long_pr_sent == 0 &&
-                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
+                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME)
+        {
+            bool editable = false;
+            focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
+
             /*On enter long press toggle edit mode.*/
             if(editable) {
                 /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
@@ -577,6 +581,9 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Release happened*/
     else if(data->state == LV_INDEV_STATE_REL && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
+
+        bool editable = false;
+        focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
         /*The button was released on a non-editable object. Just send enter*/
         if(editable == false) {
