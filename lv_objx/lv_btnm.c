@@ -841,7 +841,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         btn_pr = get_button_from_point(btnm, &p);
         /*Invalidate to old and the new areas*/;
         if(btn_pr != ext->btn_id_pr) {
-            lv_indev_reset_lpr(param);
+            lv_indev_reset_long_press(param);
             if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
                 invalidate_button_area(btnm, ext->btn_id_pr);
             }

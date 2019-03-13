@@ -111,7 +111,7 @@ void lv_indev_reset(lv_indev_t * indev)
  * Reset the long press state of an input device
  * @param indev pointer to an input device
  */
-void lv_indev_reset_lpr(lv_indev_t * indev)
+void lv_indev_reset_long_press(lv_indev_t * indev)
 {
     indev->proc.long_pr_sent = 0;
     indev->proc.longpr_rep_timestamp = lv_tick_get();
@@ -119,19 +119,15 @@ void lv_indev_reset_lpr(lv_indev_t * indev)
 }
 
 /**
- * Enable input devices device by type
- * @param type Input device type
- * @param enable true: enable this type; false: disable this type
+ * Enable or disable an input devices
+ * @param indev pointer to an input device
+ * @param en true: enable; false: disable
  */
-void lv_indev_enable(lv_hal_indev_type_t type, bool enable)
+void lv_indev_enable(lv_indev_t * indev, bool en)
 {
+    if(!indev) return;
 
-    lv_indev_t * i = lv_indev_next(NULL);
-
-    while(i) {
-        if(i->driver.type == type) i->proc.disabled = enable == false ? 1 : 0;
-        i = lv_indev_next(i);
-    }
+    indev->proc.disabled = en ? 1 : 0;
 }
 
 /**
