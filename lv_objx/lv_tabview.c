@@ -233,9 +233,10 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
 
     /*Modify the indicator size*/
     lv_style_t * style_tabs = lv_obj_get_style(ext->btns);
-    lv_coord_t indic_width = (lv_obj_get_width(tabview) - style_tabs->body.padding.inner * (ext->tab_cnt - 1) - 2 * style_tabs->body.padding.hor) / ext->tab_cnt;
+    lv_coord_t indic_width = (lv_obj_get_width(tabview) - style_tabs->body.padding.inner * (ext->tab_cnt - 1) -
+            style_tabs->body.padding.left - style_tabs->body.padding.right) / ext->tab_cnt;
     lv_obj_set_width(ext->indic, indic_width);
-    lv_obj_set_x(ext->indic, indic_width * ext->tab_cur + style_tabs->body.padding.inner * ext->tab_cur + style_tabs->body.padding.hor);
+    lv_obj_set_x(ext->indic, indic_width * ext->tab_cur + style_tabs->body.padding.inner * ext->tab_cur + style_tabs->body.padding.left);
 
     /*Set the first btn as active*/
     if(ext->tab_cnt == 1) {
@@ -275,7 +276,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 
     ext->tab_cur = id;
 
-    lv_coord_t cont_x = -(lv_obj_get_width(tabview) * id + style->body.padding.inner * id + style->body.padding.hor);
+    lv_coord_t cont_x = -(lv_obj_get_width(tabview) * id + style->body.padding.inner * id + style->body.padding.left);
     if(ext->anim_time == 0 || anim_en == false) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
@@ -300,7 +301,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     /*Move the indicator*/
     lv_coord_t indic_width = lv_obj_get_width(ext->indic);
     lv_style_t * tabs_style = lv_obj_get_style(ext->btns);
-    lv_coord_t indic_x = indic_width * id + tabs_style->body.padding.inner * id + tabs_style->body.padding.hor;
+    lv_coord_t indic_x = indic_width * id + tabs_style->body.padding.inner * id + tabs_style->body.padding.left;
 
     if(ext->anim_time == 0 || anim_en == false) {
         lv_obj_set_x(ext->indic, indic_x);
@@ -745,7 +746,7 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
         lv_style_t * indic_style = lv_obj_get_style(ext->indic);
         lv_coord_t p = ((tabpage->coords.x1 - tabview->coords.x1) * (indic_width + tabs_style->body.padding.inner)) / lv_obj_get_width(tabview);
 
-        lv_obj_set_x(ext->indic, indic_width * ext->tab_cur + tabs_style->body.padding.inner * ext->tab_cur + indic_style->body.padding.hor - p);
+        lv_obj_set_x(ext->indic, indic_width * ext->tab_cur + tabs_style->body.padding.inner * ext->tab_cur + indic_style->body.padding.left - p);
     }
 }
 
@@ -833,13 +834,13 @@ static void tabview_realign(lv_obj_t * tabview)
 
         /*Set the indicator widths*/
         lv_coord_t indic_width = (lv_obj_get_width(tabview) - style_btn_bg->body.padding.inner * (ext->tab_cnt - 1) -
-                                  2 * style_btn_bg->body.padding.hor) / ext->tab_cnt;
+                                 style_btn_bg->body.padding.left - style_btn_bg->body.padding.right) / ext->tab_cnt;
         lv_obj_set_width(ext->indic, indic_width);
 
         /*Set the tabs height*/
         lv_coord_t btns_height = lv_font_get_height(style_btn_rel->text.font) +
-                                 2 * style_btn_rel->body.padding.ver +
-                                 2 * style_btn_bg->body.padding.ver;
+                                 style_btn_rel->body.padding.top + style_btn_rel->body.padding.bottom +
+                                 style_btn_bg->body.padding.top + style_btn_bg->body.padding.bottom;
         lv_obj_set_height(ext->btns, btns_height);
 
         lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));

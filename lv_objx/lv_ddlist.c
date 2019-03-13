@@ -580,7 +580,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				new_style.text.color = sel_style->text.color;
 				new_style.text.opa = sel_style->text.opa;
 				lv_area_t area_arrow;
-				area_arrow.x2 = ddlist->coords.x2 - style->body.padding.hor;
+				area_arrow.x2 = ddlist->coords.x2 - style->body.padding.right;
 				area_arrow.x1 = area_arrow.x2 - lv_txt_get_width(LV_SYMBOL_DOWN, strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
 
 				area_arrow.y1 = ddlist->coords.y1 + style->text.line_space;
@@ -726,10 +726,12 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
     lv_obj_t * ddlist = lv_obj_get_parent(scrl);
 
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        /*TODO review this*/
         /* Because of the wider selected rectangle ext. size
          * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
         lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-        if(scrl->ext_size < style->body.padding.hor) scrl->ext_size = style->body.padding.hor;
+        lv_coord_t hpad = LV_MATH_MAX(style->body.padding.left, style->body.padding.right);
+        if(scrl->ext_size < hpad) scrl->ext_size = hpad;
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
@@ -822,7 +824,8 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     lv_style_t * style = lv_obj_get_style(ddlist);
     lv_coord_t new_height;
     if(ext->opened) { /*Open the list*/
-        if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) + 2 * style->body.padding.ver;
+        if(ext->fix_height == 0) new_height = lv_obj_get_height(lv_page_get_scrl(ddlist)) +
+                style->body.padding.top + style->body.padding.bottom;
         else new_height = ext->fix_height;
 
         lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);

@@ -347,7 +347,7 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
         lv_style_t * style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
         if(style->body.border.width > 0) {
             lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(preload), lv_obj_get_height(preload))) / 2;
-            r -= LV_MATH_MIN(style->body.padding.hor, style->body.padding.ver);
+            r -= LV_MATH_MIN(style->body.padding.left, style->body.padding.top);
 
             lv_coord_t x = preload->coords.x1 + lv_obj_get_width(preload) / 2;
             lv_coord_t y = preload->coords.y1 + lv_obj_get_height(preload) / 2;

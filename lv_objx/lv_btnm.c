@@ -163,9 +163,9 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
 
     /*Set size and positions of the buttons*/
     lv_style_t * style_bg = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
-    lv_coord_t max_w = lv_obj_get_width(btnm) - 2 * style_bg->body.padding.hor;
-    lv_coord_t max_h = lv_obj_get_height(btnm) - 2 * style_bg->body.padding.ver;
-    lv_coord_t act_y = style_bg->body.padding.ver;
+    lv_coord_t max_w = lv_obj_get_width(btnm) - style_bg->body.padding.left - style_bg->body.padding.right;
+    lv_coord_t max_h = lv_obj_get_height(btnm) - style_bg->body.padding.top - style_bg->body.padding.bottom;
+    lv_coord_t act_y = style_bg->body.padding.top;
 
     /*Count the lines to calculate button height*/
     uint8_t line_cnt = 1;
@@ -200,7 +200,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
 
         /*Make sure the last row is at the bottom of 'btnm'*/
         if(map_p_tmp[btn_cnt][0] == '\0') {         /*Last row?*/
-            btn_h = max_h - act_y + style_bg->body.padding.ver - 1;
+            btn_h = max_h - act_y + style_bg->body.padding.bottom - 1;
         }
 
         /*Only deal with the non empty lines*/
@@ -210,7 +210,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
 
             /*Set the button size and positions and set the texts*/
             uint16_t i;
-            lv_coord_t act_x = style_bg->body.padding.hor;
+            lv_coord_t act_x = style_bg->body.padding.left;
             lv_coord_t act_unit_w;
             unit_act_cnt = 0;
             for(i = 0; i < btn_cnt; i++) {
@@ -221,11 +221,11 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
                 act_unit_w --;                              /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
-                act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner + style_bg->body.padding.hor;
+                act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner + style_bg->body.padding.left;
 
                 /* Set the button's area.
                  * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding errors*/
-                if(style_bg->body.padding.inner == 0 && act_x != style_bg->body.padding.hor) {
+                if(style_bg->body.padding.inner == 0 && act_x != style_bg->body.padding.left) {
                     lv_area_set(&ext->button_areas[btn_i],  ext->button_areas[btn_i - 1].x2, act_y,
                                 act_x + act_unit_w, act_y + btn_h);
                 } else {
@@ -758,10 +758,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
             /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
             if(style_tmp.body.border.part & LV_BORDER_INTERNAL) {
-                if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.ver) {
+                if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.top) {
                     style_tmp.body.border.part &= ~LV_BORDER_TOP;
                 }
-                if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.ver) {
+                if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.bottom) {
                     style_tmp.body.border.part &= ~LV_BORDER_BOTTOM;
                 }
 
@@ -934,7 +934,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 for(area_below = ext->btn_id_pr; area_below < ext->btn_cnt; area_below ++) {
                     if(ext->button_areas[area_below].y1 >  ext->button_areas[ext->btn_id_pr].y1 &&
                             pr_center >=  ext->button_areas[area_below].x1 &&
-                            pr_center <=  ext->button_areas[area_below].x2 + style->body.padding.hor) {
+                            pr_center <=  ext->button_areas[area_below].x2 + style->body.padding.left) {
                         break;
                     }
                 }
@@ -955,7 +955,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
                 for(area_above = ext->btn_id_pr; area_above >= 0; area_above --) {
                     if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_pr].y1 &&
-                            pr_center >=  ext->button_areas[area_above].x1 - style->body.padding.hor &&
+                            pr_center >=  ext->button_areas[area_above].x1 - style->body.padding.left &&
                             pr_center <=  ext->button_areas[area_above].x2) {
                         break;
                     }

@@ -646,10 +646,10 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         if(ext->body_draw) {
             lv_area_t bg;
             lv_obj_get_coords(label, &bg);
-            bg.x1 -= style->body.padding.hor;
-            bg.x2 += style->body.padding.hor;
-            bg.y1 -= style->body.padding.ver;
-            bg.y2 += style->body.padding.ver;
+            bg.x1 -= style->body.padding.left;
+            bg.x2 += style->body.padding.right;
+            bg.y1 -= style->body.padding.top;
+            bg.y2 += style->body.padding.bottom;
 
             lv_draw_rect(&bg, mask, style, lv_obj_get_opa_scale(label));
         }
@@ -717,8 +717,10 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         if(ext->body_draw) {
             lv_style_t * style = lv_label_get_style(label);
-            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.hor);
-            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.ver);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.left);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.right);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.top);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.bottom);
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;

@@ -265,7 +265,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 #endif
 
         lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
-        lv_coord_t r_in = r_out - style->body.padding.hor;
+        lv_coord_t r_in = r_out - style->body.padding.left;
         if(r_in < 1) r_in = 1;
 
         lv_coord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;

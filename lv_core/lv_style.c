@@ -232,8 +232,10 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
     STYLE_ATTR_MIX(body.border.width, ratio);
     STYLE_ATTR_MIX(body.border.opa, ratio);
     STYLE_ATTR_MIX(body.shadow.width, ratio);
-    STYLE_ATTR_MIX(body.padding.hor, ratio);
-    STYLE_ATTR_MIX(body.padding.ver, ratio);
+    STYLE_ATTR_MIX(body.padding.left, ratio);
+    STYLE_ATTR_MIX(body.padding.right, ratio);
+    STYLE_ATTR_MIX(body.padding.top, ratio);
+    STYLE_ATTR_MIX(body.padding.bottom, ratio);
     STYLE_ATTR_MIX(body.padding.inner, ratio);
     STYLE_ATTR_MIX(text.line_space, ratio);
     STYLE_ATTR_MIX(text.letter_space, ratio);

@@ -623,14 +623,14 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
         uint16_t row;
         uint16_t cell = 0;
 
-        cell_area.y2 = table->coords.y1 + bg_style->body.padding.ver;
+        cell_area.y2 = table->coords.y1 + bg_style->body.padding.top;
         for(row = 0; row < ext->row_cnt; row++) {
             h_row = get_row_height(table, row);
 
             cell_area.y1 = cell_area.y2;
             cell_area.y2 = cell_area.y1 + h_row;
 
-            cell_area.x2 = table->coords.x1 + bg_style->body.padding.hor;
+            cell_area.x2 = table->coords.x1 + bg_style->body.padding.left;
 
             for(col = 0; col < ext->col_cnt; col++) {
 
@@ -664,10 +664,10 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
 
                 if(ext->cell_data[cell]) {
 
-                    txt_area.x1 = cell_area.x1 + cell_style->body.padding.hor;
-                    txt_area.x2 = cell_area.x2 - cell_style->body.padding.hor;
-                    txt_area.y1 = cell_area.y1 + cell_style->body.padding.ver;
-                    txt_area.y2 = cell_area.y2 - cell_style->body.padding.ver;
+                    txt_area.x1 = cell_area.x1 + cell_style->body.padding.left;
+                    txt_area.x2 = cell_area.x2 - cell_style->body.padding.right;
+                    txt_area.y1 = cell_area.y1 + cell_style->body.padding.top;
+                    txt_area.y2 = cell_area.y2 - cell_style->body.padding.bottom;
                     /*Align the content to the middle if not cropped*/
                     if(format.crop == 0) {
                         txt_flags = LV_TXT_FLAG_NONE;
@@ -792,8 +792,8 @@ static void refr_size(lv_obj_t * table)
 
     lv_style_t * bg_style = lv_obj_get_style(table);
 
-    w += bg_style->body.padding.hor * 2;
-    h += bg_style->body.padding.ver * 2;
+    w += bg_style->body.padding.left + bg_style->body.padding.right;
+    h += bg_style->body.padding.top + bg_style->body.padding.bottom;
 
     lv_obj_set_size(table, w + 1, h + 1);
     lv_obj_invalidate(table);
@@ -809,7 +809,8 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
     uint16_t row_start = row_id * ext->col_cnt;
     uint16_t cell;
     uint16_t col;
-    lv_coord_t h_max = lv_font_get_height(ext->cell_style[0]->text.font) + 2 * ext->cell_style[0]->body.padding.ver;
+    lv_coord_t h_max = lv_font_get_height(ext->cell_style[0]->text.font) +
+            ext->cell_style[0]->body.padding.top + ext->cell_style[0]->body.padding.bottom;
 
     for(cell = row_start, col = 0; cell < row_start + ext->col_cnt; cell++, col ++) {
         if(ext->cell_data[cell] != NULL) {
@@ -834,16 +835,20 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
 
             /*With text crop assume 1 line*/
             if(format.crop) {
-                h_max = LV_MATH_MAX(lv_font_get_height(cell_style->text.font) + 2 * cell_style->body.padding.ver, h_max);
+                h_max = LV_MATH_MAX(lv_font_get_height(cell_style->text.font) +
+                        cell_style->body.padding.top + cell_style->body.padding.bottom,
+                        h_max);
             }
             /*Without text crop calculate the height of the text in the cell*/
             else {
-                txt_w -= 2 * cell_style->body.padding.hor;
+                txt_w -= cell_style->body.padding.left + cell_style->body.padding.right;
 
                 lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
                         cell_style->text.letter_space, cell_style->text.line_space, txt_w, LV_TXT_FLAG_NONE);
 
-                h_max = LV_MATH_MAX(txt_size.y + 2 * cell_style->body.padding.ver, h_max);
+                h_max = LV_MATH_MAX(txt_size.y +
+                        cell_style->body.padding.top + cell_style->body.padding.bottom,
+                        h_max);
                 cell += col_merge;
                 col += col_merge;
             }

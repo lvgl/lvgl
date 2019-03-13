@@ -286,7 +286,8 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
         lv_style_copy(&style_tmp, style);
         ext->lmeter.line_cnt = ext->label_count;                        /*Only to labels*/
         style_tmp.line.width = style_tmp.line.width * 2;                /*Ticker lines*/
-        style_tmp.body.padding.hor = style_tmp.body.padding.hor * 2;    /*Longer lines*/
+        style_tmp.body.padding.left = style_tmp.body.padding.left * 2;    /*Longer lines*/
+        style_tmp.body.padding.right = style_tmp.body.padding.right * 2;    /*Longer lines*/
         gauge->style_p = &style_tmp;
 
         ancestor_design(gauge, mask, mode);           /*To draw lines*/
@@ -348,7 +349,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     lv_style_t * style = lv_obj_get_style(gauge);
     lv_opa_t opa_scale = lv_obj_get_opa_scale(gauge);
-    lv_coord_t r = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.hor) - style->body.padding.inner;
+    lv_coord_t r = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.left) - style->body.padding.inner;
     lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
     lv_coord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
     int16_t scale_angle = lv_lmeter_get_scale_angle(gauge);
@@ -398,7 +399,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     lv_style_t * style = lv_gauge_get_style(gauge);
     lv_opa_t opa_scale = lv_obj_get_opa_scale(gauge);
 
-    lv_coord_t r = lv_obj_get_width(gauge) / 2 - style->body.padding.hor;
+    lv_coord_t r = lv_obj_get_width(gauge) / 2 - style->body.padding.left;
     lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
     lv_coord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
     uint16_t angle = lv_lmeter_get_scale_angle(gauge);
@@ -455,10 +456,10 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     style_neddle_mid.body.radius = LV_RADIUS_CIRCLE;
 
     lv_area_t nm_cord;
-    nm_cord.x1 = x_ofs - style->body.padding.ver;
-    nm_cord.y1 = y_ofs - style->body.padding.ver;
-    nm_cord.x2 = x_ofs + style->body.padding.ver;
-    nm_cord.y2 = y_ofs + style->body.padding.ver;
+    nm_cord.x1 = x_ofs - style->body.padding.top;
+    nm_cord.y1 = y_ofs - style->body.padding.top;
+    nm_cord.x2 = x_ofs + style->body.padding.top;
+    nm_cord.y2 = y_ofs + style->body.padding.top;
 
     lv_draw_rect(&nm_cord, mask, &style_neddle_mid, lv_obj_get_opa_scale(gauge));
 }
