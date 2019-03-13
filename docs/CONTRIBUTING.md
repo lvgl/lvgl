@@ -14,14 +14,24 @@ But first, start with the most Frequently Asked Questions.
 
 ## FAQ about contributing
 
-### Where can I write my question and remarks?
+### What license does my code need to be under?
 
-We use [GitHub's issue tracker](https://github.com/littlevgl/lvgl/issues) to ask questions., report bugs and suggest features. But there are some simple rules:
+Any code added to LittlevGL must be licensed under [MIT](https://choosealicense.com/licenses/mit/) or another license that is fully compatible. Contributions under other licenses are highly likely to be rejected.
+
+If you borrow code from another project, please make sure to add their copyright notice to your contribution.
+
+### Where do I ask questions, give feedback, or report bugs?
+
+We use the [forum](http://forum.littlevgl.com/) for questions, feature suggestions, and discussions.
+
+We use [GitHub's issue tracker](https://github.com/littlevgl/lvgl/issues) to report bugs.
+
+For both of these there are some rules:
 - Be kind and friendly.
 - Speak about one thing in one issue.
 - Give feedback and close the issue if your question is answered. 
-- Tell what you experience or expect. _"The button is not working"_ is not enough info to get help.
-- If possible send an absolute minimal code example in order to reproduce the issue
+- Explain exactly what you experience or expect. _"The button is not working"_ is not enough info to get help.
+- For most issues you should send an absolute minimal code example in order to reproduce the issue. Ideally this should be easily usable in the PC simulator.
 - Use [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) to format your post.
 - If you don't get any answer in a week write a comment like "Can somebody help?". Maybe your issue wasn't noticed.
 
@@ -30,7 +40,7 @@ Merging new code happens via Pull Requests. If you are still not familiar with t
 1. **Fork** the [lvgl repository](https://github.com/littlevgl/lvgl). To do this click the "Fork" button in the top right corner. It will "copy" the `lvgl` repository to your GitHub account (`https://github.com/your_name?tab=repositories`)
 2. **Clone**  the forked repository and add your updates
 3. **Create a PR** on the GitHub on the page of you `lvgl` repository(`https://github.com/your_name/lvgl`) by hitting the "New pull request" button 
-4. **Set the base branch**. It means where you want to merge your update. Fixes go to `master`, new features to the actual `dev-x.y` branch. 
+4. **Set the base branch**. It means where you want to merge your update. Bugfixes for the last release go to `master`, new features to the actual `dev-x.y` branch. 
 5. **Describe** what is in the update. An example code is welcome if applicable.
 
 Some advice:
