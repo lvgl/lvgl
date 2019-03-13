@@ -493,7 +493,6 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
  */
 static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 {
-
     lv_res_t res;
 
     /* Include the ancient signal function */
@@ -501,7 +500,6 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    lv_btn_state_t state = lv_btn_get_state(btn);
     bool tgl = lv_btn_get_toggle(btn);
 
     if(sign == LV_SIGNAL_PRESSED) {
