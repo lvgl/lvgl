@@ -344,7 +344,6 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style
         break;
     case LV_LIST_STYLE_SCRL:
         lv_page_set_style(list, LV_PAGE_STYLE_SCRL, style);
-        refr_btn_width(list);
         break;
     case LV_LIST_STYLE_SB:
         lv_page_set_style(list, LV_PAGE_STYLE_SB, style);
@@ -739,14 +738,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     res = ancestor_page_signal(list, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_CORD_CHG) {
-        /*Be sure the width of the buttons are correct*/
-        lv_coord_t w = lv_obj_get_width(list);
-        if(w != lv_area_get_width(param)) {   /*Width changed*/
-            refr_btn_width(list);
-        }
-    }
-    else if(sign == LV_SIGNAL_RELEASED ||
+    if(sign == LV_SIGNAL_RELEASED ||
             sign == LV_SIGNAL_PRESSED ||
             sign == LV_SIGNAL_PRESSING ||
             sign == LV_SIGNAL_LONG_PRESS ||
@@ -788,10 +780,6 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                 }
             }
         }
-    }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
-        /*Because of the possible change of horizontal and vertical padding refresh buttons width */
-        refr_btn_width(list);
     }
     else if(sign == LV_SIGNAL_FOCUS) {
 

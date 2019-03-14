@@ -78,8 +78,10 @@ void lv_style_init(void)
     lv_style_scr.body.main_color = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color = LV_COLOR_WHITE;
     lv_style_scr.body.radius = 0;
-    lv_style_scr.body.padding.ver = 0;
-    lv_style_scr.body.padding.hor = 0;
+    lv_style_scr.body.padding.left = 0;
+    lv_style_scr.body.padding.right = 0;
+    lv_style_scr.body.padding.top = 0;
+    lv_style_scr.body.padding.bottom = 0;
     lv_style_scr.body.padding.inner = LV_DPI / 12;
 
     lv_style_scr.body.border.color = LV_COLOR_BLACK;
@@ -108,8 +110,10 @@ void lv_style_init(void)
 
     /*Plain style (by default near the same as the screen style)*/
     memcpy(&lv_style_plain, &lv_style_scr, sizeof(lv_style_t));
-    lv_style_plain.body.padding.hor = LV_DPI / 12;
-    lv_style_plain.body.padding.ver = LV_DPI / 12;
+    lv_style_plain.body.padding.left = LV_DPI / 12;
+    lv_style_plain.body.padding.right = LV_DPI / 12;
+    lv_style_plain.body.padding.top = LV_DPI / 12;
+    lv_style_plain.body.padding.bottom = LV_DPI / 12;
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
@@ -148,8 +152,10 @@ void lv_style_init(void)
 
     /*Transparent fitting size*/
     memcpy(&lv_style_transp_fit, &lv_style_transp, sizeof(lv_style_t));
-    lv_style_transp_fit.body.padding.hor = 0;
-    lv_style_transp_fit.body.padding.ver = 0;
+    lv_style_transp_fit.body.padding.left = 0;
+    lv_style_transp_fit.body.padding.right = 0;
+    lv_style_transp_fit.body.padding.top = 0;
+    lv_style_transp_fit.body.padding.bottom = 0;
 
     /*Transparent tight style*/
     memcpy(&lv_style_transp_tight, &lv_style_transp_fit, sizeof(lv_style_t));
@@ -160,8 +166,10 @@ void lv_style_init(void)
     lv_style_btn_rel.body.main_color = LV_COLOR_MAKE(0x76, 0xa2, 0xd0);
     lv_style_btn_rel.body.grad_color = LV_COLOR_MAKE(0x19, 0x3a, 0x5d);
     lv_style_btn_rel.body.radius = LV_DPI / 15;
-    lv_style_btn_rel.body.padding.hor = LV_DPI / 4;
-    lv_style_btn_rel.body.padding.ver = LV_DPI / 6;
+    lv_style_btn_rel.body.padding.left= LV_DPI / 4;
+    lv_style_btn_rel.body.padding.right = LV_DPI / 4;
+    lv_style_btn_rel.body.padding.top = LV_DPI / 6;
+    lv_style_btn_rel.body.padding.bottom = LV_DPI / 6;
     lv_style_btn_rel.body.padding.inner = LV_DPI / 10;
     lv_style_btn_rel.body.border.color = LV_COLOR_MAKE(0x0b, 0x19, 0x28);
     lv_style_btn_rel.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;

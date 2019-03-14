@@ -16,6 +16,7 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_symbol_def.h"
 #include "../lv_misc/lv_anim.h"
+#include "../lv_misc/lv_math.h"
 #include <string.h>
 
 /*********************
