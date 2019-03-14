@@ -1179,10 +1179,14 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
 {
     if(obj == NULL) return LV_RES_OK;
 
+    /*If the event was send from an other event save the previous object to restore it at the end*/
+    lv_obj_t * prev_obj_act_event = obj_act_event;
     obj_act_event = obj;
+
     obj_act_event_deleted = false;
     if(obj->event_cb) obj->event_cb(obj, event);
-    obj_act_event = NULL;
+
+    obj_act_event = prev_obj_act_event; /*Restore the previous "event object"*/
 
     if(obj_act_event_deleted) return LV_RES_INV;
 
