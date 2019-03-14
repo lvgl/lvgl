@@ -35,6 +35,7 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mask);
+static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask);
 
 /**********************
  *  STATIC VARIABLES
@@ -490,6 +491,7 @@ static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_
         if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, mask);
         if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, mask);
         if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, mask);
+        if(ext->type & LV_CHART_TYPE_AREA) lv_chart_draw_areas(chart, mask);
     }
     return true;
 }
@@ -819,4 +821,70 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
         }
     }
 }
+
+/**
+ * Draw the data lines as areas on a chart
+ * @param obj pointer to chart object
+ */
+static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
+{
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+
+	uint16_t i;
+	lv_point_t p1;
+	lv_point_t p2;
+	lv_coord_t w = lv_obj_get_width(chart);
+	lv_coord_t h = lv_obj_get_height(chart);
+	lv_coord_t x_ofs = chart->coords.x1;
+	lv_coord_t y_ofs = chart->coords.y1;
+	int32_t y_tmp;
+	lv_coord_t p_prev;
+	lv_coord_t p_act;
+	lv_chart_series_t * ser;
+	lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
+	lv_style_t style;
+	lv_style_copy(&style, &lv_style_plain);
+	style.line.opa = ext->series.opa;
+	style.line.width = ext->series.width;
+
+	/*Go through all data lines*/
+	LL_READ_BACK(ext->series_ll, ser) {
+		style.line.color = ser->color;
+
+		p1.x = 0 + x_ofs;
+		p2.x = 0 + x_ofs;
+
+		p_prev = ser->start_point;
+		y_tmp = (int32_t)((int32_t) ser->points[p_prev] - ext->ymin) * h;
+		y_tmp = y_tmp / (ext->ymax - ext->ymin);
+		p2.y = h - y_tmp + y_ofs;
+
+		for(i = 1; i < ext->point_cnt; i ++) {
+			p1.x = p2.x;
+			p1.y = p2.y;
+
+			p2.x = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
+
+			p_act = (ser->start_point + i) % ext->point_cnt;
+
+			y_tmp = (int32_t)((int32_t) ser->points[p_act] - ext->ymin) * h;
+			y_tmp = y_tmp / (ext->ymax - ext->ymin);
+			p2.y = h - y_tmp + y_ofs;
+
+			if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
+				lv_point_t triangle_points[3];
+				triangle_points[0] = p1;
+				triangle_points[1].x = p2.x;
+				triangle_points[1].y = y_ofs + h;
+				triangle_points[2].x = p1.x;
+				triangle_points[2].y = y_ofs + h;
+				lv_draw_triangle(triangle_points, mask, style.line.color);
+				triangle_points[2] = p2;
+				lv_draw_triangle(triangle_points, mask, style.line.color);
+			}
+			p_prev = p_act;
+		}
+	}
+}
+
 #endif
