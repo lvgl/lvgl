@@ -654,14 +654,14 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the width which still fits into the container
  */
-lv_coord_t lv_obj_get_width_fit(lv_obj_t * cont);
+lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj);
 
 /**
  * Get that height reduced by the top an bottom padding.
  * @param obj pointer to an object
  * @return the height which still fits into the container
  */
-lv_coord_t lv_obj_get_height_fit(lv_obj_t * cont);
+lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj);
 
 /**
  * Get the extended size attribute of an object

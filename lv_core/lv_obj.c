@@ -1522,11 +1522,11 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the width which still fits into the container
  */
-lv_coord_t lv_obj_get_width_fit(lv_obj_t * cont)
+lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj)
 {
-    lv_style_t * style = lv_cont_get_style(cont);
+    lv_style_t * style = lv_obj_get_style(obj);
 
-    return lv_obj_get_width(cont) - style->body.padding.left - style->body.padding.right;
+    return lv_obj_get_width(obj) - style->body.padding.left - style->body.padding.right;
 }
 
 /**
@@ -1534,11 +1534,11 @@ lv_coord_t lv_obj_get_width_fit(lv_obj_t * cont)
  * @param obj pointer to an object
  * @return the height which still fits into the container
  */
-lv_coord_t lv_obj_get_height_fit(lv_obj_t * cont)
+lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
 {
-    lv_style_t * style = lv_cont_get_style(cont);
+    lv_style_t * style = lv_obj_get_style(obj);
 
-    return lv_obj_get_width(cont) - style->body.padding.top - style->body.padding.bottom;
+    return lv_obj_get_width(obj) - style->body.padding.top - style->body.padding.bottom;
 }
 /**
  * Get the extended size attribute of an object
