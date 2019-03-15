@@ -358,4 +358,8 @@ static lv_fs_res_t fs_dir_close (void * rddir_p)
     return res;
 }
 
+#else /* Enable this file at the top */
+
+/* This dummy typedef exists purely to silence -Wpedantic. */
+typedef int keep_pedantic_happy;
 #endif

@@ -228,4 +228,8 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
     return res;
 }
 
+#else /* Enable this file at the top */
+
+/* This dummy typedef exists purely to silence -Wpedantic. */
+typedef int keep_pedantic_happy;
 #endif
