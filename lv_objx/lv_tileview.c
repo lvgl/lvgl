@@ -78,7 +78,6 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->anim_time = LV_TILEVIEW_ANIM_TIME;
-    ext->action = NULL;
     ext->act_id.x = 0;
     ext->act_id.y = 0;
     ext->valid_pos = NULL;
@@ -109,7 +108,6 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_tileview_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->act_id.x = copy_ext->act_id.x;
         ext->act_id.y = copy_ext->act_id.y;
-        ext->action = copy_ext->action;
         ext->anim_time = copy_ext->anim_time;
 
 
@@ -128,14 +126,22 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
 /**
  * Register an object on the tileview. The register object will able to slide the tileview
+ * @param tileview pointer to a Tileview object
  * @param element pointer to an object
  */
-void lv_tileview_add_element(lv_obj_t * element)
+void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
 {
-    /* Let objects eventto propaget to the scrollable part of the tileview.
+    /* Let the objects event to propagate to the scrollable part of the tileview.
      * It is required the handle dargging of the tileview with the element.*/
     element->parent_event = 1;
     lv_obj_set_drag_parent(element, true);
+
+    /* When adding a new element the coordinates may shift.
+     * For example y=1 can become y=1 if an element is added to the top.
+     * So be sure the current tile is correctly shown*/
+    lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
+    lv_tileview_set_tile_act(tileview, ext->act_id.x, ext->act_id.y, false);
+
 }
 
 
@@ -153,6 +159,20 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * val
 {
     lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
     ext->valid_pos = valid_pos;
+
+
+    /*If valid pos. is selected do nothing*/
+    uint16_t i;
+    for(i = 0; valid_pos[i].x != LV_COORD_MIN; i++) {
+        if(valid_pos->x == ext->act_id.x && valid_pos->y == ext->act_id.y) {
+            return;
+        }
+    }
+
+    /*Set a valid position if now an invalid is selected*/
+    if(valid_pos->x != LV_COORD_MIN && valid_pos->y != LV_COORD_MIN) {
+        lv_tileview_set_tile_act(tileview, valid_pos->x, valid_pos->y, false);
+    }
 }
 
 /**
@@ -180,10 +200,6 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
     }
 
     if(valid == false) return;  /*Don't load not valid tiles*/
-
-    lv_res_t res = LV_RES_OK;
-    if(ext->action) res = ext->action(tileview, x, y);
-    if(res != LV_RES_OK) return;        /*Prevent the tile loading*/
 
     ext->act_id.x = x;
     ext->act_id.y = y;
@@ -224,13 +240,11 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
     } else {
         lv_obj_set_size(tileview, x_coord, y_coord);
     }
-}
 
-void lv_tileview_set_tile_load_action(lv_obj_t * tileview, lv_tileview_action_t action)
-{
-    lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
-    ext->action = action;
 
+    lv_res_t res = LV_RES_OK;
+    res = lv_obj_send_event(tileview, LV_EVENT_VALUE_CHANGED);
+    if(res != LV_RES_OK) return;        /*Prevent the tile loading*/
 }
 
 /**
