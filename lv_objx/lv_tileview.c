@@ -238,7 +238,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
         }
 #endif
     } else {
-        lv_obj_set_size(tileview, x_coord, y_coord);
+        lv_obj_set_pos(scrl, x_coord, y_coord);
     }
 
 
