@@ -228,6 +228,11 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     ext->tab_name_ptr[ext->tab_cnt - 1] = name_dm;
     ext->tab_name_ptr[ext->tab_cnt] = "";
 
+    /* The button matrix's map still points to the old `tab_name_ptr` which might be freed by `lv_mem_realloc`.
+     * So make its current map invalid*/
+    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+    btnm_ext->map_p = NULL;
+
     lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
     lv_btnm_set_btn_no_repeat(ext->btns, ext->tab_cnt - 1, true);
 

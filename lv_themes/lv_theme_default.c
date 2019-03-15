@@ -56,8 +56,8 @@ static void basic_init(void)
 
     lv_style_copy(&sb, &lv_style_pretty_color);
     sb.body.grad_color = sb.body.main_color;
-    sb.body.padding.hor = sb.body.padding.hor / 2;      /*Make closer to the edges*/
-    sb.body.padding.ver = sb.body.padding.ver / 2;
+    sb.body.padding.right = sb.body.padding.right/ 2;      /*Make closer to the edges*/
+    sb.body.padding.bottom = sb.body.padding.bottom / 2;
 
     lv_style_copy(&plain_bordered, &lv_style_plain);
     plain_bordered.body.border.width = 2;
@@ -147,8 +147,10 @@ static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
     lv_style_copy(&slider_bg, &lv_style_pretty);
-    slider_bg.body.padding.hor = LV_DPI / 20;
-    slider_bg.body.padding.ver = LV_DPI / 20;
+    slider_bg.body.padding.left = LV_DPI / 20;
+    slider_bg.body.padding.right = LV_DPI / 20;
+    slider_bg.body.padding.top = LV_DPI / 20;
+    slider_bg.body.padding.bottom = LV_DPI / 20;
 
     theme.style.slider.bg = &slider_bg;
     theme.style.slider.indic = &lv_style_pretty_color;
@@ -160,8 +162,10 @@ static void sw_init(void)
 {
 #if LV_USE_SW != 0
     lv_style_copy(&sw_bg, &lv_style_pretty);
-    sw_bg.body.padding.hor = 3;
-    sw_bg.body.padding.ver = 3;
+    sw_bg.body.padding.left = 3;
+    sw_bg.body.padding.right = 3;
+    sw_bg.body.padding.top = 3;
+    sw_bg.body.padding.bottom = 3;
 
     theme.style.sw.bg = &sw_bg;
     theme.style.sw.indic = &lv_style_pretty_color;

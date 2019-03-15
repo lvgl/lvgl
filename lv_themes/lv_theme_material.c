@@ -68,8 +68,10 @@ static void basic_init(void)
     panel.body.shadow.color = DEF_SHADOW_COLOR;
     panel.body.shadow.type = LV_SHADOW_BOTTOM;
     panel.body.shadow.width = 4;
-    panel.body.padding.hor = LV_DPI / 8;
-    panel.body.padding.ver = LV_DPI / 8;
+    panel.body.padding.left = LV_DPI / 8;
+    panel.body.padding.right = LV_DPI / 8;
+    panel.body.padding.top = LV_DPI / 8;
+    panel.body.padding.bottom = LV_DPI / 8;
     panel.body.padding.inner = LV_DPI / 12;
     panel.text.color = LV_COLOR_HEX3(0x333);
     panel.image.color = LV_COLOR_HEX3(0x333);
@@ -78,7 +80,8 @@ static void basic_init(void)
     sb.body.main_color = LV_COLOR_BLACK;
     sb.body.grad_color = LV_COLOR_BLACK;
     sb.body.opa = LV_OPA_40;
-    sb.body.padding.hor = LV_DPI / 25;
+    sb.body.padding.right = LV_DPI / 25;
+    sb.body.padding.bottom = LV_DPI / 25;
 
     theme.style.bg = &bg;
     theme.style.panel = &panel;
@@ -103,8 +106,10 @@ static void btn_init(void)
     rel.body.main_color = lv_color_hsv_to_rgb(_hue, 90, 70);
     rel.body.grad_color = rel.body.main_color;
     rel.body.radius = DEF_RADIUS;
-    rel.body.padding.hor = LV_DPI / 6;
-    rel.body.padding.ver = LV_DPI / 8;
+    rel.body.padding.left = LV_DPI / 6;
+    rel.body.padding.right = LV_DPI / 6;
+    rel.body.padding.top = LV_DPI / 8;
+    rel.body.padding.bottom = LV_DPI / 8;
     rel.body.padding.inner = LV_DPI / 10;
     rel.body.shadow.color = DEF_SHADOW_COLOR;
     rel.body.shadow.type = LV_SHADOW_BOTTOM;
@@ -221,14 +226,18 @@ static void bar_init(void)
     bar_bg.body.grad_color = bar_bg.body.main_color;
     bar_bg.body.radius = 3;
     bar_bg.body.border.width = 0;
-    bar_bg.body.padding.hor = LV_DPI / 12;
-    bar_bg.body.padding.ver = LV_DPI / 12;
+    bar_bg.body.padding.left = LV_DPI / 12;
+    bar_bg.body.padding.right = LV_DPI / 12;
+    bar_bg.body.padding.top = LV_DPI / 12;
+    bar_bg.body.padding.bottom = LV_DPI / 12;
 
     lv_style_copy(&bar_indic, &bar_bg);
     bar_indic.body.main_color = lv_color_hsv_to_rgb(_hue, 85, 70);
     bar_indic.body.grad_color = bar_indic.body.main_color;
-    bar_indic.body.padding.hor = 0;
-    bar_indic.body.padding.ver = 0;
+    bar_indic.body.padding.left = 0;
+    bar_indic.body.padding.right = 0;
+    bar_indic.body.padding.top = 0;
+    bar_indic.body.padding.bottom = 0;
 
     theme.style.bar.bg = &bar_bg;
     theme.style.bar.indic = &bar_indic;
@@ -290,7 +299,7 @@ static void lmeter_init(void)
     lv_style_copy(&lmeter, &def);
     lmeter.body.main_color = lv_color_hsv_to_rgb(_hue, 75, 90);
     lmeter.body.grad_color = lmeter.body.main_color;
-    lmeter.body.padding.hor = LV_DPI / 10;                       /*Scale line length*/
+    lmeter.body.padding.left = LV_DPI / 10;                       /*Scale line length*/
     lmeter.line.color = LV_COLOR_HEX3(0x999);
     lmeter.line.width = 2;
 
@@ -306,7 +315,7 @@ static void gauge_init(void)
     lv_style_copy(&gauge, &def);
     gauge.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 60);
     gauge.body.grad_color = gauge.body.main_color;
-    gauge.body.padding.hor = LV_DPI / 16;                       /*Scale line length*/
+    gauge.body.padding.left = LV_DPI / 16;                       /*Scale line length*/
     gauge.body.padding.inner = LV_DPI / 8;
     gauge.body.border.color = LV_COLOR_HEX3(0x999);
     gauge.text.color = LV_COLOR_HEX3(0x333);
@@ -329,8 +338,10 @@ static void arc_init(void)
     /*For prelaoder*/
     arc.body.border.width = 10;
     arc.body.border.color = lv_color_hsv_to_rgb(_hue, 30, 90);
-    arc.body.padding.hor = 0;
-    arc.body.padding.ver = 0;
+    arc.body.padding.left = 0;
+    arc.body.padding.right = 0;
+    arc.body.padding.top = 0;
+    arc.body.padding.bottom = 0;
 
     theme.style.arc = &arc;
 #endif
@@ -366,8 +377,10 @@ static void calendar_init(void)
     lv_style_copy(&week_box, &def);
     week_box.body.main_color = lv_color_hsv_to_rgb(_hue, 40, 100);
     week_box.body.grad_color = lv_color_hsv_to_rgb(_hue, 40, 100);
-    week_box.body.padding.ver = LV_DPI / 20;
-    week_box.body.padding.hor = theme.style.panel->body.padding.hor;
+    week_box.body.padding.top = LV_DPI / 20;
+    week_box.body.padding.bottom = LV_DPI / 20;
+    week_box.body.padding.left = theme.style.panel->body.padding.left;
+    week_box.body.padding.right = theme.style.panel->body.padding.right;
     week_box.body.border.color = theme.style.panel->body.border.color;
     week_box.body.border.width = theme.style.panel->body.border.width;
     week_box.body.border.part = LV_BORDER_LEFT | LV_BORDER_RIGHT;
@@ -377,7 +390,8 @@ static void calendar_init(void)
     lv_style_copy(&today_box, &def);
     today_box.body.main_color = LV_COLOR_WHITE;
     today_box.body.grad_color = LV_COLOR_WHITE;
-    today_box.body.padding.ver = LV_DPI / 20;
+    today_box.body.padding.top = LV_DPI / 20;
+    today_box.body.padding.bottom = LV_DPI / 20;
     today_box.body.radius = 0;
 
     theme.style.calendar.bg = theme.style.panel;
@@ -431,8 +445,10 @@ static void btnm_init(void)
     static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&bg, theme.style.panel);
-    bg.body.padding.hor = 0;
-    bg.body.padding.ver = 0;
+    bg.body.padding.left = 0;
+    bg.body.padding.right = 0;
+    bg.body.padding.top = 0;
+    bg.body.padding.bottom = 0;
     bg.body.padding.inner = 0;
     bg.text.color = LV_COLOR_HEX3(0x555);
 
@@ -560,13 +576,17 @@ static void list_init(void)
     static lv_style_t list_bg, rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&list_bg, theme.style.panel);
-    list_bg.body.padding.hor = 0;
-    list_bg.body.padding.ver = 0;
+    list_bg.body.padding.left = 0;
+    list_bg.body.padding.right = 0;
+    list_bg.body.padding.top = 0;
+    list_bg.body.padding.bottom = 0;
     list_bg.body.padding.inner = 0;
 
     lv_style_copy(&rel, &lv_style_transp);
-    rel.body.padding.hor = LV_DPI / 8;
-    rel.body.padding.ver = LV_DPI / 6;
+    rel.body.padding.left = LV_DPI / 8;
+    rel.body.padding.right = LV_DPI / 8;
+    rel.body.padding.top = LV_DPI / 6;
+    rel.body.padding.bottom = LV_DPI / 6;
     rel.body.radius = 10;
     rel.body.border.color = LV_COLOR_HEX3(0xbbb);
     rel.body.border.width = 1;
@@ -613,8 +633,10 @@ static void ddlist_init(void)
 #if LV_USE_DDLIST != 0
     static lv_style_t bg, sel;
     lv_style_copy(&bg, theme.style.panel);
-    bg.body.padding.hor = LV_DPI / 6;
-    bg.body.padding.ver = LV_DPI / 6;
+    bg.body.padding.left = LV_DPI / 6;
+    bg.body.padding.right = LV_DPI / 6;
+    bg.body.padding.top = LV_DPI / 6;
+    bg.body.padding.bottom = LV_DPI / 6;
     bg.text.line_space = LV_DPI / 8;
 
     lv_style_copy(&sel, &bg);
@@ -637,8 +659,10 @@ static void roller_init(void)
     static lv_style_t roller_bg, roller_sel;
 
     lv_style_copy(&roller_bg, &lv_style_transp);
-    roller_bg.body.padding.hor = LV_DPI / 6;
-    roller_bg.body.padding.ver = LV_DPI / 6;
+    roller_bg.body.padding.left = LV_DPI / 6;
+    roller_bg.body.padding.right = LV_DPI / 6;
+    roller_bg.body.padding.top = LV_DPI / 6;
+    roller_bg.body.padding.bottom = LV_DPI / 6;
     roller_bg.text.line_space = LV_DPI / 8;
     roller_bg.text.font = _font;
     roller_bg.glass = 0;
@@ -676,13 +700,16 @@ static void tabview_init(void)
     btn_bg.body.shadow.color = DEF_SHADOW_COLOR;
     btn_bg.body.shadow.type = LV_SHADOW_BOTTOM;
     btn_bg.body.padding.inner = 0;
-    btn_bg.body.padding.hor = 0;
-    btn_bg.body.padding.ver = 0;
+    btn_bg.body.padding.left = 0;
+    btn_bg.body.padding.right = 0;
+    btn_bg.body.padding.top = 0;
+    btn_bg.body.padding.bottom = 0;
     btn_bg.text.color = LV_COLOR_HEX3(0x333);
 
 
     lv_style_copy(&rel, &lv_style_transp);
-    rel.body.padding.ver = LV_DPI / 8;
+    rel.body.padding.top = LV_DPI / 8;
+    rel.body.padding.bottom = LV_DPI / 8;
     rel.text.font = _font;
 
     lv_style_copy(&pr, &def);
@@ -736,8 +763,10 @@ static void table_init(void)
     lv_style_copy(&cell, theme.style.panel);
     cell.body.radius = 0;
     cell.body.border.width = 1;
-    cell.body.padding.hor = LV_DPI / 12;
-    cell.body.padding.ver = LV_DPI / 12;
+    cell.body.padding.left = LV_DPI / 12;
+    cell.body.padding.right = LV_DPI / 12;
+    cell.body.padding.top = LV_DPI / 12;
+    cell.body.padding.bottom = LV_DPI / 12;
 
 
     theme.style.table.bg = &lv_style_transp_tight;
@@ -759,8 +788,10 @@ static void win_init(void)
     header.body.border.part = LV_BORDER_BOTTOM;
     header.body.border.opa = LV_OPA_COVER;
     header.body.padding.inner = 0;
-    header.body.padding.hor = 0;
-    header.body.padding.ver = 0;
+    header.body.padding.left = 0;
+    header.body.padding.right = 0;
+    header.body.padding.top = 0;
+    header.body.padding.bottom = 0;
     header.text.color = LV_COLOR_HEX3(0x333);
     header.image.color = LV_COLOR_HEX3(0x333);
 

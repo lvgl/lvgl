@@ -196,6 +196,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
  */
 void lv_group_focus_obj(lv_obj_t * obj)
 {
+    if(obj == NULL) return;
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
 

@@ -187,8 +187,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->drag_parent = 0;
         new_obj->hidden = 0;
         new_obj->top = 0;
-        new_obj->opa_scale_en = 0;
         new_obj->protect = LV_PROTECT_NONE;
+        new_obj->opa_scale_en = 0;
         new_obj->opa_scale = LV_OPA_COVER;
         new_obj->parent_event = 0;
 
@@ -262,6 +262,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->protect = LV_PROTECT_NONE;
         new_obj->opa_scale = LV_OPA_COVER;
         new_obj->opa_scale_en = 0;
+        new_obj->parent_event = 0;
 
         new_obj->ext_attr = NULL;
     }
@@ -1179,16 +1180,22 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
 {
     if(obj == NULL) return LV_RES_OK;
 
-    /*If the event was send from an other event save the previous object to restore it at the end*/
+    /*If the event was send from an other event save the current states to restore it at the end*/
     lv_obj_t * prev_obj_act_event = obj_act_event;
-    obj_act_event = obj;
+    bool prev_obj_act_event_deleted = obj_act_event_deleted;
 
+    obj_act_event = obj;
     obj_act_event_deleted = false;
+
     if(obj->event_cb) obj->event_cb(obj, event);
 
-    obj_act_event = prev_obj_act_event; /*Restore the previous "event object"*/
+    bool deleted = obj_act_event_deleted;
 
-    if(obj_act_event_deleted) return LV_RES_INV;
+    /*Restore the previous states*/
+    obj_act_event = prev_obj_act_event;
+    obj_act_event_deleted = prev_obj_act_event_deleted;
+
+    if(deleted) return LV_RES_INV;
 
     if(obj->parent_event && obj->par) {
         lv_res_t res = lv_obj_send_event(obj->par, event);
