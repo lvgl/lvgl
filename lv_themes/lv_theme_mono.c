@@ -54,8 +54,10 @@ static void basic_init(void)
     def.body.grad_color = LV_COLOR_WHITE;
     def.body.radius = 0;
     def.body.opa = LV_OPA_COVER;
-    def.body.padding.hor = LV_DPI / 10;
-    def.body.padding.ver = LV_DPI / 10;
+    def.body.padding.left = LV_DPI / 10;
+    def.body.padding.right = LV_DPI / 10;
+    def.body.padding.top = LV_DPI / 10;
+    def.body.padding.bottom = LV_DPI / 10;
     def.body.padding.inner = LV_DPI / 10;
     def.body.border.color = LV_COLOR_BLACK;
     def.body.border.width = 1;
@@ -168,13 +170,17 @@ static void bar_init(void)
     static lv_style_t bar_indic;
 
     lv_style_copy(&bar_bg, &light_frame);
-    bar_bg.body.padding.hor = LV_DPI / 15;
-    bar_bg.body.padding.ver = LV_DPI / 15;
+    bar_bg.body.padding.left = LV_DPI / 15;
+    bar_bg.body.padding.right = LV_DPI / 15;
+    bar_bg.body.padding.top = LV_DPI / 15;
+    bar_bg.body.padding.bottom = LV_DPI / 15;
     bar_bg.body.radius = LV_RADIUS_CIRCLE;
 
     lv_style_copy(&bar_indic, &dark_frame);
-    bar_indic.body.padding.hor = LV_DPI / 30;
-    bar_indic.body.padding.ver = LV_DPI / 30;
+    bar_indic.body.padding.left = LV_DPI / 30;
+    bar_indic.body.padding.right = LV_DPI / 30;
+    bar_indic.body.padding.top = LV_DPI / 30;
+    bar_indic.body.padding.bottom = LV_DPI / 30;
     bar_indic.body.radius = LV_RADIUS_CIRCLE;
 
     theme.style.bar.bg = &bar_bg;
@@ -188,8 +194,10 @@ static void slider_init(void)
     static lv_style_t slider_knob;
     lv_style_copy(&slider_knob, &light_frame);
     slider_knob.body.radius = LV_RADIUS_CIRCLE;
-    slider_knob.body.padding.hor = LV_DPI / 30;
-    slider_knob.body.padding.ver = LV_DPI / 30;
+    slider_knob.body.padding.left = LV_DPI / 30;
+    slider_knob.body.padding.right = LV_DPI / 30;
+    slider_knob.body.padding.top = LV_DPI / 30;
+    slider_knob.body.padding.bottom = LV_DPI / 30;
 
     theme.style.slider.bg = theme.style.bar.bg;
     theme.style.slider.indic = theme.style.bar.indic;
@@ -218,7 +226,7 @@ static void lmeter_init(void)
     lmeter_bg.body.opa = LV_OPA_TRANSP;
     lmeter_bg.body.main_color = LV_COLOR_BLACK;
     lmeter_bg.body.grad_color = LV_COLOR_BLACK;
-    lmeter_bg.body.padding.hor = LV_DPI / 20;
+    lmeter_bg.body.padding.left = LV_DPI / 20;
     lmeter_bg.body.padding.inner = LV_DPI / 8;
     lmeter_bg.line.color = LV_COLOR_WHITE;
     lmeter_bg.line.width = 1;
@@ -252,7 +260,8 @@ static void calendar_init(void)
 #if LV_USE_CALENDAR
     static lv_style_t box;
     lv_style_copy(&box, &light_plain);
-    box.body.padding.ver = LV_DPI / 20;
+    box.body.padding.top = LV_DPI / 20;
+    box.body.padding.bottom = LV_DPI / 20;
 
     /*Can't handle highlighted dates in this theme*/
     theme.style.calendar.week_box = &box;
@@ -399,8 +408,10 @@ static void win_init(void)
 #if LV_USE_WIN != 0
     static lv_style_t win_header;
     lv_style_copy(&win_header, &dark_plain);
-    win_header.body.padding.hor = LV_DPI / 30;
-    win_header.body.padding.ver = LV_DPI / 30;
+    win_header.body.padding.left = LV_DPI / 30;
+    win_header.body.padding.right = LV_DPI / 30;
+    win_header.body.padding.top = LV_DPI / 30;
+    win_header.body.padding.bottom = LV_DPI / 30;
 
     theme.style.win.bg = &light_frame;
     theme.style.win.sb = &dark_frame;

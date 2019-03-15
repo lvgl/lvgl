@@ -1124,7 +1124,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         lv_area_set_pos(&ext->sb.ver_area,  obj_w - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.bottom,
                         sb_ver_pad +
                         (-(lv_obj_get_y(scrl) - ext->sb.style->body.padding.bottom) * (obj_h - size_tmp -  2 * sb_ver_pad)) /
-                        (scrl_h + style->body.padding.top + ext->sb.style->body.padding.bottom - obj_h));
+                        (scrl_h + style->body.padding.top + style->body.padding.bottom - obj_h));
 
         if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG)  ext->sb.ver_draw = 1;
     }

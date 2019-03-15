@@ -851,6 +851,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         }
 
         ext->btn_id_pr = btn_pr;
+        ext->btn_id_act = btn_pr;
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
@@ -863,6 +864,9 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 }
             }
 
+            /*Invalidate to old pressed area*/;
+            invalidate_button_area(btnm, ext->btn_id_pr);
+
 #if LV_USE_GROUP
             /*Leave the clicked button when releases if this not the focused object in a group*/
             lv_group_t * g = lv_obj_get_group(btnm);
@@ -873,10 +877,6 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_id_pr = LV_BTNM_BTN_NONE;
 #endif
         }
-
-        /*Invalidate to old pressed area*/;
-        invalidate_button_area(btnm, ext->btn_id_pr);
-
     }
     else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
         ext->btn_id_pr = LV_BTNM_BTN_NONE;

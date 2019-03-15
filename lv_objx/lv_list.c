@@ -178,7 +178,6 @@ void lv_list_clean(lv_obj_t * obj)
  */
 lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_event_cb_t event_cb)
 {
-    lv_style_t * style = lv_obj_get_style(list);
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     ext->size ++;
     /*Create a list element with the image an the text*/

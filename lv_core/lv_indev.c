@@ -398,6 +398,9 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(i->proc.reset_query) return;     /*The object might be deleted*/
             lv_obj_send_event(focused, LV_EVENT_PRESSED);
             if(i->proc.reset_query) return;     /*The object might be deleted*/
+
+            /*Send the ENTER as a normal KEY*/
+            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
         }
         /*Move the focus on NEXT*/
         else if(data->key == LV_GROUP_KEY_NEXT) {
