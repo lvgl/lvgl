@@ -99,7 +99,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_roller_set_style(new_roller, LV_ROLLER_STYLE_BG, th->style.roller.bg);
             lv_roller_set_style(new_roller, LV_ROLLER_STYLE_SEL, th->style.roller.sel);
         } else {
-            /*Let the ddlist's style*/
+            /*Refresh the roller's style*/
             lv_obj_refresh_style(new_roller);                /*To set scrollable size automatically*/
         }
     }
@@ -109,6 +109,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_ddlist_open(new_roller, false);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
+        /*Refresh the roller's style*/
         lv_obj_refresh_style(new_roller);        /*Refresh the style with new signal function*/
     }
 

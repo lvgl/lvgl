@@ -109,7 +109,6 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_NONE);
-        lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_DRAG);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_HIDE);
         lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
@@ -133,11 +132,13 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->label = lv_label_create(new_ddlist, copy_ext->label);
         lv_label_set_text(ext->label, lv_label_get_text(copy_ext->label));
         ext->sel_opt_id = copy_ext->sel_opt_id;
+        ext->sel_opt_id_ori = copy_ext->sel_opt_id;
         ext->fix_height = copy_ext->fix_height;
         ext->option_cnt = copy_ext->option_cnt;
         ext->sel_style = copy_ext->sel_style;
         ext->anim_time = copy_ext->anim_time;
         ext->draw_arrow = copy_ext->draw_arrow;
+        ext->stay_open = copy_ext->stay_open;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_ddlist);
@@ -218,6 +219,13 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 void lv_ddlist_set_fit(lv_obj_t * ddlist, lv_fit_t fit)
 {
     lv_cont_set_fit2(ddlist, fit, LV_FIT_NONE);
+
+    if(fit == LV_FIT_NONE) {
+        lv_page_set_scrl_fit2(ddlist, LV_FIT_FLOOD, LV_FIT_NONE);
+    } else {
+        lv_page_set_scrl_fit2(ddlist, LV_FIT_TIGHT, LV_FIT_NONE);
+
+    }
 
     lv_ddlist_refr_size(ddlist, false);
 }
