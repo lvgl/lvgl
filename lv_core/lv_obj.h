@@ -650,6 +650,20 @@ lv_coord_t lv_obj_get_width(const lv_obj_t * obj);
 lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
 
 /**
+ * Get that width reduced by the left and right padding.
+ * @param obj pointer to an object
+ * @return the width which still fits into the container
+ */
+lv_coord_t lv_obj_get_width_fit(lv_obj_t * cont);
+
+/**
+ * Get that height reduced by the top an bottom padding.
+ * @param obj pointer to an object
+ * @return the height which still fits into the container
+ */
+lv_coord_t lv_obj_get_height_fit(lv_obj_t * cont);
+
+/**
  * Get the extended size attribute of an object
  * @param obj pointer to an object
  * @return the extended size attribute
