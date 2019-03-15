@@ -25,7 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
-static void lv_kb_def_event_cb(lv_obj_t * kb);
+static void lv_kb_def_btn_action_cb(lv_obj_t * kb);
 
 /**********************
  *  STATIC VARIABLES
@@ -368,11 +368,11 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
     else if(sign == LV_SIGNAL_PRESSED) {
-        lv_kb_def_event_cb(kb);
+        lv_kb_def_btn_action_cb(kb);
     }
     else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
         bool no_rep = lv_btnm_get_btn_no_repeate(kb, lv_btnm_get_active_btn(kb));
-        if(no_rep == false) lv_kb_def_event_cb(kb);
+        if(no_rep == false) lv_kb_def_btn_action_cb(kb);
     }
     else if(sign == LV_SIGNAL_FOCUS) {
         lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
@@ -402,12 +402,12 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
     return res;
 }
 
+
 /**
- * Called when a button of the keyboard is released
+ * Called when a button of the keyboard is pressed or long pressed to change map or add the button's test to the assigned Text area.
  * @param kb pointer to a  keyboard
- * @param event type of the event
  */
-static void lv_kb_def_event_cb(lv_obj_t * kb)
+static void lv_kb_def_btn_action_cb(lv_obj_t * kb)
 {
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
 

@@ -185,7 +185,7 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
     if(ext->sel_opt_id == sel_opt) return;
 
     ext->sel_opt_id = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
-
+    ext->sel_opt_id_ori = ext->sel_opt_id;
     /*Move the list to show the current option*/
     if(ext->opened == 0) {
         lv_ddlist_pos_current_option(ddlist);
