@@ -848,7 +848,7 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
 	style.line.width = ext->series.width;
 
 	/*Go through all data lines*/
-	LL_READ_BACK(ext->series_ll, ser) {
+	LV_LL_READ_BACK(ext->series_ll, ser) {
 		style.line.color = ser->color;
 
 		p1.x = 0 + x_ofs;
