@@ -32,6 +32,18 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+/*Chart types*/
+enum
+{
+    LV_CHART_TYPE_LINE = 0x01,              /*Connect the points with lines*/
+    LV_CHART_TYPE_COLUMN = 0x02,            /*Draw columns*/
+    LV_CHART_TYPE_POINT = 0x04,             /*Draw circles on the points*/
+    LV_CHART_TYPE_VERTICAL_LINE = 0x08,     /*Draw vertical lines on points (useful when chart width == point count)*/
+    LV_CHART_TYPE_AREA = 0x10,              /*Draw area chart*/
+};
+typedef uint8_t lv_chart_type_t;
+
 typedef struct
 {
     lv_coord_t * points;
@@ -44,13 +56,13 @@ typedef struct
 {
     /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
-    lv_ll_t series_ll;       /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
-    lv_coord_t ymin;          /*y min value (used to scale the data)*/
-    lv_coord_t ymax;          /*y max value (used to scale the data)*/
-    uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
-    uint8_t vdiv_cnt;     /*Number of vertical division lines*/
-    uint16_t point_cnt;   /*Point number in a data line*/
-    uint8_t type    :4;   /*Line, column or point chart (from 'lv_chart_type_t')*/
+    lv_ll_t series_ll;      /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
+    lv_coord_t ymin;        /*y min value (used to scale the data)*/
+    lv_coord_t ymax;        /*y max value (used to scale the data)*/
+    uint8_t hdiv_cnt;       /*Number of horizontal division lines*/
+    uint8_t vdiv_cnt;       /*Number of vertical division lines*/
+    uint16_t point_cnt;     /*Point number in a data line*/
+    lv_chart_type_t type;   /*Line, column or point chart (from 'lv_chart_type_t')*/
     struct {
         lv_coord_t width;  /*Line width or point radius*/
         uint8_t num;       /*Number of data lines in dl_ll*/
@@ -59,15 +71,6 @@ typedef struct
     } series;
 } lv_chart_ext_t;
 
-/*Chart types*/
-enum
-{
-    LV_CHART_TYPE_LINE = 0x01,              /*Connect the points with lines*/
-    LV_CHART_TYPE_COLUMN = 0x02,            /*Draw columns*/
-    LV_CHART_TYPE_POINT = 0x04,             /*Draw circles on the points*/
-    LV_CHART_TYPE_VERTICAL_LINE = 0x08,     /*Draw vertical lines on points (useful when chart width == point count)*/
-};
-typedef uint8_t lv_chart_type_t;
 
 
 /**********************

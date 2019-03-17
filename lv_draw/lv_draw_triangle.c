@@ -33,14 +33,14 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-#if LV_USE_TRIANGLE != 0
 /**
  *
  * @param points pointer to an array with 3 points
  * @param mask the triangle will be drawn only in this mask
  * @param color color of the triangle
+ * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_color_t color)
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_color_t color, lv_opa_t opa_scale)
 {
     lv_point_t tri[3];
 
@@ -138,14 +138,12 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
         } while(edge2.y == y2_tmp);
     }
 }
-#endif
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 
-#if LV_USE_TRIANGLE != 0
 /**
  * Swap two points
  * p1 pointer to the first point
@@ -164,5 +162,3 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2)
     p2->y = tmp.y;
 
 }
-
-#endif
