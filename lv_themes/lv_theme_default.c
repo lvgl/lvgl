@@ -61,7 +61,7 @@ static void basic_init(void)
 
     lv_style_copy(&plain_bordered, &lv_style_plain);
     plain_bordered.body.border.width = 2;
-    plain_bordered.body.border.color = LV_COLOR_HEX3(0xbbb);
+    plain_bordered.body.border.color = lv_color_hex3(0xbbb);
 
     theme.style.bg = &lv_style_plain;
     theme.style.panel = &lv_style_pretty;
@@ -87,9 +87,9 @@ static void label_init(void)
     lv_style_copy(&label_sec, &lv_style_plain);
     lv_style_copy(&label_hint, &lv_style_plain);
 
-    label_prim.text.color = LV_COLOR_HEX3(0x111);
-    label_sec.text.color = LV_COLOR_HEX3(0x888);
-    label_hint.text.color = LV_COLOR_HEX3(0xaaa);
+    label_prim.text.color = lv_color_hex3(0x111);
+    label_sec.text.color = lv_color_hex3(0x888);
+    label_hint.text.color = lv_color_hex3(0xaaa);
 
 
     theme.style.label.prim = &label_prim;
@@ -180,7 +180,7 @@ static void lmeter_init(void)
 #if LV_USE_LMETER != 0
 
     lv_style_copy(&lmeter, &lv_style_pretty_color);
-    lmeter.line.color = LV_COLOR_HEX3(0xddd);
+    lmeter.line.color = lv_color_hex3(0xddd);
     lmeter.line.width = 2;
     lmeter.body.main_color = lv_color_mix(lmeter.body.main_color, LV_COLOR_WHITE, LV_OPA_50);
     lmeter.body.grad_color = lv_color_mix(lmeter.body.grad_color, LV_COLOR_BLACK, LV_OPA_50);
@@ -196,9 +196,9 @@ static void gauge_init(void)
     lv_style_copy(&gauge, &lmeter);
     gauge.line.color = lmeter.body.grad_color;
     gauge.line.width = 2;
-    gauge.body.main_color = LV_COLOR_HEX3(0x888);
+    gauge.body.main_color = lv_color_hex3(0x888);
     gauge.body.grad_color = lmeter.body.main_color;
-    gauge.text.color = LV_COLOR_HEX3(0x888);
+    gauge.text.color = lv_color_hex3(0x888);
 
     theme.style.gauge = &gauge;
 #endif

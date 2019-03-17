@@ -57,7 +57,7 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
         r = v;
         g = v;
         b = v;
-        return LV_COLOR_MAKE(v, v, v);
+        return lv_color_make(v, v, v);
     }
 
     region = h / 43;
@@ -100,7 +100,7 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
             break;
     }
 
-    lv_color_t result = LV_COLOR_MAKE(r, g, b);
+    lv_color_t result = lv_color_make(r, g, b);
     return result;
 }
 
