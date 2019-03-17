@@ -26,18 +26,15 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-/*Experimental use for 3D modeling*/
-#define LV_USE_TRIANGLE 1
 
-#if LV_USE_TRIANGLE != 0
 /**
  *
  * @param points pointer to an array with 3 points
  * @param mask the triangle will be drawn only in this mask
  * @param color color of the triangle
+ * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_color_t color);
-#endif
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_color_t color, lv_opa_t opa_scale);
 
 /**********************
  *      MACROS
