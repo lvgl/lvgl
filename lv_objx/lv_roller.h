@@ -126,6 +126,19 @@ void lv_roller_set_style(lv_obj_t *roller, lv_roller_style_t type, lv_style_t *s
 /*=====================
  * Getter functions
  *====================*/
+/**
+ * Get the id of the selected option
+ * @param roller pointer to a roller object
+ * @return id of the selected option (0 ... number of option - 1);
+ */
+uint16_t lv_roller_get_selected(const lv_obj_t *roller);
+
+/**
+ * Get the current selected option as a string
+ * @param roller pointer to roller object
+ * @param buf pointer to an array to store the string
+ */
+void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf);
 
 /**
  * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
