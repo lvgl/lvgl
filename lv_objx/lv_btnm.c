@@ -1091,6 +1091,8 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
 
 static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx)
 {
+    if(btn_idx == LV_BTNM_BTN_NONE) return;
+
     lv_area_t btn_area;
     lv_area_t btnm_area;
 
