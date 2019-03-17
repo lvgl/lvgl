@@ -66,6 +66,7 @@ enum
     LV_CHART_TYPE_COLUMN = 0x02,            /*Draw columns*/
     LV_CHART_TYPE_POINT = 0x04,             /*Draw circles on the points*/
     LV_CHART_TYPE_VERTICAL_LINE = 0x08,     /*Draw vertical lines on points (useful when chart width == point count)*/
+    LV_CHART_TYPE_AREA = 0x10,              /*Draw area chart*/
 };
 typedef uint8_t lv_chart_type_t;
 
