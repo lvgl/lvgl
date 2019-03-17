@@ -364,9 +364,7 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
     return (uint16_t) bright >> 3;
 }
 
-/* The most simple macro to create a color from R,G and B values
- * The order of bit field is different on Big-endian and Little-endian machines*/
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+/* The most simple macro to create a color from R,G and B values */
 #if LV_COLOR_DEPTH == 1
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){(b8 >> 7 | g8 >> 7 | r8 >> 7)})
 static inline lv_color_t lv_color_make(int r8, int g8, int b8){
@@ -378,9 +376,9 @@ static inline lv_color_t lv_color_make(int r8, int g8, int b8){
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8 >> 6, g8 >> 5, r8 >> 5}})
 static inline lv_color_t lv_color_make(uint8_t r8, int g8, int b8){
     lv_color_t color;
-    color.blue  = b8 >> 6;
-    color.green = g8 >> 5;
-    color.red   = r8 >> 5;
+    color.ch.blue  = b8 >> 6;
+    color.ch.green = g8 >> 5;
+    color.ch.red   = r8 >> 5;
     return color;
 }
 #elif LV_COLOR_DEPTH == 16
@@ -388,19 +386,19 @@ static inline lv_color_t lv_color_make(uint8_t r8, int g8, int b8){
 #    define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8 >> 3, g8 >> 2, r8 >> 3}})
 static inline lv_color_t lv_color_make(uint8_t r8, uint8_t g8, uint8_t b8){
     lv_color_t color;
-    color.blue  = (uint16_t)(b8 >> 3);
-    color.green = (uint16_t)(g8 >> 2);
-    color.red   = (uint16_t)(r8 >> 3);
+    color.ch.blue  = (uint16_t)(b8 >> 3);
+    color.ch.green = (uint16_t)(g8 >> 2);
+    color.ch.red   = (uint16_t)(r8 >> 3);
     return color;
 }
 #  else
 #    define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{g8 >> 5, r8 >> 3, b8 >> 3, (g8 >> 2) & 0x7}})
 static inline lv_color_t lv_color_make(uint8_t r8, uint8_t g8, uint8_t b8){
     lv_color_t color;
-    color.green_h   = (uint16_t)(g8 >> 5);
-    color.red       = (uint16_t)(r8 >> 3);
-    color.blue      = (uint16_t)(b8 >> 3);
-    color.green_l   = (uint16_t)((g8 >> 2) & 0x7);
+    color.ch.green_h   = (uint16_t)(g8 >> 5);
+    color.ch.red       = (uint16_t)(r8 >> 3);
+    color.ch.blue      = (uint16_t)(b8 >> 3);
+    color.ch.green_l   = (uint16_t)((g8 >> 2) & 0x7);
     return color;
 }
 #  endif
@@ -408,34 +406,13 @@ static inline lv_color_t lv_color_make(uint8_t r8, uint8_t g8, uint8_t b8){
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8, g8, r8, 0xff}})            /*Fix 0xff alpha*/
 static inline lv_color_t lv_color_make(uint8_t r8, uint8_t g8, uint8_t b8){
     lv_color_t color;
-    color.blue  = b8;
-    color.green = g8;
-    color.red   = r8;
-    color.alpha = 0xff;
+    color.ch.blue  = b8;
+    color.ch.green = g8;
+    color.ch.red   = r8;
+    color.ch.alpha = 0xff;
     return color;
 }
 #endif
-#else
-#if LV_COLOR_DEPTH == 1
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){(r8 >> 7 | g8 >> 7 | b8 >> 7)})
-#elif LV_COLOR_DEPTH == 8
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{r8 >> 6, g8 >> 5, b8 >> 5}})
-#elif LV_COLOR_DEPTH == 16
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{r8 >> 3, g8 >> 2, b8 >> 3}})
-#elif LV_COLOR_DEPTH == 32
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{0xff, r8, g8, b8}})            /*Fix 0xff alpha*/
-#endif
-#endif
-
-
-#define LV_COLOR_HEX(c) LV_COLOR_MAKE((uint8_t) ((uint32_t)((uint32_t)c >> 16) & 0xFF), \
-                                (uint8_t) ((uint32_t)((uint32_t)c >> 8) & 0xFF), \
-                                (uint8_t) ((uint32_t) c & 0xFF))
-
-/*Usage LV_COLOR_HEX3(0x16C) which means LV_COLOR_HEX(0x1166CC)*/
-#define LV_COLOR_HEX3(c) LV_COLOR_MAKE((uint8_t) (((c >> 4) & 0xF0) | ((c >> 8) & 0xF)),   \
-                                (uint8_t) ((uint32_t)(c & 0xF0)     | ((c & 0xF0) >> 4)), \
-                                (uint8_t) ((uint32_t)(c & 0xF)      | ((c & 0xF) << 4)))
 
 static inline lv_color_t lv_color_hex(uint32_t c) {
     return lv_color_make((uint8_t) ((c >> 16) & 0xFF),
@@ -448,7 +425,6 @@ static inline lv_color_t lv_color_hex3(uint32_t c) {
                          (uint8_t) ((c & 0xF0)        | ((c & 0xF0) >> 4)),
                          (uint8_t) ((c & 0xF)         | ((c & 0xF) << 4)));
 }
-
 
 /**
  * Convert a HSV color to RGB

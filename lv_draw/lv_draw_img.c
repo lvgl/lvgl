@@ -439,7 +439,7 @@ static const uint8_t * lv_img_decoder_open(const void * src, const lv_style_t * 
 
         uint32_t i;
         for(i = 0; i < palette_size; i++) {
-            decoder_index_map[i] = LV_COLOR_MAKE(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
+            decoder_index_map[i] = lv_color_make(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
         }
         return NULL;
 #else
