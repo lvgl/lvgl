@@ -184,4 +184,8 @@ static void mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color)
 
 #endif  /*LV_USE_GPU*/
 
+#else /* Enable this file at the top */
+
+/* This dummy typedef exists purely to silence -Wpedantic. */
+typedef int keep_pedantic_happy;
 #endif

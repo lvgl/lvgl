@@ -39,7 +39,7 @@ typedef union {
     struct {
         MEM_UNIT used: 1;       //1: if the entry is used
         MEM_UNIT d_size: 31;    //Size off the data (1 means 4 bytes)
-    };
+    } s;
     MEM_UNIT header;            //The header (used + d_size)
 } lv_mem_header_t;
 
@@ -92,9 +92,9 @@ void lv_mem_init(void)
 #endif
 
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
-    full->header.used = 0;
+    full->header.s.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */
-    full->header.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
+    full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
 #endif
 }
 
@@ -147,8 +147,8 @@ void * lv_mem_alloc(uint32_t size)
     /*Allocate a header too to store the size*/
     alloc = LV_MEM_CUSTOM_ALLOC(size + sizeof(lv_mem_header_t));
     if(alloc != NULL) {
-        ((lv_mem_ent_t *) alloc)->header.d_size = size;
-        ((lv_mem_ent_t *) alloc)->header.used = 1;
+        ((lv_mem_ent_t *) alloc)->header.s.d_size = size;
+        ((lv_mem_ent_t *) alloc)->header.s.used = 1;
         alloc = &((lv_mem_ent_t *) alloc)->first_data;
     }
 #endif /* LV_ENABLE_GC */
@@ -180,7 +180,7 @@ void lv_mem_free(const void * data)
 #if LV_ENABLE_GC==0
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data - sizeof(lv_mem_header_t));
-    e->header.used = 0;
+    e->header.s.used = 0;
 #endif
 
 #if LV_MEM_CUSTOM == 0
@@ -190,8 +190,8 @@ void lv_mem_free(const void * data)
     lv_mem_ent_t * e_next;
     e_next = ent_get_next(e);
     while(e_next != NULL) {
-        if(e_next->header.used == 0) {
-            e->header.d_size += e_next->header.d_size + sizeof(e->header);
+        if(e_next->header.s.used == 0) {
+            e->header.s.d_size += e_next->header.s.d_size + sizeof(e->header);
         } else {
             break;
         }
@@ -222,7 +222,7 @@ void * lv_mem_realloc(void * data_p, uint32_t new_size)
     /*data_p could be previously freed pointer (in this case it is invalid)*/
     if(data_p != NULL) {
         lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data_p - sizeof(lv_mem_header_t));
-        if(e->header.used == 0) {
+        if(e->header.s.used == 0) {
             data_p = NULL;
         }
     }
@@ -281,7 +281,7 @@ void lv_mem_defrag(void)
     while(1) {
         /*Search the next free entry*/
         while(e_free != NULL) {
-            if(e_free->header.used != 0) {
+            if(e_free->header.s.used != 0) {
                 e_free = ent_get_next(e_free);
             } else {
                 break;
@@ -293,8 +293,8 @@ void lv_mem_defrag(void)
         /*Joint the following free entries to the free*/
         e_next = ent_get_next(e_free);
         while(e_next != NULL) {
-            if(e_next->header.used == 0) {
-                e_free->header.d_size += e_next->header.d_size + sizeof(e_next->header);
+            if(e_next->header.s.used == 0) {
+                e_free->header.s.d_size += e_next->header.s.d_size + sizeof(e_next->header);
             } else {
                 break;
             }
@@ -326,11 +326,11 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     e = ent_get_next(e);
 
     while(e != NULL)  {
-        if(e->header.used == 0) {
+        if(e->header.s.used == 0) {
             mon_p->free_cnt++;
-            mon_p->free_size += e->header.d_size;
-            if(e->header.d_size > mon_p->free_biggest_size) {
-                mon_p->free_biggest_size = e->header.d_size;
+            mon_p->free_size += e->header.s.d_size;
+            if(e->header.s.d_size > mon_p->free_biggest_size) {
+                mon_p->free_biggest_size = e->header.s.d_size;
             }
         } else {
             mon_p->used_cnt++;
@@ -360,7 +360,7 @@ uint32_t lv_mem_get_size(const void * data)
 
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *) data - sizeof(lv_mem_header_t));
 
-    return e->header.d_size;
+    return e->header.s.d_size;
 }
 
 #else /* LV_ENABLE_GC */
@@ -390,7 +390,7 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
         next_e = (lv_mem_ent_t *) work_mem;
     } else { /*Get the next entry */
         uint8_t * data = &act_e->first_data;
-        next_e = (lv_mem_ent_t *)&data[act_e->header.d_size];
+        next_e = (lv_mem_ent_t *)&data[act_e->header.s.d_size];
 
         if(&next_e->first_data >= &work_mem[LV_MEM_SIZE]) next_e = NULL;
     }
@@ -410,11 +410,11 @@ static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
     void * alloc = NULL;
 
     /*If the memory is free and big enough then use it */
-    if(e->header.used == 0 && e->header.d_size >= size) {
+    if(e->header.s.used == 0 && e->header.s.d_size >= size) {
         /*Truncate the entry to the desired size */
         ent_trunc(e, size),
 
-                  e->header.used = 1;
+                  e->header.s.used = 1;
 
         /*Save the allocated data*/
         alloc = &e->first_data;
@@ -445,20 +445,20 @@ static void ent_trunc(lv_mem_ent_t * e, uint32_t size)
 #endif
 
     /*Don't let empty space only for a header without data*/
-    if(e->header.d_size == size + sizeof(lv_mem_header_t)) {
-        size = e->header.d_size;
+    if(e->header.s.d_size == size + sizeof(lv_mem_header_t)) {
+        size = e->header.s.d_size;
     }
 
     /* Create the new entry after the current if there is space for it */
-    if(e->header.d_size != size) {
+    if(e->header.s.d_size != size) {
         uint8_t * e_data = &e->first_data;
         lv_mem_ent_t * after_new_e = (lv_mem_ent_t *)&e_data[size];
-        after_new_e->header.used = 0;
-        after_new_e->header.d_size = e->header.d_size - size - sizeof(lv_mem_header_t);
+        after_new_e->header.s.used = 0;
+        after_new_e->header.s.d_size = e->header.s.d_size - size - sizeof(lv_mem_header_t);
     }
 
     /* Set the new size for the original entry */
-    e->header.d_size = size;
+    e->header.s.d_size = size;
 }
 
 #endif
