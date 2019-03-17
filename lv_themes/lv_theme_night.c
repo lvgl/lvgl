@@ -105,7 +105,7 @@ static void btn_init(void)
     lv_style_copy(&btn_rel, &def);
     btn_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 40);
     btn_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
-    btn_rel.body.border.color = LV_COLOR_HEX3(0x111);
+    btn_rel.body.border.color = lv_color_hex3(0x111);
     btn_rel.body.border.width = 1;
     btn_rel.body.border.opa = LV_OPA_70;
     btn_rel.body.padding.left = LV_DPI / 4;
@@ -113,10 +113,10 @@ static void btn_init(void)
     btn_rel.body.padding.top = LV_DPI / 8;
     btn_rel.body.padding.bottom = LV_DPI / 8;
     btn_rel.body.shadow.type = LV_SHADOW_BOTTOM;
-    btn_rel.body.shadow.color = LV_COLOR_HEX3(0x111);
+    btn_rel.body.shadow.color = lv_color_hex3(0x111);
     btn_rel.body.shadow.width = LV_DPI / 30;
-    btn_rel.text.color = LV_COLOR_HEX3(0xeee);
-    btn_rel.image.color  = LV_COLOR_HEX3(0xeee);
+    btn_rel.text.color = lv_color_hex3(0xeee);
+    btn_rel.image.color  = lv_color_hex3(0xeee);
 
     lv_style_copy(&btn_pr, &btn_rel);
     btn_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 30);
@@ -126,22 +126,22 @@ static void btn_init(void)
     btn_tgl_rel.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     btn_tgl_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 40);
     btn_tgl_rel.body.shadow.width = LV_DPI / 40;
-    btn_tgl_rel.text.color = LV_COLOR_HEX3(0xddd);
-    btn_tgl_rel.image.color = LV_COLOR_HEX3(0xddd);
+    btn_tgl_rel.text.color = lv_color_hex3(0xddd);
+    btn_tgl_rel.image.color = lv_color_hex3(0xddd);
 
     lv_style_copy(&btn_tgl_pr, &btn_rel);
     btn_tgl_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     btn_tgl_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 30);
     btn_tgl_pr.body.shadow.width = LV_DPI / 30;
-    btn_tgl_pr.text.color = LV_COLOR_HEX3(0xddd);
-    btn_tgl_pr.image.color = LV_COLOR_HEX3(0xddd);
+    btn_tgl_pr.text.color = lv_color_hex3(0xddd);
+    btn_tgl_pr.image.color = lv_color_hex3(0xddd);
 
     lv_style_copy(&btn_ina, &btn_rel);
     btn_ina.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     btn_ina.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     btn_ina.body.shadow.width = 0;
-    btn_ina.text.color = LV_COLOR_HEX3(0xaaa);
-    btn_ina.image.color = LV_COLOR_HEX3(0xaaa);
+    btn_ina.text.color = lv_color_hex3(0xaaa);
+    btn_ina.image.color = lv_color_hex3(0xaaa);
 
     theme.style.btn.rel = &btn_rel;
     theme.style.btn.pr = &btn_pr;
@@ -269,10 +269,10 @@ static void lmeter_init(void)
     lmeter_bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 95, 90);
     lmeter_bg.body.padding.left = LV_DPI / 10;           /*Scale line length*/
     lmeter_bg.body.padding.inner = LV_DPI / 10;         /*Text padding*/
-    lmeter_bg.body.border.color = LV_COLOR_HEX3(0x333);
-    lmeter_bg.line.color = LV_COLOR_HEX3(0x555);
+    lmeter_bg.body.border.color = lv_color_hex3(0x333);
+    lmeter_bg.line.color = lv_color_hex3(0x555);
     lmeter_bg.line.width = 1;
-    lmeter_bg.text.color = LV_COLOR_HEX3(0xddd);
+    lmeter_bg.text.color = lv_color_hex3(0xddd);
 
     theme.style.lmeter = &lmeter_bg;
 #endif
@@ -287,7 +287,7 @@ static void gauge_init(void)
     gauge_bg.body.grad_color = gauge_bg.body.main_color;
     gauge_bg.line.color = lv_color_hsv_to_rgb(_hue, 80, 75);
     gauge_bg.line.width = 1;
-    gauge_bg.text.color = LV_COLOR_HEX3(0xddd);
+    gauge_bg.text.color = lv_color_hex3(0xddd);
 
     theme.style.gauge = &gauge_bg;
 #endif
@@ -337,7 +337,7 @@ static void calendar_init(void)
     lv_style_copy(&cal_bg, &bg);
     cal_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 40);
     cal_bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 40);
-    cal_bg.body.border.color = LV_COLOR_HEX3(0x333);
+    cal_bg.body.border.color = lv_color_hex3(0x333);
     cal_bg.body.border.width = 1;
     cal_bg.body.radius = LV_DPI / 20;
     cal_bg.body.padding.left = LV_DPI / 10;
@@ -351,7 +351,7 @@ static void calendar_init(void)
     cal_header.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     cal_header.body.radius = 0;
     cal_header.body.border.width = 1;
-    cal_header.body.border.color = LV_COLOR_HEX3(0x333);
+    cal_header.body.border.color = lv_color_hex3(0x333);
     cal_header.body.padding.left = LV_DPI / 10;
     cal_header.body.padding.right = LV_DPI / 10;
     cal_header.body.padding.top = LV_DPI / 10;
@@ -427,8 +427,8 @@ static void cb_init(void)
     tgl_pr.body.border.width = 1;;
 
     lv_style_copy(&ina, &rel);
-    ina.body.main_color = LV_COLOR_HEX3(0x777);
-    ina.body.grad_color = LV_COLOR_HEX3(0x777);
+    ina.body.main_color = lv_color_hex3(0x777);
+    ina.body.grad_color = lv_color_hex3(0x777);
     ina.body.border.width = 0;
 
     theme.style.cb.bg = &lv_style_transp;
@@ -511,7 +511,7 @@ static void mbox_init(void)
     mbox_bg.body.border.color =  lv_color_hsv_to_rgb(_hue, 11, 20);
     mbox_bg.body.border.width = 1;
     mbox_bg.body.shadow.width = LV_DPI / 10;
-    mbox_bg.body.shadow.color = LV_COLOR_HEX3(0x222);
+    mbox_bg.body.shadow.color = lv_color_hex3(0x222);
     mbox_bg.body.radius = LV_DPI / 20;
     theme.style.mbox.bg = &mbox_bg;
     theme.style.mbox.btn.bg = &lv_style_transp;
@@ -528,7 +528,7 @@ static void page_init(void)
     lv_style_copy(&page_scrl, &bg);
     page_scrl.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 40);
     page_scrl.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 40);
-    page_scrl.body.border.color = LV_COLOR_HEX3(0x333);
+    page_scrl.body.border.color = lv_color_hex3(0x333);
     page_scrl.body.border.width = 1;
     page_scrl.body.radius = LV_DPI / 20;
 
@@ -697,7 +697,7 @@ static void win_init(void)
 #if LV_USE_WIN != 0
     static lv_style_t win_bg;
     lv_style_copy(&win_bg, &bg);
-    win_bg.body.border.color = LV_COLOR_HEX3(0x333);
+    win_bg.body.border.color = lv_color_hex3(0x333);
     win_bg.body.border.width = 1;
 
     static lv_style_t win_header;
@@ -714,8 +714,8 @@ static void win_init(void)
     lv_style_copy(&win_btn_pr, &def);
     win_btn_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 10);
     win_btn_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 10);
-    win_btn_pr.text.color = LV_COLOR_HEX3(0xaaa);
-    win_btn_pr.image.color = LV_COLOR_HEX3(0xaaa);
+    win_btn_pr.text.color = lv_color_hex3(0xaaa);
+    win_btn_pr.image.color = lv_color_hex3(0xaaa);
 
     theme.style.win.bg = &win_bg;
     theme.style.win.sb = &sb;

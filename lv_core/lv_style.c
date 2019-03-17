@@ -94,17 +94,17 @@ void lv_style_init(void)
     lv_style_scr.body.shadow.width = 0;
 
     lv_style_scr.text.opa = LV_OPA_COVER;
-    lv_style_scr.text.color = LV_COLOR_MAKE(0x30, 0x30, 0x30);
+    lv_style_scr.text.color = lv_color_make(0x30, 0x30, 0x30);
     lv_style_scr.text.font = LV_FONT_DEFAULT;
     lv_style_scr.text.letter_space = 2;
     lv_style_scr.text.line_space = 2;
 
     lv_style_scr.image.opa = LV_OPA_COVER;
-    lv_style_scr.image.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_scr.image.color = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = LV_OPA_TRANSP;
 
     lv_style_scr.line.opa = LV_OPA_COVER;
-    lv_style_scr.line.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_scr.line.color = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.line.width = 2;
     lv_style_scr.line.rounded = 0;
 
@@ -117,32 +117,32 @@ void lv_style_init(void)
 
     /*Plain color style*/
     memcpy(&lv_style_plain_color, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_plain_color.text.color = LV_COLOR_MAKE(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.image.color = LV_COLOR_MAKE(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.line.color = LV_COLOR_MAKE(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.body.main_color = LV_COLOR_MAKE(0x55, 0x96, 0xd8);
+    lv_style_plain_color.text.color = lv_color_make(0xf0, 0xf0, 0xf0);
+    lv_style_plain_color.image.color = lv_color_make(0xf0, 0xf0, 0xf0);
+    lv_style_plain_color.line.color = lv_color_make(0xf0, 0xf0, 0xf0);
+    lv_style_plain_color.body.main_color = lv_color_make(0x55, 0x96, 0xd8);
     lv_style_plain_color.body.grad_color = lv_style_plain_color.body.main_color;
 
     /*Pretty style */
     memcpy(&lv_style_pretty, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_pretty.text.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_pretty.image.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
-    lv_style_pretty.line.color = LV_COLOR_MAKE(0x20, 0x20, 0x20);
+    lv_style_pretty.text.color = lv_color_make(0x20, 0x20, 0x20);
+    lv_style_pretty.image.color = lv_color_make(0x20, 0x20, 0x20);
+    lv_style_pretty.line.color = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.body.main_color = LV_COLOR_WHITE;
     lv_style_pretty.body.grad_color = LV_COLOR_SILVER;
     lv_style_pretty.body.radius = LV_DPI / 15;
-    lv_style_pretty.body.border.color = LV_COLOR_MAKE(0x40, 0x40, 0x40);
+    lv_style_pretty.body.border.color = lv_color_make(0x40, 0x40, 0x40);
     lv_style_pretty.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
     lv_style_pretty.body.border.opa = LV_OPA_30;
 
     /*Pretty color style*/
     memcpy(&lv_style_pretty_color, &lv_style_pretty, sizeof(lv_style_t));
-    lv_style_pretty_color.text.color = LV_COLOR_MAKE(0xe0, 0xe0, 0xe0);
-    lv_style_pretty_color.image.color = LV_COLOR_MAKE(0xe0, 0xe0, 0xe0);
-    lv_style_pretty_color.line.color = LV_COLOR_MAKE(0xc0, 0xc0, 0xc0);
-    lv_style_pretty_color.body.main_color = LV_COLOR_MAKE(0x6b, 0x9a, 0xc7);
-    lv_style_pretty_color.body.grad_color = LV_COLOR_MAKE(0x2b, 0x59, 0x8b);
-    lv_style_pretty_color.body.border.color = LV_COLOR_MAKE(0x15, 0x2c, 0x42);
+    lv_style_pretty_color.text.color = lv_color_make(0xe0, 0xe0, 0xe0);
+    lv_style_pretty_color.image.color = lv_color_make(0xe0, 0xe0, 0xe0);
+    lv_style_pretty_color.line.color = lv_color_make(0xc0, 0xc0, 0xc0);
+    lv_style_pretty_color.body.main_color = lv_color_make(0x6b, 0x9a, 0xc7);
+    lv_style_pretty_color.body.grad_color = lv_color_make(0x2b, 0x59, 0x8b);
+    lv_style_pretty_color.body.border.color = lv_color_make(0x15, 0x2c, 0x42);
 
     /*Transparent style*/
     memcpy(&lv_style_transp, &lv_style_plain, sizeof(lv_style_t));
@@ -163,55 +163,55 @@ void lv_style_init(void)
 
     /*Button released style*/
     memcpy(&lv_style_btn_rel, &lv_style_plain, sizeof(lv_style_t));
-    lv_style_btn_rel.body.main_color = LV_COLOR_MAKE(0x76, 0xa2, 0xd0);
-    lv_style_btn_rel.body.grad_color = LV_COLOR_MAKE(0x19, 0x3a, 0x5d);
+    lv_style_btn_rel.body.main_color = lv_color_make(0x76, 0xa2, 0xd0);
+    lv_style_btn_rel.body.grad_color = lv_color_make(0x19, 0x3a, 0x5d);
     lv_style_btn_rel.body.radius = LV_DPI / 15;
     lv_style_btn_rel.body.padding.left= LV_DPI / 4;
     lv_style_btn_rel.body.padding.right = LV_DPI / 4;
     lv_style_btn_rel.body.padding.top = LV_DPI / 6;
     lv_style_btn_rel.body.padding.bottom = LV_DPI / 6;
     lv_style_btn_rel.body.padding.inner = LV_DPI / 10;
-    lv_style_btn_rel.body.border.color = LV_COLOR_MAKE(0x0b, 0x19, 0x28);
+    lv_style_btn_rel.body.border.color = lv_color_make(0x0b, 0x19, 0x28);
     lv_style_btn_rel.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50  : 1;
     lv_style_btn_rel.body.border.opa = LV_OPA_70;
     lv_style_btn_rel.body.shadow.color = LV_COLOR_GRAY;
     lv_style_btn_rel.body.shadow.width = 0;
-    lv_style_btn_rel.text.color = LV_COLOR_MAKE(0xff, 0xff, 0xff);
-    lv_style_btn_rel.image.color = LV_COLOR_MAKE(0xff, 0xff, 0xff);
+    lv_style_btn_rel.text.color = lv_color_make(0xff, 0xff, 0xff);
+    lv_style_btn_rel.image.color = lv_color_make(0xff, 0xff, 0xff);
 
     /*Button pressed style*/
     memcpy(&lv_style_btn_pr, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_btn_pr.body.main_color = LV_COLOR_MAKE(0x33, 0x62, 0x94);
-    lv_style_btn_pr.body.grad_color = LV_COLOR_MAKE(0x10, 0x26, 0x3c);
-    lv_style_btn_pr.text.color = LV_COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_btn_pr.image.color = LV_COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_btn_pr.line.color = LV_COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_pr.body.main_color = lv_color_make(0x33, 0x62, 0x94);
+    lv_style_btn_pr.body.grad_color = lv_color_make(0x10, 0x26, 0x3c);
+    lv_style_btn_pr.text.color = lv_color_make(0xa4, 0xb5, 0xc6);
+    lv_style_btn_pr.image.color = lv_color_make(0xa4, 0xb5, 0xc6);
+    lv_style_btn_pr.line.color = lv_color_make(0xa4, 0xb5, 0xc6);
 
     /*Button toggle released style*/
     memcpy(&lv_style_btn_tgl_rel, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_btn_tgl_rel.body.main_color = LV_COLOR_MAKE(0x0a, 0x11, 0x22);
-    lv_style_btn_tgl_rel.body.grad_color = LV_COLOR_MAKE(0x37, 0x62, 0x90);
-    lv_style_btn_tgl_rel.body.border.color = LV_COLOR_MAKE(0x01, 0x07, 0x0d);
-    lv_style_btn_tgl_rel.text.color = LV_COLOR_MAKE(0xc8, 0xdd, 0xf4);
-    lv_style_btn_tgl_rel.image.color = LV_COLOR_MAKE(0xc8, 0xdd, 0xf4);
-    lv_style_btn_tgl_rel.line.color = LV_COLOR_MAKE(0xc8, 0xdd, 0xf4);
+    lv_style_btn_tgl_rel.body.main_color = lv_color_make(0x0a, 0x11, 0x22);
+    lv_style_btn_tgl_rel.body.grad_color = lv_color_make(0x37, 0x62, 0x90);
+    lv_style_btn_tgl_rel.body.border.color = lv_color_make(0x01, 0x07, 0x0d);
+    lv_style_btn_tgl_rel.text.color = lv_color_make(0xc8, 0xdd, 0xf4);
+    lv_style_btn_tgl_rel.image.color = lv_color_make(0xc8, 0xdd, 0xf4);
+    lv_style_btn_tgl_rel.line.color = lv_color_make(0xc8, 0xdd, 0xf4);
 
     /*Button toggle pressed style*/
     memcpy(&lv_style_btn_tgl_pr, &lv_style_btn_tgl_rel, sizeof(lv_style_t));
-    lv_style_btn_tgl_pr.body.main_color = LV_COLOR_MAKE(0x02, 0x14, 0x27);
-    lv_style_btn_tgl_pr.body.grad_color = LV_COLOR_MAKE(0x2b, 0x4c, 0x70);
-    lv_style_btn_tgl_pr.text.color = LV_COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_btn_tgl_pr.image.color = LV_COLOR_MAKE(0xa4, 0xb5, 0xc6);
-    lv_style_btn_tgl_pr.line.color = LV_COLOR_MAKE(0xa4, 0xb5, 0xc6);
+    lv_style_btn_tgl_pr.body.main_color = lv_color_make(0x02, 0x14, 0x27);
+    lv_style_btn_tgl_pr.body.grad_color = lv_color_make(0x2b, 0x4c, 0x70);
+    lv_style_btn_tgl_pr.text.color = lv_color_make(0xa4, 0xb5, 0xc6);
+    lv_style_btn_tgl_pr.image.color = lv_color_make(0xa4, 0xb5, 0xc6);
+    lv_style_btn_tgl_pr.line.color = lv_color_make(0xa4, 0xb5, 0xc6);
 
     /*Button inactive style*/
     memcpy(&lv_style_btn_ina, &lv_style_btn_rel, sizeof(lv_style_t));
-    lv_style_btn_ina.body.main_color = LV_COLOR_MAKE(0xd8, 0xd8, 0xd8);
-    lv_style_btn_ina.body.grad_color = LV_COLOR_MAKE(0xd8, 0xd8, 0xd8);
-    lv_style_btn_ina.body.border.color = LV_COLOR_MAKE(0x90, 0x90, 0x90);
-    lv_style_btn_ina.text.color = LV_COLOR_MAKE(0x70, 0x70, 0x70);
-    lv_style_btn_ina.image.color = LV_COLOR_MAKE(0x70, 0x70, 0x70);
-    lv_style_btn_ina.line.color = LV_COLOR_MAKE(0x70, 0x70, 0x70);
+    lv_style_btn_ina.body.main_color = lv_color_make(0xd8, 0xd8, 0xd8);
+    lv_style_btn_ina.body.grad_color = lv_color_make(0xd8, 0xd8, 0xd8);
+    lv_style_btn_ina.body.border.color = lv_color_make(0x90, 0x90, 0x90);
+    lv_style_btn_ina.text.color = lv_color_make(0x70, 0x70, 0x70);
+    lv_style_btn_ina.image.color = lv_color_make(0x70, 0x70, 0x70);
+    lv_style_btn_ina.line.color = lv_color_make(0x70, 0x70, 0x70);
 }
 
 
