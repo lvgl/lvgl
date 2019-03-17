@@ -63,14 +63,14 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
 /**
  * Get the number of areas in the buffer
  * @return number of invalid areas
- */
 uint16_t lv_refr_get_buf_size(void);
+ */
 
 /**
  * Pop (delete) the last 'num' invalidated areas from the buffer
  * @param num number of areas to delete
- */
 void lv_refr_pop_from_buf(uint16_t num);
+ */
 
 /**
  * Get the display which is being refreshed
