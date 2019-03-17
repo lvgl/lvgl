@@ -330,7 +330,7 @@
  *  LV_OBJ SETTINGS
  *==================*/
 #ifndef LV_OBJ_REALIGN
-#define LV_OBJ_REALIGN          0           /*Enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+#define LV_OBJ_REALIGN          0           /*Enable `lv_obj_realign()` based on `lv_obj_align()` parameters*/
 #endif
 
 /*==================
@@ -569,6 +569,9 @@
 #if LV_USE_ROLLER != 0
 #ifndef LV_ROLLER_ANIM_TIME
 #  define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
+#endif
+#ifndef LV_ROLLER_INF_PAGES
+#  define LV_ROLLER_INF_PAGES     7       /*With inifinite rollers the options are added multiple times (on select positioned back to the center)*/
 #endif
 #endif
 

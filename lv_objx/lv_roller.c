@@ -25,6 +25,7 @@
 #  define LV_ROLLER_ANIM_TIME       0           /*No animation*/
 #endif
 
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -36,6 +37,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
 static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t * roller, bool anim_en);
+static void inf_normalize(void * roller_scrl);
 static void draw_bg(lv_obj_t * roller, const lv_area_t * mask);
 
 /**********************
@@ -105,6 +107,9 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing roller*/
     else {
+        lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        ext->inf = copy_ext->inf;
+
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_ddlist_open(new_roller, false);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
@@ -123,6 +128,39 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set the options on a roller
+ * @param roller pointer to roller object
+ * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ */
+void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf)
+{
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+
+    if(inf== false) {
+        ext->inf = 0;
+        lv_ddlist_set_options(roller, options);
+    } else {
+        ext->inf = 1;
+
+        uint32_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
+        char * opt_extra = lv_mem_alloc(opt_len * LV_ROLLER_INF_PAGES);
+        uint8_t i;
+        for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {
+            strcpy(&opt_extra[opt_len * i], options);
+            opt_extra[opt_len * (i + 1) - 1] = '\n';
+        }
+        opt_extra[opt_len * LV_ROLLER_INF_PAGES - 1] = '\0';
+        lv_ddlist_set_options(roller, opt_extra);
+        lv_mem_free(opt_extra);
+
+        uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
+        ext->ddlist.sel_opt_id = ((LV_ROLLER_INF_PAGES / 2) + 1) * real_id_cnt;             /*Select the middle page*/
+
+    }
+
+}
 
 /**
  * Set the align of the roller's options (left or center)
@@ -189,6 +227,32 @@ void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, lv_style_t *
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the id of the selected option
+ * @param roller pointer to a roller object
+ * @return id of the selected option (0 ... number of option - 1);
+ */
+uint16_t lv_roller_get_selected(const lv_obj_t *roller)
+{
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    if(ext->inf) {
+        uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
+        return lv_ddlist_get_selected(roller) % real_id_cnt;
+    } else {
+        return lv_ddlist_get_selected(roller);
+    }
+}
+
+/**
+ * Get the current selected option as a string
+ * @param roller pointer to roller object
+ * @param buf pointer to an array to store the string
+ */
+void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf)
+{
+    lv_ddlist_get_selected_str(roller, buf);
+}
 
 /**
  * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
@@ -448,9 +512,12 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         lv_coord_t label_unit = font_h + style_label->text.line_space;
         lv_coord_t mid = (roller->coords.y2 - roller->coords.y1) / 2;
         id = (mid - label_y1 + style_label->text.line_space / 2) / label_unit;
+
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
+
         ext->ddlist.sel_opt_id = id;
+        ext->ddlist.sel_opt_id_ori = id;
         res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
         if(res != LV_RES_OK) return res;
     } else if(sign == LV_SIGNAL_RELEASED) {
@@ -553,6 +620,13 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
     const lv_font_t * font = style_label->text.font;
     lv_coord_t font_h = lv_font_get_height(font);
     lv_coord_t h = lv_obj_get_height(roller);
+
+    /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
+     * But without animations do it manually*/
+    if(anim_en == false || ext->ddlist.anim_time == 0) {
+        inf_normalize(roller_scrl);
+    }
+
     int32_t id = ext->ddlist.sel_opt_id;
     lv_coord_t line_y1 = id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
     lv_coord_t new_y = - line_y1 + (h - font_h) / 2;
@@ -567,7 +641,7 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
         a.end = new_y;
         a.fp = (lv_anim_fp_t)lv_obj_set_y;
         a.path = lv_anim_path_linear;
-        a.end_cb = NULL;
+        a.end_cb = inf_normalize;
         a.act_time = 0;
         a.time = ext->ddlist.anim_time;
         a.playback = 0;
@@ -576,6 +650,37 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
         a.repeat_pause = 0;
         lv_anim_create(&a);
 #endif
+    }
+}
+
+/**
+ * Set the middle page for the roller if inifinte is enabled
+ * @param roller_scrl pointer to the roller's scrollable
+ */
+static void inf_normalize(void * roller_scrl)
+{
+    lv_obj_t * roller = lv_obj_get_parent(roller_scrl);
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+
+    if(ext->inf) {
+        uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
+
+        ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id % real_id_cnt;
+
+        ext->ddlist.sel_opt_id += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt;             /*Select the middle page*/
+        ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
+
+        /*Move to the new id*/
+        lv_obj_t * roller_scrl = lv_page_get_scrl(roller);
+        lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+        lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
+        const lv_font_t * font = style_label->text.font;
+        lv_coord_t font_h = lv_font_get_height(font);
+        lv_coord_t h = lv_obj_get_height(roller);
+
+        lv_coord_t line_y1 = ext->ddlist.sel_opt_id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
+        lv_coord_t new_y = - line_y1 + (h - font_h) / 2;
+        lv_obj_set_y(roller_scrl, new_y);
     }
 }
 

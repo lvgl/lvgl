@@ -334,6 +334,7 @@ typedef void * lv_obj_user_data_t;          /*Declare the type of the user data 
 #define LV_USE_ROLLER    1
 #if LV_USE_ROLLER != 0
 #  define LV_ROLLER_ANIM_TIME     200     /*Focus animation time [ms] (0: no animation)*/
+#  define LV_ROLLER_INF_PAGES     7       /*With inifinite rollers the options are added multiple times (on select positioned back to the center)*/
 #endif
 
 /*Slider (dependencies: lv_bar)*/

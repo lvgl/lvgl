@@ -41,6 +41,7 @@ extern "C" {
 typedef struct {
     lv_ddlist_ext_t ddlist; /*Ext. of ancestor*/
     /*New data for this type */
+    uint8_t inf :1;         /*Infinite*/
 } lv_roller_ext_t;
 
 enum {
@@ -66,21 +67,18 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
+ * Set the options on a roller
+ * @param roller pointer to roller object
+ * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ */
+void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf);
+
+/**
  * Set the align of the roller's options (left, right or center[default])
  * @param roller - pointer to a roller object
  * @param align - one of lv_label_align_t values (left, right, center)
  */
 void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align);
-
-/**
- * Set the options on a roller
- * @param roller pointer to roller object
- * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
- */
-static inline void lv_roller_set_options(lv_obj_t * roller, const char * options)
-{
-    lv_ddlist_set_options(roller, options);
-}
 
 /**
  * Set the selected option
@@ -144,26 +142,6 @@ lv_label_align_t lv_roller_get_align(const lv_obj_t * roller);
 static inline const char * lv_roller_get_options(const lv_obj_t *roller)
 {
     return lv_ddlist_get_options(roller);
-}
-
-/**
- * Get the id of the selected option
- * @param roller pointer to a roller object
- * @return id of the selected option (0 ... number of option - 1);
- */
-static inline uint16_t lv_roller_get_selected(const lv_obj_t *roller)
-{
-    return lv_ddlist_get_selected(roller);
-}
-
-/**
- * Get the current selected option as a string
- * @param roller pointer to roller object
- * @param buf pointer to an array to store the string
- */
-static inline void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf)
-{
-    lv_ddlist_get_selected_str(roller, buf);
 }
 
 /**

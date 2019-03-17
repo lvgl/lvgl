@@ -170,6 +170,8 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options)
         if(options[i] == '\n') ext->option_cnt++;
     }
     ext->option_cnt++;     /*Last option in the at row*/
+    ext->sel_opt_id = 0;
+    ext->sel_opt_id_ori = 0;
 
     lv_label_set_text(ext->label, options);
     lv_ddlist_refr_size(ddlist, false);
