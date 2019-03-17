@@ -198,7 +198,7 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
 }
 
 /**
- * Get the last key of an input device (for LV_INDEV_TYPE_KEYPAD)
+ * Get the last pressed key of an input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device
  * @return the last pressed key (0 on error)
  */
@@ -386,6 +386,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_obj_t * focused = lv_group_get_focused(g);
     if(focused == NULL) return;
 
+    /*Save the last key to compare it with the current latter on RELEASE*/
+    uint32_t prev_key = i->proc.types.keypad.last_key;
+
+    /* Save the last key.
+     * It must be done here else `lv_indev_get_key` will return the last key in events and signals*/
+    i->proc.types.keypad.last_key = data->key;
+
     /*Key press happened*/
     if(data->state == LV_INDEV_STATE_PR &&
             i->proc.types.keypad.last_state == LV_INDEV_STATE_REL)
@@ -468,7 +475,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_REL && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR)
     {
         /*The user might clear the key when it was released. Always release the pressed key*/
-        data->key = i->proc.types.keypad.last_key;
+        data->key = prev_key;
         if(data->key == LV_GROUP_KEY_ENTER) {
 
             focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
@@ -489,7 +496,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
 
     i->proc.types.keypad.last_state = data->state;
-    i->proc.types.keypad.last_key = data->key;
 #else
     (void)data; /*Unused*/
     (void)i; /*Unused*/

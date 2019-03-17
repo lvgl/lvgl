@@ -106,7 +106,7 @@ void lv_indev_set_feedback(lv_indev_t *indev, lv_indev_feedback_t feedback);
 void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point);
 
 /**
- * Get the last key of an input device (for LV_INDEV_TYPE_KEYPAD)
+ * Get the last pressed key of an input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device
  * @return the last pressed key (0 on error)
  */
