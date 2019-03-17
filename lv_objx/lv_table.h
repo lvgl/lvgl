@@ -47,7 +47,7 @@ typedef union {
         uint8_t right_merge:1;
         uint8_t type:2;
         uint8_t crop:1;
-    };
+    } s;
     uint8_t format_byte;
 }lv_table_cell_format_t;
 

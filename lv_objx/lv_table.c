@@ -144,10 +144,10 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     }
     /*Initialize the format byte*/
     else {
-        format.align = LV_LABEL_ALIGN_LEFT;
-        format.right_merge = 0;
-        format.type = 0;
-        format.crop = 0;
+        format.s.align = LV_LABEL_ALIGN_LEFT;
+        format.s.right_merge = 0;
+        format.s.type = 0;
+        format.s.crop = 0;
     }
 
 
@@ -262,7 +262,7 @@ void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_la
 
      lv_table_cell_format_t format;
      format.format_byte = ext->cell_data[cell][0];
-     format.align = align;
+     format.s.align = align;
      ext->cell_data[cell][0] = format.format_byte;
 }
 
@@ -293,7 +293,7 @@ void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_
 
      lv_table_cell_format_t format;
      format.format_byte = ext->cell_data[cell][0];
-     format.type = type;
+     format.s.type = type;
      ext->cell_data[cell][0] = format.format_byte;
 }
 
@@ -321,7 +321,7 @@ void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool c
 
      lv_table_cell_format_t format;
      format.format_byte = ext->cell_data[cell][0];
-     format.crop = crop;
+     format.s.crop = crop;
      ext->cell_data[cell][0] = format.format_byte;
 }
 
@@ -351,7 +351,7 @@ void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col,
 
     lv_table_cell_format_t format;
     format.format_byte = ext->cell_data[cell][0];
-    format.right_merge = en ? 1 : 0;
+    format.s.right_merge = en ? 1 : 0;
     ext->cell_data[cell][0] = format.format_byte;
     refr_size(table);
 }
@@ -474,7 +474,7 @@ lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_
      else {
          lv_table_cell_format_t format;
          format.format_byte = ext->cell_data[cell][0];
-         return format.align;
+         return format.s.align;
      }
 }
 
@@ -498,7 +498,7 @@ lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t
      else {
          lv_table_cell_format_t format;
          format.format_byte = ext->cell_data[cell][0];
-         return format.type + 1;        /*0,1,2,3 is stored but user sees 1,2,3,4*/
+         return format.s.type + 1;        /*0,1,2,3 is stored but user sees 1,2,3,4*/
      }
 }
 
@@ -522,7 +522,7 @@ lv_label_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t
      else {
          lv_table_cell_format_t format;
          format.format_byte = ext->cell_data[cell][0];
-         return format.crop;
+         return format.s.crop;
      }
 }
 
@@ -547,7 +547,7 @@ bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col)
     else {
         lv_table_cell_format_t format;
         format.format_byte = ext->cell_data[cell][0];
-        return format.right_merge ? true : false;
+        return format.s.right_merge ? true : false;
     }
 }
 
@@ -638,13 +638,13 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                 if(ext->cell_data[cell]) {
                     format.format_byte = ext->cell_data[cell][0];
                 } else {
-                    format.right_merge = 0;
-                    format.align = LV_LABEL_ALIGN_LEFT;
-                    format.type = 0;
-                    format.crop = 1;
+                    format.s.right_merge = 0;
+                    format.s.align = LV_LABEL_ALIGN_LEFT;
+                    format.s.type = 0;
+                    format.s.crop = 1;
                 }
 
-                cell_style = ext->cell_style[format.type];
+                cell_style = ext->cell_style[format.s.type];
                 cell_area.x1 = cell_area.x2;
                 cell_area.x2 = cell_area.x1 + ext->col_w[col];
 
@@ -653,7 +653,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
 
                     if(ext->cell_data[cell + col_merge] != NULL) {
                         format.format_byte = ext->cell_data[cell + col_merge][0];
-                        if(format.right_merge) cell_area.x2 += ext->col_w[col + col_merge + 1];
+                        if(format.s.right_merge) cell_area.x2 += ext->col_w[col + col_merge + 1];
                         else break;
                     } else {
                         break;
@@ -669,7 +669,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     txt_area.y1 = cell_area.y1 + cell_style->body.padding.top;
                     txt_area.y2 = cell_area.y2 - cell_style->body.padding.bottom;
                     /*Align the content to the middle if not cropped*/
-                    if(format.crop == 0) {
+                    if(format.s.crop == 0) {
                         txt_flags = LV_TXT_FLAG_NONE;
                     } else {
                         txt_flags = LV_TXT_FLAG_EXPAND;
@@ -679,12 +679,12 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                                               cell_style->text.letter_space, cell_style->text.line_space, lv_area_get_width(&txt_area), txt_flags);
 
                     /*Align the content to the middle if not cropped*/
-                    if(format.crop == 0) {
+                    if(format.s.crop == 0) {
                         txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
                         txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
                     }
 
-                    switch(format.align) {
+                    switch(format.s.align) {
                     default:
                     case LV_LABEL_ALIGN_LEFT:
                         txt_flags |= LV_TXT_FLAG_NONE;
@@ -822,7 +822,7 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
                 if(ext->cell_data[cell + col_merge] != NULL) {
                     lv_table_cell_format_t format;
                     format.format_byte = ext->cell_data[cell + col_merge][0];
-                    if(format.right_merge) txt_w += ext->col_w[col + col_merge + 1];
+                    if(format.s.right_merge) txt_w += ext->col_w[col + col_merge + 1];
                     else break;
                 } else {
                     break;
@@ -831,10 +831,10 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
 
             lv_table_cell_format_t format;
             format.format_byte = ext->cell_data[cell][0];
-            cell_style = ext->cell_style[format.type];
+            cell_style = ext->cell_style[format.s.type];
 
             /*With text crop assume 1 line*/
-            if(format.crop) {
+            if(format.s.crop) {
                 h_max = LV_MATH_MAX(lv_font_get_height(cell_style->text.font) +
                         cell_style->body.padding.top + cell_style->body.padding.bottom,
                         h_max);
