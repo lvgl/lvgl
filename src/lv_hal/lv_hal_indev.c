@@ -94,8 +94,8 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
  */
 lv_indev_t * lv_indev_next(lv_indev_t * indev)
 {
-    if(indev == NULL) return lv_ll_get_head(LV_GC_ROOT(&_lv_indev_ll));
-    else return lv_ll_get_next(LV_GC_ROOT(&_lv_indev_ll), indev);
+    if(indev == NULL) return lv_ll_get_head(&LV_GC_ROOT(_lv_indev_ll));
+    else return lv_ll_get_next(&LV_GC_ROOT(_lv_indev_ll), indev);
 }
 
 /**

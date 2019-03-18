@@ -630,7 +630,7 @@ static lv_res_t lv_img_built_in_decoder_line_alpha(lv_coord_t x, lv_coord_t y, l
 # if LV_COMPILER_VLA_SUPPORTED
     uint8_t fs_buf[w];
 # else
-    uint8_t fs_buf[LV_HOR_RES];
+    uint8_t fs_buf[LV_HOR_RES_MAX];
 # endif
 #endif
     const uint8_t * data_tmp = NULL;
@@ -717,7 +717,7 @@ static lv_res_t lv_img_built_in_decoder_line_indexed(lv_coord_t x, lv_coord_t y,
 # if LV_COMPILER_VLA_SUPPORTED
     uint8_t fs_buf[w];
 # else
-    uint8_t fs_buf[LV_HOR_RES];
+    uint8_t fs_buf[LV_HOR_RES_MAX];
 # endif
 #endif
     const uint8_t * data_tmp = NULL;
