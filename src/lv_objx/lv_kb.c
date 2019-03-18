@@ -371,7 +371,7 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
         lv_kb_def_btn_action_cb(kb);
     }
     else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-        bool no_rep = lv_btnm_get_btn_no_repeate(kb, lv_btnm_get_active_btn(kb));
+        bool no_rep = lv_btnm_get_btn_no_repeat(kb, lv_btnm_get_active_btn(kb));
         if(no_rep == false) lv_kb_def_btn_action_cb(kb);
     }
     else if(sign == LV_SIGNAL_FOCUS) {
