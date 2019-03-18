@@ -142,9 +142,9 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
         header->cf = LV_IMG_CF_ALPHA_1BIT;
     } else {
         LV_LOG_WARN("Image get info found unknown src type");
-        return false;
+        return LV_RES_INV;
     }
-    return true;
+    return LV_RES_OK;
 }
 
 /**
