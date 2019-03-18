@@ -74,6 +74,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cell_style[3] = &lv_style_plain;
     ext->col_cnt = 0;
     ext->row_cnt = 0;
+    ext->draw_borders = true;
 
     uint16_t i;
     for(i = 0; i < LV_TABLE_COL_MAX; i++) {
@@ -390,6 +391,19 @@ void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, lv_style_t * st
     }
 }
 
+
+/**
+ * Enable/disable borders on the table.
+ * @param table pointer to a Table object
+ * @param border_en whether to draw borders
+ */
+void lv_table_set_border_en(lv_obj_t * table, bool border_en) {
+	lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+
+	ext->draw_borders = border_en;
+	lv_obj_invalidate(table);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -585,6 +599,17 @@ lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type)
     return style;
 }
 
+/**
+ * Get whether borders are enabled/disabled on the table.
+ * @param table pointer to a Table object
+ * @return whether borders are drawn
+ */
+bool lv_table_get_border_en(lv_obj_t * table) {
+	lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+
+	return ext->draw_borders;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -660,7 +685,9 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     }
                 }
 
-                lv_draw_rect(&cell_area, mask, cell_style, opa_scale);
+                if(ext->draw_borders) {
+                	lv_draw_rect(&cell_area, mask, cell_style, opa_scale);
+                }
 
                 if(ext->cell_data[cell]) {
 

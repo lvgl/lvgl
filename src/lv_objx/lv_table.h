@@ -59,6 +59,7 @@ typedef struct {
     char ** cell_data;
     lv_style_t * cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
+    uint8_t draw_borders:1;
 } lv_table_ext_t;
 
 
@@ -164,6 +165,12 @@ void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col,
  */
 void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, lv_style_t * style);
 
+/**
+ * Enable/disable borders on the table.
+ * @param table pointer to a Table object
+ * @param border_en whether to draw borders
+ */
+void lv_table_set_border_en(lv_obj_t * table, bool border_en);
 /*=====================
  * Getter functions
  *====================*/
@@ -244,6 +251,12 @@ bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col)
  */
 lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type);
 
+/**
+ * Get whether borders are enabled/disabled on the table.
+ * @param table pointer to a Table object
+ * @return whether borders are drawn
+ */
+bool lv_table_get_border_en(lv_obj_t * table);
 /*=====================
  * Other functions
  *====================*/
