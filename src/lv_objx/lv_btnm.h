@@ -264,7 +264,7 @@ const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id);
  * @param btn_index the index a button not counting new line characters. (The return value of lv_btnm_get_pressed/released)
  * @return true: long press repeat is disabled; false: long press repeat enabled
  */
-bool lv_btnm_get_btn_no_repeate(lv_obj_t * btnm, uint16_t btn_id);
+bool lv_btnm_get_btn_no_repeat(lv_obj_t * btnm, uint16_t btn_id);
 
 /**
  * Check whether a button for a button is hidden or not.
