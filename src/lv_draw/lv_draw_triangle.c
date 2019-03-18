@@ -33,14 +33,15 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
 /**
  *
  * @param points pointer to an array with 3 points
  * @param mask the triangle will be drawn only in this mask
- * @param color color of the triangle
+ * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_color_t color, lv_opa_t opa_scale)
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     lv_point_t tri[3];
 
@@ -86,6 +87,9 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
     lv_area_t act_area;
     lv_area_t draw_area;
 
+
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
+
     while(1) {
         act_area.x1 = edge1.x;
         act_area.x2 = edge2.x ;
@@ -98,7 +102,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, lv_colo
         draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
         draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
         draw_area.x2--; /*Do not draw most right pixel because it will be drawn by the adjacent triangle*/
-        lv_draw_fill(&draw_area, mask, color, LV_OPA_COVER);
+        lv_draw_fill(&draw_area, mask, style->body.main_color, opa);
 
         /*Calc. the next point of edge1*/
         y1_tmp = edge1.y;
