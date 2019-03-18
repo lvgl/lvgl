@@ -844,12 +844,10 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
     lv_style_t style;
     lv_style_copy(&style, &lv_style_plain);
-    style.line.opa = ext->series.opa;
-    style.line.width = ext->series.width;
 
     /*Go through all data lines*/
     LV_LL_READ_BACK(ext->series_ll, ser) {
-        style.line.color = ser->color;
+        style.body.main_color = ser->color;
 
         p1.x = 0 + x_ofs;
         p2.x = 0 + x_ofs;
@@ -877,9 +875,9 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
                 triangle_points[1].y = y_ofs + h;
                 triangle_points[2].x = p1.x;
                 triangle_points[2].y = y_ofs + h;
-                lv_draw_triangle(triangle_points, mask, style.line.color, opa_scale);
+                lv_draw_triangle(triangle_points, mask, &style, opa_scale);
                 triangle_points[2] = p2;
-                lv_draw_triangle(triangle_points, mask, style.line.color, opa_scale);
+                lv_draw_triangle(triangle_points, mask, &style, opa_scale);
             }
             p_prev = p_act;
         }
