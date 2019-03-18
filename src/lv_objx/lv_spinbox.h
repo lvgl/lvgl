@@ -123,13 +123,6 @@ void lv_spinbox_set_step(lv_obj_t * spinbox, uint32_t step);
 void lv_spinbox_set_range(lv_obj_t * spinbox, int32_t range_min, int32_t range_max);
 
 /**
- * Set spinbox callback on calue change
- * @param spinbox pointer to spinbox
- * @param cb Callback function called on value change event
- */
-void lv_spinbox_set_value_changed_cb(lv_obj_t * spinbox, lv_spinbox_value_changed_cb_t cb);
-
-/**
  * Set spinbox left padding in digits count (added between sign and first digit)
  * @param spinbox pointer to spinbox
  * @param cb Callback function called on value change event
