@@ -48,63 +48,6 @@ static int16_t sin0_90_table[] = {
  **********************/
 
 /**
- * Convert a number to string
- * @param num a number
- * @param buf pointer to a `char` buffer. The result will be stored here (max 10 elements)
- * @return same as `buf` (just for convenience)
- */
-char * lv_math_num_to_str(int32_t num, char * buf)
-{
-    char * buf_ori = buf;
-    if(num == 0) {
-        buf[0] = '0';
-        buf[1] = '\0';
-        return buf;
-    } else if(num < 0) {
-        (*buf) = '-';
-        buf++;
-        num = LV_MATH_ABS(num);
-    }
-    uint32_t output = 0;
-    int8_t i;
-
-    for(i = 31; i >= 0; i--) {
-        if((output & 0xF) >= 5)
-            output += 3;
-        if(((output & 0xF0) >> 4) >= 5)
-            output += (3 << 4);
-        if(((output & 0xF00) >> 8) >= 5)
-            output += (3 << 8);
-        if(((output & 0xF000) >> 12) >= 5)
-            output += (3 << 12);
-        if(((output & 0xF0000) >> 16) >= 5)
-            output += (3 << 16);
-        if(((output & 0xF00000) >> 20) >= 5)
-            output += (3 << 20);
-        if(((output & 0xF000000) >> 24) >= 5)
-            output += (3 << 24);
-        if(((output & 0xF0000000) >> 28) >= 5)
-            output += (3 << 28);
-        output = (output << 1) | ((num >> i) & 1);
-    }
-
-    uint8_t digit;
-    bool leading_zero_ready = false;
-    for(i = 28; i >= 0; i -= 4) {
-        digit = ((output >> i) & 0xF) + '0';
-        if(digit == '0' && leading_zero_ready == false) continue;
-
-        leading_zero_ready = true;
-        (*buf) = digit;
-        buf++;
-    }
-
-    (*buf) = '\0';
-
-    return buf_ori;
-}
-
-/**
  * Return with sinus of an angle
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
@@ -157,49 +100,6 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 
     return v1 + v2 + v3 + v4;
 
-}
-
-
-/**
- * Performs a binary search within the given list.
- *
- * @note Code extracted out of https://github.com/torvalds/linux/blob/master/lib/bsearch.c
- *
- * @warning The contents of the array should already be in ascending sorted order
- * under the provided comparison function.
- *
- * @note The key need not have the same type as the elements in
- * the array, e.g. key could be a string and the comparison function
- * could compare the string with the struct's name field.  However, if
- * the key and elements in the array are of the same type, you can use
- * the same comparison function for both sort() and bsearch().
- *
- * @param key  pointer to item being searched for
- * @param base pointer to first element to search
- * @param num  number of elements
- * @param size size of each element
- * @param cmp  pointer to comparison function
- */
-void * lv_bsearch(const void * key, const void * base, uint32_t num, uint32_t size, int32_t (* cmp)(const void * key, const void * elt))
-{
-  const char * pivot;
-  int32_t result;
-
-  while (num > 0) {
-    pivot = ((char*)base) + (num >> 1) * size;
-    result = cmp(key, pivot);
-
-    if (result == 0)
-      return (void *)pivot;
-
-    if (result > 0) {
-      base = pivot + size;
-      num--;
-    }
-    num >>= 1;
-  }
-
-  return NULL;
 }
 
 /**********************

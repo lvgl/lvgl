@@ -11,7 +11,7 @@
 
 #include "../lv_draw/lv_draw.h"
 #include "../lv_hal/lv_hal_indev.h"
-#include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_utils.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_themes/lv_theme.h"
 #include <string.h>
@@ -742,7 +742,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 
     /*Add the year + month name*/
     char txt_buf[64];
-    lv_math_num_to_str(ext->showed_date.year, txt_buf);
+    lv_utils_num_to_str(ext->showed_date.year, txt_buf);
     txt_buf[4] =  ' ';
     txt_buf[5] =  '\0';
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
@@ -913,7 +913,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
             else final_style = act_style;
 
             /*Write the day's number*/
-            lv_math_num_to_str(day_cnt, buf);
+            lv_utils_num_to_str(day_cnt, buf);
             lv_draw_label(&label_area, mask, final_style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL);
 
             /*Go to the next day*/

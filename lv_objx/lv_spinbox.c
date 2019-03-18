@@ -11,6 +11,7 @@
 #if USE_LV_SPINBOX != 0
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_utils.h"
 
 /*********************
  *      DEFINES
@@ -415,7 +416,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     char digits[64];
     /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
-    lv_math_num_to_str(ext->value < 0 ? -ext->value : ext->value, digits);
+    lv_utils_num_to_str(ext->value < 0 ? -ext->value : ext->value, digits);
 
     /*Add leading zeros*/
     int lz_cnt = ext->digit_count - (int)strlen(digits);
