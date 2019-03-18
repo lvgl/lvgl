@@ -1088,7 +1088,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 #if LV_COMPILER_VLA_SUPPORTED
     lv_coord_t curve_x[radius + swidth + 1];     /*Stores the 'x' coordinates of a quarter circle.*/
 #else
-# if LV_HOR_RES > LV_VER_RES
+# if LV_HOR_RES_MAX > LV_VER_RES_MAX
     lv_coord_t curve_x[LV_HOR_RES_MAX];
 # else
     lv_coord_t curve_x[LV_VER_RES_MAX];
@@ -1109,7 +1109,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 #if LV_COMPILER_VLA_SUPPORTED
     uint32_t line_1d_blur[filter_width];
 #else
-# if LV_HOR_RES > LV_VER_RES
+# if LV_HOR_RES_MAX > LV_VER_RES_MAX
     uint32_t line_1d_blur[LV_HOR_RES_MAX];
 # else
     uint32_t line_1d_blur[LV_VER_RES_MAX];
@@ -1125,7 +1125,7 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 #if LV_COMPILER_VLA_SUPPORTED
     lv_opa_t line_2d_blur[radius + swidth + 1];
 #else
-# if LV_HOR_RES > LV_VER_RES
+# if LV_HOR_RES_MAX > LV_VER_RES_MAX
     lv_opa_t line_2d_blur[LV_HOR_RES_MAX];
 # else
     lv_opa_t line_2d_blur[LV_VER_RES_MAX];
@@ -1246,7 +1246,7 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
 #if LV_COMPILER_VLA_SUPPORTED
     lv_coord_t curve_x[radius + 1];             /*Stores the 'x' coordinates of a quarter circle.*/
 #else
-# if LV_HOR_RES > LV_VER_RES
+# if LV_HOR_RES_MAX > LV_VER_RES_MAX
     lv_coord_t curve_x[LV_HOR_RES_MAX];
 # else
     lv_coord_t curve_x[LV_VER_RES_MAX];
@@ -1265,7 +1265,7 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
 #if LV_COMPILER_VLA_SUPPORTED
     lv_opa_t line_1d_blur[swidth];
 #else
-# if LV_HOR_RES > LV_VER_RES
+# if LV_HOR_RES_MAX > LV_VER_RES_MAX
     lv_opa_t line_1d_blur[LV_HOR_RES_MAX];
 # else
     lv_opa_t line_1d_blur[LV_VER_RES_MAX];
