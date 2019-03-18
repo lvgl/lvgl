@@ -14,6 +14,7 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_utils.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -371,7 +372,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 
         int16_t scale_act = (int32_t)((int32_t)(max - min) * i) / (label_num - 1);
         scale_act += min;
-        lv_math_num_to_str(scale_act, scale_txt);
+        lv_utils_num_to_str(scale_act, scale_txt);
 
         lv_area_t label_cord;
         lv_point_t label_size;
