@@ -506,7 +506,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->header = NULL;     /*These objects were children so they are already invalid*/
         ext->page = NULL;
         ext->title = NULL;
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         /*Forward all the control signals to the page*/
         ext->page->signal_cb(ext->page, sign, param);
     } else if(sign == LV_SIGNAL_GET_TYPE) {

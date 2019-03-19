@@ -551,7 +551,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         ext->pressed_date.year = 0;
         ext->btn_pressing = 0;
         lv_obj_invalidate(calendar);
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         uint8_t c = *((uint8_t *) param);
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {

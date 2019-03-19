@@ -318,7 +318,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     lv_res_t res = LV_RES_OK;
 
     /* Include the ancient signal function */
-    if(sign != LV_SIGNAL_CONTROLL)
+    if(sign != LV_SIGNAL_CONTROL)
     {
         res = ancestor_signal(spinbox, sign, param);
         if(res != LV_RES_OK) return res;
@@ -357,7 +357,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
             }
         }
     }
-    else if(sign == LV_SIGNAL_CONTROLL) {
+    else if(sign == LV_SIGNAL_CONTROL) {
         lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/

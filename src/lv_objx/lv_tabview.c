@@ -602,7 +602,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             lv_event_send(ext->btns, LV_EVENT_CLICKED, lv_event_get_data());
         }
     }
-    else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROLL) {
+    else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL) {
         /* The button matrix is not in a group (the tab view is in it) but it should handle the group signals.
          * So propagate the related signals to the button matrix manually*/
         if(ext->btns) {

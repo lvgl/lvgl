@@ -356,7 +356,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             lv_slider_set_value(sw, LV_SW_MAX_VALUE, true);

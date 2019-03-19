@@ -522,7 +522,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
             if(slider->ext_size < shadow_w) slider->ext_size = shadow_w;
         }
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
 
         ext->drag_value = LV_SLIDER_NOT_PRESSED;

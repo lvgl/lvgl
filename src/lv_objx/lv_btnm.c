@@ -801,7 +801,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         ext->btn_id_act = ext->btn_id_pr;
         lv_obj_invalidate(btnm);
     }
-    else if(sign == LV_SIGNAL_CONTROLL) {
+    else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT) {
             if(ext->btn_id_pr  == LV_BTNM_BTN_NONE) ext->btn_id_pr = 0;

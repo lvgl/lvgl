@@ -337,7 +337,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
               sign == LV_SIGNAL_RELEASED ||
               sign == LV_SIGNAL_PRESS_LOST) {
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN ||
                 c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {

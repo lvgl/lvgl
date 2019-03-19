@@ -277,7 +277,7 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return LV_RES_OK;
 
-    return act->signal_cb(act, LV_SIGNAL_CONTROLL, &c);
+    return act->signal_cb(act, LV_SIGNAL_CONTROL, &c);
 }
 
 /**

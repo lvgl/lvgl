@@ -675,7 +675,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
             ext->sel_opt_id = ext->sel_opt_id_ori;
             lv_ddlist_refr_size(ddlist, true);
         }
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(!ext->opened) {

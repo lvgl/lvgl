@@ -802,7 +802,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         /*Ensure ext. size for the scrollbars if they are out of the page*/
         if(page->ext_size < (-ext->sb.style->body.padding.right)) page->ext_size = -ext->sb.style->body.padding.right;
         if(page->ext_size < (-ext->sb.style->body.padding.bottom)) page->ext_size = -ext->sb.style->body.padding.bottom;
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *) param);
 
         if((c == LV_GROUP_KEY_DOWN) && ext->arrow_scroll) {

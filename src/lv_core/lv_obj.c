@@ -1193,7 +1193,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
     /*If the event was send from an other event save the current states to restore it at the end*/
     lv_obj_t * prev_obj_act = event_act_obj;
     bool prev_obj_act_deleted = event_act_obj_deleted;
-    void * prev_data = event_act_data;
+    const void * prev_data = event_act_data;
 
     event_act_obj = obj;
     event_act_obj_deleted = false;

@@ -392,7 +392,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     lv_res_t res  = LV_RES_OK;
 
     /*Don't let the drop down list to handle the control signals. It works differently*/
-    if(sign != LV_SIGNAL_CONTROLL && sign != LV_SIGNAL_FOCUS && sign != LV_SIGNAL_DEFOCUS) {
+    if(sign != LV_SIGNAL_CONTROL && sign != LV_SIGNAL_FOCUS && sign != LV_SIGNAL_DEFOCUS) {
         /* Include the ancient signal function */
         res = ancestor_signal(roller, sign, param);
         if(res != LV_RES_OK) return res;
@@ -457,7 +457,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             refr_position(roller, true);
         }
 #endif
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(ext->ddlist.sel_opt_id + 1 < ext->ddlist.option_cnt) {

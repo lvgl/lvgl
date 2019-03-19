@@ -612,7 +612,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             lv_anim_create(&a);
         }
 #endif
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);

@@ -1145,7 +1145,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
                 refr_cursor_area(ta);
             }
         }
-    } else if(sign == LV_SIGNAL_CONTROLL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/
         if(c == LV_GROUP_KEY_RIGHT)     lv_ta_cursor_right(ta);
         else if(c == LV_GROUP_KEY_LEFT) lv_ta_cursor_left(ta);
