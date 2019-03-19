@@ -49,8 +49,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  *  STATIC VARIABLES
  **********************/
 static bool lv_initialized = false;
-static lv_obj_t * obj_act_event;        /*Stores the which event is currently being executed*/
-static bool obj_act_event_deleted;      /*Shows that the object was deleted in the event function*/
+static lv_obj_t * event_act_obj;        /*Stores the which event is currently being executed*/
+static bool event_act_obj_deleted;      /*Shows that the object was deleted in the event function*/
+static const void * event_act_data;           /*Stores the data passed to the event*/
 /**********************
  *      MACROS
  **********************/
@@ -342,7 +343,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 {
     lv_obj_invalidate(obj);
 
-    if(obj_act_event == obj && obj_act_event_deleted == false) obj_act_event_deleted = true;
+    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
 
     /*Delete from the group*/
 #if LV_USE_GROUP
@@ -1181,38 +1182,51 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb)
 /**
  * Send an event to the object
  * @param obj pointer to an object
- * @param event the type of the event from `lv_event_t`.
+ * @param event the type of the event from `lv_event_t`
+ * @param data arbitrary data depending on the object type and the event. (Usually `NULL`)
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 {
     if(obj == NULL) return LV_RES_OK;
 
     /*If the event was send from an other event save the current states to restore it at the end*/
-    lv_obj_t * prev_obj_act_event = obj_act_event;
-    bool prev_obj_act_event_deleted = obj_act_event_deleted;
+    lv_obj_t * prev_obj_act = event_act_obj;
+    bool prev_obj_act_deleted = event_act_obj_deleted;
+    void * prev_data = event_act_data;
 
-    obj_act_event = obj;
-    obj_act_event_deleted = false;
+    event_act_obj = obj;
+    event_act_obj_deleted = false;
+    event_act_data = data;
 
     if(obj->event_cb) obj->event_cb(obj, event);
 
-    bool deleted = obj_act_event_deleted;
+    bool deleted = event_act_obj_deleted;
 
     /*Restore the previous states*/
-    obj_act_event = prev_obj_act_event;
-    obj_act_event_deleted = prev_obj_act_event_deleted;
+    event_act_obj = prev_obj_act;
+    event_act_obj_deleted = prev_obj_act_deleted;
+    event_act_data = prev_data;
 
     if(deleted) {
         return LV_RES_INV;
     }
 
     if(obj->parent_event && obj->par) {
-        lv_res_t res = lv_obj_send_event(obj->par, event);
+        lv_res_t res = lv_event_send(obj->par, event, data);
         if(res != LV_RES_OK) return LV_RES_INV;
     }
 
     return LV_RES_OK;
+}
+
+/**
+ * Get the `data` parameter of the current event
+ * @return the `data` parameter
+ */
+const void * lv_event_get_data(void)
+{
+    return event_act_data;
 }
 
 /**
@@ -2006,7 +2020,7 @@ static void refresh_children_style(lv_obj_t * obj)
 static void delete_children(lv_obj_t * obj)
 {
 
-    if(obj_act_event == obj && obj_act_event_deleted == false) obj_act_event_deleted = true;
+    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
 
     lv_obj_t * i;
     lv_obj_t * i_next;

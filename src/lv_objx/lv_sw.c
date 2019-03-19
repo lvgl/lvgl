@@ -328,13 +328,13 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(lv_sw_get_state(sw)) {
             lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
             lv_slider_set_value(sw, LV_SW_MAX_VALUE, true);
-            res = lv_obj_send_event(sw, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
         else {
             lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
             lv_slider_set_value(sw, 0, true);
-            res = lv_obj_send_event(sw, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     }
@@ -344,7 +344,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             if(lv_sw_get_state(sw)) lv_sw_off(sw, true);
             else lv_sw_on(sw, true);
 
-            res = lv_obj_send_event(sw, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
         /*If the switch was dragged then calculate the new state based on the current position*/
@@ -353,18 +353,18 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             if(v > LV_SW_MAX_VALUE / 2) lv_sw_on(sw, true);
             else lv_sw_off(sw, true);
 
-            res = lv_obj_send_event(sw, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_CONTROLL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             lv_slider_set_value(sw, LV_SW_MAX_VALUE, true);
-            res = lv_obj_send_event(sw, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             lv_slider_set_value(sw, 0, true);
-            res = lv_obj_send_event(sw, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {

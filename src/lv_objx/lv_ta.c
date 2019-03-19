@@ -255,7 +255,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 
     placeholder_update(ta);
 
-    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
+    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, letter_buf);
 }
 
 /**
@@ -322,7 +322,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     placeholder_update(ta);
 
-    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
+    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, txt);
 }
 
 /**
@@ -365,7 +365,7 @@ void lv_ta_del_char(lv_obj_t * ta)
 
     placeholder_update(ta);
 
-    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
+    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 /**
@@ -442,7 +442,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 
     placeholder_update(ta);
 
-    lv_obj_send_event(ta, LV_EVENT_VALUE_CHANGED);
+    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, txt);
 }
 
 /**

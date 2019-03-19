@@ -41,7 +41,7 @@ static const char * kb_map_lc[] = {
 
 static const lv_btnm_ctrl_t kb_ctrl_lc_map[] = {
         5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
-        (6 | LV_BTNM_BTN_NO_REPEAT), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
+        (6 | LV_BTNM_CTRL_NO_REPEAT), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         2, 2, 6, 2, 2
 };
@@ -55,7 +55,7 @@ static const char * kb_map_uc[] = {
 
 static const lv_btnm_ctrl_t kb_ctrl_uc_map[] = {
         5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
-        (6 | LV_BTNM_BTN_NO_REPEAT), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
+        (6 | LV_BTNM_CTRL_NO_REPEAT), 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         2, 2, 6, 2, 2
 };
@@ -69,7 +69,7 @@ static const char * kb_map_spec[] = {
 
 static const lv_btnm_ctrl_t kb_ctrl_spec_map[] = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
-        (2 | LV_BTNM_BTN_NO_REPEAT), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        (2 | LV_BTNM_CTRL_NO_REPEAT), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         2, 2, 6, 2, 2
 };
@@ -371,7 +371,7 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
         lv_kb_def_btn_action_cb(kb);
     }
     else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-        bool no_rep = lv_btnm_get_btn_no_repeat(kb, lv_btnm_get_active_btn(kb));
+        bool no_rep = lv_btnm_get_btn_ctrl(kb, lv_btnm_get_active_btn(kb), LV_BTNM_CTRL_NO_REPEAT);
         if(no_rep == false) lv_kb_def_btn_action_cb(kb);
     }
     else if(sign == LV_SIGNAL_FOCUS) {
@@ -413,8 +413,7 @@ static void lv_kb_def_btn_action_cb(lv_obj_t * kb)
 
     uint16_t btn_id = lv_btnm_get_active_btn(kb);
     if(btn_id == LV_BTNM_BTN_NONE) return;
-    if(lv_btnm_get_btn_hidden(kb, btn_id)) return;
-    if(lv_btnm_get_btn_inactive(kb, btn_id)) return;
+    if(lv_btnm_get_btn_ctrl(kb, btn_id, LV_BTNM_CTRL_HIDDEN | LV_BTNM_CTRL_INACTIVE)) return;
 
     const char * txt = lv_btnm_get_active_btn_text(kb);
     if(txt == NULL) return;
@@ -434,7 +433,7 @@ static void lv_kb_def_btn_action_cb(lv_obj_t * kb)
         return;
     } else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
         if(kb->event_cb) {
-            lv_obj_send_event(kb, LV_EVENT_CANCEL);
+            lv_event_send(kb, LV_EVENT_CANCEL, NULL);
         }
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area  to hide it cursor if needed*/
@@ -442,7 +441,7 @@ static void lv_kb_def_btn_action_cb(lv_obj_t * kb)
         }
         return;
     } else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
-        if(kb->event_cb) lv_obj_send_event(kb, LV_EVENT_APPLY);
+        if(kb->event_cb) lv_event_send(kb, LV_EVENT_APPLY, NULL);
         else lv_kb_set_ta(kb, NULL);         /*De-assign the text area to hide it cursor if needed*/
         return;
     }

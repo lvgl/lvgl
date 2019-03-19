@@ -215,7 +215,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
             if(g->obj_focus == i) return;       /*Don't focus the already focused object again*/
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-                lv_res_t res = lv_obj_send_event(*g->obj_focus, LV_EVENT_DEFOCUSED);
+                lv_res_t res = lv_event_send(*g->obj_focus, LV_EVENT_DEFOCUSED, NULL);
                 if(res != LV_RES_OK) return;
                 lv_obj_invalidate(*g->obj_focus);
             }
@@ -225,7 +225,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_FOCUS, NULL);
                 if(g->focus_cb) g->focus_cb(g);
-                lv_res_t res = lv_obj_send_event(*g->obj_focus, LV_EVENT_FOCUSED);
+                lv_res_t res = lv_event_send(*g->obj_focus, LV_EVENT_FOCUSED, NULL);
                 if(res != LV_RES_OK) return;
                 lv_obj_invalidate(*g->obj_focus);
 
@@ -328,7 +328,7 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
 
     if(focused) {
         focused->signal_cb(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave/open edit/navigate mode*/
-        lv_res_t res = lv_obj_send_event(*group->obj_focus, LV_EVENT_FOCUSED);
+        lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
         if(res != LV_RES_OK) return;
     }
 
@@ -626,7 +626,7 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
 
     if(group->obj_focus) {
         (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-        lv_res_t res = lv_obj_send_event(*group->obj_focus, LV_EVENT_DEFOCUSED);
+        lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_DEFOCUSED, NULL);
         if(res != LV_RES_OK) return;
         lv_obj_invalidate(*group->obj_focus);
     }
@@ -634,7 +634,7 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
     group->obj_focus = obj_next;
 
     (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
-    lv_res_t res = lv_obj_send_event(*group->obj_focus, LV_EVENT_FOCUSED);
+    lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
     if(res != LV_RES_OK) return;
 
     /*If the object or its parent has `top == true` bring it to the foregorund*/

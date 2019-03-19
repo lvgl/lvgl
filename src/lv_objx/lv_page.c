@@ -1015,6 +1015,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
  * It is used by default if the scrollable's event is not specified
  * @param scrl pointer to the page's scrollable object
  * @param event type of the event
+ * @param data data of the event
  */
 static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
 {
@@ -1032,7 +1033,7 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
             event == LV_EVENT_FOCUSED ||
             event == LV_EVENT_DEFOCUSED)
     {
-        lv_obj_send_event(page, event);
+        lv_event_send(page, event, lv_event_get_data());
     }
 }
 

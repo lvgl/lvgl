@@ -479,7 +479,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         if(tmp != ext->drag_value) {
             ext->drag_value = tmp;
             lv_obj_invalidate(slider);
-            res = lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
@@ -529,11 +529,11 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1, true);
-            res = lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1, true);
-            res = lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {

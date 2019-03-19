@@ -544,7 +544,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         }
         else if(ext->pressed_date.year != 0)
         {
-            res = lv_obj_send_event(calendar, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(calendar, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
 

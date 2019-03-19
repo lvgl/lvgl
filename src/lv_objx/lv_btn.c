@@ -573,7 +573,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             }
 
             if(tgl) {
-                res = lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
+                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
 

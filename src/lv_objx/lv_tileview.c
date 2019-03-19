@@ -243,7 +243,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
 
 
     lv_res_t res = LV_RES_OK;
-    res = lv_obj_send_event(tileview, LV_EVENT_VALUE_CHANGED);
+    res = lv_event_send(tileview, LV_EVENT_VALUE_CHANGED, NULL);
     if(res != LV_RES_OK) return;        /*Prevent the tile loading*/
 }
 
@@ -463,7 +463,6 @@ static void tileview_scrl_event_cb(lv_obj_t * scrl, lv_event_t event)
         lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
         if(lv_indev_is_dragging(indev) && (ext->drag_hor || ext->drag_ver)) {
             indev->proc.types.pointer.drag_in_prog = 0;
-//            if(drag_obj) drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, NULL);
         }
 
          drag_end_handler(tileview);

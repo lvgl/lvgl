@@ -805,7 +805,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
 
         ext->sel_opt_id_ori = ext->sel_opt_id;
 
-        lv_res_t res = lv_obj_send_event(ddlist, LV_EVENT_VALUE_CHANGED);
+        lv_res_t res = lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &ext->sel_opt_id);
         if(res != LV_RES_OK) return res;
 
         if(ext->stay_open == 0) {

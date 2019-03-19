@@ -518,7 +518,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
 
         ext->ddlist.sel_opt_id = id;
         ext->ddlist.sel_opt_id_ori = id;
-        res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+        res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If picked an option by clicking then set it*/
@@ -536,7 +536,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
             bool editing = lv_group_get_editing(g);
             if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
 #endif
-            res = lv_obj_send_event(roller, LV_EVENT_VALUE_CHANGED);
+            res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     }

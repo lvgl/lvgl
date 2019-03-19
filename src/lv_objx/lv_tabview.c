@@ -234,7 +234,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     btnm_ext->map_p = NULL;
 
     lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
-    lv_btnm_set_btn_no_repeat(ext->btns, ext->tab_cnt - 1, true);
+    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT, true);
 
     /*Modify the indicator size*/
     lv_style_t * style_tabs = lv_obj_get_style(ext->btns);
@@ -276,8 +276,11 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     lv_res_t res = LV_RES_OK;
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
 
-    if(id != ext->tab_cur) res = lv_obj_send_event(tabview, LV_EVENT_VALUE_CHANGED);
-    if(res != LV_RES_OK) return;        /*Prevent the tab loading*/
+    if(id != ext->tab_cur) res = lv_event_send(tabview, LV_EVENT_SELECTED, lv_btnm_get_btn_text(ext->btns, id));
+    if(res != LV_RES_OK) return;
+
+
+    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE, false);
 
     ext->tab_cur = id;
 
@@ -329,7 +332,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
 #endif
     }
 
-    lv_btnm_set_btn_toggle_state(ext->btns, ext->tab_cur, true);
+    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE, true);
 }
 
 /**
@@ -596,7 +599,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         if(indev_type == LV_INDEV_TYPE_KEYPAD ||
                 (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(tabview))))
         {
-            lv_obj_send_event(ext->btns, LV_EVENT_CLICKED);
+            lv_event_send(ext->btns, LV_EVENT_CLICKED, lv_event_get_data());
         }
     }
     else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROLL) {
@@ -806,9 +809,8 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     uint16_t btn_id = lv_btnm_get_active_btn(tab_btnm);
     if(btn_id == LV_BTNM_BTN_NONE) return;
 
-
-    lv_btnm_set_btn_toggle_state_all(tab_btnm, false);
-    lv_btnm_set_btn_toggle_state(tab_btnm, btn_id, true);
+    lv_btnm_set_btn_ctrl_all(tab_btnm, LV_BTNM_CTRL_TGL_STATE, false);
+    lv_btnm_set_btn_ctrl(tab_btnm, btn_id, LV_BTNM_CTRL_TGL_STATE, true);
 
     lv_obj_t * tab = lv_obj_get_parent(tab_btnm);
     lv_tabview_set_tab_act(tab, btn_id, true);

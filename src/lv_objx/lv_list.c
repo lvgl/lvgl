@@ -760,22 +760,22 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 
             if(btn) {
                 if(sign == LV_SIGNAL_PRESSED) {
-                    lv_obj_send_event(btn, LV_EVENT_PRESSED);
+                    lv_event_send(btn, LV_EVENT_PRESSED, NULL);
                 }
                 else if(sign == LV_SIGNAL_PRESSING) {
-                    lv_obj_send_event(btn, LV_EVENT_PRESSING);
+                    lv_event_send(btn, LV_EVENT_PRESSING, NULL);
                 }
                 else if(sign == LV_SIGNAL_LONG_PRESS) {
-                    lv_obj_send_event(btn, LV_EVENT_LONG_PRESSED);
+                    lv_event_send(btn, LV_EVENT_LONG_PRESSED, NULL);
                 }
                 else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-                    lv_obj_send_event(btn, LV_EVENT_LONG_PRESSED_REPEAT);
+                    lv_event_send(btn, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
                 }
                 else if(sign == LV_SIGNAL_RELEASED) {
                     ext->last_sel = btn;
-                    if(indev->proc.long_pr_sent == 0) lv_obj_send_event(btn, LV_EVENT_SHORT_CLICKED);
-                    lv_obj_send_event(btn, LV_EVENT_CLICKED);
-                    lv_obj_send_event(btn, LV_EVENT_RELEASED);
+                    if(indev->proc.long_pr_sent == 0) lv_event_send(btn, LV_EVENT_SHORT_CLICKED, NULL);
+                    if(lv_indev_is_dragging(indev) == false) lv_event_send(btn, LV_EVENT_CLICKED, NULL);
+                    lv_event_send(btn, LV_EVENT_RELEASED, NULL);
                 }
             }
         }

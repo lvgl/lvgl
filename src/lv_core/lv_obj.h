@@ -89,6 +89,7 @@ typedef enum {
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
     LV_EVENT_VALUE_CHANGED,
+    LV_EVENT_SELECTED,
     LV_EVENT_REFRESH,
     LV_EVENT_APPLY,         /*"Ok", "Apply" or similar specific button has clicked*/
     LV_EVENT_CANCEL,        /*"Close", "Cancel" or similar specific button has clicked*/
@@ -500,9 +501,16 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb);
  * Send an event to the object
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.
+ * @param data arbitrary data depending on the object type and the event. (Usually `NULL`)
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event);
+lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
+
+/**
+ * Get the `data` parameter of the current event
+ * @return the `data` parameter
+ */
+const void * lv_event_get_data(void);
 
 /**
  * Set the a signal function of an object. Used internally by the library.

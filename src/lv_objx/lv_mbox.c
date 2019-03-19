@@ -153,6 +153,7 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_map)
     }
 
     lv_btnm_set_map(ext->btnm, btn_map);
+    lv_btnm_set_btn_ctrl_all(ext->btnm, LV_BTNM_CTRL_CLICK_TRIG | LV_BTNM_CTRL_NO_REPEAT, true);
     lv_obj_set_parent_event(ext->btnm, true);
 
     mbox_realign(mbox);
@@ -440,12 +441,9 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
         mbox_realign(mbox);
 
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
-        /*If the message box was pressed clear the last active button*/
-        if(ext->btnm) {
-            lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btnm);
-            btnm_ext->btn_id_act = LV_BTNM_BTN_NONE;
-        }
+    else if(sign == LV_SIGNAL_RELEASED) {
+        uint16_t btn_id = lv_btnm_get_active_btn(ext->btnm);
+        if(btn_id != LV_BTNM_BTN_NONE) lv_event_send(mbox, LV_EVENT_SELECTED, lv_btnm_get_btn_text(ext->btnm, btn_id));
     }
     else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS ||
               sign == LV_SIGNAL_CONTROLL || sign == LV_SIGNAL_GET_EDITABLE) {
@@ -467,8 +465,6 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
             }
 #endif
         }
-
-
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
