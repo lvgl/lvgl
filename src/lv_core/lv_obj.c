@@ -342,11 +342,16 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 {
     lv_obj_invalidate(obj);
 
-    if(obj_act_event == obj) obj_act_event_deleted = true;
+    if(obj_act_event == obj && obj_act_event_deleted == false) obj_act_event_deleted = true;
 
     /*Delete from the group*/
 #if LV_USE_GROUP
-    if(obj->group_p != NULL) lv_group_remove_obj(obj);
+    bool was_focused = false;
+
+    if(obj->group_p) {
+        if(lv_group_get_focused(obj->group_p) == obj) was_focused = true;
+        lv_group_remove_obj(obj);
+    }
 #endif
 
     /*Remove the animations from this object*/
@@ -385,9 +390,12 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
         }
-        if(lv_group_get_focused(indev->group) == obj) {
+
+#if LV_USE_GROUP
+        if(was_focused) {
             lv_indev_reset(indev);
         }
+#endif
         indev = lv_indev_next(indev);
     }
 
@@ -1195,7 +1203,9 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_t event)
     obj_act_event = prev_obj_act_event;
     obj_act_event_deleted = prev_obj_act_event_deleted;
 
-    if(deleted) return LV_RES_INV;
+    if(deleted) {
+        return LV_RES_INV;
+    }
 
     if(obj->parent_event && obj->par) {
         lv_res_t res = lv_obj_send_event(obj->par, event);
@@ -1996,7 +2006,7 @@ static void refresh_children_style(lv_obj_t * obj)
 static void delete_children(lv_obj_t * obj)
 {
 
-    if(obj_act_event == obj) obj_act_event_deleted = true;
+    if(obj_act_event == obj && obj_act_event_deleted == false) obj_act_event_deleted = true;
 
     lv_obj_t * i;
     lv_obj_t * i_next;
@@ -2006,7 +2016,12 @@ static void delete_children(lv_obj_t * obj)
      * the object still has access to all children during the 
      * LV_SIGNAL_DEFOCUS call*/
 #if LV_USE_GROUP
-    if(obj->group_p != NULL) lv_group_remove_obj(obj);
+    bool was_focused = false;
+
+    if(obj->group_p) {
+        if(lv_group_get_focused(obj->group_p) == obj) was_focused = true;
+        lv_group_remove_obj(obj);
+    }
 #endif
 
     while(i != NULL) {
@@ -2032,9 +2047,11 @@ static void delete_children(lv_obj_t * obj)
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
         }
-        if(lv_group_get_focused(indev->group) == obj) {
+#if LV_USE_GROUP
+        if(was_focused) {
             lv_indev_reset(indev);
         }
+#endif
         indev = lv_indev_next(indev);
     }
 
