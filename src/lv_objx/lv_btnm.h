@@ -60,6 +60,7 @@ typedef struct
     uint16_t btn_id_pr;                         /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
     uint16_t btn_id_act;                        /*Index of the active button (being pressed/released etc) or LV_BTNM_BTN_NONE */
     uint8_t	recolor    :1;                      /*Enable button recoloring*/
+    uint8_t one_toggle :1;						/*Single button toggled at once*/
 } lv_btnm_ext_t;
 
 enum {
@@ -166,6 +167,12 @@ void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl, bool en);
  */
 void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width);
 
+/**
+ * Make the button matrix like a selector widget (only one button may be toggled at a time).
+ * @param btnm Button matrix object
+ * @param one_toggle Whether "one toggle" mode is enabled
+ */
+void lv_btnm_set_one_toggle(const lv_obj_t *btnm, bool one_toggle);
 
 /*=====================
  * Getter functions
@@ -233,6 +240,13 @@ bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
  * @return style pointer to a style
  */
 lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type);
+
+/**
+ * Find whether "one toggle" mode is enabled.
+ * @param btnm Button matrix object
+ * @return whether "one toggle" mode is enabled
+ */
+bool lv_btnm_get_one_toggle(const lv_obj_t *btnm);
 /**********************
  *      MACROS
  **********************/
