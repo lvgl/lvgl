@@ -8,6 +8,7 @@
  *********************/
 #include <stdlib.h>
 #include "lv_canvas.h"
+#include "../lv_misc/lv_math.h"
 #if LV_USE_CANVAS != 0
 
 /*********************
@@ -130,7 +131,7 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
 {
 
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    if(x >= ext->dsc.header.w || y >= ext->dsc.header.h) {
+    if(x >= ext->dsc.header.w || y >= ext->dsc.header.h || x < 0 || y < 0) {
         LV_LOG_WARN("lv_canvas_set_px: x or y out of the canvas");
         return;
     }
@@ -210,9 +211,23 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
 {
     lv_color_t p_color = LV_COLOR_BLACK;
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    if(x >= ext->dsc.header.w || y >= ext->dsc.header.h) {
-        LV_LOG_WARN("lv_canvas_get_px: x or y out of the canvas");
-        return p_color;
+    if(x >= ext->dsc.header.w) {
+        x = ext->dsc.header.w - 1;
+        LV_LOG_WARN("lv_canvas_get_px: x is too large (out of canvas)");
+    }
+    else if(x < 0) {
+        x = 0;
+        LV_LOG_WARN("lv_canvas_get_px: x is < 0 (out of canvas)");
+    }
+
+
+    if(y >= ext->dsc.header.h) {
+        y = ext->dsc.header.h - 1;
+        LV_LOG_WARN("lv_canvas_get_px: y is too large (out of canvas)");
+    }
+    else if(y < 0) {
+        y = 0;
+        LV_LOG_WARN("lv_canvas_get_px: y is < 0 (out of canvas)");
     }
 
     uint8_t * buf_u8 = (uint8_t *) ext->dsc.data;
@@ -367,6 +382,111 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
     }
 }
 
+
+void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int32_t pivotx, int32_t pivoty, int16_t angle)
+{
+  lv_canvas_ext_t * ext_src = lv_obj_get_ext_attr(canvas_src);
+  lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas_dest);
+
+  int32_t sinma = lv_trigo_sin(-angle);
+  int32_t cosma = lv_trigo_sin(-angle + 90); /* cos */
+
+  int32_t src_width = ext_src->dsc.header.w;
+  int32_t src_height = ext_src->dsc.header.h;
+  int32_t dest_width = ext_dst->dsc.header.w;
+  int32_t dest_height = ext_dst->dsc.header.h;
+
+  lv_style_t * style = lv_canvas_get_style(canvas_dest, LV_CANVAS_STYLE_MAIN);
+  int32_t x;
+  int32_t y;
+  for (x = 0; x < dest_width; x++) {
+    for (y = 0; y < dest_height; y++) {
+      /*Get the target point relative coordinates to the pivot*/
+      int32_t xt = x - pivotx;
+      int32_t yt = y - pivoty;
+
+      /*Get the source pixel from the upscaled image*/
+      int32_t xs = ((cosma * xt - sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivotx * 256;
+      int32_t ys = ((sinma * xt + cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivoty * 256;
+
+      /*Get the integer part of the source pixel*/
+      int xs_int = xs >> 8;
+      int ys_int = ys >> 8;
+
+      /*Get the fractional part of the source pixel*/
+      int xs_fract = xs & 0xff;
+      int ys_fract = ys & 0xff;
+
+      /* If the fractional < 0x70 mix the source pixel with the left/top pixel
+       * If the fractional > 0x90 mix the source pixel with the right/bottom pixel
+       * In the 0x70..0x90 range use the unchanged source pixel */
+
+      int xn;           /*x neightboor*/
+      lv_opa_t xr;      /*x mix ratio*/
+      if(xs_fract < 0x70) {
+          xn = xs_int - 1;
+          xr = xs_fract * 2;
+      }
+      else if(xs_fract > 0x90) {
+          xn = xs_int + 1;
+          xr = (0xFF - xs_fract) * 2;
+      }
+      else {
+          xn = xs_int;
+          xr = 0xFF;
+      }
+
+      /*Handle under/overflow*/
+//      if(xn >= src_width) xn = src_width - 1;
+//      else if(xn < 0) xn = 0;
+//
+//      if(xs_int >= src_width) xs_int = src_width - 1;
+//      else if(xs_int < 0) xs_int = 0;
+
+      int yn;            /*y neightboor*/
+      lv_opa_t yr;       /*y mix ratio*/
+      if(ys_fract < 0x70) {
+          yn = ys_int - 1;
+          yr = ys_fract * 2;
+      }
+      else if(ys_fract > 0x90) {
+          yn = ys_int + 1;
+          yr = (0xFF - ys_fract) * 2;
+      }
+      else {
+          yn = ys_int;
+          yr = 0xFF;
+      }
+
+      /*Handle under/overflow*/
+//      if(yn >= src_height) yn = src_height - 1;
+//      else if(yn < 0) yn = 0;
+//
+//      if(ys_int >= src_height) ys_int = src_height - 1;
+//      else if(ys_int < 0) ys_int = 0;
+
+      /*Get the mixture of the original source and the neightboor pixels in both directions*/
+      lv_color_t c_dest_int = lv_canvas_get_px(canvas_src, xs_int, ys_int);
+      lv_color_t c_dest_xn = lv_canvas_get_px(canvas_src, xn, ys_int);
+      lv_color_t c_dest_yn = lv_canvas_get_px(canvas_src, xs_int, yn);
+      lv_color_t x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
+      lv_color_t y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
+
+      if (xs_int >= 0 && xs_int < dest_width && ys_int >= 0 && ys_int < dest_height) {
+          /*The result color as the average of the x/y mixed colors*/
+
+          lv_color_t c_res = lv_color_mix(x_dest, y_dest, LV_OPA_50);
+          lv_canvas_set_px(canvas_dest, x, y, c_res);
+      } else {
+          lv_canvas_set_px(canvas_dest, x, y, LV_COLOR_RED);//style->image.color);
+      }
+    }
+  }
+
+  lv_obj_invalidate(canvas_dest);
+
+}
+
 /**
  * Draw circle function of the canvas
  * @param canvas pointer to a canvas object
@@ -413,9 +533,6 @@ void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_c
  * @param point2 end point of the line
  * @param color color of the line
  *
- * NOTE: The lv_canvas_draw_line function originates from https://github.com/jb55/bresenham-line.c.
- */
-/*
  * NOTE: The lv_canvas_draw_line function originates from https://github.com/jb55/bresenham-line.c.
  */
 void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color)
@@ -588,5 +705,6 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
 
     return res;
 }
+
 
 #endif
