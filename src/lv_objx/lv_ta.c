@@ -9,7 +9,7 @@
  *********************/
 #include "lv_ta.h"
 #if LV_USE_TA != 0
-
+#include <string.h>
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw.h"
@@ -63,6 +63,7 @@ static lv_design_cb_t ancestor_design;
 static lv_design_cb_t scrl_design;
 static lv_signal_cb_t ancestor_signal;
 static lv_signal_cb_t scrl_signal;
+static const char * ta_insert_replace;
 
 /**********************
  *      MACROS
@@ -195,6 +196,22 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
+    uint32_t letter_buf[2];
+    letter_buf[0] = c;
+    letter_buf[1] = '\0';
+
+    ta_insert_replace = NULL;
+    lv_event_send(ta, LV_EVENT_INSERT, letter_buf);
+    if(ta_insert_replace) {
+        if(ta_insert_replace[0] == '\0') return;    /*Drop this text*/
+
+        /*Add the replaced text directly it's different from the original*/
+        if(strcmp(ta_insert_replace, (char*)letter_buf)) {
+            lv_ta_add_text(ta, ta_insert_replace);
+            return;
+        }
+    }
+
     if(ext->one_line && (c == '\n' || c == '\r')) {
         LV_LOG_INFO("Text area: line break ignored in one-line mode");
         return;
@@ -212,9 +229,6 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     lv_ta_set_edge_flash(ta, false);
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
-    uint32_t letter_buf[2];
-    letter_buf[0] = c;
-    letter_buf[1] = '\0';
 
     lv_label_ins_text(ext->label, ext->cursor.pos, (const char *)letter_buf);    /*Insert the character*/
 
@@ -255,7 +269,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 
     placeholder_update(ta);
 
-    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, letter_buf);
+    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 /**
@@ -266,6 +280,18 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    ta_insert_replace = NULL;
+    lv_event_send(ta, LV_EVENT_INSERT, txt);
+    if(ta_insert_replace) {
+        if(ta_insert_replace[0] == '\0') return;    /*Drop this text*/
+
+        /*Add the replaced text directly it's different from the original*/
+        if(strcmp(ta_insert_replace, txt)) {
+            lv_ta_add_text(ta, ta_insert_replace);
+            return;
+        }
+    }
 
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
 
@@ -322,7 +348,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     placeholder_update(ta);
 
-    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, txt);
+    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 /**
@@ -335,6 +361,19 @@ void lv_ta_del_char(lv_obj_t * ta)
     uint16_t cur_pos = ext->cursor.pos;
 
     if(cur_pos == 0) return;
+
+    ta_insert_replace = NULL;
+    char del_buf[2] = {LV_GROUP_KEY_DEL, '\0'};
+    lv_event_send(ta, LV_EVENT_INSERT, del_buf);
+    if(ta_insert_replace) {
+        if(ta_insert_replace[0] == '\0') return;    /*Drop this text*/
+
+        /*Add the replaced text directly it's different from the original*/
+        if(strcmp(ta_insert_replace, del_buf)) {
+            lv_ta_add_text(ta, ta_insert_replace);
+            return;
+        }
+    }
 
     char * label_txt = lv_label_get_text(ext->label);
     /*Delete a character*/
@@ -442,7 +481,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 
     placeholder_update(ta);
 
-    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, txt);
+    lv_event_send(ta, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 /**
@@ -696,6 +735,19 @@ void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     ext->max_length = num;
+}
+
+/**
+ * In `LV_EVENT_INSERT` the text which planned to be inserted can be replaced by an other text.
+ * It can be used to add automatic formatting to the text area.
+ * @param ta pointer to a text area.
+ * @param txt pointer to a new string to insert. If `""` no text will be added.
+ *            The variable must be live after the `event_cb` exists. (Should be `global` or `static`)
+ */
+void lv_ta_set_insert_replace(lv_obj_t * ta, const char * txt)
+{
+    (void)ta;       /*Unused*/
+    ta_insert_replace = txt;
 }
 
 /**
