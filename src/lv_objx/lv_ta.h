@@ -202,6 +202,15 @@ void lv_ta_set_accepted_chars(lv_obj_t * ta, const char * list);
 void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num);
 
 /**
+ * In `LV_EVENT_INSERT` the text which planned to be inserted can be replaced by an other text.
+ * It can be used to add automatic formatting to the text area.
+ * @param ta pointer to a text area.
+ * @param txt pointer to a new string to insert. If `""` no text will be added.
+ *            The variable must be live after the `event_cb` exists. (Should be `global` or `static`)
+ */
+void lv_ta_set_insert_replace(lv_obj_t * ta, const char * txt);
+
+/**
  * Set the scroll bar mode of a text area
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
