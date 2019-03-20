@@ -348,6 +348,13 @@ static void tabview_init(void)
 #endif
 }
 
+static void table_init(void)
+{
+#if LV_USE_TABLE != 0
+    theme.style.table.bg = &def;
+    theme.style.table.cell = &def;
+#endif
+}
 
 static void win_init(void)
 {
@@ -470,6 +477,7 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, lv_font_t * font)
     ddlist_init();
     roller_init();
     tabview_init();
+    table_init();
     win_init();
 
 #if LV_USE_GROUP
