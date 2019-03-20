@@ -704,7 +704,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                     button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
                     button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false)
             {
-                lv_event_send(btnm, LV_EVENT_SELECTED, lv_btnm_get_active_btn_text(btnm));
+                uint32_t b = ext->btn_id_act;
+                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
         }
     }
@@ -720,7 +721,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 invalidate_button_area(btnm, ext->btn_id_pr);
             }
             if(btn_pr != LV_BTNM_BTN_NONE) {
-                if(btn_pr != LV_BTNM_BTN_NONE) lv_event_send(btnm, LV_EVENT_SELECTED, ext->map_p[btn_pr]);
+                uint32_t b = ext->btn_id_act;
+                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
                 invalidate_button_area(btnm, btn_pr);
             }
         }
@@ -756,7 +758,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                     button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
                     button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false)
             {
-                lv_event_send(btnm, LV_EVENT_SELECTED, lv_btnm_get_active_btn_text(btnm));
+                uint32_t b = ext->btn_id_act;
+                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
 
         }
@@ -767,7 +770,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                     button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
                     button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false)
             {
-                lv_event_send(btnm, LV_EVENT_SELECTED, lv_btnm_get_active_btn_text(btnm));
+                uint32_t b = ext->btn_id_act;
+                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
         }
     }

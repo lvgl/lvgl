@@ -33,7 +33,7 @@ static void lv_kb_def_btn_action_cb(lv_obj_t * kb);
 static lv_signal_cb_t ancestor_signal;
 
 static const char * kb_map_lc[] = {
-    "#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "Bksp", "\n",
+    "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "Bksp", "\n",
     "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", "Enter", "\n",
     "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
     LV_SYMBOL_CLOSE, LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
@@ -47,7 +47,7 @@ static const lv_btnm_ctrl_t kb_ctrl_lc_map[] = {
 };
 
 static const char * kb_map_uc[] = {
-    "#", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Bksp", "\n",
+    "1#", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Bksp", "\n",
     "abc", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Enter", "\n",
     "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
     LV_SYMBOL_CLOSE, LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""

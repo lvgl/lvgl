@@ -276,7 +276,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
     lv_res_t res = LV_RES_OK;
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
 
-    if(id != ext->tab_cur) res = lv_event_send(tabview, LV_EVENT_SELECTED, lv_btnm_get_btn_text(ext->btns, id));
+    if(id != ext->tab_cur) res = lv_event_send(tabview, LV_EVENT_SELECTED, &id);
     if(res != LV_RES_OK) return;
 
 

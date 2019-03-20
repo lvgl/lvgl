@@ -443,7 +443,7 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         uint16_t btn_id = lv_btnm_get_active_btn(ext->btnm);
-        if(btn_id != LV_BTNM_BTN_NONE) lv_event_send(mbox, LV_EVENT_SELECTED, lv_btnm_get_btn_text(ext->btnm, btn_id));
+        if(btn_id != LV_BTNM_BTN_NONE) lv_event_send(mbox, LV_EVENT_SELECTED, &btn_id);
     }
     else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS ||
               sign == LV_SIGNAL_CONTROL || sign == LV_SIGNAL_GET_EDITABLE) {
