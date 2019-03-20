@@ -337,8 +337,20 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
     }
 }
 
-
-void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t angle, int32_t pivotx, int32_t pivoty, lv_coord_t offset_x, lv_coord_t offset_y)
+/**
+ * Rotate the content of canvas (source) and copy the result to an other canvas (destination)
+ * @param canvas_dest destination canvas.
+ * @param canvas_src source canvas.
+ *                   To rotate an image (lv_img_dsc_t) this canvas be constructed by using the image descriptor directly
+ * @param angle the angle of rotation (0..360);
+ * @param offset_x offset X to tell where to put the result data on destination canvas
+ * @param offset_y offset X to tell where to put the result data on destination canvas
+ * @param pivot_x pivot X of rotation. Relative to the source canvas
+ *                Set to `source width / 2` to rotate around the center
+ * @param pivot_y pivot Y of rotation. Relative to the source canvas
+ *                Set to `source height / 2` to rotate around the center
+ */
+void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t angle,lv_coord_t offset_x, lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y)
 {
     lv_canvas_ext_t * ext_src = lv_obj_get_ext_attr(canvas_src);
     lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas_dest);
@@ -356,12 +368,12 @@ void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t ang
     for (x = -offset_x; x < dest_width - offset_x; x++) {
         for (y = -offset_y; y < dest_height - offset_y; y++) {
             /*Get the target point relative coordinates to the pivot*/
-            int32_t xt = x - pivotx;
-            int32_t yt = y - pivoty;
+            int32_t xt = x - pivot_x;
+            int32_t yt = y - pivot_y;
 
             /*Get the source pixel from the upscaled image*/
-            int32_t xs = ((cosma * xt - sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivotx * 256;
-            int32_t ys = ((sinma * xt + cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivoty * 256;
+            int32_t xs = ((cosma * xt - sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivot_x * 256;
+            int32_t ys = ((sinma * xt + cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivot_y * 256;
 
             /*Get the integer part of the source pixel*/
             int xs_int = xs >> 8;

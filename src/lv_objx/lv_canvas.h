@@ -140,8 +140,18 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, l
  * @param y top side of the destination position
  */
 void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
-
-void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t angle, int32_t pivotx, int32_t pivoty, lv_coord_t offset_x, lv_coord_t offset_y);
+/**
+ * Rotate the content of canvas (source) and copy the result to an other canvas (destination)
+ * @param canvas_dest destination canvas.
+ * @param canvas_src source canvas.
+ *                   To rotate an image (lv_img_dsc_t) this canvas be constructed by using the image descriptor directly
+ * @param angle the angle of rotation (0..360);
+ * @param offset_x offset X to tell where to put the result data on destination canvas
+ * @param offset_y offset X to tell where to put the result data on destination canvas
+ * @param pivot_x pivot X of rotation. Relative to the source canvas
+ * @param pivot_y pivot Y of rotation. Relative to the source canvas
+ */
+void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t angle,lv_coord_t offset_x, lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y);
 
 /**
  * Draw circle function of the canvas
