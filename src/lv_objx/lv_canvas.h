@@ -141,7 +141,7 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, l
  */
 void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
 
-void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int32_t pivotx, int32_t pivoty, int16_t angle);
+void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t angle, int32_t pivotx, int32_t pivoty, lv_coord_t offset_x, lv_coord_t offset_y);
 
 /**
  * Draw circle function of the canvas
