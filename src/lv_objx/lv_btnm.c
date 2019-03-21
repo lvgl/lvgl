@@ -765,7 +765,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 } else {
                     ext->ctrl_bits[ext->btn_id_pr] |= LV_BTNM_CTRL_TGL_STATE;
                 }
-                make_one_button_toggled(btnm, ext->btn_id_pr);
+                if(ext->one_toggle)
+                	make_one_button_toggled(btnm, ext->btn_id_pr);
             }
 
             /*Invalidate to old pressed area*/;
@@ -1069,16 +1070,13 @@ static bool maps_are_identical(const char ** map1, const char ** map2)
  */
 static void make_one_button_toggled(const lv_obj_t *btnm, uint16_t btn_idx)
 {
-	lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+	/*Save whether the button was toggled*/
+	bool was_toggled = lv_btnm_get_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE);
 
-	uint16_t i = 0;
+	lv_btnm_set_btn_ctrl_all(btnm, LV_BTNM_CTRL_TGL_STATE, false);
 
-	for(i = 0; i < ext->btn_cnt; i++) {
-		if(i != btn_idx) {
-			ext->ctrl_bits[i] &= (~LV_BTNM_CTRL_TGL_STATE);
-			invalidate_button_area(btnm, i);
-		}
-	}
+	if(was_toggled)
+		lv_btnm_set_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE, true);
 }
 
 #endif
