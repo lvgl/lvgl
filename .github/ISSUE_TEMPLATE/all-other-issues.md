@@ -1,6 +1,6 @@
 ---
 name: All other issues
-about: Describe this issue template's purpose here.
+about: Questions and enhancement requests should go to the forum.
 title: ''
 labels: stale
 assignees: ''
