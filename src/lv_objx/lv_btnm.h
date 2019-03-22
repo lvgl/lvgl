@@ -172,7 +172,7 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
  * @param btnm Button matrix object
  * @param one_toggle Whether "one toggle" mode is enabled
  */
-void lv_btnm_set_one_toggle(const lv_obj_t *btnm, bool one_toggle);
+void lv_btnm_set_one_toggle(lv_obj_t *btnm, bool one_toggle);
 
 /*=====================
  * Getter functions

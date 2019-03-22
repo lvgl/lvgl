@@ -39,7 +39,7 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p);
 static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char ** map);
 static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx);
 static bool maps_are_identical(const char ** map1, const char ** map2);
-static void make_one_button_toggled(const lv_obj_t *btnm, uint16_t btn_idx);
+static void make_one_button_toggled(lv_obj_t *btnm, uint16_t btn_idx);
 
 /**********************
  *  STATIC VARIABLES
@@ -408,7 +408,7 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
  * @param btnm Button matrix object
  * @param one_toggle Whether "one toggle" mode is enabled
  */
-void lv_btnm_set_one_toggle(const lv_obj_t *btnm, bool one_toggle) {
+void lv_btnm_set_one_toggle(lv_obj_t *btnm, bool one_toggle) {
 	lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 	ext->one_toggle = one_toggle;
 
@@ -1068,7 +1068,7 @@ static bool maps_are_identical(const char ** map1, const char ** map2)
  * @param btnm Button matrix object
  * @param btn_idx Button that should remain toggled
  */
-static void make_one_button_toggled(const lv_obj_t *btnm, uint16_t btn_idx)
+static void make_one_button_toggled(lv_obj_t *btnm, uint16_t btn_idx)
 {
 	/*Save whether the button was toggled*/
 	bool was_toggled = lv_btnm_get_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE);
