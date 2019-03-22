@@ -1121,7 +1121,7 @@ static void lv_chart_draw_x_axis_label(lv_obj_t * chart, const lv_area_t * mask)
 
 		lv_area_t label_area;
 		label_area.x1 = chart->coords.x1 + w/2 - size.x/2;
-		label_area.y1 = chart->coords.y1 - LV_CHART_AXIS_TO_LABEL_DISTANCE - size.y/2;
+		label_area.y1 = chart->coords.y1 - LV_CHART_AXIS_TO_LABEL_DISTANCE - (style->text.font->h_px / 4) - size.y/2;
 		label_area.x2 = label_area.x1 + size.x;
 		label_area.y2 = label_area.y1 + size.y/2;
 
