@@ -39,11 +39,7 @@ typedef struct
     uint16_t start_point;
 } lv_chart_series_t;
 
-/*Data of chart */
-#define __LV_CHART_TO_LABEL_DISTANCE 4
-#define __LV_CHART_AXIS_X_TICK_OFFSET_FIX 1
-#define __LV_CHART_AXIS_Y_TICK_OFFSET_FIX 0
-
+/*Data of axis */
 enum
 {
     LV_CHART_AXIS_DRAW_LAST_TICK = 0x01   /* draw the last tick */

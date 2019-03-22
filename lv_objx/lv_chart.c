@@ -21,6 +21,12 @@
 #define LV_CHART_VDIV_DEF   5
 #define LV_CHART_PNUM_DEF   10
 #define LV_CHART_AXIS_MARGIN 50
+#define LV_CHART_AXIS_TICK_LABEL_MAX_LEN 16
+#define LV_CHART_AXIS_TO_LABEL_DISTANCE 4
+#define LV_CHART_AXIS_MAJOR_TICK_LEN_COE 1/15
+#define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2/3
+#define LV_CHART_AXIS_X_TICK_OFFSET_FIX 1
+#define LV_CHART_AXIS_Y_TICK_OFFSET_FIX 0
 
 /**********************
  *      TYPEDEFS
@@ -47,7 +53,6 @@ static lv_signal_func_t ancestor_signal;
 /**********************
  *      MACROS
  **********************/
-#define strlens(s) (s==NULL?0:strlen(s))
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -907,11 +912,11 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
         lv_coord_t y_ofs = chart->coords.y1;
         lv_coord_t h = lv_obj_get_height(chart);
         lv_coord_t w = lv_obj_get_width(chart);
-        char buf[16+1]; /* up to 16 symbols per label + null terminator */
+        char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN+1]; /* up to N symbols per label + null terminator */
 
         /* calculate the size of tick marks */
-        major_tick_len = (int32_t)w / 15;
-        minor_tick_len = major_tick_len * 2/3;
+        major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
+        minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
 
         /* count the '\n'-s to determine the number of options */
         list_index = 0;
@@ -947,7 +952,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
         		p2.x = p1.x - minor_tick_len; /* minor tick */
 
             /* draw a line at moving y position */
-        	p2.y = p1.y = y_ofs + h - (int32_t)(((int32_t)h * i) / num_scale_ticks + 1) - __LV_CHART_AXIS_Y_TICK_OFFSET_FIX;
+        	p2.y = p1.y = y_ofs + h - (int32_t)(((int32_t)h * i) / num_scale_ticks + 1) - LV_CHART_AXIS_Y_TICK_OFFSET_FIX;
 
         	if( i != num_scale_ticks )
         		lv_draw_line(&p1, &p2, mask, style, opa_scale);
@@ -967,7 +972,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
             				ext->y_axis.list_of_values[list_index] != '\0')
             		{
             			/* do not overflow the buffer, but move to the end of the current label */
-            			if(j < 16)
+            			if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
             				buf[j++] = ext->y_axis.list_of_values[list_index++];
             			else
             				list_index++;
@@ -985,7 +990,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
             		lv_txt_get_size(&size, buf, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
             		/* set the area at some distance of the major tick len left of the tick */
-					lv_area_t a = {(p2.x - size.x - __LV_CHART_TO_LABEL_DISTANCE) , (p2.y - size.y/2), (p2.x - __LV_CHART_TO_LABEL_DISTANCE), (p2.y + size.y/2) };
+					lv_area_t a = {(p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE) , (p2.y - size.y/2), (p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.y + size.y/2) };
 					lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL);
             	}
             }
@@ -1014,11 +1019,11 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         lv_coord_t y_ofs = chart->coords.y1;
         lv_coord_t h = lv_obj_get_height(chart);
         lv_coord_t w = lv_obj_get_width(chart);
-        char buf[16+1]; /* up to 16 symbols per label + null terminator */
+        char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN+1]; /* up to N symbols per label + null terminator */
 
         /* calculate the size of tick marks */
-        major_tick_len = (int32_t)w / 15;
-        minor_tick_len = major_tick_len * 2/3;
+        major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
+        minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
 
         /* count the '\n'-s to determine the number of options */
         list_index = 0;
@@ -1054,7 +1059,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         		p2.y = p1.y + minor_tick_len; /* minor tick */
 
             /* draw a line at moving x position */
-        	p2.x = p1.x = x_ofs + (int32_t)(((int32_t)w * i) / num_scale_ticks + 1) - __LV_CHART_AXIS_X_TICK_OFFSET_FIX;
+        	p2.x = p1.x = x_ofs + (int32_t)(((int32_t)w * i) / num_scale_ticks + 1) - LV_CHART_AXIS_X_TICK_OFFSET_FIX;
 
         	if( i != num_scale_ticks )
         		lv_draw_line(&p1, &p2, mask, style, opa_scale);
@@ -1074,7 +1079,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
             				ext->x_axis.list_of_values[list_index] != '\0')
             		{
             			/* do not overflow the buffer, but move to the end of the current label */
-            			if(j < 16)
+            			if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
             				buf[j++] = ext->x_axis.list_of_values[list_index++];
             			else
             				list_index++;
@@ -1092,7 +1097,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
             		lv_txt_get_size(&size, buf, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
             		/* set the area at some distance of the major tick len under of the tick */
-					lv_area_t a = { (p2.x - size.x/2) , (p2.y + __LV_CHART_TO_LABEL_DISTANCE), (p2.x + size.x/2), (p2.y + size.y + __LV_CHART_TO_LABEL_DISTANCE) };
+					lv_area_t a = { (p2.x - size.x/2) , (p2.y + LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.x + size.x/2), (p2.y + size.y + LV_CHART_AXIS_TO_LABEL_DISTANCE) };
 					lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL);
             	}
             }
@@ -1116,7 +1121,7 @@ static void lv_chart_draw_x_axis_label(lv_obj_t * chart, const lv_area_t * mask)
 
 		lv_area_t label_area;
 		label_area.x1 = chart->coords.x1 + w/2 - size.x/2;
-		label_area.y1 = chart->coords.y1 - __LV_CHART_TO_LABEL_DISTANCE - size.y/2;
+		label_area.y1 = chart->coords.y1 - LV_CHART_AXIS_TO_LABEL_DISTANCE - size.y/2;
 		label_area.x2 = label_area.x1 + size.x;
 		label_area.y2 = label_area.y1 + size.y/2;
 
