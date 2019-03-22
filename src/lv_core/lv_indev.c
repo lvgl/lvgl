@@ -281,7 +281,7 @@ lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t *indev)
  */
 void lv_indev_wait_release(lv_indev_t * indev)
 {
-    indev->proc.types.pointer.wait_until_release = 1;
+    indev->proc.wait_until_release = 1;
 }
 
 /**********************
@@ -380,6 +380,15 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
 #if LV_USE_GROUP
+    if(data->state == LV_INDEV_STATE_PR && i->proc.wait_until_release) return;
+
+    if(i->proc.wait_until_release) {
+        i->proc.wait_until_release = 0;
+        i->proc.pr_timestamp = 0;
+        i->proc.long_pr_sent = 0;
+        i->proc.types.keypad.last_state = LV_INDEV_STATE_REL;   /*To skip the processing of release*/
+    }
+
     lv_group_t * g = i->group;
     if(g == NULL) return;
 
@@ -510,6 +519,16 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
 #if LV_USE_GROUP
+
+    if(data->state == LV_INDEV_STATE_PR && i->proc.wait_until_release) return;
+
+    if(i->proc.wait_until_release) {
+        i->proc.wait_until_release = 0;
+        i->proc.pr_timestamp = 0;
+        i->proc.long_pr_sent = 0;
+        i->proc.types.keypad.last_state = LV_INDEV_STATE_REL;   /*To skip the processing of release*/
+    }
+
     lv_group_t * g = i->group;
     if(g == NULL) return;
 
@@ -674,7 +693,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 {
     lv_obj_t * pr_obj = proc->types.pointer.act_obj;
 
-    if(proc->types.pointer.wait_until_release != 0) return;
+    if(proc->wait_until_release != 0) return;
 
     lv_disp_t * disp = indev_act->driver.disp;
 
@@ -812,12 +831,12 @@ static void indev_proc_press(lv_indev_proc_t * proc)
  */
 static void indev_proc_release(lv_indev_proc_t * proc)
 {
-    if(proc->types.pointer.wait_until_release != 0) {
+    if(proc->wait_until_release != 0) {
         proc->types.pointer.act_obj = NULL;
         proc->types.pointer.last_obj = NULL;
         proc->pr_timestamp = 0;
         proc->longpr_rep_timestamp = 0;
-        proc->types.pointer.wait_until_release = 0;
+        proc->wait_until_release = 0;
     }
 
     /*Forget the act obj and send a released signal */

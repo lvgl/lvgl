@@ -99,7 +99,6 @@ typedef struct _lv_indev_proc_t {
             /*Flags*/
             uint8_t drag_limit_out      :1;
             uint8_t drag_in_prog        :1;
-            uint8_t wait_until_release  :1;
         }pointer;
         struct {    /*Keypad data*/
             lv_indev_state_t last_state;
@@ -114,6 +113,7 @@ typedef struct _lv_indev_proc_t {
     uint8_t long_pr_sent        :1;
     uint8_t reset_query         :1;
     uint8_t disabled            :1;
+    uint8_t wait_until_release  :1;
 } lv_indev_proc_t;
 
 typedef void (*lv_indev_feedback_t)(struct _lv_indev_t *, uint8_t);
