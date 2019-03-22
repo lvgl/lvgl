@@ -388,6 +388,33 @@ lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
  *====================*/
 
 /**
+ * Find whether the page has been scrolled to a certain edge.
+ * @param page Page object
+ * @param edge Edge to check
+ * @return true if the page is on the specified edge
+ */
+bool lv_page_on_edge(lv_obj_t *page, lv_page_edge_t edge) {
+	lv_style_t * page_style = lv_obj_get_style(page);
+	lv_obj_t * scrl = lv_page_get_scrl(page);
+	lv_area_t page_coords;
+	lv_area_t scrl_coords;
+
+	lv_obj_get_coords(scrl, &scrl_coords);
+	lv_obj_get_coords(page, &page_coords);
+
+	if(edge == LV_PAGE_EDGE_TOP && scrl_coords.y1 == page_coords.y1 + page_style->body.padding.top)
+		return true;
+	else if(edge == LV_PAGE_EDGE_BOTTOM && scrl_coords.y2 == page_coords.y2 - page_style->body.padding.bottom)
+		return true;
+	else if(edge == LV_PAGE_EDGE_LEFT && scrl_coords.x1 == page_coords.x1 + page_style->body.padding.left)
+		return true;
+	else if(edge == LV_PAGE_EDGE_RIGHT && scrl_coords.x2 == page_coords.x2 - page_style->body.padding.right)
+		return true;
+
+	return false;
+}
+
+/**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
  * @param obj pointer to an object on a page
  * @param glue true: enable glue, false: disable glue

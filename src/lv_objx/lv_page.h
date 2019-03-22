@@ -49,6 +49,17 @@ enum
 };
 typedef uint8_t lv_sb_mode_t;
 
+/*Edges: describes the four edges of the page*/
+
+enum
+{
+	LV_PAGE_EDGE_LEFT = 0x0,
+	LV_PAGE_EDGE_TOP = 0x1,
+	LV_PAGE_EDGE_RIGHT = 0x2,
+	LV_PAGE_EDGE_BOTTOM = 0x3
+};
+typedef uint8_t lv_page_edge_t;
+
 /*Data of page*/
 typedef struct
 {
@@ -348,6 +359,15 @@ lv_style_t * lv_page_get_style(const lv_obj_t *page, lv_page_style_t type);
 /*=====================
  * Other functions
  *====================*/
+
+
+/**
+ * Find whether the page has been scrolled to a certain edge.
+ * @param page Page object
+ * @param edge Edge to check
+ * @return true if the page is on the specified edge
+ */
+bool lv_page_on_edge(lv_obj_t *page, lv_page_edge_t edge);
 
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
