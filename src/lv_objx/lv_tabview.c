@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdio.h>
 #include "lv_tabview.h"
 #if LV_USE_TABVIEW != 0
 
@@ -744,11 +745,13 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 				ext->point_last.y = point_act.y;
 			}
 			ext->drag_hor = 1;
+			printf("Horizontal drag started\n");
 			lv_obj_set_drag(lv_page_get_scrl(tabpage), false);
 
 		} else if(ext->drag_hor == 0) {
 			ext->drag_hor = 0;
 		}
+		printf("%d %d\n", lv_page_on_edge(tabpage, LV_PAGE_EDGE_LEFT), lv_page_on_edge(tabpage, LV_PAGE_EDGE_RIGHT));
 	} else if(y_diff >= LV_INDEV_DRAG_LIMIT || y_diff <= -LV_INDEV_DRAG_LIMIT) {
 		ext->drag_hor = 0;
 		ext->draging = 1;

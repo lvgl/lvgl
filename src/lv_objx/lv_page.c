@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdio.h>
 #include "../lv_objx/lv_page.h"
 #if LV_USE_PAGE != 0
 
@@ -402,6 +403,10 @@ bool lv_page_on_edge(lv_obj_t *page, lv_page_edge_t edge) {
 	lv_obj_get_coords(scrl, &scrl_coords);
 	lv_obj_get_coords(page, &page_coords);
 
+	if(edge == LV_PAGE_EDGE_LEFT) {
+		printf("scrl_coords.x1 %d\n", scrl_coords.x1);
+		printf("page_coords.x1 + page_style->body.padding.left %d\n", page_coords.x1 + page_style->body.padding.left);
+	}
 	if(edge == LV_PAGE_EDGE_TOP && scrl_coords.y1 == page_coords.y1 + page_style->body.padding.top)
 		return true;
 	else if(edge == LV_PAGE_EDGE_BOTTOM && scrl_coords.y2 == page_coords.y2 - page_style->body.padding.bottom)
