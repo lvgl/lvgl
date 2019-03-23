@@ -53,6 +53,7 @@ typedef struct
     uint16_t sel_opt_id_ori;             /*Store the original index on focus*/
     uint16_t anim_time;                  /*Open/Close animation time [ms]*/
     uint8_t opened :1;                   /*1: The list is opened (handled by the library)*/
+    uint8_t force_sel :1;				 /*1: Keep the selection highlight even if the list is closed*/
     uint8_t draw_arrow :1;               /*1: Draw arrow*/
     uint8_t stay_open :1;              /*1: Don't close the list when a new item is selected*/
     lv_coord_t fix_height;               /*Height of the ddlist when opened. (0: auto-size)*/

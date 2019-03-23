@@ -44,6 +44,8 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
 static lv_res_t release_handler(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en);
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
+static void lv_ddlist_anim_cb(lv_obj_t * ddlist);
+static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int32_t height);
 
 /**********************
  *  STATIC VARIABLES
@@ -523,7 +525,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         lv_opa_t opa_scale = lv_obj_get_opa_scale(ddlist);
         /*If the list is opened draw a rectangle under the selected item*/
-        if(ext->opened != 0) {
+        if(ext->opened != 0 || ext->force_sel) {
             lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
             const lv_font_t * font = style->text.font;
             lv_coord_t font_h = lv_font_get_height(font);
@@ -548,7 +550,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         lv_opa_t opa_scale = lv_obj_get_opa_scale(ddlist);
 
         /*Redraw only in opened state*/
-        if(ext->opened) {
+        if(ext->opened || ext->force_sel) {
             lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
             const lv_font_t * font = style->text.font;
             lv_coord_t font_h = lv_font_get_height(font);
@@ -859,9 +861,9 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
         a.var = ddlist;
         a.start = lv_obj_get_height(ddlist);
         a.end = new_height;
-        a.fp = (lv_anim_fp_t)lv_obj_set_height;
+        a.fp = (lv_anim_fp_t)lv_ddlist_adjust_height;
         a.path = lv_anim_path_linear;
-        a.end_cb = (lv_anim_cb_t)lv_ddlist_pos_current_option;
+        a.end_cb = (lv_anim_cb_t)lv_ddlist_anim_cb;
         a.act_time = 0;
         a.time = ext->anim_time;
         a.playback = 0;
@@ -869,9 +871,34 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
         a.repeat = 0;
         a.repeat_pause = 0;
 
+        ext->force_sel = 1; /*Keep the list item selected*/
         lv_anim_create(&a);
 #endif
     }
+}
+
+/**
+ * Position the list and remove the selection highlight if it's closed.
+ * Called at end of list animation.
+ * @param ddlist pointer to a drop down list
+ */
+static void lv_ddlist_anim_cb(lv_obj_t * ddlist) {
+	lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+	lv_ddlist_pos_current_option(ddlist);
+
+	ext->force_sel = 0; /*Turn off drawing of selection*/
+}
+
+/**
+ * Adjusts the ddlist's height and then positions the option within it's new height.
+ * This keeps the option visible during animation.
+ * @param ddlist Drop down list object
+ * @param height New drop down list height
+ */
+static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int32_t height) {
+	lv_obj_set_height(ddlist, height);
+	lv_ddlist_pos_current_option(ddlist);
 }
 
 /**
