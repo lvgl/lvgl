@@ -944,7 +944,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 }
             }
             else if(scrl_coords.x1 > page_coords.x1 + page_style->body.padding.left) {
-                new_x = hpad;  /*Left align*/
+                new_x = page_style->body.padding.left;  /*Left align*/
                 refr_x = true;
                 if(page_ext->edge_flash.enabled &&
                         page_ext->edge_flash.left_ip == 0 && page_ext->edge_flash.right_ip == 0 &&
@@ -955,7 +955,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             }
         }
 
-        /*scrollable height smaller then page height? -> align to left*/
+        /*scrollable height smaller then page height? -> align to top*/
         if(lv_area_get_height(&scrl_coords) + vpad <= lv_area_get_height(&page_coords)) {
             if(scrl_coords.y1 != page_coords.y1 + page_style->body.padding.top) {
                 new_y = page_style->body.padding.top;
