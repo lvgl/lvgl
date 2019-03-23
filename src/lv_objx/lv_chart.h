@@ -214,6 +214,7 @@ static inline void lv_chart_set_style(lv_obj_t *chart, lv_style_t *style)
 
 /**
  * Set the margin around the chart, used for axes value and labels
+ * @param chart 	pointer to an chart object
  * @param margin	value of the margin
  */
 void lv_chart_set_margin(lv_obj_t* chart, uint16_t margin);
@@ -290,6 +291,13 @@ static inline lv_style_t* lv_chart_get_style(const lv_obj_t *chart)
 {
     return lv_obj_get_style(chart);
 }
+
+/**
+ * Set the margin around the chart, used for axes value and labels
+ * @param chart pointer to an chart object
+ * @param return margin	value of the margin
+ */
+uint16_t lv_chart_get_margin(lv_obj_t* chart);
 
 /*=====================
  * Other functions

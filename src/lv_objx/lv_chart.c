@@ -523,6 +523,17 @@ void lv_chart_refresh(lv_obj_t * chart)
     lv_obj_invalidate(chart);
 }
 
+/**
+ * Set the margin around the chart, used for axes value and labels
+ * @param chart pointer to an chart object
+ * @param return margin	value of the margin
+ */
+uint16_t lv_chart_get_margin(lv_obj_t* chart)
+{
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	return ext->margin;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
