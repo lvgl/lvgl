@@ -82,6 +82,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->drag_hor = 0;
     ext->draging = 0;
+    ext->scroll_ver = 0;
     ext->slide_enable = 1;
     ext->tab_cur = 0;
     ext->point_last.x = 0;
@@ -734,7 +735,7 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
     lv_coord_t y_diff = point_act.y - ext->point_last.y;
 
 
-	if(x_diff >= LV_INDEV_DRAG_LIMIT || x_diff <= -LV_INDEV_DRAG_LIMIT) {
+	if(!ext->scroll_ver && (x_diff >= LV_INDEV_DRAG_LIMIT || x_diff <= -LV_INDEV_DRAG_LIMIT)) {
 		ext->draging = 1;
 		/*Check if the page is on the edge */
 		if((lv_page_on_edge(tabpage, LV_PAGE_EDGE_LEFT) && x_diff > 0) ||
@@ -752,6 +753,7 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 	} else if(y_diff >= LV_INDEV_DRAG_LIMIT || y_diff <= -LV_INDEV_DRAG_LIMIT) {
 		ext->drag_hor = 0;
 		ext->draging = 1;
+		ext->scroll_ver = 1;
 	} else
 		ext->draging = 0;
 
@@ -780,6 +782,7 @@ static void tabpage_press_lost_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     ext->drag_hor = 0;
     ext->draging = 0;
+    ext->scroll_ver = 0;
 
     lv_obj_set_drag(lv_page_get_scrl(tabpage), true);
 
