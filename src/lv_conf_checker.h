@@ -439,6 +439,9 @@
 #ifndef LV_USE_CHART
 #define LV_USE_CHART    1
 #endif
+#ifndef LV_CHART_AXIS_TICK_LABEL_MAX_LEN
+#define LV_CHART_AXIS_TICK_LABEL_MAX_LEN 16
+#endif
 
 /*Table (dependencies: lv_label)*/
 #ifndef LV_USE_TABLE

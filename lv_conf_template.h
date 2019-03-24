@@ -257,6 +257,7 @@ typedef void * lv_obj_user_data_t;          /*Declare the type of the user data 
 
 /*Chart (dependencies: -)*/
 #define LV_USE_CHART    1
+#define LV_CHART_AXIS_TICK_LABEL_MAX_LEN 16
 
 /*Table (dependencies: lv_label)*/
 #define LV_USE_TABLE    1
