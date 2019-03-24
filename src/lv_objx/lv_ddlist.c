@@ -787,7 +787,6 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
             lv_point_t p;
             lv_indev_get_point(indev, &p);
-            p.x -= ext->label->coords.x1;
             p.y -= ext->label->coords.y1;
             uint16_t letter_i;
             letter_i = lv_label_get_letter_on(ext->label, &p);
@@ -803,6 +802,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             }
 
             ext->sel_opt_id = new_opt;
+            printf("rid: %d\n", new_opt);
         }
 
         ext->sel_opt_id_ori = ext->sel_opt_id;
