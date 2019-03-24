@@ -47,8 +47,8 @@ typedef uint8_t lv_chart_type_t;
 /*Chart update mode*/
 enum
 {
-	LV_CHART_MODE_SHIFT,
-	LV_CHART_MODE_CIRCULAR,
+	LV_CHART_UPDATE_MODE_SHIFT,
+	LV_CHART_UPDATE_MODE_CIRCULAR,
 };
 typedef uint8_t lv_chart_update_mode_t;
     
