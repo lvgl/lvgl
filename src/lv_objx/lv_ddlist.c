@@ -803,7 +803,6 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             }
 
             ext->sel_opt_id = new_opt;
-            printf("rid: %d\n", new_opt);
         }
 
         ext->sel_opt_id_ori = ext->sel_opt_id;
