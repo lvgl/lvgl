@@ -566,6 +566,7 @@ static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_
         if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, mask);
         if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, mask);
         if(ext->type & LV_CHART_TYPE_AREA) lv_chart_draw_areas(chart, mask);
+
         lv_chart_draw_axes(chart, mask);
     }
     return true;
@@ -623,8 +624,8 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
     uint8_t div_i_start;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t w = lv_obj_get_width(chart);
-    lv_coord_t h = lv_obj_get_height(chart);
+    lv_coord_t w = lv_obj_get_width(chart) - 1;
+    lv_coord_t h = lv_obj_get_height(chart) - 1;
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
 
