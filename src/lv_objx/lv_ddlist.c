@@ -788,6 +788,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             lv_point_t p;
             lv_indev_get_point(indev, &p);
             p.y -= ext->label->coords.y1;
+            p.x -= ext->label->coords.x1;
             uint16_t letter_i;
             letter_i = lv_label_get_letter_on(ext->label, &p);
 
