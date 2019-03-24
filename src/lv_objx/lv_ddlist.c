@@ -841,7 +841,6 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
                 style->body.padding.top + style->body.padding.bottom;
         else new_height = ext->fix_height;
 
-        lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
     } else { /*Close the list*/
         const lv_font_t * font = style->text.font;
         lv_style_t * label_style = lv_obj_get_style(ext->label);
@@ -854,6 +853,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     if(anim_en == 0) {
         lv_obj_set_height(ddlist, new_height);
         lv_ddlist_pos_current_option(ddlist);
+        if(ext->opened) lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
 #if LV_USE_ANIMATION
         lv_anim_del(ddlist, (lv_anim_fp_t)lv_obj_set_height);  /*If an animation is in progress then it will overwrite this changes*/
     } else {
@@ -888,6 +888,8 @@ static void lv_ddlist_anim_cb(lv_obj_t * ddlist) {
 	lv_ddlist_pos_current_option(ddlist);
 
 	ext->force_sel = 0; /*Turn off drawing of selection*/
+
+    if(ext->opened) lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
 }
 
 /**
