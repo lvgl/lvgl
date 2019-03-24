@@ -284,10 +284,10 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
 }
 
 /**
- * Rotate the content of canvas (source) and copy the result to an other canvas (destination)
- * @param canvas_dest destination canvas.
- * @param canvas_src source canvas.
- *                   To rotate an image (lv_img_dsc_t) this canvas be constructed by using the image descriptor directly
+ * Rotate and image and store the result on a canvas.
+ * @param canvas pointer to a canvas object
+ * @param img pointer to an image descriptor.
+ *             Can be the image descriptor of an other canvas too (`lv_canvas_get_img()`).
  * @param angle the angle of rotation (0..360);
  * @param offset_x offset X to tell where to put the result data on destination canvas
  * @param offset_y offset X to tell where to put the result data on destination canvas
@@ -296,16 +296,15 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
  * @param pivot_y pivot Y of rotation. Relative to the source canvas
  *                Set to `source height / 2` to rotate around the center
  */
-void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t angle,lv_coord_t offset_x, lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y)
+void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle,lv_coord_t offset_x, lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y)
 {
-    lv_canvas_ext_t * ext_src = lv_obj_get_ext_attr(canvas_src);
-    lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas_dest);
+    lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
 
     int32_t sinma = lv_trigo_sin(-angle);
     int32_t cosma = lv_trigo_sin(-angle + 90); /* cos */
 
-    int32_t src_width = ext_src->dsc.header.w;
-    int32_t src_height = ext_src->dsc.header.h;
+    int32_t img_width = img->header.w;
+    int32_t img_height = img->header.h;
     int32_t dest_width = ext_dst->dsc.header.w;
     int32_t dest_height = ext_dst->dsc.header.h;
 
@@ -326,11 +325,11 @@ void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t ang
             int ys_int = ys >> 8;
 
 
-            if(xs_int >= src_width) continue;
+            if(xs_int >= img_width) continue;
             else if(xs_int < 0) continue;
 
 
-            if(ys_int >= src_height) continue;
+            if(ys_int >= img_height) continue;
             else if(ys_int < 0) continue;
 
             /*Get the fractional part of the source pixel*/
@@ -357,7 +356,7 @@ void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t ang
             }
 
             /*Handle under/overflow*/
-            if(xn >= src_width) continue;
+            if(xn >= img_width) continue;
             else if(xn < 0) continue;
 
             int yn;            /*y neightboor*/
@@ -376,17 +375,17 @@ void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t ang
             }
 
             /*Handle under/overflow*/
-            if(yn >= src_height) continue;
+            if(yn >= img_height) continue;
             else if(yn < 0) continue;
 
             /*Get the mixture of the original source and the neightboor pixels in both directions*/
-            lv_color_t c_dest_int = lv_canvas_get_px(canvas_src, xs_int, ys_int);
-            lv_color_t c_dest_xn = lv_canvas_get_px(canvas_src, xn, ys_int);
-            lv_color_t c_dest_yn = lv_canvas_get_px(canvas_src, xs_int, yn);
+            lv_color_t c_dest_int = lv_img_buf_get_px(img, xs_int, ys_int);
+            lv_color_t c_dest_xn = lv_img_buf_get_px(img, xn, ys_int);
+            lv_color_t c_dest_yn = lv_img_buf_get_px(img, xs_int, yn);
             lv_color_t x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
             lv_color_t y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
 
-            //      if (x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height)
+            if (x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height)
             {
                 /*The result color as the average of the x/y mixed colors*/
                 lv_img_buf_set_px(&ext_dst->dsc, x + offset_x, y + offset_y, lv_color_mix(x_dest, y_dest, LV_OPA_50));
@@ -394,7 +393,7 @@ void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t ang
         }
     }
 
-    lv_obj_invalidate(canvas_dest);
+    lv_obj_invalidate(canvas);
 
 }
 
