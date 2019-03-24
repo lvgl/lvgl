@@ -51,6 +51,22 @@ typedef struct
     uint16_t start_point;
 } lv_chart_series_t;
 
+/*Data of axis */
+enum
+{
+    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01   /* draw the last tick */
+};
+typedef uint8_t lv_chart_axis_options_t;
+
+typedef struct
+{
+	const char* list_of_values;
+	uint8_t num_tick_marks;
+	lv_chart_axis_options_t options;
+	uint8_t major_tick_len;
+	uint8_t minor_tick_len;
+} lv_chart_axis_cfg_t;
+
 /*Data of chart */
 typedef struct
 {
@@ -63,6 +79,9 @@ typedef struct
     uint8_t vdiv_cnt;       /*Number of vertical division lines*/
     uint16_t point_cnt;     /*Point number in a data line*/
     lv_chart_type_t type;   /*Line, column or point chart (from 'lv_chart_type_t')*/
+    lv_chart_axis_cfg_t y_axis;
+    lv_chart_axis_cfg_t x_axis;
+    uint16_t margin;
     struct {
         lv_coord_t width;  /*Line width or point radius*/
         uint8_t num;       /*Number of data lines in dl_ll*/
@@ -193,6 +212,37 @@ static inline void lv_chart_set_style(lv_obj_t *chart, lv_style_t *style)
     lv_obj_set_style(chart, style);
 }
 
+/**
+ * Set the margin around the chart, used for axes value and labels
+ * @param chart 	pointer to an chart object
+ * @param margin	value of the margin
+ */
+void lv_chart_set_margin(lv_obj_t* chart, uint16_t margin);
+
+/**
+ * Set the x/y-axis ticks of a chart
+ * @param chart 			pointer to a chart object
+ * @param list_of_values 	list of string values, terminated with \n, except the last
+ * @param num_tick_marks 	if list_of_values is NULL: total number of ticks per axis
+ * 							else step in ticks between two value labels
+ * @param major_tick_len	the length of the major tick, AUTO if 0
+ * @param minor_tick_len	the length of the minor tick, AUTO if 0
+ * @param options			extra options
+ */
+void lv_chart_set_x_ticks(	lv_obj_t* chart,
+							const char* list_of_values,
+							uint8_t num_tick_marks,
+							uint8_t major_tick_len,
+							uint8_t minor_tick_len,
+							lv_chart_axis_options_t options);
+
+void lv_chart_set_y_ticks(	lv_obj_t* chart,
+							const char* list_of_values,
+							uint8_t num_tick_marks,
+							uint8_t major_tick_len,
+							uint8_t minor_tick_len,
+							lv_chart_axis_options_t options);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -241,6 +291,13 @@ static inline lv_style_t* lv_chart_get_style(const lv_obj_t *chart)
 {
     return lv_obj_get_style(chart);
 }
+
+/**
+ * Get the margin around the chart, used for axes value and labels
+ * @param chart pointer to an chart object
+ * @param return value of the margin
+ */
+uint16_t lv_chart_get_margin(lv_obj_t* chart);
 
 /*=====================
  * Other functions
