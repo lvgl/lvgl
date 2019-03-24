@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "lv_canvas.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_draw/lv_draw_img.h"
 #if LV_USE_CANVAS != 0
 
 /*********************
@@ -23,7 +24,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * param);
-static void set_px_core(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c);
 
 /**********************
  *  STATIC VARIABLES
@@ -131,7 +131,9 @@ void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_
  */
 void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c)
 {
-    set_px_core(canvas, x, y, c);
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+
+    lv_img_buf_set_px(&ext->dsc, x, y, c);
     lv_obj_invalidate(canvas);
 
 }
@@ -164,65 +166,9 @@ void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t *
  */
 lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
 {
-    lv_color_t p_color = LV_COLOR_BLACK;
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    if(x >= ext->dsc.header.w) {
-        x = ext->dsc.header.w - 1;
-        LV_LOG_WARN("lv_canvas_get_px: x is too large (out of canvas)");
-    }
-    else if(x < 0) {
-        x = 0;
-        LV_LOG_WARN("lv_canvas_get_px: x is < 0 (out of canvas)");
-    }
 
-
-    if(y >= ext->dsc.header.h) {
-        y = ext->dsc.header.h - 1;
-        LV_LOG_WARN("lv_canvas_get_px: y is too large (out of canvas)");
-    }
-    else if(y < 0) {
-        y = 0;
-        LV_LOG_WARN("lv_canvas_get_px: y is < 0 (out of canvas)");
-    }
-
-    uint8_t * buf_u8 = (uint8_t *) ext->dsc.data;
-
-    if(ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR ||
-            ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
-    {
-        uint32_t px = ext->dsc.header.w * y * sizeof(lv_color_t) + x * sizeof(lv_color_t);
-        memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_1BIT) {
-        buf_u8 += 4 * 2;
-        uint8_t bit = x & 0x7;
-        x = x >> 3;
-
-        uint32_t px = (ext->dsc.header.w >> 3) * y + x;
-        p_color.full = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_2BIT) {
-        buf_u8 += 4 * 4;
-        uint8_t bit = (x & 0x3) * 2;
-        x = x >> 2;
-
-        uint32_t px = (ext->dsc.header.w >> 2) * y + x;
-        p_color.full = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_4BIT) {
-        buf_u8 += 4 * 16;
-        uint8_t bit = (x & 0x1) * 4;
-        x = x >> 1;
-
-        uint32_t px = (ext->dsc.header.w >> 1) * y + x;
-        p_color.full = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_8BIT) {
-        buf_u8 += 4 * 256;
-        uint32_t px = ext->dsc.header.w * y + x;
-        p_color.full = buf_u8[px];
-    }
-    return p_color;
+    return lv_img_buf_get_px(&ext->dsc, x, y);
 }
 
 /**
@@ -443,7 +389,7 @@ void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t ang
             //      if (x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height)
             {
                 /*The result color as the average of the x/y mixed colors*/
-                set_px_core(canvas_dest, x + offset_x, y + offset_y, lv_color_mix(x_dest, y_dest, LV_OPA_50));
+                lv_img_buf_set_px(&ext_dst->dsc, x + offset_x, y + offset_y, lv_color_mix(x_dest, y_dest, LV_OPA_50));
             }
         }
     }
@@ -530,7 +476,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2
  * @param color line color of the triangle
  */
 void lv_canvas_draw_triangle(lv_obj_t * canvas, lv_point_t * points, lv_color_t color)
-{ 
+{
     lv_canvas_draw_polygon(canvas, points, 3, color);
 }
 
@@ -541,7 +487,7 @@ void lv_canvas_draw_triangle(lv_obj_t * canvas, lv_point_t * points, lv_color_t 
  * @param color line color of the rectangle
  */
 void lv_canvas_draw_rect(lv_obj_t * canvas, lv_point_t * points, lv_color_t color)
-{ 
+{
     lv_canvas_draw_polygon(canvas, points, 4, color);
 }
 
@@ -553,7 +499,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_point_t * points, lv_color_t colo
  * @param color line color of the polygon
  */
 void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color)
-{ 
+{
     uint8_t i;
 
     for(i=0; i < (size - 1); i++) {
@@ -593,7 +539,7 @@ void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size,
  * @param x x coordinate of the start position (seed)
  * @param y y coordinate of the start position (seed)
  * @param boundary_color edge/boundary color of the area
- * @param fill_color fill color of the area 
+ * @param fill_color fill color of the area
  */
 void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t boundary_color, lv_color_t fill_color)
 {
@@ -670,62 +616,5 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
 
     return res;
 }
-
-/**
- * Set a pixel of the canvas. Doesn't check for errors and doesn't invalidate the canvas
- * @param canvas pointer to canvas object
- * @param x x coordinate of the point to set
- * @param y x coordinate of the point to set
- * @param c color of the point
- */
-static void set_px_core(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c)
-{
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-
-    uint8_t * buf_u8 = (uint8_t *) ext->dsc.data;
-
-    if(ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR ||
-            ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
-    {
-        uint32_t px = ext->dsc.header.w * y * sizeof(lv_color_t) + x * sizeof(lv_color_t);
-
-        memcpy(&buf_u8[px], &c, sizeof(lv_color_t));
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_1BIT) {
-        buf_u8 += 4 * 2;
-        uint8_t bit = x & 0x7;
-        x = x >> 3;
-
-        uint32_t px = (ext->dsc.header.w >> 3) * y + x;
-        buf_u8[px] = buf_u8[px] & ~(1 << (7 - bit));
-        buf_u8[px] = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_2BIT) {
-        buf_u8 += 4 * 4;
-        uint8_t bit = (x & 0x3) * 2;
-        x = x >> 2;
-
-        uint32_t px = (ext->dsc.header.w >> 2) * y + x;
-
-        buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
-        buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_4BIT) {
-        buf_u8 += 4 * 16;
-        uint8_t bit = (x & 0x1) * 4;
-        x = x >> 1;
-
-        uint32_t px = (ext->dsc.header.w >> 1) * y + x;
-
-        buf_u8[px] = buf_u8[px] & ~(0xF << (4 - bit));
-        buf_u8[px] = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
-    }
-    else if(ext->dsc.header.cf == LV_IMG_CF_INDEXED_8BIT) {
-        buf_u8 += 4 * 256;
-        uint32_t px = ext->dsc.header.w * y + x;
-        buf_u8[px] = c.full;
-    }
-}
-
 
 #endif
