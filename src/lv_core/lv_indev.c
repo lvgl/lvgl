@@ -402,111 +402,112 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
      * It must be done here else `lv_indev_get_key` will return the last key in events and signals*/
     i->proc.types.keypad.last_key = data->key;
 
-    do {
-        /*Key press happened*/
-        if (data->state == LV_INDEV_STATE_PR &&
-            i->proc.types.keypad.last_state == LV_INDEV_STATE_REL)
-        {
-            i->proc.pr_timestamp = lv_tick_get();
+    /* Save the previous state so we can detect state changes below and also set the last state now
+     * so if any signal/event handler on the way returns `LV_RES_INV` the last state is remembered
+     * for the next time*/
+    uint32_t prev_state = i->proc.types.keypad.last_state;
+    i->proc.types.keypad.last_state = data->state;
 
-            /*Simulate a press on the object if ENTER was pressed*/
-            if (data->key == LV_GROUP_KEY_ENTER) {
-                focused->signal_cb(focused, LV_SIGNAL_PRESSED, NULL);
-                if (i->proc.reset_query) break;     /*The object might be deleted*/
-                lv_event_send(focused, LV_EVENT_PRESSED, NULL);
-                if (i->proc.reset_query) break;     /*The object might be deleted*/
+    /*Key press happened*/
+    if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_REL)
+    {
+        i->proc.pr_timestamp = lv_tick_get();
 
-                /*Send the ENTER as a normal KEY*/
-                lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+        /*Simulate a press on the object if ENTER was pressed*/
+        if(data->key == LV_GROUP_KEY_ENTER) {
+            focused->signal_cb(focused, LV_SIGNAL_PRESSED, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
+            lv_event_send(focused, LV_EVENT_PRESSED, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
+
+            /*Send the ENTER as a normal KEY*/
+            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+        }
+        /*Move the focus on NEXT*/
+        else if(data->key == LV_GROUP_KEY_NEXT) {
+            lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
+            lv_group_focus_next(g);
+            if(i->proc.reset_query) return;             /*The object might be deleted*/
+        }
+        /*Move the focus on PREV*/
+        else if(data->key == LV_GROUP_KEY_PREV) {
+            lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
+            lv_group_focus_prev(g);
+            if(i->proc.reset_query) return;             /*The object might be deleted*/
+        }
+        /*Just send other keys to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
+        else {
+            lv_group_send_data(g, data->key);
+        }
+    }
+    /*Pressing*/
+    else if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_PR)
+    {
+        /*Long press time has elapsed?*/
+        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
+            i->proc.long_pr_sent = 1;
+            if(data->key == LV_GROUP_KEY_ENTER) {
+                i->proc.longpr_rep_timestamp = lv_tick_get();
+                focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS, NULL);
+                if(i->proc.reset_query) return;     /*The object might be deleted*/
+                lv_event_send(focused, LV_EVENT_LONG_PRESSED, NULL);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
             }
-            /*Move the focus on NEXT*/
-            else if (data->key == LV_GROUP_KEY_NEXT) {
+        }
+        /*Long press repeated time has elapsed?*/
+        else if(i->proc.long_pr_sent != 0 && lv_tick_elaps(i->proc.longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
+
+            i->proc.longpr_rep_timestamp = lv_tick_get();
+
+            /*Send LONG_PRESS_REP on ENTER*/
+            if(data->key == LV_GROUP_KEY_ENTER) {
+                focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS_REP, NULL);
+                if(i->proc.reset_query) return;     /*The object might be deleted*/
+                lv_event_send(focused, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
+                if(i->proc.reset_query) return;         /*The object might be deleted*/
+            }
+            /*Move the focus on NEXT again*/
+            else if(data->key == LV_GROUP_KEY_NEXT) {
                 lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
                 lv_group_focus_next(g);
-                if (i->proc.reset_query) break;             /*The object might be deleted*/
+                if(i->proc.reset_query) return;             /*The object might be deleted*/
             }
-            /*Move the focus on PREV*/
-            else if (data->key == LV_GROUP_KEY_PREV) {
+            /*Move the focus on PREV again*/
+            else if(data->key == LV_GROUP_KEY_PREV) {
                 lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
                 lv_group_focus_prev(g);
-                if (i->proc.reset_query) break;             /*The object might be deleted*/
+                if(i->proc.reset_query) return;             /*The object might be deleted*/
             }
-            /*Just send other keys to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
+            /*Just send other keys again to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
             else {
                 lv_group_send_data(g, data->key);
+                if(i->proc.reset_query) return;             /*The object might be deleted*/
             }
         }
-        /*Pressing*/
-        else if (data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR)
-        {
-            /*Long press time has elapsed?*/
-            if (i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
-                i->proc.long_pr_sent = 1;
-                if (data->key == LV_GROUP_KEY_ENTER) {
-                    i->proc.longpr_rep_timestamp = lv_tick_get();
-                    focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS, NULL);
-                    if (i->proc.reset_query) break;     /*The object might be deleted*/
-                    lv_event_send(focused, LV_EVENT_LONG_PRESSED, NULL);
-                    if (i->proc.reset_query) break;         /*The object might be deleted*/
-                }
-            }
-            /*Long press repeated time has elapsed?*/
-            else if (i->proc.long_pr_sent != 0 && lv_tick_elaps(i->proc.longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
+    }
+    /*Release happened*/
+    else if(data->state == LV_INDEV_STATE_REL && prev_state == LV_INDEV_STATE_PR)
+    {
+        /*The user might clear the key when it was released. Always release the pressed key*/
+        data->key = prev_key;
+        if(data->key == LV_GROUP_KEY_ENTER) {
 
-                i->proc.longpr_rep_timestamp = lv_tick_get();
+            focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
 
-                /*Send LONG_PRESS_REP on ENTER*/
-                if (data->key == LV_GROUP_KEY_ENTER) {
-                    focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS_REP, NULL);
-                    if (i->proc.reset_query) break;     /*The object might be deleted*/
-                    lv_event_send(focused, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
-                    if (i->proc.reset_query) break;         /*The object might be deleted*/
-                }
-                /*Move the focus on NEXT again*/
-                else if (data->key == LV_GROUP_KEY_NEXT) {
-                    lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
-                    lv_group_focus_next(g);
-                    if (i->proc.reset_query) break;             /*The object might be deleted*/
-                }
-                /*Move the focus on PREV again*/
-                else if (data->key == LV_GROUP_KEY_PREV) {
-                    lv_group_set_editing(g, false);             /*Editing is not used by KEYPAD is be sure it is disabled*/
-                    lv_group_focus_prev(g);
-                    if (i->proc.reset_query) break;             /*The object might be deleted*/
-                }
-                /*Just send other keys again to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
-                else {
-                    lv_group_send_data(g, data->key);
-                    if (i->proc.reset_query) break;             /*The object might be deleted*/
-                }
+            if(i->proc.long_pr_sent == 0) {
+                lv_event_send(focused, LV_EVENT_SHORT_CLICKED, NULL);
             }
+
+            lv_event_send(focused, LV_EVENT_CLICKED, NULL);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
+
+            lv_event_send(focused, LV_EVENT_RELEASED, NULL);
+            if(i->proc.reset_query) return;         /*The object might be deleted*/
         }
-        /*Release happened*/
-        else if (data->state == LV_INDEV_STATE_REL && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR)
-        {
-            /*The user might clear the key when it was released. Always release the pressed key*/
-            data->key = prev_key;
-            if (data->key == LV_GROUP_KEY_ENTER) {
-
-                focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
-                if (i->proc.reset_query) break;     /*The object might be deleted*/
-
-                if (i->proc.long_pr_sent == 0) {
-                    lv_event_send(focused, LV_EVENT_SHORT_CLICKED, NULL);
-                }
-
-                lv_event_send(focused, LV_EVENT_CLICKED, NULL);
-                if (i->proc.reset_query) break;         /*The object might be deleted*/
-
-                lv_event_send(focused, LV_EVENT_RELEASED, NULL);
-                if (i->proc.reset_query) break;         /*The object might be deleted*/
-            }
-            i->proc.pr_timestamp = 0;
-            i->proc.long_pr_sent = 0;
-        }
-    } while (false);
-
-    i->proc.types.keypad.last_state = data->state;
+        i->proc.pr_timestamp = 0;
+        i->proc.long_pr_sent = 0;
+    }
 #else
     (void)data; /*Unused*/
     (void)i; /*Unused*/
