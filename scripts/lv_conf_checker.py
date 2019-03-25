@@ -5,7 +5,7 @@ Generates a chechker file for lv_conf.h from lv_conf_templ.h define all the not 
 
 import re
 
-fin = open("../templates/lv_conf_templ.h", "r");
+fin = open("../lv_conf_template.h", "r");
 fout = open("../src/lv_conf_checker.h", "w");
 
 

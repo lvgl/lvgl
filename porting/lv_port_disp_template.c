@@ -24,7 +24,7 @@
  **********************/
 static void disp_init(void);
 
-static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
+static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 #if LV_USE_GPU
 static void mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 static void mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color);
@@ -135,7 +135,7 @@ static void disp_init(void)
 /* Flush the content of the internal buffer the specific area on the display
  * You can use DMA or any hardware acceleration to do this operation in the background but
  * 'lv_disp_flush_ready()' has to be called when finished. */
-static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
     /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
 

@@ -108,6 +108,13 @@ void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t *
 lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y);
 
 /**
+ * Get the image of the canvas as a pointer to an `lv_img_dsc_t` variable.
+ * @param canvas pointer to a canvas object
+ * @return pointer to the image descriptor.
+ */
+lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas);
+
+/**
  * Get style of a canvas.
  * @param canvas pointer to canvas object
  * @param type which style should be get
@@ -131,27 +138,19 @@ lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type
 void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
 
 /**
- * Multiply a buffer with the canvas
+ * Rotate and image and store the result on a canvas.
  * @param canvas pointer to a canvas object
- * @param to_copy buffer to copy (multiply). LV_IMG_CF_TRUE_COLOR_ALPHA is not supported
- * @param w width of the buffer to copy
- * @param h height of the buffer to copy
- * @param x left side of the destination position
- * @param y top side of the destination position
- */
-void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
-/**
- * Rotate the content of canvas (source) and copy the result to an other canvas (destination)
- * @param canvas_dest destination canvas.
- * @param canvas_src source canvas.
- *                   To rotate an image (lv_img_dsc_t) this canvas be constructed by using the image descriptor directly
+ * @param img pointer to an image descriptor.
+ *             Can be the image descriptor of an other canvas too (`lv_canvas_get_img()`).
  * @param angle the angle of rotation (0..360);
  * @param offset_x offset X to tell where to put the result data on destination canvas
  * @param offset_y offset X to tell where to put the result data on destination canvas
  * @param pivot_x pivot X of rotation. Relative to the source canvas
+ *                Set to `source width / 2` to rotate around the center
  * @param pivot_y pivot Y of rotation. Relative to the source canvas
+ *                Set to `source height / 2` to rotate around the center
  */
-void lv_canvas_rotate(lv_obj_t * canvas_dest, lv_obj_t * canvas_src, int16_t angle,lv_coord_t offset_x, lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y);
+void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle,lv_coord_t offset_x, lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y);
 
 /**
  * Draw circle function of the canvas

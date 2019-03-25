@@ -64,6 +64,7 @@ typedef struct
     uint8_t slide_enable :1;    /*1: enable horizontal sliding by touch pad*/
     uint8_t draging :1;
     uint8_t drag_hor :1;
+    uint8_t scroll_ver :1;
     uint8_t btns_hide :1;
     lv_tabview_btns_pos_t btns_pos :1;
 } lv_tabview_ext_t;

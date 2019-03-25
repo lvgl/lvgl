@@ -145,6 +145,130 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
 
 }
 
+/**
+ * Get the color of a pixel on the canvas
+ * @param canvas
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @return color of the point
+ */
+lv_color_t lv_img_buf_get_px(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y)
+{
+    lv_color_t p_color = LV_COLOR_BLACK;
+    if(x >= dsc->header.w) {
+        x = dsc->header.w - 1;
+        LV_LOG_WARN("lv_canvas_get_px: x is too large (out of canvas)");
+    }
+    else if(x < 0) {
+        x = 0;
+        LV_LOG_WARN("lv_canvas_get_px: x is < 0 (out of canvas)");
+    }
+
+
+    if(y >= dsc->header.h) {
+        y = dsc->header.h - 1;
+        LV_LOG_WARN("lv_canvas_get_px: y is too large (out of canvas)");
+    }
+    else if(y < 0) {
+        y = 0;
+        LV_LOG_WARN("lv_canvas_get_px: y is < 0 (out of canvas)");
+    }
+
+    uint8_t * buf_u8 = (uint8_t *) dsc->data;
+
+    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR ||
+            dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
+    {
+        uint32_t px = dsc->header.w * y * sizeof(lv_color_t) + x * sizeof(lv_color_t);
+        memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
+        buf_u8 += 4 * 2;
+        uint8_t bit = x & 0x7;
+        x = x >> 3;
+
+        uint32_t px = (dsc->header.w >> 3) * y + x;
+        p_color.full = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
+        buf_u8 += 4 * 4;
+        uint8_t bit = (x & 0x3) * 2;
+        x = x >> 2;
+
+        uint32_t px = (dsc->header.w >> 2) * y + x;
+        p_color.full = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
+        buf_u8 += 4 * 16;
+        uint8_t bit = (x & 0x1) * 4;
+        x = x >> 1;
+
+        uint32_t px = (dsc->header.w >> 1) * y + x;
+        p_color.full = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        buf_u8 += 4 * 256;
+        uint32_t px = dsc->header.w * y + x;
+        p_color.full = buf_u8[px];
+    }
+    return p_color;
+}
+
+/**
+ * Set the color of a pixel on the canvas
+ * @param dsc image
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @param c color of the point
+ */
+void lv_img_buf_set_px(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_color_t c)
+{
+    uint8_t * buf_u8 = (uint8_t *) dsc->data;
+
+    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR ||
+            dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
+    {
+        uint32_t px = dsc->header.w * y * sizeof(lv_color_t) + x * sizeof(lv_color_t);
+
+        memcpy(&buf_u8[px], &c, sizeof(lv_color_t));
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
+        buf_u8 += 4 * 2;
+        uint8_t bit = x & 0x7;
+        x = x >> 3;
+
+        uint32_t px = (dsc->header.w >> 3) * y + x;
+        buf_u8[px] = buf_u8[px] & ~(1 << (7 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
+        buf_u8 += 4 * 4;
+        uint8_t bit = (x & 0x3) * 2;
+        x = x >> 2;
+
+        uint32_t px = (dsc->header.w >> 2) * y + x;
+
+        buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
+        buf_u8 += 4 * 16;
+        uint8_t bit = (x & 0x1) * 4;
+        x = x >> 1;
+
+        uint32_t px = (dsc->header.w >> 1) * y + x;
+
+        buf_u8[px] = buf_u8[px] & ~(0xF << (4 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
+    }
+    else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        buf_u8 += 4 * 256;
+        uint32_t px = dsc->header.w * y + x;
+        buf_u8[px] = c.full;
+    }
+}
+
+
 uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf)
 {
     uint8_t px_size = 0;

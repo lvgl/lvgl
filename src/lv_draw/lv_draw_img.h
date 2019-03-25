@@ -154,6 +154,23 @@ bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf);
 
 bool lv_img_color_format_has_alpha(lv_img_cf_t cf);
 
+/**
+ * Set the color of a pixel on an image
+ * @param dsc image
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @param c color of the point
+ */
+void lv_img_buf_set_px(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_color_t c);
+
+/**
+ * Get the color of a pixel on an image
+ * @param dsc image
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @return color of the point
+ */
+lv_color_t lv_img_buf_get_px(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y);
 
 /**********************
  *      MACROS

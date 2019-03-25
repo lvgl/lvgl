@@ -126,11 +126,7 @@ bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 ```
-<<<<<<< HEAD
-6. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in a Timer interrupt or in an Operation system task.
-=======
 6. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in Timer interrupt or in an Operation system task. It will redraw the screen if required, handle input devices etc.
->>>>>>> master
 
 For a detailed description check the [Documentation](https://docs.littlevgl.com/#Porting) or the [Porting examples](https://github.com/littlevgl/lvgl/tree/multi-disp/lv_porting).
  

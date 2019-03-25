@@ -410,7 +410,9 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         lv_obj_set_height(lv_page_get_scrl(roller),
                           lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
         lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
+        lv_anim_del(lv_page_get_scrl(roller), (lv_anim_fp_t)lv_obj_set_y);
         lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
+
         refr_position(roller, false);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
 
@@ -422,6 +424,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                               lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
 
             lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
+            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_fp_t)lv_obj_set_y);
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
         }
@@ -446,7 +449,6 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             }
         } else {
             ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;      /*Save the current value. Used to revert this state if ENER wont't be pressed*/
-
         }
 #endif
     } else if(sign == LV_SIGNAL_DEFOCUS) {
@@ -461,11 +463,15 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
             if(ext->ddlist.sel_opt_id + 1 < ext->ddlist.option_cnt) {
+                uint16_t ori_id = ext->ddlist.sel_opt_id_ori;       /*lv_roller_set_selceted will overwrite this*/
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id + 1, true);
+                ext->ddlist.sel_opt_id_ori = ori_id;
             }
         } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
             if(ext->ddlist.sel_opt_id > 0) {
+                uint16_t ori_id = ext->ddlist.sel_opt_id_ori;       /*lv_roller_set_selceted will overwrite this*/
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id - 1, true);
+                ext->ddlist.sel_opt_id_ori = ori_id;
             }
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
@@ -518,26 +524,18 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
 
         ext->ddlist.sel_opt_id = id;
         ext->ddlist.sel_opt_id_ori = id;
-        res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, NULL);
+        res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
         if(res != LV_RES_OK) return res;
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
         /*If picked an option by clicking then set it*/
         if(!lv_indev_is_dragging(indev)) {
-            lv_point_t p;
-            lv_indev_get_point(indev, &p);
-            p.y = p.y - ext->ddlist.label->coords.y1;
-            id = p.y / (font_h + style_label->text.line_space);
-            if(id < 0) id = 0;
-            if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
-            ext->ddlist.sel_opt_id = id;
-            ext->ddlist.sel_opt_id_ori = id;
+            id = ext->ddlist.sel_opt_id;
 #if LV_USE_GROUP
             lv_group_t * g = lv_obj_get_group(roller);
             bool editing = lv_group_get_editing(g);
             if(editing) lv_group_set_editing(g, false);     /*In edit mode go to navigate mode if an option is selected*/
 #endif
-            res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
         }
     }
 
@@ -668,7 +666,6 @@ static void inf_normalize(void * roller_scrl)
         ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id % real_id_cnt;
 
         ext->ddlist.sel_opt_id += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt;             /*Select the middle page*/
-        ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
 
         /*Move to the new id*/
         lv_obj_t * roller_scrl = lv_page_get_scrl(roller);
