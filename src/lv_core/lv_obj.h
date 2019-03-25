@@ -72,7 +72,7 @@ enum
 typedef uint8_t lv_res_t;
 
 
-typedef enum {
+enum {
     LV_EVENT_PRESSED,           /*The object has been pressed*/
     LV_EVENT_PRESSING,          /*The object is being pressed (called continuously while pressing)*/
     LV_EVENT_PRESS_LOST,        /*Still pressing but slid from the objects*/
@@ -94,7 +94,8 @@ typedef enum {
     LV_EVENT_REFRESH,
     LV_EVENT_APPLY,         /*"Ok", "Apply" or similar specific button has clicked*/
     LV_EVENT_CANCEL,        /*"Close", "Cancel" or similar specific button has clicked*/
-}lv_event_t;
+};
+typedef uint8_t lv_event_t;
 
 typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
 
