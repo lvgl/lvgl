@@ -402,9 +402,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
      * It must be done here else `lv_indev_get_key` will return the last key in events and signals*/
     i->proc.types.keypad.last_key = data->key;
 
+    /* Save the previous state so we can detect state changes below and also set the last state now
+     * so if any signal/event handler on the way returns `LV_RES_INV` the last state is remembered
+     * for the next time*/
+    uint32_t prev_state = i->proc.types.keypad.last_state;
+    i->proc.types.keypad.last_state = data->state;
+
     /*Key press happened*/
-    if(data->state == LV_INDEV_STATE_PR &&
-            i->proc.types.keypad.last_state == LV_INDEV_STATE_REL)
+    if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_REL)
     {
         i->proc.pr_timestamp = lv_tick_get();
 
@@ -436,7 +441,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Pressing*/
-    else if(data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR)
+    else if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_PR)
     {
         /*Long press time has elapsed?*/
         if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
@@ -481,7 +486,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Release happened*/
-    else if(data->state == LV_INDEV_STATE_REL && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR)
+    else if(data->state == LV_INDEV_STATE_REL && prev_state == LV_INDEV_STATE_PR)
     {
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
@@ -503,8 +508,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->proc.pr_timestamp = 0;
         i->proc.long_pr_sent = 0;
     }
-
-    i->proc.types.keypad.last_state = data->state;
 #else
     (void)data; /*Unused*/
     (void)i; /*Unused*/
