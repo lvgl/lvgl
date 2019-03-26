@@ -230,6 +230,21 @@ void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_colo
 /**********************
  *      MACROS
  **********************/
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR(w,h)              ((LV_COLOR_SIZE / 8) * w * h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w,h) ((LV_COLOR_SIZE / 8) * w * h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w,h)        (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
+
+#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w,h)            ((((w / 8) + 1) * h))                             /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
+#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w,h)          (LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w,h) + 4 * 2)      /*4 * 2: palette*/
+
+#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w,h)            ((((w / 4) + 1) * h))                             /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
+#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w,h)          (LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w,h) + 4 * 4)      /*4 * 4: palette*/
+
+#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w,h)            ((((w / 2) + 1) * h))                             /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
+#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w,h)          (LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w,h) + 4 * 16)     /*4 * 16: palette*/
+
+#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w,h)            ((w * h))
+#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w,h)          (LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w,h) + 4 * 256)    /*4 * 256: palette*/
 
 #endif  /*LV_USE_CANVAS*/
 

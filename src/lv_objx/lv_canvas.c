@@ -80,8 +80,6 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing canvas*/
     else {
-        //lv_canvas_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_canvas);
     }
@@ -133,7 +131,7 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
 {
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
-    lv_img_buf_set_px(&ext->dsc, x, y, c);
+    lv_img_buf_set_px_color(&ext->dsc, x, y, c);
     lv_obj_invalidate(canvas);
 
 }
@@ -167,8 +165,9 @@ void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t *
 lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
 {
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+    lv_style_t * style = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
 
-    return lv_img_buf_get_px(&ext->dsc, x, y);
+    return lv_img_buf_get_px_color(&ext->dsc, x, y, style);
 }
 
 /**
@@ -180,7 +179,7 @@ lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas)
 {
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
-    return &ext->img;
+    return &ext->dsc;
 }
 
 /**
@@ -311,7 +310,7 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
 void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle,lv_coord_t offset_x, lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y)
 {
     lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
-
+    lv_style_t * style = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
     int32_t sinma = lv_trigo_sin(-angle);
     int32_t cosma = lv_trigo_sin(-angle + 90); /* cos */
 
@@ -391,16 +390,69 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle,lv_co
             else if(yn < 0) continue;
 
             /*Get the mixture of the original source and the neightboor pixels in both directions*/
-            lv_color_t c_dest_int = lv_img_buf_get_px(img, xs_int, ys_int);
-            lv_color_t c_dest_xn = lv_img_buf_get_px(img, xn, ys_int);
-            lv_color_t c_dest_yn = lv_img_buf_get_px(img, xs_int, yn);
+            lv_color_t c_dest_int = lv_img_buf_get_px_color(img, xs_int, ys_int, style);
+
+            if(lv_img_color_format_is_chroma_keyed(img->header.cf)) {
+                lv_color_t ct = LV_COLOR_TRANSP;
+                if(c_dest_int.full == ct.full) continue;
+            }
+
+            lv_color_t c_dest_xn = lv_img_buf_get_px_color(img, xn, ys_int, style);
+            lv_color_t c_dest_yn = lv_img_buf_get_px_color(img, xs_int, yn, style);
             lv_color_t x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
             lv_color_t y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
+            lv_color_t color_res = lv_color_mix(x_dest, y_dest, LV_OPA_50);
 
             if (x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height)
             {
-                /*The result color as the average of the x/y mixed colors*/
-                lv_img_buf_set_px(&ext_dst->dsc, x + offset_x, y + offset_y, lv_color_mix(x_dest, y_dest, LV_OPA_50));
+                /*If the image has no alpha channel just simple set the result color on the canvas*/
+                if(lv_img_color_format_has_alpha(img->header.cf) == false) {
+                    lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, color_res);
+                } else {
+                    /*Get result pixel opacity*/
+                    lv_opa_t opa_int = lv_img_buf_get_px_alpha(img, xs_int, ys_int);
+                    lv_opa_t opa_xn = lv_img_buf_get_px_alpha(img, xn, ys_int);
+                    lv_opa_t opa_yn = lv_img_buf_get_px_alpha(img, xs_int, yn);
+                    lv_opa_t opa_x = (opa_int * xr + (opa_xn * (255 - xr))) >> 8;
+                    lv_opa_t opa_y = (opa_int * yr + (opa_yn * (255 - yr))) >> 8;
+                    lv_opa_t opa_res = (opa_x + opa_y) / 2;
+                    if(opa_res <= LV_OPA_MIN) continue;
+
+                    lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc,  x + offset_x, y + offset_y, style);
+
+                    /*If the canvas has no alpha but the image has mix the image's color with canvas*/
+                    if(lv_img_color_format_has_alpha(ext_dst->dsc.header.cf) == false) {
+                        if(opa_res < LV_OPA_MAX) color_res = lv_color_mix(color_res, bg_color, opa_res);
+                        lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, color_res);
+                    }
+                    /*Both the image and canvas has alpha channel. Some extra calculation is required*/
+                    else {
+                        lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y);
+                        /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
+                        if(opa_res >= LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
+                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, color_res);
+                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, opa_res);
+                        }
+                        /*Opaque background: use simple mix*/
+                        else if(bg_opa >= LV_OPA_MAX) {
+                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, lv_color_mix(color_res, bg_color, opa_res));
+                        }
+                        /*Both colors have alpha. Expensive calculation need to be applied*/
+                        else {
+
+                            /*Info: https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
+                            lv_opa_t opa_res_2 = 255 - ((uint16_t)((uint16_t)(255 - opa_res) * (255 - bg_opa)) >> 8);
+                            if(opa_res_2 == 0) {
+                                opa_res_2 = 1;      /*never happens, just to be sure*/
+                            }
+                            lv_opa_t ratio = (uint16_t)((uint16_t) opa_res * 255) / opa_res_2;
+
+                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, lv_color_mix(color_res, bg_color, ratio));
+                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, opa_res_2);
+                        }
+
+                    }
+                }
             }
         }
     }
