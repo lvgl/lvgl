@@ -111,8 +111,8 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y);
  * Get the image of the canvas as a pointer to an `lv_img_dsc_t` variable.
  * @param canvas pointer to a canvas object
  * @return pointer to the image descriptor.
-lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas);
  */
+lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas);
 
 /**
  * Get style of a canvas.
