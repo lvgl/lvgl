@@ -127,6 +127,14 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
 
 
 /**
+ * Initialize and `lv_img_dsc_t` variable with the image's info
+ * @param src variable, filename or symbol
+ * @param header store the result here
+ * @return LV_RES_OK: succeeded; LV_RES_INV: failed
+ */
+lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header);
+
+/**
  * Get the type of an image source
  * @param src pointer to an image source:
  *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
@@ -146,31 +154,75 @@ lv_img_src_t lv_img_src_get_type(const void * src);
 void lv_img_decoder_set_custom(lv_img_decoder_info_f_t  info_fp, lv_img_decoder_open_f_t  open_fp,
                                lv_img_decoder_read_line_f_t read_fp, lv_img_decoder_close_f_t close_fp);
 
-lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header);
-
-uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf);
-
-bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf);
-
-bool lv_img_color_format_has_alpha(lv_img_cf_t cf);
+/**
+ * Get the color of an image's pixel
+ * @param dsc an image descriptor
+ * @param x x coordinate of the point to get
+ * @param y x coordinate of the point to get
+ * @param style style of the image. In case of `LV_IMG_CF_ALPHA_1/2/4/8` `style->image.color` shows the color.
+ *              Can be `NULL` but for `ALPHA` images black will be returned. In other cases it is not used.
+ * @return color of the point
+ */
+lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_style_t * style);
+/**
+ * Get the alpha value of an image's pixel
+ * @param dsc pointer to an image descriptor
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @return alpha value of the point
+ */
+lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y);
 
 /**
- * Set the color of a pixel on an image
- * @param dsc image
+ * Set the color of a pixel of an image. The alpha channel won't be affected.
+ * @param dsc pointer to an image descriptor
  * @param x x coordinate of the point to set
  * @param y x coordinate of the point to set
  * @param c color of the point
  */
-void lv_img_buf_set_px(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_color_t c);
+void lv_img_buf_set_px_color(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_color_t c);
 
 /**
- * Get the color of a pixel on an image
- * @param dsc image
+ * Set the alpha value of a pixel of an image. The color won't be affected
+ * @param dsc pointer to an image descriptor
  * @param x x coordinate of the point to set
  * @param y x coordinate of the point to set
- * @return color of the point
+ * @param opa the desired opacity
  */
-lv_color_t lv_img_buf_get_px(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y);
+void lv_img_buf_set_px_alpha(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa);
+
+/**
+ * Set the palette color of an indexed image. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
+ * @param dsc pointer to an image descriptor
+ * @param color_id the palette color to set:
+ *   - for `LV_IMG_CF_INDEXED1`: 0..1
+ *   - for `LV_IMG_CF_INDEXED2`: 0..3
+ *   - for `LV_IMG_CF_INDEXED4`: 0..15
+ *   - for `LV_IMG_CF_INDEXED8`: 0..255
+ * @param color the color to set
+ */
+void lv_img_buf_set_palette(lv_img_dsc_t *dsc, int color_id, lv_color_t color);
+
+/**
+ * Get the pixel size of a color format in bits
+ * @param cf a color format (`LV_IMG_CF_...`)
+ * @return the pixel size in bits
+ */
+uint8_t lv_img_color_format_get_px_size(lv_img_cf_t cf);
+
+/**
+ * Check if a color format is chroma keyed or not
+ * @param cf a color format (`LV_IMG_CF_...`)
+ * @return true: chroma keyed; false: not chroma keyed
+ */
+bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf);
+
+/**
+ * Check if a color format has alpha channel or not
+ * @param cf a color format (`LV_IMG_CF_...`)
+ * @return true: has alpha channel; false: doesn't have alpha channel
+ */
+bool lv_img_color_format_has_alpha(lv_img_cf_t cf);
 
 /**********************
  *      MACROS

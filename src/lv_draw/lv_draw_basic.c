@@ -636,8 +636,8 @@ static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_
 static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa)
 {
     /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
-    if(fg_opa == LV_OPA_COVER && bg_opa <= LV_OPA_MIN) {
-        fg_color.alpha = fg_opa;
+    if(fg_opa == LV_OPA_COVER || bg_opa <= LV_OPA_MIN) {
+        fg_color.ch.alpha = fg_opa;
         return fg_color;
     }
     /*Transparent foreground: use the Background*/
@@ -653,11 +653,17 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
         /*Save the parameters and the result. If they will be asked again don't compute again*/
         static lv_opa_t fg_opa_save = 0;
         static lv_opa_t bg_opa_save = 0;
+        static lv_color_t fg_color_save = {{0}};
+        static lv_color_t bg_color_save = {{0}};
         static lv_color_t c = {{0}};
 
-        if(fg_opa != fg_opa_save || bg_opa != bg_opa_save) {
+        if(fg_opa != fg_opa_save || bg_opa != bg_opa_save ||
+           fg_color.full != fg_color_save.full || bg_color.full != bg_color_save.full)
+        {
             fg_opa_save = fg_opa;
             bg_opa_save = bg_opa;
+            fg_color.full = fg_color_save.full;
+            bg_color.full = bg_color_save.full;
             /*Info: https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
             lv_opa_t alpha_res = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
             if(alpha_res == 0) {
@@ -665,11 +671,12 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
             }
             lv_opa_t ratio = (uint16_t)((uint16_t) fg_opa * 255) / alpha_res;
             c = lv_color_mix(fg_color, bg_color, ratio);
-            c.alpha = alpha_res;
+            c.ch.alpha = alpha_res;
         }
         return c;
 
     }
 }
+
 #endif /*LV_COLOR_SCREEN_TRANSP*/
 
