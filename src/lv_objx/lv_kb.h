@@ -156,6 +156,18 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb);
  */
 lv_style_t * lv_kb_get_style(const lv_obj_t *kb, lv_kb_style_t type);
 
+/*=====================
+ * Other functions
+ *====================*/
+
+/**
+ * Default keyboard event to add characters to the Text area and change the map.
+ * If a custom `event_cb` is added to the keyboard this function be called from it to handle the button clicks
+ * @param kb pointer to a  keyboard
+ * @param event the triggering event
+ */
+void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event);
+
 /**********************
  *      MACROS
  **********************/

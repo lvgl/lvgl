@@ -25,7 +25,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
-static void lv_kb_def_btn_action_cb(lv_obj_t * kb);
 
 /**********************
  *  STATIC VARIABLES
@@ -130,6 +129,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_kb, LV_DPI * 3, LV_DPI * 2);
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+        lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_btnm_set_map(new_kb, kb_map_lc);
         lv_btnm_set_ctrl_map(new_kb, kb_ctrl_lc_map);
 
@@ -345,75 +345,25 @@ lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
     return style;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+/*=====================
+ * Other functions
+ *====================*/
 
 /**
- * Signal function of the keyboard
- * @param kb pointer to a keyboard object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
-{
-    lv_res_t res;
-
-    /* Include the ancient signal function */
-    res = ancestor_signal(kb, sign, param);
-    if(res != LV_RES_OK) return res;
-
-    if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
-    else if(sign == LV_SIGNAL_PRESSED) {
-        lv_kb_def_btn_action_cb(kb);
-    }
-    else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
-        bool no_rep = lv_btnm_get_btn_ctrl(kb, lv_btnm_get_active_btn(kb), LV_BTNM_CTRL_NO_REPEAT);
-        if(no_rep == false) lv_kb_def_btn_action_cb(kb);
-    }
-    else if(sign == LV_SIGNAL_FOCUS) {
-        lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-        /*Show the cursor of the new Text area if cursor management is enabled*/
-        if(ext->ta && ext->cursor_mng) {
-            lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
-            lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
-        }
-    }
-    else if(sign == LV_SIGNAL_DEFOCUS) {
-          lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-          /*Show the cursor of the new Text area if cursor management is enabled*/
-          if(ext->ta && ext->cursor_mng) {
-              lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
-              lv_ta_set_cursor_type(ext->ta,  cur_type | LV_CURSOR_HIDDEN);
-          }
-      }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_kb";
-    }
-
-    return res;
-}
-
-
-/**
- * Called when a button of the keyboard is pressed or long pressed to change map or add the button's test to the assigned Text area.
+ * Default keyboard event to add characters to the Text area and change the map.
+ * If a custom `event_cb` is added to the keyboard this function be called from it to handle the button clicks
  * @param kb pointer to a  keyboard
+ * @param event the triggering event
  */
-static void lv_kb_def_btn_action_cb(lv_obj_t * kb)
+void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 {
-    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+    if(event != LV_EVENT_PRESSED && event != LV_EVENT_LONG_PRESSED_REPEAT) return;
 
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     uint16_t btn_id = lv_btnm_get_active_btn(kb);
     if(btn_id == LV_BTNM_BTN_NONE) return;
     if(lv_btnm_get_btn_ctrl(kb, btn_id, LV_BTNM_CTRL_HIDDEN | LV_BTNM_CTRL_INACTIVE)) return;
+    if(lv_btnm_get_btn_ctrl(kb, btn_id, LV_BTNM_CTRL_NO_REPEAT) && event == LV_EVENT_LONG_PRESSED_REPEAT) return;
 
     const char * txt = lv_btnm_get_active_btn_text(kb);
     if(txt == NULL) return;
@@ -474,6 +424,56 @@ static void lv_kb_def_btn_action_cb(lv_obj_t * kb)
     } else {
         lv_ta_add_text(ext->ta, txt);
     }
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+/**
+ * Signal function of the keyboard
+ * @param kb pointer to a keyboard object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(kb, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    if(sign == LV_SIGNAL_CLEANUP) {
+        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+        lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+        /*Show the cursor of the new Text area if cursor management is enabled*/
+        if(ext->ta && ext->cursor_mng) {
+            lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
+            lv_ta_set_cursor_type(ext->ta,  cur_type & (~LV_CURSOR_HIDDEN));
+        }
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS) {
+          lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+          /*Show the cursor of the new Text area if cursor management is enabled*/
+          if(ext->ta && ext->cursor_mng) {
+              lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
+              lv_ta_set_cursor_type(ext->ta,  cur_type | LV_CURSOR_HIDDEN);
+          }
+      }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_kb";
+    }
+
+    return res;
 }
 
 #endif
