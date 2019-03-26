@@ -799,7 +799,8 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             uint32_t letter;
             for(line_cnt = 0; line_cnt < letter_i; line_cnt++) {
                 letter = lv_txt_encoded_next(txt, &i);
-                if(letter == '\n') new_opt ++;
+                /*Count he lines to reach the clicked letter. But ignore the last '\n' because it still belongs to the clicked line*/
+                if(letter == '\n' && i != letter_i) new_opt ++;
             }
 
             ext->sel_opt_id = new_opt;
