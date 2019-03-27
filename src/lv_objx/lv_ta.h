@@ -77,6 +77,7 @@ typedef struct
     int tmp_sel_start;			/*Temporary value*/
     int tmp_sel_end;			/*Temporary value*/
     uint8_t selecting :1;		/*User is in process of selecting */
+    uint8_t sel_mode :1;		/*Text can be selected on this text area*/
 } lv_ta_ext_t;
 
 enum {
@@ -251,6 +252,13 @@ static inline void lv_ta_set_edge_flash(lv_obj_t * ta, bool en)
  */
 void lv_ta_set_style(lv_obj_t *ta, lv_ta_style_t type, lv_style_t *style);
 
+/**
+ * Enable/disable selection mode.
+ * @param ta pointer to a text area object
+ * @param en true or false to enable/disable selection mode
+ */
+void lv_ta_set_sel_mode(lv_obj_t *ta, bool en);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -381,6 +389,13 @@ void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end);
  * @return whether text is selected or not
  */
 bool lv_ta_text_is_selected(const lv_obj_t *ta);
+
+/**
+ * Find whether selection mode is enabled.
+ * @param ta pointer to a text area object
+ * @return true: selection mode is enabled, false: disabled
+ */
+bool lv_ta_get_sel_mode(lv_obj_t *ta, bool en);
 
 /*=====================
  * Other functions

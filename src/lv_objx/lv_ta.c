@@ -791,6 +791,18 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
     }
 }
 
+/**
+ * Enable/disable selection mode.
+ * @param ta pointer to a text area object
+ * @param en true or false to enable/disable selection mode
+ */
+void lv_ta_set_sel_mode(lv_obj_t *ta, bool en) {
+	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+	ext->sel_mode = en;
+	if(!en)
+		lv_ta_clear_selection(ta);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -979,6 +991,17 @@ bool lv_ta_text_is_selected(const lv_obj_t *ta) {
 	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
 	return (ext_label->selection_start == -1 || ext_label->selection_end == -1);
+}
+
+/**
+ * Find whether selection mode is enabled.
+ * @param ta pointer to a text area object
+ * @return true: selection mode is enabled, false: disabled
+ */
+bool lv_ta_get_sel_mode(lv_obj_t *ta, bool en) {
+	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+	return ext->sel_mode;
 }
 
 /*=====================
@@ -1660,7 +1683,7 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
         click_outside_label = !lv_label_is_char_under_pos(ext->label, &relative_position);
     }
 
-    if(!ext->selecting && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
+    if(ext->sel_mode && !ext->selecting && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
     	/*Input device just went down. Store the selection start position*/
     	ext->tmp_sel_start = index_of_char_at_position;
     	ext->tmp_sel_end = -1;
