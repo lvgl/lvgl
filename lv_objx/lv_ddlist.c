@@ -701,6 +701,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
         } else if(c == LV_GROUP_KEY_ESC) {
             if(ext->opened) {
                 ext->opened = 0;
+                ext->sel_opt_id = ext->sel_opt_id_ori;
                 lv_ddlist_refr_size(ddlist, true);
             }
         }
