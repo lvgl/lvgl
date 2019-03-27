@@ -231,6 +231,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
 
     lv_label_ins_text(ext->label, ext->cursor.pos, (const char *)letter_buf);    /*Insert the character*/
+    lv_ta_clear_selection(ta); /*Clear selection*/
 
     if(ext->pwd_mode != 0) {
 
@@ -311,6 +312,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     /*Insert the text*/
     lv_label_ins_text(ext->label, ext->cursor.pos, txt);
+    lv_ta_clear_selection(ta);
 
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + strlen(txt) + 1);
@@ -380,6 +382,7 @@ void lv_ta_del_char(lv_obj_t * ta)
     lv_txt_cut(label_txt, ext->cursor.pos - 1, 1);
     /*Refresh the label*/
     lv_label_set_text(ext->label, label_txt);
+    lv_ta_clear_selection(ta);
 
     /*Don't let 'width == 0' because cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
@@ -417,6 +420,7 @@ void lv_ta_del_char_forward(lv_obj_t * ta)
 	lv_ta_set_cursor_pos(ta, cp + 1);
 	if(cp != lv_ta_get_cursor_pos(ta)) lv_ta_del_char(ta);
 }
+
 
 /*=====================
  * Setter functions
@@ -965,6 +969,18 @@ void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end) {
 	*sel_end = ext_label->selection_end;
 }
 
+/**
+ * Find whether text is selected or not.
+ * @param ta Text area object
+ * @return whether text is selected or not
+ */
+bool lv_ta_text_is_selected(const lv_obj_t *ta) {
+	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+
+	return (ext_label->selection_start == -1 || ext_label->selection_end == -1);
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -977,10 +993,11 @@ void lv_ta_clear_selection(lv_obj_t * ta) {
 	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
-	ext_label->selection_start = -1;
-	ext_label->selection_end = -1;
-
-	lv_obj_invalidate(ta);
+	if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
+		ext_label->selection_start = -1;
+		ext_label->selection_end = -1;
+		lv_obj_invalidate(ta);
+	}
 }
 
 /**

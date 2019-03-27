@@ -375,6 +375,13 @@ lv_style_t * lv_ta_get_style(const lv_obj_t *ta, lv_ta_style_t type);
 
 void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end);
 
+/**
+ * Find whether text is selected or not.
+ * @param ta Text area object
+ * @return whether text is selected or not
+ */
+bool lv_ta_text_is_selected(const lv_obj_t *ta);
+
 /*=====================
  * Other functions
  *====================*/
