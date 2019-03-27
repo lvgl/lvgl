@@ -7,7 +7,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdio.h>
 #include "lv_ta.h"
 #if LV_USE_TA != 0
 #include <string.h>
