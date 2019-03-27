@@ -363,6 +363,18 @@ static inline bool lv_ta_get_edge_flash(lv_obj_t * ta)
  */
 lv_style_t * lv_ta_get_style(const lv_obj_t *ta, lv_ta_style_t type);
 
+/**
+ * Get the selection index of the text area.
+ *
+ * The last character is exclusive (i.e. if the API says that the selection
+ * ranges from 6 to 7, only character 6 is selected).
+ * @param ta Text area object
+ * @param sel_start pointer to int used to hold first selected character
+ * @param sel_end pointer to int used to hold last selected character
+ */
+
+void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end);
+
 /*=====================
  * Other functions
  *====================*/

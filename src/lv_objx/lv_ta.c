@@ -7,7 +7,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdio.h>
 #include "lv_ta.h"
 #if LV_USE_TA != 0
 #include <string.h>
@@ -935,6 +934,31 @@ lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
     return style;
 }
 
+/**
+ * Get the selection index of the text area.
+ *
+ * The last character is exclusive (i.e. if the API says that the selection
+ * ranges from 6 to 7, only character 6 is selected).
+ * @param ta Text area object
+ * @param sel_start pointer to int used to hold first selected character
+ * @param sel_end pointer to int used to hold last selected character
+ */
+
+void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end) {
+	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+
+	/*Force both values to -1 if there is no selection*/
+	if(ext_label->selection_start == -1 || ext_label->selection_end == -1) {
+		*sel_start = -1;
+		*sel_end = -1;
+		return;
+	}
+
+	*sel_start = ext_label->selection_start;
+	*sel_end = ext_label->selection_end;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -1625,7 +1649,6 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 			lv_obj_invalidate(ta);
     	}
     }
-    printf("Selection start: %d end: %d\n", ext_label->selection_start, ext_label->selection_end);
 
     lv_ta_set_cursor_pos(ta, index_of_char_at_position);
 }
