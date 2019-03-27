@@ -189,7 +189,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             		sel_coords.x1 = pos.x;
             		sel_coords.y1 = pos.y;
             		sel_coords.x2 = pos.x + letter_w + style->text.letter_space - 1;
-            		sel_coords.y2 = pos.y + lv_font_get_height(font) - 1;
+            		sel_coords.y2 = pos.y + line_height - 1;
             		lv_draw_rect(&sel_coords, mask, &sel_style, opa);
             	}
             }
