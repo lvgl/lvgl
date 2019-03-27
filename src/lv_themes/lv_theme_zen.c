@@ -761,6 +761,9 @@ static void win_init(void)
     header.body.border.color = lv_color_hsv_to_rgb(_hue, 10, 90);
     header.text.color = lv_color_hex3(0x666);
     header.image.color = lv_color_hex3(0x666);
+    header.body.padding.top = 0;
+    header.body.padding.bottom = 0;
+    header.body.padding.inner = 0;
 
     lv_style_copy(&rel, &def);
     rel.body.opa = LV_OPA_TRANSP;
