@@ -231,6 +231,14 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
 uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
 
 /**
+ * Check if a character is drawn under a point.
+ * @param label Label object
+ * @param pos Point to check for characte under
+ * @return whether a character is drawn under the point
+ */
+bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);
+
+/**
  * Get the style of an label object
  * @param label pointer to an label object
  * @return pointer to the label's style

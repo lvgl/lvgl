@@ -7,6 +7,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdio.h>
 #include "lv_ta.h"
 #if LV_USE_TA != 0
 #include <string.h>
@@ -1625,12 +1626,17 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
     lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
     lv_area_t label_coords;
+    bool click_outside_label;
     uint16_t index_of_char_at_position;
 
     lv_obj_get_coords(ext->label, &label_coords);
 
-    lv_point_t point_act;
+    lv_point_t point_act, vect_act;
+
     lv_indev_get_point(click_source, &point_act);
+
+    lv_indev_get_vect(click_source, &vect_act);
+
     if(point_act.x < 0 || point_act.y < 0) return; /*Ignore event from keypad*/
     lv_point_t relative_position;
     relative_position.x = point_act.x - label_coords.x1;
@@ -1638,56 +1644,71 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 
     lv_coord_t label_width = lv_obj_get_width(ext->label);
 
+
+
     /*Check if the click happened on the left side of the area outside the label*/
     if (relative_position.x < 0) {
         index_of_char_at_position = 0;
+        click_outside_label = true;
     }
     /*Check if the click happened on the right side of the area outside the label*/
     else if (relative_position.x >= label_width) {
         index_of_char_at_position = LV_TA_CURSOR_LAST;
+        click_outside_label = true;
     }
     else {
         index_of_char_at_position = lv_label_get_letter_on(ext->label, &relative_position);
+        click_outside_label = !lv_label_is_char_under_pos(ext->label, &relative_position);
     }
 
-    if(!ext->selecting && sign == LV_SIGNAL_PRESSED) {
+    if(!ext->selecting && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
     	/*Input device just went down. Store the selection start position*/
     	ext->tmp_sel_start = index_of_char_at_position;
     	ext->tmp_sel_end = -1;
     	ext->selecting = 1;
+    	lv_obj_set_drag(lv_page_get_scrl(ta), false);
     } else if(ext->selecting && sign == LV_SIGNAL_PRESSING) {
     	/*Input device may be moving. Store the end position */
     	ext->tmp_sel_end = index_of_char_at_position;
-    } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+    } else if(ext->selecting && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
     	/*Input device is released. Check if anything was selected.*/
-    	ext->selecting = 0;
+    	lv_obj_set_drag(lv_page_get_scrl(ta), true);
     }
 
-    /*If the selected area has changed then update the real values and*/
-    /*invalidate the text area.*/
-    if(ext->tmp_sel_start > ext->tmp_sel_end) {
-    	if(ext_label->selection_start != ext->tmp_sel_end ||
-    	   ext_label->selection_end != ext->tmp_sel_start) {
-			ext_label->selection_start = ext->tmp_sel_end;
-			ext_label->selection_end = ext->tmp_sel_start;
-			lv_obj_invalidate(ta);
-    	}
-    } else if(ext->tmp_sel_start < ext->tmp_sel_end) {
-    	if(ext_label->selection_start != ext->tmp_sel_start ||
-		   ext_label->selection_end != ext->tmp_sel_end) {
-			ext_label->selection_start = ext->tmp_sel_start;
-			ext_label->selection_end = ext->tmp_sel_end;
-			lv_obj_invalidate(ta);
+    if(ext->selecting || sign == LV_SIGNAL_PRESSED)
+        	lv_ta_set_cursor_pos(ta, index_of_char_at_position);
+
+    if(ext->selecting) {
+		/*If the selected area has changed then update the real values and*/
+		/*invalidate the text area.*/
+		if(ext->tmp_sel_start > ext->tmp_sel_end) {
+			if(ext_label->selection_start != ext->tmp_sel_end ||
+			   ext_label->selection_end != ext->tmp_sel_start) {
+				ext_label->selection_start = ext->tmp_sel_end;
+				ext_label->selection_end = ext->tmp_sel_start;
+				lv_obj_invalidate(ta);
+			}
+		} else if(ext->tmp_sel_start < ext->tmp_sel_end) {
+			if(ext_label->selection_start != ext->tmp_sel_start ||
+			   ext_label->selection_end != ext->tmp_sel_end) {
+				ext_label->selection_start = ext->tmp_sel_start;
+				ext_label->selection_end = ext->tmp_sel_end;
+				lv_obj_invalidate(ta);
+			}
+		} else {
+			if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
+				ext_label->selection_start = -1;
+				ext_label->selection_end = -1;
+				lv_obj_invalidate(ta);
+			}
 		}
-    } else {
-    	if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
-			ext_label->selection_start = -1;
-			ext_label->selection_end = -1;
-			lv_obj_invalidate(ta);
-    	}
+		/*Finish selection if necessary */
+		if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+				ext->selecting = 0;
+		}
     }
 
-    lv_ta_set_cursor_pos(ta, index_of_char_at_position);
+
 }
 
 #endif
