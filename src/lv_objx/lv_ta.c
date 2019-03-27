@@ -431,6 +431,9 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
+    /*Clear the existing selection*/
+    lv_ta_clear_selection(ta);
+
     /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
     if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
         lv_label_set_text(ext->label, "");
@@ -626,10 +629,13 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
         }
         txt[i] = '\0';
 
+        lv_ta_clear_selection(ta);
+
         lv_label_set_text(ext->label, NULL);
     }
     /*Pwd mode is now disabled*/
     else if(ext->pwd_mode == 1 && en == false) {
+    	lv_ta_clear_selection(ta);
         lv_label_set_text(ext->label, ext->pwd_tmp);
         lv_mem_free(ext->pwd_tmp);
         ext->pwd_tmp = NULL;
@@ -962,6 +968,20 @@ void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end) {
 /*=====================
  * Other functions
  *====================*/
+
+/**
+ * Clear the selection on the text area.
+ * @param ta Text area object
+ */
+void lv_ta_clear_selection(lv_obj_t * ta) {
+	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+
+	ext_label->selection_start = -1;
+	ext_label->selection_end = -1;
+
+	lv_obj_invalidate(ta);
+}
 
 /**
  * Move the cursor one character right

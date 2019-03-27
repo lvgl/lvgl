@@ -380,6 +380,12 @@ void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end);
  *====================*/
 
 /**
+ * Clear the selection on the text area.
+ * @param ta Text area object
+ */
+void lv_ta_clear_selection(lv_obj_t * ta);
+
+/**
  * Move the cursor one character right
  * @param ta pointer to a text area object
  */
