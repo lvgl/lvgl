@@ -90,6 +90,9 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_speed = LV_LABEL_SCROLL_SPEED;
     ext->offset.x = 0;
     ext->offset.y = 0;
+    ext->selection_start = -1;
+    ext->selection_end = -1;
+
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
 
@@ -675,7 +678,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
             }
         }
 
-        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
+        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset, ext->selection_start, ext->selection_end);
     }
     return true;
 }

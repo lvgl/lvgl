@@ -373,7 +373,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
             new_style.text.color = sel_style->text.color;
             new_style.text.opa = sel_style->text.opa;
             lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style, opa_scale,
-                          lv_label_get_text(ext->ddlist.label), txt_align, NULL);
+                          lv_label_get_text(ext->ddlist.label), txt_align, NULL, -1, -1);
         }
     }
 

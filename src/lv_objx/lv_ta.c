@@ -7,6 +7,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdio.h>
 #include "lv_ta.h"
 #if LV_USE_TA != 0
 #include <string.h>
@@ -54,7 +55,7 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
 static void refr_cursor_area(lv_obj_t * ta);
 static void placeholder_update(lv_obj_t * ta);
-static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_source);
+static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source);
 
 /**********************
  *  STATIC VARIABLES
@@ -1111,7 +1112,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 #endif
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
-            lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0);
+            lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0, -1, -1);
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
             cur_style.body.opa = LV_OPA_TRANSP;
@@ -1242,8 +1243,9 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         }
 #endif
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
-        update_cursor_position_on_click(ta, (lv_indev_t *) param);
+    else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING
+    		|| sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+        update_cursor_position_on_click(ta, sign, (lv_indev_t *) param);
     }
     return res;
 }
@@ -1287,8 +1289,9 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             }
         }
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
-        update_cursor_position_on_click(ta, (lv_indev_t *)param);
+    else if(sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESS_LOST ||
+    		sign == LV_SIGNAL_RELEASED) {
+        update_cursor_position_on_click(ta, sign, (lv_indev_t *)param);
     }
 
     return res;
@@ -1546,7 +1549,7 @@ static void placeholder_update(lv_obj_t * ta)
     }
 }
 
-static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_source)
+static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source)
 {
     if(click_source == NULL) return;
 
@@ -1558,6 +1561,7 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_so
 
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
     lv_area_t label_coords;
     uint16_t index_of_char_at_position;
@@ -1584,6 +1588,44 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_indev_t * click_so
     else {
         index_of_char_at_position = lv_label_get_letter_on(ext->label, &relative_position);
     }
+
+    if(!ext->selecting && sign == LV_SIGNAL_PRESSED) {
+    	/*Input device just went down. Store the selection start position*/
+    	ext->tmp_sel_start = index_of_char_at_position;
+    	ext->tmp_sel_end = -1;
+    	ext->selecting = 1;
+    } else if(ext->selecting && sign == LV_SIGNAL_PRESSING) {
+    	/*Input device may be moving. Store the end position */
+    	ext->tmp_sel_end = index_of_char_at_position;
+    } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+    	/*Input device is released. Check if anything was selected.*/
+    	ext->selecting = 0;
+    }
+
+    /*If the selected area has changed then update the real values and*/
+    /*invalidate the text area.*/
+    if(ext->tmp_sel_start > ext->tmp_sel_end) {
+    	if(ext_label->selection_start != ext->tmp_sel_end ||
+    	   ext_label->selection_end != ext->tmp_sel_start) {
+			ext_label->selection_start = ext->tmp_sel_end;
+			ext_label->selection_end = ext->tmp_sel_start;
+			lv_obj_invalidate(ta);
+    	}
+    } else if(ext->tmp_sel_start < ext->tmp_sel_end) {
+    	if(ext_label->selection_start != ext->tmp_sel_start ||
+		   ext_label->selection_end != ext->tmp_sel_end) {
+			ext_label->selection_start = ext->tmp_sel_start;
+			ext_label->selection_end = ext->tmp_sel_end;
+			lv_obj_invalidate(ta);
+		}
+    } else {
+    	if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
+			ext_label->selection_start = -1;
+			ext_label->selection_end = -1;
+			lv_obj_invalidate(ta);
+    	}
+    }
+    printf("Selection start: %d end: %d\n", ext_label->selection_start, ext_label->selection_end);
 
     lv_ta_set_cursor_pos(ta, index_of_char_at_position);
 }

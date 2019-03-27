@@ -84,6 +84,7 @@ typedef struct
 
     struct {
         lv_color_t color;
+        lv_color_t sel_color;
         const lv_font_t * font;
         lv_coord_t letter_space;
         lv_coord_t line_space;

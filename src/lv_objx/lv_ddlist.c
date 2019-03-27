@@ -574,7 +574,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                 new_style.text.opa = sel_style->text.opa;
                 lv_txt_flag_t flag = lv_ddlist_get_txt_flag(ddlist);
                 lv_draw_label(&ext->label->coords, &mask_sel, &new_style, opa_scale,
-                              lv_label_get_text(ext->label), flag, NULL);
+                              lv_label_get_text(ext->label), flag, NULL, -1, -1);
             }
         }
 
@@ -606,7 +606,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 				if (area_ok)
 				{
 					lv_draw_label(&area_arrow, &mask_arrow, &new_style, opa_scale,
-					LV_SYMBOL_DOWN, LV_TXT_FLAG_NONE, NULL);		/*Use a down arrow in ddlist, you can replace it with your custom symbol*/
+					LV_SYMBOL_DOWN, LV_TXT_FLAG_NONE, NULL, -1, -1);		/*Use a down arrow in ddlist, you can replace it with your custom symbol*/
 				}
 			}
 		}

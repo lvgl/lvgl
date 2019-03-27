@@ -74,6 +74,9 @@ typedef struct
         lv_cursor_type_t type:4;  /*Shape of the cursor*/
         uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/
     } cursor;
+    int tmp_sel_start;			/*Temporary value*/
+    int tmp_sel_end;			/*Temporary value*/
+    uint8_t selecting :1;		/*User is in process of selecting */
 } lv_ta_ext_t;
 
 enum {
