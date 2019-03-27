@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD  5   /*Circle segment greater then this value will be anti-aliased by a non-linear (cos) opacity mapping*/
+#define CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD  1   /*Circle segment greater then this value will be anti-aliased by a non-linear (cos) opacity mapping*/
 
 #define SHADOW_OPA_EXTRA_PRECISION      8       /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
 #define SHADOW_BOTTOM_AA_EXTRA_RADIUS   3       /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
@@ -1419,16 +1419,30 @@ static uint16_t lv_draw_cont_radius_corr(uint16_t r, lv_coord_t w, lv_coord_t h)
  */
 static lv_opa_t antialias_get_opa_circ(lv_coord_t seg, lv_coord_t px_id, lv_opa_t opa)
 {
-    static const  lv_opa_t opa_map[8] = {250, 242, 221, 196, 163, 122, 74, 18};
+    /*Empirical non-linear values anti-aliasing values*/
+    static const lv_opa_t opa_map2[2] =  {210, 80};
+    static const lv_opa_t opa_map3[3] =  {230, 150, 60};
+    static const lv_opa_t opa_map4[4] =  {235, 185, 125, 50};
+    static const lv_opa_t opa_map8[8] =  {250, 242, 219, 191, 158, 117, 76, 40};
 
-    if(seg == 0) return LV_OPA_TRANSP;
-    else if(seg == 1) return LV_OPA_80;
-    else {
+#if CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD < 1
+    if(seg == 1) return 170;
+#endif
 
-        uint8_t id = (uint32_t)((uint32_t)px_id * (sizeof(opa_map) - 1)) / (seg - 1);
-        return (uint32_t)((uint32_t) opa_map[id] * opa) >> 8;
+#if CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD < 2
+    if(seg == 2) return (opa_map2[px_id] * opa) >> 8;
+#endif
 
-    }
+#if CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD < 3
+    if(seg == 3) return (opa_map3[px_id] * opa) >> 8;
+#endif
+
+#if CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD < 4
+    if(seg == 4) return (opa_map4[px_id] * opa) >> 8;
+#endif
+
+    uint8_t id = (uint32_t)((uint32_t)px_id * (sizeof(opa_map8) - 1)) / (seg - 1);
+    return (uint32_t)((uint32_t) opa_map8[id] * opa) >> 8;
 
 }
 
