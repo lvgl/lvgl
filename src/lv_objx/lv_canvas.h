@@ -138,6 +138,17 @@ lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type
 void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
 
 /**
+ * Multiply a buffer with the canvas
+ * @param canvas pointer to a canvas object
+ * @param to_copy buffer to copy (multiply). LV_IMG_CF_TRUE_COLOR_ALPHA is not supported
+ * @param w width of the buffer to copy
+ * @param h height of the buffer to copy
+ * @param x left side of the destination position
+ * @param y top side of the destination position
+ */
+void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y);
+
+/**
  * Rotate and image and store the result on a canvas.
  * @param canvas pointer to a canvas object
  * @param img pointer to an image descriptor.
