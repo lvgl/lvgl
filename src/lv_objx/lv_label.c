@@ -596,7 +596,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos) {
 	lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
 	uint32_t i = line_start;
 	uint32_t i_current = i;
-	uint32_t letter;
+	uint32_t letter = 0;
 	while(i <= new_line_start - 1) {
 		letter = lv_txt_encoded_next(txt, &i);    /*Be careful 'i' already points to the next character*/
 		/*Handle the recolor command*/
