@@ -388,12 +388,9 @@ void lv_ta_del_char(lv_obj_t * ta)
     }
 
     if(ext->pwd_mode != 0) {
-#if LV_TXT_UTF8 == 0
-        lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, 1);
-#else
         uint32_t byte_pos = lv_txt_encoded_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
         lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, lv_txt_encoded_size(&label_txt[byte_pos]));
-#endif
+
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
         lv_mem_assert(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
@@ -1101,14 +1098,9 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         } else if(ext->cursor.type == LV_CURSOR_BLOCK) {
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
 
-#if LV_TXT_UTF8 == 0
-            char letter_buf[2];
-            letter_buf[0] = txt[ext->cursor.txt_byte_pos];
-            letter_buf[1] = '\0';
-#else
             char letter_buf[8] = {0};
             memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
-#endif
+
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
             lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0);
@@ -1435,14 +1427,11 @@ static void refr_cursor_area(lv_obj_t * ta)
 
     uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
     const char * txt = lv_label_get_text(ext->label);
+
     uint32_t byte_pos;
-#if LV_TXT_UTF8 != 0
     byte_pos = lv_txt_encoded_get_byte_id(txt, cur_pos);
+
     uint32_t letter = lv_txt_encoded_next(&txt[byte_pos], NULL);
-#else
-    byte_pos = cur_pos;
-    uint32_t letter = txt[byte_pos];
-#endif
 
     lv_coord_t letter_h = lv_font_get_height(label_style->text.font);
     /*Set letter_w (set not 0 on non printable but valid chars)*/

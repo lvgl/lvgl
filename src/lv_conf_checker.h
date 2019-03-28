@@ -126,9 +126,6 @@
 #endif
 
 /*Text settings*/
-#ifndef LV_TXT_UTF8
-#define LV_TXT_UTF8             1                /*Enable UTF-8 coded Unicode character usage */
-#endif
 #ifndef LV_TXT_BREAK_CHARS
 #define LV_TXT_BREAK_CHARS     " ,.;:-_"         /*Can break texts on these chars*/
 #endif

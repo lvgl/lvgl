@@ -574,11 +574,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt)
     if(ext->text == NULL) return;
 
     if(pos == LV_LABEL_POS_LAST) {
-#if LV_TXT_UTF8 == 0
-        pos = old_len;
-#else
         pos = lv_txt_get_encoded_length(ext->text);
-#endif
     }
 
     lv_txt_ins(ext->text, pos, txt);
@@ -853,19 +849,6 @@ static void lv_label_refr_text(lv_obj_t * label)
             uint32_t letter_id = lv_label_get_letter_on(label, &p);
 
 
-#if LV_TXT_UTF8 == 0
-            /*Save letters under the dots and replace them with dots*/
-            uint8_t i;
-            for(i = 0; i < LV_LABEL_DOT_NUM; i++)  {
-                ext->dot_tmp[i] = ext->text[letter_id + i];
-                ext->text[letter_id + i] = '.';
-            }
-
-            ext->dot_tmp[LV_LABEL_DOT_NUM] = ext->text[letter_id + LV_LABEL_DOT_NUM];
-            ext->text[letter_id + LV_LABEL_DOT_NUM] = '\0';
-
-            ext->dot_end = letter_id + LV_LABEL_DOT_NUM;
-#else
             /*Save letters under the dots and replace them with dots*/
             uint32_t i;
             uint32_t byte_id = lv_txt_encoded_get_byte_id(ext->text, letter_id);
@@ -885,8 +868,6 @@ static void lv_label_refr_text(lv_obj_t * label)
             ext->text[byte_id_ori + LV_LABEL_DOT_NUM] = '\0';
 
             ext->dot_end = letter_id + LV_LABEL_DOT_NUM;
-#endif
-
         }
     }
     /*In break mode only the height can change*/
@@ -907,12 +888,6 @@ static void lv_label_revert_dots(lv_obj_t * label)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->long_mode != LV_LABEL_LONG_DOT) return;
     if(ext->dot_end == LV_LABEL_DOT_END_INV) return;
-#if LV_TXT_UTF8 == 0
-    uint32_t i;
-    for(i = 0; i <= LV_LABEL_DOT_NUM; i++) {
-        ext->text[ext->dot_end - i] = ext->dot_tmp[LV_LABEL_DOT_NUM - i];
-    }
-#else
     uint32_t letter_i = ext->dot_end - LV_LABEL_DOT_NUM;
     uint32_t byte_i = lv_txt_encoded_get_byte_id(ext->text, letter_i);
 
@@ -922,7 +897,6 @@ static void lv_label_revert_dots(lv_obj_t * label)
         ext->text[byte_i + i] = ext->dot_tmp[i];
         i++;
     }
-#endif
 
     ext->dot_end = LV_LABEL_DOT_END_INV;
 }
