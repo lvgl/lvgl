@@ -137,8 +137,12 @@ uint16_t lv_roller_get_selected(const lv_obj_t *roller);
  * Get the current selected option as a string
  * @param roller pointer to roller object
  * @param buf pointer to an array to store the string
+ * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf);
+static inline void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t buf_size)
+{
+    lv_ddlist_get_selected_str(roller, buf, buf_size);
+}
 
 /**
  * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER

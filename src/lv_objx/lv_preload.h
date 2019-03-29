@@ -45,7 +45,7 @@ enum {
     LV_PRELOAD_TYPE_SPINNING_ARC,
     LV_PRELOAD_TYPE_FILLSPIN_ARC,
 };
-typedef uint8_t lv_preloader_type_t;
+typedef uint8_t lv_preload_type_t;
 
 /*Data of pre loader*/
 typedef struct {
@@ -53,7 +53,7 @@ typedef struct {
     /*New data for this type */
     uint16_t arc_length;            /*Length of the spinning indicator in degree*/
     uint16_t time;                  /*Time of one round*/
-    lv_preloader_type_t anim_type;  /*Type of the arc animation*/
+    lv_preload_type_t anim_type;  /*Type of the arc animation*/
 } lv_preload_ext_t;
 
 
@@ -110,7 +110,7 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_
  * @param preload pointer to pre loader object
  * @param type animation type of the preload
  *  */
-void lv_preload_set_animation_type(lv_obj_t * preload, lv_preloader_type_t type);
+void lv_preload_set_animation_type(lv_obj_t * preload, lv_preload_type_t type);
 
 /*=====================
  * Getter functions
@@ -141,7 +141,7 @@ lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t t
  * @param preload pointer to pre loader object
  * @return animation type
  *  */
-lv_preloader_type_t lv_preload_get_animation_type(lv_obj_t * preload);
+lv_preload_type_t lv_preload_get_animation_type(lv_obj_t * preload);
 
 /*=====================
  * Other functions

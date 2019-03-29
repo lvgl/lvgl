@@ -46,7 +46,7 @@ enum {
     LV_INDEV_TYPE_BUTTON,      /*External (hardware button) which is assinged to a specific point of the screen*/
     LV_INDEV_TYPE_ENCODER,     /*Encoder with only Left, Right turn and a Button*/
 };
-typedef uint8_t lv_hal_indev_type_t;
+typedef uint8_t lv_indev_type_t;
 
 /*States for input devices*/
 enum {
@@ -68,7 +68,7 @@ typedef struct {
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct _lv_indev_drv_t {
-    lv_hal_indev_type_t type;                                   /*Input device type*/
+    lv_indev_type_t type;                                   /*Input device type*/
     bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t *data);        /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb (buffered)*/
 
 #if LV_USE_USER_DATA_MULTI

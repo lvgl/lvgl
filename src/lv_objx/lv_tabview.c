@@ -596,7 +596,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         /*If released by a KEYPAD or ENCODER then really the tab buttons should be released.
          * So simulate a CLICK on the tab buttons*/
         lv_indev_t * indev = lv_indev_get_act();
-        lv_hal_indev_type_t indev_type = lv_indev_get_type(indev);
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_KEYPAD ||
                 (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(tabview))))
         {
@@ -611,7 +611,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         }
 
         if(sign == LV_SIGNAL_FOCUS) {
-            lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+            lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
 #if LV_USE_GROUP

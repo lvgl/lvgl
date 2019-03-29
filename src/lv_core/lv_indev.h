@@ -46,7 +46,7 @@ lv_indev_t * lv_indev_get_act(void);
  * @param indev pointer to an input device
  * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
  */
-lv_hal_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
+lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
 
 /**
  * Reset one or all input devices

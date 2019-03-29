@@ -339,8 +339,9 @@ uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist)
  * Get the current selected option as a string
  * @param ddlist pointer to ddlist object
  * @param buf pointer to an array to store the string
+ * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf)
+void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t buf_size)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -355,7 +356,13 @@ void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf)
     }
 
     uint16_t c;
-    for(c = 0; opt_txt[i] != '\n' && i < txt_len; c++, i++) buf[c] = opt_txt[i];
+    for(c = 0; opt_txt[i] != '\n' && i < txt_len; c++, i++) {
+        if(buf_size && c >= buf_size - 1) {
+            LV_LOG_WARN("lv_ddlist_get_selected_str: the buffer was too small")
+            break;
+        }
+        buf[c] = opt_txt[i];
+    }
 
     buf[c] = '\0';
 }
@@ -641,7 +648,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
 #if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(ddlist);
         bool editing = lv_group_get_editing(g);
-        lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {

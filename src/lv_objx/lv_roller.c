@@ -245,16 +245,6 @@ uint16_t lv_roller_get_selected(const lv_obj_t *roller)
 }
 
 /**
- * Get the current selected option as a string
- * @param roller pointer to roller object
- * @param buf pointer to an array to store the string
- */
-void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf)
-{
-    lv_ddlist_get_selected_str(roller, buf);
-}
-
-/**
  * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
  * @param roller pointer to a roller object
  * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
@@ -432,7 +422,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 #if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(roller);
         bool editing = lv_group_get_editing(g);
-        lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {

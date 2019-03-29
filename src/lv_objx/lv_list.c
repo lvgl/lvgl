@@ -745,7 +745,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     {
         /*If pressed/released etc by a KEYPAD or ENCODER delegate signal to the button*/
         lv_indev_t * indev = lv_indev_get_act();
-        lv_hal_indev_type_t indev_type = lv_indev_get_type(indev);
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_KEYPAD ||
                 (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(list))))
         {
@@ -783,7 +783,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_FOCUS) {
 
 #if LV_USE_GROUP
-        lv_hal_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         /*With ENCODER select the first button only in edit mode*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             lv_group_t * g = lv_obj_get_group(list);

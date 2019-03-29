@@ -181,9 +181,9 @@ uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist);
  * Get the current selected option as a string
  * @param ddlist pointer to ddlist object
  * @param buf pointer to an array to store the string
+ * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf);
-
+void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t buf_size);
 
 /**
  * Get the fix height value.
