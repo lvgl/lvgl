@@ -90,6 +90,9 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_speed = LV_LABEL_SCROLL_SPEED;
     ext->offset.x = 0;
     ext->offset.y = 0;
+    ext->selection_start = -1;
+    ext->selection_end = -1;
+
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
 
@@ -543,6 +546,79 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     return lv_encoded_get_char_id(txt, i);
 }
 
+/**
+ * Check if a character is drawn under a point.
+ * @param label Label object
+ * @param pos Point to check for characte under
+ * @return whether a character is drawn under the point
+ */
+bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos) {
+	const char * txt = lv_label_get_text(label);
+	lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+	uint32_t line_start = 0;
+	uint32_t new_line_start = 0;
+	lv_coord_t max_w = lv_obj_get_width(label);
+	lv_style_t * style = lv_obj_get_style(label);
+	const lv_font_t * font = style->text.font;
+	uint8_t letter_height = lv_font_get_height(font);
+	lv_coord_t y = 0;
+	lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
+
+	if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
+	if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+	if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+
+	/*If the width will be expanded set the max length to very big */
+	if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+		max_w = LV_COORD_MAX;
+	}
+
+	/*Search the line of the index letter */;
+	while(txt[line_start] != '\0') {
+		new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
+
+		if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
+		y += letter_height + style->text.line_space;
+
+		line_start = new_line_start;
+	}
+
+	/*Calculate the x coordinate*/
+	lv_coord_t x = 0;
+	lv_coord_t last_x = 0;
+	if(ext->align == LV_LABEL_ALIGN_CENTER) {
+		lv_coord_t line_w;
+		line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start,
+								  font, style->text.letter_space, flag);
+		x += lv_obj_get_width(label) / 2 - line_w / 2;
+	}
+
+	lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+	uint32_t i = line_start;
+	uint32_t i_current = i;
+	uint32_t letter = 0;
+	while(i <= new_line_start - 1) {
+		letter = lv_txt_encoded_next(txt, &i);    /*Be careful 'i' already points to the next character*/
+		/*Handle the recolor command*/
+		if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+			if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
+				continue; /*Skip the letter is it is part of a command*/
+			}
+		}
+		last_x = x;
+		x += lv_font_get_width(font, letter);
+		if(pos->x < x) {
+			i = i_current;
+			break;
+		}
+		x += style->text.letter_space;
+		i_current = i;
+	}
+
+	int max_diff = lv_font_get_width(font, letter) + style->text.letter_space + 1;
+	return (pos->x >= (last_x - style->text.letter_space) && pos->x <= (last_x + max_diff));
+}
+
 
 /*=====================
  * Other functions
@@ -671,7 +747,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
             }
         }
 
-        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset);
+        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset, ext->selection_start, ext->selection_end);
     }
     return true;
 }

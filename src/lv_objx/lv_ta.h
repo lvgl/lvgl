@@ -74,6 +74,10 @@ typedef struct
         lv_cursor_type_t type:4;  /*Shape of the cursor*/
         uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/
     } cursor;
+    int tmp_sel_start;			/*Temporary value*/
+    int tmp_sel_end;			/*Temporary value*/
+    uint8_t selecting :1;		/*User is in process of selecting */
+    uint8_t sel_mode :1;		/*Text can be selected on this text area*/
 } lv_ta_ext_t;
 
 enum {
@@ -248,6 +252,13 @@ static inline void lv_ta_set_edge_flash(lv_obj_t * ta, bool en)
  */
 void lv_ta_set_style(lv_obj_t *ta, lv_ta_style_t type, lv_style_t *style);
 
+/**
+ * Enable/disable selection mode.
+ * @param ta pointer to a text area object
+ * @param en true or false to enable/disable selection mode
+ */
+void lv_ta_set_sel_mode(lv_obj_t *ta, bool en);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -360,9 +371,41 @@ static inline bool lv_ta_get_edge_flash(lv_obj_t * ta)
  */
 lv_style_t * lv_ta_get_style(const lv_obj_t *ta, lv_ta_style_t type);
 
+/**
+ * Get the selection index of the text area.
+ *
+ * The last character is exclusive (i.e. if the API says that the selection
+ * ranges from 6 to 7, only character 6 is selected).
+ * @param ta Text area object
+ * @param sel_start pointer to int used to hold first selected character
+ * @param sel_end pointer to int used to hold last selected character
+ */
+
+void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end);
+
+/**
+ * Find whether text is selected or not.
+ * @param ta Text area object
+ * @return whether text is selected or not
+ */
+bool lv_ta_text_is_selected(const lv_obj_t *ta);
+
+/**
+ * Find whether selection mode is enabled.
+ * @param ta pointer to a text area object
+ * @return true: selection mode is enabled, false: disabled
+ */
+bool lv_ta_get_sel_mode(lv_obj_t *ta, bool en);
+
 /*=====================
  * Other functions
  *====================*/
+
+/**
+ * Clear the selection on the text area.
+ * @param ta Text area object
+ */
+void lv_ta_clear_selection(lv_obj_t * ta);
 
 /**
  * Move the cursor one character right

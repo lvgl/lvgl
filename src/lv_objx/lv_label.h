@@ -73,6 +73,8 @@ typedef struct
     uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
     uint8_t expand      :1;         /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
     uint8_t body_draw   :1;         /*Draw background body*/
+    int selection_start;		/*Left-most selection character*/
+    int selection_end;			/*Right-most selection character*/
 } lv_label_ext_t;
 
 /**********************
@@ -223,6 +225,14 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
  * Expressed in character index and not byte index (different in UTF-8)
  */
 uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
+
+/**
+ * Check if a character is drawn under a point.
+ * @param label Label object
+ * @param pos Point to check for characte under
+ * @return whether a character is drawn under the point
+ */
+bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);
 
 /**
  * Get the style of an label object
