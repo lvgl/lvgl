@@ -92,8 +92,8 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     lv_area_t scr_area;
     scr_area.x1 = 0;
     scr_area.y1 = 0;
-    scr_area.x2 = disp->driver.hor_res - 1;
-    scr_area.y2 = disp->driver.ver_res - 1;
+    scr_area.x2 = lv_disp_get_hor_res(disp) - 1;
+    scr_area.y2 = lv_disp_get_ver_res(disp) - 1;
 
     lv_area_t com_area;
     bool suc;

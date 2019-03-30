@@ -71,6 +71,7 @@ typedef struct _disp_drv_t {
 #if LV_ANTIALIAS
     uint32_t antialiasing   :1;
 #endif
+    uint32_t rotated        :1;     /*1: turn the display by 90 degree.*/
 
     /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);

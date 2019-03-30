@@ -60,6 +60,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->hor_res = LV_HOR_RES_MAX;
     driver->ver_res = LV_VER_RES_MAX;
     driver->buffer = NULL;
+    driver->rotated = 1;
 
 #if LV_ANTIALIAS
     driver->antialiasing = true;
@@ -172,6 +173,21 @@ void lv_disp_remove(lv_disp_t * disp)
 }
 
 /**
+ * Update the driver in run time.
+ * @param disp Pointer toa display. (return value of `lv_disp_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_disp_update_drv(lv_disp_t * disp, lv_disp_drv_t * new_drv)
+{
+    memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
+
+    lv_obj_t * scr;
+    LV_LL_READ(disp->scr_ll, scr) {
+        lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
+    }
+}
+
+/**
  * Set a default screen. The new screens will be created on it by default.
  * @param disp pointer to a display
  */
@@ -198,8 +214,8 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
-    if(disp == NULL) return LV_HOR_RES_MAX;
-    else return disp->driver.hor_res;
+    if(disp == NULL) return disp->driver.rotated == 0 ? LV_HOR_RES_MAX : LV_VER_RES_MAX;
+    else return disp->driver.rotated == 0 ? disp->driver.hor_res : disp->driver.ver_res;
 }
 
 /**
@@ -211,8 +227,8 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
-    if(disp == NULL) return LV_VER_RES_MAX;
-    else return disp->driver.ver_res;
+    if(disp == NULL) return disp->driver.rotated == 0 ? LV_VER_RES_MAX : LV_HOR_RES_MAX;
+    else return disp->driver.rotated == 0 ? disp->driver.ver_res : disp->driver.hor_res;
 }
 
 /**
