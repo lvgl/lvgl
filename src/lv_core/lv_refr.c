@@ -30,7 +30,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_refr_task(void * param);
 static void lv_refr_join_area(void);
 static void lv_refr_areas(void);
 static void lv_refr_area(const lv_area_t * area_p);
@@ -59,9 +58,7 @@ static lv_disp_t * disp_refr;                   /*Display being refreshed*/
  */
 void lv_refr_init(void)
 {
-    lv_task_t * task;
-    task = lv_task_create(lv_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
-    lv_task_ready(task);        /*Be sure the screen will be refreshed immediately on start up*/
+    /*Nothing to do*/
 }
 
 /**
@@ -72,7 +69,7 @@ void lv_refr_init(void)
  */
 void lv_refr_now(void)
 {
-    lv_refr_task(NULL);
+    lv_disp_refr_task(NULL);
 }
 
 
@@ -133,77 +130,72 @@ lv_disp_t * lv_refr_get_disp_refreshing(void)
     return disp_refr;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
 /**
  * Called periodically to handle the refreshing
- * @param param unused
+ * @param param point to a `lv_disp_t` to refresh
  */
-static void lv_refr_task(void * param)
+void lv_disp_refr_task(void * param)
 {
-    (void)param;
-
     LV_LOG_TRACE("lv_refr_task: started");
 
     uint32_t start = lv_tick_get();
 
-    LV_LL_READ(LV_GC_ROOT(_lv_disp_ll), disp_refr) {
-        LV_LOG_TRACE("lv_refr_task: refreshing a display");
+    disp_refr = param;
 
-        lv_refr_join_area();
+    lv_refr_join_area();
 
-        lv_refr_areas();
+    lv_refr_areas();
 
-        /*If refresh happened ...*/
-        if(disp_refr->inv_p != 0) {
-            /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
-            if(lv_disp_is_true_double_buf(disp_refr)) {
-                lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
+    /*If refresh happened ...*/
+    if(disp_refr->inv_p != 0) {
+        /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date*/
+        if(lv_disp_is_true_double_buf(disp_refr)) {
+            lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
-                /*Flush the content of the VDB*/
-                lv_refr_vdb_flush();
+            /*Flush the content of the VDB*/
+            lv_refr_vdb_flush();
 
-                /* With true double buffering the flushing should be only the address change of the current frame buffer.
-                 * Wait until the address change is ready and copy the changed content to the other frame buffer (new active VDB)
-                 * to keep the buffers synchronized*/
-                while(vdb->flushing);
+            /* With true double buffering the flushing should be only the address change of the current frame buffer.
+             * Wait until the address change is ready and copy the changed content to the other frame buffer (new active VDB)
+             * to keep the buffers synchronized*/
+            while(vdb->flushing);
 
-                uint8_t * buf_act = (uint8_t *) vdb->buf_act;
-                uint8_t * buf_ina = (uint8_t *) vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
+            uint8_t * buf_act = (uint8_t *) vdb->buf_act;
+            uint8_t * buf_ina = (uint8_t *) vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
 
-                lv_coord_t hres = lv_disp_get_hor_res(disp_refr);
-                uint16_t a;
-                for(a = 0; a < disp_refr->inv_p; a++) {
-                    if(disp_refr->inv_area_joined[a] == 0) {
-                        lv_coord_t y;
-                        uint32_t start_offs = (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
-                        uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) *  sizeof(lv_color_t);
+            lv_coord_t hres = lv_disp_get_hor_res(disp_refr);
+            uint16_t a;
+            for(a = 0; a < disp_refr->inv_p; a++) {
+                if(disp_refr->inv_area_joined[a] == 0) {
+                    lv_coord_t y;
+                    uint32_t start_offs = (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
+                    uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) *  sizeof(lv_color_t);
 
-                        for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
-                            memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
-                            start_offs += hres * sizeof(lv_color_t);
-                        }
+                    for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
+                        memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
+                        start_offs += hres * sizeof(lv_color_t);
                     }
                 }
-            }   /*End of true double buffer handling*/
-
-            /*Clean up*/
-            memset(disp_refr->inv_areas, 0, sizeof(disp_refr->inv_areas));
-            memset(disp_refr->inv_area_joined, 0, sizeof(disp_refr->inv_area_joined));
-            disp_refr->inv_p = 0;
-
-            /*Call monitor cb if present*/
-            if(disp_refr->driver.monitor_cb) {
-                disp_refr->driver.monitor_cb(&disp_refr->driver, lv_tick_elaps(start), px_num);
             }
+        }   /*End of true double buffer handling*/
+
+        /*Clean up*/
+        memset(disp_refr->inv_areas, 0, sizeof(disp_refr->inv_areas));
+        memset(disp_refr->inv_area_joined, 0, sizeof(disp_refr->inv_area_joined));
+        disp_refr->inv_p = 0;
+
+        /*Call monitor cb if present*/
+        if(disp_refr->driver.monitor_cb) {
+            disp_refr->driver.monitor_cb(&disp_refr->driver, lv_tick_elaps(start), px_num);
         }
     }
 
     LV_LOG_TRACE("lv_refr_task: ready");
 }
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 /**
  * Join the areas which has got common parts

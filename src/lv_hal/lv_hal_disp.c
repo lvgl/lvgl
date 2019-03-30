@@ -14,12 +14,12 @@
 #include "lv_hal.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_core/lv_obj.h"
+#include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
 #   include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
-
 
 /*********************
  *      DEFINES
@@ -60,6 +60,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->hor_res = LV_HOR_RES_MAX;
     driver->ver_res = LV_VER_RES_MAX;
     driver->buffer = NULL;
+
+#if LV_ANTIALIAS
+    driver->antialiasing = true;
+#endif
 
 #if LV_USE_GPU
     driver->mem_blend = NULL;
@@ -132,6 +136,12 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     disp_def = disp_def_tmp;        /*Revert the default display*/
 
+    /*Create a refresh task*/
+    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
+    lv_mem_assert(disp->refr_task);
+    if(disp->refr_task == NULL) return NULL;
+
+    lv_task_ready(disp->refr_task);        /*Be sure the screen will be refreshed immediately on start up*/
 
     return disp;
 }
@@ -203,6 +213,23 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 
     if(disp == NULL) return LV_VER_RES_MAX;
     else return disp->driver.ver_res;
+}
+
+/**
+ * Get if anti-aliasing is enabled for a display or not
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return true: anti-aliasing is enabled; false: disabled
+ */
+bool lv_disp_get_antialiasing(lv_disp_t * disp)
+{
+#if LV_ANTIALIAS == 0
+    return false;
+#else
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return false;
+
+    return disp->driver.antialiasing ? true : false;
+#endif
 }
 
 /**

@@ -21,6 +21,7 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_ll.h"
+#include "../lv_misc/lv_task.h"
 
 /*********************
  *      DEFINES
@@ -67,6 +68,10 @@ typedef struct _disp_drv_t {
      * LittlevGL will use this buffer(s) to draw the screens contents */
     lv_disp_buf_t * buffer;
 
+#if LV_ANTIALIAS
+    uint32_t antialiasing   :1;
+#endif
+
     /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
@@ -109,6 +114,9 @@ struct _lv_obj_t;
 typedef struct _disp_t {
     /*Driver to the display*/
     lv_disp_drv_t driver;
+
+    /*A task which periodically checks the dirty areas and refreshes them*/
+    lv_task_t * refr_task;
 
     /*Screens of the display*/
     lv_ll_t scr_ll;
@@ -191,6 +199,13 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp);
  * @return the vertical resolution of the display
  */
 lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp);
+
+/**
+ * Get if anti-aliasing is enabled for a display or not
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return true: anti-aliasing is enabled; false: disabled
+ */
+bool lv_disp_get_antialiasing(lv_disp_t * disp);
 
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished

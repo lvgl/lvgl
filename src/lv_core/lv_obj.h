@@ -35,7 +35,7 @@ extern "C" {
 
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES_MAX == 0 || LV_VER_RES_MAX == 0
-#error "LittlevGL: LV_HOR_RES and LV_VER_RES must be greater than 0"
+#error "LittlevGL: LV_HOR_RES_MAX and LV_VER_RES_MAX must be greater than 0"
 #endif
 
 #if LV_ANTIALIAS > 1

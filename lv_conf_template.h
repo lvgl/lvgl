@@ -30,8 +30,7 @@
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
 #define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
 
-
-/*Screen refresh period in milliseconds. LittlevGL will redraw the screen with this period*/
+/*Default screen refresh period in milliseconds. LittlevGL will redraw the screen with this period*/
 #define LV_REFR_PERIOD      30      /*[ms]*/
 
 /* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide

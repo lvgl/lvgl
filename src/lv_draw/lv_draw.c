@@ -40,7 +40,7 @@
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_ANTIALIAS != 0
+#if LV_ANTIALIAS
 
 /**
  * Get the opacity of a pixel based it's position in a line segment

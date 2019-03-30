@@ -66,6 +66,12 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
  */
 lv_disp_t * lv_refr_get_disp_refreshing(void);
 
+/**
+ * Called periodically to handle the refreshing
+ * @param param point to a `lv_disp_t` to refresh
+ */
+void lv_disp_refr_task(void * param);
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

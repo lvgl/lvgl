@@ -395,7 +395,7 @@ bool lv_ta_text_is_selected(const lv_obj_t *ta);
  * @param ta pointer to a text area object
  * @return true: selection mode is enabled, false: disabled
  */
-bool lv_ta_get_sel_mode(lv_obj_t *ta, bool en);
+bool lv_ta_get_sel_mode(lv_obj_t *ta);
 
 /*=====================
  * Other functions

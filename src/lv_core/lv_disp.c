@@ -112,6 +112,24 @@ void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr)
     lv_ll_chg_list(&old_disp->scr_ll, &disp->scr_ll, scr);
 }
 
+/**
+ * Get the a pointer to the screen refresher task.
+ * It's parameters can be modified with `lv_task_...` functions,
+ * @param disp pointer to a display
+ * @return pointer to the display refresher task. (NULL on error)
+ */
+lv_task_t * lv_disp_get_refr_task(lv_disp_t * disp)
+{
+
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("lv_disp_get_refr_task: no display registered to get its top layer");
+        return NULL;
+    }
+
+    return disp->refr_task;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
