@@ -38,8 +38,7 @@
 #define LV_ANTIALIAS        1       /*1: Enable anti-aliasing*/
 #endif
 
-
-/*Screen refresh period in milliseconds. LittlevGL will redraw the screen with this period*/
+/*Default screen refresh period in milliseconds. LittlevGL will redraw the screen with this period*/
 #ifndef LV_REFR_PERIOD
 #define LV_REFR_PERIOD      30      /*[ms]*/
 #endif
