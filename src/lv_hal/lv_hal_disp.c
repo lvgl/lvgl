@@ -60,7 +60,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->hor_res = LV_HOR_RES_MAX;
     driver->ver_res = LV_VER_RES_MAX;
     driver->buffer = NULL;
-    driver->rotated = 1;
+    driver->rotated = 0;
 
 #if LV_ANTIALIAS
     driver->antialiasing = true;
