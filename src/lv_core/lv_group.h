@@ -69,7 +69,7 @@ typedef struct _lv_group_t
     uint8_t frozen          :1;             /*1: can't focus to new object*/
     uint8_t editing         :1;             /*1: Edit mode, 0: Navigate mode*/
     uint8_t click_focus     :1;             /*1: If an object in a group is clicked by an indev then it will be focused */
-    uint8_t refocus_policy  :1;             /*1: Focus prev if focused on deletion. 0: Focus prev if focused on deletion.*/
+    uint8_t refocus_policy  :1;             /*1: Focus prev if focused on deletion. 0: Focus next if focused on deletion.*/
     uint8_t wrap            :1;             /*1: Focus next/prev can wrap at end of list. 0: Focus next/prev stops at end of list.*/
 } lv_group_t;
 
