@@ -217,7 +217,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
         lv_obj_t * label = lv_label_create(liste, NULL);
         lv_label_set_text(label, txt);
         lv_obj_set_click(label, false);
-        lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL);
+        lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL_CIRC);
         lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - btn_hor_pad);
         if(label_signal == NULL) label_signal = lv_obj_get_signal_func(label);
     }

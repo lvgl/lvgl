@@ -256,7 +256,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
     ext->offset.x = 0;
     ext->offset.y = 0;
 
-    if(long_mode == LV_LABEL_LONG_ROLL || long_mode == LV_LABEL_LONG_CROP) ext->expand = 1;
+    if(long_mode == LV_LABEL_LONG_ROLL || long_mode == LV_LABEL_LONG_ROLL_CIRC || long_mode == LV_LABEL_LONG_CROP) ext->expand = 1;
     else ext->expand = 0;
 
     /*Restore the character under the dots*/
@@ -327,7 +327,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
 
     ext->anim_speed = anim_speed;
 
-    if(ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    if(ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
         lv_label_refr_text(label);
     }
 }
@@ -427,7 +427,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
     if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded  the set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
         max_w = LV_COORD_MAX;
     }
 
@@ -498,7 +498,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
     /*If the width will be expanded set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
         max_w = LV_COORD_MAX;
     }
 
@@ -569,7 +569,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos) {
 	if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
 
 	/*If the width will be expanded set the max length to very big */
-	if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+	if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
 		max_w = LV_COORD_MAX;
 	}
 
@@ -737,7 +737,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
 
         /* In ROLL mode the CENTER and RIGHT are pointless so remove them.
          * (In addition they will result mis-alignment is this case)*/
-        if((ext->long_mode == LV_LABEL_LONG_ROLL) &&
+        if((ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) &&
                 (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
             lv_point_t size;
             lv_txt_get_size(&size, ext->text, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, flag);
@@ -748,6 +748,26 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         }
 
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset, ext->selection_start, ext->selection_end);
+
+        if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
+            lv_point_t size;
+            lv_txt_get_size(&size, ext->text, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, flag);
+
+            lv_point_t ofs;
+            /*Draw the text again next to the original to make an circular effect */
+            if(size.x > lv_obj_get_width(label)) {
+                ofs.x = ext->offset.x + size.x + lv_font_get_width(style->text.font, ' ') * ANIM_WAIT_CHAR_COUNT;
+                ofs.y = ext->offset.y;
+                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs, ext->selection_start, ext->selection_end);
+            }
+
+            /*Draw the text again below the original to make an circular effect */
+            if(size.y > lv_obj_get_height(label)) {
+                ofs.x = ext->offset.x;
+                ofs.y = ext->offset.y + size.y + lv_font_get_height(style->text.font);
+                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs, ext->selection_start, ext->selection_end);
+            }
+        }
     }
     return true;
 }
@@ -821,8 +841,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     const lv_font_t * font = style->text.font;
 
     /*If the width will be expanded set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND ||
-            ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
         max_w = LV_COORD_MAX;
     }
 
@@ -834,44 +853,8 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_txt_get_size(&size, ext->text, font, style->text.letter_space, style->text.line_space, max_w, flag);
 
     /*Set the full size in expand mode*/
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND || ext->long_mode == LV_LABEL_LONG_SCROLL) {
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
         lv_obj_set_size(label, size.x, size.y);
-
-        /*Start scrolling if the label is greater then its parent*/
-        if(ext->long_mode == LV_LABEL_LONG_SCROLL) {
-#if LV_USE_ANIMATION
-            lv_obj_t * parent = lv_obj_get_parent(label);
-
-            /*Delete the potential previous scroller animations*/
-            lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_x);
-            lv_anim_del(label, (lv_anim_fp_t) lv_obj_set_y);
-
-            lv_anim_t anim;
-            anim.var = label;
-            anim.repeat = 1;
-            anim.playback = 1;
-            anim.start = 0;
-            anim.act_time = 0;
-            anim.end_cb = NULL;
-            anim.path = lv_anim_path_linear;
-
-            anim.playback_pause = (((lv_font_get_width(style->text.font, ' ') +
-                                     style->text.letter_space) * 1000) / ext->anim_speed) * ANIM_WAIT_CHAR_COUNT;
-            anim.repeat_pause = anim.playback_pause;
-
-            if(lv_obj_get_width(label) > lv_obj_get_width(parent)) {
-                anim.end = lv_obj_get_width(parent) - lv_obj_get_width(label);
-                anim.fp = (lv_anim_fp_t) lv_obj_set_x;
-                anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
-                lv_anim_create(&anim);
-            } else if(lv_obj_get_height(label) > lv_obj_get_height(parent)) {
-                anim.end =  lv_obj_get_height(parent) - lv_obj_get_height(label) - lv_font_get_height(font);
-                anim.fp = (lv_anim_fp_t)lv_obj_set_y;
-                anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
-                lv_anim_create(&anim);
-            }
-#endif
-        }
     }
     /*In roll mode keep the size but start offset animations*/
     else if(ext->long_mode == LV_LABEL_LONG_ROLL) {
@@ -911,6 +894,45 @@ static void lv_label_refr_text(lv_obj_t * label)
             ext->offset.y = 0;
         }
 #endif
+    }
+    /*In roll inf. mode keep the size but start offset animations*/
+    else if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
+    #if LV_USE_ANIMATION
+            lv_anim_t anim;
+            anim.var = label;
+            anim.repeat = 1;
+            anim.playback = 0;
+            anim.start = 0;
+            anim.act_time = 0;
+            anim.end_cb = NULL;
+            anim.path = lv_anim_path_linear;
+            anim.playback_pause = 0;
+            anim.repeat_pause =  0;
+
+            bool hor_anim = false;
+            if(size.x > lv_obj_get_width(label)) {
+                anim.end = - size.x - lv_font_get_width(font, ' ') * ANIM_WAIT_CHAR_COUNT;
+                anim.fp = (lv_anim_fp_t) lv_label_set_offset_x;
+                anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
+                lv_anim_create(&anim);
+                hor_anim = true;
+            } else {
+                /*Delete the offset animation if not required*/
+                lv_anim_del(label, (lv_anim_fp_t) lv_label_set_offset_x);
+                ext->offset.x = 0;
+            }
+
+            if(size.y > lv_obj_get_height(label) && hor_anim == false) {
+                anim.end =  - size.y - (lv_font_get_height(font));
+                anim.fp = (lv_anim_fp_t)lv_label_set_offset_y;
+                anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
+                lv_anim_create(&anim);
+            } else {
+                /*Delete the offset animation if not required*/
+                lv_anim_del(label, (lv_anim_fp_t) lv_label_set_offset_y);
+                ext->offset.y = 0;
+            }
+    #endif
     } else if(ext->long_mode == LV_LABEL_LONG_DOT) {
         if(size.y <= lv_obj_get_height(label)) {                /*No dots are required, the text is short enough*/
             ext->dot_end = LV_LABEL_DOT_END_INV;
