@@ -73,7 +73,7 @@ typedef struct _disp_drv_t {
 #endif
     uint32_t rotated        :1;     /*1: turn the display by 90 degree.*/
 
-    /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_flush_ready()' has to be called when finished */
+    /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
     /* OPTIONAL: Extend the invalidated areas to match with the display drivers requirements

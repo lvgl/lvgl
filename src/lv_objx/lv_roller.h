@@ -70,6 +70,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy);
  * Set the options on a roller
  * @param roller pointer to roller object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ * @param inf True: Loop through the options
  */
 void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf);
 
