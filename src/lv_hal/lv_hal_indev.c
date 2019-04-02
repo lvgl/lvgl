@@ -9,6 +9,7 @@
  *      INCLUDES
  *********************/
 #include "../lv_hal/lv_hal_indev.h"
+#include "../lv_core/lv_indev.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
 #include "lv_hal_disp.h"
@@ -53,6 +54,10 @@ void lv_indev_drv_init(lv_indev_drv_t * driver)
     memset(driver, 0, sizeof(lv_indev_drv_t));
 
     driver->type = LV_INDEV_TYPE_NONE;
+    driver->drag_limit = LV_INDEV_DEF_DRAG_LIMIT;
+    driver->drag_throw = LV_INDEV_DEF_DRAG_THROW;
+    driver->long_press_time = LV_INDEV_DEF_LONG_PRESS_TIME;
+    driver->long_press_rep_time = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
 }
 
 /**
@@ -70,21 +75,23 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
         return NULL;
     }
 
-    lv_indev_t * node = lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
-    if(!node) {
-        lv_mem_assert(node);
+    lv_indev_t * indev = lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
+    if(!indev) {
+        lv_mem_assert(indev);
         return NULL;
     }
 
-    memset(node, 0, sizeof(lv_indev_t));
-    memcpy(&node->driver, driver, sizeof(lv_indev_drv_t));
+    memset(indev, 0, sizeof(lv_indev_t));
+    memcpy(&indev->driver, driver, sizeof(lv_indev_drv_t));
 
-    node->proc.reset_query = 1;
-    node->cursor = NULL;
-    node->group = NULL;
-    node->btn_points = NULL;
+    indev->proc.reset_query = 1;
+    indev->cursor = NULL;
+    indev->group = NULL;
+    indev->btn_points = NULL;
 
-    return node;
+    indev->driver.read_task = lv_task_create(lv_indev_read_task, LV_INDEV_DEF_READ_PERIOD, LV_TASK_PRIO_MID, indev);
+
+    return indev;
 }
 
 /**

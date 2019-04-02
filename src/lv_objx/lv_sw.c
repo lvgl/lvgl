@@ -307,7 +307,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(indev) {
             lv_point_t p = {0,0};
             lv_indev_get_point(indev,  &p);
-            if(LV_MATH_ABS(p.x - ext->start_x) > LV_INDEV_DRAG_LIMIT) ext->slided = 1;
+            if(LV_MATH_ABS(p.x - ext->start_x) > LV_INDEV_DEF_DRAG_LIMIT) ext->slided = 1;
         }
 
         /*If didn't slide then revert the min/max value. So click without slide won't move the switch as a slider*/

@@ -24,6 +24,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include "../lv_misc/lv_area.h"
+#include "../lv_misc/lv_task.h"
 
 /*********************
  *      DEFINES
@@ -68,17 +69,38 @@ typedef struct {
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct _lv_indev_drv_t {
-    lv_indev_type_t type;                                   /*Input device type*/
-    bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t *data);        /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb (buffered)*/
+
+    /*Input device type*/
+    lv_indev_type_t type;
+
+    /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb (buffered)*/
+    bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t *data);
 
 #if LV_USE_USER_DATA_MULTI
-    lv_indev_drv_user_data_t read_user_data;                        /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
+    lv_indev_drv_user_data_t read_user_data;
 #endif
 
 #if LV_USE_USER_DATA_SINGLE
     lv_indev_drv_user_data_t user_data;
 #endif
-    struct _disp_t * disp;                                      /*Pointer to the assigned display*/
+
+    /*Pointer to the assigned display*/
+    struct _disp_t * disp;
+
+    /*Task to read the periodically read the input device*/
+    lv_task_t * read_task;
+
+    /*Number of pixels to slide before actually drag the object*/
+    uint8_t drag_limit;
+
+    /*Drag throw slow-down in [%]. Greater value means faster slow-down */
+    uint8_t drag_throw;
+
+    /*Long press time in milliseconds*/
+    uint16_t long_press_time;
+
+    /*Repeated trigger period in long press [ms] */
+    uint16_t long_press_rep_time;
 } lv_indev_drv_t;
 
 
@@ -90,7 +112,7 @@ typedef struct _lv_indev_proc_t {
             lv_point_t act_point;
             lv_point_t last_point;
             lv_point_t vect;
-            lv_point_t drag_sum;                /*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
+            lv_point_t drag_sum;                /*Count the dragged pixels to check LV_INDEV_DEF_DRAG_LIMIT*/
             lv_point_t drag_throw_vect;
             struct _lv_obj_t * act_obj;         /*The object being pressed*/
             struct _lv_obj_t * last_obj;        /*The last obejct which was pressed (used by dragthrow and other post-release event)*/

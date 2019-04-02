@@ -129,6 +129,9 @@ typedef struct _disp_t {
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint32_t inv_p        :10;
+
+    /*Miscellaneous data*/
+    uint32_t last_activity;
 } lv_disp_t;
 
 /**********************
@@ -207,6 +210,13 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp);
  * @return true: anti-aliasing is enabled; false: disabled
  */
 bool lv_disp_get_antialiasing(lv_disp_t * disp);
+
+/**
+ * Get the elapsed time since the last activity on a display.
+ * @param disp pointer to a display.
+ * @return the elapsed time since the last activity
+ */
+uint32_t lv_disp_get_inactive_time(lv_disp_t * disp);
 
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished

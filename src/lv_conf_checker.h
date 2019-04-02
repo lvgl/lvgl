@@ -40,7 +40,7 @@
 
 /*Default screen refresh period in milliseconds. LittlevGL will redraw the screen with this period*/
 #ifndef LV_REFR_PERIOD
-#define LV_REFR_PERIOD      30      /*[ms]*/
+#define LV_DISP_DEF_REFR_PERIOD      30      /*[ms]*/
 #endif
 
 /* Dot Per Inch: used to initialize default sizes. E.g. a button with width = LV_DPI / 2 -> half inch wide
@@ -106,22 +106,22 @@
 
 /*Input device settings*/
 #ifndef LV_INDEV_READ_PERIOD
-#define LV_INDEV_READ_PERIOD            30                     /*Input device read period in milliseconds*/
+#define LV_INDEV_DEF_READ_PERIOD            30                     /*Input device read period in milliseconds*/
 #endif
 #ifndef LV_INDEV_POINT_MARKER
 #define LV_INDEV_POINT_MARKER           0                      /*Mark the pressed points  (required: LV_USE_REAL_DRAW = 1)*/
 #endif
 #ifndef LV_INDEV_DRAG_LIMIT
-#define LV_INDEV_DRAG_LIMIT             10                     /*Drag threshold in pixels */
+#define LV_INDEV_DEF_DRAG_LIMIT             10                     /*Drag threshold in pixels */
 #endif
 #ifndef LV_INDEV_DRAG_THROW
-#define LV_INDEV_DRAG_THROW             20                     /*Drag throw slow-down in [%]. Greater value means faster slow-down */
+#define LV_INDEV_DEF_DRAG_THROW             20                     /*Drag throw slow-down in [%]. Greater value means faster slow-down */
 #endif
 #ifndef LV_INDEV_LONG_PRESS_TIME
-#define LV_INDEV_LONG_PRESS_TIME        400                    /*Long press time in milliseconds*/
+#define LV_INDEV_DEF_LONG_PRESS_TIME        400                    /*Long press time in milliseconds*/
 #endif
 #ifndef LV_INDEV_LONG_PRESS_REP_TIME
-#define LV_INDEV_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
+#define LV_INDEV_DEF_LONG_PRESS_REP_TIME    100                    /*Repeated trigger period in long press [ms] */
 #endif
 
 /*Text settings*/

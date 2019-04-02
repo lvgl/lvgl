@@ -138,7 +138,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def = disp_def_tmp;        /*Revert the default display*/
 
     /*Create a refresh task*/
-    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
+    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
     lv_mem_assert(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 
@@ -246,6 +246,20 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
 
     return disp->driver.antialiasing ? true : false;
 #endif
+}
+
+
+/**
+ * Get the elapsed time since the last activity on a display.
+ * @param disp pointer to a display.
+ * @return the elapsed time since the last activity
+ */
+uint32_t lv_disp_get_inactive_time(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return 0;
+
+    return disp->last_activity;
 }
 
 /**

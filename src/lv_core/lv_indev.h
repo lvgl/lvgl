@@ -35,6 +35,12 @@ extern "C" {
 void lv_indev_init(void);
 
 /**
+ * Called periodically to read the input devices
+ * @param param pointer to and input device to read
+ */
+void lv_indev_read_task(void * param);
+
+/**
  * Get the currently processed input device. Can be used in action functions too.
  * @return pointer to the currently processed input device or NULL if no input device processing right now
  */
@@ -144,6 +150,14 @@ lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t *indev);
  * @param indev pointer to an input device
  */
 void lv_indev_wait_release(lv_indev_t * indev);
+
+/**
+ * Get a pointer to the indev read task to
+ * modify its parameters with `lv_task_...` functions.
+ * @param indev pointer to an inout device
+ * @return pointer to the indev read refresher task. (NULL on error)
+ */
+lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**********************
  *      MACROS

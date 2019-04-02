@@ -63,8 +63,8 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
 /**
- * Get the a pointer to the screen refresher task.
- * It's parameters can be modified with `lv_task_...` functions,
+ * Get a pointer to the screen refresher task to
+ * modify its parameters with `lv_task_...` functions.
  * @param disp pointer to a display
  * @return pointer to the display refresher task. (NULL on error)
  */

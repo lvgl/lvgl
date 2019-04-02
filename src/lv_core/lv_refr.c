@@ -292,7 +292,7 @@ static void lv_refr_area(const lv_area_t * area_p)
             lv_coord_t y_tmp = max_row - 1;
             do {
                 tmp.y2 = y_tmp;
-                disp_refr->driver.rounder_cb(&tmp);
+                disp_refr->driver.rounder_cb(&disp_refr->driver, &tmp);
 
                 /*If this height fits into `max_row` then fine*/
                 if(lv_area_get_height(&tmp) <= max_row) break;
