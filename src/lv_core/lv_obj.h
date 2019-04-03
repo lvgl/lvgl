@@ -348,7 +348,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
  * @param w extended width to both sides
  * @param h extended height to both sides
  */
-void lv_obj_set_ext_paddinds(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+void lv_obj_set_ext_paddings(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 #endif
 
 /**
