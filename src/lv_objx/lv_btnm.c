@@ -141,7 +141,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param btnm pointer to a button matrix object
  * @param map pointer a string array. The last string has to be: "". Use "\n" to make a line break.
  */
-void lv_btnm_set_map(const lv_obj_t * btnm, const char ** map)
+void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 {
     if(map == NULL) return;
 
