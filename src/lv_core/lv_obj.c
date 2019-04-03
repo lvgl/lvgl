@@ -55,6 +55,20 @@ static const void * event_act_data;           /*Stores the data passed to the ev
 /**********************
  *      MACROS
  **********************/
+#if USE_LV_EXTENDED_CLICK_AREA
+/**
+ * Update coordinates of extended clickable area from object's coordinates and ext_paddings
+ * @param coords coordinates of an object
+ * @param ext_coords extended coordinates, which will be updated
+ * @param paddings paddings of extended clickable area
+ */
+#define UPDATE_EXT_COORDS(coords, ext_coords, paddings) do{\
+    ext_coords.x1 = paddings.x1 > coords.x1 ? 0 : coords.x1 - paddings.x1;  \
+    ext_coords.x2 = coords.x2 + paddings.x2;                                \
+    ext_coords.y1 = paddings.y1 > coords.y1 ? 0 : coords.y1 - paddings.y1;  \
+    ext_coords.y2 = coords.y2 + paddings.y2;                                \
+        } while(0)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -147,6 +161,13 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
         new_obj->ext_size = 0;
 
+#if USE_LV_EXTENDED_CLICK_AREA
+        lv_area_copy(&(new_obj->ext_coords), &(new_obj->coords));
+        new_obj->ext_paddings.x1 = 0;
+        new_obj->ext_paddings.x2 = 0;
+        new_obj->ext_paddings.y1 = 0;
+        new_obj->ext_paddings.y2 = 0;
+#endif
         /*Init realign*/
 #if LV_OBJ_REALIGN
         new_obj->realign.align = LV_ALIGN_CENTER;
@@ -218,6 +239,13 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
                              LV_OBJ_DEF_HEIGHT;
         new_obj->ext_size = 0;
 
+#if USE_LV_EXTENDED_CLICK_AREA
+        lv_area_copy(&(new_obj->ext_coords), &(new_obj->coords));
+        new_obj->ext_paddings.x1 = 0;
+        new_obj->ext_paddings.x2 = 0;
+        new_obj->ext_paddings.y1 = 0;
+        new_obj->ext_paddings.y2 = 0;
+#endif
         /*Init realign*/
 #if LV_OBJ_REALIGN
         new_obj->realign.align = LV_ALIGN_CENTER;
@@ -272,6 +300,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
     if(copy != NULL) {
         lv_area_copy(&new_obj->coords, &copy->coords);
         new_obj->ext_size = copy->ext_size;
+
+#if USE_LV_EXTENDED_CLICK_AREA
+        lv_area_copy(&new_obj->ext_coords, &copy->ext_coords);
+        lv_area_copy(&new_obj->ext_paddings, &copy->ext_paddings);
+#endif
 
         /*Set free data*/
 #if LV_USE_USER_DATA_SINGLE
@@ -559,6 +592,10 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->coords.x2 += diff.x;
     obj->coords.y2 += diff.y;
 
+#if USE_LV_EXTENDED_CLICK_AREA
+    UPDATE_EXT_COORDS(obj->coords, obj->ext_coords, obj->ext_paddings);
+#endif
+
     refresh_children_position(obj, diff.x, diff.y);
 
     /*Inform the object about its new coordinates*/
@@ -620,6 +657,9 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     obj->coords.x2 = obj->coords.x1 + w - 1;
     obj->coords.y2 = obj->coords.y1 + h - 1;
 
+#if USE_LV_EXTENDED_CLICK_AREA
+    UPDATE_EXT_COORDS(obj->coords, obj->ext_coords, obj->ext_paddings);
+#endif
 
     /*Send a signal to the object with its new coordinates*/
     obj->signal_cb(obj, LV_SIGNAL_CORD_CHG, &ori);
@@ -642,6 +682,24 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     if(obj->realign.auto_realign) lv_obj_realign(obj);
 #endif
 }
+
+#if USE_LV_EXTENDED_CLICK_AREA
+/**
+ * Set the size of an extended clickable area
+ * @param obj pointer to an object
+ * @param w extended width to both sides
+ * @param h extended height to both sides
+ */
+void lv_obj_set_ext_paddinds(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
+{
+    obj->ext_paddings.x1 = w;
+    obj->ext_paddings.x2 = w;
+    obj->ext_paddings.y1 = h;
+    obj->ext_paddings.y2 = h;
+
+    UPDATE_EXT_COORDS(obj->coords, obj->ext_coords, obj->ext_paddings);
+}
+#endif
 
 /**
  * Set the width of an object
@@ -1571,6 +1629,18 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
 
     return lv_obj_get_width(obj) - style->body.padding.top - style->body.padding.bottom;
 }
+
+#if USE_LV_EXTENDED_CLICK_AREA
+/**
+ * Copy the extended clickable area size of an object to an area
+ * @param obj pointer to an object
+ * @param cords_p pointer to an area to store the size
+ */
+void lv_obj_get_ext_paddings(const lv_obj_t * obj, lv_area_t * cords_p)
+{
+    lv_area_copy(cords_p, &obj->ext_paddings);
+}
+
 /**
  * Get the extended size attribute of an object
  * @param obj pointer to an object
@@ -1971,6 +2041,9 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
         i->coords.x2 += x_diff;
         i->coords.y2 += y_diff;
 
+#if USE_LV_EXTENDED_CLICK_AREA
+        UPDATE_EXT_COORDS(i->coords, i->ext_coords, i->ext_paddings);
+#endif
         refresh_children_position(i, x_diff, y_diff);
     }
 }

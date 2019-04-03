@@ -976,7 +976,11 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
 
     /*If the point is on this object*/
     /*Check its children too*/
-    if(lv_area_is_point_on(&obj->coords, &proc->types.pointer.act_point)) {
+#if USE_LV_EXTENDED_CLICK_AREA
+    if(lv_area_is_point_on(&obj->ext_coords, &proc->act_point)) {
+#else
+    if(lv_area_is_point_on(&obj->coords, &proc->act_point)) {
+#endif
         lv_obj_t * i;
 
         LV_LL_READ(obj->child_ll, i) {
