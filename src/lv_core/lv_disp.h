@@ -81,7 +81,7 @@ uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp);
  * Manually trigger an activity on a display
  * @param disp pointer to an display (NULL to use the default display)
  */
-void lv_disp_trig_activity(const lv_disp_t * disp);
+void lv_disp_trig_activity(lv_disp_t * disp);
 
 /*------------------------------------------------
  * To improve backward compatibility
