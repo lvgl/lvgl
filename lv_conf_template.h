@@ -342,6 +342,10 @@ typedef void * lv_obj_user_data_t;          /*Declare the type of the user data 
 /*Switch (dependencies: lv_slider)*/
 #define LV_USE_SW       1
 
+/* Extended clickable area */
+#define USE_LV_EXTENDED_CLICK_AREA 		0	/* Enables obj extension to realize extended clickable area with additional extended coords (1: enabled) */
+#define USE_LV_EXTENDED_CLICK_AREA_TINY	0	/* Enables obj extension to realize extended clickable area with calculation of the fly (1: enabled) */
+
 /*************************
  * Non-user section
  *************************/

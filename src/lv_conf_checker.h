@@ -584,6 +584,15 @@
 #define LV_USE_SW       1
 #endif
 
+/*Extended clickable area */
+#ifndef USE_LV_EXTENDED_CLICK_AREA
+#define USE_LV_EXTENDED_CLICK_AREA 		0
+#endif
+
+#ifndef USE_LV_EXTENDED_CLICK_AREA_TINY
+#define USE_LV_EXTENDED_CLICK_AREA_TINY	0
+#endif
+
 /*************************
  * Non-user section
  *************************/
