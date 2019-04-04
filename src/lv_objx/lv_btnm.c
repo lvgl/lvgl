@@ -39,14 +39,12 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p);
 static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char ** map);
 static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx);
 static bool maps_are_identical(const char ** map1, const char ** map2);
-static void make_one_button_toggled(lv_obj_t *btnm, uint16_t btn_idx);
+static void make_one_button_toggled(lv_obj_t * btnm, uint16_t btn_idx);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static const char * lv_btnm_def_map[] = {"Btn1", "Btn2", "Btn3", "\n",
-                                         "Btn4", "Btn5", ""
-                                        };
+static const char * lv_btnm_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 
 static lv_design_cb_t ancestor_design_f;
 static lv_signal_cb_t ancestor_signal;
@@ -62,7 +60,8 @@ static lv_signal_cb_t ancestor_signal;
 /**
  * Create a button matrix objects
  * @param par pointer to an object, it will be the parent of the new button matrix
- * @param copy pointer to a button matrix object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a button matrix object, if not NULL then the new object will be copied
+ * from it
  * @return pointer to the created button matrix
  */
 lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
@@ -81,19 +80,19 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
 
-    ext->btn_cnt = 0;
-    ext->btn_id_pr = LV_BTNM_BTN_NONE;
-    ext->btn_id_act = LV_BTNM_BTN_NONE;
-    ext->button_areas = NULL;
-    ext->ctrl_bits = NULL;
-    ext->map_p = NULL;
-    ext->recolor = 0;
-    ext->one_toggle = 0;
-    ext->styles_btn[LV_BTN_STATE_REL] = &lv_style_btn_rel;
-    ext->styles_btn[LV_BTN_STATE_PR] = &lv_style_btn_pr;
+    ext->btn_cnt                          = 0;
+    ext->btn_id_pr                        = LV_BTNM_BTN_NONE;
+    ext->btn_id_act                       = LV_BTNM_BTN_NONE;
+    ext->button_areas                     = NULL;
+    ext->ctrl_bits                        = NULL;
+    ext->map_p                            = NULL;
+    ext->recolor                          = 0;
+    ext->one_toggle                       = 0;
+    ext->styles_btn[LV_BTN_STATE_REL]     = &lv_style_btn_rel;
+    ext->styles_btn[LV_BTN_STATE_PR]      = &lv_style_btn_pr;
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
-    ext->styles_btn[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pr;
-    ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
+    ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
+    ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_btnm);
 
@@ -157,7 +156,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
      * set/allocation when map hasn't changed.
      */
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    if (!maps_are_identical(ext->map_p, map)) {
+    if(!maps_are_identical(ext->map_p, map)) {
 
         /*Analyze the map and create the required number of buttons*/
         allocate_btn_areas_and_controls(btnm, map);
@@ -166,43 +165,45 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 
     /*Set size and positions of the buttons*/
     lv_style_t * style_bg = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
-    lv_coord_t max_w = lv_obj_get_width(btnm) - style_bg->body.padding.left - style_bg->body.padding.right;
-    lv_coord_t max_h = lv_obj_get_height(btnm) - style_bg->body.padding.top - style_bg->body.padding.bottom;
+    lv_coord_t max_w =
+        lv_obj_get_width(btnm) - style_bg->body.padding.left - style_bg->body.padding.right;
+    lv_coord_t max_h =
+        lv_obj_get_height(btnm) - style_bg->body.padding.top - style_bg->body.padding.bottom;
     lv_coord_t act_y = style_bg->body.padding.top;
 
     /*Count the lines to calculate button height*/
     uint8_t line_cnt = 1;
     uint8_t li;
     for(li = 0; strlen(map[li]) != 0; li++) {
-        if(strcmp(map[li], "\n") == 0) line_cnt ++;
+        if(strcmp(map[li], "\n") == 0) line_cnt++;
     }
 
     lv_coord_t btn_h = max_h - ((line_cnt - 1) * style_bg->body.padding.inner);
-    btn_h = btn_h / line_cnt;
-    btn_h --;                              /*-1 because e.g. height = 100 means 101 pixels (0..100)*/
+    btn_h            = btn_h / line_cnt;
+    btn_h--; /*-1 because e.g. height = 100 means 101 pixels (0..100)*/
 
     /* Count the units and the buttons in a line
      * (A button can be 1,2,3... unit wide)*/
-    uint16_t unit_cnt;      /*Number of units in a row*/
-    uint16_t unit_act_cnt;  /*Number of units currently put in a row*/
-    uint16_t btn_cnt;       /*Number of buttons in a row*/
-    uint16_t i_tot = 0;     /*Act. index in the str map*/
-    uint16_t btn_i = 0;     /*Act. index of button areas*/
-    const char  ** map_p_tmp = map;
+    uint16_t unit_cnt;           /*Number of units in a row*/
+    uint16_t unit_act_cnt;       /*Number of units currently put in a row*/
+    uint16_t btn_cnt;            /*Number of buttons in a row*/
+    uint16_t i_tot          = 0; /*Act. index in the str map*/
+    uint16_t btn_i          = 0; /*Act. index of button areas*/
+    const char ** map_p_tmp = map;
 
     /*Count the units and the buttons in a line*/
     while(1) {
         unit_cnt = 0;
-        btn_cnt = 0;
+        btn_cnt  = 0;
         /*Count the buttons in a line*/
         while(strcmp(map_p_tmp[btn_cnt], "\n") != 0 &&
-                strlen(map_p_tmp[btn_cnt]) != 0) { /*Check a line*/
+              strlen(map_p_tmp[btn_cnt]) != 0) { /*Check a line*/
             unit_cnt += get_button_width(ext->ctrl_bits[btn_i + btn_cnt]);
-            btn_cnt ++;
+            btn_cnt++;
         }
 
         /*Make sure the last row is at the bottom of 'btnm'*/
-        if(map_p_tmp[btn_cnt][0] == '\0') {         /*Last row?*/
+        if(map_p_tmp[btn_cnt][0] == '\0') { /*Last row?*/
             btn_h = max_h - act_y + style_bg->body.padding.bottom - 1;
         }
 
@@ -221,33 +222,34 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
                  * act_unit_w = one_unit_w * button_width
                  * do this two operations but the multiply first to divide a greater number */
                 act_unit_w = (all_unit_w * get_button_width(ext->ctrl_bits[btn_i])) / unit_cnt;
-                act_unit_w --;                              /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
+                act_unit_w--; /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
-                act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner + style_bg->body.padding.left;
+                act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner +
+                        style_bg->body.padding.left;
 
                 /* Set the button's area.
-                 * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding errors*/
+                 * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding
+                 * errors*/
                 if(style_bg->body.padding.inner == 0 && act_x != style_bg->body.padding.left) {
-                    lv_area_set(&ext->button_areas[btn_i],  ext->button_areas[btn_i - 1].x2, act_y,
+                    lv_area_set(&ext->button_areas[btn_i], ext->button_areas[btn_i - 1].x2, act_y,
                                 act_x + act_unit_w, act_y + btn_h);
                 } else {
-                    lv_area_set(&ext->button_areas[btn_i],  act_x, act_y,
-                                act_x + act_unit_w, act_y + btn_h);
+                    lv_area_set(&ext->button_areas[btn_i], act_x, act_y, act_x + act_unit_w,
+                                act_y + btn_h);
                 }
 
                 unit_act_cnt += get_button_width(ext->ctrl_bits[btn_i]);
 
-                i_tot ++;
-                btn_i ++;
+                i_tot++;
+                btn_i++;
             }
         }
         act_y += btn_h + style_bg->body.padding.inner;
 
-
         if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
-        map_p_tmp = &map_p_tmp[btn_cnt + 1]; /*Set the map to the next line*/
-        i_tot ++;   /*Skip the '\n'*/
+        map_p_tmp = &map_p_tmp[btn_cnt + 1];       /*Set the map to the next line*/
+        i_tot++;                                   /*Skip the '\n'*/
     }
 
     lv_obj_invalidate(btnm);
@@ -287,16 +289,13 @@ void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
-    if (id >= ext->btn_cnt && id != LV_BTNM_BTN_NONE)
-        return;
+    if(id >= ext->btn_cnt && id != LV_BTNM_BTN_NONE) return;
 
-    if (id == ext->btn_id_pr)
-        return;
+    if(id == ext->btn_id_pr) return;
 
     ext->btn_id_pr = id;
     lv_obj_invalidate(btnm);
 }
-
 
 /**
  * Set a style of a button matrix
@@ -309,9 +308,7 @@ void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, lv_style_t * style
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     switch(type) {
-        case LV_BTNM_STYLE_BG:
-            lv_obj_set_style(btnm, style);
-            break;
+        case LV_BTNM_STYLE_BG: lv_obj_set_style(btnm, style); break;
         case LV_BTNM_STYLE_BTN_REL:
             ext->styles_btn[LV_BTN_STATE_REL] = style;
             lv_obj_invalidate(btnm);
@@ -366,7 +363,6 @@ void lv_btnm_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t
     }
 
     invalidate_button_area(btnm, btn_id);
-
 }
 
 /**
@@ -379,7 +375,7 @@ void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl, bool en)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     uint16_t i;
-    for(i= 0; i < ext->btn_cnt; i++) {
+    for(i = 0; i < ext->btn_cnt; i++) {
         lv_btnm_set_btn_ctrl(btnm, i, ctrl, en);
     }
 }
@@ -396,7 +392,7 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
 {
 
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    if (btn_id >= ext->btn_cnt) return;
+    if(btn_id >= ext->btn_cnt) return;
     ext->ctrl_bits[btn_id] &= (~LV_BTNM_WIDTH_MASK);
     ext->ctrl_bits[btn_id] |= (LV_BTNM_WIDTH_MASK & width);
 
@@ -408,12 +404,13 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
  * @param btnm Button matrix object
  * @param one_toggle Whether "one toggle" mode is enabled
  */
-void lv_btnm_set_one_toggle(lv_obj_t *btnm, bool one_toggle) {
-	lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
-	ext->one_toggle = one_toggle;
+void lv_btnm_set_one_toggle(lv_obj_t * btnm, bool one_toggle)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+    ext->one_toggle     = one_toggle;
 
-	/*If more than one button is toggled only the first one should be*/
-	make_one_button_toggled(btnm, 0);
+    /*If more than one button is toggled only the first one should be*/
+    make_one_button_toggled(btnm, 0);
 }
 
 /*=====================
@@ -471,7 +468,6 @@ const char * lv_btnm_get_active_btn_text(const lv_obj_t * btnm)
     }
 }
 
-
 /**
  * Get the pressed button's index.
  * The button be really pressed by the user or manually set to pressed with `lv_btnm_set_pressed`
@@ -487,34 +483,36 @@ uint16_t lv_btnm_get_pressed_btn(const lv_obj_t * btnm)
 /**
  * Get the button's text
  * @param btnm pointer to button matrix object
- * @param btn_id the index a button not counting new line characters. (The return value of lv_btnm_get_pressed/released)
+ * @param btn_id the index a button not counting new line characters. (The return value of
+ * lv_btnm_get_pressed/released)
  * @return  text of btn_index` button
  */
 const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
-     if(btn_id > ext->btn_cnt) return NULL;
+    if(btn_id > ext->btn_cnt) return NULL;
 
-       uint16_t txt_i = 0;
-       uint16_t btn_i = 0;
+    uint16_t txt_i = 0;
+    uint16_t btn_i = 0;
 
-       /* Search the text of ext->btn_pr the buttons text in the map
-        * Skip "\n"-s*/
-       while(btn_i != btn_id) {
-           btn_i ++;
-           txt_i ++;
-           if(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i ++;
-       }
+    /* Search the text of ext->btn_pr the buttons text in the map
+     * Skip "\n"-s*/
+    while(btn_i != btn_id) {
+        btn_i++;
+        txt_i++;
+        if(strcmp(ext->map_p[txt_i], "\n") == 0) txt_i++;
+    }
 
-       if(btn_i == ext->btn_cnt) return  NULL;
+    if(btn_i == ext->btn_cnt) return NULL;
 
-       return ext->map_p[txt_i];
+    return ext->map_p[txt_i];
 }
 
 /**
  * Get the whether a control value is enabled or disabled for button of a button matrix
  * @param btnm pointer to a button matrix object
- * @param btn_id the index a button not counting new line characters. (E.g. the return value of lv_btnm_get_pressed/released)
+ * @param btn_id the index a button not counting new line characters. (E.g. the return value of
+ * lv_btnm_get_pressed/released)
  * @param ctrl control values to check (ORed value can be used)
  * @return true: long press repeat is disabled; false: long press repeat enabled
  */
@@ -534,31 +532,17 @@ bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
  */
 lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
 {
-    lv_style_t * style = NULL;
+    lv_style_t * style  = NULL;
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     switch(type) {
-        case LV_BTNM_STYLE_BG:
-            style = lv_obj_get_style(btnm);
-            break;
-        case LV_BTNM_STYLE_BTN_REL:
-            style = ext->styles_btn[LV_BTN_STATE_REL];
-            break;
-        case LV_BTNM_STYLE_BTN_PR:
-            style = ext->styles_btn[LV_BTN_STATE_PR];
-            break;
-        case LV_BTNM_STYLE_BTN_TGL_REL:
-            style = ext->styles_btn[LV_BTN_STATE_TGL_REL];
-            break;
-        case LV_BTNM_STYLE_BTN_TGL_PR:
-            style = ext->styles_btn[LV_BTN_STATE_TGL_PR];
-            break;
-        case LV_BTNM_STYLE_BTN_INA:
-            style = ext->styles_btn[LV_BTN_STATE_INA];
-            break;
-        default:
-            style = NULL;
-            break;
+        case LV_BTNM_STYLE_BG: style = lv_obj_get_style(btnm); break;
+        case LV_BTNM_STYLE_BTN_REL: style = ext->styles_btn[LV_BTN_STATE_REL]; break;
+        case LV_BTNM_STYLE_BTN_PR: style = ext->styles_btn[LV_BTN_STATE_PR]; break;
+        case LV_BTNM_STYLE_BTN_TGL_REL: style = ext->styles_btn[LV_BTN_STATE_TGL_REL]; break;
+        case LV_BTNM_STYLE_BTN_TGL_PR: style = ext->styles_btn[LV_BTN_STATE_TGL_PR]; break;
+        case LV_BTNM_STYLE_BTN_INA: style = ext->styles_btn[LV_BTN_STATE_INA]; break;
+        default: style = NULL; break;
     }
 
     return style;
@@ -569,10 +553,11 @@ lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
  * @param btnm Button matrix object
  * @return whether "one toggle" mode is enabled
  */
-bool lv_btnm_get_one_toggle(const lv_obj_t *btnm) {
-	lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+bool lv_btnm_get_one_toggle(const lv_obj_t * btnm)
+{
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
-	return ext->one_toggle;
+    return ext->one_toggle;
 }
 
 /**********************
@@ -600,7 +585,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
         ancestor_design_f(btnm, mask, mode);
 
-        lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+        lv_btnm_ext_t * ext   = lv_obj_get_ext_attr(btnm);
         lv_style_t * bg_style = lv_obj_get_style(btnm);
         lv_style_t * btn_style;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(btnm);
@@ -619,10 +604,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
         if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
 
-        for(btn_i = 0; btn_i < ext->btn_cnt; btn_i ++, txt_i ++) {
+        for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) {
-                txt_i ++;
+                txt_i++;
             }
 
             /*Skip hidden buttons*/
@@ -639,12 +624,19 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
             /*Load the style*/
             bool tgl_state = button_get_tgl_state(ext->ctrl_bits[btn_i]);
-            if(button_is_inactive(ext->ctrl_bits[btn_i])) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_INA);
-            else if(btn_i != ext->btn_id_pr && tgl_state == false) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL);
-            else if(btn_i == ext->btn_id_pr && tgl_state == false) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_PR);
-            else if(btn_i != ext->btn_id_pr && tgl_state == true) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_REL);
-            else if(btn_i == ext->btn_id_pr && tgl_state == true) btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_PR);
-            else btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL);    /*Not possible option, just to be sure*/
+            if(button_is_inactive(ext->ctrl_bits[btn_i]))
+                btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_INA);
+            else if(btn_i != ext->btn_id_pr && tgl_state == false)
+                btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL);
+            else if(btn_i == ext->btn_id_pr && tgl_state == false)
+                btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_PR);
+            else if(btn_i != ext->btn_id_pr && tgl_state == true)
+                btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_REL);
+            else if(btn_i == ext->btn_id_pr && tgl_state == true)
+                btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_TGL_PR);
+            else
+                btn_style = lv_btnm_get_style(
+                    btnm, LV_BTNM_STYLE_BTN_REL); /*Not possible option, just to be sure*/
 
             lv_style_copy(&style_tmp, btn_style);
 
@@ -659,13 +651,12 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
 
                 if(txt_i == 0) {
                     style_tmp.body.border.part &= ~LV_BORDER_LEFT;
-                }
-                else if(strcmp(ext->map_p[txt_i - 1],"\n") == 0) {
+                } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
                     style_tmp.body.border.part &= ~LV_BORDER_LEFT;
                 }
 
                 if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
-                        style_tmp.body.border.part &= ~LV_BORDER_RIGHT;
+                    style_tmp.body.border.part &= ~LV_BORDER_RIGHT;
                 }
             }
             lv_draw_rect(&area_tmp, mask, &style_tmp, opa_scale);
@@ -674,16 +665,16 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             if(btn_style->glass) btn_style = bg_style;
             const lv_font_t * font = btn_style->text.font;
             lv_point_t txt_size;
-            lv_txt_get_size(&txt_size, ext->map_p[txt_i], font,
-                            btn_style->text.letter_space, btn_style->text.line_space,
-                            lv_area_get_width(&area_btnm), txt_flag);
+            lv_txt_get_size(&txt_size, ext->map_p[txt_i], font, btn_style->text.letter_space,
+                            btn_style->text.line_space, lv_area_get_width(&area_btnm), txt_flag);
 
             area_tmp.x1 += (btn_w - txt_size.x) / 2;
             area_tmp.y1 += (btn_h - txt_size.y) / 2;
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-            lv_draw_label(&area_tmp, mask, btn_style, opa_scale,  ext->map_p[txt_i], txt_flag, NULL, -1, -1);
+            lv_draw_label(&area_tmp, mask, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL,
+                          -1, -1);
         }
     }
     return true;
@@ -711,38 +702,36 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         lv_mem_free(ext->ctrl_bits);
     } else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_CORD_CHG) {
         lv_btnm_set_map(btnm, ext->map_p);
-    }
-    else if(sign == LV_SIGNAL_PRESSED) {
+    } else if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
+        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER ||
+           lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
             uint16_t btn_pr;
             /*Search the pressed area*/
             lv_indev_get_point(param, &p);
             btn_pr = get_button_from_point(btnm, &p);
 
-            invalidate_button_area(btnm, ext->btn_id_pr)    /*Invalidate the old area*/;
-            ext->btn_id_pr = btn_pr;
+            invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the old area*/;
+            ext->btn_id_pr  = btn_pr;
             ext->btn_id_act = btn_pr;
-            invalidate_button_area(btnm, ext->btn_id_pr);   /*Invalidate the new area*/
+            invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
         }
         if(ext->btn_id_act != LV_BTNM_BTN_NONE) {
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == false &&
-                    button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
-                    button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false)
-            {
+               button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
+               button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
                 uint32_t b = ext->btn_id_act;
                 lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
         }
-    }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    } else if(sign == LV_SIGNAL_PRESSING) {
         uint16_t btn_pr;
         /*Search the pressed area*/
         lv_indev_get_point(param, &p);
         btn_pr = get_button_from_point(btnm, &p);
         /*Invalidate to old and the new areas*/;
         if(btn_pr != ext->btn_id_pr) {
-            lv_indev_reset_long_press(param);           /*Start the log press time again on the new button*/
+            lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
             if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
                 invalidate_button_area(btnm, ext->btn_id_pr);
             }
@@ -753,10 +742,9 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             }
         }
 
-        ext->btn_id_pr = btn_pr;
+        ext->btn_id_pr  = btn_pr;
         ext->btn_id_act = btn_pr;
-    }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
             /*Toggle the button if enabled*/
             if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr])) {
@@ -765,8 +753,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 } else {
                     ext->ctrl_bits[ext->btn_id_pr] |= LV_BTNM_CTRL_TGL_STATE;
                 }
-                if(ext->one_toggle)
-                	make_one_button_toggled(btnm, ext->btn_id_pr);
+                if(ext->one_toggle) make_one_button_toggled(btnm, ext->btn_id_pr);
             }
 
             /*Invalidate to old pressed area*/;
@@ -783,34 +770,28 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 #endif
 
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == true &&
-                    button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
-                    button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false)
-            {
+               button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
+               button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
                 uint32_t b = ext->btn_id_act;
                 lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
-
         }
-    }
-    else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
+    } else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
         if(ext->btn_id_act != LV_BTNM_BTN_NONE) {
             if(button_is_repeat_disabled(ext->ctrl_bits[ext->btn_id_act]) == false &&
-                    button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
-                    button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false)
-            {
+               button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
+               button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
                 uint32_t b = ext->btn_id_act;
                 lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
         }
-    }
-    else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
-        ext->btn_id_pr = LV_BTNM_BTN_NONE;
+    } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
+        ext->btn_id_pr  = LV_BTNM_BTN_NONE;
         ext->btn_id_act = LV_BTNM_BTN_NONE;
         lv_obj_invalidate(btnm);
-    }
-    else if(sign == LV_SIGNAL_FOCUS) {
+    } else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_POINTER) {
             /*Select the clicked button*/
@@ -819,10 +800,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             uint16_t btn_i = get_button_from_point(btnm, &p1);
             ext->btn_id_pr = btn_i;
 
-        } else  if(indev_type == LV_INDEV_TYPE_ENCODER) {
+        } else if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*In navigation mode don't select any button but in edit mode select the fist*/
-            if(lv_group_get_editing(lv_obj_get_group(btnm))) ext->btn_id_pr = 0;
-            else ext->btn_id_pr = LV_BTNM_BTN_NONE;
+            if(lv_group_get_editing(lv_obj_get_group(btnm)))
+                ext->btn_id_pr = 0;
+            else
+                ext->btn_id_pr = LV_BTNM_BTN_NONE;
         } else {
             ext->btn_id_pr = 0;
         }
@@ -832,35 +815,35 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
         ext->btn_id_act = ext->btn_id_pr;
         lv_obj_invalidate(btnm);
-    }
-    else if(sign == LV_SIGNAL_CONTROL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_GROUP_KEY_RIGHT) {
-            if(ext->btn_id_pr  == LV_BTNM_BTN_NONE) ext->btn_id_pr = 0;
-            else ext->btn_id_pr++;
+            if(ext->btn_id_pr == LV_BTNM_BTN_NONE)
+                ext->btn_id_pr = 0;
+            else
+                ext->btn_id_pr++;
             if(ext->btn_id_pr >= ext->btn_cnt - 1) ext->btn_id_pr = ext->btn_cnt - 1;
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
-        }
-        else if(c == LV_GROUP_KEY_LEFT) {
-            if(ext->btn_id_pr  == LV_BTNM_BTN_NONE) ext->btn_id_pr = 0;
+        } else if(c == LV_GROUP_KEY_LEFT) {
+            if(ext->btn_id_pr == LV_BTNM_BTN_NONE) ext->btn_id_pr = 0;
             if(ext->btn_id_pr > 0) ext->btn_id_pr--;
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
-        }
-        else if(c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_GROUP_KEY_DOWN) {
             lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
-            if(ext->btn_id_pr  == LV_BTNM_BTN_NONE) {
+            if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
                 ext->btn_id_pr = 0;
             } else {
                 uint16_t area_below;
-                lv_coord_t pr_center = ext->button_areas[ext->btn_id_pr].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
+                lv_coord_t pr_center = ext->button_areas[ext->btn_id_pr].x1 +
+                                       (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
 
-                for(area_below = ext->btn_id_pr; area_below < ext->btn_cnt; area_below ++) {
-                    if(ext->button_areas[area_below].y1 >  ext->button_areas[ext->btn_id_pr].y1 &&
-                            pr_center >=  ext->button_areas[area_below].x1 &&
-                            pr_center <=  ext->button_areas[area_below].x2 + style->body.padding.left) {
+                for(area_below = ext->btn_id_pr; area_below < ext->btn_cnt; area_below++) {
+                    if(ext->button_areas[area_below].y1 > ext->button_areas[ext->btn_id_pr].y1 &&
+                       pr_center >= ext->button_areas[area_below].x1 &&
+                       pr_center <= ext->button_areas[area_below].x2 + style->body.padding.left) {
                         break;
                     }
                 }
@@ -869,43 +852,39 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             }
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
-        }
-        else if(c == LV_GROUP_KEY_UP) {
+        } else if(c == LV_GROUP_KEY_UP) {
             lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
-            if(ext->btn_id_pr  == LV_BTNM_BTN_NONE) {
+            if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
                 ext->btn_id_pr = 0;
             } else {
                 int16_t area_above;
-                lv_coord_t pr_center = ext->button_areas[ext->btn_id_pr].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
+                lv_coord_t pr_center = ext->button_areas[ext->btn_id_pr].x1 +
+                                       (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
 
-                for(area_above = ext->btn_id_pr; area_above >= 0; area_above --) {
+                for(area_above = ext->btn_id_pr; area_above >= 0; area_above--) {
                     if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_pr].y1 &&
-                            pr_center >=  ext->button_areas[area_above].x1 - style->body.padding.left &&
-                            pr_center <=  ext->button_areas[area_above].x2) {
+                       pr_center >= ext->button_areas[area_above].x1 - style->body.padding.left &&
+                       pr_center <= ext->button_areas[area_above].x2) {
                         break;
                     }
                 }
                 if(area_above >= 0) ext->btn_id_pr = area_above;
-
             }
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
         }
-    }
-    else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
-        *editable = true;
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
+        *editable       = true;
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_btnm";
     }
-
 
     return res;
 }
@@ -919,10 +898,10 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
 {
     /*Count the buttons in the map*/
     uint16_t btn_cnt = 0;
-    uint16_t i = 0;
+    uint16_t i       = 0;
     while(strlen(map[i]) != 0) {
         if(strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
-            btn_cnt ++;
+            btn_cnt++;
         }
         i++;
     }
@@ -957,7 +936,7 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
 static uint8_t get_button_width(lv_btnm_ctrl_t ctrl_bits)
 {
     uint8_t w = ctrl_bits & LV_BTNM_WIDTH_MASK;
-    return  w != 0 ? w: 1;
+    return w != 0 ? w : 1;
 }
 
 static bool button_is_hidden(lv_btnm_ctrl_t ctrl_bits)
@@ -1048,15 +1027,12 @@ static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx)
  */
 static bool maps_are_identical(const char ** map1, const char ** map2)
 {
-    if (map1 == map2)
-        return true;
-    if (map1 == NULL || map2 == NULL)
-        return map1 == map2;
+    if(map1 == map2) return true;
+    if(map1 == NULL || map2 == NULL) return map1 == map2;
 
     uint16_t i = 0;
-    while (map1[i][0] != '\0' && map2[i][0] != '\0') {
-        if (strcmp(map1[i], map2[i]) !=0 )
-            return false;
+    while(map1[i][0] != '\0' && map2[i][0] != '\0') {
+        if(strcmp(map1[i], map2[i]) != 0) return false;
         i++;
     }
     return map1[i][0] == '\0' && map2[i][0] == '\0';
@@ -1068,15 +1044,14 @@ static bool maps_are_identical(const char ** map1, const char ** map2)
  * @param btnm Button matrix object
  * @param btn_idx Button that should remain toggled
  */
-static void make_one_button_toggled(lv_obj_t *btnm, uint16_t btn_idx)
+static void make_one_button_toggled(lv_obj_t * btnm, uint16_t btn_idx)
 {
-	/*Save whether the button was toggled*/
-	bool was_toggled = lv_btnm_get_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE);
+    /*Save whether the button was toggled*/
+    bool was_toggled = lv_btnm_get_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE);
 
-	lv_btnm_set_btn_ctrl_all(btnm, LV_BTNM_CTRL_TGL_STATE, false);
+    lv_btnm_set_btn_ctrl_all(btnm, LV_BTNM_CTRL_TGL_STATE, false);
 
-	if(was_toggled)
-		lv_btnm_set_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE, true);
+    if(was_toggled) lv_btnm_set_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE, true);
 }
 
 #endif

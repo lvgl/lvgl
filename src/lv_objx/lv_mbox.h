@@ -34,7 +34,6 @@ extern "C" {
 #error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
-
 #include "../lv_core/lv_obj.h"
 #include "lv_cont.h"
 #include "lv_btnm.h"
@@ -53,9 +52,9 @@ typedef struct
 {
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t *text;             /*Text of the message box*/
-    lv_obj_t *btnm;            /*Button matrix for the buttons*/
-    uint16_t anim_time;         /*Duration of close animation [ms] (0: no animation)*/
+    lv_obj_t * text;    /*Text of the message box*/
+    lv_obj_t * btnm;    /*Button matrix for the buttons*/
+    uint16_t anim_time; /*Duration of close animation [ms] (0: no animation)*/
 } lv_mbox_ext_t;
 
 enum {
@@ -76,7 +75,8 @@ typedef uint8_t lv_mbox_style_t;
 /**
  * Create a message box objects
  * @param par pointer to an object, it will be the parent of the new message box
- * @param copy pointer to a message box object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a message box object, if not NULL then the new object will be copied from
+ * it
  * @return pointer to the created message box
  */
 lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy);
@@ -91,7 +91,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param btn_map button descriptor (button matrix map).
  *                E.g.  a const char *txt[] = {"ok", "close", ""} (Can not be local variable)
  */
-void lv_mbox_add_btns(lv_obj_t * mbox, const char **btn_mapaction);
+void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_mapaction);
 
 /*=====================
  * Setter functions
@@ -130,7 +130,7 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_mbox_set_style(lv_obj_t *mbox, lv_mbox_style_t type, lv_style_t *style);
+void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, lv_style_t * style);
 
 /**
  * Set whether recoloring is enabled. Must be called after `lv_mbox_add_btns`.
@@ -173,14 +173,13 @@ const char * lv_mbox_get_active_btn_text(lv_obj_t * mbox);
  */
 uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox);
 
-
 /**
  * Get a style of a message box
  * @param mbox pointer to a message box object
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_mbox_get_style(const lv_obj_t *mbox, lv_mbox_style_t type);
+lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type);
 
 /**
  * Get whether recoloring is enabled
@@ -201,11 +200,10 @@ lv_obj_t * lv_mbox_get_btnm(lv_obj_t * mbox);
  *      MACROS
  **********************/
 
-
-#endif  /*LV_USE_MBOX*/
+#endif /*LV_USE_MBOX*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_MBOX_H*/
+#endif /*LV_MBOX_H*/

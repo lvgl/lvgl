@@ -3,7 +3,6 @@
  *
  */
 
-
 #ifndef LV_TILEVIEW_H
 #define LV_TILEVIEW_H
 
@@ -32,34 +31,31 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-
-
 /* parametes: pointer to a tileview object, x, y (tile coordinates to load)
  * return: LV_RES_INV: to prevent the loading of the tab;  LV_RES_OK: if everything is fine*/
 typedef lv_res_t (*lv_tileview_action_t)(lv_obj_t *, lv_coord_t, lv_coord_t);
 
 /*Data of tileview*/
-typedef struct {
+typedef struct
+{
     lv_page_ext_t page;
     /*New data for this type */
     const lv_point_t * valid_pos;
     uint16_t anim_time;
     lv_point_t act_id;
-    uint8_t drag_top_en     :1;
-    uint8_t drag_bottom_en  :1;
-    uint8_t drag_left_en    :1;
-    uint8_t drag_right_en   :1;
-    uint8_t drag_hor   :1;
-    uint8_t drag_ver   :1;
+    uint8_t drag_top_en : 1;
+    uint8_t drag_bottom_en : 1;
+    uint8_t drag_left_en : 1;
+    uint8_t drag_right_en : 1;
+    uint8_t drag_hor : 1;
+    uint8_t drag_ver : 1;
 } lv_tileview_ext_t;
-
 
 /*Styles*/
 enum {
     LV_TILEVIEW_STYLE_BG,
 };
 typedef uint8_t lv_tileview_style_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -88,12 +84,12 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element);
  * Setter functions
  *====================*/
 
-
 /**
  * Set the valid position's indices. The scrolling will be possible only to these positions.
  * @param tileview pointer to a Tileview object
- * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1}, {LV_COORD_MIN, LV_COORD_MIN}};`
- * Must be closed with `{LV_COORD_MIN, LV_COORD_MIN}`. Only the pointer is saved so can't be a local variable.
+ * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1},
+ * {LV_COORD_MIN, LV_COORD_MIN}};` Must be closed with `{LV_COORD_MIN, LV_COORD_MIN}`. Only the
+ * pointer is saved so can't be a local variable.
  */
 void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * valid_pos);
 
@@ -122,7 +118,7 @@ static inline void lv_tileview_set_edge_flash(lv_obj_t * tileview, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, lv_style_t *style);
+void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -154,10 +150,10 @@ lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_TILEVIEW*/
+#endif /*LV_USE_TILEVIEW*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_TILEVIEW_H*/
+#endif /*LV_TILEVIEW_H*/

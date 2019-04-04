@@ -39,16 +39,16 @@ extern "C" {
 /*Data of slider*/
 typedef struct
 {
-    lv_bar_ext_t bar;       /*Ext. of ancestor*/
+    lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t *style_knob;     /*Style of the knob*/
-    int16_t drag_value;         /*Store a temporal value during press until release (Handled by the library)*/
-    uint8_t knob_in     :1;     /*1: Draw the knob inside the bar*/
+    lv_style_t * style_knob; /*Style of the knob*/
+    int16_t
+        drag_value; /*Store a temporal value during press until release (Handled by the library)*/
+    uint8_t knob_in : 1; /*1: Draw the knob inside the bar*/
 } lv_slider_ext_t;
 
 /*Built-in styles of slider*/
-enum
-{
+enum {
     LV_SLIDER_STYLE_BG,
     LV_SLIDER_STYLE_INDIC,
     LV_SLIDER_STYLE_KNOB,
@@ -88,7 +88,7 @@ static inline void lv_slider_set_value(lv_obj_t * slider, int16_t value, bool an
  * @param min minimum value
  * @param max maximum value
  */
-static inline void lv_slider_set_range(lv_obj_t *slider, int16_t min, int16_t max)
+static inline void lv_slider_set_range(lv_obj_t * slider, int16_t min, int16_t max)
 {
     lv_bar_set_range(slider, min, max);
 }
@@ -107,7 +107,7 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_slider_set_style(lv_obj_t *slider, lv_slider_style_t type, lv_style_t *style);
+void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -155,23 +155,22 @@ bool lv_slider_is_dragged(const lv_obj_t * slider);
  */
 bool lv_slider_get_knob_in(const lv_obj_t * slider);
 
-
 /**
  * Get a style of a slider
  * @param slider pointer to a slider object
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_slider_get_style(const lv_obj_t *slider, lv_slider_style_t type);
+lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_SLIDER*/
+#endif /*LV_USE_SLIDER*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_SLIDER_H*/
+#endif /*LV_SLIDER_H*/

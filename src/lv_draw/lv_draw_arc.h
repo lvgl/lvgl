@@ -39,12 +39,12 @@ extern "C" {
  * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
-                 uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale);
+                 uint16_t start_angle, uint16_t end_angle, const lv_style_t * style,
+                 lv_opa_t opa_scale);
 
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /* extern "C" */

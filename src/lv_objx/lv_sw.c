@@ -72,14 +72,14 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_time = 0;
 #endif
     ext->style_knob_off = ext->slider.style_knob;
-    ext->style_knob_on = ext->slider.style_knob;
+    ext->style_knob_on  = ext->slider.style_knob;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_sw, lv_sw_signal);
 
     /*Init the new switch switch*/
     if(copy == NULL) {
-        lv_obj_set_size(new_sw,  2 * LV_DPI / 3, LV_DPI / 3);
+        lv_obj_set_size(new_sw, 2 * LV_DPI / 3, LV_DPI / 3);
         lv_slider_set_knob_in(new_sw, true);
         lv_slider_set_range(new_sw, 0, LV_SW_MAX_VALUE);
 
@@ -98,15 +98,16 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing switch*/
     else {
         lv_sw_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->style_knob_off = copy_ext->style_knob_off;
-        ext->style_knob_on = copy_ext->style_knob_on;
+        ext->style_knob_off    = copy_ext->style_knob_off;
+        ext->style_knob_on     = copy_ext->style_knob_on;
 #if LV_USE_ANIMATION
         ext->anim_time = copy_ext->anim_time;
 #endif
 
-        if(lv_sw_get_state(new_sw)) lv_slider_set_style(new_sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
-        else lv_slider_set_style(new_sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
-
+        if(lv_sw_get_state(new_sw))
+            lv_slider_set_style(new_sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
+        else
+            lv_slider_set_style(new_sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_sw);
@@ -157,15 +158,17 @@ void lv_sw_off(lv_obj_t * sw, bool anim)
  * @param anim true: set the value with an animation; false: change the value immediatelly
  * @return resulting state of the switch.
  */
-bool lv_sw_toggle(lv_obj_t *sw, bool anim)
+bool lv_sw_toggle(lv_obj_t * sw, bool anim)
 {
 #if LV_USE_ANIMATION == 0
     anim = false;
 #endif
 
     bool state = lv_sw_get_state(sw);
-    if(state) lv_sw_off(sw, anim);
-    else lv_sw_on(sw, anim);
+    if(state)
+        lv_sw_off(sw, anim);
+    else
+        lv_sw_on(sw, anim);
 
     return !state;
 }
@@ -181,12 +184,8 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
     switch(type) {
-        case LV_SLIDER_STYLE_BG:
-            lv_slider_set_style(sw, LV_SLIDER_STYLE_BG, style);
-            break;
-        case LV_SLIDER_STYLE_INDIC:
-            lv_bar_set_style(sw, LV_SLIDER_STYLE_INDIC, style);
-            break;
+        case LV_SLIDER_STYLE_BG: lv_slider_set_style(sw, LV_SLIDER_STYLE_BG, style); break;
+        case LV_SLIDER_STYLE_INDIC: lv_bar_set_style(sw, LV_SLIDER_STYLE_INDIC, style); break;
         case LV_SW_STYLE_KNOB_OFF:
             ext->style_knob_off = style;
             if(lv_sw_get_state(sw) == 0) lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, style);
@@ -198,14 +197,13 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
     }
 }
 
-void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time)
+void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
 {
 #if LV_USE_ANIMATION
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-    ext->anim_time = anim_time;
+    ext->anim_time    = anim_time;
 #endif
 }
-
 
 /*=====================
  * Getter functions
@@ -220,37 +218,27 @@ void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time)
 lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
 {
     lv_style_t * style = NULL;
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+    lv_sw_ext_t * ext  = lv_obj_get_ext_attr(sw);
 
     switch(type) {
-        case LV_SW_STYLE_BG:
-            style = lv_slider_get_style(sw, LV_SLIDER_STYLE_BG);
-            break;
-        case LV_SW_STYLE_INDIC:
-            style = lv_slider_get_style(sw, LV_SLIDER_STYLE_INDIC);
-            break;
-        case LV_SW_STYLE_KNOB_OFF:
-            style = ext->style_knob_off;
-            break;
-        case LV_SW_STYLE_KNOB_ON:
-            style = ext->style_knob_on;
-            break;
-        default:
-            style = NULL;
-            break;
+        case LV_SW_STYLE_BG: style = lv_slider_get_style(sw, LV_SLIDER_STYLE_BG); break;
+        case LV_SW_STYLE_INDIC: style = lv_slider_get_style(sw, LV_SLIDER_STYLE_INDIC); break;
+        case LV_SW_STYLE_KNOB_OFF: style = ext->style_knob_off; break;
+        case LV_SW_STYLE_KNOB_ON: style = ext->style_knob_on; break;
+        default: style = NULL; break;
     }
 
     return style;
 }
 
-uint16_t lv_sw_get_anim_time(const lv_obj_t *sw)
+uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
 {
 
 #if LV_USE_ANIMATION
-	lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-	return ext->anim_time;
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+    return ext->anim_time;
 #else
-	return 0;
+    return 0;
 #endif
 }
 
@@ -269,14 +257,17 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 {
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
-    /*Save the current (old) value before slider signal modifies it. It will be required in the later colcualtions*/
+    /*Save the current (old) value before slider signal modifies it. It will be required in the
+     * later colcualtions*/
     int16_t old_val;
-    if(sign == LV_SIGNAL_PRESSING) old_val = ext->slider.drag_value;
-    else old_val = lv_slider_get_value(sw);
+    if(sign == LV_SIGNAL_PRESSING)
+        old_val = ext->slider.drag_value;
+    else
+        old_val = lv_slider_get_value(sw);
 
     /*Don't let the slider to call the action. Switch handles it differently*/
     lv_event_cb_t event_cb = sw->event_cb;
-    sw->event_cb = NULL;
+    sw->event_cb           = NULL;
 
     lv_res_t res;
     /* Include the ancient signal function */
@@ -288,61 +279,60 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
-    else if(sign == LV_SIGNAL_PRESSED) {
+    } else if(sign == LV_SIGNAL_PRESSED) {
 
         /*Save the x coordinate of the pressed point to see if the switch was slid*/
         lv_indev_t * indev = lv_indev_get_act();
         if(indev) {
             lv_point_t p;
-            lv_indev_get_point(indev,  &p);
+            lv_indev_get_point(indev, &p);
             ext->start_x = p.x;
         }
-        ext->slided = 0;
+        ext->slided  = 0;
         ext->changed = 0;
-    }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    } else if(sign == LV_SIGNAL_PRESSING) {
         /*See if the switch was slid (moved at least a little)*/
         lv_indev_t * indev = lv_indev_get_act();
         if(indev) {
-            lv_point_t p = {0,0};
-            lv_indev_get_point(indev,  &p);
+            lv_point_t p = {0, 0};
+            lv_indev_get_point(indev, &p);
             if(LV_MATH_ABS(p.x - ext->start_x) > LV_INDEV_DEF_DRAG_LIMIT) ext->slided = 1;
         }
 
-        /*If didn't slide then revert the min/max value. So click without slide won't move the switch as a slider*/
+        /*If didn't slide then revert the min/max value. So click without slide won't move the
+         * switch as a slider*/
         if(ext->slided == 0) {
-            if(lv_sw_get_state(sw)) ext->slider.drag_value = LV_SW_MAX_VALUE;
-            else ext->slider.drag_value = 0;
+            if(lv_sw_get_state(sw))
+                ext->slider.drag_value = LV_SW_MAX_VALUE;
+            else
+                ext->slider.drag_value = 0;
         }
 
         /*If explicitly changed (by slide) don't need to be toggled on release*/
-        int16_t threshold  = LV_SW_MAX_VALUE / 2;
+        int16_t threshold = LV_SW_MAX_VALUE / 2;
         if((old_val < threshold && ext->slider.drag_value > threshold) ||
-                (old_val > threshold && ext->slider.drag_value < threshold))
-        {
+           (old_val > threshold && ext->slider.drag_value < threshold)) {
             ext->changed = 1;
         }
-    }
-    else if(sign == LV_SIGNAL_PRESS_LOST) {
+    } else if(sign == LV_SIGNAL_PRESS_LOST) {
         if(lv_sw_get_state(sw)) {
             lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
             lv_slider_set_value(sw, LV_SW_MAX_VALUE, true);
             res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
-        }
-        else {
+        } else {
             lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
             lv_slider_set_value(sw, 0, true);
             res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
-    }
-    else if(sign == LV_SIGNAL_RELEASED) {
+    } else if(sign == LV_SIGNAL_RELEASED) {
         /*If not dragged then toggle the switch*/
         if(ext->changed == 0) {
-            if(lv_sw_get_state(sw)) lv_sw_off(sw, true);
-            else lv_sw_on(sw, true);
+            if(lv_sw_get_state(sw))
+                lv_sw_off(sw, true);
+            else
+                lv_sw_on(sw, true);
 
             res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
@@ -350,8 +340,10 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         /*If the switch was dragged then calculate the new state based on the current position*/
         else {
             int16_t v = lv_slider_get_value(sw);
-            if(v > LV_SW_MAX_VALUE / 2) lv_sw_on(sw, true);
-            else lv_sw_off(sw, true);
+            if(v > LV_SW_MAX_VALUE / 2)
+                lv_sw_on(sw, true);
+            else
+                lv_sw_off(sw, true);
 
             res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
@@ -369,11 +361,11 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
-        *editable = false;          /*The ancestor slider is editable the switch is not*/
+        *editable       = false; /*The ancestor slider is editable the switch is not*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_sw";

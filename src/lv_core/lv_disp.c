@@ -35,7 +35,8 @@
 
 /**
  * Return with a pointer to the active screen
- * @param disp pointer to display which active screen should be get. (NULL to use the default screen)
+ * @param disp pointer to display which active screen should be get. (NULL to use the default
+ * screen)
  * @return pointer to the active screen object (loaded by 'lv_scr_load()')
  */
 lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp)
@@ -79,7 +80,8 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp)
 }
 
 /**
- * Return with the sys. layer. (Same on every screen and it is above the normal screen and the top layer)
+ * Return with the sys. layer. (Same on every screen and it is above the normal screen and the top
+ * layer)
  * @param disp pointer to display which sys. layer  should be get. (NULL to use the default screen)
  * @return pointer to the sys layer object  (transparent screen sized lv_obj)
  */
@@ -147,7 +149,7 @@ uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp)
 
     lv_disp_t * d;
     uint32_t t = UINT32_MAX;
-    d = lv_disp_get_next(NULL);
+    d          = lv_disp_get_next(NULL);
     while(d) {
         t = LV_MATH_MIN(t, lv_tick_elaps(d->last_activity_time));
         d = lv_disp_get_next(d);

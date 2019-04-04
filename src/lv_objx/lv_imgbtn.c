@@ -41,7 +41,8 @@ static lv_design_cb_t ancestor_design;
 /**
  * Create a image button object
  * @param par pointer to an object, it will be the parent of the new image button
- * @param copy pointer to a image button object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a image button object, if not NULL then the new object will be copied from
+ * it
  * @return pointer to the created image button
  */
 lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
@@ -60,7 +61,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_imgbtn);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_imgbtn);
 
-    /*Initialize the allocated 'ext' */
+        /*Initialize the allocated 'ext' */
 #if LV_IMGBTN_TILED == 0
     memset(ext->img_src, 0, sizeof(ext->img_src));
 #else
@@ -123,11 +124,15 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
  * Set images for a state of the image button
  * @param imgbtn pointer to an image button object
  * @param state for which state set the new image (from `lv_btn_state_t`) `
- * @param src_left pointer to an image source for the left side of the button (a C array or path to a file)
- * @param src_mid pointer to an image source for the middle of the button (ideally 1px wide) (a C array or path to a file)
- * @param src_right pointer to an image source for the right side of the button (a C array or path to a file)
+ * @param src_left pointer to an image source for the left side of the button (a C array or path to
+ * a file)
+ * @param src_mid pointer to an image source for the middle of the button (ideally 1px wide) (a C
+ * array or path to a file)
+ * @param src_right pointer to an image source for the right side of the button (a C array or path
+ * to a file)
  */
-void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left, const void * src_mid, const void * src_right)
+void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left,
+                       const void * src_mid, const void * src_right)
 {
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
@@ -249,7 +254,7 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
         lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
-        bool cover = false;
+        bool cover            = false;
         if(ext->act_cf == LV_IMG_CF_TRUE_COLOR || ext->act_cf == LV_IMG_CF_RAW) {
             cover = lv_area_is_in(mask, &imgbtn->coords);
         }
@@ -260,9 +265,9 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Just draw an image*/
         lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
-        lv_btn_state_t state = lv_imgbtn_get_state(imgbtn);
-        lv_style_t * style = lv_imgbtn_get_style(imgbtn, state);
-        lv_opa_t opa_scale = lv_obj_get_opa_scale(imgbtn);
+        lv_btn_state_t state  = lv_imgbtn_get_state(imgbtn);
+        lv_style_t * style    = lv_imgbtn_get_style(imgbtn, state);
+        lv_opa_t opa_scale    = lv_obj_get_opa_scale(imgbtn);
 
 #if LV_IMGBTN_TILED == 0
         const void * src = ext->img_src[state];
@@ -302,7 +307,7 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
             lv_coord_t i;
             lv_img_dsc_get_info(src, &header);
 
-            coords.x1 = imgbtn->coords.x1 + left_w ;
+            coords.x1 = imgbtn->coords.x1 + left_w;
             coords.y1 = imgbtn->coords.y1;
             coords.x2 = coords.x1 + header.w - 1;
             coords.y2 = imgbtn->coords.y1 + header.h - 1;
@@ -314,13 +319,11 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
             }
         }
 
-
 #endif
 
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-
     }
 
     return true;
@@ -342,15 +345,15 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        /* If the style changed then the button was clicked, released etc. so probably the state was changed as well
-         * Set the new image for the new state.*/
+        /* If the style changed then the button was clicked, released etc. so probably the state was
+         * changed as well Set the new image for the new state.*/
         refr_img(imgbtn);
     } else if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_imgbtn";
@@ -359,11 +362,10 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
     return res;
 }
 
-
 static void refr_img(lv_obj_t * imgbtn)
 {
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
-    lv_btn_state_t state = lv_imgbtn_get_state(imgbtn);
+    lv_btn_state_t state  = lv_imgbtn_get_state(imgbtn);
     lv_img_header_t header;
 
 #if LV_IMGBTN_TILED == 0

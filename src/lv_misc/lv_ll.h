@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -34,8 +33,8 @@ typedef uint8_t lv_ll_node_t;
 typedef struct
 {
     uint32_t n_size;
-    lv_ll_node_t* head;
-    lv_ll_node_t* tail;
+    lv_ll_node_t * head;
+    lv_ll_node_t * tail;
 } lv_ll_t;
 
 /**********************
@@ -77,7 +76,7 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p);
  * @param ll_p pointer to the linked list of 'node_p'
  * @param node_p pointer to node in 'll_p' linked list
  */
-void lv_ll_rem(lv_ll_t  * ll_p, void * node_p);
+void lv_ll_rem(lv_ll_t * ll_p, void * node_p);
 
 /**
  * Remove and free all elements from a linked list. The list remain valid but become empty.
@@ -143,7 +142,8 @@ bool lv_ll_is_empty(lv_ll_t * ll_p);
 
 #define LV_LL_READ(list, i) for(i = lv_ll_get_head(&list); i != NULL; i = lv_ll_get_next(&list, i))
 
-#define LV_LL_READ_BACK(list, i) for(i = lv_ll_get_tail(&list); i != NULL; i = lv_ll_get_prev(&list, i))
+#define LV_LL_READ_BACK(list, i)                                                                   \
+    for(i = lv_ll_get_tail(&list); i != NULL; i = lv_ll_get_prev(&list, i))
 
 #ifdef __cplusplus
 } /* extern "C" */

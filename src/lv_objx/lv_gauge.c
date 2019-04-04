@@ -3,7 +3,6 @@
  *
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -21,12 +20,12 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_GAUGE_DEF_NEEDLE_COLOR       LV_COLOR_RED
-#define LV_GAUGE_DEF_LABEL_COUNT        6
-#define LV_GAUGE_DEF_LINE_COUNT         21      /*Should be: ((label_cnt - 1) * internal_lines) + 1*/
-#define LV_GAUGE_DEF_ANGLE              220
-#define LV_GAUGE_INTERPOLATE_SHIFT		5		/*Interpolate the needle drawing between to degrees*/
-#define LV_GAUGE_INTERPOLATE_MASK		0x1F
+#define LV_GAUGE_DEF_NEEDLE_COLOR LV_COLOR_RED
+#define LV_GAUGE_DEF_LABEL_COUNT 6
+#define LV_GAUGE_DEF_LINE_COUNT 21 /*Should be: ((label_cnt - 1) * internal_lines) + 1*/
+#define LV_GAUGE_DEF_ANGLE 220
+#define LV_GAUGE_INTERPOLATE_SHIFT 5 /*Interpolate the needle drawing between to degrees*/
+#define LV_GAUGE_INTERPOLATE_MASK 0x1F
 
 /**********************
  *      TYPEDEFS
@@ -75,10 +74,10 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
-    ext->needle_count = 0;
-    ext->values = NULL;
+    ext->needle_count  = 0;
+    ext->values        = NULL;
     ext->needle_colors = NULL;
-    ext->label_count = LV_GAUGE_DEF_LABEL_COUNT;
+    ext->label_count   = LV_GAUGE_DEF_LABEL_COUNT;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_gauge);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_gauge);
 
@@ -88,7 +87,8 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new gauge gauge*/
     if(copy == NULL) {
-        lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
+        lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT,
+                           LV_GAUGE_DEF_LABEL_COUNT);
         lv_gauge_set_needle_count(new_gauge, 1, NULL);
         lv_gauge_set_critical_value(new_gauge, 80);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
@@ -170,26 +170,26 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value)
     if(needle_id >= ext->needle_count) return;
     if(ext->values[needle_id] == value) return;
 
-
     int16_t min = lv_gauge_get_min_value(gauge);
     int16_t max = lv_gauge_get_max_value(gauge);
 
-    if(value > max) value = max;
-    else if(value < min) value = min;
+    if(value > max)
+        value = max;
+    else if(value < min)
+        value = min;
 
     ext->values[needle_id] = value;
 
-
     lv_obj_invalidate(gauge);
 }
-
 
 /**
  * Set the scale settings of a gauge
  * @param gauge pointer to a gauge object
  * @param angle angle of the scale (0..360)
  * @param line_cnt count of scale lines.
- * The get a given "subdivision" lines between label, `line_cnt` = (sub_div + 1) * (label_cnt - 1) + 1
+ * The get a given "subdivision" lines between label, `line_cnt` = (sub_div + 1) * (label_cnt - 1) +
+ * 1
  * @param label_cnt count of scale labels.
  */
 void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt)
@@ -199,7 +199,7 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
     lv_lmeter_set_scale(gauge, angle, line_cnt);
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    ext->label_count = label_cnt;
+    ext->label_count     = label_cnt;
     lv_obj_invalidate(gauge);
 }
 
@@ -213,10 +213,10 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
  * @param needle the id of the needle
  * @return the value of the needle [min,max]
  */
-int16_t lv_gauge_get_value(const lv_obj_t * gauge,  uint8_t needle)
+int16_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle)
 {
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    int16_t min = lv_gauge_get_min_value(gauge);
+    int16_t min          = lv_gauge_get_min_value(gauge);
 
     if(needle >= ext->needle_count) return min;
 
@@ -273,28 +273,28 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
          * If the object is in focus 'lv_obj_get_style()' will give a pointer to tmp style
          * and to the real object style. It is important because of style change tricks below*/
         lv_style_t * style_ori_p = gauge->style_p;
-        lv_style_t * style = lv_obj_get_style(gauge);
-        lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
+        lv_style_t * style       = lv_obj_get_style(gauge);
+        lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
 
         lv_gauge_draw_scale(gauge, mask);
 
         /*Draw the ancestor line meter with max value to show the rainbow like line colors*/
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
-        ancestor_design(gauge, mask, mode);           /*To draw lines*/
+        ancestor_design(gauge, mask, mode); /*To draw lines*/
 
         /*Temporally modify the line meter to draw thicker and longer lines where labels are*/
         lv_style_t style_tmp;
         lv_style_copy(&style_tmp, style);
-        ext->lmeter.line_cnt = ext->label_count;                        /*Only to labels*/
-        style_tmp.line.width = style_tmp.line.width * 2;                /*Ticker lines*/
-        style_tmp.body.padding.left = style_tmp.body.padding.left * 2;    /*Longer lines*/
-        style_tmp.body.padding.right = style_tmp.body.padding.right * 2;    /*Longer lines*/
-        gauge->style_p = &style_tmp;
+        ext->lmeter.line_cnt         = ext->label_count;                 /*Only to labels*/
+        style_tmp.line.width         = style_tmp.line.width * 2;         /*Ticker lines*/
+        style_tmp.body.padding.left  = style_tmp.body.padding.left * 2;  /*Longer lines*/
+        style_tmp.body.padding.right = style_tmp.body.padding.right * 2; /*Longer lines*/
+        gauge->style_p               = &style_tmp;
 
-        ancestor_design(gauge, mask, mode);           /*To draw lines*/
+        ancestor_design(gauge, mask, mode); /*To draw lines*/
 
-        ext->lmeter.line_cnt = line_cnt_tmp;          /*Restore the parameters*/
-        gauge->style_p = style_ori_p;                 /*Restore the ORIGINAL style pointer*/
+        ext->lmeter.line_cnt = line_cnt_tmp; /*Restore the parameters*/
+        gauge->style_p       = style_ori_p;  /*Restore the ORIGINAL style pointer*/
 
         lv_gauge_draw_needle(gauge, mask);
 
@@ -329,7 +329,7 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_gauge";
@@ -348,16 +348,17 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
     char scale_txt[16];
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    lv_style_t * style = lv_obj_get_style(gauge);
-    lv_opa_t opa_scale = lv_obj_get_opa_scale(gauge);
-    lv_coord_t r = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.left) - style->body.padding.inner;
-    lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
-    lv_coord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
+    lv_style_t * style   = lv_obj_get_style(gauge);
+    lv_opa_t opa_scale   = lv_obj_get_opa_scale(gauge);
+    lv_coord_t r =
+        lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.left) - style->body.padding.inner;
+    lv_coord_t x_ofs    = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
+    lv_coord_t y_ofs    = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
     int16_t scale_angle = lv_lmeter_get_scale_angle(gauge);
-    uint16_t label_num = ext->label_count;
-    int16_t angle_ofs = 90 + (360 - scale_angle) / 2;
-    int16_t min = lv_gauge_get_min_value(gauge);
-    int16_t max = lv_gauge_get_max_value(gauge);
+    uint16_t label_num  = ext->label_count;
+    int16_t angle_ofs   = 90 + (360 - scale_angle) / 2;
+    int16_t min         = lv_gauge_get_min_value(gauge);
+    int16_t max         = lv_gauge_get_max_value(gauge);
 
     uint8_t i;
     for(i = 0; i < label_num; i++) {
@@ -376,8 +377,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 
         lv_area_t label_cord;
         lv_point_t label_size;
-        lv_txt_get_size(&label_size, scale_txt, style->text.font,
-                        style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        lv_txt_get_size(&label_size, scale_txt, style->text.font, style->text.letter_space,
+                        style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;
@@ -385,7 +386,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, -1, -1);
+        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, -1,
+                      -1);
     }
 }
 /**
@@ -397,16 +399,16 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
 {
     lv_style_t style_needle;
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    lv_style_t * style = lv_gauge_get_style(gauge);
-    lv_opa_t opa_scale = lv_obj_get_opa_scale(gauge);
+    lv_style_t * style   = lv_gauge_get_style(gauge);
+    lv_opa_t opa_scale   = lv_obj_get_opa_scale(gauge);
 
-    lv_coord_t r = lv_obj_get_width(gauge) / 2 - style->body.padding.left;
-    lv_coord_t x_ofs = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
-    lv_coord_t y_ofs = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
-    uint16_t angle = lv_lmeter_get_scale_angle(gauge);
+    lv_coord_t r      = lv_obj_get_width(gauge) / 2 - style->body.padding.left;
+    lv_coord_t x_ofs  = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
+    lv_coord_t y_ofs  = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
+    uint16_t angle    = lv_lmeter_get_scale_angle(gauge);
     int16_t angle_ofs = 90 + (360 - angle) / 2;
-    int16_t min = lv_gauge_get_min_value(gauge);
-    int16_t max = lv_gauge_get_max_value(gauge);
+    int16_t min       = lv_gauge_get_min_value(gauge);
+    int16_t max       = lv_gauge_get_max_value(gauge);
     lv_point_t p_mid;
     lv_point_t p_end;
     lv_point_t p_end_low;
@@ -419,12 +421,11 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     p_mid.y = y_ofs;
     for(i = 0; i < ext->needle_count; i++) {
         /*Calculate the end point of a needle*/
-        int16_t needle_angle = (ext->values[i] - min) * angle * (1 << LV_GAUGE_INTERPOLATE_SHIFT)  / (max - min); //+ angle_ofs;
+        int16_t needle_angle = (ext->values[i] - min) * angle * (1 << LV_GAUGE_INTERPOLATE_SHIFT) /
+                               (max - min); //+ angle_ofs;
 
-
-        int16_t needle_angle_low = (needle_angle >> LV_GAUGE_INTERPOLATE_SHIFT) + angle_ofs;
+        int16_t needle_angle_low  = (needle_angle >> LV_GAUGE_INTERPOLATE_SHIFT) + angle_ofs;
         int16_t needle_angle_high = needle_angle_low + 1;
-
 
         p_end_low.y = (lv_trigo_sin(needle_angle_low) * r) / LV_TRIGO_SIN_MAX + y_ofs;
         p_end_low.x = (lv_trigo_sin(needle_angle_low + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
@@ -433,8 +434,10 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
         p_end_high.x = (lv_trigo_sin(needle_angle_high + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
 
         uint16_t rem = needle_angle & ((1 << LV_GAUGE_INTERPOLATE_SHIFT) - 1);
-        int16_t x_mod = ((LV_MATH_ABS(p_end_high.x  - p_end_low.x)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
-        int16_t y_mod = ((LV_MATH_ABS(p_end_high.y  - p_end_low.y)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
+        int16_t x_mod =
+            ((LV_MATH_ABS(p_end_high.x - p_end_low.x)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
+        int16_t y_mod =
+            ((LV_MATH_ABS(p_end_high.y - p_end_low.y)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
 
         if(p_end_high.x < p_end_low.x) x_mod = -x_mod;
         if(p_end_high.y < p_end_low.y) y_mod = -y_mod;
@@ -443,8 +446,10 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
         p_end.y = p_end_low.y + y_mod;
 
         /*Draw the needle with the corresponding color*/
-        if(ext->needle_colors == NULL) style_needle.line.color = LV_GAUGE_DEF_NEEDLE_COLOR;
-        else style_needle.line.color = ext->needle_colors[i];
+        if(ext->needle_colors == NULL)
+            style_needle.line.color = LV_GAUGE_DEF_NEEDLE_COLOR;
+        else
+            style_needle.line.color = ext->needle_colors[i];
 
         lv_draw_line(&p_mid, &p_end, mask, &style_needle, opa_scale);
     }
@@ -454,7 +459,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     lv_style_copy(&style_neddle_mid, &lv_style_plain);
     style_neddle_mid.body.main_color = style->body.border.color;
     style_neddle_mid.body.grad_color = style->body.border.color;
-    style_neddle_mid.body.radius = LV_RADIUS_CIRCLE;
+    style_neddle_mid.body.radius     = LV_RADIUS_CIRCLE;
 
     lv_area_t nm_cord;
     nm_cord.x1 = x_ofs - style->body.padding.top;

@@ -22,28 +22,26 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_RADIUS_CIRCLE  (LV_COORD_MAX)    /*A very big radius to always draw as circle*/
+#define LV_RADIUS_CIRCLE (LV_COORD_MAX) /*A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS
  **********************/
 
 /*Border types (Use 'OR'ed values)*/
-enum
-{
-    LV_BORDER_NONE =     0x00,
-    LV_BORDER_BOTTOM =   0x01,
-    LV_BORDER_TOP =      0x02,
-    LV_BORDER_LEFT =     0x04,
-    LV_BORDER_RIGHT =    0x08,
-    LV_BORDER_FULL =     0x0F,
-    LV_BORDER_INTERNAL = 0x10,    /*FOR matrix-like objects (e.g. Button matrix)*/
+enum {
+    LV_BORDER_NONE     = 0x00,
+    LV_BORDER_BOTTOM   = 0x01,
+    LV_BORDER_TOP      = 0x02,
+    LV_BORDER_LEFT     = 0x04,
+    LV_BORDER_RIGHT    = 0x08,
+    LV_BORDER_FULL     = 0x0F,
+    LV_BORDER_INTERNAL = 0x10, /*FOR matrix-like objects (e.g. Button matrix)*/
 };
 typedef uint8_t lv_border_part_t;
 
 /*Shadow types*/
-enum
-{
+enum {
     LV_SHADOW_BOTTOM = 0,
     LV_SHADOW_FULL,
 };
@@ -51,28 +49,32 @@ typedef uint8_t lv_shadow_type_t;
 
 typedef struct
 {
-    uint8_t glass :1;           /*1: Do not inherit this style*/
+    uint8_t glass : 1; /*1: Do not inherit this style*/
 
-    struct {
+    struct
+    {
         lv_color_t main_color;
-        lv_color_t grad_color;      /*`grad_color` will be removed in v6.0, use `aux_color` instead*/
+        lv_color_t grad_color; /*`grad_color` will be removed in v6.0, use `aux_color` instead*/
         lv_coord_t radius;
         lv_opa_t opa;
 
-        struct {
+        struct
+        {
             lv_color_t color;
             lv_coord_t width;
             lv_border_part_t part;
             lv_opa_t opa;
         } border;
 
-        struct {
+        struct
+        {
             lv_color_t color;
             lv_coord_t width;
             lv_shadow_type_t type;
         } shadow;
 
-        struct {
+        struct
+        {
             lv_coord_t top;
             lv_coord_t bottom;
             lv_coord_t left;
@@ -81,8 +83,8 @@ typedef struct
         } padding;
     } body;
 
-
-    struct {
+    struct
+    {
         lv_color_t color;
         lv_color_t sel_color;
         const lv_font_t * font;
@@ -91,22 +93,25 @@ typedef struct
         lv_opa_t opa;
     } text;
 
-    struct {
+    struct
+    {
         lv_color_t color;
         lv_opa_t intense;
         lv_opa_t opa;
     } image;
 
-    struct {
+    struct
+    {
         lv_color_t color;
         lv_coord_t width;
         lv_opa_t opa;
-        uint8_t rounded :1;     /*1: rounded line endings*/
+        uint8_t rounded : 1; /*1: rounded line endings*/
     } line;
 } lv_style_t;
 
 #if LV_USE_ANIMATION
-typedef struct {
+typedef struct
+{
     const lv_style_t * style_start; /*Pointer to the starting style*/
     const lv_style_t * style_end;   /*Pointer to the destination style*/
     lv_style_t * style_anim;        /*Pointer to a style to animate*/
@@ -115,8 +120,8 @@ typedef struct {
     int16_t act_time;               /*Current time in animation. Set to negative to make delay.*/
     uint16_t playback_pause;        /*Wait before play back*/
     uint16_t repeat_pause;          /*Wait before repeat*/
-    uint8_t playback :1;            /*When the animation is ready play it back*/
-    uint8_t repeat :1;              /*Repeat the animation infinitely*/
+    uint8_t playback : 1;           /*When the animation is ready play it back*/
+    uint8_t repeat : 1;             /*Repeat the animation infinitely*/
 } lv_style_anim_t;
 
 /* Example initialization
@@ -142,7 +147,7 @@ lv_style_anim_create(&a);
 /**
  *  Init the basic styles
  */
-void lv_style_init (void);
+void lv_style_init(void);
 
 /**
  * Copy a style to an other
@@ -151,7 +156,6 @@ void lv_style_init (void);
  */
 void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
-
 /**
  * Mix two styles according to a given ratio
  * @param start start style
@@ -159,14 +163,16 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
  * @param res store the result style here
  * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
  */
-void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
+void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res,
+                  uint16_t ratio);
 
 #if LV_USE_ANIMATION
 
 /**
  * Create an animation from a pre-configured 'lv_style_anim_t' variable
  * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
- * @return pointer to a descriptor. Really this variable will be animated. (Can be used in `lv_anim_del(dsc, NULL)`)
+ * @return pointer to a descriptor. Really this variable will be animated. (Can be used in
+ * `lv_anim_del(dsc, NULL)`)
  */
 void * lv_style_anim_create(lv_style_anim_t * anim);
 #endif
@@ -192,9 +198,8 @@ extern lv_style_t lv_style_btn_ina;
  *      MACROS
  **********************/
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_STYLE_H*/
+#endif /*LV_STYLE_H*/

@@ -29,10 +29,10 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_BAR_ANIM_STATE_START   0
-#define LV_BAR_ANIM_STATE_END     256
-#define LV_BAR_ANIM_STATE_INV     -1
-#define LV_BAR_ANIM_STATE_NORM     8        /*log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
+#define LV_BAR_ANIM_STATE_START 0
+#define LV_BAR_ANIM_STATE_END 256
+#define LV_BAR_ANIM_STATE_INV -1
+#define LV_BAR_ANIM_STATE_NORM 8 /*log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
 
 /**********************
  *      TYPEDEFS
@@ -41,17 +41,17 @@ extern "C" {
 /*Data of bar*/
 typedef struct
 {
-    /*No inherited ext*/            /*Ext. of ancestor*/
+    /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
-    int16_t cur_value;              /*Current value of the bar*/
-    int16_t min_value;              /*Minimum value of the bar*/
-    int16_t max_value;              /*Maximum value of the bar*/
+    int16_t cur_value; /*Current value of the bar*/
+    int16_t min_value; /*Minimum value of the bar*/
+    int16_t max_value; /*Maximum value of the bar*/
     int16_t anim_start;
     int16_t anim_end;
     int16_t anim_state;
     uint16_t anim_time;
-    uint8_t sym    :1;              /*Symmetric: means the center is around zero value*/
-    lv_style_t *style_indic;        /*Style of the indicator*/
+    uint8_t sym : 1;          /*Symmetric: means the center is around zero value*/
+    lv_style_t * style_indic; /*Style of the indicator*/
 } lv_bar_ext_t;
 
 enum {
@@ -93,7 +93,8 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, bool anim);
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
 
 /**
- * Make the bar symmetric to zero. The indicator will grow from zero instead of the minimum position.
+ * Make the bar symmetric to zero. The indicator will grow from zero instead of the minimum
+ * position.
  * @param bar pointer to a bar object
  * @param en true: enable disable symmetric behavior; false: disable
  */
@@ -105,7 +106,7 @@ void lv_bar_set_sym(lv_obj_t * bar, bool en);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_bar_set_style(lv_obj_t *bar, lv_bar_style_t type, lv_style_t *style);
+void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -145,13 +146,13 @@ bool lv_bar_get_sym(lv_obj_t * bar);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_bar_get_style(const lv_obj_t *bar, lv_bar_style_t type);
+lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_BAR*/
+#endif /*LV_USE_BAR*/
 
 #ifdef __cplusplus
 } /* extern "C" */

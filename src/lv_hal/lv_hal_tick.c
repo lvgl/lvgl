@@ -65,8 +65,9 @@ uint32_t lv_tick_get(void)
     uint32_t result;
     do {
         tick_irq_flag = 1;
-        result = sys_time;
-    } while(!tick_irq_flag);     /*'lv_tick_inc()' clears this flag which can be in an interrupt. Continue until make a non interrupted cycle */
+        result        = sys_time;
+    } while(!tick_irq_flag); /*'lv_tick_inc()' clears this flag which can be in an interrupt.
+                                Continue until make a non interrupted cycle */
 
     return result;
 #else
@@ -97,4 +98,3 @@ uint32_t lv_tick_elaps(uint32_t prev_tick)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
