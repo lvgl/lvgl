@@ -26,8 +26,9 @@
 /*********************
  *      DEFINES
  *********************/
-#define VFILL_HW_ACC_SIZE_LIMIT                                                                    \
-    50 /*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
+
+/*Always fill < 50 px with 'sw_color_fill' because of the hw. init overhead*/
+#define VFILL_HW_ACC_SIZE_LIMIT 50
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN

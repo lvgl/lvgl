@@ -14,19 +14,19 @@
  *********************/
 #define NO_BREAK_FOUND UINT32_MAX
 
+/* If a character is at least this long, will break wherever "prettiest" */
 #ifndef LV_TXT_LINE_BREAK_LONG_LEN
-#define LV_TXT_LINE_BREAK_LONG_LEN                                                                 \
-    12 /* If a character is at least this long, will break wherever "prettiest" */
+#define LV_TXT_LINE_BREAK_LONG_LEN 12
 #endif
 
+/* Minimum number of characters of a word to put on a line before a break */
 #ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
-#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN                                                         \
-    3 /* Minimum number of characters of a word to put on a line before a break */
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN 3
 #endif
 
+/* Minimum number of characters of a word to put on a line after a break */
 #ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
-#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN                                                        \
-    1 /* Minimum number of characters of a word to put on a line after a break */
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 1
 #endif
 
 /**********************
@@ -343,10 +343,13 @@ bool lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c)
         if(*state == LV_TXT_CMD_STATE_WAIT) { /*Start char*/
             *state = LV_TXT_CMD_STATE_PAR;
             ret    = true;
-        } else if(*state ==
-                  LV_TXT_CMD_STATE_PAR) { /*Other start char in parameter is escaped cmd. char */
+        }
+        /*Other start char in parameter is escaped cmd. char */
+        else if(*state == LV_TXT_CMD_STATE_PAR) {
             *state = LV_TXT_CMD_STATE_WAIT;
-        } else if(*state == LV_TXT_CMD_STATE_IN) { /*Command end */
+        }
+        /*Command end */
+        else if(*state == LV_TXT_CMD_STATE_IN) {
             *state = LV_TXT_CMD_STATE_WAIT;
             ret    = true;
         }

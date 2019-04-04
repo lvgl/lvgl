@@ -14,14 +14,15 @@
 /*********************
  *      DEFINES
  *********************/
-#define CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD                                                         \
-    1 /*Circle segment greater then this value will be anti-aliased by a non-linear (cos) opacity  \
-         mapping*/
+/*Circle segment greater then this value will be anti-aliased by a non-linear (cos) opacity
+ * mapping*/
+#define CIRCLE_AA_NON_LINEAR_OPA_THRESHOLD 1
 
-#define SHADOW_OPA_EXTRA_PRECISION                                                                 \
-    8 /*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
-#define SHADOW_BOTTOM_AA_EXTRA_RADIUS                                                              \
-    3 /*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
+/*Calculate with 2^x bigger shadow opacity values to avoid rounding errors*/
+#define SHADOW_OPA_EXTRA_PRECISION 8
+
+/*Add extra radius with LV_SHADOW_BOTTOM to cover anti-aliased corners*/
+#define SHADOW_BOTTOM_AA_EXTRA_RADIUS 3
 
 /**********************
  *      TYPEDEFS

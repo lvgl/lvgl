@@ -20,8 +20,10 @@
  *      DEFINES
  *********************/
 #define LV_PAGE_SB_MIN_SIZE (LV_DPI / 8)
-#define LV_PAGE_SCROLL_ANIM_TIME                                                                   \
-    200 /*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
+
+/*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
+#define LV_PAGE_SCROLL_ANIM_TIME 200
+
 #define LV_PAGE_END_FLASH_SIZE (LV_DPI / 4)
 #define LV_PAGE_END_ANIM_TIME 300
 #define LV_PAGE_END_ANIM_WAIT_TIME 300

@@ -19,9 +19,8 @@
  *      DEFINES
  *********************/
 /*Test configurations*/
-#ifndef LV_LABEL_SCROLL_SPEED
-#define LV_LABEL_DEF_SCROLL_SPEED                                                                  \
-    (25) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
+#ifndef LV_LABEL_DEF_SCROLL_SPEED
+#define LV_LABEL_DEF_SCROLL_SPEED (25)
 #endif
 
 #define ANIM_WAIT_CHAR_COUNT 3

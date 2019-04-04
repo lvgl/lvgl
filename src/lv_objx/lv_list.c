@@ -20,13 +20,14 @@
 #define LV_LIST_LAYOUT_DEF LV_LAYOUT_COL_M
 
 #if LV_USE_ANIMATION
-#ifndef LV_LIST_FOCUS_TIME
-#define LV_LIST_DEF_ANIM_TIME                                                                      \
-    100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+/*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#ifndef LV_LIST_DEF_ANIM_TIME
+#define LV_LIST_DEF_ANIM_TIME 100
 #endif
 #else
+/*No animations*/
 #undef LV_LIST_DEF_ANIM_TIME
-#define LV_LIST_DEF_ANIM_TIME 0 /*No animations*/
+#define LV_LIST_DEF_ANIM_TIME 0
 #endif
 
 /**********************
@@ -737,17 +738,18 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             }
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
+            /*The page receives the key presses so the events should be propagated to the selected
+             * button*/
             if(btn) {
-                bool drag = lv_indev_is_dragging(lv_indev_get_act());
                 if(sign == LV_SIGNAL_PRESSED) {
                     lv_event_send(btn, LV_EVENT_PRESSED, NULL);
                 } else if(sign == LV_SIGNAL_PRESSING) {
                     lv_event_send(btn, LV_EVENT_PRESSING, NULL);
-                } else if(sign == LV_SIGNAL_LONG_PRESS && !drag) {
+                } else if(sign == LV_SIGNAL_LONG_PRESS) {
                     lv_event_send(btn, LV_EVENT_LONG_PRESSED, NULL);
-                } else if(sign == LV_SIGNAL_LONG_PRESS_REP && !drag) {
+                } else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
                     lv_event_send(btn, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
-                } else if(sign == LV_SIGNAL_RELEASED && !drag) {
+                } else if(sign == LV_SIGNAL_RELEASED) {
                     ext->last_sel = btn;
                     if(indev->proc.long_pr_sent == 0)
                         lv_event_send(btn, LV_EVENT_SHORT_CLICKED, NULL);

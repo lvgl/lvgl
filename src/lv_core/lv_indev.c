@@ -148,7 +148,8 @@ void lv_indev_reset(lv_indev_t * indev)
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
             i->proc.reset_query = 1;
-            i                   = lv_indev_get_next(i);
+
+            i = lv_indev_get_next(i);
         }
     }
 }
@@ -851,13 +852,15 @@ static void indev_proc_release(lv_indev_proc_t * proc)
                                                    indev_act);
             if(proc->reset_query) return; /*The object might be deleted*/
 
-            if(proc->long_pr_sent == 0 && proc->types.pointer.drag_in_prog == 0) {
-                lv_event_send(proc->types.pointer.act_obj, LV_EVENT_SHORT_CLICKED, NULL);
+            if(proc->types.pointer.drag_in_prog == 0) {
+                if(proc->long_pr_sent == 0) {
+                    lv_event_send(proc->types.pointer.act_obj, LV_EVENT_SHORT_CLICKED, NULL);
+                    if(proc->reset_query) return; /*The object might be deleted*/
+                }
+
+                lv_event_send(proc->types.pointer.act_obj, LV_EVENT_CLICKED, NULL);
                 if(proc->reset_query) return; /*The object might be deleted*/
             }
-
-            lv_event_send(proc->types.pointer.act_obj, LV_EVENT_CLICKED, NULL);
-            if(proc->reset_query) return; /*The object might be deleted*/
 
             lv_event_send(proc->types.pointer.act_obj, LV_EVENT_RELEASED, NULL);
             if(proc->reset_query) return; /*The object might be deleted*/
