@@ -415,13 +415,20 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
         /*Simulate a press on the object if ENTER was pressed*/
         if(data->key == LV_GROUP_KEY_ENTER) {
+            /*Send the ENTER as a normal KEY*/
+            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+
             focused->signal_cb(focused, LV_SIGNAL_PRESSED, NULL);
             if(i->proc.reset_query) return;     /*The object might be deleted*/
             lv_event_send(focused, LV_EVENT_PRESSED, NULL);
             if(i->proc.reset_query) return;     /*The object might be deleted*/
+        }
+        else if(data->key == LV_GROUP_KEY_ESC) {
+            /*Send the ESC as a normal KEY*/
+            lv_group_send_data(g, LV_GROUP_KEY_ESC);
 
-            /*Send the ENTER as a normal KEY*/
-            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+            lv_event_send(focused, LV_EVENT_CANCEL, NULL);
+            if(i->proc.reset_query) return;     /*The object might be deleted*/
         }
         /*Move the focus on NEXT*/
         else if(data->key == LV_GROUP_KEY_NEXT) {
@@ -435,7 +442,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             lv_group_focus_prev(g);
             if(i->proc.reset_query) return;             /*The object might be deleted*/
         }
-        /*Just send other keys to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
+        /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
         else {
             lv_group_send_data(g, data->key);
         }
