@@ -24,6 +24,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include "../lv_misc/lv_area.h"
+#include "../lv_misc/lv_task.h"
 
 /*********************
  *      DEFINES
@@ -68,17 +69,38 @@ typedef struct {
 
 /*Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct _lv_indev_drv_t {
-    lv_indev_type_t type;                                   /*Input device type*/
-    bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t *data);        /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb (buffered)*/
+
+    /*Input device type*/
+    lv_indev_type_t type;
+
+    /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb (buffered)*/
+    bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t *data);
 
 #if LV_USE_USER_DATA_MULTI
-    lv_indev_drv_user_data_t read_user_data;                        /*Pointer to user defined data, passed in 'lv_indev_data_t' on read*/
+    lv_indev_drv_user_data_t read_user_data;
 #endif
 
 #if LV_USE_USER_DATA_SINGLE
     lv_indev_drv_user_data_t user_data;
 #endif
-    struct _disp_t * disp;                                      /*Pointer to the assigned display*/
+
+    /*Pointer to the assigned display*/
+    struct _disp_t * disp;
+
+    /*Task to read the periodically read the input device*/
+    lv_task_t * read_task;
+
+    /*Number of pixels to slide before actually drag the object*/
+    uint8_t drag_limit;
+
+    /*Drag throw slow-down in [%]. Greater value means faster slow-down */
+    uint8_t drag_throw;
+
+    /*Long press time in milliseconds*/
+    uint16_t long_press_time;
+
+    /*Repeated trigger period in long press [ms] */
+    uint16_t long_press_rep_time;
 } lv_indev_drv_t;
 
 
@@ -90,7 +112,7 @@ typedef struct _lv_indev_proc_t {
             lv_point_t act_point;
             lv_point_t last_point;
             lv_point_t vect;
-            lv_point_t drag_sum;                /*Count the dragged pixels to check LV_INDEV_DRAG_LIMIT*/
+            lv_point_t drag_sum;                /*Count the dragged pixels to check LV_INDEV_DEF_DRAG_LIMIT*/
             lv_point_t drag_throw_vect;
             struct _lv_obj_t * act_obj;         /*The object being pressed*/
             struct _lv_obj_t * last_obj;        /*The last obejct which was pressed (used by dragthrow and other post-release event)*/
@@ -126,7 +148,6 @@ typedef struct _lv_indev_t {
     lv_indev_drv_t driver;
     lv_indev_proc_t proc;
     lv_indev_feedback_t feedback;
-    uint32_t last_activity_time;
     struct _lv_obj_t *cursor;       /*Cursor for LV_INPUT_TYPE_POINTER*/
     struct _lv_group_t *group;      /*Keypad destination group*/
     const lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
@@ -152,11 +173,18 @@ void lv_indev_drv_init(lv_indev_drv_t *driver);
 lv_indev_t * lv_indev_drv_register(lv_indev_drv_t *driver);
 
 /**
+ * Update the driver in run time.
+ * @param indev pointer to a input device. (return value of `lv_indev_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv);
+
+/**
  * Get the next input device.
  * @param indev pointer to the current input device. NULL to initialize.
  * @return the next input devise or NULL if no more. Give the first input device when the parameter is NULL
  */
-lv_indev_t * lv_indev_next(lv_indev_t * indev);
+lv_indev_t * lv_indev_get_next(lv_indev_t * indev);
 
 /**
  * Read data from an input device.

@@ -20,7 +20,7 @@
  *      DEFINES
  *********************/
 
-#if LV_INDEV_DRAG_THROW <= 0
+#if LV_INDEV_DEF_DRAG_THROW <= 0
 #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
 
@@ -32,8 +32,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if LV_INDEV_READ_PERIOD != 0
-static void indev_proc_task(void * param);
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
@@ -44,7 +42,6 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * state);
 static void indev_drag_throw(lv_indev_proc_t * proc);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -64,12 +61,60 @@ static lv_indev_t * indev_act;
  */
 void lv_indev_init(void)
 {
-#if LV_INDEV_READ_PERIOD != 0
-    lv_task_create(indev_proc_task, LV_INDEV_READ_PERIOD, LV_TASK_PRIO_MID, NULL);
-#endif
-
     lv_indev_reset(NULL);   /*Reset all input devices*/
 }
+
+/**
+ * Called periodically to read the input devices
+ * @param param pointer to and input device to read
+ */
+void lv_indev_read_task(void * param)
+{
+    LV_LOG_TRACE("indev read task started");
+
+    lv_indev_data_t data;
+
+    indev_act = param;
+
+    /*Read and process all indevs*/
+    if(indev_act->driver.disp == NULL) return;   /*Not assigned to any displays*/
+
+    /*Handle reset query before processing the point*/
+    indev_proc_reset_query_handler(indev_act);
+
+    if(indev_act->proc.disabled) return;
+    bool more_to_read;
+    do {
+        /*Read the data*/
+        more_to_read = lv_indev_read(indev_act, &data);
+
+        /*The active object might deleted even in the read function*/
+        indev_proc_reset_query_handler(indev_act);
+
+        indev_act->proc.state = data.state;
+
+        if(indev_act->proc.state == LV_INDEV_STATE_PR) {
+            indev_act->driver.disp->last_activity_time = lv_tick_get();
+        }
+        if(indev_act->driver.type == LV_INDEV_TYPE_POINTER) {
+            indev_pointer_proc(indev_act, &data);
+        } else if(indev_act->driver.type == LV_INDEV_TYPE_KEYPAD) {
+            indev_keypad_proc(indev_act, &data);
+        } else if(indev_act->driver.type == LV_INDEV_TYPE_ENCODER) {
+            indev_encoder_proc(indev_act, &data);
+        } else if(indev_act->driver.type == LV_INDEV_TYPE_BUTTON) {
+            indev_button_proc(indev_act, &data);
+        }
+        /*Handle reset query if it happened in during processing*/
+        indev_proc_reset_query_handler(indev_act);
+    } while(more_to_read);
+
+    /*End of indev processing, so no act indev*/
+    indev_act = NULL;
+
+    LV_LOG_TRACE("indev read task finished");
+}
+
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -99,10 +144,10 @@ void lv_indev_reset(lv_indev_t * indev)
 {
     if(indev) indev->proc.reset_query = 1;
     else {
-        lv_indev_t * i = lv_indev_next(NULL);
+        lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
             i->proc.reset_query = 1;
-            i = lv_indev_next(i);
+            i = lv_indev_get_next(i);
         }
     }
 }
@@ -178,7 +223,7 @@ void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t * points)
  */
 void lv_indev_set_feedback(lv_indev_t *indev, lv_indev_feedback_t feedback)
 {
-	indev->feedback = feedback;
+    indev->feedback = feedback;
 }
 
 /**
@@ -243,36 +288,13 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
 }
 
 /**
- * Get elapsed time since last press
- * @param indev pointer to an input device (NULL to get the overall smallest inactivity)
- * @return Elapsed ticks (milliseconds) since last press
- */
-uint32_t lv_indev_get_inactive_time(const lv_indev_t * indev)
-{
-
-    uint32_t t;
-
-    if(indev) return t = lv_tick_elaps(indev->last_activity_time);
-
-    lv_indev_t * i;
-    t = UINT16_MAX;
-    i = lv_indev_next(NULL);
-    while(i) {
-        t = LV_MATH_MIN(t, lv_tick_elaps(i->last_activity_time));
-        i = lv_indev_next(i);
-    }
-
-    return t;
-}
-
-/**
  * Get feedback callback for indev.
  * @param indev pointer to an input device
  * @return feedback callback
  */
 lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t *indev)
 {
-	return indev->feedback;
+    return indev->feedback;
 }
 
 /**
@@ -284,66 +306,25 @@ void lv_indev_wait_release(lv_indev_t * indev)
     indev->proc.wait_until_release = 1;
 }
 
+/**
+ * Get a pointer to the indev read task to
+ * modify its parameters with `lv_task_...` functions.
+ * @param indev pointer to an input device
+ * @return pointer to the indev read refresher task. (NULL on error)
+ */
+lv_task_t * lv_indev_get_read_task(lv_disp_t * indev)
+{
+    if(!indev) {
+        LV_LOG_WARN("lv_indev_get_read_task: indev was NULL");
+        return NULL;
+    }
+
+    return indev->refr_task;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-#if LV_INDEV_READ_PERIOD != 0
-/**
- * Called periodically to handle the input devices
- * @param param unused
- */
-static void indev_proc_task(void * param)
-{
-    (void)param;
-
-
-    LV_LOG_TRACE("indev task started");
-
-    lv_indev_data_t data;
-    lv_indev_t * i;
-    i = lv_indev_next(NULL);
-
-    /*Read and process all indevs*/
-    while(i) {
-        if(i->driver.disp == NULL) continue;   /*Not assigned to any displays*/
-        indev_act = i;
-
-        /*Handle reset query before processing the point*/
-        indev_proc_reset_query_handler(i);
-
-        if(i->proc.disabled == 0) {
-            bool more_to_read;
-            do {
-                /*Read the data*/
-                more_to_read = lv_indev_read(i, &data);
-                indev_proc_reset_query_handler(i);          /*The active object might deleted even in the read function*/
-                i->proc.state = data.state;
-
-                if(i->proc.state == LV_INDEV_STATE_PR) {
-                    i->last_activity_time = lv_tick_get();
-                }
-                if(i->driver.type == LV_INDEV_TYPE_POINTER) {
-                    indev_pointer_proc(i, &data);
-                } else if(i->driver.type == LV_INDEV_TYPE_KEYPAD) {
-                    indev_keypad_proc(i, &data);
-                } else if(i->driver.type == LV_INDEV_TYPE_ENCODER) {
-                    indev_encoder_proc(i, &data);
-                } else if(i->driver.type == LV_INDEV_TYPE_BUTTON) {
-                    indev_button_proc(i, &data);
-                }
-                /*Handle reset query if it happened in during processing*/
-                indev_proc_reset_query_handler(i);
-            } while(more_to_read);
-        }
-        i = lv_indev_next(i);    /*Go to the next indev*/
-    }
-
-    indev_act = NULL;   /*End of indev processing, so no act indev*/
-
-    LV_LOG_TRACE("indev task finished");
-}
-
 
 /**
  * Process a new point from LV_INDEV_TYPE_POINTER input device
@@ -355,7 +336,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Move the cursor if set and moved*/
     if(i->cursor != NULL &&
             (i->proc.types.pointer.last_point.x != data->point.x ||
-             i->proc.types.pointer.last_point.y != data->point.y)) {
+                    i->proc.types.pointer.last_point.y != data->point.y)) {
         lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
     }
 
@@ -444,7 +425,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_PR)
     {
         /*Long press time has elapsed?*/
-        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
+        if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
             i->proc.long_pr_sent = 1;
             if(data->key == LV_GROUP_KEY_ENTER) {
                 i->proc.longpr_rep_timestamp = lv_tick_get();
@@ -455,7 +436,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
         }
         /*Long press repeated time has elapsed?*/
-        else if(i->proc.long_pr_sent != 0 && lv_tick_elaps(i->proc.longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
+        else if(i->proc.long_pr_sent != 0 && lv_tick_elaps(i->proc.longpr_rep_timestamp) > i->driver.long_press_rep_time) {
 
             i->proc.longpr_rep_timestamp = lv_tick_get();
 
@@ -583,7 +564,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
         if(i->proc.long_pr_sent == 0 &&
-                lv_tick_elaps(i->proc.pr_timestamp) > LV_INDEV_LONG_PRESS_TIME)
+                lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time)
         {
             bool editable = false;
             focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
@@ -800,7 +781,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         /*If there is no drag then check for long press time*/
         if(proc->types.pointer.drag_in_prog == 0 && proc->long_pr_sent == 0) {
             /*Send a signal about the long press if enough time elapsed*/
-            if(lv_tick_elaps(proc->pr_timestamp) > LV_INDEV_LONG_PRESS_TIME) {
+            if(lv_tick_elaps(proc->pr_timestamp) > indev_act->driver.long_press_time) {
                 pr_obj->signal_cb(pr_obj, LV_SIGNAL_LONG_PRESS, indev_act);
                 if(proc->reset_query) return;         /*The object might be deleted*/
                 lv_event_send(pr_obj, LV_EVENT_LONG_PRESSED, NULL);
@@ -816,7 +797,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         /*Send long press repeated signal*/
         if(proc->types.pointer.drag_in_prog == 0 && proc->long_pr_sent == 1) {
             /*Send a signal about the long press repeate if enough time elapsed*/
-            if(lv_tick_elaps(proc->longpr_rep_timestamp) > LV_INDEV_LONG_PRESS_REP_TIME) {
+            if(lv_tick_elaps(proc->longpr_rep_timestamp) > indev_act->driver.long_press_rep_time) {
                 pr_obj->signal_cb(pr_obj, LV_SIGNAL_LONG_PRESS_REP, indev_act);
                 if(proc->reset_query) return;         /*The object might be deleted*/
                 lv_event_send(pr_obj, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
@@ -1030,8 +1011,8 @@ static void indev_drag(lv_indev_proc_t * state)
     /*Enough move?*/
     if(state->types.pointer.drag_limit_out == 0) {
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if(LV_MATH_ABS(state->types.pointer.drag_sum.x) >= LV_INDEV_DRAG_LIMIT ||
-                LV_MATH_ABS(state->types.pointer.drag_sum.y) >= LV_INDEV_DRAG_LIMIT) {
+        if(LV_MATH_ABS(state->types.pointer.drag_sum.x) >= indev_act->driver.drag_limit ||
+                LV_MATH_ABS(state->types.pointer.drag_sum.y) >= indev_act->driver.drag_limit) {
             state->types.pointer.drag_limit_out = 1;
         }
     }
@@ -1108,8 +1089,8 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
     }
 
     /*Reduce the vectors*/
-    proc->types.pointer.drag_throw_vect.x = proc->types.pointer.drag_throw_vect.x * (100 - LV_INDEV_DRAG_THROW) / 100;
-    proc->types.pointer.drag_throw_vect.y = proc->types.pointer.drag_throw_vect.y * (100 - LV_INDEV_DRAG_THROW) / 100;
+    proc->types.pointer.drag_throw_vect.x = proc->types.pointer.drag_throw_vect.x * (100 - indev_act->driver.drag_throw) / 100;
+    proc->types.pointer.drag_throw_vect.y = proc->types.pointer.drag_throw_vect.y * (100 - indev_act->driver.drag_throw) / 100;
 
     if(proc->types.pointer.drag_throw_vect.x != 0 ||
             proc->types.pointer.drag_throw_vect.y != 0) {
@@ -1144,4 +1125,3 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
     }
 
 }
-#endif

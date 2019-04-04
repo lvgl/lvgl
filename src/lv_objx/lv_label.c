@@ -20,7 +20,7 @@
  *********************/
 /*Test configurations*/
 #ifndef LV_LABEL_SCROLL_SPEED
-#define LV_LABEL_SCROLL_SPEED       (25) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
+#define LV_LABEL_DEF_SCROLL_SPEED       (25) /*Hor, or ver. scroll speed (px/sec) in 'LV_LABEL_LONG_SCROLL/ROLL' mode*/
 #endif
 
 #define ANIM_WAIT_CHAR_COUNT 3
@@ -87,7 +87,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->align = LV_LABEL_ALIGN_LEFT;
     ext->dot_end = LV_LABEL_DOT_END_INV;
     ext->long_mode = LV_LABEL_LONG_EXPAND;
-    ext->anim_speed = LV_LABEL_SCROLL_SPEED;
+    ext->anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
     ext->offset.x = 0;
     ext->offset.y = 0;
     ext->selection_start = -1;

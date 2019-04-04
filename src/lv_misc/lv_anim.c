@@ -58,7 +58,7 @@ void lv_anim_init(void)
 {
     lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
     last_task_run = lv_tick_get();
-    lv_task_create(anim_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
+    lv_task_create(anim_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, NULL);
 }
 
 /**

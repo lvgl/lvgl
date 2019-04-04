@@ -18,11 +18,11 @@
  *********************/
 #if LV_USE_ANIMATION
 #  ifndef LV_TABVIEW_ANIM_TIME
-#    define LV_TABVIEW_ANIM_TIME  300 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#    define LV_TABVIEW_DEF_ANIM_TIME  300 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #  endif
 #else
-#  undef  LV_TABVIEW_ANIM_TIME
-#  define LV_TABVIEW_ANIM_TIME  0   /*No animations*/
+#  undef  LV_TABVIEW_DEF_ANIM_TIME
+#  define LV_TABVIEW_DEF_ANIM_TIME  0   /*No animations*/
 #endif
 
 /**********************
@@ -91,7 +91,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->indic = NULL;
     ext->btns = NULL;
     ext->btns_pos = LV_TABVIEW_BTNS_POS_TOP;
-    ext->anim_time = LV_TABVIEW_ANIM_TIME;
+    ext->anim_time = LV_TABVIEW_DEF_ANIM_TIME;
     ext->btns_hide = 0;
 
 
@@ -735,7 +735,7 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
     lv_coord_t y_diff = point_act.y - ext->point_last.y;
 
 
-	if(!ext->scroll_ver && (x_diff >= LV_INDEV_DRAG_LIMIT || x_diff <= -LV_INDEV_DRAG_LIMIT)) {
+	if(!ext->scroll_ver && (x_diff >= LV_INDEV_DEF_DRAG_LIMIT || x_diff <= -LV_INDEV_DEF_DRAG_LIMIT)) {
 		ext->draging = 1;
 		/*Check if the page is on the edge */
 		if((lv_page_on_edge(tabpage, LV_PAGE_EDGE_LEFT) && x_diff > 0) ||
@@ -750,7 +750,7 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 		} else if(ext->drag_hor == 0) {
 			ext->drag_hor = 0;
 		}
-	} else if(y_diff >= LV_INDEV_DRAG_LIMIT || y_diff <= -LV_INDEV_DRAG_LIMIT) {
+	} else if(y_diff >= LV_INDEV_DEF_DRAG_LIMIT || y_diff <= -LV_INDEV_DEF_DRAG_LIMIT) {
 		ext->drag_hor = 0;
 		ext->draging = 1;
 		ext->scroll_ver = 1;
@@ -795,7 +795,7 @@ static void tabpage_press_lost_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 
     while(vect.x != 0)   {
         x_predict += vect.x;
-        vect.x = vect.x * (100 - LV_INDEV_DRAG_THROW) / 100;
+        vect.x = vect.x * (100 - LV_INDEV_DEF_DRAG_THROW) / 100;
     }
 
     lv_coord_t page_x1 = tabpage->coords.x1 - tabview->coords.x1 + x_predict;

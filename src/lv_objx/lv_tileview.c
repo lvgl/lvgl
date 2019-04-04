@@ -18,11 +18,11 @@
  *********************/
 #if LV_USE_ANIMATION
 #  ifndef LV_TILEVIEW_ANIM_TIME
-#    define LV_TILEVIEW_ANIM_TIME  300 /*Animation time loading a tile [ms] (0: no animation)  */
+#    define LV_TILEVIEW_DEF_ANIM_TIME  300 /*Animation time loading a tile [ms] (0: no animation)  */
 #  endif
 #else
-#  undef  LV_TILEVIEW_ANIM_TIME
-#  define LV_TILEVIEW_ANIM_TIME  0   /*No animations*/
+#  undef  LV_TILEVIEW_DEF_ANIM_TIME
+#  define LV_TILEVIEW_DEF_ANIM_TIME  0   /*No animations*/
 #endif
 
 /**********************
@@ -77,7 +77,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_tileview);
 
     /*Initialize the allocated 'ext' */
-    ext->anim_time = LV_TILEVIEW_ANIM_TIME;
+    ext->anim_time = LV_TILEVIEW_DEF_ANIM_TIME;
     ext->act_id.x = 0;
     ext->act_id.y = 0;
     ext->valid_pos = NULL;
@@ -361,14 +361,14 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             /*Set horizontal drag constraint if no vertical constraint an dragged to valid x direction */
             if(ext->drag_ver == 0 &&
-                    ((ext->drag_right_en && indev->proc.types.pointer.drag_sum.x <= -LV_INDEV_DRAG_LIMIT) ||
-                     (ext->drag_left_en  && indev->proc.types.pointer.drag_sum.x >= LV_INDEV_DRAG_LIMIT))) {
+                    ((ext->drag_right_en && indev->proc.types.pointer.drag_sum.x <= -LV_INDEV_DEF_DRAG_LIMIT) ||
+                     (ext->drag_left_en  && indev->proc.types.pointer.drag_sum.x >= LV_INDEV_DEF_DRAG_LIMIT))) {
                 ext->drag_hor = 1;
             }
             /*Set vertical drag constraint if no horizontal constraint an dragged to valid y direction */
             if(ext->drag_hor == 0 &&
-                    ((ext->drag_bottom_en && indev->proc.types.pointer.drag_sum.y <= -LV_INDEV_DRAG_LIMIT) ||
-                     (ext->drag_top_en && indev->proc.types.pointer.drag_sum.y >= LV_INDEV_DRAG_LIMIT))) {
+                    ((ext->drag_bottom_en && indev->proc.types.pointer.drag_sum.y <= -LV_INDEV_DEF_DRAG_LIMIT) ||
+                     (ext->drag_top_en && indev->proc.types.pointer.drag_sum.y >= LV_INDEV_DEF_DRAG_LIMIT))) {
                 ext->drag_ver = 1;
             }
 
@@ -493,7 +493,7 @@ static void drag_end_handler(lv_obj_t * tileview)
 
         while(vect.x != 0) {
             predict += vect.x;
-            vect.x = vect.x * (100 - LV_INDEV_DRAG_THROW) / 100;
+            vect.x = vect.x * (100 - LV_INDEV_DEF_DRAG_THROW) / 100;
         }
 
         p.x -= predict;
@@ -505,7 +505,7 @@ static void drag_end_handler(lv_obj_t * tileview)
 
         while(vect.y != 0) {
             predict += vect.y;
-            vect.y = vect.y * (100 - LV_INDEV_DRAG_THROW) / 100;
+            vect.y = vect.y * (100 - LV_INDEV_DEF_DRAG_THROW) / 100;
         }
 
         p.y -= predict;

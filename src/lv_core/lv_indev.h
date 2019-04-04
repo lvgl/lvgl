@@ -35,6 +35,12 @@ extern "C" {
 void lv_indev_init(void);
 
 /**
+ * Called periodically to read the input devices
+ * @param param pointer to and input device to read
+ */
+void lv_indev_read_task(void * param);
+
+/**
  * Get the currently processed input device. Can be used in action functions too.
  * @return pointer to the currently processed input device or NULL if no input device processing right now
  */
@@ -125,12 +131,6 @@ bool lv_indev_is_dragging(const lv_indev_t * indev);
  * @param point pointer to a point to store the vector
  */
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
-/**
- * Get elapsed time since last press
- * @param indev pointer to an input device (NULL to get the overall smallest inactivity)
- * @return Elapsed ticks (milliseconds) since last press
- */
-uint32_t lv_indev_get_inactive_time(const lv_indev_t * indev);
 
 /**
  * Get feedback callback for indev.
@@ -144,6 +144,14 @@ lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t *indev);
  * @param indev pointer to an input device
  */
 void lv_indev_wait_release(lv_indev_t * indev);
+
+/**
+ * Get a pointer to the indev read task to
+ * modify its parameters with `lv_task_...` functions.
+ * @param indev pointer to an inout device
+ * @return pointer to the indev read refresher task. (NULL on error)
+ */
+lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**********************
  *      MACROS

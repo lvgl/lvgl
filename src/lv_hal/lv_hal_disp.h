@@ -129,6 +129,9 @@ typedef struct _disp_t {
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint32_t inv_p        :10;
+
+    /*Miscellaneous data*/
+    uint32_t last_activity_time;
 } lv_disp_t;
 
 /**********************
@@ -168,6 +171,13 @@ void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32
  * @return pointer to the new display or NULL on error
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver);
+
+/**
+ * Update the driver in run time.
+ * @param disp pointer to a display. (return value of `lv_disp_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv);
 
 /**
  * Remove a display

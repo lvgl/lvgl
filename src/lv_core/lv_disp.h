@@ -63,12 +63,25 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
 /**
- * Get the a pointer to the screen refresher task.
- * It's parameters can be modified with `lv_task_...` functions,
+ * Get a pointer to the screen refresher task to
+ * modify its parameters with `lv_task_...` functions.
  * @param disp pointer to a display
  * @return pointer to the display refresher task. (NULL on error)
  */
 lv_task_t * lv_disp_get_refr_task(lv_disp_t * disp) ;
+
+/**
+ * Get elapsed time since last user activity on a display (e.g. click)
+ * @param disp pointer to an display (NULL to get the overall smallest inactivity)
+ * @return elapsed ticks (milliseconds) since the last activity
+ */
+uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp);
+
+/**
+ * Manually trigger an activity on a display
+ * @param disp pointer to an display (NULL to use the default display)
+ */
+void lv_disp_trig_activity(lv_disp_t * disp);
 
 /*------------------------------------------------
  * To improve backward compatibility

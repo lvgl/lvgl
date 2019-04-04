@@ -21,11 +21,11 @@
 
 #if LV_USE_ANIMATION
 #  ifndef LV_LIST_FOCUS_TIME
-#    define LV_LIST_FOCUS_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#    define LV_LIST_DEF_ANIM_TIME  100 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #  endif
 #else
-#  undef  LV_LIST_FOCUS_TIME
-#  define LV_LIST_FOCUS_TIME    0   /*No animations*/
+#  undef  LV_LIST_DEF_ANIM_TIME
+#  define LV_LIST_DEF_ANIM_TIME    0   /*No animations*/
 #endif
 
 /**********************
@@ -88,7 +88,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
     ext->styles_btn[LV_BTN_STATE_TGL_PR] = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA] = &lv_style_btn_ina;
-    ext->anim_time = LV_LIST_FOCUS_TIME;
+    ext->anim_time = LV_LIST_DEF_ANIM_TIME;
     ext->single_mode = false;
     ext->size = 0;
 
@@ -643,7 +643,7 @@ void lv_list_up(const lv_obj_t * list)
                     a.path = lv_anim_path_linear;
                     a.end_cb = NULL;
                     a.act_time = 0;
-                    a.time = LV_LIST_FOCUS_TIME;
+                    a.time = LV_LIST_DEF_ANIM_TIME;
                     a.playback = 0;
                     a.playback_pause = 0;
                     a.repeat = 0;
@@ -686,7 +686,7 @@ void lv_list_down(const lv_obj_t * list)
                 a.path = lv_anim_path_linear;
                 a.end_cb = NULL;
                 a.act_time = 0;
-                a.time = LV_LIST_FOCUS_TIME;
+                a.time = LV_LIST_DEF_ANIM_TIME;
                 a.playback = 0;
                 a.playback_pause = 0;
                 a.repeat = 0;

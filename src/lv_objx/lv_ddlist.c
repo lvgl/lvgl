@@ -24,11 +24,11 @@
  *********************/
 #if LV_USE_ANIMATION
 #  ifndef LV_DDLIST_ANIM_TIME
-#    define LV_DDLIST_ANIM_TIME     200         /*ms*/
+#    define LV_DDLIST_DEF_ANIM_TIME     200         /*ms*/
 #  endif
 #else
-#  undef  LV_DDLIST_ANIM_TIME
-#  define LV_DDLIST_ANIM_TIME     0             /*No animation*/
+#  undef  LV_DDLIST_DEF_ANIM_TIME
+#  define LV_DDLIST_DEF_ANIM_TIME     0             /*No animation*/
 #endif
 
 /**********************
@@ -93,7 +93,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->sel_opt_id = 0;
     ext->sel_opt_id_ori = 0;
     ext->option_cnt = 0;
-    ext->anim_time = LV_DDLIST_ANIM_TIME;
+    ext->anim_time = LV_DDLIST_DEF_ANIM_TIME;
     ext->sel_style = &lv_style_plain_color;
     ext->draw_arrow = 0;  /*Do not draw arrow by default*/
     ext->stay_open = 0;

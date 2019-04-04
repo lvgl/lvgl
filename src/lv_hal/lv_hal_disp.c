@@ -138,13 +138,28 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def = disp_def_tmp;        /*Revert the default display*/
 
     /*Create a refresh task*/
-    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
+    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
     lv_mem_assert(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 
     lv_task_ready(disp->refr_task);        /*Be sure the screen will be refreshed immediately on start up*/
 
     return disp;
+}
+
+/**
+ * Update the driver in run time.
+ * @param disp pointer to a display. (return value of `lv_disp_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
+{
+    memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
+
+    lv_obj_t * scr;
+    LV_LL_READ(disp->scr_ll, scr) {
+        lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
+    }
 }
 
 /**
@@ -158,12 +173,12 @@ void lv_disp_remove(lv_disp_t * disp)
 
     /*Detach the input devices */
     lv_indev_t * indev;
-    indev = lv_indev_next(NULL);
+    indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->driver.disp == disp) {
             indev->driver.disp = NULL;
         }
-        indev = lv_indev_next(indev);
+        indev = lv_indev_get_next(indev);
     }
 
     lv_ll_rem(&LV_GC_ROOT(_lv_disp_ll), disp);
@@ -172,20 +187,6 @@ void lv_disp_remove(lv_disp_t * disp)
     if(was_default) lv_disp_set_default(lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
 }
 
-/**
- * Update the driver in run time.
- * @param disp Pointer toa display. (return value of `lv_disp_drv_register`)
- * @param new_drv pointer to the new driver
- */
-void lv_disp_update_drv(lv_disp_t * disp, lv_disp_drv_t * new_drv)
-{
-    memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
-
-    lv_obj_t * scr;
-    LV_LL_READ(disp->scr_ll, scr) {
-        lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
-    }
-}
 
 /**
  * Set a default screen. The new screens will be created on it by default.
@@ -247,6 +248,7 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
     return disp->driver.antialiasing ? true : false;
 #endif
 }
+
 
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished

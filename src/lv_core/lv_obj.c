@@ -386,7 +386,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
     /* Reset all input devices if
      * the object to delete is used*/
-    lv_indev_t * indev = lv_indev_next(NULL);
+    lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
@@ -397,7 +397,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
             lv_indev_reset(indev);
         }
 #endif
-        indev = lv_indev_next(indev);
+        indev = lv_indev_get_next(indev);
     }
 
     /* All children deleted.
@@ -2056,7 +2056,7 @@ static void delete_children(lv_obj_t * obj)
 
     /* Reset the input devices if
      * the object to delete is used*/
-    lv_indev_t * indev = lv_indev_next(NULL);
+    lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
@@ -2066,7 +2066,7 @@ static void delete_children(lv_obj_t * obj)
             lv_indev_reset(indev);
         }
 #endif
-        indev = lv_indev_next(indev);
+        indev = lv_indev_get_next(indev);
     }
 
     /*Remove the object from parent's children list*/
