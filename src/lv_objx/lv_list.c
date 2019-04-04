@@ -759,19 +759,20 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
             if(btn) {
+                bool drag = lv_indev_is_dragging(lv_indev_get_act());
                 if(sign == LV_SIGNAL_PRESSED) {
                     lv_event_send(btn, LV_EVENT_PRESSED, NULL);
                 }
                 else if(sign == LV_SIGNAL_PRESSING) {
                     lv_event_send(btn, LV_EVENT_PRESSING, NULL);
                 }
-                else if(sign == LV_SIGNAL_LONG_PRESS) {
+                else if(sign == LV_SIGNAL_LONG_PRESS && !drag) {
                     lv_event_send(btn, LV_EVENT_LONG_PRESSED, NULL);
                 }
-                else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
+                else if(sign == LV_SIGNAL_LONG_PRESS_REP && !drag) {
                     lv_event_send(btn, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
                 }
-                else if(sign == LV_SIGNAL_RELEASED) {
+                else if(sign == LV_SIGNAL_RELEASED && !drag) {
                     ext->last_sel = btn;
                     if(indev->proc.long_pr_sent == 0) lv_event_send(btn, LV_EVENT_SHORT_CLICKED, NULL);
                     if(lv_indev_is_dragging(indev) == false) lv_event_send(btn, LV_EVENT_CLICKED, NULL);
