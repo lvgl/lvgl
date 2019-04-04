@@ -311,6 +311,9 @@ typedef void * lv_obj_user_data_t;
 
 /*Chart (dependencies: -)*/
 #define LV_USE_CHART    1
+#if LV_USE_CHART
+#  define LV_CHART_AXIS_TICK_LABEL_MAX_LEN    20
+#endif
 
 /*Container (dependencies: -*/
 #define LV_USE_CONT     1
@@ -380,6 +383,9 @@ typedef void * lv_obj_user_data_t;
 #if LV_USE_ROLLER != 0
 /*Focus animation time [ms] (0: no animation)*/
 #  define LV_ROLLER_DEF_ANIM_TIME     200
+
+/*Number of extra "pages" when the roller is infinite*/
+#  define LV_ROLLER_INF_PAGES         7
 #endif
 
 /*Slider (dependencies: lv_bar)*/
