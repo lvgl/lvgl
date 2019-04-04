@@ -95,11 +95,21 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
 }
 
 /**
+ * Update the driver in run time.
+ * @param indev pointer to a input device. (return value of `lv_indev_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
+{
+    memcpy(&indev->driver, new_drv, sizeof(lv_indev_drv_t));
+}
+
+/**
  * Get the next input device.
  * @param indev pointer to the current input device. NULL to initialize.
  * @return the next input devise or NULL if no more. Give the first input device when the parameter is NULL
  */
-lv_indev_t * lv_indev_next(lv_indev_t * indev)
+lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
 {
     if(indev == NULL) return lv_ll_get_head(&LV_GC_ROOT(_lv_indev_ll));
     else return lv_ll_get_next(&LV_GC_ROOT(_lv_indev_ll), indev);

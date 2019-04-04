@@ -18,11 +18,11 @@
  *********************/
 #if LV_USE_ANIMATION
 #  ifndef LV_ROLLER_ANIM_TIME
-#    define LV_ROLLER_ANIM_TIME     200         /*ms*/
+#    define LV_ROLLER_DEF_ANIM_TIME     200         /*ms*/
 #  endif
 #else
-#  undef  LV_ROLLER_ANIM_TIME
-#  define LV_ROLLER_ANIM_TIME       0           /*No animation*/
+#  undef  LV_ROLLER_DEF_ANIM_TIME
+#  define LV_ROLLER_DEF_ANIM_TIME       0           /*No animation*/
 #endif
 
 
@@ -88,7 +88,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_drag(scrl, true);                                        /*In ddlist it might be disabled*/
         lv_page_set_scrl_fit2(new_roller, LV_FIT_TIGHT, LV_FIT_NONE);      /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
-        lv_ddlist_set_anim_time(new_roller, LV_ROLLER_ANIM_TIME);
+        lv_ddlist_set_anim_time(new_roller, LV_ROLLER_DEF_ANIM_TIME);
         lv_ddlist_set_stay_open(new_roller, true);
         lv_roller_set_visible_row_count(new_roller, 3);
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);

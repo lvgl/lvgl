@@ -18,11 +18,11 @@
  *********************/
 #if LV_USE_ANIMATION
 #  ifndef LV_TABVIEW_ANIM_TIME
-#    define LV_TABVIEW_ANIM_TIME  300 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
+#    define LV_TABVIEW_DEF_ANIM_TIME  300 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #  endif
 #else
-#  undef  LV_TABVIEW_ANIM_TIME
-#  define LV_TABVIEW_ANIM_TIME  0   /*No animations*/
+#  undef  LV_TABVIEW_DEF_ANIM_TIME
+#  define LV_TABVIEW_DEF_ANIM_TIME  0   /*No animations*/
 #endif
 
 /**********************
@@ -91,7 +91,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->indic = NULL;
     ext->btns = NULL;
     ext->btns_pos = LV_TABVIEW_BTNS_POS_TOP;
-    ext->anim_time = LV_TABVIEW_ANIM_TIME;
+    ext->anim_time = LV_TABVIEW_DEF_ANIM_TIME;
     ext->btns_hide = 0;
 
 

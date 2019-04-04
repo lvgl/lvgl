@@ -131,7 +131,7 @@ typedef struct _disp_t {
     uint32_t inv_p        :10;
 
     /*Miscellaneous data*/
-    uint32_t last_activity;
+    uint32_t last_activity_time;
 } lv_disp_t;
 
 /**********************
@@ -173,6 +173,13 @@ void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver);
 
 /**
+ * Update the driver in run time.
+ * @param disp pointer to a display. (return value of `lv_disp_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv);
+
+/**
  * Remove a display
  * @param disp pointer to display
  */
@@ -210,13 +217,6 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp);
  * @return true: anti-aliasing is enabled; false: disabled
  */
 bool lv_disp_get_antialiasing(lv_disp_t * disp);
-
-/**
- * Get the elapsed time since the last activity on a display.
- * @param disp pointer to a display.
- * @return the elapsed time since the last activity
- */
-uint32_t lv_disp_get_inactive_time(lv_disp_t * disp);
 
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished

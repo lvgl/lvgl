@@ -148,6 +148,21 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 }
 
 /**
+ * Update the driver in run time.
+ * @param disp pointer to a display. (return value of `lv_disp_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
+{
+    memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
+
+    lv_obj_t * scr;
+    LV_LL_READ(disp->scr_ll, scr) {
+        lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
+    }
+}
+
+/**
  * Remove a display
  * @param disp pointer to display
  */
@@ -158,12 +173,12 @@ void lv_disp_remove(lv_disp_t * disp)
 
     /*Detach the input devices */
     lv_indev_t * indev;
-    indev = lv_indev_next(NULL);
+    indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->driver.disp == disp) {
             indev->driver.disp = NULL;
         }
-        indev = lv_indev_next(indev);
+        indev = lv_indev_get_next(indev);
     }
 
     lv_ll_rem(&LV_GC_ROOT(_lv_disp_ll), disp);
@@ -172,20 +187,6 @@ void lv_disp_remove(lv_disp_t * disp)
     if(was_default) lv_disp_set_default(lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
 }
 
-/**
- * Update the driver in run time.
- * @param disp Pointer toa display. (return value of `lv_disp_drv_register`)
- * @param new_drv pointer to the new driver
- */
-void lv_disp_update_drv(lv_disp_t * disp, lv_disp_drv_t * new_drv)
-{
-    memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
-
-    lv_obj_t * scr;
-    LV_LL_READ(disp->scr_ll, scr) {
-        lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
-    }
-}
 
 /**
  * Set a default screen. The new screens will be created on it by default.
@@ -248,19 +249,6 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
 #endif
 }
 
-
-/**
- * Get the elapsed time since the last activity on a display.
- * @param disp pointer to a display.
- * @return the elapsed time since the last activity
- */
-uint32_t lv_disp_get_inactive_time(lv_disp_t * disp)
-{
-    if(disp == NULL) disp = lv_disp_get_default();
-    if(disp == NULL) return 0;
-
-    return disp->last_activity;
-}
 
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished

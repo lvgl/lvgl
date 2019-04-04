@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_disp.h"
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES
@@ -127,6 +128,47 @@ lv_task_t * lv_disp_get_refr_task(lv_disp_t * disp)
     }
 
     return disp->refr_task;
+}
+
+/**
+ * Get elapsed time since last user activity on a display (e.g. click)
+ * @param disp pointer to an display (NULL to get the overall smallest inactivity)
+ * @return elapsed ticks (milliseconds) since the last activity
+ */
+uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("lv_disp_get_inactive_time: no display registered");
+        return 0;
+    }
+
+    if(disp) return lv_tick_elaps(disp->last_activity_time);
+
+    lv_disp_t * d;
+    uint32_t t = UINT32_MAX;
+    d = lv_disp_get_next(NULL);
+    while(d) {
+        t = LV_MATH_MIN(t, lv_tick_elaps(d->last_activity_time));
+        d = lv_disp_get_next(d);
+    }
+
+    return t;
+}
+
+/**
+ * Manually trigger an activity on a display
+ * @param disp pointer to an display (NULL to use the default display)
+ */
+void lv_disp_trig_activity(const lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("lv_disp_trig_activity: no display registered");
+        return;
+    }
+
+    disp->last_activity_time = lv_tick_get();
 }
 
 /**********************

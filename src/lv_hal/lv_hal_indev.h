@@ -148,7 +148,6 @@ typedef struct _lv_indev_t {
     lv_indev_drv_t driver;
     lv_indev_proc_t proc;
     lv_indev_feedback_t feedback;
-    uint32_t last_activity_time;
     struct _lv_obj_t *cursor;       /*Cursor for LV_INPUT_TYPE_POINTER*/
     struct _lv_group_t *group;      /*Keypad destination group*/
     const lv_point_t * btn_points;      /*Array points assigned to the button ()screen will be pressed here by the buttons*/
@@ -174,11 +173,18 @@ void lv_indev_drv_init(lv_indev_drv_t *driver);
 lv_indev_t * lv_indev_drv_register(lv_indev_drv_t *driver);
 
 /**
+ * Update the driver in run time.
+ * @param indev pointer to a input device. (return value of `lv_indev_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv);
+
+/**
  * Get the next input device.
  * @param indev pointer to the current input device. NULL to initialize.
  * @return the next input devise or NULL if no more. Give the first input device when the parameter is NULL
  */
-lv_indev_t * lv_indev_next(lv_indev_t * indev);
+lv_indev_t * lv_indev_get_next(lv_indev_t * indev);
 
 /**
  * Read data from an input device.

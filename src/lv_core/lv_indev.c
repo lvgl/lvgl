@@ -94,7 +94,7 @@ void lv_indev_read_task(void * param)
         indev_act->proc.state = data.state;
 
         if(indev_act->proc.state == LV_INDEV_STATE_PR) {
-            indev_act->last_activity_time = lv_tick_get();
+            indev_act->driver.disp->last_activity_time = lv_tick_get();
         }
         if(indev_act->driver.type == LV_INDEV_TYPE_POINTER) {
             indev_pointer_proc(indev_act, &data);
@@ -144,10 +144,10 @@ void lv_indev_reset(lv_indev_t * indev)
 {
     if(indev) indev->proc.reset_query = 1;
     else {
-        lv_indev_t * i = lv_indev_next(NULL);
+        lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
             i->proc.reset_query = 1;
-            i = lv_indev_next(i);
+            i = lv_indev_get_next(i);
         }
     }
 }
@@ -285,29 +285,6 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
         point->x = indev->proc.types.pointer.vect.x;
         point->y = indev->proc.types.pointer.vect.y;
     }
-}
-
-/**
- * Get elapsed time since last press
- * @param indev pointer to an input device (NULL to get the overall smallest inactivity)
- * @return Elapsed ticks (milliseconds) since last press
- */
-uint32_t lv_indev_get_inactive_time(const lv_indev_t * indev)
-{
-
-    uint32_t t;
-
-    if(indev) return t = lv_tick_elaps(indev->last_activity_time);
-
-    lv_indev_t * i;
-    t = UINT16_MAX;
-    i = lv_indev_next(NULL);
-    while(i) {
-        t = LV_MATH_MIN(t, lv_tick_elaps(i->last_activity_time));
-        i = lv_indev_next(i);
-    }
-
-    return t;
 }
 
 /**

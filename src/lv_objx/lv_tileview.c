@@ -18,11 +18,11 @@
  *********************/
 #if LV_USE_ANIMATION
 #  ifndef LV_TILEVIEW_ANIM_TIME
-#    define LV_TILEVIEW_ANIM_TIME  300 /*Animation time loading a tile [ms] (0: no animation)  */
+#    define LV_TILEVIEW_DEF_ANIM_TIME  300 /*Animation time loading a tile [ms] (0: no animation)  */
 #  endif
 #else
-#  undef  LV_TILEVIEW_ANIM_TIME
-#  define LV_TILEVIEW_ANIM_TIME  0   /*No animations*/
+#  undef  LV_TILEVIEW_DEF_ANIM_TIME
+#  define LV_TILEVIEW_DEF_ANIM_TIME  0   /*No animations*/
 #endif
 
 /**********************
@@ -77,7 +77,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_tileview);
 
     /*Initialize the allocated 'ext' */
-    ext->anim_time = LV_TILEVIEW_ANIM_TIME;
+    ext->anim_time = LV_TILEVIEW_DEF_ANIM_TIME;
     ext->act_id.x = 0;
     ext->act_id.y = 0;
     ext->valid_pos = NULL;
