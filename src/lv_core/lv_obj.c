@@ -45,7 +45,7 @@ static void delete_children(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 #if USE_LV_EXTENDED_CLICK_AREA
-static void update_ext_coords(lv_area_t *coords, lv_area_t *ext_coords, lv_area_t *paddings);
+static void update_ext_coords(lv_area_t *coords, lv_area_t *ext_coords, uint8_t hor_pad, uint8_t ver_pad);
 #endif
 
 /**********************
@@ -152,11 +152,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 
 #if USE_LV_EXTENDED_CLICK_AREA
         lv_area_copy(&(new_obj->ext_coords), &(new_obj->coords));
-        new_obj->ext_paddings.x1 = 0;
-        new_obj->ext_paddings.x2 = 0;
-        new_obj->ext_paddings.y1 = 0;
-        new_obj->ext_paddings.y2 = 0;
 #endif
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+        new_obj->hor_pad = 0;
+        new_obj->ver_pad = 0;
+#endif
+
         /*Init realign*/
 #if LV_OBJ_REALIGN
         new_obj->realign.align = LV_ALIGN_CENTER;
@@ -230,10 +231,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 
 #if USE_LV_EXTENDED_CLICK_AREA
         lv_area_copy(&(new_obj->ext_coords), &(new_obj->coords));
-        new_obj->ext_paddings.x1 = 0;
-        new_obj->ext_paddings.x2 = 0;
-        new_obj->ext_paddings.y1 = 0;
-        new_obj->ext_paddings.y2 = 0;
+#endif
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+        new_obj->hor_pad = 0;
+        new_obj->ver_pad = 0;
 #endif
         /*Init realign*/
 #if LV_OBJ_REALIGN
@@ -292,7 +293,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 
 #if USE_LV_EXTENDED_CLICK_AREA
         lv_area_copy(&new_obj->ext_coords, &copy->ext_coords);
-        lv_area_copy(&new_obj->ext_paddings, &copy->ext_paddings);
+#endif
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+        new_obj->hor_pad = copy->hor_pad;
+        new_obj->ver_pad = copy->ver_pad;
 #endif
 
         /*Set free data*/
@@ -582,7 +586,7 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->coords.y2 += diff.y;
 
 #if USE_LV_EXTENDED_CLICK_AREA
-    update_ext_coords(&(obj->coords), &(obj->ext_coords), &(obj->ext_paddings));
+    update_ext_coords(&(obj->coords), &(obj->ext_coords), obj->hor_pad, obj->ver_pad);
 #endif
 
     refresh_children_position(obj, diff.x, diff.y);
@@ -647,7 +651,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     obj->coords.y2 = obj->coords.y1 + h - 1;
 
 #if USE_LV_EXTENDED_CLICK_AREA
-    update_ext_coords(&(obj->coords), &(obj->ext_coords), &(obj->ext_paddings));
+    update_ext_coords(&(obj->coords), &(obj->ext_coords), obj->hor_pad, obj->ver_pad);
 #endif
 
     /*Send a signal to the object with its new coordinates*/
@@ -1619,16 +1623,27 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
     return lv_obj_get_width(obj) - style->body.padding.top - style->body.padding.bottom;
 }
 
-#if USE_LV_EXTENDED_CLICK_AREA
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
 /**
- * Copy the extended clickable area size of an object to an area
+ * Get the horizontal padding of extended clickable area
  * @param obj pointer to an object
- * @param cords_p pointer to an area to store the size
+ * @return the horizontal padding
  */
-void lv_obj_get_ext_paddings(const lv_obj_t * obj, lv_area_t * cords_p)
+uint8_t lv_obj_get_ext_hor_padding(const lv_obj_t * obj)
 {
-    lv_area_copy(cords_p, &obj->ext_paddings);
+    return obj->ext_padding_hor;
 }
+
+/**
+ * Get the vertical padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the vertical padding
+ */
+uint8_t lv_obj_get_ext_ver_padding(const lv_obj_t * obj)
+{
+    return obj->ext_padding_ver;
+}
+#endif
 
 /**
  * Get the extended size attribute of an object
@@ -2031,7 +2046,7 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
         i->coords.y2 += y_diff;
 
 #if USE_LV_EXTENDED_CLICK_AREA
-        update_ext_coords(&(i->coords), &(i->ext_coords), &(i->ext_paddings));
+        update_ext_coords(&(i->coords), &(i->ext_coords), i->hor_pad, i->ver_pad);
 #endif
         refresh_children_position(i, x_diff, y_diff);
     }
@@ -2151,11 +2166,11 @@ static void delete_children(lv_obj_t * obj)
  * @param ext_coords extended coordinates, which will be updated
  * @param paddings paddings of extended clickable area
  */
-static void update_ext_coords(lv_area_t *coords, lv_area_t *ext_coords, lv_area_t *paddings)
+static void update_ext_coords(lv_area_t *coords, lv_area_t *ext_coords, uint8_t hor_pad, uint8_t ver_pad)
 {
-    ext_coords->x1 = paddings->x1 > coords->x1 ? 0 : coords->x1 - paddings->x1;
-    ext_coords->x2 = coords->x2 + paddings->x2;
-    ext_coords->y1 = paddings->y1 > coords->y1 ? 0 : coords->y1 - paddings->y1;
-    ext_coords->y2 = coords->y2 + paddings->y2;
+    ext_coords->x1 = hor_pad > coords->x1 ? 0 : coords->x1 - hor_pad;
+    ext_coords->x2 = coords->x2 + hor_pad;
+    ext_coords->y1 = ver_pad > coords->y1 ? 0 : coords->y1 - ver_pad;
+    ext_coords->y2 = coords->y2 + ver_pad;
 }
 #endif

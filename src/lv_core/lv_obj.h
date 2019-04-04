@@ -178,7 +178,10 @@ typedef struct _lv_obj_t
     lv_area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
 #if USE_LV_EXTENDED_CLICK_AREA
     lv_area_t ext_coords;
-    lv_area_t ext_paddings;
+#endif
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+    uint8_t ext_padding_hor;
+    uint8_t ext_padding_ver;
 #endif
 
     lv_event_cb_t event_cb;
@@ -341,14 +344,14 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
  */
 void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
-#if USE_LV_EXTENDED_CLICK_AREA
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
 /**
  * Set the size of an extended clickable area
  * @param obj pointer to an object
  * @param w extended width to both sides
  * @param h extended height to both sides
  */
-void lv_obj_set_ext_paddings(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+void lv_obj_set_ext_paddings(lv_obj_t * obj, uint8_t w, uint8_t h);
 #endif
 
 /**
@@ -687,13 +690,21 @@ lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj);
  */
 lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj);
 
-#if USE_LV_EXTENDED_CLICK_AREA
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
 /**
- * Copy the extended clickable area size of an object to an area
+ * Get the horizontal padding of extended clickable area
  * @param obj pointer to an object
- * @param cords_p pointer to an area to store the size
+ * @return the horizontal padding
  */
-void lv_obj_get_ext_paddings(const lv_obj_t * obj, lv_area_t * cords_p);
+uint8_t lv_obj_get_ext_hor_padding(const lv_obj_t * obj);
+
+/**
+ * Get the vertical padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the vertical padding
+ */
+uint8_t lv_obj_get_ext_ver_padding(const lv_obj_t * obj);
+
 #endif
 
 /**
