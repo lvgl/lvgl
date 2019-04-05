@@ -97,6 +97,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         } else {
             lv_table_set_style(new_table, LV_TABLE_STYLE_BG, &lv_style_plain_color);
         }
+        lv_obj_set_click(new_table, false); /*Can be removed if click support is added*/
     }
     /*Copy an existing table*/
     else {
