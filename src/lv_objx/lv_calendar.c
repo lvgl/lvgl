@@ -706,7 +706,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
     uint32_t i;
     for(i = 0; i < 7; i++) {
         label_area.x1 = calendar->coords.x1 + (w * i) / 7 + l_pad;
-        label_area.x2 = label_area.x1 + box_w;
+        label_area.x2 = label_area.x1 + box_w - 1;
         lv_draw_label(&label_area, mask, ext->style_day_names, opa_scale, get_day_name(calendar, i),
                       LV_TXT_FLAG_CENTER, NULL, -1, -1);
     }
@@ -805,7 +805,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             label_area.x1 = calendar->coords.x1 + (w * day) / 7 + style_bg->body.padding.left +
                             style_bg->body.padding.right;
-            label_area.x2 = label_area.x1 + box_w;
+            label_area.x2 = label_area.x1 + box_w - 1;
 
             /*Draw the "today box"*/
             if(draw_state == DAY_DRAW_ACT_MONTH && month_of_today_shown &&
