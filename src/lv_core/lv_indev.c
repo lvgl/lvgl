@@ -1030,6 +1030,8 @@ static void indev_drag(lv_indev_proc_t * state)
 
     if(lv_obj_get_drag(drag_obj) == false) return;
 
+    lv_drag_direction_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
+
     /*Count the movement by drag*/
     state->types.pointer.drag_sum.x += state->types.pointer.vect.x;
     state->types.pointer.drag_sum.y += state->types.pointer.vect.y;
@@ -1037,8 +1039,8 @@ static void indev_drag(lv_indev_proc_t * state)
     /*Enough move?*/
     if(state->types.pointer.drag_limit_out == 0) {
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if(LV_MATH_ABS(state->types.pointer.drag_sum.x) >= indev_act->driver.drag_limit ||
-           LV_MATH_ABS(state->types.pointer.drag_sum.y) >= indev_act->driver.drag_limit) {
+        if(((allowed_dirs & LV_DRAG_DIR_HOR) && LV_MATH_ABS(state->types.pointer.drag_sum.x) >= indev_act->driver.drag_limit) ||
+           ((allowed_dirs & LV_DRAG_DIR_VER) && LV_MATH_ABS(state->types.pointer.drag_sum.y) >= indev_act->driver.drag_limit)) {
             state->types.pointer.drag_limit_out = 1;
         }
     }
@@ -1059,8 +1061,11 @@ static void indev_drag(lv_indev_proc_t * state)
             lv_coord_t prev_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
             lv_coord_t prev_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
 
-            lv_obj_set_pos(drag_obj, act_x + state->types.pointer.vect.x,
-                           act_y + state->types.pointer.vect.y);
+            if(allowed_dirs & LV_DRAG_DIR_HOR)
+            	lv_obj_set_x(drag_obj, act_x + state->types.pointer.vect.x);
+
+            if(allowed_dirs & LV_DRAG_DIR_VER)
+            	lv_obj_set_y(drag_obj, act_y + state->types.pointer.vect.y);
 
             /*Set the drag in progress flag if the object is really moved*/
             if(drag_obj->coords.x1 != prev_x || drag_obj->coords.y1 != prev_y) {
@@ -1115,6 +1120,8 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
         return;
     }
 
+    lv_drag_direction_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
+
     /*Reduce the vectors*/
     proc->types.pointer.drag_throw_vect.x =
         proc->types.pointer.drag_throw_vect.x * (100 - indev_act->driver.drag_throw) / 100;
@@ -1127,7 +1134,12 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
         lv_obj_get_coords(drag_obj, &coords_ori);
         lv_coord_t act_x = lv_obj_get_x(drag_obj) + proc->types.pointer.drag_throw_vect.x;
         lv_coord_t act_y = lv_obj_get_y(drag_obj) + proc->types.pointer.drag_throw_vect.y;
-        lv_obj_set_pos(drag_obj, act_x, act_y);
+
+        if(allowed_dirs & LV_DRAG_DIR_HOR)
+			lv_obj_set_x(drag_obj, act_x );
+
+		if(allowed_dirs & LV_DRAG_DIR_VER)
+			lv_obj_set_y(drag_obj, act_y);
 
         lv_area_t coord_new;
         lv_obj_get_coords(drag_obj, &coord_new);
