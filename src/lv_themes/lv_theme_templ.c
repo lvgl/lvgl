@@ -8,7 +8,6 @@
  *********************/
 #include "lv_theme.h"
 
-
 #if LV_USE_THEME_TEMPL
 
 /*********************
@@ -44,18 +43,16 @@ static lv_font_t * _font;
 
 static void basic_init(void)
 {
-    lv_style_copy(&def, &lv_style_pretty);  /*Initialize the default style*/
+    lv_style_copy(&def, &lv_style_pretty); /*Initialize the default style*/
     def.text.font = _font;
 
-    theme.style.bg = &def;
+    theme.style.bg    = &def;
     theme.style.panel = &def;
-
 }
 
 static void cont_init(void)
 {
 #if LV_USE_CONT != 0
-
 
     theme.style.cont = &def;
 #endif
@@ -65,23 +62,22 @@ static void btn_init(void)
 {
 #if LV_USE_BTN != 0
 
-
-    theme.style.btn.rel = &def;
-    theme.style.btn.pr = &def;
+    theme.style.btn.rel     = &def;
+    theme.style.btn.pr      = &def;
     theme.style.btn.tgl_rel = &def;
-    theme.style.btn.tgl_pr =  &def;
-    theme.style.btn.ina =  &def;
+    theme.style.btn.tgl_pr  = &def;
+    theme.style.btn.ina     = &def;
 #endif
 }
 
 static void imgbtn_init(void)
 {
 #if LV_USE_IMGBTN != 0
-    theme.style.imgbtn.rel = &def;
-    theme.style.imgbtn.pr = &def;
+    theme.style.imgbtn.rel     = &def;
+    theme.style.imgbtn.pr      = &def;
     theme.style.imgbtn.tgl_rel = &def;
-    theme.style.imgbtn.tgl_pr = &def;
-    theme.style.imgbtn.ina = &def;
+    theme.style.imgbtn.tgl_pr  = &def;
+    theme.style.imgbtn.ina     = &def;
 #endif
 }
 
@@ -89,9 +85,8 @@ static void label_init(void)
 {
 #if LV_USE_LABEL != 0
 
-
     theme.style.label.prim = &def;
-    theme.style.label.sec = &def;
+    theme.style.label.sec  = &def;
     theme.style.label.hint = &def;
 #endif
 }
@@ -100,16 +95,14 @@ static void img_init(void)
 {
 #if LV_USE_IMG != 0
 
-
     theme.style.img.light = &def;
-    theme.style.img.dark = &def;
+    theme.style.img.dark  = &def;
 #endif
 }
 
 static void line_init(void)
 {
 #if LV_USE_LINE != 0
-
 
     theme.style.line.decor = &def;
 #endif
@@ -119,7 +112,6 @@ static void led_init(void)
 {
 #if LV_USE_LED != 0
 
-
     theme.style.led = &def;
 #endif
 }
@@ -128,8 +120,7 @@ static void bar_init(void)
 {
 #if LV_USE_BAR
 
-
-    theme.style.bar.bg = &def;
+    theme.style.bar.bg    = &def;
     theme.style.bar.indic = &def;
 #endif
 }
@@ -138,10 +129,9 @@ static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
 
-
-    theme.style.slider.bg = &def;
+    theme.style.slider.bg    = &def;
     theme.style.slider.indic = &def;
-    theme.style.slider.knob = &def;
+    theme.style.slider.knob  = &def;
 #endif
 }
 
@@ -149,19 +139,16 @@ static void sw_init(void)
 {
 #if LV_USE_SW != 0
 
-
-    theme.style.sw.bg = &def;
-    theme.style.sw.indic = &def;
+    theme.style.sw.bg       = &def;
+    theme.style.sw.indic    = &def;
     theme.style.sw.knob_off = &def;
-    theme.style.sw.knob_on = &def;
+    theme.style.sw.knob_on  = &def;
 #endif
 }
-
 
 static void lmeter_init(void)
 {
 #if LV_USE_LMETER != 0
-
 
     theme.style.lmeter = &def;
 #endif
@@ -171,7 +158,6 @@ static void gauge_init(void)
 {
 #if LV_USE_GAUGE != 0
 
-
     theme.style.gauge = &def;
 #endif
 }
@@ -180,7 +166,6 @@ static void arc_init(void)
 {
 #if LV_USE_ARC != 0
 
-
     theme.style.arc = &def;
 #endif
 }
@@ -188,7 +173,6 @@ static void arc_init(void)
 static void preload_init(void)
 {
 #if LV_USE_PRELOAD != 0
-
 
     theme.style.preload = &def;
 #endif
@@ -206,14 +190,14 @@ static void calendar_init(void)
 {
 #if LV_USE_CALENDAR
 
-    theme.style.calendar.bg = theme.style.panel;
-    theme.style.calendar.header = &def;
-    theme.style.calendar.inactive_days = &def;
+    theme.style.calendar.bg               = theme.style.panel;
+    theme.style.calendar.header           = &def;
+    theme.style.calendar.inactive_days    = &def;
     theme.style.calendar.highlighted_days = &def;
-    theme.style.calendar.week_box = &def;
-    theme.style.calendar.today_box = &def;
-    theme.style.calendar.header_pr = &def;
-    theme.style.calendar.day_names = &def;
+    theme.style.calendar.week_box         = &def;
+    theme.style.calendar.today_box        = &def;
+    theme.style.calendar.header_pr        = &def;
+    theme.style.calendar.day_names        = &def;
 #endif
 }
 
@@ -221,28 +205,25 @@ static void cb_init(void)
 {
 #if LV_USE_CB != 0
 
-
-    theme.style.cb.bg = &def;
-    theme.style.cb.box.rel = &def;
-    theme.style.cb.box.pr = &def;
+    theme.style.cb.bg          = &def;
+    theme.style.cb.box.rel     = &def;
+    theme.style.cb.box.pr      = &def;
     theme.style.cb.box.tgl_rel = &def;
-    theme.style.cb.box.tgl_pr = &def;
-    theme.style.cb.box.ina = &def;
+    theme.style.cb.box.tgl_pr  = &def;
+    theme.style.cb.box.ina     = &def;
 #endif
 }
-
 
 static void btnm_init(void)
 {
 #if LV_USE_BTNM
 
-
-    theme.style.btnm.bg = &def;
-    theme.style.btnm.btn.rel = &def;
-    theme.style.btnm.btn.pr = &def;
+    theme.style.btnm.bg          = &def;
+    theme.style.btnm.btn.rel     = &def;
+    theme.style.btnm.btn.pr      = &def;
     theme.style.btnm.btn.tgl_rel = &def;
-    theme.style.btnm.btn.tgl_pr = &def;
-    theme.style.btnm.btn.ina = &def;
+    theme.style.btnm.btn.tgl_pr  = &def;
+    theme.style.btnm.btn.ina     = &def;
 #endif
 }
 
@@ -250,26 +231,23 @@ static void kb_init(void)
 {
 #if LV_USE_KB
 
-
-    theme.style.kb.bg = &def;
-    theme.style.kb.btn.rel = &def;
-    theme.style.kb.btn.pr = &def;
+    theme.style.kb.bg          = &def;
+    theme.style.kb.btn.rel     = &def;
+    theme.style.kb.btn.pr      = &def;
     theme.style.kb.btn.tgl_rel = &def;
-    theme.style.kb.btn.tgl_pr = &def;
-    theme.style.kb.btn.ina = &def;
+    theme.style.kb.btn.tgl_pr  = &def;
+    theme.style.kb.btn.ina     = &def;
 #endif
-
 }
 
 static void mbox_init(void)
 {
 #if LV_USE_MBOX
 
-
-    theme.style.mbox.bg = &def;
-    theme.style.mbox.btn.bg = &def;
+    theme.style.mbox.bg      = &def;
+    theme.style.mbox.btn.bg  = &def;
     theme.style.mbox.btn.rel = &def;
-    theme.style.mbox.btn.pr = &def;
+    theme.style.mbox.btn.pr  = &def;
 #endif
 }
 
@@ -277,10 +255,9 @@ static void page_init(void)
 {
 #if LV_USE_PAGE
 
-
-    theme.style.page.bg = &def;
+    theme.style.page.bg   = &def;
     theme.style.page.scrl = &def;
-    theme.style.page.sb = &def;
+    theme.style.page.sb   = &def;
 #endif
 }
 
@@ -288,11 +265,10 @@ static void ta_init(void)
 {
 #if LV_USE_TA
 
-
-    theme.style.ta.area = &def;
+    theme.style.ta.area    = &def;
     theme.style.ta.oneline = &def;
-    theme.style.ta.cursor = NULL;     /*Let library to calculate the cursor's style*/
-    theme.style.ta.sb = &def;
+    theme.style.ta.cursor  = NULL; /*Let library to calculate the cursor's style*/
+    theme.style.ta.sb      = &def;
 #endif
 }
 
@@ -300,15 +276,14 @@ static void list_init(void)
 {
 #if LV_USE_LIST != 0
 
-
-    theme.style.list.sb = &def;
-    theme.style.list.bg = &def;
-    theme.style.list.scrl = &def;
-    theme.style.list.btn.rel = &def;
-    theme.style.list.btn.pr = &def;
+    theme.style.list.sb          = &def;
+    theme.style.list.bg          = &def;
+    theme.style.list.scrl        = &def;
+    theme.style.list.btn.rel     = &def;
+    theme.style.list.btn.pr      = &def;
     theme.style.list.btn.tgl_rel = &def;
-    theme.style.list.btn.tgl_pr = &def;
-    theme.style.list.btn.ina = &def;
+    theme.style.list.btn.tgl_pr  = &def;
+    theme.style.list.btn.ina     = &def;
 #endif
 }
 
@@ -316,10 +291,9 @@ static void ddlist_init(void)
 {
 #if LV_USE_DDLIST != 0
 
-
-    theme.style.ddlist.bg = &def;
+    theme.style.ddlist.bg  = &def;
     theme.style.ddlist.sel = &def;
-    theme.style.ddlist.sb = &def;
+    theme.style.ddlist.sb  = &def;
 #endif
 }
 
@@ -327,8 +301,7 @@ static void roller_init(void)
 {
 #if LV_USE_ROLLER != 0
 
-
-    theme.style.roller.bg = &def;
+    theme.style.roller.bg  = &def;
     theme.style.roller.sel = &def;
 #endif
 }
@@ -337,21 +310,20 @@ static void tabview_init(void)
 {
 #if LV_USE_TABVIEW != 0
 
-
-    theme.style.tabview.bg = &def;
-    theme.style.tabview.indic = &def;
-    theme.style.tabview.btn.bg = &def;
-    theme.style.tabview.btn.rel = &def;
-    theme.style.tabview.btn.pr = &def;
+    theme.style.tabview.bg          = &def;
+    theme.style.tabview.indic       = &def;
+    theme.style.tabview.btn.bg      = &def;
+    theme.style.tabview.btn.rel     = &def;
+    theme.style.tabview.btn.pr      = &def;
     theme.style.tabview.btn.tgl_rel = &def;
-    theme.style.tabview.btn.tgl_pr = &def;
+    theme.style.tabview.btn.tgl_pr  = &def;
 #endif
 }
 
 static void table_init(void)
 {
 #if LV_USE_TABLE != 0
-    theme.style.table.bg = &def;
+    theme.style.table.bg   = &def;
     theme.style.table.cell = &def;
 #endif
 }
@@ -360,14 +332,13 @@ static void win_init(void)
 {
 #if LV_USE_WIN != 0
 
-
-    theme.style.win.bg = &def;
-    theme.style.win.sb = &def;
-    theme.style.win.header = &def;
-    theme.style.win.content.bg = &def;
+    theme.style.win.bg           = &def;
+    theme.style.win.sb           = &def;
+    theme.style.win.header       = &def;
+    theme.style.win.content.bg   = &def;
     theme.style.win.content.scrl = &def;
-    theme.style.win.btn.rel = &def;
-    theme.style.win.btn.pr = &def;
+    theme.style.win.btn.rel      = &def;
+    theme.style.win.btn.pr       = &def;
 #endif
 }
 
@@ -375,23 +346,23 @@ static void win_init(void)
 
 static void style_mod(lv_group_t * group, lv_style_t * style)
 {
-    (void) group;   /*Unused*/
+    (void)group; /*Unused*/
 
 #if LV_COLOR_DEPTH != 1
     /*Make the style to be a little bit orange*/
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_ORANGE;
 
     /*If not empty or has border then emphasis the border*/
-    if (style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+    if(style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 
-    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
-    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
+    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
+    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
 #else
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
     style->body.border.width = 2;
 #endif
@@ -399,23 +370,23 @@ static void style_mod(lv_group_t * group, lv_style_t * style)
 
 static void style_mod_edit(lv_group_t * group, lv_style_t * style)
 {
-    (void) group;   /*Unused*/
+    (void)group; /*Unused*/
 
 #if LV_COLOR_DEPTH != 1
     /*Make the style to be a little bit orange*/
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_GREEN;
 
     /*If not empty or has border then emphasis the border*/
-    if (style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+    if(style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 
-    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
-    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
 #else
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
     style->body.border.width = 3;
 #endif
@@ -427,8 +398,6 @@ static void style_mod_edit(lv_group_t * group, lv_style_t * style)
  *   GLOBAL FUNCTIONS
  **********************/
 
-
-
 /**
  * Initialize the templ theme
  * @param hue [0..360] hue value from HSV color space to define the theme's base color
@@ -439,12 +408,12 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, lv_font_t * font)
 {
     if(font == NULL) font = LV_FONT_DEFAULT;
 
-    _hue = hue;
+    _hue  = hue;
     _font = font;
 
     /*For backward compatibility initialize all theme elements with a default style */
     uint16_t i;
-    lv_style_t ** style_p = (lv_style_t **) &theme.style;
+    lv_style_t ** style_p = (lv_style_t **)&theme.style;
     for(i = 0; i < LV_THEME_STYLE_COUNT; i++) {
         *style_p = &def;
         style_p++;
@@ -481,7 +450,7 @@ lv_theme_t * lv_theme_templ_init(uint16_t hue, lv_font_t * font)
     win_init();
 
 #if LV_USE_GROUP
-    theme.group.style_mod = style_mod;
+    theme.group.style_mod      = style_mod;
     theme.group.style_mod_edit = style_mod_edit;
 #endif
 
@@ -502,4 +471,3 @@ lv_theme_t * lv_theme_get_templ(void)
  **********************/
 
 #endif
-

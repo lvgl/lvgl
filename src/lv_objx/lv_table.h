@@ -33,7 +33,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #ifndef LV_TABLE_COL_MAX
-#define LV_TABLE_COL_MAX    12
+#define LV_TABLE_COL_MAX 12
 #endif
 
 #define LV_TABLE_CELL_STYLE_CNT 4
@@ -41,18 +41,21 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef union {
-    struct {
-        uint8_t align:2;
-        uint8_t right_merge:1;
-        uint8_t type:2;
-        uint8_t crop:1;
+typedef union
+{
+    struct
+    {
+        uint8_t align : 2;
+        uint8_t right_merge : 1;
+        uint8_t type : 2;
+        uint8_t crop : 1;
     } s;
     uint8_t format_byte;
-}lv_table_cell_format_t;
+} lv_table_cell_format_t;
 
 /*Data of table*/
-typedef struct {
+typedef struct
+{
     /*New data for this type */
     uint16_t col_cnt;
     uint16_t row_cnt;
@@ -60,7 +63,6 @@ typedef struct {
     lv_style_t * cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
 } lv_table_ext_t;
-
 
 /*Styles*/
 enum {
@@ -71,7 +73,6 @@ enum {
     LV_TABLE_STYLE_CELL4,
 };
 typedef uint8_t lv_table_style_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -94,7 +95,8 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
  * @param col id of the column [0 .. col_cnt -1]
- * @param txt text to display in the cell. It will be copied and saved so this variable is not required after this function call.
+ * @param txt text to display in the cell. It will be copied and saved so this variable is not
+ * required after this function call.
  */
 void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const char * txt);
 
@@ -204,7 +206,8 @@ lv_coord_t lv_table_get_col_width(lv_obj_t * table, uint16_t col_id);
  * @param table pointer to a Table object
  * @param row id of the row [0 .. row_cnt -1]
  * @param col id of the column [0 .. col_cnt -1]
- * @return LV_LABEL_ALIGN_LEFT (default in case of error) or LV_LABEL_ALIGN_CENTER or LV_LABEL_ALIGN_RIGHT
+ * @return LV_LABEL_ALIGN_LEFT (default in case of error) or LV_LABEL_ALIGN_CENTER or
+ * LV_LABEL_ALIGN_RIGHT
  */
 lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_t col);
 
@@ -216,7 +219,6 @@ lv_label_align_t lv_table_get_cell_align(lv_obj_t * table, uint16_t row, uint16_
  * @return 1,2,3 or 4
  */
 lv_label_align_t lv_table_get_cell_type(lv_obj_t * table, uint16_t row, uint16_t col);
-
 
 /**
  * Get the crop property of a cell
@@ -252,10 +254,10 @@ lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_TABLE*/
+#endif /*LV_USE_TABLE*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_TABLE_H*/
+#endif /*LV_TABLE_H*/

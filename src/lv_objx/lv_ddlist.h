@@ -46,17 +46,17 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t *label;                     /*Label for the options*/
-    lv_style_t * sel_style;              /*Style of the selected option*/
-    uint16_t option_cnt;                 /*Number of options*/
-    uint16_t sel_opt_id;                 /*Index of the current option*/
-    uint16_t sel_opt_id_ori;             /*Store the original index on focus*/
-    uint16_t anim_time;                  /*Open/Close animation time [ms]*/
-    uint8_t opened :1;                   /*1: The list is opened (handled by the library)*/
-    uint8_t force_sel :1;				 /*1: Keep the selection highlight even if the list is closed*/
-    uint8_t draw_arrow :1;               /*1: Draw arrow*/
-    uint8_t stay_open :1;              /*1: Don't close the list when a new item is selected*/
-    lv_coord_t fix_height;               /*Height of the ddlist when opened. (0: auto-size)*/
+    lv_obj_t * label;        /*Label for the options*/
+    lv_style_t * sel_style;  /*Style of the selected option*/
+    uint16_t option_cnt;     /*Number of options*/
+    uint16_t sel_opt_id;     /*Index of the current option*/
+    uint16_t sel_opt_id_ori; /*Store the original index on focus*/
+    uint16_t anim_time;      /*Open/Close animation time [ms]*/
+    uint8_t opened : 1;      /*1: The list is opened (handled by the library)*/
+    uint8_t force_sel : 1;   /*1: Keep the selection highlight even if the list is closed*/
+    uint8_t draw_arrow : 1;  /*1: Draw arrow*/
+    uint8_t stay_open : 1;   /*1: Don't close the list when a new item is selected*/
+    lv_coord_t fix_height;   /*Height of the ddlist when opened. (0: auto-size)*/
 } lv_ddlist_ext_t;
 
 enum {
@@ -72,7 +72,8 @@ typedef uint8_t lv_ddlist_style_t;
 /**
  * Create a drop down list objects
  * @param par pointer to an object, it will be the parent of the new drop down list
- * @param copy pointer to a drop down list object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a drop down list object, if not NULL then the new object will be copied
+ * from it
  * @return pointer to the created drop down list
  */
 lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy);
@@ -102,7 +103,6 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
  * @param h the height when the list is opened (0: auto size)
  */
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h);
-
 
 /**
  * Enable or disable the horizontal fit to the content
@@ -142,26 +142,24 @@ static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_sb_mode_t mode)
  */
 void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
 
-
 /**
  * Set a style of a drop down list
  * @param ddlist pointer to a drop down list object
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_ddlist_set_style(lv_obj_t *ddlist, lv_ddlist_style_t type, lv_style_t *style);
+void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, lv_style_t * style);
 
 /**
  * Set the alignment of the labels in a drop down list
  * @param ddlist pointer to a drop down list object
  * @param align alignment of labels
  */
-void lv_ddlist_set_align(lv_obj_t *ddlist, lv_label_align_t align);
+void lv_ddlist_set_align(lv_obj_t * ddlist, lv_label_align_t align);
 
 /*=====================
  * Getter functions
  *====================*/
-
 
 /**
  * Get the options of a drop down list
@@ -227,14 +225,14 @@ uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ddlist_get_style(const lv_obj_t *ddlist, lv_ddlist_style_t type);
+lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type);
 
 /**
  * Get the alignment of the labels in a drop down list
  * @param ddlist pointer to a drop down list object
  * @return alignment of labels
  */
-lv_label_align_t lv_ddlist_get_align(const lv_obj_t *ddlist);
+lv_label_align_t lv_ddlist_get_align(const lv_obj_t * ddlist);
 
 /*=====================
  * Other functions
@@ -258,10 +256,10 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim_en);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_DDLIST*/
+#endif /*LV_USE_DDLIST*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_DDLIST_H*/
+#endif /*LV_DDLIST_H*/

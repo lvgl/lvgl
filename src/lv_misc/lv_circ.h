@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -74,6 +73,5 @@ void lv_circ_next(lv_point_t * c, lv_coord_t * tmp);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
 
 #endif

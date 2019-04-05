@@ -49,7 +49,7 @@ enum {
     LV_CURSOR_BLOCK,
     LV_CURSOR_OUTLINE,
     LV_CURSOR_UNDERLINE,
-    LV_CURSOR_HIDDEN = 0x08,    /*Or it to any value to hide the cursor temporally*/
+    LV_CURSOR_HIDDEN = 0x08, /*Or it to any value to hide the cursor temporally*/
 };
 typedef uint8_t lv_cursor_type_t;
 
@@ -58,26 +58,31 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * label;           /*Label of the text area*/
-    lv_obj_t * placeholder;     /*Place holder label of the text area, only visible if text is an empty string*/
-    char * pwd_tmp;             /*Used to store the original text in password mode*/
-    const char * accapted_chars;/*Only these characters will be accepted. NULL: accept all*/
-    uint16_t max_length;        /*The max. number of characters. 0: no limit*/
-    uint8_t pwd_mode :1;        /*Replace characters with '*' */
-    uint8_t one_line :1;        /*One line mode (ignore line breaks)*/
-    struct {
-        lv_style_t *style;      /*Style of the cursor (NULL to use label's style)*/
-        lv_coord_t valid_x;     /*Used when stepping up/down in text area when stepping to a shorter line. (Handled by the library)*/
-        uint16_t pos;           /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
-        lv_area_t area;         /*Cursor area relative to the Text Area*/
-        uint16_t txt_byte_pos;  /*Byte index of the letter after (on) the cursor*/
-        lv_cursor_type_t type:4;  /*Shape of the cursor*/
-        uint8_t state :1;       /*Indicates that the cursor is visible now or not (Handled by the library)*/
+    lv_obj_t * label;       /*Label of the text area*/
+    lv_obj_t * placeholder; /*Place holder label of the text area, only visible if text is an empty
+                               string*/
+    char * pwd_tmp;         /*Used to store the original text in password mode*/
+    const char * accapted_chars; /*Only these characters will be accepted. NULL: accept all*/
+    uint16_t max_length;         /*The max. number of characters. 0: no limit*/
+    uint8_t pwd_mode : 1;        /*Replace characters with '*' */
+    uint8_t one_line : 1;        /*One line mode (ignore line breaks)*/
+    struct
+    {
+        lv_style_t * style; /*Style of the cursor (NULL to use label's style)*/
+        lv_coord_t valid_x; /*Used when stepping up/down in text area when stepping to a shorter
+                               line. (Handled by the library)*/
+        uint16_t
+            pos; /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
+        lv_area_t area;            /*Cursor area relative to the Text Area*/
+        uint16_t txt_byte_pos;     /*Byte index of the letter after (on) the cursor*/
+        lv_cursor_type_t type : 4; /*Shape of the cursor*/
+        uint8_t
+            state : 1; /*Indicates that the cursor is visible now or not (Handled by the library)*/
     } cursor;
-    int tmp_sel_start;			/*Temporary value*/
-    int tmp_sel_end;			/*Temporary value*/
-    uint8_t selecting :1;		/*User is in process of selecting */
-    uint8_t sel_mode :1;		/*Text can be selected on this text area*/
+    int tmp_sel_start;     /*Temporary value*/
+    int tmp_sel_end;       /*Temporary value*/
+    uint8_t selecting : 1; /*User is in process of selecting */
+    uint8_t sel_mode : 1;  /*Text can be selected on this text area*/
 } lv_ta_ext_t;
 
 enum {
@@ -93,7 +98,6 @@ typedef uint8_t lv_ta_style_t;
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Create a text area objects
  * @param par pointer to an object, it will be the parent of the new text area
@@ -101,7 +105,6 @@ typedef uint8_t lv_ta_style_t;
  * @return pointer to the created text area
  */
 lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy);
-
 
 /*======================
  * Add/remove functions
@@ -146,10 +149,10 @@ void lv_ta_del_char_forward(lv_obj_t * ta);
 void lv_ta_set_text(lv_obj_t * ta, const char * txt);
 
 /**
-* Set the placeholder text of a text area
-* @param ta pointer to a text area
-* @param txt pointer to the text
-*/
+ * Set the placeholder text of a text area
+ * @param ta pointer to a text area
+ * @param txt pointer to the text
+ */
 void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt);
 
 /**
@@ -210,7 +213,8 @@ void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num);
  * It can be used to add automatic formatting to the text area.
  * @param ta pointer to a text area.
  * @param txt pointer to a new string to insert. If `""` no text will be added.
- *            The variable must be live after the `event_cb` exists. (Should be `global` or `static`)
+ *            The variable must be live after the `event_cb` exists. (Should be `global` or
+ * `static`)
  */
 void lv_ta_set_insert_replace(lv_obj_t * ta, const char * txt);
 
@@ -225,7 +229,8 @@ static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_sb_mode_t mode)
 }
 
 /**
- * Enable the scroll propagation feature. If enabled then the Text area will move its parent if there is no more space to scroll.
+ * Enable the scroll propagation feature. If enabled then the Text area will move its parent if
+ * there is no more space to scroll.
  * @param ta pointer to a Text area
  * @param en true or false to enable/disable scroll propagation
  */
@@ -250,14 +255,14 @@ static inline void lv_ta_set_edge_flash(lv_obj_t * ta, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_ta_set_style(lv_obj_t *ta, lv_ta_style_t type, lv_style_t *style);
+void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style);
 
 /**
  * Enable/disable selection mode.
  * @param ta pointer to a text area object
  * @param en true or false to enable/disable selection mode
  */
-void lv_ta_set_sel_mode(lv_obj_t *ta, bool en);
+void lv_ta_set_sel_mode(lv_obj_t * ta, bool en);
 
 /*=====================
  * Getter functions
@@ -271,10 +276,10 @@ void lv_ta_set_sel_mode(lv_obj_t *ta, bool en);
 const char * lv_ta_get_text(const lv_obj_t * ta);
 
 /**
-* Get the placeholder text of a text area
-* @param ta pointer to a text area object
-* @return pointer to the text
-*/
+ * Get the placeholder text of a text area
+ * @param ta pointer to a text area object
+ * @return pointer to the text
+ */
 const char * lv_ta_get_placeholder_text(lv_obj_t * ta);
 
 /**
@@ -296,7 +301,7 @@ uint16_t lv_ta_get_cursor_pos(const lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return true: the cursor is drawn, false: the cursor is hidden
  */
-//bool lv_ta_get_cursor_show(const lv_obj_t * ta);
+// bool lv_ta_get_cursor_show(const lv_obj_t * ta);
 
 /**
  * Get the current cursor type.
@@ -369,7 +374,7 @@ static inline bool lv_ta_get_edge_flash(lv_obj_t * ta)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ta_get_style(const lv_obj_t *ta, lv_ta_style_t type);
+lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type);
 
 /**
  * Get the selection index of the text area.
@@ -388,14 +393,14 @@ void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end);
  * @param ta Text area object
  * @return whether text is selected or not
  */
-bool lv_ta_text_is_selected(const lv_obj_t *ta);
+bool lv_ta_text_is_selected(const lv_obj_t * ta);
 
 /**
  * Find whether selection mode is enabled.
  * @param ta pointer to a text area object
  * @return true: selection mode is enabled, false: disabled
  */
-bool lv_ta_get_sel_mode(lv_obj_t *ta);
+bool lv_ta_get_sel_mode(lv_obj_t * ta);
 
 /*=====================
  * Other functions
@@ -435,10 +440,10 @@ void lv_ta_cursor_up(lv_obj_t * ta);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_TA_H*/
+#endif /*LV_USE_TA_H*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_TA_H*/
+#endif /*LV_TA_H*/

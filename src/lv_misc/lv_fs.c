@@ -14,7 +14,7 @@
 #include "lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#   include LV_GC_INCLUDE
+#include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -39,7 +39,6 @@
 static const char * lv_fs_get_real_path(const char * path);
 static lv_fs_drv_t * lv_fs_get_drv(char letter);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -61,7 +60,8 @@ void lv_fs_init(void)
 }
 
 /**
- * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be returned.
+ * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be
+ * returned.
  * @param letter letter of the drive
  * @return true: drive is ready; false: drive is not ready
  */
@@ -69,9 +69,9 @@ bool lv_fs_is_ready(char letter)
 {
     lv_fs_drv_t * drv = lv_fs_get_drv(letter);
 
-    if(drv == NULL) return false;                      /*An unknown driver in not ready*/
+    if(drv == NULL) return false; /*An unknown driver in not ready*/
 
-    if(drv->ready == NULL) return true;                /*Assume the driver is always ready if no handler provided*/
+    if(drv->ready == NULL) return true; /*Assume the driver is always ready if no handler provided*/
 
     return drv->ready();
 }
@@ -85,7 +85,7 @@ bool lv_fs_is_ready(char letter)
  */
 lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode)
 {
-    file_p->drv = NULL;
+    file_p->drv    = NULL;
     file_p->file_d = NULL;
 
     if(path == NULL) return LV_FS_RES_INV_PARAM;
@@ -101,7 +101,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
     if(file_p->drv->ready != NULL) {
         if(file_p->drv->ready() == false) {
-            file_p->drv = NULL;
+            file_p->drv    = NULL;
             file_p->file_d = NULL;
             return LV_FS_RES_HW_ERR;
         }
@@ -111,7 +111,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     lv_mem_assert(file_p->file_d);
     if(file_p->file_d == NULL) {
         file_p->drv = NULL;
-        return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
+        return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
     }
 
     if(file_p->drv->open == NULL) {
@@ -119,12 +119,12 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    lv_fs_res_t res = file_p->drv->open(file_p->file_d, real_path, mode);
+    lv_fs_res_t res        = file_p->drv->open(file_p->file_d, real_path, mode);
 
     if(res != LV_FS_RES_OK) {
         lv_mem_free(file_p->file_d);
         file_p->file_d = NULL;
-        file_p->drv = NULL;
+        file_p->drv    = NULL;
     }
 
     return res;
@@ -147,9 +147,9 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 
     lv_fs_res_t res = file_p->drv->close(file_p->file_d);
 
-    lv_mem_free(file_p->file_d);   /*Clean up*/
+    lv_mem_free(file_p->file_d); /*Clean up*/
     file_p->file_d = NULL;
-    file_p->drv = NULL;
+    file_p->drv    = NULL;
     file_p->file_d = NULL;
 
     return res;
@@ -176,7 +176,7 @@ lv_fs_res_t lv_fs_remove(const char * path)
     if(drv->remove == NULL) return LV_FS_RES_NOT_IMP;
 
     const char * real_path = lv_fs_get_real_path(path);
-    lv_fs_res_t res = drv->remove(real_path);
+    lv_fs_res_t res        = drv->remove(real_path);
 
     return res;
 }
@@ -224,7 +224,7 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
 
     uint32_t bw_tmp = 0;
     lv_fs_res_t res = file_p->drv->write(file_p->file_d, buf, btw, &bw_tmp);
-    if(bw != NULL)  *bw = bw_tmp;
+    if(bw != NULL) *bw = bw_tmp;
 
     return res;
 }
@@ -256,7 +256,7 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos)
  * @param pos_p pointer to store the position of the read write pointer
  * @return LV_FS_RES_OK or any error from 'fs_res_t'
  */
-lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t  * pos)
+lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
 {
     if(file_p->drv == NULL) {
         pos = 0;
@@ -307,7 +307,6 @@ lv_fs_res_t lv_fs_size(lv_fs_file_t * file_p, uint32_t * size)
 
     if(file_p->drv->size == NULL) return LV_FS_RES_NOT_IMP;
 
-
     if(size == NULL) return LV_FS_RES_INV_PARAM;
 
     lv_fs_res_t res = file_p->drv->size(file_p->file_d, size);
@@ -343,11 +342,10 @@ lv_fs_res_t lv_fs_rename(const char * oldname, const char * newname)
 
     const char * old_real = lv_fs_get_real_path(oldname);
     const char * new_real = lv_fs_get_real_path(newname);
-    lv_fs_res_t res = drv->rename(old_real, new_real);
+    lv_fs_res_t res       = drv->rename(old_real, new_real);
 
     return res;
 }
-
 
 /**
  * Initialize a 'fs_read_dir_t' variable for directory reading
@@ -372,7 +370,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
     lv_mem_assert(rddir_p->dir_d);
     if(rddir_p->dir_d == NULL) {
         rddir_p->dir_d = NULL;
-        return LV_FS_RES_OUT_OF_MEM;  /* Out of memory */
+        return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
     }
 
     if(rddir_p->drv->dir_open == NULL) {
@@ -380,7 +378,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    lv_fs_res_t res = rddir_p->drv->dir_open(rddir_p->dir_d, real_path);
+    lv_fs_res_t res        = rddir_p->drv->dir_open(rddir_p->dir_d, real_path);
 
     return res;
 }
@@ -422,14 +420,14 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
     lv_fs_res_t res;
 
     if(rddir_p->drv->dir_close == NULL) {
-        res =  LV_FS_RES_NOT_IMP;
+        res = LV_FS_RES_NOT_IMP;
     } else {
         res = rddir_p->drv->dir_close(rddir_p->dir_d);
     }
 
-    lv_mem_free(rddir_p->dir_d);   /*Clean up*/
+    lv_mem_free(rddir_p->dir_d); /*Clean up*/
     rddir_p->dir_d = NULL;
-    rddir_p->drv = NULL;
+    rddir_p->drv   = NULL;
     rddir_p->dir_d = NULL;
 
     return res;
@@ -453,11 +451,11 @@ lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
     lv_fs_res_t res;
 
     if(drv->free_space == NULL) {
-        res =  LV_FS_RES_NOT_IMP;
+        res = LV_FS_RES_NOT_IMP;
     } else {
         uint32_t total_tmp = 0;
-        uint32_t free_tmp = 0;
-        res = drv->free_space(&total_tmp, &free_tmp);
+        uint32_t free_tmp  = 0;
+        res                = drv->free_space(&total_tmp, &free_tmp);
 
         if(total_p != NULL) *total_p = total_tmp;
         if(free_p != NULL) *free_p = free_tmp;
@@ -475,7 +473,7 @@ void lv_fs_add_drv(lv_fs_drv_t * drv_p)
 {
     /*Save the new driver*/
     lv_fs_drv_t * new_drv;
-    new_drv =  lv_ll_ins_head(&LV_GC_ROOT(_lv_drv_ll));
+    new_drv = lv_ll_ins_head(&LV_GC_ROOT(_lv_drv_ll));
     lv_mem_assert(new_drv);
     if(new_drv == NULL) return;
 
@@ -487,12 +485,13 @@ void lv_fs_add_drv(lv_fs_drv_t * drv_p)
  * @param buf buffer to store the letters ('\0' added after the last letter)
  * @return the buffer
  */
-char  * lv_fs_get_letters(char * buf)
+char * lv_fs_get_letters(char * buf)
 {
     lv_fs_drv_t * drv;
     uint8_t i = 0;
 
-    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
+    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv)
+    {
         buf[i] = drv->letter;
         i++;
     }
@@ -502,7 +501,6 @@ char  * lv_fs_get_letters(char * buf)
     return buf;
 }
 
-
 /**
  * Return with the extension of the filename
  * @param fn string with a filename
@@ -511,11 +509,11 @@ char  * lv_fs_get_letters(char * buf)
 const char * lv_fs_get_ext(const char * fn)
 {
     uint16_t i;
-    for(i = strlen(fn); i > 0; i --) {
+    for(i = strlen(fn); i > 0; i--) {
         if(fn[i] == '.') {
             return &fn[i + 1];
         } else if(fn[i] == '/' || fn[i] == '\\') {
-            return "";  /*No extension if a '\' or '/' found*/
+            return ""; /*No extension if a '\' or '/' found*/
         }
     }
 
@@ -532,17 +530,19 @@ char * lv_fs_up(char * path)
     uint16_t len = strlen(path);
     if(len == 0) return path;
 
-    len --; /*Go before the trailing '\0'*/
+    len--; /*Go before the trailing '\0'*/
 
     /*Ignore trailing '/' or '\'*/
     while(path[len] == '/' || path[len] == '\\') {
         path[len] = '\0';
-        if(len > 0) len --;
-        else return path;
+        if(len > 0)
+            len--;
+        else
+            return path;
     }
 
     uint16_t i;
-    for(i = len; i > 0; i --) {
+    for(i = len; i > 0; i--) {
         if(path[i] == '/' || path[i] == '\\') break;
     }
 
@@ -561,16 +561,18 @@ const char * lv_fs_get_last(const char * path)
     uint16_t len = strlen(path);
     if(len == 0) return path;
 
-    len --; /*Go before the trailing '\0'*/
+    len--; /*Go before the trailing '\0'*/
 
     /*Ignore trailing '/' or '\'*/
     while(path[len] == '/' || path[len] == '\\') {
-        if(len > 0) len --;
-        else return path;
+        if(len > 0)
+            len--;
+        else
+            return path;
     }
 
     uint16_t i;
-    for(i = len; i > 0; i --) {
+    for(i = len; i > 0; i--) {
         if(path[i] == '/' || path[i] == '\\') break;
     }
 
@@ -593,11 +595,11 @@ static const char * lv_fs_get_real_path(const char * path)
     /* Example path: "S:/folder/file.txt"
      * Leave the letter and the : / \ characters*/
 
-    path ++; /*Ignore the driver letter*/
+    path++; /*Ignore the driver letter*/
 
     while(*path != '\0') {
         if(*path == ':' || *path == '\\' || *path == '/') {
-            path ++;
+            path++;
         } else {
             break;
         }
@@ -615,7 +617,8 @@ static lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t * drv;
 
-    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
+    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv)
+    {
         if(drv->letter == letter) {
             return drv;
         }

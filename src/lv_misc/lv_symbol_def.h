@@ -1,5 +1,6 @@
 #ifndef LV_SYMBOL_DEF_H
 #define LV_SYMBOL_DEF_H
+/* clang-format off */
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,16 +10,6 @@ extern "C" {
 #else
 #include "../../../lv_conf.h"
 #endif
-
-/*
- * With no UTF-8 support (192- 255) (192..241 is used)
- *
- * With UTF-8 support (in Supplemental Private Use Area-A): 0xF800 .. 0xF831
- * - Basic symbols:     0xE000..0xE01F
- * - File symbols:      0xE020..0xE03F
- * - Feedback symbols:  0xE040..0xE05F
- * - Reserved:          0xE060..0xE07F
- */
 
 #define LV_SYMBOL_GLYPH_FIRST  0xF800
 #define LV_SYMBOL_AUDIO           _LV_SYMBOL_VALUE3(EF,A0,80)

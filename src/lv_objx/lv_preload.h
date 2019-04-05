@@ -48,14 +48,14 @@ enum {
 typedef uint8_t lv_preload_type_t;
 
 /*Data of pre loader*/
-typedef struct {
+typedef struct
+{
     lv_arc_ext_t arc; /*Ext. of ancestor*/
     /*New data for this type */
-    uint16_t arc_length;            /*Length of the spinning indicator in degree*/
-    uint16_t time;                  /*Time of one round*/
-    lv_preload_type_t anim_type;  /*Type of the arc animation*/
+    uint16_t arc_length;         /*Length of the spinning indicator in degree*/
+    uint16_t time;               /*Time of one round*/
+    lv_preload_type_t anim_type; /*Type of the arc animation*/
 } lv_preload_ext_t;
-
 
 /*Styles*/
 enum {
@@ -70,7 +70,8 @@ typedef uint8_t lv_preload_style_t;
 /**
  * Create a pre loader objects
  * @param par pointer to an object, it will be the parent of the new pre loader
- * @param copy pointer to a pre loader object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a pre loader object, if not NULL then the new object will be copied from
+ * it
  * @return pointer to the created pre loader
  */
 lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy);
@@ -103,7 +104,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_t *style);
+void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_t * style);
 
 /**
  * Set the animation type of a preloadeer.
@@ -159,10 +160,10 @@ void lv_preload_spinner_animation(void * ptr, int32_t val);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_PRELOAD*/
+#endif /*LV_USE_PRELOAD*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_PRELOAD_H*/
+#endif /*LV_PRELOAD_H*/

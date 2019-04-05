@@ -41,7 +41,6 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
  *      MACROS
  **********************/
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

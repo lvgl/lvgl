@@ -40,15 +40,16 @@ extern "C" {
 /*Data of switch*/
 typedef struct
 {
-    lv_slider_ext_t slider;         /*Ext. of ancestor*/
+    lv_slider_ext_t slider; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t *style_knob_off;     /*Style of the knob when the switch is OFF*/
-    lv_style_t *style_knob_on;      /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
+    lv_style_t * style_knob_off; /*Style of the knob when the switch is OFF*/
+    lv_style_t *
+        style_knob_on; /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
     lv_coord_t start_x;
-    uint8_t changed   :1;           /*Indicates the switch state explicitly changed by drag*/
-    uint8_t slided  :1;
+    uint8_t changed : 1; /*Indicates the switch state explicitly changed by drag*/
+    uint8_t slided : 1;
 #if LV_USE_ANIMATION
-    uint16_t anim_time;				/*switch animation time */
+    uint16_t anim_time; /*switch animation time */
 #endif
 } lv_sw_ext_t;
 
@@ -81,14 +82,14 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param sw pointer to a switch object
  * @param anim true: set the value with an animation; false: change the value immediatelly
  */
-void lv_sw_on(lv_obj_t *sw, bool anim);
+void lv_sw_on(lv_obj_t * sw, bool anim);
 
 /**
  * Turn OFF the switch
  * @param sw pointer to a switch object
  * @param anim true: set the value with an animation; false: change the value immediatelly
  */
-void lv_sw_off(lv_obj_t *sw, bool anim);
+void lv_sw_off(lv_obj_t * sw, bool anim);
 
 /**
  * Toggle the position of the switch
@@ -96,7 +97,7 @@ void lv_sw_off(lv_obj_t *sw, bool anim);
  * @param anim true: set the value with an animation; false: change the value immediatelly
  * @return resulting state of the switch.
  */
-bool lv_sw_toggle(lv_obj_t *sw, bool anim);
+bool lv_sw_toggle(lv_obj_t * sw, bool anim);
 
 /**
  * Set a style of a switch
@@ -104,7 +105,7 @@ bool lv_sw_toggle(lv_obj_t *sw, bool anim);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style);
+void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style);
 
 #if LV_USE_ANIMATION
 /**
@@ -113,7 +114,7 @@ void lv_sw_set_style(lv_obj_t *sw, lv_sw_style_t type, lv_style_t *style);
  * @param anim_time animation time
  * @return style pointer to a style
  */
-void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time);
+void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time);
 #endif
 
 /*=====================
@@ -125,7 +126,7 @@ void lv_sw_set_anim_time(lv_obj_t *sw, uint16_t anim_time);
  * @param sw pointer to a switch object
  * @return false: OFF; true: ON
  */
-static inline bool lv_sw_get_state(const lv_obj_t *sw)
+static inline bool lv_sw_get_state(const lv_obj_t * sw)
 {
     return lv_bar_get_value(sw) < LV_SW_MAX_VALUE / 2 ? false : true;
 }
@@ -136,23 +137,23 @@ static inline bool lv_sw_get_state(const lv_obj_t *sw)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_sw_get_style(const lv_obj_t *sw, lv_sw_style_t type);
+lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type);
 
 /**
  * Get the animation time of the switch
  * @param sw pointer to a  switch object
  * @return style pointer to a style
  */
-uint16_t lv_sw_get_anim_time(const lv_obj_t *sw);
+uint16_t lv_sw_get_anim_time(const lv_obj_t * sw);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_SW*/
+#endif /*LV_USE_SW*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_SW_H*/
+#endif /*LV_SW_H*/

@@ -19,47 +19,52 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_IMG_DECODER_OPEN_FAIL    ((void*)(-1))
+#define LV_IMG_DECODER_OPEN_FAIL ((void *)(-1))
 
 /**********************
  *      TYPEDEFS
  **********************/
 struct _lv_img_t;
 
-typedef struct {
+typedef struct
+{
 
     /* The first 8 bit is very important to distinguish the different source types.
      * For more info see `lv_img_get_src_type()` in lv_img.c */
-    uint32_t cf           :5;    /* Color format: See `lv_img_color_format_t`*/
-    uint32_t always_zero  :3;    /*It the upper bits of the first byte. Always zero to look like a non-printable character*/
+    uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
+    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
+                                 non-printable character*/
 
-    uint32_t reserved     :2;   /*Reserved to be used later*/
+    uint32_t reserved : 2; /*Reserved to be used later*/
 
-    uint32_t w:11;              /*Width of the image map*/
-    uint32_t h:11;              /*Height of the image map*/
+    uint32_t w : 11; /*Width of the image map*/
+    uint32_t h : 11; /*Height of the image map*/
 } lv_img_header_t;
 
 /*Image color format*/
 enum {
     LV_IMG_CF_UNKNOWN = 0,
 
-    LV_IMG_CF_RAW,                  /*Contains the file as it is. Needs custom decoder function*/
-    LV_IMG_CF_RAW_ALPHA,            /*Contains the file as it is. The image has alpha. Needs custom decoder function*/
-    LV_IMG_CF_RAW_CHROMA_KEYED,     /*Contains the file as it is. The image is chroma keyed. Needs custom decoder function*/
+    LV_IMG_CF_RAW,       /*Contains the file as it is. Needs custom decoder function*/
+    LV_IMG_CF_RAW_ALPHA, /*Contains the file as it is. The image has alpha. Needs custom decoder
+                            function*/
+    LV_IMG_CF_RAW_CHROMA_KEYED, /*Contains the file as it is. The image is chroma keyed. Needs
+                                   custom decoder function*/
 
-    LV_IMG_CF_TRUE_COLOR,           /*Color format and depth should match with LV_COLOR settings*/
-    LV_IMG_CF_TRUE_COLOR_ALPHA,     /*Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
-    LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED,  /*Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels will be transparent*/
+    LV_IMG_CF_TRUE_COLOR,       /*Color format and depth should match with LV_COLOR settings*/
+    LV_IMG_CF_TRUE_COLOR_ALPHA, /*Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
+    LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, /*Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels
+                                          will be transparent*/
 
-    LV_IMG_CF_INDEXED_1BIT,         /*Can have 2 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_2BIT,         /*Can have 4 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_4BIT,         /*Can have 16 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_8BIT,         /*Can have 256 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_1BIT, /*Can have 2 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_2BIT, /*Can have 4 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_4BIT, /*Can have 16 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_8BIT, /*Can have 256 different colors in a palette (always chroma keyed)*/
 
-    LV_IMG_CF_ALPHA_1BIT,           /*Can have one color and it can be drawn or not*/
-    LV_IMG_CF_ALPHA_2BIT,           /*Can have one color but 4 different alpha value*/
-    LV_IMG_CF_ALPHA_4BIT,           /*Can have one color but 16 different alpha value*/
-    LV_IMG_CF_ALPHA_8BIT,           /*Can have one color but 256 different alpha value*/
+    LV_IMG_CF_ALPHA_1BIT, /*Can have one color and it can be drawn or not*/
+    LV_IMG_CF_ALPHA_2BIT, /*Can have one color but 4 different alpha value*/
+    LV_IMG_CF_ALPHA_4BIT, /*Can have one color but 16 different alpha value*/
+    LV_IMG_CF_ALPHA_8BIT, /*Can have one color but 256 different alpha value*/
 };
 typedef uint8_t lv_img_cf_t;
 
@@ -74,10 +79,10 @@ typedef struct
 
 /* Decoder function definitions */
 
-
 /**
  * Get info from an image and store in the `header`
- * @param src the image source. Can be a pointer to a C array or a file name (Use `lv_img_src_get_type` to determine the type)
+ * @param src the image source. Can be a pointer to a C array or a file name (Use
+ * `lv_img_src_get_type` to determine the type)
  * @param header store the info here
  * @return LV_RES_OK: info written correctly; LV_RES_INV: failed
  */
@@ -85,12 +90,14 @@ typedef lv_res_t (*lv_img_decoder_info_f_t)(const void * src, lv_img_header_t * 
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
- * @param src the image source. Can be a pointer to a C array or a file name (Use `lv_img_src_get_type` to determine the type)
+ * @param src the image source. Can be a pointer to a C array or a file name (Use
+ * `lv_img_src_get_type` to determine the type)
  * @param style the style of image (maybe it will be required to determine a color or something)
  * @return there are 3 possible return values:
  *    1) buffer with the decoded image
- *    2) if can decode the whole image NULL. decoder_read_line will be called to read the image line-by-line
- *    3) LV_IMG_DECODER_OPEN_FAIL if the image format is unknown to the decoder or an error occurred
+ *    2) if can decode the whole image NULL. decoder_read_line will be called to read the image
+ * line-by-line 3) LV_IMG_DECODER_OPEN_FAIL if the image format is unknown to the decoder or an
+ * error occurred
  */
 typedef const uint8_t * (*lv_img_decoder_open_f_t)(const void * src, const lv_style_t * style);
 
@@ -103,7 +110,8 @@ typedef const uint8_t * (*lv_img_decoder_open_f_t)(const void * src, const lv_st
  * @param buf a buffer to store the decoded pixels
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
-typedef lv_res_t (*lv_img_decoder_read_line_f_t)(lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+typedef lv_res_t (*lv_img_decoder_read_line_f_t)(lv_coord_t x, lv_coord_t y, lv_coord_t len,
+                                                 uint8_t * buf);
 
 /**
  * Close the pending decoding. Free resources etc.
@@ -122,9 +130,8 @@ typedef void (*lv_img_decoder_close_f_t)(void);
  * @param style style of the image
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask,
-                 const void * src, const lv_style_t * style, lv_opa_t opa_scale);
-
+void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+                 const lv_style_t * style, lv_opa_t opa_scale);
 
 /**
  * Initialize and `lv_img_dsc_t` variable with the image's info
@@ -145,25 +152,29 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header);
 lv_img_src_t lv_img_src_get_type(const void * src);
 
 /**
- * Set custom decoder functions. See the typdefs of the function typed above for more info about them
+ * Set custom decoder functions. See the typdefs of the function typed above for more info about
+ * them
  * @param info_fp info get function
  * @param open_fp open function
  * @param read_fp read line function
  * @param close_fp clode function
  */
-void lv_img_decoder_set_custom(lv_img_decoder_info_f_t  info_fp, lv_img_decoder_open_f_t  open_fp,
-                               lv_img_decoder_read_line_f_t read_fp, lv_img_decoder_close_f_t close_fp);
+void lv_img_decoder_set_custom(lv_img_decoder_info_f_t info_fp, lv_img_decoder_open_f_t open_fp,
+                               lv_img_decoder_read_line_f_t read_fp,
+                               lv_img_decoder_close_f_t close_fp);
 
 /**
  * Get the color of an image's pixel
  * @param dsc an image descriptor
  * @param x x coordinate of the point to get
  * @param y x coordinate of the point to get
- * @param style style of the image. In case of `LV_IMG_CF_ALPHA_1/2/4/8` `style->image.color` shows the color.
- *              Can be `NULL` but for `ALPHA` images black will be returned. In other cases it is not used.
+ * @param style style of the image. In case of `LV_IMG_CF_ALPHA_1/2/4/8` `style->image.color` shows
+ * the color. Can be `NULL` but for `ALPHA` images black will be returned. In other cases it is not
+ * used.
  * @return color of the point
  */
-lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_style_t * style);
+lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+                                   lv_style_t * style);
 /**
  * Get the alpha value of an image's pixel
  * @param dsc pointer to an image descriptor
@@ -171,7 +182,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y
  * @param y x coordinate of the point to set
  * @return alpha value of the point
  */
-lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y);
+lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set the color of a pixel of an image. The alpha channel won't be affected.
@@ -180,7 +191,7 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y);
  * @param y x coordinate of the point to set
  * @param c color of the point
  */
-void lv_img_buf_set_px_color(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_color_t c);
+void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c);
 
 /**
  * Set the alpha value of a pixel of an image. The color won't be affected
@@ -189,7 +200,7 @@ void lv_img_buf_set_px_color(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_c
  * @param y x coordinate of the point to set
  * @param opa the desired opacity
  */
-void lv_img_buf_set_px_alpha(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa);
+void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa);
 
 /**
  * Set the palette color of an indexed image. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
@@ -201,7 +212,7 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t *dsc, lv_coord_t x, lv_coord_t y, lv_o
  *   - for `LV_IMG_CF_INDEXED8`: 0..255
  * @param color the color to set
  */
-void lv_img_buf_set_palette(lv_img_dsc_t *dsc, int color_id, lv_color_t color);
+void lv_img_buf_set_palette(lv_img_dsc_t * dsc, int color_id, lv_color_t color);
 
 /**
  * Get the pixel size of a color format in bits
@@ -227,7 +238,6 @@ bool lv_img_color_format_has_alpha(lv_img_cf_t cf);
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /* extern "C" */

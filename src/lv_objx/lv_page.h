@@ -38,25 +38,24 @@ extern "C" {
  **********************/
 
 /*Scrollbar modes: shows when should the scrollbars be visible*/
-enum
-{
-    LV_SB_MODE_OFF  = 0x0,      /*Never show scrollbars*/
-    LV_SB_MODE_ON   = 0x1,      /*Always show scrollbars*/
-    LV_SB_MODE_DRAG = 0x2,      /*Show scrollbars when page is being dragged*/
-    LV_SB_MODE_AUTO = 0x3,      /*Show scrollbars when the scrollable container is large enough to be scrolled*/
-    LV_SB_MODE_HIDE = 0x4,      /*Hide the scroll bar temporally*/
-    LV_SB_MODE_UNHIDE = 0x5,    /*Unhide the previously hidden scrollbar. Recover it's type too*/
+enum {
+    LV_SB_MODE_OFF  = 0x0, /*Never show scrollbars*/
+    LV_SB_MODE_ON   = 0x1, /*Always show scrollbars*/
+    LV_SB_MODE_DRAG = 0x2, /*Show scrollbars when page is being dragged*/
+    LV_SB_MODE_AUTO =
+        0x3, /*Show scrollbars when the scrollable container is large enough to be scrolled*/
+    LV_SB_MODE_HIDE   = 0x4, /*Hide the scroll bar temporally*/
+    LV_SB_MODE_UNHIDE = 0x5, /*Unhide the previously hidden scrollbar. Recover it's type too*/
 };
 typedef uint8_t lv_sb_mode_t;
 
 /*Edges: describes the four edges of the page*/
 
-enum
-{
-	LV_PAGE_EDGE_LEFT = 0x0,
-	LV_PAGE_EDGE_TOP = 0x1,
-	LV_PAGE_EDGE_RIGHT = 0x2,
-	LV_PAGE_EDGE_BOTTOM = 0x3
+enum {
+    LV_PAGE_EDGE_LEFT   = 0x0,
+    LV_PAGE_EDGE_TOP    = 0x1,
+    LV_PAGE_EDGE_RIGHT  = 0x2,
+    LV_PAGE_EDGE_BOTTOM = 0x3
 };
 typedef uint8_t lv_page_edge_t;
 
@@ -65,28 +64,36 @@ typedef struct
 {
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * scrl;            /*The scrollable object on the background*/
-    struct {
-        lv_style_t *style;          /*Style of scrollbars*/
-        lv_area_t hor_area;            /*Horizontal scrollbar area relative to the page. (Handled by the library) */
-        lv_area_t ver_area;            /*Vertical scrollbar area relative to the page (Handled by the library)*/
-        uint8_t hor_draw :1;        /*1: horizontal scrollbar is visible now (Handled by the library)*/
-        uint8_t ver_draw :1;        /*1: vertical scrollbar is visible now (Handled by the library)*/
-        lv_sb_mode_t mode:3;        /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
+    lv_obj_t * scrl; /*The scrollable object on the background*/
+    struct
+    {
+        lv_style_t * style; /*Style of scrollbars*/
+        lv_area_t
+            hor_area; /*Horizontal scrollbar area relative to the page. (Handled by the library) */
+        lv_area_t
+            ver_area; /*Vertical scrollbar area relative to the page (Handled by the library)*/
+        uint8_t hor_draw : 1;  /*1: horizontal scrollbar is visible now (Handled by the library)*/
+        uint8_t ver_draw : 1;  /*1: vertical scrollbar is visible now (Handled by the library)*/
+        lv_sb_mode_t mode : 3; /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } sb;
-    struct {
-        uint16_t state;  /*Store the current size of the edge flash effect*/
-        lv_style_t *style;    /*Style of edge flash effect (usually homogeneous circle)*/
-        uint8_t enabled    :1;     /*1: Show a flash animation on the edge*/
-        uint8_t top_ip     :1;     /*Used internally to show that top most position is reached (flash is In Progress)*/
-        uint8_t bottom_ip  :1;     /*Used internally to show that bottom most position is reached (flash is In Progress)*/
-        uint8_t right_ip   :1;     /*Used internally to show that right most position is reached (flash is In Progress)*/
-        uint8_t left_ip    :1;     /*Used internally to show that left most position is reached (flash is In Progress)*/
-    }edge_flash;
+    struct
+    {
+        uint16_t state;      /*Store the current size of the edge flash effect*/
+        lv_style_t * style;  /*Style of edge flash effect (usually homogeneous circle)*/
+        uint8_t enabled : 1; /*1: Show a flash animation on the edge*/
+        uint8_t top_ip : 1; /*Used internally to show that top most position is reached (flash is In
+                               Progress)*/
+        uint8_t bottom_ip : 1; /*Used internally to show that bottom most position is reached (flash
+                                  is In Progress)*/
+        uint8_t right_ip : 1;  /*Used internally to show that right most position is reached (flash
+                                  is In Progress)*/
+        uint8_t left_ip : 1; /*Used internally to show that left most position is reached (flash is
+                                In Progress)*/
+    } edge_flash;
 
-    uint8_t arrow_scroll   :1;        /*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
-    uint8_t scroll_prop    :1;        /*1: Propagate the scrolling the the parent if the edge is reached*/
-    uint8_t scroll_prop_ip :1;        /*1: Scroll propagation is in progress (used by the library)*/
+    uint8_t arrow_scroll : 1;   /*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
+    uint8_t scroll_prop : 1;    /*1: Propagate the scrolling the the parent if the edge is reached*/
+    uint8_t scroll_prop_ip : 1; /*1: Scroll propagation is in progress (used by the library)*/
 } lv_page_ext_t;
 
 enum {
@@ -113,7 +120,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
  * Delete all children of the scrl object, without deleting scrl child.
  * @param obj pointer to an object
  */
-void lv_page_clean(lv_obj_t *obj);
+void lv_page_clean(lv_obj_t * obj);
 
 /**
  * Get the scrollable object of a page
@@ -134,14 +141,16 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page);
 void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
 
 /**
- * Enable/Disable scrolling with arrows if the page is in group (arrows: LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN)
+ * Enable/Disable scrolling with arrows if the page is in group (arrows:
+ * LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN)
  * @param page pointer to a page object
  * @param en true: enable scrolling with arrows
  */
 void lv_page_set_arrow_scroll(lv_obj_t * page, bool en);
 
 /**
- * Enable the scroll propagation feature. If enabled then the page will move its parent if there is no more space to scroll.
+ * Enable the scroll propagation feature. If enabled then the page will move its parent if there is
+ * no more space to scroll.
  * @param page pointer to a Page
  * @param en true or false to enable/disable scroll propagation
  */
@@ -154,7 +163,6 @@ void lv_page_set_scroll_propagation(lv_obj_t * page, bool en);
  */
 void lv_page_set_edge_flash(lv_obj_t * page, bool en);
 
-
 /**
  * Set the fit policy in all 4 directions separately.
  * It tell how to change the page size automatically.
@@ -164,7 +172,8 @@ void lv_page_set_edge_flash(lv_obj_t * page, bool en);
  * @param top bottom fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
-static inline void lv_page_set_scrl_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
+static inline void lv_page_set_scrl_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right,
+                                         lv_fit_t top, lv_fit_t bottom)
 {
     lv_cont_set_fit4(lv_page_get_scrl(page), left, right, top, bottom);
 }
@@ -197,7 +206,7 @@ static inline void lv_page_set_scrl_fit(lv_obj_t * page, lv_fit_t fit)
  * @param page pointer to a page object
  * @param w the new width of the scrollable (it ha no effect is horizontal fit is enabled)
  */
-static inline void lv_page_set_scrl_width(lv_obj_t *page, lv_coord_t w)
+static inline void lv_page_set_scrl_width(lv_obj_t * page, lv_coord_t w)
 {
     lv_obj_set_width(lv_page_get_scrl(page), w);
 }
@@ -207,17 +216,16 @@ static inline void lv_page_set_scrl_width(lv_obj_t *page, lv_coord_t w)
  * @param page pointer to a page object
  * @param h the new height of the scrollable (it ha no effect is vertical fit is enabled)
  */
-static inline void lv_page_set_scrl_height(lv_obj_t *page, lv_coord_t h)
+static inline void lv_page_set_scrl_height(lv_obj_t * page, lv_coord_t h)
 {
     lv_obj_set_height(lv_page_get_scrl(page), h);
-
 }
 
 /**
-* Set the layout of the scrollable part of the page
-* @param page pointer to a page object
-* @param layout a layout from 'lv_cont_layout_t'
-*/
+ * Set the layout of the scrollable part of the page
+ * @param page pointer to a page object
+ * @param layout a layout from 'lv_cont_layout_t'
+ */
 static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
 {
     lv_cont_set_layout(lv_page_get_scrl(page), layout);
@@ -229,7 +237,7 @@ static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_page_set_style(lv_obj_t *page, lv_page_style_t type, lv_style_t *style);
+void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -241,7 +249,6 @@ void lv_page_set_style(lv_obj_t *page, lv_page_style_t type, lv_style_t *style);
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
 lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
-
 
 /**
  * Get the the scrolling with arrows (LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
@@ -283,7 +290,7 @@ lv_coord_t lv_page_get_fit_height(lv_obj_t * page);
  * @param page pointer to a page object
  * @return the width of the scrollable
  */
-static inline lv_coord_t lv_page_get_scrl_width(const lv_obj_t *page)
+static inline lv_coord_t lv_page_get_scrl_width(const lv_obj_t * page)
 {
     return lv_obj_get_width(lv_page_get_scrl(page));
 }
@@ -293,16 +300,16 @@ static inline lv_coord_t lv_page_get_scrl_width(const lv_obj_t *page)
  * @param page pointer to a page object
  * @return the height of the scrollable
  */
-static inline lv_coord_t lv_page_get_scrl_height(const lv_obj_t *page)
+static inline lv_coord_t lv_page_get_scrl_height(const lv_obj_t * page)
 {
     return lv_obj_get_height(lv_page_get_scrl(page));
 }
 
 /**
-* Get the layout of the scrollable part of a page
-* @param page pointer to page object
-* @return the layout from 'lv_cont_layout_t'
-*/
+ * Get the layout of the scrollable part of a page
+ * @param page pointer to page object
+ * @return the layout from 'lv_cont_layout_t'
+ */
 static inline lv_layout_t lv_page_get_scrl_layout(const lv_obj_t * page)
 {
     return lv_cont_get_layout(lv_page_get_scrl(page));
@@ -354,12 +361,11 @@ static inline lv_fit_t lv_page_get_scrl_fit_bottom(const lv_obj_t * page)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_page_get_style(const lv_obj_t *page, lv_page_style_t type);
+lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type);
 
 /*=====================
  * Other functions
  *====================*/
-
 
 /**
  * Find whether the page has been scrolled to a certain edge.
@@ -367,7 +373,7 @@ lv_style_t * lv_page_get_style(const lv_obj_t *page, lv_page_style_t type);
  * @param edge Edge to check
  * @return true if the page is on the specified edge
  */
-bool lv_page_on_edge(lv_obj_t *page, lv_page_edge_t edge);
+bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge);
 
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
@@ -408,10 +414,10 @@ void lv_page_start_edge_flash(lv_obj_t * page);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_PAGE*/
+#endif /*LV_USE_PAGE*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_PAGE_H*/
+#endif /*LV_PAGE_H*/

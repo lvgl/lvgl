@@ -3,7 +3,6 @@
  *
  */
 
-
 #ifndef LV_SPINBOX_H
 #define LV_SPINBOX_H
 
@@ -33,7 +32,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_SPINBOX_MAX_DIGIT_COUNT	16
+#define LV_SPINBOX_MAX_DIGIT_COUNT 16
 
 /**********************
  *      TYPEDEFS
@@ -43,18 +42,18 @@ extern "C" {
 typedef void (*lv_spinbox_value_changed_cb_t)(lv_obj_t * spinbox, int32_t new_value);
 
 /*Data of spinbox*/
-typedef struct {
+typedef struct
+{
     lv_ta_ext_t ta; /*Ext. of ancestor*/
     /*New data for this type */
     int32_t value;
     int32_t range_max;
     int32_t range_min;
     int32_t step;
-    uint16_t digit_count:4;
-    uint16_t dec_point_pos:4;      /*if 0, there is no separator and the number is an integer*/
-    uint16_t digit_padding_left:4;
+    uint16_t digit_count : 4;
+    uint16_t dec_point_pos : 4; /*if 0, there is no separator and the number is an integer*/
+    uint16_t digit_padding_left : 4;
 } lv_spinbox_ext_t;
-
 
 /*Styles*/
 enum {
@@ -63,7 +62,6 @@ enum {
     LV_SPINBOX_STYLE_CURSOR,
 };
 typedef uint8_t lv_spinbox_style_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -87,7 +85,8 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param type which style should be set
  * @param style pointer to a style
  */
-static inline void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type, lv_style_t *style)
+static inline void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type,
+                                        lv_style_t * style)
 {
     lv_ta_set_style(spinbox, type, style);
 }
@@ -103,9 +102,11 @@ void lv_spinbox_set_value(lv_obj_t * spinbox, int32_t i);
  * Set spinbox digit format (digit count and decimal format)
  * @param spinbox pointer to spinbox
  * @param digit_count number of digit excluding the decimal separator and the sign
- * @param separator_position number of digit before the decimal point. If 0, decimal point is not shown
+ * @param separator_position number of digit before the decimal point. If 0, decimal point is not
+ * shown
  */
-void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
+void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count,
+                                 uint8_t separator_position);
 
 /**
  * Set spinbox step
@@ -179,15 +180,14 @@ void lv_spinbox_increment(lv_obj_t * spinbox);
  */
 void lv_spinbox_decrement(lv_obj_t * spinbox);
 
-
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_SPINBOX*/
+#endif /*LV_USE_SPINBOX*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_SPINBOX_H*/
+#endif /*LV_SPINBOX_H*/

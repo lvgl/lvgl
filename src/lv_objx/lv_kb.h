@@ -48,12 +48,14 @@ enum {
 typedef uint8_t lv_kb_mode_t;
 
 /*Data of keyboard*/
-typedef struct {
-    lv_btnm_ext_t btnm;     /*Ext. of ancestor*/
+typedef struct
+{
+    lv_btnm_ext_t btnm; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t *ta;               /*Pointer to the assigned text area*/
-    lv_kb_mode_t mode;          /*Key map type*/
-    uint8_t cursor_mng      :1; /*1: automatically show/hide cursor when a text area is assigned or left*/
+    lv_obj_t * ta;     /*Pointer to the assigned text area*/
+    lv_kb_mode_t mode; /*Key map type*/
+    uint8_t
+        cursor_mng : 1; /*1: automatically show/hide cursor when a text area is assigned or left*/
 } lv_kb_ext_t;
 
 enum {
@@ -65,7 +67,6 @@ enum {
     LV_KB_STYLE_BTN_INA,
 };
 typedef uint8_t lv_kb_style_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -110,9 +111,22 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en);
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnm_set_map()' for more info.
  */
-static inline void lv_kb_set_map(lv_obj_t *kb, const char ** map)
+static inline void lv_kb_set_map(lv_obj_t * kb, const char * map[])
 {
     lv_btnm_set_map(kb, map);
+}
+
+/**
+ * Set the button control map (hidden, disabled etc.) for the keyboard. The
+ * control map array will be copied and so may be deallocated after this
+ * function returns.
+ * @param kb pointer to a keyboard object
+ * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes.
+ *                 See: `lv_btnm_set_ctrl_map` for more details.
+ */
+static inline void lv_kb_set_ctrl_map(lv_obj_t * kb, const lv_btnm_ctrl_t * ctrl_map)
+{
+    lv_btnm_set_ctrl_map(kb, ctrl_map);
 }
 
 /**
@@ -121,7 +135,7 @@ static inline void lv_kb_set_map(lv_obj_t *kb, const char ** map)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_kb_set_style(lv_obj_t *kb, lv_kb_style_t type, lv_style_t *style);
+void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -154,7 +168,7 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_kb_get_style(const lv_obj_t *kb, lv_kb_style_t type);
+lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type);
 
 /*=====================
  * Other functions
@@ -162,7 +176,8 @@ lv_style_t * lv_kb_get_style(const lv_obj_t *kb, lv_kb_style_t type);
 
 /**
  * Default keyboard event to add characters to the Text area and change the map.
- * If a custom `event_cb` is added to the keyboard this function be called from it to handle the button clicks
+ * If a custom `event_cb` is added to the keyboard this function be called from it to handle the
+ * button clicks
  * @param kb pointer to a  keyboard
  * @param event the triggering event
  */
@@ -172,10 +187,10 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_KB*/
+#endif /*LV_USE_KB*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_KB_H*/
+#endif /*LV_KB_H*/

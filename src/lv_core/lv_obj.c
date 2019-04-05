@@ -22,14 +22,14 @@
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#   include LV_GC_INCLUDE
+#include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJ_DEF_WIDTH  (LV_DPI)
-#define LV_OBJ_DEF_HEIGHT  (2 * LV_DPI / 3)
+#define LV_OBJ_DEF_WIDTH (LV_DPI)
+#define LV_OBJ_DEF_HEIGHT (2 * LV_DPI / 3)
 
 /**********************
  *      TYPEDEFS
@@ -42,16 +42,16 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
-static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode);
+static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static bool lv_initialized = false;
-static lv_obj_t * event_act_obj;        /*Stores the which event is currently being executed*/
-static bool event_act_obj_deleted;      /*Shows that the object was deleted in the event function*/
-static const void * event_act_data;           /*Stores the data passed to the event*/
+static lv_obj_t * event_act_obj;    /*Stores the which event is currently being executed*/
+static bool event_act_obj_deleted;  /*Shows that the object was deleted in the event function*/
+static const void * event_act_data; /*Stores the data passed to the event*/
 /**********************
  *      MACROS
  **********************/
@@ -66,7 +66,7 @@ static const void * event_act_data;           /*Stores the data passed to the ev
 void lv_init(void)
 {
     /* Do nothing if already initialized */
-    if (lv_initialized) {
+    if(lv_initialized) {
         LV_LOG_WARN("lv_init: already inited");
         return;
     }
@@ -99,7 +99,6 @@ void lv_init(void)
     lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
-
 #if LV_INDEV_READ_PERIOD != 0
     /*Init the input device handling*/
     lv_indev_init();
@@ -120,7 +119,7 @@ void lv_init(void)
  * @param copy pointer to a base object, if not NULL then the new object will be copied from it
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
+lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
 
     lv_obj_t * new_obj = NULL;
@@ -129,7 +128,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         LV_LOG_TRACE("Screen create started");
         lv_disp_t * disp = lv_disp_get_default();
         if(!disp) {
-            LV_LOG_WARN("lv_obj_create: not display created to so far. No place to assign the new screen");
+            LV_LOG_WARN(
+                "lv_obj_create: not display created to so far. No place to assign the new screen");
             return NULL;
         }
 
@@ -145,14 +145,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->coords.y1 = 0;
         new_obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
         new_obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
-        new_obj->ext_size = 0;
+        new_obj->ext_size  = 0;
 
         /*Init realign*/
 #if LV_OBJ_REALIGN
-        new_obj->realign.align = LV_ALIGN_CENTER;
-        new_obj->realign.xofs = 0;
-        new_obj->realign.yofs = 0;
-        new_obj->realign.base = NULL;
+        new_obj->realign.align        = LV_ALIGN_CENTER;
+        new_obj->realign.xofs         = 0;
+        new_obj->realign.yofs         = 0;
+        new_obj->realign.base         = NULL;
         new_obj->realign.auto_realign = 0;
 #endif
 
@@ -182,15 +182,15 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         new_obj->group_p = NULL;
 #endif
         /*Set attributes*/
-        new_obj->click = 0;
-        new_obj->drag = 0;
-        new_obj->drag_throw = 0;
-        new_obj->drag_parent = 0;
-        new_obj->hidden = 0;
-        new_obj->top = 0;
-        new_obj->protect = LV_PROTECT_NONE;
+        new_obj->click        = 0;
+        new_obj->drag         = 0;
+        new_obj->drag_throw   = 0;
+        new_obj->drag_parent  = 0;
+        new_obj->hidden       = 0;
+        new_obj->top          = 0;
+        new_obj->protect      = LV_PROTECT_NONE;
         new_obj->opa_scale_en = 0;
-        new_obj->opa_scale = LV_OPA_COVER;
+        new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->parent_event = 0;
 
         new_obj->ext_attr = NULL;
@@ -205,25 +205,22 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
         lv_mem_assert(new_obj);
         if(new_obj == NULL) return NULL;
 
-
         new_obj->par = parent; /*Set the parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
         /*Set coordinates left top corner of parent*/
         new_obj->coords.x1 = parent->coords.x1;
         new_obj->coords.y1 = parent->coords.y1;
-        new_obj->coords.x2 = parent->coords.x1 +
-                             LV_OBJ_DEF_WIDTH;
-        new_obj->coords.y2 = parent->coords.y1 +
-                             LV_OBJ_DEF_HEIGHT;
-        new_obj->ext_size = 0;
+        new_obj->coords.x2 = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
+        new_obj->coords.y2 = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
+        new_obj->ext_size  = 0;
 
         /*Init realign*/
 #if LV_OBJ_REALIGN
-        new_obj->realign.align = LV_ALIGN_CENTER;
-        new_obj->realign.xofs = 0;
-        new_obj->realign.yofs = 0;
-        new_obj->realign.base = NULL;
+        new_obj->realign.align        = LV_ALIGN_CENTER;
+        new_obj->realign.xofs         = 0;
+        new_obj->realign.yofs         = 0;
+        new_obj->realign.base         = NULL;
         new_obj->realign.auto_realign = 0;
 #endif
         /*Set appearance*/
@@ -254,14 +251,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 #endif
 
         /*Set attributes*/
-        new_obj->click = 1;
-        new_obj->drag = 0;
-        new_obj->drag_throw = 0;
-        new_obj->drag_parent = 0;
-        new_obj->hidden = 0;
-        new_obj->top = 0;
-        new_obj->protect = LV_PROTECT_NONE;
-        new_obj->opa_scale = LV_OPA_COVER;
+        new_obj->click        = 1;
+        new_obj->drag         = 0;
+        new_obj->drag_throw   = 0;
+        new_obj->drag_parent  = 0;
+        new_obj->hidden       = 0;
+        new_obj->top          = 0;
+        new_obj->protect      = LV_PROTECT_NONE;
+        new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->opa_scale_en = 0;
         new_obj->parent_event = 0;
 
@@ -285,28 +282,29 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 
         /*Copy realign*/
 #if LV_OBJ_REALIGN
-        new_obj->realign.align = copy->realign.align;
-        new_obj->realign.xofs = copy->realign.xofs;
-        new_obj->realign.yofs = copy->realign.yofs;
-        new_obj->realign.base = copy->realign.base;
+        new_obj->realign.align        = copy->realign.align;
+        new_obj->realign.xofs         = copy->realign.xofs;
+        new_obj->realign.yofs         = copy->realign.yofs;
+        new_obj->realign.base         = copy->realign.base;
         new_obj->realign.auto_realign = copy->realign.auto_realign;
 #endif
 
-        /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied the the derived object type (e.g. `lv_btn`)*/
-        new_obj-> event_cb = copy->event_cb;
+        /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied the the derived
+         * object type (e.g. `lv_btn`)*/
+        new_obj->event_cb = copy->event_cb;
 
         /*Copy attributes*/
-        new_obj->click = copy->click;
-        new_obj->drag = copy->drag;
-        new_obj->drag_throw = copy->drag_throw;
-        new_obj->drag_parent = copy->drag_parent;
-        new_obj->hidden = copy->hidden;
-        new_obj->top = copy->top;
+        new_obj->click        = copy->click;
+        new_obj->drag         = copy->drag;
+        new_obj->drag_throw   = copy->drag_throw;
+        new_obj->drag_parent  = copy->drag_parent;
+        new_obj->hidden       = copy->hidden;
+        new_obj->top          = copy->top;
         new_obj->parent_event = copy->parent_event;
 
         new_obj->opa_scale_en = copy->opa_scale_en;
-        new_obj->protect = copy->protect;
-        new_obj->opa_scale = copy->opa_scale;
+        new_obj->protect      = copy->protect;
+        new_obj->opa_scale    = copy->opa_scale;
 
         new_obj->style_p = copy->style_p;
 
@@ -321,7 +319,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const  lv_obj_t * copy)
 
         LV_LOG_INFO("Object create ready");
     }
-
 
     /*Send a signal to the parent to notify it about the new child*/
     if(parent != NULL) {
@@ -345,7 +342,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
     if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
 
-    /*Delete from the group*/
+        /*Delete from the group*/
 #if LV_USE_GROUP
     bool was_focused = false;
 
@@ -386,7 +383,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
     /* Reset all input devices if
      * the object to delete is used*/
-    lv_indev_t * indev = lv_indev_next(NULL);
+    lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
@@ -397,7 +394,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
             lv_indev_reset(indev);
         }
 #endif
-        indev = lv_indev_next(indev);
+        indev = lv_indev_get_next(indev);
     }
 
     /* All children deleted.
@@ -405,7 +402,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
 
     /*Delete the base objects*/
-    if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
+    if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
     lv_mem_free(obj); /*Free the object itself*/
 
     /*Send a signal to the parent to notify it about the child delete*/
@@ -443,14 +440,13 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 
     /*Invalidate the object only if it belongs to the 'LV_GC_ROOT(_lv_act_scr)'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    lv_disp_t * disp = lv_obj_get_disp(obj_scr);
-    if(obj_scr == lv_disp_get_scr_act(disp) ||
-            obj_scr == lv_disp_get_layer_top(disp)||
-            obj_scr == lv_disp_get_layer_sys(disp)) {
+    lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
+    if(obj_scr == lv_disp_get_scr_act(disp) || obj_scr == lv_disp_get_layer_top(disp) ||
+       obj_scr == lv_disp_get_layer_sys(disp)) {
         /*Truncate recursively to the parents*/
         lv_area_t area_trunc;
         lv_obj_t * par = lv_obj_get_parent(obj);
-        bool union_ok = true;
+        bool union_ok  = true;
         /*Start with the original coordinates*/
         lv_coord_t ext_size = obj->ext_size;
         lv_area_copy(&area_trunc, &obj->coords);
@@ -462,8 +458,9 @@ void lv_obj_invalidate(const lv_obj_t * obj)
         /*Check through all parents*/
         while(par != NULL) {
             union_ok = lv_area_intersect(&area_trunc, &area_trunc, &par->coords);
-            if(union_ok == false) break;        /*If no common parts with parent break;*/
-            if(lv_obj_get_hidden(par)) return;  /*If the parent is hidden then the child is hidden and won't be drawn*/
+            if(union_ok == false) break; /*If no common parts with parent break;*/
+            if(lv_obj_get_hidden(par))
+                return; /*If the parent is hidden then the child is hidden and won't be drawn*/
 
             par = lv_obj_get_parent(par);
         }
@@ -471,7 +468,6 @@ void lv_obj_invalidate(const lv_obj_t * obj)
         if(union_ok) lv_inv_area(disp, &area_trunc);
     }
 }
-
 
 /*=====================
  * Setter functions
@@ -497,7 +493,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
         LV_LOG_WARN("Can't set parent == NULL to an object");
         return;
     }
-
 
     lv_obj_invalidate(obj);
 
@@ -534,13 +529,13 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * par = obj->par;
-    x = x + par->coords.x1;
-    y = y + par->coords.y1;
+    x              = x + par->coords.x1;
+    y              = y + par->coords.y1;
 
     /*Calculate and set the movement*/
     lv_point_t diff;
-    diff.x =  x - obj->coords.x1;
-    diff.y =  y - obj->coords.y1;
+    diff.x = x - obj->coords.x1;
+    diff.y = y - obj->coords.y1;
 
     /* Do nothing if the position is not changed */
     /* It is very important else recursive positioning can
@@ -571,7 +566,6 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     lv_obj_invalidate(obj);
 }
 
-
 /**
  * Set the x coordinate of a object
  * @param obj pointer to an object
@@ -581,7 +575,6 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 {
     lv_obj_set_pos(obj, x, lv_obj_get_y(obj));
 }
-
 
 /**
  * Set the y coordinate of a object
@@ -616,10 +609,9 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
 
-    //Set the length and height
+    // Set the length and height
     obj->coords.x2 = obj->coords.x1 + w - 1;
     obj->coords.y2 = obj->coords.y1 + h - 1;
-
 
     /*Send a signal to the object with its new coordinates*/
     obj->signal_cb(obj, LV_SIGNAL_CORD_CHG, &ori);
@@ -630,8 +622,9 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     /*Tell the children the parent's size has changed*/
     lv_obj_t * i;
-    LV_LL_READ(obj->child_ll, i) {
-       i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
+    LV_LL_READ(obj->child_ll, i)
+    {
+        i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
     }
 
     /*Invalidate the new area*/
@@ -671,7 +664,8 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod,
+                  lv_coord_t y_mod)
 {
     lv_coord_t new_x = lv_obj_get_x(obj);
     lv_coord_t new_y = lv_obj_get_y(obj);
@@ -731,12 +725,12 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
         case LV_ALIGN_OUT_TOP_MID:
             new_x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2;
-            new_y = - lv_obj_get_height(obj);
+            new_y = -lv_obj_get_height(obj);
             break;
 
         case LV_ALIGN_OUT_TOP_RIGHT:
             new_x = lv_obj_get_width(base) - lv_obj_get_width(obj);
-            new_y = - lv_obj_get_height(obj);
+            new_y = -lv_obj_get_height(obj);
             break;
 
         case LV_ALIGN_OUT_BOTTOM_LEFT:
@@ -755,17 +749,17 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
             break;
 
         case LV_ALIGN_OUT_LEFT_TOP:
-            new_x = - lv_obj_get_width(obj);
+            new_x = -lv_obj_get_width(obj);
             new_y = 0;
             break;
 
         case LV_ALIGN_OUT_LEFT_MID:
-            new_x = - lv_obj_get_width(obj);
+            new_x = -lv_obj_get_width(obj);
             new_y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2;
             break;
 
         case LV_ALIGN_OUT_LEFT_BOTTOM:
-            new_x = - lv_obj_get_width(obj);
+            new_x = -lv_obj_get_width(obj);
             new_y = lv_obj_get_height(base) - lv_obj_get_height(obj);
             break;
 
@@ -786,11 +780,11 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     }
 
     /*Bring together the coordination system of base and obj*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
+    lv_obj_t * par        = lv_obj_get_parent(obj);
     lv_coord_t base_abs_x = base->coords.x1;
     lv_coord_t base_abs_y = base->coords.y1;
-    lv_coord_t par_abs_x = par->coords.x1;
-    lv_coord_t par_abs_y = par->coords.y1;
+    lv_coord_t par_abs_x  = par->coords.x1;
+    lv_coord_t par_abs_y  = par->coords.y1;
     new_x += x_mod + base_abs_x;
     new_y += y_mod + base_abs_y;
     new_x -= par_abs_x;
@@ -800,10 +794,10 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
 #if LV_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
-    obj->realign.align = align;
-    obj->realign.xofs = x_mod;
-    obj->realign.yofs = y_mod;
-    obj->realign.base = base;
+    obj->realign.align       = align;
+    obj->realign.xofs        = x_mod;
+    obj->realign.yofs        = y_mod;
+    obj->realign.base        = base;
     obj->realign.origo_align = 0;
 #endif
 }
@@ -816,12 +810,13 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod,
+                        lv_coord_t y_mod)
 {
     lv_coord_t new_x = lv_obj_get_x(obj);
     lv_coord_t new_y = lv_obj_get_y(obj);
 
-    lv_coord_t obj_w_half =  lv_obj_get_width(obj) / 2;
+    lv_coord_t obj_w_half = lv_obj_get_width(obj) / 2;
     lv_coord_t obj_h_half = lv_obj_get_height(obj) / 2;
 
     if(base == NULL) {
@@ -884,7 +879,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 
         case LV_ALIGN_OUT_TOP_RIGHT:
             new_x = lv_obj_get_width(base) - obj_w_half;
-            new_y = - obj_h_half;
+            new_y = -obj_h_half;
             break;
 
         case LV_ALIGN_OUT_BOTTOM_LEFT:
@@ -903,17 +898,17 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
             break;
 
         case LV_ALIGN_OUT_LEFT_TOP:
-            new_x = - obj_w_half ;
-            new_y = - obj_h_half;
+            new_x = -obj_w_half;
+            new_y = -obj_h_half;
             break;
 
         case LV_ALIGN_OUT_LEFT_MID:
-            new_x = - obj_w_half;
+            new_x = -obj_w_half;
             new_y = lv_obj_get_height(base) / 2 - obj_h_half;
             break;
 
         case LV_ALIGN_OUT_LEFT_BOTTOM:
-            new_x = - obj_w_half;
+            new_x = -obj_w_half;
             new_y = lv_obj_get_height(base) - obj_h_half;
             break;
 
@@ -934,11 +929,11 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     }
 
     /*Bring together the coordination system of base and obj*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
+    lv_obj_t * par        = lv_obj_get_parent(obj);
     lv_coord_t base_abs_x = base->coords.x1;
     lv_coord_t base_abs_y = base->coords.y1;
-    lv_coord_t par_abs_x = par->coords.x1;
-    lv_coord_t par_abs_y = par->coords.y1;
+    lv_coord_t par_abs_x  = par->coords.x1;
+    lv_coord_t par_abs_y  = par->coords.y1;
     new_x += x_mod + base_abs_x;
     new_y += y_mod + base_abs_y;
     new_x -= par_abs_x;
@@ -948,10 +943,10 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 
 #if LV_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
-    obj->realign.align = align;
-    obj->realign.xofs = x_mod;
-    obj->realign.yofs = y_mod;
-    obj->realign.base = base;
+    obj->realign.align       = align;
+    obj->realign.xofs        = x_mod;
+    obj->realign.yofs        = y_mod;
+    obj->realign.base        = base;
     obj->realign.origo_align = 1;
 #endif
 }
@@ -963,16 +958,21 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 void lv_obj_realign(lv_obj_t * obj)
 {
 #if LV_OBJ_REALIGN
-    if(obj->realign.origo_align) lv_obj_align_origo(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
-    else lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
+    if(obj->realign.origo_align)
+        lv_obj_align_origo(obj, obj->realign.base, obj->realign.align, obj->realign.xofs,
+                           obj->realign.yofs);
+    else
+        lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs,
+                     obj->realign.yofs);
 #else
-    (void) obj;
+    (void)obj;
     LV_LOG_WARN("lv_obj_realaign: no effect because LV_OBJ_REALIGN = 0");
 #endif
 }
 
 /**
- * Enable the automatic realign of the object when its size has changed based on the last `lv_obj_align` parameters.
+ * Enable the automatic realign of the object when its size has changed based on the last
+ * `lv_obj_align` parameters.
  * @param obj pointer to an object
  * @param en true: enable auto realign; false: disable auto realign
  */
@@ -981,8 +981,8 @@ void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
 #if LV_OBJ_REALIGN
     obj->realign.auto_realign = en ? 1 : 0;
 #else
-    (void) obj;
-    (void) en;
+    (void)obj;
+    (void)en;
     LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_OBJ_REALIGN = 0");
 #endif
 }
@@ -1016,7 +1016,6 @@ void lv_obj_refresh_style(lv_obj_t * obj)
     lv_obj_invalidate(obj);
     obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
     lv_obj_invalidate(obj);
-
 }
 
 /**
@@ -1030,7 +1029,8 @@ void lv_obj_report_style_mod(lv_style_t * style)
 
     while(d) {
         lv_obj_t * i;
-        LV_LL_READ(d->scr_ll, i) {
+        LV_LL_READ(d->scr_ll, i)
+        {
             if(i->style_p == style || style == NULL) {
                 lv_obj_refresh_style(i);
             }
@@ -1052,15 +1052,16 @@ void lv_obj_report_style_mod(lv_style_t * style)
  */
 void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 {
-    if(!obj->hidden) lv_obj_invalidate(obj);    /*Invalidate when not hidden (hidden objects are ignored) */
+    if(!obj->hidden)
+        lv_obj_invalidate(obj); /*Invalidate when not hidden (hidden objects are ignored) */
 
     obj->hidden = en == false ? 0 : 1;
 
-    if(!obj->hidden) lv_obj_invalidate(obj);    /*Invalidate when not hidden (hidden objects are ignored) */
+    if(!obj->hidden)
+        lv_obj_invalidate(obj); /*Invalidate when not hidden (hidden objects are ignored) */
 
     lv_obj_t * par = lv_obj_get_parent(obj);
     par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
-
 }
 
 /**
@@ -1091,7 +1092,7 @@ void lv_obj_set_top(lv_obj_t * obj, bool en)
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en)
 {
-    if(en == true) lv_obj_set_click(obj, true);     /*Drag is useless without enabled clicking*/
+    if(en == true) lv_obj_set_click(obj, true); /*Drag is useless without enabled clicking*/
     obj->drag = (en == true ? 1 : 0);
 }
 
@@ -1133,7 +1134,7 @@ void lv_obj_set_parent_event(lv_obj_t * obj, bool en)
  */
 void lv_obj_set_opa_scale_enable(lv_obj_t * obj, bool en)
 {
-    obj->opa_scale_en =  en ? 1 : 0;
+    obj->opa_scale_en = en ? 1 : 0;
 }
 
 /**
@@ -1191,22 +1192,22 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
     if(obj == NULL) return LV_RES_OK;
 
     /*If the event was send from an other event save the current states to restore it at the end*/
-    lv_obj_t * prev_obj_act = event_act_obj;
+    lv_obj_t * prev_obj_act   = event_act_obj;
     bool prev_obj_act_deleted = event_act_obj_deleted;
-    const void * prev_data = event_act_data;
+    const void * prev_data    = event_act_data;
 
-    event_act_obj = obj;
+    event_act_obj         = obj;
     event_act_obj_deleted = false;
-    event_act_data = data;
+    event_act_data        = data;
 
     if(obj->event_cb) obj->event_cb(obj, event);
 
     bool deleted = event_act_obj_deleted;
 
     /*Restore the previous states*/
-    event_act_obj = prev_obj_act;
+    event_act_obj         = prev_obj_act;
     event_act_obj_deleted = prev_obj_act_deleted;
-    event_act_data = prev_data;
+    event_act_data        = prev_data;
 
     if(deleted) {
         return LV_RES_INV;
@@ -1298,71 +1299,71 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj)
  * @param delay delay before the animation in milliseconds
  * @param cb a function to call when the animation is ready
  */
-void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay, void (*cb)(lv_obj_t *))
+void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay,
+                    void (*cb)(lv_obj_t *))
 {
     lv_obj_t * par = lv_obj_get_parent(obj);
 
     /*Get the direction*/
     bool out = (type & LV_ANIM_DIR_MASK) == LV_ANIM_IN ? false : true;
-    type = type & (~LV_ANIM_DIR_MASK);
+    type     = type & (~LV_ANIM_DIR_MASK);
 
     lv_anim_t a;
-    a.var = obj;
-    a.time = time;
-    a.act_time = (int32_t) - delay;
-    a.end_cb = (void(*)(void *))cb;
-    a.path = lv_anim_path_linear;
+    a.var            = obj;
+    a.time           = time;
+    a.act_time       = (int32_t)-delay;
+    a.end_cb         = (void (*)(void *))cb;
+    a.path           = lv_anim_path_linear;
     a.playback_pause = 0;
-    a.repeat_pause = 0;
-    a.playback = 0;
-    a.repeat = 0;
+    a.repeat_pause   = 0;
+    a.playback       = 0;
+    a.repeat         = 0;
 
     /*Init to ANIM_IN*/
     switch(type) {
         case LV_ANIM_FLOAT_LEFT:
-            a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
+            a.fp    = (void (*)(void *, int32_t))lv_obj_set_x;
             a.start = -lv_obj_get_width(obj);
-            a.end = lv_obj_get_x(obj);
+            a.end   = lv_obj_get_x(obj);
             break;
         case LV_ANIM_FLOAT_RIGHT:
-            a.fp = (void(*)(void *, int32_t))lv_obj_set_x;
+            a.fp    = (void (*)(void *, int32_t))lv_obj_set_x;
             a.start = lv_obj_get_width(par);
-            a.end = lv_obj_get_x(obj);
+            a.end   = lv_obj_get_x(obj);
             break;
         case LV_ANIM_FLOAT_TOP:
-            a.fp = (void(*)(void *, int32_t))lv_obj_set_y;
+            a.fp    = (void (*)(void *, int32_t))lv_obj_set_y;
             a.start = -lv_obj_get_height(obj);
-            a.end = lv_obj_get_y(obj);
+            a.end   = lv_obj_get_y(obj);
             break;
         case LV_ANIM_FLOAT_BOTTOM:
-            a.fp = (void(*)(void *, int32_t))lv_obj_set_y;
+            a.fp    = (void (*)(void *, int32_t))lv_obj_set_y;
             a.start = lv_obj_get_height(par);
-            a.end = lv_obj_get_y(obj);
+            a.end   = lv_obj_get_y(obj);
             break;
         case LV_ANIM_GROW_H:
-            a.fp = (void(*)(void *, int32_t))lv_obj_set_width;
+            a.fp    = (void (*)(void *, int32_t))lv_obj_set_width;
             a.start = 0;
-            a.end = lv_obj_get_width(obj);
+            a.end   = lv_obj_get_width(obj);
             break;
         case LV_ANIM_GROW_V:
-            a.fp = (void(*)(void *, int32_t))lv_obj_set_height;
+            a.fp    = (void (*)(void *, int32_t))lv_obj_set_height;
             a.start = 0;
-            a.end = lv_obj_get_height(obj);
+            a.end   = lv_obj_get_height(obj);
             break;
         case LV_ANIM_NONE:
-            a.fp = NULL;
+            a.fp    = NULL;
             a.start = 0;
-            a.end = 0;
+            a.end   = 0;
             break;
-        default:
-            break;
+        default: break;
     }
 
     /*Swap start and end in case of ANIM OUT*/
     if(out != false) {
         int32_t tmp = a.start;
-        a.start = a.end;
-        a.end = tmp;
+        a.start     = a.end;
+        a.end       = tmp;
     }
 
     lv_anim_create(&a);
@@ -1386,7 +1387,7 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 
     do {
         act_p = par;
-        par = lv_obj_get_parent(act_p);
+        par   = lv_obj_get_parent(act_p);
     } while(par != NULL);
 
     return (lv_obj_t *)act_p;
@@ -1401,13 +1402,17 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
 {
     const lv_obj_t * scr;
 
-    if(obj->par == NULL) scr = obj;         /*`obj` is a screen*/
-    else scr = lv_obj_get_screen(obj);      /*get the screen of `obj`*/
+    if(obj->par == NULL)
+        scr = obj; /*`obj` is a screen*/
+    else
+        scr = lv_obj_get_screen(obj); /*get the screen of `obj`*/
 
     lv_disp_t * d;
-    LV_LL_READ(LV_GC_ROOT(_lv_disp_ll), d) {
+    LV_LL_READ(LV_GC_ROOT(_lv_disp_ll), d)
+    {
         lv_obj_t * s;
-        LV_LL_READ(d->scr_ll, s) {
+        LV_LL_READ(d->scr_ll, s)
+        {
             if(s == scr) return d;
         }
     }
@@ -1499,7 +1504,6 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p)
     lv_area_copy(cords_p, &obj->coords);
 }
 
-
 /**
  * Get the x coordinate of object
  * @param obj pointer to an object
@@ -1509,7 +1513,7 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
 {
     lv_coord_t rel_x;
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    rel_x = obj->coords.x1 - parent->coords.x1;
+    rel_x             = obj->coords.x1 - parent->coords.x1;
 
     return rel_x;
 }
@@ -1523,7 +1527,7 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
 {
     lv_coord_t rel_y;
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    rel_y = obj->coords.y1 - parent->coords.y1;
+    rel_y             = obj->coords.y1 - parent->coords.y1;
 
     return rel_y;
 }
@@ -1591,7 +1595,7 @@ bool lv_obj_get_auto_realign(lv_obj_t * obj)
 #if LV_OBJ_REALIGN
     return obj->realign.auto_realign ? true : false;
 #else
-    (void) obj;
+    (void)obj;
     return false;
 #endif
 }
@@ -1752,7 +1756,7 @@ lv_opa_t lv_obj_get_opa_scale(const lv_obj_t * obj)
  */
 uint8_t lv_obj_get_protect(const lv_obj_t * obj)
 {
-    return obj->protect ;
+    return obj->protect;
 }
 
 /**
@@ -1763,7 +1767,7 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj)
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
 {
-    return (obj->protect & prot) == 0 ? false : true ;
+    return (obj->protect & prot) == 0 ? false : true;
 }
 
 /**
@@ -1820,7 +1824,6 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
         if(tmp.type[cnt] == NULL) break;
     }
-
 
     /*Swap the order. The real type comes first*/
     uint8_t i;
@@ -1880,7 +1883,7 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  * @param return true/false, depends on 'mode'
  */
-static bool lv_obj_design(lv_obj_t * obj, const  lv_area_t * mask_p, lv_design_mode_t mode)
+static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
 
@@ -1934,11 +1937,10 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     lv_style_t * style = lv_obj_get_style(obj);
 
-    lv_indev_t *indev_act = lv_indev_get_act();
+    lv_indev_t * indev_act = lv_indev_get_act();
 
     if(sign > _LV_SIGNAL_FEEDBACK_SECTION_START && sign < _LV_SIGNAL_FEEDBACK_SECTION_END) {
-		if(indev_act != NULL && indev_act->feedback != NULL)
-			indev_act->feedback(indev_act, sign);
+        if(indev_act != NULL && indev_act->feedback != NULL) indev_act->feedback(indev_act, sign);
     }
 
     if(sign == LV_SIGNAL_CHILD_CHG) {
@@ -1946,11 +1948,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         if(style->body.shadow.width > obj->ext_size) obj->ext_size = style->body.shadow.width;
-    } else if(sign ==  LV_SIGNAL_STYLE_CHG) {
+    } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_size(obj);
-    } else if(sign ==  LV_SIGNAL_GET_TYPE) {
+    } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
-        buf->type[0] = "lv_obj";
+        buf->type[0]        = "lv_obj";
     }
 
     return res;
@@ -1965,7 +1967,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
 {
     lv_obj_t * i;
-    LV_LL_READ(obj->child_ll, i) {
+    LV_LL_READ(obj->child_ll, i)
+    {
         i->coords.x1 += x_diff;
         i->coords.y1 += y_diff;
         i->coords.x2 += x_diff;
@@ -1983,7 +1986,8 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style_p, lv_obj_t * obj)
 {
     lv_obj_t * i;
-    LV_LL_READ(obj->child_ll, i) {
+    LV_LL_READ(obj->child_ll, i)
+    {
         if(i->style_p == style_p || style_p == NULL) {
             refresh_children_style(i);
             lv_obj_refresh_style(i);
@@ -2003,8 +2007,8 @@ static void refresh_children_style(lv_obj_t * obj)
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child != NULL) {
         if(child->style_p == NULL) {
-            refresh_children_style(child);     /*Check children too*/
-            lv_obj_refresh_style(child);       /*Notify the child about the style change*/
+            refresh_children_style(child); /*Check children too*/
+            lv_obj_refresh_style(child);   /*Notify the child about the style change*/
         } else if(child->style_p->glass) {
             /*Children with 'glass' parent might be effected if their style == NULL*/
             refresh_children_style(child);
@@ -2026,8 +2030,8 @@ static void delete_children(lv_obj_t * obj)
     lv_obj_t * i_next;
     i = lv_ll_get_head(&(obj->child_ll));
 
-    /*Remove from the group; remove before transversing children so that 
-     * the object still has access to all children during the 
+    /*Remove from the group; remove before transversing children so that
+     * the object still has access to all children during the
      * LV_SIGNAL_DEFOCUS call*/
 #if LV_USE_GROUP
     bool was_focused = false;
@@ -2056,7 +2060,7 @@ static void delete_children(lv_obj_t * obj)
 
     /* Reset the input devices if
      * the object to delete is used*/
-    lv_indev_t * indev = lv_indev_next(NULL);
+    lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
@@ -2066,7 +2070,7 @@ static void delete_children(lv_obj_t * obj)
             lv_indev_reset(indev);
         }
 #endif
-        indev = lv_indev_next(indev);
+        indev = lv_indev_get_next(indev);
     }
 
     /*Remove the object from parent's children list*/
@@ -2077,7 +2081,6 @@ static void delete_children(lv_obj_t * obj)
     obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
 
     /*Delete the base objects*/
-    if(obj->ext_attr != NULL)  lv_mem_free(obj->ext_attr);
+    if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
     lv_mem_free(obj); /*Free the object itself*/
-
 }

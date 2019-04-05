@@ -13,7 +13,7 @@
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#   include LV_GC_INCLUDE
+#include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -30,11 +30,10 @@
 static void style_mod_def(lv_group_t * group, lv_style_t * style);
 static void style_mod_edit_def(lv_group_t * group, lv_style_t * style);
 static void refresh_theme(lv_group_t * g, lv_theme_t * th);
-static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *), void * (*move)(const lv_ll_t *, const void *));
+static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *),
+                            void * (*move)(const lv_ll_t *, const void *));
 static void lv_group_refocus(lv_group_t * g);
 static void obj_to_foreground(lv_obj_t * obj);
-
-
 
 /**********************
  *  STATIC VARIABLES
@@ -67,13 +66,13 @@ lv_group_t * lv_group_create(void)
     if(group == NULL) return NULL;
     lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
-    group->obj_focus = NULL;
-    group->frozen = 0;
-    group->focus_cb = NULL;
-    group->click_focus = 1;
-    group->editing = 0;
+    group->obj_focus      = NULL;
+    group->frozen         = 0;
+    group->focus_cb       = NULL;
+    group->click_focus    = 1;
+    group->editing        = 0;
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
-    group->wrap = 1;
+    group->wrap           = 1;
 
 #if LV_USE_USER_DATA_SINGLE
     memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
@@ -84,7 +83,6 @@ lv_group_t * lv_group_create(void)
     memset(&group->style_mod_user_data, 0, sizeof(lv_group_user_data_t));
     memset(&group->style_mod_edit_user_data, 0, sizeof(lv_group_user_data_t));
 #endif
-
 
     /*Initialize style modification callbacks from current theme*/
     refresh_theme(group, lv_theme_get_current());
@@ -106,7 +104,8 @@ void lv_group_del(lv_group_t * group)
 
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
-    LV_LL_READ(group->obj_ll, obj) {
+    LV_LL_READ(group->obj_ll, obj)
+    {
         (*obj)->group_p = NULL;
     }
 
@@ -125,7 +124,8 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
     /*Do not add the object twice*/
     lv_obj_t ** obj_i;
-    LV_LL_READ(group->obj_ll, obj_i) {
+    LV_LL_READ(group->obj_ll, obj_i)
+    {
         if((*obj_i) == obj) {
             LV_LOG_INFO("lv_group_add_obj: the object is already added to this group");
             return;
@@ -141,7 +141,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
         }
     }
 
-    obj->group_p = group;
+    obj->group_p     = group;
     lv_obj_t ** next = lv_ll_ins_tail(&group->obj_ll);
     lv_mem_assert(next);
     if(next == NULL) return;
@@ -162,12 +162,14 @@ void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
-    if(g->obj_focus == NULL) return;        /*Just to be sure (Not possible if there is at least one object in the group)*/
+    if(g->obj_focus == NULL)
+        return; /*Just to be sure (Not possible if there is at least one object in the group)*/
 
     /*Focus on the next object*/
     if(*g->obj_focus == obj) {
         /*If this is the only object in the group then focus to nothing.*/
-        if(lv_ll_get_head(&g->obj_ll) == g->obj_focus && lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
+        if(lv_ll_get_head(&g->obj_ll) == g->obj_focus &&
+           lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
             (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         }
         /*If there more objects in the group then focus to the next/prev object*/
@@ -176,15 +178,17 @@ void lv_group_remove_obj(lv_obj_t * obj)
         }
     }
 
-    /* If the focuses object is still the same then it was the only object in the group but it will be deleted.
-     * Set the `obj_focus` to NULL to get back to the initial state of the group with zero objects*/
+    /* If the focuses object is still the same then it was the only object in the group but it will
+     * be deleted. Set the `obj_focus` to NULL to get back to the initial state of the group with
+     * zero objects*/
     if(*g->obj_focus == obj) {
         g->obj_focus = NULL;
     }
 
     /*Search the object and remove it from its group */
     lv_obj_t ** i;
-    LV_LL_READ(g->obj_ll, i) {
+    LV_LL_READ(g->obj_ll, i)
+    {
         if(*i == obj) {
             lv_ll_rem(&g->obj_ll, i);
             lv_mem_free(i);
@@ -210,9 +214,10 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_group_set_editing(g, false);
 
     lv_obj_t ** i;
-    LV_LL_READ(g->obj_ll, i) {
+    LV_LL_READ(g->obj_ll, i)
+    {
         if(*i == obj) {
-            if(g->obj_focus == i) return;       /*Don't focus the already focused object again*/
+            if(g->obj_focus == i) return; /*Don't focus the already focused object again*/
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
                 lv_res_t res = lv_event_send(*g->obj_focus, LV_EVENT_DEFOCUSED, NULL);
@@ -262,8 +267,10 @@ void lv_group_focus_prev(lv_group_t * group)
  */
 void lv_group_focus_freeze(lv_group_t * group, bool en)
 {
-    if(en == false) group->frozen = 0;
-    else group->frozen = 1;
+    if(en == false)
+        group->frozen = 0;
+    else
+        group->frozen = 1;
 }
 
 /**
@@ -321,13 +328,14 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
 {
     uint8_t en_val = edit ? 1 : 0;
 
-    if(en_val == group->editing) return;        /*Do not set the same mode again*/
+    if(en_val == group->editing) return; /*Do not set the same mode again*/
 
-    group->editing = en_val;
+    group->editing     = en_val;
     lv_obj_t * focused = lv_group_get_focused(group);
 
     if(focused) {
-        focused->signal_cb(focused, LV_SIGNAL_FOCUS, NULL);       /*Focus again to properly leave/open edit/navigate mode*/
+        focused->signal_cb(focused, LV_SIGNAL_FOCUS,
+                           NULL); /*Focus again to properly leave/open edit/navigate mode*/
         lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
         if(res != LV_RES_OK) return;
     }
@@ -345,7 +353,8 @@ void lv_group_set_click_focus(lv_group_t * group, bool en)
     group->click_focus = en ? 1 : 0;
 }
 
-void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t policy) {
+void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t policy)
+{
     group->refocus_policy = policy & 0x01;
 }
 
@@ -403,7 +412,6 @@ lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
 }
 #endif
 
-
 /**
  * Get a the style modifier function of a group
  * @param group pointer to a group
@@ -412,7 +420,7 @@ lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
 lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
 {
     if(!group) return false;
-    return group->style_mod ;
+    return group->style_mod;
 }
 
 /**
@@ -471,7 +479,8 @@ bool lv_group_get_wrap(lv_group_t * group)
 }
 
 /**
- * Notify the group that current theme changed and style modification callbacks need to be refreshed.
+ * Notify the group that current theme changed and style modification callbacks need to be
+ * refreshed.
  * @param group pointer to group. If NULL then all groups are notified.
  */
 void lv_group_report_style_mod(lv_group_t * group)
@@ -484,7 +493,8 @@ void lv_group_report_style_mod(lv_group_t * group)
     }
 
     lv_group_t * i;
-    LV_LL_READ(LV_GC_ROOT(_lv_group_ll), i) {
+    LV_LL_READ(LV_GC_ROOT(_lv_group_ll), i)
+    {
         refresh_theme(i, th);
     }
 }
@@ -493,10 +503,11 @@ void lv_group_report_style_mod(lv_group_t * group)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_group_refocus(lv_group_t *g) {
+static void lv_group_refocus(lv_group_t * g)
+{
     /*Refocus must temporarily allow wrapping to work correctly*/
     uint8_t temp_wrap = g->wrap;
-    g->wrap = 1;
+    g->wrap           = 1;
 
     if(g->refocus_policy == LV_GROUP_REFOCUS_POLICY_NEXT)
         lv_group_focus_next(g);
@@ -513,28 +524,28 @@ static void lv_group_refocus(lv_group_t *g) {
  */
 static void style_mod_def(lv_group_t * group, lv_style_t * style)
 {
-    (void)group;    /*Unused*/
+    (void)group; /*Unused*/
 #if LV_COLOR_DEPTH != 1
 
     /*Make the style to be a little bit orange*/
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_ORANGE;
 
     /*If not empty or has border then emphasis the border*/
-    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0)
+        style->body.border.width = LV_DPI / 20;
 
-    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
-    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
+    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
+    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
 #else
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
     style->body.border.width = 2;
 
 #endif
-
 }
 
 /**
@@ -544,57 +555,56 @@ static void style_mod_def(lv_group_t * group, lv_style_t * style)
  */
 static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
 {
-    (void)group;    /*Unused*/
+    (void)group; /*Unused*/
 #if LV_COLOR_DEPTH != 1
 
     /*Make the style to be a little bit orange*/
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_GREEN;
 
     /*If not empty or has border then emphasis the border*/
-    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0)
+        style->body.border.width = LV_DPI / 20;
 
-    style->body.main_color = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
-    style->body.grad_color = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
+    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
 #else
-    style->body.border.opa = LV_OPA_COVER;
+    style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
     style->body.border.width = 3;
 
 #endif
-
 }
 
 static void refresh_theme(lv_group_t * g, lv_theme_t * th)
 {
-    g->style_mod = style_mod_def;
+    g->style_mod      = style_mod_def;
     g->style_mod_edit = style_mod_edit_def;
     if(th) {
-        if(th->group.style_mod)
-            g->style_mod = th->group.style_mod;
-        if(th->group.style_mod_edit)
-            g->style_mod_edit = th->group.style_mod_edit;
+        if(th->group.style_mod) g->style_mod = th->group.style_mod;
+        if(th->group.style_mod_edit) g->style_mod_edit = th->group.style_mod_edit;
     }
 }
 
-static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *), void * (*move)(const lv_ll_t *, const void *))
+static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *),
+                            void * (*move)(const lv_ll_t *, const void *))
 {
-    if (group->frozen) return;
+    if(group->frozen) return;
 
-    lv_obj_t ** obj_next = group->obj_focus;
+    lv_obj_t ** obj_next     = group->obj_focus;
     lv_obj_t ** obj_sentinel = NULL;
-    bool can_move = true;
-    bool can_begin = true;
+    bool can_move            = true;
+    bool can_begin           = true;
 
     for(;;) {
         if(obj_next == NULL) {
             if(group->wrap || obj_sentinel == NULL) {
                 if(!can_begin) return;
-                obj_next = begin(&group->obj_ll);
-                can_move = false;
+                obj_next  = begin(&group->obj_ll);
+                can_move  = false;
                 can_begin = false;
             } else {
                 /*Currently focused object is the last/first in the group, keep it that way*/
@@ -622,7 +632,8 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
         if(!lv_obj_get_hidden(*obj_next)) break;
     }
 
-    if(obj_next == group->obj_focus) return; /*There's only one visible object and it's already focused*/
+    if(obj_next == group->obj_focus)
+        return; /*There's only one visible object and it's already focused*/
 
     if(group->obj_focus) {
         (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
@@ -648,7 +659,7 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
 static void obj_to_foreground(lv_obj_t * obj)
 {
     /*Search for 'top' attribute*/
-    lv_obj_t * i = obj;
+    lv_obj_t * i        = obj;
     lv_obj_t * last_top = NULL;
     while(i != NULL) {
         if(i->top != 0) last_top = i;

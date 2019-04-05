@@ -13,13 +13,13 @@
 #include "lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#   include LV_GC_INCLUDE
+#include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
  *      DEFINES
  *********************/
-#define IDLE_MEAS_PERIOD    500     /*[ms]*/
+#define IDLE_MEAS_PERIOD 500 /*[ms]*/
 
 /**********************
  *      TYPEDEFS
@@ -33,7 +33,7 @@ static bool lv_task_exec(lv_task_t * lv_task_p);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_task_run = false;
+static bool lv_task_run  = false;
 static uint8_t idle_last = 0;
 static bool task_deleted;
 static bool task_created;
@@ -70,8 +70,8 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     task_handler_mutex = true;
 
     static uint32_t idle_period_start = 0;
-    static uint32_t handler_start = 0;
-    static uint32_t busy_time = 0;
+    static uint32_t handler_start     = 0;
+    static uint32_t busy_time         = 0;
 
     if(lv_task_run == false) return;
 
@@ -84,9 +84,9 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     lv_task_t * next;
     bool end_flag;
     do {
-        end_flag = true;
-        task_deleted = false;
-        task_created = false;
+        end_flag                 = true;
+        task_deleted             = false;
+        task_created             = false;
         LV_GC_ROOT(_lv_task_act) = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
         while(LV_GC_ROOT(_lv_task_act)) {
             /* The task might be deleted if it runs only once ('once = 1')
@@ -100,9 +100,10 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 
             /*Here is the interrupter task. Don't execute it again.*/
             if(LV_GC_ROOT(_lv_task_act) == task_interrupter) {
-                task_interrupter = NULL;     /*From this point only task after the interrupter comes, so the interrupter is not interesting anymore*/
+                task_interrupter = NULL; /*From this point only task after the interrupter comes, so
+                                            the interrupter is not interesting anymore*/
                 LV_GC_ROOT(_lv_task_act) = next;
-                continue;                   /*Load the next task*/
+                continue; /*Load the next task*/
             }
 
             /*Just try to run the tasks with highest priority.*/
@@ -113,7 +114,8 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             else if(task_interrupter) {
                 if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio > task_interrupter->prio) {
                     if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
-                        task_interrupter = LV_GC_ROOT(_lv_task_act);  /*Check all tasks again from the highest priority */
+                        task_interrupter = LV_GC_ROOT(
+                            _lv_task_act); /*Check all tasks again from the highest priority */
                         end_flag = false;
                         break;
                     }
@@ -123,16 +125,19 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
              * Just run the remaining tasks*/
             else {
                 if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
-                    task_interrupter = LV_GC_ROOT(_lv_task_act);  /*Check all tasks again from the highest priority */
+                    task_interrupter = LV_GC_ROOT(
+                        _lv_task_act); /*Check all tasks again from the highest priority */
                     end_flag = false;
                     break;
                 }
             }
 
-            if(task_deleted) break;     /*If a task was deleted then this or the next item might be corrupted*/
-            if(task_created) break;     /*If a task was deleted then this or the next item might be corrupted*/
+            if(task_deleted)
+                break; /*If a task was deleted then this or the next item might be corrupted*/
+            if(task_created)
+                break; /*If a task was deleted then this or the next item might be corrupted*/
 
-            LV_GC_ROOT(_lv_task_act) = next;         /*Load the next task*/
+            LV_GC_ROOT(_lv_task_act) = next; /*Load the next task*/
         }
     } while(!end_flag);
 
@@ -140,15 +145,14 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
     if(idle_period_time >= IDLE_MEAS_PERIOD) {
 
-        idle_last = (uint32_t)((uint32_t)busy_time * 100) / IDLE_MEAS_PERIOD;   /*Calculate the busy percentage*/
-        idle_last = idle_last > 100 ? 0 : 100 - idle_last;                      /*But we need idle time*/
-        busy_time = 0;
+        idle_last = (uint32_t)((uint32_t)busy_time * 100) /
+                    IDLE_MEAS_PERIOD;                              /*Calculate the busy percentage*/
+        idle_last         = idle_last > 100 ? 0 : 100 - idle_last; /*But we need idle time*/
+        busy_time         = 0;
         idle_period_start = lv_tick_get();
-
-
     }
 
-    task_handler_mutex = false;     /*Release the mutex*/
+    task_handler_mutex = false; /*Release the mutex*/
 
     LV_LOG_TRACE("lv_task_handler ready");
 }
@@ -168,7 +172,7 @@ lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t
 
     /*Create task lists in order of priority from high to low*/
     tmp = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
-    if(NULL == tmp) {                               /*First task*/
+    if(NULL == tmp) { /*First task*/
         new_lv_task = lv_ll_ins_head(&LV_GC_ROOT(_lv_task_ll));
         lv_mem_assert(new_lv_task);
         if(new_lv_task == NULL) return NULL;
@@ -183,18 +187,18 @@ lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t
             tmp = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), tmp);
         } while(tmp != NULL);
 
-        if(tmp == NULL) {   /*Only too high priority tasks were found*/
+        if(tmp == NULL) { /*Only too high priority tasks were found*/
             new_lv_task = lv_ll_ins_tail(&LV_GC_ROOT(_lv_task_ll));
             lv_mem_assert(new_lv_task);
             if(new_lv_task == NULL) return NULL;
         }
     }
 
-    new_lv_task->period = period;
-    new_lv_task->task = task;
-    new_lv_task->prio = prio;
-    new_lv_task->param = param;
-    new_lv_task->once = 0;
+    new_lv_task->period   = period;
+    new_lv_task->task     = task;
+    new_lv_task->prio     = prio;
+    new_lv_task->param    = param;
+    new_lv_task->once     = 0;
     new_lv_task->last_run = lv_tick_get();
 
     task_created = true;
@@ -212,7 +216,7 @@ void lv_task_del(lv_task_t * lv_task_p)
 
     lv_mem_free(lv_task_p);
 
-    if(LV_GC_ROOT(_lv_task_act) == lv_task_p) task_deleted = true;      /*The active task was deleted*/
+    if(LV_GC_ROOT(_lv_task_act) == lv_task_p) task_deleted = true; /*The active task was deleted*/
 }
 
 /**
@@ -224,7 +228,8 @@ void lv_task_set_prio(lv_task_t * lv_task_p, lv_task_prio_t prio)
 {
     /*Find the tasks with new priority*/
     lv_task_t * i;
-    LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i) {
+    LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i)
+    {
         if(i->prio <= prio) {
             if(i != lv_task_p) lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), lv_task_p, i);
             break;
@@ -235,7 +240,6 @@ void lv_task_set_prio(lv_task_t * lv_task_p, lv_task_prio_t prio)
     if(i == NULL) {
         lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), lv_task_p, NULL);
     }
-
 
     lv_task_p->prio = prio;
 }
@@ -296,7 +300,6 @@ uint8_t lv_task_get_idle(void)
     return idle_last;
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -314,19 +317,18 @@ static bool lv_task_exec(lv_task_t * lv_task_p)
     uint32_t elp = lv_tick_elaps(lv_task_p->last_run);
     if(elp >= lv_task_p->period) {
         lv_task_p->last_run = lv_tick_get();
-        task_deleted = false;
-        task_created = false;
+        task_deleted        = false;
+        task_created        = false;
         lv_task_p->task(lv_task_p->param);
 
         /*Delete if it was a one shot lv_task*/
-        if(task_deleted == false) {			/*The task might be deleted by itself as well*/
-        	if(lv_task_p->once != 0) {
-        	    lv_task_del(lv_task_p);
-        	}
+        if(task_deleted == false) { /*The task might be deleted by itself as well*/
+            if(lv_task_p->once != 0) {
+                lv_task_del(lv_task_p);
+            }
         }
         exec = true;
     }
 
     return exec;
 }
-

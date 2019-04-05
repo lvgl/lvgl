@@ -32,27 +32,26 @@ extern "C" {
  **********************/
 
 /*Layout options*/
-enum
-{
+enum {
     LV_LAYOUT_OFF = 0,
     LV_LAYOUT_CENTER,
-    LV_LAYOUT_COL_L,    /*Column left align*/
-    LV_LAYOUT_COL_M,    /*Column middle align*/
-    LV_LAYOUT_COL_R,    /*Column right align*/
-    LV_LAYOUT_ROW_T,    /*Row top align*/
-    LV_LAYOUT_ROW_M,    /*Row middle align*/
-    LV_LAYOUT_ROW_B,    /*Row bottom align*/
-    LV_LAYOUT_PRETTY,   /*Put as many object as possible in row and begin a new row*/
-    LV_LAYOUT_GRID,     /*Align same-sized object into a grid*/
+    LV_LAYOUT_COL_L,  /*Column left align*/
+    LV_LAYOUT_COL_M,  /*Column middle align*/
+    LV_LAYOUT_COL_R,  /*Column right align*/
+    LV_LAYOUT_ROW_T,  /*Row top align*/
+    LV_LAYOUT_ROW_M,  /*Row middle align*/
+    LV_LAYOUT_ROW_B,  /*Row bottom align*/
+    LV_LAYOUT_PRETTY, /*Put as many object as possible in row and begin a new row*/
+    LV_LAYOUT_GRID,   /*Align same-sized object into a grid*/
 };
 typedef uint8_t lv_layout_t;
 
-
 enum {
-    LV_FIT_NONE,         /*Do not change the size automatically*/
-    LV_FIT_TIGHT,        /*Involve the children*/
-    LV_FIT_FLOOD,        /*Align the size to the parent's edge*/
-    LV_FIT_FILL,         /*Align the size to the parent's edge first but if there is an object out of it then involve it*/
+    LV_FIT_NONE,  /*Do not change the size automatically*/
+    LV_FIT_TIGHT, /*Involve the children*/
+    LV_FIT_FLOOD, /*Align the size to the parent's edge*/
+    LV_FIT_FILL,  /*Align the size to the parent's edge first but if there is an object out of it
+                     then involve it*/
 };
 typedef uint8_t lv_fit_t;
 
@@ -60,13 +59,12 @@ typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
     /*New data for this type */
-    uint8_t layout  :4;     /*A layout from 'lv_layout_t' enum*/
-    uint8_t fit_left :2;    /*A fit type from `lv_fit_t` enum */
-    uint8_t fit_right :2;   /*A fit type from `lv_fit_t` enum */
-    uint8_t fit_top :2;     /*A fit type from `lv_fit_t` enum */
-    uint8_t fit_bottom :2;  /*A fit type from `lv_fit_t` enum */
+    uint8_t layout : 4;     /*A layout from 'lv_layout_t' enum*/
+    uint8_t fit_left : 2;   /*A fit type from `lv_fit_t` enum */
+    uint8_t fit_right : 2;  /*A fit type from `lv_fit_t` enum */
+    uint8_t fit_top : 2;    /*A fit type from `lv_fit_t` enum */
+    uint8_t fit_bottom : 2; /*A fit type from `lv_fit_t` enum */
 } lv_cont_ext_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -100,7 +98,8 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout);
  * @param top bottom fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
-void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom);
+void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top,
+                      lv_fit_t bottom);
 
 /**
  * Set the fit policy horizontally and vertically separately.
@@ -114,7 +113,6 @@ static inline void lv_cont_set_fit2(lv_obj_t * cont, lv_fit_t hor, lv_fit_t ver)
     lv_cont_set_fit4(cont, hor, hor, ver, ver);
 }
 
-
 /**
  * Set the fit policyin all 4 direction at once.
  * It tell how to change the container's size automatically.
@@ -126,13 +124,12 @@ static inline void lv_cont_set_fit(lv_obj_t * cont, lv_fit_t fit)
     lv_cont_set_fit4(cont, fit, fit, fit, fit);
 }
 
-
 /**
  * Set the style of a container
  * @param cont pointer to a container object
  * @param style pointer to the new style
  */
-static inline void lv_cont_set_style(lv_obj_t *cont, lv_style_t * style)
+static inline void lv_cont_set_style(lv_obj_t * cont, lv_style_t * style)
 {
     lv_obj_set_style(cont, style);
 }
@@ -181,7 +178,7 @@ lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont);
  * @param cont pointer to a container object
  * @return pointer to the container's style
  */
-static inline lv_style_t * lv_cont_get_style(const lv_obj_t *cont)
+static inline lv_style_t * lv_cont_get_style(const lv_obj_t * cont)
 {
     return lv_obj_get_style(cont);
 }
@@ -190,10 +187,10 @@ static inline lv_style_t * lv_cont_get_style(const lv_obj_t *cont)
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_CONT*/
+#endif /*LV_USE_CONT*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_CONT_H*/
+#endif /*LV_CONT_H*/

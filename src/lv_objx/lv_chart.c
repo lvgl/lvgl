@@ -15,14 +15,14 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_CHART_YMIN_DEF   0
-#define LV_CHART_YMAX_DEF   100
-#define LV_CHART_HDIV_DEF   3
-#define LV_CHART_VDIV_DEF   5
-#define LV_CHART_PNUM_DEF   10
+#define LV_CHART_YMIN_DEF 0
+#define LV_CHART_YMAX_DEF 100
+#define LV_CHART_HDIV_DEF 3
+#define LV_CHART_VDIV_DEF 5
+#define LV_CHART_PNUM_DEF 10
 #define LV_CHART_AXIS_TO_LABEL_DISTANCE 4
-#define LV_CHART_AXIS_MAJOR_TICK_LEN_COE 1/15
-#define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2/3
+#define LV_CHART_AXIS_MAJOR_TICK_LEN_COE 1 / 15
+#define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2 / 3
 #define LV_CHART_AXIS_X_TICK_OFFSET_FIX 1
 #define LV_CHART_AXIS_Y_TICK_OFFSET_FIX 0
 
@@ -60,7 +60,8 @@ static lv_signal_cb_t ancestor_signal;
 /**
  * Create a chart background objects
  * @param par pointer to an object, it will be the parent of the new chart background
- * @param copy pointer to a chart background object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a chart background object, if not NULL then the new object will be copied
+ * from it
  * @return pointer to the created chart background
  */
 lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
@@ -78,17 +79,17 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
-    ext->series.num = 0;
-    ext->ymin = LV_CHART_YMIN_DEF;
-    ext->ymax = LV_CHART_YMAX_DEF;
-    ext->hdiv_cnt = LV_CHART_HDIV_DEF;
-    ext->vdiv_cnt = LV_CHART_VDIV_DEF;
-    ext->point_cnt = LV_CHART_PNUM_DEF;
-    ext->type = LV_CHART_TYPE_LINE;
-    ext->series.opa = LV_OPA_COVER;
-    ext->series.dark = LV_OPA_50;
+    ext->series.num   = 0;
+    ext->ymin         = LV_CHART_YMIN_DEF;
+    ext->ymax         = LV_CHART_YMAX_DEF;
+    ext->hdiv_cnt     = LV_CHART_HDIV_DEF;
+    ext->vdiv_cnt     = LV_CHART_VDIV_DEF;
+    ext->point_cnt    = LV_CHART_PNUM_DEF;
+    ext->type         = LV_CHART_TYPE_LINE;
+    ext->series.opa   = LV_OPA_COVER;
+    ext->series.dark  = LV_OPA_50;
     ext->series.width = 2;
-    ext->margin = 0;
+    ext->margin       = 0;
     memset(&ext->x_axis, 0, sizeof(ext->x_axis));
     memset(&ext->y_axis, 0, sizeof(ext->y_axis));
 
@@ -112,14 +113,14 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 
     } else {
         lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
-        ext->type = ext_copy->type;
-        ext->ymin = ext_copy->ymin;
-        ext->ymax = ext_copy->ymax;
-        ext->hdiv_cnt = ext_copy->hdiv_cnt;
-        ext->vdiv_cnt = ext_copy->vdiv_cnt;
-        ext->point_cnt = ext_copy->point_cnt;
-        ext->series.opa =  ext_copy->series.opa;
-        ext->margin = ext_copy->margin;
+        ext->type                 = ext_copy->type;
+        ext->ymin                 = ext_copy->ymin;
+        ext->ymax                 = ext_copy->ymax;
+        ext->hdiv_cnt             = ext_copy->hdiv_cnt;
+        ext->vdiv_cnt             = ext_copy->vdiv_cnt;
+        ext->point_cnt            = ext_copy->point_cnt;
+        ext->series.opa           = ext_copy->series.opa;
+        ext->margin               = ext_copy->margin;
         memcpy(&ext->x_axis, &ext_copy->x_axis, sizeof(lv_chart_axis_cfg_t));
         memcpy(&ext->y_axis, &ext_copy->y_axis, sizeof(lv_chart_axis_cfg_t));
 
@@ -128,7 +129,6 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     LV_LOG_INFO("chart created");
-
 
     return new_chart;
 }
@@ -145,7 +145,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    lv_chart_ext_t * ext    = lv_obj_get_ext_attr(chart);
     lv_chart_series_t * ser = lv_ll_ins_head(&ext->series_ll);
     lv_mem_assert(ser);
     if(ser == NULL) return NULL;
@@ -185,19 +185,16 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
  */
 void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
 {
-    if(chart == NULL || serie == NULL)
-        return;
+    if(chart == NULL || serie == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext == NULL) return;
 
     uint32_t i;
-    for(i = 0; i < ext->point_cnt; i++)
-    {
+    for(i = 0; i < ext->point_cnt; i++) {
         serie->points[i] = LV_CHART_POINT_DEF;
     }
 
     serie->start_point = 0;
-
 }
 
 /*=====================
@@ -270,7 +267,8 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 
     if(point_cnt < 1) point_cnt = 1;
 
-    LV_LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser)
+    {
         if(ser->start_point != 0) {
             lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * point_cnt);
             lv_mem_assert(new_points);
@@ -278,14 +276,16 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 
             if(point_cnt >= point_cnt_old) {
                 for(i = 0; i < point_cnt_old; i++) {
-                    new_points[i] = ser->points[(i + ser->start_point) % point_cnt_old];    /*Copy old contents to new array*/
+                    new_points[i] = ser->points[(i + ser->start_point) %
+                                                point_cnt_old]; /*Copy old contents to new array*/
                 }
                 for(i = point_cnt_old; i < point_cnt; i++) {
-                    new_points[i] = def;                                                    /*Fill up the rest with default value*/
+                    new_points[i] = def; /*Fill up the rest with default value*/
                 }
             } else {
                 for(i = 0; i < point_cnt; i++) {
-                    new_points[i] = ser->points[(i + ser->start_point) % point_cnt_old];    /*Copy old contents to new array*/
+                    new_points[i] = ser->points[(i + ser->start_point) %
+                                                point_cnt_old]; /*Copy old contents to new array*/
                 }
             }
 
@@ -394,7 +394,8 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-    ser->points[ser->start_point] = y;  /*This was the place of the former left most value, after shifting it is the rightmost*/
+    ser->points[ser->start_point] =
+        y; /*This was the place of the former left most value, after shifting it is the rightmost*/
     ser->start_point = (ser->start_point + 1) % ext->point_cnt;
 
     lv_chart_refresh(chart);
@@ -404,11 +405,11 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
  * Set the margin around the chart, used for axes value and labels
  * @param margin	value of the margin
  */
-void lv_chart_set_margin(lv_obj_t* chart, uint16_t margin)
+void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-	ext->margin = margin;
-	lv_obj_refresh_ext_size(chart);
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    ext->margin          = margin;
+    lv_obj_refresh_ext_size(chart);
 }
 
 /**
@@ -421,34 +422,28 @@ void lv_chart_set_margin(lv_obj_t* chart, uint16_t margin)
  * @param minor_tick_len	the length of the minor tick, AUTO if 0
  * @param options			extra options
  */
-void lv_chart_set_x_ticks(	lv_obj_t* chart,
-							const char* list_of_values,
-							uint8_t num_tick_marks,
-							uint8_t major_tick_len,
-							uint8_t minor_tick_len,
-							lv_chart_axis_options_t options)
+void lv_chart_set_x_ticks(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                          uint8_t major_tick_len, uint8_t minor_tick_len,
+                          lv_chart_axis_options_t options)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->x_axis.num_tick_marks = num_tick_marks;
     ext->x_axis.list_of_values = list_of_values;
     ext->x_axis.major_tick_len = major_tick_len;
     ext->x_axis.minor_tick_len = minor_tick_len;
-    ext->x_axis.options = options;
+    ext->x_axis.options        = options;
 }
 
-void lv_chart_set_y_ticks(	lv_obj_t* chart,
-							const char* list_of_values,
-							uint8_t num_tick_marks,
-							uint8_t major_tick_len,
-							uint8_t minor_tick_len,
-							lv_chart_axis_options_t options)
+void lv_chart_set_y_ticks(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                          uint8_t major_tick_len, uint8_t minor_tick_len,
+                          lv_chart_axis_options_t options)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->y_axis.num_tick_marks = num_tick_marks;
     ext->y_axis.list_of_values = list_of_values;
     ext->y_axis.major_tick_len = major_tick_len;
     ext->y_axis.minor_tick_len = minor_tick_len;
-    ext->y_axis.options = options;
+    ext->y_axis.options        = options;
 }
 
 /*=====================
@@ -528,10 +523,10 @@ void lv_chart_refresh(lv_obj_t * chart)
  * @param chart pointer to an chart object
  * @param return value of the margin
  */
-uint16_t lv_chart_get_margin(lv_obj_t* chart)
+uint16_t lv_chart_get_margin(lv_obj_t * chart)
 {
-	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-	return ext->margin;
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    return ext->margin;
 }
 
 /**********************
@@ -589,20 +584,21 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_coord_t ** datal;
-        LV_LL_READ(ext->series_ll, datal) {
+        LV_LL_READ(ext->series_ll, datal)
+        {
             lv_mem_free(*datal);
         }
         lv_ll_clear(&ext->series_ll);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_chart";
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-    	/*Provide extra px draw area around the chart*/
-    	chart->ext_size = ext->margin;
+        /*Provide extra px draw area around the chart*/
+        chart->ext_size = ext->margin;
     }
 
     return res;
@@ -616,16 +612,16 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
 static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    lv_style_t * style = lv_obj_get_style(chart);
-    lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
+    lv_style_t * style   = lv_obj_get_style(chart);
+    lv_opa_t opa_scale   = lv_obj_get_opa_scale(chart);
 
     uint8_t div_i;
     uint8_t div_i_end;
     uint8_t div_i_start;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t w = lv_obj_get_width(chart) - 1;
-    lv_coord_t h = lv_obj_get_height(chart) - 1;
+    lv_coord_t w     = lv_obj_get_width(chart) - 1;
+    lv_coord_t h     = lv_obj_get_height(chart) - 1;
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
 
@@ -633,19 +629,21 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
         /*Draw slide lines if no border*/
         if(style->body.border.width != 0) {
             div_i_start = 1;
-            div_i_end = ext->hdiv_cnt;
+            div_i_end   = ext->hdiv_cnt;
         } else {
             div_i_start = 0;
-            div_i_end = ext->hdiv_cnt + 1;
+            div_i_end   = ext->hdiv_cnt + 1;
         }
 
         p1.x = 0 + x_ofs;
         p2.x = w + x_ofs;
         for(div_i = div_i_start; div_i <= div_i_end; div_i++) {
             p1.y = (int32_t)((int32_t)h * div_i) / (ext->hdiv_cnt + 1);
-            p1.y +=  y_ofs;
-            if(div_i == div_i_start) p1.y += (style->line.width >> 1) + 1;  /*The first line might not be visible*/
-            if(div_i == div_i_end) p1.y -= (style->line.width >> 1) + 1;  /*The last line might not be visible*/
+            p1.y += y_ofs;
+            if(div_i == div_i_start)
+                p1.y += (style->line.width >> 1) + 1; /*The first line might not be visible*/
+            if(div_i == div_i_end)
+                p1.y -= (style->line.width >> 1) + 1; /*The last line might not be visible*/
 
             p2.y = p1.y;
             lv_draw_line(&p1, &p2, mask, style, opa_scale);
@@ -656,19 +654,21 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
         /*Draw slide lines if no border*/
         if(style->body.border.width != 0) {
             div_i_start = 1;
-            div_i_end = ext->vdiv_cnt;
+            div_i_end   = ext->vdiv_cnt;
         } else {
             div_i_start = 0;
-            div_i_end = ext->vdiv_cnt + 1;
+            div_i_end   = ext->vdiv_cnt + 1;
         }
 
         p1.y = 0 + y_ofs;
         p2.y = h + y_ofs;
-        for(div_i = div_i_start; div_i <= div_i_end; div_i ++) {
+        for(div_i = div_i_start; div_i <= div_i_end; div_i++) {
             p1.x = (int32_t)((int32_t)w * div_i) / (ext->vdiv_cnt + 1);
-            p1.x +=  x_ofs;
-            if(div_i == div_i_start) p1.x += (style->line.width >> 1) + 1;  /*The first line might not be visible*/
-            if(div_i == div_i_end) p1.x -= (style->line.width >> 1) + 1;  /*The last line might not be visible*/
+            p1.x += x_ofs;
+            if(div_i == div_i_start)
+                p1.x += (style->line.width >> 1) + 1; /*The first line might not be visible*/
+            if(div_i == div_i_end)
+                p1.x -= (style->line.width >> 1) + 1; /*The last line might not be visible*/
             p2.x = p1.x;
             lv_draw_line(&p1, &p2, mask, style, opa_scale);
         }
@@ -686,8 +686,8 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
     uint16_t i;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t w = lv_obj_get_width(chart);
-    lv_coord_t h = lv_obj_get_height(chart);
+    lv_coord_t w     = lv_obj_get_width(chart);
+    lv_coord_t h     = lv_obj_get_height(chart);
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
     int32_t y_tmp;
@@ -697,22 +697,23 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
     lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
     lv_style_t style;
     lv_style_copy(&style, &lv_style_plain);
-    style.line.opa = ext->series.opa;
+    style.line.opa   = ext->series.opa;
     style.line.width = ext->series.width;
 
     /*Go through all data lines*/
-    LV_LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser)
+    {
         style.line.color = ser->color;
 
         p1.x = 0 + x_ofs;
         p2.x = 0 + x_ofs;
 
         p_prev = ser->start_point;
-        y_tmp = (int32_t)((int32_t) ser->points[p_prev] - ext->ymin) * h;
-        y_tmp = y_tmp / (ext->ymax - ext->ymin);
-        p2.y = h - y_tmp + y_ofs;
+        y_tmp  = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin) * h;
+        y_tmp  = y_tmp / (ext->ymax - ext->ymin);
+        p2.y   = h - y_tmp + y_ofs;
 
-        for(i = 1; i < ext->point_cnt; i ++) {
+        for(i = 1; i < ext->point_cnt; i++) {
             p1.x = p2.x;
             p1.y = p2.y;
 
@@ -720,11 +721,12 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
 
             p_act = (ser->start_point + i) % ext->point_cnt;
 
-            y_tmp = (int32_t)((int32_t) ser->points[p_act] - ext->ymin) * h;
+            y_tmp = (int32_t)((int32_t)ser->points[p_act] - ext->ymin) * h;
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
-            p2.y = h - y_tmp + y_ofs;
+            p2.y  = h - y_tmp + y_ofs;
 
-            if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF)
+            if(ser->points[p_prev] != LV_CHART_POINT_DEF &&
+               ser->points[p_act] != LV_CHART_POINT_DEF)
                 lv_draw_line(&p1, &p2, mask, &style, opa_scale);
 
             p_prev = p_act;
@@ -743,8 +745,8 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
 
     uint16_t i;
     lv_area_t cir_a;
-    lv_coord_t w = lv_obj_get_width(chart);
-    lv_coord_t h = lv_obj_get_height(chart);
+    lv_coord_t w     = lv_obj_get_width(chart);
+    lv_coord_t h     = lv_obj_get_height(chart);
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
     int32_t y_tmp;
@@ -755,22 +757,23 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_copy(&style_point, &lv_style_plain);
 
     style_point.body.border.width = 0;
-    style_point.body.radius = LV_RADIUS_CIRCLE;
-    style_point.body.opa = ext->series.opa;
-    style_point.body.radius = ext->series.width;
+    style_point.body.radius       = LV_RADIUS_CIRCLE;
+    style_point.body.opa          = ext->series.opa;
+    style_point.body.radius       = ext->series.width;
 
     /*Go through all data lines*/
-    LV_LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser)
+    {
         style_point.body.main_color = ser->color;
         style_point.body.grad_color = lv_color_mix(LV_COLOR_BLACK, ser->color, ext->series.dark);
 
-        for(i = 0; i < ext->point_cnt; i ++) {
+        for(i = 0; i < ext->point_cnt; i++) {
             cir_a.x1 = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
             cir_a.x2 = cir_a.x1 + style_point.body.radius;
             cir_a.x1 -= style_point.body.radius;
-            p_act = (ser->start_point + i) % ext->point_cnt;
-            y_tmp = (int32_t)((int32_t) ser->points[p_act] - ext->ymin) * h;
-            y_tmp = y_tmp / (ext->ymax - ext->ymin);
+            p_act    = (ser->start_point + i) % ext->point_cnt;
+            y_tmp    = (int32_t)((int32_t)ser->points[p_act] - ext->ymin) * h;
+            y_tmp    = y_tmp / (ext->ymax - ext->ymin);
             cir_a.y1 = h - y_tmp + y_ofs;
             cir_a.y2 = cir_a.y1 + style_point.body.radius;
             cir_a.y1 -= style_point.body.radius;
@@ -800,35 +803,37 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
     int32_t y_tmp;
     lv_chart_series_t * ser;
     lv_style_t rects;
-    lv_coord_t col_w = w / ((ext->series.num + 1) * ext->point_cnt); /* Suppose + 1 series as separator*/
-    lv_coord_t x_ofs = col_w / 2; /*Shift with a half col.*/
+    lv_coord_t col_w =
+        w / ((ext->series.num + 1) * ext->point_cnt); /* Suppose + 1 series as separator*/
+    lv_coord_t x_ofs = col_w / 2;                     /*Shift with a half col.*/
 
     lv_style_copy(&rects, &lv_style_plain);
     rects.body.border.width = 0;
-    rects.body.radius = 0;
-    rects.body.opa = ext->series.opa;
+    rects.body.radius       = 0;
+    rects.body.opa          = ext->series.opa;
 
     col_a.y2 = chart->coords.y2;
 
     lv_coord_t x_act;
 
     /*Go through all points*/
-    for(i = 0; i < ext->point_cnt; i ++) {
-        x_act = (int32_t)((int32_t) w * i) / ext->point_cnt;
+    for(i = 0; i < ext->point_cnt; i++) {
+        x_act = (int32_t)((int32_t)w * i) / ext->point_cnt;
         x_act += chart->coords.x1 + x_ofs;
 
         /*Draw the current point of all data line*/
-        LV_LL_READ_BACK(ext->series_ll, ser) {
+        LV_LL_READ_BACK(ext->series_ll, ser)
+        {
             rects.body.main_color = ser->color;
             rects.body.grad_color = lv_color_mix(LV_COLOR_BLACK, ser->color, ext->series.dark);
-            col_a.x1 = x_act;
-            col_a.x2 = col_a.x1 + col_w;
+            col_a.x1              = x_act;
+            col_a.x2              = col_a.x1 + col_w;
             x_act += col_w;
 
             lv_coord_t p_act = (ser->start_point + i) % ext->point_cnt;
-            y_tmp = (int32_t)((int32_t) ser->points[p_act] - ext->ymin) * h;
-            y_tmp = y_tmp / (ext->ymax - ext->ymin);
-            col_a.y1 = h - y_tmp + chart->coords.y1;
+            y_tmp            = (int32_t)((int32_t)ser->points[p_act] - ext->ymin) * h;
+            y_tmp            = y_tmp / (ext->ymax - ext->ymin);
+            col_a.y1         = h - y_tmp + chart->coords.y1;
 
             mask_ret = lv_area_intersect(&col_mask, mask, &col_a);
             if(mask_ret != false && ser->points[p_act] != LV_CHART_POINT_DEF) {
@@ -846,7 +851,7 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
 {
 
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    lv_coord_t w = lv_obj_get_width(chart);
+    lv_coord_t w         = lv_obj_get_width(chart);
     /*Vertical lines works only if the width == point count. Else use the normal line type*/
     if(ext->point_cnt != w) {
         lv_chart_draw_lines(chart, mask);
@@ -856,7 +861,7 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
     uint16_t i;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t h = lv_obj_get_height(chart);
+    lv_coord_t h     = lv_obj_get_height(chart);
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
     int32_t y_tmp;
@@ -864,29 +869,28 @@ static void lv_chart_draw_vertical_lines(lv_obj_t * chart, const lv_area_t * mas
     lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
     lv_style_t style;
     lv_style_copy(&style, &lv_style_plain);
-    style.line.opa = ext->series.opa;
+    style.line.opa   = ext->series.opa;
     style.line.width = ext->series.width;
 
     /*Go through all data lines*/
-    LV_LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser)
+    {
         style.line.color = ser->color;
 
-        p1.x = 0 + x_ofs;
-        p2.x = 0 + x_ofs;
-        y_tmp = (int32_t)((int32_t) ser->points[0] - ext->ymin) * h;
+        p1.x  = 0 + x_ofs;
+        p2.x  = 0 + x_ofs;
+        y_tmp = (int32_t)((int32_t)ser->points[0] - ext->ymin) * h;
         y_tmp = y_tmp / (ext->ymax - ext->ymin);
-        p2.y = h - y_tmp + y_ofs;
-        p1.y = p2.y;
+        p2.y  = h - y_tmp + y_ofs;
+        p1.y  = p2.y;
 
-        for(i = 0; i < ext->point_cnt; i++)
-        {
+        for(i = 0; i < ext->point_cnt; i++) {
 
-            y_tmp = (int32_t)((int32_t) ser->points[i] - ext->ymin) * h;
+            y_tmp = (int32_t)((int32_t)ser->points[i] - ext->ymin) * h;
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
-            p2.y = h - y_tmp + y_ofs;
+            p2.y  = h - y_tmp + y_ofs;
 
-            if(p1.y == p2.y)
-            {
+            if(p1.y == p2.y) {
                 p2.x++;
             }
 
@@ -912,8 +916,8 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     uint16_t i;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t w = lv_obj_get_width(chart);
-    lv_coord_t h = lv_obj_get_height(chart);
+    lv_coord_t w     = lv_obj_get_width(chart);
+    lv_coord_t h     = lv_obj_get_height(chart);
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
     int32_t y_tmp;
@@ -925,31 +929,33 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_copy(&style, &lv_style_plain);
 
     /*Go through all data lines*/
-    LV_LL_READ_BACK(ext->series_ll, ser) {
+    LV_LL_READ_BACK(ext->series_ll, ser)
+    {
         style.body.main_color = ser->color;
 
         p1.x = 0 + x_ofs;
         p2.x = 0 + x_ofs;
 
         p_prev = ser->start_point;
-        y_tmp = (int32_t)((int32_t) ser->points[p_prev] - ext->ymin) * h;
-        y_tmp = y_tmp / (ext->ymax - ext->ymin);
-        p2.y = h - y_tmp + y_ofs;
+        y_tmp  = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin) * h;
+        y_tmp  = y_tmp / (ext->ymax - ext->ymin);
+        p2.y   = h - y_tmp + y_ofs;
 
-        for(i = 1; i < ext->point_cnt; i ++) {
+        for(i = 1; i < ext->point_cnt; i++) {
             p1.x = p2.x;
             p1.y = p2.y;
 
-            p2.x = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
+            p2.x  = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
             p_act = (ser->start_point + i) % ext->point_cnt;
 
-            y_tmp = (int32_t)((int32_t) ser->points[p_act] - ext->ymin) * h;
+            y_tmp = (int32_t)((int32_t)ser->points[p_act] - ext->ymin) * h;
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
-            p2.y = h - y_tmp + y_ofs;
+            p2.y  = h - y_tmp + y_ofs;
 
-            if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
+            if(ser->points[p_prev] != LV_CHART_POINT_DEF &&
+               ser->points[p_act] != LV_CHART_POINT_DEF) {
                 lv_point_t triangle_points[3];
-                triangle_points[0] = p1;
+                triangle_points[0]   = p1;
                 triangle_points[1].x = p2.x;
                 triangle_points[1].y = y_ofs + h;
                 triangle_points[2].x = p1.x;
@@ -970,9 +976,9 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
     if(ext->y_axis.list_of_values != NULL || ext->y_axis.num_tick_marks != 0) {
 
         const lv_style_t * style = lv_obj_get_style(chart);
-        lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
+        lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
-        uint8_t i,j;
+        uint8_t i, j;
         uint8_t list_index;
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
@@ -981,96 +987,95 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
         lv_point_t p2;
         lv_coord_t x_ofs = chart->coords.x1;
         lv_coord_t y_ofs = chart->coords.y1;
-        lv_coord_t h = lv_obj_get_height(chart);
-        lv_coord_t w = lv_obj_get_width(chart);
-        char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN+1]; /* up to N symbols per label + null terminator */
+        lv_coord_t h     = lv_obj_get_height(chart);
+        lv_coord_t w     = lv_obj_get_width(chart);
+        char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN +
+                 1]; /* up to N symbols per label + null terminator */
 
         /* calculate the size of tick marks */
         if(ext->y_axis.major_tick_len == 0)
-        	major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
+            major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
         else
-        	major_tick_len = ext->y_axis.major_tick_len;
+            major_tick_len = ext->y_axis.major_tick_len;
 
         if(ext->y_axis.minor_tick_len == 0)
-        	minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
+            minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
         else
-        	minor_tick_len = ext->y_axis.minor_tick_len;
+            minor_tick_len = ext->y_axis.minor_tick_len;
 
         /* count the '\n'-s to determine the number of options */
-        list_index = 0;
+        list_index    = 0;
         num_of_labels = 0;
-        if(ext->y_axis.list_of_values != NULL)
-        {
-			for(j = 0; ext->y_axis.list_of_values[j] != '\0'; j++) {
-				if(ext->y_axis.list_of_values[j] == '\n')
-					num_of_labels++;
-			}
+        if(ext->y_axis.list_of_values != NULL) {
+            for(j = 0; ext->y_axis.list_of_values[j] != '\0'; j++) {
+                if(ext->y_axis.list_of_values[j] == '\n') num_of_labels++;
+            }
 
-	        num_of_labels++; /* last option in the at row*/
+            num_of_labels++; /* last option in the at row*/
         }
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
-        if(ext->y_axis.num_tick_marks == 0)
-        	ext->y_axis.num_tick_marks = 1;
+        if(ext->y_axis.num_tick_marks == 0) ext->y_axis.num_tick_marks = 1;
 
         /* calculate total number of ticks */
         if(num_of_labels < 2)
-        	num_scale_ticks = ext->y_axis.num_tick_marks;
+            num_scale_ticks = ext->y_axis.num_tick_marks;
         else
-        	num_scale_ticks = (ext->y_axis.num_tick_marks * (num_of_labels - 1));
+            num_scale_ticks = (ext->y_axis.num_tick_marks * (num_of_labels - 1));
 
-        for(i = 0; i < (num_scale_ticks + 1); i++ ) { /* one extra loop - it may not exist in the list, empty label */
-        	/* first point of the tick */
+        for(i = 0; i < (num_scale_ticks + 1);
+            i++) { /* one extra loop - it may not exist in the list, empty label */
+                   /* first point of the tick */
             p1.x = 0 + x_ofs;
 
-        	/* second point of the tick */
-        	if( (num_of_labels != 0) && (i == 0 || i % ext->y_axis.num_tick_marks == 0) )
-        		p2.x = p1.x - major_tick_len; /* major tick */
-        	else
-        		p2.x = p1.x - minor_tick_len; /* minor tick */
+            /* second point of the tick */
+            if((num_of_labels != 0) && (i == 0 || i % ext->y_axis.num_tick_marks == 0))
+                p2.x = p1.x - major_tick_len; /* major tick */
+            else
+                p2.x = p1.x - minor_tick_len; /* minor tick */
 
             /* draw a line at moving y position */
-        	p2.y = p1.y = y_ofs + h - (int32_t)(((int32_t)h * i) / num_scale_ticks + 1) - LV_CHART_AXIS_Y_TICK_OFFSET_FIX;
+            p2.y = p1.y = y_ofs + h - (int32_t)(((int32_t)h * i) / num_scale_ticks + 1) -
+                          LV_CHART_AXIS_Y_TICK_OFFSET_FIX;
 
-        	if( i != num_scale_ticks )
-        		lv_draw_line(&p1, &p2, mask, style, opa_scale);
-        	else
-        		if( (ext->y_axis.options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0 )
-        			lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            if(i != num_scale_ticks)
+                lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            else if((ext->y_axis.options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
+                lv_draw_line(&p1, &p2, mask, style, opa_scale);
 
             /* draw values if available */
-            if (num_of_labels != 0)
-            {
-            	/* add text only to major tick */
-            	if( i == 0 || i % ext->y_axis.num_tick_marks == 0 )
-            	{
-            		/* search for tick string */
-            		j = 0;
-            		while(	ext->y_axis.list_of_values[list_index] != '\n' &&
-            				ext->y_axis.list_of_values[list_index] != '\0')
-            		{
-            			/* do not overflow the buffer, but move to the end of the current label */
-            			if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
-            				buf[j++] = ext->y_axis.list_of_values[list_index++];
-            			else
-            				list_index++;
-            		}
+            if(num_of_labels != 0) {
+                /* add text only to major tick */
+                if(i == 0 || i % ext->y_axis.num_tick_marks == 0) {
+                    /* search for tick string */
+                    j = 0;
+                    while(ext->y_axis.list_of_values[list_index] != '\n' &&
+                          ext->y_axis.list_of_values[list_index] != '\0') {
+                        /* do not overflow the buffer, but move to the end of the current label */
+                        if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
+                            buf[j++] = ext->y_axis.list_of_values[list_index++];
+                        else
+                            list_index++;
+                    }
 
-            		/* this was a string, but not end of the list, so jump to the next string */
-            		if(ext->y_axis.list_of_values[list_index] == '\n')
-            			list_index++;
+                    /* this was a string, but not end of the list, so jump to the next string */
+                    if(ext->y_axis.list_of_values[list_index] == '\n') list_index++;
 
-            		/* terminate the string */
-            		buf[j] = '\0';
+                    /* terminate the string */
+                    buf[j] = '\0';
 
-            		/* reserve appropriate area */
-            		lv_point_t size;
-            		lv_txt_get_size(&size, buf, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_CENTER);
+                    /* reserve appropriate area */
+                    lv_point_t size;
+                    lv_txt_get_size(&size, buf, style->text.font, style->text.letter_space,
+                                    style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
-            		/* set the area at some distance of the major tick len left of the tick */
-					lv_area_t a = {(p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE) , (p2.y - size.y/2), (p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.y + size.y/2) };
-					lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1);
-            	}
+                    /* set the area at some distance of the major tick len left of the tick */
+                    lv_area_t a = {(p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE),
+                                   (p2.y - size.y / 2), (p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE),
+                                   (p2.y + size.y / 2)};
+                    lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1,
+                                  -1);
+                }
             }
         }
     }
@@ -1084,9 +1089,9 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
     if(ext->x_axis.list_of_values != NULL || ext->x_axis.num_tick_marks != 0) {
 
         const lv_style_t * style = lv_obj_get_style(chart);
-        lv_opa_t opa_scale = lv_obj_get_opa_scale(chart);
+        lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
-        uint8_t i,j;
+        uint8_t i, j;
         uint8_t list_index;
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
@@ -1095,96 +1100,95 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         lv_point_t p2;
         lv_coord_t x_ofs = chart->coords.x1;
         lv_coord_t y_ofs = chart->coords.y1;
-        lv_coord_t h = lv_obj_get_height(chart);
-        lv_coord_t w = lv_obj_get_width(chart);
-        char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN+1]; /* up to N symbols per label + null terminator */
+        lv_coord_t h     = lv_obj_get_height(chart);
+        lv_coord_t w     = lv_obj_get_width(chart);
+        char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN +
+                 1]; /* up to N symbols per label + null terminator */
 
         /* calculate the size of tick marks */
         if(ext->x_axis.major_tick_len == 0)
-        	major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
+            major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
         else
-        	major_tick_len = ext->x_axis.major_tick_len;
+            major_tick_len = ext->x_axis.major_tick_len;
 
         if(ext->x_axis.minor_tick_len == 0)
-        	minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
+            minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
         else
-        	minor_tick_len = ext->x_axis.minor_tick_len;
+            minor_tick_len = ext->x_axis.minor_tick_len;
 
         /* count the '\n'-s to determine the number of options */
-        list_index = 0;
+        list_index    = 0;
         num_of_labels = 0;
-        if(ext->x_axis.list_of_values != NULL)
-        {
-			for(j = 0; ext->x_axis.list_of_values[j] != '\0'; j++) {
-				if(ext->x_axis.list_of_values[j] == '\n')
-					num_of_labels++;
-			}
+        if(ext->x_axis.list_of_values != NULL) {
+            for(j = 0; ext->x_axis.list_of_values[j] != '\0'; j++) {
+                if(ext->x_axis.list_of_values[j] == '\n') num_of_labels++;
+            }
 
-	        num_of_labels++; /* last option in the at row*/
+            num_of_labels++; /* last option in the at row*/
         }
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
-        if(ext->x_axis.num_tick_marks == 0)
-        	ext->x_axis.num_tick_marks = 1;
+        if(ext->x_axis.num_tick_marks == 0) ext->x_axis.num_tick_marks = 1;
 
         /* calculate total number of marks */
         if(num_of_labels < 2)
-        	num_scale_ticks = ext->x_axis.num_tick_marks;
+            num_scale_ticks = ext->x_axis.num_tick_marks;
         else
-        	num_scale_ticks = (ext->x_axis.num_tick_marks * (num_of_labels - 1));
+            num_scale_ticks = (ext->x_axis.num_tick_marks * (num_of_labels - 1));
 
-        for(i = 0; i < (num_scale_ticks + 1); i++ ) { /* one extra loop - it may not exist in the list, empty label */
-        	/* first point of the tick */
+        for(i = 0; i < (num_scale_ticks + 1);
+            i++) { /* one extra loop - it may not exist in the list, empty label */
+                   /* first point of the tick */
             p1.y = h + y_ofs;
 
-        	/* second point of the tick */
-        	if( (num_of_labels != 0) && (i == 0 || i % ext->x_axis.num_tick_marks == 0) )
-        		p2.y = p1.y + major_tick_len; /* major tick */
-        	else
-        		p2.y = p1.y + minor_tick_len; /* minor tick */
+            /* second point of the tick */
+            if((num_of_labels != 0) && (i == 0 || i % ext->x_axis.num_tick_marks == 0))
+                p2.y = p1.y + major_tick_len; /* major tick */
+            else
+                p2.y = p1.y + minor_tick_len; /* minor tick */
 
             /* draw a line at moving x position */
-        	p2.x = p1.x = x_ofs + (int32_t)(((int32_t)w * i) / num_scale_ticks + 1) - LV_CHART_AXIS_X_TICK_OFFSET_FIX;
+            p2.x = p1.x = x_ofs + (int32_t)(((int32_t)w * i) / num_scale_ticks + 1) -
+                          LV_CHART_AXIS_X_TICK_OFFSET_FIX;
 
-        	if( i != num_scale_ticks )
-        		lv_draw_line(&p1, &p2, mask, style, opa_scale);
-        	else
-        		if( (ext->x_axis.options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0 )
-        			lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            if(i != num_scale_ticks)
+                lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            else if((ext->x_axis.options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
+                lv_draw_line(&p1, &p2, mask, style, opa_scale);
 
             /* draw values if available */
-            if (num_of_labels != 0)
-            {
-            	/* add text only to major tick */
-            	if( i == 0 || i % ext->x_axis.num_tick_marks == 0 )
-            	{
-            		/* search for tick string */
-            		j = 0;
-            		while(	ext->x_axis.list_of_values[list_index] != '\n' &&
-            				ext->x_axis.list_of_values[list_index] != '\0')
-            		{
-            			/* do not overflow the buffer, but move to the end of the current label */
-            			if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
-            				buf[j++] = ext->x_axis.list_of_values[list_index++];
-            			else
-            				list_index++;
-            		}
+            if(num_of_labels != 0) {
+                /* add text only to major tick */
+                if(i == 0 || i % ext->x_axis.num_tick_marks == 0) {
+                    /* search for tick string */
+                    j = 0;
+                    while(ext->x_axis.list_of_values[list_index] != '\n' &&
+                          ext->x_axis.list_of_values[list_index] != '\0') {
+                        /* do not overflow the buffer, but move to the end of the current label */
+                        if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
+                            buf[j++] = ext->x_axis.list_of_values[list_index++];
+                        else
+                            list_index++;
+                    }
 
-            		/* this was a string, but not end of the list, so jump to the next string */
-            		if(ext->x_axis.list_of_values[list_index] == '\n')
-            			list_index++;
+                    /* this was a string, but not end of the list, so jump to the next string */
+                    if(ext->x_axis.list_of_values[list_index] == '\n') list_index++;
 
-            		/* terminate the string */
-            		buf[j] = '\0';
+                    /* terminate the string */
+                    buf[j] = '\0';
 
-            		/* reserve appropriate area */
-            		lv_point_t size;
-            		lv_txt_get_size(&size, buf, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_CENTER);
+                    /* reserve appropriate area */
+                    lv_point_t size;
+                    lv_txt_get_size(&size, buf, style->text.font, style->text.letter_space,
+                                    style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
-            		/* set the area at some distance of the major tick len under of the tick */
-					lv_area_t a = { (p2.x - size.x/2) , (p2.y + LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.x + size.x/2), (p2.y + size.y + LV_CHART_AXIS_TO_LABEL_DISTANCE) };
-					lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1);
-            	}
+                    /* set the area at some distance of the major tick len under of the tick */
+                    lv_area_t a = {(p2.x - size.x / 2), (p2.y + LV_CHART_AXIS_TO_LABEL_DISTANCE),
+                                   (p2.x + size.x / 2),
+                                   (p2.y + size.y + LV_CHART_AXIS_TO_LABEL_DISTANCE)};
+                    lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1,
+                                  -1);
+                }
             }
         }
     }

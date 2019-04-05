@@ -27,7 +27,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static void (*print_cb)(lv_log_level_t, const char *, uint32_t,  const char *);
+static void (*print_cb)(lv_log_level_t, const char *, uint32_t, const char *);
 
 /**********************
  *      MACROS
@@ -40,9 +40,10 @@ static void (*print_cb)(lv_log_level_t, const char *, uint32_t,  const char *);
 /**
  * Register custom print (or anything else) function to call when log is added
  * @param f a function pointer:
- *          `void my_print (lv_log_level_t level, const char * file, uint32_t line, const char * dsc)`
+ *          `void my_print (lv_log_level_t level, const char * file, uint32_t line, const char *
+ * dsc)`
  */
-void lv_log_register_print(void f(lv_log_level_t, const char *, uint32_t,  const char *))
+void lv_log_register_print(void f(lv_log_level_t, const char *, uint32_t, const char *))
 {
     print_cb = f;
 }
@@ -56,13 +57,13 @@ void lv_log_register_print(void f(lv_log_level_t, const char *, uint32_t,  const
  */
 void lv_log_add(lv_log_level_t level, const char * file, int line, const char * dsc)
 {
-    if(level >= _LV_LOG_LEVEL_NUM) return;      /*Invalid level*/
+    if(level >= _LV_LOG_LEVEL_NUM) return; /*Invalid level*/
 
     if(level >= LV_LOG_LEVEL) {
 
 #if LV_LOG_PRINTF
         static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error"};
-        printf("%s: %s \t(%s #%d)\n", lvl_prefix[level], dsc,  file, line);
+        printf("%s: %s \t(%s #%d)\n", lvl_prefix[level], dsc, file, line);
 #else
         if(print_cb) print_cb(level, file, line, dsc);
 #endif

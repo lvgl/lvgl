@@ -55,18 +55,18 @@ typedef struct
     /*New data for this type */
     lv_obj_t * btns;
     lv_obj_t * indic;
-    lv_obj_t * content;   /*A rectangle to show the current tab*/
+    lv_obj_t * content; /*A rectangle to show the current tab*/
     const char ** tab_name_ptr;
     lv_point_t point_last;
     uint16_t tab_cur;
     uint16_t tab_cnt;
     uint16_t anim_time;
-    uint8_t slide_enable :1;    /*1: enable horizontal sliding by touch pad*/
-    uint8_t draging :1;
-    uint8_t drag_hor :1;
-    uint8_t scroll_ver :1;
-    uint8_t btns_hide :1;
-    lv_tabview_btns_pos_t btns_pos :1;
+    uint8_t slide_enable : 1; /*1: enable horizontal sliding by touch pad*/
+    uint8_t draging : 1;
+    uint8_t drag_hor : 1;
+    uint8_t scroll_ver : 1;
+    uint8_t btns_hide : 1;
+    lv_tabview_btns_pos_t btns_pos : 1;
 } lv_tabview_ext_t;
 
 enum {
@@ -84,7 +84,6 @@ typedef uint8_t lv_tabview_style_t;
  * GLOBAL PROTOTYPES
  **********************/
 
-
 /**
  * Create a Tab view object
  * @param par pointer to an object, it will be the parent of the new tab
@@ -97,7 +96,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy);
  * Delete all children of the scrl object, without deleting scrl child.
  * @param obj pointer to an object
  */
-void lv_tabview_clean(lv_obj_t *obj);
+void lv_tabview_clean(lv_obj_t * obj);
 
 /*======================
  * Add/remove functions
@@ -143,21 +142,21 @@ void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time);
  * @param type which style should be set
  * @param style pointer to the new style
  */
-void lv_tabview_set_style(lv_obj_t *tabview, lv_tabview_style_t type, lv_style_t *style);
+void lv_tabview_set_style(lv_obj_t * tabview, lv_tabview_style_t type, lv_style_t * style);
 
 /**
  * Set the position of tab select buttons
  * @param tabview pointer to a tab view object
  * @param btns_pos which button position
  */
-void lv_tabview_set_btns_pos(lv_obj_t *tabview, lv_tabview_btns_pos_t btns_pos);
+void lv_tabview_set_btns_pos(lv_obj_t * tabview, lv_tabview_btns_pos_t btns_pos);
 
 /**
  * Set whether tab buttons are hidden
  * @param tabview pointer to a tab view object
  * @param en whether tab buttons are hidden
  */
-void lv_tabview_set_btns_hidden(lv_obj_t *tabview, bool en);
+void lv_tabview_set_btns_hidden(lv_obj_t * tabview, bool en);
 
 /*=====================
  * Getter functions
@@ -204,29 +203,29 @@ uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_tabview_get_style(const lv_obj_t *tabview, lv_tabview_style_t type);
+lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_style_t type);
 
 /**
  * Get position of tab select buttons
  * @param tabview pointer to a ab view object
  */
-lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t *tabview);
+lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t * tabview);
 
 /**
  * Get whether tab buttons are hidden
  * @param tabview pointer to a tab view object
  * @return whether tab buttons are hidden
  */
-bool lv_tabview_get_btns_hidden(const lv_obj_t *tabview);
+bool lv_tabview_get_btns_hidden(const lv_obj_t * tabview);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_TABVIEW*/
+#endif /*LV_USE_TABVIEW*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_TABVIEW_H*/
+#endif /*LV_TABVIEW_H*/
