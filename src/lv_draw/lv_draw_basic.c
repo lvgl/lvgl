@@ -158,11 +158,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
     else if(opa == LV_OPA_COVER) {
         /*Use hw fill if present*/
         if(disp->driver.mem_fill_cb) {
-            lv_coord_t row;
-            for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                disp->driver.mem_fill_cb(vdb->buf_act, &vdb->area, &vdb_rel_a, color);
-                vdb_buf_tmp += vdb_width;
-            }
+            disp->driver.mem_fill_cb(vdb->buf_act, &vdb->area, &vdb_rel_a, color);
         }
         /*Use hw blend if present and the area is not too small*/
         else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT &&
