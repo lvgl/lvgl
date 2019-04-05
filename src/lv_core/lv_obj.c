@@ -1104,9 +1104,9 @@ void lv_obj_set_drag(lv_obj_t * obj, bool en)
 /**
  * Set the directions an object can be dragged in
  * @param obj pointer to an object
- * @param en true: make the object dragable
+ * @param drag_dir bitwise OR of allowed directions an object can be dragged in
  */
-void lv_obj_set_drag_dir(lv_obj_t * obj, lv_drag_direction_t drag_dir)
+void lv_obj_set_drag_dir(lv_obj_t * obj, lv_drag_dir_t drag_dir)
 {
     obj->drag_dir = drag_dir;
 
@@ -1713,9 +1713,9 @@ bool lv_obj_get_drag(const lv_obj_t * obj)
 /**
  * Get the directions an object can be dragged
  * @param obj pointer to an object
- * @return directions an object can be dragged
+ * @return bitwise OR of allowed directions an object can be dragged in
  */
-lv_drag_direction_t lv_obj_get_drag_dir(const lv_obj_t * obj)
+lv_drag_dir_t lv_obj_get_drag_dir(const lv_obj_t * obj)
 {
     return obj->drag_dir;
 }

@@ -1030,7 +1030,7 @@ static void indev_drag(lv_indev_proc_t * state)
 
     if(lv_obj_get_drag(drag_obj) == false) return;
 
-    lv_drag_direction_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
+    lv_drag_dir_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
 
     /*Count the movement by drag*/
     state->types.pointer.drag_sum.x += state->types.pointer.vect.x;
@@ -1120,7 +1120,7 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
         return;
     }
 
-    lv_drag_direction_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
+    lv_drag_dir_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
 
     /*Reduce the vectors*/
     proc->types.pointer.drag_throw_vect.x =
