@@ -193,6 +193,13 @@ void lv_chart_set_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t *
 void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y);
 
 /**
+ * Set update mode of the chart object.
+ * @param chart pointer to a chart object
+ * @param update mode
+ */
+void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mode);
+    
+/**
  * Set the style of a chart
  * @param chart pointer to a chart object
  * @param style pointer to a style
