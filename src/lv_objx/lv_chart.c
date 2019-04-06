@@ -400,6 +400,20 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
 	}
 }
 
+/**
+ * Set update mode of the chart object.
+ * @param chart pointer to a chart object
+ * @param update mode
+ */
+void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mode)
+{
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if(ext->update_mode == update_mode) return;
+
+	ext->update_mode = update_mode;
+	lv_obj_invalidate(chart);
+}
+
 /*=====================
  * Getter functions
  *====================*/
