@@ -44,6 +44,14 @@ enum {
 };
 typedef uint8_t lv_chart_type_t;
 
+/*Chart update mode*/
+enum
+{
+	LV_CHART_UPDATE_MODE_SHIFT,
+	LV_CHART_UPDATE_MODE_CIRCULAR,
+};
+typedef uint8_t lv_chart_update_mode_t;
+    
 typedef struct
 {
     lv_coord_t * points;
@@ -81,6 +89,7 @@ typedef struct
     lv_chart_axis_cfg_t y_axis;
     lv_chart_axis_cfg_t x_axis;
     uint16_t margin;
+    uint8_t update_mode: 1;
     struct
     {
         lv_coord_t width; /*Line width or point radius*/
@@ -201,6 +210,13 @@ void lv_chart_set_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t *
  */
 void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y);
 
+/**
+ * Set update mode of the chart object.
+ * @param chart pointer to a chart object
+ * @param update mode
+ */
+void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mode);
+    
 /**
  * Set the style of a chart
  * @param chart pointer to a chart object
