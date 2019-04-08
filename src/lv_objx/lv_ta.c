@@ -368,7 +368,7 @@ void lv_ta_del_char(lv_obj_t * ta)
     if(cur_pos == 0) return;
 
     ta_insert_replace = NULL;
-    char del_buf[2]   = {LV_GROUP_KEY_DEL, '\0'};
+    char del_buf[2]   = {LV_KEY_DEL, '\0'};
     lv_event_send(ta, LV_EVENT_INSERT, del_buf);
     if(ta_insert_replace) {
         if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
@@ -1276,21 +1276,21 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
-        if(c == LV_GROUP_KEY_RIGHT)
+        if(c == LV_KEY_RIGHT)
             lv_ta_cursor_right(ta);
-        else if(c == LV_GROUP_KEY_LEFT)
+        else if(c == LV_KEY_LEFT)
             lv_ta_cursor_left(ta);
-        else if(c == LV_GROUP_KEY_UP)
+        else if(c == LV_KEY_UP)
             lv_ta_cursor_up(ta);
-        else if(c == LV_GROUP_KEY_DOWN)
+        else if(c == LV_KEY_DOWN)
             lv_ta_cursor_down(ta);
-        else if(c == LV_GROUP_KEY_BACKSPACE)
+        else if(c == LV_KEY_BACKSPACE)
             lv_ta_del_char(ta);
-        else if(c == LV_GROUP_KEY_DEL)
+        else if(c == LV_KEY_DEL)
             lv_ta_del_char_forward(ta);
-        else if(c == LV_GROUP_KEY_HOME)
+        else if(c == LV_KEY_HOME)
             lv_ta_set_cursor_pos(ta, 0);
-        else if(c == LV_GROUP_KEY_END)
+        else if(c == LV_KEY_END)
             lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
         else {
             lv_ta_add_char(ta, c);

@@ -296,19 +296,19 @@ static bool keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
         /*Translate the keys to LittlevGL control characters according to your key definitions*/
         switch(act_key) {
         case 1:
-            act_key = LV_GROUP_KEY_NEXT;
+            act_key = LV_KEY_NEXT;
             break;
         case 2:
-            act_key = LV_GROUP_KEY_PREV;
+            act_key = LV_KEY_PREV;
             break;
         case 3:
-            act_key = LV_GROUP_KEY_LEFT;
+            act_key = LV_KEY_LEFT;
             break;
         case 4:
-            act_key = LV_GROUP_KEY_RIGHT;
+            act_key = LV_KEY_RIGHT;
             break;
         case 5:
-            act_key = LV_GROUP_KEY_ENTER;
+            act_key = LV_KEY_ENTER;
             break;
         }
 

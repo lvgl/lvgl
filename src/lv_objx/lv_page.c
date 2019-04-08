@@ -204,7 +204,7 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 
 /**
  * Enable/Disable scrolling with arrows if the page is in group (arrows:
- * LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN)
+ * LV_KEY_LEFT/RIGHT/UP/DOWN)
  * @param page pointer to a page object
  * @param en true: enable scrolling with arrows
  */
@@ -290,7 +290,7 @@ lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
 }
 
 /**
- * Get the the scrolling with arrows (LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
+ * Get the the scrolling with arrows (LV_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
  * @param page pointer to a page object
  * @return true: scrolling with arrows is enabled
  */
@@ -818,18 +818,18 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param);
 
-        if((c == LV_GROUP_KEY_DOWN) && ext->arrow_scroll) {
+        if((c == LV_KEY_DOWN) && ext->arrow_scroll) {
             lv_page_scroll_ver(page, -lv_obj_get_height(page) / 4);
-        } else if((c == LV_GROUP_KEY_UP) && ext->arrow_scroll) {
+        } else if((c == LV_KEY_UP) && ext->arrow_scroll) {
             lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
-        } else if((c == LV_GROUP_KEY_RIGHT) && ext->arrow_scroll) {
+        } else if((c == LV_KEY_RIGHT) && ext->arrow_scroll) {
             /*If the page can't be scrolled horizontally because it's not wide enough then scroll it
              * vertically*/
             if(lv_page_get_scrl_width(page) <= lv_obj_get_width(page))
                 lv_page_scroll_ver(page, -lv_obj_get_height(page) / 4);
             else
                 lv_page_scroll_hor(page, -lv_obj_get_width(page) / 4);
-        } else if((c == LV_GROUP_KEY_LEFT) && ext->arrow_scroll) {
+        } else if((c == LV_KEY_LEFT) && ext->arrow_scroll) {
             /*If the page can't be scrolled horizontally because it's not wide enough then scroll it
              * vertically*/
             if(lv_page_get_scrl_width(page) <= lv_obj_get_width(page))

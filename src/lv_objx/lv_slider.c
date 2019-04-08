@@ -559,11 +559,11 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
         ext->drag_value = LV_SLIDER_NOT_PRESSED;
 
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+        if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) + 1, true);
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
-        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             lv_slider_set_value(slider, lv_slider_get_value(slider) - 1, true);
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;

@@ -406,12 +406,12 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
-    /*Translate LV_GROUP_KEY_UP/DOWN to LV_GROUP_KEY_LEFT/RIGHT */
+    /*Translate LV_KEY_UP/DOWN to LV_KEY_LEFT/RIGHT */
     char c_trans = 0;
     if(sign == LV_SIGNAL_CONTROL) {
         c_trans = *((char *)param);
-        if(c_trans == LV_GROUP_KEY_DOWN) c_trans = LV_GROUP_KEY_LEFT;
-        if(c_trans == LV_GROUP_KEY_UP) c_trans = LV_GROUP_KEY_RIGHT;
+        if(c_trans == LV_KEY_DOWN) c_trans = LV_KEY_LEFT;
+        if(c_trans == LV_KEY_UP) c_trans = LV_KEY_RIGHT;
 
         param = &c_trans;
     }

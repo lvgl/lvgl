@@ -1,5 +1,5 @@
 /**
- * @file lv_indev_proc.h
+ * @file lv_indev.h
  *
  */
 

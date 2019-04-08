@@ -817,7 +817,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         lv_obj_invalidate(btnm);
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
-        if(c == LV_GROUP_KEY_RIGHT) {
+        if(c == LV_KEY_RIGHT) {
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE)
                 ext->btn_id_pr = 0;
             else
@@ -825,12 +825,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             if(ext->btn_id_pr >= ext->btn_cnt - 1) ext->btn_id_pr = ext->btn_cnt - 1;
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
-        } else if(c == LV_GROUP_KEY_LEFT) {
+        } else if(c == LV_KEY_LEFT) {
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE) ext->btn_id_pr = 0;
             if(ext->btn_id_pr > 0) ext->btn_id_pr--;
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
-        } else if(c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_KEY_DOWN) {
             lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
@@ -852,7 +852,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             }
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
-        } else if(c == LV_GROUP_KEY_UP) {
+        } else if(c == LV_KEY_UP) {
             lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {

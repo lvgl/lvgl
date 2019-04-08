@@ -528,7 +528,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     } else if(sign == LV_SIGNAL_CONTROL) {
         uint8_t c               = *((uint8_t *)param);
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+        if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             if(ext->showed_date.month >= 12) {
                 ext->showed_date.month = 1;
                 ext->showed_date.year++;
@@ -536,7 +536,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
                 ext->showed_date.month++;
             }
             lv_obj_invalidate(calendar);
-        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             if(ext->showed_date.month <= 1) {
                 ext->showed_date.month = 12;
                 ext->showed_date.year--;

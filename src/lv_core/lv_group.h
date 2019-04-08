@@ -26,18 +26,18 @@ extern "C" {
  *********************/
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
 /*For compatibility in signal function define the keys regardless to LV_GROUP*/
-#define LV_GROUP_KEY_UP 17       /*0x11*/
-#define LV_GROUP_KEY_DOWN 18     /*0x12*/
-#define LV_GROUP_KEY_RIGHT 19    /*0x13*/
-#define LV_GROUP_KEY_LEFT 20     /*0x14*/
-#define LV_GROUP_KEY_ESC 27      /*0x1B*/
-#define LV_GROUP_KEY_DEL 127     /*0x7F*/
-#define LV_GROUP_KEY_BACKSPACE 8 /*0x08*/
-#define LV_GROUP_KEY_ENTER 10    /*0x0A, '\n'*/
-#define LV_GROUP_KEY_NEXT 9      /*0x09, '\t'*/
-#define LV_GROUP_KEY_PREV 11     /*0x0B, '*/
-#define LV_GROUP_KEY_HOME 2      /*0x02, STX*/
-#define LV_GROUP_KEY_END 3       /*0x03, ETX*/
+#define LV_KEY_UP 17       /*0x11*/
+#define LV_KEY_DOWN 18     /*0x12*/
+#define LV_KEY_RIGHT 19    /*0x13*/
+#define LV_KEY_LEFT 20     /*0x14*/
+#define LV_KEY_ESC 27      /*0x1B*/
+#define LV_KEY_DEL 127     /*0x7F*/
+#define LV_KEY_BACKSPACE 8 /*0x08*/
+#define LV_KEY_ENTER 10    /*0x0A, '\n'*/
+#define LV_KEY_NEXT 9      /*0x09, '\t'*/
+#define LV_KEY_PREV 11     /*0x0B, '*/
+#define LV_KEY_HOME 2      /*0x02, STX*/
+#define LV_KEY_END 3       /*0x03, ETX*/
 
 #if LV_USE_GROUP != 0
 /**********************
@@ -144,7 +144,7 @@ void lv_group_focus_freeze(lv_group_t * group, bool en);
 /**
  * Send a control character to the focuses object of a group
  * @param group pointer to a group
- * @param c a character (use LV_GROUP_KEY_.. to navigate)
+ * @param c a character (use LV_KEY_.. to navigate)
  * @return result of focused object in group.
  */
 lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c);
