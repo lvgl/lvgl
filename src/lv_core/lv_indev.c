@@ -1052,6 +1052,14 @@ static void indev_drag(lv_indev_proc_t * state)
         /*Set new position if the vector is not zero*/
         if(state->types.pointer.vect.x != 0 || state->types.pointer.vect.y != 0) {
 
+            uint16_t inv_buf_size = lv_disp_get_inv_buf_size(
+                indev_act->driver.disp); /*Get the number of currently invalidated areas*/
+
+            lv_coord_t prev_x     = drag_obj->coords.x1;
+            lv_coord_t prev_y     = drag_obj->coords.y1;
+            lv_coord_t prev_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
+            lv_coord_t prev_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
+
             /*Get the coordinates of the object and modify them*/
             lv_coord_t act_x      = lv_obj_get_x(drag_obj);
             lv_coord_t act_y      = lv_obj_get_y(drag_obj);
@@ -1069,7 +1077,23 @@ static void indev_drag(lv_indev_proc_t * state)
                 drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
                 if(state->reset_query != 0) return;
             }
+
             state->types.pointer.drag_in_prog = 1;
+
+            /*If the object didn't moved then clear the invalidated areas*/
+            if(drag_obj->coords.x1 == prev_x && drag_obj->coords.y1 == prev_y) {
+                /*In a special case if the object is moved on a page and
+                 * the scrollable has fit == true and the object is dragged of the page then
+                 * while its coordinate is not changing only the parent's size is reduced */
+                lv_coord_t act_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
+                lv_coord_t act_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
+                if(act_par_w == prev_par_w && act_par_h == prev_par_h) {
+                    uint16_t new_inv_buf_size = lv_disp_get_inv_buf_size(indev_act->driver.disp);
+                    lv_disp_pop_from_inv_buf(indev_act->driver.disp,
+                                             new_inv_buf_size - inv_buf_size);
+                }
+            }
+
         }
     }
 }
