@@ -171,7 +171,8 @@ typedef struct
 
 enum {
 	LV_DRAG_DIR_HOR = 0x1,
-	LV_DRAG_DIR_VER = 0x2
+	LV_DRAG_DIR_VER = 0x2,
+	LV_DRAG_DIR_ALL = 0x3, /* Should be the bitwise OR of the above */
 };
 
 typedef uint8_t lv_drag_dir_t;

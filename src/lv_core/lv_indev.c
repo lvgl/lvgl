@@ -1056,10 +1056,11 @@ static void indev_drag(lv_indev_proc_t * state)
             lv_coord_t act_x      = lv_obj_get_x(drag_obj);
             lv_coord_t act_y      = lv_obj_get_y(drag_obj);
 
-            if(allowed_dirs & LV_DRAG_DIR_HOR)
+            if(allowed_dirs == LV_DRAG_DIR_ALL)
+                lv_obj_set_pos(drag_obj, act_x + state->types.pointer.vect.x, act_y + state->types.pointer.vect.y);
+            else if(allowed_dirs & LV_DRAG_DIR_HOR)
                 lv_obj_set_x(drag_obj, act_x + state->types.pointer.vect.x);
-
-            if(allowed_dirs & LV_DRAG_DIR_VER)
+            else if(allowed_dirs & LV_DRAG_DIR_VER)
                 lv_obj_set_y(drag_obj, act_y + state->types.pointer.vect.y);
 
             /*Set the drag in progress flag*/
@@ -1115,9 +1116,12 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
         lv_coord_t act_x = lv_obj_get_x(drag_obj) + proc->types.pointer.drag_throw_vect.x;
         lv_coord_t act_y = lv_obj_get_y(drag_obj) + proc->types.pointer.drag_throw_vect.y;
 
-        if(allowed_dirs & LV_DRAG_DIR_HOR) lv_obj_set_x(drag_obj, act_x);
-
-        if(allowed_dirs & LV_DRAG_DIR_VER) lv_obj_set_y(drag_obj, act_y);
+        if(allowed_dirs == LV_DRAG_DIR_ALL)
+		lv_obj_set_pos(drag_obj, act_x, act_y);
+        else if(allowed_dirs & LV_DRAG_DIR_HOR)
+		lv_obj_set_x(drag_obj, act_x);
+        else if(allowed_dirs & LV_DRAG_DIR_VER)
+		lv_obj_set_y(drag_obj, act_y);
 
         lv_area_t coord_new;
         lv_obj_get_coords(drag_obj, &coord_new);
