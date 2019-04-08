@@ -401,24 +401,24 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->proc.pr_timestamp = lv_tick_get();
 
         /*Simulate a press on the object if ENTER was pressed*/
-        if(data->key == LV_GROUP_KEY_ENTER) {
+        if(data->key == LV_KEY_ENTER) {
             focused->signal_cb(focused, LV_SIGNAL_PRESSED, NULL);
             if(i->proc.reset_query) return; /*The object might be deleted*/
             lv_event_send(focused, LV_EVENT_PRESSED, NULL);
             if(i->proc.reset_query) return; /*The object might be deleted*/
 
             /*Send the ENTER as a normal KEY*/
-            lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+            lv_group_send_data(g, LV_KEY_ENTER);
         }
         /*Move the focus on NEXT*/
-        else if(data->key == LV_GROUP_KEY_NEXT) {
+        else if(data->key == LV_KEY_NEXT) {
             lv_group_set_editing(g,
                                  false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_next(g);
             if(i->proc.reset_query) return; /*The object might be deleted*/
         }
         /*Move the focus on PREV*/
-        else if(data->key == LV_GROUP_KEY_PREV) {
+        else if(data->key == LV_KEY_PREV) {
             lv_group_set_editing(g,
                                  false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_prev(g);
@@ -435,7 +435,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         if(i->proc.long_pr_sent == 0 &&
            lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
             i->proc.long_pr_sent = 1;
-            if(data->key == LV_GROUP_KEY_ENTER) {
+            if(data->key == LV_KEY_ENTER) {
                 i->proc.longpr_rep_timestamp = lv_tick_get();
                 focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS, NULL);
                 if(i->proc.reset_query) return; /*The object might be deleted*/
@@ -450,21 +450,21 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->proc.longpr_rep_timestamp = lv_tick_get();
 
             /*Send LONG_PRESS_REP on ENTER*/
-            if(data->key == LV_GROUP_KEY_ENTER) {
+            if(data->key == LV_KEY_ENTER) {
                 focused->signal_cb(focused, LV_SIGNAL_LONG_PRESS_REP, NULL);
                 if(i->proc.reset_query) return; /*The object might be deleted*/
                 lv_event_send(focused, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
                 if(i->proc.reset_query) return; /*The object might be deleted*/
             }
             /*Move the focus on NEXT again*/
-            else if(data->key == LV_GROUP_KEY_NEXT) {
+            else if(data->key == LV_KEY_NEXT) {
                 lv_group_set_editing(
                     g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
                 lv_group_focus_next(g);
                 if(i->proc.reset_query) return; /*The object might be deleted*/
             }
             /*Move the focus on PREV again*/
-            else if(data->key == LV_GROUP_KEY_PREV) {
+            else if(data->key == LV_KEY_PREV) {
                 lv_group_set_editing(
                     g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
                 lv_group_focus_prev(g);
@@ -481,7 +481,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     else if(data->state == LV_INDEV_STATE_REL && prev_state == LV_INDEV_STATE_PR) {
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
-        if(data->key == LV_GROUP_KEY_ENTER) {
+        if(data->key == LV_KEY_ENTER) {
 
             focused->signal_cb(focused, LV_SIGNAL_RELEASED, NULL);
             if(i->proc.reset_query) return; /*The object might be deleted*/
@@ -535,9 +535,9 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         if(lv_group_get_editing(g)) {
             int32_t s;
             if(data->enc_diff < 0) {
-                for(s = 0; s < -data->enc_diff; s++) lv_group_send_data(g, LV_GROUP_KEY_LEFT);
+                for(s = 0; s < -data->enc_diff; s++) lv_group_send_data(g, LV_KEY_LEFT);
             } else if(data->enc_diff > 0) {
-                for(s = 0; s < data->enc_diff; s++) lv_group_send_data(g, LV_GROUP_KEY_RIGHT);
+                for(s = 0; s < data->enc_diff; s++) lv_group_send_data(g, LV_KEY_RIGHT);
             }
         }
         /*In navigate mode focus on the next/prev objects*/
@@ -633,7 +633,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 lv_event_send(focused, LV_EVENT_RELEASED, NULL);
                 if(i->proc.reset_query) return; /*The object might be deleted*/
 
-                lv_group_send_data(g, LV_GROUP_KEY_ENTER);
+                lv_group_send_data(g, LV_KEY_ENTER);
             }
         }
         /*If the focused object is editable and now in navigate mode then on enter switch edit

@@ -91,7 +91,7 @@ typedef struct
                                 In Progress)*/
     } edge_flash;
 
-    uint8_t arrow_scroll : 1;   /*1: Enable scrolling with LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN*/
+    uint8_t arrow_scroll : 1;   /*1: Enable scrolling with LV_KEY_LEFT/RIGHT/UP/DOWN*/
     uint8_t scroll_prop : 1;    /*1: Propagate the scrolling the the parent if the edge is reached*/
     uint8_t scroll_prop_ip : 1; /*1: Scroll propagation is in progress (used by the library)*/
 } lv_page_ext_t;
@@ -142,7 +142,7 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
 
 /**
  * Enable/Disable scrolling with arrows if the page is in group (arrows:
- * LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN)
+ * LV_KEY_LEFT/RIGHT/UP/DOWN)
  * @param page pointer to a page object
  * @param en true: enable scrolling with arrows
  */
@@ -251,7 +251,7 @@ void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, lv_style_t * style
 lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
 
 /**
- * Get the the scrolling with arrows (LV_GROUP_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
+ * Get the the scrolling with arrows (LV_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
  * @param page pointer to a page object
  * @return true: scrolling with arrows is enabled
  */

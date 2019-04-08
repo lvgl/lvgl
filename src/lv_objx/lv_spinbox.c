@@ -353,19 +353,19 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
-        if(c == LV_GROUP_KEY_RIGHT) {
+        if(c == LV_KEY_RIGHT) {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
                 lv_spinbox_increment(spinbox);
             else
                 lv_spinbox_step_next(spinbox);
-        } else if(c == LV_GROUP_KEY_LEFT) {
+        } else if(c == LV_KEY_LEFT) {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
                 lv_spinbox_decrement(spinbox);
             else
                 lv_spinbox_step_previous(spinbox);
-        } else if(c == LV_GROUP_KEY_UP) {
+        } else if(c == LV_KEY_UP) {
             lv_spinbox_increment(spinbox);
-        } else if(c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_KEY_DOWN) {
             lv_spinbox_decrement(spinbox);
         } else {
             lv_ta_add_char(spinbox, c);

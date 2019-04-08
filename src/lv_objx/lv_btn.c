@@ -600,13 +600,13 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 #endif
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_UP) {
+        if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
 
-        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_DOWN) {
+        } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_REL);
         }
-        //        else if(c == LV_GROUP_KEY_ENTER) {
+        //        else if(c == LV_KEY_ENTER) {
         //            if(lv_btn_get_toggle(btn)) {
         //                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR)
         //                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL); else if(state ==

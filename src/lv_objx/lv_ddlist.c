@@ -668,7 +668,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
         }
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
+        if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(!ext->opened) {
                 ext->opened = 1;
                 lv_ddlist_refr_size(ddlist, true);
@@ -679,7 +679,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 lv_ddlist_pos_current_option(ddlist);
                 lv_obj_invalidate(ddlist);
             }
-        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
+        } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(!ext->opened) {
                 ext->opened = 1;
                 lv_ddlist_refr_size(ddlist, true);
@@ -689,7 +689,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
                 lv_ddlist_pos_current_option(ddlist);
                 lv_obj_invalidate(ddlist);
             }
-        } else if(c == LV_GROUP_KEY_ESC) {
+        } else if(c == LV_KEY_ESC) {
             if(ext->opened) {
                 ext->opened     = 0;
                 ext->sel_opt_id = ext->sel_opt_id_ori;

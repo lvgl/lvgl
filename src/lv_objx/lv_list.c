@@ -812,7 +812,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 
 #if LV_USE_GROUP
         char c = *((char *)param);
-        if(c == LV_GROUP_KEY_RIGHT || c == LV_GROUP_KEY_DOWN) {
+        if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
             /*If there is a valid selected button the make the previous selected*/
             if(ext->selected_btn) {
@@ -827,7 +827,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                         list,
                         btn); /*If there are no buttons on the list then there is no first button*/
             }
-        } else if(c == LV_GROUP_KEY_LEFT || c == LV_GROUP_KEY_UP) {
+        } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
             /*If there is a valid selected button the make the next selected*/
             if(ext->selected_btn != NULL) {
