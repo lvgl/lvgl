@@ -120,6 +120,7 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
         res = lv_fs_open(&file, src, LV_FS_MODE_RD);
         if(res == LV_FS_RES_OK) {
             res = lv_fs_read(&file, header, sizeof(lv_img_header_t), &rn);
+            lv_fs_close(&file);
         }
 
         /*Create a dummy header on fs error*/
@@ -127,9 +128,8 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
             header->w  = LV_DPI;
             header->h  = LV_DPI;
             header->cf = LV_IMG_CF_UNKNOWN;
+            return LV_RES_INV;
         }
-
-        lv_fs_close(&file);
     }
 #endif
     else if(src_type == LV_IMG_SRC_SYMBOL) {
@@ -142,9 +142,9 @@ lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header)
         header->cf = LV_IMG_CF_ALPHA_1BIT;
     } else {
         LV_LOG_WARN("Image get info found unknown src type");
-        return false;
+        return LV_RES_INV;
     }
-    return true;
+    return LV_RES_OK;
 }
 
 /**
