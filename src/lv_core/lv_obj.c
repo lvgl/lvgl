@@ -1573,7 +1573,7 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
 {
     lv_style_t * style = lv_obj_get_style(obj);
 
-    return lv_obj_get_width(obj) - style->body.padding.top - style->body.padding.bottom;
+    return lv_obj_get_height(obj) - style->body.padding.top - style->body.padding.bottom;
 }
 /**
  * Get the extended size attribute of an object
