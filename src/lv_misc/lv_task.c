@@ -73,7 +73,10 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     static uint32_t handler_start     = 0;
     static uint32_t busy_time         = 0;
 
-    if(lv_task_run == false) return;
+    if(lv_task_run == false) {
+        task_handler_mutex = false; /*Release mutex*/
+        return;
+    }
 
     handler_start = lv_tick_get();
 
