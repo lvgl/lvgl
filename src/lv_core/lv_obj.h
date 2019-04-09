@@ -169,6 +169,14 @@ typedef struct
 } lv_reailgn_t;
 #endif
 
+enum {
+	LV_DRAG_DIR_HOR = 0x1,
+	LV_DRAG_DIR_VER = 0x2,
+	LV_DRAG_DIR_ALL = 0x3, /* Should be the bitwise OR of the above */
+};
+
+typedef uint8_t lv_drag_dir_t;
+
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par; /*Pointer to the parent object*/
@@ -189,6 +197,7 @@ typedef struct _lv_obj_t
     /*Attributes and states*/
     uint8_t click : 1;       /*1: Can be pressed by an input device*/
     uint8_t drag : 1;        /*1: Enable the dragging*/
+    lv_drag_dir_t drag_dir : 2; /* Which directions the object can be dragged in */
     uint8_t drag_throw : 1;  /*1: Enable throwing with drag*/
     uint8_t drag_parent : 1; /*1: Parent will be dragged instead*/
     uint8_t hidden : 1;      /*1: Object is hidden*/
@@ -445,6 +454,13 @@ void lv_obj_set_top(lv_obj_t * obj, bool en);
  * @param en true: make the object dragable
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en);
+
+/**
+ * Set the directions an object can be dragged in
+ * @param obj pointer to an object
+ * @param drag_dir bitwise OR of allowed drag directions
+ */
+void lv_obj_set_drag_dir(lv_obj_t * obj, lv_drag_dir_t drag_dir);
 
 /**
  * Enable the throwing of an object after is is dragged
@@ -735,6 +751,13 @@ bool lv_obj_get_top(const lv_obj_t * obj);
  * @return true: the object is dragable
  */
 bool lv_obj_get_drag(const lv_obj_t * obj);
+
+/**
+ * Get the directions an object can be dragged
+ * @param obj pointer to an object
+ * @return bitwise OR of allowed directions an object can be dragged in
+ */
+lv_drag_dir_t lv_obj_get_drag_dir(const lv_obj_t * obj);
 
 /**
  * Get the drag throw enable attribute of an object
