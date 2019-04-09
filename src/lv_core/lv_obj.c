@@ -253,7 +253,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set attributes*/
         new_obj->click        = 1;
         new_obj->drag         = 0;
-        new_obj->drag_dir     = 0;
+        new_obj->drag_dir     = LV_DRAG_DIR_ALL;
         new_obj->drag_throw   = 0;
         new_obj->drag_parent  = 0;
         new_obj->hidden       = 0;
@@ -1096,9 +1096,6 @@ void lv_obj_set_drag(lv_obj_t * obj, bool en)
 {
     if(en == true) lv_obj_set_click(obj, true); /*Drag is useless without enabled clicking*/
     obj->drag = (en == true ? 1 : 0);
-    if(en && obj->drag_dir == 0) {
-    	obj->drag_dir = LV_DRAG_DIR_HOR | LV_DRAG_DIR_VER;
-    }
 }
 
 /**
