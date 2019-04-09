@@ -253,6 +253,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set attributes*/
         new_obj->click        = 1;
         new_obj->drag         = 0;
+        new_obj->drag_dir     = LV_DRAG_DIR_ALL;
         new_obj->drag_throw   = 0;
         new_obj->drag_parent  = 0;
         new_obj->hidden       = 0;
@@ -296,6 +297,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Copy attributes*/
         new_obj->click        = copy->click;
         new_obj->drag         = copy->drag;
+        new_obj->drag_dir     = copy->drag_dir;
         new_obj->drag_throw   = copy->drag_throw;
         new_obj->drag_parent  = copy->drag_parent;
         new_obj->hidden       = copy->hidden;
@@ -1097,6 +1099,19 @@ void lv_obj_set_drag(lv_obj_t * obj, bool en)
 }
 
 /**
+ * Set the directions an object can be dragged in
+ * @param obj pointer to an object
+ * @param drag_dir bitwise OR of allowed directions an object can be dragged in
+ */
+void lv_obj_set_drag_dir(lv_obj_t * obj, lv_drag_dir_t drag_dir)
+{
+    obj->drag_dir = drag_dir;
+
+    if(obj->drag_dir != 0)
+    	lv_obj_set_drag(obj, true); /*Drag direction requires drag*/
+}
+
+/**
  * Enable the throwing of an object after is is dragged
  * @param obj pointer to an object
  * @param en true: enable the drag throw
@@ -1690,6 +1705,16 @@ bool lv_obj_get_top(const lv_obj_t * obj)
 bool lv_obj_get_drag(const lv_obj_t * obj)
 {
     return obj->drag == 0 ? false : true;
+}
+
+/**
+ * Get the directions an object can be dragged
+ * @param obj pointer to an object
+ * @return bitwise OR of allowed directions an object can be dragged in
+ */
+lv_drag_dir_t lv_obj_get_drag_dir(const lv_obj_t * obj)
+{
+    return obj->drag_dir;
 }
 
 /**
