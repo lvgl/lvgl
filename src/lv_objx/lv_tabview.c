@@ -113,7 +113,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->btns = lv_btnm_create(new_tabview, NULL);
         lv_obj_set_height(ext->btns, 3 * LV_DPI / 4);
-        lv_btnm_set_map(ext->btns, tab_def);
+        lv_btnm_set_map_array(ext->btns, tab_def);
         lv_obj_set_event_cb(ext->btns, tab_btnm_event_cb);
 
         ext->indic = lv_obj_create(ext->btns, NULL);
@@ -161,7 +161,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_mem_assert(ext->tab_name_ptr);
         if(ext->tab_name_ptr == NULL) return NULL;
         ext->tab_name_ptr[0] = "";
-        lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
+        lv_btnm_set_map_array(ext->btns, ext->tab_name_ptr);
 
         uint16_t i;
         lv_obj_t * new_tab;
@@ -242,7 +242,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
     btnm_ext->map_p          = NULL;
 
-    lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
+    lv_btnm_set_map_array(ext->btns, ext->tab_name_ptr);
     lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT, true);
 
     /*Modify the indicator size*/
