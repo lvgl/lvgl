@@ -116,8 +116,8 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_kb, LV_DPI * 3, LV_DPI * 2);
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
-        lv_btnm_set_map_array(new_kb, kb_map_lc);
-        lv_btnm_set_ctrl_map_array(new_kb, kb_ctrl_lc_map);
+        lv_btnm_set_map(new_kb, kb_map_lc);
+        lv_btnm_set_ctrl_map(new_kb, kb_ctrl_lc_map);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -190,11 +190,11 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 
     ext->mode = mode;
     if(mode == LV_KB_MODE_TEXT) {
-        lv_btnm_set_map_array(kb, kb_map_lc);
-        lv_btnm_set_ctrl_map_array(kb, kb_ctrl_lc_map);
+        lv_btnm_set_map(kb, kb_map_lc);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl_lc_map);
     } else if(mode == LV_KB_MODE_NUM) {
-        lv_btnm_set_map_array(kb, kb_map_num);
-        lv_btnm_set_ctrl_map_array(kb, kb_ctrl_num_map);
+        lv_btnm_set_map(kb, kb_map_num);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl_num_map);
     }
 }
 
@@ -332,16 +332,16 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 
     /*Do the corresponding action according to the text of the button*/
     if(strcmp(txt, "abc") == 0) {
-        lv_btnm_set_map_array(kb, kb_map_lc);
-        lv_btnm_set_ctrl_map_array(kb, kb_ctrl_lc_map);
+        lv_btnm_set_map(kb, kb_map_lc);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl_lc_map);
         return;
     } else if(strcmp(txt, "ABC") == 0) {
-        lv_btnm_set_map_array(kb, kb_map_uc);
-        lv_btnm_set_ctrl_map_array(kb, kb_ctrl_uc_map);
+        lv_btnm_set_map(kb, kb_map_uc);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl_uc_map);
         return;
     } else if(strcmp(txt, "1#") == 0) {
-        lv_btnm_set_map_array(kb, kb_map_spec);
-        lv_btnm_set_ctrl_map_array(kb, kb_ctrl_spec_map);
+        lv_btnm_set_map(kb, kb_map_spec);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl_spec_map);
         return;
     } else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
         if(kb->event_cb) {

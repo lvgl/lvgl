@@ -655,9 +655,9 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
  */
 static void inf_normalize(void * scrl)
 {
-    lv_obj_t * roller_scrl= (lv_obj_t *)scrl;
-    lv_obj_t * roller     = lv_obj_get_parent(roller_scrl);
-    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    lv_obj_t * roller_scrl = (lv_obj_t *)scrl;
+    lv_obj_t * roller      = lv_obj_get_parent(roller_scrl);
+    lv_roller_ext_t * ext  = lv_obj_get_ext_attr(roller);
 
     if(ext->inf) {
         uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;

@@ -151,7 +151,7 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_map)
         }
     }
 
-    lv_btnm_set_map_array(ext->btnm, btn_map);
+    lv_btnm_set_map(ext->btnm, btn_map);
     lv_btnm_set_btn_ctrl_all(ext->btnm, LV_BTNM_CTRL_CLICK_TRIG | LV_BTNM_CTRL_NO_REPEAT, true);
     lv_obj_set_parent_event(ext->btnm, true);
 

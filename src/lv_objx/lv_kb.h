@@ -111,9 +111,9 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en);
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnm_set_map_array()' for more info.
  */
-static inline void lv_kb_set_map_array(lv_obj_t * kb, const char ** map)
+static inline void lv_kb_set_map(lv_obj_t * kb, const char * map[])
 {
-    lv_btnm_set_map_array(kb, map);
+    lv_btnm_set_map(kb, map);
 }
 
 /**
@@ -124,9 +124,9 @@ static inline void lv_kb_set_map_array(lv_obj_t * kb, const char ** map)
  * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes.
  *                 See: `lv_btnm_set_ctrl_map` for more details.
  */
-static inline void lv_kb_set_ctrl_map_array(lv_obj_t * kb, const lv_btnm_ctrl_t * ctrl_map)
+static inline void lv_kb_set_ctrl_map(lv_obj_t * kb, const lv_btnm_ctrl_t ctrl_map[])
 {
-    lv_btnm_set_ctrl_map_array(kb, ctrl_map);
+    lv_btnm_set_ctrl_map(kb, ctrl_map);
 }
 
 /**

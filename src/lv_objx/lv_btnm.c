@@ -102,7 +102,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new button matrix object*/
     if(copy == NULL) {
         lv_obj_set_size(new_btnm, LV_DPI * 3, LV_DPI * 2);
-        lv_btnm_set_map_array(new_btnm, lv_btnm_def_map);
+        lv_btnm_set_map(new_btnm, lv_btnm_def_map);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -121,7 +121,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_btnm_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         memcpy(ext->styles_btn, copy_ext->styles_btn, sizeof(ext->styles_btn));
-        lv_btnm_set_map_array(new_btnm, lv_btnm_get_map_array(copy));
+        lv_btnm_set_map(new_btnm, lv_btnm_get_map_array(copy));
     }
 
     LV_LOG_INFO("button matrix created");
@@ -140,7 +140,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param btnm pointer to a button matrix object
  * @param map pointer a string array. The last string has to be: "". Use "\n" to make a line break.
  */
-void lv_btnm_set_map_array(const lv_obj_t * btnm, const char ** map)
+void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 {
     if(map == NULL) return;
 
@@ -271,12 +271,12 @@ void lv_btnm_set_map_array(const lv_obj_t * btnm, const char ** map)
  *                 - bit 2..0: Relative width compared to the buttons in the
  *                             same row. [1..7]
  */
-void lv_btnm_set_ctrl_map_array(const lv_obj_t * btnm, const lv_btnm_ctrl_t * ctrl_map)
+void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t ctrl_map[])
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnm_ctrl_t) * ext->btn_cnt);
 
-    lv_btnm_set_map_array(btnm, ext->map_p);
+    lv_btnm_set_map(btnm, ext->map_p);
 }
 
 /**
@@ -396,7 +396,7 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
     ext->ctrl_bits[btn_id] &= (~LV_BTNM_WIDTH_MASK);
     ext->ctrl_bits[btn_id] |= (LV_BTNM_WIDTH_MASK & width);
 
-    lv_btnm_set_map_array(btnm, ext->map_p);
+    lv_btnm_set_map(btnm, ext->map_p);
 }
 
 /**
@@ -701,7 +701,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         lv_mem_free(ext->button_areas);
         lv_mem_free(ext->ctrl_bits);
     } else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_CORD_CHG) {
-        lv_btnm_set_map_array(btnm, ext->map_p);
+        lv_btnm_set_map(btnm, ext->map_p);
     } else if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER ||
