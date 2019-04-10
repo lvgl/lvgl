@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_conf.h"
 #include "lv_area.h"
 #include "lv_math.h"
 
@@ -162,7 +163,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p)
  * @param ext_ver extended horizontal padding
  * @return false:the point is out of the area
  */
-bool lv_area_ext_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, unit8_t ext_hor, unit8_t ext_ver)
+bool lv_area_ext_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, uint8_t ext_hor, uint8_t ext_ver)
 {
     bool is_on = false;
 
@@ -173,6 +174,7 @@ bool lv_area_ext_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, unit
 
     return is_on;
 }
+
 #endif
 
 /**

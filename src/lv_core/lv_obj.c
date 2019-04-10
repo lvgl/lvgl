@@ -152,8 +152,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         lv_area_copy(&(new_obj->ext_coords), &(new_obj->coords));
 #endif
 #if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
-        new_obj->hor_pad = 0;
-        new_obj->ver_pad = 0;
+        new_obj->ext_padding_hor = 0;
+        new_obj->ext_padding_ver = 0;
 #endif
 
         /*Init realign*/
@@ -228,8 +228,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         lv_area_copy(&(new_obj->ext_coords), &(new_obj->coords));
 #endif
 #if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
-        new_obj->hor_pad = 0;
-        new_obj->ver_pad = 0;
+        new_obj->ext_padding_hor = 0;
+        new_obj->ext_padding_ver = 0;
 #endif
         /*Init realign*/
 #if LV_OBJ_REALIGN
@@ -291,8 +291,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         lv_area_copy(&new_obj->ext_coords, &copy->ext_coords);
 #endif
 #if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
-        new_obj->hor_pad = copy->hor_pad;
-        new_obj->ver_pad = copy->ver_pad;
+        new_obj->ext_padding_hor = copy->ext_padding_hor;
+        new_obj->ext_padding_ver = copy->ext_padding_ver;
 #endif
 
         /*Set free data*/
@@ -670,21 +670,21 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 #endif
 }
 
-#if USE_LV_EXTENDED_CLICK_AREA
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
 /**
  * Set the size of an extended clickable area
  * @param obj pointer to an object
  * @param w extended width to both sides
  * @param h extended height to both sides
  */
-void lv_obj_set_ext_paddings(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
+void lv_obj_set_ext_paddings(lv_obj_t * obj, uint8_t w, uint8_t h)
 {
-    obj->ext_paddings.x1 = w;
-    obj->ext_paddings.x2 = w;
-    obj->ext_paddings.y1 = h;
-    obj->ext_paddings.y2 = h;
-
+    obj->ext_padding_hor = w;
+    obj->ext_padding_ver = h;
+    
+#if USE_LV_EXTENDED_CLICK_AREA
     update_ext_coords(&(obj->coords), &(obj->ext_coords), &(obj->ext_paddings));
+#endif
 }
 #endif
 
