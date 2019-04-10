@@ -109,7 +109,7 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en);
  * Set a new map for the keyboard
  * @param kb pointer to a Keyboard object
  * @param map pointer to a string array to describe the map.
- *            See 'lv_btnm_set_map_array()' for more info.
+ *            See 'lv_btnm_set_map()' for more info.
  */
 static inline void lv_kb_set_map(lv_obj_t * kb, const char * map[])
 {
