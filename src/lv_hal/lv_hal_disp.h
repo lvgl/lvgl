@@ -90,13 +90,13 @@ typedef struct _disp_drv_t
      * number of flushed pixels */
     void (*monitor_cb)(struct _disp_drv_t * disp_drv, uint32_t time, uint32_t px);
 
-
 #if LV_USE_GPU
     /*OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*mem_blend_cb)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
 
     /*OPTIONAL: Fill a memory with a color (GPU only)*/
-    void (*mem_fill_cb)(lv_color_t * dest_buf, const lv_area_t * dest_area, const lv_area_t * fill_area, lv_color_t color);
+    void (*mem_fill_cb)(lv_color_t * dest_buf, const lv_area_t * dest_area,
+                        const lv_area_t * fill_area, lv_color_t color);
 #endif
 
 #if LV_USE_USER_DATA_SINGLE
@@ -109,7 +109,6 @@ typedef struct _disp_drv_t
     lv_disp_drv_user_data_t set_px_user_data;
     lv_disp_drv_user_data_t monitor_user_data;
 #endif
-
 
 } lv_disp_drv_t;
 

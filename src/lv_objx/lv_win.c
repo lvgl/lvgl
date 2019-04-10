@@ -72,8 +72,10 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new window object*/
     if(copy == NULL) {
         /* Set a size which fits into the parent.
-         * Don't use `par` directly because if the window is created on a page it is moved to the scrollable so the parent has changed */
-        lv_obj_set_size(new_win, lv_obj_get_width_fit(lv_obj_get_parent(new_win)), lv_obj_get_height_fit(lv_obj_get_parent(new_win)));
+         * Don't use `par` directly because if the window is created on a page it is moved to the
+         * scrollable so the parent has changed */
+        lv_obj_set_size(new_win, lv_obj_get_width_fit(lv_obj_get_parent(new_win)),
+                        lv_obj_get_height_fit(lv_obj_get_parent(new_win)));
 
         lv_obj_set_pos(new_win, 0, 0);
         lv_obj_set_style(new_win, &lv_style_pretty);

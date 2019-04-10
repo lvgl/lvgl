@@ -1107,8 +1107,7 @@ void lv_obj_set_drag_dir(lv_obj_t * obj, lv_drag_dir_t drag_dir)
 {
     obj->drag_dir = drag_dir;
 
-    if(obj->drag_dir != 0)
-    	lv_obj_set_drag(obj, true); /*Drag direction requires drag*/
+    if(obj->drag_dir != 0) lv_obj_set_drag(obj, true); /*Drag direction requires drag*/
 }
 
 /**

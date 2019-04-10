@@ -170,9 +170,9 @@ typedef struct
 #endif
 
 enum {
-	LV_DRAG_DIR_HOR = 0x1,
-	LV_DRAG_DIR_VER = 0x2,
-	LV_DRAG_DIR_ALL = 0x3, /* Should be the bitwise OR of the above */
+    LV_DRAG_DIR_HOR = 0x1,
+    LV_DRAG_DIR_VER = 0x2,
+    LV_DRAG_DIR_ALL = 0x3, /* Should be the bitwise OR of the above */
 };
 
 typedef uint8_t lv_drag_dir_t;
@@ -195,12 +195,12 @@ typedef struct _lv_obj_t
     void * group_p; /*Pointer to the group of the object*/
 #endif
     /*Attributes and states*/
-    uint8_t click : 1;       /*1: Can be pressed by an input device*/
-    uint8_t drag : 1;        /*1: Enable the dragging*/
+    uint8_t click : 1;          /*1: Can be pressed by an input device*/
+    uint8_t drag : 1;           /*1: Enable the dragging*/
     lv_drag_dir_t drag_dir : 2; /* Which directions the object can be dragged in */
-    uint8_t drag_throw : 1;  /*1: Enable throwing with drag*/
-    uint8_t drag_parent : 1; /*1: Parent will be dragged instead*/
-    uint8_t hidden : 1;      /*1: Object is hidden*/
+    uint8_t drag_throw : 1;     /*1: Enable throwing with drag*/
+    uint8_t drag_parent : 1;    /*1: Parent will be dragged instead*/
+    uint8_t hidden : 1;         /*1: Object is hidden*/
     uint8_t top : 1; /*1: If the object or its children is clicked it goes to the foreground*/
     uint8_t opa_scale_en : 1; /*1: opa_scale is set*/
     uint8_t parent_event : 1; /*1: Send the object's events to the parent too. */
