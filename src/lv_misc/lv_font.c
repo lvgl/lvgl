@@ -23,7 +23,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t lv_font_codeCompare (const void* pRef, const void* pElement);
+static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
 
 /**********************
  *  STATIC VARIABLES
@@ -63,7 +63,6 @@ void lv_font_add(lv_font_t * child, lv_font_t * parent)
     }
 
     parent->next_page = child;
-
 }
 
 /**
@@ -82,7 +81,6 @@ void lv_font_remove(lv_font_t * child, lv_font_t * parent)
 
     parent->next_page = child->next_page;
 }
-
 
 /**
  * Tells if font which contains `letter` is monospace or not
@@ -150,7 +148,6 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
     }
 
     return 0;
-
 }
 
 /**
@@ -190,11 +187,11 @@ uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter)
     }
 
     return 0;
-
 }
 
 /**
- * Generic bitmap get function used in 'font->get_bitmap' when the font contains all characters in the range
+ * Generic bitmap get function used in 'font->get_bitmap' when the font contains all characters in
+ * the range
  * @param font pointer to font
  * @param unicode_letter an unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
@@ -209,7 +206,8 @@ const uint8_t * lv_font_get_bitmap_continuous(const lv_font_t * font, uint32_t u
 }
 
 /**
- * Generic bitmap get function used in 'font->get_bitmap' when the font NOT contains all characters in the range (sparse)
+ * Generic bitmap get function used in 'font->get_bitmap' when the font NOT contains all characters
+ * in the range (sparse)
  * @param font pointer to font
  * @param unicode_letter an unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
@@ -219,16 +217,13 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
 
-    uint32_t* pUnicode;
+    uint32_t * pUnicode;
 
-    pUnicode = lv_utils_bsearch(&unicode_letter,
-                                (uint32_t*) font->unicode_list,
-                                font->glyph_cnt,
-                                sizeof(uint32_t),
-                                lv_font_codeCompare);
+    pUnicode = lv_utils_bsearch(&unicode_letter, (uint32_t *)font->unicode_list, font->glyph_cnt,
+                                sizeof(uint32_t), lv_font_codeCompare);
 
-    if (pUnicode != NULL) {
-        uint32_t idx = (uint32_t) (pUnicode - font->unicode_list);
+    if(pUnicode != NULL) {
+        uint32_t idx = (uint32_t)(pUnicode - font->unicode_list);
         return &font->glyph_bitmap[font->glyph_dsc[idx].glyph_index];
     }
 
@@ -236,7 +231,8 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
 }
 
 /**
- * Generic glyph width get function used in 'font->get_width' when the font contains all characters in the range
+ * Generic glyph width get function used in 'font->get_width' when the font contains all characters
+ * in the range
  * @param font pointer to font
  * @param unicode_letter an unicode letter which width should be get
  * @return width of the gylph or -1 if not found
@@ -253,7 +249,8 @@ int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unicode_le
 }
 
 /**
- * Generic glyph width get function used in 'font->get_bitmap' when the font NOT contains all characters in the range (sparse)
+ * Generic glyph width get function used in 'font->get_bitmap' when the font NOT contains all
+ * characters in the range (sparse)
  * @param font pointer to font
  * @param unicode_letter an unicode letter which width should be get
  * @return width of the glyph or -1 if not found
@@ -263,16 +260,13 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return -1;
 
-    uint32_t* pUnicode;
+    uint32_t * pUnicode;
 
-    pUnicode = lv_utils_bsearch(&unicode_letter,
-                                (uint32_t*) font->unicode_list,
-                                font->glyph_cnt,
-                                sizeof(uint32_t),
-                                lv_font_codeCompare);
+    pUnicode = lv_utils_bsearch(&unicode_letter, (uint32_t *)font->unicode_list, font->glyph_cnt,
+                                sizeof(uint32_t), lv_font_codeCompare);
 
-    if (pUnicode != NULL) {
-        uint32_t idx = (uint32_t) (pUnicode - font->unicode_list);
+    if(pUnicode != NULL) {
+        uint32_t idx = (uint32_t)(pUnicode - font->unicode_list);
         return font->glyph_dsc[idx].w_px;
     }
 
@@ -296,8 +290,7 @@ int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter
  *  @retval > 0   Reference is less than element.
  *
  */
-static int32_t lv_font_codeCompare (const void* pRef,
-                                    const void* pElement)
+static int32_t lv_font_codeCompare(const void * pRef, const void * pElement)
 {
-    return (*(uint32_t*) pRef) - (*(uint32_t*) pElement);
+    return (*(uint32_t *)pRef) - (*(uint32_t *)pElement);
 }

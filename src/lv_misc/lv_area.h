@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -21,8 +20,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_COORD_MAX     (16383)    /*To avoid overflow don't let the max [-32,32k] range */
-#define LV_COORD_MIN     (-16384)
+#define LV_COORD_MAX (16383) /*To avoid overflow don't let the max [-32,32k] range */
+#define LV_COORD_MIN (-16384)
 
 /**********************
  *      TYPEDEFS
@@ -176,6 +175,5 @@ bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
 
 #endif

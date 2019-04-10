@@ -3,7 +3,6 @@
  *
  */
 
-
 #ifndef LV_ARC_H
 #define LV_ARC_H
 
@@ -32,20 +31,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 /*Data of arc*/
-typedef struct {
+typedef struct
+{
     /*New data for this type */
     lv_coord_t angle_start;
     lv_coord_t angle_end;
 } lv_arc_ext_t;
-
 
 /*Styles*/
 enum {
     LV_ARC_STYLE_MAIN,
 };
 typedef uint8_t lv_arc_style_t;
-
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -62,7 +59,6 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy);
 /*======================
  * Add/remove functions
  *=====================*/
-
 
 /*=====================
  * Setter functions
@@ -82,7 +78,7 @@ void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, lv_style_t *style);
+void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -118,10 +114,10 @@ lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_ARC*/
+#endif /*LV_USE_ARC*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_ARC_H*/
+#endif /*LV_ARC_H*/

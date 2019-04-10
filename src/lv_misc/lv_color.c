@@ -60,7 +60,7 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
         return lv_color_make(v, v, v);
     }
 
-    region = h / 43;
+    region    = h / 43;
     remainder = (h - (region * 43)) * 6;
 
     p = (v * (255 - s)) >> 8;

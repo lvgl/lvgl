@@ -34,12 +34,12 @@ extern "C" {
  * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style,
+                      lv_opa_t opa_scale);
 
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /* extern "C" */

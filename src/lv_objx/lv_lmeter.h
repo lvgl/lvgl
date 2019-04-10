@@ -33,10 +33,10 @@ extern "C" {
 /*Data of line meter*/
 typedef struct
 {
-    /*No inherited ext.*/            /*Ext. of ancestor*/
+    /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
-    uint16_t scale_angle;        /*Angle of the scale in deg. (0..360)*/
-    uint8_t line_cnt;            /*Count of lines */
+    uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/
+    uint8_t line_cnt;     /*Count of lines */
     int16_t cur_value;
     int16_t min_value;
     int16_t max_value;
@@ -49,7 +49,8 @@ typedef struct
 /**
  * Create a line meter objects
  * @param par pointer to an object, it will be the parent of the new line meter
- * @param copy pointer to a line meter object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a line meter object, if not NULL then the new object will be copied from
+ * it
  * @return pointer to the created line meter
  */
 lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy);
@@ -63,7 +64,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param lmeter pointer to a line meter object
  * @param value new value
  */
-void lv_lmeter_set_value(lv_obj_t *lmeter, int16_t value);
+void lv_lmeter_set_value(lv_obj_t * lmeter, int16_t value);
 
 /**
  * Set minimum and the maximum values of a line meter
@@ -71,7 +72,7 @@ void lv_lmeter_set_value(lv_obj_t *lmeter, int16_t value);
  * @param min minimum value
  * @param max maximum value
  */
-void lv_lmeter_set_range(lv_obj_t *lmeter, int16_t min, int16_t max);
+void lv_lmeter_set_range(lv_obj_t * lmeter, int16_t min, int16_t max);
 
 /**
  * Set the scale settings of a line meter
@@ -86,7 +87,7 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt);
  * @param lmeter pointer to a line meter object
  * @param bg set the style of the line meter
  */
-static inline void lv_lmeter_set_style(lv_obj_t *lmeter, lv_style_t *bg)
+static inline void lv_lmeter_set_style(lv_obj_t * lmeter, lv_style_t * bg)
 {
     lv_obj_set_style(lmeter, bg);
 }
@@ -100,7 +101,7 @@ static inline void lv_lmeter_set_style(lv_obj_t *lmeter, lv_style_t *bg)
  * @param lmeter pointer to a line meter object
  * @return the value of the line meter
  */
-int16_t lv_lmeter_get_value(const lv_obj_t *lmeter);
+int16_t lv_lmeter_get_value(const lv_obj_t * lmeter);
 
 /**
  * Get the minimum value of a line meter
@@ -144,10 +145,10 @@ static inline lv_style_t * lv_lmeter_get_style(const lv_obj_t * lmeter)
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_LMETER*/
+#endif /*LV_USE_LMETER*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_LMETER_H*/
+#endif /*LV_LMETER_H*/

@@ -39,13 +39,13 @@ extern "C" {
  * @param sel_start start index of selected area (-1 if none)
  * @param sel_end end index of selected area (-1 if none)
  */
-void lv_draw_label(const lv_area_t * coords,const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, int sel_start, int sel_end);
+void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style,
+                   lv_opa_t opa_scale, const char * txt, lv_txt_flag_t flag, lv_point_t * offset,
+                   int sel_start, int sel_end);
 
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /* extern "C" */

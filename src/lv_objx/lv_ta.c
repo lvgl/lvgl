@@ -3,7 +3,6 @@
  *
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -24,15 +23,15 @@
 /*Test configuration*/
 
 #ifndef LV_TA_CURSOR_BLINK_TIME
-#define LV_TA_CURSOR_BLINK_TIME 400    /*ms*/
+#define LV_TA_CURSOR_BLINK_TIME 400 /*ms*/
 #endif
 
 #ifndef LV_TA_PWD_SHOW_TIME
-#define LV_TA_PWD_SHOW_TIME 1500    /*ms*/
+#define LV_TA_PWD_SHOW_TIME 1500 /*ms*/
 #endif
 
-#define LV_TA_DEF_WIDTH     (2 * LV_DPI)
-#define LV_TA_DEF_HEIGHT    (1 * LV_DPI)
+#define LV_TA_DEF_WIDTH (2 * LV_DPI)
+#define LV_TA_DEF_HEIGHT (1 * LV_DPI)
 
 /**********************
  *      TYPEDEFS
@@ -54,7 +53,8 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
 static void refr_cursor_area(lv_obj_t * ta);
 static void placeholder_update(lv_obj_t * ta);
-static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source);
+static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
+                                            lv_indev_t * click_source);
 
 /**********************
  *  STATIC VARIABLES
@@ -88,28 +88,28 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_ta);
     if(new_ta == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_ta);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_ta);
-    if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(new_ta));
-    if(scrl_design == NULL) scrl_design = lv_obj_get_design_func(lv_page_get_scrl(new_ta));
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_ta);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_ta);
+    if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_ta));
+    if(scrl_design == NULL) scrl_design = lv_obj_get_design_cb(lv_page_get_scrl(new_ta));
 
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_allocate_ext_attr(new_ta, sizeof(lv_ta_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
 
-    ext->cursor.state = 1;
-    ext->pwd_mode = 0;
-    ext->pwd_tmp = NULL;
+    ext->cursor.state   = 1;
+    ext->pwd_mode       = 0;
+    ext->pwd_tmp        = NULL;
     ext->accapted_chars = NULL;
-    ext->max_length = 0;
-    ext->cursor.style = NULL;
-    ext->cursor.pos = 0;
-    ext->cursor.type = LV_CURSOR_LINE;
+    ext->max_length     = 0;
+    ext->cursor.style   = NULL;
+    ext->cursor.pos     = 0;
+    ext->cursor.type    = LV_CURSOR_LINE;
     ext->cursor.valid_x = 0;
-    ext->one_line = 0;
-    ext->label = NULL;
-    ext->placeholder = NULL;
+    ext->one_line       = 0;
+    ext->label          = NULL;
+    ext->placeholder    = NULL;
 
     lv_obj_set_signal_cb(new_ta, lv_ta_signal);
     lv_obj_set_signal_cb(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);
@@ -143,14 +143,14 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_obj_set_design_cb(ext->page.scrl, lv_ta_scrollable_design);
         lv_ta_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->label = lv_label_create(new_ta, copy_ext->label);
-        ext->pwd_mode = copy_ext->pwd_mode;
-        ext->accapted_chars = copy_ext->accapted_chars;
-        ext->max_length = copy_ext->max_length;
-        ext->cursor.style = copy_ext->cursor.style;
-        ext->cursor.pos = copy_ext->cursor.pos;
-        ext->cursor.valid_x = copy_ext->cursor.valid_x;
-        ext->cursor.type = copy_ext->cursor.type;
+        ext->label             = lv_label_create(new_ta, copy_ext->label);
+        ext->pwd_mode          = copy_ext->pwd_mode;
+        ext->accapted_chars    = copy_ext->accapted_chars;
+        ext->max_length        = copy_ext->max_length;
+        ext->cursor.style      = copy_ext->cursor.style;
+        ext->cursor.pos        = copy_ext->cursor.pos;
+        ext->cursor.valid_x    = copy_ext->cursor.valid_x;
+        ext->cursor.type       = copy_ext->cursor.type;
         if(copy_ext->one_line) lv_ta_set_one_line(new_ta, true);
 
         lv_ta_set_style(new_ta, LV_TA_STYLE_CURSOR, lv_ta_get_style(copy, LV_TA_STYLE_CURSOR));
@@ -162,18 +162,18 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 #if LV_USE_ANIMATION
     /*Create a cursor blinker animation*/
     lv_anim_t a;
-    a.var = new_ta;
-    a.fp = (lv_anim_fp_t)cursor_blink_anim;
-    a.time = LV_TA_CURSOR_BLINK_TIME;
-    a.act_time = 0;
-    a.end_cb = NULL;
-    a.start = 1;
-    a.end = 0;
-    a.repeat = 1;
-    a.repeat_pause = 0;
-    a.playback = 1;
+    a.var            = new_ta;
+    a.fp             = (lv_anim_fp_t)cursor_blink_anim;
+    a.time           = LV_TA_CURSOR_BLINK_TIME;
+    a.act_time       = 0;
+    a.end_cb         = NULL;
+    a.start          = 1;
+    a.end            = 0;
+    a.repeat         = 1;
+    a.repeat_pause   = 0;
+    a.playback       = 1;
     a.playback_pause = 0;
-    a.path = lv_anim_path_step;
+    a.path           = lv_anim_path_step;
     lv_anim_create(&a);
 #endif
 
@@ -203,10 +203,10 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     ta_insert_replace = NULL;
     lv_event_send(ta, LV_EVENT_INSERT, letter_buf);
     if(ta_insert_replace) {
-        if(ta_insert_replace[0] == '\0') return;    /*Drop this text*/
+        if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
         /*Add the replaced text directly it's different from the original*/
-        if(strcmp(ta_insert_replace, (char*)letter_buf)) {
+        if(strcmp(ta_insert_replace, (char *)letter_buf)) {
             lv_ta_add_text(ta, ta_insert_replace);
             return;
         }
@@ -220,7 +220,8 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     uint32_t c_uni = lv_txt_encoded_next((const char *)&c, NULL);
 
     if(char_is_accepted(ta, c_uni) == false) {
-        LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the accepted list)");
+        LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the "
+                    "accepted list)");
         return;
     }
 
@@ -228,14 +229,16 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     bool edge_flash_en = lv_ta_get_edge_flash(ta);
     lv_ta_set_edge_flash(ta, false);
 
-    if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
+    if(ext->pwd_mode != 0) pwd_char_hider(ta); /*Make sure all the current text contains only '*'*/
 
-    lv_label_ins_text(ext->label, ext->cursor.pos, (const char *)letter_buf);    /*Insert the character*/
-    lv_ta_clear_selection(ta); /*Clear selection*/
+    lv_label_ins_text(ext->label, ext->cursor.pos,
+                      (const char *)letter_buf); /*Insert the character*/
+    lv_ta_clear_selection(ta);                   /*Clear selection*/
 
     if(ext->pwd_mode != 0) {
 
-        ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2);  /*+2: the new char + \0 */
+        ext->pwd_tmp =
+            lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2); /*+2: the new char + \0 */
         lv_mem_assert(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
 
@@ -244,18 +247,18 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
 #if LV_USE_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
-        a.var = ta;
-        a.fp = (lv_anim_fp_t)pwd_char_hider_anim;
-        a.time = LV_TA_PWD_SHOW_TIME;
-        a.act_time = 0;
-        a.end_cb = (lv_anim_cb_t)pwd_char_hider;
-        a.start = 0;
-        a.end = 1;
-        a.repeat = 0;
-        a.repeat_pause = 0;
-        a.playback = 0;
+        a.var            = ta;
+        a.fp             = (lv_anim_fp_t)pwd_char_hider_anim;
+        a.time           = LV_TA_PWD_SHOW_TIME;
+        a.act_time       = 0;
+        a.end_cb         = (lv_anim_cb_t)pwd_char_hider;
+        a.start          = 0;
+        a.end            = 1;
+        a.repeat         = 0;
+        a.repeat_pause   = 0;
+        a.playback       = 0;
         a.playback_pause = 0;
-        a.path = lv_anim_path_step;
+        a.path           = lv_anim_path_step;
         lv_anim_create(&a);
 #else
         pwd_char_hider(ta);
@@ -285,7 +288,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
     ta_insert_replace = NULL;
     lv_event_send(ta, LV_EVENT_INSERT, txt);
     if(ta_insert_replace) {
-        if(ta_insert_replace[0] == '\0') return;    /*Drop this text*/
+        if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
         /*Add the replaced text directly it's different from the original*/
         if(strcmp(ta_insert_replace, txt)) {
@@ -294,7 +297,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         }
     }
 
-    if(ext->pwd_mode != 0) pwd_char_hider(ta);  /*Make sure all the current text contains only '*'*/
+    if(ext->pwd_mode != 0) pwd_char_hider(ta); /*Make sure all the current text contains only '*'*/
 
     /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
     if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
@@ -324,18 +327,18 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 #if LV_USE_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
-        a.var = ta;
-        a.fp = (lv_anim_fp_t)pwd_char_hider_anim;
-        a.time = LV_TA_PWD_SHOW_TIME;
-        a.act_time = 0;
-        a.end_cb = (lv_anim_cb_t)pwd_char_hider;
-        a.start = 0;
-        a.end = 1;
-        a.repeat = 0;
-        a.repeat_pause = 0;
-        a.playback = 0;
+        a.var            = ta;
+        a.fp             = (lv_anim_fp_t)pwd_char_hider_anim;
+        a.time           = LV_TA_PWD_SHOW_TIME;
+        a.act_time       = 0;
+        a.end_cb         = (lv_anim_cb_t)pwd_char_hider;
+        a.start          = 0;
+        a.end            = 1;
+        a.repeat         = 0;
+        a.repeat_pause   = 0;
+        a.playback       = 0;
         a.playback_pause = 0;
-        a.path = lv_anim_path_step;
+        a.path           = lv_anim_path_step;
         lv_anim_create(&a);
 #else
         pwd_char_hider(ta);
@@ -360,15 +363,15 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 void lv_ta_del_char(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    uint16_t cur_pos = ext->cursor.pos;
+    uint16_t cur_pos  = ext->cursor.pos;
 
     if(cur_pos == 0) return;
 
     ta_insert_replace = NULL;
-    char del_buf[2] = {LV_GROUP_KEY_DEL, '\0'};
+    char del_buf[2]   = {LV_KEY_DEL, '\0'};
     lv_event_send(ta, LV_EVENT_INSERT, del_buf);
     if(ta_insert_replace) {
-        if(ta_insert_replace[0] == '\0') return;    /*Drop this text*/
+        if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
         /*Add the replaced text directly it's different from the original*/
         if(strcmp(ta_insert_replace, del_buf)) {
@@ -413,11 +416,10 @@ void lv_ta_del_char(lv_obj_t * ta)
  */
 void lv_ta_del_char_forward(lv_obj_t * ta)
 {
-	uint16_t cp = lv_ta_get_cursor_pos(ta);
-	lv_ta_set_cursor_pos(ta, cp + 1);
-	if(cp != lv_ta_get_cursor_pos(ta)) lv_ta_del_char(ta);
+    uint16_t cp = lv_ta_get_cursor_pos(ta);
+    lv_ta_set_cursor_pos(ta, cp + 1);
+    if(cp != lv_ta_get_cursor_pos(ta)) lv_ta_del_char(ta);
 }
-
 
 /*=====================
  * Setter functions
@@ -465,18 +467,18 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 #if LV_USE_ANIMATION && LV_TA_PWD_SHOW_TIME > 0
         /*Auto hide characters*/
         lv_anim_t a;
-        a.var = ta;
-        a.fp = (lv_anim_fp_t)pwd_char_hider_anim;
-        a.time = LV_TA_PWD_SHOW_TIME;
-        a.act_time = 0;
-        a.end_cb = (lv_anim_cb_t)pwd_char_hider;
-        a.start = 0;
-        a.end = 1;
-        a.repeat = 0;
-        a.repeat_pause = 0;
-        a.playback = 0;
+        a.var            = ta;
+        a.fp             = (lv_anim_fp_t)pwd_char_hider_anim;
+        a.time           = LV_TA_PWD_SHOW_TIME;
+        a.act_time       = 0;
+        a.end_cb         = (lv_anim_cb_t)pwd_char_hider;
+        a.start          = 0;
+        a.end            = 1;
+        a.repeat         = 0;
+        a.repeat_pause   = 0;
+        a.playback       = 0;
         a.playback_pause = 0;
-        a.path = lv_anim_path_step;
+        a.path           = lv_anim_path_step;
         lv_anim_create(&a);
 #else
         pwd_char_hider(ta);
@@ -489,10 +491,10 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 }
 
 /**
-* Set the placeholder text of a text area
-* @param ta pointer to a text area
-* @param txt pointer to the text
-*/
+ * Set the placeholder text of a text area
+ * @param ta pointer to a text area
+ * @param txt pointer to the text
+ */
 void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
@@ -536,7 +538,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     /*Position the label to make the cursor visible*/
     lv_obj_t * label_par = lv_obj_get_parent(ext->label);
     lv_point_t cur_pos;
-    lv_style_t * style = lv_obj_get_style(ta);
+    lv_style_t * style       = lv_obj_get_style(ta);
     const lv_font_t * font_p = style->text.font;
     lv_area_t label_cords;
     lv_area_t ta_cords;
@@ -547,23 +549,23 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     /*Check the top*/
     lv_coord_t font_h = lv_font_get_height(font_p);
     if(lv_obj_get_y(label_par) + cur_pos.y < 0) {
-        lv_obj_set_y(label_par, - cur_pos.y + style->body.padding.top);
+        lv_obj_set_y(label_par, -cur_pos.y + style->body.padding.top);
     }
 
     /*Check the bottom*/
     if(label_cords.y1 + cur_pos.y + font_h + style->body.padding.bottom > ta_cords.y2) {
-        lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) +
-                                  font_h + style->body.padding.top + style->body.padding.bottom));
+        lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) + font_h +
+                                  style->body.padding.top + style->body.padding.bottom));
     }
     /*Check the left (use the font_h as general unit)*/
     if(lv_obj_get_x(label_par) + cur_pos.x < font_h) {
-        lv_obj_set_x(label_par, - cur_pos.x + font_h);
+        lv_obj_set_x(label_par, -cur_pos.x + font_h);
     }
 
     /*Check the right (use the font_h as general unit)*/
     if(label_cords.x1 + cur_pos.x + font_h + style->body.padding.right > ta_cords.x2) {
-        lv_obj_set_x(label_par, -(cur_pos.x - lv_obj_get_width(ta) +
-                                  font_h + style->body.padding.left + style->body.padding.right));
+        lv_obj_set_x(label_par, -(cur_pos.x - lv_obj_get_width(ta) + font_h +
+                                  style->body.padding.left + style->body.padding.right));
     }
 
     ext->cursor.valid_x = cur_pos.x;
@@ -571,18 +573,18 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 #if LV_USE_ANIMATION
     /*Reset cursor blink animation*/
     lv_anim_t a;
-    a.var = ta;
-    a.fp = (lv_anim_fp_t)cursor_blink_anim;
-    a.time = LV_TA_CURSOR_BLINK_TIME;
-    a.act_time = 0;
-    a.end_cb = NULL;
-    a.start = 1;
-    a.end = 0;
-    a.repeat = 1;
-    a.repeat_pause = 0;
-    a.playback = 1;
+    a.var            = ta;
+    a.fp             = (lv_anim_fp_t)cursor_blink_anim;
+    a.time           = LV_TA_CURSOR_BLINK_TIME;
+    a.act_time       = 0;
+    a.end_cb         = NULL;
+    a.start          = 1;
+    a.end            = 0;
+    a.repeat         = 1;
+    a.repeat_pause   = 0;
+    a.playback       = 1;
     a.playback_pause = 0;
-    a.path = lv_anim_path_step;
+    a.path           = lv_anim_path_step;
     lv_anim_create(&a);
 #endif
 
@@ -616,7 +618,7 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
 
     /*Pwd mode is now enabled*/
     if(ext->pwd_mode == 0 && en != false) {
-        char * txt = lv_label_get_text(ext->label);
+        char * txt   = lv_label_get_text(ext->label);
         uint16_t len = strlen(txt);
         ext->pwd_tmp = lv_mem_alloc(len + 1);
         lv_mem_assert(ext->pwd_tmp);
@@ -626,7 +628,7 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
 
         uint16_t i;
         for(i = 0; i < len; i++) {
-            txt[i] = '*';       /*All char to '*'*/
+            txt[i] = '*'; /*All char to '*'*/
         }
         txt[i] = '\0';
 
@@ -636,7 +638,7 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
     }
     /*Pwd mode is now disabled*/
     else if(ext->pwd_mode == 1 && en == false) {
-    	lv_ta_clear_selection(ta);
+        lv_ta_clear_selection(ta);
         lv_label_set_text(ext->label, ext->pwd_tmp);
         lv_mem_free(ext->pwd_tmp);
         ext->pwd_tmp = NULL;
@@ -658,18 +660,19 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
     if(ext->one_line == en) return;
 
     if(en) {
-        lv_style_t * style_ta = lv_obj_get_style(ta);
-        lv_style_t * style_scrl = lv_obj_get_style(lv_page_get_scrl(ta));
+        lv_style_t * style_ta    = lv_obj_get_style(ta);
+        lv_style_t * style_scrl  = lv_obj_get_style(lv_page_get_scrl(ta));
         lv_style_t * style_label = lv_obj_get_style(ext->label);
-        lv_coord_t font_h =  lv_font_get_height(style_label->text.font);
+        lv_coord_t font_h        = lv_font_get_height(style_label->text.font);
 
         ext->one_line = 1;
         lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
         lv_obj_set_height(ta, font_h + style_ta->body.padding.top + style_ta->body.padding.bottom +
-                style_scrl->body.padding.top + style_scrl->body.padding.bottom);
+                                  style_scrl->body.padding.top + style_scrl->body.padding.bottom);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_EXPAND);
-        lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.left, style_ta->body.padding.top);
+        lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.left,
+                       style_ta->body.padding.top);
     } else {
         lv_style_t * style_ta = lv_obj_get_style(ta);
 
@@ -679,7 +682,8 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_BREAK);
 
         lv_obj_set_height(ta, LV_TA_DEF_HEIGHT);
-        lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.left, style_ta->body.padding.top);
+        lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.left,
+                       style_ta->body.padding.top);
     }
 
     placeholder_update(ta);
@@ -696,7 +700,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
 void lv_ta_set_text_align(lv_obj_t * ta, lv_label_align_t align)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    lv_obj_t * label = lv_ta_get_label(ta);
+    lv_obj_t * label  = lv_ta_get_label(ta);
     if(!ext->one_line) {
         lv_label_set_align(label, align);
     } else {
@@ -749,11 +753,12 @@ void lv_ta_set_max_length(lv_obj_t * ta, uint16_t num)
  * It can be used to add automatic formatting to the text area.
  * @param ta pointer to a text area.
  * @param txt pointer to a new string to insert. If `""` no text will be added.
- *            The variable must be live after the `event_cb` exists. (Should be `global` or `static`)
+ *            The variable must be live after the `event_cb` exists. (Should be `global` or
+ * `static`)
  */
 void lv_ta_set_insert_replace(lv_obj_t * ta, const char * txt)
 {
-    (void)ta;       /*Unused*/
+    (void)ta; /*Unused*/
     ta_insert_replace = txt;
 }
 
@@ -768,18 +773,13 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     switch(type) {
-        case LV_TA_STYLE_BG:
-            lv_page_set_style(ta, LV_PAGE_STYLE_BG, style);
-            break;
-        case LV_TA_STYLE_SB:
-            lv_page_set_style(ta, LV_PAGE_STYLE_SB, style);
-            break;
-        case LV_TA_STYLE_EDGE_FLASH:
-            lv_page_set_style(ta, LV_PAGE_STYLE_EDGE_FLASH, style);
-            break;
+        case LV_TA_STYLE_BG: lv_page_set_style(ta, LV_PAGE_STYLE_BG, style); break;
+        case LV_TA_STYLE_SB: lv_page_set_style(ta, LV_PAGE_STYLE_SB, style); break;
+        case LV_TA_STYLE_EDGE_FLASH: lv_page_set_style(ta, LV_PAGE_STYLE_EDGE_FLASH, style); break;
         case LV_TA_STYLE_CURSOR:
             ext->cursor.style = style;
-            lv_obj_refresh_ext_size(lv_page_get_scrl(ta)); /*Refresh ext. size because of cursor drawing*/
+            lv_obj_refresh_ext_size(
+                lv_page_get_scrl(ta)); /*Refresh ext. size because of cursor drawing*/
             refr_cursor_area(ta);
             break;
         case LV_TA_STYLE_PLACEHOLDER:
@@ -793,11 +793,11 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
  * @param ta pointer to a text area object
  * @param en true or false to enable/disable selection mode
  */
-void lv_ta_set_sel_mode(lv_obj_t *ta, bool en) {
-	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-	ext->sel_mode = en;
-	if(!en)
-		lv_ta_clear_selection(ta);
+void lv_ta_set_sel_mode(lv_obj_t * ta, bool en)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    ext->sel_mode     = en;
+    if(!en) lv_ta_clear_selection(ta);
 }
 
 /*=====================
@@ -824,10 +824,10 @@ const char * lv_ta_get_text(const lv_obj_t * ta)
 }
 
 /**
-* Get the placeholder text of a text area
-* @param ta pointer to a text area object
-* @return pointer to the text
-*/
+ * Get the placeholder text of a text area
+ * @param ta pointer to a text area object
+ * @return pointer to the text
+ */
 const char * lv_ta_get_placeholder_text(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
@@ -849,7 +849,6 @@ lv_obj_t * lv_ta_get_label(const lv_obj_t * ta)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->label;
 }
-
 
 /**
  * Get the current cursor position in character index
@@ -927,27 +926,17 @@ uint16_t lv_ta_get_max_length(lv_obj_t * ta)
 lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
 {
     lv_style_t * style = NULL;
-    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_ta_ext_t * ext  = lv_obj_get_ext_attr(ta);
 
     switch(type) {
-        case LV_TA_STYLE_BG:
-            style = lv_page_get_style(ta, LV_PAGE_STYLE_BG);
-            break;
-        case LV_TA_STYLE_SB:
-            style = lv_page_get_style(ta, LV_PAGE_STYLE_SB);
-            break;
-        case LV_TA_STYLE_EDGE_FLASH:
-            style = lv_page_get_style(ta, LV_PAGE_STYLE_EDGE_FLASH);
-            break;
-        case LV_TA_STYLE_CURSOR:
-            style = ext->cursor.style;
-            break;
+        case LV_TA_STYLE_BG: style = lv_page_get_style(ta, LV_PAGE_STYLE_BG); break;
+        case LV_TA_STYLE_SB: style = lv_page_get_style(ta, LV_PAGE_STYLE_SB); break;
+        case LV_TA_STYLE_EDGE_FLASH: style = lv_page_get_style(ta, LV_PAGE_STYLE_EDGE_FLASH); break;
+        case LV_TA_STYLE_CURSOR: style = ext->cursor.style; break;
         case LV_TA_STYLE_PLACEHOLDER:
             if(ext->placeholder) style = lv_label_get_style(ext->placeholder);
             break;
-        default:
-            style = NULL;
-            break;
+        default: style = NULL; break;
     }
 
     return style;
@@ -963,19 +952,20 @@ lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
  * @param sel_end pointer to int used to hold last selected character
  */
 
-void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end) {
-	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end)
+{
+    lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
+    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
-	/*Force both values to -1 if there is no selection*/
-	if(ext_label->selection_start == -1 || ext_label->selection_end == -1) {
-		*sel_start = -1;
-		*sel_end = -1;
-		return;
-	}
+    /*Force both values to -1 if there is no selection*/
+    if(ext_label->selection_start == -1 || ext_label->selection_end == -1) {
+        *sel_start = -1;
+        *sel_end   = -1;
+        return;
+    }
 
-	*sel_start = ext_label->selection_start;
-	*sel_end = ext_label->selection_end;
+    *sel_start = ext_label->selection_start;
+    *sel_end   = ext_label->selection_end;
 }
 
 /**
@@ -983,11 +973,12 @@ void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end) {
  * @param ta Text area object
  * @return whether text is selected or not
  */
-bool lv_ta_text_is_selected(const lv_obj_t *ta) {
-	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+bool lv_ta_text_is_selected(const lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
+    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
-	return (ext_label->selection_start == -1 || ext_label->selection_end == -1);
+    return (ext_label->selection_start == -1 || ext_label->selection_end == -1);
 }
 
 /**
@@ -995,10 +986,11 @@ bool lv_ta_text_is_selected(const lv_obj_t *ta) {
  * @param ta pointer to a text area object
  * @return true: selection mode is enabled, false: disabled
  */
-bool lv_ta_get_sel_mode(lv_obj_t *ta) {
-	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+bool lv_ta_get_sel_mode(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-	return ext->sel_mode;
+    return ext->sel_mode;
 }
 
 /*=====================
@@ -1009,15 +1001,16 @@ bool lv_ta_get_sel_mode(lv_obj_t *ta) {
  * Clear the selection on the text area.
  * @param ta Text area object
  */
-void lv_ta_clear_selection(lv_obj_t * ta) {
-	lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-	lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+void lv_ta_clear_selection(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
+    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
-	if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
-		ext_label->selection_start = -1;
-		ext_label->selection_end = -1;
-		lv_obj_invalidate(ta);
-	}
+    if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
+        ext_label->selection_start = -1;
+        ext_label->selection_end   = -1;
+        lv_obj_invalidate(ta);
+    }
 }
 
 /**
@@ -1038,7 +1031,7 @@ void lv_ta_cursor_right(lv_obj_t * ta)
 void lv_ta_cursor_left(lv_obj_t * ta)
 {
     uint16_t cp = lv_ta_get_cursor_pos(ta);
-    if(cp > 0)  {
+    if(cp > 0) {
         cp--;
         lv_ta_set_cursor_pos(ta, cp);
     }
@@ -1059,7 +1052,7 @@ void lv_ta_cursor_down(lv_obj_t * ta)
     /*Increment the y with one line and keep the valid x*/
     lv_style_t * label_style = lv_obj_get_style(ext->label);
     const lv_font_t * font_p = label_style->text.font;
-    lv_coord_t font_h = lv_font_get_height(font_p);
+    lv_coord_t font_h        = lv_font_get_height(font_p);
     pos.y += font_h + label_style->text.line_space + 1;
     pos.x = ext->cursor.valid_x;
 
@@ -1068,7 +1061,8 @@ void lv_ta_cursor_down(lv_obj_t * ta)
         /*Get the letter index on the new cursor position and set it*/
         uint16_t new_cur_pos = lv_label_get_letter_on(ext->label, &pos);
 
-        lv_coord_t cur_valid_x_tmp = ext->cursor.valid_x;   /*Cursor position set overwrites the valid positon */
+        lv_coord_t cur_valid_x_tmp =
+            ext->cursor.valid_x; /*Cursor position set overwrites the valid positon */
         lv_ta_set_cursor_pos(ta, new_cur_pos);
         ext->cursor.valid_x = cur_valid_x_tmp;
     }
@@ -1088,15 +1082,15 @@ void lv_ta_cursor_up(lv_obj_t * ta)
 
     /*Decrement the y with one line and keep the valid x*/
     lv_style_t * label_style = lv_obj_get_style(ext->label);
-    const lv_font_t * font = label_style->text.font;
-    lv_coord_t font_h = lv_font_get_height(font);
+    const lv_font_t * font   = label_style->text.font;
+    lv_coord_t font_h        = lv_font_get_height(font);
     pos.y -= font_h + label_style->text.line_space - 1;
     pos.x = ext->cursor.valid_x;
 
-
     /*Get the letter index on the new cursor position and set it*/
     uint16_t new_cur_pos = lv_label_get_letter_on(ext->label, &pos);
-    lv_coord_t cur_valid_x_tmp = ext->cursor.valid_x;   /*Cursor position set overwrites the valid positon */
+    lv_coord_t cur_valid_x_tmp =
+        ext->cursor.valid_x; /*Cursor position set overwrites the valid positon */
     lv_ta_set_cursor_pos(ta, new_cur_pos);
     ext->cursor.valid_x = cur_valid_x_tmp;
 }
@@ -1130,7 +1124,6 @@ static bool lv_ta_design(lv_obj_t * ta, const lv_area_t * mask, lv_design_mode_t
     return true;
 }
 
-
 /**
  * An extended scrollable design of the page. Calls the normal design function and draws a cursor.
  * @param scrl pointer to the scrollable part of the Text area
@@ -1153,13 +1146,12 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         scrl_design(scrl, mask, mode);
 
         /*Draw the cursor*/
-        lv_obj_t * ta = lv_obj_get_parent(scrl);
+        lv_obj_t * ta     = lv_obj_get_parent(scrl);
         lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-        if(ext->cursor.type == LV_CURSOR_NONE ||
-                (ext->cursor.type & LV_CURSOR_HIDDEN) ||
-                ext->cursor.state == 0) {
-            return true;    /*The cursor is not visible now*/
+        if(ext->cursor.type == LV_CURSOR_NONE || (ext->cursor.type & LV_CURSOR_HIDDEN) ||
+           ext->cursor.state == 0) {
+            return true; /*The cursor is not visible now*/
         }
 
         lv_style_t cur_style;
@@ -1171,12 +1163,12 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         lv_area_t cur_area;
         lv_area_copy(&cur_area, &ext->cursor.area);
 
-         cur_area.x1 += ext->label->coords.x1;
-         cur_area.y1 += ext->label->coords.y1;
-         cur_area.x2 += ext->label->coords.x1;
-         cur_area.y2 += ext->label->coords.y1;
+        cur_area.x1 += ext->label->coords.x1;
+        cur_area.y1 += ext->label->coords.y1;
+        cur_area.x2 += ext->label->coords.x1;
+        cur_area.y2 += ext->label->coords.y1;
 
-         lv_opa_t opa_scale = lv_obj_get_opa_scale(ta);
+        lv_opa_t opa_scale = lv_obj_get_opa_scale(ta);
 
         if(ext->cursor.type == LV_CURSOR_LINE) {
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
@@ -1184,15 +1176,18 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
 
             char letter_buf[8] = {0};
-            memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
+            memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos],
+                   lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
-            lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0, -1, -1);
+            lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0,
+                          -1, -1);
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
             cur_style.body.opa = LV_OPA_TRANSP;
-            if(cur_style.body.border.width == 0) cur_style.body.border.width = 1; /*Be sure the border will be drawn*/
+            if(cur_style.body.border.width == 0)
+                cur_style.body.border.width = 1; /*Be sure the border will be drawn*/
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
         } else if(ext->cursor.type == LV_CURSOR_UNDERLINE) {
             lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
@@ -1224,39 +1219,43 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         /* (The created label will be deleted automatically) */
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(ext->label) {
-            lv_obj_t * scrl = lv_page_get_scrl(ta);
-            lv_style_t * style_ta = lv_obj_get_style(ta);
+            lv_obj_t * scrl         = lv_page_get_scrl(ta);
+            lv_style_t * style_ta   = lv_obj_get_style(ta);
             lv_style_t * style_scrl = lv_obj_get_style(scrl);
             if(ext->one_line) {
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
                 lv_style_t * style_label = lv_obj_get_style(ext->label);
-                lv_coord_t font_h =  lv_font_get_height(style_label->text.font);
-                lv_obj_set_height(ta, font_h +
-                        style_ta->body.padding.top + style_ta->body.padding.bottom +
-                        style_scrl->body.padding.top + style_scrl->body.padding.bottom);
+                lv_coord_t font_h        = lv_font_get_height(style_label->text.font);
+                lv_obj_set_height(
+                    ta, font_h + style_ta->body.padding.top + style_ta->body.padding.bottom +
+                            style_scrl->body.padding.top + style_scrl->body.padding.bottom);
             } else {
                 /*In not one line mode refresh the Label width because 'hpad' can modify it*/
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
-                lv_obj_set_pos(ext->label, style_scrl->body.padding.left, style_scrl->body.padding.right);         /*Be sure the Label is in the correct position*/
+                lv_obj_set_pos(ext->label, style_scrl->body.padding.left,
+                               style_scrl->body.padding
+                                   .right); /*Be sure the Label is in the correct position*/
 
                 if(ext->placeholder) {
                     lv_obj_set_width(ext->placeholder, lv_page_get_fit_width(ta));
-                    lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left, style_scrl->body.padding.top);         /*Be sure the placeholder is in the correct position*/
+                    lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left,
+                                   style_scrl->body.padding
+                                       .top); /*Be sure the placeholder is in the correct position*/
                 }
             }
             lv_label_set_text(ext->label, NULL);
-
         }
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
-                    lv_obj_get_height(ta) != lv_area_get_height(param)) {
-                lv_obj_t * scrl = lv_page_get_scrl(ta);
+               lv_obj_get_height(ta) != lv_area_get_height(param)) {
+                lv_obj_t * scrl         = lv_page_get_scrl(ta);
                 lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
-                lv_obj_set_pos(ext->label, style_scrl->body.padding.left, style_scrl->body.padding.top);
-                lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
+                lv_obj_set_pos(ext->label, style_scrl->body.padding.left,
+                               style_scrl->body.padding.top);
+                lv_label_set_text(ext->label, NULL); /*Refresh the label*/
 
                 refr_cursor_area(ta);
             }
@@ -1264,36 +1263,45 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         /*Set the placeholder width according to the text area width*/
         if(ext->placeholder) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
-                   lv_obj_get_height(ta) != lv_area_get_height(param)) {
-                lv_obj_t * scrl = lv_page_get_scrl(ta);
+               lv_obj_get_height(ta) != lv_area_get_height(param)) {
+                lv_obj_t * scrl         = lv_page_get_scrl(ta);
                 lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->placeholder, lv_page_get_fit_width(ta));
-                lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left, style_scrl->body.padding.top);
-                lv_label_set_text(ext->placeholder, NULL);    /*Refresh the label*/
+                lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left,
+                               style_scrl->body.padding.top);
+                lv_label_set_text(ext->placeholder, NULL); /*Refresh the label*/
 
                 refr_cursor_area(ta);
             }
         }
     } else if(sign == LV_SIGNAL_CONTROL) {
-        uint32_t c = *((uint32_t *)param);      /*uint32_t because can be UTF-8*/
-        if(c == LV_GROUP_KEY_RIGHT)     lv_ta_cursor_right(ta);
-        else if(c == LV_GROUP_KEY_LEFT) lv_ta_cursor_left(ta);
-        else if(c == LV_GROUP_KEY_UP)   lv_ta_cursor_up(ta);
-        else if(c == LV_GROUP_KEY_DOWN) lv_ta_cursor_down(ta);
-        else if(c == LV_GROUP_KEY_BACKSPACE) lv_ta_del_char(ta);
-        else if(c == LV_GROUP_KEY_DEL)  lv_ta_del_char_forward(ta);
-        else if(c == LV_GROUP_KEY_HOME) lv_ta_set_cursor_pos(ta, 0);
-        else if(c == LV_GROUP_KEY_END)  lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
+        uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
+        if(c == LV_KEY_RIGHT)
+            lv_ta_cursor_right(ta);
+        else if(c == LV_KEY_LEFT)
+            lv_ta_cursor_left(ta);
+        else if(c == LV_KEY_UP)
+            lv_ta_cursor_up(ta);
+        else if(c == LV_KEY_DOWN)
+            lv_ta_cursor_down(ta);
+        else if(c == LV_KEY_BACKSPACE)
+            lv_ta_del_char(ta);
+        else if(c == LV_KEY_DEL)
+            lv_ta_del_char_forward(ta);
+        else if(c == LV_KEY_HOME)
+            lv_ta_set_cursor_pos(ta, 0);
+        else if(c == LV_KEY_END)
+            lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
         else {
             lv_ta_add_char(ta, c);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
-        *editable = true;
+        *editable       = true;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_ta";
@@ -1304,24 +1312,24 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP
         lv_cursor_type_t cur_type;
-        cur_type = lv_ta_get_cursor_type(ta);
-        lv_group_t * g = lv_obj_get_group(ta);
-        bool editing = lv_group_get_editing(g);
+        cur_type                   = lv_ta_get_cursor_type(ta);
+        lv_group_t * g             = lv_obj_get_group(ta);
+        bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            if(editing) lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
-            else lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
-        }
-        else {
+            if(editing)
+                lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
+            else
+                lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
+        } else {
             lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
         }
 #endif
-    }
-    else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING
-    		|| sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
-        update_cursor_position_on_click(ta, sign, (lv_indev_t *) param);
+    } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING ||
+              sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+        update_cursor_position_on_click(ta, sign, (lv_indev_t *)param);
     }
     return res;
 }
@@ -1341,32 +1349,31 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     res = scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
 
-    lv_obj_t * ta = lv_obj_get_parent(scrl);
+    lv_obj_t * ta     = lv_obj_get_parent(scrl);
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         /*Set ext. size because the cursor might be out of this object*/
         lv_style_t * style_label = lv_obj_get_style(ext->label);
-        lv_coord_t font_h = lv_font_get_height(style_label->text.font);
+        lv_coord_t font_h        = lv_font_get_height(style_label->text.font);
         scrl->ext_size = LV_MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
-    }
-    else if(sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
-                    lv_obj_get_height(ta) != lv_area_get_height(param)) {
+               lv_obj_get_height(ta) != lv_area_get_height(param)) {
 
                 lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
-                lv_obj_set_pos(ext->label, style_scrl->body.padding.left, style_scrl->body.padding.top);
-                lv_label_set_text(ext->label, NULL);    /*Refresh the label*/
+                lv_obj_set_pos(ext->label, style_scrl->body.padding.left,
+                               style_scrl->body.padding.top);
+                lv_label_set_text(ext->label, NULL); /*Refresh the label*/
 
                 refr_cursor_area(ta);
             }
         }
-    }
-    else if(sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESS_LOST ||
-    		sign == LV_SIGNAL_RELEASED) {
+    } else if(sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESSED ||
+              sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
         update_cursor_position_on_click(ta, sign, (lv_indev_t *)param);
     }
 
@@ -1385,10 +1392,8 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(show != ext->cursor.state) {
         ext->cursor.state = show == 0 ? 0 : 1;
-        if(ext->cursor.type != LV_CURSOR_NONE &&
-                (ext->cursor.type & LV_CURSOR_HIDDEN) == 0)
-        {
-            lv_disp_t * disp  = lv_obj_get_disp(ta);
+        if(ext->cursor.type != LV_CURSOR_NONE && (ext->cursor.type & LV_CURSOR_HIDDEN) == 0) {
+            lv_disp_t * disp = lv_obj_get_disp(ta);
             lv_area_t area_tmp;
             lv_area_copy(&area_tmp, &ext->cursor.area);
             area_tmp.x1 += ext->label->coords.x1;
@@ -1399,7 +1404,6 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
         }
     }
 }
-
 
 /**
  * Dummy function to animate char hiding in pwd mode.
@@ -1424,13 +1428,13 @@ static void pwd_char_hider(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->pwd_mode != 0) {
-        char * txt = lv_label_get_text(ext->label);
+        char * txt  = lv_label_get_text(ext->label);
         int16_t len = lv_txt_get_encoded_length(txt);
-        bool refr = false;
+        bool refr   = false;
         uint16_t i;
         for(i = 0; i < len; i++) {
             txt[i] = '*';
-            refr = true;
+            refr   = true;
         }
 
         txt[i] = '\0';
@@ -1453,8 +1457,7 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
     if(ext->accapted_chars == NULL && ext->max_length == 0) return true;
 
     /*Too many characters?*/
-    if(ext->max_length > 0 &&
-            lv_txt_get_encoded_length(lv_ta_get_text(ta)) >= ext->max_length) {
+    if(ext->max_length > 0 && lv_txt_get_encoded_length(lv_ta_get_text(ta)) >= ext->max_length) {
         return false;
     }
 
@@ -1467,16 +1470,15 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
             if(a == c) return true; /*Accepted*/
         }
 
-        return false;   /*The character wasn't in the list*/
+        return false; /*The character wasn't in the list*/
     } else {
-        return true;    /*If the accepted char list in not specified the accept the character*/
+        return true; /*If the accepted char list in not specified the accept the character*/
     }
-
 }
 
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
 {
-    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_ta_ext_t * ext        = lv_obj_get_ext_attr(ta);
     lv_style_t * label_style = lv_obj_get_style(ext->label);
 
     if(ext->cursor.style) {
@@ -1484,29 +1486,30 @@ static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
     } else {
         /*If cursor style is not specified then use the modified label style */
         lv_style_copy(style_res, label_style);
-        lv_color_t clv_color_tmp = style_res->text.color;        /*Make letter color to cursor color*/
-        style_res->text.color = style_res->body.main_color;       /*In block mode the letter color will be current background color*/
-        style_res->body.main_color = clv_color_tmp;
-        style_res->body.grad_color = clv_color_tmp;
-        style_res->body.border.color = clv_color_tmp;
-        style_res->body.border.opa = LV_OPA_COVER;
-        style_res->body.border.width = 1;
-        style_res->body.shadow.width = 0;
-        style_res->body.radius = 0;
-        style_res->body.opa = LV_OPA_COVER;
-        style_res->body.padding.left = 0;
-        style_res->body.padding.right = 0;
-        style_res->body.padding.top = 0;
+        lv_color_t clv_color_tmp = style_res->text.color; /*Make letter color to cursor color*/
+        style_res->text.color =
+            style_res->body
+                .main_color; /*In block mode the letter color will be current background color*/
+        style_res->body.main_color     = clv_color_tmp;
+        style_res->body.grad_color     = clv_color_tmp;
+        style_res->body.border.color   = clv_color_tmp;
+        style_res->body.border.opa     = LV_OPA_COVER;
+        style_res->body.border.width   = 1;
+        style_res->body.shadow.width   = 0;
+        style_res->body.radius         = 0;
+        style_res->body.opa            = LV_OPA_COVER;
+        style_res->body.padding.left   = 0;
+        style_res->body.padding.right  = 0;
+        style_res->body.padding.top    = 0;
         style_res->body.padding.bottom = 0;
-        style_res->line.width = 1;
-        style_res->body.opa = LV_OPA_COVER;
+        style_res->line.width          = 1;
+        style_res->body.opa            = LV_OPA_COVER;
     }
-
 }
 
 static void refr_cursor_area(lv_obj_t * ta)
 {
-    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_ta_ext_t * ext        = lv_obj_get_ext_attr(ta);
     lv_style_t * label_style = lv_obj_get_style(ext->label);
 
     lv_style_t cur_style;
@@ -1533,7 +1536,8 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, cur_pos, &letter_pos);
 
     /*If the cursor is out of the text (most right) draw it to the next line*/
-    if(letter_pos.x + ext->label->coords.x1 + letter_w > ext->label->coords.x2 && ext->one_line == 0 && lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
+    if(letter_pos.x + ext->label->coords.x1 + letter_w > ext->label->coords.x2 &&
+       ext->one_line == 0 && lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
         letter_pos.x = 0;
         letter_pos.y += letter_h + label_style->text.line_space;
 
@@ -1556,7 +1560,8 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_area_t cur_area;
 
     if(ext->cursor.type == LV_CURSOR_LINE) {
-        cur_area.x1 = letter_pos.x + cur_style.body.padding.left - (cur_style.line.width >> 1) - (cur_style.line.width & 0x1);
+        cur_area.x1 = letter_pos.x + cur_style.body.padding.left - (cur_style.line.width >> 1) -
+                      (cur_style.line.width & 0x1);
         cur_area.y1 = letter_pos.y + cur_style.body.padding.top;
         cur_area.x2 = letter_pos.x + cur_style.body.padding.right + (cur_style.line.width >> 1);
         cur_area.y2 = letter_pos.y + cur_style.body.padding.bottom + letter_h;
@@ -1573,13 +1578,15 @@ static void refr_cursor_area(lv_obj_t * ta)
         cur_area.y2 = letter_pos.y + cur_style.body.padding.bottom + letter_h;
     } else if(ext->cursor.type == LV_CURSOR_UNDERLINE) {
         cur_area.x1 = letter_pos.x + cur_style.body.padding.left;
-        cur_area.y1 = letter_pos.y + cur_style.body.padding.top + letter_h - (cur_style.line.width >> 1);
+        cur_area.y1 =
+            letter_pos.y + cur_style.body.padding.top + letter_h - (cur_style.line.width >> 1);
         cur_area.x2 = letter_pos.x + cur_style.body.padding.right + letter_w;
-        cur_area.y2 = letter_pos.y + cur_style.body.padding.bottom + letter_h + (cur_style.line.width >> 1) + (cur_style.line.width & 0x1);
+        cur_area.y2 = letter_pos.y + cur_style.body.padding.bottom + letter_h +
+                      (cur_style.line.width >> 1) + (cur_style.line.width & 0x1);
     }
 
     /*Save the new area*/
-    lv_disp_t * disp  = lv_obj_get_disp(ta);
+    lv_disp_t * disp = lv_obj_get_disp(ta);
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, &ext->cursor.area);
     area_tmp.x1 += ext->label->coords.x1;
@@ -1609,31 +1616,30 @@ static void placeholder_update(lv_obj_t * ta)
 
     if(ta_text[0] == '\0') {
         /*Be sure the main label and the placeholder has the same coordinates*/
-        lv_obj_t * scrl = lv_page_get_scrl(ta);
+        lv_obj_t * scrl         = lv_page_get_scrl(ta);
         lv_style_t * style_scrl = lv_obj_get_style(scrl);
-        lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left, style_scrl->body.padding.top);
+        lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left,
+                       style_scrl->body.padding.top);
         lv_obj_set_pos(ext->label, style_scrl->body.padding.left, style_scrl->body.padding.top);
 
         lv_obj_set_width(ext->placeholder, lv_page_get_fit_width(ta));
         lv_obj_set_hidden(ext->placeholder, false);
-    }
-    else {
+    } else {
         lv_obj_set_hidden(ext->placeholder, true);
     }
 }
 
-static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source)
+static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
+                                            lv_indev_t * click_source)
 {
     if(click_source == NULL) return;
 
     if(lv_indev_get_type(click_source) == LV_INDEV_TYPE_KEYPAD ||
-            lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER)
-    {
+       lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER) {
         return;
     }
 
-
-    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
     lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
     lv_area_t label_coords;
@@ -1655,71 +1661,66 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 
     lv_coord_t label_width = lv_obj_get_width(ext->label);
 
-
-
     /*Check if the click happened on the left side of the area outside the label*/
-    if (relative_position.x < 0) {
+    if(relative_position.x < 0) {
         index_of_char_at_position = 0;
-        click_outside_label = true;
+        click_outside_label       = true;
     }
     /*Check if the click happened on the right side of the area outside the label*/
-    else if (relative_position.x >= label_width) {
+    else if(relative_position.x >= label_width) {
         index_of_char_at_position = LV_TA_CURSOR_LAST;
-        click_outside_label = true;
-    }
-    else {
+        click_outside_label       = true;
+    } else {
         index_of_char_at_position = lv_label_get_letter_on(ext->label, &relative_position);
-        click_outside_label = !lv_label_is_char_under_pos(ext->label, &relative_position);
+        click_outside_label       = !lv_label_is_char_under_pos(ext->label, &relative_position);
     }
 
     if(ext->sel_mode && !ext->selecting && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
-    	/*Input device just went down. Store the selection start position*/
-    	ext->tmp_sel_start = index_of_char_at_position;
-    	ext->tmp_sel_end = -1;
-    	ext->selecting = 1;
-    	lv_obj_set_drag(lv_page_get_scrl(ta), false);
+        /*Input device just went down. Store the selection start position*/
+        ext->tmp_sel_start = index_of_char_at_position;
+        ext->tmp_sel_end   = -1;
+        ext->selecting     = 1;
+        lv_obj_set_drag(lv_page_get_scrl(ta), false);
     } else if(ext->selecting && sign == LV_SIGNAL_PRESSING) {
-    	/*Input device may be moving. Store the end position */
-    	ext->tmp_sel_end = index_of_char_at_position;
+        /*Input device may be moving. Store the end position */
+        ext->tmp_sel_end = index_of_char_at_position;
     } else if(ext->selecting && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
-    	/*Input device is released. Check if anything was selected.*/
-    	lv_obj_set_drag(lv_page_get_scrl(ta), true);
+        /*Input device is released. Check if anything was selected.*/
+        lv_obj_set_drag(lv_page_get_scrl(ta), true);
     }
 
     if(ext->selecting || sign == LV_SIGNAL_PRESSED)
-        	lv_ta_set_cursor_pos(ta, index_of_char_at_position);
+        lv_ta_set_cursor_pos(ta, index_of_char_at_position);
 
     if(ext->selecting) {
-		/*If the selected area has changed then update the real values and*/
-		/*invalidate the text area.*/
-		if(ext->tmp_sel_start > ext->tmp_sel_end) {
-			if(ext_label->selection_start != ext->tmp_sel_end ||
-			   ext_label->selection_end != ext->tmp_sel_start) {
-				ext_label->selection_start = ext->tmp_sel_end;
-				ext_label->selection_end = ext->tmp_sel_start;
-				lv_obj_invalidate(ta);
-			}
-		} else if(ext->tmp_sel_start < ext->tmp_sel_end) {
-			if(ext_label->selection_start != ext->tmp_sel_start ||
-			   ext_label->selection_end != ext->tmp_sel_end) {
-				ext_label->selection_start = ext->tmp_sel_start;
-				ext_label->selection_end = ext->tmp_sel_end;
-				lv_obj_invalidate(ta);
-			}
-		} else {
-			if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
-				ext_label->selection_start = -1;
-				ext_label->selection_end = -1;
-				lv_obj_invalidate(ta);
-			}
-		}
-		/*Finish selection if necessary */
-		if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
-				ext->selecting = 0;
-		}
+        /*If the selected area has changed then update the real values and*/
+        /*invalidate the text area.*/
+        if(ext->tmp_sel_start > ext->tmp_sel_end) {
+            if(ext_label->selection_start != ext->tmp_sel_end ||
+               ext_label->selection_end != ext->tmp_sel_start) {
+                ext_label->selection_start = ext->tmp_sel_end;
+                ext_label->selection_end   = ext->tmp_sel_start;
+                lv_obj_invalidate(ta);
+            }
+        } else if(ext->tmp_sel_start < ext->tmp_sel_end) {
+            if(ext_label->selection_start != ext->tmp_sel_start ||
+               ext_label->selection_end != ext->tmp_sel_end) {
+                ext_label->selection_start = ext->tmp_sel_start;
+                ext_label->selection_end   = ext->tmp_sel_end;
+                lv_obj_invalidate(ta);
+            }
+        } else {
+            if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
+                ext_label->selection_start = -1;
+                ext_label->selection_end   = -1;
+                lv_obj_invalidate(ta);
+            }
+        }
+        /*Finish selection if necessary */
+        if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+            ext->selecting = 0;
+        }
     }
-
-
 }
 
 #endif

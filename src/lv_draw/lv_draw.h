@@ -27,11 +27,11 @@ extern "C" {
  *********************/
 /*If image pixels contains alpha we need to know how much byte is a pixel*/
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
-# define LV_IMG_PX_SIZE_ALPHA_BYTE   2
+#define LV_IMG_PX_SIZE_ALPHA_BYTE 2
 #elif LV_COLOR_DEPTH == 16
-# define LV_IMG_PX_SIZE_ALPHA_BYTE   3
+#define LV_IMG_PX_SIZE_ALPHA_BYTE 3
 #elif LV_COLOR_DEPTH == 32
-# define LV_IMG_PX_SIZE_ALPHA_BYTE   4
+#define LV_IMG_PX_SIZE_ALPHA_BYTE 4
 #endif
 
 /**********************
@@ -45,7 +45,6 @@ enum {
     LV_IMG_SRC_UNKNOWN,
 };
 typedef uint8_t lv_img_src_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -71,7 +70,8 @@ lv_opa_t lv_draw_aa_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t base_opa)
  * @param color color of pixels
  * @param opa maximum opacity
  */
-void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
+void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask,
+                        lv_color_t color, lv_opa_t opa);
 
 /**
  * Add a horizontal anti-aliasing segment (pixels with decreasing opacity)
@@ -82,7 +82,8 @@ void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
  * @param color color of pixels
  * @param opa maximum opacity
  */
-void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color, lv_opa_t opa);
+void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask,
+                        lv_color_t color, lv_opa_t opa);
 #endif
 
 /**********************
@@ -107,4 +108,4 @@ void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
 } /* extern "C" */
 #endif
 
-#endif  /*LV_DRAW_H*/
+#endif /*LV_DRAW_H*/

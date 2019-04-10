@@ -29,22 +29,22 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_LABEL_DOT_NUM    3
-#define LV_LABEL_POS_LAST   0xFFFF
+#define LV_LABEL_DOT_NUM 3
+#define LV_LABEL_POS_LAST 0xFFFF
 
 /**********************
  *      TYPEDEFS
  **********************/
 
 /*Long mode behaviors. Used in 'lv_label_ext_t' */
-enum
-{
-    LV_LABEL_LONG_EXPAND,   /*Expand the object size to the text size*/
-    LV_LABEL_LONG_BREAK,    /*Keep the object width, break the too long lines and expand the object height*/
-    LV_LABEL_LONG_DOT,      /*Keep the size and write dots at the end if the text is too long*/
-    LV_LABEL_LONG_ROLL,     /*Keep the size and roll the text back and forth*/
-    LV_LABEL_LONG_ROLL_CIRC,/*Keep the size and roll the text circularly*/
-    LV_LABEL_LONG_CROP,     /*Keep the size and crop the text out of it*/
+enum {
+    LV_LABEL_LONG_EXPAND,    /*Expand the object size to the text size*/
+    LV_LABEL_LONG_BREAK,     /*Keep the object width, break the too long lines and expand the object
+                                height*/
+    LV_LABEL_LONG_DOT,       /*Keep the size and write dots at the end if the text is too long*/
+    LV_LABEL_LONG_ROLL,      /*Keep the size and roll the text back and forth*/
+    LV_LABEL_LONG_ROLL_CIRC, /*Keep the size and roll the text circularly*/
+    LV_LABEL_LONG_CROP,      /*Keep the size and crop the text out of it*/
 };
 typedef uint8_t lv_label_long_mode_t;
 
@@ -59,28 +59,28 @@ typedef uint8_t lv_label_align_t;
 /*Data of label*/
 typedef struct
 {
-    /*Inherited from 'base_obj' so no inherited ext.*/  /*Ext. of ancestor*/
+    /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
-    char * text;                            /*Text of the label*/
-    lv_label_long_mode_t long_mode;         /*Determinate what to do with the long texts*/
-    char dot_tmp[LV_LABEL_DOT_NUM * 4 + 1]; /*Store the character which are replaced by dots (Handled by the library)*/
+    char * text;                    /*Text of the label*/
+    lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
+    char dot_tmp[LV_LABEL_DOT_NUM * 4 +
+                 1]; /*Store the character which are replaced by dots (Handled by the library)*/
 
-    uint16_t dot_end;               /*The text end position in dot mode (Handled by the library)*/
-    uint16_t anim_speed;            /*Speed of scroll and roll animation in px/sec unit*/
-    lv_point_t offset;              /*Text draw position offset*/
-    uint8_t static_txt  :1;         /*Flag to indicate the text is static*/
-    uint8_t align       :2;         /*Align type from 'lv_label_align_t'*/
-    uint8_t recolor     :1;         /*Enable in-line letter re-coloring*/
-    uint8_t expand      :1;         /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
-    uint8_t body_draw   :1;         /*Draw background body*/
-    int selection_start;		/*Left-most selection character*/
-    int selection_end;			/*Right-most selection character*/
+    uint16_t dot_end;       /*The text end position in dot mode (Handled by the library)*/
+    uint16_t anim_speed;    /*Speed of scroll and roll animation in px/sec unit*/
+    lv_point_t offset;      /*Text draw position offset*/
+    uint8_t static_txt : 1; /*Flag to indicate the text is static*/
+    uint8_t align : 2;      /*Align type from 'lv_label_align_t'*/
+    uint8_t recolor : 1;    /*Enable in-line letter re-coloring*/
+    uint8_t expand : 1;     /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
+    uint8_t body_draw : 1;  /*Draw background body*/
+    int selection_start;    /*Left-most selection character*/
+    int selection_end;      /*Right-most selection character*/
 } lv_label_ext_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 /**
  * Create a label objects
@@ -122,7 +122,8 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text);
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.
- *                  In LV_LONG_BREAK/LONG/ROLL the size of the label should be set AFTER this function
+ *                  In LV_LONG_BREAK/LONG/ROLL the size of the label should be set AFTER this
+ * function
  */
 void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
 
@@ -131,7 +132,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode);
  * @param label pointer to a label object
  * @param align 'LV_LABEL_ALIGN_LEFT' or 'LV_LABEL_ALIGN_LEFT'
  */
-void lv_label_set_align(lv_obj_t *label, lv_label_align_t align);
+void lv_label_set_align(lv_obj_t * label, lv_label_align_t align);
 
 /**
  * Enable the recoloring by in-line commands
@@ -145,21 +146,21 @@ void lv_label_set_recolor(lv_obj_t * label, bool en);
  * @param label pointer to a label object
  * @param en true: draw body; false: don't draw body
  */
-void lv_label_set_body_draw(lv_obj_t *label, bool en);
+void lv_label_set_body_draw(lv_obj_t * label, bool en);
 
 /**
  * Set the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
  * @param label pointer to a label object
  * @param anim_speed speed of animation in px/sec unit
  */
-void lv_label_set_anim_speed(lv_obj_t *label, uint16_t anim_speed);
+void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed);
 
 /**
  * Set the style of an label
  * @param label pointer to an label object
  * @param style pointer to a style
  */
-static inline void lv_label_set_style(lv_obj_t *label, lv_style_t *style)
+static inline void lv_label_set_style(lv_obj_t * label, lv_style_t * style)
 {
     lv_obj_set_style(label, style);
 }
@@ -200,19 +201,20 @@ bool lv_label_get_recolor(const lv_obj_t * label);
  * @param label pointer to a label object
  * @return true: draw body; false: don't draw body
  */
-bool lv_label_get_body_draw(const lv_obj_t *label);
+bool lv_label_get_body_draw(const lv_obj_t * label);
 
 /**
  * Get the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
  * @param label pointer to a label object
  * @return speed of animation in px/sec unit
  */
-uint16_t lv_label_get_anim_speed(const lv_obj_t *label);
+uint16_t lv_label_get_anim_speed(const lv_obj_t * label);
 
 /**
  * Get the relative x and y coordinates of a letter
  * @param label pointer to a label object
- * @param index index of the letter [0 ... text length]. Expressed in character index, not byte index (different in UTF-8)
+ * @param index index of the letter [0 ... text length]. Expressed in character index, not byte
+ * index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
 void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t * pos);
@@ -239,7 +241,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);
  * @param label pointer to an label object
  * @return pointer to the label's style
  */
-static inline lv_style_t* lv_label_get_style(const lv_obj_t *label)
+static inline lv_style_t * lv_label_get_style(const lv_obj_t * label)
 {
     return lv_obj_get_style(label);
 }
@@ -251,30 +253,29 @@ static inline lv_style_t* lv_label_get_style(const lv_obj_t *label)
 /**
  * Insert a text to the label. The label text can not be static.
  * @param label pointer to a label object
- * @param pos character index to insert. Expressed in character index and not byte index (Different in UTF-8)
- *            0: before first char.
- *            LV_LABEL_POS_LAST: after last char.
+ * @param pos character index to insert. Expressed in character index and not byte index (Different
+ * in UTF-8) 0: before first char. LV_LABEL_POS_LAST: after last char.
  * @param txt pointer to the text to insert
  */
-void lv_label_ins_text(lv_obj_t * label, uint32_t pos,  const char * txt);
+void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt);
 
 /**
  * Delete characters from a label. The label text can not be static.
  * @param label pointer to a label object
- * @param pos character index to insert. Expressed in character index and not byte index (Different in UTF-8)
- *            0: before first char.
+ * @param pos character index to insert. Expressed in character index and not byte index (Different
+ * in UTF-8) 0: before first char.
  * @param cnt number of characters to cut
  */
-void lv_label_cut_text(lv_obj_t * label, uint32_t pos,  uint32_t cnt);
+void lv_label_cut_text(lv_obj_t * label, uint32_t pos, uint32_t cnt);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_LABEL*/
+#endif /*LV_USE_LABEL*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_LABEL_H*/
+#endif /*LV_LABEL_H*/

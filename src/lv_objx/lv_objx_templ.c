@@ -8,8 +8,8 @@
  *                    templ -> object short name with lower case(e.g. btn, label etc)
  *                    TEMPL -> object short name with upper case (e.g. BTN, LABEL etc.)
  *
- * You can remove the defined() clause from the #if statement below. This exists because LV_USE_TEMPL
- * is not in lv_conf.h or lv_conf_templ.h by default.
+ * You can remove the defined() clause from the #if statement below. This exists because
+ * LV_USE_TEMPL is not in lv_conf.h or lv_conf_templ.h by default.
  */
 
 /*********************
@@ -102,7 +102,6 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
  * New object specific "add" or "remove" functions come here
  */
 
-
 /*=====================
  * Setter functions
  *====================*/
@@ -110,7 +109,6 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
 /*
  * New object specific "set" functions come here
  */
-
 
 /**
  * Set a style of a template.
@@ -123,10 +121,8 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t * st
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
 
     switch(type) {
-        case LV_TEMPL_STYLE_X:
-            break;
-        case LV_TEMPL_STYLE_Y:
-            break;
+        case LV_TEMPL_STYLE_X: break;
+        case LV_TEMPL_STYLE_Y: break;
     }
 }
 
@@ -147,15 +143,12 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, lv_style_t * st
 lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type)
 {
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
-    lv_style_t * style = NULL;
+    lv_style_t * style   = NULL;
 
     switch(type) {
-        case LV_TEMPL_STYLE_X:
-            style =  NULL;      /*Replace NULL with a pointer to the style*/
-        case LV_TEMPL_STYLE_Y:
-            style = NULL;       /*Replace NULL with a pointer to the style*/
-        default:
-            style =  NULL;
+        case LV_TEMPL_STYLE_X: style = NULL; /*Replace NULL with a pointer to the style*/
+        case LV_TEMPL_STYLE_Y: style = NULL; /*Replace NULL with a pointer to the style*/
+        default: style = NULL;
     }
 
     return style;
@@ -195,7 +188,6 @@ static bool lv_templ_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-
     }
 
     return true;
@@ -216,13 +208,12 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
     res = ancestor_signal(templ, sign, param);
     if(res != LV_RES_OK) return res;
 
-
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_templ";

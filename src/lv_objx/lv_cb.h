@@ -47,8 +47,8 @@ typedef struct
 {
     lv_btn_ext_t bg_btn; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * bullet;  /*Pointer to button*/
-    lv_obj_t * label;   /*Pointer to label*/
+    lv_obj_t * bullet; /*Pointer to button*/
+    lv_obj_t * label;  /*Pointer to label*/
 } lv_cb_ext_t;
 
 enum {
@@ -118,7 +118,7 @@ static inline void lv_cb_set_inactive(lv_obj_t * cb)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t *style);
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -153,10 +153,10 @@ lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_CB*/
+#endif /*LV_USE_CB*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_CB_H*/
+#endif /*LV_CB_H*/

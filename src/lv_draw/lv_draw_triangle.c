@@ -41,7 +41,8 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
  * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style,
+                      lv_opa_t opa_scale)
 {
     lv_point_t tri[3];
 
@@ -62,18 +63,18 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
 
     /*Draw the triangle*/
     lv_point_t edge1;
-    lv_coord_t dx1 = LV_MATH_ABS(tri[0].x - tri[1].x);
-    lv_coord_t sx1 = tri[0].x < tri[1].x ? 1 : -1;
-    lv_coord_t dy1 = LV_MATH_ABS(tri[0].y - tri[1].y);
-    lv_coord_t sy1 = tri[0].y < tri[1].y ? 1 : -1;
+    lv_coord_t dx1  = LV_MATH_ABS(tri[0].x - tri[1].x);
+    lv_coord_t sx1  = tri[0].x < tri[1].x ? 1 : -1;
+    lv_coord_t dy1  = LV_MATH_ABS(tri[0].y - tri[1].y);
+    lv_coord_t sy1  = tri[0].y < tri[1].y ? 1 : -1;
     lv_coord_t err1 = (dx1 > dy1 ? dx1 : -dy1) / 2;
     lv_coord_t err_tmp1;
 
     lv_point_t edge2;
-    lv_coord_t dx2 = LV_MATH_ABS(tri[0].x - tri[2].x);
-    lv_coord_t sx2 = tri[0].x < tri[2].x ? 1 : -1;
-    lv_coord_t dy2 = LV_MATH_ABS(tri[0].y - tri[2].y);
-    lv_coord_t sy2 = tri[0].y < tri[2].y ? 1 : -1;
+    lv_coord_t dx2  = LV_MATH_ABS(tri[0].x - tri[2].x);
+    lv_coord_t sx2  = tri[0].x < tri[2].x ? 1 : -1;
+    lv_coord_t dy2  = LV_MATH_ABS(tri[0].y - tri[2].y);
+    lv_coord_t sy2  = tri[0].y < tri[2].y ? 1 : -1;
     lv_coord_t err2 = (dx1 > dy2 ? dx2 : -dy2) / 2;
     lv_coord_t err_tmp2;
 
@@ -87,21 +88,22 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
     lv_area_t act_area;
     lv_area_t draw_area;
 
-
-    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t) style->body.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER
+                       ? style->body.opa
+                       : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
 
     while(1) {
         act_area.x1 = edge1.x;
-        act_area.x2 = edge2.x ;
+        act_area.x2 = edge2.x;
         act_area.y1 = edge1.y;
-        act_area.y2 = edge2.y ;
-
+        act_area.y2 = edge2.y;
 
         draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
         draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
         draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
         draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
-        draw_area.x2--; /*Do not draw most right pixel because it will be drawn by the adjacent triangle*/
+        draw_area.x2--; /*Do not draw most right pixel because it will be drawn by the adjacent
+                           triangle*/
         lv_draw_fill(&draw_area, mask, style->body.main_color, opa);
 
         /*Calc. the next point of edge1*/
@@ -109,12 +111,13 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
         do {
             if(edge1.x == tri[1].x && edge1.y == tri[1].y) {
 
-                dx1 = LV_MATH_ABS(tri[1].x - tri[2].x);
-                sx1 = tri[1].x < tri[2].x ? 1 : -1;
-                dy1 = LV_MATH_ABS(tri[1].y - tri[2].y);
-                sy1 = tri[1].y < tri[2].y ? 1 : -1;
+                dx1  = LV_MATH_ABS(tri[1].x - tri[2].x);
+                sx1  = tri[1].x < tri[2].x ? 1 : -1;
+                dy1  = LV_MATH_ABS(tri[1].y - tri[2].y);
+                sy1  = tri[1].y < tri[2].y ? 1 : -1;
                 err1 = (dx1 > dy1 ? dx1 : -dy1) / 2;
-            } else if(edge1.x == tri[2].x && edge1.y == tri[2].y) return;
+            } else if(edge1.x == tri[2].x && edge1.y == tri[2].y)
+                return;
             err_tmp1 = err1;
             if(err_tmp1 > -dx1) {
                 err1 -= dy1;
@@ -147,7 +150,6 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
  *   STATIC FUNCTIONS
  **********************/
 
-
 /**
  * Swap two points
  * p1 pointer to the first point
@@ -164,5 +166,4 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2)
 
     p2->x = tmp.x;
     p2->y = tmp.y;
-
 }

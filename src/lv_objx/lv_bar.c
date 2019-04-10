@@ -62,22 +62,22 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_bar);
     if(new_bar == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_bar);
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_bar);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_bar);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_bar);
 
     /*Allocate the object type specific extended data*/
     lv_bar_ext_t * ext = lv_obj_allocate_ext_attr(new_bar, sizeof(lv_bar_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
 
-    ext->min_value = 0;
-    ext->max_value = 100;
-    ext->cur_value = 0;
-    ext->anim_time = 200;
-    ext->anim_start = 0;
-    ext->anim_end = 0;
-    ext->anim_state = LV_BAR_ANIM_STATE_INV;
-    ext->sym = 0;
+    ext->min_value   = 0;
+    ext->max_value   = 100;
+    ext->cur_value   = 0;
+    ext->anim_time   = 200;
+    ext->anim_start  = 0;
+    ext->anim_end    = 0;
+    ext->anim_state  = LV_BAR_ANIM_STATE_INV;
+    ext->sym         = 0;
     ext->style_indic = &lv_style_pretty_color;
 
     lv_obj_set_signal_cb(new_bar, lv_bar_signal);
@@ -98,11 +98,11 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
         }
     } else {
         lv_bar_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
-        ext->min_value = ext_copy->min_value;
-        ext->max_value = ext_copy->max_value;
-        ext->cur_value = ext_copy->cur_value;
-        ext->style_indic = ext_copy->style_indic;
-        ext->sym = ext_copy->sym;
+        ext->min_value          = ext_copy->min_value;
+        ext->max_value          = ext_copy->max_value;
+        ext->cur_value          = ext_copy->cur_value;
+        ext->style_indic        = ext_copy->style_indic;
+        ext->sym                = ext_copy->sym;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_bar);
 
@@ -146,33 +146,32 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, bool anim)
         /*No animation in progress -> simply set the values*/
         if(ext->anim_state == LV_BAR_ANIM_STATE_INV) {
             ext->anim_start = ext->cur_value;
-            ext->anim_end = new_value;
+            ext->anim_end   = new_value;
         }
         /*Animation in progress. Start from the animation end value*/
         else {
             ext->anim_start = ext->anim_end;
-            ext->anim_end = new_value;
+            ext->anim_end   = new_value;
         }
 
         lv_anim_t a;
-        a.var = bar;
-        a.start = LV_BAR_ANIM_STATE_START;
-        a.end = LV_BAR_ANIM_STATE_END;
-        a.fp = (lv_anim_fp_t)lv_bar_animate;
-        a.path = lv_anim_path_linear;
-        a.end_cb = lv_bar_anim_ready;
-        a.act_time = 0;
-        a.time = ext->anim_time;
-        a.playback = 0;
+        a.var            = bar;
+        a.start          = LV_BAR_ANIM_STATE_START;
+        a.end            = LV_BAR_ANIM_STATE_END;
+        a.fp             = (lv_anim_fp_t)lv_bar_animate;
+        a.path           = lv_anim_path_linear;
+        a.end_cb         = lv_bar_anim_ready;
+        a.act_time       = 0;
+        a.time           = ext->anim_time;
+        a.playback       = 0;
         a.playback_pause = 0;
-        a.repeat = 0;
-        a.repeat_pause = 0;
+        a.repeat         = 0;
+        a.repeat_pause   = 0;
 
         lv_anim_create(&a);
 #endif
     }
 }
-
 
 /**
  * Set minimum and the maximum values of a bar
@@ -199,14 +198,15 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 }
 
 /**
- * Make the bar symmetric to zero. The indicator will grow from zero instead of the minimum position.
+ * Make the bar symmetric to zero. The indicator will grow from zero instead of the minimum
+ * position.
  * @param bar pointer to a bar object
  * @param en true: enable disable symmetric behavior; false: disable
  */
 void lv_bar_set_sym(lv_obj_t * bar, bool en)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-    ext->sym = en ? 1 : 0;
+    ext->sym           = en ? 1 : 0;
 }
 
 /**
@@ -220,9 +220,7 @@ void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, lv_style_t * style)
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     switch(type) {
-        case LV_BAR_STYLE_BG:
-            lv_obj_set_style(bar, style);
-            break;
+        case LV_BAR_STYLE_BG: lv_obj_set_style(bar, style); break;
         case LV_BAR_STYLE_INDIC:
             ext->style_indic = style;
             lv_obj_refresh_ext_size(bar);
@@ -245,7 +243,8 @@ int16_t lv_bar_get_value(const lv_obj_t * bar)
     /*If animated tell that it's already at the end value*/
     if(ext->anim_state != LV_BAR_ANIM_STATE_INV) return ext->anim_end;
     /*No animation, simple return the current value*/
-    else return ext->cur_value;
+    else
+        return ext->cur_value;
 }
 
 /**
@@ -293,15 +292,9 @@ lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type)
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     switch(type) {
-        case LV_BAR_STYLE_BG:
-            style = lv_obj_get_style(bar);
-            break;
-        case LV_BAR_STYLE_INDIC:
-            style = ext->style_indic;
-            break;
-        default:
-            style = NULL;
-            break;
+        case LV_BAR_STYLE_BG: style = lv_obj_get_style(bar); break;
+        case LV_BAR_STYLE_INDIC: style = ext->style_indic; break;
+        default: style = NULL; break;
     }
 
     return style;
@@ -325,7 +318,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask area*/
-        return  ancestor_design_f(bar, mask, mode);
+        return ancestor_design_f(bar, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_opa_t opa_scale = lv_obj_get_opa_scale(bar);
 
@@ -333,7 +326,8 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
         ancestor_design_f(bar, mask, mode);
 #else
         /* Draw the borders later if the bar is focused.
-         * At value = 100% the indicator can cover to whole background and the focused style won't be visible*/
+         * At value = 100% the indicator can cover to whole background and the focused style won't
+         * be visible*/
         if(lv_obj_is_focused(bar)) {
             lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
             lv_style_t style_tmp;
@@ -346,7 +340,8 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 #endif
         lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-        if(ext->cur_value != ext->min_value || ext->sym || ext->anim_start != LV_BAR_ANIM_STATE_INV) {
+        if(ext->cur_value != ext->min_value || ext->sym ||
+           ext->anim_start != LV_BAR_ANIM_STATE_INV) {
             lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
             lv_area_t indic_area;
             lv_area_copy(&indic_area, &bar->coords);
@@ -362,21 +357,31 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
                 /*Horizontal*/
                 if(ext->anim_state != LV_BAR_ANIM_STATE_INV) {
                     /*Calculate the coordinates of anim. start and end*/
-                    lv_coord_t anim_start_x = (int32_t)((int32_t)w * (ext->anim_start - ext->min_value)) / (ext->max_value - ext->min_value);
-                    lv_coord_t anim_end_x = (int32_t)((int32_t)w * (ext->anim_end - ext->min_value)) / (ext->max_value - ext->min_value);
+                    lv_coord_t anim_start_x =
+                        (int32_t)((int32_t)w * (ext->anim_start - ext->min_value)) /
+                        (ext->max_value - ext->min_value);
+                    lv_coord_t anim_end_x =
+                        (int32_t)((int32_t)w * (ext->anim_end - ext->min_value)) /
+                        (ext->max_value - ext->min_value);
 
-                    /*Calculate the real position based on `anim_state` (between `anim_start` and `anim_end`)*/
-                    indic_area.x2 = anim_start_x + (((anim_end_x - anim_start_x) * ext->anim_state) >> LV_BAR_ANIM_STATE_NORM);
+                    /*Calculate the real position based on `anim_state` (between `anim_start` and
+                     * `anim_end`)*/
+                    indic_area.x2 =
+                        anim_start_x +
+                        (((anim_end_x - anim_start_x) * ext->anim_state) >> LV_BAR_ANIM_STATE_NORM);
                 } else {
-                    indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
+                    indic_area.x2 = (int32_t)((int32_t)w * (ext->cur_value - ext->min_value)) /
+                                    (ext->max_value - ext->min_value);
                 }
 
                 indic_area.x2 = indic_area.x1 + indic_area.x2 - 1;
                 if(ext->sym && ext->min_value < 0 && ext->max_value > 0) {
                     /*Calculate the coordinate of the zero point*/
                     lv_coord_t zero;
-                    zero = indic_area.x1 + (-ext->min_value * w) / (ext->max_value - ext->min_value);
-                    if(indic_area.x2 > zero) indic_area.x1 = zero;
+                    zero =
+                        indic_area.x1 + (-ext->min_value * w) / (ext->max_value - ext->min_value);
+                    if(indic_area.x2 > zero)
+                        indic_area.x1 = zero;
                     else {
                         indic_area.x1 = indic_area.x2;
                         indic_area.x2 = zero;
@@ -385,13 +390,21 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
             } else {
                 if(ext->anim_state != LV_BAR_ANIM_STATE_INV) {
                     /*Calculate the coordinates of anim. start and end*/
-                    lv_coord_t anim_start_y = (int32_t)((int32_t)h * (ext->anim_start - ext->min_value)) / (ext->max_value - ext->min_value);
-                    lv_coord_t anim_end_y = (int32_t)((int32_t)h * (ext->anim_end - ext->min_value)) / (ext->max_value - ext->min_value);
+                    lv_coord_t anim_start_y =
+                        (int32_t)((int32_t)h * (ext->anim_start - ext->min_value)) /
+                        (ext->max_value - ext->min_value);
+                    lv_coord_t anim_end_y =
+                        (int32_t)((int32_t)h * (ext->anim_end - ext->min_value)) /
+                        (ext->max_value - ext->min_value);
 
-                    /*Calculate the real position based on `anim_state` (between `anim_start` and `anim_end`)*/
-                    indic_area.y1 = anim_start_y + (((anim_end_y - anim_start_y) * ext->anim_state) >> LV_BAR_ANIM_STATE_NORM);
+                    /*Calculate the real position based on `anim_state` (between `anim_start` and
+                     * `anim_end`)*/
+                    indic_area.y1 =
+                        anim_start_y +
+                        (((anim_end_y - anim_start_y) * ext->anim_state) >> LV_BAR_ANIM_STATE_NORM);
                 } else {
-                    indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value)) / (ext->max_value - ext->min_value);
+                    indic_area.y1 = (int32_t)((int32_t)h * (ext->cur_value - ext->min_value)) /
+                                    (ext->max_value - ext->min_value);
                 }
 
                 indic_area.y1 = indic_area.y2 - indic_area.y1 + 1;
@@ -399,15 +412,16 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
                 if(ext->sym && ext->min_value < 0 && ext->max_value > 0) {
                     /*Calculate the coordinate of the zero point*/
                     lv_coord_t zero;
-                    zero = indic_area.y2 - (-ext->min_value * h) / (ext->max_value - ext->min_value);
-                    if(indic_area.y1 < zero) indic_area.y2 = zero;
+                    zero =
+                        indic_area.y2 - (-ext->min_value * h) / (ext->max_value - ext->min_value);
+                    if(indic_area.y1 < zero)
+                        indic_area.y2 = zero;
                     else {
                         indic_area.y2 = indic_area.y1;
                         indic_area.y1 = zero;
                     }
                 }
             }
-
 
             /*Draw the indicator*/
             lv_draw_rect(&indic_area, mask, style_indic, opa_scale);
@@ -416,16 +430,15 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 #if LV_USE_GROUP
         /*Draw the border*/
         if(lv_obj_is_focused(bar)) {
-            lv_opa_t opa_scale = lv_obj_get_opa_scale(bar);
+            lv_opa_t opa_scale    = lv_obj_get_opa_scale(bar);
             lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
             lv_style_t style_tmp;
             lv_style_copy(&style_tmp, style_bg);
-            style_tmp.body.opa = LV_OPA_TRANSP;
+            style_tmp.body.opa          = LV_OPA_TRANSP;
             style_tmp.body.shadow.width = 0;
             lv_draw_rect(&bar->coords, mask, &style_tmp, opa_scale);
         }
 #endif
-
     }
     return true;
 }
@@ -447,11 +460,12 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
-        if(style_indic->body.shadow.width > bar->ext_size) bar->ext_size = style_indic->body.shadow.width;
+        if(style_indic->body.shadow.width > bar->ext_size)
+            bar->ext_size = style_indic->body.shadow.width;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_bar";
@@ -460,20 +474,18 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     return res;
 }
 
-
 static void lv_bar_animate(void * bar, int32_t value)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-    ext->anim_state = value;
+    ext->anim_state    = value;
     lv_obj_invalidate(bar);
 }
 
 static void lv_bar_anim_ready(void * bar)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-    ext->anim_state = LV_BAR_ANIM_STATE_INV;
+    ext->anim_state    = LV_BAR_ANIM_STATE_INV;
     lv_bar_set_value(bar, ext->anim_end, false);
-
 }
 
 #endif

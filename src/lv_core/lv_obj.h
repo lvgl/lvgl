@@ -42,11 +42,11 @@ extern "C" {
 #error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
 
-#define LV_ANIM_IN              0x00    /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_OUT             0x80    /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_DIR_MASK        0x80    /*ANIM_IN/ANIM_OUT mask*/
+#define LV_ANIM_IN 0x00       /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
+#define LV_ANIM_OUT 0x80      /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
+#define LV_ANIM_DIR_MASK 0x80 /*ANIM_IN/ANIM_OUT mask*/
 
-#define LV_MAX_ANCESTOR_NUM     8
+#define LV_MAX_ANCESTOR_NUM 8
 
 /**********************
  *      TYPEDEFS
@@ -54,35 +54,35 @@ extern "C" {
 
 struct _lv_obj_t;
 
-enum
-{
+enum {
     LV_DESIGN_DRAW_MAIN,
     LV_DESIGN_DRAW_POST,
     LV_DESIGN_COVER_CHK,
 };
 typedef uint8_t lv_design_mode_t;
 
-typedef bool (* lv_design_cb_t) (struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
+typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p,
+                               lv_design_mode_t mode);
 
-enum
-{
-    LV_RES_INV = 0,      /*Typically indicates that the object is deleted (become invalid) in the action function or an operation was failed*/
-    LV_RES_OK,           /*The object is valid (no deleted) after the action*/
+enum {
+    LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
+                       function or an operation was failed*/
+    LV_RES_OK,      /*The object is valid (no deleted) after the action*/
 };
 typedef uint8_t lv_res_t;
 
-
 enum {
-    LV_EVENT_PRESSED,           /*The object has been pressed*/
-    LV_EVENT_PRESSING,          /*The object is being pressed (called continuously while pressing)*/
-    LV_EVENT_PRESS_LOST,        /*Still pressing but slid from the objects*/
-    LV_EVENT_SHORT_CLICKED,     /*Released before long press time. Not called if dragged.*/
-    LV_EVENT_LONG_PRESSED,      /*Pressing for `LV_INDEV_LONG_PRESS_TIME` time.  Not called if dragged.*/
-    LV_EVENT_LONG_PRESSED_REPEAT, /*Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
-    LV_EVENT_CLICKED,           /*Called on release if not dragged (regardless to long press)*/
-    LV_EVENT_RELEASED,          /*Called in every cases when the object has been released*/
-    LV_EVENT_LONG_HOVER_IN,     /*TODO*/
-    LV_EVENT_LONG_HOVER_OUT,    /*TODO*/
+    LV_EVENT_PRESSED,       /*The object has been pressed*/
+    LV_EVENT_PRESSING,      /*The object is being pressed (called continuously while pressing)*/
+    LV_EVENT_PRESS_LOST,    /*Still pressing but slid from the objects*/
+    LV_EVENT_SHORT_CLICKED, /*Released before long press time. Not called if dragged.*/
+    LV_EVENT_LONG_PRESSED, /*Pressing for `LV_INDEV_LONG_PRESS_TIME` time.  Not called if dragged.*/
+    LV_EVENT_LONG_PRESSED_REPEAT, /*Called after `LV_INDEV_LONG_PRESS_TIME` in every
+                                     `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
+    LV_EVENT_CLICKED,             /*Called on release if not dragged (regardless to long press)*/
+    LV_EVENT_RELEASED,            /*Called in every cases when the object has been released*/
+    LV_EVENT_LONG_HOVER_IN,       /*TODO*/
+    LV_EVENT_LONG_HOVER_OUT,      /*TODO*/
     LV_EVENT_DRAG_BEGIN,
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
@@ -92,15 +92,14 @@ enum {
     LV_EVENT_INSERT,
     LV_EVENT_SELECTED,
     LV_EVENT_REFRESH,
-    LV_EVENT_APPLY,         /*"Ok", "Apply" or similar specific button has clicked*/
-    LV_EVENT_CANCEL,        /*"Close", "Cancel" or similar specific button has clicked*/
+    LV_EVENT_APPLY,  /*"Ok", "Apply" or similar specific button has clicked*/
+    LV_EVENT_CANCEL, /*"Close", "Cancel" or similar specific button has clicked*/
 };
 typedef uint8_t lv_event_t;
 
 typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
 
-enum
-{
+enum {
     /*General signals*/
     LV_SIGNAL_CLEANUP,
     LV_SIGNAL_CHILD_CHG,
@@ -110,7 +109,7 @@ enum
     LV_SIGNAL_REFR_EXT_SIZE,
     LV_SIGNAL_GET_TYPE,
 
-	_LV_SIGNAL_FEEDBACK_SECTION_START,
+    _LV_SIGNAL_FEEDBACK_SECTION_START,
     /*Input device related*/
     LV_SIGNAL_PRESSED,
     LV_SIGNAL_PRESSING,
@@ -130,10 +129,9 @@ enum
 };
 typedef uint8_t lv_signal_t;
 
-typedef lv_res_t (* lv_signal_cb_t) (struct _lv_obj_t * obj, lv_signal_t sign, void * param);
+typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
-enum
-{
+enum {
     LV_ALIGN_CENTER = 0,
     LV_ALIGN_IN_TOP_LEFT,
     LV_ALIGN_IN_TOP_MID,
@@ -159,23 +157,32 @@ enum
 typedef uint8_t lv_align_t;
 
 #if LV_OBJ_REALIGN
-typedef struct {
+typedef struct
+{
     const struct _lv_obj_t * base;
     lv_coord_t xofs;
     lv_coord_t yofs;
     lv_align_t align;
-    uint8_t auto_realign :1;
-    uint8_t origo_align  :1;        /*1: the oigo (center of the object) was aligned with `lv_obj_align_origo`*/
-}lv_reailgn_t;
+    uint8_t auto_realign : 1;
+    uint8_t origo_align : 1; /*1: the oigo (center of the object) was aligned with
+                                `lv_obj_align_origo`*/
+} lv_reailgn_t;
 #endif
 
+enum {
+    LV_DRAG_DIR_HOR = 0x1,
+    LV_DRAG_DIR_VER = 0x2,
+    LV_DRAG_DIR_ALL = 0x3, /* Should be the bitwise OR of the above */
+};
+
+typedef uint8_t lv_drag_dir_t;
 
 typedef struct _lv_obj_t
 {
-    struct _lv_obj_t * par;    /*Pointer to the parent object*/
-    lv_ll_t child_ll;          /*Linked list to store the children objects*/
+    struct _lv_obj_t * par; /*Pointer to the parent object*/
+    lv_ll_t child_ll;       /*Linked list to store the children objects*/
 
-    lv_area_t coords;               /*Coordinates of the object (x1, y1, x2, y2)*/
+    lv_area_t coords; /*Coordinates of the object (x1, y1, x2, y2)*/
 #if USE_LV_EXTENDED_CLICK_AREA
     lv_area_t ext_coords;
 #endif
@@ -185,28 +192,31 @@ typedef struct _lv_obj_t
 #endif
 
     lv_event_cb_t event_cb;
-    lv_signal_cb_t signal_cb;     /*Object type specific signal function*/
-    lv_design_cb_t design_cb;     /*Object type specific design function*/
+    lv_signal_cb_t signal_cb; /*Object type specific signal function*/
+    lv_design_cb_t design_cb; /*Object type specific design function*/
 
-    void * ext_attr;                 /*Object type specific extended data*/
-    lv_style_t * style_p;       /*Pointer to the object's style*/
+    void * ext_attr;      /*Object type specific extended data*/
+    lv_style_t * style_p; /*Pointer to the object's style*/
 
 #if LV_USE_GROUP != 0
-    void * group_p;                 /*Pointer to the group of the object*/
+    void * group_p; /*Pointer to the group of the object*/
 #endif
     /*Attributes and states*/
-    uint8_t click         :1;    /*1: Can be pressed by an input device*/
-    uint8_t drag          :1;    /*1: Enable the dragging*/
-    uint8_t drag_throw    :1;    /*1: Enable throwing with drag*/
-    uint8_t drag_parent   :1;    /*1: Parent will be dragged instead*/
-    uint8_t hidden        :1;    /*1: Object is hidden*/
-    uint8_t top           :1;    /*1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t opa_scale_en  :1;    /*1: opa_scale is set*/
-    uint8_t parent_event :1;     /*1: Send the object's events to the parent too. */
-    uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from `lv_protect_t`*/
-    lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
+    uint8_t click : 1;          /*1: Can be pressed by an input device*/
+    uint8_t drag : 1;           /*1: Enable the dragging*/
+    lv_drag_dir_t drag_dir : 2; /* Which directions the object can be dragged in */
+    uint8_t drag_throw : 1;     /*1: Enable throwing with drag*/
+    uint8_t drag_parent : 1;    /*1: Parent will be dragged instead*/
+    uint8_t hidden : 1;         /*1: Object is hidden*/
+    uint8_t top : 1; /*1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t opa_scale_en : 1; /*1: opa_scale is set*/
+    uint8_t parent_event : 1; /*1: Send the object's events to the parent too. */
+    uint8_t protect;          /*Automatically happening actions can be prevented. 'OR'ed values from
+                                 `lv_protect_t`*/
+    lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
 
-    lv_coord_t ext_size;        /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+    lv_coord_t
+        ext_size; /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 #if LV_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif
@@ -224,33 +234,34 @@ typedef struct _lv_obj_t
 } lv_obj_t;
 
 /*Protect some attributes (max. 8 bit)*/
-enum
-{
+enum {
     LV_PROTECT_NONE      = 0x00,
-    LV_PROTECT_CHILD_CHG = 0x01, /*Disable the child change signal. Used by the library*/
-    LV_PROTECT_PARENT    = 0x02, /*Prevent automatic parent change (e.g. in lv_page)*/
-    LV_PROTECT_POS       = 0x04, /*Prevent automatic positioning (e.g. in lv_cont layout)*/
-    LV_PROTECT_FOLLOW    = 0x08, /*Prevent the object be followed in automatic ordering (e.g. in lv_cont PRETTY layout)*/
-    LV_PROTECT_PRESS_LOST= 0x10, /*If the `indev` was pressing this object but swiped out while pressing do not search other object.*/
-    LV_PROTECT_CLICK_FOCUS= 0x20,/*Prevent focusing the object by clicking on it*/
+    LV_PROTECT_CHILD_CHG = 0x01,   /*Disable the child change signal. Used by the library*/
+    LV_PROTECT_PARENT    = 0x02,   /*Prevent automatic parent change (e.g. in lv_page)*/
+    LV_PROTECT_POS       = 0x04,   /*Prevent automatic positioning (e.g. in lv_cont layout)*/
+    LV_PROTECT_FOLLOW    = 0x08,   /*Prevent the object be followed in automatic ordering (e.g. in
+                                      lv_cont PRETTY layout)*/
+    LV_PROTECT_PRESS_LOST = 0x10,  /*If the `indev` was pressing this object but swiped out while
+                                      pressing do not search other object.*/
+    LV_PROTECT_CLICK_FOCUS = 0x20, /*Prevent focusing the object by clicking on it*/
 };
 typedef uint8_t lv_protect_t;
 
-
 /*Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
-typedef struct {
-    const char * type[LV_MAX_ANCESTOR_NUM];   /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor ... [x]: "lv_obj" */
+typedef struct
+{
+    const char * type[LV_MAX_ANCESTOR_NUM]; /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor
+                                               ... [x]: "lv_obj" */
 } lv_obj_type_t;
 
-enum
-{
+enum {
     LV_ANIM_NONE = 0,
-    LV_ANIM_FLOAT_TOP,      /*Float from/to the top*/
-    LV_ANIM_FLOAT_LEFT,     /*Float from/to the left*/
-    LV_ANIM_FLOAT_BOTTOM,   /*Float from/to the bottom*/
-    LV_ANIM_FLOAT_RIGHT,    /*Float from/to the right*/
-    LV_ANIM_GROW_H,         /*Grow/shrink  horizontally*/
-    LV_ANIM_GROW_V,         /*Grow/shrink  vertically*/
+    LV_ANIM_FLOAT_TOP,    /*Float from/to the top*/
+    LV_ANIM_FLOAT_LEFT,   /*Float from/to the left*/
+    LV_ANIM_FLOAT_BOTTOM, /*Float from/to the bottom*/
+    LV_ANIM_FLOAT_RIGHT,  /*Float from/to the right*/
+    LV_ANIM_GROW_H,       /*Grow/shrink  horizontally*/
+    LV_ANIM_GROW_V,       /*Grow/shrink  vertically*/
 };
 typedef uint8_t lv_anim_builtin_t;
 
@@ -274,7 +285,7 @@ void lv_init(void);
  * @param copy pointer to a base object, if not NULL then the new object will be copied from it
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent,const  lv_obj_t * copy);
+lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children
@@ -287,7 +298,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj);
  * Delete all children of an object
  * @param obj pointer to an object
  */
-void lv_obj_clean(lv_obj_t *obj);
+void lv_obj_clean(lv_obj_t * obj);
 
 /**
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
@@ -376,7 +387,8 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align(lv_obj_t * obj,const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
+void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod,
+                  lv_coord_t y_mod);
 
 /**
  * Align an object to an other object.
@@ -386,7 +398,8 @@ void lv_obj_align(lv_obj_t * obj,const lv_obj_t * base, lv_align_t align, lv_coo
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod,
+                        lv_coord_t y_mod);
 
 /**
  * Realign the object based on the last `lv_obj_align` parameters.
@@ -395,7 +408,8 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 void lv_obj_realign(lv_obj_t * obj);
 
 /**
- * Enable the automatic realign of the object when its size has changed based on the last `lv_obj_align` parameters.
+ * Enable the automatic realign of the object when its size has changed based on the last
+ * `lv_obj_align` parameters.
  * @param obj pointer to an object
  * @param en true: enable auto realign; false: disable auto realign
  */
@@ -457,6 +471,13 @@ void lv_obj_set_top(lv_obj_t * obj, bool en);
  * @param en true: make the object dragable
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en);
+
+/**
+ * Set the directions an object can be dragged in
+ * @param obj pointer to an object
+ * @param drag_dir bitwise OR of allowed drag directions
+ */
+void lv_obj_set_drag_dir(lv_obj_t * obj, lv_drag_dir_t drag_dir);
 
 /**
  * Enable the throwing of an object after is is dragged
@@ -544,7 +565,7 @@ void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb);
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.
  */
-void lv_obj_send_signal(lv_obj_t * obj, lv_signal_t signal, void * param);
+void lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
 
 /**
  * Set a new design function for an object
@@ -580,7 +601,8 @@ void lv_obj_refresh_ext_size(lv_obj_t * obj);
  * @param delay delay before the animation in milliseconds
  * @param cb a function to call when the animation is ready
  */
-void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay, void (*cb) (lv_obj_t *));
+void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay,
+                    void (*cb)(lv_obj_t *));
 #endif
 
 /*=======================
@@ -765,6 +787,13 @@ bool lv_obj_get_top(const lv_obj_t * obj);
 bool lv_obj_get_drag(const lv_obj_t * obj);
 
 /**
+ * Get the directions an object can be dragged
+ * @param obj pointer to an object
+ * @return bitwise OR of allowed directions an object can be dragged in
+ */
+lv_drag_dir_t lv_obj_get_drag_dir(const lv_obj_t * obj);
+
+/**
  * Get the drag throw enable attribute of an object
  * @param obj pointer to an object
  * @return true: drag throw is enabled
@@ -819,14 +848,21 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_cb_t lv_obj_get_signal_func(const lv_obj_t * obj);
+lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj);
 
 /**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
  */
-lv_design_cb_t lv_obj_get_design_func(const lv_obj_t * obj);
+lv_design_cb_t lv_obj_get_design_cb(const lv_obj_t * obj);
+
+/**
+ * Get the event function of an object
+ * @param obj pointer to an object
+ * @return the event function
+ */
+lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
 
 /*------------------
  * Other get
@@ -848,7 +884,6 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj);
  */
 void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
-
 #if LV_USE_USER_DATA_SINGLE
 /**
  * Get a pointer to the object's user data
@@ -866,7 +901,6 @@ lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj);
  */
 void * lv_obj_get_group(const lv_obj_t * obj);
 
-
 /**
  * Tell whether the object is the focused object of a group or not.
  * @param obj pointer to an object
@@ -876,11 +910,9 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
 
 #endif
 
-
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /* extern "C" */

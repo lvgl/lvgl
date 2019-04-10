@@ -15,10 +15,10 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_LED_WIDTH_DEF    (LV_DPI / 3)
-#define LV_LED_HEIGHT_DEF   (LV_DPI / 3)
-#define LV_LED_BRIGHT_OFF   100
-#define LV_LED_BRIGHT_ON    255
+#define LV_LED_WIDTH_DEF (LV_DPI / 3)
+#define LV_LED_HEIGHT_DEF (LV_DPI / 3)
+#define LV_LED_BRIGHT_OFF 100
+#define LV_LED_BRIGHT_ON 255
 
 /**********************
  *      TYPEDEFS
@@ -59,8 +59,8 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_led);
     if(new_led == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_led);
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_led);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_led);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_led);
 
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
@@ -87,12 +87,11 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing object*/
     else {
         lv_led_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->bright = copy_ext->bright;
+        ext->bright             = copy_ext->bright;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_led);
     }
-
 
     LV_LOG_INFO("led created");
 
@@ -138,7 +137,6 @@ void lv_led_off(lv_obj_t * led)
     lv_led_set_bright(led, LV_LED_BRIGHT_OFF);
 }
 
-
 /**
  * Toggle the state of a LED
  * @param led pointer to a LED object
@@ -146,8 +144,10 @@ void lv_led_off(lv_obj_t * led)
 void lv_led_toggle(lv_obj_t * led)
 {
     uint8_t bright = lv_led_get_bright(led);
-    if(bright > (LV_LED_BRIGHT_OFF + LV_LED_BRIGHT_ON) >> 1) lv_led_off(led);
-    else lv_led_on(led);
+    if(bright > (LV_LED_BRIGHT_OFF + LV_LED_BRIGHT_ON) >> 1)
+        lv_led_off(led);
+    else
+        lv_led_on(led);
 }
 
 /*=====================
@@ -199,17 +199,22 @@ static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode
         memcpy(&leds_tmp, style, sizeof(leds_tmp));
 
         /*Mix. the color with black proportionally with brightness*/
-        leds_tmp.body.main_color = lv_color_mix(leds_tmp.body.main_color, LV_COLOR_BLACK, ext->bright);
-        leds_tmp.body.grad_color = lv_color_mix(leds_tmp.body.grad_color, LV_COLOR_BLACK, ext->bright);
-        leds_tmp.body.border.color = lv_color_mix(leds_tmp.body.border.color, LV_COLOR_BLACK, ext->bright);
+        leds_tmp.body.main_color =
+            lv_color_mix(leds_tmp.body.main_color, LV_COLOR_BLACK, ext->bright);
+        leds_tmp.body.grad_color =
+            lv_color_mix(leds_tmp.body.grad_color, LV_COLOR_BLACK, ext->bright);
+        leds_tmp.body.border.color =
+            lv_color_mix(leds_tmp.body.border.color, LV_COLOR_BLACK, ext->bright);
 
-        /*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF and LV_LED_BRIGHT_ON*/
-        uint16_t bright_tmp = ext->bright;
-        leds_tmp.body.shadow.width = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->body.shadow.width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
+        /*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF
+         * and LV_LED_BRIGHT_ON*/
+        uint16_t bright_tmp        = ext->bright;
+        leds_tmp.body.shadow.width = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->body.shadow.width) /
+                                     (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
         led->style_p = &leds_tmp;
         ancestor_design_f(led, mask, mode);
-        led->style_p = style_ori_p;                 /*Restore the ORIGINAL style pointer*/
+        led->style_p = style_ori_p; /*Restore the ORIGINAL style pointer*/
     }
     return true;
 }
@@ -229,11 +234,10 @@ static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param)
     res = ancestor_signal(led, sign, param);
     if(res != LV_RES_OK) return res;
 
-
     if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_led";

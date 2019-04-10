@@ -34,7 +34,6 @@ extern "C" {
 #error "lv_list: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
-
 #include "../lv_core/lv_obj.h"
 #include "lv_page.h"
 #include "lv_btn.h"
@@ -53,14 +52,15 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    uint16_t anim_time;                          /*Scroll animation time*/
-    lv_style_t *styles_btn[LV_BTN_STATE_NUM];    /*Styles of the list element buttons*/
-    lv_style_t *style_img;                       /*Style of the list element images on buttons*/
-    uint32_t size; /*the number of items(buttons) in the list*/
-    bool single_mode; /* whether single selected mode is enabled */
+    uint16_t anim_time;                        /*Scroll animation time*/
+    lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of the list element buttons*/
+    lv_style_t * style_img;                    /*Style of the list element images on buttons*/
+    uint32_t size;                             /*the number of items(buttons) in the list*/
+    bool single_mode;                          /* whether single selected mode is enabled */
 #if LV_USE_GROUP
-    lv_obj_t * last_sel;                          /* The last selected button. It will be reverted when the list is focused again */
-    lv_obj_t * selected_btn;                      /* The button is currently being selected*/
+    lv_obj_t *
+        last_sel; /* The last selected button. It will be reverted when the list is focused again */
+    lv_obj_t * selected_btn; /* The button is currently being selected*/
 #endif
 } lv_list_ext_t;
 
@@ -76,7 +76,6 @@ enum {
     LV_LIST_STYLE_BTN_INA,
 };
 typedef uint8_t lv_list_style_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -94,7 +93,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy);
  * Delete all children of the scrl object, without deleting scrl child.
  * @param obj pointer to an object
  */
-void lv_list_clean(lv_obj_t *obj);
+void lv_list_clean(lv_obj_t * obj);
 
 /*======================
  * Add/remove functions
@@ -108,12 +107,14 @@ void lv_list_clean(lv_obj_t *obj);
  * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_event_cb_t event_cb);
+lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt,
+                       lv_event_cb_t event_cb);
 
 /**
  * Remove the index of the button in the list
  * @param list pointer to a list object
- * @param index pointer to a the button's index in the list, index must be 0 <= index < lv_list_ext_t.size
+ * @param index pointer to a the button's index in the list, index must be 0 <= index <
+ * lv_list_ext_t.size
  * @return true: successfully deleted
  */
 bool lv_list_remove(const lv_obj_t * list, uint32_t index);
@@ -121,14 +122,14 @@ bool lv_list_remove(const lv_obj_t * list, uint32_t index);
 /*=====================
  * Setter functions
  *====================*/
- 
+
 /**
  * Set single button selected mode, only one button will be selected if enabled.
  * @param list pointer to the currently pressed list object
  * @param mode, enable(true)/disable(false) single selected mode.
  */
-void lv_list_set_single_mode(lv_obj_t *list, bool mode);
-    
+void lv_list_set_single_mode(lv_obj_t * list, bool mode);
+
 #if LV_USE_GROUP
 
 /**
@@ -144,7 +145,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn);
  * @param list pointer to a list object
  * @param anim_time duration of animation [ms]
  */
-void lv_list_set_anim_time(lv_obj_t *list, uint16_t anim_time);
+void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time);
 
 /**
  * Set the scroll bar mode of a list
@@ -157,7 +158,8 @@ static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
 }
 
 /**
- * Enable the scroll propagation feature. If enabled then the List will move its parent if there is no more space to scroll.
+ * Enable the scroll propagation feature. If enabled then the List will move its parent if there is
+ * no more space to scroll.
  * @param list pointer to a List
  * @param en true or false to enable/disable scroll propagation
  */
@@ -182,7 +184,7 @@ static inline void lv_list_set_edge_flash(lv_obj_t * list, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style);
+void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -192,8 +194,8 @@ void lv_list_set_style(lv_obj_t *list, lv_list_style_t type, lv_style_t *style);
  * Get single button selected mode.
  * @param list pointer to the currently pressed list object.
  */
-bool lv_list_get_single_mode(lv_obj_t *list);
-    
+bool lv_list_get_single_mode(lv_obj_t * list);
+
 /**
  * Get the text of a list element
  * @param btn pointer to list element
@@ -254,14 +256,12 @@ uint32_t lv_list_get_size(const lv_obj_t * list);
 lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list);
 #endif
 
-
 /**
  * Get scroll animation duration
  * @param list pointer to a list object
  * @return duration of animation [ms]
  */
-uint16_t lv_list_get_anim_time(const lv_obj_t *list);
-
+uint16_t lv_list_get_anim_time(const lv_obj_t * list);
 
 /**
  * Get the scroll bar mode of a list
@@ -299,7 +299,7 @@ static inline bool lv_list_get_edge_flash(lv_obj_t * list)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_list_get_style(const lv_obj_t *list, lv_list_style_t type);
+lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type);
 
 /*=====================
  * Other functions
@@ -321,16 +321,16 @@ void lv_list_down(const lv_obj_t * list);
  * @param btn pointer to a list button to focus
  * @param anim_en true: scroll with animation, false: without animation
  */
-void lv_list_focus(const lv_obj_t *btn, bool anim_en);
+void lv_list_focus(const lv_obj_t * btn, bool anim_en);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_LIST*/
+#endif /*LV_USE_LIST*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_LIST_H*/
+#endif /*LV_LIST_H*/

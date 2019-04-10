@@ -18,17 +18,16 @@
  *      DEFINES
  *********************/
 #ifndef LV_PRELOAD_DEF_ARC_LENGTH
-# define LV_PRELOAD_DEF_ARC_LENGTH  60      /*[deg]*/
+#define LV_PRELOAD_DEF_ARC_LENGTH 60 /*[deg]*/
 #endif
 
 #ifndef LV_PRELOAD_DEF_SPIN_TIME
-# define LV_PRELOAD_DEF_SPIN_TIME   1000    /*[ms]*/
+#define LV_PRELOAD_DEF_SPIN_TIME 1000 /*[ms]*/
 #endif
 
 #ifndef LV_PRELOAD_DEF_ANIM
-# define LV_PRELOAD_DEF_ANIM        LV_PRELOAD_TYPE_SPINNING_ARC    /*animation type*/
+#define LV_PRELOAD_DEF_ANIM LV_PRELOAD_TYPE_SPINNING_ARC /*animation type*/
 #endif
-
 
 /**********************
  *      TYPEDEFS
@@ -57,7 +56,8 @@ static lv_design_cb_t ancestor_design;
 /**
  * Create a pre loader object
  * @param par pointer to an object, it will be the parent of the new pre loader
- * @param copy pointer to a pre loader object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a pre loader object, if not NULL then the new object will be copied from
+ * it
  * @return pointer to the created pre loader
  */
 lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
@@ -74,17 +74,16 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_preload);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_preload);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_preload);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_preload);
 
     /*Initialize the allocated 'ext' */
     ext->arc_length = LV_PRELOAD_DEF_ARC_LENGTH;
-    ext->anim_type = LV_PRELOAD_DEF_ANIM;
+    ext->anim_type  = LV_PRELOAD_DEF_ANIM;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_preload, lv_preload_signal);
     lv_obj_set_design_cb(new_preload, lv_preload_design);
-
 
     /*Init the new pre loader pre loader*/
     if(copy == NULL) {
@@ -104,14 +103,13 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing pre loader*/
     else {
         lv_preload_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->arc_length = copy_ext->arc_length;
-        ext->time = copy_ext->time;
+        ext->arc_length             = copy_ext->arc_length;
+        ext->time                   = copy_ext->time;
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_preload);
     }
 
     lv_preload_set_animation_type(new_preload, ext->anim_type);
-
 
     LV_LOG_INFO("preload created");
 
@@ -159,9 +157,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
 void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_t * style)
 {
     switch(type) {
-    case LV_PRELOAD_STYLE_MAIN:
-        lv_arc_set_style(preload, LV_ARC_STYLE_MAIN, style);
-        break;
+        case LV_PRELOAD_STYLE_MAIN: lv_arc_set_style(preload, LV_ARC_STYLE_MAIN, style); break;
     }
 }
 
@@ -176,66 +172,63 @@ void lv_preload_set_animation_type(lv_obj_t * preload, lv_preload_type_t type)
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     /*delete previous animation*/
-    //lv_anim_del(preload, NULL);
-    switch(type)
-    {
-    case LV_PRELOAD_TYPE_FILLSPIN_ARC:
-    {
-        ext->anim_type = LV_PRELOAD_TYPE_FILLSPIN_ARC;
-        lv_anim_t a;
-        a.var = preload;
-        a.start = 0;
-        a.end = 360;
-        a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
-        a.path = lv_anim_path_ease_in_out;
-        a.end_cb = NULL;
-        a.act_time = 0;
-        a.time = ext->time;
-        a.playback = 0;
-        a.playback_pause = 0;
-        a.repeat = 1;
-        a.repeat_pause = 0;
-        lv_anim_create(&a);
+    // lv_anim_del(preload, NULL);
+    switch(type) {
+        case LV_PRELOAD_TYPE_FILLSPIN_ARC: {
+            ext->anim_type = LV_PRELOAD_TYPE_FILLSPIN_ARC;
+            lv_anim_t a;
+            a.var            = preload;
+            a.start          = 0;
+            a.end            = 360;
+            a.fp             = (lv_anim_fp_t)lv_preload_spinner_animation;
+            a.path           = lv_anim_path_ease_in_out;
+            a.end_cb         = NULL;
+            a.act_time       = 0;
+            a.time           = ext->time;
+            a.playback       = 0;
+            a.playback_pause = 0;
+            a.repeat         = 1;
+            a.repeat_pause   = 0;
+            lv_anim_create(&a);
 
-        lv_anim_t b;
-        b.var = preload;
-        b.start = ext->arc_length;
-        b.end = 360 - ext->arc_length;
-        b.fp = (lv_anim_fp_t)lv_preload_set_arc_length;
-        b.path = lv_anim_path_ease_in_out;
-        b.end_cb = NULL;
-        b.act_time = 0;
-        b.time = ext->time;
-        b.playback = 1;
-        b.playback_pause = 0;
-        b.repeat = 1;
-        b.repeat_pause = 0;
-        lv_anim_create(&b);
-        break;
-    }
-    case LV_PRELOAD_TYPE_SPINNING_ARC:
-    default:
-    {
-        ext->anim_type = LV_PRELOAD_TYPE_SPINNING_ARC;
-        lv_anim_t a;
-        a.var = preload;
-        a.start = 0;
-        a.end = 360;
-        a.fp = (lv_anim_fp_t)lv_preload_spinner_animation;
-        a.path = lv_anim_path_ease_in_out;
-        a.end_cb = NULL;
-        a.act_time = 0;
-        a.time = ext->time;
-        a.playback = 0;
-        a.playback_pause = 0;
-        a.repeat = 1;
-        a.repeat_pause = 0;
-        lv_anim_create(&a);
-        break;
-    }
+            lv_anim_t b;
+            b.var            = preload;
+            b.start          = ext->arc_length;
+            b.end            = 360 - ext->arc_length;
+            b.fp             = (lv_anim_fp_t)lv_preload_set_arc_length;
+            b.path           = lv_anim_path_ease_in_out;
+            b.end_cb         = NULL;
+            b.act_time       = 0;
+            b.time           = ext->time;
+            b.playback       = 1;
+            b.playback_pause = 0;
+            b.repeat         = 1;
+            b.repeat_pause   = 0;
+            lv_anim_create(&b);
+            break;
+        }
+        case LV_PRELOAD_TYPE_SPINNING_ARC:
+        default: {
+            ext->anim_type = LV_PRELOAD_TYPE_SPINNING_ARC;
+            lv_anim_t a;
+            a.var            = preload;
+            a.start          = 0;
+            a.end            = 360;
+            a.fp             = (lv_anim_fp_t)lv_preload_spinner_animation;
+            a.path           = lv_anim_path_ease_in_out;
+            a.end_cb         = NULL;
+            a.act_time       = 0;
+            a.time           = ext->time;
+            a.playback       = 0;
+            a.playback_pause = 0;
+            a.repeat         = 1;
+            a.repeat_pause   = 0;
+            lv_anim_create(&a);
+            break;
+        }
     }
 
-#endif //LV_USE_ANIMATION
+#endif // LV_USE_ANIMATION
 }
 
 /*=====================
@@ -250,7 +243,6 @@ uint16_t lv_preload_get_arc_length(const lv_obj_t * preload)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->arc_length;
-
 }
 
 /**
@@ -274,12 +266,8 @@ lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t t
     lv_style_t * style = NULL;
 
     switch(type) {
-    case LV_PRELOAD_STYLE_MAIN:
-        style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
-        break;
-    default:
-        style = NULL;
-        break;
+        case LV_PRELOAD_STYLE_MAIN: style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN); break;
+        default: style = NULL; break;
     }
 
     return style;
@@ -307,18 +295,16 @@ lv_preload_type_t lv_preload_get_animation_type(lv_obj_t * preload)
  */
 void lv_preload_spinner_animation(void * ptr, int32_t val)
 {
-    lv_obj_t * preload = ptr;
+    lv_obj_t * preload     = ptr;
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
-    int16_t angle_start = val - ext->arc_length / 2 + 180;
-    int16_t angle_end = angle_start + ext->arc_length;
+    int16_t angle_start    = val - ext->arc_length / 2 + 180;
+    int16_t angle_end      = angle_start + ext->arc_length;
 
     angle_start = angle_start % 360;
-    angle_end = angle_end % 360;
+    angle_end   = angle_end % 360;
 
     lv_arc_set_angles(preload, angle_start, angle_end);
-
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -354,8 +340,8 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
 
             lv_style_t bg_style;
             lv_style_copy(&bg_style, &lv_style_plain);
-            bg_style.body.opa = LV_OPA_TRANSP;
-            bg_style.body.radius = LV_RADIUS_CIRCLE;
+            bg_style.body.opa          = LV_OPA_TRANSP;
+            bg_style.body.radius       = LV_RADIUS_CIRCLE;
             bg_style.body.border.color = style->body.border.color;
             bg_style.body.border.width = style->body.border.width;
 
@@ -372,7 +358,6 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-
     }
 
     return true;
@@ -393,13 +378,12 @@ static lv_res_t lv_preload_signal(lv_obj_t * preload, lv_signal_t sign, void * p
     res = ancestor_signal(preload, sign, param);
     if(res != LV_RES_OK) return res;
 
-
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_preload";

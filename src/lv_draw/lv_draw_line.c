@@ -16,27 +16,29 @@
  *      DEFINES
  *********************/
 #if LV_COMPILER_VLA_SUPPORTED == 0
-#define LINE_MAX_WIDTH        64
+#define LINE_MAX_WIDTH 64
 #endif
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef struct {
+typedef struct
+{
     lv_point_t p1;
     lv_point_t p2;
     lv_point_t p_act;
     lv_coord_t dx;
-    lv_coord_t sx;      /*-1: x1 < x2; 1: x2 >= x1*/
+    lv_coord_t sx; /*-1: x1 < x2; 1: x2 >= x1*/
     lv_coord_t dy;
-    lv_coord_t sy;      /*-1: y1 < y2; 1: y2 >= y1*/
+    lv_coord_t sy; /*-1: y1 < y2; 1: y2 >= y1*/
     lv_coord_t err;
     lv_coord_t e2;
-    bool hor;   /*Rather horizontal or vertical*/
+    bool hor; /*Rather horizontal or vertical*/
 } line_draw_t;
 
-typedef struct {
+typedef struct
+{
     lv_coord_t width;
     lv_coord_t width_1;
     lv_coord_t width_half;
@@ -45,9 +47,12 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void line_draw_hor(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
-static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
-static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+static void line_draw_hor(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style,
+                          lv_opa_t opa_scale);
+static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style,
+                          lv_opa_t opa_scale);
+static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_t * mask,
+                           const lv_style_t * style, lv_opa_t opa_scale);
 static void line_init(line_draw_t * line, const lv_point_t * p1, const lv_point_t * p2);
 static bool line_next(line_draw_t * line);
 static bool line_next_y(line_draw_t * line);
@@ -74,7 +79,7 @@ static bool line_next_x(line_draw_t * line);
  * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * mask,
-        const lv_style_t * style, lv_opa_t opa_scale)
+                  const lv_style_t * style, lv_opa_t opa_scale)
 {
 
     if(style->line.width == 0) return;
@@ -117,7 +122,6 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
 
     line_init(&main_line, &p1, &p2);
 
-
     /*Special case draw a horizontal line*/
     if(main_line.p1.y == main_line.p2.y) {
         line_draw_hor(&main_line, mask, style, opa_scale);
@@ -140,30 +144,31 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
                     p_tmp.x = main_line.p2.x;
                     p_tmp.y = main_line.p2.y - 1;
                     line_init(&main_line, &p1, &p_tmp);
-                    main_line.sy = LV_MATH_ABS(main_line.sy);   /*The sign can change if the line becomes horizontal*/
-                }
-                else if(main_line.p1.y > main_line.p2.y) {
+                    main_line.sy = LV_MATH_ABS(
+                        main_line.sy); /*The sign can change if the line becomes horizontal*/
+                } else if(main_line.p1.y > main_line.p2.y) {
                     dir_ori = false;
                     p_tmp.x = main_line.p2.x;
                     p_tmp.y = main_line.p2.y + 1;
                     line_init(&main_line, &p1, &p_tmp);
-                    main_line.sy = -LV_MATH_ABS(main_line.sy);  /*The sign can change if the line becomes horizontal*/
+                    main_line.sy = -LV_MATH_ABS(
+                        main_line.sy); /*The sign can change if the line becomes horizontal*/
                 }
-            }
-            else {
+            } else {
                 if(main_line.p1.x < main_line.p2.x) {
                     dir_ori = true;
                     p_tmp.x = main_line.p2.x - 1;
                     p_tmp.y = main_line.p2.y;
                     line_init(&main_line, &p1, &p_tmp);
-                    main_line.sx = LV_MATH_ABS(main_line.sx);   /*The sign can change if the line becomes vertical*/
-                }
-                else if(main_line.p1.x > main_line.p2.x) {
+                    main_line.sx = LV_MATH_ABS(
+                        main_line.sx); /*The sign can change if the line becomes vertical*/
+                } else if(main_line.p1.x > main_line.p2.x) {
                     dir_ori = false;
                     p_tmp.x = main_line.p2.x + 1;
                     p_tmp.y = main_line.p2.y;
                     line_init(&main_line, &p1, &p_tmp);
-                    main_line.sx = -LV_MATH_ABS(main_line.sx);  /*The sign can change if the line becomes vertical*/
+                    main_line.sx = -LV_MATH_ABS(
+                        main_line.sx); /*The sign can change if the line becomes vertical*/
                 }
             }
         }
@@ -172,24 +177,25 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-
-static void line_draw_hor(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+static void line_draw_hor(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style,
+                          lv_opa_t opa_scale)
 {
-    lv_coord_t width = style->line.width - 1;
+    lv_coord_t width      = style->line.width - 1;
     lv_coord_t width_half = width >> 1;
-    lv_coord_t width_1 = width & 0x1;
-    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+    lv_coord_t width_1    = width & 0x1;
+    lv_opa_t opa          = opa_scale == LV_OPA_COVER
+                       ? style->line.opa
+                       : (uint16_t)((uint16_t)style->line.opa * opa_scale) >> 8;
 
     lv_area_t act_area;
     act_area.x1 = main_line->p1.x;
     act_area.x2 = main_line->p2.x;
     act_area.y1 = main_line->p1.y - width_half - width_1;
-    act_area.y2 = main_line->p2.y + width_half ;
+    act_area.y2 = main_line->p2.y + width_half;
 
     lv_area_t draw_area;
     draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
@@ -199,12 +205,15 @@ static void line_draw_hor(line_draw_t * main_line, const lv_area_t * mask, const
     lv_draw_fill(&draw_area, mask, style->line.color, opa);
 }
 
-static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const lv_style_t * style,
+                          lv_opa_t opa_scale)
 {
-    lv_coord_t width = style->line.width - 1;
+    lv_coord_t width      = style->line.width - 1;
     lv_coord_t width_half = width >> 1;
-    lv_coord_t width_1 = width & 0x1;
-    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+    lv_coord_t width_1    = width & 0x1;
+    lv_opa_t opa          = opa_scale == LV_OPA_COVER
+                       ? style->line.opa
+                       : (uint16_t)((uint16_t)style->line.opa * opa_scale) >> 8;
 
     lv_area_t act_area;
     act_area.x1 = main_line->p1.x - width_half;
@@ -220,10 +229,13 @@ static void line_draw_ver(line_draw_t * main_line, const lv_area_t * mask, const
     lv_draw_fill(&draw_area, mask, style->line.color, opa);
 }
 
-static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_t * mask,
+                           const lv_style_t * style, lv_opa_t opa_scale)
 {
 
-    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->line.opa : (uint16_t)((uint16_t) style->line.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER
+                       ? style->line.opa
+                       : (uint16_t)((uint16_t)style->line.opa * opa_scale) >> 8;
     bool aa = lv_disp_get_antialiasing(lv_refr_get_disp_refreshing());
     lv_point_t vect_main, vect_norm;
     vect_main.x = main_line->p2.x - main_line->p1.x;
@@ -231,7 +243,7 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
 
     if(main_line->hor) {
         if(main_line->p1.y < main_line->p2.y + dir_ori) {
-            vect_norm.x = - vect_main.y;
+            vect_norm.x = -vect_main.y;
             vect_norm.y = vect_main.x;
         } else {
             vect_norm.x = vect_main.y;
@@ -240,9 +252,9 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
     } else {
         if(main_line->p1.x < main_line->p2.x + dir_ori) {
             vect_norm.x = vect_main.y;
-            vect_norm.y = - vect_main.x;
+            vect_norm.y = -vect_main.x;
         } else {
-            vect_norm.x = - vect_main.y;
+            vect_norm.x = -vect_main.y;
             vect_norm.y = vect_main.x;
         }
     }
@@ -272,12 +284,14 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
 
         uint32_t width_sqr = width * width;
         /* Run for a lot of times. Meanwhile the real width will be determined as well */
-        for(i = 0; i < (lv_coord_t)sizeof(pattern); i ++) {
+        for(i = 0; i < (lv_coord_t)sizeof(pattern); i++) {
             pattern[i].x = pattern_line.p_act.x;
             pattern[i].y = pattern_line.p_act.y;
 
-            /*Finish the pattern line if it's length equal to the desired width (Use Pythagoras theorem)*/
-            uint32_t  sqr = pattern_line.p_act.x * pattern_line.p_act.x + pattern_line.p_act.y * pattern_line.p_act.y;
+            /*Finish the pattern line if it's length equal to the desired width (Use Pythagoras
+             * theorem)*/
+            uint32_t sqr = pattern_line.p_act.x * pattern_line.p_act.x +
+                           pattern_line.p_act.y * pattern_line.p_act.y;
             if(sqr >= width_sqr) {
                 width = i;
 #if LV_ANTIALIAS
@@ -306,10 +320,9 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
     if(width != 0) {
         x_center_ofs = pattern[width - 1].x / 2;
         y_center_ofs = pattern[width - 1].y / 2;
-    }
-    else {
-        if(main_line->hor && main_line->p1.y >= main_line->p2.y + dir_ori) pattern[0].y --;
-        if(!main_line->hor && main_line->p1.x >= main_line->p2.x + dir_ori) pattern[0].x --;
+    } else {
+        if(main_line->hor && main_line->p1.y >= main_line->p2.y + dir_ori) pattern[0].y--;
+        if(!main_line->hor && main_line->p1.x >= main_line->p2.x + dir_ori) pattern[0].x--;
     }
 
     /* Make the coordinates relative to the center */
@@ -323,17 +336,23 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
                     if(pattern[i - 1].x != pattern[i].x) {
                         lv_coord_t seg_w = pattern[i].y - pattern[aa_last_corner].y;
                         if(main_line->sy < 0) {
-                            lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y + seg_w + 1,
-                                    seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1,
+                                               main_line->p1.y + pattern[aa_last_corner].y + seg_w +
+                                                   1,
+                                               seg_w, mask, style->line.color, opa);
 
-                            lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y + seg_w + 1,
-                                    -seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1,
+                                               main_line->p2.y + pattern[aa_last_corner].y + seg_w +
+                                                   1,
+                                               -seg_w, mask, style->line.color, opa);
                         } else {
-                            lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y,
-                                    seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1,
+                                               main_line->p1.y + pattern[aa_last_corner].y, seg_w,
+                                               mask, style->line.color, opa);
 
-                            lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y,
-                                    -seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1,
+                                               main_line->p2.y + pattern[aa_last_corner].y, -seg_w,
+                                               mask, style->line.color, opa);
                         }
                         aa_last_corner = i;
                     }
@@ -341,22 +360,27 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
                     if(pattern[i - 1].y != pattern[i].y) {
                         lv_coord_t seg_w = pattern[i].x - pattern[aa_last_corner].x;
                         if(main_line->sx < 0) {
-                            lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x + seg_w + 1, main_line->p1.y + pattern[aa_last_corner].y - 1,
-                                    seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x + seg_w +
+                                                   1,
+                                               main_line->p1.y + pattern[aa_last_corner].y - 1,
+                                               seg_w, mask, style->line.color, opa);
 
-                            lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x + seg_w + 1, main_line->p2.y + pattern[aa_last_corner].y + 1,
-                                    -seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x + seg_w +
+                                                   1,
+                                               main_line->p2.y + pattern[aa_last_corner].y + 1,
+                                               -seg_w, mask, style->line.color, opa);
                         } else {
-                            lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x, main_line->p1.y + pattern[aa_last_corner].y - 1,
-                                    seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x,
+                                               main_line->p1.y + pattern[aa_last_corner].y - 1,
+                                               seg_w, mask, style->line.color, opa);
 
-                            lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x, main_line->p2.y + pattern[aa_last_corner].y + 1,
-                                    -seg_w, mask, style->line.color, opa);
+                            lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x,
+                                               main_line->p2.y + pattern[aa_last_corner].y + 1,
+                                               -seg_w, mask, style->line.color, opa);
                         }
                         aa_last_corner = i;
                     }
                 }
-
             }
         }
 #endif
@@ -364,40 +388,47 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
 
 #if LV_ANTIALIAS
     /*Add the last part of anti-aliasing for the perpendicular ending*/
-    if(width != 0 && aa) {    /*Due to rounding error with very thin lines it looks ugly*/
+    if(width != 0 && aa) { /*Due to rounding error with very thin lines it looks ugly*/
         if(main_line->hor) {
             lv_coord_t seg_w = pattern[width_safe - 1].y - pattern[aa_last_corner].y;
             if(main_line->sy < 0) {
-                lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y + seg_w,
-                        seg_w + main_line->sy, mask, style->line.color, opa);
+                lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1,
+                                   main_line->p1.y + pattern[aa_last_corner].y + seg_w,
+                                   seg_w + main_line->sy, mask, style->line.color, opa);
 
-                lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y + seg_w,
-                        -(seg_w + main_line->sy), mask, style->line.color, opa);
+                lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1,
+                                   main_line->p2.y + pattern[aa_last_corner].y + seg_w,
+                                   -(seg_w + main_line->sy), mask, style->line.color, opa);
 
             } else {
-                lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1, main_line->p1.y + pattern[aa_last_corner].y,
-                        seg_w + main_line->sy, mask, style->line.color, opa);
+                lv_draw_aa_ver_seg(main_line->p1.x + pattern[aa_last_corner].x - 1,
+                                   main_line->p1.y + pattern[aa_last_corner].y,
+                                   seg_w + main_line->sy, mask, style->line.color, opa);
 
-                lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1, main_line->p2.y + pattern[aa_last_corner].y,
-                        -(seg_w + main_line->sy), mask, style->line.color, opa);
+                lv_draw_aa_ver_seg(main_line->p2.x + pattern[aa_last_corner].x + 1,
+                                   main_line->p2.y + pattern[aa_last_corner].y,
+                                   -(seg_w + main_line->sy), mask, style->line.color, opa);
             }
         } else {
             lv_coord_t seg_w = pattern[width_safe - 1].x - pattern[aa_last_corner].x;
             if(main_line->sx < 0) {
-                lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x + seg_w, main_line->p1.y + pattern[aa_last_corner].y - 1,
-                        seg_w + main_line->sx, mask, style->line.color, opa);
+                lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x + seg_w,
+                                   main_line->p1.y + pattern[aa_last_corner].y - 1,
+                                   seg_w + main_line->sx, mask, style->line.color, opa);
 
-                lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x + seg_w, main_line->p2.y + pattern[aa_last_corner].y + 1,
-                        -(seg_w + main_line->sx), mask, style->line.color, opa);
+                lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x + seg_w,
+                                   main_line->p2.y + pattern[aa_last_corner].y + 1,
+                                   -(seg_w + main_line->sx), mask, style->line.color, opa);
 
             } else {
-                lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x, main_line->p1.y + pattern[aa_last_corner].y - 1,
-                        seg_w + main_line->sx, mask, style->line.color, opa);
+                lv_draw_aa_hor_seg(main_line->p1.x + pattern[aa_last_corner].x,
+                                   main_line->p1.y + pattern[aa_last_corner].y - 1,
+                                   seg_w + main_line->sx, mask, style->line.color, opa);
 
-                lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x, main_line->p2.y + pattern[aa_last_corner].y + 1,
-                        -(seg_w + main_line->sx), mask, style->line.color, opa);
+                lv_draw_aa_hor_seg(main_line->p2.x + pattern[aa_last_corner].x,
+                                   main_line->p2.y + pattern[aa_last_corner].y + 1,
+                                   -(seg_w + main_line->sx), mask, style->line.color, opa);
             }
-
         }
     }
 #endif
@@ -405,8 +436,8 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
 #if LV_ANTIALIAS
 
     /*Shift the anti aliasing on the edges (-1, 1 or 0 (zero only in case width == 0))*/
-    lv_coord_t aa_shift1;
-    lv_coord_t aa_shift2;
+    lv_coord_t aa_shift1 = 0;
+    lv_coord_t aa_shift2 = 0;
     if(aa) {
         if(main_line->hor == false) {
             if(main_line->sx < 0) {
@@ -444,18 +475,21 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
                 lv_draw_fill(&draw_area, mask, style->line.color, opa);
 
                 /* Fill the gaps
-                 * When stepping in y one pixel remains empty on every corner (don't do this on the first segment ) */
+                 * When stepping in y one pixel remains empty on every corner (don't do this on the
+                 * first segment ) */
                 if(i != 0 && pattern[i].x != pattern[i - 1].x && !first_run) {
-                    lv_draw_px(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, opa);
+                    lv_draw_px(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color,
+                               opa);
                 }
             }
 
 #if LV_ANTIALIAS
             if(aa) {
                 lv_draw_aa_hor_seg(prev_p.x + pattern[0].x, prev_p.y + pattern[0].y - aa_shift1,
-                        -(main_line->p_act.x - prev_p.x), mask, style->line.color, opa);
-                lv_draw_aa_hor_seg(prev_p.x + pattern[width_safe - 1].x, prev_p.y + pattern[width_safe - 1].y + aa_shift2,
-                        main_line->p_act.x - prev_p.x, mask, style->line.color, opa);
+                                   -(main_line->p_act.x - prev_p.x), mask, style->line.color, opa);
+                lv_draw_aa_hor_seg(prev_p.x + pattern[width_safe - 1].x,
+                                   prev_p.y + pattern[width_safe - 1].y + aa_shift2,
+                                   main_line->p_act.x - prev_p.x, mask, style->line.color, opa);
             }
 #endif
 
@@ -475,16 +509,18 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
             /* Fill the gaps
              * When stepping in y one pixel remains empty on every corner */
             if(i != 0 && pattern[i].x != pattern[i - 1].x && !first_run) {
-                lv_draw_px(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color, opa);
+                lv_draw_px(draw_area.x1, draw_area.y1 - main_line->sy, mask, style->line.color,
+                           opa);
             }
         }
 
 #if LV_ANTIALIAS
         if(aa) {
             lv_draw_aa_hor_seg(prev_p.x + pattern[0].x, prev_p.y + pattern[0].y - aa_shift1,
-                    -(main_line->p_act.x - prev_p.x + 1), mask, style->line.color, opa);
-            lv_draw_aa_hor_seg(prev_p.x + pattern[width_safe - 1].x, prev_p.y + pattern[width_safe - 1].y + aa_shift2,
-                    main_line->p_act.x - prev_p.x + 1, mask, style->line.color, opa);
+                               -(main_line->p_act.x - prev_p.x + 1), mask, style->line.color, opa);
+            lv_draw_aa_hor_seg(prev_p.x + pattern[width_safe - 1].x,
+                               prev_p.y + pattern[width_safe - 1].y + aa_shift2,
+                               main_line->p_act.x - prev_p.x + 1, mask, style->line.color, opa);
         }
 #endif
     }
@@ -501,19 +537,21 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
                 lv_draw_fill(&draw_area, mask, style->line.color, opa);
 
                 /* Fill the gaps
-                 * When stepping in x one pixel remains empty on every corner (don't do this on the first segment ) */
+                 * When stepping in x one pixel remains empty on every corner (don't do this on the
+                 * first segment ) */
                 if(i != 0 && pattern[i].y != pattern[i - 1].y && !first_run) {
-                    lv_draw_px(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, opa);
+                    lv_draw_px(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color,
+                               opa);
                 }
-
             }
 
 #if LV_ANTIALIAS
             if(aa) {
                 lv_draw_aa_ver_seg(prev_p.x + pattern[0].x - aa_shift1, prev_p.y + pattern[0].y,
-                        -(main_line->p_act.y - prev_p.y), mask, style->line.color, opa);
-                lv_draw_aa_ver_seg(prev_p.x + pattern[width_safe - 1].x + aa_shift2, prev_p.y + pattern[width_safe - 1].y,
-                        main_line->p_act.y - prev_p.y, mask, style->line.color, opa);
+                                   -(main_line->p_act.y - prev_p.y), mask, style->line.color, opa);
+                lv_draw_aa_ver_seg(prev_p.x + pattern[width_safe - 1].x + aa_shift2,
+                                   prev_p.y + pattern[width_safe - 1].y,
+                                   main_line->p_act.y - prev_p.y, mask, style->line.color, opa);
             }
 #endif
 
@@ -535,21 +573,22 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
             /* Fill the gaps
              * When stepping in x one pixel remains empty on every corner */
             if(i != 0 && pattern[i].y != pattern[i - 1].y && !first_run) {
-                lv_draw_px(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color, opa);
+                lv_draw_px(draw_area.x1 - main_line->sx, draw_area.y1, mask, style->line.color,
+                           opa);
             }
         }
 
 #if LV_ANTIALIAS
         if(aa) {
             lv_draw_aa_ver_seg(prev_p.x + pattern[0].x - aa_shift1, prev_p.y + pattern[0].y,
-                    -(main_line->p_act.y - prev_p.y + 1), mask, style->line.color, opa);
-            lv_draw_aa_ver_seg(prev_p.x + pattern[width_safe - 1].x + aa_shift2, prev_p.y + pattern[width_safe - 1].y,
-                    main_line->p_act.y - prev_p.y + 1, mask, style->line.color, opa);
+                               -(main_line->p_act.y - prev_p.y + 1), mask, style->line.color, opa);
+            lv_draw_aa_ver_seg(prev_p.x + pattern[width_safe - 1].x + aa_shift2,
+                               prev_p.y + pattern[width_safe - 1].y,
+                               main_line->p_act.y - prev_p.y + 1, mask, style->line.color, opa);
         }
 #endif
     }
 }
-
 
 static void line_init(line_draw_t * line, const lv_point_t * p1, const lv_point_t * p2)
 {
@@ -558,12 +597,12 @@ static void line_init(line_draw_t * line, const lv_point_t * p1, const lv_point_
     line->p2.x = p2->x;
     line->p2.y = p2->y;
 
-    line->dx = LV_MATH_ABS(line->p2.x - line->p1.x);
-    line->sx = line->p1.x < line->p2.x ? 1 : -1;
-    line->dy = LV_MATH_ABS(line->p2.y - line->p1.y);
-    line->sy = line->p1.y < line->p2.y ? 1 : -1;
+    line->dx  = LV_MATH_ABS(line->p2.x - line->p1.x);
+    line->sx  = line->p1.x < line->p2.x ? 1 : -1;
+    line->dy  = LV_MATH_ABS(line->p2.y - line->p1.y);
+    line->sy  = line->p1.y < line->p2.y ? 1 : -1;
     line->err = (line->dx > line->dy ? line->dx : -line->dy) / 2;
-    line->e2 = 0;
+    line->e2  = 0;
     line->hor = line->dx > line->dy ? true : false; /*Rather horizontal or vertical*/
 
     line->p_act.x = line->p1.x;
@@ -599,7 +638,6 @@ static bool line_next_y(line_draw_t * line)
     } while(last_y == line->p_act.y);
 
     return true;
-
 }
 
 /**
@@ -616,6 +654,4 @@ static bool line_next_x(line_draw_t * line)
     } while(last_x == line->p_act.x);
 
     return true;
-
 }
-

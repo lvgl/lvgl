@@ -42,10 +42,10 @@ extern "C" {
 /*Data of gauge*/
 typedef struct
 {
-    lv_lmeter_ext_t lmeter;     /*Ext. of ancestor*/
+    lv_lmeter_ext_t lmeter; /*Ext. of ancestor*/
     /*New data for this type */
-    int16_t * values;               /*Array of the set values (for needles) */
-    const lv_color_t * needle_colors;        /*Color of the needles (lv_color_t my_colors[needle_num])*/
+    int16_t * values;                 /*Array of the set values (for needles) */
+    const lv_color_t * needle_colors; /*Color of the needles (lv_color_t my_colors[needle_num])*/
     uint8_t needle_count;             /*Number of needles*/
     uint8_t label_count;              /*Number of labels on the scale*/
 } lv_gauge_ext_t;
@@ -72,7 +72,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param needle_cnt new count of needles
  * @param colors an array of colors for needles (with 'num' elements)
  */
-void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_color_t * colors);
+void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_color_t colors[]);
 
 /**
  * Set the value of a needle
@@ -88,7 +88,7 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value);
  * @param min minimum value
  * @param max maximum value
  */
-static inline void lv_gauge_set_range(lv_obj_t *gauge, int16_t min, int16_t max)
+static inline void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max)
 {
     lv_lmeter_set_range(gauge, min, max);
 }
@@ -108,7 +108,8 @@ static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, int16_t value)
  * @param gauge pointer to a gauge object
  * @param angle angle of the scale (0..360)
  * @param line_cnt count of scale lines.
- * The get a given "subdivision" lines between label, `line_cnt` = (sub_div + 1) * (label_cnt - 1) + 1
+ * The get a given "subdivision" lines between label, `line_cnt` = (sub_div + 1) * (label_cnt - 1) +
+ * 1
  * @param label_cnt count of scale labels.
  */
 void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt);
@@ -118,7 +119,7 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
  * @param gauge pointer to a gauge object
  * @param bg set the style of the gauge
  *  */
-static inline void lv_gauge_set_style(lv_obj_t *gauge, lv_style_t *bg)
+static inline void lv_gauge_set_style(lv_obj_t * gauge, lv_style_t * bg)
 {
     lv_obj_set_style(gauge, bg);
 }
@@ -133,7 +134,7 @@ static inline void lv_gauge_set_style(lv_obj_t *gauge, lv_style_t *bg)
  * @param needle the id of the needle
  * @return the value of the needle [min,max]
  */
-int16_t lv_gauge_get_value(const lv_obj_t * gauge,  uint8_t needle);
+int16_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle);
 
 /**
  * Get the count of needles on a gauge
@@ -204,7 +205,7 @@ static inline uint16_t lv_gauge_get_scale_angle(const lv_obj_t * gauge)
  * @param gauge pointer to a gauge object
  * @return pointer to the gauge's style
  */
-static inline lv_style_t * lv_gauge_get_style(const lv_obj_t *gauge)
+static inline lv_style_t * lv_gauge_get_style(const lv_obj_t * gauge)
 {
     return lv_obj_get_style(gauge);
 }
@@ -213,10 +214,10 @@ static inline lv_style_t * lv_gauge_get_style(const lv_obj_t *gauge)
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_GAUGE*/
+#endif /*LV_USE_GAUGE*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_GAUGE_H*/
+#endif /*LV_GAUGE_H*/

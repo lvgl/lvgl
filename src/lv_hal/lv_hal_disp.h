@@ -27,11 +27,11 @@ extern "C" {
  *      DEFINES
  *********************/
 #ifndef LV_INV_BUF_SIZE
-#define LV_INV_BUF_SIZE    32    /*Buffer size for invalid areas */
+#define LV_INV_BUF_SIZE 32 /*Buffer size for invalid areas */
 #endif
 
 #ifndef LV_ATTRIBUTE_FLUSH_READY
-#  define LV_ATTRIBUTE_FLUSH_READY
+#define LV_ATTRIBUTE_FLUSH_READY
 #endif
 
 /**********************
@@ -41,7 +41,6 @@ extern "C" {
 struct _disp_t;
 struct _disp_drv_t;
 
-
 typedef struct
 {
     void * buf1;
@@ -49,16 +48,16 @@ typedef struct
 
     /*Used by the library*/
     void * buf_act;
-    uint32_t size;                      /*In pixel count*/
+    uint32_t size; /*In pixel count*/
     lv_area_t area;
-    volatile uint32_t flushing   :1;
-}lv_disp_buf_t;
-
+    volatile uint32_t flushing : 1;
+} lv_disp_buf_t;
 
 /**
  * Display Driver structure to be registered by HAL
  */
-typedef struct _disp_drv_t {
+typedef struct _disp_drv_t
+{
 
     /*Horizontal and vertical resolution*/
     lv_coord_t hor_res;
@@ -69,11 +68,12 @@ typedef struct _disp_drv_t {
     lv_disp_buf_t * buffer;
 
 #if LV_ANTIALIAS
-    uint32_t antialiasing   :1;
+    uint32_t antialiasing : 1;
 #endif
-    uint32_t rotated        :1;     /*1: turn the display by 90 degree.*/
+    uint32_t rotated : 1; /*1: turn the display by 90 degree.*/
 
-    /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be called when finished */
+    /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be
+     * called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
     /* OPTIONAL: Extend the invalidated areas to match with the display drivers requirements
@@ -83,11 +83,21 @@ typedef struct _disp_drv_t {
     /* OPTIONAL: Set a pixel in a buffer according to the special requirements of the display
      * Can be used for color format not supported in LittelvGL. E.g. 2 bit -> 4 gray scales
      * Note: Much slower then drawing with supported color formats. */
-    void (*set_px_cb)(struct _disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
+    void (*set_px_cb)(struct _disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
+                      lv_coord_t y, lv_color_t color, lv_opa_t opa);
 
-    /* OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the number of flushed pixels */
+    /* OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
+     * number of flushed pixels */
     void (*monitor_cb)(struct _disp_drv_t * disp_drv, uint32_t time, uint32_t px);
 
+#if LV_USE_GPU
+    /*OPTIONAL: Blend two memories using opacity (GPU only)*/
+    void (*mem_blend_cb)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+
+    /*OPTIONAL: Fill a memory with a color (GPU only)*/
+    void (*mem_fill_cb)(lv_color_t * dest_buf, const lv_area_t * dest_area,
+                        const lv_area_t * fill_area, lv_color_t color);
+#endif
 
 #if LV_USE_USER_DATA_SINGLE
     lv_disp_drv_user_data_t user_data;
@@ -100,19 +110,12 @@ typedef struct _disp_drv_t {
     lv_disp_drv_user_data_t monitor_user_data;
 #endif
 
-#if LV_USE_GPU
-    /*OPTIONAL: Blend two memories using opacity (GPU only)*/
-    void (*mem_blend)(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
-
-    /*OPTIONAL: Fill a memory with a color (GPU only)*/
-    void (*mem_fill)(lv_color_t * dest, uint32_t length, lv_color_t color);
-#endif
-
 } lv_disp_drv_t;
 
 struct _lv_obj_t;
 
-typedef struct _disp_t {
+typedef struct _disp_t
+{
     /*Driver to the display*/
     lv_disp_drv_t driver;
 
@@ -128,7 +131,10 @@ typedef struct _disp_t {
     /*Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
-    uint32_t inv_p        :10;
+    uint32_t inv_p : 10;
+
+    /*Miscellaneous data*/
+    uint32_t last_activity_time;
 } lv_disp_t;
 
 /**********************
@@ -143,7 +149,6 @@ typedef struct _disp_t {
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver);
 
-
 /**
  * Initialize a display buffer
  * @param disp_buf pointer `lv_disp_buf_t` variable to initialize
@@ -155,8 +160,8 @@ void lv_disp_drv_init(lv_disp_drv_t * driver);
  *             (sending to the display) parallel.
  *             In the `disp_drv->flush` you should use DMA or similar hardware to send
  *             the image to the display in the background.
- *             It lets LittlevGL to render next frame into the other buffer while previous is being sent.
- *             Set to `NULL` if unused.
+ *             It lets LittlevGL to render next frame into the other buffer while previous is being
+ * sent. Set to `NULL` if unused.
  * @param size size of the `buf1` and `buf2` in pixel count.
  */
 void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size);
@@ -168,6 +173,13 @@ void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32
  * @return pointer to the new display or NULL on error
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver);
+
+/**
+ * Update the driver in run time.
+ * @param disp pointer to a display. (return value of `lv_disp_drv_register`)
+ * @param new_drv pointer to the new driver
+ */
+void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv);
 
 /**
  * Remove a display
@@ -214,7 +226,6 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp);
  */
 LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv);
 
-
 /**
  * Get the next display.
  * @param disp pointer to the current display. NULL to initialize.
@@ -249,7 +260,8 @@ void lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num);
 bool lv_disp_is_double_buf(lv_disp_t * disp);
 
 /**
- * Check the driver configuration if it's TRUE double buffered (both `buf1` and `buf2` are set and `size` is screen sized)
+ * Check the driver configuration if it's TRUE double buffered (both `buf1` and `buf2` are set and
+ * `size` is screen sized)
  * @param disp pointer to to display to check
  * @return true: double buffered; false: not double buffered
  */

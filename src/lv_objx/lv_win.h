@@ -34,7 +34,6 @@ extern "C" {
 #error "lv_win: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG  1) "
 #endif
 
-
 #if LV_USE_PAGE == 0
 #error "lv_win: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
 #endif
@@ -59,13 +58,13 @@ typedef struct
 {
     /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * page;                /*Pointer to a page which holds the content*/
-    lv_obj_t * header;              /*Pointer to the header container of the window*/
-    lv_obj_t * title;               /*Pointer to the title label of the window*/
-    lv_style_t * style_header;      /*Style of the header container*/
-    lv_style_t * style_btn_rel;    /*Control button releases style*/
-    lv_style_t * style_btn_pr;     /*Control button pressed style*/
-    lv_coord_t btn_size;               /*Size of the control buttons (square)*/
+    lv_obj_t * page;            /*Pointer to a page which holds the content*/
+    lv_obj_t * header;          /*Pointer to the header container of the window*/
+    lv_obj_t * title;           /*Pointer to the title label of the window*/
+    lv_style_t * style_header;  /*Style of the header container*/
+    lv_style_t * style_btn_rel; /*Control button releases style*/
+    lv_style_t * style_btn_pr;  /*Control button pressed style*/
+    lv_coord_t btn_size;        /*Size of the control buttons (square)*/
 } lv_win_ext_t;
 
 enum {
@@ -95,7 +94,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy);
  * Delete all children of the scrl object, without deleting scrl child.
  * @param obj pointer to an object
  */
-void lv_win_clean(lv_obj_t *obj);
+void lv_win_clean(lv_obj_t * obj);
 
 /*======================
  * Add/remove functions
@@ -140,14 +139,14 @@ void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
  * @param win pointer to a window object
  * @param layout the layout from 'lv_layout_t'
  */
-void lv_win_set_layout(lv_obj_t *win, lv_layout_t layout);
+void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout);
 
 /**
  * Set the scroll bar mode of a window
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
  */
-void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
+void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode);
 
 /**
  * Set a style of a window
@@ -155,14 +154,14 @@ void lv_win_set_sb_mode(lv_obj_t *win, lv_sb_mode_t sb_mode);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_win_set_style(lv_obj_t *win, lv_win_style_t type, lv_style_t *style);
+void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, lv_style_t * style);
 
 /**
  * Set drag status of a window. If set to 'true' window can be dragged like on a PC.
  * @param win pointer to a window object
  * @param en whether dragging is enabled
  */
-void lv_win_set_drag(lv_obj_t *win, bool en);
+void lv_win_set_drag(lv_obj_t * win, bool en);
 
 /*=====================
  * Getter functions
@@ -176,10 +175,10 @@ void lv_win_set_drag(lv_obj_t *win, bool en);
 const char * lv_win_get_title(const lv_obj_t * win);
 
 /**
-* Get the content holder object of window (`lv_page`) to allow additional customization
-* @param win pointer to a window object
-* @return the Page object where the window's content is
-*/
+ * Get the content holder object of window (`lv_page`) to allow additional customization
+ * @param win pointer to a window object
+ * @return the Page object where the window's content is
+ */
 lv_obj_t * lv_win_get_content(const lv_obj_t * win);
 
 /**
@@ -202,14 +201,14 @@ lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn);
  * @param win pointer to a window object
  * @return the layout of the window (from 'lv_layout_t')
  */
-lv_layout_t lv_win_get_layout(lv_obj_t *win);
+lv_layout_t lv_win_get_layout(lv_obj_t * win);
 
 /**
  * Get the scroll bar mode of a window
  * @param win pointer to a window object
  * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
  */
-lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t *win);
+lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win);
 
 /**
  * Get width of the content area (page scrollable) of the window
@@ -224,14 +223,14 @@ lv_coord_t lv_win_get_width(lv_obj_t * win);
  * @param type which style window be get
  * @return style pointer to a style
  */
-lv_style_t * lv_win_get_style(const lv_obj_t *win, lv_win_style_t type);
+lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type);
 
 /**
  * Get drag status of a window. If set to 'true' window can be dragged like on a PC.
  * @param win pointer to a window object
  * @return whether window is draggable
  */
-static inline bool lv_win_get_drag(const lv_obj_t *win)
+static inline bool lv_win_get_drag(const lv_obj_t * win)
 {
     return lv_obj_get_drag(win);
 }

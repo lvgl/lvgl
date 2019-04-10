@@ -17,8 +17,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_LMETER_LINE_UPSCALE          5                   /*2^x upscale of line to make rounding*/
-#define LV_LMETER_LINE_UPSCALE_MASK     ((1 << LV_LMETER_LINE_UPSCALE) - 1)
+#define LV_LMETER_LINE_UPSCALE 5 /*2^x upscale of line to make rounding*/
+#define LV_LMETER_LINE_UPSCALE_MASK ((1 << LV_LMETER_LINE_UPSCALE) - 1)
 
 /**********************
  *      TYPEDEFS
@@ -47,7 +47,8 @@ static lv_signal_cb_t ancestor_signal;
 /**
  * Create a line meter objects
  * @param par pointer to an object, it will be the parent of the new line meter
- * @param copy pointer to a line meter object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a line meter object, if not NULL then the new object will be copied from
+ * it
  * @return pointer to the created line meter
  */
 lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
@@ -59,7 +60,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_lmeter);
     if(new_lmeter == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_lmeter);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_lmeter);
 
     /*Allocate the line meter type specific extended data*/
     lv_lmeter_ext_t * ext = lv_obj_allocate_ext_attr(new_lmeter, sizeof(lv_lmeter_ext_t));
@@ -67,10 +68,10 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
-    ext->min_value = 0;
-    ext->max_value = 100;
-    ext->cur_value = 0;
-    ext->line_cnt = 21;    /*Odd scale number looks better*/
+    ext->min_value   = 0;
+    ext->max_value   = 100;
+    ext->cur_value   = 0;
+    ext->line_cnt    = 21;  /*Odd scale number looks better*/
     ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
 
     /*The signal and design functions are not copied so set them here*/
@@ -92,11 +93,11 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing line meter*/
     else {
         lv_lmeter_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->scale_angle = copy_ext->scale_angle;
-        ext->line_cnt = copy_ext->line_cnt;
-        ext->min_value = copy_ext->min_value;
-        ext->max_value = copy_ext->max_value;
-        ext->cur_value = copy_ext->cur_value;
+        ext->scale_angle           = copy_ext->scale_angle;
+        ext->line_cnt              = copy_ext->line_cnt;
+        ext->min_value             = copy_ext->min_value;
+        ext->max_value             = copy_ext->max_value;
+        ext->cur_value             = copy_ext->cur_value;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_lmeter);
@@ -162,11 +163,10 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt)
     if(ext->scale_angle == angle && ext->line_cnt == line_cnt) return;
 
     ext->scale_angle = angle;
-    ext->line_cnt = line_cnt;
+    ext->line_cnt    = line_cnt;
 
     lv_obj_invalidate(lmeter);
 }
-
 
 /*=====================
  * Getter functions
@@ -213,7 +213,7 @@ int16_t lv_lmeter_get_max_value(const lv_obj_t * lmeter)
 uint8_t lv_lmeter_get_line_count(const lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    return ext->line_cnt ;
+    return ext->line_cnt;
 }
 
 /**
@@ -230,7 +230,6 @@ uint16_t lv_lmeter_get_scale_angle(const lv_obj_t * lmeter)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 /**
  * Handle the drawing related tasks of the line meters
@@ -251,11 +250,10 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-        lv_style_t * style = lv_obj_get_style(lmeter);
-        lv_opa_t opa_scale = lv_obj_get_opa_scale(lmeter);
+        lv_style_t * style    = lv_obj_get_style(lmeter);
+        lv_opa_t opa_scale    = lv_obj_get_opa_scale(lmeter);
         lv_style_t style_tmp;
         memcpy(&style_tmp, style, sizeof(lv_style_t));
-
 
 #if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(lmeter);
@@ -265,27 +263,29 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 #endif
 
         lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
-        lv_coord_t r_in = r_out - style->body.padding.left;
+        lv_coord_t r_in  = r_out - style->body.padding.left;
         if(r_in < 1) r_in = 1;
 
-        lv_coord_t x_ofs = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
-        lv_coord_t y_ofs = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
+        lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
+        lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
         int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;
-        int16_t level = (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
+        int16_t level     = (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) /
+                        (ext->max_value - ext->min_value);
         uint8_t i;
 
         style_tmp.line.color = style->body.main_color;
 
         /*Calculate every coordinate in a bigger size to make rounding later*/
         r_out = r_out << LV_LMETER_LINE_UPSCALE;
-        r_in = r_in << LV_LMETER_LINE_UPSCALE;
+        r_in  = r_in << LV_LMETER_LINE_UPSCALE;
 
         for(i = 0; i < ext->line_cnt; i++) {
             /*Calculate the position a scale label*/
             int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
 
             lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> LV_TRIGO_SHIFT;
-            lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> LV_TRIGO_SHIFT;
+            lv_coord_t x_out =
+                (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> LV_TRIGO_SHIFT;
             lv_coord_t y_in = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> LV_TRIGO_SHIFT;
             lv_coord_t x_in = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> LV_TRIGO_SHIFT;
 
@@ -299,14 +299,16 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
             lv_point_t p2;
 
             p2.x = x_in + x_ofs;
-            p2.y = y_in +  y_ofs;
+            p2.y = y_in + y_ofs;
 
             p1.x = x_out + x_ofs;
             p1.y = y_out + y_ofs;
 
-            if(i >= level) style_tmp.line.color = style->line.color;
+            if(i >= level)
+                style_tmp.line.color = style->line.color;
             else {
-                style_tmp.line.color = lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) /  ext->line_cnt);
+                style_tmp.line.color = lv_color_mix(style->body.grad_color, style->body.main_color,
+                                                    (255 * i) / ext->line_cnt);
             }
 
             lv_draw_line(&p1, &p2, mask, &style_tmp, opa_scale);
@@ -315,7 +317,6 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-
     }
 
     return true;
@@ -342,11 +343,11 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
         lv_obj_refresh_ext_size(lmeter);
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         lv_style_t * style = lv_lmeter_get_style(lmeter);
-        lmeter->ext_size = LV_MATH_MAX(lmeter->ext_size, style->line.width);
+        lmeter->ext_size   = LV_MATH_MAX(lmeter->ext_size, style->line.width);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_lmeter";
@@ -366,10 +367,11 @@ static lv_coord_t lv_lmeter_coord_round(int32_t x)
     bool was_negative = false;
     if(x < 0) {
         was_negative = true;
-        x = -x;
+        x            = -x;
     }
 
-    x = (x >> LV_LMETER_LINE_UPSCALE) + ((x & LV_LMETER_LINE_UPSCALE_MASK) >> (LV_LMETER_LINE_UPSCALE - 1));
+    x = (x >> LV_LMETER_LINE_UPSCALE) +
+        ((x & LV_LMETER_LINE_UPSCALE_MASK) >> (LV_LMETER_LINE_UPSCALE - 1));
 
     if(was_negative) x = -x;
 

@@ -39,13 +39,13 @@ typedef struct
 {
     /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
     /*New data for this type */
-    const void * src;             /*Image source: Pointer to an array or a file or a symbol*/
+    const void * src; /*Image source: Pointer to an array or a file or a symbol*/
     lv_point_t offset;
-    lv_coord_t w;               /*Width of the image (Handled by the library)*/
-    lv_coord_t h;               /*Height of the image (Handled by the library)*/
-    uint8_t src_type  :2;       /*See: lv_img_src_t*/
-    uint8_t auto_size :1;       /*1: automatically set the object size to the image size*/
-    uint8_t cf :5;              /*Color format from `lv_img_color_format_t`*/
+    lv_coord_t w;          /*Width of the image (Handled by the library)*/
+    lv_coord_t h;          /*Height of the image (Handled by the library)*/
+    uint8_t src_type : 2;  /*See: lv_img_src_t*/
+    uint8_t auto_size : 1; /*1: automatically set the object size to the image size*/
+    uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
 } lv_img_ext_t;
 
 /**********************
@@ -79,8 +79,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img);
  */
 static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
 {
-    (void) img;
-    (void) fn;
+    (void)img;
+    (void)fn;
 }
 
 /**
@@ -98,7 +98,7 @@ void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
  * @param x: the new offset along x axis.
  * @param y: the new offset along y axis.
  */
-void lv_img_set_offset(lv_obj_t *img, lv_coord_t x, lv_coord_t y);
+void lv_img_set_offset(lv_obj_t * img, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set an offset for the source of an image.
@@ -106,7 +106,7 @@ void lv_img_set_offset(lv_obj_t *img, lv_coord_t x, lv_coord_t y);
  * @param img pointer to an image
  * @param x: the new offset along x axis.
  */
-void lv_img_set_offset_x(lv_obj_t *img, lv_coord_t x);
+void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x);
 
 /**
  * Set an offset for the source of an image.
@@ -114,14 +114,14 @@ void lv_img_set_offset_x(lv_obj_t *img, lv_coord_t x);
  * @param img pointer to an image
  * @param y: the new offset along y axis.
  */
-void lv_img_set_offset_y(lv_obj_t *img, lv_coord_t y);
-    
+void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y);
+
 /**
  * Set the style of an image
  * @param img pointer to an image object
  * @param style pointer to a style
  */
-static inline void lv_img_set_style(lv_obj_t *img, lv_style_t *style)
+static inline void lv_img_set_style(lv_obj_t * img, lv_style_t * style)
 {
     lv_obj_set_style(img, style);
 }
@@ -133,8 +133,8 @@ static inline void lv_img_set_style(lv_obj_t *img, lv_style_t *style)
  */
 static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
 {
-    (void) img;
-    (void) upcale;
+    (void)img;
+    (void)upcale;
 }
 
 /*=====================
@@ -167,21 +167,21 @@ bool lv_img_get_auto_size(const lv_obj_t * img);
  * @param img pointer to an image
  * @return offset.x value.
  */
-lv_coord_t lv_img_get_offset_x(lv_obj_t *img);
+lv_coord_t lv_img_get_offset_x(lv_obj_t * img);
 
 /**
  * Get the offset.y attribute of the img object.
  * @param img pointer to an image
  * @return offset.y value.
  */
-lv_coord_t lv_img_get_offset_y(lv_obj_t *img);
-    
+lv_coord_t lv_img_get_offset_y(lv_obj_t * img);
+
 /**
  * Get the style of an image object
  * @param img pointer to an image object
  * @return pointer to the image's style
  */
-static inline lv_style_t* lv_img_get_style(const lv_obj_t *img)
+static inline lv_style_t * lv_img_get_style(const lv_obj_t * img)
 {
     return lv_obj_get_style(img);
 }
@@ -204,10 +204,10 @@ static inline bool lv_img_get_upscale(const lv_obj_t * img)
 /*Use this macro to declare an image in a c file*/
 #define LV_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 
-#endif  /*LV_USE_IMG*/
+#endif /*LV_USE_IMG*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif  /*LV_IMG_H*/
+#endif /*LV_IMG_H*/
