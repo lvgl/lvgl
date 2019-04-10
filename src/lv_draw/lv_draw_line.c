@@ -436,8 +436,8 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
 #if LV_ANTIALIAS
 
     /*Shift the anti aliasing on the edges (-1, 1 or 0 (zero only in case width == 0))*/
-    lv_coord_t aa_shift1;
-    lv_coord_t aa_shift2;
+    lv_coord_t aa_shift1 = 0;
+    lv_coord_t aa_shift2 = 0;
     if(aa) {
         if(main_line->hor == false) {
             if(main_line->sx < 0) {

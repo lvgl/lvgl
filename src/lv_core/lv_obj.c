@@ -99,10 +99,8 @@ void lv_init(void)
     lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
-#if LV_INDEV_READ_PERIOD != 0
     /*Init the input device handling*/
     lv_indev_init();
-#endif
 
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
