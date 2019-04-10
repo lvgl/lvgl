@@ -167,7 +167,10 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb);
  * @param kb pointer to a keyboard object
  * @return the current map
  */
-static inline const char ** lv_btnm_get_map_array(const lv_obj_t * btnm);
+static inline const char ** lv_kb_get_map_array(const lv_obj_t * kb)
+{
+    return lv_btnm_get_map_array(kb);
+}
 
 /**
  * Get a style of a keyboard
