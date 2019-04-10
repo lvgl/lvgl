@@ -85,8 +85,8 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_calendar_ext_t * ext = lv_obj_allocate_ext_attr(new_calendar, sizeof(lv_calendar_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_calendar);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_calendar);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_calendar);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_calendar);
 
     /*Initialize the allocated 'ext' */
     ext->today.year  = 2018;

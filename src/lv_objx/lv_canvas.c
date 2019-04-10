@@ -58,8 +58,8 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_canvas_ext_t * ext = lv_obj_allocate_ext_attr(new_canvas, sizeof(lv_canvas_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_canvas);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_canvas);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_canvas);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_canvas);
 
     /*Initialize the allocated 'ext' */
     ext->dsc.header.always_zero = 0;

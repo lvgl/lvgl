@@ -54,7 +54,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_win);
     if(new_win == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_win);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_win);
 
     /*Allocate the object type specific extended data*/
     lv_win_ext_t * ext = lv_obj_allocate_ext_attr(new_win, sizeof(lv_win_ext_t));

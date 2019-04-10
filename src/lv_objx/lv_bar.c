@@ -62,8 +62,8 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_bar);
     if(new_bar == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_bar);
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_bar);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_bar);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_bar);
 
     /*Allocate the object type specific extended data*/
     lv_bar_ext_t * ext = lv_obj_allocate_ext_attr(new_bar, sizeof(lv_bar_ext_t));

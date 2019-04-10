@@ -61,8 +61,8 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_slider);
     if(new_slider == NULL) return NULL;
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_slider);
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_slider);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_slider);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_slider);
 
     /*Allocate the slider type specific extended data*/
     lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(new_slider, sizeof(lv_slider_ext_t));

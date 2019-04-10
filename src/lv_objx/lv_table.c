@@ -63,8 +63,8 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_table_ext_t * ext = lv_obj_allocate_ext_attr(new_table, sizeof(lv_table_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_table);
-    if(ancestor_scrl_design == NULL) ancestor_scrl_design = lv_obj_get_design_func(new_table);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_table);
+    if(ancestor_scrl_design == NULL) ancestor_scrl_design = lv_obj_get_design_cb(new_table);
 
     /*Initialize the allocated 'ext' */
     ext->cell_data     = NULL;

@@ -63,7 +63,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_img);
     if(new_img == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_img);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_img);
 
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));

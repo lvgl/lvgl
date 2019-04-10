@@ -79,7 +79,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_list);
     if(new_list == NULL) return NULL;
 
-    if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_func(new_list);
+    if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(new_list);
 
     lv_list_ext_t * ext = lv_obj_allocate_ext_attr(new_list, sizeof(lv_list_ext_t));
     lv_mem_assert(ext);
@@ -189,7 +189,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt,
     liste = lv_btn_create(list, NULL);
 
     /*Save the original signal function because it will be required in `lv_list_btn_signal`*/
-    if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_func(liste);
+    if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_cb(liste);
 
     /*Set the default styles*/
     lv_btn_set_style(liste, LV_BTN_STYLE_REL, ext->styles_btn[LV_BTN_STATE_REL]);
@@ -212,7 +212,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt,
         lv_img_set_src(img, img_src);
         lv_obj_set_style(img, ext->style_img);
         lv_obj_set_click(img, false);
-        if(img_signal == NULL) img_signal = lv_obj_get_signal_func(img);
+        if(img_signal == NULL) img_signal = lv_obj_get_signal_cb(img);
     }
 #endif
     if(txt != NULL) {
@@ -223,7 +223,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt,
         lv_obj_set_click(label, false);
         lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL_CIRC);
         lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - btn_hor_pad);
-        if(label_signal == NULL) label_signal = lv_obj_get_signal_func(label);
+        if(label_signal == NULL) label_signal = lv_obj_get_signal_cb(label);
     }
 #if LV_USE_GROUP
     /* If this is the first item to be added to the list and the list is

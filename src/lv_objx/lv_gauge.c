@@ -78,8 +78,8 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->values        = NULL;
     ext->needle_colors = NULL;
     ext->label_count   = LV_GAUGE_DEF_LABEL_COUNT;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_gauge);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_gauge);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_gauge);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_gauge);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_gauge, lv_gauge_signal);

@@ -73,8 +73,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_page);
     if(new_page == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_page);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_page);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_page);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_page);
 
     /*Allocate the object type specific extended data*/
     lv_page_ext_t * ext = lv_obj_allocate_ext_attr(new_page, sizeof(lv_page_ext_t));

@@ -73,7 +73,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_btnm);
     if(new_btnm == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_btnm);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_btnm);
 
     /*Allocate the object type specific extended data*/
     lv_btnm_ext_t * ext = lv_obj_allocate_ext_attr(new_btnm, sizeof(lv_btnm_ext_t));
@@ -94,7 +94,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_btnm);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_btnm);
 
     lv_obj_set_signal_cb(new_btnm, lv_btnm_signal);
     lv_obj_set_design_cb(new_btnm, lv_btnm_design);

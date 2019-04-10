@@ -58,8 +58,8 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_imgbtn_ext_t * ext = lv_obj_allocate_ext_attr(new_imgbtn, sizeof(lv_imgbtn_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_imgbtn);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_imgbtn);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_imgbtn);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_imgbtn);
 
         /*Initialize the allocated 'ext' */
 #if LV_IMGBTN_TILED == 0

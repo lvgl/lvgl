@@ -88,10 +88,10 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_ta);
     if(new_ta == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_ta);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_ta);
-    if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(new_ta));
-    if(scrl_design == NULL) scrl_design = lv_obj_get_design_func(lv_page_get_scrl(new_ta));
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_ta);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_ta);
+    if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_ta));
+    if(scrl_design == NULL) scrl_design = lv_obj_get_design_cb(lv_page_get_scrl(new_ta));
 
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_allocate_ext_attr(new_ta, sizeof(lv_ta_ext_t));

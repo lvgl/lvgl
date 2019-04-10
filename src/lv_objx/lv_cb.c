@@ -58,8 +58,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_cb);
     if(new_cb == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_cb);
-    if(ancestor_bg_design == NULL) ancestor_bg_design = lv_obj_get_design_func(new_cb);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_cb);
+    if(ancestor_bg_design == NULL) ancestor_bg_design = lv_obj_get_design_cb(new_cb);
 
     lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
     lv_mem_assert(ext);
@@ -75,7 +75,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         ext->bullet = lv_btn_create(new_cb, NULL);
         if(ancestor_bullet_design == NULL)
-            ancestor_bullet_design = lv_obj_get_design_func(ext->bullet);
+            ancestor_bullet_design = lv_obj_get_design_cb(ext->bullet);
         lv_obj_set_click(ext->bullet, false);
 
         ext->label = lv_label_create(new_cb, NULL);

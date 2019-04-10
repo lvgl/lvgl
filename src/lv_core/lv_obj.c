@@ -1258,7 +1258,7 @@ void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb)
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.
  */
-void lv_obj_send_signal(lv_obj_t * obj, lv_signal_t signal, void * param)
+void lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 {
     if(obj->signal_cb) obj->signal_cb(obj, signal, param);
 }
@@ -1797,7 +1797,7 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
  * @param obj pointer to an object
  * @return the signal function
  */
-lv_signal_cb_t lv_obj_get_signal_func(const lv_obj_t * obj)
+lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj)
 {
     return obj->signal_cb;
 }
@@ -1807,9 +1807,19 @@ lv_signal_cb_t lv_obj_get_signal_func(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the design function
  */
-lv_design_cb_t lv_obj_get_design_func(const lv_obj_t * obj)
+lv_design_cb_t lv_obj_get_design_cb(const lv_obj_t * obj)
 {
     return obj->design_cb;
+}
+
+/**
+ * Get the event function of an object
+ * @param obj pointer to an object
+ * @return the event function
+ */
+lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj)
+{
+    return obj->event_cb;
 }
 
 /*------------------

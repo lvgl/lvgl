@@ -69,8 +69,8 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     if(new_roller == NULL) return NULL;
 
     if(ancestor_scrl_signal == NULL)
-        ancestor_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(new_roller));
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_roller);
+        ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_roller));
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_roller);
 
     /*Allocate the roller type specific extended data*/
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));

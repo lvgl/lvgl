@@ -59,8 +59,8 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_led);
     if(new_led == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_led);
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_led);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_led);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_led);
 
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));

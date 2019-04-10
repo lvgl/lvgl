@@ -74,7 +74,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_t * new_tabview = lv_obj_create(par, copy);
     lv_mem_assert(new_tabview);
     if(new_tabview == NULL) return NULL;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_tabview);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_tabview);
 
     /*Allocate the tab type specific extended data*/
     lv_tabview_ext_t * ext = lv_obj_allocate_ext_attr(new_tabview, sizeof(lv_tabview_ext_t));
@@ -219,8 +219,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_transp);
     lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp);
 
-    if(page_signal == NULL) page_signal = lv_obj_get_signal_func(h);
-    if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_func(lv_page_get_scrl(h));
+    if(page_signal == NULL) page_signal = lv_obj_get_signal_cb(h);
+    if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(h));
     lv_obj_set_signal_cb(h, tabpage_signal);
     lv_obj_set_signal_cb(lv_page_get_scrl(h), tabpage_scrl_signal);
 
@@ -889,7 +889,7 @@ static void tabview_realign(lv_obj_t * tabview)
 
     lv_obj_t * pages = lv_obj_get_child(ext->content, NULL);
     while(pages != NULL) {
-        if(lv_obj_get_signal_func(pages) ==
+        if(lv_obj_get_signal_cb(pages) ==
            tabpage_signal) { /*Be sure adjust only the pages (user can other things)*/
             lv_obj_set_size(pages, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
         }

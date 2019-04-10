@@ -93,8 +93,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     memset(&ext->x_axis, 0, sizeof(ext->x_axis));
     memset(&ext->y_axis, 0, sizeof(ext->y_axis));
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_func(new_chart);
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_chart);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_chart);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_chart);
 
     lv_obj_set_signal_cb(new_chart, lv_chart_signal);
     lv_obj_set_design_cb(new_chart, lv_chart_design);

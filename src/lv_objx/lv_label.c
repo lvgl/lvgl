@@ -71,7 +71,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_label);
     if(new_label == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_label);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_label);
 
     /*Extend the basic object to a label object*/
     lv_obj_allocate_ext_attr(new_label, sizeof(lv_label_ext_t));
