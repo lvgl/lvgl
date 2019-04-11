@@ -162,9 +162,9 @@ void lv_disp_drv_init(lv_disp_drv_t * driver);
  *             the image to the display in the background.
  *             It lets LittlevGL to render next frame into the other buffer while previous is being
  * sent. Set to `NULL` if unused.
- * @param size size of the `buf1` and `buf2` in pixel count.
+ * @param size_in_px_cnt size of the `buf1` and `buf2` in pixel count.
  */
-void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size);
+void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt);
 
 /**
  * Register an initialized display driver.
