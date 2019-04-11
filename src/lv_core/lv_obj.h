@@ -42,11 +42,15 @@ extern "C" {
 #error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
 
+#define LV_MAX_ANCESTOR_NUM 8
+
 #define LV_ANIM_IN 0x00       /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_OUT 0x80      /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
 #define LV_ANIM_DIR_MASK 0x80 /*ANIM_IN/ANIM_OUT mask*/
 
-#define LV_MAX_ANCESTOR_NUM 8
+#define LV_EXT_CLICK_AREA_OFF   0
+#define LV_EXT_CLICK_AREA_TINY  1
+#define LV_EXT_CLICK_AREA_FULL  2
 
 /**********************
  *      TYPEDEFS
@@ -106,7 +110,7 @@ enum {
     LV_SIGNAL_CORD_CHG,
     LV_SIGNAL_PARENT_SIZE_CHG,
     LV_SIGNAL_STYLE_CHG,
-    LV_SIGNAL_REFR_EXT_SIZE,
+    LV_SIGNAL_REFR_EXT_DRAW_PAD,
     LV_SIGNAL_GET_TYPE,
 
     _LV_SIGNAL_FEEDBACK_SECTION_START,
@@ -156,7 +160,7 @@ enum {
 };
 typedef uint8_t lv_align_t;
 
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
 typedef struct
 {
     const struct _lv_obj_t * base;
@@ -183,13 +187,6 @@ typedef struct _lv_obj_t
     lv_ll_t child_ll;       /*Linked list to store the children objects*/
 
     lv_area_t coords; /*Coordinates of the object (x1, y1, x2, y2)*/
-#if USE_LV_EXTENDED_CLICK_AREA
-    lv_area_t ext_coords;
-#endif
-#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
-    uint8_t ext_padding_hor;
-    uint8_t ext_padding_ver;
-#endif
 
     lv_event_cb_t event_cb;
     lv_signal_cb_t signal_cb; /*Object type specific signal function*/
@@ -201,6 +198,16 @@ typedef struct _lv_obj_t
 #if LV_USE_GROUP != 0
     void * group_p; /*Pointer to the group of the object*/
 #endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+    uint8_t ext_click_pad_hor;
+    uint8_t ext_click_pad_ver;
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+    lv_area_t ext_click_pad;
+#endif
+
     /*Attributes and states*/
     uint8_t click : 1;          /*1: Can be pressed by an input device*/
     uint8_t drag : 1;           /*1: Enable the dragging*/
@@ -215,9 +222,8 @@ typedef struct _lv_obj_t
                                  `lv_protect_t`*/
     lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
 
-    lv_coord_t
-        ext_size; /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
-#if LV_OBJ_REALIGN
+    lv_coord_t ext_draw_pad; /*EXTtend the size in every direction for drawing. */
+#if LV_USE_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif
 
@@ -355,16 +361,6 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
  */
 void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
-#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
-/**
- * Set the size of an extended clickable area
- * @param obj pointer to an object
- * @param w extended width to both sides
- * @param h extended height to both sides
- */
-void lv_obj_set_ext_paddings(lv_obj_t * obj, uint8_t w, uint8_t h);
-#endif
-
 /**
  * Set the width of an object
  * @param obj pointer to an object
@@ -414,6 +410,28 @@ void lv_obj_realign(lv_obj_t * obj);
  * @param en true: enable auto realign; false: disable auto realign
  */
 void lv_obj_set_auto_realign(lv_obj_t * obj, bool en);
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+/**
+ * Set the size of an extended clickable area
+ * @param obj pointer to an object
+ * @param w extended width to both sides
+ * @param h extended height to both sides
+ */
+void lv_obj_set_ext_click_area(lv_obj_t * obj, uint8_t w, uint8_t h);
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+/**
+ * Set the size of an extended clickable area
+ * @param obj pointer to an object
+ * @param left extended clickable are on the left [px]
+ * @param right extended clickable are on the right [px]
+ * @param top extended clickable are on the top [px]
+ * @param bottom extended clickable are on the bottom [px]
+ */
+void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom);
+#endif
 
 /*---------------------
  * Appearance set
@@ -590,7 +608,7 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
  * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object
  * @param obj pointer to an object
  */
-void lv_obj_refresh_ext_size(lv_obj_t * obj);
+void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj);
 
 #if LV_USE_ANIMATION
 /**
@@ -712,21 +730,38 @@ lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj);
  */
 lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj);
 
-#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+/**
+ * Get the automatic realign property of the object.
+ * @param obj pointer to an object
+ * @return  true: auto realign is enabled; false: auto realign is disabled
+ */
+bool lv_obj_get_auto_realign(lv_obj_t * obj);
+
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
 /**
  * Get the horizontal padding of extended clickable area
  * @param obj pointer to an object
  * @return the horizontal padding
  */
-uint8_t lv_obj_get_ext_hor_padding(const lv_obj_t * obj);
+uint8_t lv_obj_get_ext_click_pad_hor(const lv_obj_t * obj);
 
 /**
  * Get the vertical padding of extended clickable area
  * @param obj pointer to an object
  * @return the vertical padding
  */
-uint8_t lv_obj_get_ext_ver_padding(const lv_obj_t * obj);
+uint8_t lv_obj_get_ext_click_pad_ver(const lv_obj_t * obj);
 
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+/**
+ * Get the horizontal padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the horizontal padding
+ */
+const lv_area_t * lv_obj_get_ext_click_pad(const lv_obj_t * obj);
 #endif
 
 /**
@@ -734,14 +769,7 @@ uint8_t lv_obj_get_ext_ver_padding(const lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the extended size attribute
  */
-lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj);
-
-/**
- * Get the automatic realign property of the object.
- * @param obj pointer to an object
- * @return  true: auto realign is enabled; false: auto realign is disabled
- */
-bool lv_obj_get_auto_realign(lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
 
 /*-----------------
  * Appearance get

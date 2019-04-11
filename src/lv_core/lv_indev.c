@@ -989,12 +989,23 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
 {
     lv_obj_t * found_p = NULL;
 
-    /*If the point is on this object*/
-    /*Check its children too*/
-#if USE_LV_EXTENDED_CLICK_AREA
-    if(lv_area_is_point_on(&obj->ext_coords, &proc->types.pointer.act_point)) {
-#elif USE_LV_EXTENDED_CLICK_AREA_TINY
-    if(lv_area_ext_is_point_on(&obj->coords, &proc->types.pointer.act_point, obj->ext_padding_hor, obj->ext_padding_ver)) {
+    /*If the point is on this object check its children too*/
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+    lv_area_t ext_area;
+    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;
+    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad_hor;
+    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad_ver;
+    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad_ver;
+
+    if(lv_area_is_point_on(&ext_area, &proc->types.pointer.act_point)) {
+#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+        lv_area_t ext_area;
+        ext_area.x1 = obj->coords.x1 - obj->ext_click_pad.x1;
+        ext_area.x2 = obj->coords.x2 + obj->ext_click_pad.x2;
+        ext_area.y1 = obj->coords.y1 - obj->ext_click_pad.y1;
+        ext_area.y2 = obj->coords.y2 + obj->ext_click_pad.y2;
+
+        if(lv_area_is_point_on(&ext_area, &proc->types.pointer.act_point)) {
 #else
     if(lv_area_is_point_on(&obj->coords, &proc->types.pointer.act_point)) {
 #endif

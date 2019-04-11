@@ -317,7 +317,7 @@ void lv_label_set_body_draw(lv_obj_t * label, bool en)
 
     ext->body_draw = en == false ? 0 : 1;
 
-    lv_obj_refresh_ext_size(label);
+    lv_obj_refresh_ext_draw_pad(label);
 
     lv_obj_invalidate(label);
 }
@@ -824,13 +824,13 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
             lv_label_revert_dots(label);
             lv_label_refr_text(label);
         }
-    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         if(ext->body_draw) {
             lv_style_t * style = lv_label_get_style(label);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.left);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.right);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.top);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.bottom);
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.left);
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.right);
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.top);
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.bottom);
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;

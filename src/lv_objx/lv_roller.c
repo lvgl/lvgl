@@ -557,34 +557,34 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
     bool union_ok;
     lv_area_copy(&half_roller, &roller->coords);
 
-    half_roller.x1 -= roller->ext_size; /*Add ext size too (e.g. because of shadow draw) */
-    half_roller.x2 += roller->ext_size;
-    half_roller.y1 -= roller->ext_size;
+    half_roller.x1 -= roller->ext_draw_pad; /*Add ext size too (e.g. because of shadow draw) */
+    half_roller.x2 += roller->ext_draw_pad;
+    half_roller.y1 -= roller->ext_draw_pad;
     half_roller.y2 = roller->coords.y1 + h / 2;
 
     union_ok = lv_area_intersect(&half_mask, &half_roller, mask);
 
-    half_roller.x1 += roller->ext_size; /*Revert ext. size adding*/
-    half_roller.x2 -= roller->ext_size;
-    half_roller.y1 += roller->ext_size;
+    half_roller.x1 += roller->ext_draw_pad; /*Revert ext. size adding*/
+    half_roller.x2 -= roller->ext_draw_pad;
+    half_roller.y1 += roller->ext_draw_pad;
     half_roller.y2 += style->body.radius;
 
     if(union_ok) {
         lv_draw_rect(&half_roller, &half_mask, style, lv_obj_get_opa_scale(roller));
     }
 
-    half_roller.x1 -= roller->ext_size; /*Add ext size too (e.g. because of shadow draw) */
-    half_roller.x2 += roller->ext_size;
-    half_roller.y2 = roller->coords.y2 + roller->ext_size;
+    half_roller.x1 -= roller->ext_draw_pad; /*Add ext size too (e.g. because of shadow draw) */
+    half_roller.x2 += roller->ext_draw_pad;
+    half_roller.y2 = roller->coords.y2 + roller->ext_draw_pad;
     half_roller.y1 = roller->coords.y1 + h / 2;
     if((h & 0x1) == 0)
         half_roller.y1++; /*With even height the pixels in the middle would be drawn twice*/
 
     union_ok = lv_area_intersect(&half_mask, &half_roller, mask);
 
-    half_roller.x1 += roller->ext_size; /*Revert ext. size adding*/
-    half_roller.x2 -= roller->ext_size;
-    half_roller.y2 -= roller->ext_size;
+    half_roller.x1 += roller->ext_draw_pad; /*Revert ext. size adding*/
+    half_roller.x2 -= roller->ext_draw_pad;
+    half_roller.y2 -= roller->ext_draw_pad;
     half_roller.y1 -= style->body.radius;
 
     if(union_ok) {

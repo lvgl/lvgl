@@ -290,7 +290,7 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, lv_style_t *
         case LV_DDLIST_STYLE_SEL:
             ext->sel_style  = style;
             lv_obj_t * scrl = lv_page_get_scrl(ddlist);
-            lv_obj_refresh_ext_size(scrl); /*Because of the wider selected rectangle*/
+            lv_obj_refresh_ext_draw_pad(scrl); /*Because of the wider selected rectangle*/
             break;
     }
 }
@@ -728,13 +728,13 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
 
     lv_obj_t * ddlist = lv_obj_get_parent(scrl);
 
-    if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*TODO review this*/
         /* Because of the wider selected rectangle ext. size
          * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
         lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
         lv_coord_t hpad    = LV_MATH_MAX(style->body.padding.left, style->body.padding.right);
-        if(scrl->ext_size < hpad) scrl->ext_size = hpad;
+        if(scrl->ext_draw_pad < hpad) scrl->ext_draw_pad = hpad;
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             release_handler(ddlist);

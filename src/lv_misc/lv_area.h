@@ -140,7 +140,7 @@ void lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t *
  */
 bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p);
 
-#if USE_LV_EXTENDED_CLICK_AREA_TINY
+#if LV_USE_EXTENDED_CLICK_AREA_TINY
 /**
  * Check if a point is on an area
  * @param a_p pointer to an area
