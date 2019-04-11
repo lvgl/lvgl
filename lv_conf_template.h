@@ -434,10 +434,6 @@ typedef void * lv_obj_user_data_t;
 /*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
 #define LV_USE_WIN      1
 
-/* Extended clickable area */
-#define LV_USE_EXTENDED_CLICK_AREA 		0	/* Enables obj extension to realize extended clickable area with additional extended coords (1: enabled) */
-#define LV_USE_EXTENDED_CLICK_AREA_TINY	0	/* Enables obj extension to realize extended clickable area with calculation of the fly (1: enabled) */
-
 /*==================
  * Non-user section
  *==================*/
