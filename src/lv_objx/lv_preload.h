@@ -47,6 +47,12 @@ enum {
 };
 typedef uint8_t lv_preload_type_t;
 
+enum {
+    LV_PRELOAD_DIRECTION_FORWARD,
+    LV_PRELOAD_DIRECTION_BACKWARD,
+};
+typedef uint8_t lv_preload_direction_t;
+
 /*Data of pre loader*/
 typedef struct
 {
@@ -54,7 +60,8 @@ typedef struct
     /*New data for this type */
     uint16_t arc_length;         /*Length of the spinning indicator in degree*/
     uint16_t time;               /*Time of one round*/
-    lv_preload_type_t anim_type; /*Type of the arc animation*/
+    lv_preload_type_t anim_type:1; /*Type of the arc animation*/
+    lv_preload_direction_t anim_direction:1; /*Animation Direction*/
 } lv_preload_ext_t;
 
 /*Styles*/
@@ -107,11 +114,18 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time);
 void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_style_t * style);
 
 /**
- * Set the animation type of a preloadeer.
+ * Set the animation type of a preloader.
  * @param preload pointer to pre loader object
  * @param type animation type of the preload
  *  */
 void lv_preload_set_animation_type(lv_obj_t * preload, lv_preload_type_t type);
+
+/**
+ * Set the animation direction of a preloader
+ * @param preload pointer to pre loader object
+ * @param direction animation direction of the preload
+ */
+void lv_preload_set_animation_direction(lv_obj_t * preload, lv_preload_direction_t direction);
 
 /*=====================
  * Getter functions
@@ -138,11 +152,18 @@ uint16_t lv_preload_get_spin_time(const lv_obj_t * preload);
 const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type);
 
 /**
- * Get the animation type of a preloadeer.
+ * Get the animation type of a preloader.
  * @param preload pointer to pre loader object
  * @return animation type
  *  */
 lv_preload_type_t lv_preload_get_animation_type(lv_obj_t * preload);
+
+/**
+ * Get the animation direction of a preloader
+ * @param preload pointer to pre loader object
+ * @return animation direction
+ */
+lv_preload_direction_t lv_preload_get_animation_direction(lv_obj_t * preload);
 
 /*=====================
  * Other functions
