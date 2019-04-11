@@ -47,7 +47,7 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;        /*Label for the options*/
-    lv_style_t * sel_style;  /*Style of the selected option*/
+    const lv_style_t * sel_style;  /*Style of the selected option*/
     uint16_t option_cnt;     /*Number of options*/
     uint16_t sel_opt_id;     /*Index of the current option*/
     uint16_t sel_opt_id_ori; /*Store the original index on focus*/
@@ -148,7 +148,7 @@ void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, lv_style_t * style);
+void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, const lv_style_t * style);
 
 /**
  * Set the alignment of the labels in a drop down list
@@ -225,7 +225,7 @@ uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type);
+const lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type);
 
 /**
  * Get the alignment of the labels in a drop down list

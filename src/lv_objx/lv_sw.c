@@ -179,7 +179,7 @@ bool lv_sw_toggle(lv_obj_t * sw, bool anim)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style)
+void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style)
 {
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
@@ -215,9 +215,9 @@ void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
+const lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
     lv_sw_ext_t * ext  = lv_obj_get_ext_attr(sw);
 
     switch(type) {

@@ -136,7 +136,7 @@ void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, lv_style_t * style)
+void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, const lv_style_t * style)
 {
     switch(type) {
         case LV_ARC_STYLE_MAIN: lv_obj_set_style(arc, style); break;
@@ -177,9 +177,9 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type)
+const lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
 
     switch(type) {
         case LV_ARC_STYLE_MAIN: style = lv_obj_get_style(arc); break;
@@ -219,8 +219,8 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
-        lv_style_t * style = lv_arc_get_style(arc, LV_ARC_STYLE_MAIN);
+        lv_arc_ext_t * ext       = lv_obj_get_ext_attr(arc);
+        const lv_style_t * style = lv_arc_get_style(arc, LV_ARC_STYLE_MAIN);
 
         lv_coord_t r       = (LV_MATH_MIN(lv_obj_get_width(arc), lv_obj_get_height(arc))) / 2;
         lv_coord_t x       = arc->coords.x1 + lv_obj_get_width(arc) / 2;

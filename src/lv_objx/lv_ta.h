@@ -68,9 +68,9 @@ typedef struct
     uint8_t one_line : 1;        /*One line mode (ignore line breaks)*/
     struct
     {
-        lv_style_t * style; /*Style of the cursor (NULL to use label's style)*/
-        lv_coord_t valid_x; /*Used when stepping up/down in text area when stepping to a shorter
-                               line. (Handled by the library)*/
+        const lv_style_t * style; /*Style of the cursor (NULL to use label's style)*/
+        lv_coord_t valid_x;       /*Used when stepping up/down in text area when stepping to a shorter
+                                    line. (Handled by the library)*/
         uint16_t
             pos; /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
         lv_area_t area;            /*Cursor area relative to the Text Area*/
@@ -255,7 +255,7 @@ static inline void lv_ta_set_edge_flash(lv_obj_t * ta, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style);
+void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, const lv_style_t * style);
 
 /**
  * Enable/disable selection mode.
@@ -374,7 +374,7 @@ static inline bool lv_ta_get_edge_flash(lv_obj_t * ta)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type);
+const lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type);
 
 /**
  * Get the selection index of the text area.

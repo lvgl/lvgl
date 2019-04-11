@@ -54,7 +54,7 @@ typedef struct
     const char ** map_p;                       /*Pointer to the current map*/
     lv_area_t * button_areas;                  /*Array of areas of buttons*/
     lv_btnm_ctrl_t * ctrl_bits;                /*Array of control bytes*/
-    lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of buttons in each state*/
+    const lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of buttons in each state*/
     uint16_t btn_cnt;   /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr; /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
     uint16_t
@@ -131,7 +131,7 @@ void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, lv_style_t * style);
+void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t * style);
 
 /**
  * Enable recoloring of button's texts
@@ -242,7 +242,7 @@ bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type);
+const lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type);
 
 /**
  * Find whether "one toggle" mode is enabled.

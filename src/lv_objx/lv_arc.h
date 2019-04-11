@@ -78,7 +78,7 @@ void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, lv_style_t * style);
+void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -104,7 +104,7 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type);
+const lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type);
 
 /*=====================
  * Other functions

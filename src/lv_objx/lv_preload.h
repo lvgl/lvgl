@@ -104,7 +104,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_t * style);
+void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_style_t * style);
 
 /**
  * Set the animation type of a preloadeer.
@@ -135,7 +135,7 @@ uint16_t lv_preload_get_spin_time(const lv_obj_t * preload);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type);
+const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type);
 
 /**
  * Get the animation type of a preloadeer.

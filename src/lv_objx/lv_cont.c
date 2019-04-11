@@ -303,7 +303,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
 
     /*Adjust margin and get the alignment type*/
     lv_align_t align;
-    lv_style_t * style = lv_obj_get_style(cont);
+    const lv_style_t * style = lv_obj_get_style(cont);
     lv_coord_t hpad_corr;
 
     switch(type) {
@@ -353,7 +353,7 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 
     /*Adjust margin and get the alignment type*/
     lv_align_t align;
-    lv_style_t * style = lv_obj_get_style(cont);
+    const lv_style_t * style = lv_obj_get_style(cont);
     lv_coord_t vpad_corr;
 
     switch(type) {
@@ -400,9 +400,9 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 static void lv_cont_layout_center(lv_obj_t * cont)
 {
     lv_obj_t * child;
-    lv_style_t * style = lv_obj_get_style(cont);
-    uint32_t obj_num   = 0;
-    lv_coord_t h_tot   = 0;
+    const lv_style_t * style = lv_obj_get_style(cont);
+    uint32_t obj_num         = 0;
+    lv_coord_t h_tot         = 0;
 
     LV_LL_READ(cont->child_ll, child)
     {
@@ -444,9 +444,9 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
     lv_obj_t * child_rs;  /* Row starter child */
     lv_obj_t * child_rc;  /* Row closer child */
     lv_obj_t * child_tmp; /* Temporary child */
-    lv_style_t * style = lv_obj_get_style(cont);
-    lv_coord_t w_obj   = lv_obj_get_width(cont);
-    lv_coord_t act_y   = style->body.padding.top;
+    const lv_style_t * style = lv_obj_get_style(cont);
+    lv_coord_t w_obj         = lv_obj_get_width(cont);
+    lv_coord_t act_y         = style->body.padding.top;
     /* Disable child change action because the children will be moved a lot
      * an unnecessary child change signals could be sent*/
 
@@ -545,12 +545,12 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
 static void lv_cont_layout_grid(lv_obj_t * cont)
 {
     lv_obj_t * child;
-    lv_style_t * style = lv_obj_get_style(cont);
-    lv_coord_t w_tot   = lv_obj_get_width(cont);
-    lv_coord_t w_obj   = lv_obj_get_width(lv_obj_get_child(cont, NULL));
-    lv_coord_t h_obj   = lv_obj_get_height(lv_obj_get_child(cont, NULL));
-    uint16_t obj_row   = (w_tot - style->body.padding.left - style->body.padding.right) /
-                       (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
+    const lv_style_t * style = lv_obj_get_style(cont);
+    lv_coord_t w_tot         = lv_obj_get_width(cont);
+    lv_coord_t w_obj         = lv_obj_get_width(lv_obj_get_child(cont, NULL));
+    lv_coord_t h_obj         = lv_obj_get_height(lv_obj_get_child(cont, NULL));
+    uint16_t obj_row         = (w_tot - style->body.padding.left - style->body.padding.right) /
+                               (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
     lv_coord_t x_ofs;
     if(obj_row > 1) {
         x_ofs = (w_obj + (w_tot - style->body.padding.left - style->body.padding.right) -
@@ -607,11 +607,11 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 
     lv_area_t tight_area;
     lv_area_t ori;
-    lv_style_t * style = lv_obj_get_style(cont);
+    const lv_style_t * style = lv_obj_get_style(cont);
     lv_obj_t * child_i;
 
-    lv_obj_t * par         = lv_obj_get_parent(cont);
-    lv_style_t * par_style = lv_obj_get_style(par);
+    lv_obj_t * par               = lv_obj_get_parent(cont);
+    const lv_style_t * par_style = lv_obj_get_style(par);
     lv_area_t flood_area;
     lv_area_copy(&flood_area, &par->coords);
     flood_area.x1 += par_style->body.padding.left;

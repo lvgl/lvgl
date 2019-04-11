@@ -154,7 +154,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, lv_style_t * style)
+void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_style_t * style)
 {
     switch(type) {
         case LV_PRELOAD_STYLE_MAIN: lv_arc_set_style(preload, LV_ARC_STYLE_MAIN, style); break;
@@ -261,9 +261,9 @@ uint16_t lv_preload_get_spin_time(const lv_obj_t * preload)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type)
+const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
 
     switch(type) {
         case LV_PRELOAD_STYLE_MAIN: style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN); break;
@@ -330,7 +330,7 @@ static bool lv_preload_design(lv_obj_t * preload, const lv_area_t * mask, lv_des
     else if(mode == LV_DESIGN_DRAW_MAIN) {
 
         /*Draw a circle as background*/
-        lv_style_t * style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
+        const lv_style_t * style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
         if(style->body.border.width > 0) {
             lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(preload), lv_obj_get_height(preload))) / 2;
             r -= LV_MATH_MIN(style->body.padding.left, style->body.padding.top);

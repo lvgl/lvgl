@@ -132,7 +132,7 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, lv_style_t * style)
+void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_style_t * style)
 {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
@@ -194,9 +194,9 @@ bool lv_slider_get_knob_in(const lv_obj_t * slider)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
+const lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
 {
-    lv_style_t * style    = NULL;
+    const lv_style_t * style    = NULL;
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     switch(type) {
@@ -233,9 +233,9 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
-        lv_style_t * style_bg    = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
-        lv_style_t * style_knob  = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
-        lv_style_t * style_indic = lv_slider_get_style(slider, LV_SLIDER_STYLE_INDIC);
+        const lv_style_t * style_bg    = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
+        const lv_style_t * style_knob  = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
+        const lv_style_t * style_indic = lv_slider_get_style(slider, LV_SLIDER_STYLE_INDIC);
 
         lv_opa_t opa_scale = lv_obj_get_opa_scale(slider);
 
@@ -536,8 +536,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             slider->signal_cb(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-        lv_style_t * style      = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
-        lv_style_t * knob_style = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
+        const lv_style_t * style      = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
+        const lv_style_t * knob_style = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
         lv_coord_t shadow_w     = knob_style->body.shadow.width;
         if(ext->knob_in == 0) {
             /* The smaller size is the knob diameter*/

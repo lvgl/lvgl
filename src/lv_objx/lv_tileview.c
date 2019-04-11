@@ -249,7 +249,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, lv_style_t * style)
+void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const lv_style_t * style)
 {
 
     switch(type) {
@@ -271,9 +271,9 @@ void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, lv_sty
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_t type)
+const lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
     switch(type) {
         case LV_TILEVIEW_STYLE_BG: style = lv_obj_get_style(tileview); break;
         default: style = NULL;
@@ -339,8 +339,8 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     res = ancestor_scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
 
-    lv_obj_t * tileview   = lv_obj_get_parent(scrl);
-    lv_style_t * style_bg = lv_tileview_get_style(tileview, LV_TILEVIEW_STYLE_BG);
+    lv_obj_t * tileview         = lv_obj_get_parent(scrl);
+    const lv_style_t * style_bg = lv_tileview_get_style(tileview, LV_TILEVIEW_STYLE_BG);
 
     /*Apply constraint on moving of the tileview*/
     if(sign == LV_SIGNAL_CORD_CHG) {

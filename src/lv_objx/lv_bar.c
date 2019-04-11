@@ -215,7 +215,7 @@ void lv_bar_set_sym(lv_obj_t * bar, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, lv_style_t * style)
+void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, const lv_style_t * style)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
@@ -286,9 +286,9 @@ bool lv_bar_get_sym(lv_obj_t * bar)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type)
+const lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     switch(type) {
@@ -329,7 +329,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
          * At value = 100% the indicator can cover to whole background and the focused style won't
          * be visible*/
         if(lv_obj_is_focused(bar)) {
-            lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
+            const lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
             lv_style_t style_tmp;
             lv_style_copy(&style_tmp, style_bg);
             style_tmp.body.border.width = 0;
@@ -342,7 +342,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 
         if(ext->cur_value != ext->min_value || ext->sym ||
            ext->anim_start != LV_BAR_ANIM_STATE_INV) {
-            lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
+            const lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
             lv_area_t indic_area;
             lv_area_copy(&indic_area, &bar->coords);
             indic_area.x1 += style_indic->body.padding.left;
@@ -431,7 +431,7 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
         /*Draw the border*/
         if(lv_obj_is_focused(bar)) {
             lv_opa_t opa_scale    = lv_obj_get_opa_scale(bar);
-            lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
+            const lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
             lv_style_t style_tmp;
             lv_style_copy(&style_tmp, style_bg);
             style_tmp.body.opa          = LV_OPA_TRANSP;
@@ -459,7 +459,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-        lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
+        const lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
         if(style_indic->body.shadow.width > bar->ext_size)
             bar->ext_size = style_indic->body.shadow.width;
     } else if(sign == LV_SIGNAL_GET_TYPE) {

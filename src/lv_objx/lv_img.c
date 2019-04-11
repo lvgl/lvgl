@@ -176,7 +176,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
     if(src_type == LV_IMG_SRC_SYMBOL) {
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
-        lv_style_t * style = lv_img_get_style(img);
+        const lv_style_t * style = lv_img_get_style(img);
         lv_point_t size;
         lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space,
                         style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
@@ -342,7 +342,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img)
  */
 static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode_t mode)
 {
-    lv_style_t * style = lv_obj_get_style(img);
+    const lv_style_t * style = lv_obj_get_style(img);
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {

@@ -56,13 +56,13 @@ typedef struct
         month_names; /*Pointer to an array with the name of the month (NULL. use default names)*/
 
     /*Styles*/
-    lv_style_t * style_header;
-    lv_style_t * style_header_pr;
-    lv_style_t * style_day_names;
-    lv_style_t * style_highlighted_days;
-    lv_style_t * style_inactive_days;
-    lv_style_t * style_week_box;
-    lv_style_t * style_today_box;
+    const lv_style_t * style_header;
+    const lv_style_t * style_header_pr;
+    const lv_style_t * style_day_names;
+    const lv_style_t * style_highlighted_days;
+    const lv_style_t * style_inactive_days;
+    const lv_style_t * style_week_box;
+    const lv_style_t * style_today_box;
 } lv_calendar_ext_t;
 
 /*Styles*/
@@ -148,7 +148,7 @@ void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_style_t * style);
+void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -209,7 +209,7 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type);
+const lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type);
 
 /*=====================
  * Other functions

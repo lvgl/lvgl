@@ -236,7 +236,7 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, lv_style_t * style)
+void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, const lv_style_t * style)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
@@ -336,9 +336,9 @@ uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
+const lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
 {
-    lv_style_t * style  = NULL;
+    const lv_style_t * style  = NULL;
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     switch(type) {
@@ -473,7 +473,7 @@ static void mbox_realign(lv_obj_t * mbox)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-    lv_style_t * style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BG);
+    const lv_style_t * style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BG);
     lv_coord_t w = lv_obj_get_width(mbox) - style->body.padding.left - style->body.padding.right;
 
     if(ext->text) {
@@ -481,9 +481,9 @@ static void mbox_realign(lv_obj_t * mbox)
     }
 
     if(ext->btnm) {
-        lv_style_t * btn_bg_style  = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
-        lv_style_t * btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
-        lv_coord_t font_h          = lv_font_get_height(btn_rel_style->text.font);
+        const lv_style_t * btn_bg_style  = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
+        const lv_style_t * btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
+        lv_coord_t font_h                = lv_font_get_height(btn_rel_style->text.font);
         lv_obj_set_size(ext->btnm, w,
                         font_h + btn_rel_style->body.padding.top +
                             btn_rel_style->body.padding.bottom + btn_bg_style->body.padding.top +

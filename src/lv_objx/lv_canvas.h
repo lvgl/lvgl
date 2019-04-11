@@ -92,7 +92,7 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t * style);
+void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -120,7 +120,7 @@ lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas);
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type);
+const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type);
 
 /*=====================
  * Other functions

@@ -67,7 +67,7 @@ typedef struct
     lv_obj_t * scrl; /*The scrollable object on the background*/
     struct
     {
-        lv_style_t * style; /*Style of scrollbars*/
+        const lv_style_t * style; /*Style of scrollbars*/
         lv_area_t
             hor_area; /*Horizontal scrollbar area relative to the page. (Handled by the library) */
         lv_area_t
@@ -79,7 +79,7 @@ typedef struct
     struct
     {
         uint16_t state;      /*Store the current size of the edge flash effect*/
-        lv_style_t * style;  /*Style of edge flash effect (usually homogeneous circle)*/
+        const lv_style_t * style;  /*Style of edge flash effect (usually homogeneous circle)*/
         uint8_t enabled : 1; /*1: Show a flash animation on the edge*/
         uint8_t top_ip : 1; /*Used internally to show that top most position is reached (flash is In
                                Progress)*/
@@ -237,7 +237,7 @@ static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, lv_style_t * style);
+void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -361,7 +361,7 @@ static inline lv_fit_t lv_page_get_scrl_fit_bottom(const lv_obj_t * page)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type);
+const lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type);
 
 /*=====================
  * Other functions

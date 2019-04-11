@@ -174,7 +174,7 @@ void lv_img_decoder_set_custom(lv_img_decoder_info_f_t info_fp, lv_img_decoder_o
  * @return color of the point
  */
 lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                   lv_style_t * style);
+                                   const lv_style_t * style);
 /**
  * Get the alpha value of an image's pixel
  * @param dsc pointer to an image descriptor

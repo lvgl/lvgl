@@ -141,7 +141,7 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t * style)
+void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, const lv_style_t * style)
 {
     switch(type) {
         case LV_CANVAS_STYLE_MAIN: lv_img_set_style(canvas, style); break;
@@ -161,8 +161,8 @@ void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, lv_style_t *
  */
 lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
 {
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    lv_style_t * style    = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
+    lv_canvas_ext_t * ext    = lv_obj_get_ext_attr(canvas);
+    const lv_style_t * style = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
 
     return lv_img_buf_get_px_color(&ext->dsc, x, y, style);
 }
@@ -185,10 +185,10 @@ lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas)
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type)
+const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type)
 {
     // lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
 
     switch(type) {
         case LV_CANVAS_STYLE_MAIN: style = lv_img_get_style(canvas); break;
@@ -323,7 +323,7 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
                       lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y)
 {
     lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
-    lv_style_t * style        = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
+    const lv_style_t * style  = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
     int32_t sinma             = lv_trigo_sin(-angle);
     int32_t cosma             = lv_trigo_sin(-angle + 90); /* cos */
 

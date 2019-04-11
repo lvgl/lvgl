@@ -342,7 +342,7 @@ void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style)
+void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t * style)
 {
     lv_list_ext_t * ext           = lv_obj_get_ext_attr(list);
     lv_btn_style_t btn_style_refr = LV_BTN_STYLE_REL;
@@ -575,9 +575,9 @@ uint16_t lv_list_get_anim_time(const lv_obj_t * list)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
+const lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
 {
-    lv_style_t * style  = NULL;
+    const lv_style_t * style  = NULL;
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
     switch(type) {
