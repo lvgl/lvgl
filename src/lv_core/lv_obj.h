@@ -183,6 +183,13 @@ typedef struct _lv_obj_t
     lv_ll_t child_ll;       /*Linked list to store the children objects*/
 
     lv_area_t coords; /*Coordinates of the object (x1, y1, x2, y2)*/
+#if USE_LV_EXTENDED_CLICK_AREA
+    lv_area_t ext_coords;
+#endif
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+    uint8_t ext_padding_hor;
+    uint8_t ext_padding_ver;
+#endif
 
     lv_event_cb_t event_cb;
     lv_signal_cb_t signal_cb; /*Object type specific signal function*/
@@ -347,6 +354,16 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
  * @param h new height
  */
 void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+/**
+ * Set the size of an extended clickable area
+ * @param obj pointer to an object
+ * @param w extended width to both sides
+ * @param h extended height to both sides
+ */
+void lv_obj_set_ext_paddings(lv_obj_t * obj, uint8_t w, uint8_t h);
+#endif
 
 /**
  * Set the width of an object
@@ -694,6 +711,23 @@ lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj);
  * @return the height which still fits into the container
  */
 lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj);
+
+#if USE_LV_EXTENDED_CLICK_AREA || USE_LV_EXTENDED_CLICK_AREA_TINY
+/**
+ * Get the horizontal padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the horizontal padding
+ */
+uint8_t lv_obj_get_ext_hor_padding(const lv_obj_t * obj);
+
+/**
+ * Get the vertical padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the vertical padding
+ */
+uint8_t lv_obj_get_ext_ver_padding(const lv_obj_t * obj);
+
+#endif
 
 /**
  * Get the extended size attribute of an object
