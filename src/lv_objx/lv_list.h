@@ -52,11 +52,11 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    uint16_t anim_time;                        /*Scroll animation time*/
-    lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of the list element buttons*/
-    lv_style_t * style_img;                    /*Style of the list element images on buttons*/
-    uint32_t size;                             /*the number of items(buttons) in the list*/
-    bool single_mode;                          /* whether single selected mode is enabled */
+    uint16_t anim_time;                              /*Scroll animation time*/
+    const lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of the list element buttons*/
+    const lv_style_t * style_img;                    /*Style of the list element images on buttons*/
+    uint32_t size;                                   /*the number of items(buttons) in the list*/
+    bool single_mode;                                /* whether single selected mode is enabled */
 #if LV_USE_GROUP
     lv_obj_t *
         last_sel; /* The last selected button. It will be reverted when the list is focused again */
@@ -184,7 +184,7 @@ static inline void lv_list_set_edge_flash(lv_obj_t * list, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, lv_style_t * style);
+void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -299,7 +299,7 @@ static inline bool lv_list_get_edge_flash(lv_obj_t * list)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type);
+const lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type);
 
 /*=====================
  * Other functions

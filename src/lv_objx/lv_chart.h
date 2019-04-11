@@ -206,7 +206,7 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y);
  * @param chart pointer to a chart object
  * @param style pointer to a style
  */
-static inline void lv_chart_set_style(lv_obj_t * chart, lv_style_t * style)
+static inline void lv_chart_set_style(lv_obj_t * chart, const lv_style_t * style)
 {
     lv_obj_set_style(chart, style);
 }
@@ -280,7 +280,7 @@ lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart);
  * @param chart pointer to an chart object
  * @return pointer to the chart's style
  */
-static inline lv_style_t * lv_chart_get_style(const lv_obj_t * chart)
+static inline const lv_style_t * lv_chart_get_style(const lv_obj_t * chart)
 {
     return lv_obj_get_style(chart);
 }

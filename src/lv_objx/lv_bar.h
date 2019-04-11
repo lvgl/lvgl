@@ -50,8 +50,8 @@ typedef struct
     int16_t anim_end;
     int16_t anim_state;
     uint16_t anim_time;
-    uint8_t sym : 1;          /*Symmetric: means the center is around zero value*/
-    lv_style_t * style_indic; /*Style of the indicator*/
+    uint8_t sym : 1;                /*Symmetric: means the center is around zero value*/
+    const lv_style_t * style_indic; /*Style of the indicator*/
 } lv_bar_ext_t;
 
 enum {
@@ -106,7 +106,7 @@ void lv_bar_set_sym(lv_obj_t * bar, bool en);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, lv_style_t * style);
+void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -146,7 +146,7 @@ bool lv_bar_get_sym(lv_obj_t * bar);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type);
+const lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type);
 
 /**********************
  *      MACROS

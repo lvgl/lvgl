@@ -419,16 +419,16 @@ uint16_t lv_label_get_anim_speed(const lv_obj_t * label)
  */
 void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t * pos)
 {
-    const char * txt        = lv_label_get_text(label);
-    lv_label_ext_t * ext    = lv_obj_get_ext_attr(label);
-    uint32_t line_start     = 0;
-    uint32_t new_line_start = 0;
-    lv_coord_t max_w        = lv_obj_get_width(label);
-    lv_style_t * style      = lv_obj_get_style(label);
-    const lv_font_t * font  = style->text.font;
-    uint8_t letter_height   = lv_font_get_height(font);
-    lv_coord_t y            = 0;
-    lv_txt_flag_t flag      = LV_TXT_FLAG_NONE;
+    const char * txt         = lv_label_get_text(label);
+    lv_label_ext_t * ext     = lv_obj_get_ext_attr(label);
+    uint32_t line_start      = 0;
+    uint32_t new_line_start  = 0;
+    lv_coord_t max_w         = lv_obj_get_width(label);
+    const lv_style_t * style = lv_obj_get_style(label);
+    const lv_font_t * font   = style->text.font;
+    uint8_t letter_height    = lv_font_get_height(font);
+    lv_coord_t y             = 0;
+    lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
@@ -492,16 +492,16 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
  */
 uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 {
-    const char * txt        = lv_label_get_text(label);
-    lv_label_ext_t * ext    = lv_obj_get_ext_attr(label);
-    uint32_t line_start     = 0;
-    uint32_t new_line_start = 0;
-    lv_coord_t max_w        = lv_obj_get_width(label);
-    lv_style_t * style      = lv_obj_get_style(label);
-    const lv_font_t * font  = style->text.font;
-    uint8_t letter_height   = lv_font_get_height(font);
-    lv_coord_t y            = 0;
-    lv_txt_flag_t flag      = LV_TXT_FLAG_NONE;
+    const char * txt         = lv_label_get_text(label);
+    lv_label_ext_t * ext     = lv_obj_get_ext_attr(label);
+    uint32_t line_start      = 0;
+    uint32_t new_line_start  = 0;
+    lv_coord_t max_w         = lv_obj_get_width(label);
+    const lv_style_t * style = lv_obj_get_style(label);
+    const lv_font_t * font   = style->text.font;
+    uint8_t letter_height    = lv_font_get_height(font);
+    lv_coord_t y             = 0;
+    lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
@@ -566,16 +566,16 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
  */
 bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
 {
-    const char * txt        = lv_label_get_text(label);
-    lv_label_ext_t * ext    = lv_obj_get_ext_attr(label);
-    uint32_t line_start     = 0;
-    uint32_t new_line_start = 0;
-    lv_coord_t max_w        = lv_obj_get_width(label);
-    lv_style_t * style      = lv_obj_get_style(label);
-    const lv_font_t * font  = style->text.font;
-    uint8_t letter_height   = lv_font_get_height(font);
-    lv_coord_t y            = 0;
-    lv_txt_flag_t flag      = LV_TXT_FLAG_NONE;
+    const char * txt         = lv_label_get_text(label);
+    lv_label_ext_t * ext     = lv_obj_get_ext_attr(label);
+    uint32_t line_start      = 0;
+    uint32_t new_line_start  = 0;
+    lv_coord_t max_w         = lv_obj_get_width(label);
+    const lv_style_t * style = lv_obj_get_style(label);
+    const lv_font_t * font   = style->text.font;
+    uint8_t letter_height    = lv_font_get_height(font);
+    lv_coord_t y             = 0;
+    lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
@@ -716,7 +716,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         return false;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_area_t coords;
-        lv_style_t * style = lv_obj_get_style(label);
+        const lv_style_t * style = lv_obj_get_style(label);
         lv_opa_t opa_scale = lv_obj_get_opa_scale(label);
         lv_obj_get_coords(label, &coords);
 
@@ -826,11 +826,11 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         if(ext->body_draw) {
-            lv_style_t * style = lv_label_get_style(label);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.left);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.right);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.top);
-            label->ext_size    = LV_MATH_MAX(label->ext_size, style->body.padding.bottom);
+            const lv_style_t * style = lv_label_get_style(label);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.left);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.right);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.top);
+            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.bottom);
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
@@ -854,9 +854,9 @@ static void lv_label_refr_text(lv_obj_t * label)
 
     if(ext->text == NULL) return;
 
-    lv_coord_t max_w       = lv_obj_get_width(label);
-    lv_style_t * style     = lv_obj_get_style(label);
-    const lv_font_t * font = style->text.font;
+    lv_coord_t max_w         = lv_obj_get_width(label);
+    const lv_style_t * style = lv_obj_get_style(label);
+    const lv_font_t * font   = style->text.font;
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND) {

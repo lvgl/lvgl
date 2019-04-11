@@ -130,7 +130,7 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, lv_style_t * style);
+void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, const lv_style_t * style);
 
 /**
  * Set whether recoloring is enabled. Must be called after `lv_mbox_add_btns`.
@@ -179,7 +179,7 @@ uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type);
+const lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type);
 
 /**
  * Get whether recoloring is enabled

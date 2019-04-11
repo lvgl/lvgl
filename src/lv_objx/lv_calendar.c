@@ -279,7 +279,7 @@ void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, lv_style_t * style)
+void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, const lv_style_t * style)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
@@ -384,9 +384,9 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type)
+const lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type)
 {
-    lv_style_t * style      = NULL;
+    const lv_style_t * style      = NULL;
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
     switch(type) {
@@ -569,7 +569,7 @@ static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touche
 {
     lv_area_t days_area;
     lv_area_copy(&days_area, &calendar->coords);
-    lv_style_t * style_bg = lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG);
+    const lv_style_t * style_bg = lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG);
     days_area.x1 += style_bg->body.padding.left;
     days_area.x2 -= style_bg->body.padding.right;
     days_area.y1 = calendar->coords.y1 + get_header_height(calendar) +
@@ -670,7 +670,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
                   NULL, -1, -1);
 
     /*Add the left arrow*/
-    lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
+    const lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 += ext->style_header->body.padding.left;
     lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_LEFT, LV_TXT_FLAG_NONE,
                   NULL, -1, -1);
@@ -719,8 +719,8 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
  */
 static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 {
-    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    lv_style_t * style_bg   = lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG);
+    lv_calendar_ext_t * ext     = lv_obj_get_ext_attr(calendar);
+    const lv_style_t * style_bg = lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG);
     lv_area_t label_area;
     lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
     label_area.y1      = calendar->coords.y1 + get_header_height(calendar) +
@@ -739,7 +739,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     uint8_t day_cnt;
     uint8_t month_start_day = get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
     day_draw_state_t draw_state; /*true: Not the prev. or next month is drawn*/
-    lv_style_t * act_style;
+    const lv_style_t * act_style;
 
     /*If starting with the first day of the week then the previous month is not visible*/
     if(month_start_day == 0) {
@@ -821,7 +821,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
             }
 
             /*Get the final style : highlighted/week box/today box/normal*/
-            lv_style_t * final_style;
+            const lv_style_t * final_style;
             if(draw_state == DAY_DRAW_PREV_MONTH &&
                is_highlighted(
                    calendar, ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0),

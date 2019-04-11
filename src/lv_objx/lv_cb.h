@@ -118,7 +118,7 @@ static inline void lv_cb_set_inactive(lv_obj_t * cb)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t * style);
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -147,7 +147,7 @@ static inline bool lv_cb_is_checked(const lv_obj_t * cb)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type);
+const lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type);
 
 /**********************
  *      MACROS

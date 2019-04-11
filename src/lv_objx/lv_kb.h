@@ -135,7 +135,7 @@ static inline void lv_kb_set_ctrl_map(lv_obj_t * kb, const lv_btnm_ctrl_t ctrl_m
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, lv_style_t * style);
+void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -178,7 +178,7 @@ static inline const char ** lv_kb_get_map_array(const lv_obj_t * kb)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type);
+const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type);
 
 /*=====================
  * Other functions

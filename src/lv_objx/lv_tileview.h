@@ -118,7 +118,7 @@ static inline void lv_tileview_set_edge_flash(lv_obj_t * tileview, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, lv_style_t * style);
+void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -140,7 +140,7 @@ static inline bool lv_tileview_get_edge_flash(lv_obj_t * tileview)
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_t type);
+const lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_t type);
 
 /*=====================
  * Other functions

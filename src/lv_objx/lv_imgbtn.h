@@ -143,7 +143,7 @@ static inline void lv_imgbtn_toggle(lv_obj_t * imgbtn)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t * style);
+void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -211,7 +211,7 @@ static inline bool lv_imgbtn_get_toggle(const lv_obj_t * imgbtn)
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_imgbtn_get_style(const lv_obj_t * imgbtn, lv_imgbtn_style_t type);
+const lv_style_t * lv_imgbtn_get_style(const lv_obj_t * imgbtn, lv_imgbtn_style_t type);
 
 /*=====================
  * Other functions

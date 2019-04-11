@@ -54,7 +54,7 @@ typedef struct
 {
     lv_cont_ext_t cont; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t * styles[LV_BTN_STATE_NUM]; /*Styles in each state*/
+    const lv_style_t * styles[LV_BTN_STATE_NUM]; /*Styles in each state*/
     lv_btn_state_t state; /*Current state of the button from 'lv_btn_state_t' enum*/
 #if LV_BTN_INK_EFFECT
     uint16_t ink_in_time;   /*[ms] Time of ink fill effect (0: disable ink effect)*/
@@ -185,7 +185,7 @@ void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, lv_style_t * style);
+void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -282,7 +282,7 @@ uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type);
+const lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type);
 
 /**********************
  *      MACROS

@@ -42,8 +42,8 @@ typedef struct
 {
     lv_slider_ext_t slider; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t * style_knob_off; /*Style of the knob when the switch is OFF*/
-    lv_style_t *
+    const lv_style_t * style_knob_off; /*Style of the knob when the switch is OFF*/
+    const lv_style_t *
         style_knob_on; /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
     lv_coord_t start_x;
     uint8_t changed : 1; /*Indicates the switch state explicitly changed by drag*/
@@ -105,7 +105,7 @@ bool lv_sw_toggle(lv_obj_t * sw, bool anim);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, lv_style_t * style);
+void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style);
 
 #if LV_USE_ANIMATION
 /**
@@ -137,7 +137,7 @@ static inline bool lv_sw_get_state(const lv_obj_t * sw)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type);
+const lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type);
 
 /**
  * Get the animation time of the switch

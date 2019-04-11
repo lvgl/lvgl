@@ -164,7 +164,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
     ext->map_p = map;
 
     /*Set size and positions of the buttons*/
-    lv_style_t * style_bg = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
+    const lv_style_t * style_bg = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
     lv_coord_t max_w =
         lv_obj_get_width(btnm) - style_bg->body.padding.left - style_bg->body.padding.right;
     lv_coord_t max_h =
@@ -303,7 +303,7 @@ void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, lv_style_t * style)
+void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t * style)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
@@ -530,9 +530,9 @@ bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
+const lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
 {
-    lv_style_t * style  = NULL;
+    const lv_style_t * style  = NULL;
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     switch(type) {
@@ -586,8 +586,8 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
         ancestor_design_f(btnm, mask, mode);
 
         lv_btnm_ext_t * ext   = lv_obj_get_ext_attr(btnm);
-        lv_style_t * bg_style = lv_obj_get_style(btnm);
-        lv_style_t * btn_style;
+        const lv_style_t * bg_style = lv_obj_get_style(btnm);
+        const lv_style_t * btn_style;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(btnm);
 
         lv_area_t area_btnm;
@@ -831,7 +831,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_DOWN) {
-            lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
+            const lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
                 ext->btn_id_pr = 0;
@@ -853,7 +853,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_UP) {
-            lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
+            const lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
                 ext->btn_id_pr = 0;

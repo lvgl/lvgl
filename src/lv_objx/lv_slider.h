@@ -41,7 +41,7 @@ typedef struct
 {
     lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_t * style_knob; /*Style of the knob*/
+    const lv_style_t * style_knob; /*Style of the knob*/
     int16_t
         drag_value; /*Store a temporal value during press until release (Handled by the library)*/
     uint8_t knob_in : 1; /*1: Draw the knob inside the bar*/
@@ -107,7 +107,7 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, lv_style_t * style);
+void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -161,7 +161,7 @@ bool lv_slider_get_knob_in(const lv_obj_t * slider);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type);
+const lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type);
 
 /**********************
  *      MACROS

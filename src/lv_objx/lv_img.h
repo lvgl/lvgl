@@ -121,7 +121,7 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y);
  * @param img pointer to an image object
  * @param style pointer to a style
  */
-static inline void lv_img_set_style(lv_obj_t * img, lv_style_t * style)
+static inline void lv_img_set_style(lv_obj_t * img, const lv_style_t * style)
 {
     lv_obj_set_style(img, style);
 }
@@ -181,7 +181,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img);
  * @param img pointer to an image object
  * @return pointer to the image's style
  */
-static inline lv_style_t * lv_img_get_style(const lv_obj_t * img)
+static inline const lv_style_t * lv_img_get_style(const lv_obj_t * img)
 {
     return lv_obj_get_style(img);
 }

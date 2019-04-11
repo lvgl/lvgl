@@ -189,7 +189,7 @@ typedef struct _lv_obj_t
     lv_design_cb_t design_cb; /*Object type specific design function*/
 
     void * ext_attr;      /*Object type specific extended data*/
-    lv_style_t * style_p; /*Pointer to the object's style*/
+    const lv_style_t * style_p; /*Pointer to the object's style*/
 
 #if LV_USE_GROUP != 0
     void * group_p; /*Pointer to the group of the object*/
@@ -407,7 +407,7 @@ void lv_obj_set_auto_realign(lv_obj_t * obj, bool en);
  * @param obj pointer to an object
  * @param style_p pointer to the new style
  */
-void lv_obj_set_style(lv_obj_t * obj, lv_style_t * style);
+void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style);
 
 /**
  * Notify an object about its style is modified
@@ -718,7 +718,7 @@ bool lv_obj_get_auto_realign(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to a style
  */
-lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
+const lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 
 /*-----------------
  * Attribute get

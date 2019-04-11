@@ -254,7 +254,7 @@ void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, lv_style_t * style)
+void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, const lv_style_t * style)
 {
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
@@ -350,9 +350,9 @@ uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type)
+const lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
     switch(type) {

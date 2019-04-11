@@ -389,7 +389,7 @@ void lv_ta_del_char(lv_obj_t * ta)
 
     /*Don't let 'width == 0' because cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
-        lv_style_t * style = lv_obj_get_style(ext->label);
+        const lv_style_t * style = lv_obj_get_style(ext->label);
         lv_obj_set_width(ext->label, style->line.width);
     }
 
@@ -454,7 +454,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 
     /*Don't let 'width == 0' because the cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
-        lv_style_t * style = lv_obj_get_style(ext->label);
+        const lv_style_t * style = lv_obj_get_style(ext->label);
         lv_obj_set_width(ext->label, lv_font_get_width(style->text.font, ' '));
     }
 
@@ -538,7 +538,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     /*Position the label to make the cursor visible*/
     lv_obj_t * label_par = lv_obj_get_parent(ext->label);
     lv_point_t cur_pos;
-    lv_style_t * style       = lv_obj_get_style(ta);
+    const lv_style_t * style = lv_obj_get_style(ta);
     const lv_font_t * font_p = style->text.font;
     lv_area_t label_cords;
     lv_area_t ta_cords;
@@ -660,10 +660,10 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
     if(ext->one_line == en) return;
 
     if(en) {
-        lv_style_t * style_ta    = lv_obj_get_style(ta);
-        lv_style_t * style_scrl  = lv_obj_get_style(lv_page_get_scrl(ta));
-        lv_style_t * style_label = lv_obj_get_style(ext->label);
-        lv_coord_t font_h        = lv_font_get_height(style_label->text.font);
+        const lv_style_t * style_ta    = lv_obj_get_style(ta);
+        const lv_style_t * style_scrl  = lv_obj_get_style(lv_page_get_scrl(ta));
+        const lv_style_t * style_label = lv_obj_get_style(ext->label);
+        lv_coord_t font_h              = lv_font_get_height(style_label->text.font);
 
         ext->one_line = 1;
         lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
@@ -674,7 +674,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         lv_obj_set_pos(lv_page_get_scrl(ta), style_ta->body.padding.left,
                        style_ta->body.padding.top);
     } else {
-        lv_style_t * style_ta = lv_obj_get_style(ta);
+        const lv_style_t * style_ta = lv_obj_get_style(ta);
 
         ext->one_line = 0;
         lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
@@ -768,7 +768,7 @@ void lv_ta_set_insert_replace(lv_obj_t * ta, const char * txt)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, lv_style_t * style)
+void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, const lv_style_t * style)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
@@ -923,9 +923,9 @@ uint16_t lv_ta_get_max_length(lv_obj_t * ta)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
+const lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
     lv_ta_ext_t * ext  = lv_obj_get_ext_attr(ta);
 
     switch(type) {
@@ -1050,9 +1050,9 @@ void lv_ta_cursor_down(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, lv_ta_get_cursor_pos(ta), &pos);
 
     /*Increment the y with one line and keep the valid x*/
-    lv_style_t * label_style = lv_obj_get_style(ext->label);
-    const lv_font_t * font_p = label_style->text.font;
-    lv_coord_t font_h        = lv_font_get_height(font_p);
+    const lv_style_t * label_style = lv_obj_get_style(ext->label);
+    const lv_font_t * font_p       = label_style->text.font;
+    lv_coord_t font_h              = lv_font_get_height(font_p);
     pos.y += font_h + label_style->text.line_space + 1;
     pos.x = ext->cursor.valid_x;
 
@@ -1081,9 +1081,9 @@ void lv_ta_cursor_up(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, lv_ta_get_cursor_pos(ta), &pos);
 
     /*Decrement the y with one line and keep the valid x*/
-    lv_style_t * label_style = lv_obj_get_style(ext->label);
-    const lv_font_t * font   = label_style->text.font;
-    lv_coord_t font_h        = lv_font_get_height(font);
+    const lv_style_t * label_style = lv_obj_get_style(ext->label);
+    const lv_font_t * font         = label_style->text.font;
+    lv_coord_t font_h              = lv_font_get_height(font);
     pos.y -= font_h + label_style->text.line_space - 1;
     pos.x = ext->cursor.valid_x;
 
@@ -1219,13 +1219,13 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         /* (The created label will be deleted automatically) */
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(ext->label) {
-            lv_obj_t * scrl         = lv_page_get_scrl(ta);
-            lv_style_t * style_ta   = lv_obj_get_style(ta);
-            lv_style_t * style_scrl = lv_obj_get_style(scrl);
+            lv_obj_t * scrl               = lv_page_get_scrl(ta);
+            const lv_style_t * style_ta   = lv_obj_get_style(ta);
+            const lv_style_t * style_scrl = lv_obj_get_style(scrl);
             if(ext->one_line) {
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
-                lv_style_t * style_label = lv_obj_get_style(ext->label);
-                lv_coord_t font_h        = lv_font_get_height(style_label->text.font);
+                const lv_style_t * style_label = lv_obj_get_style(ext->label);
+                lv_coord_t font_h              = lv_font_get_height(style_label->text.font);
                 lv_obj_set_height(
                     ta, font_h + style_ta->body.padding.top + style_ta->body.padding.bottom +
                             style_scrl->body.padding.top + style_scrl->body.padding.bottom);
@@ -1250,8 +1250,8 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         if(ext->label) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
                lv_obj_get_height(ta) != lv_area_get_height(param)) {
-                lv_obj_t * scrl         = lv_page_get_scrl(ta);
-                lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                lv_obj_t * scrl               = lv_page_get_scrl(ta);
+                const lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
                 lv_obj_set_pos(ext->label, style_scrl->body.padding.left,
                                style_scrl->body.padding.top);
@@ -1264,8 +1264,8 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         if(ext->placeholder) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
                lv_obj_get_height(ta) != lv_area_get_height(param)) {
-                lv_obj_t * scrl         = lv_page_get_scrl(ta);
-                lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                lv_obj_t * scrl               = lv_page_get_scrl(ta);
+                const lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->placeholder, lv_page_get_fit_width(ta));
                 lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left,
                                style_scrl->body.padding.top);
@@ -1354,8 +1354,8 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
     if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
         /*Set ext. size because the cursor might be out of this object*/
-        lv_style_t * style_label = lv_obj_get_style(ext->label);
-        lv_coord_t font_h        = lv_font_get_height(style_label->text.font);
+        const lv_style_t * style_label = lv_obj_get_style(ext->label);
+        lv_coord_t font_h              = lv_font_get_height(style_label->text.font);
         scrl->ext_size = LV_MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Set the label width according to the text area width*/
@@ -1363,7 +1363,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             if(lv_obj_get_width(ta) != lv_area_get_width(param) ||
                lv_obj_get_height(ta) != lv_area_get_height(param)) {
 
-                lv_style_t * style_scrl = lv_obj_get_style(scrl);
+                const lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
                 lv_obj_set_pos(ext->label, style_scrl->body.padding.left,
                                style_scrl->body.padding.top);
@@ -1478,8 +1478,8 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
 
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
 {
-    lv_ta_ext_t * ext        = lv_obj_get_ext_attr(ta);
-    lv_style_t * label_style = lv_obj_get_style(ext->label);
+    lv_ta_ext_t * ext              = lv_obj_get_ext_attr(ta);
+    const lv_style_t * label_style = lv_obj_get_style(ext->label);
 
     if(ext->cursor.style) {
         lv_style_copy(style_res, ext->cursor.style);
@@ -1509,8 +1509,8 @@ static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
 
 static void refr_cursor_area(lv_obj_t * ta)
 {
-    lv_ta_ext_t * ext        = lv_obj_get_ext_attr(ta);
-    lv_style_t * label_style = lv_obj_get_style(ext->label);
+    lv_ta_ext_t * ext              = lv_obj_get_ext_attr(ta);
+    const lv_style_t * label_style = lv_obj_get_style(ext->label);
 
     lv_style_t cur_style;
     get_cursor_style(ta, &cur_style);
@@ -1616,8 +1616,8 @@ static void placeholder_update(lv_obj_t * ta)
 
     if(ta_text[0] == '\0') {
         /*Be sure the main label and the placeholder has the same coordinates*/
-        lv_obj_t * scrl         = lv_page_get_scrl(ta);
-        lv_style_t * style_scrl = lv_obj_get_style(scrl);
+        lv_obj_t * scrl               = lv_page_get_scrl(ta);
+        const lv_style_t * style_scrl = lv_obj_get_style(scrl);
         lv_obj_set_pos(ext->placeholder, style_scrl->body.padding.left,
                        style_scrl->body.padding.top);
         lv_obj_set_pos(ext->label, style_scrl->body.padding.left, style_scrl->body.padding.top);

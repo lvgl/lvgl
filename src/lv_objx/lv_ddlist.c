@@ -280,7 +280,7 @@ void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, lv_style_t * style)
+void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, const lv_style_t * style)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -409,7 +409,7 @@ uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type)
+const lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -517,9 +517,9 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         lv_opa_t opa_scale    = lv_obj_get_opa_scale(ddlist);
         /*If the list is opened draw a rectangle under the selected item*/
         if(ext->opened != 0 || ext->force_sel) {
-            lv_style_t * style     = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-            const lv_font_t * font = style->text.font;
-            lv_coord_t font_h      = lv_font_get_height(font);
+            const lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
+            const lv_font_t * font   = style->text.font;
+            lv_coord_t font_h        = lv_font_get_height(font);
 
             /*Draw the selected*/
             lv_area_t rect_area;
@@ -542,9 +542,9 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 
         /*Redraw only in opened state*/
         if(ext->opened || ext->force_sel) {
-            lv_style_t * style     = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-            const lv_font_t * font = style->text.font;
-            lv_coord_t font_h      = lv_font_get_height(font);
+            const lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
+            const lv_font_t * font   = style->text.font;
+            lv_coord_t font_h        = lv_font_get_height(font);
 
             lv_area_t area_sel;
             area_sel.y1 = ext->label->coords.y1;
@@ -558,7 +558,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
             bool area_ok;
             area_ok = lv_area_intersect(&mask_sel, mask, &area_sel);
             if(area_ok) {
-                lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_SEL);
+                const lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_SEL);
                 lv_style_t new_style;
                 lv_style_copy(&new_style, style);
                 new_style.text.color = sel_style->text.color;
@@ -573,10 +573,10 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         else {
             /*Draw a arrow in ddlist if enabled*/
             if(ext->draw_arrow) {
-                lv_style_t * style     = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-                const lv_font_t * font = style->text.font;
-                lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-                lv_coord_t font_h      = lv_font_get_height(font);
+                const lv_style_t * style     = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
+                const lv_font_t * font       = style->text.font;
+                const lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
+                lv_coord_t font_h            = lv_font_get_height(font);
                 lv_style_t new_style;
                 lv_style_copy(&new_style, style);
                 new_style.text.color = sel_style->text.color;
@@ -732,8 +732,8 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
         /*TODO review this*/
         /* Because of the wider selected rectangle ext. size
          * In this way by dragging the scrollable part the wider rectangle area can be redrawn too*/
-        lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-        lv_coord_t hpad    = LV_MATH_MAX(style->body.padding.left, style->body.padding.right);
+        const lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
+        lv_coord_t hpad          = LV_MATH_MAX(style->body.padding.left, style->body.padding.right);
         if(scrl->ext_size < hpad) scrl->ext_size = hpad;
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
@@ -823,8 +823,8 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
 #if LV_USE_ANIMATION == 0
     anim_en = false;
 #endif
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    lv_style_t * style    = lv_obj_get_style(ddlist);
+    lv_ddlist_ext_t * ext    = lv_obj_get_ext_attr(ddlist);
+    const lv_style_t * style = lv_obj_get_style(ddlist);
     lv_coord_t new_height;
     if(ext->opened) { /*Open the list*/
         if(ext->fix_height == 0)
@@ -834,10 +834,10 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
             new_height = ext->fix_height;
 
     } else { /*Close the list*/
-        const lv_font_t * font   = style->text.font;
-        lv_style_t * label_style = lv_obj_get_style(ext->label);
-        lv_coord_t font_h        = lv_font_get_height(font);
-        new_height               = font_h + 2 * label_style->text.line_space;
+        const lv_font_t * font         = style->text.font;
+        const lv_style_t * label_style = lv_obj_get_style(ext->label);
+        lv_coord_t font_h              = lv_font_get_height(font);
+        new_height                     = font_h + 2 * label_style->text.line_space;
 
         lv_page_set_sb_mode(ddlist, LV_SB_MODE_HIDE);
     }
@@ -904,12 +904,12 @@ static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int32_t height)
  */
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
 {
-    lv_ddlist_ext_t * ext    = lv_obj_get_ext_attr(ddlist);
-    lv_style_t * style       = lv_obj_get_style(ddlist);
-    const lv_font_t * font   = style->text.font;
-    lv_coord_t font_h        = lv_font_get_height(font);
-    lv_style_t * label_style = lv_obj_get_style(ext->label);
-    lv_obj_t * scrl          = lv_page_get_scrl(ddlist);
+    lv_ddlist_ext_t * ext          = lv_obj_get_ext_attr(ddlist);
+    const lv_style_t * style       = lv_obj_get_style(ddlist);
+    const lv_font_t * font         = style->text.font;
+    lv_coord_t font_h              = lv_font_get_height(font);
+    const lv_style_t * label_style = lv_obj_get_style(ext->label);
+    lv_obj_t * scrl                = lv_page_get_scrl(ddlist);
 
     lv_coord_t h       = lv_obj_get_height(ddlist);
     lv_coord_t line_y1 = ext->sel_opt_id * (font_h + label_style->text.line_space) +

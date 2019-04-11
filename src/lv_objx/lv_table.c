@@ -365,7 +365,7 @@ void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col,
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, lv_style_t * style)
+void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, const lv_style_t * style)
 {
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
 
@@ -565,10 +565,10 @@ bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col)
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type)
+const lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type)
 {
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    lv_style_t * style   = NULL;
+    const lv_style_t * style   = NULL;
 
     switch(type) {
         case LV_TABLE_STYLE_BG: style = lv_obj_get_style(table); break;
@@ -606,9 +606,9 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         ancestor_scrl_design(table, mask, mode);
 
-        lv_table_ext_t * ext  = lv_obj_get_ext_attr(table);
-        lv_style_t * bg_style = lv_obj_get_style(table);
-        lv_style_t * cell_style;
+        lv_table_ext_t * ext        = lv_obj_get_ext_attr(table);
+        const lv_style_t * bg_style = lv_obj_get_style(table);
+        const lv_style_t * cell_style;
         lv_coord_t h_row;
         lv_point_t txt_size;
         lv_area_t cell_area;
@@ -785,7 +785,7 @@ static void refr_size(lv_obj_t * table)
         h += get_row_height(table, i);
     }
 
-    lv_style_t * bg_style = lv_obj_get_style(table);
+    const lv_style_t * bg_style = lv_obj_get_style(table);
 
     w += bg_style->body.padding.left + bg_style->body.padding.right;
     h += bg_style->body.padding.top + bg_style->body.padding.bottom;
@@ -799,7 +799,7 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
     lv_point_t txt_size;
     lv_coord_t txt_w;
-    lv_style_t * cell_style;
+    const lv_style_t * cell_style;
 
     uint16_t row_start = row_id * ext->col_cnt;
     uint16_t cell;
