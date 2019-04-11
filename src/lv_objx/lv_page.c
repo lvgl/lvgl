@@ -624,7 +624,7 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
     /*Cache page bg style for temporary modification*/
     const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
     lv_style_t style_tmp;
-    memcpy(&style_tmp, style, sizeof(lv_style_t));
+    lv_style_copy(&style_tmp, style);
 
     if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw without border*/
