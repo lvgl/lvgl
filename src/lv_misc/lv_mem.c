@@ -18,8 +18,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_MEM_ADD_JUNK                                                                            \
-    0 /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
+/*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
+#define LV_MEM_ADD_JUNK     0
 
 #ifdef LV_MEM_ENV64
 #define MEM_UNIT uint64_t
