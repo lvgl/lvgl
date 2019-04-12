@@ -151,7 +151,7 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, lv_style_t * style)
+void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, const lv_style_t * style)
 {
     lv_btn_set_style(imgbtn, type, style);
 }
@@ -222,7 +222,7 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_btn_state_t state)
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_imgbtn_get_style(const lv_obj_t * imgbtn, lv_imgbtn_style_t type)
+const lv_style_t * lv_imgbtn_get_style(const lv_obj_t * imgbtn, lv_imgbtn_style_t type)
 {
     return lv_btn_get_style(imgbtn, type);
 }
@@ -264,10 +264,10 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Just draw an image*/
-        lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
-        lv_btn_state_t state  = lv_imgbtn_get_state(imgbtn);
-        lv_style_t * style    = lv_imgbtn_get_style(imgbtn, state);
-        lv_opa_t opa_scale    = lv_obj_get_opa_scale(imgbtn);
+        lv_imgbtn_ext_t * ext    = lv_obj_get_ext_attr(imgbtn);
+        lv_btn_state_t state     = lv_imgbtn_get_state(imgbtn);
+        const lv_style_t * style = lv_imgbtn_get_style(imgbtn, state);
+        lv_opa_t opa_scale       = lv_obj_get_opa_scale(imgbtn);
 
 #if LV_IMGBTN_TILED == 0
         const void * src = ext->img_src[state];

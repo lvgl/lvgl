@@ -142,7 +142,7 @@ void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time);
  * @param type which style should be set
  * @param style pointer to the new style
  */
-void lv_tabview_set_style(lv_obj_t * tabview, lv_tabview_style_t type, lv_style_t * style);
+void lv_tabview_set_style(lv_obj_t * tabview, lv_tabview_style_t type, const lv_style_t * style);
 
 /**
  * Set the position of tab select buttons
@@ -203,7 +203,7 @@ uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview);
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_style_t type);
+const lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_style_t type);
 
 /**
  * Get position of tab select buttons

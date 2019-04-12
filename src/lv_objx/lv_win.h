@@ -58,13 +58,13 @@ typedef struct
 {
     /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * page;            /*Pointer to a page which holds the content*/
-    lv_obj_t * header;          /*Pointer to the header container of the window*/
-    lv_obj_t * title;           /*Pointer to the title label of the window*/
-    lv_style_t * style_header;  /*Style of the header container*/
-    lv_style_t * style_btn_rel; /*Control button releases style*/
-    lv_style_t * style_btn_pr;  /*Control button pressed style*/
-    lv_coord_t btn_size;        /*Size of the control buttons (square)*/
+    lv_obj_t * page;                  /*Pointer to a page which holds the content*/
+    lv_obj_t * header;                /*Pointer to the header container of the window*/
+    lv_obj_t * title;                 /*Pointer to the title label of the window*/
+    const lv_style_t * style_header;  /*Style of the header container*/
+    const lv_style_t * style_btn_rel; /*Control button releases style*/
+    const lv_style_t * style_btn_pr;  /*Control button pressed style*/
+    lv_coord_t btn_size;              /*Size of the control buttons (square)*/
 } lv_win_ext_t;
 
 enum {
@@ -154,7 +154,7 @@ void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, lv_style_t * style);
+void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, const lv_style_t * style);
 
 /**
  * Set drag status of a window. If set to 'true' window can be dragged like on a PC.
@@ -223,7 +223,7 @@ lv_coord_t lv_win_get_width(lv_obj_t * win);
  * @param type which style window be get
  * @return style pointer to a style
  */
-lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type);
+const lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type);
 
 /**
  * Get drag status of a window. If set to 'true' window can be dragged like on a PC.

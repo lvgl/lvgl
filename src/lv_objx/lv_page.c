@@ -243,7 +243,7 @@ void lv_page_set_edge_flash(lv_obj_t * page, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, lv_style_t * style)
+void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, const lv_style_t * style)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
@@ -329,8 +329,8 @@ bool lv_page_get_edge_flash(lv_obj_t * page)
  */
 lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
 {
-    lv_style_t * bg_style   = lv_page_get_style(page, LV_PAGE_STYLE_BG);
-    lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+    const lv_style_t * bg_style   = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    const lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
     return lv_obj_get_width(page) - bg_style->body.padding.left - bg_style->body.padding.right -
            scrl_style->body.padding.left - scrl_style->body.padding.right;
@@ -343,8 +343,8 @@ lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
  */
 lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
 {
-    lv_style_t * bg_style   = lv_page_get_style(page, LV_PAGE_STYLE_BG);
-    lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+    const lv_style_t * bg_style   = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    const lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
     return lv_obj_get_height(page) - bg_style->body.padding.top - bg_style->body.padding.bottom -
            scrl_style->body.padding.top - scrl_style->body.padding.bottom;
@@ -356,9 +356,9 @@ lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
  * @param type which style should be get
  * @return style pointer to a style
  *  */
-lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
+const lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
 {
-    lv_style_t * style  = NULL;
+    const lv_style_t * style  = NULL;
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
     switch(type) {
@@ -384,8 +384,8 @@ lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
  */
 bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge)
 {
-    lv_style_t * page_style = lv_obj_get_style(page);
-    lv_obj_t * scrl         = lv_page_get_scrl(page);
+    const lv_style_t * page_style = lv_obj_get_style(page);
+    lv_obj_t * scrl               = lv_page_get_scrl(page);
     lv_area_t page_coords;
     lv_area_t scrl_coords;
 
@@ -441,8 +441,8 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
     lv_anim_del(ext->scrl, (lv_anim_fp_t)lv_obj_set_pos);
 #endif
 
-    lv_style_t * style      = lv_page_get_style(page, LV_PAGE_STYLE_BG);
-    lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+    const lv_style_t * style      = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    const lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
     /*If obj is higher then the page focus where the "error" is smaller*/
     lv_coord_t obj_y      = obj->coords.y1 - ext->scrl->coords.y1;
@@ -620,25 +620,22 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(page, mask, mode);
-    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+    }
+    /*Cache page bg style for temporary modification*/
+    const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+    lv_style_t style_tmp;
+    lv_style_copy(&style_tmp, style);
+
+    if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw without border*/
-        lv_style_t * style          = lv_page_get_style(page, LV_PAGE_STYLE_BG);
-        lv_coord_t border_width_tmp = style->body.border.width;
-        style->body.border.width    = 0;
-        lv_draw_rect(&page->coords, mask, style, lv_obj_get_opa_scale(page));
-        style->body.border.width = border_width_tmp;
+        style_tmp.body.border.width = 0;
+        lv_draw_rect(&page->coords, mask, &style_tmp, lv_obj_get_opa_scale(page));
 
     } else if(mode == LV_DESIGN_DRAW_POST) { /*Draw the scroll bars finally*/
-
         /*Draw only a border*/
-        lv_style_t * style          = lv_page_get_style(page, LV_PAGE_STYLE_BG);
-        lv_coord_t shadow_width_tmp = style->body.shadow.width;
-        lv_opa_t opa_tmp            = style->body.opa;
-        style->body.shadow.width    = 0;
-        style->body.opa             = LV_OPA_TRANSP;
-        lv_draw_rect(&page->coords, mask, style, lv_obj_get_opa_scale(page));
-        style->body.shadow.width = shadow_width_tmp;
-        style->body.opa          = opa_tmp;
+        style_tmp.body.shadow.width = 0;
+        style_tmp.body.opa          = LV_OPA_TRANSP;
+        lv_draw_rect(&page->coords, mask, &style_tmp, lv_obj_get_opa_scale(page));
 
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
@@ -723,10 +720,10 @@ static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mo
         /* If the page is focused in a group and
          * the background object is not visible (transparent)
          * then "activate" the style of the scrollable*/
-        lv_style_t * style_scrl_ori = lv_obj_get_style(scrl);
-        lv_obj_t * page             = lv_obj_get_parent(scrl);
-        lv_style_t * style_page     = lv_obj_get_style(page);
-        lv_group_t * g              = lv_obj_get_group(page);
+        const lv_style_t * style_scrl_ori = lv_obj_get_style(scrl);
+        lv_obj_t * page                   = lv_obj_get_parent(scrl);
+        const lv_style_t * style_page     = lv_obj_get_style(page);
+        lv_group_t * g                    = lv_obj_get_group(page);
         if((style_page->body.opa == LV_OPA_TRANSP) &&
            style_page->body.border.width == 0) { /*Is the background visible?*/
             if(lv_group_get_focused(g) == page) {
@@ -780,7 +777,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 child = lv_obj_get_child(page, child); /*Get the next child before move this*/
 
                 /*Reposition the child to take padding into account*/
-                lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+                const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
                 tmp->coords.x1 += style->body.padding.left;
                 tmp->coords.x2 += style->body.padding.left;
                 tmp->coords.y1 += style->body.padding.top;
@@ -867,9 +864,9 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
     res = ancestor_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
 
-    lv_obj_t * page          = lv_obj_get_parent(scrl);
-    lv_style_t * page_style  = lv_obj_get_style(page);
-    lv_page_ext_t * page_ext = lv_obj_get_ext_attr(page);
+    lv_obj_t * page                = lv_obj_get_parent(scrl);
+    const lv_style_t * page_style  = lv_obj_get_style(page);
+    lv_page_ext_t * page_ext       = lv_obj_get_ext_attr(page);
 
     if(sign == LV_SIGNAL_CORD_CHG) {
         /*Limit the position of the scrollable object to be always visible
@@ -1062,9 +1059,9 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
  */
 static void lv_page_sb_refresh(lv_obj_t * page)
 {
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    lv_style_t * style  = lv_obj_get_style(page);
-    lv_obj_t * scrl     = ext->scrl;
+    lv_page_ext_t * ext      = lv_obj_get_ext_attr(page);
+    const lv_style_t * style = lv_obj_get_style(page);
+    lv_obj_t * scrl          = ext->scrl;
     lv_coord_t size_tmp;
     lv_coord_t scrl_w = lv_obj_get_width(scrl);
     lv_coord_t scrl_h = lv_obj_get_height(scrl);

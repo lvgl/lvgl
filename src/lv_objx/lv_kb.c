@@ -228,7 +228,7 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, lv_style_t * style)
+void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style)
 {
     switch(type) {
         case LV_KB_STYLE_BG: lv_btnm_set_style(kb, LV_BTNM_STYLE_BG, style); break;
@@ -285,9 +285,9 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
  * @param type which style should be get
  * @return style pointer to a style
  */
-lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
+const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
 {
-    lv_style_t * style = NULL;
+    const lv_style_t * style = NULL;
 
     switch(type) {
         case LV_KB_STYLE_BG: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BG); break;

@@ -160,7 +160,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed);
  * @param label pointer to an label object
  * @param style pointer to a style
  */
-static inline void lv_label_set_style(lv_obj_t * label, lv_style_t * style)
+static inline void lv_label_set_style(lv_obj_t * label, const lv_style_t * style)
 {
     lv_obj_set_style(label, style);
 }
@@ -241,7 +241,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);
  * @param label pointer to an label object
  * @return pointer to the label's style
  */
-static inline lv_style_t * lv_label_get_style(const lv_obj_t * label)
+static inline const lv_style_t * lv_label_get_style(const lv_obj_t * label)
 {
     return lv_obj_get_style(label);
 }

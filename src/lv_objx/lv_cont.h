@@ -129,7 +129,7 @@ static inline void lv_cont_set_fit(lv_obj_t * cont, lv_fit_t fit)
  * @param cont pointer to a container object
  * @param style pointer to the new style
  */
-static inline void lv_cont_set_style(lv_obj_t * cont, lv_style_t * style)
+static inline void lv_cont_set_style(lv_obj_t * cont, const lv_style_t * style)
 {
     lv_obj_set_style(cont, style);
 }
@@ -178,7 +178,7 @@ lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont);
  * @param cont pointer to a container object
  * @return pointer to the container's style
  */
-static inline lv_style_t * lv_cont_get_style(const lv_obj_t * cont)
+static inline const lv_style_t * lv_cont_get_style(const lv_obj_t * cont)
 {
     return lv_obj_get_style(cont);
 }

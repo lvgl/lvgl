@@ -611,9 +611,9 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
  */
 static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
 {
-    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    lv_style_t * style   = lv_obj_get_style(chart);
-    lv_opa_t opa_scale   = lv_obj_get_opa_scale(chart);
+    lv_chart_ext_t * ext     = lv_obj_get_ext_attr(chart);
+    const lv_style_t * style = lv_obj_get_style(chart);
+    lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
     uint8_t div_i;
     uint8_t div_i_end;

@@ -60,7 +60,7 @@ typedef struct
     uint16_t col_cnt;
     uint16_t row_cnt;
     char ** cell_data;
-    lv_style_t * cell_style[LV_TABLE_CELL_STYLE_CNT];
+    const lv_style_t * cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
 } lv_table_ext_t;
 
@@ -164,7 +164,7 @@ void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col,
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, lv_style_t * style);
+void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions
@@ -244,7 +244,7 @@ bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col)
  * @param type which style should be get
  * @return style pointer to the style
  */
-lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type);
+const lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type);
 
 /*=====================
  * Other functions

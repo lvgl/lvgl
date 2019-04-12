@@ -272,9 +272,9 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
         /* Store the real pointer because of 'lv_group'
          * If the object is in focus 'lv_obj_get_style()' will give a pointer to tmp style
          * and to the real object style. It is important because of style change tricks below*/
-        lv_style_t * style_ori_p = gauge->style_p;
-        lv_style_t * style       = lv_obj_get_style(gauge);
-        lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
+        const lv_style_t * style_ori_p = gauge->style_p;
+        const lv_style_t * style       = lv_obj_get_style(gauge);
+        lv_gauge_ext_t * ext           = lv_obj_get_ext_attr(gauge);
 
         lv_gauge_draw_scale(gauge, mask);
 
@@ -347,9 +347,9 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 {
     char scale_txt[16];
 
-    lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    lv_style_t * style   = lv_obj_get_style(gauge);
-    lv_opa_t opa_scale   = lv_obj_get_opa_scale(gauge);
+    lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
+    const lv_style_t * style = lv_obj_get_style(gauge);
+    lv_opa_t opa_scale       = lv_obj_get_opa_scale(gauge);
     lv_coord_t r =
         lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.left) - style->body.padding.inner;
     lv_coord_t x_ofs    = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
@@ -398,9 +398,9 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
 {
     lv_style_t style_needle;
-    lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    lv_style_t * style   = lv_gauge_get_style(gauge);
-    lv_opa_t opa_scale   = lv_obj_get_opa_scale(gauge);
+    lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
+    const lv_style_t * style = lv_gauge_get_style(gauge);
+    lv_opa_t opa_scale       = lv_obj_get_opa_scale(gauge);
 
     lv_coord_t r      = lv_obj_get_width(gauge) / 2 - style->body.padding.left;
     lv_coord_t x_ofs  = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;

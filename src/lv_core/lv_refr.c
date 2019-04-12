@@ -412,7 +412,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
         /*If no better children check this object*/
         if(found_p == NULL) {
-            lv_style_t * style = lv_obj_get_style(obj);
+            const lv_style_t * style = lv_obj_get_style(obj);
             if(style->body.opa == LV_OPA_COVER &&
                obj->design_cb(obj, area_p, LV_DESIGN_COVER_CHK) != false &&
                lv_obj_get_opa_scale(obj) == LV_OPA_COVER) {

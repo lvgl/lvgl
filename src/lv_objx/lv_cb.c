@@ -149,7 +149,7 @@ void lv_cb_set_static_text(lv_obj_t * cb, const char * txt)
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, lv_style_t * style)
+void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, const lv_style_t * style)
 {
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
@@ -194,10 +194,10 @@ const char * lv_cb_get_text(const lv_obj_t * cb)
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
+const lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
 {
-    lv_style_t * style = NULL;
-    lv_cb_ext_t * ext  = lv_obj_get_ext_attr(cb);
+    const lv_style_t * style = NULL;
+    lv_cb_ext_t * ext        = lv_obj_get_ext_attr(cb);
 
     switch(type) {
         case LV_CB_STYLE_BOX_REL: style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL); break;
@@ -271,10 +271,10 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
         /* If the check box is the active in a group and
          * the background is not visible (transparent)
          * then activate the style of the bullet*/
-        lv_style_t * style_ori  = lv_obj_get_style(bullet);
-        lv_obj_t * bg           = lv_obj_get_parent(bullet);
-        lv_style_t * style_page = lv_obj_get_style(bg);
-        lv_group_t * g          = lv_obj_get_group(bg);
+        const lv_style_t * style_ori  = lv_obj_get_style(bullet);
+        lv_obj_t * bg                 = lv_obj_get_parent(bullet);
+        const lv_style_t * style_page = lv_obj_get_style(bg);
+        lv_group_t * g                = lv_obj_get_group(bg);
         if(style_page->body.opa == LV_OPA_TRANSP) { /*Is the Background visible?*/
             if(lv_group_get_focused(g) == bg) {
                 lv_style_t * style_mod;
@@ -313,7 +313,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_style_t * label_style = lv_label_get_style(ext->label);
+        const lv_style_t * label_style = lv_label_get_style(ext->label);
         lv_obj_set_size(ext->bullet, lv_font_get_height(label_style->text.font),
                         lv_font_get_height(label_style->text.font));
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
