@@ -253,7 +253,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
         const lv_style_t * style    = lv_obj_get_style(lmeter);
         lv_opa_t opa_scale    = lv_obj_get_opa_scale(lmeter);
         lv_style_t style_tmp;
-        memcpy(&style_tmp, style, sizeof(lv_style_t));
+        lv_style_copy(&style_tmp, style);
 
 #if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(lmeter);
