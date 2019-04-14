@@ -1875,6 +1875,16 @@ lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj)
 {
     return &obj->user_data;
 }
+
+/**
+ * Set the objet's user data
+ * @param obj pointer to an object
+ * @param data user data
+ */
+void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
+{
+    obj->user_data = data;
+}
 #endif
 
 #if LV_USE_GROUP
