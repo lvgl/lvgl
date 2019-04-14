@@ -345,7 +345,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
 void lv_label_set_selection_start( const lv_obj_t * label, int index ) {
 #if LV_LABEL_SELECTION_EN
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if( index > 0 ) {
+    if( index >= 0 ) {
         ext->selection_en = 1;
         ext->selection_start = index;
     }
@@ -359,7 +359,7 @@ void lv_label_set_selection_start( const lv_obj_t * label, int index ) {
 void lv_label_set_selection_end( const lv_obj_t * label, int index ) {
 #if LV_LABEL_SELECTION_EN
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if( index > 0 ) {
+    if( index >= 0 ) {
         ext->selection_en = 1;
         ext->selection_end = index;
     }
