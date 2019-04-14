@@ -340,10 +340,10 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_refresh_ext_size(lmeter);
-    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+        lv_obj_refresh_ext_draw_pad(lmeter);
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style = lv_lmeter_get_style(lmeter);
-        lmeter->ext_size   = LV_MATH_MAX(lmeter->ext_size, style->line.width);
+        lmeter->ext_draw_pad   = LV_MATH_MAX(lmeter->ext_draw_pad, style->line.width);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

@@ -143,10 +143,19 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->coords.y1 = 0;
         new_obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
         new_obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
-        new_obj->ext_size  = 0;
+        new_obj->ext_draw_pad  = 0;
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+        memset(&new_obj->ext_click_pad, 0, sizeof(new_obj->ext_click_pad));
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+        new_obj->ext_click_pad_hor = 0;
+        new_obj->ext_click_pad_ver = 0;
+#endif
 
         /*Init realign*/
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
         new_obj->realign.align        = LV_ALIGN_CENTER;
         new_obj->realign.xofs         = 0;
         new_obj->realign.yofs         = 0;
@@ -211,10 +220,19 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->coords.y1 = parent->coords.y1;
         new_obj->coords.x2 = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
         new_obj->coords.y2 = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
-        new_obj->ext_size  = 0;
+        new_obj->ext_draw_pad  = 0;
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+        memset(&new_obj->ext_click_pad, 0, sizeof(new_obj->ext_click_pad));
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+        new_obj->ext_click_pad_hor = 0;
+        new_obj->ext_click_pad_ver = 0;
+#endif
 
         /*Init realign*/
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
         new_obj->realign.align        = LV_ALIGN_CENTER;
         new_obj->realign.xofs         = 0;
         new_obj->realign.yofs         = 0;
@@ -233,6 +251,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         lv_obj_set_signal_cb(new_obj, lv_obj_signal);
         lv_obj_set_design_cb(new_obj, lv_obj_design);
         new_obj->event_cb = NULL;
+
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+        memset(&new_obj->ext_click_pad, 0, sizeof(new_obj->ext_click_pad));
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+        new_obj->ext_click_pad_hor = 0;
+        new_obj->ext_click_pad_ver = 0;
+#endif
 
         /*Init. user date*/
 #if LV_USE_USER_DATA_SINGLE
@@ -267,7 +295,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     /*Copy the attributes if required*/
     if(copy != NULL) {
         lv_area_copy(&new_obj->coords, &copy->coords);
-        new_obj->ext_size = copy->ext_size;
+        new_obj->ext_draw_pad = copy->ext_draw_pad;
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+        lv_area_copy(&new_obj->ext_click_pad, &copy->ext_click_pad);
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+        new_obj->ext_click_pad_hor = copy->ext_click_pad_hor;
+        new_obj->ext_click_pad_ver = copy->ext_click_pad_ver;
+#endif
 
         /*Set free data*/
 #if LV_USE_USER_DATA_SINGLE
@@ -280,7 +317,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Copy realign*/
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
         new_obj->realign.align        = copy->realign.align;
         new_obj->realign.xofs         = copy->realign.xofs;
         new_obj->realign.yofs         = copy->realign.yofs;
@@ -449,7 +486,7 @@ void lv_obj_invalidate(const lv_obj_t * obj)
         lv_obj_t * par = lv_obj_get_parent(obj);
         bool union_ok  = true;
         /*Start with the original coordinates*/
-        lv_coord_t ext_size = obj->ext_size;
+        lv_coord_t ext_size = obj->ext_draw_pad;
         lv_area_copy(&area_trunc, &obj->coords);
         area_trunc.x1 -= ext_size;
         area_trunc.y1 -= ext_size;
@@ -530,6 +567,7 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * par = obj->par;
+
     x              = x + par->coords.x1;
     y              = y + par->coords.y1;
 
@@ -610,7 +648,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
 
-    // Set the length and height
+    /*Set the length and height*/
     obj->coords.x2 = obj->coords.x1 + w - 1;
     obj->coords.y2 = obj->coords.y1 + h - 1;
 
@@ -632,7 +670,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_obj_invalidate(obj);
 
     /*Automatically realign the object if required*/
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
     if(obj->realign.auto_realign) lv_obj_realign(obj);
 #endif
 }
@@ -793,7 +831,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     lv_obj_set_pos(obj, new_x, new_y);
 
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align       = align;
     obj->realign.xofs        = x_mod;
@@ -942,7 +980,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 
     lv_obj_set_pos(obj, new_x, new_y);
 
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align       = align;
     obj->realign.xofs        = x_mod;
@@ -958,7 +996,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
  */
 void lv_obj_realign(lv_obj_t * obj)
 {
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
     if(obj->realign.origo_align)
         lv_obj_align_origo(obj, obj->realign.base, obj->realign.align, obj->realign.xofs,
                            obj->realign.yofs);
@@ -967,7 +1005,7 @@ void lv_obj_realign(lv_obj_t * obj)
                      obj->realign.yofs);
 #else
     (void)obj;
-    LV_LOG_WARN("lv_obj_realaign: no effect because LV_OBJ_REALIGN = 0");
+    LV_LOG_WARN("lv_obj_realaign: no effect because LV_USE_OBJ_REALIGN = 0");
 #endif
 }
 
@@ -979,14 +1017,46 @@ void lv_obj_realign(lv_obj_t * obj)
  */
 void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
 {
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
     obj->realign.auto_realign = en ? 1 : 0;
 #else
     (void)obj;
     (void)en;
-    LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_OBJ_REALIGN = 0");
+    LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_USE_OBJ_REALIGN = 0");
 #endif
 }
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+/**
+ * Set the size of an extended clickable area
+ * @param obj pointer to an object
+ * @param w extended width to both sides
+ * @param h extended height to both sides
+ */
+void lv_obj_set_ext_click_area(lv_obj_t * obj, uint8_t w, uint8_t h)
+{
+    obj->ext_click_pad_hor= w;
+    obj->ext_click_pad_ver = h;
+}
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+/**
+ * Set the size of an extended clickable area
+ * @param obj pointer to an object
+ * @param left extended clickable are on the left [px]
+ * @param right extended clickable are on the right [px]
+ * @param top extended clickable are on the top [px]
+ * @param bottom extended clickable are on the bottom [px]
+ */
+void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom)
+{
+    obj->ext_click_pad.x1 = left;
+    obj->ext_click_pad.x2 = right;
+    obj->ext_click_pad.y1 = top;
+    obj->ext_click_pad.y2 = bottom;
+}
+#endif
 
 /*---------------------
  * Appearance set
@@ -1295,10 +1365,10 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
  * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object
  * @param obj pointer to an object
  */
-void lv_obj_refresh_ext_size(lv_obj_t * obj)
+void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
 {
-    obj->ext_size = 0;
-    obj->signal_cb(obj, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+    obj->ext_draw_pad = 0;
+    obj->signal_cb(obj, LV_SIGNAL_REFR_EXT_DRAW_PAD, NULL);
 
     lv_obj_invalidate(obj);
 }
@@ -1588,15 +1658,6 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
 
     return lv_obj_get_height(obj) - style->body.padding.top - style->body.padding.bottom;
 }
-/**
- * Get the extended size attribute of an object
- * @param obj pointer to an object
- * @return the extended size attribute
- */
-lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj)
-{
-    return obj->ext_size;
-}
 
 /**
  * Get the automatic realign property of the object.
@@ -1605,12 +1666,56 @@ lv_coord_t lv_obj_get_ext_size(const lv_obj_t * obj)
  */
 bool lv_obj_get_auto_realign(lv_obj_t * obj)
 {
-#if LV_OBJ_REALIGN
+#if LV_USE_OBJ_REALIGN
     return obj->realign.auto_realign ? true : false;
 #else
     (void)obj;
     return false;
 #endif
+}
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+/**
+ * Get the horizontal padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the horizontal padding
+ */
+uint8_t lv_obj_get_ext_click_pad_hor(const lv_obj_t * obj)
+{
+    return obj->ext_click_pad_hor;
+}
+
+/**
+ * Get the vertical padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the vertical padding
+ */
+uint8_t lv_obj_get_ext_click_pad_ver(const lv_obj_t * obj)
+{
+    return obj->ext_click_pad_ver;
+}
+#endif
+
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+/**
+ * Get the horizontal padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the horizontal padding
+ */
+const lv_area_t * lv_obj_get_ext_click_pad(const lv_obj_t * obj)
+{
+    return &obj->ext_click_pad;
+}
+#endif
+
+/**
+ * Get the extended size attribute of an object
+ * @param obj pointer to an object
+ * @return the extended size attribute
+ */
+lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj)
+{
+    return obj->ext_draw_pad;
 }
 
 /*-----------------
@@ -1979,10 +2084,10 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CHILD_CHG) {
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
-    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
-        if(style->body.shadow.width > obj->ext_size) obj->ext_size = style->body.shadow.width;
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        if(style->body.shadow.width > obj->ext_draw_pad) obj->ext_draw_pad = style->body.shadow.width;
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_refresh_ext_size(obj);
+        lv_obj_refresh_ext_draw_pad(obj);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         buf->type[0]        = "lv_obj";

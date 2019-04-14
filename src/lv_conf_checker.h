@@ -420,8 +420,8 @@
 /*Declare the type of the user data of object (can be e.g. `void *`, `int`, `struct`)*/
 
 /*1: enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
-#ifndef LV_OBJ_REALIGN
-#define LV_OBJ_REALIGN          1
+#ifndef LV_USE_OBJ_REALIGN
+#define LV_USE_OBJ_REALIGN          1
 #endif
 
 /*==================

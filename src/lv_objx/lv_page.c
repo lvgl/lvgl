@@ -255,7 +255,7 @@ void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, const lv_style_t *
             lv_area_set_height(&ext->sb.hor_area, ext->sb.style->body.padding.inner);
             lv_area_set_width(&ext->sb.ver_area, ext->sb.style->body.padding.inner);
             lv_page_sb_refresh(page);
-            lv_obj_refresh_ext_size(page);
+            lv_obj_refresh_ext_draw_pad(page);
             lv_obj_invalidate(page);
             break;
         case LV_PAGE_STYLE_EDGE_FLASH: ext->edge_flash.style = style; break;
@@ -795,7 +795,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
 
         /*Refresh the ext. size because the scrollbars might be positioned out of the page*/
-        lv_obj_refresh_ext_size(page);
+        lv_obj_refresh_ext_draw_pad(page);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Refresh the scrollbar and notify the scrl if the size is changed*/
         if(ext->scrl != NULL && (lv_obj_get_width(page) != lv_area_get_width(param) ||
@@ -806,12 +806,12 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             /*The scrollbars are important only if they are visible now*/
             if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
         }
-    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*Ensure ext. size for the scrollbars if they are out of the page*/
-        if(page->ext_size < (-ext->sb.style->body.padding.right))
-            page->ext_size = -ext->sb.style->body.padding.right;
-        if(page->ext_size < (-ext->sb.style->body.padding.bottom))
-            page->ext_size = -ext->sb.style->body.padding.bottom;
+        if(page->ext_draw_pad < (-ext->sb.style->body.padding.right))
+            page->ext_draw_pad = -ext->sb.style->body.padding.right;
+        if(page->ext_draw_pad < (-ext->sb.style->body.padding.bottom))
+            page->ext_draw_pad = -ext->sb.style->body.padding.bottom;
     } else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param);
 
