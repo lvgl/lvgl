@@ -140,6 +140,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         else{
             memcpy(ext->dot_tmp, copy_ext->dot_tmp, sizeof(ext->dot_tmp));
         }
+        ext->dot_tmp_alloc = copy_ext->dot_tmp_alloc;
         ext->dot_end = copy_ext->dot_end;
 
         /*Refresh the style with new signal function*/
