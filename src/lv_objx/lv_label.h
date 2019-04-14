@@ -62,7 +62,10 @@ typedef struct
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     char * text;                    /*Text of the label*/
-    char dot_tmp[LV_LABEL_DOT_NUM * 4 ]; /*Store the character which are replaced by dots (Handled by the library)*/
+    union{
+        char * dot_tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled by the library)*/
+        char dot_tmp[4];    /* Directly store the characters if <=4 characters */
+    };
     uint16_t dot_end;       /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;    /*Speed of scroll and roll animation in px/sec unit*/
     lv_point_t offset;      /*Text draw position offset*/
@@ -79,6 +82,7 @@ typedef struct
     uint8_t recolor : 1;    /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;     /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
     uint8_t body_draw : 1;  /*Draw background body*/
+    uint8_t dot_tmp_alloc : 1; /*True if dot_tmp has been allocated. False if dot_tmp directly holds up to 4 bytes of characters */
 } lv_label_ext_t;
 
 /**********************

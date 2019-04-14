@@ -208,8 +208,7 @@ typedef struct _lv_obj_t
                                  `lv_protect_t`*/
     lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
 
-    lv_coord_t
-        ext_size; /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+    lv_coord_t ext_size; /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 #if LV_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif
