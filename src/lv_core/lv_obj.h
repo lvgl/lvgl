@@ -195,6 +195,11 @@ typedef struct _lv_obj_t
     void * group_p; /*Pointer to the group of the object*/
 #endif
     /*Attributes and states*/
+    uint8_t protect;          /*Automatically happening actions can be prevented. 'OR'ed values from
+                                 `lv_protect_t`*/
+    lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
+    lv_coord_t ext_size; /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
+
     uint8_t click : 1;          /*1: Can be pressed by an input device*/
     uint8_t drag : 1;           /*1: Enable the dragging*/
     lv_drag_dir_t drag_dir : 2; /* Which directions the object can be dragged in */
@@ -204,12 +209,8 @@ typedef struct _lv_obj_t
     uint8_t top : 1; /*1: If the object or its children is clicked it goes to the foreground*/
     uint8_t opa_scale_en : 1; /*1: opa_scale is set*/
     uint8_t parent_event : 1; /*1: Send the object's events to the parent too. */
-    uint8_t protect;          /*Automatically happening actions can be prevented. 'OR'ed values from
-                                 `lv_protect_t`*/
-    lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
+    uint32_t small_zone : 22;      /* Free space that user can use. May change in size */
 
-    lv_coord_t
-        ext_size; /*EXTtend the size of the object in every direction. E.g. for shadow drawing*/
 #if LV_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif

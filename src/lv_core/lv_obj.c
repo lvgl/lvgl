@@ -190,6 +190,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale_en = 0;
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->parent_event = 0;
+        new_obj->small_zone   = 0;
 
         new_obj->ext_attr = NULL;
 
@@ -260,6 +261,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->opa_scale_en = 0;
         new_obj->parent_event = 0;
+        new_obj->small_zone   = 0;
 
         new_obj->ext_attr = NULL;
     }
@@ -305,6 +307,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale_en = copy->opa_scale_en;
         new_obj->protect      = copy->protect;
         new_obj->opa_scale    = copy->opa_scale;
+        new_obj->small_zone   = copy->small_zone;
 
         new_obj->style_p = copy->style_p;
 
