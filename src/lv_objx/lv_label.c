@@ -90,8 +90,11 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_speed      = LV_LABEL_DEF_SCROLL_SPEED;
     ext->offset.x        = 0;
     ext->offset.y        = 0;
-    ext->selection_start = -1;
-    ext->selection_end   = -1;
+#if LV_LABEL_SELECTION_EN
+    ext->selection_start = 0;
+    ext->selection_end   = 0;
+    ext->selection_en    = 0;
+#endif
 
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
@@ -339,6 +342,34 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
     }
 }
 
+void lv_label_set_selection_start( const lv_obj_t * label, int index ) {
+#if LV_LABEL_SELECTION_EN
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if( index > 0 ) {
+        ext->selection_en = 1;
+        ext->selection_start = index;
+    }
+    else {
+        ext->selection_en = 0;
+        ext->selection_start = 0;
+    }
+#endif
+}
+
+void lv_label_set_selection_end( const lv_obj_t * label, int index ) {
+#if LV_LABEL_SELECTION_EN
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if( index > 0 ) {
+        ext->selection_en = 1;
+        ext->selection_end = index;
+    }
+    else {
+        ext->selection_en = 0;
+        ext->selection_end = 0;
+    }
+#endif
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -558,6 +589,31 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     return lv_encoded_get_char_id(txt, i);
 }
 
+int lv_label_get_selection_start( const lv_obj_t * label ) {
+#if LV_LABEL_SELECTION_EN
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if( ext->selection_en )
+        return ext->selection_start;
+    else
+        return -1;
+#else
+    return -1;
+#endif
+}
+
+int lv_label_get_selection_end( const lv_obj_t * label ) {
+#if LV_LABEL_SELECTION_EN
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if( ext->selection_en )
+        return ext->selection_end;
+    else
+        return -1;
+#else
+    return -1;
+#endif
+}
+
+
 /**
  * Check if a character is drawn under a point.
  * @param label Label object
@@ -763,7 +819,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         }
 
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
-                      ext->selection_start, ext->selection_end);
+                lv_label_get_selection_start(label), lv_label_get_selection_end(label));
 
         if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
             lv_point_t size;
@@ -776,8 +832,9 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.x = ext->offset.x + size.x +
                         lv_font_get_width(style->text.font, ' ') * ANIM_WAIT_CHAR_COUNT;
                 ofs.y = ext->offset.y;
+
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              ext->selection_start, ext->selection_end);
+                        lv_label_get_selection_start(label), lv_label_get_selection_end(label));
             }
 
             /*Draw the text again below the original to make an circular effect */
@@ -785,7 +842,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.x = ext->offset.x;
                 ofs.y = ext->offset.y + size.y + lv_font_get_height(style->text.font);
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              ext->selection_start, ext->selection_end);
+                        lv_label_get_selection_start(label), lv_label_get_selection_end(label));
             }
         }
     }

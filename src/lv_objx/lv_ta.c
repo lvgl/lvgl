@@ -955,17 +955,15 @@ const lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
 void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end)
 {
     lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+
+    *sel_start = lv_label_get_selection_start(ext->label) ;
+    *sel_end   = lv_label_get_selection_end(ext->label) ;
 
     /*Force both values to -1 if there is no selection*/
-    if(ext_label->selection_start == -1 || ext_label->selection_end == -1) {
+    if( *sel_start == -1 || *sel_end == -1) {
         *sel_start = -1;
         *sel_end   = -1;
-        return;
     }
-
-    *sel_start = ext_label->selection_start;
-    *sel_end   = ext_label->selection_end;
 }
 
 /**
@@ -976,9 +974,7 @@ void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end)
 bool lv_ta_text_is_selected(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
-
-    return (ext_label->selection_start == -1 || ext_label->selection_end == -1);
+    return (lv_label_get_selection_start(ext->label) == -1 || lv_label_get_selection_end(ext->label) == -1);
 }
 
 /**
@@ -1004,11 +1000,10 @@ bool lv_ta_get_sel_mode(lv_obj_t * ta)
 void lv_ta_clear_selection(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
-    if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
-        ext_label->selection_start = -1;
-        ext_label->selection_end   = -1;
+    if(lv_label_get_selection_start(ext->label) == -1 || lv_label_get_selection_end(ext->label) == -1){
+        lv_label_set_selection_start(ext->label, -1);
+        lv_label_set_selection_end(ext->label, -1);
         lv_obj_invalidate(ta);
     }
 }
@@ -1695,24 +1690,28 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
     if(ext->selecting) {
         /*If the selected area has changed then update the real values and*/
         /*invalidate the text area.*/
+        int sel_start, sel_end;
+        sel_start = lv_label_get_selection_start(ext->label);
+        sel_end   = lv_label_get_selection_end(ext->label);
+
         if(ext->tmp_sel_start > ext->tmp_sel_end) {
-            if(ext_label->selection_start != ext->tmp_sel_end ||
-               ext_label->selection_end != ext->tmp_sel_start) {
-                ext_label->selection_start = ext->tmp_sel_end;
-                ext_label->selection_end   = ext->tmp_sel_start;
+            if(sel_start != ext->tmp_sel_end ||
+               sel_end != ext->tmp_sel_start) {
+                sel_start = ext->tmp_sel_end;
+                sel_end   = ext->tmp_sel_start;
                 lv_obj_invalidate(ta);
             }
         } else if(ext->tmp_sel_start < ext->tmp_sel_end) {
-            if(ext_label->selection_start != ext->tmp_sel_start ||
-               ext_label->selection_end != ext->tmp_sel_end) {
-                ext_label->selection_start = ext->tmp_sel_start;
-                ext_label->selection_end   = ext->tmp_sel_end;
+            if(sel_start != ext->tmp_sel_start ||
+               sel_end != ext->tmp_sel_end) {
+                sel_start = ext->tmp_sel_start;
+                sel_end   = ext->tmp_sel_end;
                 lv_obj_invalidate(ta);
             }
         } else {
-            if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
-                ext_label->selection_start = -1;
-                ext_label->selection_end   = -1;
+            if(sel_start != -1 || sel_end != -1) {
+                sel_start = -1;
+                sel_end   = -1;
                 lv_obj_invalidate(ta);
             }
         }

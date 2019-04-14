@@ -62,20 +62,23 @@ typedef struct
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     char * text;                    /*Text of the label*/
-    lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
-    char dot_tmp[LV_LABEL_DOT_NUM * 4 +
-                 1]; /*Store the character which are replaced by dots (Handled by the library)*/
-
+    char dot_tmp[LV_LABEL_DOT_NUM * 4 ]; /*Store the character which are replaced by dots (Handled by the library)*/
     uint16_t dot_end;       /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;    /*Speed of scroll and roll animation in px/sec unit*/
     lv_point_t offset;      /*Text draw position offset*/
+
+#if LV_LABEL_SELECTION_EN
+    uint16_t selection_start;    /*Left-most selection character*/
+    uint16_t selection_end;      /*Right-most selection character*/
+    uint8_t  selection_en : 1;   /*True if text is selection */  
+#endif
+
+    lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/
     uint8_t static_txt : 1; /*Flag to indicate the text is static*/
     uint8_t align : 2;      /*Align type from 'lv_label_align_t'*/
     uint8_t recolor : 1;    /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;     /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
     uint8_t body_draw : 1;  /*Draw background body*/
-    int selection_start;    /*Left-most selection character*/
-    int selection_end;      /*Right-most selection character*/
 } lv_label_ext_t;
 
 /**********************
@@ -164,6 +167,21 @@ static inline void lv_label_set_style(lv_obj_t * label, const lv_style_t * style
 {
     lv_obj_set_style(label, style);
 }
+
+/**
+ * @brief Set the selection start index.
+ * @param label pointer to a label object.
+ * @param index index to set. -1 to select nothing.
+ */
+void lv_label_set_selection_start( const lv_obj_t * label, int index );
+
+/**
+ * @brief Set the selection end index.
+ * @param label pointer to a label object.
+ * @param index index to set. -1 to select nothing.
+ */
+void lv_label_set_selection_end( const lv_obj_t * label, int index );
+
 /*=====================
  * Getter functions
  *====================*/
@@ -245,6 +263,21 @@ static inline const lv_style_t * lv_label_get_style(const lv_obj_t * label)
 {
     return lv_obj_get_style(label);
 }
+
+/**
+ * @brief Get the selection start index.
+ * @param label pointer to a label object.
+ * @return selection start index. -1 if nothing is selected.
+ */
+int lv_label_get_selection_start( const lv_obj_t * label );
+
+/**
+ * @brief Get the selection end index.
+ * @param label pointer to a label object.
+ * @return selection end index. -1 if nothing is selected.
+ */
+int lv_label_get_selection_end( const lv_obj_t * label );
+
 
 /*=====================
  * Other functions
