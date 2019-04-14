@@ -1122,7 +1122,7 @@ static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y)
 static bool lv_label_set_dot_tmp(lv_obj_t *label, char *data, int len){
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     lv_label_dot_tmp_free( label ); /* Deallocate any existing space */
-    if( len > 4 ){
+    if( len > sizeof(char *) ){
         /* Memory needs to be allocated. Allocates an additional byte
          * for a NULL-terminator so it can be copied. */
         ext->dot_tmp_ptr = lv_mem_alloc(len + 1);
