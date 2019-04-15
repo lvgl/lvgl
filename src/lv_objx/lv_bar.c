@@ -223,7 +223,7 @@ void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, const lv_style_t * st
         case LV_BAR_STYLE_BG: lv_obj_set_style(bar, style); break;
         case LV_BAR_STYLE_INDIC:
             ext->style_indic = style;
-            lv_obj_refresh_ext_size(bar);
+            lv_obj_refresh_ext_draw_pad(bar);
             break;
     }
 }
@@ -458,10 +458,11 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     res = ancestor_signal(bar, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
-        if(style_indic->body.shadow.width > bar->ext_size)
-            bar->ext_size = style_indic->body.shadow.width;
+        if(style_indic->body.shadow.width > bar->ext_draw_pad)
+            bar->ext_draw_pad = style_indic->body.shadow.width;
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;

@@ -295,9 +295,9 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_line";
-    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style = lv_line_get_style(line);
-        if(line->ext_size < style->line.width) line->ext_size = style->line.width;
+        if(line->ext_draw_pad < style->line.width) line->ext_draw_pad = style->line.width;
     }
 
     return res;

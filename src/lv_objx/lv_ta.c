@@ -778,7 +778,7 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, const lv_style_t * style
         case LV_TA_STYLE_EDGE_FLASH: lv_page_set_style(ta, LV_PAGE_STYLE_EDGE_FLASH, style); break;
         case LV_TA_STYLE_CURSOR:
             ext->cursor.style = style;
-            lv_obj_refresh_ext_size(
+            lv_obj_refresh_ext_draw_pad(
                 lv_page_get_scrl(ta)); /*Refresh ext. size because of cursor drawing*/
             refr_cursor_area(ta);
             break;
@@ -1347,11 +1347,11 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     lv_obj_t * ta     = lv_obj_get_parent(scrl);
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*Set ext. size because the cursor might be out of this object*/
         const lv_style_t * style_label = lv_obj_get_style(ext->label);
-        lv_coord_t font_h              = lv_font_get_height(style_label->text.font);
-        scrl->ext_size = LV_MATH_MAX(scrl->ext_size, style_label->text.line_space + font_h);
+        lv_coord_t font_h        = lv_font_get_height(style_label->text.font);
+        scrl->ext_draw_pad = LV_MATH_MAX(scrl->ext_draw_pad, style_label->text.line_space + font_h);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {

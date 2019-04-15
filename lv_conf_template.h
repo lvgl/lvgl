@@ -275,7 +275,14 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the d
 typedef void * lv_obj_user_data_t;
 
 /*1: enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
-#define LV_OBJ_REALIGN          1
+#define LV_USE_OBJ_REALIGN          1
+
+/* Enable to make the object clickable on a larger area.
+ * LV_EXT_CLICK_AREA_OFF or 0: Disable this feature
+ * LV_EXT_CLICK_AREA_TINY: The extra area can be adjusted horizontally and vertically (0..255 px)
+ * LV_EXT_CLICK_AREA_FULL: The extra area can be adjusted in all 4 directions (-32k..+32k px)
+ */
+#define LV_USE_EXT_CLICK_AREA  LV_EXT_CLICK_AREA_OFF
 
 /*==================
  *  LV OBJ X USAGE
