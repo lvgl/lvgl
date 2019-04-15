@@ -141,7 +141,7 @@ void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_sty
         case LV_SLIDER_STYLE_INDIC: lv_bar_set_style(slider, LV_BAR_STYLE_INDIC, style); break;
         case LV_SLIDER_STYLE_KNOB:
             ext->style_knob = style;
-            lv_obj_refresh_ext_size(slider);
+            lv_obj_refresh_ext_draw_pad(slider);
             break;
     }
 }
@@ -533,16 +533,17 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
          * During the drawing method the ext. size is used by the knob so refresh the ext. size.*/
         if(lv_obj_get_width(slider) != lv_area_get_width(param) ||
            lv_obj_get_height(slider) != lv_area_get_height(param)) {
-            slider->signal_cb(slider, LV_SIGNAL_REFR_EXT_SIZE, NULL);
+            slider->signal_cb(slider, LV_SIGNAL_REFR_EXT_DRAW_PAD, NULL);
         }
-    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style      = lv_slider_get_style(slider, LV_SLIDER_STYLE_BG);
         const lv_style_t * knob_style = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
+
         lv_coord_t shadow_w     = knob_style->body.shadow.width;
         if(ext->knob_in == 0) {
             /* The smaller size is the knob diameter*/
             lv_coord_t x = LV_MATH_MIN(w / 2 + 1 + shadow_w, h / 2 + 1 + shadow_w);
-            if(slider->ext_size < x) slider->ext_size = x;
+            if(slider->ext_draw_pad < x) slider->ext_draw_pad = x;
         } else {
             lv_coord_t pad = 0;
             pad            = LV_MATH_MIN(pad, style->body.padding.top);
@@ -550,9 +551,9 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             pad            = LV_MATH_MIN(pad, style->body.padding.left);
             pad            = LV_MATH_MIN(pad, style->body.padding.right);
             if(pad < 0) pad = -pad;
-            if(slider->ext_size < pad) slider->ext_size = pad;
+            if(slider->ext_draw_pad < pad) slider->ext_draw_pad = pad;
 
-            if(slider->ext_size < shadow_w) slider->ext_size = shadow_w;
+            if(slider->ext_draw_pad < shadow_w) slider->ext_draw_pad = shadow_w;
         }
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
