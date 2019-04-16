@@ -353,6 +353,7 @@ typedef void * lv_obj_user_data_t;
 #if LV_USE_LABEL != 0
 /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_ROLL/ROLL_CIRC' mode*/
 #  define LV_LABEL_DEF_SCROLL_SPEED       25
+#  define LV_LABEL_WAIT_CHAR_COUNT        3 /* Waiting period at beginning/end of animation cycle */
 #endif
 
 /*LED (dependencies: -)*/
