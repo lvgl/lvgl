@@ -177,14 +177,14 @@ static inline void lv_label_set_style(lv_obj_t * label, const lv_style_t * style
  * @param label pointer to a label object.
  * @param index index to set. -1 to select nothing.
  */
-void lv_label_set_selection_start( const lv_obj_t * label, int index );
+void lv_label_set_selection_start( lv_obj_t * label, int32_t index );
 
 /**
  * @brief Set the selection end index.
  * @param label pointer to a label object.
  * @param index index to set. -1 to select nothing.
  */
-void lv_label_set_selection_end( const lv_obj_t * label, int index );
+void lv_label_set_selection_end( lv_obj_t * label, int32_t index );
 
 /*=====================
  * Getter functions
@@ -273,14 +273,14 @@ static inline const lv_style_t * lv_label_get_style(const lv_obj_t * label)
  * @param label pointer to a label object.
  * @return selection start index. -1 if nothing is selected.
  */
-int lv_label_get_selection_start( const lv_obj_t * label );
+int32_t lv_label_get_selection_start( const lv_obj_t * label );
 
 /**
  * @brief Get the selection end index.
  * @param label pointer to a label object.
  * @return selection end index. -1 if nothing is selected.
  */
-int lv_label_get_selection_end( const lv_obj_t * label );
+int32_t lv_label_get_selection_end( const lv_obj_t * label );
 
 
 /*=====================

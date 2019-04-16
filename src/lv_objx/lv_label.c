@@ -356,7 +356,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
     }
 }
 
-void lv_label_set_selection_start( const lv_obj_t * label, int index ) {
+void lv_label_set_selection_start( lv_obj_t * label, int32_t index ) {
 #if LV_LABEL_SELECTION_EN
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if( index >= 0 ) {
@@ -370,7 +370,7 @@ void lv_label_set_selection_start( const lv_obj_t * label, int index ) {
 #endif
 }
 
-void lv_label_set_selection_end( const lv_obj_t * label, int index ) {
+void lv_label_set_selection_end( lv_obj_t * label, int32_t index ) {
 #if LV_LABEL_SELECTION_EN
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if( index >= 0 ) {
@@ -603,7 +603,12 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     return lv_encoded_get_char_id(txt, i);
 }
 
-int lv_label_get_selection_start( const lv_obj_t * label ) {
+/**
+ * @brief Get the selection start index.
+ * @param label pointer to a label object.
+ * @return selection start index. -1 if nothing is selected.
+ */
+int32_t lv_label_get_selection_start( const lv_obj_t * label ) {
 #if LV_LABEL_SELECTION_EN
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if( ext->selection_en )
@@ -615,7 +620,12 @@ int lv_label_get_selection_start( const lv_obj_t * label ) {
 #endif
 }
 
-int lv_label_get_selection_end( const lv_obj_t * label ) {
+/**
+ * @brief Get the selection end index.
+ * @param label pointer to a label object.
+ * @return selection end index. -1 if nothing is selected.
+ */
+int32_t lv_label_get_selection_end( const lv_obj_t * label ) {
 #if LV_LABEL_SELECTION_EN
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if( ext->selection_en )
