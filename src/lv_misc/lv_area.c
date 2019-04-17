@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_conf.h"
 #include "lv_area.h"
 #include "lv_math.h"
 
@@ -152,6 +153,29 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p)
 
     return is_on;
 }
+
+#if LV_USE_EXTENDED_CLICK_AREA_TINY
+/**
+ * Check if a point is on an area
+ * @param a_p pointer to an area
+ * @param p_p pointer to a point
+ * @param ext_hor extended horizontal padding
+ * @param ext_ver extended horizontal padding
+ * @return false:the point is out of the area
+ */
+bool lv_area_ext_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, uint8_t ext_hor, uint8_t ext_ver)
+{
+    bool is_on = false;
+
+    if(( (p_p->x + ext_hor) >= a_p->x1 && p_p->x <= (a_p->x2 + ext_hor) ) &&
+            ( (p_p->y + ext_ver) >= a_p->y1 && p_p->y <= (a_p->y2 + ext_ver)) ) {
+        is_on = true;
+    }
+
+    return is_on;
+}
+
+#endif
 
 /**
  * Check if two area has common parts
