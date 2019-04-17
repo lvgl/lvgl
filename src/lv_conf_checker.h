@@ -424,6 +424,15 @@
 #define LV_USE_OBJ_REALIGN          1
 #endif
 
+/* Enable to make the object clickable on a larger area.
+ * LV_EXT_CLICK_AREA_OFF or 0: Disable this feature
+ * LV_EXT_CLICK_AREA_TINY: The extra area can be adjusted horizontally and vertically (0..255 px)
+ * LV_EXT_CLICK_AREA_FULL: The extra area can be adjusted in all 4 directions (-32k..+32k px)
+ */
+#ifndef LV_USE_EXT_CLICK_AREA
+#define LV_USE_EXT_CLICK_AREA  LV_EXT_CLICK_AREA_OFF
+#endif
+
 /*==================
  *  LV OBJ X USAGE
  *================*/
@@ -532,6 +541,9 @@
 /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_ROLL/ROLL_CIRC' mode*/
 #ifndef LV_LABEL_DEF_SCROLL_SPEED
 #  define LV_LABEL_DEF_SCROLL_SPEED       25
+#endif
+#ifndef LV_LABEL_WAIT_CHAR_COUNT
+#  define LV_LABEL_WAIT_CHAR_COUNT        3 /* Waiting period at beginning/end of animation cycle */
 #endif
 #endif
 
