@@ -63,16 +63,26 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
     lv_coord_t x_min = LV_MATH_MIN(LV_MATH_MIN(points[0].x, points[1].x), points[2].x);
     lv_coord_t x_max = LV_MATH_MAX(LV_MATH_MAX(points[0].x, points[1].x), points[2].x);
     lv_coord_t y_min = LV_MATH_MIN(LV_MATH_MIN(points[0].y, points[1].y), points[2].y);
-    lv_coord_t y_max = LV_MATH_MAX(LV_MATH_MIN(points[0].y, points[1].y), points[2].y);
+    lv_coord_t y_max = LV_MATH_MAX(LV_MATH_MAX(points[0].y, points[1].y), points[2].y);
 
-    /* If smaller in x then it's flat.
+
+    static lv_color_t c = LV_COLOR_BLACK;
+    c.full += 0xAA234;
+    lv_style_t style_tmp;
+    lv_style_copy(&style_tmp, style);
+//    style_tmp.body.main_color = c;
+
+
+    /* If smaller in x then it's tall.
      * Draw from horizontal lines*/
     if(x_max - x_min < y_max - y_min) {
-        tri_draw_flat(points, mask, style, opa);
+        style_tmp.body.main_color = LV_COLOR_RED;
+        tri_draw_tall(points, mask, &style_tmp, opa);
     }
-    /*Else tall so draw from vertical lines*/
+    /*Else flat so draw from vertical lines*/
     else {
-        tri_draw_tall(points, mask, style, opa);
+        style_tmp.body.main_color = LV_COLOR_BLUE;
+        tri_draw_flat(points, mask, &style_tmp, opa);
     }
 }
 
@@ -124,12 +134,13 @@ void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_s
         act_area.y1 = edge1.y;
         act_area.y2 = edge2.y;
 
+        /* Get the area of a line.
+         * Adjust it a little bit to perfectly match (no redrawn pixels) with the adjacent triangles*/
         draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
-        draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
-        draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
-        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
-        draw_area.x2--; /*Do not draw most right pixel because it will be drawn by the adjacent
-                              triangle*/
+        draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2) - 1;
+        draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2) - 1;
+        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2) - 1;
+
         lv_draw_fill(&draw_area, mask, style->body.main_color, opa);
 
         /*Calc. the next point of edge1*/
@@ -230,9 +241,8 @@ void tri_draw_tall(const lv_point_t * points, const lv_area_t * mask, const lv_s
         draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
         draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
         draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
-        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
-        draw_area.y2--; /*Do not draw most right pixel because it will be drawn by the adjacent
-                              triangle*/
+        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2) - 1;
+
         lv_draw_fill(&draw_area, mask, style->body.main_color, opa);
 
         /*Calc. the next point of edge1*/
