@@ -1063,7 +1063,7 @@ static void tabview_realign(lv_obj_t * tabview)
             case LV_TABVIEW_BTNS_POS_BOTTOM:
                 lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
                 lv_obj_align(ext->btns, ext->content, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
-                lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+                lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_LEFT, 0, 0);
 
                 lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
                 lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
@@ -1086,7 +1086,7 @@ static void tabview_realign(lv_obj_t * tabview)
             case LV_TABVIEW_BTNS_POS_RIGHT:
                 lv_obj_align(ext->btns, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
                 lv_obj_align(ext->content, tabview, LV_ALIGN_IN_TOP_LEFT, 0, 0);
-                lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+                lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_LEFT, 0, 0);
 
                 lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
                 lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
@@ -1128,12 +1128,16 @@ static void tabview_realign(lv_obj_t * tabview)
     if(!ext->btns_hide) {
         switch(ext->btns_pos) {
             case LV_TABVIEW_BTNS_POS_TOP:
-            case LV_TABVIEW_BTNS_POS_BOTTOM:
                 lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
                 break;
+            case LV_TABVIEW_BTNS_POS_BOTTOM:
+                lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+                break;
             case LV_TABVIEW_BTNS_POS_LEFT:
-            case LV_TABVIEW_BTNS_POS_RIGHT:
                 lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+                break;
+            case LV_TABVIEW_BTNS_POS_RIGHT:
+                lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_LEFT, 0, 0);
                 break;
         }        
     }
