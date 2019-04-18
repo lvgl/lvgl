@@ -223,6 +223,7 @@ typedef struct _lv_obj_t
     lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_draw_pad; /*EXTtend the size in every direction for drawing. */
+    
 #if LV_USE_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif
