@@ -795,10 +795,16 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, const lv_style_t * style
  */
 void lv_ta_set_text_sel(lv_obj_t * ta, bool en)
 {
+#if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
     ext->text_sel_en     = en;
 
     if(!en) lv_ta_clear_selection(ta);
+#else
+    (void) ta; /*Unused*/
+    (void) en; /*Unused*/
+#endif
 }
 
 /*=====================
@@ -950,8 +956,19 @@ const lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
  */
 bool lv_ta_text_is_selected(const lv_obj_t * ta)
 {
-    lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    return (lv_label_get_txt_sel_start(ext->label) == LV_LABEL_TEXT_SEL_OFF || lv_label_get_tsxt_sel_end(ext->label) == LV_LABEL_TEXT_SEL_OFF);
+#if LV_LABEL_TEXT_SEL
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+
+    if((lv_label_get_text_sel_start(ext->label) == LV_LABEL_TEXT_SEL_OFF ||
+        lv_label_get_text_sel_end(ext->label) == LV_LABEL_TEXT_SEL_OFF)){
+        return true;
+    } else {
+        return false;
+    }
+#else
+    (void) ta; /*Unused*/
+    return false;
+#endif
 }
 
 /**
@@ -959,11 +976,15 @@ bool lv_ta_text_is_selected(const lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return true: selection mode is enabled, false: disabled
  */
-bool lv_ta_get_text_sel_mode(lv_obj_t * ta)
+bool lv_ta_get_text_sel_en(lv_obj_t * ta)
 {
+#if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-
     return ext->text_sel_en;
+#else
+    (void) ta; /*Unused*/
+    return false;
+#endif
 }
 
 /*=====================
@@ -976,13 +997,17 @@ bool lv_ta_get_text_sel_mode(lv_obj_t * ta)
  */
 void lv_ta_clear_selection(lv_obj_t * ta)
 {
+#if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
 
-    if(lv_label_get_txt_sel_start(ext->label) != LV_LABEL_TEXT_SEL_OFF ||
-       lv_label_get_tsxt_sel_end(ext->label) != LV_LABEL_TEXT_SEL_OFF){
+    if(lv_label_get_text_sel_start(ext->label) != LV_LABEL_TEXT_SEL_OFF ||
+       lv_label_get_text_sel_end(ext->label) != LV_LABEL_TEXT_SEL_OFF){
         lv_label_set_text_sel_start(ext->label, LV_LABEL_TEXT_SEL_OFF);
         lv_label_set_text_sel_end(ext->label, LV_LABEL_TEXT_SEL_OFF);
     }
+#else
+    (void) ta; /*Unused*/
+#endif
 }
 
 /**
@@ -1612,18 +1637,12 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
     }
 
     lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
     lv_area_t label_coords;
-    bool click_outside_label;
-    uint16_t index_of_char_at_position;
-
     lv_obj_get_coords(ext->label, &label_coords);
 
     lv_point_t point_act, vect_act;
-
     lv_indev_get_point(click_source, &point_act);
-
     lv_indev_get_vect(click_source, &vect_act);
 
     if(point_act.x < 0 || point_act.y < 0) return; /*Ignore event from keypad*/
@@ -1633,6 +1652,12 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
 
     lv_coord_t label_width = lv_obj_get_width(ext->label);
 
+    uint16_t index_of_char_at_position;
+
+
+#if LV_LABEL_TEXT_SEL
+    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+    bool click_outside_label;
     /*Check if the click happened on the left side of the area outside the label*/
     if(relative_position.x < 0) {
         index_of_char_at_position = 0;
@@ -1697,6 +1722,21 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
             ext->text_sel_in_prog = 0;
         }
     }
+#else
+    /*Check if the click happened on the left side of the area outside the label*/
+    if(relative_position.x < 0) {
+        index_of_char_at_position = 0;
+    }
+    /*Check if the click happened on the right side of the area outside the label*/
+    else if(relative_position.x >= label_width) {
+        index_of_char_at_position = LV_TA_CURSOR_LAST;
+    } else {
+        index_of_char_at_position = lv_label_get_letter_on(ext->label, &relative_position);
+    }
+
+    if(sign == LV_SIGNAL_PRESSED)
+        lv_ta_set_cursor_pos(ta, index_of_char_at_position);
+#endif
 }
 
 #endif

@@ -93,7 +93,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->anim_speed      = LV_LABEL_DEF_SCROLL_SPEED;
     ext->offset.x        = 0;
     ext->offset.y        = 0;
-#if LV_LABEL_TEXT_SELECTION
+#if LV_LABEL_TEXT_SEL
     ext->txt_sel_start = LV_LABEL_TEXT_SEL_OFF;
     ext->txt_sel_end   = LV_LABEL_TEXT_SEL_OFF;
 #endif
@@ -354,7 +354,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
 }
 
 void lv_label_set_text_sel_start( lv_obj_t * label, uint16_t index ) {
-#if LV_LABEL_TEXT_SELECTION
+#if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->txt_sel_start = index;
     lv_obj_invalidate(label);
@@ -363,7 +363,7 @@ void lv_label_set_text_sel_start( lv_obj_t * label, uint16_t index ) {
 
 void lv_label_set_text_sel_end( lv_obj_t * label, uint16_t index )
 {
-#if LV_LABEL_TEXT_SELECTION
+#if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->txt_sel_end = index;
     lv_obj_invalidate(label);
@@ -594,8 +594,8 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
  * @param label pointer to a label object.
  * @return selection start index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-int32_t lv_label_get_txt_sel_start( const lv_obj_t * label ) {
-#if LV_LABEL_TEXT_SELECTION
+uint16_t lv_label_get_text_sel_start( const lv_obj_t * label ) {
+#if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->txt_sel_start;
 
@@ -609,11 +609,12 @@ int32_t lv_label_get_txt_sel_start( const lv_obj_t * label ) {
  * @param label pointer to a label object.
  * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-int32_t lv_label_get_tsxt_sel_end( const lv_obj_t * label ) {
-#if LV_LABEL_TEXT_SELECTION
+uint16_t lv_label_get_text_sel_end( const lv_obj_t * label ) {
+#if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
         return ext->txt_sel_end;
 #else
+        (void) label; /*Unused*/
     return LV_LABEL_TEXT_SEL_OFF;
 #endif
 }
@@ -824,7 +825,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         }
 
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
-                lv_label_get_txt_sel_start(label), lv_label_get_tsxt_sel_end(label));
+                lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label));
 
         if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
             lv_point_t size;
@@ -839,7 +840,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.y = ext->offset.y;
 
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                        lv_label_get_txt_sel_start(label), lv_label_get_tsxt_sel_end(label));
+                        lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label));
             }
 
             /*Draw the text again below the original to make an circular effect */
@@ -847,7 +848,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.x = ext->offset.x;
                 ofs.y = ext->offset.y + size.y + lv_font_get_height(style->text.font);
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                        lv_label_get_txt_sel_start(label), lv_label_get_tsxt_sel_end(label));
+                        lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label));
             }
         }
     }

@@ -71,7 +71,7 @@ typedef struct
     uint16_t anim_speed;    /*Speed of scroll and roll animation in px/sec unit*/
     lv_point_t offset;      /*Text draw position offset*/
 
-#if LV_LABEL_TEXT_SELECTION
+#if LV_LABEL_TEXT_SEL
     uint16_t txt_sel_start;    /*Left-most selection character*/
     uint16_t txt_sel_end;      /*Right-most selection character*/
 #endif
@@ -273,14 +273,14 @@ static inline const lv_style_t * lv_label_get_style(const lv_obj_t * label)
  * @param label pointer to a label object.
  * @return selection start index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-int32_t lv_label_get_text_sel_start( const lv_obj_t * label );
+uint16_t lv_label_get_text_sel_start( const lv_obj_t * label );
 
 /**
  * @brief Get the selection end index.
  * @param label pointer to a label object.
  * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-int32_t lv_label_get_tsxt_sel_end( const lv_obj_t * label );
+uint16_t lv_label_get_text_sel_end( const lv_obj_t * label );
 
 
 /*=====================
