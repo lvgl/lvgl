@@ -1877,13 +1877,13 @@ lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj)
 }
 
 /**
- * Set the objet's user data
+ * Set the object's user data. The data will be copied.
  * @param obj pointer to an object
  * @param data user data
  */
 void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
 {
-    obj->user_data = data;
+    memcpy(&obj->user_data, &data, sizeof(lv_obj_user_data_t));
 }
 #endif
 

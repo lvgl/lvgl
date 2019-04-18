@@ -859,7 +859,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj);
 
 /**
- * Set the objet's user data
+ * Set the object's user data. The data will be copied.
  * @param obj pointer to an object
  * @param data user data
  */
