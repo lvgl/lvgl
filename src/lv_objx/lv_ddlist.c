@@ -916,6 +916,7 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
                          ext->label->coords.y1 - scrl->coords.y1;
 
     lv_obj_set_y(scrl, -line_y1 + (h - font_h) / 2);
+    lv_obj_invalidate(ddlist);
 }
 
 #endif
