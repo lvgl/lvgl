@@ -23,8 +23,6 @@
 #define LV_LABEL_DEF_SCROLL_SPEED (25)
 #endif
 
-#define ANIM_WAIT_CHAR_COUNT 3
-
 #define LV_LABEL_DOT_END_INV 0xFFFF
 
 /**********************
@@ -317,7 +315,7 @@ void lv_label_set_body_draw(lv_obj_t * label, bool en)
 
     ext->body_draw = en == false ? 0 : 1;
 
-    lv_obj_refresh_ext_size(label);
+    lv_obj_refresh_ext_draw_pad(label);
 
     lv_obj_invalidate(label);
 }
@@ -774,7 +772,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
             /*Draw the text again next to the original to make an circular effect */
             if(size.x > lv_obj_get_width(label)) {
                 ofs.x = ext->offset.x + size.x +
-                        lv_font_get_width(style->text.font, ' ') * ANIM_WAIT_CHAR_COUNT;
+                        lv_font_get_width(style->text.font, ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 ofs.y = ext->offset.y;
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
                               ext->selection_start, ext->selection_end);
@@ -824,13 +822,14 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
             lv_label_revert_dots(label);
             lv_label_refr_text(label);
         }
-    } else if(sign == LV_SIGNAL_REFR_EXT_SIZE) {
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         if(ext->body_draw) {
             const lv_style_t * style = lv_label_get_style(label);
-            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.left);
-            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.right);
-            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.top);
-            label->ext_size = LV_MATH_MAX(label->ext_size, style->body.padding.bottom);
+
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.left);
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.right);
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.top);
+            label->ext_draw_pad    = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.bottom);
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
@@ -883,15 +882,13 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.repeat   = 1;
         anim.playback = 1;
         anim.start    = 0;
-        anim.act_time = 0;
         anim.end_cb   = NULL;
         anim.path     = lv_anim_path_linear;
         anim.playback_pause =
             (((lv_font_get_width(style->text.font, ' ') + style->text.letter_space) * 1000) /
-             ext->anim_speed) *
-            ANIM_WAIT_CHAR_COUNT;
-        ;
+             ext->anim_speed) * LV_LABEL_WAIT_CHAR_COUNT;
         anim.repeat_pause = anim.playback_pause;
+        anim.act_time = -anim.playback_pause;
 
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
@@ -926,7 +923,9 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.repeat         = 1;
         anim.playback       = 0;
         anim.start          = 0;
-        anim.act_time       = 0;
+        anim.act_time       = 
+            -(((lv_font_get_width(style->text.font, ' ') + style->text.letter_space) * 1000) /
+             ext->anim_speed) * LV_LABEL_WAIT_CHAR_COUNT;
         anim.end_cb         = NULL;
         anim.path           = lv_anim_path_linear;
         anim.playback_pause = 0;
@@ -934,7 +933,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
-            anim.end  = -size.x - lv_font_get_width(font, ' ') * ANIM_WAIT_CHAR_COUNT;
+            anim.end  = -size.x - lv_font_get_width(font, ' ') * LV_LABEL_WAIT_CHAR_COUNT;
             anim.fp   = (lv_anim_fp_t)lv_label_set_offset_x;
             anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
