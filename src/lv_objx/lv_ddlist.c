@@ -847,8 +847,9 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
         lv_ddlist_pos_current_option(ddlist);
         if(ext->opened) lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
 #if LV_USE_ANIMATION
-        lv_anim_del(ddlist, (lv_anim_fp_t)lv_obj_set_height); /*If an animation is in progress then
+        lv_anim_del(ddlist, (lv_anim_fp_t)lv_ddlist_adjust_height); /*If an animation is in progress then
                                                                  it will overwrite this changes*/
+        lv_ddlist_anim_cb(ddlist); /*Force animation complete to fix highlight selection*/
     } else {
         lv_anim_t a;
         a.var            = ddlist;
