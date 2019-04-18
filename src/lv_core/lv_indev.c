@@ -497,9 +497,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(i->proc.reset_query) return; /*The object might be deleted*/
             }
 
-            lv_event_send(focused, LV_EVENT_CLICKED, NULL);
-            if(i->proc.reset_query) return; /*The object might be deleted*/
-
             lv_event_send(focused, LV_EVENT_RELEASED, NULL);
             if(i->proc.reset_query) return; /*The object might be deleted*/
         }
