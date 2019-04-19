@@ -308,8 +308,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     /*Set the first btn as active*/
     if(ext->tab_cnt == 1) {
         ext->tab_cur = 0;
-        tabview_realign(tabview); /*To set the proper btns height*/
     }
+
+    tabview_realign(tabview); /*Set the size of the pages, tab buttons and indicator*/
 
     lv_tabview_set_tab_act(tabview, ext->tab_cur, false);
 
