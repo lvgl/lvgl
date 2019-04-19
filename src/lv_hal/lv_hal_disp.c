@@ -124,13 +124,13 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def = disp; /*Temporarily change the default screen to create the default screens on the
                         new display*/
 
+    disp->inv_p = 0;
+
     disp->act_scr   = lv_obj_create(NULL, NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
     lv_obj_set_style(disp->top_layer, &lv_style_transp);
     lv_obj_set_style(disp->sys_layer, &lv_style_transp);
-
-    disp->inv_p = 0;
 
     lv_obj_invalidate(disp->act_scr);
 
