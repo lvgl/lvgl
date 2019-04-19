@@ -248,6 +248,10 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_mem_assert(ext->tab_name_ptr);
     if(ext->tab_name_ptr == NULL) return NULL;
 
+    /* FIXME: It is not possible yet to switch tab button position from/to top/bottom from/to left/right at runtime.
+     * Method: clean extra \n when switch from LV_TABVIEW_BTNS_POS_LEFT or LV_TABVIEW_BTNS_POS_RIGHT
+     * to LV_TABVIEW_BTNS_POS_TOP or LV_TABVIEW_BTNS_POS_BOTTOM.
+     */
     switch(ext->btns_pos) {
         case LV_TABVIEW_BTNS_POS_TOP:
         case LV_TABVIEW_BTNS_POS_BOTTOM:
