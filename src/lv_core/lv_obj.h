@@ -98,6 +98,7 @@ enum {
     LV_EVENT_REFRESH,
     LV_EVENT_APPLY,  /*"Ok", "Apply" or similar specific button has clicked*/
     LV_EVENT_CANCEL, /*"Close", "Cancel" or similar specific button has clicked*/
+    LV_EVENT_DELETE,
 };
 typedef uint8_t lv_event_t;
 

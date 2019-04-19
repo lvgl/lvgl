@@ -1114,6 +1114,8 @@ static void indev_drag(lv_indev_proc_t * state)
             if(state->types.pointer.drag_in_prog == 0) {
                 drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
                 if(state->reset_query != 0) return;
+                lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
+                if(state->reset_query) return; /*The object might be deleted*/
             }
 
             state->types.pointer.drag_in_prog = 1;

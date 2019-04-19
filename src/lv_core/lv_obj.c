@@ -379,7 +379,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
     if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
 
-        /*Delete from the group*/
+    /*Delete from the group*/
 #if LV_USE_GROUP
     bool was_focused = false;
     lv_group_t * group = lv_obj_get_group(obj);
@@ -409,6 +409,9 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         /*Set i to the next node*/
         i = i_next;
     }
+
+    /*Let the suer free the resources used in `LV_EVENT_DELETE`*/
+    lv_event_send(obj, LV_EVENT_DELETE, NULL);
 
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
@@ -2201,6 +2204,9 @@ static void delete_children(lv_obj_t * obj)
         /*Set i to the next node*/
         i = i_next;
     }
+
+    /*Let the suer free the resources used in `LV_EVENT_DELETE`*/
+    lv_event_send(obj, LV_EVENT_DELETE, NULL);
 
     /*Remove the animations from this object*/
 #if LV_USE_ANIMATION
