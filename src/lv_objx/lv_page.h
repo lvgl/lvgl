@@ -340,7 +340,7 @@ static inline lv_fit_t lv_page_get_scrl_fit_right(const lv_obj_t * page)
  * @param page pointer to a page object
  * @return an element of `lv_fit_t`
  */
-static inline lv_fit_t lv_page_get_scrl_get_fit_top(const lv_obj_t * page)
+static inline lv_fit_t lv_page_get_scrl_fit_top(const lv_obj_t * page)
 {
     return lv_cont_get_fit_top(lv_page_get_scrl(page));
 }

@@ -768,6 +768,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    lv_fit_t fit_left = lv_page_get_scrl_fit_left(page);
+    lv_fit_t fit_top = lv_page_get_scrl_fit_top(page);
+    const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
     lv_obj_t * child;
     if(sign == LV_SIGNAL_CHILD_CHG) { /*Automatically move children to the scrollable object*/
         child = lv_obj_get_child(page, NULL);
@@ -776,13 +779,16 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 lv_obj_t * tmp = child;
                 child = lv_obj_get_child(page, child); /*Get the next child before move this*/
 
-                /*Reposition the child to take padding into account*/
-                const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
-                tmp->coords.x1 += style->body.padding.left;
-                tmp->coords.x2 += style->body.padding.left;
-                tmp->coords.y1 += style->body.padding.top;
-                tmp->coords.y2 += style->body.padding.top;
-
+                /* Reposition the child to take padding into account (Only if it's on (0;0) now)
+                 * It's required to keep new the object on the same coordinate if FIT is enabled.*/
+                if((tmp->coords.x1 == page->coords.x1) && (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_FILL)) {
+                    tmp->coords.x1 += style->body.padding.left;
+                    tmp->coords.x2 += style->body.padding.left;
+                }
+                if((tmp->coords.y1 == page->coords.y1) && (fit_top == LV_FIT_TIGHT || fit_top == LV_FIT_FILL)) {
+                    tmp->coords.y1 += style->body.padding.top;
+                    tmp->coords.y2 += style->body.padding.top;
+                }
                 lv_obj_set_parent(tmp, ext->scrl);
             } else {
                 child = lv_obj_get_child(page, child);
