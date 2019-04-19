@@ -1044,13 +1044,23 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
 {
     lv_obj_t * page = lv_obj_get_parent(scrl);
 
-    if(event == LV_EVENT_PRESSED || event == LV_EVENT_PRESSING || event == LV_EVENT_PRESS_LOST ||
-       event == LV_EVENT_RELEASED || event == LV_EVENT_SHORT_CLICKED ||
-       event == LV_EVENT_LONG_PRESSED || event == LV_EVENT_LONG_PRESSED_REPEAT ||
-       event == LV_EVENT_LONG_HOVER_IN || event == LV_EVENT_LONG_HOVER_OUT ||
-       event == LV_EVENT_FOCUSED || event == LV_EVENT_DEFOCUSED) {
+    /*clang-format off*/
+    if(event == LV_EVENT_PRESSED ||
+       event == LV_EVENT_PRESSING ||
+       event == LV_EVENT_PRESS_LOST ||
+       event == LV_EVENT_RELEASED ||
+       event == LV_EVENT_SHORT_CLICKED ||
+       event == LV_EVENT_CLICKED ||
+       event == LV_EVENT_LONG_PRESSED ||
+       event == LV_EVENT_LONG_PRESSED_REPEAT ||
+       event == LV_EVENT_LONG_HOVER_IN ||
+       event == LV_EVENT_LONG_HOVER_OUT ||
+       event == LV_EVENT_FOCUSED ||
+       event == LV_EVENT_DEFOCUSED)
+    {
         lv_event_send(page, event, lv_event_get_data());
     }
+    /*clang-format on*/
 }
 
 /**
