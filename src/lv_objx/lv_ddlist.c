@@ -177,11 +177,17 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options)
 
     lv_label_set_text(ext->label, options);
 
-    /*Set the TIGHT fit horizontally the set the width the content*/
-    lv_page_set_scrl_fit2(ddlist, LV_FIT_TIGHT, LV_FIT_TIGHT);
-
-    /*Revert FILL fit to fill the parent with the options area. It allows to RIGHT/CENTER align the text*/
-    lv_page_set_scrl_fit2(ddlist, LV_FIT_FILL, LV_FIT_TIGHT);
+    switch(lv_label_get_align(ext->label)) {
+    case LV_LABEL_ALIGN_LEFT:
+        lv_obj_align(ext->label, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+        break;
+    case LV_LABEL_ALIGN_CENTER:
+        lv_obj_align(ext->label, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+        break;
+    case LV_LABEL_ALIGN_RIGHT:
+        lv_obj_align(ext->label, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+        break;
+    }
 
     lv_ddlist_refr_size(ddlist, false);
 }
@@ -230,12 +236,6 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 void lv_ddlist_set_fit(lv_obj_t * ddlist, lv_fit_t fit)
 {
     lv_cont_set_fit2(ddlist, fit, LV_FIT_NONE);
-
-    if(fit == LV_FIT_NONE) {
-        lv_page_set_scrl_fit2(ddlist, LV_FIT_FLOOD, LV_FIT_NONE);
-    } else {
-        lv_page_set_scrl_fit2(ddlist, LV_FIT_TIGHT, LV_FIT_NONE);
-    }
 
     lv_ddlist_refr_size(ddlist, false);
 }
@@ -307,6 +307,18 @@ void lv_ddlist_set_align(lv_obj_t * ddlist, lv_label_align_t align)
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     lv_label_set_align(ext->label, align);
+    switch(align) {
+    case LV_LABEL_ALIGN_LEFT:
+        lv_obj_align(ext->label, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+        break;
+    case LV_LABEL_ALIGN_CENTER:
+        lv_obj_align(ext->label, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+        break;
+    case LV_LABEL_ALIGN_RIGHT:
+        lv_obj_align(ext->label, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+        break;
+    }
+
 }
 /*=====================
  * Getter functions
