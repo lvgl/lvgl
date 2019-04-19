@@ -1159,6 +1159,10 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
     if(lv_obj_get_drag_throw(drag_obj) == false) {
         proc->types.pointer.drag_in_prog = 0;
         drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
+        lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
+        if(proc->reset_query) return; /*The object might be deleted*/
+
+        lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
         return;
     }
 
@@ -1197,6 +1201,8 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
             proc->types.pointer.drag_throw_vect.y = 0;
             drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
             if(proc->reset_query) return; /*The object might be deleted*/
+            lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
+            if(proc->reset_query) return; /*The object might be deleted*/
         }
     }
     /*If the types.pointer.vectors become 0 -> types.pointer.drag_in_prog = 0 and send a drag end
@@ -1204,6 +1210,8 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
     else {
         proc->types.pointer.drag_in_prog = 0;
         drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
+        if(proc->reset_query) return; /*The object might be deleted*/
+        lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
         if(proc->reset_query) return; /*The object might be deleted*/
     }
 }
