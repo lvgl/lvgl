@@ -154,7 +154,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p)
     return is_on;
 }
 
-#if LV_USE_EXTENDED_CLICK_AREA_TINY
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
 /**
  * Check if a point is on an area
  * @param a_p pointer to an area

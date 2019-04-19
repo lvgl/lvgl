@@ -147,7 +147,6 @@ typedef void * lv_group_user_data_t;
 
 /*1: Add separate `user_data` for every callback*/
 #define LV_USE_USER_DATA_MULTI  0
-
 /*=====================
  *  Compiler settings
  *====================*/
@@ -156,6 +155,11 @@ typedef void * lv_group_user_data_t;
 
 /* Define a custom attribute to `lv_task_handler` function */
 #define LV_ATTRIBUTE_TASK_HANDLER
+
+/* With size optimization (-Os) the compiler might not align data to
+ * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.*/
+#define LV_ATTRIBUTE_MEM_ALIGN               __attribute__((aligned(4)))  
+
 
 /* 1: Variable length array is supported*/
 #define LV_COMPILER_VLA_SUPPORTED            1
@@ -176,7 +180,7 @@ typedef void * lv_group_user_data_t;
 #endif   /*LV_TICK_CUSTOM*/
 
 typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
-typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the display driver*/
+typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
 
 /*================
  * Log settings
@@ -439,7 +443,6 @@ typedef void * lv_obj_user_data_t;
 /*==================
  * Non-user section
  *==================*/
-
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
 #  define _CRT_SECURE_NO_WARNINGS
 #endif
