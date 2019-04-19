@@ -793,11 +793,18 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, const lv_style_t * style
  * @param ta pointer to a text area object
  * @param en true or false to enable/disable selection mode
  */
-void lv_ta_set_sel_mode(lv_obj_t * ta, bool en)
+void lv_ta_set_text_sel(lv_obj_t * ta, bool en)
 {
+#if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    ext->sel_mode     = en;
+
+    ext->text_sel_en     = en;
+
     if(!en) lv_ta_clear_selection(ta);
+#else
+    (void) ta; /*Unused*/
+    (void) en; /*Unused*/
+#endif
 }
 
 /*=====================
@@ -943,42 +950,25 @@ const lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
 }
 
 /**
- * Get the selection index of the text area.
- *
- * The last character is exclusive (i.e. if the API says that the selection
- * ranges from 6 to 7, only character 6 is selected).
- * @param ta Text area object
- * @param sel_start pointer to int used to hold first selected character
- * @param sel_end pointer to int used to hold last selected character
- */
-
-void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end)
-{
-    lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
-
-    /*Force both values to -1 if there is no selection*/
-    if(ext_label->selection_start == -1 || ext_label->selection_end == -1) {
-        *sel_start = -1;
-        *sel_end   = -1;
-        return;
-    }
-
-    *sel_start = ext_label->selection_start;
-    *sel_end   = ext_label->selection_end;
-}
-
-/**
  * Find whether text is selected or not.
  * @param ta Text area object
  * @return whether text is selected or not
  */
 bool lv_ta_text_is_selected(const lv_obj_t * ta)
 {
-    lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+#if LV_LABEL_TEXT_SEL
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    return (ext_label->selection_start == -1 || ext_label->selection_end == -1);
+    if((lv_label_get_text_sel_start(ext->label) == LV_LABEL_TEXT_SEL_OFF ||
+        lv_label_get_text_sel_end(ext->label) == LV_LABEL_TEXT_SEL_OFF)){
+        return true;
+    } else {
+        return false;
+    }
+#else
+    (void) ta; /*Unused*/
+    return false;
+#endif
 }
 
 /**
@@ -986,11 +976,15 @@ bool lv_ta_text_is_selected(const lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return true: selection mode is enabled, false: disabled
  */
-bool lv_ta_get_sel_mode(lv_obj_t * ta)
+bool lv_ta_get_text_sel_en(lv_obj_t * ta)
 {
+#if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-
-    return ext->sel_mode;
+    return ext->text_sel_en;
+#else
+    (void) ta; /*Unused*/
+    return false;
+#endif
 }
 
 /*=====================
@@ -1003,14 +997,17 @@ bool lv_ta_get_sel_mode(lv_obj_t * ta)
  */
 void lv_ta_clear_selection(lv_obj_t * ta)
 {
+#if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
-    if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
-        ext_label->selection_start = -1;
-        ext_label->selection_end   = -1;
-        lv_obj_invalidate(ta);
+    if(lv_label_get_text_sel_start(ext->label) != LV_LABEL_TEXT_SEL_OFF ||
+       lv_label_get_text_sel_end(ext->label) != LV_LABEL_TEXT_SEL_OFF){
+        lv_label_set_text_sel_start(ext->label, LV_LABEL_TEXT_SEL_OFF);
+        lv_label_set_text_sel_end(ext->label, LV_LABEL_TEXT_SEL_OFF);
     }
+#else
+    (void) ta; /*Unused*/
+#endif
 }
 
 /**
@@ -1182,7 +1179,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
             lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0,
-                          -1, -1);
+                          LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF);
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
             cur_style.body.opa = LV_OPA_TRANSP;
@@ -1640,18 +1637,12 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
     }
 
     lv_ta_ext_t * ext          = lv_obj_get_ext_attr(ta);
-    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
 
     lv_area_t label_coords;
-    bool click_outside_label;
-    uint16_t index_of_char_at_position;
-
     lv_obj_get_coords(ext->label, &label_coords);
 
     lv_point_t point_act, vect_act;
-
     lv_indev_get_point(click_source, &point_act);
-
     lv_indev_get_vect(click_source, &vect_act);
 
     if(point_act.x < 0 || point_act.y < 0) return; /*Ignore event from keypad*/
@@ -1661,6 +1652,12 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
 
     lv_coord_t label_width = lv_obj_get_width(ext->label);
 
+    uint16_t index_of_char_at_position;
+
+
+#if LV_LABEL_TEXT_SEL
+    lv_label_ext_t * ext_label = lv_obj_get_ext_attr(ext->label);
+    bool click_outside_label;
     /*Check if the click happened on the left side of the area outside the label*/
     if(relative_position.x < 0) {
         index_of_char_at_position = 0;
@@ -1675,52 +1672,71 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign,
         click_outside_label       = !lv_label_is_char_under_pos(ext->label, &relative_position);
     }
 
-    if(ext->sel_mode && !ext->selecting && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
-        /*Input device just went down. Store the selection start position*/
-        ext->tmp_sel_start = index_of_char_at_position;
-        ext->tmp_sel_end   = -1;
-        ext->selecting     = 1;
-        lv_obj_set_drag(lv_page_get_scrl(ta), false);
-    } else if(ext->selecting && sign == LV_SIGNAL_PRESSING) {
-        /*Input device may be moving. Store the end position */
-        ext->tmp_sel_end = index_of_char_at_position;
-    } else if(ext->selecting && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
-        /*Input device is released. Check if anything was selected.*/
-        lv_obj_set_drag(lv_page_get_scrl(ta), true);
+    if(ext->text_sel_en) {
+        if(!ext->text_sel_in_prog && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
+            /*Input device just went down. Store the selection start position*/
+            ext->tmp_sel_start = index_of_char_at_position;
+            ext->tmp_sel_end   = LV_LABEL_TEXT_SEL_OFF;
+            ext->text_sel_in_prog     = 1;
+            lv_obj_set_drag(lv_page_get_scrl(ta), false);
+        } else if(ext->text_sel_in_prog && sign == LV_SIGNAL_PRESSING) {
+            /*Input device may be moving. Store the end position */
+            ext->tmp_sel_end = index_of_char_at_position;
+        } else if(ext->text_sel_in_prog && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
+            /*Input device is released. Check if anything was selected.*/
+            lv_obj_set_drag(lv_page_get_scrl(ta), true);
+        }
     }
 
-    if(ext->selecting || sign == LV_SIGNAL_PRESSED)
+    if(ext->text_sel_in_prog || sign == LV_SIGNAL_PRESSED)
         lv_ta_set_cursor_pos(ta, index_of_char_at_position);
 
-    if(ext->selecting) {
+    if(ext->text_sel_in_prog) {
         /*If the selected area has changed then update the real values and*/
         /*invalidate the text area.*/
+
         if(ext->tmp_sel_start > ext->tmp_sel_end) {
-            if(ext_label->selection_start != ext->tmp_sel_end ||
-               ext_label->selection_end != ext->tmp_sel_start) {
-                ext_label->selection_start = ext->tmp_sel_end;
-                ext_label->selection_end   = ext->tmp_sel_start;
+            if(ext_label->txt_sel_start != ext->tmp_sel_end ||
+                    ext_label->txt_sel_end != ext->tmp_sel_start) {
+                ext_label->txt_sel_start = ext->tmp_sel_end;
+                ext_label->txt_sel_end   = ext->tmp_sel_start;
                 lv_obj_invalidate(ta);
             }
         } else if(ext->tmp_sel_start < ext->tmp_sel_end) {
-            if(ext_label->selection_start != ext->tmp_sel_start ||
-               ext_label->selection_end != ext->tmp_sel_end) {
-                ext_label->selection_start = ext->tmp_sel_start;
-                ext_label->selection_end   = ext->tmp_sel_end;
+            if(ext_label->txt_sel_start != ext->tmp_sel_start ||
+                    ext_label->txt_sel_end != ext->tmp_sel_end) {
+                ext_label->txt_sel_start = ext->tmp_sel_start;
+                ext_label->txt_sel_end   = ext->tmp_sel_end;
                 lv_obj_invalidate(ta);
             }
         } else {
-            if(ext_label->selection_start != -1 || ext_label->selection_end != -1) {
-                ext_label->selection_start = -1;
-                ext_label->selection_end   = -1;
+            if(ext_label->txt_sel_start != LV_LABEL_TEXT_SEL_OFF ||
+                    ext_label->txt_sel_end != LV_LABEL_TEXT_SEL_OFF) {
+                ext_label->txt_sel_start = LV_LABEL_TEXT_SEL_OFF;
+                ext_label->txt_sel_end   = LV_LABEL_TEXT_SEL_OFF;
                 lv_obj_invalidate(ta);
             }
         }
         /*Finish selection if necessary */
         if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
-            ext->selecting = 0;
+            ext->text_sel_in_prog = 0;
         }
     }
+#else
+    /*Check if the click happened on the left side of the area outside the label*/
+    if(relative_position.x < 0) {
+        index_of_char_at_position = 0;
+    }
+    /*Check if the click happened on the right side of the area outside the label*/
+    else if(relative_position.x >= label_width) {
+        index_of_char_at_position = LV_TA_CURSOR_LAST;
+    } else {
+        index_of_char_at_position = lv_label_get_letter_on(ext->label, &relative_position);
+    }
+
+    if(sign == LV_SIGNAL_PRESSED)
+        lv_ta_set_cursor_pos(ta, index_of_char_at_position);
+#endif
 }
 
 #endif
