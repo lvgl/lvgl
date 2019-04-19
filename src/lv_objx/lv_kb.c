@@ -344,7 +344,7 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
         lv_btnm_set_ctrl_map(kb, kb_ctrl_spec_map);
         return;
     } else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
-        if(kb->event_cb) {
+        if(kb->event_cb != lv_kb_def_event_cb) {
             lv_event_send(kb, LV_EVENT_CANCEL, NULL);
         } else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area  to hide it cursor if needed*/
@@ -352,7 +352,7 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
         }
         return;
     } else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
-        if(kb->event_cb)
+        if(kb->event_cb != lv_kb_def_event_cb)
             lv_event_send(kb, LV_EVENT_APPLY, NULL);
         else
             lv_kb_set_ta(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
