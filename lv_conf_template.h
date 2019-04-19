@@ -147,6 +147,7 @@ typedef void * lv_group_user_data_t;
 
 /*1: Add separate `user_data` for every callback*/
 #define LV_USE_USER_DATA_MULTI  0
+
 /*=====================
  *  Compiler settings
  *====================*/
@@ -443,6 +444,7 @@ typedef void * lv_obj_user_data_t;
 /*==================
  * Non-user section
  *==================*/
+
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /* Disable warnings for Visual Studio*/
 #  define _CRT_SECURE_NO_WARNINGS
 #endif
