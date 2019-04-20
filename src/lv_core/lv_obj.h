@@ -85,8 +85,6 @@ enum {
                                      `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
     LV_EVENT_CLICKED,             /*Called on release if not dragged (regardless to long press)*/
     LV_EVENT_RELEASED,            /*Called in every cases when the object has been released*/
-    LV_EVENT_LONG_HOVER_IN,       /*TODO*/
-    LV_EVENT_LONG_HOVER_OUT,      /*TODO*/
     LV_EVENT_DRAG_BEGIN,
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
