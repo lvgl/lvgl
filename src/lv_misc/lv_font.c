@@ -112,7 +112,7 @@ bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter)
  * @param letter an UNICODE character code
  * @return  pointer to the bitmap of the letter
  */
-const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
+const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter)
 {
     const lv_font_t * font_i = font_p;
     while(font_i != NULL) {
@@ -131,38 +131,18 @@ const uint8_t * lv_font_get_bitmap(const lv_font_t * font_p, uint32_t letter)
  * @param letter an UNICODE character code
  * @return the width of a letter
  */
-uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter)
+uint8_t lv_font_get_glyph_dsc(const lv_font_t * font_p, uint32_t letter, lv_font_glyph_dsc_t * dsc)
 {
     const lv_font_t * font_i = font_p;
     int16_t w;
     while(font_i != NULL) {
-        w = font_i->get_width(font_i, letter);
+        w = font_i->get_dsc(font_i, letter, dsc);
         if(w >= 0) {
             /*Glyph found*/
             uint8_t m = font_i->monospace;
             if(m) w = m;
             return w;
         }
-
-        font_i = font_i->next_page;
-    }
-
-    return 0;
-}
-
-/**
- * Get the width of the letter without overwriting it with the `monospace` attribute
- * @param font_p pointer to a font
- * @param letter an UNICODE character code
- * @return the width of a letter
- */
-uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter)
-{
-    const lv_font_t * font_i = font_p;
-    int16_t w;
-    while(font_i != NULL) {
-        w = font_i->get_width(font_i, letter);
-        if(w >= 0) return w;
 
         font_i = font_i->next_page;
     }
@@ -196,37 +176,28 @@ uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter)
  * @param unicode_letter an unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
  */
-const uint8_t * lv_font_get_bitmap_continuous(const lv_font_t * font, uint32_t unicode_letter)
+const uint8_t * lv_font_get_glyph_bitmap_plain(const lv_font_t * font, uint32_t unicode_letter)
 {
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
 
-    uint32_t index = (unicode_letter - font->unicode_first);
-    return &font->glyph_bitmap[font->glyph_dsc[index].glyph_index];
-}
-
-/**
- * Generic bitmap get function used in 'font->get_bitmap' when the font NOT contains all characters
- * in the range (sparse)
- * @param font pointer to font
- * @param unicode_letter an unicode letter which bitmap should be get
- * @return pointer to the bitmap or NULL if not found
- */
-const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unicode_letter)
-{
-    /*Check the range*/
-    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
-
-    uint32_t * pUnicode;
-
-    pUnicode = lv_utils_bsearch(&unicode_letter, (uint32_t *)font->unicode_list, font->glyph_cnt,
-                                sizeof(uint32_t), lv_font_codeCompare);
-
-    if(pUnicode != NULL) {
-        uint32_t idx = (uint32_t)(pUnicode - font->unicode_list);
-        return &font->glyph_bitmap[font->glyph_dsc[idx].glyph_index];
+    /*No Unicode list -> Continuous font*/
+    if(font->unicode_list == NULL) {
+        uint32_t index = (unicode_letter - font->unicode_first);
+        return &font->glyph_bitmap[font->glyph_dsc[index].bitmap_index];
+    }
+    /*Has Unicode list -> Sparse font */
+    else {
+        uint32_t * pUnicode;
+        pUnicode = lv_utils_bsearch(&unicode_letter, (uint32_t *)font->unicode_list, font->glyph_cnt,
+                                    sizeof(uint32_t), lv_font_codeCompare);
+        if(pUnicode != NULL) {
+            uint32_t idx = (uint32_t)(pUnicode - font->unicode_list);
+            return &font->glyph_bitmap[font->glyph_dsc[idx].bitmap_index];
+        }
     }
 
+    /*If not returned earlier then the letter is not found in this font*/
     return NULL;
 }
 
@@ -237,40 +208,32 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
  * @param unicode_letter an unicode letter which width should be get
  * @return width of the gylph or -1 if not found
  */
-int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unicode_letter)
+const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc_plain(const lv_font_t * font, uint32_t unicode_letter)
 {
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) {
-        return -1;
+        return NULL;
     }
 
-    uint32_t index = (unicode_letter - font->unicode_first);
-    return font->glyph_dsc[index].w_px;
-}
+    /*No Unicode list -> Continuous font*/
+    if(font->unicode_list == NULL) {
+        uint32_t index = (unicode_letter - font->unicode_first);
+        return &font->glyph_dsc[index];
+    }
+    /*Has Unicode list -> Sparse font */
+    else {
+        uint32_t * pUnicode;
+        pUnicode = lv_utils_bsearch(&unicode_letter, (uint32_t *)font->unicode_list, font->glyph_cnt,
+                                    sizeof(uint32_t), lv_font_codeCompare);
 
-/**
- * Generic glyph width get function used in 'font->get_bitmap' when the font NOT contains all
- * characters in the range (sparse)
- * @param font pointer to font
- * @param unicode_letter an unicode letter which width should be get
- * @return width of the glyph or -1 if not found
- */
-int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter)
-{
-    /*Check the range*/
-    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return -1;
-
-    uint32_t * pUnicode;
-
-    pUnicode = lv_utils_bsearch(&unicode_letter, (uint32_t *)font->unicode_list, font->glyph_cnt,
-                                sizeof(uint32_t), lv_font_codeCompare);
-
-    if(pUnicode != NULL) {
-        uint32_t idx = (uint32_t)(pUnicode - font->unicode_list);
-        return font->glyph_dsc[idx].w_px;
+        if(pUnicode != NULL) {
+            uint32_t idx = (uint32_t)(pUnicode - font->unicode_list);
+            return &font->glyph_dsc[idx];
+        }
     }
 
-    return -1;
+    /*If not returned earlier then the letter is not found in this font*/
+    return NULL;
 }
 
 /**********************

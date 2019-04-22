@@ -273,7 +273,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
         default: return; /*Invalid bpp. Can't render the letter*/
     }
 
-    const uint8_t * map_p = lv_font_get_bitmap(font_p, letter);
+    const uint8_t * map_p = lv_font_get_glyph_bitmap(font_p, letter);
 
     if(map_p == NULL) return;
 
