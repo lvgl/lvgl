@@ -158,8 +158,9 @@ typedef void * lv_group_user_data_t;
 #define LV_ATTRIBUTE_TASK_HANDLER
 
 /* With size optimization (-Os) the compiler might not align data to
- * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.*/
-#define LV_ATTRIBUTE_MEM_ALIGN               __attribute__((aligned(4)))  
+ * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.
+ * E.g. __attribute__((aligned(4))) */
+#define LV_ATTRIBUTE_MEM_ALIGN
 
 
 /* 1: Variable length array is supported*/

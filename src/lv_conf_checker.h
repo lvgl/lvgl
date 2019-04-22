@@ -225,6 +225,14 @@
 #define LV_ATTRIBUTE_TASK_HANDLER
 #endif
 
+/* With size optimization (-Os) the compiler might not align data to
+ * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.
+ * E.g. __attribute__((aligned(4))) */
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
+
 /* 1: Variable length array is supported*/
 #ifndef LV_COMPILER_VLA_SUPPORTED
 #define LV_COMPILER_VLA_SUPPORTED            1
@@ -544,6 +552,9 @@
 #endif
 #ifndef LV_LABEL_WAIT_CHAR_COUNT
 #  define LV_LABEL_WAIT_CHAR_COUNT        3 /* Waiting period at beginning/end of animation cycle */
+#endif
+#ifndef LV_LABEL_TEXT_SEL
+#  define LV_LABEL_TEXT_SEL               1  /*Enable selecting text of the label */
 #endif
 #endif
 
