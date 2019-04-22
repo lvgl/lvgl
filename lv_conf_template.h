@@ -120,6 +120,9 @@
 
 /*1: Enable the Animations */
 #define LV_USE_ANIMATION        1
+#if LV_USE_ANIMATION
+typedef void * lv_anim_user_data_t;
+#endif
 
 /* 1: Enable shadow drawing*/
 #define LV_USE_SHADOW           1
