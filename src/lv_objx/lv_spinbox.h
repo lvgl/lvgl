@@ -38,9 +38,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*callback on value change*/
-typedef void (*lv_spinbox_value_changed_cb_t)(lv_obj_t * spinbox, int32_t new_value);
-
 /*Data of spinbox*/
 typedef struct
 {

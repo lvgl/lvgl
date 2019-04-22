@@ -68,8 +68,8 @@ void lv_anim_create(lv_anim_t * anim_p)
 {
     LV_LOG_TRACE("animation create started")
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
-    if(anim_p->fp != NULL)
-        lv_anim_del(anim_p->var, anim_p->fp); /*fp == NULL would delete all animations of var*/
+    if(anim_p->exec_cb != NULL)
+        lv_anim_del(anim_p->var, anim_p->exec_cb); /*fp == NULL would delete all animations of var*/
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
@@ -81,7 +81,7 @@ void lv_anim_create(lv_anim_t * anim_p)
     memcpy(new_anim, anim_p, sizeof(lv_anim_t));
 
     /*Set the start value*/
-    if(new_anim->fp != NULL) new_anim->fp(new_anim->var, new_anim->start);
+    if(new_anim->exec_cb != NULL) new_anim->exec_cb(new_anim->var, new_anim->start);
 
     /* Creating an animation changed the linked list.
      * It's important if it happens in a ready callback. (see `anim_task`)*/
@@ -97,7 +97,7 @@ void lv_anim_create(lv_anim_t * anim_p)
  *           or NULL to delete all animations of 'var'
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_fp_t fp)
+bool lv_anim_del(void * var, lv_anim_exec_cb_t fp)
 {
     lv_anim_t * a;
     lv_anim_t * a_next;
@@ -107,7 +107,7 @@ bool lv_anim_del(void * var, lv_anim_fp_t fp)
         /*'a' might be deleted, so get the next object while 'a' is valid*/
         a_next = lv_ll_get_next(&LV_GC_ROOT(_lv_anim_ll), a);
 
-        if(a->var == var && (a->fp == fp || fp == NULL)) {
+        if(a->var == var && (a->exec_cb == fp || fp == NULL)) {
             lv_ll_rem(&LV_GC_ROOT(_lv_anim_ll), a);
             lv_mem_free(a);
             anim_list_changed = true; /*Read by `anim_task`. It need to know if a delete occurred in
@@ -386,9 +386,9 @@ static void anim_task(void * param)
                 if(a->act_time > a->time) a->act_time = a->time;
 
                 int32_t new_value;
-                new_value = a->path(a);
+                new_value = a->path_cb(a);
 
-                if(a->fp != NULL) a->fp(a->var, new_value); /*Apply the calculated value*/
+                if(a->exec_cb != NULL) a->exec_cb(a->var, new_value); /*Apply the calculated value*/
 
                 /*If the time is elapsed the animation is ready*/
                 if(a->act_time >= a->time) {
@@ -422,7 +422,7 @@ static bool anim_ready_handler(lv_anim_t * a)
      * - no repeat, play back is enabled and play back is ready */
     if((a->repeat == 0 && a->playback == 0) ||
        (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
-        void (*cb)(void *) = a->end_cb;
+        lv_anim_ready_cb_t ready_cb = a->ready_cb;
         void * p           = a->var;
         lv_ll_rem(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
@@ -431,7 +431,7 @@ static bool anim_ready_handler(lv_anim_t * a)
         /* Call the callback function at the end*/
         /* Check if an animation is deleted in the cb function
          * if yes then the caller function has to know this*/
-        if(cb != NULL) cb(p);
+        if(ready_cb != NULL) ready_cb(p);
     }
     /*If the animation is not deleted then restart it*/
     else {

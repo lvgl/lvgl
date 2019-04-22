@@ -34,23 +34,37 @@ extern "C" {
 
 struct _lv_anim_t;
 
-typedef int32_t (*lv_anim_path_t)(const struct _lv_anim_t *);
+/*Generic prototype of "animator" functions*/
+typedef void (*lv_anim_exec_cb_t)(void *, int32_t);
 
-typedef void (*lv_anim_fp_t)(void *, int32_t);
-typedef void (*lv_anim_cb_t)(void *);
+/*Get the current value in an animation*/
+typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
+
+/*Callback for animation ready*/
+typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 
 typedef struct _lv_anim_t
 {
     void * var;              /*Variable to animate*/
-    lv_anim_fp_t fp;         /*Animator function*/
-    lv_anim_cb_t end_cb;     /*Call it when the animation is ready*/
-    lv_anim_path_t path;     /*An array with the steps of animations*/
+    lv_anim_exec_cb_t exec_cb;     /*Function to execute to animate*/
+    lv_anim_path_cb_t path_cb;     /*An array with the steps of animations*/
+    lv_anim_ready_cb_t ready_cb;     /*Call it when the animation is ready*/
     int32_t start;           /*Start value*/
     int32_t end;             /*End value*/
     uint16_t time;           /*Animation time in ms*/
     int16_t act_time;        /*Current time in animation. Set to negative to make delay.*/
     uint16_t playback_pause; /*Wait before play back*/
     uint16_t repeat_pause;   /*Wait before repeat*/
+#if LV_USE_USER_DATA_SINGLE
+    lv_anim_user_data_t user_data;  /*Custom user data*/
+#endif
+
+#if LV_USE_USER_DATA_MULTI
+    lv_anim_user_data_t exec_user_data;
+    lv_anim_user_data_t path_user_data;
+    lv_anim_user_data_t ready_user_data;
+#endif
+
     uint8_t playback : 1;    /*When the animation is ready play it back*/
     uint8_t repeat : 1;      /*Repeat the animation infinitely*/
     /*Animation system use these - user shouldn't set*/
@@ -63,15 +77,16 @@ lv_anim_t a;
 a.var = obj;
 a.start = lv_obj_get_height(obj);
 a.end = new_height;
-a.fp = (lv_anim_fp_t)lv_obj_set_height;
-a.path = lv_anim_path_linear;
-a.end_cb = NULL;
+a.exec_cb = (lv_anim_fp_t)lv_obj_set_height;
+a.path_cb = lv_anim_path_linear;
+a.ready_cb = NULL;
 a.act_time = 0;
 a.time = 200;
 a.playback = 0;
 a.playback_pause = 0;
 a.repeat = 0;
 a.repeat_pause = 0;
+a.user_data = NULL;
 lv_anim_create(&a);
  */
 /**********************
@@ -96,7 +111,7 @@ void lv_anim_create(lv_anim_t * anim_p);
  *           or NULL to ignore it and delete all animation with 'var
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_fp_t fp);
+bool lv_anim_del(void * var, lv_anim_exec_cb_t fp);
 
 /**
  * Get the number of currently running animations
@@ -162,6 +177,7 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a);
  * @return the current value to set
  */
 int32_t lv_anim_path_step(const lv_anim_t * a);
+
 /**********************
  *      MACROS
  **********************/

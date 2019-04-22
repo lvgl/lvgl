@@ -33,7 +33,7 @@ typedef struct
                                will be modified too*/
     lv_style_t style_end;
     lv_style_t * style_anim;
-    void (*end_cb)(void *);
+    lv_anim_ready_cb_t ready_cb;
 } lv_style_anim_dsc_t;
 #endif
 
@@ -42,7 +42,7 @@ typedef struct
  **********************/
 #if LV_USE_ANIMATION
 static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val);
-static void style_animation_common_end_cb(void * ptr);
+static void style_animation_common_end_cb(lv_anim_t * a);
 #endif
 
 /**********************
@@ -303,15 +303,15 @@ void * lv_style_anim_create(lv_style_anim_t * anim)
     memcpy(&dsc->style_start, anim->style_start, sizeof(lv_style_t));
     memcpy(&dsc->style_end, anim->style_end, sizeof(lv_style_t));
     memcpy(dsc->style_anim, anim->style_start, sizeof(lv_style_t));
-    dsc->end_cb = anim->end_cb;
+    dsc->ready_cb = anim->ready_cb;
 
     lv_anim_t a;
     a.var            = (void *)dsc;
     a.start          = 0;
     a.end            = STYLE_MIX_MAX;
-    a.fp             = (lv_anim_fp_t)style_animator;
-    a.path           = lv_anim_path_linear;
-    a.end_cb         = style_animation_common_end_cb;
+    a.exec_cb        = (lv_anim_exec_cb_t)style_animator;
+    a.path_cb        = lv_anim_path_linear;
+    a.ready_cb       = style_animation_common_end_cb;
     a.act_time       = anim->act_time;
     a.time           = anim->time;
     a.playback       = anim->playback;
@@ -348,13 +348,15 @@ static void style_animator(lv_style_anim_dsc_t * dsc, int32_t val)
 /**
  * Called when a style animation is ready
  * It called the user defined call back and free the allocated memories
- * @param ptr the 'animated variable' set by lv_style_anim_create()
+ * @param a pointer to the animation
  */
-static void style_animation_common_end_cb(void * ptr)
+static void style_animation_common_end_cb(lv_anim_t * a)
 {
-    lv_style_anim_dsc_t * dsc = ptr; /*To avoid casting*/
 
-    if(dsc->end_cb) dsc->end_cb(dsc);
+    (void) a;       /*Unused*/
+    lv_style_anim_dsc_t * dsc = a->var; /*To avoid casting*/
+
+    if(dsc->ready_cb) dsc->ready_cb(a);
 
     lv_mem_free(dsc);
 }

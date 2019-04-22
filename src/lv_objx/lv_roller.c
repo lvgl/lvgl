@@ -37,6 +37,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t * roller, bool anim_en);
 static void inf_normalize(void * roller_scrl);
+static void scroll_anim_ready_cb(lv_anim_t * a);
 static void draw_bg(lv_obj_t * roller, const lv_area_t * mask);
 
 /**********************
@@ -399,7 +400,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         lv_obj_set_height(lv_page_get_scrl(roller),
                           lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
         lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
-        lv_anim_del(lv_page_get_scrl(roller), (lv_anim_fp_t)lv_obj_set_y);
+        lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_cb_t)lv_obj_set_y);
         lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
 
         refr_position(roller, false);
@@ -413,7 +414,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                               lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
 
             lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
-            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_fp_t)lv_obj_set_y);
+            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_cb_t)lv_obj_set_y);
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
         }
@@ -632,9 +633,9 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
         a.var            = roller_scrl;
         a.start          = lv_obj_get_y(roller_scrl);
         a.end            = new_y;
-        a.fp             = (lv_anim_fp_t)lv_obj_set_y;
-        a.path           = lv_anim_path_linear;
-        a.end_cb         = inf_normalize;
+        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = scroll_anim_ready_cb;
         a.act_time       = 0;
         a.time           = ext->ddlist.anim_time;
         a.playback       = 0;
@@ -675,6 +676,11 @@ static void inf_normalize(void * scrl)
         lv_coord_t new_y = -line_y1 + (h - font_h) / 2;
         lv_obj_set_y(roller_scrl, new_y);
     }
+}
+
+static void scroll_anim_ready_cb(lv_anim_t * a)
+{
+    inf_normalize(a->var);
 }
 
 #endif

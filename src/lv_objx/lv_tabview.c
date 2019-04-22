@@ -379,9 +379,9 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
         a.var            = ext->content;
         a.start          = lv_obj_get_x(ext->content);
         a.end            = cont_x;
-        a.fp             = (lv_anim_fp_t)lv_obj_set_x;
-        a.path           = lv_anim_path_linear;
-        a.end_cb         = NULL;
+        a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_x;
+        a.path_cb           = lv_anim_path_linear;
+        a.ready_cb         = NULL;
         a.act_time       = 0;
         a.time           = ext->anim_time;
         a.playback       = 0;
@@ -431,18 +431,18 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             case LV_TABVIEW_BTNS_POS_BOTTOM:
                 a.start          = lv_obj_get_x(ext->indic);
                 a.end            = indic_pos;
-                a.fp             = (lv_anim_fp_t)lv_obj_set_x;
+                a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_x;
                 break;
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT:
                 a.start          = lv_obj_get_y(ext->indic);
                 a.end            = indic_pos;
-                a.fp             = (lv_anim_fp_t)lv_obj_set_y;
+                a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_y;
                 break;
         }
 
-        a.path           = lv_anim_path_linear;
-        a.end_cb         = NULL;
+        a.path_cb           = lv_anim_path_linear;
+        a.ready_cb         = NULL;
         a.act_time       = 0;
         a.time           = ext->anim_time;
         a.playback       = 0;

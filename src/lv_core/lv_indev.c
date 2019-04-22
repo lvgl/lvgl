@@ -220,16 +220,6 @@ void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t * points)
 }
 
 /**
- * Set feedback callback for indev.
- * @param indev pointer to an input device
- * @param feedback feedback callback
- */
-void lv_indev_set_feedback(lv_indev_t * indev, lv_indev_feedback_t feedback)
-{
-    indev->feedback = feedback;
-}
-
-/**
  * Get the last point of an input device (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the result
@@ -293,16 +283,6 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
         point->x = indev->proc.types.pointer.vect.x;
         point->y = indev->proc.types.pointer.vect.y;
     }
-}
-
-/**
- * Get feedback callback for indev.
- * @param indev pointer to an input device
- * @return feedback callback
- */
-lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t * indev)
-{
-    return indev->feedback;
 }
 
 /**
