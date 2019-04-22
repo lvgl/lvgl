@@ -768,11 +768,11 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    lv_fit_t fit_left = lv_page_get_scrl_fit_left(page);
-    lv_fit_t fit_top = lv_page_get_scrl_fit_top(page);
-    const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
     lv_obj_t * child;
     if(sign == LV_SIGNAL_CHILD_CHG) { /*Automatically move children to the scrollable object*/
+        const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+        lv_fit_t fit_left = lv_page_get_scrl_fit_left(page);
+        lv_fit_t fit_top = lv_page_get_scrl_fit_top(page);
         child = lv_obj_get_child(page, NULL);
         while(child != NULL) {
             if(lv_obj_is_protected(child, LV_PROTECT_PARENT) == false) {

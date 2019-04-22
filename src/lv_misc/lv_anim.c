@@ -422,16 +422,17 @@ static bool anim_ready_handler(lv_anim_t * a)
      * - no repeat, play back is enabled and play back is ready */
     if((a->repeat == 0 && a->playback == 0) ||
        (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
-        lv_anim_ready_cb_t ready_cb = a->ready_cb;
-        void * p           = a->var;
+
+        /*Create copy from the animation and delete the animation from the list.
+         * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
+        lv_anim_t a_tmp;
+        memcpy(&a_tmp, a, sizeof(lv_anim_t));
         lv_ll_rem(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
         anim_list_changed = true;
 
         /* Call the callback function at the end*/
-        /* Check if an animation is deleted in the cb function
-         * if yes then the caller function has to know this*/
-        if(ready_cb != NULL) ready_cb(p);
+        if(a_tmp.ready_cb != NULL) a_tmp.ready_cb(&a_tmp);
     }
     /*If the animation is not deleted then restart it*/
     else {
