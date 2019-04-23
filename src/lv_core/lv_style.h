@@ -115,11 +115,19 @@ typedef struct
     const lv_style_t * style_start; /*Pointer to the starting style*/
     const lv_style_t * style_end;   /*Pointer to the destination style*/
     lv_style_t * style_anim;        /*Pointer to a style to animate*/
-    lv_anim_cb_t end_cb;            /*Call it when the animation is ready (NULL if unused)*/
+    lv_anim_ready_cb_t ready_cb;            /*Call it when the animation is ready (NULL if unused)*/
     int16_t time;                   /*Animation time in ms*/
     int16_t act_time;               /*Current time in animation. Set to negative to make delay.*/
     uint16_t playback_pause;        /*Wait before play back*/
     uint16_t repeat_pause;          /*Wait before repeat*/
+#if LV_USE_USER_DATA_SINGLE
+    lv_anim_user_data_t user_data;  /*Custom user data*/
+#endif
+
+#if LV_USE_USER_DATA_MULTI
+    lv_anim_user_data_t ready_user_data;
+#endif
+
     uint8_t playback : 1;           /*When the animation is ready play it back*/
     uint8_t repeat : 1;             /*Repeat the animation infinitely*/
 } lv_style_anim_t;
@@ -135,7 +143,8 @@ a.playback = 0;
 a.playback_pause = 0;
 a.repeat = 0;
 a.repeat_pause = 0;
-a.end_cb = NULL;
+a.ready_cb = NULL;
+a.user_data = NULL;
 lv_style_anim_create(&a);
  */
 #endif

@@ -552,9 +552,9 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
  * Set a an event handler function for an object.
  * Used by the user to react on event which happens with the object.
  * @param obj pointer to an object
- * @param cb the new event function
+ * @param event_cb the new event function
  */
-void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb);
+void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
 
 /**
  * Send an event to the object
@@ -575,9 +575,9 @@ const void * lv_event_get_data(void);
  * Set the a signal function of an object. Used internally by the library.
  * Always call the previous signal function in the new.
  * @param obj pointer to an object
- * @param cb the new signal function
+ * @param signal_cb the new signal function
  */
-void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb);
+void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
 
 /**
  * Send an event to the object
@@ -589,9 +589,9 @@ void lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
 /**
  * Set a new design function for an object
  * @param obj pointer to an object
- * @param cb the new design function
+ * @param design_cb the new design function
  */
-void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t cb);
+void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
 
 /*----------------
  * Other set
@@ -612,16 +612,17 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj);
 
 #if LV_USE_ANIMATION
+
 /**
  * Animate an object
  * @param obj pointer to an object to animate
  * @param type type of animation from 'lv_anim_builtin_t'. 'OR' it with ANIM_IN or ANIM_OUT
  * @param time time of animation in milliseconds
  * @param delay delay before the animation in milliseconds
- * @param cb a function to call when the animation is ready
+ * @param ready_cb a function to call when the animation is ready
  */
 void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay,
-                    void (*cb)(lv_obj_t *));
+                    lv_anim_ready_cb_t ready_cb);
 #endif
 
 /*=======================

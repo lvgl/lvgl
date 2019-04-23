@@ -54,6 +54,7 @@ typedef uint8_t lv_indev_type_t;
 enum { LV_INDEV_STATE_REL = 0, LV_INDEV_STATE_PR };
 typedef uint8_t lv_indev_state_t;
 
+
 /*Data type when an input device is read */
 typedef struct
 {
@@ -73,17 +74,22 @@ typedef struct _lv_indev_drv_t
     /*Input device type*/
     lv_indev_type_t type;
 
-    /*Function pointer to read_cb data. Return 'true' if there is still data to be read_cb
-     * (buffered)*/
+    /*Function pointer to read input device data.
+     * Return 'true' if there is still data to be read (buffered)*/
     bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 
-#if LV_USE_USER_DATA_MULTI
-    lv_indev_drv_user_data_t read_user_data;
-#endif
+    /*Called when an action happened on the input device.*/
+    void (*feedback_cb)(struct _lv_indev_drv_t *, uint8_t);
 
 #if LV_USE_USER_DATA_SINGLE
     lv_indev_drv_user_data_t user_data;
 #endif
+
+#if LV_USE_USER_DATA_MULTI
+    lv_indev_drv_user_data_t read_user_data;
+    lv_indev_drv_user_data_t feedback_user_data;
+#endif
+
 
     /*Pointer to the assigned display*/
     struct _disp_t * disp;
@@ -143,8 +149,6 @@ typedef struct _lv_indev_proc_t
     uint8_t wait_until_release : 1;
 } lv_indev_proc_t;
 
-typedef void (*lv_indev_feedback_t)(struct _lv_indev_t *, uint8_t);
-
 struct _lv_obj_t;
 struct _lv_group_t;
 
@@ -154,7 +158,6 @@ typedef struct _lv_indev_t
 {
     lv_indev_drv_t driver;
     lv_indev_proc_t proc;
-    lv_indev_feedback_t feedback;
     struct _lv_obj_t * cursor;     /*Cursor for LV_INPUT_TYPE_POINTER*/
     struct _lv_group_t * group;    /*Keypad destination group*/
     const lv_point_t * btn_points; /*Array points assigned to the button ()screen will be pressed

@@ -64,9 +64,9 @@ typedef struct
     /*New data for this type */
     char * text;                    /*Text of the label*/
     union{
-        char * dot_tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled by the library)*/
-        char dot_tmp[ sizeof(char *) ];    /* Directly store the characters if <=4 characters */
-    };
+        char * tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled by the library)*/
+        char tmp[ sizeof(char *) ];    /* Directly store the characters if <=4 characters */
+    } dot;
     uint16_t dot_end;       /*The text end position in dot mode (Handled by the library)*/
     uint16_t anim_speed;    /*Speed of scroll and roll animation in px/sec unit*/
     lv_point_t offset;      /*Text draw position offset*/

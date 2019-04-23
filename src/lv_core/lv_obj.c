@@ -1259,11 +1259,11 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
  * Set a an event handler function for an object.
  * Used by the user to react on event which happens with the object.
  * @param obj pointer to an object
- * @param cb the new event function
+ * @param event_cb the new event function
  */
-void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb)
+void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
-    obj->event_cb = cb;
+    obj->event_cb = event_cb;
 }
 
 /**
@@ -1322,9 +1322,9 @@ const void * lv_event_get_data(void)
  * @param obj pointer to an object
  * @param cb the new signal function
  */
-void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb)
+void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb)
 {
-    obj->signal_cb = cb;
+    obj->signal_cb = signal_cb;
 }
 
 /**
@@ -1340,11 +1340,11 @@ void lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 /**
  * Set a new design function for an object
  * @param obj pointer to an object
- * @param cb the new design function
+ * @param design_cb the new design function
  */
-void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t cb)
+void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb)
 {
-    obj->design_cb = cb;
+    obj->design_cb = design_cb;
 }
 
 /*----------------
@@ -1383,10 +1383,10 @@ void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
  * @param type type of animation from 'lv_anim_builtin_t'. 'OR' it with ANIM_IN or ANIM_OUT
  * @param time time of animation in milliseconds
  * @param delay delay before the animation in milliseconds
- * @param cb a function to call when the animation is ready
+ * @param ready_cb a function to call when the animation is ready
  */
 void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay,
-                    void (*cb)(lv_obj_t *))
+                    lv_anim_ready_cb_t ready_cb)
 {
     lv_obj_t * par = lv_obj_get_parent(obj);
 
@@ -1398,8 +1398,8 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
     a.var            = obj;
     a.time           = time;
     a.act_time       = (int32_t)-delay;
-    a.end_cb         = (void (*)(void *))cb;
-    a.path           = lv_anim_path_linear;
+    a.ready_cb       = ready_cb;
+    a.path_cb        = lv_anim_path_linear;
     a.playback_pause = 0;
     a.repeat_pause   = 0;
     a.playback       = 0;
@@ -1408,37 +1408,37 @@ void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint1
     /*Init to ANIM_IN*/
     switch(type) {
         case LV_ANIM_FLOAT_LEFT:
-            a.fp    = (void (*)(void *, int32_t))lv_obj_set_x;
+            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_x;
             a.start = -lv_obj_get_width(obj);
             a.end   = lv_obj_get_x(obj);
             break;
         case LV_ANIM_FLOAT_RIGHT:
-            a.fp    = (void (*)(void *, int32_t))lv_obj_set_x;
+            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_x;
             a.start = lv_obj_get_width(par);
             a.end   = lv_obj_get_x(obj);
             break;
         case LV_ANIM_FLOAT_TOP:
-            a.fp    = (void (*)(void *, int32_t))lv_obj_set_y;
+            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_y;
             a.start = -lv_obj_get_height(obj);
             a.end   = lv_obj_get_y(obj);
             break;
         case LV_ANIM_FLOAT_BOTTOM:
-            a.fp    = (void (*)(void *, int32_t))lv_obj_set_y;
+            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_y;
             a.start = lv_obj_get_height(par);
             a.end   = lv_obj_get_y(obj);
             break;
         case LV_ANIM_GROW_H:
-            a.fp    = (void (*)(void *, int32_t))lv_obj_set_width;
+            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_width;
             a.start = 0;
             a.end   = lv_obj_get_width(obj);
             break;
         case LV_ANIM_GROW_V:
-            a.fp    = (void (*)(void *, int32_t))lv_obj_set_height;
+            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_height;
             a.start = 0;
             a.end   = lv_obj_get_height(obj);
             break;
         case LV_ANIM_NONE:
-            a.fp    = NULL;
+            a.exec_cb    = NULL;
             a.start = 0;
             a.end   = 0;
             break;
@@ -2091,7 +2091,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_indev_t * indev_act = lv_indev_get_act();
 
     if(sign > _LV_SIGNAL_FEEDBACK_SECTION_START && sign < _LV_SIGNAL_FEEDBACK_SECTION_END) {
-        if(indev_act != NULL && indev_act->feedback != NULL) indev_act->feedback(indev_act, sign);
+        if(indev_act != NULL) {
+            if(indev_act->driver.feedback_cb) indev_act->driver.feedback_cb(&indev_act->driver, sign);
+        }
     }
 
     if(sign == LV_SIGNAL_CHILD_CHG) {

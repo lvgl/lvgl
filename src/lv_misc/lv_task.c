@@ -165,10 +165,10 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
  * @param task a function which is the task itself
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
- * @param param free parameter
+ * @param user_data free parameter
  * @return pointer to the new task
  */
-lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void * param)
+lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void * user_data)
 {
     lv_task_t * new_lv_task = NULL;
     lv_task_t * tmp;
@@ -200,7 +200,7 @@ lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t
     new_lv_task->period   = period;
     new_lv_task->task     = task;
     new_lv_task->prio     = prio;
-    new_lv_task->param    = param;
+    new_lv_task->param    = user_data;
     new_lv_task->once     = 0;
     new_lv_task->last_run = lv_tick_get();
 

@@ -36,7 +36,7 @@
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t * mbox);
-static void lv_mbox_close_end_cb(lv_obj_t * mbox);
+static void lv_mbox_close_ready_cb(lv_anim_t * a);
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event);
 
 /**********************
@@ -204,12 +204,12 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         /*Add shrinking animations*/
         lv_obj_animate(mbox, LV_ANIM_GROW_H | LV_ANIM_OUT, ext->anim_time, delay, NULL);
         lv_obj_animate(mbox, LV_ANIM_GROW_V | LV_ANIM_OUT, ext->anim_time, delay,
-                       lv_mbox_close_end_cb);
+                       lv_mbox_close_ready_cb);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, LV_FIT_NONE);
     } else {
-        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_mbox_close_end_cb);
+        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_mbox_close_ready_cb);
     }
 #else
     (void)delay; /*Unused*/
@@ -491,9 +491,9 @@ static void mbox_realign(lv_obj_t * mbox)
     }
 }
 
-static void lv_mbox_close_end_cb(lv_obj_t * mbox)
+static void lv_mbox_close_ready_cb(lv_anim_t * a)
 {
-    lv_obj_del(mbox);
+    lv_obj_del(a->var);
 }
 
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event)

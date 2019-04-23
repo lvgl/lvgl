@@ -145,18 +145,6 @@ void lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t *
  */
 bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p);
 
-#if LV_USE_EXTENDED_CLICK_AREA_TINY
-/**
- * Check if a point is on an area
- * @param a_p pointer to an area
- * @param p_p pointer to a point
- * @param ext_hor extended horizontal padding
- * @param ext_ver extended horizontal padding
- * @return false:the point is out of the area
- */
-bool lv_area_ext_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, uint8_t ext_hor, uint8_t ext_ver);
-#endif
-
 /**
  * Check if two area has common parts
  * @param a1_p pointer to an area.
