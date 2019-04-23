@@ -335,7 +335,7 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t *
 
             lv_coord_t char_width = lv_font_get_width(font, letter);
             if(char_width > 0) {
-                width += lv_font_get_width(font, letter);
+                width += char_width;
                 width += letter_space;
             }
         }
