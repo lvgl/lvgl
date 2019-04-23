@@ -80,11 +80,11 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
  * @param task a function which is the task itself
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
- * @param param free parameter
+ * @param user_data free parameter
  * @return pointer to the new task
  */
 lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio,
-                           void * param);
+                           void * user_data);
 
 /**
  * Delete a lv_task

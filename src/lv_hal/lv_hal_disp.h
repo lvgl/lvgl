@@ -105,6 +105,8 @@ typedef struct _disp_drv_t
 
 #if LV_USE_USER_DATA_MULTI
     lv_disp_drv_user_data_t flush_user_data;
+    lv_disp_drv_user_data_t mem_blend_user_data;
+    lv_disp_drv_user_data_t mem_fill_user_data;
     lv_disp_drv_user_data_t rounder_user_data;
     lv_disp_drv_user_data_t set_px_user_data;
     lv_disp_drv_user_data_t monitor_user_data;

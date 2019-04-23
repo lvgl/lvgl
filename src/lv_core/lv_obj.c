@@ -1259,11 +1259,11 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
  * Set a an event handler function for an object.
  * Used by the user to react on event which happens with the object.
  * @param obj pointer to an object
- * @param cb the new event function
+ * @param event_cb the new event function
  */
-void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb)
+void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
-    obj->event_cb = cb;
+    obj->event_cb = event_cb;
 }
 
 /**
@@ -1322,9 +1322,9 @@ const void * lv_event_get_data(void)
  * @param obj pointer to an object
  * @param cb the new signal function
  */
-void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb)
+void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb)
 {
-    obj->signal_cb = cb;
+    obj->signal_cb = signal_cb;
 }
 
 /**
@@ -1340,11 +1340,11 @@ void lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
 /**
  * Set a new design function for an object
  * @param obj pointer to an object
- * @param cb the new design function
+ * @param design_cb the new design function
  */
-void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t cb)
+void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb)
 {
-    obj->design_cb = cb;
+    obj->design_cb = design_cb;
 }
 
 /*----------------

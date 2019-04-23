@@ -291,11 +291,11 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
 /**
  * Set a function for a group which will modify the object's style if it is in focus
  * @param group pointer to a group
- * @param style_mod_func the style modifier function pointer
+ * @param style_mod_cb the style modifier function pointer
  */
-void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func)
+void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_cb)
 {
-    group->style_mod = style_mod_func;
+    group->style_mod_cb = style_mod_cb;
     if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
 }
 
@@ -304,9 +304,9 @@ void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_func_t sty
  * @param group pointer to a group
  * @param style_mod_func the style modifier function pointer
  */
-void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func)
+void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_edit_cb)
 {
-    group->style_mod_edit = style_mod_func;
+    group->style_mod_edit_cb = style_mod_edit_cb;
     if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
 }
 
@@ -381,9 +381,9 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
     lv_style_copy(&group->style_tmp, style);
 
     if(group->editing) {
-        if(group->style_mod_edit) group->style_mod_edit(group, &group->style_tmp);
+        if(group->style_mod_edit_cb) group->style_mod_edit_cb(group, &group->style_tmp);
     } else {
-        if(group->style_mod) group->style_mod(group, &group->style_tmp);
+        if(group->style_mod_cb) group->style_mod_cb(group, &group->style_tmp);
     }
     return &group->style_tmp;
 }
@@ -418,10 +418,10 @@ lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
+lv_group_style_mod_cb_t lv_group_get_style_mod_cb(const lv_group_t * group)
 {
     if(!group) return false;
-    return group->style_mod;
+    return group->style_mod_cb;
 }
 
 /**
@@ -429,10 +429,10 @@ lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
+lv_group_style_mod_cb_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
 {
     if(!group) return false;
-    return group->style_mod_edit;
+    return group->style_mod_edit_cb;
 }
 
 /**
@@ -582,11 +582,11 @@ static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
 
 static void refresh_theme(lv_group_t * g, lv_theme_t * th)
 {
-    g->style_mod      = style_mod_def;
-    g->style_mod_edit = style_mod_edit_def;
+    g->style_mod_cb      = style_mod_def;
+    g->style_mod_edit_cb = style_mod_edit_def;
     if(th) {
-        if(th->group.style_mod) g->style_mod = th->group.style_mod;
-        if(th->group.style_mod_edit) g->style_mod_edit = th->group.style_mod_edit;
+        if(th->group.style_mod_cb) g->style_mod_cb = th->group.style_mod_cb;
+        if(th->group.style_mod_edit_cb) g->style_mod_edit_cb = th->group.style_mod_edit_cb;
     }
 }
 
