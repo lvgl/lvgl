@@ -64,7 +64,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->page          = NULL;
     ext->header        = NULL;
     ext->title         = NULL;
-    ext->style_header  = &lv_style_plain_color;
     ext->style_btn_rel = &lv_style_btn_rel;
     ext->style_btn_pr  = &lv_style_btn_pr;
     ext->btn_size      = (LV_DPI) / 2;
@@ -538,7 +537,8 @@ static void lv_win_realign(lv_obj_t * win)
         btn      = lv_obj_get_child_back(ext->header, btn);
     }
 
-    lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, ext->style_header->body.padding.left, 0);
+    const lv_style_t * style_header = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
+    lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, style_header->body.padding.left, 0);
 
     lv_obj_set_pos(ext->header, 0, 0);
 

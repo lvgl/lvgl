@@ -61,7 +61,6 @@ typedef struct
     lv_obj_t * page;                  /*Pointer to a page which holds the content*/
     lv_obj_t * header;                /*Pointer to the header container of the window*/
     lv_obj_t * title;                 /*Pointer to the title label of the window*/
-    const lv_style_t * style_header;  /*Style of the header container*/
     const lv_style_t * style_btn_rel; /*Control button releases style*/
     const lv_style_t * style_btn_pr;  /*Control button pressed style*/
     lv_coord_t btn_size;              /*Size of the control buttons (square)*/
