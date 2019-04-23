@@ -169,6 +169,8 @@
 #ifndef LV_USE_ANIMATION
 #define LV_USE_ANIMATION        1
 #endif
+#if LV_USE_ANIMATION
+#endif
 
 /* 1: Enable shadow drawing*/
 #ifndef LV_USE_SHADOW
@@ -400,6 +402,15 @@
 /*=================
  *  Text settings
  *=================*/
+
+/* Select a character encoding for strings.
+ * Your IDE or editor should have the same character encoding
+ * - LV_TXT_ENC_UTF8
+ * - LV_TXT_ENC_ISO8859_1
+ * */
+#ifndef LV_TXT_ENC
+#define LV_TXT_ENC LV_TXT_ENC_UTF8
+#endif
 
  /*Can break (wrap) texts on these chars*/
 #ifndef LV_TXT_BREAK_CHARS

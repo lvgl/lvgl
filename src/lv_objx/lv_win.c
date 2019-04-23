@@ -537,7 +537,7 @@ static void lv_win_realign(lv_obj_t * win)
         btn      = lv_obj_get_child_back(ext->header, btn);
     }
 
-    const lv_style_t * style_header = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
+    const   lv_style_t * style_header = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
     lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, style_header->body.padding.left, 0);
 
     lv_obj_set_pos(ext->header, 0, 0);
