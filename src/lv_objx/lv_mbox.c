@@ -483,7 +483,7 @@ static void mbox_realign(lv_obj_t * mbox)
     if(ext->btnm) {
         const lv_style_t * btn_bg_style  = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
         const lv_style_t * btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
-        lv_coord_t font_h                = lv_font_get_height(btn_rel_style->text.font);
+        lv_coord_t font_h                = lv_font_get_line_height(btn_rel_style->text.font);
         lv_obj_set_size(ext->btnm, w,
                         font_h + btn_rel_style->body.padding.top +
                             btn_rel_style->body.padding.bottom + btn_bg_style->body.padding.top +

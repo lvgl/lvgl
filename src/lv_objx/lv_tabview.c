@@ -867,7 +867,7 @@ static void tabview_realign(lv_obj_t * tabview)
         lv_obj_set_width(ext->indic, indic_width);
 
         /*Set the tabs height*/
-        lv_coord_t btns_height = lv_font_get_height(style_btn_rel->text.font) +
+        lv_coord_t btns_height = lv_font_get_line_height(style_btn_rel->text.font) +
                                  style_btn_rel->body.padding.top +
                                  style_btn_rel->body.padding.bottom +
                                  style_btn_bg->body.padding.top + style_btn_bg->body.padding.bottom;

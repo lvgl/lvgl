@@ -97,7 +97,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
     uint32_t line_start     = 0;
     uint32_t new_line_start = 0;
     lv_coord_t act_line_length;
-    uint8_t letter_height = lv_font_get_height(font);
+    uint8_t letter_height = lv_font_get_line_height(font);
 
     /*Calc. the height and longest line*/
     while(text[line_start] != '\0') {

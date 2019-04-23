@@ -35,13 +35,14 @@ extern "C" {
 
 typedef struct
 {
+    uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
     uint32_t adv_w :8;              /*The glyph need this space. Draw the next glyph after this width */
     uint32_t adv_w_fract :4;        /*Fractional part of `advance_width` in 1/16 unit*/
-    uint32_t box_w :8;              /*Width of the glyph's bounding box*/
-    uint32_t box_h :8;              /*Height of the glyph's bounding box*/
-    uint32_t ofs_x :8;              /*x offset of the bounding box*/
-    uint32_t ofs_y :8;              /*y offset of the bounding box*/
-    uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
+
+    uint8_t box_w;              /*Width of the glyph's bounding box*/
+    uint8_t box_h;              /*Height of the glyph's bounding box*/
+    uint8_t ofs_x;              /*x offset of the bounding box*/
+    int8_t  ofs_y;              /*y offset of the bounding box*/
 } lv_font_glyph_dsc_t;
 
 typedef struct _lv_font_struct
@@ -60,10 +61,12 @@ typedef struct _lv_font_struct
 
     /*Pointer to a font extension*/
     struct _lv_font_struct * next_page;
-    uint32_t line_height :8;
-    uint32_t monospace   :8;  /*Fix width (0: normal width)*/
-    uint32_t bpp         :4;  /*Bit per pixel: 1, 2, 4 or 8*/
-    uint16_t glyph_cnt   :11; /*Number of glyphs in the font. Max. 2048*/
+    uint8_t size;
+    uint8_t ascent;
+    int8_t descent;
+    uint8_t monospace;        /*Fix width (0: normal width)*/
+    uint8_t bpp;              /*Bit per pixel: 1, 2, 4 or 8*/
+    uint16_t glyph_cnt; /*Number of glyphs in the font. Max. 2048*/
 } lv_font_t;
 
 /**********************
@@ -122,13 +125,13 @@ uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
 uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter);
 
 /**
- * Get the height of a font
+ * Get the line height of a font. All characters fit into this height
  * @param font_p pointer to a font
  * @return the height of a font
  */
-static inline uint8_t lv_font_get_height(const lv_font_t * font_p)
+static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
 {
-    return font_p->h_px;
+    return (uint8_t)((int16_t)font_p->ascent - font_p->descent);
 }
 
 /**

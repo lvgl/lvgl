@@ -243,7 +243,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     lv_coord_t pos_x = pos_p->x;
     lv_coord_t pos_y = pos_p->y;
     uint8_t letter_w = lv_font_get_real_width(font_p, letter);
-    uint8_t letter_h = lv_font_get_height(font_p);
+    uint8_t letter_h = lv_font_get_line_height(font_p);
     uint8_t bpp      = lv_font_get_bpp(font_p, letter); /*Bit per pixel (1,2, 4 or 8)*/
     const uint8_t * bpp_opa_table;
     uint8_t mask_init;

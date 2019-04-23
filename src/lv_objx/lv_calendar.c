@@ -624,7 +624,7 @@ static lv_coord_t get_header_height(lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
-    return lv_font_get_height(ext->style_header->text.font) + ext->style_header->body.padding.top +
+    return lv_font_get_line_height(ext->style_header->text.font) + ext->style_header->body.padding.top +
            ext->style_header->body.padding.bottom;
 }
 
@@ -637,7 +637,7 @@ static lv_coord_t get_day_names_height(lv_obj_t * calendar)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
-    return lv_font_get_height(ext->style_day_names->text.font) +
+    return lv_font_get_line_height(ext->style_day_names->text.font) +
            ext->style_day_names->body.padding.top + ext->style_day_names->body.padding.bottom;
 }
 
@@ -702,7 +702,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
     lv_area_t label_area;
     label_area.y1 =
         calendar->coords.y1 + get_header_height(calendar) + ext->style_day_names->body.padding.top;
-    label_area.y2 = label_area.y1 + lv_font_get_height(ext->style_day_names->text.font);
+    label_area.y2 = label_area.y1 + lv_font_get_line_height(ext->style_day_names->text.font);
     uint32_t i;
     for(i = 0; i < 7; i++) {
         label_area.x1 = calendar->coords.x1 + (w * i) / 7 + l_pad;
@@ -725,15 +725,15 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
     label_area.y1      = calendar->coords.y1 + get_header_height(calendar) +
                     ext->style_day_names->body.padding.top +
-                    lv_font_get_height(ext->style_day_names->text.font) +
+                    lv_font_get_line_height(ext->style_day_names->text.font) +
                     ext->style_day_names->body.padding.bottom;
-    label_area.y2 = label_area.y1 + lv_font_get_height(style_bg->text.font);
+    label_area.y2 = label_area.y1 + lv_font_get_line_height(style_bg->text.font);
 
     lv_coord_t w =
         lv_obj_get_width(calendar) - style_bg->body.padding.left - style_bg->body.padding.right;
     lv_coord_t h          = calendar->coords.y2 - label_area.y1 - style_bg->body.padding.bottom;
     lv_coord_t box_w      = w / 7;
-    lv_coord_t vert_space = (h - (6 * lv_font_get_height(style_bg->text.font))) / 5;
+    lv_coord_t vert_space = (h - (6 * lv_font_get_line_height(style_bg->text.font))) / 5;
 
     uint32_t week;
     uint8_t day_cnt;
@@ -854,8 +854,8 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
         }
 
         /*Got to the next weeks row*/
-        label_area.y1 += vert_space + lv_font_get_height(style_bg->text.font);
-        label_area.y2 += vert_space + lv_font_get_height(style_bg->text.font);
+        label_area.y1 += vert_space + lv_font_get_line_height(style_bg->text.font);
+        label_area.y2 += vert_space + lv_font_get_line_height(style_bg->text.font);
     }
 }
 

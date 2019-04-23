@@ -544,7 +544,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         if(ext->opened != 0 || ext->force_sel) {
             const lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
             const lv_font_t * font   = style->text.font;
-            lv_coord_t font_h        = lv_font_get_height(font);
+            lv_coord_t font_h        = lv_font_get_line_height(font);
 
             /*Draw the selected*/
             lv_area_t rect_area;
@@ -569,7 +569,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
         if(ext->opened || ext->force_sel) {
             const lv_style_t * style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
             const lv_font_t * font   = style->text.font;
-            lv_coord_t font_h        = lv_font_get_height(font);
+            lv_coord_t font_h        = lv_font_get_line_height(font);
 
             lv_area_t area_sel;
             area_sel.y1 = ext->label->coords.y1;
@@ -601,7 +601,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                 const lv_style_t * style     = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
                 const lv_font_t * font       = style->text.font;
                 const lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
-                lv_coord_t font_h            = lv_font_get_height(font);
+                lv_coord_t font_h            = lv_font_get_line_height(font);
                 lv_style_t new_style;
                 lv_style_copy(&new_style, style);
                 new_style.text.color = sel_style->text.color;
@@ -861,7 +861,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     } else { /*Close the list*/
         const lv_font_t * font         = style->text.font;
         const lv_style_t * label_style = lv_obj_get_style(ext->label);
-        lv_coord_t font_h              = lv_font_get_height(font);
+        lv_coord_t font_h              = lv_font_get_line_height(font);
         new_height                     = font_h + 2 * label_style->text.line_space;
 
         lv_page_set_sb_mode(ddlist, LV_SB_MODE_HIDE);
@@ -933,7 +933,7 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
     lv_ddlist_ext_t * ext          = lv_obj_get_ext_attr(ddlist);
     const lv_style_t * style       = lv_obj_get_style(ddlist);
     const lv_font_t * font         = style->text.font;
-    lv_coord_t font_h              = lv_font_get_height(font);
+    lv_coord_t font_h              = lv_font_get_line_height(font);
     const lv_style_t * label_style = lv_obj_get_style(ext->label);
     lv_obj_t * scrl                = lv_page_get_scrl(ddlist);
 

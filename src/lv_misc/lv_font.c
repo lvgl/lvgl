@@ -90,20 +90,22 @@ void lv_font_remove(lv_font_t * child, lv_font_t * parent)
  */
 bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter)
 {
-    const lv_font_t * font_i = font_p;
-    int16_t w;
-    while(font_i != NULL) {
-        w = font_i->get_width(font_i, letter);
-        if(w >= 0) {
-            /*Glyph found*/
-            if(font_i->monospace) return true;
-            return false;
-        }
+//    const lv_font_t * font_i = font_p;
+//    int16_t w;
+//    while(font_i != NULL) {
+//        w = font_i->get_width(font_i, letter);
+//        if(w >= 0) {
+//            /*Glyph found*/
+//            if(font_i->monospace) return true;
+//            return false;
+//        }
+//
+//        font_i = font_i->next_page;
+//    }
+//
+//    return 0;
 
-        font_i = font_i->next_page;
-    }
-
-    return 0;
+    return false;
 }
 
 /**
@@ -126,28 +128,26 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
 }
 
 /**
- * Get the width of a letter in a font. If `monospace` is set then return with it.
+ * Get the description of a glyph in a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
- * @return the width of a letter
+ * @return pointer to a glyph descriptor
  */
-uint8_t lv_font_get_glyph_dsc(const lv_font_t * font_p, uint32_t letter, lv_font_glyph_dsc_t * dsc)
+lv_font_glyph_dsc_t * lv_font_get_glyph_dsc(const lv_font_t * font_p, uint32_t letter)
 {
     const lv_font_t * font_i = font_p;
-    int16_t w;
+    lv_font_glyph_dsc_t * dsc;
     while(font_i != NULL) {
-        w = font_i->get_dsc(font_i, letter, dsc);
-        if(w >= 0) {
+        dsc = font_i->get_dsc(font_i, letter);
+        if(dsc) {
             /*Glyph found*/
-            uint8_t m = font_i->monospace;
-            if(m) w = m;
-            return w;
+            return dsc;
         }
 
         font_i = font_i->next_page;
     }
 
-    return 0;
+    return NULL;
 }
 
 /**

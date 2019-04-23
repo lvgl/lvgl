@@ -70,7 +70,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         w = p.x;
     }
 
-    lv_coord_t line_height = lv_font_get_height(font) + style->text.line_space;
+    lv_coord_t line_height = lv_font_get_line_height(font) + style->text.line_space;
 
     /*Init variables for the first line*/
     lv_coord_t line_width = 0;
