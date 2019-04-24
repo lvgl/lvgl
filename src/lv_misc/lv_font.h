@@ -45,28 +45,34 @@ typedef struct
     int8_t  ofs_y;              /*y offset of the bounding box*/
 } lv_font_glyph_dsc_t;
 
+typedef struct {
+    const uint8_t * glyph_bitmap;
+    const lv_font_glyph_dsc_t * glyph_dsc;
+    const uint16_t * unicode_list;
+    uint16_t glyph_cnt;        /*Number of glyphs in the font. */
+}lv_font_dsc_built_in_t;
+
+
 typedef struct _lv_font_struct
 {
     uint32_t unicode_first;
     uint32_t unicode_last;
-    const uint8_t * glyph_bitmap;
-    const lv_font_glyph_dsc_t * glyph_dsc;
-    const uint32_t * unicode_list;
 
     /*Get a glyph's  descriptor from a font*/
-    const uint8_t * (*get_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t * dsc);
+    const lv_font_glyph_dsc_t * (*get_glyph_dsc)(const struct _lv_font_struct *, uint32_t letter);
 
     /*Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_bitmap)(const struct _lv_font_struct *, uint32_t);
+    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_struct *, uint32_t);
 
-    /*Pointer to a font extension*/
+    /*Pointer to the font in a font pack (must have the same line height)*/
     struct _lv_font_struct * next_page;
-    uint8_t size;
-    uint8_t ascent;
-    int8_t descent;
-    uint8_t monospace;        /*Fix width (0: normal width)*/
+    uint8_t size;             /*The original size*/
+    uint8_t line_height;      /*The real line height where any text fits*/
+    uint8_t base_line;        /*Base line measured from the top of the line*/
+    uint8_t monospace;        /*Overwrite the glyph's width (0: normal width)*/
     uint8_t bpp;              /*Bit per pixel: 1, 2, 4 or 8*/
-    uint16_t glyph_cnt; /*Number of glyphs in the font. Max. 2048*/
+
+    void * dsc;               /*Store implementation specific data here*/
 } lv_font_t;
 
 /**********************
@@ -100,6 +106,7 @@ void lv_font_remove(lv_font_t * child, lv_font_t * parent);
  */
 bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter);
 
+
 /**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
@@ -108,6 +115,15 @@ bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter);
  */
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter);
 
+/**
+ * Get the description of a glyph in a font.
+ * @param font_p pointer to a font
+ * @param letter an UNICODE character code
+ * @return pointer to a glyph descriptor
+ */
+const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc(const lv_font_t * font_p, uint32_t letter);
+
+uint8_t lv_font_get_width(const lv_font_t * font, uint32_t letter);
 /**
  * Get the width of a letter in a font. If `monospace` is set then return with it.
  * @param font_p pointer to a font
@@ -131,7 +147,7 @@ uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter);
  */
 static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
 {
-    return (uint8_t)((int16_t)font_p->ascent - font_p->descent);
+    return font_p->line_height;//(uint8_t)((int16_t)font_p->ascent - font_p->descent);
 }
 
 /**

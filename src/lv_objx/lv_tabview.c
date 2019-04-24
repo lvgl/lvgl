@@ -1023,7 +1023,7 @@ static void tabview_realign(lv_obj_t * tabview)
         switch(ext->btns_pos) {
             case LV_TABVIEW_BTNS_POS_TOP:
             case LV_TABVIEW_BTNS_POS_BOTTOM:
-                btns_size = lv_font_get_height(style_btn_rel->text.font) +
+                btns_size = lv_font_get_line_height(style_btn_rel->text.font) +
                             style_btn_rel->body.padding.top +
                             style_btn_rel->body.padding.bottom +
                             style_btn_bg->body.padding.top + style_btn_bg->body.padding.bottom;
