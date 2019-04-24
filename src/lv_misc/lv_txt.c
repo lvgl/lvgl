@@ -47,7 +47,7 @@ static uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i_start);
 static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id);
 static uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id);
 static uint32_t lv_txt_utf8_get_length(const char * txt);
-#elif LV_TXT_ENC == LV_TXT_ENC_ISO8859_1
+#elif LV_TXT_ENC == LV_TXT_ENC_ASCII
 static uint8_t lv_txt_iso8859_1_size(const char * str);
 static uint32_t lv_txt_unicode_to_iso8859_1(uint32_t letter_uni);
 static uint32_t lv_txt_iso8859_1_conv_wc(uint32_t c);
@@ -73,7 +73,7 @@ uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *)      = lv_txt_utf8_pre
 uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_utf8_get_byte_id;
 uint32_t (*lv_encoded_get_char_id)(const char *, uint32_t)     = lv_txt_utf8_get_char_id;
 uint32_t (*lv_txt_get_encoded_length)(const char *)            = lv_txt_utf8_get_length;
-#elif LV_TXT_ENC == LV_TXT_ENC_ISO8859_1
+#elif LV_TXT_ENC == LV_TXT_ENC_ASCII
 uint8_t (*lv_txt_encoded_size)(const char *)                   = lv_txt_iso8859_1_size;
 uint32_t (*lv_txt_unicode_to_encoded)(uint32_t)                = lv_txt_unicode_to_iso8859_1;
 uint32_t (*lv_txt_encoded_conv_wc)(uint32_t)                   = lv_txt_iso8859_1_conv_wc;
@@ -677,9 +677,9 @@ static uint32_t lv_txt_utf8_get_length(const char * txt)
     return len;
 }
 
-#elif LV_TXT_ENC == LV_TXT_ENC_ISO8859_1
+#elif LV_TXT_ENC == LV_TXT_ENC_ASCII
 /*******************************
- *   IOS8859-1 ENCODER/DECOER
+ *  ASCII ENCODER/DECOER
  ******************************/
 
 /**

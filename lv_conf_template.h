@@ -267,7 +267,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 /* Select a character encoding for strings.
  * Your IDE or editor should have the same character encoding
  * - LV_TXT_ENC_UTF8
- * - LV_TXT_ENC_ISO8859_1
+ * - LV_TXT_ENC_ASCII
  * */
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
