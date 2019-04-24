@@ -1,7 +1,7 @@
 
 #include "../lv_misc/lv_font.h"
 
-#if USE_LV_FONT_DEJAVU_20 != 0  /*Can be enabled in lv_conf.h*/
+#if LV_USE_FONT_DEJAVU_20 != 0  /*Can be enabled in lv_conf.h*/
 
 /***********************************************************************************
  * DejaVuSans.ttf 20 px Font in U+0020 ( ) .. U+007e (~)  range with 1 bpp
@@ -81,21 +81,13 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
     /*4 rows*/
 };
 
-uint32_t advance_w :8;          /*The glyph need this space. Draw the next glyph after this width */
-uint32_t advance_w_fract :4;    /*Fractional part of `advance_width` in 1/16 unit*/
-uint32_t box_w :8;              /*Width of the glyph's bounding box*/
-uint32_t box_h :8;              /*Height of the glyph's bounding box*/
-uint32_t ofs_x :8;              /*x offset of the bounding box*/
-uint32_t ofs_y :8;              /*y offset of the bounding box*/
-uint32_t glyph_index : 20;      /* Start index of the bitmap. A font can be max 1 MB. */
-
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_dejavu_20_glyph_dsc[] = {
-    {.adv_w = 6,  .adv_w_fract = 0,  .box_w = 6, .box_h = 0, .ofs_x = 0, .ofs_y = 0, .glyph_index = 0},  /*Unicode: U+0020 ( )*/
-    {.adv_w = 8,  .adv_w_fract = 0,  .box_w = 8, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .glyph_index = 0},  /*Unicode: U+0031 (1)*/
-    {.adv_w = 9,  .adv_w_fract = 0,  .box_w = 9, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .glyph_index = 13}, /*Unicode: U+0033 (3)*/
-    {.adv_w = 12, .adv_w_fract = 0,  .box_w = 12,.box_h = 13,.ofs_x = 0, .ofs_y = 3, .glyph_index = 26}, /*Unicode: U+0041 (A)*/
-    {.adv_w = 8,  .adv_w_fract = 0,  .box_w = 8, .box_h = 10,.ofs_x = 0, .ofs_y = 6, .glyph_index = 39}, /*Unicode: U+0061 (a)*/
+    {.adv_w = 6,  .adv_w_fract = 0,  .box_w = 6, .box_h = 0, .ofs_x = 0, .ofs_y = 0, .bitmap_index = 0},  /*Unicode: U+0020 ( )*/
+    {.adv_w = 8,  .adv_w_fract = 0,  .box_w = 8, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 0},  /*Unicode: U+0031 (1)*/
+    {.adv_w = 9,  .adv_w_fract = 0,  .box_w = 9, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 13}, /*Unicode: U+0033 (3)*/
+    {.adv_w = 12, .adv_w_fract = 0,  .box_w = 12,.box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 26}, /*Unicode: U+0041 (A)*/
+    {.adv_w = 8,  .adv_w_fract = 0,  .box_w = 8, .box_h = 10,.ofs_x = 0, .ofs_y = 6, .bitmap_index = 39}, /*Unicode: U+0061 (a)*/
 };
 
 static const uint16_t lv_font_dejavu_20_unicode_map[] = {

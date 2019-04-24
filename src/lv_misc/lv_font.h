@@ -142,6 +142,7 @@ static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
  */
 uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter);
 
+
 /**
  * Generic bitmap get function used in 'font->get_bitmap' when the font contains all characters in
  * the range
@@ -149,16 +150,8 @@ uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter);
  * @param unicode_letter an unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
  */
-const uint8_t * lv_font_get_bitmap_continuous(const lv_font_t * font, uint32_t unicode_letter);
+const uint8_t * lv_font_get_glyph_bitmap_plain(const lv_font_t * font, uint32_t unicode_letter);
 
-/**
- * Generic bitmap get function used in 'font->get_bitmap' when the font NOT contains all characters
- * in the range (sparse)
- * @param font pointer to font
- * @param unicode_letter an unicode letter which bitmap should be get
- * @return pointer to the bitmap or NULL if not found
- */
-const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unicode_letter);
 /**
  * Generic glyph width get function used in 'font->get_width' when the font contains all characters
  * in the range
@@ -166,16 +159,7 @@ const uint8_t * lv_font_get_bitmap_sparse(const lv_font_t * font, uint32_t unico
  * @param unicode_letter an unicode letter which width should be get
  * @return width of the gylph or -1 if not found
  */
-int16_t lv_font_get_width_continuous(const lv_font_t * font, uint32_t unicode_letter);
-
-/**
- * Generic glyph width get function used in 'font->get_bitmap' when the font NOT contains all
- * characters in the range (sparse)
- * @param font pointer to font
- * @param unicode_letter an unicode letter which width should be get
- * @return width of the glyph or -1 if not found
- */
-int16_t lv_font_get_width_sparse(const lv_font_t * font, uint32_t unicode_letter);
+const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc_plain(const lv_font_t * font, uint32_t unicode_letter);
 
 /**********************
  *      MACROS
