@@ -83,32 +83,6 @@ void lv_font_remove(lv_font_t * child, lv_font_t * parent)
 }
 
 /**
- * Tells if font which contains `letter` is monospace or not
- * @param font_p point to font
- * @param letter an UNICODE character code
- * @return true: the letter is monospace; false not monospace
- */
-bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter)
-{
-//    const lv_font_t * font_i = font_p;
-//    int16_t w;
-//    while(font_i != NULL) {
-//        w = font_i->get_width(font_i, letter);
-//        if(w >= 0) {
-//            /*Glyph found*/
-//            if(font_i->monospace) return true;
-//            return false;
-//        }
-//
-//        font_i = font_i->next_page;
-//    }
-//
-//    return 0;
-
-    return false;
-}
-
-/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code

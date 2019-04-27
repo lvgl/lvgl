@@ -83,11 +83,11 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
 
 /*Store the glyph descriptions*/
 static const lv_font_glyph_dsc_t lv_font_dejavu_20_glyph_dsc[] = {
-    {.adv_w = 6,  .adv_w_fract = 0,  .box_w = 6, .box_h = 0, .ofs_x = 0, .ofs_y = 0, .bitmap_index = 0},  /*Unicode: U+0020 ( )*/
-    {.adv_w = 8,  .adv_w_fract = 0,  .box_w = 8, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 0},  /*Unicode: U+0031 (1)*/
-    {.adv_w = 9,  .adv_w_fract = 0,  .box_w = 9, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 13}, /*Unicode: U+0033 (3)*/
-    {.adv_w = 12, .adv_w_fract = 0,  .box_w = 12,.box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 39}, /*Unicode: U+0041 (A)*/
-    {.adv_w = 8,  .adv_w_fract = 0,  .box_w = 8, .box_h = 10,.ofs_x = 0, .ofs_y = 6, .bitmap_index = 65}, /*Unicode: U+0061 (a)*/
+    {.adv_w = LV_FONT_SET_ADV_W(6, 0),  .box_w = 6, .box_h = 0, .ofs_x = 0, .ofs_y = 0, .bitmap_index = 0},  /*Unicode: U+0020 ( )*/
+    {.adv_w = LV_FONT_SET_ADV_W(8, 0),  .box_w = 8, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 0},  /*Unicode: U+0031 (1)*/
+    {.adv_w = LV_FONT_SET_ADV_W(9, 0),  .box_w = 9, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 13}, /*Unicode: U+0033 (3)*/
+    {.adv_w = LV_FONT_SET_ADV_W(12, 0), .box_w = 12,.box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 39}, /*Unicode: U+0041 (A)*/
+    {.adv_w = LV_FONT_SET_ADV_W(8, 0),  .box_w = 8, .box_h = 10,.ofs_x = 0, .ofs_y = 6, .bitmap_index = 65}, /*Unicode: U+0061 (a)*/
 };
 
 static const uint16_t lv_font_dejavu_20_unicode_list[] = {
@@ -113,7 +113,6 @@ lv_font_t lv_font_dejavu_20 = {
     .get_glyph_dsc = lv_font_get_glyph_dsc_plain,  /*Function pointer to get glyph's width*/
     .bpp = 1,               /*Bit per pixel*/
     .line_height = 20,             /*Font height in pixels*/
-    .monospace = 0,
     .next_page = NULL,      /*Pointer to a font extension*/
 };
 

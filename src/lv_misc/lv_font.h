@@ -28,6 +28,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+/*Number of fractional digits in the advanced width (`adv_w`) field of `lv_font_glyph_dsc_t`*/
+#define LV_FONT_ADV_W_FRACT_DIGIT       4
 
 /**********************
  *      TYPEDEFS
@@ -36,9 +38,7 @@ extern "C" {
 typedef struct
 {
     uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
-    uint32_t adv_w :8;              /*The glyph need this space. Draw the next glyph after this width */
-    uint32_t adv_w_fract :4;        /*Fractional part of `advance_width` in 1/16 unit*/
-
+    uint32_t adv_w :12;              /*The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
     uint8_t box_w;              /*Width of the glyph's bounding box*/
     uint8_t box_h;              /*Height of the glyph's bounding box*/
     uint8_t ofs_x;              /*x offset of the bounding box*/
@@ -69,7 +69,6 @@ typedef struct _lv_font_struct
     uint8_t size;             /*The original size*/
     uint8_t line_height;      /*The real line height where any text fits*/
     uint8_t base_line;        /*Base line measured from the top of the line*/
-    uint8_t monospace;        /*Overwrite the glyph's width (0: normal width)*/
     uint8_t bpp;              /*Bit per pixel: 1, 2, 4 or 8*/
 
     void * dsc;               /*Store implementation specific data here*/
@@ -182,6 +181,11 @@ const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc_plain(const lv_font_t * font, 
  **********************/
 
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
+
+#define LV_FONT_SET_ADV_W(_integer, _fract) ((_integer << LV_FONT_ADV_W_FRACT_DIGIT) + _fract)
+#define LV_FONT_GET_ADV_W_INT(_adv_w)       (_adw_v >> LV_FONT_ADV_W_FRACT_DIGIT)
+#define LV_FONT_GET_ADV_W_FRACT(_adv_w)     (_adw_v & ((1 << LV_FONT_ADV_W_FRACT_DIGIT) -1))
+
 
 /**********************
  * ADD BUILT IN FONTS
