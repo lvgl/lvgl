@@ -68,13 +68,13 @@ void lv_indev_init(void)
  * Called periodically to read the input devices
  * @param param pointer to and input device to read
  */
-void lv_indev_read_task(void * param)
+void lv_indev_read_task(lv_task_t * task)
 {
     LV_LOG_TRACE("indev read task started");
 
     lv_indev_data_t data;
 
-    indev_act = param;
+    indev_act = task->user_data;
 
     /*Read and process all indevs*/
     if(indev_act->driver.disp == NULL) return; /*Not assigned to any displays*/

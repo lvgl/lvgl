@@ -132,15 +132,15 @@ lv_disp_t * lv_refr_get_disp_refreshing(void)
 
 /**
  * Called periodically to handle the refreshing
- * @param param point to a `lv_disp_t` to refresh
+ * @param task pointer to the task itself
  */
-void lv_disp_refr_task(void * param)
+void lv_disp_refr_task(lv_task_t * task)
 {
     LV_LOG_TRACE("lv_refr_task: started");
 
     uint32_t start = lv_tick_get();
 
-    disp_refr = param;
+    disp_refr = task->user_data;
 
     lv_refr_join_area();
 

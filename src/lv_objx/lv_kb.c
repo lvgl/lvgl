@@ -118,7 +118,12 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new keyboard keyboard*/
     if(copy == NULL) {
-        lv_obj_set_size(new_kb, LV_DPI * 3, LV_DPI * 2);
+        /* Set a size which fits into the parent.
+         * Don't use `par` directly because if the window is created on a page it is moved to the
+         * scrollable so the parent has changed */
+        lv_obj_set_size(new_kb, lv_obj_get_width_fit(lv_obj_get_parent(new_kb)),
+                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)));
+
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_btnm_set_map(new_kb, kb_map_lc);
@@ -350,17 +355,22 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
         return;
     } else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
         if(kb->event_cb != lv_kb_def_event_cb) {
-            lv_event_send(kb, LV_EVENT_CANCEL, NULL);
+            lv_res_t res = lv_event_send(kb, LV_EVENT_CANCEL, NULL);
+            if(res != LV_RES_OK) return;
         } else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area  to hide it cursor if needed*/
             lv_obj_del(kb);
+            return;
         }
         return;
     } else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
-        if(kb->event_cb != lv_kb_def_event_cb)
-            lv_event_send(kb, LV_EVENT_APPLY, NULL);
-        else
+        if(kb->event_cb != lv_kb_def_event_cb) {
+            lv_res_t res = lv_event_send(kb, LV_EVENT_APPLY, NULL);
+            if(res != LV_RES_OK) return;
+        }
+        else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
+        }
         return;
     }
 

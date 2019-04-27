@@ -36,9 +36,9 @@ void lv_indev_init(void);
 
 /**
  * Called periodically to read the input devices
- * @param param pointer to and input device to read
+ * @param task pointer to the task itself
  */
-void lv_indev_read_task(void * param);
+void lv_indev_read_task(lv_task_t * task);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
