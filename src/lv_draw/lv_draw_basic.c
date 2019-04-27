@@ -245,7 +245,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     }
 
     const lv_font_glyph_dsc_t * g = lv_font_get_glyph_dsc(font_p, letter);
-
+    if(g == NULL) return;
     lv_coord_t pos_x = pos_p->x + g->ofs_x;
     lv_coord_t pos_y = pos_p->y + g->ofs_y;
 
