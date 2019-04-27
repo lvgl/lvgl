@@ -55,8 +55,16 @@ typedef struct
 {
     uint32_t period;
     uint32_t last_run;
-    void (*task)(void *);
-    void * param;
+    void (*task_cb)(void *);
+
+#if LV_USE_USER_DATA_SINGLE
+    void * user_data;
+#endif
+
+#if LV_USE_USER_DATA_MULTI
+    void * task_user_data;
+#endif
+
     uint8_t prio : 3;
     uint8_t once : 1;
 } lv_task_t;
@@ -80,15 +88,14 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
  * @param task a function which is the task itself
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
- * @param user_data free parameter
- * @return pointer to the new task
+ * @param user_data custom parameter
+ * @return pointer to the new task_cb
  */
-lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio,
-                           void * user_data);
+lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void *  user_data);
 
 /**
  * Delete a lv_task
- * @param lv_task_p pointer to task created by lv_task_p
+ * @param lv_task_p pointer to task_cb created by lv_task_p
  */
 void lv_task_del(lv_task_t * lv_task_p);
 

@@ -138,7 +138,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             if(task_deleted)
                 break; /*If a task was deleted then this or the next item might be corrupted*/
             if(task_created)
-                break; /*If a task was deleted then this or the next item might be corrupted*/
+                break; /*If a task was created then this or the next item might be corrupted*/
 
             LV_GC_ROOT(_lv_task_act) = next; /*Load the next task*/
         }
@@ -165,7 +165,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
  * @param task a function which is the task itself
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
- * @param user_data free parameter
+ * @param user_data custom parameter
  * @return pointer to the new task
  */
 lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void * user_data)
@@ -198,11 +198,19 @@ lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t
     }
 
     new_lv_task->period   = period;
-    new_lv_task->task     = task;
+    new_lv_task->task_cb     = task;
     new_lv_task->prio     = prio;
-    new_lv_task->param    = user_data;
+
     new_lv_task->once     = 0;
     new_lv_task->last_run = lv_tick_get();
+
+#if LV_USE_USER_DATA_SINGLE
+    new_lv_task->user_data    = user_data;
+#endif
+
+#if LV_USE_USER_DATA_MULTI
+    new_lv_task->task_user_data    = NULL;
+#endif
 
     task_created = true;
 
@@ -322,7 +330,7 @@ static bool lv_task_exec(lv_task_t * lv_task_p)
         lv_task_p->last_run = lv_tick_get();
         task_deleted        = false;
         task_created        = false;
-        lv_task_p->task(lv_task_p->param);
+        lv_task_p->task_cb(lv_task_p);
 
         /*Delete if it was a one shot lv_task*/
         if(task_deleted == false) { /*The task might be deleted by itself as well*/
