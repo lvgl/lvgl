@@ -118,7 +118,12 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new keyboard keyboard*/
     if(copy == NULL) {
-        lv_obj_set_size(new_kb, LV_DPI * 3, LV_DPI * 2);
+        /* Set a size which fits into the parent.
+         * Don't use `par` directly because if the window is created on a page it is moved to the
+         * scrollable so the parent has changed */
+        lv_obj_set_size(new_kb, lv_obj_get_width_fit(lv_obj_get_parent(new_kb)),
+                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)));
+
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_btnm_set_map(new_kb, kb_map_lc);
