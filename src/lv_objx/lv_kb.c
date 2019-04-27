@@ -350,17 +350,21 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
         return;
     } else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
         if(kb->event_cb != lv_kb_def_event_cb) {
-            lv_event_send(kb, LV_EVENT_CANCEL, NULL);
+            lv_res_t res = lv_event_send(kb, LV_EVENT_CANCEL, NULL);
+            if(res != LV_RES_OK) return;
         } else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area  to hide it cursor if needed*/
             lv_obj_del(kb);
         }
         return;
     } else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
-        if(kb->event_cb != lv_kb_def_event_cb)
-            lv_event_send(kb, LV_EVENT_APPLY, NULL);
-        else
+        if(kb->event_cb != lv_kb_def_event_cb) {
+            lv_res_t res = lv_event_send(kb, LV_EVENT_APPLY, NULL);
+            if(res != LV_RES_OK) return;
+        }
+        else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
+        }
         return;
     }
 
