@@ -124,10 +124,16 @@ const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc(const lv_font_t * font_p, uint
     return NULL;
 }
 
-uint8_t lv_font_get_width(const lv_font_t * font, uint32_t letter)
+uint8_t lv_font_get_width_int(const lv_font_t * font, uint32_t letter)
 {
     const lv_font_glyph_dsc_t * dsc = lv_font_get_glyph_dsc(font, letter);
-    return dsc ? dsc->adv_w : 0;
+    return dsc ? LV_FONT_GET_ADV_W_INT(dsc->adv_w) : 0;
+}
+
+uint8_t lv_font_get_width_fract(const lv_font_t * font, uint32_t letter)
+{
+    const lv_font_glyph_dsc_t * dsc = lv_font_get_glyph_dsc(font, letter);
+    return dsc ? LV_FONT_GET_ADV_W_FRACT(dsc->adv_w) : 0;
 }
 
 /**

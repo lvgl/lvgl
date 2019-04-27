@@ -455,7 +455,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
     /*Don't let 'width == 0' because the cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
         const lv_style_t * style = lv_obj_get_style(ext->label);
-        lv_obj_set_width(ext->label, lv_font_get_width(style->text.font, ' '));
+        lv_obj_set_width(ext->label, lv_font_get_width_int(style->text.font, ' '));
     }
 
     if(ext->pwd_mode != 0) {
@@ -1524,9 +1524,9 @@ static void refr_cursor_area(lv_obj_t * ta)
     /*Set letter_w (set not 0 on non printable but valid chars)*/
     lv_coord_t letter_w;
     if(letter == '\0' || letter == '\n' || letter == '\r') {
-        letter_w = lv_font_get_width(label_style->text.font, ' ');
+        letter_w = lv_font_get_width_int(label_style->text.font, ' ');
     } else {
-        letter_w = lv_font_get_width(label_style->text.font, letter);
+        letter_w = lv_font_get_width_int(label_style->text.font, letter);
     }
 
     lv_point_t letter_pos;
@@ -1544,9 +1544,9 @@ static void refr_cursor_area(lv_obj_t * ta)
         }
 
         if(letter == '\0' || letter == '\n' || letter == '\r') {
-            letter_w = lv_font_get_width(label_style->text.font, ' ');
+            letter_w = lv_font_get_width_int(label_style->text.font, ' ');
         } else {
-            letter_w = lv_font_get_width(label_style->text.font, letter);
+            letter_w = lv_font_get_width_int(label_style->text.font, letter);
         }
     }
 

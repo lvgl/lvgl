@@ -1031,7 +1031,7 @@ static void tabview_realign(lv_obj_t * tabview)
                 break;
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT:
-                btns_size = lv_font_get_width(style_btn_rel->text.font, 0x0041) + // 'A'
+                btns_size = lv_font_get_width_int(style_btn_rel->text.font, 0x0041) + // 'A'
                             style_btn_rel->body.padding.left +
                             style_btn_rel->body.padding.right +
                             style_btn_bg->body.padding.left + style_btn_bg->body.padding.right;

@@ -256,10 +256,6 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     uint8_t bitmask_init;
     uint8_t bitmask;
 
-    if(lv_font_is_monospace(font_p, letter)) {
-        pos_x += (lv_font_get_width(font_p, letter) - g->box_w) / 2;
-    }
-
     switch(bpp) {
         case 1:
             bpp_opa_table = bpp1_opa_table;

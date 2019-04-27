@@ -122,22 +122,14 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
  */
 const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc(const lv_font_t * font_p, uint32_t letter);
 
-uint8_t lv_font_get_width(const lv_font_t * font, uint32_t letter);
+uint8_t lv_font_get_width_int(const lv_font_t * font, uint32_t letter);
 /**
  * Get the width of a letter in a font. If `monospace` is set then return with it.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
  * @return the width of a letter
  */
-uint8_t lv_font_get_width(const lv_font_t * font_p, uint32_t letter);
-
-/**
- * Get the width of the letter without overwriting it with the `monospace` attribute
- * @param font_p pointer to a font
- * @param letter an UNICODE character code
- * @return the width of a letter
- */
-uint8_t lv_font_get_real_width(const lv_font_t * font_p, uint32_t letter);
+uint8_t lv_font_get_width_int(const lv_font_t * font_p, uint32_t letter);
 
 /**
  * Get the line height of a font. All characters fit into this height
@@ -183,8 +175,8 @@ const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc_plain(const lv_font_t * font, 
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
 #define LV_FONT_SET_ADV_W(_integer, _fract) ((_integer << LV_FONT_ADV_W_FRACT_DIGIT) + _fract)
-#define LV_FONT_GET_ADV_W_INT(_adv_w)       (_adw_v >> LV_FONT_ADV_W_FRACT_DIGIT)
-#define LV_FONT_GET_ADV_W_FRACT(_adv_w)     (_adw_v & ((1 << LV_FONT_ADV_W_FRACT_DIGIT) -1))
+#define LV_FONT_GET_ADV_W_INT(_adv_w)       (_adv_w >> LV_FONT_ADV_W_FRACT_DIGIT)
+#define LV_FONT_GET_ADV_W_FRACT(_adv_w)     (_adv_w & ((1 << LV_FONT_ADV_W_FRACT_DIGIT) -1))
 
 
 /**********************

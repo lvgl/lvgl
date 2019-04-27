@@ -181,7 +181,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
 
-            letter_w = lv_font_get_width(font, letter);
+            letter_w = lv_font_get_width_int(font, letter);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
                 int char_ind = lv_encoded_get_char_id(txt, i);
