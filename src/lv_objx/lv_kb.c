@@ -122,7 +122,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
          * Don't use `par` directly because if the window is created on a page it is moved to the
          * scrollable so the parent has changed */
         lv_obj_set_size(new_kb, lv_obj_get_width_fit(lv_obj_get_parent(new_kb)),
-                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)));
+                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)) / 2);
 
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
