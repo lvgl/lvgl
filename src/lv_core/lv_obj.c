@@ -34,6 +34,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct _lv_event_temp_data
+{
+    lv_obj_t * obj;
+    bool deleted;
+    struct _lv_event_temp_data * prev;
+}lv_event_temp_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -42,6 +48,7 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
+static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
@@ -49,9 +56,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  *  STATIC VARIABLES
  **********************/
 static bool lv_initialized = false;
-static lv_obj_t * event_act_obj;    /*Stores the which event is currently being executed*/
-static bool event_act_obj_deleted;  /*Shows that the object was deleted in the event function*/
-static const void * event_act_data; /*Stores the data passed to the event*/
+static lv_event_temp_data_t * event_temp_data_head;
+
 /**********************
  *      MACROS
  **********************/
@@ -411,8 +417,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
     lv_event_send(obj, LV_EVENT_DELETE, NULL);
 
-    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
-
+    lv_event_mark_deleted(obj);
 
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
@@ -1278,35 +1283,26 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 {
     if(obj == NULL) return LV_RES_OK;
 
-    /*In case of nested events the object might be already deleted. */
-    if(event_act_obj == obj && event_act_obj_deleted) return LV_RES_INV;
+    lv_event_temp_data_t event_temp_data;
+    event_temp_data.obj = obj;
+    event_temp_data.deleted = false;
+    event_temp_data.prev = NULL;
 
-    /*If the event was send from an other event save the current states to restore it at the end*/
-    lv_obj_t * prev_obj_act   = event_act_obj;
-    bool prev_obj_act_deleted = event_act_obj_deleted;
-    const void * prev_data    = event_act_data;
+    if(event_temp_data_head == NULL) {
+        event_temp_data_head = &event_temp_data;
+    } else {
+        event_temp_data.prev = event_temp_data_head;
+        event_temp_data_head = &event_temp_data;
+    }
 
-    event_act_obj         = obj;
-    event_act_obj_deleted = false;
-    event_act_data        = data;
+    event_temp_data_head = &event_temp_data;
 
     if(obj->event_cb) obj->event_cb(obj, event);
 
-    bool deleted = event_act_obj_deleted;
+    /*Remove this element from the list*/
+    event_temp_data_head = event_temp_data_head->prev;
 
-    /* If the object was deleted here and the previous object is the same like this
-     * restore deleted state (because this object was deleted)*/
-    if(event_act_obj == prev_obj_act && event_act_obj_deleted) {
-        prev_obj_act_deleted = true;
-        deleted = true;
-    }
-
-    /*Restore the previous states*/
-    event_act_obj         = prev_obj_act;
-    event_act_obj_deleted = prev_obj_act_deleted;
-    event_act_data        = prev_data;
-
-    if(deleted) {
+    if(event_temp_data.deleted) {
         return LV_RES_INV;
     }
 
@@ -1324,7 +1320,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
  */
 const void * lv_event_get_data(void)
 {
-    return event_act_data;
+    return NULL; //event_act_data;
 }
 
 /**
@@ -2217,7 +2213,8 @@ static void delete_children(lv_obj_t * obj)
 
     /*Let the suer free the resources used in `LV_EVENT_DELETE`*/
     lv_event_send(obj, LV_EVENT_DELETE, NULL);
-    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
+
+    lv_event_mark_deleted(obj);
 
     /*Remove the animations from this object*/
 #if LV_USE_ANIMATION
@@ -2249,4 +2246,14 @@ static void delete_children(lv_obj_t * obj)
     /*Delete the base objects*/
     if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
     lv_mem_free(obj); /*Free the object itself*/
+}
+
+static void lv_event_mark_deleted(lv_obj_t * obj)
+{
+    lv_event_temp_data_t * t = event_temp_data_head;
+
+    while(t) {
+        if(t->obj == obj) t->deleted = true;
+        t = t->prev;
+    }
 }

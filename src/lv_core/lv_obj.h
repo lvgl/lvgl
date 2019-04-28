@@ -572,15 +572,6 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
 const void * lv_event_get_data(void);
 
 /**
- * Mark the current object in the event as deleted.
- * It not required in the general cases because the library will take care of it.
- * However if an event is sent manually to an other object from an event where the object is deleted
- * the library will not know about the deletion (because it happened in an other object's event).
- * In this specific case the object need to be marked as deleted manually.
- */
-void lv_event_mark_as_deleted(void);
-
-/**
  * Set the a signal function of an object. Used internally by the library.
  * Always call the previous signal function in the new.
  * @param obj pointer to an object
