@@ -721,7 +721,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
                button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
                 uint32_t b = ext->btn_id_act;
-                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
+                res = lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
         }
     } else if(sign == LV_SIGNAL_PRESSING) {
@@ -737,8 +737,10 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             }
             if(btn_pr != LV_BTNM_BTN_NONE) {
                 uint32_t b = ext->btn_id_act;
-                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
-                invalidate_button_area(btnm, btn_pr);
+                res = lv_event_send(btnm, LV_EVENT_SELECTED, &b);
+                if(res == LV_RES_OK) {
+                    invalidate_button_area(btnm, btn_pr);
+                }
             }
         }
 
@@ -773,7 +775,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
                button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
                 uint32_t b = ext->btn_id_act;
-                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
+                res = lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
         }
     } else if(sign == LV_SIGNAL_LONG_PRESS_REP) {
@@ -782,7 +784,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
                button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
                 uint32_t b = ext->btn_id_act;
-                lv_event_send(btnm, LV_EVENT_SELECTED, &b);
+                res = lv_event_send(btnm, LV_EVENT_SELECTED, &b);
             }
         }
     } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {

@@ -377,8 +377,6 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 {
     lv_obj_invalidate(obj);
 
-    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
-
     /*Delete from the group*/
 #if LV_USE_GROUP
     bool was_focused = false;
@@ -410,8 +408,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         i = i_next;
     }
 
-    /*Let the suer free the resources used in `LV_EVENT_DELETE`*/
+    /*Let the user free the resources used in `LV_EVENT_DELETE`*/
     lv_event_send(obj, LV_EVENT_DELETE, NULL);
+
+    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
+
 
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
@@ -1277,6 +1278,9 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 {
     if(obj == NULL) return LV_RES_OK;
 
+    /*In case of nested events the object might be already deleted. */
+    if(event_act_obj == obj && event_act_obj_deleted) return LV_RES_INV;
+
     /*If the event was send from an other event save the current states to restore it at the end*/
     lv_obj_t * prev_obj_act   = event_act_obj;
     bool prev_obj_act_deleted = event_act_obj_deleted;
@@ -1289,6 +1293,13 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
     if(obj->event_cb) obj->event_cb(obj, event);
 
     bool deleted = event_act_obj_deleted;
+
+    /* If the object was deleted here and the previous object is the same like this
+     * restore deleted state (because this object was deleted)*/
+    if(event_act_obj == prev_obj_act && event_act_obj_deleted) {
+        prev_obj_act_deleted = true;
+        deleted = true;
+    }
 
     /*Restore the previous states*/
     event_act_obj         = prev_obj_act;
@@ -2176,9 +2187,6 @@ static void refresh_children_style(lv_obj_t * obj)
  */
 static void delete_children(lv_obj_t * obj)
 {
-
-    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
-
     lv_obj_t * i;
     lv_obj_t * i_next;
     i = lv_ll_get_head(&(obj->child_ll));
@@ -2209,6 +2217,7 @@ static void delete_children(lv_obj_t * obj)
 
     /*Let the suer free the resources used in `LV_EVENT_DELETE`*/
     lv_event_send(obj, LV_EVENT_DELETE, NULL);
+    if(event_act_obj == obj && event_act_obj_deleted == false) event_act_obj_deleted = true;
 
     /*Remove the animations from this object*/
 #if LV_USE_ANIMATION
