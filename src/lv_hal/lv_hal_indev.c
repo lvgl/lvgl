@@ -90,7 +90,7 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     indev->btn_points       = NULL;
 
     indev->driver.read_task =
-        lv_task_create(lv_indev_read_task, LV_INDEV_DEF_READ_PERIOD, LV_TASK_PRIO_MID, indev);
+        lv_task_create( (lv_task_cb_t) lv_indev_read_task, LV_INDEV_DEF_READ_PERIOD, LV_TASK_PRIO_MID, indev);
 
     return indev;
 }

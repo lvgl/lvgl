@@ -69,6 +69,8 @@ typedef struct
     uint8_t once : 1;
 } lv_task_t;
 
+typedef void (*lv_task_cb_t)(void *);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -91,7 +93,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
  * @param user_data custom parameter
  * @return pointer to the new task_cb
  */
-lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void *  user_data);
+lv_task_t * lv_task_create(lv_task_cb_t task, uint32_t period, lv_task_prio_t prio, void *  user_data);
 
 /**
  * Delete a lv_task
