@@ -168,7 +168,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
  * @param user_data custom parameter
  * @return pointer to the new task
  */
-lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void * user_data)
+lv_task_t * lv_task_create(void (*task)(lv_task_t *), uint32_t period, lv_task_prio_t prio, void * user_data)
 {
     lv_task_t * new_lv_task = NULL;
     lv_task_t * tmp;

@@ -137,8 +137,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def = disp_def_tmp; /*Revert the default display*/
 
     /*Create a refresh task*/
-    disp->refr_task =
-        lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
+    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
     lv_mem_assert(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 

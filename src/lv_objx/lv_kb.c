@@ -41,7 +41,7 @@ static const lv_btnm_ctrl_t kb_ctrl_lc_map[] = {
     LV_KB_CTRL_BTN_FLAGS | 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
     LV_KB_CTRL_BTN_FLAGS | 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 6, 2, 2};
+    LV_KB_CTRL_BTN_FLAGS | 2, 2, 6, 2, LV_KB_CTRL_BTN_FLAGS | 2};
 
 static const char * kb_map_uc[] = {"1#", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Bksp", "\n",
                                    "abc", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Enter", "\n",
@@ -52,7 +52,7 @@ static const lv_btnm_ctrl_t kb_ctrl_uc_map[] = {
     LV_KB_CTRL_BTN_FLAGS | 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
     LV_KB_CTRL_BTN_FLAGS | 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 6, 2, 2};
+    LV_KB_CTRL_BTN_FLAGS | 2, 2, 6, 2, LV_KB_CTRL_BTN_FLAGS | 2};
 
 static const char * kb_map_spec[] = {"0", "1", "2", "3", "4" ,"5", "6", "7", "8", "9", "Bksp", "\n",
                                      "abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
@@ -122,7 +122,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
          * Don't use `par` directly because if the window is created on a page it is moved to the
          * scrollable so the parent has changed */
         lv_obj_set_size(new_kb, lv_obj_get_width_fit(lv_obj_get_parent(new_kb)),
-                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)));
+                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)) / 2);
 
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
