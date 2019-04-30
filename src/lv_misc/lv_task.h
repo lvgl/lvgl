@@ -51,11 +51,11 @@ typedef uint8_t lv_task_prio_t;
 /**
  * Descriptor of a lv_task
  */
-typedef struct
+typedef struct _lv_task_t
 {
     uint32_t period;
     uint32_t last_run;
-    void (*task_cb)(void *);
+    void (*task_cb)(struct _lv_task_t *);
 
 #if LV_USE_USER_DATA_SINGLE
     void * user_data;
@@ -91,7 +91,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
  * @param user_data custom parameter
  * @return pointer to the new task_cb
  */
-lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void *  user_data);
+lv_task_t * lv_task_create(void (*task)(lv_task_t *), uint32_t period, lv_task_prio_t prio, void *  user_data);
 
 /**
  * Delete a lv_task
