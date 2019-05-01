@@ -31,6 +31,9 @@ extern "C" {
 /*Number of fractional digits in the advanced width (`adv_w`) field of `lv_font_glyph_dsc_t`*/
 #define LV_FONT_WIDTH_FRACT_DIGIT       4
 
+#define LV_FONT_KERN_POSITIVE        0
+#define LV_FONT_KERN_NEGATIVE        1
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -203,10 +206,6 @@ bool lv_font_get_glyph_dsc_plain(const lv_font_t * font, lv_font_glyph_dsc_t * d
 #define LV_FONT_SET_WIDTH(_integer, _fract) ((_integer << LV_FONT_WIDTH_FRACT_DIGIT) + _fract)
 #define LV_FONT_GET_WIDTH_INT(_w)       (_w >> LV_FONT_WIDTH_FRACT_DIGIT)
 #define LV_FONT_GET_WIDTH_FRACT(_w)     (_w & ((1 << LV_FONT_WIDTH_FRACT_DIGIT) -1))
-
-#define LV_FONT_KERN_POSITIVE        0
-#define LV_FONT_KERN_NEGATIVE        1
-
 
 /**********************
  * ADD BUILT IN FONTS
