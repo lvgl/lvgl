@@ -35,11 +35,17 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/*------------------
+ * General types
+ *-----------------*/
+
+/*One element of a kerning table*/
 typedef struct {
     int32_t next_unicode    :23;
     int32_t space           :9;       /*5 integer,  4 fractional*/
 }lv_font_kern_t;
 
+/*Describe the properties of a glyph*/
 typedef struct
 {
     uint16_t adv_w; /*The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
@@ -51,6 +57,7 @@ typedef struct
     const lv_font_kern_t * kern_table;
 }lv_font_glyph_dsc_t;
 
+/*Describe the properties of a font*/
 typedef struct _lv_font_struct
 {
     uint32_t unicode_first;
@@ -70,6 +77,12 @@ typedef struct _lv_font_struct
     void * dsc;               /*Store implementation specific data here*/
 } lv_font_t;
 
+
+/*---------------------------------------------
+ * Types for LittlevGL's internal font format
+ *---------------------------------------------*/
+
+/*Describe a glyph in internal font format */
 typedef struct
 {
     uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
@@ -84,6 +97,7 @@ typedef struct
 }lv_font_glyph_dsc_built_in_t;
 
 
+/*Describe store additional data for fonts */
 typedef struct {
     const uint8_t * glyph_bitmap;
     const lv_font_glyph_dsc_built_in_t * glyph_dsc;
@@ -96,8 +110,12 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+/*----------------
+ * General API
+ *---------------*/
+
 /**
- * Initialize the fonts
+ * Initialize the font module
  */
 void lv_font_init(void);
 
@@ -151,6 +169,10 @@ static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
 {
     return font_p->line_height;
 }
+
+/*----------------------------------
+ * LittlevGL's internal font format
+ *----------------------------------*/
 
 /**
  * Used as `get_glyph_bitmap` callback in LittelvGL's native font format if the font is uncompressed.
