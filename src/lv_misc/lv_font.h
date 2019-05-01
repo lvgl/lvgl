@@ -41,8 +41,10 @@ extern "C" {
 
 /*One element of a kerning table*/
 typedef struct {
-    int32_t next_unicode    :23;
-    int32_t space           :9;       /*5 integer,  4 fractional*/
+    uint32_t next_unicode    :23;
+
+    uint32_t space           :8;       /*5 integer,  4 fractional*/
+    uint32_t space_sign      :1;       /*0: space positive; 1: space negative*/
 }lv_font_kern_t;
 
 /*Describe the properties of a glyph*/
@@ -201,6 +203,9 @@ bool lv_font_get_glyph_dsc_plain(const lv_font_t * font, lv_font_glyph_dsc_t * d
 #define LV_FONT_SET_WIDTH(_integer, _fract) ((_integer << LV_FONT_WIDTH_FRACT_DIGIT) + _fract)
 #define LV_FONT_GET_WIDTH_INT(_w)       (_w >> LV_FONT_WIDTH_FRACT_DIGIT)
 #define LV_FONT_GET_WIDTH_FRACT(_w)     (_w & ((1 << LV_FONT_WIDTH_FRACT_DIGIT) -1))
+
+#define LV_FONT_KERN_POSITIVE        0
+#define LV_FONT_KERN_NEGATIVE        1
 
 
 /**********************

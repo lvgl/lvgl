@@ -42,7 +42,7 @@ static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
  **********************/
 
 /**
- * Initialize the fonts
+ * Initialize the font module
  */
 void lv_font_init(void)
 {
@@ -143,7 +143,11 @@ uint8_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_
         uint32_t i;
         for(i = 0; dsc.kern_table[i].next_unicode != 0; i++) {
             if((uint32_t)dsc.kern_table[i].next_unicode == letter_next) {
-                w += dsc.kern_table[i].space;
+                if(dsc.kern_table[i].space_sign == LV_FONT_KERN_POSITIVE) {
+                    w += dsc.kern_table[i].space;
+                } else {
+                    w -= dsc.kern_table[i].space;
+                }
                 break;
             }
         }

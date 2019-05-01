@@ -83,8 +83,8 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
 
 
 static const lv_font_kern_t kern_0031[] = {
-        {.next_unicode = 0x0033, .space = 3 << 4},
-        {.next_unicode  = 0x0000}                       /*Trailing*/
+        {.next_unicode = 0x0033, .space = LV_FONT_SET_WIDTH(8, 0), .space_sign = LV_FONT_KERN_POSITIVE},
+        {.next_unicode  = 0x0000}   /*Trailing*/
 };
 
 /*Store the glyph descriptions*/
