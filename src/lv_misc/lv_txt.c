@@ -173,11 +173,13 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord
     uint32_t n_char_since_last_break = 0; /* Used count word length of long words */
     uint32_t last_break              = NO_BREAK_FOUND;
     lv_txt_cmd_state_t cmd_state     = LV_TXT_CMD_STATE_WAIT;
-    uint32_t letter                  = 0;
+    uint32_t letter;
+    uint32_t letter_next;
 
     while(txt[i] != '\0') {
         lv_coord_t letter_width;
         letter = lv_txt_encoded_next(txt, &i);
+        letter_next = lv_txt_encoded_next(&txt[i], NULL);
 
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -196,7 +198,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord
 
         } else { /*Check the actual length*/
             n_char_since_last_break++;
-            letter_width = lv_font_get_width_int(font, letter);
+            letter_width = lv_font_get_glyph_width(font, letter, letter_next);
             cur_w += letter_width;
 
             /* Get the length of the current work and determine best place
@@ -210,12 +212,12 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord
                         i = last_break;
                     } else {
                         uint32_t i_tmp = i;
-                        cur_w -=
-                            w_at_last_break +
-                            letter_space; /*ignore the first letter_space after the break char */
+                        /*ignore the first letter_space after the break char */
+                        cur_w -= w_at_last_break + letter_space;
                         bool other = true;
                         while(txt[i_tmp] != '\0') {
                             letter = lv_txt_encoded_next(txt, &i_tmp);
+                            letter_next = lv_txt_encoded_next(&txt[i_tmp], NULL);
 
                             /*Handle the recolor command*/
                             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -242,7 +244,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord
                                 break;
                             }
                             n_char_since_last_break++;
-                            lv_coord_t letter_width2 = lv_font_get_width_int(font, letter);
+                            lv_coord_t letter_width2 = lv_font_get_glyph_width(font, letter, letter_next);
                             cur_w += letter_width2;
                             if(cur_w > max_width) {
                                 /* Current letter already exceeds, return previous */
@@ -323,17 +325,19 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t *
     lv_coord_t width             = 0;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter;
+    uint32_t letter_next;
 
     if(length != 0) {
         while(i < length) {
             letter = lv_txt_encoded_next(txt, &i);
+            letter_next = lv_txt_encoded_next(&txt[i], NULL);
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(lv_txt_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
             }
 
-            lv_coord_t char_width = lv_font_get_width_int(font, letter);
+            lv_coord_t char_width = lv_font_get_glyph_width(font, letter, letter_next);
             if(char_width > 0) {
                 width += char_width;
                 width += letter_space;

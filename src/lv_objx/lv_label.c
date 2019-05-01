@@ -564,12 +564,20 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     }
 
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+
     uint32_t i                   = line_start;
     uint32_t i_current           = i;
     uint32_t letter;
+    uint32_t letter_next;
+
     while(i <= new_line_start - 1) {
-        letter =
-            lv_txt_encoded_next(txt, &i); /*Be careful 'i' already points to the next character*/
+        /* Get the current letter.
+         * Be careful 'i' already points to the next character*/
+        letter = lv_txt_encoded_next(txt, &i);
+
+        /*Get the next letter too for kerning*/
+        letter_next = lv_txt_encoded_next(&txt[i], NULL);
+
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
             if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
@@ -577,7 +585,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
             }
         }
 
-        x += lv_font_get_width_int(font, letter);
+        x += lv_font_get_glyph_width(font, letter, letter_next);
         if(pos->x < x) {
             i = i_current;
             break;
@@ -670,12 +678,20 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
     }
 
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
+
     uint32_t i                   = line_start;
     uint32_t i_current           = i;
-    uint32_t letter              = 0;
+    uint32_t letter;
+    uint32_t letter_next;
+
     while(i <= new_line_start - 1) {
-        letter =
-            lv_txt_encoded_next(txt, &i); /*Be careful 'i' already points to the next character*/
+        /* Get the current letter
+         * Be careful 'i' already points to the next character */
+        letter = lv_txt_encoded_next(txt, &i);
+
+        /*Get the next letter for kerning*/
+        letter_next = lv_txt_encoded_next(&txt[i], NULL);
+
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
             if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
@@ -683,7 +699,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
             }
         }
         last_x = x;
-        x += lv_font_get_width_int(font, letter);
+        x += lv_font_get_glyph_width(font, letter, letter_next);
         if(pos->x < x) {
             i = i_current;
             break;
@@ -692,7 +708,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
         i_current = i;
     }
 
-    int max_diff = lv_font_get_width_int(font, letter) + style->text.letter_space + 1;
+    int32_t max_diff = lv_font_get_glyph_width(font, letter, letter_next) + style->text.letter_space + 1;
     return (pos->x >= (last_x - style->text.letter_space) && pos->x <= (last_x + max_diff));
 }
 
@@ -833,10 +849,11 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                             style->text.line_space, LV_COORD_MAX, flag);
 
             lv_point_t ofs;
+
             /*Draw the text again next to the original to make an circular effect */
             if(size.x > lv_obj_get_width(label)) {
                 ofs.x = ext->offset.x + size.x +
-                        lv_font_get_width_int(style->text.font, ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+                        lv_font_get_glyph_width(style->text.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 ofs.y = ext->offset.y;
 
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
@@ -950,8 +967,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.start    = 0;
         anim.ready_cb   = NULL;
         anim.path_cb     = lv_anim_path_linear;
-        anim.playback_pause =
-            (((lv_font_get_width_int(style->text.font, ' ') + style->text.letter_space) * 1000) /
+        anim.playback_pause = (((lv_font_get_glyph_width(style->text.font, ' ', ' ') + style->text.letter_space) * 1000) /
              ext->anim_speed) * LV_LABEL_WAIT_CHAR_COUNT;
         anim.repeat_pause = anim.playback_pause;
         anim.act_time = -anim.playback_pause;
@@ -990,8 +1006,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         anim.repeat         = 1;
         anim.playback       = 0;
         anim.start          = 0;
-        anim.act_time       = 
-            -(((lv_font_get_width_int(style->text.font, ' ') + style->text.letter_space) * 1000) /
+        anim.act_time       =  -(((lv_font_get_glyph_width(style->text.font, ' ', ' ') + style->text.letter_space) * 1000) /
              ext->anim_speed) * LV_LABEL_WAIT_CHAR_COUNT;
         anim.ready_cb         = NULL;
         anim.path_cb           = lv_anim_path_linear;
@@ -1000,7 +1015,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
-            anim.end  = -size.x - lv_font_get_width_int(font, ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+            anim.end  = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
             anim.exec_cb   = (lv_anim_exec_cb_t)lv_label_set_offset_x;
             anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
@@ -1031,7 +1046,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         } else {
             lv_point_t p;
             p.x = lv_obj_get_width(label) -
-                  (lv_font_get_width_int(style->text.font, '.') + style->text.letter_space) *
+                  (lv_font_get_glyph_width(style->text.font, '.', '.') + style->text.letter_space) *
                       LV_LABEL_DOT_NUM; /*Shrink with dots*/
             p.y = lv_obj_get_height(label);
             p.y -= p.y % (lv_font_get_line_height(style->text.font) +

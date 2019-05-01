@@ -29,29 +29,27 @@ extern "C" {
  *      DEFINES
  *********************/
 /*Number of fractional digits in the advanced width (`adv_w`) field of `lv_font_glyph_dsc_t`*/
-#define LV_FONT_ADV_W_FRACT_DIGIT       4
+#define LV_FONT_WIDTH_FRACT_DIGIT       4
 
 /**********************
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    int32_t next_unicode    :23;
+    int32_t space           :9;       /*5 integer,  4 fractional*/
+}lv_font_kern_t;
+
 typedef struct
 {
-    uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
-    uint32_t adv_w :12;              /*The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
-    uint8_t box_w;              /*Width of the glyph's bounding box*/
-    uint8_t box_h;              /*Height of the glyph's bounding box*/
-    uint8_t ofs_x;              /*x offset of the bounding box*/
-    int8_t  ofs_y;              /*y offset of the bounding box*/
-} lv_font_glyph_dsc_t;
-
-typedef struct {
-    const uint8_t * glyph_bitmap;
-    const lv_font_glyph_dsc_t * glyph_dsc;
-    const uint16_t * unicode_list;
-    uint16_t glyph_cnt;        /*Number of glyphs in the font. */
-}lv_font_dsc_built_in_t;
-
+    uint16_t adv_w; /*The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
+    uint8_t box_w;  /*Width of the glyph's bounding box*/
+    uint8_t box_h;  /*Height of the glyph's bounding box*/
+    int8_t ofs_x;   /*x offset of the bounding box*/
+    int8_t ofs_y;  /*y offset of the bounding box*/
+    uint8_t bpp;   /*Bit-per-pixel: 1, 2, 4, 8*/
+    const lv_font_kern_t * kern_table;
+}lv_font_glyph_dsc_t;
 
 typedef struct _lv_font_struct
 {
@@ -59,20 +57,40 @@ typedef struct _lv_font_struct
     uint32_t unicode_last;
 
     /*Get a glyph's  descriptor from a font*/
-    const lv_font_glyph_dsc_t * (*get_glyph_dsc)(const struct _lv_font_struct *, uint32_t letter);
+    bool (*get_glyph_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t *, uint32_t letter);
 
     /*Get a glyph's bitmap from a font*/
     const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_struct *, uint32_t);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
     struct _lv_font_struct * next_page;
-    uint8_t size;             /*The original size*/
+    uint8_t size;             /*The original size (height)*/
     uint8_t line_height;      /*The real line height where any text fits*/
-    uint8_t base_line;        /*Base line measured from the top of the line*/
-    uint8_t bpp;              /*Bit per pixel: 1, 2, 4 or 8*/
-
+    uint8_t base_line;        /*Base line measured from the top of the line_height*/
     void * dsc;               /*Store implementation specific data here*/
 } lv_font_t;
+
+typedef struct
+{
+    uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
+    uint32_t adv_w :12;             /*The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
+
+    uint8_t box_w;                  /*Width of the glyph's bounding box*/
+    uint8_t box_h;                  /*Height of the glyph's bounding box*/
+    int8_t ofs_x;                   /*x offset of the bounding box*/
+    int8_t ofs_y;                   /*y offset of the bounding box*/
+
+    const lv_font_kern_t * kern_table;
+}lv_font_glyph_dsc_built_in_t;
+
+
+typedef struct {
+    const uint8_t * glyph_bitmap;
+    const lv_font_glyph_dsc_built_in_t * glyph_dsc;
+    const uint16_t * unicode_list;
+    uint16_t glyph_cnt;        /*Number of glyphs in the font. */
+    uint8_t bpp;               /*Bit per pixel: 1, 2, 4 or 8*/
+}lv_font_dsc_built_in_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -98,15 +116,6 @@ void lv_font_add(lv_font_t * child, lv_font_t * parent);
 void lv_font_remove(lv_font_t * child, lv_font_t * parent);
 
 /**
- * Tells if font which contains `letter` is monospace or not
- * @param font_p point to font
- * @param letter an UNICODE character code
- * @return true: the letter is monospace; false not monospace
- */
-bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter);
-
-
-/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
@@ -115,21 +124,23 @@ bool lv_font_is_monospace(const lv_font_t * font_p, uint32_t letter);
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter);
 
 /**
- * Get the description of a glyph in a font.
- * @param font_p pointer to a font
- * @param letter an UNICODE character code
- * @return pointer to a glyph descriptor
+ * Get the descriptor of a glyph
+ * @param font_p pointer to font
+ * @param dsc_out store the result descriptor here
+ * @param letter an UNICODE letter code
+ * @return true: descriptor is successfully loaded into `dsc_out`.
+ *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc(const lv_font_t * font_p, uint32_t letter);
+bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter);
 
-uint8_t lv_font_get_width_int(const lv_font_t * font, uint32_t letter);
 /**
- * Get the width of a letter in a font. If `monospace` is set then return with it.
- * @param font_p pointer to a font
- * @param letter an UNICODE character code
- * @return the width of a letter
+ * Get the width of a glyph with kerning
+ * @param font pointer to a font
+ * @param letter an UNICODE letter
+ * @param letter_next the next letter after `letter`. Used for kerning
+ * @return the width of the glyph
  */
-uint8_t lv_font_get_width_int(const lv_font_t * font_p, uint32_t letter);
+uint8_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next);
 
 /**
  * Get the line height of a font. All characters fit into this height
@@ -138,35 +149,26 @@ uint8_t lv_font_get_width_int(const lv_font_t * font_p, uint32_t letter);
  */
 static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
 {
-    return font_p->line_height;//(uint8_t)((int16_t)font_p->ascent - font_p->descent);
+    return font_p->line_height;
 }
 
 /**
- * Get the bit-per-pixel of font
- * @param font pointer to font
- * @param letter a letter from font (font extensions can have different bpp)
- * @return bpp of the font (or font extension)
- */
-uint8_t lv_font_get_bpp(const lv_font_t * font, uint32_t letter);
-
-
-/**
- * Generic bitmap get function used in 'font->get_bitmap' when the font contains all characters in
- * the range
+ * Used as `get_glyph_bitmap` callback in LittelvGL's native font format if the font is uncompressed.
  * @param font pointer to font
  * @param unicode_letter an unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
  */
-const uint8_t * lv_font_get_glyph_bitmap_plain(const lv_font_t * font, uint32_t unicode_letter);
+const uint8_t * lv_font_get_glyph_bitmap_plain(const lv_font_t * font, uint32_t letter);
 
 /**
- * Generic glyph width get function used in 'font->get_width' when the font contains all characters
- * in the range
- * @param font pointer to font
- * @param unicode_letter an unicode letter which width should be get
- * @return width of the gylph or -1 if not found
+ * Used as `get_glyph_dsc` callback in LittelvGL's native font format if the font is uncompressed.
+ * @param font_p pointer to font
+ * @param dsc_out store the result descriptor here
+ * @param letter an UNICODE letter code
+ * @return true: descriptor is successfully loaded into `dsc_out`.
+ *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc_plain(const lv_font_t * font, uint32_t unicode_letter);
+bool lv_font_get_glyph_dsc_plain(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter);
 
 /**********************
  *      MACROS
@@ -174,9 +176,9 @@ const lv_font_glyph_dsc_t * lv_font_get_glyph_dsc_plain(const lv_font_t * font, 
 
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
-#define LV_FONT_SET_ADV_W(_integer, _fract) ((_integer << LV_FONT_ADV_W_FRACT_DIGIT) + _fract)
-#define LV_FONT_GET_ADV_W_INT(_adv_w)       (_adv_w >> LV_FONT_ADV_W_FRACT_DIGIT)
-#define LV_FONT_GET_ADV_W_FRACT(_adv_w)     (_adv_w & ((1 << LV_FONT_ADV_W_FRACT_DIGIT) -1))
+#define LV_FONT_SET_WIDTH(_integer, _fract) ((_integer << LV_FONT_WIDTH_FRACT_DIGIT) + _fract)
+#define LV_FONT_GET_WIDTH_INT(_w)       (_w >> LV_FONT_WIDTH_FRACT_DIGIT)
+#define LV_FONT_GET_WIDTH_FRACT(_w)     (_w & ((1 << LV_FONT_WIDTH_FRACT_DIGIT) -1))
 
 
 /**********************

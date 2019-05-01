@@ -244,19 +244,18 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
         return;
     }
 
-    const lv_font_glyph_dsc_t * g = lv_font_get_glyph_dsc(font_p, letter);
-    if(g == NULL) return;
-    lv_coord_t pos_x = pos_p->x + g->ofs_x;
-    lv_coord_t pos_y = pos_p->y + g->ofs_y;
+    lv_font_glyph_dsc_t g;
+    bool g_ret = lv_font_get_glyph_dsc(font_p, &g, letter);
+    if(g_ret == false) return;
 
-    uint8_t bpp      = lv_font_get_bpp(font_p, letter); /*Bit per pixel (1,2, 4 or 8)*/
-
+    lv_coord_t pos_x = pos_p->x + g.ofs_x;
+    lv_coord_t pos_y = pos_p->y + g.ofs_y;
 
     const uint8_t * bpp_opa_table;
     uint8_t bitmask_init;
     uint8_t bitmask;
 
-    switch(bpp) {
+    switch(g.bpp) {
         case 1:
             bpp_opa_table = bpp1_opa_table;
             bitmask_init     = 0x80;
@@ -281,7 +280,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     if(map_p == NULL) return;
 
     /*If the letter is completely out of mask don't draw it */
-    if(pos_x + g->box_w < mask_p->x1 || pos_x > mask_p->x2 || pos_y + g->box_h < mask_p->y1 ||
+    if(pos_x + g.box_w < mask_p->x1 || pos_x > mask_p->x2 || pos_y + g.box_h < mask_p->y1 ||
        pos_y > mask_p->y2)
         return;
 
@@ -293,16 +292,16 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     lv_coord_t col, row;
     uint8_t col_bit;
     uint8_t col_byte_cnt;
-    uint8_t width_byte_scr = g->box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
-    if(g->box_w & 0x7) width_byte_scr++;
-    uint8_t width_byte_bpp = (g->box_w * bpp) >> 3; /*Letter width in byte. Real width in the font*/
-    if((g->box_w * bpp) & 0x7) width_byte_bpp++;
+    uint8_t width_byte_scr = g.box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
+    if(g.box_w & 0x7) width_byte_scr++;
+    uint8_t width_byte_bpp = (g.box_w * g.bpp) >> 3; /*Letter width in byte. Real width in the font*/
+    if((g.box_w * g.bpp) & 0x7) width_byte_bpp++;
 
     /* Calculate the col/row start/end on the map*/
     lv_coord_t col_start = pos_x >= mask_p->x1 ? 0 : mask_p->x1 - pos_x;
-    lv_coord_t col_end   = pos_x + g->box_w <= mask_p->x2 ? g->box_w : mask_p->x2 - pos_x + 1;
+    lv_coord_t col_end   = pos_x + g.box_w <= mask_p->x2 ? g.box_w : mask_p->x2 - pos_x + 1;
     lv_coord_t row_start = pos_y >= mask_p->y1 ? 0 : mask_p->y1 - pos_y;
-    lv_coord_t row_end   = pos_y + g->box_h <= mask_p->y2 ? g->box_h : mask_p->y2 - pos_y + 1;
+    lv_coord_t row_end   = pos_y + g.box_h <= mask_p->y2 ? g.box_h : mask_p->y2 - pos_y + 1;
 
     /*Set a pointer on VDB to the first pixel of the letter*/
     vdb_buf_tmp += ((pos_y - vdb->area.y1) * vdb_width) + pos_x - vdb->area.x1;
@@ -311,21 +310,21 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
-    map_p += (row_start * width_byte_bpp) + ((col_start * bpp) >> 3);
+    map_p += (row_start * width_byte_bpp) + ((col_start * g.bpp) >> 3);
 
     uint8_t letter_px;
     lv_opa_t px_opa;
     for(row = row_start; row < row_end; row++) {
         col_byte_cnt = 0;
-        col_bit      = (col_start * bpp) % 8;
+        col_bit      = (col_start * g.bpp) % 8;
         bitmask         = bitmask_init >> col_bit;
         for(col = col_start; col < col_end; col++) {
-            letter_px = (*map_p & bitmask) >> (8 - col_bit - bpp);
+            letter_px = (*map_p & bitmask) >> (8 - col_bit - g.bpp);
             if(letter_px != 0) {
                 if(opa == LV_OPA_COVER) {
-                    px_opa = bpp == 8 ? letter_px : bpp_opa_table[letter_px];
+                    px_opa = g.bpp == 8 ? letter_px : bpp_opa_table[letter_px];
                 } else {
-                    px_opa = bpp == 8 ? (uint16_t)((uint16_t)letter_px * opa) >> 8
+                    px_opa = g.bpp == 8 ? (uint16_t)((uint16_t)letter_px * opa) >> 8
                                       : (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
                 }
 
@@ -345,9 +344,9 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
 
             vdb_buf_tmp++;
 
-            if(col_bit < 8 - bpp) {
-                col_bit += bpp;
-                bitmask = bitmask >> bpp;
+            if(col_bit < 8 - g.bpp) {
+                col_bit += g.bpp;
+                bitmask = bitmask >> g.bpp;
             } else {
                 col_bit = 0;
                 col_byte_cnt++;
