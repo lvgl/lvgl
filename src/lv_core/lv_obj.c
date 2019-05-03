@@ -214,7 +214,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     else {
         LV_LOG_TRACE("Object create started");
 
-        new_obj = lv_ll_ins_head(&(parent)->child_ll);
+        new_obj = lv_ll_ins_head(&parent->child_ll);
         lv_mem_assert(new_obj);
         if(new_obj == NULL) return NULL;
 
@@ -428,8 +428,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         lv_ll_rem(&(par->child_ll), obj);
     }
 
-    /* Reset all input devices if
-     * the object to delete is used*/
+    /* Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
@@ -552,7 +551,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     lv_obj_t * old_par = obj->par;
 
-    lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
+    lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj, true);
     obj->par = parent;
     lv_obj_set_pos(obj, old_pos.x, old_pos.y);
 
@@ -563,6 +562,42 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
 
     lv_obj_invalidate(obj);
+}
+
+/**
+ * Move and object to the foreground
+ * @param obj pointer to an object
+ */
+void lv_obj_move_foreground(lv_obj_t * obj)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    lv_obj_invalidate(parent);
+
+    lv_ll_chg_list(&parent->child_ll, &parent->child_ll, obj, true);
+
+    /*Notify the new parent about the child*/
+    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    lv_obj_invalidate(parent);
+}
+
+/**
+ * Move and object to the background
+ * @param obj pointer to an object
+ */
+void lv_obj_move_background(lv_obj_t * obj)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    lv_obj_invalidate(parent);
+
+    lv_ll_chg_list(&parent->child_ll, &parent->child_ll, obj, false);
+
+    /*Notify the new parent about the child*/
+    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    lv_obj_invalidate(parent);
 }
 
 /*--------------------
@@ -2017,7 +2052,7 @@ void * lv_obj_get_group(const lv_obj_t * obj)
 }
 
 /**
- * Tell whether the ohe object is the focused object of a group or not.
+ * Tell whether the object is the focused object of a group or not.
  * @param obj pointer to an object
  * @return true: the object is focused, false: the object is not focused or not in a group
  */

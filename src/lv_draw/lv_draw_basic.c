@@ -336,8 +336,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                                            (row + pos_y) - vdb->area.y1, color, px_opa);
                 } else {
                     if(px_opa > LV_OPA_MAX) *vdb_buf_tmp = color;
-                    else if(px_opa < LV_OPA_MIN) continue;
-                    else {
+                    else if(px_opa > LV_OPA_MIN) {
 #if LV_COLOR_SCREEN_TRANSP == 0
                         *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
 #else

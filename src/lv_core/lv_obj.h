@@ -328,6 +328,18 @@ void lv_obj_invalidate(const lv_obj_t * obj);
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent);
 
+/**
+ * Move and object to the foreground
+ * @param obj pointer to an object
+ */
+void lv_obj_move_foreground(lv_obj_t * obj);
+
+/**
+ * Move and object to the background
+ * @param obj pointer to an object
+ */
+void lv_obj_move_background(lv_obj_t * obj);
+
 /*--------------------
  * Coordinate set
  * ------------------*/

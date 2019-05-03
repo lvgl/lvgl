@@ -738,10 +738,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
             if(last_top != NULL) {
                 /*Move the last_top object to the foreground*/
-                lv_obj_t * par = lv_obj_get_parent(last_top);
-                /*After list change it will be the new head*/
-                lv_ll_chg_list(&par->child_ll, &par->child_ll, last_top);
-                lv_obj_invalidate(last_top);
+                lv_obj_move_foreground(last_top);
             }
 
             /*Send a signal about the press*/
