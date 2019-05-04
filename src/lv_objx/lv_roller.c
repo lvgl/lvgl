@@ -506,7 +506,8 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         lv_coord_t label_y1   = ext->ddlist.label->coords.y1 - roller->coords.y1;
         lv_coord_t label_unit = font_h + style_label->text.line_space;
         lv_coord_t mid        = (roller->coords.y2 - roller->coords.y1) / 2;
-        id                    = (mid - label_y1 + style_label->text.line_space / 2) / label_unit;
+
+        id = (mid - label_y1 + style_label->text.line_space / 2) / label_unit;
 
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
@@ -515,18 +516,22 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         ext->ddlist.sel_opt_id_ori = id;
         res                        = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
         if(res != LV_RES_OK) return res;
-    } else if(sign == LV_SIGNAL_RELEASED) {
-        /*If picked an option by clicking then set it*/
+    }
+    /*If picked an option by clicking then set it*/
+    else if(sign == LV_SIGNAL_RELEASED) {
         if(!lv_indev_is_dragging(indev)) {
             id = ext->ddlist.sel_opt_id;
 #if LV_USE_GROUP
+            /*In edit mode go to navigate mode if an option is selected*/
             lv_group_t * g = lv_obj_get_group(roller);
             bool editing   = lv_group_get_editing(g);
             if(editing)
-                lv_group_set_editing(
-                    g, false); /*In edit mode go to navigate mode if an option is selected*/
+                lv_group_set_editing(g, false);
 #endif
         }
+    }
+    else if(sign == LV_SIGNAL_PRESSED) {
+        lv_anim_del(roller_scrl, (lv_anim_exec_cb_t)lv_obj_set_y);
     }
 
     /*Position the scrollable according to the new selected option*/
