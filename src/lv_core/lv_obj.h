@@ -44,10 +44,6 @@ extern "C" {
 
 #define LV_MAX_ANCESTOR_NUM 8
 
-#define LV_ANIM_IN 0x00       /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_OUT 0x80      /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_DIR_MASK 0x80 /*ANIM_IN/ANIM_OUT mask*/
-
 #define LV_EXT_CLICK_AREA_OFF   0
 #define LV_EXT_CLICK_AREA_TINY  1
 #define LV_EXT_CLICK_AREA_FULL  2
@@ -260,17 +256,6 @@ typedef struct
     const char * type[LV_MAX_ANCESTOR_NUM]; /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
-
-enum {
-    LV_ANIM_NONE = 0,
-    LV_ANIM_FLOAT_TOP,    /*Float from/to the top*/
-    LV_ANIM_FLOAT_LEFT,   /*Float from/to the left*/
-    LV_ANIM_FLOAT_BOTTOM, /*Float from/to the bottom*/
-    LV_ANIM_FLOAT_RIGHT,  /*Float from/to the right*/
-    LV_ANIM_GROW_H,       /*Grow/shrink  horizontally*/
-    LV_ANIM_GROW_V,       /*Grow/shrink  vertically*/
-};
-typedef uint8_t lv_anim_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -622,20 +607,6 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
  * @param obj pointer to an object
  */
 void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj);
-
-#if LV_USE_ANIMATION
-
-/**
- * Animate an object
- * @param obj pointer to an object to animate
- * @param type type of animation from 'lv_anim_builtin_t'. 'OR' it with ANIM_IN or ANIM_OUT
- * @param time time of animation in milliseconds
- * @param delay delay before the animation in milliseconds
- * @param ready_cb a function to call when the animation is ready
- */
-void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay,
-                    lv_anim_ready_cb_t ready_cb);
-#endif
 
 /*=======================
  * Getter functions

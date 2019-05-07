@@ -32,13 +32,15 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef int16_t lv_anim_value_t;         /*Type of the animated value*/
+
 struct _lv_anim_t;
 
 /*Generic prototype of "animator" functions*/
-typedef void (*lv_anim_exec_cb_t)(void *, int32_t);
+typedef void (*lv_anim_exec_cb_t)(void *, lv_anim_value_t);
 
 /*Get the current value in an animation*/
-typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
+typedef lv_anim_value_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
 
 /*Callback for animation ready*/
 typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
@@ -77,7 +79,7 @@ lv_anim_t a;
 a.var = obj;
 a.start = lv_obj_get_height(obj);
 a.end = new_height;
-a.exec_cb = (lv_anim_fp_t)lv_obj_set_height;
+a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_height;
 a.path_cb = lv_anim_path_linear;
 a.ready_cb = NULL;
 a.act_time = 0;
@@ -126,49 +128,49 @@ uint16_t lv_anim_count_running(void);
  * @param end end value of the animation
  * @return the required time [ms] for the animation with the given parameters
  */
-uint16_t lv_anim_speed_to_time(uint16_t speed, int32_t start, int32_t end);
+uint16_t lv_anim_speed_to_time(uint16_t speed, lv_anim_value_t start, lv_anim_value_t end);
 
 /**
  * Calculate the current value of an animation applying linear characteristic
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_linear(const lv_anim_t * a);
+lv_anim_value_t lv_anim_path_linear(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation slowing down the start phase
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_in(const lv_anim_t * a);
+lv_anim_value_t lv_anim_path_ease_in(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation slowing down the end phase
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_out(const lv_anim_t * a);
+lv_anim_value_t lv_anim_path_ease_out(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation applying an "S" characteristic (cosine)
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_ease_in_out(const lv_anim_t * a);
+lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation with overshoot at the end
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_overshoot(const lv_anim_t * a);
+lv_anim_value_t lv_anim_path_overshoot(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation with 3 bounces
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_bounce(const lv_anim_t * a);
+lv_anim_value_t lv_anim_path_bounce(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation applying step characteristic.
@@ -176,7 +178,7 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a);
  * @param a pointer to an animation
  * @return the current value to set
  */
-int32_t lv_anim_path_step(const lv_anim_t * a);
+lv_anim_value_t lv_anim_path_step(const lv_anim_t * a);
 
 /**********************
  *      MACROS

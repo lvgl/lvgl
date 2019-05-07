@@ -669,8 +669,6 @@ static void obj_to_foreground(lv_obj_t * obj)
 
     if(last_top != NULL) {
         /*Move the last_top object to the foreground*/
-        lv_obj_t * par = lv_obj_get_parent(last_top);
-        /*After list change it will be the new head*/
         lv_obj_move_foreground(last_top);
     }
 }

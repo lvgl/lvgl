@@ -202,14 +202,45 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 
     if(ext->anim_time != 0) {
         /*Add shrinking animations*/
-        lv_obj_animate(mbox, LV_ANIM_GROW_H | LV_ANIM_OUT, ext->anim_time, delay, NULL);
-        lv_obj_animate(mbox, LV_ANIM_GROW_V | LV_ANIM_OUT, ext->anim_time, delay,
-                       lv_mbox_close_ready_cb);
+        lv_anim_t a;
+        a.var = mbox;
+        a.start = lv_obj_get_height(mbox);
+        a.end = 0;
+        a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_height;
+        a.path_cb = lv_anim_path_linear;
+        a.ready_cb = NULL;
+        a.act_time = -delay;
+        a.time = ext->anim_time;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        a.user_data = NULL;
+        lv_anim_create(&a);
+
+        a.start = lv_obj_get_width(mbox);
+        a.ready_cb = lv_mbox_close_ready_cb;
+        lv_anim_create(&a);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, LV_FIT_NONE);
     } else {
-        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_mbox_close_ready_cb);
+        /*Create an animation to delete the mbox `delay` ms later*/
+        lv_anim_t a;
+        a.var = mbox;
+        a.start = 0;
+        a.end = 1;
+        a.exec_cb = (lv_anim_exec_cb_t)NULL;
+        a.path_cb = lv_anim_path_linear;
+        a.ready_cb = lv_mbox_close_ready_cb;
+        a.act_time = -delay;
+        a.time = 0;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        a.user_data = NULL;
+        lv_anim_create(&a);
     }
 #else
     (void)delay; /*Unused*/
