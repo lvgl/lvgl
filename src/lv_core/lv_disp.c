@@ -112,7 +112,7 @@ void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr)
 
     if(old_disp == disp) return;
 
-    lv_ll_chg_list(&old_disp->scr_ll, &disp->scr_ll, scr);
+    lv_ll_chg_list(&old_disp->scr_ll, &disp->scr_ll, scr, true);
 }
 
 /**

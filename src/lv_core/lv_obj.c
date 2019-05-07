@@ -215,7 +215,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     else {
         LV_LOG_TRACE("Object create started");
 
-        new_obj = lv_ll_ins_head(&(parent)->child_ll);
+        new_obj = lv_ll_ins_head(&parent->child_ll);
         lv_mem_assert(new_obj);
         if(new_obj == NULL) return NULL;
 
@@ -429,12 +429,14 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         lv_ll_rem(&(par->child_ll), obj);
     }
 
-    /* Reset all input devices if
-     * the object to delete is used*/
+    /* Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
+        }
+        if(indev->proc.types.pointer.last_pressed == obj) {
+            indev->proc.types.pointer.last_pressed = NULL;
         }
 
 #if LV_USE_GROUP
@@ -550,7 +552,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     lv_obj_t * old_par = obj->par;
 
-    lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
+    lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj, true);
     obj->par = parent;
     lv_obj_set_pos(obj, old_pos.x, old_pos.y);
 
@@ -561,6 +563,42 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
 
     lv_obj_invalidate(obj);
+}
+
+/**
+ * Move and object to the foreground
+ * @param obj pointer to an object
+ */
+void lv_obj_move_foreground(lv_obj_t * obj)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    lv_obj_invalidate(parent);
+
+    lv_ll_chg_list(&parent->child_ll, &parent->child_ll, obj, true);
+
+    /*Notify the new parent about the child*/
+    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    lv_obj_invalidate(parent);
+}
+
+/**
+ * Move and object to the background
+ * @param obj pointer to an object
+ */
+void lv_obj_move_background(lv_obj_t * obj)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    lv_obj_invalidate(parent);
+
+    lv_ll_chg_list(&parent->child_ll, &parent->child_ll, obj, false);
+
+    /*Notify the new parent about the child*/
+    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    lv_obj_invalidate(parent);
 }
 
 /*--------------------
@@ -1409,87 +1447,6 @@ void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 }
 
-#if LV_USE_ANIMATION
-/**
- * Animate an object
- * @param obj pointer to an object to animate
- * @param type type of animation from 'lv_anim_builtin_t'. 'OR' it with ANIM_IN or ANIM_OUT
- * @param time time of animation in milliseconds
- * @param delay delay before the animation in milliseconds
- * @param ready_cb a function to call when the animation is ready
- */
-void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay,
-                    lv_anim_ready_cb_t ready_cb)
-{
-    lv_obj_t * par = lv_obj_get_parent(obj);
-
-    /*Get the direction*/
-    bool out = (type & LV_ANIM_DIR_MASK) == LV_ANIM_IN ? false : true;
-    type     = type & (~LV_ANIM_DIR_MASK);
-
-    lv_anim_t a;
-    a.var            = obj;
-    a.time           = time;
-    a.act_time       = (int32_t)-delay;
-    a.ready_cb       = ready_cb;
-    a.path_cb        = lv_anim_path_linear;
-    a.playback_pause = 0;
-    a.repeat_pause   = 0;
-    a.playback       = 0;
-    a.repeat         = 0;
-
-    /*Init to ANIM_IN*/
-    switch(type) {
-        case LV_ANIM_FLOAT_LEFT:
-            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_x;
-            a.start = -lv_obj_get_width(obj);
-            a.end   = lv_obj_get_x(obj);
-            break;
-        case LV_ANIM_FLOAT_RIGHT:
-            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_x;
-            a.start = lv_obj_get_width(par);
-            a.end   = lv_obj_get_x(obj);
-            break;
-        case LV_ANIM_FLOAT_TOP:
-            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_y;
-            a.start = -lv_obj_get_height(obj);
-            a.end   = lv_obj_get_y(obj);
-            break;
-        case LV_ANIM_FLOAT_BOTTOM:
-            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_y;
-            a.start = lv_obj_get_height(par);
-            a.end   = lv_obj_get_y(obj);
-            break;
-        case LV_ANIM_GROW_H:
-            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_width;
-            a.start = 0;
-            a.end   = lv_obj_get_width(obj);
-            break;
-        case LV_ANIM_GROW_V:
-            a.exec_cb    = (void (*)(void *, int32_t))lv_obj_set_height;
-            a.start = 0;
-            a.end   = lv_obj_get_height(obj);
-            break;
-        case LV_ANIM_NONE:
-            a.exec_cb    = NULL;
-            a.start = 0;
-            a.end   = 0;
-            break;
-        default: break;
-    }
-
-    /*Swap start and end in case of ANIM OUT*/
-    if(out != false) {
-        int32_t tmp = a.start;
-        a.start     = a.end;
-        a.end       = tmp;
-    }
-
-    lv_anim_create(&a);
-}
-
-#endif
-
 /*=======================
  * Getter functions
  *======================*/
@@ -2041,7 +1998,7 @@ void * lv_obj_get_group(const lv_obj_t * obj)
 }
 
 /**
- * Tell whether the ohe object is the focused object of a group or not.
+ * Tell whether the object is the focused object of a group or not.
  * @param obj pointer to an object
  * @return true: the object is focused, false: the object is not focused or not in a group
  */
@@ -2254,6 +2211,10 @@ static void delete_children(lv_obj_t * obj)
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
             lv_indev_reset(indev);
+        }
+
+        if(indev->proc.types.pointer.last_pressed == obj) {
+            indev->proc.types.pointer.last_pressed = NULL;
         }
 #if LV_USE_GROUP
         if(indev->group == group && was_focused) {

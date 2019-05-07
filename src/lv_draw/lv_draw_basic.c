@@ -290,10 +290,13 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     lv_coord_t col, row;
     uint8_t col_bit;
     uint8_t col_byte_cnt;
-    uint8_t width_byte_scr =
-        letter_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
+
+    /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
+    uint8_t width_byte_scr = letter_w >> 3;
     if(letter_w & 0x7) width_byte_scr++;
-    uint8_t width_byte_bpp = (letter_w * bpp) >> 3; /*Letter width in byte. Real width in the font*/
+
+    /*Letter width in byte. Real width in the font*/
+    uint8_t width_byte_bpp = (letter_w * bpp) >> 3;
     if((letter_w * bpp) & 0x7) width_byte_bpp++;
 
     /* Calculate the col/row start/end on the map*/
@@ -331,13 +334,16 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                     disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width,
                                            (col + pos_x) - vdb->area.x1,
                                            (row + pos_y) - vdb->area.y1, color, px_opa);
-                } else {
+                } else if (vdb_buf_tmp->full != color.full) {
+                    if(px_opa > LV_OPA_MAX) *vdb_buf_tmp = color;
+                    else if(px_opa > LV_OPA_MIN) {
 #if LV_COLOR_SCREEN_TRANSP == 0
-                    *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
+                        *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
 #else
-                    *vdb_buf_tmp =
-                        color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).alpha, color, px_opa);
+                        *vdb_buf_tmp =
+                                color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).alpha, color, px_opa);
 #endif
+                    }
                 }
             }
 

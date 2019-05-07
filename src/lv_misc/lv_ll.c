@@ -214,22 +214,39 @@ void lv_ll_clear(lv_ll_t * ll_p)
  * @param ll_ori_p pointer to the original (old) linked list
  * @param ll_new_p pointer to the new linked list
  * @param node pointer to a node
+ * @param head true: be the head in the new list
+ *             false be the head in the new list
  */
-void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node)
+void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head)
 {
     lv_ll_rem(ll_ori_p, node);
 
-    /*Set node as head*/
-    node_set_prev(ll_new_p, node, NULL);
-    node_set_next(ll_new_p, node, ll_new_p->head);
+    if(head) {
+        /*Set node as head*/
+        node_set_prev(ll_new_p, node, NULL);
+        node_set_next(ll_new_p, node, ll_new_p->head);
 
-    if(ll_new_p->head != NULL) { /*If there is old head then before it goes the new*/
-        node_set_prev(ll_new_p, ll_new_p->head, node);
-    }
+        if(ll_new_p->head != NULL) { /*If there is old head then before it goes the new*/
+            node_set_prev(ll_new_p, ll_new_p->head, node);
+        }
 
-    ll_new_p->head = node;       /*Set the new head in the dsc.*/
-    if(ll_new_p->tail == NULL) { /*If there is no tail (first node) set the tail too*/
-        ll_new_p->tail = node;
+        ll_new_p->head = node;       /*Set the new head in the dsc.*/
+        if(ll_new_p->tail == NULL) { /*If there is no tail (first node) set the tail too*/
+            ll_new_p->tail = node;
+        }
+    } else {
+        /*Set node as tail*/
+        node_set_prev(ll_new_p, node, ll_new_p->tail);
+        node_set_next(ll_new_p, node, NULL);
+
+        if(ll_new_p->tail != NULL) { /*If there is old tail then after it goes the new*/
+            node_set_next(ll_new_p, ll_new_p->tail, node);
+        }
+
+        ll_new_p->tail = node;       /*Set the new tail in the dsc.*/
+        if(ll_new_p->head == NULL) { /*If there is no head (first node) set the head too*/
+            ll_new_p->head = node;
+        }
     }
 }
 
