@@ -57,9 +57,7 @@ typedef struct _lv_task_t
     uint32_t last_run;
     void (*task_cb)(struct _lv_task_t *);
 
-#if LV_USE_USER_DATA_SINGLE
     void * user_data;
-#endif
 
 #if LV_USE_USER_DATA_MULTI
     void * task_user_data;

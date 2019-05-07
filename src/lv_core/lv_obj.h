@@ -566,6 +566,16 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
 lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
 
 /**
+ * Call an event function with an object, event, and data.
+ * @param event_cb an event callback function
+ * @param obj pointer to an object to associate with the event (can be `NULL` to simply call the `event_cb`)
+ * @param event an event
+ * @param data pointer to a custom data
+ * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
+ */
+lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t event, const void * data);
+
+/**
  * Get the `data` parameter of the current event
  * @return the `data` parameter
  */
@@ -920,7 +930,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj);
+lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj);
 
 /**
  * Set the object's user data. The data will be copied.

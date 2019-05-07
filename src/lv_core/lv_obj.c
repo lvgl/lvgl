@@ -57,6 +57,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
  **********************/
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
+static const void * event_act_data;
 
 /**********************
  *      MACROS
@@ -1283,6 +1284,23 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 {
     if(obj == NULL) return LV_RES_OK;
 
+    lv_res_t res;
+    res = lv_event_send_func(obj->event_cb, obj, event, data);
+    return res;
+}
+
+/**
+ * Call an event function with an object, event, and data.
+ * @param event_cb an event callback function. If `NULL` `LV_RES_OK` will return without any actions.
+ * @param obj pointer to an object to associate with the event (can be `NULL` to simply call the `event_cb`)
+ * @param event an event
+ * @param data pointer to a custom data
+ * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
+ */
+lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t event, const void * data)
+{
+    if(event_cb == NULL) return LV_RES_OK;
+
     lv_event_temp_data_t event_temp_data;
     event_temp_data.obj = obj;
     event_temp_data.deleted = false;
@@ -1297,18 +1315,26 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 
     event_temp_data_head = &event_temp_data;
 
-    if(obj->event_cb) obj->event_cb(obj, event);
+    event_act_data = data;
+
+    if(event_cb) event_cb(obj, event);
 
     /*Remove this element from the list*/
     event_temp_data_head = event_temp_data_head->prev;
 
     if(event_temp_data.deleted) {
+        event_act_data = NULL;
         return LV_RES_INV;
     }
 
-    if(obj->parent_event && obj->par) {
-        lv_res_t res = lv_event_send(obj->par, event, data);
-        if(res != LV_RES_OK) return LV_RES_INV;
+    if(obj) {
+        if(obj->parent_event && obj->par) {
+            lv_res_t res = lv_event_send(obj->par, event, data);
+            if(res != LV_RES_OK) {
+                event_act_data = NULL;
+                return LV_RES_INV;
+            }
+        }
     }
 
     return LV_RES_OK;
@@ -1320,7 +1346,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
  */
 const void * lv_event_get_data(void)
 {
-    return NULL; //event_act_data;
+    return event_act_data;
 }
 
 /**
@@ -1981,14 +2007,15 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
 }
 
 #if LV_USE_USER_DATA_SINGLE
+
 /**
  * Get a pointer to the object's user data
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj)
+lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
 {
-    return &obj->user_data;
+    return obj->user_data;
 }
 
 /**

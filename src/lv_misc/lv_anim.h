@@ -77,7 +77,7 @@ lv_anim_t a;
 a.var = obj;
 a.start = lv_obj_get_height(obj);
 a.end = new_height;
-a.exec_cb = (lv_anim_fp_t)lv_obj_set_height;
+a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_height;
 a.path_cb = lv_anim_path_linear;
 a.ready_cb = NULL;
 a.act_time = 0;

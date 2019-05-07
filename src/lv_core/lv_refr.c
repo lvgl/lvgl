@@ -69,7 +69,12 @@ void lv_refr_init(void)
  */
 void lv_refr_now(void)
 {
-    lv_disp_refr_task(NULL);
+    lv_disp_t * d;
+    d = lv_disp_get_next(NULL);
+    while(d) {
+        lv_disp_refr_task(d->refr_task);
+        d = lv_disp_get_next(NULL);
+    }
 }
 
 /**
