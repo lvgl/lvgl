@@ -464,6 +464,9 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
             i = lv_ll_get_prev(&(par->child_ll), i);
         }
 
+        /*Call the post draw design function of the parents of the to object*/
+        par->design_cb(par, mask_p, LV_DESIGN_DRAW_POST);
+
         /*The new border will be there last parents,
          *so the 'younger' brothers of parent will be refreshed*/
         border_p = par;
@@ -471,12 +474,6 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
         par = lv_obj_get_parent(par);
     }
 
-    /*Call the post draw design function of the parents of the to object*/
-    par = lv_obj_get_parent(top_p);
-    while(par != NULL) {
-        par->design_cb(par, mask_p, LV_DESIGN_DRAW_POST);
-        par = lv_obj_get_parent(par);
-    }
 }
 
 /**

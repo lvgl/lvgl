@@ -128,7 +128,9 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
     union_ok = lv_area_intersect(&res_a, cords_p, mask_p);
 
     /*If there are common part of the three area then draw to the vdb*/
-    if(union_ok == false) return;
+    if(union_ok == false) {
+        return;
+    }
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);

@@ -739,7 +739,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             lv_obj_t * i        = proc->types.pointer.act_obj;
             lv_obj_t * last_top = NULL;
             while(i != NULL) {
-                if(i->top != 0) last_top = i;
+                if(i->top) last_top = i;
                 i = lv_obj_get_parent(i);
             }
 
