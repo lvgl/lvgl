@@ -527,7 +527,7 @@ static void lv_mbox_close_ready_cb(lv_anim_t * a)
 
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event)
 {
-    if(event != LV_EVENT_CLICKED) return;
+    if(event != LV_EVENT_SELECTED) return;
 
     uint16_t btn_id = lv_mbox_get_active_btn(mbox);
     if(btn_id == LV_BTNM_BTN_NONE) return;

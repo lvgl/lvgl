@@ -1343,8 +1343,6 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
  */
 lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t event, const void * data)
 {
-    if(event_cb == NULL) return LV_RES_OK;
-
     lv_event_temp_data_t event_temp_data;
     event_temp_data.obj = obj;
     event_temp_data.deleted = false;

@@ -80,6 +80,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
                   lv_opa_t opa_scale)
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
+    if(lv_area_is_on(coords, mask) == false) return;
 
 #if LV_USE_SHADOW
     if(style->body.shadow.width != 0) {
