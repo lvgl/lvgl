@@ -1970,13 +1970,23 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
 #if LV_USE_USER_DATA_SINGLE
 
 /**
- * Get a pointer to the object's user data
+ * Get the object's user data
  * @param obj pointer to an object
- * @return pointer to the user data
+ * @return user data
  */
 lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
 {
     return obj->user_data;
+}
+
+/**
+ * Get a pointer to the object's user data
+ * @param obj pointer to an object
+ * @return pointer to the user data
+ */
+lv_obj_user_data_t *lv_obj_get_user_data_ptr(lv_obj_t * obj)
+{
+    return &obj->user_data;
 }
 
 /**
