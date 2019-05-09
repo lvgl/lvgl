@@ -215,7 +215,6 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         a.playback_pause = 0;
         a.repeat = 0;
         a.repeat_pause = 0;
-        a.user_data = NULL;
         lv_anim_create(&a);
 
         a.start = lv_obj_get_width(mbox);
@@ -239,7 +238,6 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         a.playback_pause = 0;
         a.repeat = 0;
         a.repeat_pause = 0;
-        a.user_data = NULL;
         lv_anim_create(&a);
     }
 #else

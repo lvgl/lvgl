@@ -48,6 +48,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
 static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x);
 #endif
+static void pwd_char_hider_anim_ready(lv_anim_t * a);
 static void pwd_char_hider(lv_obj_t * ta);
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
@@ -252,7 +253,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
         a.exec_cb             = (lv_anim_exec_cb_t)pwd_char_hider_anim;
         a.time           = LV_TA_PWD_SHOW_TIME;
         a.act_time       = 0;
-        a.ready_cb         = (lv_anim_ready_cb_t)pwd_char_hider;
+        a.ready_cb         = pwd_char_hider_anim_ready;
         a.start          = 0;
         a.end            = 1;
         a.repeat         = 0;
@@ -332,7 +333,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         a.exec_cb             = (lv_anim_exec_cb_t)pwd_char_hider_anim;
         a.time           = LV_TA_PWD_SHOW_TIME;
         a.act_time       = 0;
-        a.ready_cb         = (lv_anim_ready_cb_t)pwd_char_hider;
+        a.ready_cb       = pwd_char_hider_anim_ready;
         a.start          = 0;
         a.end            = 1;
         a.repeat         = 0;
@@ -469,10 +470,10 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         /*Auto hide characters*/
         lv_anim_t a;
         a.var            = ta;
-        a.exec_cb             = (lv_anim_exec_cb_t)pwd_char_hider_anim;
+        a.exec_cb        = (lv_anim_exec_cb_t)pwd_char_hider_anim;
         a.time           = LV_TA_PWD_SHOW_TIME;
         a.act_time       = 0;
-        a.ready_cb         = (lv_anim_ready_cb_t)pwd_char_hider;
+        a.ready_cb       = pwd_char_hider_anim_ready;
         a.start          = 0;
         a.end            = 1;
         a.repeat         = 0;
@@ -1417,6 +1418,17 @@ static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x)
 }
 
 #endif
+
+
+/**
+ * Call when an animation is ready to convert all characters to '*'
+ * @param a pointer to the animation
+ */
+static void pwd_char_hider_anim_ready(lv_anim_t * a)
+{
+    lv_obj_t * ta = a->var;
+    pwd_char_hider(ta);
+}
 
 /**
  * Hide all characters (convert them to '*')
