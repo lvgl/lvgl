@@ -572,6 +572,9 @@ void lv_obj_move_foreground(lv_obj_t * obj)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
 
+    /*Do nothing of already in the foreground*/
+    if(lv_ll_get_head(&parent->child_ll) == obj) return;
+
     lv_obj_invalidate(parent);
 
     lv_ll_chg_list(&parent->child_ll, &parent->child_ll, obj, true);
@@ -589,6 +592,9 @@ void lv_obj_move_foreground(lv_obj_t * obj)
 void lv_obj_move_background(lv_obj_t * obj)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    /*Do nothing of already in the background*/
+    if(lv_ll_get_tail(&parent->child_ll) == obj) return;
 
     lv_obj_invalidate(parent);
 
