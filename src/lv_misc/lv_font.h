@@ -101,14 +101,36 @@ typedef struct
     const lv_font_kern_t * kern_table;
 }lv_font_glyph_dsc_built_in_t;
 
+typedef struct {
+    /* First Unicode character for this range */
+    uint32_t range_start;
+
+    /* Number of Unicode characters related to this range.
+     * Last Unicode character = range_start + range_length - 1*/
+    uint16_t range_length;
+
+    /* First glyph ID (array index of `glyph_dsc`) for this range */
+    uint16_t glyph_id_start;
+
+    /* NULL: the range is mapped continuously from `glyph_id_start`
+     * Else map the Unicode characters from `glyph_id_start` (relative to `range_start`)*/
+    uint16_t * unicode_list;
+}lv_font_cmap_built_in_t;
 
 /*Describe store additional data for fonts */
 typedef struct {
     const uint8_t * glyph_bitmap;
     const lv_font_glyph_dsc_built_in_t * glyph_dsc;
-    const uint16_t * unicode_list;
-    uint16_t glyph_cnt;        /*Number of glyphs in the font. */
-    uint8_t bpp;               /*Bit per pixel: 1, 2, 4 or 8*/
+
+    /* Map the glyphs to Unicode characters.
+     * Array of `lv_font_cmap_built_in_t` variables*/
+    const lv_font_cmap_built_in_t * cmaps;
+
+    /*Number of cmap tables*/
+    uint8_t cmap_num;
+
+    /*Bit per pixel: 1, 2, 4 or 8*/
+    uint8_t bpp;
 }lv_font_dsc_built_in_t;
 
 /**********************
