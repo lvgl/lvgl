@@ -351,11 +351,11 @@ void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coor
 #  if LV_COLOR_16_SWAP == 0
             canvas_buf_color[j].green = (uint16_t) ((uint16_t) canvas_buf_color[j].green * copy_buf_color[j].green) >> 6;
 #  else
-            uint8_t green_canvas = (canvas_buf_color[j].ch.green_h << 3) + (canvas_buf_color[j].ch.green_l);
-            uint8_t green_buf = (copy_buf_color[j].ch.green_h << 3) + (copy_buf_color[j].ch.green_l);
+            uint8_t green_canvas = (canvas_buf_color[j].green_h << 3) + (canvas_buf_color[j].green_l);
+            uint8_t green_buf = (copy_buf_color[j].green_h << 3) + (copy_buf_color[j].green_l);
             uint8_t green_res = (uint16_t)((uint16_t)green_canvas * green_buf) >> 6;
-            canvas_buf_color[j].ch.green_h = (green_res >> 3) & 0x07;
-            canvas_buf_color[j].ch.green_l = green_res & 0x07;
+            canvas_buf_color[j].green_h = (green_res >> 3) & 0x07;
+            canvas_buf_color[j].green_l = green_res & 0x07;
 #  endif    /*LV_COLOR_16_SWAP*/
 
 #elif LV_COLOR_DEPTH == 8
