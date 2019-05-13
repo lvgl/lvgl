@@ -25,19 +25,22 @@ extern "C" {
  *      DEFINES
  *********************/
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
-/*For compatibility in signal function define the keys regardless to LV_GROUP*/
-#define LV_KEY_UP 17       /*0x11*/
-#define LV_KEY_DOWN 18     /*0x12*/
-#define LV_KEY_RIGHT 19    /*0x13*/
-#define LV_KEY_LEFT 20     /*0x14*/
-#define LV_KEY_ESC 27      /*0x1B*/
-#define LV_KEY_DEL 127     /*0x7F*/
-#define LV_KEY_BACKSPACE 8 /*0x08*/
-#define LV_KEY_ENTER 10    /*0x0A, '\n'*/
-#define LV_KEY_NEXT 9      /*0x09, '\t'*/
-#define LV_KEY_PREV 11     /*0x0B, '*/
-#define LV_KEY_HOME 2      /*0x02, STX*/
-#define LV_KEY_END 3       /*0x03, ETX*/
+/*For compatibility in signal function define the keys regardless to `LV_USE_GROUP`*/
+
+typedef enum {
+    LV_KEY_UP = 17,       /*0x11*/
+    LV_KEY_DOWN = 18,     /*0x12*/
+    LV_KEY_RIGHT = 19,    /*0x13*/
+    LV_KEY_LEFT = 20,     /*0x14*/
+    LV_KEY_ESC = 27,      /*0x1B*/
+    LV_KEY_DEL = 127,     /*0x7F*/
+    LV_KEY_BACKSPACE = 8, /*0x08*/
+    LV_KEY_ENTER = 10,    /*0x0A, '\n'*/
+    LV_KEY_NEXT = 9,      /*0x09, '\t'*/
+    LV_KEY_PREV=11,       /*0x0B, '*/
+    LV_KEY_HOME = 2,      /*0x02, STX*/
+    LV_KEY_END = 3,       /*0x03, ETX*/
+} lv_key_t;
 
 #if LV_USE_GROUP != 0
 /**********************
