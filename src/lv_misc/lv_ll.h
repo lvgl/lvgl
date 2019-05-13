@@ -125,6 +125,13 @@ void * lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act);
 void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act);
 
 /**
+ * Return the length of the linked list.
+ * @param ll_p pointer to linked list
+ * @return length of the linked list
+ */
+uint32_t lv_ll_get_len(const lv_ll_t *ll_p);
+
+/**
  * Move a nodw before an other node in the same linked list
  * @param ll_p pointer to a linked list
  * @param n_act pointer to node to move

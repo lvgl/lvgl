@@ -318,6 +318,22 @@ void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
     return prev;
 }
 
+/**
+ * Return the length of the linked list.
+ * @param ll_p pointer to linked list
+ * @return length of the linked list
+ */
+uint32_t lv_ll_get_len(const lv_ll_t *ll_p){
+    uint32_t len = 0;
+    void * node;
+
+    for(node=lv_ll_get_head(ll_p); node!=NULL; node=lv_ll_get_next(ll_p, node)) {
+        len++;
+    }
+
+    return len;
+}
+
 void lv_ll_swap(lv_ll_t * ll_p, void * n1_p, void * n2_p)
 {
     (void)(ll_p);
