@@ -16,6 +16,7 @@
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_fs.h"
+#include "../lv_misc/lv_img_decoder.h"
 #include "../lv_hal/lv_hal.h"
 #include <stdint.h>
 #include <string.h>
@@ -108,6 +109,8 @@ void lv_init(void)
 
     /*Init the input device handling*/
     lv_indev_init();
+
+    lv_img_decoder_init();
 
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");

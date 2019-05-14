@@ -41,14 +41,6 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
                  const lv_style_t * style, lv_opa_t opa_scale);
 
 /**
- * Initialize and `lv_img_dsc_t` variable with the image's info
- * @param src variable, filename or symbol
- * @param header store the result here
- * @return LV_RES_OK: succeeded; LV_RES_INV: failed
- */
-lv_res_t lv_img_dsc_get_info(const char * src, lv_img_header_t * header);
-
-/**
  * Get the type of an image source
  * @param src pointer to an image source:
  *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)

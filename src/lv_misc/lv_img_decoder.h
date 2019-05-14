@@ -21,15 +21,38 @@ extern "C" {
 
 #include <stdint.h>
 #include "lv_fs.h"
+#include "lv_types.h"
+#include "lv_area.h"
+#include "../lv_core/lv_style.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_IMG_DECODER_OPEN_FAIL ((void *)(-1));
+/*If image pixels contains alpha we need to know how much byte is a pixel*/
+#if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
+#define LV_IMG_PX_SIZE_ALPHA_BYTE 2
+#elif LV_COLOR_DEPTH == 16
+#define LV_IMG_PX_SIZE_ALPHA_BYTE 3
+#elif LV_COLOR_DEPTH == 32
+#define LV_IMG_PX_SIZE_ALPHA_BYTE 4
+#endif
+
+
+#define LV_IMG_DECODER_OPEN_FAIL ((void *)(-1))
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+enum {
+    LV_IMG_SRC_VARIABLE,
+    LV_IMG_SRC_FILE,
+    LV_IMG_SRC_SYMBOL,
+    LV_IMG_SRC_UNKNOWN,
+};
+
+typedef uint8_t lv_img_src_t;
+
 typedef struct
 {
 
@@ -126,7 +149,7 @@ typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder * decode
  */
 typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
 
-typedef struct _lv_img_decoder_dsc {
+typedef struct _lv_img_decoder {
     lv_img_decoder_info_f_t info_cb;
     lv_img_decoder_open_f_t open_cb;
     lv_img_decoder_read_line_f_t read_line_cb;
@@ -138,7 +161,7 @@ typedef struct _lv_img_decoder_dsc {
 }lv_img_decoder_t;
 
 
-typedef struct {
+typedef struct _lv_img_decoder_dsc {
     lv_img_decoder_t * decoder;
     const lv_style_t * style;
     const void * src;
@@ -154,6 +177,33 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize the image decoder module
+ * */
+void lv_img_decoder_init(void);
+
+lv_img_decoder_t * lv_img_decoder_create(void);
+
+void lv_img_decoder_delete(lv_img_decoder_t * decoder);
+
+void lv_img_decoder_set_info_cb(lv_img_decoder_t * decoder, lv_img_decoder_info_f_t info_cb);
+
+void lv_img_decoder_set_open_cb(lv_img_decoder_t * decoder, lv_img_decoder_open_f_t open_cb);
+
+void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_read_line_f_t read_line_cb);
+
+void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_close_f_t close_cb);
+void lv_img_decoder_set_user_data(lv_img_decoder_t * decoder, lv_img_decoder_t user_data);
+
+lv_img_decoder_user_data_t lv_img_decoder_get_user_data(lv_img_decoder_t * decoder);
+lv_img_decoder_user_data_t * lv_img_decoder_get_user_data_ptr(lv_img_decoder_t * decoder);
+
+lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header);
+const uint8_t * lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const lv_style_t * style);
+
+lv_res_t lv_img_decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+
+void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc);
 /**********************
  *      MACROS
  **********************/

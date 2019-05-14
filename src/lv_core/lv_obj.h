@@ -22,6 +22,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_style.h"
+#include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_ll.h"
@@ -63,13 +64,6 @@ typedef uint8_t lv_design_mode_t;
 
 typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p,
                                lv_design_mode_t mode);
-
-enum {
-    LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
-                       function or an operation was failed*/
-    LV_RES_OK,      /*The object is valid (no deleted) after the action*/
-};
-typedef uint8_t lv_res_t;
 
 enum {
     LV_EVENT_PRESSED,       /*The object has been pressed*/
