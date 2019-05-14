@@ -876,12 +876,8 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
         if(proc->reset_query != 0) return;
 
-            /*Handle click focus*/
+        /*Handle click focus*/
 #if LV_USE_GROUP
-        /*Edit mode is not used by POINTER devices. So leave edit mode if we are in it*/
-        lv_group_t * g = lv_obj_get_group(proc->types.pointer.act_obj);
-        if(lv_group_get_editing(g)) lv_group_set_editing(g, false);
-
         /*Check, if the parent is in a group focus on it.*/
         if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_CLICK_FOCUS) ==
            false) { /*Respect the click focus protection*/
