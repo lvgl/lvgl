@@ -878,8 +878,6 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
         /*Handle click focus*/
 #if LV_USE_GROUP
-        /* Edit mode is not used by POINTER devices.
-         * So leave edit mode if the focused object is still `act_obj`*/
         lv_group_t * g = lv_obj_get_group(proc->types.pointer.act_obj);
 
         /*Check, if the parent is in a group focus on it.*/
