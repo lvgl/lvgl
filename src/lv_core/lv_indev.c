@@ -881,8 +881,8 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         lv_group_t * g = lv_obj_get_group(proc->types.pointer.act_obj);
 
         /*Check, if the parent is in a group focus on it.*/
-        if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_CLICK_FOCUS) ==
-           false) { /*Respect the click focus protection*/
+        /*Respect the click focus protection*/
+        if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_CLICK_FOCUS) == false) {
             lv_obj_t * parent = proc->types.pointer.act_obj;
 
             while(g == NULL) {
