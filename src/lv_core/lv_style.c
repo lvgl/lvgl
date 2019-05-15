@@ -26,16 +26,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-#if LV_USE_ANIMATION
-typedef struct
-{
-    lv_style_t style_start; /*Save not only pointers because can be same as 'style_anim' then it
-                               will be modified too*/
-    lv_style_t style_end;
-    lv_style_t * style_anim;
-    lv_anim_ready_cb_t ready_cb;
-} lv_style_anim_dsc_t;
-#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -286,44 +276,38 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
 
 #if LV_USE_ANIMATION
 
-/**
- * Create an animation from a pre-configured 'lv_style_anim_t' variable
- * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
- * @return pointer to a descriptor. Really this variable will be animated. (Can be used in
- * `lv_anim_del(dsc, NULL)`)
- */
-void * lv_style_anim_create(lv_style_anim_t * anim)
+
+void lv_style_anim_init(lv_anim_t * a)
 {
-    lv_style_anim_dsc_t * dsc;
-    dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-    lv_mem_assert(dsc);
-    if(dsc == NULL) return NULL;
+    lv_anim_init(a);
+    a->start          = 0;
+    a->end            = STYLE_MIX_MAX;
+    a->exec_cb        = (lv_anim_exec_cb_t)style_animator;
+    a->path_cb        = lv_anim_path_linear;
+    a->ready_cb       = style_animation_common_end_cb;
 
-    dsc->style_anim = anim->style_anim;
-    memcpy(&dsc->style_start, anim->style_start, sizeof(lv_style_t));
-    memcpy(&dsc->style_end, anim->style_end, sizeof(lv_style_t));
-    memcpy(dsc->style_anim, anim->style_start, sizeof(lv_style_t));
-    dsc->ready_cb = anim->ready_cb;
+   lv_style_anim_dsc_t * dsc;
+   dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
+   lv_mem_assert(dsc);
+   if(dsc == NULL) return;
+   dsc->ready_cb = NULL;
+   dsc->style_anim = NULL;
+   lv_style_copy(&dsc->style_start, &lv_style_plain);
+   lv_style_copy(&dsc->style_end, &lv_style_plain);
 
-    lv_anim_t a;
-    a.var            = (void *)dsc;
-    a.start          = 0;
-    a.end            = STYLE_MIX_MAX;
-    a.exec_cb        = (lv_anim_exec_cb_t)style_animator;
-    a.path_cb        = lv_anim_path_linear;
-    a.ready_cb       = style_animation_common_end_cb;
-    a.act_time       = anim->act_time;
-    a.time           = anim->time;
-    a.playback       = anim->playback;
-    a.playback_pause = anim->playback_pause;
-    a.repeat         = anim->repeat;
-    a.repeat_pause   = anim->repeat_pause;
-    a.user_data      = anim->user_data;
-    lv_anim_create(&a);
+   a->var            = (void *)dsc;
 
-    return dsc;
 }
 
+void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_style_t * start, const lv_style_t * end)
+{
+
+    lv_style_anim_dsc_t * dsc = a->var;
+    dsc->style_anim = to_anim;
+    memcpy(&dsc->style_start, start, sizeof(lv_style_t));
+    memcpy(&dsc->style_end, end, sizeof(lv_style_t));
+    memcpy(dsc->style_anim, start, sizeof(lv_style_t));
+}
 #endif
 /**********************
  *   STATIC FUNCTIONS

@@ -112,104 +112,12 @@ typedef struct
 #if LV_USE_ANIMATION
 typedef struct
 {
-    const lv_style_t * style_start; /*Pointer to the starting style*/
-    const lv_style_t * style_end;   /*Pointer to the destination style*/
-    lv_style_t * style_anim;        /*Pointer to a style to animate*/
-    lv_anim_ready_cb_t ready_cb;            /*Call it when the animation is ready (NULL if unused)*/
-    int16_t time;                   /*Animation time in ms*/
-    int16_t act_time;               /*Current time in animation. Set to negative to make delay.*/
-    uint16_t playback_pause;        /*Wait before play back*/
-    uint16_t repeat_pause;          /*Wait before repeat*/
-#if LV_USE_USER_DATA_SINGLE
-    lv_anim_user_data_t user_data;  /*Custom user data*/
-#endif
-
-#if LV_USE_USER_DATA_MULTI
-    lv_anim_user_data_t ready_user_data;
-#endif
-
-    uint8_t playback : 1;           /*When the animation is ready play it back*/
-    uint8_t repeat : 1;             /*Repeat the animation infinitely*/
-} lv_style_anim_t;
-
-/* Example initialization
-lv_style_anim_t a;
-a.style_anim = &style_to_anim;
-a.style_start = &style_1;
-a.style_end = &style_2;
-a.act_time = 0;
-a.time = 1000;
-a.playback = 0;
-a.playback_pause = 0;
-a.repeat = 0;
-a.repeat_pause = 0;
-a.ready_cb = NULL;
-a.user_data = NULL;
-lv_style_anim_create(&a);
- */
-
-
-static inline void lv_style_anim_init(lv_style_anim_t * a)
-{
-    memset(a, 0, sizeof(lv_style_anim_t));
-}
-
-static inline void lv_style_anim_set_styles(lv_style_anim_t * a, lv_style_t * to_anim, const lv_style_t * start, const lv_style_t * end)
-{
-    a->style_anim = to_anim;
-    a->style_start = start;
-    a->style_end = end;
-}
-
-static inline void lv_style_anim_set_time(lv_style_anim_t * a, uint16_t duration, uint16_t delay)
-{
-    a->time = duration;
-    a->act_time = -delay;
-}
-
-static inline void lv_style_anim_set_ready_cb(lv_style_anim_t * a, lv_anim_ready_cb_t ready_cb)
-{
-    a->ready_cb = ready_cb;
-}
-
-static inline void lv_style_anim_set_playback(lv_style_anim_t * a, uint16_t wait_time)
-{
-    a->playback = 1;
-    a->playback_pause = wait_time;
-}
-
-static inline void lv_style_anim_clear_playback(lv_style_anim_t * a)
-{
-    a->playback = 0;
-}
-
-static inline void lv_style_anim_set_repeat(lv_style_anim_t * a, uint16_t wait_time)
-{
-    a->repeat = 1;
-    a->repeat_pause = wait_time;
-}
-
-static inline void lv_style_anim_clear_repeat(lv_style_anim_t * a)
-{
-    a->repeat = 0;
-}
-
-static inline void lv_style_anim_set_user_data(lv_style_anim_t * a, lv_anim_user_data_t user_data)
-{
-    memcpy(&a->user_data, &user_data, sizeof(user_data));
-}
-
-static inline lv_anim_user_data_t lv_style_anim_get_user_data(lv_style_anim_t * a)
-{
-    return a->user_data;
-}
-
-static inline lv_anim_user_data_t * lv_style_anim_get_user_data_ptr(lv_style_anim_t * a)
-{
-    return &a->user_data;
-}
-
-
+    lv_style_t style_start; /*Save not only pointers because can be same as 'style_anim' then it
+                               will be modified too*/
+    lv_style_t style_end;
+    lv_style_t * style_anim;
+    lv_anim_ready_cb_t ready_cb;
+} lv_style_anim_dsc_t;
 #endif
 
 /**********************
@@ -241,12 +149,124 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
 #if LV_USE_ANIMATION
 
 /**
- * Create an animation from a pre-configured 'lv_style_anim_t' variable
- * @param anim pointer to a pre-configured 'lv_style_anim_t' variable (will be copied)
- * @return pointer to a descriptor. Really this variable will be animated. (Can be used in
- * `lv_anim_del(dsc, NULL)`)
+ * Initialize an animation variable.
+ * E.g.:
+ * lv_anim_t a;
+ * lv_style_anim__init(&a);
+ * lv_style_anim_set_...(&a);
+ * lv_style_anim_create(&a);
+ * @param a pointer to an `lv_anim_t` variable to initialize
  */
-void * lv_style_anim_create(lv_style_anim_t * anim);
+void lv_style_anim_init(lv_anim_t * a);
+
+/**
+ *
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param to_anim pointer to the style to animate
+ * @param start pointer to a style to animate from (start value)
+ * @param end pointer to a style to animate to (end value)
+ */
+void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_style_t * start, const lv_style_t * end);
+
+/**
+ * Set the duration and delay of an animation
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param duration duration of the animation in milliseconds
+ * @param delay delay before the animation in milliseconds
+ */
+static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, uint16_t delay)
+{
+    lv_anim_set_time(a, duration, delay);
+}
+
+/**
+ * Set a function call when the animation is ready
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param ready_cb a function call when the animation is ready
+ */
+static inline void lv_style_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_cb)
+{
+    lv_style_anim_dsc_t * dsc = a->var;
+    dsc->ready_cb = ready_cb;
+}
+
+/**
+ * Make the animation to play back to when the forward direction is ready
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param wait_time time in milliseconds to wait before starting the back direction
+ */
+static inline void lv_style_anim_set_playback(lv_anim_t * a, uint16_t wait_time)
+{
+    lv_anim_set_playback(a, wait_time);
+}
+
+/**
+ * Disable playback. (Disabled after `lv_anim_init()`)
+ * @param a pointer to an initialized `lv_anim_t` variable
+ */
+static inline void lv_style_anim_clear_playback(lv_anim_t * a)
+{
+    lv_anim_clear_playback(a);
+}
+
+/**
+ * Make the animation to start again when ready.
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param wait_time time in milliseconds to wait before starting the animation again
+ */
+static inline void lv_style_anim_set_repeat(lv_anim_t * a, uint16_t wait_time)
+{
+    lv_anim_set_repeat(a, wait_time);
+}
+
+/**
+ * Disable repeat. (Disabled after `lv_anim_init()`)
+ * @param a pointer to an initialized `lv_anim_t` variable
+ */
+static inline void lv_style_anim_clear_repeat(lv_anim_t * a)
+{
+    lv_anim_clear_repeat(a);
+}
+
+/**
+ * Set a user specific data for the animation
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param user_data the user data
+ */
+static inline void lv_style_anim_set_user_data(lv_anim_t * a, lv_anim_user_data_t user_data)
+{
+    lv_anim_set_user_data(a, user_data);
+}
+
+/**
+ * Get the user data
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @return the user data
+ */
+static inline lv_anim_user_data_t lv_style_anim_get_user_data(lv_anim_t * a)
+{
+    return lv_anim_get_user_data(a);
+}
+
+/**
+ * Get pointer to the user data
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @return pointer to the user data
+ */
+static inline lv_anim_user_data_t * lv_style_anim_get_user_data_ptr(lv_anim_t * a)
+{
+    return lv_style_anim_get_user_data_ptr(a);
+}
+
+/**
+ * Create an animation
+ * @param a an initialized 'anim_t' variable. Not required after call.
+ */
+static inline void lv_style_anim_create(lv_anim_t * a)
+{
+    return lv_anim_create(a);
+}
+
 #endif
 
 /*************************
